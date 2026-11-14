@@ -11,7 +11,7 @@ export type BuildFailureCode =
 	| "CONTENT_SECURITY_POLICY_PRESENT"
 	| "EXTERNAL_ASSET"
 	| "PAGE_DOCS_LINK_MISSING"
-	| "PAGE_CLI_LINK_MISSING"
+	| "PAGE_SKILLS_LINK_MISSING"
 	| "HEADER_MISSING"
 	| "HERO_MISSING"
 	| "FOOTER_MISSING"
@@ -32,7 +32,6 @@ export type BuildFailureCode =
 	| "HREFLANG_MISSING"
 	| "HREFLANG_DUPLICATE"
 	| "HREFLANG_TARGET"
-	| "OWNER_WRITTEN_MISSING"
 	| "OWNER_PLACEHOLDER_IN_PRODUCTION"
 	| "SCRIPT_DETECTS_LANGUAGE"
 	| "SWITCHER_MISSING"
@@ -68,7 +67,6 @@ export type BuildFailureCode =
 	| "HEADLINE_NOT_RENDERED"
 	| "SUBLINE_NOT_RENDERED"
 	| "DISCLAIMER_NOT_RENDERED"
-	| "TAX_SENTENCE_NOT_RENDERED"
 
 /** One failed build check: the rule's code, the file it concerns and a line a maintainer can act on. */
 export interface BuildFailure {

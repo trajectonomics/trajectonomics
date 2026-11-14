@@ -4,7 +4,10 @@ export interface Dictionary {
 	readonly languageName: string
 	/** The short label of the current Language, while the other Language keeps its own name. */
 	readonly languageSwitchLabel: string
+	/** The hero headline with no script, and the line the cycle ends on and holds. */
 	readonly heroHeading: string
+	/** The headlines a script may show before it holds `heroHeading`, in order. */
+	readonly heroHeadingCycle: readonly string[]
 	readonly heroSubline: string
 	readonly docsLink: string
 	readonly githubLink: string
@@ -15,7 +18,6 @@ export interface Dictionary {
 	readonly licence: string
 	readonly org: string
 	readonly footerDisclaimer: string
-	readonly taxSentence: string
 	readonly notFoundHeading: string
 	readonly notFoundBody: string
 }

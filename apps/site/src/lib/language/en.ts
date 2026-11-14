@@ -1,5 +1,3 @@
-import type { Dictionary } from "./dictionary"
-import { OWNER_WRITTEN_PLACEHOLDER } from "./dictionary"
 import type { LanguageEntry } from "./language"
 
 /** English: the Language of `/en/`, and the fallback when nothing else chooses. */
@@ -10,9 +8,13 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 	dictionary: Object.freeze({
 		languageName: "English",
 		languageSwitchLabel: "EN",
-		heroHeading: "A money tool your AI agent operates.",
+		heroHeading: "The only tool your agent needs for your future.",
+		heroHeadingCycle: Object.freeze([
+			"The only tool your agent needs for retirement planning",
+			"The only tool your agent needs for financial projection",
+		] as const),
 		heroSubline:
-			"Tell your agent what you earn, spend and owe. traj keeps the books and returns exact, repeatable numbers. Free and open source. Thailand first.",
+			"Tell your agent about your financial situation and your goal. It uses traj under the hood to run the accounts, the financial projection, and a comparison of life scenarios, then interprets the result for you. You get tested math, in the format you like.",
 		docsLink: "Docs",
 		githubLink: "GitHub",
 		starOnGitHub: "Star on GitHub",
@@ -21,13 +23,10 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		copyFailed: "Select the command and copy it.",
 		licence: "MIT",
 		org: "trajectonomics",
-		footerDisclaimer: OWNER_WRITTEN_PLACEHOLDER,
-		taxSentence: OWNER_WRITTEN_PLACEHOLDER,
+		footerDisclaimer:
+			"traj is in alpha, so a bug is possible. Tax is not applied yet. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/skills and we will update it as soon as we can.",
 		notFoundHeading: "Page not found",
 		notFoundBody: "This link may have moved, or it may be mistyped.",
 	}),
-	ownerWritten: Object.freeze([
-		"footerDisclaimer",
-		"taxSentence",
-	] as const satisfies readonly (keyof Dictionary)[]),
+	ownerWritten: Object.freeze([] as const),
 })

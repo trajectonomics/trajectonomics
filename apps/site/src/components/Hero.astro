@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import { GITHUB_CLI_URL } from "../lib/site"
+import { GITHUB_SKILLS_URL } from "../lib/site"
 import CopyCommand from "./CopyCommand.astro"
 
 interface Props {
@@ -12,15 +12,18 @@ interface Props {
 
 const { dictionary } = Astro.props
 const subline = sublineParts(dictionary.heroSubline)
+/** The headline the page holds when nothing runs, and the phrases a script shows before it. */
+const headlines = Object.freeze([...dictionary.heroHeadingCycle, dictionary.heroHeading])
 ---
 
 <div
 	class="mx-auto flex max-w-3xl flex-col items-center px-5 pt-20 pb-20 text-center sm:px-6 sm:pt-24 sm:pb-28"
 >
 	<h1
+		data-hero-headline
 		class="max-w-3xl text-4xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl"
 	>
-		{dictionary.heroHeading}
+		{headlines.map((headline) => <span>{headline}</span>)}
 	</h1>
 	<p class="mt-6 max-w-2xl text-lg text-pretty text-muted-foreground sm:mt-8 sm:text-xl">
 		{
@@ -39,7 +42,47 @@ const subline = sublineParts(dictionary.heroSubline)
 		<CopyCommand dictionary={dictionary} />
 		<a
 			class="mt-5 inline-flex text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-			href={GITHUB_CLI_URL}>{dictionary.starOnGitHub}</a
+			href={GITHUB_SKILLS_URL}>{dictionary.starOnGitHub}</a
 		>
 	</div>
 </div>
+
+<script is:inline>
+	;(() => {
+		const headline = document.querySelector("[data-hero-headline]")
+		if (!(headline instanceof HTMLElement)) return
+		// The cycle is decoration: a visitor who asks for less motion keeps the line the page ships.
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+		const lines = [...headline.children]
+		/** Show one phrase, then the next 2.4 s later; the last one stays. */
+		const show = (step) => {
+			const line = lines[step]
+			if (!(line instanceof HTMLElement)) return
+			for (const other of lines) if (other !== line) other.removeAttribute("data-hero-shown")
+			line.setAttribute("data-hero-shown", "")
+			headline.setAttribute("data-hero-stepping", "")
+			if (step + 1 < lines.length) setTimeout(() => show(step + 1), 2400)
+		}
+		show(0)
+	})()
+</script>
+
+<style>
+	/*
+		The phrases share one grid cell, so the hero is as tall as its longest phrase and the page
+		never shifts; only the shown one is visible, and with no script that is the shipped line.
+	*/
+	[data-hero-headline] {
+		display: grid;
+	}
+
+	[data-hero-headline] > span {
+		grid-area: 1 / 1;
+		visibility: hidden;
+	}
+
+	[data-hero-headline]:not([data-hero-stepping]) > span:last-child,
+	[data-hero-headline] > span[data-hero-shown] {
+		visibility: visible;
+	}
+</style>

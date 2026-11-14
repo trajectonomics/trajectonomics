@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { dictionaryFor } from "../language/languages"
-import { CLI_LICENCE_URL, GITHUB_CLI_URL, GITHUB_ORG_URL } from "../site"
+import { GITHUB_ORG_URL, GITHUB_SKILLS_URL, SKILLS_LICENCE_URL } from "../site"
 import { checkSiteLinks } from "./site-links"
 import { heroCodes, heroHome } from "./testing/hero"
 
@@ -11,18 +11,21 @@ describe("the links of the three regions", () => {
 		expect(heroCodes(checkSiteLinks)).toEqual([])
 	})
 
-	it("fails a star link that goes to the organisation instead of the cli repository", () => {
+	it("fails a star link that goes to the organisation instead of the skills repository", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(
-			`<a href="${GITHUB_CLI_URL}">${DICTIONARY.starOnGitHub}</a>`,
+			`<a href="${GITHUB_SKILLS_URL}">${DICTIONARY.starOnGitHub}</a>`,
 			`<a href="${GITHUB_ORG_URL}">${DICTIONARY.starOnGitHub}</a>`,
 		)
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
 
-	it("fails a licence link that does not open the cli repository's LICENSE", () => {
+	it("fails a licence link that does not open the skills repository's LICENSE", () => {
 		const page = heroHome("en")
-		const content = page.content.replace(`href="${CLI_LICENCE_URL}"`, `href="${GITHUB_CLI_URL}"`)
+		const content = page.content.replace(
+			`href="${SKILLS_LICENCE_URL}"`,
+			`href="${GITHUB_SKILLS_URL}"`,
+		)
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
 

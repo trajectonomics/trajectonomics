@@ -1,12 +1,12 @@
 import type { Language } from "../../language/language"
 import { LANGUAGES, languageEntry, localeUrl } from "../../language/languages"
 import {
-	CLI_LICENCE_URL,
 	DOCS_PATH,
-	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
+	GITHUB_SKILLS_URL,
 	INSTALL_COMMAND,
 	SITE_NAME,
+	SKILLS_LICENCE_URL,
 } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
@@ -14,18 +14,29 @@ import { switcher } from "./homes"
 
 /** The parts of a home a test replaces to break one rule at a time. */
 export interface HeroParts {
+	/** The whole inner markup of the hero's `<h1>`, so a test can drop a phrase the headline cycles. */
 	readonly headline?: string
 	readonly subline?: string
 	readonly disclaimer?: string
-	readonly tax?: string
 	readonly command?: string
 	readonly button?: string
 	readonly extra?: string
 }
 
+/** Every phrase the hero's `<h1>` carries, the one it holds last. */
+function headlines(language: Language): readonly string[] {
+	const dictionary = languageEntry(language).dictionary
+	return [...dictionary.heroHeadingCycle, dictionary.heroHeading]
+}
+
 /** One Language's home as the build must produce it, with the three regions and the copy command. */
 export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 	const dictionary = languageEntry(language).dictionary
+	const headline =
+		parts.headline ??
+		headlines(language)
+			.map((phrase) => `<span>${phrase}</span>`)
+			.join("")
 	const command = parts.command ?? `<code data-install-command>${INSTALL_COMMAND}</code>`
 	const button =
 		parts.button ??
@@ -35,20 +46,20 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		"<body>",
 		`<header><nav><a href="${localeUrl(language)}" aria-label="${SITE_NAME}"><svg></svg></a>`,
 		`<a href="${DOCS_PATH}">${dictionary.docsLink}</a>`,
-		`<a href="${GITHUB_CLI_URL}">${dictionary.githubLink}</a>`,
+		`<a href="${GITHUB_SKILLS_URL}">${dictionary.githubLink}</a>`,
 		switcher(language),
 		"</nav></header>",
 		"<main>",
-		`<h1>${parts.headline ?? dictionary.heroHeading}</h1>`,
+		`<h1>${headline}</h1>`,
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
 		`<div>${command}${button}</div>`,
 		'<p role="status"></p>',
-		`<a href="${GITHUB_CLI_URL}">${dictionary.starOnGitHub}</a>`,
+		`<a href="${GITHUB_SKILLS_URL}">${dictionary.starOnGitHub}</a>`,
 		"</main>",
 		"<footer><ul>",
-		`<li><a href="${CLI_LICENCE_URL}">${dictionary.licence}</a></li>`,
+		`<li><a href="${SKILLS_LICENCE_URL}">${dictionary.licence}</a></li>`,
 		`<li><a href="${GITHUB_ORG_URL}">${dictionary.org}</a></li>`,
-		`</ul><p>${parts.disclaimer ?? dictionary.footerDisclaimer}</p><p>${parts.tax ?? dictionary.taxSentence}</p></footer>`,
+		`</ul><p>${parts.disclaimer ?? dictionary.footerDisclaimer}</p></footer>`,
 		parts.extra ?? "",
 		"</body></html>",
 	].join("\n")

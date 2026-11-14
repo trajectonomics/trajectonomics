@@ -1,7 +1,7 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the props it renders.
 import type { Dictionary } from "../lib/language/dictionary"
-import { CLI_LICENCE_URL, GITHUB_ORG_URL } from "../lib/site"
+import { GITHUB_ORG_URL, SKILLS_LICENCE_URL } from "../lib/site"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -19,7 +19,7 @@ const { dictionary } = Astro.props
 			<li>
 				<a
 					class="transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-					href={CLI_LICENCE_URL}>{dictionary.licence}</a
+					href={SKILLS_LICENCE_URL}>{dictionary.licence}</a
 				>
 			</li>
 			<li>
@@ -29,9 +29,6 @@ const { dictionary } = Astro.props
 				>
 			</li>
 		</ul>
-		<div class="max-w-xl space-y-1">
-			<p>{dictionary.footerDisclaimer}</p>
-			<p>{dictionary.taxSentence}</p>
-		</div>
+		<p class="max-w-xl">{dictionary.footerDisclaimer}</p>
 	</div>
 </footer>

@@ -10,7 +10,7 @@ function nextAfter(page: ScannedPage, from: HtmlElement, tag: string): HtmlEleme
 	return page.elements.slice(page.elements.indexOf(from) + 1).find((element) => element.tag === tag)
 }
 
-/** The footer carries the owner's disclaimer and tax sentence, in that order. */
+/** The footer carries the owner's disclaimer, the one paragraph that also carries the tax wording. */
 function footerFailures(
 	file: BuiltFile,
 	page: ScannedPage,
@@ -18,31 +18,19 @@ function footerFailures(
 ): readonly BuildFailure[] {
 	const footer = elementsByTag(page, "footer")[0]
 	const disclaimer = footer === undefined ? undefined : nextAfter(page, footer, "p")
-	const tax = disclaimer === undefined ? undefined : nextAfter(page, disclaimer, "p")
-	const failures: BuildFailure[] = []
-	if (disclaimer === undefined || textOf(page, disclaimer) !== dictionary.footerDisclaimer) {
-		failures.push(
-			buildFailure(
-				"DISCLAIMER_NOT_RENDERED",
-				file.path,
-				`the footer's first paragraph does not show "${dictionary.footerDisclaimer}".`,
-			),
-		)
-	}
-	if (tax === undefined || textOf(page, tax) !== dictionary.taxSentence) {
-		failures.push(
-			buildFailure(
-				"TAX_SENTENCE_NOT_RENDERED",
-				file.path,
-				`the footer's second paragraph does not show "${dictionary.taxSentence}".`,
-			),
-		)
-	}
-	return failures
+	if (disclaimer !== undefined && textOf(page, disclaimer) === dictionary.footerDisclaimer)
+		return []
+	return [
+		buildFailure(
+			"DISCLAIMER_NOT_RENDERED",
+			file.path,
+			`the footer's first paragraph does not show "${dictionary.footerDisclaimer}".`,
+		),
+	]
 }
 
-/** The hero's headline and sub-line, and the footer's owner text, are the Dictionary's. */
-function textFailures(
+/** The hero's headline, the phrases it cycles, and its sub-line, as the Dictionary writes them. */
+function heroFailures(
 	file: BuiltFile,
 	page: ScannedPage,
 	dictionary: Dictionary,
@@ -51,12 +39,16 @@ function textFailures(
 	const hero = elementsByTag(page, "h1").find((heading) =>
 		heading.ancestors.some((ancestor) => ancestor.tag === "main"),
 	)
-	if (hero === undefined || textOf(page, hero) !== dictionary.heroHeading) {
+	const text = hero === undefined ? "" : textOf(page, hero)
+	const missing = [dictionary.heroHeading, ...dictionary.heroHeadingCycle].find(
+		(headline) => !text.includes(headline),
+	)
+	if (missing !== undefined) {
 		failures.push(
 			buildFailure(
 				"HEADLINE_NOT_RENDERED",
 				file.path,
-				`the hero's <h1> does not show "${dictionary.heroHeading}".`,
+				`the hero's <h1> does not show "${missing}".`,
 			),
 		)
 	}
@@ -70,12 +62,16 @@ function textFailures(
 			),
 		)
 	}
-	return [...failures, ...footerFailures(file, page, dictionary)]
+	return failures
 }
 
 /** Every Language home renders its headline, its sub-line and its footer's owner text. */
 export function checkPageText(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) =>
-		textFailures(file, scanHtml(file.content), entry.dictionary),
-	)
+	return builtHomes(files).flatMap(({ entry, file }) => {
+		const page = scanHtml(file.content)
+		return [
+			...heroFailures(file, page, entry.dictionary),
+			...footerFailures(file, page, entry.dictionary),
+		]
+	})
 }

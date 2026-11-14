@@ -10,7 +10,7 @@ import { checkLanguageHomes } from "./language-home"
 import { type BuildMode, DEFAULT_BUILD_MODE } from "./mode"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { checkNotFoundPages } from "./not-found-pages"
-import { checkOwnerPlaceholder, checkOwnerWritten } from "./owner-written"
+import { checkOwnerPlaceholder } from "./owner-written"
 import { checkPageLinks } from "./page-links"
 import { checkPageText } from "./page-text"
 import { checkPageWeight } from "./page-weight"
@@ -45,7 +45,6 @@ export function checkBuild(
 		...checkLanguageHomes(files),
 		...checkHreflang(files),
 		...checkSwitcher(files),
-		...checkOwnerWritten(files, mode),
 		...checkOwnerPlaceholder(files, mode),
 		...checkNoLanguageDetection(files),
 		...checkNotFoundPages(files),

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { dictionaryFor } from "../src/lib/language/languages"
 import { COPY_TEXT, focusableCount, PAGES } from "./pages"
 
 /** The homes, which carry the Copy button and the install command. */
@@ -22,6 +23,15 @@ for (const underTest of HOMES) {
 		}
 		await page.locator("[data-install-command]").selectText()
 		expect(await page.evaluate(() => document.getSelection()?.toString() ?? "")).toBe(COPY_TEXT)
+	})
+
+	test(`${underTest.name}: the hero shows the headline the page ships, not a phrase a script would cycle`, async ({
+		page,
+	}) => {
+		await page.goto(underTest.path)
+		await expect(page.locator("[data-hero-headline] > span:visible")).toHaveText(
+			dictionaryFor(underTest.language).heroHeading,
+		)
 	})
 
 	test(`${underTest.name}: the Theme the HTML ships is styled without JavaScript`, async ({

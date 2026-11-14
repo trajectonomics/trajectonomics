@@ -5,7 +5,7 @@ import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw
 import { currentLanguageName, type Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
 import { localeUrl, otherLanguages } from "../lib/language/languages"
-import { DOCS_PATH, GITHUB_CLI_URL, SITE_NAME } from "../lib/site"
+import { DOCS_PATH, GITHUB_SKILLS_URL, SITE_NAME } from "../lib/site"
 
 interface Props {
 	readonly language: Language
@@ -35,7 +35,7 @@ const artwork = wordmark.replace("<svg ", '<svg aria-hidden="true" focusable="fa
 			>
 			<a
 				class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-				href={GITHUB_CLI_URL}>{dictionary.githubLink}</a
+				href={GITHUB_SKILLS_URL}>{dictionary.githubLink}</a
 			>
 			<span class="hidden h-4 w-px bg-border sm:block" aria-hidden="true"></span>
 			<div class="flex items-center gap-3">

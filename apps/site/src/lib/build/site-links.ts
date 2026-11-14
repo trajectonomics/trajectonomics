@@ -1,7 +1,7 @@
 import type { Dictionary } from "../language/dictionary"
 import type { Language } from "../language/language"
 import { localeUrl } from "../language/languages"
-import { CLI_LICENCE_URL, GITHUB_CLI_URL, GITHUB_ORG_URL, SITE_NAME } from "../site"
+import { GITHUB_ORG_URL, GITHUB_SKILLS_URL, SITE_NAME, SKILLS_LICENCE_URL } from "../site"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
@@ -13,11 +13,11 @@ interface ExpectedLink {
 	readonly href: string
 }
 
-/** The named links the hero and footer show; the Docs and cli links are pinned by `checkPageLinks`. */
+/** The named links the hero and footer show; the Docs and GitHub links are pinned by `checkPageLinks`. */
 function expectedLinks(dictionary: Dictionary): readonly ExpectedLink[] {
 	return [
-		{ text: dictionary.starOnGitHub, href: GITHUB_CLI_URL },
-		{ text: dictionary.licence, href: CLI_LICENCE_URL },
+		{ text: dictionary.starOnGitHub, href: GITHUB_SKILLS_URL },
+		{ text: dictionary.licence, href: SKILLS_LICENCE_URL },
 		{ text: dictionary.org, href: GITHUB_ORG_URL },
 	]
 }

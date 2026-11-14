@@ -1,11 +1,11 @@
 import { describe, expect, it } from "bun:test"
 import { dictionaryFor } from "../language/languages"
-import { DOCS_PATH, GITHUB_CLI_URL } from "../site"
+import { DOCS_PATH, GITHUB_SKILLS_URL } from "../site"
 import { checkPageLinks } from "./page-links"
 import { heroCodes, heroHome } from "./testing/hero"
 
 describe("the links every Language document must have", () => {
-	it("passes every home that links the Docs Portal and the cli repository", () => {
+	it("passes every home that links the Docs Portal and the skills repository", () => {
 		expect(heroCodes(checkPageLinks)).toEqual([])
 	})
 
@@ -17,14 +17,14 @@ describe("the links every Language document must have", () => {
 		])
 	})
 
-	it("fails a home with no link to the cli repository", () => {
+	it("fails a home with no link to the skills repository", () => {
 		const page = heroHome("en")
 		const content = page.content.replaceAll(
-			`href="${GITHUB_CLI_URL}"`,
-			'href="https://example.com/cli"',
+			`href="${GITHUB_SKILLS_URL}"`,
+			'href="https://example.com/skills"',
 		)
 		expect(heroCodes(checkPageLinks, { path: page.path, content })).toEqual([
-			"PAGE_CLI_LINK_MISSING",
+			"PAGE_SKILLS_LINK_MISSING",
 		])
 	})
 
