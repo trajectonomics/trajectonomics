@@ -3,9 +3,10 @@ name: Browser checks
 # axe, the keyboard, the Language checks and the Lighthouse budget need a browser, so they run here
 # and not in the shared check. The three callers in ci.yml, pr-title.yml and drift.yml stay one job
 # with no steps, and trajectonomics/cicd stays unchanged (ADR 0004, site#6).
+#
+# Pull requests only: the checks gate the PR, and the run after the merge to main (the CD) would
+# only repeat what the PR already proved.
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 

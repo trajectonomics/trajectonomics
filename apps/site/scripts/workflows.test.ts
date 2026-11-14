@@ -62,10 +62,10 @@ describe("browser.yml, the workflow that needs a browser", () => {
 		expect(job["timeout-minutes"]).toBe(15)
 	})
 
-	it("runs on every pull request to main and on main", () => {
+	it("runs on every pull request to main, and not on the push to main after the merge", () => {
 		const workflow = load("browser.yml")
 		expect(workflow.on).toHaveProperty("pull_request")
-		expect(workflow.on).toHaveProperty("push")
+		expect(workflow.on).not.toHaveProperty("push")
 		expect(workflow.permissions).toEqual({ contents: "read" })
 	})
 
