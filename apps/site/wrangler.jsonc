@@ -1,0 +1,14 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "site",
+	"compatibility_date": "2026-11-01",
+	"workers_dev": true,
+	// No "main": the Worker has no script in this change (ADR 0002, ADR 0003).
+	// No "routes": the router attaches the public route, not this repository.
+	// No "env": there is no staging Worker yet, so deployment is a later change.
+	"assets": {
+		"directory": "./dist",
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	}
+}

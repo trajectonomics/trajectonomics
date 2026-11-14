@@ -1,15 +1,15 @@
 # AGENTS.md
 
-Instructions for AI coding agents working in `trajectonomics` repositories instantiated from this template.
+Instructions for AI coding agents working in the `trajectonomics/site` repository, the Site at the root of trajectonomics.com.
 
 ## Rules
 
 1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR.
-2. Never commit secrets or `.env` files. `NPM_TOKEN` lives in repo secrets only.
-3. Package design: Keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
+2. Never commit secrets or `.env` files.
+3. Design: keep the built-file checks in `src/lib/build/` and the probe check in `src/lib/probe/` pure (data in, data out, no I/O). Node, filesystem and network access lives in `scripts/`. The Site ships static HTML and CSS: no React, no Fumadocs, no client-side router ([ADR 0002](docs/adr/0002-site-worker-with-static-assets.md)).
 4. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
-5. Done means `bun run check` passes (Biome lint with zero warnings, strict typecheck, tests, build, publint + are-the-types-wrong). `bun run format` fixes formatting and import order. Do not loosen `tsconfig.base.json` or `biome.json` to make an error go away.
-6. Never edit `version` in `package.json` (a first-publish bump is never committed) and never run `npm publish` locally, except the very first publish of a brand-new package, which the maintainer may run locally with `--provenance=false`. Merges to `main` publish alphas; a stable release is the manual Release workflow. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...) because they decide the next version (see README "Releasing").
+5. Done means `bun run check` passes (Biome lint with zero warnings, strict typecheck, tests, the Astro build, the built-file checks and the local Worker probe). `bun run format` fixes formatting and import order. Do not loosen `tsconfig.base.json` or `biome.json` to make an error go away.
+6. This repository is private and never published to npm: do not add a release workflow or a publish surface. Never edit `version` in `package.json`. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...).
 7. Model & Pi (`pi.dev`) rules:
    - Never use `gemini-3.8-flash` anywhere; use `gemini-4-hydrogen` instead for Antigravity tasks and reviews (and `gemini-4-argon` where configured).
    - When running the Pi coding agent (`pi.dev`), strictly use **DeepSeek 4.1 Flash** only (e.g., `deepseek/deepseek-v4.1-flash`, `deepseek/deepseek-v4.1-flash-fast`), whether routed via Command Code GOAT (`command-code`) or OpenCode Go (`opencode`). Do not switch to or run any other models (Claude, GPT, Gemini, etc.) in Pi sessions for this repository. This rule is mechanically enforced via `.pi/settings.json`.
@@ -29,9 +29,8 @@ Verify live GitHub state (`gh issue view`, `gh pr view`) and CLI/API schemas bef
 
 ## Agent skills
 
-### Skills included in this template
+### Skills included in this repository
 
-- **Bootstrap Skill (`setup-the-repo`)**: Single-use interactive setup wizard. When initializing a new repo from this template, run `/setup-the-repo` (or `bun run setup`). It customizes the repository, verifies the build, removes itself, and instructs you to run `/setup-matt-pocock-skills`.
 - **Matt Pocock Skills (`mattpocock/skills`)**: Complete engineering workflow including `/ask-matt`, `/tdd`, `/implement`, `/code-review`, `/wayfinder`, `/diagnosing-bugs`, `/codebase-design`, `/grill-with-docs`, etc.
 - **Trajectonomics Internal Skills (`trajectonomics/internal-skills`)**: Organization-specific workflow including `/pick-the-issue` to discover unblocked GitHub issues not currently handled by active T3 Code sessions and route them into the `ask-matt` framework.
 
@@ -63,13 +62,6 @@ Skills come from [`mattpocock/skills`](https://github.com/mattpocock/skills) and
   npx skills add trajectonomics/internal-skills -y
   ```
 - Restore from the lock: `npx skills experimental_install`
-
-## Checklist When Instantiating a New Repo
-
-When creating a new repository from this template:
-1. Run `/setup-the-repo` (or `bun run setup`) to interactively configure your package coordinates, description, archetype, domain glossary, and architecture records.
-2. Next, run `/setup-matt-pocock-skills` to wire up your issue tracker and triage labels.
-3. Run `bun run check` to verify linting, types, build, and tests.
 
 ## Factory Runs
 

@@ -1,0 +1,24 @@
+---
+import "../styles/global.css"
+
+interface Props {
+	readonly title: string
+}
+
+// biome-ignore lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see {title}.
+const { title } = Astro.props
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<nav></nav>
+		<main>
+			<slot />
+		</main>
+	</body>
+</html>

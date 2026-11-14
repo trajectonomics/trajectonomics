@@ -1,9 +1,10 @@
 {
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"lib": ["ES2022"],
-		"types": []
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"types": ["astro/client", "bun"],
+		"isolatedDeclarations": false,
+		"declaration": false
 	},
-	"include": ["src"],
-	"exclude": ["src/**/*.test.ts"]
+	"include": ["src", "scripts", "astro.config.ts", ".astro/types.d.ts"]
 }

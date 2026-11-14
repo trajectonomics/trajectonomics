@@ -20,5 +20,5 @@ Closes #
 
 ## Pre-Merge Verification
 
-- [ ] `bun run check` passes locally (Biome lint/format, strict TypeScript `isolatedDeclarations`, tests, `tsdown` build, `publint`, `attw`).
+- [ ] `bun run check` passes locally (Biome lint, strict TypeScript, tests, Astro build, built-file checks, local Worker probe).
 - [ ] Added or updated test cases covering positive paths and invariant edge cases.
