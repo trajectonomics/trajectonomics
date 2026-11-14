@@ -14,3 +14,25 @@
 	height: 1.5rem;
 	width: auto;
 }
+
+/* Thai type comes from the visitor's own fonts, so the Site downloads none (ADR 0003). */
+html {
+	font-family:
+		system-ui, -apple-system, "Segoe UI", "Leelawadee UI", Thonburi, "Sukhumvit Set",
+		"Noto Sans Thai", sans-serif;
+}
+
+/*
+ * Thai vowel marks sit above and below the line, so it needs room; never break-all or anywhere.
+ * The Theme's type utilities each set their own line height (1.11 on `text-4xl`, 1.56 on `text-lg`),
+ * which would clip Thai, so every box that carries Thai copy keeps 1.6 as well.
+ */
+html[lang="th"] {
+	line-height: 1.6;
+	word-break: normal;
+	overflow-wrap: normal;
+}
+
+html[lang="th"] :is(h1, h2, h3, p, a, li, pre, code, div) {
+	line-height: 1.6;
+}

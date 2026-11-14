@@ -2,33 +2,33 @@ import { describe, expect, it } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkStructure } from "./structure"
 
-function build(index: string, notFound = index): readonly BuiltFile[] {
+const complete = "<html><head></head><body><nav></nav><main></main></body></html>"
+
+function build(thai = complete, english = complete): readonly BuiltFile[] {
 	return [
-		{ path: "index.html", content: index },
-		{ path: "404.html", content: notFound },
+		{ path: "th/index.html", content: thai },
+		{ path: "en/index.html", content: english },
 		{ path: "_astro/site.css", content: "body{}" },
 	]
 }
-
-const complete = "<html><head></head><body><nav></nav><main></main></body></html>"
 
 function codes(files: readonly BuiltFile[]): readonly string[] {
 	return checkStructure(files).map((failure) => failure.code)
 }
 
 describe("the structure of the built pages", () => {
-	it("passes a page with exactly one head, body, nav and main", () => {
-		expect(codes(build(complete))).toEqual([])
+	it("passes every home with exactly one head, body, nav and main", () => {
+		expect(codes(build())).toEqual([])
 	})
 
-	it("fails a build with no index page at the assets root", () => {
-		const files = build(complete).filter((file) => file.path !== "index.html")
-		expect(codes(files)).toContain("INDEX_PAGE_MISSING")
+	it("passes a Not-found page too, because the router injects onto it as well", () => {
+		expect(codes([...build(), { path: "th/404.html", content: complete }])).toEqual([])
 	})
 
-	it("fails a build with no Not-found page at the assets root", () => {
-		const files = build(complete).filter((file) => file.path !== "404.html")
-		expect(codes(files)).toContain("NOT_FOUND_PAGE_MISSING")
+	it("fails a build that put a document at /, which must redirect instead", () => {
+		expect(codes([...build(), { path: "index.html", content: complete }])).toEqual([
+			"ROOT_DOCUMENT_PRESENT",
+		])
 	})
 
 	it("counts opening tags only, so one nav is one nav", () => {
@@ -39,27 +39,27 @@ describe("the structure of the built pages", () => {
 
 	it("fails a page with two navs", () => {
 		const page = "<html><head></head><body><nav></nav><nav></nav><main></main></body></html>"
-		expect(codes(build(page, complete))).toEqual(["NAV_NOT_SINGLE"])
+		expect(codes(build(complete, page))).toEqual(["NAV_NOT_SINGLE"])
 	})
 
 	it("fails a page with no main", () => {
-		expect(codes(build("<html><head></head><body><nav></nav></body></html>", complete))).toEqual([
+		expect(codes(build("<html><head></head><body><nav></nav></body></html>"))).toEqual([
 			"MAIN_NOT_SINGLE",
 		])
 	})
 
 	it("fails a page with two heads", () => {
 		const page = "<html><head></head><head></head><body><nav></nav><main></main></body></html>"
-		expect(codes(build(page, complete))).toEqual(["HEAD_NOT_SINGLE"])
+		expect(codes(build(page))).toEqual(["HEAD_NOT_SINGLE"])
 	})
 
 	it("fails a page with two bodies", () => {
 		const page = "<html><head></head><body><nav></nav><main></main></body><body></body></html>"
-		expect(codes(build(page, complete))).toEqual(["BODY_NOT_SINGLE"])
+		expect(codes(build(page))).toEqual(["BODY_NOT_SINGLE"])
 	})
 
-	it("fails the Not-found page too, not only the index page", () => {
-		const notFound = "<html><head></head><body><main></main></body></html>"
-		expect(codes(build(complete, notFound))).toEqual(["NAV_NOT_SINGLE"])
+	it("names every page it fails, not only the first", () => {
+		const page = "<html><head></head><body><nav></nav></body></html>"
+		expect(codes(build(page, page))).toEqual(["MAIN_NOT_SINGLE", "MAIN_NOT_SINGLE"])
 	})
 })

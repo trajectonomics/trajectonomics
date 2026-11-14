@@ -1,23 +1,35 @@
-import { checkProbeResponses, PROBE_PATHS, type ProbeResponse } from "../src/lib/probe/status"
+import { checkProbeResponses } from "../src/lib/probe/check-probe"
+import { PROBES, type Probe, type ProbeResponse } from "../src/lib/probe/probes"
 import { freePort, signalGroup, startDevServer, stop, waitUntilServing } from "./probe/dev-server"
 import { reportFailures } from "./report-failures"
 
 const REQUEST_TIMEOUT_MS = 10_000
 const HARD_TIMEOUT_MS = 90_000
 
+/** The Visitor signal headers one probe sends, named as the request headers they are. */
+function headersOf(probe: Probe): Record<string, string> {
+	const headers: Record<string, string> = {}
+	if (probe.acceptLanguage !== null) headers["Accept-Language"] = probe.acceptLanguage
+	if (probe.country !== null) headers["CF-IPCountry"] = probe.country
+	return headers
+}
+
 async function readResponses(baseUrl: string): Promise<readonly ProbeResponse[]> {
 	const responses: ProbeResponse[] = []
-	for (const path of PROBE_PATHS) {
-		const response = await fetch(`${baseUrl}${path}`, {
-			redirect: "manual",
+	for (const probe of PROBES) {
+		const response = await fetch(`${baseUrl}${probe.path}`, {
+			redirect: probe.followRedirects ? "follow" : "manual",
+			headers: headersOf(probe),
 			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 		})
-		await response.arrayBuffer()
+		const html = await response.text()
 		responses.push({
-			path,
+			probe,
 			status: response.status,
+			location: response.headers.get("location"),
 			setCookie: response.headers.get("set-cookie"),
 			contentSecurityPolicy: response.headers.get("content-security-policy"),
+			html,
 		})
 	}
 	return responses

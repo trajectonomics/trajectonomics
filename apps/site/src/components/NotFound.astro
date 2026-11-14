@@ -1,0 +1,22 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import Layout from "../layouts/Layout.astro"
+import type { Language } from "../lib/language/language"
+import { dictionaryFor, localeUrl } from "../lib/language/languages"
+
+interface Props {
+	readonly language: Language
+}
+
+const { language } = Astro.props
+const dictionary = dictionaryFor(language)
+---
+
+<Layout language={language} title={dictionary.notFoundHeading} indexed={false}>
+	<h1 class="text-4xl font-semibold tracking-tight text-foreground">{dictionary.notFoundHeading}</h1>
+	<p class="mt-6 max-w-2xl text-lg text-muted-foreground">{dictionary.notFoundBody}</p>
+	<p class="mt-6 text-lg">
+		<a class="text-foreground underline" href={localeUrl(language)}>Trajectonomics</a>
+	</p>
+</Layout>

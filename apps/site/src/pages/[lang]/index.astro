@@ -1,0 +1,35 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import Layout from "../../layouts/Layout.astro"
+import type { Language } from "../../lib/language/language"
+import { dictionaryFor } from "../../lib/language/languages"
+import { languagePaths } from "../../lib/language/paths"
+import { INSTALL_COMMAND } from "../../lib/site"
+
+interface Props {
+	readonly language: Language
+}
+
+export function getStaticPaths() {
+	return languagePaths()
+}
+
+const { language } = Astro.props
+const dictionary = dictionaryFor(language)
+---
+
+<Layout language={language} title="Trajectonomics" indexed={true}>
+	<h1 class="text-4xl font-semibold tracking-tight text-foreground">{dictionary.heroHeading}</h1>
+	<p class="mt-6 max-w-2xl text-lg text-muted-foreground">{dictionary.heroSubline}</p>
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold tracking-tight text-foreground">{dictionary.installHeading}</h2>
+		<pre
+			class="mt-4 overflow-x-auto rounded border border-border bg-muted p-4"><code>{INSTALL_COMMAND}</code></pre>
+	</section>
+	<p class="mt-6 text-lg">
+		<a class="text-foreground underline" href="https://github.com/trajectonomics/cli"
+			>{dictionary.starOnGitHub}</a
+		>
+	</p>
+</Layout>

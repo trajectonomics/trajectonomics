@@ -17,8 +17,8 @@ bun run dev
 | --- | --- |
 | `bun run dev` | Astro dev server on a local port |
 | `bun run build` | Build the Site into `dist/` |
-| `bun run verify:build` | Check the built pages: one `head`, `body`, `nav` and `main` each, no Reserved preload path, no content security policy, no third-party resource |
-| `bun run probe:status` | Start `wrangler dev` with no Cloudflare credential and check `/` is 200 and an unknown path and `/__mf-preload.js` are 404 |
+| `bun run verify:build` | Check the built pages: a home per Language and a Not-found page per Locale URL, one `head`, `body`, `nav` and `main` each, no document at `/`, absolute `hreflang` and `x-default`, the switcher, `noindex` on misses, no downloaded font, no Reserved preload path, no content security policy, no third-party resource |
+| `bun run probe:status` | Start `wrangler dev` with no Cloudflare credential and check `/` redirects by Visitor signal, both Locale URLs are 200, a miss under a Locale URL is 404 in that Language, and `/__mf-preload.js` is 404 |
 | `bun run test` | `bun test` over `src` and `scripts` |
 | `bun run typecheck` | `tsc` plus `astro check` |
 | `bun run lint` | Biome, warnings as errors |
@@ -29,9 +29,9 @@ bun run dev
 
 ## The build
 
-`dist/index.html` is the placeholder page and `dist/404.html` is the Not-found page; the Worker answers an unknown path with the latter as a real 404. Both are the source of truth for the structure rules, not HTML fetched through the router.
+`dist/th/index.html` and `dist/en/index.html` are the two Language homes, and there is no document at `/`: the Worker's only script answers `/` with a 302 to the chosen Locale URL ([ADR 0003](./docs/adr/0003-thai-and-english-from-visitor-signals.md)). `dist/404.html` is the English Not-found page, `dist/th/404.html` the Thai one and `dist/en/404.html` the English one under its own Locale URL, so the assets handler's nearest-`404.html` rule answers a miss in the Language of the Locale URL the visitor tried. The built files are the source of truth for the structure rules, not HTML fetched through the router.
 
-The page is a placeholder until the header, hero and footer ticket replaces it. Language handling and deployment are later changes; the Scaffold's `/` becomes the Language redirect ([ADR 0003](./docs/adr/0003-thai-and-english-from-visitor-signals.md)).
+The header, hero and footer are placeholders until that ticket replaces them, and the strings only the owner may write stay `[OWNER TO WRITE]` in both Dictionaries until the owner-written ticket. Deployment is a later change.
 
 ## License
 

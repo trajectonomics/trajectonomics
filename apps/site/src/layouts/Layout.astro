@@ -1,23 +1,35 @@
 ---
-// biome-ignore lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see {wordmark}.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw"
 import "../styles/global.css"
+import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
+import {
+	absoluteLocaleUrl,
+	dictionaryFor,
+	LANGUAGES,
+	localeUrl,
+	otherLanguages,
+} from "../lib/language/languages"
 
 interface Props {
+	readonly language: Language
 	readonly title: string
+	readonly indexed: boolean
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see {title}.
-const { title } = Astro.props
+const { language, title, indexed } = Astro.props
+const dictionary = dictionaryFor(language)
 ---
 
-<html lang="en" data-theme="light">
+<html lang={language} data-theme="light">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		{/*
 			The Theme is on <html> before the first paint: `light` is the no-JavaScript fallback, and this
-			inline script switches to `dark` when the device asks for it. No storage, and no theme control.
+			inline script switches to `dark` when the device asks for it. It reads no Visitor signal: a
+			Locale URL already says which Language the page is ([ADR 0003]).
 		*/}
 		<script is:inline>
 			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -25,6 +37,23 @@ const { title } = Astro.props
 			}
 		</script>
 		<title>{title}</title>
+		{
+			indexed ? (
+				<>
+					<link rel="canonical" href={absoluteLocaleUrl(language)} />
+					{LANGUAGES.map((entry) => (
+						<link
+							rel="alternate"
+							hreflang={entry.language}
+							href={absoluteLocaleUrl(entry.language)}
+						/>
+					))}
+					<link rel="alternate" hreflang="x-default" href={absoluteLocaleUrl(FALLBACK_LANGUAGE)} />
+				</>
+			) : (
+				<meta name="robots" content="noindex" />
+			)
+		}
 		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
 		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
 		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
@@ -32,13 +61,26 @@ const { title } = Astro.props
 	<body class="bg-background text-foreground">
 		<header class="border-b border-border">
 			<nav class="mx-auto flex max-w-5xl items-center gap-6 px-6 py-4" aria-label="Main">
-				<a class="wordmark block text-foreground" href="/">
+				<a class="wordmark block text-foreground" href={localeUrl(language)}>
 					<Fragment set:html={wordmark} />
 				</a>
-				<a class="text-sm text-muted-foreground hover:text-foreground" href="/docs/">Docs</a>
+				{
+					otherLanguages(language).map((entry) => (
+						<a
+							class="text-sm text-muted-foreground hover:text-foreground"
+							href={localeUrl(entry.language)}
+							lang={entry.language}
+							hreflang={entry.language}>
+							{entry.dictionary.languageName}
+						</a>
+					))
+				}
+				<a class="text-sm text-muted-foreground hover:text-foreground" href="/docs/">
+					{dictionary.docsLink}
+				</a>
 				<a
 					class="text-sm text-muted-foreground hover:text-foreground"
-					href="https://github.com/trajectonomics/cli">GitHub</a
+					href="https://github.com/trajectonomics/cli">{dictionary.githubLink}</a
 				>
 			</nav>
 		</header>
@@ -47,8 +89,8 @@ const { title } = Astro.props
 		</main>
 		<footer class="border-t border-border">
 			<div class="mx-auto flex max-w-5xl flex-col gap-2 px-6 py-8 text-sm text-muted-foreground">
-				<p>[OWNER TO WRITE]</p>
-				<p>[OWNER TO WRITE]</p>
+				<p>{dictionary.footerDisclaimer}</p>
+				<p>{dictionary.taxSentence}</p>
 				<a class="hover:text-foreground" href="https://github.com/trajectonomics">
 					github.com/trajectonomics
 				</a>

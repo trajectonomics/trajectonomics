@@ -1,11 +1,9 @@
 ---
-// biome-ignore lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <Layout />.
-import Layout from "../layouts/Layout.astro"
+// biome-ignore lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see <NotFound />.
+import NotFound from "../components/NotFound.astro"
+// biome-ignore lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see FALLBACK_LANGUAGE.
+import { FALLBACK_LANGUAGE } from "../lib/language/language"
 ---
 
-<Layout title="Page not found">
-	<h1 class="text-4xl font-semibold tracking-tight text-foreground">Page not found</h1>
-	<p class="mt-6 max-w-2xl text-lg text-muted-foreground">
-		<a class="text-foreground underline" href="/">Trajectonomics</a>
-	</p>
-</Layout>
+<!-- A miss with no Locale URL answers in the fallback Language (ADR 0003). -->
+<NotFound language={FALLBACK_LANGUAGE} />

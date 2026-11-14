@@ -7,8 +7,11 @@ import { faviconSet } from "./scripts/favicon-set"
 export default defineConfig({
 	output: "static",
 	outDir: "./dist",
-	// Always a trailing slash, so a later Locale URL such as `/th/` can be a directory.
+	// Always a trailing slash, so a Locale URL such as `/th/` is a directory.
 	trailingSlash: "always",
+	// `preserve` keeps `th/index.html` and `th/404.html`: the assets handler finds the nearest
+	// `404.html`, and `directory` would build `th/404/index.html` instead ([ADR 0003]).
+	build: { format: "preserve" },
 	integrations: [faviconSet()],
 	vite: { plugins: [tailwindcss()] },
 })

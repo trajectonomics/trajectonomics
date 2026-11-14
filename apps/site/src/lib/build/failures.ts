@@ -1,11 +1,11 @@
 /** Stable codes for every way the built Site can fail verification. One code per rule. */
 export type BuildFailureCode =
-	| "INDEX_PAGE_MISSING"
 	| "NOT_FOUND_PAGE_MISSING"
 	| "HEAD_NOT_SINGLE"
 	| "BODY_NOT_SINGLE"
 	| "NAV_NOT_SINGLE"
 	| "MAIN_NOT_SINGLE"
+	| "ROOT_DOCUMENT_PRESENT"
 	| "RESERVED_PRELOAD_PATH_BUILT"
 	| "CONTENT_SECURITY_POLICY_PRESENT"
 	| "EXTERNAL_RESOURCE_PRESENT"
@@ -23,6 +23,21 @@ export type BuildFailureCode =
 	| "TEXT_CONTRAST_TOO_LOW"
 	| "TEXT_COLOUR_UNRESOLVED"
 	| "TEXT_COLOUR_UNREADABLE"
+	| "LANGUAGE_HOME_MISSING"
+	| "LANGUAGE_NOT_DECLARED"
+	| "HREFLANG_MISSING"
+	| "HREFLANG_WRONG_URL"
+	| "X_DEFAULT_MISSING"
+	| "X_DEFAULT_WRONG_URL"
+	| "OWNER_WRITTEN_MISSING"
+	| "SCRIPT_DETECTS_LANGUAGE"
+	| "SWITCHER_MISSING"
+	| "SWITCHER_TEXT_WRONG"
+	| "NOINDEX_MISSING"
+	| "NOT_FOUND_HAS_CANONICAL"
+	| "NOT_FOUND_HAS_HREFLANG"
+	| "FONT_FILE_PRESENT"
+	| "FONT_FACE_PRESENT"
 
 /** One failed build check: the rule's code, the file it concerns and a line a maintainer can act on. */
 export interface BuildFailure {

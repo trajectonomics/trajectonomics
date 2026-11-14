@@ -1,11 +1,10 @@
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { builtPages, fileAt } from "./built-files"
 import type { BuildFailure, BuildFailureCode } from "./failures"
 import { buildFailure } from "./failures"
 
-/** Both pages the router mounts, at their paths in the assets root. */
-const INDEX_PAGE = "index.html"
-const NOT_FOUND_PAGE = "404.html"
+/** The path no document may be built at, because `/` redirects to a Locale URL ([ADR 0003]). */
+const ROOT_DOCUMENT = "index.html"
 
 /** The elements the router needs exactly one of on every page. */
 const SINGLE_ELEMENTS = [
@@ -34,31 +33,18 @@ function checkSingleElements(file: BuiltFile): readonly BuildFailure[] {
 	})
 }
 
-/** Every page must carry exactly one `head`, `body`, `nav` and `main` ([ADR 0002]). */
+/** Every built page carries exactly one `head`, `body`, `nav` and `main`, and `/` has no document. */
 export function checkStructure(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	const failures: BuildFailure[] = []
-	const index = fileAt(files, INDEX_PAGE)
-	const notFound = fileAt(files, NOT_FOUND_PAGE)
-	if (index === undefined) {
+	if (fileAt(files, ROOT_DOCUMENT) !== undefined) {
 		failures.push(
 			buildFailure(
-				"INDEX_PAGE_MISSING",
-				INDEX_PAGE,
-				"the build has no index page at the assets root.",
+				"ROOT_DOCUMENT_PRESENT",
+				ROOT_DOCUMENT,
+				"the build has a document at /; / redirects to a Locale URL and serves no page.",
 			),
 		)
 	}
-	if (notFound === undefined) {
-		failures.push(
-			buildFailure(
-				"NOT_FOUND_PAGE_MISSING",
-				NOT_FOUND_PAGE,
-				"the build has no 404.html at the assets root, so the Worker has no Not-found page.",
-			),
-		)
-	}
-	for (const page of [index, notFound]) {
-		if (page !== undefined) failures.push(...checkSingleElements(page))
-	}
+	for (const file of builtPages(files)) failures.push(...checkSingleElements(file))
 	return failures
 }

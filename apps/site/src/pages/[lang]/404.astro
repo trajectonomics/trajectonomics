@@ -1,0 +1,19 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import NotFound from "../../components/NotFound.astro"
+import type { Language } from "../../lib/language/language"
+import { languagePaths } from "../../lib/language/paths"
+
+interface Props {
+	readonly language: Language
+}
+
+export function getStaticPaths() {
+	return languagePaths()
+}
+
+const { language } = Astro.props
+---
+
+<NotFound language={language} />

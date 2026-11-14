@@ -20,6 +20,8 @@ interface WranglerConfig {
 	readonly env?: Readonly<Record<string, unknown>>
 	readonly assets?: {
 		readonly directory?: string
+		readonly binding?: string
+		readonly run_worker_first?: readonly string[] | boolean
 		readonly html_handling?: string
 		readonly not_found_handling?: string
 	}
@@ -54,8 +56,10 @@ describe("the Worker config", () => {
 		expect(config.compatibility_date).toBe("2026-11-01")
 	})
 
-	it("has no script entry", () => {
-		expect(config.main).toBeUndefined()
+	it("runs the Worker first only for the redirect from /", () => {
+		expect(config.main).toBe("src/worker/index.ts")
+		expect(config.assets?.binding).toBe("ASSETS")
+		expect(config.assets?.run_worker_first).toEqual(["/"])
 	})
 
 	it("attaches no route or custom domain", () => {
