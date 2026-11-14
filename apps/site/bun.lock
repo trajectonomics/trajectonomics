@@ -4,6 +4,11 @@
   "workspaces": {
     "": {
       "name": "@trajectonomics/site",
+      "dependencies": {
+        "@trajectonomics/design-system": "0.1.0-alpha.1",
+        "@trajectonomics/design-system-assets": "0.1.0-alpha.1",
+        "@trajectonomics/design-system-theme": "0.1.0-alpha.1",
+      },
       "devDependencies": {
         "@astrojs/check": "^0.9.12",
         "@biomejs/biome": "2.6.3",
@@ -367,6 +372,12 @@
     "@tailwindcss/oxide-win32-x64-msvc": ["@tailwindcss/oxide-win32-x64-msvc@4.3.5", "", { "os": "win32", "cpu": "x64" }, "sha512-XiKFfIy1RWe7qK4WqByxNW7Oz1/nkOy8o/BWhHminyV1PmpUd8Eedj5v2A8h2kpqeVlz6xRnwk9Fr/ZXNLcZfg=="],
 
     "@tailwindcss/vite": ["@tailwindcss/vite@4.3.5", "", { "dependencies": { "@tailwindcss/node": "4.3.5", "@tailwindcss/oxide": "4.3.5", "tailwindcss": "4.3.5" }, "peerDependencies": { "vite": "^5.2.0 || ^6 || ^7 || ^8" } }, "sha512-BCNiY0a1ZjdOHVqw7kyb7U72BwfMF3dfUuN+tQsLWky/J5JOI/r7abibglXfygrZhVO/3u3V+E25kkKTeMkXaQ=="],
+
+    "@trajectonomics/design-system": ["@trajectonomics/design-system@0.1.0-alpha.1", "", {}, "sha512-xqTo89zvJK2DnKRJxaMC7kcJh2G6cQtQOwE+bzYRdGNBbwpkQpYWquD7Rkc7FvD5wYtjhGia2tY2iUSPYbNe7A=="],
+
+    "@trajectonomics/design-system-assets": ["@trajectonomics/design-system-assets@0.1.0-alpha.1", "", {}, "sha512-XV+nSG1Nb8bjFytgk902T3uw/SAW2zoa0VYvOS8rA8al1r8IR2JfJsa9lgChOVFIX3AnwUqmX2bbwFi6Umn6hg=="],
+
+    "@trajectonomics/design-system-theme": ["@trajectonomics/design-system-theme@0.1.0-alpha.1", "", { "peerDependencies": { "@trajectonomics/design-system": "^0.1.0-alpha.0" } }, "sha512-TO1PzqsczFB5b+tzSukEtHjUxRKJlRSM5z+yyBY4QilklwEGPsKPFyhcph8FV706zjKLwSYyux1KCw06zInQAA=="],
 
     "@trajectonomics/tooling": ["@trajectonomics/tooling@1.1.0", "", {}, "sha512-AqKQYsyPN+EosNtxLUaKipA+ocXl2tEWizJ0eXOtSn+C4Lge82ZXCKDbyPYwdsjMiLknnFWfwGeyhKYPTTAl7g=="],
 

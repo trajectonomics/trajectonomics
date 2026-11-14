@@ -1,1 +1,16 @@
+/*
+ * The Web Consumer Contract, in its documented order: Tailwind, the light Prebuilt Theme CSS, the dark
+ * Prebuilt Theme CSS, then the Tailwind Theme Stylesheet that turns the Semantic Token Roles into
+ * utility colours (design-system ADR 0005). There is no `dark:` variant: it would follow the device
+ * scheme rather than `data-theme`, and the colour-literal check rejects one.
+ */
 @import "tailwindcss";
+@import "@trajectonomics/design-system-theme/themes/light.css";
+@import "@trajectonomics/design-system-theme/themes/dark.css";
+@import "@trajectonomics/design-system-theme/tailwind.css";
+
+/* The inlined wordmark carries a viewBox and no intrinsic size, so the header gives it one. */
+.wordmark > svg {
+	height: 1.5rem;
+	width: auto;
+}

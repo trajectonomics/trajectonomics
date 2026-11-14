@@ -37,5 +37,10 @@
 		"tailwindcss": "^4.3.5",
 		"typescript": "~6.0.3",
 		"wrangler": "^4.158.0"
+	},
+	"dependencies": {
+		"@trajectonomics/design-system": "0.1.0-alpha.1",
+		"@trajectonomics/design-system-assets": "0.1.0-alpha.1",
+		"@trajectonomics/design-system-theme": "0.1.0-alpha.1"
 	}
 }
