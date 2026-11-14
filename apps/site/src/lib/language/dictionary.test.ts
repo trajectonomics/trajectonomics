@@ -48,28 +48,26 @@ describe("the Dictionary of every Language", () => {
 		}
 	})
 
-	it("keeps the English hero headline the owner approved, and the phrases it cycles", () => {
+	it("keeps the English hero headline the owner approved, and the suffixes it cycles", () => {
 		const english = dictionaryFor("en")
+		expect(english.heroHeadingPrefix).toBe("The only tool your agent needs for")
 		expect(english.heroHeadingCycle).toEqual([
-			"The only tool your agent needs for retirement planning",
-			"The only tool your agent needs for financial projection",
+			"retirement planning.",
+			"financial projections.",
+			"your future.",
 		])
-		expect(english.heroHeading).toBe("The only tool your agent needs for your future.")
 	})
 
-	it("keeps the Thai hero headline the owner approved, and the phrases it cycles", () => {
+	it("keeps the Thai hero headline the owner approved, and the suffixes it cycles", () => {
 		const thai = dictionaryFor("th")
-		expect(thai.heroHeadingCycle).toEqual([
-			"เครื่องมือเดียวที่ agent ของคุณต้องการสำหรับ การวางแผนเกษียณ",
-			"เครื่องมือเดียวที่ agent ของคุณต้องการสำหรับ ดู trend ของทรัพย์สิน",
-		])
-		expect(thai.heroHeading).toBe("เครื่องมือเดียวที่ agent ของคุณต้องการสำหรับอนาคตของคุณ")
+		expect(thai.heroHeadingPrefix).toBe("เครื่องมือเดียวที่ agent ของคุณต้องการสำหรับ")
+		expect(thai.heroHeadingCycle).toEqual(["การวางแผนเกษียณอายุ", "การคาดการณ์การเงิน", "อนาคตของคุณ"])
 	})
 
 	it("keeps the English sub-line and disclaimer the owner approved", () => {
 		const english = dictionaryFor("en")
 		expect(english.heroSubline).toBe(
-			"Tell your agent about your financial situation and your goal. It uses traj under the hood to run the accounts, the financial projection, and a comparison of life scenarios, then interprets the result for you. You get tested math, in the format you like.",
+			"traj is a free, open-source money tool built for AI agents. One command installs it as a skill, and your agent handles the rest — no account, no dashboard, no signup.",
 		)
 		expect(english.footerDisclaimer).toBe(
 			"traj is in alpha, so a bug is possible. Tax is not applied yet. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/skills and we will update it as soon as we can.",
@@ -79,7 +77,7 @@ describe("the Dictionary of every Language", () => {
 	it("keeps the Thai sub-line and disclaimer the owner approved", () => {
 		const thai = dictionaryFor("th")
 		expect(thai.heroSubline).toBe(
-			"บอก agent เกี่ยวกับสถานะการเงินและเป้าหมายของคุณ agent ใช้ traj ทำงานบัญชี การคาดการณ์ทางการเงิน และการเปรียบเทียบเส้นทางชีวิต แล้วอธิบายผลให้คุณ ได้ตัวเลขที่ตรวจสอบแล้ว ในรูปแบบเฉพาะของคุณ",
+			"traj คือเครื่องมือการเงินโอเพนซอร์สฟรีสำหรับ AI agent คำสั่งเดียวติดตั้งเป็นสกิล แล้ว agent ของคุณจะจัดการส่วนที่เหลือ — ไม่ต้องมีบัญชี ไม่ต้องมีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		)
 		expect(thai.footerDisclaimer).toBe(
 			"traj ยังเป็นอัลฟา จึงอาจมีบั๊ก ยังไม่คำนวณภาษี เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/skills แล้วเราจะอัปเดตโดยเร็ว",
@@ -97,7 +95,7 @@ describe("the Dictionary of every Language", () => {
 describe("the hero headline a script cycles", () => {
 	it("holds a phrase no earlier one repeats, so the cycle ends on a new line", () => {
 		for (const entry of LANGUAGES) {
-			const phrases = [...entry.dictionary.heroHeadingCycle, entry.dictionary.heroHeading]
+			const phrases = [entry.dictionary.heroHeadingPrefix, ...entry.dictionary.heroHeadingCycle]
 			expect({ language: entry.language, cycles: phrases.length > 1 }).toEqual({
 				language: entry.language,
 				cycles: true,

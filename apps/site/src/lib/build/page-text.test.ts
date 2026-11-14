@@ -15,7 +15,7 @@ describe("the text a Language home renders", () => {
 	})
 
 	it("fails a home whose hero lost one of the phrases the headline cycles", () => {
-		const held = dictionaryFor("en").heroHeading
+		const held = dictionaryFor("en").heroHeadingCycle.at(-1) ?? ""
 		expect(heroCodes(checkPageText, heroHome("en", { headline: `<span>${held}</span>` }))).toEqual([
 			"HEADLINE_NOT_RENDERED",
 		])

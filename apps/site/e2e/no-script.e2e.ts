@@ -25,12 +25,12 @@ for (const underTest of HOMES) {
 		expect(await page.evaluate(() => document.getSelection()?.toString() ?? "")).toBe(COPY_TEXT)
 	})
 
-	test(`${underTest.name}: the hero shows the headline the page ships, not a phrase a script would cycle`, async ({
+	test(`${underTest.name}: the hero shows the suffix the page ships, not one a script would cycle`, async ({
 		page,
 	}) => {
 		await page.goto(underTest.path)
-		await expect(page.locator("[data-hero-headline] > span:visible")).toHaveText(
-			dictionaryFor(underTest.language).heroHeading,
+		await expect(page.locator("[data-hero-stack] > span:visible")).toHaveText(
+			dictionaryFor(underTest.language).heroHeadingCycle.at(-1) ?? "",
 		)
 	})
 

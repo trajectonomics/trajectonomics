@@ -12,9 +12,9 @@ describe("the program JavaScript budget", () => {
 		expect(codes([page("en/index.html")])).toEqual([])
 	})
 
-	it("counts inline script text uncompressed and fails at 5,000 bytes", () => {
-		const under = page("en/index.html", "", `<script>${"x".repeat(4_999)}</script>`)
-		const reaching = page("en/index.html", "", `<script>${"x".repeat(5_000)}</script>`)
+	it("counts inline script text uncompressed and fails at 10,000 bytes", () => {
+		const under = page("en/index.html", "", `<script>${"x".repeat(9_999)}</script>`)
+		const reaching = page("en/index.html", "", `<script>${"x".repeat(10_000)}</script>`)
 		expect(codes([under])).toEqual([])
 		expect(codes([reaching])).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})
@@ -23,7 +23,7 @@ describe("the program JavaScript budget", () => {
 		const files = [
 			page("en/index.html", '<script src="/_astro/main.js" type="module"></script>'),
 			asset("_astro/main.js", `import "./a.js"\n${"x".repeat(1_000)}`),
-			asset("_astro/a.js", incompressible(6_000)),
+			asset("_astro/a.js", incompressible(11_000)),
 		]
 		expect(codes(files)).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})
@@ -42,7 +42,7 @@ describe("the program JavaScript budget", () => {
 		const files = [
 			page("en/index.html", '<script src="/_astro/main.js" type="module"></script>'),
 			asset("_astro/main.js", 'import "./deep/a.js"'),
-			asset("_astro/deep/a.js", incompressible(6_000)),
+			asset("_astro/deep/a.js", incompressible(11_000)),
 		]
 		expect(codes(files)).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})
@@ -50,7 +50,7 @@ describe("the program JavaScript budget", () => {
 	it("follows the static imports of an inline module script", () => {
 		const files = [
 			page("en/index.html", "", '<script type="module">import "/_astro/a.js"</script>'),
-			asset("_astro/a.js", incompressible(6_000)),
+			asset("_astro/a.js", incompressible(11_000)),
 		]
 		expect(codes(files)).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})
@@ -58,7 +58,7 @@ describe("the program JavaScript budget", () => {
 	it("counts a same-origin script preload", () => {
 		const files = [
 			page("en/index.html", '<link rel="preload" as="script" href="/_astro/a.js">'),
-			asset("_astro/a.js", incompressible(6_000)),
+			asset("_astro/a.js", incompressible(11_000)),
 		]
 		expect(codes(files)).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})
@@ -66,7 +66,7 @@ describe("the program JavaScript budget", () => {
 	it("counts a module preload", () => {
 		const files = [
 			page("en/index.html", '<link rel="modulepreload" href="/_astro/a.js">'),
-			asset("_astro/a.js", incompressible(6_000)),
+			asset("_astro/a.js", incompressible(11_000)),
 		]
 		expect(codes(files)).toEqual(["PAGE_JAVASCRIPT_OVER_BUDGET"])
 	})

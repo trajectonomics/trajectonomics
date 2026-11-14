@@ -11,6 +11,7 @@
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.12",
+        "@astrojs/compiler-rs": "0.5.3",
         "@axe-core/playwright": "4.14.0",
         "@biomejs/biome": "2.6.3",
         "@playwright/test": "1.65.0",

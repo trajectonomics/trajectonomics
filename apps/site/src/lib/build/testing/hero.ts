@@ -23,10 +23,10 @@ export interface HeroParts {
 	readonly extra?: string
 }
 
-/** Every phrase the hero's `<h1>` carries, the one it holds last. */
+/** Every phrase the hero's `<h1>` carries: the static prefix and the suffixes it cycles. */
 function headlines(language: Language): readonly string[] {
 	const dictionary = languageEntry(language).dictionary
-	return [...dictionary.heroHeadingCycle, dictionary.heroHeading]
+	return [dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle]
 }
 
 /** One Language's home as the build must produce it, with the three regions and the copy command. */

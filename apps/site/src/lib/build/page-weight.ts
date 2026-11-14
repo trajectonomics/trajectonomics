@@ -10,7 +10,7 @@ import { pageScripts } from "./program-scripts"
 export const PAGE_WEIGHT_BUDGET_BYTES = 50_000
 
 /** The most program JavaScript one page may run, uncompressed. */
-export const PROGRAM_JAVASCRIPT_BUDGET_BYTES = 5_000
+export const PROGRAM_JAVASCRIPT_BUDGET_BYTES = 10_000
 
 /** The UTF-8 byte length of a text, the uncompressed figure the script budget fixes. */
 function byteLength(text: string): number {

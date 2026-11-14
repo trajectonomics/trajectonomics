@@ -21,6 +21,8 @@
 		"test": "bun test ./src ./scripts",
 		"test:browser": "bun run build && playwright test",
 		"test:performance": "bun run build && bun scripts/performance.ts",
+		"test:visual": "bun run build && playwright test e2e/visual.e2e.ts",
+		"test:visual:update": "bun run build && playwright test e2e/visual.e2e.ts --update-snapshots",
 		"typecheck": "tsc -p tsconfig.json && astro check",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
@@ -32,6 +34,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
+		"@astrojs/compiler-rs": "0.5.3",
 		"@axe-core/playwright": "4.14.0",
 		"@biomejs/biome": "2.6.3",
 		"@playwright/test": "1.65.0",

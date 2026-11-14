@@ -8,6 +8,9 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] as const
 for (const theme of THEMES) {
 	test.describe(`axe in the ${theme} theme`, () => {
 		test.use({ colorScheme: theme })
+		// Reduced motion settles the load-in animation at once, so axe judges the shipped pixels
+		// instead of a mid-animation frame whose opacity lowers the computed contrast.
+		test.use({ reducedMotion: "reduce" })
 
 		for (const underTest of PAGES) {
 			test(`${underTest.name} has no axe violation`, async ({ page }) => {

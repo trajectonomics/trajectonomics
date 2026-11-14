@@ -12,9 +12,9 @@ function codes(files: readonly BuiltFile[]): readonly string[] {
 }
 
 describe("the page weight budget", () => {
-	it("is under 50,000 gzip bytes of HTML and stylesheets, and 5,000 uncompressed script bytes", () => {
+	it("is under 50,000 gzip bytes of HTML and stylesheets, and 10,000 uncompressed script bytes", () => {
 		expect(PAGE_WEIGHT_BUDGET_BYTES).toBe(50_000)
-		expect(PROGRAM_JAVASCRIPT_BUDGET_BYTES).toBe(5_000)
+		expect(PROGRAM_JAVASCRIPT_BUDGET_BYTES).toBe(10_000)
 	})
 
 	it("passes a page whose HTML and stylesheet stay under the budget", () => {

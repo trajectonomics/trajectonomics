@@ -40,7 +40,7 @@ function heroFailures(
 		heading.ancestors.some((ancestor) => ancestor.tag === "main"),
 	)
 	const text = hero === undefined ? "" : textOf(page, hero)
-	const missing = [dictionary.heroHeading, ...dictionary.heroHeadingCycle].find(
+	const missing = [dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle].find(
 		(headline) => !text.includes(headline),
 	)
 	if (missing !== undefined) {

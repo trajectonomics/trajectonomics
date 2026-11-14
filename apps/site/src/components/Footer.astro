@@ -15,6 +15,7 @@ const { dictionary } = Astro.props
 	<div
 		class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:px-6 sm:py-10"
 	>
+		<p class="max-w-xl">{dictionary.footerDisclaimer}</p>
 		<ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
 			<li>
 				<a
@@ -29,6 +30,5 @@ const { dictionary } = Astro.props
 				>
 			</li>
 		</ul>
-		<p class="max-w-xl">{dictionary.footerDisclaimer}</p>
 	</div>
 </footer>

@@ -4,10 +4,12 @@ export interface Dictionary {
 	readonly languageName: string
 	/** The short label of the current Language, while the other Language keeps its own name. */
 	readonly languageSwitchLabel: string
-	/** The hero headline with no script, and the line the cycle ends on and holds. */
-	readonly heroHeading: string
-	/** The headlines a script may show before it holds `heroHeading`, in order. */
+	/** The hero headline's static prefix; only the suffix after it changes when the cycle steps. */
+	readonly heroHeadingPrefix: string
+	/** The suffixes a script may show after the prefix, in order; the last one is held with no script. */
 	readonly heroHeadingCycle: readonly string[]
+	/** The small uppercase line above the hero headline, marked with the kicker colour. */
+	readonly heroEyebrow: string
 	readonly heroSubline: string
 	readonly docsLink: string
 	readonly githubLink: string

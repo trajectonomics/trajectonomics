@@ -8,13 +8,15 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 	dictionary: Object.freeze({
 		languageName: "English",
 		languageSwitchLabel: "EN",
-		heroHeading: "The only tool your agent needs for your future.",
+		heroHeadingPrefix: "The only tool your agent needs for",
 		heroHeadingCycle: Object.freeze([
-			"The only tool your agent needs for retirement planning",
-			"The only tool your agent needs for financial projection",
+			"retirement planning.",
+			"financial projections.",
+			"your future.",
 		] as const),
+		heroEyebrow: "v0.1.0-alpha.1 is launching now — 2026-11-14",
 		heroSubline:
-			"Tell your agent about your financial situation and your goal. It uses traj under the hood to run the accounts, the financial projection, and a comparison of life scenarios, then interprets the result for you. You get tested math, in the format you like.",
+			"traj is a free, open-source money tool built for AI agents. One command installs it as a skill, and your agent handles the rest — no account, no dashboard, no signup.",
 		docsLink: "Docs",
 		githubLink: "GitHub",
 		starOnGitHub: "Star on GitHub",

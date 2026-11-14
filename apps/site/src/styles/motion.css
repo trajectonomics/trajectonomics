@@ -1,0 +1,66 @@
+/* The landing page redesign's motion (ADR 0004): CSS first, one JS layer, reduced motion wins. */
+
+/* Load-in: the hero's children rise once, staggered. */
+@keyframes hero-rise {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.hero-rise > * {
+	animation: hero-rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-rise > *:nth-child(1) {
+	animation-delay: 0ms;
+}
+
+.hero-rise > *:nth-child(2) {
+	animation-delay: 80ms;
+}
+
+.hero-rise > *:nth-child(3) {
+	animation-delay: 160ms;
+}
+
+.hero-rise > *:nth-child(4) {
+	animation-delay: 240ms;
+}
+
+/* The sticky header gains elevation once the page scrolls 8px; the hairline border is the fallback. */
+@keyframes header-elev {
+	to {
+		box-shadow:
+			0 1px 2px 0 var(--ds-color-border),
+			0 12px 32px -16px var(--ds-color-border);
+	}
+}
+
+@supports (animation-timeline: scroll()) {
+	.site-header {
+		animation: header-elev linear both;
+		animation-timeline: scroll(root);
+		animation-range: 0 8px;
+	}
+}
+
+/* The reduced-motion kill switch must win over every animation and transition, so it is !important. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		/* biome-ignore lint/complexity/noImportantStyles: the kill switch must override every utility */
+		animation-duration: 0.01ms !important;
+		/* biome-ignore lint/complexity/noImportantStyles: the kill switch must override every utility */
+		animation-iteration-count: 1 !important;
+		/* biome-ignore lint/complexity/noImportantStyles: the kill switch must override every utility */
+		transition-duration: 0.01ms !important;
+		/* biome-ignore lint/complexity/noImportantStyles: the kill switch must override every utility */
+		scroll-behavior: auto !important;
+	}
+}

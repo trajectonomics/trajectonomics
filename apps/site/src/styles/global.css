@@ -8,6 +8,8 @@
 @import "@trajectonomics/design-system-theme/themes/light.css";
 @import "@trajectonomics/design-system-theme/themes/dark.css";
 @import "@trajectonomics/design-system-theme/tailwind.css";
+@import "./landing.css";
+@import "./motion.css";
 
 /* The inlined wordmark carries a viewBox and no intrinsic size, so the header gives it one. */
 .wordmark > svg {

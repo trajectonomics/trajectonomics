@@ -13,6 +13,16 @@ export default defineConfig({
 	fullyParallel: true,
 	retries: 0,
 	reporter: process.env["CI"] ? [["list"], ["html", { open: "never" }]] : "list",
+	// The baselines e2e/visual.e2e.ts is validated against, committed so CI can compare them.
+	snapshotDir: "e2e/visual-snapshots",
+	snapshotPathTemplate: "{snapshotDir}/{arg}{ext}",
+	expect: {
+		toHaveScreenshot: {
+			animations: "disabled",
+			caret: "hide",
+			maxDiffPixelRatio: 0.01,
+		},
+	},
 	use: {
 		baseURL: BASE_URL,
 		trace: "retain-on-failure",
