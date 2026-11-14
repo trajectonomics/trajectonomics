@@ -1,4 +1,4 @@
-import { OWNER_WRITTEN_PLACEHOLDER } from "../../language/dictionary"
+import { currentLanguageName, OWNER_WRITTEN_PLACEHOLDER } from "../../language/dictionary"
 import { FALLBACK_LANGUAGE, type Language, type LanguageEntry } from "../../language/language"
 import {
 	absoluteLocaleUrl,
@@ -30,7 +30,7 @@ export function switcher(language: Language): string {
 		})
 		.join("")
 	const entry = languageEntry(language)
-	return `${others}<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${entry.dictionary.languageName}" aria-current="page">${entry.dictionary.languageSwitchLabel}</a>`
+	return `${others}<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${currentLanguageName(entry.dictionary)}" aria-current="page">${entry.dictionary.languageSwitchLabel}</a>`
 }
 
 /** The advertised links every home carries: one per Language, plus `x-default`. */

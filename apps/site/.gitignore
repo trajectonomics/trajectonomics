@@ -11,3 +11,6 @@ coverage/
 .astro/
 .wrangler/
 .dev.vars
+# Playwright writes these beside the repository when the browser checks fail.
+test-results/
+playwright-report/

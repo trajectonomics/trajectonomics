@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import type { Dictionary } from "./dictionary"
-import { OWNER_WRITTEN_PLACEHOLDER } from "./dictionary"
+import { currentLanguageName, OWNER_WRITTEN_PLACEHOLDER } from "./dictionary"
 import { dictionaryFor, LANGUAGES } from "./languages"
 
 /** The keys of one Dictionary, as the owner-written rule reads them. */
@@ -57,5 +57,15 @@ describe("the Dictionary of every Language", () => {
 		expect(dictionaryFor("th").languageName).toBe("ไทย")
 		expect(dictionaryFor("en").languageSwitchLabel).toBe("EN")
 		expect(dictionaryFor("th").languageSwitchLabel).toBe("ไทย")
+	})
+})
+
+describe("the accessible name of the current Language link", () => {
+	it("is the Language's own name when the visible label already is it", () => {
+		expect(currentLanguageName(dictionaryFor("th"))).toBe("ไทย")
+	})
+
+	it("keeps the visible short label in front of the full name", () => {
+		expect(currentLanguageName(dictionaryFor("en"))).toBe("EN — English")
 	})
 })

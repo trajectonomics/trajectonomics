@@ -2,7 +2,8 @@ import { describe, expect, it } from "bun:test"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
-type Job = { uses?: string; steps?: unknown[] }
+type Step = { run?: string; with?: Record<string, unknown> }
+type Job = { uses?: string; steps?: Step[]; "timeout-minutes"?: number }
 type Workflow = {
 	on?: Record<string, unknown>
 	permissions?: Record<string, string>
@@ -47,5 +48,34 @@ describe("drift.yml, the third caller", () => {
 
 	it("grants contents to check the repository out and issues to report drift", () => {
 		expect(load("drift.yml").permissions).toEqual({ contents: "read", issues: "write" })
+	})
+})
+
+describe("browser.yml, the workflow that needs a browser", () => {
+	const steps = () => soleJob(load("browser.yml")).steps ?? []
+	const runs = () => steps().flatMap((step) => (step.run === undefined ? [] : [step.run]))
+
+	it("is one job with its own steps and a hard 15 minute limit", () => {
+		const job = soleJob(load("browser.yml"))
+		expect(job.uses).toBeUndefined()
+		expect(job.steps?.length).toBeGreaterThan(0)
+		expect(job["timeout-minutes"]).toBe(15)
+	})
+
+	it("runs on every pull request to main and on main", () => {
+		const workflow = load("browser.yml")
+		expect(workflow.on).toHaveProperty("pull_request")
+		expect(workflow.on).toHaveProperty("push")
+		expect(workflow.permissions).toEqual({ contents: "read" })
+	})
+
+	it("installs the Node version package.json declares and a Chromium", () => {
+		expect(steps().some((step) => step.with?.["node-version-file"] === "package.json")).toBe(true)
+		expect(runs().some((run) => run.includes("playwright install"))).toBe(true)
+	})
+
+	it("runs the browser checks and the performance budget", () => {
+		expect(runs()).toContain("bun run test:browser")
+		expect(runs()).toContain("bun run test:performance")
 	})
 })

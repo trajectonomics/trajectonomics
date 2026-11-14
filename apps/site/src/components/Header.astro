@@ -2,7 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and links it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw"
-import type { Dictionary } from "../lib/language/dictionary"
+import { currentLanguageName, type Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
 import { localeUrl, otherLanguages } from "../lib/language/languages"
 import { DOCS_PATH, GITHUB_CLI_URL, SITE_NAME } from "../lib/site"
@@ -44,7 +44,7 @@ const artwork = wordmark.replace("<svg ", '<svg aria-hidden="true" focusable="fa
 					href={localeUrl(language)}
 					lang={language}
 					hreflang={language}
-					aria-label={dictionary.languageName}
+					aria-label={currentLanguageName(dictionary)}
 					aria-current={markCurrent ? "page" : undefined}>{dictionary.languageSwitchLabel}</a
 				>
 				{

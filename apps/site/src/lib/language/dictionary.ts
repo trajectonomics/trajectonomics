@@ -22,3 +22,10 @@ export interface Dictionary {
 
 /** The literal a string only the owner may write carries until the owner writes it. */
 export const OWNER_WRITTEN_PLACEHOLDER = "[OWNER TO WRITE]"
+
+/** The current Language link's accessible name: its visible label, plus the full name when they differ. */
+export function currentLanguageName(dictionary: Dictionary): string {
+	return dictionary.languageSwitchLabel === dictionary.languageName
+		? dictionary.languageName
+		: `${dictionary.languageSwitchLabel} — ${dictionary.languageName}`
+}

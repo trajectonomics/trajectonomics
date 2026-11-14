@@ -1,3 +1,4 @@
+import { currentLanguageName } from "../language/dictionary"
 import type { Language } from "../language/language"
 import { dictionaryFor, localeUrl, otherLanguages } from "../language/languages"
 import type { BuiltFile } from "./built-files"
@@ -55,7 +56,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 			),
 		]
 	}
-	const named = current.attributes["aria-label"] === entry.languageName
+	const named = current.attributes["aria-label"] === currentLanguageName(entry)
 	const labelled = textOf(page, current) === entry.languageSwitchLabel
 	if (named && labelled) return failures
 	return [
@@ -63,7 +64,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 		buildFailure(
 			"SWITCHER_CURRENT_LABEL_WRONG",
 			file.path,
-			`the current link should show "${entry.languageSwitchLabel}" and be named "${entry.languageName}".`,
+			`the current link should show "${entry.languageSwitchLabel}" and be named "${currentLanguageName(entry)}".`,
 		),
 	]
 }

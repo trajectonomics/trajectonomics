@@ -35,3 +35,29 @@ _Avoid_: soft 404, error page
 **Reserved preload path**:
 The path `/__mf-preload.js`, owned by the router and never built by the Site.
 _Avoid_: preload script, client router
+
+## Built site
+
+**Invariant**:
+A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the absence of a Web font are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+_Avoid_: Rule, assertion
+
+**Pure Core**:
+A module that takes data in and returns data out, with no clock, randomness, network or filesystem access. The built-file checks in `src/lib/build/` and the probe check in `src/lib/probe/` are Pure Cores; `scripts/` holds the adapters that read the build and start the Worker.
+_Avoid_: Utility, helper, service
+
+**Error Code**:
+A stable code naming exactly one rule a built page can break, so one run reports every rule it breaks and no code changes meaning ([CODING_STANDARDS.md](CODING_STANDARDS.md)).
+_Avoid_: Error message, failure string
+
+**Page weight budget**:
+The most one page's HTML and its same-origin stylesheets may gzip to together: under 50,000 bytes at zlib level 6, measured from the build ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+_Avoid_: Size limit, bundle size
+
+**Program JavaScript**:
+The script text one page runs, uncompressed and under 5,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript.
+_Avoid_: Bundle, JS payload
+
+**Web font**:
+A font the Site downloads instead of drawing with the visitor's own fonts. A font file, an `@font-face` rule, a remote font URL and a `data:` font URL are each forbidden.
+_Avoid_: Custom font, typeface asset

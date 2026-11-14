@@ -12,6 +12,8 @@
 			"**",
 			"!**/dist",
 			"!**/coverage",
+			"!**/test-results",
+			"!**/playwright-report",
 			"!**/*.md",
 			"!**/skills-lock.json",
 			"!**/.agents",

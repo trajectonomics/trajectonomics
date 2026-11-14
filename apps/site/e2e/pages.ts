@@ -1,0 +1,97 @@
+import { expect, type Page } from "@playwright/test"
+import type { Language } from "../src/lib/language/language"
+import { dictionaryFor } from "../src/lib/language/languages"
+import { INSTALL_COMMAND } from "../src/lib/site"
+
+/** One page the browser checks judge, and the status its real response must have. */
+export interface PageUnderTest {
+	readonly path: string
+	readonly language: Language
+	readonly name: string
+	readonly status: number
+}
+
+/** The Language homes and the real Not-found response every browser check judges. */
+export const PAGES: readonly PageUnderTest[] = Object.freeze([
+	{ path: "/th/", language: "th", name: "Thai home", status: 200 },
+	{ path: "/en/", language: "en", name: "English home", status: 200 },
+	{ path: "/no-such-path/", language: "en", name: "Not-found page", status: 404 },
+])
+
+/** The controls a keyboard visitor can reach, excluding anything hidden or disabled. */
+const FOCUSABLE = "a[href], button:not([disabled]):not([hidden])"
+
+/** The two Themes the harness sets before navigation. */
+export const THEMES = Object.freeze(["light", "dark"] as const)
+/** One of the two Themes a page can ship. */
+export type Theme = (typeof THEMES)[number]
+
+/** The Language home of one Language, which every browser check judges. */
+export function homeOf(language: Language): PageUnderTest {
+	const home = PAGES.find(
+		(underTest) => underTest.language === language && underTest.status === 200,
+	)
+	if (home === undefined) throw new Error(`the Site has no ${language} home`)
+	return home
+}
+
+/** Open a page, assert its real status and the Language its document declares. */
+export async function openPage(page: Page, underTest: PageUnderTest): Promise<void> {
+	const response = await page.goto(underTest.path)
+	expect(response?.status(), `${underTest.path} answers ${underTest.status}`).toBe(underTest.status)
+	await expect(page.locator("html")).toHaveAttribute("lang", new RegExp(`^${underTest.language}`))
+}
+
+/** Assert the page painted the Theme the harness asked for before navigation. */
+export async function expectTheme(page: Page, theme: Theme): Promise<void> {
+	await expect(page.locator("html")).toHaveAttribute("data-theme", theme)
+}
+
+/** The number of controls a keyboard visitor can reach on the page. */
+export function focusableCount(page: Page): Promise<number> {
+	return page.evaluate((selector) => document.querySelectorAll(selector).length, FOCUSABLE)
+}
+
+/** Whether the focused control paints a ring in a `--ds-*` role: an outline or a box shadow. */
+export function ringVisible(page: Page): Promise<boolean> {
+	return page.evaluate(() => {
+		const focused = document.activeElement
+		if (!(focused instanceof HTMLElement)) return false
+		const token = getComputedStyle(document.documentElement)
+			.getPropertyValue("--ds-color-ring")
+			.trim()
+		if (token === "") return false
+		const probe = document.createElement("span")
+		probe.style.color = token
+		document.body.append(probe)
+		const ring = getComputedStyle(probe).color
+		probe.remove()
+		const style = getComputedStyle(focused)
+		const outline =
+			style.outlineStyle !== "none" &&
+			Number.parseFloat(style.outlineWidth) > 0 &&
+			style.outlineColor === ring
+		return outline || (style.boxShadow !== "none" && style.boxShadow.includes(ring))
+	})
+}
+
+/** Press Tab until the Copy button has focus, and return whether it gets there at all. */
+export async function tabToCopyButton(page: Page): Promise<boolean> {
+	const count = await focusableCount(page)
+	for (let press = 0; press < count; press++) {
+		await page.keyboard.press("Tab")
+		const onCopy = await page.evaluate(
+			() => document.activeElement?.hasAttribute("data-copy-command") ?? false,
+		)
+		if (onCopy) return true
+	}
+	return false
+}
+
+/** The dictionary string one Language announces after a copy. */
+export function copiedMessage(language: Language): string {
+	return dictionaryFor(language).copied
+}
+
+/** The install command a copy puts on the clipboard. */
+export const COPY_TEXT = INSTALL_COMMAND
