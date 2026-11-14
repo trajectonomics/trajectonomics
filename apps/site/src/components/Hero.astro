@@ -1,0 +1,45 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the links.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { sublineParts } from "../lib/language/subline"
+import { GITHUB_CLI_URL } from "../lib/site"
+import CopyCommand from "./CopyCommand.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+const subline = sublineParts(dictionary.heroSubline)
+---
+
+<div
+	class="mx-auto flex max-w-3xl flex-col items-center px-5 pt-20 pb-20 text-center sm:px-6 sm:pt-24 sm:pb-28"
+>
+	<h1
+		class="max-w-3xl text-4xl leading-[1.15] font-semibold tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl"
+	>
+		{dictionary.heroHeading}
+	</h1>
+	<p class="mt-6 max-w-2xl text-lg text-pretty text-muted-foreground sm:mt-8 sm:text-xl">
+		{
+			subline.map((part) =>
+				part.code ? (
+					<code class="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[0.9em] text-secondary-foreground">
+						{part.text}
+					</code>
+				) : (
+					<Fragment>{part.text}</Fragment>
+				),
+			)
+		}
+	</p>
+	<div class="mt-10 w-full sm:mt-12">
+		<CopyCommand dictionary={dictionary} />
+		<a
+			class="mt-5 inline-flex text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+			href={GITHUB_CLI_URL}>{dictionary.starOnGitHub}</a
+		>
+	</div>
+</div>

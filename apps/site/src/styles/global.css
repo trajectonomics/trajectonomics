@@ -15,6 +15,12 @@
 	width: auto;
 }
 
+@media (min-width: 40rem) {
+	.wordmark > svg {
+		height: 1.75rem;
+	}
+}
+
 /* Thai type comes from the visitor's own fonts, so the Site downloads none (ADR 0003). */
 html {
 	font-family:

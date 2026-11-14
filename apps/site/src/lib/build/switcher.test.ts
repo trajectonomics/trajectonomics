@@ -9,7 +9,7 @@ describe("the switcher in the header", () => {
 
 	it("fails a home with no link to the other Language", () => {
 		const page = home(entryAt(0).language, undefined, "")
-		expect(codes(checkSwitcher, page)).toEqual(["SWITCHER_MISSING"])
+		expect(codes(checkSwitcher, page)).toEqual(["SWITCHER_MISSING", "SWITCHER_CURRENT_MISSING"])
 	})
 
 	it("fails a link that does not say which Language it leads to", () => {
@@ -21,7 +21,22 @@ describe("the switcher in the header", () => {
 
 	it("fails a switcher that is a button, because it must work with JavaScript off", () => {
 		const page = home(entryAt(0).language, undefined, "<button>x</button>")
-		expect(codes(checkSwitcher, page)).toEqual(["SWITCHER_MISSING"])
+		expect(codes(checkSwitcher, page)).toEqual(["SWITCHER_MISSING", "SWITCHER_CURRENT_MISSING"])
+	})
+
+	it("fails a current link that does not name the reading Language", () => {
+		const page = home(entryAt(0).language)
+		const entry = entryAt(0)
+		const content = page.content.replace(`aria-label="${entry.dictionary.languageName}"`, "")
+		expect(codes(checkSwitcher, { path: page.path, content })).toEqual([
+			"SWITCHER_CURRENT_LABEL_WRONG",
+		])
+	})
+
+	it("fails a home that does not mark the reading Language as current", () => {
+		const page = home(entryAt(0).language)
+		const content = page.content.replace(' aria-current="page"', "")
+		expect(codes(checkSwitcher, { path: page.path, content })).toEqual(["SWITCHER_CURRENT_MISSING"])
 	})
 
 	it("fails a link labelled in the page's Language instead of the target's", () => {

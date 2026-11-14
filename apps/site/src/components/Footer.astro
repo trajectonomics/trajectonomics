@@ -1,0 +1,37 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the props it renders.
+import type { Dictionary } from "../lib/language/dictionary"
+import { CLI_LICENCE_URL, GITHUB_ORG_URL } from "../lib/site"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+// biome-ignore lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see dictionary.
+const { dictionary } = Astro.props
+---
+
+<footer class="border-t border-border">
+	<div
+		class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:px-6 sm:py-10"
+	>
+		<ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
+			<li>
+				<a
+					class="transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+					href={CLI_LICENCE_URL}>{dictionary.licence}</a
+				>
+			</li>
+			<li>
+				<a
+					class="transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+					href={GITHUB_ORG_URL}>{dictionary.org}</a
+				>
+			</li>
+		</ul>
+		<div class="max-w-xl space-y-1">
+			<p>{dictionary.footerDisclaimer}</p>
+			<p>{dictionary.taxSentence}</p>
+		</div>
+	</div>
+</footer>

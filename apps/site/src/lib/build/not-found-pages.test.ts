@@ -70,6 +70,13 @@ describe("the Not-found pages", () => {
 		])
 	})
 
+	it("fails a Not-found page that marks a Language as the current page", () => {
+		const page = firstPage()
+		const current = `<a href="/en/" aria-current="page">EN</a>`
+		const content = `<html lang="${page.language}"><head>${NOINDEX}</head><body><nav>${current}</nav><main></main></body></html>`
+		expect(codes(build({ path: page.path, content }))).toEqual(["NOT_FOUND_HAS_CURRENT"])
+	})
+
 	it("fails a Not-found page that declares a Language other than its own", () => {
 		const page = firstPage()
 		expect(codes(build(notFound(page.path, "xx")))).toEqual(["LANGUAGE_NOT_DECLARED"])

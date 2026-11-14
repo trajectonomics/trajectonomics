@@ -17,7 +17,7 @@ bun run dev
 | --- | --- |
 | `bun run dev` | Astro dev server on a local port |
 | `bun run build` | Build the Site into `dist/` |
-| `bun run verify:build` | Check the built pages: a home per Language and a Not-found page per Locale URL, one `head`, `body`, `nav` and `main` each, no document at `/`, absolute `hreflang` and `x-default`, the switcher, `noindex` on misses, no downloaded font, no Reserved preload path, no content security policy, no third-party resource |
+| `bun run verify:build` | Check the built pages: a home per Language and a Not-found page per Locale URL, the three regions, the install command and its links, one `head`, `body`, `nav` and `main` each, no document at `/`, absolute `hreflang` and `x-default`, the switcher, `noindex` on misses, no downloaded font, no Reserved preload path, no content security policy, no third-party resource |
 | `bun run probe:status` | Start `wrangler dev` with no Cloudflare credential and check `/` redirects by Visitor signal, both Locale URLs are 200, a miss under a Locale URL is 404 in that Language, and `/__mf-preload.js` is 404 |
 | `bun run test` | `bun test` over `src` and `scripts` |
 | `bun run typecheck` | `tsc` plus `astro check` |
@@ -31,7 +31,7 @@ bun run dev
 
 `dist/th/index.html` and `dist/en/index.html` are the two Language homes, and there is no document at `/`: the Worker's only script answers `/` with a 302 to the chosen Locale URL ([ADR 0003](./docs/adr/0003-thai-and-english-from-visitor-signals.md)). `dist/404.html` is the English Not-found page, `dist/th/404.html` the Thai one and `dist/en/404.html` the English one under its own Locale URL, so the assets handler's nearest-`404.html` rule answers a miss in the Language of the Locale URL the visitor tried. The built files are the source of truth for the structure rules, not HTML fetched through the router.
 
-The header, hero and footer are placeholders until that ticket replaces them, and the strings only the owner may write stay `[OWNER TO WRITE]` in both Dictionaries until the owner-written ticket. Deployment is a later change.
+The page shows the three confirmed regions only: the header, the hero with the install command, and the footer ([site#3](https://github.com/trajectonomics/site/issues/3)). The Thai headline, the Thai sub-line and each footer disclaimer stay `[OWNER TO WRITE]` until the owner writes them; the English hero text is confirmed. Screenshots of the built page are in [`docs/screenshots/`](./docs/screenshots/). Deployment is a later change.
 
 ## License
 

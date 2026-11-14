@@ -40,6 +40,16 @@ function checkNotIndexed(file: BuiltFile): readonly BuildFailure[] {
 			buildFailure("NOT_FOUND_HAS_HREFLANG", file.path, "advertises itself as a Language home."),
 		)
 	}
+	const anchors = elementsByTag(page, "a")
+	if (anchors.some((anchor) => anchor.attributes["aria-current"] === "page")) {
+		failures.push(
+			buildFailure(
+				"NOT_FOUND_HAS_CURRENT",
+				file.path,
+				"marks a link as the current page, but a miss is not its Language home.",
+			),
+		)
+	}
 	return failures
 }
 

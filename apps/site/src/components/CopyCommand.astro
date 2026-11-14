@@ -1,0 +1,75 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the fixture and the props it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { INSTALL_COMMAND } from "../lib/site"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<div>
+	<div
+		class="flex w-full flex-col items-stretch gap-2 rounded-2xl bg-primary p-2 sm:flex-row sm:items-center sm:gap-3 sm:p-3"
+	>
+		<code
+			data-install-command
+			class="min-w-0 flex-1 px-3 py-2 text-left font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-primary-foreground sm:text-base"
+		>
+			{INSTALL_COMMAND}
+		</code>
+		<button
+			type="button"
+			hidden
+			data-copy-command
+			data-copied={dictionary.copied}
+			data-copy-failed={dictionary.copyFailed}
+			class="shrink-0 rounded-xl bg-primary-foreground px-5 py-2.5 text-sm font-semibold text-primary transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+		>
+			{dictionary.copy}
+		</button>
+	</div>
+	<p
+		role="status"
+		aria-live="polite"
+		aria-atomic="true"
+		data-copy-status
+		class="mt-3 min-h-5 text-sm text-muted-foreground"
+	>
+	</p>
+</div>
+
+<script is:inline>
+	;(() => {
+		const command = document.querySelector("[data-install-command]")
+		const button = document.querySelector("[data-copy-command]")
+		const status = document.querySelector("[data-copy-status]")
+		if (
+			!(command instanceof HTMLElement) ||
+			!(button instanceof HTMLButtonElement) ||
+			!(status instanceof HTMLElement)
+		) {
+			return
+		}
+
+		// The button is progressive enhancement: with JavaScript off the command alone is the action.
+		button.hidden = false
+		button.addEventListener("click", async () => {
+			const text = command.textContent?.trim() ?? ""
+			try {
+				await navigator.clipboard.writeText(text)
+				status.textContent = button.dataset.copied ?? ""
+			} catch {
+				const range = document.createRange()
+				range.selectNodeContents(command)
+				const selection = document.getSelection()
+				selection?.removeAllRanges()
+				selection?.addRange(range)
+				status.textContent = button.dataset.copyFailed ?? ""
+			}
+		})
+	})()
+</script>

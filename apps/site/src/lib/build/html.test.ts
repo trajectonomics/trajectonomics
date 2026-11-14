@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { elementsByTag, scanHtml } from "./html"
+import { elementsByTag, scanHtml, textOf } from "./html"
 
 const PAGE = `<!doctype html>
 <html lang="en" data-theme="light">
@@ -89,5 +89,16 @@ describe("the text runs of a built page", () => {
 
 	it("leave out whitespace, which no one reads", () => {
 		expect(scanHtml("<p>\n\t \n</p>").text).toEqual([])
+	})
+
+	it("read the text an element carries, including the text of its children", () => {
+		const [paragraph] = elementsByTag(page, "p")
+		expect(paragraph === undefined ? "" : textOf(page, paragraph)).toBe("Sub-line with bold words")
+	})
+
+	it("collapse the whitespace of an element's text, as a browser renders it", () => {
+		const scanned = scanHtml('<a href="/">  Star   on\nGitHub </a>')
+		const [anchor] = elementsByTag(scanned, "a")
+		expect(anchor === undefined ? "" : textOf(scanned, anchor)).toBe("Star on GitHub")
 	})
 })

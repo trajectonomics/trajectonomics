@@ -11,8 +11,11 @@ import { checkLanguageHomes } from "./language-home"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { checkNotFoundPages } from "./not-found-pages"
 import { checkOwnerWritten } from "./owner-written"
+import { checkPageText } from "./page-text"
 import { checkContentSecurityPolicy } from "./policy"
 import { checkReservedPreloadPath } from "./reserved-path"
+import { checkSiteContent } from "./site-content"
+import { checkSiteLinks } from "./site-links"
 import { checkStructure } from "./structure"
 import { checkSwitcher } from "./switcher"
 import { checkTheme } from "./theme"
@@ -38,6 +41,9 @@ export function checkBuild(
 		...checkOwnerWritten(files),
 		...checkNoLanguageDetection(files),
 		...checkNotFoundPages(files),
+		...checkSiteContent(files),
+		...checkSiteLinks(files),
+		...checkPageText(files),
 	]
 }
 

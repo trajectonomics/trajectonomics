@@ -1,0 +1,64 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and links it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw"
+import type { Dictionary } from "../lib/language/dictionary"
+import type { Language } from "../lib/language/language"
+import { localeUrl, otherLanguages } from "../lib/language/languages"
+import { DOCS_PATH, GITHUB_CLI_URL, SITE_NAME } from "../lib/site"
+
+interface Props {
+	readonly language: Language
+	readonly dictionary: Dictionary
+	/** A Language home is the page the reading Language points at; a miss is not. */
+	readonly markCurrent: boolean
+}
+
+const { language, dictionary, markCurrent } = Astro.props
+// The link names itself, so the artwork is decoration: the accessible name is the Site's.
+const artwork = wordmark.replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
+---
+
+<header class="border-b border-border">
+	<nav
+		class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-4 sm:gap-6 sm:px-6 sm:py-5"
+	>
+		<a
+			class="wordmark shrink-0 text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+			href={localeUrl(language)}
+			aria-label={SITE_NAME}><Fragment set:html={artwork} /></a
+		>
+		<div class="flex items-center gap-3 sm:gap-6">
+			<a
+				class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+				href={DOCS_PATH}>{dictionary.docsLink}</a
+			>
+			<a
+				class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+				href={GITHUB_CLI_URL}>{dictionary.githubLink}</a
+			>
+			<span class="hidden h-4 w-px bg-border sm:block" aria-hidden="true"></span>
+			<div class="flex items-center gap-3">
+				<a
+					class="text-sm font-semibold text-foreground underline decoration-1 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+					href={localeUrl(language)}
+					lang={language}
+					hreflang={language}
+					aria-label={dictionary.languageName}
+					aria-current={markCurrent ? "page" : undefined}>{dictionary.languageSwitchLabel}</a
+				>
+				{
+					otherLanguages(language).map((entry) => (
+						<a
+							class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+							href={localeUrl(entry.language)}
+							lang={entry.language}
+							hreflang={entry.language}>
+							{entry.dictionary.languageName}
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</nav>
+</header>

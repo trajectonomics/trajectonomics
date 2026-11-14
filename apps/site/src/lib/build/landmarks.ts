@@ -10,6 +10,9 @@ const LANDMARKS = [
 	{ tag: "footer", count: 1, code: "FOOTER_MISSING" },
 ] as const satisfies readonly { tag: string; count: number; code: BuildFailureCode }[]
 
+/** The headings a page may not carry: the hero makes the page's one claim. */
+const OTHER_HEADINGS = ["h2", "h3", "h4", "h5", "h6"] as const
+
 /** Every page shows one header, one hero inside main, and one footer. */
 export function checkLandmarks(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return builtPages(files).flatMap((file) => {
@@ -34,6 +37,16 @@ export function checkLandmarks(files: readonly BuiltFile[]): readonly BuildFailu
 					"HERO_MISSING",
 					file.path,
 					`expected one <h1> inside <main> for the hero, found ${heroes.length}.`,
+				),
+			)
+		}
+		const extra = OTHER_HEADINGS.flatMap((tag) => elementsByTag(page, tag))
+		if (extra.length > 0) {
+			failures.push(
+				buildFailure(
+					"EXTRA_HEADING",
+					file.path,
+					`expected one <h1> and no other heading, found <${extra[0]?.tag ?? "h2"}>.`,
 				),
 			)
 		}

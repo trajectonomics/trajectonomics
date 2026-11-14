@@ -1,3 +1,4 @@
+import type { Dictionary } from "./dictionary"
 import { OWNER_WRITTEN_PLACEHOLDER } from "./dictionary"
 import type { LanguageEntry } from "./language"
 
@@ -8,17 +9,25 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 	countries: Object.freeze([]),
 	dictionary: Object.freeze({
 		languageName: "English",
-		heroHeading: OWNER_WRITTEN_PLACEHOLDER,
-		heroSubline: OWNER_WRITTEN_PLACEHOLDER,
-		installHeading: "Install",
+		languageSwitchLabel: "EN",
+		heroHeading: "A money tool your AI agent operates.",
+		heroSubline:
+			"Tell your agent what you earn, spend and owe. traj keeps the books and returns exact, repeatable numbers. Free and open source. Thailand first.",
 		docsLink: "Docs",
 		githubLink: "GitHub",
 		starOnGitHub: "Star on GitHub",
 		copy: "Copy",
 		copied: "Copied",
+		copyFailed: "Select the command and copy it.",
+		licence: "MIT",
+		org: "trajectonomics",
 		footerDisclaimer: OWNER_WRITTEN_PLACEHOLDER,
 		taxSentence: OWNER_WRITTEN_PLACEHOLDER,
 		notFoundHeading: "Page not found",
 		notFoundBody: "This link may have moved, or it may be mistyped.",
 	}),
+	ownerWritten: Object.freeze([
+		"footerDisclaimer",
+		"taxSentence",
+	] as const satisfies readonly (keyof Dictionary)[]),
 })

@@ -37,6 +37,12 @@ describe("the landmarks of a built page", () => {
 		).toEqual(["HERO_MISSING"])
 	})
 
+	it("fails a page with a second heading, because the hero makes the page's one claim", () => {
+		expect(
+			codes(page("<header></header><main><h1>Hero</h1><h2>More</h2></main><footer></footer>")),
+		).toEqual(["EXTRA_HEADING"])
+	})
+
 	it("fails a page with two h1 elements in main", () => {
 		expect(
 			codes(page("<header></header><main><h1>a</h1><h1>b</h1></main><footer></footer>")),

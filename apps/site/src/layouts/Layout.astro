@@ -1,16 +1,11 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
-// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
-import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw"
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and the canonical links it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import Footer from "../components/Footer.astro"
+import Header from "../components/Header.astro"
 import "../styles/global.css"
 import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
-import {
-	absoluteLocaleUrl,
-	dictionaryFor,
-	LANGUAGES,
-	localeUrl,
-	otherLanguages,
-} from "../lib/language/languages"
+import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../lib/language/languages"
 
 interface Props {
 	readonly language: Language
@@ -58,43 +53,9 @@ const dictionary = dictionaryFor(language)
 		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
 		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
 	</head>
-	<body class="bg-background text-foreground">
-		<header class="border-b border-border">
-			<nav class="mx-auto flex max-w-5xl items-center gap-6 px-6 py-4" aria-label="Main">
-				<a class="wordmark block text-foreground" href={localeUrl(language)}>
-					<Fragment set:html={wordmark} />
-				</a>
-				{
-					otherLanguages(language).map((entry) => (
-						<a
-							class="text-sm text-muted-foreground hover:text-foreground"
-							href={localeUrl(entry.language)}
-							lang={entry.language}
-							hreflang={entry.language}>
-							{entry.dictionary.languageName}
-						</a>
-					))
-				}
-				<a class="text-sm text-muted-foreground hover:text-foreground" href="/docs/">
-					{dictionary.docsLink}
-				</a>
-				<a
-					class="text-sm text-muted-foreground hover:text-foreground"
-					href="https://github.com/trajectonomics/cli">{dictionary.githubLink}</a
-				>
-			</nav>
-		</header>
-		<main class="mx-auto max-w-5xl px-6 py-20">
-			<slot />
-		</main>
-		<footer class="border-t border-border">
-			<div class="mx-auto flex max-w-5xl flex-col gap-2 px-6 py-8 text-sm text-muted-foreground">
-				<p>{dictionary.footerDisclaimer}</p>
-				<p>{dictionary.taxSentence}</p>
-				<a class="hover:text-foreground" href="https://github.com/trajectonomics">
-					github.com/trajectonomics
-				</a>
-			</div>
-		</footer>
+	<body class="flex min-h-dvh flex-col bg-background text-foreground">
+		<Header language={language} dictionary={dictionary} markCurrent={indexed} />
+		<main class="flex flex-1 flex-col"><slot /></main>
+		<Footer dictionary={dictionary} />
 	</body>
 </html>

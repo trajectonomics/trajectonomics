@@ -12,6 +12,8 @@ export interface LanguageEntry {
 	readonly pathPrefix: string
 	readonly countries: readonly string[]
 	readonly dictionary: Dictionary
+	/** The keys whose text only the owner may write for this Language, so no agent invents it. */
+	readonly ownerWritten: readonly (keyof Dictionary)[]
 }
 
 /** The ways a Language lookup can be rejected. One code per rule. */

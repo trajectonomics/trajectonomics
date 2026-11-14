@@ -1,6 +1,12 @@
 import { OWNER_WRITTEN_PLACEHOLDER } from "../../language/dictionary"
 import { FALLBACK_LANGUAGE, type Language, type LanguageEntry } from "../../language/language"
-import { absoluteLocaleUrl, LANGUAGES, localeUrl, otherLanguages } from "../../language/languages"
+import {
+	absoluteLocaleUrl,
+	LANGUAGES,
+	languageEntry,
+	localeUrl,
+	otherLanguages,
+} from "../../language/languages"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
 
@@ -11,15 +17,20 @@ export function entryAt(index: number): LanguageEntry {
 	return entry
 }
 
-/** The switcher a home must show: every other Language, in that Language's own name. */
+/**
+ * The switcher a home must show: the reading Language, marked current, and every other Language in
+ * that Language's own name. The current link comes last, so a test can edit the other one first.
+ */
 export function switcher(language: Language): string {
-	return otherLanguages(language)
+	const others = otherLanguages(language)
 		.map((other) => {
 			const href = localeUrl(other.language)
 			const code = other.language
 			return `<a href="${href}" lang="${code}" hreflang="${code}">${other.dictionary.languageName}</a>`
 		})
 		.join("")
+	const entry = languageEntry(language)
+	return `${others}<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${entry.dictionary.languageName}" aria-current="page">${entry.dictionary.languageSwitchLabel}</a>`
 }
 
 /** The advertised links every home carries: one per Language, plus `x-default`. */

@@ -34,3 +34,13 @@ export function isStylesheetLink(element: HtmlElement): boolean {
 export function elementsByTag(page: ScannedPage, tag: string): readonly HtmlElement[] {
 	return page.elements.filter((element) => element.tag === tag)
 }
+
+/** The text an element carries, whitespace collapsed, from the runs inside it. */
+export function textOf(page: ScannedPage, element: HtmlElement): string {
+	return page.text
+		.filter((run) => run.ancestors.includes(element))
+		.map((run) => run.text)
+		.join(" ")
+		.replace(/\s+/g, " ")
+		.trim()
+}

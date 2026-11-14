@@ -14,9 +14,17 @@ const dictionary = dictionaryFor(language)
 ---
 
 <Layout language={language} title={dictionary.notFoundHeading} indexed={false}>
-	<h1 class="text-4xl font-semibold tracking-tight text-foreground">{dictionary.notFoundHeading}</h1>
-	<p class="mt-6 max-w-2xl text-lg text-muted-foreground">{dictionary.notFoundBody}</p>
-	<p class="mt-6 text-lg">
-		<a class="text-foreground underline" href={localeUrl(language)}>Trajectonomics</a>
-	</p>
+	<div class="mx-auto flex max-w-3xl flex-col items-center px-5 py-24 text-center sm:px-6 sm:py-32">
+		<h1 class="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+			{dictionary.notFoundHeading}
+		</h1>
+		<p class="mt-6 max-w-2xl text-lg text-pretty text-muted-foreground">
+			{dictionary.notFoundBody}
+		</p>
+		<p class="mt-6 text-lg">
+			<a class="text-foreground underline underline-offset-4" href={localeUrl(language)}>
+				Trajectonomics
+			</a>
+		</p>
+	</div>
 </Layout>
