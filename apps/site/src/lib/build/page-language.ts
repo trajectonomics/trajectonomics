@@ -3,6 +3,7 @@ import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, scanHtml } from "./html"
+import { pageUrl } from "./page-url"
 
 /** The Language a built page declares in `<html lang>`, or `undefined` when it declares none. */
 export function declaredLanguage(html: string): string | undefined {
@@ -20,7 +21,7 @@ export function checkDeclaredLanguage(
 	return [
 		buildFailure(
 			"LANGUAGE_NOT_DECLARED",
-			file.path,
+			pageUrl(file.path),
 			`declares <html lang="${declared ?? ""}">, not "${language}"; the browser breaks and speaks lines by it.`,
 		),
 	]

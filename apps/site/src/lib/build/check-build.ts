@@ -1,16 +1,18 @@
 import type { DesignTokens } from "../design/tokens"
-import { checkAdvertisedLinks } from "./advertised-links"
 import type { BuiltFile } from "./built-files"
 import { checkTextContrast } from "./contrast"
-import { checkExternalResources } from "./external-resources"
+import { checkExternalAssets } from "./external-assets"
 import type { BuildFailure } from "./failures"
 import { checkNoDownloadedFonts } from "./fonts"
+import { checkHreflang } from "./hreflang"
 import { checkLandmarkColours } from "./landmark-colours"
 import { checkLandmarks } from "./landmarks"
 import { checkLanguageHomes } from "./language-home"
+import { type BuildMode, DEFAULT_BUILD_MODE } from "./mode"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { checkNotFoundPages } from "./not-found-pages"
-import { checkOwnerWritten } from "./owner-written"
+import { checkOwnerPlaceholder, checkOwnerWritten } from "./owner-written"
+import { checkPageLinks } from "./page-links"
 import { checkPageText } from "./page-text"
 import { checkContentSecurityPolicy } from "./policy"
 import { checkReservedPreloadPath } from "./reserved-path"
@@ -24,21 +26,24 @@ import { checkTheme } from "./theme"
 export function checkBuild(
 	files: readonly BuiltFile[],
 	tokens: DesignTokens,
+	mode: BuildMode = DEFAULT_BUILD_MODE,
 ): readonly BuildFailure[] {
 	return [
 		...checkStructure(files),
+		...checkPageLinks(files),
 		...checkReservedPreloadPath(files),
 		...checkContentSecurityPolicy(files),
-		...checkExternalResources(files),
+		...checkExternalAssets(files),
 		...checkLandmarks(files),
 		...checkTheme(files, tokens),
 		...checkLandmarkColours(files, tokens),
 		...checkTextContrast(files, tokens),
 		...checkNoDownloadedFonts(files),
 		...checkLanguageHomes(files),
-		...checkAdvertisedLinks(files),
+		...checkHreflang(files),
 		...checkSwitcher(files),
-		...checkOwnerWritten(files),
+		...checkOwnerWritten(files, mode),
+		...checkOwnerPlaceholder(files, mode),
 		...checkNoLanguageDetection(files),
 		...checkNotFoundPages(files),
 		...checkSiteContent(files),

@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkStructure } from "./structure"
 
-const complete = "<html><head></head><body><nav></nav><main></main></body></html>"
+const complete = "<html><head></head><body><nav></nav><main><h1></h1></main></body></html>"
 
 function build(thai = complete, english = complete): readonly BuiltFile[] {
 	return [
@@ -17,7 +17,7 @@ function codes(files: readonly BuiltFile[]): readonly string[] {
 }
 
 describe("the structure of the built pages", () => {
-	it("passes every home with exactly one head, body, nav and main", () => {
+	it("passes every home with exactly one head, body, nav, main and h1", () => {
 		expect(codes(build())).toEqual([])
 	})
 
@@ -31,35 +31,71 @@ describe("the structure of the built pages", () => {
 		])
 	})
 
-	it("counts opening tags only, so one nav is one nav", () => {
-		expect(codes(build("<html><head></head><body><nav></nav><main></main></body></html>"))).toEqual(
-			[],
-		)
+	it("does not count a landmark a comment names, so a commented-out nav is no nav", () => {
+		const page = "<html><head></head><body><!-- <nav></nav> --><main><h1></h1></main></body></html>"
+		expect(codes(build(page))).toEqual(["PAGE_NAV_COUNT"])
 	})
 
-	it("fails a page with two navs", () => {
-		const page = "<html><head></head><body><nav></nav><nav></nav><main></main></body></html>"
-		expect(codes(build(complete, page))).toEqual(["NAV_NOT_SINGLE"])
+	it("does not count a landmark a script carries as text", () => {
+		const page =
+			'<html><head></head><body><nav></nav><main><h1></h1></main><script>const tpl = "<nav></nav>"</script></body></html>'
+		expect(codes(build(page))).toEqual([])
 	})
 
-	it("fails a page with no main", () => {
-		expect(codes(build("<html><head></head><body><nav></nav></body></html>"))).toEqual([
-			"MAIN_NOT_SINGLE",
+	it("fails a page with no nav", () => {
+		expect(codes(build("<html><head></head><body><main><h1></h1></main></body></html>"))).toEqual([
+			"PAGE_NAV_COUNT",
 		])
 	})
 
+	it("fails a page with two navs", () => {
+		const page =
+			"<html><head></head><body><nav></nav><nav></nav><main><h1></h1></main></body></html>"
+		expect(codes(build(complete, page))).toEqual(["PAGE_NAV_COUNT"])
+	})
+
+	it("fails a page with no main", () => {
+		expect(codes(build("<html><head></head><body><nav></nav><h1></h1></body></html>"))).toEqual([
+			"PAGE_MAIN_COUNT",
+		])
+	})
+
+	it("fails a page with two mains", () => {
+		const page =
+			"<html><head></head><body><nav></nav><main></main><main><h1></h1></main></body></html>"
+		expect(codes(build(complete, page))).toEqual(["PAGE_MAIN_COUNT"])
+	})
+
+	it("fails a page with no h1", () => {
+		expect(codes(build("<html><head></head><body><nav></nav><main></main></body></html>"))).toEqual(
+			["PAGE_H1_COUNT"],
+		)
+	})
+
+	it("fails a page with two h1s", () => {
+		const page = "<html><head></head><body><nav></nav><main><h1></h1><h1></h1></main></body></html>"
+		expect(codes(build(complete, page))).toEqual(["PAGE_H1_COUNT"])
+	})
+
 	it("fails a page with two heads", () => {
-		const page = "<html><head></head><head></head><body><nav></nav><main></main></body></html>"
+		const page =
+			"<html><head></head><head></head><body><nav></nav><main><h1></h1></main></body></html>"
 		expect(codes(build(page))).toEqual(["HEAD_NOT_SINGLE"])
 	})
 
 	it("fails a page with two bodies", () => {
-		const page = "<html><head></head><body><nav></nav><main></main></body><body></body></html>"
+		const page =
+			"<html><head></head><body><nav></nav><main><h1></h1></main></body><body></body></html>"
 		expect(codes(build(page))).toEqual(["BODY_NOT_SINGLE"])
 	})
 
 	it("names every page it fails, not only the first", () => {
-		const page = "<html><head></head><body><nav></nav></body></html>"
-		expect(codes(build(page, page))).toEqual(["MAIN_NOT_SINGLE", "MAIN_NOT_SINGLE"])
+		const page = "<html><head></head><body><nav></nav><h1></h1></body></html>"
+		expect(codes(build(page, page))).toEqual(["PAGE_MAIN_COUNT", "PAGE_MAIN_COUNT"])
+	})
+
+	it("names the page URL rather than the build file, so the failure points at the page", () => {
+		const [failure] = checkStructure(build("<html><head></head><body><nav></nav></body></html>"))
+		expect(failure?.path).toBe("/th/")
 	})
 })

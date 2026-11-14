@@ -5,6 +5,7 @@ import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { checkDeclaredLanguage } from "./page-language"
+import { pageUrl } from "./page-url"
 
 /** The file a Language's home is built to: a directory index, so `/th` reaches `/th/`. */
 export function languageHomeFile(language: Language): string {
@@ -33,8 +34,8 @@ export function checkLanguageHomes(files: readonly BuiltFile[]): readonly BuildF
 		if (file === undefined) {
 			return [
 				buildFailure(
-					"LANGUAGE_HOME_MISSING",
-					path,
+					"LANGUAGE_PAGE_MISSING",
+					pageUrl(path),
 					`the build produced no ${entry.language} home.`,
 				),
 			]

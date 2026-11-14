@@ -11,7 +11,7 @@ describe("the Language homes", () => {
 		const missing = entryAt(0)
 		const files = homes().filter((file) => file.path !== `${missing.language}/index.html`)
 		expect(checkLanguageHomes(files).map((failure) => failure.code)).toEqual([
-			"LANGUAGE_HOME_MISSING",
+			"LANGUAGE_PAGE_MISSING",
 		])
 	})
 

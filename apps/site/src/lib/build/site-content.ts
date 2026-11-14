@@ -11,7 +11,7 @@ import { builtHomes } from "./language-home"
 const SCRIPT = /<script\b[^>]*>[\s\S]*?<\/script>/gi
 
 /** The npm package that is not Trajectonomics', and must appear nowhere. */
-const UNSCOPED_PACKAGE = /\bnpx\s+traj\b/
+const FORBIDDEN_COMMAND = "npx traj"
 
 /** The command is visible text in a `<code>` element, and stays there once the scripts are removed. */
 function commandFailures(file: BuiltFile, dictionary: Dictionary): readonly BuildFailure[] {
@@ -48,10 +48,10 @@ function commandFailures(file: BuiltFile, dictionary: Dictionary): readonly Buil
 export function checkSiteContent(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return [
 		...files.flatMap((file) =>
-			UNSCOPED_PACKAGE.test(file.content)
+			file.content.includes(FORBIDDEN_COMMAND)
 				? [
 						buildFailure(
-							"UNSCOPED_PACKAGE_SHOWN",
+							"FORBIDDEN_NPX_TRAJ",
 							file.path,
 							'shows "npx traj"; that package belongs to someone else.',
 						),

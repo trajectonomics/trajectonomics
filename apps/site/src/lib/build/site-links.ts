@@ -1,7 +1,7 @@
 import type { Dictionary } from "../language/dictionary"
 import type { Language } from "../language/language"
 import { localeUrl } from "../language/languages"
-import { CLI_LICENCE_URL, DOCS_PATH, GITHUB_CLI_URL, GITHUB_ORG_URL, SITE_NAME } from "../site"
+import { CLI_LICENCE_URL, GITHUB_CLI_URL, GITHUB_ORG_URL, SITE_NAME } from "../site"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
@@ -13,11 +13,9 @@ interface ExpectedLink {
 	readonly href: string
 }
 
-/** The links the three regions show, and where each one goes. */
+/** The named links the hero and footer show; the Docs and cli links are pinned by `checkPageLinks`. */
 function expectedLinks(dictionary: Dictionary): readonly ExpectedLink[] {
 	return [
-		{ text: dictionary.docsLink, href: DOCS_PATH },
-		{ text: dictionary.githubLink, href: GITHUB_CLI_URL },
 		{ text: dictionary.starOnGitHub, href: GITHUB_CLI_URL },
 		{ text: dictionary.licence, href: CLI_LICENCE_URL },
 		{ text: dictionary.org, href: GITHUB_ORG_URL },

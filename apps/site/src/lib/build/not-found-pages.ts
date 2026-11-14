@@ -4,8 +4,9 @@ import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { elementsByTag, scanHtml } from "./html"
+import { elementsByTag, relTokens, scanHtml } from "./html"
 import { checkDeclaredLanguage } from "./page-language"
+import { pageUrl } from "./page-url"
 
 /** One Not-found page the build must produce, and the Language it answers in. */
 export interface NotFoundPage {
@@ -28,16 +29,26 @@ function checkNotIndexed(file: BuiltFile): readonly BuildFailure[] {
 	)
 	if (!/\bnoindex\b/i.test(robots?.attributes["content"] ?? "")) {
 		failures.push(
-			buildFailure("NOINDEX_MISSING", file.path, "is not marked noindex, so a crawler indexes it."),
+			buildFailure(
+				"NOINDEX_MISSING",
+				pageUrl(file.path),
+				"is not marked noindex, so a crawler indexes it.",
+			),
 		)
 	}
 	const links = elementsByTag(page, "link")
-	if (links.some((link) => /\bcanonical\b/i.test(link.attributes["rel"] ?? ""))) {
-		failures.push(buildFailure("NOT_FOUND_HAS_CANONICAL", file.path, "advertises a canonical URL."))
+	if (links.some((link) => relTokens(link).includes("canonical"))) {
+		failures.push(
+			buildFailure("NOT_FOUND_HAS_CANONICAL", pageUrl(file.path), "advertises a canonical URL."),
+		)
 	}
 	if (links.some((link) => link.attributes["hreflang"] !== undefined)) {
 		failures.push(
-			buildFailure("NOT_FOUND_HAS_HREFLANG", file.path, "advertises itself as a Language home."),
+			buildFailure(
+				"NOT_FOUND_HAS_HREFLANG",
+				pageUrl(file.path),
+				"advertises itself as a Language home.",
+			),
 		)
 	}
 	const anchors = elementsByTag(page, "a")
@@ -45,7 +56,7 @@ function checkNotIndexed(file: BuiltFile): readonly BuildFailure[] {
 		failures.push(
 			buildFailure(
 				"NOT_FOUND_HAS_CURRENT",
-				file.path,
+				pageUrl(file.path),
 				"marks a link as the current page, but a miss is not its Language home.",
 			),
 		)
@@ -61,7 +72,7 @@ export function checkNotFoundPages(files: readonly BuiltFile[]): readonly BuildF
 			return [
 				buildFailure(
 					"NOT_FOUND_PAGE_MISSING",
-					page.path,
+					pageUrl(page.path),
 					`the build produced no ${page.language} Not-found page, so a miss has no page there.`,
 				),
 			]

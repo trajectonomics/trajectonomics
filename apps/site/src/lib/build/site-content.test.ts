@@ -61,9 +61,7 @@ describe("the Copy control", () => {
 describe("the unscoped npm package", () => {
 	it("fails a build that shows npx traj in any file", () => {
 		const files = [...heroHomes(), { path: "_astro/x.js", content: "npx traj" }]
-		expect(checkSiteContent(files).map((failure) => failure.code)).toEqual([
-			"UNSCOPED_PACKAGE_SHOWN",
-		])
+		expect(checkSiteContent(files).map((failure) => failure.code)).toEqual(["FORBIDDEN_NPX_TRAJ"])
 	})
 
 	it("passes a build that shows npx skills and never npx traj", () => {

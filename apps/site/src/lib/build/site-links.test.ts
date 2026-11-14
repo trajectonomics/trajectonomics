@@ -11,21 +11,6 @@ describe("the links of the three regions", () => {
 		expect(heroCodes(checkSiteLinks)).toEqual([])
 	})
 
-	it("fails a Docs link that does not go to /docs/", () => {
-		const page = heroHome("en")
-		const content = page.content.replace('href="/docs/"', 'href="/documentation/"')
-		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
-	})
-
-	it("fails a page with no GitHub link", () => {
-		const page = heroHome("en")
-		const content = page.content.replace(
-			`<a href="${GITHUB_CLI_URL}">${DICTIONARY.githubLink}</a>`,
-			"",
-		)
-		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_MISSING"])
-	})
-
 	it("fails a star link that goes to the organisation instead of the cli repository", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(

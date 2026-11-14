@@ -20,6 +20,11 @@ export interface ScannedPage {
 
 export { scanHtml } from "./html-scan"
 
+/** The `rel` tokens of an element, lowercased, because `rel` is a space-separated token list. */
+export function relTokens(element: HtmlElement): readonly string[] {
+	return (element.attributes["rel"] ?? "").toLowerCase().split(/\s+/).filter(Boolean)
+}
+
 /** Whether an element is a script the document carries itself, so it runs before any file loads. */
 export function isInlineScript(element: HtmlElement): boolean {
 	return element.tag === "script" && element.attributes["src"] === undefined
@@ -27,7 +32,7 @@ export function isInlineScript(element: HtmlElement): boolean {
 
 /** Whether an element is a stylesheet link, the only link that can paint the page. */
 export function isStylesheetLink(element: HtmlElement): boolean {
-	return element.tag === "link" && /\bstylesheet\b/i.test(element.attributes["rel"] ?? "")
+	return element.tag === "link" && relTokens(element).includes("stylesheet")
 }
 
 /** Every element of one tag, in document order. */
