@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { GITHUB_ORG_URL } from "../lib/site"
-import { STARRED_REPOS, TOP_STAR_LABEL } from "../lib/site/star-snapshot"
+import { STARRED_REPOS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import ArrowUpRight from "./icons/ArrowUpRight.astro"
 import Check from "./icons/Check.astro"
@@ -18,15 +18,15 @@ const { dictionary } = Astro.props
 /** The repository the trigger names: the highest count, and the row the menu checks. */
 const defaultRepo = STARRED_REPOS[0]?.repo
 const label =
-	TOP_STAR_LABEL === undefined
+	TOP_REPO_NAME === undefined
 		? dictionary.starMenuLabel
-		: `${dictionary.starMenuLabel}: ${TOP_STAR_LABEL}`
+		: `${dictionary.starMenuLabel}: ${TOP_REPO_NAME}`
 ---
 
 <details class="header-menu" data-header-menu>
 	<summary class="header-menu-summary" aria-label={label}>
 		<GitHubMark class="header-menu-mark" />
-		{TOP_STAR_LABEL !== undefined && <span>{TOP_STAR_LABEL}</span>}
+		{TOP_REPO_NAME !== undefined && <span>{TOP_REPO_NAME}</span>}
 		<Chevron class="header-menu-chevron" />
 	</summary>
 	<div

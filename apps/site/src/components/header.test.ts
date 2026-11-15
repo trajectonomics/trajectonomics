@@ -5,7 +5,7 @@ import type { Dictionary } from "../lib/language/dictionary"
 import { currentLanguageName } from "../lib/language/dictionary"
 import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
 import { DOCS_PATH, GITHUB_ORG_URL, SITE_NAME } from "../lib/site"
-import { STARRED_REPOS, TOP_STAR_LABEL } from "../lib/site/star-snapshot"
+import { STARRED_REPOS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import Header from "./Header.astro"
 import { renderComponent } from "./testing/render"
@@ -122,15 +122,15 @@ describe("the Header component in every Language, current or not", () => {
 				expect(textOf(page, docs)).toBe(dictionary.docsLink)
 			})
 
-			it(`names the highest count on the Star menu's trigger, with no verb (${variant})`, async () => {
+			it(`names the top repository on the Star menu's trigger, with no verb (${variant})`, async () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
 				const menu = menuWith(page, STARRED_REPOS[0]?.url ?? GITHUB_ORG_URL)
 				const summary = summaryOf(page, menu)
-				expect(textOf(page, summary)).toBe(TOP_STAR_LABEL ?? "")
+				expect(textOf(page, summary)).toBe(TOP_REPO_NAME ?? "")
 				const label =
-					TOP_STAR_LABEL === undefined
+					TOP_REPO_NAME === undefined
 						? dictionary.starMenuLabel
-						: `${dictionary.starMenuLabel}: ${TOP_STAR_LABEL}`
+						: `${dictionary.starMenuLabel}: ${TOP_REPO_NAME}`
 				expect(summary.attributes["aria-label"]).toBe(label)
 			})
 

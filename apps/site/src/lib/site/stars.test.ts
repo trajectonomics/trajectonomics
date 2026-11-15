@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { STAR_REPOS } from "../site"
-import { STAR_SNAPSHOT, STARRED_REPOS, TOP_STAR_LABEL } from "./star-snapshot"
+import { STAR_SNAPSHOT, STARRED_REPOS, TOP_REPO_NAME } from "./star-snapshot"
 import { formatStarCount, starredRepos, topStarLabel } from "./stars"
 
 const REPOS = [
@@ -54,12 +54,10 @@ describe("the committed star snapshot", () => {
 		expect(STAR_SNAPSHOT.asOf).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 	})
 
-	it("lists the repositories highest stars first and shows their highest count", () => {
+	it("lists the repositories highest stars first and names the highest one", () => {
 		expect(STARRED_REPOS.map((repo) => repo.stars)).toEqual(
 			[...STARRED_REPOS.map((repo) => repo.stars)].sort((left, right) => right - left),
 		)
-		expect(TOP_STAR_LABEL).toBe(
-			STARRED_REPOS.length === 0 ? undefined : formatStarCount(STARRED_REPOS[0]?.stars ?? 0),
-		)
+		expect(TOP_REPO_NAME).toBe(STARRED_REPOS[0]?.name)
 	})
 })

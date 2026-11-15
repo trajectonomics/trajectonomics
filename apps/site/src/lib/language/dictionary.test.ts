@@ -61,17 +61,13 @@ describe("the Dictionary of every Language", () => {
 	it("keeps the Thai hero headline the owner approved, and the suffixes it cycles", () => {
 		const thai = dictionaryFor("th")
 		expect(thai.heroHeadingPrefix).toBe("เครื่องมือเดียวที่ agent ของคุณต้องมี เพื่อ")
-		expect(thai.heroHeadingCycle).toEqual([
-			"วางแผนเกษียณอายุ",
-			"คาดการณ์อนาคตทางการเงิน",
-			"สร้างอนาคตของคุณ",
-		])
+		expect(thai.heroHeadingCycle).toEqual(["วางแผนเกษียณอายุ", "จำลองการเงิน", "สร้างอนาคตของคุณ"])
 	})
 
 	it("keeps the English sub-line and disclaimer the owner approved", () => {
 		const english = dictionaryFor("en")
 		expect(english.heroSubline).toBe(
-			"traj is a free, open-source money tool built for AI agents. Install as a skill in one command, and let your agent handle the rest — no accounts, no dashboards, no subscriptions.",
+			"traj is a free, open-source financial simulation tool built for AI agents. Ship as a skill and CLI — local-first, no accounts, no dashboards, no subscriptions.",
 		)
 		expect(english.footerDisclaimer).toBe(
 			"traj v0.1.0 is the first stable release; a bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
@@ -81,7 +77,7 @@ describe("the Dictionary of every Language", () => {
 	it("keeps the Thai sub-line and disclaimer the owner approved", () => {
 		const thai = dictionaryFor("th")
 		expect(thai.heroSubline).toBe(
-			"traj คือเครื่องมือวางแผนการเงินโอเพนซอร์สฟรีสำหรับ AI agent ติดตั้งเป็นสกิลได้ในคำสั่งเดียว แล้วให้ agent จัดการส่วนที่เหลือ — ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
+			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent ใช้ได้ทั้งเป็นสกิลและ CLI — ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		)
 		expect(thai.footerDisclaimer).toBe(
 			"traj v0.1.0 เป็นรุ่นเสถียรรุ่นแรก ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว",
@@ -134,9 +130,9 @@ describe("the Dictionary of every Language", () => {
 			})
 		}
 		expect(dictionaryFor("en").stepLabels).toEqual([
-			"1 Run in terminal",
-			"2 Answer setup",
-			"3 Ready in agent",
+			"1 Install the onboarding skill",
+			"2 Open your coding agent",
+			"3 Run the onboarding skill",
 		])
 	})
 

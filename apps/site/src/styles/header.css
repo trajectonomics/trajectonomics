@@ -1,4 +1,4 @@
-/* The header (ADR 0007): the mark's tile, and the mono nav it sits in. */
+/* The header (ADR 0007): the mark's tile, the mono nav, and a ground that only appears on scroll. */
 
 /* The mark on its tile: 40 px, 32 px on a phone, painted from the primary roles. */
 .brand-tile {

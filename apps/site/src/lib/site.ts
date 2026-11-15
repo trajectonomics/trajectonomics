@@ -56,6 +56,6 @@ export interface StarRepo {
  * repository is one entry here and a snapshot refresh.
  */
 export const STAR_REPOS: readonly StarRepo[] = Object.freeze([
-	Object.freeze({ repo: "cli", name: "traj CLI", url: GITHUB_CLI_URL }),
-	Object.freeze({ repo: "skills", name: "traj-onboarding", url: GITHUB_SKILLS_URL }),
+	Object.freeze({ repo: "cli", name: "cli", url: GITHUB_CLI_URL }),
+	Object.freeze({ repo: "skills", name: "skills", url: GITHUB_SKILLS_URL }),
 ])

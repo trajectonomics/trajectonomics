@@ -34,7 +34,7 @@ describe("the Site's own constants", () => {
 	})
 
 	it("names the repositories the Star menu may list, and their GitHub names", () => {
-		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["traj CLI", "traj-onboarding"])
+		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["cli", "skills"])
 		expect(STAR_REPOS.map((repo) => repo.repo)).toEqual(["cli", "skills"])
 		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_CLI_URL, GITHUB_SKILLS_URL])
 	})

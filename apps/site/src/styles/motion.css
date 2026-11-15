@@ -50,26 +50,30 @@
 }
 
 /*
- * The header is opaque from the first frame and gains a shadow after 8 px of scroll: the shadow is
- * the only elevation it carries, so it never competes with the hairline. A browser without scroll
- * timelines keeps the hairline alone.
+ * The header is a hole at the top of the page and settles over the first 64 px of scroll: the ground
+ * fades in with its hairline, and the shadow follows. A browser without scroll timelines keeps the
+ * opaque header the classes paint, so nothing depends on the animation to stay legible.
  */
-@keyframes header-shadow {
+@keyframes header-settles {
 	from {
+		background-color: transparent;
+		border-bottom-color: transparent;
 		box-shadow: none;
 	}
 	to {
+		background-color: var(--ds-color-background);
+		border-bottom-color: var(--ds-color-border);
 		box-shadow: 0 12px 32px -16px var(--ds-color-border);
 	}
 }
 
 @supports (animation-timeline: scroll()) {
 	.site-header {
-		animation-name: header-shadow;
+		animation-name: header-settles;
 		animation-timing-function: linear;
 		animation-fill-mode: both;
 		animation-timeline: scroll(root);
-		animation-range: 0 8px;
+		animation-range: 0 64px;
 	}
 }
 
