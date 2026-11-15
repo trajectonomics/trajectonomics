@@ -26,7 +26,7 @@ export const THAI: LanguageEntry = Object.freeze({
 		licence: "MIT",
 		org: "trajectonomics",
 		footerDisclaimer:
-			"traj ยังเป็นอัลฟา จึงอาจมีบั๊ก ยังไม่คำนวณภาษี เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/skills แล้วเราจะอัปเดตโดยเร็ว",
+			"traj ยังเป็นอัลฟา จึงอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว",
 		notFoundHeading: "ไม่พบหน้านี้",
 		notFoundBody: "ลิงก์นี้อาจถูกย้ายหรือพิมพ์ผิด",
 	}),

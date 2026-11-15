@@ -26,7 +26,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		licence: "MIT",
 		org: "trajectonomics",
 		footerDisclaimer:
-			"traj is in alpha, so a bug is possible. Tax is not applied yet. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/skills and we will update it as soon as we can.",
+			"traj is in alpha, so a bug is possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
 		notFoundHeading: "Page not found",
 		notFoundBody: "This link may have moved, or it may be mistyped.",
 	}),

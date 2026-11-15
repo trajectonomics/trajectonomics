@@ -70,7 +70,7 @@ describe("the Dictionary of every Language", () => {
 			"traj is a free, open-source money tool built for AI agents. One command installs it as a skill, and your agent handles the rest — no account, no dashboard, no signup.",
 		)
 		expect(english.footerDisclaimer).toBe(
-			"traj is in alpha, so a bug is possible. Tax is not applied yet. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/skills and we will update it as soon as we can.",
+			"traj is in alpha, so a bug is possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
 		)
 	})
 
@@ -80,7 +80,7 @@ describe("the Dictionary of every Language", () => {
 			"traj คือเครื่องมือการเงินโอเพนซอร์สฟรีสำหรับ AI agent คำสั่งเดียวติดตั้งเป็นสกิล แล้ว agent ของคุณจะจัดการส่วนที่เหลือ — ไม่ต้องมีบัญชี ไม่ต้องมีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		)
 		expect(thai.footerDisclaimer).toBe(
-			"traj ยังเป็นอัลฟา จึงอาจมีบั๊ก ยังไม่คำนวณภาษี เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/skills แล้วเราจะอัปเดตโดยเร็ว",
+			"traj ยังเป็นอัลฟา จึงอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว",
 		)
 	})
 
