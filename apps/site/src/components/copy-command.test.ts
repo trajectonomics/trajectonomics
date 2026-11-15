@@ -39,6 +39,20 @@ describe("the CopyCommand component in every Language", () => {
 			expect(status.attributes["aria-atomic"]).toBe("true")
 		})
 
+		it(`clears the notification after six seconds (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const button = withAttribute(page, "data-copy-command")[0]
+			if (button === undefined) throw new Error("no copy button rendered")
+			expect(button.attributes["data-notice-timeout"]).toBe("6000")
+		})
+
+		it(`keeps the next step under the command, always visible (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const nextStep = withAttribute(page, "data-next-step")[0]
+			if (nextStep === undefined) throw new Error("no next step rendered")
+			expect(textOf(page, nextStep)).toBe(dictionary.nextStep)
+		})
+
 		it(`carries its inline script and no heading (${language})`, async () => {
 			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
 			expect(page.elements.some(isInlineScript)).toBe(true)

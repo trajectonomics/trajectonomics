@@ -6,7 +6,7 @@ import { heroCodes, heroHome } from "./testing/hero"
 
 const DICTIONARY = dictionaryFor("en")
 
-describe("the links of the three regions", () => {
+describe("the links of the two-part section and the footer", () => {
 	it("passes every Language home, whose named links go where they say", () => {
 		expect(heroCodes(checkSiteLinks)).toEqual([])
 	})
@@ -14,8 +14,8 @@ describe("the links of the three regions", () => {
 	it("fails a star link that goes to the organisation instead of the skills repository", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(
-			`<a href="${GITHUB_SKILLS_URL}">${DICTIONARY.starOnGitHub}</a>`,
-			`<a href="${GITHUB_ORG_URL}">${DICTIONARY.starOnGitHub}</a>`,
+			`<a href="${GITHUB_SKILLS_URL}">${DICTIONARY.starOnboarding}</a>`,
+			`<a href="${GITHUB_ORG_URL}">${DICTIONARY.starOnboarding}</a>`,
 		)
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
@@ -29,7 +29,7 @@ describe("the links of the three regions", () => {
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
 
-	it("fails a wordmark that links the other Language's home", () => {
+	it("fails a brand lockup that links the other Language's home", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(
 			'href="/en/" aria-label="trajectonomics"',
@@ -40,7 +40,7 @@ describe("the links of the three regions", () => {
 		])
 	})
 
-	it("fails a page with no wordmark link at all", () => {
+	it("fails a page with no brand link at all", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(' aria-label="trajectonomics"', "")
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["WORDMARK_MISSING"])

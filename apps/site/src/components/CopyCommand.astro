@@ -9,6 +9,8 @@ interface Props {
 }
 
 const { dictionary } = Astro.props
+// How long the copy notification stays before it clears itself.
+const NOTICE_TIMEOUT_MS = 6000
 ---
 
 <div class="relative">
@@ -38,6 +40,7 @@ const { dictionary } = Astro.props
 				data-copy-command
 				data-copied={dictionary.copied}
 				data-copy-failed={dictionary.copyFailed}
+				data-notice-timeout={NOTICE_TIMEOUT_MS}
 				class="shrink-0 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 			>
 				{dictionary.copy}
@@ -48,8 +51,14 @@ const { dictionary } = Astro.props
 			aria-live="polite"
 			aria-atomic="true"
 			data-copy-status
-			class="min-h-4 px-4 pb-3 text-xs text-muted-foreground"
+			class="copy-status text-xs font-medium text-foreground"
 		>
+		</p>
+		<p
+			data-next-step
+			class="border-t border-border px-4 py-3 text-sm text-pretty text-muted-foreground"
+		>
+			{dictionary.nextStep}
 		</p>
 	</div>
 </div>
@@ -67,20 +76,32 @@ const { dictionary } = Astro.props
 			return
 		}
 
+		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
+		let notice = null
+		/** The notification confirms the copy, then clears itself so the next step keeps the eye. */
+		const notify = (message) => {
+			status.textContent = message
+			if (notice !== null) clearTimeout(notice)
+			notice = setTimeout(() => {
+				status.textContent = ""
+				notice = null
+			}, timeoutMs)
+		}
+
 		// The button is progressive enhancement: with JavaScript off the command alone is the action.
 		button.hidden = false
 		button.addEventListener("click", async () => {
 			const text = command.textContent?.trim() ?? ""
 			try {
 				await navigator.clipboard.writeText(text)
-				status.textContent = button.dataset.copied ?? ""
+				notify(button.dataset.copied ?? "")
 			} catch {
 				const range = document.createRange()
 				range.selectNodeContents(command)
 				const selection = document.getSelection()
 				selection?.removeAllRanges()
 				selection?.addRange(range)
-				status.textContent = button.dataset.copyFailed ?? ""
+				notify(button.dataset.copyFailed ?? "")
 			}
 		})
 	})()

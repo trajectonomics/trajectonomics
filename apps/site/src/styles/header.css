@@ -1,0 +1,67 @@
+/* The header's two disclosures (site#24): the Star menu and the Language menu. */
+
+.header-menu {
+	position: relative;
+}
+
+.header-menu-summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	cursor: pointer;
+	list-style: none;
+}
+
+.header-menu-summary::-webkit-details-marker {
+	display: none;
+}
+
+.header-menu-summary::marker {
+	content: "";
+}
+
+.header-menu-mark {
+	flex-shrink: 0;
+}
+
+.header-menu-chevron {
+	transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-menu[open] .header-menu-chevron {
+	transform: rotate(180deg);
+}
+
+.header-menu-panel {
+	position: absolute;
+	right: 0;
+	top: calc(100% + 10px);
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 12rem;
+	padding: 4px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 12px;
+	background: var(--ds-color-background);
+	box-shadow:
+		0 1px 2px 0 var(--ds-color-border),
+		0 12px 32px -16px var(--ds-color-border);
+}
+
+.header-menu-link {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 14px;
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+.header-menu-link:hover {
+	background: var(--ds-color-secondary);
+}

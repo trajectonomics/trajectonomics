@@ -1,0 +1,34 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { STAR_REPOS } from "../lib/site"
+import Chevron from "./icons/Chevron.astro"
+import GitHubMark from "./icons/GitHubMark.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<details class="header-menu" data-header-menu>
+	<summary
+		class="header-menu-summary text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+	>
+		<GitHubMark class="header-menu-mark" />
+		<span>{dictionary.starMenuLabel}</span>
+		<Chevron class="header-menu-chevron" />
+	</summary>
+	<div class="header-menu-panel">
+		{
+			STAR_REPOS.map((repo) => (
+				<a class="header-menu-link" href={repo.url}>
+					<GitHubMark class="header-menu-mark" />
+					<span>{repo.name}</span>
+				</a>
+			))
+		}
+	</div>
+</details>

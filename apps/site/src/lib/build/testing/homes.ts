@@ -18,10 +18,12 @@ export function entryAt(index: number): LanguageEntry {
 }
 
 /**
- * The switcher a home must show: the reading Language, marked current, and every other Language in
- * that Language's own name. The current link comes last, so a test can edit the other one first.
+ * The switcher a home must show: every Language in that Language's own name, the reading Language
+ * first and marked current. The reading Language comes first, so a test can edit the other one after.
  */
 export function switcher(language: Language): string {
+	const entry = languageEntry(language)
+	const current = `<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${currentLanguageName(entry.dictionary)}" aria-current="page">${entry.dictionary.languageName}</a>`
 	const others = otherLanguages(language)
 		.map((other) => {
 			const href = localeUrl(other.language)
@@ -29,8 +31,7 @@ export function switcher(language: Language): string {
 			return `<a href="${href}" lang="${code}" hreflang="${code}">${other.dictionary.languageName}</a>`
 		})
 		.join("")
-	const entry = languageEntry(language)
-	return `${others}<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${currentLanguageName(entry.dictionary)}" aria-current="page">${entry.dictionary.languageSwitchLabel}</a>`
+	return `${current}${others}`
 }
 
 /** The advertised links every home carries: one per Language, plus `x-default`. */

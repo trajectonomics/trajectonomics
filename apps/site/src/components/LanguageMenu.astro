@@ -1,0 +1,47 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import { currentLanguageName, type Dictionary } from "../lib/language/dictionary"
+import type { Language } from "../lib/language/language"
+import { languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
+import Chevron from "./icons/Chevron.astro"
+import Globe from "./icons/Globe.astro"
+
+interface Props {
+	readonly language: Language
+	readonly dictionary: Dictionary
+	/** A Language home is the page the reading Language points at; a miss is not. */
+	readonly markCurrent: boolean
+}
+
+const { language, dictionary, markCurrent } = Astro.props
+const languages = [languageEntry(language), ...otherLanguages(language)]
+---
+
+<details class="header-menu" data-header-menu>
+	<summary
+		class="header-menu-summary text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+	>
+		<Globe class="header-menu-mark" />
+		<span>{dictionary.languageSwitchLabel}</span>
+		<Chevron class="header-menu-chevron" />
+	</summary>
+	<div class="header-menu-panel">
+		{
+			languages.map((entry) => (
+				<a
+					class="header-menu-link"
+					href={localeUrl(entry.language)}
+					lang={entry.language}
+					hreflang={entry.language}
+					aria-label={
+						entry.language === language ? currentLanguageName(entry.dictionary) : undefined
+					}
+					aria-current={entry.language === language && markCurrent ? "page" : undefined}
+				>
+					{entry.dictionary.languageName}
+				</a>
+			))
+		}
+	</div>
+</details>

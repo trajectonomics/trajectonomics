@@ -1,0 +1,57 @@
+/* The install-command window (ADR 0004): its corner marks, and the notification a copy raises. */
+
+/* Corner plus-marks around the command window, drawn with bars so they carry no text. */
+.hero-plus {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	pointer-events: none;
+}
+
+.hero-plus::before,
+.hero-plus::after {
+	content: "";
+	position: absolute;
+	background: var(--ds-color-destructive);
+}
+
+.hero-plus::before {
+	left: 0;
+	right: 0;
+	top: 6px;
+	height: 2px;
+}
+
+.hero-plus::after {
+	top: 0;
+	bottom: 0;
+	left: 6px;
+	width: 2px;
+}
+
+/* The copy notification: a small pill beside the command, cleared by its script after 6 seconds. */
+.copy-status {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 16px;
+	padding: 0 16px 12px;
+}
+
+.copy-status:not(:empty) {
+	width: fit-content;
+	margin: 0 16px 12px;
+	padding: 4px 12px 4px 10px;
+	border-radius: 9999px;
+	background: var(--ds-color-secondary);
+}
+
+.copy-status:not(:empty)::before {
+	content: "";
+	width: 6px;
+	height: 10px;
+	margin-top: -3px;
+	border-right: 2px solid var(--ds-color-primary);
+	border-bottom: 2px solid var(--ds-color-primary);
+	transform: rotate(45deg);
+}

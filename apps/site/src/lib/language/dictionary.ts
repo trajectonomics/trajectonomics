@@ -2,18 +2,31 @@
 export interface Dictionary {
 	/** The Language's own name, the visible label of its switcher link on the other home. */
 	readonly languageName: string
-	/** The short label of the current Language, while the other Language keeps its own name. */
+	/** The short label of the current Language, the Language menu's summary. */
 	readonly languageSwitchLabel: string
 	/** The hero headline's static prefix; only the suffix after it changes when the cycle steps. */
 	readonly heroHeadingPrefix: string
 	/** The suffixes a script may show after the prefix, in order; the last one is held with no script. */
 	readonly heroHeadingCycle: readonly string[]
-	/** The small uppercase line above the hero headline, marked with the kicker colour. */
-	readonly heroEyebrow: string
+	/** The release line above the hero headline: the stable release, naming both parts. */
+	readonly heroRelease: string
+	/** The release date as this Language writes it; the machine-readable date is `HERO_RELEASE_DATE`. */
+	readonly heroReleaseDate: string
 	readonly heroSubline: string
 	readonly docsLink: string
-	readonly githubLink: string
-	readonly starOnGitHub: string
+	/** The Star menu's summary label, beside the GitHub mark. */
+	readonly starMenuLabel: string
+	/** The Skills card's quiet star link to the onboarding skill's repository. */
+	readonly starOnboarding: string
+	readonly twoPartHeading: string
+	readonly skillsCardTitle: string
+	readonly skillsCardBody: string
+	readonly cliCardTitle: string
+	readonly cliCardBody: string
+	readonly cliDocsLink: string
+	readonly twoPartFootnote: string
+	/** The instruction under the command, always visible: the notification only confirms the copy. */
+	readonly nextStep: string
 	readonly copy: string
 	readonly copied: string
 	readonly copyFailed: string

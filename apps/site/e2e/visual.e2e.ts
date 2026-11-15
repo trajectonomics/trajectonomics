@@ -18,7 +18,9 @@ const FONT_CSS = `
 @font-face { font-family: "Visual Thai"; src: url("/e2e-fonts/NotoSansThai.ttf"); font-weight: 400; }
 @font-face { font-family: "Visual Mono"; src: url("/e2e-fonts/LiberationMono-Regular.ttf"); font-weight: 400; }
 html { font-family: "Visual Sans", "Visual Thai", sans-serif; }
-.font-mono, code, pre, kbd, samp { font-family: "Visual Mono", monospace; }
+.font-mono, code, pre, kbd, samp { font-family: "Visual Mono", "Visual Thai", monospace; }
+/* The hero's kicker asks for the system monospace directly, so the snapshot pins that too. */
+.hero-eyebrow { font-family: "Visual Mono", "Visual Thai", monospace; }
 `
 
 /** Serve the pinned fonts from `e2e/fonts/`, so every runner renders the snapshots alike. */

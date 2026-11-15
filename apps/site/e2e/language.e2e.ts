@@ -43,6 +43,8 @@ for (const theme of THEMES) {
 
 		test("the Thai label on the English home is marked Thai", async ({ page }) => {
 			await openPage(page, homeOf("en"))
+			// The Language menu's panel is closed until its summary is clicked.
+			await page.locator('details[data-header-menu]:has(a[hreflang="th"]) summary').click()
 			const label = page.locator('[lang="th"]', { hasText: "ไทย" }).first()
 			await expect(label).toBeVisible()
 		})

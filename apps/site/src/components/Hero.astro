@@ -1,9 +1,9 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the links.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the links it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import { GITHUB_SKILLS_URL } from "../lib/site"
+import { HERO_RELEASE_DATE } from "../lib/site"
 import CopyCommand from "./CopyCommand.astro"
 
 interface Props {
@@ -18,12 +18,14 @@ const subline = sublineParts(dictionary.heroSubline)
 	<div class="hero-glow" aria-hidden="true"></div>
 	<div class="hero-pointer-glow" data-pointer-glow aria-hidden="true"></div>
 	<div
-		class="hero-rise mx-auto flex max-w-6xl flex-col items-center px-5 pt-16 pb-16 text-center sm:px-6 sm:pt-24 sm:pb-24"
+		class="hero-rise mx-auto flex max-w-6xl flex-col items-center px-5 pt-32 pb-16 text-center sm:px-6 sm:pt-40 sm:pb-24"
 	>
-		<p
-			class="hero-eyebrow text-foreground"
-		>
-			{dictionary.heroEyebrow}
+		<p class="hero-eyebrow text-foreground">
+			<span>{dictionary.heroRelease}</span>
+			<span class="hero-eyebrow-sep" aria-hidden="true">·</span>
+			<time class="hero-release-date" datetime={HERO_RELEASE_DATE}>
+				{dictionary.heroReleaseDate}
+			</time>
 		</p>
 		<h1
 			data-hero-headline
@@ -49,10 +51,6 @@ const subline = sublineParts(dictionary.heroSubline)
 		</p>
 		<div class="mt-10 w-full max-w-xl sm:mt-12">
 			<CopyCommand dictionary={dictionary} />
-			<a
-				class="mt-5 inline-flex text-sm font-medium text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-				href={GITHUB_SKILLS_URL}>{dictionary.starOnGitHub}</a
-			>
 		</div>
 	</div>
 </section>
@@ -116,9 +114,12 @@ const subline = sublineParts(dictionary.heroSubline)
 	/*
 		The suffixes share one grid cell, so the hero is as tall as its longest suffix and the page
 		never shifts; only the shown one is visible, and with no script that is the shipped suffix.
+		The slot is its own line, so a suffix shorter than the longest one leaves no gap after the
+		prefix, whatever the Language and width.
 	*/
 	[data-hero-stack] {
-		display: inline-grid;
+		display: grid;
+		justify-items: center;
 	}
 
 	[data-hero-stack] > span {

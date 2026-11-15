@@ -43,6 +43,23 @@ for (const theme of THEMES) {
 				expect(visited).toHaveLength(count)
 			})
 
+			test("the header menus open from the keyboard and close on Escape", async ({ page }) => {
+				await openPage(page, underTest)
+				await expectTheme(page, theme)
+				const menu = page.locator("details[data-header-menu]").first()
+				const summary = menu.locator("summary")
+				const firstLink = menu.locator("a").first()
+				// A closed disclosure keeps its panel out of the tab order, so no hidden link is reachable.
+				await expect(firstLink).toBeHidden()
+				await summary.focus()
+				await page.keyboard.press("Enter")
+				await expect(firstLink).toBeVisible()
+				await page.keyboard.press("Tab")
+				await page.keyboard.press("Escape")
+				await expect(firstLink).toBeHidden()
+				await expect(summary).toBeFocused()
+			})
+
 			test("Enter and Space copy the command and announce it in this Language", async ({
 				page,
 			}) => {

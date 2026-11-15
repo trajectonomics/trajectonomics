@@ -62,19 +62,22 @@ All three: same header (sticky, wordmark, Docs, GitHub, switcher), same footer (
 links left, disclaimer right), both themes, both languages, Thai line-height 1.6, one h1, no other
 headings.
 
-## 4. Copy options (shorter; prefix + rotating suffixes; last suffix held without JS)
+## 4. Copy (adopted for the v0.1.0 launch)
 
-EN prefix options:
-1. "The only tool your agent needs for"
-2. "Your agent's money tool for"
-3. "One command, and your agent handles"
+The v0.1.0 launch revision ([site#24](https://github.com/trajectonomics/site/issues/24)) replaced §4's
+options with this copy. It is the owner's, verbatim, and it is the source of the strings in
+`src/lib/language/en.ts` and `src/lib/language/th.ts`.
 
-EN suffixes (cycle, last held): "retirement planning." / "financial projections." / "your future."
+EN prefix: "The only tool your agent needs to" ; suffixes (cycle, last held): "plan your
+retirement." / "project your finances." / "build your future."
 
-TH prefix: "เครื่องมือเดียวที่ agent ของคุณต้องการสำหรับ" ; suffixes: "การวางแผนเกษียณ" / "การคาดการณ์การเงิน" /
-"อนาคตของคุณ" (owner reviews Thai).
+TH prefix: "เครื่องมือเดียวที่ agent ของคุณต้องมี เพื่อ" ; suffixes: "วางแผนเกษียณอายุ" /
+"คาดการณ์อนาคตทางการเงิน" / "สร้างอนาคตของคุณ".
 
-Subline gets shorter in all variants (drafted with the chosen variant).
+The hero subline, the release line (`v0.1.0 stable — traj CLI + traj-onboarding` with the CLI's
+release date as its own run), the two-part section below the hero, the next step under the install
+command and the footer's stable wording are all in those two Dictionary files, which are the source
+of truth for the copy.
 
 ## 5. Motion plan (CSS first, one JS layer)
 

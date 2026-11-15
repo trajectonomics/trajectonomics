@@ -1,4 +1,4 @@
-/* The landing page redesign's surfaces (ADR 0004, variant A): the hero's glow, kicker and marks. */
+/* The landing page redesign's hero (ADR 0004, variant A): the glow, the kicker and the type step. */
 
 /* The hero's radial glow: the Theme's own background, masked to a soft ellipse. */
 .hero-glow {
@@ -39,13 +39,29 @@
 /* The kicker line above the headline: mono uppercase with a destructive marker block. */
 .hero-eyebrow {
 	display: inline-flex;
+	flex-wrap: wrap;
+	justify-content: center;
 	align-items: center;
 	gap: 8px;
+	max-width: 100%;
 	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 	font-size: 12px;
 	font-weight: 500;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
+}
+
+/* The release date is its own run beside the release line: smaller and normal case, not muted. */
+.hero-eyebrow-sep {
+	font-size: 11px;
+	letter-spacing: 0;
+}
+
+.hero-release-date {
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	text-transform: none;
+	white-space: nowrap;
 }
 
 .hero-eyebrow::before {
@@ -54,33 +70,4 @@
 	height: 7px;
 	border-radius: 1px;
 	background: var(--ds-color-destructive);
-}
-
-/* Corner plus-marks around the command window, drawn with bars so they carry no text. */
-.hero-plus {
-	position: absolute;
-	width: 14px;
-	height: 14px;
-	pointer-events: none;
-}
-
-.hero-plus::before,
-.hero-plus::after {
-	content: "";
-	position: absolute;
-	background: var(--ds-color-destructive);
-}
-
-.hero-plus::before {
-	left: 0;
-	right: 0;
-	top: 6px;
-	height: 2px;
-}
-
-.hero-plus::after {
-	top: 0;
-	bottom: 0;
-	left: 6px;
-	width: 2px;
 }

@@ -12,6 +12,22 @@ _Avoid_: Landing page, home page, marketing site
 Thai (`th`) or English (`en`), the two native languages of the Site. English is the fallback.
 _Avoid_: Translation, copy, tongue
 
+**Skill**:
+A package of instructions a coding agent follows, installed into that agent rather than imported by a program. traj ships as one.
+_Avoid_: Plugin, extension, package
+
+**Onboarding skill**:
+The Skill `traj-onboarding`, the one the Site's install command installs: it asks about the visitor's money, sets up the traj CLI, and starts them off.
+_Avoid_: Setup skill, getting-started skill
+
+**CLI**:
+The `traj` command-line program (`@trajectonomics/cli`) that does the arithmetic: same input, same answer, every time, and it never calls a model.
+_Avoid_: Binary, tool, executable
+
+**Stable release**:
+A release the owner names as no longer alpha. The first is `v0.1.0`, for both the CLI and the Onboarding skill, announced on the Site with its date.
+_Avoid_: GA, production release, 1.0
+
 **Locale URL**:
 A Site URL whose first segment is a Language code, `/th/…` or `/en/…`. It is the only record of which Language a page is.
 _Avoid_: Language prefix, translated URL
@@ -55,7 +71,7 @@ The most one page's HTML and its same-origin stylesheets may gzip to together: u
 _Avoid_: Size limit, bundle size
 
 **Program JavaScript**:
-The script text one page runs, uncompressed and under 5,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript.
+The script text one page runs, uncompressed and under 10,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript. [ADR 0004 (landing page redesign)](docs/adr/0004-landing-page-redesign.md) raised the budget from ADR 0005's 5,000 bytes.
 _Avoid_: Bundle, JS payload
 
 **Web font**:

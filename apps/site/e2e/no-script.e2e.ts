@@ -8,6 +8,17 @@ const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 test.use({ javaScriptEnabled: false, colorScheme: "dark" })
 
 for (const underTest of HOMES) {
+	test(`${underTest.name}: the header menus still open by click without JavaScript`, async ({
+		page,
+	}) => {
+		await page.goto(underTest.path)
+		const menu = page.locator("details[data-header-menu]").first()
+		const firstLink = menu.locator("a").first()
+		await expect(firstLink).toBeHidden()
+		await menu.locator("summary").click()
+		await expect(firstLink).toBeVisible()
+	})
+
 	test(`${underTest.name}: the Copy button is out of the tab order and the command stays selectable`, async ({
 		page,
 	}) => {

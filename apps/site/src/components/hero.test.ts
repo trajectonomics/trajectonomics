@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { GITHUB_SKILLS_URL, INSTALL_COMMAND } from "../lib/site"
+import { HERO_RELEASE_DATE, INSTALL_COMMAND } from "../lib/site"
 import Hero from "./Hero.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -34,11 +34,17 @@ describe("the Hero component in every Language", () => {
 			expect(suffixes.length).toBe(dictionary.heroHeadingCycle.length)
 		})
 
-		it(`shows the launch eyebrow above the headline (${language})`, async () => {
+		it(`shows the release line and its date as two runs above the headline (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const eyebrow = withClass(page, "hero-eyebrow")[0]
 			if (eyebrow === undefined) throw new Error("the hero rendered no eyebrow")
-			expect(textOf(page, eyebrow)).toBe(dictionary.heroEyebrow)
+			expect(textOf(page, eyebrow)).toContain(dictionary.heroRelease)
+			const date = elementsByTag(page, "time").find((element) =>
+				element.ancestors.includes(eyebrow),
+			)
+			if (date === undefined) throw new Error("the eyebrow rendered no release date")
+			expect(date.attributes["datetime"]).toBe(HERO_RELEASE_DATE)
+			expect(textOf(page, date)).toBe(dictionary.heroReleaseDate)
 		})
 
 		it(`marks the command name in the subline as code (${language})`, async () => {
@@ -47,16 +53,14 @@ describe("the Hero component in every Language", () => {
 			expect(codes).toContain("traj")
 		})
 
-		it(`renders the install command and the star link (${language})`, async () => {
+		it(`renders the install command and the instruction under it (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const command = withAttribute(page, "data-install-command")[0]
 			if (command === undefined) throw new Error("the hero rendered no install command")
 			expect(textOf(page, command)).toBe(INSTALL_COMMAND)
-			const star = elementsByTag(page, "a").find(
-				(element) => element.attributes["href"] === GITHUB_SKILLS_URL,
-			)
-			if (star === undefined) throw new Error("the hero rendered no star link")
-			expect(textOf(page, star)).toBe(dictionary.starOnGitHub)
+			const nextStep = withAttribute(page, "data-next-step")[0]
+			if (nextStep === undefined) throw new Error("the hero rendered no next step")
+			expect(textOf(page, nextStep)).toBe(dictionary.nextStep)
 		})
 
 		it(`carries its inline motion script (${language})`, async () => {

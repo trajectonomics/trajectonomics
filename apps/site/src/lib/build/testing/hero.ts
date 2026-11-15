@@ -1,12 +1,14 @@
 import type { Language } from "../../language/language"
 import { LANGUAGES, languageEntry, localeUrl } from "../../language/languages"
 import {
+	DOCS_CLI_PATH,
 	DOCS_PATH,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
 	INSTALL_COMMAND,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
+	STAR_REPOS,
 } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
@@ -29,7 +31,10 @@ function headlines(language: Language): readonly string[] {
 	return [dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle]
 }
 
-/** One Language's home as the build must produce it, with the three regions and the copy command. */
+/** The Star menu's panel, one link per repository in star order. */
+const starPanel = STAR_REPOS.map((repo) => `<a href="${repo.url}">${repo.name}</a>`).join("")
+
+/** One Language's home as the build must produce it, with every region and the copy command. */
 export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 	const dictionary = languageEntry(language).dictionary
 	const headline =
@@ -46,7 +51,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		"<body>",
 		`<header><nav><a href="${localeUrl(language)}" aria-label="${SITE_NAME}"><svg></svg></a>`,
 		`<a href="${DOCS_PATH}">${dictionary.docsLink}</a>`,
-		`<a href="${GITHUB_SKILLS_URL}">${dictionary.githubLink}</a>`,
+		`<details><summary>${dictionary.starMenuLabel}</summary><div>${starPanel}</div></details>`,
 		switcher(language),
 		"</nav></header>",
 		"<main>",
@@ -54,7 +59,13 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
 		`<div>${command}${button}</div>`,
 		'<p role="status"></p>',
-		`<a href="${GITHUB_SKILLS_URL}">${dictionary.starOnGitHub}</a>`,
+		`<p>${dictionary.nextStep}</p>`,
+		"<section>",
+		`<h2>${dictionary.twoPartHeading}</h2>`,
+		`<a href="${GITHUB_SKILLS_URL}">${dictionary.starOnboarding}</a>`,
+		`<a href="${DOCS_CLI_PATH}">${dictionary.cliDocsLink}</a>`,
+		`<p>${dictionary.twoPartFootnote}</p>`,
+		"</section>",
 		"</main>",
 		"<footer><ul>",
 		`<li><a href="${SKILLS_LICENCE_URL}">${dictionary.licence}</a></li>`,

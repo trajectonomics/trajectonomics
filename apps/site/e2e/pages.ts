@@ -19,7 +19,7 @@ export const PAGES: readonly PageUnderTest[] = Object.freeze([
 ])
 
 /** The controls a keyboard visitor can reach, excluding anything hidden or disabled. */
-const FOCUSABLE = "a[href], button:not([disabled]):not([hidden])"
+const FOCUSABLE = "a[href], button:not([disabled]):not([hidden]), summary"
 
 /** The two Themes the harness sets before navigation. */
 export const THEMES = Object.freeze(["light", "dark"] as const)
@@ -49,7 +49,16 @@ export async function expectTheme(page: Page, theme: Theme): Promise<void> {
 
 /** The number of controls a keyboard visitor can reach on the page. */
 export function focusableCount(page: Page): Promise<number> {
-	return page.evaluate((selector) => document.querySelectorAll(selector).length, FOCUSABLE)
+	return page.evaluate(
+		(selector) =>
+			// A closed <details> keeps its panel laid out but out of the tab order, so only the
+			// summary and the controls outside every closed panel are counted.
+			[...document.querySelectorAll(selector)].filter((element) => {
+				const panel = element.closest("details:not([open])")
+				return panel === null || element.tagName === "SUMMARY"
+			}).length,
+		FOCUSABLE,
+	)
 }
 
 /** Whether the focused control paints a ring in a `--ds-*` role: an outline or a box shadow. */

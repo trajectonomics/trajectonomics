@@ -1,11 +1,13 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and links it renders.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the menus and the brand mark it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
-import wordmark from "@trajectonomics/design-system-assets/logo/wordmark.svg?raw"
-import { currentLanguageName, type Dictionary } from "../lib/language/dictionary"
+import mark from "@trajectonomics/design-system-assets/logo/mark.svg?raw"
+import type { Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
-import { localeUrl, otherLanguages } from "../lib/language/languages"
-import { DOCS_PATH, GITHUB_SKILLS_URL, SITE_NAME } from "../lib/site"
+import { localeUrl } from "../lib/language/languages"
+import { DOCS_PATH, SITE_NAME } from "../lib/site"
+import LanguageMenu from "./LanguageMenu.astro"
+import StarMenu from "./StarMenu.astro"
 
 interface Props {
 	readonly language: Language
@@ -15,50 +17,80 @@ interface Props {
 }
 
 const { language, dictionary, markCurrent } = Astro.props
-// The link names itself, so the artwork is decoration: the accessible name is the Site's.
-const artwork = wordmark.replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
+// The link names itself, so the artwork is decoration: the mark's own role and title go with it, and
+// its viewBox and xmlns stay, because that is what draws it.
+const artwork = mark
+	.replace(' role="img"', "")
+	.replace(/ aria-label="[^"]*"/, "")
+	.replace(/<title>[\s\S]*?<\/title>/, "")
+	.replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
 ---
 
-<header class="site-header sticky top-0 z-50 border-b border-border bg-background">
+<header class="site-header fixed inset-x-0 top-0 z-50 border-b border-border bg-background">
 	<nav
 		class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6"
 	>
 		<a
-			class="wordmark shrink-0 text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+			class="brand shrink-0 text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 			href={localeUrl(language)}
 			aria-label={SITE_NAME}><Fragment set:html={artwork} /></a
 		>
 		<div class="flex items-center gap-3 sm:gap-6">
 			<a
-				class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+				class="text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 				href={DOCS_PATH}>{dictionary.docsLink}</a
 			>
-			<a
-				class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-				href={GITHUB_SKILLS_URL}>{dictionary.githubLink}</a
-			>
+			<StarMenu dictionary={dictionary} />
 			<span class="hidden h-4 w-px bg-border sm:block" aria-hidden="true"></span>
-			<div class="flex items-center gap-3">
-				<a
-					class="text-sm font-semibold text-foreground underline decoration-1 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-					href={localeUrl(language)}
-					lang={language}
-					hreflang={language}
-					aria-label={currentLanguageName(dictionary)}
-					aria-current={markCurrent ? "page" : undefined}>{dictionary.languageSwitchLabel}</a
-				>
-				{
-					otherLanguages(language).map((entry) => (
-						<a
-							class="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-							href={localeUrl(entry.language)}
-							lang={entry.language}
-							hreflang={entry.language}>
-							{entry.dictionary.languageName}
-						</a>
-					))
-				}
-			</div>
+			<LanguageMenu language={language} dictionary={dictionary} markCurrent={markCurrent} />
 		</div>
 	</nav>
 </header>
+
+<script is:inline>
+	;(() => {
+		const menus = [...document.querySelectorAll("details[data-header-menu]")]
+		if (menus.length === 0) return
+
+		// Only one header menu is open at a time: opening one closes the other.
+		const closeOthers = (open) => {
+			for (const menu of menus) if (menu !== open) menu.open = false
+		}
+
+		const fine = window.matchMedia("(pointer: fine)").matches
+		for (const menu of menus) {
+			if (!(menu instanceof HTMLDetailsElement)) continue
+			const summary = menu.querySelector("summary")
+			let hoverOpened = false
+			menu.addEventListener("toggle", () => {
+				if (menu.open) closeOthers(menu)
+			})
+			// Hover is an enhancement on a fine pointer; click and keyboard are the native <details>.
+			if (fine) {
+				menu.addEventListener("pointerenter", () => {
+					if (menu.open) return
+					hoverOpened = true
+					closeOthers(menu)
+					menu.open = true
+				})
+				menu.addEventListener("pointerleave", () => {
+					menu.open = false
+					hoverOpened = false
+				})
+				// A click right after hover would otherwise toggle the menu the hover just opened shut.
+				menu.addEventListener("click", (event) => {
+					if (!(event.target instanceof Element) || !event.target.closest("summary")) return
+					if (!hoverOpened || !menu.open) return
+					event.preventDefault()
+					hoverOpened = false
+				})
+			}
+			menu.addEventListener("keydown", (event) => {
+				if (event.key !== "Escape" || !menu.open) return
+				menu.open = false
+				hoverOpened = false
+				if (summary instanceof HTMLElement) summary.focus()
+			})
+		}
+	})()
+</script>
