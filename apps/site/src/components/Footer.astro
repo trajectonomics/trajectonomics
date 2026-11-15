@@ -1,34 +1,33 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the props it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { GITHUB_ORG_URL, SKILLS_LICENCE_URL } from "../lib/site"
+import { GITHUB_ORG_URL, RELEASE_DATE, SKILLS_LICENCE_URL } from "../lib/site"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see dictionary.
 const { dictionary } = Astro.props
+const link =
+	"underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 ---
 
-<footer class="border-t border-border">
+<footer class="border-t border-border bg-stage text-stage-foreground">
 	<div
-		class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:px-6 sm:py-10"
+		class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-10 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:px-6"
 	>
-		<p class="max-w-xl">{dictionary.footerDisclaimer}</p>
-		<ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
-			<li>
-				<a
-					class="transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-					href={SKILLS_LICENCE_URL}>{dictionary.licence}</a
-				>
-			</li>
-			<li>
-				<a
-					class="transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-					href={GITHUB_ORG_URL}>{dictionary.org}</a
-				>
-			</li>
-		</ul>
+		<p class="max-w-xl text-pretty">{dictionary.footerDisclaimer}</p>
+		<div class="flex flex-col gap-4 sm:items-end">
+			<ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
+				<li><a class={link} href={SKILLS_LICENCE_URL}>{dictionary.licence}</a></li>
+				<li><a class={link} href={GITHUB_ORG_URL}>{dictionary.org}</a></li>
+			</ul>
+			<p class="font-mono text-xs tracking-wide uppercase">
+				{dictionary.releaseLine}
+				<span aria-hidden="true"> · </span>
+				<time datetime={RELEASE_DATE}>{dictionary.releaseDate}</time>
+			</p>
+		</div>
 	</div>
 </footer>

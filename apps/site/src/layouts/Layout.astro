@@ -55,7 +55,7 @@ const dictionary = dictionaryFor(language)
 	</head>
 	<body class="flex min-h-dvh flex-col bg-background text-foreground">
 		<Header language={language} dictionary={dictionary} markCurrent={indexed} />
-		<main class="flex flex-1 flex-col"><slot /></main>
+		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
 		<Footer dictionary={dictionary} />
 	</body>
 </html>

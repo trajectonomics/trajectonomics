@@ -1,6 +1,8 @@
 # Landing page redesign spec (twenty.com direction)
 
-Status: implemented — the owner picked **variant A (Glow hero)** with EN prefix 1
+Status: the first pass (sections 1–6) is implemented; the second pass (section 7, [site#33](https://github.com/trajectonomics/site/issues/33))
+replaced its type, surfaces and text blocks with twenty.com's flat language and is recorded in
+[ADR 0007](../adr/0007-landing-page-restyle-twenty-language.md). The owner picked **variant A (Glow hero)** with EN prefix 1
 ("The only tool your agent needs for") and the suffixes/Thai shown in the prototypes.
 Decisions are recorded in [ADR 0004](../adr/0004-landing-page-redesign.md). Research sources:
 live twenty.com plus `github.com/twentyhq/twenty` `packages/twenty-website/src` (tokens, sections,
@@ -96,3 +98,35 @@ of truth for the copy.
 1. Pick variant A, B or C.
 2. Pick EN prefix + suffixes and approve the Thai.
 3. Confirm hero surface: `bg-muted` (subline `text-foreground`) vs `bg-background`.
+
+## 7. Second pass: the whole visual language (site#33)
+
+The first pass kept our type, radii, shadows and surfaces. The second borrows the rest, measured in Chromium on
+the live site during a grilling session, and recorded in [ADR 0007](../adr/0007-landing-page-restyle-twenty-language.md)
+and [ADR 0008](../adr/0008-landmark-surface-roles.md).
+
+| Part | What it is now | Where it lives |
+|---|---|---|
+| Ground | `main` on `muted`, no hero band, no static glow, the pointer light kept | `src/layouts/Layout.astro`, `src/styles/landing.css` |
+| Header | 64 px, `background`, hairline; mark on a 40 px tile (32 px under 640) on `primary`/`primary-foreground`; mono nav `Docs │ ⟨gh⟩ N ⌄ │ EN ⌄` | `Header.astro`, `src/styles/header.css` |
+| Menus | Star menu is a select (236 px, group label, 34 px rows with tabular counts, a check on the default repository, `All repositories ↗`); Language menu is a plain panel; an 8 px bridge and a 150 ms close | `StarMenu.astro`, `LanguageMenu.astro`, `src/styles/menu.css` |
+| Type | Theme sans for body; `--font-display` (Georgia until ds#77) for the headline and the `h2`; `--font-meta` (the Theme's mono) for every meta label; Thai from `typography.css` (1.7, Thai 1.8) | `src/styles/global.css`, `src/styles/landing.css` |
+| Shape | 4 px controls, 6 px cards and panels, 12 px terminal window; hairlines; shadows only on the scrolled header and the toast | `src/components/ui/`, `src/styles/primitives.css` |
+| Button | Filled/outlined with a 16 px bottom-right bevel under `@supports (corner-shape: bevel)`, plain 4 px otherwise | `ui/Button.astro`, `src/styles/primitives.css` |
+| Accent | `accent` orange: pill marker, headline suffix, toast check | roles only |
+| Hero | A 28 px hairline pill (`v0.1.0` · hairline · `MIT · open source`), the display headline, the sub-line, the terminal window | `Hero.astro` |
+| Command | Window with bevel Copy button, a three-step strip (terminal → `?` → `✓`, 12 px mono labels), and the floating 236 px toast with a 2 px countdown line | `CopyCommand.astro`, `src/styles/command.css` |
+| Section | The `h2` stays `Two parts, one command`; two 232 px wireframe tiles joined by a 56 px `traj calc` connector; the two links under the diagram | `TwoParts.astro`, `src/styles/diagram.css`, `src/styles/wireframe.css` |
+| Footer | `stage`/`stage-foreground`, dark in both Themes; the release line and its date moved here from the hero | `Footer.astro` |
+| Star data | Committed `src/lib/site/stars.json` (`asOf` + count per repository), written by `bun run stars:update`; sorted desc, zero absent, no number when all are zero | `scripts/stars.ts`, `src/lib/site/stars.ts` |
+
+Copy added in this pass, in both Dictionaries: `heroVersion` (`v0.1.0`), `heroLicence` (`MIT · open source`),
+`starMenuGroupLabel`, `starMenuAllRepos`, `agentCardTitle`/`agentCardCopy` (five words), `cliCardCopy`,
+`diagramConnector`, three `stepLabels`, and `copied` becomes `Command copied`. `heroRelease`/`heroReleaseDate`
+became the footer's `releaseLine`/`releaseDate`; `nextStep`, `twoPartFootnote` and the Skills card copy left with
+the paragraphs they belonged to. `src/lib/site.ts` keeps the install command, the diagram's `$ traj plan` fixture
+and its `14,280.00` figure, because those are product facts, not Language.
+
+Not adopted, and why: a downloaded display or mono face (Web fonts stay forbidden until design-system#77), the
+728 px tiled favicon (design-system#76), and moving the primitives into `@trajectonomics/design-system-svelte`
+(design-system#74, site#32).

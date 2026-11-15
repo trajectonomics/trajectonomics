@@ -2,7 +2,11 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { STAR_REPOS } from "../lib/site"
+import { GITHUB_ORG_URL } from "../lib/site"
+import { STARRED_REPOS, TOP_STAR_LABEL } from "../lib/site/star-snapshot"
+import { formatStarCount } from "../lib/site/stars"
+import ArrowUpRight from "./icons/ArrowUpRight.astro"
+import Check from "./icons/Check.astro"
 import Chevron from "./icons/Chevron.astro"
 import GitHubMark from "./icons/GitHubMark.astro"
 
@@ -11,24 +15,40 @@ interface Props {
 }
 
 const { dictionary } = Astro.props
+/** The repository the trigger names: the highest count, and the row the menu checks. */
+const defaultRepo = STARRED_REPOS[0]?.repo
+const label =
+	TOP_STAR_LABEL === undefined
+		? dictionary.starMenuLabel
+		: `${dictionary.starMenuLabel}: ${TOP_STAR_LABEL}`
 ---
 
 <details class="header-menu" data-header-menu>
-	<summary
-		class="header-menu-summary text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-	>
+	<summary class="header-menu-summary" aria-label={label}>
 		<GitHubMark class="header-menu-mark" />
-		<span>{dictionary.starMenuLabel}</span>
+		{TOP_STAR_LABEL !== undefined && <span>{TOP_STAR_LABEL}</span>}
 		<Chevron class="header-menu-chevron" />
 	</summary>
-	<div class="header-menu-panel">
-		{
-			STAR_REPOS.map((repo) => (
-				<a class="header-menu-link" href={repo.url}>
-					<GitHubMark class="header-menu-mark" />
-					<span>{repo.name}</span>
-				</a>
-			))
-		}
+	<div class="header-menu-panel bg-popover text-popover-foreground">
+		<p class="header-menu-group">{dictionary.starMenuGroupLabel}</p>
+		<ul class="header-menu-list">
+			{
+				STARRED_REPOS.map((repo) => (
+					<li>
+						<a class="header-menu-row" href={repo.url}>
+							<span class="header-menu-row-name">{repo.name}</span>
+							<span class="header-menu-row-count tabular-nums">
+								{formatStarCount(repo.stars)}
+							</span>
+							{repo.repo === defaultRepo && <Check class="header-menu-check" />}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+		<a class="header-menu-footer" href={GITHUB_ORG_URL}>
+			<span>{dictionary.starMenuAllRepos}</span>
+			<ArrowUpRight class="header-menu-out" />
+		</a>
 	</div>
 </details>

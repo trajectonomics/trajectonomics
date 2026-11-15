@@ -1,0 +1,90 @@
+/* The two-tile diagram under the section heading (ADR 0007): wireframe tiles joined by a connector. */
+
+.diagram {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.diagram-tile {
+	width: 100%;
+	max-width: 232px;
+	padding: 14px;
+}
+
+/* The connector: 56 px wide between the tiles, and a short run between them on a phone. */
+.diagram-connector {
+	display: flex;
+	height: 40px;
+	align-items: center;
+	gap: 8px;
+	padding: 0 4px;
+}
+
+.diagram-connector-line {
+	width: 1px;
+	height: 100%;
+	background: var(--ds-color-border);
+}
+
+.diagram-connector-label {
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+	white-space: nowrap;
+}
+
+@media (min-width: 40rem) {
+	.diagram {
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.diagram-connector {
+		width: 56px;
+		height: auto;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.diagram-connector-line {
+		width: 100%;
+		height: 1px;
+	}
+
+	/* 56 px is the whole gap between the tiles, so the label sets solid to sit inside it. */
+	.diagram-connector-label {
+		letter-spacing: 0;
+	}
+}
+
+.diagram-links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px 24px;
+	margin: 24px 0 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.diagram-link {
+	color: var(--ds-color-foreground);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.diagram-link:hover {
+	text-decoration: none;
+}
+
+.diagram-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

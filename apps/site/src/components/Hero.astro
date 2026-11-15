@@ -1,10 +1,11 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the links it renders.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the badge it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import { HERO_RELEASE_DATE } from "../lib/site"
 import CopyCommand from "./CopyCommand.astro"
+import Badge from "./ui/Badge.astro"
+import Separator from "./ui/Separator.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -14,33 +15,31 @@ const { dictionary } = Astro.props
 const subline = sublineParts(dictionary.heroSubline)
 ---
 
-<section data-hero class="relative overflow-clip bg-muted">
-	<div class="hero-glow" aria-hidden="true"></div>
+<section data-hero class="relative overflow-clip">
 	<div class="hero-pointer-glow" data-pointer-glow aria-hidden="true"></div>
 	<div
 		class="hero-rise mx-auto flex max-w-6xl flex-col items-center px-5 pt-32 pb-16 text-center sm:px-6 sm:pt-40 sm:pb-24"
 	>
-		<p class="hero-eyebrow text-foreground">
-			<span>{dictionary.heroRelease}</span>
-			<span class="hero-eyebrow-sep" aria-hidden="true">·</span>
-			<time class="hero-release-date" datetime={HERO_RELEASE_DATE}>
-				{dictionary.heroReleaseDate}
-			</time>
-		</p>
+		<Badge class="hero-pill">
+			<span class="hero-pill-marker" aria-hidden="true"></span>
+			<span>{dictionary.heroVersion}</span>
+			<Separator />
+			<span>{dictionary.heroLicence}</span>
+		</Badge>
 		<h1
 			data-hero-headline
-			class="mt-8 max-w-2xl text-4xl font-light tracking-tight text-balance text-foreground sm:text-6xl"
+			class="mt-8 max-w-2xl text-4xl font-light text-balance text-foreground sm:text-6xl"
 		>
 			<span>{dictionary.heroHeadingPrefix}</span>
-			<span data-hero-stack class="text-destructive">
+			<span data-hero-stack class="text-accent">
 				{dictionary.heroHeadingCycle.map((suffix) => <span>{suffix}</span>)}
 			</span>
 		</h1>
-		<p class="mt-8 max-w-xl text-base text-pretty text-foreground sm:text-lg">
+		<p class="mt-8 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
 			{
 				subline.map((part) =>
 					part.code ? (
-						<code class="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[0.9em] text-secondary-foreground">
+						<code class="rounded-sm bg-secondary px-1.5 py-0.5 font-mono text-[0.9em] text-secondary-foreground">
 							{part.text}
 						</code>
 					) : (
@@ -49,7 +48,7 @@ const subline = sublineParts(dictionary.heroSubline)
 				)
 			}
 		</p>
-		<div class="mt-10 w-full max-w-xl sm:mt-12">
+		<div class="hero-command mt-10 w-full max-w-xl sm:mt-12">
 			<CopyCommand dictionary={dictionary} />
 		</div>
 	</div>
@@ -109,40 +108,3 @@ const subline = sublineParts(dictionary.heroSubline)
 		}
 	})()
 </script>
-
-<style>
-	/*
-		The suffixes share one grid cell, so the hero is as tall as its longest suffix and the page
-		never shifts; only the shown one is visible, and with no script that is the shipped suffix.
-		The slot is its own line, so a suffix shorter than the longest one leaves no gap after the
-		prefix, whatever the Language and width.
-	*/
-	[data-hero-stack] {
-		display: grid;
-		justify-items: center;
-	}
-
-	[data-hero-stack] > span {
-		grid-area: 1 / 1;
-		visibility: hidden;
-	}
-
-	[data-hero-stack]:not([data-hero-stepping]) > span:last-child,
-	[data-hero-stack] > span[data-hero-shown] {
-		visibility: visible;
-	}
-
-	[data-hero-stack][data-hero-stepping] > span {
-		visibility: visible;
-		opacity: 0;
-		transform: translateY(0.35em);
-		transition:
-			opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
-			transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	[data-hero-stack][data-hero-stepping] > span[data-hero-shown] {
-		opacity: 1;
-		transform: none;
-	}
-</style>

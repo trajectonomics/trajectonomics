@@ -10,16 +10,25 @@ export const SITE_NAME = "trajectonomics"
  */
 export const INSTALL_COMMAND = "npx skills add trajectonomics/skills --skill traj-onboarding"
 
+/**
+ * The plan the two-tile diagram shows the CLI running, and the figure it returns: a product fixture,
+ * the same text in every Language, not copy.
+ */
+export const DIAGRAM_PLAN_COMMAND = "$ traj plan"
+
+/** The figure the diagram's CLI tile returns: a product fixture, not copy. */
+export const DIAGRAM_PLAN_AMOUNT = "14,280.00"
+
 /** The Docs Portal's path, which the router serves; this repository does not build it. */
 export const DOCS_PATH = "/docs/"
 
-/** The Docs Portal's CLI page, the traj CLI card's link name. */
+/** The Docs Portal's CLI page, the CLI docs link under the diagram. */
 export const DOCS_CLI_PATH = "/docs/cli/"
 
-/** The CLI's v0.1.0 release date, the machine-readable date the hero's release line names. */
-export const HERO_RELEASE_DATE = "2026-11-12"
+/** The CLI's v0.1.0 release date, the machine-readable date the footer's release line names. */
+export const RELEASE_DATE = "2026-11-12"
 
-/** The skills repository: the star menu, the Skills card's star link and the footer's licence name it. */
+/** The skills repository: the star menu, the diagram's star link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
 /** The traj CLI's repository. */
@@ -31,18 +40,22 @@ export const GITHUB_ORG_URL = "https://github.com/trajectonomics"
 /** The skills repository's MIT licence, the footer's licence link. */
 export const SKILLS_LICENCE_URL = `${GITHUB_SKILLS_URL}/blob/main/LICENSE`
 
-/** One repository the Star menu offers: the name a visitor reads, and where its star goes. */
+/**
+ * One repository the Star menu offers: the repository's own name on GitHub, the name a visitor
+ * reads, and where its star goes.
+ */
 export interface StarRepo {
+	readonly repo: string
 	readonly name: string
 	readonly url: string
 }
 
 /**
- * The repositories the Star menu lists, highest GitHub stars first. The list is frozen, because the
- * Site is static and a stale live count would be worse than none: adding a repository means
- * inserting it here in star order.
+ * The repositories the Star menu may list, in the order a tie falls back to. The menu orders them by
+ * the committed star snapshot, highest first, and leaves out a repository at zero, so adding a
+ * repository is one entry here and a snapshot refresh.
  */
 export const STAR_REPOS: readonly StarRepo[] = Object.freeze([
-	Object.freeze({ name: "traj CLI", url: GITHUB_CLI_URL }),
-	Object.freeze({ name: "traj-onboarding", url: GITHUB_SKILLS_URL }),
+	Object.freeze({ repo: "cli", name: "traj CLI", url: GITHUB_CLI_URL }),
+	Object.freeze({ repo: "skills", name: "traj-onboarding", url: GITHUB_SKILLS_URL }),
 ])

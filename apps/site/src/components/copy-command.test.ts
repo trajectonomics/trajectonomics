@@ -4,7 +4,7 @@ import { LANGUAGES, languageEntry } from "../lib/language/languages"
 import { INSTALL_COMMAND } from "../lib/site"
 import CopyCommand from "./CopyCommand.astro"
 import { renderComponent } from "./testing/render"
-import { headings, scanComponent, withAttribute } from "./testing/scan"
+import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
 
 describe("the CopyCommand component in every Language", () => {
 	for (const { language } of LANGUAGES) {
@@ -46,11 +46,21 @@ describe("the CopyCommand component in every Language", () => {
 			expect(button.attributes["data-notice-timeout"]).toBe("6000")
 		})
 
-		it(`keeps the next step under the command, always visible (${language})`, async () => {
+		it(`shows the three steps under the command (${language})`, async () => {
 			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
-			const nextStep = withAttribute(page, "data-next-step")[0]
-			if (nextStep === undefined) throw new Error("no next step rendered")
-			expect(textOf(page, nextStep)).toBe(dictionary.nextStep)
+			const steps = withClass(page, "window-step")
+			expect(steps.map((step) => textOf(page, step))).toEqual([...dictionary.stepLabels])
+		})
+
+		it(`floats the copy toast, whose countdown line a reader never hears (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const toast = withAttribute(page, "data-copy-toast")[0]
+			const status = withAttribute(page, "data-copy-status")[0]
+			const countdown = withClass(page, "copy-toast-countdown")[0]
+			if (toast === undefined) throw new Error("no copy toast rendered")
+			if (status === undefined) throw new Error("no copy status rendered")
+			expect(status.ancestors.includes(toast)).toBe(true)
+			expect(countdown?.attributes["aria-hidden"]).toBe("true")
 		})
 
 		it(`carries its inline script and no heading (${language})`, async () => {

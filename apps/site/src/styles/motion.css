@@ -1,4 +1,4 @@
-/* The landing page redesign's motion (ADR 0004): CSS first, one JS layer, reduced motion wins. */
+/* The landing page's motion (ADR 0004): CSS first, one JS layer, reduced motion wins. */
 
 /* Load-in: the hero's children rise once, staggered. */
 @keyframes hero-rise {
@@ -33,28 +33,39 @@
 }
 
 /*
- * The header blends into the hero at the top of the page and gains its surface from 8px of scroll:
- * the opaque utilities are the fallback for a browser without scroll timelines, and only the
- * animation overrides them. The hairline border is part of the surface, so it fades in with it.
+ * The command's wrapper fades in without moving. A transform on it would make it the containing block
+ * of the fixed copy toast inside it, so the toast would land against the wrapper, not the viewport.
  */
-@keyframes header-surface {
+.hero-command {
+	animation-name: hero-fade;
+}
+
+@keyframes hero-fade {
 	from {
-		background-color: transparent;
-		border-bottom-color: transparent;
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/*
+ * The header is opaque from the first frame and gains a shadow after 8 px of scroll: the shadow is
+ * the only elevation it carries, so it never competes with the hairline. A browser without scroll
+ * timelines keeps the hairline alone.
+ */
+@keyframes header-shadow {
+	from {
 		box-shadow: none;
 	}
 	to {
-		background-color: var(--ds-color-background);
-		border-bottom-color: var(--ds-color-border);
-		box-shadow:
-			0 1px 2px 0 var(--ds-color-border),
-			0 12px 32px -16px var(--ds-color-border);
+		box-shadow: 0 12px 32px -16px var(--ds-color-border);
 	}
 }
 
 @supports (animation-timeline: scroll()) {
 	.site-header {
-		animation-name: header-surface;
+		animation-name: header-shadow;
 		animation-timing-function: linear;
 		animation-fill-mode: both;
 		animation-timeline: scroll(root);

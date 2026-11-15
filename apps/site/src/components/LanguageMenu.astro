@@ -5,7 +5,6 @@ import { currentLanguageName, type Dictionary } from "../lib/language/dictionary
 import type { Language } from "../lib/language/language"
 import { languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
 import Chevron from "./icons/Chevron.astro"
-import Globe from "./icons/Globe.astro"
 
 interface Props {
 	readonly language: Language
@@ -19,14 +18,11 @@ const languages = [languageEntry(language), ...otherLanguages(language)]
 ---
 
 <details class="header-menu" data-header-menu>
-	<summary
-		class="header-menu-summary text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-	>
-		<Globe class="header-menu-mark" />
+	<summary class="header-menu-summary">
 		<span>{dictionary.languageSwitchLabel}</span>
 		<Chevron class="header-menu-chevron" />
 	</summary>
-	<div class="header-menu-panel">
+	<div class="header-menu-panel bg-popover text-popover-foreground">
 		{
 			languages.map((entry) => (
 				<a

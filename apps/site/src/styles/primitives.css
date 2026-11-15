@@ -1,0 +1,16 @@
+/* The primitives in src/components/ui (ADR 0007): the shapes a utility class cannot say. */
+
+/*
+ * The button's filled corner: a 4 px radius, with the bottom-right corner bevelled to 16 px. A browser
+ * without `corner-shape` keeps the plain 4 px radius, so the control is never left square.
+ */
+[data-bevel] {
+	border-radius: 4px;
+}
+
+@supports (corner-shape: bevel) {
+	[data-bevel] {
+		border-radius: 4px 4px 16px 4px;
+		corner-shape: round round bevel round;
+	}
+}

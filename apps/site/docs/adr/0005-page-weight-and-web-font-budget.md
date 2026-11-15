@@ -32,6 +32,18 @@ These rules are a Pure Core in `src/lib/build/`, taking the built files and retu
 - **Run the weight check in its own workflow.** Rejected. The shared check already builds before its built-file step, so the budget belongs there; the browser-measured limits are a separate workflow (site#10).
 - **Allow a system font to be downloaded as a web font.** Rejected. A download delays the first paint and is the regression the ban exists to stop.
 
+## Amendment (site#33, the restyle)
+
+The restyle ([ADR 0007](./0007-landing-page-restyle-twenty-language.md)) moves the page's type onto
+`@trajectonomics/design-system-theme/typography.css` and names its two families in `src/styles/global.css`
+(`--font-display` and `--font-meta`). Nothing here changes yet: the families are still the visitor's own fonts,
+no font file, `@font-face` rule, remote URL or `data:` URL joins the build, and all four Error Codes stand.
+
+When [design-system#77](https://github.com/trajectonomics/design-system/issues/77) ships the display and mono
+files, this record's "no web font" rule becomes a font budget — one number and one Error Code per rule, in the
+same framework — and that is a new record, not an edit to the numbers above. The restyle leaves the change to
+those two lines so the budget lands in one file.
+
 ## Consequences
 
 - The build is judged with the structural rules in [ADR 0004](./0004-build-output-checks.md); this record adds the byte rules, and a new rule is still one file, one Error Code and one fixture test.

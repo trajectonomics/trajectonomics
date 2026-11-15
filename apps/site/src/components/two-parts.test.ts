@@ -1,7 +1,12 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { DOCS_CLI_PATH, GITHUB_SKILLS_URL } from "../lib/site"
+import {
+	DIAGRAM_PLAN_AMOUNT,
+	DIAGRAM_PLAN_COMMAND,
+	DOCS_CLI_PATH,
+	GITHUB_SKILLS_URL,
+} from "../lib/site"
 import TwoParts from "./TwoParts.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent } from "./testing/scan"
@@ -18,18 +23,25 @@ describe("the TwoParts section in every Language", () => {
 			expect(textOf(page, h2)).toBe(dictionary.twoPartHeading)
 		})
 
-		it(`names both parts and explains what one command installs (${language})`, async () => {
+		it(`names both tiles and the command that joins them (${language})`, async () => {
 			const page = scanComponent(await renderComponent(TwoParts, { dictionary }))
 			const text = page.text.map((run) => run.text).join(" ")
 			for (const copy of [
-				dictionary.skillsCardTitle,
-				dictionary.skillsCardBody,
+				dictionary.agentCardTitle,
+				dictionary.agentCardCopy,
 				dictionary.cliCardTitle,
-				dictionary.cliCardBody,
-				dictionary.twoPartFootnote,
+				dictionary.cliCardCopy,
+				dictionary.diagramConnector,
 			]) {
 				expect(text).toContain(copy)
 			}
+		})
+
+		it(`shows the CLI running the plan and the figure it returns (${language})`, async () => {
+			const page = scanComponent(await renderComponent(TwoParts, { dictionary }))
+			const text = page.text.map((run) => run.text).join(" ")
+			expect(text).toContain(DIAGRAM_PLAN_COMMAND)
+			expect(text).toContain(DIAGRAM_PLAN_AMOUNT)
 		})
 
 		it(`stars the onboarding skill and links the CLI docs (${language})`, async () => {

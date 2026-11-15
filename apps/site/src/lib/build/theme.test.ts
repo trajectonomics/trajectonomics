@@ -76,7 +76,7 @@ describe("the Themes in the stylesheet the page loads", () => {
 
 	it("passes a stylesheet whose short hexadecimal values name the published colours", () => {
 		const css =
-			"[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#737373}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1}"
+			"[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#525252;--ds-color-stage:#171717;--ds-color-stage-foreground:#fafafa}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1;--ds-color-stage:#0a0a0a;--ds-color-stage-foreground:#fafafa}"
 		expect(codes(undefined, css)).toEqual([])
 	})
 
@@ -86,13 +86,13 @@ describe("the Themes in the stylesheet the page loads", () => {
 
 	it("fails a stylesheet that lost one Theme", () => {
 		const css =
-			"[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#737373}"
+			"[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#525252}"
 		expect(codes(undefined, css)).toContain("THEME_CSS_NOT_BUILT")
 	})
 
 	it("fails a stylesheet that defines a role at a value the package does not publish", () => {
 		const css =
-			"[data-theme=light]{--ds-color-background:#fefefe;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#737373}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1}"
+			"[data-theme=light]{--ds-color-background:#fefefe;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#525252}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1}"
 		expect(codes(undefined, css)).toContain("THEME_CSS_NOT_BUILT")
 	})
 })

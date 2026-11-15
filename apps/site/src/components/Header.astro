@@ -8,6 +8,7 @@ import { localeUrl } from "../lib/language/languages"
 import { DOCS_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 import StarMenu from "./StarMenu.astro"
+import Separator from "./ui/Separator.astro"
 
 interface Props {
 	readonly language: Language
@@ -27,21 +28,19 @@ const artwork = mark
 ---
 
 <header class="site-header fixed inset-x-0 top-0 z-50 border-b border-border bg-background">
-	<nav
-		class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6"
-	>
+	<nav class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6">
 		<a
-			class="brand shrink-0 text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+			class="brand shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 			href={localeUrl(language)}
-			aria-label={SITE_NAME}><Fragment set:html={artwork} /></a
+			aria-label={SITE_NAME}
 		>
-		<div class="flex items-center gap-3 sm:gap-6">
-			<a
-				class="text-sm text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-				href={DOCS_PATH}>{dictionary.docsLink}</a
-			>
+			<span class="brand-tile"><Fragment set:html={artwork} /></span>
+		</a>
+		<div class="flex items-center gap-2 sm:gap-3">
+			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
+			<Separator />
 			<StarMenu dictionary={dictionary} />
-			<span class="hidden h-4 w-px bg-border sm:block" aria-hidden="true"></span>
+			<Separator />
 			<LanguageMenu language={language} dictionary={dictionary} markCurrent={markCurrent} />
 		</div>
 	</nav>
@@ -52,44 +51,72 @@ const artwork = mark
 		const menus = [...document.querySelectorAll("details[data-header-menu]")]
 		if (menus.length === 0) return
 
+		// How long the pointer may sit outside a disclosure before its menu closes, so a crossing
+		// between the summary and the panel is not a dismissal.
+		const CLOSE_DELAY_MS = 150
+		const fine = window.matchMedia("(pointer: fine)").matches
+
 		// Only one header menu is open at a time: opening one closes the other.
 		const closeOthers = (open) => {
 			for (const menu of menus) if (menu !== open) menu.open = false
 		}
 
-		const fine = window.matchMedia("(pointer: fine)").matches
 		for (const menu of menus) {
 			if (!(menu instanceof HTMLDetailsElement)) continue
 			const summary = menu.querySelector("summary")
 			let hoverOpened = false
+			let closing = null
+			const cancelClose = () => {
+				if (closing !== null) clearTimeout(closing)
+				closing = null
+			}
+
 			menu.addEventListener("toggle", () => {
 				if (menu.open) closeOthers(menu)
 			})
+
 			// Hover is an enhancement on a fine pointer; click and keyboard are the native <details>.
 			if (fine) {
 				menu.addEventListener("pointerenter", () => {
+					cancelClose()
 					if (menu.open) return
 					hoverOpened = true
 					closeOthers(menu)
 					menu.open = true
 				})
+				// The panel's own 8 px bridge keeps the pointer inside the disclosure across the gap.
 				menu.addEventListener("pointerleave", () => {
-					menu.open = false
-					hoverOpened = false
+					cancelClose()
+					closing = setTimeout(() => {
+						menu.open = false
+						hoverOpened = false
+						closing = null
+					}, CLOSE_DELAY_MS)
 				})
-				// A click right after hover would otherwise toggle the menu the hover just opened shut.
+				// A click while hover holds the menu open must never toggle it shut.
 				menu.addEventListener("click", (event) => {
-					if (!(event.target instanceof Element) || !event.target.closest("summary")) return
+					if (!(event.target instanceof Element)) return
+					if (event.target.closest("summary") === null) return
+					cancelClose()
 					if (!hoverOpened || !menu.open) return
 					event.preventDefault()
 					hoverOpened = false
 				})
 			}
+
 			menu.addEventListener("keydown", (event) => {
 				if (event.key !== "Escape" || !menu.open) return
 				menu.open = false
 				hoverOpened = false
 				if (summary instanceof HTMLElement) summary.focus()
+			})
+
+			// A touch screen has no pointerleave to wait for, so an outside tap is the dismissal.
+			document.addEventListener("pointerdown", (event) => {
+				if (!menu.open) return
+				if (event.target instanceof Node && menu.contains(event.target)) return
+				menu.open = false
+				hoverOpened = false
 			})
 		}
 	})()

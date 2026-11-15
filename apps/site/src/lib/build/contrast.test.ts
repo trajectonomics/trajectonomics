@@ -20,13 +20,13 @@ describe("the contrast of the text on the built page", () => {
 		expect(codes()).toEqual([])
 	})
 
-	it("fails muted text on a muted background: under AA in the light Theme, and it reports the ratio", () => {
+	it("fails quiet text on the stage surface: under AA in the light Theme, and it reports the ratio", () => {
 		const found = failures(
-			page("bg-background text-foreground", '<p class="bg-muted text-muted-foreground">Quiet</p>'),
+			page("bg-background text-foreground", '<p class="bg-stage text-muted-foreground">Quiet</p>'),
 		)
 		expect(found.map((failure) => failure.code)).toEqual(["TEXT_CONTRAST_TOO_LOW"])
 		expect(found[0]?.message).toContain("light")
-		expect(found[0]?.message).toMatch(/4\.\d\d:1/)
+		expect(found[0]?.message).toMatch(/2\.\d\d:1/)
 	})
 
 	it("fails text whose colours no Semantic Token Role resolves", () => {

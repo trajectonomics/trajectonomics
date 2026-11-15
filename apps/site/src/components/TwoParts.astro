@@ -2,39 +2,53 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the links it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { DOCS_CLI_PATH, GITHUB_SKILLS_URL } from "../lib/site"
+import {
+	DIAGRAM_PLAN_AMOUNT,
+	DIAGRAM_PLAN_COMMAND,
+	DOCS_CLI_PATH,
+	GITHUB_SKILLS_URL,
+} from "../lib/site"
+import Arrow from "./icons/Arrow.astro"
+import Card from "./ui/Card.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
 const { dictionary } = Astro.props
-const card = "flex flex-col rounded-[20px] border border-border bg-card p-6"
-const cardTitle = "text-sm font-semibold text-foreground"
-const cardBody = "mt-3 flex-1 text-sm text-pretty text-muted-foreground"
-const cardLink =
-	"mt-6 inline-flex w-fit text-sm font-medium text-foreground underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 ---
 
-<section class="border-t border-border bg-background">
+<section class="border-t border-border">
 	<div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
-		<h2
-			class="text-2xl font-light tracking-tight text-balance text-foreground sm:text-3xl"
-		>
+		<h2 class="section-heading text-2xl text-balance text-foreground sm:text-3xl">
 			{dictionary.twoPartHeading}
 		</h2>
-		<div class="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-6">
-			<article class={card}>
-				<p class={cardTitle}>{dictionary.skillsCardTitle}</p>
-				<p class={cardBody}>{dictionary.skillsCardBody}</p>
-				<a class={cardLink} href={GITHUB_SKILLS_URL}>{dictionary.starOnboarding}</a>
-			</article>
-			<article class={card}>
-				<p class={cardTitle}>{dictionary.cliCardTitle}</p>
-				<p class={cardBody}>{dictionary.cliCardBody}</p>
-				<a class={cardLink} href={DOCS_CLI_PATH}>{dictionary.cliDocsLink}</a>
-			</article>
+		<div class="diagram mt-10 sm:mt-14">
+			<Card class="diagram-tile">
+				<div class="diagram-bubbles" aria-hidden="true">
+					<span class="diagram-bubble"></span>
+					<span class="diagram-bubble diagram-bubble-back"></span>
+				</div>
+				<p class="diagram-title">{dictionary.agentCardTitle}</p>
+				<p class="diagram-copy">{dictionary.agentCardCopy}</p>
+			</Card>
+			<div class="diagram-connector">
+				<span class="diagram-connector-line" aria-hidden="true"></span>
+				<span class="diagram-connector-label">{dictionary.diagramConnector}</span>
+			</div>
+			<Card class="diagram-tile">
+				<div class="diagram-terminal">
+					<code class="diagram-command">{DIAGRAM_PLAN_COMMAND}</code>
+					<Arrow class="diagram-arrow" />
+					<span class="diagram-amount tabular-nums">{DIAGRAM_PLAN_AMOUNT}</span>
+				</div>
+				<p class="diagram-title">{dictionary.cliCardTitle}</p>
+				<p class="diagram-copy">{dictionary.cliCardCopy}</p>
+			</Card>
 		</div>
-		<p class="mt-6 text-sm text-pretty text-muted-foreground">{dictionary.twoPartFootnote}</p>
+		<ul class="diagram-links">
+			<li><a class="diagram-link" href={GITHUB_SKILLS_URL}>{dictionary.starOnboarding}</a></li>
+			<li><a class="diagram-link" href={DOCS_CLI_PATH}>{dictionary.cliDocsLink}</a></li>
+		</ul>
 	</div>
 </section>

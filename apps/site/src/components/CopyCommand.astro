@@ -1,31 +1,35 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the fixture and the props it renders.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the icons, the button and the props it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { INSTALL_COMMAND } from "../lib/site"
+import Arrow from "./icons/Arrow.astro"
+import Check from "./icons/Check.astro"
+import Question from "./icons/Question.astro"
+import Terminal from "./icons/Terminal.astro"
+import Button from "./ui/Button.astro"
+import Card from "./ui/Card.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
 const { dictionary } = Astro.props
-// How long the copy notification stays before it clears itself.
+// How long the copy toast stays before it clears itself, which is also how long its countdown runs.
 const NOTICE_TIMEOUT_MS = 6000
+/** The three steps under the command, each with the mark its label names. */
+const STEPS = [Terminal, Question, Check] as const
 ---
 
 <div class="relative">
-	<span class="hero-plus top-[-7px] left-[-7px]" aria-hidden="true"></span>
-	<span class="hero-plus top-[-7px] right-[-7px]" aria-hidden="true"></span>
-	<span class="hero-plus bottom-[-7px] left-[-7px]" aria-hidden="true"></span>
-	<span class="hero-plus bottom-[-7px] right-[-7px]" aria-hidden="true"></span>
-	<div
-		class="overflow-hidden rounded-[20px] border border-border bg-background text-left shadow-2xl"
-	>
+	<Card variant="panel" class="overflow-hidden text-left">
 		<div class="flex items-center gap-2 border-b border-border bg-secondary px-4 py-2.5">
-			<span class="h-3 w-3 rounded-full bg-destructive" aria-hidden="true"></span>
-			<span class="h-3 w-3 rounded-full bg-border" aria-hidden="true"></span>
-			<span class="h-3 w-3 rounded-full bg-border" aria-hidden="true"></span>
-			<span class="ml-2 font-mono text-xs text-foreground">terminal</span>
+			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
+			<span class="ml-2 font-mono text-xs tracking-wide text-muted-foreground uppercase">
+				terminal
+			</span>
 		</div>
 		<div class="flex flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-center">
 			<code
@@ -34,32 +38,44 @@ const NOTICE_TIMEOUT_MS = 6000
 			>
 				{INSTALL_COMMAND}
 			</code>
-			<button
+			<Button
 				type="button"
+				bevel
 				hidden
 				data-copy-command
 				data-copied={dictionary.copied}
 				data-copy-failed={dictionary.copyFailed}
 				data-notice-timeout={NOTICE_TIMEOUT_MS}
-				class="shrink-0 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				class="shrink-0 px-5"
 			>
 				{dictionary.copy}
-			</button>
+			</Button>
 		</div>
-		<p
+		<ol class="window-steps">
+			{
+				STEPS.map((Mark, step) => (
+					<li class="window-step">
+						{step > 0 ? <Arrow class="window-step-arrow" /> : null}
+						<Mark class="window-step-mark" />
+						<span>{dictionary.stepLabels[step]}</span>
+					</li>
+				))
+			}
+		</ol>
+	</Card>
+	<div
+		data-copy-toast
+		class="copy-toast rounded-sm border border-border bg-popover text-popover-foreground"
+		style={`--toast-ms: ${NOTICE_TIMEOUT_MS}ms`}
+	>
+		<Check class="copy-toast-check" />
+		<span
+			data-copy-status
+			class="text-xs font-medium"
 			role="status"
 			aria-live="polite"
-			aria-atomic="true"
-			data-copy-status
-			class="copy-status text-xs font-medium text-foreground"
-		>
-		</p>
-		<p
-			data-next-step
-			class="border-t border-border px-4 py-3 text-sm text-pretty text-muted-foreground"
-		>
-			{dictionary.nextStep}
-		</p>
+			aria-atomic="true"></span>
+		<span class="copy-toast-countdown" aria-hidden="true"></span>
 	</div>
 </div>
 
@@ -68,22 +84,26 @@ const NOTICE_TIMEOUT_MS = 6000
 		const command = document.querySelector("[data-install-command]")
 		const button = document.querySelector("[data-copy-command]")
 		const status = document.querySelector("[data-copy-status]")
+		const toast = document.querySelector("[data-copy-toast]")
 		if (
 			!(command instanceof HTMLElement) ||
 			!(button instanceof HTMLButtonElement) ||
-			!(status instanceof HTMLElement)
+			!(status instanceof HTMLElement) ||
+			!(toast instanceof HTMLElement)
 		) {
 			return
 		}
 
 		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
 		let notice = null
-		/** The notification confirms the copy, then clears itself so the next step keeps the eye. */
+		/** The toast confirms the copy, then clears itself so the next step keeps the eye. */
 		const notify = (message) => {
 			status.textContent = message
+			toast.setAttribute("data-visible", "")
 			if (notice !== null) clearTimeout(notice)
 			notice = setTimeout(() => {
 				status.textContent = ""
+				toast.removeAttribute("data-visible")
 				notice = null
 			}, timeoutMs)
 		}

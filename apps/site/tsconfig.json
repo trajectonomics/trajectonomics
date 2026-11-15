@@ -4,6 +4,7 @@
 		"lib": ["ES2023", "DOM", "DOM.Iterable"],
 		"types": ["astro/client", "bun"],
 		"isolatedDeclarations": false,
+		"resolveJsonModule": true,
 		"declaration": false
 	},
 	"include": [

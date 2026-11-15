@@ -4,10 +4,12 @@ import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import type { Dictionary } from "../lib/language/dictionary"
 import { currentLanguageName } from "../lib/language/dictionary"
 import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
-import { DOCS_PATH, GITHUB_CLI_URL, SITE_NAME, STAR_REPOS } from "../lib/site"
+import { DOCS_PATH, GITHUB_ORG_URL, SITE_NAME } from "../lib/site"
+import { STARRED_REPOS, TOP_STAR_LABEL } from "../lib/site/star-snapshot"
+import { formatStarCount } from "../lib/site/stars"
 import Header from "./Header.astro"
 import { renderComponent } from "./testing/render"
-import { headings, scanComponent, withAttribute } from "./testing/scan"
+import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
 
 /** The attributes a header link carries, as the checks read them. */
 interface LinkShape {
@@ -120,13 +122,49 @@ describe("the Header component in every Language, current or not", () => {
 				expect(textOf(page, docs)).toBe(dictionary.docsLink)
 			})
 
+			it(`names the highest count on the Star menu's trigger, with no verb (${variant})`, async () => {
+				const page = await renderHeader(language, dictionary, markCurrent)
+				const menu = menuWith(page, STARRED_REPOS[0]?.url ?? GITHUB_ORG_URL)
+				const summary = summaryOf(page, menu)
+				expect(textOf(page, summary)).toBe(TOP_STAR_LABEL ?? "")
+				const label =
+					TOP_STAR_LABEL === undefined
+						? dictionary.starMenuLabel
+						: `${dictionary.starMenuLabel}: ${TOP_STAR_LABEL}`
+				expect(summary.attributes["aria-label"]).toBe(label)
+			})
+
 			it(`offers every repository in the Star menu, highest stars first (${variant})`, async () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
-				const menu = menuWith(page, GITHUB_CLI_URL)
-				expect(textOf(page, summaryOf(page, menu))).toBe(dictionary.starMenuLabel)
-				expect(linksIn(page, menu).map((link) => [link.text, link.href])).toEqual(
-					STAR_REPOS.map((repo) => [repo.name, repo.url]),
+				const menu = menuWith(page, STARRED_REPOS[0]?.url ?? GITHUB_ORG_URL)
+				const group = withClass(page, "header-menu-group")[0]
+				expect(group === undefined ? undefined : textOf(page, group)).toBe(
+					dictionary.starMenuGroupLabel,
 				)
+				expect(linksIn(page, menu).map((link) => [link.text, link.href])).toEqual([
+					...STARRED_REPOS.map((repo) => [`${repo.name} ${formatStarCount(repo.stars)}`, repo.url]),
+					[dictionary.starMenuAllRepos, GITHUB_ORG_URL],
+				])
+			})
+
+			it(`checks the repository the trigger names, and only that one (${variant})`, async () => {
+				const page = await renderHeader(language, dictionary, markCurrent)
+				const menu = menuWith(page, STARRED_REPOS[0]?.url ?? GITHUB_ORG_URL)
+				const rows = page.elements.filter(
+					(element) =>
+						element.tag === "a" &&
+						element.ancestors.includes(menu) &&
+						(element.attributes["class"] ?? "").includes("header-menu-row"),
+				)
+				const checked = rows.map((row) =>
+					page.elements.some(
+						(element) =>
+							element.tag === "svg" &&
+							element.ancestors.includes(row) &&
+							(element.attributes["class"] ?? "").includes("header-menu-check"),
+					),
+				)
+				expect(checked).toEqual(rows.map((_, index) => index === 0))
 			})
 
 			it(`marks the current Language only when the page is its home (${variant})`, async () => {

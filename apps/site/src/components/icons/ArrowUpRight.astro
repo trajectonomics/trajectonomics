@@ -1,0 +1,24 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see the class it renders.
+/** An arrow out of the page, drawn with `currentColor`: the Star menu's link to the Organisation. */
+interface Props {
+	readonly class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<svg
+	class={className}
+	aria-hidden="true"
+	focusable="false"
+	viewBox="0 0 16 16"
+	width="12"
+	height="12"><path
+		fill="none"
+		stroke="currentColor"
+		stroke-width="1.5"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"></path></svg
+>

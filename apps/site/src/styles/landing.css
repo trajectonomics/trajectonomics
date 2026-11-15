@@ -1,23 +1,4 @@
-/* The landing page redesign's hero (ADR 0004, variant A): the glow, the kicker and the type step. */
-
-/* The hero's radial glow: the Theme's own background, masked to a soft ellipse. */
-.hero-glow {
-	position: absolute;
-	inset: 0 -20%;
-	background: var(--ds-color-background);
-	opacity: 0.6;
-	-webkit-mask-image: radial-gradient(
-		ellipse 80% 60% at 50% 40%,
-		var(--ds-color-foreground) 0%,
-		transparent 70%
-	);
-	mask-image: radial-gradient(
-		ellipse 80% 60% at 50% 40%,
-		var(--ds-color-foreground) 0%,
-		transparent 70%
-	);
-	pointer-events: none;
-}
+/* The landing page's hero (ADR 0007): the pointer light, the pill, and the display headline. */
 
 /* The one JavaScript motion: a soft light the script moves with transform only. */
 .hero-pointer-glow {
@@ -36,38 +17,47 @@
 	will-change: transform;
 }
 
-/* The kicker line above the headline: mono uppercase with a destructive marker block. */
-.hero-eyebrow {
-	display: inline-flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	gap: 8px;
-	max-width: 100%;
-	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+/* The headline's face: the display family, at the one weight the Site uses on a heading. */
+[data-hero-headline],
+.section-heading {
+	font-family: var(--font-display);
+	font-weight: 300;
+	letter-spacing: -0.02em;
 }
 
-/* The release date is its own run beside the release line: smaller and normal case, not muted. */
-.hero-eyebrow-sep {
-	font-size: 11px;
-	letter-spacing: 0;
+/* The pill's marker: an accent block, drawn with bars so it carries no text. */
+.hero-pill-marker {
+	width: 8px;
+	height: 8px;
+	background: var(--ds-color-accent);
 }
 
-.hero-release-date {
-	font-size: 11px;
-	letter-spacing: 0.04em;
-	text-transform: none;
-	white-space: nowrap;
+/* The stack of headline suffixes: one grid cell each, so the page never shifts as they change. */
+[data-hero-stack] {
+	display: grid;
+	justify-items: center;
 }
 
-.hero-eyebrow::before {
-	content: "";
-	width: 14px;
-	height: 7px;
-	border-radius: 1px;
-	background: var(--ds-color-destructive);
+[data-hero-stack] > span {
+	grid-area: 1 / 1;
+	visibility: hidden;
+}
+
+[data-hero-stack]:not([data-hero-stepping]) > span:last-child,
+[data-hero-stack] > span[data-hero-shown] {
+	visibility: visible;
+}
+
+[data-hero-stack][data-hero-stepping] > span {
+	visibility: visible;
+	opacity: 0;
+	transform: translateY(0.35em);
+	transition:
+		opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+		transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-hero-stack][data-hero-stepping] > span[data-hero-shown] {
+	opacity: 1;
+	transform: none;
 }

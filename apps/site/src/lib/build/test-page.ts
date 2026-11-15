@@ -11,7 +11,9 @@ export const TEST_THEME_CSS = `[data-theme="light"] {
 	--ds-color-foreground: #0a0a0a;
 	--ds-color-card: #ffffff;
 	--ds-color-muted: #f5f5f5;
-	--ds-color-muted-foreground: #737373;
+	--ds-color-muted-foreground: #525252;
+	--ds-color-stage: #171717;
+	--ds-color-stage-foreground: #fafafa;
 }
 [data-theme="dark"] {
 	--ds-color-background: #0a0a0a;
@@ -19,6 +21,8 @@ export const TEST_THEME_CSS = `[data-theme="light"] {
 	--ds-color-card: #171717;
 	--ds-color-muted: #262626;
 	--ds-color-muted-foreground: #a1a1a1;
+	--ds-color-stage: #0a0a0a;
+	--ds-color-stage-foreground: #fafafa;
 }`
 
 /** The Tailwind Theme Stylesheet, as the package writes it: one utility per Semantic Token Role. */
@@ -28,6 +32,8 @@ export const TEST_TAILWIND_CSS = `@theme inline {
 	--color-card: var(--ds-color-card);
 	--color-muted: var(--ds-color-muted);
 	--color-muted-foreground: var(--ds-color-muted-foreground);
+	--color-stage: var(--ds-color-stage);
+	--color-stage-foreground: var(--ds-color-stage-foreground);
 }`
 
 /** The Web Consumer Contract, read the way `verify:build` reads the published package. */
@@ -37,10 +43,10 @@ export const TEST_TOKENS: DesignTokens = parseDesignTokens({
 })
 
 /** The built stylesheet: the same Themes, minified the way a build emits them, plus the type scale. */
-export const TEST_BUILT_CSS = `[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#737373}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1}:root{--text-4xl:2.25rem;--text-xl:1.25rem;--text-lg:1.125rem;--font-weight-bold:700}.text-4xl{font-size:var(--text-4xl)}.text-xl{font-size:var(--text-xl)}.text-lg{font-size:var(--text-lg)}.font-bold{font-weight:var(--font-weight-bold)}`
+export const TEST_BUILT_CSS = `[data-theme=light]{--ds-color-background:#fff;--ds-color-foreground:#0a0a0a;--ds-color-card:#fff;--ds-color-muted:#f5f5f5;--ds-color-muted-foreground:#525252;--ds-color-stage:#171717;--ds-color-stage-foreground:#fafafa}[data-theme=dark]{--ds-color-background:#0a0a0a;--ds-color-foreground:#fafafa;--ds-color-card:#171717;--ds-color-muted:#262626;--ds-color-muted-foreground:#a1a1a1;--ds-color-stage:#0a0a0a;--ds-color-stage-foreground:#fafafa}:root{--text-4xl:2.25rem;--text-xl:1.25rem;--text-lg:1.125rem;--font-weight-bold:700}.text-4xl{font-size:var(--text-4xl)}.text-xl{font-size:var(--text-xl)}.text-lg{font-size:var(--text-lg)}.font-bold{font-weight:var(--font-weight-bold)}`
 
 /** One built page showing the three landmarks, the Theme script before the stylesheet. */
-export const TEST_PAGE = `<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><script>if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.setAttribute("data-theme", "dark")</script><link rel="stylesheet" href="/_astro/site.css"><link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml"><title>Trajectonomics</title></head><body class="bg-background text-foreground"><header class="border-b"><nav><a href="/docs/">Docs</a></nav></header><main><h1>Hero</h1><p class="text-muted-foreground">Sub-line</p></main><footer class="border-t"><a href="https://github.com/trajectonomics">GitHub</a></footer></body></html>`
+export const TEST_PAGE = `<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><script>if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.setAttribute("data-theme", "dark")</script><link rel="stylesheet" href="/_astro/site.css"><link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml"><title>Trajectonomics</title></head><body class="bg-background text-foreground"><header class="border-b"><nav><a href="/docs/">Docs</a></nav></header><main class="bg-muted text-foreground"><h1>Hero</h1><p class="text-muted-foreground">Sub-line</p></main><footer class="border-t bg-stage text-stage-foreground"><a href="https://github.com/trajectonomics">GitHub</a></footer></body></html>`
 
 /** A built Site of both pages and one stylesheet, with the index page and the CSS replaceable. */
 export function testFiles(overrides: { readonly index?: string; readonly css?: string } = {}) {

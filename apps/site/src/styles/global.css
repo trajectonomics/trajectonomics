@@ -8,42 +8,37 @@
 @import "@trajectonomics/design-system-theme/themes/light.css";
 @import "@trajectonomics/design-system-theme/themes/dark.css";
 @import "@trajectonomics/design-system-theme/tailwind.css";
+/* The Theme's own type: the sans stack with its Thai fallback, line height 1.7 and Thai 1.8. */
+@import "@trajectonomics/design-system-theme/typography.css";
+@import "./primitives.css";
 @import "./landing.css";
+@import "./diagram.css";
+@import "./wireframe.css";
 @import "./command.css";
 @import "./header.css";
+@import "./menu.css";
 @import "./motion.css";
 
-/* The inlined brand mark carries a viewBox and no intrinsic size, so the header gives it one. */
-.brand > svg {
-	height: 1.5rem;
-	width: 1.5rem;
+/*
+ * The families the Site draws with, in one place: the display face of the headline run, and the mono
+ * face of every meta label. Body text keeps the Theme's sans stack, so the Thai fallback stays the
+ * theme's. The font files arrive with design-system#77; until then the fallbacks are the faces, and
+ * only these two lines change when the files do.
+ */
+:root {
+	--font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
+	--font-meta: var(--ds-font-family-mono);
+}
+
+/* The inlined brand mark carries a viewBox and no intrinsic size, so the header's tile gives it one. */
+.brand-tile > svg {
+	height: 1.25rem;
+	width: 1.25rem;
 }
 
 @media (min-width: 40rem) {
-	.brand > svg {
-		height: 1.75rem;
-		width: 1.75rem;
+	.brand-tile > svg {
+		height: 1.5rem;
+		width: 1.5rem;
 	}
-}
-
-/* Thai type comes from the visitor's own fonts, so the Site downloads none (ADR 0003). */
-html {
-	font-family:
-		system-ui, -apple-system, "Segoe UI", "Leelawadee UI", Thonburi, "Sukhumvit Set",
-		"Noto Sans Thai", sans-serif;
-}
-
-/*
- * Thai vowel marks sit above and below the line, so it needs room; never break-all or anywhere.
- * The Theme's type utilities each set their own line height (1.11 on `text-4xl`, 1.56 on `text-lg`),
- * which would clip Thai, so every box that carries Thai copy keeps 1.6 as well.
- */
-html[lang="th"] {
-	line-height: 1.6;
-	word-break: normal;
-	overflow-wrap: normal;
-}
-
-html[lang="th"] :is(h1, h2, h3, p, a, li, pre, code, div) {
-	line-height: 1.6;
 }

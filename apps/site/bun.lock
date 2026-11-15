@@ -5,9 +5,9 @@
     "": {
       "name": "@trajectonomics/site",
       "dependencies": {
-        "@trajectonomics/design-system": "0.1.0-alpha.1",
+        "@trajectonomics/design-system": "0.1.0-alpha.4",
         "@trajectonomics/design-system-assets": "0.1.0-alpha.1",
-        "@trajectonomics/design-system-theme": "0.1.0-alpha.1",
+        "@trajectonomics/design-system-theme": "0.1.0-alpha.5",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.12",
@@ -452,11 +452,11 @@
 
     "@tailwindcss/vite": ["@tailwindcss/vite@4.3.5", "", { "dependencies": { "@tailwindcss/node": "4.3.5", "@tailwindcss/oxide": "4.3.5", "tailwindcss": "4.3.5" }, "peerDependencies": { "vite": "^5.2.0 || ^6 || ^7 || ^8" } }, "sha512-BCNiY0a1ZjdOHVqw7kyb7U72BwfMF3dfUuN+tQsLWky/J5JOI/r7abibglXfygrZhVO/3u3V+E25kkKTeMkXaQ=="],
 
-    "@trajectonomics/design-system": ["@trajectonomics/design-system@0.1.0-alpha.1", "", {}, "sha512-xqTo89zvJK2DnKRJxaMC7kcJh2G6cQtQOwE+bzYRdGNBbwpkQpYWquD7Rkc7FvD5wYtjhGia2tY2iUSPYbNe7A=="],
+    "@trajectonomics/design-system": ["@trajectonomics/design-system@0.1.0-alpha.4", "", {}, "sha512-0LON+lGbmWaZZpjNZOsupGsAWd0AyYkUMdROPN5YmK7hUeAjCERbmrHmbfxngODKDBC4Rrb7EG1KZDkjvbBS7g=="],
 
     "@trajectonomics/design-system-assets": ["@trajectonomics/design-system-assets@0.1.0-alpha.1", "", {}, "sha512-XV+nSG1Nb8bjFytgk902T3uw/SAW2zoa0VYvOS8rA8al1r8IR2JfJsa9lgChOVFIX3AnwUqmX2bbwFi6Umn6hg=="],
 
-    "@trajectonomics/design-system-theme": ["@trajectonomics/design-system-theme@0.1.0-alpha.1", "", { "peerDependencies": { "@trajectonomics/design-system": "^0.1.0-alpha.0" } }, "sha512-TO1PzqsczFB5b+tzSukEtHjUxRKJlRSM5z+yyBY4QilklwEGPsKPFyhcph8FV706zjKLwSYyux1KCw06zInQAA=="],
+    "@trajectonomics/design-system-theme": ["@trajectonomics/design-system-theme@0.1.0-alpha.5", "", { "peerDependencies": { "@trajectonomics/design-system": "^0.1.0-alpha.3" } }, "sha512-2uRN3XduQEwTUp2SCIYyF2owrDFmfDz5OUFGcKbrMqW4szAe/gZ4uFVCmHJ9l/qaqCrvA7F0tRVtlH8wwijWSw=="],
 
     "@trajectonomics/tooling": ["@trajectonomics/tooling@1.1.0", "", {}, "sha512-AqKQYsyPN+EosNtxLUaKipA+ocXl2tEWizJ0eXOtSn+C4Lge82ZXCKDbyPYwdsjMiLknnFWfwGeyhKYPTTAl7g=="],
 

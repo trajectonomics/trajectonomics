@@ -4,8 +4,8 @@ import {
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	HERO_RELEASE_DATE,
 	INSTALL_COMMAND,
+	RELEASE_DATE,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 	STAR_REPOS,
@@ -33,13 +33,14 @@ describe("the Site's own constants", () => {
 		expect(GITHUB_ORG_URL).toBe("https://github.com/trajectonomics")
 	})
 
-	it("lists the Star menu's repositories highest stars first, the CLI before the skill", () => {
+	it("names the repositories the Star menu may list, and their GitHub names", () => {
 		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["traj CLI", "traj-onboarding"])
+		expect(STAR_REPOS.map((repo) => repo.repo)).toEqual(["cli", "skills"])
 		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_CLI_URL, GITHUB_SKILLS_URL])
 	})
 
-	it("names the CLI's docs page and the release date the hero announces", () => {
+	it("names the CLI's docs page and the release date the footer announces", () => {
 		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
-		expect(HERO_RELEASE_DATE).toBe("2026-11-12")
+		expect(RELEASE_DATE).toBe("2026-11-12")
 	})
 })

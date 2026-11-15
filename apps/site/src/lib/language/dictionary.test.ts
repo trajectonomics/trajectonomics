@@ -88,33 +88,56 @@ describe("the Dictionary of every Language", () => {
 		)
 	})
 
-	it("names both parts of the product at stable v0.1.0 in the release line", () => {
+	it("names both parts of the product at stable v0.1.0 in the footer's release line", () => {
 		for (const entry of LANGUAGES) {
-			expect({ language: entry.language, release: entry.dictionary.heroRelease }).toEqual({
+			expect({ language: entry.language, release: entry.dictionary.releaseLine }).toEqual({
 				language: entry.language,
 				release: expect.stringContaining("v0.1.0"),
 			})
-			expect(entry.dictionary.heroRelease).toContain("traj CLI")
-			expect(entry.dictionary.heroRelease).toContain("traj-onboarding")
+			expect(entry.dictionary.releaseLine).toContain("traj CLI")
+			expect(entry.dictionary.releaseLine).toContain("traj-onboarding")
 		}
-		expect(dictionaryFor("en").heroReleaseDate).toBe("12 Nov 2026")
-		expect(dictionaryFor("th").heroReleaseDate).toBe("12 พ.ย. 2026")
+		expect(dictionaryFor("en").releaseDate).toBe("12 Nov 2026")
+		expect(dictionaryFor("th").releaseDate).toBe("12 พ.ย. 2026")
 	})
 
-	it("keeps the English two-part section, next step and menu labels the owner approved", () => {
+	it("keeps the release pill, the two-tile section and the menu labels the owner approved", () => {
 		const english = dictionaryFor("en")
+		expect(english.heroVersion).toBe("v0.1.0")
+		expect(english.heroLicence).toBe("MIT · open source")
 		expect(english.twoPartHeading).toBe("Two parts, one command")
-		expect(english.skillsCardTitle).toBe("Skills")
+		expect(english.agentCardTitle).toBe("AI agent")
+		expect(english.agentCardCopy).toBe("Your agent does the talking.")
 		expect(english.cliCardTitle).toBe("traj CLI")
-		expect(english.starMenuLabel).toBe("Star")
+		expect(english.cliCardCopy).toBe("Same input, the same answer.")
+		expect(english.diagramConnector).toBe("traj calc")
+		expect(english.starMenuLabel).toBe("GitHub stars")
+		expect(english.starMenuGroupLabel).toBe("Repositories")
+		expect(english.starMenuAllRepos).toBe("All repositories")
 		expect(english.starOnboarding).toBe("Star traj-onboarding")
 		expect(english.cliDocsLink).toBe("Read the CLI docs")
-		expect(english.twoPartFootnote).toBe(
-			"One command installs traj-onboarding; it sets up the CLI and the traj skill.",
-		)
-		expect(english.nextStep).toBe(
-			"Now open your coding agent and paste it. traj-onboarding asks about your money and gets you started.",
-		)
+		expect(english.copied).toBe("Command copied")
+	})
+
+	it("keeps each diagram tile's copy to five words", () => {
+		const english = dictionaryFor("en")
+		for (const copy of [english.agentCardCopy, english.cliCardCopy]) {
+			expect(copy.replace(/[.,]/g, "").split(/\s+/)).toHaveLength(5)
+		}
+	})
+
+	it("writes the three steps under the command, in every Language", () => {
+		for (const entry of LANGUAGES) {
+			expect({ language: entry.language, steps: entry.dictionary.stepLabels.length }).toEqual({
+				language: entry.language,
+				steps: 3,
+			})
+		}
+		expect(dictionaryFor("en").stepLabels).toEqual([
+			"1 Run in terminal",
+			"2 Answer setup",
+			"3 Ready in agent",
+		])
 	})
 
 	it("names each Language in its own words, and the short label of the reading one", () => {

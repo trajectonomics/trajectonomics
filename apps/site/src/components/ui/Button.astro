@@ -1,0 +1,39 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { HTMLAttributes } from "astro/types"
+
+/** The button's look: a filled control on the primary role, or an outlined one on the page surface. */
+type Variant = "filled" | "outlined"
+
+/** The classes each variant paints; every colour is a Semantic Token Role, never a literal. */
+const VARIANTS: Readonly<Record<Variant, string>> = Object.freeze({
+	filled: "bg-primary text-primary-foreground hover:opacity-90",
+	outlined:
+		"border border-border bg-background text-foreground hover:bg-secondary hover:text-secondary-foreground",
+})
+
+interface Props extends HTMLAttributes<"button"> {
+	readonly variant?: Variant
+	/** Bevelled bottom-right corner, for the filled control beside the install command. */
+	readonly bevel?: boolean
+}
+
+const { variant = "filled", bevel = false, class: className, ...rest } = Astro.props
+const classes = [
+	"inline-flex min-h-9 items-center justify-center gap-2 rounded-sm px-4 py-2 font-mono text-xs tracking-wider uppercase transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+	VARIANTS[variant],
+	className,
+]
+	.filter(Boolean)
+	.join(" ")
+---
+
+<button
+	{...rest}
+	data-slot="button"
+	data-variant={variant}
+	data-bevel={bevel ? "" : undefined}
+	class={classes}
+>
+	<slot />
+</button>

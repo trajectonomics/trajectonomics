@@ -8,25 +8,37 @@ export interface Dictionary {
 	readonly heroHeadingPrefix: string
 	/** The suffixes a script may show after the prefix, in order; the last one is held with no script. */
 	readonly heroHeadingCycle: readonly string[]
-	/** The release line above the hero headline: the stable release, naming both parts. */
-	readonly heroRelease: string
-	/** The release date as this Language writes it; the machine-readable date is `HERO_RELEASE_DATE`. */
-	readonly heroReleaseDate: string
+	/** The stable release's version, the first run of the pill above the headline. */
+	readonly heroVersion: string
+	/** The licence note beside the version: the pill's second run. */
+	readonly heroLicence: string
 	readonly heroSubline: string
+	/** The footer's release line: the stable release, naming both parts. */
+	readonly releaseLine: string
+	/** The release date as this Language writes it; the machine-readable date is `RELEASE_DATE`. */
+	readonly releaseDate: string
 	readonly docsLink: string
-	/** The Star menu's summary label, beside the GitHub mark. */
+	/** The Star menu's summary: the GitHub mark, the count and this name, for a reader who hears it. */
 	readonly starMenuLabel: string
+	/** The Star menu's panel group label, above the repository rows. */
+	readonly starMenuGroupLabel: string
+	/** The Star menu's last row, to the Organisation on GitHub. */
+	readonly starMenuAllRepos: string
 	/** The Skills card's quiet star link to the onboarding skill's repository. */
 	readonly starOnboarding: string
 	readonly twoPartHeading: string
-	readonly skillsCardTitle: string
-	readonly skillsCardBody: string
+	/** The first diagram tile's title: the AI agent the visitor already runs. */
+	readonly agentCardTitle: string
+	/** The first diagram tile's one line, five words at most. */
+	readonly agentCardCopy: string
 	readonly cliCardTitle: string
-	readonly cliCardBody: string
+	/** The second diagram tile's one line, five words at most. */
+	readonly cliCardCopy: string
+	/** The label on the connector between the two tiles: the command that joins them. */
+	readonly diagramConnector: string
+	/** The three steps under the command, in order: run it, answer the setup, it is ready. */
+	readonly stepLabels: readonly string[]
 	readonly cliDocsLink: string
-	readonly twoPartFootnote: string
-	/** The instruction under the command, always visible: the notification only confirms the copy. */
-	readonly nextStep: string
 	readonly copy: string
 	readonly copied: string
 	readonly copyFailed: string
