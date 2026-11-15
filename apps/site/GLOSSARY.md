@@ -57,12 +57,12 @@ _Avoid_: preload script, client router
 **Surface**:
 A published Semantic Token Role a landmark paints behind its content, and the text role that belongs on it:
 `background`/`foreground`, `muted`/`foreground`, `stage`/`stage-foreground` ([ADR 0008](docs/adr/0008-landmark-surface-roles.md)).
-_Avoid_: Background colour, panel, band
+_Avoid_: Background colour, band
 
 **Star snapshot**:
 The committed star counts the Star menu renders from, one number per repository plus the date they were read,
 written by `bun run stars:update` and never fetched at request time.
-_Avoid_: Live count, star count, stars file
+_Avoid_: Live count, stars file
 
 **Invariant**:
 A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the absence of a Web font are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).

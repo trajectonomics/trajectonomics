@@ -15,8 +15,10 @@
 @import "./diagram.css";
 @import "./wireframe.css";
 @import "./command.css";
+@import "./toast.css";
 @import "./header.css";
 @import "./menu.css";
+@import "./menu-panel.css";
 @import "./motion.css";
 
 /*
@@ -28,6 +30,8 @@
 :root {
 	--font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
 	--font-meta: var(--ds-font-family-mono);
+	/* `font-mono` reads the same variable, so design-system#77 changes this block alone. */
+	--font-mono: var(--font-meta);
 }
 
 /* The inlined brand mark carries a viewBox and no intrinsic size, so the header's tile gives it one. */

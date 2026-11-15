@@ -51,7 +51,7 @@ const STEPS = [Terminal, Question, Check] as const
 				{dictionary.copy}
 			</Button>
 		</div>
-		<ol class="window-steps">
+		<ol class="window-steps text-muted-foreground">
 			{
 				STEPS.map((Mark, step) => (
 					<li class="window-step">
@@ -68,7 +68,7 @@ const STEPS = [Terminal, Question, Check] as const
 		class="copy-toast rounded-sm border border-border bg-popover text-popover-foreground"
 		style={`--toast-ms: ${NOTICE_TIMEOUT_MS}ms`}
 	>
-		<Check class="copy-toast-check" />
+		<Check class="copy-toast-check" data-copy-check />
 		<span
 			data-copy-status
 			class="text-xs font-medium"
@@ -85,6 +85,7 @@ const STEPS = [Terminal, Question, Check] as const
 		const button = document.querySelector("[data-copy-command]")
 		const status = document.querySelector("[data-copy-status]")
 		const toast = document.querySelector("[data-copy-toast]")
+		const check = document.querySelector("[data-copy-check]")
 		if (
 			!(command instanceof HTMLElement) ||
 			!(button instanceof HTMLButtonElement) ||
@@ -97,8 +98,12 @@ const STEPS = [Terminal, Question, Check] as const
 		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
 		let notice = null
 		/** The toast confirms the copy, then clears itself so the next step keeps the eye. */
-		const notify = (message) => {
+		const notify = (message, failed) => {
 			status.textContent = message
+			if (check instanceof HTMLElement) check.hidden = failed
+			// Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
+			toast.removeAttribute("data-visible")
+			void toast.offsetWidth
 			toast.setAttribute("data-visible", "")
 			if (notice !== null) clearTimeout(notice)
 			notice = setTimeout(() => {
@@ -114,14 +119,14 @@ const STEPS = [Terminal, Question, Check] as const
 			const text = command.textContent?.trim() ?? ""
 			try {
 				await navigator.clipboard.writeText(text)
-				notify(button.dataset.copied ?? "")
+				notify(button.dataset.copied ?? "", false)
 			} catch {
 				const range = document.createRange()
 				range.selectNodeContents(command)
 				const selection = document.getSelection()
 				selection?.removeAllRanges()
 				selection?.addRange(range)
-				notify(button.dataset.copyFailed ?? "")
+				notify(button.dataset.copyFailed ?? "", true)
 			}
 		})
 	})()

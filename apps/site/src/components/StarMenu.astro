@@ -29,23 +29,32 @@ const label =
 		{TOP_STAR_LABEL !== undefined && <span>{TOP_STAR_LABEL}</span>}
 		<Chevron class="header-menu-chevron" />
 	</summary>
-	<div class="header-menu-panel bg-popover text-popover-foreground">
-		<p class="header-menu-group">{dictionary.starMenuGroupLabel}</p>
-		<ul class="header-menu-list">
-			{
-				STARRED_REPOS.map((repo) => (
+	<div
+		class="header-menu-panel bg-popover text-popover-foreground"
+		data-empty={STARRED_REPOS.length === 0 ? "" : undefined}
+	>
+		{
+			STARRED_REPOS.length > 0 && (
+				<p class="header-menu-group text-muted-foreground">{dictionary.starMenuGroupLabel}</p>
+			)
+		}
+		{
+			STARRED_REPOS.length > 0 && (
+				<ul class="header-menu-list">
+					{STARRED_REPOS.map((repo) => (
 					<li>
 						<a class="header-menu-row" href={repo.url}>
 							<span class="header-menu-row-name">{repo.name}</span>
-							<span class="header-menu-row-count tabular-nums">
+							<span class="header-menu-row-count text-muted-foreground tabular-nums">
 								{formatStarCount(repo.stars)}
 							</span>
 							{repo.repo === defaultRepo && <Check class="header-menu-check" />}
 						</a>
-					</li>
-				))
-			}
-		</ul>
+						</li>
+					))}
+				</ul>
+			)
+		}
 		<a class="header-menu-footer" href={GITHUB_ORG_URL}>
 			<span>{dictionary.starMenuAllRepos}</span>
 			<ArrowUpRight class="header-menu-out" />

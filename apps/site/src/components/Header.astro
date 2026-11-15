@@ -27,8 +27,8 @@ const artwork = mark
 	.replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
 ---
 
-<header class="site-header fixed inset-x-0 top-0 z-50 border-b border-border bg-background">
-	<nav class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6">
+<header class="site-header fixed inset-x-0 top-0 z-50 h-16 border-b border-border bg-background">
+	<nav class="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6">
 		<a
 			class="brand shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 			href={localeUrl(language)}
@@ -100,6 +100,14 @@ const artwork = mark
 					cancelClose()
 					if (!hoverOpened || !menu.open) return
 					event.preventDefault()
+				})
+
+				// Tabbing out of an open menu closes it, so no visitor is left behind a panel.
+				menu.addEventListener("focusout", (event) => {
+					if (!menu.open) return
+					const next = event.relatedTarget
+					if (next instanceof Node && menu.contains(next)) return
+					menu.open = false
 					hoverOpened = false
 				})
 			}

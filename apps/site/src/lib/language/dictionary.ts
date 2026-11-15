@@ -24,7 +24,7 @@ export interface Dictionary {
 	readonly starMenuGroupLabel: string
 	/** The Star menu's last row, to the Organisation on GitHub. */
 	readonly starMenuAllRepos: string
-	/** The Skills card's quiet star link to the onboarding skill's repository. */
+	/** The star link under the diagram, to the onboarding skill's repository. */
 	readonly starOnboarding: string
 	readonly twoPartHeading: string
 	/** The first diagram tile's title: the AI agent the visitor already runs. */

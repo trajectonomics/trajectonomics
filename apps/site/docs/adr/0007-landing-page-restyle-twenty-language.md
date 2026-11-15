@@ -76,6 +76,8 @@ settled in a grilling session against the live site, measured in Chromium rather
 - `src/styles/global.css` imports the Theme's `typography.css` and drops the hand-written Thai stack.
 - `e2e/menus.e2e.ts` reproduces the pointer crossing the bridge, so the bug the issue reports cannot come back
   unnoticed.
+- The pill's radius is `radius.sm` (4 px), not the 2 px the sketch carried: a radius comes from the
+  scale, and 2 px is not on it.
 - The twelve visual baselines change, and only because the page changed.
 - This record supersedes the "direction" paragraph of [ADR 0004](./0004-landing-page-redesign.md) (palette-only
   restyle, red kicker, hero band and glow) and its 1.6 Thai line height. Its static-artifact decisions, the JS

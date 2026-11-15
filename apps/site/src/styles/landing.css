@@ -17,6 +17,11 @@
 	will-change: transform;
 }
 
+/* The ground is `muted`, so in the dark Theme the light is the foreground, not the background. */
+[data-theme="dark"] .hero-pointer-glow {
+	background: var(--ds-color-foreground);
+}
+
 /* The headline's face: the display family, at the one weight the Site uses on a heading. */
 [data-hero-headline],
 .section-heading {

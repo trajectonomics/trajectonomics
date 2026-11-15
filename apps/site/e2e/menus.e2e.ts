@@ -56,6 +56,26 @@ test.describe("the header menus on a fine pointer", () => {
 		await expect(firstRow).toBeVisible()
 	})
 
+	test("closes when Tab moves focus out of it", async ({ page }) => {
+		await openPage(page, HOME)
+		const menu = page.locator("details[data-header-menu]").first()
+		const firstRow = menu.locator("a").first()
+		await menu.locator("summary").focus()
+		await page.keyboard.press("Enter")
+		await expect(firstRow).toBeVisible()
+		// Walk the tab order until focus is outside the disclosure, then it must be shut behind us.
+		for (let stop = 0; stop < 12; stop++) {
+			const inside = await page.evaluate(
+				() =>
+					document.querySelector("details[data-header-menu]")?.contains(document.activeElement) ??
+					false,
+			)
+			if (!inside) break
+			await page.keyboard.press("Tab")
+		}
+		await expect(firstRow).toBeHidden()
+	})
+
 	test("closes on Escape, and an outside click closes what a click opened", async ({ page }) => {
 		await openPage(page, HOME)
 		const menu = page.locator("details[data-header-menu]").first()
