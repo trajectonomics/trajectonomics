@@ -57,9 +57,9 @@ settled in a grilling session against the live site, measured in Chromium rather
 
 - **Keep the hero band and the static glow.** Rejected: the ground is `main` on `muted`, so a band would be a
   second surface tint, and a static radial glow is exactly the elevation the flat language drops.
-- **Download the display and mono faces now.** Rejected: the Site forbids a Web font ([ADR 0005](./0005-page-weight-and-web-font-budget.md));
+- **Download the display and mono faces now.** Rejected at the time: the Site forbade a Web font ([ADR 0005](./0005-page-weight-and-web-font-budget.md));
   design-system#77 ships the files and a font budget as a separate change, and the two custom properties make it
-  one file here.
+  one file here. That separate change has landed: see the amendment below.
 - **Keep the inline copy pill.** Rejected: a pill inside the window reflows the command, while a floating toast
   leaves the layout alone and reads as a system confirmation.
 - **Fix the menu's 10 px gap by moving the panel.** Rejected: a panel touching its trigger loses the float the
@@ -82,3 +82,13 @@ settled in a grilling session against the live site, measured in Chromium rather
 - This record supersedes the "direction" paragraph of [ADR 0004](./0004-landing-page-redesign.md) (palette-only
   restyle, red kicker, hero band and glow) and its 1.6 Thai line height. Its static-artifact decisions, the JS
   budget and the Copy button's behaviour stand.
+
+## Amendment (the Brand Typeface)
+
+The "Type" bullet's "the font files arrive with design-system#77" is now fact, and the rejection of "Download
+the display and mono faces now" no longer holds. `@trajectonomics/design-system-assets@0.1.0-alpha.4` ships
+Aleo 300 and 400 and Azeret Mono 500, and the Site serves them itself under the Font budget in
+[ADR 0005](./0005-page-weight-and-web-font-budget.md): 40,632 bytes of the 48,000-byte font budget.
+`src/styles/fonts.css` declares the faces with their metric-matched fallbacks, and `src/styles/global.css`
+names them in the two custom properties this record reserved. Body text and Thai are unchanged: the Theme's
+system sans stays the body face, and no Thai font file ships.

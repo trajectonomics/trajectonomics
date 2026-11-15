@@ -9,19 +9,15 @@ const VIEWPORTS = {
 } as const
 
 /**
- * The fonts the screenshots render with. The Site ships no web fonts (ADR 0003), so a snapshot would
- * otherwise depend on the fonts a runner happens to have installed; the test pins its own instead.
+ * The one face the screenshots pin: Thai. The page serves Aleo and Azeret Mono from its build, but
+ * Thai still falls through to the visitor's own face, so the pin keeps that family the same on every
+ * runner. The `unicode-range` keeps it to Thai code points, so Latin renders in the page's own faces.
  */
 const FONT_CSS = `
-@font-face { font-family: "Visual Sans"; src: url("/e2e-fonts/LiberationSans-Regular.ttf"); font-weight: 400; }
-@font-face { font-family: "Visual Sans"; src: url("/e2e-fonts/LiberationSans-Bold.ttf"); font-weight: 700; }
-@font-face { font-family: "Visual Serif"; src: url("/e2e-fonts/LiberationSerif-Regular.ttf"); font-weight: 300 400; }
-@font-face { font-family: "Visual Thai"; src: url("/e2e-fonts/NotoSansThai.ttf"); font-weight: 400; }
-@font-face { font-family: "Visual Mono"; src: url("/e2e-fonts/LiberationMono-Regular.ttf"); font-weight: 400; }
-/* The Theme's typography sheet names the family on [data-theme], so the pin names it there too. */
-html[data-theme] { font-family: "Visual Sans", "Visual Thai", sans-serif; }
-:root { --font-display: "Visual Serif", "Visual Thai", serif; --font-meta: "Visual Mono", "Visual Thai", monospace; }
-.font-mono, code, pre, kbd, samp { font-family: "Visual Mono", "Visual Thai", monospace; }
+@font-face { font-family: "Visual Thai"; src: url("/e2e-fonts/NotoSansThai.ttf"); font-weight: 400; unicode-range: U+0E00-0E7F; }
+/* The Theme's typography sheet names the sans stack on [data-theme], so the pin names it there too. */
+html[data-theme] { font-family: "Visual Thai", ui-sans-serif, system-ui, "Segoe UI", "Leelawadee UI", Thonburi, "Noto Sans Thai", sans-serif; }
+:root { --font-display: "Visual Thai", "Aleo", "Aleo Fallback", Georgia, serif; --font-meta: "Visual Thai", "Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace; }
 `
 
 /** Serve the pinned fonts from `e2e/fonts/`, so every runner renders the snapshots alike. */

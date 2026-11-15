@@ -14,10 +14,13 @@
 		"node": ">=22.23.4"
 	},
 	"scripts": {
+		"predev": "bun scripts/copy-fonts.ts",
 		"dev": "astro dev",
+		"prebuild": "bun scripts/copy-fonts.ts",
 		"build": "astro build",
+		"prebuild:preview": "bun scripts/copy-fonts.ts",
 		"build:preview": "astro build --mode preview",
-		"preview": "astro build && wrangler dev",
+		"preview": "bun run build && wrangler dev",
 		"test": "bun test ./src ./scripts",
 		"test:browser": "bun run build && playwright test",
 		"test:performance": "bun run build && bun scripts/performance.ts",
@@ -51,7 +54,7 @@
 	},
 	"dependencies": {
 		"@trajectonomics/design-system": "0.1.0-alpha.4",
-		"@trajectonomics/design-system-assets": "0.1.0-alpha.1",
+		"@trajectonomics/design-system-assets": "0.1.0-alpha.4",
 		"@trajectonomics/design-system-theme": "0.1.0-alpha.5"
 	}
 }

@@ -14,7 +14,12 @@ export async function readBuildFiles(root: string): Promise<readonly BuiltFile[]
 	paths.sort()
 	const files: BuiltFile[] = []
 	for (const path of paths) {
-		files.push({ path, content: BINARY.test(path) ? "" : await Bun.file(`${root}/${path}`).text() })
+		const file = Bun.file(`${root}/${path}`)
+		files.push({
+			path,
+			content: BINARY.test(path) ? "" : await file.text(),
+			bytes: file.size,
+		})
 	}
 	return files
 }

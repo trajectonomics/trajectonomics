@@ -127,6 +127,6 @@ became the footer's `releaseLine`/`releaseDate`; `nextStep`, `twoPartFootnote` a
 the paragraphs they belonged to. `src/lib/site.ts` keeps the install command, the diagram's `$ traj plan` fixture
 and its `14,280.00` figure, because those are product facts, not Language.
 
-Not adopted, and why: a downloaded display or mono face (Web fonts stay forbidden until design-system#77), the
+Not adopted, and why: a downloaded display or mono face (forbidden until design-system#77; now adopted, see ADR 0007's amendment), the
 728 px tiled favicon (design-system#76), and moving the primitives into `@trajectonomics/design-system-svelte`
 (design-system#74, site#32).

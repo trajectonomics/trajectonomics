@@ -65,7 +65,7 @@ written by `bun run stars:update` and never fetched at request time.
 _Avoid_: Live count, stars file
 
 **Invariant**:
-A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the absence of a Web font are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the Font budget are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Rule, assertion
 
 **Pure Core**:
@@ -80,10 +80,14 @@ _Avoid_: Error message, failure string
 The most one page's HTML and its same-origin stylesheets may gzip to together: under 50,000 bytes at zlib level 6, measured from the build ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Size limit, bundle size
 
+**Font budget**:
+The most the distinct same-origin `.woff2` files one page's stylesheets reference may weigh: at most 48,000 bytes, uncompressed, each file once. The Brand Typeface costs 40,632 bytes of it ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+_Avoid_: Font limit, type limit
+
 **Program JavaScript**:
 The script text one page runs, uncompressed and under 10,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript. [ADR 0004 (landing page redesign)](docs/adr/0004-landing-page-redesign.md) raised the budget from ADR 0005's 5,000 bytes.
 _Avoid_: Bundle, JS payload
 
 **Web font**:
-A font the Site downloads instead of drawing with the visitor's own fonts. A font file, an `@font-face` rule, a remote font URL and a `data:` font URL are each forbidden.
+A font file the Site serves itself under the Font budget: the Brand Typeface's three latin `.woff2` files (`Aleo` 300 and 400, `Azeret Mono` 500), copied from `@trajectonomics/design-system-assets` and declared in `src/styles/fonts.css`. A font URL that is absolute, a font or font stylesheet on another origin and a font in a `data:` URL each fail an Invariant, and the Site ships no Thai face, so Thai still draws from the visitor's own fonts ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Custom font, typeface asset

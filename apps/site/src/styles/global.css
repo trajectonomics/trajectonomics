@@ -10,6 +10,8 @@
 @import "@trajectonomics/design-system-theme/tailwind.css";
 /* The Theme's own type: the sans stack with its Thai fallback, line height 1.7 and Thai 1.8. */
 @import "@trajectonomics/design-system-theme/typography.css";
+/* The Brand Typeface's @font-face rules, whose files `scripts/copy-fonts.ts` puts in public/fonts/. */
+@import "./fonts.css";
 @import "./primitives.css";
 @import "./landing.css";
 @import "./diagram.css";
@@ -23,14 +25,14 @@
 
 /*
  * The families the Site draws with, in one place: the display face of the headline run, and the mono
- * face of every meta label. Body text keeps the Theme's sans stack, so the Thai fallback stays the
- * theme's. The font files arrive with design-system#77; until then the fallbacks are the faces, and
- * only these two lines change when the files do.
+ * face of every meta label. Body text keeps the Theme's sans stack, which is also where the Thai
+ * fallback lives. The files are latin subsets, so Thai falls through to the system Thai face.
  */
 :root {
-	--font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
-	--font-meta: var(--ds-font-family-mono);
-	/* `font-mono` reads the same variable, so design-system#77 changes this block alone. */
+	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+	/* `font-mono` reads the same variable, so the meta layer has one family. */
 	--font-mono: var(--font-meta);
 }
 

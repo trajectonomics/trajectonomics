@@ -2,11 +2,18 @@
 export interface BuiltFile {
 	readonly path: string
 	readonly content: string
+	/** The file's byte length on disk, so a check can measure a binary the scan does not read as text. */
+	readonly bytes?: number
 }
 
 /** The file at one assets-root-relative path, or `undefined` when the build produced none. */
 export function fileAt(files: readonly BuiltFile[], path: string): BuiltFile | undefined {
 	return files.find((file) => file.path === path)
+}
+
+/** The byte length of a built file, from the disk size when the scan read it as binary. */
+export function fileBytes(file: BuiltFile): number {
+	return file.bytes ?? new TextEncoder().encode(file.content).length
 }
 
 /**

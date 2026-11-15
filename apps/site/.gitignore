@@ -1,6 +1,9 @@
 node_modules/
 /dist/
 public/favicon/
+# The Brand Typeface is copied from the pinned assets package before every build; the package is the
+# source of truth and the repository commits no binaries.
+public/fonts/
 coverage/
 *.tgz
 .scratch/

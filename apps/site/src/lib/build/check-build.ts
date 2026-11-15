@@ -3,6 +3,7 @@ import type { BuiltFile } from "./built-files"
 import { checkTextContrast } from "./contrast"
 import { checkExternalAssets } from "./external-assets"
 import type { BuildFailure } from "./failures"
+import { checkFonts } from "./fonts"
 import { checkHreflang } from "./hreflang"
 import { checkLandmarkColours } from "./landmark-colours"
 import { checkLandmarks } from "./landmarks"
@@ -22,7 +23,6 @@ import { checkStructure } from "./structure"
 import { checkSwitcher } from "./switcher"
 import { checkThaiTextLanguage } from "./thai-text"
 import { checkTheme } from "./theme"
-import { checkNoWebFonts } from "./web-fonts"
 
 /** Every rule the built Site fails, so one run names all of them instead of the first. */
 export function checkBuild(
@@ -40,7 +40,7 @@ export function checkBuild(
 		...checkTheme(files, tokens),
 		...checkLandmarkColours(files, tokens),
 		...checkTextContrast(files, tokens),
-		...checkNoWebFonts(files),
+		...checkFonts(files),
 		...checkPageWeight(files),
 		...checkLanguageHomes(files),
 		...checkHreflang(files),

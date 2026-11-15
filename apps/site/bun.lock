@@ -6,7 +6,7 @@
       "name": "@trajectonomics/site",
       "dependencies": {
         "@trajectonomics/design-system": "0.1.0-alpha.4",
-        "@trajectonomics/design-system-assets": "0.1.0-alpha.1",
+        "@trajectonomics/design-system-assets": "0.1.0-alpha.4",
         "@trajectonomics/design-system-theme": "0.1.0-alpha.5",
       },
       "devDependencies": {
@@ -454,7 +454,7 @@
 
     "@trajectonomics/design-system": ["@trajectonomics/design-system@0.1.0-alpha.4", "", {}, "sha512-0LON+lGbmWaZZpjNZOsupGsAWd0AyYkUMdROPN5YmK7hUeAjCERbmrHmbfxngODKDBC4Rrb7EG1KZDkjvbBS7g=="],
 
-    "@trajectonomics/design-system-assets": ["@trajectonomics/design-system-assets@0.1.0-alpha.1", "", {}, "sha512-XV+nSG1Nb8bjFytgk902T3uw/SAW2zoa0VYvOS8rA8al1r8IR2JfJsa9lgChOVFIX3AnwUqmX2bbwFi6Umn6hg=="],
+    "@trajectonomics/design-system-assets": ["@trajectonomics/design-system-assets@0.1.0-alpha.4", "", {}, "sha512-BOkT3B4ATlXztRKuNNVjLTtT7TfLyxd/meLXJHR56QzDLzkZj5P1LPDYnqoAMqYgbnKIj/4ppd8B6zSbvtj9Ug=="],
 
     "@trajectonomics/design-system-theme": ["@trajectonomics/design-system-theme@0.1.0-alpha.5", "", { "peerDependencies": { "@trajectonomics/design-system": "^0.1.0-alpha.3" } }, "sha512-2uRN3XduQEwTUp2SCIYyF2owrDFmfDz5OUFGcKbrMqW4szAe/gZ4uFVCmHJ9l/qaqCrvA7F0tRVtlH8wwijWSw=="],
 
