@@ -92,6 +92,14 @@ _Avoid_: Utility, helper, service
 A stable code naming exactly one rule a built page can break, so one run reports every rule it breaks and no code changes meaning ([CODING_STANDARDS.md](CODING_STANDARDS.md)).
 _Avoid_: Error message, failure string
 
+**Social card**:
+The Open Graph and X meta a share sheet renders for a page: its title, description, absolute URL, type, site name and card kind. The share image is not part of it, because no 1200×630 asset ships yet.
+_Avoid_: Preview card, OG tags
+
+**Structured data**:
+The JSON-LD block a page carries, naming the `WebSite` and the `Organization` that publishes it. It is data, so it is outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+_Avoid_: Schema, schema.org markup, metadata blob
+
 **Page weight budget**:
 The most one page's HTML and its same-origin stylesheets may gzip to together: under 50,000 bytes at zlib level 6, measured from the build ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Size limit, bundle size
