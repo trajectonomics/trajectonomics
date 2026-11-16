@@ -48,6 +48,20 @@ function checkLanguage(response: ProbeResponse): readonly ProbeFailure[] {
 	]
 }
 
+/** A probe that names media types is answered with one of them, its parameters ignored. */
+function checkMediaType(response: ProbeResponse): readonly ProbeFailure[] {
+	const { probe } = response
+	const actual = response.contentType?.split(";")[0]?.trim().toLowerCase()
+	if (probe.mediaTypes.length === 0 || probe.mediaTypes.includes(actual ?? "")) return []
+	return [
+		probeFailure(
+			"PROBE_CONTENT_TYPE_WRONG",
+			probe.path,
+			`expected ${probe.mediaTypes.join(" or ")}, got ${actual ?? "no content type"}.`,
+		),
+	]
+}
+
 /** The rules every answer keeps: the Site stores nothing, and sets no content security policy. */
 function checkEveryAnswer(response: ProbeResponse): readonly ProbeFailure[] {
 	const failures: ProbeFailure[] = []
@@ -85,6 +99,7 @@ export function checkProbeResponses(responses: readonly ProbeResponse[]): readon
 			...checkStatus(response),
 			...checkLocation(response),
 			...checkLanguage(response),
+			...checkMediaType(response),
 			...checkEveryAnswer(response),
 		]),
 	]

@@ -10,6 +10,7 @@ function healthy(probe: Probe): ProbeResponse {
 		location: probe.location,
 		setCookie: null,
 		contentSecurityPolicy: null,
+		contentType: probe.mediaTypes[0] ?? null,
 		html: probe.language === null ? "" : `<html lang="${probe.language}">`,
 	}
 }
@@ -30,6 +31,8 @@ const THAI_HOME_WITHOUT_SLASH = 6
 const THAI_MISS = 7
 const UNPREFIXED_MISS = 8
 const RESERVED_PRELOAD = 9
+const SITEMAP = 10
+const ROBOTS = 11
 
 /** The clean answers with the answer at `index` replaced by `answer`. */
 function withAnswer(index: number, answer: Partial<ProbeResponse>): readonly ProbeResponse[] {
@@ -91,6 +94,24 @@ describe("the answers the local Worker gives", () => {
 		expect(
 			codes(withAnswer(UNPREFIXED_MISS, { contentSecurityPolicy: "default-src 'self'" })),
 		).toEqual(["CONTENT_SECURITY_POLICY_PRESENT"])
+	})
+
+	it("fails a Sitemap the Worker answers as a page", () => {
+		expect(codes(withAnswer(SITEMAP, { contentType: "text/html" }))).toEqual([
+			"PROBE_CONTENT_TYPE_WRONG",
+		])
+	})
+
+	it("fails a Robots file the Worker answers with no content type", () => {
+		expect(codes(withAnswer(ROBOTS, { contentType: null }))).toEqual(["PROBE_CONTENT_TYPE_WRONG"])
+	})
+
+	it("passes a media type that carries a parameter", () => {
+		expect(codes(withAnswer(ROBOTS, { contentType: "text/plain; charset=utf-8" }))).toEqual([])
+	})
+
+	it("judges no content type on an answer that carries no body", () => {
+		expect(codes(withAnswer(ROOT_DEFAULT, { contentType: "text/html" }))).toEqual([])
 	})
 
 	it("fails a probe the Worker never answered", () => {

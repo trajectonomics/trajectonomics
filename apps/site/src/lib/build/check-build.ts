@@ -17,8 +17,10 @@ import { checkPageText } from "./page-text"
 import { checkPageWeight } from "./page-weight"
 import { checkContentSecurityPolicy } from "./policy"
 import { checkReservedPreloadPath } from "./reserved-path"
+import { checkRobots } from "./robots"
 import { checkSiteContent } from "./site-content"
 import { checkSiteLinks } from "./site-links"
+import { checkSitemap } from "./sitemap"
 import { checkStructure } from "./structure"
 import { checkSwitcher } from "./switcher"
 import { checkThaiTextLanguage } from "./thai-text"
@@ -44,6 +46,8 @@ export function checkBuild(
 		...checkPageWeight(files),
 		...checkLanguageHomes(files),
 		...checkHreflang(files),
+		...checkSitemap(files),
+		...checkRobots(files),
 		...checkSwitcher(files),
 		...checkOwnerPlaceholder(files, mode),
 		...checkNoLanguageDetection(files),

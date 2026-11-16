@@ -29,6 +29,7 @@ async function readResponses(baseUrl: string): Promise<readonly ProbeResponse[]>
 			location: response.headers.get("location"),
 			setCookie: response.headers.get("set-cookie"),
 			contentSecurityPolicy: response.headers.get("content-security-policy"),
+			contentType: response.headers.get("content-type"),
 			html,
 		})
 	}
