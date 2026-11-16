@@ -68,8 +68,20 @@ _Avoid_: Live count, stars file
 A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the Font budget are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Rule, assertion
 
+**Crawler file**:
+A built file a crawler reads at the assets root rather than a page: the Sitemap and the Robots file, both written by the build from the Language constants and judged by a built-file check.
+_Avoid_: SEO file, metadata file, static asset
+
+**Sitemap**:
+The Crawler file at `/sitemap.xml`: one `<url>` per Language home, each naming every Language's alternate and `x-default` at the English home. It lists only the Site's homes and speaks for the whole host, so a Docs Portal sitemap later turns it into a sitemap index.
+_Avoid_: URL list, page index
+
+**Robots file**:
+The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /` and the absolute `Sitemap:` line, with no `Disallow:`. It is read at the host root, so it speaks for `/docs` too, which another repository serves.
+_Avoid_: Crawl rules, allowlist
+
 **Pure Core**:
-A module that takes data in and returns data out, with no clock, randomness, network or filesystem access. The built-file checks in `src/lib/build/` and the probe check in `src/lib/probe/` are Pure Cores; `scripts/` holds the adapters that read the build and start the Worker.
+A module that takes data in and returns data out, with no clock, randomness, network or filesystem access. The built-file checks in `src/lib/build/`, the Crawler files' generators in `src/lib/crawl/` and the probe check in `src/lib/probe/` are Pure Cores; `scripts/` holds the adapters that read the build and start the Worker.
 _Avoid_: Utility, helper, service
 
 **Error Code**:
