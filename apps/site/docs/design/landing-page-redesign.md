@@ -115,7 +115,7 @@ and [ADR 0008](../adr/0008-landmark-surface-roles.md).
 | Button | Filled/outlined with a 16 px bottom-right bevel under `@supports (corner-shape: bevel)`, plain 4 px otherwise | `ui/Button.astro`, `src/styles/primitives.css` |
 | Accent | `accent` orange: pill marker, headline suffix, toast check | roles only |
 | Hero | A 28 px hairline pill (`v0.1.0` · hairline · `MIT · open source`), the display headline, the sub-line, the terminal window | `Hero.astro` |
-| Command | Window with bevel Copy button, a three-step strip (terminal → `?` → `✓`, 12 px mono labels), and the floating 236 px toast with a 2 px countdown line | `CopyCommand.astro`, `src/styles/command.css` |
+| Command | Window with bevel Copy button, a three-step strip (terminal → `?` → `✓`, 12 px mono labels), one quiet row under the strip linking the CLI installation page ([ADR 0009](../adr/0009-the-site-prints-one-command.md)), and the floating 236 px toast with a 2 px countdown line | `CopyCommand.astro`, `src/styles/command.css` |
 | Section | The `h2` stays `Two parts, one command`; two 232 px wireframe tiles joined by a 56 px `traj calc` connector; the two links under the diagram | `TwoParts.astro`, `src/styles/diagram.css`, `src/styles/wireframe.css` |
 | Footer | `stage`/`stage-foreground`, dark in both Themes; the release line and its date moved here from the hero | `Footer.astro` |
 | Star data | Committed `src/lib/site/stars.json` (`asOf` + count per repository), written by `bun run stars:update`; sorted desc, zero absent, no number when all are zero | `scripts/stars.ts`, `src/lib/site/stars.ts` |

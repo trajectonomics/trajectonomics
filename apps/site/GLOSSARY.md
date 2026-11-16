@@ -24,6 +24,10 @@ _Avoid_: Setup skill, getting-started skill
 The `traj` command-line program (`@trajectonomics/cli`) that does the arithmetic: same input, same answer, every time, and it never calls a model.
 _Avoid_: Binary, tool, executable
 
+**Install path**:
+One way a visitor gets traj onto their machine: the Site's one command, which installs the Onboarding skill into a coding agent, or the Docs Portal's CLI installation page, which lists the CLI's install channels. The Site prints the one command and names the Docs Portal for the other.
+_Avoid_: Install method, installer, setup path
+
 **Stable release**:
 A release the owner names as no longer alpha. The first is `v0.1.0`, for both the CLI and the Onboarding skill, announced on the Site with its date.
 _Avoid_: GA, production release, 1.0
