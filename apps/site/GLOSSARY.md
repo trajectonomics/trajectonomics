@@ -58,6 +58,10 @@ _Avoid_: preload script, client router
 
 ## Built site
 
+**Theme**:
+The published colour set a page asks for with `data-theme`, one value per Semantic Token Role. The Site ships one, light, for every visitor: it never follows the device's scheme, and both published Themes stay in the build ([ADR 0011](docs/adr/0011-the-site-ships-the-light-theme.md)).
+_Avoid_: Colour scheme, dark mode, colour mode
+
 **Surface**:
 A published Semantic Token Role a landmark paints behind its content, and the text role that belongs on it:
 `background`/`foreground`, `muted`/`foreground`, `stage`/`stage-foreground` ([ADR 0008](docs/adr/0008-landmark-surface-roles.md)).
