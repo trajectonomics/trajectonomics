@@ -32,7 +32,11 @@ async function pinFonts(page: Page): Promise<void> {
 /**
  * The screenshots CI validates: every page in every Theme on a desktop and a phone. Motion is
  * reduced, so the hero holds the suffix the page ships and nothing animates into the snapshot.
- * Regenerate the baselines with `bun run test:visual:update` after an intended visual change.
+ * Regenerate the baselines with `bun run test:visual:update` after an intended visual change, in an
+ * environment whose fallback sans is the GitHub runner's DejaVu Sans: the pin above covers Thai
+ * only, so every sans glyph comes from the host, and a host with another one changes them all.
+ * `mcr.microsoft.com/playwright:v1.65.0-noble` (the tag for the version above) with
+ * `fonts-dejavu-core` added renders them byte for byte the way the browser check does (site#42).
  */
 test.describe("the built pages as screenshots", () => {
 	test.use({ reducedMotion: "reduce" })

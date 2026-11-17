@@ -11,6 +11,20 @@ async function centreOf(locator: Locator) {
 	return { x: box.x + box.width / 2, y: box.y + box.height / 2, box }
 }
 
+test.describe("the Star menu's trigger and panel", () => {
+	test("opens on a star, with no check mark in the panel", async ({ page }) => {
+		await openPage(page, HOME)
+		const menu = page.locator("details[data-header-menu]").first()
+		await expect(menu.locator("summary .header-menu-star")).toBeVisible()
+		await menu.locator("summary").click()
+		await expect(menu.locator("a").first()).toBeVisible()
+		// Nothing in the panel is a current value, so nothing in it is checked.
+		await expect(menu.locator(".header-menu-check")).toHaveCount(0)
+		// The footer's arrow is the panel's only glyph: a check mark has no place to hide.
+		await expect(menu.locator(".header-menu-panel svg")).toHaveCount(1)
+	})
+})
+
 test.describe("the header menus on a fine pointer", () => {
 	test("keeps the menu open while the pointer crosses the gap under its trigger", async ({
 		page,

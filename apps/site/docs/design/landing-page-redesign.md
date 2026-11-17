@@ -108,8 +108,8 @@ and [ADR 0008](../adr/0008-landmark-surface-roles.md).
 | Part | What it is now | Where it lives |
 |---|---|---|
 | Ground | `main` on `muted`, no hero band, no static glow, the pointer light kept | `src/layouts/Layout.astro`, `src/styles/landing.css` |
-| Header | 64 px, `background`, hairline; mark on a 40 px tile (32 px under 640) on `primary`/`primary-foreground`; mono nav `Docs │ ⟨gh⟩ N ⌄ │ EN ⌄` | `Header.astro`, `src/styles/header.css` |
-| Menus | Star menu is a select (236 px, group label, 34 px rows with tabular counts, a check on the default repository, `All repositories ↗`); Language menu is a plain panel; an 8 px bridge and a 150 ms close | `StarMenu.astro`, `LanguageMenu.astro`, `src/styles/menu.css` |
+| Header | 64 px, `background`, hairline; mark on a 40 px tile (32 px under 640) on `primary`/`primary-foreground`; mono nav `Docs │ ★ cli ⌄ │ EN ⌄` | `Header.astro`, `src/styles/header.css` |
+| Menus | Star menu's trigger is a star and the top repository's name; its panel is 236 px, a group label, 34 px rows with tabular counts, no current value and no check, `All repositories ↗`; Language menu is a plain panel; an 8 px bridge and a 150 ms close | `StarMenu.astro`, `LanguageMenu.astro`, `src/styles/menu.css` |
 | Type | Theme sans for body; `--font-display` (Georgia until ds#77) for the headline and the `h2`; `--font-meta` (the Theme's mono) for every meta label; Thai from `typography.css` (1.7, Thai 1.8) | `src/styles/global.css`, `src/styles/landing.css` |
 | Shape | 4 px controls, 6 px cards and panels, 12 px terminal window; hairlines; shadows only on the scrolled header and the toast | `src/components/ui/`, `src/styles/primitives.css` |
 | Button | Filled/outlined with a 16 px bottom-right bevel under `@supports (corner-shape: bevel)`, plain 4 px otherwise | `ui/Button.astro`, `src/styles/primitives.css` |
@@ -130,3 +130,12 @@ and its `14,280.00` figure, because those are product facts, not Language.
 Not adopted, and why: a downloaded display or mono face (forbidden until design-system#77; now adopted, see ADR 0007's amendment), the
 728 px tiled favicon (design-system#76), and moving the primitives into `@trajectonomics/design-system-svelte`
 (design-system#74, site#32).
+
+## Amendment (2026-11-16, owner)
+
+The owner's answer to Q3 of site#39 (site#42) corrects the Menus row: "the header menu should be star and the
+list down there right now it looks like a check mark which we don't". The Star menu is not a select. Its
+trigger draws a star in place of the GitHub mark, keeps the repository name and the accessible name
+`GitHub stars: <repository>`, and its panel carries no current value, so the check on its first row goes. The
+repository names `cli` and `skills` stay as site#37 left them (Q3's second answer: "Keep repo name match like
+this"), and the trigger's nav sketch above reads `★ cli` rather than the GitHub mark and a count.

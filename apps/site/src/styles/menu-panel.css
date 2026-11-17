@@ -1,4 +1,4 @@
-/* The header menus' panel (ADR 0007): the select anatomy, its rows and its footer. */
+/* The header menus' panel (ADR 0007): its rows, its group label and its footer. */
 
 /* The panel floats 8 px under its summary, on the popover role, with a hairline and no shadow. */
 .header-menu-panel {
@@ -59,11 +59,6 @@
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-}
-
-.header-menu-check {
-	flex-shrink: 0;
-	color: var(--ds-color-foreground);
 }
 
 .header-menu-row:focus-visible,

@@ -6,17 +6,14 @@ import { GITHUB_ORG_URL } from "../lib/site"
 import { STARRED_REPOS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import ArrowUpRight from "./icons/ArrowUpRight.astro"
-import Check from "./icons/Check.astro"
 import Chevron from "./icons/Chevron.astro"
-import GitHubMark from "./icons/GitHubMark.astro"
+import Star from "./icons/Star.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
 const { dictionary } = Astro.props
-/** The repository the trigger names: the highest count, and the row the menu checks. */
-const defaultRepo = STARRED_REPOS[0]?.repo
 const label =
 	TOP_REPO_NAME === undefined
 		? dictionary.starMenuLabel
@@ -25,7 +22,7 @@ const label =
 
 <details class="header-menu" data-header-menu>
 	<summary class="header-menu-summary" aria-label={label}>
-		<GitHubMark class="header-menu-mark" />
+		<Star class="header-menu-mark header-menu-star" />
 		{TOP_REPO_NAME !== undefined && <span>{TOP_REPO_NAME}</span>}
 		<Chevron class="header-menu-chevron" />
 	</summary>
@@ -48,7 +45,6 @@ const label =
 							<span class="header-menu-row-count text-muted-foreground tabular-nums">
 								{formatStarCount(repo.stars)}
 							</span>
-							{repo.repo === defaultRepo && <Check class="header-menu-check" />}
 						</a>
 						</li>
 					))}

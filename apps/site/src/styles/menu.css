@@ -1,4 +1,4 @@
-/* The header's two disclosures (ADR 0007): the Star menu's select anatomy, and the Language panel. */
+/* The header's two disclosures (ADR 0007): the frame and chevron both menus share. */
 
 .header-menu {
 	position: relative;
