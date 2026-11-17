@@ -1,10 +1,21 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { GITHUB_ORG_URL, SKILLS_LICENCE_URL } from "../lib/site"
+import {
+	DOCS_CLI_INSTALL_PATH,
+	DOCS_CLI_PATH,
+	DOCS_PATH,
+	GITHUB_CLI_ISSUES_URL,
+	GITHUB_CLI_RELEASES_URL,
+	GITHUB_CLI_URL,
+	GITHUB_ORG_URL,
+	GITHUB_SKILLS_URL,
+	SITE_NAME,
+	SKILLS_LICENCE_URL,
+} from "../lib/site"
 import Footer from "./Footer.astro"
 import { renderComponent } from "./testing/render"
-import { headings, scanComponent } from "./testing/scan"
+import { headings, scanComponent, withClass } from "./testing/scan"
 
 describe("the Footer component in every Language", () => {
 	for (const { language } of LANGUAGES) {
@@ -31,6 +42,47 @@ describe("the Footer component in every Language", () => {
 			if (licence === undefined || org === undefined) throw new Error("a footer link is missing")
 			expect(textOf(page, licence)).toBe(dictionary.licence)
 			expect(textOf(page, org)).toBe(dictionary.org)
+		})
+
+		it(`makes the disclaimer the footer's first paragraph, ahead of the brand and the columns (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const first = elementsByTag(page, "p")[0]
+			if (first === undefined) throw new Error("no paragraph rendered")
+			expect(textOf(page, first)).toBe(dictionary.footerDisclaimer)
+		})
+
+		it(`lists three labelled columns of links, and every link goes where it says (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const labels = withClass(page, "footer-label").map((element) => textOf(page, element))
+			expect(labels).toEqual([
+				dictionary.footerProductLabel,
+				dictionary.footerSourceLabel,
+				dictionary.footerHelpLabel,
+			])
+			const links = withClass(page, "footer-link").map((element) => [
+				textOf(page, element),
+				element.attributes["href"],
+			])
+			expect(links).toEqual([
+				[dictionary.footerDocsLink, DOCS_PATH],
+				[dictionary.footerCliDocsLink, DOCS_CLI_PATH],
+				[dictionary.footerInstallLink, DOCS_CLI_INSTALL_PATH],
+				[dictionary.footerCliRepo, GITHUB_CLI_URL],
+				[dictionary.footerSkillsRepo, GITHUB_SKILLS_URL],
+				[dictionary.org, GITHUB_ORG_URL],
+				[dictionary.footerIssues, GITHUB_CLI_ISSUES_URL],
+				[dictionary.footerReleases, GITHUB_CLI_RELEASES_URL],
+				[dictionary.licence, SKILLS_LICENCE_URL],
+			])
+		})
+
+		it(`draws the wordmark as decoration, not a second brand link or a second nav (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const wordmark = withClass(page, "footer-wordmark")[0]
+			expect(wordmark?.attributes["aria-hidden"]).toBe("true")
+			expect(wordmark?.attributes["data-text"]).toBe(SITE_NAME)
+			expect(page.text.some((run) => run.text.trim() === SITE_NAME)).toBe(true)
+			expect(elementsByTag(page, "nav")).toEqual([])
 		})
 
 		it(`renders no heading (${language})`, async () => {

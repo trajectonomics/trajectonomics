@@ -2,32 +2,87 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the props it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { GITHUB_ORG_URL, RELEASE_DATE, SKILLS_LICENCE_URL } from "../lib/site"
+import {
+	DOCS_CLI_INSTALL_PATH,
+	DOCS_CLI_PATH,
+	DOCS_PATH,
+	GITHUB_CLI_ISSUES_URL,
+	GITHUB_CLI_RELEASES_URL,
+	GITHUB_CLI_URL,
+	GITHUB_ORG_URL,
+	GITHUB_SKILLS_URL,
+	RELEASE_DATE,
+	SITE_NAME,
+	SKILLS_LICENCE_URL,
+} from "../lib/site"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
 const { dictionary } = Astro.props
-const link =
-	"underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+
+/** One link column: a mono label and its links. The page's one `nav` is the header's, so these are lists. */
+const columns = [
+	{
+		label: dictionary.footerProductLabel,
+		links: [
+			{ text: dictionary.footerDocsLink, href: DOCS_PATH },
+			{ text: dictionary.footerCliDocsLink, href: DOCS_CLI_PATH },
+			{ text: dictionary.footerInstallLink, href: DOCS_CLI_INSTALL_PATH },
+		],
+	},
+	{
+		label: dictionary.footerSourceLabel,
+		links: [
+			{ text: dictionary.footerCliRepo, href: GITHUB_CLI_URL },
+			{ text: dictionary.footerSkillsRepo, href: GITHUB_SKILLS_URL },
+			{ text: dictionary.org, href: GITHUB_ORG_URL },
+		],
+	},
+	{
+		label: dictionary.footerHelpLabel,
+		links: [
+			{ text: dictionary.footerIssues, href: GITHUB_CLI_ISSUES_URL },
+			{ text: dictionary.footerReleases, href: GITHUB_CLI_RELEASES_URL },
+			{ text: dictionary.licence, href: SKILLS_LICENCE_URL },
+		],
+	},
+] as const
 ---
 
-<footer class="border-t border-border bg-stage text-stage-foreground">
-	<div
-		class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-10 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:px-6"
-	>
-		<p class="max-w-xl text-pretty">{dictionary.footerDisclaimer}</p>
-		<div class="flex flex-col gap-4 sm:items-end">
-			<ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
-				<li><a class={link} href={SKILLS_LICENCE_URL}>{dictionary.licence}</a></li>
-				<li><a class={link} href={GITHUB_ORG_URL}>{dictionary.org}</a></li>
-			</ul>
-			<p class="font-mono text-xs tracking-wide uppercase">
-				{dictionary.releaseLine}
-				<span aria-hidden="true"> · </span>
-				<time datetime={RELEASE_DATE}>{dictionary.releaseDate}</time>
-			</p>
+<footer class="site-footer border-t border-border bg-stage text-stage-foreground">
+	<div class="footer-inner">
+		<div class="footer-top">
+			<div class="footer-brand">
+				<span class="footer-name">{SITE_NAME}</span>
+				<span class="footer-tagline">{dictionary.footerTagline}</span>
+			</div>
+			<div class="footer-columns">
+				{
+					columns.map((column) => (
+						<div class="footer-column">
+							<span class="footer-label">{column.label}</span>
+							<ul class="footer-links">
+								{column.links.map((link) => (
+									<li>
+										<a class="footer-link" href={link.href}>
+											{link.text}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
 		</div>
+		<p class="footer-disclaimer">{dictionary.footerDisclaimer}</p>
+		<p class="footer-release">
+			{dictionary.releaseLine}
+			<span aria-hidden="true"> · </span>
+			<time datetime={RELEASE_DATE}>{dictionary.releaseDate}</time>
+		</p>
 	</div>
+	<div class="footer-wordmark" aria-hidden="true" data-text={SITE_NAME}></div>
 </footer>

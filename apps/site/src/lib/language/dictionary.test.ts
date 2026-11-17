@@ -48,20 +48,16 @@ describe("the Dictionary of every Language", () => {
 		}
 	})
 
-	it("keeps the English hero headline the owner approved, and the suffixes it cycles", () => {
+	it("sets the English hero headline the owner asked for, with its accent", () => {
 		const english = dictionaryFor("en")
-		expect(english.heroHeadingPrefix).toBe("The only tool your agent needs to")
-		expect(english.heroHeadingCycle).toEqual([
-			"plan your retirement.",
-			"project your finances.",
-			"build your future.",
-		])
+		expect(english.heroHeadingPrefix).toBe("Deterministic layers for your")
+		expect(english.heroHeadingAccent).toBe("Financial Planning")
 	})
 
-	it("keeps the Thai hero headline the owner approved, and the suffixes it cycles", () => {
+	it("sets the Thai hero headline, with its accent", () => {
 		const thai = dictionaryFor("th")
-		expect(thai.heroHeadingPrefix).toBe("เครื่องมือเดียวที่ agent ของคุณต้องมี เพื่อ")
-		expect(thai.heroHeadingCycle).toEqual(["วางแผนเกษียณอายุ", "จำลองการเงิน", "สร้างอนาคตของคุณ"])
+		expect(thai.heroHeadingPrefix).toBe("เลเยอร์ที่ให้ผลแน่นอนสำหรับ")
+		expect(thai.heroHeadingAccent).toBe("การวางแผนการเงินของคุณ")
 	})
 
 	it("keeps the English sub-line and disclaimer the owner approved", () => {
@@ -97,16 +93,10 @@ describe("the Dictionary of every Language", () => {
 		expect(dictionaryFor("th").releaseDate).toBe("12 พ.ย. 2026")
 	})
 
-	it("keeps the release pill, the two-tile section and the menu labels the owner approved", () => {
+	it("keeps the release pill and the menu labels the owner approved", () => {
 		const english = dictionaryFor("en")
 		expect(english.heroVersion).toBe("v0.1.0")
 		expect(english.heroLicence).toBe("MIT · open source")
-		expect(english.twoPartHeading).toBe("Two parts, one command")
-		expect(english.agentCardTitle).toBe("AI agent")
-		expect(english.agentCardCopy).toBe("Your agent does the talking.")
-		expect(english.cliCardTitle).toBe("traj CLI")
-		expect(english.cliCardCopy).toBe("Same input, the same answer.")
-		expect(english.diagramConnector).toBe("traj calc")
 		expect(english.starMenuLabel).toBe("GitHub stars")
 		expect(english.starMenuGroupLabel).toBe("Repositories")
 		expect(english.starMenuAllRepos).toBe("All repositories")
@@ -115,11 +105,39 @@ describe("the Dictionary of every Language", () => {
 		expect(english.copied).toBe("Command copied")
 	})
 
-	it("keeps each diagram tile's copy to five words", () => {
-		const english = dictionaryFor("en")
-		for (const copy of [english.agentCardCopy, english.cliCardCopy]) {
-			expect(copy.replace(/[.,]/g, "").split(/\s+/)).toHaveLength(5)
+	it("writes the three runs, the four steps and the six features in every Language", () => {
+		for (const { language, dictionary } of LANGUAGES) {
+			expect({ language, runs: dictionary.actionRunLabels.length }).toEqual({ language, runs: 3 })
+			expect({ language, guesses: dictionary.actionGuesses.length }).toEqual({
+				language,
+				guesses: 3,
+			})
+			expect({ language, steps: dictionary.howSteps.length }).toEqual({ language, steps: 4 })
+			expect({ language, presentation: dictionary.howPresentationItems.length }).toEqual({
+				language,
+				presentation: 4,
+			})
+			expect({ language, logic: dictionary.howLogicItems.length }).toEqual({ language, logic: 4 })
+			expect({ language, titles: dictionary.featureTitles.length }).toEqual({ language, titles: 6 })
+			expect({ language, copies: dictionary.featureCopies.length }).toEqual({ language, copies: 6 })
 		}
+	})
+
+	it("gives the agent alone three different guesses, because that is the point of the comparison", () => {
+		for (const { language, dictionary } of LANGUAGES) {
+			expect({ language, unique: new Set(dictionary.actionGuesses).size }).toEqual({
+				language,
+				unique: dictionary.actionGuesses.length,
+			})
+		}
+	})
+
+	it("names the three sections the owner asked for, in English", () => {
+		const english = dictionaryFor("en")
+		expect(english.actionHeading).toBe("See it in action")
+		expect(english.howHeading).toBe("Agents own the presentation. traj owns the logic.")
+		expect(english.howPresentationOwner).toBe("Owned by your agent")
+		expect(english.howLogicOwner).toBe("Owned by traj")
 	})
 
 	it("writes the three steps under the command, in every Language", () => {
@@ -178,18 +196,15 @@ describe("the Dictionary of every Language", () => {
 	})
 })
 
-describe("the hero headline a script cycles", () => {
-	it("holds a phrase no earlier one repeats, so the cycle ends on a new line", () => {
+describe("the hero headline", () => {
+	it("holds still: a plain run and one accent, with nothing for a script to cycle", () => {
 		for (const entry of LANGUAGES) {
-			const phrases = [entry.dictionary.heroHeadingPrefix, ...entry.dictionary.heroHeadingCycle]
-			expect({ language: entry.language, cycles: phrases.length > 1 }).toEqual({
+			const keys = Object.keys(entry.dictionary)
+			expect({ language: entry.language, cycles: keys.includes("heroHeadingCycle") }).toEqual({
 				language: entry.language,
-				cycles: true,
+				cycles: false,
 			})
-			expect({ language: entry.language, unique: new Set(phrases).size }).toEqual({
-				language: entry.language,
-				unique: phrases.length,
-			})
+			expect(entry.dictionary.heroHeadingAccent).not.toBe(entry.dictionary.heroHeadingPrefix)
 		}
 	})
 })

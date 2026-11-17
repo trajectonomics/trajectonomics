@@ -14,11 +14,11 @@ describe("the text a Language home renders", () => {
 		])
 	})
 
-	it("fails a home whose hero lost one of the phrases the headline cycles", () => {
-		const held = dictionaryFor("en").heroHeadingCycle.at(-1) ?? ""
-		expect(heroCodes(checkPageText, heroHome("en", { headline: `<span>${held}</span>` }))).toEqual([
-			"HEADLINE_NOT_RENDERED",
-		])
+	it("fails a home whose hero lost the accent the headline highlights", () => {
+		const plain = dictionaryFor("en").heroHeadingPrefix
+		expect(heroCodes(checkPageText, heroHome("en", { headline: `<span>${plain}</span>` }))).toEqual(
+			["HEADLINE_NOT_RENDERED"],
+		)
 	})
 
 	it("fails a home whose sub-line is not the one the Dictionary names", () => {

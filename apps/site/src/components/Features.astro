@@ -1,0 +1,35 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<section class="section-surface">
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.featuresEyebrow}</p>
+			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.featuresHeading}
+			</h2>
+		</div>
+
+		<ul class="features">
+			{
+				dictionary.featureTitles.map((title, index) => (
+					<li class="feature bg-background text-foreground">
+						<span class="feature-index text-muted-foreground tabular-nums">
+							{String(index + 1).padStart(2, "0")}
+						</span>
+						<span class="feature-title">{title}</span>
+						<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>

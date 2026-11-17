@@ -1,4 +1,4 @@
-/* The landing page's hero (ADR 0007): the pointer light, the pill, and the display headline. */
+/* The landing page's hero (ADR 0007): the stage, the pill, and the display headline. The headline holds still: its accent is colour, not motion (ADR 0012). */
 
 /* The hero is one viewport and then some, so a visitor lands on it alone and scrolls into the next section. */
 .hero-stage {
@@ -12,33 +12,11 @@
 	}
 }
 
-/* The one JavaScript motion: a soft light the script moves with transform only. */
-.hero-pointer-glow {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 480px;
-	height: 480px;
-	border-radius: 9999px;
-	background: var(--ds-color-accent);
-	opacity: 0;
-	transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
-	-webkit-mask-image: radial-gradient(circle, var(--ds-color-foreground) 0%, transparent 65%);
-	mask-image: radial-gradient(circle, var(--ds-color-foreground) 0%, transparent 65%);
-	pointer-events: none;
-	will-change: transform;
-}
-
-/* The light shows while the pointer moves over the hero, at the strength the Theme allows. */
-.hero-pointer-glow[data-glow="on"] {
-	opacity: 0.16;
-}
-
-[data-theme="dark"] .hero-pointer-glow[data-glow="on"] {
-	opacity: 0.26;
-}
-
-/* The headline's face: the display family, at the one weight the Site uses on a heading. */
+/*
+ * The display family on every heading. The section headings stay light; the hero's headline, the page's
+ * one claim, is bold (ADR 0013). The brand package ships Aleo at 300 and 400 only, and a 700 file would
+ * cost about 15 KB of the 48,000-byte font budget, so the browser draws the bold from the 400 face.
+ */
 [data-hero-headline],
 .section-heading {
 	font-family: var(--font-display);
@@ -46,39 +24,13 @@
 	letter-spacing: -0.02em;
 }
 
+[data-hero-headline] {
+	font-weight: 700;
+}
+
 /* The pill's marker: an accent block, drawn with bars so it carries no text. */
 .hero-pill-marker {
 	width: 8px;
 	height: 8px;
 	background: var(--ds-color-accent);
-}
-
-/* The stack of headline suffixes: one grid cell each, so the page never shifts as they change. */
-[data-hero-stack] {
-	display: grid;
-	justify-items: center;
-}
-
-[data-hero-stack] > span {
-	grid-area: 1 / 1;
-	visibility: hidden;
-}
-
-[data-hero-stack]:not([data-hero-stepping]) > span:last-child,
-[data-hero-stack] > span[data-hero-shown] {
-	visibility: visible;
-}
-
-[data-hero-stack][data-hero-stepping] > span {
-	visibility: visible;
-	opacity: 0;
-	transform: translateY(0.35em);
-	transition:
-		opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
-		transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-[data-hero-stack][data-hero-stepping] > span[data-hero-shown] {
-	opacity: 1;
-	transform: none;
 }

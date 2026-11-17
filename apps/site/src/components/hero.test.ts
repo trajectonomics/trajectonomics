@@ -15,23 +15,21 @@ describe("the Hero component in every Language", () => {
 			expect(headings(page).map((element) => element.tag)).toEqual(["h1"])
 		})
 
-		it(`carries the prefix and every cycle suffix in the h1 (${language})`, async () => {
+		it(`carries the plain run and the accent in the h1 (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const h1 = elementsByTag(page, "h1")[0]
 			if (h1 === undefined) throw new Error("the hero rendered no h1")
 			expect(textOf(page, h1)).toBe(
-				[dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle].join(" "),
+				[dictionary.heroHeadingPrefix, dictionary.heroHeadingAccent].join(" "),
 			)
 		})
 
-		it(`stacks one span per suffix, so the cycle has a slot each (${language})`, async () => {
+		it(`highlights only the accent, and never cycles it (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
-			const stack = withAttribute(page, "data-hero-stack")[0]
-			if (stack === undefined) throw new Error("the hero rendered no suffix stack")
-			const suffixes = page.elements.filter(
-				(element) => element.tag === "span" && element.ancestors.includes(stack),
-			)
-			expect(suffixes.length).toBe(dictionary.heroHeadingCycle.length)
+			const accent = withAttribute(page, "data-hero-accent")
+			expect(accent.map((element) => textOf(page, element))).toEqual([dictionary.heroHeadingAccent])
+			expect(withAttribute(page, "data-hero-stack")).toEqual([])
+			expect(accent[0]?.attributes["class"]).toContain("text-accent")
 		})
 
 		it(`shows the release pill above the headline: the version, a hairline, the licence (${language})`, async () => {
@@ -63,11 +61,23 @@ describe("the Hero component in every Language", () => {
 			])
 		})
 
-		it(`carries its inline motion script (${language})`, async () => {
+		it(`answers a click with a ripple, and never follows the pointer (${language})`, async () => {
 			const html = await renderComponent(Hero, { dictionary })
 			const page = scanComponent(html)
 			expect(page.elements.some(isInlineScript)).toBe(true)
 			expect(withAttribute(page, "data-hero").length).toBe(1)
+			expect(withAttribute(page, "data-ripple").length).toBe(1)
+			expect(withAttribute(page, "data-pointer-glow")).toEqual([])
+			expect(html).toContain('addEventListener("click"')
+			expect(html).not.toContain("pointermove")
+			expect(html).not.toContain("pointerleave")
+		})
+
+		it(`sets the headline bold and the accent in the accent colour (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const h1 = elementsByTag(page, "h1")[0]
+			expect(h1?.attributes["class"]).toContain("font-bold")
+			expect(h1?.attributes["class"]).not.toContain("font-light")
 		})
 	}
 })

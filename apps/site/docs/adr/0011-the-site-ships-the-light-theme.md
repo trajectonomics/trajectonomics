@@ -34,7 +34,7 @@ Portal takes the same decision in its own repository (docs#89).
   page loads, and the rule that requires them at the published values is unchanged. The contrast and
   landmark rules still judge both, so the deferred Theme's roles stay readable and wired
   ([ADR 0008](./0008-landmark-surface-roles.md)). The one Site style that names it,
-  `[data-theme="dark"] .hero-pointer-glow`, stays where it is and is dormant.
+  `[data-theme="dark"] .hero-pointer-glow`, stays where it is and is dormant. (The pointer light and that style were removed by [ADR 0013](./0013-the-hero-ripples-on-click-and-holds-still-on-hover.md).)
 - **The checks narrow, one rule at a time.** The rules that only made sense while the device chose the
   Theme are retired with their Error Codes, and the forcing that replaces them is checked rather than
   assumed: no built page and no stylesheet a page loads names `prefers-color-scheme`, the page's

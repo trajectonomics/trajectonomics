@@ -17,7 +17,7 @@ describe("the landmarks of a built page", () => {
 		expect(codes()).toEqual([])
 	})
 
-	it("passes one section heading inside main, which the v0.1.0 two-part section needs", () => {
+	it("passes one section heading inside main", () => {
 		expect(
 			codes(page("<header></header><main><h1>Hero</h1><h2>Section</h2></main><footer></footer>")),
 		).toEqual([])
@@ -43,20 +43,20 @@ describe("the landmarks of a built page", () => {
 		).toEqual(["HERO_MISSING"])
 	})
 
-	it("fails a page with a second section heading", () => {
+	it("passes a section heading for every section inside main (ADR 0012)", () => {
 		expect(
 			codes(
 				page(
-					"<header></header><main><h1>Hero</h1><h2>One</h2><h2>Two</h2></main><footer></footer>",
+					"<header></header><main><h1>Hero</h1><h2>One</h2><h2>Two</h2><h2>Three</h2></main><footer></footer>",
 				),
 			),
-		).toEqual(["HEADING_H2_NOT_ALLOWED"])
+		).toEqual([])
 	})
 
 	it("fails a section heading outside main, because the page's sections live in main", () => {
 		expect(
 			codes(page("<header></header><main><h1>Hero</h1></main><footer><h2>Elsewhere</h2></footer>")),
-		).toEqual(["HEADING_H2_NOT_ALLOWED"])
+		).toEqual(["HEADING_H2_OUTSIDE_MAIN"])
 	})
 
 	it("fails a deeper heading anywhere, because two levels are the whole page", () => {

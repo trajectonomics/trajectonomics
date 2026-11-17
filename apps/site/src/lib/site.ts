@@ -11,18 +11,32 @@ export const SITE_NAME = "trajectonomics"
 export const INSTALL_COMMAND = "npx skills add trajectonomics/skills --skill traj-onboarding"
 
 /**
- * The plan the two-tile diagram shows the CLI running, and the figure it returns: a product fixture,
- * the same text in every Language, not copy.
+ * The command the See it in action section shows the agent running, taken from the CLI's own `traj fi`
+ * examples. A product fixture, the same text in every Language, and not copy.
  */
-export const DIAGRAM_PLAN_COMMAND = "$ traj plan"
+export const FI_DEMO_COMMAND =
+	"traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json"
 
-/** The figure the diagram's CLI tile returns: a product fixture, not copy. */
-export const DIAGRAM_PLAN_AMOUNT = "14,280.00"
+/** The earliest month the demo's survival answer says earned income could stop: the figure it repeats. */
+export const FI_DEMO_DATE = "2041-08-01"
+
+/**
+ * The abridged JSON `traj fi --json` prints for the demo, one line each: the echo of the date it read,
+ * the tax status and the answer. A product fixture in the CLI's own field names, not copy.
+ */
+export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
+	"{",
+	'  "asOf": "2026-03-31",',
+	'  "tax": "not_applied",',
+	'  "method": "survival",',
+	`  "fi": { "reachable": true, "fiDate": "${FI_DEMO_DATE}" }`,
+	"}",
+])
 
 /** The Docs Portal's path, which the router serves; this repository does not build it. */
 export const DOCS_PATH = "/docs/"
 
-/** The Docs Portal's CLI page, the CLI docs link under the diagram. */
+/** The Docs Portal's CLI page, the CLI docs link under the How it works section and in the footer. */
 export const DOCS_CLI_PATH = "/docs/cli/"
 
 /**
@@ -34,11 +48,17 @@ export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 /** The CLI's v0.1.0 release date, the machine-readable date the footer's release line names. */
 export const RELEASE_DATE = "2026-11-12"
 
-/** The skills repository: the star menu, the diagram's star link and the footer's licence name it. */
+/** The skills repository: the star menu, the How it works star link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
 /** The traj CLI's repository. */
 export const GITHUB_CLI_URL = "https://github.com/trajectonomics/cli"
+
+/** The CLI's issue tracker, where the disclaimer sends a visitor who finds a bug. */
+export const GITHUB_CLI_ISSUES_URL = `${GITHUB_CLI_URL}/issues`
+
+/** The CLI's releases page: every version and its notes. */
+export const GITHUB_CLI_RELEASES_URL = `${GITHUB_CLI_URL}/releases`
 
 /** The Organisation, for the footer's link. */
 export const GITHUB_ORG_URL = "https://github.com/trajectonomics"

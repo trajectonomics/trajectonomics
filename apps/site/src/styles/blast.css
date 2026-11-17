@@ -39,10 +39,20 @@
 	mask-image: radial-gradient(76% 62% at 50% 30%, var(--ds-color-foreground) 0%, transparent 88%);
 }
 
+/*
+ * The layer the field drifts on (motion.css moves it): the squares and the ripple share it, so a ripple
+ * lights the squares the visitor sees, not a second set that slides against them.
+ */
+.hero-blast-drift {
+	position: absolute;
+	inset: -6%;
+	will-change: transform;
+}
+
 /* The squares themselves: the baked tile, repeated, painted the Theme's accent role. */
 .hero-blast-pixels {
 	position: absolute;
-	inset: -6%;
+	inset: 0;
 	background: var(--ds-color-accent);
 	opacity: 0.3;
 	-webkit-mask-image: url("/hero/pixel-blast.png");
@@ -51,7 +61,6 @@
 	mask-size: 1020px 1020px;
 	-webkit-mask-repeat: repeat;
 	mask-repeat: repeat;
-	will-change: transform;
 }
 
 [data-theme="dark"] .hero-blast-pixels {

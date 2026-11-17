@@ -1,0 +1,66 @@
+/*
+ * The hero's ripple (ADR 0013): the baked field answers a click. The ripple is the same tile as the
+ * squares, painted over them in `accent`, and masked to a ring that widens from the click, so the ring
+ * lights the squares that are already there rather than drawing new ones. The ring's radius is a
+ * registered property, so the keyframes can animate it; a browser without `@property` shows no ripple
+ * and loses nothing else.
+ */
+@property --ripple-radius {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+.hero-blast-ripple {
+	--ripple-x: 50%;
+	--ripple-y: 50%;
+	position: absolute;
+	inset: 0;
+	background: var(--ds-color-accent);
+	opacity: 0;
+	pointer-events: none;
+	-webkit-mask-image:
+		url("/hero/pixel-blast.png"),
+		radial-gradient(
+			circle at var(--ripple-x) var(--ripple-y),
+			transparent calc(var(--ripple-radius) - 120px),
+			var(--ds-color-foreground) calc(var(--ripple-radius) - 40px),
+			transparent var(--ripple-radius)
+		);
+	mask-image:
+		url("/hero/pixel-blast.png"),
+		radial-gradient(
+			circle at var(--ripple-x) var(--ripple-y),
+			transparent calc(var(--ripple-radius) - 120px),
+			var(--ds-color-foreground) calc(var(--ripple-radius) - 40px),
+			transparent var(--ripple-radius)
+		);
+	-webkit-mask-size:
+		1020px 1020px,
+		100% 100%;
+	mask-size:
+		1020px 1020px,
+		100% 100%;
+	-webkit-mask-repeat: repeat, no-repeat;
+	mask-repeat: repeat, no-repeat;
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect;
+}
+
+.hero-blast-ripple[data-rippling] {
+	animation: hero-ripple 1600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes hero-ripple {
+	from {
+		--ripple-radius: 0px;
+		opacity: 0.55;
+	}
+	50% {
+		opacity: 0.32;
+	}
+	to {
+		--ripple-radius: 1100px;
+		opacity: 0;
+	}
+}

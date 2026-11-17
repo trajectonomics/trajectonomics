@@ -1,3 +1,4 @@
+import { ENGLISH_SECTIONS } from "./en-sections"
 import type { LanguageEntry } from "./language"
 
 /** English: the Language of `/en/`, and the fallback when nothing else chooses. */
@@ -6,17 +7,14 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 	pathPrefix: "/en",
 	countries: Object.freeze([]),
 	dictionary: Object.freeze({
+		...ENGLISH_SECTIONS,
 		documentTitle: "traj — free, open-source financial simulation for AI agents",
 		description:
 			"traj is a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement and project your finances with no account.",
 		languageName: "English",
 		languageSwitchLabel: "EN",
-		heroHeadingPrefix: "The only tool your agent needs to",
-		heroHeadingCycle: Object.freeze([
-			"plan your retirement.",
-			"project your finances.",
-			"build your future.",
-		] as const),
+		heroHeadingPrefix: "Deterministic layers for your",
+		heroHeadingAccent: "Financial Planning",
 		heroVersion: "v0.1.0",
 		heroLicence: "MIT · open source",
 		releaseLine: "v0.1.0 stable — traj CLI + traj-onboarding",
@@ -28,12 +26,6 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		starMenuGroupLabel: "Repositories",
 		starMenuAllRepos: "All repositories",
 		starOnboarding: "Star traj-onboarding",
-		twoPartHeading: "Two parts, one command",
-		agentCardTitle: "AI agent",
-		agentCardCopy: "Your agent does the talking.",
-		cliCardTitle: "traj CLI",
-		cliCardCopy: "Same input, the same answer.",
-		diagramConnector: "traj calc",
 		stepLabels: Object.freeze([
 			"1 Install the onboarding skill",
 			"2 Open your coding agent",

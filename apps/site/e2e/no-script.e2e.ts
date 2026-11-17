@@ -36,13 +36,15 @@ for (const underTest of HOMES) {
 		expect(await page.evaluate(() => document.getSelection()?.toString() ?? "")).toBe(COPY_TEXT)
 	})
 
-	test(`${underTest.name}: the hero shows the suffix the page ships, not one a script would cycle`, async ({
+	test(`${underTest.name}: the hero shows its whole headline, accent included, with no script`, async ({
 		page,
 	}) => {
 		await page.goto(underTest.path)
-		await expect(page.locator("[data-hero-stack] > span:visible")).toHaveText(
-			dictionaryFor(underTest.language).heroHeadingCycle.at(-1) ?? "",
+		const dictionary = dictionaryFor(underTest.language)
+		await expect(page.locator("h1")).toHaveText(
+			`${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent}`,
 		)
+		await expect(page.locator("[data-hero-accent]")).toBeVisible()
 	})
 
 	test(`${underTest.name}: the Theme the HTML ships is styled without JavaScript`, async ({

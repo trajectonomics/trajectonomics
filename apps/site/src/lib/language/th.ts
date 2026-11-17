@@ -1,4 +1,5 @@
 import type { LanguageEntry } from "./language"
+import { THAI_SECTIONS } from "./th-sections"
 
 /** Thai: the Language of `/th/`, and of Thailand when no tag chooses. */
 export const THAI: LanguageEntry = Object.freeze({
@@ -6,13 +7,14 @@ export const THAI: LanguageEntry = Object.freeze({
 	pathPrefix: "/th",
 	countries: Object.freeze(["TH"]),
 	dictionary: Object.freeze({
+		...THAI_SECTIONS,
 		documentTitle: "traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
 		description:
 			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
 		languageName: "ไทย",
 		languageSwitchLabel: "ไทย",
-		heroHeadingPrefix: "เครื่องมือเดียวที่ agent ของคุณต้องมี เพื่อ",
-		heroHeadingCycle: Object.freeze(["วางแผนเกษียณอายุ", "จำลองการเงิน", "สร้างอนาคตของคุณ"] as const),
+		heroHeadingPrefix: "เลเยอร์ที่ให้ผลแน่นอนสำหรับ",
+		heroHeadingAccent: "การวางแผนการเงินของคุณ",
 		heroVersion: "v0.1.0",
 		heroLicence: "MIT · โอเพนซอร์ส",
 		releaseLine: "v0.1.0 เสถียรแล้ว — traj CLI + traj-onboarding",
@@ -24,12 +26,6 @@ export const THAI: LanguageEntry = Object.freeze({
 		starMenuGroupLabel: "รีโป",
 		starMenuAllRepos: "รีโปทั้งหมด",
 		starOnboarding: "ให้ดาว traj-onboarding",
-		twoPartHeading: "สองส่วน หนึ่งคำสั่ง",
-		agentCardTitle: "AI agent",
-		agentCardCopy: "เอเจนต์เป็นคนคุยให้",
-		cliCardTitle: "traj CLI",
-		cliCardCopy: "ข้อมูลเดิม คำตอบเดิม เสมอ",
-		diagramConnector: "traj calc",
 		stepLabels: Object.freeze([
 			"1 ติดตั้งสกิล onboarding",
 			"2 เปิด coding agent ของคุณ",

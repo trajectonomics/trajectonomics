@@ -2,6 +2,9 @@ import { describe, expect, it } from "bun:test"
 import {
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
+	FI_DEMO_COMMAND,
+	FI_DEMO_DATE,
+	FI_DEMO_OUTPUT,
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
@@ -47,5 +50,19 @@ describe("the Site's own constants", () => {
 
 	it("pinpoints the CLI installation page, the way out under the command", () => {
 		expect(DOCS_CLI_INSTALL_PATH).toBe("/docs/cli/installation/")
+	})
+
+	it("shows the CLI's own `traj fi` example, with the JSON flag an agent reads", () => {
+		expect(FI_DEMO_COMMAND.startsWith("traj fi --scenario base ")).toBe(true)
+		expect(FI_DEMO_COMMAND).toContain("--as-of")
+		expect(FI_DEMO_COMMAND).toContain("--horizon")
+		expect(FI_DEMO_COMMAND.endsWith("--json")).toBe(true)
+	})
+
+	it("prints the demo's output as the CLI's JSON, with one date the panel repeats", () => {
+		const parsed = JSON.parse(FI_DEMO_OUTPUT.join("\n"))
+		expect(parsed.fi).toEqual({ reachable: true, fiDate: FI_DEMO_DATE })
+		expect(parsed.tax).toBe("not_applied")
+		expect(FI_DEMO_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 	})
 })

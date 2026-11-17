@@ -139,3 +139,33 @@ trigger draws a star in place of the GitHub mark, keeps the repository name and 
 `GitHub stars: <repository>`, and its panel carries no current value, so the check on its first row goes. The
 repository names `cli` and `skills` stay as site#37 left them (Q3's second answer: "Keep repo name match like
 this"), and the trigger's nav sketch above reads `★ cli` rather than the GitHub mark and a count.
+
+## 8. Third pass: a headline that holds still and three more sections (ADR 0012)
+
+The owner's brief: change the headline to "Deterministic layers for your Financial Planning", remove its animation and
+highlight "Financial Planning"; add **See it in action** (an agent told to plan your future vs an agent using the skills
+and CLI), a **Features** section, and a redesigned **How it works** that says the user's agent uses skills to control the
+CLI under the hood, the agent owns the presentation layer and traj owns the logic layer; and take the footer and the other
+sections from twenty.com. Reference: twenty.com, the same direction as ADR 0007.
+
+| Part | What it is now | Where it lives |
+|---|---|---|
+| Headline | Static `heroHeadingPrefix` plus the accent run `heroHeadingAccent` ("Financial Planning") on its own line in `accent`, set bold; the suffix cycle, its script and its CSS are gone. The load-in rise stays; the pointer light is removed and the field ripples on a click instead ([ADR 0013](../adr/0013-the-hero-ripples-on-click-and-holds-still-on-hover.md)) | `Hero.astro`, `landing.css` |
+| See it in action | Two panels asked the same question: the agent alone (dashed, three different guesses) and the agent with the traj skill (solid, the real `traj fi --json` command, its abridged JSON, and the same answer three times) | `SeeItInAction.astro`, `compare.css`, `conversation.css`, `terminal.css` |
+| How it works | Four numbered steps beside two layers: the **Presentation layer** (dashed, light, "Owned by your agent": chat, tables, charts, narration), the **Skills** join, and the **Logic layer** (solid, dark, "Owned by traj": projections, tax, FI date, ledger) | `HowItWorks.astro`, `how.css`, `layers.css` |
+| Features | Six cells on one hairline grid, titles as plain text (no `h3`): deterministic, agent-operated, local-first, open source, tax on request, shows its working | `Features.astro`, `features.css` |
+| Footer | Stage surface; the name and a line beside three labelled link columns (Product, Open source, Help); the disclaimer under a hairline (still the footer's first paragraph); the release line; a wordmark drawn as generated content, cropped at the bottom edge | `Footer.astro`, `footer.css`, `footer-legal.css` |
+| Rhythm | Hero and See it in action on `background` with no seam between them (ADR 0010), How it works on `muted` ruled above and below, Features on `background`, footer on `stage` | `sections.css` |
+
+Every fact in the demo is the CLI's own: the command is from `traj fi`'s examples, and the JSON uses its field names
+(`asOf`, `tax: not_applied`, `method: survival`, `fi.reachable`, `fi.fiDate` as `YYYY-MM-DD`). The output is labelled
+"Example output, abridged", and the three guesses on the left are illustrative copy, not measurements. The old tile
+diagram showed `traj plan` and `traj calc`, which the CLI does not have; they are gone with it.
+
+Two build rules shaped the markup: the stylesheets may not write `color-mix()` (the colour-literal check), so secondary
+footer text is `opacity`, and the page has one `nav`, so the footer's columns are lists. The footer's links are worded
+apart from the header's and the sections' (`Documentation`, `CLI docs`), because the keyboard test treats each tab stop
+as one unique control.
+
+Thai copy for every new string is a first draft in `th-sections.ts`; it was not read by a Thai speaker.
+

@@ -32,7 +32,7 @@ band, and the CSS grainient it first carried.
   still reads on it.
 - **One motion, still.** The field drifts as one transform-only layer, the pointer light follows the pointer, and
   the reduced-motion kill switch in `motion.css` stops both.
-- **What is not shipped.** The ripples and the liquid distortion need the live shader: they answer a click and
+- **What is not shipped.** (Ripples are shipped since [ADR 0013](./0013-the-hero-ripples-on-click-and-holds-still-on-hover.md), as a ring cut from the baked tile, and the pointer light is gone.) The ripples and the liquid distortion need the live shader: they answer a click and
   warp the field, which a baked tile cannot do. A row of CSS-animated squares was not taken, because it would be
   tens of nodes and a repaint per frame for an effect the drift already suggests.
 - **What is measured.** Axe composites the field's colour and its opacity behind the hero's copy, so how strong

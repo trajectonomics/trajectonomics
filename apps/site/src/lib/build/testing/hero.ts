@@ -27,10 +27,10 @@ export interface HeroParts {
 	readonly extra?: string
 }
 
-/** Every phrase the hero's `<h1>` carries: the static prefix and the suffixes it cycles. */
+/** Every phrase the hero's `<h1>` carries: the plain run and the accent. */
 function headlines(language: Language): readonly string[] {
 	const dictionary = languageEntry(language).dictionary
-	return [dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle]
+	return [dictionary.heroHeadingPrefix, dictionary.heroHeadingAccent]
 }
 
 /** The Star menu's panel, one link per repository in star order. */
@@ -64,12 +64,16 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<a href="${DOCS_CLI_INSTALL_PATH}">${dictionary.cliInstallLink}</a>`,
 		'<p role="status"></p>',
 		"<section>",
-		`<h2>${dictionary.twoPartHeading}</h2>`,
-		`<p>${dictionary.agentCardTitle}</p><p>${dictionary.agentCardCopy}</p>`,
-		`<p>${dictionary.cliCardTitle}</p><p>${dictionary.cliCardCopy}</p>`,
-		`<p>${dictionary.diagramConnector}</p>`,
+		`<h2>${dictionary.actionHeading}</h2>`,
+		`<p>${dictionary.actionQuestion}</p>`,
+		"</section>",
+		"<section>",
+		`<h2>${dictionary.howHeading}</h2>`,
 		`<a href="${GITHUB_SKILLS_URL}">${dictionary.starOnboarding}</a>`,
 		`<a href="${DOCS_CLI_PATH}">${dictionary.cliDocsLink}</a>`,
+		"</section>",
+		"<section>",
+		`<h2>${dictionary.featuresHeading}</h2>`,
 		"</section>",
 		"</main>",
 		'<footer class="bg-stage text-stage-foreground"><ul>',

@@ -1,0 +1,88 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT } from "../lib/site"
+import Check from "./icons/Check.astro"
+import Cross from "./icons/Cross.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<section class="section-surface">
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.actionEyebrow}</p>
+			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.actionHeading}
+			</h2>
+			<p class="section-lede text-foreground">{dictionary.actionLede}</p>
+		</div>
+
+		<div class="compare">
+			<div class="compare-panel" data-side="without">
+				<div class="compare-tab">
+					<span class="compare-tab-label">{dictionary.actionWithoutLabel}</span>
+					<Cross class="compare-tab-mark" />
+				</div>
+				<div class="compare-body">
+					<p class="compare-question">
+						<span class="speaker">{dictionary.actionYou}</span>
+						<span class="text-foreground">{dictionary.actionQuestion}</span>
+					</p>
+					<ol class="compare-runs">
+						{
+							dictionary.actionGuesses.map((guess, run) => (
+								<li class="compare-run">
+									<span class="run-label text-muted-foreground">{dictionary.actionRunLabels[run]}</span>
+									<span class="bubble bubble-guess">
+										<span class="speaker">{dictionary.actionAgent}</span>
+										<span class="text-foreground">{guess}</span>
+									</span>
+								</li>
+							))
+						}
+					</ol>
+				</div>
+				<p class="compare-note text-muted-foreground">{dictionary.actionWithoutNote}</p>
+			</div>
+
+			<div class="compare-panel" data-side="with">
+				<div class="compare-tab">
+					<span class="compare-tab-label">{dictionary.actionWithLabel}</span>
+					<Check class="compare-tab-mark" />
+				</div>
+				<div class="compare-body">
+					<p class="compare-question">
+						<span class="speaker">{dictionary.actionYou}</span>
+						<span class="text-foreground">{dictionary.actionQuestion}</span>
+					</p>
+					<p class="compare-skill-line text-muted-foreground">{dictionary.actionSkillLine}</p>
+					<div class="terminal bg-stage text-stage-foreground">
+						<code class="terminal-command"><span class="terminal-prompt" aria-hidden="true">$ </span>{FI_DEMO_COMMAND}</code>
+						<pre class="terminal-output"><code>{FI_DEMO_OUTPUT.join("\n")}</code></pre>
+						<p class="terminal-note">{dictionary.actionExampleNote}</p>
+					</div>
+					<ol class="compare-runs">
+						{
+							dictionary.actionRunLabels.map((label) => (
+								<li class="compare-run">
+									<span class="run-label text-muted-foreground">{label}</span>
+									<span class="bubble bubble-answer">
+										<span class="speaker">{dictionary.actionAgent}</span>
+										<span class="text-foreground">{dictionary.actionAnswer}</span>
+									</span>
+								</li>
+							))
+						}
+					</ol>
+				</div>
+				<p class="compare-note text-foreground">{dictionary.actionWithNote}</p>
+			</div>
+		</div>
+	</div>
+</section>

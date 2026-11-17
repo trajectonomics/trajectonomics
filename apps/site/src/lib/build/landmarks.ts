@@ -10,25 +10,19 @@ const LANDMARKS = [
 	{ tag: "footer", count: 1, code: "FOOTER_MISSING" },
 ] as const satisfies readonly { tag: string; count: number; code: BuildFailureCode }[]
 
-/** The headings a page may not carry at any depth: one claim, then one section at most. */
+/** The headings a page may not carry at any depth: one claim, then one `h2` per section. */
 const DEEP_HEADINGS = ["h3", "h4", "h5", "h6"] as const
 
-/** One rule: the page's single section heading may be an `h2` inside `main`, and nowhere else. */
+/** One rule: every section heading is an `h2` inside `main`, and nowhere else (ADR 0012). */
 function sectionFailures(path: string, page: ReturnType<typeof scanHtml>): readonly BuildFailure[] {
-	const sections = elementsByTag(page, "h2")
-	if (sections.length === 0) return []
-	const inside = sections.filter((heading) =>
-		heading.ancestors.some((ancestor) => ancestor.tag === "main"),
+	const outside = elementsByTag(page, "h2").find(
+		(heading) => !heading.ancestors.some((ancestor) => ancestor.tag === "main"),
 	)
-	if (sections.length === 1 && inside.length === 1) return []
-	const reason =
-		sections.length > 1
-			? `expected at most one <h2>, found ${sections.length}.`
-			: "the <h2> is outside <main>."
-	return [buildFailure("HEADING_H2_NOT_ALLOWED", path, reason)]
+	if (outside === undefined) return []
+	return [buildFailure("HEADING_H2_OUTSIDE_MAIN", path, "the <h2> is outside <main>.")]
 }
 
-/** One rule: no `h3`–`h6` anywhere, because the page keeps one claim and one section. */
+/** One rule: no `h3`–`h6` anywhere, because the page keeps one claim and its sections are two levels deep. */
 function deepHeadingFailures(
 	path: string,
 	page: ReturnType<typeof scanHtml>,
@@ -38,7 +32,7 @@ function deepHeadingFailures(
 	return [buildFailure("HEADING_TOO_DEEP", path, `expected no <h3>–<h6>, found <${deep.tag}>.`)]
 }
 
-/** Every page shows one header, one hero inside main, at most one section heading, and one footer. */
+/** Every page shows one header, one hero inside main, section headings only inside main, and one footer. */
 export function checkLandmarks(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return builtPages(files).flatMap((file) => {
 		const page = scanHtml(file.content)

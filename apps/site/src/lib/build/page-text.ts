@@ -29,7 +29,7 @@ function footerFailures(
 	]
 }
 
-/** The hero's headline, the phrases it cycles, and its sub-line, as the Dictionary writes them. */
+/** The hero's headline (its plain run and its accent) and its sub-line, as the Dictionary writes them. */
 function heroFailures(
 	file: BuiltFile,
 	page: ScannedPage,
@@ -40,7 +40,7 @@ function heroFailures(
 		heading.ancestors.some((ancestor) => ancestor.tag === "main"),
 	)
 	const text = hero === undefined ? "" : textOf(page, hero)
-	const missing = [dictionary.heroHeadingPrefix, ...dictionary.heroHeadingCycle].find(
+	const missing = [dictionary.heroHeadingPrefix, dictionary.heroHeadingAccent].find(
 		(headline) => !text.includes(headline),
 	)
 	if (missing !== undefined) {

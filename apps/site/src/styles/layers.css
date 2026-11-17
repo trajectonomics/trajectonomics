@@ -1,0 +1,115 @@
+/*
+ * The two layers of How it works (ADR 0012). The presentation layer is dashed and light, because the agent
+ * owns it and may draw it any way; the logic layer is solid and dark, because traj owns it and it never
+ * changes shape. Skills are the join between them.
+ */
+
+.layers {
+	display: flex;
+	flex-direction: column;
+}
+
+.layer {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 20px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 12px;
+}
+
+.layer {
+	--layer-line: var(--ds-color-border);
+}
+
+.layer-logic {
+	--layer-line: var(--ds-color-muted-foreground);
+}
+
+.layer-presentation {
+	border-style: dashed;
+}
+
+.layer-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.layer-name {
+	font-family: var(--font-display);
+	font-size: 22px;
+	font-weight: 300;
+	letter-spacing: -0.02em;
+}
+
+.layer-owner,
+.layer-chip {
+	border: 1px solid var(--layer-line);
+	border-radius: 4px;
+	font-family: var(--font-meta);
+}
+
+.layer-owner {
+	padding: 2px 8px;
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.layer-copy {
+	margin: 0;
+	font-size: 15px;
+}
+
+.layer-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.layer-chip {
+	padding: 4px 10px;
+	font-size: 12px;
+}
+
+/* The join between the layers: a hairline down from the one above, the skills label, a hairline into the one below. */
+.layers-join {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.layers-join-line {
+	width: 1px;
+	height: 20px;
+	background: var(--ds-color-muted-foreground);
+}
+
+.layers-join-label {
+	display: flex;
+	max-width: 26rem;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	margin: 0;
+	padding: 10px 14px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 8px;
+	background: var(--ds-color-background);
+	font-size: 13px;
+	text-align: center;
+}
+
+.layers-join-name {
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-foreground);
+}

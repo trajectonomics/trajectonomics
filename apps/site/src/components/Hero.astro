@@ -18,10 +18,12 @@ const subline = sublineParts(dictionary.heroSubline)
 <section data-hero class="hero-stage relative isolate flex flex-col overflow-clip bg-background">
 	<div class="hero-blast" aria-hidden="true">
 		<div class="hero-blast-field">
-			<div class="hero-blast-pixels"></div>
+			<div class="hero-blast-drift">
+				<div class="hero-blast-pixels"></div>
+				<div class="hero-blast-ripple" data-ripple></div>
+			</div>
 		</div>
 	</div>
-	<div class="hero-pointer-glow" data-pointer-glow aria-hidden="true"></div>
 	<div
 		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 pt-28 pb-24 text-center sm:px-6 sm:pt-32 sm:pb-28"
 	>
@@ -33,12 +35,10 @@ const subline = sublineParts(dictionary.heroSubline)
 		</Badge>
 		<h1
 			data-hero-headline
-			class="mt-8 max-w-2xl text-4xl font-light text-balance text-foreground sm:text-6xl"
+			class="mt-8 max-w-4xl text-4xl font-bold text-balance text-foreground sm:text-6xl"
 		>
-			<span>{dictionary.heroHeadingPrefix}</span>
-			<span data-hero-stack class="text-accent">
-				{dictionary.heroHeadingCycle.map((suffix) => <span>{suffix}</span>)}
-			</span>
+			<span>{dictionary.heroHeadingPrefix}</span>{" "}
+			<span data-hero-accent class="block text-accent">{dictionary.heroHeadingAccent}</span>
 		</h1>
 		<p class="mt-8 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
 			{
@@ -61,55 +61,25 @@ const subline = sublineParts(dictionary.heroSubline)
 
 <script is:inline>
 	;(() => {
-		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-		// The suffix cycle is decoration: a visitor who asks for less motion keeps the suffix the page ships.
-		const stack = document.querySelector("[data-hero-stack]")
-		if (stack instanceof HTMLElement && !reduced) {
-			const lines = [...stack.children]
-			/** Show one suffix, then the next 2.4 s later; the last one stays. */
-			const show = (step) => {
-				const line = lines[step]
-				if (!(line instanceof HTMLElement)) return
-				for (const other of lines) if (other !== line) other.removeAttribute("data-hero-shown")
-				line.setAttribute("data-hero-shown", "")
-				stack.setAttribute("data-hero-stepping", "")
-				if (step + 1 < lines.length) setTimeout(() => show(step + 1), 2400)
-			}
-			show(0)
-		}
-
-		// The one JavaScript motion: a soft light that follows the pointer, transform only.
+		// A click or a tap on the hero's ground sends one ripple through the field. It is a response to
+		// the visitor, never ambient: nothing follows the pointer, and a visitor who asks for less
+		// motion gets none.
 		const hero = document.querySelector("[data-hero]")
-		const glow = document.querySelector("[data-pointer-glow]")
-		if (
-			hero instanceof HTMLElement &&
-			glow instanceof HTMLElement &&
-			!reduced &&
-			window.matchMedia("(pointer: fine)").matches
-		) {
-			let tx = 0
-			let ty = 0
-			let cx = 0
-			let cy = 0
-			let raf = null
-			const tick = () => {
-				cx += (tx - cx) * 0.12
-				cy += (ty - cy) * 0.12
-				glow.style.transform = `translate3d(${cx - 240}px, ${cy - 240}px, 0)`
-				if (Math.abs(tx - cx) > 0.5 || Math.abs(ty - cy) > 0.5) raf = requestAnimationFrame(tick)
-				else raf = null
-			}
-			hero.addEventListener("pointermove", (event) => {
-				const box = hero.getBoundingClientRect()
-				tx = event.clientX - box.left
-				ty = event.clientY - box.top
-				glow.dataset.glow = "on"
-				if (raf === null) raf = requestAnimationFrame(tick)
-			})
-			hero.addEventListener("pointerleave", () => {
-				delete glow.dataset.glow
-			})
-		}
+		const ripple = document.querySelector("[data-ripple]")
+		if (!(hero instanceof HTMLElement) || !(ripple instanceof HTMLElement)) return
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+		hero.addEventListener("click", (event) => {
+			// A control keeps its click: the command, the pill and the links make no ripple.
+			if (event.target instanceof Element && event.target.closest("a, button, summary, code")) return
+			const box = ripple.getBoundingClientRect()
+			ripple.style.setProperty("--ripple-x", `${event.clientX - box.left}px`)
+			ripple.style.setProperty("--ripple-y", `${event.clientY - box.top}px`)
+			// Take the attribute off and put it back after a reflow, so a second click restarts the ring.
+			ripple.removeAttribute("data-rippling")
+			void ripple.offsetWidth
+			ripple.setAttribute("data-rippling", "")
+		})
+		ripple.addEventListener("animationend", () => ripple.removeAttribute("data-rippling"))
 	})()
 </script>

@@ -33,10 +33,10 @@
 }
 
 /*
- * The field drifts, slowly: the squares move as one layer, transform only, so the fade at the hero's
+ * The field drifts, slowly: the squares and the ripple move as one layer, transform only, so the fade at the hero's
  * edges stays exactly where the seam needs it.
  */
-.hero-blast-pixels {
+.hero-blast-drift {
 	animation: hero-blast-drift 32s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 

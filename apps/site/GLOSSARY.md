@@ -20,6 +20,14 @@ _Avoid_: Plugin, extension, package
 The Skill `traj-onboarding`, the one the Site's install command installs: it asks about the visitor's money, sets up the traj CLI, and starts them off.
 _Avoid_: Setup skill, getting-started skill
 
+**Presentation layer**:
+What the visitor's agent owns on the home: how an answer is explained, in words, tables, charts and the visitor's language. The agent draws it any way it likes, so the home draws it dashed.
+_Avoid_: Frontend, UI, interface
+
+**Logic layer**:
+What the traj CLI owns: the arithmetic, tax and projections. Same input, same answer; it never calls a model. The agent reaches it only through a Skill.
+_Avoid_: Backend, engine, server
+
 **CLI**:
 The `traj` command-line program (`@trajectonomics/cli`) that does the arithmetic: same input, same answer, every time, and it never calls a model.
 _Avoid_: Binary, tool, executable
