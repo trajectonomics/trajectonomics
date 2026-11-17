@@ -13,7 +13,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 			"traj is a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement and project your finances with no account.",
 		languageName: "English",
 		languageSwitchLabel: "EN",
-		heroHeadingPrefix: "Deterministic layers for your",
+		heroHeadingPrefix: "Deterministic layers for",
 		heroHeadingAccent: "Financial Planning",
 		heroVersion: "v0.1.0",
 		heroLicence: "MIT · open source",

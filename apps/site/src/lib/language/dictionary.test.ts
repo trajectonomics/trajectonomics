@@ -50,14 +50,14 @@ describe("the Dictionary of every Language", () => {
 
 	it("sets the English hero headline the owner asked for, with its accent", () => {
 		const english = dictionaryFor("en")
-		expect(english.heroHeadingPrefix).toBe("Deterministic layers for your")
+		expect(english.heroHeadingPrefix).toBe("Deterministic layers for")
 		expect(english.heroHeadingAccent).toBe("Financial Planning")
 	})
 
 	it("sets the Thai hero headline, with its accent", () => {
 		const thai = dictionaryFor("th")
-		expect(thai.heroHeadingPrefix).toBe("เลเยอร์ที่ให้ผลแน่นอนสำหรับ")
-		expect(thai.heroHeadingAccent).toBe("การวางแผนการเงินของคุณ")
+		expect(thai.heroHeadingPrefix).toBe("ชุดเครื่องมือสำหรับ")
+		expect(thai.heroHeadingAccent).toBe("การวางแผนการเงิน")
 	})
 
 	it("keeps the English sub-line and disclaimer the owner approved", () => {

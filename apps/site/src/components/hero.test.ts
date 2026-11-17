@@ -73,11 +73,13 @@ describe("the Hero component in every Language", () => {
 			expect(html).not.toContain("pointerleave")
 		})
 
-		it(`sets the headline bold and the accent in the accent colour (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+		it(`sets the headline in regular weight, with the accent in the accent colour and no bold (${language})`, async () => {
+			const html = await renderComponent(Hero, { dictionary })
+			const page = scanComponent(html)
 			const h1 = elementsByTag(page, "h1")[0]
-			expect(h1?.attributes["class"]).toContain("font-bold")
-			expect(h1?.attributes["class"]).not.toContain("font-light")
+			expect(h1?.attributes["class"]).toContain("font-normal")
+			expect(h1?.attributes["class"]).not.toContain("font-bold")
+			expect(html).not.toContain("<strong")
 		})
 	}
 })

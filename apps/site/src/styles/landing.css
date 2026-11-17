@@ -13,9 +13,9 @@
 }
 
 /*
- * The display family on every heading. The section headings stay light; the hero's headline, the page's
- * one claim, is bold (ADR 0013). The brand package ships Aleo at 300 and 400 only, and a 700 file would
- * cost about 15 KB of the 48,000-byte font budget, so the browser draws the bold from the 400 face.
+ * The display family on every heading. The section headings stay light (300); the hero's headline, the
+ * page's one claim, is regular (400), the heaviest face the brand package ships, with no bold anywhere
+ * in it (ADR 0014).
  */
 [data-hero-headline],
 .section-heading {
@@ -25,7 +25,7 @@
 }
 
 [data-hero-headline] {
-	font-weight: 700;
+	font-weight: 400;
 }
 
 /* The pill's marker: an accent block, drawn with bars so it carries no text. */
