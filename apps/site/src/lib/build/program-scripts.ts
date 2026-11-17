@@ -1,12 +1,8 @@
 import { type AssetGraph, walkAssets } from "./asset-graph"
 import { sameOriginPath } from "./asset-url"
 import type { BuiltFile } from "./built-files"
-import { scanHtml } from "./html"
-import { parseAttributes } from "./html-tag"
+import { isDataBlockType, type ScriptElement, scanHtml, scriptElements } from "./html"
 import { staticImportPaths } from "./module-graph"
-
-const SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi
-const JSON_LD = /\bapplication\/ld\+json\b/i
 
 /** The text a page runs itself, the script files it loads, and the scripts the build did not produce. */
 export interface PageScripts extends AssetGraph {
@@ -20,17 +16,16 @@ interface PageScriptElements {
 }
 
 /** The text or the same-origin source one `<script>` names; neither for a data block. */
-interface ScriptElement {
+interface ScriptSource {
 	readonly inline: string | null
 	readonly source: string | null
 }
 
 /** What one `<script>` element contributes: its text, or the file it loads, or nothing. */
-function scriptOf(page: BuiltFile, match: RegExpMatchArray): ScriptElement {
-	const attributes = parseAttributes(match[1] ?? "")
-	if (JSON_LD.test(attributes["type"] ?? "")) return { inline: null, source: null }
-	const src = attributes["src"]
-	if (src === undefined) return { inline: match[2] ?? "", source: null }
+function scriptOf(page: BuiltFile, element: ScriptElement): ScriptSource {
+	if (isDataBlockType(element.attributes["type"])) return { inline: null, source: null }
+	const src = element.attributes["src"]
+	if (src === undefined) return { inline: element.body, source: null }
 	return { inline: null, source: sameOriginPath(page.path, src) ?? null }
 }
 
@@ -38,10 +33,10 @@ function scriptOf(page: BuiltFile, match: RegExpMatchArray): ScriptElement {
 function scriptsOf(page: BuiltFile): PageScriptElements {
 	const inline: string[] = []
 	const sources: string[] = []
-	for (const match of page.content.matchAll(SCRIPT)) {
-		const element = scriptOf(page, match)
-		if (element.inline !== null) inline.push(element.inline)
-		if (element.source !== null) sources.push(element.source)
+	for (const element of scriptElements(page.content)) {
+		const script = scriptOf(page, element)
+		if (script.inline !== null) inline.push(script.inline)
+		if (script.source !== null) sources.push(script.source)
 	}
 	return { inline, sources }
 }

@@ -13,6 +13,7 @@ import {
 } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
+import { headOf } from "./head"
 import { switcher } from "./homes"
 
 /** The parts of a home a test replaces to break one rule at a time. */
@@ -48,7 +49,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		parts.button ??
 		`<button type="button" data-copied="${dictionary.copied}" data-copy-failed="${dictionary.copyFailed}">${dictionary.copy}</button>`
 	const content = [
-		`<html lang="${language}"><head><title>${SITE_NAME}</title></head>`,
+		`<html lang="${language}"><head>${headOf(language)}</head>`,
 		"<body>",
 		`<header><nav><a href="${localeUrl(language)}" aria-label="${SITE_NAME}"><svg></svg></a>`,
 		`<a href="${DOCS_PATH}">${dictionary.docsLink}</a>`,

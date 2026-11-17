@@ -6,6 +6,9 @@ export const THAI: LanguageEntry = Object.freeze({
 	pathPrefix: "/th",
 	countries: Object.freeze(["TH"]),
 	dictionary: Object.freeze({
+		documentTitle: "traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
+		description:
+			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
 		languageName: "ไทย",
 		languageSwitchLabel: "ไทย",
 		heroHeadingPrefix: "เครื่องมือเดียวที่ agent ของคุณต้องมี เพื่อ",

@@ -1,20 +1,32 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and the canonical links it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import darkTheme from "@trajectonomics/design-system-theme/themes/dark.css?raw"
+import lightTheme from "@trajectonomics/design-system-theme/themes/light.css?raw"
 import Footer from "../components/Footer.astro"
 import Header from "../components/Header.astro"
 import "../styles/global.css"
+import { themePaints } from "../lib/design/theme-paint"
+import { parseDesignTokens } from "../lib/design/tokens"
 import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
 import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../lib/language/languages"
+import { SITE_NAME } from "../lib/site"
+import { structuredDataJson } from "../lib/site/structured-data"
 
 interface Props {
 	readonly language: Language
 	readonly title: string
+	/** The Language home's one-line summary; a miss passes none, so the absence is structural. */
+	readonly description?: string
 	readonly indexed: boolean
 }
 
-const { language, title, indexed } = Astro.props
+const { language, title, description, indexed } = Astro.props
 const dictionary = dictionaryFor(language)
+// The published Theme CSS the page loads for its own paint, read as text, so the browser's bar and
+// the header carry one colour: no colour literal is written here.
+const tokens = parseDesignTokens({ themes: [lightTheme, darkTheme], tailwind: "" })
+const paints = themePaints(tokens)
 ---
 
 <html lang={language} data-theme="light">
@@ -32,9 +44,13 @@ const dictionary = dictionaryFor(language)
 			}
 		</script>
 		<title>{title}</title>
+		{paints.map((paint) => (
+			<meta name="theme-color" media={paint.media} content={paint.colour} />
+		))}
 		{
 			indexed ? (
 				<>
+					{description === undefined ? null : <meta name="description" content={description} />}
 					<link rel="canonical" href={absoluteLocaleUrl(language)} />
 					{LANGUAGES.map((entry) => (
 						<link
@@ -44,6 +60,17 @@ const dictionary = dictionaryFor(language)
 						/>
 					))}
 					<link rel="alternate" hreflang="x-default" href={absoluteLocaleUrl(FALLBACK_LANGUAGE)} />
+					<meta property="og:title" content={title} />
+					{description === undefined ? null : (
+						<meta property="og:description" content={description} />
+					)}
+					<meta property="og:url" content={absoluteLocaleUrl(language)} />
+					<meta property="og:type" content="website" />
+					<meta property="og:site_name" content={SITE_NAME} />
+					{/* No share image ships yet, so `summary` is the card kind the page can honour. */}
+					<meta name="twitter:card" content="summary" />
+					{/* Data, not a program: ADR 0005 keeps JSON-LD outside the Program JavaScript budget. */}
+					<script type="application/ld+json" set:html={structuredDataJson(language)} />
 				</>
 			) : (
 				<meta name="robots" content="noindex" />

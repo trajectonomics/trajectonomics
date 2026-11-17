@@ -1,5 +1,10 @@
+import type { HeadFailureCode } from "./head-failure-codes"
+
+export type { HeadFailureCode }
+
 /** Stable codes for every way the built Site can fail verification. One code per rule. */
 export type BuildFailureCode =
+	| HeadFailureCode
 	| "NOT_FOUND_PAGE_MISSING"
 	| "HEAD_NOT_SINGLE"
 	| "BODY_NOT_SINGLE"
@@ -33,17 +38,10 @@ export type BuildFailureCode =
 	| "LANGUAGE_PAGE_MISSING"
 	| "LANGUAGE_NOT_DECLARED"
 	| "THAI_TEXT_LANGUAGE_WRONG"
-	| "HREFLANG_MISSING"
-	| "HREFLANG_DUPLICATE"
-	| "HREFLANG_TARGET"
 	| "OWNER_PLACEHOLDER_IN_PRODUCTION"
 	| "SCRIPT_DETECTS_LANGUAGE"
 	| "SWITCHER_MISSING"
 	| "SWITCHER_TEXT_WRONG"
-	| "NOINDEX_MISSING"
-	| "NOT_FOUND_HAS_CANONICAL"
-	| "NOT_FOUND_HAS_HREFLANG"
-	| "NOT_FOUND_HAS_CURRENT"
 	| "FONT_BUDGET_OVER"
 	| "FONT_FILE_MISSING"
 	| "REMOTE_FONT_URL_PRESENT"

@@ -4,7 +4,7 @@ import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { elementsByTag, relTokens, scanHtml } from "./html"
+import { checkNotFoundHead } from "./not-found-head"
 import { checkDeclaredLanguage } from "./page-language"
 import { pageUrl } from "./page-url"
 
@@ -20,50 +20,6 @@ export const NOT_FOUND_PAGES: readonly NotFoundPage[] = Object.freeze([
 	...LANGUAGES.map((entry) => ({ path: `${entry.language}/404.html`, language: entry.language })),
 ])
 
-/** A Not-found page is not a Language home: it asks not to be indexed and advertises nothing. */
-function checkNotIndexed(file: BuiltFile): readonly BuildFailure[] {
-	const page = scanHtml(file.content)
-	const failures: BuildFailure[] = []
-	const robots = elementsByTag(page, "meta").find(
-		(meta) => meta.attributes["name"]?.toLowerCase() === "robots",
-	)
-	if (!/\bnoindex\b/i.test(robots?.attributes["content"] ?? "")) {
-		failures.push(
-			buildFailure(
-				"NOINDEX_MISSING",
-				pageUrl(file.path),
-				"is not marked noindex, so a crawler indexes it.",
-			),
-		)
-	}
-	const links = elementsByTag(page, "link")
-	if (links.some((link) => relTokens(link).includes("canonical"))) {
-		failures.push(
-			buildFailure("NOT_FOUND_HAS_CANONICAL", pageUrl(file.path), "advertises a canonical URL."),
-		)
-	}
-	if (links.some((link) => link.attributes["hreflang"] !== undefined)) {
-		failures.push(
-			buildFailure(
-				"NOT_FOUND_HAS_HREFLANG",
-				pageUrl(file.path),
-				"advertises itself as a Language home.",
-			),
-		)
-	}
-	const anchors = elementsByTag(page, "a")
-	if (anchors.some((anchor) => anchor.attributes["aria-current"] === "page")) {
-		failures.push(
-			buildFailure(
-				"NOT_FOUND_HAS_CURRENT",
-				pageUrl(file.path),
-				"marks a link as the current page, but a miss is not its Language home.",
-			),
-		)
-	}
-	return failures
-}
-
 /** Every Not-found page exists, speaks its Language, and stays out of every index. */
 export function checkNotFoundPages(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return NOT_FOUND_PAGES.flatMap((page) => {
@@ -77,6 +33,6 @@ export function checkNotFoundPages(files: readonly BuiltFile[]): readonly BuildF
 				),
 			]
 		}
-		return [...checkDeclaredLanguage(file, page.language), ...checkNotIndexed(file)]
+		return [...checkDeclaredLanguage(file, page.language), ...checkNotFoundHead(file)]
 	})
 }

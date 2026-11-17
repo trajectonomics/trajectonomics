@@ -34,6 +34,19 @@ describe("the Theme the markup asks for", () => {
 		expect(codes(page('data-theme="dark"'))).toContain("THEME_FALLBACK_NOT_LIGHT")
 	})
 
+	it("lets a data block sit before the theme script, because the page runs none of it", () => {
+		const data = '<script type="application/ld+json">{"@context":"https://schema.org"}</script>'
+		expect(codes(page('data-theme="light"', `${data}${HEAD}`))).toEqual([])
+	})
+
+	it("fails a page whose only inline script is a data block, which sets no Theme", () => {
+		const data = '<script type="application/ld+json">{"@context":"https://schema.org"}</script>'
+		const stylesheet = '<link rel="stylesheet" href="/_astro/site.css">'
+		expect(codes(page('data-theme="light"', `${data}${stylesheet}`))).toEqual([
+			"THEME_SCRIPT_MISSING",
+		])
+	})
+
 	it("judges the Not-found page as well, not only the index page", () => {
 		const files = [
 			{ path: "index.html", content: page('data-theme="light"') },

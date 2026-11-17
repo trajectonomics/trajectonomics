@@ -1,6 +1,8 @@
 import type { DesignTokens } from "../design/tokens"
 import type { BuiltFile } from "./built-files"
 import { checkTextContrast } from "./contrast"
+import { checkDescription } from "./description"
+import { checkDocumentTitle } from "./document-title"
 import { checkExternalAssets } from "./external-assets"
 import type { BuildFailure } from "./failures"
 import { checkFonts } from "./fonts"
@@ -21,10 +23,43 @@ import { checkRobots } from "./robots"
 import { checkSiteContent } from "./site-content"
 import { checkSiteLinks } from "./site-links"
 import { checkSitemap } from "./sitemap"
+import { checkSocialCard } from "./social-card"
 import { checkStructure } from "./structure"
+import { checkStructuredData } from "./structured-data"
 import { checkSwitcher } from "./switcher"
 import { checkThaiTextLanguage } from "./thai-text"
 import { checkTheme } from "./theme"
+import { checkThemeColour } from "./theme-colour"
+
+/** The rules that judge the built files alone, in the order their failures read. */
+const FILE_RULES = [
+	checkStructure,
+	checkPageLinks,
+	checkReservedPreloadPath,
+	checkContentSecurityPolicy,
+	checkExternalAssets,
+	checkLandmarks,
+	checkFonts,
+	checkPageWeight,
+	checkLanguageHomes,
+	checkHreflang,
+	checkSitemap,
+	checkRobots,
+	checkDocumentTitle,
+	checkDescription,
+	checkSocialCard,
+	checkStructuredData,
+	checkSwitcher,
+	checkNoLanguageDetection,
+	checkNotFoundPages,
+	checkSiteContent,
+	checkSiteLinks,
+	checkPageText,
+	checkThaiTextLanguage,
+] as const
+
+/** The rules that judge the build against the Web Consumer Contract the Site pins. */
+const TOKEN_RULES = [checkTheme, checkLandmarkColours, checkTextContrast, checkThemeColour] as const
 
 /** Every rule the built Site fails, so one run names all of them instead of the first. */
 export function checkBuild(
@@ -33,29 +68,9 @@ export function checkBuild(
 	mode: BuildMode = DEFAULT_BUILD_MODE,
 ): readonly BuildFailure[] {
 	return [
-		...checkStructure(files),
-		...checkPageLinks(files),
-		...checkReservedPreloadPath(files),
-		...checkContentSecurityPolicy(files),
-		...checkExternalAssets(files),
-		...checkLandmarks(files),
-		...checkTheme(files, tokens),
-		...checkLandmarkColours(files, tokens),
-		...checkTextContrast(files, tokens),
-		...checkFonts(files),
-		...checkPageWeight(files),
-		...checkLanguageHomes(files),
-		...checkHreflang(files),
-		...checkSitemap(files),
-		...checkRobots(files),
-		...checkSwitcher(files),
+		...FILE_RULES.flatMap((rule) => rule(files)),
+		...TOKEN_RULES.flatMap((rule) => rule(files, tokens)),
 		...checkOwnerPlaceholder(files, mode),
-		...checkNoLanguageDetection(files),
-		...checkNotFoundPages(files),
-		...checkSiteContent(files),
-		...checkSiteLinks(files),
-		...checkPageText(files),
-		...checkThaiTextLanguage(files),
 	]
 }
 

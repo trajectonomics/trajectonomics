@@ -2,6 +2,13 @@ import { dirname, resolve } from "node:path"
 import { transform } from "@astrojs/compiler-rs"
 
 /**
+ * Whether the plugin is resolving a `?raw` specifier right now. Bun runs the plugin chain again for
+ * the stripped specifier, so without this the CSS stub below would answer a raw stylesheet import
+ * with a `css-stub:` name that no file answers to.
+ */
+let readingRaw = false
+
+/**
  * The `bun test` preload that lets component tests import `.astro` files: it compiles them with the
  * same compiler Astro's Vite plugin uses, serves `?raw` imports as their file text, and stubs CSS
  * imports. Registration only — no mocks, no environment changes — so every other `bun test` run,
@@ -10,10 +17,17 @@ import { transform } from "@astrojs/compiler-rs"
 Bun.plugin({
 	name: "astro-test-loader",
 	setup(build) {
-		build.onResolve({ filter: /\?raw$/ }, (args) => ({
-			path: import.meta.resolveSync(args.path.replace(/\?raw$/, ""), args.importer),
-			namespace: "raw-text",
-		}))
+		build.onResolve({ filter: /\?raw$/ }, (args) => {
+			readingRaw = true
+			try {
+				return {
+					path: import.meta.resolveSync(args.path.replace(/\?raw$/, ""), args.importer),
+					namespace: "raw-text",
+				}
+			} finally {
+				readingRaw = false
+			}
+		})
 		build.onLoad({ filter: /.*/, namespace: "raw-text" }, async (args) => ({
 			contents: `export default ${JSON.stringify(await Bun.file(args.path).text())}`,
 			loader: "js",
@@ -22,6 +36,7 @@ Bun.plugin({
 		// anything else (e.g. Bun.resolveSync in scripts/adapters) must resolve to its real file,
 		// so the default resolution continues.
 		build.onResolve({ filter: /\.css$/ }, (args) => {
+			if (readingRaw) return undefined
 			if (!args.importer.endsWith(".astro")) return undefined
 			return { path: args.path, namespace: "css-stub" }
 		})

@@ -7,7 +7,6 @@ import Layout from "../../layouts/Layout.astro"
 import type { Language } from "../../lib/language/language"
 import { dictionaryFor } from "../../lib/language/languages"
 import { languagePaths } from "../../lib/language/paths"
-import { SITE_NAME } from "../../lib/site"
 
 interface Props {
 	readonly language: Language
@@ -21,7 +20,12 @@ const { language } = Astro.props
 const dictionary = dictionaryFor(language)
 ---
 
-<Layout language={language} title={SITE_NAME} indexed={true}>
+<Layout
+	language={language}
+	title={dictionary.documentTitle}
+	description={dictionary.description}
+	indexed={true}
+>
 	<Hero dictionary={dictionary} />
 	<TwoParts dictionary={dictionary} />
 </Layout>

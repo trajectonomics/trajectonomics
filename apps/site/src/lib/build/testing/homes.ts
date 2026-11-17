@@ -1,14 +1,9 @@
 import { currentLanguageName, OWNER_WRITTEN_PLACEHOLDER } from "../../language/dictionary"
-import { FALLBACK_LANGUAGE, type Language, type LanguageEntry } from "../../language/language"
-import {
-	absoluteLocaleUrl,
-	LANGUAGES,
-	languageEntry,
-	localeUrl,
-	otherLanguages,
-} from "../../language/languages"
+import type { Language, LanguageEntry } from "../../language/language"
+import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../../language/languages"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
+import { headOf } from "./head"
 
 /** One Language's entry, so a test names the Language it changes. */
 export function entryAt(index: number): LanguageEntry {
@@ -34,25 +29,15 @@ export function switcher(language: Language): string {
 	return `${current}${others}`
 }
 
-/** The advertised links every home carries: one per Language, plus `x-default`. */
-const ALTERNATES = [
-	...LANGUAGES.map(
-		(entry) =>
-			`<link rel="alternate" hreflang="${entry.language}" href="${absoluteLocaleUrl(entry.language)}">`,
-	),
-	`<link rel="alternate" hreflang="x-default" href="${absoluteLocaleUrl(FALLBACK_LANGUAGE)}">`,
-].join("")
-
 /** One Language's home, as the build must produce it, with a chosen nav and body. */
 export function home(
 	language: Language,
 	body = `<p>${OWNER_WRITTEN_PLACEHOLDER}</p>`,
 	nav = switcher(language),
 ): BuiltFile {
-	const canonical = `<link rel="canonical" href="${absoluteLocaleUrl(language)}">`
 	return {
 		path: `${language}/index.html`,
-		content: `<html lang="${language}"><head>${canonical}${ALTERNATES}</head><body><nav>${nav}</nav><main>${body}</main></body></html>`,
+		content: `<html lang="${language}"><head>${headOf(language)}</head><body><nav>${nav}</nav><main>${body}</main></body></html>`,
 	}
 }
 

@@ -81,4 +81,36 @@ describe("the Not-found pages", () => {
 		const page = firstPage()
 		expect(codes(build(notFound(page.path, "xx")))).toEqual(["LANGUAGE_NOT_DECLARED"])
 	})
+
+	it("fails a Not-found page that describes itself, which only a home does", () => {
+		const page = firstPage()
+		const description = '<meta name="description" content="traj, a simulator">'
+		expect(codes(build(notFound(page.path, page.language, `${NOINDEX}${description}`)))).toEqual([
+			"NOT_FOUND_HAS_DESCRIPTION",
+		])
+	})
+
+	it("fails a Not-found page that carries a Social card, which only a home does", () => {
+		const page = firstPage()
+		const card = '<meta property="og:title" content="traj">'
+		expect(codes(build(notFound(page.path, page.language, `${NOINDEX}${card}`)))).toEqual([
+			"NOT_FOUND_HAS_SOCIAL_CARD",
+		])
+	})
+
+	it("fails a Not-found page that carries Structured data, which only a home does", () => {
+		const page = firstPage()
+		const block = '<script type="application/ld+json">{"@context":"https://schema.org"}</script>'
+		expect(codes(build(notFound(page.path, page.language, `${NOINDEX}${block}`)))).toEqual([
+			"NOT_FOUND_HAS_JSON_LD",
+		])
+	})
+
+	it("fails a Not-found page that names a card kind for X, which only a home does", () => {
+		const page = firstPage()
+		const card = '<meta name="twitter:card" content="summary">'
+		expect(codes(build(notFound(page.path, page.language, `${NOINDEX}${card}`)))).toEqual([
+			"NOT_FOUND_HAS_SOCIAL_CARD",
+		])
+	})
 })

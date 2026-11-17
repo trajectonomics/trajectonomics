@@ -141,6 +141,35 @@ describe("the Dictionary of every Language", () => {
 		expect(dictionaryFor("th").cliInstallLink).toBe("ติดตั้ง CLI โดยตรง")
 	})
 
+	it("keeps the document title and the description the owner approved, in every Language", () => {
+		expect(dictionaryFor("en").documentTitle).toBe(
+			"traj — free, open-source financial simulation for AI agents",
+		)
+		expect(dictionaryFor("en").description).toBe(
+			"traj is a free, open-source financial simulation tool for AI agents: a CLI and a skill that plan retirement and project your finances with no account.",
+		)
+		expect(dictionaryFor("th").documentTitle).toBe(
+			"traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
+		)
+		expect(dictionaryFor("th").description).toBe(
+			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
+		)
+	})
+
+	it("keeps the title and the description short enough for a search result", () => {
+		for (const entry of LANGUAGES) {
+			const { documentTitle, description } = entry.dictionary
+			expect({ language: entry.language, title: documentTitle.length <= 60 }).toEqual({
+				language: entry.language,
+				title: true,
+			})
+			expect({ language: entry.language, description: description.length <= 155 }).toEqual({
+				language: entry.language,
+				description: true,
+			})
+		}
+	})
+
 	it("names each Language in its own words, and the short label of the reading one", () => {
 		expect(dictionaryFor("en").languageName).toBe("English")
 		expect(dictionaryFor("th").languageName).toBe("ไทย")

@@ -21,7 +21,7 @@ describe("the Site's own constants", () => {
 		expect(INSTALL_COMMAND).not.toContain("npx traj")
 	})
 
-	it("names the Site trajectonomics, the document title of every Language home", () => {
+	it("names the Site trajectonomics, the brand lockup's accessible name", () => {
 		expect(SITE_NAME).toBe("trajectonomics")
 	})
 

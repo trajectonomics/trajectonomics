@@ -1,5 +1,9 @@
 /** Every string one Language shows. Every Language has the same keys (`GLOSSARY.md`). */
 export interface Dictionary {
+	/** The document title of this Language's home: what a tab and a search result show. */
+	readonly documentTitle: string
+	/** This Language's home one line of summary, for a search result and a shared link. */
+	readonly description: string
 	/** The Language's own name, the visible label of its switcher link on the other home. */
 	readonly languageName: string
 	/** The short label of the current Language, the Language menu's summary. */

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, scanHtml, textOf } from "./html"
+import { unescapeText } from "./html-tag"
 
 const PAGE = `<!doctype html>
 <html lang="en" data-theme="light">
@@ -100,5 +101,20 @@ describe("the text runs of a built page", () => {
 		const scanned = scanHtml('<a href="/">  Star   on\nGitHub </a>')
 		const [anchor] = elementsByTag(scanned, "a")
 		expect(anchor === undefined ? "" : textOf(scanned, anchor)).toBe("Star on GitHub")
+	})
+})
+
+describe("the text an element carries, once the writer's escaping is undone", () => {
+	it("turns the characters an HTML writer escapes back into the text the page shows", () => {
+		expect(unescapeText("traj &amp; friends")).toBe("traj & friends")
+		expect(unescapeText("don&#39;t &lt;panic&gt; &quot;now&quot;")).toBe('don\'t <panic> "now"')
+	})
+
+	it("leaves escaping written twice alone once, so text that shows a literal entity survives", () => {
+		expect(unescapeText("&amp;amp;")).toBe("&amp;")
+	})
+
+	it("leaves an entity it does not know as it is, so no text is invented", () => {
+		expect(unescapeText("&nbsp; &copy;")).toBe("&nbsp; &copy;")
 	})
 })
