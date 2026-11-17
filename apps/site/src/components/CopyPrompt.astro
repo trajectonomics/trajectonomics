@@ -2,11 +2,9 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the icons, the button and the props it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { DOCS_CLI_INSTALL_PATH, INSTALL_COMMAND } from "../lib/site"
+import { DOCS_CLI_INSTALL_PATH, INSTALL_PROMPT } from "../lib/site"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
-import Question from "./icons/Question.astro"
-import Terminal from "./icons/Terminal.astro"
 import Button from "./ui/Button.astro"
 import Card from "./ui/Card.astro"
 
@@ -17,48 +15,36 @@ interface Props {
 const { dictionary } = Astro.props
 // How long the copy toast stays before it clears itself, which is also how long its countdown runs.
 const NOTICE_TIMEOUT_MS = 6000
-/** The three steps under the command, each with the mark its label names. */
-const STEPS = [Terminal, Question, Check] as const
 ---
 
 <div class="relative">
-	<Card variant="panel" class="overflow-hidden text-left">
+	<Card variant="panel" data-install-window class="overflow-hidden text-left">
 		<div class="flex items-center gap-2 border-b border-border bg-secondary px-4 py-2.5">
 			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
 			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
 			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
 		</div>
-		<div class="flex flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-center">
+		<div class="flex flex-col items-stretch gap-3 p-4">
 			<code
-				data-install-command
-				class="min-w-0 flex-1 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-foreground sm:text-base"
+				data-install-prompt
+				class="min-w-0 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-foreground sm:text-base"
 			>
-				{INSTALL_COMMAND}
+				{INSTALL_PROMPT}
 			</code>
 			<Button
 				type="button"
 				bevel
 				hidden
-				data-copy-command
+				data-copy-prompt
 				data-copied={dictionary.copied}
+				data-copied-label={dictionary.copiedLabel}
 				data-copy-failed={dictionary.copyFailed}
 				data-notice-timeout={NOTICE_TIMEOUT_MS}
-				class="shrink-0 px-5"
+				class="window-copy px-5"
 			>
 				{dictionary.copy}
 			</Button>
 		</div>
-		<ol class="window-steps text-muted-foreground">
-			{
-				STEPS.map((Mark, step) => (
-					<li class="window-step">
-						{step > 0 ? <Arrow class="window-step-arrow" /> : null}
-						<Mark class="window-step-mark" />
-						<span>{dictionary.stepLabels[step]}</span>
-					</li>
-				))
-			}
-		</ol>
 		<a class="window-exit" href={DOCS_CLI_INSTALL_PATH}>
 			{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
 		</a>
@@ -81,13 +67,13 @@ const STEPS = [Terminal, Question, Check] as const
 
 <script is:inline>
 	;(() => {
-		const command = document.querySelector("[data-install-command]")
-		const button = document.querySelector("[data-copy-command]")
+		const prompt = document.querySelector("[data-install-prompt]")
+		const button = document.querySelector("[data-copy-prompt]")
 		const status = document.querySelector("[data-copy-status]")
 		const toast = document.querySelector("[data-copy-toast]")
 		const check = document.querySelector("[data-copy-check]")
 		if (
-			!(command instanceof HTMLElement) ||
+			!(prompt instanceof HTMLElement) ||
 			!(button instanceof HTMLButtonElement) ||
 			!(status instanceof HTMLElement) ||
 			!(toast instanceof HTMLElement)
@@ -96,11 +82,19 @@ const STEPS = [Terminal, Question, Check] as const
 		}
 
 		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
+		const label = button.textContent ?? ""
 		let notice = null
-		/** The toast confirms the copy, then clears itself so the next step keeps the eye. */
+		/**
+		 * The toast confirms the copy and the button says what it did, then both clear together so one
+		 * timer drives them and they cannot disagree.
+		 */
 		const notify = (message, failed) => {
 			status.textContent = message
 			if (check instanceof HTMLElement) check.hidden = failed
+			// The button paints the accent role and shortens its word, or keeps both for a failed copy.
+			if (failed) button.removeAttribute("data-copy-state")
+			else button.setAttribute("data-copy-state", "copied")
+			button.textContent = failed ? label : (button.dataset.copiedLabel ?? label)
 			// Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
 			toast.removeAttribute("data-visible")
 			void toast.offsetWidth
@@ -109,25 +103,27 @@ const STEPS = [Terminal, Question, Check] as const
 			notice = setTimeout(() => {
 				status.textContent = ""
 				toast.removeAttribute("data-visible")
+				button.removeAttribute("data-copy-state")
+				button.textContent = label
 				notice = null
 			}, timeoutMs)
 		}
 
-		// The button is progressive enhancement: with JavaScript off the command alone is the action.
+		// The button is progressive enhancement: with JavaScript off the prompt alone is the action.
 		button.hidden = false
 		button.addEventListener("click", async () => {
-			const text = command.textContent?.trim() ?? ""
+			const text = prompt.textContent?.trim() ?? ""
 			try {
 				await navigator.clipboard.writeText(text)
 				notify(button.dataset.copied ?? "", false)
-				// The command reached the clipboard: say so once, so the page can count the copy. The
-				// name is stable because the command text changes with every release.
+				// The prompt reached the clipboard: say so once, so the page can count the copy. The
+				// name and the value are frozen, because a metric that changes its name breaks its series.
 				window.dispatchEvent(
 					new CustomEvent("traj:site-command-copied", { detail: { command: "install" } }),
 				)
 			} catch {
 				const range = document.createRange()
-				range.selectNodeContents(command)
+				range.selectNodeContents(prompt)
 				const selection = document.getSelection()
 				selection?.removeAllRanges()
 				selection?.addRange(range)

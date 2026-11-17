@@ -1,53 +1,23 @@
-/* The install-command window (ADR 0007): the three steps under the command, and the copy toast. */
+/* The install window (ADR 0007, ADR 0015): the prompt, its Copy control's own confirmation, and the way out. */
 
-/* The three-step strip: terminal, question mark, check, with a hairline arrow between each pair. */
-.window-steps {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
-	gap: 6px 10px;
-	margin: 0;
-	padding: 10px 16px;
-	border-top: 1px solid var(--ds-color-border);
-	list-style: none;
-	font-family: var(--font-meta);
-	font-size: 12px;
+/*
+ * The Copy control's confirmation: the accent role, with the foreground that belongs on it, for the six
+ * seconds the toast is up (site#61). Nothing here answers a hover: the notice runs on its one timer and
+ * a pointer neither pauses it nor paints another colour, and the button's own hover opacity is held, so
+ * hovering the copied state does nothing at all.
+ */
+.window-copy[data-copy-state="copied"] {
+	background: var(--ds-color-accent);
+	color: var(--ds-color-accent-foreground);
 }
 
-.window-step {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	white-space: nowrap;
-}
-
-.window-step-arrow {
-	flex-shrink: 0;
-	color: var(--ds-color-border);
-}
-
-.window-step-mark {
-	flex-shrink: 0;
-	color: var(--ds-color-foreground);
-}
-
-/* On a phone the strip stacks, so no arrow is left leading a wrapped row. */
-@media (max-width: 39.99rem) {
-	.window-steps {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 6px;
-	}
-
-	.window-step-arrow {
-		display: none;
-	}
+.window-copy[data-copy-state="copied"]:hover {
+	opacity: 1;
 }
 
 /*
- * The way out of the command (ADR 0009): one quiet row under the strip, in the strip's own type and
- * hairline, so a visitor the skills CLI cannot reach has a next step that never competes with the command.
+ * The way out of the prompt (ADR 0009, ADR 0015): one quiet row under it, in the window's own type and
+ * hairline, so a visitor the skills CLI cannot reach has a next step that never competes with the prompt.
  * It is muted, not the diagram links' foreground, and a phone wraps it rather than overflowing the card.
  */
 .window-exit {

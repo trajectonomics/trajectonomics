@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { INSTALL_COMMAND } from "../lib/site"
+import { INSTALL_PROMPT } from "../lib/site"
 import Hero from "./Hero.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -51,14 +51,13 @@ describe("the Hero component in every Language", () => {
 			expect(codes).toContain("traj")
 		})
 
-		it(`renders the install command and the steps under it (${language})`, async () => {
+		it(`renders the prompt and no step strip (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
-			const command = withAttribute(page, "data-install-command")[0]
-			if (command === undefined) throw new Error("the hero rendered no install command")
-			expect(textOf(page, command)).toBe(INSTALL_COMMAND)
-			expect(withClass(page, "window-step").map((step) => textOf(page, step))).toEqual([
-				...dictionary.stepLabels,
-			])
+			const prompt = withAttribute(page, "data-install-prompt")[0]
+			if (prompt === undefined) throw new Error("the hero rendered no prompt")
+			expect(textOf(page, prompt)).toBe(INSTALL_PROMPT)
+			expect(withClass(page, "window-steps")).toEqual([])
+			expect(withClass(page, "window-step")).toEqual([])
 		})
 
 		it(`answers a click with a ripple, and never follows the pointer (${language})`, async () => {

@@ -1,62 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import { dictionaryFor } from "../language/languages"
-import { INSTALL_COMMAND } from "../site"
 import { checkSiteContent } from "./site-content"
 import { heroCodes, heroHome, heroHomes } from "./testing/hero"
-
-const command = `<code>${INSTALL_COMMAND}</code>`
-
-describe("the install command on a Language home", () => {
-	it("passes a home that shows the fixture in a code element, beside its Copy button", () => {
-		expect(heroCodes(checkSiteContent)).toEqual([])
-	})
-
-	it("passes the Thai home, whose button and messages are Thai", () => {
-		expect(heroCodes(checkSiteContent, heroHome("th"))).toEqual([])
-	})
-
-	it("fails a home with no code element showing the fixture", () => {
-		expect(
-			heroCodes(checkSiteContent, heroHome("en", { command: "<code>npx skills add other</code>" })),
-		).toEqual(["INSTALL_COMMAND_MISSING"])
-	})
-
-	it("fails a home whose command is in the HTML only inside a script", () => {
-		const script = `<script>const command = "${INSTALL_COMMAND}"</script>`
-		expect(heroCodes(checkSiteContent, heroHome("en", { command: "", extra: script }))).toEqual([
-			"INSTALL_COMMAND_MISSING",
-			"INSTALL_COMMAND_SCRIPT_ONLY",
-		])
-	})
-})
-
-describe("the Copy control", () => {
-	it("fails a home with no Copy button", () => {
-		expect(heroCodes(checkSiteContent, heroHome("en", { command, button: "" }))).toEqual([
-			"COPY_BUTTON_MISSING",
-		])
-	})
-
-	it("fails a home whose button shows the other Language's label", () => {
-		const button = `<button type="button">${dictionaryFor("th").copy}</button>`
-		expect(heroCodes(checkSiteContent, heroHome("en", { command, button }))).toContain(
-			"COPY_BUTTON_LABEL_MISMATCH",
-		)
-	})
-
-	it("fails a home whose button is not a sibling of the command", () => {
-		expect(
-			heroCodes(checkSiteContent, heroHome("en", { command: `<div>${command}</div>` })),
-		).toEqual(["COPY_BUTTON_NOT_SIBLING"])
-	})
-
-	it("fails a home whose button carries neither copy message", () => {
-		const button = `<button type="button">${dictionaryFor("en").copy}</button>`
-		expect(heroCodes(checkSiteContent, heroHome("en", { command, button }))).toEqual([
-			"COPY_MESSAGES_MISSING",
-		])
-	})
-})
 
 describe("the unscoped npm package", () => {
 	it("fails a build that shows npx traj in any file", () => {
@@ -64,7 +8,31 @@ describe("the unscoped npm package", () => {
 		expect(checkSiteContent(files).map((failure) => failure.code)).toEqual(["FORBIDDEN_NPX_TRAJ"])
 	})
 
-	it("passes a build that shows npx skills and never npx traj", () => {
+	it("passes a home that shows no npx traj", () => {
 		expect(heroCodes(checkSiteContent)).toEqual([])
+	})
+})
+
+describe("the install command the window retired", () => {
+	const retired = "npx skills add trajectonomics/skills --skill traj-onboarding"
+
+	it("passes a Language home whose window shows the prompt and no command", () => {
+		expect(heroCodes(checkSiteContent, heroHome("en"))).toEqual([])
+		expect(heroCodes(checkSiteContent, heroHome("th"))).toEqual([])
+	})
+
+	it("fails a Language home that prints an npx skills add line", () => {
+		const page = heroHome("en", { window: `<code>${retired}</code>` })
+		expect(heroCodes(checkSiteContent, page)).toEqual(["INSTALL_COMMAND_RETURNED"])
+	})
+
+	it("fails a home that prints the line outside the window, so the tripwire is not window-scoped", () => {
+		const page = heroHome("en", { extra: `<p>${retired}</p>` })
+		expect(heroCodes(checkSiteContent, page)).toEqual(["INSTALL_COMMAND_RETURNED"])
+	})
+
+	it("judges built homes only, so a repository file carrying the line is left alone", () => {
+		const files = [...heroHomes(), { path: "AGENTS.md", content: `Run \`${retired}\`.` }]
+		expect(checkSiteContent(files)).toEqual([])
 	})
 })

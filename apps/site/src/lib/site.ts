@@ -5,10 +5,20 @@ export const SITE_ORIGIN = "https://trajectonomics.com"
 export const SITE_NAME = "trajectonomics"
 
 /**
- * The install command the Site shows: unpinned and without `-y`, because the visitor copies it as it
- * is. It is one value, the same text in every Language, and a fixture no edit may change silently.
+ * The skills repository's raw path to the skills it publishes on its default branch, which a coding
+ * agent reads with nothing installed: no skills CLI, no Node version, no clone.
  */
-export const INSTALL_COMMAND = "npx skills add trajectonomics/skills --skill traj-onboarding"
+const SKILLS_RAW_PATH = "https://raw.githubusercontent.com/trajectonomics/skills/main/skills"
+
+/** The Onboarding skill's published file: the one the prompt names, so the path and the prompt agree. */
+export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md`
+
+/**
+ * The prompt the Site shows: one sentence the visitor pastes into a coding agent, which then reads the
+ * Onboarding skill and sets the machine up itself. It is one value, the same text in every Language,
+ * a fixture no edit may change silently, and it prints no command.
+ */
+export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and follow it.`
 
 /**
  * The command the See it in action section shows the agent running, taken from the CLI's own `traj fi`
@@ -41,7 +51,7 @@ export const DOCS_CLI_PATH = "/docs/cli/"
 
 /**
  * The Docs Portal's CLI installation page: every install channel, release pinning and uninstall. It is the
- * way out under the install command, for the visitor the skills CLI cannot reach (ADR 0009).
+ * way out under the prompt, for the visitor the skills CLI cannot reach (ADR 0015).
  */
 export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 

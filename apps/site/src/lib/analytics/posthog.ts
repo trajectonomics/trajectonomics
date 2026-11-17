@@ -23,9 +23,6 @@ export const SURFACE = "site"
 /** The event a visitor's page load sends, and the one the name PostHog's Web Analytics reads. */
 export const PAGEVIEW_EVENT = "$pageview"
 
-/** The event the Copy button sends when one command reaches the clipboard. */
-export const COMMAND_COPIED_EVENT = "site_command_copied"
-
 /** The browser conditions that decide whether the page measures a visitor at all. */
 export interface VisitorConditions {
 	readonly hostname: string
@@ -42,13 +39,6 @@ export interface PageviewSource {
 	/** The Language of the Locale URL the page is under. */
 	readonly language: string
 	readonly title: string
-}
-
-/** One command the Copy button put on the clipboard. */
-export interface CopiedCommand {
-	/** A stable name for the command, not its text: the text changes with every release. */
-	readonly command: string
-	readonly language: string
 }
 
 /** The body one event posts: the endpoint reads `api_key` and `event` beside the properties. */
@@ -84,11 +74,6 @@ export function pageviewProperties(
 		language: source.language,
 		surface: SURFACE,
 	}
-}
-
-/** The properties of one copied command: the command's name and the Language of the page it sat on. */
-export function commandCopiedProperties(copied: CopiedCommand): Readonly<Record<string, string>> {
-	return { command: copied.command, language: copied.language, surface: SURFACE }
 }
 
 /**

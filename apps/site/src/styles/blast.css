@@ -29,8 +29,8 @@
 
 /*
  * The field thins towards the sides and the bottom, so the squares never reach the page's corners, and it
- * leaves the centre: a clearing of 46% by 52% behind the headline, the subline and the command keeps the
- * copy on clean ground, so the squares frame the text instead of competing with it (ADR 0014).
+ * leaves the centre: a clearing of 46% by 52% behind the headline, the subline and the install window
+ * keeps the copy on clean ground, so the squares frame the text instead of competing with it (ADR 0014).
  */
 .hero-blast-field {
 	position: absolute;

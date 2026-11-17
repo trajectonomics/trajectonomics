@@ -1,9 +1,9 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyCommand /> and the badge it renders.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyPrompt /> and the badge it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import CopyCommand from "./CopyCommand.astro"
+import CopyPrompt from "./CopyPrompt.astro"
 import Badge from "./ui/Badge.astro"
 import Separator from "./ui/Separator.astro"
 
@@ -54,7 +54,7 @@ const subline = sublineParts(dictionary.heroSubline)
 			}
 		</p>
 		<div class="hero-command mt-10 w-full max-w-xl sm:mt-12">
-			<CopyCommand dictionary={dictionary} />
+			<CopyPrompt dictionary={dictionary} />
 		</div>
 	</div>
 </section>
@@ -70,7 +70,7 @@ const subline = sublineParts(dictionary.heroSubline)
 		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
 		hero.addEventListener("click", (event) => {
-			// A control keeps its click: the command, the pill and the links make no ripple.
+			// A control keeps its click: the prompt, the pill and the links make no ripple.
 			if (event.target instanceof Element && event.target.closest("a, button, summary, code")) return
 			const box = ripple.getBoundingClientRect()
 			ripple.style.setProperty("--ripple-x", `${event.clientX - box.left}px`)

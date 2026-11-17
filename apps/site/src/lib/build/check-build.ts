@@ -7,6 +7,7 @@ import { checkExternalAssets } from "./external-assets"
 import type { BuildFailure } from "./failures"
 import { checkFonts } from "./fonts"
 import { checkHreflang } from "./hreflang"
+import { checkInstallWindow } from "./install-window"
 import { checkLandmarkColours } from "./landmark-colours"
 import { checkLandmarks } from "./landmarks"
 import { checkLanguageHomes } from "./language-home"
@@ -52,6 +53,7 @@ const FILE_RULES = [
 	checkSwitcher,
 	checkNoLanguageDetection,
 	checkNotFoundPages,
+	checkInstallWindow,
 	checkSiteContent,
 	checkSiteLinks,
 	checkPageText,

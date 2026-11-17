@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test"
+import { dictionaryFor } from "../src/lib/language/languages"
+import { paintedColour } from "./colour"
 import {
-	COPY_TEXT,
+	COPY_PROMPT_TEXT,
+	copiedLabel,
 	copiedMessage,
 	expectTheme,
 	focusableCount,
@@ -60,9 +63,7 @@ for (const theme of THEMES) {
 				await expect(summary).toBeFocused()
 			})
 
-			test("Enter and Space copy the command and announce it in this Language", async ({
-				page,
-			}) => {
+			test("Enter and Space copy the prompt and announce it in this Language", async ({ page }) => {
 				await openPage(page, underTest)
 				expect(await tabToCopyButton(page)).toBe(true)
 				const status = page.locator("[data-copy-status]")
@@ -71,12 +72,37 @@ for (const theme of THEMES) {
 
 				await page.keyboard.press("Enter")
 				await expect(status).toHaveText(copiedMessage(underTest.language))
-				expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(COPY_TEXT)
+				expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(COPY_PROMPT_TEXT)
 
 				await page.evaluate(() => navigator.clipboard.writeText(""))
 				await page.keyboard.press("Space")
 				await expect(status).toHaveText(copiedMessage(underTest.language))
-				expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(COPY_TEXT)
+				expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(COPY_PROMPT_TEXT)
+			})
+
+			test("the Copy button confirms in the accent role, and reverts with the notice", async ({
+				page,
+			}) => {
+				await openPage(page, underTest)
+				const button = page.locator("[data-copy-prompt]")
+				const accent = await paintedColour(page, "--ds-color-accent")
+				await expect(button).toHaveText(dictionaryFor(underTest.language).copy)
+
+				await button.click()
+				await expect(button).toHaveText(copiedLabel(underTest.language))
+				await expect(button).toHaveCSS("background-color", accent)
+
+				// Hovering neither paints another colour nor restarts the six seconds.
+				await button.hover()
+				await expect(button).toHaveCSS("background-color", accent)
+				await expect(button).toHaveText(copiedLabel(underTest.language))
+
+				await expect(button).toHaveText(dictionaryFor(underTest.language).copy, {
+					timeout: 10_000,
+				})
+				expect(await button.evaluate((element) => element.hasAttribute("data-copy-state"))).toBe(
+					false,
+				)
 			})
 		})
 	}

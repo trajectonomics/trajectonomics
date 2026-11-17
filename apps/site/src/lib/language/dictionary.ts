@@ -96,13 +96,14 @@ export interface Dictionary {
 	readonly featureTitles: readonly string[]
 	/** Six feature sentences, one per title and in the same order. */
 	readonly featureCopies: readonly string[]
-	/** The three steps under the command, in order: run it, answer the setup, it is ready. */
-	readonly stepLabels: readonly string[]
 	readonly cliDocsLink: string
-	/** The way out under the command: the Docs Portal's CLI installation page, which needs no skills CLI. */
+	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
 	readonly copy: string
+	/** What the toast announces once the prompt is on the clipboard. */
 	readonly copied: string
+	/** The Copy button's own word while the notice lasts: short, because the button is one word wide. */
+	readonly copiedLabel: string
 	readonly copyFailed: string
 	readonly licence: string
 	readonly org: string

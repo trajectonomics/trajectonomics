@@ -1,50 +1,40 @@
-import type { Dictionary } from "../language/dictionary"
-import { INSTALL_COMMAND } from "../site"
 import type { BuiltFile } from "./built-files"
-import { copyFailures } from "./copy-control"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { elementsByTag, scanHtml, textOf } from "./html"
 import { builtHomes } from "./language-home"
 
-/** A script element of a built page; with JavaScript off, none of it runs. */
-const SCRIPT = /<script\b[^>]*>[\s\S]*?<\/script>/gi
-
-/** The npm package that is not Trajectonomics', and must appear nowhere. */
+/**
+ * The npm package that is not Trajectonomics', and must appear nowhere: not on a page, not in a
+ * script, not in a file the build copies.
+ */
 const FORBIDDEN_COMMAND = "npx traj"
 
-/** The command is visible text in a `<code>` element, and stays there once the scripts are removed. */
-function commandFailures(file: BuiltFile, dictionary: Dictionary): readonly BuildFailure[] {
-	const page = scanHtml(file.content)
-	const command = elementsByTag(page, "code").find(
-		(element) => textOf(page, element) === INSTALL_COMMAND,
-	)
-	const failures: BuildFailure[] =
-		command === undefined
-			? [
-					buildFailure(
-						"INSTALL_COMMAND_MISSING",
-						file.path,
-						`no <code> shows the install command "${INSTALL_COMMAND}".`,
-					),
-				]
-			: [...copyFailures(file.path, page, dictionary, command)]
-	if (
-		file.content.includes(INSTALL_COMMAND) &&
-		!file.content.replace(SCRIPT, "").includes(INSTALL_COMMAND)
-	) {
-		failures.push(
-			buildFailure(
-				"INSTALL_COMMAND_SCRIPT_ONLY",
-				file.path,
-				`"${INSTALL_COMMAND}" is not in the HTML once its scripts are removed.`,
-			),
-		)
-	}
-	return failures
+/**
+ * The command the install window retired (site#54): a fixture the Site no longer prints and whose
+ * proof it never had. It is a tripwire, not a proof: it catches the reversal in the cheapest place,
+ * but a home that printed some *other* command outside the window would pass, because the page prints
+ * product copy and run labels on purpose.
+ */
+const RETIRED_COMMAND = "npx skills add"
+
+/** A Language home prints no `npx skills add` line: the window shows a prompt, never a command. */
+function retiredCommandFailures(file: BuiltFile): readonly BuildFailure[] {
+	if (!file.content.includes(RETIRED_COMMAND)) return []
+	return [
+		buildFailure(
+			"INSTALL_COMMAND_RETURNED",
+			file.path,
+			`prints "${RETIRED_COMMAND}"; the install window shows a prompt and names no command.`,
+		),
+	]
 }
 
-/** The fixture command is on every Language home, and the unscoped package is nowhere. */
+/**
+ * The unscoped package is nowhere, and no Language home prints the command the window retired.
+ *
+ * The second rule judges built Language homes and never the repository: `AGENTS.md` legitimately
+ * carries such lines, and judging the repository would fail a file this rule does not own.
+ */
 export function checkSiteContent(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return [
 		...files.flatMap((file) =>
@@ -58,6 +48,6 @@ export function checkSiteContent(files: readonly BuiltFile[]): readonly BuildFai
 					]
 				: [],
 		),
-		...builtHomes(files).flatMap(({ entry, file }) => commandFailures(file, entry.dictionary)),
+		...builtHomes(files).flatMap(({ file }) => retiredCommandFailures(file)),
 	]
 }

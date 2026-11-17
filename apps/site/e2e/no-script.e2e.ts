@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test"
 import { dictionaryFor } from "../src/lib/language/languages"
-import { COPY_TEXT, focusableCount, PAGES } from "./pages"
+import { COPY_PROMPT_TEXT, focusableCount, PAGES } from "./pages"
 
-/** The homes, which carry the Copy button and the install command. */
+/** The homes, which carry the Copy button and the install prompt. */
 const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 
 test.use({ javaScriptEnabled: false, colorScheme: "dark" })
@@ -19,21 +19,23 @@ for (const underTest of HOMES) {
 		await expect(firstLink).toBeVisible()
 	})
 
-	test(`${underTest.name}: the Copy button is out of the tab order and the command stays selectable`, async ({
+	test(`${underTest.name}: the Copy button is out of the tab order and the prompt stays selectable`, async ({
 		page,
 	}) => {
 		await page.goto(underTest.path)
-		await expect(page.locator("[data-copy-command]")).toBeHidden()
+		await expect(page.locator("[data-copy-prompt]")).toBeHidden()
 		const count = await focusableCount(page)
 		for (let stop = 1; stop <= count; stop++) {
 			await page.keyboard.press("Tab")
 			const onCopy = await page.evaluate(
-				() => document.activeElement?.hasAttribute("data-copy-command") ?? false,
+				() => document.activeElement?.hasAttribute("data-copy-prompt") ?? false,
 			)
 			expect(onCopy, `Tab stop ${stop} never lands on the Copy button`).toBe(false)
 		}
-		await page.locator("[data-install-command]").selectText()
-		expect(await page.evaluate(() => document.getSelection()?.toString() ?? "")).toBe(COPY_TEXT)
+		await page.locator("[data-install-prompt]").selectText()
+		expect(await page.evaluate(() => document.getSelection()?.toString() ?? "")).toBe(
+			COPY_PROMPT_TEXT,
+		)
 	})
 
 	test(`${underTest.name}: the hero shows its whole headline, accent included, with no script`, async ({

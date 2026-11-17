@@ -102,7 +102,7 @@ describe("the Dictionary of every Language", () => {
 		expect(english.starMenuAllRepos).toBe("All repositories")
 		expect(english.starOnboarding).toBe("Star traj-onboarding")
 		expect(english.cliDocsLink).toBe("Read the CLI docs")
-		expect(english.copied).toBe("Command copied")
+		expect(english.copied).toBe("Prompt copied")
 	})
 
 	it("writes the three runs, the four steps and the six features in every Language", () => {
@@ -140,21 +140,22 @@ describe("the Dictionary of every Language", () => {
 		expect(english.howLogicOwner).toBe("Owned by traj")
 	})
 
-	it("writes the three steps under the command, in every Language", () => {
-		for (const entry of LANGUAGES) {
-			expect({ language: entry.language, steps: entry.dictionary.stepLabels.length }).toEqual({
-				language: entry.language,
-				steps: 3,
-			})
-		}
-		expect(dictionaryFor("en").stepLabels).toEqual([
-			"1 Install the onboarding skill",
-			"2 Open your coding agent",
-			"3 Run the onboarding skill",
-		])
+	it("writes the prompt's two messages and the button's short confirmation, in both Languages", () => {
+		expect(dictionaryFor("en").copied).toBe("Prompt copied")
+		expect(dictionaryFor("en").copyFailed).toBe("Select the prompt and copy it.")
+		expect(dictionaryFor("en").copiedLabel).toBe("Copied")
+		expect(dictionaryFor("th").copied).toBe("คัดลอกพรอมต์แล้ว")
+		expect(dictionaryFor("th").copyFailed).toBe("เลือกพรอมต์แล้วคัดลอก")
+		expect(dictionaryFor("th").copiedLabel).toBe("คัดลอกแล้ว")
 	})
 
-	it("writes the owner's way out under the command, in both Languages", () => {
+	it("retires the three step labels, because the window has no steps any more", () => {
+		for (const { language, dictionary } of LANGUAGES) {
+			expect({ language, steps: "stepLabels" in dictionary }).toEqual({ language, steps: false })
+		}
+	})
+
+	it("writes the owner's way out under the prompt, in both Languages", () => {
 		expect(dictionaryFor("en").cliInstallLink).toBe("Install the CLI directly")
 		expect(dictionaryFor("th").cliInstallLink).toBe("ติดตั้ง CLI โดยตรง")
 	})

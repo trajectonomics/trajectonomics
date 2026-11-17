@@ -1,8 +1,11 @@
 import {
-	COMMAND_COPIED_EVENT,
-	type CopiedCommand,
+	type CopiedSignal,
+	copiedPrompt,
+	PROMPT_COPIED_EVENT,
+	promptCopiedProperties,
+} from "./copy"
+import {
 	capturePayload,
-	commandCopiedProperties,
 	PAGEVIEW_EVENT,
 	POSTHOG_CAPTURE_URL,
 	pageviewProperties,
@@ -10,11 +13,12 @@ import {
 } from "./posthog"
 
 /**
- * The event the Copy button dispatches when one command reaches the clipboard. It carries a
+ * The event the Copy button dispatches when the prompt reaches the clipboard. It carries a
  * `detail.command`, and the script that did the copying does not itself post anything, so the
- * button keeps working with JavaScript off and the measurement is one listener here.
+ * button keeps working with JavaScript off and the measurement is one listener here. Both names are
+ * wire values the series was measured with, so neither moves with the page's words.
  */
-export const COMMAND_COPIED_SIGNAL = "traj:site-command-copied"
+export const PROMPT_COPIED_SIGNAL = "traj:site-command-copied"
 
 /** The two browser fields the opt-out check reads beyond the standard `Navigator`. */
 interface PrivacyNavigator extends Navigator {
@@ -57,7 +61,7 @@ function createId(): string {
 }
 
 /**
- * Measure this visit: one pageview for the page the visitor opened, and one event for each command
+ * Measure this visit: one pageview for the page the visitor opened, and one event for each prompt
  * the Copy button puts on their clipboard.
  *
  * Nothing is sent when the page is not on the production host or the visitor set an opt-out signal
@@ -94,9 +98,9 @@ export function startAnalytics(win: Window = window, doc: Document = document): 
 		),
 	)
 
-	doc.addEventListener(COMMAND_COPIED_SIGNAL, (event) => {
-		const detail = (event as CustomEvent<CopiedCommand>).detail
-		const copied: CopiedCommand = { command: detail.command, language }
-		post(body(capturePayload(COMMAND_COPIED_EVENT, createId(), commandCopiedProperties(copied))))
+	doc.addEventListener(PROMPT_COPIED_SIGNAL, (event) => {
+		const detail = (event as CustomEvent<CopiedSignal>).detail
+		const copied = copiedPrompt(detail, language)
+		post(body(capturePayload(PROMPT_COPIED_EVENT, createId(), promptCopiedProperties(copied))))
 	})
 }

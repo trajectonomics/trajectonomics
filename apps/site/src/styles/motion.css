@@ -50,8 +50,9 @@
 }
 
 /*
- * The command's wrapper fades in without moving. A transform on it would make it the containing block
- * of the fixed copy toast inside it, so the toast would land against the wrapper, not the viewport.
+ * The install window's wrapper fades in without moving. A transform on it would make it the containing
+ * block of the fixed copy toast inside it, so the toast would land against the wrapper, not the viewport.
+ * The `.hero-command` class name stays: the window, not a command, is what it wraps (ADR 0015).
  */
 .hero-command {
 	animation-name: hero-fade;

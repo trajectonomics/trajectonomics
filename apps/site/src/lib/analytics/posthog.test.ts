@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import {
 	capturePayload,
-	commandCopiedProperties,
 	MEASURED_HOSTNAME,
 	PAGEVIEW_EVENT,
 	POSTHOG_KEY,
@@ -61,16 +60,6 @@ describe("pageviewProperties", () => {
 
 	it("says which Surface sent it", () => {
 		expect(properties["surface"]).toBe(SURFACE)
-	})
-})
-
-describe("commandCopiedProperties", () => {
-	it("names the command by a stable name, never by the command text a release changes", () => {
-		expect(commandCopiedProperties({ command: "install", language: "th" })).toEqual({
-			command: "install",
-			language: "th",
-			surface: SURFACE,
-		})
 	})
 })
 

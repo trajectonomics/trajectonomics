@@ -1,12 +1,10 @@
 import type { Language } from "../../language/language"
 import { LANGUAGES, languageEntry, localeUrl } from "../../language/languages"
 import {
-	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
 	DOCS_PATH,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	INSTALL_COMMAND,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 	STAR_REPOS,
@@ -15,15 +13,14 @@ import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
 import { headOf } from "./head"
 import { switcher } from "./homes"
+import { installWindow, type WindowParts } from "./window"
 
 /** The parts of a home a test replaces to break one rule at a time. */
-export interface HeroParts {
+export interface HeroParts extends WindowParts {
 	/** The whole inner markup of the hero's `<h1>`, so a test can drop a phrase the headline cycles. */
 	readonly headline?: string
 	readonly subline?: string
 	readonly disclaimer?: string
-	readonly command?: string
-	readonly button?: string
 	readonly extra?: string
 }
 
@@ -36,7 +33,7 @@ function headlines(language: Language): readonly string[] {
 /** The Star menu's panel, one link per repository in star order. */
 const starPanel = STAR_REPOS.map((repo) => `<a href="${repo.url}">${repo.name}</a>`).join("")
 
-/** One Language's home as the build must produce it, with every region and the copy command. */
+/** One Language's home as the build must produce it, with every region and the prompt window. */
 export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 	const dictionary = languageEntry(language).dictionary
 	const headline =
@@ -44,10 +41,6 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		headlines(language)
 			.map((phrase) => `<span>${phrase}</span>`)
 			.join("")
-	const command = parts.command ?? `<code data-install-command>${INSTALL_COMMAND}</code>`
-	const button =
-		parts.button ??
-		`<button type="button" data-copied="${dictionary.copied}" data-copy-failed="${dictionary.copyFailed}">${dictionary.copy}</button>`
 	const content = [
 		`<html lang="${language}"><head>${headOf(language)}</head>`,
 		"<body>",
@@ -59,9 +52,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		'<main class="bg-muted text-foreground">',
 		`<h1>${headline}</h1>`,
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
-		`<div>${command}${button}</div>`,
-		`<ol><li>${dictionary.stepLabels.join("</li><li>")}</li></ol>`,
-		`<a href="${DOCS_CLI_INSTALL_PATH}">${dictionary.cliInstallLink}</a>`,
+		installWindow(dictionary, parts),
 		'<p role="status"></p>',
 		"<section>",
 		`<h2>${dictionary.actionHeading}</h2>`,

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import * as site from "./site"
 import {
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
@@ -8,7 +9,8 @@ import {
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	INSTALL_COMMAND,
+	INSTALL_PROMPT,
+	ONBOARDING_SKILL_URL,
 	RELEASE_DATE,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
@@ -16,12 +18,27 @@ import {
 } from "./site"
 
 describe("the Site's own constants", () => {
-	it("shows the issued unpinned install command, the fixture no edit may change silently", () => {
-		expect(INSTALL_COMMAND).toBe("npx skills add trajectonomics/skills --skill traj-onboarding")
+	it("shows the prompt the owner approved, the fixture no edit may change silently", () => {
+		expect(INSTALL_PROMPT).toBe(
+			"Set up traj: read https://raw.githubusercontent.com/trajectonomics/skills/main/skills/traj-onboarding/SKILL.md and follow it.",
+		)
 	})
 
-	it("never names the unscoped npx traj package, which belongs to someone else", () => {
-		expect(INSTALL_COMMAND).not.toContain("npx traj")
+	it("names the skills repository's raw path to the Onboarding skill on its default branch", () => {
+		expect(ONBOARDING_SKILL_URL).toBe(
+			"https://raw.githubusercontent.com/trajectonomics/skills/main/skills/traj-onboarding/SKILL.md",
+		)
+		expect(INSTALL_PROMPT).toContain(ONBOARDING_SKILL_URL)
+	})
+
+	it("prints no command, so the window asks for no terminal the Site cannot prove", () => {
+		expect(INSTALL_PROMPT.startsWith("Set up traj: read ")).toBe(true)
+		expect(INSTALL_PROMPT.endsWith(" and follow it.")).toBe(true)
+		expect(INSTALL_PROMPT).not.toContain("npx")
+	})
+
+	it("retires the install command constant, because the window prints no command", () => {
+		expect(Object.hasOwn(site, "INSTALL_COMMAND")).toBe(false)
 	})
 
 	it("names the Site trajectonomics, the brand lockup's accessible name", () => {
@@ -48,7 +65,7 @@ describe("the Site's own constants", () => {
 		expect(RELEASE_DATE).toBe("2026-11-12")
 	})
 
-	it("pinpoints the CLI installation page, the way out under the command", () => {
+	it("pinpoints the CLI installation page, the way out under the prompt", () => {
 		expect(DOCS_CLI_INSTALL_PATH).toBe("/docs/cli/installation/")
 	})
 

@@ -19,12 +19,12 @@ function messageFailures(
 	return [buildFailure("COPY_MESSAGES_MISSING", path, `the Copy button carries no ${names}.`)]
 }
 
-/** The Copy button sits beside the command, shows its label, and carries both messages. */
+/** The Copy button sits under the prompt, shows its label, and carries both messages. */
 export function copyFailures(
 	path: string,
 	page: ScannedPage,
 	dictionary: Dictionary,
-	command: HtmlElement,
+	prompt: HtmlElement,
 ): readonly BuildFailure[] {
 	const button = elementsByTag(page, "button")[0]
 	if (button === undefined) {
@@ -40,12 +40,12 @@ export function copyFailures(
 			),
 		)
 	}
-	if (button.ancestors.at(-1) !== command.ancestors.at(-1)) {
+	if (button.ancestors.at(-1) !== prompt.ancestors.at(-1)) {
 		failures.push(
 			buildFailure(
 				"COPY_BUTTON_NOT_SIBLING",
 				path,
-				"the Copy button is not a sibling of the command, so it wraps it or sits elsewhere.",
+				"the Copy button is not a sibling of the prompt, so it wraps it or sits elsewhere.",
 			),
 		)
 	}
