@@ -104,3 +104,13 @@ select. The trigger draws a star in place of the GitHub mark and keeps the repos
 accessible name stays `GitHub stars: <repository>`; the panel has no current value, so the check on its first
 row goes with the select framing. The rows are equal links out and nothing in them is selected. The repository
 names `cli` and `skills` stay as site#37 left them, and the star is drawn at 12 px like the icons beside it.
+
+## Amendment (2026-11-17, owner): the window prints a prompt
+
+Two lines of the restyle describe a window that no longer exists. The "Pictures replace prose" bullet ends
+"Under the install command, a three-step strip (terminal → `?` → `✓` with a 12 px mono label each) replaces the
+instruction paragraph", and the "Copy feedback" bullet names `Command copied` as the toast. The strip is gone with
+the command it described, and the toast now reports the prompt. Everything else in this record stands: the flat
+surfaces, the hairlines, the mono meta layer, the one accent, the bevel, the panels, the twelve-pixel meta type
+and the toast's shape, timing and countdown line are untouched, and the prompt's row and its Copy control are
+built from them. [ADR 0015](./0015-the-window-prints-a-prompt-and-no-command.md) records why the command left.

@@ -115,14 +115,14 @@ and [ADR 0008](../adr/0008-landmark-surface-roles.md).
 | Button | Filled/outlined with a 16 px bottom-right bevel under `@supports (corner-shape: bevel)`, plain 4 px otherwise | `ui/Button.astro`, `src/styles/primitives.css` |
 | Accent | `accent` orange: pill marker, headline suffix, toast check | roles only |
 | Hero | A 28 px hairline pill (`v0.1.0` · hairline · `MIT · open source`), the display headline, the sub-line, the terminal window | `Hero.astro` |
-| Command | Window with bevel Copy button, a three-step strip (terminal → `?` → `✓`, 12 px mono labels), one quiet row under the strip linking the CLI installation page ([ADR 0009](../adr/0009-the-site-prints-one-command.md)), and the floating 236 px toast with a 2 px countdown line | `CopyCommand.astro`, `src/styles/command.css` |
+| Command | Window with the prompt in its mono face, a full-width bevel Copy button under it that turns to `accent` and reads `Copied` for the toast's six seconds, one quiet row under them linking the CLI installation page, and the floating 236 px toast with a 2 px countdown line ([ADR 0015](../adr/0015-the-window-prints-a-prompt-and-no-command.md), which retired the command and the three-step strip) | `CopyCommand.astro`, `src/styles/command.css` |
 | Section | The `h2` stays `Two parts, one command`; two 232 px wireframe tiles joined by a 56 px `traj calc` connector; the two links under the diagram | `TwoParts.astro`, `src/styles/diagram.css`, `src/styles/wireframe.css` |
 | Footer | `stage`/`stage-foreground`, dark in both Themes; the release line and its date moved here from the hero | `Footer.astro` |
 | Star data | Committed `src/lib/site/stars.json` (`asOf` + count per repository), written by `bun run stars:update`; sorted desc, zero absent, no number when all are zero | `scripts/stars.ts`, `src/lib/site/stars.ts` |
 
 Copy added in this pass, in both Dictionaries: `heroVersion` (`v0.1.0`), `heroLicence` (`MIT · open source`),
 `starMenuGroupLabel`, `starMenuAllRepos`, `agentCardTitle`/`agentCardCopy` (five words), `cliCardCopy`,
-`diagramConnector`, three `stepLabels`, and `copied` becomes `Command copied`. `heroRelease`/`heroReleaseDate`
+`diagramConnector`, three `stepLabels` (retired on 2026-11-17 with the strip), and `copied` becomes `Command copied` (now `Prompt copied`). `heroRelease`/`heroReleaseDate`
 became the footer's `releaseLine`/`releaseDate`; `nextStep`, `twoPartFootnote` and the Skills card copy left with
 the paragraphs they belonged to. `src/lib/site.ts` keeps the install command, the diagram's `$ traj plan` fixture
 and its `14,280.00` figure, because those are product facts, not Language.

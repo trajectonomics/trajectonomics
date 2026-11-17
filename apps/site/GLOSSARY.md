@@ -17,7 +17,7 @@ A package of instructions a coding agent follows, installed into that agent rath
 _Avoid_: Plugin, extension, package
 
 **Onboarding skill**:
-The Skill `traj-onboarding`, the one the Site's install command installs: it asks about the visitor's money, sets up the traj CLI, and starts them off.
+The Skill `traj-onboarding`, the one the Site's prompt route hands to a visitor's agent: it asks about the visitor's money, sets up the traj CLI, installs the operating skill, and starts them off.
 _Avoid_: Setup skill, getting-started skill
 
 **Presentation layer**:
@@ -33,8 +33,12 @@ The `traj` command-line program (`@trajectonomics/cli`) that does the arithmetic
 _Avoid_: Binary, tool, executable
 
 **Install path**:
-One way a visitor gets traj onto their machine: the Site's one command, which installs the Onboarding skill into a coding agent, or the Docs Portal's CLI installation page, which lists the CLI's install channels. The Site prints the one command and names the Docs Portal for the other.
+One way a visitor gets traj onto their machine: the Site's Prompt route, which hands the Onboarding skill to the visitor's agent, or the Docs Portal's CLI installation page, which lists the CLI's install channels. The Site prints no command; it prints the prompt and names the Docs Portal for the other.
 _Avoid_: Install method, installer, setup path
+
+**Prompt route**:
+The install window's one action: a single sentence, copied into a coding agent, that names the published Onboarding skill by its raw URL rather than quoting a command, so the commands stay in the Skill that owns and versions them. It serves the visitor who has no terminal but whose agent does ([ADR 0015](docs/adr/0015-the-window-prints-a-prompt-and-no-command.md)).
+_Avoid_: Prompt command, paste command, copy command
 
 **Stable release**:
 A release the owner names as no longer alpha. The first is `v0.1.0`, for both the CLI and the Onboarding skill, announced on the Site with its date.

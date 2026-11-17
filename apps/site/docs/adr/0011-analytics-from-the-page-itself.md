@@ -33,3 +33,11 @@ Two rules in this repository shape how that can be done. [ADR 0005](./0005-page-
 - The home's program JavaScript is 8,240 bytes of the 10,000 budget, 1,503 of them this module. The remaining headroom is about 1,760 bytes, so the next script on the home needs to earn its place.
 - A visitor with JavaScript off is not measured at all, and neither is one on the staging host. Both are absences of evidence, not zero visitors.
 - Reading the numbers needs a PostHog credential, which only the owner holds. A Factory pass reads them through the PostHog MCP server, not through this repository.
+
+## Amendment (2026-11-17): the copy it measures is a prompt
+
+The window copies a prompt now, not a command ([ADR 0015](./0015-the-window-prints-a-prompt-and-no-command.md)).
+The two events are unchanged on the wire: the DOM signal, `site_command_copied` and its `command: "install"`
+detail keep their names and their values, because they are measured history and the value was always chosen to
+be stable "never by its text, which changes every release" — which is exactly why it survives the text changing.
+Only the code and comments around them say prompt.
