@@ -79,6 +79,16 @@ const paints = themePaints(tokens)
 		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
 		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
 		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+		{/*
+			One pageview and the Copy event, posted from the page itself: the Site loads no third-party
+			script, so no library arrives with it ([ADR 0005], [ADR 0011]). The script decides for itself
+			whether the host and the visitor's opt-out signals allow it.
+		*/}
+		<script>
+			import { startAnalytics } from "../lib/analytics/client"
+
+			startAnalytics()
+		</script>
 	</head>
 	<body class="flex min-h-dvh flex-col bg-background text-foreground">
 		<Header language={language} dictionary={dictionary} markCurrent={indexed} />

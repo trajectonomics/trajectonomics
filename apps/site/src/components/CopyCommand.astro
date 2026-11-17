@@ -120,6 +120,11 @@ const STEPS = [Terminal, Question, Check] as const
 			try {
 				await navigator.clipboard.writeText(text)
 				notify(button.dataset.copied ?? "", false)
+				// The command reached the clipboard: say so once, so the page can count the copy. The
+				// name is stable because the command text changes with every release.
+				window.dispatchEvent(
+					new CustomEvent("traj:site-command-copied", { detail: { command: "install" } }),
+				)
 			} catch {
 				const range = document.createRange()
 				range.selectNodeContents(command)
