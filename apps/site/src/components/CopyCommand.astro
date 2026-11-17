@@ -2,7 +2,7 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the icons, the button and the props it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
-import { INSTALL_COMMAND } from "../lib/site"
+import { DOCS_CLI_INSTALL_PATH, INSTALL_COMMAND } from "../lib/site"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
 import Question from "./icons/Question.astro"
@@ -59,6 +59,9 @@ const STEPS = [Terminal, Question, Check] as const
 				))
 			}
 		</ol>
+		<a class="window-exit" href={DOCS_CLI_INSTALL_PATH}>
+			{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
+		</a>
 	</Card>
 	<div
 		data-copy-toast

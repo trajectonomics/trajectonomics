@@ -33,6 +33,7 @@ export const THAI: LanguageEntry = Object.freeze({
 			"3 รันสกิล onboarding",
 		] as const),
 		cliDocsLink: "อ่านเอกสาร CLI",
+		cliInstallLink: "ติดตั้ง CLI โดยตรง",
 		copy: "คัดลอก",
 		copied: "คัดลอกคำสั่งแล้ว",
 		copyFailed: "เลือกคำสั่งแล้วคัดลอก",

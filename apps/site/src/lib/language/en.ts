@@ -37,6 +37,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 			"3 Run the onboarding skill",
 		] as const),
 		cliDocsLink: "Read the CLI docs",
+		cliInstallLink: "Install the CLI directly",
 		copy: "Copy",
 		copied: "Command copied",
 		copyFailed: "Select the command and copy it.",

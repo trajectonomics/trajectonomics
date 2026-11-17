@@ -25,6 +25,12 @@ export const DOCS_PATH = "/docs/"
 /** The Docs Portal's CLI page, the CLI docs link under the diagram. */
 export const DOCS_CLI_PATH = "/docs/cli/"
 
+/**
+ * The Docs Portal's CLI installation page: every install channel, release pinning and uninstall. It is the
+ * way out under the install command, for the visitor the skills CLI cannot reach (ADR 0009).
+ */
+export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
+
 /** The CLI's v0.1.0 release date, the machine-readable date the footer's release line names. */
 export const RELEASE_DATE = "2026-11-12"
 

@@ -39,6 +39,8 @@ export interface Dictionary {
 	/** The three steps under the command, in order: run it, answer the setup, it is ready. */
 	readonly stepLabels: readonly string[]
 	readonly cliDocsLink: string
+	/** The way out under the command: the Docs Portal's CLI installation page, which needs no skills CLI. */
+	readonly cliInstallLink: string
 	readonly copy: string
 	readonly copied: string
 	readonly copyFailed: string

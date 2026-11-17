@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { isInlineScript, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { INSTALL_COMMAND } from "../lib/site"
+import { DOCS_CLI_INSTALL_PATH, INSTALL_COMMAND } from "../lib/site"
 import CopyCommand from "./CopyCommand.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -61,6 +61,38 @@ describe("the CopyCommand component in every Language", () => {
 			if (status === undefined) throw new Error("no copy status rendered")
 			expect(status.ancestors.includes(toast)).toBe(true)
 			expect(countdown?.attributes["aria-hidden"]).toBe("true")
+		})
+
+		it(`shows the way out of the command, one link under the steps (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const exits = withClass(page, "window-exit")
+			expect(exits).toHaveLength(1)
+			const exit = exits[0]
+			if (exit === undefined) throw new Error("no way out rendered")
+			expect(exit.tag).toBe("a")
+			expect(exit.attributes["href"]).toBe(DOCS_CLI_INSTALL_PATH)
+			expect(textOf(page, exit)).toBe(dictionary.cliInstallLink)
+		})
+
+		it(`puts the way out directly under the three-step strip (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const steps = withClass(page, "window-steps")[0]
+			const exit = withClass(page, "window-exit")[0]
+			if (steps === undefined) throw new Error("no three-step strip rendered")
+			if (exit === undefined) throw new Error("no way out rendered")
+			const deepest = page.elements.filter((element) => element.ancestors.includes(steps)).at(-1)
+			expect(page.elements.indexOf(exit)).toBeGreaterThan(page.elements.indexOf(deepest ?? steps))
+			expect(exit.ancestors.at(-1)).toBe(steps.ancestors.at(-1))
+		})
+
+		it(`draws the way out with the arrow as decoration (${language})`, async () => {
+			const page = scanComponent(await renderComponent(CopyCommand, { dictionary }))
+			const exit = withClass(page, "window-exit")[0]
+			if (exit === undefined) throw new Error("no way out rendered")
+			const arrow = page.elements.find(
+				(element) => element.tag === "svg" && element.ancestors.includes(exit),
+			)
+			expect(arrow?.attributes["aria-hidden"]).toBe("true")
 		})
 
 		it(`carries its inline script and no heading (${language})`, async () => {

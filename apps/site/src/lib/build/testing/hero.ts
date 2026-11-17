@@ -1,6 +1,7 @@
 import type { Language } from "../../language/language"
 import { LANGUAGES, languageEntry, localeUrl } from "../../language/languages"
 import {
+	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
 	DOCS_PATH,
 	GITHUB_ORG_URL,
@@ -59,6 +60,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
 		`<div>${command}${button}</div>`,
 		`<ol><li>${dictionary.stepLabels.join("</li><li>")}</li></ol>`,
+		`<a href="${DOCS_CLI_INSTALL_PATH}">${dictionary.cliInstallLink}</a>`,
 		'<p role="status"></p>',
 		"<section>",
 		`<h2>${dictionary.twoPartHeading}</h2>`,

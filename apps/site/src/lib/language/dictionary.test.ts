@@ -136,6 +136,11 @@ describe("the Dictionary of every Language", () => {
 		])
 	})
 
+	it("writes the owner's way out under the command, in both Languages", () => {
+		expect(dictionaryFor("en").cliInstallLink).toBe("Install the CLI directly")
+		expect(dictionaryFor("th").cliInstallLink).toBe("ติดตั้ง CLI โดยตรง")
+	})
+
 	it("names each Language in its own words, and the short label of the reading one", () => {
 		expect(dictionaryFor("en").languageName).toBe("English")
 		expect(dictionaryFor("th").languageName).toBe("ไทย")

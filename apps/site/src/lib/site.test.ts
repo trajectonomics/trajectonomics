@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import {
+	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
@@ -42,5 +43,9 @@ describe("the Site's own constants", () => {
 	it("names the CLI's docs page and the release date the footer announces", () => {
 		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
 		expect(RELEASE_DATE).toBe("2026-11-12")
+	})
+
+	it("pinpoints the CLI installation page, the way out under the command", () => {
+		expect(DOCS_CLI_INSTALL_PATH).toBe("/docs/cli/installation/")
 	})
 })
