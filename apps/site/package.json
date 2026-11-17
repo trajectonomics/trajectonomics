@@ -14,11 +14,11 @@
 		"node": ">=22.23.4"
 	},
 	"scripts": {
-		"predev": "bun scripts/copy-fonts.ts",
+		"predev": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
 		"dev": "astro dev",
-		"prebuild": "bun scripts/copy-fonts.ts",
+		"prebuild": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
 		"build": "astro build",
-		"prebuild:preview": "bun scripts/copy-fonts.ts",
+		"prebuild:preview": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
 		"build:preview": "astro build --mode preview",
 		"preview": "bun run build && wrangler dev",
 		"test": "bun test ./src ./scripts",

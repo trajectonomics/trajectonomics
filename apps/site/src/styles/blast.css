@@ -1,0 +1,59 @@
+/* The hero's pixel blast ground (ADR 0010): the baked field, its shape, and its colour. */
+
+/*
+ * The hero's ground is a pixel blast (ADR 0010): a one-bit field of 4 px squares, ordered-dithered
+ * from fbm noise and baked into the tile the build writes to `public/hero/`. The same field as a
+ * shader needs three.js and postprocessing, far past the Site's 10,000-byte script budget, so the
+ * field is printed once and only its colour, its shape and its drift are live.
+ */
+.hero-blast {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(
+		to bottom,
+		transparent 0%,
+		var(--ds-color-foreground) 12%,
+		var(--ds-color-foreground) 74%,
+		transparent 100%
+	);
+	mask-image: linear-gradient(
+		to bottom,
+		transparent 0%,
+		var(--ds-color-foreground) 12%,
+		var(--ds-color-foreground) 74%,
+		transparent 100%
+	);
+}
+
+/* The field thins towards the sides and the bottom, so the squares never reach the page's corners. */
+.hero-blast-field {
+	position: absolute;
+	inset: 0;
+	-webkit-mask-image: radial-gradient(
+		76% 62% at 50% 30%,
+		var(--ds-color-foreground) 0%,
+		transparent 88%
+	);
+	mask-image: radial-gradient(76% 62% at 50% 30%, var(--ds-color-foreground) 0%, transparent 88%);
+}
+
+/* The squares themselves: the baked tile, repeated, painted the Theme's accent role. */
+.hero-blast-pixels {
+	position: absolute;
+	inset: -6%;
+	background: var(--ds-color-accent);
+	opacity: 0.3;
+	-webkit-mask-image: url("/hero/pixel-blast.png");
+	mask-image: url("/hero/pixel-blast.png");
+	-webkit-mask-size: 1020px 1020px;
+	mask-size: 1020px 1020px;
+	-webkit-mask-repeat: repeat;
+	mask-repeat: repeat;
+	will-change: transform;
+}
+
+[data-theme="dark"] .hero-blast-pixels {
+	opacity: 0.34;
+}

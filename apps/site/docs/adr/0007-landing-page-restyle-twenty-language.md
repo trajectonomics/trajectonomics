@@ -13,7 +13,9 @@ settled in a grilling session against the live site, measured in Chromium rather
 ## Decision
 
 - **Ground.** `main` paints `muted` (`#f5f5f5` / `#262626`); there is no hero band and no static radial glow.
-  The pointer-follow light stays: it is the one JavaScript motion, and it moves with `transform` only.
+  The pointer-follow light stays: it is the one JavaScript motion, and it moves with `transform` only. The hero's
+  band and its baked pixel-blast field replace this paragraph, in
+  [ADR 0010](./0010-the-hero-carries-a-pixel-blast-field.md).
 - **Header.** 64 px, `background` with a hairline. The mark sits on a 40 px tile (32 px under 640 px) painted
   `primary`/`primary-foreground`, so it reads as a control rather than an image. The nav is Azeret Mono's
   place — 11 px mono uppercase with hair separators: `Docs │ ★ cli ⌄ │ EN ⌄`.

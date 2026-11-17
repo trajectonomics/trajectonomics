@@ -13,6 +13,7 @@
 /* The Brand Typeface's @font-face rules, whose files `scripts/copy-fonts.ts` puts in public/fonts/. */
 @import "./fonts.css";
 @import "./primitives.css";
+@import "./blast.css";
 @import "./landing.css";
 @import "./diagram.css";
 @import "./wireframe.css";

@@ -33,6 +33,23 @@
 }
 
 /*
+ * The field drifts, slowly: the squares move as one layer, transform only, so the fade at the hero's
+ * edges stays exactly where the seam needs it.
+ */
+.hero-blast-pixels {
+	animation: hero-blast-drift 32s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes hero-blast-drift {
+	from {
+		transform: translate3d(-1.5%, -1%, 0);
+	}
+	to {
+		transform: translate3d(2%, 1.5%, 0);
+	}
+}
+
+/*
  * The command's wrapper fades in without moving. A transform on it would make it the containing block
  * of the fixed copy toast inside it, so the toast would land against the wrapper, not the viewport.
  */

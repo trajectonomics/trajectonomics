@@ -15,10 +15,15 @@ const { dictionary } = Astro.props
 const subline = sublineParts(dictionary.heroSubline)
 ---
 
-<section data-hero class="relative overflow-clip">
+<section data-hero class="hero-stage relative isolate flex flex-col overflow-clip bg-background">
+	<div class="hero-blast" aria-hidden="true">
+		<div class="hero-blast-field">
+			<div class="hero-blast-pixels"></div>
+		</div>
+	</div>
 	<div class="hero-pointer-glow" data-pointer-glow aria-hidden="true"></div>
 	<div
-		class="hero-rise mx-auto flex max-w-6xl flex-col items-center px-5 pt-32 pb-16 text-center sm:px-6 sm:pt-40 sm:pb-24"
+		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 pt-28 pb-24 text-center sm:px-6 sm:pt-32 sm:pb-28"
 	>
 		<Badge class="hero-pill">
 			<span class="hero-pill-marker" aria-hidden="true"></span>
@@ -99,11 +104,11 @@ const subline = sublineParts(dictionary.heroSubline)
 				const box = hero.getBoundingClientRect()
 				tx = event.clientX - box.left
 				ty = event.clientY - box.top
-				glow.style.opacity = "1"
+				glow.dataset.glow = "on"
 				if (raf === null) raf = requestAnimationFrame(tick)
 			})
 			hero.addEventListener("pointerleave", () => {
-				glow.style.opacity = "0"
+				delete glow.dataset.glow
 			})
 		}
 	})()
