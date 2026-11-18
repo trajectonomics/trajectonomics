@@ -44,12 +44,28 @@ _Avoid_: Prompt command, paste command, copy command
 A release the owner names as no longer alpha. The first was `v0.1.0`, on 2026-11-12, for both the CLI and the Onboarding skill; from the CLI's `v0.2.0` the Site names the CLI's stable release with its version and date, and the Onboarding skill publishes continuously from `main`, so it carries no version on the Site.
 _Avoid_: GA, production release, 1.0
 
-**Locale URL**:
-A Site URL whose first segment is a Language code, `/th/…` or `/en/…`. It is the only record of which Language a page is.
-_Avoid_: Language prefix, translated URL
+**Language home**:
+The page a Language's build writes. English's home is the Site's one address, `/`; Thai's home is written to its Language build path and reaches a visitor at `/` through the Worker.
+_Avoid_: Language page, variant
+
+**Clean URL**:
+The one address the Site answers, `https://trajectonomics.com/`, with no Language segment. It is what a visitor copies, and what the canonical, the `x-default` alternate, the Sitemap and the Answer engine files name.
+_Avoid_: Bare URL, root URL, landing URL
+
+**Language build path**:
+The path a Language's home is written to in the build: `/` for English, `th/` for Thai. It is not an address: the Worker serves Thai at `/`, and `/th` answers 301.
+_Avoid_: Locale URL, language prefix, translated URL
+
+**Language choice**:
+The Language a visitor picked in the Language menu, readable before any page script runs. It is stored in the first-party cookie `traj_lang`, with `Path=/` so every app under the origin reads the same one, and only an explicit choice writes it.
+_Avoid_: Preference, language setting, locale cookie
+
+**Language choice link**:
+The link `/?lang=<code>` a Language menu entry points at. The Worker answers it by writing the Language choice and replying 302 to `/`, so the menu switches and remembers with JavaScript off.
+_Avoid_: Language switch URL, setter endpoint
 
 **Visitor signal**:
-The `Accept-Language` header, otherwise the `cf-ipcountry` header, read only to choose the redirect from `/`. Not the HTTP `Origin` header.
+The `Accept-Language` header, otherwise the `cf-ipcountry` header, read only to resolve the Language `/` is answered in, after the Language choice. Not the HTTP `Origin` header.
 _Avoid_: Origin, geolocation
 
 **Dictionary**:
@@ -57,11 +73,11 @@ The strings for one Language. Every Language has the same keys.
 _Avoid_: Translation file, messages, catalog
 
 **Worker with Static Assets**:
-The Site's Worker that serves the built files. Its only script is the redirect from `/` to a Locale URL.
+The Site's Worker that serves the built files. Its script answers `/` in the resolved Language, stores the Language choice when a visitor picks one, redirects the old per-Language prefixes to `/`, and hands every other path to the assets binding.
 _Avoid_: Assets Worker, site server, hosting
 
 **Not-found page**:
-The built page served with HTTP status 404 when a path is not in the Site.
+The built page served with HTTP status 404 when a path is not in the Site. There is one, in English: a miss is answered outside every Language build path.
 _Avoid_: soft 404, error page
 
 **Reserved preload path**:
@@ -99,7 +115,7 @@ A built file a crawler reads at the assets root rather than a page: the Sitemap 
 _Avoid_: SEO file, metadata file, static asset
 
 **Sitemap**:
-The Crawler file at `/sitemap.xml`: one `<url>` per Language home, each naming every Language's alternate and `x-default` at the English home. It lists only the Site's homes and speaks for the whole host, so a Docs Portal sitemap later turns it into a sitemap index.
+The Crawler file at `/sitemap.xml`: one `<url>` for the Clean URL, naming `x-default` at that address, which is also what the IndexNow payload submits. It lists only the Site's address and speaks for the whole host, so a Docs Portal sitemap later turns it into a sitemap index.
 _Avoid_: URL list, page index
 
 **Robots file**:
@@ -123,7 +139,7 @@ A stable code naming exactly one rule a built page can break, so one run reports
 _Avoid_: Error message, failure string
 
 **Social card**:
-The Open Graph and X meta a share sheet renders for a page: its title, description, absolute URL, type, site name, the Share image it advertises and the card kind that names the picture (`summary_large_image`).
+The Open Graph and X meta a share sheet renders for a page: its title, description, absolute URL, type, site name, the Share image it advertises, the Language it states as `og:locale` with the other as `og:locale:alternate`, and the card kind that names the picture (`summary_large_image`).
 _Avoid_: Preview card, OG tags
 
 **Share image**:
