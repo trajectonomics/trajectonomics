@@ -1,12 +1,15 @@
 import type { Language } from "../language/language"
 import { absoluteLocaleUrl, dictionaryFor } from "../language/languages"
-import { SITE_NAME, SITE_ORIGIN } from "../site"
+import { SITE_NAME } from "../site"
+import { type SoftwareApplicationNode, softwareApplication } from "./structured-data-application"
+import {
+	ORGANIZATION_ID,
+	type OrganizationNode,
+	organization,
+} from "./structured-data-organization"
 
 /** The vocabulary every block states its keys come from. */
 const CONTEXT = "https://schema.org"
-
-/** The `@id` the Organization is published under, and the WebSite's publisher points at. */
-const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`
 
 /** The WebSite node: the page as a site, at its Locale URL, in its Language. */
 export interface WebSiteNode {
@@ -19,41 +22,34 @@ export interface WebSiteNode {
 	readonly publisher: { readonly "@id": string }
 }
 
-/** The Organization node: who publishes the Site. */
-export interface OrganizationNode {
-	readonly "@type": "Organization"
-	readonly "@id": string
-	readonly name: string
-	readonly url: string
-}
-
-/** One page's Structured data: the WebSite it is, and the Organization that publishes it. */
+/** One page's Structured data: the WebSite it is, the Organization that publishes it and traj. */
 export interface StructuredData {
 	readonly "@context": string
-	readonly "@graph": readonly [WebSiteNode, OrganizationNode]
+	readonly "@graph": readonly [WebSiteNode, OrganizationNode, SoftwareApplicationNode]
 }
 
-/** The one WebSite a Language home is, and the Organization that publishes it. */
+/** One Language home's WebSite: the URL it is, the Language it speaks and who publishes it. */
+function website(language: Language, url: string): WebSiteNode {
+	return Object.freeze({
+		"@type": "WebSite",
+		"@id": `${url}#website`,
+		url,
+		name: SITE_NAME,
+		description: dictionaryFor(language).description,
+		inLanguage: language,
+		publisher: Object.freeze({ "@id": ORGANIZATION_ID }),
+	})
+}
+
+/** The one WebSite a Language home is, the Organization that publishes it, and traj itself. */
 export function structuredData(language: Language): StructuredData {
 	const url = absoluteLocaleUrl(language)
 	return Object.freeze({
 		"@context": CONTEXT,
 		"@graph": Object.freeze([
-			Object.freeze({
-				"@type": "WebSite" as const,
-				"@id": `${url}#website`,
-				url,
-				name: SITE_NAME,
-				description: dictionaryFor(language).description,
-				inLanguage: language,
-				publisher: Object.freeze({ "@id": ORGANIZATION_ID }),
-			}),
-			Object.freeze({
-				"@type": "Organization" as const,
-				"@id": ORGANIZATION_ID,
-				name: SITE_NAME,
-				url: SITE_ORIGIN,
-			}),
+			website(language, url),
+			organization(),
+			softwareApplication(language, url),
 		] as const),
 	})
 }

@@ -6,6 +6,9 @@ public/favicon/
 public/fonts/
 # The hero's pixel field is printed by `scripts/hero-ground.ts` before every build, from a seed.
 public/hero/
+# The Answer engine files are printed by `scripts/llms-txt.ts` before every build, from the dictionaries.
+public/llms.txt
+public/llms-full.txt
 coverage/
 *.tgz
 .scratch/

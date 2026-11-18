@@ -97,8 +97,16 @@ The Crawler file at `/sitemap.xml`: one `<url>` per Language home, each naming e
 _Avoid_: URL list, page index
 
 **Robots file**:
-The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /` and the absolute `Sitemap:` line, with no `Disallow:`. It is read at the host root, so it speaks for `/docs` too, which another repository serves.
+The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` group per named answer engine, and the absolute `Sitemap:` line, with no `Disallow:`. It is read at the host root, so it speaks for `/docs` too, which another repository serves ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: Crawl rules, allowlist
+
+**Answer engine file**:
+A file an answer engine reads instead of the HTML: `/llms.txt`, the Site's name, its one-line summary and its links in the llmstxt.org shape, and `/llms-full.txt`, the landing page's copy in the fallback Language rendered as Markdown. Both are generated from the Dictionary before every build and judged by a built-file check; neither is committed ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+_Avoid_: llm file, AI sitemap, RAG index
+
+**IndexNow key**:
+The 32-hex string committed as `public/<key>.txt` and served at the Site's root, which names the host to IndexNow and signs nothing, so it is public by design. `bun run indexnow` fetches it from the live Site before it submits the Sitemap's URLs, and no workflow runs that command ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+_Avoid_: API key, index token
 
 **Pure Core**:
 A module that takes data in and returns data out, with no clock, randomness, network or filesystem access. The built-file checks in `src/lib/build/`, the Crawler files' generators in `src/lib/crawl/` and the probe check in `src/lib/probe/` are Pure Cores; `scripts/` holds the adapters that read the build and start the Worker.
@@ -113,7 +121,7 @@ The Open Graph and X meta a share sheet renders for a page: its title, descripti
 _Avoid_: Preview card, OG tags
 
 **Structured data**:
-The JSON-LD block a page carries, naming the `WebSite` and the `Organization` that publishes it. It is data, so it is outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
+The JSON-LD block a page carries, naming the `WebSite`, the `Organization` that publishes it with its `logo` and `sameAs`, and `traj` as a free `SoftwareApplication`. It states only what the page or the repository states, and never a rating, so it is data and outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md), [ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: Schema, schema.org markup, metadata blob
 
 **Page weight budget**:

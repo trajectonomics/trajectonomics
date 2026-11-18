@@ -8,10 +8,12 @@ import { checkExternalAssets } from "./external-assets"
 import type { BuildFailure } from "./failures"
 import { checkFonts } from "./fonts"
 import { checkHreflang } from "./hreflang"
+import { checkIndexNowKey } from "./indexnow-key"
 import { checkInstallWindow } from "./install-window"
 import { checkLandmarkColours } from "./landmark-colours"
 import { checkLandmarks } from "./landmarks"
 import { checkLanguageHomes } from "./language-home"
+import { checkLlmsFiles } from "./llms"
 import { type BuildMode, DEFAULT_BUILD_MODE } from "./mode"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { checkNotFoundPages } from "./not-found-pages"
@@ -28,6 +30,7 @@ import { checkSitemap } from "./sitemap"
 import { checkSocialCard } from "./social-card"
 import { checkStructure } from "./structure"
 import { checkStructuredData } from "./structured-data"
+import { checkStructuredDataClaims } from "./structured-data-claims"
 import { checkSwitcher } from "./switcher"
 import { checkThaiTextLanguage } from "./thai-text"
 import { checkTheme } from "./theme"
@@ -47,10 +50,13 @@ const FILE_RULES = [
 	checkHreflang,
 	checkSitemap,
 	checkRobots,
+	checkLlmsFiles,
+	checkIndexNowKey,
 	checkDocumentTitle,
 	checkDescription,
 	checkSocialCard,
 	checkStructuredData,
+	checkStructuredDataClaims,
 	checkSwitcher,
 	checkNoLanguageDetection,
 	checkNotFoundPages,

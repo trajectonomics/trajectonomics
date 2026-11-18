@@ -85,6 +85,14 @@ export type BuildFailureCode =
 	| "ROBOTS_DISALLOW_PRESENT"
 	| "ROBOTS_SITEMAP_MISSING"
 	| "ROBOTS_SITEMAP_TARGET"
+	| "ROBOTS_NAMED_AGENT_MISSING"
+	| "ROBOTS_NAMED_ALLOW_MISSING"
+	| "JSON_LD_CLAIM_PRESENT"
+	| "LLMS_FILE_MISSING"
+	| "LLMS_PLACEHOLDER_PRESENT"
+	| "LLMS_HOME_MISSING"
+	| "INDEXNOW_KEY_FILE_MISSING"
+	| "INDEXNOW_KEY_FILE_WRONG"
 
 /** One failed build check: the rule's code, the file it concerns and a line a maintainer can act on. */
 export interface BuildFailure {

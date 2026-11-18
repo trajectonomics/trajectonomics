@@ -14,11 +14,11 @@
 		"node": ">=22.23.4"
 	},
 	"scripts": {
-		"predev": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
+		"predev": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts",
 		"dev": "astro dev",
-		"prebuild": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
+		"prebuild": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts",
 		"build": "astro build",
-		"prebuild:preview": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts",
+		"prebuild:preview": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts",
 		"build:preview": "astro build --mode preview",
 		"preview": "bun run build && wrangler dev",
 		"test": "bun test ./src ./scripts",
@@ -33,6 +33,7 @@
 		"verify:build": "bun test ./test/dist",
 		"probe:status": "bun scripts/probe-status.ts",
 		"stars:update": "bun scripts/stars.ts",
+		"indexnow": "bun scripts/indexnow.ts",
 		"skills:check": "bunx skills@latest check",
 		"skills:update": "bunx skills@latest update"
 	},

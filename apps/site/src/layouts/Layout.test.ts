@@ -119,5 +119,11 @@ describe("the Layout every page renders", () => {
 			expect(metas(rendered.page).filter((meta) => meta.attributes["property"])).toEqual([])
 			expect(blocks(rendered.html)).toEqual([])
 		})
+
+		it(`does not claim a search engine's verification while the owner supplies no token (${language})`, async () => {
+			const rendered = await home(language)
+			expect(metaNames(rendered.page)).not.toContain("google-site-verification")
+			expect(metaNames(rendered.page)).not.toContain("msvalidate.01")
+		})
 	}
 })

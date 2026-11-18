@@ -13,8 +13,14 @@ import { themeScript } from "../lib/design/theme-script"
 import { parseDesignTokens } from "../lib/design/tokens"
 import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
 import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../lib/language/languages"
-import { SITE_NAME } from "../lib/site"
+import {
+	APPLE_TOUCH_ICON_PATH,
+	BING_SITE_VERIFICATION_TOKEN,
+	GOOGLE_SITE_VERIFICATION_TOKEN,
+	SITE_NAME,
+} from "../lib/site"
 import { structuredDataJson } from "../lib/site/structured-data"
+import { verificationMetas } from "../lib/site/verification"
 
 interface Props {
 	readonly language: Language
@@ -36,6 +42,12 @@ const mode = buildMode(import.meta.env.MODE)
 const themes = shippedThemes(mode)
 const paints = themePaints(tokens, themes)
 const script = themeScript(themes)
+// The owner supplies a search engine's verification token later; no token means no meta at all, and
+// a token this repository invented would verify nothing.
+const verification = verificationMetas({
+	google: GOOGLE_SITE_VERIFICATION_TOKEN,
+	bing: BING_SITE_VERIFICATION_TOKEN,
+})
 ---
 
 <html lang={language} data-theme={fallbackTheme(mode)}>
@@ -69,6 +81,9 @@ const script = themeScript(themes)
 					<meta property="og:site_name" content={SITE_NAME} />
 					{/* No share image ships yet, so `summary` is the card kind the page can honour. */}
 					<meta name="twitter:card" content="summary" />
+					{verification.map((meta) => (
+						<meta name={meta.name} content={meta.content} />
+					))}
 					{/* Data, not a program: ADR 0005 keeps JSON-LD outside the Program JavaScript budget. */}
 					<script type="application/ld+json" set:html={structuredDataJson(language)} />
 				</>
@@ -78,7 +93,7 @@ const script = themeScript(themes)
 		}
 		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
 		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
-		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" href={APPLE_TOUCH_ICON_PATH} />
 		{/*
 			One pageview and the Copy event, posted from the page itself: the Site loads no third-party
 			script, so no library arrives with it ([ADR 0005], [ADR 0011]). The script decides for itself

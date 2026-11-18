@@ -1,8 +1,10 @@
 import { describe, expect, it } from "bun:test"
 import { absoluteLocaleUrl } from "../language/languages"
+import { structuredData, structuredDataJson } from "../site/structured-data"
 import type { BuiltFile } from "./built-files"
 import { checkStructuredData } from "./structured-data"
-import { codes, edited, entryAt } from "./testing/homes"
+import { checkStructuredDataClaims } from "./structured-data-claims"
+import { codes, edited, entryAt, homes } from "./testing/homes"
 
 const HOME = entryAt(0).language
 const OTHER = entryAt(1).language
@@ -15,13 +17,18 @@ function conditions(files: readonly BuiltFile[]): readonly string[] {
 	return [...new Set(checkStructuredData(files).map((failure) => failure.code))]
 }
 
-/** A block naming the WebSite at `url`, as a page that got it wrong writes it. */
-function blockAt(url: string): string {
-	return `<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"${url}#website","url":"${url}","name":"trajectonomics","description":"a page","inLanguage":"en","publisher":{"@id":"https://trajectonomics.com/#organization"}},{"@type":"Organization","@id":"https://trajectonomics.com/#organization","name":"trajectonomics","url":"https://trajectonomics.com"}]}</script>`
+/** The claim codes a build reports, distinct, as the claims rule reports them. */
+function claimConditions(files: readonly BuiltFile[]): readonly string[] {
+	return [...new Set(checkStructuredDataClaims(files).map((failure) => failure.code))]
+}
+
+/** The block of one Language's home as a page writes it. */
+function blockOf(language: string): string {
+	return `<script type="application/ld+json">${structuredDataJson(language)}</script>`
 }
 
 describe("the Structured data of a Language home", () => {
-	it("passes a home whose one block names the WebSite and its publisher", () => {
+	it("passes a home whose one block names the WebSite, its publisher and traj", () => {
 		expect(codes(checkStructuredData)).toEqual([])
 	})
 
@@ -42,9 +49,7 @@ describe("the Structured data of a Language home", () => {
 	})
 
 	it("fails a home whose block points at the other Language's URL", () => {
-		expect(conditions([edited(HOME, BLOCK, blockAt(absoluteLocaleUrl(OTHER)))])).toEqual([
-			"JSON_LD_WRONG",
-		])
+		expect(conditions([edited(HOME, BLOCK, blockOf(OTHER))])).toEqual(["JSON_LD_WRONG"])
 	})
 
 	it("fails a block that names no publisher, so nothing attributes the page", () => {
@@ -52,19 +57,45 @@ describe("the Structured data of a Language home", () => {
 		expect(conditions([edited(HOME, BLOCK, noPublisher)])).toEqual(["JSON_LD_WRONG"])
 	})
 
-	it("fails a block that claims a property the page must not state, such as a logo", () => {
-		const withLogo = blockAt(absoluteLocaleUrl(HOME)).replace(
-			'"name":"trajectonomics","url"',
-			'"name":"trajectonomics","logo":"https://trajectonomics.com/logo.png","url"',
-		)
-		expect(conditions([edited(HOME, BLOCK, withLogo)])).toEqual(["JSON_LD_WRONG"])
+	it("fails a block that leaves traj out, so a crawler cannot name the program", () => {
+		const block = structuredData(HOME)
+		const [website, organization] = block["@graph"]
+		const withoutTraj = `<script type="application/ld+json">${JSON.stringify({
+			"@context": block["@context"],
+			"@graph": [website, organization],
+		})}</script>`
+		expect(conditions([edited(HOME, BLOCK, withoutTraj)])).toEqual(["JSON_LD_WRONG"])
 	})
 
 	it("names the property that differs, what the build wrote and what the page must state", () => {
-		const [failure] = checkStructuredData([edited(HOME, BLOCK, blockAt(absoluteLocaleUrl(OTHER)))])
+		const [failure] = checkStructuredData([edited(HOME, BLOCK, blockOf(OTHER))])
 		expect(failure?.message).toContain("@graph.0.")
 		expect(failure?.message).toContain(absoluteLocaleUrl(OTHER))
 		expect(failure?.message).toContain(absoluteLocaleUrl(HOME))
 		expect(failure?.path).toBe(`/${HOME}/`)
+	})
+})
+
+describe("the claims a home's Structured data may state", () => {
+	it("passes a home whose block claims no rating and no review", () => {
+		expect(claimConditions(homes())).toEqual([])
+	})
+
+	for (const claim of ["aggregateRating", "reviewRating"]) {
+		it(`fails a block that claims a ${claim}, which no fact on the page supports`, () => {
+			const claimed = blockOf(HOME).replace(
+				'"@type":"SoftwareApplication"',
+				`"${claim}":{"@type":"AggregateRating","ratingValue":"5","reviewCount":"1"},"@type":"SoftwareApplication"`,
+			)
+			expect(claimConditions([edited(HOME, BLOCK, claimed)])).toEqual(["JSON_LD_CLAIM_PRESENT"])
+		})
+	}
+
+	it("fails a block that nests a review inside another node", () => {
+		const claimed = blockOf(HOME).replace(
+			'"sameAs"',
+			'"review":{"@type":"Review","reviewBody":"great"},"sameAs"',
+		)
+		expect(claimConditions([edited(HOME, BLOCK, claimed)])).toEqual(["JSON_LD_CLAIM_PRESENT"])
 	})
 })

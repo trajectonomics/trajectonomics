@@ -32,3 +32,8 @@ export const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 ${LANGUAGES.map((other) => entry(other.language)).join("\n")}
 </urlset>
 `
+
+/** Every absolute URL the Sitemap lists: one per Language home, in `LANGUAGES` order. */
+export const SITEMAP_URLS: readonly string[] = Object.freeze(
+	LANGUAGES.map((entry) => absoluteLocaleUrl(entry.language)),
+)

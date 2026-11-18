@@ -4,6 +4,15 @@ export const SITE_ORIGIN = "https://trajectonomics.com"
 /** The Site's name: the brand lockup's accessible name, and the name the Organisation goes by. */
 export const SITE_NAME = "trajectonomics"
 
+/** The CLI's name: the program the Site is about, and the `name` Structured data gives it. */
+export const CLI_NAME = "traj"
+
+/** The apple-touch icon's path: the one image the Site publishes of itself. */
+export const APPLE_TOUCH_ICON_PATH = "/favicon/apple-touch-icon.png"
+
+/** That icon on the Site's own origin, which is the absolute URL a `logo` must be. */
+export const APPLE_TOUCH_ICON_URL = `${SITE_ORIGIN}${APPLE_TOUCH_ICON_PATH}`
+
 /**
  * The skills repository's raw path to the skills it publishes on its default branch, which a coding
  * agent reads with nothing installed: no skills CLI, no Node version, no clone.
@@ -75,6 +84,15 @@ export const GITHUB_ORG_URL = "https://github.com/trajectonomics"
 
 /** The skills repository's MIT licence, the footer's licence link. */
 export const SKILLS_LICENCE_URL = `${GITHUB_SKILLS_URL}/blob/main/LICENSE`
+
+/**
+ * The owner's Google Search Console token, once the owner pastes one in. While it is `undefined` the
+ * page carries no verification meta, because a token this repository invented verifies nothing.
+ */
+export const GOOGLE_SITE_VERIFICATION_TOKEN: string | undefined = undefined
+
+/** The owner's Bing Webmaster Tools token, under the same rule as the Google one. */
+export const BING_SITE_VERIFICATION_TOKEN: string | undefined = undefined
 
 /**
  * One repository the Star menu offers: the repository's own name on GitHub, the name a visitor
