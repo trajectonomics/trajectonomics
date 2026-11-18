@@ -21,7 +21,7 @@ The Skill `traj-onboarding`, the one the Site's prompt route hands to a visitor'
 _Avoid_: Setup skill, getting-started skill
 
 **Presentation layer**:
-What the visitor's agent owns on the home: how an answer is explained, in words, tables, charts and the visitor's language. The agent draws it any way it likes, so the home draws it dashed.
+What the visitor's agent owns on the home: how the answer comes back — as an answer in the visitor's words, an interactive chart, or an action in an app the visitor already uses — in the visitor's language. The agent draws it any way it likes, so the home draws it dashed.
 _Avoid_: Frontend, UI, interface
 
 **Logic layer**:
@@ -161,6 +161,10 @@ _Avoid_: Font limit, type limit
 **Program JavaScript**:
 The script text one page runs, uncompressed and under 10,000 bytes: inline scripts, same-origin files in the static import graph, and script preloads, each once. JSON-LD is data, not Program JavaScript. [ADR 0004 (landing page redesign)](docs/adr/0004-landing-page-redesign.md) raised the budget from ADR 0005's 5,000 bytes.
 _Avoid_: Bundle, JS payload
+
+**Reveal layer**:
+The one small script that marks a section's root when it first arrives, so the section's timeline can play. It sequences nothing: the order and the timing are the timeline's, and the stylesheet only applies them. With no script, or with motion reduced, the section is complete and still.
+_Avoid_: Animation controller, trigger, observer
 
 **Web font**:
 A font file the Site serves itself under the Font budget: the Brand Typeface's three latin `.woff2` files (`Aleo` 300 and 400, `Azeret Mono` 500), copied from `@trajectonomics/design-system-assets` and declared in `src/styles/fonts.css`. A font URL that is absolute, a font or font stylesheet on another origin and a font in a `data:` URL each fail an Invariant, and the Site ships no Thai face, so Thai still draws from the visitor's own fonts ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
