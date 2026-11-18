@@ -34,6 +34,24 @@ describe("the Footer component in every Language", () => {
 			expect(disclaimer).toBeDefined()
 		})
 
+		it(`states the three facts above the disclaimer (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const footer = elementsByTag(page, "footer")[0]
+			if (footer === undefined) throw new Error("no footer")
+			const facts = page.elements.find((element) => "data-facts" in element.attributes)
+			if (facts === undefined) throw new Error("no facts in the footer")
+			expect(facts.ancestors).toContain(footer)
+			const labels = elementsByTag(page, "dt").map((term) => textOf(page, term))
+			const texts = elementsByTag(page, "dd").map((value) => textOf(page, value))
+			expect(labels).toEqual([...dictionary.factLabels])
+			expect(texts).toEqual([...dictionary.factTexts])
+			const disclaimer = page.elements.find(
+				(element) => element.tag === "p" && textOf(page, element) === dictionary.footerDisclaimer,
+			)
+			if (disclaimer === undefined) throw new Error("no disclaimer")
+			expect(page.elements.indexOf(facts)).toBeLessThan(page.elements.indexOf(disclaimer))
+		})
+
 		it(`links the licence and the organisation (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Footer, { dictionary }))
 			const links = elementsByTag(page, "a")

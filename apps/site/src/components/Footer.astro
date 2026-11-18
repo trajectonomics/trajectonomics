@@ -15,6 +15,7 @@ import {
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 } from "../lib/site"
+import Facts from "./Facts.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -77,6 +78,7 @@ const columns = [
 				}
 			</div>
 		</div>
+		<Facts dictionary={dictionary} />
 		<p class="footer-disclaimer">{dictionary.footerDisclaimer}</p>
 		<p class="footer-release">
 			{dictionary.releaseLine}

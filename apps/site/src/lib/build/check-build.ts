@@ -5,6 +5,7 @@ import { checkTextContrast } from "./contrast"
 import { checkDescription } from "./description"
 import { checkDocumentTitle } from "./document-title"
 import { checkExternalAssets } from "./external-assets"
+import { checkFacts } from "./facts"
 import type { BuildFailure } from "./failures"
 import { checkFonts } from "./fonts"
 import { checkHreflang } from "./hreflang"
@@ -62,6 +63,7 @@ const FILE_RULES = [
 	checkSwitcher,
 	checkNoLanguageDetection,
 	checkNotFoundPages,
+	checkFacts,
 	checkInstallWindow,
 	checkSiteContent,
 	checkSiteLinks,

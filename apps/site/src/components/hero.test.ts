@@ -51,6 +51,11 @@ describe("the Hero component in every Language", () => {
 			expect(codes).toContain("traj")
 		})
 
+		it(`carries no facts strip, which belongs to the footer (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			expect(withAttribute(page, "data-facts")).toEqual([])
+		})
+
 		it(`renders the prompt and no step strip (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const prompt = withAttribute(page, "data-install-prompt")[0]

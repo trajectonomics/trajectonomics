@@ -56,7 +56,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 		"Runs on your machine. No accounts, no dashboards, no subscriptions.",
 		"Free and MIT licensed. Read the code that computes your future.",
 		"Tax is applied only when you ask for it, and every figure says whether it includes tax.",
-		"Every result states its as-of date, the engine version and the assumptions it applied.",
+		"Every projection, comparison and FI result states its as-of date, engine version and scenario in its JSON.",
 	] as const),
 	footerTagline: "Free, open-source financial simulation for AI agents.",
 	footerProductLabel: "Product",

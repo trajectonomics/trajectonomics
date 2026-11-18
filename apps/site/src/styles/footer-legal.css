@@ -1,25 +1,13 @@
-/* The footer's lower half (ADR 0012): the disclaimer under a hairline, the release line, and the wordmark. */
+/* The footer's lower half (ADR 0012): the facts under a hairline, the disclaimer, the release line and
+ * the wordmark. The facts strip carries the rule, so the disclaimer needs none of its own. */
 
 .footer-disclaimer {
 	max-width: 48rem;
 	margin: 0;
-	padding-top: 32px;
-	position: relative;
 	font-size: 13px;
 	line-height: 1.7;
 	opacity: 0.72;
 	text-wrap: pretty;
-}
-
-.footer-disclaimer::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	right: 0;
-	left: 0;
-	height: 1px;
-	background: var(--ds-color-stage-foreground);
-	opacity: 0.2;
 }
 
 .footer-release {

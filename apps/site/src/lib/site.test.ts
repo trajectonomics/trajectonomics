@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import * as site from "./site"
 import {
+	CLI_VERSION,
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
 	FI_DEMO_COMMAND,
@@ -11,6 +12,7 @@ import {
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
 	ONBOARDING_SKILL_URL,
+	ONBOARDING_VERSION,
 	RELEASE_DATE,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
@@ -62,7 +64,9 @@ describe("the Site's own constants", () => {
 
 	it("names the CLI's docs page and the release date the footer announces", () => {
 		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
-		expect(RELEASE_DATE).toBe("2026-11-12")
+		expect(RELEASE_DATE).toBe("2026-11-17")
+		expect(CLI_VERSION).toBe("v0.2.0")
+		expect(ONBOARDING_VERSION).toBe("v0.1.0")
 	})
 
 	it("pinpoints the CLI installation page, the way out under the prompt", () => {

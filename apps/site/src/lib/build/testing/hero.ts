@@ -11,6 +11,7 @@ import {
 } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
+import { factsStrip } from "./facts"
 import { headOf } from "./head"
 import { switcher } from "./homes"
 import { installWindow, type WindowParts } from "./window"
@@ -20,6 +21,8 @@ export interface HeroParts extends WindowParts {
 	/** The whole inner markup of the hero's `<h1>`, so a test can drop a phrase the headline cycles. */
 	readonly headline?: string
 	readonly subline?: string
+	/** The strip in the footer, so a test can drop a fact or move it out of the footer. */
+	readonly facts?: string
 	readonly disclaimer?: string
 	readonly extra?: string
 }
@@ -70,7 +73,10 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		'<footer class="bg-stage text-stage-foreground"><ul>',
 		`<li><a href="${SKILLS_LICENCE_URL}">${dictionary.licence}</a></li>`,
 		`<li><a href="${GITHUB_ORG_URL}">${dictionary.org}</a></li>`,
-		`</ul><p>${parts.disclaimer ?? dictionary.footerDisclaimer}</p></footer>`,
+		"</ul>",
+		parts.facts ?? factsStrip(dictionary),
+		`<p>${parts.disclaimer ?? dictionary.footerDisclaimer}</p>`,
+		"</footer>",
 		parts.extra ?? "",
 		"</body></html>",
 	].join("\n")

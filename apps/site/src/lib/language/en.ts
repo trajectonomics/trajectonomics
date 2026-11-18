@@ -1,3 +1,4 @@
+import { CLI_VERSION, ONBOARDING_VERSION } from "../site"
 import { ENGLISH_SECTIONS } from "./en-sections"
 import type { LanguageEntry } from "./language"
 
@@ -15,12 +16,18 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		languageSwitchLabel: "EN",
 		heroHeadingPrefix: "Deterministic layers for",
 		heroHeadingAccent: "Financial Planning",
-		heroVersion: "v0.1.0",
+		heroVersion: CLI_VERSION,
 		heroLicence: "MIT · open source",
-		releaseLine: "v0.1.0 stable — traj CLI + traj-onboarding",
-		releaseDate: "12 Nov 2026",
+		releaseLine: `stable: traj CLI ${CLI_VERSION} · traj-onboarding ${ONBOARDING_VERSION}`,
+		releaseDate: "17 Nov 2026",
 		heroSubline:
 			"traj is a free, open-source financial simulation tool built for AI agents. Ship as a skill and CLI — local-first, no accounts, no dashboards, no subscriptions.",
+		factLabels: Object.freeze(["Currency", "First run", "Agent"] as const),
+		factTexts: Object.freeze([
+			"Thai baht only, for now.",
+			"About 100 MB downloads once.",
+			"A coding agent that can run commands, such as Claude Code, Codex or Cursor.",
+		] as const),
 		docsLink: "Docs",
 		starMenuLabel: "GitHub stars",
 		starMenuGroupLabel: "Repositories",
@@ -34,8 +41,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		copyFailed: "Select the prompt and copy it.",
 		licence: "MIT",
 		org: "trajectonomics",
-		footerDisclaimer:
-			"traj v0.1.0 is the first stable release; a bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
+		footerDisclaimer: `traj ${CLI_VERSION} is the latest stable release; a bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.`,
 		notFoundHeading: "Page not found",
 		notFoundBody: "This link may have moved, or it may be mistyped.",
 	}),

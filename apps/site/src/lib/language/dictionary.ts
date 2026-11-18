@@ -17,6 +17,13 @@ export interface Dictionary {
 	/** The licence note beside the version: the pill's second run. */
 	readonly heroLicence: string
 	readonly heroSubline: string
+	/**
+	 * The three plain facts in the footer, one label per fact: the currency the CLI accepts, the first
+	 * run's download and the agent that can run it. They sit with the footer's fine print.
+	 */
+	readonly factLabels: readonly string[]
+	/** One fact per label, in the same order: the plain sentence under its label. */
+	readonly factTexts: readonly string[]
 	/** The footer's release line: the stable release, naming both parts. */
 	readonly releaseLine: string
 	/** The release date as this Language writes it; the machine-readable date is `RELEASE_DATE`. */
