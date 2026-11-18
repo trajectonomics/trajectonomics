@@ -84,8 +84,11 @@ ripple from 0.55 to 0.7.
   baselines do not change at all, byte for byte.
 - The evidence is `docs/screenshots/hero-rim-{before,after}-{1280,390}-{light,dark}.png`, captured from the
   same preview build at the same viewports, so the pair differs by the rim and nothing else.
-- axe at 390x844 reports the same two findings with the rim and without it — `scrollable-region-focusable` on
-  the prompt's `pre`, and a color-contrast run it cannot judge — so neither belongs to this change. Neither
-  is in CI's path either: `e2e/accessibility.e2e.ts` runs at the desktop viewport.
+- axe at 390x844 reported the same two findings with the rim and without it — `scrollable-region-focusable` on
+  the `traj fi` output block in See it in action, and a color-contrast run it could not judge — so neither
+  belonged to this change. Neither was in CI's path either, because `e2e/accessibility.e2e.ts` ran at the
+  desktop viewport. This line first named the finding as the install window's prompt; site#74 measured it,
+  corrected the name, and fixed both: the prompt wraps and never scrolled
+  ([ADR 0021](./0021-the-browser-checks-judge-a-phone-and-the-demo-output-wraps.md)).
 - The clearing is the one knob. Widening it pushes the rim further to the sides; narrowing it lets the rim
   creep towards the copy, and `e2e/rim.e2e.ts` fails before it touches a line box.
