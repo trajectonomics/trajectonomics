@@ -60,6 +60,16 @@ describe("the Hero component in every Language", () => {
 			expect(withClass(page, "window-step")).toEqual([])
 		})
 
+		it(`draws one rim layer beside the squares, inside the layer that drifts (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const drift = withClass(page, "hero-blast-drift")[0]
+			if (drift === undefined) throw new Error("the hero rendered no drift wrapper")
+			const rim = withClass(page, "hero-blast-rim")
+			expect(rim.length).toBe(1)
+			expect(rim[0]?.ancestors.includes(drift)).toBe(true)
+			expect(withClass(page, "hero-blast-pixels")[0]?.ancestors.includes(drift)).toBe(true)
+		})
+
 		it(`answers a click with a ripple, and never follows the pointer (${language})`, async () => {
 			const html = await renderComponent(Hero, { dictionary })
 			const page = scanComponent(html)

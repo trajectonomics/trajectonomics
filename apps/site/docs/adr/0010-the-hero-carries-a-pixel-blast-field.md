@@ -38,5 +38,7 @@ band, and the CSS grainient it first carried.
 - **What is measured.** Axe composites the field's colour and its opacity behind the hero's copy, so how strong
   the field may be is held by WCAG rather than by taste: `0.30` in the light Theme and `0.34` in the dark one are
   the most the hero's `muted-foreground` text and its `accent` suffix carry (4.97:1 and 3.29:1 light, 4.88:1 and
-  3.54:1 dark). Lighthouse's mobile score stays at 1.00, and the page weighs 13.7 KB gzip of its 50 KB budget,
-  with the tile as one extra 2.8 KB request.
+  3.54:1 dark). A second, stronger layer now paints outside that clearing, so this cap holds behind the copy
+  only ([ADR 0017](./0017-the-hero-rim-brightens-the-field-outside-the-copy.md)). Lighthouse's mobile score
+  stays at 1.00, and the page weighs 13.7 KB gzip of its 50 KB budget, with the tile as one extra 2.8 KB
+  request.

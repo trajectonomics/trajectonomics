@@ -1,0 +1,70 @@
+/* The hero's rim (ADR 0017): the field one size up and twice as strong, held away from the copy. */
+
+/*
+ * The rim (ADR 0017) is the field one size up and about twice as strong, and it is held away from the copy
+ * so the headline stays the first thing the visitor reads. The band leaves the hero's first 12% empty,
+ * where the fixed header's links sit, and the clearing is wider than the copy: the headline is at most
+ * 56 rem wide and the subline and the install window 36 rem, so a 480 px radius holds every viewport, and
+ * the phone, whose copy fills the hero, keeps no rim beside it at all. This layer sits in the drift
+ * wrapper, which is inset 6%, so the band's 17% is the hero's own 12%.
+ */
+.hero-blast-rim {
+	position: absolute;
+	inset: 0;
+	opacity: 0.55;
+	-webkit-mask-image:
+		linear-gradient(
+			to bottom,
+			transparent 0%,
+			transparent 17%,
+			var(--ds-color-foreground) 32%,
+			var(--ds-color-foreground) 60%,
+			transparent 90%
+		),
+		radial-gradient(
+			ellipse 480px 420px at 50% 48%,
+			transparent 0%,
+			transparent 85%,
+			var(--ds-color-foreground) 100%
+		);
+	mask-image:
+		linear-gradient(
+			to bottom,
+			transparent 0%,
+			transparent 17%,
+			var(--ds-color-foreground) 32%,
+			var(--ds-color-foreground) 60%,
+			transparent 90%
+		),
+		radial-gradient(
+			ellipse 480px 420px at 50% 48%,
+			transparent 0%,
+			transparent 85%,
+			var(--ds-color-foreground) 100%
+		);
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect;
+}
+
+/*
+ * The squares the rim draws: the baked tile, one size up, so a cell reads 9 px against the field's 6. They
+ * are painted by a pseudo-element because axe composites an element's own background colour by its box and
+ * cannot read a mask, so it would judge the copy against a colour the rim never puts behind it. The field's
+ * own element keeps painting its 0.30, and axe keeps judging the copy against that.
+ */
+.hero-blast-rim::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: var(--ds-color-accent);
+	-webkit-mask-image: url("/hero/pixel-blast.png");
+	mask-image: url("/hero/pixel-blast.png");
+	-webkit-mask-size: 1530px 1530px;
+	mask-size: 1530px 1530px;
+	-webkit-mask-repeat: repeat;
+	mask-repeat: repeat;
+}
+
+[data-theme="dark"] .hero-blast-rim {
+	opacity: 0.62;
+}
