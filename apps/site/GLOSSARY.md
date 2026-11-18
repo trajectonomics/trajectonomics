@@ -117,8 +117,12 @@ A stable code naming exactly one rule a built page can break, so one run reports
 _Avoid_: Error message, failure string
 
 **Social card**:
-The Open Graph and X meta a share sheet renders for a page: its title, description, absolute URL, type, site name and card kind. The share image is not part of it, because no 1200×630 asset ships yet.
+The Open Graph and X meta a share sheet renders for a page: its title, description, absolute URL, type, site name, the Share image it advertises and the card kind that names the picture (`summary_large_image`).
 _Avoid_: Preview card, OG tags
+
+**Share image**:
+The 1200 × 630 PNG a Language home advertises as `og:image`: the Language's value statement, the brand lockup and the host, painted in the shipped Theme's colours and written to `public/og/<language>.png` by `scripts/share-image.ts` before every build. It is generated and never committed, and it is no page subresource, so no page budget counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.md)).
+_Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:
 The JSON-LD block a page carries, naming the `WebSite`, the `Organization` that publishes it with its `logo` and `sameAs`, and `traj` as a free `SoftwareApplication`. It states only what the page or the repository states, and never a rating, so it is data and outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md), [ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).

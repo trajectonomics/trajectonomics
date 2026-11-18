@@ -9,6 +9,9 @@ public/hero/
 # The Answer engine files are printed by `scripts/llms-txt.ts` before every build, from the dictionaries.
 public/llms.txt
 public/llms-full.txt
+# The share image is rasterized by `scripts/share-image.ts` before every build, from the Dictionaries,
+# the pinned Theme and the assets package: the words and the colours are the source of truth.
+public/og/
 coverage/
 *.tgz
 .scratch/

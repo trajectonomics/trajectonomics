@@ -21,6 +21,8 @@ import {
 } from "../lib/site"
 import { structuredDataJson } from "../lib/site/structured-data"
 import { verificationMetas } from "../lib/site/verification"
+import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../lib/social/layout"
+import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../lib/social/share-advert"
 
 interface Props {
 	readonly language: Language
@@ -79,8 +81,14 @@ const verification = verificationMetas({
 					<meta property="og:url" content={absoluteLocaleUrl(language)} />
 					<meta property="og:type" content="website" />
 					<meta property="og:site_name" content={SITE_NAME} />
-					{/* No share image ships yet, so `summary` is the card kind the page can honour. */}
-					<meta name="twitter:card" content="summary" />
+					{/* The 1200 × 630 image the prebuild step writes, which every share sheet cuts a large card from. */}
+					<meta property="og:image" content={absoluteShareImageUrl(language)} />
+					<meta property="og:image:width" content={String(SHARE_IMAGE_WIDTH)} />
+					<meta property="og:image:height" content={String(SHARE_IMAGE_HEIGHT)} />
+					<meta property="og:image:type" content={SHARE_IMAGE_TYPE} />
+					<meta property="og:image:alt" content={shareImageAlt(dictionary)} />
+					<meta name="twitter:card" content="summary_large_image" />
+					<meta name="twitter:image" content={absoluteShareImageUrl(language)} />
 					{verification.map((meta) => (
 						<meta name={meta.name} content={meta.content} />
 					))}

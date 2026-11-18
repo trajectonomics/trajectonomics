@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url"
 const ASSETS_PACKAGE = "@trajectonomics/design-system-assets"
 
 /** The faces the Site draws with: the display pair and the mono, latin subsets only. */
-const FACES = [
+export const BRAND_FACES = [
 	"aleo-latin-300.woff2",
 	"aleo-latin-400.woff2",
 	"azeret-mono-latin-500.woff2",
@@ -18,7 +18,7 @@ const resolve = createRequire(import.meta.url).resolve
 
 /** Where the published package keeps the Brand Typeface, found through its own exports. */
 export function brandFontsSource(): string {
-	return dirname(resolve(`${ASSETS_PACKAGE}/fonts/${FACES[0]}`))
+	return dirname(resolve(`${ASSETS_PACKAGE}/fonts/${BRAND_FACES[0]}`))
 }
 
 /**
@@ -31,7 +31,7 @@ export async function copyBrandFonts(
 	source: string = brandFontsSource(),
 ): Promise<readonly string[]> {
 	await mkdir(destination, { recursive: true })
-	for (const face of FACES) {
+	for (const face of BRAND_FACES) {
 		const from = join(source, face)
 		const file = Bun.file(from)
 		if (!(await file.exists())) {
@@ -45,7 +45,7 @@ export async function copyBrandFonts(
 			throw new Error(`copy-fonts: ${join(destination, face)} was not copied in full.`)
 		}
 	}
-	return FACES
+	return BRAND_FACES
 }
 
 if (import.meta.main) {

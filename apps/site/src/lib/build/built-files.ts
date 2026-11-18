@@ -1,9 +1,13 @@
+import type { ImagePixels } from "./image-pixels"
+
 /** One file of the built Site, at a path relative to the Worker's assets root (`dist/`). */
 export interface BuiltFile {
 	readonly path: string
 	readonly content: string
 	/** The file's byte length on disk, so a check can measure a binary the scan does not read as text. */
 	readonly bytes?: number
+	/** The size an image states in its own header, which the adapter reads and no scan reads as text. */
+	readonly pixels?: ImagePixels
 }
 
 /** The file at one assets-root-relative path, or `undefined` when the build produced none. */

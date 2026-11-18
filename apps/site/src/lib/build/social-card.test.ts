@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { absoluteLocaleUrl } from "../language/languages"
+import { absoluteShareImageUrl } from "../social/share-advert"
 import { checkSocialCard } from "./social-card"
 import { codes, edited, entryAt } from "./testing/homes"
 
@@ -59,14 +60,69 @@ describe("the Social card of a Language home", () => {
 		).toEqual(["SOCIAL_CARD_WRONG"])
 	})
 
-	it("fails a card that promises a large image the page does not ship", () => {
+	it("fails a card that promises a small image the page does not draw", () => {
 		expect(
 			codes(
 				checkSocialCard,
 				edited(
 					HOME,
 					/<meta name="twitter:card"[^>]*>/,
-					'<meta name="twitter:card" content="summary_large_image">',
+					'<meta name="twitter:card" content="summary">',
+				),
+			),
+		).toEqual(["SOCIAL_CARD_WRONG"])
+	})
+
+	it("fails a home whose card names no share image", () => {
+		expect(codes(checkSocialCard, edited(HOME, propertyPattern("og:image"), ""))).toEqual([
+			"SOCIAL_CARD_MISSING",
+		])
+	})
+
+	it("fails a home whose card points at the other Language's image", () => {
+		expect(
+			codes(
+				checkSocialCard,
+				edited(
+					HOME,
+					propertyPattern("og:image"),
+					`<meta property="og:image" content="${absoluteShareImageUrl(OTHER)}">`,
+				),
+			),
+		).toEqual(["SOCIAL_CARD_WRONG"])
+	})
+
+	it("passes the card's own width and fails any other the image is not drawn at", () => {
+		expect(
+			codes(
+				checkSocialCard,
+				edited(
+					HOME,
+					propertyPattern("og:image:width"),
+					'<meta property="og:image:width" content="1200">',
+				),
+			),
+		).toEqual([])
+		expect(
+			codes(
+				checkSocialCard,
+				edited(
+					HOME,
+					propertyPattern("og:image:width"),
+					'<meta property="og:image:width" content="600">',
+				),
+			),
+		).toEqual(["SOCIAL_CARD_WRONG"])
+	})
+
+	it("fails a card that describes the image in the other Language's words", () => {
+		expect(
+			codes(
+				checkSocialCard,
+				edited(
+					HOME,
+					propertyPattern("og:image:alt"),
+					`<meta property="og:image:alt" content="traj — a share image">`,
 				),
 			),
 		).toEqual(["SOCIAL_CARD_WRONG"])

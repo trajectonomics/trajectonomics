@@ -24,6 +24,7 @@ import { checkPageWeight } from "./page-weight"
 import { checkContentSecurityPolicy } from "./policy"
 import { checkReservedPreloadPath } from "./reserved-path"
 import { checkRobots } from "./robots"
+import { checkShareImage } from "./share-image"
 import { checkSiteContent } from "./site-content"
 import { checkSiteLinks } from "./site-links"
 import { checkSitemap } from "./sitemap"
@@ -55,6 +56,7 @@ const FILE_RULES = [
 	checkDocumentTitle,
 	checkDescription,
 	checkSocialCard,
+	checkShareImage,
 	checkStructuredData,
 	checkStructuredDataClaims,
 	checkSwitcher,

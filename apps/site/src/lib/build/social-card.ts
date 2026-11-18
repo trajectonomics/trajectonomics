@@ -1,6 +1,8 @@
 import type { Language } from "../language/language"
 import { absoluteLocaleUrl, dictionaryFor } from "../language/languages"
 import { SITE_NAME } from "../site"
+import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../social/layout"
+import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../social/share-advert"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
@@ -9,8 +11,8 @@ import { unescapeText } from "./html-tag"
 import { builtHomes } from "./language-home"
 import { pageUrl } from "./page-url"
 
-/** The card kind: `summary`, because no share image ships yet. */
-const CARD_KIND = "summary"
+/** The card kind: `summary_large_image`, because a 1200 × 630 share image ships with the page. */
+const CARD_KIND = "summary_large_image"
 
 /** One property a Social card carries: the attribute that names it, and the value the page gives it. */
 interface CardProperty {
@@ -22,13 +24,20 @@ interface CardProperty {
 /** The card one Language home must carry, property by property. */
 function cardOf(language: Language): readonly CardProperty[] {
 	const dictionary = dictionaryFor(language)
+	const image = absoluteShareImageUrl(language)
 	return [
 		{ attribute: "property", key: "og:title", expected: dictionary.documentTitle },
 		{ attribute: "property", key: "og:description", expected: dictionary.description },
 		{ attribute: "property", key: "og:url", expected: absoluteLocaleUrl(language) },
 		{ attribute: "property", key: "og:type", expected: "website" },
 		{ attribute: "property", key: "og:site_name", expected: SITE_NAME },
+		{ attribute: "property", key: "og:image", expected: image },
+		{ attribute: "property", key: "og:image:width", expected: String(SHARE_IMAGE_WIDTH) },
+		{ attribute: "property", key: "og:image:height", expected: String(SHARE_IMAGE_HEIGHT) },
+		{ attribute: "property", key: "og:image:type", expected: SHARE_IMAGE_TYPE },
+		{ attribute: "property", key: "og:image:alt", expected: shareImageAlt(dictionary) },
 		{ attribute: "name", key: "twitter:card", expected: CARD_KIND },
+		{ attribute: "name", key: "twitter:image", expected: image },
 	]
 }
 
