@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test"
+import { PRODUCTION_THEME } from "../src/lib/design/shipped-themes"
 import type { Language } from "../src/lib/language/language"
 import { dictionaryFor } from "../src/lib/language/languages"
 import { INSTALL_PROMPT } from "../src/lib/site"
@@ -21,10 +22,11 @@ export const PAGES: readonly PageUnderTest[] = Object.freeze([
 /** The controls a keyboard visitor can reach, excluding anything hidden or disabled. */
 const FOCUSABLE = "a[href], button:not([disabled]):not([hidden]), summary"
 
-/** The two Themes the harness sets before navigation. */
-export const THEMES = Object.freeze(["light", "dark"] as const)
-/** One of the two Themes a page can ship. */
-export type Theme = (typeof THEMES)[number]
+/**
+ * The device schemes the harness sets before navigation. Both are kept although the Site ships one
+ * Theme: a leftover device query in a component's own styles is what this catches ([ADR 0016]).
+ */
+export const DEVICE_SCHEMES = Object.freeze(["light", "dark"] as const)
 
 /** The Language home of one Language, which every browser check judges. */
 export function homeOf(language: Language): PageUnderTest {
@@ -42,9 +44,9 @@ export async function openPage(page: Page, underTest: PageUnderTest): Promise<vo
 	await expect(page.locator("html")).toHaveAttribute("lang", new RegExp(`^${underTest.language}`))
 }
 
-/** Assert the page painted the Theme the harness asked for before navigation. */
-export async function expectTheme(page: Page, theme: Theme): Promise<void> {
-	await expect(page.locator("html")).toHaveAttribute("data-theme", theme)
+/** Assert the page painted the Theme a production build ships, whatever the device asked for. */
+export async function expectShippedTheme(page: Page): Promise<void> {
+	await expect(page.locator("html")).toHaveAttribute("data-theme", PRODUCTION_THEME)
 }
 
 /** The number of controls a keyboard visitor can reach on the page. */

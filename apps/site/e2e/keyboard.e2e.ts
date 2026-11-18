@@ -5,26 +5,26 @@ import {
 	COPY_PROMPT_TEXT,
 	copiedLabel,
 	copiedMessage,
-	expectTheme,
+	DEVICE_SCHEMES,
+	expectShippedTheme,
 	focusableCount,
 	openPage,
 	PAGES,
 	ringVisible,
-	THEMES,
 	tabToCopyButton,
 } from "./pages"
 
 /** The homes, which carry the controls a keyboard visitor operates. */
 const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 
-for (const theme of THEMES) {
+for (const scheme of DEVICE_SCHEMES) {
 	for (const underTest of HOMES) {
-		test.describe(`${underTest.name}, ${theme} theme`, () => {
-			test.use({ colorScheme: theme })
+		test.describe(`${underTest.name} on a ${scheme} device`, () => {
+			test.use({ colorScheme: scheme })
 
 			test("Tab reaches every control and each one paints its ring", async ({ page }) => {
 				await openPage(page, underTest)
-				await expectTheme(page, theme)
+				await expectShippedTheme(page)
 				const count = await focusableCount(page)
 				expect(count).toBeGreaterThan(0)
 				const visited: string[] = []
@@ -48,7 +48,7 @@ for (const theme of THEMES) {
 
 			test("the header menus open from the keyboard and close on Escape", async ({ page }) => {
 				await openPage(page, underTest)
-				await expectTheme(page, theme)
+				await expectShippedTheme(page)
 				const menu = page.locator("details[data-header-menu]").first()
 				const summary = menu.locator("summary")
 				const firstLink = menu.locator("a").first()

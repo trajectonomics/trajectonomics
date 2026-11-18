@@ -37,7 +37,7 @@ One way a visitor gets traj onto their machine: the Site's Prompt route, which h
 _Avoid_: Install method, installer, setup path
 
 **Prompt route**:
-The install window's one action: a single sentence, copied into a coding agent, that names the published Onboarding skill by its raw URL rather than quoting a command, so the commands stay in the Skill that owns and versions them. It serves the visitor who has no terminal but whose agent does ([ADR 0015](docs/adr/0015-the-window-prints-a-prompt-and-no-command.md)).
+The install window's one action: a single sentence, copied into a coding agent, that names the published Onboarding skill by its raw URL rather than quoting a command, so the commands stay in the Skill that owns and versions them. It serves the visitor who has no terminal but whose agent does ([ADR 0016](docs/adr/0015-the-window-prints-a-prompt-and-no-command.md)).
 _Avoid_: Prompt command, paste command, copy command
 
 **Stable release**:
@@ -71,7 +71,7 @@ _Avoid_: preload script, client router
 ## Built site
 
 **Theme**:
-The published colour set a page asks for with `data-theme`, one value per Semantic Token Role. The Site ships one, light, for every visitor: it never follows the device's scheme, and both published Themes stay in the build ([ADR 0011](docs/adr/0011-the-site-ships-the-light-theme.md)).
+The published colour set a page asks for with `data-theme`, one value per Semantic Token Role. A production build ships one, dark, for every visitor: it never follows the device's scheme. Every other build ships both and follows the device, so the light Theme stays capturable and cannot rot while it is deferred ([ADR 0016](docs/adr/0016-the-site-ships-the-dark-theme.md)).
 _Avoid_: Colour scheme, dark mode, colour mode
 
 **Surface**:

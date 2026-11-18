@@ -6,7 +6,10 @@ import lightTheme from "@trajectonomics/design-system-theme/themes/light.css?raw
 import Footer from "../components/Footer.astro"
 import Header from "../components/Header.astro"
 import "../styles/global.css"
+import { buildMode } from "../lib/build/mode"
+import { fallbackTheme, shippedThemes } from "../lib/design/shipped-themes"
 import { themePaints } from "../lib/design/theme-paint"
+import { themeScript } from "../lib/design/theme-script"
 import { parseDesignTokens } from "../lib/design/tokens"
 import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
 import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../lib/language/languages"
@@ -26,23 +29,20 @@ const dictionary = dictionaryFor(language)
 // The published Theme CSS the page loads for its own paint, read as text, so the browser's bar and
 // the header carry one colour: no colour literal is written here.
 const tokens = parseDesignTokens({ themes: [lightTheme, darkTheme], tailwind: "" })
-const paints = themePaints(tokens)
+// The Theme is resolved from the Build Mode: a production build ships one Theme and asks for it, so no
+// device query decides anything; every other build ships both Themes and follows the device, which is
+// what keeps the light Theme capturable while it is deferred ([ADR 0016]).
+const mode = buildMode(import.meta.env.MODE)
+const themes = shippedThemes(mode)
+const paints = themePaints(tokens, themes)
+const script = themeScript(themes)
 ---
 
-<html lang={language} data-theme="light">
+<html lang={language} data-theme={fallbackTheme(mode)}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		{/*
-			The Theme is on <html> before the first paint: `light` is the no-JavaScript fallback, and this
-			inline script switches to `dark` when the device asks for it. It reads no Visitor signal: a
-			Locale URL already says which Language the page is ([ADR 0003]).
-		*/}
-		<script is:inline>
-			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-				document.documentElement.setAttribute("data-theme", "dark")
-			}
-		</script>
+		{script === undefined ? null : <script is:inline set:html={script}></script>}
 		<title>{title}</title>
 		{paints.map((paint) => (
 			<meta name="theme-color" media={paint.media} content={paint.colour} />

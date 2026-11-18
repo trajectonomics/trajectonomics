@@ -19,5 +19,10 @@
 			"!**/.agents",
 			"!**/.claude"
 		]
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	}
 }

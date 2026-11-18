@@ -1,3 +1,4 @@
+import { shippedThemes } from "../design/shipped-themes"
 import type { DesignTokens } from "../design/tokens"
 import type { BuiltFile } from "./built-files"
 import { checkTextContrast } from "./contrast"
@@ -60,8 +61,8 @@ const FILE_RULES = [
 	checkThaiTextLanguage,
 ] as const
 
-/** The rules that judge the build against the Web Consumer Contract the Site pins. */
-const TOKEN_RULES = [checkTheme, checkLandmarkColours, checkTextContrast, checkThemeColour] as const
+/** The rules that judge the build against the Web Consumer Contract the Site pins, Themes aside. */
+const TOKEN_RULES = [checkLandmarkColours, checkTextContrast] as const
 
 /** Every rule the built Site fails, so one run names all of them instead of the first. */
 export function checkBuild(
@@ -69,9 +70,12 @@ export function checkBuild(
 	tokens: DesignTokens,
 	mode: BuildMode = DEFAULT_BUILD_MODE,
 ): readonly BuildFailure[] {
+	const themes = shippedThemes(mode)
 	return [
 		...FILE_RULES.flatMap((rule) => rule(files)),
 		...TOKEN_RULES.flatMap((rule) => rule(files, tokens)),
+		...checkTheme(files, tokens, themes),
+		...checkThemeColour(files, tokens, themes),
 		...checkOwnerPlaceholder(files, mode),
 	]
 }

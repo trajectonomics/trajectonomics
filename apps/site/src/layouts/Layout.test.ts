@@ -7,7 +7,9 @@ import {
 	type HtmlElement,
 	isDataBlockType,
 	type ScannedPage,
+	scriptElements,
 } from "../lib/build/html"
+import { shippedThemes } from "../lib/design/shipped-themes"
 import { themePaints } from "../lib/design/theme-paint"
 import { dictionaryFor, LANGUAGES } from "../lib/language/languages"
 import { structuredData } from "../lib/site/structured-data"
@@ -19,8 +21,11 @@ interface Rendered {
 	readonly page: ScannedPage
 }
 
-/** The two paints the pinned Theme CSS publishes, read as `verify:build` reads them. */
-const PAINTS = themePaints(await readDesignTokens())
+/**
+ * The paint the pinned Theme CSS publishes for the Themes a production build ships, read as
+ * `verify:build` reads it. The container renders with no Build Mode, and no mode means production.
+ */
+const PAINTS = themePaints(await readDesignTokens(), shippedThemes("production"))
 
 /** The metas of one rendered page, in document order. */
 function metas(page: ScannedPage): readonly HtmlElement[] {
@@ -65,8 +70,11 @@ async function miss(language: string): Promise<Rendered> {
 
 describe("the Layout every page renders", () => {
 	for (const { language } of LANGUAGES) {
-		it(`paints the browser bar once per published Theme (${language})`, async () => {
-			const paints = metas((await home(language)).page).filter(
+		it(`asks for the dark Theme and paints the browser bar once, with no media (${language})`, async () => {
+			const rendered = await home(language)
+			const [html] = elementsByTag(rendered.page, "html")
+			expect(html?.attributes["data-theme"]).toBe("dark")
+			const paints = metas(rendered.page).filter(
 				(meta) => meta.attributes["name"] === "theme-color",
 			)
 			expect(paints.map((meta) => meta.attributes["media"])).toEqual(
@@ -75,6 +83,14 @@ describe("the Layout every page renders", () => {
 			expect(paints.map((meta) => meta.attributes["content"])).toEqual(
 				PAINTS.map((paint) => paint.colour),
 			)
+			expect(paints).toHaveLength(1)
+			expect(paints[0]?.attributes["content"]).toBe("#0a0a0a")
+		})
+
+		it(`carries no script that reads the device scheme (${language})`, async () => {
+			const rendered = await home(language)
+			const scripts = scriptElements(rendered.html)
+			expect(scripts.filter((script) => /prefers-color-scheme/i.test(script.body))).toEqual([])
 		})
 
 		it(`carries one Structured data block naming the page (${language})`, async () => {
@@ -99,7 +115,7 @@ describe("the Layout every page renders", () => {
 
 		it(`keeps a miss out of every index and every claim (${language})`, async () => {
 			const rendered = await miss(language)
-			expect(metaNames(rendered.page)).toEqual(["viewport", "theme-color", "theme-color", "robots"])
+			expect(metaNames(rendered.page)).toEqual(["viewport", "theme-color", "robots"])
 			expect(metas(rendered.page).filter((meta) => meta.attributes["property"])).toEqual([])
 			expect(blocks(rendered.html)).toEqual([])
 		})

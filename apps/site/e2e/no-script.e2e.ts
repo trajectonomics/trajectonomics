@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test"
 import { dictionaryFor } from "../src/lib/language/languages"
-import { COPY_PROMPT_TEXT, focusableCount, PAGES } from "./pages"
+import { COPY_PROMPT_TEXT, expectShippedTheme, focusableCount, PAGES } from "./pages"
 
 /** The homes, which carry the Copy button and the install prompt. */
 const HOMES = PAGES.filter((underTest) => underTest.status === 200)
 
-test.use({ javaScriptEnabled: false, colorScheme: "dark" })
+test.use({ javaScriptEnabled: false, colorScheme: "light" })
 
 for (const underTest of HOMES) {
 	test(`${underTest.name}: the header menus still open by click without JavaScript`, async ({
@@ -53,7 +53,7 @@ for (const underTest of HOMES) {
 		page,
 	}) => {
 		await page.goto(underTest.path)
-		await expect(page.locator("html")).toHaveAttribute("data-theme", "light")
+		await expectShippedTheme(page)
 		const painted = await page.evaluate(() => ({
 			token: getComputedStyle(document.documentElement)
 				.getPropertyValue("--ds-color-background")

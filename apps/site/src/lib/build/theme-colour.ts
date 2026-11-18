@@ -16,12 +16,14 @@ function paintsOf(page: ScannedPage): readonly HtmlElement[] {
 	)
 }
 
-/** The media queries the published Themes state, for a message that names what the page owes. */
+/** The media each shipped Theme's paint states, for a message that names what the page owes. */
 function statedMedia(paints: readonly ThemePaint[]): string {
-	return paints.map((paint) => `"${paint.media}"`).join(" or ")
+	return paints
+		.map((paint) => (paint.media === undefined ? "no media" : `"${paint.media}"`))
+		.join(" or ")
 }
 
-/** Every paint that follows no device scheme, which leaves the meta unreadable to a browser. */
+/** Every paint whose media is not the one its Theme states, which no device reads as intended. */
 function unattributed(
 	path: string,
 	metas: readonly HtmlElement[],
@@ -29,13 +31,13 @@ function unattributed(
 ): readonly BuildFailure[] {
 	const media = paints.map((paint) => paint.media)
 	return metas.flatMap((meta) => {
-		const written = meta.attributes["media"] ?? ""
+		const written = meta.attributes["media"]
 		if (media.includes(written)) return []
 		return [
 			buildFailure(
-				"THEME_COLOUR_MEDIA_WRONG",
+				"THEME_COLOUR_MEDIA_NOT_SHIPPED",
 				path,
-				`carries a theme-color under media "${written}", not ${statedMedia(paints)}.`,
+				`carries a theme-color under media ${written === undefined ? "no media" : `"${written}"`}, not ${statedMedia(paints)}.`,
 			),
 		]
 	})
@@ -78,12 +80,13 @@ function checkPaint(
 	]
 }
 
-/** Every built page paints the browser's bar with each published Theme's background, once. */
+/** Every built page paints the browser's bar with each shipped Theme's background, once. */
 export function checkThemeColour(
 	files: readonly BuiltFile[],
 	tokens: DesignTokens,
+	themes: readonly string[],
 ): readonly BuildFailure[] {
-	const paints = themePaints(tokens)
+	const paints = themePaints(tokens, themes)
 	return builtPages(files).flatMap((file) => {
 		const path = pageUrl(file.path)
 		const metas = paintsOf(scanHtml(file.content))

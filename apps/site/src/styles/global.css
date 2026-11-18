@@ -33,6 +33,27 @@
 @import "./motion.css";
 
 /*
+ * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own
+ * fixtures spell classes the Site never ships (a `dark:` variant is what the colour-literal rule
+ * forbids). A test file must not become a stylesheet source: it would ship the device-scheme media
+ * query a production build refuses to answer ([ADR 0016]).
+ */
+@source not "../**/*.test.ts";
+
+/*
+ * Each Theme states its own `color-scheme`, so the browser's own scrollbars and controls follow the page
+ * and not the device: the pinned Theme CSS states no `color-scheme`, and a production build ships one
+ * Theme while a preview build ships both ([ADR 0016]).
+ */
+[data-theme="light"] {
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+/*
  * The families the Site draws with, in one place: the display face of the headline run, and the mono
  * face of every meta label. Body text keeps the Theme's sans stack, which is also where the Thai
  * fallback lives. The files are latin subsets, so Thai falls through to the system Thai face.

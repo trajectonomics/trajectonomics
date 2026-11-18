@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test"
 
-const PORT = 8791
+// Two Runs in one repository are separate checkouts, never separate machines, so a Run whose sibling
+// holds the default port picks another one ([factory ADR 0006](https://github.com/trajectonomics/factory/blob/main/docs/adr/0006-runs-are-not-exclusive-per-repository.md)).
+const PORT = Number(process.env["SITE_BROWSER_PORT"] ?? 8791)
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
 /**

@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url"
 import { expect, type Page, test } from "@playwright/test"
-import { expectTheme, openPage, PAGES, THEMES } from "./pages"
+import { expectShippedTheme, openPage, PAGES } from "./pages"
 
 /** The viewports the screenshots cover: the desktop the checks run at, and a phone. */
 const VIEWPORTS = {
@@ -30,36 +30,32 @@ async function pinFonts(page: Page): Promise<void> {
 }
 
 /**
- * The screenshots CI validates: every page in every Theme on a desktop and a phone. Motion is
- * reduced, so the hero holds the suffix the page ships and nothing animates into the snapshot.
- * Regenerate the baselines with `bun run test:visual:update` after an intended visual change, in an
- * environment whose fallback sans is the GitHub runner's DejaVu Sans: the pin above covers Thai
- * only, so every sans glyph comes from the host, and a host with another one changes them all.
+ * The screenshots CI validates: every page on a desktop and a phone, with the device set to light.
+ * That is the case the Site has to ignore ([ADR 0016]), so the one baseline set per page per viewport
+ * is also the pixel proof that a light device gets the dark Theme. Motion is reduced, so the hero
+ * holds the suffix the page ships and nothing animates into the snapshot. Regenerate the baselines
+ * with `bun run test:visual:update` after an intended visual change, in an environment whose fallback
+ * sans is the GitHub runner's DejaVu Sans: the pin above covers Thai only, so every sans glyph comes
+ * from the host, and a host with another one changes them all.
  * `mcr.microsoft.com/playwright:v1.65.0-noble` (the tag for the version above) with
  * `fonts-dejavu-core` added renders them byte for byte the way the browser check does (site#42).
  */
 test.describe("the built pages as screenshots", () => {
-	test.use({ reducedMotion: "reduce" })
+	test.use({ reducedMotion: "reduce", colorScheme: "light" })
 
 	for (const underTest of PAGES) {
-		for (const theme of THEMES) {
-			test.describe(`in the ${theme} Theme`, () => {
-				test.use({ colorScheme: theme })
-
-				for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-					test(`${underTest.name} on ${viewportName}`, async ({ page }) => {
-						await pinFonts(page)
-						await page.setViewportSize(viewport)
-						await openPage(page, underTest)
-						await expectTheme(page, theme)
-						await page.addStyleTag({ content: FONT_CSS })
-						await page.evaluate(() => document.fonts.ready)
-						const slug = underTest.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-						await expect(page).toHaveScreenshot(`${slug}-${theme}-${viewportName}.png`, {
-							fullPage: true,
-						})
-					})
-				}
+		for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
+			test(`${underTest.name} on ${viewportName}`, async ({ page }) => {
+				await pinFonts(page)
+				await page.setViewportSize(viewport)
+				await openPage(page, underTest)
+				await expectShippedTheme(page)
+				await page.addStyleTag({ content: FONT_CSS })
+				await page.evaluate(() => document.fonts.ready)
+				const slug = underTest.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+				await expect(page).toHaveScreenshot(`${slug}-${viewportName}.png`, {
+					fullPage: true,
+				})
 			})
 		}
 	}

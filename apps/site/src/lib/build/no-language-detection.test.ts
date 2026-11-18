@@ -3,7 +3,7 @@ import { checkNoLanguageDetection } from "./no-language-detection"
 import { codes, edited, entryAt } from "./testing/homes"
 
 describe("the Language a Locale URL chooses", () => {
-	it("passes a home whose only script reads the device's colour scheme", () => {
+	it("passes a home that reads no browser signal at all", () => {
 		expect(codes(checkNoLanguageDetection)).toEqual([])
 	})
 

@@ -1,8 +1,17 @@
 ---
-status: accepted
+status: superseded
 ---
 
 # The Site ships the light Theme only
+
+## Status
+
+Superseded by [ADR 0016](./0016-the-site-ships-the-dark-theme.md), after the owner changed their mind on
+2026-11-17: "hey I change my mind can we only expose the dark them only and the site repo too only dark
+theme", corrected to "let force it only in production". The mechanism this record designed — the shipped
+list as data, the paints derived from it, the rules narrowed one rule at a time, the light-and-dark
+evidence — is what ADR 0016 uses. What changed is which Themes each build ships: production forces one,
+every other build ships both.
 
 Until this record, the Site answered the device. `<html>` carried `data-theme="light"` as a fallback, an
 inline script in the layout rewrote it to `dark` when the visitor's device asked for dark, and the head

@@ -1,3 +1,4 @@
+import { shippedThemes } from "../../design/shipped-themes"
 import { themePaints } from "../../design/theme-paint"
 import { FALLBACK_LANGUAGE, type Language } from "../../language/language"
 import { absoluteLocaleUrl, LANGUAGES, languageEntry } from "../../language/languages"
@@ -27,9 +28,10 @@ const ALTERNATES = [
 	`<link rel="alternate" hreflang="x-default" href="${absoluteLocaleUrl(FALLBACK_LANGUAGE)}">`,
 ].join("")
 
-/** The browser bar paints the published Themes state, one meta per device scheme. */
-const PAINTS = themePaints(TEST_TOKENS).map(
-	(paint) => `<meta name="theme-color" media="${paint.media}" content="${paint.colour}">`,
+/** The browser bar paints the Themes the Site ships state, with the media query each one states. */
+const PAINTS = themePaints(TEST_TOKENS, shippedThemes("production")).map(
+	(paint) =>
+		`<meta name="theme-color"${paint.media === undefined ? "" : ` media="${paint.media}"`} content="${paint.colour}">`,
 )
 
 /** The head one Language home must carry, as the build writes it: its title, summary and claims. */

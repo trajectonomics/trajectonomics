@@ -29,7 +29,7 @@
 		"typecheck": "tsc -p tsconfig.json && astro check",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build:preview && SITE_BUILD_MODE=preview bun run verify:build && bun run probe:status",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build:preview && SITE_BUILD_MODE=preview bun run verify:build && bun run build && bun run verify:build && bun run probe:status",
 		"verify:build": "bun test ./test/dist",
 		"probe:status": "bun scripts/probe-status.ts",
 		"stars:update": "bun scripts/stars.ts",
