@@ -41,7 +41,7 @@ The install window's one action: a single sentence, copied into a coding agent, 
 _Avoid_: Prompt command, paste command, copy command
 
 **Stable release**:
-A release the owner names as no longer alpha. The first is `v0.1.0`, for both the CLI and the Onboarding skill, announced on the Site with its date.
+A release the owner names as no longer alpha. The first was `v0.1.0`, on 2026-11-12, for both the CLI and the Onboarding skill; from the CLI's `v0.2.0` the Site names the CLI's stable release with its version and date, and the Onboarding skill publishes continuously from `main`, so it carries no version on the Site.
 _Avoid_: GA, production release, 1.0
 
 **Locale URL**:
@@ -83,6 +83,12 @@ _Avoid_: Background colour, band
 The committed star counts the Star menu renders from, one number per repository plus the date they were read,
 written by `bun run stars:update` and never fetched at request time.
 _Avoid_: Live count, stars file
+
+**Release snapshot**:
+The committed release facts the Site prints: the CLI's stable version, its release date as an ISO date, and the date they were read,
+written by `bun run release:update` from npm's `latest` and the GitHub release of that tag, and never fetched at build or request time.
+Every page's version and date come from it, so a release is one command and no edit to a Dictionary.
+_Avoid_: Version file, release config, changelog
 
 **Invariant**:
 A property every built page must hold, checked after the build, so a page that breaks it cannot merge. The Page weight budget, the Program JavaScript budget and the Font budget are Invariants of the Site ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
