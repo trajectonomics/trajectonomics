@@ -11,10 +11,10 @@ import {
 	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
-	RELEASE_DATE,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 } from "../lib/site"
+import { RELEASE_SNAPSHOT } from "../lib/site/release-snapshot"
 import Facts from "./Facts.astro"
 
 interface Props {
@@ -83,7 +83,7 @@ const columns = [
 		<p class="footer-release">
 			{dictionary.releaseLine}
 			<span aria-hidden="true"> · </span>
-			<time datetime={RELEASE_DATE}>{dictionary.releaseDate}</time>
+			<time datetime={RELEASE_SNAPSHOT.releasedOn}>{dictionary.releaseDate}</time>
 		</p>
 	</div>
 	<div class="footer-wordmark" aria-hidden="true" data-text={SITE_NAME}></div>

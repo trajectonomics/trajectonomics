@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import * as site from "./site"
 import {
-	CLI_VERSION,
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
 	FI_DEMO_COMMAND,
@@ -12,8 +11,6 @@ import {
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
 	ONBOARDING_SKILL_URL,
-	ONBOARDING_VERSION,
-	RELEASE_DATE,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 	STAR_REPOS,
@@ -62,11 +59,10 @@ describe("the Site's own constants", () => {
 		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_CLI_URL, GITHUB_SKILLS_URL])
 	})
 
-	it("names the CLI's docs page and the release date the footer announces", () => {
+	it("names the CLI's docs page, and leaves the release facts to the Release snapshot", () => {
 		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
-		expect(RELEASE_DATE).toBe("2026-11-17")
-		expect(CLI_VERSION).toBe("v0.2.0")
-		expect(ONBOARDING_VERSION).toBe("v0.1.0")
+		expect(Object.hasOwn(site, "CLI_VERSION")).toBe(false)
+		expect(Object.hasOwn(site, "RELEASE_DATE")).toBe(false)
 	})
 
 	it("pinpoints the CLI installation page, the way out under the prompt", () => {

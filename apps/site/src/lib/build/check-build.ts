@@ -23,6 +23,7 @@ import { checkPageLinks } from "./page-links"
 import { checkPageText } from "./page-text"
 import { checkPageWeight } from "./page-weight"
 import { checkContentSecurityPolicy } from "./policy"
+import { checkReleaseFacts } from "./release"
 import { checkReservedPreloadPath } from "./reserved-path"
 import { checkRobots } from "./robots"
 import { checkShareImage } from "./share-image"
@@ -69,6 +70,7 @@ const FILE_RULES = [
 	checkSiteLinks,
 	checkPageText,
 	checkThaiTextLanguage,
+	checkReleaseFacts,
 ] as const
 
 /** The rules that judge the build against the Web Consumer Contract the Site pins, Themes aside. */

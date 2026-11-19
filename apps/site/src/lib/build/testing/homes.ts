@@ -4,6 +4,7 @@ import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../../langu
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
 import { headOf } from "./head"
+import { releaseStrip } from "./release"
 
 /** One Language's entry, so a test names the Language it changes. */
 export function entryAt(index: number): LanguageEntry {
@@ -37,7 +38,7 @@ export function home(
 ): BuiltFile {
 	return {
 		path: `${language}/index.html`,
-		content: `<html lang="${language}"><head>${headOf(language)}</head><body><nav>${nav}</nav><main>${body}</main></body></html>`,
+		content: `<html lang="${language}"><head>${headOf(language)}</head><body><nav>${nav}</nav><main>${body}</main><footer>${releaseStrip(language)}</footer></body></html>`,
 	}
 }
 

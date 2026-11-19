@@ -1,6 +1,9 @@
-import { CLI_VERSION, ONBOARDING_VERSION } from "../site"
+import { releaseFor } from "../site/release-snapshot"
 import type { LanguageEntry } from "./language"
 import { THAI_SECTIONS } from "./th-sections"
+
+/** The release strings Thai prints, from the committed Release snapshot. */
+const RELEASE = releaseFor("th")
 
 /** Thai: the Language of `/th/`, and of Thailand when no tag chooses. */
 export const THAI: LanguageEntry = Object.freeze({
@@ -16,10 +19,10 @@ export const THAI: LanguageEntry = Object.freeze({
 		languageSwitchLabel: "ไทย",
 		heroHeadingPrefix: "ชุดเครื่องมือสำหรับ",
 		heroHeadingAccent: "การวางแผนการเงิน",
-		heroVersion: CLI_VERSION,
+		heroVersion: RELEASE.heroVersion,
 		heroLicence: "MIT · โอเพนซอร์ส",
-		releaseLine: `เสถียร: traj CLI ${CLI_VERSION} · traj-onboarding ${ONBOARDING_VERSION}`,
-		releaseDate: "17 พ.ย. 2026",
+		releaseLine: RELEASE.releaseLine,
+		releaseDate: RELEASE.releaseDate,
 		heroSubline:
 			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent ใช้ได้ทั้งเป็นสกิลและ CLI — ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		factLabels: Object.freeze(["สกุลเงิน", "ครั้งแรก", "เอเจนต์"] as const),
@@ -41,7 +44,8 @@ export const THAI: LanguageEntry = Object.freeze({
 		copyFailed: "เลือกพรอมต์แล้วคัดลอก",
 		licence: "MIT",
 		org: "trajectonomics",
-		footerDisclaimer: `traj ${CLI_VERSION} เป็นรุ่นเสถียรล่าสุด ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว`,
+		footerDisclaimer:
+			"ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว",
 		notFoundHeading: "ไม่พบหน้านี้",
 		notFoundBody: "ลิงก์นี้อาจถูกย้ายหรือพิมพ์ผิด",
 	}),

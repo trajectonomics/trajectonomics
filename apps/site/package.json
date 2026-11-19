@@ -33,6 +33,9 @@
 		"verify:build": "bun test ./test/dist",
 		"probe:status": "bun scripts/probe-status.ts",
 		"stars:update": "bun scripts/stars.ts",
+		"release:update": "bun scripts/release-update.ts",
+		"release:check": "bun scripts/release-check.ts",
+		"release:drift": "bun scripts/release-drift.ts",
 		"indexnow": "bun scripts/indexnow.ts",
 		"skills:check": "bunx skills@latest check",
 		"skills:update": "bunx skills@latest update"

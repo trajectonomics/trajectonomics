@@ -64,18 +64,6 @@ export const DOCS_CLI_PATH = "/docs/cli/"
  */
 export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 
-/** The CLI's v0.2.0 release date, the machine-readable date the footer's release line names. */
-export const RELEASE_DATE = "2026-11-17"
-
-/**
- * The traj CLI's latest stable release. The pill, the footer's release line and its disclaimer name
- * it, so a release is one edit here and one date beside it.
- */
-export const CLI_VERSION = "v0.2.0"
-
-/** The Onboarding skill's latest stable release, which ships on its own schedule. */
-export const ONBOARDING_VERSION = "v0.1.0"
-
 /** The skills repository: the star menu, the How it works star link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 

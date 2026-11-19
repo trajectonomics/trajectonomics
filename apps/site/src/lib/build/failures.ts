@@ -1,8 +1,7 @@
 import type { CrawlerFailureCode } from "./crawler-failure-codes"
 import type { HeadFailureCode } from "./head-failure-codes"
+import type { ReleaseFailureCode } from "./release-failure-codes"
 import type { ShareFailureCode } from "./share-failure-codes"
-
-export type { CrawlerFailureCode, HeadFailureCode, ShareFailureCode }
 
 /** Stable codes for every way the built Site can fail verification. One code per rule. */
 export type BuildFailureCode =
@@ -91,6 +90,7 @@ export type BuildFailureCode =
 	| "ROBOTS_SITEMAP_MISSING"
 	| "ROBOTS_SITEMAP_TARGET"
 	| CrawlerFailureCode
+	| ReleaseFailureCode
 	| ShareFailureCode
 
 /** One failed build check: the rule's code, the file it concerns and a line a maintainer can act on. */

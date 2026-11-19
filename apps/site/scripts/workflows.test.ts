@@ -79,3 +79,24 @@ describe("browser.yml, the workflow that needs a browser", () => {
 		expect(runs()).toContain("bun run test:performance")
 	})
 })
+
+describe("release-drift.yml, the weekly release report", () => {
+	const steps = () => soleJob(load("release-drift.yml")).steps ?? []
+	const runs = () => steps().flatMap((step) => (step.run === undefined ? [] : [step.run]))
+
+	it("runs weekly and by hand, because a missed refresh is found by the report", () => {
+		const workflow = load("release-drift.yml")
+		expect(workflow.on?.["schedule"]).toEqual([{ cron: "0 6 * * 2" }])
+		expect(workflow.on).toHaveProperty("workflow_dispatch")
+	})
+
+	it("grants contents to read the snapshot and issues to report drift", () => {
+		expect(load("release-drift.yml").permissions).toEqual({ contents: "read", issues: "write" })
+	})
+
+	it("is one job that runs the check, and opens no branch, pull request or deploy", () => {
+		expect(Object.values(load("release-drift.yml").jobs ?? {})).toHaveLength(1)
+		expect(runs()).toContain("bun run release:drift")
+		expect(runs().some((run) => /\bgh pr\b|wrangler|git push/.test(run))).toBe(false)
+	})
+})

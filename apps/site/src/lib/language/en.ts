@@ -1,6 +1,9 @@
-import { CLI_VERSION, ONBOARDING_VERSION } from "../site"
+import { releaseFor } from "../site/release-snapshot"
 import { ENGLISH_SECTIONS } from "./en-sections"
 import type { LanguageEntry } from "./language"
+
+/** The release strings English prints, from the committed Release snapshot. */
+const RELEASE = releaseFor("en")
 
 /** English: the Language of `/en/`, and the fallback when nothing else chooses. */
 export const ENGLISH: LanguageEntry = Object.freeze({
@@ -16,10 +19,10 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		languageSwitchLabel: "EN",
 		heroHeadingPrefix: "Deterministic layers for",
 		heroHeadingAccent: "Financial Planning",
-		heroVersion: CLI_VERSION,
+		heroVersion: RELEASE.heroVersion,
 		heroLicence: "MIT · open source",
-		releaseLine: `stable: traj CLI ${CLI_VERSION} · traj-onboarding ${ONBOARDING_VERSION}`,
-		releaseDate: "17 Nov 2026",
+		releaseLine: RELEASE.releaseLine,
+		releaseDate: RELEASE.releaseDate,
 		heroSubline:
 			"traj is a free, open-source financial simulation tool built for AI agents. Ship as a skill and CLI — local-first, no accounts, no dashboards, no subscriptions.",
 		factLabels: Object.freeze(["Currency", "First run", "Agent"] as const),
@@ -41,7 +44,8 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		copyFailed: "Select the prompt and copy it.",
 		licence: "MIT",
 		org: "trajectonomics",
-		footerDisclaimer: `traj ${CLI_VERSION} is the latest stable release; a bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.`,
+		footerDisclaimer:
+			"A bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
 		notFoundHeading: "Page not found",
 		notFoundBody: "This link may have moved, or it may be mistyped.",
 	}),
