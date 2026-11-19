@@ -6,6 +6,8 @@ export const THAI_SECTIONS = Object.freeze({
 	actionQuestion: "ฉันหยุดทำงานได้เมื่อไหร่",
 	actionYou: "คุณ",
 	actionAgent: "เอเจนต์",
+	actionBeforeLabel: "ก่อน",
+	actionAfterLabel: "หลัง",
 	actionWithoutLabel: "ถามเอเจนต์เฉยๆ",
 	actionWithoutNote: "ได้คำตอบใหม่ทุกครั้ง และไม่มีอะไรให้ตรวจสอบ",
 	actionWithLabel: "เอเจนต์ + สกิล traj",

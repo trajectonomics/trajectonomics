@@ -35,7 +35,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		starOnboarding: "Star traj-onboarding",
 		cliDocsLink: "Read the CLI docs",
 		cliInstallLink: "Install the CLI directly",
-		copy: "Copy",
+		copy: "Copy prompt to your AI agents",
 		copied: "Prompt copied",
 		copiedLabel: "Copied",
 		copyFailed: "Select the prompt and copy it.",

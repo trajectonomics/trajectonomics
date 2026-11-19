@@ -1,0 +1,46 @@
+/*
+ * The phone's tab bar for the comparison (see compare.css): one panel at a time, before on landing. The
+ * animation that advances to after belongs to another issue. At the desktop width both panels return
+ * side by side and the bar steps aside, because the panels label themselves Before and After.
+ */
+
+.compare-tabs {
+	display: flex;
+	gap: 8px;
+	margin-top: 40px;
+}
+
+.compare-tab-button {
+	flex: 1;
+	min-height: 40px;
+	padding: 10px 12px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 8px;
+	background: var(--ds-color-background);
+	color: var(--ds-color-muted-foreground);
+	font-family: var(--font-meta);
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+.compare-tab-button[aria-pressed="true"] {
+	border-color: var(--ds-color-accent);
+	color: var(--ds-color-foreground);
+}
+
+.compare-tab-button:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+@media (min-width: 64rem) {
+	.compare-panel {
+		display: flex;
+	}
+
+	.compare-tabs {
+		display: none;
+	}
+}

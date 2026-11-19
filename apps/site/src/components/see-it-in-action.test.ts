@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { elementsByTag, textOf } from "../lib/build/html"
+import { textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
 import { FI_DEMO_COMMAND, FI_DEMO_DATE } from "../lib/site"
 import SeeItInAction from "./SeeItInAction.astro"
@@ -10,12 +10,32 @@ describe("the See it in action section in every Language", () => {
 	for (const { language } of LANGUAGES) {
 		const dictionary = languageEntry(language).dictionary
 
-		it(`carries one h2 and no deeper heading (${language})`, async () => {
+		it(`carries no heading: the hero's one h1 is the page's claim (${language})`, async () => {
 			const page = scanComponent(await renderComponent(SeeItInAction, { dictionary }))
-			expect(headings(page).map((element) => element.tag)).toEqual(["h2"])
-			const h2 = elementsByTag(page, "h2")[0]
-			if (h2 === undefined) throw new Error("the section rendered no h2")
-			expect(textOf(page, h2)).toBe(dictionary.actionHeading)
+			expect(headings(page)).toEqual([])
+			expect(withClass(page, "section-head")).toEqual([])
+		})
+
+		it(`labels the panels before and after, and lands on before (${language})`, async () => {
+			const page = scanComponent(await renderComponent(SeeItInAction, { dictionary }))
+			expect(withClass(page, "compare-tab-label").map((element) => textOf(page, element))).toEqual([
+				dictionary.actionBeforeLabel,
+				dictionary.actionAfterLabel,
+			])
+			const wrap = withAttribute(page, "data-action-compare")[0]
+			expect(wrap?.attributes["data-action-stage"]).toBe("without")
+			expect(
+				withClass(page, "compare-tab-button").map((element) => element.attributes["aria-pressed"]),
+			).toEqual(["true", "false"])
+		})
+
+		it(`gives a phone one tab per panel, with the animation's two hooks (${language})`, async () => {
+			const html = await renderComponent(SeeItInAction, { dictionary })
+			const page = scanComponent(html)
+			expect(withClass(page, "compare-tabs")).toHaveLength(1)
+			expect(withClass(page, "compare-tab-button")).toHaveLength(2)
+			expect(html).toContain("traj:action-animation-start")
+			expect(html).toContain("traj:action-animation-finished")
 		})
 
 		it(`puts the same question to both panels (${language})`, async () => {

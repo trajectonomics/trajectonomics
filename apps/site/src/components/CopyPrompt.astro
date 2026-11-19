@@ -18,16 +18,12 @@ const NOTICE_TIMEOUT_MS = 6000
 ---
 
 <div class="relative">
-	<Card variant="panel" data-install-window class="overflow-hidden text-left">
-		<div class="flex items-center gap-2 border-b border-border bg-secondary px-4 py-2.5">
-			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
-			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
-			<span class="h-2.5 w-2.5 rounded-full bg-border" aria-hidden="true"></span>
-		</div>
-		<div class="flex flex-col items-stretch gap-3 p-4">
+	<Card variant="panel" data-install-window class="install-cta text-left">
+		<div class="install-row flex flex-col items-stretch gap-3 p-4">
 			<code
 				data-install-prompt
-				class="min-w-0 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap text-foreground sm:text-base"
+				hidden
+				class="install-prompt"
 			>
 				{INSTALL_PROMPT}
 			</code>
@@ -40,14 +36,14 @@ const NOTICE_TIMEOUT_MS = 6000
 				data-copied-label={dictionary.copiedLabel}
 				data-copy-failed={dictionary.copyFailed}
 				data-notice-timeout={NOTICE_TIMEOUT_MS}
-				class="window-copy px-5"
+				class="window-copy copy-cta px-5"
 			>
 				{dictionary.copy}
 			</Button>
+			<a class="window-exit" href={DOCS_CLI_INSTALL_PATH}>
+				{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
+			</a>
 		</div>
-		<a class="window-exit" href={DOCS_CLI_INSTALL_PATH}>
-			{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
-		</a>
 	</Card>
 	<div
 		data-copy-toast
@@ -109,7 +105,8 @@ const NOTICE_TIMEOUT_MS = 6000
 			}, timeoutMs)
 		}
 
-		// The button is progressive enhancement: with JavaScript off the prompt alone is the action.
+		// The prompt stays in the page for this button to copy, but the CTA shows only two controls:
+		// this one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
 		button.hidden = false
 		button.addEventListener("click", async () => {
 			const text = prompt.textContent?.trim() ?? ""

@@ -49,6 +49,10 @@ export interface Dictionary {
 	readonly actionYou: string
 	/** The speaker label of the agent in a transcript. */
 	readonly actionAgent: string
+	/** The comparison's before label: the agent asked alone, shown first on a phone. */
+	readonly actionBeforeLabel: string
+	/** The comparison's after label: the agent with traj, shown once the animation finishes. */
+	readonly actionAfterLabel: string
 	/** The left panel's tab: the agent asked alone. */
 	readonly actionWithoutLabel: string
 	/** The left panel's verdict under its three runs. */

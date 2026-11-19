@@ -11,7 +11,7 @@
 .hero-blast-rim {
 	position: absolute;
 	inset: 0;
-	opacity: 0.55;
+	opacity: 0.85;
 	-webkit-mask-image:
 		linear-gradient(
 			to bottom,
@@ -66,5 +66,5 @@
 }
 
 [data-theme="dark"] .hero-blast-rim {
-	opacity: 0.62;
+	opacity: 0.95;
 }

@@ -35,7 +35,7 @@ export const THAI: LanguageEntry = Object.freeze({
 		starOnboarding: "ให้ดาว traj-onboarding",
 		cliDocsLink: "อ่านเอกสาร CLI",
 		cliInstallLink: "ติดตั้ง CLI โดยตรง",
-		copy: "คัดลอก",
+		copy: "คัดลอกพรอมต์ให้เอเจนต์ของคุณ",
 		copied: "คัดลอกพรอมต์แล้ว",
 		copiedLabel: "คัดลอกแล้ว",
 		copyFailed: "เลือกพรอมต์แล้วคัดลอก",

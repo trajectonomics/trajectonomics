@@ -8,6 +8,7 @@
 	display: grid;
 	gap: 16px;
 	margin-top: 40px;
+	text-align: left;
 }
 
 @media (min-width: 64rem) {
@@ -19,7 +20,7 @@
 }
 
 .compare-panel {
-	display: flex;
+	display: none;
 	min-width: 0;
 	flex-direction: column;
 	overflow: hidden;
@@ -31,6 +32,12 @@
 
 .compare-panel[data-side="without"] {
 	border-style: dashed;
+}
+
+/* The phone shows only the active side; compare-tabs.css restores both at the desktop width. */
+.compare-wrap[data-action-stage="without"] .compare-panel[data-side="without"],
+.compare-wrap[data-action-stage="with"] .compare-panel[data-side="with"] {
+	display: flex;
 }
 
 .compare-tab {

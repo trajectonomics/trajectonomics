@@ -4,6 +4,7 @@
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
 import CopyPrompt from "./CopyPrompt.astro"
+import SeeItInAction from "./SeeItInAction.astro"
 import Badge from "./ui/Badge.astro"
 import Separator from "./ui/Separator.astro"
 
@@ -16,6 +17,8 @@ const subline = sublineParts(dictionary.heroSubline)
 ---
 
 <section data-hero class="hero-stage relative isolate flex flex-col overflow-clip bg-background">
+	<!-- The ground belongs to the copy alone: the comparison below it sits on the plain page surface. -->
+	<div class="hero-ground relative">
 	<div class="hero-blast" aria-hidden="true">
 		<div class="hero-blast-field">
 			<div class="hero-blast-drift">
@@ -26,7 +29,7 @@ const subline = sublineParts(dictionary.heroSubline)
 		</div>
 	</div>
 	<div
-		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 pt-28 pb-24 text-center sm:px-6 sm:pt-32 sm:pb-28"
+		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 pt-20 pb-10 text-center sm:px-6 sm:pt-24 sm:pb-14"
 	>
 		<Badge class="hero-pill">
 			<span class="hero-pill-marker" aria-hidden="true"></span>
@@ -57,6 +60,11 @@ const subline = sublineParts(dictionary.heroSubline)
 		<div class="hero-command mt-10 w-full max-w-xl sm:mt-12">
 			<CopyPrompt dictionary={dictionary} />
 		</div>
+	</div>
+	</div>
+	<!-- The demonstration is part of the landing view, not a section the visitor has to hunt for. -->
+	<div class="hero-compare relative mx-auto w-full max-w-6xl px-5 pb-16 sm:px-6 sm:pb-20">
+		<SeeItInAction dictionary={dictionary} />
 	</div>
 </section>
 

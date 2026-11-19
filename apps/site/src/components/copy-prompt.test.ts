@@ -139,5 +139,15 @@ describe("the CopyPrompt component in every Language", () => {
 			expect(elementsByTag(page, "button")).toHaveLength(1)
 			expect(elementsByTag(page, "a")).toHaveLength(1)
 		})
+
+		it(`shows only two controls, with the prompt kept out of view for Copy to read (${language})`, async () => {
+			const page = await render()
+			const prompt = withAttribute(page, "data-install-prompt")[0]
+			if (prompt === undefined) throw new Error("no prompt rendered")
+			expect("hidden" in prompt.attributes).toBe(true)
+			expect(withClass(page, "install-row")).toHaveLength(1)
+			expect(elementsByTag(page, "button")).toHaveLength(1)
+			expect(elementsByTag(page, "a")).toHaveLength(1)
+		})
 	}
 })

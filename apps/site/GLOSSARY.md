@@ -37,7 +37,7 @@ One way a visitor gets traj onto their machine: the Site's Prompt route, which h
 _Avoid_: Install method, installer, setup path
 
 **Prompt route**:
-The install window's one action: a single sentence, copied into a coding agent, that names the published Onboarding skill by its raw URL rather than quoting a command, so the commands stay in the Skill that owns and versions them. It serves the visitor who has no terminal but whose agent does ([ADR 0016](docs/adr/0015-the-window-prints-a-prompt-and-no-command.md)).
+The CTA's one action: a single sentence, copied into a coding agent by the CTA's Copy control, that names the published Onboarding skill by its raw URL rather than quoting a command, so the commands stay in the Skill that owns and versions them. It serves the visitor who has no terminal but whose agent does; the sentence ships in the page but is not printed beside the two CTA controls ([ADR 0015](docs/adr/0015-the-window-prints-a-prompt-and-no-command.md), amendment of 2026-11-19).
 _Avoid_: Prompt command, paste command, copy command
 
 **Stable release**:

@@ -9,23 +9,28 @@ const VIEWPORTS = [
 
 test.describe("the hero's height", () => {
 	for (const viewport of VIEWPORTS) {
-		test(`fills a ${viewport.name} viewport and then some, so the next section lands below the fold`, async ({
+		test(`puts the comparison on the landing view and follows it straight with the next section (${viewport.name})`, async ({
 			page,
 		}) => {
 			await page.setViewportSize({ width: viewport.width, height: viewport.height })
 			await openPage(page, homeOf("en"))
 			const measured = await page.evaluate(() => {
 				const hero = document.querySelector("[data-hero]")
+				const comparison = document.querySelector("[data-action-compare]")
 				const next = document.querySelector("main > section:not([data-hero])")
 				return {
 					hero: Math.round(hero?.getBoundingClientRect().height ?? 0),
+					comparison: Math.round(comparison?.getBoundingClientRect().top ?? 0),
 					next: Math.round(next?.getBoundingClientRect().top ?? 0),
 				}
 			})
-			expect(measured.hero, "the hero is taller than the viewport").toBeGreaterThan(viewport.height)
-			expect(measured.next, "the section under the hero starts below the fold").toBeGreaterThan(
+			expect(measured.comparison, "the comparison starts on the landing view").toBeLessThan(
 				viewport.height,
 			)
+			expect(
+				measured.next - measured.hero,
+				"the next section meets the hero with no gap",
+			).toBeLessThan(100)
 		})
 	}
 })

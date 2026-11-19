@@ -90,3 +90,12 @@ change.
 - The copy rate is measured the same way it was: `site_command_copied` over `$pageview`.
 - The window's copy is the owner's, in both Languages, and the prompt is one English fixture in every Language
   because its reader is the agent.
+
+## Amendment (2026-11-19): the CTA shows only two controls
+
+The owner asked on 2026-11-19: *"Remove prompt in the CTA let make it only 2 button in CTA copy prompt to your AI agents and install cli directly."* This amends the "One prompt" bullet above; the no-command decision and the single way out stand.
+
+- The CTA shows exactly two controls: the Copy control, now labelled for the visitor's agent, and the CLI link as a quiet outlined peer. No terminal chrome, no visible prompt line.
+- The prompt text still ships in every Language home inside a `hidden` `code[data-install-prompt]`. The Copy control reads that text, and the pure built-file rule still proves the exact sentence is present and is not a command. What that rule no longer proves is that a visitor can read the sentence: that guarantee is retired with this change.
+- With JavaScript off, the Copy control and the prompt both stay hidden; the CLI link is the only CTA action. A visitor with no agent and no script has one way out, not two. This is a named gap, not a solved problem.
+- The measured event name and its stable `install` value stay unchanged, so the copy series is not split.

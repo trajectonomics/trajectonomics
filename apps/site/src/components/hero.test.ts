@@ -15,6 +15,16 @@ describe("the Hero component in every Language", () => {
 			expect(headings(page).map((element) => element.tag)).toEqual(["h1"])
 		})
 
+		it(`carries the before/after comparison inside the hero, so it is seen on landing (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const hero = withAttribute(page, "data-hero")[0]
+			if (hero === undefined) throw new Error("the hero rendered no stage")
+			const panels = withClass(page, "compare-panel")
+			expect(panels).toHaveLength(2)
+			for (const panel of panels) expect(panel.ancestors.includes(hero)).toBe(true)
+			expect(withAttribute(page, "data-action-compare")).toHaveLength(1)
+		})
+
 		it(`carries the plain run and the accent in the h1 (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const h1 = elementsByTag(page, "h1")[0]
