@@ -1,5 +1,5 @@
 import type { Language } from "../../language/language"
-import { CLEAN_URL, LANGUAGES, languageEntry, languageHomeFile } from "../../language/languages"
+import { LANGUAGES, languageEntry, localeUrl } from "../../language/languages"
 import {
 	DOCS_CLI_PATH,
 	DOCS_PATH,
@@ -47,7 +47,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 	const content = [
 		`<html lang="${language}"><head>${headOf(language)}</head>`,
 		"<body>",
-		`<header><nav><a href="${CLEAN_URL}" aria-label="${SITE_NAME}"><svg></svg></a>`,
+		`<header><nav><a href="${localeUrl(language)}" aria-label="${SITE_NAME}"><svg></svg></a>`,
 		`<a href="${DOCS_PATH}">${dictionary.docsLink}</a>`,
 		`<details><summary>${dictionary.starMenuLabel}</summary><div>${starPanel}</div></details>`,
 		`<details><summary>${dictionary.languageSwitchLabel}</summary><div>${switcher(language)}</div></details>`,
@@ -80,7 +80,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		parts.extra ?? "",
 		"</body></html>",
 	].join("\n")
-	return { path: languageHomeFile(language), content }
+	return { path: `${language}/index.html`, content }
 }
 
 /** Every Language's home, with `page` standing in for the home at the same path. */

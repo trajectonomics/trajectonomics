@@ -6,12 +6,11 @@ import { reportFailures } from "./report-failures"
 const REQUEST_TIMEOUT_MS = 10_000
 const HARD_TIMEOUT_MS = 90_000
 
-/** The headers one probe sends: the Visitor signals and the Language choice the request carries. */
+/** The Visitor signal headers one probe sends, named as the request headers they are. */
 function headersOf(probe: Probe): Record<string, string> {
 	const headers: Record<string, string> = {}
 	if (probe.acceptLanguage !== null) headers["Accept-Language"] = probe.acceptLanguage
 	if (probe.country !== null) headers["CF-IPCountry"] = probe.country
-	if (probe.cookie !== null) headers["Cookie"] = probe.cookie
 	return headers
 }
 
@@ -19,7 +18,7 @@ async function readResponses(baseUrl: string): Promise<readonly ProbeResponse[]>
 	const responses: ProbeResponse[] = []
 	for (const probe of PROBES) {
 		const response = await fetch(`${baseUrl}${probe.path}`, {
-			redirect: "manual",
+			redirect: probe.followRedirects ? "follow" : "manual",
 			headers: headersOf(probe),
 			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 		})
@@ -28,10 +27,7 @@ async function readResponses(baseUrl: string): Promise<readonly ProbeResponse[]>
 			probe,
 			status: response.status,
 			location: response.headers.get("location"),
-			setCookies: response.headers.getSetCookie(),
-			vary: response.headers.get("vary"),
-			cacheControl: response.headers.get("cache-control"),
-			etag: response.headers.get("etag"),
+			setCookie: response.headers.get("set-cookie"),
 			contentSecurityPolicy: response.headers.get("content-security-policy"),
 			contentType: response.headers.get("content-type"),
 			html,

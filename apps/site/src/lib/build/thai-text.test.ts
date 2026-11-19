@@ -14,7 +14,7 @@ describe("the Language Thai text inherits", () => {
 
 	it("passes a Thai word marked Thai on an English page", () => {
 		const body = '<a href="/th/" lang="th" hreflang="th">ไทย</a>'
-		expect(codes([page("index.html", "", body)])).toEqual([])
+		expect(codes([page("en/index.html", "", body)])).toEqual([])
 	})
 
 	it("treats a Thai variant such as th-TH as Thai", () => {
@@ -23,7 +23,7 @@ describe("the Language Thai text inherits", () => {
 	})
 
 	it("fails Thai text on a page that declares another Language", () => {
-		expect(codes([page("index.html", "", "<p>สวัสดี</p>")])).toEqual(["THAI_TEXT_LANGUAGE_WRONG"])
+		expect(codes([page("en/index.html", "", "<p>สวัสดี</p>")])).toEqual(["THAI_TEXT_LANGUAGE_WRONG"])
 	})
 
 	it("fails Thai text whose nearest declared Language is not Thai", () => {
@@ -33,7 +33,7 @@ describe("the Language Thai text inherits", () => {
 
 	it("fails Thai text in an element with no Language of its own under an English page", () => {
 		const body = "<div><span>สวัสดี</span></div>"
-		expect(codes([page("index.html", "", body)])).toEqual(["THAI_TEXT_LANGUAGE_WRONG"])
+		expect(codes([page("en/index.html", "", body)])).toEqual(["THAI_TEXT_LANGUAGE_WRONG"])
 	})
 
 	it("judges a Thai title against the Language it inherits", () => {

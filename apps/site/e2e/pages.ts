@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test"
 import { PRODUCTION_THEME } from "../src/lib/design/shipped-themes"
 import type { Language } from "../src/lib/language/language"
-import { LANGUAGE_CHOICE_COOKIE } from "../src/lib/language/stored-choice"
-import { BASE_URL } from "./base-url"
+import { dictionaryFor } from "../src/lib/language/languages"
+import { INSTALL_PROMPT } from "../src/lib/site"
 
 /** One page the browser checks judge, and the status its real response must have. */
 export interface PageUnderTest {
@@ -10,22 +10,17 @@ export interface PageUnderTest {
 	readonly language: Language
 	readonly name: string
 	readonly status: number
-	/** The Language the visitor stored before the page opened, or `null` when they stored none. */
-	readonly storedChoice: Language | null
 }
 
-/** The Site's one address in each Language, and the real Not-found response every check judges. */
+/** The Language homes and the real Not-found response every browser check judges. */
 export const PAGES: readonly PageUnderTest[] = Object.freeze([
-	{ path: "/", language: "en", name: "English home", status: 200, storedChoice: null },
-	{ path: "/", language: "th", name: "Thai home", status: 200, storedChoice: "th" },
-	{
-		path: "/no-such-path/",
-		language: "en",
-		name: "Not-found page",
-		status: 404,
-		storedChoice: null,
-	},
+	{ path: "/th/", language: "th", name: "Thai home", status: 200 },
+	{ path: "/en/", language: "en", name: "English home", status: 200 },
+	{ path: "/no-such-path/", language: "en", name: "Not-found page", status: 404 },
 ])
+
+/** The controls a keyboard visitor can reach, excluding anything hidden or disabled. */
+const FOCUSABLE = "a[href], button:not([disabled]):not([hidden]), summary"
 
 /**
  * The device schemes the harness sets before navigation. Both are kept although the Site ships one
@@ -42,25 +37,10 @@ export function homeOf(language: Language): PageUnderTest {
 	return home
 }
 
-/**
- * Open one page the way a visitor reaches it: the Site's one address, with the Language choice the
- * visitor stored carried as a cookie. No check navigates to a Language build path, because no
- * visitor is ever given one (ADR 0020).
- */
-export async function visit(page: Page, underTest: PageUnderTest): Promise<number> {
-	if (underTest.storedChoice !== null) {
-		await page
-			.context()
-			.addCookies([{ name: LANGUAGE_CHOICE_COOKIE, value: underTest.storedChoice, url: BASE_URL }])
-	}
-	const response = await page.goto(underTest.path)
-	return response?.status() ?? 0
-}
-
 /** Open a page, assert its real status and the Language its document declares. */
 export async function openPage(page: Page, underTest: PageUnderTest): Promise<void> {
-	const status = await visit(page, underTest)
-	expect(status, `${underTest.path} answers ${underTest.status}`).toBe(underTest.status)
+	const response = await page.goto(underTest.path)
+	expect(response?.status(), `${underTest.path} answers ${underTest.status}`).toBe(underTest.status)
 	await expect(page.locator("html")).toHaveAttribute("lang", new RegExp(`^${underTest.language}`))
 }
 
@@ -68,3 +48,69 @@ export async function openPage(page: Page, underTest: PageUnderTest): Promise<vo
 export async function expectShippedTheme(page: Page): Promise<void> {
 	await expect(page.locator("html")).toHaveAttribute("data-theme", PRODUCTION_THEME)
 }
+
+/** The number of controls a keyboard visitor can reach on the page. */
+export function focusableCount(page: Page): Promise<number> {
+	return page.evaluate(
+		(selector) =>
+			// A closed <details> keeps its panel laid out but out of the tab order, so only the
+			// summary and the controls outside every closed panel are counted.
+			[...document.querySelectorAll(selector)].filter((element) => {
+				const panel = element.closest("details:not([open])")
+				if (panel !== null && element.tagName !== "SUMMARY") return false
+				// A tab bar hidden at this width is out of the browser's tab order too, so it must
+				// not be counted here (the comparison's phone tabs are hidden on a desktop).
+				return element.getClientRects().length > 0
+			}).length,
+		FOCUSABLE,
+	)
+}
+
+/** Whether the focused control paints a ring in a `--ds-*` role: an outline or a box shadow. */
+export function ringVisible(page: Page): Promise<boolean> {
+	return page.evaluate(() => {
+		const focused = document.activeElement
+		if (!(focused instanceof HTMLElement)) return false
+		const token = getComputedStyle(document.documentElement)
+			.getPropertyValue("--ds-color-ring")
+			.trim()
+		if (token === "") return false
+		const probe = document.createElement("span")
+		probe.style.color = token
+		document.body.append(probe)
+		const ring = getComputedStyle(probe).color
+		probe.remove()
+		const style = getComputedStyle(focused)
+		const outline =
+			style.outlineStyle !== "none" &&
+			Number.parseFloat(style.outlineWidth) > 0 &&
+			style.outlineColor === ring
+		return outline || (style.boxShadow !== "none" && style.boxShadow.includes(ring))
+	})
+}
+
+/** Press Tab until the Copy button has focus, and return whether it gets there at all. */
+export async function tabToCopyButton(page: Page): Promise<boolean> {
+	const count = await focusableCount(page)
+	for (let press = 0; press < count; press++) {
+		await page.keyboard.press("Tab")
+		const onCopy = await page.evaluate(
+			() => document.activeElement?.hasAttribute("data-copy-prompt") ?? false,
+		)
+		if (onCopy) return true
+	}
+	return false
+}
+
+/** The dictionary string one Language announces after a copy. */
+export function copiedMessage(language: Language): string {
+	return dictionaryFor(language).copied
+}
+
+/** The short word one Language puts on the Copy button while the notice lasts. */
+export function copiedLabel(language: Language): string {
+	return dictionaryFor(language).copiedLabel
+}
+
+/** The prompt a copy puts on the clipboard. */
+export const COPY_PROMPT_TEXT = INSTALL_PROMPT

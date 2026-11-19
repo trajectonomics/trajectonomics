@@ -26,12 +26,12 @@ const SITE_CSS = asset(
 const LINK = '<link rel="stylesheet" href="/_astro/site.css">'
 
 /** A page, its stylesheet and the three faces, plus whatever a test adds. */
-function site(extra: readonly BuiltFile[] = [], pagePath = "index.html"): readonly BuiltFile[] {
+function site(extra: readonly BuiltFile[] = [], pagePath = "en/index.html"): readonly BuiltFile[] {
 	return [page(pagePath, LINK), SITE_CSS, ...FACES, ...extra]
 }
 
 /** One page linking one stylesheet, with a font file of `bytes` for its single `url()`. */
-function big(bytes: number, pagePath = "index.html"): readonly BuiltFile[] {
+function big(bytes: number, pagePath = "en/index.html"): readonly BuiltFile[] {
 	return [
 		page(pagePath, '<link rel="stylesheet" href="/_astro/big.css">'),
 		asset("_astro/big.css", 'body{src:url("/fonts/big.woff2")}'),
@@ -60,7 +60,7 @@ describe("the font budget", () => {
 		const twice = '@font-face{src:url("/fonts/aleo-latin-300.woff2")}'
 		const files = [
 			page(
-				"index.html",
+				"en/index.html",
 				'<link rel="stylesheet" href="/_astro/a.css"><link rel="stylesheet" href="/_astro/b.css">',
 			),
 			asset("_astro/a.css", twice),
@@ -72,7 +72,7 @@ describe("the font budget", () => {
 
 	it("follows a font on a stylesheet another stylesheet imports", () => {
 		const files = [
-			page("index.html", '<link rel="stylesheet" href="/_astro/a.css">'),
+			page("en/index.html", '<link rel="stylesheet" href="/_astro/a.css">'),
 			asset("_astro/a.css", '@import "./deep/b.css";'),
 			asset("_astro/deep/b.css", 'body{src:url("../../fonts/big.woff2")}'),
 			font("fonts/big.woff2", 48_001),
@@ -91,7 +91,7 @@ describe("the fonts a page serves", () => {
 	it("fails a font another origin serves, as a preload", () => {
 		const html =
 			'<html><head><link rel="preload" as="font" href="https://fonts.example.com/x.woff2"></head></html>'
-		expect(codes([{ path: "index.html", content: html }])).toEqual([
+		expect(codes([{ path: "en/index.html", content: html }])).toEqual([
 			"REMOTE_FONT_URL_PRESENT",
 			"FONT_FROM_ANOTHER_ORIGIN",
 		])
@@ -99,7 +99,7 @@ describe("the fonts a page serves", () => {
 
 	it("fails a font another origin serves, as a stylesheet url()", () => {
 		const files = [
-			page("index.html", LINK),
+			page("en/index.html", LINK),
 			asset("_astro/site.css", 'body{src:url("https://fonts.example.com/x.woff2")}'),
 		]
 		expect(codes(files)).toEqual(["REMOTE_FONT_URL_PRESENT", "FONT_FROM_ANOTHER_ORIGIN"])
@@ -108,18 +108,18 @@ describe("the fonts a page serves", () => {
 	it("fails a font URL that names the Site's own origin absolutely", () => {
 		const html =
 			'<html><head><link rel="preload" as="font" href="https://trajectonomics.com/fonts/aleo.woff2"></head></html>'
-		expect(codes([{ path: "index.html", content: html }])).toEqual(["REMOTE_FONT_URL_PRESENT"])
+		expect(codes([{ path: "en/index.html", content: html }])).toEqual(["REMOTE_FONT_URL_PRESENT"])
 	})
 
 	it("fails a font embedded in a data: URL", () => {
 		const html =
 			'<html><head><style>@font-face{src:url("data:font/woff2;base64,d09GMg")}</style></head></html>'
-		expect(codes([{ path: "index.html", content: html }])).toEqual(["DATA_FONT_URL_PRESENT"])
+		expect(codes([{ path: "en/index.html", content: html }])).toEqual(["DATA_FONT_URL_PRESENT"])
 	})
 
 	it("fails a stylesheet that asks for a font the build did not produce", () => {
 		const files = [
-			page("index.html", LINK),
+			page("en/index.html", LINK),
 			asset("_astro/site.css", 'body{src:url("/fonts/missing.woff2")}'),
 		]
 		const failures = checkFonts(files)
@@ -130,7 +130,7 @@ describe("the fonts a page serves", () => {
 	it("reports one failure per rule, however many URLs a page carries", () => {
 		const css =
 			'@font-face{src:url("https://a.example.com/a.woff2")}@font-face{src:url("//b.example.com/b.woff2")}'
-		expect(codes([page("index.html", `<style>${css}</style>`)])).toEqual([
+		expect(codes([page("en/index.html", `<style>${css}</style>`)])).toEqual([
 			"REMOTE_FONT_URL_PRESENT",
 			"FONT_FROM_ANOTHER_ORIGIN",
 		])
@@ -138,7 +138,7 @@ describe("the fonts a page serves", () => {
 
 	it("fails a remote stylesheet that could declare a font", () => {
 		const css = '@import url("https://fonts.googleapis.com/css2?family=Aleo");'
-		expect(codes([page("index.html", `<style>${css}</style>`)])).toEqual([
+		expect(codes([page("en/index.html", `<style>${css}</style>`)])).toEqual([
 			"REMOTE_FONT_URL_PRESENT",
 			"FONT_FROM_ANOTHER_ORIGIN",
 		])
@@ -146,7 +146,7 @@ describe("the fonts a page serves", () => {
 
 	it("ignores a URL that names no font", () => {
 		const files = [
-			page("index.html", LINK),
+			page("en/index.html", LINK),
 			asset("_astro/site.css", 'body{background:url("/bg.png")}'),
 		]
 		expect(codes(files)).toEqual([])

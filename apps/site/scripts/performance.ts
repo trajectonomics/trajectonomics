@@ -9,31 +9,19 @@ import {
 import { freePort, signalGroup, startDevServer, stop, waitUntilServing } from "./probe/dev-server"
 import { reportFailures } from "./report-failures"
 
-/**
- * The renderings the performance budget judges: the Site's one address as an English and as a Thai
- * visitor reaches it. The Thai one is asked for with the choice cookie, because the address alone
- * says nothing about the Language (ADR 0020).
- */
-const PAGES = [
-	{ label: "/", cookie: null },
-	{ label: "/ (th)", cookie: "traj_lang=th" },
-] as const
+/** The pages the performance budget judges: the home of each Language. */
+const PAGES = ["/th/", "/en/"] as const
 
 /** A hung browser or Worker must not hold CI, so the whole check is bounded. */
 const HARD_TIMEOUT_MS = 420_000
 
 /** The performance score one mobile Lighthouse run reports, or `undefined` when it has none. */
-async function scoreOf(
-	url: string,
-	port: number,
-	cookie: string | null,
-): Promise<number | undefined> {
+async function scoreOf(url: string, port: number): Promise<number | undefined> {
 	const result = await lighthouse(url, {
 		port,
 		output: "json",
 		logLevel: "error",
 		onlyCategories: ["performance"],
-		...(cookie === null ? {} : { extraHeaders: { Cookie: cookie } }),
 		formFactor: "mobile",
 		screenEmulation: {
 			mobile: true,
@@ -68,15 +56,14 @@ export async function main(): Promise<number> {
 		// Chromium with a debugging port is what Lighthouse drives; Playwright installed it already.
 		browser = await chromium.launch({ args: [`--remote-debugging-port=${debugPort}`] })
 		const failures: PerformanceFailure[] = []
-		for (const page of PAGES) {
+		for (const path of PAGES) {
 			const scores: (number | undefined)[] = []
 			for (let run = 1; run <= PERFORMANCE_RUNS; run++) {
-				scores.push(await scoreOf(`${baseUrl}/`, debugPort, page.cookie))
+				scores.push(await scoreOf(`${baseUrl}${path}`, debugPort))
 			}
 			const median = medianScore(scores)
-			if (median !== undefined)
-				console.log(`performance: ${page.label} median ${median.toFixed(2)}`)
-			failures.push(...checkPerformance(page.label, scores))
+			if (median !== undefined) console.log(`performance: ${path} median ${median.toFixed(2)}`)
+			failures.push(...checkPerformance(path, scores))
 		}
 		return reportFailures("performance", failures)
 	} finally {

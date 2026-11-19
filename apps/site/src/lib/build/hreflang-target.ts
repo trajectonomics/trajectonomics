@@ -3,7 +3,7 @@ import { isAbsoluteUrl } from "./absolute-url"
 
 /** Where an `hreflang` href points: its path, and the origin when the href is absolute. */
 export interface HreflangTarget {
-	/** The URL path, such as `/`, which is what the alternate promises. */
+	/** The URL path, such as `/th/`, which is what the pair promises. */
 	readonly path: string
 	/** The origin of an absolute href, or `undefined` for a path-absolute one. */
 	readonly origin: string | undefined
@@ -11,7 +11,7 @@ export interface HreflangTarget {
 
 /**
  * The target an alternate's `href` names, or `undefined` when it is neither path-absolute nor
- * absolute, because a relative href does not name the Site's address.
+ * absolute, because a relative href does not name a Locale URL.
  */
 export function hreflangTarget(href: string | undefined): HreflangTarget | undefined {
 	if (href === undefined) return undefined

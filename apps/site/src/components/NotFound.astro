@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import Layout from "../layouts/Layout.astro"
 import type { Language } from "../lib/language/language"
-import { CLEAN_URL, dictionaryFor } from "../lib/language/languages"
+import { dictionaryFor, localeUrl } from "../lib/language/languages"
 
 interface Props {
 	readonly language: Language
@@ -24,7 +24,7 @@ const dictionary = dictionaryFor(language)
 			{dictionary.notFoundBody}
 		</p>
 		<p class="mt-6 text-lg">
-			<a class="text-foreground underline underline-offset-4" href={CLEAN_URL}>
+			<a class="text-foreground underline underline-offset-4" href={localeUrl(language)}>
 				Trajectonomics
 			</a>
 		</p>

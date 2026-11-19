@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import { currentLanguageName, type Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
-import { languageChoiceLink, languageEntry, otherLanguages } from "../lib/language/languages"
+import { languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
 import Chevron from "./icons/Chevron.astro"
 
 interface Props {
@@ -27,8 +27,9 @@ const languages = [languageEntry(language), ...otherLanguages(language)]
 			languages.map((entry) => (
 				<a
 					class="header-menu-link"
-					href={languageChoiceLink(entry.language)}
+					href={localeUrl(entry.language)}
 					lang={entry.language}
+					hreflang={entry.language}
 					aria-label={
 						entry.language === language ? currentLanguageName(entry.dictionary) : undefined
 					}

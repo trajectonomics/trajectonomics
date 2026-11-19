@@ -5,5 +5,5 @@ import NotFound from "../components/NotFound.astro"
 import { FALLBACK_LANGUAGE } from "../lib/language/language"
 ---
 
-<!-- One Not-found page answers every miss, in the fallback Language (ADR 0020). -->
+<!-- A miss with no Locale URL answers in the fallback Language (ADR 0003). -->
 <NotFound language={FALLBACK_LANGUAGE} />

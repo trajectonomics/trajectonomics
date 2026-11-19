@@ -4,7 +4,7 @@
 import mark from "@trajectonomics/design-system-assets/logo/mark.svg?raw"
 import type { Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
-import { CLEAN_URL } from "../lib/language/languages"
+import { localeUrl } from "../lib/language/languages"
 import { DOCS_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 import StarMenu from "./StarMenu.astro"
@@ -31,7 +31,7 @@ const artwork = mark
 	<nav class="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6">
 		<a
 			class="brand shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-			href={CLEAN_URL}
+			href={localeUrl(language)}
 			aria-label={SITE_NAME}
 		>
 			<span class="brand-tile"><Fragment set:html={artwork} /></span>

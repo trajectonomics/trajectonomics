@@ -2,49 +2,11 @@ import { describe, expect, it } from "bun:test"
 import type { Assets } from "./handle-request"
 import { handleRequest } from "./handle-request"
 
-/** One asset answer: the bytes, the validator, and the cache control the assets layer writes. */
-interface Asset {
-	readonly body: string
-	readonly etag: string
-}
-
-/** The answers the assets layer gives for the two Language homes and one crawler file. */
-const ASSETS: Readonly<Record<string, Asset>> = Object.freeze({
-	"/": { body: '<html lang="en">English</html>', etag: '"root-en"' },
-	"/th/": { body: '<html lang="th">ไทย</html>', etag: '"thai-home"' },
-	"/sitemap.xml": { body: "<urlset />", etag: '"sitemap"' },
-})
-
-/** What the fake assets layer was asked for, in the order it was asked. */
-interface Asked {
-	readonly path: string
-	readonly method: string
-	readonly ifNoneMatch: string | null
-}
-
-/** An assets binding that answers from `ASSETS` and records each request it is handed. */
-function fakeAssets(asked: Asked[] = []): Assets {
-	return {
-		async fetch(request: Request): Promise<Response> {
-			const url = new URL(request.url)
-			asked.push({
-				path: url.pathname,
-				method: request.method,
-				ifNoneMatch: request.headers.get("if-none-match"),
-			})
-			const asset = ASSETS[url.pathname]
-			if (asset === undefined) return new Response("not found", { status: 404 })
-			const headers = {
-				"Content-Type": "text/html",
-				ETag: asset.etag,
-				"Cache-Control": "public, max-age=0, must-revalidate",
-			}
-			if (request.headers.get("if-none-match") === asset.etag) {
-				return new Response(null, { status: 304, headers })
-			}
-			return new Response(asset.body, { status: 200, headers })
-		},
-	}
+/** An assets binding that names the path it was asked for, so a delegation is visible. */
+const assets: Assets = {
+	async fetch(request: Request): Promise<Response> {
+		return new Response(`asset:${new URL(request.url).pathname}`, { status: 200 })
+	},
 }
 
 function get(path: string, headers: Record<string, string> = {}): Request {
@@ -55,176 +17,75 @@ function contentOf(response: Response): Promise<string> {
 	return response.text()
 }
 
-describe("the Worker's answer from the Site's one address", () => {
-	it("answers English when no choice and no signal names a Language", async () => {
-		const response = await handleRequest(get("/"), fakeAssets())
-		expect(response.status).toBe(200)
-		expect(await contentOf(response)).toContain('lang="en"')
+describe("the Worker's answer from /", () => {
+	it("redirects to Thai when the browser asks for Thai", async () => {
+		const response = await handleRequest(get("/", { "accept-language": "th" }), assets)
+		expect(response.status).toBe(302)
+		expect(response.headers.get("location")).toBe("/th/")
 	})
 
-	it("answers Thai when the browser asks for Thai", async () => {
-		const asked: Asked[] = []
-		const response = await handleRequest(get("/", { "accept-language": "th" }), fakeAssets(asked))
-		expect(await contentOf(response)).toContain("ไทย")
-		expect(asked.map((one) => one.path)).toEqual(["/th/"])
+	it("redirects to Thai for a request from Thailand that asks for nothing", async () => {
+		const response = await handleRequest(get("/", { "cf-ipcountry": "TH" }), assets)
+		expect(response.headers.get("location")).toBe("/th/")
 	})
 
-	it("answers Thai for a request from Thailand that asks for nothing", async () => {
-		const response = await handleRequest(get("/", { "cf-ipcountry": "TH" }), fakeAssets())
-		expect(await contentOf(response)).toContain("ไทย")
+	it("redirects to English when no Visitor signal says otherwise", async () => {
+		const response = await handleRequest(get("/"), assets)
+		expect(response.headers.get("location")).toBe("/en/")
 	})
 
-	it("answers Thai when the visitor stored the choice", async () => {
-		const response = await handleRequest(get("/", { cookie: "traj_lang=th" }), fakeAssets())
-		expect(await contentOf(response)).toContain("ไทย")
-	})
-
-	it("lets the stored choice beat the browser's Language", async () => {
-		const response = await handleRequest(
-			get("/", { cookie: "traj_lang=th", "accept-language": "en" }),
-			fakeAssets(),
-		)
-		expect(await contentOf(response)).toContain("ไทย")
-	})
-
-	it("lets the browser's Language beat the country", async () => {
+	it("gives English to an English browser in Thailand", async () => {
 		const response = await handleRequest(
 			get("/", { "accept-language": "en", "cf-ipcountry": "TH" }),
-			fakeAssets(),
+			assets,
 		)
-		expect(await contentOf(response)).toContain('lang="en"')
+		expect(response.headers.get("location")).toBe("/en/")
 	})
 
-	it("ignores a stored value the Site does not speak", async () => {
-		const response = await handleRequest(get("/", { cookie: "traj_lang=zz" }), fakeAssets())
-		expect(await contentOf(response)).toContain('lang="en"')
-	})
-
-	it("answers English for a hostile stored value rather than passing it on", async () => {
+	it("keeps the query string, so a campaign tag survives the hop", async () => {
 		const response = await handleRequest(
-			get("/", { cookie: "traj_lang=../../etc/passwd" }),
-			fakeAssets(),
+			get("/?ref=share&x=1", { "accept-language": "th" }),
+			assets,
 		)
-		expect(await contentOf(response)).toContain('lang="en"')
+		expect(response.headers.get("location")).toBe("/th/?ref=share&x=1")
 	})
 
-	it("reads the choice among other cookies", async () => {
-		const response = await handleRequest(
-			get("/", { cookie: "a=1; traj_lang=th; b=2" }),
-			fakeAssets(),
-		)
-		expect(await contentOf(response)).toContain("ไทย")
+	it("names the Visitor signals a shared cache must vary on", async () => {
+		const response = await handleRequest(get("/"), assets)
+		expect(response.headers.get("vary")).toBe("Accept-Language, CF-IPCountry")
 	})
 
-	it("names every signal the answer depends on", async () => {
-		const response = await handleRequest(get("/"), fakeAssets())
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+	it("may not be stored, because the next visitor may come from elsewhere", async () => {
+		const response = await handleRequest(get("/"), assets)
+		expect(response.headers.get("cache-control")).toBe("no-store")
 	})
 
-	it("keeps the answer out of every shared cache, and asks the browser to revalidate", async () => {
-		const response = await handleRequest(get("/"), fakeAssets())
-		expect(response.headers.get("cache-control")).toBe("private, no-cache")
-	})
-
-	it("carries the ETag of the bytes it serves, not the root asset's", async () => {
-		const response = await handleRequest(get("/", { "accept-language": "th" }), fakeAssets())
-		expect(response.headers.get("etag")).toBe('"thai-home"')
-	})
-
-	it("sets no cookie on the address itself", async () => {
-		const response = await handleRequest(get("/", { "accept-language": "th" }), fakeAssets())
+	it("sets no cookie", async () => {
+		const response = await handleRequest(get("/"), assets)
 		expect(response.headers.get("set-cookie")).toBeNull()
 	})
 
-	it("passes a 304 through with the cache contract the answer would have carried", async () => {
-		const asked: Asked[] = []
-		const response = await handleRequest(
-			get("/", { "if-none-match": '"thai-home"', "accept-language": "th" }),
-			fakeAssets(asked),
-		)
-		expect(asked[0]?.ifNoneMatch).toBe('"thai-home"')
-		expect(response.status).toBe(304)
+	it("answers with an empty body, so no document lives at /", async () => {
+		const response = await handleRequest(get("/"), assets)
 		expect(await contentOf(response)).toBe("")
-		expect(response.headers.get("etag")).toBe('"thai-home"')
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
-		expect(response.headers.get("cache-control")).toBe("private, no-cache")
 	})
 
-	it("answers HEAD with the headers and no body", async () => {
+	it("answers HEAD / with the same redirect", async () => {
 		const response = await handleRequest(
 			new Request("https://trajectonomics.com/", { method: "HEAD" }),
-			fakeAssets(),
+			assets,
 		)
-		expect(response.status).toBe(200)
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
-		expect(await contentOf(response)).toBe("")
-	})
-})
-
-describe("the Language menu's choice link", () => {
-	it("stores Thai and returns to the address with no shared cache", async () => {
-		const response = await handleRequest(get("/?lang=th"), fakeAssets())
 		expect(response.status).toBe(302)
-		expect(response.headers.get("location")).toBe("/")
-		expect(response.headers.get("cache-control")).toBe("no-store")
-		expect(response.headers.get("set-cookie")).toBe(
-			"traj_lang=th; Path=/; Secure; SameSite=Lax; Max-Age=31536000",
-		)
+		expect(response.headers.get("location")).toBe("/en/")
 	})
 
-	it("stores English too, so a visitor can leave Thai", async () => {
-		const response = await handleRequest(get("/?lang=en"), fakeAssets())
-		expect(response.headers.get("set-cookie")).toStartWith("traj_lang=en;")
+	it("chooses nothing for a Locale URL, which is served as a static asset", async () => {
+		const response = await handleRequest(get("/th/", { "accept-language": "en" }), assets)
+		expect(await contentOf(response)).toBe("asset:/th/")
 	})
 
-	it("writes no cookie for a Language the Site does not speak", async () => {
-		const response = await handleRequest(get("/?lang=zz"), fakeAssets())
-		expect(response.status).toBe(302)
-		expect(response.headers.get("location")).toBe("/")
-		expect(response.headers.get("set-cookie")).toBeNull()
-		expect(response.headers.get("cache-control")).toBe("no-store")
-	})
-
-	it("writes no cookie for an empty choice", async () => {
-		const response = await handleRequest(get("/?lang="), fakeAssets())
-		expect(response.status).toBe(302)
-		expect(response.headers.get("set-cookie")).toBeNull()
-	})
-
-	it("reads no asset, because the choice answer is the whole response", async () => {
-		const asked: Asked[] = []
-		await handleRequest(get("/?lang=th"), fakeAssets(asked))
-		expect(asked).toEqual([])
-	})
-})
-
-describe("the addresses the Site used to answer at", () => {
-	for (const path of ["/en", "/en/", "/en/anything", "/th", "/th/", "/th/anything"]) {
-		it(`answers ${path} with a permanent redirect to the address`, async () => {
-			const response = await handleRequest(get(path), fakeAssets())
-			expect(response.status).toBe(301)
-			expect(response.headers.get("location")).toBe("/")
-		})
-	}
-
-	it("answers no prefix for a path that merely begins with one", async () => {
-		for (const path of ["/english", "/theme"]) {
-			const response = await handleRequest(get(path), fakeAssets())
-			expect(response.status).toBe(404)
-		}
-	})
-
-	it("hands a deeper path to the assets binding, which answers the one 404", async () => {
-		const asked: Asked[] = []
-		const response = await handleRequest(get("/no-such-page"), fakeAssets(asked))
-		expect(response.status).toBe(404)
-		expect(asked.map((one) => one.path)).toEqual(["/no-such-page"])
-	})
-
-	it("hands a crawler file to the assets binding unchanged", async () => {
-		const response = await handleRequest(get("/sitemap.xml"), fakeAssets())
-		expect(response.status).toBe(200)
-		expect(response.headers.get("vary")).toBeNull()
-		expect(response.headers.get("cache-control")).toBe("public, max-age=0, must-revalidate")
+	it("hands an unknown path to the assets binding, which answers 404", async () => {
+		const response = await handleRequest(get("/no-such-page"), assets)
+		expect(await contentOf(response)).toBe("asset:/no-such-page")
 	})
 })

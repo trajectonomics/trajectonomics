@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test"
-import { languageChoiceCookie } from "../language/stored-choice"
 import { checkProbeResponses } from "./check-probe"
 import { PROBES, type Probe, type ProbeResponse } from "./probes"
 
@@ -9,10 +8,7 @@ function healthy(probe: Probe): ProbeResponse {
 		probe,
 		status: probe.status,
 		location: probe.location,
-		setCookies: probe.storesChoice === null ? [] : [languageChoiceCookie(probe.storesChoice)],
-		vary: probe.vary.length === 0 ? null : probe.vary.join(", "),
-		cacheControl: probe.cacheControl.length === 0 ? null : probe.cacheControl.join(", "),
-		etag: probe.etag === true ? '"etag"' : null,
+		setCookie: null,
 		contentSecurityPolicy: null,
 		contentType: probe.mediaTypes[0] ?? null,
 		html: probe.language === null ? "" : `<html lang="${probe.language}">`,
@@ -27,19 +23,16 @@ function codes(responses: readonly ProbeResponse[]): readonly string[] {
 	return checkProbeResponses(responses).map((failure) => failure.code)
 }
 
-/** The probe each test means, by the answer it judges. */
-const ROOT_ENGLISH = 0
-const ROOT_THAI = 1
-const ROOT_STORED_THAI = 3
-const ROOT_HOSTILE_COOKIE = 5
-const CHOICE_THAI = 7
-const CHOICE_UNKNOWN = 9
-const MOVED_PREFIX = 10
-const MOVED_DEEP_PREFIX = 12
-const ENGLISH_MISS = 16
-const RESERVED_PRELOAD = 17
-const SITEMAP = 18
-const ROBOTS = 19
+/** The probes that share a path or a Language, so a test can point at the one it means. */
+const ROOT_DEFAULT = 2
+const ROOT_THAI = 0
+const THAI_HOME = 4
+const THAI_HOME_WITHOUT_SLASH = 6
+const THAI_MISS = 7
+const UNPREFIXED_MISS = 8
+const RESERVED_PRELOAD = 9
+const SITEMAP = 10
+const ROBOTS = 11
 
 /** The clean answers with the answer at `index` replaced by `answer`. */
 function withAnswer(index: number, answer: Partial<ProbeResponse>): readonly ProbeResponse[] {
@@ -47,101 +40,44 @@ function withAnswer(index: number, answer: Partial<ProbeResponse>): readonly Pro
 }
 
 describe("the answers the local Worker gives", () => {
-	it("passes a Worker that answers the address, the choice link and the old prefixes", () => {
+	it("passes a Worker that redirects /, serves both homes and misses in the right Language", () => {
 		expect(codes(clean())).toEqual([])
 	})
 
-	it("fails when the address does not answer 200", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { status: 500 }))).toEqual(["PROBE_STATUS_WRONG"])
+	it("fails when / serves a page instead of redirecting", () => {
+		expect(codes(withAnswer(ROOT_DEFAULT, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
 	})
 
-	it("fails when the address answers in another Language", () => {
-		expect(codes(withAnswer(ROOT_THAI, { html: '<html lang="xx">' }))).toEqual([
+	it("fails when / redirects to the wrong Locale URL", () => {
+		expect(codes(withAnswer(ROOT_THAI, { location: "/en/" }))).toEqual(["ROOT_LOCATION_WRONG"])
+	})
+
+	it("fails when a Locale URL does not answer 200", () => {
+		expect(codes(withAnswer(THAI_HOME, { status: 500 }))).toEqual(["PROBE_STATUS_WRONG"])
+	})
+
+	it("fails when a Locale URL answers in another Language", () => {
+		expect(codes(withAnswer(THAI_HOME, { html: '<html lang="xx">' }))).toEqual([
 			"PAGE_LANGUAGE_WRONG",
 		])
 	})
 
-	it("fails when the stored choice does not choose the Language", () => {
-		expect(codes(withAnswer(ROOT_STORED_THAI, { html: '<html lang="en">' }))).toEqual([
-			"PAGE_LANGUAGE_WRONG",
+	it("fails when /th without a slash does not reach the Thai home", () => {
+		expect(codes(withAnswer(THAI_HOME_WITHOUT_SLASH, { status: 307 }))).toEqual([
+			"PROBE_STATUS_WRONG",
 		])
 	})
 
-	it("fails when a hostile stored value is not ignored", () => {
-		expect(codes(withAnswer(ROOT_HOSTILE_COOKIE, { html: '<html lang="th">' }))).toEqual([
-			"PAGE_LANGUAGE_WRONG",
-		])
+	it("fails when a miss under /th/ is not the Thai Not-found page", () => {
+		expect(codes(withAnswer(THAI_MISS, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
 	})
 
-	it("fails when the address names none of the signals it depends on", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { vary: null }))).toEqual(["PROBE_VARY_WRONG"])
+	it("fails when an unprefixed miss is not a 404", () => {
+		expect(codes(withAnswer(UNPREFIXED_MISS, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
 	})
 
-	it("fails when the address names only part of what it depends on", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { vary: "Accept-Language, CF-IPCountry" }))).toEqual([
-			"PROBE_VARY_WRONG",
-		])
-	})
-
-	it("fails when the address may be stored by a shared cache", () => {
-		expect(
-			codes(withAnswer(ROOT_ENGLISH, { cacheControl: "public, max-age=0, must-revalidate" })),
-		).toEqual(["PROBE_CACHE_CONTROL_WRONG"])
-	})
-
-	it("fails when the address carries no validator", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { etag: null }))).toEqual(["PROBE_ETAG_MISSING"])
-	})
-
-	it("fails when the address sets a cookie of its own", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { setCookies: ["seen=1"] }))).toEqual([
-			"PROBE_SET_COOKIE_PRESENT",
-		])
-	})
-
-	it("fails when the choice link stores no choice", () => {
-		expect(codes(withAnswer(CHOICE_THAI, { setCookies: [] }))).toEqual(["PROBE_SET_COOKIE_MISSING"])
-	})
-
-	it("fails when the choice link stores more than one cookie", () => {
-		expect(codes(withAnswer(CHOICE_THAI, { setCookies: ["traj_lang=th", "seen=1"] }))).toEqual([
-			"PROBE_SET_COOKIE_COUNT_WRONG",
-		])
-	})
-
-	it("fails when the choice cookie carries the wrong attributes", () => {
-		expect(codes(withAnswer(CHOICE_THAI, { setCookies: ["traj_lang=th; Path=/"] }))).toEqual([
-			"PROBE_SET_COOKIE_WRONG",
-		])
-	})
-
-	it("fails when an unknown Language still stores a cookie", () => {
-		expect(codes(withAnswer(CHOICE_UNKNOWN, { setCookies: ["traj_lang=zz"] }))).toEqual([
-			"PROBE_SET_COOKIE_PRESENT",
-		])
-	})
-
-	it("fails when the choice link is cached", () => {
-		expect(codes(withAnswer(CHOICE_THAI, { cacheControl: null }))).toEqual([
-			"PROBE_CACHE_CONTROL_WRONG",
-		])
-	})
-
-	it("fails when an old prefix does not answer 301 to the address", () => {
-		expect(codes(withAnswer(MOVED_PREFIX, { status: 302 }))).toEqual(["PROBE_STATUS_WRONG"])
-		expect(codes(withAnswer(MOVED_PREFIX, { location: "/th/" }))).toEqual(["PROBE_LOCATION_WRONG"])
-	})
-
-	it("fails when a deep path under an old prefix is not moved", () => {
-		expect(codes(withAnswer(MOVED_DEEP_PREFIX, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
-	})
-
-	it("fails when a miss is not a 404", () => {
-		expect(codes(withAnswer(ENGLISH_MISS, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
-	})
-
-	it("fails when a miss answers in a Language that is not the fallback", () => {
-		expect(codes(withAnswer(ENGLISH_MISS, { html: '<html lang="xx">' }))).toEqual([
+	it("fails when an unprefixed miss answers in a Language that is not the fallback", () => {
+		expect(codes(withAnswer(UNPREFIXED_MISS, { html: '<html lang="xx">' }))).toEqual([
 			"PAGE_LANGUAGE_WRONG",
 		])
 	})
@@ -150,9 +86,13 @@ describe("the answers the local Worker gives", () => {
 		expect(codes(withAnswer(RESERVED_PRELOAD, { status: 200 }))).toEqual(["PROBE_STATUS_WRONG"])
 	})
 
+	it("fails a response that sets a cookie", () => {
+		expect(codes(withAnswer(ROOT_DEFAULT, { setCookie: "seen=1" }))).toEqual(["SET_COOKIE_PRESENT"])
+	})
+
 	it("fails a response that carries a content security policy", () => {
 		expect(
-			codes(withAnswer(ENGLISH_MISS, { contentSecurityPolicy: "default-src 'self'" })),
+			codes(withAnswer(UNPREFIXED_MISS, { contentSecurityPolicy: "default-src 'self'" })),
 		).toEqual(["CONTENT_SECURITY_POLICY_PRESENT"])
 	})
 
@@ -171,7 +111,7 @@ describe("the answers the local Worker gives", () => {
 	})
 
 	it("judges no content type on an answer that carries no body", () => {
-		expect(codes(withAnswer(ROOT_ENGLISH, { contentType: "text/html" }))).toEqual([])
+		expect(codes(withAnswer(ROOT_DEFAULT, { contentType: "text/html" }))).toEqual([])
 	})
 
 	it("fails a probe the Worker never answered", () => {

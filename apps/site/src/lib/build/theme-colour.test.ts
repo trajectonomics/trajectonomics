@@ -26,12 +26,12 @@ function page(path: string, head = DARK): BuiltFile {
 
 /** Every page of a preview build, each painting one bar per Theme. */
 function previewBuild(head = PREVIEW_PAINTS): readonly BuiltFile[] {
-	return ["th/index.html", "index.html", "404.html"].map((path) => page(path, head))
+	return ["th/index.html", "en/index.html", "404.html"].map((path) => page(path, head))
 }
 
 /** The two homes and a Not-found page, so a test names the page it changes. */
 function build(changed?: BuiltFile): readonly BuiltFile[] {
-	return ["th/index.html", "index.html", "404.html"].map((path) =>
+	return ["th/index.html", "en/index.html", "404.html"].map((path) =>
 		changed?.path === path ? changed : page(path),
 	)
 }
@@ -49,18 +49,18 @@ describe("the browser bar a production build paints", () => {
 	})
 
 	it("fails a page that carries no theme-color at all", () => {
-		expect(codes(PRODUCTION, build(page("index.html", "")))).toEqual(["THEME_COLOUR_MISSING"])
+		expect(codes(PRODUCTION, build(page("en/index.html", "")))).toEqual(["THEME_COLOUR_MISSING"])
 	})
 
 	it("fails a page that carries the paint twice", () => {
-		expect(codes(PRODUCTION, build(page("index.html", `${DARK}${DARK}`)))).toEqual([
+		expect(codes(PRODUCTION, build(page("en/index.html", `${DARK}${DARK}`)))).toEqual([
 			"THEME_COLOUR_DUPLICATE",
 		])
 	})
 
 	it("fails a page whose paint is a colour the Theme does not publish", () => {
 		const wrong = DARK.replace("#0a0a0a", "#111111")
-		expect(codes(PRODUCTION, build(page("index.html", wrong)))).toEqual([
+		expect(codes(PRODUCTION, build(page("en/index.html", wrong)))).toEqual([
 			"THEME_COLOUR_NOT_PUBLISHED",
 		])
 	})
@@ -84,14 +84,14 @@ describe("the browser bar a production build paints", () => {
 
 	it("names the Theme, the colour the build wrote and the colour the Theme publishes", () => {
 		const failure = checkThemeColour(
-			build(page("index.html", DARK.replace("#0a0a0a", "#111111"))),
+			build(page("en/index.html", DARK.replace("#0a0a0a", "#111111"))),
 			TEST_TOKENS,
 			PRODUCTION,
 		)[0]
 		expect(failure?.message).toContain("dark")
 		expect(failure?.message).toContain("#111111")
 		expect(failure?.message).toContain("#0a0a0a")
-		expect(failure?.path).toBe("/")
+		expect(failure?.path).toBe("/en/")
 	})
 })
 
@@ -102,7 +102,7 @@ describe("the browser bar a preview build paints", () => {
 
 	it("fails a page that carries no device query, so no device paints the Theme it asks for", () => {
 		const pages = previewBuild().map((file) =>
-			file.path === "index.html" ? page("index.html", DARK) : file,
+			file.path === "en/index.html" ? page("en/index.html", DARK) : file,
 		)
 		expect(codes(PREVIEW, pages)).toEqual([
 			"THEME_COLOUR_MEDIA_NOT_SHIPPED",

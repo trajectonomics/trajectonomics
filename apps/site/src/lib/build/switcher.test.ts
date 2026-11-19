@@ -21,19 +21,6 @@ describe("the switcher in the header", () => {
 		expect(codes(checkSwitcher, home(language, undefined, link))).toEqual(["SWITCHER_MISSING"])
 	})
 
-	it("fails a Language choice link that claims to be a Language alternate", () => {
-		const language = entryAt(0).language
-		const other = otherLanguages(language)[0]
-		if (other === undefined) throw new Error("the Site speaks one Language only")
-		const link = switcher(language).replace(
-			`href="/?lang=${other.language}"`,
-			`href="/?lang=${other.language}" hreflang="${other.language}"`,
-		)
-		expect(codes(checkSwitcher, home(language, undefined, link))).toEqual([
-			"SWITCHER_CLAIMS_HREFLANG",
-		])
-	})
-
 	it("fails a switcher that is a button, because it must work with JavaScript off", () => {
 		const page = home(entryAt(0).language, undefined, "<button>x</button>")
 		expect(codes(checkSwitcher, page)).toEqual(["SWITCHER_MISSING", "SWITCHER_CURRENT_MISSING"])

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test"
-import { languageHomeFile } from "../language/languages"
 import { checkLanguageHomes } from "./language-home"
 import { codes, edited, entryAt, homes } from "./testing/homes"
 
@@ -10,7 +9,7 @@ describe("the Language homes", () => {
 
 	it("fails a Language with no home", () => {
 		const missing = entryAt(0)
-		const files = homes().filter((file) => file.path !== languageHomeFile(missing.language))
+		const files = homes().filter((file) => file.path !== `${missing.language}/index.html`)
 		expect(checkLanguageHomes(files).map((failure) => failure.code)).toEqual([
 			"LANGUAGE_PAGE_MISSING",
 		])

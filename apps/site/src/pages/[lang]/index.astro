@@ -1,8 +1,12 @@
 ---
-// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see <Home />.
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
-import Home from "../../components/Home.astro"
+import Features from "../../components/Features.astro"
+import Hero from "../../components/Hero.astro"
+import HowItWorks from "../../components/HowItWorks.astro"
+import Layout from "../../layouts/Layout.astro"
 import type { Language } from "../../lib/language/language"
+import { dictionaryFor } from "../../lib/language/languages"
 import { languagePaths } from "../../lib/language/paths"
 
 interface Props {
@@ -14,7 +18,16 @@ export function getStaticPaths() {
 }
 
 const { language } = Astro.props
+const dictionary = dictionaryFor(language)
 ---
 
-<!-- A Language home built beside the address: a build path the Worker serves at `/` (ADR 0020). -->
-<Home language={language} />
+<Layout
+	language={language}
+	title={dictionary.documentTitle}
+	description={dictionary.description}
+	indexed={true}
+>
+	<Hero dictionary={dictionary} />
+	<HowItWorks dictionary={dictionary} />
+	<Features dictionary={dictionary} />
+</Layout>

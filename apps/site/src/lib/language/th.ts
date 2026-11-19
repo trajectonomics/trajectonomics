@@ -5,11 +5,10 @@ import { THAI_SECTIONS } from "./th-sections"
 /** The release strings Thai prints, from the committed Release snapshot. */
 const RELEASE = releaseFor("th")
 
-/** Thai: the Language of Thailand when no tag chooses; its home is a build path, not an address. */
+/** Thai: the Language of `/th/`, and of Thailand when no tag chooses. */
 export const THAI: LanguageEntry = Object.freeze({
 	language: "th",
-	buildPath: "th",
-	locale: "th_TH",
+	pathPrefix: "/th",
 	countries: Object.freeze(["TH"]),
 	dictionary: Object.freeze({
 		...THAI_SECTIONS,

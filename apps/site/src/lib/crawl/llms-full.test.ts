@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
-import { dictionaryFor } from "../language/languages"
+import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../language/languages"
 import { FI_DEMO_COMMAND, INSTALL_PROMPT } from "../site"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "./llms-full"
 
@@ -46,9 +46,13 @@ describe("the full Answer engine file", () => {
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
 
-	it("prints the Prompt route sentence, and carries no Languages section", () => {
+	it("prints the Prompt route sentence, and links the home in every other Language", () => {
 		expect(LLMS_FULL_TXT).toContain(INSTALL_PROMPT)
-		expect(LLMS_FULL_TXT).not.toContain("## Languages")
+		for (const entry of LANGUAGES.filter((one) => one.language !== FALLBACK_LANGUAGE)) {
+			expect(LLMS_FULL_TXT).toContain(
+				`- [${entry.dictionary.languageName}](${absoluteLocaleUrl(entry.language)})`,
+			)
+		}
 	})
 
 	it("carries no text the owner has not written, and no placeholder for it", () => {

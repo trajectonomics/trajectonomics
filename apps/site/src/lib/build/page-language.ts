@@ -11,7 +11,7 @@ export function declaredLanguage(html: string): string | undefined {
 	return element?.attributes["lang"]
 }
 
-/** A page must declare the Language its build answers in, in `<html lang>`. */
+/** A page must declare the Language of the Locale URL it is served at, in `<html lang>`. */
 export function checkDeclaredLanguage(
 	file: BuiltFile,
 	language: Language,

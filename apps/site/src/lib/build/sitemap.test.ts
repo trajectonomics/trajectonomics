@@ -1,16 +1,30 @@
 import { describe, expect, it } from "bun:test"
 import { SITEMAP } from "../crawl/sitemap"
-import { ABSOLUTE_CLEAN_URL } from "../language/languages"
+import type { Language } from "../language/language"
+import { absoluteLocaleUrl, localeUrl } from "../language/languages"
+import { SITE_ORIGIN } from "../site"
 import { checkSitemap } from "./sitemap"
 import { codes, edited, sitemapEntry } from "./testing/crawl-files"
+import { entryAt } from "./testing/homes"
 
-/** The `<loc>` line a healthy Sitemap carries, so a test can point it somewhere else. */
-const LOC = new RegExp(`<loc>${ABSOLUTE_CLEAN_URL}</loc>`)
+const HOME = entryAt(0).language
+const OTHER = entryAt(1).language
 
-/** The one alternate a healthy Sitemap carries, so a test can point it somewhere else. */
-const DEFAULT = /<xhtml:link rel="alternate" hreflang="x-default" href="[^"]*" \/>/
+/** The `<loc>` a healthy Sitemap carries for one Language's home. */
+function loc(language: Language): RegExp {
+	return new RegExp(`<loc>${absoluteLocaleUrl(language)}</loc>`)
+}
 
-describe("the Sitemap of the Site's one address", () => {
+/** One `xhtml:link` of a healthy Sitemap, so a test can point it somewhere else. */
+function alternate(hreflang: string): RegExp {
+	return new RegExp(`<xhtml:link rel="alternate" hreflang="${hreflang}" href="[^"]*" />`)
+}
+
+describe("the Sitemap of the Language homes", () => {
+	it("passes a Sitemap that lists both homes with every Language and x-default", () => {
+		expect(codes(checkSitemap)).toEqual([])
+	})
+
 	it("passes the Sitemap the build generates", () => {
 		expect(codes(checkSitemap, [{ path: "sitemap.xml", content: SITEMAP }])).toEqual([])
 	})
@@ -19,43 +33,45 @@ describe("the Sitemap of the Site's one address", () => {
 		expect(codes(checkSitemap, [])).toEqual(["SITEMAP_MISSING"])
 	})
 
-	it("fails a Sitemap that lists no entry", () => {
-		const empty = SITEMAP.replace(/ {2}<url>[\s\S]*?<\/url>\n/, "")
-		expect(codes(checkSitemap, [{ path: "sitemap.xml", content: empty }])).toEqual([
+	it("fails a Sitemap that leaves out a Language's home", () => {
+		expect(codes(checkSitemap, edited("sitemap.xml", / {2}<url>[\s\S]*?<\/url>\n/, ""))).toEqual([
 			"SITEMAP_URL_MISSING",
 		])
 	})
 
-	it("fails a Sitemap that lists the address twice", () => {
+	it("fails a Sitemap that lists one home twice", () => {
 		expect(
-			codes(checkSitemap, edited("sitemap.xml", /<\/urlset>/, `${sitemapEntry}</urlset>`)),
+			codes(checkSitemap, edited("sitemap.xml", /<\/urlset>/, `${sitemapEntry(HOME)}</urlset>`)),
 		).toEqual(["SITEMAP_URL_DUPLICATE"])
 	})
 
-	it("fails an entry that names a Language's build path, which is no address", () => {
+	it("fails an entry whose loc is no Language's home, and the home it displaced", () => {
 		expect(
-			codes(checkSitemap, edited("sitemap.xml", LOC, "<loc>https://trajectonomics.com/th/</loc>")),
+			codes(checkSitemap, edited("sitemap.xml", loc(OTHER), `<loc>${SITE_ORIGIN}/de/</loc>`)),
 		).toEqual(["SITEMAP_URL_UNKNOWN", "SITEMAP_URL_MISSING"])
 	})
 
-	it("fails an entry whose loc is that path on another origin", () => {
+	it("fails an entry whose loc is that home's path on another origin", () => {
 		expect(
-			codes(checkSitemap, edited("sitemap.xml", LOC, "<loc>https://example.com/</loc>")),
+			codes(
+				checkSitemap,
+				edited("sitemap.xml", loc(HOME), `<loc>https://example.com${localeUrl(HOME)}</loc>`),
+			),
 		).toEqual(["SITEMAP_LOC_TARGET"])
 	})
 
-	it("fails an entry that names no alternate", () => {
-		expect(codes(checkSitemap, edited("sitemap.xml", DEFAULT, ""))).toEqual([
+	it("fails an entry that names no alternate for a Language", () => {
+		expect(codes(checkSitemap, edited("sitemap.xml", alternate(OTHER), ""))).toEqual([
 			"SITEMAP_ALTERNATE_MISSING",
 		])
 	})
 
-	it("fails an entry that names x-default twice", () => {
-		const duplicate = `<xhtml:link rel="alternate" hreflang="x-default" href="${ABSOLUTE_CLEAN_URL}" />`
+	it("fails an entry that names one Language twice", () => {
+		const duplicate = `<xhtml:link rel="alternate" hreflang="${OTHER}" href="${absoluteLocaleUrl(OTHER)}" />`
 		expect(
 			codes(
 				checkSitemap,
-				edited("sitemap.xml", LOC, `<loc>${ABSOLUTE_CLEAN_URL}</loc>\n    ${duplicate}`),
+				edited("sitemap.xml", loc(HOME), `<loc>${absoluteLocaleUrl(HOME)}</loc>\n    ${duplicate}`),
 			),
 		).toEqual(["SITEMAP_ALTERNATE_DUPLICATE"])
 	})
@@ -66,21 +82,21 @@ describe("the Sitemap of the Site's one address", () => {
 				checkSitemap,
 				edited(
 					"sitemap.xml",
-					DEFAULT,
-					'<xhtml:link rel="alternate" hreflang="x-default" href="/" />',
+					alternate(OTHER),
+					`<xhtml:link rel="alternate" hreflang="${OTHER}" href="${localeUrl(OTHER)}" />`,
 				),
 			),
 		).toEqual(["SITEMAP_ALTERNATE_TARGET"])
 	})
 
-	it("fails an alternate that names a Language's build path", () => {
+	it("fails an x-default that is not the English home", () => {
 		expect(
 			codes(
 				checkSitemap,
 				edited(
 					"sitemap.xml",
-					DEFAULT,
-					'<xhtml:link rel="alternate" hreflang="x-default" href="https://trajectonomics.com/th/" />',
+					alternate("x-default"),
+					`<xhtml:link rel="alternate" hreflang="x-default" href="${absoluteLocaleUrl(HOME)}" />`,
 				),
 			),
 		).toEqual(["SITEMAP_ALTERNATE_TARGET"])

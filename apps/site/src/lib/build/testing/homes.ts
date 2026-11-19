@@ -1,12 +1,6 @@
 import { currentLanguageName, OWNER_WRITTEN_PLACEHOLDER } from "../../language/dictionary"
 import type { Language, LanguageEntry } from "../../language/language"
-import {
-	LANGUAGES,
-	languageChoiceLink,
-	languageEntry,
-	languageHomeFile,
-	otherLanguages,
-} from "../../language/languages"
+import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../../language/languages"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
 import { headOf } from "./head"
@@ -25,12 +19,12 @@ export function entryAt(index: number): LanguageEntry {
  */
 export function switcher(language: Language): string {
 	const entry = languageEntry(language)
-	const current = `<a href="${languageChoiceLink(language)}" lang="${language}" aria-label="${currentLanguageName(entry.dictionary)}" aria-current="page">${entry.dictionary.languageName}</a>`
+	const current = `<a href="${localeUrl(language)}" lang="${language}" hreflang="${language}" aria-label="${currentLanguageName(entry.dictionary)}" aria-current="page">${entry.dictionary.languageName}</a>`
 	const others = otherLanguages(language)
 		.map((other) => {
-			const href = languageChoiceLink(other.language)
+			const href = localeUrl(other.language)
 			const code = other.language
-			return `<a href="${href}" lang="${code}">${other.dictionary.languageName}</a>`
+			return `<a href="${href}" lang="${code}" hreflang="${code}">${other.dictionary.languageName}</a>`
 		})
 		.join("")
 	return `${current}${others}`
@@ -43,7 +37,7 @@ export function home(
 	nav = switcher(language),
 ): BuiltFile {
 	return {
-		path: languageHomeFile(language),
+		path: `${language}/index.html`,
 		content: `<html lang="${language}"><head>${headOf(language)}</head><body><nav>${nav}</nav><main>${body}</main><footer>${releaseStrip(language)}</footer></body></html>`,
 	}
 }

@@ -29,13 +29,8 @@ function languageByCountry(
 	return rejected ? undefined : entry.language
 }
 
-/** The Language `/` is answered in: the stored choice, else the best tag, else the country, else English. */
-export function chooseLanguage(
-	stored: Language | undefined,
-	acceptLanguage: string | null,
-	country: string | null,
-): Language {
-	if (stored !== undefined) return stored
+/** The Language `/` redirects to: the best tag, else the country, else English. No I/O, no clock. */
+export function chooseLanguage(acceptLanguage: string | null, country: string | null): Language {
 	const tags = parseAcceptLanguage(acceptLanguage)
 	return languageByQuality(tags) ?? languageByCountry(tags, country) ?? FALLBACK_LANGUAGE
 }

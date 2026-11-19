@@ -29,6 +29,6 @@ describe("the owner's placeholder", () => {
 		const files = [...homes(), { path: "_astro/site.js", content: "// [OWNER TO WRITE]" }]
 		const failures = checkOwnerPlaceholder(files, "production")
 		expect(failures.map((failure) => failure.path)).toContain("_astro/site.js")
-		expect(failures.map((failure) => failure.path)).toContain("/th/")
+		expect(failures.map((failure) => failure.path)).toContain("/en/")
 	})
 })

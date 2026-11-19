@@ -19,7 +19,7 @@ describe("the mobile performance budget", () => {
 
 	it("passes a page whose median is exactly 0.95", () => {
 		expect(checkPerformance("/th/", [0.95, 0.95, 0.95])).toEqual([])
-		expect(checkPerformance("/", [0.9, 1, 0.95])).toEqual([])
+		expect(checkPerformance("/en/", [0.9, 1, 0.95])).toEqual([])
 	})
 
 	it("fails a page whose median is below 0.95", () => {
@@ -30,13 +30,13 @@ describe("the mobile performance budget", () => {
 
 	it("fails when one run has no score, rather than judging the rest", () => {
 		expect(medianScore([0.99, undefined, 0.99])).toBeUndefined()
-		expect(checkPerformance("/", [0.99, undefined, 0.99]).map((failure) => failure.code)).toEqual([
-			"LIGHTHOUSE_SCORE_MISSING",
-		])
+		expect(
+			checkPerformance("/en/", [0.99, undefined, 0.99]).map((failure) => failure.code),
+		).toEqual(["LIGHTHOUSE_SCORE_MISSING"])
 	})
 
 	it("fails when fewer than 3 runs were made", () => {
-		expect(checkPerformance("/", [0.99, 0.99]).map((failure) => failure.code)).toEqual([
+		expect(checkPerformance("/en/", [0.99, 0.99]).map((failure) => failure.code)).toEqual([
 			"LIGHTHOUSE_SCORE_MISSING",
 		])
 	})

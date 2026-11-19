@@ -3,15 +3,15 @@
 	"name": "site",
 	"compatibility_date": "2026-11-01",
 	"workers_dev": true,
-	// The one script the Site has: `/` in the resolved Language, the choice link, the old prefixes (ADR 0020).
+	// The one script the Site has: the redirect from `/` to a Locale URL (ADR 0003).
 	"main": "src/worker/index.ts",
 	// No "routes": the router attaches the public route, not this repository.
 	// No "env": there is no staging Worker yet, so deployment is a later change.
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS",
-		// The address, its choice link and the old prefixes need the script; every other path is an asset.
-		"run_worker_first": ["/", "/en", "/en/*", "/th", "/th/*"],
+		// Only `/` needs the script; every other path is a static asset (ADR 0003).
+		"run_worker_first": ["/"],
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"
 	}

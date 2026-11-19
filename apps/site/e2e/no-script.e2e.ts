@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { dictionaryFor } from "../src/lib/language/languages"
-import { BASE_URL } from "./base-url"
-import { focusableCount } from "./controls"
-import { expectShippedTheme, PAGES, visit } from "./pages"
+import { expectShippedTheme, focusableCount, PAGES } from "./pages"
 
 /** The homes, whose CTA carries the Copy button and the CLI link. */
 const HOMES = PAGES.filter((underTest) => underTest.status === 200)
@@ -13,7 +11,7 @@ for (const underTest of HOMES) {
 	test(`${underTest.name}: the header menus still open by click without JavaScript`, async ({
 		page,
 	}) => {
-		await visit(page, underTest)
+		await page.goto(underTest.path)
 		const menu = page.locator("details[data-header-menu]").first()
 		const firstLink = menu.locator("a").first()
 		await expect(firstLink).toBeHidden()
@@ -24,7 +22,7 @@ for (const underTest of HOMES) {
 	test(`${underTest.name}: the Copy button is out of the tab order and the CLI link remains`, async ({
 		page,
 	}) => {
-		await visit(page, underTest)
+		await page.goto(underTest.path)
 		await expect(page.locator("[data-copy-prompt]")).toBeHidden()
 		await expect(page.locator("[data-install-prompt]")).toBeHidden()
 		await expect(page.locator("[data-install-window] a[href]")).toBeVisible()
@@ -41,7 +39,7 @@ for (const underTest of HOMES) {
 	test(`${underTest.name}: the hero shows its whole headline, accent included, with no script`, async ({
 		page,
 	}) => {
-		await visit(page, underTest)
+		await page.goto(underTest.path)
 		const dictionary = dictionaryFor(underTest.language)
 		await expect(page.locator("h1")).toHaveText(
 			`${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent}`,
@@ -52,7 +50,7 @@ for (const underTest of HOMES) {
 	test(`${underTest.name}: the Theme the HTML ships is styled without JavaScript`, async ({
 		page,
 	}) => {
-		await visit(page, underTest)
+		await page.goto(underTest.path)
 		await expectShippedTheme(page)
 		const painted = await page.evaluate(() => ({
 			token: getComputedStyle(document.documentElement)
@@ -64,29 +62,3 @@ for (const underTest of HOMES) {
 		expect(painted.background).not.toBe("rgba(0, 0, 0, 0)")
 	})
 }
-
-test("the Language menu switches and remembers with JavaScript off, at the one address", async ({
-	page,
-}) => {
-	await visit(page, {
-		path: "/",
-		language: "en",
-		name: "English home",
-		status: 200,
-		storedChoice: null,
-	})
-	await expect(page.locator("html")).toHaveAttribute("lang", "en")
-	// A first visit stores nothing, so no choice is set before the visitor makes one.
-	expect((await page.context().cookies()).map((cookie) => cookie.name)).not.toContain("traj_lang")
-
-	const menu = page.locator('details[data-header-menu]:has(a[href="/?lang=th"])').first()
-	await menu.locator("summary").click()
-	await page.locator('details[data-header-menu] a[href="/?lang=th"]').click()
-	await expect(page.locator("html")).toHaveAttribute("lang", "th")
-	expect(page.url()).toBe(`${BASE_URL}/`)
-
-	// The next visit is Thai with no click, because the choice was stored on this origin.
-	await page.goto("/")
-	await expect(page.locator("html")).toHaveAttribute("lang", "th")
-	expect(page.url()).toBe(`${BASE_URL}/`)
-})

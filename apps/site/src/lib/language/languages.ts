@@ -7,15 +7,6 @@ import { THAI } from "./th"
 /** Every Language the Site speaks. A further Language is one Dictionary file and one entry here. */
 export const LANGUAGES: readonly LanguageEntry[] = Object.freeze([THAI, ENGLISH])
 
-/** The Site's one address: every Language's home answers here, and every page states it. */
-export const CLEAN_URL = "/"
-
-/** That address on the Site's own origin, the absolute form canonical and `x-default` need. */
-export const ABSOLUTE_CLEAN_URL = `${SITE_ORIGIN}${CLEAN_URL}`
-
-/** The query parameter a Language menu entry carries its choice in. */
-export const LANGUAGE_CHOICE_PARAM = "lang"
-
 /** The config entry of one Language. */
 export function languageEntry(language: Language): LanguageEntry {
 	const entry = LANGUAGES.find((candidate) => candidate.language === language)
@@ -34,26 +25,12 @@ export function otherLanguages(language: Language): readonly LanguageEntry[] {
 	return Object.freeze(LANGUAGES.filter((entry) => entry.language !== own.language))
 }
 
-/** The Language a code names, or `undefined` when the Site does not speak it. */
-export function spokenLanguage(code: string | null | undefined): Language | undefined {
-	const value = code?.trim().toLowerCase()
-	if (value === undefined || value.length === 0) return undefined
-	return LANGUAGES.find((entry) => entry.language === value)?.language
+/** The Locale URL of a Language's home, such as `/th/`; the form a `Location` and an `href` take. */
+export function localeUrl(language: Language): string {
+	return `${languageEntry(language).pathPrefix}/`
 }
 
-/** The asset path one Language's home is built at, relative to the assets root. */
-export function languageHomePath(language: Language): string {
-	const { buildPath } = languageEntry(language)
-	return buildPath === "" ? CLEAN_URL : `/${buildPath}/`
-}
-
-/** The built file one Language's home is written to, relative to the assets root. */
-export function languageHomeFile(language: Language): string {
-	const { buildPath } = languageEntry(language)
-	return buildPath === "" ? "index.html" : `${buildPath}/index.html`
-}
-
-/** The Language choice link: it stores one Language as the visitor's choice, then returns to the address. */
-export function languageChoiceLink(language: Language): string {
-	return `${CLEAN_URL}?${LANGUAGE_CHOICE_PARAM}=${encodeURIComponent(language)}`
+/** That Locale URL on the Site's own origin, the absolute form `hreflang` and canonical need. */
+export function absoluteLocaleUrl(language: Language): string {
+	return `${SITE_ORIGIN}${localeUrl(language)}`
 }

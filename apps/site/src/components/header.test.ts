@@ -3,7 +3,7 @@ import type { HtmlElement, ScannedPage } from "../lib/build/html"
 import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import type { Dictionary } from "../lib/language/dictionary"
 import { currentLanguageName } from "../lib/language/dictionary"
-import { LANGUAGES, languageEntry, otherLanguages } from "../lib/language/languages"
+import { LANGUAGES, languageEntry, localeUrl, otherLanguages } from "../lib/language/languages"
 import { DOCS_PATH, GITHUB_ORG_URL, SITE_NAME } from "../lib/site"
 import { STARRED_REPOS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
@@ -100,7 +100,8 @@ describe("the Header component in every Language, current or not", () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
 				const brand = elementsByTag(page, "a").find(
 					(element) =>
-						element.attributes["aria-label"] === SITE_NAME && element.attributes["href"] === "/",
+						element.attributes["aria-label"] === SITE_NAME &&
+						element.attributes["href"] === localeUrl(language),
 				)
 				if (brand === undefined) throw new Error("no brand link rendered")
 				const artwork = page.elements.find(
@@ -188,7 +189,7 @@ describe("the Header component in every Language, current or not", () => {
 				const current = elementsByTag(page, "a").find(
 					(element) =>
 						element.attributes["lang"] === language &&
-						element.attributes["href"] === `/?lang=${language}` &&
+						element.attributes["href"] === localeUrl(language) &&
 						element.attributes["aria-label"] === currentLanguageName(dictionary),
 				)
 				if (current === undefined) throw new Error("no current-Language link rendered")
@@ -200,14 +201,14 @@ describe("the Header component in every Language, current or not", () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
 				const other = otherLanguages(language)[0]
 				if (other === undefined) throw new Error("the Site speaks one Language only")
-				const menu = menuWith(page, `/?lang=${other.language}`)
+				const menu = menuWith(page, localeUrl(other.language))
 				expect(textOf(page, summaryOf(page, menu))).toBe(dictionary.languageSwitchLabel)
 				expect(linksIn(page, menu)).toEqual(
 					[languageEntry(language), ...otherLanguages(language)].map((entry) => ({
 						text: entry.dictionary.languageName,
 						lang: entry.language,
-						hreflang: undefined,
-						href: `/?lang=${entry.language}`,
+						hreflang: entry.language,
+						href: localeUrl(entry.language),
 					})),
 				)
 			})

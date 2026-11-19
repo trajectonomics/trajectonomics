@@ -1,4 +1,5 @@
 import { FALLBACK_LANGUAGE, type Language } from "../language/language"
+import { LANGUAGES } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
@@ -13,12 +14,13 @@ export interface NotFoundPage {
 	readonly language: Language
 }
 
-/** One Not-found page answers every miss, in the fallback Language: a miss has no Language address. */
+/** The root page answers English, and each Locale URL has one of its own ([ADR 0003]). */
 export const NOT_FOUND_PAGES: readonly NotFoundPage[] = Object.freeze([
 	{ path: "404.html", language: FALLBACK_LANGUAGE },
+	...LANGUAGES.map((entry) => ({ path: `${entry.language}/404.html`, language: entry.language })),
 ])
 
-/** The Not-found page exists, speaks its Language, and stays out of every index. */
+/** Every Not-found page exists, speaks its Language, and stays out of every index. */
 export function checkNotFoundPages(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return NOT_FOUND_PAGES.flatMap((page) => {
 		const file = fileAt(files, page.path)
