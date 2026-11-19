@@ -1,5 +1,5 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../language/languages"
+import { dictionaryFor } from "../language/languages"
 import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
@@ -41,15 +41,10 @@ const FEATURES = dictionary.featureTitles.map(
 	(title, index) => `- **${title}**: ${dictionary.featureCopies[index] ?? ""}`,
 )
 
-/** Every Language other than this file's, so a reader can reach the home in its own Language. */
-const OTHER_LANGUAGES = LANGUAGES.filter((entry) => entry.language !== FALLBACK_LANGUAGE).map(
-	(entry) => linkLine(entry.dictionary.languageName, absoluteLocaleUrl(entry.language)),
-)
-
 /**
  * The full Answer engine file at `/llms-full.txt`: the landing page's copy in the fallback Language,
- * rendered as Markdown, and the link to the home in every other Language. It is the page's own words,
- * so it cannot say anything the page does not.
+ * rendered as Markdown, at the Site's one address. It is the page's own words, so it cannot say
+ * anything the page does not.
  */
 export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.description, [
 	section(HEADLINE, [dictionary.heroSubline, "", RELEASE]),
@@ -74,5 +69,4 @@ export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.des
 	section(dictionary.featuresHeading, FEATURES),
 	section("Install", [INSTALL_PROMPT]),
 	section("License", [linkLine(dictionary.licence, SKILLS_LICENCE_URL)]),
-	section("Languages", OTHER_LANGUAGES),
 ])

@@ -1,7 +1,7 @@
 import { shippedThemes } from "../../design/shipped-themes"
 import { themePaints } from "../../design/theme-paint"
-import { FALLBACK_LANGUAGE, type Language } from "../../language/language"
-import { absoluteLocaleUrl, LANGUAGES, languageEntry } from "../../language/languages"
+import type { Language } from "../../language/language"
+import { ABSOLUTE_CLEAN_URL, languageEntry, otherLanguages } from "../../language/languages"
 import { SITE_NAME } from "../../site"
 import { structuredDataJson } from "../../site/structured-data"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../../social/layout"
@@ -10,12 +10,17 @@ import { TEST_TOKENS } from "../test-page"
 
 /** The Social card every Language home must carry, as the build writes it. */
 function cardOf(language: Language): readonly string[] {
-	const dictionary = languageEntry(language).dictionary
+	const entry = languageEntry(language)
+	const dictionary = entry.dictionary
 	const image = absoluteShareImageUrl(language)
 	return [
 		`<meta property="og:title" content="${dictionary.documentTitle}">`,
 		`<meta property="og:description" content="${dictionary.description}">`,
-		`<meta property="og:url" content="${absoluteLocaleUrl(language)}">`,
+		`<meta property="og:url" content="${ABSOLUTE_CLEAN_URL}">`,
+		`<meta property="og:locale" content="${entry.locale}">`,
+		...otherLanguages(language).map(
+			(other) => `<meta property="og:locale:alternate" content="${other.locale}">`,
+		),
 		'<meta property="og:type" content="website">',
 		`<meta property="og:site_name" content="${SITE_NAME}">`,
 		`<meta property="og:image" content="${image}">`,
@@ -28,14 +33,8 @@ function cardOf(language: Language): readonly string[] {
 	]
 }
 
-/** The advertised links every home carries: one per Language, plus `x-default`. */
-const ALTERNATES = [
-	...LANGUAGES.map(
-		(entry) =>
-			`<link rel="alternate" hreflang="${entry.language}" href="${absoluteLocaleUrl(entry.language)}">`,
-	),
-	`<link rel="alternate" hreflang="x-default" href="${absoluteLocaleUrl(FALLBACK_LANGUAGE)}">`,
-].join("")
+/** The one advertised alternate every home carries: `x-default` at the Site's one address. */
+const ALTERNATES = `<link rel="alternate" hreflang="x-default" href="${ABSOLUTE_CLEAN_URL}">`
 
 /** The browser bar paints the Themes the Site ships state, with the media query each one states. */
 const PAINTS = themePaints(TEST_TOKENS, shippedThemes("production")).map(
@@ -51,7 +50,7 @@ export function headOf(language: Language): string {
 		`<meta name="description" content="${dictionary.description}">`,
 		...PAINTS,
 		...cardOf(language),
-		`<link rel="canonical" href="${absoluteLocaleUrl(language)}">`,
+		`<link rel="canonical" href="${ABSOLUTE_CLEAN_URL}">`,
 		ALTERNATES,
 		`<script type="application/ld+json">${structuredDataJson(language)}</script>`,
 	].join("")

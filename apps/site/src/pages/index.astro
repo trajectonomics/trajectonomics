@@ -1,0 +1,8 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see <Home /> or FALLBACK_LANGUAGE.
+import Home from "../components/Home.astro"
+import { FALLBACK_LANGUAGE } from "../lib/language/language"
+---
+
+<!-- The Site's one address: the fallback Language's home, written to the assets root (ADR 0020). -->
+<Home language={FALLBACK_LANGUAGE} />

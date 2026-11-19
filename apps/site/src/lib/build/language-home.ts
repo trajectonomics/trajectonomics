@@ -1,5 +1,5 @@
-import type { Language, LanguageEntry } from "../language/language"
-import { LANGUAGES } from "../language/languages"
+import type { LanguageEntry } from "../language/language"
+import { LANGUAGES, languageHomeFile } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
@@ -7,10 +7,7 @@ import { buildFailure } from "./failures"
 import { checkDeclaredLanguage } from "./page-language"
 import { pageUrl } from "./page-url"
 
-/** The file a Language's home is built to: a directory index, so `/th` reaches `/th/`. */
-export function languageHomeFile(language: Language): string {
-	return `${language}/index.html`
-}
+export { languageHomeFile }
 
 /** One Language's built home, with the entry it belongs to. */
 export interface BuiltHome {
@@ -26,7 +23,10 @@ export function builtHomes(files: readonly BuiltFile[]): readonly BuiltHome[] {
 	})
 }
 
-/** Each Language has a home at its Locale URL, and that home declares the Language. */
+/**
+ * The fallback Language's home is the Site's one address, and every other Language's home is a
+ * build path: each declares the Language it answers in.
+ */
 export function checkLanguageHomes(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return LANGUAGES.flatMap((entry) => {
 		const path = languageHomeFile(entry.language)
@@ -36,7 +36,7 @@ export function checkLanguageHomes(files: readonly BuiltFile[]): readonly BuildF
 				buildFailure(
 					"LANGUAGE_PAGE_MISSING",
 					pageUrl(path),
-					`the build produced no ${entry.language} home.`,
+					`the build produced no ${entry.language} home at ${pageUrl(path)}.`,
 				),
 			]
 		}

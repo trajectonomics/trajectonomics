@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { absoluteLocaleUrl } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, languageEntry } from "../language/languages"
 import { absoluteShareImageUrl } from "../social/share-advert"
 import { checkSocialCard } from "./social-card"
 import { codes, edited, entryAt } from "./testing/homes"
@@ -38,17 +38,36 @@ describe("the Social card of a Language home", () => {
 		).toEqual(["SOCIAL_CARD_DUPLICATE"])
 	})
 
-	it("fails a home whose card points at the other Language's URL", () => {
+	it("fails a home whose card points somewhere other than the Site's address", () => {
 		expect(
 			codes(
 				checkSocialCard,
 				edited(
 					HOME,
 					propertyPattern("og:url"),
-					`<meta property="og:url" content="${absoluteLocaleUrl(OTHER)}">`,
+					'<meta property="og:url" content="https://trajectonomics.com/th/">',
 				),
 			),
 		).toEqual(["SOCIAL_CARD_WRONG"])
+	})
+
+	it("fails a home whose card states the other Language's locale", () => {
+		expect(
+			codes(
+				checkSocialCard,
+				edited(
+					HOME,
+					propertyPattern("og:locale"),
+					`<meta property="og:locale" content="${languageEntry(OTHER).locale}">`,
+				),
+			),
+		).toEqual(["SOCIAL_CARD_WRONG"])
+	})
+
+	it("fails a home whose card names no alternate Language", () => {
+		expect(
+			codes(checkSocialCard, edited(HOME, propertyPattern("og:locale:alternate"), "")),
+		).toEqual(["SOCIAL_CARD_MISSING"])
 	})
 
 	it("fails a home whose card calls the page an article", () => {
@@ -146,12 +165,12 @@ describe("the Social card of a Language home", () => {
 			edited(
 				HOME,
 				propertyPattern("og:url"),
-				'<meta property="og:url" content="https://trajectonomics.com/">',
+				'<meta property="og:url" content="https://example.com/">',
 			),
 		])
 		expect(failure?.message).toContain("og:url")
-		expect(failure?.message).toContain("https://trajectonomics.com/")
-		expect(failure?.message).toContain(absoluteLocaleUrl(HOME))
+		expect(failure?.message).toContain("https://example.com/")
+		expect(failure?.message).toContain(ABSOLUTE_CLEAN_URL)
 		expect(failure?.path).toBe(`/${HOME}/`)
 	})
 })

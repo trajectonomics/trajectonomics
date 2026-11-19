@@ -14,7 +14,7 @@ const PAGE = `<!DOCTYPE html><html lang="en" data-theme="dark"><head><link rel="
 /** One built Site of a page and the stylesheet it loads, each replaceable. */
 function build(index = PAGE, css = TEST_BUILT_CSS): readonly BuiltFile[] {
 	return [
-		{ path: "en/index.html", content: index },
+		{ path: "index.html", content: index },
 		{ path: "_astro/site.css", content: css },
 	]
 }
@@ -55,7 +55,7 @@ describe("the device scheme a build that forces one Theme refuses to follow", ()
 
 	it("fails a page whose stylesheet imports a sheet that names a device scheme", () => {
 		const files = [
-			{ path: "en/index.html", content: PAGE },
+			{ path: "index.html", content: PAGE },
 			{ path: "_astro/site.css", content: `@import "./override.css";${TEST_BUILT_CSS}` },
 			{
 				path: "_astro/override.css",
@@ -68,7 +68,7 @@ describe("the device scheme a build that forces one Theme refuses to follow", ()
 	it("names the place that asks the device, so a maintainer knows where to look", () => {
 		const css = `${TEST_BUILT_CSS}@media (prefers-color-scheme: dark){:root{--ds-color-stage:#0a0a0a}}`
 		const [failure] = checkThemeDeviceScheme(build(PAGE, css), PRODUCTION)
-		expect(failure?.path).toBe("/en/")
+		expect(failure?.path).toBe("/")
 		expect(failure?.message).toContain("_astro/site.css")
 		expect(failure?.message).toContain("prefers-color-scheme")
 	})

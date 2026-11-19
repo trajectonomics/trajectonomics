@@ -79,16 +79,33 @@ describe("the Language a Visitor signal chooses", () => {
 		const header = testCase.acceptLanguage ?? "no header"
 		const country = testCase.country ?? "no header"
 		it(`${header} with ${country} gives ${testCase.expected}, because ${testCase.why}`, () => {
-			expect(chooseLanguage(testCase.acceptLanguage, testCase.country)).toBe(testCase.expected)
+			expect(chooseLanguage(undefined, testCase.acceptLanguage, testCase.country)).toBe(
+				testCase.expected,
+			)
 		})
 	}
 
 	it("tolerates the whitespace a browser may send", () => {
-		expect(chooseLanguage(" th ; q=0 ", "TH")).toBe("en")
-		expect(chooseLanguage(" en , th ; q=0.4 ", null)).toBe("en")
+		expect(chooseLanguage(undefined, " th ; q=0 ", "TH")).toBe("en")
+		expect(chooseLanguage(undefined, " en , th ; q=0.4 ", null)).toBe("en")
 	})
 
 	it("gives the same answer every time, so a cache may not store it", () => {
-		expect(chooseLanguage("fr", "TH")).toBe(chooseLanguage("fr", "TH"))
+		expect(chooseLanguage(undefined, "fr", "TH")).toBe(chooseLanguage(undefined, "fr", "TH"))
+	})
+})
+
+describe("the Language the visitor stored", () => {
+	it("beats a browser that asks for the other Language", () => {
+		expect(chooseLanguage("th", "en", null)).toBe("th")
+		expect(chooseLanguage("en", "th", "TH")).toBe("en")
+	})
+
+	it("beats the country when the visitor stored English in Thailand", () => {
+		expect(chooseLanguage("en", null, "TH")).toBe("en")
+	})
+
+	it("leaves the Visitor signals to choose when the visitor stored nothing", () => {
+		expect(chooseLanguage(undefined, null, "TH")).toBe("th")
 	})
 })

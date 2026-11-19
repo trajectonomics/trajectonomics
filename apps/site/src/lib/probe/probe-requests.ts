@@ -1,0 +1,89 @@
+import type { Language } from "../language/language"
+import { LANGUAGE_CHOICE_PARAM } from "../language/languages"
+import type { Probe } from "./probe"
+
+/** The media types of an answer that carries no body, so no media type is judged on one. */
+const NO_BODY: readonly string[] = Object.freeze([])
+
+/** The media type every page answers with. */
+export const PAGE_MEDIA: readonly string[] = Object.freeze(["text/html"])
+
+/** The media types the Sitemap may answer with: the sitemaps protocol names both of them. */
+export const SITEMAP_MEDIA: readonly string[] = Object.freeze(["application/xml", "text/xml"])
+
+/** The media type the Robots file answers with. */
+export const ROBOTS_MEDIA: readonly string[] = Object.freeze(["text/plain"])
+
+/** The directives `/` must name, because its answer depends on the choice and on the signals. */
+const HOME_VARY: readonly string[] = Object.freeze(["cookie", "accept-language", "cf-ipcountry"])
+
+/** `/` is private and revalidated, so no shared cache hands one Language to another visitor. */
+const HOME_CACHE: readonly string[] = Object.freeze(["private", "no-cache"])
+
+/** The choice answer is state, so nothing may store it. */
+const CHOICE_CACHE: readonly string[] = Object.freeze(["no-store"])
+
+/** An empty list of judged directives. */
+const NONE: readonly string[] = Object.freeze([])
+
+/** The facts an answer carries before a probe fills in what it judges: nothing it must prove. */
+const DEFAULT_ANSWER: Omit<Probe, "path" | "status"> = Object.freeze({
+	acceptLanguage: null,
+	country: null,
+	cookie: null,
+	location: null,
+	language: null,
+	mediaTypes: NO_BODY,
+	vary: NONE,
+	cacheControl: NONE,
+	etag: null,
+	storesChoice: null,
+})
+
+/** One probe, from the answer it asks for. */
+function probe(facts: Pick<Probe, "path" | "status"> & Partial<Probe>): Probe {
+	return Object.freeze({ ...DEFAULT_ANSWER, ...facts })
+}
+
+/** The signals one request carries, filled in from its `null`s. */
+type Signals = Partial<Pick<Probe, "acceptLanguage" | "country" | "cookie">>
+
+/** A request for `/`, answered with that Language's home for the signals given. */
+export function home(language: Language, signals: Signals = {}): Probe {
+	return probe({
+		path: "/",
+		status: 200,
+		language,
+		mediaTypes: PAGE_MEDIA,
+		vary: HOME_VARY,
+		cacheControl: HOME_CACHE,
+		etag: true,
+		...signals,
+	})
+}
+
+/** The Language choice link, which stores the Language it names and returns to the address. */
+export function choice(language: Language | null): Probe {
+	return probe({
+		path: `/?${LANGUAGE_CHOICE_PARAM}=${language ?? "zz"}`,
+		status: 302,
+		location: "/",
+		cacheControl: CHOICE_CACHE,
+		storesChoice: language,
+	})
+}
+
+/** An old prefix, which answers 301 to the address and stores nothing. */
+export function moved(path: string): Probe {
+	return probe({ path, status: 301, location: "/" })
+}
+
+/** A request for a built path, which must answer with `status`, in `language`, as `mediaTypes`. */
+export function answered(
+	path: string,
+	status: number,
+	language: Language | null,
+	mediaTypes: readonly string[],
+): Probe {
+	return probe({ path, status, language, mediaTypes })
+}

@@ -2,12 +2,16 @@ import { describe, expect, it } from "bun:test"
 import { SITE_ORIGIN } from "../site"
 import { FALLBACK_LANGUAGE } from "./language"
 import {
-	absoluteLocaleUrl,
+	ABSOLUTE_CLEAN_URL,
+	CLEAN_URL,
 	dictionaryFor,
 	LANGUAGES,
+	languageChoiceLink,
 	languageEntry,
-	localeUrl,
+	languageHomeFile,
+	languageHomePath,
 	otherLanguages,
+	spokenLanguage,
 } from "./languages"
 
 /** The code of the error `run` throws, or what it did instead. */
@@ -26,9 +30,9 @@ describe("the Languages the Site speaks", () => {
 		expect(new Set(codes).size).toBe(codes.length)
 	})
 
-	it("prefixes each Locale URL with its own Language code", () => {
+	it("gives each Language a territory-qualified og:locale", () => {
 		for (const entry of LANGUAGES) {
-			expect(entry.pathPrefix).toBe(`/${entry.language}`)
+			expect(entry.locale).toMatch(/^[a-z]{2}_[A-Z]{2}$/)
 		}
 	})
 
@@ -58,11 +62,32 @@ describe("the Languages the Site speaks", () => {
 		expect(languageEntry(FALLBACK_LANGUAGE).countries).toEqual([])
 	})
 
-	it("gives each Language a home at its Locale URL", () => {
-		for (const entry of LANGUAGES) {
-			expect(localeUrl(entry.language)).toBe(`${entry.pathPrefix}/`)
-			expect(absoluteLocaleUrl(entry.language)).toBe(`${SITE_ORIGIN}${entry.pathPrefix}/`)
+	it("gives each Language a home at its own build path, and the fallback the address", () => {
+		expect(languageHomePath(FALLBACK_LANGUAGE)).toBe(CLEAN_URL)
+		expect(languageHomeFile(FALLBACK_LANGUAGE)).toBe("index.html")
+		for (const entry of LANGUAGES.filter((other) => other.language !== FALLBACK_LANGUAGE)) {
+			expect(languageHomePath(entry.language)).toBe(`/${entry.buildPath}/`)
+			expect(languageHomeFile(entry.language)).toBe(`${entry.buildPath}/index.html`)
 		}
+	})
+
+	it("states the Site's one address for every Language", () => {
+		expect(CLEAN_URL).toBe("/")
+		expect(ABSOLUTE_CLEAN_URL).toBe(`${SITE_ORIGIN}/`)
+	})
+
+	it("gives every Language a Language choice link that returns to the address", () => {
+		for (const entry of LANGUAGES) {
+			expect(languageChoiceLink(entry.language)).toBe(`/?lang=${entry.language}`)
+		}
+	})
+
+	it("names only a Language the Site speaks from a code", () => {
+		expect(spokenLanguage("th")).toBe("th")
+		expect(spokenLanguage(" TH ")).toBe("th")
+		expect(spokenLanguage("zz")).toBeUndefined()
+		expect(spokenLanguage(null)).toBeUndefined()
+		expect(spokenLanguage("")).toBeUndefined()
 	})
 
 	it("lists every other Language for the switcher, and not the page's own", () => {

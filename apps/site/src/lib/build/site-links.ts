@@ -1,6 +1,5 @@
 import type { Dictionary } from "../language/dictionary"
-import type { Language } from "../language/language"
-import { localeUrl } from "../language/languages"
+import { CLEAN_URL } from "../language/languages"
 import { GITHUB_ORG_URL, GITHUB_SKILLS_URL, SITE_NAME, SKILLS_LICENCE_URL } from "../site"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
@@ -54,12 +53,8 @@ function namedLinkFailures(
 	})
 }
 
-/** The brand lockup is the accessible name trajectonomics, and it links the Language's home. */
-function brandFailures(
-	path: string,
-	links: readonly HtmlElement[],
-	language: Language,
-): readonly BuildFailure[] {
+/** The brand lockup is the accessible name trajectonomics, and it links the Site's one address. */
+function brandFailures(path: string, links: readonly HtmlElement[]): readonly BuildFailure[] {
 	const brand = links.find((link) => link.attributes["aria-label"] === SITE_NAME)
 	if (brand === undefined) {
 		return [
@@ -70,12 +65,12 @@ function brandFailures(
 			),
 		]
 	}
-	if (brand.attributes["href"] === localeUrl(language)) return []
+	if (brand.attributes["href"] === CLEAN_URL) return []
 	return [
 		buildFailure(
 			"WORDMARK_HREF_MISMATCH",
 			path,
-			`the brand lockup goes to ${brand.attributes["href"] ?? "nowhere"}, not ${localeUrl(language)}.`,
+			`the brand lockup goes to ${brand.attributes["href"] ?? "nowhere"}, not ${CLEAN_URL}.`,
 		),
 	]
 }
@@ -87,7 +82,7 @@ export function checkSiteLinks(files: readonly BuiltFile[]): readonly BuildFailu
 		const links = elementsByTag(scanned, "a")
 		return [
 			...namedLinkFailures(file.path, scanned, links, entry.dictionary),
-			...brandFailures(file.path, links, entry.language),
+			...brandFailures(file.path, links),
 		]
 	})
 }

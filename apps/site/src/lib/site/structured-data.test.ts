@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { absoluteLocaleUrl, dictionaryFor } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import {
 	APPLE_TOUCH_ICON_URL,
 	CLI_NAME,
@@ -49,10 +49,11 @@ describe("the Structured data a Language home carries", () => {
 		])
 	})
 
-	it("places the WebSite at the home's own absolute Locale URL, in its Language", () => {
-		expect(website("th").url).toBe(absoluteLocaleUrl("th"))
-		expect(website("th")["@id"]).toBe(`${absoluteLocaleUrl("th")}#website`)
+	it("places the WebSite at the Site's one address, in its Language", () => {
+		expect(website("th").url).toBe(ABSOLUTE_CLEAN_URL)
+		expect(website("th")["@id"]).toBe(`${ABSOLUTE_CLEAN_URL}#website`)
 		expect(website("th").inLanguage).toBe("th")
+		expect(website("en").url).toBe(ABSOLUTE_CLEAN_URL)
 	})
 
 	it("gives the page the Site's name and the summary the Dictionary states", () => {
@@ -82,7 +83,7 @@ describe("the Structured data a Language home carries", () => {
 	})
 
 	it("gives traj the page's own URL, Language and summary, and the repository it is built in", () => {
-		expect(traj("th").url).toBe(absoluteLocaleUrl("th"))
+		expect(traj("th").url).toBe(ABSOLUTE_CLEAN_URL)
 		expect(traj("th").inLanguage).toBe("th")
 		expect(traj("th").description).toBe(dictionaryFor("th").description)
 		expect(traj("en").codeRepository).toBe(GITHUB_CLI_URL)

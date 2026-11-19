@@ -29,10 +29,10 @@ describe("the links of the How it works section and the footer", () => {
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
 
-	it("fails a brand lockup that links the other Language's home", () => {
+	it("fails a brand lockup that links a Language build path instead of the address", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(
-			'href="/en/" aria-label="trajectonomics"',
+			'href="/" aria-label="trajectonomics"',
 			'href="/th/" aria-label="trajectonomics"',
 		)
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual([

@@ -5,14 +5,11 @@ import {
 	COPY_PROMPT_TEXT,
 	copiedLabel,
 	copiedMessage,
-	DEVICE_SCHEMES,
-	expectShippedTheme,
 	focusableCount,
-	openPage,
-	PAGES,
 	ringVisible,
 	tabToCopyButton,
-} from "./pages"
+} from "./controls"
+import { DEVICE_SCHEMES, expectShippedTheme, openPage, PAGES } from "./pages"
 
 /** The homes, which carry the controls a keyboard visitor operates. */
 const HOMES = PAGES.filter((underTest) => underTest.status === 200)

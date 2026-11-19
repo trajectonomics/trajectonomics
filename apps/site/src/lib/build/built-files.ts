@@ -21,8 +21,9 @@ export function fileBytes(file: BuiltFile): number {
 }
 
 /**
- * Every page the build produced, whatever its Language: the files the page checks judge. A Locale
- * URL, and the Not-found page of each, are pages like any other ([ADR 0003]).
+ * Every page the build produced, whatever its Language: the files the page checks judge. The
+ * address's home, a Language build path's home, and the one Not-found page are pages like any
+ * other (ADR 0020).
  */
 export function builtPages(files: readonly BuiltFile[]): readonly BuiltFile[] {
 	return files.filter((file) => file.path.endsWith(".html"))

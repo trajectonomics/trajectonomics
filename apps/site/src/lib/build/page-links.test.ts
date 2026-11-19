@@ -48,7 +48,7 @@ describe("the links every Language document must have", () => {
 		const failures = checkPageLinks(heroHomes(homeWithoutWayOut())).filter(
 			(failure) => failure.code === "PAGE_CLI_INSTALL_LINK_MISSING",
 		)
-		expect(failures.map((failure) => failure.path)).toEqual(["/en/"])
+		expect(failures.map((failure) => failure.path)).toEqual(["/"])
 	})
 
 	it("leaves the Docs and skills targets alone when the way out is missing", () => {

@@ -5,10 +5,11 @@ import type { LanguageEntry } from "./language"
 /** The release strings English prints, from the committed Release snapshot. */
 const RELEASE = releaseFor("en")
 
-/** English: the Language of `/en/`, and the fallback when nothing else chooses. */
+/** English: the Language of the Site's one address, and the fallback when nothing else chooses. */
 export const ENGLISH: LanguageEntry = Object.freeze({
 	language: "en",
-	pathPrefix: "/en",
+	buildPath: "",
+	locale: "en_US",
 	countries: Object.freeze([]),
 	dictionary: Object.freeze({
 		...ENGLISH_SECTIONS,

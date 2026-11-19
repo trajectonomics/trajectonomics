@@ -68,17 +68,22 @@ export async function stop(proc: DevServer): Promise<void> {
 	clearTimeout(force)
 }
 
-/** Wait until the dev server answers any request, or until the start timeout runs out. */
+/**
+ * Wait until the Site answers its one address with 200, or until the start timeout runs out. Any
+ * other answer is not the Site: wrangler's dev proxy answers 403 before the Worker takes a request,
+ * so a check that accepted any response would probe a server that is not serving the build yet.
+ */
 export async function waitUntilServing(baseUrl: string, proc: DevServer): Promise<boolean> {
 	const deadline = Date.now() + START_TIMEOUT_MS
 	while (Date.now() < deadline) {
 		if (proc.exitCode !== null) return false
 		try {
-			await fetch(baseUrl, { signal: AbortSignal.timeout(1_000) })
-			return true
+			const response = await fetch(baseUrl, { signal: AbortSignal.timeout(1_000) })
+			if (response.ok) return true
 		} catch {
-			await Bun.sleep(250)
+			// The server is not answering yet, which is what this loop waits out.
 		}
+		await Bun.sleep(250)
 	}
 	return false
 }

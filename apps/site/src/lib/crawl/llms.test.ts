@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import {
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
@@ -36,10 +36,10 @@ describe("the short Answer engine file", () => {
 		expect(titles()).toEqual(["Site", "Docs", "Source", "Install", "License"])
 	})
 
-	it("links every Language home at its absolute Locale URL", () => {
-		for (const entry of LANGUAGES) {
-			expect(LLMS_TXT).toContain(`](${absoluteLocaleUrl(entry.language)})`)
-		}
+	it("links the Site's one address, once, and no Language build path", () => {
+		expect(LLMS_TXT).toContain(`](${ABSOLUTE_CLEAN_URL})`)
+		expect(LLMS_TXT.match(new RegExp(`\\]\\(${ABSOLUTE_CLEAN_URL}\\)`, "g"))).toHaveLength(1)
+		expect(LLMS_TXT).not.toContain("](https://trajectonomics.com/th/)")
 	})
 
 	it("links the Docs Portal, both repositories and the MIT licence the footer links", () => {

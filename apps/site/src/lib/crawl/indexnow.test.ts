@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { FALLBACK_LANGUAGE } from "../language/language"
-import { absoluteLocaleUrl, LANGUAGES } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL } from "../language/languages"
 import { SITE_ORIGIN } from "../site"
 import {
 	INDEXNOW_ENDPOINT,
@@ -34,11 +33,10 @@ describe("the body an IndexNow submission carries", () => {
 		expect(payload.keyLocation).toBe(INDEXNOW_KEY_URL)
 	})
 
-	it("lists every Language home at its absolute Locale URL, in the Sitemap's own order", () => {
+	it("lists the Site's one address, as the Sitemap does", () => {
 		const payload = indexNowPayload()
 		expect(payload.urlList).toEqual(SITEMAP_URLS)
-		expect(payload.urlList).toEqual(LANGUAGES.map((entry) => absoluteLocaleUrl(entry.language)))
-		expect(payload.urlList).toContain(absoluteLocaleUrl(FALLBACK_LANGUAGE))
+		expect(payload.urlList).toEqual([ABSOLUTE_CLEAN_URL])
 	})
 
 	it("hands the body out frozen, so a run cannot edit what it submits", () => {

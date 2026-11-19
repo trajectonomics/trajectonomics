@@ -2,7 +2,8 @@ import { describe, expect, it } from "bun:test"
 import { LLMS_FILE, LLMS_TXT } from "../crawl/llms"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "../crawl/llms-full"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
-import { absoluteLocaleUrl } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL } from "../language/languages"
+import { SITE_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import { checkLlmsFiles } from "./llms"
 
@@ -42,9 +43,14 @@ describe("the Answer engine files of the host", () => {
 		])
 	})
 
-	it("fails the short file once for every Language home it leaves out", () => {
-		const withoutThai = LLMS_TXT.replaceAll(absoluteLocaleUrl("th"), "")
-		expect(codes(built(LLMS_FILE, withoutThai))).toEqual(["LLMS_HOME_MISSING"])
+	it("fails the short file that links no address", () => {
+		const withoutHome = LLMS_TXT.replaceAll(`](${ABSOLUTE_CLEAN_URL})`, "")
+		expect(codes(built(LLMS_FILE, withoutHome))).toEqual(["LLMS_HOME_MISSING"])
+	})
+
+	it("fails the short file that links a Language build path instead of the address", () => {
+		const withThai = `${LLMS_TXT}- [ไทย](${SITE_ORIGIN}/th/)\n`
+		expect(codes(built(LLMS_FILE, withThai))).toEqual(["LLMS_BUILD_PATH_PRESENT"])
 	})
 
 	it("passes the full file whether or not it names a home, because that is the short file's job", () => {

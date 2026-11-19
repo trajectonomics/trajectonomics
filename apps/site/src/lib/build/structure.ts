@@ -1,12 +1,15 @@
+import { LANGUAGES } from "../language/languages"
 import type { BuiltFile } from "./built-files"
-import { builtPages, fileAt } from "./built-files"
+import { builtPages } from "./built-files"
 import type { BuildFailure, BuildFailureCode } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, scanHtml } from "./html"
 import { pageUrl } from "./page-url"
 
-/** The path no document may be built at, because `/` redirects to a Locale URL ([ADR 0003]). */
-const ROOT_DOCUMENT = "index.html"
+/** The Language codes that are no Language build path, so no page may be built under one. */
+const CODES_WITHOUT_A_PATH: ReadonlySet<string> = new Set(
+	LANGUAGES.filter((entry) => entry.buildPath !== entry.language).map((entry) => entry.language),
+)
 
 /** The elements a page carries exactly one of: the router injects onto the landmarks, and a page has one title. */
 const SINGLE_ELEMENTS = [
@@ -33,18 +36,25 @@ function checkSingleElements(file: BuiltFile): readonly BuildFailure[] {
 	})
 }
 
-/** Every built page carries exactly one `head`, `body`, `nav`, `main` and `h1`, and `/` has no document. */
-export function checkStructure(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	const failures: BuildFailure[] = []
-	if (fileAt(files, ROOT_DOCUMENT) !== undefined) {
-		failures.push(
+/** No page is written under a directory named after a Language code that is no build path. */
+function checkLanguageDirectories(files: readonly BuiltFile[]): readonly BuildFailure[] {
+	return files.flatMap((file) => {
+		const [directory] = file.path.split("/")
+		if (directory === undefined || !CODES_WITHOUT_A_PATH.has(directory)) return []
+		return [
 			buildFailure(
-				"ROOT_DOCUMENT_PRESENT",
-				pageUrl(ROOT_DOCUMENT),
-				"the build has a document at /; / redirects to a Locale URL and serves no page.",
+				"LANGUAGE_CODE_DIRECTORY_PRESENT",
+				pageUrl(file.path),
+				`is built under ${directory}/, which is no Language build path; the Site's one address is /.`,
 			),
-		)
-	}
-	for (const file of builtPages(files)) failures.push(...checkSingleElements(file))
-	return failures
+		]
+	})
+}
+
+/** Every built page carries exactly one `head`, `body`, `nav`, `main` and `h1`. */
+export function checkStructure(files: readonly BuiltFile[]): readonly BuildFailure[] {
+	return [
+		...checkLanguageDirectories(files),
+		...builtPages(files).flatMap((file) => checkSingleElements(file)),
+	]
 }

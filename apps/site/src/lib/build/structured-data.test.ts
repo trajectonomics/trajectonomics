@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { absoluteLocaleUrl } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { structuredData, structuredDataJson } from "../site/structured-data"
 import type { BuiltFile } from "./built-files"
 import { checkStructuredData } from "./structured-data"
@@ -48,12 +48,22 @@ describe("the Structured data of a Language home", () => {
 		expect(codes(checkStructuredData, edited(HOME, BLOCK, broken))).toEqual(["JSON_LD_INVALID"])
 	})
 
-	it("fails a home whose block points at the other Language's URL", () => {
+	it("fails a home whose block states the other Language's words", () => {
 		expect(conditions([edited(HOME, BLOCK, blockOf(OTHER))])).toEqual(["JSON_LD_WRONG"])
 	})
 
+	it("states the Site's one address for every Language, and that Language's own words", () => {
+		for (const language of [HOME, OTHER]) {
+			const [website, _organization, traj] = structuredData(language)["@graph"]
+			expect(website.url).toBe(ABSOLUTE_CLEAN_URL)
+			expect(website["@id"]).toBe(`${ABSOLUTE_CLEAN_URL}#website`)
+			expect(website.inLanguage).toBe(language)
+			expect(traj.url).toBe(ABSOLUTE_CLEAN_URL)
+		}
+	})
+
 	it("fails a block that names no publisher, so nothing attributes the page", () => {
-		const noPublisher = `<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","url":"${absoluteLocaleUrl(HOME)}"}]}</script>`
+		const noPublisher = `<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","url":"${ABSOLUTE_CLEAN_URL}"}]}</script>`
 		expect(conditions([edited(HOME, BLOCK, noPublisher)])).toEqual(["JSON_LD_WRONG"])
 	})
 
@@ -70,9 +80,9 @@ describe("the Structured data of a Language home", () => {
 	it("names the property that differs, what the build wrote and what the page must state", () => {
 		const [failure] = checkStructuredData([edited(HOME, BLOCK, blockOf(OTHER))])
 		expect(failure?.message).toContain("@graph.0.")
-		expect(failure?.message).toContain(absoluteLocaleUrl(OTHER))
-		expect(failure?.message).toContain(absoluteLocaleUrl(HOME))
-		expect(failure?.path).toBe(`/${HOME}/`)
+		expect(failure?.message).toContain(dictionaryFor(OTHER).description)
+		expect(failure?.message).toContain(dictionaryFor(HOME).description)
+		expect(failure?.path).toBe(HOME === "en" ? "/" : `/${HOME}/`)
 	})
 })
 

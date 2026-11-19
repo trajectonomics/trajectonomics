@@ -33,20 +33,18 @@ function firstPage(): (typeof NOT_FOUND_PAGES)[number] {
 }
 
 describe("the Not-found pages", () => {
-	it("passes a page per Locale URL and the root page, all not indexed", () => {
+	it("passes one page at the assets root, not indexed", () => {
 		expect(codes(pages())).toEqual([])
 	})
 
-	it("fails a build with no root Not-found page", () => {
+	it("fails a build with no Not-found page", () => {
 		expect(codes(pages().filter((file) => file.path !== "404.html"))).toEqual([
 			"NOT_FOUND_PAGE_MISSING",
 		])
 	})
 
-	it("fails a build with no Not-found page under a Locale URL", () => {
-		expect(codes(pages().filter((file) => file.path !== "th/404.html"))).toEqual([
-			"NOT_FOUND_PAGE_MISSING",
-		])
+	it("asks for no Not-found page per Language, because a miss has no Language address", () => {
+		expect(NOT_FOUND_PAGES.map((page) => page.path)).toEqual(["404.html"])
 	})
 
 	it("fails a Not-found page that asks to be indexed", () => {
@@ -72,7 +70,7 @@ describe("the Not-found pages", () => {
 
 	it("fails a Not-found page that marks a Language as the current page", () => {
 		const page = firstPage()
-		const current = `<a href="/en/" aria-current="page">EN</a>`
+		const current = `<a href="/" aria-current="page">EN</a>`
 		const content = `<html lang="${page.language}"><head>${NOINDEX}</head><body><nav>${current}</nav><main></main></body></html>`
 		expect(codes(build({ path: page.path, content }))).toEqual(["NOT_FOUND_HAS_CURRENT"])
 	})

@@ -1,0 +1,24 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import Layout from "../layouts/Layout.astro"
+import type { Language } from "../lib/language/language"
+import { dictionaryFor } from "../lib/language/languages"
+import Features from "./Features.astro"
+import Hero from "./Hero.astro"
+import HowItWorks from "./HowItWorks.astro"
+
+interface Props {
+	readonly language: Language
+}
+
+// One Language's home: the words its Dictionary carries, under the Site's one address.
+const { language } = Astro.props
+const dictionary = dictionaryFor(language)
+---
+
+<Layout language={language} title={dictionary.documentTitle} description={dictionary.description} indexed={true}>
+	<Hero dictionary={dictionary} />
+	<HowItWorks dictionary={dictionary} />
+	<Features dictionary={dictionary} />
+</Layout>
