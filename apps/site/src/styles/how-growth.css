@@ -1,0 +1,33 @@
+/*
+ * The one block on the Site that grows (ADR 0019): the skills band and the logic layer are collapsed
+ * while the request is still in the presentation layer, and grow once to their full height when it
+ * reaches the logic layer. The rest state is the full height, so a motion-off visitor's page is laid
+ * out once and never shifts.
+ */
+
+.layers-growth {
+	display: grid;
+	grid-template-rows: 1fr;
+}
+
+.layers-growth-inner {
+	display: flex;
+	min-height: 0;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	/* Collapsed at once, and only ever grown from there: the row goes 0fr to 1fr once, at step 2. */
+	.how[data-motion="play"]:not([data-step="2"], [data-step="3"], [data-step="4"]) .layers-growth {
+		grid-template-rows: 0fr;
+		transition: none;
+	}
+
+	.how[data-motion="play"][data-step="2"] .layers-growth,
+	.how[data-motion="play"][data-step="3"] .layers-growth,
+	.how[data-motion="play"][data-step="4"] .layers-growth {
+		grid-template-rows: 1fr;
+		transition: grid-template-rows 900ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+}

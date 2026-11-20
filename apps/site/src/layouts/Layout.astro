@@ -117,5 +117,65 @@ const verification = verificationMetas({
 		<Header language={language} dictionary={dictionary} markCurrent={indexed} />
 		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
 		<Footer dictionary={dictionary} />
+		{/*
+			The Reveal layer (ADR 0019) and the phone's tab pair for the comparison (site#95), in one script
+			because the page's whole Program JavaScript budget is 10,000 bytes. The page as served is the
+			whole story: every message, step, actor and output is in the markup at its resting state, and
+			this script only marks a panel's root so the timeline in the stylesheet can play — in the same
+			frame for a root already on screen, so a visitor who lands on it never sees a still frame first.
+			It runs the flow's one `data-step` value, and a comparison panel's own settle, on one interval,
+			and takes the value and the motion attribute off when the sequence ends, so the settled page is
+			the static page. A comparison panel that settles moves a phone from before to after; a tab or
+			`Replay` shows its side and plays it again from the first beat. The beats are the stylesheet's.
+			There is no comment inside the script: every byte of it ships, and the whole page has 10,000.
+		*/}
+		<script is:inline>
+		;(() => {
+			const wrap = document.querySelector("[data-action-compare]")
+			const roots = [...document.querySelectorAll(".compare-panel, .how")]
+			if (!wrap || matchMedia("(prefers-reduced-motion: reduce)").matches) return
+			const panelOf = (side) => roots.find((one) => one.dataset.side === side)
+			const show = (side) => {
+				wrap.dataset.actionStage = side
+				for (const tab of wrap.querySelectorAll("[data-tab]")) {
+					tab.ariaPressed = String(tab.dataset.tab === side)
+				}
+			}
+			const play = (root) => {
+				const d = root.dataset
+				const steps = +d.flowSteps
+				delete d.motion
+				delete d.step
+				void root.offsetWidth
+				d.motion = "play"
+				clearInterval(root.timerId)
+				let beat = 0
+				root.timerId = setInterval(
+					() => {
+						if (steps && ++beat <= steps) return (d.step = beat)
+						clearInterval(root.timerId)
+						delete d.step
+						delete d.motion
+						if (d.side === "without") show("with")
+					},
+					steps ? +d.flowMs : +d.playMs,
+				)
+			}
+			for (const one of document.querySelectorAll("[data-tab], [data-replay]")) {
+				const side = one.dataset.tab ?? one.dataset.replay
+				one.hidden = false
+				one.onclick = () => (side && show(side), play(side ? panelOf(side) : roots[2]))
+			}
+			const watch =
+				window.IntersectionObserver &&
+				new IntersectionObserver((entries) => {
+					for (const { isIntersecting, target } of entries) isIntersecting && play(target)
+				})
+			for (const root of roots) {
+				const { top, bottom } = root.getBoundingClientRect()
+				bottom > 0 && top < innerHeight ? play(root) : watch?.observe(root)
+			}
+		})()
+		</script>
 	</body>
 </html>

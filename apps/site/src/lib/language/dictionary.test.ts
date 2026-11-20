@@ -71,25 +71,26 @@ describe("the Dictionary of every Language", () => {
 		expect(english.copied).toBe("Prompt copied")
 	})
 
-	it("writes the three runs, the four steps and the six features in every Language", () => {
+	it("writes the two guesses, the four steps and the six features in every Language", () => {
 		for (const { language, dictionary } of LANGUAGES) {
-			expect({ language, runs: dictionary.actionRunLabels.length }).toEqual({ language, runs: 3 })
 			expect({ language, guesses: dictionary.actionGuesses.length }).toEqual({
 				language,
-				guesses: 3,
+				guesses: 2,
 			})
 			expect({ language, steps: dictionary.howSteps.length }).toEqual({ language, steps: 4 })
+			expect({ language, actors: dictionary.howStepActors.length }).toEqual({ language, actors: 4 })
 			expect({ language, presentation: dictionary.howPresentationItems.length }).toEqual({
 				language,
-				presentation: 4,
+				presentation: 3,
 			})
+			expect({ language, chat: dictionary.howOutputChat.length }).toEqual({ language, chat: 2 })
 			expect({ language, logic: dictionary.howLogicItems.length }).toEqual({ language, logic: 4 })
 			expect({ language, titles: dictionary.featureTitles.length }).toEqual({ language, titles: 6 })
 			expect({ language, copies: dictionary.featureCopies.length }).toEqual({ language, copies: 6 })
 		}
 	})
 
-	it("gives the agent alone three different guesses, because that is the point of the comparison", () => {
+	it("gives the agent alone two different guesses, because that is the point of the comparison", () => {
 		for (const { language, dictionary } of LANGUAGES) {
 			expect({ language, unique: new Set(dictionary.actionGuesses).size }).toEqual({
 				language,

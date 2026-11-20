@@ -24,6 +24,8 @@
 @import "./terminal.css";
 @import "./how.css";
 @import "./layers.css";
+@import "./how-outputs.css";
+@import "./how-agent.css";
 @import "./features.css";
 @import "./footer.css";
 @import "./footer-legal.css";
@@ -34,6 +36,13 @@
 @import "./menu.css";
 @import "./menu-panel.css";
 @import "./motion.css";
+@import "./replay.css";
+@import "./motion-compare.css";
+@import "./how-growth.css";
+@import "./motion-flow.css";
+@import "./motion-steps.css";
+@import "./motion-outputs.css";
+@import "./motion-phone.css";
 
 /*
  * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own

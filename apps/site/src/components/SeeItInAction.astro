@@ -2,7 +2,14 @@
 // biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
+import {
+	COMPARE_ALONE,
+	COMPARE_WITH,
+	sequenceTimeline,
+	type Timeline,
+} from "../lib/motion/timeline"
 import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT } from "../lib/site"
+import ChatMessage from "./ChatMessage.astro"
 import Check from "./icons/Check.astro"
 import Cross from "./icons/Cross.astro"
 
@@ -11,121 +18,131 @@ interface Props {
 }
 
 const { dictionary } = Astro.props
+// One beat per message, so the stylesheet plays the exchange and this file only says when each starts.
+const alone = sequenceTimeline(COMPARE_ALONE)
+const guided = sequenceTimeline(COMPARE_WITH)
+/** The delay one beat starts at, in milliseconds, as the message renders it. */
+const at = (sequence: Timeline, beat: number) => sequence.beats[beat]?.startMs ?? 0
+/** The right chat's beats, in the order its markup renders them: five messages, the CLI, its lines, the answer. */
+const BEAT = {
+	question: 0,
+	guide: 1,
+	attach: 2,
+	needMore: 3,
+	data: 4,
+	terminal: 5,
+	lines: 6,
+	answer: 6 + FI_DEMO_OUTPUT.length,
+} as const
+const guesses = dictionary.actionGuesses
 ---
 
 {/*
- * The comparison now sits inside the hero, so the visitor sees it on landing. It carries no heading of
- * its own: the hero's one h1 is the page's claim, and the panels label themselves Before and After.
- * On a phone the two panels become a tabbed pair; the before panel is what a visitor lands on, and the
- * animation that advances it belongs to another issue (it announces itself with an event).
+ * The comparison now sits inside the hero, so the visitor sees it on landing (site#95). It carries no
+ * heading of its own: the hero's one h1 is the page's claim, and the panels label themselves Before and
+ * After. On a phone the two panels become a tabbed pair; the before panel is what a visitor lands on, and
+ * the animation that advances it is this section's: the Reveal layer listens for
+ * `traj:action-animation-start` and announces `traj:action-animation-finished` when a panel settles.
  */}
 <div class="compare-wrap" data-action-compare data-action-stage="without">
 	<div class="compare-tabs" role="group" aria-label={dictionary.actionLede}>
 		<button
 			type="button"
 			class="compare-tab-button"
-			data-action-tab="without"
+			data-tab="without"
 			aria-pressed="true"
 		>
 			{dictionary.actionBeforeLabel}
 		</button>
-		<button
-			type="button"
-			class="compare-tab-button"
-			data-action-tab="with"
-			aria-pressed="false"
-		>
+		<button type="button" class="compare-tab-button" data-action-tab="with" aria-pressed="false">
 			{dictionary.actionAfterLabel}
 		</button>
 	</div>
 
 	<div class="compare">
-		<div class="compare-panel" data-side="without">
+		<div class="compare-panel" data-side="without" data-play-ms={alone.totalMs}>
 			<div class="compare-tab">
 				<span class="compare-tab-label">{dictionary.actionBeforeLabel}</span>
 				<Cross class="compare-tab-mark" />
+				<button
+					class="section-replay"
+					type="button"
+					data-replay="without"
+					aria-label={`${dictionary.replay} — ${dictionary.actionWithoutLabel}`}
+					hidden
+				>
+					{dictionary.replay}
+				</button>
 			</div>
 			<div class="compare-body">
-				<p class="compare-question">
-					<span class="speaker">{dictionary.actionYou}</span>
-					<span class="text-foreground">{dictionary.actionQuestion}</span>
-				</p>
-				<ol class="compare-runs">
-					{
-						dictionary.actionGuesses.map((guess, run) => (
-							<li class="compare-run">
-								<span class="run-label text-muted-foreground">{dictionary.actionRunLabels[run]}</span>
-								<span class="bubble bubble-guess">
-									<span class="speaker">{dictionary.actionAgent}</span>
-									<span class="text-foreground">{guess}</span>
-								</span>
-							</li>
-						))
-					}
+				<ol class="chat">
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(alone, 0)}>
+						<p class="chat-text">{dictionary.actionQuestion}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(alone, 1)}>
+						<p class="chat-text">{guesses[0]}</p>
+					</ChatMessage>
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(alone, 2)}>
+						<p class="chat-text">{dictionary.actionReask}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(alone, 3)}>
+						<p class="chat-text">{guesses[1]}</p>
+					</ChatMessage>
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(alone, 4)}>
+						<p class="chat-text">{dictionary.actionExplain}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(alone, 5)}>
+						<p class="chat-text">{dictionary.actionGuessReason}</p>
+					</ChatMessage>
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(alone, 6)}>
+						<p class="chat-text">{dictionary.actionSure}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(alone, 7)}>
+						<p class="chat-text">{dictionary.actionConfession}</p>
+					</ChatMessage>
 				</ol>
 			</div>
 			<p class="compare-note text-muted-foreground">{dictionary.actionWithoutNote}</p>
 		</div>
 
-		<div class="compare-panel" data-side="with">
+		<div class="compare-panel" data-side="with" data-play-ms={guided.totalMs}>
 			<div class="compare-tab">
 				<span class="compare-tab-label">{dictionary.actionAfterLabel}</span>
 				<Check class="compare-tab-mark" />
 			</div>
 			<div class="compare-body">
-				<p class="compare-question">
-					<span class="speaker">{dictionary.actionYou}</span>
-					<span class="text-foreground">{dictionary.actionQuestion}</span>
-				</p>
-				<p class="compare-skill-line text-muted-foreground">{dictionary.actionSkillLine}</p>
-				<div class="terminal bg-stage text-stage-foreground">
-					<code class="terminal-command"><span class="terminal-prompt" aria-hidden="true">$ </span>{FI_DEMO_COMMAND}</code>
-					<pre class="terminal-output"><code>{FI_DEMO_OUTPUT.join("\n")}</code></pre>
-					<p class="terminal-note">{dictionary.actionExampleNote}</p>
-				</div>
-				<ol class="compare-runs">
-					{
-						dictionary.actionRunLabels.map((label) => (
-							<li class="compare-run">
-								<span class="run-label text-muted-foreground">{label}</span>
-								<span class="bubble bubble-answer">
-									<span class="speaker">{dictionary.actionAgent}</span>
-									<span class="text-foreground">{dictionary.actionAnswer}</span>
-								</span>
-							</li>
-						))
-					}
+				<ol class="chat">
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(guided, BEAT.question)}>
+						<p class="chat-text">{dictionary.actionQuestion}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(guided, BEAT.guide)}>
+						<p class="chat-text">{dictionary.actionGuideQuestion}</p>
+					</ChatMessage>
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(guided, BEAT.attach)}>
+						<p class="chat-text">{dictionary.actionAttach}</p>
+						<span class="chat-file">{dictionary.actionAttachName}</span>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(guided, BEAT.needMore)}>
+						<p class="chat-text">{dictionary.actionNeedMore}</p>
+					</ChatMessage>
+					<ChatMessage from="you" speaker={dictionary.actionYou} delayMs={at(guided, BEAT.data)}>
+						<p class="chat-text">{dictionary.actionData}</p>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(guided, BEAT.terminal)}>
+						<p class="chat-text chat-note">{dictionary.actionSkillLine}</p>
+						<div class="terminal bg-stage text-stage-foreground">
+							<code class="terminal-command"><span class="terminal-prompt" aria-hidden="true">$ </span>{FI_DEMO_COMMAND}</code>
+							<pre class="terminal-output"><code>{FI_DEMO_OUTPUT.map((line, index) => <span class="terminal-line" style={`--step-delay:${at(guided, BEAT.lines + index)}ms`}>{line}</span>)}</code></pre>
+							<p class="terminal-note">{dictionary.actionExampleNote}</p>
+						</div>
+					</ChatMessage>
+					<ChatMessage from="agent" speaker={dictionary.actionAgent} delayMs={at(guided, BEAT.answer)}>
+						<p class="chat-text">{dictionary.actionAnswer}</p>
+						<p class="chat-provenance">{dictionary.actionProvenance}</p>
+					</ChatMessage>
 				</ol>
 			</div>
 			<p class="compare-note text-foreground">{dictionary.actionWithNote}</p>
 		</div>
 	</div>
 </div>
-
-<script is:inline>
-	;(() => {
-		const wrap = document.querySelector("[data-action-compare]")
-		if (!(wrap instanceof HTMLElement)) return
-		const tabs = Array.from(wrap.querySelectorAll("[data-action-tab]"))
-		if (tabs.length === 0) return
-
-		/** Show one side, and keep the two tab buttons in step with it. */
-		const show = (side, announce) => {
-			wrap.setAttribute("data-action-stage", side)
-			for (const tab of tabs) {
-				tab.setAttribute("aria-pressed", String(tab.getAttribute("data-action-tab") === side))
-			}
-			// Switching tabs is the visitor asking for the animation to run: the animation lives in
-			// another issue and listens for this. The auto-advance below passes false so it cannot loop.
-			if (announce) {
-				window.dispatchEvent(new CustomEvent("traj:action-animation-start", { detail: { side } }))
-			}
-		}
-
-		for (const tab of tabs) {
-			tab.addEventListener("click", () => show(tab.getAttribute("data-action-tab") ?? "without", true))
-		}
-		// When the animation finishes it announces itself, and the visitor sees the after panel.
-		window.addEventListener("traj:action-animation-finished", () => show("with", false))
-	})()
-</script>

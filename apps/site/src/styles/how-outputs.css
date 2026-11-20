@@ -1,0 +1,105 @@
+/* One output per name: the chip says what the visitor gets, and the artifact under it draws it. */
+.layer-output {
+	display: flex;
+	min-width: 0;
+	flex: 1 1 7rem;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.layer-output > .layer-chip {
+	align-self: flex-start;
+}
+
+.how-output {
+	display: flex;
+	gap: 4px;
+	padding: 8px;
+	border: 1px dashed var(--ds-color-border);
+	border-radius: 8px;
+}
+
+/* The answer: two short bubbles, the visitor's and the agent's. */
+.how-output-answer {
+	flex-direction: column;
+}
+
+/* The chart: the bar row, and the value its last bar reads pinned above that bar's own top. */
+.how-output-chart {
+	position: relative;
+}
+
+.how-output-bubble {
+	padding: 4px 8px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 8px;
+	background: var(--ds-color-secondary);
+	color: var(--ds-color-secondary-foreground);
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+.how-output-bubble-agent {
+	align-self: flex-end;
+	background: var(--ds-color-card);
+	color: var(--ds-color-card-foreground);
+}
+
+/* The chart: six bars, the last in the accent, with room above it for the value it reads. */
+.how-output-bars {
+	display: flex;
+	width: 100%;
+	align-items: flex-end;
+	gap: 3px;
+	/* The 40 px the bars draw in, plus the band above them for the value. */
+	height: 52px;
+	padding-top: 12px;
+}
+
+.how-output-bar {
+	position: relative;
+	display: flex;
+	flex: 1;
+	min-width: 4px;
+	height: var(--bar);
+	border-radius: 1px;
+	background: var(--ds-color-muted-foreground);
+}
+
+.how-output-bar:last-child {
+	background: var(--ds-color-accent);
+}
+
+/* The value sits centred over the last bar's own top edge, which is the bar it reads. */
+.how-output-value {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	padding-bottom: 2px;
+	transform: translateX(-50%);
+	font-family: var(--font-meta);
+	font-size: 10px;
+	line-height: 1.2;
+	color: var(--ds-color-foreground);
+}
+
+/* The action: one task row in an app the visitor already uses. */
+.how-output-action {
+	align-items: center;
+	padding: 6px 8px;
+	font-size: 12px;
+}
+
+.how-output-tick {
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+	color: var(--ds-color-accent);
+}
+
+.how-output-source {
+	margin-left: auto;
+	font-family: var(--font-meta);
+	font-size: 10px;
+	color: var(--ds-color-muted-foreground);
+}

@@ -30,6 +30,9 @@ The owner asked for the two compare panels and the presentation-layer flow to mo
 
 - The reduced-motion visual baselines are the pixel proof of the shipped static state: they are generated with `reducedMotion: "reduce"`, so an animation that fails to settle cannot pass them.
 - The How it works growth is the Site's one layout animation. It is bounded (under twelve seconds), monotonic, and one-shot, and a browser test holds the height against the static height.
-- A new animated section is a timeline entry, one attribute on its root and a block in `motion-sections.css`; nothing else.
+- A new animated section is a timeline entry, one attribute on its root and a block in the stylesheet
+  that section owns (`src/styles/motion-compare.css`, `motion-flow.css`, `motion-steps.css`); nothing
+  else. They are several files rather than one because a stylesheet has the same 100-line ceiling as a
+  module, and site#64 filled one.
 - The budgets do not move: page weight stays under 50,000 bytes gzip, Program JavaScript under 10,000 bytes, and no new Invariant or Error Code is created, because no new invariant exists.
 - The `Replay` control is the only new control on the home. It is a `<button>` with a focus ring, it replays one section, and it is not in the tab order where there is no motion to replay.

@@ -102,6 +102,19 @@ export async function tabToCopyButton(page: Page): Promise<boolean> {
 	return false
 }
 
+/**
+ * The pulse's dot waits in the logic layer, whatever the width: its travel is the layer's own height,
+ * and the dot is painted at the foot of the pulse's column.
+ */
+export async function expectPulseInLogicLayer(page: Page): Promise<void> {
+	const dot = await page.locator(".layers-pulse").boundingBox()
+	const logic = await page.locator(".how .layer-logic").boundingBox()
+	if (dot === null || logic === null) throw new Error("the pulse or the logic layer has no box")
+	const dotCentre = dot.y + dot.height - 3
+	expect(dotCentre, "the dot is inside the logic layer").toBeGreaterThan(logic.y)
+	expect(dotCentre, "the dot is inside the logic layer").toBeLessThan(logic.y + logic.height)
+}
+
 /** The dictionary string one Language announces after a copy. */
 export function copiedMessage(language: Language): string {
 	return dictionaryFor(language).copied

@@ -1,6 +1,12 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../language/languages"
-import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
+import {
+	FI_DEMO_COMMAND,
+	FI_DEMO_DATE,
+	FI_DEMO_OUTPUT,
+	INSTALL_PROMPT,
+	SKILLS_LICENCE_URL,
+} from "../site"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
 /** The full Answer engine file's built path, relative to the Worker's assets root. */
@@ -18,15 +24,44 @@ const RELEASE = `${dictionary.heroLicence} · ${dictionary.heroVersion}`
 /** The demo the page shows: the command an agent runs, and the abridged JSON it answers with. */
 const DEMO = ["```bash", FI_DEMO_COMMAND, "```", "", "```json", ...FI_DEMO_OUTPUT, "```"]
 
-/** The comparison: what an agent answers alone, run by run, and what it answers with the skill. */
-const COMPARISON = [
-	`**${dictionary.actionQuestion}**`,
+/** A line of one transcript: the speaker the page aligns, then what they say. */
+const line = (speaker: string, said: string) => `- ${speaker}: ${said}`
+
+/** The agent alone's exchange, in the order the page plays it. */
+const ALONE = [
+	`**${dictionary.actionWithoutLabel}**`,
 	"",
-	...dictionary.actionRunLabels.map(
-		(label, index) =>
-			`- ${label} — ${dictionary.actionWithoutLabel}: ${dictionary.actionGuesses[index] ?? ""}`,
-	),
-	`- ${dictionary.actionWithLabel}: ${dictionary.actionAnswer}`,
+	line(dictionary.actionYou, dictionary.actionQuestion),
+	line(dictionary.actionAgent, dictionary.actionGuesses[0] ?? ""),
+	line(dictionary.actionYou, dictionary.actionReask),
+	line(dictionary.actionAgent, dictionary.actionGuesses[1] ?? ""),
+	line(dictionary.actionYou, dictionary.actionExplain),
+	line(dictionary.actionAgent, dictionary.actionGuessReason),
+	line(dictionary.actionYou, dictionary.actionSure),
+	line(dictionary.actionAgent, dictionary.actionConfession),
+]
+
+/** The agent with traj's exchange: the guide question, the sheet, the figure it asks for, then the CLI. */
+const WITH_TRAJ = [
+	`**${dictionary.actionWithLabel}**`,
+	"",
+	line(dictionary.actionYou, dictionary.actionQuestion),
+	line(dictionary.actionAgent, dictionary.actionGuideQuestion),
+	line(dictionary.actionYou, `${dictionary.actionAttach} (${dictionary.actionAttachName})`),
+	line(dictionary.actionAgent, dictionary.actionNeedMore),
+	line(dictionary.actionYou, dictionary.actionData),
+	line(dictionary.actionAgent, dictionary.actionSkillLine),
+	"",
+	...DEMO,
+	"",
+	line(dictionary.actionAgent, `${dictionary.actionAnswer} (${dictionary.actionProvenance})`),
+]
+
+/** The three things the agent hands back on the presentation layer, drawn under their own names. */
+const OUTPUTS = [
+	`- ${dictionary.howPresentationItems[0]}: ${dictionary.howOutputChat.join(" / ")}`,
+	`- ${dictionary.howPresentationItems[1]}: ${FI_DEMO_DATE.slice(0, 4)}`,
+	`- ${dictionary.howPresentationItems[2]}: ${dictionary.howOutputStatus} (${dictionary.howOutputSource})`,
 ]
 
 /** The three layers, named with the owner and the sentence the page gives each. */
@@ -56,20 +91,22 @@ export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.des
 	section(dictionary.actionHeading, [
 		dictionary.actionLede,
 		"",
-		...COMPARISON,
+		...ALONE,
 		"",
-		dictionary.actionSkillLine,
-		"",
-		...DEMO,
+		...WITH_TRAJ,
 		"",
 		dictionary.actionExampleNote,
 	]),
 	section(dictionary.howHeading, [
 		dictionary.howLede,
 		"",
-		...dictionary.howSteps.map((step, index) => `${index + 1}. ${step}`),
+		...dictionary.howSteps.map(
+			(step, index) => `${index + 1}. ${step} — ${dictionary.howStepActors[index] ?? ""}`,
+		),
 		"",
 		...LAYERS,
+		"",
+		...OUTPUTS,
 	]),
 	section(dictionary.featuresHeading, FEATURES),
 	section("Install", [INSTALL_PROMPT]),

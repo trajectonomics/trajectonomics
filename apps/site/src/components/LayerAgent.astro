@@ -1,0 +1,21 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icon it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import Bot from "./icons/Bot.astro"
+
+interface Props {
+	/** The step of the flow this chip belongs to, which the one `data-step` value reveals. */
+	readonly step: number
+	/** Who is doing that step, in the Glossary's words. */
+	readonly actor: string
+}
+
+const { step, actor } = Astro.props
+---
+
+{/* The agent docked on the stage it is working in: decoration, so it rests invisible and is not read. */}
+<span class="layer-agent" data-step-chip={step} aria-hidden="true">
+	<Bot class="layer-agent-mark" />
+	<span>{actor}</span>
+	<span class="layer-agent-dots dots"><i /><i /><i /></span>
+</span>

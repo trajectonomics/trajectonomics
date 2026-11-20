@@ -1,0 +1,84 @@
+/*
+ * The four steps of the layer flow (ADR 0019), in one state machine: pending, running and done all
+ * read the single `data-step` value the Reveal layer sets, and the three outputs fill as it settles.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+	/* The steps: pending, running and done, all keyed off the one `data-step` value. */
+	.how[data-motion="play"][data-step] .how-step {
+		opacity: 0.45;
+	}
+
+	/* The rows the flow has left behind. */
+	.how[data-motion="play"][data-step="2"] .how-step:nth-child(-n + 1),
+	.how[data-motion="play"][data-step="3"] .how-step:nth-child(-n + 2),
+	.how[data-motion="play"][data-step="4"] .how-step:nth-child(-n + 3) {
+		opacity: 0.8;
+	}
+
+	/* The row that is running, wherever the flow is. */
+	.how[data-motion="play"][data-step="1"] .how-step:nth-child(1),
+	.how[data-motion="play"][data-step="2"] .how-step:nth-child(2),
+	.how[data-motion="play"][data-step="3"] .how-step:nth-child(3),
+	.how[data-motion="play"][data-step="4"] .how-step:nth-child(4) {
+		opacity: 1;
+	}
+
+	.how[data-motion="play"][data-step="1"] .how-step:nth-child(1) .how-step-number,
+	.how[data-motion="play"][data-step="1"] .how-step:nth-child(1) .how-step-actor,
+	.how[data-motion="play"][data-step="2"] .how-step:nth-child(2) .how-step-number,
+	.how[data-motion="play"][data-step="2"] .how-step:nth-child(2) .how-step-actor,
+	.how[data-motion="play"][data-step="3"] .how-step:nth-child(3) .how-step-number,
+	.how[data-motion="play"][data-step="3"] .how-step:nth-child(3) .how-step-actor,
+	.how[data-motion="play"][data-step="4"] .how-step:nth-child(4) .how-step-number,
+	.how[data-motion="play"][data-step="4"] .how-step:nth-child(4) .how-step-actor {
+		color: var(--ds-color-accent);
+	}
+
+	.how[data-motion="play"][data-step="1"] .how-step:nth-child(1) .how-step-running,
+	.how[data-motion="play"][data-step="2"] .how-step:nth-child(2) .how-step-running,
+	.how[data-motion="play"][data-step="3"] .how-step:nth-child(3) .how-step-running,
+	.how[data-motion="play"][data-step="4"] .how-step:nth-child(4) .how-step-running {
+		opacity: 1;
+		animation: dots-run 900ms ease-in-out infinite;
+	}
+
+	/*
+	 * The one token rides to the row that is running: `--row` is the step, and its own height is one row,
+	 * so the translate is exact at any width and the script measures nothing.
+	 */
+	.how[data-motion="play"] .how-step-token {
+		display: flex;
+		opacity: 1;
+		transition:
+			transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+			opacity 200ms ease-out;
+	}
+
+	.how[data-motion="play"][data-step="1"] .how-step-token {
+		transform: translateY(0);
+	}
+
+	.how[data-motion="play"][data-step="2"] .how-step-token {
+		transform: translateY(100%);
+	}
+
+	.how[data-motion="play"][data-step="3"] .how-step-token {
+		transform: translateY(200%);
+	}
+
+	.how[data-motion="play"][data-step="4"] .how-step-token {
+		transform: translateY(300%);
+	}
+
+	/* The dots that say a step is still working. */
+	@keyframes dots-run {
+		0%,
+		100% {
+			opacity: 0.35;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+}

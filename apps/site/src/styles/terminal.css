@@ -21,13 +21,24 @@
 	opacity: 0.6;
 }
 
+/*
+ * The output wraps rather than scrolls (ADR 0021): at 390 px the fixture is wider than this box, and a
+ * scroll container with no keyboard path is an accessibility failure. It is not a scroll container at
+ * all: `overflow-x: auto` would make it one, and a browser makes a scrollable region a Tab stop, which
+ * an output that is not a control should never be. The wrap guarantees there is nothing to scroll.
+ */
 .terminal-output {
 	margin: 10px 0 0;
 	padding: 10px 0 0;
 	position: relative;
-	overflow-x: auto;
 	font: inherit;
-	white-space: pre;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+/* One element per line, so the timeline can land them one at a time. */
+.terminal-line {
+	display: block;
 }
 
 .terminal-note {

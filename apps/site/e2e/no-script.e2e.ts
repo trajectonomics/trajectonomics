@@ -47,6 +47,24 @@ for (const underTest of HOMES) {
 		await expect(page.locator("[data-hero-accent]")).toBeVisible()
 	})
 
+	test(`${underTest.name}: both transcripts and the flow are whole with no script`, async ({
+		page,
+	}) => {
+		await page.goto(underTest.path)
+		const dictionary = dictionaryFor(underTest.language)
+		const alone = page.locator('.compare-panel[data-side="without"]')
+		const guided = page.locator('.compare-panel[data-side="with"]')
+		await expect(alone.locator(".chat-message")).toHaveCount(8)
+		await expect(alone).toContainText(dictionary.actionConfession)
+		await expect(guided.locator(".chat-message")).toHaveCount(7)
+		await expect(guided).toContainText(dictionary.actionProvenance)
+		await expect(page.locator(".how-step")).toHaveCount(4)
+		await expect(page.locator(".how-output-chart")).toContainText("2041")
+		// No section carries a motion state, and no control offers a replay that cannot happen.
+		await expect(page.locator("[data-motion], [data-step]")).toHaveCount(0)
+		await expect(page.locator("[data-replay]").first()).toBeHidden()
+	})
+
 	test(`${underTest.name}: the Theme the HTML ships is styled without JavaScript`, async ({
 		page,
 	}) => {

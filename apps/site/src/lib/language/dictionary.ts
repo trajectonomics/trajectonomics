@@ -41,9 +41,9 @@ export interface Dictionary {
 	readonly actionEyebrow: string
 	/** The See it in action section's `h2`. */
 	readonly actionHeading: string
-	/** The line under that heading: what the visitor is about to compare. */
+	/** The line under that heading: the two panels' claim in one sentence. */
 	readonly actionLede: string
-	/** The one question both panels put to the agent. */
+	/** The one question both transcripts open with. */
 	readonly actionQuestion: string
 	/** The speaker label of the visitor in a transcript. */
 	readonly actionYou: string
@@ -55,20 +55,42 @@ export interface Dictionary {
 	readonly actionAfterLabel: string
 	/** The left panel's tab: the agent asked alone. */
 	readonly actionWithoutLabel: string
-	/** The left panel's verdict under its three runs. */
+	/** The left panel's verdict under its transcript. */
 	readonly actionWithoutNote: string
 	/** The right panel's tab: the agent with the traj skill and CLI. */
 	readonly actionWithLabel: string
-	/** The right panel's verdict under its three runs. */
+	/** The right panel's verdict under its transcript. */
 	readonly actionWithNote: string
-	/** One label per run, so each panel reads as three attempts at the same question. */
-	readonly actionRunLabels: readonly string[]
-	/** What the agent alone answers on each run, one string per run: three different guesses. */
+	/** What the agent alone answers, twice, with a different guess each time. */
 	readonly actionGuesses: readonly string[]
-	/** What the agent with traj answers on every run: one string, repeated, because the answer is. */
+	/** The visitor's re-ask, which brings the contradictory second guess. */
+	readonly actionReask: string
+	/** The visitor's challenge: how did the agent arrive at its number. */
+	readonly actionExplain: string
+	/** The agent's confident rule of thumb, with nothing of the visitor's in it. */
+	readonly actionGuessReason: string
+	/** The visitor's doubt: is the agent sure. */
+	readonly actionSure: string
+	/** The agent's confession: it has none of the visitor's numbers, and its data is stale. */
+	readonly actionConfession: string
+	/** What the agent with traj answers: one figure, and the date it was computed. */
 	readonly actionAnswer: string
+	/** The question the agent asks before anything runs: the visitor's situation and goal. */
+	readonly actionGuideQuestion: string
+	/** The visitor's message that hands over the budget sheet they already keep. */
+	readonly actionAttach: string
+	/** The name on the sheet's file pill: a label, because the Site uploads nothing. */
+	readonly actionAttachName: string
+	/** What the agent says the sheet does not cover, and the one figure it asks for. */
+	readonly actionNeedMore: string
+	/** The visitor's answer: the balance and the monthly saving the CLI needs. */
+	readonly actionData: string
 	/** The line above the command: the agent loads the skill, which runs the CLI. */
 	readonly actionSkillLine: string
+	/** The date the figure was computed, under the agent's answer. */
+	readonly actionProvenance: string
+	/** The control that plays a section's sequence again. */
+	readonly replay: string
 	/** The caption under the output: it is an abridged example, not a live result. */
 	readonly actionExampleNote: string
 	/** The small label above the How it works heading. */
@@ -83,7 +105,7 @@ export interface Dictionary {
 	readonly howPresentationOwner: string
 	/** What the top layer is: how the answer is explained. */
 	readonly howPresentationCopy: string
-	/** What the agent draws on the top layer, four short chips. */
+	/** The three things the agent hands back on the top layer: an answer, an interactive chart, an action. */
 	readonly howPresentationItems: readonly string[]
 	/** The band between the layers: the skills. */
 	readonly howSkillsLabel: string
@@ -99,6 +121,14 @@ export interface Dictionary {
 	readonly howLogicItems: readonly string[]
 	/** The workflow as four ordered steps, from the visitor's question to the figure shown. */
 	readonly howSteps: readonly string[]
+	/** Who does the work at each of the four steps, in the same order. */
+	readonly howStepActors: readonly string[]
+	/** The two lines of the answer the agent draws back on the top layer. */
+	readonly howOutputChat: readonly string[]
+	/** The words on the action the agent takes in an app the visitor already uses. */
+	readonly howOutputStatus: string
+	/** The app that action is taken in, named as an example and no promise of an integration. */
+	readonly howOutputSource: string
 	/** The small label above the Features heading. */
 	readonly featuresEyebrow: string
 	/** The Features section's `h2`. */

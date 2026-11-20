@@ -1,0 +1,61 @@
+/*
+ * The agent docked on the stage it is working in, and the pulse that travels the flow: both are
+ * decoration, so both rest invisible and both are aria-hidden (ADR 0019).
+ */
+/* The flowing parts need a box to move in: the stack, each layer, and the skills join. */
+.layers,
+.layer,
+.layers-join {
+	position: relative;
+}
+
+.layer-agent {
+	position: absolute;
+	bottom: -11px;
+	left: 14px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 8px;
+	border: 1px solid var(--ds-color-accent);
+	border-radius: 999px;
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.layer-agent-mark {
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+	color: var(--ds-color-accent);
+}
+
+.layer-agent-dots {
+	color: var(--ds-color-accent);
+}
+
+/*
+ * The pulse is a transparent column hanging from the presentation layer's bottom edge, with the dot
+ * painted at its own foot, so its travel is a share of the layer's height rather than a fixed number of
+ * pixels: the same rule crosses the skills band and lands in the logic layer at 390 px and at 1280 px.
+ */
+.layers-pulse {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	z-index: 3;
+	width: 6px;
+	height: 66%;
+	margin-left: -3px;
+	background: radial-gradient(
+		circle 3px at 50% calc(100% - 3px),
+		var(--ds-color-accent) 0 3px,
+		transparent 3.5px
+	);
+	opacity: 0;
+}

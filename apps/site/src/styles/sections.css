@@ -40,6 +40,13 @@
 	gap: 16px;
 }
 
+/* The head and the Replay control beside it: the control holds the column's top right corner. */
+.section-head-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+}
 /* The eyebrow: a mono label led by the accent block the hero's pill carries. */
 .eyebrow {
 	display: inline-flex;

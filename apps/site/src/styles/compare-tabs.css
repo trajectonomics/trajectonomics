@@ -1,7 +1,8 @@
 /*
  * The phone's tab bar for the comparison (see compare.css): one panel at a time, before on landing. The
- * animation that advances to after belongs to another issue. At the desktop width both panels return
- * side by side and the bar steps aside, because the panels label themselves Before and After.
+ * Reveal layer plays the panel a tab asks for and moves to after when the before chat settles
+ * (site#64). At the desktop width both panels return side by side and the bar steps aside, because the
+ * panels label themselves Before and After.
  */
 
 .compare-tabs {

@@ -27,10 +27,14 @@ answer; making the block keyboard-reachable left the contrast run unjudged and t
 ## Decision
 
 - **The demo output wraps.** `.terminal-output` takes `white-space: pre-wrap` and `overflow-wrap: anywhere`,
-  so each JSON line is still its own line and a longer one wraps rather than clipping. `overflow-x: auto`
-  stays: the panel around it sets `overflow: hidden`, so without the valve a future overflow would be clipped
-  invisibly instead of becoming a finding. The rule stays in `src/styles/terminal.css`, where the block
-  already lives.
+  so each JSON line is still its own line and a longer one wraps rather than clipping. The rule stays in
+  `src/styles/terminal.css`, where the block already lives.
+- **The block is not a scroll container.** It carried `overflow-x: auto` as a valve for a future overflow.
+  site#64 put the block inside a chat bubble and measured the cost: while the Brand Typeface is still
+  loading the fallback face is wider, the box really does overflow for a moment, and the browser makes a
+  scrollable region a Tab stop — so a keyboard visitor landed on the output as if it were a control, with
+  no focus ring to say so. The wrap above guarantees there is nothing to scroll, so the valve was removed
+  rather than a scroll region kept for an overflow that cannot happen.
 - **No breakpoint.** The fixture is 382 px wide and the box is 476 px at 1280, so no line reaches the edge
   there and the desktop rendering is unchanged — page height at 1280×800 is identical with and without the
   change, on both homes. The wrap only acts where it is needed.

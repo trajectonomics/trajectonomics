@@ -46,6 +46,38 @@ describe("the full Answer engine file", () => {
 		expect(LLMS_FULL_TXT).toContain("```json\n{\n")
 	})
 
+	it("carries both transcripts, so the argument survives with no script", () => {
+		for (const said of [
+			dictionary.actionReask,
+			dictionary.actionExplain,
+			dictionary.actionGuessReason,
+			dictionary.actionSure,
+			dictionary.actionConfession,
+			dictionary.actionGuideQuestion,
+			dictionary.actionAttachName,
+			dictionary.actionNeedMore,
+			dictionary.actionData,
+			dictionary.actionProvenance,
+		]) {
+			expect(LLMS_FULL_TXT).toContain(said)
+		}
+		expect(LLMS_FULL_TXT).toContain(dictionary.actionWithoutLabel)
+		expect(LLMS_FULL_TXT).toContain(dictionary.actionWithLabel)
+	})
+
+	it("names each step's actor and the three things the agent hands back", () => {
+		for (const [index, actor] of dictionary.howStepActors.entries()) {
+			expect(LLMS_FULL_TXT).toContain(`${index + 1}. ${dictionary.howSteps[index]} — ${actor}`)
+		}
+		for (const item of dictionary.howPresentationItems) expect(LLMS_FULL_TXT).toContain(item)
+		expect(LLMS_FULL_TXT).toContain(dictionary.howOutputChat.join(" / "))
+		expect(LLMS_FULL_TXT).toContain(dictionary.howOutputSource)
+	})
+
+	it("carries no run label, because the page has none", () => {
+		expect(LLMS_FULL_TXT).not.toContain("Run 1")
+	})
+
 	it("prints the Prompt route sentence, and links the home in every other Language", () => {
 		expect(LLMS_FULL_TXT).toContain(INSTALL_PROMPT)
 		for (const entry of LANGUAGES.filter((one) => one.language !== FALLBACK_LANGUAGE)) {

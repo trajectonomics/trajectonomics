@@ -36,7 +36,9 @@ for (const scheme of DEVICE_SCHEMES) {
 						const focused = document.activeElement
 						if (!(focused instanceof HTMLElement)) return "none"
 						const href = focused.getAttribute("href") ?? ""
-						return `${focused.tagName}:${href}:${(focused.textContent ?? "").trim()}`
+						// The accessible name, not the text: two Replays in two sections are two controls.
+						const name = focused.getAttribute("aria-label") ?? focused.textContent ?? ""
+						return `${focused.tagName}:${href}:${name.trim()}`
 					})
 					expect(reached, `Tab stop ${stop} is a control`).not.toBe("none")
 					expect(visited, `Tab stop ${stop} is a control not reached yet`).not.toContain(reached)

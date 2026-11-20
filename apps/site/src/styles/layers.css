@@ -92,6 +92,7 @@
 }
 
 .layers-join-label {
+	position: relative;
 	display: flex;
 	max-width: 26rem;
 	flex-direction: column;
