@@ -12,17 +12,8 @@
 	text-align: left;
 }
 
-@media (min-width: 64rem) {
-	.compare {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		align-items: start;
-		gap: 24px;
-		margin-top: 56px;
-	}
-}
-
 .compare-panel {
-	display: none;
+	display: flex;
 	min-width: 0;
 	flex-direction: column;
 	overflow: hidden;
@@ -34,12 +25,6 @@
 
 .compare-panel[data-side="without"] {
 	border-style: dashed;
-}
-
-/* The phone shows only the active side; compare-tabs.css restores both at the desktop width. */
-.compare-wrap[data-action-stage="without"] .compare-panel[data-side="without"],
-.compare-wrap[data-action-stage="with"] .compare-panel[data-side="with"] {
-	display: flex;
 }
 
 .compare-tab {
@@ -80,4 +65,55 @@
 	padding: 12px 16px;
 	border-top: 1px solid var(--ds-color-border);
 	font-size: 13px;
+}
+
+@media (min-width: 64rem) {
+	.compare {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: start;
+		gap: 24px;
+		margin-top: 56px;
+	}
+}
+
+/*
+ * A phone shows one panel at a time, and the Reveal layer says which one with `data-action-stage`. It
+ * sets no stage at all when motion is reduced or no script runs, so both panels stand one above the
+ * other and a reader loses nothing (ADR 0019).
+ */
+@media (max-width: 63.999rem) {
+	.compare-wrap[data-action-stage="without"] .compare-panel[data-side="with"],
+	.compare-wrap[data-action-stage="with"] .compare-panel[data-side="without"] {
+		display: none;
+	}
+}
+
+/* The header's Replay control is the desktop's: a phone's is the one in the slot under the panels. */
+@media (max-width: 63.999rem) {
+	.compare-tab .section-replay {
+		display: none;
+	}
+}
+
+/*
+ * A phone that moves holds one panel at one height, so the control under the panels never moves; the
+ * longer after chat scrolls inside its own body instead of pushing the page about, and the note under it
+ * stays in view. A still phone keeps its whole transcript instead: with motion reduced the two
+ * panels stand one above the other and no chat is folded away behind a scrollbar (ADR 0019).
+ */
+@media (max-width: 63.999rem) and (prefers-reduced-motion: no-preference) {
+	.compare-panel {
+		height: min(70dvh, 34rem);
+	}
+
+	.compare-tab,
+	.compare-note {
+		flex: none;
+	}
+
+	.compare-body {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+	}
 }

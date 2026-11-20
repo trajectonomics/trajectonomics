@@ -9,6 +9,7 @@ export const THAI_SECTIONS = Object.freeze({
 	actionAgent: "เอเจนต์",
 	actionBeforeLabel: "ก่อน",
 	actionAfterLabel: "หลัง",
+	actionSeeGood: "ดูว่าคำตอบที่ดีเป็นแบบไหน",
 	actionWithoutLabel: "ถามเอเจนต์เฉยๆ",
 	actionWithoutNote: "เดาไปเรื่อย แล้วยอมรับเมื่อถูกถาม ไม่มีแหล่งที่มา ไม่มีวันที่ ไม่มีอะไรให้ตรวจ",
 	actionWithLabel: "เอเจนต์ + สกิล traj",

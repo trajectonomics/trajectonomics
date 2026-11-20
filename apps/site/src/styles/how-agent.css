@@ -40,6 +40,32 @@
 }
 
 /*
+ * A phone reads the diagram as the whole section, so the chip carries who does what: it docks
+ * in its own stage's flow rather than hanging off the border, where the growing block below clips it, and
+ * it is set large enough to read. It holds its row whether it shows or not, so the flow never reflows.
+ */
+@media (max-width: 63.999rem) {
+	.layer-agent {
+		position: static;
+		align-self: flex-start;
+		margin-top: 2px;
+		padding: 4px 10px;
+		font-size: 12px;
+	}
+
+	.layers-join-label .layer-agent {
+		align-self: center;
+	}
+}
+
+/* With motion reduced nothing else on a phone names the actor, so the chips rest where they are. */
+@media (max-width: 63.999rem) and (prefers-reduced-motion: reduce) {
+	.layer-agent {
+		opacity: 1;
+	}
+}
+
+/*
  * The pulse is a transparent column hanging from the presentation layer's bottom edge, with the dot
  * painted at its own foot, so its travel is a share of the layer's height rather than a fixed number of
  * pixels: the same rule crosses the skills band and lands in the logic layer at 390 px and at 1280 px.

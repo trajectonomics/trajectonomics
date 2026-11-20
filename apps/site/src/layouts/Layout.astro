@@ -118,16 +118,19 @@ const verification = verificationMetas({
 		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
 		<Footer dictionary={dictionary} />
 		{/*
-			The Reveal layer (ADR 0019) and the phone's tab pair for the comparison (site#95), in one script
+			The Reveal layer (ADR 0019) and the comparison's own controls (site#95), in one script
 			because the page's whole Program JavaScript budget is 10,000 bytes. The page as served is the
 			whole story: every message, step, actor and output is in the markup at its resting state, and
-			this script only marks a panel's root so the timeline in the stylesheet can play — in the same
-			frame for a root already on screen, so a visitor who lands on it never sees a still frame first.
-			It runs the flow's one `data-step` value, and a comparison panel's own settle, on one interval,
-			and takes the value and the motion attribute off when the sequence ends, so the settled page is
-			the static page. A comparison panel that settles moves a phone from before to after; a tab or
-			`Replay` shows its side and plays it again from the first beat. The beats are the stylesheet's.
-			There is no comment inside the script: every byte of it ships, and the whole page has 10,000.
+			nothing here is needed to read it. The script marks a panel's root so the timeline in the
+			stylesheet can play — in the same frame for a root already on screen, so a visitor who lands on it
+			never sees a still frame first — and takes the mark and the motion attribute off when the sequence
+			ends, so the settled page is the static page again. It sets the stage a phone is on, which is a
+			panel at a time; when the before chat has been read it offers the after one with a five-second
+			countdown, and the visitor's tap or the countdown's last second moves there. It keeps the newest
+			message of a playing panel in view, and it unhides the Replay controls. It sets no stage where
+			motion is reduced, so both panels stand whole. The beats are the stylesheet's and the timeline's,
+			never counted here. There is no comment inside the script: every byte of it ships, and the whole
+			page has 10,000.
 		*/}
 		<script is:inline>
 		;(() => {
@@ -135,37 +138,57 @@ const verification = verificationMetas({
 			const roots = [...document.querySelectorAll(".compare-panel, .how")]
 			if (!wrap || matchMedia("(prefers-reduced-motion: reduce)").matches) return
 			const panelOf = (side) => roots.find((one) => one.dataset.side === side)
-			const show = (side) => {
-				wrap.dataset.actionStage = side
-				for (const tab of wrap.querySelectorAll("[data-tab]")) {
-					tab.ariaPressed = String(tab.dataset.tab === side)
-				}
-			}
+			const cta = wrap.querySelector(".compare-cta")
+			const count = wrap.querySelector("[data-action-count]")
+			let wait
+			const show = (side) => (wrap.dataset.actionStage = side)
 			const play = (root) => {
 				const d = root.dataset
+				if (d.motion) return
 				const steps = +d.flowSteps
-				delete d.motion
 				delete d.step
-				void root.offsetWidth
 				d.motion = "play"
 				clearInterval(root.timerId)
 				let beat = 0
-				root.timerId = setInterval(
-					() => {
-						if (steps && ++beat <= steps) return (d.step = beat)
-						clearInterval(root.timerId)
-						delete d.step
-						delete d.motion
-						if (d.side === "without") show("with")
-					},
-					steps ? +d.flowMs : +d.playMs,
-				)
+				root.timerId = setInterval(() => {
+					if (steps && ++beat <= steps) return (d.step = beat)
+					clearInterval(root.timerId)
+					delete d.step
+					delete d.motion
+					d.side === "without" && offer()
+				}, steps ? +d.flowMs : +d.playMs)
 			}
-			for (const one of document.querySelectorAll("[data-tab], [data-replay]")) {
-				const side = one.dataset.tab ?? one.dataset.replay
+			const offer = () => {
+				if (!cta.offsetParent) return
+				let left = 6
+				wrap.dataset.actionCta = "count"
+				clearInterval(wait)
+				const tick = () => {
+					count.textContent = ` (${--left})`
+					left || turn("with")
+				}
+				wait = setInterval(tick, 1e3)
+				tick()
+			}
+			const turn = (side) => {
+				clearInterval(wait)
+				delete wrap.dataset.actionCta
+				show(side)
+				play(panelOf(side))
+			}
+			cta.onclick = () => turn(wrap.dataset.actionStage === "with" ? "without" : "with")
+			for (const one of document.querySelectorAll("[data-replay]")) {
 				one.hidden = false
-				one.onclick = () => (side && show(side), play(side ? panelOf(side) : roots[2]))
+				one.onclick = () => (one.dataset.replay ? turn(one.dataset.replay) : play(roots[2]))
 			}
+			wrap.addEventListener("animationstart", ({ target }) => {
+				const message = target.closest(".chat-message")
+				const body = message && message.closest(".compare-body")
+				if (body)
+					body.scrollTop +=
+						message.getBoundingClientRect().bottom - body.getBoundingClientRect().bottom
+			})
+			show("without")
 			const watch =
 				window.IntersectionObserver &&
 				new IntersectionObserver((entries) => {

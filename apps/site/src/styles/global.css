@@ -19,10 +19,11 @@
 @import "./landing.css";
 @import "./sections.css";
 @import "./compare.css";
-@import "./compare-tabs.css";
+@import "./compare-cta.css";
 @import "./conversation.css";
 @import "./terminal.css";
 @import "./how.css";
+@import "./how-steps.css";
 @import "./layers.css";
 @import "./how-outputs.css";
 @import "./how-agent.css";
@@ -42,7 +43,6 @@
 @import "./motion-flow.css";
 @import "./motion-steps.css";
 @import "./motion-outputs.css";
-@import "./motion-phone.css";
 
 /*
  * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own

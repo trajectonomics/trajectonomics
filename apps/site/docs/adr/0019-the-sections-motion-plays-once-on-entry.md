@@ -36,3 +36,47 @@ The owner asked for the two compare panels and the presentation-layer flow to mo
   module, and site#64 filled one.
 - The budgets do not move: page weight stays under 50,000 bytes gzip, Program JavaScript under 10,000 bytes, and no new Invariant or Error Code is created, because no new invariant exists.
 - The `Replay` control is the only new control on the home. It is a `<button>` with a focus ring, it replays one section, and it is not in the tab order where there is no motion to replay.
+
+## Amendment (2026-11-20, owner): the phone reads one panel, and the diagram alone
+
+The owner's phone review of the comparison found four things this record had got wrong, and they are all
+about the *phone*: the before/after tab bar at the top of the comparison was a second thing to press before
+anything was read (and its after button never worked, because it carried `data-action-tab` where the script
+looked for `data-tab`); the chat was over before a visitor could finish the bad answer; the panels' heights
+changed as one replaced the other, so the page moved under the reader; and the flow's step list on a phone was
+pinned to the bottom edge as one card, where it was effectively invisible. This section supersedes the tab
+pair and the bottom card, and leaves the rest of this record standing.
+
+- **One panel at a time, at one height.** A phone shows the panel whose `data-action-stage` the Reveal layer
+  set, and nothing sets a stage under reduced motion or with no script, so both panels stand one above the
+  other and whole. The stage is the only thing the script puts on a still page; a motion-off phone keeps the
+  whole transcript and no inner scrollbar, which is what the visual baselines pin.
+- **One reserved slot under the panels.** The comparison's controls live in a single row under both panels,
+  at one height and one style, because the row must not move when the control's words and job change: the
+  before chat offers the after one once it has been read, counts five seconds down, and moves there on the
+  visitor's tap or on the last second; the after panel's place in the same row offers the chat it came from.
+  A visitor with motion off or no script is offered neither, and the section carries no tab bar.
+- **Reading pace is a measured number, not a rewrite.** The bad chat holds each message for 1.4 s and pauses
+  0.4 s, and the good chat holds a message for 1.0 s and prints a CLI line for 0.2 s, so a visitor cannot be
+  outrun by the transcript that argues the agent alone is not enough. The bounds in `SEQUENCE_BOUNDS_MS` rose
+  with them (15 s for each chat, still 12 s for the flow), and the sequence carries the CLI's faster pace as
+  its own field rather than as a second keyframe rule.
+- **A phone reads the diagram alone.** Below 64 rem the four steps leave the layout and the layers diagram is
+  the whole section; the step that runs still names its actor, in the chip docked on the stage, which on a
+  phone sits in the stage's own flow (the growing block below it clipped the old border-docked chip) and is
+  set large enough to read. The steps keep their markup and are only out of the phone's layout, so a screen
+  reader still hears all four with their actors. At 64 rem and above the list is untouched.
+- **The newest message is followed, not abandoned.** A playing chat's body scrolls to the beat that just
+  landed, driven by the animation's own `animationstart` rather than a second timer, so the Reveal layer
+  counts no beats of its own.
+- **Comments in an inline script are bytes.** The page's 10,000 still stands, and this change needed room; the
+  notes above the page's inline scripts now sit in the component's own template, where Astro strips them,
+  instead of inside the script the browser downloads.
+
+Considered and rejected: a second tab bar with a working after button (the owner asked for one control, and
+the tab bar was the bug); keeping both panels at their natural height and letting the page move (the reader
+loses their place every time the panel changes); a CSS-only "follow the newest message" (`column-reverse` and
+`justify-content: flex-end` both keep the *last* message in view only by reversing the transcript's reading
+order or by making its top unreachable); and docking the phone's step card lower, which the owner had already
+judged invisible.
+

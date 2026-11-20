@@ -34,17 +34,45 @@ describe("the See it in action section in every Language", () => {
 			expect(withClass(page, "section-head")).toEqual([])
 		})
 
-		it(`labels the panels before and after, and lands on before (${language})`, async () => {
+		it(`labels the panels before and after, and ships no stage for a scriptless page (${language})`, async () => {
 			const page = scanComponent(await renderComponent(SeeItInAction, { dictionary }))
 			expect(withClass(page, "compare-tab-label").map((element) => textOf(page, element))).toEqual([
 				dictionary.actionBeforeLabel,
 				dictionary.actionAfterLabel,
 			])
+			// The stage is the Reveal layer's: with no script, or with motion reduced, both panels are
+			// laid out and read, and no tab bar stands between them.
 			const wrap = withAttribute(page, "data-action-compare")[0]
-			expect(wrap?.attributes["data-action-stage"]).toBe("without")
+			expect(wrap?.attributes["data-action-stage"]).toBeUndefined()
+			expect(withClass(page, "compare-tab-button")).toEqual([])
+			expect(withAttribute(page, "data-tab")).toEqual([])
+		})
+
+		it(`offers one control under the panels, in one slot, for both directions (${language})`, async () => {
+			const page = scanComponent(await renderComponent(SeeItInAction, { dictionary }))
+			const [slot] = withClass(page, "compare-cta")
+			if (slot === undefined) throw new Error("the section rendered no control slot")
+			// It sits under both panels, not inside one, so switching them moves nothing.
+			const panels = withClass(page, "compare-panel")
+			expect(panels.slice(0, 2).every((panel) => !panel.ancestors.includes(slot))).toBe(true)
+			const buttons = page.elements.filter(
+				(element) => element.tag === "button" && element.ancestors.includes(slot),
+			)
+			expect(buttons.map((button) => button.attributes["class"])).toEqual([
+				"compare-cta-button",
+				"compare-cta-button",
+			])
+			expect(textOf(page, buttons[0] as HtmlElement)).toBe(dictionary.actionSeeGood)
+			// The countdown's own span is empty until the chat has been read.
 			expect(
-				withClass(page, "compare-tab-button").map((element) => element.attributes["aria-pressed"]),
-			).toEqual(["true", "false"])
+				withAttribute(page, "data-action-count").map((element) => textOf(page, element)),
+			).toEqual([""])
+			expect(textOf(page, buttons[1] as HtmlElement)).toBe(dictionary.replay)
+			expect(buttons[1]?.attributes["aria-label"]).toBe(
+				`${dictionary.replay} — ${dictionary.actionWithoutLabel}`,
+			)
+			// A still page draws neither: compare-cta.css only shows them where the wrap carries a stage.
+			expect(buttons.every((button) => button.attributes["hidden"] === undefined)).toBe(true)
 		})
 
 		it(`opens both transcripts with the same question (${language})`, async () => {

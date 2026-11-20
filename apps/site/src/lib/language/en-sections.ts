@@ -9,6 +9,7 @@ export const ENGLISH_SECTIONS = Object.freeze({
 	actionAgent: "Agent",
 	actionBeforeLabel: "Before",
 	actionAfterLabel: "After",
+	actionSeeGood: "See what good looks like",
 	actionWithoutLabel: "Ask the agent alone",
 	actionWithoutNote: "Made up, then admitted when asked. No source, no date, nothing to check.",
 	actionWithLabel: "Agent + traj skill",

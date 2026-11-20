@@ -58,8 +58,8 @@ export function focusableCount(page: Page): Promise<number> {
 			[...document.querySelectorAll(selector)].filter((element) => {
 				const panel = element.closest("details:not([open])")
 				if (panel !== null && element.tagName !== "SUMMARY") return false
-				// A tab bar hidden at this width is out of the browser's tab order too, so it must
-				// not be counted here (the comparison's phone tabs are hidden on a desktop).
+				// A control hidden at this width is out of the browser's tab order too, so it must
+				// not be counted here (the comparison's phone slot is hidden on a desktop).
 				return element.getClientRects().length > 0
 			}).length,
 		FOCUSABLE,

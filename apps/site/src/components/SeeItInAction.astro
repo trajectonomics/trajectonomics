@@ -38,27 +38,13 @@ const guesses = dictionary.actionGuesses
 ---
 
 {/*
- * The comparison now sits inside the hero, so the visitor sees it on landing (site#95). It carries no
- * heading of its own: the hero's one h1 is the page's claim, and the panels label themselves Before and
- * After. On a phone the two panels become a tabbed pair; the before panel is what a visitor lands on, and
- * the animation that advances it is this section's: the Reveal layer listens for
- * `traj:action-animation-start` and announces `traj:action-animation-finished` when a panel settles.
+ * The comparison now sits inside the hero, so the visitor sees it on landing (site#95). It
+ * carries no heading of its own: the hero's one h1 is the page's claim, and the panels label themselves
+ * Before and After. A phone shows one panel at a time, and the Reveal layer sets `data-action-stage` to
+ * say which; the control in the slot under the panels moves between them. With no script, or with motion
+ * reduced, no stage is set and both panels stand one above the other, whole.
  */}
-<div class="compare-wrap" data-action-compare data-action-stage="without">
-	<div class="compare-tabs" role="group" aria-label={dictionary.actionLede}>
-		<button
-			type="button"
-			class="compare-tab-button"
-			data-tab="without"
-			aria-pressed="true"
-		>
-			{dictionary.actionBeforeLabel}
-		</button>
-		<button type="button" class="compare-tab-button" data-action-tab="with" aria-pressed="false">
-			{dictionary.actionAfterLabel}
-		</button>
-	</div>
-
+<div class="compare-wrap" data-action-compare>
 	<div class="compare">
 		<div class="compare-panel" data-side="without" data-play-ms={alone.totalMs}>
 			<div class="compare-tab">
@@ -144,5 +130,27 @@ const guesses = dictionary.actionGuesses
 			</div>
 			<p class="compare-note text-foreground">{dictionary.actionWithNote}</p>
 		</div>
+	</div>
+
+	{/*
+	 * One reserved slot under both panels, at one fixed size, so the control can change its words and its
+	 * job without moving anything: the before chat's offer to show the after one, counting down, and then
+	 * the after panel's way back to the chat it came from. compare-cta.css draws it only where the Reveal
+	 * layer has marked the wrap, so a reader with no script, or with motion reduced, is offered no control
+	 * that cannot happen.
+	 */}
+	<div class="compare-cta">
+		<button class="compare-cta-button" type="button" data-action-next>
+			{dictionary.actionSeeGood}
+			<span class="compare-cta-count tabular-nums" data-action-count></span>
+		</button>
+		<button
+			class="compare-cta-button"
+			type="button"
+			data-action-again
+			aria-label={`${dictionary.replay} — ${dictionary.actionWithoutLabel}`}
+		>
+			{dictionary.replay}
+		</button>
 	</div>
 </div>
