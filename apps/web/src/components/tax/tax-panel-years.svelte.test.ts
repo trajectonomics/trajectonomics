@@ -21,8 +21,8 @@ describe("TaxPanel: the chart and the Carry-in", () => {
 				source: "flag" as const,
 			},
 		]
-		const html = panel({ base: ok(projectionRun({ taxYears: [year()], carryIn })) })
-		expect(html).toContain("Carry-in records")
-		expect(html).toContain("income.section40_1")
+		const body = panel({ base: ok(projectionRun({ taxYears: [year()], carryIn })) })
+		expect(body).toContain("Carry-in records")
+		expect(body).toContain("income.section40_1")
 	})
 })

@@ -1,7 +1,7 @@
-import { renderToStaticMarkup } from "react-dom/server"
+import { render } from "svelte/server"
 import type { ProjectionRun, Read, TaxYear } from "../../lib/contract"
 import { projectionRun } from "../../lib/view/compare/projection.test-support"
-import { TaxPanel } from "./TaxPanel"
+import TaxPanel from "./TaxPanel.svelte"
 
 export function year(over: Partial<TaxYear> = {}): TaxYear {
 	return {
@@ -22,9 +22,9 @@ export function panel(
 	projections: Readonly<Record<string, Read<ProjectionRun>>>,
 	requested = "",
 ): string {
-	return renderToStaticMarkup(
-		<TaxPanel projections={projections} requested={requested} onScenario={() => {}} />,
-	)
+	return render(TaxPanel, {
+		props: { projections, requested, onScenario: () => {} },
+	}).body
 }
 
 export const withLevy = projectionRun({ taxYears: [year()] })
