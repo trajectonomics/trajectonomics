@@ -97,7 +97,9 @@ _Avoid_: Background colour, band
 
 **Star snapshot**:
 The committed star count of the Site's one repository, plus the date it was read,
-written by `bun run stars:update` and never fetched at request time.
+written by `bun run stars:update` and never fetched at request time. The deploy workflow runs that script
+before it builds the Site, and runs daily, so the printed count is at most a day old; the committed file is
+the fallback when GitHub cannot be read.
 _Avoid_: Live count, stars file
 
 **Release snapshot**:
