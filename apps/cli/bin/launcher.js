@@ -2,8 +2,8 @@
 import { createHash } from "node:crypto"
 import { constants } from "node:os"
 
-/** The repo's releases root: one release's assets sit under `download/v<version>`. */
-export const RELEASE_BASE = "https://github.com/trajectonomics/cli/releases"
+/** The releases root of this repository: one cli release's assets sit under `download/cli-v<version>`. */
+export const RELEASE_BASE = "https://github.com/trajectonomics/trajectonomics/releases"
 
 /** `process.platform`-`process.arch` to asset name. */
 const ASSETS = {
@@ -60,7 +60,7 @@ export function exitStatus(code, signal) {
 }
 
 export function releaseUrl(version, name, base = RELEASE_BASE) {
-	return `${base}/download/v${version}/${name}`
+	return `${base}/download/cli-v${version}/${name}`
 }
 
 /**
