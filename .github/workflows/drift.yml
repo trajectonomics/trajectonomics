@@ -1,0 +1,20 @@
+name: Tooling drift
+
+# Weekly report of stale pins and Biome rules, the same check every per-package caller ran before
+# phase 4. It calls the planner in trajectonomics/cicd, so this file stays a thin caller.
+#
+# One issue for the repository, updated in place and closed when nothing is stale. A finding is a
+# report, not a red run. GitHub turns a schedule off after 60 days without repository activity;
+# turn it back on with `gh workflow enable drift.yml`.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays
+  workflow_dispatch:
+
+permissions:
+  contents: read # check this repository out
+  issues: write # open, update and close the drift issue
+
+jobs:
+  drift:
+    uses: trajectonomics/cicd/.github/workflows/drift.yml@v1

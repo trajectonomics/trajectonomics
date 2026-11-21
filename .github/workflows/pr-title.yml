@@ -1,0 +1,30 @@
+name: PR title
+
+# Squash merges use the PR title as the commit subject, so the title must be a conventional commit:
+# feat: -> minor, feat!: / BREAKING CHANGE -> major, anything else -> patch. The scope is optional,
+# but when present it must name a folder of this monorepo (or one of the cross-cutting scopes).
+# This is the port of trajectonomics/cicd's pr-title.yml, which the per-package callers used.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  conventional:
+    name: Conventional title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          types='feat|fix|perf|refactor|docs|test|build|ci|chore|style|revert'
+          scopes='cli|site|docs|blog|core|money|ledger|tax|sim|brand|skills|goals|agents|config|ci|release|deps|monorepo|migrate'
+          if printf '%s' "$TITLE" | grep -Eq "^(${types})(\((${scopes})\))?!?: .+"; then
+            echo "ok: $TITLE"
+          else
+            echo "::error::PR title must be a conventional commit with an optional scope from this monorepo, e.g. 'feat(sim): add the bond ladder' or 'fix!: rename Posting.amount'. Got: $TITLE"
+            exit 1
+          fi
