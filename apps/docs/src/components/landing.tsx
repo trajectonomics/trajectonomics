@@ -45,7 +45,7 @@ function LandingEnding() {
 }
 
 /** The Landing Page's props: the shell provider's, and the release line it states when the build has one. */
-export type LandingProps = ProviderProps & { readonly releaseLine?: string }
+export type LandingProps = ProviderProps & { readonly releaseLine?: string | undefined }
 
 /** React island for the Landing Page: the portal name, its purpose, the release line and one entry per audience. */
 export function Landing({ releaseLine, ...props }: LandingProps) {
