@@ -1,4 +1,10 @@
-import { agentPrompt, agentRoutes, COPIED_LABEL, COPY_PROMPT_LABEL } from "../src/lib/agent-start"
+import {
+	agentPrompt,
+	agentRoutes,
+	COPIED_LABEL,
+	COPY_FAILED_LABEL,
+	COPY_PROMPT_LABEL,
+} from "../src/lib/agent-start"
 import { readReleaseLine } from "../src/lib/release-line-source"
 import { SITE_ORIGIN } from "../src/lib/site"
 import { SITE_HOME_PATH } from "../src/lib/site-home"
@@ -149,4 +155,19 @@ test("the Landing Page shows the prompt it copies and each Agent route with its 
 			page.getByRole("button", { name: `Copy ${route.title}`, exact: true }),
 		).toBeVisible()
 	}
+})
+
+test("Copy prompt says so when the browser refuses the clipboard", async ({ page }) => {
+	await page.addInitScript(() => {
+		Object.defineProperty(navigator, "clipboard", {
+			value: { writeText: () => Promise.reject(new Error("denied")) },
+		})
+	})
+	await page.goto(LANDING_PATH)
+	await waitForIsland(page)
+
+	await page.getByRole("button", { name: COPY_PROMPT_LABEL, exact: true }).click()
+
+	await expect(page.getByRole("button", { name: COPY_FAILED_LABEL, exact: true })).toBeVisible()
+	await expect(page.getByRole("status").filter({ hasText: "was not copied" })).toHaveCount(1)
 })

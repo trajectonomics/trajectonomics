@@ -1,28 +1,44 @@
 import { useEffect, useState } from "react"
-import { COPIED_LABEL, COPY_PROMPT_LABEL } from "../../lib/agent-start"
+import { COPIED_LABEL, COPY_FAILED_LABEL, COPY_PROMPT_LABEL } from "../../lib/agent-start"
 
-/** How long a copy control says it copied before it reads as a copy control again. */
-const COPIED_FOR_MS = 2000
+/** How long a copy control shows its outcome before it reads as a copy control again. */
+const OUTCOME_FOR_MS = 2000
 
-/** Copy `text` to the clipboard, and say whether it was copied. */
-export function useCopy(text: string): readonly [boolean, () => void] {
-	const [copied, setCopied] = useState(false)
+/** Where a copy control stands: ready, just copied, or refused by the browser. */
+export type CopyState = "idle" | "copied" | "failed"
+
+/** Write `text` to the clipboard; a browser without one, or one that refuses, is a failure. */
+async function writeClipboard(text: string): Promise<void> {
+	if (navigator.clipboard === undefined) throw new Error("no clipboard")
+	await navigator.clipboard.writeText(text)
+}
+
+/**
+ * Copy `text` to the clipboard and say how it went. Every click clears the outcome first and
+ * restarts its timer, so a second copy is announced again and shows for its full time.
+ */
+export function useCopy(text: string): readonly [CopyState, () => void] {
+	const [state, setState] = useState<CopyState>("idle")
+	const [attempt, setAttempt] = useState(0)
 	useEffect(() => {
-		if (!copied) return
-		const timer = setTimeout(() => setCopied(false), COPIED_FOR_MS)
+		if (attempt === 0) return
+		const timer = setTimeout(() => setState("idle"), OUTCOME_FOR_MS)
 		return () => clearTimeout(timer)
-	}, [copied])
+	}, [attempt])
 	const copy = () => {
-		void navigator.clipboard.writeText(text).then(
-			() => setCopied(true),
-			() => setCopied(false),
-		)
+		setState("idle")
+		writeClipboard(text)
+			.then(
+				() => setState("copied"),
+				() => setState("failed"),
+			)
+			.finally(() => setAttempt((count) => count + 1))
 	}
-	return [copied, copy]
+	return [state, copy]
 }
 
 /** The copy and check glyphs, drawn in the text colour, decoration only. */
-export function CopyGlyph({ copied }: { readonly copied: boolean }) {
+export function CopyGlyph({ state }: { readonly state: CopyState }) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -35,7 +51,7 @@ export function CopyGlyph({ copied }: { readonly copied: boolean }) {
 			strokeLinejoin="round"
 			className="size-4 shrink-0"
 		>
-			{copied ? (
+			{state === "copied" ? (
 				<path d="M20 6 9 17l-5-5" />
 			) : (
 				<>
@@ -47,24 +63,38 @@ export function CopyGlyph({ copied }: { readonly copied: boolean }) {
 	)
 }
 
+/** What a copy says to a screen reader, without moving focus. */
+function outcome(state: CopyState, what: string): string {
+	if (state === "copied") return `${what} copied to the clipboard`
+	if (state === "failed") return `${what} was not copied. Select the text to copy it.`
+	return ""
+}
+
 /** The announcement a copy makes to a screen reader, without moving focus. */
 export function CopiedStatus({
-	copied,
+	state,
 	what,
 }: {
-	readonly copied: boolean
+	readonly state: CopyState
 	readonly what: string
 }) {
 	return (
 		<span role="status" className="sr-only">
-			{copied ? `${what} copied to the clipboard` : ""}
+			{outcome(state, what)}
 		</span>
 	)
 }
 
+/** The prompt button's words in each state. */
+const PROMPT_LABELS: Readonly<Record<CopyState, string>> = {
+	idle: COPY_PROMPT_LABEL,
+	copied: COPIED_LABEL,
+	failed: COPY_FAILED_LABEL,
+}
+
 /** The prompt's copy control: the page's one primary button. */
 export function CopyPromptButton({ prompt }: { readonly prompt: string }) {
-	const [copied, copy] = useCopy(prompt)
+	const [state, copy] = useCopy(prompt)
 	return (
 		<>
 			<button
@@ -73,10 +103,10 @@ export function CopyPromptButton({ prompt }: { readonly prompt: string }) {
 				data-copy-prompt=""
 				className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-3 py-2 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
 			>
-				<CopyGlyph copied={copied} />
-				{copied ? COPIED_LABEL : COPY_PROMPT_LABEL}
+				<CopyGlyph state={state} />
+				{PROMPT_LABELS[state]}
 			</button>
-			<CopiedStatus copied={copied} what="The prompt" />
+			<CopiedStatus state={state} what="The prompt" />
 		</>
 	)
 }

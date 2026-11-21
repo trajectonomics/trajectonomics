@@ -21,9 +21,10 @@ export const AGENT_START_LEAD =
 /** The heading of the Landing Page section on the ways an Agent reads the Portal on its own. */
 export const AGENT_ROUTES_HEADING = "Every page reads as Markdown"
 
-/** The copy control's label before and after it copies. */
+/** The copy control's label before it copies, after it copies, and when the browser refuses. */
 export const COPY_PROMPT_LABEL = "Copy prompt"
 export const COPIED_LABEL = "Copied"
+export const COPY_FAILED_LABEL = "Copy failed"
 
 /** The prompt a reader hands their Agent, with every URL absolute so it works pasted anywhere. */
 export function agentPrompt(origin: string): string {

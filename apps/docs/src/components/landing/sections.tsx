@@ -74,7 +74,7 @@ export function AudienceEntries() {
 
 /** One route an Agent reads by: what it is, and its line with a copy control. */
 function RouteCard({ route }: { readonly route: AgentRoute }) {
-	const [copied, copy] = useCopy(route.snippet)
+	const [state, copy] = useCopy(route.snippet)
 	return (
 		<li className="flex flex-col gap-3 rounded-md border p-5">
 			<h3 className="text-base font-semibold">{route.title}</h3>
@@ -89,9 +89,9 @@ function RouteCard({ route }: { readonly route: AgentRoute }) {
 					aria-label={`Copy ${route.title}`}
 					className="rounded-sm p-1 text-fd-muted-foreground transition-colors hover:text-fd-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
 				>
-					<CopyGlyph copied={copied} />
+					<CopyGlyph state={state} />
 				</button>
-				<CopiedStatus copied={copied} what={route.title} />
+				<CopiedStatus state={state} what={route.title} />
 			</div>
 		</li>
 	)
