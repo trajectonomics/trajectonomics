@@ -136,15 +136,36 @@ Flow belongs to.
 - `--children <number>` — children counted for the child allowance; needs `--tax`, defaults to 0
 - `--children-at-higher-rate <number>` — children born 2018 or later, allowed at the higher rate; a
   subset of `--children`, needs `--tax`
+- `--parents <number>` — parents aged 60 or over with income of at most 30,000 THB whom the taxpayer
+  supports; needs `--tax`
+- `--disabled-care <number>` — relatives with a disability the taxpayer cares for; needs `--tax`
+- `--social-security <number>` — social security contributions paid in the tax year, in THB; needs
+  `--tax`
+- `--life-insurance <number>` — life insurance premiums paid in the tax year, in THB; needs `--tax`
+- `--health-insurance <number>` — the taxpayer's own health insurance premiums, in THB; needs `--tax`
+- `--parent-health-insurance <number>` — health insurance premiums paid for the taxpayer's parents,
+  in THB; needs `--tax`
+- `--spouse-life-insurance <number>` — life insurance premiums paid for a spouse with no income, in
+  THB; needs `--tax` and a filing status that allows the spouse allowance
+- `--mortgage-interest <number>` — home-loan interest paid in the tax year, in THB; needs `--tax`
+- `--donation2x <number>` — donations that the statute counts twice, such as education and
+  hospitals, in THB; needs `--tax`
+- `--donation1x <number>` — donations counted once, in THB; needs `--tax`
 - `--label <string>` — classify one Flow for tax as `<flow>=<label>`, such as
   `salary=income.section40_1`; repeatable, needs `--tax`
 - `--none` — remove the tax Levy instead of writing one
 - `--dry-run` — report the row and roll the write back
 
+The filing statuses are `single`, `married_no_income_spouse`, `married_separate`, `married_joint` and
+`married_separate_40_1_joint_rest`. The deduction flags state what the taxpayer paid; the statutory
+ceilings are applied by the tax core, not by the command. `traj help scenario tax` lists every
+accepted `--label` value.
+
 ```bash
-traj scenario tax base --tax th-2026 --label salary=income.section40_1                                             # Charge Thailand's 2026 income tax on the salary this Scenario declares.
-traj scenario tax base --tax th-2026 --filing-status married_joint --children 1 --label salary=income.section40_1  # The same Levy under a married-joint profile with one child.
-traj scenario tax base --none                                                                                      # Take the tax Levy out, so the figures are pre-tax again.
+traj scenario tax base --tax th-2026 --label salary=income.section40_1                                                                                                                                     # Charge Thailand's 2026 income tax on the salary this Scenario declares.
+traj scenario tax base --tax th-2026 --filing-status married_joint --children 1 --label salary=income.section40_1                                                                                          # The same Levy under a married-joint profile with one child.
+traj scenario tax base --tax th-2026 --filing-status married_no_income_spouse --life-insurance 20000 --mortgage-interest 30000 --social-security 9000 --donation1x 5000 --label salary=income.section40_1  # The same Levy with the deductions a Thai employee usually has.
+traj scenario tax base --none                                                                                                                                                                              # Take the tax Levy out, so the figures are pre-tax again.
 ```
 
 ## Decisions
