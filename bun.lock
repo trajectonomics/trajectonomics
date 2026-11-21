@@ -105,6 +105,7 @@
       "version": "0.0.0-development",
       "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.5",
+        "@biomejs/biome": "2.6.3",
         "@trajectonomics/ledger": "workspace:*",
         "@trajectonomics/money": "workspace:*",
         "@trajectonomics/sim": "workspace:*",

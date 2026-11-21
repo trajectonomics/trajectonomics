@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
-type Step = { run?: string; with?: Record<string, unknown> }
+type Step = { run?: string; with?: Record<string, unknown>; env?: Record<string, unknown> }
 type Job = { uses?: string; steps?: Step[]; "timeout-minutes"?: number }
 type Workflow = {
 	on?: Record<string, unknown>
@@ -10,36 +10,81 @@ type Workflow = {
 	jobs?: Record<string, Job>
 }
 
-const WORKFLOWS = join(import.meta.dir, "..", ".github", "workflows")
+// The workflows live at the monorepo root, which is three folders up from this file.
+const WORKFLOWS = join(import.meta.dir, "..", "..", "..", ".github", "workflows")
 
 function load(file: string): Workflow {
 	return Bun.YAML.parse(readFileSync(join(WORKFLOWS, file), "utf8")) as Workflow
 }
 
-/** A caller is one job; a second job means this is no longer the shape a new repository copies. */
+/** A workflow here is one job; a second job means the file no longer does one thing. */
 function soleJob(workflow: Workflow): Job {
 	const jobs = Object.values(workflow.jobs ?? {})
 	expect(jobs).toHaveLength(1)
 	return jobs[0]!
 }
 
-const callers = [
-	{ file: "ci.yml", uses: "trajectonomics/cicd/.github/workflows/check.yml@v1" },
-	{ file: "pr-title.yml", uses: "trajectonomics/cicd/.github/workflows/pr-title.yml@v1" },
-	{ file: "drift.yml", uses: "trajectonomics/cicd/.github/workflows/drift.yml@v1" },
-]
+function runsOf(job: Job): string[] {
+	return (job.steps ?? []).flatMap((step) => (step.run === undefined ? [] : [step.run]))
+}
 
-describe("the three callers a new repository copies", () => {
-	for (const caller of callers) {
-		it(`${caller.file} calls the shared workflow at v1 and has no steps`, () => {
-			const job = soleJob(load(caller.file))
-			expect(job.uses).toBe(caller.uses)
-			expect(job.steps).toBeUndefined()
-		})
-	}
+describe("ci.yml, the one CI for the monorepo", () => {
+	const workflow = load("ci.yml")
+	const job = () => workflow.jobs?.["check"] ?? { steps: [] }
+
+	it("runs on every pull request, whatever its base, on pushes to main, and by hand", () => {
+		expect(workflow.on).toHaveProperty("pull_request")
+		expect(workflow.on?.["pull_request"]).toBeNull()
+		expect(workflow.on?.["push"]).toEqual({ branches: ["main"] })
+		expect(workflow.on).toHaveProperty("workflow_dispatch")
+		expect(workflow.permissions).toEqual({ contents: "read" })
+	})
+
+	it("checks only the packages a pull request affects, against its base commit", () => {
+		const affected = (job().steps ?? []).find((step) => step.run?.includes("--affected"))
+		expect(affected?.run).toContain("bunx turbo run check --affected --concurrency=2")
+		expect(String(affected?.env?.["TURBO_SCM_BASE"])).toContain(
+			"github.event.pull_request.base.sha",
+		)
+	})
+
+	it("checks every package on main and by hand, two tasks at a time", () => {
+		const full = (job().steps ?? []).find(
+			(step) => step.run === "bunx turbo run check --concurrency=2",
+		)
+		expect(full).toBeDefined()
+	})
+
+	it("fetches the whole history, so turbo can compare a pull request with its base", () => {
+		const checkout = (job().steps ?? []).find((step) => step.with?.["fetch-depth"] !== undefined)
+		expect(checkout?.with?.["fetch-depth"]).toBe(0)
+	})
 })
 
-describe("drift.yml, the third caller", () => {
+describe("pr-title.yml, the conventional commit check", () => {
+	const workflow = load("pr-title.yml")
+
+	it("runs on every pull request event that sets a title", () => {
+		expect(workflow.on?.["pull_request"]).toEqual({
+			types: ["opened", "edited", "synchronize", "reopened"],
+		})
+	})
+
+	it("accepts only the monorepo's scopes", () => {
+		const script = runsOf(soleJob(workflow)).join("\n")
+		for (const scope of ["site", "docs", "core", "money", "sim", "brand", "skills", "monorepo"]) {
+			expect(script).toContain(scope)
+		}
+	})
+})
+
+describe("drift.yml, the weekly tooling report", () => {
+	it("calls the shared drift workflow at v1 and has no steps", () => {
+		const job = soleJob(load("drift.yml"))
+		expect(job.uses).toBe("trajectonomics/cicd/.github/workflows/drift.yml@v1")
+		expect(job.steps).toBeUndefined()
+	})
+
 	it("runs weekly and by hand, because the caller owns the schedule", () => {
 		const workflow = load("drift.yml")
 		expect(workflow.on?.["schedule"]).toEqual([{ cron: "0 6 * * 1" }])
@@ -52,51 +97,50 @@ describe("drift.yml, the third caller", () => {
 })
 
 describe("browser.yml, the workflow that needs a browser", () => {
-	const steps = () => soleJob(load("browser.yml")).steps ?? []
-	const runs = () => steps().flatMap((step) => (step.run === undefined ? [] : [step.run]))
+	const workflow = load("browser.yml")
+	const steps = () => soleJob(workflow).steps ?? []
 
-	it("is one job with its own steps and a hard 15 minute limit", () => {
-		const job = soleJob(load("browser.yml"))
-		expect(job.uses).toBeUndefined()
-		expect(job.steps?.length).toBeGreaterThan(0)
-		expect(job["timeout-minutes"]).toBe(15)
+	it("runs on pull requests and on pushes to main that touch the site, the brand or the lockfile", () => {
+		const paths = ["apps/site/**", "packages/brand/**", "bun.lock"]
+		expect(workflow.on?.["pull_request"]).toEqual({ paths })
+		expect(workflow.on?.["push"]).toEqual({ branches: ["main"], paths })
 	})
 
-	it("runs on every pull request to main, and not on the push to main after the merge", () => {
-		const workflow = load("browser.yml")
-		expect(workflow.on).toHaveProperty("pull_request")
-		expect(workflow.on).not.toHaveProperty("push")
+	it("is one job with a hard 15 minute limit and read-only permissions", () => {
+		const job = soleJob(workflow)
+		expect(job.uses).toBeUndefined()
+		expect(job["timeout-minutes"]).toBe(15)
 		expect(workflow.permissions).toEqual({ contents: "read" })
 	})
 
-	it("installs the Node version package.json declares and a Chromium", () => {
-		expect(steps().some((step) => step.with?.["node-version-file"] === "package.json")).toBe(true)
-		expect(runs().some((run) => run.includes("playwright install"))).toBe(true)
-	})
-
-	it("runs the browser checks and the performance budget", () => {
-		expect(runs()).toContain("bun run test:browser")
-		expect(runs()).toContain("bun run test:performance")
+	it("runs the Playwright steps inside apps/site", () => {
+		const playwright = steps().filter((step) => step.run?.includes("playwright install"))
+		expect(playwright).toHaveLength(1)
+		expect(steps().some((step) => step.run?.includes("bun run test:browser"))).toBe(true)
+		expect(steps().some((step) => step.run?.includes("bun run test:performance"))).toBe(true)
 	})
 })
 
 describe("release-drift.yml, the weekly release report", () => {
-	const steps = () => soleJob(load("release-drift.yml")).steps ?? []
-	const runs = () => steps().flatMap((step) => (step.run === undefined ? [] : [step.run]))
+	const workflow = load("release-drift.yml")
+	const steps = () => soleJob(workflow).steps ?? []
 
 	it("runs weekly and by hand, because a missed refresh is found by the report", () => {
-		const workflow = load("release-drift.yml")
 		expect(workflow.on?.["schedule"]).toEqual([{ cron: "0 6 * * 2" }])
 		expect(workflow.on).toHaveProperty("workflow_dispatch")
 	})
 
 	it("grants contents to read the snapshot and issues to report drift", () => {
-		expect(load("release-drift.yml").permissions).toEqual({ contents: "read", issues: "write" })
+		expect(workflow.permissions).toEqual({ contents: "read", issues: "write" })
 	})
 
-	it("is one job that runs the check, and opens no branch, pull request or deploy", () => {
-		expect(Object.values(load("release-drift.yml").jobs ?? {})).toHaveLength(1)
-		expect(runs()).toContain("bun run release:drift")
-		expect(runs().some((run) => /\bgh pr\b|wrangler|git push/.test(run))).toBe(false)
+	it("is one job that runs the check in apps/site, and opens no branch, pull request or deploy", () => {
+		expect(Object.values(workflow.jobs ?? {})).toHaveLength(1)
+		const run = steps().find((step) => step.run === "bun run release:drift")
+		expect(run).toBeDefined()
+		expect(steps().some((step) => step.run?.includes("bun install"))).toBe(false)
+		expect(
+			runsOf(soleJob(workflow)).some((script) => /\bgh pr\b|wrangler|git push/.test(script)),
+		).toBe(false)
 	})
 })

@@ -1,11 +1,11 @@
-import { fileURLToPath } from "node:url"
-import { defineConfig, type UserConfig } from "tsdown"
+import { fileURLToPath } from "node:url";
+import { defineConfig, type UserConfig } from "tsdown";
 
 // Each internal package is bundled from its source, so the build does not wait on the four
 // packages' own builds, and every subpath shares one copy of each module. `alias` and
 // `alwaysBundle` make sure no `@trajectonomics/*` specifier survives into `dist/`.
-const here = (path: string) => fileURLToPath(new URL(path, import.meta.url))
-const sourceOf = (name: string) => here(`./${name}/src/index.ts`)
+const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
+const sourceOf = (name: string) => here(`./${name}/src/index.ts`);
 
 const config: UserConfig = defineConfig({
 	entry: {
@@ -29,6 +29,6 @@ const config: UserConfig = defineConfig({
 	deps: {
 		alwaysBundle: [/^@trajectonomics\//],
 	},
-})
+});
 
-export default config
+export default config;

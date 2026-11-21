@@ -84,12 +84,15 @@
 	"scripts": {
 		"build": "tsdown",
 		"typecheck": "tsc -p tsconfig.json",
+		"lint": "biome ci --error-on-warnings scripts tsdown.config.ts",
+		"format": "biome check --write scripts tsdown.config.ts",
 		"check:deps": "bun run scripts/check-deps.ts && bun test scripts",
 		"lint:package": "publint --strict && attw --pack . --profile node16",
-		"check": "bun run typecheck && bun run check:deps && bun run build && bun run lint:package"
+		"check": "bun run lint && bun run typecheck && bun run check:deps && bun run build && bun run lint:package"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",
+		"@biomejs/biome": "2.6.3",
 		"@trajectonomics/ledger": "workspace:*",
 		"@trajectonomics/money": "workspace:*",
 		"@trajectonomics/sim": "workspace:*",
