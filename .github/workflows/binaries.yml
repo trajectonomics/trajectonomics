@@ -104,6 +104,10 @@ jobs:
       - name: Install the workspace
         working-directory: .
         run: bun install --frozen-lockfile
+      - name: Build the engine the CLI bundles
+        # bun build --compile resolves @trajectonomics/core/* through core's dist/, which only exists after a build.
+        working-directory: .
+        run: bunx turbo run build --filter="@trajectonomics/cli^..." --concurrency=2
       - name: Stamp the version the tag names, before compiling
         # The compiler inlines package.json, so a binary built at 0.0.0 reports
         # 0.0.0 whatever npm publishes: this step is what makes --version a sentinel.
@@ -112,7 +116,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$(jq -r .version package.json)" != "$VERSION" ]; then
-            npm version "$VERSION" --no-git-tag-version
+            npm pkg set version="$VERSION" # npm version rejects the workspace: devDependencies
           fi
       - name: Compile the five assets, x64 from the baseline targets
         # The autoload flags stay off: a bunfig.toml with `preload` in the working
