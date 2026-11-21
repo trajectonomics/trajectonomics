@@ -8,9 +8,9 @@ describe("the newest cli release", () => {
 	})
 
 	test("ignores tags of other packages, prereleases and bare version tags", () => {
-		expect(
-			newestCliVersion(["core-v0.9.0", "cli-v0.4.0-alpha.1", "v0.8.0", "cli-v0.3.0"]),
-		).toBe("0.3.0")
+		expect(newestCliVersion(["core-v0.9.0", "cli-v0.4.0-alpha.1", "v0.8.0", "cli-v0.3.0"])).toBe(
+			"0.3.0",
+		)
 	})
 
 	test("is undefined when no tag is a cli release", () => {

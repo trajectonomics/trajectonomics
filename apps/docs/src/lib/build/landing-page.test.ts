@@ -43,7 +43,9 @@ const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, `<p>${RELE
 
 describe("the built Landing Page", () => {
 	test("a page with one link to each Tab and no redirect reports no failure", () => {
-		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli"])], RELEASE_LINE)).toEqual([])
+		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli"])], RELEASE_LINE)).toEqual(
+			[],
+		)
 	})
 
 	test("a page that is a meta refresh is reported as LANDING_PAGE_REDIRECT", () => {
@@ -95,7 +97,9 @@ describe("the built Landing Page", () => {
 	})
 
 	test("a page that states another release is reported as LANDING_PAGE_RELEASE_LINE", () => {
-		const stale = landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, "<p>Docs for traj 0.3.0</p>"))
+		const stale = landingPage(
+			landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, "<p>Docs for traj 0.3.0</p>"),
+		)
 
 		expect(codesOf([stale], RELEASE_LINE)).toEqual(["LANDING_PAGE_RELEASE_LINE"])
 	})
