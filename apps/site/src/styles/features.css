@@ -1,6 +1,9 @@
 /*
  * Features (ADR 0012): six cells on one hairline grid. The grid's own background is the hairline, and
- * a 1 px gap between the cells shows it, so no cell needs a border of its own.
+ * a 1 px gap between the cells shows it, so no cell needs a border of its own. The first two cells are
+ * wide and carry a sample of the CLI's own output (Resend's and Cursor's feature cards on Mobbin); the
+ * other four are small. Twelve columns on a wide screen: a wide cell takes six, a small one three. The sample window is in
+ * feature-sample.css.
  */
 
 .features {
@@ -21,11 +24,23 @@
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		margin-top: 56px;
 	}
+
+	.feature-wide {
+		grid-column: span 2;
+	}
 }
 
 @media (min-width: 64rem) {
 	.features {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+	}
+
+	.feature {
+		grid-column: span 3;
+	}
+
+	.feature-wide {
+		grid-column: span 6;
 	}
 }
 
@@ -35,6 +50,10 @@
 	flex-direction: column;
 	gap: 10px;
 	padding: 24px;
+}
+
+.feature-wide {
+	padding: 24px 24px 28px;
 }
 
 .feature-index {
@@ -47,6 +66,11 @@
 	margin-top: 14px;
 	font-size: 18px;
 	font-weight: 500;
+}
+
+.feature-wide .feature-title {
+	margin-top: 4px;
+	font-size: 20px;
 }
 
 .feature-copy {

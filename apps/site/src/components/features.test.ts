@@ -33,3 +33,15 @@ describe("the Features section in every Language", () => {
 		})
 	}
 })
+
+describe("the Features section's wide cards", () => {
+	const dictionary = languageEntry("en").dictionary
+
+	it("puts a sample of the CLI's output on the first two cards only", async () => {
+		const page = scanComponent(await renderComponent(Features, { dictionary }))
+		const cells = withClass(page, "feature")
+		const wide = cells.map((cell) => (cell.attributes["class"] ?? "").includes("feature-wide"))
+		expect(wide).toEqual([true, true, false, false, false, false])
+		expect(withClass(page, "feature-sample")).toHaveLength(2)
+	})
+})
