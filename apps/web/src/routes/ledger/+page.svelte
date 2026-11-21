@@ -1,9 +1,13 @@
 <script lang="ts">
-import PlaceholderPage from "../../components/pages/PlaceholderPage.svelte"
+import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
+import LedgerPage from "../../components/pages/LedgerPage.svelte"
+
+// A route file alone reads the address bar: the account filter is passed down as a prop.
+const account = $derived(queryParam("account", ""))
 </script>
 
 <svelte:head>
 	<title>Ledger · Dashboard</title>
 </svelte:head>
 
-<PlaceholderPage title="Ledger" intro="The Ledger is ported to Svelte in the next step. Until then it shows the net worth Read." />
+<LedgerPage {account} onAccount={(value) => void setQueryParam("account", value)} />
