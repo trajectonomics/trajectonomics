@@ -1,12 +1,10 @@
 import { fileURLToPath } from "node:url"
 import { expect, type Page, test } from "@playwright/test"
 import { expectShippedTheme, openPage, PAGES } from "./pages"
+import { VIEWPORTS } from "./viewports"
 
-/** The viewports the screenshots cover: the desktop the checks run at, and a phone. */
-const VIEWPORTS = {
-	desktop: { width: 1280, height: 800 },
-	mobile: { width: 390, height: 844 },
-} as const
+/** The two baselines this file names, and the viewport each one judges. The filenames are its own. */
+const SNAPSHOTS = { desktop: VIEWPORTS.desktop, mobile: VIEWPORTS.phone } as const
 
 /**
  * The one face the screenshots pin: Thai. The page serves Aleo and Azeret Mono from its build, but
@@ -44,8 +42,8 @@ test.describe("the built pages as screenshots", () => {
 	test.use({ reducedMotion: "reduce", colorScheme: "light" })
 
 	for (const underTest of PAGES) {
-		for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-			test(`${underTest.name} on ${viewportName}`, async ({ page }) => {
+		for (const [snapshot, viewport] of Object.entries(SNAPSHOTS)) {
+			test(`${underTest.name} on ${snapshot}`, async ({ page }) => {
 				await pinFonts(page)
 				await page.setViewportSize(viewport)
 				await openPage(page, underTest)
@@ -53,7 +51,7 @@ test.describe("the built pages as screenshots", () => {
 				await page.addStyleTag({ content: FONT_CSS })
 				await page.evaluate(() => document.fonts.ready)
 				const slug = underTest.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-				await expect(page).toHaveScreenshot(`${slug}-${viewportName}.png`, {
+				await expect(page).toHaveScreenshot(`${slug}-${snapshot}.png`, {
 					fullPage: true,
 				})
 			})

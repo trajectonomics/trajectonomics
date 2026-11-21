@@ -1,18 +1,13 @@
 import { expect, test } from "@playwright/test"
 import { homeOf, openPage } from "./pages"
-
-/** The first screen the hero owns: a desktop, and a phone whose browser chrome moves its viewport. */
-const VIEWPORTS = [
-	{ name: "desktop", width: 1280, height: 800 },
-	{ name: "phone", width: 390, height: 844 },
-] as const
+import { VIEWPORTS } from "./viewports"
 
 test.describe("the hero's height", () => {
-	for (const viewport of VIEWPORTS) {
-		test(`puts the comparison on the landing view and follows it straight with the next section (${viewport.name})`, async ({
+	for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
+		test(`puts the comparison on the landing view and follows it straight with the next section (${viewportName})`, async ({
 			page,
 		}) => {
-			await page.setViewportSize({ width: viewport.width, height: viewport.height })
+			await page.setViewportSize(viewport)
 			await openPage(page, homeOf("en"))
 			const measured = await page.evaluate(() => {
 				const hero = document.querySelector("[data-hero]")

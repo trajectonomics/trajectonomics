@@ -6,7 +6,7 @@ status: accepted
 
 The browser accessibility check, `e2e/accessibility.e2e.ts`, ran at the Playwright project's desktop
 viewport and nowhere else, so the Site's phone layout was never judged. On 2026-11-18 the hero-rim work
-measured the cost: axe at a 390×844 phone reported two findings on the home pages, in both device schemes,
+measured the cost: axe at a 390×844 phone reported two findings on the Language homes, in both device schemes,
 and
 [ADR 0017](./0017-the-hero-rim-brightens-the-field-outside-the-copy.md)'s Consequences recorded them as
 belonging to neither that change nor CI's path. That record also named the element wrongly, which is how
@@ -78,14 +78,21 @@ answer; making the block keyboard-reachable left the contrast run unjudged and t
 
 ## Consequences
 
-- The two mobile home visual baselines move and were regenerated: the page grows 21 px (English) and 23 px
-  (Thai) at 390×844, because the longest JSON line moves its closing date onto a second line at the left
-  margin. The desktop and Not-found baselines do not change, byte for byte.
+- The comparison's phone layout moved twice after this record was written: #95 made the panels a tabbed
+  pair, #108 rewrote them as two chat transcripts, and #109 settled it on one panel at a time with a control
+  under them. With motion reduced — which is the setting the axe suite runs at — the page lays **both**
+  panels out whole, so the demo output is in the judged tree and the After panel needs no interaction to be
+  reached. The tab pair #95 and #108 carried is gone, and with it the inert After button #108 left behind.
+- The two mobile home baselines move with the layout changes around the wrap, and the desktop and Not-found
+  baselines do not change with the wrap itself, byte for byte.
 - The twelve `docs/screenshots/site-<language>-<width>-<scheme>.png` renders were refreshed, because a surface
-  ticket's pull request carries them at 1280, 2000 and 390, dark and light, in both Languages.
-- The axe suite goes from six runs to twelve, and a future `axe-core` upgrade that adds a rule axe cannot
-  decide turns the check red. That is the review this record wants, and `@axe-core/playwright` is pinned to an
-  exact version.
+  ticket's pull request carries them at 1280, 2000 and 390, dark and light, in both Languages. They are
+  captured with motion reduced, so each is the settled page and the 390 ones show both transcripts, the
+  demo output among them.
+- The axe suite stays twelve runs, and a phone home is judged in the state the suite sets: both panels laid
+  out, because reduced motion is what the check asks for and what the page answers with. A future
+  `axe-core` upgrade that adds a rule axe cannot decide turns the check red; that is the review this record
+  wants, and `@axe-core/playwright` is pinned to an exact version.
 - An element that outgrows its box now fails a named check on a phone-wide run instead of reaching production
   unjudged. That is the class this record is about, not the one block it was found on.
 - [ADR 0017](./0017-the-hero-rim-brightens-the-field-outside-the-copy.md)'s Consequences carried the wrong
