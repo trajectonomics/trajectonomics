@@ -84,8 +84,9 @@ test("/docs still redirects to /", async ({ request }) => {
 		maxRedirects: 0,
 	})
 
-	expect(response.status()).toBe(307)
-	expect(response.headers()["location"]).toBe("/")
+	// The old mount answers a permanent redirect to the same path without `/docs` (ADR 0013).
+	expect(response.status()).toBe(301)
+	expect(new URL(response.headers()["location"] ?? "", response.url()).pathname).toBe("/")
 })
 
 test("an audience alias still reaches its Tab", async ({ request }) => {
