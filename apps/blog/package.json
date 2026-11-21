@@ -1,5 +1,5 @@
 {
-	"name": "@trajectonomics/technical-template",
+	"name": "@trajectonomics/blog",
 	"version": "0.0.0-development",
 	"description": "Standard technical repository template for Trajectonomics libraries and services",
 	"license": "MIT",
@@ -8,6 +8,7 @@
 		"url": "git+https://github.com/trajectonomics/technical-template.git"
 	},
 	"type": "module",
+	"private": true,
 	"sideEffects": false,
 	"packageManager": "bun@1.4.4",
 	"engines": {
