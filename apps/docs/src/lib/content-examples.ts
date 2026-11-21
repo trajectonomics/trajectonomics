@@ -1,6 +1,4 @@
 import type { ContentFile } from "./content-pages"
-import { codeFences } from "./content-programs"
-import { undefinedProjectArguments } from "./project-example"
 import {
 	accountReferences,
 	declaredAccounts,
@@ -9,12 +7,9 @@ import {
 } from "./scenario-document"
 
 /** One rule of the example check; one value per way a published example can be incomplete. */
-export type ContentExamplesRule =
-	| "scenario-document-missing"
-	| "scenario-document-dangling-account"
-	| "sim-core-example-undefined-input"
+export type ContentExamplesRule = "scenario-document-missing" | "scenario-document-dangling-account"
 
-/** One page that publishes an incomplete Scenario document or an incomplete Builder example. */
+/** One page that publishes an incomplete Scenario document. */
 export interface ContentExamplesProblem {
 	readonly rule: ContentExamplesRule
 	readonly file: string
@@ -23,12 +18,6 @@ export interface ContentExamplesProblem {
 
 /** The Operator page that documents `traj scenario apply`, its document and its flags. */
 const SCENARIO_PAGE = "cli/commands/scenario.mdx"
-
-/** The Builder tab, whose pages publish the example programs the check runs. */
-const BUILDER_TAB = "developers/"
-
-/** The fence languages a Builder example is written in. */
-const PROGRAM_LANGUAGES = ["ts", "typescript"]
 
 function scenarioProblems(file: ContentFile): readonly ContentExamplesProblem[] {
 	const lookup = scenarioDocument(file.content)
@@ -53,24 +42,11 @@ function scenarioProblems(file: ContentFile): readonly ContentExamplesProblem[] 
 	)
 }
 
-function programProblems(file: ContentFile): readonly ContentExamplesProblem[] {
-	return codeFences(file.content).flatMap((fence) => {
-		if (!PROGRAM_LANGUAGES.includes(fence.language)) return []
-		return undefinedProjectArguments(fence.body).map(({ call, index, source }) => ({
-			rule: "sim-core-example-undefined-input",
-			file: file.path,
-			detail: `project() call ${call + 1}'s argument ${index + 1} is "${source}", which the fence neither inlines nor declares`,
-		}))
-	})
-}
-
-/** Every way the authored pages publish an incomplete Scenario document or Builder example. */
+/** Every way the authored pages publish an incomplete Scenario document. */
 export function checkContentExamples(
 	files: readonly ContentFile[],
 ): readonly ContentExamplesProblem[] {
 	return files.flatMap((file) => {
-		if (file.path === SCENARIO_PAGE) return scenarioProblems(file)
-		if (file.path.startsWith(BUILDER_TAB)) return programProblems(file)
-		return []
+		return file.path === SCENARIO_PAGE ? scenarioProblems(file) : []
 	})
 }

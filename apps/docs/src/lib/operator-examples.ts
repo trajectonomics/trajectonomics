@@ -1,6 +1,6 @@
 import type { ContentFile } from "./content-pages"
 import { type ContentSubcommand, subcommandsIn } from "./content-subcommands"
-import { OPERATOR_TAB_CONTENT } from "./release-truth"
+import { OPERATOR_TAB_CONTENT } from "./tabs"
 
 /** One rule of the operator-examples check; one value per way an Operator page can break it. */
 export type OperatorExampleRule = "opening-account"

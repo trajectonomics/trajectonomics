@@ -4,6 +4,8 @@ status: accepted
 
 # A page bound to an upstream wire contract is kept by a built-page check
 
+> **Partly superseded** by the monorepo migration ([`docs/monorepo-migration.md`](../../../../docs/monorepo-migration.md) §2d). Docs Sync, the sync manifest and `release-truth` are removed; a page bound to a wire contract is still checked by its own build rule.
+
 `traj tx import` reads exactly one CSV template, and its header
 `date,from,to,amount,memo,external_ref,project` is a wire contract that external prompts and scripts
 target ([cli ADR 0025](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0025-csv-import-is-one-template.md)).

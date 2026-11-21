@@ -1,14 +1,8 @@
-import { readFileSync } from "node:fs"
-import { parseSyncManifest, SYNC_MANIFEST_PATH } from "../src/lib/docs-sync/manifest"
-import { releaseLine } from "../src/lib/release-line"
 import { DOCS_BASE_PATH, TABS, tabUrl } from "../src/lib/tabs"
 import { openSearch, otherTab, searchTerm } from "./docs-portal"
 import { expect, test } from "./fixtures"
 
 const LANDING_PATH = `${DOCS_BASE_PATH}/`
-
-/** The release line the built page must state, read the way the build reads it. */
-const RELEASE_LINE = releaseLine(parseSyncManifest(readFileSync(SYNC_MANIFEST_PATH, "utf8")))
 
 /** A Site Home document, so the browser test never asks `wrangler dev` for the page at `/`. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
@@ -43,12 +37,6 @@ test("each audience entry says what its reader gets", async ({ page }) => {
 		expect(descriptionId, `${tab.folder} entry describes its reader's next step`).not.toBeNull()
 		await expect(page.locator(`#${descriptionId}`)).toHaveText(tab.description)
 	}
-})
-
-test("the Landing Page states the release the docs were synced from", async ({ page }) => {
-	await page.goto(LANDING_PATH)
-
-	await expect(page.getByText(RELEASE_LINE, { exact: true })).toBeVisible()
 })
 
 test("the Landing Page ends with Site Home, Source and License links", async ({ page }) => {

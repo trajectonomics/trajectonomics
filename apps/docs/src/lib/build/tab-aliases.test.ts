@@ -10,11 +10,12 @@ function stub(path: string, target: string): BuiltFile {
 	}
 }
 
-/** The build output of a site whose two audience names redirect to their Tabs. */
+/** The build output of a site whose audience names redirect to their Tabs. */
 function aliases(): BuiltFile[] {
 	return [
 		stub(aliasFile("/operators"), "/docs/cli/"),
-		stub(aliasFile("/builders"), "/docs/developers/"),
+		stub(aliasFile("/contributors"), "/docs/contribute/"),
+		stub(aliasFile("/builders"), "/docs/contribute/"),
 	]
 }
 
@@ -32,9 +33,10 @@ describe("the audience names a reader may type", () => {
 	})
 
 	test("one that sends readers to another page is reported as TAB_ALIAS_TARGET", () => {
-		expect(codesOf([stub(aliasFile("/operators"), "/docs/"), aliases()[1]!])).toEqual([
-			"TAB_ALIAS_TARGET",
-		])
+		const [operators, , builders] = aliases()
+		expect(
+			codesOf([stub(aliasFile("/contributors"), "/docs/"), operators!, builders!]),
+		).toEqual(["TAB_ALIAS_TARGET"])
 	})
 
 	test("one that is a real page rather than a redirect is reported", () => {
@@ -42,7 +44,7 @@ describe("the audience names a reader may type", () => {
 			path: aliasFile("/builders"),
 			content: "<html><body>Hi</body></html>",
 		}
-		expect(codesOf([aliases()[0]!, page])).toEqual(["TAB_ALIAS_TARGET"])
+		expect(codesOf([...aliases().slice(0, 2), page])).toEqual(["TAB_ALIAS_TARGET"])
 	})
 
 	test("the failure names the file a maintainer edits", () => {

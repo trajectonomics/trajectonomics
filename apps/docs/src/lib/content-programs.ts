@@ -1,5 +1,3 @@
-import type { ContentFile } from "./content-pages"
-
 /** One fenced code block a page publishes: its language and the text between its fences. */
 export interface CodeFence {
 	readonly language: string
@@ -12,9 +10,6 @@ interface FenceLine {
 	readonly length: number
 	readonly info: string
 }
-
-/** The fence languages whose blocks are TypeScript programs a reader can run. */
-const TYPESCRIPT_LANGUAGES: ReadonlySet<string> = new Set(["ts", "typescript"])
 
 function fenceOf(line: string): FenceLine | undefined {
 	const match = /^\s*(`{3,}|~{3,})(.*)$/.exec(line)
@@ -59,11 +54,4 @@ export function codeFences(content: string): readonly CodeFence[] {
 		lines = []
 	}
 	return fences
-}
-
-/** Every TypeScript fenced program in one content file, in source order. */
-export function typescriptPrograms(file: ContentFile): readonly string[] {
-	return codeFences(file.content)
-		.filter((fence) => TYPESCRIPT_LANGUAGES.has(fence.language))
-		.map((fence) => fence.body)
 }

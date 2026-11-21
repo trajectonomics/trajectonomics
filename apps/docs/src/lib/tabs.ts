@@ -6,12 +6,15 @@ export interface TabDefinition {
 	/** Folder under `src/content/docs/`, also the first URL segment of the Tab. */
 	readonly folder: string
 	readonly title: string
-	readonly audience: "Operator" | "Builder"
+	readonly audience: "Operator" | "Contributor"
 	/** The Landing Page entry that sends this Tab's audience here. */
 	readonly entry: string
 	/** The Landing Page line under the entry saying what the reader gets and where it starts. */
 	readonly description: string
 }
+
+/** The content folder of the Operator tab, whose pages document the `cli` release. */
+export const OPERATOR_TAB_CONTENT = "cli"
 
 /** The two Tabs of the Docs Portal, the Operator tab first. */
 export const TABS: readonly [TabDefinition, TabDefinition] = [
@@ -23,11 +26,11 @@ export const TABS: readonly [TabDefinition, TabDefinition] = [
 		description: "Install traj, then record your first transaction and read your balance.",
 	},
 	{
-		folder: "developers",
-		title: "Build on Trajectonomics",
-		audience: "Builder",
-		entry: "For Builders: build on Trajectonomics packages",
-		description: "What each package computes, and how to adopt one without the others.",
+		folder: "contribute",
+		title: "Contribute",
+		audience: "Contributor",
+		entry: "For Contributors: help make the tax rules right",
+		description: "Report a wrong figure, add a tax year or a country, and check your change.",
 	},
 ]
 
@@ -47,8 +50,10 @@ export interface TabAlias {
  * The audience names a reader may type, and the Tab each one means. They are not a front-door
  * redirect: `/docs/` stays on the Landing Page, which sends each audience to its own Tab.
  */
-export const TAB_ALIASES: readonly [TabAlias, TabAlias] = [
+export const TAB_ALIASES: readonly [TabAlias, TabAlias, TabAlias] = [
 	{ path: "/operators", tab: TABS[0] },
+	{ path: "/contributors", tab: TABS[1] },
+	// The audience name the Builder tab answered to. It now reaches the Contribute Tab.
 	{ path: "/builders", tab: TABS[1] },
 ]
 

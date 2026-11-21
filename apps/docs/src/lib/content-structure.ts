@@ -7,9 +7,6 @@ export type ContentStructureRule =
 	| "tab-landing-page"
 	| "tab-navigation"
 	| "tab-listed"
-	| "package-landing-page"
-	| "package-navigation"
-	| "package-listed"
 	| "navigation-entry"
 	| "internal-link"
 

@@ -9,4 +9,4 @@ export const PORTAL_NAME = "Trajectonomics Docs"
 
 /** The one sentence that says what the Docs Portal is for. */
 export const PORTAL_PURPOSE =
-	"Documentation for running the Trajectonomics CLI and building on its packages."
+	"Documentation for running the Trajectonomics CLI and helping make its tax rules right."

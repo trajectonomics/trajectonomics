@@ -24,7 +24,7 @@ describe("the placeholder copy of built pages", () => {
 	test("every built page that shows the sentence is reported, not only the first", () => {
 		const placeholder: BuiltFile = { path: PAGE, content: "This page is a placeholder." }
 		const other: BuiltFile = {
-			path: "docs/developers/index.html",
+			path: "docs/contribute/index.html",
 			content: "This page is a placeholder.",
 		}
 

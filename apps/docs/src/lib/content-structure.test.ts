@@ -46,24 +46,11 @@ describe("Docs Portal content structure", () => {
 	})
 
 	test("a Tab without a navigation file is reported", () => {
-		expect(rulesOf(without("developers/meta.json"))).toContain("tab-navigation")
+		expect(rulesOf(without("contribute/meta.json"))).toContain("tab-navigation")
 	})
 
 	test("a Tab missing from the content root navigation is reported", () => {
-		expect(rulesOf(withMeta("meta.json", ["developers"]))).toContain("tab-listed")
-	})
-
-	test("an Upstream Package without a landing page is reported", () => {
-		expect(rulesOf(without("developers/sim-core/index.mdx"))).toContain("package-landing-page")
-	})
-
-	test("an Upstream Package without a navigation file is reported", () => {
-		expect(rulesOf(without("developers/tax-core/meta.json"))).toContain("package-navigation")
-	})
-
-	test("an Upstream Package missing from its Tab navigation is reported", () => {
-		const pages = ["index", "sim-core", "tax-core", "design-system"]
-		expect(rulesOf(withMeta("developers/meta.json", pages))).toContain("package-listed")
+		expect(rulesOf(withMeta("meta.json", ["cli"]))).toContain("tab-listed")
 	})
 
 	test("a navigation entry with no page behind it is reported", () => {
@@ -72,18 +59,18 @@ describe("Docs Portal content structure", () => {
 	})
 
 	test("an internal link with no page behind it is reported", () => {
-		expect(rulesOf(withPageLink("developers/index.mdx", "/docs/developers/missing/"))).toContain(
+		expect(rulesOf(withPageLink("contribute/index.mdx", "/docs/contribute/missing/"))).toContain(
 			"internal-link",
 		)
 	})
 
 	test("a JSX link with no page behind it is reported", () => {
-		const link = '<a href="/docs/developers/missing/">Broken</a>'
-		expect(rulesOf(withContent("developers/index.mdx", link))).toContain("internal-link")
+		const link = '<a href="/docs/contribute/missing/">Broken</a>'
+		expect(rulesOf(withContent("contribute/index.mdx", link))).toContain("internal-link")
 	})
 
 	test("a link to the Landing Page at /docs/ needs no content page", () => {
-		expect(rulesOf(withContent("developers/index.mdx", "[Home](/docs/)"))).not.toContain(
+		expect(rulesOf(withContent("contribute/index.mdx", "[Home](/docs/)"))).not.toContain(
 			"internal-link",
 		)
 	})

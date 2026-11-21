@@ -13,7 +13,7 @@ export const LANDING_PAGE_FILE = `${DOCS_BASE_PATH.slice(1)}/index.html`
 /** The page ids the search index must not answer with: the Landing Page, with or without a slash. */
 const LANDING_PAGE_IDS: readonly string[] = [DOCS_BASE_PATH, `${DOCS_BASE_PATH}/`]
 
-function pageFailures(page: BuiltFile, releaseLine: string): readonly BuildFailure[] {
+function pageFailures(page: BuiltFile): readonly BuildFailure[] {
 	if (isRedirectPage(page.content)) {
 		return [buildFailure("LANDING_PAGE_REDIRECT", page.path, "the Landing Page is a meta refresh")]
 	}
@@ -34,15 +34,6 @@ function pageFailures(page: BuiltFile, releaseLine: string): readonly BuildFailu
 			),
 		)
 	}
-	if (!page.content.includes(releaseLine)) {
-		failures.push(
-			buildFailure(
-				"LANDING_PAGE_RELEASE_LINE",
-				page.path,
-				`the Landing Page does not state "${releaseLine}"`,
-			),
-		)
-	}
 	return failures
 }
 
@@ -60,11 +51,8 @@ function indexFailures(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	)
 }
 
-/** Failures for a Landing Page that redirects, links wrongly into the Tabs, states another release, or is searchable. */
-export function checkLandingPage(
-	files: readonly BuiltFile[],
-	releaseLine: string,
-): readonly BuildFailure[] {
+/** Failures for a Landing Page that redirects, links wrongly into the Tabs, or is searchable. */
+export function checkLandingPage(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	const page = fileAt(files, LANDING_PAGE_FILE)
-	return [...(page === undefined ? [] : pageFailures(page, releaseLine)), ...indexFailures(files)]
+	return [...(page === undefined ? [] : pageFailures(page)), ...indexFailures(files)]
 }

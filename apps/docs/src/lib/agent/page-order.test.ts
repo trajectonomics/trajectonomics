@@ -25,7 +25,7 @@ const TREE: Root = {
 		{ type: "page", name: "Source", url: "https://github.com/trajectonomics/docs", external: true },
 		{
 			type: "folder",
-			name: "Build on Trajectonomics",
+			name: "Contribute",
 			children: [{ type: "page", name: "Overview", url: "/docs/developers" }],
 		},
 	],
