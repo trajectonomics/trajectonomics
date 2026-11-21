@@ -1,0 +1,102 @@
+{
+	"name": "@trajectonomics/core",
+	"version": "0.0.0-development",
+	"description": "Pure personal-finance core: money, double-entry ledger, Thai and US income tax, and the projection engine, as subpath exports.",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"exports": {
+		"./money": {
+			"import": {
+				"types": "./dist/money/index.d.mts",
+				"default": "./dist/money/index.mjs"
+			},
+			"require": {
+				"types": "./dist/money/index.d.cts",
+				"default": "./dist/money/index.cjs"
+			}
+		},
+		"./ledger": {
+			"import": {
+				"types": "./dist/ledger/index.d.mts",
+				"default": "./dist/ledger/index.mjs"
+			},
+			"require": {
+				"types": "./dist/ledger/index.d.cts",
+				"default": "./dist/ledger/index.cjs"
+			}
+		},
+		"./tax": {
+			"import": {
+				"types": "./dist/tax/index.d.mts",
+				"default": "./dist/tax/index.mjs"
+			},
+			"require": {
+				"types": "./dist/tax/index.d.cts",
+				"default": "./dist/tax/index.cjs"
+			}
+		},
+		"./tax/th": {
+			"import": {
+				"types": "./dist/tax/th/index.d.mts",
+				"default": "./dist/tax/th/index.mjs"
+			},
+			"require": {
+				"types": "./dist/tax/th/index.d.cts",
+				"default": "./dist/tax/th/index.cjs"
+			}
+		},
+		"./tax/us": {
+			"import": {
+				"types": "./dist/tax/us/index.d.mts",
+				"default": "./dist/tax/us/index.mjs"
+			},
+			"require": {
+				"types": "./dist/tax/us/index.d.cts",
+				"default": "./dist/tax/us/index.cjs"
+			}
+		},
+		"./sim": {
+			"import": {
+				"types": "./dist/sim/index.d.mts",
+				"default": "./dist/sim/index.mjs"
+			},
+			"require": {
+				"types": "./dist/sim/index.d.cts",
+				"default": "./dist/sim/index.cjs"
+			}
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
+	"scripts": {
+		"build": "tsdown",
+		"typecheck": "tsc -p tsconfig.json",
+		"check:deps": "bun run scripts/check-deps.ts && bun test scripts",
+		"lint:package": "publint --strict && attw --pack . --profile node16",
+		"check": "bun run typecheck && bun run check:deps && bun run build && bun run lint:package"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
+		"@trajectonomics/ledger": "workspace:*",
+		"@trajectonomics/money": "workspace:*",
+		"@trajectonomics/sim": "workspace:*",
+		"@trajectonomics/tax": "workspace:*",
+		"@types/bun": "^1.4.4",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.2",
+		"typescript": "^7.0.2"
+	}
+}

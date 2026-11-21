@@ -11,6 +11,7 @@
 		"packages/core/ledger",
 		"packages/core/tax",
 		"packages/core/sim",
+		"packages/core",
 		"packages/brand",
 		"apps/cli",
 		"apps/site",
