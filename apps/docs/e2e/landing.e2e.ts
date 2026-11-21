@@ -1,6 +1,9 @@
+import { agentPrompt, agentRoutes, COPIED_LABEL, COPY_PROMPT_LABEL } from "../src/lib/agent-start"
 import { readReleaseLine } from "../src/lib/release-line-source"
+import { SITE_ORIGIN } from "../src/lib/site"
+import { SITE_HOME_PATH } from "../src/lib/site-home"
 import { DOCS_BASE_PATH, TABS, tabUrl } from "../src/lib/tabs"
-import { openSearch, otherTab, searchTerm } from "./docs-portal"
+import { openSearch, otherTab, searchTerm, waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
 
 const LANDING_PATH = `${DOCS_BASE_PATH}/`
@@ -8,7 +11,13 @@ const LANDING_PATH = `${DOCS_BASE_PATH}/`
 /** The release line the built page must state: the newest cli tag this checkout sees, or none. */
 const RELEASE_LINE = readReleaseLine()
 
-/** A Site Home document, so the browser test never asks `wrangler dev` for the page at `/`. */
+/** Whether `url` is the Site Home, which is on another host (ADR 0013). */
+function isSiteHome(url: URL): boolean {
+	const home = new URL(SITE_HOME_PATH)
+	return url.origin === home.origin && url.pathname === home.pathname
+}
+
+/** A Site Home document, so the browser test never asks the network for trajectonomics.com. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
 test("/docs reaches the Landing Page at /", async ({ page }) => {
@@ -55,7 +64,7 @@ test("the Landing Page ends with Site Home, Source and License links", async ({ 
 
 	await expect(page.getByRole("link", { name: "Site Home", exact: true })).toHaveAttribute(
 		"href",
-		"/",
+		SITE_HOME_PATH,
 	)
 	await expect(page.getByRole("link", { name: "Source", exact: true })).toHaveAttribute(
 		"href",
@@ -67,18 +76,18 @@ test("the Landing Page ends with Site Home, Source and License links", async ({ 
 	)
 })
 
-test("the ending's Site Home link loads / as one document and never prefetches", async ({
+test("the ending's Site Home link loads the Site Home as one document and never prefetches", async ({
 	page,
 }) => {
 	await page.goto(LANDING_PATH)
 	await page.route(
-		(url) => url.pathname === "/",
+		(url) => isSiteHome(url),
 		(route) => route.fulfill({ status: 200, contentType: "text/html", body: SITE_HOME_DOCUMENT }),
 	)
 
 	const siteHomeRequests: string[] = []
 	page.on("request", (request) => {
-		if (new URL(request.url()).pathname === "/") {
+		if (isSiteHome(new URL(request.url()))) {
 			siteHomeRequests.push(request.resourceType())
 		}
 	})
@@ -91,7 +100,7 @@ test("the ending's Site Home link loads / as one document and never prefetches",
 
 	await link.click()
 	await expect.poll(() => siteHomeRequests).toEqual(["document"])
-	await expect(page).toHaveURL("/")
+	await expect(page).toHaveURL(SITE_HOME_PATH)
 })
 
 test("an audience entry opens its Tab", async ({ page }) => {
@@ -111,4 +120,33 @@ test("search opens on the Landing Page and does not offer the Landing Page", asy
 
 	await expect(page.getByRole("option").first()).toBeVisible()
 	await expect(page.getByRole("option").filter({ hasText: "Trajectonomics Docs" })).toHaveCount(0)
+})
+
+test("Copy prompt puts the Agent prompt on the clipboard and says so", async ({
+	page,
+	context,
+}) => {
+	await context.grantPermissions(["clipboard-read", "clipboard-write"])
+	await page.goto(LANDING_PATH)
+	await waitForIsland(page)
+
+	await page.getByRole("button", { name: COPY_PROMPT_LABEL, exact: true }).click()
+
+	await expect(page.getByRole("button", { name: COPIED_LABEL, exact: true })).toBeVisible()
+	await expect(page.getByRole("status").filter({ hasText: "prompt copied" })).toHaveCount(1)
+	expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(agentPrompt(SITE_ORIGIN))
+})
+
+test("the Landing Page shows the prompt it copies and each Agent route with its own copy control", async ({
+	page,
+}) => {
+	await page.goto(LANDING_PATH)
+
+	await expect(page.locator("[data-agent-prompt]")).toHaveText(agentPrompt(SITE_ORIGIN))
+	for (const route of agentRoutes(SITE_ORIGIN)) {
+		await expect(page.getByText(route.snippet, { exact: true })).toBeVisible()
+		await expect(
+			page.getByRole("button", { name: `Copy ${route.title}`, exact: true }),
+		).toBeVisible()
+	}
 })
