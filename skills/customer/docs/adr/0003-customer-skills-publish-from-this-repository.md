@@ -1,6 +1,6 @@
 # ADR 0003: Customer Skills publish from this repository
 
-**Status**: Accepted
+**Status**: Accepted. The install source name is amended by [ADR 0005](./0005-customer-skills-install-from-the-monorepo-folder.md): the Skills now install from `trajectonomics/trajectonomics/skills/customer`.
 
 ## Context
 

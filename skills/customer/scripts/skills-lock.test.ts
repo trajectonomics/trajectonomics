@@ -13,7 +13,7 @@ function lockWith(entries: Record<string, Record<string, unknown>> = {}): Skills
 	const skills: Record<string, Record<string, unknown>> = {}
 	for (const name of ["traj-onboarding", "traj"]) {
 		skills[name] = {
-			source: "trajectonomics/skills",
+			source: "trajectonomics/trajectonomics",
 			ref: COMMIT,
 			commit: COMMIT,
 			computedHash: HASH,
@@ -25,7 +25,7 @@ function lockWith(entries: Record<string, Record<string, unknown>> = {}): Skills
 
 const EXPECTED = {
 	names: ["traj-onboarding", "traj"],
-	source: "trajectonomics/skills",
+	source: "trajectonomics/trajectonomics",
 	commit: COMMIT,
 	hashFor: () => HASH,
 }
@@ -45,7 +45,7 @@ describe("a skills lock", () => {
 
 	it("fails an entry from another source, on any Skill, not only the operating one", () => {
 		expect(lockProblems(lockWith({ traj: { source: "someone/else" } }), EXPECTED)).toEqual([
-			'"traj" records the source "someone/else", not "trajectonomics/skills"',
+			'"traj" records the source "someone/else", not "trajectonomics/trajectonomics"',
 		])
 	})
 
@@ -63,7 +63,7 @@ describe("a skills lock", () => {
 
 	it("fails an installed Skill the manifest does not publish", () => {
 		const lock = lockWith()
-		lock.skills = { ...lock.skills, "traj-invented": { source: "trajectonomics/skills" } }
+		lock.skills = { ...lock.skills, "traj-invented": { source: "trajectonomics/trajectonomics" } }
 		expect(lockProblems(lock, EXPECTED)).toEqual([
 			'"traj-invented" is installed but the manifest lists no such Skill',
 		])

@@ -14,10 +14,11 @@ export const APPLE_TOUCH_ICON_PATH = "/favicon/apple-touch-icon.png"
 export const APPLE_TOUCH_ICON_URL = `${SITE_ORIGIN}${APPLE_TOUCH_ICON_PATH}`
 
 /**
- * The skills repository's raw path to the skills it publishes on its default branch, which a coding
+ * The monorepo's raw path to the customer skills it publishes on its default branch, which a coding
  * agent reads with nothing installed: no skills CLI, no Node version, no clone.
  */
-const SKILLS_RAW_PATH = "https://raw.githubusercontent.com/trajectonomics/skills/main/skills"
+const SKILLS_RAW_PATH =
+	"https://raw.githubusercontent.com/trajectonomics/trajectonomics/main/skills/customer/skills"
 
 /** The Onboarding skill's published file: the one the prompt names, so the path and the prompt agree. */
 export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md`
@@ -70,11 +71,11 @@ export const DOCS_CLI_PATH = "/docs/cli/"
  */
 export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 
-/** The skills repository: the star menu, the footer's own link and the footer's licence name it. */
-export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
-
 /** The monorepo the CLI is built and released from. Issues and releases live at its root. */
 export const GITHUB_REPO_URL = "https://github.com/trajectonomics/trajectonomics"
+
+/** The customer skills' folder in the monorepo: the star menu and the footer's own link name it. */
+export const GITHUB_SKILLS_URL = `${GITHUB_REPO_URL}/tree/main/skills/customer`
 
 /** The traj CLI's source folder in the monorepo. */
 export const GITHUB_CLI_URL = `${GITHUB_REPO_URL}/tree/main/apps/cli`
@@ -88,8 +89,8 @@ export const GITHUB_CLI_RELEASES_URL = `${GITHUB_REPO_URL}/releases`
 /** The Organisation, for the footer's link. */
 export const GITHUB_ORG_URL = "https://github.com/trajectonomics"
 
-/** The skills repository's MIT licence, the footer's licence link. */
-export const SKILLS_LICENCE_URL = `${GITHUB_SKILLS_URL}/blob/main/LICENSE`
+/** The customer skills' MIT licence, the footer's licence link. */
+export const SKILLS_LICENCE_URL = `${GITHUB_REPO_URL}/blob/main/skills/customer/LICENSE`
 
 /**
  * The owner's Google Search Console token, once the owner pastes one in. While it is `undefined` the

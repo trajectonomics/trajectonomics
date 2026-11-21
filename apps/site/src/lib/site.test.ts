@@ -19,13 +19,13 @@ import {
 describe("the Site's own constants", () => {
 	it("shows the prompt the owner approved, the fixture no edit may change silently", () => {
 		expect(INSTALL_PROMPT).toBe(
-			"Set up traj: read https://raw.githubusercontent.com/trajectonomics/skills/main/skills/traj-onboarding/SKILL.md and follow it.",
+			"Set up traj: read https://raw.githubusercontent.com/trajectonomics/trajectonomics/main/skills/customer/skills/traj-onboarding/SKILL.md and follow it.",
 		)
 	})
 
-	it("names the skills repository's raw path to the Onboarding skill on its default branch", () => {
+	it("names the monorepo's raw path to the Onboarding skill on its default branch", () => {
 		expect(ONBOARDING_SKILL_URL).toBe(
-			"https://raw.githubusercontent.com/trajectonomics/skills/main/skills/traj-onboarding/SKILL.md",
+			"https://raw.githubusercontent.com/trajectonomics/trajectonomics/main/skills/customer/skills/traj-onboarding/SKILL.md",
 		)
 		expect(INSTALL_PROMPT).toContain(ONBOARDING_SKILL_URL)
 	})
@@ -44,9 +44,13 @@ describe("the Site's own constants", () => {
 		expect(SITE_NAME).toBe("trajectonomics")
 	})
 
-	it("points the skills links at the skills repository the Site installs from", () => {
-		expect(GITHUB_SKILLS_URL).toBe("https://github.com/trajectonomics/skills")
-		expect(SKILLS_LICENCE_URL).toBe("https://github.com/trajectonomics/skills/blob/main/LICENSE")
+	it("points the skills links at the monorepo folder the Site installs from", () => {
+		expect(GITHUB_SKILLS_URL).toBe(
+			"https://github.com/trajectonomics/trajectonomics/tree/main/skills/customer",
+		)
+		expect(SKILLS_LICENCE_URL).toBe(
+			"https://github.com/trajectonomics/trajectonomics/blob/main/skills/customer/LICENSE",
+		)
 	})
 
 	it("keeps the footer's organisation link on the organisation", () => {

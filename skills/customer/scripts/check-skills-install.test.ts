@@ -20,7 +20,7 @@ import {
 setDefaultTimeout(30_000)
 
 /** The pin the source is installed from: one 40-character commit, never a branch or a tag. */
-const PINNED = new RegExp(`add \\S+@${PINNED_COMMIT} --skill`)
+const PINNED = new RegExp(`add \\S+#${PINNED_COMMIT} --skill`)
 /** `skills@1.9.0` records the source commit; 1.7.6 did not. */
 const SKILLS_CLI = "skills@1.9.0"
 /** A run that left no scratch directory behind: the check cleans up what it makes. */
@@ -34,7 +34,7 @@ describe("the install check", () => {
 		expect(output).toContain("PASS:")
 		expect(exitCode).toBe(0)
 		expect(calls).toHaveLength(PUBLISHED_SKILLS.length + 1)
-		expect(calls[0]).toMatch(new RegExp(`^\\S+ ${SKILLS_CLI} add \\S+@${PINNED_COMMIT} --list$`))
+		expect(calls[0]).toMatch(new RegExp(`^\\S+ ${SKILLS_CLI} add \\S+#${PINNED_COMMIT} --list$`))
 		expect(calls.slice(1).every((call) => PINNED.test(call))).toBe(true)
 		expect(calls[1]).toMatch(/--skill traj-onboarding -a claude-code codex -y$/)
 		expect(calls[2]).toMatch(/--skill traj -a claude-code codex -y$/)
@@ -43,9 +43,11 @@ describe("the install check", () => {
 
 	it("reads the manifest at the commit it installs, not from this checkout", () => {
 		const { ghCalls } = runInstallCheck({ source: "repo" })
-		expect(ghCalls[0]).toMatch(new RegExp(`repos/trajectonomics/skills/commits/${PINNED_COMMIT}`))
+		expect(ghCalls[0]).toMatch(
+			new RegExp(`repos/trajectonomics/trajectonomics/commits/${PINNED_COMMIT}`),
+		)
 		expect(ghCalls[1]).toContain(
-			`repos/trajectonomics/skills/contents/skills.manifest.json?ref=${PINNED_COMMIT}`,
+			`repos/trajectonomics/trajectonomics/contents/skills/customer/skills.manifest.json?ref=${PINNED_COMMIT}`,
 		)
 	})
 
@@ -78,10 +80,10 @@ describe("the install check", () => {
 
 	it("refuses a source that names no commit, a short one, a branch or a tag", () => {
 		for (const argument of [
-			"trajectonomics/skills",
-			"trajectonomics/skills@8f55956",
-			"trajectonomics/skills@main",
-			"trajectonomics/skills@v0.2.0",
+			"trajectonomics/trajectonomics",
+			"trajectonomics/trajectonomics@8f55956",
+			"trajectonomics/trajectonomics@main",
+			"trajectonomics/trajectonomics@v0.2.0",
 		]) {
 			const { exitCode, output, calls } = runInstallCheck({ argument })
 			expect(exitCode).not.toBe(0)
@@ -119,7 +121,7 @@ describe("the install check", () => {
 		})
 		expect(exitCode).not.toBe(0)
 		expect(output).toContain(
-			'"traj-onboarding" records the source "someone/else", not "trajectonomics/skills"',
+			'"traj-onboarding" records the source "someone/else", not "trajectonomics/trajectonomics"',
 		)
 	})
 

@@ -10,7 +10,7 @@ const README_URL = new URL('../README.md', import.meta.url);
  * `npx skills add trajectonomics/internal-skills --list` finds one.
  *
  * `traj` is a customer's operating Skill and is retired here: it publishes from
- * `trajectonomics/skills` instead, so a second copy here would be a duplicate.
+ * `skills/customer` in `trajectonomics/trajectonomics` instead, so a second copy here would be a duplicate.
  */
 async function publishedSkills() {
   const entries = await readdir(SKILLS_URL, { withFileTypes: true });
@@ -27,7 +27,7 @@ test('the repository no longer publishes the traj skill', async () => {
   assert.equal(
     names.includes('traj'),
     false,
-    'traj publishes from trajectonomics/skills now; a copy here is the duplicate meant to go',
+    'traj publishes from skills/customer in trajectonomics/trajectonomics now; a copy here is the duplicate meant to go',
   );
 });
 
@@ -46,7 +46,7 @@ test('the README no longer gives the outsider traj install', async () => {
   assert.doesNotMatch(
     readme,
     /--skill traj/,
-    'nothing here installs the retired traj skill; it publishes from trajectonomics/skills',
+    'nothing here installs the retired traj skill; it publishes from skills/customer in trajectonomics/trajectonomics',
   );
   assert.doesNotMatch(
     readme,

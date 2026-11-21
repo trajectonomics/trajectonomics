@@ -1,7 +1,7 @@
 /**
  * The stand-in for `npx` that the install-check tests run, so `bun run check` proves the check's
  * assertions without a network. `scripts/check-skills-install.sh` itself is exercised for real
- * against `trajectonomics/skills` before a pull request that touches `skills/`.
+ * against `trajectonomics/trajectonomics` before a pull request that touches `skills/`.
  *
  * It stands in for `skills@1.9.0`: `--list` prints the published set, and an install copies the
  * Skill's `SKILL.md` into the two agent trees and records the [Skill Pin](../GLOSSARY.md) the CLI would
@@ -61,10 +61,11 @@ function installOutside(skill: string, source: string): void {
 function entry(source: string, skill: string): Record<string, unknown> {
 	const sha = commitOf(source)
 	return {
-		source: source.split("@")[0] ?? source,
+		source: sha === null ? source : repositoryOf(source),
 		...(sha === null ? {} : { ref: sha, commit: sha }),
 		sourceType: sha === null ? "local" : "github",
-		skillPath: `skills/${skill}/SKILL.md`,
+		skillPath:
+			sha === null ? `skills/${skill}/SKILL.md` : `skills/customer/skills/${skill}/SKILL.md`,
 		computedHash: skillFolderHash(join(".agents/skills", skill)),
 		...overrides()[skill],
 	}
@@ -86,10 +87,15 @@ function valueAfter(args: readonly string[], flag: string): string {
 	return value
 }
 
-/** The 40-character commit a `<source>@<sha>` install names, or null for a local path. */
+/** The 40-character commit a `<owner>/<repo>/<folder>#<sha>` install names, or null for a local path. */
 function commitOf(source: string): string | null {
-	const ref = source.split("@")[1]
+	const ref = source.split("#")[1]
 	return ref !== undefined && /^[0-9a-f]{40}$/.test(ref) ? ref : null
+}
+
+/** The `<owner>/<repo>` a folder source names, which is what the CLI records as the lock's source. */
+function repositoryOf(source: string): string {
+	return (source.split("#")[0] ?? source).split("/").slice(0, 2).join("/")
 }
 
 /** Per-Skill lock fields a fixture replaces, written the way the CLI would have written them. */
