@@ -73,13 +73,16 @@ A stage reads its numbers from a parameter table. It never holds a statutory num
 **One rule per file.** Each statutory rule is a pure function in its own file, under 100 lines. Each
 stage file has one test file of its own under 200 lines, so the test for a rule is easy to find.
 
-**Money is integer minor units.** Amounts come in as major units, such as baht or dollars. They are
-converted to satang or cents once, at the boundary, with `toMinorUnits`, and back with
-`fromMinorUnits`. Every stage between those calls works in integers. See
+**Know each stage's units before you change it.** The public API takes major units, such as baht or
+dollars. Arithmetic that must not drift, such as the bracket slices in `src/th/stages/bracket-eval.ts`,
+converts to integer satang or cents with `toMinorUnits` and back with `fromMinorUnits`. Many Thai
+stages instead work in whole-baht major units. Every stage says which in a `Units:` line in its doc
+comment, for example "THB major units" or "inputs and outputs in THB major units; arithmetic in integer
+satang". Read that line first, and keep it true when you change the stage. See
 [ADR 0002](https://github.com/trajectonomics/trajectonomics/blob/main/packages/core/tax/docs/adr/0002-minor-unit-integer-arithmetic-and-statutory-clamping.md).
 
-**Statutory rounding.** Where a statute rounds down in whole baht, the stage rounds down on that unit
-with `Math.floor`. The Section 40(1) and (2) expense is one example, in
+**Statutory rounding.** Where a statute rounds down in whole baht, a stage that works in baht rounds
+down with `Math.floor`. The Section 40(1) and (2) expense is one example, in
 `src/th/stages/expenses-40-1-2.ts`.
 
 **No raw strings in stages.** Diagnostic paths and breakdown keys are typed enums, such as
@@ -169,7 +172,8 @@ bunx turbo run check --filter=@trajectonomics/tax
 ```
 
 Or run them inside `packages/core/tax` with `bun run check`. The check runs these steps in order:
-`lint`, `check:th-sources`, `typecheck`, `test`, `build`, `check:readme` and `lint:package`.
+`lint` (Biome, then the hardcoded-string check `check:strings`), `check:th-sources`, `typecheck`,
+`test` (with the 100% line-coverage floor), `build`, `check:readme` and `lint:package`.
 
 Run the core checks too when you change the bundle, its exports or the import rules:
 
@@ -183,7 +187,7 @@ What each failure means:
 | --- | --- | --- | --- |
 | `lint` (Biome) | a formatting, import or style error | The file does not match the shared style | Run `bun run format`. |
 | `lint` (Biome) | a file or function is too long or too complex | A source file has over 100 lines, a test file over 200, or a function complexity over 10 | Split the file or the function. |
-| `check:strings` | Hardcoded diagnostic string, or Hardcoded 'THB' | A stage holds a raw field name or currency | Use the typed enum, or `parameters.currency`. |
+| `lint` (`check:strings`) | Hardcoded diagnostic string, or Hardcoded 'THB' | A stage holds a raw field name or currency | Use the typed enum, or `parameters.currency`. |
 | `check:th-sources` | `SOURCES ...: missing-row` | A parameter path has no row | Add the row with its document. |
 | `check:th-sources` | `SOURCES ...: extra-row` | A row names no parameter | Remove the row, or add the parameter. |
 | `check:th-sources` | `MANIFEST ...` or `duplicate-row` | A row is malformed or repeated | Fix the row. |
