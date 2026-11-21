@@ -3,7 +3,7 @@
 Move the `trajectonomics` org's repos into this repo (`trajectonomics/trajectonomics`) as one
 Bun workspace, keeping each repo's git history, its npm package names, and its Cloudflare worker names.
 
-Status: **phases 1 to 5c are done (PRs #1 to #11, merged in order with merge commits). What remains is the owner's cutover (phase 6, `docs/runbooks/release.md`) and archiving the old repos (phase 7).** Inventory taken 2026-11-21: 22 repos, 0 open PRs.
+Status: **done on 2026-11-21.** The 12 repos are in this repository (PRs #1–#15), `traj` 0.4.0 shipped from here, the site and the docs deploy from CI (`docs/runbooks/deploy.md`), the old install commands forward here, and the old repositories are archived, each pointing at its folder. Follow-ups: publishing the customer skills from here (#16) and the site's star menu (#17).
 
 ## 0. Why this is cheaper than it looks
 
