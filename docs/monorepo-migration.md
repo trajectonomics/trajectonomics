@@ -116,32 +116,36 @@ theme package's prebuilt CSS list, and logos and fonts only exist for Trajectono
 **brand is a folder**:
 
 ```
-packages/brand/
-  src/                      token contract, primitives, contrast checks (from core)
-                            defineTheme, validation, themeToCss, Tailwind stylesheet (from theme)
+packages/brand/                 @trajectonomics/brand (private, not published)
+  src/
+    tokens/                     contract, primitives, semantic tokens, contrast (from core/src)
+    theme/                      defineTheme, validation, themeToCss (from theme/src)
+    index.ts                    the public API
   brands/
     trajectonomics/
-      light.ts              export default defineTheme({ name: "trajectonomics-light", tokens: {...} })
-      dark.ts
-      assets/               logo/, favicon/, fonts/ (from design-system assets + brand-source)
-    acme/                   a white-label customer: copy the folder, change tokens and assets
-      light.ts
-      dark.ts
-      assets/
-  scripts/build.ts          finds brands/*, writes dist/brands/<brand>/{light,dark}.css,
-                            tailwind.css, typography.css, and copies assets/
+      light.ts                  export default <Theme named "light">
+      dark.ts                   export default <Theme named "dark">
+      assets/svg/  assets/webp/ (from brand-source)   assets/fonts/ (from assets/fonts)
+    acme/                       a white-label customer: copy the folder, change tokens and assets
+  tailwind.css, typography.css  brand-agnostic: they only reference --ds-* variables
+  scripts/build.ts              finds brands/*, writes dist/brands/<brand>/{light.css,dark.css,logo/,favicon/,fonts/},
+                                and copies the brand named by BRAND (default trajectonomics) to dist/current/
 ```
 
+- **Theme names stay `light` and `dark` inside every brand.** `themeToCss` scopes the CSS to
+  `[data-theme="<name>"]`, and apps set `data-theme="light"` or `"dark"`. The folder name is the brand.
 - **Adding a brand = adding a folder.** The build and the tests find `brands/*` themselves.
   Nothing gets registered by hand.
 - **Every brand is tested automatically.** A test runs over every folder in `brands/*` and fails if
   a theme breaks the Semantic Token Contract, misses the WCAG AA contrast floor (the check core has
-  today), or lacks a required asset (logo mark, favicon set).
-- **Exports:** `@trajectonomics/brand` (the JS API: `defineTheme`, `themeToCss`, the contract, the
-  `brands` list) and `@trajectonomics/brand/brands/<brand>/light.css`, `.../dark.css`, `.../logo/mark.svg`, and so on.
-- **Picking a brand in an app:** site and docs read `BRAND` (default `trajectonomics`) at build time
-  and import that brand's CSS and assets through one alias, `@brand/*`. A white-label deploy is
-  then the same app built with `BRAND=acme`: one more Cloudflare worker, no code fork.
+  today), or lacks a required asset (logo mark, favicon set, fonts stylesheet).
+- **Exports:** `@trajectonomics/brand` (the JS API: `defineTheme`, `themeToCss`, the contract,
+  primitives, the brand list), `@trajectonomics/brand/brands/<brand>/...`,
+  `@trajectonomics/brand/current/...`, `@trajectonomics/brand/tailwind.css` and `@trajectonomics/brand/typography.css`.
+- **Picking a brand in an app:** site and docs import from `@trajectonomics/brand/current/...`.
+  `BRAND=acme bun run build` builds the same apps as Acme. `turbo.json` lists `BRAND` in the build
+  task's `env`, so the cache never mixes brands. A white-label deploy is one more Cloudflare worker
+  with `BRAND` set. Nothing in the code is forked.
 - **White-label for a company = a private mirror of this repo.** GitHub won't make a private fork of
   a public repo, so: create a private repo `trajectonomics/<company>`, push this repo into it, and
   add this repo as `upstream` (the same setup `agentic-inbox` has with `cloudflare/agentic-inbox`).
