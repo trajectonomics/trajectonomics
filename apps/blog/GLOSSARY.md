@@ -1,7 +1,8 @@
 # Glossary
 
 The blog's words. Code, tests, commit messages and pull request titles use them exactly; a synonym
-in a diff is a defect. The Theme and brand words are `packages/brand`'s.
+in a diff is a defect. The Theme and brand words (Theme, Theme role, Favicon Set, Brand Typeface)
+are `packages/brand`'s.
 
 ## Post
 
@@ -37,6 +38,14 @@ A value only the owner writes: the Verdict and each row's better side. Until the
 ## Placeholder
 
 The token `[OWNER TO WRITE]`, standing for an Owner-written Value not written yet.
+
+## Site Home
+
+`/` on the apex: the Site's landing page, which the header's brand mark links to.
+
+## Docs Portal
+
+The product documentation at `https://docs.trajectonomics.com/`, which the header's Docs link names.
 
 ## Shell
 

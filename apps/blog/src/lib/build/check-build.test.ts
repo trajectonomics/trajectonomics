@@ -8,7 +8,7 @@ const SHELL = `<a href="/">Home</a><a href="/blog/">Blog</a><footer></footer>`
 const PAGE = `<html><head>${HEAD}</head><body>${SHELL}</body></html>`
 const NOT_FOUND = `<html><head><title>Not found</title><meta name="robots" content="noindex"></head><body>${SHELL}</body></html>`
 
-/** A build that passes: the front page and the Not-found page. */
+/** A build that passes: the front page and the Not-found Page. */
 const GOOD: readonly BuiltFile[] = [
 	{ path: "blog/index.html", text: PAGE },
 	{ path: "blog/404.html", text: NOT_FOUND },
@@ -67,7 +67,7 @@ describe("the built blog", () => {
 			"</head>",
 			`<meta http-equiv="Content-Security-Policy" content="script-src 'self'"></head>`,
 		)
-		expect(codes(withFrontPage(html))).toEqual(["security-policy-set"])
+		expect(codes(withFrontPage(html))).toEqual(["security-policy-meta-set"])
 	})
 
 	test("a security policy in a headers file fails", () => {
@@ -75,7 +75,7 @@ describe("the built blog", () => {
 			path: "blog/_headers",
 			text: "/*\n  Content-Security-Policy: default-src 'self'",
 		}
-		expect(codes([...GOOD, headers])).toEqual(["security-policy-set"])
+		expect(codes([...GOOD, headers])).toEqual(["security-policy-header-set"])
 	})
 
 	test("a page with no link to the Site Home fails", () => {
@@ -96,7 +96,7 @@ describe("the built blog", () => {
 		])
 	})
 
-	test("a build with no Not-found page fails", () => {
+	test("a build with no Not-found Page fails", () => {
 		expect(codes(GOOD.filter((file) => file.path !== "blog/404.html"))).toEqual([
 			"not-found-page-missing",
 		])

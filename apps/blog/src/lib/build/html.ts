@@ -28,7 +28,7 @@ export function canonicalOf(html: string): string | undefined {
 	return href === undefined || href === "" ? undefined : href
 }
 
-/** Whether the page asks search engines not to index it, as the 404 page does. */
+/** Whether the page asks search engines not to index it, as the Not-found Page does. */
 export function isNoindex(html: string): boolean {
 	return tags(html, "meta").some(
 		(attributes) =>

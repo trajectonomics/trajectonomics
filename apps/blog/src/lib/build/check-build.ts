@@ -7,7 +7,7 @@ const BASE = "blog/"
 /** The router's preload path, which a microfrontend must never serve. */
 const PRELOAD_FILE = "__mf-preload.js"
 
-/** The blog's own Not-found page, which the Worker's `404-page` handling finds for a miss. */
+/** The blog's own Not-found Page, which the Worker's `404-page` handling finds for a miss. */
 const NOT_FOUND_PAGE = "blog/404.html"
 
 /** The rules every built file meets, whatever kind it is. */
@@ -23,7 +23,7 @@ function checkFile(file: BuiltFile): Failure[] {
 	}
 	if (file.path.endsWith("_headers") && /content-security-policy/i.test(file.text ?? "")) {
 		failures.push(
-			failure("security-policy-set", file.path, "sets a content security policy header"),
+			failure("security-policy-header-set", file.path, "sets a content security policy header"),
 		)
 	}
 	return failures
@@ -39,7 +39,9 @@ function checkPage(path: string, html: string): Failure[] {
 		failures.push(failure("page-canonical-missing", path, "is indexable and names no canonical"))
 	}
 	if (setsSecurityPolicy(html)) {
-		failures.push(failure("security-policy-set", path, "sets a content security policy meta tag"))
+		failures.push(
+			failure("security-policy-meta-set", path, "sets a content security policy meta tag"),
+		)
 	}
 	const targets = linkTargets(html)
 	if (!targets.includes("/")) {

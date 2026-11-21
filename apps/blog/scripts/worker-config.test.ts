@@ -40,7 +40,7 @@ describe("the blog Worker", () => {
 		expect(config.assets.directory).toBe("./dist")
 	})
 
-	test("answers an address without its slash with the slashed one, and a miss with the 404 page", () => {
+	test("answers an address without its slash with the slashed one, and a miss with the Not-found Page", () => {
 		expect(config.assets.html_handling).toBe("auto-trailing-slash")
 		expect(config.assets.not_found_handling).toBe("404-page")
 	})

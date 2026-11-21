@@ -13,18 +13,18 @@ import { FALLBACK_THEME, themeScript } from "../lib/themes"
 
 interface Props {
 	readonly title: string
-	/** An indexable page's one-line summary; the Not-found page passes none. */
+	/** An indexable page's one-line summary; the Not-found Page passes none. */
 	readonly description?: string
-	/** Whether search engines may index the page: every page but the Not-found page. */
+	/** Whether search engines may index the page: every page but the Not-found Page. */
 	readonly indexed: boolean
 	/** The blog's front page marks the header's Blog link as the current page. */
-	readonly front?: boolean
+	readonly isFrontPage?: boolean
 }
 
-const { title, description, indexed, front = false } = Astro.props
+const { title, description, indexed, isFrontPage = false } = Astro.props
 const canonical = canonicalUrl(Astro.url.pathname)
 // The browser's bar takes each Theme's background, read from the brand's stylesheets.
-const paints = [
+const themeColours = [
 	{ scheme: "light", colour: themeRole(lightTheme, "background") },
 	{ scheme: "dark", colour: themeRole(darkTheme, "background") },
 ]
@@ -36,7 +36,7 @@ const paints = [
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script is:inline set:html={themeScript()}></script>
 		<title>{title}</title>
-		{paints.map((paint) => (
+		{themeColours.map((paint) => (
 			<meta name="theme-color" media={`(prefers-color-scheme: ${paint.scheme})`} content={paint.colour} />
 		))}
 		{
@@ -61,7 +61,7 @@ const paints = [
 	</head>
 	<body class="blog-body">
 		<a class="skip-link" href="#main">Skip to content</a>
-		<Header current={front} />
+		<Header current={isFrontPage} />
 		<main id="main" class="blog-main"><slot /></main>
 		<Footer />
 	</body>

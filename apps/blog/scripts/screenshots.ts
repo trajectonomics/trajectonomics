@@ -20,7 +20,7 @@ const WIDTHS = Object.freeze([1280, 2000, 390])
 /** The device schemes, which pick the Theme because the blog follows the device. */
 const SCHEMES = Object.freeze(["light", "dark"] as const)
 
-/** Answers a request the way Workers Static Assets does for this build: index files and the 404 page. */
+/** Answers a request the way Workers Static Assets does for this build: index files and the Not-found Page. */
 async function answer(request: Request): Promise<Response> {
 	const { pathname } = new URL(request.url)
 	const file = Bun.file(

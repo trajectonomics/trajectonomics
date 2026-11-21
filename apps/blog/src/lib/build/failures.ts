@@ -2,7 +2,8 @@
 export type FailureCode =
 	| "file-outside-base"
 	| "preload-path-served"
-	| "security-policy-set"
+	| "security-policy-header-set"
+	| "security-policy-meta-set"
 	| "not-found-page-missing"
 	| "page-title-missing"
 	| "page-canonical-missing"
