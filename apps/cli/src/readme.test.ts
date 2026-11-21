@@ -17,9 +17,9 @@ const [beforeDevelopment = "", development = ""] = readme.split(DEVELOPMENT_HEAD
 const firstScreen = beforeDevelopment.replaceAll("`", "").replace(/\s+/g, " ")
 const prose = (text: string) => text.replaceAll("`", "").replace(/\s+/g, " ").trim()
 const SCRIPT_INSTALL =
-	"curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | sh"
+	"curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh"
 const WINDOWS_INSTALL =
-	"irm https://github.com/trajectonomics/cli/releases/latest/download/install.ps1 | iex"
+	"irm https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.ps1 | iex"
 const NPM_INSTALL = "npx @trajectonomics/cli@latest --version"
 const BUNX_INSTALL = "bunx @trajectonomics/cli@latest --version"
 // Both Skills publish from `trajectonomics/skills` (skills ADR-0003). `trajectonomics/internal-skills`

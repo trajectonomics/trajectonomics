@@ -1,14 +1,14 @@
 #!/bin/sh
 # Install traj: one checksum-verified binary from a GitHub release.
 #
-#   curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | sh
+#   curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh
 #
 # TRAJ_VERSION=X.Y.Z installs a pinned release instead of the latest one.
 # TRAJ_INSTALL_DIR overrides the directory (default: $HOME/.local/bin).
 # TRAJ_DOWNLOAD_BASE_URL replaces the releases root, which is how CI tests it.
 set -eu
 
-DEFAULT_BASE="https://github.com/trajectonomics/cli/releases"
+DEFAULT_BASE="https://github.com/trajectonomics/trajectonomics/releases"
 SUPPORTED="darwin/arm64, darwin/x64, linux/x64, linux/arm64"
 
 say() { printf 'traj: %s\n' "$*" >&2; }
@@ -33,7 +33,7 @@ asset="traj-$os-$arch"
 
 base="${TRAJ_DOWNLOAD_BASE_URL:-$DEFAULT_BASE}"
 if [ -n "${TRAJ_VERSION:-}" ]; then
-	prefix="$base/download/v$TRAJ_VERSION"
+	prefix="$base/download/cli-v$TRAJ_VERSION"
 else
 	prefix="$base/latest/download"
 fi
