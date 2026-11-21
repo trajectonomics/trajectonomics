@@ -13,7 +13,7 @@ describe("the strings the Dictionary states for its reader", () => {
 		)
 		// The owner settled the disclaimer on 2026-11-18: it opens at the bug clause, with no version and no stability claim.
 		expect(english.footerDisclaimer).toBe(
-			"A bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/cli and we will update it as soon as we can.",
+			"A bug is still possible. Tax is applied only when you ask for it, and every figure says whether it includes tax. Trust the figures traj returns. If you find a bug, open an issue on https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli and we will update it as soon as we can.",
 		)
 	})
 
@@ -23,7 +23,7 @@ describe("the strings the Dictionary states for its reader", () => {
 			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent ใช้ได้ทั้งเป็นสกิลและ CLI — ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		)
 		expect(thai.footerDisclaimer).toBe(
-			"ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/cli แล้วเราจะอัปเดตโดยเร็ว",
+			"ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli แล้วเราจะอัปเดตโดยเร็ว",
 		)
 	})
 

@@ -5,7 +5,7 @@ description: Write the one file a restore reads into a new directory.
 
 `traj backup` writes the one file a restore reads, `traj.jsonl`, into a new directory. It is the
 canonical JSONL export under a name that says what it is for, so a backup restores by construction
-([ADR 0038](https://github.com/trajectonomics/cli/blob/v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+([ADR 0038](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
 CSV and Markdown do not restore, so `backup` has no `--format` flag.
 
 - `--out <string>` — a directory to create; it must not already exist; required

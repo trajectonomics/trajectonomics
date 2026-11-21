@@ -6,7 +6,7 @@ description: Install the Trajectonomics CLI, add the agent skill, check the vers
 The Docs Portal documents `traj` `v0.2.0`, released on 2026-11-17 with release binaries, both
 install scripts, and `@trajectonomics/cli` on npm. All three channels below end at the same compiled
 binary and the same version
-([ADR 0011](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0011-distribution.md)).
+([ADR 0011](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0011-distribution.md)).
 
 ## Linux and macOS
 
@@ -15,7 +15,7 @@ One command; it verifies the release checksum, installs `traj` to `~/.local/bin`
 
 ```bash
 curl -fsSL \
-  https://github.com/trajectonomics/cli/releases/latest/download/install.sh \
+  https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh \
   | sh
 ```
 
@@ -37,7 +37,7 @@ One line; it installs to `%LOCALAPPDATA%\traj\bin`, adds it to the user `PATH` o
 new shell afterwards:
 
 ```powershell
-irm https://github.com/trajectonomics/cli/releases/latest/download/install.ps1 | iex
+irm https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.ps1 | iex
 ```
 
 ## npm or Bun
@@ -62,7 +62,7 @@ Both install scripts accept `TRAJ_VERSION=X.Y.Z` to install a pinned release ins
 one, and `TRAJ_INSTALL_DIR` to override the install directory. npm pins with `@X.Y.Z`:
 
 ```bash
-curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | TRAJ_VERSION=0.2.0 sh
+curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | TRAJ_VERSION=0.2.0 sh
 npx @trajectonomics/cli@0.2.0 --version
 ```
 
@@ -128,6 +128,6 @@ set, so it survives every delete above. [Your data](/docs/cli/data/) shows how t
 to remove it on purpose.
 
 Building the CLI from source is for contributors, described in the
-[repository](https://github.com/trajectonomics/cli), not here.
+[repository](https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli), not here.
 
 Next: [Your data](/docs/cli/data/).

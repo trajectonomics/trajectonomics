@@ -66,7 +66,7 @@ The command line needs Node 20 or later. The unscoped `traj` on npm is a differe
 package.
 
 **On PATH.** When the person wants to type `traj` on its own, read the Install section of
-https://github.com/trajectonomics/cli, give them the one-line command for their platform, and let
+https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli, give them the one-line command for their platform, and let
 them run it. Running a remote script is their decision to make, not yours. If that page cannot be
 read, keep to the scoped package above and invent no script URL.
 
