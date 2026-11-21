@@ -130,6 +130,11 @@ jobs:
       - name: Install the workspace
         run: bun install --frozen-lockfile
 
+      # Check the package as committed, before the version is stamped: the CLI reports its own
+      # version as the engine's, so its goldens record the committed 0.0.0, not the release version.
+      - name: Check the package
+        run: bunx turbo run check --filter="$PACKAGE_NAME..." --concurrency=2
+
       - name: Compute the version and set it in the package
         shell: bash
         run: |
@@ -154,9 +159,6 @@ jobs:
           # npm version failed in core's folder here (its devDependencies use workspace:), so set only
           # the version field.
           (cd "$FOLDER" && npm pkg set version="$VERSION")
-
-      - name: Check the package
-        run: bunx turbo run check --filter="$PACKAGE_NAME..." --concurrency=2
 
       # Trusted publishing (OIDC) needs npm >= 11.5.1; setup-node 22 ships npm 10.x.
       - name: Upgrade npm for trusted publishing
