@@ -1,0 +1,33 @@
+---
+title: doctor
+description: Check the data directory, the database and the ledger before anything goes wrong.
+---
+
+`traj doctor` checks the data directory, the database and the ledger, and reports what it found.
+It writes nothing of its own and creates nothing: a diagnostic does not create what it diagnoses
+([ADR 0038](https://github.com/trajectonomics/cli/blob/v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+
+- `--as-of <string>` — add the Trial Balance at this date, as `YYYY-MM-DD`
+
+```bash
+traj doctor                            # Check the data directory and what it holds.
+traj doctor --as-of 2026-11-30 --json  # Add the Trial Balance and describe every check.
+```
+
+The checks run in this order, each with a one-sentence verdict of `pass`, `fail` or `skipped`:
+
+- `directory` — the data directory exists.
+- `writable` — a file can be written to it and removed again.
+- `database` — `traj.db` opens, and reports its schema version against the one this build writes.
+- `integrity` — SQLite's own integrity check over the database pages.
+- `ledger` — every stored transaction is validated again through the ledger core.
+- `trialBalance` — the Trial Balance at `--as-of` balances. It is `skipped` without `--as-of`.
+
+A finding is a result, not an error: `ok` is `false` when a check failed, and the process still exits
+`0`. A skipped check is not a failure. Only a bad `--as-of` fails the command: `INVALID_DATE`, with exit
+code `3`.
+
+In JSON mode the result carries `cliVersion`, the `directory` and `database` facts, the stored
+`rows` per table, the `checks` in order, and the `trialBalance` when `--as-of` was given.
+
+See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.

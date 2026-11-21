@@ -32,12 +32,13 @@ directory then holds the ledger alone.
 Before you delete anything, take the copy you would keep:
 
 ```bash
-traj export --out ~/traj-backup
+traj backup --out ~/traj-backup
 ```
 
-The export writes the stored rows into a directory that must not already exist, as JSONL by
-default ([ADR 0017](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0017-syncable-roots-and-lossless-export.md),
-[ADR 0028](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0028-export-writes-a-new-directory.md)).
+The backup writes `traj.jsonl` into a directory that must not already exist, and
+[`traj restore`](/docs/cli/commands/restore/) reads it back into an empty database
+([ADR 0038](https://github.com/trajectonomics/cli/blob/v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+`traj export` writes the same JSONL plus CSV and Markdown, which do not restore.
 
 ## Remove traj, keep the ledger
 
@@ -46,7 +47,7 @@ ledger stays where it is, and a later install opens the same books.
 
 ## Remove the ledger too
 
-Delete the whole data directory:
+Delete the whole data directory yourself:
 
 ```bash
 rm -rf ~/.traj
@@ -58,9 +59,12 @@ Use `"$TRAJ_HOME"` instead when you set it:
 rm -rf "$TRAJ_HOME"
 ```
 
-That deletes the database, and there is no copy anywhere else unless you made one above. No `traj`
-command removes the data directory: `traj scenario rm` tombstones one Scenario, and nothing deletes
-accounts or transactions, so deleting the directory is the only way to start clean.
+That deletes the database, and there is no copy anywhere else unless you made one above.
+
+To remove only the ledger and keep the data directory, use [`traj data remove`](/docs/cli/commands/data/).
+It deletes the database files and nothing else, and it refuses unless a backup holds exactly the data
+as it is now. `traj scenario rm` tombstones one Scenario, and no other command deletes accounts or
+transactions.
 
 ## Keep several ledgers apart
 

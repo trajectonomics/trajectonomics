@@ -3,8 +3,8 @@ title: Commands
 description: The command reference of the Trajectonomics CLI.
 ---
 
-`traj` has 14 top-level commands. Six are groups with their own subcommands — `account`, `baseline`,
-`projection`, `report`, `scenario` and `tx` — and the other eight are single commands. `traj help`
+`traj` has 18 top-level commands. Seven are groups with their own subcommands — `account`, `baseline`,
+`data`, `projection`, `report`, `scenario` and `tx` — and the other eleven are single commands. `traj help`
 lists them and `traj help <command>` shows one command's usage; both are generated from the same
 definitions that validate input, so the two cannot drift
 ([ADR 0015](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0015-command-tree.md)).
@@ -14,14 +14,18 @@ definitions that validate input, so the two cannot drift
 | Command | What it does |
 | --- | --- |
 | [account](/docs/cli/commands/account/) | Manage the chart of accounts |
+| [backup](/docs/cli/commands/backup/) | Write the one file a restore reads into a new directory |
 | [balance](/docs/cli/commands/balance/) | Show every account's balance and net worth at a date |
 | [baseline](/docs/cli/commands/baseline/) | Show the Baseline a Projection starts from |
+| [data](/docs/cli/commands/data/) | Manage the stored data itself |
+| [doctor](/docs/cli/commands/doctor/) | Check the data directory, the database and the ledger before anything goes wrong |
 | [export](/docs/cli/commands/export/) | Write the stored rows into a new directory |
 | [fi](/docs/cli/commands/fi/) | Report the financial independence date under a Scenario |
 | [help](/docs/cli/commands/help/) | Show usage for traj or for one command |
 | [init](/docs/cli/commands/init/) | Create the data directory and an empty database |
 | [inspect](/docs/cli/commands/inspect/) | Show the stored rows of one table, or of every table |
 | [projection](/docs/cli/commands/projection/) | Project the future under a Scenario, and compare two of them |
+| [restore](/docs/cli/commands/restore/) | Write a backup's rows into an empty database |
 | [report](/docs/cli/commands/report/) | Report on the ledger over a period or at a date |
 | [scenario](/docs/cli/commands/scenario/) | Manage Scenarios, the named what-ifs |
 | [schema](/docs/cli/commands/schema/) | Describe the commands and the error registry |

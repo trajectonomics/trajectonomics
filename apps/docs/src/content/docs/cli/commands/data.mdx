@@ -1,0 +1,40 @@
+---
+title: data
+description: Manage the stored data itself.
+---
+
+`traj data` manages the stored data itself. It has one subcommand, `remove`, which deletes the
+database and nothing else in the data directory. The removal is guarded: it runs only when a backup
+holds exactly the data it is about to delete, so no write is lost
+([ADR 0038](https://github.com/trajectonomics/cli/blob/v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+
+## `traj data remove`
+
+Delete the stored data, and nothing else in the data directory.
+
+- `--confirm <string>` — the data directory's own path, typed to confirm the deletion
+- `--backup <string>` — a backup directory, or its `traj.jsonl`, holding a copy of the data as it is now
+
+Without `--confirm` the command removes nothing: it prints what the removal would lose, such as
+`4 transactions, 8 postings and 7 accounts`. With `--confirm` but no `--backup`, or with a backup
+that does not match the data, it also removes nothing. A matching backup is one whose bytes equal
+the canonical dump of the data as it stands, so take a fresh backup after every write:
+
+```bash
+traj data remove                                    # Refuse, and print what the removal would lose.
+traj data remove --confirm ~/.traj --backup backup  # Delete traj.db after checking the backup holds every row.
+```
+
+The removal deletes `traj.db-shm`, `traj.db-wal` and `traj.db`, in that order, so the database goes
+last. It leaves the data directory, the launcher's `bin/` cache and anything else in it. The result
+lists the files removed and what remains beside them.
+
+A complete replacement takes three commands: back up, remove, then [restore](/docs/cli/commands/restore/).
+
+```bash
+traj backup --out backup
+traj data remove --confirm ~/.traj --backup backup
+traj restore backup
+```
+
+See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.

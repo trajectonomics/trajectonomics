@@ -1,0 +1,30 @@
+---
+title: restore
+description: Write a backup's rows into an empty database.
+---
+
+`traj restore` reads a backup written by [`traj backup`](/docs/cli/commands/backup/) and writes its
+rows into an empty database. It never merges and never overwrites: a database that already holds
+data is refused with `restore_target_not_empty` (exit code `5`), and the message names
+`traj data remove` as the way to clear it first
+([ADR 0038](https://github.com/trajectonomics/cli/blob/v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+
+- `<source>` — a backup directory holding `traj.jsonl`, or that file's own path; required
+
+The backup is read before anything is created, so a missing one leaves no data directory behind.
+If the database does not exist, restore creates it, the only command besides `traj init` that does.
+
+```bash
+traj restore backup                    # Restore a backup directory.
+traj restore backup/traj.jsonl --json  # Restore the file itself and describe what was written.
+```
+
+To replace live data, remove it deliberately and then restore:
+
+```bash
+traj backup --out backup
+traj data remove --confirm ~/.traj --backup backup
+traj restore backup
+```
+
+See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.
