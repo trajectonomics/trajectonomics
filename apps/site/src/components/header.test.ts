@@ -164,6 +164,20 @@ describe("the Header component in every Language, current or not", () => {
 				expect(menus(page)).toHaveLength(1)
 			})
 
+			it(`puts the Language menu after the repository link, at the end of the bar (${variant})`, async () => {
+				const page = await renderHeader(language, dictionary, markCurrent)
+				const { link } = repositoryLink(page)
+				const menu = menus(page)[0]
+				if (menu === undefined) throw new Error("no Language menu rendered")
+				const end = page.elements.find((element) =>
+					(element.attributes["class"] ?? "").split(/\s+/).includes("header-end"),
+				)
+				if (end === undefined) throw new Error("no header-end group rendered")
+				expect(link.ancestors.includes(end)).toBe(true)
+				expect(menu.ancestors.includes(end)).toBe(true)
+				expect(page.elements.indexOf(menu)).toBeGreaterThan(page.elements.indexOf(link))
+			})
+
 			it(`marks the current Language only when the page is its home (${variant})`, async () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
 				const current = elementsByTag(page, "a").find(

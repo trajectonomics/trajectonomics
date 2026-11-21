@@ -37,10 +37,12 @@ const artwork = mark
 		</a>
 		<div class="header-nav">
 			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
+		</div>
+		<div class="header-end">
+			<RepoLink dictionary={dictionary} />
 			<span class="header-sep" aria-hidden="true"></span>
 			<LanguageMenu language={language} dictionary={dictionary} markCurrent={markCurrent} />
 		</div>
-		<RepoLink dictionary={dictionary} />
 	</nav>
 </header>
 

@@ -126,3 +126,23 @@ describe("release-drift.yml, the weekly release report", () => {
 		).toBe(false)
 	})
 })
+
+describe("deploy.yml, the daily star refresh", () => {
+	const workflow = load("deploy.yml")
+	const deploy = () => workflow.jobs?.["deploy"] ?? { steps: [] }
+
+	it("runs every day, so the star count is read again", () => {
+		const schedule = workflow.on?.["schedule"] as { cron: string }[] | undefined
+		expect(schedule).toHaveLength(1)
+		expect(schedule?.[0]?.cron).toMatch(/^\d+ \d+ \* \* \*$/)
+	})
+
+	it("refreshes the star count before the Site's build, and never fails the deploy over it", () => {
+		const steps = deploy().steps ?? []
+		const refresh = steps.findIndex((step) => step.run?.startsWith("bun run stars:update"))
+		const build = steps.findIndex((step) => step.run?.includes("turbo run build"))
+		expect(refresh).toBeGreaterThan(-1)
+		expect(refresh).toBeLessThan(build)
+		expect(steps[refresh]?.run).toContain("||")
+	})
+})
