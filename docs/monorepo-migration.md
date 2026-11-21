@@ -32,8 +32,7 @@ What goes away after the move:
 5. **Also not moved:** `copy-engine` (already moved out), `cicd` (config lives in this repo instead;
    only the release scripts it holds, `version.ts` and `release-plan.ts`, get copied in during phase 5),
    `factory` (becomes a skill, a separate task after the migration), and `technical-template`.
-6. **`design-system`: open question**, see §2a. It is left out of phase 1. Because the import script is
-   idempotent, it can be added later.
+6. **`design-system` becomes `packages/brand`**, a public npm package built for white-label themes (§2a, §2b).
 
 ### How history is kept
 
@@ -66,7 +65,7 @@ packages/
   ledger/            <- ledger-core   (@trajectonomics/ledger)
   tax/               <- tax-core      (@trajectonomics/tax)
   sim/               <- sim-core      (@trajectonomics/sim)
-  brand/             <- design-system, slimmed (only if §2a says so)
+  brand/             <- design-system  (@trajectonomics/brand, white-label themes, §2b)
 skills/
   customer/          <- skills           (the published agent skills)
   internal/          <- internal-skills
@@ -97,12 +96,52 @@ So the parts in use are a few CSS files and some static brand files. The rest is
 system with its own npm releases. About 200 lines of Svelte, plus Storybook, Vitest and a Prettier
 setup, have no consumer.
 
-**Recommendation:** don't import it as it stands. Replace it with one private workspace package,
-`packages/brand`, that holds the tokens, the CSS build and the assets. Don't publish it to npm.
-Drop the Svelte package and Storybook; they stay readable in the archived repo. Site and docs then
-switch to `@trajectonomics/brand` with `workspace:*`. One alternative is to import the history and
-delete the unused parts in phase 2. Another is to keep design-system as its own repo for now, with
-site and docs still using the npm packages.
+**Decision (2026-11-21):** import design-system's history into `packages/brand` and make it one
+**public, npm-published** package, `@trajectonomics/brand`. Drop the Svelte package and Storybook;
+they stay readable in the archived repo. Core and theme exist so we can add themes and white-label
+the product for other companies, and `brand` keeps that ability and makes it easier.
+
+### 2b. `packages/brand` for white-label
+
+Today, adding a theme means touching `core/src/themes/<name>.ts`, `core/src/themes.ts` and the
+theme package's prebuilt CSS list, and logos and fonts only exist for Trajectonomics. Instead, a
+**brand is a folder**:
+
+```
+packages/brand/
+  src/                      token contract, primitives, contrast checks (from core)
+                            defineTheme, validation, themeToCss, Tailwind stylesheet (from theme)
+  brands/
+    trajectonomics/
+      light.ts              export default defineTheme({ name: "trajectonomics-light", tokens: {...} })
+      dark.ts
+      assets/               logo/, favicon/, fonts/ (from design-system assets + brand-source)
+    acme/                   a white-label customer: copy the folder, change tokens and assets
+      light.ts
+      dark.ts
+      assets/
+  scripts/build.ts          finds brands/*, writes dist/brands/<brand>/{light,dark}.css,
+                            tailwind.css, typography.css, and copies assets/
+```
+
+- **Adding a brand = adding a folder.** The build and the tests find `brands/*` themselves.
+  Nothing gets registered by hand.
+- **Every brand is tested automatically.** A test runs over every folder in `brands/*` and fails if
+  a theme breaks the Semantic Token Contract, misses the WCAG AA contrast floor (the check core has
+  today), or lacks a required asset (logo mark, favicon set).
+- **Exports:** `@trajectonomics/brand` (the JS API: `defineTheme`, `themeToCss`, the contract, the
+  `brands` list) and `@trajectonomics/brand/brands/<brand>/light.css`, `.../dark.css`, `.../logo/mark.svg`, and so on.
+- **Picking a brand in an app:** site and docs read `BRAND` (default `trajectonomics`) at build time
+  and import that brand's CSS and assets through one alias, `@brand/*`. A white-label deploy is
+  then the same app built with `BRAND=acme`: one more Cloudflare worker, no code fork.
+- **Brands outside this repo:** a company can `bun add @trajectonomics/brand`, call `defineTheme`
+  with its own tokens and `themeToCss` to get its CSS, all without a pull request here.
+- **Private customer brands:** this repo is public, so a brand folder that a customer wants kept
+  private belongs in a private repo that depends on `@trajectonomics/brand`. The same folder layout
+  works there.
+- **npm:** `@trajectonomics/brand` is a new name. The first version gets published by hand once,
+  then trusted publishing is set up (the same as any new package). The four old `design-system*`
+  packages get `npm deprecate` with a pointer to `@trajectonomics/brand`.
 
 ## 3. Known problems to fix during the move
 
@@ -145,7 +184,7 @@ package folder):
 - push to main → for each publishable package whose folder changed, publish an alpha (dist-tag `alpha`).
 - `workflow_dispatch` with a `package` and `bump` → stable release, tag `<name>-vX.Y.Z`, GitHub
   release named after the package.
-- Publishable packages: money, ledger, tax, sim, cli. If §2a ends with `packages/brand`, it stays private.
+- Publishable packages: money, ledger, tax, sim, cli, brand.
 - Publish order follows the dependency graph (money → ledger/tax → sim → cli). `workspace:*` gets
   replaced by the real version at publish time (`bun publish` does this).
 - **Old tags:** imported tags are renamed with the package prefix (`v0.2.0` in sim-core →
@@ -186,7 +225,8 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 | # | Phase | Agent | Check before moving on |
 |---|---|---|---|
 | 1 | **Import with history**: script `tooling/migrate/import.sh` runs `git filter-repo --to-subdirectory-filter <dest> --tag-rename ':<prefix>-'` on a fresh clone of each repo, then `git merge --allow-unrelated-histories`. No content edits. | DeepSeek V4.1 Flash | `git log --follow` works for a file in each package; tag count matches the source repos |
-| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, and do whatever §2a decides | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
+| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, and add design-system to the import (`packages/brand`) | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
+| 2b | **Brand package**: restructure `packages/brand` per §2b, delete the Svelte package and Storybook, switch site and docs to `@trajectonomics/brand` with `BRAND` selection | DeepSeek V4 Pro, reviewed by Opus | site and docs build pixel-identical with `BRAND=trajectonomics`; a throwaway `brands/example` passes the tests without touching any other file |
 | 3 | **Agent docs and skills**: merge `AGENTS.md`/`CLAUDE.md`/`CODING_STANDARDS.md`/`GLOSSARY.md` into the root, one skills lock | DeepSeek V4.1 Flash | No duplicate root skill dirs; `bun run skills:check` passes |
 | 4 | **CI**: `ci.yml` + `pr-title.yml` with turbo affected; delete per-package workflows | DeepSeek V4 Pro | A PR touching only `packages/money` runs only money and its dependents |
 | 5 | **Release**: generalized `release.yml`, CLI binaries, installer tag lookup | DeepSeek V4 Pro, reviewed by Opus | Dry-run publish (`npm publish --dry-run`) of every package in dependency order |
