@@ -46,7 +46,7 @@ person who has done this before is noticed before anything is installed.
 
 When the two install checks pass and step 3 has ended — its question answered by the person directly
 or grounded in the Ledger File they already have, or, where the read failed, that failure reported and
-the handover made — and a below-floor command line has been disclosed where one exists, and a skill
+the handover made — and a below-floor command line has been disclosed where one exists, as has a skill
 whose range the command line has passed, setup is done:
 this skill stops, and every later conversation about their money is the operating skill's.
 
@@ -182,8 +182,8 @@ money, and that another machine needs setup once.
 
 Done when their answer is in hand — given directly, or confirmed against the Ledger File — or, where
 the read failed, the failure has been reported and the conversation handed over; a below-floor command
-line has been disclosed where one exists, and a skill whose range the command line has passed; and the
-operating skill is running the conversation.
+line has been disclosed where one exists, as has a skill whose range the command line has passed; and
+the operating skill is running the conversation.
 
 ## What setup leaves behind
 

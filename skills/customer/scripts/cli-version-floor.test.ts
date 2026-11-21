@@ -14,7 +14,7 @@ const skill = read(ONBOARDING_SKILL_PATH)
 /** The sentence both rules that end setup must count. */
 const DISCLOSURE_COUNTED = "a below-floor command line has been disclosed"
 /** The above-range disclosure both rules that end setup must count too (skills ADR 0004). */
-const ABOVE_RANGE_COUNTED = "a skill whose range the command line has passed"
+const ABOVE_RANGE_COUNTED = "as has a skill whose range the command line has passed"
 
 /** The pinned floor the Skill must state; a Skill that states another fails naming both numbers. */
 function pinnedFloor(skillSource: string): string {
