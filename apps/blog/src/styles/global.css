@@ -14,6 +14,9 @@
 @import "./header.css";
 @import "./footer.css";
 @import "./page.css";
+@import "./list.css";
+@import "./post.css";
+@import "./prose.css";
 
 /* A test fixture spells markup the blog never ships, so it must not become a stylesheet source. */
 @source not "../**/*.test.ts";

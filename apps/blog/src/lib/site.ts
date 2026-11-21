@@ -1,11 +1,11 @@
-/** The public origin every canonical and share URL is built on. */
-export const SITE_ORIGIN = "https://trajectonomics.com"
+/** The blog's own host: every canonical and share URL is built on it. */
+export const SITE_ORIGIN = "https://blog.trajectonomics.com"
 
-/** The path the router mounts the blog at, with the trailing slash every address carries. */
-export const BLOG_PATH = "/blog/"
+/** The blog's front page, the root of its host. */
+export const BLOG_PATH = "/"
 
-/** The Site Home: the root of the apex, which the router answers with the Site. */
-export const SITE_HOME_PATH = "/"
+/** The Site Home: the landing page at the root of the apex. */
+export const SITE_HOME_URL = "https://trajectonomics.com/"
 
 /** The Docs Portal, on its own host since docs ADR 0013. */
 export const DOCS_URL = "https://docs.trajectonomics.com/"

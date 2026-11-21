@@ -4,10 +4,9 @@
 	"compatibility_date": "2026-11-01",
 	"workers_dev": true,
 	// Static Assets only: no "main", so no script runs (ADR 0002). One Worker serves every collection.
-	// No "routes" and no "custom_domain" on purpose: the router reaches this Worker by a service
-	// binding and mounts it at /blog without stripping the prefix (web-router#22).
+	// The Worker owns blog.trajectonomics.com and attaches it on deploy, as the Docs Portal does.
+	"routes": [{ "pattern": "blog.trajectonomics.com", "custom_domain": true }],
 	"assets": {
-		// astro.config.ts builds into dist/blog, so /blog/... URLs resolve under ./dist.
 		"directory": "./dist",
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"

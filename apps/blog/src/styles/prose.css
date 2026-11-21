@@ -1,0 +1,82 @@
+/* The Markdown body of a Post: headings in the display face, code on the secondary surface. */
+
+.post-body {
+	font-size: 17px;
+}
+
+.post-body > * + * {
+	margin-top: 1.25em;
+}
+
+.post-body h2 {
+	margin-top: 2.2em;
+	font-family: var(--font-display);
+	font-size: 30px;
+	font-weight: 300;
+	letter-spacing: -0.02em;
+	line-height: 1.2;
+}
+
+.post-body p,
+.post-body ul,
+.post-body ol {
+	margin-bottom: 0;
+}
+
+.post-body ul,
+.post-body ol {
+	padding-left: 1.25em;
+}
+
+.post-body li + li {
+	margin-top: 0.5em;
+}
+
+.post-body a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 4px;
+}
+
+.post-body a:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+.post-body code {
+	padding: 0.1em 0.35em;
+	border-radius: var(--ds-radius-sm);
+	background: var(--ds-color-secondary);
+	font-family: var(--font-mono);
+	font-size: 0.85em;
+}
+
+.post-body pre {
+	overflow-x: auto;
+	padding: 16px 18px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-secondary);
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.post-body pre code {
+	padding: 0;
+	background: none;
+	font-size: inherit;
+}
+
+.post-body figure {
+	margin: 2em 0;
+}
+
+.post-body figcaption {
+	margin-top: 10px;
+	font-size: 14px;
+	color: var(--ds-color-muted-foreground);
+}
+
+.post-body strong {
+	font-weight: 600;
+}

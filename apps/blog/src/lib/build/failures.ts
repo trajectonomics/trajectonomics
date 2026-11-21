@@ -1,12 +1,10 @@
 /** One rule the built blog breaks; each rule has its own code. */
 export type FailureCode =
-	| "file-outside-base"
-	| "preload-path-served"
-	| "security-policy-header-set"
-	| "security-policy-meta-set"
 	| "not-found-page-missing"
 	| "page-title-missing"
 	| "page-canonical-missing"
+	| "page-image-missing"
+	| "page-image-alt-missing"
 	| "shell-home-link-missing"
 	| "shell-blog-link-missing"
 	| "shell-footer-missing"
@@ -18,7 +16,7 @@ export interface Failure {
 	readonly message: string
 }
 
-/** A file in the build output: its path under `dist/`, and its text when it is a page or headers file. */
+/** A file in the build output: its path under `dist/`, and its text when it is a page. */
 export interface BuiltFile {
 	readonly path: string
 	readonly text?: string

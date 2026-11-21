@@ -12,9 +12,9 @@ const config = JSON.parse(
 	),
 )
 
-// The deploy reads this file, and the router's service binding names the Worker: its shape is a rule.
+// The deploy reads this file and attaches the domain it names: its shape is a rule.
 describe("the blog Worker", () => {
-	test("is named blog, the name the router's service binding uses", () => {
+	test("is named blog, the name the deploy and the dashboard use", () => {
 		expect(config.name).toBe("blog")
 	})
 
@@ -22,13 +22,12 @@ describe("the blog Worker", () => {
 		expect(config.main).toBeUndefined()
 	})
 
-	test("attaches no route and no custom domain, because the router reaches it", () => {
-		expect(config.routes).toBeUndefined()
+	test("owns blog.trajectonomics.com as a custom domain, and no other route", () => {
+		expect(config.routes).toEqual([{ pattern: "blog.trajectonomics.com", custom_domain: true }])
 		expect(config.route).toBeUndefined()
-		expect(JSON.stringify(config)).not.toContain("custom_domain")
 	})
 
-	test("keeps its workers.dev address, for checking a deploy before the router mounts it", () => {
+	test("keeps its workers.dev address, for checking a deploy before the domain answers", () => {
 		expect(config.workers_dev).toBe(true)
 	})
 
@@ -36,7 +35,7 @@ describe("the blog Worker", () => {
 		expect(config.env).toBeUndefined()
 	})
 
-	test("serves ./dist, where /blog/... resolves to the build", () => {
+	test("serves ./dist, the root of its host", () => {
 		expect(config.assets.directory).toBe("./dist")
 	})
 

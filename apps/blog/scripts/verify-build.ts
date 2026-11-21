@@ -3,7 +3,7 @@ import { resolve } from "node:path"
 import { checkBuild } from "../src/lib/build/check-build"
 import { readBuiltFiles } from "./read-built-files"
 
-/** The Worker's assets root: Astro builds into dist/blog, and the Worker serves dist. */
+/** The Worker's assets root, where Astro builds the blog. */
 const BUILD_ROOT = "dist"
 
 /** Checks the built blog on disk and returns the process exit code. */

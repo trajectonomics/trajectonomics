@@ -3,16 +3,17 @@ import { checkBuild } from "./check-build"
 import type { BuiltFile, FailureCode } from "./failures"
 
 /** A page that meets every rule; each test breaks one. */
-const HEAD = `<title>Blog</title><link rel="canonical" href="https://trajectonomics.com/blog/">`
-const SHELL = `<a href="/">Home</a><a href="/blog/">Blog</a><footer></footer>`
-const PAGE = `<html><head>${HEAD}</head><body>${SHELL}</body></html>`
+const HEAD = `<title>Blog</title><link rel="canonical" href="https://blog.trajectonomics.com/">`
+const IMAGE = `<img src="/posts/a/cover.webp" alt="Three robots">`
+const SHELL = `<a href="https://trajectonomics.com/">Home</a><a href="/">Blog</a><footer></footer>`
+const PAGE = `<html><head>${HEAD}</head><body>${IMAGE}${SHELL}</body></html>`
 const NOT_FOUND = `<html><head><title>Not found</title><meta name="robots" content="noindex"></head><body>${SHELL}</body></html>`
 
-/** A build that passes: the front page and the Not-found Page. */
+/** A build that passes: the front page, its image and the Not-found Page. */
 const GOOD: readonly BuiltFile[] = [
-	{ path: "blog/index.html", text: PAGE },
-	{ path: "blog/404.html", text: NOT_FOUND },
-	{ path: "blog/fonts/aleo-latin-300.woff2" },
+	{ path: "index.html", text: PAGE },
+	{ path: "404.html", text: NOT_FOUND },
+	{ path: "posts/a/cover.webp" },
 ]
 
 /** The codes a build fails with. */
@@ -22,7 +23,7 @@ function codes(files: readonly BuiltFile[]): readonly FailureCode[] {
 
 /** The good build with its front page replaced. */
 function withFrontPage(html: string): readonly BuiltFile[] {
-	return [{ path: "blog/index.html", text: html }, ...GOOD.slice(1)]
+	return [{ path: "index.html", text: html }, ...GOOD.slice(1)]
 }
 
 describe("the built blog", () => {
@@ -51,41 +52,30 @@ describe("the built blog", () => {
 		expect(codes(GOOD)).not.toContain("page-canonical-missing")
 	})
 
-	test("a build that serves the router's preload path fails", () => {
-		expect(codes([...GOOD, { path: "blog/__mf-preload.js" }])).toEqual(["preload-path-served"])
-	})
-
-	test("a preload file at the assets root fails twice: outside the base, and served", () => {
-		expect(codes([...GOOD, { path: "__mf-preload.js" }])).toEqual([
-			"file-outside-base",
-			"preload-path-served",
+	test("an image the build does not contain fails", () => {
+		expect(codes(GOOD.filter((file) => file.path !== "posts/a/cover.webp"))).toEqual([
+			"page-image-missing",
 		])
 	})
 
-	test("a security policy in a page's meta fails", () => {
-		const html = PAGE.replace(
-			"</head>",
-			`<meta http-equiv="Content-Security-Policy" content="script-src 'self'"></head>`,
-		)
-		expect(codes(withFrontPage(html))).toEqual(["security-policy-meta-set"])
+	test("an image with no alt text fails", () => {
+		expect(codes(withFrontPage(PAGE.replace(' alt="Three robots"', "")))).toEqual([
+			"page-image-alt-missing",
+		])
 	})
 
-	test("a security policy in a headers file fails", () => {
-		const headers = {
-			path: "blog/_headers",
-			text: "/*\n  Content-Security-Policy: default-src 'self'",
-		}
-		expect(codes([...GOOD, headers])).toEqual(["security-policy-header-set"])
+	test("an image from another host is not looked for in the build", () => {
+		const html = PAGE.replace("/posts/a/cover.webp", "https://example.com/a.webp")
+		expect(codes(withFrontPage(html))).toEqual([])
 	})
 
 	test("a page with no link to the Site Home fails", () => {
-		expect(codes(withFrontPage(PAGE.replace('<a href="/">Home</a>', "")))).toEqual([
-			"shell-home-link-missing",
-		])
+		const html = PAGE.replace('<a href="https://trajectonomics.com/">Home</a>', "")
+		expect(codes(withFrontPage(html))).toEqual(["shell-home-link-missing"])
 	})
 
 	test("a page with no link to the blog's front page fails", () => {
-		expect(codes(withFrontPage(PAGE.replace('<a href="/blog/">Blog</a>', "")))).toEqual([
+		expect(codes(withFrontPage(PAGE.replace('<a href="/">Blog</a>', "")))).toEqual([
 			"shell-blog-link-missing",
 		])
 	})
@@ -97,17 +87,13 @@ describe("the built blog", () => {
 	})
 
 	test("a build with no Not-found Page fails", () => {
-		expect(codes(GOOD.filter((file) => file.path !== "blog/404.html"))).toEqual([
+		expect(codes(GOOD.filter((file) => file.path !== "404.html"))).toEqual([
 			"not-found-page-missing",
 		])
 	})
 
-	test("a file outside /blog fails, because the router forwards nothing else", () => {
-		expect(codes([...GOOD, { path: "favicon.ico" }])).toEqual(["file-outside-base"])
-	})
-
 	test("each failure names the file that breaks the rule", () => {
 		const [failure] = checkBuild(withFrontPage(PAGE.replace("<footer></footer>", "")))
-		expect(failure?.path).toBe("blog/index.html")
+		expect(failure?.path).toBe("index.html")
 	})
 })

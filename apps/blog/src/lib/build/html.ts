@@ -36,14 +36,15 @@ export function isNoindex(html: string): boolean {
 	)
 }
 
-/** Whether the page sets a content security policy in a meta tag. */
-export function setsSecurityPolicy(html: string): boolean {
-	return tags(html, "meta").some(
-		(attributes) => attributes.get("http-equiv")?.toLowerCase() === "content-security-policy",
-	)
-}
-
 /** Every link target in the page. */
 export function linkTargets(html: string): readonly string[] {
 	return tags(html, "a").flatMap((attributes) => attributes.get("href") ?? [])
+}
+
+/** Every image in the page, as its source and its alternative text (`undefined` when it has none). */
+export function images(html: string): readonly { src: string; alt: string | undefined }[] {
+	return tags(html, "img").map((attributes) => ({
+		src: attributes.get("src") ?? "",
+		alt: attributes.get("alt"),
+	}))
 }

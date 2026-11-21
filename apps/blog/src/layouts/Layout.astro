@@ -6,8 +6,8 @@ import lightTheme from "@trajectonomics/brand/current/light.css?raw"
 import Footer from "../components/Footer.astro"
 import Header from "../components/Header.astro"
 import "../styles/global.css"
-import { canonicalUrl } from "../lib/page-url"
-import { BLOG_PATH, SITE_NAME } from "../lib/site"
+import { canonicalUrl, fileUrl } from "../lib/page-url"
+import { SITE_NAME } from "../lib/site"
 import { themeRole } from "../lib/theme-role"
 import { FALLBACK_THEME, themeScript } from "../lib/themes"
 
@@ -19,9 +19,18 @@ interface Props {
 	readonly indexed: boolean
 	/** The blog's front page marks the header's Blog link as the current page. */
 	readonly isFrontPage?: boolean
+	/** The image a share card shows: a Post's cover. */
+	readonly image?: {
+		readonly src: string
+		readonly alt: string
+		readonly width: number
+		readonly height: number
+	}
+	/** A Post's publication date, which makes the page an article to a share card. */
+	readonly article?: Date
 }
 
-const { title, description, indexed, isFrontPage = false } = Astro.props
+const { title, description, indexed, isFrontPage = false, image, article } = Astro.props
 const canonical = canonicalUrl(Astro.url.pathname)
 // The browser's bar takes each Theme's background, read from the brand's stylesheets.
 const themeColours = [
@@ -47,17 +56,28 @@ const themeColours = [
 					<meta property="og:title" content={title} />
 					{description === undefined ? null : <meta property="og:description" content={description} />}
 					<meta property="og:url" content={canonical} />
-					<meta property="og:type" content="website" />
+					<meta property="og:type" content={article === undefined ? "website" : "article"} />
+					{article === undefined ? null : (
+						<meta property="article:published_time" content={article.toISOString().slice(0, 10)} />
+					)}
 					<meta property="og:site_name" content={SITE_NAME} />
-					<meta name="twitter:card" content="summary" />
+					{image === undefined ? null : (
+						<>
+							<meta property="og:image" content={fileUrl(image.src)} />
+							<meta property="og:image:width" content={String(image.width)} />
+							<meta property="og:image:height" content={String(image.height)} />
+							<meta property="og:image:alt" content={image.alt} />
+						</>
+					)}
+					<meta name="twitter:card" content={image === undefined ? "summary" : "summary_large_image"} />
 				</>
 			) : (
 				<meta name="robots" content="noindex" />
 			)
 		}
-		<link rel="icon" href={`${BLOG_PATH}favicon/favicon.svg`} type="image/svg+xml" />
-		<link rel="icon" href={`${BLOG_PATH}favicon/favicon.ico`} sizes="16x16 32x32 48x48" />
-		<link rel="apple-touch-icon" href={`${BLOG_PATH}favicon/apple-touch-icon.png`} />
+		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
+		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
 	</head>
 	<body class="blog-body">
 		<a class="skip-link" href="#main">Skip to content</a>

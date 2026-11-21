@@ -1,0 +1,74 @@
+/* A Post: a narrow reading column, the cover a little wider, and the body in the Theme's quiet type. */
+
+.post {
+	width: 100%;
+	max-width: 72rem;
+	margin: 0 auto;
+	padding: 56px 1.25rem 96px;
+}
+
+@media (min-width: 40rem) {
+	.post {
+		padding: 88px 1.5rem 120px;
+	}
+}
+
+.post-header,
+.post-body,
+.post-fair-play {
+	max-width: 42rem;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.post-header {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.post-title {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: clamp(2.5rem, 6vw, 3.75rem);
+	font-weight: 300;
+	letter-spacing: -0.03em;
+	line-height: 1.05;
+}
+
+.post-lede {
+	margin: 0;
+	font-size: 19px;
+	color: var(--ds-color-muted-foreground);
+}
+
+.post-byline {
+	margin: 0;
+	font-size: 14px;
+}
+
+.post-cover {
+	max-width: 52rem;
+	margin: 40px auto 48px;
+}
+
+.post-cover img,
+.post-body img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: var(--ds-radius-md);
+}
+
+.post-fair-play {
+	margin-top: 56px;
+	padding-top: 20px;
+	border-top: 1px solid var(--ds-color-border);
+	font-size: 14px;
+	color: var(--ds-color-muted-foreground);
+}
+
+.post-fair-play a {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 4px;
+}

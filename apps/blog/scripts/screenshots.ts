@@ -10,8 +10,9 @@ const OUTPUT_ROOT = resolve(import.meta.dir, "..", "docs", "screenshots")
 
 /** The pages a Surface ticket shows, by file-name stem. */
 const PAGES = Object.freeze([
-	{ name: "front", path: "/blog/" },
-	{ name: "not-found", path: "/blog/missing/" },
+	{ name: "front", path: "/" },
+	{ name: "post", path: "/guides/one-answer-every-time/" },
+	{ name: "not-found", path: "/missing/" },
 ])
 
 /** The widths every Surface ticket's evidence covers: desktop, wide and phone. */
@@ -27,7 +28,7 @@ async function answer(request: Request): Promise<Response> {
 		join(BUILD_ROOT, pathname.endsWith("/") ? `${pathname}index.html` : pathname),
 	)
 	if (await file.exists()) return new Response(file)
-	return new Response(Bun.file(join(BUILD_ROOT, "blog", "404.html")), {
+	return new Response(Bun.file(join(BUILD_ROOT, "404.html")), {
 		status: 404,
 		headers: { "content-type": "text/html; charset=utf-8" },
 	})

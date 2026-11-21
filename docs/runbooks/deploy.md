@@ -47,11 +47,11 @@ the workers by name, so a deploy changes nothing in the router.
 
 ## The blog's first deploy
 
-The first deploy of `apps/blog` creates the Worker `blog`; nothing in Cloudflare needs creating by
-hand. It has no route of its own: check it on its `workers.dev` address (`/blog/` answers 200), then
-the router mounts it at `trajectonomics.com/blog` with a service binding to `blog` and
-`stripPrefix: false` (trajectonomics/web-router#22). Until that route lands, the apex `/blog` is not
-the blog.
+The first deploy of `apps/blog` creates the Worker `blog` and attaches `blog.trajectonomics.com` as
+a custom domain, as the docs Worker attaches its host. Nothing in Cloudflare needs creating by hand,
+but the hostname must not already be a CNAME, and the API token needs permission to attach a custom
+domain on the `trajectonomics.com` zone. Then open `https://blog.trajectonomics.com/`. The router is
+not involved.
 
 ## White-label deploys
 

@@ -6,7 +6,8 @@ are `packages/brand`'s.
 
 ## Post
 
-One published article under `/blog/`. Every Post has exactly one **Post Type**.
+One published article on the blog, one Markdown file under `src/content/posts/`. Every Post has
+exactly one **Post Type**.
 
 ## Post Type
 
@@ -41,7 +42,7 @@ The token `[OWNER TO WRITE]`, standing for an Owner-written Value not written ye
 
 ## Site Home
 
-`/` on the apex: the Site's landing page, which the header's brand mark links to.
+`https://trajectonomics.com/`: the Site's landing page, which the header's brand mark links to.
 
 ## Docs Portal
 
@@ -53,4 +54,4 @@ The header, the dark footer and the Not-found page that every page sits inside.
 
 ## Not-found Page
 
-`/blog/404.html`, the blog's own 404 body inside the Shell, answered for every miss under `/blog/`.
+`404.html`, the blog's own 404 body inside the Shell, answered for every miss.

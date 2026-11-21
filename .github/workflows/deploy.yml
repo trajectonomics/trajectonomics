@@ -2,8 +2,8 @@ name: Deploy
 
 # Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs) and the
 # blog (worker "blog", apps/blog) to Cloudflare Workers from main. The docs Worker attaches
-# docs.trajectonomics.com. The router still forwards trajectonomics.com/docs so the Worker can
-# redirect it, and mounts the blog at trajectonomics.com/blog. docs/runbooks/deploy.md has the setup.
+# docs.trajectonomics.com and the blog Worker attaches blog.trajectonomics.com. The router still
+# forwards trajectonomics.com/docs so the docs Worker can redirect it. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
 #                         config, the lockfile), changed in the push.
