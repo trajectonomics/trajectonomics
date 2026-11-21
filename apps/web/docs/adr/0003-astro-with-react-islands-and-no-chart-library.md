@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [ADR 0006](0006-svelte-5-on-sveltekit-replaces-astro-and-react.md)
 ---
 
 # Astro with React islands and no chart library

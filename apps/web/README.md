@@ -2,7 +2,7 @@
 
 A read-only web app that shows what `traj` already computed. It reads one Snapshot, a JSON document made only of `traj … --json` results, and renders it on `127.0.0.1`. It never does arithmetic on money and never sends anything anywhere.
 
-Requires a checkout of this repository and [Bun](https://bun.sh). The `traj` binary is built from this workspace.
+Requires a checkout of this repository and [Bun](https://bun.sh). The `traj` binary is built from this workspace. The pages are Svelte 5 on SvelteKit, built as static files ([ADR 0006](docs/adr/0006-svelte-5-on-sveltekit-replaces-astro-and-react.md)).
 
 ```sh
 bun install
@@ -10,7 +10,7 @@ bunx turbo run build --filter=@trajectonomics/cli   # builds apps/cli/dist/traj
 bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-05-15 --age 45 --age 60
 ```
 
-`dashboard` builds the pages, writes the Snapshot to `dist/snapshot.json` from your own ledger (`TRAJ_HOME`, or `~/.traj`), and previews on `127.0.0.1`. Run it again to see new figures.
+`dashboard` builds the pages with Vite, writes the Snapshot to `dist/snapshot.json` from your own ledger (`TRAJ_HOME`, or `~/.traj`), and previews on `127.0.0.1:4321`. Run it again to see new figures.
 
 ## Commands
 
@@ -18,8 +18,8 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 |---|---|
 | `bun run snapshot -- --as-of DATE --horizon DATE [--scenario NAME]... [--compare A B] [--birth-date DATE] [--age N]... [--monthly] [--carry-in PATH] [--traj PATH] [--out FILE]` | Runs the Plan and writes a Snapshot. `traj` is taken from `--traj`, then `TRAJ_BINARY_PATH`, then `PATH`. |
 | `bun run demo` | Builds a fictional ledger in a temporary directory and rewrites `public/demo/snapshot.json`, the committed Demo snapshot. |
-| `bun run dashboard -- …` | Builds the pages, writes `dist/snapshot.json` with the same flags as `snapshot`, and previews. |
-| `bun run check` | Lint, typecheck, tests and the build. |
+| `bun run dashboard -- …` | Builds the pages, writes `dist/snapshot.json` with the same flags as `snapshot`, and previews with `vite preview`. |
+| `bun run check` | Lint, typecheck (`svelte-check` with warnings as errors), tests (including the Svelte guard) and the build. |
 
 ## Where it lives
 
@@ -27,13 +27,16 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 - `src/lib/snapshot/`: the pure Plan, which decides the argv and assembles the Snapshot.
 - `scripts/`: the I/O: spawning `traj`, reading the ledger for the demo, writing files.
 - `src/lib/view/`, `src/lib/format/`, `src/lib/chart/`: pure functions from a Snapshot to what a page shows, the formatting of the CLI's strings, and the chart geometry.
-- `src/client/`: the browser: storage, the address bar, `fetch`, and the React hooks over them.
-- `src/components/` and `src/pages/`: the eight pages, one island each.
+- `src/client/`: the browser: storage, the address bar, `fetch`, and the Svelte modules (`.svelte.ts`) that hold the reactive state over them.
+- `src/routes/`: the eight routes, one `+page.svelte` each, and the root layout (the shell, prerendered as static files).
+- `src/components/`: the Svelte components: `ui/` (shared), `chart/`, `shell/`, `net-worth/` and `pages/`.
+- `src/styles/`: the brand's CSS.
+- `scripts/svelte/`: the preload that lets `bun test` render components, and the test stand-in for SvelteKit's `$app` modules.
 - `docs/adr/` and [GLOSSARY.md](GLOSSARY.md): why it is shaped this way, and its words.
 
 ## Pages
 
-Overview, Net worth, Ledger, Projection, FI date, Compare, Tax and Health. Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx astro preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
+Overview, Net worth, Ledger, Projection, FI date, Compare, Tax and Health. Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
 
 ## Licence
 

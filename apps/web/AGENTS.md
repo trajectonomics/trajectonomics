@@ -1,14 +1,39 @@
 # AGENTS.md
 
-Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is specific to `apps/web`, the Dashboard: a read-only static web app that renders a Snapshot of `traj --json` results.
+Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is specific to `apps/web`, the Dashboard: a read-only static web app that renders a Snapshot of `traj --json` results. It is Svelte 5 on SvelteKit ([ADR 0006](docs/adr/0006-svelte-5-on-sveltekit-replaces-astro-and-react.md)).
 
 ## Rules
 
-1. The CLI is the only source of figures. The Dashboard never imports a core to compute, never does arithmetic on money, and shows the CLI's decimal strings as they are ([ADR 0002](docs/adr/0002-the-cli-is-the-only-source-of-figures.md)). A string may be parsed to a number only to place a mark on a chart.
-2. `src/lib/` is pure: data in, data out, no I/O, no clock, no `Date`, no `process`. Spawning `traj`, reading and writing files, and the command line live in `scripts/`. The browser (storage, the address bar, `fetch`) and the React hooks over it live in `src/client/`. The Snapshot plan (`src/lib/snapshot/`) emits read leaves only, and `leaves.test.ts` pins that allowlist.
+1. The CLI is the only source of figures. The Dashboard never imports a core to compute, never does arithmetic on money, and shows the CLI's decimal strings as they are ([ADR 0002](docs/adr/0002-the-cli-is-the-only-source-of-figures.md)). A string may be parsed to a number only to place a mark on a chart, in `toChartNumber` in `src/lib/chart/`.
+2. `src/lib/` is pure: data in, data out, no I/O, no clock, no `Date`, no `process`. Spawning `traj`, reading and writing files, and the command line live in `scripts/`. The browser (storage, the address bar, `fetch`, the document) is reached only from `src/client/`. The Snapshot plan (`src/lib/snapshot/`) emits read leaves only, and `leaves.test.ts` pins that allowlist.
 3. Dates come from the caller (`--as-of`, `--horizon`), never from the machine ([cli ADR 0029](../cli/docs/adr/0029-reads-take-their-date-from-the-caller.md)).
 4. The Dashboard is a checkout tool. Do not add hosting, a Worker, a `wrangler.jsonc`, a deploy job or anything under `.github/` without the owner. It runs on `127.0.0.1` ([ADR 0004](docs/adr/0004-no-server-and-no-hosting.md)).
 5. The contract in `src/lib/contract/` follows `traj schema <leaf> --json`. Take every field from that output, never from memory. A change in the CLI's output must fail `scripts/contract.test.ts`, which builds a ledger with the workspace `traj` binary.
-6. Done means `bun run check` passes in `apps/web`: Biome lint with zero warnings, strict typecheck, tests, and the Astro build. Do not loosen `tsconfig.base.json`, `biome.json` or the shared config to make an error go away.
+6. Done means `bun run check` passes in `apps/web`: Biome lint with zero warnings, `svelte-check` and the strict typecheck with warnings as errors, the tests (including the Svelte guard) and the Vite build. Do not loosen `tsconfig.base.json`, `biome.json` or the shared config to make an error go away.
 7. Keep to the vocabulary in [GLOSSARY.md](GLOSSARY.md). A Snapshot is not a "backend response", and a Read is not a "fetch".
 8. Subagents do the work on a work model: **`deepseek-v4.1-flash`** (Pi). The expensive models (`claude-*`, `gemini-*`) are for consultation and review only.
+
+## Svelte 5: how to write a component
+
+The Svelte 5 docs are the reference, and they are current: read them, not your memory of Svelte 3 or 4. Fetch `https://svelte.dev/docs/svelte/llms.txt` for the language (runes, snippets, event attributes, `.svelte.ts` modules, `render` from `svelte/server`) and `https://svelte.dev/docs/kit/llms.txt` for SvelteKit (page options, `$app/state`, `$app/navigation`, the static adapter).
+
+- **Runes only.** Props are `let { a, b = 1 }: Props = $props()`; state is `$state`; a value computed from others is `$derived` (or `$derived.by`). Never `export let`, `$:`, `$$props`, `$$restProps` or `$$slots`.
+- **Snippets, not slots.** A child is a `children: Snippet` prop, rendered with `{@render children()}`. A named piece of markup is a `{#snippet name()}…{/snippet}`.
+- **Event attributes.** `onclick={handler}`, `onkeydown={…}`, never `on:click`.
+- **Every `<script>` is `lang="ts"`.** A component is at most 100 non-blank lines; split it when it grows.
+- **Shared reactive state is a `.svelte.ts` module under `src/client/`** that exports a class instance or a `$state` object. Never a Svelte store (`svelte/store`), and never a reactive `let` exported from a module (it is not reactive for an importer).
+- **`$effect` only to touch the browser.** Anything computed is `$derived`. Starting a read on mount is `onMount`, in the shell.
+- **Page logic stays in the pure view models in `src/lib/view/`.** A component only renders: it takes the view model's values as props and places them.
+- **A component takes props.** It reads `$app/state` only when it is a route file (`src/routes/`) or part of the shell (the root layout and `src/components/shell/`). Components below the shell read the address through `src/client/location.svelte.ts`, and the Snapshot through `src/client/snapshot.svelte.ts`.
+- **Query-string state** (such as the Scenario a page shows) is read in a route file with `queryParam` and set with `setQueryParam` from `src/client/query-param.svelte.ts`. The helper replaces the entry and does not load.
+- **Tests render to a string** with `render` from `svelte/server`, after `bunfig.toml` has preloaded the compiler. A snippet a test passes is made with `createRawSnippet`. `$app/*` resolves to `scripts/svelte/app-stub.ts`, where a test sets the address with `setTestUrl`.
+
+## The guards, and how to read a failure
+
+- **Runes mode** (`vite.config.ts`, `compilerOptions.runes`). A Svelte 4 form fails the compile, in `svelte-check` or `vite build`: `Cannot use export let in runes mode — use $props() instead`. Write the form it names.
+- **`svelte-check --fail-on-warnings`** (`bun run typecheck`). A deprecated form that still compiles, such as `<slot>` or `on:click`, fails here as a warning, and so does a symbol that is declared and not used, which Biome cannot see in markup.
+- **The Svelte guard** (`bun test`, `scripts/svelte-guard.test.ts`). It prints `file:line [rule] message`, for example `Money.svelte:2 [money/number-conversion] …`. The message names the Svelte 5 form to write. The rules are in `src/lib/guard/`, one file per kind of rule, each with a bad and a good example in `rules.test.ts`.
+- **The dependency guard** (`scripts/dependency-guard.test.ts`) is a `test.todo` until the last React page is ported. Then it becomes a test that the package lists no `react`, `react-dom`, `astro` or `@astrojs/*`.
+- **Biome** lints and formats `.svelte` scripts and checks the file length of `.ts` files. It does not check the markup, and the unused-symbol rules are off for `.svelte` (see above). A markup problem is caught by the browser tests, not by Biome.
+
+Biome's formatter moves the body of a `<script>` to column zero. Write it that way, as `bun run format` leaves it.

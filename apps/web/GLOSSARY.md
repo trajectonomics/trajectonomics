@@ -5,7 +5,7 @@ A read-only web app, in this repository, that shows what `traj` already computed
 ## Language
 
 **Dashboard**:
-The static web app in `apps/web`: pages and React islands that render one Snapshot and compute no figure of their own.
+The static web app in `apps/web`: Svelte 5 pages and components that render one Snapshot and compute no figure of their own.
 _Avoid_: backend, API, sync, server
 
 **Snapshot**:
