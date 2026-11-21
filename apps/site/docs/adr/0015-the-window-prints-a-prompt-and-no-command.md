@@ -99,3 +99,7 @@ The owner asked on 2026-11-19: *"Remove prompt in the CTA let make it only 2 but
 - The prompt text still ships in every Language home inside a `hidden` `code[data-install-prompt]`. The Copy control reads that text, and the pure built-file rule still proves the exact sentence is present and is not a command. What that rule no longer proves is that a visitor can read the sentence: that guarantee is retired with this change.
 - With JavaScript off, the Copy control and the prompt both stay hidden; the CLI link is the only CTA action. A visitor with no agent and no script has one way out, not two. This is a named gap, not a solved problem.
 - The measured event name and its stable `install` value stay unchanged, so the copy series is not split.
+
+## Amendment (2026-11-21): the prompt's raw URL points into the monorepo
+
+`trajectonomics/skills` was archived in the monorepo cutover, so its raw URL would have served a frozen Onboarding skill (issue #16). The prompt now names `https://raw.githubusercontent.com/trajectonomics/trajectonomics/main/skills/customer/skills/traj-onboarding/SKILL.md`, and the footer's skills and licence links point at the `skills/customer` folder. The no-command decision stands; `skills/customer` owns that file and proves the install (its ADR 0005).

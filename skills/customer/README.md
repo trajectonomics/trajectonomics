@@ -2,7 +2,7 @@
 
 Agent skills for Trajectonomics
 
-[![CI](https://github.com/trajectonomics/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/trajectonomics/skills/actions/workflows/ci.yml)
+[![CI](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml/badge.svg)](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 Part of the [Trajectonomics](https://github.com/trajectonomics) ecosystem.
@@ -14,12 +14,12 @@ Part of the [Trajectonomics](https://github.com/trajectonomics) ecosystem.
 Install the onboarding skill, then let your agent set you up:
 
 ```bash
-npx skills add trajectonomics/skills --skill traj-onboarding
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding
 ```
 
 Or paste this to your agent, which runs it for you:
 
-> Install `traj` for me. Run `npx skills add trajectonomics/skills --skill traj-onboarding -y`, then
+> Install `traj` for me. Run `npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -y`, then
 > read the `traj-onboarding` skill and follow it to set me up. If you cannot run shell commands, say
 > so and give me the command above to run myself.
 

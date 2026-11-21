@@ -37,7 +37,9 @@ describe("Step 2, installing the published set", () => {
 	})
 
 	it("reads the manifest at that commit and installs one explicit --skill per row", () => {
-		expect(stepTwo).toContain("Fetch `skills.manifest.json` from `trajectonomics/skills` at the")
+		expect(stepTwo).toContain(
+			"Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the",
+		)
 		expect(stepTwo).toContain("in install order")
 		expect(stepTwo).toContain("with an explicit `--skill` per")
 	})
