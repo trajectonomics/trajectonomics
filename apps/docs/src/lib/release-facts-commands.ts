@@ -41,8 +41,9 @@ export function commandTableProblems(
 
 /** The `0` ok, `1` unexpected … line under `## Exit codes`, as entries. */
 function exitCodeLine(content: string): readonly HelpEntry[] | undefined {
-	const section = /^## Exit codes\n+(.+)$/m.exec(content)?.[1]
-	if (section === undefined) return undefined
+	const heading = /^## Exit codes\n+/m.exec(content)
+	if (heading === null) return undefined
+	const section = content.slice(heading.index + heading[0].length).split(/\n\s*\n/)[0] ?? ""
 	return [...section.matchAll(/`(\d+)`\s+([^,.]+)/g)].map((match) => ({
 		name: match[1] ?? "",
 		summary: (match[2] ?? "").trim(),

@@ -50,14 +50,16 @@ async function runAll(
 		console.log(`run-examples: ${QUICKSTART_PAGE} is missing, so nothing was run`)
 		return 1
 	}
+	const quickstartExamples = execExamples(quickstart)
+	if (quickstartExamples.length === 0) {
+		console.log(
+			`run-examples: ${QUICKSTART_PAGE} has no bash exec examples, so nothing was checked`,
+		)
+		return 1
+	}
 	const seed = join(root, "seed")
 	await mkdir(seed)
-	const seeded = await runPage(
-		execExamples(quickstart),
-		seed,
-		await workdirFor(root, "quickstart"),
-		env,
-	)
+	const seeded = await runPage(quickstartExamples, seed, await workdirFor(root, "quickstart"), env)
 	if (seeded.problems.length > 0) {
 		report(seeded.problems)
 		console.log("run-examples: the Quickstart failed, so the other pages were skipped")

@@ -8,6 +8,7 @@ export type ReleaseFactRule =
 	| "exit-codes"
 	| "retryable-codes"
 	| "error-code-unknown"
+	| "error-exit-code"
 	| "env-var-missing"
 	| "env-var-unknown"
 

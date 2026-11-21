@@ -30,13 +30,19 @@ export async function snapshotRelease(
 	if (help === undefined || schema === undefined) {
 		throw new CheckError("RELEASE_UNREADABLE", `traj ${release.version} did not print its help`)
 	}
-	return {
+	const snapshot: CliRelease = {
 		...release,
 		commands: helpSection(help, "Commands"),
 		exitCodes: helpSection(help, "Exit codes"),
 		environment: helpSection(help, "Environment"),
 		errors: errorsOf(schema),
 	}
+	for (const field of ["commands", "exitCodes", "environment", "errors"] as const) {
+		if (snapshot[field].length === 0) {
+			throw new CheckError("SNAPSHOT_INCOMPLETE", `traj ${release.version} printed no ${field}`)
+		}
+	}
+	return snapshot
 }
 
 /** Write the latest (or `--version`) release's snapshot and return the process exit code. */
@@ -45,6 +51,13 @@ export async function main(argv: readonly string[], deps: CommandReferenceDeps):
 		const release = await snapshotRelease(deps, requestedVersion(argv))
 		await mkdir(dirname(CLI_RELEASE_PATH), { recursive: true })
 		await Bun.write(CLI_RELEASE_PATH, `${JSON.stringify(release, null, "\t")}\n`)
+		const formatted = Bun.spawnSync(["bunx", "biome", "format", "--write", CLI_RELEASE_PATH], {
+			stdout: "pipe",
+			stderr: "pipe",
+		})
+		if (formatted.exitCode !== 0) {
+			throw new CheckError("SNAPSHOT_UNFORMATTED", "biome could not format the snapshot")
+		}
 		deps.print(`snapshot:cli: wrote ${CLI_RELEASE_PATH} for traj ${release.version}`)
 		return 0
 	} catch (error) {

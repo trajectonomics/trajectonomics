@@ -10,10 +10,11 @@ export interface AdrLinkProblem {
 
 /**
  * A path or URL with an `adr/` segment, wherever the page writes it: an inline link with or without
- * a title, a reference definition, an autolink, a bare URL or an HTML anchor. Matching the path
+ * a title, a reference definition, an autolink, a bare URL, an HTML anchor or the `adr` folder itself. Matching the path
  * rather than the link syntax keeps every form a page can link with inside the check.
  */
-const ADR_PATH = /(?<![\w-])(?:[^\s()<>"'[\]]*\/)?adr\/[^\s()<>"'[\]]+/gi
+const ADR_PATH =
+	/(?<![\w-])(?:(?:[^\s()<>"'[\]]*\/)?adr\/[^\s()<>"'[\]]*|[^\s()<>"'[\]]*\/adr(?![\w-]))/gi
 
 /** Every design-record path in `file`; empty outside the Operator tab, whose readers are contributors. */
 function linkProblems(file: ContentFile): readonly AdrLinkProblem[] {

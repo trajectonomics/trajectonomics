@@ -23,6 +23,8 @@ concurrency:
 jobs:
   docs-release:
     name: Docs release
+    # A stable release is a dispatched Release run; the alpha runs on push are skipped.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -45,10 +47,13 @@ jobs:
           if [ -z "$latest" ]; then
             echo "::notice::Could not read npm's latest dist-tag for @trajectonomics/cli; nothing to compare."
             echo "state=unknown" >> "$GITHUB_OUTPUT"
+          elif [ "$latest" != "$snapshot" ] && [ "$(printf '%s\n%s\n' "$snapshot" "$latest" | sort -V | tail -n 1)" = "$latest" ]; then
+            echo "state=behind" >> "$GITHUB_OUTPUT"
           elif [ "$latest" = "$snapshot" ]; then
             echo "state=current" >> "$GITHUB_OUTPUT"
           else
-            echo "state=behind" >> "$GITHUB_OUTPUT"
+            echo "::warning::The snapshot records @trajectonomics/cli@$snapshot, which is newer than npm's latest @trajectonomics/cli@$latest."
+            echo "state=ahead" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Find the open issue

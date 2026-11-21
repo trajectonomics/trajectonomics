@@ -27,22 +27,42 @@ function nextNonBlank(lines: readonly string[], from: number): number | undefine
 	return index === -1 ? undefined : index
 }
 
-/** The block a page's `output` fence directly after `block` records, if there is one. */
-function expectedOutput(
+/** The `output` fence directly after `block` (only blank lines between), if there is one. */
+function outputBlockAfter(
+	lines: readonly string[],
+	blocks: readonly FenceBlock[],
+	block: FenceBlock,
+): FenceBlock | undefined {
+	const next = nextNonBlank(lines, block.end + 1)
+	const output = blocks.find((candidate) => candidate.start === next)
+	if (output === undefined || !infoWords(output.open.info).includes("output")) {
+		return undefined
+	}
+	return output
+}
+
+/** The start line index of every `output` fence that a `bash exec` fence in `blocks` claims. */
+export function claimedOutputStarts(
+	lines: readonly string[],
+	blocks: readonly FenceBlock[],
+): ReadonlySet<number> {
+	const starts = blocks
+		.filter((block) => infoWords(block.open.info).includes("exec"))
+		.map((block) => outputBlockAfter(lines, blocks, block)?.start)
+	return new Set(starts.filter((start): start is number => start !== undefined))
+}
+
+/** The output a `bash exec` fence is checked against: its following `output` fence, if any. */
+function expectedOutputOf(
 	lines: readonly string[],
 	blocks: readonly FenceBlock[],
 	block: FenceBlock,
 ): ExpectedOutput | undefined {
-	const next = nextNonBlank(lines, block.end + 1)
-	const output = blocks.find((candidate) => candidate.start === next)
+	const output = outputBlockAfter(lines, blocks, block)
 	if (output === undefined) {
 		return undefined
 	}
-	const words = infoWords(output.open.info)
-	if (!words.includes("output")) {
-		return undefined
-	}
-	const [language = ""] = words
+	const [language = ""] = infoWords(output.open.info)
 	return { language, text: output.body }
 }
 
@@ -56,7 +76,7 @@ export function execExamples(file: ContentFile): readonly ExecExample[] {
 			file: file.path,
 			line: block.start + 1,
 			script: block.body,
-			expected: expectedOutput(lines, blocks, block),
+			expected: expectedOutputOf(lines, blocks, block),
 		}))
 }
 
