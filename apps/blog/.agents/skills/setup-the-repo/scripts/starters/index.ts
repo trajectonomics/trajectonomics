@@ -1,5 +1,0 @@
-export { cliStarter } from "./cli"
-export { coreStarter } from "./core"
-export { minimalStarter } from "./minimal"
-export { serviceStarter } from "./service"
-export type { Starter } from "./types"
