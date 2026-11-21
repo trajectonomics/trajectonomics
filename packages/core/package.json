@@ -1,6 +1,7 @@
 {
 	"name": "@trajectonomics/core",
 	"version": "0.0.0-development",
+	"private": true,
 	"description": "Pure personal-finance core: money, double-entry ledger, Thai and US income tax, and the projection engine, as subpath exports.",
 	"license": "MIT",
 	"repository": {
@@ -82,10 +83,6 @@
 		"README.md",
 		"LICENSE"
 	],
-	"publishConfig": {
-		"access": "public",
-		"provenance": true
-	},
 	"scripts": {
 		"build": "tsdown",
 		"typecheck": "tsc -p tsconfig.json",

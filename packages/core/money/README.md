@@ -12,9 +12,8 @@ Zero dependencies, no I/O, no clock, no randomness. It ships no currency table a
 
 ## Install
 
-```bash
-bun add @trajectonomics/core
-```
+Not published. It ships inside the `traj` CLI through [`packages/core`](../README.md); inside this
+repository, depend on `@trajectonomics/core` with `workspace:*` and import `@trajectonomics/core/money`.
 
 ## API
 
@@ -54,10 +53,10 @@ Convert **once**, at the boundary you own, and carry integer Minor Units from th
 
 ## Releasing
 
-This package is not published on its own. It ships inside
-[`@trajectonomics/core`](../README.md), which releases as `core-vX.Y.Z` from
-`.github/workflows/release.yml`; see [docs/runbooks/release.md](../../../docs/runbooks/release.md).
-Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose).
+This package is not published. It ships inside the `traj` CLI's binaries through
+[`packages/core`](../README.md), so a change here reaches users in the next `cli-vX.Y.Z` release; see
+[docs/runbooks/release.md](../../../docs/runbooks/release.md). `package.json` says
+`0.0.0-development` on purpose and is never edited by hand.
 
 ## License
 

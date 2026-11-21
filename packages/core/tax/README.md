@@ -4,10 +4,8 @@ Pure, deterministic statutory tax calculation engine with subpaths for Thailand 
 
 ## Install
 
-```bash
-bun add @trajectonomics/core
-npm install @trajectonomics/core
-```
+Not published. It ships inside the `traj` CLI through [`packages/core`](../README.md); inside this
+repository, depend on `@trajectonomics/core` with `workspace:*` and import its `tax` subpaths.
 
 ## Quick start
 
@@ -132,10 +130,10 @@ The golden corpus in `src/th/tests/levy-golden.test.ts` generates over 3,000 det
 
 ## Releasing
 
-This package is not published on its own. It ships inside
-[`@trajectonomics/core`](../README.md), which releases as `core-vX.Y.Z` from
-`.github/workflows/release.yml`; see [docs/runbooks/release.md](../../../docs/runbooks/release.md).
-Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose).
+This package is not published. It ships inside the `traj` CLI's binaries through
+[`packages/core`](../README.md), so a change here reaches users in the next `cli-vX.Y.Z` release; see
+[docs/runbooks/release.md](../../../docs/runbooks/release.md). `package.json` says
+`0.0.0-development` on purpose and is never edited by hand.
 
 ## License
 

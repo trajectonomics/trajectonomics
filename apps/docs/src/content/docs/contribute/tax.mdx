@@ -6,7 +6,8 @@ description: "How to contribute tax rules: what to change, the source rule, two 
 This guide is for people who know a country's or a state's tax rules and want the code to follow
 them. You do not need to know the rest of the codebase.
 
-The package is `@trajectonomics/tax`. It is published as `@trajectonomics/core/tax`, with the
+The package is `@trajectonomics/tax`. It reaches users inside the `traj` CLI, which bundles it through
+`packages/core` as `@trajectonomics/core/tax`, with the
 Thai and US entry points at `@trajectonomics/core/tax/th` and `@trajectonomics/core/tax/us`. Paths
 in this guide are relative to this folder, `packages/core/tax`, unless they start with `packages/`.
 
@@ -144,7 +145,7 @@ Use this for a country that has no folder yet. The example code is `xx`, and the
 5. **Cover your stages in the string check.** `scripts/check-no-hardcoded-strings.ts` scans only
    `src/th/stages`, `src/us/stages` and `src/us/state`. Add your stage folder to `STAGES_DIRS`, or the
    check does not cover it.
-6. **Export the subpath in the bundle.** The published package is built by `packages/core`, not by this
+6. **Export the subpath in the bundle.** The bundle the CLI builds on is `packages/core`, not this
    folder. Add an entry such as `"tax/xx/index": here("./tax/src/xx/index.ts")` to
    `packages/core/tsdown.config.ts`. Add a `./tax/xx` entry to `packages/core/package.json`, with the
    `import` and `require` types and default files, copied from the `./tax/th` entry. In this folder, add
