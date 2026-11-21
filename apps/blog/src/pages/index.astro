@@ -1,0 +1,23 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
+import Layout from "../layouts/Layout.astro"
+---
+
+<Layout
+	title="Blog · Trajectonomics"
+	description="Comparisons, guides and news about traj, the free, open-source financial simulation tool for AI agents."
+	indexed={true}
+	front={true}
+>
+	<section class="masthead" aria-labelledby="masthead-title">
+		<p class="meta-label">Trajectonomics blog</p>
+		<h1 id="masthead-title" class="masthead-title">Comparisons, guides and news</h1>
+		<p class="masthead-lede">
+			How traj compares with what you would otherwise do, with every number from a test you can rerun.
+		</p>
+	</section>
+	<section class="posts" aria-labelledby="posts-title">
+		<h2 id="posts-title" class="meta-label posts-title">Latest</h2>
+		<p class="empty-state">No posts yet. The first one compares traj with an agent working alone.</p>
+	</section>
+</Layout>

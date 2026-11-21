@@ -1,8 +1,9 @@
 name: Deploy
 
-# Deploys the Site (worker "site", apps/site) and the Docs Portal (worker "docs", apps/docs) to
-# Cloudflare Workers from main. The docs Worker attaches docs.trajectonomics.com. The router still
-# forwards trajectonomics.com/docs so the Worker can redirect it. docs/runbooks/deploy.md has the setup.
+# Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs) and the
+# blog (worker "blog", apps/blog) to Cloudflare Workers from main. The docs Worker attaches
+# docs.trajectonomics.com. The router still forwards trajectonomics.com/docs so the Worker can
+# redirect it, and mounts the blog at trajectonomics.com/blog. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
 #                         config, the lockfile), changed in the push.
@@ -18,7 +19,7 @@ on:
       app:
         description: Which worker to deploy.
         type: choice
-        options: [all, site, docs]
+        options: [all, site, docs, blog]
         default: all
 
 permissions:
@@ -50,7 +51,7 @@ jobs:
               exit 1
             fi
             case "$APP" in
-            all) apps='["site","docs"]' ;;
+            all) apps='["site","docs","blog"]' ;;
             *) apps="[\"$APP\"]" ;;
             esac
           else
@@ -60,7 +61,7 @@ jobs:
             fi
             shared=(packages/brand tooling/config bun.lock package.json turbo.json)
             apps='[]'
-            for app in site docs; do
+            for app in site docs blog; do
               if [ -n "$(git diff --name-only "$base" "$SHA" -- "apps/$app" "${shared[@]}")" ]; then
                 apps=$(jq -c --arg app "$app" '. + [$app]' <<<"$apps")
               fi
@@ -107,7 +108,7 @@ jobs:
       - name: Install the workspace
         run: bun install --frozen-lockfile
 
-      # turbo builds packages/brand first: both apps import its dist/current/.
+      # turbo builds packages/brand first: every app imports its dist/current/.
       - name: Build
         env:
           APP: ${{ matrix.app }}

@@ -6,7 +6,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 - [`apps/site`](apps/site/AGENTS.md): the Site at trajectonomics.com (Worker `site`, static HTML).
 - [`apps/docs`](apps/docs/AGENTS.md): the docs portal (Worker `docs`, `@trajectonomics/docs`).
-- [`apps/blog`](apps/blog/AGENTS.md): the blog (Worker, not deployed yet).
+- [`apps/blog`](apps/blog/AGENTS.md): the blog at trajectonomics.com/blog (Worker `blog`, static Astro, mounted by the router).
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
 - `packages/core`: `@trajectonomics/core`, the engine bundle the CLI builds on (private, not published). It bundles the four packages below as subpath exports (`/money`, `/ledger`, `/tax`, `/sim`).
   - [`packages/core/money`](packages/core/money/AGENTS.md), [`packages/core/ledger`](packages/core/ledger/AGENTS.md), [`packages/core/tax`](packages/core/tax/AGENTS.md), [`packages/core/sim`](packages/core/sim/AGENTS.md): private workspace packages.

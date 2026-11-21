@@ -1,0 +1,70 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import {
+	BLOG_PATH,
+	DOCS_URL,
+	GITHUB_ORG_URL,
+	ISSUES_URL,
+	LICENCE_URL,
+	SITE_HOME_PATH,
+	SITE_NAME,
+	SOURCE_URL,
+} from "../lib/site"
+
+/** The link columns: a mono label and its links. The page's one `nav` is the header's. */
+const columns = [
+	{
+		label: "Read",
+		links: [
+			{ text: "Blog", href: BLOG_PATH },
+			{ text: "Docs", href: DOCS_URL },
+			{ text: "Site Home", href: SITE_HOME_PATH },
+		],
+	},
+	{
+		label: "Source",
+		links: [
+			{ text: "Source code", href: SOURCE_URL },
+			{ text: "Organisation", href: GITHUB_ORG_URL },
+		],
+	},
+	{
+		label: "Help",
+		links: [
+			{ text: "Report a wrong fact", href: ISSUES_URL },
+			{ text: "Licence", href: LICENCE_URL },
+		],
+	},
+] as const
+---
+
+<footer class="blog-footer">
+	<div class="blog-footer-inner">
+		<div class="blog-footer-top">
+			<div class="blog-footer-brand">
+				<span class="blog-footer-name">{SITE_NAME}</span>
+				<span class="blog-footer-tagline">Free, open-source financial simulation for AI agents.</span>
+			</div>
+			<div class="blog-footer-columns">
+				{
+					columns.map((column) => (
+						<div>
+							<span class="meta-label blog-footer-label">{column.label}</span>
+							<ul class="blog-footer-links">
+								{column.links.map((link) => (
+									<li>
+										<a class="blog-footer-link" href={link.href}>
+											{link.text}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
+		</div>
+		<p class="blog-footer-licence">{SITE_NAME}. The blog's source is MIT licensed.</p>
+	</div>
+</footer>

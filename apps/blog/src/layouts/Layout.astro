@@ -1,0 +1,68 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import darkTheme from "@trajectonomics/brand/current/dark.css?raw"
+import lightTheme from "@trajectonomics/brand/current/light.css?raw"
+import Footer from "../components/Footer.astro"
+import Header from "../components/Header.astro"
+import "../styles/global.css"
+import { canonicalUrl } from "../lib/page-url"
+import { BLOG_PATH, SITE_NAME } from "../lib/site"
+import { themeRole } from "../lib/theme-role"
+import { FALLBACK_THEME, themeScript } from "../lib/themes"
+
+interface Props {
+	readonly title: string
+	/** An indexable page's one-line summary; the Not-found page passes none. */
+	readonly description?: string
+	/** Whether search engines may index the page: every page but the Not-found page. */
+	readonly indexed: boolean
+	/** The blog's front page marks the header's Blog link as the current page. */
+	readonly front?: boolean
+}
+
+const { title, description, indexed, front = false } = Astro.props
+const canonical = canonicalUrl(Astro.url.pathname)
+// The browser's bar takes each Theme's background, read from the brand's stylesheets.
+const paints = [
+	{ scheme: "light", colour: themeRole(lightTheme, "background") },
+	{ scheme: "dark", colour: themeRole(darkTheme, "background") },
+]
+---
+
+<html lang="en" data-theme={FALLBACK_THEME}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script is:inline set:html={themeScript()}></script>
+		<title>{title}</title>
+		{paints.map((paint) => (
+			<meta name="theme-color" media={`(prefers-color-scheme: ${paint.scheme})`} content={paint.colour} />
+		))}
+		{
+			indexed ? (
+				<>
+					{description === undefined ? null : <meta name="description" content={description} />}
+					<link rel="canonical" href={canonical} />
+					<meta property="og:title" content={title} />
+					{description === undefined ? null : <meta property="og:description" content={description} />}
+					<meta property="og:url" content={canonical} />
+					<meta property="og:type" content="website" />
+					<meta property="og:site_name" content={SITE_NAME} />
+					<meta name="twitter:card" content="summary" />
+				</>
+			) : (
+				<meta name="robots" content="noindex" />
+			)
+		}
+		<link rel="icon" href={`${BLOG_PATH}favicon/favicon.svg`} type="image/svg+xml" />
+		<link rel="icon" href={`${BLOG_PATH}favicon/favicon.ico`} sizes="16x16 32x32 48x48" />
+		<link rel="apple-touch-icon" href={`${BLOG_PATH}favicon/apple-touch-icon.png`} />
+	</head>
+	<body class="blog-body">
+		<a class="skip-link" href="#main">Skip to content</a>
+		<Header current={front} />
+		<main id="main" class="blog-main"><slot /></main>
+		<Footer />
+	</body>
+</html>
