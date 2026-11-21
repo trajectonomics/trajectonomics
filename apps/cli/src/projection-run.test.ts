@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { writeFileSync } from "node:fs"
 import { join } from "node:path"
-import simPackage from "@trajectonomics/core/package.json"
+import simPackage from "../package.json"
 import { goldenTextIn, recordGoldenTextIn } from "./golden-test-support"
 import { AS_OF, baseFlags, HORIZON, projection, projectionHome } from "./projection/testing"
 import { runBody, tableOf } from "./projection-run-support"
@@ -30,7 +30,7 @@ async function expectGoldenEngineVersion(): Promise<void> {
 	const { engine } = JSON.parse(text) as { engine: { version: string } }
 	if (engine.version !== simPackage.version) {
 		throw new Error(
-			`The golden was produced with @trajectonomics/core ${engine.version}, but ${simPackage.version} is installed. Re-baseline it deliberately: TRAJ_UPDATE_GOLDEN=1 bun test src/projection-run.test.ts`,
+			`The golden was produced with @trajectonomics/cli ${engine.version}, but ${simPackage.version} is installed. Re-baseline it deliberately: TRAJ_UPDATE_GOLDEN=1 bun test src/projection-run.test.ts`,
 		)
 	}
 }
@@ -53,7 +53,7 @@ describe("projection run", () => {
 		expect(body.asOf).toBe(AS_OF)
 		expect(body.horizon).toBe(HORIZON)
 		expect(body.currency).toBe("THB")
-		expect(body.engine).toEqual({ package: "@trajectonomics/core", version: simPackage.version })
+		expect(body.engine).toEqual({ package: "@trajectonomics/cli", version: simPackage.version })
 		expect(body.scenario).toMatchObject({
 			name: "base",
 			contentHash: body.scenario.effectiveContentHash,

@@ -36,6 +36,10 @@ jobs:
       - name: Install the workspace
         working-directory: .
         run: bun install --frozen-lockfile
+      - name: Build the engine the CLI imports
+        # The check runs the CLI's source, which resolves @trajectonomics/core/* through core's dist/.
+        working-directory: .
+        run: bunx turbo run build --filter="@trajectonomics/cli^..." --concurrency=2
       - name: Read the latest published release's own command list
         # npm serves a version a minute or three before its release has assets (ADR-0023), so
         # this waits for the release rather than failing a pull request on that window.

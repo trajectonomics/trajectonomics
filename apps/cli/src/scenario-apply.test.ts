@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import simPackage from "@trajectonomics/core/package.json"
+import simPackage from "../package.json"
 import { acceptedScenarioSchemaVersion } from "./scenario/document"
 import {
 	applyScenario,
@@ -189,7 +189,7 @@ describe("scenario apply", () => {
 		])
 		expect(document.schema.properties["schemaVersion"]?.const).toBe(acceptedScenarioSchemaVersion())
 		expect(Object.keys(document.schema.properties)).toContain("flows")
-		expect(document.schema.description).toContain(`@trajectonomics/core@${simPackage.version}`)
+		expect(document.schema.description).toContain(`@trajectonomics/cli@${simPackage.version}`)
 		expect(document.schema.description).toContain("check()")
 		expect(described.errorCodes).toContain("invalid_input")
 		expect(described.errorCodes).toContain("database_busy")

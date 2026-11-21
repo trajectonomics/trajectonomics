@@ -34,8 +34,11 @@ What goes away after the move:
    `factory` (becomes a skill, a separate task after the migration), and `technical-template`.
 6. **`design-system` becomes `packages/brand`**, a package in this repo built for white-label themes (§2a, §2b).
    It is **not published to npm**.
-7. **Only two npm packages:** `@trajectonomics/core` (money, ledger, tax and sim as subpath exports)
-   and `@trajectonomics/cli`. Then `money`, `ledger`, `tax`, `sim` and the four `design-system*` packages get
+7. **One npm package: `@trajectonomics/cli`.** (Updated 2026-11-21: the owner dropped the planned
+   `@trajectonomics/core` release to focus on the product. `packages/core` stays a private bundle of
+   money, ledger, tax and sim that the CLI builds on; the CLI's output names its engine as
+   `@trajectonomics/cli` at the CLI's version.) Originally planned: `@trajectonomics/core` and
+   `@trajectonomics/cli`. Then `money`, `ledger`, `tax`, `sim` and the four `design-system*` packages get
    `npm deprecate`d with a pointer to the replacement. Versions already published keep installing. (§2c)
 8. **White-label goes through private mirror repos** (§2b), not through npm.
 9. **Docs:** remove the "Build on Trajectonomics" section and add a contributor guide aimed at people
@@ -68,7 +71,7 @@ apps/
   blog/              <- blog          (worker, not deployed yet)
   cli/               <- cli           (npm @trajectonomics/cli + 5 binaries)
 packages/
-  core/              @trajectonomics/core, published (§2c)
+  core/              @trajectonomics/core, private engine bundle (§2c)
     money/           <- money         (imported to packages/money in phase 1, git mv'd here)
     ledger/          <- ledger-core
     tax/             <- tax-core      (the main area for outside contributors, §2d)
@@ -155,7 +158,7 @@ packages/brand/                 @trajectonomics/brand (private, not published)
     the private repo does it every day and opens a PR if the merge does not apply cleanly.
   - The private repo deploys its own Cloudflare worker built with `BRAND=<company>`.
 
-### 2c. One published package: `@trajectonomics/core`
+### 2c. One engine package: `@trajectonomics/core` (private since 2026-11-21)
 
 Outside this repo, only `cli` and `docs` import money, ledger, tax and sim (about 100 import sites).
 npm shows about 2–4k downloads a month each, and the CLI itself only 681, so this is mostly our own
@@ -164,7 +167,7 @@ than they give.
 
 - **Layout: four private packages, one published bundle.**
   ```
-  packages/core/              @trajectonomics/core  (published)
+  packages/core/              @trajectonomics/core  (private bundle the CLI builds on)
     package.json, tsdown.config.ts, README.md, scripts/check-deps.ts
     money/   ledger/   tax/   sim/      private workspace packages, moved here with git mv
   ```
@@ -177,7 +180,7 @@ than they give.
   `ledger` or `tax` import anything internal except `money`, if `sim` or `money` import any internal
   package, or if `tax` imports `sim` outside its test files. `tax`'s levy tests may import `sim`.
 - `cli` changes imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on. `docs` keeps npm `sim@0.1.0` until phase 3b deletes the page that documents it.
-- Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
+- Release: one published package, `cli` (tags `cli-v*`); `core` is not published. Old tags
   imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
   higher than any old package's `latest`, so nobody mistakes the two.
 
@@ -269,8 +272,8 @@ package folder):
 - push to main → for each publishable package whose folder changed, publish an alpha (dist-tag `alpha`).
 - `workflow_dispatch` with a `package` and `bump` → stable release, tag `<name>-vX.Y.Z`, GitHub
   release named after the package.
-- Publishable packages: `core` and `cli` only.
-- Publish order: core, then cli. `workspace:*` gets
+- Publishable packages: `cli` only (core was dropped on 2026-11-21).
+- Publish order: only cli. `workspace:*` gets
   replaced by the real version at publish time (`bun publish` does this).
 - **Old tags:** imported tags are renamed with the package prefix (`v0.2.0` in sim-core →
   `sim-v0.2.0`), so `version.ts` keeps counting from the last release.
@@ -320,7 +323,7 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 | 5 | **Release**: generalized `release.yml`, CLI binaries, installer tag lookup, the docs Landing Page's release line (it came from the deleted `docs-sync-manifest.json`; take it from the latest `cli-v*` release instead), a `repository` field (with `directory`) in `packages/core` and `apps/cli` package.json, which npm provenance needs | DeepSeek V4 Pro, reviewed by Opus | Dry-run publish (`npm publish --dry-run`) of every package in dependency order |
 | 5b | **cli distribution** (decided 2026-11-21: cli releases live in this repo as `cli-vX.Y.Z`, always marked GitHub "latest"; core releases never are): launcher, `install.sh`/`install.ps1`, README and docs install lines point at `trajectonomics/trajectonomics/releases`; forwarding installers for one last release in `trajectonomics/cli`; the docs release line from the latest `cli-v*` tag | Claude Haiku, verified by Opus | Launcher and installer tests pass against the new URLs |
 | 5c | **Leftovers** found in 5a: inert issue/PR templates under `apps/{site,docs,blog}`, `packages/brand` and `skills/customer` (GitHub only reads the root `.github/`); old-flow release docs in `apps/cli/docs/runbooks/releasing.md`, `packages/brand/docs/publishing.md` and the core packages' READMEs | Claude Haiku | `git ls-files '*/.github/*'` is empty; no doc describes `trajectonomics/cicd` publishing |
-| 6 | **Cutover**: you publish `@trajectonomics/core` once by hand (a new name), set its trusted publisher, move `cli`'s trusted publisher here, deprecate the old npm packages, and update the Cloudflare projects. The agent also changes the customer skills' install command (`skills/customer/AGENTS.md` and docs) from `trajectonomics/skills` to this repo, and refreshes the root `skills-lock.json` (`bun run skills:update`): its 38 `mattpocock/skills` hashes are stale, carried over unchanged from the old repos' locks. The agent then opens archive-notice PRs in the old repos | You + DeepSeek Flash | A stable release of `money` from here; site and docs deploy from here |
+| 6 | **Cutover**, as `docs/runbooks/release.md` lays out: move `cli`'s npm Trusted Publisher here, turn on `RELEASES_ENABLED`, release cli `0.4.0`, repoint the Cloudflare workers, forward the old installers and archive the old repos. (Publishing `@trajectonomics/core` and deprecating the old packages were dropped on 2026-11-21.) The agent also changes the customer skills' install command (`skills/customer/AGENTS.md` and docs) from `trajectonomics/skills` to this repo, and refreshes the root `skills-lock.json` (`bun run skills:update`): its 38 `mattpocock/skills` hashes are stale, carried over unchanged from the old repos' locks. The agent then opens archive-notice PRs in the old repos | You + DeepSeek Flash | A stable release of `money` from here; site and docs deploy from here |
 | 7 | **Archive** the old repos | You | — |
 
 ### Rules for delegated phases

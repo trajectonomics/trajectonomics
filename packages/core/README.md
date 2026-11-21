@@ -2,12 +2,10 @@
 
 Pure personal-finance building blocks in one package: money, a double-entry ledger, Thai and US income tax, and a deterministic projection engine. Each piece is a subpath export.
 
-## Install
+## Not published
 
-```bash
-bun add @trajectonomics/core
-npm install @trajectonomics/core
-```
+This package is private: it is not on npm. The `traj` CLI (`apps/cli`) bundles it into its binaries,
+and nothing else consumes it. Inside this repository, depend on it with `"@trajectonomics/core": "workspace:*"`.
 
 ## Subpaths
 

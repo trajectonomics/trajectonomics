@@ -1,5 +1,5 @@
-import { version as simVersion } from "@trajectonomics/core/package.json"
 import { z } from "zod"
+import { version as cliVersion } from "../../package.json"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
 import {
 	SCENARIO_SHAPE_REQUIRED,
@@ -38,7 +38,7 @@ export const scenarioDocument: z.ZodType<unknown> = z
 		properties: scenarioShapeProperties(version),
 		required: [...SCENARIO_SHAPE_REQUIRED],
 		additionalProperties: false,
-		description: scenarioShapeDescription(simVersion),
+		description: scenarioShapeDescription(cliVersion),
 		// An example the pin cannot stamp is not a document this build accepts, so it is left out.
 		...(version === undefined ? {} : { examples: [scenarioExample(version)] }),
 	})

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Read the root [AGENTS.md](../../../AGENTS.md) first. This file holds only what is specific to `packages/core/ledger` (`@trajectonomics/ledger`). It is a private workspace package: it is published only through `@trajectonomics/core/ledger`.
+Read the root [AGENTS.md](../../../AGENTS.md) first. This file holds only what is specific to `packages/core/ledger` (`@trajectonomics/ledger`). It is a private workspace package: it is not published, and reaches users only inside the `traj` CLI, which bundles it through `packages/core`.
 
 ## Rules
 

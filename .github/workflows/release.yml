@@ -1,7 +1,7 @@
 name: Release
 
-# Publishes this repository's npm packages: @trajectonomics/core and @trajectonomics/cli. The packages
-# and their tags are listed in tooling/release/packages.json. Keep this file named release.yml: npm
+# Publishes this repository's one npm package, @trajectonomics/cli. packages/core is not published: the
+# CLI bundles it. The package and its tag prefix are listed in tooling/release/packages.json. Keep this file named release.yml: npm
 # trusted publishing validates the calling workflow's file name and repository.
 #
 #   push to main         -> alpha (dist-tag "alpha") for every package whose folder changed in the
@@ -21,7 +21,7 @@ on:
       package:
         description: Package to release as stable.
         type: choice
-        options: [core, cli]
+        options: [cli]
         required: true
       bump:
         description: "Stable version bump: auto reads the commits that touched the package since its last stable tag."
