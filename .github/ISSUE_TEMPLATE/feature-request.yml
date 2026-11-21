@@ -1,0 +1,51 @@
+name: Feature request
+description: Propose a new capability, a behaviour change or a domain extension.
+title: "feat: "
+labels: ["needs-triage"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: The folder the change belongs in.
+      options:
+        - cli (apps/cli)
+        - core/tax (packages/core/tax)
+        - core/sim (packages/core/sim)
+        - core/ledger (packages/core/ledger)
+        - core/money (packages/core/money)
+        - docs (apps/docs)
+        - site (apps/site)
+        - brand (packages/brand)
+        - skills (skills/)
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and motivation
+      description: What problem does this solve, and for whom? Why now?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: The capability, API shape or behaviour change you have in mind. Alternatives you rejected are useful too.
+    validations:
+      required: true
+  - type: textarea
+    id: terms
+    attributes:
+      label: Domain terminology
+      description: GLOSSARY.md terms this uses, or terms you propose to add.
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: The change is done when all of these hold.
+      options:
+        - label: New behaviour has tests that run under `bun test`.
+        - label: The change follows CODING_STANDARDS.md.
+        - label: "`bun run check` passes for the package (`bunx turbo run check --filter=<package>`)."
