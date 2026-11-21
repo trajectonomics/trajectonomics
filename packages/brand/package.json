@@ -1,0 +1,36 @@
+{
+	"name": "@trajectonomics/design-system-workspace",
+	"private": true,
+	"description": "Workspace root for the Trajectonomics design system packages. Never published.",
+	"type": "module",
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"workspaces": [
+		"packages/*",
+		"apps/*"
+	],
+	"scripts": {
+		"lint": "biome ci --error-on-warnings . && bun run --filter '*' lint",
+		"format": "biome check --write . && bun run --filter '*' format:svelte",
+		"typecheck": "tsc -p tsconfig.json && bun run --filter '*' typecheck",
+		"test": "bun test scripts && bun run --filter '*' test",
+		"build": "bun run --filter '*' build",
+		"lint:package": "bun run --filter '*' lint:package",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run lint:package",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update",
+		"check:published-docs": "bun scripts/check-published-docs.ts",
+		"smoke": "bash scripts/consumer-smoke.sh"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
+		"@biomejs/biome": "2.6.3",
+		"@trajectonomics/tooling": "1.1.0",
+		"@types/bun": "^1.4.4",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.2",
+		"typescript": "^7.0.2"
+	}
+}
