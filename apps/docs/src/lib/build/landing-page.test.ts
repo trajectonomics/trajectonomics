@@ -28,20 +28,24 @@ function searchIndex(pageIds: readonly string[]): BuiltFile {
 	}
 }
 
-/** The Landing Page body around its Tab links. */
-function landingBody(links: string): string {
-	return `<main>${links}</main>`
+/** The Landing Page body around its Tab links and the release line, when the build has one. */
+function landingBody(links: string, line = ""): string {
+	return `<main>${links}${line}</main>`
 }
 
-function codesOf(files: readonly BuiltFile[]): readonly string[] {
-	return checkLandingPage(files).map((failure) => failure.code)
+function codesOf(files: readonly BuiltFile[], releaseLine?: string): readonly string[] {
+	return checkLandingPage(files, releaseLine).map((failure) => failure.code)
 }
 
-const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`)
+const RELEASE_LINE = "Docs for traj 0.4.0"
+
+const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, `<p>${RELEASE_LINE}</p>`)
 
 describe("the built Landing Page", () => {
 	test("a page with one link to each Tab and no redirect reports no failure", () => {
-		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli"])])).toEqual([])
+		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs/cli"])], RELEASE_LINE)).toEqual(
+			[],
+		)
 	})
 
 	test("a page that is a meta refresh is reported as LANDING_PAGE_REDIRECT", () => {
@@ -84,6 +88,26 @@ describe("the built Landing Page", () => {
 		expect(codesOf([landingPage(TWO_ENTRIES), searchIndex(["/docs"])])).toEqual([
 			"LANDING_PAGE_INDEXED",
 		])
+	})
+
+	test("a page that does not state the release line is reported as LANDING_PAGE_RELEASE_LINE", () => {
+		const bare = landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`))
+
+		expect(codesOf([bare], RELEASE_LINE)).toEqual(["LANDING_PAGE_RELEASE_LINE"])
+	})
+
+	test("a page that states another release is reported as LANDING_PAGE_RELEASE_LINE", () => {
+		const stale = landingPage(
+			landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`, "<p>Docs for traj 0.3.0</p>"),
+		)
+
+		expect(codesOf([stale], RELEASE_LINE)).toEqual(["LANDING_PAGE_RELEASE_LINE"])
+	})
+
+	test("a build with no release line, as in a shallow clone, requires no line", () => {
+		const bare = landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`))
+
+		expect(codesOf([bare])).toEqual([])
 	})
 
 	test("a missing page is left to the required-pages check", () => {

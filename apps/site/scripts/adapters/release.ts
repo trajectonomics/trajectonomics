@@ -4,8 +4,8 @@ import { latestVersion, releasedOn } from "../../src/lib/site/release-feed"
 /** The npm registry document of the CLI, the package a visitor installs. */
 const REGISTRY = "https://registry.npmjs.org/@trajectonomics%2Fcli"
 
-/** The CLI's repository, whose releases carry the day a version was published. */
-const CLI_REPO = "trajectonomics/cli"
+/** This repository, whose `cli-v<version>` releases carry the day a CLI version was published. */
+const CLI_REPO = "trajectonomics/trajectonomics"
 
 /** The version a visitor installs today, read from npm's registry over HTTPS. */
 async function readRegistry(): Promise<unknown> {
@@ -33,7 +33,7 @@ async function readRelease(tag: string): Promise<unknown> {
 /** Both release feeds: npm's `latest`, and the release day of the tag it names. */
 export async function readReleaseFeed(): Promise<ReleaseFeed> {
 	const latest = latestVersion(await readRegistry())
-	const release = await readRelease(`v${latest}`)
+	const release = await readRelease(`cli-v${latest}`)
 	return Object.freeze({
 		latest,
 		releasedOn: release === undefined ? undefined : releasedOn(release),

@@ -44,11 +44,11 @@ function LandingEnding() {
 	)
 }
 
-/** The Landing Page's props: the shell provider's. */
-export type LandingProps = ProviderProps
+/** The Landing Page's props: the shell provider's, and the release line it states when the build has one. */
+export type LandingProps = ProviderProps & { readonly releaseLine?: string | undefined }
 
-/** React island for the Landing Page: the portal name, its purpose and one entry per audience. */
-export function Landing(props: LandingProps) {
+/** React island for the Landing Page: the portal name, its purpose, the release line and one entry per audience. */
+export function Landing({ releaseLine, ...props }: LandingProps) {
 	return (
 		<Provider {...props}>
 			<HomeLayout {...baseOptions("home")}>
@@ -56,6 +56,9 @@ export function Landing(props: LandingProps) {
 					<div className="flex flex-col gap-3">
 						<h1 className="text-3xl font-semibold tracking-tight">{PORTAL_NAME}</h1>
 						<p className="max-w-prose text-fd-muted-foreground">{PORTAL_PURPOSE}</p>
+						{releaseLine === undefined ? null : (
+							<p className="text-sm text-fd-muted-foreground">{releaseLine}</p>
+						)}
 					</div>
 					<div className="grid gap-4 md:grid-cols-2">
 						{TABS.map((tab) => {

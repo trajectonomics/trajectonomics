@@ -31,13 +31,13 @@ describe("asset naming", () => {
 describe("release URL", () => {
 	it("points at the asset of the release matching the package version", () => {
 		expect(releaseUrl("1.2.3", "traj-linux-x64")).toBe(
-			"https://github.com/trajectonomics/cli/releases/download/v1.2.3/traj-linux-x64",
+			"https://github.com/trajectonomics/trajectonomics/releases/download/cli-v1.2.3/traj-linux-x64",
 		)
 	})
 
 	it("takes a download base override", () => {
 		expect(releaseUrl("1.2.3", "checksums.txt", "http://127.0.0.1:9")).toBe(
-			"http://127.0.0.1:9/download/v1.2.3/checksums.txt",
+			"http://127.0.0.1:9/download/cli-v1.2.3/checksums.txt",
 		)
 	})
 })

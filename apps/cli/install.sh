@@ -1,14 +1,17 @@
 #!/bin/sh
 # Install traj: one checksum-verified binary from a GitHub release.
 #
-#   curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | sh
+#   curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh
 #
 # TRAJ_VERSION=X.Y.Z installs a pinned release instead of the latest one.
 # TRAJ_INSTALL_DIR overrides the directory (default: $HOME/.local/bin).
 # TRAJ_DOWNLOAD_BASE_URL replaces the releases root, which is how CI tests it.
 set -eu
 
-DEFAULT_BASE="https://github.com/trajectonomics/cli/releases"
+DEFAULT_BASE="https://github.com/trajectonomics/trajectonomics/releases"
+# 0.1.0 to 0.3.0 were released from trajectonomics/cli, before the monorepo. Their assets stay there.
+LEGACY_BASE="https://github.com/trajectonomics/cli/releases"
+LEGACY_VERSIONS="0.1.0 0.2.0 0.3.0"
 SUPPORTED="darwin/arm64, darwin/x64, linux/x64, linux/arm64"
 
 say() { printf 'traj: %s\n' "$*" >&2; }
@@ -32,8 +35,14 @@ esac
 asset="traj-$os-$arch"
 
 base="${TRAJ_DOWNLOAD_BASE_URL:-$DEFAULT_BASE}"
-if [ -n "${TRAJ_VERSION:-}" ]; then
-	prefix="$base/download/v$TRAJ_VERSION"
+legacy=false
+for v in $LEGACY_VERSIONS; do
+	[ "${TRAJ_VERSION:-}" = "$v" ] && legacy=true
+done
+if [ "$legacy" = true ] && [ -z "${TRAJ_DOWNLOAD_BASE_URL:-}" ]; then
+	prefix="$LEGACY_BASE/download/v$TRAJ_VERSION"
+elif [ -n "${TRAJ_VERSION:-}" ]; then
+	prefix="$base/download/cli-v$TRAJ_VERSION"
 else
 	prefix="$base/latest/download"
 fi

@@ -12,14 +12,14 @@ Linux and macOS, one line (verifies the release checksum, installs `traj` to `~/
 or `$TRAJ_INSTALL_DIR`, and prints what it installed):
 
 ```bash
-curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh
 ```
 
 Windows, one line (installs to `%LOCALAPPDATA%\traj\bin`, adds it to the user `PATH` once,
 and needs a new shell afterwards):
 
 ```powershell
-irm https://github.com/trajectonomics/cli/releases/latest/download/install.ps1 | iex
+irm https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.ps1 | iex
 ```
 
 npm, on any machine with Node 20 or later, or with Bun (`npx` needs no Bun; the package

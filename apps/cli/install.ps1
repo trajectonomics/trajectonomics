@@ -1,13 +1,13 @@
 # Install traj on Windows: one checksum-verified binary from a GitHub release.
 #
-#   irm https://github.com/trajectonomics/cli/releases/latest/download/install.ps1 | iex
+#   irm https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.ps1 | iex
 #
 # TRAJ_VERSION=X.Y.Z installs a pinned release instead of the latest one.
 # TRAJ_INSTALL_DIR overrides the directory (default: %LOCALAPPDATA%\traj\bin).
 # TRAJ_DOWNLOAD_BASE_URL replaces the releases root, which is how CI tests it.
 $ErrorActionPreference = "Stop"
 
-$DEFAULT_BASE = "https://github.com/trajectonomics/cli/releases"
+$DEFAULT_BASE = "https://github.com/trajectonomics/trajectonomics/releases"
 $SUPPORTED = "windows/x64"
 
 function Say($message) { Write-Host "traj: $message" }
@@ -22,8 +22,17 @@ if ($env:PROCESSOR_ARCHITECTURE -ne "AMD64") {
 }
 $asset = "traj-windows-x64.exe"
 
+# 0.1.0 to 0.3.0 were released from trajectonomics/cli, before the monorepo. Their assets stay there.
+$LEGACY_BASE = "https://github.com/trajectonomics/cli/releases"
+$LEGACY_VERSIONS = @("0.1.0", "0.2.0", "0.3.0")
 $base = if ($env:TRAJ_DOWNLOAD_BASE_URL) { $env:TRAJ_DOWNLOAD_BASE_URL } else { $DEFAULT_BASE }
-$prefix = if ($env:TRAJ_VERSION) { "$base/download/v$($env:TRAJ_VERSION)" } else { "$base/latest/download" }
+$prefix = if ($env:TRAJ_VERSION -and ($LEGACY_VERSIONS -contains $env:TRAJ_VERSION) -and -not $env:TRAJ_DOWNLOAD_BASE_URL) {
+	"$LEGACY_BASE/download/v$($env:TRAJ_VERSION)"
+} elseif ($env:TRAJ_VERSION) {
+	"$base/download/cli-v$($env:TRAJ_VERSION)"
+} else {
+	"$base/latest/download"
+}
 
 function Fetch($url, $out) {
 	try {

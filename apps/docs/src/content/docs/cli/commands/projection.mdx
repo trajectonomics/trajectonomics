@@ -5,10 +5,10 @@ description: Project the future under a Scenario, and compare two of them.
 
 `traj projection` runs the Baseline through a Scenario and compares the result. A Projection is
 deterministic: the same rows, the same Scenario and the same dates give the same answer
-([ADR 0007](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0007-deterministic-projections.md)).
+([ADR 0007](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0007-deterministic-projections.md)).
 Every result states its As-of, the engine version, the Scenario's hashes, the Overrides it applied
 and its tax status
-([ADR 0030](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0030-projection-inputs-and-echo.md)).
+([ADR 0030](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0030-projection-inputs-and-echo.md)).
 
 ## `traj projection run`
 
@@ -47,8 +47,8 @@ traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows
 
 ## Decisions
 
-- [ADR 0007: Projections are deterministic](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0007-deterministic-projections.md)
-- [ADR 0030: a Projection echoes its inputs](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0030-projection-inputs-and-echo.md)
-- [ADR 0032: tax is the Scenario's Levy](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0032-tax-is-the-scenarios-levy.md)
+- [ADR 0007: Projections are deterministic](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0007-deterministic-projections.md)
+- [ADR 0030: a Projection echoes its inputs](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0030-projection-inputs-and-echo.md)
+- [ADR 0032: tax is the Scenario's Levy](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0032-tax-is-the-scenarios-levy.md)
 
 See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.

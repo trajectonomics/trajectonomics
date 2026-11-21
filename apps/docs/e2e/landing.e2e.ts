@@ -1,8 +1,12 @@
+import { readReleaseLine } from "../src/lib/release-line-source"
 import { DOCS_BASE_PATH, TABS, tabUrl } from "../src/lib/tabs"
 import { openSearch, otherTab, searchTerm } from "./docs-portal"
 import { expect, test } from "./fixtures"
 
 const LANDING_PATH = `${DOCS_BASE_PATH}/`
+
+/** The release line the built page must state: the newest cli tag this checkout sees, or none. */
+const RELEASE_LINE = readReleaseLine()
 
 /** A Site Home document, so the browser test never asks `wrangler dev` for the page at `/`. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
@@ -37,6 +41,13 @@ test("each audience entry says what its reader gets", async ({ page }) => {
 		expect(descriptionId, `${tab.folder} entry describes its reader's next step`).not.toBeNull()
 		await expect(page.locator(`#${descriptionId}`)).toHaveText(tab.description)
 	}
+})
+
+test("the Landing Page states the newest traj release this build sees", async ({ page }) => {
+	test.skip(RELEASE_LINE === undefined, "this checkout has no cli-v tag, so the line is omitted")
+	await page.goto(LANDING_PATH)
+
+	await expect(page.getByText(RELEASE_LINE ?? "", { exact: true })).toBeVisible()
 })
 
 test("the Landing Page ends with Site Home, Source and License links", async ({ page }) => {

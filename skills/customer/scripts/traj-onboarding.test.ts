@@ -13,7 +13,7 @@ import {
  * Static checks on the first-party onboarding Skill the website installs. The networked check that
  * runs the install has its own file, `check-skills-install.test.ts`.
  */
-const CLI_REPOSITORY = "https://github.com/trajectonomics/cli"
+const CLI_REPOSITORY = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli"
 const CLI_PACKAGE = "@trajectonomics/cli"
 /**
  * The Ledger File: the one path that says the ledger has been opened on this machine. `TRAJ_HOME` is

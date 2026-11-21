@@ -5,10 +5,10 @@ description: Manage Scenarios, the named what-ifs.
 
 `traj scenario` manages Scenarios, the named what-ifs. A Scenario's document is `sim-core`'s, and
 overrides use dotted paths with stable ids
-([ADR 0024](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0024-scenario-documents-and-overrides.md)).
+([ADR 0024](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0024-scenario-documents-and-overrides.md)).
 A leaf with a document form may print one template: `traj scenario apply --template` prints a
 document the pinned `sim-core` accepts
-([ADR 0033](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)).
+([ADR 0033](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)).
 A Scenario can also carry a tax Levy, which its Projection applies.
 
 ## `traj scenario apply <name>`
@@ -127,7 +127,7 @@ traj scenario show base --json | jq .scenario.document  # Print only the documen
 ## `traj scenario tax <scenario>`
 
 Write or remove the tax Levy a Scenario's labelled Flows are taxed under
-([ADR 0032](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0032-tax-is-the-scenarios-levy.md)).
+([ADR 0032](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0032-tax-is-the-scenarios-levy.md)).
 A Levy tallies labels and never guesses them, so `--label` says which Section 40 class each income
 Flow belongs to.
 
@@ -170,9 +170,9 @@ traj scenario tax base --none                                                   
 
 ## Decisions
 
-- [ADR 0016: deletion has three names, and only one is a tombstone](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0016-three-deletion-stories.md)
-- [ADR 0024: Scenario documents are `sim-core`'s, and Overrides use dotted paths](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0024-scenario-documents-and-overrides.md)
-- [ADR 0032: tax is the Scenario's Levy](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0032-tax-is-the-scenarios-levy.md)
-- [ADR 0033: a document leaf prints one template its core accepts](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)
+- [ADR 0016: deletion has three names, and only one is a tombstone](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0016-three-deletion-stories.md)
+- [ADR 0024: Scenario documents are `sim-core`'s, and Overrides use dotted paths](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0024-scenario-documents-and-overrides.md)
+- [ADR 0032: tax is the Scenario's Levy](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0032-tax-is-the-scenarios-levy.md)
+- [ADR 0033: a document leaf prints one template its core accepts](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)
 
 See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.

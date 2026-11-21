@@ -74,7 +74,7 @@ export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
 /** The traj CLI's repository. */
-export const GITHUB_CLI_URL = "https://github.com/trajectonomics/cli"
+export const GITHUB_CLI_URL = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli"
 
 /** The CLI's issue tracker, where the disclaimer sends a visitor who finds a bug. */
 export const GITHUB_CLI_ISSUES_URL = `${GITHUB_CLI_URL}/issues`
