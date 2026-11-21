@@ -1,0 +1,24 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see the class it renders.
+/** A cross, drawn with `currentColor`: the mark on the panel whose answer changes every run. */
+interface Props {
+	readonly class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<svg
+	class={className}
+	aria-hidden="true"
+	focusable="false"
+	viewBox="0 0 16 16"
+	width="12"
+	height="12"><path
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		d="M4 4l8 8M12 4l-8 8"></path></svg
+>

@@ -1,0 +1,103 @@
+/*
+ * The home's sections below the hero (ADR 0012), in twenty.com's manner: a hairline above each, a mono
+ * eyebrow, a light display heading and a short lede, left aligned inside the 72 rem column. Every colour
+ * is a Semantic Token Role.
+ */
+
+/*
+ * A section on the page surface. The first one meets the hero's fade in the same flat colour and carries
+ * no border, so there is no seam (ADR 0010); the sections after it alternate with the muted ones.
+ */
+.section-surface {
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+}
+
+/* A section on the muted surface, ruled above and below, between two on the page surface. */
+.section-muted {
+	border-block: 1px solid var(--ds-color-border);
+	background: var(--ds-color-muted);
+	color: var(--ds-color-foreground);
+}
+
+.section-inner {
+	max-width: 72rem;
+	margin: 0 auto;
+	padding: 4rem 1.25rem;
+}
+
+@media (min-width: 40rem) {
+	.section-inner {
+		padding: 6rem 1.5rem;
+	}
+}
+
+.section-head {
+	display: flex;
+	max-width: 40rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+/* The head and the Replay control beside it: the control holds the column's top right corner. */
+.section-head-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+}
+/* The eyebrow: a mono label led by the accent block the hero's pill carries. */
+.eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-foreground);
+}
+
+.eyebrow::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	background: var(--ds-color-accent);
+}
+
+.section-lede {
+	margin: 0;
+	max-width: 36rem;
+	text-wrap: pretty;
+}
+
+/* The links under a section: mono, underlined, left aligned. */
+.section-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 24px;
+	margin: 40px 0 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.section-link {
+	color: var(--ds-color-foreground);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.section-link:hover {
+	text-decoration: none;
+}
+
+.section-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

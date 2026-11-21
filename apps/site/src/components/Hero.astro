@@ -1,0 +1,95 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see <CopyPrompt /> and the badge it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { sublineParts } from "../lib/language/subline"
+import CopyPrompt from "./CopyPrompt.astro"
+import DemoWindow from "./DemoWindow.astro"
+import Badge from "./ui/Badge.astro"
+import Separator from "./ui/Separator.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+const subline = sublineParts(dictionary.heroSubline)
+---
+
+<section data-hero class="hero-stage relative isolate flex flex-col overflow-clip bg-background">
+	{/* The ground is the whole stage, copy and window: the squares flank the window, as twenty.com's do. */}
+	<div class="hero-blast" aria-hidden="true">
+		<div class="hero-blast-field">
+			<div class="hero-blast-drift">
+				<div class="hero-blast-pixels"></div>
+				<div class="hero-blast-rim"></div>
+				<div class="hero-blast-ripple" data-ripple></div>
+			</div>
+		</div>
+	</div>
+	<div
+		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-5 pt-20 pb-10 text-center sm:px-6 sm:pt-28 sm:pb-14"
+	>
+		<Badge class="hero-pill">
+			<span class="hero-pill-marker" aria-hidden="true"></span>
+			<span>{dictionary.heroVersion}</span>
+			<Separator />
+			<span>{dictionary.heroLicence}</span>
+		</Badge>
+		<h1
+			data-hero-headline
+			class="mt-8 max-w-4xl text-4xl font-normal text-balance text-foreground sm:text-6xl"
+		>
+			<span>{dictionary.heroHeadingPrefix}</span>{" "}
+			<span data-hero-accent class="block text-accent">{dictionary.heroHeadingAccent}</span>
+		</h1>
+		<p class="mt-8 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
+			{
+				subline.map((part) =>
+					part.code ? (
+						<code class="rounded-sm bg-secondary px-1.5 py-0.5 font-mono text-[0.9em] text-secondary-foreground">
+							{part.text}
+						</code>
+					) : (
+						<Fragment>{part.text}</Fragment>
+					),
+				)
+			}
+		</p>
+		<div class="hero-command mt-10 w-full max-w-xl sm:mt-12">
+			<CopyPrompt dictionary={dictionary} />
+		</div>
+	</div>
+	{/* The demonstration is the product itself in a window, in the landing view, as twenty.com's hero is. */}
+	<div class="hero-app relative mx-auto w-full max-w-[67rem] px-5 pb-16 sm:px-6 sm:pb-24">
+		<DemoWindow dictionary={dictionary} />
+	</div>
+</section>
+
+{/*
+	The hero's ripple: a click or a tap on the hero's ground sends one ripple through the field. It is a
+	response to the visitor, never ambient — nothing follows the pointer — and a visitor who asks for less
+	motion gets none. The notes live here rather than inside the script because every byte of an inline
+	script ships against the page's 10,000 (ADR 0005): a control keeps its click, so the prompt, the pill,
+	the links and the demo window make no ripple, and the attribute is taken off and put back after a reflow so a second
+	click restarts the ring.
+*/}
+<script is:inline>
+	;(() => {
+		const hero = document.querySelector("[data-hero]")
+		const ripple = document.querySelector("[data-ripple]")
+		if (!(hero instanceof HTMLElement) || !(ripple instanceof HTMLElement)) return
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+		hero.addEventListener("click", (event) => {
+			if (event.target instanceof Element && event.target.closest("a, button, summary, code, [data-app]")) return
+			const box = ripple.getBoundingClientRect()
+			ripple.style.setProperty("--ripple-x", `${event.clientX - box.left}px`)
+			ripple.style.setProperty("--ripple-y", `${event.clientY - box.top}px`)
+			ripple.removeAttribute("data-rippling")
+			void ripple.offsetWidth
+			ripple.setAttribute("data-rippling", "")
+		})
+		ripple.addEventListener("animationend", () => ripple.removeAttribute("data-rippling"))
+	})()
+</script>

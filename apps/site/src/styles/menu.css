@@ -1,0 +1,13 @@
+/* The header's two disclosures (ADR 0007): the frame and chevron both menus share. */
+
+.header-menu {
+	position: relative;
+}
+
+.header-menu-chevron {
+	transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-menu[open] .header-menu-chevron {
+	transform: rotate(180deg);
+}

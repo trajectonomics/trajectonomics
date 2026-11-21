@@ -1,0 +1,66 @@
+{
+	"name": "@trajectonomics/site",
+	"version": "0.0.0-development",
+	"description": "The Trajectonomics Site at the root of trajectonomics.com: static Astro served by a Worker with Static Assets. Never published to npm.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/trajectonomics/site.git"
+	},
+	"type": "module",
+	"private": true,
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=22.23.4"
+	},
+	"scripts": {
+		"predev": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts && bun scripts/share-image.ts",
+		"dev": "astro dev",
+		"prebuild": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts && bun scripts/share-image.ts",
+		"build": "astro build",
+		"prebuild:preview": "bun scripts/copy-fonts.ts && bun scripts/hero-ground.ts && bun scripts/llms-txt.ts && bun scripts/share-image.ts",
+		"build:preview": "astro build --mode preview",
+		"preview": "bun run build && wrangler dev",
+		"test": "bun test ./src ./scripts",
+		"test:browser": "bun run build && playwright test",
+		"test:performance": "bun run build && bun scripts/performance.ts",
+		"test:visual": "bun run build && playwright test e2e/visual.e2e.ts",
+		"test:visual:update": "bun run build && playwright test e2e/visual.e2e.ts --update-snapshots",
+		"typecheck": "tsc -p tsconfig.json && astro check",
+		"lint": "biome ci --error-on-warnings .",
+		"format": "biome check --write .",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build:preview && SITE_BUILD_MODE=preview bun run verify:build && bun run build && bun run verify:build && bun run probe:status",
+		"verify:build": "bun test ./test/dist",
+		"probe:status": "bun scripts/probe-status.ts",
+		"stars:update": "bun scripts/stars.ts",
+		"release:update": "bun scripts/release-update.ts",
+		"release:check": "bun scripts/release-check.ts",
+		"release:drift": "bun scripts/release-drift.ts",
+		"indexnow": "bun scripts/indexnow.ts",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.12",
+		"@astrojs/compiler-rs": "0.5.3",
+		"@axe-core/playwright": "4.14.0",
+		"@biomejs/biome": "2.6.3",
+		"@playwright/test": "1.65.0",
+		"@resvg/resvg-js": "2.6.2",
+		"@tailwindcss/vite": "^4.3.5",
+		"@trajectonomics/tooling": "1.1.0",
+		"@types/bun": "^1.4.4",
+		"astro": "^7.4.7",
+		"lighthouse": "13.6.0",
+		"playwright-core": "1.65.0",
+		"tailwindcss": "^4.3.5",
+		"typescript": "~6.0.3",
+		"wawoff2": "^2.0.1",
+		"wrangler": "^4.158.0"
+	},
+	"dependencies": {
+		"@trajectonomics/design-system": "0.1.0-alpha.4",
+		"@trajectonomics/design-system-assets": "0.1.0-alpha.4",
+		"@trajectonomics/design-system-theme": "0.1.0-alpha.5"
+	}
+}

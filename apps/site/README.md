@@ -1,0 +1,51 @@
+# Trajectonomics Site
+
+The Site at the root of [trajectonomics.com](https://trajectonomics.com): static [Astro](https://astro.build) built with Bun and Tailwind, served by a Worker with Static Assets. `trajectonomics/web-router` mounts it at `/` and sends `/docs` to the Docs Portal.
+
+This repository is private and never published to npm. The Worker is named `site` and takes no route of its own; the router attaches the public one ([ADR 0002](./docs/adr/0002-site-worker-with-static-assets.md)).
+
+## Develop
+
+```bash
+bun install
+bun run dev
+```
+
+## Scripts
+
+| Script | Does |
+| --- | --- |
+| `bun run dev` | Astro dev server on a local port |
+| `bun run build` | Build the Site into `dist/` as a production build |
+| `bun run build:preview` | Build into `dist/` with Astro mode `preview`, the build `bun run check` scans |
+| `bun run verify:build` | Scan `dist/` with `bun test`: a home per Language, the English home at `/`, one Not-found page, one `h1` and at most one `h2` inside `main` with no deeper heading, `main`, `nav` and `head` each, the Docs and skills links, one `x-default` alternate and no per-Language one, `og:locale`, the localized title, description, social card and share image on each home — the image 1200 × 630 and under its ceiling — one `theme-color` per Theme the build ships — the dark Theme's `background` with no `media` in production — no device-scheme `media` a Theme does not state, no `prefers-color-scheme` in a production page or in the stylesheet it loads, a `color-scheme` per Theme it declares, one JSON-LD block, none of it on a miss, the four regions and the surface each one paints, the install prompt, no `en/` directory, no absolute asset, the switcher, `noindex` on misses, the page weight, script and font budgets, no Reserved preload path, no content security policy, no `npx traj`, and in production mode no `[OWNER TO WRITE]` |
+| `bun run indexnow` | Fetch `https://trajectonomics.com/<key>.txt` and refuse unless it answers 200 with the committed key, then POST the host, the key and every URL the Sitemap lists to `https://api.indexnow.org/IndexNow`. Run it by hand after a deploy; no workflow runs it ([ADR 0017](./docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)) |
+| `bun run stars:update` | Read the Organisation's repositories with `gh api` and rewrite the committed `src/lib/site/stars.json` snapshot the Star menu renders from |
+| `bun run probe:status` | Start `wrangler dev` with no Cloudflare credential and check `/` is answered in the Language its signals choose, `/?lang=<code>` stores the choice, `/en/` and `/th/` answer 301 to `/`, a miss is 404 in English, and `/__mf-preload.js` is 404 |
+| `bun run test` | `bun test` over `src` and `scripts` |
+| `bun run test:browser` | Build, then run Playwright: axe with the device set to both schemes on both Language homes and the real Not-found response, Tab and the focus ring, the Copy announcement, and the page with JavaScript off |
+| `bun run test:performance` | Build, then run mobile Lighthouse three times against the local Worker for each Language home and require a median of 0.95 or more |
+| `bun run typecheck` | `tsc` plus `astro check` |
+| `bun run lint` | Biome, warnings as errors |
+| `bun run format` | Rewrite formatting and import order |
+| `bun run check` | Lint, typecheck, test, a preview build scanned in preview mode, a production build scanned in production mode, `probe:status` |
+| `bun run skills:check` | Verify installed agent skills against `skills-lock.json` |
+| `bun run skills:update` | Update installed agent skills |
+
+## The build
+
+`dist/index.html` is the English home and the Site's one address, and `dist/th/index.html` is the Thai home, written to a Language build path that no address names: the Worker's script answers `/` with the home of the Language the visitor's signals choose, stores the choice the Language menu makes, and redirects `/en/` and `/th/` to `/` ([ADR 0020](./docs/adr/0020-the-site-has-one-address.md), which supersedes [ADR 0003](./docs/adr/0003-thai-and-english-from-visitor-signals.md)). Each home's head carries the owner's localized title and description, the one address as its canonical and `og:url`, one `x-default` alternate, a complete Open Graph and X card naming that Language's own `og/<language>.png` share image and its own `og:locale`, one `theme-color` per Theme the build ships — the dark Theme's `background`, read from the pinned Theme tokens, and the only paint in a production build — a `color-scheme` for each, and one JSON-LD block naming the `WebSite`, its `Organization` and `traj` as a free `SoftwareApplication`; a miss carries none of it. `dist/robots.txt` names one `Allow: /` group per answer engine, `dist/llms.txt` and `dist/llms-full.txt` are generated from the dictionaries by `scripts/llms-txt.ts` before every build, and `dist/<key>.txt` holds the committed IndexNow key ([ADR 0017](./docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)). `dist/404.html` is the one Not-found page and it answers every miss in English. `dist/og/en.png` and `dist/og/th.png` are those share images: 1200 × 630 PNGs written into `public/og/` before every build by `scripts/share-image.ts`, from each Language's own value statement, the pinned Theme's colours and the brand lockup, so no picture is committed ([ADR 0018](./docs/adr/0018-the-share-image-is-generated-at-build-time.md)). The built files are the source of truth for the structure rules, not HTML fetched through the router.
+
+The page shows the header, the hero with the prompt route and the Demo window, one section below it (Features), and the footer, with no How it works section ([ADR 0022](./docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)) ([site#3](https://github.com/trajectonomics/site/issues/3), [site#24](https://github.com/trajectonomics/site/issues/24)). The footer states the three limits setup meets, above its disclaimer: money in Thai baht only, about 100 MB downloaded once on the first run, and a coding agent that can run commands ([ADR 0019](./docs/adr/0019-the-site-states-the-three-setup-limits-in-its-footer.md)). The header carries one Star menu and one Language menu, both native `<details>` disclosures that work with JavaScript off; the Star menu's trigger is a star and the name of the repository with the most stars in the committed snapshot, and its panel lists the repositories above `All repositories`, none of them checked ([ADR 0007](./docs/adr/0007-landing-page-restyle-twenty-language.md)). The hero's copy is the owner's, in both Languages ([site#7](https://github.com/trajectonomics/site/issues/7)): the headline is "Deterministic layers for your Financial Planning" with the last words in the accent colour, and it holds still ([ADR 0012](./docs/adr/0012-one-h2-per-section.md)). The primitives the page is built from are Astro components in `src/components/ui/` with `data-slot` attributes and variants, and every colour they paint is a Semantic Token Role. The page keeps one `h1` and one `h2` per section, all inside `main`, and no deeper heading ([ADR 0012](./docs/adr/0012-one-h2-per-section.md), which amends [ADR 0006](./docs/adr/0006-page-headings.md)). Screenshots of the built page are in [`docs/screenshots/`](./docs/screenshots/), at 1280, 2000 and 390 px in both Languages, captured from a preview build with the device set to light and to dark ([ADR 0016](./docs/adr/0016-the-site-ships-the-dark-theme.md)). Deployment is a later change.
+
+A production build ships the dark Theme only, and every other build ships both and follows the device, so the light Theme stays capturable while it is deferred ([ADR 0016](./docs/adr/0016-the-site-ships-the-dark-theme.md)). The Build Mode decides that: `bun run build` is production, `bun run build:preview` (and `astro dev`) is not.
+
+The built-file rules are a pure core in `src/lib/build/`, and the scan is `bun test ./test/dist`, which `bun run check` runs twice: after `astro build --mode preview` with `SITE_BUILD_MODE=preview`, and after `astro build` with no mode, which judges a production build — the one that ships, so a production `dist/` that still holds `[OWNER TO WRITE]` fails instead of shipping. [ADR 0004](./docs/adr/0004-build-output-checks.md) records the design.
+
+## Browser checks
+
+`.github/workflows/browser.yml` runs the checks a browser is needed for: axe with the WCAG 2.2 AA tags under both device schemes on `/`, on the same address read in Thai, and on the real 404 response, the keyboard and Language checks, the page with JavaScript off, the headline, which holds still with or without motion, and the mobile Lighthouse budget ([ADR 0005](./docs/adr/0005-page-weight-and-web-font-budget.md)). It serves the build with `wrangler dev`, which is why it is a separate workflow with a 15 minute limit and why the three shared CI callers stay one job with no steps.
+
+## License
+
+[MIT](./LICENSE)

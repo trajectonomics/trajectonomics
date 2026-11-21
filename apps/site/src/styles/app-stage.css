@@ -1,0 +1,78 @@
+/*
+ * The demo window in motion (ADR 0022): once the Reveal layer sets a stage, the window holds one height
+ * and shows one chat, and its transcript scrolls inside it. With no stage — no script, or motion
+ * reduced — none of this applies, and the window is as tall as both transcripts.
+ */
+.app[data-stage] .app-body {
+	height: 38rem;
+}
+
+.app[data-stage] .app-main,
+.app[data-stage] .app-side {
+	min-height: 0;
+}
+
+.app[data-stage="without"] .app-chat[data-chat="with"],
+.app[data-stage="with"] .app-chat[data-chat="without"] {
+	display: none;
+}
+
+.app[data-stage] .app-chat {
+	min-height: 0;
+	flex: 1;
+}
+
+.app[data-stage] .app-chat + .app-chat {
+	border-top: 0;
+}
+
+.app[data-stage] .app-scroll {
+	min-height: 0;
+	overflow-y: auto;
+	gap: 0;
+}
+
+.app[data-stage] .app-composer {
+	display: flex;
+}
+
+/* A phone has no sidebar to spare: the controls become a strip above the chat, and the window is shorter. */
+@media (max-width: 47.999rem) {
+	.app-body {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.app-side {
+		flex-flow: row wrap;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 12px;
+		border-right: 0;
+		border-bottom: 1px solid var(--ds-color-border);
+	}
+
+	.app-side-label {
+		display: none;
+	}
+
+	.app-recents {
+		flex-flow: row wrap;
+		min-width: 0;
+	}
+
+	.app-new {
+		width: auto;
+		min-height: 2rem;
+	}
+
+	.app-recent {
+		max-width: 9rem;
+		min-height: 2rem;
+		border: 1px solid var(--ds-color-border);
+	}
+
+	.app[data-stage] .app-body {
+		height: min(78dvh, 36rem);
+		grid-template-rows: auto minmax(0, 1fr);
+	}
+}

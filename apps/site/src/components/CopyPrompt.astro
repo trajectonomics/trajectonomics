@@ -1,0 +1,130 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the icons, the button and the props it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { DOCS_CLI_INSTALL_PATH, INSTALL_PROMPT } from "../lib/site"
+import Arrow from "./icons/Arrow.astro"
+import Check from "./icons/Check.astro"
+import Button from "./ui/Button.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+// How long the copy toast stays before it clears itself, which is also how long its countdown runs.
+const NOTICE_TIMEOUT_MS = 6000
+---
+
+<div class="relative">
+	<div data-install-window class="install-cta">
+		<div class="install-row">
+			<code
+				data-install-prompt
+				hidden
+				class="install-prompt"
+			>
+				{INSTALL_PROMPT}
+			</code>
+			<Button
+				type="button"
+				bevel
+				hidden
+				data-copy-prompt
+				data-copied={dictionary.copied}
+				data-copied-label={dictionary.copiedLabel}
+				data-copy-failed={dictionary.copyFailed}
+				data-notice-timeout={NOTICE_TIMEOUT_MS}
+				class="window-copy copy-cta px-5"
+			>
+				{dictionary.copy}
+			</Button>
+			<a class="window-exit" data-bevel href={DOCS_CLI_INSTALL_PATH}>
+				{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
+			</a>
+		</div>
+	</div>
+	<div
+		data-copy-toast
+		class="copy-toast rounded-sm border border-border bg-popover text-popover-foreground"
+		style={`--toast-ms: ${NOTICE_TIMEOUT_MS}ms`}
+	>
+		<Check class="copy-toast-check" data-copy-check />
+		<span
+			data-copy-status
+			class="text-xs font-medium"
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"></span>
+		<span class="copy-toast-countdown" aria-hidden="true"></span>
+	</div>
+</div>
+
+<script is:inline>
+	;(() => {
+		const prompt = document.querySelector("[data-install-prompt]")
+		const button = document.querySelector("[data-copy-prompt]")
+		const status = document.querySelector("[data-copy-status]")
+		const toast = document.querySelector("[data-copy-toast]")
+		const check = document.querySelector("[data-copy-check]")
+		if (
+			!(prompt instanceof HTMLElement) ||
+			!(button instanceof HTMLButtonElement) ||
+			!(status instanceof HTMLElement) ||
+			!(toast instanceof HTMLElement)
+		) {
+			return
+		}
+
+		const timeoutMs = Number(button.dataset.noticeTimeout ?? "6000")
+		const label = button.textContent ?? ""
+		let notice = null
+		/**
+		 * The toast confirms the copy and the button says what it did, then both clear together so one
+		 * timer drives them and they cannot disagree.
+		 */
+		const notify = (message, failed) => {
+			status.textContent = message
+			if (check instanceof HTMLElement) check.hidden = failed
+			// The button paints the accent role and shortens its word, or keeps both for a failed copy.
+			if (failed) button.removeAttribute("data-copy-state")
+			else button.setAttribute("data-copy-state", "copied")
+			button.textContent = failed ? label : (button.dataset.copiedLabel ?? label)
+			// Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
+			toast.removeAttribute("data-visible")
+			void toast.offsetWidth
+			toast.setAttribute("data-visible", "")
+			if (notice !== null) clearTimeout(notice)
+			notice = setTimeout(() => {
+				status.textContent = ""
+				toast.removeAttribute("data-visible")
+				button.removeAttribute("data-copy-state")
+				button.textContent = label
+				notice = null
+			}, timeoutMs)
+		}
+
+		// The prompt stays in the page for this button to copy, but the CTA shows only two controls:
+		// this one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
+		button.hidden = false
+		button.addEventListener("click", async () => {
+			const text = prompt.textContent?.trim() ?? ""
+			try {
+				await navigator.clipboard.writeText(text)
+				notify(button.dataset.copied ?? "", false)
+				// The prompt reached the clipboard: say so once, so the page can count the copy. The
+				// name and the value are frozen, because a metric that changes its name breaks its series.
+				window.dispatchEvent(
+					new CustomEvent("traj:site-command-copied", { detail: { command: "install" } }),
+				)
+			} catch {
+				const range = document.createRange()
+				range.selectNodeContents(prompt)
+				const selection = document.getSelection()
+				selection?.removeAllRanges()
+				selection?.addRange(range)
+				notify(button.dataset.copyFailed ?? "", true)
+			}
+		})
+	})()
+</script>

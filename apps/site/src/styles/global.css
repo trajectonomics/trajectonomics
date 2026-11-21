@@ -1,0 +1,86 @@
+/*
+ * The Web Consumer Contract, in its documented order: Tailwind, the light Prebuilt Theme CSS, the dark
+ * Prebuilt Theme CSS, then the Tailwind Theme Stylesheet that turns the Semantic Token Roles into
+ * utility colours (design-system ADR 0005). There is no `dark:` variant: it would follow the device
+ * scheme rather than `data-theme`, and the colour-literal check rejects one.
+ */
+@import "tailwindcss";
+@import "@trajectonomics/design-system-theme/themes/light.css";
+@import "@trajectonomics/design-system-theme/themes/dark.css";
+@import "@trajectonomics/design-system-theme/tailwind.css";
+/* The Theme's own type: the sans stack with its Thai fallback, line height 1.7 and Thai 1.8. */
+@import "@trajectonomics/design-system-theme/typography.css";
+/* The Brand Typeface's @font-face rules, whose files `scripts/copy-fonts.ts` puts in public/fonts/. */
+@import "./fonts.css";
+@import "./primitives.css";
+@import "./blast.css";
+@import "./rim.css";
+@import "./ripple.css";
+@import "./landing.css";
+@import "./sections.css";
+@import "./app.css";
+@import "./app-side.css";
+@import "./app-chat.css";
+@import "./app-composer.css";
+@import "./app-stage.css";
+@import "./conversation.css";
+@import "./terminal.css";
+@import "./features.css";
+@import "./footer.css";
+@import "./footer-legal.css";
+@import "./footer-facts.css";
+@import "./command.css";
+@import "./toast.css";
+@import "./header.css";
+@import "./menu.css";
+@import "./menu-panel.css";
+@import "./motion.css";
+@import "./replay.css";
+@import "./motion-app.css";
+
+/*
+ * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own
+ * fixtures spell classes the Site never ships (a `dark:` variant is what the colour-literal rule
+ * forbids). A test file must not become a stylesheet source: it would ship the device-scheme media
+ * query a production build refuses to answer ([ADR 0016]).
+ */
+@source not "../**/*.test.ts";
+
+/*
+ * Each Theme states its own `color-scheme`, so the browser's own scrollbars and controls follow the page
+ * and not the device: the pinned Theme CSS states no `color-scheme`, and a production build ships one
+ * Theme while a preview build ships both ([ADR 0016]).
+ */
+[data-theme="light"] {
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+/*
+ * The families the Site draws with, in one place: the display face of the headline run, and the mono
+ * face of every meta label. Body text keeps the Theme's sans stack, which is also where the Thai
+ * fallback lives. The files are latin subsets, so Thai falls through to the system Thai face.
+ */
+:root {
+	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+	/* `font-mono` reads the same variable, so the meta layer has one family. */
+	--font-mono: var(--font-meta);
+}
+
+/* The inlined brand mark carries a viewBox and no intrinsic size, so the header's tile gives it one. */
+.brand-tile > svg {
+	height: 1.25rem;
+	width: 1.25rem;
+}
+
+@media (min-width: 40rem) {
+	.brand-tile > svg {
+		height: 1.5rem;
+		width: 1.5rem;
+	}
+}

@@ -1,0 +1,194 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components and the canonical links it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import darkTheme from "@trajectonomics/design-system-theme/themes/dark.css?raw"
+import lightTheme from "@trajectonomics/design-system-theme/themes/light.css?raw"
+import Footer from "../components/Footer.astro"
+import Header from "../components/Header.astro"
+import "../styles/global.css"
+import { buildMode } from "../lib/build/mode"
+import { fallbackTheme, shippedThemes } from "../lib/design/shipped-themes"
+import { themePaints } from "../lib/design/theme-paint"
+import { themeScript } from "../lib/design/theme-script"
+import { parseDesignTokens } from "../lib/design/tokens"
+import type { Language } from "../lib/language/language"
+import {
+	ABSOLUTE_CLEAN_URL,
+	dictionaryFor,
+	languageEntry,
+	otherLanguages,
+} from "../lib/language/languages"
+import {
+	APPLE_TOUCH_ICON_PATH,
+	BING_SITE_VERIFICATION_TOKEN,
+	GOOGLE_SITE_VERIFICATION_TOKEN,
+	SITE_NAME,
+} from "../lib/site"
+import { structuredDataJson } from "../lib/site/structured-data"
+import { verificationMetas } from "../lib/site/verification"
+import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../lib/social/layout"
+import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../lib/social/share-advert"
+
+interface Props {
+	readonly language: Language
+	readonly title: string
+	/** The Language home's one-line summary; a miss passes none, so the absence is structural. */
+	readonly description?: string
+	readonly indexed: boolean
+}
+
+const { language, title, description, indexed } = Astro.props
+const dictionary = dictionaryFor(language)
+// The published Theme CSS the page loads for its own paint, read as text, so the browser's bar and
+// the header carry one colour: no colour literal is written here.
+const tokens = parseDesignTokens({ themes: [lightTheme, darkTheme], tailwind: "" })
+// The Theme is resolved from the Build Mode: a production build ships one Theme and asks for it, so no
+// device query decides anything; every other build ships both Themes and follows the device, which is
+// what keeps the light Theme capturable while it is deferred ([ADR 0016]).
+const mode = buildMode(import.meta.env.MODE)
+const themes = shippedThemes(mode)
+const paints = themePaints(tokens, themes)
+const script = themeScript(themes)
+// The owner supplies a search engine's verification token later; no token means no meta at all, and
+// a token this repository invented would verify nothing.
+const verification = verificationMetas({
+	google: GOOGLE_SITE_VERIFICATION_TOKEN,
+	bing: BING_SITE_VERIFICATION_TOKEN,
+})
+---
+
+<html lang={language} data-theme={fallbackTheme(mode)}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		{script === undefined ? null : <script is:inline set:html={script}></script>}
+		<title>{title}</title>
+		{paints.map((paint) => (
+			<meta name="theme-color" media={paint.media} content={paint.colour} />
+		))}
+		{
+			indexed ? (
+				<>
+					{description === undefined ? null : <meta name="description" content={description} />}
+					<link rel="canonical" href={ABSOLUTE_CLEAN_URL} />
+					{/* One address means one alternate: there is no second URL for a Language to name. */}
+					<link rel="alternate" hreflang="x-default" href={ABSOLUTE_CLEAN_URL} />
+					<meta property="og:title" content={title} />
+					{description === undefined ? null : (
+						<meta property="og:description" content={description} />
+					)}
+					<meta property="og:url" content={ABSOLUTE_CLEAN_URL} />
+					<meta property="og:type" content="website" />
+					<meta property="og:site_name" content={SITE_NAME} />
+					{/* The address no longer says which Language a share is in, so the card does. */}
+					<meta property="og:locale" content={languageEntry(language).locale} />
+					{otherLanguages(language).map((entry) => (
+						<meta property="og:locale:alternate" content={entry.locale} />
+					))}
+					{/* The 1200 × 630 image the prebuild step writes, which every share sheet cuts a large card from. */}
+					<meta property="og:image" content={absoluteShareImageUrl(language)} />
+					<meta property="og:image:width" content={String(SHARE_IMAGE_WIDTH)} />
+					<meta property="og:image:height" content={String(SHARE_IMAGE_HEIGHT)} />
+					<meta property="og:image:type" content={SHARE_IMAGE_TYPE} />
+					<meta property="og:image:alt" content={shareImageAlt(dictionary)} />
+					<meta name="twitter:card" content="summary_large_image" />
+					<meta name="twitter:image" content={absoluteShareImageUrl(language)} />
+					{verification.map((meta) => (
+						<meta name={meta.name} content={meta.content} />
+					))}
+					{/* Data, not a program: ADR 0005 keeps JSON-LD outside the Program JavaScript budget. */}
+					<script type="application/ld+json" set:html={structuredDataJson(language)} />
+				</>
+			) : (
+				<meta name="robots" content="noindex" />
+			)
+		}
+		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
+		<link rel="apple-touch-icon" href={APPLE_TOUCH_ICON_PATH} />
+		{/*
+			One pageview and the Copy event, posted from the page itself: the Site loads no third-party
+			script, so no library arrives with it ([ADR 0005], [ADR 0011]). The script decides for itself
+			whether the host and the visitor's opt-out signals allow it.
+		*/}
+		<script>
+			import { startAnalytics } from "../lib/analytics/client"
+
+			startAnalytics()
+		</script>
+	</head>
+	<body class="flex min-h-dvh flex-col bg-background text-foreground">
+		<Header language={language} dictionary={dictionary} markCurrent={indexed} />
+		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
+		<Footer dictionary={dictionary} />
+		{/*
+			The Reveal layer (ADR 0019) and the demo window's own controls (ADR 0022), in one script because the
+			page's whole Program JavaScript budget is 10,000 bytes. The page as served is the whole story: both
+			chats, every message, the CLI's output and the verdicts are in the markup at their resting state, and
+			nothing here is needed to read it. With motion reduced the script does nothing at all, so both chats
+			stand whole and the sidebar stays out of the reading order. Otherwise it sets the window's stage,
+			which is the one chat on screen, and marks that chat's root so the timeline in the stylesheet can
+			play; the root is marked `wait` until the window's head is on screen, so a visitor who lands on it
+			never sees a still frame first, and the mark comes off when the chat ends, so the settled chat is the
+			static chat again. When the chat without the skill has been read it asks for New chat to be pressed
+			and, after the pause the markup names, presses it: the chat with the skill plays. The sidebar's controls
+			are enabled here, and the transcript becomes a Tab stop, because it scrolls only where there is a
+			stage. It keeps the newest message of a playing chat in view. The beats are the stylesheet's and the
+			timeline's, never counted here. There is no comment inside the script: every byte of it ships, and
+			the whole page has 10,000.
+		*/}
+		<script is:inline>
+		;(() => {
+			const app = document.querySelector("[data-app]")
+			if (!app || matchMedia("(prefers-reduced-motion: reduce)").matches) return
+			const all = (selector) => [...app.querySelectorAll(selector)]
+			const chats = all(".app-chat")
+			let timer
+			const show = (name, mode) => {
+				clearTimeout(timer)
+				delete app.dataset.hint
+				app.dataset.stage = name
+				for (const mark of all("[data-app-chat]")) mark.ariaCurrent = mark.dataset.appChat == name
+				for (const chat of chats) {
+					delete chat.dataset.motion
+					if (chat.dataset.chat != name) continue
+					chat.querySelector(".app-scroll").scrollTop = 0
+					void chat.offsetWidth
+					if (mode) chat.dataset.motion = mode
+					if (mode == "play")
+						timer = setTimeout(() => {
+							delete chat.dataset.motion
+							if (name == "with") return
+							app.dataset.hint = ""
+							timer = setTimeout(() => show("with", "play"), +app.dataset.hintMs)
+						}, +chat.dataset.playMs)
+				}
+			}
+			for (const one of all("[disabled]")) one.disabled = false
+			for (const one of all(".app-scroll")) one.tabIndex = 0
+			app.querySelector("[data-app-side]").removeAttribute("aria-hidden")
+			app.querySelector("[data-app-replay]").hidden = false
+			app.onclick = ({ target }) => {
+				const { dataset } = target.closest("button") || {}
+				if (!dataset) return
+				if ("appReplay" in dataset) show("without", "play")
+				else if ("appNew" in dataset) show("with", "play")
+				else show(dataset.appChat)
+			}
+			app.addEventListener("animationstart", ({ target }) => {
+				const message = target.closest(".chat-message")
+				const box = message && message.closest(".app-scroll")
+				if (box)
+					box.scrollTop += message.getBoundingClientRect().bottom - box.getBoundingClientRect().bottom
+			})
+			show("without", "wait")
+			const start = () => chats[0].dataset.motion == "wait" && show("without", "play")
+			if (window.IntersectionObserver)
+				new IntersectionObserver(([{ isIntersecting }], watch) => {
+					if (isIntersecting) watch.disconnect(), start()
+				}, { rootMargin: "0px 0px -120px" }).observe(app)
+			else start()
+		})()
+		</script>
+	</body>
+</html>

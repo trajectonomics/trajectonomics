@@ -1,0 +1,28 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { HTMLAttributes } from "astro/types"
+
+/** The badge's look: the hairline pill, or a filled run on the secondary surface. */
+type Variant = "pill" | "solid"
+
+/** The classes each variant paints; every colour is a Semantic Token Role, never a literal. */
+const VARIANTS: Readonly<Record<Variant, string>> = Object.freeze({
+	pill: "border border-border text-muted-foreground",
+	solid: "bg-secondary text-secondary-foreground",
+})
+
+interface Props extends HTMLAttributes<"span"> {
+	readonly variant?: Variant
+}
+
+const { variant = "pill", class: className, ...rest } = Astro.props
+const classes = [
+	"inline-flex min-h-7 items-center gap-2 rounded-sm px-2.5 font-mono text-xs tracking-wide uppercase",
+	VARIANTS[variant],
+	className,
+]
+	.filter(Boolean)
+	.join(" ")
+---
+
+<span {...rest} data-slot="badge" data-variant={variant} class={classes}><slot /></span>

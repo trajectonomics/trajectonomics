@@ -1,0 +1,70 @@
+/*
+ * One chat in the demo window (ADR 0022): its title and the tag that says whether the agent had the
+ * skill, its transcript, the verdict under it and the composer the prompt is typed into. With no stage set,
+ * both chats stand whole one above the other and the composers are not drawn, so the page is the
+ * transcript alone.
+ */
+.app-chat {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+}
+
+.app-chat + .app-chat {
+	border-top: 1px solid var(--ds-color-border);
+}
+
+.app-chat-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 16px;
+	border-bottom: 1px solid var(--ds-color-border);
+	font-size: 13px;
+}
+
+.app-chat-title {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: 500;
+}
+
+/* The tag says which chat this is: the agent alone, or the agent with the skill. */
+.app-chat-tag {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+.app-chat-mark {
+	width: 12px;
+	height: 12px;
+}
+
+.app-chat-tag[data-tone="good"] .app-chat-mark {
+	color: var(--ds-color-accent);
+}
+
+.app-scroll {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	padding: 16px;
+}
+
+/* The verdict the chat ends on: said once, under the transcript, so the point is not left to the reader. */
+.app-verdict {
+	margin: 0;
+	padding: 10px 16px;
+	border-top: 1px solid var(--ds-color-border);
+	font-size: 13px;
+}
