@@ -1,34 +1,42 @@
 {
-	"name": "@trajectonomics/design-system-workspace",
+	"name": "@trajectonomics/brand",
+	"version": "0.0.0",
 	"private": true,
-	"description": "Workspace root for the Trajectonomics design system packages. Never published.",
+	"description": "Trajectonomics brand: Design Tokens, Themes, Brand Assets and one folder per white-label brand. Never published.",
 	"type": "module",
 	"packageManager": "bun@1.4.4",
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=22.23.4"
 	},
-	"workspaces": [
-		"packages/*",
-		"apps/*"
-	],
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"./brands/*": "./dist/brands/*",
+		"./current/*": "./dist/current/*",
+		"./tailwind.css": "./dist/tailwind.css",
+		"./typography.css": "./dist/typography.css",
+		"./package.json": "./package.json"
+	},
 	"scripts": {
-		"lint": "biome ci --error-on-warnings . && bun run --filter '*' lint",
-		"format": "biome check --write . && bun run --filter '*' format:svelte",
-		"typecheck": "tsc -p tsconfig.json && bun run --filter '*' typecheck",
-		"test": "bun test scripts && bun run --filter '*' test",
-		"build": "bun run --filter '*' build",
-		"lint:package": "bun run --filter '*' lint:package",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run lint:package",
-		"skills:check": "bunx skills@latest check",
-		"skills:update": "bunx skills@latest update",
-		"check:published-docs": "bun scripts/check-published-docs.ts",
-		"smoke": "bash scripts/consumer-smoke.sh"
+		"build": "bun run scripts/build.ts",
+		"generate:tailwind": "bun run scripts/generate-tailwind-theme.ts",
+		"test": "bun test",
+		"typecheck": "tsc -p tsconfig.json",
+		"lint": "biome ci --error-on-warnings .",
+		"format": "biome check --write .",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build"
 	},
 	"devDependencies": {
-		"@arethetypeswrong/cli": "^0.18.5",
 		"@biomejs/biome": "2.6.3",
+		"@resvg/resvg-wasm": "^2.6.2",
+		"@tailwindcss/cli": "^4.3.5",
 		"@types/bun": "^1.4.4",
-		"publint": "^0.3.25",
+		"tailwindcss": "^4.3.5",
 		"tsdown": "^0.23.2",
 		"typescript": "^7.0.2"
 	}

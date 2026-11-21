@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url"
 import type { AstroIntegration } from "astro"
 
 /** The assets package that ships the Favicon Set. */
-const ASSETS_PACKAGE = "@trajectonomics/design-system-assets"
+const ASSETS_PACKAGE = "@trajectonomics/brand/current"
 
 /** The files of the Favicon Set a browser, an iOS home screen and an Android home screen ask for. */
 const FAVICONS = [

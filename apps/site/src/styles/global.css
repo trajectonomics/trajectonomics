@@ -5,11 +5,11 @@
  * scheme rather than `data-theme`, and the colour-literal check rejects one.
  */
 @import "tailwindcss";
-@import "@trajectonomics/design-system-theme/themes/light.css";
-@import "@trajectonomics/design-system-theme/themes/dark.css";
-@import "@trajectonomics/design-system-theme/tailwind.css";
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
+@import "@trajectonomics/brand/tailwind.css";
 /* The Theme's own type: the sans stack with its Thai fallback, line height 1.7 and Thai 1.8. */
-@import "@trajectonomics/design-system-theme/typography.css";
+@import "@trajectonomics/brand/typography.css";
 /* The Brand Typeface's @font-face rules, whose files `scripts/copy-fonts.ts` puts in public/fonts/. */
 @import "./fonts.css";
 @import "./primitives.css";

@@ -1,9 +1,9 @@
 {
-	"extends": "./tsconfig.base.json",
+	"extends": "../../tooling/config/tsconfig/web.json",
 	"compilerOptions": {
 		"lib": ["ES2022"],
 		"types": ["bun"],
 		"isolatedDeclarations": false
 	},
-	"include": ["scripts"]
+	"include": ["src", "scripts", "brands"]
 }

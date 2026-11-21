@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
-@import "@trajectonomics/design-system-theme/themes/light.css";
-@import "@trajectonomics/design-system-theme/themes/dark.css";
-@import "@trajectonomics/design-system-assets/fonts/inter.css";
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
+@import "@trajectonomics/brand/current/fonts/inter.css";
 @import "./shell-layout.css";
 @import "./theme-seam.css";

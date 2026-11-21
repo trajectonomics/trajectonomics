@@ -2,7 +2,7 @@ import { createRequire } from "node:module"
 import type { ShareLockup } from "../../src/lib/social/lockup"
 
 /** The assets package that ships the brand lockup. */
-const ASSETS_PACKAGE = "@trajectonomics/design-system-assets"
+const ASSETS_PACKAGE = "@trajectonomics/brand/current"
 
 /** The wordmark's file inside that package: the lockup a share image draws. */
 const WORDMARK = "logo/wordmark.svg"

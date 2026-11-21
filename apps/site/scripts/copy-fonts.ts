@@ -4,7 +4,7 @@ import { basename, dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 /** The assets package that ships the Brand Typeface. */
-const ASSETS_PACKAGE = "@trajectonomics/design-system-assets"
+const ASSETS_PACKAGE = "@trajectonomics/brand/current"
 
 /** The faces the Site draws with: the display pair and the mono, latin subsets only. */
 export const BRAND_FACES = [
