@@ -49,14 +49,6 @@
 		"parity:update": "bun scripts/parity-update.ts && biome format --write parity/cases.json",
 		"lint:package": "publint --strict && attw --pack . --profile node16"
 	},
-	"peerDependencies": {
-		"@trajectonomics/tax": ">=0.0.0"
-	},
-	"peerDependenciesMeta": {
-		"@trajectonomics/tax": {
-			"optional": true
-		}
-	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",
 		"@biomejs/biome": "2.6.3",

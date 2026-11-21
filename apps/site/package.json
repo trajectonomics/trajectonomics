@@ -58,8 +58,8 @@
 		"wrangler": "^4.158.0"
 	},
 	"dependencies": {
-		"@trajectonomics/design-system": "0.1.0-alpha.4",
-		"@trajectonomics/design-system-assets": "0.1.0-alpha.4",
-		"@trajectonomics/design-system-theme": "0.1.0-alpha.5"
+		"@trajectonomics/design-system": "workspace:*",
+		"@trajectonomics/design-system-assets": "workspace:*",
+		"@trajectonomics/design-system-theme": "workspace:*"
 	}
 }
