@@ -8,8 +8,8 @@ import type { Terms } from "./terms"
 /** The name of the nominal series, as the chart's legend shows it. */
 export const NOMINAL_NAME = "Nominal net worth"
 
-/** The name of the real series: net worth in today's money. Drawn dashed, so it is told apart. */
-export const REAL_NAME = "Net worth in today's money"
+/** The name of the real series: net worth in As-of terms. Drawn dashed, so it is told apart. */
+export const REAL_NAME = "Real net worth, in As-of terms"
 
 /**
  * The net worth series of a projection, one point per annual row. The x position is the row's

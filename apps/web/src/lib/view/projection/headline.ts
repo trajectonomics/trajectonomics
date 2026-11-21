@@ -5,7 +5,7 @@ import { annualRowsOf } from "./annual"
 export interface Headline {
 	/** Nominal net worth at the close of the last annual row, and the day that close is on. */
 	readonly closing: { readonly amount: string; readonly date: string }
-	/** The same row's net worth in today's money, and the monthly row the CLI measured it at. */
+	/** The same row's net worth in As-of terms, and the monthly row the CLI measured it at. */
 	readonly real: { readonly amount: string; readonly date: string }
 	/** Where the money runs out and how much is unmet, or null when it does not run out. */
 	readonly runsOut: { readonly date: string; readonly unmet: string } | null

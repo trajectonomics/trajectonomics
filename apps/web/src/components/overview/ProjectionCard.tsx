@@ -7,7 +7,7 @@ export interface ProjectionCardProps {
 	readonly scenario: ScenarioView<ProjectionView | null>
 }
 
-/** The projection's closing net worth, nominal and in today's money, and whether it runs out. */
+/** The projection's closing net worth, nominal and in As-of terms, and whether it runs out. */
 export function ProjectionCard({ scenario }: ProjectionCardProps) {
 	return (
 		<ScenarioCard
@@ -28,7 +28,7 @@ export function ProjectionCard({ scenario }: ProjectionCardProps) {
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-muted-foreground">In today's money</p>
+								<p className="text-sm text-muted-foreground">Real, in As-of terms</p>
 								<p className="mt-1 text-2xl font-semibold tracking-tight">
 									<Money amount={view.real} currency={view.currency} />
 								</p>

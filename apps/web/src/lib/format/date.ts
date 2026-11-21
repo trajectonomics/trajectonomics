@@ -1,3 +1,5 @@
+import { daysInMonth } from "../snapshot/dates"
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/
 
@@ -14,7 +16,7 @@ function parseDate(date: string): CalendarDate | null {
 	const year = Number(match[1])
 	const month = Number(match[2])
 	const day = Number(match[3])
-	if (month < 1 || month > 12 || day < 1 || day > 31) return null
+	if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) return null
 	return { year, month, day }
 }
 

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { bindingSentence } from "../fi/binding"
 import { fiView } from "./fi"
 import { fi } from "./projection-fixtures.test-support"
 
@@ -35,7 +36,7 @@ describe("fiView", () => {
 		expect(view).toEqual({
 			reachable: false,
 			horizon: "31 Dec 2060",
-			binding: "Even with every asset, the money does not cover the spending once work stops.",
+			binding: bindingSentence("insufficientMoney"),
 		})
 	})
 

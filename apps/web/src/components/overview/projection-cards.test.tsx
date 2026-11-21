@@ -13,14 +13,14 @@ import { ProjectionCard } from "./ProjectionCard"
 import { TaxCard } from "./TaxCard"
 
 describe("ProjectionCard", () => {
-	test("shows the closing net worth nominal and in today's money, and that it does not run out", () => {
+	test("shows the closing net worth nominal and in As-of terms, and that it does not run out", () => {
 		const run = projectionRun({ annual: [annualRow("2060-12-31", "19756836.98", "7196252.23")] })
 		const read = okRead(["projection"], projectionView(run))
 		const html = renderToStaticMarkup(
 			<ProjectionCard scenario={{ status: "ready", name: "base", read }} />,
 		)
 		expect(html).toContain("19,756,836.98")
-		expect(html).toContain("In today&#x27;s money")
+		expect(html).toContain("Real, in As-of terms")
 		expect(html).toContain("7,196,252.23")
 		expect(html).toContain("Does not run out before 31 Dec 2060.")
 	})

@@ -47,7 +47,7 @@ function annualColumns(): Column<AnnualRow>[] {
 		money("unmet", "Unmet", (row) => row.unmet),
 		{
 			key: "real",
-			header: "Net worth in today's money",
+			header: "Real net worth, in As-of terms",
 			numeric: true,
 			cell: (row) => (
 				<>

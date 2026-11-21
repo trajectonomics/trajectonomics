@@ -23,7 +23,9 @@ export function TaxCard({ scenario }: TaxCardProps) {
 						<p className="text-sm">This Scenario has no Levy, so every figure is before tax.</p>
 					) : (
 						<div className="space-y-2">
-							<p className="text-sm text-muted-foreground">Owed for {view.first.period}</p>
+							<p className="text-sm text-muted-foreground">
+								{view.first.owed.startsWith("-") ? "Refund for" : "Owed for"} {view.first.period}
+							</p>
 							<p className="text-2xl font-semibold tracking-tight">
 								<Money amount={view.first.owed} currency={view.currency} />
 							</p>

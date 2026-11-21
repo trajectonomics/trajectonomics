@@ -1,4 +1,4 @@
-/** The terms a net worth chart shows: nominal, real in today's money, or both. */
+/** The terms a net worth chart shows: nominal, real in As-of terms, or both. */
 export const TERMS = ["both", "nominal", "real"] as const
 
 /** One of the terms a net worth chart can show. */

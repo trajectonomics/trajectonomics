@@ -1,3 +1,4 @@
+import { useId } from "react"
 import type { BestCaseView, UnreachableFi } from "../../lib/view/fi/model"
 import { Money } from "../ui/Money"
 import { Stat } from "../ui/Stat"
@@ -24,12 +25,10 @@ interface BestCaseProps {
 }
 
 function BestCase({ best, currency }: BestCaseProps) {
+	const headingId = useId()
 	return (
-		<section
-			aria-labelledby="fi-best-case"
-			className="space-y-2 rounded-lg border border-border p-4"
-		>
-			<h2 id="fi-best-case" className="text-base font-semibold">
+		<section aria-labelledby={headingId} className="space-y-2 rounded-lg border border-border p-4">
+			<h2 id={headingId} className="text-base font-semibold">
 				Best case
 			</h2>
 			<p className="text-sm">If earned income stopped in {best.month}:</p>

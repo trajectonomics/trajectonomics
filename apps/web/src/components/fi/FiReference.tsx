@@ -1,3 +1,4 @@
+import { useId } from "react"
 import type { ReferenceView } from "../../lib/view/fi/reference"
 import { Fact } from "../projection/Fact"
 import { Money } from "../ui/Money"
@@ -9,12 +10,13 @@ export interface FiReferenceProps {
 
 /** The rule-of-thumb reference: labelled as a reference, with the figures the CLI states for it. */
 export function FiReference({ reference, currency }: FiReferenceProps) {
+	const headingId = useId()
 	return (
 		<section
-			aria-labelledby="fi-reference"
+			aria-labelledby={headingId}
 			className="space-y-4 rounded-lg border border-dashed border-border p-4 sm:p-5"
 		>
-			<h2 id="fi-reference" className="text-base font-semibold">
+			<h2 id={headingId} className="text-base font-semibold">
 				Rule-of-thumb reference, not the answer
 			</h2>
 			<p className="text-sm text-muted-foreground">

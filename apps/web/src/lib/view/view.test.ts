@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import { toChartNumber } from "../chart"
 import { type Snapshot, snapshot as snapshotSchema } from "../contract"
+import { formatDate, formatMoney, formatMonth } from "../format"
 import { type FetchedText, fetchSnapshot } from "./fetch-snapshot"
 import { headerLine } from "./header"
 import { withSearch } from "./links"
@@ -113,17 +115,25 @@ describe("createSnapshotLoader", () => {
 
 describe("header and overview view models, on the Demo snapshot", () => {
 	test("states the As-of, the currency and the traj version", () => {
-		expect(headerLine(DEMO)).toEqual({ asOf: "31 Oct 2026", currency: "THB", cliVersion: "0.0.0" })
+		expect(headerLine(DEMO)).toEqual({
+			asOf: formatDate(DEMO.params.asOf),
+			currency: "THB",
+			cliVersion: DEMO.cliVersion,
+		})
 	})
 
 	test("charts month-end net worth from the CLI's strings, one point per month", () => {
-		const series = netWorthHistorySeries(DEMO.reads.netWorthHistory)
-		expect(series.points).toHaveLength(24)
+		const reads = DEMO.reads.netWorthHistory
+		const series = netWorthHistorySeries(reads)
+		const last = reads.at(-1)
+		if (!last?.ok) throw new Error("the Demo snapshot's last month-end Read must be ok")
+		const amount = last.data.totals[0]?.amount ?? ""
+		expect(series.points).toHaveLength(reads.length)
 		expect(series.points.at(-1)).toEqual({
-			x: 23,
-			xLabel: "Oct 2026",
-			y: 1214900,
-			display: "1,214,900.00",
+			x: reads.length - 1,
+			xLabel: formatMonth(last.data.asOf),
+			y: toChartNumber(amount),
+			display: formatMoney(amount),
 		})
 	})
 })

@@ -73,8 +73,7 @@ describe("stage two", () => {
 		expect(plan.projections["retire-early"]?.argv).toEqual([
 			"projection",
 			"run",
-			"--scenario",
-			"retire-early",
+			"--scenario=retire-early",
 			"--as-of",
 			"2026-10-31",
 			"--horizon",
@@ -83,8 +82,7 @@ describe("stage two", () => {
 		])
 		expect(plan.fi["base"]?.argv).toEqual([
 			"fi",
-			"--scenario",
-			"base",
+			"--scenario=base",
 			"--as-of",
 			"2026-10-31",
 			"--horizon",
@@ -143,8 +141,6 @@ describe("stage two", () => {
 		expect(plan.compare?.argv).toEqual([
 			"projection",
 			"compare",
-			"base",
-			"retire-early",
 			"--as-of",
 			"2026-10-31",
 			"--horizon",
@@ -158,6 +154,9 @@ describe("stage two", () => {
 			"--carry-in",
 			"-",
 			"--json",
+			"--",
+			"base",
+			"retire-early",
 		])
 		expect(plan.compare?.carryInFor).toEqual(["base", "retire-early"])
 	})

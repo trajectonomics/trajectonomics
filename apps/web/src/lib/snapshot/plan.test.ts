@@ -49,11 +49,12 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 }
 
 describe("every argv the Plan emits", () => {
-	test("starts with an allowlisted read leaf and ends with --json, under every combination", () => {
+	test("starts with an allowlisted read leaf and asks for JSON before any --, under every combination", () => {
 		for (const overrides of combinations) {
 			for (const argv of allArgvs(overrides)) {
 				expect(leafOf(argv)).not.toBeNull()
-				expect(argv.at(-1)).toBe("--json")
+				const flags = argv.includes("--") ? argv.slice(0, argv.indexOf("--")) : argv
+				expect(flags.at(-1)).toBe("--json")
 			}
 		}
 	})
@@ -62,6 +63,17 @@ describe("every argv the Plan emits", () => {
 		for (const overrides of combinations) {
 			const leaves = allArgvs(overrides).map((argv) => leafOf(argv))
 			for (const leaf of leaves) expect(READ_LEAVES as readonly (string | null)[]).toContain(leaf)
+		}
+	})
+})
+
+describe("a Scenario name that looks like a flag", () => {
+	test("is never a token of its own, so traj reads it as a name", () => {
+		const names = { compare: { a: "--help", b: "-x" }, scenarios: ["--help"] }
+		for (const argv of allArgvs(names)) {
+			const flags = argv.includes("--") ? argv.slice(0, argv.indexOf("--")) : argv
+			expect(flags).not.toContain("--help")
+			expect(flags).not.toContain("-x")
 		}
 	})
 })

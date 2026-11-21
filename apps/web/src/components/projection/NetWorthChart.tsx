@@ -8,7 +8,7 @@ import { SegmentedControl, type SegmentedOption } from "../ui/SegmentedControl"
 const TERM_OPTIONS: readonly SegmentedOption<Terms>[] = [
 	{ value: "both", label: "Both" },
 	{ value: "nominal", label: "Nominal" },
-	{ value: "real", label: "In today's money" },
+	{ value: "real", label: "Real, in As-of terms" },
 ]
 
 export interface NetWorthChartProps {

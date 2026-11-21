@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { type ReactNode, useId } from "react"
 import { type ProjectionShape, statementOf } from "../../lib/view/projection/statement"
 import { Badge } from "../ui/Badge"
 import { Provenance } from "../ui/Provenance"
@@ -17,12 +17,13 @@ export interface ResultStatementProps {
 /** What a result says about itself: its tax status, its echo, its Overrides and notes, and its command. */
 export function ResultStatement({ shape, argv, children }: ResultStatementProps) {
 	const statement = statementOf(shape)
+	const headingId = useId()
 	return (
 		<section
-			aria-labelledby="result-statement"
+			aria-labelledby={headingId}
 			className="space-y-4 rounded-lg border border-border p-4 sm:p-5"
 		>
-			<h2 id="result-statement" className="text-base font-semibold">
+			<h2 id={headingId} className="text-base font-semibold">
 				What this result says about itself
 			</h2>
 			<div>

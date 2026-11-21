@@ -54,6 +54,19 @@ describe("the snapshot command line", () => {
 		expect(parseSnapshotArgs(["--nope", "1"]).ok).toBe(false)
 	})
 
+	test("a value keeps every = after the first, and flags without a value refuse one", () => {
+		const result = parseSnapshotArgs(["--out=a=b.json"])
+		expect(result.ok && result.options.out).toBe("a=b.json")
+		expect(parseSnapshotArgs(["--monthly=false"]).ok).toBe(false)
+		expect(parseSnapshotArgs(["--compare=base", "x"]).ok).toBe(false)
+	})
+
+	test("an age is a whole number of years", () => {
+		expect(parseSnapshotArgs(["--age", ""]).ok).toBe(false)
+		expect(parseSnapshotArgs(["--age", "4.5"]).ok).toBe(false)
+		expect(parseSnapshotArgs(["--age", "45"]).ok).toBe(true)
+	})
+
 	test("--carry-in names a file and sets the Carry-in flag", () => {
 		const result = parseSnapshotArgs(["--carry-in", "carry.json"])
 		expect(result.ok).toBe(true)

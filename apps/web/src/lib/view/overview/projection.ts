@@ -7,7 +7,7 @@ export interface ProjectionView {
 	readonly endDate: string
 	/** The CLI's nominal closing net worth, shown as stated. */
 	readonly nominal: string
-	/** The CLI's real figure at the same row, shown beside the nominal one as in today's money. */
+	/** The CLI's real figure at the same row, shown beside the nominal one as in As-of terms. */
 	readonly real: string
 	readonly runsOut: { readonly date: string; readonly unmet: string } | null
 	readonly horizon: string

@@ -33,6 +33,8 @@ describe("formatDate and formatMonth", () => {
 
 	test("refuses to print a date that is not a calendar day, and returns it as it came", () => {
 		expect(formatDate("2026-13-01")).toBe("2026-13-01")
+		expect(formatDate("2026-02-31")).toBe("2026-02-31")
+		expect(formatDate("2024-02-29")).toBe("29 Feb 2024")
 		expect(formatDate("tomorrow")).toBe("tomorrow")
 	})
 

@@ -10,11 +10,11 @@ import { ProjectionResult } from "./ProjectionResult"
 const ARGV = ["projection", "run", "--scenario", "base", "--as-of", "2026-10-31", "--json"]
 
 describe("ProjectionResult", () => {
-	test("states the closing net worth nominal and the real figure in today's money, dated", () => {
+	test("states the closing net worth nominal and the real figure in As-of terms, dated", () => {
 		const html = renderToStaticMarkup(<ProjectionResult run={projectionRunFixture()} argv={ARGV} />)
 		expect(html).toContain("Closing net worth")
 		expect(html).toContain("1,550,000.00")
-		expect(html).toContain("Net worth in today&#x27;s money")
+		expect(html).toContain("Real net worth, in As-of terms")
 		expect(html).toContain("1,420,000.00")
 	})
 

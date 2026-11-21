@@ -20,7 +20,8 @@ export interface LineChartProps {
 
 /**
  * A line chart. Hover, and the arrow keys once it has focus, show a crosshair and a tooltip with
- * every series' string. Its axis labels are the CLI's figures, abbreviated, and hide with them.
+ * every series' string as the CLI printed it. Its axis labels are round tick values, abbreviated,
+ * and hide with the amounts.
  */
 export function LineChart({ label, series, money = true, hidden }: LineChartProps) {
 	const [ref, width] = useMeasuredWidth(640)

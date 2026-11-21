@@ -29,9 +29,13 @@ function monthlyColumns(): Column<MonthlyRow>[] {
 	return [
 		{ key: "date", header: "Date", cell: (row) => formatDate(row.date) },
 		money("netWorth", "Net worth", (row) => row.netWorth),
-		money("real", "Net worth in today's money", (row) => row.realNetWorth),
+		money("real", "Real net worth, in As-of terms", (row) => row.realNetWorth),
 		money("accessible", "Accessible net worth", (row) => row.accessibleNetWorth),
-		money("realAccessible", "Accessible, in today's money", (row) => row.realAccessibleNetWorth),
+		money(
+			"realAccessible",
+			"Accessible, real, in As-of terms",
+			(row) => row.realAccessibleNetWorth,
+		),
 	]
 }
 

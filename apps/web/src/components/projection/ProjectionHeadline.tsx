@@ -8,7 +8,7 @@ export interface ProjectionHeadlineProps {
 	readonly currency: string
 }
 
-/** The three headline figures: closing net worth, the same in today's money, and the run-out. */
+/** The three headline figures: closing net worth, the same in As-of terms, and the run-out. */
 export function ProjectionHeadline({ headline, currency }: ProjectionHeadlineProps) {
 	const { closing, real, runsOut, horizon } = headline
 	return (
@@ -19,7 +19,7 @@ export function ProjectionHeadline({ headline, currency }: ProjectionHeadlinePro
 				secondary={`Nominal, at ${formatDate(closing.date)}`}
 			/>
 			<Stat
-				label="Net worth in today's money"
+				label="Real net worth, in As-of terms"
 				value={<Money amount={real.amount} currency={currency} />}
 				secondary={`At ${formatDate(real.date)}`}
 			/>
