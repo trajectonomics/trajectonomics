@@ -15,7 +15,6 @@ const readme = readFileSync(join(ROOT, "README.md"), "utf8")
 const DEVELOPMENT_HEADING = "\n## Development\n"
 const [beforeDevelopment = "", development = ""] = readme.split(DEVELOPMENT_HEADING)
 const firstScreen = beforeDevelopment.replaceAll("`", "").replace(/\s+/g, " ")
-const prose = (text: string) => text.replaceAll("`", "").replace(/\s+/g, " ").trim()
 const SCRIPT_INSTALL =
 	"curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh"
 const WINDOWS_INSTALL =
@@ -31,9 +30,8 @@ const SETUP_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj-onboard
 const OPERATOR_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj -y`
 const INSTALL_COMMANDS = [SCRIPT_INSTALL, WINDOWS_INSTALL, NPM_INSTALL, BUNX_INSTALL]
 
-// The one visible line that says which release ships a section's commands (ADR-0034).
+// The section that describes projections, fi and scenario tax, which the release ships (ADR-0034).
 const FUTURE_HEADING = "\n## Reading the future\n"
-const RELEASE_MARKER = "> **Ships in 0.2.0.**"
 const [, afterFuture = ""] = readme.split(FUTURE_HEADING)
 const futureSection = afterFuture.split("\n## ")[0] ?? ""
 
@@ -171,27 +169,10 @@ describe("the README says where the ledger lives", () => {
 	})
 })
 
-describe("the README's release marker", () => {
-	it("opens the section with the release that ships its commands, before any prose", () => {
+describe("the README's projection section", () => {
+	it("describes the projection, fi and scenario tax commands", () => {
 		expect(readme).toContain(FUTURE_HEADING)
-		const visible = futureSection.split("\n").filter((line) => line.trim() !== "")
-		expect(visible[0]).toBe(RELEASE_MARKER)
-	})
 
-	it("says what today's release lacks and where those commands arrive", () => {
-		const marker = prose(
-			futureSection
-				.split("\n")
-				.filter((line) => line.startsWith(">"))
-				.map((line) => line.replace(/^>\s?/, ""))
-				.join(" "),
-		)
-		expect(marker).toContain(
-			"The release you installed has no projection, fi or scenario tax: they are on main and reach the install channels with 0.2.0.",
-		)
-	})
-
-	it("still describes the commands that marker covers", () => {
 		for (const command of [
 			"traj projection run",
 			"traj projection compare",

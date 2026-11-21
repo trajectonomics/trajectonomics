@@ -107,10 +107,6 @@ From a checkout, run the CLI with `bun run dev -- …`. The npm launcher refuses
 
 ## Reading the future
 
-> **Ships in 0.2.0.**
-> The release you installed has no `projection`, `fi` or `scenario tax`: they are on `main`
-> and reach the install channels with `0.2.0`.
-
 Three read-only commands run a stored Scenario over the Baseline the ledger
 states at a date: `traj projection run` rolls net worth up year by year,
 nominal and real (monthly rows with `--monthly`); `traj projection compare`
@@ -178,10 +174,6 @@ and where it came from, and one that starts on a period boundary needs nothing:
 ```
 
 ## Keeping a backup, and removing the data
-
-> **Ships in 0.3.0.**
-> The release you installed has no `doctor`, `backup`, `restore` or `data remove`: they are on
-> `main` and reach the install channels with `0.3.0`.
 
 Four commands keep the ledger recoverable. `traj doctor` checks the data directory, the
 database and every stored transaction and says what is wrong without changing anything;
