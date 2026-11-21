@@ -1,4 +1,4 @@
-/* The header (ADR 0007): the mark's tile, the centred mono nav, and the one repository link. */
+/* The header (ADR 0007): the mark's tile, the centred mono nav, and the repository link with the Language menu at the end. */
 
 /* The mark on its tile: 40 px, painted from the primary roles, the same size twenty's mark is. */
 .brand-tile {
@@ -49,6 +49,20 @@
 @media (min-width: 40rem) {
 	.header-nav {
 		gap: 2rem;
+	}
+}
+
+/* The right column: the repository link, a hairline, then the Language menu, pushed to the end. */
+.header-end {
+	display: flex;
+	align-items: center;
+	justify-self: end;
+	gap: 1rem;
+}
+
+@media (min-width: 40rem) {
+	.header-end {
+		gap: 1.25rem;
 	}
 }
 
