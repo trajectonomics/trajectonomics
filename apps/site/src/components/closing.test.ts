@@ -26,9 +26,13 @@ describe("the closing section in every Language", () => {
 				href: anchor.attributes["href"],
 				text: textOf(page, anchor).trim(),
 			}))
+			const back = elementsByTag(page, "a").find(
+				(anchor) => anchor.attributes["href"] === "#install",
+			)
+			expect(back !== undefined && "hidden" in back.attributes).toBe(true)
 			expect(links).toEqual([
 				{ href: "#install", text: dictionary.ctaPromptLink },
-				{ href: DOCS_CLI_INSTALL_PATH, text: dictionary.cliInstallLink },
+				{ href: DOCS_CLI_INSTALL_PATH, text: dictionary.ctaInstallLink },
 			])
 		})
 	}

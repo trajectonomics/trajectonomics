@@ -16,9 +16,10 @@ const { dictionary } = Astro.props
  * The closing section: the demo's question put to the visitor's own agent, then the hero CTA's two
  * controls once more. The page keeps one Copy control and no visible prompt (ADR 0015, amendment of
  * 2026-11-19), so the filled link goes back up to it rather than copying a second time, and the outlined
- * one is the hero's own way out, with the same words to the same page.
+ * one goes to the hero's way out in its own words, because the keyboard check tells controls apart by them. The filled link ships `hidden` and the
+ * copy script shows it with the Copy control, so with JavaScript off it never leads to a control that is not there.
  */}
-<section class="section-surface" data-closing>
+<section class="section-surface bg-background" data-closing>
 	<div class="section-inner closing">
 		<p class="eyebrow">{dictionary.ctaEyebrow}</p>
 		<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
@@ -30,12 +31,13 @@ const { dictionary } = Astro.props
 				class="closing-primary bg-primary text-primary-foreground"
 				data-bevel
 				data-closing-prompt
+				hidden
 				href="#install"
 			>
 				{dictionary.ctaPromptLink}
 			</a>
 			<a class="window-exit" data-bevel href={DOCS_CLI_INSTALL_PATH}>
-				{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
+				{dictionary.ctaInstallLink}<Arrow class="window-exit-arrow" />
 			</a>
 		</div>
 	</div>

@@ -107,6 +107,9 @@ const NOTICE_TIMEOUT_MS = 6000
 		// The prompt stays in the page for this button to copy, but the CTA shows only two controls:
 		// this one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
 		button.hidden = false
+		// The closing section's link back up to this control appears only when the control does.
+		const back = document.querySelector("[data-closing-prompt]")
+		if (back instanceof HTMLElement) back.hidden = false
 		button.addEventListener("click", async () => {
 			const text = prompt.textContent?.trim() ?? ""
 			try {

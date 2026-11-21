@@ -18,7 +18,7 @@ export interface FeatureSample {
 export function featureSamples(version: string): readonly FeatureSample[] {
 	return Object.freeze([
 		Object.freeze({
-			command: "traj fi --scenario base --as-of 2026-03-31 --json",
+			command: "traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json",
 			output: [
 				"{",
 				'  "asOf": "2026-03-31",',
@@ -28,7 +28,7 @@ export function featureSamples(version: string): readonly FeatureSample[] {
 				"  },",
 				'  "scenario": { "name": "base", … },',
 				'  "tax": "not_applied",',
-				'  "fi": { "reachable": true, "fiDate": "2041-08-01" … }',
+				'  "fi": { "reachable": true, "fiDate": "2041-08-01", … }',
 				"}",
 			].join("\n"),
 		}),
@@ -43,7 +43,7 @@ export function featureSamples(version: string): readonly FeatureSample[] {
 				"    }",
 				"  },",
 				'  "output": { "properties": { "fi": …, … } },',
-				'  "errorCodes": ["projection_refused", …]',
+				'  "errorCodes": […, "projection_refused", …]',
 				"}",
 			].join("\n"),
 		}),

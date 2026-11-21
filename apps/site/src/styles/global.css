@@ -76,6 +76,11 @@
 	--font-mono: var(--font-meta);
 }
 
+/* The header is fixed and 64 px tall, so whatever is scrolled into view, a link's target or a focused control, lands below it. */
+html {
+	scroll-padding-top: 80px;
+}
+
 /* The inlined brand mark carries a viewBox and no intrinsic size, so the header's 40 px tile gives it one. */
 .brand-tile > svg {
 	height: 1.5rem;

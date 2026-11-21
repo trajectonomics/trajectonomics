@@ -43,7 +43,7 @@
 	outline-offset: 4px;
 }
 
-/* The link lands the Copy control below the sticky header, with room to read the line above it. */
+/* The link lands the Copy control below the fixed header (global.css), with room to read the line above it. */
 #install {
-	scroll-margin-top: 160px;
+	scroll-margin-top: 80px;
 }

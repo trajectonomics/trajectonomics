@@ -48,6 +48,10 @@
 	display: none;
 }
 
+.faq-question::marker {
+	content: "";
+}
+
 .faq-question:hover > span:first-child {
 	text-decoration: underline;
 	text-underline-offset: 4px;

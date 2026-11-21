@@ -30,8 +30,10 @@ the footer's fine print or the CLI's README.
 - **A closing call to action ends `main`.** It puts the demo's question to the visitor's own agent and repeats the
   hero's two controls. The page keeps one Copy control and no visible prompt
   ([ADR 0015](./0015-the-window-prints-a-prompt-and-no-command.md), amendment of 2026-11-19), so the filled control is
-  a link to `#install`, the hero's install window, and the outlined one is the hero's own way out with the same words.
-  The copy rate is still one button's.
+  a link to `#install`, the hero's install window, and ships `hidden` until the copy script shows the Copy control, so
+  with JavaScript off it never leads to a control that is not there. The outlined one goes to the hero's way out in its
+  own words ("Install the CLI yourself"), because the keyboard check tells two controls apart by their words. The copy
+  rate is still one button's.
 - **Surfaces alternate.** Features on the page surface after the hero, the FAQ on the muted one, the closing section on
   the page surface again.
 
@@ -48,8 +50,10 @@ the footer's fine print or the CLI's README.
 
 ## Consequences
 
-- The six visual baselines change. The two not-found baselines were already stale on `main` (the header and footer
-  had changed since they were taken) and are refreshed with them.
+- The page sets `scroll-padding-top` for the fixed 64 px header, so a link's target or a focused control lands below it.
+- `e2e/feature-samples.e2e.ts` asks that the samples wrap at the phone viewport, and `/llms-full.txt` carries the FAQ.
+- The four home baselines change, regenerated in `mcr.microsoft.com/playwright:v1.65.0-noble` with `fonts-dejavu-core`
+  ([ADR 0019](./0019-the-site-prints-the-release-from-a-committed-snapshot.md)); the not-found pair does not.
 - The twelve `docs/screenshots/` renders now predate these sections.
 - The Dictionary gains `faq*` and `cta*` strings in both Languages; `dictionary-strings.test.ts` follows the moved
   "Shows its working" sentence.

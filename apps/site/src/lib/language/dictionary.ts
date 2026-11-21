@@ -120,6 +120,8 @@ export interface Dictionary {
 	readonly ctaLede: string
 	/** The closing section's filled link, which goes back up to the Copy control (ADR 0015 keeps one). */
 	readonly ctaPromptLink: string
+	/** The closing section's outlined link to the CLI installation page; worded apart from the hero's, so no two controls read alike. */
+	readonly ctaInstallLink: string
 	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
 	readonly copy: string
