@@ -324,5 +324,6 @@ delegated phase brief from now on states:
 - Mechanical, checkable work (imports, tag pushes, mass renames that a script can do) gets a script,
   not an agent.
 
-During phases 1–5 the old repos stay live. Freeze merges into them from the start of phase 1 until
-cutover, or re-run the phase 1 import script (it is idempotent and works from fresh clones) just before phase 6.
+During phases 1–5 the old repos stay live and keep deploying. **Freeze merges into them now.** If a
+change has to land before cutover, make it here as a normal commit. (`import.sh` skips folders that
+already exist, so re-running it does not pick up late changes in an old repo.)
