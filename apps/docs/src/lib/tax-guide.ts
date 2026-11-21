@@ -13,7 +13,7 @@ export const REPOSITORY_BLOB_URL = "https://github.com/trajectonomics/trajectono
 const FRONTMATTER = [
 	"---",
 	"title: Tax contributor guide",
-	"description: How to contribute tax rules: what to change, the source rule, two walkthroughs, the checks and review.",
+	'description: "How to contribute tax rules: what to change, the source rule, two walkthroughs, the checks and review."',
 	"---",
 	"",
 ].join("\n")
