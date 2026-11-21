@@ -54,16 +54,10 @@ Convert **once**, at the boundary you own, and carry integer Minor Units from th
 
 ## Releasing
 
-Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose). The shared publish workflow reads the last `vX.Y.Z` tag and the conventional commit messages since then:
-
-| Commits since last release | Bump |
-| --- | --- |
-| any `feat!:` / `fix!:` / `BREAKING CHANGE:` | major (minor while on 0.x) |
-| any `feat:` | minor |
-| anything else | patch |
-
-- **Alpha, automatic:** every merge to `main` that touches code publishes `<next>-alpha.<n>` under the npm dist-tag `alpha`.
-- **Stable, on demand:** Actions -> Release -> Run workflow (on `main`) publishes `<next>` under `latest`, tags `vX.Y.Z` and creates a GitHub release.
+This package is not published on its own. It ships inside
+[`@trajectonomics/core`](../README.md), which releases as `core-vX.Y.Z` from
+`.github/workflows/release.yml`; see [docs/runbooks/release.md](../../../docs/runbooks/release.md).
+Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose).
 
 ## License
 

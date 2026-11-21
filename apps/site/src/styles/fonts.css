@@ -1,6 +1,6 @@
 /*
  * The Brand Typeface (design-system#77, ADR 0005): the three latin woff2 files the Site draws with,
- * copied from `@trajectonomics/design-system-assets` into `public/fonts/` by `scripts/copy-fonts.ts`.
+ * copied from `@trajectonomics/brand/current/fonts/` into `public/fonts/` by `scripts/copy-fonts.ts`.
  * `global.css` names the families; this file only declares them. The fallback families are the
  * package's own metric-matched ones, so the first paint keeps Aleo's and Azeret Mono's line box.
  *

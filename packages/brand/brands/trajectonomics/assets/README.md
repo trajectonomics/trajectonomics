@@ -1,6 +1,6 @@
 # Brand source
 
-Owner-supplied Trajectonomics brand art, the source for `@trajectonomics/design-system-assets` (ticket #44). Agents must not redraw or invent brand art; take it from here.
+Owner-supplied Trajectonomics brand art, the source for this brand's logo, wordmark and Favicon Set, which `packages/brand`'s build writes to `dist/brands/trajectonomics/` (ticket #44). Agents must not redraw or invent brand art; take it from here.
 
 - `svg/`: the source files. Every SVG has a `viewBox` and outlined paths (no live text). `mark.svg`, `wordmark.svg` and `lockup.svg` use `currentColor`; the `-on-light` files are black and the `-on-dark` files are white. `mark-tile.svg` is the mark on its filled tile and `favicon.svg` is the favicon silhouette on the same tile: both carry their own `prefers-color-scheme` rule, which swaps the tile and the mark between schemes.
 - `webp/`: lossless raster copies of the same art, for places that cannot use SVG.
