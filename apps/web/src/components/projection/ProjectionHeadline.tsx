@@ -32,7 +32,10 @@ export function ProjectionHeadline({ headline, currency }: ProjectionHeadlinePro
 							<Money amount={runsOut.unmet} currency={currency} /> unmet
 						</>
 					) : (
-						<span className="whitespace-nowrap">Does not run out before {formatDate(horizon)}</span>
+						<>
+							Does not run out before{" "}
+							<span className="whitespace-nowrap">{formatDate(horizon)}</span>
+						</>
 					)
 				}
 			/>
