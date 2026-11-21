@@ -22,7 +22,7 @@ gh workflow run release.yml --ref main -f package=core -f bump=auto
 gh workflow run release.yml --ref main -f package=cli -f bump=patch
 ```
 
-`auto` fails with "Nothing to release" when nothing touched the folder since the last tag.
+`auto` fails with "Nothing to release" when the folder has no commits since the last tag.
 
 ## Repair a cli release's binaries
 
@@ -33,8 +33,7 @@ If the stable cli publish worked but `binaries.yml` failed, rebuild the assets f
 gh workflow run binaries.yml --ref main -f tag=cli-v0.3.1
 ```
 
-It refuses a tag that is not `cli-vX.Y.Z`, smoke-tests the binaries and uploads them with the
-install scripts and `checksums.txt`.
+It refuses a tag that is not `cli-vX.Y.Z`, then smoke-tests and uploads the binaries.
 
 ## One-time cutover (owner)
 
@@ -47,9 +46,10 @@ package that does not exist yet. From a clean checkout of main:
 bun install --frozen-lockfile
 bunx turbo run check --filter=@trajectonomics/core... --concurrency=2
 cd packages/core
-npm version 0.3.0-alpha.0 --no-git-tag-version
+npm pkg set version=0.3.0-alpha.0
+mkdir -p ~/.cache/release && bun pm pack --destination ~/.cache/release
 npm login
-npm publish --access public --tag alpha --provenance=false
+npm publish ~/.cache/release/trajectonomics-core-0.3.0-alpha.0.tgz --access public --tag alpha --provenance=false
 git checkout -- package.json
 ```
 

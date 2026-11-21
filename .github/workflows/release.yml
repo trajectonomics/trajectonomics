@@ -144,7 +144,9 @@ jobs:
             echo "DIST_TAG=$DIST_TAG"
             echo "TAG=$TAG"
           } >> "$GITHUB_ENV"
-          (cd "$FOLDER" && npm version "$VERSION" --no-git-tag-version)
+          # npm version failed in core's folder here (its devDependencies use workspace:), so set only
+          # the version field.
+          (cd "$FOLDER" && npm pkg set version="$VERSION")
 
       - name: Check the package
         run: bunx turbo run check --filter="$PACKAGE_NAME..." --concurrency=2
@@ -172,6 +174,8 @@ jobs:
           exit 1
 
       # Uses NPM_TOKEN when the secret is set; otherwise npm uses trusted publishing (OIDC).
+      # npm publish cannot read workspace: ranges, so bun packs the folder (it rewrites them) and npm
+      # publishes that tarball. bun publish cannot make provenance.
       - name: Publish to npm
         working-directory: ${{ matrix.folder }}
         env:
@@ -187,7 +191,8 @@ jobs:
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
           fi
-          npm publish --tag "$DIST_TAG" --provenance
+          bun pm pack --quiet --destination "$RUNNER_TEMP"
+          npm publish "$RUNNER_TEMP"/*.tgz --tag "$DIST_TAG" --provenance
 
       # Tag and release only after npm accepted the version, so a failed publish leaves no tag.
       - name: Tag and GitHub release
