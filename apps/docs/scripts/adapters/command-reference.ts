@@ -86,7 +86,7 @@ function git(args: readonly string[]): string | undefined {
 
 /** The command-reference pages at a git ref, read through git so no checkout is moved. */
 async function pagesAt(ref: string): Promise<readonly ContentFile[] | undefined> {
-	const listed = git(["ls-tree", "-r", "--name-only", ref, "--", ROOT])
+	const listed = git(["ls-tree", "-r", "--name-only", "--full-name", ref, "--", ROOT])
 	if (listed === undefined) return undefined
 	const files: ContentFile[] = []
 	for (const path of listed.split("\n").filter(isPage)) {

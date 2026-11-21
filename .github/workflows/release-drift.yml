@@ -1,9 +1,9 @@
-name: Release drift
+name: Release drift (site)
 
 # The Site prints the release its committed Release snapshot records, and only `bun run release:update`
 # moves it. This weekly run compares that snapshot with npm's `latest` and with the GitHub release of
 # the same tag, then reports a snapshot that has fallen behind as one issue, updated in place and
-# closed again when the snapshot is current ([ADR 0019](../../docs/adr/0019-the-site-prints-the-release-from-a-committed-snapshot.md)).
+# closed again when the snapshot is current ([ADR 0019](../../apps/site/docs/adr/0019-the-site-prints-the-release-from-a-committed-snapshot.md)).
 #
 # It opens no branch, merges nothing and touches no host: a stale snapshot is a report for the owner
 # and the next Factory pass, never a red build with no cause. A `latest` whose release does not exist
@@ -11,6 +11,7 @@ name: Release drift
 #
 # GitHub turns a schedule off after 60 days without repository activity, and a disabled workflow
 # cannot be dispatched; turn it back on with `gh workflow enable release-drift.yml`.
+# This is the port of apps/site/.github/workflows/release-drift.yml.
 on:
   schedule:
     - cron: "0 6 * * 2" # Tuesdays, the day after the tooling drift
@@ -40,6 +41,7 @@ jobs:
           bun-version: 1.4.4
 
       - name: Report a snapshot behind the published release
+        working-directory: apps/site
         env:
           GH_TOKEN: ${{ github.token }}
         run: bun run release:drift

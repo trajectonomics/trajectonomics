@@ -1,8 +1,15 @@
-name: Command reference
+name: Command reference (docs)
 
+# The docs' command reference must match the published `@trajectonomics/cli`. A pull request compares
+# its own head with the merge base of its base branch. A push to main and the weekly run compare the
+# head with the published CLI, and file or close the drift issue. This is the port of
+# apps/docs/.github/workflows/command-reference.yml.
 on:
   pull_request:
+    paths: ["apps/cli/**", "apps/docs/**", "bun.lock"]
+  push:
     branches: [main]
+    paths: ["apps/cli/**", "apps/docs/**", "bun.lock"]
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:
@@ -31,7 +38,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version: "22"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -43,6 +50,7 @@ jobs:
 
       - name: Compare with the published CLI
         id: check
+        working-directory: apps/docs
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
