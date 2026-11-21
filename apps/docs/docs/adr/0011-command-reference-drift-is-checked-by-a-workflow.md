@@ -1,10 +1,10 @@
 ---
-status: accepted
+status: superseded
 ---
 
 # The command reference's drift from the published release is checked by a workflow job
 
-> **Partly superseded** by the monorepo migration ([`docs/monorepo-migration.md`](../../../../docs/monorepo-migration.md) §2d). The sync manifest and the `release-truth` comparison it fed are removed with Docs Sync; the rest of this decision stands.
+> **Superseded** by [ADR 0015](./0015-the-portal-follows-the-release-through-a-committed-snapshot.md): the rules below now run offline in `bun test` against the committed release snapshot, and the `Command reference` workflow is removed. Earlier, **partly superseded** by the monorepo migration ([`docs/monorepo-migration.md`](../../../../docs/monorepo-migration.md) §2d). The sync manifest and the `release-truth` comparison it fed are removed with Docs Sync; the rest of this decision stands.
 
 The Operator tab is the reference a person reads before installing `traj`, and its pages are
 authored here ([ADR 0002](./0002-authored-content-with-proposal-only-sync.md)). Nothing in this

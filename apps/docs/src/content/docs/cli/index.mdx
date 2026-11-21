@@ -19,7 +19,7 @@ curl -fsSL \
 
 ## From an empty machine to a first balance
 
-```bash
+```bash exec
 # create ~/.traj and an empty database
 traj init
 
@@ -31,9 +31,38 @@ traj account add Opening --type equity --currency THB
 # fund Cash at the start of the record, then spend from it
 traj tx add --opening --from Opening --to Cash --amount 1000.00 --date 2026-01-01
 traj tx add --from Cash --to Food --amount 120.50 --date 2026-03-01
+```
 
-# every account's balance and net worth
+Then read every account's balance and net worth:
+
+```bash exec
 traj balance --as-of 2026-03-31
+```
+
+```text output
+asOf: 2026-03-31
+rows:
+  - account:
+      id: 01a1ff02-9448-70cc-9da9-0ba9dc6e0149
+      name: Cash
+    type: asset
+    amount: 879.50
+    currency: THB
+  - account:
+      id: 01a1ff02-94a2-737d-bee2-c44a350103a9
+      name: Food
+    type: expense
+    amount: 120.50
+    currency: THB
+  - account:
+      id: 01a1ff02-950a-7437-b8f6-07a7233cf17b
+      name: Opening
+    type: equity
+    amount: -1000.00
+    currency: THB
+netWorth:
+  - currency: THB
+    amount: 879.50
 ```
 
 `--type` and `--currency` are required when adding an account, and THB is the only currency this
@@ -41,15 +70,16 @@ release supports. `--as-of` is required on `balance`. Every date a command acts 
 and it is always one you pass.
 
 `traj tx add --opening` is how a ledger gets its first money: `--from` names the equity account the
-amount posts against. On this ledger the balance prints Cash `879.50` THB, Food `120.50` THB and
-Opening `-1000.00` THB, and net worth (assets minus liabilities) is `879.50` THB. Without the
+amount posts against. Net worth is assets minus liabilities, `879.50` THB here; each account's id
+is its own and differs on your machine. Without the
 opening balance Cash holds `-120.50` THB, and [the Baseline](/cli/commands/baseline/) refuses
 the ledger rather than state a negative asset.
 
 ## Where your data lives
 
 `traj init` writes `~/.traj/traj.db`, or `$TRAJ_HOME/traj.db` when `TRAJ_HOME` is set. That one file
-is the ledger. [Your data](/cli/data/) says what else is in the directory, what is safe to
+is the ledger, and until `traj init` has created it every command that reads or writes it fails
+with `ledger_missing`. [Your data](/cli/data/) says what else is in the directory, what is safe to
 delete, and how to back it up.
 
 ## What next
@@ -62,5 +92,5 @@ delete, and how to back it up.
 - [Configuration](/cli/configuration/): the environment variables the CLI reads.
 - [Commands](/cli/commands/): the command reference.
 
-Source code and design decisions live in
+The source code lives in
 [`trajectonomics/trajectonomics/apps/cli`](https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli).

@@ -1,0 +1,63 @@
+/*
+ * The Landing Page's motion: a one-time rise for the hero, a line-by-line fade for the Agent
+ * prompt, a caret that blinks at its end and a slow drift for the glow behind it. Movement and
+ * opacity only: the colours come from the Theme's roles in the markup (the seam owns them).
+ * A reader who asks for reduced motion gets the page at rest, with nothing moving.
+ */
+
+@keyframes landing-rise {
+	from {
+		opacity: 0;
+		transform: translateY(0.75rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes landing-fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes landing-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+@keyframes landing-drift {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(4%, -6%) scale(1.08);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	/* `--landing-order` staggers a group: each step starts 90ms after the one before it. */
+	[data-landing-rise] {
+		animation: landing-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+		animation-delay: calc(var(--landing-order, 0) * 90ms);
+	}
+
+	[data-landing-fade] {
+		animation: landing-fade 500ms ease-out both;
+		animation-delay: calc(400ms + var(--landing-order, 0) * 120ms);
+	}
+
+	[data-landing-caret] {
+		animation: landing-blink 1.1s steps(1, end) infinite;
+	}
+
+	[data-landing-glow] {
+		animation: landing-drift 14s ease-in-out infinite;
+	}
+}

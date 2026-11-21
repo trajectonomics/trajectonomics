@@ -3,10 +3,9 @@ title: Installation
 description: Install the Trajectonomics CLI, add the agent skill, check the version, and uninstall.
 ---
 
-The Docs Portal documents `traj` `v0.2.0`, released on 2026-11-17 with release binaries, both
-install scripts, and `@trajectonomics/cli` on npm. All three channels below end at the same compiled
-binary and the same version
-([ADR 0011](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0011-distribution.md)).
+These pages document the latest `traj` release. Every release ships as release binaries, both
+install scripts and `@trajectonomics/cli` on npm, and all three channels below end at the same
+compiled binary and the same version.
 
 ## Linux and macOS
 
@@ -62,8 +61,8 @@ Both install scripts accept `TRAJ_VERSION=X.Y.Z` to install a pinned release ins
 one, and `TRAJ_INSTALL_DIR` to override the install directory. npm pins with `@X.Y.Z`:
 
 ```bash
-curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | TRAJ_VERSION=0.2.0 sh
-npx @trajectonomics/cli@0.2.0 --version
+curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | TRAJ_VERSION=0.4.0 sh
+npx @trajectonomics/cli@0.4.0 --version
 ```
 
 A release pinned below the operating skill's floor leaves that skill describing work the release

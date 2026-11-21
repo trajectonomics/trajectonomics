@@ -19,10 +19,19 @@ const PORT = 8788
 
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
-/** Wait until no transition or animation is still running, so a shot shows the settled state. */
+/**
+ * Wait until no transition or animation is still running, so a shot shows the settled state. A
+ * loop never settles by design (the Landing Page's caret and glow), so it is not waited for.
+ */
 async function waitForAnimations(page: Page): Promise<void> {
 	await page.waitForFunction(() =>
-		document.getAnimations().every((animation) => animation.playState !== "running"),
+		document
+			.getAnimations()
+			.every(
+				(animation) =>
+					animation.playState !== "running" ||
+					animation.effect?.getTiming().iterations === Number.POSITIVE_INFINITY,
+			),
 	)
 }
 

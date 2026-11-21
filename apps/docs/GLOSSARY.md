@@ -33,8 +33,12 @@ The Operator tab's pages that document every released `traj` leaf and its flags:
 _Avoid_: CLI docs, reference docs, man pages
 
 **Landing Page**:
-The page at `/` of `docs.trajectonomics.com` that names the two audiences and sends each to its Tab.
+The page at `/` of `docs.trajectonomics.com` that hands the portal to an Agent with a prompt a reader copies, names the two audiences and sends each to its Tab.
 _Avoid_: Home page, index page, front page, Site Home
+
+**Agent prompt**:
+The text the Landing Page's **Copy prompt** control puts on the clipboard for a reader to paste into their Agent: it sends the Agent to the Docs index and the Installation page's twin, and names no command of its own.
+_Avoid_: Starter prompt, system prompt, magic prompt
 
 **Site Home**:
 The page at `/` on trajectonomics.com, built and deployed by `apps/site`, outside the Docs Portal.

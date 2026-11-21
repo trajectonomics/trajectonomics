@@ -3,13 +3,10 @@ title: scenario
 description: Manage Scenarios, the named what-ifs.
 ---
 
-`traj scenario` manages Scenarios, the named what-ifs. A Scenario's document is `sim-core`'s, and
-overrides use dotted paths with stable ids
-([ADR 0024](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0024-scenario-documents-and-overrides.md)).
-A leaf with a document form may print one template: `traj scenario apply --template` prints a
-document the pinned `sim-core` accepts
-([ADR 0033](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)).
-A Scenario can also carry a tax Levy, which its Projection applies.
+`traj scenario` manages Scenarios, the named what-ifs. A Scenario is a JSON document, and an
+override changes one value in it by a dotted path with stable ids, such as `flows.salary.amount`.
+`traj scenario apply --template` prints a document to start from. A Scenario can also carry a tax
+Levy, which its Projection applies.
 
 ## `traj scenario apply <name>`
 
@@ -27,9 +24,13 @@ traj scenario apply base --file base.json --dry-run  # Show the row and roll the
 ```
 
 `traj scenario apply --template` prints a complete document to start from: print it, edit it, then
-apply it. At `@trajectonomics/cli@0.2.0`, the release the Docs Portal documents, it prints:
+apply it. The latest release prints:
 
-```json
+```bash exec
+traj scenario apply --template
+```
+
+```json output
 {
   "schemaVersion": 4,
   "currency": "THB",
@@ -126,10 +127,8 @@ traj scenario show base --json | jq .scenario.document  # Print only the documen
 
 ## `traj scenario tax <scenario>`
 
-Write or remove the tax Levy a Scenario's labelled Flows are taxed under
-([ADR 0032](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0032-tax-is-the-scenarios-levy.md)).
-A Levy tallies labels and never guesses them, so `--label` says which Section 40 class each income
-Flow belongs to.
+Write or remove the tax Levy a Scenario's labelled Flows are taxed under. A Levy tallies labels and
+never guesses them, so `--label` says which Section 40 class each income Flow belongs to.
 
 - `--tax <string>` — write the Levy for this jurisdiction: `th-2026`, Thailand's 2026 income tax
 - `--filing-status <string>` — the taxpayer's filing status; needs `--tax`, defaults to `single`
@@ -167,12 +166,5 @@ traj scenario tax base --tax th-2026 --filing-status married_joint --children 1 
 traj scenario tax base --tax th-2026 --filing-status married_no_income_spouse --life-insurance 20000 --mortgage-interest 30000 --social-security 9000 --donation1x 5000 --label salary=income.section40_1  # The same Levy with the deductions a Thai employee usually has.
 traj scenario tax base --none                                                                                                                                                                              # Take the tax Levy out, so the figures are pre-tax again.
 ```
-
-## Decisions
-
-- [ADR 0016: deletion has three names, and only one is a tombstone](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0016-three-deletion-stories.md)
-- [ADR 0024: Scenario documents are `sim-core`'s, and Overrides use dotted paths](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0024-scenario-documents-and-overrides.md)
-- [ADR 0032: tax is the Scenario's Levy](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0032-tax-is-the-scenarios-levy.md)
-- [ADR 0033: a document leaf prints one template its core accepts](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0033-a-document-leaf-prints-a-template-the-core-accepts.md)
 
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.
