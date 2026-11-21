@@ -12,6 +12,7 @@ export type CommandReferenceErrorCode =
 	| "GLOBAL_OPTIONS_EMPTY"
 	| "PAGES_UNREADABLE"
 	| "BASELINE_UNREADABLE"
+	| "VERSION_INVALID"
 
 /** The one error the check raises to refuse a verdict, so a caller can branch on `code`. */
 export class CheckError extends Error {

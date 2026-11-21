@@ -74,7 +74,14 @@ bun run preview
 # Run the unit tests (no build needed)
 bun run test
 
-# Compare the command reference with the published CLI (needs the network; not part of bun run check)
+# Record the latest published traj release in src/generated/cli-release.json (needs the network).
+# bun test checks every Operator page against that snapshot; --version X.Y.Z pins another release.
+bun run snapshot:cli
+
+# Run every `bash exec` example against a traj binary (the Docs examples job uses the snapshot's release)
+bun run check:examples --traj ~/.local/bin/traj
+
+# Compare the command reference with npm's latest instead of the snapshot (needs the network)
 bun run check:command-reference
 
 # Code formatting & lint

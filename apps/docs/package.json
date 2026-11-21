@@ -24,8 +24,10 @@
 		"format": "biome check --write .",
 		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run verify:build",
 		"check:command-reference": "bun scripts/check-command-reference.ts",
+		"check:examples": "bun scripts/run-examples.ts",
 		"verify:build": "bun scripts/verify-build.ts",
-		"sync:tax-guide": "bun scripts/sync-tax-guide.ts"
+		"sync:tax-guide": "bun scripts/sync-tax-guide.ts",
+		"snapshot:cli": "bun scripts/snapshot-cli.ts"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
