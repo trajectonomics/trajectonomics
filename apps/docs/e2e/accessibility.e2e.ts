@@ -1,10 +1,13 @@
 import AxeBuilder from "@axe-core/playwright"
 import { openPage, pageName, pagesUnderTest } from "./built-site"
+import { waitForSettledPage } from "./docs-portal"
 import { expect, test } from "./fixtures"
 
 for (const path of pagesUnderTest()) {
 	test(`the ${pageName(path)} page has no serious accessibility violations`, async ({ page }) => {
 		await openPage(page, path)
+		// Contrast is measured at rest: text still fading in is not what a reader is left with.
+		await waitForSettledPage(page)
 
 		const results = await new AxeBuilder({ page }).analyze()
 		const blocking = results.violations.filter(
