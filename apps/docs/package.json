@@ -25,9 +25,7 @@
 		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run verify:build",
 		"check:command-reference": "bun scripts/check-command-reference.ts",
 		"verify:build": "bun scripts/verify-build.ts",
-		"sync:release": "bun scripts/sync-upstream-release.ts",
-		"skills:check": "bunx skills@latest check",
-		"skills:update": "bunx skills@latest update"
+		"sync:release": "bun scripts/sync-upstream-release.ts"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",

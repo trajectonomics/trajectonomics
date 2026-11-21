@@ -36,9 +36,7 @@
 		"release:update": "bun scripts/release-update.ts",
 		"release:check": "bun scripts/release-check.ts",
 		"release:drift": "bun scripts/release-drift.ts",
-		"indexnow": "bun scripts/indexnow.ts",
-		"skills:check": "bunx skills@latest check",
-		"skills:update": "bunx skills@latest update"
+		"indexnow": "bun scripts/indexnow.ts"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",

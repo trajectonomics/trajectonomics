@@ -67,9 +67,7 @@
 		"check:th-sources": "bun run scripts/check-th-sources.ts",
 		"check:readme": "bun run scripts/check-readme.ts",
 		"check": "bun run lint && bun run check:th-sources && bun run typecheck && bun run test && bun run build && bun run check:readme && bun run lint:package",
-		"lint:package": "publint --strict && attw --pack . --profile node16",
-		"skills:check": "bunx skills@latest check",
-		"skills:update": "bunx skills@latest update"
+		"lint:package": "publint --strict && attw --pack . --profile node16"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",

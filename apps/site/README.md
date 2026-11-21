@@ -29,8 +29,6 @@ bun run dev
 | `bun run lint` | Biome, warnings as errors |
 | `bun run format` | Rewrite formatting and import order |
 | `bun run check` | Lint, typecheck, test, a preview build scanned in preview mode, a production build scanned in production mode, `probe:status` |
-| `bun run skills:check` | Verify installed agent skills against `skills-lock.json` |
-| `bun run skills:update` | Update installed agent skills |
 
 ## The build
 

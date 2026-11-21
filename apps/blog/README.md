@@ -95,16 +95,14 @@ Setup checks that it can proceed before changing anything. On `main` or `master`
 | `bun run format` | `biome check --write .` | Auto-format files and organize imports |
 | `bun run build` | `tsdown` | Compile dual ESM/CJS build into `dist/` |
 | `bun run lint:package`| `publint --strict && attw --pack . --profile node16` | Validate package exports & types |
-| `bun run skills:check`| `bunx skills@latest check` | Verify installed agent skills against lockfile |
-| `bun run skills:update`| `bunx skills@latest update` | Update installed skills to latest versions |
 
 ---
 
 ## Skills Architecture
 
-Skills are pinned in `skills-lock.json`:
-- Canonical skill files live in `.agents/skills/`.
-- Claude Code symlinks live in `.claude/skills/`.
+Skills are pinned in the root `skills-lock.json` of the monorepo, and the commands below run from the repository root:
+- Canonical skill files live in the root `.agents/skills/`.
+- Claude Code symlinks live in the root `.claude/skills/`.
 - Managed using the Vercel `skills` CLI:
   ```bash
   # Check skills status
