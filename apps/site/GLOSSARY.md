@@ -96,7 +96,7 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 _Avoid_: Background colour, band
 
 **Star snapshot**:
-The committed star counts the Star menu renders from, one number per repository plus the date they were read,
+The committed star count of the Site's one repository, plus the date it was read,
 written by `bun run stars:update` and never fetched at request time.
 _Avoid_: Live count, stars file
 

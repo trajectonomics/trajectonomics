@@ -124,3 +124,14 @@ the command it described, and the toast now reports the prompt. Everything else 
 surfaces, the hairlines, the mono meta layer, the one accent, the bevel, the panels, the twelve-pixel meta type
 and the toast's shape, timing and countdown line are untouched, and the prompt's row and its Copy control are
 built from them. [ADR 0015](./0015-the-window-prints-a-prompt-and-no-command.md) records why the command left.
+
+## Amendment (2026-11-21, owner): the header links the one repository
+
+The owner asked the header to match twenty.com's, and the project has one repository. The Star menu is gone.
+The bar is twenty's: the mark on the left, the primary links centred (`Docs`, then the Language menu, with a
+10 px hairline between them), and one link on the right to `trajectonomics/trajectonomics`. That link draws
+the GitHub mark, the committed star count (zero included) and an arrow out, in the 14 / count / 8 row
+twenty's community link uses. It is not a disclosure, so it lists no rows and offers no "all repositories".
+The Language menu stays the header's only disclosure. The amendments above that describe the Star menu's
+trigger, its panel and its rows are superseded by this one. The snapshot still counts the one repository;
+the link prints that count.

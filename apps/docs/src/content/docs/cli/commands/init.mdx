@@ -4,12 +4,20 @@ description: Create the data directory and an empty database.
 ---
 
 `traj init` creates the data directory and an empty database. The data directory is `~/.traj` unless
-`TRAJ_HOME` overrides it, and holds `traj.db` plus the npm launcher's `bin/` cache
-([ADR 0014](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0014-data-directory.md)).
+`TRAJ_HOME` overrides it, and holds `traj.db` plus the npm launcher's `bin/` cache.
 
 ```bash
 traj init                             # Create ~/.traj/traj.db if it does not exist.
 TRAJ_HOME=/tmp/traj traj init --json  # Use another directory.
 ```
+
+Run it first: until it has, a command that reads or writes the ledger fails with `ledger_missing`
+(exit code `4`). `init` and [`restore`](/cli/commands/restore/) are the only commands that create a
+ledger. A second `init` changes nothing and reports `created: false`.
+
+A new data directory is readable only by you (mode `0700`), and so is the ledger (mode `0600`). A
+data directory that already exists keeps the mode you gave it.
+
+On a new ledger, `init` ends with a hint naming the command that creates your first account.
 
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

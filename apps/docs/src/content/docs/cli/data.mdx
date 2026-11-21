@@ -9,13 +9,16 @@ the two is safe to delete.
 
 ## The data directory
 
-All state is one directory, `~/.traj` on every platform, or the value of `TRAJ_HOME` when that is
-set ([ADR 0014](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0014-data-directory.md)).
-`traj init` creates it:
+All state is one directory, `~/.traj` on every platform, or the value of `TRAJ_HOME` when
+that is set. `traj init` creates it:
 
 ```bash
 traj init
 ```
+
+`traj init` creates the directory readable only by you (mode `0700`) and the ledger the same way
+(mode `0600`), and every later command keeps the ledger at `0600`. A directory that already exists
+keeps the mode you gave it.
 
 Two children matter:
 
@@ -36,8 +39,7 @@ traj backup --out ~/traj-backup
 ```
 
 The backup writes `traj.jsonl` into a directory that must not already exist, and
-[`traj restore`](/cli/commands/restore/) reads it back into an empty database
-([ADR 0038](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
+[`traj restore`](/cli/commands/restore/) reads it back into an empty database.
 `traj export` writes the same JSONL plus CSV and Markdown, which do not restore.
 
 ## Remove traj, keep the ledger

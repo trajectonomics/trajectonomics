@@ -1,0 +1,39 @@
+/*
+ * The one repository: GitHub's mark, the committed count, and an arrow out. The row is 14 / count / 8,
+ * the sizes twenty's community link uses, inside a 32 px target.
+ */
+.header-repo {
+	display: grid;
+	grid-template-columns: 14px auto 8px;
+	column-gap: 8px;
+	align-items: center;
+	justify-self: end;
+	min-height: 2rem;
+	padding-inline: 2px;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+.header-repo:hover {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.header-repo:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+.header-repo-mark,
+.header-repo-out {
+	display: block;
+}
+
+.header-repo-out {
+	width: 8px;
+	height: 8px;
+}

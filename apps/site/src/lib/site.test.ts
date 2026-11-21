@@ -57,7 +57,7 @@ describe("the Site's own constants", () => {
 		expect(GITHUB_ORG_URL).toBe("https://github.com/trajectonomics")
 	})
 
-	it("names the repositories the Star menu may list, and their GitHub names", () => {
+	it("names the one repository the header links, and its GitHub name", () => {
 		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["trajectonomics/trajectonomics"])
 		expect(STAR_REPOS.map((repo) => repo.repo)).toEqual(["trajectonomics"])
 		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_REPO_URL])

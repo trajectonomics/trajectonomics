@@ -4,9 +4,7 @@ description: Write the stored rows into a new directory.
 ---
 
 `traj export` writes the stored rows into a new directory. The export is a lossless dump, and JSONL
-stays the only importable format
-([ADR 0017](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0017-syncable-roots-and-lossless-export.md),
-[ADR 0028](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0028-export-writes-a-new-directory.md)).
+stays the only importable format.
 
 - `--format <string>` — the file format to write: `jsonl`, `csv` or `md`
 - `--out <string>` — a directory to create; it must not already exist; required
