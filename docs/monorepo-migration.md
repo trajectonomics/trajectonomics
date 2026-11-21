@@ -162,15 +162,21 @@ npm shows about 2–4k downloads a month each, and the CLI itself only 681, so t
 CI and Cloudflare builds. Five packages with their own versions and trusted publishers cost more
 than they give.
 
-- `packages/core/` with subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`,
-  `/tax/th`, `/tax/us`, `/sim`. The four folders keep their source and tests. Each one's history
-  comes in through the phase 1 import, then a `git mv` (history still shows with `git log --follow`).
-- **Dependency direction checked by lint:** `ledger` and `tax` may import `money`. `sim`
-  imports none of the others. `tax`'s production code never imports `sim`, but its levy tests may,
-  because they evaluate the levy graph `tax` emits with sim's evaluator. Nothing imports upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
-  promised. A Biome `noRestrictedImports` rule per folder, or a small script, enforces both.
-- The sim↔tax cycle (§3) is gone by then: phase 2 drops sim's unused optional peer dependency on tax.
-- `cli` and `docs` change imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on.
+- **Layout: four private packages, one published bundle.**
+  ```
+  packages/core/              @trajectonomics/core  (published)
+    package.json, tsdown.config.ts, README.md, scripts/check-deps.ts
+    money/   ledger/   tax/   sim/      private workspace packages, moved here with git mv
+  ```
+  The four keep their package names (`@trajectonomics/money`, and so on), now `"private": true`, and
+  their own scripts, tests and checks, so tax's source, README-claim and coverage checks run as before
+  and turbo still caches each one separately. `@trajectonomics/core`'s build bundles them into
+  subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`, `/tax/th`, `/tax/us`, `/sim`.
+  Nothing outside `packages/core/` imports the private names.
+- **Dependency direction checked:** `scripts/check-deps.ts` (part of core's `check`) fails if
+  `ledger` or `tax` import anything internal except `money`, if `sim` or `money` import any internal
+  package, or if `tax` imports `sim` outside its test files. `tax`'s levy tests may import `sim`.
+- `cli` changes imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on. `docs` keeps npm `sim@0.1.0` until phase 3b deletes the page that documents it.
 - Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
   imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
   higher than any old package's `latest`, so nobody mistakes the two.
