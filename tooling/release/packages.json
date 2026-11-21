@@ -1,0 +1,15 @@
+[
+	{
+		"name": "@trajectonomics/core",
+		"folder": "packages/core",
+		"tagPrefix": "core-v",
+		"firstVersion": "0.3.0",
+		"githubLatest": false
+	},
+	{
+		"name": "@trajectonomics/cli",
+		"folder": "apps/cli",
+		"tagPrefix": "cli-v",
+		"githubLatest": true
+	}
+]
