@@ -127,7 +127,8 @@ describe("the README first screen", () => {
 	it("links the landing page and the docs page, and no other site host", () => {
 		// A trajectonomics.com link is allowed only for the landing page and the docs host.
 		const siteUrls = ["https://trajectonomics.com/", "https://docs.trajectonomics.com/"]
-		const linked = beforeDevelopment.match(/https?:\/\/(?:docs\.)?trajectonomics\.com[^\s)\]]*/g) ?? []
+		const linked =
+			beforeDevelopment.match(/https?:\/\/(?:docs\.)?trajectonomics\.com[^\s)\]]*/g) ?? []
 		expect(linked.length).toBeGreaterThan(0)
 		for (const url of linked) {
 			expect(siteUrls).toContain(url)
