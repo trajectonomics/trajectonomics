@@ -84,8 +84,10 @@ test("/docs still redirects to /", async ({ request }) => {
 		maxRedirects: 0,
 	})
 
-	expect(response.status()).toBe(307)
-	expect(response.headers()["location"]).toBe("/")
+	// The Worker answers the old mount with a permanent redirect that keeps the host and drops the
+	// prefix (ADR 0013); only a request on trajectonomics.com is sent to docs.trajectonomics.com.
+	expect(response.status()).toBe(301)
+	expect(response.headers()["location"]).toBe(`${new URL(response.url()).origin}/`)
 })
 
 test("an audience alias still reaches its Tab", async ({ request }) => {
