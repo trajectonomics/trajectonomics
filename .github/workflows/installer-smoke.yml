@@ -45,13 +45,17 @@ jobs:
       - name: Install the workspace
         working-directory: .
         run: bun install --frozen-lockfile
+      - name: Build the engine the CLI bundles
+        # bun build --compile resolves @trajectonomics/core/* through core's dist/, which only exists after a build.
+        working-directory: .
+        run: bunx turbo run build --filter="@trajectonomics/cli^..." --concurrency=2
       - name: Build the binary and the release tree the script installs from
         shell: bash
         env:
           ASSET: ${{ matrix.asset }}
         run: |
           set -euo pipefail
-          npm version "$VERSION" --no-git-tag-version
+          npm pkg set version="$VERSION" # npm version rejects the workspace: devDependencies
           mkdir -p "release/download/v$VERSION" "release/bad/download/v$VERSION"
           bun build src/index.ts --compile --no-compile-autoload-bunfig --no-compile-autoload-dotenv --outfile "release/download/v$VERSION/$ASSET"
           cd "release/download/v$VERSION"
