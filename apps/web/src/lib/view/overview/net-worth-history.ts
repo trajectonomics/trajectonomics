@@ -22,3 +22,8 @@ export function netWorthHistorySeries(reads: readonly Read<NetWorth>[]): LineSer
 	})
 	return { name: "Net worth", points }
 }
+
+/** The month-end values a sparkline draws, in order: the points the history series holds. */
+export function monthEndValues(reads: readonly Read<NetWorth>[]): number[] {
+	return netWorthHistorySeries(reads).points.map((point) => point.y)
+}
