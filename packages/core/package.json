@@ -3,6 +3,11 @@
 	"version": "0.0.0-development",
 	"description": "Pure personal-finance core: money, double-entry ledger, Thai and US income tax, and the projection engine, as subpath exports.",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "packages/core"
+	},
 	"type": "module",
 	"sideEffects": false,
 	"packageManager": "bun@1.4.4",

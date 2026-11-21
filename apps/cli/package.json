@@ -19,11 +19,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/cli.git"
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "apps/cli"
 	},
-	"homepage": "https://github.com/trajectonomics/cli#readme",
+	"homepage": "https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli#readme",
 	"bugs": {
-		"url": "https://github.com/trajectonomics/cli/issues"
+		"url": "https://github.com/trajectonomics/trajectonomics/issues"
 	},
 	"scripts": {
 		"dev": "bun run src/index.ts",
