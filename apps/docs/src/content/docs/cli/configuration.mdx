@@ -6,13 +6,16 @@ description: The environment variables the Trajectonomics CLI reads.
 The CLI is configured through environment variables; there is no configuration file. A flag beats
 the environment: `--json` beats `TRAJ_FORMAT`.
 
+Only the environment of the shell that runs `traj` counts. A `.env` or `bunfig.toml` file in the
+directory you run it from is never read, so a cloned project cannot point `traj` at another ledger.
+`bunx` is the one exception: Bun reads `bunfig.toml` itself before `traj` starts, so use the install
+script or `npx` inside a directory you do not trust.
+
 ## TRAJ_HOME
 
 The data directory, default `~/.traj`. It holds `traj.db`, the SQLite database, and the npm
-launcher's `bin/` cache of downloaded binaries
-([ADR 0014](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0014-data-directory.md)).
-Override it to keep several ledgers apart, and see [Your data](/cli/data/) for the directory's
-contents, backups and removal:
+launcher's `bin/` cache of downloaded binaries. Override it to keep several ledgers apart, and see
+[Your data](/cli/data/) for the directory's contents, backups and removal:
 
 ```bash
 TRAJ_HOME=/tmp/traj traj init --json
@@ -20,10 +23,8 @@ TRAJ_HOME=/tmp/traj traj init --json
 
 ## TRAJ_FORMAT
 
-`human` (the default) or `json`
-([ADR 0010](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0010-output-contract.md)).
-`--json` takes precedence over the environment. An unrecognized value falls back to `human` and is
-reported as text with exit code 2.
+`human` (the default) or `json`. `--json` takes precedence over the environment. An unrecognized
+value falls back to `human` and is reported as text with exit code 2.
 
 ## TRAJ_DEBUG
 
