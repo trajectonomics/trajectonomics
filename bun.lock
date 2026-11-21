@@ -103,7 +103,7 @@
         "typescript": "^7.0.2",
       },
     },
-    "packages/ledger": {
+    "packages/core/ledger": {
       "name": "@trajectonomics/ledger",
       "version": "0.0.0-development",
       "dependencies": {
@@ -118,7 +118,7 @@
         "typescript": "^7.0.2",
       },
     },
-    "packages/money": {
+    "packages/core/money": {
       "name": "@trajectonomics/money",
       "version": "0.0.0-development",
       "devDependencies": {
@@ -130,7 +130,7 @@
         "typescript": "^7.0.2",
       },
     },
-    "packages/sim": {
+    "packages/core/sim": {
       "name": "@trajectonomics/sim",
       "version": "0.0.0-development",
       "devDependencies": {
@@ -142,7 +142,7 @@
         "typescript": "^7.0.2",
       },
     },
-    "packages/tax": {
+    "packages/core/tax": {
       "name": "@trajectonomics/tax",
       "version": "0.0.0-development",
       "dependencies": {
@@ -784,17 +784,17 @@
 
     "@trajectonomics/internal-skills": ["@trajectonomics/internal-skills@workspace:skills/internal"],
 
-    "@trajectonomics/ledger": ["@trajectonomics/ledger@workspace:packages/ledger"],
+    "@trajectonomics/ledger": ["@trajectonomics/ledger@workspace:packages/core/ledger"],
 
-    "@trajectonomics/money": ["@trajectonomics/money@workspace:packages/money"],
+    "@trajectonomics/money": ["@trajectonomics/money@workspace:packages/core/money"],
 
-    "@trajectonomics/sim": ["@trajectonomics/sim@workspace:packages/sim"],
+    "@trajectonomics/sim": ["@trajectonomics/sim@workspace:packages/core/sim"],
 
     "@trajectonomics/site": ["@trajectonomics/site@workspace:apps/site"],
 
     "@trajectonomics/skills": ["@trajectonomics/skills@workspace:skills/customer"],
 
-    "@trajectonomics/tax": ["@trajectonomics/tax@workspace:packages/tax"],
+    "@trajectonomics/tax": ["@trajectonomics/tax@workspace:packages/core/tax"],
 
     "@turbo/darwin-64": ["@turbo/darwin-64@2.11.10", "", { "os": "darwin", "cpu": "x64" }, "sha512-By4idRap5+nLnMuRzLB4qkOPRlvNdyY1ne4VJYDyUoUB11H94k7uif9mbe3JT8JSNXs1D68uMcBj6hJ/jMQRvA=="],
 
