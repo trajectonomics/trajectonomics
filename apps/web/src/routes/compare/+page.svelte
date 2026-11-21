@@ -1,9 +1,13 @@
 <script lang="ts">
-import PlaceholderPage from "../../components/pages/PlaceholderPage.svelte"
+import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
+import ComparePage from "../../components/pages/ComparePage.svelte"
 </script>
 
 <svelte:head>
 	<title>Compare · Dashboard</title>
 </svelte:head>
 
-<PlaceholderPage title="Compare" intro="Compare is ported to Svelte in the next step. Until then it shows the net worth Read." />
+<ComparePage
+	terms={queryParam("terms", "nominal")}
+	onTerms={(value) => setQueryParam("terms", value)}
+/>
