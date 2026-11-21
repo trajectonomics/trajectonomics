@@ -24,7 +24,8 @@ The checks run in this order, each with a one-sentence verdict of `pass`, `fail`
 - `trialBalance` — the Trial Balance at `--as-of` balances. It is `skipped` without `--as-of`.
 
 A finding is a result, not an error: `ok` is `false` when a check failed, and the process still exits
-`0`. A skipped check is not a failure. Only a bad `--as-of` is an input error (`INVALID_DATE`).
+`0`. A skipped check is not a failure. Only a bad `--as-of` fails the command: `INVALID_DATE`, with exit
+code `3`.
 
 In JSON mode the result carries `cliVersion`, the `directory` and `database` facts, the stored
 `rows` per table, the `checks` in order, and the `trialBalance` when `--as-of` was given.
