@@ -16,7 +16,7 @@
 			"dependsOn": ["^build"]
 		},
 		"check": {
-			"dependsOn": ["^build", "^check"]
+			"dependsOn": ["^build"]
 		}
 	}
 }
