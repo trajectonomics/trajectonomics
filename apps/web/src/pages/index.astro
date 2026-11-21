@@ -1,10 +1,8 @@
 ---
+import { OverviewPage } from "../components/pages/OverviewPage"
 import Layout from "../layouts/Layout.astro"
 ---
 
-<Layout title="Dashboard">
-	<main class="mx-auto max-w-3xl p-6">
-		<h1 class="text-2xl font-semibold">Dashboard</h1>
-		<p class="mt-4">The Dashboard pages arrive in the next change. This page only proves the build and the theme.</p>
-	</main>
+<Layout title="Overview">
+	<OverviewPage client:load />
 </Layout>
