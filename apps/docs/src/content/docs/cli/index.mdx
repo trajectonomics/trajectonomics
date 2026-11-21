@@ -49,8 +49,8 @@ the ledger rather than state a negative asset.
 ## Where your data lives
 
 `traj init` writes `~/.traj/traj.db`, or `$TRAJ_HOME/traj.db` when `TRAJ_HOME` is set. That one file
-is the ledger, and until `traj init` has created it every other ledger command fails with
-`ledger_missing`. [Your data](/cli/data/) says what else is in the directory, what is safe to
+is the ledger, and until `traj init` has created it every command that reads or writes it fails
+with `ledger_missing`. [Your data](/cli/data/) says what else is in the directory, what is safe to
 delete, and how to back it up.
 
 ## What next

@@ -8,16 +8,20 @@ export interface AdrLinkProblem {
 	readonly detail: string
 }
 
-/** A Markdown link whose target has an `adr/` path segment: a design record, written for contributors. */
-const ADR_LINK = /\[([^\]]*)\]\(([^)\s]*\/adr\/[^)\s]*)\)/g
+/**
+ * A path or URL with an `adr/` segment, wherever the page writes it: an inline link with or without
+ * a title, a reference definition, an autolink, a bare URL or an HTML anchor. Matching the path
+ * rather than the link syntax keeps every form a page can link with inside the check.
+ */
+const ADR_PATH = /(?<![\w-])(?:[^\s()<>"'[\]]*\/)?adr\/[^\s()<>"'[\]]+/gi
 
-/** Every design-record link in `file`; empty outside the Operator tab, whose readers are contributors. */
+/** Every design-record path in `file`; empty outside the Operator tab, whose readers are contributors. */
 function linkProblems(file: ContentFile): readonly AdrLinkProblem[] {
 	if (!file.path.startsWith(`${OPERATOR_TAB_CONTENT}/`)) return []
-	return [...file.content.matchAll(ADR_LINK)].map((match) => ({
+	return [...file.content.matchAll(ADR_PATH)].map((match) => ({
 		rule: "adr-link",
 		file: file.path,
-		detail: `links a design record: [${(match[1] ?? "").replace(/\s+/g, " ")}](${match[2]})`,
+		detail: `links a design record: ${match[0]}`,
 	}))
 }
 

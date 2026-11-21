@@ -6,7 +6,7 @@ status: accepted
 
 An Operator-tab page (`src/content/docs/cli/`) tells a reader what `traj` does and what to type. It links no ADR. A fact a reader needs is stated on the page in the reader's words. The reasoning behind a design stays in the ADR, and contributors find it from the source tree that `cli/index.mdx` links. `src/lib/adr-links.ts` fails `bun test` on an Operator page that links any path with an `adr/` segment. The Contribute tab keeps its ADR links, because its readers are the contributors those records are written for.
 
-On 2026-11-21 the Operator tab carried about 70 ADR links across 24 of its 26 pages. 61 of them pinned `cli-v0.2.0` while `0.4.0` was the latest release. They came from [ADR 0002](./0002-authored-content-with-proposal-only-sync.md)'s "Upstream ADRs are linked on GitHub, never copied". That ADR was superseded with Docs Sync, but the habit outlived it. Each link also brought a clause of contributor reasoning ("so a pipe and a terminal cannot disagree by accident"). That clause answers a question the reader never asked, and it pinned the page to a tag that went stale.
+On 2026-11-21 the Operator tab carried 66 ADR links across 23 of its 26 pages. 61 of them pinned `cli-v0.2.0` while `0.4.0` was the latest release. They came from [ADR 0002](./0002-authored-content-with-proposal-only-sync.md)'s "Upstream ADRs are linked on GitHub, never copied". That ADR was superseded with Docs Sync, but the habit outlived it. Each link also brought a clause of contributor reasoning ("so a pipe and a terminal cannot disagree by accident"). That clause answers a question the reader never asked, and it pinned the page to a tag that went stale.
 
 ## Considered options
 

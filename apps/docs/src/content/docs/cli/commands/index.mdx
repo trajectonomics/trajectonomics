@@ -51,8 +51,8 @@ A bare `--` ends flag parsing: nothing after it counts as a flag.
 ## Errors
 
 In JSON mode a failure is a JSON envelope on stderr, where `code` names the failure and `exitCode`
-names its class; both come from one registry that `traj schema` prints. `hint`, when present, names
-what to run next. `traj account show Nope --json` on a ledger with no such account prints:
+names its class; both come from one registry that `traj schema` prints. `hint`, when present, says
+what to do next. `traj account show Nope --json` on a ledger with no such account prints:
 
 ```json
 {"error":{"code":"not_found","exitCode":4,"message":"No account matches \"Nope\".","hint":"Run \"traj account list\" to see the chart.","details":{"resource":"account"}}}
@@ -60,8 +60,8 @@ what to run next. `traj account show Nope --json` on a ledger with no such accou
 
 Outside JSON mode the same failure is text on stderr with the same exit code. Commands never prompt.
 
-Two codes are worth retrying as they are: `database_busy` and `disk_full`. Every other failure is
-permanent, and running the same command again gives the same answer. `traj help` lists the
+Two codes are worth retrying as they are: `database_busy` and `disk_full`. For every other failure,
+running the same command again unchanged gives the same answer. `traj help` lists the
 retryable codes, and each code in `traj schema`'s registry carries `retryable`.
 
 A command that reads or writes the ledger fails with `ledger_missing` (exit code `4`) until
