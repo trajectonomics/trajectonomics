@@ -55,7 +55,7 @@ body:
     id: actual
     attributes:
       label: Actual behaviour
-      description: What happened instead: the error, stack trace, output or return value.
+      description: "What happened instead: the error, stack trace, output or return value."
     validations:
       required: true
   - type: input
