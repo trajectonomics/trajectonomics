@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import simPackage from "@trajectonomics/core/package.json"
+import simPackage from "../package.json"
 import type { FiView } from "./projection/fi-view"
 import { AS_OF, baseFlags, errorOf, fi, HORIZON, projectionHome } from "./projection/testing"
 import { type Captured, capture } from "./test-support"
@@ -19,7 +19,7 @@ describe("fi", () => {
 		const body = bodyOf(res)
 		expect(body.asOf).toBe(AS_OF)
 		expect(body.horizon).toBe(HORIZON)
-		expect(body.engine).toEqual({ package: "@trajectonomics/core", version: simPackage.version })
+		expect(body.engine).toEqual({ package: "@trajectonomics/cli", version: simPackage.version })
 		expect(body.method).toBe("survival")
 		expect(body.definition).toEqual({ method: "survival", definitionVersion: 1 })
 		expect(body.fi).toMatchObject({ reachable: true, fiDate: "2026-04-01" })

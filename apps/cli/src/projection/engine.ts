@@ -1,13 +1,17 @@
-import { version as simVersion } from "@trajectonomics/core/package.json"
 import type { ProjectionProblem } from "@trajectonomics/core/sim"
+import { version as cliVersion } from "../../package.json"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
 
-/** The engine's package and the exact version this build runs on (ADR-0030). */
-export const SIM_PACKAGE = "@trajectonomics/core"
+/**
+ * The engine's package and the exact version this build runs on (ADR-0030). The engine
+ * (`packages/core`) is not published on its own: it ships bundled inside this CLI, so the
+ * installable package that pins it is `@trajectonomics/cli` at the CLI's own version.
+ */
+export const SIM_PACKAGE = "@trajectonomics/cli"
 
-/** The engine version, read from the package that ships it. */
-export const SIM_VERSION: string = simVersion
+/** The engine version: the version of the CLI that bundles it. */
+export const SIM_VERSION: string = cliVersion
 
 /** One engine problem as the envelope's detail row: the core's code, path, date and account. */
 type ProblemDetail = { code: string; path?: string; date?: string; account?: string }

@@ -9,7 +9,7 @@ export function scenarioShapeDescription(simVersion: string): string {
 		"Every amount is an integer of minor units and every rate an integer of basis points, as each field's own description states.",
 		"An Account's `id` is the name this document gives it, and every other reference uses that name; a projection also accepts the Ledger Account's own id, which `traj baseline show --json` lists.",
 		"A Flow's `amount` is a positive magnitude, never a signed posting: `kind` decides the direction, and an expense Flow spends what it names.",
-		`@trajectonomics/core@${simVersion}'s \`check()\`, with an empty Baseline and no Timeline, is the only validator: its codes are the only refusals, and this shape is documentation of what it accepts, with the units and closed values it cannot state itself (ADR-0024).`,
+		`The \`check()\` of the engine bundled in @trajectonomics/cli@${simVersion}, with an empty Baseline and no Timeline, is the only validator: its codes are the only refusals, and this shape is documentation of what it accepts, with the units and closed values it cannot state itself (ADR-0024).`,
 		"What this version cannot do is listed by `traj schema`.",
 	].join(" ")
 }
