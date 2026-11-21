@@ -26,9 +26,14 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 - `src/lib/contract/`: strict schemas for each read leaf, written from `traj schema <leaf> --json`.
 - `src/lib/snapshot/`: the pure Plan, which decides the argv and assembles the Snapshot.
 - `scripts/`: the I/O: spawning `traj`, reading the ledger for the demo, writing files.
+- `src/lib/view/`, `src/lib/format/`, `src/lib/chart/`: pure functions from a Snapshot to what a page shows, the formatting of the CLI's strings, and the chart geometry.
+- `src/client/`: the browser: storage, the address bar, `fetch`, and the React hooks over them.
+- `src/components/` and `src/pages/`: the eight pages, one island each.
 - `docs/adr/` and [GLOSSARY.md](GLOSSARY.md): why it is shaped this way, and its words.
 
-The pages arrive in the next change. For now `src/pages/index.astro` only shows that the build and the brand theme work.
+## Pages
+
+Overview, Net worth, Ledger, Projection, FI date, Compare, Tax and Health. Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx astro preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
 
 ## Licence
 

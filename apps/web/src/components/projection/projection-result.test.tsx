@@ -34,7 +34,8 @@ describe("ProjectionResult", () => {
 		const html = renderToStaticMarkup(
 			<ProjectionResult run={projectionRunFixture({ runsOut: null })} argv={ARGV} />,
 		)
-		expect(html).toContain("Does not run out before 31 Dec 2028")
+		expect(html).toContain("Does not run out before")
+		expect(html).toContain('<span class="whitespace-nowrap">31 Dec 2028</span>')
 	})
 
 	test("marks the year the projection ended in part", () => {
