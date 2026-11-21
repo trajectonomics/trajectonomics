@@ -37,7 +37,8 @@ It refuses a tag that is not `cli-vX.Y.Z`, then smoke-tests and uploads the bina
 
 ## One-time cutover (owner)
 
-Do these once, in order. Until (b) is done, every release from here fails with an auth error.
+Do these once, in order. Nothing runs before (c): `release.yml` does nothing until the repository
+variable `RELEASES_ENABLED` is `true`, so merging to main cannot publish by accident.
 
 **(a) Publish core once by hand at `0.3.0-alpha.0`.** npm cannot attach a Trusted Publisher to a
 package that does not exist yet. From a clean checkout of main:
@@ -47,6 +48,7 @@ bun install --frozen-lockfile
 bunx turbo run check --filter=@trajectonomics/core... --concurrency=2
 cd packages/core
 npm pkg set version=0.3.0-alpha.0
+npm pkg delete devDependencies
 mkdir -p ~/.cache/release && bun pm pack --destination ~/.cache/release
 npm login
 npm publish ~/.cache/release/trajectonomics-core-0.3.0-alpha.0.tgz --access public --tag alpha --provenance=false
@@ -59,11 +61,17 @@ git checkout -- package.json
 GitHub Actions, repository `trajectonomics/trajectonomics`, workflow `release.yml`, no environment.
 For `cli`, replace the old `trajectonomics/cli` publisher.
 
-**(c) First stable of each.** Dispatch the workflow for `core` (it publishes `0.3.0`, tag
-`core-v0.3.0`) and for `cli` (`bump` as needed). Check that `latest` on npm is what you expect:
-`npm view @trajectonomics/core dist-tags`.
+**(c) Turn releases on.** `gh variable set RELEASES_ENABLED --body true -R trajectonomics/trajectonomics`.
+From here every push to main publishes alphas. Turn it off again with `--body false`.
 
-**(d) Deprecate the retired packages.** Each command marks every version of the old package:
+**(d) First stable of each.** Dispatch the workflow for `core` (it publishes `0.3.0`, tag
+`core-v0.3.0`) and for `cli` with `bump=auto`. Expect cli `0.4.0`: cli counts `packages/core` as
+its own (its binaries bundle core), and core's imported history after `cli-v0.3.0` holds `feat`
+commits. That release is also the first one whose binaries live in this repository, so do it before
+the docs and site deploy from here (their install lines point at this repository's releases).
+Check that `latest` on npm is what you expect: `npm view @trajectonomics/core dist-tags`.
+
+**(e) Deprecate the retired packages.** Each command marks every version of the old package:
 
 ```sh
 npm deprecate @trajectonomics/money "Moved into @trajectonomics/core (import @trajectonomics/core/money). No longer published."
@@ -76,4 +84,4 @@ npm deprecate @trajectonomics/design-system-svelte "Retired. Source is packages/
 npm deprecate @trajectonomics/design-system-assets "Retired. Source is packages/brand in github.com/trajectonomics/trajectonomics; not published."
 ```
 
-Run them as the owner, after (c). They are reversible: `npm deprecate <pkg> ""` clears the message.
+Run them as the owner, after (d). They are reversible: `npm deprecate <pkg> ""` clears the message.

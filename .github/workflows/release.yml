@@ -35,6 +35,10 @@ permissions:
 
 jobs:
   plan:
+    # Safety switch: nothing runs until the owner sets the repository variable RELEASES_ENABLED to
+    # true (docs/runbooks/release.md, cutover step c). Until then a merge to main publishes nothing,
+    # even if an NPM_TOKEN secret is inherited from the organisation.
+    if: vars.RELEASES_ENABLED == 'true'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
@@ -75,8 +79,9 @@ jobs:
             fi
             selected='[]'
             while IFS= read -r package; do
-              folder=$(jq -r .folder <<<"$package")
-              changed=$(git diff --name-only "$base" "$SHA" -- "$folder" | grep -v '\.md$' || true)
+              # A package also changes when a path it ships from changes (cli bundles packages/core).
+              mapfile -t paths < <(jq -r '.folder, (.extraPaths // [])[]' <<<"$package")
+              changed=$(git diff --name-only "$base" "$SHA" -- "${paths[@]}" | grep -v '\.md$' || true)
               if [ -n "$changed" ]; then
                 selected=$(jq -c --argjson package "$package" '. + [$package]' <<<"$selected")
               fi
@@ -108,6 +113,7 @@ jobs:
       FOLDER: ${{ matrix.folder }}
       TAG_PREFIX: ${{ matrix.tagPrefix }}
       FIRST_VERSION: ${{ matrix.firstVersion }}
+      EXTRA_PATHS: ${{ join(matrix.extraPaths, ' ') }}
       GITHUB_LATEST: ${{ matrix.githubLatest }}
     steps:
       - uses: actions/checkout@v4
@@ -130,6 +136,7 @@ jobs:
           set -euo pipefail
           args=(--package-folder "$FOLDER" --tag-prefix "$TAG_PREFIX" --channel "$CHANNEL" --bump "$BUMP")
           if [ -n "$FIRST_VERSION" ]; then args+=(--first-version "$FIRST_VERSION"); fi
+          for extra in $EXTRA_PATHS; do args+=(--extra-path "$extra"); done
           VERSION=$(bun tooling/release/version.ts "${args[@]}")
           if [ "$CHANNEL" = "stable" ]; then
             DIST_TAG=latest
@@ -191,6 +198,9 @@ jobs:
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
           fi
+          # Consumers never install devDependencies, and core's name private workspace packages
+          # at versions npm does not have, so ship the manifest without them.
+          npm pkg delete devDependencies
           bun pm pack --quiet --destination "$RUNNER_TEMP"
           npm publish "$RUNNER_TEMP"/*.tgz --tag "$DIST_TAG" --provenance
 
