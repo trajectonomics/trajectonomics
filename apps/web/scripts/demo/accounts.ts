@@ -4,8 +4,10 @@ export const DEMO_ACCOUNTS = [
 	{ name: "Fund", type: "asset" },
 	{ name: "Car Loan", type: "liability" },
 	{ name: "Salary", type: "income" },
+	{ name: "Fund Return", type: "income" },
 	{ name: "Living", type: "expense" },
 	{ name: "Rent", type: "expense" },
+	{ name: "Travel", type: "expense" },
 	{ name: "Opening", type: "equity" },
 ] as const
 

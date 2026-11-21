@@ -53,15 +53,15 @@
 				"database": {
 					"path": "~/.traj/traj.db",
 					"exists": true,
-					"bytes": 212992,
+					"bytes": 233472,
 					"schemaVersion": 2,
 					"head": 2
 				},
 				"rows": {
 					"entity": 1,
-					"account": 7,
-					"tx": 123,
-					"posting": 246,
+					"account": 9,
+					"tx": 152,
+					"posting": 304,
 					"scenario": 2
 				},
 				"trialBalance": {
@@ -69,8 +69,8 @@
 					"totals": [
 						{
 							"currency": "THB",
-							"debit": "2274000.00",
-							"credit": "2274000.00"
+							"debit": "2575600.00",
+							"credit": "2575600.00"
 						}
 					],
 					"balanced": true
@@ -99,7 +99,7 @@
 					{
 						"name": "ledger",
 						"status": "pass",
-						"detail": "123 transactions and 246 postings validate."
+						"detail": "152 transactions and 304 postings validate."
 					},
 					{
 						"name": "trialBalance",
@@ -117,16 +117,16 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+							"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 							"name": "Bank"
 						},
 						"type": "asset",
-						"amount": "606000.00",
+						"amount": "662300.00",
 						"currency": "THB"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+							"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,25 +135,34 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+							"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 							"name": "Fund"
 						},
 						"type": "asset",
-						"amount": "660000.00",
+						"amount": "736600.00",
 						"currency": "THB"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+							"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+							"name": "Fund Return"
+						},
+						"type": "income",
+						"amount": "-76600.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 							"name": "Living"
 						},
 						"type": "expense",
-						"amount": "672000.00",
+						"amount": "762200.00",
 						"currency": "THB"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1fe9-71fa-abfd-6339e977c953",
+							"id": "01a1ff20-a4c9-7631-8b8b-a44f36754024",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -162,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+							"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -171,34 +180,43 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+							"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 							"name": "Salary"
 						},
 						"type": "income",
-						"amount": "-2040000.00",
+						"amount": "-2265000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff20-a45f-7575-9c58-838725470f49",
+							"name": "Travel"
+						},
+						"type": "expense",
+						"amount": "78500.00",
 						"currency": "THB"
 					}
 				],
 				"netWorth": [
 					{
 						"currency": "THB",
-						"amount": "1082000.00"
+						"amount": "1214900.00"
 					}
 				],
 				"trialBalance": {
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
-							"debit": "606000.00",
+							"debit": "662300.00",
 							"credit": "0.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -207,25 +225,34 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
-							"debit": "660000.00",
+							"debit": "736600.00",
 							"credit": "0.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+								"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+								"name": "Fund Return"
+							},
+							"debit": "0.00",
+							"credit": "76600.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 								"name": "Living"
 							},
-							"debit": "672000.00",
+							"debit": "762200.00",
 							"credit": "0.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1fe9-71fa-abfd-6339e977c953",
+								"id": "01a1ff20-a4c9-7631-8b8b-a44f36754024",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -234,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+								"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -243,19 +270,28 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+								"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 								"name": "Salary"
 							},
 							"debit": "0.00",
-							"credit": "2040000.00",
+							"credit": "2265000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff20-a45f-7575-9c58-838725470f49",
+								"name": "Travel"
+							},
+							"debit": "78500.00",
+							"credit": "0.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"debit": "2274000.00",
-							"credit": "2274000.00"
+							"debit": "2575600.00",
+							"credit": "2575600.00"
 						}
 					]
 				}
@@ -271,16 +307,25 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
-							"name": "Living"
+							"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+							"name": "Fund Return"
 						},
-						"type": "expense",
-						"amount": "280000.00",
+						"type": "income",
+						"amount": "-23300.00",
 						"currency": "THB"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+							"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
+							"name": "Living"
+						},
+						"type": "expense",
+						"amount": "348500.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -289,18 +334,27 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+							"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 							"name": "Salary"
 						},
 						"type": "income",
-						"amount": "-850000.00",
+						"amount": "-900000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff20-a45f-7575-9c58-838725470f49",
+							"name": "Travel"
+						},
+						"type": "expense",
+						"amount": "36500.00",
 						"currency": "THB"
 					}
 				],
 				"totals": [
 					{
 						"currency": "THB",
-						"amount": "430000.00"
+						"amount": "398300.00"
 					}
 				]
 			}
@@ -311,16 +365,16 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a1ff0e-2209-71e0-b058-bafd059c4b5c",
+						"id": "01a1ff20-a6d5-7277-828c-12dd05a22bc0",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
-						"externalRef": "demo-rent-2026-08",
+						"externalRef": "demo-rent-2026-08-01",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+									"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -330,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -340,45 +394,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e1-80cb-8a5426100dc4",
+						"id": "01a1ff20-a6d5-727a-8b91-12139053e1a2",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
-						"externalRef": "demo-living-2026-08",
+						"externalRef": "demo-living-2026-08-05",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+									"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 									"name": "Living"
 								},
-								"amount": "28000.00",
+								"amount": "30300.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "-28000.00",
+								"amount": "-30300.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e2-8b6c-760d951162e8",
+						"id": "01a1ff20-a6d5-7278-bc26-7bb2dbc49998",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
-						"externalRef": "demo-car-2026-08",
+						"externalRef": "demo-car-2026-08-10",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+									"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -388,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -398,45 +452,74 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71df-8d99-babe76e0f915",
+						"id": "01a1ff20-a6d5-728d-8097-eb8e33044451",
+						"date": "2026-08-15",
+						"memo": "new laptop",
+						"linkedTo": null,
+						"externalRef": "demo-laptop-2026-08-15",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
+									"name": "Living"
+								},
+								"amount": "58000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
+									"name": "Bank"
+								},
+								"amount": "-58000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff20-a6d5-727b-a4b1-f017ae70c76b",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
-						"externalRef": "demo-salary-2026-08",
+						"externalRef": "demo-salary-2026-08-25",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "85000.00",
+								"amount": "90000.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+									"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 									"name": "Salary"
 								},
-								"amount": "-85000.00",
+								"amount": "-90000.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e3-b864-a2ce1a3205f0",
+						"id": "01a1ff20-a6d5-7279-a97d-5a00d5894f95",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
-						"externalRef": "demo-fund-2026-08",
+						"externalRef": "demo-fund-2026-08-26",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -446,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -456,16 +539,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e5-8ca0-14ee7ca1a394",
+						"id": "01a1ff20-a6d5-727c-aa4e-b78e7bdc3d23",
+						"date": "2026-08-28",
+						"memo": "market move",
+						"linkedTo": null,
+						"externalRef": "demo-market-2026-08-28",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
+									"name": "Fund"
+								},
+								"amount": "9500.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+									"name": "Fund Return"
+								},
+								"amount": "-9500.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff20-a6d5-727d-8ad4-eb0175366683",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
-						"externalRef": "demo-rent-2026-09",
+						"externalRef": "demo-rent-2026-09-01",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+									"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -475,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -485,45 +597,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e6-acbb-7fb78e0a53a5",
+						"id": "01a1ff20-a6d5-7280-bef8-673c17702a10",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
-						"externalRef": "demo-living-2026-09",
+						"externalRef": "demo-living-2026-09-05",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+									"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 									"name": "Living"
 								},
-								"amount": "28000.00",
+								"amount": "26900.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "-28000.00",
+								"amount": "-26900.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e7-90cb-82e512ad62a2",
+						"id": "01a1ff20-a6d5-727e-b2cc-f64dea7b4b3a",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
-						"externalRef": "demo-car-2026-09",
+						"externalRef": "demo-car-2026-09-10",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+									"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -533,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -543,45 +655,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e4-8060-3e72d05cdd34",
+						"id": "01a1ff20-a6d5-7281-ae0a-016f34ddfa7b",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
-						"externalRef": "demo-salary-2026-09",
+						"externalRef": "demo-salary-2026-09-25",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "85000.00",
+								"amount": "90000.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+									"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 									"name": "Salary"
 								},
-								"amount": "-85000.00",
+								"amount": "-90000.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e8-88ff-e2c136317701",
+						"id": "01a1ff20-a6d5-727f-9702-51b9882dfd61",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
-						"externalRef": "demo-fund-2026-09",
+						"externalRef": "demo-fund-2026-09-26",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -591,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -601,16 +713,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71ea-9d3f-b2030cd26541",
-						"date": "2026-10-01",
-						"memo": "rent",
+						"id": "01a1ff20-a6d5-7282-baec-d25355b3342c",
+						"date": "2026-09-28",
+						"memo": "market move",
 						"linkedTo": null,
-						"externalRef": "demo-rent-2026-10",
+						"externalRef": "demo-market-2026-09-28",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+									"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+									"name": "Fund Return"
+								},
+								"amount": "12600.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
+									"name": "Fund"
+								},
+								"amount": "-12600.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff20-a6d5-7283-bb29-562f0c79be2c",
+						"date": "2026-10-01",
+						"memo": "rent",
+						"linkedTo": null,
+						"externalRef": "demo-rent-2026-10-01",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -620,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -630,45 +771,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71eb-82eb-a1808e3df120",
+						"id": "01a1ff20-a6d5-7286-9491-7b3e745b0921",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
-						"externalRef": "demo-living-2026-10",
+						"externalRef": "demo-living-2026-10-05",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+									"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 									"name": "Living"
 								},
-								"amount": "28000.00",
+								"amount": "28800.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "-28000.00",
+								"amount": "-28800.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71ec-ab10-02c7338eb66c",
+						"id": "01a1ff20-a6d5-7284-966f-e46e4191e236",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
-						"externalRef": "demo-car-2026-10",
+						"externalRef": "demo-car-2026-10-10",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+									"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -678,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -688,45 +829,45 @@
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71e9-a477-0ae6af99ed77",
+						"id": "01a1ff20-a6d5-7287-a346-feb218fe1d0c",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
-						"externalRef": "demo-salary-2026-10",
+						"externalRef": "demo-salary-2026-10-25",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
-								"amount": "85000.00",
+								"amount": "90000.00",
 								"currency": "THB",
 								"dimensions": null
 							},
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+									"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 									"name": "Salary"
 								},
-								"amount": "-85000.00",
+								"amount": "-90000.00",
 								"currency": "THB",
 								"dimensions": null
 							}
 						]
 					},
 					{
-						"id": "01a1ff0e-2209-71ed-940d-77dcf2a22410",
+						"id": "01a1ff20-a6d5-7285-90f8-d15130586e8b",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
-						"externalRef": "demo-fund-2026-10",
+						"externalRef": "demo-fund-2026-10-26",
 						"postings": [
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -736,10 +877,39 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+									"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff20-a6d5-7288-ac90-8999b4e54f17",
+						"date": "2026-10-28",
+						"memo": "market move",
+						"linkedTo": null,
+						"externalRef": "demo-market-2026-10-28",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
+									"name": "Fund"
+								},
+								"amount": "7300.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+									"name": "Fund Return"
+								},
+								"amount": "-7300.00",
 								"currency": "THB",
 								"dimensions": null
 							}
@@ -757,23 +927,23 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+							"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 							"name": "Bank"
 						},
 						"kind": "asset",
-						"amount": "606000.00"
+						"amount": "662300.00"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+							"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 							"name": "Fund"
 						},
 						"kind": "asset",
-						"amount": "660000.00"
+						"amount": "736600.00"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+							"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -793,16 +963,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "169000.00",
+							"amount": "169500.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -811,18 +981,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "315000.00",
+							"amount": "325800.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "93000.00"
+							"amount": "104300.00"
 						}
 					]
 				}
@@ -837,16 +1007,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "188000.00",
+							"amount": "267400.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -855,18 +1025,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "330000.00",
+							"amount": "345000.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "136000.00"
+							"amount": "230400.00"
 						}
 					]
 				}
@@ -881,16 +1051,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "207000.00",
+							"amount": "282900.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -899,18 +1069,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "345000.00",
+							"amount": "368200.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "179000.00"
+							"amount": "278100.00"
 						}
 					]
 				}
@@ -925,16 +1095,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "226000.00",
+							"amount": "303100.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -943,18 +1113,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "360000.00",
+							"amount": "377800.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "222000.00"
+							"amount": "316900.00"
 						}
 					]
 				}
@@ -969,16 +1139,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "245000.00",
+							"amount": "322200.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -987,18 +1157,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "375000.00",
+							"amount": "404100.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "265000.00"
+							"amount": "371300.00"
 						}
 					]
 				}
@@ -1013,16 +1183,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "264000.00",
+							"amount": "294000.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1031,18 +1201,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "390000.00",
+							"amount": "409300.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "308000.00"
+							"amount": "357300.00"
 						}
 					]
 				}
@@ -1057,16 +1227,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "283000.00",
+							"amount": "312600.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1075,18 +1245,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "405000.00",
+							"amount": "430400.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "351000.00"
+							"amount": "406000.00"
 						}
 					]
 				}
@@ -1101,16 +1271,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "302000.00",
+							"amount": "332500.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1119,18 +1289,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "420000.00",
+							"amount": "457800.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "394000.00"
+							"amount": "462300.00"
 						}
 					]
 				}
@@ -1145,16 +1315,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "321000.00",
+							"amount": "349900.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1163,18 +1333,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "435000.00",
+							"amount": "469100.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "437000.00"
+							"amount": "500000.00"
 						}
 					]
 				}
@@ -1189,16 +1359,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "340000.00",
+							"amount": "366600.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1207,18 +1377,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "450000.00",
+							"amount": "493600.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "480000.00"
+							"amount": "550200.00"
 						}
 					]
 				}
@@ -1233,16 +1403,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "359000.00",
+							"amount": "386700.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1251,18 +1421,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "465000.00",
+							"amount": "496000.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "523000.00"
+							"amount": "581700.00"
 						}
 					]
 				}
@@ -1277,16 +1447,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "378000.00",
+							"amount": "404900.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1295,18 +1465,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "480000.00",
+							"amount": "518300.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "566000.00"
+							"amount": "631200.00"
 						}
 					]
 				}
@@ -1321,16 +1491,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "397000.00",
+							"amount": "424400.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1339,18 +1509,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "495000.00",
+							"amount": "544100.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "609000.00"
+							"amount": "685500.00"
 						}
 					]
 				}
@@ -1365,16 +1535,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "416000.00",
+							"amount": "527300.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1383,18 +1553,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "510000.00",
+							"amount": "563300.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "652000.00"
+							"amount": "816600.00"
 						}
 					]
 				}
@@ -1409,16 +1579,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "435000.00",
+							"amount": "547800.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1427,18 +1597,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "525000.00",
+							"amount": "586500.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "695000.00"
+							"amount": "869300.00"
 						}
 					]
 				}
@@ -1453,16 +1623,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "454000.00",
+							"amount": "536500.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1471,18 +1641,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "540000.00",
+							"amount": "596100.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "738000.00"
+							"amount": "876600.00"
 						}
 					]
 				}
@@ -1497,16 +1667,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "473000.00",
+							"amount": "560600.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1515,18 +1685,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "555000.00",
+							"amount": "622400.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "781000.00"
+							"amount": "936000.00"
 						}
 					]
 				}
@@ -1541,16 +1711,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "492000.00",
+							"amount": "579400.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1559,18 +1729,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "570000.00",
+							"amount": "627600.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "824000.00"
+							"amount": "969000.00"
 						}
 					]
 				}
@@ -1585,16 +1755,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "511000.00",
+							"amount": "603000.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1603,18 +1773,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "585000.00",
+							"amount": "648700.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "867000.00"
+							"amount": "1022700.00"
 						}
 					]
 				}
@@ -1629,16 +1799,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "530000.00",
+							"amount": "627900.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1647,18 +1817,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "600000.00",
+							"amount": "676100.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "910000.00"
+							"amount": "1084000.00"
 						}
 					]
 				}
@@ -1673,16 +1843,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "549000.00",
+							"amount": "650300.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1691,18 +1861,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "615000.00",
+							"amount": "687400.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "953000.00"
+							"amount": "1126700.00"
 						}
 					]
 				}
@@ -1717,16 +1887,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "568000.00",
+							"amount": "614000.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1735,18 +1905,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "630000.00",
+							"amount": "711900.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "996000.00"
+							"amount": "1123900.00"
 						}
 					]
 				}
@@ -1761,16 +1931,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "587000.00",
+							"amount": "639100.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1779,18 +1949,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "645000.00",
+							"amount": "714300.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "1039000.00"
+							"amount": "1160400.00"
 						}
 					]
 				}
@@ -1805,16 +1975,16 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+								"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 								"name": "Bank"
 							},
 							"type": "asset",
-							"amount": "606000.00",
+							"amount": "662300.00",
 							"currency": "THB"
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+								"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1823,18 +1993,18 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+								"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 								"name": "Fund"
 							},
 							"type": "asset",
-							"amount": "660000.00",
+							"amount": "736600.00",
 							"currency": "THB"
 						}
 					],
 					"totals": [
 						{
 							"currency": "THB",
-							"amount": "1082000.00"
+							"amount": "1214900.00"
 						}
 					]
 				}
@@ -1863,10 +2033,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff0e-231b-73b8-a96c-0b320542b0ee",
+						"id": "01a1ff20-a7dd-764d-a972-09a6fde61a78",
 						"name": "base",
-						"contentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926",
-						"effectiveContentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926"
+						"contentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b",
+						"effectiveContentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -2038,9 +2208,9 @@
 							"from": "2026-01-01",
 							"to": "2026-12-31",
 							"settlementDate": "2027-03-31",
-							"due": "87000.00",
+							"due": "89000.00",
 							"prepaid": "0.00",
-							"owed": "87000.00",
+							"owed": "89000.00",
 							"settled": true,
 							"partial": false
 						},
@@ -2049,9 +2219,9 @@
 							"from": "2027-01-01",
 							"to": "2027-12-31",
 							"settlementDate": "2028-03-31",
-							"due": "88020.00",
+							"due": "100080.00",
 							"prepaid": "0.00",
-							"owed": "88020.00",
+							"owed": "100080.00",
 							"settled": true,
 							"partial": false
 						},
@@ -2060,9 +2230,9 @@
 							"from": "2028-01-01",
 							"to": "2028-12-31",
 							"settlementDate": "2029-03-31",
-							"due": "94170.60",
+							"due": "106592.40",
 							"prepaid": "0.00",
-							"owed": "94170.60",
+							"owed": "106592.40",
 							"settled": true,
 							"partial": false
 						},
@@ -2071,9 +2241,9 @@
 							"from": "2029-01-01",
 							"to": "2029-12-31",
 							"settlementDate": "2030-03-31",
-							"due": "100505.72",
+							"due": "113300.17",
 							"prepaid": "0.00",
-							"owed": "100505.72",
+							"owed": "113300.17",
 							"settled": true,
 							"partial": false
 						},
@@ -2082,9 +2252,9 @@
 							"from": "2030-01-01",
 							"to": "2030-12-31",
 							"settlementDate": "2031-03-31",
-							"due": "107030.90",
+							"due": "121511.47",
 							"prepaid": "0.00",
-							"owed": "107030.90",
+							"owed": "121511.47",
 							"settled": true,
 							"partial": false
 						},
@@ -2093,9 +2263,9 @@
 							"from": "2031-01-01",
 							"to": "2031-12-31",
 							"settlementDate": "2032-03-31",
-							"due": "113751.82",
+							"due": "130406.81",
 							"prepaid": "0.00",
-							"owed": "113751.82",
+							"owed": "130406.81",
 							"settled": true,
 							"partial": false
 						},
@@ -2104,9 +2274,9 @@
 							"from": "2032-01-01",
 							"to": "2032-12-31",
 							"settlementDate": "2033-03-31",
-							"due": "122092.98",
+							"due": "139569.03",
 							"prepaid": "0.00",
-							"owed": "122092.98",
+							"owed": "139569.03",
 							"settled": true,
 							"partial": false
 						},
@@ -2115,9 +2285,9 @@
 							"from": "2033-01-01",
 							"to": "2033-12-31",
 							"settlementDate": "2034-03-31",
-							"due": "131005.77",
+							"due": "149006.10",
 							"prepaid": "0.00",
-							"owed": "131005.77",
+							"owed": "149006.10",
 							"settled": true,
 							"partial": false
 						},
@@ -2126,9 +2296,9 @@
 							"from": "2034-01-01",
 							"to": "2034-12-31",
 							"settlementDate": "2035-03-31",
-							"due": "140185.93",
+							"due": "158726.28",
 							"prepaid": "0.00",
-							"owed": "140185.93",
+							"owed": "158726.28",
 							"settled": true,
 							"partial": false
 						},
@@ -2137,9 +2307,9 @@
 							"from": "2035-01-01",
 							"to": "2035-12-31",
 							"settlementDate": "2036-03-31",
-							"due": "149641.51",
+							"due": "168738.07",
 							"prepaid": "0.00",
-							"owed": "149641.51",
+							"owed": "168738.07",
 							"settled": true,
 							"partial": false
 						},
@@ -2148,9 +2318,9 @@
 							"from": "2036-01-01",
 							"to": "2036-12-31",
 							"settlementDate": "2037-03-31",
-							"due": "159380.75",
+							"due": "179050.21",
 							"prepaid": "0.00",
-							"owed": "159380.75",
+							"owed": "179050.21",
 							"settled": true,
 							"partial": false
 						},
@@ -2159,9 +2329,9 @@
 							"from": "2037-01-01",
 							"to": "2037-12-31",
 							"settlementDate": "2038-03-31",
-							"due": "169412.17",
+							"due": "189671.70",
 							"prepaid": "0.00",
-							"owed": "169412.17",
+							"owed": "189671.70",
 							"settled": true,
 							"partial": false
 						},
@@ -2170,9 +2340,9 @@
 							"from": "2038-01-01",
 							"to": "2038-12-31",
 							"settlementDate": "2039-03-31",
-							"due": "179744.54",
+							"due": "200611.87",
 							"prepaid": "0.00",
-							"owed": "179744.54",
+							"owed": "200611.87",
 							"settled": true,
 							"partial": false
 						},
@@ -2181,9 +2351,9 @@
 							"from": "2039-01-01",
 							"to": "2039-12-31",
 							"settlementDate": "2040-03-31",
-							"due": "190386.89",
+							"due": "211880.22",
 							"prepaid": "0.00",
-							"owed": "190386.89",
+							"owed": "211880.22",
 							"settled": true,
 							"partial": false
 						},
@@ -2192,9 +2362,9 @@
 							"from": "2040-01-01",
 							"to": "2040-12-31",
 							"settlementDate": "2041-03-31",
-							"due": "201348.49",
+							"due": "223486.62",
 							"prepaid": "0.00",
-							"owed": "201348.49",
+							"owed": "223486.62",
 							"settled": true,
 							"partial": false
 						},
@@ -2203,9 +2373,9 @@
 							"from": "2041-01-01",
 							"to": "2041-12-31",
 							"settlementDate": "2042-03-31",
-							"due": "212638.94",
+							"due": "235441.24",
 							"prepaid": "0.00",
-							"owed": "212638.94",
+							"owed": "235441.24",
 							"settled": true,
 							"partial": false
 						},
@@ -2214,9 +2384,9 @@
 							"from": "2042-01-01",
 							"to": "2042-12-31",
 							"settlementDate": "2043-03-31",
-							"due": "224268.10",
+							"due": "247754.47",
 							"prepaid": "0.00",
-							"owed": "224268.10",
+							"owed": "247754.47",
 							"settled": true,
 							"partial": false
 						},
@@ -2225,9 +2395,9 @@
 							"from": "2043-01-01",
 							"to": "2043-12-31",
 							"settlementDate": "2044-03-31",
-							"due": "236246.15",
+							"due": "260437.10",
 							"prepaid": "0.00",
-							"owed": "236246.15",
+							"owed": "260437.10",
 							"settled": true,
 							"partial": false
 						},
@@ -2236,9 +2406,9 @@
 							"from": "2044-01-01",
 							"to": "2044-12-31",
 							"settlementDate": "2045-03-31",
-							"due": "248583.53",
+							"due": "273500.22",
 							"prepaid": "0.00",
-							"owed": "248583.53",
+							"owed": "273500.22",
 							"settled": true,
 							"partial": false
 						},
@@ -2247,9 +2417,9 @@
 							"from": "2045-01-01",
 							"to": "2045-12-31",
 							"settlementDate": "2046-03-31",
-							"due": "261291.03",
+							"due": "286955.22",
 							"prepaid": "0.00",
-							"owed": "261291.03",
+							"owed": "286955.22",
 							"settled": true,
 							"partial": false
 						},
@@ -2258,9 +2428,9 @@
 							"from": "2046-01-01",
 							"to": "2046-12-31",
 							"settlementDate": "2047-03-31",
-							"due": "274379.75",
+							"due": "300813.86",
 							"prepaid": "0.00",
-							"owed": "274379.75",
+							"owed": "300813.86",
 							"settled": true,
 							"partial": false
 						},
@@ -2269,9 +2439,9 @@
 							"from": "2047-01-01",
 							"to": "2047-12-31",
 							"settlementDate": "2048-03-31",
-							"due": "287861.15",
+							"due": "315088.28",
 							"prepaid": "0.00",
-							"owed": "287861.15",
+							"owed": "315088.28",
 							"settled": true,
 							"partial": false
 						},
@@ -2280,9 +2450,9 @@
 							"from": "2048-01-01",
 							"to": "2048-12-31",
 							"settlementDate": "2049-03-31",
-							"due": "301747.00",
+							"due": "329790.93",
 							"prepaid": "0.00",
-							"owed": "301747.00",
+							"owed": "329790.93",
 							"settled": true,
 							"partial": false
 						},
@@ -2291,9 +2461,9 @@
 							"from": "2049-01-01",
 							"to": "2049-12-31",
 							"settlementDate": "2050-03-31",
-							"due": "316049.40",
+							"due": "344934.67",
 							"prepaid": "0.00",
-							"owed": "316049.40",
+							"owed": "344934.67",
 							"settled": true,
 							"partial": false
 						},
@@ -2302,9 +2472,9 @@
 							"from": "2050-01-01",
 							"to": "2050-12-31",
 							"settlementDate": "2051-03-31",
-							"due": "54316.14",
+							"due": "61717.09",
 							"prepaid": "0.00",
-							"owed": "54316.14",
+							"owed": "61717.09",
 							"settled": true,
 							"partial": false
 						},
@@ -2428,630 +2598,630 @@
 									"index": 0,
 									"from": "2026-10-31",
 									"to": "2027-10-30",
-									"openingNetWorth": "1082000.00",
-									"closingNetWorth": "1549025.44",
-									"income": "1020000.00",
+									"openingNetWorth": "1214900.00",
+									"closingNetWorth": "1744616.72",
+									"income": "1080000.00",
 									"expense": "504000.00",
 									"contributions": "288000.00",
 									"unfundedContributions": "0.00",
-									"interest": "38025.44",
+									"interest": "42716.72",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2027-10-31",
-										"amount": "1504031.34"
+										"amount": "1693939.27"
 									}
 								},
 								{
 									"index": 1,
 									"from": "2027-10-31",
 									"to": "2028-10-30",
-									"openingNetWorth": "1549025.44",
-									"closingNetWorth": "2048199.43",
-									"income": "1050600.00",
+									"openingNetWorth": "1744616.72",
+									"closingNetWorth": "2298965.09",
+									"income": "1112400.00",
 									"expense": "519120.00",
 									"contributions": "269308.37",
 									"unfundedContributions": "0.00",
-									"interest": "55713.99",
+									"interest": "61148.37",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2028-10-31",
-										"amount": "1930788.58"
+										"amount": "2167174.17"
 									}
 								},
 								{
 									"index": 2,
 									"from": "2028-10-31",
 									"to": "2029-10-30",
-									"openingNetWorth": "2048199.43",
-									"closingNetWorth": "2572876.34",
-									"income": "1082118.00",
+									"openingNetWorth": "2298965.09",
+									"closingNetWorth": "2881029.01",
+									"income": "1145772.00",
 									"expense": "534693.60",
 									"contributions": "190962.00",
 									"unfundedContributions": "0.00",
-									"interest": "71423.11",
+									"interest": "77577.92",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2029-10-31",
-										"amount": "2354743.30"
+										"amount": "2636762.98"
 									}
 								},
 								{
 									"index": 3,
 									"from": "2029-10-31",
 									"to": "2030-10-30",
-									"openingNetWorth": "2572876.34",
-									"closingNetWorth": "3123127.35",
-									"income": "1114581.60",
+									"openingNetWorth": "2881029.01",
+									"closingNetWorth": "3490954.75",
+									"income": "1180145.16",
 									"expense": "550734.48",
 									"contributions": "196690.92",
 									"unfundedContributions": "0.00",
-									"interest": "86909.61",
+									"interest": "93815.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2030-10-31",
-										"amount": "2775088.31"
+										"amount": "3101915.91"
 									}
 								},
 								{
 									"index": 4,
 									"from": "2030-10-31",
 									"to": "2031-10-30",
-									"openingNetWorth": "3123127.35",
-									"closingNetWorth": "3700254.65",
-									"income": "1148019.00",
+									"openingNetWorth": "3490954.75",
+									"closingNetWorth": "4128812.42",
+									"income": "1215549.48",
 									"expense": "567256.44",
 									"contributions": "202591.56",
 									"unfundedContributions": "0.00",
-									"interest": "103395.64",
+									"interest": "111076.10",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2031-10-31",
-										"amount": "3192135.75"
+										"amount": "3561832.49"
 									}
 								},
 								{
 									"index": 5,
 									"from": "2031-10-31",
 									"to": "2032-10-30",
-									"openingNetWorth": "3700254.65",
-									"closingNetWorth": "4305626.66",
-									"income": "1182459.60",
+									"openingNetWorth": "4128812.42",
+									"closingNetWorth": "4795558.01",
+									"income": "1252016.04",
 									"expense": "584274.12",
 									"contributions": "208669.32",
 									"unfundedContributions": "0.00",
-									"interest": "120938.35",
+									"interest": "129410.48",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2032-10-31",
-										"amount": "3606191.93"
+										"amount": "4016522.06"
 									}
 								},
 								{
 									"index": 6,
 									"from": "2032-10-31",
 									"to": "2033-10-30",
-									"openingNetWorth": "4305626.66",
-									"closingNetWorth": "4939254.54",
-									"income": "1217933.40",
+									"openingNetWorth": "4795558.01",
+									"closingNetWorth": "5492640.76",
+									"income": "1289576.52",
 									"expense": "601802.28",
 									"contributions": "214929.36",
 									"unfundedContributions": "0.00",
-									"interest": "139589.74",
+									"interest": "148877.54",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2033-10-31",
-										"amount": "4016397.48"
+										"amount": "4466372.69"
 									}
 								},
 								{
 									"index": 7,
 									"from": "2033-10-31",
 									"to": "2034-10-30",
-									"openingNetWorth": "4939254.54",
-									"closingNetWorth": "5602268.87",
-									"income": "1254471.36",
+									"openingNetWorth": "5492640.76",
+									"closingNetWorth": "6221583.34",
+									"income": "1328263.80",
 									"expense": "619856.40",
 									"contributions": "221377.32",
 									"unfundedContributions": "0.00",
-									"interest": "159405.14",
+									"interest": "169541.28",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2034-10-31",
-										"amount": "4422848.81"
+										"amount": "4911764.18"
 									}
 								},
 								{
 									"index": 8,
 									"from": "2034-10-31",
 									"to": "2035-10-30",
-									"openingNetWorth": "5602268.87",
-									"closingNetWorth": "6296185.88",
-									"income": "1292105.52",
+									"openingNetWorth": "6221583.34",
+									"closingNetWorth": "6983985.88",
+									"income": "1368111.72",
 									"expense": "638452.08",
 									"contributions": "228018.60",
 									"unfundedContributions": "0.00",
-									"interest": "180449.50",
+									"interest": "191469.18",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2035-10-31",
-										"amount": "4825903.08"
+										"amount": "5353068.56"
 									}
 								},
 								{
 									"index": 9,
 									"from": "2035-10-31",
 									"to": "2036-10-30",
-									"openingNetWorth": "6296185.88",
-									"closingNetWorth": "7022599.85",
-									"income": "1330868.64",
+									"openingNetWorth": "6983985.88",
+									"closingNetWorth": "7781529.63",
+									"income": "1409155.08",
 									"expense": "657605.64",
 									"contributions": "234859.20",
 									"unfundedContributions": "0.00",
-									"interest": "202792.48",
+									"interest": "214732.38",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2036-10-31",
-										"amount": "5225909.90"
+										"amount": "5790650.21"
 									}
 								},
 								{
 									"index": 10,
 									"from": "2036-10-31",
 									"to": "2037-10-30",
-									"openingNetWorth": "7022599.85",
-									"closingNetWorth": "7783187.57",
-									"income": "1370794.68",
+									"openingNetWorth": "7781529.63",
+									"closingNetWorth": "8615980.96",
+									"income": "1451429.64",
 									"expense": "677333.88",
 									"contributions": "241905.00",
 									"unfundedContributions": "0.00",
-									"interest": "226507.67",
+									"interest": "239405.78",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2037-10-31",
-										"amount": "5623212.02"
+										"amount": "6224866.15"
 									}
 								},
 								{
 									"index": 11,
 									"from": "2037-10-31",
 									"to": "2038-10-30",
-									"openingNetWorth": "7783187.57",
-									"closingNetWorth": "8579712.59",
-									"income": "1411918.56",
+									"openingNetWorth": "8615980.96",
+									"closingNetWorth": "9489196.28",
+									"income": "1494972.60",
 									"expense": "697653.84",
 									"contributions": "249162.12",
 									"unfundedContributions": "0.00",
-									"interest": "251672.47",
+									"interest": "265568.26",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2038-10-31",
-										"amount": "6018145.55"
+										"amount": "6656066.76"
 									}
 								},
 								{
 									"index": 12,
 									"from": "2038-10-31",
 									"to": "2039-10-30",
-									"openingNetWorth": "8579712.59",
-									"closingNetWorth": "9414029.27",
-									"income": "1454276.16",
+									"openingNetWorth": "9489196.28",
+									"closingNetWorth": "10403125.73",
+									"income": "1539821.76",
 									"expense": "718583.40",
 									"contributions": "256636.92",
 									"unfundedContributions": "0.00",
-									"interest": "278368.46",
+									"interest": "293302.96",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2039-10-31",
-										"amount": "6411040.09"
+										"amount": "7084595.47"
 									}
 								},
 								{
 									"index": 13,
 									"from": "2039-10-31",
 									"to": "2040-10-30",
-									"openingNetWorth": "9414029.27",
-									"closingNetWorth": "10288087.48",
-									"income": "1497904.44",
+									"openingNetWorth": "10403125.73",
+									"closingNetWorth": "11359818.37",
+									"income": "1586016.36",
 									"expense": "740140.92",
 									"contributions": "264336.12",
 									"unfundedContributions": "0.00",
-									"interest": "306681.58",
+									"interest": "322697.42",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2040-10-31",
-										"amount": "6802218.99"
+										"amount": "7510789.35"
 									}
 								},
 								{
 									"index": 14,
 									"from": "2040-10-31",
 									"to": "2041-10-30",
-									"openingNetWorth": "10288087.48",
-									"closingNetWorth": "11203937.69",
-									"income": "1542841.56",
+									"openingNetWorth": "11359818.37",
+									"closingNetWorth": "12361427.36",
+									"income": "1633596.96",
 									"expense": "762345.24",
 									"contributions": "272266.20",
 									"unfundedContributions": "0.00",
-									"interest": "336702.38",
+									"interest": "353843.89",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2041-10-31",
-										"amount": "7191999.83"
+										"amount": "7934979.54"
 									}
 								},
 								{
 									"index": 15,
 									"from": "2041-10-31",
 									"to": "2042-10-30",
-									"openingNetWorth": "11203937.69",
-									"closingNetWorth": "12163736.19",
-									"income": "1589126.76",
+									"openingNetWorth": "12361427.36",
+									"closingNetWorth": "13410214.78",
+									"income": "1682604.84",
 									"expense": "785215.56",
 									"contributions": "280434.12",
 									"unfundedContributions": "0.00",
-									"interest": "368526.24",
+									"interest": "386839.38",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2042-10-31",
-										"amount": "7580694.72"
+										"amount": "8357491.23"
 									}
 								},
 								{
 									"index": 16,
 									"from": "2042-10-31",
 									"to": "2043-10-30",
-									"openingNetWorth": "12163736.19",
-									"closingNetWorth": "13169750.23",
-									"income": "1636800.60",
+									"openingNetWorth": "13410214.78",
+									"closingNetWorth": "14508557.38",
+									"income": "1733082.96",
 									"expense": "808772.04",
 									"contributions": "288847.20",
 									"unfundedContributions": "0.00",
-									"interest": "402253.58",
+									"interest": "421786.15",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2043-10-31",
-										"amount": "7968610.35"
+										"amount": "8778644.08"
 									}
 								},
 								{
 									"index": 17,
 									"from": "2043-10-31",
 									"to": "2044-10-30",
-									"openingNetWorth": "13169750.23",
-									"closingNetWorth": "14224363.77",
-									"income": "1685904.60",
+									"openingNetWorth": "14508557.38",
+									"closingNetWorth": "15658952.44",
+									"income": "1785075.48",
 									"expense": "833035.20",
 									"contributions": "297512.52",
 									"unfundedContributions": "0.00",
-									"interest": "437990.29",
+									"interest": "458791.88",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2044-10-31",
-										"amount": "8356048.37"
+										"amount": "9198752.51"
 									}
 								},
 								{
 									"index": 18,
 									"from": "2044-10-31",
 									"to": "2045-10-30",
-									"openingNetWorth": "14224363.77",
-									"closingNetWorth": "15330083.38",
-									"income": "1736481.72",
+									"openingNetWorth": "15658952.44",
+									"closingNetWorth": "16864023.63",
+									"income": "1838627.76",
 									"expense": "858026.28",
 									"contributions": "306438.00",
 									"unfundedContributions": "0.00",
-									"interest": "475847.70",
+									"interest": "497969.93",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2045-10-31",
-										"amount": "8743305.61"
+										"amount": "9618125.90"
 									}
 								},
 								{
 									"index": 19,
 									"from": "2045-10-31",
 									"to": "2046-10-30",
-									"openingNetWorth": "15330083.38",
-									"closingNetWorth": "16489544.57",
-									"income": "1788576.12",
+									"openingNetWorth": "16864023.63",
+									"closingNetWorth": "18126527.53",
+									"income": "1893786.48",
 									"expense": "883767.00",
 									"contributions": "315631.08",
 									"unfundedContributions": "0.00",
-									"interest": "515943.10",
+									"interest": "539439.64",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2046-10-31",
-										"amount": "9130674.33"
+										"amount": "10037068.80"
 									}
 								},
 								{
 									"index": 20,
 									"from": "2046-10-31",
 									"to": "2047-10-30",
-									"openingNetWorth": "16489544.57",
-									"closingNetWorth": "17705518.30",
-									"income": "1842233.40",
+									"openingNetWorth": "18126527.53",
+									"closingNetWorth": "19449360.42",
+									"income": "1950600.12",
 									"expense": "910280.04",
 									"contributions": "325100.04",
 									"unfundedContributions": "0.00",
-									"interest": "558400.12",
+									"interest": "583326.67",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2047-10-31",
-										"amount": "9518442.48"
+										"amount": "10455881.31"
 									}
 								},
 								{
 									"index": 21,
 									"from": "2047-10-31",
 									"to": "2048-10-30",
-									"openingNetWorth": "17705518.30",
-									"closingNetWorth": "18980918.07",
-									"income": "1897500.48",
+									"openingNetWorth": "19449360.42",
+									"closingNetWorth": "20835565.07",
+									"income": "2009118.12",
 									"expense": "937588.44",
 									"contributions": "334853.04",
 									"unfundedContributions": "0.00",
-									"interest": "603348.88",
+									"interest": "629763.25",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2048-10-31",
-										"amount": "9906893.97"
+										"amount": "10874859.16"
 									}
 								},
 								{
 									"index": 22,
 									"from": "2048-10-31",
 									"to": "2049-10-30",
-									"openingNetWorth": "18980918.07",
-									"closingNetWorth": "20318806.58",
-									"income": "1954425.48",
+									"openingNetWorth": "20835565.07",
+									"closingNetWorth": "22288338.31",
+									"income": "2069391.72",
 									"expense": "965716.20",
 									"contributions": "344898.60",
 									"unfundedContributions": "0.00",
-									"interest": "650926.23",
+									"interest": "678888.65",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2049-10-31",
-										"amount": "10296308.65"
+										"amount": "11294294.00"
 									}
 								},
 								{
 									"index": 23,
 									"from": "2049-10-31",
 									"to": "2050-10-30",
-									"openingNetWorth": "20318806.58",
-									"closingNetWorth": "20880138.71",
-									"income": "1174283.95",
+									"openingNetWorth": "22288338.31",
+									"closingNetWorth": "22919312.46",
+									"income": "1243359.53",
 									"expense": "994687.56",
 									"contributions": "207226.60",
 									"unfundedContributions": "0.00",
-									"interest": "697785.14",
+									"interest": "727236.85",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2050-10-31",
-										"amount": "10272605.01"
+										"amount": "11275783.65"
 									}
 								},
 								{
 									"index": 24,
 									"from": "2050-10-31",
 									"to": "2051-10-30",
-									"openingNetWorth": "20880138.71",
-									"closingNetWorth": "20524102.95",
+									"openingNetWorth": "22919312.46",
+									"closingNetWorth": "22586104.81",
 									"income": "0.00",
 									"expense": "1024528.20",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "722808.58",
+									"interest": "753037.64",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2051-10-31",
-										"amount": "9803386.65"
+										"amount": "10788250.25"
 									}
 								},
 								{
 									"index": 25,
 									"from": "2051-10-31",
 									"to": "2052-10-30",
-									"openingNetWorth": "20524102.95",
-									"closingNetWorth": "20214229.70",
+									"openingNetWorth": "22586104.81",
+									"closingNetWorth": "22307226.00",
 									"income": "0.00",
 									"expense": "1055264.04",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "745390.79",
+									"interest": "776385.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2052-10-31",
-										"amount": "9374194.27"
+										"amount": "10344745.52"
 									}
 								},
 								{
 									"index": 26,
 									"from": "2052-10-31",
 									"to": "2053-10-30",
-									"openingNetWorth": "20214229.70",
-									"closingNetWorth": "19896720.49",
+									"openingNetWorth": "22307226.00",
+									"closingNetWorth": "22021539.89",
 									"income": "0.00",
 									"expense": "1086922.08",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "769412.87",
+									"interest": "801235.97",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2053-10-31",
-										"amount": "8958250.74"
+										"amount": "9914860.96"
 									}
 								},
 								{
 									"index": 27,
 									"from": "2053-10-31",
 									"to": "2054-10-30",
-									"openingNetWorth": "19896720.49",
-									"closingNetWorth": "19571908.88",
+									"openingNetWorth": "22021539.89",
+									"closingNetWorth": "21729414.28",
 									"income": "0.00",
 									"expense": "1119529.68",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "794718.07",
+									"interest": "827404.07",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2054-10-31",
-										"amount": "8555394.33"
+										"amount": "9498429.46"
 									}
 								},
 								{
 									"index": 28,
 									"from": "2054-10-31",
 									"to": "2055-10-30",
-									"openingNetWorth": "19571908.88",
-									"closingNetWorth": "19240171.12",
+									"openingNetWorth": "21729414.28",
+									"closingNetWorth": "21431261.24",
 									"income": "0.00",
 									"expense": "1153115.52",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "821377.76",
+									"interest": "854962.48",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2055-10-31",
-										"amount": "8165468.21"
+										"amount": "9095288.91"
 									}
 								},
 								{
 									"index": 29,
 									"from": "2055-10-31",
 									"to": "2056-10-30",
-									"openingNetWorth": "19240171.12",
-									"closingNetWorth": "18901929.31",
+									"openingNetWorth": "21431261.24",
+									"closingNetWorth": "21127540.47",
 									"income": "0.00",
 									"expense": "1187709.00",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "849467.19",
+									"interest": "883988.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2056-10-31",
-										"amount": "7788320.44"
+										"amount": "8705282.29"
 									}
 								},
 								{
 									"index": 30,
 									"from": "2056-10-31",
 									"to": "2057-10-30",
-									"openingNetWorth": "18901929.31",
-									"closingNetWorth": "18557654.69",
+									"openingNetWorth": "21127540.47",
+									"closingNetWorth": "20818762.62",
 									"income": "0.00",
 									"expense": "1223340.24",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "879065.62",
+									"interest": "914562.39",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2057-10-31",
-										"amount": "7423804.05"
+										"amount": "8328257.61"
 									}
 								},
 								{
 									"index": 31,
 									"from": "2057-10-31",
 									"to": "2058-10-30",
-									"openingNetWorth": "18557654.69",
-									"closingNetWorth": "18191033.79",
+									"openingNetWorth": "20818762.62",
+									"closingNetWorth": "20505492.54",
 									"income": "0.00",
 									"expense": "1260040.44",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "893419.54",
+									"interest": "946770.36",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2058-10-31",
-										"amount": "7065196.46"
+										"amount": "7964067.82"
 									}
 								},
 								{
 									"index": 32,
 									"from": "2058-10-31",
 									"to": "2059-10-30",
-									"openingNetWorth": "18191033.79",
-									"closingNetWorth": "17768101.35",
+									"openingNetWorth": "20505492.54",
+									"closingNetWorth": "20185899.23",
 									"income": "0.00",
 									"expense": "1297841.76",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "874909.32",
+									"interest": "978248.45",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2059-10-31",
-										"amount": "6699936.10"
+										"amount": "7611631.21"
 									}
 								},
 								{
 									"index": 33,
 									"from": "2059-10-31",
 									"to": "2060-10-30",
-									"openingNetWorth": "17768101.35",
-									"closingNetWorth": "17284047.80",
+									"openingNetWorth": "20185899.23",
+									"closingNetWorth": "19822735.60",
 									"income": "0.00",
 									"expense": "1336776.96",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "852723.41",
+									"interest": "973613.33",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2060-10-31",
-										"amount": "6327583.31"
+										"amount": "7256981.25"
 									}
 								},
 								{
 									"index": 34,
 									"from": "2060-10-31",
 									"to": "2060-12-31",
-									"openingNetWorth": "17284047.80",
-									"closingNetWorth": "17197022.02",
+									"openingNetWorth": "19822735.60",
+									"closingNetWorth": "19756836.98",
 									"income": "0.00",
 									"expense": "229480.04",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "142454.26",
+									"interest": "163581.42",
 									"unmet": "0.00",
 									"partial": true,
 									"realNetWorth": {
 										"date": "2060-12-31",
-										"amount": "6263862.39"
+										"amount": "7196252.23"
 									}
 								}
 							]
@@ -3081,10 +3251,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff0e-241d-74e7-a031-f40b723f3bd3",
+						"id": "01a1ff20-a903-7117-99c1-8552a380f78c",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77",
-						"effectiveContentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77"
+						"contentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf",
+						"effectiveContentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -3251,8 +3421,8 @@
 					"horizon": "2060-12-31",
 					"currency": "THB",
 					"runsOut": {
-						"date": "2054-11-01",
-						"unmet": "78420.81"
+						"date": "2056-05-01",
+						"unmet": "70359.24"
 					},
 					"taxYears": [
 						{
@@ -3260,9 +3430,9 @@
 							"from": "2026-01-01",
 							"to": "2026-12-31",
 							"settlementDate": "2027-03-31",
-							"due": "87000.00",
+							"due": "89000.00",
 							"prepaid": "0.00",
-							"owed": "87000.00",
+							"owed": "89000.00",
 							"settled": true,
 							"partial": false
 						},
@@ -3271,9 +3441,9 @@
 							"from": "2027-01-01",
 							"to": "2027-12-31",
 							"settlementDate": "2028-03-31",
-							"due": "88020.00",
+							"due": "100080.00",
 							"prepaid": "0.00",
-							"owed": "88020.00",
+							"owed": "100080.00",
 							"settled": true,
 							"partial": false
 						},
@@ -3282,9 +3452,9 @@
 							"from": "2028-01-01",
 							"to": "2028-12-31",
 							"settlementDate": "2029-03-31",
-							"due": "94170.60",
+							"due": "106592.40",
 							"prepaid": "0.00",
-							"owed": "94170.60",
+							"owed": "106592.40",
 							"settled": true,
 							"partial": false
 						},
@@ -3293,9 +3463,9 @@
 							"from": "2029-01-01",
 							"to": "2029-12-31",
 							"settlementDate": "2030-03-31",
-							"due": "100505.72",
+							"due": "113300.17",
 							"prepaid": "0.00",
-							"owed": "100505.72",
+							"owed": "113300.17",
 							"settled": true,
 							"partial": false
 						},
@@ -3304,9 +3474,9 @@
 							"from": "2030-01-01",
 							"to": "2030-12-31",
 							"settlementDate": "2031-03-31",
-							"due": "107030.90",
+							"due": "121511.47",
 							"prepaid": "0.00",
-							"owed": "107030.90",
+							"owed": "121511.47",
 							"settled": true,
 							"partial": false
 						},
@@ -3315,9 +3485,9 @@
 							"from": "2031-01-01",
 							"to": "2031-12-31",
 							"settlementDate": "2032-03-31",
-							"due": "113751.82",
+							"due": "130406.81",
 							"prepaid": "0.00",
-							"owed": "113751.82",
+							"owed": "130406.81",
 							"settled": true,
 							"partial": false
 						},
@@ -3326,9 +3496,9 @@
 							"from": "2032-01-01",
 							"to": "2032-12-31",
 							"settlementDate": "2033-03-31",
-							"due": "122092.98",
+							"due": "139569.03",
 							"prepaid": "0.00",
-							"owed": "122092.98",
+							"owed": "139569.03",
 							"settled": true,
 							"partial": false
 						},
@@ -3337,9 +3507,9 @@
 							"from": "2033-01-01",
 							"to": "2033-12-31",
 							"settlementDate": "2034-03-31",
-							"due": "131005.77",
+							"due": "149006.10",
 							"prepaid": "0.00",
-							"owed": "131005.77",
+							"owed": "149006.10",
 							"settled": true,
 							"partial": false
 						},
@@ -3348,9 +3518,9 @@
 							"from": "2034-01-01",
 							"to": "2034-12-31",
 							"settlementDate": "2035-03-31",
-							"due": "140185.93",
+							"due": "158726.28",
 							"prepaid": "0.00",
-							"owed": "140185.93",
+							"owed": "158726.28",
 							"settled": true,
 							"partial": false
 						},
@@ -3359,9 +3529,9 @@
 							"from": "2035-01-01",
 							"to": "2035-12-31",
 							"settlementDate": "2036-03-31",
-							"due": "149641.51",
+							"due": "168738.07",
 							"prepaid": "0.00",
-							"owed": "149641.51",
+							"owed": "168738.07",
 							"settled": true,
 							"partial": false
 						},
@@ -3370,9 +3540,9 @@
 							"from": "2036-01-01",
 							"to": "2036-12-31",
 							"settlementDate": "2037-03-31",
-							"due": "159380.75",
+							"due": "179050.21",
 							"prepaid": "0.00",
-							"owed": "159380.75",
+							"owed": "179050.21",
 							"settled": true,
 							"partial": false
 						},
@@ -3381,9 +3551,9 @@
 							"from": "2037-01-01",
 							"to": "2037-12-31",
 							"settlementDate": "2038-03-31",
-							"due": "169412.17",
+							"due": "189671.70",
 							"prepaid": "0.00",
-							"owed": "169412.17",
+							"owed": "189671.70",
 							"settled": true,
 							"partial": false
 						},
@@ -3392,9 +3562,9 @@
 							"from": "2038-01-01",
 							"to": "2038-12-31",
 							"settlementDate": "2039-03-31",
-							"due": "179744.54",
+							"due": "200611.87",
 							"prepaid": "0.00",
-							"owed": "179744.54",
+							"owed": "200611.87",
 							"settled": true,
 							"partial": false
 						},
@@ -3403,9 +3573,9 @@
 							"from": "2039-01-01",
 							"to": "2039-12-31",
 							"settlementDate": "2040-03-31",
-							"due": "190386.89",
+							"due": "211880.22",
 							"prepaid": "0.00",
-							"owed": "190386.89",
+							"owed": "211880.22",
 							"settled": true,
 							"partial": false
 						},
@@ -3414,9 +3584,9 @@
 							"from": "2040-01-01",
 							"to": "2040-12-31",
 							"settlementDate": "2041-03-31",
-							"due": "23912.69",
+							"due": "27626.02",
 							"prepaid": "0.00",
-							"owed": "23912.69",
+							"owed": "27626.02",
 							"settled": true,
 							"partial": false
 						},
@@ -3571,6 +3741,28 @@
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
 							"settled": false,
 							"partial": true
 						}
@@ -3578,527 +3770,545 @@
 					"tables": [
 						{
 							"name": "annual",
-							"count": 29,
+							"count": 30,
 							"rows": [
 								{
 									"index": 0,
 									"from": "2026-10-31",
 									"to": "2027-10-30",
-									"openingNetWorth": "1082000.00",
-									"closingNetWorth": "1549025.44",
-									"income": "1020000.00",
+									"openingNetWorth": "1214900.00",
+									"closingNetWorth": "1744616.72",
+									"income": "1080000.00",
 									"expense": "504000.00",
 									"contributions": "288000.00",
 									"unfundedContributions": "0.00",
-									"interest": "38025.44",
+									"interest": "42716.72",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2027-10-31",
-										"amount": "1504031.34"
+										"amount": "1693939.27"
 									}
 								},
 								{
 									"index": 1,
 									"from": "2027-10-31",
 									"to": "2028-10-30",
-									"openingNetWorth": "1549025.44",
-									"closingNetWorth": "2048199.43",
-									"income": "1050600.00",
+									"openingNetWorth": "1744616.72",
+									"closingNetWorth": "2298965.09",
+									"income": "1112400.00",
 									"expense": "519120.00",
 									"contributions": "269308.37",
 									"unfundedContributions": "0.00",
-									"interest": "55713.99",
+									"interest": "61148.37",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2028-10-31",
-										"amount": "1930788.58"
+										"amount": "2167174.17"
 									}
 								},
 								{
 									"index": 2,
 									"from": "2028-10-31",
 									"to": "2029-10-30",
-									"openingNetWorth": "2048199.43",
-									"closingNetWorth": "2572876.34",
-									"income": "1082118.00",
+									"openingNetWorth": "2298965.09",
+									"closingNetWorth": "2881029.01",
+									"income": "1145772.00",
 									"expense": "534693.60",
 									"contributions": "190962.00",
 									"unfundedContributions": "0.00",
-									"interest": "71423.11",
+									"interest": "77577.92",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2029-10-31",
-										"amount": "2354743.30"
+										"amount": "2636762.98"
 									}
 								},
 								{
 									"index": 3,
 									"from": "2029-10-31",
 									"to": "2030-10-30",
-									"openingNetWorth": "2572876.34",
-									"closingNetWorth": "3123127.35",
-									"income": "1114581.60",
+									"openingNetWorth": "2881029.01",
+									"closingNetWorth": "3490954.75",
+									"income": "1180145.16",
 									"expense": "550734.48",
 									"contributions": "196690.92",
 									"unfundedContributions": "0.00",
-									"interest": "86909.61",
+									"interest": "93815.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2030-10-31",
-										"amount": "2775088.31"
+										"amount": "3101915.91"
 									}
 								},
 								{
 									"index": 4,
 									"from": "2030-10-31",
 									"to": "2031-10-30",
-									"openingNetWorth": "3123127.35",
-									"closingNetWorth": "3700254.65",
-									"income": "1148019.00",
+									"openingNetWorth": "3490954.75",
+									"closingNetWorth": "4128812.42",
+									"income": "1215549.48",
 									"expense": "567256.44",
 									"contributions": "202591.56",
 									"unfundedContributions": "0.00",
-									"interest": "103395.64",
+									"interest": "111076.10",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2031-10-31",
-										"amount": "3192135.75"
+										"amount": "3561832.49"
 									}
 								},
 								{
 									"index": 5,
 									"from": "2031-10-31",
 									"to": "2032-10-30",
-									"openingNetWorth": "3700254.65",
-									"closingNetWorth": "4305626.66",
-									"income": "1182459.60",
+									"openingNetWorth": "4128812.42",
+									"closingNetWorth": "4795558.01",
+									"income": "1252016.04",
 									"expense": "584274.12",
 									"contributions": "208669.32",
 									"unfundedContributions": "0.00",
-									"interest": "120938.35",
+									"interest": "129410.48",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2032-10-31",
-										"amount": "3606191.93"
+										"amount": "4016522.06"
 									}
 								},
 								{
 									"index": 6,
 									"from": "2032-10-31",
 									"to": "2033-10-30",
-									"openingNetWorth": "4305626.66",
-									"closingNetWorth": "4939254.54",
-									"income": "1217933.40",
+									"openingNetWorth": "4795558.01",
+									"closingNetWorth": "5492640.76",
+									"income": "1289576.52",
 									"expense": "601802.28",
 									"contributions": "214929.36",
 									"unfundedContributions": "0.00",
-									"interest": "139589.74",
+									"interest": "148877.54",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2033-10-31",
-										"amount": "4016397.48"
+										"amount": "4466372.69"
 									}
 								},
 								{
 									"index": 7,
 									"from": "2033-10-31",
 									"to": "2034-10-30",
-									"openingNetWorth": "4939254.54",
-									"closingNetWorth": "5602268.87",
-									"income": "1254471.36",
+									"openingNetWorth": "5492640.76",
+									"closingNetWorth": "6221583.34",
+									"income": "1328263.80",
 									"expense": "619856.40",
 									"contributions": "221377.32",
 									"unfundedContributions": "0.00",
-									"interest": "159405.14",
+									"interest": "169541.28",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2034-10-31",
-										"amount": "4422848.81"
+										"amount": "4911764.18"
 									}
 								},
 								{
 									"index": 8,
 									"from": "2034-10-31",
 									"to": "2035-10-30",
-									"openingNetWorth": "5602268.87",
-									"closingNetWorth": "6296185.88",
-									"income": "1292105.52",
+									"openingNetWorth": "6221583.34",
+									"closingNetWorth": "6983985.88",
+									"income": "1368111.72",
 									"expense": "638452.08",
 									"contributions": "228018.60",
 									"unfundedContributions": "0.00",
-									"interest": "180449.50",
+									"interest": "191469.18",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2035-10-31",
-										"amount": "4825903.08"
+										"amount": "5353068.56"
 									}
 								},
 								{
 									"index": 9,
 									"from": "2035-10-31",
 									"to": "2036-10-30",
-									"openingNetWorth": "6296185.88",
-									"closingNetWorth": "7022599.85",
-									"income": "1330868.64",
+									"openingNetWorth": "6983985.88",
+									"closingNetWorth": "7781529.63",
+									"income": "1409155.08",
 									"expense": "657605.64",
 									"contributions": "234859.20",
 									"unfundedContributions": "0.00",
-									"interest": "202792.48",
+									"interest": "214732.38",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2036-10-31",
-										"amount": "5225909.90"
+										"amount": "5790650.21"
 									}
 								},
 								{
 									"index": 10,
 									"from": "2036-10-31",
 									"to": "2037-10-30",
-									"openingNetWorth": "7022599.85",
-									"closingNetWorth": "7783187.57",
-									"income": "1370794.68",
+									"openingNetWorth": "7781529.63",
+									"closingNetWorth": "8615980.96",
+									"income": "1451429.64",
 									"expense": "677333.88",
 									"contributions": "241905.00",
 									"unfundedContributions": "0.00",
-									"interest": "226507.67",
+									"interest": "239405.78",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2037-10-31",
-										"amount": "5623212.02"
+										"amount": "6224866.15"
 									}
 								},
 								{
 									"index": 11,
 									"from": "2037-10-31",
 									"to": "2038-10-30",
-									"openingNetWorth": "7783187.57",
-									"closingNetWorth": "8579712.59",
-									"income": "1411918.56",
+									"openingNetWorth": "8615980.96",
+									"closingNetWorth": "9489196.28",
+									"income": "1494972.60",
 									"expense": "697653.84",
 									"contributions": "249162.12",
 									"unfundedContributions": "0.00",
-									"interest": "251672.47",
+									"interest": "265568.26",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2038-10-31",
-										"amount": "6018145.55"
+										"amount": "6656066.76"
 									}
 								},
 								{
 									"index": 12,
 									"from": "2038-10-31",
 									"to": "2039-10-30",
-									"openingNetWorth": "8579712.59",
-									"closingNetWorth": "9414029.27",
-									"income": "1454276.16",
+									"openingNetWorth": "9489196.28",
+									"closingNetWorth": "10403125.73",
+									"income": "1539821.76",
 									"expense": "718583.40",
 									"contributions": "256636.92",
 									"unfundedContributions": "0.00",
-									"interest": "278368.46",
+									"interest": "293302.96",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2039-10-31",
-										"amount": "6411040.09"
+										"amount": "7084595.47"
 									}
 								},
 								{
 									"index": 13,
 									"from": "2039-10-31",
 									"to": "2040-10-30",
-									"openingNetWorth": "9414029.27",
-									"closingNetWorth": "9661362.75",
-									"income": "873777.59",
+									"openingNetWorth": "10403125.73",
+									"closingNetWorth": "10696290.14",
+									"income": "925176.21",
 									"expense": "740140.92",
 									"contributions": "154196.07",
 									"unfundedContributions": "110140.05",
-									"interest": "304083.70",
+									"interest": "320009.34",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2040-10-31",
-										"amount": "6387860.96"
+										"amount": "7072099.21"
 									}
 								},
 								{
 									"index": 14,
 									"from": "2040-10-31",
 									"to": "2041-10-30",
-									"openingNetWorth": "9661362.75",
-									"closingNetWorth": "9188022.92",
+									"openingNetWorth": "10696290.14",
+									"closingNetWorth": "10235630.32",
 									"income": "0.00",
 									"expense": "762345.24",
 									"contributions": "0.00",
 									"unfundedContributions": "272266.20",
-									"interest": "312918.10",
+									"interest": "329311.44",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2041-10-31",
-										"amount": "5897998.50"
+										"amount": "6570447.03"
 									}
 								},
 								{
 									"index": 15,
 									"from": "2041-10-31",
 									"to": "2042-10-30",
-									"openingNetWorth": "9188022.92",
-									"closingNetWorth": "8722035.41",
+									"openingNetWorth": "10235630.32",
+									"closingNetWorth": "9786487.86",
 									"income": "0.00",
 									"expense": "785215.56",
 									"contributions": "0.00",
 									"unfundedContributions": "280434.12",
-									"interest": "319228.05",
+									"interest": "336073.10",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2042-10-31",
-										"amount": "5435835.40"
+										"amount": "6099196.14"
 									}
 								},
 								{
 									"index": 16,
 									"from": "2042-10-31",
 									"to": "2043-10-30",
-									"openingNetWorth": "8722035.41",
-									"closingNetWorth": "8239283.26",
+									"openingNetWorth": "9786487.86",
+									"closingNetWorth": "9321067.67",
 									"income": "0.00",
 									"expense": "808772.04",
 									"contributions": "0.00",
 									"unfundedContributions": "288847.20",
-									"interest": "326019.89",
+									"interest": "343351.85",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2043-10-31",
-										"amount": "4985448.72"
+										"amount": "5639975.22"
 									}
 								},
 								{
 									"index": 17,
 									"from": "2043-10-31",
 									"to": "2044-10-30",
-									"openingNetWorth": "8239283.26",
-									"closingNetWorth": "7739467.28",
+									"openingNetWorth": "9321067.67",
+									"closingNetWorth": "8839091.35",
 									"income": "0.00",
 									"expense": "833035.20",
 									"contributions": "0.00",
 									"unfundedContributions": "297512.52",
-									"interest": "333219.22",
+									"interest": "351058.88",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2044-10-31",
-										"amount": "4546664.20"
+										"amount": "5192606.58"
 									}
 								},
 								{
 									"index": 18,
 									"from": "2044-10-31",
 									"to": "2045-10-30",
-									"openingNetWorth": "7739467.28",
-									"closingNetWorth": "7222292.86",
+									"openingNetWorth": "8839091.35",
+									"closingNetWorth": "8340286.08",
 									"income": "0.00",
 									"expense": "858026.28",
 									"contributions": "0.00",
 									"unfundedContributions": "306438.00",
-									"interest": "340851.86",
+									"interest": "359221.01",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2045-10-31",
-										"amount": "4119312.04"
+										"amount": "4756917.08"
 									}
 								},
 								{
 									"index": 19,
 									"from": "2045-10-31",
 									"to": "2046-10-30",
-									"openingNetWorth": "7222292.86",
-									"closingNetWorth": "6675502.60",
+									"openingNetWorth": "8340286.08",
+									"closingNetWorth": "7824385.70",
 									"income": "0.00",
 									"expense": "883767.00",
 									"contributions": "0.00",
 									"unfundedContributions": "315631.08",
-									"interest": "336976.74",
+									"interest": "367866.62",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2046-10-31",
-										"amount": "3696558.03"
+										"amount": "4332738.08"
 									}
 								},
 								{
 									"index": 20,
 									"from": "2046-10-31",
 									"to": "2047-10-30",
-									"openingNetWorth": "6675502.60",
-									"closingNetWorth": "6074700.24",
+									"openingNetWorth": "7824385.70",
+									"closingNetWorth": "7280153.91",
 									"income": "0.00",
 									"expense": "910280.04",
 									"contributions": "0.00",
 									"unfundedContributions": "325100.04",
-									"interest": "309477.68",
+									"interest": "366048.25",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2047-10-31",
-										"amount": "3265887.24"
+										"amount": "3913964.62"
 									}
 								},
 								{
 									"index": 21,
 									"from": "2047-10-31",
 									"to": "2048-10-30",
-									"openingNetWorth": "6074700.24",
-									"closingNetWorth": "5415820.43",
+									"openingNetWorth": "7280153.91",
+									"closingNetWorth": "6681546.78",
 									"income": "0.00",
 									"expense": "937588.44",
 									"contributions": "0.00",
 									"unfundedContributions": "334853.04",
-									"interest": "278708.63",
+									"interest": "338981.31",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2048-10-31",
-										"amount": "2826853.91"
+										"amount": "3487515.31"
 									}
 								},
 								{
 									"index": 22,
 									"from": "2048-10-31",
 									"to": "2049-10-30",
-									"openingNetWorth": "5415820.43",
-									"closingNetWorth": "4695118.07",
+									"openingNetWorth": "6681546.78",
+									"closingNetWorth": "6024130.73",
 									"income": "0.00",
 									"expense": "965716.20",
 									"contributions": "0.00",
 									"unfundedContributions": "344898.60",
-									"interest": "245013.84",
+									"interest": "308300.15",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2049-10-31",
-										"amount": "2379295.61"
+										"amount": "3052785.38"
 									}
 								},
 								{
 									"index": 23,
 									"from": "2049-10-31",
 									"to": "2050-10-30",
-									"openingNetWorth": "4695118.07",
-									"closingNetWorth": "3908635.92",
+									"openingNetWorth": "6024130.73",
+									"closingNetWorth": "5304099.20",
 									"income": "0.00",
 									"expense": "994687.56",
 									"contributions": "0.00",
 									"unfundedContributions": "207226.60",
-									"interest": "208205.41",
+									"interest": "274656.03",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2050-10-31",
-										"amount": "1923046.91"
+										"amount": "2609614.14"
 									}
 								},
 								{
 									"index": 24,
 									"from": "2050-10-31",
 									"to": "2051-10-30",
-									"openingNetWorth": "3908635.92",
-									"closingNetWorth": "3052192.50",
+									"openingNetWorth": "5304099.20",
+									"closingNetWorth": "4517428.94",
 									"income": "0.00",
 									"expense": "1024528.20",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "168084.78",
+									"interest": "237857.94",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2051-10-31",
-										"amount": "1457939.01"
+										"amount": "2157837.64"
 									}
 								},
 								{
 									"index": 25,
 									"from": "2051-10-31",
 									"to": "2052-10-30",
-									"openingNetWorth": "3052192.50",
-									"closingNetWorth": "2121370.67",
+									"openingNetWorth": "4517428.94",
+									"closingNetWorth": "3659868.94",
 									"income": "0.00",
 									"expense": "1055264.04",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "124442.21",
+									"interest": "197704.04",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2052-10-31",
-										"amount": "983799.89"
+										"amount": "1697288.79"
 									}
 								},
 								{
 									"index": 26,
 									"from": "2052-10-31",
 									"to": "2053-10-30",
-									"openingNetWorth": "2121370.67",
-									"closingNetWorth": "1111504.67",
+									"openingNetWorth": "3659868.94",
+									"closingNetWorth": "2726927.86",
 									"income": "0.00",
 									"expense": "1086922.08",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "77056.08",
+									"interest": "153981.00",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2053-10-31",
-										"amount": "500454.13"
+										"amount": "1227797.19"
 									}
 								},
 								{
 									"index": 27,
 									"from": "2053-10-31",
 									"to": "2054-10-30",
-									"openingNetWorth": "1111504.67",
-									"closingNetWorth": "17667.42",
+									"openingNetWorth": "2726927.86",
+									"closingNetWorth": "1713861.76",
 									"income": "0.00",
 									"expense": "1119529.68",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "25692.43",
+									"interest": "106463.58",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2054-10-31",
-										"amount": "7723.05"
+										"amount": "749189.27"
 									}
 								},
 								{
 									"index": 28,
 									"from": "2054-10-31",
-									"to": "2054-11-01",
-									"openingNetWorth": "17667.42",
-									"closingNetWorth": "0.00",
+									"to": "2055-10-30",
+									"openingNetWorth": "1713861.76",
+									"closingNetWorth": "615660.02",
 									"income": "0.00",
-									"expense": "96092.96",
+									"expense": "1153115.52",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "4.73",
-									"unmet": "78420.81",
+									"interest": "54913.78",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2055-10-31",
+										"amount": "261288.02"
+									}
+								},
+								{
+									"index": 29,
+									"from": "2055-10-31",
+									"to": "2056-05-01",
+									"openingNetWorth": "615660.02",
+									"closingNetWorth": "0.00",
+									"income": "0.00",
+									"expense": "692830.25",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "6810.99",
+									"unmet": "70359.24",
 									"partial": true,
 									"realNetWorth": {
-										"date": "2054-11-01",
+										"date": "2056-05-01",
 										"amount": "0.00"
 									}
 								}
@@ -4130,10 +4340,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff0e-231b-73b8-a96c-0b320542b0ee",
+						"id": "01a1ff20-a7dd-764d-a972-09a6fde61a78",
 						"name": "base",
-						"contentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926",
-						"effectiveContentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926"
+						"contentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b",
+						"effectiveContentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -4305,19 +4515,19 @@
 					},
 					"fi": {
 						"reachable": true,
-						"fiDate": "2043-08-01",
+						"fiDate": "2042-10-01",
 						"reference": {
 							"label": "ruleOfThumb",
-							"date": "2043-08-01",
+							"date": "2042-10-01",
 							"multiplier": 25,
 							"basis": "unlockedAssets",
 							"window": "next12Months",
 							"terms": "nominal",
-							"unlockedAssets": "12860343.00",
-							"numerator": "12860343.00",
-							"annualExpenses": "826969.41",
-							"threshold": "20674235.25",
-							"multipleBps": 155511,
+							"unlockedAssets": "13303437.41",
+							"numerator": "13303437.41",
+							"annualExpenses": "806809.00",
+							"threshold": "20170225.00",
+							"multipleBps": 164889,
 							"partial": false,
 							"met": false
 						}
@@ -4328,9 +4538,9 @@
 							"from": "2026-01-01",
 							"to": "2026-12-31",
 							"settlementDate": "2027-03-31",
-							"due": "87000.00",
+							"due": "89000.00",
 							"prepaid": "0.00",
-							"owed": "87000.00",
+							"owed": "89000.00",
 							"settled": true,
 							"partial": false
 						},
@@ -4339,9 +4549,9 @@
 							"from": "2027-01-01",
 							"to": "2027-12-31",
 							"settlementDate": "2028-03-31",
-							"due": "88020.00",
+							"due": "100080.00",
 							"prepaid": "0.00",
-							"owed": "88020.00",
+							"owed": "100080.00",
 							"settled": true,
 							"partial": false
 						},
@@ -4350,9 +4560,9 @@
 							"from": "2028-01-01",
 							"to": "2028-12-31",
 							"settlementDate": "2029-03-31",
-							"due": "94170.60",
+							"due": "106592.40",
 							"prepaid": "0.00",
-							"owed": "94170.60",
+							"owed": "106592.40",
 							"settled": true,
 							"partial": false
 						},
@@ -4361,9 +4571,9 @@
 							"from": "2029-01-01",
 							"to": "2029-12-31",
 							"settlementDate": "2030-03-31",
-							"due": "100505.72",
+							"due": "113300.17",
 							"prepaid": "0.00",
-							"owed": "100505.72",
+							"owed": "113300.17",
 							"settled": true,
 							"partial": false
 						},
@@ -4372,9 +4582,9 @@
 							"from": "2030-01-01",
 							"to": "2030-12-31",
 							"settlementDate": "2031-03-31",
-							"due": "107030.90",
+							"due": "121511.47",
 							"prepaid": "0.00",
-							"owed": "107030.90",
+							"owed": "121511.47",
 							"settled": true,
 							"partial": false
 						},
@@ -4383,9 +4593,9 @@
 							"from": "2031-01-01",
 							"to": "2031-12-31",
 							"settlementDate": "2032-03-31",
-							"due": "113751.82",
+							"due": "130406.81",
 							"prepaid": "0.00",
-							"owed": "113751.82",
+							"owed": "130406.81",
 							"settled": true,
 							"partial": false
 						},
@@ -4394,9 +4604,9 @@
 							"from": "2032-01-01",
 							"to": "2032-12-31",
 							"settlementDate": "2033-03-31",
-							"due": "122092.98",
+							"due": "139569.03",
 							"prepaid": "0.00",
-							"owed": "122092.98",
+							"owed": "139569.03",
 							"settled": true,
 							"partial": false
 						},
@@ -4405,9 +4615,9 @@
 							"from": "2033-01-01",
 							"to": "2033-12-31",
 							"settlementDate": "2034-03-31",
-							"due": "131005.77",
+							"due": "149006.10",
 							"prepaid": "0.00",
-							"owed": "131005.77",
+							"owed": "149006.10",
 							"settled": true,
 							"partial": false
 						},
@@ -4416,9 +4626,9 @@
 							"from": "2034-01-01",
 							"to": "2034-12-31",
 							"settlementDate": "2035-03-31",
-							"due": "140185.93",
+							"due": "158726.28",
 							"prepaid": "0.00",
-							"owed": "140185.93",
+							"owed": "158726.28",
 							"settled": true,
 							"partial": false
 						},
@@ -4427,9 +4637,9 @@
 							"from": "2035-01-01",
 							"to": "2035-12-31",
 							"settlementDate": "2036-03-31",
-							"due": "149641.51",
+							"due": "168738.07",
 							"prepaid": "0.00",
-							"owed": "149641.51",
+							"owed": "168738.07",
 							"settled": true,
 							"partial": false
 						},
@@ -4438,9 +4648,9 @@
 							"from": "2036-01-01",
 							"to": "2036-12-31",
 							"settlementDate": "2037-03-31",
-							"due": "159380.75",
+							"due": "179050.21",
 							"prepaid": "0.00",
-							"owed": "159380.75",
+							"owed": "179050.21",
 							"settled": true,
 							"partial": false
 						},
@@ -4449,9 +4659,9 @@
 							"from": "2037-01-01",
 							"to": "2037-12-31",
 							"settlementDate": "2038-03-31",
-							"due": "169412.17",
+							"due": "189671.70",
 							"prepaid": "0.00",
-							"owed": "169412.17",
+							"owed": "189671.70",
 							"settled": true,
 							"partial": false
 						},
@@ -4460,9 +4670,9 @@
 							"from": "2038-01-01",
 							"to": "2038-12-31",
 							"settlementDate": "2039-03-31",
-							"due": "179744.54",
+							"due": "200611.87",
 							"prepaid": "0.00",
-							"owed": "179744.54",
+							"owed": "200611.87",
 							"settled": true,
 							"partial": false
 						},
@@ -4471,9 +4681,9 @@
 							"from": "2039-01-01",
 							"to": "2039-12-31",
 							"settlementDate": "2040-03-31",
-							"due": "190386.89",
+							"due": "211880.22",
 							"prepaid": "0.00",
-							"owed": "190386.89",
+							"owed": "211880.22",
 							"settled": true,
 							"partial": false
 						},
@@ -4482,9 +4692,9 @@
 							"from": "2040-01-01",
 							"to": "2040-12-31",
 							"settlementDate": "2041-03-31",
-							"due": "201348.49",
+							"due": "223486.62",
 							"prepaid": "0.00",
-							"owed": "201348.49",
+							"owed": "223486.62",
 							"settled": true,
 							"partial": false
 						},
@@ -4493,9 +4703,9 @@
 							"from": "2041-01-01",
 							"to": "2041-12-31",
 							"settlementDate": "2042-03-31",
-							"due": "212638.94",
+							"due": "235441.24",
 							"prepaid": "0.00",
-							"owed": "212638.94",
+							"owed": "235441.24",
 							"settled": true,
 							"partial": false
 						},
@@ -4504,9 +4714,9 @@
 							"from": "2042-01-01",
 							"to": "2042-12-31",
 							"settlementDate": "2043-03-31",
-							"due": "224268.10",
+							"due": "247754.47",
 							"prepaid": "0.00",
-							"owed": "224268.10",
+							"owed": "247754.47",
 							"settled": true,
 							"partial": false
 						},
@@ -4515,9 +4725,9 @@
 							"from": "2043-01-01",
 							"to": "2043-12-31",
 							"settlementDate": "2044-03-31",
-							"due": "236246.15",
+							"due": "260437.10",
 							"prepaid": "0.00",
-							"owed": "236246.15",
+							"owed": "260437.10",
 							"settled": true,
 							"partial": false
 						},
@@ -4526,9 +4736,9 @@
 							"from": "2044-01-01",
 							"to": "2044-12-31",
 							"settlementDate": "2045-03-31",
-							"due": "248583.53",
+							"due": "273500.22",
 							"prepaid": "0.00",
-							"owed": "248583.53",
+							"owed": "273500.22",
 							"settled": true,
 							"partial": false
 						},
@@ -4537,9 +4747,9 @@
 							"from": "2045-01-01",
 							"to": "2045-12-31",
 							"settlementDate": "2046-03-31",
-							"due": "261291.03",
+							"due": "286955.22",
 							"prepaid": "0.00",
-							"owed": "261291.03",
+							"owed": "286955.22",
 							"settled": true,
 							"partial": false
 						},
@@ -4548,9 +4758,9 @@
 							"from": "2046-01-01",
 							"to": "2046-12-31",
 							"settlementDate": "2047-03-31",
-							"due": "274379.75",
+							"due": "300813.86",
 							"prepaid": "0.00",
-							"owed": "274379.75",
+							"owed": "300813.86",
 							"settled": true,
 							"partial": false
 						},
@@ -4559,9 +4769,9 @@
 							"from": "2047-01-01",
 							"to": "2047-12-31",
 							"settlementDate": "2048-03-31",
-							"due": "287861.15",
+							"due": "315088.28",
 							"prepaid": "0.00",
-							"owed": "287861.15",
+							"owed": "315088.28",
 							"settled": true,
 							"partial": false
 						},
@@ -4570,9 +4780,9 @@
 							"from": "2048-01-01",
 							"to": "2048-12-31",
 							"settlementDate": "2049-03-31",
-							"due": "301747.00",
+							"due": "329790.93",
 							"prepaid": "0.00",
-							"owed": "301747.00",
+							"owed": "329790.93",
 							"settled": true,
 							"partial": false
 						},
@@ -4581,9 +4791,9 @@
 							"from": "2049-01-01",
 							"to": "2049-12-31",
 							"settlementDate": "2050-03-31",
-							"due": "316049.40",
+							"due": "344934.67",
 							"prepaid": "0.00",
-							"owed": "316049.40",
+							"owed": "344934.67",
 							"settled": true,
 							"partial": false
 						},
@@ -4592,9 +4802,9 @@
 							"from": "2050-01-01",
 							"to": "2050-12-31",
 							"settlementDate": "2051-03-31",
-							"due": "54316.14",
+							"due": "61717.09",
 							"prepaid": "0.00",
-							"owed": "54316.14",
+							"owed": "61717.09",
 							"settled": true,
 							"partial": false
 						},
@@ -4732,10 +4942,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff0e-241d-74e7-a031-f40b723f3bd3",
+						"id": "01a1ff20-a903-7117-99c1-8552a380f78c",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77",
-						"effectiveContentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77"
+						"contentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf",
+						"effectiveContentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -4912,8 +5122,8 @@
 						"bestCase": {
 							"month": "2040-06-01",
 							"runsOut": {
-								"date": "2054-11-01",
-								"unmet": "78420.81"
+								"date": "2056-05-01",
+								"unmet": "70359.24"
 							}
 						}
 					},
@@ -4923,9 +5133,9 @@
 							"from": "2026-01-01",
 							"to": "2026-12-31",
 							"settlementDate": "2027-03-31",
-							"due": "87000.00",
+							"due": "89000.00",
 							"prepaid": "0.00",
-							"owed": "87000.00",
+							"owed": "89000.00",
 							"settled": true,
 							"partial": false
 						},
@@ -4934,9 +5144,9 @@
 							"from": "2027-01-01",
 							"to": "2027-12-31",
 							"settlementDate": "2028-03-31",
-							"due": "88020.00",
+							"due": "100080.00",
 							"prepaid": "0.00",
-							"owed": "88020.00",
+							"owed": "100080.00",
 							"settled": true,
 							"partial": false
 						},
@@ -4945,9 +5155,9 @@
 							"from": "2028-01-01",
 							"to": "2028-12-31",
 							"settlementDate": "2029-03-31",
-							"due": "94170.60",
+							"due": "106592.40",
 							"prepaid": "0.00",
-							"owed": "94170.60",
+							"owed": "106592.40",
 							"settled": true,
 							"partial": false
 						},
@@ -4956,9 +5166,9 @@
 							"from": "2029-01-01",
 							"to": "2029-12-31",
 							"settlementDate": "2030-03-31",
-							"due": "100505.72",
+							"due": "113300.17",
 							"prepaid": "0.00",
-							"owed": "100505.72",
+							"owed": "113300.17",
 							"settled": true,
 							"partial": false
 						},
@@ -4967,9 +5177,9 @@
 							"from": "2030-01-01",
 							"to": "2030-12-31",
 							"settlementDate": "2031-03-31",
-							"due": "107030.90",
+							"due": "121511.47",
 							"prepaid": "0.00",
-							"owed": "107030.90",
+							"owed": "121511.47",
 							"settled": true,
 							"partial": false
 						},
@@ -4978,9 +5188,9 @@
 							"from": "2031-01-01",
 							"to": "2031-12-31",
 							"settlementDate": "2032-03-31",
-							"due": "113751.82",
+							"due": "130406.81",
 							"prepaid": "0.00",
-							"owed": "113751.82",
+							"owed": "130406.81",
 							"settled": true,
 							"partial": false
 						},
@@ -4989,9 +5199,9 @@
 							"from": "2032-01-01",
 							"to": "2032-12-31",
 							"settlementDate": "2033-03-31",
-							"due": "122092.98",
+							"due": "139569.03",
 							"prepaid": "0.00",
-							"owed": "122092.98",
+							"owed": "139569.03",
 							"settled": true,
 							"partial": false
 						},
@@ -5000,9 +5210,9 @@
 							"from": "2033-01-01",
 							"to": "2033-12-31",
 							"settlementDate": "2034-03-31",
-							"due": "131005.77",
+							"due": "149006.10",
 							"prepaid": "0.00",
-							"owed": "131005.77",
+							"owed": "149006.10",
 							"settled": true,
 							"partial": false
 						},
@@ -5011,9 +5221,9 @@
 							"from": "2034-01-01",
 							"to": "2034-12-31",
 							"settlementDate": "2035-03-31",
-							"due": "140185.93",
+							"due": "158726.28",
 							"prepaid": "0.00",
-							"owed": "140185.93",
+							"owed": "158726.28",
 							"settled": true,
 							"partial": false
 						},
@@ -5022,9 +5232,9 @@
 							"from": "2035-01-01",
 							"to": "2035-12-31",
 							"settlementDate": "2036-03-31",
-							"due": "149641.51",
+							"due": "168738.07",
 							"prepaid": "0.00",
-							"owed": "149641.51",
+							"owed": "168738.07",
 							"settled": true,
 							"partial": false
 						},
@@ -5033,9 +5243,9 @@
 							"from": "2036-01-01",
 							"to": "2036-12-31",
 							"settlementDate": "2037-03-31",
-							"due": "159380.75",
+							"due": "179050.21",
 							"prepaid": "0.00",
-							"owed": "159380.75",
+							"owed": "179050.21",
 							"settled": true,
 							"partial": false
 						},
@@ -5044,9 +5254,9 @@
 							"from": "2037-01-01",
 							"to": "2037-12-31",
 							"settlementDate": "2038-03-31",
-							"due": "169412.17",
+							"due": "189671.70",
 							"prepaid": "0.00",
-							"owed": "169412.17",
+							"owed": "189671.70",
 							"settled": true,
 							"partial": false
 						},
@@ -5055,9 +5265,9 @@
 							"from": "2038-01-01",
 							"to": "2038-12-31",
 							"settlementDate": "2039-03-31",
-							"due": "179744.54",
+							"due": "200611.87",
 							"prepaid": "0.00",
-							"owed": "179744.54",
+							"owed": "200611.87",
 							"settled": true,
 							"partial": false
 						},
@@ -5066,9 +5276,9 @@
 							"from": "2039-01-01",
 							"to": "2039-12-31",
 							"settlementDate": "2040-03-31",
-							"due": "190386.89",
+							"due": "211880.22",
 							"prepaid": "0.00",
-							"owed": "190386.89",
+							"owed": "211880.22",
 							"settled": true,
 							"partial": false
 						},
@@ -5077,9 +5287,9 @@
 							"from": "2040-01-01",
 							"to": "2040-12-31",
 							"settlementDate": "2041-03-31",
-							"due": "23912.69",
+							"due": "27626.02",
 							"prepaid": "0.00",
-							"owed": "23912.69",
+							"owed": "27626.02",
 							"settled": true,
 							"partial": false
 						},
@@ -5234,6 +5444,28 @@
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
 							"settled": false,
 							"partial": true
 						}
@@ -5276,10 +5508,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a1ff0e-231b-73b8-a96c-0b320542b0ee",
+							"id": "01a1ff20-a7dd-764d-a972-09a6fde61a78",
 							"name": "base",
-							"contentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926",
-							"effectiveContentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926"
+							"contentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b",
+							"effectiveContentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -5439,19 +5671,19 @@
 						],
 						"fi": {
 							"reachable": true,
-							"fiDate": "2043-08-01",
+							"fiDate": "2042-10-01",
 							"reference": {
 								"label": "ruleOfThumb",
-								"date": "2043-08-01",
+								"date": "2042-10-01",
 								"multiplier": 25,
 								"basis": "unlockedAssets",
 								"window": "next12Months",
 								"terms": "nominal",
-								"unlockedAssets": "12860343.00",
-								"numerator": "12860343.00",
-								"annualExpenses": "826969.41",
-								"threshold": "20674235.25",
-								"multipleBps": 155511,
+								"unlockedAssets": "13303437.41",
+								"numerator": "13303437.41",
+								"annualExpenses": "806809.00",
+								"threshold": "20170225.00",
+								"multipleBps": 164889,
 								"partial": false,
 								"met": false
 							}
@@ -5462,9 +5694,9 @@
 								"from": "2026-01-01",
 								"to": "2026-12-31",
 								"settlementDate": "2027-03-31",
-								"due": "87000.00",
+								"due": "89000.00",
 								"prepaid": "0.00",
-								"owed": "87000.00",
+								"owed": "89000.00",
 								"settled": true,
 								"partial": false
 							},
@@ -5473,9 +5705,9 @@
 								"from": "2027-01-01",
 								"to": "2027-12-31",
 								"settlementDate": "2028-03-31",
-								"due": "88020.00",
+								"due": "100080.00",
 								"prepaid": "0.00",
-								"owed": "88020.00",
+								"owed": "100080.00",
 								"settled": true,
 								"partial": false
 							},
@@ -5484,9 +5716,9 @@
 								"from": "2028-01-01",
 								"to": "2028-12-31",
 								"settlementDate": "2029-03-31",
-								"due": "94170.60",
+								"due": "106592.40",
 								"prepaid": "0.00",
-								"owed": "94170.60",
+								"owed": "106592.40",
 								"settled": true,
 								"partial": false
 							},
@@ -5495,9 +5727,9 @@
 								"from": "2029-01-01",
 								"to": "2029-12-31",
 								"settlementDate": "2030-03-31",
-								"due": "100505.72",
+								"due": "113300.17",
 								"prepaid": "0.00",
-								"owed": "100505.72",
+								"owed": "113300.17",
 								"settled": true,
 								"partial": false
 							},
@@ -5506,9 +5738,9 @@
 								"from": "2030-01-01",
 								"to": "2030-12-31",
 								"settlementDate": "2031-03-31",
-								"due": "107030.90",
+								"due": "121511.47",
 								"prepaid": "0.00",
-								"owed": "107030.90",
+								"owed": "121511.47",
 								"settled": true,
 								"partial": false
 							},
@@ -5517,9 +5749,9 @@
 								"from": "2031-01-01",
 								"to": "2031-12-31",
 								"settlementDate": "2032-03-31",
-								"due": "113751.82",
+								"due": "130406.81",
 								"prepaid": "0.00",
-								"owed": "113751.82",
+								"owed": "130406.81",
 								"settled": true,
 								"partial": false
 							},
@@ -5528,9 +5760,9 @@
 								"from": "2032-01-01",
 								"to": "2032-12-31",
 								"settlementDate": "2033-03-31",
-								"due": "122092.98",
+								"due": "139569.03",
 								"prepaid": "0.00",
-								"owed": "122092.98",
+								"owed": "139569.03",
 								"settled": true,
 								"partial": false
 							},
@@ -5539,9 +5771,9 @@
 								"from": "2033-01-01",
 								"to": "2033-12-31",
 								"settlementDate": "2034-03-31",
-								"due": "131005.77",
+								"due": "149006.10",
 								"prepaid": "0.00",
-								"owed": "131005.77",
+								"owed": "149006.10",
 								"settled": true,
 								"partial": false
 							},
@@ -5550,9 +5782,9 @@
 								"from": "2034-01-01",
 								"to": "2034-12-31",
 								"settlementDate": "2035-03-31",
-								"due": "140185.93",
+								"due": "158726.28",
 								"prepaid": "0.00",
-								"owed": "140185.93",
+								"owed": "158726.28",
 								"settled": true,
 								"partial": false
 							},
@@ -5561,9 +5793,9 @@
 								"from": "2035-01-01",
 								"to": "2035-12-31",
 								"settlementDate": "2036-03-31",
-								"due": "149641.51",
+								"due": "168738.07",
 								"prepaid": "0.00",
-								"owed": "149641.51",
+								"owed": "168738.07",
 								"settled": true,
 								"partial": false
 							},
@@ -5572,9 +5804,9 @@
 								"from": "2036-01-01",
 								"to": "2036-12-31",
 								"settlementDate": "2037-03-31",
-								"due": "159380.75",
+								"due": "179050.21",
 								"prepaid": "0.00",
-								"owed": "159380.75",
+								"owed": "179050.21",
 								"settled": true,
 								"partial": false
 							},
@@ -5583,9 +5815,9 @@
 								"from": "2037-01-01",
 								"to": "2037-12-31",
 								"settlementDate": "2038-03-31",
-								"due": "169412.17",
+								"due": "189671.70",
 								"prepaid": "0.00",
-								"owed": "169412.17",
+								"owed": "189671.70",
 								"settled": true,
 								"partial": false
 							},
@@ -5594,9 +5826,9 @@
 								"from": "2038-01-01",
 								"to": "2038-12-31",
 								"settlementDate": "2039-03-31",
-								"due": "179744.54",
+								"due": "200611.87",
 								"prepaid": "0.00",
-								"owed": "179744.54",
+								"owed": "200611.87",
 								"settled": true,
 								"partial": false
 							},
@@ -5605,9 +5837,9 @@
 								"from": "2039-01-01",
 								"to": "2039-12-31",
 								"settlementDate": "2040-03-31",
-								"due": "190386.89",
+								"due": "211880.22",
 								"prepaid": "0.00",
-								"owed": "190386.89",
+								"owed": "211880.22",
 								"settled": true,
 								"partial": false
 							},
@@ -5616,9 +5848,9 @@
 								"from": "2040-01-01",
 								"to": "2040-12-31",
 								"settlementDate": "2041-03-31",
-								"due": "201348.49",
+								"due": "223486.62",
 								"prepaid": "0.00",
-								"owed": "201348.49",
+								"owed": "223486.62",
 								"settled": true,
 								"partial": false
 							},
@@ -5627,9 +5859,9 @@
 								"from": "2041-01-01",
 								"to": "2041-12-31",
 								"settlementDate": "2042-03-31",
-								"due": "212638.94",
+								"due": "235441.24",
 								"prepaid": "0.00",
-								"owed": "212638.94",
+								"owed": "235441.24",
 								"settled": true,
 								"partial": false
 							},
@@ -5638,9 +5870,9 @@
 								"from": "2042-01-01",
 								"to": "2042-12-31",
 								"settlementDate": "2043-03-31",
-								"due": "224268.10",
+								"due": "247754.47",
 								"prepaid": "0.00",
-								"owed": "224268.10",
+								"owed": "247754.47",
 								"settled": true,
 								"partial": false
 							},
@@ -5649,9 +5881,9 @@
 								"from": "2043-01-01",
 								"to": "2043-12-31",
 								"settlementDate": "2044-03-31",
-								"due": "236246.15",
+								"due": "260437.10",
 								"prepaid": "0.00",
-								"owed": "236246.15",
+								"owed": "260437.10",
 								"settled": true,
 								"partial": false
 							},
@@ -5660,9 +5892,9 @@
 								"from": "2044-01-01",
 								"to": "2044-12-31",
 								"settlementDate": "2045-03-31",
-								"due": "248583.53",
+								"due": "273500.22",
 								"prepaid": "0.00",
-								"owed": "248583.53",
+								"owed": "273500.22",
 								"settled": true,
 								"partial": false
 							},
@@ -5671,9 +5903,9 @@
 								"from": "2045-01-01",
 								"to": "2045-12-31",
 								"settlementDate": "2046-03-31",
-								"due": "261291.03",
+								"due": "286955.22",
 								"prepaid": "0.00",
-								"owed": "261291.03",
+								"owed": "286955.22",
 								"settled": true,
 								"partial": false
 							},
@@ -5682,9 +5914,9 @@
 								"from": "2046-01-01",
 								"to": "2046-12-31",
 								"settlementDate": "2047-03-31",
-								"due": "274379.75",
+								"due": "300813.86",
 								"prepaid": "0.00",
-								"owed": "274379.75",
+								"owed": "300813.86",
 								"settled": true,
 								"partial": false
 							},
@@ -5693,9 +5925,9 @@
 								"from": "2047-01-01",
 								"to": "2047-12-31",
 								"settlementDate": "2048-03-31",
-								"due": "287861.15",
+								"due": "315088.28",
 								"prepaid": "0.00",
-								"owed": "287861.15",
+								"owed": "315088.28",
 								"settled": true,
 								"partial": false
 							},
@@ -5704,9 +5936,9 @@
 								"from": "2048-01-01",
 								"to": "2048-12-31",
 								"settlementDate": "2049-03-31",
-								"due": "301747.00",
+								"due": "329790.93",
 								"prepaid": "0.00",
-								"owed": "301747.00",
+								"owed": "329790.93",
 								"settled": true,
 								"partial": false
 							},
@@ -5715,9 +5947,9 @@
 								"from": "2049-01-01",
 								"to": "2049-12-31",
 								"settlementDate": "2050-03-31",
-								"due": "316049.40",
+								"due": "344934.67",
 								"prepaid": "0.00",
-								"owed": "316049.40",
+								"owed": "344934.67",
 								"settled": true,
 								"partial": false
 							},
@@ -5726,9 +5958,9 @@
 								"from": "2050-01-01",
 								"to": "2050-12-31",
 								"settlementDate": "2051-03-31",
-								"due": "54316.14",
+								"due": "61717.09",
 								"prepaid": "0.00",
-								"owed": "54316.14",
+								"owed": "61717.09",
 								"settled": true,
 								"partial": false
 							},
@@ -5847,34 +6079,34 @@
 						"netWorth": {
 							"final": {
 								"date": "2060-12-31",
-								"nominal": "17197022.02",
-								"real": "6263862.39"
+								"nominal": "19756836.98",
+								"real": "7196252.23"
 							},
 							"atAges": [
 								{
 									"age": 45,
-									"nominal": "5876290.95",
-									"real": "4571299.09"
+									"nominal": "6520465.53",
+									"real": "5072417.00"
 								},
 								{
 									"age": 55,
-									"nominal": "14647613.90",
-									"real": "8478733.45"
+									"nominal": "16119241.91",
+									"real": "9330581.52"
 								},
 								{
 									"age": 60,
-									"nominal": "20855405.98",
-									"real": "10413497.66"
+									"nominal": "22869824.55",
+									"real": "11419334.85"
 								}
 							]
 						}
 					},
 					"b": {
 						"scenario": {
-							"id": "01a1ff0e-241d-74e7-a031-f40b723f3bd3",
+							"id": "01a1ff20-a903-7117-99c1-8552a380f78c",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77",
-							"effectiveContentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77"
+							"contentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf",
+							"effectiveContentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6038,8 +6270,8 @@
 							"bestCase": {
 								"month": "2040-06-01",
 								"runsOut": {
-									"date": "2054-11-01",
-									"unmet": "78420.81"
+									"date": "2056-05-01",
+									"unmet": "70359.24"
 								}
 							}
 						},
@@ -6049,9 +6281,9 @@
 								"from": "2026-01-01",
 								"to": "2026-12-31",
 								"settlementDate": "2027-03-31",
-								"due": "87000.00",
+								"due": "89000.00",
 								"prepaid": "0.00",
-								"owed": "87000.00",
+								"owed": "89000.00",
 								"settled": true,
 								"partial": false
 							},
@@ -6060,9 +6292,9 @@
 								"from": "2027-01-01",
 								"to": "2027-12-31",
 								"settlementDate": "2028-03-31",
-								"due": "88020.00",
+								"due": "100080.00",
 								"prepaid": "0.00",
-								"owed": "88020.00",
+								"owed": "100080.00",
 								"settled": true,
 								"partial": false
 							},
@@ -6071,9 +6303,9 @@
 								"from": "2028-01-01",
 								"to": "2028-12-31",
 								"settlementDate": "2029-03-31",
-								"due": "94170.60",
+								"due": "106592.40",
 								"prepaid": "0.00",
-								"owed": "94170.60",
+								"owed": "106592.40",
 								"settled": true,
 								"partial": false
 							},
@@ -6082,9 +6314,9 @@
 								"from": "2029-01-01",
 								"to": "2029-12-31",
 								"settlementDate": "2030-03-31",
-								"due": "100505.72",
+								"due": "113300.17",
 								"prepaid": "0.00",
-								"owed": "100505.72",
+								"owed": "113300.17",
 								"settled": true,
 								"partial": false
 							},
@@ -6093,9 +6325,9 @@
 								"from": "2030-01-01",
 								"to": "2030-12-31",
 								"settlementDate": "2031-03-31",
-								"due": "107030.90",
+								"due": "121511.47",
 								"prepaid": "0.00",
-								"owed": "107030.90",
+								"owed": "121511.47",
 								"settled": true,
 								"partial": false
 							},
@@ -6104,9 +6336,9 @@
 								"from": "2031-01-01",
 								"to": "2031-12-31",
 								"settlementDate": "2032-03-31",
-								"due": "113751.82",
+								"due": "130406.81",
 								"prepaid": "0.00",
-								"owed": "113751.82",
+								"owed": "130406.81",
 								"settled": true,
 								"partial": false
 							},
@@ -6115,9 +6347,9 @@
 								"from": "2032-01-01",
 								"to": "2032-12-31",
 								"settlementDate": "2033-03-31",
-								"due": "122092.98",
+								"due": "139569.03",
 								"prepaid": "0.00",
-								"owed": "122092.98",
+								"owed": "139569.03",
 								"settled": true,
 								"partial": false
 							},
@@ -6126,9 +6358,9 @@
 								"from": "2033-01-01",
 								"to": "2033-12-31",
 								"settlementDate": "2034-03-31",
-								"due": "131005.77",
+								"due": "149006.10",
 								"prepaid": "0.00",
-								"owed": "131005.77",
+								"owed": "149006.10",
 								"settled": true,
 								"partial": false
 							},
@@ -6137,9 +6369,9 @@
 								"from": "2034-01-01",
 								"to": "2034-12-31",
 								"settlementDate": "2035-03-31",
-								"due": "140185.93",
+								"due": "158726.28",
 								"prepaid": "0.00",
-								"owed": "140185.93",
+								"owed": "158726.28",
 								"settled": true,
 								"partial": false
 							},
@@ -6148,9 +6380,9 @@
 								"from": "2035-01-01",
 								"to": "2035-12-31",
 								"settlementDate": "2036-03-31",
-								"due": "149641.51",
+								"due": "168738.07",
 								"prepaid": "0.00",
-								"owed": "149641.51",
+								"owed": "168738.07",
 								"settled": true,
 								"partial": false
 							},
@@ -6159,9 +6391,9 @@
 								"from": "2036-01-01",
 								"to": "2036-12-31",
 								"settlementDate": "2037-03-31",
-								"due": "159380.75",
+								"due": "179050.21",
 								"prepaid": "0.00",
-								"owed": "159380.75",
+								"owed": "179050.21",
 								"settled": true,
 								"partial": false
 							},
@@ -6170,9 +6402,9 @@
 								"from": "2037-01-01",
 								"to": "2037-12-31",
 								"settlementDate": "2038-03-31",
-								"due": "169412.17",
+								"due": "189671.70",
 								"prepaid": "0.00",
-								"owed": "169412.17",
+								"owed": "189671.70",
 								"settled": true,
 								"partial": false
 							},
@@ -6181,9 +6413,9 @@
 								"from": "2038-01-01",
 								"to": "2038-12-31",
 								"settlementDate": "2039-03-31",
-								"due": "179744.54",
+								"due": "200611.87",
 								"prepaid": "0.00",
-								"owed": "179744.54",
+								"owed": "200611.87",
 								"settled": true,
 								"partial": false
 							},
@@ -6192,9 +6424,9 @@
 								"from": "2039-01-01",
 								"to": "2039-12-31",
 								"settlementDate": "2040-03-31",
-								"due": "190386.89",
+								"due": "211880.22",
 								"prepaid": "0.00",
-								"owed": "190386.89",
+								"owed": "211880.22",
 								"settled": true,
 								"partial": false
 							},
@@ -6203,9 +6435,9 @@
 								"from": "2040-01-01",
 								"to": "2040-12-31",
 								"settlementDate": "2041-03-31",
-								"due": "23912.69",
+								"due": "27626.02",
 								"prepaid": "0.00",
-								"owed": "23912.69",
+								"owed": "27626.02",
 								"settled": true,
 								"partial": false
 							},
@@ -6360,35 +6592,57 @@
 								"due": "0.00",
 								"prepaid": "0.00",
 								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2055-01-01",
+								"to": "2055-12-31",
+								"settlementDate": "2056-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2056-01-01",
+								"to": "2056-12-31",
+								"settlementDate": "2057-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
 								"settled": false,
 								"partial": true
 							}
 						],
 						"runOut": {
-							"date": "2054-11-01",
-							"unmet": "78420.81"
+							"date": "2056-05-01",
+							"unmet": "70359.24"
 						},
 						"netWorth": {
 							"final": {
-								"date": "2054-11-01",
+								"date": "2056-05-01",
 								"nominal": "0.00",
 								"real": "0.00"
 							},
 							"atAges": [
 								{
 									"age": 45,
-									"nominal": "5876290.95",
-									"real": "4571299.09"
+									"nominal": "6520465.53",
+									"real": "5072417.00"
 								},
 								{
 									"age": 55,
-									"nominal": "7479432.24",
-									"real": "4329450.03"
+									"nominal": "8588148.13",
+									"real": "4971227.35"
 								},
 								{
 									"age": 60,
-									"nominal": "4306402.34",
-									"real": "2150267.93"
+									"nominal": "5668144.04",
+									"real": "2830211.25"
 								}
 							]
 						}
@@ -6406,13 +6660,13 @@
 						},
 						{
 							"age": 55,
-							"nominal": "-7168181.66",
-							"real": "-4149283.42"
+							"nominal": "-7531093.78",
+							"real": "-4359354.17"
 						},
 						{
 							"age": 60,
-							"nominal": "-16549003.64",
-							"real": "-8263229.73"
+							"nominal": "-17201680.51",
+							"real": "-8589123.60"
 						}
 					]
 				},
@@ -6430,81 +6684,103 @@
 			"data": {
 				"accounts": [
 					{
-						"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+						"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:17.491Z",
-						"updatedAt": "2026-11-21T17:01:17.491Z"
+						"createdAt": "2026-11-21T17:21:30.778Z",
+						"updatedAt": "2026-11-21T17:21:30.778Z"
 					},
 					{
-						"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+						"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:17.770Z",
-						"updatedAt": "2026-11-21T17:01:17.770Z"
+						"createdAt": "2026-11-21T17:21:31.043Z",
+						"updatedAt": "2026-11-21T17:21:31.043Z"
 					},
 					{
-						"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+						"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:17.641Z",
-						"updatedAt": "2026-11-21T17:01:17.641Z"
+						"createdAt": "2026-11-21T17:21:30.913Z",
+						"updatedAt": "2026-11-21T17:21:30.913Z"
 					},
 					{
-						"id": "01a1ff0e-1f16-7793-9a23-963c19a12ee9",
+						"id": "01a1ff20-a2bc-76f9-b775-635bfb8b4a9a",
+						"name": "Fund Return",
+						"type": "income",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:21:31.324Z",
+						"updatedAt": "2026-11-21T17:21:31.324Z"
+					},
+					{
+						"id": "01a1ff20-a35d-770b-a6db-fb8116f10e6b",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:17.974Z",
-						"updatedAt": "2026-11-21T17:01:17.974Z"
+						"createdAt": "2026-11-21T17:21:31.485Z",
+						"updatedAt": "2026-11-21T17:21:31.485Z"
 					},
 					{
-						"id": "01a1ff0e-1fe9-71fa-abfd-6339e977c953",
+						"id": "01a1ff20-a4c9-7631-8b8b-a44f36754024",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:18.185Z",
-						"updatedAt": "2026-11-21T17:01:18.185Z"
+						"createdAt": "2026-11-21T17:21:31.849Z",
+						"updatedAt": "2026-11-21T17:21:31.849Z"
 					},
 					{
-						"id": "01a1ff0e-1f7d-71a1-b7cf-c932c04d9d65",
+						"id": "01a1ff20-a3eb-7060-8760-03287a33161d",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:18.077Z",
-						"updatedAt": "2026-11-21T17:01:18.077Z"
+						"createdAt": "2026-11-21T17:21:31.627Z",
+						"updatedAt": "2026-11-21T17:21:31.627Z"
 					},
 					{
-						"id": "01a1ff0e-1eb8-74c6-ad37-e48ff6b831e2",
+						"id": "01a1ff20-a22d-7712-9809-376ccb0ccd68",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:17.880Z",
-						"updatedAt": "2026-11-21T17:01:17.880Z"
+						"createdAt": "2026-11-21T17:21:31.181Z",
+						"updatedAt": "2026-11-21T17:21:31.181Z"
+					},
+					{
+						"id": "01a1ff20-a45f-7575-9c58-838725470f49",
+						"name": "Travel",
+						"type": "expense",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:21:31.743Z",
+						"updatedAt": "2026-11-21T17:21:31.743Z"
 					}
 				]
 			}
@@ -6519,16 +6795,16 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff0e-1d33-74bc-8afd-023ae46f2c55",
+							"id": "01a1ff20-a09a-761d-8dca-f39dbe03b111",
 							"name": "Bank"
 						},
 						"type": "asset",
-						"amount": "606000.00",
+						"amount": "662300.00",
 						"currency": "THB"
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1e4a-743c-b2b8-b770fc3399aa",
+							"id": "01a1ff20-a1a3-754f-b35d-992213d47f08",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -6537,18 +6813,18 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff0e-1dc9-7313-8f62-23d600591e7f",
+							"id": "01a1ff20-a121-7250-b334-9971461e1cb5",
 							"name": "Fund"
 						},
 						"type": "asset",
-						"amount": "660000.00",
+						"amount": "736600.00",
 						"currency": "THB"
 					}
 				],
 				"totals": [
 					{
 						"currency": "THB",
-						"amount": "1082000.00"
+						"amount": "1214900.00"
 					}
 				]
 			}
@@ -6559,22 +6835,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a1ff0e-231b-73b8-a96c-0b320542b0ee",
+						"id": "01a1ff20-a7dd-764d-a972-09a6fde61a78",
 						"name": "base",
-						"contentHash": "jcs1:sha256:ccfd1b9210500de877377af3bdd1280c61b639da73f831aff99ba298cb18a926",
+						"contentHash": "jcs1:sha256:eba03634f561f50366b628822d26ad92ba3582670fae4bca013c0d739519234b",
 						"forkedFrom": null,
 						"version": 2,
-						"createdAt": "2026-11-21T17:01:19.003Z",
-						"updatedAt": "2026-11-21T17:01:19.141Z"
+						"createdAt": "2026-11-21T17:21:32.637Z",
+						"updatedAt": "2026-11-21T17:21:32.790Z"
 					},
 					{
-						"id": "01a1ff0e-241d-74e7-a031-f40b723f3bd3",
+						"id": "01a1ff20-a903-7117-99c1-8552a380f78c",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:c2f5a830a06dd4c4a8a385f8dfc19325b39111e8db3645fd761b21758128ea77",
-						"forkedFrom": "01a1ff0e-231b-73b8-a96c-0b320542b0ee",
+						"contentHash": "jcs1:sha256:96b450109259d81eeafd561ad955a7908df0f521e4cdf85bb047440bc63d3cbf",
+						"forkedFrom": "01a1ff20-a7dd-764d-a972-09a6fde61a78",
 						"version": 1,
-						"createdAt": "2026-11-21T17:01:19.261Z",
-						"updatedAt": "2026-11-21T17:01:19.261Z"
+						"createdAt": "2026-11-21T17:21:32.931Z",
+						"updatedAt": "2026-11-21T17:21:32.931Z"
 					}
 				]
 			}

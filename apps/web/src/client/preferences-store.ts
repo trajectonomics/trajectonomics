@@ -1,5 +1,4 @@
 import { useEffect, useSyncExternalStore } from "react"
-import { applyTheme, prefersDark, readStored, subscribeExternal, writeStored } from "./browser"
 import {
 	HIDE_KEY,
 	parseHideAmounts,
@@ -7,7 +6,8 @@ import {
 	serializeHideAmounts,
 	THEME_KEY,
 	type Theme,
-} from "./preferences"
+} from "../lib/view/preferences"
+import { applyTheme, prefersDark, readStored, subscribeExternal, writeStored } from "./browser"
 
 const listeners = new Set<() => void>()
 

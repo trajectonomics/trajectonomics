@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from "react"
+import { snapshotUrl } from "../lib/view/snapshot-url"
+import { LOADING, type SnapshotState } from "../lib/view/state"
 import { currentSearch, snapshotLoader } from "./browser"
-import { snapshotUrl } from "./snapshot-url"
-import { LOADING, type SnapshotState } from "./state"
 
 /**
  * The Snapshot this page shows. The first island to mount starts the one read; the others share it.

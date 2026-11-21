@@ -1,6 +1,6 @@
 import { useState } from "react"
+import { useHideAmounts } from "../../client/preferences-store"
 import { type LineSeries, lineLayout } from "../../lib/chart"
-import { useHideAmounts } from "../../lib/view/preferences-store"
 import { EmptyState } from "../ui/EmptyState"
 import { HEIGHT, MARGIN } from "./geometry"
 import { LineHover } from "./LineHover"

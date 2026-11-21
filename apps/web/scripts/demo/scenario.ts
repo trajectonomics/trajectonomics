@@ -27,7 +27,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 				frequency: "monthly",
 				start: "2026-11-01",
 				end: BASE_SALARY_END,
-				amount: 8500000,
+				amount: 9000000,
 				growth: "inflation",
 			},
 			{

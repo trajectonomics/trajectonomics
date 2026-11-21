@@ -9,7 +9,7 @@ describe("CompositionBar", () => {
 		{ label: "Fund", amount: "660000.00", value: 660000 },
 	]
 
-	test("lists each part with its CLI amount and its share", () => {
+	test("lists each part with its CLI amount and states no computed share", () => {
 		const html = renderToStaticMarkup(
 			<CompositionBar
 				label="Assets by account"
@@ -20,17 +20,15 @@ describe("CompositionBar", () => {
 		)
 		expect(html).toContain("606,000.00")
 		expect(html).toContain("THB")
-		expect(html).toContain("48%")
-		expect(html).toContain("52%")
+		expect(html).not.toContain("%")
 	})
 
-	test("hides each amount while keeping the labels and the shares", () => {
+	test("hides each amount while keeping the labels", () => {
 		const html = renderToStaticMarkup(
 			<CompositionBar label="Assets by account" segments={segments} hidden />,
 		)
 		expect(html).not.toContain("606,000.00")
 		expect(html).toContain("Bank")
-		expect(html).toContain("52%")
 	})
 
 	test("is an image with its label and a 2 px gap between segments", () => {

@@ -1,6 +1,6 @@
 import type { AnchorHTMLAttributes, ReactNode } from "react"
+import { useSearch } from "../../client/location"
 import { withSearch } from "../../lib/view/links"
-import { useSearch } from "../../lib/view/location"
 
 export interface SiteLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
 	/** A path on the Dashboard, such as "/net-worth/". The query string of the page is added to it. */

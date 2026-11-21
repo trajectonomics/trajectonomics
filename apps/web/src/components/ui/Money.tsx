@@ -1,5 +1,5 @@
+import { useHideAmounts } from "../../client/preferences-store"
 import { formatMoney, maskMoney } from "../../lib/format"
-import { useHideAmounts } from "../../lib/view/preferences-store"
 import { cx } from "./cx"
 
 export interface MoneyProps {

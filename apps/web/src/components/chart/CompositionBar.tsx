@@ -25,7 +25,7 @@ function swatchOf(index: number): string {
 	return SWATCHES[index % SWATCHES.length] ?? "bg-primary"
 }
 
-/** A bar split into segments with a 2 px gap, and a legend of each part's amount and share. */
+/** A bar split into segments with a 2 px gap, and a legend of each part's amount. */
 export function CompositionBar({ label, segments, currency, hidden }: CompositionBarProps) {
 	const parts = shares(segments.map((segment) => segment.value))
 	const rows = segments.map((segment, index) => ({
@@ -57,11 +57,8 @@ export function CompositionBar({ label, segments, currency, hidden }: Compositio
 							<span aria-hidden="true" className={cx("size-3 shrink-0 rounded-sm", row.swatch)} />
 							<span className="truncate">{row.label}</span>
 						</span>
-						<span className="flex shrink-0 items-baseline gap-3">
+						<span className="shrink-0">
 							<Money amount={row.amount} currency={currency} hidden={hidden} />
-							<span className="w-12 text-right text-muted-foreground tabular-nums">
-								{Math.round(row.share * 100)}%
-							</span>
 						</span>
 					</li>
 				))}

@@ -122,8 +122,8 @@ describe("header and overview view models, on the Demo snapshot", () => {
 		expect(series.points.at(-1)).toEqual({
 			x: 23,
 			xLabel: "Oct 2026",
-			y: 1082000,
-			display: "1,082,000.00",
+			y: 1214900,
+			display: "1,214,900.00",
 		})
 	})
 })

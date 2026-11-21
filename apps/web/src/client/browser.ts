@@ -1,7 +1,7 @@
-// The one module in src/lib/view that touches the browser: storage, the system theme, the address bar,
-// the document and fetch. Everything else in this folder is pure or takes these as arguments.
-import { createSnapshotLoader } from "./loader"
-import type { Theme } from "./preferences"
+// The one module that touches the browser: storage, the system theme, the address bar, the document
+// and fetch. `src/lib/` stays pure; the hooks in this folder are the only callers.
+import { createSnapshotLoader } from "../lib/view/loader"
+import type { Theme } from "../lib/view/preferences"
 
 /** The page's one Snapshot loader. Every island on the page reads the same file once. */
 export const snapshotLoader = createSnapshotLoader((url) => fetch(url, { cache: "no-store" }))

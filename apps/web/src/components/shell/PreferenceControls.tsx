@@ -1,4 +1,4 @@
-import { useHideAmounts, useTheme } from "../../lib/view/preferences-store"
+import { useHideAmounts, useTheme } from "../../client/preferences-store"
 import { cx } from "../ui/cx"
 
 const TOGGLE = cx(

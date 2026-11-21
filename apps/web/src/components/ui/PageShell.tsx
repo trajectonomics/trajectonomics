@@ -1,9 +1,9 @@
 import type { ReactNode } from "react"
+import { usePathname } from "../../client/location"
+import { useSnapshot } from "../../client/use-snapshot"
 import type { Snapshot } from "../../lib/contract"
 import { withSearch } from "../../lib/view/links"
-import { usePathname } from "../../lib/view/location"
 import type { SnapshotState } from "../../lib/view/state"
-import { useSnapshot } from "../../lib/view/use-snapshot"
 import { EmptyState } from "./EmptyState"
 import { SiteLink } from "./SiteLink"
 

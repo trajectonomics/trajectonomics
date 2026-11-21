@@ -1,8 +1,8 @@
+import { useSearch } from "../../client/location"
+import { useSnapshot } from "../../client/use-snapshot"
 import { headerLine } from "../../lib/view/header"
-import { useSearch } from "../../lib/view/location"
 import { isDemo } from "../../lib/view/snapshot-url"
 import type { SnapshotState } from "../../lib/view/state"
-import { useSnapshot } from "../../lib/view/use-snapshot"
 import { Badge } from "../ui/Badge"
 
 /** The As-of, the currency and the traj version of the Snapshot, and a badge when it is the Demo. */
