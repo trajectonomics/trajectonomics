@@ -25,7 +25,9 @@
 		"check": "turbo run check",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
-		"typecheck": "turbo run typecheck"
+		"typecheck": "turbo run typecheck",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update"
 	},
 	"devDependencies": {
 		"turbo": "2.11.10"
