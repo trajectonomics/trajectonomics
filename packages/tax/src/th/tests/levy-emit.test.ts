@@ -24,16 +24,29 @@ const TIMELINE = { start: "2026-01-01", horizon: "2026-12-31", resolution: "mont
 
 function scenario(levy: Levy): Scenario {
 	return {
-		schemaVersion: 2,
+		schemaVersion: 4,
 		currency: "THB",
 		economy: { inflation: 0 },
 		accounts: [{ id: "cash", kind: "asset", rate: 0 }],
-		flows: [],
+		flows: [
+			{
+				id: "salary",
+				kind: "income",
+				earned: true,
+				label: ThLevyIncomeLabel.Section40_1,
+				amount: 0,
+				frequency: "monthly",
+				start: "2026-01-01",
+				growth: "inflation",
+			},
+		],
 		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
-		levy: {
-			...levy,
-			carryIn: [{ periodStart: "2025-01-01", tallies: [], prepaid: 0 }],
-		},
+		levies: [
+			{
+				...levy,
+				carryIn: [{ periodStart: "2025-01-01", tallies: [], prepaid: 0 }],
+			},
+		],
 	}
 }
 

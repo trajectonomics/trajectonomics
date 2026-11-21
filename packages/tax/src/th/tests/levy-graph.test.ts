@@ -10,7 +10,7 @@ import {
 	rateFlooredToBaht,
 	sumMeasures,
 } from "../levy/graph-rates"
-import { ThLevyRounding, ThLevyTallyBasis } from "../levy/graph-types"
+import { type ThLevy, ThLevyRounding, ThLevyTallyBasis } from "../levy/graph-types"
 import { ThLevyMeasureId } from "../levy/measure-ids"
 import { levyValues, simTallies } from "./levy-sim"
 
@@ -28,7 +28,7 @@ function measureValue(levy: Levy, id: string, tallies: Tallies = emptyTallies())
 	return value
 }
 
-function build(graph: ThLevyGraph, due: string): Levy {
+function build(graph: ThLevyGraph, due: string): ThLevy {
 	return graph.build("test", { month: 1, day: 1 }, { month: 3, day: 31 }, due)
 }
 
