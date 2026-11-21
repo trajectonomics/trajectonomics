@@ -137,8 +137,9 @@ describe("the Header component in every Language, current or not", () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
 				const menu = menuWith(page, STARRED_REPOS[0]?.url ?? GITHUB_ORG_URL)
 				const group = withClass(page, "header-menu-group")[0]
+				// A repository at zero is left out, so a menu with no starred repository has no group either.
 				expect(group === undefined ? undefined : textOf(page, group)).toBe(
-					dictionary.starMenuGroupLabel,
+					STARRED_REPOS.length === 0 ? undefined : dictionary.starMenuGroupLabel,
 				)
 				expect(linksIn(page, menu).map((link) => [link.text, link.href])).toEqual([
 					...STARRED_REPOS.map((repo) => [`${repo.name} ${formatStarCount(repo.stars)}`, repo.url]),
