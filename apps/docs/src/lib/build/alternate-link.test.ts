@@ -34,7 +34,7 @@ describe("the alternate Markdown link of a built page", () => {
 	})
 
 	test("a link to another twin does not count", () => {
-		const link = '<link rel="alternate" type="text/markdown" href="/docs/developers.md">'
+		const link = '<link rel="alternate" type="text/markdown" href="/docs/contribute.md">'
 
 		expect(
 			checkAlternateLinks([page("docs/cli/index.html", link)]).map((failure) => failure.code),

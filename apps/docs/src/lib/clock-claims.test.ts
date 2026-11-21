@@ -74,7 +74,7 @@ describe("a page that states which dates the caller supplies", () => {
 		).toEqual([])
 	})
 
-	test("is accepted in the Builder tab when a package reads no clock", () => {
+	test("is accepted in the Contribute tab when a package reads no clock", () => {
 		expect(builderPage("The package generates no ids and reads no clock.")).toEqual([])
 	})
 

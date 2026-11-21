@@ -38,7 +38,7 @@ describe("the built redirect rules", () => {
 		])
 	})
 
-	test("a rule to the Builder tab is not the Operator redirect", () => {
+	test("a rule to the Contribute tab is not the Operator redirect", () => {
 		expect(codesOf("/old /docs/contribute/ 301\n")).toEqual([])
 	})
 })

@@ -26,7 +26,7 @@ const TREE: Root = {
 		{
 			type: "folder",
 			name: "Contribute",
-			children: [{ type: "page", name: "Overview", url: "/docs/developers" }],
+			children: [{ type: "page", name: "Get started", url: "/docs/contribute" }],
 		},
 	],
 }
@@ -38,7 +38,7 @@ describe("the order the Docs sidebar presents its pages in", () => {
 			"/docs/cli/installation",
 			"/docs/cli/commands",
 			"/docs/cli/commands/tx",
-			"/docs/developers",
+			"/docs/contribute",
 		])
 	})
 
