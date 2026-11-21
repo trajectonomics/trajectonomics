@@ -1,0 +1,39 @@
+name: "Tax: new jurisdiction"
+description: Propose a US state or a new country for the tax engine.
+title: "Tax: new jurisdiction: "
+labels: ["tax"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Name the jurisdiction and its official tax authority. Read the tax contributor guide's sections on
+        adding a US state and walkthrough B before you start.
+  - type: input
+    id: jurisdiction
+    attributes:
+      label: Jurisdiction
+      description: A US state, the District of Columbia, or a country.
+    validations:
+      required: true
+  - type: input
+    id: official-source
+    attributes:
+      label: Official source (URL)
+      description: The tax authority's official rate schedule, form instructions or statute.
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: tax-year
+    attributes:
+      label: Tax year
+      placeholder: "2026"
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: What the tax covers
+      description: Income tax only, or also surtaxes, withholding or credits. Name the parts you can source.
+    validations:
+      required: true

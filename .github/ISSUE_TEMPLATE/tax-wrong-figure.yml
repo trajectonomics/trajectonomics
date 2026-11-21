@@ -1,0 +1,44 @@
+name: "Tax: wrong figure"
+description: Report a tax figure that does not match its official source.
+title: "Tax: wrong figure: "
+labels: ["tax"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Name the figure and the official document that states it. A report without an official source
+        cannot be checked, so the source field is required.
+  - type: input
+    id: official-source
+    attributes:
+      label: Official source (URL)
+      description: The official document that states the figure, with the page or section.
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: figure
+    attributes:
+      label: Parameter or figure
+      description: The parameter path in the code, such as TH_2026_PARAMETERS.allowances.personal, or the figure's name.
+    validations:
+      required: true
+  - type: input
+    id: values
+    attributes:
+      label: What the code says, and what the source says
+      placeholder: "Code: 60,000 THB. Source: 60,000 THB (Section 47(1))."
+    validations:
+      required: true
+  - type: input
+    id: date-read
+    attributes:
+      label: Date you read the source
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else the reviewer needs, such as a second source or the year the figure applies to.
