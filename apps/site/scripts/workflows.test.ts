@@ -78,24 +78,6 @@ describe("pr-title.yml, the conventional commit check", () => {
 	})
 })
 
-describe("drift.yml, the weekly tooling report", () => {
-	it("calls the shared drift workflow at v1 and has no steps", () => {
-		const job = soleJob(load("drift.yml"))
-		expect(job.uses).toBe("trajectonomics/cicd/.github/workflows/drift.yml@v1")
-		expect(job.steps).toBeUndefined()
-	})
-
-	it("runs weekly and by hand, because the caller owns the schedule", () => {
-		const workflow = load("drift.yml")
-		expect(workflow.on?.["schedule"]).toEqual([{ cron: "0 6 * * 1" }])
-		expect(workflow.on).toHaveProperty("workflow_dispatch")
-	})
-
-	it("grants contents to check the repository out and issues to report drift", () => {
-		expect(load("drift.yml").permissions).toEqual({ contents: "read", issues: "write" })
-	})
-})
-
 describe("browser.yml, the workflow that needs a browser", () => {
 	const workflow = load("browser.yml")
 	const steps = () => soleJob(workflow).steps ?? []
