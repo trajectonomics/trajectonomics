@@ -32,13 +32,8 @@ function headlines(language: Language): readonly string[] {
 	return [dictionary.heroHeadingPrefix, dictionary.heroHeadingAccent]
 }
 
-/**
- * The Star menu's panel, one link per repository in star order. Each row shows its name and its count,
- * as the real menu does, so a repository named like the Organisation never reads as the footer's link.
- */
-const starPanel = STAR_REPOS.map(
-	(repo) => `<a href="${repo.url}"><span>${repo.name}</span><span>1</span></a>`,
-).join("")
+/** The Star menu's panel, one link per repository in star order. */
+const starPanel = STAR_REPOS.map((repo) => `<a href="${repo.url}">${repo.name}</a>`).join("")
 
 /** One Language's home as the build must produce it, with every region and the prompt window. */
 export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {

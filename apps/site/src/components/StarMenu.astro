@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { GITHUB_ORG_URL } from "../lib/site"
-import { STARRED_REPOS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
+import { STAR_MENU_ROWS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import ArrowUpRight from "./icons/ArrowUpRight.astro"
 import Chevron from "./icons/Chevron.astro"
@@ -28,23 +28,25 @@ const label =
 	</summary>
 	<div
 		class="header-menu-panel bg-popover text-popover-foreground"
-		data-empty={STARRED_REPOS.length === 0 ? "" : undefined}
+		data-empty={STAR_MENU_ROWS.length === 0 ? "" : undefined}
 	>
 		{
-			STARRED_REPOS.length > 0 && (
+			STAR_MENU_ROWS.length > 0 && (
 				<p class="header-menu-group text-muted-foreground">{dictionary.starMenuGroupLabel}</p>
 			)
 		}
 		{
-			STARRED_REPOS.length > 0 && (
+			STAR_MENU_ROWS.length > 0 && (
 				<ul class="header-menu-list">
-					{STARRED_REPOS.map((repo) => (
+					{STAR_MENU_ROWS.map((repo) => (
 					<li>
 						<a class="header-menu-row" href={repo.url}>
 							<span class="header-menu-row-name">{repo.name}</span>
-							<span class="header-menu-row-count text-muted-foreground tabular-nums">
-								{formatStarCount(repo.stars)}
-							</span>
+							{repo.stars !== undefined && (
+								<span class="header-menu-row-count text-muted-foreground tabular-nums">
+									{formatStarCount(repo.stars)}
+								</span>
+							)}
 						</a>
 						</li>
 					))}

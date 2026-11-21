@@ -103,15 +103,16 @@ the list down there right now it looks like a check mark which we don't" (site#4
 select. The trigger draws a star in place of the GitHub mark and keeps the repository name beside it, so its
 accessible name stays `GitHub stars: <repository>`; the panel has no current value, so the check on its first
 row goes with the select framing. The rows are equal links out and nothing in them is selected. The repository
-names `cli` and `skills` stay as site#37 left them, and the star is drawn at 12 px like the icons beside it.
+names `cli` and `skills` stay as site#37 left them (superseded by the 2026-11-21 amendment below), and the star is drawn at 12 px like the icons beside it.
 
 ## Amendment (2026-11-21): the Star menu counts the monorepo only
 
 `trajectonomics/cli` and `trajectonomics/skills` were archived when the monorepo cutover finished, so a star on
 either no longer reaches the project. `STAR_REPOS` lists `trajectonomics/trajectonomics` alone, the repository
 whose star the button adds, and the committed snapshot counts that repository (the count restarts from its own
-stars, which is zero today, so the menu shows no number and only `All repositories` until the first star).
-The `cli` and `skills` names in the amendment above are superseded by this one.
+stars, which is zero today). While every repository is at zero the snapshot lists none, and the menu lists
+the repositories it may list with no count and no number on the trigger, so a visitor can still reach the
+repository to star it. The row is named `trajectonomics/trajectonomics`, so it never reads as the footer's Organisation link. The `cli` and `skills` names in the amendment above are superseded by this one.
 ([site#17](https://github.com/trajectonomics/trajectonomics/issues/17))
 
 ## Amendment (2026-11-17, owner): the window prints a prompt
