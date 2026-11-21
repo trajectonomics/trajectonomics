@@ -1,0 +1,196 @@
+import { describe, expect, it } from "bun:test"
+import { acceptedScenarioSchemaVersion } from "../scenario/document"
+import { ledgerHome, mustOpen } from "../store/testing"
+import { edit, goldenJsonl, refused } from "./testing"
+
+const LUNCH = "0194b000-0004-7000-8000-000000000004"
+const MISSING = "0194ffff-0000-7000-8000-000000000000"
+
+describe("importJsonl refusals", () => {
+	it("rolls back the whole import and names a dangling reference", async () => {
+		const golden = await goldenJsonl()
+		const text = edit(golden, `"linkedTo":"${LUNCH}"`, `"linkedTo":"${MISSING}"`)
+		expect(refused(text)).toMatchObject({
+			code: "invalid_input",
+			details: { dangling: [{ table: "tx", column: "linked_to", parent: "tx", missing: MISSING }] },
+		})
+		const account = "0194a000-0002-7000-8000-000000000002"
+		const posting = edit(golden, `"accountId":"${account}"`, `"accountId":"${MISSING}"`)
+		expect(refused(posting).details).toEqual({
+			dangling: [{ table: "posting", column: "account_id", parent: "account", missing: MISSING }],
+		})
+	})
+
+	it("refuses an unknown or malformed header before writing any row", async () => {
+		const golden = await goldenJsonl()
+		const header = '{"record":"header","formatVersion":1,"schemaVersion":2}'
+		const cases: [string, string][] = [
+			['{"record":"header","formatVersion":2,"schemaVersion":2}', "line.1.formatVersion"],
+			['{"record":"header","formatVersion":1,"schemaVersion":3}', "line.1.schemaVersion"],
+			['{"record":"header","formatVersion":1,"schemaVersion":1}', "line.1.schemaVersion"],
+			['{"record":"header","formatVersion":1,"schemaVersion":0}', "line.1.schemaVersion"],
+			['{"record":"header","schemaVersion":2,"formatVersion":1}', "line.1"],
+			['{"record":"header","formatVersion":1,"schemaVersion":2,"at":"now"}', "line.1"],
+			['{"record":"entity"}', "line.1.record"],
+			["not json", "line.1"],
+		]
+		for (const [replacement, path] of cases) {
+			expect(refused(edit(golden, header, replacement))).toMatchObject({
+				code: "invalid_input",
+				exitCode: 2,
+				path,
+			})
+		}
+		expect(refused("").path).toBe("line.1")
+	})
+
+	it("refuses a target that holds more than the seeded personal entity", async () => {
+		const store = mustOpen(ledgerHome())
+		store.createAccount({ name: "Cash", type: "asset", currency: "THB" })
+		const body = refused(await goldenJsonl(), store)
+		expect(body).toMatchObject({ code: "restore_target_not_empty", details: { rows: 1 } })
+	})
+
+	it("refuses a v1 Scenario document at its line, which the pinned engine no longer accepts", async () => {
+		const golden = await goldenJsonl()
+		const text = edit(golden, '"schemaVersion":4}', '"schemaVersion":1}')
+		const accepted = acceptedScenarioSchemaVersion()
+		const path = "line.22.document.schemaVersion"
+		expect(refused(text)).toMatchObject({
+			code: "invalid_input",
+			exitCode: 2,
+			path,
+			message: `${path}: UNSUPPORTED_SCHEMA_VERSION (the accepted version is ${accepted})`,
+			hint: 'Run "traj schema scenario apply" to see the document schema.',
+			details: [{ path, code: "UNSUPPORTED_SCHEMA_VERSION" }],
+		})
+	})
+
+	it("refuses a record that does not match the declared fields", async () => {
+		const golden = await goldenJsonl()
+		const cases: [string, string, string, string][] = [
+			['"amount":"-125.50"', '"amount":"-125.505"', "INVALID_AMOUNT", "line.18.amount"],
+			['"amount":"-125.50"', '"amount":-12550', "invalid_input", "line.18.amount"],
+			['"amount":"-125.50"', '"amount":"-125.500"', "invalid_input", "line.18.amount"],
+			['"amount":"-125.50"', '"amount":"-125.5"', "invalid_input", "line.18.amount"],
+			['"amount":"50000.00"', '"amount":"50000"', "invalid_input", "line.16.amount"],
+			['"amount":"50000.00"', '"amount":"-0.00"', "invalid_input", "line.16.amount"],
+			[
+				'"currency":"THB","dimensions":null}',
+				'"currency":"THB","dimensions":{}}',
+				"invalid_input",
+				"line.14.dimensions",
+			],
+			['"memo":null', '"note":null', "invalid_input", "line.11"],
+			[
+				'"correctionKind":"reversal"',
+				'"correctionKind":"void"',
+				"invalid_input",
+				"line.12.correctionKind",
+			],
+			[
+				'"correctionKind":"reversal"',
+				'"correctionKind":null',
+				"invalid_input",
+				"line.12.correctionKind",
+			],
+			[
+				'"correctionKind":null',
+				'"correctionKind":"reversal"',
+				"invalid_input",
+				"line.10.correctionKind",
+			],
+			['{"record":"tx"', '{"record":"transfer"', "invalid_input", "line.10.record"],
+			[
+				'"version":2,"createdAt":"1970',
+				'"version":"2","createdAt":"1970',
+				"invalid_input",
+				"line.2.version",
+			],
+			[
+				'"updatedAt":"2026-01-01T08:00:00.000Z"',
+				'"updatedAt":"2026-01-01T08:00:00Z"',
+				"invalid_input",
+				"line.2.updatedAt",
+			],
+			[
+				'"entityId":"00000000-0000-7000-8000-000000000001","name":"Salary"',
+				'"entityId":"other","name":"Salary"',
+				"invalid_input",
+				"line.4.entityId",
+			],
+			['"rate":250', '"rate":251', "invalid_input", "line.23.contentHash"],
+			['"id":"draft-salary"', '"id":"draft-salary","x":NaN', "invalid_input", "line.24"],
+			[
+				'"id":"draft-salary"',
+				'"id":"draft-salary","nope":1',
+				"invalid_input",
+				"line.24.document.flows.0.nope",
+			],
+		]
+		for (const [from, to, code, path] of cases) {
+			expect(refused(edit(golden, from, to))).toMatchObject({ code, path })
+		}
+	})
+
+	it("refuses a repeated id of any record type at its line, before any write", async () => {
+		const golden = await goldenJsonl()
+		const lines = golden.split("\n")
+		const cases: [string, string][] = [
+			['"record":"entity"', "line.25.id"],
+			['"name":"Assets"', "line.25.id"],
+			['"record":"tx"', "line.25.id"],
+			['"record":"posting"', "line.25.ordinal"],
+			['"name":"base"', "line.25.id"],
+		]
+		for (const [needle, path] of cases) {
+			const line = lines.find((l) => l.includes(needle))!
+			const body = refused(`${golden}${line}\n`)
+			expect(body).toMatchObject({
+				code: "invalid_input",
+				path,
+				details: { firstLine: expect.any(Number) },
+			})
+		}
+	})
+
+	it("refuses any entity other than exactly one personal entity", async () => {
+		const golden = await goldenJsonl()
+		const personal = '"record":"entity","id":"00000000-0000-7000-8000-000000000001"'
+		const other = '"record":"entity","id":"0194d000-0001-7000-8000-000000000001"'
+		expect(refused(edit(golden, personal, other))).toMatchObject({
+			code: "invalid_input",
+			path: "line.2.id",
+		})
+		const withoutEntity = golden.split("\n").filter((l) => !l.includes('"record":"entity"'))
+		expect(refused(withoutEntity.join("\n"))).toMatchObject({
+			code: "invalid_input",
+			path: "entity",
+		})
+	})
+
+	it("refuses an empty name and an unknown account type at the line path", async () => {
+		const golden = await goldenJsonl()
+		const cases: [string, string, string][] = [
+			['"name":"ส่วนตัว"', '"name":""', "line.2.name"],
+			['"name":"Salary"', '"name":""', "line.4.name"],
+			['"name":"base"', '"name":""', "line.23.name"],
+			['"name":"Salary","type":"income"', '"name":"Salary","type":"revenue"', "line.4.type"],
+		]
+		for (const [from, to, path] of cases) {
+			expect(refused(edit(golden, from, to))).toMatchObject({ code: "invalid_input", path })
+		}
+	})
+
+	it("refuses rows the schema rejects, such as two live accounts with one name", async () => {
+		const golden = await goldenJsonl()
+		const body = refused(edit(golden, '"name":"Salary"', '"name":"อาหาร"'))
+		expect(body).toEqual({
+			code: "invalid_input",
+			exitCode: 2,
+			path: "account",
+			message: "account: a row breaks a constraint of the account table.",
+			details: { table: "account" },
+		})
+	})
+})
