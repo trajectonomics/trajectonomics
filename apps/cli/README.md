@@ -4,7 +4,7 @@
 The command line never calls a model, so every result is repeatable.
 
 The landing page is [trajectonomics.com](https://trajectonomics.com/) and the docs are at
-[trajectonomics.com/docs](https://trajectonomics.com/docs/).
+[docs.trajectonomics.com](https://docs.trajectonomics.com/).
 
 ## Install
 

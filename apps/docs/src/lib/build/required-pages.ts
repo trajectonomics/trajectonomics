@@ -1,5 +1,5 @@
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure, BuildFailureCode } from "./failures"
 import { buildFailure } from "./failures"
 
@@ -11,10 +11,14 @@ interface RequiredPage {
 }
 
 const REQUIRED_PAGES: readonly RequiredPage[] = [
-	{ path: "docs/404.html", code: "NOT_FOUND_PAGE_MISSING", description: "the 404 page" },
-	{ path: "docs/index.html", code: "LANDING_PAGE_MISSING", description: "the Landing Page" },
+	{ path: portalAsset("404.html"), code: "NOT_FOUND_PAGE_MISSING", description: "the 404 page" },
 	{
-		path: "docs/cli/index.html",
+		path: portalAsset("index.html"),
+		code: "LANDING_PAGE_MISSING",
+		description: "the Landing Page",
+	},
+	{
+		path: portalAsset("cli/index.html"),
 		code: "OPERATOR_TAB_PAGE_MISSING",
 		description: "the Operator Tab page",
 	},

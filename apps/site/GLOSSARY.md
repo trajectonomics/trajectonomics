@@ -1,6 +1,6 @@
 # Site
 
-The public page at the root of trajectonomics.com, in Thai and English. The router mounts it at `/` and sends `/docs` to the Docs Portal.
+The public page at the root of trajectonomics.com, in Thai and English. The router mounts it at `/`. The Docs Portal is `docs.trajectonomics.com`; `trajectonomics.com/docs` redirects there.
 
 ## Language
 
@@ -115,11 +115,11 @@ A built file a crawler reads at the assets root rather than a page: the Sitemap 
 _Avoid_: SEO file, metadata file, static asset
 
 **Sitemap**:
-The Crawler file at `/sitemap.xml`: one `<url>` for the Clean URL, naming `x-default` at that address, which is also what the IndexNow payload submits. It lists only the Site's address and speaks for the whole host, so a Docs Portal sitemap later turns it into a sitemap index.
+The Crawler file at `/sitemap.xml`: one `<url>` for the Clean URL, naming `x-default` at that address, which is also what the IndexNow payload submits. It lists only the Site's address. The Docs Portal publishes its own sitemap on `docs.trajectonomics.com`.
 _Avoid_: URL list, page index
 
 **Robots file**:
-The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` group per named answer engine, and the absolute `Sitemap:` line, with no `Disallow:`. It is read at the host root, so it speaks for `/docs` too, which another repository serves ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+The Crawler file at `/robots.txt`: `User-agent: *`, `Allow: /`, one `Allow: /` group per named answer engine, and the absolute `Sitemap:` line, with no `Disallow:`. It describes this host only. `/docs` stays allowed because that path redirects to the Docs Portal, which publishes its own file on `docs.trajectonomics.com` ([ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: Crawl rules, allowlist
 
 **Answer engine file**:

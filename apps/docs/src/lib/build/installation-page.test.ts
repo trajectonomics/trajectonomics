@@ -81,6 +81,6 @@ describe("the built Installation page", () => {
 	})
 
 	test("a build with no Installation page is left to the required-pages check", () => {
-		expect(codesOf([{ path: "docs/cli/index.html", content: "<main></main>" }])).toEqual([])
+		expect(codesOf([{ path: "cli/index.html", content: "<main></main>" }])).toEqual([])
 	})
 })

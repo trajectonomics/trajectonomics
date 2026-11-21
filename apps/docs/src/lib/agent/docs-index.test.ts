@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { SITE_ORIGIN } from "../site"
 import { TABS } from "../tabs"
 import { buildDocsIndex, type DocsIndexTab } from "./docs-index"
 
-const ORIGIN = "https://trajectonomics.com"
+const ORIGIN = SITE_ORIGIN
 
 /** The pages the two Tabs present, in their sidebar order. */
 const TABS_PAGES: readonly DocsIndexTab[] = [
@@ -12,12 +13,12 @@ const TABS_PAGES: readonly DocsIndexTab[] = [
 			{
 				title: "Quickstart",
 				description: "Install traj, then record your first transaction.",
-				url: "/docs/cli",
+				url: "/cli",
 			},
 			{
 				title: "tx",
 				description: "Manage ledger transactions.",
-				url: "/docs/cli/commands/tx",
+				url: "/cli/commands/tx",
 			},
 		],
 	},
@@ -27,7 +28,7 @@ const TABS_PAGES: readonly DocsIndexTab[] = [
 			{
 				title: "Overview",
 				description: "The packages and how they fit together.",
-				url: "/docs/developers",
+				url: "/developers",
 			},
 		],
 	},
@@ -57,10 +58,10 @@ describe("the Docs index", () => {
 
 	test("lists every page once, by title, at its absolute twin URL, with its description", () => {
 		expect(bullets(buildDocsIndex(TABS_PAGES, ORIGIN))).toEqual([
-			"- [Trajectonomics Docs](https://trajectonomics.com/docs/index.md): Documentation for running the Trajectonomics CLI and helping make its tax rules right.",
-			"- [Quickstart](https://trajectonomics.com/docs/cli.md): Install traj, then record your first transaction.",
-			"- [tx](https://trajectonomics.com/docs/cli/commands/tx.md): Manage ledger transactions.",
-			"- [Overview](https://trajectonomics.com/docs/developers.md): The packages and how they fit together.",
+			"- [Trajectonomics Docs](https://docs.trajectonomics.com/index.md): Documentation for running the Trajectonomics CLI and helping make its tax rules right.",
+			"- [Quickstart](https://docs.trajectonomics.com/cli.md): Install traj, then record your first transaction.",
+			"- [tx](https://docs.trajectonomics.com/cli/commands/tx.md): Manage ledger transactions.",
+			"- [Overview](https://docs.trajectonomics.com/developers.md): The packages and how they fit together.",
 		])
 	})
 })

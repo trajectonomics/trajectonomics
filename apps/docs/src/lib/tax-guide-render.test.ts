@@ -16,7 +16,7 @@ describe("rendering the tax guide page", () => {
 	})
 
 	test("leaves anchors, URLs and absolute paths as they are", () => {
-		const body = "[up](#top) [rd](https://www.rd.go.th/) [site](/docs/contribute/)"
+		const body = "[up](#top) [rd](https://www.rd.go.th/) [site](/contribute/)"
 		expect(renderTaxGuidePage(`# T\n\n${body}\n`, SOURCE_PATH)).toContain(body)
 	})
 

@@ -21,7 +21,7 @@ const START_HERE = "Start here"
 
 /** How an Agent fetches Markdown, in the index's own words. */
 const FETCH_SENTENCE =
-	"To fetch a page as Markdown, take its twin URL: the page's path with `.md` in place of the trailing slash, and `/docs/index.md` for the Landing Page. The links below are absolute, so this index works wherever it is read."
+	"To fetch a page as Markdown, take its twin URL: the page's path with `.md` in place of the trailing slash, and `/index.md` for the Landing Page. The links below are absolute, so this index works wherever it is read."
 
 /** One bullet of the index: a page's title, its absolute twin URL and its description. */
 function bullet(page: DocsIndexPage, origin: string): string {
@@ -30,7 +30,7 @@ function bullet(page: DocsIndexPage, origin: string): string {
 	return `- [${page.title}](${twinUrl(origin, page.url)})${described}`
 }
 
-/** The Docs index at `/docs/llms.txt`: every page once, in the order the Tabs present them. */
+/** The Docs index at `/llms.txt`: every page once, in the order the Tabs present them. */
 export function buildDocsIndex(tabs: readonly DocsIndexTab[], origin: string): string {
 	const landingPage: DocsIndexPage = {
 		title: PORTAL_NAME,

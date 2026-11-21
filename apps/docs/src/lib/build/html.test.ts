@@ -3,10 +3,10 @@ import { anchors, elementContent, linkName, visibleText } from "./html"
 
 const PAGE = [
 	'<header id="nd-subnav" class="x">',
-	'<a href="/docs/cli/" aria-current="page">CLI &amp; Quickstart</a>',
-	'<a href="/docs/contribute/">Contribute</a>',
+	'<a href="/cli/" aria-current="page">CLI &amp; Quickstart</a>',
+	'<a href="/contribute/">Contribute</a>',
 	"</header>",
-	'<main><a href="/docs/other/">Other</a></main>',
+	'<main><a href="/other/">Other</a></main>',
 ].join("")
 
 describe("the visible text of an HTML fragment", () => {
@@ -24,8 +24,8 @@ describe("the visible text of an HTML fragment", () => {
 describe("the element of an HTML fragment found by id", () => {
 	test("returns the content of the element with the id, without the rest of the page", () => {
 		expect(elementContent(PAGE, "nd-subnav")).toBe(
-			'<a href="/docs/cli/" aria-current="page">CLI &amp; Quickstart</a>' +
-				'<a href="/docs/contribute/">Contribute</a>',
+			'<a href="/cli/" aria-current="page">CLI &amp; Quickstart</a>' +
+				'<a href="/contribute/">Contribute</a>',
 		)
 	})
 
@@ -51,19 +51,19 @@ describe("the links of an HTML fragment", () => {
 	test("reads the href, the aria-current and the text of every link", () => {
 		expect(anchors(PAGE)).toEqual([
 			{
-				href: "/docs/cli/",
+				href: "/cli/",
 				ariaCurrent: "page",
 				ariaLabel: undefined,
 				text: "CLI & Quickstart",
 			},
 			{
-				href: "/docs/contribute/",
+				href: "/contribute/",
 				ariaCurrent: undefined,
 				ariaLabel: undefined,
 				text: "Contribute",
 			},
 			{
-				href: "/docs/other/",
+				href: "/other/",
 				ariaCurrent: undefined,
 				ariaLabel: undefined,
 				text: "Other",
@@ -78,20 +78,20 @@ describe("the links of an HTML fragment", () => {
 	})
 
 	test("reads the aria-label a link names itself with", () => {
-		expect(anchors('<a href="/docs/" aria-label="Trajectonomics Docs"><svg></svg></a>')).toEqual([
-			{ href: "/docs/", ariaCurrent: undefined, ariaLabel: "Trajectonomics Docs", text: "" },
+		expect(anchors('<a href="/" aria-label="Trajectonomics Docs"><svg></svg></a>')).toEqual([
+			{ href: "/", ariaCurrent: undefined, ariaLabel: "Trajectonomics Docs", text: "" },
 		])
 	})
 })
 
 describe("the name a link is read aloud with", () => {
 	test("a link that names itself is read with its aria-label, not its artwork", () => {
-		const [link] = anchors('<a href="/docs/" aria-label="Trajectonomics Docs"><svg></svg></a>')
+		const [link] = anchors('<a href="/" aria-label="Trajectonomics Docs"><svg></svg></a>')
 		expect(link === undefined ? undefined : linkName(link)).toBe("Trajectonomics Docs")
 	})
 
 	test("a link without an aria-label is read with its text", () => {
-		const [link] = anchors('<a href="/docs/">Trajectonomics Docs</a>')
+		const [link] = anchors('<a href="/">Trajectonomics Docs</a>')
 		expect(link === undefined ? undefined : linkName(link)).toBe("Trajectonomics Docs")
 	})
 })

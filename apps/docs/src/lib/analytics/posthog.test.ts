@@ -51,16 +51,16 @@ describe("shouldSend", () => {
 
 describe("pageviewProperties", () => {
 	const properties = pageviewProperties({
-		href: "https://trajectonomics.com/docs/cli/installation/",
+		href: "https://docs.trajectonomics.com/cli/installation/",
 		referrer: "https://trajectonomics.com/en/",
 		language: "en",
 		title: "CLI installation — Trajectonomics Docs",
 	})
 
 	it("names the page by its URL, host and path, which the Web Analytics product reads", () => {
-		expect(properties["$current_url"]).toBe("https://trajectonomics.com/docs/cli/installation/")
-		expect(properties["$host"]).toBe("trajectonomics.com")
-		expect(properties["$pathname"]).toBe("/docs/cli/installation/")
+		expect(properties["$current_url"]).toBe("https://docs.trajectonomics.com/cli/installation/")
+		expect(properties["$host"]).toBe("docs.trajectonomics.com")
+		expect(properties["$pathname"]).toBe("/cli/installation/")
 	})
 
 	it("carries how the reader arrived, the page's title and its Language", () => {

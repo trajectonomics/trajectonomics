@@ -5,15 +5,15 @@ import { expect, test } from "./fixtures"
 // The Worker answers `Accept: text/markdown` with the page's twin and forwards everything else to
 // the assets (ADR 0010), so the redirect, the aliases, the 404 page and the assets keep their
 // answers. `wrangler dev` serves the built site, which is the production seam (ADR 0004).
-const PAGE = "/docs/cli/commands/tx/"
-const TWIN = "/docs/cli/commands/tx.md"
-const DOCS_ROOT = fileURLToPath(new URL("../dist/docs/", import.meta.url))
+const PAGE = "/cli/commands/tx/"
+const TWIN = "/cli/commands/tx.md"
+const DOCS_ROOT = fileURLToPath(new URL("../dist/", import.meta.url))
 
 /** A built asset's URL path, to check that a stylesheet still passes through untouched. */
 function firstAssetPath(): string {
 	const asset = readdirSync(`${DOCS_ROOT}_astro`).find((file) => file.endsWith(".css"))
 	if (asset === undefined) throw new Error("the built site has no stylesheet")
-	return `/docs/_astro/${asset}`
+	return `/_astro/${asset}`
 }
 
 test("a page asked for as Markdown answers its twin, typed and varied", async ({ request }) => {
@@ -62,7 +62,7 @@ test("a HEAD request answers the negotiated content type", async ({ request }) =
 
 test("a twin URL and the Docs index are served unchanged", async ({ request }) => {
 	const twin = await request.get(TWIN, { headers: { Accept: "text/markdown" } })
-	const index = await request.get("/docs/llms.txt")
+	const index = await request.get("/llms.txt")
 
 	expect(twin.status()).toBe(200)
 	expect(twin.headers()["content-type"]).toBe("text/markdown; charset=utf-8")
@@ -78,32 +78,32 @@ test("an asset passes through untouched", async ({ request }) => {
 	expect(response.headers()["content-type"]).toBe("text/css; charset=utf-8")
 })
 
-test("/docs still redirects to /docs/", async ({ request }) => {
+test("/docs still redirects to /", async ({ request }) => {
 	const response = await request.get("/docs", {
 		headers: { Accept: "text/markdown" },
 		maxRedirects: 0,
 	})
 
 	expect(response.status()).toBe(307)
-	expect(response.headers()["location"]).toBe("/docs/")
+	expect(response.headers()["location"]).toBe("/")
 })
 
 test("an audience alias still reaches its Tab", async ({ request }) => {
-	const redirect = await request.get("/docs/operators", {
+	const redirect = await request.get("/operators", {
 		headers: { Accept: "text/markdown" },
 		maxRedirects: 0,
 	})
-	const alias = await request.get("/docs/operators/", { headers: { Accept: "text/markdown" } })
+	const alias = await request.get("/operators/", { headers: { Accept: "text/markdown" } })
 
 	expect(redirect.status()).toBe(307)
-	expect(redirect.headers()["location"]).toBe("/docs/operators/")
+	expect(redirect.headers()["location"]).toBe("/operators/")
 	expect(alias.status()).toBe(200)
 	expect(alias.headers()["content-type"]).toBe("text/html; charset=utf-8")
 	expect(await alias.text()).toContain('http-equiv="refresh"')
 })
 
 test("a missing page still shows the 404 page", async ({ request }) => {
-	const response = await request.get("/docs/no-such-page/", {
+	const response = await request.get("/no-such-page/", {
 		headers: { Accept: "text/markdown" },
 	})
 

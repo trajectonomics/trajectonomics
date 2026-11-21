@@ -3,13 +3,13 @@ import { PORTAL_NAME } from "../portal"
 import type { BuiltFile } from "./built-files"
 import { checkHeaderMark } from "./header-mark"
 
-const LANDING_PAGE_FILE = "docs/index.html"
-const TAB_PAGE_FILE = "docs/cli/index.html"
-const NOT_FOUND_PAGE_FILE = "docs/404.html"
+const LANDING_PAGE_FILE = "index.html"
+const TAB_PAGE_FILE = "cli/index.html"
+const NOT_FOUND_PAGE_FILE = "404.html"
 
 /** The anchor Fumadocs renders for the header mark, in the layout whose header carries `id`. */
 function mark(headerId: string, attributes: string, content = ""): string {
-	return `<header id="${headerId}" aria-label="Main"><a href="/docs/" ${attributes}>${content}</a></header>`
+	return `<header id="${headerId}" aria-label="Main"><a href="/" ${attributes}>${content}</a></header>`
 }
 
 /** The header of the home layout with the mark the Spec asks for. */
@@ -37,12 +37,12 @@ describe("the header mark of a built page", () => {
 	})
 
 	test("a header with no link to the Landing Page is reported as HEADER_MARK_LINK", () => {
-		const content = `<header id="nd-nav"><a href="/">trajectonomics.com</a></header>`
+		const content = `<header id="nd-nav"><a href="https://trajectonomics.com/">trajectonomics.com</a></header>`
 		expect(codesOf([page(LANDING_PAGE_FILE, content)])).toEqual(["HEADER_MARK_LINK"])
 	})
 
 	test("a header with two links to the Landing Page is reported as HEADER_MARK_LINK", () => {
-		const content = `<header id="nd-nav"><a href="/docs/" aria-label="${PORTAL_NAME}"></a><a href="/docs/" aria-label="${PORTAL_NAME}"></a></header>`
+		const content = `<header id="nd-nav"><a href="/" aria-label="${PORTAL_NAME}"></a><a href="/" aria-label="${PORTAL_NAME}"></a></header>`
 		expect(codesOf([page(LANDING_PAGE_FILE, content)])).toEqual(["HEADER_MARK_LINK"])
 	})
 
@@ -61,12 +61,12 @@ describe("the header mark of a built page", () => {
 	})
 
 	test("a link to the Landing Page outside the header is not the mark", () => {
-		const content = `${mark("nd-nav", `aria-label="${PORTAL_NAME}"`)}<main><a href="/docs/">Docs Portal</a></main>`
+		const content = `${mark("nd-nav", `aria-label="${PORTAL_NAME}"`)}<main><a href="/">Docs Portal</a></main>`
 		expect(codesOf([page(NOT_FOUND_PAGE_FILE, content)])).toEqual([])
 	})
 
 	test("a redirect stub is never asked for a header", () => {
-		const stub = '<meta http-equiv="refresh" content="0;url=/docs/cli/" /><main></main>'
-		expect(codesOf([page("docs/quickstart/index.html", stub)])).toEqual([])
+		const stub = '<meta http-equiv="refresh" content="0;url=/cli/" /><main></main>'
+		expect(codesOf([page("quickstart/index.html", stub)])).toEqual([])
 	})
 })

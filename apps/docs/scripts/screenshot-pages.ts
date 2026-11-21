@@ -1,6 +1,6 @@
 /*
- * The curated screenshot set `docs/design/portal-shell.md` requires and commits under
- * `docs/screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, plus the
+ * The curated screenshot set `design/portal-shell.md` requires and commits under
+ * `screenshots/`: the built Docs Portal at 1280, 2000 and 390px in light and dark, plus the
  * surfaces no plain page load opens. `scripts/screenshots.ts` captures it.
  */
 import { join } from "node:path"
@@ -43,52 +43,52 @@ async function hoverCopyControl(page: Page): Promise<void> {
  * dropdown through it (docs#91). Both Tab pages are here, because the shell reaches every Tab page.
  */
 const PAGES: readonly CuratedPage[] = [
-	{ path: "/docs/", name: "landing-page", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
+	{ path: "/", name: "landing-page", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
 	{
-		path: "/docs/no-such-page/",
+		path: "/no-such-page/",
 		name: "not-found",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
-	{ path: "/docs/cli/", name: "cli", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
+	{ path: "/cli/", name: "cli", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
 	{
-		path: "/docs/contribute/",
+		path: "/contribute/",
 		name: "contribute",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
 	{
-		path: "/docs/cli/commands/tx/",
+		path: "/cli/commands/tx/",
 		name: "cli-commands-tx",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,
 	},
 	{
-		path: "/docs/cli/",
+		path: "/cli/",
 		name: "cli-hover",
 		widthsPx: [1280],
 		drive: hoverCopyControl,
 		fullPage: true,
 	},
 	{
-		path: "/docs/cli/",
+		path: "/cli/",
 		name: "search-dialog",
 		widthsPx: [1280],
 		drive: openSearch,
 		fullPage: false,
 	},
 	{
-		path: "/docs/",
+		path: "/",
 		name: "phone-menu",
 		widthsPx: [390],
 		drive: openPhoneMenu,
 		fullPage: false,
 	},
 	{
-		path: "/docs/cli/",
+		path: "/cli/",
 		name: "sidebar-drawer",
 		widthsPx: [390],
 		drive: openSidebarDrawer,
@@ -97,7 +97,7 @@ const PAGES: readonly CuratedPage[] = [
 ]
 
 /** Every curated screenshot, as `<root>/<theme>/<width>/<page>.png`. */
-export function curatedShots(root = "docs/screenshots"): CuratedShot[] {
+export function curatedShots(root = "screenshots"): CuratedShot[] {
 	const themes = ["light", "dark"] as const
 	return themes.flatMap((theme) =>
 		PAGES.flatMap((page) =>

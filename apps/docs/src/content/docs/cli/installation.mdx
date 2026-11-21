@@ -99,7 +99,7 @@ npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -y
 
 That is the command the setup skill's second step runs, from the same folder, so a project's
 `skills-lock.json` records one source whichever line you use. What the Agent asks you for, and where
-the tool stops, is on [Agent](/docs/cli/agent/).
+the tool stops, is on [Agent](/cli/agent/).
 
 ## Check the installed version
 
@@ -111,7 +111,7 @@ traj version
 
 `traj init` creates the data directory, `~/.traj`, or `$TRAJ_HOME` when that is set. It holds
 `traj.db`, the ledger, and the npm launcher's `bin/` cache of downloaded binaries.
-[Your data](/docs/cli/data/) says what else is there, how to back the ledger up, and how to use more
+[Your data](/cli/data/) says what else is there, how to back the ledger up, and how to use more
 than one.
 
 ## Uninstall
@@ -125,10 +125,10 @@ delete that too:
 - `~/.npm/_npx`: npm's own cache of the launcher package. Safe to delete; npm rebuilds it.
 
 The ledger is none of those. It is `~/.traj/traj.db`, or `$TRAJ_HOME/traj.db` when `TRAJ_HOME` is
-set, so it survives every delete above. [Your data](/docs/cli/data/) shows how to back it up and how
+set, so it survives every delete above. [Your data](/cli/data/) shows how to back it up and how
 to remove it on purpose.
 
 Building the CLI from source is for contributors, described in the
 [repository](https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli), not here.
 
-Next: [Your data](/docs/cli/data/).
+Next: [Your data](/cli/data/).

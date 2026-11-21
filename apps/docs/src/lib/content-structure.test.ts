@@ -59,19 +59,17 @@ describe("Docs Portal content structure", () => {
 	})
 
 	test("an internal link with no page behind it is reported", () => {
-		expect(rulesOf(withPageLink("contribute/index.mdx", "/docs/contribute/missing/"))).toContain(
+		expect(rulesOf(withPageLink("contribute/index.mdx", "/contribute/missing/"))).toContain(
 			"internal-link",
 		)
 	})
 
 	test("a JSX link with no page behind it is reported", () => {
-		const link = '<a href="/docs/contribute/missing/">Broken</a>'
+		const link = '<a href="/contribute/missing/">Broken</a>'
 		expect(rulesOf(withContent("contribute/index.mdx", link))).toContain("internal-link")
 	})
 
-	test("a link to the Landing Page at /docs/ needs no content page", () => {
-		expect(rulesOf(withContent("contribute/index.mdx", "[Home](/docs/)"))).not.toContain(
-			"internal-link",
-		)
+	test("a link to the Landing Page at / needs no content page", () => {
+		expect(rulesOf(withContent("contribute/index.mdx", "[Home](/)"))).not.toContain("internal-link")
 	})
 })

@@ -11,13 +11,13 @@ const TREE: Root = {
 			type: "folder",
 			name: "CLI & Quickstart",
 			children: [
-				{ type: "page", name: "Quickstart", url: "/docs/cli" },
-				{ type: "page", name: "Installation", url: "/docs/cli/installation" },
+				{ type: "page", name: "Quickstart", url: "/cli" },
+				{ type: "page", name: "Installation", url: "/cli/installation" },
 				{
 					type: "folder",
 					name: "Commands",
-					index: { type: "page", name: "Commands", url: "/docs/cli/commands" },
-					children: [{ type: "page", name: "tx", url: "/docs/cli/commands/tx" }],
+					index: { type: "page", name: "Commands", url: "/cli/commands" },
+					children: [{ type: "page", name: "tx", url: "/cli/commands/tx" }],
 				},
 			],
 		},
@@ -26,7 +26,7 @@ const TREE: Root = {
 		{
 			type: "folder",
 			name: "Contribute",
-			children: [{ type: "page", name: "Get started", url: "/docs/contribute" }],
+			children: [{ type: "page", name: "Get started", url: "/contribute" }],
 		},
 	],
 }
@@ -34,11 +34,11 @@ const TREE: Root = {
 describe("the order the Docs sidebar presents its pages in", () => {
 	test("a page comes in its folder's place, and a nested folder's index page precedes its children", () => {
 		expect(sidebarPageUrls(TREE)).toEqual([
-			"/docs/cli",
-			"/docs/cli/installation",
-			"/docs/cli/commands",
-			"/docs/cli/commands/tx",
-			"/docs/contribute",
+			"/cli",
+			"/cli/installation",
+			"/cli/commands",
+			"/cli/commands/tx",
+			"/contribute",
 		])
 	})
 

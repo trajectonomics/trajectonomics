@@ -35,8 +35,12 @@ nothing in the router.
    The account ID is on the dashboard's **Workers & Pages** overview, or comes from
    `curl -s -H "Authorization: Bearer $TOKEN" https://api.cloudflare.com/client/v4/accounts`.
 3. **First deploy.** `gh workflow run deploy.yml --ref main -f app=all`, then open
-   trajectonomics.com and trajectonomics.com/docs. `/docs/contribute/tax/` exists only in builds from
-   this repository, so it answering 200 proves the new deploy is live.
+   trajectonomics.com and docs.trajectonomics.com. `/contribute/tax/` exists only in builds from
+   this repository, so it answering 200 proves the new deploy is live. `trajectonomics.com/docs/contribute/tax/`
+   should answer 301 to that page. The docs Worker attaches `docs.trajectonomics.com` as a custom domain
+   on deploy. That creates the DNS record, so the hostname must not already be a CNAME, and the API
+   token needs permission to attach a custom domain on the `trajectonomics.com` zone. The router keeps
+   forwarding `/docs`; do not remove that mount.
 4. **Disconnect the old Git integration (optional).** In each worker's **Settings → Build**,
    disconnect the old `trajectonomics/site` and `trajectonomics/docs` repositories, so no build from
    them can overwrite a CI deploy.

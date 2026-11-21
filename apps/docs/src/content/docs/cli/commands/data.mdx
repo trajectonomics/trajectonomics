@@ -29,7 +29,7 @@ The removal deletes `traj.db-shm`, `traj.db-wal` and `traj.db`, in that order, s
 last. It leaves the data directory, the launcher's `bin/` cache and anything else in it. The result
 lists the files removed and what remains beside them.
 
-A complete replacement takes three commands: back up, remove, then [restore](/docs/cli/commands/restore/).
+A complete replacement takes three commands: back up, remove, then [restore](/cli/commands/restore/).
 
 ```bash
 traj backup --out backup
@@ -37,4 +37,4 @@ traj data remove --confirm ~/.traj --backup backup
 traj restore backup
 ```
 
-See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.
+See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

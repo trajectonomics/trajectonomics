@@ -1,5 +1,8 @@
-/** URL path the Docs Portal is served under. */
-export const DOCS_BASE_PATH = "/docs"
+/**
+ * URL path the Docs Portal is served under. Empty when the portal is the whole host
+ * (`docs.trajectonomics.com`), so a page is `/cli/` and not `/docs/cli/` (ADR 0013).
+ */
+export const DOCS_BASE_PATH = ""
 
 /** A top-level Tab of the Docs Portal, addressed to exactly one audience. */
 export interface TabDefinition {
@@ -48,7 +51,7 @@ export interface TabAlias {
 
 /**
  * The audience names a reader may type, and the Tab each one means. They are not a front-door
- * redirect: `/docs/` stays on the Landing Page, which sends each audience to its own Tab.
+ * redirect: `/` stays on the Landing Page, which sends each audience to its own Tab.
  */
 export const TAB_ALIASES: readonly [TabAlias, TabAlias, TabAlias] = [
 	{ path: "/operators", tab: TABS[0] },

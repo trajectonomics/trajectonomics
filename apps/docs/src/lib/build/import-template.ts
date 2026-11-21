@@ -1,5 +1,5 @@
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 
@@ -7,7 +7,7 @@ import { buildFailure } from "./failures"
 export const IMPORT_TEMPLATE_HEADER = "date,from,to,amount,memo,external_ref,project"
 
 /** Assets-root path of the built `tx` command page. */
-const TX_PAGE_FILE = "docs/cli/commands/tx/index.html"
+const TX_PAGE_FILE = portalAsset("cli/commands/tx/index.html")
 
 const PRE = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi
 const TAG = /<[^>]*>/g

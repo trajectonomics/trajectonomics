@@ -1,19 +1,17 @@
 import { describe, expect, test } from "bun:test"
+import { SITE_ORIGIN } from "../site"
 import { absoluteDocsLinks } from "./absolute-links"
 
-const ORIGIN = "https://trajectonomics.com"
+const ORIGIN = SITE_ORIGIN
 
 describe("the links in a Markdown twin", () => {
 	test.each([
+		["[Commands](/cli/commands/)", "[Commands](https://docs.trajectonomics.com/cli/commands/)"],
 		[
-			"[Commands](/docs/cli/commands/)",
-			"[Commands](https://trajectonomics.com/docs/cli/commands/)",
+			'[tx](/cli/commands/tx/?a=1#flags "The tx page")',
+			'[tx](https://docs.trajectonomics.com/cli/commands/tx/?a=1#flags "The tx page")',
 		],
-		[
-			'[tx](/docs/cli/commands/tx/?a=1#flags "The tx page")',
-			'[tx](https://trajectonomics.com/docs/cli/commands/tx/?a=1#flags "The tx page")',
-		],
-		["[Docs](/docs/)", "[Docs](https://trajectonomics.com/docs/)"],
+		["[Docs](/)", "[Docs](https://docs.trajectonomics.com/)"],
 	])("an internal link is made absolute: %s", (content, expected) => {
 		expect(absoluteDocsLinks(content, ORIGIN)).toBe(expected)
 	})
@@ -24,7 +22,7 @@ describe("the links in a Markdown twin", () => {
 	})
 
 	test("a link already absolute is left as it is", () => {
-		const content = "[tx](https://trajectonomics.com/docs/cli/commands/tx.md)"
+		const content = "[tx](https://docs.trajectonomics.com/cli/commands/tx.md)"
 		expect(absoluteDocsLinks(content, ORIGIN)).toBe(content)
 	})
 })

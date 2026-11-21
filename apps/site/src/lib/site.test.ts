@@ -64,13 +64,13 @@ describe("the Site's own constants", () => {
 	})
 
 	it("names the CLI's docs page, and leaves the release facts to the Release snapshot", () => {
-		expect(DOCS_CLI_PATH).toBe("/docs/cli/")
+		expect(DOCS_CLI_PATH).toBe("https://docs.trajectonomics.com/cli/")
 		expect(Object.hasOwn(site, "CLI_VERSION")).toBe(false)
 		expect(Object.hasOwn(site, "RELEASE_DATE")).toBe(false)
 	})
 
 	it("pinpoints the CLI installation page, the way out under the prompt", () => {
-		expect(DOCS_CLI_INSTALL_PATH).toBe("/docs/cli/installation/")
+		expect(DOCS_CLI_INSTALL_PATH).toBe("https://docs.trajectonomics.com/cli/installation/")
 	})
 
 	it("shows the CLI's own `traj fi` example, with the JSON flag an agent reads", () => {

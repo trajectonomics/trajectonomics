@@ -15,8 +15,8 @@ function refusalOf(site: URL | undefined): { code: string; field: string } | und
 
 describe("the Portal's origin at the build boundary", () => {
 	test("is the origin of the site astro.config.ts declares", () => {
-		expect(portalOrigin(new URL("https://trajectonomics.com/docs/"))).toBe(
-			"https://trajectonomics.com",
+		expect(portalOrigin(new URL("https://docs.trajectonomics.com/"))).toBe(
+			"https://docs.trajectonomics.com",
 		)
 	})
 

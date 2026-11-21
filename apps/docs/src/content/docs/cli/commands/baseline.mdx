@@ -25,7 +25,7 @@ Show the Baseline a Projection starts from at a date.
 traj baseline show --as-of 2026-03-31 --json  # The Baseline a Projection would start from at one date.
 ```
 
-On the [Quickstart](/docs/cli/)'s funded ledger the Baseline is one row: `Cash`, an asset, `879.50`
+On the [Quickstart](/cli/)'s funded ledger the Baseline is one row: `Cash`, an asset, `879.50`
 THB. The equity account `Opening` and the expense account `Food` do not cross.
 
 ## When a Baseline refuses
@@ -37,6 +37,6 @@ carrying either would make the Baseline disagree with the ledger without saying 
 On the Quickstart's ledger without its opening balance, Cash holds `-120.50` THB and the command
 fails with `NEGATIVE_AMOUNT` and `Cash holds -120.50 THB, which is negative once stated as an
 asset`. The way to a Baseline that succeeds is a funded ledger: create the equity account, then post
-the [opening balance](/docs/cli/commands/tx/) that keeps every asset and liability positive.
+the [opening balance](/cli/commands/tx/) that keeps every asset and liability positive.
 
-See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.
+See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

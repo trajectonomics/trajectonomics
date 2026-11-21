@@ -45,7 +45,7 @@ traj tx add --opening --from Opening --to Cash --amount -25.00 --date 2026-01-01
 
 A positive `--amount` funds the destination; a negative one opens it already overdrawn, and the
 sign is always yours to state. An asset opened that way refuses the Baseline with `NEGATIVE_AMOUNT`
-until a posting funds it, as [the baseline page](/docs/cli/commands/baseline/) explains.
+until a posting funds it, as [the baseline page](/cli/commands/baseline/) explains.
 
 `--from` must be an equity account. Any other type is refused at exit code `3` with
 `NON_EQUITY_CONTRA`, which names the type it found.
@@ -83,7 +83,7 @@ THB purchase paid from Cash, and is the smallest document that runs:
   form is exactly `"dimensions": { "project": "lunch" }` on each posting.
 
 Unlike a Scenario document, whose amounts are whole numbers of the currency's smallest unit
-([Agent](/docs/cli/agent/)), a transaction document's amounts are decimal strings.
+([Agent](/cli/agent/)), a transaction document's amounts are decimal strings.
 
 Hand the document over by path, or as `-` to read it from stdin:
 
@@ -213,4 +213,4 @@ traj tx void 0194a000-0003-7000-8000-000000000003 --date 2026-03-02 --dry-run  #
 - [ADR 0022: date ranges are `--since` and `--until`](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0022-date-ranges-are-since-and-until.md)
 - [ADR 0025: CSV import is one template, one transaction, keyed by external reference](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0025-csv-import-is-one-template.md)
 
-See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.
+See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

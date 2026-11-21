@@ -1,13 +1,13 @@
 import { NOT_FOUND_BODY_ID } from "../not-found"
 import { DOCS_BASE_PATH } from "../tabs"
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { anchors, elementContent } from "./html"
 
 /** Assets-root path of the built 404 page. */
-export const NOT_FOUND_PAGE_FILE = `${DOCS_BASE_PATH.slice(1)}/404.html`
+export const NOT_FOUND_PAGE_FILE = portalAsset("404.html")
 
 /** The header the home layout renders, which holds the search trigger. */
 const HEADER_ID = "nd-nav"

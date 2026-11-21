@@ -1,8 +1,8 @@
 name: Deploy
 
 # Deploys the Site (worker "site", apps/site) and the Docs Portal (worker "docs", apps/docs) to
-# Cloudflare Workers from main. trajectonomics-web-router routes trajectonomics.com to both by
-# worker name, so nothing else changes. docs/runbooks/deploy.md has the setup and the switches.
+# Cloudflare Workers from main. The docs Worker attaches docs.trajectonomics.com. The router still
+# forwards trajectonomics.com/docs so the Worker can redirect it. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
 #                         config, the lockfile), changed in the push.

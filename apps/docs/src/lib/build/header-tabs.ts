@@ -1,6 +1,6 @@
 import { TABS, type TabDefinition, tabUrl } from "../tabs"
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import type { HtmlAnchor } from "./html"
@@ -8,7 +8,7 @@ import { anchors, elementContent } from "./html"
 
 /** Assets-root path of a Tab's built index page. */
 function tabPageFile(tab: TabDefinition): string {
-	return `docs/${tab.folder}/index.html`
+	return portalAsset(`${tab.folder}/index.html`)
 }
 
 function missingFailures(file: BuiltFile, links: readonly HtmlAnchor[]): readonly BuildFailure[] {

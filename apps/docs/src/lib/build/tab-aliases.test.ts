@@ -13,9 +13,9 @@ function stub(path: string, target: string): BuiltFile {
 /** The build output of a site whose audience names redirect to their Tabs. */
 function aliases(): BuiltFile[] {
 	return [
-		stub(aliasFile("/operators"), "/docs/cli/"),
-		stub(aliasFile("/contributors"), "/docs/contribute/"),
-		stub(aliasFile("/builders"), "/docs/contribute/"),
+		stub(aliasFile("/operators"), "/cli/"),
+		stub(aliasFile("/contributors"), "/contribute/"),
+		stub(aliasFile("/builders"), "/contribute/"),
 	]
 }
 
@@ -34,7 +34,7 @@ describe("the audience names a reader may type", () => {
 
 	test("one that sends readers to another page is reported as TAB_ALIAS_TARGET", () => {
 		const [operators, , builders] = aliases()
-		expect(codesOf([stub(aliasFile("/contributors"), "/docs/"), operators!, builders!])).toEqual([
+		expect(codesOf([stub(aliasFile("/contributors"), "/"), operators!, builders!])).toEqual([
 			"TAB_ALIAS_TARGET",
 		])
 	})
@@ -49,7 +49,7 @@ describe("the audience names a reader may type", () => {
 
 	test("the failure names the file a maintainer edits", () => {
 		const [failure] = checkTabAliases(aliases().slice(1))
-		expect(failure?.path).toBe("docs/operators/index.html")
+		expect(failure?.path).toBe("operators/index.html")
 		expect(failure?.message).toBe("the build did not produce the redirect for /operators")
 	})
 })

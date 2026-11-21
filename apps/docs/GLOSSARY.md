@@ -1,6 +1,6 @@
 # Trajectonomics Docs
 
-The public documentation portal for the Trajectonomics ecosystem, written for two audiences and served under `trajectonomics.com/docs`.
+The public documentation portal for the Trajectonomics ecosystem, written for two audiences and served at `docs.trajectonomics.com`.
 
 ## Language
 
@@ -33,21 +33,21 @@ The Operator tab's pages that document every released `traj` leaf and its flags:
 _Avoid_: CLI docs, reference docs, man pages
 
 **Landing Page**:
-The page at `/docs/` that names the two audiences and sends each to its Tab.
-_Avoid_: Home page, index page, front page
+The page at `/` of `docs.trajectonomics.com` that names the two audiences and sends each to its Tab.
+_Avoid_: Home page, index page, front page, Site Home
 
 **Site Home**:
-The page at `/` on trajectonomics.com, built and deployed by `trajectonomics/site`, outside the Docs Portal.
-_Avoid_: Landing Page (that is the page at `/docs/`)
+The page at `/` on trajectonomics.com, built and deployed by `apps/site`, outside the Docs Portal.
+_Avoid_: Landing Page (that is the page at `/` of `docs.trajectonomics.com`)
 
 **Sitemap**:
-The machine-readable list of the Docs Portal's pages, served at `/docs/sitemap.xml` and generated at build time from the same content collection the search index reads. It is not the Site's sitemap at `/sitemap.xml`, which lists the Site's two language homes.
+The machine-readable list of the Docs Portal's pages, served at `/sitemap.xml` on `docs.trajectonomics.com` and generated at build time from the same content collection the search index reads. It is not the Site's sitemap at `trajectonomics.com/sitemap.xml`, which lists the Site's address.
 _Avoid_: page list, XML index, page index
 
 **Markdown twin**:
-The Markdown form of a page, served at the page's path with `.md` in place of its trailing slash (and at `/docs/index.md` for the Landing Page). It is the authored page, not a second copy: the same words with their links made absolute.
+The Markdown form of a page, served at the page's path with `.md` in place of its trailing slash (and at `/index.md` for the Landing Page). It is the authored page, not a second copy: the same words with their links made absolute.
 _Avoid_: Markdown export, plain-text version
 
 **Docs index**:
-The file at `/docs/llms.txt` that names every page of the Docs Portal and its Markdown twin, in the order the Tabs present them. An Agent reads it first.
+The file at `/llms.txt` that names every page of the Docs Portal and its Markdown twin, in the order the Tabs present them. An Agent reads it first.
 _Avoid_: Sitemap, index file

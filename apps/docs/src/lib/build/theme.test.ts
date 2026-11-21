@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkTheme } from "./theme"
 
-const PAGE = "docs/cli/index.html"
+const PAGE = "cli/index.html"
 
 /** A built page whose `<html>` carries `attributes` and whose body is `body`. */
 function page(attributes = ' data-theme="dark"', body = ""): BuiltFile {
@@ -46,7 +46,7 @@ describe("the Theme of a built page", () => {
 	})
 
 	test("a non-HTML build file is ignored", () => {
-		expect(codesOf([{ path: "docs/api/search.json", content: '{"theme":"light"}' }])).toEqual([])
+		expect(codesOf([{ path: "api/search.json", content: '{"theme":"light"}' }])).toEqual([])
 	})
 
 	test("each failure names the page it comes from", () => {
@@ -56,13 +56,13 @@ describe("the Theme of a built page", () => {
 })
 
 describe("a built redirect stub", () => {
-	const STUB = "docs/operators/index.html"
+	const STUB = "operators/index.html"
 
 	test("is not a page, so it carries no Theme and is not reported", () => {
 		const stub: BuiltFile = {
 			path: STUB,
 			content:
-				'<!doctype html><title>Redirecting to: /docs/cli/</title><meta http-equiv="refresh" content="0;url=/docs/cli/">',
+				'<!doctype html><title>Redirecting to: /cli/</title><meta http-equiv="refresh" content="0;url=/cli/">',
 		}
 		expect(checkTheme([stub])).toEqual([])
 	})

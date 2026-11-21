@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkTocPlaceholder } from "./toc-placeholder"
 
-const PAGE = "docs/cli/installation/index.html"
+const PAGE = "cli/installation/index.html"
 
 function codesOf(files: readonly BuiltFile[]): readonly string[] {
 	return checkTocPlaceholder(files).map((failure) => failure.code)
@@ -24,8 +24,8 @@ describe("the table-of-contents column of built pages", () => {
 	})
 
 	test("a non-HTML file that names the placeholder is not a page", () => {
-		expect(
-			codesOf([{ path: "docs/api/search.json", content: '{"id":"nd-toc-placeholder"}' }]),
-		).toEqual([])
+		expect(codesOf([{ path: "api/search.json", content: '{"id":"nd-toc-placeholder"}' }])).toEqual(
+			[],
+		)
 	})
 })

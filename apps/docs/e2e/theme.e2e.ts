@@ -5,8 +5,8 @@ import { expect, test } from "./fixtures"
 import { expectDarkTheme, seedStoredLightTheme } from "./theme"
 
 /** The page whose links the shell swaps in without a reload, and the Tab one of them opens. */
-const LANDING_PATH = "/docs/"
-const OPERATOR_PATH = "/docs/cli/"
+const LANDING_PATH = "/"
+const OPERATOR_PATH = "/cli/"
 
 /** A property on `window`, which only a swapped-in page keeps: a full load gives it back empty. */
 const NAVIGATION_MARKER = "__docsPortalNavigationMarker"

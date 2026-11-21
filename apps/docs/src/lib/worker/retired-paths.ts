@@ -18,7 +18,7 @@ function isUnder(pathname: string, base: string): boolean {
 }
 
 /**
- * The page a retired `/docs/developers` path now answers with a 301, or `null` when the path is not
+ * The page a retired `/developers` path now answers with a 301, or `null` when the path is not
  * retired. `tax-core` pages go to the tax guide; every other path in the section goes to the Contribute Tab.
  */
 export function retiredPathTarget(pathname: string): string | null {

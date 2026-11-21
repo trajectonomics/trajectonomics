@@ -16,7 +16,7 @@ function firstLine(content: string): string {
 
 /** Every built Markdown twin, at its assets-root-relative path. */
 function twinFiles(files: readonly BuiltFile[]): readonly BuiltFile[] {
-	return files.filter((file) => file.path.startsWith("docs/") && file.path.endsWith(".md"))
+	return files.filter((file) => file.path.endsWith(".md"))
 }
 
 /** Whether a twin carries a Markdown link to the Docs index. */

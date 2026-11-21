@@ -2,29 +2,29 @@ import { describe, expect, test } from "bun:test"
 import { SITE_ORIGIN } from "./site"
 import { sitemapDocument, sitemapLocations } from "./sitemap"
 
-const PAGE_PATHS = ["/docs/cli/commands/tx/", "/docs/", "/docs/cli"]
+const PAGE_PATHS = ["/cli/commands/tx/", "/", "/cli"]
 
 describe("the Sitemap document", () => {
 	test("a page is listed as an absolute URL with exactly one trailing slash", () => {
-		expect(sitemapLocations(sitemapDocument(["/docs/cli"]))).toEqual([`${SITE_ORIGIN}/docs/cli/`])
+		expect(sitemapLocations(sitemapDocument(["/cli"]))).toEqual([`${SITE_ORIGIN}/cli/`])
 	})
 
 	test("the URLs are sorted", () => {
 		expect(sitemapLocations(sitemapDocument(PAGE_PATHS))).toEqual([
-			`${SITE_ORIGIN}/docs/`,
-			`${SITE_ORIGIN}/docs/cli/`,
-			`${SITE_ORIGIN}/docs/cli/commands/tx/`,
+			`${SITE_ORIGIN}/`,
+			`${SITE_ORIGIN}/cli/`,
+			`${SITE_ORIGIN}/cli/commands/tx/`,
 		])
 	})
 
 	test("a page path given twice is listed once", () => {
-		const document = sitemapDocument(["/docs/cli/", "/docs/cli"])
+		const document = sitemapDocument(["/cli/", "/cli"])
 
-		expect(sitemapLocations(document)).toEqual([`${SITE_ORIGIN}/docs/cli/`])
+		expect(sitemapLocations(document)).toEqual([`${SITE_ORIGIN}/cli/`])
 	})
 
 	test("it carries no lastmod, changefreq, priority or hreflang", () => {
-		const document = sitemapDocument(["/docs/"])
+		const document = sitemapDocument(["/"])
 
 		expect(document).not.toContain("<lastmod>")
 		expect(document).not.toContain("<changefreq>")
@@ -33,10 +33,10 @@ describe("the Sitemap document", () => {
 	})
 
 	test("a path with an unusual character round-trips through the escaped document", () => {
-		const document = sitemapDocument(["/docs/a&b/"])
+		const document = sitemapDocument(["/a&b/"])
 
-		expect(document).toContain(`${SITE_ORIGIN}/docs/a&amp;b/`)
-		expect(sitemapLocations(document)).toEqual([`${SITE_ORIGIN}/docs/a&b/`])
+		expect(document).toContain(`${SITE_ORIGIN}/a&amp;b/`)
+		expect(sitemapLocations(document)).toEqual([`${SITE_ORIGIN}/a&b/`])
 	})
 })
 
@@ -53,7 +53,7 @@ describe("reading a Sitemap document", () => {
 
 	test("a urlset with no closing tag is unreadable", () => {
 		expect(
-			sitemapLocations("<urlset><url><loc>https://trajectonomics.com/docs/</loc></url>"),
+			sitemapLocations("<urlset><url><loc>https://docs.trajectonomics.com/</loc></url>"),
 		).toBeUndefined()
 	})
 

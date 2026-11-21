@@ -32,8 +32,8 @@ describe("the Worker config", () => {
 		expect(config.assets.binding).toBe("ASSETS")
 	})
 
-	test("invokes the Worker first for /docs and everything under it", () => {
-		expect(config.assets.run_worker_first).toEqual(["/docs", "/docs/*"])
+	test("invokes the Worker first for every path", () => {
+		expect(config.assets.run_worker_first).toBe(true)
 	})
 
 	test("declares no Wrangler environment, so there is one Worker to deploy", () => {
@@ -60,7 +60,9 @@ describe("the Worker config", () => {
 		expect(declaredRoutes({ routes: [], env: { staging: { routes: [] } } })).toEqual([])
 	})
 
-	test("the shipped Worker config declares no route at any level", () => {
-		expect(declaredRoutes(config)).toEqual([])
+	test("the shipped Worker attaches the docs subdomain and no other hostname", () => {
+		expect(config.routes).toEqual([{ pattern: "docs.trajectonomics.com", custom_domain: true }])
+		expect(declaredRoutes(config)).toEqual([{ scope: "top level", key: "routes" }])
+		expect(JSON.stringify(config)).not.toContain("trajectonomics.com/docs")
 	})
 })

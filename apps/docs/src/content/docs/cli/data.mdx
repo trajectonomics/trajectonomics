@@ -36,13 +36,13 @@ traj backup --out ~/traj-backup
 ```
 
 The backup writes `traj.jsonl` into a directory that must not already exist, and
-[`traj restore`](/docs/cli/commands/restore/) reads it back into an empty database
+[`traj restore`](/cli/commands/restore/) reads it back into an empty database
 ([ADR 0038](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.3.0/apps/cli/docs/adr/0038-a-backup-restores-and-removal-needs-one.md)).
 `traj export` writes the same JSONL plus CSV and Markdown, which do not restore.
 
 ## Remove traj, keep the ledger
 
-Delete the program and the caches. [Installation](/docs/cli/installation/) lists each path. The
+Delete the program and the caches. [Installation](/cli/installation/) lists each path. The
 ledger stays where it is, and a later install opens the same books.
 
 ## Remove the ledger too
@@ -61,7 +61,7 @@ rm -rf "$TRAJ_HOME"
 
 That deletes the database, and there is no copy anywhere else unless you made one above.
 
-To remove only the ledger and keep the data directory, use [`traj data remove`](/docs/cli/commands/data/).
+To remove only the ledger and keep the data directory, use [`traj data remove`](/cli/commands/data/).
 It deletes the database files and nothing else, and it refuses unless a backup holds exactly the data
 as it is now. `traj scenario rm` tombstones one Scenario, and no other command deletes accounts or
 transactions.
@@ -78,4 +78,4 @@ TRAJ_HOME=~/money/work traj balance --as-of 2026-03-31
 Each directory is complete on its own: its own `traj.db`, its own `bin/` cache, and nothing shared
 with the default `~/.traj`.
 
-Previous: [Installation](/docs/cli/installation/) · Next: [Agent](/docs/cli/agent/).
+Previous: [Installation](/cli/installation/) · Next: [Agent](/cli/agent/).

@@ -3,7 +3,7 @@ title: restore
 description: Write a backup's rows into an empty database.
 ---
 
-`traj restore` reads a backup written by [`traj backup`](/docs/cli/commands/backup/) and writes its
+`traj restore` reads a backup written by [`traj backup`](/cli/commands/backup/) and writes its
 rows into an empty database. It never merges and never overwrites: a database that already holds
 data is refused with `restore_target_not_empty` (exit code `5`), and the message names
 `traj data remove` as the way to clear it first
@@ -27,4 +27,4 @@ traj data remove --confirm ~/.traj --backup backup
 traj restore backup
 ```
 
-See [Commands](/docs/cli/commands/) for the global options, exit codes and error envelope.
+See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

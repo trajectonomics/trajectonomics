@@ -1,3 +1,5 @@
+import { DOCS_BASE_PATH } from "./tabs"
+
 /** One file of the Docs Portal content tree: its path under `src/content/docs/` and its text. */
 export interface ContentFile {
 	readonly path: string
@@ -65,13 +67,13 @@ export function resolvesNavigationEntry(
 	return resolvesPagePath(files, folder === "" ? entry : `${folder}/${entry}`)
 }
 
-/** A markdown link to a site path under the Docs Portal base; `!` makes it an image. */
-const MARKDOWN_LINK = /(!?)\]\((\/docs(?:\/[^)\s]*)?)\)/g
+/** A markdown link to a site path on this host; `!` makes it an image. */
+const MARKDOWN_LINK = /(!?)\]\((\/(?!\/)[^)\s]*)\)/g
 
-/** An `href` attribute pointing at a site path under the Docs Portal base. */
-const ATTRIBUTE_LINK = /href="(\/docs(?:\/[^"]*)?)"/g
+/** An `href` attribute pointing at a site path on this host. */
+const ATTRIBUTE_LINK = /href="(\/(?!\/)[^"]*)"/g
 
-/** Every site-absolute link under `/docs` in `content`, markdown or JSX, in source order. */
+/** Every site-absolute link in `content`, markdown or JSX, in source order. */
 export function internalLinks(content: string): readonly string[] {
 	const links: string[] = []
 	for (const match of content.matchAll(MARKDOWN_LINK)) {
@@ -89,8 +91,12 @@ export function internalLinks(content: string): readonly string[] {
 	return links
 }
 
-/** The content path a `/docs` URL names, with the base, trailing slashes, fragment and query gone. */
+/** The content path a portal URL names, with the base, trailing slashes, fragment and query gone. */
 export function contentPathOf(url: string): string {
-	const path = url.split(/[?#]/)[0] ?? ""
-	return path.replace(/^\/docs\/?/, "").replace(/\/+$/, "")
+	const path = (url.split(/[?#]/)[0] ?? "").replace(/\/+$/, "")
+	const withoutBase =
+		DOCS_BASE_PATH.length > 0 && (path === DOCS_BASE_PATH || path.startsWith(`${DOCS_BASE_PATH}/`))
+			? path.slice(DOCS_BASE_PATH.length)
+			: path
+	return withoutBase.replace(/^\//, "")
 }

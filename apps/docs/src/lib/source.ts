@@ -6,5 +6,5 @@ import { DOCS_BASE_PATH } from "./tabs"
 /** The Fumadocs source over the authored Docs Portal pages. */
 export const source = loader({
 	source: toFumadocsSource(await getCollection("docs"), await getCollection("meta")),
-	baseUrl: DOCS_BASE_PATH,
+	baseUrl: DOCS_BASE_PATH.length === 0 ? "/" : DOCS_BASE_PATH,
 })

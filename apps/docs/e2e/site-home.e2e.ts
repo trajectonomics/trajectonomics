@@ -8,6 +8,12 @@ import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
 
 const LANDING_PATH = `${DOCS_BASE_PATH}/`
 
+/** Whether `url` is the Site Home. The link is absolute, so the path alone is not enough. */
+function isSiteHome(url: URL): boolean {
+	const home = new URL(SITE_HOME_PATH)
+	return url.origin === home.origin && url.pathname === home.pathname
+}
+
 /** A page that carries the Site Home link, where it lives, and the control that reveals a phone's. */
 interface PageWithSiteHomeLink {
 	readonly name: string
@@ -45,7 +51,7 @@ const PAGES: readonly PageWithSiteHomeLink[] = [
 	},
 ]
 
-/** A Site Home document, so the browser test never asks `wrangler dev` for the page at `/`. */
+/** A Site Home document, so the browser test never asks the network for trajectonomics.com. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
 /** The Site Home link, in the header or wherever the small-screen control opened it. */
@@ -90,17 +96,17 @@ for (const pageUnderTest of PAGES) {
 	})
 }
 
-test("clicking the Site Home link loads / as a new document", async ({ page }) => {
+test("clicking the Site Home link loads trajectonomics.com as a new document", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: TEST_VIEWPORT_HEIGHT_PX })
 	await openPage(page, tabUrl(TABS[0]))
 	await page.route(
-		(url) => url.pathname === SITE_HOME_PATH,
+		(url) => isSiteHome(url),
 		(route) => route.fulfill({ status: 200, contentType: "text/html", body: SITE_HOME_DOCUMENT }),
 	)
 
 	const siteHomeRequests: string[] = []
 	page.on("request", (request) => {
-		if (new URL(request.url()).pathname === SITE_HOME_PATH) {
+		if (isSiteHome(new URL(request.url()))) {
 			siteHomeRequests.push(request.resourceType())
 		}
 	})

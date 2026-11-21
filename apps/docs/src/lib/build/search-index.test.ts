@@ -19,7 +19,7 @@ function codesOf(files: readonly BuiltFile[]): readonly string[] {
 
 describe("the search index of the built Docs Portal", () => {
 	test("an index that exported at least one entry reports no failure", () => {
-		expect(codesOf([searchIndexFile(exportedIndex(["/docs/cli"]))])).toEqual([])
+		expect(codesOf([searchIndexFile(exportedIndex(["/cli"]))])).toEqual([])
 	})
 
 	test("a build with no search index is reported as SEARCH_INDEX_MISSING", () => {
