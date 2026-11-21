@@ -1,0 +1,49 @@
+name: Docs examples
+
+# The examples on the Docs Portal's CLI pages run against the release the committed snapshot records
+# (apps/docs/src/generated/cli-release.json, ADR 0015 in apps/docs/docs/adr), so a page and the release
+# it documents cannot disagree. The check needs the network to download that release, so it is a
+# workflow job and never part of `bun run check`.
+on:
+  pull_request:
+    paths: ["apps/docs/**", ".github/workflows/docs-examples.yml"]
+  push:
+    branches: [main]
+    paths: ["apps/docs/**", ".github/workflows/docs-examples.yml"]
+  schedule:
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  examples:
+    name: Docs examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install the recorded traj release
+        run: |
+          VERSION="$(jq -r .version apps/docs/src/generated/cli-release.json)"
+          curl -fsSL "https://github.com/trajectonomics/trajectonomics/releases/download/cli-v${VERSION}/install.sh" \
+            | TRAJ_VERSION="$VERSION" TRAJ_INSTALL_DIR="$RUNNER_TEMP/traj-bin" sh
+
+      - name: Run the examples against the release
+        working-directory: apps/docs
+        run: bun run check:examples --traj "$RUNNER_TEMP/traj-bin/traj"

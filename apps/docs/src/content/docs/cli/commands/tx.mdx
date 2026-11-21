@@ -48,7 +48,7 @@ until a posting funds it, as [the baseline page](/cli/commands/baseline/) explai
 A debt opens negative. A loan of 300.00 THB that you owe is `--amount -300.00` on the liability
 account:
 
-```bash
+```bash exec
 traj account add Loan --type liability --currency THB                              # The account the debt is owed on.
 traj tx add --opening --from Opening --to Loan --amount -300.00 --date 2026-01-01  # Owe 300.00: a negative amount.
 ```

@@ -1,0 +1,514 @@
+{
+	"version": "0.4.0",
+	"leaves": [
+		{
+			"name": "account add",
+			"flags": ["--type", "--currency", "--parent", "--dry-run"]
+		},
+		{
+			"name": "account close",
+			"flags": ["--dry-run"]
+		},
+		{
+			"name": "account list",
+			"flags": []
+		},
+		{
+			"name": "account show",
+			"flags": []
+		},
+		{
+			"name": "backup",
+			"flags": ["--out"]
+		},
+		{
+			"name": "balance",
+			"flags": ["--as-of", "--trial-balance"]
+		},
+		{
+			"name": "baseline show",
+			"flags": ["--as-of"]
+		},
+		{
+			"name": "data remove",
+			"flags": ["--confirm", "--backup"]
+		},
+		{
+			"name": "doctor",
+			"flags": ["--as-of"]
+		},
+		{
+			"name": "export",
+			"flags": ["--format", "--out"]
+		},
+		{
+			"name": "fi",
+			"flags": ["--as-of", "--horizon", "--scenario", "--set", "--carry-in"]
+		},
+		{
+			"name": "help",
+			"flags": []
+		},
+		{
+			"name": "init",
+			"flags": []
+		},
+		{
+			"name": "inspect",
+			"flags": ["--all"]
+		},
+		{
+			"name": "projection compare",
+			"flags": ["--as-of", "--horizon", "--set", "--carry-in", "--birth-date", "--age"]
+		},
+		{
+			"name": "projection run",
+			"flags": ["--as-of", "--horizon", "--scenario", "--set", "--carry-in", "--monthly"]
+		},
+		{
+			"name": "report networth",
+			"flags": ["--as-of"]
+		},
+		{
+			"name": "report pnl",
+			"flags": ["--until", "--since", "--project"]
+		},
+		{
+			"name": "restore",
+			"flags": []
+		},
+		{
+			"name": "scenario apply",
+			"flags": ["--file", "--template", "--dry-run"]
+		},
+		{
+			"name": "scenario diff",
+			"flags": []
+		},
+		{
+			"name": "scenario fork",
+			"flags": ["--set", "--dry-run"]
+		},
+		{
+			"name": "scenario list",
+			"flags": []
+		},
+		{
+			"name": "scenario rm",
+			"flags": ["--dry-run"]
+		},
+		{
+			"name": "scenario show",
+			"flags": []
+		},
+		{
+			"name": "scenario tax",
+			"flags": [
+				"--tax",
+				"--filing-status",
+				"--children",
+				"--children-at-higher-rate",
+				"--parents",
+				"--disabled-care",
+				"--social-security",
+				"--life-insurance",
+				"--health-insurance",
+				"--parent-health-insurance",
+				"--spouse-life-insurance",
+				"--mortgage-interest",
+				"--donation2x",
+				"--donation1x",
+				"--label",
+				"--none",
+				"--dry-run"
+			]
+		},
+		{
+			"name": "schema",
+			"flags": []
+		},
+		{
+			"name": "tx add",
+			"flags": [
+				"--from",
+				"--to",
+				"--amount",
+				"--date",
+				"--opening",
+				"--project",
+				"--memo",
+				"--external-ref",
+				"--dry-run",
+				"--postings"
+			]
+		},
+		{
+			"name": "tx amend",
+			"flags": [
+				"--date",
+				"--void-date",
+				"--from",
+				"--to",
+				"--amount",
+				"--opening",
+				"--project",
+				"--memo",
+				"--external-ref",
+				"--dry-run",
+				"--postings"
+			]
+		},
+		{
+			"name": "tx import",
+			"flags": ["--template", "--dry-run"]
+		},
+		{
+			"name": "tx list",
+			"flags": ["--since", "--until", "--account", "--project"]
+		},
+		{
+			"name": "tx show",
+			"flags": []
+		},
+		{
+			"name": "tx void",
+			"flags": ["--date", "--dry-run"]
+		},
+		{
+			"name": "version",
+			"flags": []
+		}
+	],
+	"globalFlags": ["--json", "-h", "--help", "-v", "--version"],
+	"commands": [
+		{
+			"name": "account",
+			"summary": "Manage the chart of accounts"
+		},
+		{
+			"name": "backup",
+			"summary": "Write the one file a restore reads into a new directory"
+		},
+		{
+			"name": "balance",
+			"summary": "Show every account's balance and net worth at a date"
+		},
+		{
+			"name": "baseline",
+			"summary": "Show the Baseline a Projection starts from"
+		},
+		{
+			"name": "data",
+			"summary": "Manage the stored data itself"
+		},
+		{
+			"name": "doctor",
+			"summary": "Check the data directory, the database and the ledger before anything goes wrong"
+		},
+		{
+			"name": "export",
+			"summary": "Write the stored rows into a new directory"
+		},
+		{
+			"name": "fi",
+			"summary": "Report the financial independence date under a Scenario"
+		},
+		{
+			"name": "help",
+			"summary": "Show usage for traj or for one command"
+		},
+		{
+			"name": "init",
+			"summary": "Create an empty ledger; only restore may also create one"
+		},
+		{
+			"name": "inspect",
+			"summary": "Show the stored rows of one table, or of every table"
+		},
+		{
+			"name": "projection",
+			"summary": "Project the future under a Scenario, and compare two of them"
+		},
+		{
+			"name": "report",
+			"summary": "Report on the ledger over a period or at a date"
+		},
+		{
+			"name": "restore",
+			"summary": "Write a backup's rows into an empty database"
+		},
+		{
+			"name": "scenario",
+			"summary": "Manage Scenarios, the named what-ifs"
+		},
+		{
+			"name": "schema",
+			"summary": "Describe the commands and the error registry"
+		},
+		{
+			"name": "tx",
+			"summary": "Manage ledger transactions"
+		},
+		{
+			"name": "version",
+			"summary": "Print the CLI version"
+		}
+	],
+	"exitCodes": [
+		{
+			"name": "0",
+			"summary": "ok"
+		},
+		{
+			"name": "1",
+			"summary": "unexpected"
+		},
+		{
+			"name": "2",
+			"summary": "invalid input"
+		},
+		{
+			"name": "3",
+			"summary": "domain rejection"
+		},
+		{
+			"name": "4",
+			"summary": "not found"
+		},
+		{
+			"name": "5",
+			"summary": "conflict"
+		}
+	],
+	"environment": [
+		{
+			"name": "TRAJ_FORMAT",
+			"summary": "human (default) or json; --json takes precedence"
+		},
+		{
+			"name": "TRAJ_HOME",
+			"summary": "Data directory (default ~/.traj)"
+		},
+		{
+			"name": "TRAJ_DEBUG",
+			"summary": "Set to 1 to print diagnostics for unexpected errors"
+		}
+	],
+	"errors": [
+		{
+			"code": "AMOUNT_OVERFLOW",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "CURRENCY_MISMATCH",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "DUPLICATE_TRANSACTION_ID",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_ACCOUNT_HIERARCHY",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_AMOUNT",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_CURRENCY",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_DATE",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_DIMENSION",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "INVALID_PERIOD",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "NEGATIVE_AMOUNT",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "NON_EQUITY_CONTRA",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "NON_LEAF_ACCOUNT",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "REVERSAL_BEFORE_ORIGINAL",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "SINGLE_POSTING",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "UNBALANCED_TRANSACTION",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "UNKNOWN_ACCOUNT",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "ZERO_AMOUNT_POSTING",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "account_archived",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "account_name_taken",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "backup_stale",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "backup_unreadable",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "database_busy",
+			"exitCode": 5,
+			"retryable": true
+		},
+		{
+			"code": "database_corrupt",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "database_too_new",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "disk_full",
+			"exitCode": 1,
+			"retryable": true
+		},
+		{
+			"code": "export_failed",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "external_ref_conflict",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "internal",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "invalid_input",
+			"exitCode": 2,
+			"retryable": false
+		},
+		{
+			"code": "ledger_missing",
+			"exitCode": 4,
+			"retryable": false
+		},
+		{
+			"code": "liability_opening_positive",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "migration_failed",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "not_a_directory",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "not_found",
+			"exitCode": 4,
+			"retryable": false
+		},
+		{
+			"code": "output_exists",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "permission_denied",
+			"exitCode": 1,
+			"retryable": false
+		},
+		{
+			"code": "projection_refused",
+			"exitCode": 3,
+			"retryable": false
+		},
+		{
+			"code": "restore_target_not_empty",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "scenario_name_taken",
+			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "unknown_command",
+			"exitCode": 2,
+			"retryable": false
+		},
+		{
+			"code": "unknown_flag",
+			"exitCode": 2,
+			"retryable": false
+		},
+		{
+			"code": "unknown_format",
+			"exitCode": 2,
+			"retryable": false
+		},
+		{
+			"code": "unsupported_currency",
+			"exitCode": 3,
+			"retryable": false
+		}
+	]
+}

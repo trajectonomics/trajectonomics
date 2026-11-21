@@ -26,7 +26,11 @@ traj scenario apply base --file base.json --dry-run  # Show the row and roll the
 `traj scenario apply --template` prints a complete document to start from: print it, edit it, then
 apply it. The latest release prints:
 
-```json
+```bash exec
+traj scenario apply --template
+```
+
+```json output
 {
   "schemaVersion": 4,
   "currency": "THB",

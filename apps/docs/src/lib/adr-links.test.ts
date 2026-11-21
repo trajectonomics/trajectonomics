@@ -49,6 +49,15 @@ describe("an Operator-tab page", () => {
 		["a link around an image", `[![ADR](badge.svg)](${ADR_URL})`],
 		["a relative path", "[ADR 0010](adr/0010-output-contract.md)"],
 		["a parent-relative path", "[ADR 0010](../docs/adr/0010-output-contract.md)"],
+		[
+			"the folder with a slash",
+			"[the records](https://github.com/x/y/tree/main/apps/cli/docs/adr/)",
+		],
+		[
+			"the folder without a slash",
+			"[the records](https://github.com/x/y/tree/main/apps/cli/docs/adr)",
+		],
+		["a bare relative folder", "[the records](adr/)"],
 	])("is reported for %s", (_form, content) => {
 		expect(detailsOf("cli/agent.mdx", content)).toHaveLength(1)
 	})

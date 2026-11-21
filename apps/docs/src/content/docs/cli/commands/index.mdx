@@ -3,10 +3,9 @@ title: Commands
 description: The command reference of the Trajectonomics CLI.
 ---
 
-`traj` has 18 top-level commands. Seven are groups with their own subcommands — `account`,
-`baseline`, `data`, `projection`, `report`, `scenario` and `tx` — and the other eleven are single
-commands. `traj help` lists them and `traj help <command>` shows one command's usage; both are
-generated from the same definitions that validate input.
+`traj help` lists the top-level commands below, and `traj help <command>` shows one command's usage;
+both are generated from the same definitions that validate input. A group, such as `tx` or
+`account`, has its own subcommands; the rest are single commands.
 
 ## The command tree
 
@@ -21,7 +20,7 @@ generated from the same definitions that validate input.
 | [export](/cli/commands/export/) | Write the stored rows into a new directory |
 | [fi](/cli/commands/fi/) | Report the financial independence date under a Scenario |
 | [help](/cli/commands/help/) | Show usage for traj or for one command |
-| [init](/cli/commands/init/) | Create the data directory and an empty database |
+| [init](/cli/commands/init/) | Create an empty ledger; only restore may also create one |
 | [inspect](/cli/commands/inspect/) | Show the stored rows of one table, or of every table |
 | [projection](/cli/commands/projection/) | Project the future under a Scenario, and compare two of them |
 | [restore](/cli/commands/restore/) | Write a backup's rows into an empty database |
@@ -60,8 +59,8 @@ what to do next. `traj account show Nope --json` on a ledger with no such accoun
 
 Outside JSON mode the same failure is text on stderr with the same exit code. Commands never prompt.
 
-Two codes are worth retrying as they are: `database_busy` and `disk_full`. For every other failure,
-running the same command again unchanged gives the same answer. `traj help` lists the
+These codes are worth retrying as they are: `database_busy` and `disk_full`. For every other
+failure, running the same command again unchanged gives the same answer. `traj help` lists the
 retryable codes, and each code in `traj schema`'s registry carries `retryable`.
 
 A command that reads or writes the ledger fails with `ledger_missing` (exit code `4`) until
