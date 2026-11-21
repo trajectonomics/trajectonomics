@@ -40,6 +40,10 @@ It refuses a tag that is not `cli-vX.Y.Z`, then smoke-tests and uploads the bina
 
 ## One-time cutover
 
+Done on 2026-11-21: `traj` 0.4.0 is the first release from here, the forwarding release
+`v0.3.1-moved` is live in `trajectonomics/cli`, and the 12 old repositories are archived. The steps
+stay below as the record.
+
 Do these in order. Step 1, and the Cloudflare token in step 4, need the owner's own logins; the rest can be run from a terminal
 with `gh` signed in to the organisation.
 
