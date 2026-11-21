@@ -21,7 +21,7 @@ let { data }: Props = $props()
 	</div>
 	{#if data.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-muted-foreground">
-			{#each data.notes as note (note)}
+			{#each data.notes as note, index (index)}
 				<li>{note}</li>
 			{/each}
 		</ul>

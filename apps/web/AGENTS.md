@@ -21,7 +21,7 @@ The Svelte 5 docs are the reference, and they are current: read them, not your m
 - **Event attributes.** `onclick={handler}`, `onkeydown={…}`, never `on:click`.
 - **Every `<script>` is `lang="ts"`.** A component is at most 100 non-blank lines; split it when it grows.
 - **Shared reactive state is a `.svelte.ts` module under `src/client/`** that exports a class instance or a `$state` object. Never a Svelte store (`svelte/store`), and never a reactive `let` exported from a module (it is not reactive for an importer).
-- **`$effect` only to touch the browser.** Anything computed is `$derived`. Starting a read on mount is `onMount`, in the shell.
+- **`$effect` only to touch the browser.** Anything computed is `$derived`. The shell starts the Snapshot read in an `$effect` that follows the address, so a switch to `?demo=1` loads the Demo snapshot.
 - **Page logic stays in the pure view models in `src/lib/view/`.** A component only renders: it takes the view model's values as props and places them.
 - **A component takes props.** It reads `$app/state` only when it is a route file (`src/routes/`) or part of the shell (the root layout and `src/components/shell/`). Components below the shell read the address through `src/client/location.svelte.ts`, and the Snapshot through `src/client/snapshot.svelte.ts`.
 - **Query-string state** (such as the Scenario a page shows) is read in a route file with `queryParam` and set with `setQueryParam` from `src/client/query-param.svelte.ts`. The helper replaces the entry and does not load.
@@ -31,7 +31,7 @@ The Svelte 5 docs are the reference, and they are current: read them, not your m
 
 - **Runes mode** (`vite.config.ts`, `compilerOptions.runes`). A Svelte 4 form fails the compile, in `svelte-check` or `vite build`: `Cannot use export let in runes mode — use $props() instead`. Write the form it names.
 - **`svelte-check --fail-on-warnings`** (`bun run typecheck`). A deprecated form that still compiles, such as `<slot>` or `on:click`, fails here as a warning, and so does a symbol that is declared and not used, which Biome cannot see in markup.
-- **The Svelte guard** (`bun test`, `scripts/svelte-guard.test.ts`). It prints `file:line [rule] message`, for example `Money.svelte:2 [money/number-conversion] …`. The message names the Svelte 5 form to write. The rules are in `src/lib/guard/`, one file per kind of rule, each with a bad and a good example in `rules.test.ts`.
+- **The Svelte guard** (`bun test`, `scripts/svelte-guard.test.ts`). It prints `file:line [rule] message`, for example `Money.svelte:2 [money/number-conversion] …`. The message names the Svelte 5 form to write. The rules are in `src/lib/guard/`, one file per kind of rule, each with a bad and a good example in `rules.test.ts`. A plain `.ts` module under `src/` is held to the boundary rules too (no store, no React or Astro, no browser call outside `src/client/`), so a forbidden call cannot hide in a helper.
 - **The dependency guard** (`scripts/dependency-guard.test.ts`) fails when the package lists `react`, `react-dom`, `astro` or any `@astrojs/*` package. React is allowed in this repository only in `apps/docs`, for Fumadocs.
 - **Biome** lints and formats `.svelte` scripts and checks the file length of `.ts` files. It does not check the markup, and the unused-symbol rules are off for `.svelte` (see above). A markup problem is caught by the browser tests, not by Biome.
 

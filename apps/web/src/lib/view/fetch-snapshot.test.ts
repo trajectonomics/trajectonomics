@@ -33,4 +33,9 @@ describe("fetchSnapshot: a missing file", () => {
 		const state = await fetchSnapshot(URL, async () => response(200, '{"hello":"world"}'))
 		expect(state).toMatchObject({ status: "invalid", url: URL })
 	})
+
+	test("a file cut short is an invalid Snapshot, so a broken write is not read as no file", async () => {
+		const state = await fetchSnapshot(URL, async () => response(200, '{"snapshotVersion": 1, "par'))
+		expect(state).toMatchObject({ status: "invalid", url: URL })
+	})
 })

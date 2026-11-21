@@ -13,7 +13,7 @@ let { notes }: Props = $props()
 	<div class="space-y-2 text-sm">
 		<p class="font-medium">Notes</p>
 		<ul class="list-disc space-y-1 pl-5">
-			{#each notes as note (note)}
+			{#each notes as note, index (index)}
 				<li>{note}</li>
 			{/each}
 		</ul>

@@ -31,12 +31,12 @@ const rows = $derived(
 		aria-label={label}
 		class="flex h-3 w-full gap-[2px] overflow-hidden rounded-sm bg-muted"
 	>
-		{#each rows.filter((row) => row.share > 0) as row (row.label)}
+		{#each rows.filter((row) => row.share > 0) as row, index (index)}
 			<span style:flex-grow={row.share} style:flex-basis="0" class={row.swatch}></span>
 		{/each}
 	</div>
 	<ul class="space-y-2 text-sm">
-		{#each rows as row (row.label)}
+		{#each rows as row, index (index)}
 			<li class="flex items-center justify-between gap-3">
 				<span class="flex min-w-0 items-center gap-2">
 					<span aria-hidden="true" class={cx("size-3 shrink-0 rounded-sm", row.swatch)}></span>

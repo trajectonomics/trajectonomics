@@ -35,7 +35,7 @@ let { state, terms, onTerms }: Props = $props()
 		<LineChart label={`Net worth by year, ${terms}`} series={state.series} />
 	{:else}
 		<EmptyState title="The chart is not drawn">
-			{#each state.reasons as reason (reason)}
+			{#each state.reasons as reason, index (index)}
 				<p>{reason}</p>
 			{/each}
 		</EmptyState>

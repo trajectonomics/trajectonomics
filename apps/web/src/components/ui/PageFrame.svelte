@@ -4,7 +4,6 @@ import type { Snapshot } from "../../lib/contract"
 import { withSearch } from "../../lib/view/links"
 import type { SnapshotState } from "../../lib/view/state"
 import EmptyState from "./EmptyState.svelte"
-import SiteLink from "./SiteLink.svelte"
 import { SNAPSHOT_COMMAND } from "./snapshot-command"
 
 interface Props {
@@ -42,9 +41,8 @@ let { title, intro, state, pathname, children }: Props = $props()
 					>{SNAPSHOT_COMMAND}</code
 				></pre>
 			<p class="mt-3">
-				<SiteLink
-					href={withSearch(pathname, "?demo=1")}
-					class="text-accent underline-offset-4 hover:underline">View the demo</SiteLink
+				<a href={withSearch(pathname, "?demo=1")} class="text-accent underline-offset-4 hover:underline"
+					>View the demo</a
 				>
 			</p>
 		</EmptyState>
@@ -53,7 +51,7 @@ let { title, intro, state, pathname, children }: Props = $props()
 			<p class="font-medium">The Snapshot at {state.url} {state.reason}.</p>
 			{#if state.details.length > 0}
 				<ul class="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
-					{#each state.details as detail (detail)}
+					{#each state.details as detail, index (index)}
 						<li>{detail}</li>
 					{/each}
 				</ul>

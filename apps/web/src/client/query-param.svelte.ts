@@ -1,16 +1,6 @@
 import { goto } from "$app/navigation"
-import { page } from "$app/state"
+import { visibleAddress } from "./location.svelte.js"
 import { paramOf, withParam } from "./query-string"
-
-/**
- * The address the page shows. A shallow navigation (`setQueryParam`) changes the address bar and
- * `page.shallow`, but not `page.url`, which stays the rendered page. So the visible address is
- * `page.shallow` when it is set, and `page.url` otherwise.
- */
-function visibleAddress(): { readonly pathname: string; readonly search: string } {
-	const url = page.shallow?.url ?? page.url
-	return { pathname: url.pathname, search: url.search }
-}
 
 /**
  * One query parameter of the address bar as state, such as the Scenario a page shows. Read it in

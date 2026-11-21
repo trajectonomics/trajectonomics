@@ -1,5 +1,13 @@
 import type { LineRule } from "./line-rule"
 
+/** Stores are Svelte 4's shared state. A static or a dynamic import of them is refused. */
+export const STORE_RULE: LineRule = {
+	rule: "legacy/svelte-store",
+	pattern: /["']svelte\/store["']/,
+	message:
+		"Svelte stores are not used. Share reactive state through a `.svelte.ts` module under `src/client/` with `$state`.",
+}
+
 /** Svelte 4 syntax. It compiles in Svelte 5 with the runes mode off, so the guard refuses it by name. */
 export const SYNTAX_RULES: readonly LineRule[] = [
 	{
@@ -30,12 +38,7 @@ export const SYNTAX_RULES: readonly LineRule[] = [
 		message:
 			"Svelte 4 `createEventDispatcher`. Pass a callback prop, such as `onSave: (value: string) => void`.",
 	},
-	{
-		rule: "legacy/svelte-store",
-		pattern: /from\s+["']svelte\/store["']/,
-		message:
-			"Svelte stores are not used. Share reactive state through a `.svelte.ts` module under `src/client/` with `$state`.",
-	},
+	STORE_RULE,
 	{
 		rule: "legacy/dollar-props",
 		pattern: /\$\$props\b/,

@@ -12,9 +12,10 @@ export interface FetchedText {
 export type TextFetcher = (url: string) => Promise<FetchedText>
 
 /**
- * Reads one Snapshot. A 404 is a missing file, and so is a 200 whose body is not JSON: a static server
- * such as `vite preview` answers an unknown path with its app page. Any other failure, or a JSON body
- * that is not a Snapshot, is an invalid one. It never throws: the page renders whichever state it returns.
+ * Reads one Snapshot. A 404 is a missing file, and so is a 200 whose body is empty or a page of HTML:
+ * a static server such as `vite preview` answers an unknown path with its app page. Any other failure,
+ * or a body that is not a Snapshot (broken JSON included), is an invalid one. It never throws: the page
+ * renders whichever state it returns.
  */
 export async function fetchSnapshot(url: string, fetchText: TextFetcher): Promise<SnapshotState> {
 	try {
@@ -22,7 +23,7 @@ export async function fetchSnapshot(url: string, fetchText: TextFetcher): Promis
 		if (response.status === 404) return { status: "missing", url }
 		if (!response.ok) return invalid(url, `could not be read (HTTP ${response.status})`)
 		const text = await response.text()
-		if (!isJson(text)) return { status: "missing", url }
+		if (isAppPage(text)) return { status: "missing", url }
 		const parsed = parseSnapshotText(text)
 		return parsed.ok
 			? { status: "ready", url, snapshot: parsed.snapshot }
@@ -32,14 +33,10 @@ export async function fetchSnapshot(url: string, fetchText: TextFetcher): Promis
 	}
 }
 
-/** Whether a body parses as JSON. A page of HTML, or an empty body, does not. */
-function isJson(text: string): boolean {
-	try {
-		JSON.parse(text)
-		return true
-	} catch {
-		return false
-	}
+/** Whether a body is what a static server sends for a file it does not have: nothing, or its HTML page. */
+function isAppPage(text: string): boolean {
+	const body = text.trimStart()
+	return body === "" || body.startsWith("<")
 }
 
 function invalid(url: string, reason: string, details: readonly string[] = []): Invalid {

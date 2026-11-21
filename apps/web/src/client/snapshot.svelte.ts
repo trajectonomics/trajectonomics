@@ -17,7 +17,7 @@ export function currentSnapshot(): SnapshotState {
 	return store.state
 }
 
-/** Starts the one read of the Snapshot for a query string. A second call for the same file does nothing. */
+/** Shows the Snapshot a query string names. Each file is read once; a second call for the same one does nothing. */
 export function loadSnapshot(search: string): void {
 	void snapshotLoader.load(snapshotUrl(search))
 }

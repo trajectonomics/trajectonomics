@@ -3,7 +3,7 @@
 import { createSnapshotLoader } from "../lib/view/loader"
 import type { Theme } from "../lib/view/preferences"
 
-/** The page's one Snapshot loader. Every island on the page reads the same file once. */
+/** The visit's one Snapshot loader. Every component reads the same file once. */
 export const snapshotLoader = createSnapshotLoader((url) => fetch(url, { cache: "no-store" }))
 
 /** A stored value, or null when storage is unavailable (a private window, blocked site data). */
@@ -38,16 +38,6 @@ export function applyTheme(theme: Theme): void {
 	document.documentElement.setAttribute("data-theme", theme)
 }
 
-/** The query string of the address bar, or "" on the server. */
-export function currentSearch(): string {
-	return typeof window === "undefined" ? "" : window.location.search
-}
-
-/** The path of the address bar, or "/" on the server. */
-export function currentPathname(): string {
-	return typeof window === "undefined" ? "/" : window.location.pathname
-}
-
 /**
  * Calls the listener when a setting or the address could have changed in another tab or by the
  * history, or when the system's colour scheme changes. Returns the unsubscribe.
@@ -70,16 +60,4 @@ function matchMediaOrNull(): MediaQueryList | null {
 	} catch {
 		return null
 	}
-}
-
-/**
- * Replaces one query parameter in the address bar without a navigation, and tells the subscribers.
- * An empty value removes the parameter, so the default state has a clean address.
- */
-export function replaceQueryParam(name: string, value: string): void {
-	const url = new URL(window.location.href)
-	if (value === "") url.searchParams.delete(name)
-	else url.searchParams.set(name, value)
-	window.history.replaceState(window.history.state, "", url)
-	window.dispatchEvent(new PopStateEvent("popstate"))
 }

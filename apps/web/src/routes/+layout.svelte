@@ -1,7 +1,7 @@
 <script lang="ts">
 import "../styles/global.css"
 import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
-import { onMount, type Snippet } from "svelte"
+import type { Snippet } from "svelte"
 import { page } from "$app/state"
 import { loadSnapshot } from "../client/snapshot.svelte.js"
 import { brandArtwork } from "../components/shell/brand-artwork"
@@ -13,8 +13,10 @@ import SnapshotStatus from "../components/shell/SnapshotStatus.svelte"
 let { children }: { children: Snippet } = $props()
 const artwork = brandArtwork(mark)
 
-// The one read of the Snapshot for the whole visit. Client-side navigation keeps this layout mounted.
-onMount(() => {
+// The Snapshot follows the address: this layout stays mounted across pages, so the read is started
+// again whenever the query string changes. The loader reads each file once, so a page change with the
+// same `demo` parameter costs nothing, and a switch to `?demo=1` loads the Demo snapshot.
+$effect(() => {
 	loadSnapshot(page.url.search)
 })
 </script>

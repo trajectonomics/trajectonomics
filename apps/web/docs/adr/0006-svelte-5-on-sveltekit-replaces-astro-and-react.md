@@ -20,8 +20,8 @@ Agents write Svelte from memory, and a weaker model writes Svelte 3 or 4 syntax 
 
 1. **Runes mode is forced** in `vite.config.ts`. `export let`, `$:`, `$$props`, `$$restProps` and `$$slots` do not compile.
 2. **`svelte-check --fail-on-warnings`** in `typecheck`. The deprecated forms that still compile, such as `<slot>` and `on:click`, fail the check as warnings.
-3. **A source guard under `bun test`** (`src/lib/guard/`, run over every component by `scripts/svelte-guard.test.ts`). It refuses Svelte 4 syntax, a component script without `lang="ts"`, a component longer than 100 non-blank lines, a money string turned into a number, React or Astro imports, `{@html}` outside the brand mark, and `fetch`, `localStorage`, `window` and `document` outside `src/client/`.
-4. **A dependency guard**, `scripts/dependency-guard.test.ts`, that refuses `react`, `react-dom`, `astro` and `@astrojs/*` in the Dashboard's `package.json`. It is a `test.todo` until the last React page is ported, because the React pages still in the tree need React.
+3. **A source guard under `bun test`** (`src/lib/guard/`, run over every component by `scripts/svelte-guard.test.ts`). It refuses Svelte 4 syntax, a component script without `lang="ts"`, a component longer than 100 non-blank lines, a money string turned into a number, React or Astro imports, `{@html}` outside the brand mark, and `fetch`, `localStorage`, `window` and `document` outside `src/client/`. Plain `.ts` modules are held to the store, framework and browser rules as well.
+4. **A dependency guard**, `scripts/dependency-guard.test.ts`, that refuses `react`, `react-dom`, `astro` and `@astrojs/*` in the Dashboard's `package.json`.
 5. **Component tests under `bun test`.** `bunfig.toml` preloads `scripts/svelte/preload.ts`, which compiles `.svelte` and `.svelte.ts` with `svelte/compiler`, in the server form, so `render` from `svelte/server` renders a component to a string. The official `bun-plugin-svelte` 0.0.6 was checked and does not support server-side imports, so it cannot provide this.
 
 Biome 2.6.3 lints and formats `.svelte` files, but only their scripts. It flags an import used only in the markup as unused, so the `.svelte` override turns off `noUnusedImports` and `noUnusedVariables`, as the `.astro` override did before. `svelte-check` checks those with the template in view, under the base `noUnusedLocals`.
@@ -38,4 +38,4 @@ Biome 2.6.3 lints and formats `.svelte` files, but only their scripts. It flags 
 - A component is a `.svelte` file with `<script lang="ts">`, props from `$props()`, snippets for children, and event attributes. Its page's logic is a pure view model.
 - A new page starts from a route file that sets `<svelte:head>` with `<Name> · Dashboard`, and renders a component.
 - The static shell has no markup of its own, so the first paint is empty until the script runs. The theme is still set before the first paint by the inline script in `src/app.html`.
-- React stays in `src/components/` only for the pages not yet ported. It is deleted with the last port, and then `react` and `react-dom` leave `apps/web/package.json` and the dependency guard is turned on.
+- Every page is ported: no React file remains, `react` and `react-dom` have left `apps/web/package.json`, and the dependency guard is a test.

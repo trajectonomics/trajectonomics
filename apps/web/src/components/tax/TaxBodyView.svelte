@@ -40,7 +40,7 @@ const carry = $derived(carryInRows(run.carryIn ?? []))
 	{/if}
 	{#if run.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-			{#each run.notes as note (note)}
+			{#each run.notes as note, index (index)}
 				<li>{note}</li>
 			{/each}
 		</ul>

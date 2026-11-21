@@ -9,13 +9,15 @@ export interface SnapshotLoader {
 }
 
 /**
- * A loader for one page. Each URL is read once: a second call for the same URL gets the first
- * request, still in flight or already settled. Islands on one page share one loader.
+ * A loader for one visit. Each URL is read once: a second call for the same URL gets the first
+ * request, still in flight or already settled. The state follows the URL asked for last, so a switch
+ * to another URL (the Demo snapshot, say) shows that one, and a slower earlier read cannot replace it.
  */
 export function createSnapshotLoader(fetchText: TextFetcher): SnapshotLoader {
 	let state: SnapshotState = LOADING
 	const requests = new Map<string, Promise<SnapshotState>>()
 	const listeners = new Set<() => void>()
+	let latest: string | null = null
 
 	function publish(next: SnapshotState): void {
 		state = next
@@ -32,13 +34,15 @@ export function createSnapshotLoader(fetchText: TextFetcher): SnapshotLoader {
 		},
 		load(url) {
 			const existing = requests.get(url)
-			if (existing) return existing
-			const request = fetchSnapshot(url, fetchText).then((next) => {
-				publish(next)
+			if (url === latest && existing) return existing
+			latest = url
+			if (state !== LOADING) publish(LOADING)
+			const request = existing ?? fetchSnapshot(url, fetchText)
+			requests.set(url, request)
+			return request.then((next) => {
+				if (latest === url) publish(next)
 				return next
 			})
-			requests.set(url, request)
-			return request
 		},
 	}
 }

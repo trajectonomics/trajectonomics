@@ -13,7 +13,7 @@ export function isBrowserFile(file: string): boolean {
 /** A money string becomes a number only in `toChartNumber`, never in a component. */
 export const MONEY_RULE: LineRule = {
 	rule: "money/number-conversion",
-	pattern: /\b(Number|parseFloat|parseInt)\(|\.toFixed\(|\bIntl\.NumberFormat\b/,
+	pattern: /\b(Number|parseFloat|parseInt|BigInt)\s*\(|\.toFixed\(|\bIntl\.NumberFormat\b/,
 	message:
 		"A money string is shown as the CLI printed it. A number for a chart mark comes from `toChartNumber` in `src/lib/chart/`.",
 }
@@ -21,7 +21,7 @@ export const MONEY_RULE: LineRule = {
 /** React and Astro belong to apps/docs (React, for Fumadocs) and never to the Dashboard. */
 export const FRAMEWORK_RULE: LineRule = {
 	rule: "framework/react-or-astro",
-	pattern: /["'](react|react-dom)(\/[^"']*)?["']|["']@astrojs\/[^"']*["']/,
+	pattern: /["'](react|react-dom|astro)([/:][^"']*)?["']|["']@astrojs\/[^"']*["']/,
 	message:
 		"The Dashboard is Svelte 5. Write a Svelte component; React and Astro are not imported here.",
 }
@@ -41,26 +41,26 @@ const OUTSIDE_CLIENT = (file: string) => !isBrowserFile(file)
 export const BROWSER_RULES: readonly LineRule[] = [
 	{
 		rule: "browser/fetch",
-		pattern: /\bfetch\(/,
+		pattern: /\bfetch\s*\(/,
 		message: "Read data through `src/client/snapshot.svelte.ts`. A component never calls `fetch`.",
 		applies: OUTSIDE_CLIENT,
 	},
 	{
 		rule: "browser/local-storage",
-		pattern: /\blocalStorage\b/,
+		pattern: /\b(localStorage|sessionStorage)\b/,
 		message: "Settings are stored by `src/client/preferences.svelte.ts`, not by a component.",
 		applies: OUTSIDE_CLIENT,
 	},
 	{
 		rule: "browser/window",
-		pattern: /\bwindow\./,
+		pattern: /\bwindow\??\.|\bglobalThis\b|\bmatchMedia\s*\(/,
 		message:
 			"Read the address through `src/client/location.svelte.ts`. A component never reads `window`.",
 		applies: OUTSIDE_CLIENT,
 	},
 	{
 		rule: "browser/document",
-		pattern: /\bdocument\./,
+		pattern: /\bdocument\??\./,
 		message:
 			"Touch the page only from `src/client/`. A component renders markup, it does not touch `document`.",
 		applies: OUTSIDE_CLIENT,

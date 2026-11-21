@@ -2,3 +2,4 @@
 export { checkComponent, MAX_COMPONENT_LINES } from "./check"
 export { forbiddenDependencies, type PackageManifest } from "./dependencies"
 export type { GuardIssue } from "./line-rule"
+export { checkModule } from "./module"

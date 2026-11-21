@@ -88,7 +88,7 @@ describe("fetchSnapshot", () => {
 })
 
 describe("createSnapshotLoader", () => {
-	test("reads one URL once, however many islands ask for it", async () => {
+	test("reads one URL once, however many components ask for it", async () => {
 		let calls = 0
 		const loader = createSnapshotLoader(async () => {
 			calls += 1
