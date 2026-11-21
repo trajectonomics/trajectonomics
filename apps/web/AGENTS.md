@@ -11,7 +11,6 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
 5. The contract in `src/lib/contract/` follows `traj schema <leaf> --json`. Take every field from that output, never from memory. A change in the CLI's output must fail `scripts/contract.test.ts`, which builds a ledger with the workspace `traj` binary.
 6. Done means `bun run check` passes in `apps/web`: Biome lint with zero warnings, `svelte-check` and the strict typecheck with warnings as errors, the tests (including the Svelte guard) and the Vite build. Do not loosen `tsconfig.base.json`, `biome.json` or the shared config to make an error go away.
 7. Keep to the vocabulary in [GLOSSARY.md](GLOSSARY.md). A Snapshot is not a "backend response", and a Read is not a "fetch".
-8. Subagents do the work on a work model: **`deepseek-v4.1-flash`** (Pi). The expensive models (`claude-*`, `gemini-*`) are for consultation and review only.
 
 ## Svelte 5: how to write a component
 
@@ -33,7 +32,7 @@ The Svelte 5 docs are the reference, and they are current: read them, not your m
 - **Runes mode** (`vite.config.ts`, `compilerOptions.runes`). A Svelte 4 form fails the compile, in `svelte-check` or `vite build`: `Cannot use export let in runes mode — use $props() instead`. Write the form it names.
 - **`svelte-check --fail-on-warnings`** (`bun run typecheck`). A deprecated form that still compiles, such as `<slot>` or `on:click`, fails here as a warning, and so does a symbol that is declared and not used, which Biome cannot see in markup.
 - **The Svelte guard** (`bun test`, `scripts/svelte-guard.test.ts`). It prints `file:line [rule] message`, for example `Money.svelte:2 [money/number-conversion] …`. The message names the Svelte 5 form to write. The rules are in `src/lib/guard/`, one file per kind of rule, each with a bad and a good example in `rules.test.ts`.
-- **The dependency guard** (`scripts/dependency-guard.test.ts`) is a `test.todo` until the last React page is ported. Then it becomes a test that the package lists no `react`, `react-dom`, `astro` or `@astrojs/*`.
+- **The dependency guard** (`scripts/dependency-guard.test.ts`) fails when the package lists `react`, `react-dom`, `astro` or any `@astrojs/*` package. React is allowed in this repository only in `apps/docs`, for Fumadocs.
 - **Biome** lints and formats `.svelte` scripts and checks the file length of `.ts` files. It does not check the markup, and the unused-symbol rules are off for `.svelte` (see above). A markup problem is caught by the browser tests, not by Biome.
 
 Biome's formatter moves the body of a `<script>` to column zero. Write it that way, as `bun run format` leaves it.
