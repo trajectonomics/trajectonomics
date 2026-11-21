@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { renderToStaticMarkup } from "react-dom/server"
+import { render } from "svelte/server"
 import type { ProjectionCompare, ProjectionRun, Read } from "../../lib/contract"
 import { SIDE_A, SIDE_B } from "../../lib/view/compare/fixtures.test-support"
 import {
@@ -10,7 +10,7 @@ import {
 	ok,
 	projectionRun,
 } from "../../lib/view/compare/projection.test-support"
-import { ComparePanel } from "./ComparePanel"
+import ComparePanel from "./ComparePanel.svelte"
 
 const compare: Read<ProjectionCompare> = ok(compareOf(SIDE_A, SIDE_B, DEFAULT_DELTAS))
 
@@ -36,48 +36,48 @@ function panel(
 	read: Read<ProjectionCompare> | null = compare,
 	terms: "nominal" | "real" = "nominal",
 ): string {
-	return renderToStaticMarkup(
-		<ComparePanel compare={read} projections={projections} terms={terms} onTerms={() => {}} />,
-	)
+	return render(ComparePanel, {
+		props: { compare: read, projections, terms, onTerms: () => {} },
+	}).body
 }
 
 describe("ComparePanel", () => {
 	test("with no comparison, it says a comparison needs two Scenarios and shows the flag", () => {
-		const html = panel({}, null)
-		expect(html).toContain("A comparison needs two Scenarios")
-		expect(html).toContain("--compare A B")
+		const body = panel({}, null)
+		expect(body).toContain("A comparison needs two Scenarios")
+		expect(body).toContain("--compare A B")
 	})
 
 	test("A is solid and B dashed, and the difference column is labelled B minus A", () => {
-		const html = panel({ base: ok(runA), "retire-early": ok(runB) })
-		expect(html).toContain("A, solid")
-		expect(html).toContain("B, dashed")
-		expect(html).toContain("Difference, B minus A")
-		expect(html).toContain("Content hash eba036341234")
-		expect(html).toContain('role="img"')
+		const body = panel({ base: ok(runA), "retire-early": ok(runB) })
+		expect(body).toContain("A, solid")
+		expect(body).toContain("B, dashed")
+		expect(body).toContain("Difference, B minus A")
+		expect(body).toContain("Content hash eba036341234")
+		expect(body).toContain('role="img"')
 	})
 
 	test("the figures are the CLI's: a zero delta reads No change and an unstated one is a dash", () => {
-		const html = panel({ base: ok(runA), "retire-early": ok(runB) })
-		expect(html).toContain("No change")
-		expect(html).toContain("One FI date is not reachable")
-		expect(html).toContain("Binding: insufficientMoney")
-		expect(html).toContain("Not reached")
+		const body = panel({ base: ok(runA), "retire-early": ok(runB) })
+		expect(body).toContain("No change")
+		expect(body).toContain("One FI date is not reachable")
+		expect(body).toContain("Binding: insufficientMoney")
+		expect(body).toContain("Not reached")
 	})
 
 	test("a failed Projection Read leaves the chart out, says why, and keeps the table", () => {
-		const html = panel({ base: ok(runA), "retire-early": failed("The Scenario is empty.") })
-		expect(html).toContain("The chart is not drawn")
-		expect(html).toContain(
+		const body = panel({ base: ok(runA), "retire-early": failed("The Scenario is empty.") })
+		expect(body).toContain("The chart is not drawn")
+		expect(body).toContain(
 			"The Projection of retire-early could not be read: The Scenario is empty.",
 		)
-		expect(html).not.toContain('role="img"')
-		expect(html).toContain("Difference, B minus A")
+		expect(body).not.toContain('role="img"')
+		expect(body).toContain("Difference, B minus A")
 	})
 
 	test("a failed compare Read says the comparison could not be read", () => {
-		const html = panel({}, failed("No such Scenario."))
-		expect(html).toContain("The comparison could not be read")
-		expect(html).toContain("No such Scenario.")
+		const body = panel({}, failed("No such Scenario."))
+		expect(body).toContain("The comparison could not be read")
+		expect(body).toContain("No such Scenario.")
 	})
 })
