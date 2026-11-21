@@ -1,8 +1,10 @@
 ---
-status: accepted
+status: superseded
 ---
 
 # Docs Portal pages are authored here; Docs Sync only proposes edits
+
+> **Superseded** by the monorepo migration ([`docs/monorepo-migration.md`](../../../../docs/monorepo-migration.md) §2d). Docs Sync, the sync manifest and the upstream dispatch are removed; the Docs Portal is built from the source in the same repository.
 
 The Docs Portal's pages are written and reviewed in this repository for two audiences, the Operator tab and the Builder tab. They are not mirrors of Upstream Package READMEs or ADRs. Those are written for contributors ("Releasing", "Adding a command"), so mirroring them would publish internal material to Operators and tie this site's build to five other repositories. Upstream ADRs are linked on GitHub, never copied.
 

@@ -6,7 +6,7 @@ import { checkHeaderTabs } from "./header-tabs"
 const OPERATOR = TABS[0]
 const BUILDER = TABS[1]
 const OPERATOR_PAGE = "docs/cli/index.html"
-const BUILDER_PAGE = "docs/developers/index.html"
+const CONTRIBUTE_PAGE = "docs/contribute/index.html"
 
 /** A Tab link, marked as the current page only when it is `current`. */
 function tabLink(tab: TabDefinition, current: TabDefinition | undefined): string {
@@ -28,7 +28,7 @@ function codesOf(files: readonly BuiltFile[]): readonly string[] {
 
 describe("header Tabs of a built Tab page", () => {
 	test("both Tab pages with both Tabs in the header report no failure", () => {
-		expect(codesOf([page(OPERATOR_PAGE, OPERATOR), page(BUILDER_PAGE, BUILDER)])).toEqual([])
+		expect(codesOf([page(OPERATOR_PAGE, OPERATOR), page(CONTRIBUTE_PAGE, BUILDER)])).toEqual([])
 	})
 
 	test("a header without a link to a Tab is reported as HEADER_TAB_LINK_MISSING", () => {

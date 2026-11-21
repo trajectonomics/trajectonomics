@@ -17,8 +17,9 @@ never published to npm.
 
 - Static [Astro](https://astro.build) site with [Fumadocs](https://fumadocs.dev) (React islands) and the built-in
   local static search (no external search service, no API key). Pages are authored in `src/content/docs/`.
-- Two Tabs: the **Operator tab** (`/docs/cli/`, CLI and quickstart) and the **Builder tab**
-  (`/docs/developers/`, build on Trajectonomics). `/docs/` is a Landing Page with one entry for each.
+- Two Tabs: the **Operator tab** (`/docs/cli/`, CLI and quickstart) and the **Contribute tab**
+  (`/docs/contribute/`, how to help make the tax rules right). `/docs/` is a Landing Page with one entry for each.
+  Old `/docs/developers/` URLs answer 301 redirects into the Contribute tab (`src/lib/worker/handler.ts`).
 - Served by one Cloudflare Worker, `docs`, from one [`wrangler.jsonc`](./wrangler.jsonc): a merge to `main` deploys
   production ([ADR 0007](./docs/adr/0007-main-deploys-production.md)). Deployed by Cloudflare Workers Builds, whose
   build command runs `bun run check` ([ADR 0003](./docs/adr/0003-direct-route-and-workers-builds-deploy.md)), so a

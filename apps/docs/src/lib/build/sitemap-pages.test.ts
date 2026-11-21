@@ -32,7 +32,7 @@ function sitemap(locations: readonly string[]): BuiltFile {
 const PAGES_A_READER_CAN_OPEN: readonly BuiltFile[] = [
 	...PAGES.map(page),
 	alias("docs/operators/index.html", "/docs/cli/"),
-	alias("docs/builders/index.html", "/docs/developers/"),
+	alias("docs/builders/index.html", "/docs/contribute/"),
 	page("docs/404.html"),
 ]
 

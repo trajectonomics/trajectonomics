@@ -1,8 +1,10 @@
 ---
-status: accepted
+status: superseded
 ---
 
 # The `sim-core` example is executed in the deploy gate
+
+> **Superseded** by the monorepo migration ([`docs/monorepo-migration.md`](../../../../docs/monorepo-migration.md) §2d). Docs Sync, the sync manifest and the upstream dispatch are removed; the Docs Portal is built from the source in the same repository.
 
 The `sim-core` page on the Builder tab publishes the one TypeScript program the Docs Portal offers for
 `@trajectonomics/sim`, and nothing in this repository ever ran it: the fence called

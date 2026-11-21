@@ -7,7 +7,6 @@ import {
 import { CONTENT_ROOT, type ContentFile } from "./content-pages"
 
 const SCENARIO_PAGE = "cli/commands/scenario.mdx"
-const SIM_CORE_PAGE = "developers/sim-core/index.mdx"
 
 async function readContentTree(): Promise<ContentFile[]> {
 	const files: ContentFile[] = []
@@ -45,10 +44,6 @@ function scenarioPage(document: unknown): ContentFile[] {
 	return [{ path: SCENARIO_PAGE, content: `# scenario\n\n\`\`\`json\n${block}\n\`\`\`\n` }]
 }
 
-function builderPage(program: string): ContentFile[] {
-	return [{ path: SIM_CORE_PAGE, content: `# sim-core\n\n\`\`\`ts\n${program}\n\`\`\`\n` }]
-}
-
 function rulesOf(files: readonly ContentFile[]): readonly ContentExamplesRule[] {
 	return checkContentExamples(files).map((problem) => problem.rule)
 }
@@ -62,7 +57,7 @@ function detailsOf(files: readonly ContentFile[]): readonly string[] {
 }
 
 describe("the authored content's examples", () => {
-	test("the Scenario page's document and the Builder example are both complete", () => {
+	test("the Scenario page's document is complete", () => {
 		expect(checkContentExamples(tree)).toEqual([])
 	})
 })
@@ -162,54 +157,5 @@ describe("the Scenario document", () => {
 
 	test("is accepted when every route and target names a declared Account", () => {
 		expect(rulesOf(scenarioPage(DOCUMENT))).toEqual([])
-	})
-})
-
-describe("the Builder example", () => {
-	test("is reported when an argument is an identifier the fence does not declare", () => {
-		const program = [
-			"const scenario = { schemaVersion: 1 }",
-			"const timeline = { start: '2026-01-01' }",
-			"const result = project(baseline, scenario, timeline)",
-		].join("\n")
-		expect(rulesOf(builderPage(program))).toEqual(["sim-core-example-undefined-input"])
-	})
-
-	test("is accepted when every argument is an inline literal", () => {
-		const program = "const result = project({ schemaVersion: 1 }, { schemaVersion: 1 }, {})"
-		expect(rulesOf(builderPage(program))).toEqual([])
-	})
-
-	test("is accepted when an inline literal holds a comma inside a string", () => {
-		const program = 'const result = project({ currency: "THB", schemaVersion: 1 }, {}, {})'
-		expect(rulesOf(builderPage(program))).toEqual([])
-	})
-
-	test("is accepted when every argument is declared in the same fence", () => {
-		const program = [
-			"const baseline = { schemaVersion: 1 }",
-			"let scenario = { schemaVersion: 1 }",
-			"var timeline = { start: '2026-01-01' }",
-			"const result = project(baseline, scenario, timeline)",
-		].join("\n")
-		expect(rulesOf(builderPage(program))).toEqual([])
-	})
-
-	test("is reported once for each undefined argument of one call", () => {
-		const program = "const result = project(baseline, { schemaVersion: 1 }, horizon)"
-		expect(rulesOf(builderPage(program))).toEqual([
-			"sim-core-example-undefined-input",
-			"sim-core-example-undefined-input",
-		])
-	})
-
-	test("is not checked outside the Builder tab", () => {
-		const operatorPage: ContentFile[] = [
-			{
-				path: "cli/commands/account.mdx",
-				content: "```ts\nproject(baseline, scenario, timeline)\n```\n",
-			},
-		]
-		expect(rulesOf(operatorPage)).toEqual([])
 	})
 })

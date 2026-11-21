@@ -1,0 +1,39 @@
+name: "Tax: new tax year"
+description: Ask for, or offer, the figures for a new tax year.
+title: "Tax: new tax year: "
+labels: ["tax"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A new tax year changes figures and, for Thailand, the year wiring too. Read walkthrough A in the
+        tax contributor guide. The official source is required for every figure you list.
+  - type: input
+    id: jurisdiction
+    attributes:
+      label: Jurisdiction and year
+      placeholder: "Thailand 2027, or United States 2027"
+    validations:
+      required: true
+  - type: input
+    id: official-source
+    attributes:
+      label: Official source (URL)
+      description: The official document that states the new figures, with the page or section.
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: figures
+    attributes:
+      label: Figures that change
+      description: One line per figure, with the parameter path and the new value as the document states it.
+    validations:
+      required: true
+  - type: input
+    id: date-read
+    attributes:
+      label: Date you read the source
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true

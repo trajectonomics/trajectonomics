@@ -30,7 +30,7 @@ function operatorPage(content: string): readonly string[] {
 }
 
 function builderPage(content: string): readonly string[] {
-	return rulesOf("developers/sim-core/example.mdx", content)
+	return rulesOf("contribute/sim-core/example.mdx", content)
 }
 
 describe("clock claims in the Docs Portal content", () => {
@@ -74,7 +74,7 @@ describe("a page that states which dates the caller supplies", () => {
 		).toEqual([])
 	})
 
-	test("is accepted in the Builder tab when a package reads no clock", () => {
+	test("is accepted in the Contribute tab when a package reads no clock", () => {
 		expect(builderPage("The package generates no ids and reads no clock.")).toEqual([])
 	})
 

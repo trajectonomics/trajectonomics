@@ -4,8 +4,8 @@ import { checkLandingPage, LANDING_PAGE_FILE } from "./landing-page"
 import { SEARCH_INDEX_FILE } from "./search-index"
 
 const OPERATOR_LINK = '<a href="/docs/cli/">For Operators: install and run the CLI</a>'
-const BUILDER_LINK =
-	'<a href="/docs/developers/">For Builders: build on Trajectonomics packages</a>'
+const CONTRIBUTE_LINK =
+	'<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>'
 
 function landingPage(body: string, head = ""): BuiltFile {
 	return {
@@ -28,18 +28,16 @@ function searchIndex(pageIds: readonly string[]): BuiltFile {
 	}
 }
 
-const RELEASE_LINE = "Docs synced from traj v0.2.0"
-
-/** The Landing Page body around its Tab links, with the release line the build requires. */
+/** The Landing Page body around its Tab links. */
 function landingBody(links: string): string {
-	return `<main>${links}<p>${RELEASE_LINE}</p></main>`
+	return `<main>${links}</main>`
 }
 
 function codesOf(files: readonly BuiltFile[]): readonly string[] {
-	return checkLandingPage(files, RELEASE_LINE).map((failure) => failure.code)
+	return checkLandingPage(files).map((failure) => failure.code)
 }
 
-const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${BUILDER_LINK}`)
+const TWO_ENTRIES = landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}`)
 
 describe("the built Landing Page", () => {
 	test("a page with one link to each Tab and no redirect reports no failure", () => {
@@ -59,9 +57,9 @@ describe("the built Landing Page", () => {
 	test("a page with a third link into a Tab is reported as LANDING_PAGE_LINKS", () => {
 		const extra = '<a href="/docs/cli/installation/">Installation</a>'
 
-		expect(codesOf([landingPage(landingBody(`${OPERATOR_LINK}${BUILDER_LINK}${extra}`))])).toEqual([
-			"LANDING_PAGE_LINKS",
-		])
+		expect(
+			codesOf([landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}${extra}`))]),
+		).toEqual(["LANDING_PAGE_LINKS"])
 	})
 
 	test("the same Tab linked twice is reported as LANDING_PAGE_LINKS", () => {
@@ -74,18 +72,6 @@ describe("the built Landing Page", () => {
 		const title = '<a href="/docs/">Trajectonomics Docs</a>'
 
 		expect(codesOf([landingPage(`<header>${title}</header>${TWO_ENTRIES}`)])).toEqual([])
-	})
-
-	test("a page that does not state the release line is reported as LANDING_PAGE_RELEASE_LINE", () => {
-		expect(codesOf([landingPage(`<main>${OPERATOR_LINK}${BUILDER_LINK}</main>`)])).toEqual([
-			"LANDING_PAGE_RELEASE_LINE",
-		])
-	})
-
-	test("a page that states another release is reported as LANDING_PAGE_RELEASE_LINE", () => {
-		const stale = `<main>${OPERATOR_LINK}${BUILDER_LINK}<p>Docs synced from traj v0.1.0</p></main>`
-
-		expect(codesOf([landingPage(stale)])).toEqual(["LANDING_PAGE_RELEASE_LINE"])
 	})
 
 	test("a search index with an entry for /docs/ is reported as LANDING_PAGE_INDEXED", () => {

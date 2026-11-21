@@ -6,7 +6,7 @@ import { checkSearchIndexPages } from "./search-index-pages"
 const CONTENT_PAGES = [
 	"docs/cli/index.html",
 	"docs/cli/commands/index.html",
-	"docs/developers/index.html",
+	"docs/contribute/index.html",
 ]
 
 function page(path: string): BuiltFile {
@@ -30,7 +30,7 @@ function indexedAt(pageIds: readonly string[]): BuiltFile {
 	)
 }
 
-const INDEXED_PAGES = ["/docs/cli", "/docs/cli/commands", "/docs/developers"]
+const INDEXED_PAGES = ["/docs/cli", "/docs/cli/commands", "/docs/contribute"]
 
 describe("the search index's coverage of the built content pages", () => {
 	test("an entry for every content page reports no failure", () => {
@@ -40,7 +40,7 @@ describe("the search index's coverage of the built content pages", () => {
 	})
 
 	test("a built content page with no page entry is reported as SEARCH_INDEX_PAGE_MISSING", () => {
-		const files = [...CONTENT_PAGES.map(page), indexedAt(["/docs/cli", "/docs/developers"])]
+		const files = [...CONTENT_PAGES.map(page), indexedAt(["/docs/cli", "/docs/contribute"])]
 
 		const failures = checkSearchIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["SEARCH_INDEX_PAGE_MISSING"])
@@ -50,7 +50,7 @@ describe("the search index's coverage of the built content pages", () => {
 	test("the page list is read from the build, so a new content page must be indexed", () => {
 		const files = [
 			...CONTENT_PAGES.map(page),
-			page("docs/developers/sim-core/index.html"),
+			page("docs/contribute/sim-core/index.html"),
 			indexedAt(INDEXED_PAGES),
 		]
 

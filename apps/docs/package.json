@@ -25,7 +25,7 @@
 		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run verify:build",
 		"check:command-reference": "bun scripts/check-command-reference.ts",
 		"verify:build": "bun scripts/verify-build.ts",
-		"sync:release": "bun scripts/sync-upstream-release.ts"
+		"sync:tax-guide": "bun scripts/sync-tax-guide.ts"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
@@ -33,7 +33,6 @@
 		"@biomejs/biome": "2.6.3",
 		"@playwright/test": "1.65.0",
 		"@tailwindcss/vite": "^4.3.5",
-		"@trajectonomics/sim": "0.1.0",
 		"@types/bun": "^1.4.4",
 		"@types/mdx": "^2.0.14",
 		"@types/react": "^19.3.0",

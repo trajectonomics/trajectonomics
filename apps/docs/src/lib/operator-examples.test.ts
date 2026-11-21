@@ -83,7 +83,7 @@ describe("an --opening example in the Operator tab", () => {
 	})
 
 	test("is not read from a page outside the Operator tab", () => {
-		expect(problemsOf("developers/example.mdx", OPENING)).toEqual([])
+		expect(problemsOf("contribute/example.mdx", OPENING)).toEqual([])
 	})
 
 	test("is not read from prose, which the rule cannot copy from", () => {

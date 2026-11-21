@@ -4,7 +4,7 @@ import { anchors, elementContent, linkName, visibleText } from "./html"
 const PAGE = [
 	'<header id="nd-subnav" class="x">',
 	'<a href="/docs/cli/" aria-current="page">CLI &amp; Quickstart</a>',
-	'<a href="/docs/developers/"><span>Build</span> on Trajectonomics</a>',
+	'<a href="/docs/contribute/">Contribute</a>',
 	"</header>",
 	'<main><a href="/docs/other/">Other</a></main>',
 ].join("")
@@ -25,7 +25,7 @@ describe("the element of an HTML fragment found by id", () => {
 	test("returns the content of the element with the id, without the rest of the page", () => {
 		expect(elementContent(PAGE, "nd-subnav")).toBe(
 			'<a href="/docs/cli/" aria-current="page">CLI &amp; Quickstart</a>' +
-				'<a href="/docs/developers/"><span>Build</span> on Trajectonomics</a>',
+				'<a href="/docs/contribute/">Contribute</a>',
 		)
 	})
 
@@ -57,10 +57,10 @@ describe("the links of an HTML fragment", () => {
 				text: "CLI & Quickstart",
 			},
 			{
-				href: "/docs/developers/",
+				href: "/docs/contribute/",
 				ariaCurrent: undefined,
 				ariaLabel: undefined,
-				text: "Build on Trajectonomics",
+				text: "Contribute",
 			},
 			{
 				href: "/docs/other/",

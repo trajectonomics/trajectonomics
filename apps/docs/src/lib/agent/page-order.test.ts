@@ -25,8 +25,8 @@ const TREE: Root = {
 		{ type: "page", name: "Source", url: "https://github.com/trajectonomics/docs", external: true },
 		{
 			type: "folder",
-			name: "Build on Trajectonomics",
-			children: [{ type: "page", name: "Overview", url: "/docs/developers" }],
+			name: "Contribute",
+			children: [{ type: "page", name: "Get started", url: "/docs/contribute" }],
 		},
 	],
 }
@@ -38,7 +38,7 @@ describe("the order the Docs sidebar presents its pages in", () => {
 			"/docs/cli/installation",
 			"/docs/cli/commands",
 			"/docs/cli/commands/tx",
-			"/docs/developers",
+			"/docs/contribute",
 		])
 	})
 

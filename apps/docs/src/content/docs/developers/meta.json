@@ -1,5 +1,0 @@
-{
-	"title": "Build on Trajectonomics",
-	"root": true,
-	"pages": ["index", "sim-core", "ledger-core", "tax-core", "design-system"]
-}

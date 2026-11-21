@@ -53,8 +53,8 @@ const PAGES: readonly CuratedPage[] = [
 	},
 	{ path: "/docs/cli/", name: "cli", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
 	{
-		path: "/docs/developers/",
-		name: "developers",
+		path: "/docs/contribute/",
+		name: "contribute",
 		widthsPx: TEST_WIDTHS_PX,
 		drive: null,
 		fullPage: true,

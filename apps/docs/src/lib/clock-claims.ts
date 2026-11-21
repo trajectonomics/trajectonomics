@@ -1,5 +1,5 @@
 import type { ContentFile } from "./content-pages"
-import { OPERATOR_TAB_CONTENT } from "./release-truth"
+import { OPERATOR_TAB_CONTENT } from "./tabs"
 
 /** One rule of the clock-claim check; one value per way a page can make the claim. */
 export type ClockClaimRule =

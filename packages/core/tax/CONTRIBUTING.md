@@ -1,0 +1,209 @@
+# Contributing tax rules
+
+This guide is for people who know a country's or a state's tax rules and want the code to follow
+them. You do not need to know the rest of the codebase.
+
+The package is `@trajectonomics/tax`. It is published as `@trajectonomics/core/tax`, with the
+Thai and US entry points at `@trajectonomics/core/tax/th` and `@trajectonomics/core/tax/us`. Paths
+in this guide are relative to this folder, `packages/core/tax`, unless they start with `packages/`.
+
+## Who this is for
+
+- Accountants and tax practitioners who can read a statute, a rate schedule or a form instruction.
+- Developers who know one of the jurisdictions well enough to check a figure against its source.
+
+The code is pure. It does no I/O, reads no clock and uses no randomness. A rule is data plus a few
+pure functions. You change the data and the functions that read it, and every change is tested
+against a figure you can point to.
+
+## What you can contribute
+
+From the easiest to the hardest:
+
+1. **Report a wrong figure.** Open the **Tax: wrong figure** issue. It asks for the official source
+   URL, and the issue gets the `tax` label.
+2. **Update a figure for a new tax year.** Read walkthrough A first. Today the Thai and US engines
+   only accept 2026, so a new year also needs the year wiring.
+3. **Add worked examples** from official documents to the test corpus. A corpus case is a literal
+   input, literal expected figures and a comment that names its source.
+4. **Add a US state.** See [Adding a US state](#adding-a-us-state).
+5. **Add a new country.** Read walkthrough B.
+
+## The source rule
+
+Every statutory figure cites an official document.
+
+**Thailand.** [`references/th/SOURCES.md`](./references/th/SOURCES.md) has one row for each parameter
+path in `TH_2026_PARAMETERS`. A row names the parameter path, the figure as the document prints it,
+the citation, the URL that was read, the date it was read and a result:
+
+- `match`: the document states the figure and the engine applies it.
+- `derived`: the figure is hand arithmetic over documented figures. The row shows the working.
+- `reported`: only a secondary source states the 2026 figure. Enough for a corpus case, never for a
+  `match`.
+- `unsourced`: neither the instrument nor a secondary source was read. No corpus case asserts it.
+- `fixed`: the engine was corrected from the document. Written only when the owner has authorised the change.
+
+`bun run check:th-sources` fails when a parameter path has no row, when a row names no parameter,
+when a row is malformed, or when a corpus file imports something other than `bun:test`, the corpus
+harness or the money module.
+
+**United States.** [`references/SOURCES.md`](./references/SOURCES.md) has one table per verification
+level. Each row names the state, the document, the date read and the result. A state's level is
+`official`, `partial`, `reported` or `unconfirmed`. Nothing runs a script over this
+file. `src/us/tests/state-parameters.test.ts` fails when the tally of levels in the file drifts from
+the parameter tables, and the reviewer checks each row.
+
+**Raw documents are not committed.** `references/*` and `references/th/*` are git-ignored, except the
+two manifests. Download a document from the URL in its row, and keep it on your machine. A reviewer
+downloads the same URL to check the figure.
+
+## How the code is organised
+
+**Parameters are data; stages are logic.** Statutory amounts, rates, allowances and brackets are
+typed constants. Thailand's are in `src/th/parameters.ts`, with the brackets in
+`src/th/parameters-brackets.ts` and the special regimes in `src/th/parameters-special.ts`. The US
+federal constants are in `src/us/parameters/`, and each state's table is in
+`src/us/state/parameters/`. The stages are in `src/th/stages/`, `src/us/stages/` and `src/us/state/`.
+A stage reads its numbers from a parameter table. It never holds a statutory number of its own.
+
+**One rule per file.** Each statutory rule is a pure function in its own file, under 100 lines. Each
+stage file has one test file of its own under 200 lines, so the test for a rule is easy to find.
+
+**Know each stage's units before you change it.** The public API takes major units, such as baht or
+dollars. Arithmetic that must not drift, such as the bracket slices in `src/th/stages/bracket-eval.ts`,
+converts to integer satang or cents with `toMinorUnits` and back with `fromMinorUnits`. Many Thai
+stages instead work in whole-baht major units. Every stage says which in a `Units:` line in its doc
+comment, for example "THB major units" or "inputs and outputs in THB major units; arithmetic in integer
+satang". Read that line first, and keep it true when you change the stage. See
+[ADR 0002](./docs/adr/0002-minor-unit-integer-arithmetic-and-statutory-clamping.md).
+
+**Statutory rounding.** Where a statute rounds down in whole baht, a stage that works in baht rounds
+down with `Math.floor`. The Section 40(1) and (2) expense is one example, in
+`src/th/stages/expenses-40-1-2.ts`.
+
+**No raw strings in stages.** Diagnostic paths and breakdown keys are typed enums, such as
+`ThTaxField` and `ThBracketField`. Currency comes from the parameters, never from a literal. See
+[ADR 0003](./docs/adr/0003-typed-fields-stage-isolation-and-statutory-standards.md).
+
+**Jurisdictions are subpaths.** Each jurisdiction has its own entry point, so a caller imports only
+the rules it needs. See [ADR 0001](./docs/adr/0001-per-jurisdiction-subpath-exports-and-statutory-inputs.md).
+
+**Money primitives come from the shared package.** The conversions delegate to
+`@trajectonomics/money`. See [ADR 0004](./docs/adr/0004-money-primitives-from-the-shared-package.md).
+
+The Thai pipeline is `runThTaxPipeline` in `src/th/stages/pipeline.ts`. It resolves the special
+regimes, then assessable income, expenses, allowances and brackets, then the minimum gross tax, and
+last the combined liability.
+
+## Walkthrough A: a new Thai tax year, end to end
+
+Use this when a Thai figure changes for a new year. The example year is 2027.
+
+1. **Find the instrument that moved the figure.** Start from the Revenue Code section in the Revenue
+   Department's English publication, at `https://www.rd.go.th/english/37749.html`. The English text
+   prints the Code as enacted, so find the Amendment Act, Royal Decree, Ministerial Regulation or
+   Departmental Notification that changed the figure. The consolidated Code at
+   `https://www.rd.go.th/5937.html` shows the current wording. Do not cite the personal income tax
+   overview at `https://www.rd.go.th/english/6045.html` as a source of record. It prints 2013 and 2014
+   figures.
+2. **Keep the document and write the row.** Save the document in `references/th/`, which is
+   git-ignored. Add a row to `references/th/SOURCES.md` for each changed parameter path, with the
+   result word.
+3. **Change the parameters, and the year wiring.** This is the step the code does not yet support.
+   `TH_2026_PARAMETERS` is the only parameter set. `taxYear` is typed as the literal `2026` in
+   `src/th/parameters-types.ts`, and `validateYear` in `src/th/stages/pipeline.ts` rejects every other
+   year. A 2027 set needs its own constant, a widened `taxYear` type, and a way to select the set by
+   year. `check:th-sources` also compares the rows with `TH_2026_PARAMETERS` only, so it needs the new
+   set wired in too. Review this step as a change to a stage, not as a data edit.
+4. **Add a corpus case.** Put it in the `src/th/tests/corpus-*.test.ts` file for the rule. Use literal
+   expected baht figures and a comment that names the basis (`documented`, `derived` or `reported`) and
+   the section. A corpus file imports only `bun:test`, `./corpus-harness` and `../../core/money`.
+5. **Check it.** Run `bun run check:th-sources`, then the full check in [Checking your change](#checking-your-change).
+6. **Review it.** A reviewer re-reads each changed figure in its document. See [Review](#review).
+
+## Walkthrough B: a new country, from folder skeleton to export
+
+Use this for a country that has no folder yet. The example code is `xx`, and the folder is `src/xx/`.
+
+1. **Create the skeleton.** Copy the shape of `src/th/`: `parameters.ts` with a `taxYear` and a
+   `currency`, `types.ts`, `calculate.ts` for the entry function, `system.ts` for the `TaxSystem`
+   value, `index.ts` for the public exports, and `stages/` and `tests/` folders. Keep `index.ts` to the
+   public API.
+2. **Add the currency if it is new.** `TaxSupportedCurrency` in `src/core/money/currency.ts` is
+   `"THB" | "USD"`. A new currency means extending that type and the currency tables that go with it.
+3. **Write the source manifest.** Create `references/xx/SOURCES.md` in the Thai format: one row per
+   parameter path, with a result word. No checker reads it yet. `check-th-sources.ts` is written for
+   Thailand, so a new country needs its own check, or a reviewer checks every row by hand. Say which in
+   the pull request.
+4. **Write the first source-backed test.** Put it in `src/xx/tests/`. Use literal expected figures from
+   the document, and name the document in a comment.
+5. **Cover your stages in the string check.** `scripts/check-no-hardcoded-strings.ts` scans only
+   `src/th/stages`, `src/us/stages` and `src/us/state`. Add your stage folder to `STAGES_DIRS`, or the
+   check does not cover it.
+6. **Export the subpath in the bundle.** The published package is built by `packages/core`, not by this
+   folder. Add an entry such as `"tax/xx/index": here("./tax/src/xx/index.ts")` to
+   `packages/core/tsdown.config.ts`. Add a `./tax/xx` entry to `packages/core/package.json`, with the
+   `import` and `require` types and default files, copied from the `./tax/th` entry. In this folder, add
+   `src/xx/index.ts` to the `entry` list in `tsdown.config.ts`, and a `./xx` entry to `exports` in
+   `package.json`, as `./th` and `./us` have.
+7. **Check it.** Run the tax checks and the core checks in [Checking your change](#checking-your-change).
+
+## Adding a US state
+
+1. Put the state's table in the file for its tax structure: `src/us/state/parameters/progressive/`
+   for a graduated schedule, or `src/us/state/parameters/flat/` for a flat rate. A state with no income
+   tax goes in `src/us/state/parameters/none.ts`.
+2. Set the table's `verification` level, and add a row to the table for that level in
+   `references/SOURCES.md`.
+3. Update the tally line in `references/SOURCES.md`, or `src/us/tests/state-parameters.test.ts` fails.
+4. Add a golden case in the matching `src/us/tests/state-golden*.test.ts` file.
+5. The README's state paragraph is prose. No script checks it, so update it when a state's treatment changes.
+
+## Checking your change
+
+Run the tax checks from the repository root:
+
+```bash
+bunx turbo run check --filter=@trajectonomics/tax
+```
+
+Or run them inside `packages/core/tax` with `bun run check`. The check runs these steps in order:
+`lint` (Biome, then the hardcoded-string check `check:strings`), `check:th-sources`, `typecheck`,
+`test` (with the 100% line-coverage floor), `build`, `check:readme` and `lint:package`.
+
+Run the core checks too when you change the bundle, its exports or the import rules:
+
+```bash
+bunx turbo run check --filter=@trajectonomics/core
+```
+
+What each failure means:
+
+| Step | Message | What it means | What to do |
+| --- | --- | --- | --- |
+| `lint` (Biome) | a formatting, import or style error | The file does not match the shared style | Run `bun run format`. |
+| `lint` (Biome) | a file or function is too long or too complex | A source file has over 100 lines, a test file over 200, or a function complexity over 10 | Split the file or the function. |
+| `lint` (`check:strings`) | Hardcoded diagnostic string, or Hardcoded 'THB' | A stage holds a raw field name or currency | Use the typed enum, or `parameters.currency`. |
+| `check:th-sources` | `SOURCES ...: missing-row` | A parameter path has no row | Add the row with its document. |
+| `check:th-sources` | `SOURCES ...: extra-row` | A row names no parameter | Remove the row, or add the parameter. |
+| `check:th-sources` | `MANIFEST ...` or `duplicate-row` | A row is malformed or repeated | Fix the row. |
+| `check:th-sources` | `CORPUS ...: forbidden import` | A corpus file imports something it may not | Import only the three allowed modules. |
+| `typecheck` | an error on an exported value | The build needs an explicit type on every export | Add the type. |
+| `test` | coverage below 100% | A source file has a line no test runs | Add a test for the line. |
+| `test` | a corpus or stage test fails | The engine and the case disagree | Read the document again before you change either side. |
+| `build` | tsdown error | The bundle does not build | Read the error. It is usually an export or a type. |
+| `check:readme` | an example fails, or its output differs | The README example no longer runs as written | Update the example and its output together. |
+| `check:readme` | a name is not exported | A backticked `Th`, `Us`, `TH_`, `US_`, `calculate`, `emit` or `Tax` name is not a public export | Export it, or stop naming it. |
+| `lint:package` | publint or attw error | The `exports` or the types in `package.json` are wrong | Fix the entry you added. |
+
+## Review
+
+- Write the title as a conventional commit with the `tax` scope: `feat(tax): ...` for a new year, state,
+  country or rule, and `fix(tax): ...` for a corrected figure or a bug. Release versions are computed
+  from commit messages, so the title matters.
+- Do not edit `version` in `package.json`. The release process sets it.
+- Name the official document in the pull request for each figure that changed: the URL, the page or
+  section, and the date you read it.
+- A reviewer re-checks every changed figure against its cited source. The owner of this folder is
+  `@fromsukong`, set in `.github/CODEOWNERS`.

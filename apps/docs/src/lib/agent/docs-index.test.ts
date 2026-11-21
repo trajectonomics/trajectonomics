@@ -52,12 +52,12 @@ describe("the Docs index", () => {
 			buildDocsIndex(TABS_PAGES, ORIGIN)
 				.split("\n")
 				.filter((line) => line.startsWith("#")),
-		).toEqual(["# Trajectonomics Docs", "## Start here", "## Operator", "## Builder"])
+		).toEqual(["# Trajectonomics Docs", "## Start here", "## Operator", "## Contributor"])
 	})
 
 	test("lists every page once, by title, at its absolute twin URL, with its description", () => {
 		expect(bullets(buildDocsIndex(TABS_PAGES, ORIGIN))).toEqual([
-			"- [Trajectonomics Docs](https://trajectonomics.com/docs/index.md): Documentation for running the Trajectonomics CLI and building on its packages.",
+			"- [Trajectonomics Docs](https://trajectonomics.com/docs/index.md): Documentation for running the Trajectonomics CLI and helping make its tax rules right.",
 			"- [Quickstart](https://trajectonomics.com/docs/cli.md): Install traj, then record your first transaction.",
 			"- [tx](https://trajectonomics.com/docs/cli/commands/tx.md): Manage ledger transactions.",
 			"- [Overview](https://trajectonomics.com/docs/developers.md): The packages and how they fit together.",

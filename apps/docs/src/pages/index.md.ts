@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro"
 import { buildLandingTwin, portalOrigin, runBuildStep } from "../lib/agent"
-import { trackedReleaseLine } from "../lib/tracked-release-line"
 
 export const prerender = true
 
@@ -8,7 +7,7 @@ export const prerender = true
 export const GET: APIRoute = ({ site }) =>
 	runBuildStep(
 		() =>
-			new Response(buildLandingTwin(trackedReleaseLine(), portalOrigin(site)), {
+			new Response(buildLandingTwin(portalOrigin(site)), {
 				headers: { "content-type": "text/markdown; charset=utf-8" },
 			}),
 	)
