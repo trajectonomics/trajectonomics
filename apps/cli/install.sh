@@ -9,6 +9,9 @@
 set -eu
 
 DEFAULT_BASE="https://github.com/trajectonomics/trajectonomics/releases"
+# 0.1.0 to 0.3.0 were released from trajectonomics/cli, before the monorepo. Their assets stay there.
+LEGACY_BASE="https://github.com/trajectonomics/cli/releases"
+LEGACY_VERSIONS="0.1.0 0.2.0 0.3.0"
 SUPPORTED="darwin/arm64, darwin/x64, linux/x64, linux/arm64"
 
 say() { printf 'traj: %s\n' "$*" >&2; }
@@ -32,7 +35,13 @@ esac
 asset="traj-$os-$arch"
 
 base="${TRAJ_DOWNLOAD_BASE_URL:-$DEFAULT_BASE}"
-if [ -n "${TRAJ_VERSION:-}" ]; then
+legacy=false
+for v in $LEGACY_VERSIONS; do
+	[ "${TRAJ_VERSION:-}" = "$v" ] && legacy=true
+done
+if [ "$legacy" = true ] && [ -z "${TRAJ_DOWNLOAD_BASE_URL:-}" ]; then
+	prefix="$LEGACY_BASE/download/v$TRAJ_VERSION"
+elif [ -n "${TRAJ_VERSION:-}" ]; then
 	prefix="$base/download/cli-v$TRAJ_VERSION"
 else
 	prefix="$base/latest/download"
