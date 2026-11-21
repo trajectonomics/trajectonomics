@@ -1,6 +1,6 @@
-# Domain Glossary: @trajectonomics/design-system
+# Domain Glossary: @trajectonomics/brand
 
-Ubiquitous language for `trajectonomics/design-system`. Every term defined here is binding across code, tests, documentation, and PR titles. Synonyms in a diff are defects.
+Ubiquitous language for `packages/brand` (formerly the `trajectonomics/design-system` repository). Every term defined here is binding across code, tests, documentation, and PR titles. Synonyms in a diff are defects.
 
 ## Core Terms
 

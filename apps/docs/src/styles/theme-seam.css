@@ -4,7 +4,7 @@
  *
  * Colours, radius, spacing, font families and font sizes come from the design
  * system: global.css imports the prebuilt
- * @trajectonomics/design-system-theme stylesheets, which set the `--ds-*`
+ * @trajectonomics/brand/current stylesheets, which set the `--ds-*`
  * roles under `[data-theme="light"]` and `[data-theme="dark"]`, and this seam
  * maps them onto the variables the shell reads. The active Theme is the
  * `data-theme` attribute on <html> (set in Layout.astro). The status colours

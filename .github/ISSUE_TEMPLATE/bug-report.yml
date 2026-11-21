@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a defect, or a rule the code breaks (CODING_STANDARDS.md, a GLOSSARY.md term, or an ADR).
+title: "fix: "
+labels: ["needs-triage"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: The folder the defect is in.
+      options:
+        - cli (apps/cli)
+        - core/tax (packages/core/tax)
+        - core/sim (packages/core/sim)
+        - core/ledger (packages/core/ledger)
+        - core/money (packages/core/money)
+        - docs (apps/docs)
+        - site (apps/site)
+        - brand (packages/brand)
+        - skills (skills/)
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is wrong, in a sentence or two.
+    validations:
+      required: true
+  - type: textarea
+    id: invariant
+    attributes:
+      label: Invariant or contract violated
+      description: Which rule in CODING_STANDARDS.md, which GLOSSARY.md term, or which ADR does the behaviour break? Write "none" if you do not know.
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The command, input or page that shows the defect.
+      placeholder: |
+        1. Run `...`
+        2. Give it `...`
+        3. See `...`
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened, according to the domain rules.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: "What happened instead: the error, stack trace, output or return value."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: The Bun version (`bun --version`), the OS, and the package version if you know it.
+      placeholder: "Bun 1.x, Linux, @trajectonomics/cli 0.3.0"

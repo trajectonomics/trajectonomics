@@ -1,17 +1,17 @@
 # @trajectonomics/tax
 
-Pure, deterministic statutory tax calculation engine with subpaths for Thailand (`@trajectonomics/tax/th`) and the United States (`@trajectonomics/tax/us`), covering 2026 federal tax plus all 50 state income tax systems and the District of Columbia.
+Pure, deterministic statutory tax calculation engine with subpaths for Thailand (`@trajectonomics/core/tax/th`) and the United States (`@trajectonomics/core/tax/us`), covering 2026 federal tax plus all 50 state income tax systems and the District of Columbia.
 
 ## Install
 
 ```bash
-bun add @trajectonomics/tax
-npm install @trajectonomics/tax
+bun add @trajectonomics/core
+npm install @trajectonomics/core
 ```
 
 ## Quick start
 
-Thailand, from `@trajectonomics/tax/th`:
+Thailand, from `@trajectonomics/core/tax/th`:
 
 ```ts
 import { calculateThTax } from "@trajectonomics/tax/th"
@@ -28,7 +28,7 @@ console.log(currency, taxableIncome, totalTax)
 THB 640000 48500
 ```
 
-The United States, from `@trajectonomics/tax/us`, with the optional state layer:
+The United States, from `@trajectonomics/core/tax/us`, with the optional state layer:
 
 ```ts
 import { calculateUsTax } from "@trajectonomics/tax/us"
@@ -60,7 +60,7 @@ Each call returns a Tax Result; its `breakdown` carries the itemized audit trail
 
 ## Thailand Levy for sim-core
 
-`@trajectonomics/tax/th` exports `emitThLevy(profile)`, which freezes one TH 2026 taxpayer profile into a [sim-core](https://github.com/trajectonomics/sim-core) `Levy`. The emitted graph uses only `const`, `tally`, `add`, `sub`, `min`, `max`, `scale`, and `pick`, so sim-core evaluates it in exact integer satang without importing this package. The dependency points this way only: the package takes a dev-dependency on `@trajectonomics/sim` for its golden corpus. That dependency pins `0.2.0-alpha.4`, the first published version that exports `evaluateMeasures` (the stable `0.1.0` predates it); nothing in the built package imports it.
+`@trajectonomics/core/tax/th` exports `emitThLevy(profile)`, which freezes one TH 2026 taxpayer profile into a [sim-core](https://github.com/trajectonomics/sim-core) `Levy`. The emitted graph uses only `const`, `tally`, `add`, `sub`, `min`, `max`, `scale`, and `pick`, so sim-core evaluates it in exact integer satang without importing this package. The dependency points this way only: the package takes a dev-dependency on `@trajectonomics/sim` for its golden corpus. That dependency pins `0.2.0-alpha.4`, the first published version that exports `evaluateMeasures` (the stable `0.1.0` predates it); nothing in the built package imports it.
 
 The profile fixes the filing status, the fixed allowances (personal, spouse, children, parents, disabled care, social security, life/health insurance, parent health insurance, spouse life insurance, mortgage interest, and donation requests), the standard-versus-actual expense elections, the Section 40(4) final-withholding elections with the Section 47 bis corporate rate, and the Levy identity (`id` defaults to `th-2026-pit`, period to 1 January, settlement to 31 March). Income, expense, and contribution amounts are not in the profile: they arrive as Flow tallies under the labels below.
 
@@ -132,18 +132,10 @@ The golden corpus in `src/th/tests/levy-golden.test.ts` generates over 3,000 det
 
 ## Releasing
 
-Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose). The shared publish workflow (`trajectonomics/cicd`) reads the last `vX.Y.Z` git tag and the conventional commit messages since then:
-
-| Commits since last release | Bump |
-| --- | --- |
-| any `feat!:` / `fix!:` / `BREAKING CHANGE:` | major (minor while on 0.x) |
-| any `feat:` | minor |
-| anything else | patch |
-
-- **Alpha, automatic:** Every merge to `main` that touches code publishes `<next>-alpha.<n>` under the npm dist-tag `alpha` (`bun add @trajectonomics/tax@alpha`). `n` counts up per upcoming version.
-- **Stable, on demand:** Actions → Release → Run workflow (on `main`). It publishes `<next>` under `latest`, tags `vX.Y.Z`, and creates a GitHub release with generated notes. The bump input overrides the computed one; pick `major` to cut 1.0.0.
-
-PR titles must be conventional commits (enforced by the `PR title` check) because squash-merge commit subjects become the basis for version calculation.
+This package is not published on its own. It ships inside
+[`@trajectonomics/core`](../README.md), which releases as `core-vX.Y.Z` from
+`.github/workflows/release.yml`; see [docs/runbooks/release.md](../../../docs/runbooks/release.md).
+Versions are computed, never edited by hand (`package.json` says `0.0.0-development` on purpose).
 
 ## License
 

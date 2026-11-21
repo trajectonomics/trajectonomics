@@ -3,7 +3,7 @@
 Move the `trajectonomics` org's repos into this repo (`trajectonomics/trajectonomics`) as one
 Bun workspace, keeping each repo's git history, its npm package names, and its Cloudflare worker names.
 
-Status: **phase 1 (import) done on branch `monorepo/phase-1-import`; phase 2 next.** Inventory taken 2026-11-21: 22 repos, 0 open PRs.
+Status: **phases 1 to 5c are done (PRs #1 to #11, merged in order with merge commits). What remains is the owner's cutover (phase 6, `docs/runbooks/release.md`) and archiving the old repos (phase 7).** Inventory taken 2026-11-21: 22 repos, 0 open PRs.
 
 ## 0. Why this is cheaper than it looks
 
