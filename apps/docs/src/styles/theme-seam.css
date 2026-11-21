@@ -1,0 +1,149 @@
+/*
+ * The theme seam: the only project stylesheet that defines a colour, a font family, a border
+ * radius, a shadow or the layout width.
+ *
+ * Colours, radius, spacing, font families and font sizes come from the design
+ * system: global.css imports the prebuilt
+ * @trajectonomics/design-system-theme stylesheets, which set the `--ds-*`
+ * roles under `[data-theme="light"]` and `[data-theme="dark"]`, and this seam
+ * maps them onto the variables the shell reads. The active Theme is the
+ * `data-theme` attribute on <html> (set in Layout.astro). The status colours
+ * (`--color-fd-info`, `-warning`, `-error`, `-success`, `-idea` and `-diff-*`)
+ * stay in the Fumadocs preset: they do not vary by theme and the shell only
+ * reads them.
+ *
+ * The seam still owns the layout width and the `--font-sans` assignment: the
+ * assets package deliberately leaves the font-family assignment to the
+ * consumer, and Inter Variable stays first in the stack. The shape is the
+ * Site's (site ADR 0007, docs#90): corners from the same design-system radius
+ * roles, nothing rounder than a card, hairlines instead of shadows, and a ring
+ * for keyboard focus.
+ * See docs/adr/0004-docs-portal-shell.md.
+ */
+
+:root {
+	/*
+	 * The Docs Portal exposes the design-system dark Theme only while the organisation ships
+	 * one look (the owner reversed the light-only decision on 17 Nov 2026, docs#89). next-themes
+	 * writes this rendering mode when it runs; stating it here is what gives a reader with
+	 * JavaScript off the dark rendering mode for scrollbars and form controls. Light's return
+	 * deletes this declaration.
+	 */
+	color-scheme: dark;
+
+	--fd-layout-width: 1400px;
+
+	/*
+	 * The reading column's own measure: Fumadocs' 900px page column, the design brief's measure.
+	 * Kept beside the layout width so the shell has one place for the two widths it spans.
+	 */
+	--fd-reading-measure: 900px;
+
+	/*
+	 * Tailwind v4 computes spacing from one unit; Contract v2's spacing roles
+	 * are 0.25rem multiples, so `--ds-space-1` is that unit.
+	 */
+	--spacing: var(--ds-space-1);
+
+	/*
+	 * 4px on controls and 6px on cards and panels: the Site's own split, and
+	 * nothing above it, so no Fumadocs dialog, drawer or code block is rounder
+	 * than a Site card. `rounded-full` is a shape rather than a corner and is
+	 * not driven by these roles, so a pill or a circle stays round.
+	 */
+	--radius-sm: var(--ds-radius-sm);
+	--radius-md: var(--ds-radius-md);
+	--radius-lg: var(--ds-radius-md);
+	--radius-xl: var(--ds-radius-md);
+	--radius-2xl: var(--ds-radius-md);
+	--radius-3xl: var(--ds-radius-md);
+
+	--font-sans: "Inter Variable", var(--ds-font-family-sans);
+	--font-mono: var(--ds-font-family-mono);
+
+	--text-xs: var(--ds-font-size-xs);
+	--text-sm: var(--ds-font-size-sm);
+	--text-base: var(--ds-font-size-base);
+	--text-lg: var(--ds-font-size-lg);
+	--text-xl: var(--ds-font-size-xl);
+	--text-2xl: var(--ds-font-size-2xl);
+	--text-3xl: var(--ds-font-size-3xl);
+
+	--color-fd-background: var(--ds-color-background);
+	--color-fd-foreground: var(--ds-color-foreground);
+	--color-fd-muted: var(--ds-color-muted);
+	--color-fd-muted-foreground: var(--ds-color-muted-foreground);
+	--color-fd-popover: var(--ds-color-popover);
+	--color-fd-popover-foreground: var(--ds-color-popover-foreground);
+	--color-fd-card: var(--ds-color-card);
+	--color-fd-card-foreground: var(--ds-color-card-foreground);
+	--color-fd-border: var(--ds-color-border);
+	--color-fd-primary: var(--ds-color-primary);
+	--color-fd-primary-foreground: var(--ds-color-primary-foreground);
+	--color-fd-secondary: var(--ds-color-secondary);
+	--color-fd-secondary-foreground: var(--ds-color-secondary-foreground);
+	--color-fd-accent: var(--ds-color-accent);
+	--color-fd-accent-foreground: var(--ds-color-accent-foreground);
+	--color-fd-ring: var(--ds-color-ring);
+	--color-fd-overlay: hsla(0, 0%, 0%, 0.2);
+}
+
+/* The search trigger keeps neutral chrome on hover; the flat fill is the affordance. */
+:where(#nd-sidebar, #nd-sidebar-mobile) [data-search-full]:is(:hover, :focus-visible) {
+	background-color: var(--ds-color-secondary);
+	color: var(--ds-color-foreground);
+}
+
+/*
+ * Fumadocs' floating panels separate from the page behind the hairline they already carry, not a
+ * shadow: the search dialog, the home layout's phone menu, the sidebar drawer and the
+ * table-of-contents popover. Tailwind's `shadow-*` utilities hold their values in `--tw-shadow`,
+ * so redefining a shadow role there would do nothing; the utility itself has to be answered.
+ */
+#nd-nav > div,
+#nd-sidebar-mobile,
+[data-toc-popover] > header,
+[role="dialog"] {
+	box-shadow: none;
+}
+/*
+ * The sidebar's way back to the site is the shell's control surface: a hairline border on the
+ * secondary ground, muted until the reader points at it.
+ */
+#nd-notebook-layout [data-site-home] {
+	border-color: var(--ds-color-border);
+	background-color: var(--ds-color-secondary);
+	color: var(--ds-color-muted-foreground);
+}
+
+#nd-notebook-layout [data-site-home]:is(:hover, :focus-visible) {
+	background-color: var(--ds-color-accent);
+	color: var(--ds-color-accent-foreground);
+}
+
+/* Twenty's rhythm marks the row the reader is on with the secondary ground, not an accent tint. */
+#nd-notebook-layout :is(#nd-sidebar, #nd-sidebar-mobile) a[data-active="true"],
+#nd-notebook-layout :is(#nd-sidebar, #nd-sidebar-mobile) a[data-active="true"]:hover {
+	background-color: var(--ds-color-secondary);
+	color: var(--ds-color-foreground);
+}
+
+/*
+ * The shell draws no shadow. Keyboard focus on the header and sidebar controls is a ring on the
+ * ring role, drawn with `outline` rather than `box-shadow`, because the removed soft shadow was
+ * those links' only focus indicator. The home layout's header is in the list because the header
+ * mark is its first graphic control (docs#75).
+ */
+#nd-nav :is(a, button):focus-visible,
+#nd-notebook-layout :is(#nd-subnav, #nd-sidebar, #nd-sidebar-mobile) :is(a, button):focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+/*
+ * The drawer's tree reads at the desktop sidebar's size: Fumadocs sets the drawer to 0.9375rem, so
+ * the same navigation would change size when a phone opens it (docs#91).
+ */
+#nd-notebook-layout #nd-sidebar-mobile {
+	font-size: var(--ds-font-size-sm);
+}

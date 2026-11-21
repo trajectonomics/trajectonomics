@@ -1,0 +1,20 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "docs",
+	"main": "./src/worker.ts",
+	"compatibility_date": "2026-11-01",
+	"workers_dev": true,
+	// One Worker only: a merge to `main` deploys production (ADR 0007), so there is no `env` block.
+	// No "routes" and no "custom_domain" on purpose: the router reaches this Worker by a service
+	// binding, so this Worker never attaches to the apex itself (ADR 0006).
+	"assets": {
+		// astro.config.ts builds into dist/docs, so /docs/... URLs resolve under ./dist.
+		"directory": "./dist",
+		// The Worker answers `Accept: text/markdown` and forwards everything else to the assets
+		// (ADR 0010), whose own rules still decide the /docs redirect, the aliases and the 404 page.
+		"binding": "ASSETS",
+		"run_worker_first": ["/docs", "/docs/*"],
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	}
+}

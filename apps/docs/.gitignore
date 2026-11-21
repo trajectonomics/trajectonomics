@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.scratch/
+.DS_Store
+*.log
+.env
+.env.*
+.astro/
+.wrangler/
+.dev.vars
+playwright-report/
+/screenshots/
+test-results/

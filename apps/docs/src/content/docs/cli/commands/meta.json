@@ -1,0 +1,20 @@
+{
+	"title": "Commands",
+	"pages": [
+		"index",
+		"account",
+		"balance",
+		"baseline",
+		"export",
+		"fi",
+		"help",
+		"init",
+		"inspect",
+		"projection",
+		"report",
+		"scenario",
+		"schema",
+		"tx",
+		"version"
+	]
+}
