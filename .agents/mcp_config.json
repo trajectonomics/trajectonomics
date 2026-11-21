@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mobbin": {
+      "serverUrl": "https://api.mobbin.com/mcp"
+    },
+    "posthog": {
+      "serverUrl": "https://mcp.posthog.com/mcp"
+    },
+    "cloudflare": {
+      "serverUrl": "https://mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-docs": {
+      "serverUrl": "https://docs.mcp.cloudflare.com/mcp"
+    }
+  }
+}
