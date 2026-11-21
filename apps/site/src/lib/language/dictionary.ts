@@ -97,10 +97,29 @@ export interface Dictionary {
 	readonly featuresEyebrow: string
 	/** The Features section's `h2`. */
 	readonly featuresHeading: string
-	/** Six feature titles, in order; each is plain text, not a heading (ADR 0012). */
+	/**
+	 * Six feature titles, in order; each is plain text, not a heading (ADR 0012). The first two head the
+	 * section's wide cards, each with a sample of the CLI's output; the other four are the small cards.
+	 */
 	readonly featureTitles: readonly string[]
 	/** Six feature sentences, one per title and in the same order. */
 	readonly featureCopies: readonly string[]
+	/** The small label above the FAQ heading. */
+	readonly faqEyebrow: string
+	/** The FAQ section's `h2`. */
+	readonly faqHeading: string
+	/** The FAQ's questions, in order; each is a disclosure's summary, plain text, not a heading. */
+	readonly faqQuestions: readonly string[]
+	/** One answer per question, in the same order. */
+	readonly faqAnswers: readonly string[]
+	/** The small label above the closing section's heading. */
+	readonly ctaEyebrow: string
+	/** The closing section's `h2`: the demo's question, put to the visitor's own agent. */
+	readonly ctaHeading: string
+	/** The line under the closing heading. */
+	readonly ctaLede: string
+	/** The closing section's filled link, which goes back up to the Copy control (ADR 0015 keeps one). */
+	readonly ctaPromptLink: string
 	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
 	readonly copy: string

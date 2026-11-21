@@ -1,6 +1,8 @@
 ---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see FEATURE_SAMPLES.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
+import { FEATURE_SAMPLES } from "../lib/site/feature-samples"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -18,17 +20,32 @@ const { dictionary } = Astro.props
 			</h2>
 		</div>
 
+		{/* Two wide cards with a sample of the CLI's own output, then four small ones (Resend and Cursor on Mobbin). */}
 		<ul class="features">
 			{
-				dictionary.featureTitles.map((title, index) => (
-					<li class="feature bg-background text-foreground">
-						<span class="feature-index text-muted-foreground tabular-nums">
-							{String(index + 1).padStart(2, "0")}
-						</span>
-						<span class="feature-title">{title}</span>
-						<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
-					</li>
-				))
+				dictionary.featureTitles.map((title, index) => {
+					const sample = FEATURE_SAMPLES[index]
+					return (
+						<li
+							class:list={["feature bg-background text-foreground", { "feature-wide": sample !== undefined }]}
+						>
+							{sample !== undefined && (
+								<figure class="feature-sample bg-muted text-foreground" data-feature-sample>
+									<span class="feature-sample-bar">
+										<code class="feature-sample-command">{sample.command}</code>
+									</span>
+									<pre class="feature-sample-output">{sample.output}</pre>
+									<figcaption class="feature-sample-note">{dictionary.actionExampleNote}</figcaption>
+								</figure>
+							)}
+							<span class="feature-index text-muted-foreground tabular-nums">
+								{String(index + 1).padStart(2, "0")}
+							</span>
+							<span class="feature-title">{title}</span>
+							<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
+						</li>
+					)
+				})
 			}
 		</ul>
 	</div>

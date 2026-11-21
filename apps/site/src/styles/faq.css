@@ -1,0 +1,97 @@
+/*
+ * The FAQ: the section head on the left and a hairline-ruled list of native disclosures on the right
+ * (Retool's FAQ on Mobbin), one column below 64 rem. The answers paint `foreground`, so they
+ * keep 4.5:1 on either surface (the muted pair falls under it on the muted surface in the light theme).
+ */
+
+.faq-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 40px;
+}
+
+@media (min-width: 64rem) {
+	.faq-layout {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		gap: 64px;
+	}
+
+	.faq-head {
+		position: sticky;
+		top: 96px;
+		align-self: start;
+	}
+}
+
+.faq-list {
+	border-top: 1px solid var(--ds-color-border);
+}
+
+.faq-item {
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.faq-question {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 20px 0;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.5;
+	cursor: pointer;
+	list-style: none;
+}
+
+.faq-question::-webkit-details-marker {
+	display: none;
+}
+
+.faq-question:hover > span:first-child {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.faq-question:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The plus that turns into a minus: two hairline bars, the upright one folds away when the item opens. */
+.faq-mark {
+	position: relative;
+	flex: none;
+	width: 14px;
+	height: 14px;
+}
+
+.faq-mark::before,
+.faq-mark::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 14px;
+	height: 1.5px;
+	margin-top: -0.75px;
+	background: currentColor;
+	transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.faq-mark::after {
+	transform: rotate(90deg);
+}
+
+.faq-item[open] .faq-mark::after {
+	transform: rotate(0deg);
+}
+
+.faq-answer {
+	max-width: 40rem;
+	margin: 0;
+	padding: 0 38px 24px 0;
+	font-size: 15px;
+	line-height: 1.7;
+	text-wrap: pretty;
+}

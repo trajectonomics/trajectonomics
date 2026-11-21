@@ -26,6 +26,9 @@
 @import "./conversation.css";
 @import "./terminal.css";
 @import "./features.css";
+@import "./feature-sample.css";
+@import "./faq.css";
+@import "./closing.css";
 @import "./footer.css";
 @import "./footer-legal.css";
 @import "./footer-facts.css";
