@@ -1,0 +1,90 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the props it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import {
+	DOCS_CLI_INSTALL_PATH,
+	DOCS_CLI_PATH,
+	DOCS_PATH,
+	GITHUB_CLI_ISSUES_URL,
+	GITHUB_CLI_RELEASES_URL,
+	GITHUB_CLI_URL,
+	GITHUB_ORG_URL,
+	GITHUB_SKILLS_URL,
+	SITE_NAME,
+	SKILLS_LICENCE_URL,
+} from "../lib/site"
+import { RELEASE_SNAPSHOT } from "../lib/site/release-snapshot"
+import Facts from "./Facts.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+
+/** One link column: a mono label and its links. The page's one `nav` is the header's, so these are lists. */
+const columns = [
+	{
+		label: dictionary.footerProductLabel,
+		links: [
+			{ text: dictionary.footerDocsLink, href: DOCS_PATH },
+			{ text: dictionary.footerCliDocsLink, href: DOCS_CLI_PATH },
+			{ text: dictionary.footerInstallLink, href: DOCS_CLI_INSTALL_PATH },
+		],
+	},
+	{
+		label: dictionary.footerSourceLabel,
+		links: [
+			{ text: dictionary.footerCliRepo, href: GITHUB_CLI_URL },
+			{ text: dictionary.footerSkillsRepo, href: GITHUB_SKILLS_URL },
+			{ text: dictionary.org, href: GITHUB_ORG_URL },
+		],
+	},
+	{
+		label: dictionary.footerHelpLabel,
+		links: [
+			{ text: dictionary.footerIssues, href: GITHUB_CLI_ISSUES_URL },
+			{ text: dictionary.footerReleases, href: GITHUB_CLI_RELEASES_URL },
+			{ text: dictionary.licence, href: SKILLS_LICENCE_URL },
+		],
+	},
+] as const
+---
+
+<footer class="site-footer border-t border-border bg-stage text-stage-foreground">
+	<div class="footer-inner">
+		<div class="footer-top">
+			<div class="footer-brand">
+				<span class="footer-name">{SITE_NAME}</span>
+				<span class="footer-tagline">{dictionary.footerTagline}</span>
+			</div>
+			<div class="footer-columns">
+				{
+					columns.map((column) => (
+						<div class="footer-column">
+							<span class="footer-label">{column.label}</span>
+							<ul class="footer-links">
+								{column.links.map((link) => (
+									<li>
+										<a class="footer-link" href={link.href}>
+											{link.text}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
+		</div>
+		<Facts dictionary={dictionary} />
+		<p class="footer-disclaimer">{dictionary.footerDisclaimer}</p>
+		<p class="footer-release">
+			{dictionary.releaseLine}
+			<span aria-hidden="true"> · </span>
+			<time datetime={RELEASE_SNAPSHOT.releasedOn}>{dictionary.releaseDate}</time>
+		</p>
+	</div>
+	<div class="footer-wordmark" aria-hidden="true" data-text={SITE_NAME}></div>
+</footer>

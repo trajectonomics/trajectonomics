@@ -1,0 +1,60 @@
+/* The header (ADR 0007): the mark's tile, the mono nav, and a ground that only appears on scroll. */
+
+/* The mark on its tile: 40 px, 32 px on a phone, painted from the primary roles. */
+.brand-tile {
+	display: flex;
+	width: 2rem;
+	height: 2rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+@media (min-width: 40rem) {
+	.brand-tile {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+}
+
+/* The nav's items: mono, uppercase, 11 px, with a hairline between each pair. */
+.header-nav-link,
+.header-menu-summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 2rem;
+	padding: 0 2px;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	line-height: 1;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-color-foreground);
+	cursor: pointer;
+	list-style: none;
+	text-decoration: none;
+}
+
+.header-nav-link:hover,
+.header-menu-summary:hover {
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+/* Every control the keyboard reaches paints the Theme's ring, so focus is never invisible. */
+.header-nav-link:focus-visible,
+.header-menu-summary:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+.header-menu-summary::-webkit-details-marker {
+	display: none;
+}
+
+.header-menu-summary::marker {
+	content: "";
+}

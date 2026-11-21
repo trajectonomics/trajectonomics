@@ -1,0 +1,133 @@
+---
+title: Installation
+description: Install the Trajectonomics CLI, add the agent skill, check the version, and uninstall.
+---
+
+The Docs Portal documents `traj` `v0.2.0`, released on 2026-11-17 with release binaries, both
+install scripts, and `@trajectonomics/cli` on npm. All three channels below end at the same compiled
+binary and the same version
+([ADR 0011](https://github.com/trajectonomics/cli/blob/v0.2.0/docs/adr/0011-distribution.md)).
+
+## Linux and macOS
+
+One command; it verifies the release checksum, installs `traj` to `~/.local/bin` (or
+`$TRAJ_INSTALL_DIR`), and prints what it installed:
+
+```bash
+curl -fsSL \
+  https://github.com/trajectonomics/cli/releases/latest/download/install.sh \
+  | sh
+```
+
+The script does not change your `PATH`. On a machine where `~/.local/bin` is not already on it,
+`traj` is not a command yet; this line adds the directory in the current shell, so `traj` works
+straight away:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To keep it in new shells, add the same line to your shell's startup file — `~/.zshrc` for zsh,
+`~/.bashrc` for bash — using your `TRAJ_INSTALL_DIR` directory in place of `~/.local/bin` when you
+set it, and that edit needs a new shell afterwards.
+
+## Windows
+
+One line; it installs to `%LOCALAPPDATA%\traj\bin`, adds it to the user `PATH` once, and needs a
+new shell afterwards:
+
+```powershell
+irm https://github.com/trajectonomics/cli/releases/latest/download/install.ps1 | iex
+```
+
+## npm or Bun
+
+On any machine with Node 20 or later, or with Bun (`npx` needs no Bun; the package fetches the
+release binary on first run and caches it under `~/.traj/bin`):
+
+```bash
+npx @trajectonomics/cli@latest --version
+bunx @trajectonomics/cli@latest --version
+```
+
+## Which channel
+
+Use the script for a machine where `traj` should stay on `PATH`: on Linux and macOS it installs into
+a directory you put on `PATH` yourself, and on Windows it adds that directory for you. Use npm when
+you already have Node or Bun and want one command.
+
+## Pin a release
+
+Both install scripts accept `TRAJ_VERSION=X.Y.Z` to install a pinned release instead of the latest
+one, and `TRAJ_INSTALL_DIR` to override the install directory. npm pins with `@X.Y.Z`:
+
+```bash
+curl -fsSL https://github.com/trajectonomics/cli/releases/latest/download/install.sh | TRAJ_VERSION=0.2.0 sh
+npx @trajectonomics/cli@0.2.0 --version
+```
+
+A release pinned below the operating skill's floor leaves that skill describing work the release
+cannot do, so setup skips the skill.
+
+## Add the agent skill
+
+Both skills publish from `trajectonomics/skills`, and `-y` keeps the install non-interactive. The
+setup skill is the front door: it asks about your situation and goal, installs the command line, and
+installs the operating skill as its second step.
+
+```bash
+npx skills add trajectonomics/skills --skill traj-onboarding -y
+```
+
+The operating skill expects a recent `traj`: it describes a projection, a financial-independence
+date and Thai tax, and an older release has none of that work — the commands end at
+`unknown_command`.
+
+The setup skill states the exact floor it needs and checks the version your machine prints, which
+`traj version` shows ([Check the installed version](#check-the-installed-version)). On a `traj`
+below that floor it skips the operating skill, names the release range it wanted and says which
+work the older command line cannot do. The fix is to install the latest release rather than pin
+below the floor.
+
+The operating skill on its own, for an Agent that is already set up on a `traj` that setup accepts.
+This line skips the setup skill's version check, so that precondition is yours to check:
+
+```bash
+npx skills add trajectonomics/skills --skill traj -y
+```
+
+That is the command the setup skill's second step runs, from the same repository, so a project's
+`skills-lock.json` records one source whichever line you use. What the Agent asks you for, and where
+the tool stops, is on [Agent](/docs/cli/agent/).
+
+## Check the installed version
+
+```bash
+traj version
+```
+
+## Where your data lives
+
+`traj init` creates the data directory, `~/.traj`, or `$TRAJ_HOME` when that is set. It holds
+`traj.db`, the ledger, and the npm launcher's `bin/` cache of downloaded binaries.
+[Your data](/docs/cli/data/) says what else is there, how to back the ledger up, and how to use more
+than one.
+
+## Uninstall
+
+There is no uninstall command. Delete the program, and leave the ledger alone unless you mean to
+delete that too:
+
+- `~/.local/bin/traj`: the Unix install script's binary.
+- `%LOCALAPPDATA%\traj\bin`: the Windows install script's binary.
+- `~/.traj/bin`: the npm launcher's download cache. Safe to delete; the next run downloads again.
+- `~/.npm/_npx`: npm's own cache of the launcher package. Safe to delete; npm rebuilds it.
+
+The ledger is none of those. It is `~/.traj/traj.db`, or `$TRAJ_HOME/traj.db` when `TRAJ_HOME` is
+set, so it survives every delete above. [Your data](/docs/cli/data/) shows how to back it up and how
+to remove it on purpose.
+
+Building the CLI from source is Builder work, described in the
+[repository](https://github.com/trajectonomics/cli), not here.
+
+Next: [Your data](/docs/cli/data/).

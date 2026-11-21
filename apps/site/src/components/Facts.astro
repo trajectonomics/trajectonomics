@@ -1,0 +1,22 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see the props it renders.
+import type { Dictionary } from "../lib/language/dictionary"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/* The three plain facts about setup (site#69): the limits a visitor meets after the step, kept with the footer's fine print. */}
+<dl data-facts class="footer-facts w-full text-left">
+	{
+		dictionary.factLabels.map((label, index) => (
+			<div class="footer-fact" data-fact>
+				<dt class="text-stage-foreground">{label}</dt>
+				<dd class="text-stage-foreground">{dictionary.factTexts[index]}</dd>
+			</div>
+		))
+	}
+</dl>

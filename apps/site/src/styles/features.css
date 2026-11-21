@@ -1,0 +1,56 @@
+/*
+ * Features (ADR 0012): six cells on one hairline grid. The grid's own background is the hairline, and
+ * a 1 px gap between the cells shows it, so no cell needs a border of its own.
+ */
+
+.features {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1px;
+	margin: 40px 0 0;
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 12px;
+	background: var(--ds-color-border);
+	list-style: none;
+}
+
+@media (min-width: 40rem) {
+	.features {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		margin-top: 56px;
+	}
+}
+
+@media (min-width: 64rem) {
+	.features {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.feature {
+	display: flex;
+	min-height: 11rem;
+	flex-direction: column;
+	gap: 10px;
+	padding: 24px;
+}
+
+.feature-index {
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+}
+
+.feature-title {
+	margin-top: 14px;
+	font-size: 18px;
+	font-weight: 500;
+}
+
+.feature-copy {
+	font-size: 14px;
+	line-height: 1.6;
+	text-wrap: pretty;
+}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.scratch/
+.DS_Store
+*.log
+.env
+.env.*
+.svelte-kit/
+.svelte-check/
+storybook-static/
+artifacts/
+fixtures/*/bun.lock

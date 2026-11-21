@@ -1,0 +1,22 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { HTMLAttributes } from "astro/types"
+
+/** The card's look: a hairline wireframe tile on the card role, or a 12 px panel on the page surface. */
+type Variant = "wireframe" | "panel"
+
+/** The classes each variant paints; every colour is a Semantic Token Role, never a literal. */
+const VARIANTS: Readonly<Record<Variant, string>> = Object.freeze({
+	wireframe: "rounded-md border border-border bg-card text-card-foreground",
+	panel: "rounded-xl border border-border bg-background text-foreground",
+})
+
+interface Props extends HTMLAttributes<"div"> {
+	readonly variant?: Variant
+}
+
+const { variant = "wireframe", class: className, ...rest } = Astro.props
+const classes = [VARIANTS[variant], className].filter(Boolean).join(" ")
+---
+
+<div {...rest} data-slot="card" data-variant={variant} class={classes}><slot /></div>

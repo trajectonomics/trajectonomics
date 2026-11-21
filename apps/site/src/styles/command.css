@@ -1,0 +1,68 @@
+/* The install CTA (ADR 0007, ADR 0015, ADR 0022): two buttons side by side, as twenty.com's hero has them. */
+
+/*
+ * The Copy control's confirmation: the accent role, with the foreground that belongs on it, for the six
+ * seconds the toast is up (site#61). Nothing here answers a hover: the notice runs on its one timer and
+ * a pointer neither pauses it nor paints another colour, and the button's own hover opacity is held, so
+ * hovering the copied state does nothing at all.
+ */
+.window-copy[data-copy-state="copied"] {
+	background: var(--ds-color-accent);
+	color: var(--ds-color-accent-foreground);
+}
+
+.window-copy[data-copy-state="copied"]:hover {
+	opacity: 1;
+}
+
+/*
+ * The CTA shows exactly two controls, one filled and one outlined, both bevelled at the bottom right.
+ * Copy leads, and the CLI link is its outlined peer for a visitor whose agent cannot use the prompt. The
+ * prompt ships in the page for the Copy control to read, but it is hidden, so no code block competes with
+ * the two buttons (ADR 0015, amendment of 2026-11-19). On a narrow phone the pair wraps.
+ */
+.install-row {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+}
+
+.window-copy,
+.window-exit {
+	min-height: 2.5rem;
+	padding: 8px 20px;
+	white-space: nowrap;
+}
+
+.window-exit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--ds-color-border);
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+	font-family: var(--font-meta);
+	font-size: 12px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.window-exit:hover {
+	border-color: var(--ds-color-foreground);
+	background: var(--ds-color-secondary);
+}
+
+.window-exit:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+.window-exit-arrow {
+	display: inline-block;
+	width: 16px;
+	margin-left: 6px;
+	vertical-align: middle;
+}

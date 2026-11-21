@@ -1,0 +1,82 @@
+const CODES = [
+	"UNSUPPORTED_SCHEMA_VERSION",
+	"NOT_AN_OBJECT",
+	"NOT_AN_ARRAY",
+	"MISSING_KEY",
+	"UNKNOWN_KEY",
+	"WRONG_TYPE",
+	"EMPTY_STRING",
+	"NOT_SAFE_INTEGER",
+	"NEGATIVE_AMOUNT",
+	"INVALID_DATE",
+	"INVALID_KIND",
+	"INVALID_COMPOUNDING",
+	"INVALID_FREQUENCY",
+	"INVALID_GROWTH",
+	"INVALID_RESOLUTION",
+	"HORIZON_BEFORE_START",
+	"END_BEFORE_START",
+	"ONCE_FLOW_END_MISMATCH",
+	"DUPLICATE_ID",
+	"UNKNOWN_ACCOUNT",
+	"UNDECLARED_BALANCE_ACCOUNT",
+	"LIABILITY_MISUSE",
+	"SURPLUS_UNROUTED",
+	"CONTRIBUTION_UNROUTED",
+	"RATE_OUT_OF_RANGE",
+	"INVALID_OP",
+	"INVALID_BASIS",
+	"INVALID_ROUNDING",
+	"INVALID_DENOMINATOR",
+	"INVALID_MONTH_DAY",
+	"UNKNOWN_MEASURE",
+	"UNKNOWN_LEVY",
+	"UNKNOWN_FLOW",
+	"FLOW_CYCLE",
+	"STEPS_NOT_ASCENDING",
+	"DERIVED_EXPENSE_READS_EARNED",
+	"CAP_NOT_CONST",
+	"MEASURE_CYCLE",
+	"FIELD_NOT_ALLOWED",
+	"LEVY_REQUIRED",
+	"CONFLICTING_LABELS",
+	"MISSING_BASIS",
+	"MISSING_CARRY_IN",
+	"DUPLICATE_CARRY_IN",
+	"MISALIGNED_CARRY_IN",
+	"UNKNOWN_TALLY_LABEL",
+	"UNSUPPLIED_TALLY_LABEL",
+	"INVALID_FI_METHOD",
+	"INVALID_PATH_COUNT",
+	"INVALID_SEED",
+	"REFERENCE_MULTIPLIER_OUT_OF_RANGE",
+	"INVALID_REFERENCE_BASIS",
+	"INVALID_REFERENCE_WINDOW",
+	"INVALID_REFERENCE_TERMS",
+	"INVALID_WEIGHT",
+	"RETURN_WEIGHT_TOTAL",
+	"TOO_MANY_ENTRIES",
+	"INVALID_DAY_RULE",
+	"DUPLICATE_HOLIDAY",
+	"HOLIDAYS_UNUSABLE",
+] as const
+
+/** The closed set of problem codes. Frozen so consumers cannot mutate it at runtime. */
+export const ERROR_CODES: typeof CODES = Object.freeze(CODES)
+
+export type ErrorCode = (typeof CODES)[number]
+
+/** Location of a problem: a segment is an object key or an array index. */
+export type Path = readonly (string | number)[]
+
+export interface Problem {
+	readonly code: ErrorCode
+	readonly path: Path
+}
+
+export type Emit = (code: ErrorCode, path: Path) => void
+
+export type Check = (value: unknown, path: Path, emit: Emit) => void
+
+/** Declared account id -> raw `kind` value from the scenario. */
+export type AccountIndex = ReadonlyMap<string, unknown>

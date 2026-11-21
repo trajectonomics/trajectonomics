@@ -1,0 +1,81 @@
+import { growthYears } from "../calendar/arith"
+import { grow } from "../money/growth"
+import type {
+	BinaryMeasure,
+	ConstMeasure,
+	ConstStep,
+	LevyContext,
+	LevyMeasure,
+	Tallies,
+} from "../types"
+import { mulValue } from "./mul"
+import { scaleValue } from "./scale"
+
+export type Lookup = (id: string) => bigint
+
+// Math.min and Math.max do not take BigInt.
+function lesser(a: bigint, b: bigint): bigint {
+	if (a < b) return a
+	return b
+}
+
+function greater(a: bigint, b: bigint): bigint {
+	if (a > b) return a
+	return b
+}
+
+const BINARY: Readonly<Record<BinaryMeasure["op"], (a: bigint, b: bigint) => bigint>> = {
+	add: (a, b) => a + b,
+	sub: (a, b) => a - b,
+	min: lesser,
+	max: greater,
+}
+
+/** The value of the last step on or before `through`; `value` holds before the first step. */
+function steppedValue(value: number, steps: readonly ConstStep[], through: string): number {
+	let found = value
+	for (let index = 0; index < steps.length; index++) {
+		const step = steps[index]
+		if (step === undefined || step.from > through) break
+		found = step.value
+	}
+	return found
+}
+
+/**
+ * A constant: with `steps`, the value at the context's `periodEnd` (falling back to `date`);
+ * with `growth`, grown by whole years from `asOf` (never shrunk by time).
+ */
+export function constantValue(measure: ConstMeasure, context: LevyContext): bigint {
+	const { value, asOf, growth, steps } = measure
+	if (steps !== undefined)
+		return BigInt(steppedValue(value, steps, context.periodEnd ?? context.date))
+	if (growth === undefined || asOf === undefined) return BigInt(value)
+	const rate = growth === "inflation" ? context.inflation : growth.bps
+	const days = growthYears(asOf, context.date) * 365
+	const grown = grow(BigInt(Math.abs(value)), rate, days)
+	return value < 0 ? -grown : grown
+}
+
+/** The exact value of one Measure given the values of the Measures it reads. */
+export function step(
+	measure: LevyMeasure,
+	get: Lookup,
+	tallies: Tallies,
+	context: LevyContext,
+): bigint {
+	switch (measure.op) {
+		case "const":
+			return constantValue(measure, context)
+		case "tally":
+			return BigInt(tallies[measure.basis]?.get(measure.label) ?? 0)
+		case "scale":
+			return scaleValue(get(measure.of), BigInt(measure.num), BigInt(measure.den), measure.rounding)
+		case "mul":
+			return mulValue(get(measure.a), get(measure.b), BigInt(measure.den), measure.rounding)
+		case "pick":
+			return get(measure.a) > get(measure.b) ? get(measure.then) : get(measure.else)
+		default:
+			return BINARY[measure.op](get(measure.a), get(measure.b))
+	}
+}

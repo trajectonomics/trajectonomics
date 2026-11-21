@@ -1,0 +1,17 @@
+{
+  "name": "@trajectonomics/internal-skills",
+  "version": "0.1.0",
+  "description": "Internal AI coding agent skills for Trajectonomics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trajectonomics/internal-skills.git"
+  },
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "install-skills-profile": "./scripts/install-profile.mjs"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

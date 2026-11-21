@@ -1,0 +1,66 @@
+# AGENTS.md
+
+Instructions for AI coding agents in `trajectonomics/docs` (`@trajectonomics/docs`).
+
+## Rules
+
+1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR.
+2. Never commit secrets or `.env` files. Cloudflare credentials live in Cloudflare (Workers Builds), never in this repo or in GitHub secrets.
+3. Package design: Keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
+4. Bun only: `bun install`, `bun test`, `bun run <script>`. The one exception is `bun run test:e2e`, which runs Playwright on Node through its own bin ([ADR 0004](./docs/adr/0004-browser-tests-run-outside-the-deploy-gate.md)). Do not add npm/pnpm/yarn lockfiles.
+5. Done means `bun run check` passes (Biome lint with zero warnings, strict typecheck plus `astro check`, tests, Astro build, then the built Docs Portal check `verify:build`), and the `e2e` browser job is green in CI (advisory until the owner makes it a required check, trajectonomics/infra#32). `bun run format` fixes formatting and import order. Do not loosen `tsconfig.base.json` or `biome.json` to make an error go away.
+6. This repo is a deployed site, never published: never edit `version` in `package.json`, never run `npm publish`, and keep `private: true`. A merge to `main` deploys production, the single Worker `docs` ([ADR 0007](./docs/adr/0007-main-deploys-production.md)); there is no staging Worker and no `production` branch, do not create either. Deploys go through Workers Builds, whose build command runs `bun run check` (see ADR 0003); do not add a GitHub Actions deploy workflow. PR titles are conventional commits (`feat:`, `fix:`, `docs:` ...).
+7. Pi (`pi.dev`) model restriction: When running the Pi coding agent (`pi.dev`), strictly use **DeepSeek 4.1 Flash** only (e.g., `deepseek/deepseek-v4.1-flash`, `deepseek/deepseek-v4.1-flash-fast`), whether routed via Command Code GOAT (`command-code`) or OpenCode Go (`opencode`). Do not switch to or run any other models (Claude, GPT, Gemini, etc.) in Pi sessions for this repository. This rule is mechanically enforced via `.pi/settings.json`.
+
+## Organisation goals
+
+The organisation's goals are in https://github.com/trajectonomics/goals, `GOALS.md`. Read them before proposing a new direction. Only the owner edits that file; never edit it.
+
+## Agent skills
+
+### Skills included
+
+- **Matt Pocock Skills (`mattpocock/skills`)**: Complete engineering workflow including `/ask-matt`, `/tdd`, `/implement`, `/code-review`, `/wayfinder`, `/diagnosing-bugs`, `/codebase-design`, `/grill-with-docs`, etc.
+- **Trajectonomics Internal Skills (`trajectonomics/internal-skills`)**: Organization-specific workflow including `/pick-the-issue` to discover unblocked GitHub issues not currently handled by active T3 Code sessions and route them into the `ask-matt` framework.
+
+### Reviewing a diff
+
+`CODING_STANDARDS.md`: the conventions `bun run check` cannot enforce. Read it when reviewing, not when implementing.
+
+### Issue tracker
+
+GitHub Issues via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Planning
+
+Every plan and issue states goals and non-goals; user-facing work adds a Surface & design section. See `docs/agents/planning.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Installing and updating skills
+
+Skills come from [`mattpocock/skills`](https://github.com/mattpocock/skills) and [`trajectonomics/internal-skills`](https://github.com/trajectonomics/internal-skills) via the Vercel [`skills`](https://github.com/vercel-labs/skills) CLI and are pinned in `skills-lock.json`. The canonical copy is `.agents/skills/` (read natively by Codex, OpenCode, Pi, and Antigravity CLI); `.claude/skills/` holds symlinks into it for Claude Code, and `.vibe/skills/` holds symlinks into it for Mistral Vibe (the pattern from `trajectonomics/factory#80`). Never edit them by hand.
+
+- Update: `bun run skills:update` (or `npx skills update -p -y`)
+- Check status: `bun run skills:check` (or `npx skills check`)
+- Reinstall:
+  ```bash
+  npx skills add mattpocock/skills --skill '*' -a claude-code codex opencode antigravity-cli pi -y
+  npx skills add trajectonomics/internal-skills -y
+  ```
+- Restore from the lock: `npx skills experimental_install`
+
+## Repository Information
+
+- Repository: https://github.com/trajectonomics/docs
+- Package: `@trajectonomics/docs`
+
+## Factory Runs
+
+A Factory Run or Spec drafter (a thread titled `traj/trajectonomics/<repo>#<n>` or `triage/trajectonomics/<repo>#<n>`) takes its instructions from the Dispatcher runbook in `trajectonomics/factory`, never from this repository, where `docs/dispatcher-runbook.md` does not exist. Read it with `gh api repos/trajectonomics/factory/contents/docs/dispatcher-runbook.md -H "Accept: application/vnd.github.raw"`. If you cannot read it, stop and say so; do not build from the issue alone.

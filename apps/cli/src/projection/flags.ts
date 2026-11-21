@@ -1,0 +1,47 @@
+import { z } from "zod"
+import type { FlagDocument } from "../command"
+import type { ErrorCode } from "../errors"
+import { LEDGER_READ_CODES } from "../store"
+import { carryInDocument } from "./carryin"
+
+/** Every code the projection leaves raise: flags, the Baseline and the engine (ADR-0030). */
+export const PROJECTION_ERROR_CODES: readonly ErrorCode[] = [
+	"invalid_input",
+	"INVALID_DATE",
+	"NEGATIVE_AMOUNT",
+	"AMOUNT_OVERFLOW",
+	"unsupported_currency",
+	"not_found",
+	"projection_refused",
+	...LEDGER_READ_CODES,
+]
+
+/** The `--scenario` flag that names the one Scenario a leaf projects. */
+export const scenarioFlag: z.ZodString = z.string().describe("The Scenario's exact name or its id.")
+
+/** `--as-of`, the date every projection starts at, which the caller states (ADR-0029). */
+export const asOfFlag: z.ZodString = z
+	.string()
+	.describe("The date the Projection starts at, as YYYY-MM-DD.")
+
+/** `--horizon`, the date every projection ends at. */
+export const horizonFlag: z.ZodString = z
+	.string()
+	.describe("The date the Projection ends at, as YYYY-MM-DD.")
+
+/** `--carry-in`, the one document that states what each Levy's period already tallied (ADR-0032). */
+export const carryInFlag: z.ZodOptional<z.ZodString> = z
+	.string()
+	.optional()
+	.describe(
+		'Read what each Levy\'s period already tallied and prepaid from this JSON path, or - for stdin: one record per Scenario, Levy and period, {"scenario", "levy", "periodStart", "tallies": [{"label", "basis", "amount"}], "prepaid", and "rest" instead of the classes left at zero}.',
+	)
+
+/** The document `--carry-in` names, published under `flagDocuments` so its shape is not guessed. */
+export const carryInFlagDocument: FlagDocument = { flag: "carryIn", schema: carryInDocument }
+
+/** `--set`, one transient Override, repeatable and in command-line order (ADR-0024). */
+export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
+	.array(z.string())
+	.optional()
+	.describe("Replace one existing dotted document path with a JSON value; repeatable.")

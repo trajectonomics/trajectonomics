@@ -1,0 +1,21 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { HTMLAttributes } from "astro/types"
+
+/** A hairline between two runs: the header's nav items, or the two halves of the hero's pill. */
+interface Props extends HTMLAttributes<"span"> {
+	readonly orientation?: "vertical" | "horizontal"
+}
+
+const { orientation = "vertical", class: className, ...rest } = Astro.props
+const classes = [
+	"block shrink-0 bg-border",
+	orientation === "vertical" ? "h-4 w-px" : "h-px w-full",
+	className,
+]
+	.filter(Boolean)
+	.join(" ")
+---
+
+<span {...rest} data-slot="separator" data-orientation={orientation} aria-hidden="true" class={classes}
+></span>

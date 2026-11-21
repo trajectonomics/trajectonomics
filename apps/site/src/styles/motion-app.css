@@ -1,0 +1,119 @@
+/*
+ * The demo window's chats in motion (ADR 0019, ADR 0022): the prompt typing itself into the composer, then one
+ * beat per message, the agent's thinking dots before its words, and the CLI's output landing line by line.
+ * Every rule needs `data-motion` on the chat, so the page as served is complete and still. `wait` is the
+ * first frame held, for a chat that has been set up but has not yet scrolled into view.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+	.app-chat[data-motion="wait"] * {
+		animation-play-state: paused;
+	}
+
+	/* ---------- the prompt: typed into the composer, then sent ---------- */
+
+	.app-chat[data-motion] .app-typed {
+		animation:
+			app-type var(--type-ms) steps(var(--chars), end) var(--type-start) both,
+			app-gone 1ms linear var(--type-sent) forwards;
+	}
+
+	/* The hint leaves while the prompt is typed, and comes back once it has been sent. */
+	.app-chat[data-motion] .app-placeholder {
+		animation:
+			app-gone 1ms linear var(--type-start) both,
+			app-back 200ms linear var(--type-sent) forwards;
+	}
+
+	@keyframes app-type {
+		from {
+			opacity: 1;
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			opacity: 1;
+			clip-path: inset(0 0 0 0);
+		}
+	}
+
+	@keyframes app-gone {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	@keyframes app-back {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	/* ---------- the transcript: one beat per message ---------- */
+
+	.app-chat[data-motion] .chat-bubble,
+	.app-chat[data-motion] .app-verdict {
+		animation: chat-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+		animation-delay: var(--step-delay, 0ms);
+	}
+
+	.app-chat[data-motion] [data-from="agent"] .chat-text,
+	.app-chat[data-motion] .chat-provenance {
+		animation: chat-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+		animation-delay: calc(var(--step-delay, 0ms) + 140ms);
+	}
+
+	/* The three painted dots that say the agent is thinking, then the words that land after them. */
+	.app-chat[data-motion] .chat-thinking {
+		animation: chat-think 780ms both;
+		animation-delay: var(--step-delay, 0ms);
+	}
+
+	.app-chat[data-motion] .terminal-line {
+		animation: chat-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+		animation-delay: var(--step-delay, 0ms);
+	}
+
+	@keyframes chat-in {
+		from {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes chat-think {
+		0% {
+			opacity: 0;
+		}
+		25%,
+		60% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
+	}
+
+	/* ---------- the hand-off: New chat asks to be pressed once the Before chat has been read ---------- */
+
+	.app[data-hint] .app-new {
+		outline: 2px solid transparent;
+		outline-offset: 2px;
+		animation: app-hint 900ms ease-in-out infinite;
+	}
+
+	@keyframes app-hint {
+		50% {
+			outline-color: var(--ds-color-accent);
+		}
+	}
+}

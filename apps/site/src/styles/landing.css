@@ -1,0 +1,29 @@
+/* The landing page's hero (ADR 0007): the stage, the pill, and the display headline. The headline holds still: its accent is colour, not motion (ADR 0012). */
+
+/*
+ * The hero is no longer a full viewport. It is only as tall as its copy and the demo window it carries,
+ * so the demonstration sits on the page the visitor lands on and the sections below follow close behind.
+ */
+
+/*
+ * The display family on every heading. The section headings stay light (300); the hero's headline, the
+ * page's one claim, is regular (400), the heaviest face the brand package ships, with no bold anywhere
+ * in it (ADR 0014).
+ */
+[data-hero-headline],
+.section-heading {
+	font-family: var(--font-display);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+}
+
+[data-hero-headline] {
+	font-weight: 400;
+}
+
+/* The pill's marker: an accent block, drawn with bars so it carries no text. */
+.hero-pill-marker {
+	width: 8px;
+	height: 8px;
+	background: var(--ds-color-accent);
+}

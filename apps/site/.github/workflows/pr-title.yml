@@ -1,0 +1,13 @@
+name: PR title
+
+# Squash merges use the PR title as the commit subject, and the shared workflow
+# rejects a title that is not a conventional commit: feat: -> minor,
+# feat!: / BREAKING CHANGE -> major, anything else -> patch. This repository
+# never publishes, but a readable history still starts with the title.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  title:
+    uses: trajectonomics/cicd/.github/workflows/pr-title.yml@v1

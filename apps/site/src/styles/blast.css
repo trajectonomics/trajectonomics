@@ -1,0 +1,97 @@
+/* The hero's pixel blast ground (ADR 0010): the baked field, its shape, and its colour. */
+
+/*
+ * The hero's ground is a pixel blast (ADR 0010): a one-bit field of 4 px squares, ordered-dithered
+ * from fbm noise and baked into the tile the build writes to `public/hero/`. The same field as a
+ * shader needs three.js and postprocessing, far past the Site's 10,000-byte script budget, so the
+ * field is printed once and only its colour, its shape and its drift are live.
+ */
+.hero-blast {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(
+		to bottom,
+		transparent 0%,
+		var(--ds-color-foreground) 12%,
+		var(--ds-color-foreground) 74%,
+		transparent 100%
+	);
+	mask-image: linear-gradient(
+		to bottom,
+		transparent 0%,
+		var(--ds-color-foreground) 12%,
+		var(--ds-color-foreground) 74%,
+		transparent 100%
+	);
+}
+
+/*
+ * The ground is the whole stage, the copy and the demo window under it, so the squares frame both: they
+ * gather at the top and run down the window's two sides, as twenty.com's do, and they leave a clearing
+ * behind the headline, the subline and the buttons so the copy sits on clean ground (ADR 0014). The
+ * window's own surface is opaque, so nothing needs to be cleared behind it.
+ */
+.hero-blast-field {
+	position: absolute;
+	inset: 0;
+	-webkit-mask-image:
+		linear-gradient(
+			to right,
+			var(--ds-color-foreground) 0%,
+			transparent 36%,
+			transparent 64%,
+			var(--ds-color-foreground) 100%
+		),
+		radial-gradient(
+			ellipse 40% 21% at 50% 21%,
+			transparent 0%,
+			transparent 62%,
+			var(--ds-color-foreground) 100%
+		);
+	mask-image:
+		linear-gradient(
+			to right,
+			var(--ds-color-foreground) 0%,
+			transparent 36%,
+			transparent 64%,
+			var(--ds-color-foreground) 100%
+		),
+		radial-gradient(
+			ellipse 40% 21% at 50% 21%,
+			transparent 0%,
+			transparent 62%,
+			var(--ds-color-foreground) 100%
+		);
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect;
+}
+
+/*
+ * The layer the field drifts on (motion.css moves it): the squares and the ripple share it, so a ripple
+ * lights the squares the visitor sees, not a second set that slides against them.
+ */
+.hero-blast-drift {
+	position: absolute;
+	inset: -6%;
+	will-change: transform;
+}
+
+/* The squares themselves: the baked tile, repeated, painted the Theme's accent role. */
+.hero-blast-pixels {
+	position: absolute;
+	inset: 0;
+	background: var(--ds-color-accent);
+	opacity: 0.3;
+	-webkit-mask-image: url("/hero/pixel-blast.png");
+	mask-image: url("/hero/pixel-blast.png");
+	-webkit-mask-size: 1020px 1020px;
+	mask-size: 1020px 1020px;
+	-webkit-mask-repeat: repeat;
+	mask-repeat: repeat;
+}
+
+[data-theme="dark"] .hero-blast-pixels {
+	opacity: 0.34;
+}

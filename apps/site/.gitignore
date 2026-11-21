@@ -1,0 +1,27 @@
+node_modules/
+/dist/
+public/favicon/
+# The Brand Typeface is copied from the pinned assets package before every build; the package is the
+# source of truth and the repository commits no binaries.
+public/fonts/
+# The hero's pixel field is printed by `scripts/hero-ground.ts` before every build, from a seed.
+public/hero/
+# The Answer engine files are printed by `scripts/llms-txt.ts` before every build, from the dictionaries.
+public/llms.txt
+public/llms-full.txt
+# The share image is rasterized by `scripts/share-image.ts` before every build, from the Dictionaries,
+# the pinned Theme and the assets package: the words and the colours are the source of truth.
+public/og/
+coverage/
+*.tgz
+.scratch/
+.DS_Store
+*.log
+.env
+.env.*
+.astro/
+.wrangler/
+.dev.vars
+# Playwright writes these beside the repository when the browser checks fail.
+test-results/
+playwright-report/

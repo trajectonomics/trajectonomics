@@ -1,0 +1,101 @@
+/*
+ * The footer (ADR 0012), after twenty.com's: the stage surface, a brand block beside three link
+ * columns, the disclaimer under a hairline, and a wordmark too large to fit, cropped at the bottom edge.
+ * Secondary text is the stage-foreground at 72% opacity, so every shade is still a Theme role.
+ */
+
+.site-footer {
+	overflow: hidden;
+}
+
+.footer-inner {
+	display: flex;
+	max-width: 72rem;
+	flex-direction: column;
+	gap: 32px;
+	margin: 0 auto;
+	padding: 56px 1.25rem 24px;
+}
+
+@media (min-width: 40rem) {
+	.footer-inner {
+		padding: 80px 1.5rem 32px;
+	}
+}
+
+.footer-top {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+}
+
+@media (min-width: 64rem) {
+	.footer-top {
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+}
+
+.footer-brand {
+	display: flex;
+	max-width: 20rem;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.footer-name {
+	font-family: var(--font-display);
+	font-size: 28px;
+	font-weight: 300;
+	letter-spacing: -0.02em;
+}
+
+.footer-tagline {
+	font-size: 14px;
+	opacity: 0.72;
+}
+
+.footer-columns {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 32px 24px;
+}
+
+@media (min-width: 40rem) {
+	.footer-columns {
+		grid-template-columns: repeat(3, 11rem);
+		gap: 40px;
+	}
+}
+
+.footer-label {
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	opacity: 0.72;
+}
+
+.footer-links {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 14px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.footer-link {
+	font-size: 14px;
+	text-underline-offset: 4px;
+}
+
+.footer-link:hover {
+	text-decoration: underline;
+}
+
+.footer-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

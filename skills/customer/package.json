@@ -1,0 +1,56 @@
+{
+	"name": "@trajectonomics/skills",
+	"version": "0.0.0-development",
+	"description": "Agent skills for Trajectonomics",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/trajectonomics/skills.git"
+	},
+	"type": "module",
+	"sideEffects": false,
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.cts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"test": "bun test",
+		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+		"lint": "biome ci --error-on-warnings .",
+		"format": "biome check --write .",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run lint:package",
+		"lint:package": "publint --strict && attw --pack . --profile node16",
+		"skills:sync": "bun scripts/sync-skills-manifest.ts",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
+		"@biomejs/biome": "2.6.3",
+		"@types/bun": "^1.4.4",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.2",
+		"typescript": "^7.0.2"
+	},
+	"private": true
+}

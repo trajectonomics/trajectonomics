@@ -1,0 +1,99 @@
+import type { CrawlerFailureCode } from "./crawler-failure-codes"
+import type { HeadFailureCode } from "./head-failure-codes"
+import type { ReleaseFailureCode } from "./release-failure-codes"
+import type { ShareFailureCode } from "./share-failure-codes"
+
+/** Stable codes for every way the built Site can fail verification. One code per rule. */
+export type BuildFailureCode =
+	| HeadFailureCode
+	| "NOT_FOUND_PAGE_MISSING"
+	| "HEAD_NOT_SINGLE"
+	| "BODY_NOT_SINGLE"
+	| "PAGE_H1_COUNT"
+	| "PAGE_MAIN_COUNT"
+	| "PAGE_NAV_COUNT"
+	| "HEADING_H2_OUTSIDE_MAIN"
+	| "HEADING_TOO_DEEP"
+	| "LANGUAGE_CODE_DIRECTORY_PRESENT"
+	| "RESERVED_PRELOAD_PATH_BUILT"
+	| "CONTENT_SECURITY_POLICY_PRESENT"
+	| "EXTERNAL_ASSET"
+	| "PAGE_DOCS_LINK_MISSING"
+	| "PAGE_CLI_INSTALL_LINK_MISSING"
+	| "PAGE_SKILLS_LINK_MISSING"
+	| "HEADER_MISSING"
+	| "HERO_MISSING"
+	| "FOOTER_MISSING"
+	| "THEME_ATTRIBUTE_MISSING"
+	| "THEME_ATTRIBUTE_NOT_PUBLISHED"
+	| "THEME_ATTRIBUTE_NOT_SHIPPED"
+	| "THEME_STYLESHEET_MISSING"
+	| "THEME_CSS_NOT_BUILT"
+	| "THEME_COLOUR_SCHEME_MISSING"
+	| "THEME_DEVICE_SCHEME_PRESENT"
+	| "LANDMARK_COLOUR_NOT_WIRED"
+	| "LANDMARK_TEXT_ROLE_MISMATCH"
+	| "TEXT_CONTRAST_TOO_LOW"
+	| "TEXT_COLOUR_UNRESOLVED"
+	| "TEXT_COLOUR_UNREADABLE"
+	| "LANGUAGE_PAGE_MISSING"
+	| "LANGUAGE_NOT_DECLARED"
+	| "THAI_TEXT_LANGUAGE_WRONG"
+	| "OWNER_PLACEHOLDER_IN_PRODUCTION"
+	| "SCRIPT_DETECTS_LANGUAGE"
+	| "SWITCHER_MISSING"
+	| "SWITCHER_TEXT_WRONG"
+	| "FONT_BUDGET_OVER"
+	| "FONT_FILE_MISSING"
+	| "REMOTE_FONT_URL_PRESENT"
+	| "FONT_FROM_ANOTHER_ORIGIN"
+	| "DATA_FONT_URL_PRESENT"
+	| "PAGE_WEIGHT_OVER_BUDGET"
+	| "PAGE_JAVASCRIPT_OVER_BUDGET"
+	| "STYLESHEET_MISSING"
+	| "SCRIPT_MISSING"
+	| "SWITCHER_CURRENT_MISSING"
+	| "SWITCHER_CURRENT_LABEL_WRONG"
+	| "SWITCHER_CLAIMS_HREFLANG"
+	| "PAGE_FACTS_MISSING"
+	| "FACT_NOT_STATED"
+	| "PAGE_FACTS_NOT_IN_FOOTER"
+	| "PAGE_PROMPT_MISSING"
+	| "PROMPT_TEXT_MISMATCH"
+	| "INSTALL_WINDOW_EXTRA_CODE"
+	| "INSTALL_COMMAND_RETURNED"
+	| "FORBIDDEN_NPX_TRAJ"
+	| "DICTIONARY_KEY_MISSING"
+	| "DICTIONARY_SHAPE"
+	| "COPY_BUTTON_MISSING"
+	| "COPY_BUTTON_LABEL_MISMATCH"
+	| "COPY_BUTTON_NOT_SIBLING"
+	| "COPY_MESSAGES_MISSING"
+	| "WORDMARK_MISSING"
+	| "WORDMARK_HREF_MISMATCH"
+	| "LINK_MISSING"
+	| "LINK_HREF_MISMATCH"
+	| "HEADLINE_NOT_RENDERED"
+	| "SUBLINE_NOT_RENDERED"
+	| "DISCLAIMER_NOT_RENDERED"
+	| "ROBOTS_MISSING"
+	| "ROBOTS_AGENT_MISSING"
+	| "ROBOTS_ALLOW_MISSING"
+	| "ROBOTS_DISALLOW_PRESENT"
+	| "ROBOTS_SITEMAP_MISSING"
+	| "ROBOTS_SITEMAP_TARGET"
+	| CrawlerFailureCode
+	| ReleaseFailureCode
+	| ShareFailureCode
+
+/** One failed build check: the rule's code, the file it concerns and a line a maintainer can act on. */
+export interface BuildFailure {
+	readonly code: BuildFailureCode
+	readonly path: string
+	readonly message: string
+}
+
+/** A frozen failure, so a caller cannot edit a check's verdict. */
+export function buildFailure(code: BuildFailureCode, path: string, message: string): BuildFailure {
+	return Object.freeze({ code, path, message })
+}

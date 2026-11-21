@@ -1,0 +1,60 @@
+{
+	"name": "@trajectonomics/docs",
+	"version": "0.0.0-development",
+	"description": "Trajectonomics Docs Portal (Fumadocs + Astro), deployed to trajectonomics.com/docs on Cloudflare Workers Static Assets. Never published to npm.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/trajectonomics/docs.git"
+	},
+	"type": "module",
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=22.23.4"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro build && wrangler dev",
+		"test": "bun test ./src ./scripts",
+		"test:e2e": "bun run build && playwright test",
+		"screenshots:curated": "bun run build && bun scripts/screenshots.ts",
+		"typecheck": "tsc -p tsconfig.json && astro check",
+		"lint": "biome ci --error-on-warnings .",
+		"format": "biome check --write .",
+		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run verify:build",
+		"check:command-reference": "bun scripts/check-command-reference.ts",
+		"verify:build": "bun scripts/verify-build.ts",
+		"sync:release": "bun scripts/sync-upstream-release.ts",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.12",
+		"@axe-core/playwright": "4.14.0",
+		"@biomejs/biome": "2.6.3",
+		"@playwright/test": "1.65.0",
+		"@tailwindcss/vite": "^4.3.5",
+		"@trajectonomics/sim": "0.1.0",
+		"@types/bun": "^1.4.4",
+		"@types/mdx": "^2.0.14",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
+		"tailwindcss": "^4.3.5",
+		"typescript": "~6.0.3",
+		"wrangler": "^4.158.0"
+	},
+	"private": true,
+	"dependencies": {
+		"@astrojs/react": "^7.1.4",
+		"@fumadocs/astro": "^0.2.1",
+		"@trajectonomics/design-system": "0.1.0-alpha.4",
+		"@trajectonomics/design-system-assets": "0.1.0-alpha.2",
+		"@trajectonomics/design-system-theme": "0.1.0-alpha.5",
+		"astro": "^7.4.7",
+		"fumadocs-core": "^16.18.2",
+		"fumadocs-ui": "^16.18.2",
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1"
+	}
+}

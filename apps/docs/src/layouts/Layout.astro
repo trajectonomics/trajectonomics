@@ -1,0 +1,55 @@
+---
+import { ClientRouter } from "astro:transitions"
+import appleTouchIcon from "@trajectonomics/design-system-assets/favicon/apple-touch-icon.png?url"
+import faviconIco from "@trajectonomics/design-system-assets/favicon/favicon.ico?url"
+import faviconSvg from "@trajectonomics/design-system-assets/favicon/favicon.svg?url"
+import icon192 from "@trajectonomics/design-system-assets/favicon/icon-192.png?url"
+import icon512 from "@trajectonomics/design-system-assets/favicon/icon-512.png?url"
+import AgentLine from "../components/AgentLine.astro"
+import "../styles/global.css"
+
+interface Props {
+	title: string
+	description?: string | undefined
+	/**
+	 * The page's Markdown twin, for the head's alternate link and the Agent's pointer at the top of the
+	 * body; a page with no twin passes none and carries neither.
+	 */
+	markdownTwin?: string | undefined
+}
+
+const { title, description, markdownTwin } = Astro.props
+---
+
+<!-- data-theme is the no-JS fallback; the theme provider (provider.tsx) forces the dark Theme and
+     sets class and data-theme together before first paint, selecting the design-system Theme CSS. -->
+<html lang="en" data-theme="dark" transition:animate="none">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		{description && <meta name="description" content={description} />}
+		{markdownTwin && <link rel="alternate" type="text/markdown" href={markdownTwin} />}
+		<link rel="icon" type="image/svg+xml" href={faviconSvg} />
+		<link rel="icon" type="image/x-icon" sizes="any" href={faviconIco} />
+		<link rel="icon" type="image/png" sizes="192x192" href={icon192} />
+		<link rel="icon" type="image/png" sizes="512x512" href={icon512} />
+		<link rel="apple-touch-icon" href={appleTouchIcon} />
+		<ClientRouter />
+		{/*
+			One pageview per page the reader opens, posted from the page itself: the Portal loads no
+			third-party script ([ADR 0008](./docs/adr/0008-analytics-from-the-page-itself.md)). The script
+			decides for itself whether the host and the reader's opt-out signals allow it, and it measures
+			the pages the Client Router swaps in as well as the first one.
+		*/}
+		<script>
+			import { startAnalytics } from "../lib/analytics/client"
+
+			startAnalytics()
+		</script>
+	</head>
+	<body class="flex flex-col min-h-screen">
+		{markdownTwin && <AgentLine twin={markdownTwin} />}
+		<slot />
+	</body>
+</html>
