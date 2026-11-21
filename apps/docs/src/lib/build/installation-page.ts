@@ -1,11 +1,11 @@
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { visibleText } from "./html"
 
 /** Assets-root path of the built Installation page. */
-export const INSTALLATION_PAGE_FILE = "docs/cli/installation/index.html"
+export const INSTALLATION_PAGE_FILE = portalAsset("cli/installation/index.html")
 
 /** A `<pre>` block of a built page: the code a reader can copy out of it. */
 const CODE_BLOCK = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi

@@ -28,8 +28,8 @@ function namedGroup(agent: string): string {
 
 /**
  * The Robots file: every agent may read every path, the Sitemap is named, and each answer engine
- * gets a group of its own. It carries no `Disallow:`, because it is read at the host root and would
- * speak for `/docs` too, which another repository serves.
+ * gets a group of its own. It carries no `Disallow:`. `/docs` on this host is the redirect to the
+ * Docs Portal, so disallowing it would hide that redirect from crawlers.
  */
 export const ROBOTS = `User-agent: *
 Allow: /

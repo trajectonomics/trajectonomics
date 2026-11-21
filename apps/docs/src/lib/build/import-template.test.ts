@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkImportTemplate, IMPORT_TEMPLATE_HEADER } from "./import-template"
 
-const PAGE = "docs/cli/commands/tx/index.html"
+const PAGE = "cli/commands/tx/index.html"
 
 /** The header as the highlighter ships it: one line split into a `<span>` per token. */
 const HIGHLIGHTED = [
@@ -51,7 +51,7 @@ describe("the import template the tx page shows", () => {
 			codesOf([
 				page("<p>Import transactions from the one CSV template.</p>"),
 				{
-					path: "docs/cli/index.html",
+					path: "cli/index.html",
 					content: `<pre><code>${IMPORT_TEMPLATE_HEADER}</code></pre>`,
 				},
 			]),

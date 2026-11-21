@@ -27,9 +27,9 @@ describe("a build step's refusal", () => {
 
 	test("a page with no frontmatter title becomes a build error with its message", async () => {
 		const error = await refusalOf(() => {
-			throw new PageWordsError("TITLE_MISSING", "/docs/cli has no frontmatter title", "data.title")
+			throw new PageWordsError("TITLE_MISSING", "/cli has no frontmatter title", "data.title")
 		})
-		expect((error as Error).message).toBe("/docs/cli has no frontmatter title")
+		expect((error as Error).message).toBe("/cli has no frontmatter title")
 	})
 
 	test("a frozen error from anywhere becomes a build error with its message", async () => {

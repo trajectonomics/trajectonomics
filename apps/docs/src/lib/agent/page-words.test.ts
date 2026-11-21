@@ -16,18 +16,16 @@ function refusalOf(page: SourcePageWords): { code: string; field: string } | und
 describe("a page's authored words", () => {
 	test("are its frontmatter title and description, with the URL its twin follows", () => {
 		expect(
-			pageWords({ url: "/docs/cli", data: { title: "Quickstart", description: "Install traj." } }),
-		).toEqual({ title: "Quickstart", description: "Install traj.", url: "/docs/cli" })
+			pageWords({ url: "/cli", data: { title: "Quickstart", description: "Install traj." } }),
+		).toEqual({ title: "Quickstart", description: "Install traj.", url: "/cli" })
 	})
 
 	test("are frozen, so no caller can edit the words a twin and its index bullet carry", () => {
-		expect(Object.isFrozen(pageWords({ url: "/docs/cli", data: { title: "Quickstart" } }))).toBe(
-			true,
-		)
+		expect(Object.isFrozen(pageWords({ url: "/cli", data: { title: "Quickstart" } }))).toBe(true)
 	})
 
 	test("are refused as TITLE_MISSING when the frontmatter has no title", () => {
-		expect(refusalOf({ url: "/docs/cli", data: {} })).toEqual({
+		expect(refusalOf({ url: "/cli", data: {} })).toEqual({
 			code: "TITLE_MISSING",
 			field: "data.title",
 		})

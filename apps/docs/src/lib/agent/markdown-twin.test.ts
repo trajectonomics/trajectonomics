@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { SITE_ORIGIN } from "../site"
 import { indexReference } from "./index-reference"
 import { buildMarkdownTwin, MarkdownTwinError, type PageTwinSource } from "./markdown-twin"
 
-const ORIGIN = "https://trajectonomics.com"
+const ORIGIN = SITE_ORIGIN
 
 /** Every twin ends with this line, the reference to the Docs index it belongs to. */
 const INDEX_REFERENCE = indexReference(ORIGIN)
@@ -43,14 +44,14 @@ describe("a page's Markdown twin", () => {
 	})
 
 	test("ends with a reference to the Docs index, so a twin read alone can find the rest", () => {
-		expect(buildMarkdownTwin(PAGE, ORIGIN)).toContain(`[Docs index](${ORIGIN}/docs/llms.txt)`)
+		expect(buildMarkdownTwin(PAGE, ORIGIN)).toContain(`[Docs index](${ORIGIN}/llms.txt)`)
 	})
 
 	test("makes an internal link absolute and leaves an external one untouched", () => {
 		const built = buildMarkdownTwin(
 			{
 				...PAGE,
-				body: "[Commands](/docs/cli/commands/) and [npm](https://www.npmjs.com/package/x).",
+				body: "[Commands](/cli/commands/) and [npm](https://www.npmjs.com/package/x).",
 			},
 			ORIGIN,
 		)
@@ -60,7 +61,7 @@ describe("a page's Markdown twin", () => {
 				"",
 				"> Manage ledger transactions.",
 				"",
-				"[Commands](https://trajectonomics.com/docs/cli/commands/) and [npm](https://www.npmjs.com/package/x).",
+				"[Commands](https://docs.trajectonomics.com/cli/commands/) and [npm](https://www.npmjs.com/package/x).",
 			),
 		)
 	})

@@ -4,14 +4,14 @@ import type { BuiltFile } from "./built-files"
 import { DOCS_INDEX_FILE } from "./docs-index-file"
 import { checkDocsIndexPages } from "./docs-index-pages"
 
-const PAGES = ["docs/index.html", "docs/cli/index.html", "docs/cli/commands/tx/index.html"]
+const PAGES = ["index.html", "cli/index.html", "cli/commands/tx/index.html"]
 
-const TWINS = ["docs/index.md", "docs/cli.md", "docs/cli/commands/tx.md"]
+const TWINS = ["index.md", "cli.md", "cli/commands/tx.md"]
 
 const ENTRIES = [
-	["Trajectonomics Docs", `${SITE_ORIGIN}/docs/index.md`],
-	["Quickstart", `${SITE_ORIGIN}/docs/cli.md`],
-	["tx", `${SITE_ORIGIN}/docs/cli/commands/tx.md`],
+	["Trajectonomics Docs", `${SITE_ORIGIN}/index.md`],
+	["Quickstart", `${SITE_ORIGIN}/cli.md`],
+	["tx", `${SITE_ORIGIN}/cli/commands/tx.md`],
 ] as const
 
 function page(path: string): BuiltFile {
@@ -54,7 +54,7 @@ describe("the Docs index's coverage of the built pages", () => {
 
 		const failures = checkDocsIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["DOCS_INDEX_PAGE_MISSING"])
-		expect(failures[0]?.message).toContain("/docs/cli/")
+		expect(failures[0]?.message).toContain("/cli/")
 	})
 
 	test("the Landing Page is covered by the same rule as every content page", () => {
@@ -65,11 +65,11 @@ describe("the Docs index's coverage of the built pages", () => {
 
 		const failures = checkDocsIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["DOCS_INDEX_PAGE_MISSING"])
-		expect(failures[0]?.message).toContain("/docs/index.md")
+		expect(failures[0]?.message).toContain("/index.md")
 	})
 
 	test("a page added without touching the index fails, because the page list comes from the build", () => {
-		const files = [...COMPLETE_BUILD, page("docs/cli/new/index.html"), twin("docs/cli/new.md")]
+		const files = [...COMPLETE_BUILD, page("cli/new/index.html"), twin("cli/new.md")]
 
 		expect(checkDocsIndexPages(files).map((failure) => failure.code)).toEqual([
 			"DOCS_INDEX_PAGE_MISSING",
@@ -77,11 +77,11 @@ describe("the Docs index's coverage of the built pages", () => {
 	})
 
 	test("an index entry with no twin is reported as TWIN_MISSING", () => {
-		const files = COMPLETE_BUILD.filter((file) => file.path !== "docs/cli/commands/tx.md")
+		const files = COMPLETE_BUILD.filter((file) => file.path !== "cli/commands/tx.md")
 
 		const failures = checkDocsIndexPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["TWIN_MISSING"])
-		expect(failures[0]?.message).toContain("/docs/cli/commands/tx.md")
+		expect(failures[0]?.message).toContain("/cli/commands/tx.md")
 	})
 
 	test("a twin the index lists twice is reported as DOCS_INDEX_PAGE_DUPLICATE", () => {
@@ -109,7 +109,7 @@ describe("the Docs index's coverage of the built pages", () => {
 	test("a relative twin URL is unexpected, because the index is read away from the Portal", () => {
 		const files = [
 			...COMPLETE_BUILD.filter((file) => file.path !== DOCS_INDEX_FILE),
-			docsIndex([...ENTRIES, ["Relative", "/docs/cli.md"]]),
+			docsIndex([...ENTRIES, ["Relative", "/cli.md"]]),
 		]
 
 		expect(checkDocsIndexPages(files).map((failure) => failure.code)).toEqual([
@@ -139,10 +139,10 @@ describe("the Docs index's coverage of the built pages", () => {
 	test("the 404 page and the audience aliases have no twin and are not required in the index", () => {
 		const files = [
 			...COMPLETE_BUILD,
-			page("docs/404.html"),
+			page("404.html"),
 			{
-				path: "docs/operators/index.html",
-				content: '<html><meta http-equiv="refresh" content="0;url=/docs/cli/"></html>',
+				path: "operators/index.html",
+				content: '<html><meta http-equiv="refresh" content="0;url=/cli/"></html>',
 			},
 		]
 

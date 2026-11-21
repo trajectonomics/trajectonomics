@@ -3,8 +3,8 @@ import { contentPathOf, internalLinks, resolvesPagePath } from "./content-pages"
 import type { ContentStructureProblem } from "./content-structure"
 
 /**
- * A site-absolute link under `/docs` that has no page behind it. The Landing Page at `/docs/` is
- * an Astro page, not a content page, so a link to it resolves without a file.
+ * A site-absolute link that has no page behind it. The Landing Page at `/` is an Astro page, not a
+ * content page, so a link to it resolves without a file.
  */
 function linkProblems(file: ContentFile, files: readonly ContentFile[]): readonly string[] {
 	return internalLinks(file.content).filter((link) => {
@@ -13,7 +13,7 @@ function linkProblems(file: ContentFile, files: readonly ContentFile[]): readonl
 	})
 }
 
-/** Every site-absolute link under `/docs` in an authored page names a page that exists. */
+/** Every site-absolute link in an authored page names a page that exists. */
 export function linkStructureProblems(
 	files: readonly ContentFile[],
 ): readonly ContentStructureProblem[] {

@@ -58,17 +58,20 @@ export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 	"}",
 ])
 
-/** The Docs Portal's path, which the router serves; this repository does not build it. */
-export const DOCS_PATH = "/docs/"
+/** The Docs Portal's origin. This repository does not build it (ADR 0013 in `apps/docs`). */
+export const DOCS_ORIGIN = "https://docs.trajectonomics.com"
+
+/** The Docs Portal's Landing Page. */
+export const DOCS_PATH = `${DOCS_ORIGIN}/`
 
 /** The Docs Portal's CLI page, the CLI docs link in the footer. */
-export const DOCS_CLI_PATH = "/docs/cli/"
+export const DOCS_CLI_PATH = `${DOCS_ORIGIN}/cli/`
 
 /**
  * The Docs Portal's CLI installation page: every install channel, release pinning and uninstall. It is the
  * way out under the prompt, for the visitor the skills CLI cannot reach (ADR 0015).
  */
-export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
+export const DOCS_CLI_INSTALL_PATH = `${DOCS_ORIGIN}/cli/installation/`
 
 /** The skills repository: the star menu, the footer's own link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"

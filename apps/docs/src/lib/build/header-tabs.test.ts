@@ -5,8 +5,8 @@ import { checkHeaderTabs } from "./header-tabs"
 
 const OPERATOR = TABS[0]
 const BUILDER = TABS[1]
-const OPERATOR_PAGE = "docs/cli/index.html"
-const CONTRIBUTE_PAGE = "docs/contribute/index.html"
+const OPERATOR_PAGE = "cli/index.html"
+const CONTRIBUTE_PAGE = "contribute/index.html"
 
 /** A Tab link, marked as the current page only when it is `current`. */
 function tabLink(tab: TabDefinition, current: TabDefinition | undefined): string {

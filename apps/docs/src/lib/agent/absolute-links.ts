@@ -1,7 +1,7 @@
-/** A Markdown link whose target is a site path under the Docs Portal base, its title kept. */
-const MARKDOWN_LINK = /(\]\(\s*)(\/docs(?:\/[^)\s]*)?)/g
+/** A Markdown link whose target is a site path on this host, its title kept. */
+const MARKDOWN_LINK = /(\]\(\s*)(\/(?!\/)[^)\s]*)/g
 
-/** `content` with every Markdown link under `/docs` rewritten to its absolute URL; other links are untouched. */
+/** `content` with every Markdown link on this host rewritten to its absolute URL; other links are untouched. */
 export function absoluteDocsLinks(content: string, origin: string): string {
 	return content.replace(
 		MARKDOWN_LINK,

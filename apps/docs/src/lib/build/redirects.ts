@@ -7,7 +7,7 @@ import { buildFailure } from "./failures"
 /** Path of the Worker's redirect rules in the build output, one segment below the assets root. */
 export const REDIRECTS_FILE = "_redirects"
 
-/** The Operator tab's URL with and without its trailing slash: the targets `/docs` must not take. */
+/** The Operator tab's URL with and without its trailing slash: the targets a redirect must not take. */
 const OPERATOR_TAB_TARGETS: readonly string[] = [tabUrl(TABS[0]), tabUrl(TABS[0]).slice(0, -1)]
 
 /** The target of a `_redirects` rule line, or `undefined` for a blank line or a comment. */
@@ -16,7 +16,7 @@ function ruleTarget(line: string): string | undefined {
 	return rule === "" || rule.startsWith("#") ? undefined : rule.split(/\s+/)[1]
 }
 
-/** Failures for each redirect rule that sends readers to the Operator tab, as `/docs` once did. */
+/** Failures for each redirect rule that sends readers to the Operator tab. */
 export function checkRedirects(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	const file = fileAt(files, REDIRECTS_FILE)
 	if (file === undefined) {

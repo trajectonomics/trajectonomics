@@ -31,7 +31,7 @@ function wildcardFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 	]
 }
 
-/** The file carries no `Disallow:`, because it is read at the host root and speaks for `/docs` too. */
+/** The file carries no `Disallow:`. `/docs` on this host redirects to the Docs Portal. */
 function disallowFailures(parsed: ParsedRobots): readonly BuildFailure[] {
 	return parsed.directives
 		.filter((directive) => directive.field === "disallow")

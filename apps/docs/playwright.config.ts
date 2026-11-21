@@ -20,7 +20,7 @@ export default defineConfig({
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 	webServer: {
 		command: `bunx wrangler dev --ip 127.0.0.1 --port ${PORT}`,
-		url: `${BASE_URL}/docs/cli/`,
+		url: `${BASE_URL}/cli/`,
 		reuseExistingServer: false,
 		timeout: 120_000,
 	},

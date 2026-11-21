@@ -4,13 +4,9 @@ import { sitemapDocument, sitemapLocations } from "../sitemap"
 import type { BuiltFile } from "./built-files"
 import { checkSitemapPages, SITEMAP_FILE } from "./sitemap-pages"
 
-const PAGES = ["docs/index.html", "docs/cli/index.html", "docs/cli/commands/tx/index.html"]
+const PAGES = ["index.html", "cli/index.html", "cli/commands/tx/index.html"]
 
-const URLS = [
-	`${SITE_ORIGIN}/docs/`,
-	`${SITE_ORIGIN}/docs/cli/`,
-	`${SITE_ORIGIN}/docs/cli/commands/tx/`,
-]
+const URLS = [`${SITE_ORIGIN}/`, `${SITE_ORIGIN}/cli/`, `${SITE_ORIGIN}/cli/commands/tx/`]
 
 function page(path: string): BuiltFile {
 	return { path, content: "<!doctype html><title>A page</title>" }
@@ -31,9 +27,9 @@ function sitemap(locations: readonly string[]): BuiltFile {
 /** Every page a reader can open, beside the two files a Sitemap must not list. */
 const PAGES_A_READER_CAN_OPEN: readonly BuiltFile[] = [
 	...PAGES.map(page),
-	alias("docs/operators/index.html", "/docs/cli/"),
-	alias("docs/builders/index.html", "/docs/contribute/"),
-	page("docs/404.html"),
+	alias("operators/index.html", "/cli/"),
+	alias("builders/index.html", "/contribute/"),
+	page("404.html"),
 ]
 
 describe("the Sitemap's coverage of the pages a reader can open", () => {
@@ -46,8 +42,8 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 	test("a page whose slug needs percent-encoding is listed and checked once", () => {
 		const files = [
 			...PAGES_A_READER_CAN_OPEN,
-			page("docs/cli/café/index.html"),
-			sitemap([...URLS, sitemapLocations(sitemapDocument(["/docs/cli/café/"]))?.[0] ?? ""]),
+			page("cli/café/index.html"),
+			sitemap([...URLS, sitemapLocations(sitemapDocument(["/cli/café/"]))?.[0] ?? ""]),
 		]
 
 		expect(checkSitemapPages(files)).toEqual([])
@@ -71,7 +67,7 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 
 		const failures = checkSitemapPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["SITEMAP_PAGE_MISSING"])
-		expect(failures[0]?.message).toContain("/docs/cli/commands/tx/")
+		expect(failures[0]?.message).toContain("/cli/commands/tx/")
 	})
 
 	test("a URL listed twice is reported as SITEMAP_PAGE_DUPLICATE, naming the URL", () => {
@@ -79,19 +75,19 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 
 		const failures = checkSitemapPages(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["SITEMAP_PAGE_DUPLICATE"])
-		expect(failures[0]?.message).toContain(`${SITE_ORIGIN}/docs/`)
+		expect(failures[0]?.message).toContain(`${SITE_ORIGIN}/`)
 	})
 
 	test("a URL that is not a page a reader can open is reported as SITEMAP_PAGE_UNEXPECTED", () => {
-		const listed = [...URLS, `${SITE_ORIGIN}/docs/404.html`, `${SITE_ORIGIN}/docs/operators/`]
+		const listed = [...URLS, `${SITE_ORIGIN}/404.html`, `${SITE_ORIGIN}/operators/`]
 
 		const failures = checkSitemapPages([...PAGES_A_READER_CAN_OPEN, sitemap(listed)])
 		expect(failures.map((failure) => failure.code)).toEqual([
 			"SITEMAP_PAGE_UNEXPECTED",
 			"SITEMAP_PAGE_UNEXPECTED",
 		])
-		expect(failures.map((failure) => failure.message).join("\n")).toContain("/docs/404.html")
-		expect(failures.map((failure) => failure.message).join("\n")).toContain("/docs/operators/")
+		expect(failures.map((failure) => failure.message).join("\n")).toContain("/404.html")
+		expect(failures.map((failure) => failure.message).join("\n")).toContain("/operators/")
 	})
 
 	test("a URL on another origin is reported as SITEMAP_PAGE_UNEXPECTED", () => {
@@ -105,14 +101,14 @@ describe("the Sitemap's coverage of the pages a reader can open", () => {
 	})
 
 	test("a URL without its trailing slash does not match the page it names", () => {
-		const listed = [`${SITE_ORIGIN}/docs/`, `${SITE_ORIGIN}/docs/cli`, URLS[2]!]
+		const listed = [`${SITE_ORIGIN}/`, `${SITE_ORIGIN}/cli`, URLS[2]!]
 
 		const failures = checkSitemapPages([...PAGES_A_READER_CAN_OPEN, sitemap(listed)])
 		expect(failures.map((failure) => failure.code)).toEqual([
 			"SITEMAP_PAGE_MISSING",
 			"SITEMAP_PAGE_UNEXPECTED",
 		])
-		expect(failures[0]?.message).toContain("/docs/cli/")
+		expect(failures[0]?.message).toContain("/cli/")
 	})
 
 	test("a readable urlset with no url reports every page missing, not SITEMAP_INVALID", () => {

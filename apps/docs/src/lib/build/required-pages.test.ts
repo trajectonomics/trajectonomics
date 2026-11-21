@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test"
 import type { BuiltFile } from "./built-files"
 import { checkRequiredPages } from "./required-pages"
 
-const NOT_FOUND_PAGE = "docs/404.html"
-const LANDING_PAGE = "docs/index.html"
-const OPERATOR_TAB_PAGE = "docs/cli/index.html"
+const NOT_FOUND_PAGE = "404.html"
+const LANDING_PAGE = "index.html"
+const OPERATOR_TAB_PAGE = "cli/index.html"
 
 function page(path: string): BuiltFile {
 	return { path, content: "<!doctype html><title>A page</title>" }

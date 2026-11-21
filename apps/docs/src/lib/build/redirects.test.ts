@@ -15,30 +15,30 @@ describe("the built redirect rules", () => {
 		expect(checkRedirects([])).toEqual([])
 	})
 
-	test("a rule that keeps /docs on the Landing Page reports no failure", () => {
-		expect(codesOf("/docs /docs/ 301\n")).toEqual([])
+	test("a rule whose target is the Landing Page reports no failure", () => {
+		expect(codesOf("/old / 301\n")).toEqual([])
 	})
 
 	test("comments and blank lines are not rules", () => {
-		expect(codesOf("# /docs /docs/cli/ 302\n\n")).toEqual([])
+		expect(codesOf("# /old /cli/ 302\n\n")).toEqual([])
 	})
 
-	test("a rule that sends /docs to the Operator tab is reported as REDIRECT_TO_OPERATOR_TAB", () => {
-		expect(codesOf("/docs /docs/cli/ 302\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
+	test("a rule that sends readers to the Operator tab is reported as REDIRECT_TO_OPERATOR_TAB", () => {
+		expect(codesOf("/old /cli/ 302\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
 	})
 
 	test("the Operator tab without its trailing slash is the same target", () => {
-		expect(codesOf("/docs/ /docs/cli 301\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
+		expect(codesOf("/ /cli 301\n")).toEqual(["REDIRECT_TO_OPERATOR_TAB"])
 	})
 
 	test("every rule that targets the Operator tab is reported, not only the first", () => {
-		expect(codesOf("/docs /docs/cli/ 302\n/docs/ /docs/cli/ 302\n")).toEqual([
+		expect(codesOf("/old /cli/ 302\n/also /cli/ 302\n")).toEqual([
 			"REDIRECT_TO_OPERATOR_TAB",
 			"REDIRECT_TO_OPERATOR_TAB",
 		])
 	})
 
 	test("a rule to the Contribute tab is not the Operator redirect", () => {
-		expect(codesOf("/old /docs/contribute/ 301\n")).toEqual([])
+		expect(codesOf("/old /contribute/ 301\n")).toEqual([])
 	})
 })

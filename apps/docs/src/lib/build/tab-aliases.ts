@@ -1,13 +1,13 @@
 import { TAB_ALIASES, tabUrl } from "../tabs"
 import type { BuiltFile } from "./built-files"
-import { fileAt } from "./built-files"
+import { fileAt, portalAsset } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { redirectTarget } from "./redirect-page"
 
-/** Assets-root path of the built stub for an alias path, such as `docs/operators/index.html`. */
+/** Assets-root path of the built stub for an alias path, such as `operators/index.html`. */
 export function aliasFile(path: string): string {
-	return `docs${path}/index.html`
+	return portalAsset(`${path.replace(/^\//, "")}/index.html`)
 }
 
 function aliasFailures(

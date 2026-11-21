@@ -12,7 +12,7 @@ describe("the stale redirect rules of an earlier build", () => {
 	test("a _redirects file left in the assets root is removed", async () => {
 		const root = await assetsRoot()
 		try {
-			await writeFile(join(root, "_redirects"), "/docs /docs/cli/ 302\n")
+			await writeFile(join(root, "_redirects"), "/docs /cli/ 302\n")
 
 			await removeStaleRedirects(root)
 

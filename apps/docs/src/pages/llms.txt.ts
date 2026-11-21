@@ -12,7 +12,7 @@ import { isTabPath, TABS } from "../lib/tabs"
 
 export const prerender = true
 
-/** The Docs index at `/docs/llms.txt`: every page the Tabs present, its absolute twin and its description. */
+/** The Docs index at `/llms.txt`: every page the Tabs present, its absolute twin and its description. */
 export const GET: APIRoute = ({ site }) =>
 	runBuildStep(() => {
 		const pages = new Map(source.getPages().map((page) => [page.url, page]))

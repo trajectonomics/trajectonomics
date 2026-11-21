@@ -11,7 +11,7 @@ const RELEASE_LINE = readReleaseLine()
 /** A Site Home document, so the browser test never asks `wrangler dev` for the page at `/`. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
-test("/docs reaches the Landing Page at /docs/", async ({ page }) => {
+test("/docs reaches the Landing Page at /", async ({ page }) => {
 	const response = await page.goto(DOCS_BASE_PATH)
 
 	expect(response?.status()).toBe(200)

@@ -1,7 +1,7 @@
 {
 	"name": "@trajectonomics/docs",
 	"version": "0.0.0-development",
-	"description": "Trajectonomics Docs Portal (Fumadocs + Astro), deployed to trajectonomics.com/docs on Cloudflare Workers Static Assets. Never published to npm.",
+	"description": "Trajectonomics Docs Portal (Fumadocs + Astro), deployed to docs.trajectonomics.com on Cloudflare Workers Static Assets. Never published to npm.",
 	"license": "MIT",
 	"repository": {
 		"type": "git",

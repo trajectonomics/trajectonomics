@@ -6,9 +6,9 @@ import { DOCS_INDEX_FILE } from "./docs-index-file"
 import { checkMarkdownTwins } from "./markdown-twins"
 
 const ENTRIES = [
-	["Trajectonomics Docs", `${SITE_ORIGIN}/docs/index.md`],
-	["Quickstart", `${SITE_ORIGIN}/docs/cli.md`],
-	["tx", `${SITE_ORIGIN}/docs/cli/commands/tx.md`],
+	["Trajectonomics Docs", `${SITE_ORIGIN}/index.md`],
+	["Quickstart", `${SITE_ORIGIN}/cli.md`],
+	["tx", `${SITE_ORIGIN}/cli/commands/tx.md`],
 ] as const
 
 function docsIndex(entries: readonly (readonly [string, string])[] = ENTRIES): BuiltFile {
@@ -29,9 +29,9 @@ function twin(path: string, title: string, reference = indexReference(SITE_ORIGI
 /** A build whose every twin starts with the index's title and names the index. */
 const COMPLETE_BUILD: readonly BuiltFile[] = [
 	docsIndex(),
-	twin("docs/index.md", "Trajectonomics Docs"),
-	twin("docs/cli.md", "Quickstart"),
-	twin("docs/cli/commands/tx.md", "tx"),
+	twin("index.md", "Trajectonomics Docs"),
+	twin("cli.md", "Quickstart"),
+	twin("cli/commands/tx.md", "tx"),
 ]
 
 describe("a Markdown twin's shape", () => {
@@ -41,7 +41,7 @@ describe("a Markdown twin's shape", () => {
 
 	test("a twin whose first line is not its title is reported as TWIN_TITLE_MISSING", () => {
 		const files = COMPLETE_BUILD.map((file) =>
-			file.path === "docs/cli.md"
+			file.path === "cli.md"
 				? { ...file, content: `> Quickstart\n\n${indexReference(SITE_ORIGIN)}\n` }
 				: file,
 		)
@@ -51,7 +51,7 @@ describe("a Markdown twin's shape", () => {
 
 	test("a twin whose title differs from the index's is reported as TWIN_TITLE_MISMATCH", () => {
 		const files = COMPLETE_BUILD.map((file) =>
-			file.path === "docs/cli.md" ? twin("docs/cli.md", "Start here") : file,
+			file.path === "cli.md" ? twin("cli.md", "Start here") : file,
 		)
 
 		expect(checkMarkdownTwins(files).map((failure) => failure.code)).toEqual([
@@ -61,18 +61,18 @@ describe("a Markdown twin's shape", () => {
 
 	test("a twin with no Markdown link to the Docs index is reported as TWIN_INDEX_REFERENCE_MISSING", () => {
 		const files = COMPLETE_BUILD.map((file) =>
-			file.path === "docs/cli.md" ? twin("docs/cli.md", "Quickstart", "") : file,
+			file.path === "cli.md" ? twin("cli.md", "Quickstart", "") : file,
 		)
 
 		const failures = checkMarkdownTwins(files)
 		expect(failures.map((failure) => failure.code)).toEqual(["TWIN_INDEX_REFERENCE_MISSING"])
-		expect(failures[0]?.path).toBe("docs/cli.md")
+		expect(failures[0]?.path).toBe("cli.md")
 	})
 
 	test("a relative link to the index counts, because the twin and the index share the Portal's origin", () => {
 		const files = COMPLETE_BUILD.map((file) =>
-			file.path === "docs/cli.md"
-				? twin("docs/cli.md", "Quickstart", "Part of the [Docs index](/docs/llms.txt).")
+			file.path === "cli.md"
+				? twin("cli.md", "Quickstart", "Part of the [Docs index](/llms.txt).")
 				: file,
 		)
 

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url"
 import { expect, type Page } from "@playwright/test"
 import { DOCS_BASE_PATH } from "../src/lib/tabs"
 
-const DOCS_ROOT = fileURLToPath(new URL("../dist/docs/", import.meta.url))
+const DOCS_ROOT = fileURLToPath(new URL("../dist/", import.meta.url))
 
 /** A path a reader reaches when nothing is there; the 404 page answers it. */
 export const NOT_FOUND_PATH = `${DOCS_BASE_PATH}/no-such-page/`

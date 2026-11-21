@@ -5,15 +5,16 @@
 	"compatibility_date": "2026-11-01",
 	"workers_dev": true,
 	// One Worker only: a merge to `main` deploys production (ADR 0007), so there is no `env` block.
-	// No "routes" and no "custom_domain" on purpose: the router reaches this Worker by a service
-	// binding, so this Worker never attaches to the apex itself (ADR 0006).
+	// The Worker owns docs.trajectonomics.com. It does not attach the apex: the router still
+	// forwards /docs there, and this Worker redirects those paths (ADR 0013).
+	"routes": [{ "pattern": "docs.trajectonomics.com", "custom_domain": true }],
 	"assets": {
-		// astro.config.ts builds into dist/docs, so /docs/... URLs resolve under ./dist.
+		// astro.config.ts builds into ./dist, and request paths are the host root.
 		"directory": "./dist",
-		// The Worker answers `Accept: text/markdown` and forwards everything else to the assets
-		// (ADR 0010), whose own rules still decide the /docs redirect, the aliases and the 404 page.
+		// The Worker redirects the old /docs mount and answers `Accept: text/markdown`
+		// (ADR 0010, ADR 0013), then forwards everything else to the assets.
 		"binding": "ASSETS",
-		"run_worker_first": ["/docs", "/docs/*"],
+		"run_worker_first": true,
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"
 	}

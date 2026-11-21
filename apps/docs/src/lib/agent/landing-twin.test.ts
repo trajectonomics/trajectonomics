@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { SITE_ORIGIN } from "../site"
 import { indexReference } from "./index-reference"
 import { buildLandingTwin } from "./landing-twin"
 
-const ORIGIN = "https://trajectonomics.com"
+const ORIGIN = SITE_ORIGIN
 
 describe("the Landing Page's Markdown twin", () => {
 	test("states the release line under the purpose when the build has one", () => {
@@ -20,11 +21,11 @@ describe("the Landing Page's Markdown twin", () => {
 				"",
 				"## For Operators: install and run the CLI",
 				"",
-				"- [CLI & Quickstart](https://trajectonomics.com/docs/cli.md): Install traj, then record your first transaction and read your balance.",
+				"- [CLI & Quickstart](https://docs.trajectonomics.com/cli.md): Install traj, then record your first transaction and read your balance.",
 				"",
 				"## For Contributors: help make the tax rules right",
 				"",
-				"- [Contribute](https://trajectonomics.com/docs/contribute.md): Report a wrong figure, add a tax year or a country, and check your change.",
+				"- [Contribute](https://docs.trajectonomics.com/contribute.md): Report a wrong figure, add a tax year or a country, and check your change.",
 				"",
 				indexReference(ORIGIN),
 				"",

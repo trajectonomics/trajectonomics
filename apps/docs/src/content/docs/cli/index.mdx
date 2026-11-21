@@ -9,7 +9,7 @@ that runs it supplies the judgement.
 
 ## Install
 
-[Installation](/docs/cli/installation/) lists the three channels. On Linux or macOS:
+[Installation](/cli/installation/) lists the three channels. On Linux or macOS:
 
 ```bash
 curl -fsSL \
@@ -43,24 +43,24 @@ and it is always one you pass.
 `traj tx add --opening` is how a ledger gets its first money: `--from` names the equity account the
 amount posts against. On this ledger the balance prints Cash `879.50` THB, Food `120.50` THB and
 Opening `-1000.00` THB, and net worth (assets minus liabilities) is `879.50` THB. Without the
-opening balance Cash holds `-120.50` THB, and [the Baseline](/docs/cli/commands/baseline/) refuses
+opening balance Cash holds `-120.50` THB, and [the Baseline](/cli/commands/baseline/) refuses
 the ledger rather than state a negative asset.
 
 ## Where your data lives
 
 `traj init` writes `~/.traj/traj.db`, or `$TRAJ_HOME/traj.db` when `TRAJ_HOME` is set. That one file
-is the ledger. [Your data](/docs/cli/data/) says what else is in the directory, what is safe to
+is the ledger. [Your data](/cli/data/) says what else is in the directory, what is safe to
 delete, and how to back it up.
 
 ## What next
 
-- [Installation](/docs/cli/installation/): the three install channels, the agent skill, release
+- [Installation](/cli/installation/): the three install channels, the agent skill, release
   pinning and uninstall.
-- [Your data](/docs/cli/data/): the data directory, backups and a clean removal.
-- [Agent](/docs/cli/agent/): what the Agent asks you for, where the tool stops, and what this release
+- [Your data](/cli/data/): the data directory, backups and a clean removal.
+- [Agent](/cli/agent/): what the Agent asks you for, where the tool stops, and what this release
   does.
-- [Configuration](/docs/cli/configuration/): the environment variables the CLI reads.
-- [Commands](/docs/cli/commands/): the command reference.
+- [Configuration](/cli/configuration/): the environment variables the CLI reads.
+- [Commands](/cli/commands/): the command reference.
 
 Source code and design decisions live in
 [`trajectonomics/trajectonomics/apps/cli`](https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli).
