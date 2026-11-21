@@ -18,7 +18,7 @@ export function stubMain(): void {
 	const args = process.argv.slice(2)
 	appendFileSync(required("STUB_GH_LOG"), `${args.join(" ")}\n`)
 	const path = args.find((arg) => arg.startsWith("repos/")) ?? ""
-	if (path.includes("/skills.manifest.json?")) {
+	if (path.includes("/skills/customer/skills.manifest.json?")) {
 		process.stdout.write(readFileSync(required("STUB_MANIFEST"), "utf8"))
 		return
 	}

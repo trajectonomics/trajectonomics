@@ -60,12 +60,12 @@ function installOutside(skill: string, source: string): void {
 /** One [Skill Pin](../GLOSSARY.md): the source and commit the install names, and the hash it left. */
 function entry(source: string, skill: string): Record<string, unknown> {
 	const sha = commitOf(source)
+	const isLocal = sha === null
 	return {
-		source: sha === null ? source : repositoryOf(source),
+		source: isLocal ? source : repositoryOf(source),
 		...(sha === null ? {} : { ref: sha, commit: sha }),
-		sourceType: sha === null ? "local" : "github",
-		skillPath:
-			sha === null ? `skills/${skill}/SKILL.md` : `skills/customer/skills/${skill}/SKILL.md`,
+		sourceType: isLocal ? "local" : "github",
+		skillPath: isLocal ? `skills/${skill}/SKILL.md` : `skills/customer/skills/${skill}/SKILL.md`,
 		computedHash: skillFolderHash(join(".agents/skills", skill)),
 		...overrides()[skill],
 	}

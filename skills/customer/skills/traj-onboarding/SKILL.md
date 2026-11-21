@@ -41,7 +41,7 @@ person who has done this before is noticed before anything is installed.
 - **Scope and operating skill**: `npx skills list --json` and `npx skills list -g --json`. A project
   list that names `traj-onboarding` is this session's copy; when it does not, a global list that does
   is, and step 2 installs into that same scope. Read the operating skill out of that one scope's list:
-  a skill named `traj`, whose `source` is `trajectonomics/trajectonomics` like this one's, is the operating
+  a skill named `traj`, whose `source` is the same as this one's, is the operating
   skill, and its `path` is where you read it. A `traj` in the other scope belongs to another setup.
 
 When the two install checks pass and step 3 has ended — its question answered by the person directly
@@ -97,7 +97,10 @@ That is the command the Site prints. What this step installs is the published se
 copy came from.
 
 **Find the pin.** `skills@1.9.0` records, in `skills-lock.json`, the `commit` it installed this
-skill from. Read this skill's own entry and that `commit`: everything below installs from it. Never install from `main`:
+skill from. Read this skill's own entry and that `commit`: everything below installs from it. When
+that entry's `source` is `trajectonomics/skills`, this copy predates the move to this source and its
+`commit` does not exist here: run the command above again, with this skill's own scope, and read the
+new entry. Never install from `main`:
 a branch moves, and a person's setup must not.
 
 **Read the set at that commit.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the
