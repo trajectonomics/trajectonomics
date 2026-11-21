@@ -13,7 +13,7 @@ Instructions for AI coding agents working in the `trajectonomics/site` repositor
 7. Model & Pi (`pi.dev`) rules:
    - Never use `gemini-3.8-flash` anywhere; use `gemini-4-hydrogen` instead for Antigravity tasks and reviews (and `gemini-4-argon` where configured).
    - When running the Pi coding agent (`pi.dev`), strictly use **DeepSeek 4.1 Flash** only (e.g., `deepseek/deepseek-v4.1-flash`, `deepseek/deepseek-v4.1-flash-fast`), whether routed via Command Code GOAT (`command-code`) or OpenCode Go (`opencode`). Do not switch to or run any other models (Claude, GPT, Gemini, etc.) in Pi sessions for this repository. This rule is mechanically enforced via `.pi/settings.json`.
-   - Subagents do the work on a work model: **`deepseek-v4.1-flash`** (Pi) or **`mistral-large-4`** (Mistral Vibe). The expensive models (`claude-*`, `gemini-*`, `grok-*`) are for consultation, review and debugging help only, never for routine implementation.
+   - Subagents do the work on a work model: **`deepseek-v4.1-flash`** (Pi). The expensive models (`claude-*`, `gemini-*`, `grok-*`) are for consultation, review and debugging help only, never for routine implementation. **Mistral Vibe (`mistral-vibe` / `mistral-large-4`) is retired** as of 2026-11-21 and is no longer a work model ([trajectonomics/factory ADR 0027](https://github.com/trajectonomics/factory/blob/main/docs/adr/0027-reviews-run-on-hydrogen-and-grok.md)).
 8. Temporary files and scratch clones: `/tmp` is a shared, nearly full tmpfs. Never use fixed `/tmp` filenames (`mktemp` for small files; `--body-file -` for `gh` bodies) and never install `node_modules` or clone scratch repos under `/tmp`; use `~/.cache/<slug>`.
 
 ## Organisation goals
