@@ -1,0 +1,86 @@
+{
+	"name": "@trajectonomics/tax",
+	"version": "0.0.0-development",
+	"description": "Pure, multi-jurisdiction individual income tax engine (TH 2026, US 2026 federal and 50-state)",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/trajectonomics/tax-core.git"
+	},
+	"type": "module",
+	"sideEffects": false,
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.cts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		},
+		"./th": {
+			"import": {
+				"types": "./dist/th/index.d.mts",
+				"default": "./dist/th/index.mjs"
+			},
+			"require": {
+				"types": "./dist/th/index.d.cts",
+				"default": "./dist/th/index.cjs"
+			}
+		},
+		"./us": {
+			"import": {
+				"types": "./dist/us/index.d.mts",
+				"default": "./dist/us/index.mjs"
+			},
+			"require": {
+				"types": "./dist/us/index.d.cts",
+				"default": "./dist/us/index.cjs"
+			}
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
+	"scripts": {
+		"build": "tsdown",
+		"test": "bun test --coverage --coverage-reporter=lcov --coverage-reporter=text && bun run scripts/check-coverage.ts",
+		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+		"lint": "biome ci --error-on-warnings . && bun run scripts/check-no-hardcoded-strings.ts",
+		"format": "biome check --write .",
+		"check:strings": "bun run scripts/check-no-hardcoded-strings.ts",
+		"check:th-sources": "bun run scripts/check-th-sources.ts",
+		"check:readme": "bun run scripts/check-readme.ts",
+		"check": "bun run lint && bun run check:th-sources && bun run typecheck && bun run test && bun run build && bun run check:readme && bun run lint:package",
+		"lint:package": "publint --strict && attw --pack . --profile node16",
+		"skills:check": "bunx skills@latest check",
+		"skills:update": "bunx skills@latest update"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
+		"@biomejs/biome": "2.6.3",
+		"@trajectonomics/sim": "0.2.0-alpha.4",
+		"@trajectonomics/tooling": "1.1.0",
+		"@types/bun": "^1.4.4",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.2",
+		"typescript": "^7.0.2"
+	},
+	"dependencies": {
+		"@trajectonomics/money": "0.1.0"
+	}
+}
