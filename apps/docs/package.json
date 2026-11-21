@@ -51,7 +51,7 @@
 		"@trajectonomics/design-system": "workspace:*",
 		"@trajectonomics/design-system-assets": "workspace:*",
 		"@trajectonomics/design-system-theme": "workspace:*",
-		"astro": "7.4.7",
+		"astro": "7.4.12",
 		"fumadocs-core": "16.18.2",
 		"fumadocs-ui": "16.18.2",
 		"react": "^19.3.1",
