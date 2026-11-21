@@ -33,14 +33,14 @@ bunx @trajectonomics/cli@latest --version
 Then give your agent the setup skill:
 
 ```bash
-npx skills add trajectonomics/skills --skill traj-onboarding -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboarding -y
 ```
 
 The setup skill asks about your situation and goal, then its second step installs the `traj`
-operating skill from `trajectonomics/skills`, the repository both skills publish from.
+operating skill from `skills/customer` in this repository, the folder both skills publish from.
 
 ```bash
-npx skills add trajectonomics/skills --skill traj -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill traj -y
 ```
 
 That is the operating skill on its own, for an agent that is already set up. Both commands

@@ -5,6 +5,7 @@ import {
 	ONBOARDING_SKILL_PATH,
 	read,
 	SKILL_VERSION,
+	SKILLS_SOURCE,
 	section,
 	WEBSITE_COMMAND,
 } from "./skills-test-support"
@@ -56,7 +57,7 @@ describe("the traj-onboarding Skill", () => {
 	it("names one install command, the one the Site prints, with -y stated once", () => {
 		const installLines = body
 			.split("\n")
-			.filter((line) => line.trim().startsWith("npx skills add trajectonomics/skills --skill"))
+			.filter((line) => line.trim().startsWith(`npx skills add ${SKILLS_SOURCE} --skill`))
 		expect(installLines).toEqual([WEBSITE_COMMAND])
 		expect(body.split("an unattended run appends `-y`")).toHaveLength(2)
 	})
@@ -66,7 +67,7 @@ describe("the traj-onboarding Skill", () => {
 		expect(stepTwo).toContain("skills-lock.json")
 		expect(stepTwo).toContain("Never install from `main`")
 		expect(stepTwo).toContain("skills.manifest.json")
-		expect(stepTwo).toContain("npx skills add trajectonomics/skills@<commit> --skill <name>")
+		expect(stepTwo).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name>`)
 		expect(stepTwo).toContain("add `-g` when the project list did not name `traj-onboarding`")
 		expect(stepTwo).toContain("Skip a row whose CLI Range the command line does not satisfy")
 		expect(stepTwo).toContain("install `traj` alone from the pin")

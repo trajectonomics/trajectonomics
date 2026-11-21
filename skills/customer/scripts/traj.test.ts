@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { skillFrontmatter } from "./skill-frontmatter"
 import { metadataCli } from "./skill-metadata"
-import { manifest, OPERATING_SKILL_PATH, read } from "./skills-test-support"
+import { manifest, OPERATING_SKILL_PATH, read, SKILLS_SOURCE } from "./skills-test-support"
 
 /**
  * Static checks on the first-party operating Skill, `traj`, which publishes from this repository and
@@ -139,7 +139,7 @@ describe("the traj operating Skill", () => {
 	})
 
 	it("hands a job to the Skill that owns it, installed by its explicit name", () => {
-		expect(body).toContain("npx skills add trajectonomics/skills --skill <name> -y")
+		expect(body).toContain(`npx skills add ${SKILLS_SOURCE} --skill <name> -y`)
 		expect(body).toContain("is not a router either")
 	})
 

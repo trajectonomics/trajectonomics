@@ -89,7 +89,7 @@ function copyOf(name: string, fixture: InstallCheckFixture): string | null {
 /** The argument the run passes the check: this checkout, or a repository pinned to its commit. */
 function sourceArgs(fixture: InstallCheckFixture): string[] {
 	if (fixture.argument !== undefined) return [fixture.argument]
-	return fixture.source === "repo" ? [`trajectonomics/skills@${PINNED_COMMIT}`] : ["."]
+	return fixture.source === "repo" ? [`trajectonomics/trajectonomics@${PINNED_COMMIT}`] : ["."]
 }
 
 /** A stub on `PATH`: a Bun launcher for one `scripts/stub-*.ts` module. */

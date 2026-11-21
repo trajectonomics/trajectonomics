@@ -22,11 +22,11 @@ const WINDOWS_INSTALL =
 	"irm https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.ps1 | iex"
 const NPM_INSTALL = "npx @trajectonomics/cli@latest --version"
 const BUNX_INSTALL = "bunx @trajectonomics/cli@latest --version"
-// Both Skills publish from `trajectonomics/skills` (skills ADR-0003). `trajectonomics/internal-skills`
+// Both Skills publish from `skills/customer` in this repository (skills ADR-0003, ADR-0005). `trajectonomics/internal-skills`
 // keeps only the Skills an internal session runs, so an install line that names it gives a customer
 // no `traj` once the internal copy is retired, and one that drops `--skill traj` would add an
 // internal session's Skills to their repository (cli#152).
-const SKILL_SOURCE = "trajectonomics/skills"
+const SKILL_SOURCE = "trajectonomics/trajectonomics/skills/customer"
 const SETUP_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj-onboarding -y`
 const OPERATOR_SKILL_COMMAND = `npx skills add ${SKILL_SOURCE} --skill traj -y`
 const INSTALL_COMMANDS = [SCRIPT_INSTALL, WINDOWS_INSTALL, NPM_INSTALL, BUNX_INSTALL]
@@ -87,7 +87,9 @@ describe("the README first screen", () => {
 		)
 		const operatorStep = firstScreen.slice(visibleAt(OPERATOR_SKILL_COMMAND), visibleAt(CHANNELS))
 		expect(setupStep).toMatch(/asks about your situation and goal/i)
-		expect(setupStep).toMatch(/installs the traj operating skill from trajectonomics\/skills/i)
+		expect(setupStep).toMatch(
+			/installs the traj operating skill from skills\/customer in this repository/i,
+		)
 		expect(operatorStep).toMatch(/already set up/i)
 		expect(firstScreen).not.toMatch(/adds only the traj skill/i)
 	})

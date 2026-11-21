@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { read, WEBSITE_COMMAND } from "./skills-test-support"
+import { read, SKILLS_SOURCE, WEBSITE_COMMAND } from "./skills-test-support"
 
 /** `engines.node` of the command line the Skill installs. */
 const CLI_NODE_FLOOR = "Node 20"
@@ -17,7 +17,7 @@ describe("the README the website links to", () => {
 	it("leads with the website command as written, without -y or an agent flag", () => {
 		const commandLines = readme
 			.split("\n")
-			.filter((line) => line.startsWith("npx skills add trajectonomics/skills"))
+			.filter((line) => line.startsWith(`npx skills add ${SKILLS_SOURCE}`))
 		expect(commandLines).toEqual([WEBSITE_COMMAND])
 		expect(readme.indexOf(WEBSITE_COMMAND)).toBeLessThan(readme.indexOf("## Development"))
 	})

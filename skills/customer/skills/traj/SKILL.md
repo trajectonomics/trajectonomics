@@ -74,10 +74,10 @@ A flag that carries a document takes a path or `-`. `-` is the only way to send 
 
 This is the contract, not a recipe, and it is not a router either: a Skill the agent has to hop through is one an unattended run skips.
 
-When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/skills/blob/main/skills.manifest.json) names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it:
+When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/main/skills/customer/skills.manifest.json) names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it:
 
 ```bash
-npx skills add trajectonomics/skills --skill <name> -y
+npx skills add trajectonomics/trajectonomics/skills/customer --skill <name> -y
 ```
 
 When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.

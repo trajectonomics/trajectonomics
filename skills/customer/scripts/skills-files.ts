@@ -26,8 +26,11 @@ export const PLAN_SKILL_PATH = "skills/traj-plan/SKILL.md"
 /** The networked install check the stubbed runs stand in for. */
 export const INSTALL_CHECK = "scripts/check-skills-install.sh"
 
+/** The source every install command names: the folder of the monorepo the customer Skills publish from. */
+export const SKILLS_SOURCE = "trajectonomics/trajectonomics/skills/customer"
+
 /** The one install command the Site prints, which the README and the onboarding Skill both name. */
-export const WEBSITE_COMMAND = "npx skills add trajectonomics/skills --skill traj-onboarding"
+export const WEBSITE_COMMAND = `npx skills add ${SKILLS_SOURCE} --skill traj-onboarding`
 
 /** The onboarding Skill's stable version: the repository tag, and the version the Site announces. */
 export const SKILL_VERSION = "0.1.0"

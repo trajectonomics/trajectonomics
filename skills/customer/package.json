@@ -5,7 +5,8 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/skills.git"
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "skills/customer"
 	},
 	"type": "module",
 	"sideEffects": false,

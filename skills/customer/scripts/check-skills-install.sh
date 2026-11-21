@@ -5,16 +5,20 @@
 # recomputed from the installed files), on a stray `agent/` skills tree, and on a published Skill
 # installed from another source.
 #
-#   bash scripts/check-skills-install.sh                       # trajectonomics/skills at its default tip
-#   bash scripts/check-skills-install.sh trajectonomics/skills@<40-character commit>
-#   bash scripts/check-skills-install.sh /path/to/this/checkout # a local source, which pins no commit
+# The Skills install from the `skills/customer` folder of the monorepo, the one source every install
+# command names, so a pinned run installs `trajectonomics/trajectonomics/skills/customer#<commit>`.
+#
+#   bash scripts/check-skills-install.sh trajectonomics/trajectonomics@<40-character commit>
+#   bash scripts/check-skills-install.sh /path/to/skills/customer # a local source, which pins no commit
 #
 # It needs the network and the skills CLI, so it stays out of `bun run check`; run it before opening a
 # pull request that touches skills/, the manifest or the README's first screen.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE_ARG="${1:-trajectonomics/skills}"
+SOURCE_ARG="${1:-trajectonomics/trajectonomics}"
+# The folder of the monorepo the customer Skills publish from, which every install command names.
+SKILLS_FOLDER="skills/customer"
 SKILLS_CLI="skills@1.9.0"
 AGENTS=(claude-code codex)
 ONBOARDING_SKILL="traj-onboarding"
@@ -66,7 +70,7 @@ resolve_source() {
 	fi
 	case "$1" in
 	*@*) ;;
-	*) fail "name the commit to install: <owner>/<repo>@<40-character commit>, or a checkout path" ;;
+	*) fail "name the commit to install: <owner>/<repo>@<40-character commit>, or the path of a skills/customer checkout" ;;
 	esac
 	SOURCE="${1%@*}"
 	REF="${1##*@}"
@@ -77,9 +81,9 @@ resolve_source() {
 	[ "$(cat "$SCRATCH/commit.log")" = "$REF" ] ||
 		fail "$SOURCE does not resolve $REF to that commit"
 	INSTALLED="$REF"
-	INSTALL_SOURCE="$SOURCE@$REF"
+	INSTALL_SOURCE="$SOURCE/$SKILLS_FOLDER#$REF"
 	LOCK_COMMIT="$REF"
-	bounded 60 gh api "repos/$SOURCE/contents/skills.manifest.json?ref=$REF" \
+	bounded 60 gh api "repos/$SOURCE/contents/$SKILLS_FOLDER/skills.manifest.json?ref=$REF" \
 		-H "Accept: application/vnd.github.raw" >"$SCRATCH/manifest.json" 2>"$SCRATCH/manifest.err" ||
 		{ cat "$SCRATCH/manifest.err" >&2; fail "$SOURCE states no skills.manifest.json at $REF"; }
 	MANIFEST_FILE="$SCRATCH/manifest.json"
