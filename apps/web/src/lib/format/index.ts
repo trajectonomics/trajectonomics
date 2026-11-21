@@ -2,5 +2,5 @@
 export { abbreviate } from "./abbreviate"
 export { formatArgv } from "./argv"
 export { formatDate, formatMonth } from "./date"
-export { formatMoney, MINUS } from "./money"
 export { AMOUNT_MASK, maskMoney } from "./mask"
+export { formatMoney, MINUS } from "./money"

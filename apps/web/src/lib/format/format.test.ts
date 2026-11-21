@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test"
 import { abbreviate } from "./abbreviate"
 import { formatArgv } from "./argv"
 import { formatDate, formatMonth } from "./date"
-import { formatMoney } from "./money"
 import { AMOUNT_MASK, maskMoney } from "./mask"
+import { formatMoney } from "./money"
 
 describe("formatMoney", () => {
 	test("groups the digits of a negative amount and uses the true minus sign", () => {

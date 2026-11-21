@@ -14,9 +14,7 @@ export function abbreviate(value: number): string {
 	if (!Number.isFinite(value)) throw new RangeError("abbreviate takes a finite number")
 	const magnitude = Math.abs(value)
 	const unit = UNITS.find((candidate) => magnitude >= candidate.size)
-	const text = unit
-		? `${trimmed(value / unit.size, 1)}${unit.suffix}`
-		: trimmed(value, 2)
+	const text = unit ? `${trimmed(value / unit.size, 1)}${unit.suffix}` : trimmed(value, 2)
 	return text.replace("-", MINUS)
 }
 

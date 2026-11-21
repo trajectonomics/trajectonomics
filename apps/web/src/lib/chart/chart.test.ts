@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { extent } from "./extent"
 import { nearestIndex } from "./nearest"
+import { toChartNumber } from "./number"
 import { areaPath, linePath } from "./path"
 import { linearScale } from "./scale"
 import { shares } from "./shares"
 import { niceTicks } from "./ticks"
-import { toChartNumber } from "./number"
 
 describe("toChartNumber", () => {
 	test("places a decimal money string as a number", () => {
