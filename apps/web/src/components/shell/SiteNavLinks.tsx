@@ -7,11 +7,11 @@ export interface SiteNavLinksProps {
 	readonly current: string
 }
 
-/** The eight pages in navigation order. On a narrow screen the row scrolls on its own. */
+/** The eight pages in navigation order. On a narrow screen the row wraps, so no page is out of sight. */
 export function SiteNavLinks({ current }: SiteNavLinksProps) {
 	return (
-		<nav aria-label="Pages" className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
-			<ul className="flex min-w-max gap-1 py-1">
+		<nav aria-label="Pages">
+			<ul className="flex flex-wrap gap-1 py-1">
 				{ROUTES.map((route) => {
 					const isCurrent = route.path === current
 					return (
