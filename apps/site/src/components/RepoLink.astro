@@ -1,0 +1,27 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icons it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { GITHUB_REPO_URL, STAR_REPOS } from "../lib/site"
+import { STAR_SNAPSHOT } from "../lib/site/star-snapshot"
+import { formatStarCount } from "../lib/site/stars"
+import ArrowUpRight from "./icons/ArrowUpRight.astro"
+import Github from "./icons/Github.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+// One repository, one link: the mark, the committed count (zero included), and an arrow out.
+const repo = STAR_REPOS[0]
+const href = repo?.url ?? GITHUB_REPO_URL
+const stars = formatStarCount(repo === undefined ? 0 : (STAR_SNAPSHOT.stars[repo.repo] ?? 0))
+const label = `${dictionary.repoLinkLabel} ${stars}`
+---
+
+<a class="header-repo" href={href} aria-label={label}>
+	<Github class="header-repo-mark" />
+	<span class="header-repo-count tabular-nums">{stars}</span>
+	<ArrowUpRight class="header-repo-out" />
+</a>

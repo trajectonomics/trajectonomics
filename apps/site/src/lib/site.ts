@@ -73,7 +73,7 @@ export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 
 /**
  * The monorepo the CLI is built and released from. Issues and releases live at its root, and it is the
- * one repository the Star menu counts, because its star is the one the button adds.
+ * one repository the header links, because its star is the count that link prints.
  */
 export const GITHUB_REPO_URL = "https://github.com/trajectonomics/trajectonomics"
 
@@ -105,8 +105,8 @@ export const GOOGLE_SITE_VERIFICATION_TOKEN: string | undefined = undefined
 export const BING_SITE_VERIFICATION_TOKEN: string | undefined = undefined
 
 /**
- * One repository the Star menu offers: the repository's own name on GitHub, the name a visitor
- * reads, and where its star goes.
+ * One repository the header links: the repository's own name on GitHub, the name a visitor reads,
+ * and where its star count goes.
  */
 export interface StarRepo {
 	readonly repo: string
@@ -115,9 +115,8 @@ export interface StarRepo {
 }
 
 /**
- * The repositories the Star menu may list, in the order a tie falls back to. The menu orders them by
- * the committed star snapshot, highest first, and leaves out a repository at zero, so adding a
- * repository is one entry here and a snapshot refresh.
+ * The one repository the header links. The committed star snapshot counts it, and the link prints
+ * that count, zero included. Adding a repository is one entry here and a snapshot refresh.
  */
 export const STAR_REPOS: readonly StarRepo[] = Object.freeze([
 	Object.freeze({

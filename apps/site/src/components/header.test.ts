@@ -4,12 +4,12 @@ import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import type { Dictionary } from "../lib/language/dictionary"
 import { currentLanguageName } from "../lib/language/dictionary"
 import { LANGUAGES, languageEntry, otherLanguages } from "../lib/language/languages"
-import { DOCS_PATH, GITHUB_ORG_URL, SITE_NAME } from "../lib/site"
-import { STAR_MENU_ROWS, TOP_REPO_NAME } from "../lib/site/star-snapshot"
+import { DOCS_PATH, SITE_NAME, STAR_REPOS } from "../lib/site"
+import { STAR_SNAPSHOT } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import Header from "./Header.astro"
 import { renderComponent } from "./testing/render"
-import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
+import { headings, scanComponent, withAttribute } from "./testing/scan"
 
 /** The attributes a header link carries, as the checks read them. */
 interface LinkShape {
@@ -19,7 +19,7 @@ interface LinkShape {
 	readonly href: string | undefined
 }
 
-/** The header's two disclosures: the Star menu and the Language menu. */
+/** The header's one disclosure: the Language menu. */
 function menus(page: ScannedPage): readonly HtmlElement[] {
 	return withAttribute(page, "data-header-menu")
 }
@@ -54,6 +54,33 @@ function summaryOf(page: ScannedPage, menu: HtmlElement): HtmlElement {
 	)
 	if (summary === undefined) throw new Error("a header menu rendered no summary")
 	return summary
+}
+
+/** The one repository link, its count, and the two marks it draws. */
+function repositoryLink(page: ScannedPage) {
+	const repo = STAR_REPOS[0]
+	if (repo === undefined) throw new Error("the Site names no repository")
+	const stars = formatStarCount(STAR_SNAPSHOT.stars[repo.repo] ?? 0)
+	const links = elementsByTag(page, "a").filter(
+		(element) => element.attributes["href"] === repo.url,
+	)
+	const link = links[0]
+	if (link === undefined) throw new Error("the repository link is missing")
+	const marks = page.elements.filter(
+		(element) => element.tag === "svg" && element.ancestors.includes(link),
+	)
+	return { stars, links, link, marks }
+}
+
+/** The path the first mark inside `link` draws. */
+function markPath(page: ScannedPage, link: HtmlElement): string {
+	const mark = page.elements.find(
+		(element) => element.tag === "svg" && element.ancestors.includes(link),
+	)
+	const drawn = page.elements.find(
+		(element) => element.tag === "path" && mark !== undefined && element.ancestors.includes(mark),
+	)
+	return drawn?.attributes["d"] ?? ""
 }
 
 /** The header element itself, found by the class the layout and the rules name. */
@@ -93,6 +120,7 @@ describe("the Header component in every Language, current or not", () => {
 				const nav = elementsByTag(page, "nav")[0]
 				if (nav === undefined) throw new Error("no nav rendered")
 				expect(nav.ancestors.includes(header)).toBe(true)
+				expect((nav.attributes["class"] ?? "").split(/\s+/)).toContain("header-bar")
 				expect(headings(page)).toEqual([])
 			})
 
@@ -121,69 +149,19 @@ describe("the Header component in every Language, current or not", () => {
 				expect(textOf(page, docs)).toBe(dictionary.docsLink)
 			})
 
-			it(`names the top repository on the Star menu's trigger, with no verb (${variant})`, async () => {
+			it(`links the one repository, with its star count and no repository menu (${variant})`, async () => {
 				const page = await renderHeader(language, dictionary, markCurrent)
-				const menu = menuWith(page, STAR_MENU_ROWS[0]?.url ?? GITHUB_ORG_URL)
-				const summary = summaryOf(page, menu)
-				expect(textOf(page, summary)).toBe(TOP_REPO_NAME ?? "")
-				const label =
-					TOP_REPO_NAME === undefined
-						? dictionary.starMenuLabel
-						: `${dictionary.starMenuLabel}: ${TOP_REPO_NAME}`
-				expect(summary.attributes["aria-label"]).toBe(label)
-			})
-
-			it(`offers every repository in the Star menu, highest stars first (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				const menu = menuWith(page, STAR_MENU_ROWS[0]?.url ?? GITHUB_ORG_URL)
-				const group = withClass(page, "header-menu-group")[0]
-				expect(group === undefined ? undefined : textOf(page, group)).toBe(
-					dictionary.starMenuGroupLabel,
-				)
-				expect(linksIn(page, menu).map((link) => [link.text, link.href])).toEqual([
-					...STAR_MENU_ROWS.map((repo) => [
-						repo.stars === undefined ? repo.name : `${repo.name} ${formatStarCount(repo.stars)}`,
-						repo.url,
-					]),
-					[dictionary.starMenuAllRepos, GITHUB_ORG_URL],
+				const { stars, links, link, marks } = repositoryLink(page)
+				expect(links).toHaveLength(1)
+				expect(textOf(page, link)).toBe(stars)
+				expect(link.attributes["aria-label"]).toBe(`${dictionary.repoLinkLabel} ${stars}`)
+				expect(marks.map((mark) => mark.attributes["class"])).toEqual([
+					"header-repo-mark",
+					"header-repo-out",
 				])
-			})
-
-			it(`draws a star on the Star menu's trigger, never the GitHub mark (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				const summary = summaryOf(page, menuWith(page, STAR_MENU_ROWS[0]?.url ?? GITHUB_ORG_URL))
-				const mark = page.elements.find(
-					(element) => element.tag === "svg" && element.ancestors.includes(summary),
-				)
-				if (mark === undefined) throw new Error("the Star menu's trigger draws no mark")
-				const classes = (mark.attributes["class"] ?? "").split(/\s+/)
-				expect(classes).toContain("header-menu-mark")
-				expect(classes).toContain("header-menu-star")
-				const drawn = page.elements.find(
-					(element) => element.tag === "path" && element.ancestors.includes(mark),
-				)
-				// The star's own path, so the mark cannot silently return to the GitHub mark's `M8 0C3.58`.
-				expect(drawn?.attributes["d"]?.startsWith("M8 1.8L9.6")).toBe(true)
-			})
-
-			it(`marks no current repository in the Star menu's panel (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				const panel = withClass(page, "header-menu-panel")[0]
-				if (panel === undefined) throw new Error("the Star menu renders no panel")
-				const checked = page.elements.filter(
-					(element) =>
-						element.ancestors.includes(panel) &&
-						(element.attributes["class"] ?? "").split(/\s+/).includes("header-menu-check"),
-				)
-				expect(checked).toEqual([])
-				// The footer's arrow is the panel's only glyph, so a check has nowhere to hide.
-				const marks = page.elements.filter(
-					(element) => element.tag === "svg" && element.ancestors.includes(panel),
-				)
-				expect(marks).toHaveLength(1)
-				expect(
-					marks[0]?.ancestors.some((element) => element.attributes["href"] === GITHUB_ORG_URL),
-				).toBe(true)
+				// The GitHub mark twenty's community link draws, so the header cannot return to a star menu.
+				expect(markPath(page, link).startsWith("M6.979")).toBe(true)
+				expect(menus(page)).toHaveLength(1)
 			})
 
 			it(`marks the current Language only when the page is its home (${variant})`, async () => {

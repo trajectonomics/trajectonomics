@@ -1,6 +1,5 @@
-/* The header menus' panel (ADR 0007): its rows, its group label and its footer. */
+/* The Language menu's panel: it floats 8 px under its summary, on the popover role, with a hairline. */
 
-/* The panel floats 8 px under its summary, on the popover role, with a hairline and no shadow. */
 .header-menu-panel {
 	position: absolute;
 	top: calc(100% + 8px);
@@ -25,22 +24,6 @@
 	height: 8px;
 }
 
-.header-menu-group {
-	margin: 0;
-	padding: 6px 8px 4px;
-	font-family: var(--font-meta);
-	font-size: 10px;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-}
-
-.header-menu-list {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.header-menu-row,
 .header-menu-link {
 	display: flex;
 	min-height: 34px;
@@ -53,46 +36,11 @@
 	text-decoration: none;
 }
 
-.header-menu-row-name {
-	min-width: 0;
-	flex: 1;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-.header-menu-row:focus-visible,
-.header-menu-link:focus-visible,
-.header-menu-footer:focus-visible {
+.header-menu-link:focus-visible {
 	outline: 2px solid var(--ds-color-ring);
 	outline-offset: -2px;
 }
 
-.header-menu-row:hover,
-.header-menu-link:hover,
-.header-menu-footer:hover {
+.header-menu-link:hover {
 	background: var(--ds-color-secondary);
-}
-
-.header-menu-out {
-	flex-shrink: 0;
-}
-
-.header-menu-footer {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	margin-top: 4px;
-	padding: 8px;
-	border-top: 1px solid var(--ds-color-border);
-	font-size: 13px;
-	color: var(--ds-color-popover-foreground);
-	text-decoration: none;
-}
-
-.header-menu-panel[data-empty] .header-menu-footer {
-	margin-top: 0;
-	padding-top: 4px;
-	border-top: 0;
 }

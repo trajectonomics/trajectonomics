@@ -3,10 +3,10 @@ import { CLEAN_URL, LANGUAGES, languageEntry, languageHomeFile } from "../../lan
 import {
 	DOCS_PATH,
 	GITHUB_ORG_URL,
+	GITHUB_REPO_URL,
 	GITHUB_SKILLS_URL,
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
-	STAR_REPOS,
 } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
@@ -32,9 +32,6 @@ function headlines(language: Language): readonly string[] {
 	return [dictionary.heroHeadingPrefix, dictionary.heroHeadingAccent]
 }
 
-/** The Star menu's panel, one link per repository in star order. */
-const starPanel = STAR_REPOS.map((repo) => `<a href="${repo.url}">${repo.name}</a>`).join("")
-
 /** One Language's home as the build must produce it, with every region and the prompt window. */
 export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 	const dictionary = languageEntry(language).dictionary
@@ -48,7 +45,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		"<body>",
 		`<header><nav><a href="${CLEAN_URL}" aria-label="${SITE_NAME}"><svg></svg></a>`,
 		`<a href="${DOCS_PATH}">${dictionary.docsLink}</a>`,
-		`<details><summary>${dictionary.starMenuLabel}</summary><div>${starPanel}</div></details>`,
+		`<a href="${GITHUB_REPO_URL}">${dictionary.repoLinkLabel}</a>`,
 		`<details><summary>${dictionary.languageSwitchLabel}</summary><div>${switcher(language)}</div></details>`,
 		"</nav></header>",
 		'<main class="bg-muted text-foreground">',

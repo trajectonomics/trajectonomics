@@ -1,7 +1,8 @@
 import { expect, type Locator, test } from "@playwright/test"
+import { GITHUB_REPO_URL } from "../src/lib/site"
 import { homeOf, openPage } from "./pages"
 
-/** The English home's first header menu: the Star menu, whose panel holds the repository rows. */
+/** The English home. Its header links one repository, and its one menu is the Language menu. */
 const HOME = homeOf("en")
 
 /** A point in the middle of one element's box, in the coordinates the mouse moves in. */
@@ -11,17 +12,15 @@ async function centreOf(locator: Locator) {
 	return { x: box.x + box.width / 2, y: box.y + box.height / 2, box }
 }
 
-test.describe("the Star menu's trigger and panel", () => {
-	test("opens on a star, with no check mark in the panel", async ({ page }) => {
+test.describe("the header's repository link", () => {
+	test("is one link to the one repository, with its star count", async ({ page }) => {
 		await openPage(page, HOME)
-		const menu = page.locator("details[data-header-menu]").first()
-		await expect(menu.locator("summary .header-menu-star")).toBeVisible()
-		await menu.locator("summary").click()
-		await expect(menu.locator("a").first()).toBeVisible()
-		// Nothing in the panel is a current value, so nothing in it is checked.
-		await expect(menu.locator(".header-menu-check")).toHaveCount(0)
-		// The footer's arrow is the panel's only glyph: a check mark has no place to hide.
-		await expect(menu.locator(".header-menu-panel svg")).toHaveCount(1)
+		const link = page.locator("header a.header-repo")
+		await expect(link).toHaveCount(1)
+		await expect(link).toHaveAttribute("href", GITHUB_REPO_URL)
+		await expect(link).toHaveText(/^(?:\d{1,3}|\d{1,3}(?:\.\d)?K)$/)
+		await expect(page.locator("header details[data-header-menu]")).toHaveCount(1)
+		await expect(page.locator(".header-menu-star")).toHaveCount(0)
 	})
 })
 

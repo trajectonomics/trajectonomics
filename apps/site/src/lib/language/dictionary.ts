@@ -29,12 +29,8 @@ export interface Dictionary {
 	/** The release date as this Language writes it; the machine-readable date is the snapshot's `releasedOn`. */
 	readonly releaseDate: string
 	readonly docsLink: string
-	/** The Star menu's summary: the GitHub mark, the count and this name, for a reader who hears it. */
-	readonly starMenuLabel: string
-	/** The Star menu's panel group label, above the repository rows. */
-	readonly starMenuGroupLabel: string
-	/** The Star menu's last row, to the Organisation on GitHub. */
-	readonly starMenuAllRepos: string
+	/** The header's one repository link, heard with its star count: the GitHub mark, the count and an arrow. */
+	readonly repoLinkLabel: string
 	/** The See it in action section's small label, which the page no longer draws. */
 	readonly actionEyebrow: string
 	/** The See it in action section's heading in the full Answer engine file. */
