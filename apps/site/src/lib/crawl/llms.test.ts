@@ -10,10 +10,10 @@ import {
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
 	SITE_NAME,
-	SITE_ORIGIN,
 	SKILLS_LICENCE_URL,
 } from "../site"
 import { LLMS_FILE, LLMS_TXT } from "./llms"
+import { LLMS_FULL_TXT } from "./llms-full"
 import { linkCount } from "./llms-markdown"
 
 /** The `## ` section titles the file states, in order. */
@@ -44,9 +44,9 @@ describe("the short Answer engine file", () => {
 
 	it("links the Docs Portal, both repositories and the MIT licence the footer links", () => {
 		for (const url of [
-			`${SITE_ORIGIN}${DOCS_PATH}`,
-			`${SITE_ORIGIN}${DOCS_CLI_PATH}`,
-			`${SITE_ORIGIN}${DOCS_CLI_INSTALL_PATH}`,
+			DOCS_PATH,
+			DOCS_CLI_PATH,
+			DOCS_CLI_INSTALL_PATH,
 			GITHUB_CLI_URL,
 			GITHUB_SKILLS_URL,
 			SKILLS_LICENCE_URL,
@@ -61,5 +61,15 @@ describe("the short Answer engine file", () => {
 
 	it("carries no text the owner has not written, and no placeholder for it", () => {
 		expect(LLMS_TXT).not.toContain(OWNER_WRITTEN_PLACEHOLDER)
+	})
+
+	it("writes every link as one absolute URL, never two URLs run together", () => {
+		for (const file of [LLMS_TXT, LLMS_FULL_TXT]) {
+			for (const link of file.matchAll(/\]\(([^)\s]+)\)/g)) {
+				const href = link[1] ?? ""
+				expect(new URL(href).protocol).toMatch(/^https?:$/)
+				expect(href.indexOf("https://", 1)).toBe(-1)
+			}
+		}
 	})
 })

@@ -9,7 +9,6 @@ import {
 	INSTALL_PROMPT,
 	ONBOARDING_SKILL_URL,
 	SITE_NAME,
-	SITE_ORIGIN,
 	SKILLS_LICENCE_URL,
 } from "../site"
 import { linkLine, renderLlms, section } from "./llms-markdown"
@@ -20,19 +19,14 @@ export const LLMS_FILE = "llms.txt"
 /** The words the file uses, taken from the Language a crawler falls back to, so none is invented. */
 const dictionary = dictionaryFor(FALLBACK_LANGUAGE)
 
-/** A Site path named in full, because the file is read away from the Site. */
-function at(path: string): string {
-	return `${SITE_ORIGIN}${path}`
-}
-
 /** The Site has one address, so it is listed once rather than once per Language. */
 const SITE_LINES = [linkLine(SITE_NAME, ABSOLUTE_CLEAN_URL)]
 
-/** The Docs Portal's pages, under the footer's own words for them. */
+/** The Docs Portal's pages, under the footer's own words for them. The constants are full URLs already. */
 const DOCS_LINES = [
-	linkLine(dictionary.footerDocsLink, at(DOCS_PATH)),
-	linkLine(dictionary.footerCliDocsLink, at(DOCS_CLI_PATH)),
-	linkLine(dictionary.footerInstallLink, at(DOCS_CLI_INSTALL_PATH)),
+	linkLine(dictionary.footerDocsLink, DOCS_PATH),
+	linkLine(dictionary.footerCliDocsLink, DOCS_CLI_PATH),
+	linkLine(dictionary.footerInstallLink, DOCS_CLI_INSTALL_PATH),
 ]
 
 /** The two repositories that hold traj and the skills that operate it. */
