@@ -1,0 +1,79 @@
+# Release runbook
+
+Two npm packages ship from this repository: `@trajectonomics/core` (`packages/core`) and
+`@trajectonomics/cli` (`apps/cli`). Their tags are `core-v*` and `cli-v*`. The packages and their
+tag prefixes are listed in `tooling/release/packages.json`. Workflow: `.github/workflows/release.yml`.
+
+## How versions happen
+
+- **Alpha, on push to main.** A package whose folder changed gets `<next>-alpha.N` under dist-tag
+  `alpha`. Markdown-only changes publish nothing. `tooling/release/version.ts` computes it.
+- **Stable, by hand.** From main, for one package: publishes `<next>` under dist-tag `latest`, then
+  creates the tag `<tagPrefix><next>` and a GitHub release. Only `cli` is marked latest.
+- **Bump.** `auto` reads the conventional commits that touched the folder since the last stable
+  tag (`feat` minor, breaking major, else patch). Pass `patch`, `minor` or `major` to override.
+- **First stable.** With no stable tag yet, a package takes `firstVersion` from `packages.json`
+  (`core`: `0.3.0`), and its alphas are `0.3.0-alpha.N`.
+
+## Dispatch a stable release
+
+```sh
+gh workflow run release.yml --ref main -f package=core -f bump=auto
+gh workflow run release.yml --ref main -f package=cli -f bump=patch
+```
+
+`auto` fails with "Nothing to release" when nothing touched the folder since the last tag.
+
+## Repair a cli release's binaries
+
+If the stable cli publish worked but `binaries.yml` failed, rebuild the assets from the tag
+(nothing is published):
+
+```sh
+gh workflow run binaries.yml --ref main -f tag=cli-v0.3.1
+```
+
+It refuses a tag that is not `cli-vX.Y.Z`, smoke-tests the binaries and uploads them with the
+install scripts and `checksums.txt`.
+
+## One-time cutover (owner)
+
+Do these once, in order. Until (b) is done, every release from here fails with an auth error.
+
+**(a) Publish core once by hand at `0.3.0-alpha.0`.** npm cannot attach a Trusted Publisher to a
+package that does not exist yet. From a clean checkout of main:
+
+```sh
+bun install --frozen-lockfile
+bunx turbo run check --filter=@trajectonomics/core... --concurrency=2
+cd packages/core
+npm version 0.3.0-alpha.0 --no-git-tag-version
+npm login
+npm publish --access public --tag alpha --provenance=false
+git checkout -- package.json
+```
+
+`--provenance=false`: `publishConfig` asks for provenance, which only CI can give.
+
+**(b) Trusted Publishers.** On npmjs.com, for both packages: Settings → Trusted Publisher →
+GitHub Actions, repository `trajectonomics/trajectonomics`, workflow `release.yml`, no environment.
+For `cli`, replace the old `trajectonomics/cli` publisher.
+
+**(c) First stable of each.** Dispatch the workflow for `core` (it publishes `0.3.0`, tag
+`core-v0.3.0`) and for `cli` (`bump` as needed). Check that `latest` on npm is what you expect:
+`npm view @trajectonomics/core dist-tags`.
+
+**(d) Deprecate the retired packages.** Each command marks every version of the old package:
+
+```sh
+npm deprecate @trajectonomics/money "Moved into @trajectonomics/core (import @trajectonomics/core/money). No longer published."
+npm deprecate @trajectonomics/ledger "Moved into @trajectonomics/core (import @trajectonomics/core/ledger). No longer published."
+npm deprecate @trajectonomics/tax "Moved into @trajectonomics/core (import @trajectonomics/core/tax). No longer published."
+npm deprecate @trajectonomics/sim "Moved into @trajectonomics/core (import @trajectonomics/core/sim). No longer published."
+npm deprecate @trajectonomics/design-system "Retired. Source is packages/brand in github.com/trajectonomics/trajectonomics; not published."
+npm deprecate @trajectonomics/design-system-theme "Retired. Source is packages/brand in github.com/trajectonomics/trajectonomics; not published."
+npm deprecate @trajectonomics/design-system-svelte "Retired. Source is packages/brand in github.com/trajectonomics/trajectonomics; not published."
+npm deprecate @trajectonomics/design-system-assets "Retired. Source is packages/brand in github.com/trajectonomics/trajectonomics; not published."
+```
+
+Run them as the owner, after (c). They are reversible: `npm deprecate <pkg> ""` clears the message.
