@@ -1,4 +1,4 @@
-import glyph from "@trajectonomics/design-system-assets/logo/mark.svg?raw"
+import glyph from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { ComponentProps } from "react"
 import { PORTAL_NAME } from "../lib/portal"
 

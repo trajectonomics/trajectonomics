@@ -142,7 +142,7 @@ describe("theme seam", () => {
 	test("the global stylesheet imports the assets font stylesheet and not the fontsource package", async () => {
 		const css = await Bun.file(GLOBAL_PATH).text()
 		const imports = [...css.matchAll(/@import\s+"([^"]+)"/g)].map((match) => match[1])
-		expect(imports).toContain("@trajectonomics/design-system-assets/fonts/inter.css")
+		expect(imports).toContain("@trajectonomics/brand/current/fonts/inter.css")
 		expect(imports).not.toContain("@fontsource-variable/inter/index.css")
 	})
 
@@ -150,13 +150,13 @@ describe("theme seam", () => {
 		const css = await Bun.file(GLOBAL_PATH).text()
 		const imports = [...css.matchAll(/@import\s+"([^"]+)"/g)].map((match) => match[1])
 		expect(imports).toContain("fumadocs-ui/css/neutral.css")
-		expect(imports).toContain("@trajectonomics/design-system-theme/themes/light.css")
-		expect(imports).toContain("@trajectonomics/design-system-theme/themes/dark.css")
+		expect(imports).toContain("@trajectonomics/brand/current/light.css")
+		expect(imports).toContain("@trajectonomics/brand/current/dark.css")
 		expect(imports.indexOf("./theme-seam.css")).toBeGreaterThan(
 			imports.indexOf("fumadocs-ui/css/neutral.css"),
 		)
 		expect(imports.indexOf("./theme-seam.css")).toBeGreaterThan(
-			imports.indexOf("@trajectonomics/design-system-theme/themes/dark.css"),
+			imports.indexOf("@trajectonomics/brand/current/dark.css"),
 		)
 	})
 })

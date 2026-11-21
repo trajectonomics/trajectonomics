@@ -162,15 +162,21 @@ npm shows about 2–4k downloads a month each, and the CLI itself only 681, so t
 CI and Cloudflare builds. Five packages with their own versions and trusted publishers cost more
 than they give.
 
-- `packages/core/` with subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`,
-  `/tax/th`, `/tax/us`, `/sim`. The four folders keep their source and tests. Each one's history
-  comes in through the phase 1 import, then a `git mv` (history still shows with `git log --follow`).
-- **Dependency direction checked by lint:** `ledger` and `tax` may import `money`. `sim`
-  imports none of the others. `tax`'s production code never imports `sim`, but its levy tests may,
-  because they evaluate the levy graph `tax` emits with sim's evaluator. Nothing imports upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
-  promised. A Biome `noRestrictedImports` rule per folder, or a small script, enforces both.
-- The sim↔tax cycle (§3) is gone by then: phase 2 drops sim's unused optional peer dependency on tax.
-- `cli` and `docs` change imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on.
+- **Layout: four private packages, one published bundle.**
+  ```
+  packages/core/              @trajectonomics/core  (published)
+    package.json, tsdown.config.ts, README.md, scripts/check-deps.ts
+    money/   ledger/   tax/   sim/      private workspace packages, moved here with git mv
+  ```
+  The four keep their package names (`@trajectonomics/money`, and so on), now `"private": true`, and
+  their own scripts, tests and checks, so tax's source, README-claim and coverage checks run as before
+  and turbo still caches each one separately. `@trajectonomics/core`'s build bundles them into
+  subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`, `/tax/th`, `/tax/us`, `/sim`.
+  Nothing outside `packages/core/` imports the private names.
+- **Dependency direction checked:** `scripts/check-deps.ts` (part of core's `check`) fails if
+  `ledger` or `tax` import anything internal except `money`, if `sim` or `money` import any internal
+  package, or if `tax` imports `sim` outside its test files. `tax`'s levy tests may import `sim`.
+- `cli` changes imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on. `docs` keeps npm `sim@0.1.0` until phase 3b deletes the page that documents it.
 - Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
   imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
   higher than any old package's `latest`, so nobody mistakes the two.
@@ -305,7 +311,7 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 |---|---|---|---|
 | 1 | **Import with history** (done 2026-11-21): `tooling/migrate/import.sh` imported 12 repos (design-system as `packages/brand`), 476 commits and 9 tags, in 33 s. No content edits. | Claude, as a script: the job is mechanical | Done: each folder's contents match the source repo's latest commit and every commit count is exact; re-running changes nothing; no secrets in history |
 | 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
-| 2b | **Brand package**: restructure `packages/brand` per §2b, delete the Svelte package and Storybook, switch site and docs to `@trajectonomics/brand` with `BRAND` selection | DeepSeek V4 Pro, reviewed by Opus | site and docs build pixel-identical with `BRAND=trajectonomics`; a throwaway `brands/example` passes the tests without touching any other file |
+| 2b | **Brand package**: restructure `packages/brand` per §2b, delete the Svelte package and Storybook, switch site and docs to `@trajectonomics/brand` with `BRAND` selection | Claude Haiku, verified by Opus | site and docs build pixel-identical with `BRAND=trajectonomics`; a throwaway `brands/example` passes the tests without touching any other file |
 | 2c | **Core package**: `git mv` money/ledger/tax/sim into `packages/core/`, subpath exports, import-direction lint, update cli and docs imports | DeepSeek V4 Pro | `bun run check` passes; `npm pack --dry-run` of core shows every subpath; a test import that goes upward fails lint |
 | 3 | **Agent docs and skills**: merge `AGENTS.md`/`CLAUDE.md`/`CODING_STANDARDS.md`/`GLOSSARY.md` into the root, one skills lock | DeepSeek V4.1 Flash | No duplicate root skill dirs; `bun run skills:check` passes |
 | 3b | **Docs and contributing**: remove the developers section and add redirects, add the contribute section, the tax guide (§2d outline), issue templates, CODEOWNERS | DeepSeek V4 Pro, reviewed by Opus | Old `/docs/developers/*` URLs answer 301; the tax guide's walkthrough works step by step on a clean clone |
@@ -328,6 +334,10 @@ delegated phase brief from now on states:
 - One phase per run. Push the phase branch and open a draft PR. Do not merge.
 - Mechanical, checkable work (imports, tag pushes, mass renames that a script can do) gets a script,
   not an agent.
+- Clean-clone verification goes under `~/.cache/`, never `/tmp`: `/tmp` on this machine is RAM-backed
+  (tmpfs), and three leftover clones with `node_modules` took 4 GB of RAM and helped kill a run with
+  an out-of-memory error. Delete each clone when done. Run turbo with `--concurrency=2` and builds
+  inside `systemd-run --user --scope -p MemoryMax=6G` so a big build cannot take the machine down.
 
 During phases 1–5 the old repos stay live and keep deploying. **Freeze merges into them now.** If a
 change has to land before cutover, make it here as a normal commit. (`import.sh` skips folders that

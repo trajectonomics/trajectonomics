@@ -42,9 +42,7 @@
       "dependencies": {
         "@astrojs/react": "^7.1.4",
         "@fumadocs/astro": "0.2.1",
-        "@trajectonomics/design-system": "workspace:*",
-        "@trajectonomics/design-system-assets": "workspace:*",
-        "@trajectonomics/design-system-theme": "workspace:*",
+        "@trajectonomics/brand": "workspace:*",
         "astro": "7.4.12",
         "fumadocs-core": "16.18.2",
         "fumadocs-ui": "16.18.2",
@@ -71,9 +69,7 @@
       "name": "@trajectonomics/site",
       "version": "0.0.0-development",
       "dependencies": {
-        "@trajectonomics/design-system": "workspace:*",
-        "@trajectonomics/design-system-assets": "workspace:*",
-        "@trajectonomics/design-system-theme": "workspace:*",
+        "@trajectonomics/brand": "workspace:*",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.12",
@@ -94,37 +90,17 @@
         "wrangler": "^4.158.0",
       },
     },
-    "packages/brand/packages/assets": {
-      "name": "@trajectonomics/design-system-assets",
-      "version": "0.0.0-development",
+    "packages/brand": {
+      "name": "@trajectonomics/brand",
+      "version": "0.0.0",
       "devDependencies": {
+        "@biomejs/biome": "2.6.3",
         "@resvg/resvg-wasm": "^2.6.2",
-        "@types/bun": "^1.4.4",
-        "typescript": "^7.0.2",
-      },
-    },
-    "packages/brand/packages/core": {
-      "name": "@trajectonomics/design-system",
-      "version": "0.0.0-development",
-      "devDependencies": {
-        "@types/bun": "^1.4.4",
-        "tsdown": "^0.23.2",
-        "typescript": "^7.0.2",
-      },
-    },
-    "packages/brand/packages/theme": {
-      "name": "@trajectonomics/design-system-theme",
-      "version": "0.0.0-development",
-      "devDependencies": {
         "@tailwindcss/cli": "^4.3.5",
-        "@trajectonomics/design-system": "workspace:*",
         "@types/bun": "^1.4.4",
         "tailwindcss": "^4.3.5",
         "tsdown": "^0.23.2",
         "typescript": "^7.0.2",
-      },
-      "peerDependencies": {
-        "@trajectonomics/design-system": "workspace:*",
       },
     },
     "packages/ledger": {
@@ -800,13 +776,9 @@
 
     "@trajectonomics/blog": ["@trajectonomics/blog@workspace:apps/blog"],
 
+    "@trajectonomics/brand": ["@trajectonomics/brand@workspace:packages/brand"],
+
     "@trajectonomics/cli": ["@trajectonomics/cli@workspace:apps/cli"],
-
-    "@trajectonomics/design-system": ["@trajectonomics/design-system@workspace:packages/brand/packages/core"],
-
-    "@trajectonomics/design-system-assets": ["@trajectonomics/design-system-assets@workspace:packages/brand/packages/assets"],
-
-    "@trajectonomics/design-system-theme": ["@trajectonomics/design-system-theme@workspace:packages/brand/packages/theme"],
 
     "@trajectonomics/docs": ["@trajectonomics/docs@workspace:apps/docs"],
 

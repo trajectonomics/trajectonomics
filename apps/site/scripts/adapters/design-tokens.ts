@@ -1,10 +1,10 @@
 import { type DesignTokens, parseDesignTokens } from "../../src/lib/design/tokens"
 
 /** The published package the Site pins, whose CSS the built Site is judged against. */
-const THEME_PACKAGE = "@trajectonomics/design-system-theme"
+const THEME_PACKAGE = "@trajectonomics/brand"
 
 /** The Prebuilt Theme CSS files the package exports, one per published Theme. */
-const THEME_SHEETS = ["themes/light.css", "themes/dark.css"]
+const THEME_SHEETS = ["current/light.css", "current/dark.css"]
 
 /** The Tailwind Theme Stylesheet, which turns the Semantic Token Roles into utility colours. */
 const TAILWIND_SHEET = "tailwind.css"

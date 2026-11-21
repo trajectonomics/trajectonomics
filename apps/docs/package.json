@@ -48,9 +48,7 @@
 	"dependencies": {
 		"@astrojs/react": "^7.1.4",
 		"@fumadocs/astro": "0.2.1",
-		"@trajectonomics/design-system": "workspace:*",
-		"@trajectonomics/design-system-assets": "workspace:*",
-		"@trajectonomics/design-system-theme": "workspace:*",
+		"@trajectonomics/brand": "workspace:*",
 		"astro": "7.4.12",
 		"fumadocs-core": "16.18.2",
 		"fumadocs-ui": "16.18.2",
