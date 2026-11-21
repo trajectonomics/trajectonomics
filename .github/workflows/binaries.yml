@@ -1,33 +1,35 @@
-name: Binaries
+name: CLI binaries
 
-# One release's five binaries, smoke-tested twice and attached beside the install
-# scripts and one checksums file. release.yml calls it after npm publishes; a
-# manual dispatch with a tag repairs a release whose binaries failed.
+# One cli release's five binaries, smoke-tested twice and attached beside the install scripts and one
+# checksums file on the cli-v<version> release. release.yml calls it after npm publishes a stable cli;
+# a manual dispatch with a tag repairs a release whose binaries failed.
 #
-# Nothing here publishes: the tag, the npm package and the GitHub release are
-# release.yml's publish job, and this job cannot run before it (needs: publish).
+# Nothing here publishes: the tag, the npm package and the GitHub release are release.yml's publish
+# job, and this job cannot run before it (needs: publish).
 on:
   workflow_call:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing stable tag to rebuild the assets for, for example v1.2.3.
+        description: Existing stable cli tag to rebuild the assets for, for example cli-v0.3.1.
         required: true
         type: string
   pull_request:
     paths:
       - .github/workflows/binaries.yml
       - .github/workflows/release.yml
-      - .github/smoke.sh
-      - install.sh
-      - install.ps1
+      - apps/cli/**
 
 permissions:
   contents: read
 
 concurrency:
-  group: binaries-${{ github.ref }}
+  group: cli-binaries-${{ github.ref }}
   cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: apps/cli
 
 jobs:
   resolve:
@@ -48,11 +50,11 @@ jobs:
           EVENT: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          stable='^v[0-9]+\.[0-9]+\.[0-9]+$'
+          stable='^cli-v[0-9]+\.[0-9]+\.[0-9]+$'
 
           if [ -n "$INPUT_TAG" ]; then
             # Dispatch mode: a repair rebuilds the tag it is given, whatever the SHA.
-            [[ "$INPUT_TAG" =~ $stable ]] || { echo "::error::$INPUT_TAG is not a stable vX.Y.Z tag."; exit 1; }
+            [[ "$INPUT_TAG" =~ $stable ]] || { echo "::error::$INPUT_TAG is not a stable cli-vX.Y.Z tag."; exit 1; }
             tag=$INPUT_TAG
             upload=true
           elif [ "$EVENT" = "pull_request" ]; then
@@ -67,7 +69,7 @@ jobs:
             } >> "$GITHUB_OUTPUT"
             exit 0
           else
-            # Call mode: the tag the publish job just created at this commit, never a guess.
+            # Call mode: the cli tag the publish job just created at this commit, never a guess.
             git fetch --tags --force origin
             tag=
             while read -r candidate; do
@@ -76,14 +78,14 @@ jobs:
                 tag=$candidate
                 break
               fi
-            done < <(git tag --list 'v*' --sort=-v:refname)
-            [ -n "$tag" ] || { echo "::error::No stable vX.Y.Z tag points at $GITHUB_SHA."; exit 1; }
+            done < <(git tag --list 'cli-v*' --sort=-v:refname)
+            [ -n "$tag" ] || { echo "::error::No stable cli-vX.Y.Z tag points at $GITHUB_SHA."; exit 1; }
             upload=true
           fi
 
           {
             echo "tag=$tag"
-            echo "version=${tag#v}"
+            echo "version=${tag#cli-v}"
             echo "ref=refs/tags/$tag"
             echo "upload=$upload"
           } >> "$GITHUB_OUTPUT"
@@ -99,7 +101,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
-      - run: bun install --frozen-lockfile
+      - name: Install the workspace
+        working-directory: .
+        run: bun install --frozen-lockfile
       - name: Stamp the version the tag names, before compiling
         # The compiler inlines package.json, so a binary built at 0.0.0 reports
         # 0.0.0 whatever npm publishes: this step is what makes --version a sentinel.
@@ -138,7 +142,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: release-assets
-          path: assets/
+          path: apps/cli/assets/
           if-no-files-found: error
           retention-days: 7
 
@@ -167,7 +171,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-assets
-          path: assets
+          path: apps/cli/assets
       - name: Run the round trip on the asset for this runner
         # Nothing here downloads from the release: a failure stops the upload.
         shell: bash
@@ -177,7 +181,7 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x "assets/$ASSET"
-          sh .github/smoke.sh "$VERSION" "$PWD/assets/$ASSET"
+          sh scripts/smoke.sh "$VERSION" "$PWD/assets/$ASSET"
 
   attach:
     needs: [resolve, build, artifact-smoke]
@@ -192,7 +196,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-assets
-          path: assets
+          path: apps/cli/assets
       - name: Attach the binaries and the install scripts first
         env:
           GH_TOKEN: ${{ github.token }}
@@ -261,7 +265,7 @@ jobs:
             wait=$((wait * 2))
             [ "$wait" -le 60 ] || wait=60
           done
-          sh .github/smoke.sh "$VERSION" npx --yes "@trajectonomics/cli@$VERSION"
+          sh scripts/smoke.sh "$VERSION" npx --yes "@trajectonomics/cli@$VERSION"
       - uses: oven-sh/setup-bun@v2
         if: runner.os == 'Linux'
         with:
@@ -271,4 +275,4 @@ jobs:
         shell: bash
         env:
           VERSION: ${{ needs.resolve.outputs.version }}
-        run: sh .github/smoke.sh "$VERSION" bunx "@trajectonomics/cli@$VERSION"
+        run: sh scripts/smoke.sh "$VERSION" bunx "@trajectonomics/cli@$VERSION"

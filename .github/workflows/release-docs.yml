@@ -8,12 +8,19 @@ name: Release docs
 on:
   pull_request:
     branches: [main]
+    paths:
+      - apps/cli/**
+      - .github/workflows/release-docs.yml
   schedule:
     - cron: "0 6 * * 1" # Mondays, with the tooling drift job
   workflow_dispatch:
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    working-directory: apps/cli
 
 jobs:
   check:
@@ -26,7 +33,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: bun install --frozen-lockfile
+      - name: Install the workspace
+        working-directory: .
+        run: bun install --frozen-lockfile
       - name: Read the latest published release's own command list
         # npm serves a version a minute or three before its release has assets (ADR-0023), so
         # this waits for the release rather than failing a pull request on that window.
