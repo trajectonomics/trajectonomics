@@ -1,52 +1,18 @@
-# Releasing runbook
+# Releasing the cli
 
-One release is one dispatch of `release.yml` from `main`. It publishes the npm package,
-creates the tag `vX.Y.Z` and the GitHub release, then builds five binaries, smokes them
-and attaches them with both install scripts and one `checksums.txt`. Nobody edits
-`version` in `package.json`; the workflow stamps it from the tag before compiling.
+The release process for every package, including `@trajectonomics/cli`, is in
+[`docs/runbooks/release.md`](../../../../docs/runbooks/release.md). Read it first. Dispatch a
+stable cli release from `main`:
 
-The decisions behind this are in [ADR 0023](../adr/0023-release-artifacts.md); the shared
-publisher is `trajectonomics/cicd`'s `publish.yml@v1`.
+```sh
+gh workflow run release.yml --ref main -f package=cli -f bump=auto
+```
 
-## The one-time bootstrap (owner)
+The rest of this page is what is specific to the cli: the release docs check, the npm-first
+window, what a green cli release looks like, and how to re-run one. The decisions behind the
+binaries are in [ADR 0023](../adr/0023-release-artifacts.md).
 
-npm cannot attach a trusted publisher to a package that does not exist yet, so the first
-version goes up by hand.
-
-1. Publish a placeholder, below the version `scripts/version.ts` will compute, to a
-   throwaway dist-tag so `latest` never points at it, then restore `package.json`:
-
-   ```bash
-   npm version 0.0.1-bootstrap.0 --no-git-tag-version
-   npm publish --access public --provenance=false --tag bootstrap
-   git checkout package.json
-   ```
-
-2. On npm, add a Trusted Publisher for `@trajectonomics/cli`: repository
-   `trajectonomics/cli`, workflow `release.yml`, no environment, "allow publish directly".
-3. Prove it within two days: one successful CI publish, or npm expires the unproven entry.
-4. Dispatch `Release` from `main` once. That is the first real tag and release.
-
-## Cutting a stable release
-
-Actions → **Release** → *Run workflow* on `main`, choosing a bump. `auto` reads the
-conventional-commit subjects since the last tag (`feat:` is a minor, anything else a
-patch, `!` or `BREAKING CHANGE` a major; while on 0.x an inferred breaking change bumps
-the minor).
-
-Then, in order: `bun run check` → the version is computed → `npm version` → the package is
-published with `latest` → the tag and the GitHub release are created → the `binaries` job
-resolves the tag at that commit, stamps the version, compiles the five assets, writes
-`checksums.txt` and stages the install scripts → the artifact smoke runs one binary on a
-runner of its own platform → the binaries and scripts are attached, then the checksums →
-the channel smoke installs through `npx` and `bunx`.
-
-Never run a stable release from a branch other than `main`; the shared workflow refuses it.
-
-Once `npm dist-tags.latest` serves the version you cut, land the marker-clearing pull request
-(see [After the dispatch](#after-the-dispatch-clear-the-markers)).
-
-## After the dispatch: clear the markers
+## Clear the release markers after the dispatch
 
 The `> **Ships in X.Y.Z.**` line in `README.md` and every help note that names the version you just
 cut come out **after** the dispatch, in the next pull request. The release-docs pull-request check
@@ -61,7 +27,14 @@ the alternative is a pull request merged with a knowingly red check, or a check 
 bypass label or a repository variable. A published version number is spent (ADR-0023), so the
 clearing pull request is part of cutting a release, not a follow-up nobody owes.
 
-## What a green release means
+## The npm-first window
+
+npm publishes before the binaries exist. For a few minutes `npx @trajectonomics/cli@X.Y.Z`
+prints one `retrying` line on stderr and the install script says the release is still being
+built. That is expected, not a failure; both retry, and `releases/latest/download` only
+404s during that window.
+
+## What a green cli release means
 
 - npm serves `@trajectonomics/cli@X.Y.Z`.
 - The release `vX.Y.Z` carries eight assets: `traj-darwin-arm64`, `traj-darwin-x64`,
@@ -72,13 +45,6 @@ clearing pull request is part of cutting a release, not a follow-up nobody owes.
 - The channel smoke installed through `npx` (and `bunx` on Linux) and ran the round trip,
   so the public URL, the launcher, the checksums and the cache all work together.
 - `traj --version` prints the tag's version, not `0.0.0`, on every channel.
-
-## The npm-first window
-
-npm publishes before the binaries exist. For a few minutes `npx @trajectonomics/cli@X.Y.Z`
-prints one `retrying` line on stderr and the install script says the release is still being
-built. That is expected, not a failure; both retry, and `releases/latest/download` only
-404s during that window.
 
 ## Re-running
 
@@ -93,26 +59,7 @@ A re-run does not publish a new version, move the tag, or create a second releas
 cannot replace a *wrong* binary under the same version: a published version number is
 spent, so cut a patch instead.
 
-## Repairing a release whose binaries failed
-
-When the publish job succeeded and the binaries job failed, the version is on npm and its
-release has missing or stale assets.
-
-1. Actions → **Binaries** → *Run workflow* with `tag: vX.Y.Z`. Dispatch mode checks out the
-   tag, ignores the dispatched commit, rebuilds, smokes, and clobbers every asset.
-2. Read its log: `gh release view vX.Y.Z --json assets` must list the eight assets, and the
-   channel smoke must be green.
-
-Do not delete and re-create the release: `install.sh` resolves
+Do not delete and re-create a release to repair it: `install.sh` resolves
 `releases/latest/download`, so deleting the newest release moves that redirect backwards.
-
-## Where the pieces live
-
-| Path | What it is |
-| --- | --- |
-| `.github/workflows/release.yml` | the thin caller npm trusted publishing validates |
-| `.github/workflows/binaries.yml` | assets, two smoke stages, the upload |
-| `.github/workflows/installer-smoke.yml` | the installers' test on every pull request |
-| `.github/smoke.sh` | the round trip every channel runs |
-| `install.sh`, `install.ps1` | the installers, attached to every release |
-| `bin/` | the npm launcher, the only published files besides the manifest |
+To repair missing or stale binaries, dispatch `binaries.yml` with `tag: vX.Y.Z` as the
+[shared runbook describes](../../../../docs/runbooks/release.md#repair-a-cli-releases-binaries).
