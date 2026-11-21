@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { homeOf, openPage } from "./pages"
 
-/** The English home, whose header is the one with the Star menu and the scroll ground. */
+/** The English home, whose header carries the repository link and the scroll ground. */
 const HOME = homeOf("en")
 
 /** The header's painted background, read after the scroll-driven animation has settled. */

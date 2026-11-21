@@ -32,6 +32,7 @@
 @import "./command.css";
 @import "./toast.css";
 @import "./header.css";
+@import "./repo-link.css";
 @import "./menu.css";
 @import "./menu-panel.css";
 @import "./motion.css";
@@ -72,15 +73,8 @@
 	--font-mono: var(--font-meta);
 }
 
-/* The inlined brand mark carries a viewBox and no intrinsic size, so the header's tile gives it one. */
+/* The inlined brand mark carries a viewBox and no intrinsic size, so the header's 40 px tile gives it one. */
 .brand-tile > svg {
-	height: 1.25rem;
-	width: 1.25rem;
-}
-
-@media (min-width: 40rem) {
-	.brand-tile > svg {
-		height: 1.5rem;
-		width: 1.5rem;
-	}
+	height: 1.5rem;
+	width: 1.5rem;
 }

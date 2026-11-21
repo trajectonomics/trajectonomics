@@ -1,4 +1,4 @@
-/* The header's two disclosures (ADR 0007): the frame and chevron both menus share. */
+/* The Language menu (ADR 0007): the frame and the chevron. */
 
 .header-menu {
 	position: relative;

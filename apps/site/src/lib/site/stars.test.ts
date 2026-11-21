@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { STAR_REPOS } from "../site"
-import { STAR_SNAPSHOT, STARRED_REPOS, TOP_REPO_NAME } from "./star-snapshot"
+import { STAR_SNAPSHOT, STARRED_REPOS } from "./star-snapshot"
 import { formatStarCount, starredRepos, topStarLabel } from "./stars"
 
 const REPOS = [
@@ -18,7 +18,7 @@ describe("the star count the trigger shows", () => {
 	})
 })
 
-describe("the repositories the Star menu lists", () => {
+describe("the repositories a star count lists", () => {
 	it("orders them highest stars first", () => {
 		const snapshot = { asOf: "2026-11-20", stars: { cli: 2, skills: 40 } }
 		expect(starredRepos(snapshot, REPOS).map((repo) => repo.repo)).toEqual(["skills", "cli"])
@@ -46,7 +46,7 @@ describe("the repositories the Star menu lists", () => {
 })
 
 describe("the committed star snapshot", () => {
-	it("counts every repository the Star menu may list", () => {
+	it("counts the one repository the header links", () => {
 		for (const repo of STAR_REPOS) expect(STAR_SNAPSHOT.stars[repo.repo]).toBeNumber()
 	})
 
@@ -54,10 +54,9 @@ describe("the committed star snapshot", () => {
 		expect(STAR_SNAPSHOT.asOf).toMatch(/^\d{4}-\d{2}-\d{2}$/)
 	})
 
-	it("lists the repositories highest stars first and names the highest one", () => {
+	it("lists the repositories highest stars first", () => {
 		expect(STARRED_REPOS.map((repo) => repo.stars)).toEqual(
 			[...STARRED_REPOS.map((repo) => repo.stars)].sort((left, right) => right - left),
 		)
-		expect(TOP_REPO_NAME).toBe(STARRED_REPOS[0]?.name)
 	})
 })

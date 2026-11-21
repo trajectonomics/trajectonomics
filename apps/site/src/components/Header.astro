@@ -7,8 +7,7 @@ import type { Language } from "../lib/language/language"
 import { CLEAN_URL } from "../lib/language/languages"
 import { DOCS_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
-import StarMenu from "./StarMenu.astro"
-import Separator from "./ui/Separator.astro"
+import RepoLink from "./RepoLink.astro"
 
 interface Props {
 	readonly language: Language
@@ -28,7 +27,7 @@ const artwork = mark
 ---
 
 <header class="site-header fixed inset-x-0 top-0 z-50 h-16 border-b border-border bg-background">
-	<nav class="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-5 sm:gap-6 sm:px-6">
+	<nav class="header-bar">
 		<a
 			class="brand shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
 			href={CLEAN_URL}
@@ -36,18 +35,17 @@ const artwork = mark
 		>
 			<span class="brand-tile"><Fragment set:html={artwork} /></span>
 		</a>
-		<div class="flex items-center gap-2 sm:gap-3">
+		<div class="header-nav">
 			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
-			<Separator />
-			<StarMenu dictionary={dictionary} />
-			<Separator />
+			<span class="header-sep" aria-hidden="true"></span>
 			<LanguageMenu language={language} dictionary={dictionary} markCurrent={markCurrent} />
 		</div>
+		<RepoLink dictionary={dictionary} />
 	</nav>
 </header>
 
 {/*
-	The header menus: native <details> for click and keyboard, with hover as an enhancement on a fine
+	The Language menu: native <details> for click and keyboard, with hover as an enhancement on a fine
 	pointer. The notes live here rather than inside the script because every byte of an inline script
 	ships against the page's 10,000 (ADR 0005): the pointer may sit outside a disclosure for
 	CLOSE_DELAY_MS before its menu closes, so a crossing between the summary and the panel is not a

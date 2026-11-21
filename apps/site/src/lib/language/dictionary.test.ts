@@ -60,12 +60,10 @@ describe("the Dictionary of every Language", () => {
 		expect(thai.heroHeadingAccent).toBe("การวางแผนการเงิน")
 	})
 
-	it("keeps the release pill's licence and the menu labels the owner approved", () => {
+	it("keeps the release pill's licence and the repository link label the owner approved", () => {
 		const english = dictionaryFor("en")
 		expect(english.heroLicence).toBe("MIT · open source")
-		expect(english.starMenuLabel).toBe("GitHub stars")
-		expect(english.starMenuGroupLabel).toBe("Repositories")
-		expect(english.starMenuAllRepos).toBe("All repositories")
+		expect(english.repoLinkLabel).toBe("GitHub stars")
 		expect(english.copied).toBe("Prompt copied")
 	})
 
