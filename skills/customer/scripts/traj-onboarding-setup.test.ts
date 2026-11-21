@@ -44,10 +44,20 @@ describe("Step 2, installing the published set", () => {
 		expect(stepTwo).toContain("with an explicit `--skill` per")
 	})
 
-	it("skips a row the command line cannot satisfy, naming it, its range and the reason", () => {
-		expect(stepTwo).toContain("Skip a row whose CLI Range the command line does not satisfy")
-		expect(stepTwo).toContain("name it with the range it wants and")
+	it("skips and names a row below its floor, with its range and the reason", () => {
+		expect(stepTwo).toContain("at or above its CLI Range floor")
+		expect(stepTwo).toContain("Skip a row below its floor")
+		expect(stepTwo).toContain("name it with the range it")
 		expect(stepTwo).toContain("describe a command that")
+		expect(stepTwo).not.toContain("does not satisfy")
+	})
+
+	it("installs a row whose upper bound the command line has passed (skills ADR 0004)", () => {
+		expect(stepTwo).toContain(
+			"A row whose upper bound the command line has passed is installed all the",
+		)
+		expect(stepTwo).toContain("only marks when this repository rechecks the skill")
+		expect(stepTwo).toContain("`traj schema`")
 	})
 
 	it("falls back to traj alone, in plain words, when the manifest cannot be read", () => {
