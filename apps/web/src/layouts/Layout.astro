@@ -1,11 +1,23 @@
 ---
 import "../styles/global.css"
+import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
+import { PreferenceControls } from "../components/shell/PreferenceControls"
+import { SiteBrand } from "../components/shell/SiteBrand"
+import { SiteNavLinks } from "../components/shell/SiteNavLinks"
+import { SnapshotStatus } from "../components/shell/SnapshotStatus"
 
 interface Props {
 	title: string
 }
 
 const { title } = Astro.props
+// The brand link names itself, so the artwork is decoration: the mark's own role and title go with it.
+const artwork = mark
+	.replace(' role="img"', "")
+	.replace(/ aria-label="[^"]*"/, "")
+	.replace(/<title>[\s\S]*?<\/title>/, "")
+	.replace("<svg ", '<svg focusable="false" ')
+const current = Astro.url.pathname
 ---
 
 <!doctype html>
@@ -14,9 +26,44 @@ const { title } = Astro.props
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="robots" content="noindex" />
-		<title>{title}</title>
+		<title>{title} · Dashboard</title>
+		<!-- Sets the Theme before first paint: the stored choice, else the system's preference. -->
+		<script is:inline>
+			;(() => {
+				let theme = "light"
+				try {
+					const stored = localStorage.getItem("traj.theme")
+					if (stored === "light" || stored === "dark") theme = stored
+					else if (matchMedia("(prefers-color-scheme: dark)").matches) theme = "dark"
+				} catch {
+					// Storage or matchMedia is unavailable: the light Theme stands.
+				}
+				document.documentElement.dataset.theme = theme
+			})()
+		</script>
 	</head>
-	<body class="bg-background text-foreground min-h-screen">
-		<slot />
+	<body class="flex min-h-screen flex-col bg-background font-sans text-foreground">
+		<header class="border-b border-border">
+			<div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
+				<SiteBrand client:load artwork={artwork} />
+				<PreferenceControls client:load />
+			</div>
+			<div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+				<SnapshotStatus client:load />
+			</div>
+			<div class="border-t border-border">
+				<div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+					<SiteNavLinks client:load current={current} />
+				</div>
+			</div>
+		</header>
+		<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+			<slot />
+		</main>
+		<footer class="border-t border-border">
+			<p class="mx-auto w-full max-w-6xl px-4 py-4 text-sm text-muted-foreground sm:px-6">
+				Every figure is a traj result. The Dashboard computes nothing.
+			</p>
+		</footer>
 	</body>
 </html>
