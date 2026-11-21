@@ -161,11 +161,11 @@ than they give.
 - `packages/core/` with subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`,
   `/tax/th`, `/tax/us`, `/sim`. The four folders keep their source and tests. Each one's history
   comes in through the phase 1 import, then a `git mv` (history still shows with `git log --follow`).
-- **Dependency direction checked by lint:** `money` ← `ledger`, `tax` ← `sim`. Nothing imports
-  upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
+- **Dependency direction checked by lint:** `ledger` and `tax` may import `money`. `sim`
+  imports none of the others. `tax`'s production code never imports `sim`, but its levy tests may,
+  because they evaluate the levy graph `tax` emits with sim's evaluator. Nothing imports upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
   promised. A Biome `noRestrictedImports` rule per folder, or a small script, enforces both.
-- The sim↔tax cycle (§3) becomes imports between two folders in one package, and only the
-  direction rule needs to hold.
+- The sim↔tax cycle (§3) is gone by then: phase 2 drops sim's unused optional peer dependency on tax.
 - `cli` and `docs` change imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on.
 - Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
   imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
@@ -220,9 +220,10 @@ Also add to `.github/`: issue templates `tax-wrong-figure.yml`, `tax-new-year.ym
 
 ## 3. Known problems to fix during the move
 
-- **Cycle between `sim` and `tax`.** `sim` has a peer dependency on `tax`, and `tax` has a dev
-  dependency on `sim` (for its tests). Merging them into `core` (§2c) solves it: tax tests that use
-  sim move to `sim/` so the direction rule `tax` ← `sim` holds.
+- **Cycle between `sim` and `tax`.** `sim` declares an *optional* peer dependency on `tax`, but its
+  source never imports `tax`. `tax` has a dev dependency on `sim`, because its levy tests evaluate the
+  emitted graph with sim. Fix (phase 2): drop sim's unused peer entry. The only edge left is
+  tax → sim, test-only.
 - **Wrong package name.** `blog` still calls itself `@trajectonomics/technical-template`. Rename it
   to `@trajectonomics/blog` (private).
 - **Different Node engine.** `site` requires Node `>=22.23.4`; everything else requires `>=20`. The root
