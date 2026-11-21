@@ -36,6 +36,8 @@ const OPERATOR_TAB_PAGE = [
 	"</body></html>",
 ].join("")
 
+const RELEASE_LINE = "Docs for traj 0.4.0"
+
 const LANDING_PAGE = [
 	'<html data-theme="dark"><head>',
 	alternate("/docs/index.md"),
@@ -45,6 +47,7 @@ const LANDING_PAGE = [
 	"<main>",
 	'<a href="/docs/cli/">For Operators: install and run the CLI</a>',
 	'<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>',
+	`<p>${RELEASE_LINE}</p>`,
 	"<h1>Trajectonomics Docs</h1>",
 	"</main>",
 	"</body></html>",
@@ -145,7 +148,7 @@ const COMPLETE_BUILD: readonly BuiltFile[] = [
 
 describe("the check of the built Docs Portal", () => {
 	test("a complete build reports no failure", () => {
-		expect(checkBuild(COMPLETE_BUILD)).toEqual([])
+		expect(checkBuild(COMPLETE_BUILD, RELEASE_LINE)).toEqual([])
 	})
 
 	test("a build whose Installation page shows no copyable PATH line reports that rule", () => {
@@ -153,7 +156,7 @@ describe("the check of the built Docs Portal", () => {
 			"docs/cli/installation/index.html",
 			'<html data-theme="dark"><main><p>Add ~/.local/bin to your PATH.</p></main></html>',
 		)
-		const codes = checkBuild([...COMPLETE_BUILD, withoutLine]).map((failure) => failure.code)
+		const codes = checkBuild([...COMPLETE_BUILD, withoutLine], RELEASE_LINE).map((failure) => failure.code)
 
 		expect(codes).toContain("INSTALLATION_PAGE_PATH_LINE_MISSING")
 	})
@@ -161,7 +164,7 @@ describe("the check of the built Docs Portal", () => {
 	test("a build that breaks several rules reports every failed rule, not only the first", () => {
 		const stale: BuiltFile = { path: "_redirects", content: "/docs /docs/cli/ 302\n" }
 
-		expect(checkBuild([stale]).map((failure) => failure.code)).toEqual([
+		expect(checkBuild([stale], RELEASE_LINE).map((failure) => failure.code)).toEqual([
 			"NOT_FOUND_PAGE_MISSING",
 			"LANDING_PAGE_MISSING",
 			"OPERATOR_TAB_PAGE_MISSING",

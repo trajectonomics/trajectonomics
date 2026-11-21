@@ -2,8 +2,11 @@
 import { Landing } from "../components/landing"
 import Layout from "../layouts/Layout.astro"
 import { twinPath } from "../lib/agent/twin-path"
+import { readReleaseLine } from "../lib/release-line-source"
 import { PORTAL_NAME, PORTAL_PURPOSE } from "../lib/portal"
 import { DOCS_BASE_PATH } from "../lib/tabs"
+
+const releaseLine = readReleaseLine()
 ---
 
 <Layout
@@ -11,5 +14,10 @@ import { DOCS_BASE_PATH } from "../lib/tabs"
 	description={PORTAL_PURPOSE}
 	markdownTwin={twinPath(DOCS_BASE_PATH)}
 >
-	<Landing client:load pathname={Astro.url.pathname} params={Astro.params} />
+	<Landing
+		client:load
+		pathname={Astro.url.pathname}
+		params={Astro.params}
+		releaseLine={releaseLine}
+	/>
 </Layout>

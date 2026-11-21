@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs"
 import { checkBuild } from "../src/lib/build"
+import { readReleaseLine } from "../src/lib/release-line-source"
 import { readBuildFiles } from "./adapters/build-files"
 
 /** The Worker's assets root: Astro builds into `dist/docs`, so the Worker serves `./dist`. */
@@ -11,7 +12,7 @@ export async function main(root: string): Promise<number> {
 		console.error(`verify:build: ${root}/ is missing. Run \`bun run build\` first.`)
 		return 1
 	}
-	const failures = checkBuild(await readBuildFiles(root))
+	const failures = checkBuild(await readBuildFiles(root), readReleaseLine())
 	for (const failure of failures) {
 		console.error(`${failure.code} ${failure.path}: ${failure.message}`)
 	}

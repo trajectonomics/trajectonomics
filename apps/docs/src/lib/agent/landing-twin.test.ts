@@ -5,6 +5,12 @@ import { buildLandingTwin } from "./landing-twin"
 const ORIGIN = "https://trajectonomics.com"
 
 describe("the Landing Page's Markdown twin", () => {
+	test("states the release line under the purpose when the build has one", () => {
+		expect(buildLandingTwin(ORIGIN, "Docs for traj 0.4.0")).toContain(
+			"> Documentation for running the Trajectonomics CLI and helping make its tax rules right.\n\nDocs for traj 0.4.0\n\n## For Operators",
+		)
+	})
+
 	test("states the Portal's name and purpose, then one entry per Tab's Markdown", () => {
 		expect(buildLandingTwin(ORIGIN)).toBe(
 			[
