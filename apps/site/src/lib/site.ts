@@ -70,10 +70,13 @@ export const DOCS_CLI_PATH = "/docs/cli/"
  */
 export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 
-/** The skills repository: the star menu, the footer's own link and the footer's licence name it. */
+/** The skills repository: the footer's own link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
-/** The monorepo the CLI is built and released from. Issues and releases live at its root. */
+/**
+ * The monorepo the CLI is built and released from. Issues and releases live at its root, and it is the
+ * one repository the Star menu counts, because its star is the one the button adds.
+ */
 export const GITHUB_REPO_URL = "https://github.com/trajectonomics/trajectonomics"
 
 /** The traj CLI's source folder in the monorepo. */
@@ -116,6 +119,9 @@ export interface StarRepo {
  * repository is one entry here and a snapshot refresh.
  */
 export const STAR_REPOS: readonly StarRepo[] = Object.freeze([
-	Object.freeze({ repo: "cli", name: "cli", url: GITHUB_CLI_URL }),
-	Object.freeze({ repo: "skills", name: "skills", url: GITHUB_SKILLS_URL }),
+	Object.freeze({
+		repo: "trajectonomics",
+		name: "trajectonomics/trajectonomics",
+		url: GITHUB_REPO_URL,
+	}),
 ])

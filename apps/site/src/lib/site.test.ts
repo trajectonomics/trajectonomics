@@ -6,8 +6,8 @@ import {
 	FI_DEMO_COMMAND,
 	FI_DEMO_DATE,
 	FI_DEMO_OUTPUT,
-	GITHUB_CLI_URL,
 	GITHUB_ORG_URL,
+	GITHUB_REPO_URL,
 	GITHUB_SKILLS_URL,
 	INSTALL_PROMPT,
 	ONBOARDING_SKILL_URL,
@@ -54,9 +54,9 @@ describe("the Site's own constants", () => {
 	})
 
 	it("names the repositories the Star menu may list, and their GitHub names", () => {
-		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["cli", "skills"])
-		expect(STAR_REPOS.map((repo) => repo.repo)).toEqual(["cli", "skills"])
-		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_CLI_URL, GITHUB_SKILLS_URL])
+		expect(STAR_REPOS.map((repo) => repo.name)).toEqual(["trajectonomics/trajectonomics"])
+		expect(STAR_REPOS.map((repo) => repo.repo)).toEqual(["trajectonomics"])
+		expect(STAR_REPOS.map((repo) => repo.url)).toEqual([GITHUB_REPO_URL])
 	})
 
 	it("names the CLI's docs page, and leaves the release facts to the Release snapshot", () => {
