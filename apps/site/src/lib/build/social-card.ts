@@ -1,5 +1,10 @@
 import type { Language } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor } from "../language/languages"
+import {
+	ABSOLUTE_CLEAN_URL,
+	dictionaryFor,
+	languageEntry,
+	otherLanguages,
+} from "../language/languages"
 import { SITE_NAME } from "../site"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../social/layout"
 import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../social/share-advert"
@@ -25,10 +30,17 @@ interface CardProperty {
 function cardOf(language: Language): readonly CardProperty[] {
 	const dictionary = dictionaryFor(language)
 	const image = absoluteShareImageUrl(language)
+	const entry = languageEntry(language)
 	return [
 		{ attribute: "property", key: "og:title", expected: dictionary.documentTitle },
 		{ attribute: "property", key: "og:description", expected: dictionary.description },
-		{ attribute: "property", key: "og:url", expected: absoluteLocaleUrl(language) },
+		{ attribute: "property", key: "og:url", expected: ABSOLUTE_CLEAN_URL },
+		{ attribute: "property", key: "og:locale", expected: entry.locale },
+		...otherLanguages(language).map((other) => ({
+			attribute: "property" as const,
+			key: "og:locale:alternate",
+			expected: other.locale,
+		})),
 		{ attribute: "property", key: "og:type", expected: "website" },
 		{ attribute: "property", key: "og:site_name", expected: SITE_NAME },
 		{ attribute: "property", key: "og:image", expected: image },

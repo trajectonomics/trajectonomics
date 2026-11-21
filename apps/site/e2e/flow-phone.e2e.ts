@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { dictionaryFor } from "../src/lib/language/languages"
-import { expectPulseInLogicLayer, homeOf, openPage } from "./pages"
+import { expectPulseInLogicLayer } from "./controls"
+import { homeOf, openPage } from "./pages"
 
 /** The English home, whose flow a phone reads as the diagram alone, with no step list. */
 const HOME = homeOf("en")

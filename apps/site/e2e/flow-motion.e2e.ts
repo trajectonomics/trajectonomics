@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test"
 import { dictionaryFor } from "../src/lib/language/languages"
-import { expectPulseInLogicLayer, homeOf, openPage } from "./pages"
+import { expectPulseInLogicLayer } from "./controls"
+import { homeOf, openPage } from "./pages"
 
 /** The English home, whose layer flow runs its four steps once (ADR 0019). */
 const HOME = homeOf("en")

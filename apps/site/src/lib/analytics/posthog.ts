@@ -2,8 +2,9 @@
  * The event payloads the Site posts to PostHog, and the conditions under which it posts none.
  *
  * The Site loads no third-party script ([ADR 0005](../../../docs/adr/0005-page-weight-and-web-font-budget.md))
- * and stores nothing for the visitor ([ADR 0003](../../../docs/adr/0003-thai-and-english-from-visitor-signals.md)),
- * so it posts to PostHog's capture endpoint itself ([ADR 0011](../../../docs/adr/0011-analytics-from-the-page-itself.md))
+ * and stores nothing but the Language choice the visitor picked
+ * ([ADR 0020](../../../docs/adr/0020-the-site-has-one-address.md)), so it posts to PostHog's capture
+ * endpoint itself ([ADR 0011](../../../docs/adr/0011-analytics-from-the-page-itself.md))
  * and every event it posts is anonymous, with an id made for that event alone.
  * A project key can only write events, so it is public by design and is committed here.
  */
@@ -36,7 +37,7 @@ export interface VisitorConditions {
 export interface PageviewSource {
 	readonly href: string
 	readonly referrer: string
-	/** The Language of the Locale URL the page is under. */
+	/** The Language the document declares, which is the Language the Worker answered in. */
 	readonly language: string
 	readonly title: string
 }

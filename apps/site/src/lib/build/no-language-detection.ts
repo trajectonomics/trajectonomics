@@ -16,7 +16,7 @@ function inlineScripts(html: string): readonly string[] {
 	})
 }
 
-/** A Locale URL is its Language already, so nothing on it reads a Visitor signal ([ADR 0003]). */
+/** The server resolves the Language, so no page script reads a Visitor signal or the choice (ADR 0020). */
 export function checkNoLanguageDetection(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return builtHomes(files)
 		.filter(({ file }) => inlineScripts(file.content).some((body) => DETECTION.test(body)))
@@ -24,7 +24,7 @@ export function checkNoLanguageDetection(files: readonly BuiltFile[]): readonly 
 			buildFailure(
 				"SCRIPT_DETECTS_LANGUAGE",
 				file.path,
-				"runs a script that reads the browser's Language, a cookie or storage; a Locale URL is the Language already.",
+				"runs a script that reads the browser's Language, a cookie or storage; the Worker resolves the Language, so a page script must not.",
 			),
 		)
 }

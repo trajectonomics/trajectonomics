@@ -2,8 +2,7 @@ import { defineConfig, devices } from "@playwright/test"
 
 // Two Runs in one repository are separate checkouts, never separate machines, so a Run whose sibling
 // holds the default port picks another one ([factory ADR 0006](https://github.com/trajectonomics/factory/blob/main/docs/adr/0006-runs-are-not-exclusive-per-repository.md)).
-const PORT = Number(process.env["SITE_BROWSER_PORT"] ?? 8791)
-const BASE_URL = `http://127.0.0.1:${PORT}`
+import { BASE_URL, SITE_BROWSER_PORT as PORT } from "./e2e/base-url"
 
 /**
  * Browser checks of the built Site, served by the Worker (`wrangler dev`), so the trailing-slash
@@ -33,7 +32,7 @@ export default defineConfig({
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 	webServer: {
 		command: `./node_modules/.bin/wrangler dev --ip 127.0.0.1 --port ${PORT} --inspector-port ${PORT + 1} --show-interactive-dev-session=false`,
-		url: `${BASE_URL}/th/`,
+		url: `${BASE_URL}/`,
 		reuseExistingServer: false,
 		timeout: 120_000,
 		env: { BROWSER: "none", WRANGLER_SEND_METRICS: "false" },

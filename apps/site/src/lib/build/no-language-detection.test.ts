@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { codes, edited, entryAt } from "./testing/homes"
 
-describe("the Language a Locale URL chooses", () => {
+describe("the Language a page script must not choose", () => {
 	it("passes a home that reads no browser signal at all", () => {
 		expect(codes(checkNoLanguageDetection)).toEqual([])
 	})
@@ -20,7 +20,7 @@ describe("the Language a Locale URL chooses", () => {
 		expect(codes(checkNoLanguageDetection, page)).toEqual([])
 	})
 
-	it("fails a home whose script reads a stored preference", () => {
+	it("fails a home whose script reads the Language choice from storage", () => {
 		const script = "<script>const saved = localStorage.getItem('language')</script>"
 		const page = edited(entryAt(0).language, /<\/body>/, `${script}</body>`)
 		expect(codes(checkNoLanguageDetection, page)).toEqual(["SCRIPT_DETECTS_LANGUAGE"])

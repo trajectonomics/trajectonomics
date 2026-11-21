@@ -1,9 +1,10 @@
 import { describe, expect, it } from "bun:test"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { FALLBACK_LANGUAGE } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor, languageBuildUrl } from "../language/languages"
 import { FI_DEMO_COMMAND, INSTALL_PROMPT } from "../site"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "./llms-full"
+import { linkCount } from "./llms-markdown"
 
 /** The English Dictionary the file is written from. */
 const dictionary = dictionaryFor(FALLBACK_LANGUAGE)
@@ -78,13 +79,14 @@ describe("the full Answer engine file", () => {
 		expect(LLMS_FULL_TXT).not.toContain("Run 1")
 	})
 
-	it("prints the Prompt route sentence, and links the home in every other Language", () => {
+	it("prints the Prompt route sentence, and carries no Languages section", () => {
 		expect(LLMS_FULL_TXT).toContain(INSTALL_PROMPT)
-		for (const entry of LANGUAGES.filter((one) => one.language !== FALLBACK_LANGUAGE)) {
-			expect(LLMS_FULL_TXT).toContain(
-				`- [${entry.dictionary.languageName}](${absoluteLocaleUrl(entry.language)})`,
-			)
-		}
+		expect(LLMS_FULL_TXT).not.toContain("## Languages")
+	})
+
+	it("links the Site's one address, once, and no Language build path", () => {
+		expect(linkCount(LLMS_FULL_TXT, ABSOLUTE_CLEAN_URL)).toBe(1)
+		expect(LLMS_FULL_TXT).not.toContain(`](${languageBuildUrl("th")})`)
 	})
 
 	it("carries no text the owner has not written, and no placeholder for it", () => {

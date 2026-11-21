@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, relTokens, textOf } from "../lib/build/html"
-import { LANGUAGES, languageEntry, localeUrl } from "../lib/language/languages"
+import { CLEAN_URL, LANGUAGES, languageEntry } from "../lib/language/languages"
 import NotFound from "./NotFound.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -33,7 +33,7 @@ describe("the NotFound component in every Language", () => {
 			const body = page.text.map((run) => run.text).join(" ")
 			expect(body).toContain(dictionary.notFoundBody)
 			const home = elementsByTag(page, "a").find(
-				(element) => element.attributes["href"] === localeUrl(language),
+				(element) => element.attributes["href"] === CLEAN_URL,
 			)
 			expect(home).toBeDefined()
 		})

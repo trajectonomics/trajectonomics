@@ -1,31 +1,37 @@
 import { currentLanguageName } from "../language/dictionary"
 import type { Language } from "../language/language"
-import { dictionaryFor, localeUrl, otherLanguages } from "../language/languages"
+import { dictionaryFor, languageChoiceLink, otherLanguages } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, scanHtml, textOf } from "./html"
 import { builtHomes } from "./language-home"
 
-/** The switcher on one home: one ordinary link per other Language, named in that Language. */
+/** The switcher on one home: one Language choice link per other Language, named in that Language. */
 function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFailure[] {
 	const page = scanHtml(file.content)
 	const anchors = elementsByTag(page, "a")
 	const failures = otherLanguages(language).flatMap((other) => {
-		const href = localeUrl(other.language)
+		const href = languageChoiceLink(other.language)
 		const code = other.language
 		const link = anchors.find(
-			(anchor) =>
-				anchor.attributes["href"] === href &&
-				anchor.attributes["lang"] === code &&
-				anchor.attributes["hreflang"] === code,
+			(anchor) => anchor.attributes["href"] === href && anchor.attributes["lang"] === code,
 		)
 		if (link === undefined) {
 			return [
 				buildFailure(
 					"SWITCHER_MISSING",
 					file.path,
-					`has no <a href="${href}" lang="${code}" hreflang="${code}">, so the other Language is not one click and not script-free.`,
+					`has no <a href="${href}" lang="${code}">, so the other Language is not one click and not script-free.`,
+				),
+			]
+		}
+		if (link.attributes["hreflang"] !== undefined) {
+			return [
+				buildFailure(
+					"SWITCHER_CLAIMS_HREFLANG",
+					file.path,
+					`marks ${href} as a Language alternate, but a Language choice link is not one.`,
 				),
 			]
 		}
@@ -43,7 +49,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 	const entry = dictionaryFor(language)
 	const current = anchors.find(
 		(anchor) =>
-			anchor.attributes["href"] === localeUrl(language) &&
+			anchor.attributes["href"] === languageChoiceLink(language) &&
 			anchor.attributes["aria-current"] === "page",
 	)
 	if (current === undefined) {
@@ -52,7 +58,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 			buildFailure(
 				"SWITCHER_CURRENT_MISSING",
 				file.path,
-				`no link marks ${localeUrl(language)} as the current Language.`,
+				`no link marks ${languageChoiceLink(language)} as the current Language.`,
 			),
 		]
 	}
@@ -69,7 +75,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 	]
 }
 
-/** A home switches to every other Language with a plain link, with JavaScript off ([ADR 0003]). */
+/** A home switches to every other Language with a plain Language choice link, with JavaScript off (ADR 0020). */
 export function checkSwitcher(files: readonly BuiltFile[]): readonly BuildFailure[] {
 	return builtHomes(files).flatMap(({ entry, file }) => checkSwitcherFor(file, entry.language))
 }

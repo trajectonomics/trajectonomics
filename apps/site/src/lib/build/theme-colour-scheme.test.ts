@@ -17,7 +17,7 @@ const DARK = '[data-theme="dark"]{color-scheme:dark}'
 /** One built Site of a page and the stylesheet it loads. */
 function build(css = `${LIGHT}${DARK}`): readonly BuiltFile[] {
 	return [
-		{ path: "en/index.html", content: PAGE },
+		{ path: "index.html", content: PAGE },
 		{ path: "_astro/site.css", content: css },
 	]
 }
@@ -52,7 +52,7 @@ describe("the `color-scheme` each Theme declares", () => {
 
 	it("passes when a sheet the page imports states it, not only the sheet it links", () => {
 		const files = [
-			{ path: "en/index.html", content: PAGE },
+			{ path: "index.html", content: PAGE },
 			{ path: "_astro/site.css", content: '@import "./scheme.css";body{color:red}' },
 			{ path: "_astro/scheme.css", content: `${LIGHT}${DARK}` },
 		]
@@ -61,7 +61,7 @@ describe("the `color-scheme` each Theme declares", () => {
 
 	it("names the Theme whose `color-scheme` is owed, and the page that paints without it", () => {
 		const [failure] = checkThemeColourScheme(build(LIGHT), PRODUCTION)
-		expect(failure?.path).toBe("/en/")
+		expect(failure?.path).toBe("/")
 		expect(failure?.message).toContain("color-scheme: dark")
 	})
 })

@@ -1,5 +1,5 @@
 import type { Language } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { SITE_NAME } from "../site"
 import { type SoftwareApplicationNode, softwareApplication } from "./structured-data-application"
 import {
@@ -11,7 +11,7 @@ import {
 /** The vocabulary every block states its keys come from. */
 const CONTEXT = "https://schema.org"
 
-/** The WebSite node: the page as a site, at its Locale URL, in its Language. */
+/** The WebSite node: the page as a site, at the Site's one address, in its Language. */
 export interface WebSiteNode {
 	readonly "@type": "WebSite"
 	readonly "@id": string
@@ -43,7 +43,7 @@ function website(language: Language, url: string): WebSiteNode {
 
 /** The one WebSite a Language home is, the Organization that publishes it, and traj itself. */
 export function structuredData(language: Language): StructuredData {
-	const url = absoluteLocaleUrl(language)
+	const url = ABSOLUTE_CLEAN_URL
 	return Object.freeze({
 		"@context": CONTEXT,
 		"@graph": Object.freeze([

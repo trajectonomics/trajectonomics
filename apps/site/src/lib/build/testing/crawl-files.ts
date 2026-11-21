@@ -1,28 +1,18 @@
-import type { Language } from "../../language/language"
-import { FALLBACK_LANGUAGE } from "../../language/language"
-import { absoluteLocaleUrl, LANGUAGES } from "../../language/languages"
+import { ABSOLUTE_CLEAN_URL } from "../../language/languages"
 import { SITE_ORIGIN } from "../../site"
 import type { BuiltFile } from "../built-files"
 import type { BuildFailure } from "../failures"
 
-/** The `xhtml:link` an entry carries for one `hreflang`, self-closed as the Sitemap writes it. */
-function alternate(hreflang: string, href: string): string {
-	return `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}" />`
-}
+/** The `<url>` a healthy Sitemap carries, naming `x-default` at the Site's one address. */
+export const sitemapEntry = `  <url>
+    <loc>${ABSOLUTE_CLEAN_URL}</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${ABSOLUTE_CLEAN_URL}" />
+  </url>`
 
-/** The `<url>` a healthy Sitemap carries for one Language's home, naming every alternate. */
-export function sitemapEntry(language: Language): string {
-	const alternates = [
-		...LANGUAGES.map((entry) => alternate(entry.language, absoluteLocaleUrl(entry.language))),
-		alternate("x-default", absoluteLocaleUrl(FALLBACK_LANGUAGE)),
-	].join("\n")
-	return `  <url>\n    <loc>${absoluteLocaleUrl(language)}</loc>\n${alternates}\n  </url>`
-}
-
-/** The Sitemap a healthy build writes: one `<url>` per Language home, in `LANGUAGES` order. */
+/** The Sitemap a healthy build writes: one `<url>` at the Site's one address. */
 export const HEALTHY_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${LANGUAGES.map((entry) => sitemapEntry(entry.language)).join("\n")}
+${sitemapEntry}
 </urlset>
 `
 

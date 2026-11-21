@@ -1,5 +1,5 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
-import { absoluteLocaleUrl, dictionaryFor, LANGUAGES, languageEntry } from "../language/languages"
+import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import {
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
@@ -25,11 +25,8 @@ function at(path: string): string {
 	return `${SITE_ORIGIN}${path}`
 }
 
-/** Every Language's home, the fallback first, each under the name that Language calls itself. */
-const SITE_LINES = [
-	languageEntry(FALLBACK_LANGUAGE),
-	...LANGUAGES.filter((entry) => entry.language !== FALLBACK_LANGUAGE),
-].map((entry) => linkLine(entry.dictionary.languageName, absoluteLocaleUrl(entry.language)))
+/** The Site has one address, so it is listed once rather than once per Language. */
+const SITE_LINES = [linkLine(SITE_NAME, ABSOLUTE_CLEAN_URL)]
 
 /** The Docs Portal's pages, under the footer's own words for them. */
 const DOCS_LINES = [

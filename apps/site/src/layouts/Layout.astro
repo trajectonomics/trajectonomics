@@ -11,8 +11,13 @@ import { fallbackTheme, shippedThemes } from "../lib/design/shipped-themes"
 import { themePaints } from "../lib/design/theme-paint"
 import { themeScript } from "../lib/design/theme-script"
 import { parseDesignTokens } from "../lib/design/tokens"
-import { FALLBACK_LANGUAGE, type Language } from "../lib/language/language"
-import { absoluteLocaleUrl, dictionaryFor, LANGUAGES } from "../lib/language/languages"
+import type { Language } from "../lib/language/language"
+import {
+	ABSOLUTE_CLEAN_URL,
+	dictionaryFor,
+	languageEntry,
+	otherLanguages,
+} from "../lib/language/languages"
 import {
 	APPLE_TOUCH_ICON_PATH,
 	BING_SITE_VERIFICATION_TOKEN,
@@ -65,22 +70,21 @@ const verification = verificationMetas({
 			indexed ? (
 				<>
 					{description === undefined ? null : <meta name="description" content={description} />}
-					<link rel="canonical" href={absoluteLocaleUrl(language)} />
-					{LANGUAGES.map((entry) => (
-						<link
-							rel="alternate"
-							hreflang={entry.language}
-							href={absoluteLocaleUrl(entry.language)}
-						/>
-					))}
-					<link rel="alternate" hreflang="x-default" href={absoluteLocaleUrl(FALLBACK_LANGUAGE)} />
+					<link rel="canonical" href={ABSOLUTE_CLEAN_URL} />
+					{/* One address means one alternate: there is no second URL for a Language to name. */}
+					<link rel="alternate" hreflang="x-default" href={ABSOLUTE_CLEAN_URL} />
 					<meta property="og:title" content={title} />
 					{description === undefined ? null : (
 						<meta property="og:description" content={description} />
 					)}
-					<meta property="og:url" content={absoluteLocaleUrl(language)} />
+					<meta property="og:url" content={ABSOLUTE_CLEAN_URL} />
 					<meta property="og:type" content="website" />
 					<meta property="og:site_name" content={SITE_NAME} />
+					{/* The address no longer says which Language a share is in, so the card does. */}
+					<meta property="og:locale" content={languageEntry(language).locale} />
+					{otherLanguages(language).map((entry) => (
+						<meta property="og:locale:alternate" content={entry.locale} />
+					))}
 					{/* The 1200 × 630 image the prebuild step writes, which every share sheet cuts a large card from. */}
 					<meta property="og:image" content={absoluteShareImageUrl(language)} />
 					<meta property="og:image:width" content={String(SHARE_IMAGE_WIDTH)} />
