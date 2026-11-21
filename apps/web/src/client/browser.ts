@@ -71,3 +71,11 @@ function matchMediaOrNull(): MediaQueryList | null {
 		return null
 	}
 }
+
+/** Replaces one query parameter in the address bar without a navigation, and tells the subscribers. */
+export function replaceQueryParam(name: string, value: string): void {
+	const url = new URL(window.location.href)
+	url.searchParams.set(name, value)
+	window.history.replaceState(window.history.state, "", url)
+	window.dispatchEvent(new PopStateEvent("popstate"))
+}
