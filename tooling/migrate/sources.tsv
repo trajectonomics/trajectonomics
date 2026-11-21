@@ -1,0 +1,12 @@
+blog	apps/blog	blog	75bb355d4db34af98224a846850b05b4e43efef3	1	0
+cli	apps/cli	cli	a38a03096a6f409ffa647da4c694c500873ca6cc	71	3
+design-system	packages/brand	brand	35036c46b0b96bde93bfc7ade1b6b695ddb264a7	50	0
+docs	apps/docs	docs	fb7a16ca4b4f90ff47d4a8f87fa27b8a71985e3f	75	0
+goals	org/goals	goals	f3c00ea41c98a9ae4efbfc7f39a8966db998ac78	5	0
+internal-skills	skills/internal	internal-skills	77f640d63234f7f7bb40f7bcbc7a2bfea3a6443f	23	0
+ledger-core	packages/ledger	ledger	03e93e3a0da3bc40c45832c01fa871fc250ec427	40	1
+money	packages/money	money	8a95316c557f33917a5895188eb71609dec91923	17	1
+sim-core	packages/sim	sim	fc6a682ddfc03f939f6b8666df686b095668ddd8	55	1
+site	apps/site	site	e9a405ea8033b68a0a26abee47e84465df6ff7f2	55	0
+skills	skills/customer	skills	d19b7fff2c2befd601c70a258139060465f5325b	23	1
+tax-core	packages/tax	tax	37568168485aa3ff51def3d7fe60ba3c84c08c4d	42	2
