@@ -3,7 +3,7 @@
 Move the `trajectonomics` org's repos into this repo (`trajectonomics/trajectonomics`) as one
 Bun workspace, keeping each repo's git history, its npm package names, and its Cloudflare worker names.
 
-Status: **decisions made (§1); phase 1 in progress.** Inventory taken 2026-11-21: 22 repos, 0 open PRs.
+Status: **phase 1 (import) done on branch `monorepo/phase-1-import`; phase 2 next.** Inventory taken 2026-11-21: 22 repos, 0 open PRs.
 
 ## 0. Why this is cheaper than it looks
 
@@ -298,8 +298,8 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 
 | # | Phase | Agent | Check before moving on |
 |---|---|---|---|
-| 1 | **Import with history**: script `tooling/migrate/import.sh` runs `git filter-repo --to-subdirectory-filter <dest> --tag-rename ':<prefix>-'` on a fresh clone of each repo, then `git merge --allow-unrelated-histories`. No content edits. | DeepSeek V4.1 Flash | `git log --follow` works for a file in each package; tag count matches the source repos |
-| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, and add design-system to the import (`packages/brand`) | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
+| 1 | **Import with history** (done 2026-11-21): `tooling/migrate/import.sh` imported 12 repos (design-system as `packages/brand`), 476 commits and 9 tags, in 33 s. No content edits. | Claude, as a script: the job is mechanical | Done: each folder's contents match the source repo's latest commit and every commit count is exact; re-running changes nothing; no secrets in history |
+| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
 | 2b | **Brand package**: restructure `packages/brand` per §2b, delete the Svelte package and Storybook, switch site and docs to `@trajectonomics/brand` with `BRAND` selection | DeepSeek V4 Pro, reviewed by Opus | site and docs build pixel-identical with `BRAND=trajectonomics`; a throwaway `brands/example` passes the tests without touching any other file |
 | 2c | **Core package**: `git mv` money/ledger/tax/sim into `packages/core/`, subpath exports, import-direction lint, update cli and docs imports | DeepSeek V4 Pro | `bun run check` passes; `npm pack --dry-run` of core shows every subpath; a test import that goes upward fails lint |
 | 3 | **Agent docs and skills**: merge `AGENTS.md`/`CLAUDE.md`/`CODING_STANDARDS.md`/`GLOSSARY.md` into the root, one skills lock | DeepSeek V4.1 Flash | No duplicate root skill dirs; `bun run skills:check` passes |
@@ -308,6 +308,21 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 | 5 | **Release**: generalized `release.yml`, CLI binaries, installer tag lookup | DeepSeek V4 Pro, reviewed by Opus | Dry-run publish (`npm publish --dry-run`) of every package in dependency order |
 | 6 | **Cutover**: you publish `@trajectonomics/core` once by hand (a new name), set its trusted publisher, move `cli`'s trusted publisher here, deprecate the old npm packages, and update the Cloudflare projects. The agent then opens archive-notice PRs in the old repos | You + DeepSeek Flash | A stable release of `money` from here; site and docs deploy from here |
 | 7 | **Archive** the old repos | You | — |
+
+### Rules for delegated phases
+
+A DeepSeek agent ran the first try at phase 1. It ran `git filter-repo` in the parent checkout, not in
+its own worktree, and rewrote local branches it did not own (including another thread's base). It
+repaired most of the damage itself, then got cancelled, and the import was redone as a script. Every
+delegated phase brief from now on states:
+
+- Work only inside the worktree path the brief gives. Never `cd` to `/home/prame/trajectonomics` or
+  any other checkout. Never touch branches other than the phase branch.
+- No history-rewriting commands (`filter-repo`, `filter-branch`, `rebase` of shared branches,
+  `reset --hard` to other refs, `update-ref` outside the phase branch, force push).
+- One phase per run. Push the phase branch and open a draft PR. Do not merge.
+- Mechanical, checkable work (imports, tag pushes, mass renames that a script can do) gets a script,
+  not an agent.
 
 During phases 1–5 the old repos stay live. Freeze merges into them from the start of phase 1 until
 cutover, or re-run the phase 1 import script (it is idempotent and works from fresh clones) just before phase 6.
