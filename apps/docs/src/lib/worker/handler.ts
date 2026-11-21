@@ -1,5 +1,6 @@
 import { acceptsMarkdown } from "./accepts-markdown"
 import { pageTwinPath } from "./page-twin-path"
+import { retiredPathTarget } from "./retired-paths"
 
 /** The Worker's assets binding: the built site, by request path. */
 export interface AssetsBinding {
@@ -43,10 +44,18 @@ function markdownResponse(request: Request, twin: Response): Response {
 	})
 }
 
-/** Answer one request: a page's Markdown twin when its client asks for it, the assets otherwise. */
+/** A permanent redirect to `location`, for a retired path a reader or a search result still reaches. */
+function permanentRedirect(location: string): Response {
+	return new Response(null, { status: 301, headers: { location } })
+}
+
+/** Answer one request: a retired path's redirect, a page's Markdown twin when its client asks for it, the assets otherwise. */
 export async function handleRequest(request: Request, assets: AssetsBinding): Promise<Response> {
 	const read = request.method === "GET" || request.method === "HEAD"
-	const twinPath = read ? pageTwinPath(new URL(request.url).pathname) : null
+	const pathname = new URL(request.url).pathname
+	const retired = read ? retiredPathTarget(pathname) : null
+	if (retired !== null) return permanentRedirect(retired)
+	const twinPath = read ? pageTwinPath(pathname) : null
 	if (twinPath === null) return assets.fetch(request)
 	const twin = await assets.fetch(twinRequest(request, twinPath))
 	if (twin.status !== 200) return assets.fetch(request)

@@ -127,3 +127,48 @@ describe("the Worker answers a page with its Markdown twin when asked", () => {
 		expect(response.headers.get("vary")).toBeNull()
 	})
 })
+
+describe("the Worker redirects the retired /docs/developers section with a 301", () => {
+	test("tax-core pages answer 301 to the tax guide, with or without a trailing slash", async () => {
+		for (const path of ["/docs/developers/tax-core", "/docs/developers/tax-core/"]) {
+			const response = await handleRequest(request(path), pages)
+
+			expect(response.status).toBe(301)
+			expect(response.headers.get("location")).toBe("/docs/contribute/tax/")
+		}
+	})
+
+	test("the rest of the section answers 301 to the Contribute Tab", async () => {
+		for (const path of ["/docs/developers", "/docs/developers/", "/docs/developers/sim-core/"]) {
+			const response = await handleRequest(request(path), pages)
+
+			expect(response.status).toBe(301)
+			expect(response.headers.get("location")).toBe("/docs/contribute/")
+		}
+	})
+
+	test("the Markdown twin request is redirected too, not answered with a twin", async () => {
+		const response = await handleRequest(
+			request("/docs/developers/tax-core/", "text/markdown"),
+			pages,
+		)
+
+		expect(response.status).toBe(301)
+		expect(response.headers.get("location")).toBe("/docs/contribute/tax/")
+		expect(response.headers.get("content-type")).toBeNull()
+	})
+
+	test("a HEAD request is redirected with no body", async () => {
+		const response = await handleRequest(request("/docs/developers/", undefined, "HEAD"), pages)
+
+		expect(response.status).toBe(301)
+		expect(response.headers.get("location")).toBe("/docs/contribute/")
+	})
+
+	test("a path that only starts with the section's name is forwarded to the assets", async () => {
+		const response = await handleRequest(request("/docs/developers-notes/"), pages)
+
+		expect(response.status).toBe(404)
+		expect(response.headers.get("location")).toBeNull()
+	})
+})

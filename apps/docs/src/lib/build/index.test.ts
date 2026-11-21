@@ -153,9 +153,7 @@ describe("the check of the built Docs Portal", () => {
 			"docs/cli/installation/index.html",
 			'<html data-theme="dark"><main><p>Add ~/.local/bin to your PATH.</p></main></html>',
 		)
-		const codes = checkBuild([...COMPLETE_BUILD, withoutLine]).map(
-			(failure) => failure.code,
-		)
+		const codes = checkBuild([...COMPLETE_BUILD, withoutLine]).map((failure) => failure.code)
 
 		expect(codes).toContain("INSTALLATION_PAGE_PATH_LINE_MISSING")
 	})

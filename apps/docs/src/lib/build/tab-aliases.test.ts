@@ -34,9 +34,9 @@ describe("the audience names a reader may type", () => {
 
 	test("one that sends readers to another page is reported as TAB_ALIAS_TARGET", () => {
 		const [operators, , builders] = aliases()
-		expect(
-			codesOf([stub(aliasFile("/contributors"), "/docs/"), operators!, builders!]),
-		).toEqual(["TAB_ALIAS_TARGET"])
+		expect(codesOf([stub(aliasFile("/contributors"), "/docs/"), operators!, builders!])).toEqual([
+			"TAB_ALIAS_TARGET",
+		])
 	})
 
 	test("one that is a real page rather than a redirect is reported", () => {

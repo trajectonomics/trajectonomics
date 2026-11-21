@@ -1,8 +1,4 @@
-import {
-	type ContentFile,
-	navigationEntries,
-	resolvesNavigationEntry,
-} from "./content-pages"
+import { type ContentFile, navigationEntries, resolvesNavigationEntry } from "./content-pages"
 import type { ContentStructureProblem, ContentStructureRule } from "./content-structure"
 import { TABS } from "./tabs"
 

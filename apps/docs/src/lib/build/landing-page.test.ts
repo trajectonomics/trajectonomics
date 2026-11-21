@@ -4,7 +4,8 @@ import { checkLandingPage, LANDING_PAGE_FILE } from "./landing-page"
 import { SEARCH_INDEX_FILE } from "./search-index"
 
 const OPERATOR_LINK = '<a href="/docs/cli/">For Operators: install and run the CLI</a>'
-const CONTRIBUTE_LINK = '<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>'
+const CONTRIBUTE_LINK =
+	'<a href="/docs/contribute/">For Contributors: help make the tax rules right</a>'
 
 function landingPage(body: string, head = ""): BuiltFile {
 	return {
@@ -56,9 +57,9 @@ describe("the built Landing Page", () => {
 	test("a page with a third link into a Tab is reported as LANDING_PAGE_LINKS", () => {
 		const extra = '<a href="/docs/cli/installation/">Installation</a>'
 
-		expect(codesOf([landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}${extra}`))])).toEqual([
-			"LANDING_PAGE_LINKS",
-		])
+		expect(
+			codesOf([landingPage(landingBody(`${OPERATOR_LINK}${CONTRIBUTE_LINK}${extra}`))]),
+		).toEqual(["LANDING_PAGE_LINKS"])
 	})
 
 	test("the same Tab linked twice is reported as LANDING_PAGE_LINKS", () => {
