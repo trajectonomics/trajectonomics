@@ -10,13 +10,13 @@ Status: **decisions made (§1); phase 1 in progress.** Inventory taken 2026-11-2
 Every repo already uses the same stack: `bun@1.4.4`, Biome 2.6.3, TypeScript 7, tsdown, the
 shared `@trajectonomics/tooling` package, and thin CI callers into `trajectonomics/cicd`.
 `design-system` already runs a mini monorepo (Bun workspaces, one release workflow per package,
-tag prefixes such as `core-v`). The migration takes that pattern and applies it to the whole org.
+tag prefixes such as `core-v`). The migration applies that pattern to the whole org.
 
 What goes away after the move:
 
 | Today | After |
 |---|---|
-| `@trajectonomics/tooling` pinned at 1.1.0 in some repos and 1.3.0 in others, plus a weekly `drift.yml` in each repo | one `workspace:*` dependency, no drift job |
+| `@trajectonomics/tooling` pinned at 1.1.0 in some repos and 1.3.0 in others, plus a weekly `drift.yml` in each repo | Biome and TS config live at this repo's root; the `tooling` package and the drift jobs go away |
 | Internal deps pinned to published alphas (`sim 0.2.0-alpha.17`, `tax 0.2.0-alpha.6`, ...) | `workspace:*`, so a change and the code that uses it land in one PR |
 | `docs` waits for a `repository_dispatch` from cicd after an upstream release | docs builds against the source in the same commit |
 | Reusable workflows called at `trajectonomics/cicd/...@v1` | local workflows in `.github/workflows/` |
@@ -29,6 +29,11 @@ What goes away after the move:
 2. **`agentic-inbox` (a fork of `cloudflare/agentic-inbox`) and `mcp-auth-gateway` (Docker image) stay separate.**
 3. **History is kept**, as described below.
 4. **Old repos get archived** after cutover, each with a README that points here. Nothing gets deleted.
+5. **Also not moved:** `copy-engine` (already moved out), `cicd` (config lives in this repo instead;
+   only the release scripts it holds, `version.ts` and `release-plan.ts`, get copied in during phase 5),
+   `factory` (becomes a skill, a separate task after the migration), and `technical-template`.
+6. **`design-system`: open question**, see §2a. It is left out of phase 1. Because the import script is
+   idempotent, it can be added later.
 
 ### How history is kept
 
@@ -56,33 +61,48 @@ apps/
   docs/              <- docs          (worker "docs")
   blog/              <- blog          (worker, not deployed yet)
   cli/               <- cli           (npm @trajectonomics/cli + 5 binaries)
-  factory/           <- factory
-  storybook/         <- design-system/apps/storybook
 packages/
   money/             <- money         (@trajectonomics/money)
   ledger/            <- ledger-core   (@trajectonomics/ledger)
   tax/               <- tax-core      (@trajectonomics/tax)
   sim/               <- sim-core      (@trajectonomics/sim)
-  copy-engine/       <- copy-engine
-  design-system/     <- design-system (imported whole in phase 1; its
-                        packages/* stay nested, storybook moves to apps/ in phase 2)
-  tooling/           <- cicd          (@trajectonomics/tooling; scripts/ and the
-                        reusable workflows move out in phases 2 and 5)
+  brand/             <- design-system, slimmed (only if §2a says so)
 skills/
   customer/          <- skills           (the published agent skills)
   internal/          <- internal-skills
 org/
-  goals/             <- goals            (GOALS.md stays the source of truth Factory reads)
+  goals/             <- goals
 tooling/
   migrate/           import script + tags manifest
-  templates/package/ <- technical-template
-.github/workflows/   <- merged CI, release, deploy
+  release/           version.ts, release-plan.ts copied from cicd (phase 5)
+biome.json, tsconfig.base.json   root config, replaces @trajectonomics/tooling
+.github/workflows/   merged CI, release
 ```
 
-Not moved (§1): `agentic-inbox`, `mcp-auth-gateway`, and the private
-`infra`, `web-router`, `growth`, `external-comm`. `technical-template` is retired: a new package
-becomes a folder plus a `bun run new:package <name>` script, not a new repo. Its history gets
-imported to `tooling/templates/package/` so nothing is lost.
+Not moved (§1): `agentic-inbox`, `mcp-auth-gateway`, `copy-engine`, `cicd`, `factory`,
+`technical-template`, and the private repos `infra`, `web-router`, `growth`, `external-comm`.
+
+### 2a. Is design-system needed?
+
+What site and docs actually import (2026-11-21):
+
+| design-system package | Used by | What for |
+|---|---|---|
+| `design-system-theme` | site, docs | `themes/light.css`, `themes/dark.css`, `tailwind.css`, `typography.css` |
+| `design-system-assets` | site, docs | logo SVG, favicon set, Inter/Aleo/Azeret fonts |
+| `design-system` (core) | only indirectly | the tokens that `theme`'s build turns into those CSS files |
+| `design-system-svelte` + Storybook | **nothing** | site and docs are Astro, and neither imports a Svelte component |
+
+So the parts in use are a few CSS files and some static brand files. The rest is a four-package
+system with its own npm releases. About 200 lines of Svelte, plus Storybook, Vitest and a Prettier
+setup, have no consumer.
+
+**Recommendation:** don't import it as it stands. Replace it with one private workspace package,
+`packages/brand`, that holds the tokens, the CSS build and the assets. Don't publish it to npm.
+Drop the Svelte package and Storybook; they stay readable in the archived repo. Site and docs then
+switch to `@trajectonomics/brand` with `workspace:*`. One alternative is to import the history and
+delete the unused parts in phase 2. Another is to keep design-system as its own repo for now, with
+site and docs still using the npm packages.
 
 ## 3. Known problems to fix during the move
 
@@ -90,24 +110,25 @@ imported to `tooling/templates/package/` so nothing is lost.
   dependency on `sim` (for its tests). Turborepo rejects cyclic task graphs. Fix: move the tax tests
   that use `sim` into `packages/sim` (or into a new `packages/integration-tests`). Then `tax` stops
   depending on `sim` entirely.
-- **Wrong package names.** `blog`, `copy-engine` and `external-comm` still call themselves
-  `@trajectonomics/technical-template`. Rename them to `@trajectonomics/blog` (private) and
-  `@trajectonomics/copy-engine` before wiring the workspace, or the workspace will fail with a
-  duplicate-name error.
+- **Wrong package name.** `blog` still calls itself `@trajectonomics/technical-template`. Rename it
+  to `@trajectonomics/blog` (private).
 - **Different Node engine.** `site` requires Node `>=22.23.4`; everything else requires `>=20`. The root
   sets `>=22.23.4`.
 - **`docs` pins old versions.** It uses `sim 0.1.0` and `design-system-assets 0.1.0-alpha.2`. Moving to
   `workspace:*` may break the docs build. That is a real error the old setup was hiding, and it gets
   fixed during the move.
+- **Dependencies on `@trajectonomics/tooling`.** Every package has it as a dev dependency and extends
+  its Biome and TS presets. Phase 2 copies the presets into the root config and removes the dependency.
 
 ## 4. Tooling
 
-- **Workspaces:** Bun (`"workspaces": ["apps/*", "packages/*", "packages/design-system/packages/*", "skills/*", "org/*"]`),
+- **Workspaces:** Bun (`"workspaces": ["apps/*", "packages/*", "skills/*", "org/*"]`),
   one `bun.lock`.
 - **Task runner:** Turborepo, for `check`/`build`/`test` with caching and `--affected` on PRs. Every
   package already has `check`, `build`, `test`, `lint` and `typecheck` scripts, so `turbo.json` stays small.
-- **Biome/TS:** a root `biome.json` and `tsconfig.base.json` that extend `packages/tooling`. Delete
-  per-package copies unless they differ, and record any difference in the package's `AGENTS.md`.
+- **Biome/TS:** a root `biome.json` and `tsconfig.base.json`, copied from `@trajectonomics/tooling`'s
+  presets and then owned here. Delete per-package copies unless they differ, and record any
+  difference in the package's `AGENTS.md`.
 - **Agent skills:** one root `skills-lock.json` and one root set of `.agents/.claude/.pi/.vibe/skills`.
   Nested `AGENTS.md` files stay where a package needs them.
 
@@ -124,8 +145,7 @@ package folder):
 - push to main → for each publishable package whose folder changed, publish an alpha (dist-tag `alpha`).
 - `workflow_dispatch` with a `package` and `bump` → stable release, tag `<name>-vX.Y.Z`, GitHub
   release named after the package.
-- Publishable packages: money, ledger, tax, sim, cli, tooling, design-system{,-theme,-svelte,-assets},
-  copy-engine.
+- Publishable packages: money, ledger, tax, sim, cli. If §2a ends with `packages/brand`, it stays private.
 - Publish order follows the dependency graph (money → ledger/tax → sim → cli). `workspace:*` gets
   replaced by the real version at publish time (`bun publish` does this).
 - **Old tags:** imported tags are renamed with the package prefix (`v0.2.0` in sim-core →
@@ -147,9 +167,9 @@ each repo. Point each worker at this repo:
 
 | Worker | Root directory | Build command | Deploy command | Build watch paths |
 |---|---|---|---|---|
-| `site` | `apps/site` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/site/**`, `packages/design-system/**`, `bun.lock` |
+| `site` | `apps/site` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/site/**`, `packages/brand/**`, `bun.lock` |
 | `docs` | `apps/docs` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/docs/**`, `packages/**`, `bun.lock` |
-| `trajectonomics-web-router` | (stays in its own repo unless §1.1 changes) | | | |
+| `trajectonomics-web-router` | stays in its own repo, unchanged | | | |
 
 Worker names do not change, so the router's service bindings (`DOCS` → `docs`, `HOME` → `site`) keep
 working. Run `bun install` from the repo root: Workers Builds runs inside the root directory, and
@@ -166,7 +186,7 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 | # | Phase | Agent | Check before moving on |
 |---|---|---|---|
 | 1 | **Import with history**: script `tooling/migrate/import.sh` runs `git filter-repo --to-subdirectory-filter <dest> --tag-rename ':<prefix>-'` on a fresh clone of each repo, then `git merge --allow-unrelated-histories`. No content edits. | DeepSeek V4.1 Flash | `git log --follow` works for a file in each package; tag count matches the source repos |
-| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig, rename the wrong package names, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
+| 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, and do whatever §2a decides | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
 | 3 | **Agent docs and skills**: merge `AGENTS.md`/`CLAUDE.md`/`CODING_STANDARDS.md`/`GLOSSARY.md` into the root, one skills lock | DeepSeek V4.1 Flash | No duplicate root skill dirs; `bun run skills:check` passes |
 | 4 | **CI**: `ci.yml` + `pr-title.yml` with turbo affected; delete per-package workflows | DeepSeek V4 Pro | A PR touching only `packages/money` runs only money and its dependents |
 | 5 | **Release**: generalized `release.yml`, CLI binaries, installer tag lookup | DeepSeek V4 Pro, reviewed by Opus | Dry-run publish (`npm publish --dry-run`) of every package in dependency order |
