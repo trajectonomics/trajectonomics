@@ -1,0 +1,48 @@
+name: Skills against the CLI floors
+
+# A published Skill may name only what the CLI at its CLI Range floor publishes. The offline half runs
+# inside `bun run check` in skills/customer on a checked-in fixture. This job regenerates that fixture
+# from each release the manifest declares, fails when it has drifted, and checks the Skills against the
+# live surface so nothing passes by naming a command that only exists on `main`. This is the step that
+# skills/customer's ci.yml ran after its check; this is the port of that step.
+on:
+  pull_request:
+    paths: ["skills/customer/**", "apps/cli/**", "bun.lock"]
+  push:
+    branches: [main]
+    paths: ["skills/customer/**", "apps/cli/**", "bun.lock"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  floors:
+    name: Skills against the CLI floors
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check the Skills name only what the CLI publishes
+        working-directory: skills/customer
+        run: |
+          for floor in $(bun scripts/cli-schema-fixture.ts --floors); do
+            bun scripts/cli-schema-fixture.ts --floor "$floor" \
+              --out "$RUNNER_TEMP/cli-schema-$floor.json" \
+              --compare "scripts/fixtures/cli-schema-$floor.json"
+          done
+          bun scripts/check-skill-command-surface.ts "$RUNNER_TEMP"/cli-schema-*.json
