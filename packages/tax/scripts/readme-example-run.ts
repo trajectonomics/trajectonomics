@@ -34,6 +34,7 @@ export function exampleTsconfig(examples: readonly ReadmeExample[]): string {
 			moduleResolution: "Bundler",
 			strict: true,
 			noEmit: true,
+			skipLibCheck: true,
 			types: ["bun"],
 		},
 		files: examples.map((example) => exampleFileName(example.index)),

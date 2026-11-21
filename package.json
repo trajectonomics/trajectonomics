@@ -1,0 +1,37 @@
+{
+	"name": "@trajectonomics/monorepo",
+	"private": true,
+	"type": "module",
+	"packageManager": "bun@1.4.4",
+	"engines": {
+		"node": ">=22.23.4"
+	},
+	"workspaces": [
+		"packages/money",
+		"packages/ledger",
+		"packages/tax",
+		"packages/sim",
+		"packages/brand/packages/core",
+		"packages/brand/packages/theme",
+		"packages/brand/packages/assets",
+		"apps/cli",
+		"apps/site",
+		"apps/docs",
+		"apps/blog",
+		"skills/customer",
+		"skills/internal"
+	],
+	"scripts": {
+		"build": "turbo run build",
+		"check": "turbo run check",
+		"test": "turbo run test",
+		"lint": "turbo run lint",
+		"typecheck": "turbo run typecheck"
+	},
+	"devDependencies": {
+		"turbo": "2.11.10"
+	},
+	"overrides": {
+		"@fumadocs/satteri": "0.7.1"
+	}
+}

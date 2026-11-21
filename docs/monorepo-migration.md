@@ -116,32 +116,36 @@ theme package's prebuilt CSS list, and logos and fonts only exist for Trajectono
 **brand is a folder**:
 
 ```
-packages/brand/
-  src/                      token contract, primitives, contrast checks (from core)
-                            defineTheme, validation, themeToCss, Tailwind stylesheet (from theme)
+packages/brand/                 @trajectonomics/brand (private, not published)
+  src/
+    tokens/                     contract, primitives, semantic tokens, contrast (from core/src)
+    theme/                      defineTheme, validation, themeToCss (from theme/src)
+    index.ts                    the public API
   brands/
     trajectonomics/
-      light.ts              export default defineTheme({ name: "trajectonomics-light", tokens: {...} })
-      dark.ts
-      assets/               logo/, favicon/, fonts/ (from design-system assets + brand-source)
-    acme/                   a white-label customer: copy the folder, change tokens and assets
-      light.ts
-      dark.ts
-      assets/
-  scripts/build.ts          finds brands/*, writes dist/brands/<brand>/{light,dark}.css,
-                            tailwind.css, typography.css, and copies assets/
+      light.ts                  export default <Theme named "light">
+      dark.ts                   export default <Theme named "dark">
+      assets/svg/  assets/webp/ (from brand-source)   assets/fonts/ (from assets/fonts)
+    acme/                       a white-label customer: copy the folder, change tokens and assets
+  tailwind.css, typography.css  brand-agnostic: they only reference --ds-* variables
+  scripts/build.ts              finds brands/*, writes dist/brands/<brand>/{light.css,dark.css,logo/,favicon/,fonts/},
+                                and copies the brand named by BRAND (default trajectonomics) to dist/current/
 ```
 
+- **Theme names stay `light` and `dark` inside every brand.** `themeToCss` scopes the CSS to
+  `[data-theme="<name>"]`, and apps set `data-theme="light"` or `"dark"`. The folder name is the brand.
 - **Adding a brand = adding a folder.** The build and the tests find `brands/*` themselves.
   Nothing gets registered by hand.
 - **Every brand is tested automatically.** A test runs over every folder in `brands/*` and fails if
   a theme breaks the Semantic Token Contract, misses the WCAG AA contrast floor (the check core has
-  today), or lacks a required asset (logo mark, favicon set).
-- **Exports:** `@trajectonomics/brand` (the JS API: `defineTheme`, `themeToCss`, the contract, the
-  `brands` list) and `@trajectonomics/brand/brands/<brand>/light.css`, `.../dark.css`, `.../logo/mark.svg`, and so on.
-- **Picking a brand in an app:** site and docs read `BRAND` (default `trajectonomics`) at build time
-  and import that brand's CSS and assets through one alias, `@brand/*`. A white-label deploy is
-  then the same app built with `BRAND=acme`: one more Cloudflare worker, no code fork.
+  today), or lacks a required asset (logo mark, favicon set, fonts stylesheet).
+- **Exports:** `@trajectonomics/brand` (the JS API: `defineTheme`, `themeToCss`, the contract,
+  primitives, the brand list), `@trajectonomics/brand/brands/<brand>/...`,
+  `@trajectonomics/brand/current/...`, `@trajectonomics/brand/tailwind.css` and `@trajectonomics/brand/typography.css`.
+- **Picking a brand in an app:** site and docs import from `@trajectonomics/brand/current/...`.
+  `BRAND=acme bun run build` builds the same apps as Acme. `turbo.json` lists `BRAND` in the build
+  task's `env`, so the cache never mixes brands. A white-label deploy is one more Cloudflare worker
+  with `BRAND` set. Nothing in the code is forked.
 - **White-label for a company = a private mirror of this repo.** GitHub won't make a private fork of
   a public repo, so: create a private repo `trajectonomics/<company>`, push this repo into it, and
   add this repo as `upstream` (the same setup `agentic-inbox` has with `cloudflare/agentic-inbox`).
@@ -161,11 +165,11 @@ than they give.
 - `packages/core/` with subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`,
   `/tax/th`, `/tax/us`, `/sim`. The four folders keep their source and tests. Each one's history
   comes in through the phase 1 import, then a `git mv` (history still shows with `git log --follow`).
-- **Dependency direction checked by lint:** `money` ← `ledger`, `tax` ← `sim`. Nothing imports
-  upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
+- **Dependency direction checked by lint:** `ledger` and `tax` may import `money`. `sim`
+  imports none of the others. `tax`'s production code never imports `sim`, but its levy tests may,
+  because they evaluate the levy graph `tax` emits with sim's evaluator. Nothing imports upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
   promised. A Biome `noRestrictedImports` rule per folder, or a small script, enforces both.
-- The sim↔tax cycle (§3) becomes imports between two folders in one package, and only the
-  direction rule needs to hold.
+- The sim↔tax cycle (§3) is gone by then: phase 2 drops sim's unused optional peer dependency on tax.
 - `cli` and `docs` change imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on.
 - Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
   imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
@@ -220,9 +224,10 @@ Also add to `.github/`: issue templates `tax-wrong-figure.yml`, `tax-new-year.ym
 
 ## 3. Known problems to fix during the move
 
-- **Cycle between `sim` and `tax`.** `sim` has a peer dependency on `tax`, and `tax` has a dev
-  dependency on `sim` (for its tests). Merging them into `core` (§2c) solves it: tax tests that use
-  sim move to `sim/` so the direction rule `tax` ← `sim` holds.
+- **Cycle between `sim` and `tax`.** `sim` declares an *optional* peer dependency on `tax`, but its
+  source never imports `tax`. `tax` has a dev dependency on `sim`, because its levy tests evaluate the
+  emitted graph with sim. Fix (phase 2): drop sim's unused peer entry. The only edge left is
+  tax → sim, test-only.
 - **Wrong package name.** `blog` still calls itself `@trajectonomics/technical-template`. Rename it
   to `@trajectonomics/blog` (private).
 - **Different Node engine.** `site` requires Node `>=22.23.4`; everything else requires `>=20`. The root

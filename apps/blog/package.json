@@ -1,5 +1,5 @@
 {
-	"name": "@trajectonomics/technical-template",
+	"name": "@trajectonomics/blog",
 	"version": "0.0.0-development",
 	"description": "Standard technical repository template for Trajectonomics libraries and services",
 	"license": "MIT",
@@ -8,6 +8,7 @@
 		"url": "git+https://github.com/trajectonomics/technical-template.git"
 	},
 	"type": "module",
+	"private": true,
 	"sideEffects": false,
 	"packageManager": "bun@1.4.4",
 	"engines": {
@@ -38,10 +39,8 @@
 		"tag": "latest"
 	},
 	"scripts": {
-		"setup": "bun .agents/skills/setup-the-repo/scripts/setup.ts",
-		"verify:setup": "bun .agents/skills/setup-the-repo/scripts/verify.ts",
 		"build": "tsdown",
-		"test": "bun test ./src ./scripts ./.agents/skills/setup-the-repo/scripts",
+		"test": "bun test ./src ./scripts",
 		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
@@ -53,7 +52,6 @@
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",
 		"@biomejs/biome": "2.6.3",
-		"@trajectonomics/tooling": "1.1.0",
 		"@types/bun": "^1.4.4",
 		"publint": "^0.3.25",
 		"tsdown": "^0.23.2",
