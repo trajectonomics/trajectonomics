@@ -1,0 +1,20 @@
+{
+	"name": "@trajectonomics/release-tools",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Computes the version each published package releases: stable from its own tags, alphas from npm.",
+	"type": "module",
+	"packageManager": "bun@1.4.4",
+	"scripts": {
+		"lint": "biome ci --error-on-warnings .",
+		"format": "biome check --write .",
+		"typecheck": "tsc -p tsconfig.json",
+		"test": "bun test",
+		"check": "bun run lint && bun run typecheck && bun run test"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.3",
+		"@types/bun": "^1.4.4",
+		"typescript": "^7.0.2"
+	}
+}

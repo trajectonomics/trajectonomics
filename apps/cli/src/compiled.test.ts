@@ -54,7 +54,7 @@ describe("the compiled binary", () => {
 		// The two tests above only hold because every compile keeps the switch off. A workflow or
 		// a `bun run build` that drops it puts a working directory back in charge (ADR-0039).
 		const workflows = ["binaries.yml", "installer-smoke.yml"].map((name) =>
-			readFileSync(join(ROOT, ".github/workflows", name), "utf8"),
+			readFileSync(join(ROOT, "../..", ".github/workflows", name), "utf8"),
 		)
 		const builds = [...workflows, readFileSync(join(ROOT, "package.json"), "utf8")].flatMap(
 			(text) => text.split("\n").filter((line) => line.includes("bun build")),

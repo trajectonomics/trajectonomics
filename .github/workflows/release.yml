@@ -1,0 +1,237 @@
+name: Release
+
+# Publishes this repository's npm packages: @trajectonomics/core and @trajectonomics/cli. The packages
+# and their tags are listed in tooling/release/packages.json. Keep this file named release.yml: npm
+# trusted publishing validates the calling workflow's file name and repository.
+#
+#   push to main         -> alpha (dist-tag "alpha") for every package whose folder changed in the
+#                           push. Markdown-only changes publish nothing.
+#   workflow_dispatch    -> stable (dist-tag "latest") for one package, from main. The version comes
+#                           from tooling/release/version.ts. It is published to npm, then the tag
+#                           <tagPrefix><version> and a GitHub release are created. A stable cli release
+#                           then builds and attaches its binaries (binaries.yml).
+#
+# Every publish needs the package on npm already (or NPM_TOKEN). Trusted publishing (OIDC) needs npm
+# >= 11.5.1, which the publish job installs. Tag and release only after npm accepted the version.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to release as stable.
+        type: choice
+        options: [core, cli]
+        required: true
+      bump:
+        description: "Stable version bump: auto reads the commits that touched the package since its last stable tag."
+        type: choice
+        options: [auto, patch, minor, major]
+        default: auto
+
+permissions:
+  contents: write # tags and GitHub releases
+  id-token: write # npm provenance and trusted publishing
+
+jobs:
+  plan:
+    # Safety switch: nothing runs until the owner sets the repository variable RELEASES_ENABLED to
+    # true (docs/runbooks/release.md, cutover step c). Until then a merge to main publishes nothing,
+    # even if an NPM_TOKEN secret is inherited from the organisation.
+    if: vars.RELEASES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+      channel: ${{ steps.plan.outputs.channel }}
+      stable_cli: ${{ steps.plan.outputs.stable_cli }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the diff of a push, and the tags
+      - id: plan
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          PACKAGE: ${{ inputs.package }}
+        run: |
+          set -euo pipefail
+          registry=tooling/release/packages.json
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ "$REF" != "refs/heads/main" ]; then
+              echo "::error::Run the stable release from main, not $REF."
+              exit 1
+            fi
+            channel=stable
+            selected=$(jq -c --arg name "@trajectonomics/$PACKAGE" '[.[] | select(.name == $name)]' "$registry")
+            stable_cli=$([ "$PACKAGE" = "cli" ] && echo true || echo false)
+          else
+            channel=alpha
+            stable_cli=false
+            base=$BEFORE
+            # A new branch pushes an all-zero "before"; compare with the parent, or the empty tree.
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base=$(git rev-parse --verify --quiet "$SHA^" || git hash-object -t tree /dev/null)
+            fi
+            selected='[]'
+            while IFS= read -r package; do
+              # A package also changes when a path it ships from changes (cli bundles packages/core).
+              mapfile -t paths < <(jq -r '.folder, (.extraPaths // [])[]' <<<"$package")
+              changed=$(git diff --name-only "$base" "$SHA" -- "${paths[@]}" | grep -v '\.md$' || true)
+              if [ -n "$changed" ]; then
+                selected=$(jq -c --argjson package "$package" '. + [$package]' <<<"$selected")
+              fi
+            done < <(jq -c '.[]' "$registry")
+          fi
+
+          {
+            echo "channel=$channel"
+            echo "stable_cli=$stable_cli"
+            echo "count=$(jq length <<<"$selected")"
+            echo "matrix=$(jq -c '{include: .}' <<<"$selected")"
+          } >> "$GITHUB_OUTPUT"
+          jq . <<<"$selected"
+
+  publish:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: release-${{ matrix.name }}
+      cancel-in-progress: false
+    env:
+      CHANNEL: ${{ needs.plan.outputs.channel }}
+      BUMP: ${{ inputs.bump || 'auto' }}
+      PACKAGE_NAME: ${{ matrix.name }}
+      FOLDER: ${{ matrix.folder }}
+      TAG_PREFIX: ${{ matrix.tagPrefix }}
+      FIRST_VERSION: ${{ matrix.firstVersion }}
+      EXTRA_PATHS: ${{ join(matrix.extraPaths, ' ') }}
+      GITHUB_LATEST: ${{ matrix.githubLatest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags and commit messages drive the version
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install the workspace
+        run: bun install --frozen-lockfile
+
+      - name: Compute the version and set it in the package
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--package-folder "$FOLDER" --tag-prefix "$TAG_PREFIX" --channel "$CHANNEL" --bump "$BUMP")
+          if [ -n "$FIRST_VERSION" ]; then args+=(--first-version "$FIRST_VERSION"); fi
+          for extra in $EXTRA_PATHS; do args+=(--extra-path "$extra"); done
+          VERSION=$(bun tooling/release/version.ts "${args[@]}")
+          if [ "$CHANNEL" = "stable" ]; then
+            DIST_TAG=latest
+            TAG="$TAG_PREFIX$VERSION"
+          else
+            DIST_TAG=alpha
+            TAG=
+          fi
+          echo "Publishing $PACKAGE_NAME@$VERSION ($CHANNEL, dist-tag $DIST_TAG)"
+          {
+            echo "VERSION=$VERSION"
+            echo "DIST_TAG=$DIST_TAG"
+            echo "TAG=$TAG"
+          } >> "$GITHUB_ENV"
+          # npm version failed in core's folder here (its devDependencies use workspace:), so set only
+          # the version field.
+          (cd "$FOLDER" && npm pkg set version="$VERSION")
+
+      - name: Check the package
+        run: bunx turbo run check --filter="$PACKAGE_NAME..." --concurrency=2
+
+      # Trusted publishing (OIDC) needs npm >= 11.5.1; setup-node 22 ships npm 10.x.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@^11.5.1
+
+      # A package that is not on npm yet cannot have a Trusted Publisher, so without NPM_TOKEN the
+      # publish below would die with a bare "need auth". Say what to do instead.
+      - name: Preflight, a brand-new package needs a first publish by hand
+        working-directory: ${{ matrix.folder }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          [ -n "$NODE_AUTH_TOKEN" ] && exit 0
+          NAME=$(node -p "require('./package.json').name")
+          if OUT=$(npm view "$NAME" version 2>&1); then exit 0; fi
+          echo "$OUT" | grep -q E404 || exit 0 # a registry hiccup is not a missing package
+          {
+            echo "::error title=$NAME is not on npm yet::npm cannot attach a Trusted Publisher to a package that does not exist, and this repository has no NPM_TOKEN."
+            echo "::error::The owner publishes the first version once by hand, as docs/runbooks/release.md says (cutover step a)."
+            echo "::error::Then add a Trusted Publisher at https://www.npmjs.com/package/$NAME/access (GitHub Actions, trajectonomics/trajectonomics, workflow release.yml, no environment), and re-run this job."
+          }
+          exit 1
+
+      # Uses NPM_TOKEN when the secret is set; otherwise npm uses trusted publishing (OIDC).
+      # npm publish cannot read workspace: ranges, so bun packs the folder (it rewrites them) and npm
+      # publishes that tarball. bun publish cannot make provenance.
+      - name: Publish to npm
+        working-directory: ${{ matrix.folder }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          NAME=$(node -p "require('./package.json').name")
+          # Lets "Re-run failed jobs" finish the tag and release after a transient failure.
+          if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
+            echo "$NAME@$VERSION is already on npm; skipping publish."
+            exit 0
+          fi
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
+          fi
+          # Consumers never install devDependencies, and core's name private workspace packages
+          # at versions npm does not have, so ship the manifest without them.
+          npm pkg delete devDependencies
+          bun pm pack --quiet --destination "$RUNNER_TEMP"
+          npm publish "$RUNNER_TEMP"/*.tgz --tag "$DIST_TAG" --provenance
+
+      # Tag and release only after npm accepted the version, so a failed publish leaves no tag.
+      - name: Tag and GitHub release
+        if: needs.plan.outputs.channel == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists; skipping."
+            exit 0
+          fi
+          # The previous stable release of this package, so the notes cover only what changed.
+          previous=$(git tag --list "$TAG_PREFIX*" --sort=-v:refname \
+            | grep -E "^$TAG_PREFIX[0-9]+\.[0-9]+\.[0-9]+$" | grep -vxF "$TAG" | head -n 1 || true)
+          args=(--target "$GITHUB_SHA" --title "$PACKAGE_NAME $VERSION" --generate-notes --latest="$GITHUB_LATEST")
+          if [ -n "$previous" ]; then args+=(--notes-start-tag "$previous"); fi
+          # GitHub's API fails transiently (HTTP 500); retry before giving up.
+          for attempt in 1 2 3; do
+            gh release create "$TAG" "${args[@]}" && exit 0
+            echo "Attempt $attempt failed; retrying."
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+  binaries:
+    # The cli's binaries ride the stable cli release it just created. A core release has none.
+    needs: [plan, publish]
+    if: needs.plan.outputs.stable_cli == 'true' && needs.publish.result == 'success'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/binaries.yml

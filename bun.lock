@@ -190,6 +190,15 @@
         "install-skills-profile": "./scripts/install-profile.mjs",
       },
     },
+    "tooling/release": {
+      "name": "@trajectonomics/release-tools",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@biomejs/biome": "2.6.3",
+        "@types/bun": "^1.4.4",
+        "typescript": "^7.0.2",
+      },
+    },
   },
   "overrides": {
     "@fumadocs/satteri": "0.7.1",
@@ -802,6 +811,8 @@
     "@trajectonomics/ledger": ["@trajectonomics/ledger@workspace:packages/core/ledger"],
 
     "@trajectonomics/money": ["@trajectonomics/money@workspace:packages/core/money"],
+
+    "@trajectonomics/release-tools": ["@trajectonomics/release-tools@workspace:tooling/release"],
 
     "@trajectonomics/sim": ["@trajectonomics/sim@workspace:packages/core/sim"],
 

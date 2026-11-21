@@ -6,10 +6,10 @@ name: Installer smoke
 on:
   pull_request:
     paths:
-      - install.sh
-      - install.ps1
+      - apps/cli/install.sh
+      - apps/cli/install.ps1
       - .github/workflows/installer-smoke.yml
-      - .github/smoke.sh
+      - apps/cli/scripts/smoke.sh
   workflow_dispatch:
 
 permissions:
@@ -18,6 +18,10 @@ permissions:
 env:
   VERSION: 0.0.0-smoke
   PORT: 8765
+
+defaults:
+  run:
+    working-directory: apps/cli
 
 jobs:
   install:
@@ -38,14 +42,20 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.4.4"
-      - run: bun install --frozen-lockfile
+      - name: Install the workspace
+        working-directory: .
+        run: bun install --frozen-lockfile
+      - name: Build the engine the CLI bundles
+        # The compiler resolves @trajectonomics/core/* through core's dist/, which only exists after a build.
+        working-directory: .
+        run: bunx turbo run build --filter="@trajectonomics/cli^..." --concurrency=2
       - name: Build the binary and the release tree the script installs from
         shell: bash
         env:
           ASSET: ${{ matrix.asset }}
         run: |
           set -euo pipefail
-          npm version "$VERSION" --no-git-tag-version
+          npm pkg set version="$VERSION" # npm version rejects the workspace: devDependencies
           mkdir -p "release/download/v$VERSION" "release/bad/download/v$VERSION"
           bun build src/index.ts --compile --no-compile-autoload-bunfig --no-compile-autoload-dotenv --outfile "release/download/v$VERSION/$ASSET"
           cd "release/download/v$VERSION"
@@ -105,7 +115,7 @@ jobs:
           cat "$log"
           grep -qF "downloading" "$log" || { echo "::error::the installer did not say what it downloads."; exit 1; }
           grep -qF "$install" "$log" || { echo "::error::the installer did not say where it installed."; exit 1; }
-          sh .github/smoke.sh "$VERSION" "$binary"
+          sh scripts/smoke.sh "$VERSION" "$binary"
 
           status=0
           if [ "$RUNNER_OS" = "Windows" ]; then
