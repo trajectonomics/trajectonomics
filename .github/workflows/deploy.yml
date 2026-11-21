@@ -1,0 +1,121 @@
+name: Deploy
+
+# Deploys the Site (worker "site", apps/site) and the Docs Portal (worker "docs", apps/docs) to
+# Cloudflare Workers from main. trajectonomics-web-router routes trajectonomics.com to both by
+# worker name, so nothing else changes. docs/runbooks/deploy.md has the setup and the switches.
+#
+#   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
+#                         config, the lockfile), changed in the push.
+#   workflow_dispatch  -> deploys the app you pick, or both, from main.
+#
+# Safety switch: nothing runs until the repository variable DEPLOYS_ENABLED is true. It needs the
+# secrets CLOUDFLARE_API_TOKEN (Workers Scripts: Edit) and CLOUDFLARE_ACCOUNT_ID.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Which worker to deploy.
+        type: choice
+        options: [all, site, docs]
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    if: vars.DEPLOYS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.plan.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the diff of a push
+      - id: plan
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          APP: ${{ inputs.app }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ "$REF" != "refs/heads/main" ]; then
+              echo "::error::Deploy from main, not $REF."
+              exit 1
+            fi
+            case "$APP" in
+            all) apps='["site","docs"]' ;;
+            *) apps="[\"$APP\"]" ;;
+            esac
+          else
+            base=$BEFORE
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base=$(git rev-parse --verify --quiet "$SHA^" || git hash-object -t tree /dev/null)
+            fi
+            shared=(packages/brand tooling/config bun.lock package.json turbo.json)
+            apps='[]'
+            for app in site docs; do
+              if [ -n "$(git diff --name-only "$base" "$SHA" -- "apps/$app" "${shared[@]}")" ]; then
+                apps=$(jq -c --arg app "$app" '. + [$app]' <<<"$apps")
+              fi
+            done
+          fi
+          echo "apps=$apps" >> "$GITHUB_OUTPUT"
+          echo "Deploying: $apps"
+
+  deploy:
+    needs: plan
+    if: needs.plan.outputs.apps != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.plan.outputs.apps) }}
+    concurrency:
+      group: deploy-${{ matrix.app }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the docs read the newest cli-v tag for their release line
+
+      - name: Stop when Cloudflare is not configured
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$ACCOUNT" ]; then
+            echo "::error::Set the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets (docs/runbooks/deploy.md)."
+            exit 1
+          fi
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install the workspace
+        run: bun install --frozen-lockfile
+
+      # turbo builds packages/brand first: both apps import its dist/current/.
+      - name: Build
+        env:
+          APP: ${{ matrix.app }}
+        run: bunx turbo run build --filter="@trajectonomics/$APP" --concurrency=2
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: apps/${{ matrix.app }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bunx wrangler deploy

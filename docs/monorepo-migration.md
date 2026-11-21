@@ -287,24 +287,13 @@ published package, edit its Trusted Publisher on npmjs.com to repository
 `trajectonomics/trajectonomics`, workflow `release.yml`. Until you do, releases from here will fail
 with an auth error. The old repos keep working until they are archived.
 
-## 6. Cloudflare deploys (your part)
+## 6. Cloudflare deploys
 
-No repo deploys from GitHub Actions today, so these are Cloudflare Workers Builds connected to
-each repo. Point each worker at this repo:
-
-| Worker | Root directory | Build command | Deploy command | Build watch paths |
-|---|---|---|---|---|
-| `site` | `apps/site` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/site/**`, `packages/brand/**`, `bun.lock` |
-| `docs` | `apps/docs` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/docs/**`, `packages/core/**`, `packages/brand/**`, `bun.lock` |
-| `trajectonomics-web-router` | stays in its own repo, unchanged | | | |
-
-Worker names do not change, so the router's service bindings (`DOCS` → `docs`, `HOME` → `site`) keep
-working. Run `bun install` from the repo root: Workers Builds runs inside the root directory, and
-Bun finds the workspace root by walking up.
-
-Alternative: deploy from GitHub Actions with `wrangler deploy` and a `CLOUDFLARE_API_TOKEN` secret.
-That puts deploys next to CI and the release workflows. Cloudflare Workers Builds is fine too, and
-needs no secrets in GitHub.
+Decided 2026-11-21: the `site` and `docs` workers deploy from this repository's CI
+(`.github/workflows/deploy.yml`, `wrangler deploy` after a turbo build), not from Cloudflare's Git
+integration, so the deploy is configured and reviewed here. Setup and switches:
+`docs/runbooks/deploy.md`. Worker names do not change, so `trajectonomics-web-router` (which stays in
+its own repository) keeps routing to them.
 
 ## 7. Phases
 

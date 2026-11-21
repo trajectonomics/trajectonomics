@@ -40,7 +40,7 @@ It refuses a tag that is not `cli-vX.Y.Z`, then smoke-tests and uploads the bina
 
 ## One-time cutover
 
-Do these in order. Steps 1 and 4 need the owner's own logins; the rest can be run from a terminal
+Do these in order. Step 1, and the Cloudflare token in step 4, need the owner's own logins; the rest can be run from a terminal
 with `gh` signed in to the organisation.
 
 **1. Point npm at this repository (owner, on npmjs.com).** Sign in, open
@@ -64,25 +64,9 @@ imported history after `cli-v0.3.0` holds `feat` commits, and the output now nam
 - `curl -fsSL https://github.com/trajectonomics/trajectonomics/releases/latest/download/install.sh | sh`
   then `traj --version` prints `0.4.0`.
 
-**4. Deploy the site and the docs from here (owner, in the Cloudflare dashboard).** Only after step
-3, because both now link to this repository's releases. For each worker, open **Workers & Pages →
-the worker → Settings → Build**, disconnect the old repository, connect
-`trajectonomics/trajectonomics` on branch `main`, and set:
-
-| Setting | `site` worker | `docs` worker |
-| --- | --- | --- |
-| Root directory | `apps/site` | `apps/docs` |
-| Build command | `bun install --frozen-lockfile && bunx turbo run build --filter=@trajectonomics/site` | `bun install --frozen-lockfile && bunx turbo run build --filter=@trajectonomics/docs` |
-| Deploy command | `bunx wrangler deploy` | `bunx wrangler deploy` |
-| Build watch paths (include) | `apps/site/*`, `packages/brand/*`, `bun.lock` | `apps/docs/*`, `packages/brand/*`, `bun.lock` |
-| Build variables | `BUN_VERSION=1.4.4`, `NODE_VERSION=22` | `BUN_VERSION=1.4.4`, `NODE_VERSION=22` |
-
-Then **Retry build** (or push a commit) and open trajectonomics.com and trajectonomics.com/docs. The
-worker names do not change, so `trajectonomics-web-router` keeps routing to them. Build with turbo,
-not `bun run build`: turbo builds `packages/brand` first, whose `dist/current/` both apps import. A
-white-label deploy is the same settings with one more variable, `BRAND=<folder in packages/brand/brands>`.
-These commands were checked on a fresh shallow clone: install, build and `wrangler deploy --dry-run`
-succeed for both apps.
+**4. Deploy the site and the docs from here.** Only after step 3, because both now link to this
+repository's releases. They deploy from CI (`.github/workflows/deploy.yml`), not from Cloudflare's
+Git integration: [deploy.md](deploy.md) has the one-time token, secrets and switch.
 
 **5. Forward the old install commands, then archive the old repositories.** Publish the forwarding
 release in `trajectonomics/cli` as `tooling/release/forwarding/README.md` describes, so
