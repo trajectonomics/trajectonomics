@@ -1,10 +1,10 @@
 import { SITE_HOME_LOAD, SITE_HOME_PATH } from "../../lib/site-home"
 
-/** The Source link's destination: this repository. */
-const SOURCE_URL = "https://github.com/trajectonomics/docs"
+/** The Source link's destination: the Docs Portal's package in the monorepo. */
+const SOURCE_URL = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/docs"
 
-/** The License link's destination: the MIT license this repository ships. */
-const LICENSE_URL = `${SOURCE_URL}/blob/main/LICENSE`
+/** The License link's destination: the MIT license the Docs Portal ships. */
+const LICENSE_URL = "https://github.com/trajectonomics/trajectonomics/blob/main/apps/docs/LICENSE"
 
 /**
  * The Landing Page's own ending: a hairline above Site Home, Source and License, at the bottom of
