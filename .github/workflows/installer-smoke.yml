@@ -46,7 +46,7 @@ jobs:
         working-directory: .
         run: bun install --frozen-lockfile
       - name: Build the engine the CLI bundles
-        # bun build --compile resolves @trajectonomics/core/* through core's dist/, which only exists after a build.
+        # The compiler resolves @trajectonomics/core/* through core's dist/, which only exists after a build.
         working-directory: .
         run: bunx turbo run build --filter="@trajectonomics/cli^..." --concurrency=2
       - name: Build the binary and the release tree the script installs from
