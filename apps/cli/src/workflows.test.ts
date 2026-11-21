@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { ROOT } from "./launcher-test-support"
 
-const dir = join(ROOT, ".github/workflows")
+// The workflows live at the repository root, two levels above this package.
+const dir = join(ROOT, "../..", ".github/workflows")
 
 type Step = {
 	name?: string
@@ -15,6 +16,8 @@ type Step = {
 type Job = {
 	uses?: string
 	needs?: string | string[]
+	if?: string
+	concurrency?: Record<string, unknown>
 	permissions?: Record<string, string>
 	with?: Record<string, unknown>
 	secrets?: string
@@ -22,7 +25,7 @@ type Job = {
 	strategy?: { matrix?: { include?: Record<string, string>[] } }
 }
 type Workflow = {
-	on: Record<string, { inputs?: Record<string, unknown>; paths?: string[] } | null>
+	on: Record<string, { inputs?: Record<string, unknown>; paths?: string[]; branches?: string[] } | null>
 	permissions?: Record<string, string>
 	jobs: Record<string, Job>
 }
@@ -67,30 +70,38 @@ describe("every workflow that compiles the CLI", () => {
 	})
 })
 
-describe("release.yml, the caller npm trusted publishing validates", () => {
-	it("publishes only when dispatched, never on a push to main", () => {
-		expect(Object.keys(RELEASE.on).sort()).toEqual(["workflow_dispatch"])
+describe("release.yml, the one workflow that publishes core and cli", () => {
+	it("publishes an alpha on a push to main, and a stable only when dispatched", () => {
+		expect(Object.keys(RELEASE.on).sort()).toEqual(["push", "workflow_dispatch"])
+		expect(RELEASE.on["push"]?.branches).toEqual(["main"])
+		expect(RELEASE.on["workflow_dispatch"]?.inputs).toHaveProperty("package")
 		expect(RELEASE.on["workflow_dispatch"]?.inputs).toHaveProperty("bump")
 	})
 
-	it("grants the tokens the shared publisher and the release upload need", () => {
+	it("grants the tokens npm provenance and the release need", () => {
 		expect(RELEASE.permissions).toEqual({ contents: "write", "id-token": "write" })
 	})
 
-	it("is a thin caller: no steps, and the publishing logic stays in cicd", () => {
-		const publish = RELEASE.jobs["publish"]
-		expect(publish?.uses).toBe("trajectonomics/cicd/.github/workflows/publish.yml@v1")
-		expect(publish?.with).toHaveProperty("bump")
-		expect(publish?.secrets).toBe("inherit")
-		expect(publish?.steps).toBeUndefined()
-	})
-
-	it("adds exactly one job, which cannot start before the version exists", () => {
-		expect(Object.keys(RELEASE.jobs)).toEqual(["publish", "binaries"])
+	it("plans, then publishes each package in its own job, then calls binaries after a stable cli", () => {
+		expect(Object.keys(RELEASE.jobs).sort()).toEqual(["binaries", "plan", "publish"])
 		const binaries = RELEASE.jobs["binaries"]
 		expect(binaries?.uses).toBe("./.github/workflows/binaries.yml")
-		expect(needs(binaries!)).toEqual(["publish"])
-		expect(binaries?.permissions).toMatchObject({ contents: "write" })
+		expect(needs(binaries!).sort()).toEqual(["plan", "publish"])
+		expect(binaries?.if).toContain("stable_cli")
+	})
+
+	it("serialises each package's publish and never cancels one in flight", () => {
+		const publish = RELEASE.jobs["publish"]
+		expect(publish?.concurrency).toMatchObject({ "cancel-in-progress": false })
+		expect(String(publish?.concurrency?.["group"])).toContain("matrix.name")
+	})
+
+	it("checks, computes the version with the release tools, then publishes with provenance", () => {
+		const text = runs(RELEASE.jobs["publish"]!).join("\n")
+		expect(text).toContain("bunx turbo run check")
+		expect(text).toContain("tooling/release/version.ts")
+		expect(text).toContain("npm publish")
+		expect(text).toContain("--provenance")
 	})
 })
 
@@ -141,7 +152,7 @@ describe("binaries.yml, the assets job", () => {
 			"macos-15",
 			"windows-latest",
 		])
-		expect(runs(smoke!).join("\n")).toContain(".github/smoke.sh")
+		expect(runs(smoke!).join("\n")).toContain("scripts/smoke.sh")
 	})
 
 	it("uploads only after the artifact smoke passed, with only the uploader allowed to write", () => {
