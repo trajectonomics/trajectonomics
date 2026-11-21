@@ -25,7 +25,7 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/*.astro"],
+			"includes": ["**/*.svelte"],
 			"linter": {
 				"rules": {
 					"correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" }

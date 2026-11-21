@@ -1,13 +1,13 @@
 {
-	"extends": "./tsconfig.base.json",
+	"extends": ["$app/tsconfig", "./tsconfig.base.json"],
 	"compilerOptions": {
 		"lib": ["ES2023", "DOM", "DOM.Iterable"],
-		"types": ["astro/client", "bun"],
+		"types": ["bun", "$app/types"],
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
 		"isolatedDeclarations": false,
 		"resolveJsonModule": true,
 		"declaration": false
 	},
-	"include": ["src", "scripts", "astro.config.ts", ".astro/types.d.ts"]
+	"include": ["src", "scripts", "vite.config.ts", ".svelte-kit/ambient.d.ts"]
 }

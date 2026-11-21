@@ -9,7 +9,7 @@ function inherit(argv: string[]): Promise<number> {
 
 /** Builds, writes the Snapshot from the flags, and previews. Returns the exit code of the first failure. */
 export async function main(flags: readonly string[]): Promise<number> {
-	const build = await inherit(["bunx", "astro", "build"])
+	const build = await inherit(["bunx", "vite", "build"])
 	if (build !== 0) return build
 	const snapshot = await inherit([
 		process.execPath,
@@ -22,7 +22,7 @@ export async function main(flags: readonly string[]): Promise<number> {
 	process.stdout.write(
 		`The Snapshot is in ${SNAPSHOT}. Serving the Dashboard on http://127.0.0.1:4321 .\n`,
 	)
-	return inherit(["bunx", "astro", "preview", "--host", "127.0.0.1"])
+	return inherit(["bunx", "vite", "preview", "--host", "127.0.0.1"])
 }
 
 if (import.meta.main) {
