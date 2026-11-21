@@ -1,36 +1,29 @@
-import { EmptyState } from "../ui/EmptyState"
-import { Money } from "../ui/Money"
+import { useQueryParam } from "../../client/query-param"
+import type { Snapshot } from "../../lib/contract"
+import { parseTerms } from "../../lib/view/compare"
+import { ComparePanel } from "../compare/ComparePanel"
 import { PageShell } from "../ui/PageShell"
-import { ReadView } from "../ui/ReadView"
-import { Stat } from "../ui/Stat"
 
-/** Compare: two Scenarios side by side, and the deltas the CLI states between them. Placeholder. */
+/** Compare: two Scenarios side by side, and the deltas the CLI states between them. */
 export function ComparePage() {
 	return (
 		<PageShell
 			title="Compare"
-			intro="Two Scenarios side by side, with each difference as the CLI states it."
-			render={(snapshot) => {
-				const read = snapshot.reads.compare
-				if (!read) return <EmptyState title="No comparison" />
-				return (
-					<ReadView
-						read={read}
-						label="Comparison"
-						render={(data) => {
-							const delta = data.deltas.netWorth?.nominal
-							return (
-								<Stat
-									label="Net worth difference at the horizon"
-									value={
-										delta ? <Money amount={delta} currency={data.currency} signed /> : "Not stated"
-									}
-								/>
-							)
-						}}
-					/>
-				)
-			}}
+			intro="A is drawn solid and B dashed everywhere on this page. Each difference is B minus A, as the CLI states it."
+			render={(snapshot) => <CompareReady snapshot={snapshot} />}
+		/>
+	)
+}
+
+/** The page once the Snapshot is ready: its terms live in the address bar, so a link keeps them. */
+function CompareReady({ snapshot }: { readonly snapshot: Snapshot }) {
+	const [raw, setRaw] = useQueryParam("terms", "nominal")
+	return (
+		<ComparePanel
+			compare={snapshot.reads.compare}
+			projections={snapshot.reads.projections}
+			terms={parseTerms(raw)}
+			onTerms={setRaw}
 		/>
 	)
 }
