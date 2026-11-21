@@ -163,8 +163,12 @@ The script text one page runs, uncompressed and under 10,000 bytes: inline scrip
 _Avoid_: Bundle, JS payload
 
 **Reveal layer**:
-The one small script that marks a section's root when it first arrives, so the section's timeline can play. It sequences nothing: the order and the timing are the timeline's, and the stylesheet only applies them. With no script, or with motion reduced, the section is complete and still.
+The one small script that sets the Demo window's stage and marks the chat on screen when the window's head first arrives, so the chat's timeline can play, and that wires the window's controls. It sequences nothing: the order and the timing are the timeline's, and the stylesheet only applies them. With no script, or with motion reduced, the window is complete and still.
 _Avoid_: Animation controller, trigger, observer
+
+**Demo window**:
+The hero's drawn picture of the app a visitor's agent runs in: a title bar, a sidebar with New chat and Recents, and a main pane holding one chat at a time. It plays the chat of the agent alone, then presses New chat and plays the chat with the traj Skill ([ADR 0022](docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)). Its composer is a picture and takes no input. With no script, or with motion reduced, both chats stand whole, one above the other.
+_Avoid_: Comparison, Before/After panels, mock app, chat widget
 
 **Web font**:
 A font file the Site serves itself under the Font budget: the Brand Typeface's three latin `.woff2` files (`Aleo` 300 and 400, `Azeret Mono` 500), copied from `@trajectonomics/design-system-assets` and declared in `src/styles/fonts.css`. A font URL that is absolute, a font or font stylesheet on another origin and a font in a `data:` URL each fail an Invariant, and the Site ships no Thai face, so Thai still draws from the visitor's own fonts ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).

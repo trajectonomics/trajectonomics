@@ -28,25 +28,38 @@
 }
 
 /*
- * The field thins towards the sides and the bottom, so the squares never reach the page's corners, and it
- * leaves the centre: a clearing of 46% by 52% behind the headline, the subline and the install window
- * keeps the copy on clean ground, so the squares frame the text instead of competing with it (ADR 0014).
+ * The ground is the whole stage, the copy and the demo window under it, so the squares frame both: they
+ * gather at the top and run down the window's two sides, as twenty.com's do, and they leave a clearing
+ * behind the headline, the subline and the buttons so the copy sits on clean ground (ADR 0014). The
+ * window's own surface is opaque, so nothing needs to be cleared behind it.
  */
 .hero-blast-field {
 	position: absolute;
 	inset: 0;
 	-webkit-mask-image:
-		radial-gradient(76% 62% at 50% 30%, var(--ds-color-foreground) 0%, transparent 88%),
+		linear-gradient(
+			to right,
+			var(--ds-color-foreground) 0%,
+			transparent 36%,
+			transparent 64%,
+			var(--ds-color-foreground) 100%
+		),
 		radial-gradient(
-			ellipse 46% 52% at 50% 48%,
+			ellipse 40% 21% at 50% 21%,
 			transparent 0%,
 			transparent 62%,
 			var(--ds-color-foreground) 100%
 		);
 	mask-image:
-		radial-gradient(76% 62% at 50% 30%, var(--ds-color-foreground) 0%, transparent 88%),
+		linear-gradient(
+			to right,
+			var(--ds-color-foreground) 0%,
+			transparent 36%,
+			transparent 64%,
+			var(--ds-color-foreground) 100%
+		),
 		radial-gradient(
-			ellipse 46% 52% at 50% 48%,
+			ellipse 40% 21% at 50% 21%,
 			transparent 0%,
 			transparent 62%,
 			var(--ds-color-foreground) 100%

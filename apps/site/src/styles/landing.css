@@ -1,7 +1,7 @@
 /* The landing page's hero (ADR 0007): the stage, the pill, and the display headline. The headline holds still: its accent is colour, not motion (ADR 0012). */
 
 /*
- * The hero is no longer a full viewport. It is only as tall as its copy and the comparison it carries,
+ * The hero is no longer a full viewport. It is only as tall as its copy and the demo window it carries,
  * so the demonstration sits on the page the visitor lands on and the sections below follow close behind.
  */
 

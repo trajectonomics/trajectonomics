@@ -24,21 +24,20 @@ describe("the full Answer engine file", () => {
 	})
 
 	it("renders every section the page shows, under the page's own headings", () => {
-		for (const heading of [
-			dictionary.actionHeading,
-			dictionary.howHeading,
-			dictionary.featuresHeading,
-		]) {
+		for (const heading of [dictionary.actionHeading, dictionary.featuresHeading]) {
 			expect(LLMS_FULL_TXT).toContain(`## ${heading}`)
 		}
 	})
 
-	it("lists every feature and every step, in the order the page lists them", () => {
+	it("carries no How it works section, because the page no longer has one", () => {
+		expect(LLMS_FULL_TXT).not.toContain("How it works")
+		expect(LLMS_FULL_TXT).not.toContain("Presentation layer")
+		expect(LLMS_FULL_TXT).not.toContain("Logic layer")
+	})
+
+	it("lists every feature, in the order the page lists them", () => {
 		for (const [index, title] of dictionary.featureTitles.entries()) {
 			expect(LLMS_FULL_TXT).toContain(`- **${title}**: ${dictionary.featureCopies[index]}`)
-		}
-		for (const [index, step] of dictionary.howSteps.entries()) {
-			expect(LLMS_FULL_TXT).toContain(`${index + 1}. ${step}`)
 		}
 	})
 
@@ -64,15 +63,6 @@ describe("the full Answer engine file", () => {
 		}
 		expect(LLMS_FULL_TXT).toContain(dictionary.actionWithoutLabel)
 		expect(LLMS_FULL_TXT).toContain(dictionary.actionWithLabel)
-	})
-
-	it("names each step's actor and the three things the agent hands back", () => {
-		for (const [index, actor] of dictionary.howStepActors.entries()) {
-			expect(LLMS_FULL_TXT).toContain(`${index + 1}. ${dictionary.howSteps[index]} — ${actor}`)
-		}
-		for (const item of dictionary.howPresentationItems) expect(LLMS_FULL_TXT).toContain(item)
-		expect(LLMS_FULL_TXT).toContain(dictionary.howOutputChat.join(" / "))
-		expect(LLMS_FULL_TXT).toContain(dictionary.howOutputSource)
 	})
 
 	it("carries no run label, because the page has none", () => {

@@ -15,14 +15,32 @@ describe("the Hero component in every Language", () => {
 			expect(headings(page).map((element) => element.tag)).toEqual(["h1"])
 		})
 
-		it(`carries the before/after comparison inside the hero, so it is seen on landing (${language})`, async () => {
+		it(`carries the demo window inside the hero, after the copy, so it is seen on landing (${language})`, async () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const hero = withAttribute(page, "data-hero")[0]
 			if (hero === undefined) throw new Error("the hero rendered no stage")
-			const panels = withClass(page, "compare-panel")
-			expect(panels).toHaveLength(2)
-			for (const panel of panels) expect(panel.ancestors.includes(hero)).toBe(true)
-			expect(withAttribute(page, "data-action-compare")).toHaveLength(1)
+			const windows = withAttribute(page, "data-app")
+			expect(windows).toHaveLength(1)
+			expect(windows[0]?.ancestors.includes(hero)).toBe(true)
+			const h1 = elementsByTag(page, "h1")[0]
+			const prompt = withAttribute(page, "data-install-prompt")[0]
+			if (h1 === undefined || prompt === undefined || windows[0] === undefined)
+				throw new Error("the hero lost its headline, its prompt or its window")
+			expect(page.elements.indexOf(h1)).toBeLessThan(page.elements.indexOf(prompt))
+			expect(page.elements.indexOf(prompt)).toBeLessThan(page.elements.indexOf(windows[0]))
+		})
+
+		it(`lets the pixel field run behind the copy and the window alike (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const hero = withAttribute(page, "data-hero")[0]
+			const blast = withClass(page, "hero-blast")[0]
+			const window = withAttribute(page, "data-app")[0]
+			if (hero === undefined || blast === undefined || window === undefined)
+				throw new Error("the hero lost its field or its window")
+			// The field is a direct child of the stage, so it spans the copy and the window.
+			expect(blast.ancestors.at(-1)).toBe(hero)
+			expect(window.ancestors.includes(blast)).toBe(false)
+			expect(withClass(page, "hero-ground")).toEqual([])
 		})
 
 		it(`carries the plain run and the accent in the h1 (${language})`, async () => {

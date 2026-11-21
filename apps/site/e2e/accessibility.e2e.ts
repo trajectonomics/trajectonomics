@@ -39,9 +39,9 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
 				colorScheme: scheme,
 				// Reduced motion settles the load-in animation at once, so axe judges the shipped pixels
 				// instead of a mid-animation frame whose opacity lowers the computed contrast. It also
-				// lays both comparison panels out whole, where motion allowed shows a phone one at a
-				// time: the After panel, which carries the demo output, is in the judged tree only here
-				// ([ADR 0019](../docs/adr/0019-the-sections-motion-plays-once-on-entry.md)).
+				// lays both demo chats out whole, where motion allowed shows one at a time: the chat with
+				// the skill, which carries the demo output, is in the judged tree only here
+				// ([ADR 0022](../docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)).
 				reducedMotion: "reduce",
 				viewport,
 			})
@@ -57,6 +57,29 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
 			}
 		})
 	}
+}
+
+for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
+	test.describe(`axe on the demo window in its interactive state at the ${viewportName} viewport`, () => {
+		// Motion allowed, so the script runs: the sidebar is in the reading order, its controls are
+		// enabled and each transcript is a scroll region that must be a Tab stop. A click on a chat in the
+		// sidebar settles it, so axe judges the shipped pixels and not a frame of the sequence.
+		test.use({ colorScheme: "light", reducedMotion: "no-preference", viewport })
+
+		test("has no axe violation, and nothing axe cannot judge", async ({ page }) => {
+			await openPage(page, homeOf("en"))
+			await page.locator('[data-app-chat="with"]').click()
+			await page.locator('[data-app-chat="without"]').click()
+			await expect(page.locator('.app-chat[data-chat="without"]')).not.toHaveAttribute(
+				"data-motion",
+				/.+/,
+			)
+			await expect(page.locator("[data-app-side]")).not.toHaveAttribute("aria-hidden", /.+/)
+			// The load-in animation has settled, so no frame of it lowers a computed contrast.
+			await page.waitForTimeout(1_500)
+			await expectAxeReportsNothing(page, "the English home with the demo window interactive")
+		})
+	})
 }
 
 test.describe("the demo output at the phone viewport", () => {

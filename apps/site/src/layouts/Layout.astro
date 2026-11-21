@@ -122,86 +122,72 @@ const verification = verificationMetas({
 		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
 		<Footer dictionary={dictionary} />
 		{/*
-			The Reveal layer (ADR 0019) and the comparison's own controls (site#95), in one script
-			because the page's whole Program JavaScript budget is 10,000 bytes. The page as served is the
-			whole story: every message, step, actor and output is in the markup at its resting state, and
-			nothing here is needed to read it. The script marks a panel's root so the timeline in the
-			stylesheet can play — in the same frame for a root already on screen, so a visitor who lands on it
-			never sees a still frame first — and takes the mark and the motion attribute off when the sequence
-			ends, so the settled page is the static page again. It sets the stage a phone is on, which is a
-			panel at a time; when the before chat has been read it offers the after one with a five-second
-			countdown, and the visitor's tap or the countdown's last second moves there. It keeps the newest
-			message of a playing panel in view, and it unhides the Replay controls. It sets no stage where
-			motion is reduced, so both panels stand whole. The beats are the stylesheet's and the timeline's,
-			never counted here. There is no comment inside the script: every byte of it ships, and the whole
-			page has 10,000.
+			The Reveal layer (ADR 0019) and the demo window's own controls (ADR 0022), in one script because the
+			page's whole Program JavaScript budget is 10,000 bytes. The page as served is the whole story: both
+			chats, every message, the CLI's output and the verdicts are in the markup at their resting state, and
+			nothing here is needed to read it. With motion reduced the script does nothing at all, so both chats
+			stand whole and the sidebar stays out of the reading order. Otherwise it sets the window's stage,
+			which is the one chat on screen, and marks that chat's root so the timeline in the stylesheet can
+			play; the root is marked `wait` until the window's head is on screen, so a visitor who lands on it
+			never sees a still frame first, and the mark comes off when the chat ends, so the settled chat is the
+			static chat again. When the chat without the skill has been read it asks for New chat to be pressed
+			and, after the pause the markup names, presses it: the chat with the skill plays. The sidebar's controls
+			are enabled here, and the transcript becomes a Tab stop, because it scrolls only where there is a
+			stage. It keeps the newest message of a playing chat in view. The beats are the stylesheet's and the
+			timeline's, never counted here. There is no comment inside the script: every byte of it ships, and
+			the whole page has 10,000.
 		*/}
 		<script is:inline>
 		;(() => {
-			const wrap = document.querySelector("[data-action-compare]")
-			const roots = [...document.querySelectorAll(".compare-panel, .how")]
-			if (!wrap || matchMedia("(prefers-reduced-motion: reduce)").matches) return
-			const panelOf = (side) => roots.find((one) => one.dataset.side === side)
-			const cta = wrap.querySelector(".compare-cta")
-			const count = wrap.querySelector("[data-action-count]")
-			let wait
-			const show = (side) => (wrap.dataset.actionStage = side)
-			const play = (root) => {
-				const d = root.dataset
-				if (d.motion) return
-				const steps = +d.flowSteps
-				delete d.step
-				d.motion = "play"
-				clearInterval(root.timerId)
-				let beat = 0
-				root.timerId = setInterval(() => {
-					if (steps && ++beat <= steps) return (d.step = beat)
-					clearInterval(root.timerId)
-					delete d.step
-					delete d.motion
-					d.side === "without" && offer()
-				}, steps ? +d.flowMs : +d.playMs)
-			}
-			const offer = () => {
-				if (!cta.offsetParent) return
-				let left = 6
-				wrap.dataset.actionCta = "count"
-				clearInterval(wait)
-				const tick = () => {
-					count.textContent = ` (${--left})`
-					left || turn("with")
+			const app = document.querySelector("[data-app]")
+			if (!app || matchMedia("(prefers-reduced-motion: reduce)").matches) return
+			const all = (selector) => [...app.querySelectorAll(selector)]
+			const chats = all(".app-chat")
+			let timer
+			const show = (name, mode) => {
+				clearTimeout(timer)
+				delete app.dataset.hint
+				app.dataset.stage = name
+				for (const mark of all("[data-app-chat]")) mark.ariaCurrent = mark.dataset.appChat == name
+				for (const chat of chats) {
+					delete chat.dataset.motion
+					if (chat.dataset.chat != name) continue
+					chat.querySelector(".app-scroll").scrollTop = 0
+					void chat.offsetWidth
+					if (mode) chat.dataset.motion = mode
+					if (mode == "play")
+						timer = setTimeout(() => {
+							delete chat.dataset.motion
+							if (name == "with") return
+							app.dataset.hint = ""
+							timer = setTimeout(() => show("with", "play"), +app.dataset.hintMs)
+						}, +chat.dataset.playMs)
 				}
-				wait = setInterval(tick, 1e3)
-				tick()
 			}
-			const turn = (side) => {
-				clearInterval(wait)
-				delete wrap.dataset.actionCta
-				show(side)
-				play(panelOf(side))
+			for (const one of all("[disabled]")) one.disabled = false
+			for (const one of all(".app-scroll")) one.tabIndex = 0
+			app.querySelector("[data-app-side]").removeAttribute("aria-hidden")
+			app.querySelector("[data-app-replay]").hidden = false
+			app.onclick = ({ target }) => {
+				const { dataset } = target.closest("button") || {}
+				if (!dataset) return
+				if ("appReplay" in dataset) show("without", "play")
+				else if ("appNew" in dataset) show("with", "play")
+				else show(dataset.appChat)
 			}
-			cta.onclick = () => turn(wrap.dataset.actionStage === "with" ? "without" : "with")
-			for (const one of document.querySelectorAll("[data-replay]")) {
-				one.hidden = false
-				one.onclick = () => (one.dataset.replay ? turn(one.dataset.replay) : play(roots[2]))
-			}
-			wrap.addEventListener("animationstart", ({ target }) => {
+			app.addEventListener("animationstart", ({ target }) => {
 				const message = target.closest(".chat-message")
-				const body = message && message.closest(".compare-body")
-				if (body)
-					body.scrollTop +=
-						message.getBoundingClientRect().bottom - body.getBoundingClientRect().bottom
+				const box = message && message.closest(".app-scroll")
+				if (box)
+					box.scrollTop += message.getBoundingClientRect().bottom - box.getBoundingClientRect().bottom
 			})
-			show("without")
-			const watch =
-				window.IntersectionObserver &&
-				new IntersectionObserver((entries) => {
-					for (const { isIntersecting, target } of entries) isIntersecting && play(target)
-				})
-			for (const root of roots) {
-				const { top, bottom } = root.getBoundingClientRect()
-				bottom > 0 && top < innerHeight ? play(root) : watch?.observe(root)
-			}
+			show("without", "wait")
+			const start = () => chats[0].dataset.motion == "wait" && show("without", "play")
+			if (window.IntersectionObserver)
+				new IntersectionObserver(([{ isIntersecting }], watch) => {
+					if (isIntersecting) watch.disconnect(), start()
+				}, { rootMargin: "0px 0px -120px" }).observe(app)
+			else start()
 		})()
 		</script>
 	</body>

@@ -36,8 +36,6 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		starMenuLabel: "GitHub stars",
 		starMenuGroupLabel: "Repositories",
 		starMenuAllRepos: "All repositories",
-		starOnboarding: "Star traj-onboarding",
-		cliDocsLink: "Read the CLI docs",
 		cliInstallLink: "Install the CLI directly",
 		copy: "Copy prompt to your AI agents",
 		copied: "Prompt copied",

@@ -1,10 +1,10 @@
-import { expect, type Page } from "@playwright/test"
+import type { Page } from "@playwright/test"
 import type { Language } from "../src/lib/language/language"
 import { dictionaryFor } from "../src/lib/language/languages"
 import { INSTALL_PROMPT } from "../src/lib/site"
 
 /** The controls a keyboard visitor can reach, excluding anything hidden or disabled. */
-const FOCUSABLE = "a[href], button:not([disabled]):not([hidden]), summary"
+const FOCUSABLE = 'a[href], button:not([disabled]):not([hidden]), summary, [tabindex="0"]'
 
 /** The number of controls a keyboard visitor can reach on the page. */
 export function focusableCount(page: Page): Promise<number> {
@@ -15,8 +15,8 @@ export function focusableCount(page: Page): Promise<number> {
 			[...document.querySelectorAll(selector)].filter((element) => {
 				const panel = element.closest("details:not([open])")
 				if (panel !== null && element.tagName !== "SUMMARY") return false
-				// A tab bar hidden at this width is out of the browser's tab order too, so it must
-				// not be counted here (the comparison's phone tabs are hidden on a desktop).
+				// A control hidden at this width is out of the browser's tab order too, so it must
+				// not be counted here (the demo window's hidden chat is not laid out).
 				return element.getClientRects().length > 0
 			}).length,
 		FOCUSABLE,
@@ -71,16 +71,3 @@ export function copiedLabel(language: Language): string {
 
 /** The prompt a copy puts on the clipboard. */
 export const COPY_PROMPT_TEXT = INSTALL_PROMPT
-
-/**
- * The pulse's dot waits in the logic layer, whatever the width: its travel is the layer's own height,
- * and the dot is painted at the foot of the pulse's column.
- */
-export async function expectPulseInLogicLayer(page: Page): Promise<void> {
-	const dot = await page.locator(".layers-pulse").boundingBox()
-	const logic = await page.locator(".how .layer-logic").boundingBox()
-	if (dot === null || logic === null) throw new Error("the pulse or the logic layer has no box")
-	const dotCentre = dot.y + dot.height - 3
-	expect(dotCentre, "the dot is inside the logic layer").toBeGreaterThan(logic.y)
-	expect(dotCentre, "the dot is inside the logic layer").toBeLessThan(logic.y + logic.height)
-}

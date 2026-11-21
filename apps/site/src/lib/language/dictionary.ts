@@ -35,11 +35,9 @@ export interface Dictionary {
 	readonly starMenuGroupLabel: string
 	/** The Star menu's last row, to the Organisation on GitHub. */
 	readonly starMenuAllRepos: string
-	/** The star link under the How it works section, to the onboarding skill's repository. */
-	readonly starOnboarding: string
-	/** The small label above the See it in action heading. */
+	/** The See it in action section's small label, which the page no longer draws. */
 	readonly actionEyebrow: string
-	/** The See it in action section's `h2`. */
+	/** The See it in action section's heading in the full Answer engine file. */
 	readonly actionHeading: string
 	/** The line under that heading: the two panels' claim in one sentence. */
 	readonly actionLede: string
@@ -49,15 +47,6 @@ export interface Dictionary {
 	readonly actionYou: string
 	/** The speaker label of the agent in a transcript. */
 	readonly actionAgent: string
-	/** The comparison's before label: the agent asked alone, the panel a phone lands on. */
-	readonly actionBeforeLabel: string
-	/** The comparison's after label: the agent with traj, the panel the before chat leads to. */
-	readonly actionAfterLabel: string
-	/**
-	 * The phone's control under the before chat, which counts down and then shows the after panel: the
-	 * one sentence that names what the visitor is about to see instead.
-	 */
-	readonly actionSeeGood: string
 	/** The left panel's tab: the agent asked alone. */
 	readonly actionWithoutLabel: string
 	/** The left panel's verdict under its transcript. */
@@ -94,46 +83,20 @@ export interface Dictionary {
 	readonly actionSkillLine: string
 	/** The date the figure was computed, under the agent's answer. */
 	readonly actionProvenance: string
-	/** The control that plays a section's sequence again. */
+	/** The control that plays the demo window's two chats again. */
 	readonly replay: string
 	/** The caption under the output: it is an abridged example, not a live result. */
 	readonly actionExampleNote: string
-	/** The small label above the How it works heading. */
-	readonly howEyebrow: string
-	/** The How it works section's `h2`: the agent owns the presentation, traj owns the logic. */
-	readonly howHeading: string
-	/** The line under that heading: the workflow in one sentence. */
-	readonly howLede: string
-	/** The top layer's name. */
-	readonly howPresentationLabel: string
-	/** Who owns the top layer. */
-	readonly howPresentationOwner: string
-	/** What the top layer is: how the answer is explained. */
-	readonly howPresentationCopy: string
-	/** The three things the agent hands back on the top layer: an answer, an interactive chart, an action. */
-	readonly howPresentationItems: readonly string[]
-	/** The band between the layers: the skills. */
-	readonly howSkillsLabel: string
-	/** What a skill does: tells the agent which commands to run. */
-	readonly howSkillsCopy: string
-	/** The bottom layer's name. */
-	readonly howLogicLabel: string
-	/** Who owns the bottom layer. */
-	readonly howLogicOwner: string
-	/** What the bottom layer is: the arithmetic. */
-	readonly howLogicCopy: string
-	/** What traj computes on the bottom layer, four short chips. */
-	readonly howLogicItems: readonly string[]
-	/** The workflow as four ordered steps, from the visitor's question to the figure shown. */
-	readonly howSteps: readonly string[]
-	/** Who does the work at each of the four steps, in the same order. */
-	readonly howStepActors: readonly string[]
-	/** The two lines of the answer the agent draws back on the top layer. */
-	readonly howOutputChat: readonly string[]
-	/** The words on the action the agent takes in an app the visitor already uses. */
-	readonly howOutputStatus: string
-	/** The app that action is taken in, named as an example and no promise of an integration. */
-	readonly howOutputSource: string
+	/** The app window's New chat control, which opens the chat with the traj skill. */
+	readonly appNewChat: string
+	/** The label above the chats the window's sidebar lists. */
+	readonly appRecents: string
+	/** The title the agent alone's chat carries in the sidebar and above its transcript. */
+	readonly appTitleWithout: string
+	/** The title the chat with the traj skill carries in the sidebar and above its transcript. */
+	readonly appTitleWith: string
+	/** The composer's hint before anything is typed in it. */
+	readonly appPlaceholder: string
 	/** The small label above the Features heading. */
 	readonly featuresEyebrow: string
 	/** The Features section's `h2`. */
@@ -142,7 +105,6 @@ export interface Dictionary {
 	readonly featureTitles: readonly string[]
 	/** Six feature sentences, one per title and in the same order. */
 	readonly featureCopies: readonly string[]
-	readonly cliDocsLink: string
 	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
 	readonly copy: string

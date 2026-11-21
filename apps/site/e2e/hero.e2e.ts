@@ -4,22 +4,22 @@ import { VIEWPORTS } from "./viewports"
 
 test.describe("the hero's height", () => {
 	for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
-		test(`puts the comparison on the landing view and follows it straight with the next section (${viewportName})`, async ({
+		test(`puts the demo window on the landing view and follows it straight with the next section (${viewportName})`, async ({
 			page,
 		}) => {
 			await page.setViewportSize(viewport)
 			await openPage(page, homeOf("en"))
 			const measured = await page.evaluate(() => {
 				const hero = document.querySelector("[data-hero]")
-				const comparison = document.querySelector("[data-action-compare]")
+				const window = document.querySelector("[data-app]")
 				const next = document.querySelector("main > section:not([data-hero])")
 				return {
 					hero: Math.round(hero?.getBoundingClientRect().height ?? 0),
-					comparison: Math.round(comparison?.getBoundingClientRect().top ?? 0),
+					window: Math.round(window?.getBoundingClientRect().top ?? 0),
 					next: Math.round(next?.getBoundingClientRect().top ?? 0),
 				}
 			})
-			expect(measured.comparison, "the comparison starts on the landing view").toBeLessThan(
+			expect(measured.window, "the demo window starts on the landing view").toBeLessThan(
 				viewport.height,
 			)
 			expect(

@@ -1,7 +1,6 @@
 import type { Language } from "../../language/language"
 import { CLEAN_URL, LANGUAGES, languageEntry, languageHomeFile } from "../../language/languages"
 import {
-	DOCS_CLI_PATH,
 	DOCS_PATH,
 	GITHUB_ORG_URL,
 	GITHUB_SKILLS_URL,
@@ -62,15 +61,11 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<p>${dictionary.actionQuestion}</p>`,
 		"</section>",
 		"<section>",
-		`<h2>${dictionary.howHeading}</h2>`,
-		`<a href="${GITHUB_SKILLS_URL}">${dictionary.starOnboarding}</a>`,
-		`<a href="${DOCS_CLI_PATH}">${dictionary.cliDocsLink}</a>`,
-		"</section>",
-		"<section>",
 		`<h2>${dictionary.featuresHeading}</h2>`,
 		"</section>",
 		"</main>",
 		'<footer class="bg-stage text-stage-foreground"><ul>',
+		`<li><a href="${GITHUB_SKILLS_URL}">${dictionary.footerSkillsRepo}</a></li>`,
 		`<li><a href="${SKILLS_LICENCE_URL}">${dictionary.licence}</a></li>`,
 		`<li><a href="${GITHUB_ORG_URL}">${dictionary.org}</a></li>`,
 		"</ul>",

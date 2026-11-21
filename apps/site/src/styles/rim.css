@@ -6,7 +6,8 @@
  * where the fixed header's links sit, and the clearing is wider than the copy: the headline is at most
  * 56 rem wide and the subline and the install window 36 rem, so a 480 px radius holds every viewport, and
  * the phone, whose copy fills the hero, keeps no rim beside it at all. This layer sits in the drift
- * wrapper, which is inset 6%, so the band's 17% is the hero's own 12%.
+ * wrapper, which is inset 6%. The stage is now the copy and the demo window under it (ADR 0022), so the band
+ * runs from a fifth of its height to three quarters of it, beside the window's top, and the clearing sits on the copy.
  */
 .hero-blast-rim {
 	position: absolute;
@@ -16,13 +17,13 @@
 		linear-gradient(
 			to bottom,
 			transparent 0%,
-			transparent 17%,
-			var(--ds-color-foreground) 32%,
-			var(--ds-color-foreground) 60%,
-			transparent 90%
+			transparent 22%,
+			var(--ds-color-foreground) 38%,
+			var(--ds-color-foreground) 54%,
+			transparent 74%
 		),
 		radial-gradient(
-			ellipse 480px 420px at 50% 48%,
+			ellipse 480px 330px at 50% 22%,
 			transparent 0%,
 			transparent 85%,
 			var(--ds-color-foreground) 100%
@@ -31,13 +32,13 @@
 		linear-gradient(
 			to bottom,
 			transparent 0%,
-			transparent 17%,
-			var(--ds-color-foreground) 32%,
-			var(--ds-color-foreground) 60%,
-			transparent 90%
+			transparent 22%,
+			var(--ds-color-foreground) 38%,
+			var(--ds-color-foreground) 54%,
+			transparent 74%
 		),
 		radial-gradient(
-			ellipse 480px 420px at 50% 48%,
+			ellipse 480px 330px at 50% 22%,
 			transparent 0%,
 			transparent 85%,
 			var(--ds-color-foreground) 100%

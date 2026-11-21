@@ -53,19 +53,21 @@ describe("the CopyPrompt component in every Language", () => {
 			expect(textOf(page, button)).toBe(dictionary.copy)
 		})
 
-		it(`stretches the Copy button under the prompt, as its sibling (${language})`, async () => {
+		it(`sets the Copy button and the way out side by side, as two buttons and no card (${language})`, async () => {
 			const page = await render()
-			const prompt = withAttribute(page, "data-install-prompt")[0]
 			const button = withAttribute(page, "data-copy-prompt")[0]
-			if (prompt === undefined) throw new Error("no prompt rendered")
-			if (button === undefined) throw new Error("no copy button rendered")
-			const row = prompt.ancestors.at(-1)
-			expect(row).toBeDefined()
+			const exit = withClass(page, "window-exit")[0]
+			const row = withClass(page, "install-row")[0]
+			if (button === undefined || exit === undefined || row === undefined)
+				throw new Error("the row, its Copy button or its way out is missing")
 			expect(button.ancestors.at(-1)).toBe(row)
-			expect(row?.attributes["class"]).toContain("flex-col")
-			expect(row?.attributes["class"]).toContain("items-stretch")
-			expect(row?.attributes["class"]).not.toContain("flex-row")
-			expect(button.attributes["class"]).not.toContain("shrink-0")
+			expect(exit.ancestors.at(-1)).toBe(row)
+			// The row is a plain wrapper, not a stacked column inside a bordered card.
+			expect(row.attributes["class"]).not.toContain("flex-col")
+			expect(withAttribute(page, "data-slot", "card")).toEqual([])
+			// Both controls are bevelled at the bottom right, as twenty.com's pair is.
+			expect("data-bevel" in button.attributes).toBe(true)
+			expect("data-bevel" in exit.attributes).toBe(true)
 		})
 
 		it(`has a polite status line for the copy result (${language})`, async () => {

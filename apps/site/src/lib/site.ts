@@ -30,11 +30,17 @@ export const ONBOARDING_SKILL_URL = `${SKILLS_RAW_PATH}/traj-onboarding/SKILL.md
 export const INSTALL_PROMPT = `Set up traj: read ${ONBOARDING_SKILL_URL} and follow it.`
 
 /**
- * The command the See it in action section shows the agent running, taken from the CLI's own `traj fi`
+ * The command the demo window shows the agent running, taken from the CLI's own `traj fi`
  * examples. A product fixture, the same text in every Language, and not copy.
  */
 export const FI_DEMO_COMMAND =
 	"traj fi --scenario base --as-of 2026-03-31 --horizon 2066-03-31 --json"
+
+/** The name on the demo window's title bar: the app a visitor's agent runs in, drawn rather than embedded. */
+export const DEMO_APP_NAME = "Claude"
+
+/** What the visitor types before the question to hand it to the traj skill: the skill's own name, the same in every Language. */
+export const DEMO_SKILL_COMMAND = "/traj"
 
 /** The earliest month the demo's survival answer says earned income could stop: the figure it repeats. */
 export const FI_DEMO_DATE = "2041-08-01"
@@ -55,7 +61,7 @@ export const FI_DEMO_OUTPUT: readonly string[] = Object.freeze([
 /** The Docs Portal's path, which the router serves; this repository does not build it. */
 export const DOCS_PATH = "/docs/"
 
-/** The Docs Portal's CLI page, the CLI docs link under the How it works section and in the footer. */
+/** The Docs Portal's CLI page, the CLI docs link in the footer. */
 export const DOCS_CLI_PATH = "/docs/cli/"
 
 /**
@@ -64,7 +70,7 @@ export const DOCS_CLI_PATH = "/docs/cli/"
  */
 export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 
-/** The skills repository: the star menu, the How it works star link and the footer's licence name it. */
+/** The skills repository: the star menu, the footer's own link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
 /** The traj CLI's repository. */

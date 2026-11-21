@@ -6,7 +6,6 @@ import { DOCS_CLI_INSTALL_PATH, INSTALL_PROMPT } from "../lib/site"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
 import Button from "./ui/Button.astro"
-import Card from "./ui/Card.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -18,8 +17,8 @@ const NOTICE_TIMEOUT_MS = 6000
 ---
 
 <div class="relative">
-	<Card variant="panel" data-install-window class="install-cta text-left">
-		<div class="install-row flex flex-col items-stretch gap-3 p-4">
+	<div data-install-window class="install-cta">
+		<div class="install-row">
 			<code
 				data-install-prompt
 				hidden
@@ -40,11 +39,11 @@ const NOTICE_TIMEOUT_MS = 6000
 			>
 				{dictionary.copy}
 			</Button>
-			<a class="window-exit" href={DOCS_CLI_INSTALL_PATH}>
+			<a class="window-exit" data-bevel href={DOCS_CLI_INSTALL_PATH}>
 				{dictionary.cliInstallLink}<Arrow class="window-exit-arrow" />
 			</a>
 		</div>
-	</Card>
+	</div>
 	<div
 		data-copy-toast
 		class="copy-toast rounded-sm border border-border bg-popover text-popover-foreground"

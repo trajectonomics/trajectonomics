@@ -39,12 +39,25 @@ export interface PacedSequence extends Sequence {
 	readonly lineMs: number
 }
 
-/** The most each section's sequence may take, so a copy edit cannot make the page crawl. */
+/** One prompt typed into the composer: when it starts, how long it takes, and when it is sent. */
+export interface Typing {
+	readonly startMs: number
+	readonly typeMs: number
+	/** The moment the prompt leaves the composer and its message lands: the chat's first beat. */
+	readonly sentMs: number
+}
+
+/** The most each chat may take from the first keystroke, so a copy edit cannot make the page crawl. */
 export const SEQUENCE_BOUNDS_MS = Object.freeze({
-	alone: 15_000,
-	withTraj: 15_000,
-	flow: 12_000,
+	alone: 17_000,
+	withTraj: 17_000,
 })
+
+/** The pause before the first key, one key's length, and the hold between the last key and Send. */
+const TYPING = Object.freeze({ startMs: 300, keyMs: 45, holdMs: 450 })
+
+/** How long the Before chat is left alone before New chat is pressed for the visitor, in milliseconds. */
+export const HINT_MS = 2_500
 
 /** The agent alone's exchange: eight messages at reading pace, from the question to the confession. */
 export const COMPARE_ALONE: Sequence = Object.freeze({ beats: 8, beatMs: 1_400, gapMs: 400 })
@@ -62,28 +75,42 @@ export const COMPARE_WITH: PacedSequence = Object.freeze({
 	lineMs: 200,
 })
 
-/** The layer flow's four steps, at two and three-quarter seconds each. */
-export const HOW_FLOW: Sequence = Object.freeze({ beats: 4, beatMs: 2_750, gapMs: 0 })
+/** One prompt typed key by key: its start, its length for `chars` keys, and the moment it is sent. */
+export function typing(chars: number): Typing {
+	const typeMs = Math.max(0, Math.trunc(chars)) * TYPING.keyMs
+	return Object.freeze({
+		startMs: TYPING.startMs,
+		typeMs,
+		sentMs: TYPING.startMs + typeMs + TYPING.holdMs,
+	})
+}
 
-/** The timeline of one sequence, with the CLI's lines spliced in where the message that runs them is. */
-export function sequenceTimeline(sequence: Sequence | PacedSequence): Timeline {
-	if (!("lines" in sequence)) return timeline(sequence.beats, sequence)
+/**
+ * The timeline of one sequence, with the CLI's lines spliced in where the message that runs them is.
+ * `leadMs` is what comes before the first message (the prompt being typed), so every beat starts later.
+ */
+export function sequenceTimeline(sequence: Sequence | PacedSequence, leadMs = 0): Timeline {
+	if (!("lines" in sequence)) return timeline(sequence.beats, sequence, leadMs)
 	const messages = Array.from({ length: sequence.beats }, () => sequence.beatMs)
 	const lines = Array.from({ length: sequence.lines }, () => sequence.lineMs)
 	const at = sequence.linesAt + 1
-	return fromLengths([...messages.slice(0, at), ...lines, ...messages.slice(at)], sequence.gapMs)
+	return fromLengths(
+		[...messages.slice(0, at), ...lines, ...messages.slice(at)],
+		sequence.gapMs,
+		leadMs,
+	)
 }
 
 /** The timeline of `count` beats, each shaped alike: when each starts and ends, and the total. */
-export function timeline(count: number, shape: Omit<Sequence, "beats">): Timeline {
+export function timeline(count: number, shape: Omit<Sequence, "beats">, leadMs = 0): Timeline {
 	const lengths = Array.from({ length: Math.max(0, Math.trunc(count)) }, () => shape.beatMs)
-	return fromLengths(lengths, shape.gapMs)
+	return fromLengths(lengths, shape.gapMs, leadMs)
 }
 
 /** The timeline of beats of the given lengths, each a gap after the one before it: the total is the last end. */
-function fromLengths(lengths: readonly number[], gapMs: number): Timeline {
+function fromLengths(lengths: readonly number[], gapMs: number, leadMs: number): Timeline {
 	const beats: Beat[] = []
-	let atMs = 0
+	let atMs = Math.max(0, leadMs)
 	for (const beatMs of lengths) {
 		beats.push(Object.freeze({ startMs: atMs, endMs: atMs + beatMs }))
 		atMs += beatMs + gapMs

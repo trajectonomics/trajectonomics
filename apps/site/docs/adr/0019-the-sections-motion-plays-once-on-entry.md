@@ -80,3 +80,10 @@ loses their place every time the panel changes); a CSS-only "follow the newest m
 order or by making its top unreachable); and docking the phone's step card lower, which the owner had already
 judged invisible.
 
+## Amendment (2026-11-21, owner): the panels and the flow are gone
+
+[ADR 0022](./0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md) replaces the two compare
+panels with one app window that plays its two chats in turn, and removes How it works with its layer flow. What this
+record says about those two sections, the phone's one-panel stage and the control slot under the panels, and the one
+named layout animation, no longer describes the page; the Site now animates only `opacity` and `transform`. The static
+state, the media-query gate, the timeline as data, the reading pace and the Replay control stand.

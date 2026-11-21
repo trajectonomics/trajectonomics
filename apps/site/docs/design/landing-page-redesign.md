@@ -169,3 +169,11 @@ as one unique control.
 
 Thai copy for every new string is a first draft in `th-sections.ts`; it was not read by a Thai speaker.
 
+## 9. Fourth pass: twenty.com's hero, and the demo as an app window (ADR 0022)
+
+The owner did not like the hero and asked for twenty.com's structure with one difference, the demo. The hero is now the
+pill, the headline, the subline and two bevelled buttons, then one wide window drawn as the visitor's agent app: a
+sidebar with New chat and Recents, a main pane with one chat at a time. The agent alone answers badly first, then New
+chat is pressed and the chat with the traj skill plays; the Before/After panels, the phone's tab slot and the whole
+**How it works** section (section 8) are gone. The pixel field is now the ground of the whole stage and runs down the
+window's two sides.

@@ -36,8 +36,6 @@ export const THAI: LanguageEntry = Object.freeze({
 		starMenuLabel: "ดาวบน GitHub",
 		starMenuGroupLabel: "รีโป",
 		starMenuAllRepos: "รีโปทั้งหมด",
-		starOnboarding: "ให้ดาว traj-onboarding",
-		cliDocsLink: "อ่านเอกสาร CLI",
 		cliInstallLink: "ติดตั้ง CLI โดยตรง",
 		copy: "คัดลอกพรอมต์ให้เอเจนต์ของคุณ",
 		copied: "คัดลอกพรอมต์แล้ว",

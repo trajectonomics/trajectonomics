@@ -49,22 +49,30 @@ for (const underTest of HOMES) {
 		await expect(page.locator("[data-hero-accent]")).toBeVisible()
 	})
 
-	test(`${underTest.name}: both transcripts and the flow are whole with no script`, async ({
+	test(`${underTest.name}: both chats are whole, one above the other, with no script`, async ({
 		page,
 	}) => {
 		await visit(page, underTest)
 		const dictionary = dictionaryFor(underTest.language)
-		const alone = page.locator('.compare-panel[data-side="without"]')
-		const guided = page.locator('.compare-panel[data-side="with"]')
+		const alone = page.locator('.app-chat[data-chat="without"]')
+		const guided = page.locator('.app-chat[data-chat="with"]')
 		await expect(alone.locator(".chat-message")).toHaveCount(8)
 		await expect(alone).toContainText(dictionary.actionConfession)
+		await expect(alone).toContainText(dictionary.actionWithoutNote)
 		await expect(guided.locator(".chat-message")).toHaveCount(7)
 		await expect(guided).toContainText(dictionary.actionProvenance)
-		await expect(page.locator(".how-step")).toHaveCount(4)
-		await expect(page.locator(".how-output-chart")).toContainText("2041")
-		// No section carries a motion state, and no control offers a replay that cannot happen.
-		await expect(page.locator("[data-motion], [data-step]")).toHaveCount(0)
-		await expect(page.locator("[data-replay]").first()).toBeHidden()
+		await expect(guided).toContainText(dictionary.actionWithNote)
+		// Both are laid out at once, so the second starts below the first.
+		const [first, second] = await Promise.all([alone.boundingBox(), guided.boundingBox()])
+		expect(second?.y ?? 0).toBeGreaterThan((first?.y ?? 0) + (first?.height ?? 0) - 1)
+		// No section carries a motion state or a stage, and no control offers what cannot happen.
+		await expect(page.locator("[data-motion], [data-stage], [data-hint]")).toHaveCount(0)
+		await expect(page.locator("[data-app-replay]")).toBeHidden()
+		for (const control of await page.locator("[data-app] button:not([hidden])").all()) {
+			await expect(control).toBeDisabled()
+		}
+		await expect(page.locator(".app-composer").first()).toBeHidden()
+		await expect(page.locator("[data-app-side]")).toHaveAttribute("aria-hidden", "true")
 	})
 
 	test(`${underTest.name}: the Theme the HTML ships is styled without JavaScript`, async ({

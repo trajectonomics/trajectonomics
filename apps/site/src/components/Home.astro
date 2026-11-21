@@ -6,7 +6,6 @@ import type { Language } from "../lib/language/language"
 import { dictionaryFor } from "../lib/language/languages"
 import Features from "./Features.astro"
 import Hero from "./Hero.astro"
-import HowItWorks from "./HowItWorks.astro"
 
 interface Props {
 	readonly language: Language
@@ -19,6 +18,5 @@ const dictionary = dictionaryFor(language)
 
 <Layout language={language} title={dictionary.documentTitle} description={dictionary.description} indexed={true}>
 	<Hero dictionary={dictionary} />
-	<HowItWorks dictionary={dictionary} />
 	<Features dictionary={dictionary} />
 </Layout>

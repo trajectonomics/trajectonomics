@@ -46,8 +46,11 @@ describe("the strings the two conversations need", () => {
 			"actionData",
 			"actionProvenance",
 			"replay",
-			"howOutputStatus",
-			"howOutputSource",
+			"appNewChat",
+			"appRecents",
+			"appTitleWithout",
+			"appTitleWith",
+			"appPlaceholder",
 		] as const
 		for (const { language, dictionary } of LANGUAGES) {
 			for (const key of keys) {
@@ -64,14 +67,5 @@ describe("the strings the two conversations need", () => {
 	it("names the one control the sections add, in every Language", () => {
 		expect(dictionaryFor("en").replay).toBe("Replay")
 		expect(dictionaryFor("th").replay).not.toBe("Replay")
-	})
-
-	it("names the three outputs the agent hands back, in place of the four names", () => {
-		const english = dictionaryFor("en")
-		expect(english.howPresentationItems).toEqual(["Answer", "Interactive chart", "Actions"])
-		expect(english.howStepActors[0]).toContain("you")
-		expect(english.howStepActors[3]).toContain("traj")
-		expect(english.howOutputStatus).toBe("On track")
-		expect(english.howOutputSource).toBe("Google Tasks")
 	})
 })

@@ -66,25 +66,15 @@ describe("the Dictionary of every Language", () => {
 		expect(english.starMenuLabel).toBe("GitHub stars")
 		expect(english.starMenuGroupLabel).toBe("Repositories")
 		expect(english.starMenuAllRepos).toBe("All repositories")
-		expect(english.starOnboarding).toBe("Star traj-onboarding")
-		expect(english.cliDocsLink).toBe("Read the CLI docs")
 		expect(english.copied).toBe("Prompt copied")
 	})
 
-	it("writes the two guesses, the four steps and the six features in every Language", () => {
+	it("writes the two guesses and the six features in every Language", () => {
 		for (const { language, dictionary } of LANGUAGES) {
 			expect({ language, guesses: dictionary.actionGuesses.length }).toEqual({
 				language,
 				guesses: 2,
 			})
-			expect({ language, steps: dictionary.howSteps.length }).toEqual({ language, steps: 4 })
-			expect({ language, actors: dictionary.howStepActors.length }).toEqual({ language, actors: 4 })
-			expect({ language, presentation: dictionary.howPresentationItems.length }).toEqual({
-				language,
-				presentation: 3,
-			})
-			expect({ language, chat: dictionary.howOutputChat.length }).toEqual({ language, chat: 2 })
-			expect({ language, logic: dictionary.howLogicItems.length }).toEqual({ language, logic: 4 })
 			expect({ language, titles: dictionary.featureTitles.length }).toEqual({ language, titles: 6 })
 			expect({ language, copies: dictionary.featureCopies.length }).toEqual({ language, copies: 6 })
 		}
@@ -99,19 +89,37 @@ describe("the Dictionary of every Language", () => {
 		}
 	})
 
-	it("names the three sections the owner asked for, in English", () => {
-		const english = dictionaryFor("en")
-		expect(english.actionHeading).toBe("See it in action")
-		expect(english.howHeading).toBe("Agents own the presentation. traj owns the logic.")
-		expect(english.howPresentationOwner).toBe("Owned by your agent")
-		expect(english.howLogicOwner).toBe("Owned by traj")
+	it("retires the How it works section's strings, because the page has no such section", () => {
+		for (const { language, dictionary } of LANGUAGES) {
+			const survivors = Object.keys(dictionary).filter((key) => /^how[A-Z]/.test(key))
+			expect({ language, survivors }).toEqual({ language, survivors: [] })
+			expect({ language, onboarding: "starOnboarding" in dictionary }).toEqual({
+				language,
+				onboarding: false,
+			})
+		}
 	})
 
-	it("names the two sides of the comparison before and after, in both Languages", () => {
-		expect(dictionaryFor("en").actionBeforeLabel).toBe("Before")
-		expect(dictionaryFor("en").actionAfterLabel).toBe("After")
-		expect(dictionaryFor("th").actionBeforeLabel).toBe("ก่อน")
-		expect(dictionaryFor("th").actionAfterLabel).toBe("หลัง")
+	it("names the demo window's own controls and chats, in both Languages", () => {
+		const english = dictionaryFor("en")
+		expect(english.actionHeading).toBe("See it in action")
+		expect(english.appNewChat).toBe("New chat")
+		expect(english.appRecents).toBe("Recents")
+		expect(dictionaryFor("th").appNewChat).not.toBe(english.appNewChat)
+		for (const { language, dictionary } of LANGUAGES) {
+			// Two chats are listed side by side, so their titles must tell them apart.
+			expect({ language, apart: dictionary.appTitleWithout !== dictionary.appTitleWith }).toEqual({
+				language,
+				apart: true,
+			})
+			for (const key of ["appPlaceholder", "appTitleWithout", "appTitleWith"] as const) {
+				expect({ language, key, written: dictionary[key].trim().length > 0 }).toEqual({
+					language,
+					key,
+					written: true,
+				})
+			}
+		}
 	})
 
 	it("names the CTA's Copy control for the visitor's agent, in both Languages", () => {

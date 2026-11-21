@@ -12,10 +12,10 @@ interface ExpectedLink {
 	readonly href: string
 }
 
-/** The named links the How it works section and footer show; the Docs and skills links are pinned by `checkPageLinks`. */
+/** The named links the footer shows; the Docs and skills links are pinned by `checkPageLinks`. */
 function expectedLinks(dictionary: Dictionary): readonly ExpectedLink[] {
 	return [
-		{ text: dictionary.starOnboarding, href: GITHUB_SKILLS_URL },
+		{ text: dictionary.footerSkillsRepo, href: GITHUB_SKILLS_URL },
 		{ text: dictionary.licence, href: SKILLS_LICENCE_URL },
 		{ text: dictionary.org, href: GITHUB_ORG_URL },
 	]

@@ -1,4 +1,4 @@
-/* The CLI's window in See it in action (ADR 0012): the command and its abridged JSON on the stage surface. */
+/* The CLI's window in the demo window (ADR 0012, ADR 0022): the command and its abridged JSON on the stage surface. */
 
 .terminal {
 	min-width: 0;

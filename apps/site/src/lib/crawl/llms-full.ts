@@ -1,12 +1,6 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
-import {
-	FI_DEMO_COMMAND,
-	FI_DEMO_DATE,
-	FI_DEMO_OUTPUT,
-	INSTALL_PROMPT,
-	SKILLS_LICENCE_URL,
-} from "../site"
+import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
 /** The full Answer engine file's built path, relative to the Worker's assets root. */
@@ -57,20 +51,6 @@ const WITH_TRAJ = [
 	line(dictionary.actionAgent, `${dictionary.actionAnswer} (${dictionary.actionProvenance})`),
 ]
 
-/** The three things the agent hands back on the presentation layer, drawn under their own names. */
-const OUTPUTS = [
-	`- ${dictionary.howPresentationItems[0]}: ${dictionary.howOutputChat.join(" / ")}`,
-	`- ${dictionary.howPresentationItems[1]}: ${FI_DEMO_DATE.slice(0, 4)}`,
-	`- ${dictionary.howPresentationItems[2]}: ${dictionary.howOutputStatus} (${dictionary.howOutputSource})`,
-]
-
-/** The three layers, named with the owner and the sentence the page gives each. */
-const LAYERS = [
-	`**${dictionary.howPresentationLabel}** — ${dictionary.howPresentationOwner}: ${dictionary.howPresentationCopy}`,
-	`**${dictionary.howSkillsLabel}**: ${dictionary.howSkillsCopy}`,
-	`**${dictionary.howLogicLabel}** — ${dictionary.howLogicOwner}: ${dictionary.howLogicCopy}`,
-]
-
 /** Every feature, its title and its sentence, in the order the page lists them. */
 const FEATURES = dictionary.featureTitles.map(
 	(title, index) => `- **${title}**: ${dictionary.featureCopies[index] ?? ""}`,
@@ -95,17 +75,6 @@ export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.des
 		...WITH_TRAJ,
 		"",
 		dictionary.actionExampleNote,
-	]),
-	section(dictionary.howHeading, [
-		dictionary.howLede,
-		"",
-		...dictionary.howSteps.map(
-			(step, index) => `${index + 1}. ${step} — ${dictionary.howStepActors[index] ?? ""}`,
-		),
-		"",
-		...LAYERS,
-		"",
-		...OUTPUTS,
 	]),
 	section(dictionary.featuresHeading, FEATURES),
 	section("Install", [INSTALL_PROMPT]),

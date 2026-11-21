@@ -6,16 +6,16 @@ import { heroCodes, heroHome } from "./testing/hero"
 
 const DICTIONARY = dictionaryFor("en")
 
-describe("the links of the How it works section and the footer", () => {
+describe("the named links of the footer", () => {
 	it("passes every Language home, whose named links go where they say", () => {
 		expect(heroCodes(checkSiteLinks)).toEqual([])
 	})
 
-	it("fails a star link that goes to the organisation instead of the skills repository", () => {
+	it("fails a skills link that goes to the organisation instead of the skills repository", () => {
 		const page = heroHome("en")
 		const content = page.content.replace(
-			`<a href="${GITHUB_SKILLS_URL}">${DICTIONARY.starOnboarding}</a>`,
-			`<a href="${GITHUB_ORG_URL}">${DICTIONARY.starOnboarding}</a>`,
+			`<a href="${GITHUB_SKILLS_URL}">${DICTIONARY.footerSkillsRepo}</a>`,
+			`<a href="${GITHUB_ORG_URL}">${DICTIONARY.footerSkillsRepo}</a>`,
 		)
 		expect(heroCodes(checkSiteLinks, { path: page.path, content })).toEqual(["LINK_HREF_MISMATCH"])
 	})
