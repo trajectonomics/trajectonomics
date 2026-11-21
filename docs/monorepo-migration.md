@@ -32,7 +32,14 @@ What goes away after the move:
 5. **Also not moved:** `copy-engine` (already moved out), `cicd` (config lives in this repo instead;
    only the release scripts it holds, `version.ts` and `release-plan.ts`, get copied in during phase 5),
    `factory` (becomes a skill, a separate task after the migration), and `technical-template`.
-6. **`design-system` becomes `packages/brand`**, a public npm package built for white-label themes (§2a, §2b).
+6. **`design-system` becomes `packages/brand`**, a package in this repo built for white-label themes (§2a, §2b).
+   It is **not published to npm**.
+7. **Only two npm packages:** `@trajectonomics/core` (money, ledger, tax and sim as subpath exports)
+   and `@trajectonomics/cli`. Then `money`, `ledger`, `tax`, `sim` and the four `design-system*` packages get
+   `npm deprecate`d with a pointer to the replacement. Versions already published keep installing. (§2c)
+8. **White-label goes through private mirror repos** (§2b), not through npm.
+9. **Docs:** remove the "Build on Trajectonomics" section and add a contributor guide aimed at people
+   who contribute tax rules. (§2d)
 
 ### How history is kept
 
@@ -61,11 +68,12 @@ apps/
   blog/              <- blog          (worker, not deployed yet)
   cli/               <- cli           (npm @trajectonomics/cli + 5 binaries)
 packages/
-  money/             <- money         (@trajectonomics/money)
-  ledger/            <- ledger-core   (@trajectonomics/ledger)
-  tax/               <- tax-core      (@trajectonomics/tax)
-  sim/               <- sim-core      (@trajectonomics/sim)
-  brand/             <- design-system  (@trajectonomics/brand, white-label themes, §2b)
+  core/              @trajectonomics/core, published (§2c)
+    money/           <- money         (imported to packages/money in phase 1, git mv'd here)
+    ledger/          <- ledger-core
+    tax/             <- tax-core      (the main area for outside contributors, §2d)
+    sim/             <- sim-core
+  brand/             <- design-system (white-label themes, not published, §2b)
 skills/
   customer/          <- skills           (the published agent skills)
   internal/          <- internal-skills
@@ -97,7 +105,7 @@ system with its own npm releases. About 200 lines of Svelte, plus Storybook, Vit
 setup, have no consumer.
 
 **Decision (2026-11-21):** import design-system's history into `packages/brand` and make it one
-**public, npm-published** package, `@trajectonomics/brand`. Drop the Svelte package and Storybook;
+package in this repo, **not published to npm**. Drop the Svelte package and Storybook;
 they stay readable in the archived repo. Core and theme exist so we can add themes and white-label
 the product for other companies, and `brand` keeps that ability and makes it easier.
 
@@ -134,21 +142,87 @@ packages/brand/
 - **Picking a brand in an app:** site and docs read `BRAND` (default `trajectonomics`) at build time
   and import that brand's CSS and assets through one alias, `@brand/*`. A white-label deploy is
   then the same app built with `BRAND=acme`: one more Cloudflare worker, no code fork.
-- **Brands outside this repo:** a company can `bun add @trajectonomics/brand`, call `defineTheme`
-  with its own tokens and `themeToCss` to get its CSS, all without a pull request here.
-- **Private customer brands:** this repo is public, so a brand folder that a customer wants kept
-  private belongs in a private repo that depends on `@trajectonomics/brand`. The same folder layout
-  works there.
-- **npm:** `@trajectonomics/brand` is a new name. The first version gets published by hand once,
-  then trusted publishing is set up (the same as any new package). The four old `design-system*`
-  packages get `npm deprecate` with a pointer to `@trajectonomics/brand`.
+- **White-label for a company = a private mirror of this repo.** GitHub won't make a private fork of
+  a public repo, so: create a private repo `trajectonomics/<company>`, push this repo into it, and
+  add this repo as `upstream` (the same setup `agentic-inbox` has with `cloudflare/agentic-inbox`).
+  - The private repo **only adds**: `packages/brand/brands/<company>/` and that company's worker
+    config. Any change to shared code is made here, in public, and pulled down.
+  - Keeping to that makes syncing a conflict-free `git merge upstream/main`. A scheduled workflow in
+    the private repo does it every day and opens a PR if the merge does not apply cleanly.
+  - The private repo deploys its own Cloudflare worker built with `BRAND=<company>`.
+
+### 2c. One published package: `@trajectonomics/core`
+
+Outside this repo, only `cli` and `docs` import money, ledger, tax and sim (about 100 import sites).
+npm shows about 2–4k downloads a month each, and the CLI itself only 681, so this is mostly our own
+CI and Cloudflare builds. Five packages with their own versions and trusted publishers cost more
+than they give.
+
+- `packages/core/` with subpath exports: `@trajectonomics/core/money`, `/ledger`, `/tax`,
+  `/tax/th`, `/tax/us`, `/sim`. The four folders keep their source and tests. Each one's history
+  comes in through the phase 1 import, then a `git mv` (history still shows with `git log --follow`).
+- **Dependency direction checked by lint:** `money` ← `ledger`, `tax` ← `sim`. Nothing imports
+  upward. Each folder stays pure (no I/O, no clock, no unseeded randomness) as the old packages
+  promised. A Biome `noRestrictedImports` rule per folder, or a small script, enforces both.
+- The sim↔tax cycle (§3) becomes imports between two folders in one package, and only the
+  direction rule needs to hold.
+- `cli` and `docs` change imports: `@trajectonomics/sim` → `@trajectonomics/core/sim`, and so on.
+- Release: two published packages, `core` (tags `core-v*`) and `cli` (tags `cli-v*`). Old tags
+  imported from money/ledger/tax/sim keep their prefixes as history. The `core` version starts at `0.3.0`,
+  higher than any old package's `latest`, so nobody mistakes the two.
+
+### 2d. Docs: drop "Build on Trajectonomics", add a tax contributor guide
+
+`apps/docs` today has two sections: `cli` (for users) and `developers`, titled
+"Build on Trajectonomics", with one page per package (sim-core, ledger-core, tax-core, design-system).
+With only `core` and `cli` published and no developer audience to serve, that section goes.
+
+- **Remove** `src/content/docs/developers/**` and its sidebar entry. Add **301 redirects** in the docs
+  worker from `/docs/developers/*` to `/docs/contribute/` (or to `/docs/contribute/tax/` for
+  `tax-core` pages), so old links and search results still land somewhere.
+- **Remove** `sync-release.yml` (the upstream-release dispatch from cicd). The docs now build against
+  the source in the same commit.
+- **Add a `contribute` section** with two pages:
+  - `/docs/contribute/`: a short general guide (clone, `bun install`, `bun run check`, PR title scope).
+  - `/docs/contribute/tax/`: **the main page.** See the outline below.
+- **One source, no copies:** the tax guide's text lives in `packages/core/tax/CONTRIBUTING.md`
+  (GitHub shows it to people browsing the code), and the docs page imports that file. A root
+  `CONTRIBUTING.md` covers the general flow and links to the tax guide first.
+
+**Outline of the tax contributor guide.** Every rule comes from how tax-core already works:
+
+1. **Who this is for:** accountants, tax practitioners and developers who know a jurisdiction's
+   rules. You do not need to know the rest of the codebase.
+2. **What you can contribute**, from easiest to hardest:
+   - report a wrong figure (an issue template that requires a link to the official source),
+   - update a figure for a new tax year (brackets, allowances, caps),
+   - add worked examples from official documents to the test corpus,
+   - add a US state,
+   - add a new country.
+3. **The source rule.** Every statutory figure cites an official document. The citation is a row in
+   `references/<jurisdiction>/SOURCES.md` (URL, local file name, date read, result).
+   `bun run check:th-sources` fails when a parameter has no row or a row has no parameter. Raw
+   documents are git-ignored. Only the manifest is committed.
+4. **How the code is organised:** parameters (data) are kept apart from stages (logic). Money is
+   integer minor units with statutory rounding and clamping (ADR-0002). Fields are typed and stages
+   are isolated (ADR-0003). Each jurisdiction is a subpath export (ADR-0001). Link the ADRs, don't copy them.
+5. **Walkthroughs:** (a) a new Thai tax year, from the Revenue Department source to a parameters
+   change, a SOURCES row and a corpus test; (b) a new country, from a folder skeleton to the
+   `@trajectonomics/core/tax/<cc>` export and a first source-backed test.
+6. **Checking your change:** `bun run check --filter=@trajectonomics/core`. What each failure means:
+   hardcoded-string check, source check, coverage floor, README claims check.
+7. **Review:** PR title `feat(tax): ...` or `fix(tax): ...`. A reviewer re-checks every changed
+   figure against its cited source. `CODEOWNERS` routes `packages/core/tax/**` to the tax reviewers.
+
+Also add to `.github/`: issue templates `tax-wrong-figure.yml`, `tax-new-year.yml` and
+`tax-new-jurisdiction.yml` (each with a required "official source URL" field), a `tax` label, and
+`CODEOWNERS`.
 
 ## 3. Known problems to fix during the move
 
 - **Cycle between `sim` and `tax`.** `sim` has a peer dependency on `tax`, and `tax` has a dev
-  dependency on `sim` (for its tests). Turborepo rejects cyclic task graphs. Fix: move the tax tests
-  that use `sim` into `packages/sim` (or into a new `packages/integration-tests`). Then `tax` stops
-  depending on `sim` entirely.
+  dependency on `sim` (for its tests). Merging them into `core` (§2c) solves it: tax tests that use
+  sim move to `sim/` so the direction rule `tax` ← `sim` holds.
 - **Wrong package name.** `blog` still calls itself `@trajectonomics/technical-template`. Rename it
   to `@trajectonomics/blog` (private).
 - **Different Node engine.** `site` requires Node `>=22.23.4`; everything else requires `>=20`. The root
@@ -184,8 +258,8 @@ package folder):
 - push to main → for each publishable package whose folder changed, publish an alpha (dist-tag `alpha`).
 - `workflow_dispatch` with a `package` and `bump` → stable release, tag `<name>-vX.Y.Z`, GitHub
   release named after the package.
-- Publishable packages: money, ledger, tax, sim, cli, brand.
-- Publish order follows the dependency graph (money → ledger/tax → sim → cli). `workspace:*` gets
+- Publishable packages: `core` and `cli` only.
+- Publish order: core, then cli. `workspace:*` gets
   replaced by the real version at publish time (`bun publish` does this).
 - **Old tags:** imported tags are renamed with the package prefix (`v0.2.0` in sim-core →
   `sim-v0.2.0`), so `version.ts` keeps counting from the last release.
@@ -207,7 +281,7 @@ each repo. Point each worker at this repo:
 | Worker | Root directory | Build command | Deploy command | Build watch paths |
 |---|---|---|---|---|
 | `site` | `apps/site` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/site/**`, `packages/brand/**`, `bun.lock` |
-| `docs` | `apps/docs` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/docs/**`, `packages/**`, `bun.lock` |
+| `docs` | `apps/docs` | `bun install --frozen-lockfile && bun run build` | `bunx wrangler deploy` | `apps/docs/**`, `packages/core/**`, `packages/brand/**`, `bun.lock` |
 | `trajectonomics-web-router` | stays in its own repo, unchanged | | | |
 
 Worker names do not change, so the router's service bindings (`DOCS` → `docs`, `HOME` → `site`) keep
@@ -227,10 +301,12 @@ Each phase is one PR into `main`. The agent stops after each phase for review.
 | 1 | **Import with history**: script `tooling/migrate/import.sh` runs `git filter-repo --to-subdirectory-filter <dest> --tag-rename ':<prefix>-'` on a fresh clone of each repo, then `git merge --allow-unrelated-histories`. No content edits. | DeepSeek V4.1 Flash | `git log --follow` works for a file in each package; tag count matches the source repos |
 | 2 | **Workspace wiring**: root `package.json`, `turbo.json`, root biome/tsconfig (from tooling's presets), drop the `@trajectonomics/tooling` dependency, rename blog, internal deps → `workspace:*`, break the sim↔tax cycle, delete duplicate configs, and add design-system to the import (`packages/brand`) | DeepSeek V4 Pro | `bun install && turbo run check build test` passes from a clean clone |
 | 2b | **Brand package**: restructure `packages/brand` per §2b, delete the Svelte package and Storybook, switch site and docs to `@trajectonomics/brand` with `BRAND` selection | DeepSeek V4 Pro, reviewed by Opus | site and docs build pixel-identical with `BRAND=trajectonomics`; a throwaway `brands/example` passes the tests without touching any other file |
+| 2c | **Core package**: `git mv` money/ledger/tax/sim into `packages/core/`, subpath exports, import-direction lint, update cli and docs imports | DeepSeek V4 Pro | `bun run check` passes; `npm pack --dry-run` of core shows every subpath; a test import that goes upward fails lint |
 | 3 | **Agent docs and skills**: merge `AGENTS.md`/`CLAUDE.md`/`CODING_STANDARDS.md`/`GLOSSARY.md` into the root, one skills lock | DeepSeek V4.1 Flash | No duplicate root skill dirs; `bun run skills:check` passes |
+| 3b | **Docs and contributing**: remove the developers section and add redirects, add the contribute section, the tax guide (§2d outline), issue templates, CODEOWNERS | DeepSeek V4 Pro, reviewed by Opus | Old `/docs/developers/*` URLs answer 301; the tax guide's walkthrough works step by step on a clean clone |
 | 4 | **CI**: `ci.yml` + `pr-title.yml` with turbo affected; delete per-package workflows | DeepSeek V4 Pro | A PR touching only `packages/money` runs only money and its dependents |
 | 5 | **Release**: generalized `release.yml`, CLI binaries, installer tag lookup | DeepSeek V4 Pro, reviewed by Opus | Dry-run publish (`npm publish --dry-run`) of every package in dependency order |
-| 6 | **Cutover**: you update the npm Trusted Publishers and Cloudflare projects. The agent then opens archive-notice PRs in the old repos | You + DeepSeek Flash | A stable release of `money` from here; site and docs deploy from here |
+| 6 | **Cutover**: you publish `@trajectonomics/core` once by hand (a new name), set its trusted publisher, move `cli`'s trusted publisher here, deprecate the old npm packages, and update the Cloudflare projects. The agent then opens archive-notice PRs in the old repos | You + DeepSeek Flash | A stable release of `money` from here; site and docs deploy from here |
 | 7 | **Archive** the old repos | You | — |
 
 During phases 1–5 the old repos stay live. Freeze merges into them from the start of phase 1 until
