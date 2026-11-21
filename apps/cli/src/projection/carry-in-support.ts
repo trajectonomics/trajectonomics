@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs"
 import { join } from "node:path"
-import type { TallyBasis } from "@trajectonomics/sim"
-import { emitThLevy } from "@trajectonomics/tax/th"
+import type { TallyBasis } from "@trajectonomics/core/sim"
+import { emitThLevy } from "@trajectonomics/core/tax/th"
 import { scenario } from "../scenario-test-support"
 import { projectionHome } from "./testing"
 

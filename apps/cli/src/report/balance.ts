@@ -1,4 +1,4 @@
-import { balances, netWorth, trialBalance } from "@trajectonomics/ledger"
+import { balances, netWorth, trialBalance } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"

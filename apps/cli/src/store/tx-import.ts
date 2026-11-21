@@ -1,4 +1,4 @@
-import { LedgerValidationError } from "@trajectonomics/ledger"
+import { LedgerValidationError } from "@trajectonomics/core/ledger"
 import { type AppError, fail, isAppError } from "../errors"
 import type { Ctx } from "./context"
 import { write } from "./guard"

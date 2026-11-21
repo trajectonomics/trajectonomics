@@ -1,4 +1,4 @@
-import { validateTransaction } from "@trajectonomics/ledger"
+import { validateTransaction } from "@trajectonomics/core/ledger"
 import { type AppError, fail } from "../errors"
 import { chartOf } from "./chart"
 import type { Ctx } from "./context"

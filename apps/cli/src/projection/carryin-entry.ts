@@ -1,4 +1,4 @@
-import type { MonthDay } from "@trajectonomics/sim"
+import type { MonthDay } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
 import type { JsonRecord } from "../scenario/tax/json"
 import { records as objects } from "../scenario/tax/json"

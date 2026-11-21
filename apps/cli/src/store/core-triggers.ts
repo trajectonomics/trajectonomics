@@ -7,7 +7,7 @@ import {
 	profitAndLoss,
 	reverse,
 	simple,
-} from "@trajectonomics/ledger"
+} from "@trajectonomics/core/ledger"
 import { guard } from "./guard"
 import { PERSONAL_ENTITY_ID } from "./ids"
 

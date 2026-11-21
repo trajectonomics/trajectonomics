@@ -1,4 +1,4 @@
-import { amend, LedgerValidationError, type Transaction } from "@trajectonomics/ledger"
+import { amend, LedgerValidationError, type Transaction } from "@trajectonomics/core/ledger"
 import { type AppError, isAppError } from "../errors"
 import { yearFailure } from "../year"
 import { chartOf } from "./chart"

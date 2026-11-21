@@ -1,4 +1,4 @@
-import { check, type Problem } from "@trajectonomics/sim"
+import { check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,

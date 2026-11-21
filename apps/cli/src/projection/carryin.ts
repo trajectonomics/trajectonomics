@@ -1,4 +1,4 @@
-import type { TallyBasis } from "@trajectonomics/sim"
+import type { TallyBasis } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import { parseDocument, readDocument } from "../document"
 import { type AppError, isAppError } from "../errors"

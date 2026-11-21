@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { emitThLevy } from "@trajectonomics/tax/th"
+import { emitThLevy } from "@trajectonomics/core/tax/th"
 import { projection, projectionHome } from "./projection/testing"
 import { runBody } from "./projection-run-support"
 import type { ScenarioBody } from "./scenario-test-support"

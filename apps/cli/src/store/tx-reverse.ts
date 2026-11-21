@@ -1,4 +1,4 @@
-import { reverse, type Transaction } from "@trajectonomics/ledger"
+import { reverse, type Transaction } from "@trajectonomics/core/ledger"
 import { chartOf } from "./chart"
 import type { Ctx } from "./context"
 import { postingsOf } from "./tx-content"

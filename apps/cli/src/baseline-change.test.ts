@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import type { AnnualRollup, Projection } from "@trajectonomics/sim"
-import { project } from "@trajectonomics/sim"
+import type { AnnualRollup, Projection } from "@trajectonomics/core/sim"
+import { project } from "@trajectonomics/core/sim"
 import { SIM_SCENARIO, SIM_TIMELINE } from "./baseline/fixture"
 import { baselineFrom, goldenJson, type Shown, show, withOne } from "./baseline/testing"
 import { FIXTURE_ACCOUNTS, FIXTURE_AS_OF, fixtureHome, seededHome } from "./ledger-fixture"

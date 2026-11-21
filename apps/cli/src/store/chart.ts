@@ -1,5 +1,5 @@
-import type { AccountInput, AccountType, ChartOfAccounts } from "@trajectonomics/ledger"
-import { createChartOfAccounts, LedgerValidationError } from "@trajectonomics/ledger"
+import type { AccountInput, AccountType, ChartOfAccounts } from "@trajectonomics/core/ledger"
+import { createChartOfAccounts, LedgerValidationError } from "@trajectonomics/core/ledger"
 import type { Ctx } from "./context"
 
 export type ChartRow = { id: string; type: AccountType; currency: string; parentId: string | null }

@@ -1,5 +1,5 @@
-import type { ISODate } from "@trajectonomics/ledger"
-import { LedgerValidationError, parseISODate } from "@trajectonomics/ledger"
+import type { ISODate } from "@trajectonomics/core/ledger"
+import { LedgerValidationError, parseISODate } from "@trajectonomics/core/ledger"
 import type { AppError } from "./errors"
 import { ledgerFailure } from "./store"
 import { yearFailure } from "./year"

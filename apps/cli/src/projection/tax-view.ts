@@ -1,4 +1,4 @@
-import type { LevyReport } from "@trajectonomics/sim"
+import type { LevyReport } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import { dateField, moneyField, moneyOf } from "./money"
 

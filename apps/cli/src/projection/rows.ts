@@ -1,4 +1,4 @@
-import type { AnnualRollup, ProjectionRow, RunsOut } from "@trajectonomics/sim"
+import type { AnnualRollup, ProjectionRow, RunsOut } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"
 import { addDays } from "./dates"

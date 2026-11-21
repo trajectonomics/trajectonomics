@@ -1,4 +1,4 @@
-import { version as simVersion } from "@trajectonomics/sim/package.json"
+import { version as simVersion } from "@trajectonomics/core/package.json"
 import { z } from "zod"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
 import {

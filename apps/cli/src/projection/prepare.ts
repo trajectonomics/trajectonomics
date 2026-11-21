@@ -1,4 +1,4 @@
-import type { Baseline, Scenario, Timeline } from "@trajectonomics/sim"
+import type { Baseline, Scenario, Timeline } from "@trajectonomics/core/sim"
 import { BASELINE_CURRENCY } from "../baseline/kind"
 import { type AppError, isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"

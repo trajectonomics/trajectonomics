@@ -1,4 +1,4 @@
-import type { Scenario } from "@trajectonomics/sim"
+import type { Scenario } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
 import type { CarryInRecordForm } from "./carryin"
 import { placeCarryIn } from "./carryin-place"

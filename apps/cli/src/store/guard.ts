@@ -1,5 +1,5 @@
 import { type Database, SQLiteError } from "bun:sqlite"
-import { LedgerValidationError } from "@trajectonomics/ledger"
+import { LedgerValidationError } from "@trajectonomics/core/ledger"
 import { type AppError, fail, isAppError } from "../errors"
 import { databaseFailure } from "./io-errors"
 import { fromLedgerError } from "./ledger-errors"

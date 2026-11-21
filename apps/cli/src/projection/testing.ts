@@ -1,4 +1,4 @@
-import type { Scenario } from "@trajectonomics/sim"
+import type { Scenario } from "@trajectonomics/core/sim"
 import { SIM_SCENARIO, SIM_TIMELINE } from "../baseline/fixture"
 import type { ErrorBody } from "../errors"
 import { fixtureHome } from "../ledger-fixture"

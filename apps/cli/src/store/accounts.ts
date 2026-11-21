@@ -1,4 +1,4 @@
-import type { AccountType } from "@trajectonomics/ledger"
+import type { AccountType } from "@trajectonomics/core/ledger"
 import { type AppError, fail } from "../errors"
 import { chartOf } from "./chart"
 import { ACCOUNT_COLUMNS, ACCOUNT_ORDER, liveOnly } from "./columns"

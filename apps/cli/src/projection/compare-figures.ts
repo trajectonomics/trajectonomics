@@ -1,4 +1,4 @@
-import type { AccountAmount, ProjectionRow, RunsOut } from "@trajectonomics/sim"
+import type { AccountAmount, ProjectionRow, RunsOut } from "@trajectonomics/core/sim"
 import type { Placed } from "./carryin-apply"
 import type { CompareSide } from "./compare-side"
 import type { CompareDeltas } from "./compare-view"

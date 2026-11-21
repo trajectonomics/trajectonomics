@@ -1,4 +1,4 @@
-import type { LedgerErrorCode, LedgerValidationError } from "@trajectonomics/ledger"
+import type { LedgerErrorCode, LedgerValidationError } from "@trajectonomics/core/ledger"
 import { type AppError, type ErrorCode, fail } from "../errors"
 
 // Exhaustive on purpose: a core release that adds a code fails typecheck here instead of
