@@ -5,4 +5,5 @@
 @import "@trajectonomics/brand/current/dark.css";
 @import "@trajectonomics/brand/current/fonts/inter.css";
 @import "./shell-layout.css";
+@import "./motion.css";
 @import "./theme-seam.css";

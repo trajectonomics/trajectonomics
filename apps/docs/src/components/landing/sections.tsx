@@ -21,7 +21,7 @@ function SectionHeading({
 	return (
 		<div className="flex flex-col gap-2">
 			<p className="font-mono text-xs uppercase tracking-widest text-fd-muted-foreground">
-				{number} · {label}
+				<span className="text-fd-accent">{number}</span> · {label}
 			</p>
 			<h2 id={id} className="text-2xl font-semibold tracking-tight sm:text-3xl">
 				{children}
@@ -43,7 +43,7 @@ export function AudienceEntries() {
 					return (
 						<div
 							key={tab.folder}
-							className="group relative flex flex-col gap-3 rounded-md border bg-fd-card p-6 text-fd-card-foreground transition-colors hover:bg-fd-accent focus-within:ring-2 focus-within:ring-fd-ring"
+							className="group relative flex flex-col gap-3 rounded-md border bg-fd-card p-6 text-fd-card-foreground transition-[border-color,transform] duration-300 hover:border-fd-accent focus-within:ring-2 focus-within:ring-fd-ring motion-safe:hover:-translate-y-1"
 						>
 							<p className="font-mono text-xs uppercase tracking-widest text-fd-muted-foreground">
 								{tab.audience}
@@ -51,7 +51,7 @@ export function AudienceEntries() {
 							<a
 								href={tabUrl(tab)}
 								aria-describedby={descriptionId}
-								className="text-lg font-medium outline-none after:absolute after:inset-0 after:rounded-md group-hover:text-fd-accent-foreground"
+								className="text-lg font-medium outline-none after:absolute after:inset-0 after:rounded-md"
 							>
 								{tab.entry}
 							</a>
@@ -60,7 +60,7 @@ export function AudienceEntries() {
 							</p>
 							<span
 								aria-hidden="true"
-								className="mt-auto pt-2 text-sm text-fd-muted-foreground transition-transform group-hover:translate-x-1"
+								className="mt-auto pt-2 text-sm text-fd-muted-foreground transition-[color,transform] duration-300 group-hover:translate-x-1 group-hover:text-fd-accent"
 							>
 								{tab.title} →
 							</span>
@@ -76,7 +76,7 @@ export function AudienceEntries() {
 function RouteCard({ route }: { readonly route: AgentRoute }) {
 	const [state, copy] = useCopy(route.snippet)
 	return (
-		<li className="flex flex-col gap-3 rounded-md border p-5">
+		<li className="flex flex-col gap-3 rounded-md border p-5 transition-colors duration-300 hover:border-fd-accent">
 			<h3 className="text-base font-semibold">{route.title}</h3>
 			<p className="text-sm text-fd-muted-foreground">{route.description}</p>
 			<div className="mt-auto flex items-start gap-2 rounded-sm border bg-fd-secondary p-2">
@@ -87,7 +87,7 @@ function RouteCard({ route }: { readonly route: AgentRoute }) {
 					type="button"
 					onClick={copy}
 					aria-label={`Copy ${route.title}`}
-					className="rounded-sm p-1 text-fd-muted-foreground transition-colors hover:text-fd-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+					className={`rounded-sm p-1 transition-colors hover:text-fd-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring ${state === "copied" ? "text-fd-accent" : "text-fd-muted-foreground"}`}
 				>
 					<CopyGlyph state={state} />
 				</button>

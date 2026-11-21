@@ -101,7 +101,7 @@ export function CopyPromptButton({ prompt }: { readonly prompt: string }) {
 				type="button"
 				onClick={copy}
 				data-copy-prompt=""
-				className="inline-flex items-center gap-2 rounded-md bg-fd-primary px-3 py-2 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+				className="inline-flex items-center gap-2 rounded-md bg-fd-accent px-3 py-2 text-sm font-medium text-fd-accent-foreground transition-[opacity,transform] hover:opacity-90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
 			>
 				<CopyGlyph state={state} />
 				{PROMPT_LABELS[state]}

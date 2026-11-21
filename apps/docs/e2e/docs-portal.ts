@@ -98,12 +98,17 @@ export async function waitForSettledPage(page: Page): Promise<void> {
 		const progress = document.querySelector(selector)
 		return progress === null || Number(progress.getAttribute("aria-valuenow")) > 0
 	}, SUBNAV_PROGRESS)
-	// A page without the row has no cross-fade, so any transition still running there counts.
+	// A page without the row has no cross-fade, so any transition still running there counts. A
+	// loop never settles by design (the Landing Page's caret and glow), so it is not waited for.
 	await page.waitForFunction((selector: string) => {
 		const trigger = document.querySelector(selector)
 		const animations =
 			trigger === null ? document.getAnimations() : trigger.getAnimations({ subtree: true })
-		return animations.every((animation) => animation.playState !== "running")
+		return animations.every(
+			(animation) =>
+				animation.playState !== "running" ||
+				animation.effect?.getTiming().iterations === Number.POSITIVE_INFINITY,
+		)
 	}, SUBNAV_TRIGGER)
 }
 
