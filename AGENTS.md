@@ -52,7 +52,7 @@ Delegate: the lead session plans, briefs, reviews the diffs and merges, and suba
 Pick the cheapest model that can finish the brief:
 
 1. `claude-haiku-5-5` for a Claude subagent.
-2. `opencode/deepseek-v4.1-flash-free` (OpenCode, free) for a delegated task off Claude.
+2. `opencode/deepseek-v4.1-flash-free` (OpenCode, free) for a delegated task off Claude. When it fails with the free usage limit, rerun the brief on `opencode-go/deepseek-v4.1-flash`.
 3. `claude-sonnet-5-5` or a stronger model only when a cheap one failed the brief, or for design and the independent review. The reviewer is a different model from the author.
 
 ## Agent skills
