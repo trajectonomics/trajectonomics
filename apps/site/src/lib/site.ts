@@ -73,14 +73,17 @@ export const DOCS_CLI_INSTALL_PATH = "/docs/cli/installation/"
 /** The skills repository: the star menu, the footer's own link and the footer's licence name it. */
 export const GITHUB_SKILLS_URL = "https://github.com/trajectonomics/skills"
 
-/** The traj CLI's repository. */
-export const GITHUB_CLI_URL = "https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli"
+/** The monorepo the CLI is built and released from. Issues and releases live at its root. */
+export const GITHUB_REPO_URL = "https://github.com/trajectonomics/trajectonomics"
+
+/** The traj CLI's source folder in the monorepo. */
+export const GITHUB_CLI_URL = `${GITHUB_REPO_URL}/tree/main/apps/cli`
 
 /** The CLI's issue tracker, where the disclaimer sends a visitor who finds a bug. */
-export const GITHUB_CLI_ISSUES_URL = `${GITHUB_CLI_URL}/issues`
+export const GITHUB_CLI_ISSUES_URL = `${GITHUB_REPO_URL}/issues`
 
-/** The CLI's releases page: every version and its notes. */
-export const GITHUB_CLI_RELEASES_URL = `${GITHUB_CLI_URL}/releases`
+/** The CLI's releases page: every version and its notes, tagged cli-vX.Y.Z. */
+export const GITHUB_CLI_RELEASES_URL = `${GITHUB_REPO_URL}/releases`
 
 /** The Organisation, for the footer's link. */
 export const GITHUB_ORG_URL = "https://github.com/trajectonomics"
