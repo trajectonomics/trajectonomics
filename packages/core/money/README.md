@@ -13,7 +13,7 @@ Zero dependencies, no I/O, no clock, no randomness. It ships no currency table a
 ## Install
 
 ```bash
-bun add @trajectonomics/money
+bun add @trajectonomics/core
 ```
 
 ## API
