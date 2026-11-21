@@ -45,6 +45,18 @@ Saving the owner's attention is part of the job, so finish a task instead of ask
 - Record every durable lesson here, in the package's `AGENTS.md` or in `docs/`, never only in agent memory.
 - Settle your own T3 thread (`t3_thread_organize`, `action: "settle"`) when the work is done and nothing waits on the owner.
 
+## Subagents
+
+Delegate: the lead session plans, briefs, reviews the diffs and merges, and subagents do the legwork (reading, searching, editing, running checks). Brief each one with the files, the exact change and its completion criterion, because a subagent starts without your context. A Pi session keeps rule 7's DeepSeek-only models, and a package whose `AGENTS.md` names its own work model (such as `apps/site`) keeps it inside that package; this ladder is the default everywhere else.
+
+Pick the cheapest model that can finish the brief:
+
+1. `claude-haiku-5-5` for a Claude subagent (the `Agent` tool, `model: haiku`).
+2. `opencode/deepseek-v4.1-flash-free` for a task on OpenCode (`delegate_task`). When it fails with the free usage limit, rerun the brief on `opencode-go/deepseek-v4.1-flash`.
+3. A model from the Owner section's list (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`) only when a cheap one failed the brief, or for design and the independent review. The reviewer is a different model from the author.
+
+A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
+
 ## Agent skills
 
 ### Where the skills come from
