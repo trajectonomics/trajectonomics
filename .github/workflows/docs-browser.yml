@@ -36,6 +36,12 @@ jobs:
         with:
           bun-version: 1.4.4
 
+      # The site and docs import `@trajectonomics/brand`'s generated ./current folder, which `bun install`
+      # does not create. Turbo builds it before a check; these jobs run outside turbo, so build it here.
+      - name: Build the brand package
+        working-directory: packages/brand
+        run: bun run build
+
       - name: Read the Playwright version
         id: playwright
         working-directory: apps/docs
