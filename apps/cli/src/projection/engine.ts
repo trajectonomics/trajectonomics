@@ -1,10 +1,10 @@
-import type { ProjectionProblem } from "@trajectonomics/sim"
-import { version as simVersion } from "@trajectonomics/sim/package.json"
+import { version as simVersion } from "@trajectonomics/core/package.json"
+import type { ProjectionProblem } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
 
 /** The engine's package and the exact version this build runs on (ADR-0030). */
-export const SIM_PACKAGE = "@trajectonomics/sim"
+export const SIM_PACKAGE = "@trajectonomics/core"
 
 /** The engine version, read from the package that ships it. */
 export const SIM_VERSION: string = simVersion

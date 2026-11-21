@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { check, type Problem } from "@trajectonomics/sim"
+import { check, type Problem } from "@trajectonomics/core/sim"
 import { SCENARIO_DOCUMENT } from "../store/testing"
 import { scenarioProblems } from "./document"
 

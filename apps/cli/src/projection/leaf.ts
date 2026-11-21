@@ -1,4 +1,4 @@
-import type { Baseline } from "@trajectonomics/sim"
+import type { Baseline } from "@trajectonomics/core/sim"
 import { baselineOf } from "../baseline/mapping"
 import type { Context, Result } from "../command"
 import { ok } from "../command"

@@ -1,5 +1,5 @@
-import type { ProfitAndLossOptions } from "@trajectonomics/ledger"
-import { profitAndLoss } from "@trajectonomics/ledger"
+import type { ProfitAndLossOptions } from "@trajectonomics/core/ledger"
+import { profitAndLoss } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"

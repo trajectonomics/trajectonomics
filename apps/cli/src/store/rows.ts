@@ -1,4 +1,4 @@
-import type { AccountType } from "@trajectonomics/ledger"
+import type { AccountType } from "@trajectonomics/core/ledger"
 
 // Store-owned row shapes. Keys are declared in column order, so a writer that walks them in
 // declaration order sees the table's own order. Money is integer minor units; timestamps are

@@ -1,4 +1,4 @@
-import { parseCurrency } from "@trajectonomics/ledger"
+import { parseCurrency } from "@trajectonomics/core/ledger"
 import { type AppError, fail, isAppError } from "../errors"
 import { guard } from "./guard"
 

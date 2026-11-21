@@ -7,10 +7,11 @@
 		"node": ">=22.23.4"
 	},
 	"workspaces": [
-		"packages/money",
-		"packages/ledger",
-		"packages/tax",
-		"packages/sim",
+		"packages/core/money",
+		"packages/core/ledger",
+		"packages/core/tax",
+		"packages/core/sim",
+		"packages/core",
 		"packages/brand",
 		"apps/cli",
 		"apps/site",

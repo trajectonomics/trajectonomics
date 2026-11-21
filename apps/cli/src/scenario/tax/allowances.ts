@@ -1,6 +1,6 @@
 /**
  * The fixed allowances a caller states for the taxpayer. They are frozen into the Levy at write
- * time because they depend on the taxpayer, never on a Flow: `@trajectonomics/tax` emits them as
+ * time because they depend on the taxpayer, never on a Flow: `@trajectonomics/core/tax` emits them as
  * one `allowances.fixed` Measure, and the CLI holds no amount of its own.
  */
 export type TaxAllowances = {

@@ -1,4 +1,4 @@
-import type { Scenario, Timeline } from "@trajectonomics/sim"
+import type { Scenario, Timeline } from "@trajectonomics/core/sim"
 import { FIXTURE_ACCOUNTS, FIXTURE_AS_OF } from "../ledger-fixture"
 
 /*

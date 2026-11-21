@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import { check, project } from "@trajectonomics/sim"
-import simPackage from "@trajectonomics/sim/package.json"
+import simPackage from "@trajectonomics/core/package.json"
+import { check, project } from "@trajectonomics/core/sim"
 import { SIM_SCENARIO, SIM_TIMELINE } from "./baseline/fixture"
 import {
 	baselineFrom,
@@ -25,7 +25,7 @@ async function expectEngineVersion(): Promise<void> {
 	const { simVersion } = await readGolden()
 	if (simVersion !== simPackage.version) {
 		throw new Error(
-			`The golden was produced with @trajectonomics/sim ${simVersion}, but ${simPackage.version} is installed. Re-baseline it deliberately: TRAJ_UPDATE_GOLDEN=1 bun test src/baseline-golden.test.ts`,
+			`The golden was produced with @trajectonomics/core ${simVersion}, but ${simPackage.version} is installed. Re-baseline it deliberately: TRAJ_UPDATE_GOLDEN=1 bun test src/baseline-golden.test.ts`,
 		)
 	}
 }

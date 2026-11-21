@@ -1,4 +1,9 @@
-import type { BalanceRow, Total, TrialBalanceRow, TrialBalanceTotal } from "@trajectonomics/ledger"
+import type {
+	BalanceRow,
+	Total,
+	TrialBalanceRow,
+	TrialBalanceTotal,
+} from "@trajectonomics/core/ledger"
 import { ref } from "../account/view"
 import { type AccountRow, formatMinorUnits } from "../store"
 import type { ReportRow, TotalView, TrialRowView, TrialTotalView } from "./view"

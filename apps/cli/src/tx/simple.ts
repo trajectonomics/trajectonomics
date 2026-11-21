@@ -1,4 +1,4 @@
-import { simple } from "@trajectonomics/ledger"
+import { simple } from "@trajectonomics/core/ledger"
 import { type AppError, isAppError } from "../errors"
 import type { NewTransaction, Store } from "../store"
 import {

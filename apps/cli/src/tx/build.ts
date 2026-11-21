@@ -1,4 +1,4 @@
-import { openingBalance } from "@trajectonomics/ledger"
+import { openingBalance } from "@trajectonomics/core/ledger"
 import { type AppError, fail, isAppError } from "../errors"
 import { type AccountRow, formatMinorUnits, type NewTransaction, type Store } from "../store"
 import type { TransactionDocument } from "./document"

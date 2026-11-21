@@ -1,4 +1,4 @@
-import type { AccountType, ChartOfAccounts } from "@trajectonomics/ledger"
+import type { AccountType, ChartOfAccounts } from "@trajectonomics/core/ledger"
 import type { AppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
 import type { Ledger } from "./ledger"

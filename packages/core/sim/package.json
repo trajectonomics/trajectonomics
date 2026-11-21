@@ -1,11 +1,12 @@
 {
-	"name": "@trajectonomics/ledger",
+	"name": "@trajectonomics/sim",
+	"private": true,
 	"version": "0.0.0-development",
-	"description": "Pure double-entry ledger domain: accounts, balanced postings, balances, header rollups, net worth, P&L. No I/O.",
+	"description": "Pure, deterministic personal-finance projection engine",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/ledger-core.git"
+		"url": "git+https://github.com/trajectonomics/sim-core.git"
 	},
 	"type": "module",
 	"sideEffects": false,
@@ -34,19 +35,20 @@
 	],
 	"publishConfig": {
 		"access": "public",
-		"provenance": true,
-		"tag": "latest"
+		"provenance": true
 	},
 	"scripts": {
 		"build": "tsdown",
 		"test": "bun test",
+		"bench": "bun scripts/bench-fi.ts",
 		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
-		"lint": "biome ci --error-on-warnings .",
+		"lint": "biome ci --colors=off --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run lint:package",
-		"lint:package": "publint --strict && attw --pack . --profile node16",
-		"skills:check": "bunx skills@latest check",
-		"skills:update": "bunx skills@latest update"
+		"check": "bun run lint && bun run typecheck && bun test && bun run build && bun run parity && bun run lint:package",
+		"check:ci": "bun run check && npm pack --dry-run",
+		"parity": "node scripts/parity-check.mjs",
+		"parity:update": "bun scripts/parity-update.ts && biome format --write parity/cases.json",
+		"lint:package": "publint --strict && attw --pack . --profile node16"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",
@@ -55,8 +57,5 @@
 		"publint": "^0.3.25",
 		"tsdown": "^0.23.2",
 		"typescript": "^7.0.2"
-	},
-	"dependencies": {
-		"@trajectonomics/money": "workspace:*"
 	}
 }

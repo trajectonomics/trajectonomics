@@ -1,4 +1,4 @@
-import { project } from "@trajectonomics/sim"
+import { project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"

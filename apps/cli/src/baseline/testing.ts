@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite"
 import { join } from "node:path"
-import type { Baseline } from "@trajectonomics/sim"
+import type { Baseline } from "@trajectonomics/core/sim"
 import { goldenJson, goldenTextIn, recordGoldenIn } from "../golden-test-support"
 import { FIXTURE_ACCOUNTS, FIXTURE_AS_OF, FIXTURE_ROWS } from "../ledger-fixture"
 import { posting, transaction } from "../ledger-fixture/rows"

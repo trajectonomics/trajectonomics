@@ -1,4 +1,4 @@
-import { TH_LEVY_CONTRIBUTION_LABELS, TH_LEVY_INCOME_LABELS } from "@trajectonomics/tax/th"
+import { TH_LEVY_CONTRIBUTION_LABELS, TH_LEVY_INCOME_LABELS } from "@trajectonomics/core/tax/th"
 import { type AppError, fail } from "../../errors"
 import type { ScenarioDocument } from "../document"
 import { type JsonRecord, records } from "./json"
@@ -63,7 +63,7 @@ function labelProblem(flow: string, target: JsonRecord, label: string): AppError
 	}
 	if (allowed.includes(label)) return null
 	return fail("invalid_input", {
-		message: `"${label}" is not a label @trajectonomics/tax reads for a ${String(target["kind"])} Flow.`,
+		message: `"${label}" is not a label @trajectonomics/core/tax reads for a ${String(target["kind"])} Flow.`,
 		path: "label",
 		details: { labels: allowed },
 	})

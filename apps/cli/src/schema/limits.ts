@@ -22,7 +22,7 @@ export const NOT_SUPPORTED: readonly NotSupported[] = [
 	{
 		feature: "Monte Carlo, return shocks and a safest-return stress",
 		detail:
-			"`traj fi` reports the survival date on one deterministic Projection, and no flag sets a probability threshold, a market-return model or a shock. `@trajectonomics/sim` can model them; this build does not expose them, so a `--method` or `--threshold` flag does not exist.",
+			"`traj fi` reports the survival date on one deterministic Projection, and no flag sets a probability threshold, a market-return model or a shock. `@trajectonomics/core/sim` can model them; this build does not expose them, so a `--method` or `--threshold` flag does not exist.",
 	},
 	{
 		feature: 'A retirement date, as in "retire at 60"',

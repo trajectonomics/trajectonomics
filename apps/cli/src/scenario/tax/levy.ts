@@ -1,4 +1,4 @@
-import { emitThLevy } from "@trajectonomics/tax/th"
+import { emitThLevy } from "@trajectonomics/core/tax/th"
 import { type AppError, fail, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
 import type { TaxRequest } from "./flags"
@@ -63,7 +63,7 @@ function labelRefusal(document: ScenarioDocument): AppError | null {
 	const unlabelled = unlabelledIncome(document)
 	if (unlabelled.length > 0) {
 		return fail("invalid_input", {
-			message: `With --tax, every income Flow needs a label from @trajectonomics/tax/th; ${
+			message: `With --tax, every income Flow needs a label from @trajectonomics/core/tax/th; ${
 				unlabelled.length === 1 ? "one Flow has" : `${unlabelled.length} Flows have`
 			} none this build recognises, so tax on them would be zero.`,
 			path: "document",

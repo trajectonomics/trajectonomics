@@ -1,4 +1,8 @@
-import { type ChartOfAccounts, type Transaction, validateTransaction } from "@trajectonomics/ledger"
+import {
+	type ChartOfAccounts,
+	type Transaction,
+	validateTransaction,
+} from "@trajectonomics/core/ledger"
 import type { NewPosting, PostingRow, TxRow } from "./types"
 
 /** A stored or core posting as a new-posting input; absent and null dimensions both mean none. */

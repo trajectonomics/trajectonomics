@@ -1,4 +1,4 @@
-import type { AccountAmount } from "@trajectonomics/sim"
+import type { AccountAmount } from "@trajectonomics/core/sim"
 import { moneyOf } from "./money"
 
 /** The total a Projection could not invest, in minor units; `null` when the sum is not exact. */

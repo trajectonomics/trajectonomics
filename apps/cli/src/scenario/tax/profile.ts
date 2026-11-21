@@ -1,4 +1,4 @@
-import { ThLevyContributionLabel } from "@trajectonomics/tax/th"
+import { ThLevyContributionLabel } from "@trajectonomics/core/tax/th"
 import type { ScenarioDocument } from "../document"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
 import type { TaxRequest } from "./flags"
@@ -23,7 +23,7 @@ export type TaxAllowanceClass = (typeof TAX_ALLOWANCE_CLASSES)[number]
 
 /**
  * The classes the flags stated and the ones this build supports but the write left out. It is not
- * an eligibility claim: `@trajectonomics/tax` applies every statutory ceiling and eligibility rule
+ * an eligibility claim: `@trajectonomics/core/tax` applies every statutory ceiling and eligibility rule
  * (a spouse life insurance premium stated by a single filer is read and clamped to zero), and the
  * CLI would have to reimplement those rules to say what the Levy applied (ADR-0036).
  */

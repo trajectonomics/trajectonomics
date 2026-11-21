@@ -1,4 +1,4 @@
-import { netWorth, type Transaction } from "@trajectonomics/ledger"
+import { netWorth, type Transaction } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"

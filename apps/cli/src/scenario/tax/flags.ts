@@ -1,4 +1,4 @@
-import type { ThFilingStatus } from "@trajectonomics/tax/th"
+import type { ThFilingStatus } from "@trajectonomics/core/tax/th"
 import { type AppError, fail } from "../../errors"
 import { ALLOWANCE_FLAGS, allowancesOf, type TaxAllowances } from "./allowances"
 import { labelSetsSentence } from "./labels"
@@ -41,7 +41,7 @@ export const FILING_STATUSES: readonly [ThFilingStatus, ...ThFilingStatus[]] = [
 
 /**
  * The `--label` flag's one description, so usage and `traj schema` publish the same closed sets
- * (ADR-0010). Both lists are `@trajectonomics/tax`'s own exports: a pin bump that changes them
+ * (ADR-0010). Both lists are `@trajectonomics/core/tax`'s own exports: a pin bump that changes them
  * changes what this says, and no label is restated here (ADR-0032).
  */
 export function labelFlagDescription(): string {

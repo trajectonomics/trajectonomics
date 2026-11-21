@@ -1,4 +1,4 @@
-import type { MonthDay } from "@trajectonomics/sim"
+import type { MonthDay } from "@trajectonomics/core/sim"
 import { checkedDate } from "../date"
 import { type AppError, fail, isAppError } from "../errors"
 import { parseMinorUnits } from "../store"

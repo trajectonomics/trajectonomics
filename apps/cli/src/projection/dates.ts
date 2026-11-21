@@ -1,4 +1,4 @@
-import type { RunsOut } from "@trajectonomics/sim"
+import type { RunsOut } from "@trajectonomics/core/sim"
 
 const ISO = /^(\d{4})-(\d{2})-(\d{2})$/
 

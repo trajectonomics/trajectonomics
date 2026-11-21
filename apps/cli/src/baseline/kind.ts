@@ -1,4 +1,4 @@
-import type { AccountType } from "@trajectonomics/ledger"
+import type { AccountType } from "@trajectonomics/core/ledger"
 
 /** The two sim-core account kinds. A Baseline declares no kinds; the Scenario does (ADR-0026). */
 export type SimKind = "asset" | "liability"

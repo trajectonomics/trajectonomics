@@ -1,5 +1,5 @@
-import type { ChartOfAccounts, Transaction } from "@trajectonomics/ledger"
-import { LedgerValidationError } from "@trajectonomics/ledger"
+import type { ChartOfAccounts, Transaction } from "@trajectonomics/core/ledger"
+import { LedgerValidationError } from "@trajectonomics/core/ledger"
 import type { AppError, ErrorCode } from "../errors"
 import { isAppError } from "../errors"
 import { listAccounts } from "./accounts"

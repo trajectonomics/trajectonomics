@@ -1,4 +1,4 @@
-import type { AccountType } from "@trajectonomics/ledger"
+import type { AccountType } from "@trajectonomics/core/ledger"
 import { z } from "zod"
 import type { AccountRow } from "../store"
 

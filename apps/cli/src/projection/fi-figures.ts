@@ -1,4 +1,4 @@
-import type { FiBestCase, RuleOfThumbReference } from "@trajectonomics/sim"
+import type { FiBestCase, RuleOfThumbReference } from "@trajectonomics/core/sim"
 import type { BestCaseView, RuleOfThumbView } from "./fi-view"
 import { moneyOf } from "./money"
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import type { Baseline, TallyBasis } from "@trajectonomics/sim"
-import { check, type Scenario, type Timeline } from "@trajectonomics/sim"
+import type { Baseline, TallyBasis } from "@trajectonomics/core/sim"
+import { check, type Scenario, type Timeline } from "@trajectonomics/core/sim"
 import { isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
 import { taxRequestOf, withTaxLevy } from "../scenario/tax"

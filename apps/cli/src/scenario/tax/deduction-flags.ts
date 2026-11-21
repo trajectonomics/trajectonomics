@@ -9,7 +9,7 @@ export type DeductionFlags = Record<keyof TaxAllowances, DeductionFlag>
 
 /**
  * The deduction flags `scenario tax` accepts. Each states an amount the taxpayer paid in the tax
- * year; `@trajectonomics/tax` owns every statutory ceiling, so none is restated here. The fields
+ * year; `@trajectonomics/core/tax` owns every statutory ceiling, so none is restated here. The fields
  * are spread into the command's input so one file holds their wording and their order.
  */
 export const deductionFlags: DeductionFlags = {

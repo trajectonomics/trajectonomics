@@ -1,0 +1,9 @@
+{
+	"extends": "../../tooling/config/tsconfig/base.json",
+	"compilerOptions": {
+		"lib": ["ES2022"],
+		"types": ["bun"]
+	},
+	"include": ["scripts", "tsdown.config.ts", "money/src", "ledger/src", "tax/src", "sim/src"],
+	"exclude": ["**/*.test.ts", "**/tests/**"]
+}

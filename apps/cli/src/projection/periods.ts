@@ -1,4 +1,4 @@
-import type { MonthDay } from "@trajectonomics/sim"
+import type { MonthDay } from "@trajectonomics/core/sim"
 import { addDays } from "./dates"
 
 /*

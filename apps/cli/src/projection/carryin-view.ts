@@ -1,4 +1,4 @@
-import type { TallyBasis } from "@trajectonomics/sim"
+import type { TallyBasis } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import { dateField, moneyField } from "./money"
 

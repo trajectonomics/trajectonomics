@@ -1,4 +1,4 @@
-import type { AccountType } from "@trajectonomics/ledger"
+import type { AccountType } from "@trajectonomics/core/ledger"
 import type { AccountRow, EntityRow, PostingRow, TxRow } from "../store"
 import { PERSONAL_ENTITY_ID } from "../store"
 

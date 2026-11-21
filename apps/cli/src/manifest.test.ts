@@ -57,6 +57,6 @@ describe("the publishable manifest", () => {
 
 	it("keeps the build-time-only packages out of the install", () => {
 		expect(manifest.devDependencies).toHaveProperty("zod")
-		expect(manifest.devDependencies).toHaveProperty("@trajectonomics/ledger")
+		expect(manifest.devDependencies).toHaveProperty("@trajectonomics/core")
 	})
 })

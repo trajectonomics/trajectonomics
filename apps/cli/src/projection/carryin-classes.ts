@@ -1,4 +1,4 @@
-import type { TallyBasis } from "@trajectonomics/sim"
+import type { TallyBasis } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { type JsonRecord, records as objects } from "../scenario/tax/json"
 import { isBasis } from "./carryin-view"
