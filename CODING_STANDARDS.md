@@ -1,10 +1,10 @@
 # Coding Standards
 
 Read at **review** time. `bun run check` already enforces the mechanical rules (formatting, strict
-types, tests, build). This file covers what it cannot: the conventions a reviewer
-must check by reading the diff.
+types, tests, build, package shape). This file covers what it cannot: the conventions a reviewer
+must check by reading the diff. A package's `AGENTS.md` adds the conventions that only apply to it.
 
-Decisions behind the API live in `docs/adr/`; vocabulary lives in `GLOSSARY.md`.
+Decisions behind the API live in the package's `docs/adr/`; vocabulary lives in its `GLOSSARY.md`.
 
 ## Public API
 
@@ -21,7 +21,7 @@ Decisions behind the API live in `docs/adr/`; vocabulary lives in `GLOSSARY.md`.
 
 ## Naming and Domain Language
 
-- Use `GLOSSARY.md` vocabulary strictly. Synonyms in a diff are considered defects.
+- Use the package's `GLOSSARY.md` vocabulary strictly. Synonyms in a diff are considered defects.
 - When an API requires a unit or duration, make the unit explicit in the type and parameter name (e.g. `timeoutMs`, `cents`).
 
 ## Tests
@@ -32,5 +32,5 @@ Decisions behind the API live in `docs/adr/`; vocabulary lives in `GLOSSARY.md`.
 
 ## Files
 
-- One concern per file. The 100-line ceiling (200 for test files) is enforced by Biome. Split files as soon as multiple concerns arise.
+- One concern per file. The file-length ceiling is enforced by Biome: 100 lines for a source file and 200 for a test file, unless the package's `AGENTS.md` states another. Split files as soon as multiple concerns arise.
 - `index.ts` remains a clean re-export list defining the package's public surface.
