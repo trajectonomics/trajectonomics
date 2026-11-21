@@ -1,0 +1,25 @@
+# Dashboard
+
+A read-only web app, in this repository, that shows what `traj` already computed. It runs from a checkout on `127.0.0.1` and reads one Snapshot file.
+
+## Language
+
+**Dashboard**:
+The static web app in `apps/web`: pages and React islands that render one Snapshot and compute no figure of their own.
+_Avoid_: backend, API, sync, server
+
+**Snapshot**:
+One JSON document, version 1, that holds every Read the Dashboard needs, each with the argv that produced it. It is the closed contract between `traj` and the Dashboard.
+_Avoid_: backend, API, sync, server, payload, cache
+
+**Read**:
+One `traj … --json` call, kept verbatim in a Snapshot: its argv and either its parsed data or its error envelope.
+_Avoid_: fetch, request, query, call
+
+**Demo snapshot**:
+The committed Snapshot in `public/demo/snapshot.json`, built from a fictional ledger, so the Dashboard can be seen with no ledger of anyone's own.
+_Avoid_: sample data, mock, fixture, seed data
+
+**Plan**:
+The list of argv a Snapshot needs, computed from the parameters alone. Stage one reads the Scenarios, the accounts and the first transaction date; stage two reads everything else.
+_Avoid_: pipeline, workflow, job, script

@@ -16,6 +16,7 @@
 		"apps/cli",
 		"apps/site",
 		"apps/docs",
+		"apps/web",
 		"apps/blog",
 		"skills/customer",
 		"skills/internal",

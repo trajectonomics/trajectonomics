@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"types": ["astro/client", "bun"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "react",
+		"isolatedDeclarations": false,
+		"resolveJsonModule": true,
+		"declaration": false
+	},
+	"include": ["src", "scripts", "astro.config.ts", ".astro/types.d.ts"]
+}

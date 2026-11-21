@@ -87,6 +87,29 @@
         "wrangler": "^4.158.0",
       },
     },
+    "apps/web": {
+      "name": "@trajectonomics/web",
+      "version": "0.0.0-development",
+      "dependencies": {
+        "@astrojs/react": "^7.1.4",
+        "@trajectonomics/brand": "workspace:*",
+        "astro": "7.4.12",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "zod": "^4.6.7",
+      },
+      "devDependencies": {
+        "@astrojs/check": "^0.9.12",
+        "@biomejs/biome": "2.6.3",
+        "@tailwindcss/vite": "^4.3.5",
+        "@trajectonomics/cli": "workspace:*",
+        "@types/bun": "^1.4.4",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "tailwindcss": "^4.3.5",
+        "typescript": "~6.0.3",
+      },
+    },
     "packages/brand": {
       "name": "@trajectonomics/brand",
       "version": "0.0.0",
@@ -821,6 +844,8 @@
     "@trajectonomics/skills": ["@trajectonomics/skills@workspace:skills/customer"],
 
     "@trajectonomics/tax": ["@trajectonomics/tax@workspace:packages/core/tax"],
+
+    "@trajectonomics/web": ["@trajectonomics/web@workspace:apps/web"],
 
     "@turbo/darwin-64": ["@turbo/darwin-64@2.11.10", "", { "os": "darwin", "cpu": "x64" }, "sha512-By4idRap5+nLnMuRzLB4qkOPRlvNdyY1ne4VJYDyUoUB11H94k7uif9mbe3JT8JSNXs1D68uMcBj6hJ/jMQRvA=="],
 
@@ -1953,6 +1978,10 @@
     "@trajectonomics/site/@astrojs/check": ["@astrojs/check@0.9.12", "", { "dependencies": { "@astrojs/language-server": "^2.17.3", "chokidar": "^5.0.0", "kleur": "^4.1.5", "yargs": "^18.2.0" }, "peerDependencies": { "typescript": "^5.0.0 || ^6.0.0" }, "bin": { "astro-check": "./bin/astro-check.js" } }, "sha512-hazpqxIfZWj2VhyPyR0pOEQ/IhFDM/2nIApL96zMXABdD8NrUKYDmhxTy7h+drTDl9MQG/Sd1ET/4amadVJUUA=="],
 
     "@trajectonomics/site/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
+    "@trajectonomics/web/@astrojs/check": ["@astrojs/check@0.9.12", "", { "dependencies": { "@astrojs/language-server": "^2.17.3", "chokidar": "^5.0.0", "kleur": "^4.1.5", "yargs": "^18.2.0" }, "peerDependencies": { "typescript": "^5.0.0 || ^6.0.0" }, "bin": { "astro-check": "./bin/astro-check.js" } }, "sha512-hazpqxIfZWj2VhyPyR0pOEQ/IhFDM/2nIApL96zMXABdD8NrUKYDmhxTy7h+drTDl9MQG/Sd1ET/4amadVJUUA=="],
+
+    "@trajectonomics/web/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@volar/kit/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
