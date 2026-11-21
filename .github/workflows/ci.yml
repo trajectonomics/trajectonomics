@@ -1,0 +1,64 @@
+name: CI
+
+# One CI for the whole monorepo. A pull request runs `turbo run check --affected`, so a PR that
+# touches only apps/site checks only what depends on it. Pull requests run on every base branch,
+# so a PR stacked on another phase branch is checked too. A push to main and a manual run check
+# every package.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Turbo compares the PR's base with its head, so the base commit must be in the clone.
+          fetch-depth: 0
+
+      # The root package.json engines is >=22.23.4 (the site needs it); "22" resolves to the newest 22.x.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
+      # Turbo keeps task outputs in .turbo/cache. Restore the newest cache for this lockfile, then
+      # save this run's cache (actions/cache saves on success).
+      - name: Restore the Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check the packages a pull request affects
+        if: github.event_name == 'pull_request'
+        env:
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+        run: bunx turbo run check --affected --concurrency=2
+
+      - name: Check every package
+        if: github.event_name != 'pull_request'
+        run: bunx turbo run check --concurrency=2
