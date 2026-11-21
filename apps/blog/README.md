@@ -1,119 +1,23 @@
-# @trajectonomics/technical-template
+# @trajectonomics/blog
 
-The official starter repository template for technical packages, libraries, and services across [Trajectonomics](https://github.com/trajectonomics).
+The Trajectonomics blog: Astro with MDX content collections, to be served at
+`trajectonomics.com/blog` from Cloudflare Workers Static Assets. It is never published to npm.
 
-## Highlights
+**Status: not built yet.** This package is still the technical-template starter (`src/index.ts` is a
+placeholder library). The Astro site, its content collection and its Cloudflare worker come later.
+Until then it only runs the shared checks.
 
-- **Interactive Repo Setup**: Includes the single-use `/setup-the-repo` skill (or `bun run setup`) that interactively customizes package metadata, README, GLOSSARY, CI workflows, and starter code for your archetype — Pure Domain Library, CLI Tool, Service/Worker, Minimal Library, or a UI Component Library (Bun workspace with a pure core, Svelte 5 components and optional Storybook). A project that fits none of them is an agent-protocol answer (`Other`), not a forced choice. The skill self-destructs to leave a clean repo, and prompts setting up Matt Pocock's skills.
-- **AI Agent Skills Ready**: Bundled with [Matt Pocock's skills](https://github.com/mattpocock/skills) (`ask-matt`, `tdd`, `implement`, `wayfinder`, `code-review`, etc.) and Trajectonomics [internal skills](https://github.com/trajectonomics/internal-skills) (`pick-the-issue`) managed via `skills-lock.json`. Compatible with Claude Code, Codex, OpenCode, Antigravity CLI, and Pi.
-- **Bun First**: Built on [Bun](https://bun.sh) (`1.4.4`) for blazing fast testing, installs, and script execution.
-- **Dual ESM + CJS Output**: Powered by [`tsdown`](https://github.com/sxzz/tsdown) with full `.d.ts` and `.d.mts` declaration generation.
-- **Strict Verification Pipeline**: Biome linting and formatting (with strict file line ceilings and cognitive complexity limits), strict TypeScript compilation with `isolatedDeclarations`, tests via `bun test`, plus package export verification via [`publint`](https://publint.dev) and [`@arethetypeswrong/cli`](https://github.com/arethetypeswrong/arethetypeswrong).
-- **Automated Semver & Releases**: Git-tag-driven version computation (`scripts/version.ts`), automated conventional commit PR title validation, and GitHub Actions publishing workflow.
-- **The Whole CI Contract**: A new repository starts current, not with a copy of the rules. `.github/workflows/` carries all three shared callers — `ci.yml`, `pr-title.yml` and `drift.yml` — each a few lines calling a reusable workflow in [`trajectonomics/cicd`](https://github.com/trajectonomics/cicd) at `v1`. The third one is a weekly drift check that opens one issue when the `@trajectonomics/tooling` pin falls behind `latest` or the Biome config keeps rules of its own.
-- **Domain Modeling & ADRs**: Pre-structured `GLOSSARY.md`, Architecture Decision Records (`docs/adr/`), and agent operational guides (`docs/agents/`).
+## Scripts
 
----
+Run from the repo root with `bunx turbo run <script> --filter=@trajectonomics/blog`, or with
+`bun run <script>` inside this folder.
 
-## Quick Start
-
-### 1. Create a Repository from this Template
-
-Using GitHub CLI:
-```bash
-gh repo create trajectonomics/<new-repo-name> \
-  --template trajectonomics/technical-template \
-  --public \
-  --clone
-```
-
-Or click **"Use this template"** on GitHub at [trajectonomics/technical-template](https://github.com/trajectonomics/technical-template).
-
-### 2. Run Interactive Setup
-
-Inside your newly cloned repository, run the interactive setup wizard:
-
-```bash
-bun install
-bun run setup
-```
-
-*Or within an AI agent session (Claude Code, Antigravity, OpenCode, etc.):*
-```
-/setup-the-repo
-```
-
-The interactive wizard will:
-1. Ask you for your repository coordinates, project description, archetype (Pure Domain Library, CLI Tool, Service/Worker, Minimal Library, UI Component Library, or Other), domain terms, and whether to enable publishing (UI Component Library ships with publishing off).
-2. Customize `package.json`, `README.md`, `GLOSSARY.md`, `AGENTS.md`, `CODING_STANDARDS.md`, `docs/adr/`, and the starter code (for `ui-library`, a Bun workspace under `packages/` and `apps/`).
-3. Check first, move off `main` onto `feat/bootstrap`, then verify your new repository via `bun run check`.
-4. **Self-destruct**: automatically delete the single-use `setup-the-repo` bootstrap skill so your repository stays clean.
-5. Remind you to push the branch and open a pull request, then run `/setup-matt-pocock-skills` to wire up GitHub Issues and triage labels!
-
-If your project fits none of the Archetypes, choose **Other**. The script says plainly that it cannot scaffold an arbitrary description and points you to the agent protocol: run `/setup-the-repo` with an agent, describe the project, and the agent maps it to the nearest Archetype, shows you what it will adapt, runs the script with `--no-commit`, then commits once after adapting.
-
-### 3. Scripted Setup
-
-```bash
-bun .agents/skills/setup-the-repo/scripts/setup.ts \
-  --name "trajectonomics/my-project" \
-  --pkg "@trajectonomics/my-project" \
-  --description "Deterministic projection engine" \
-  --archetype core \
-  --term "Invoice=A bill sent to a customer" \
-  --term "Tax Rate=A percentage of the amount" \
-  --co-author "Agent Name <agent@example.com>"
-```
-
-Flags:
-
-| Flag | Meaning |
+| Script | What it does |
 | --- | --- |
-| `--archetype core\|cli\|service\|minimal\|ui-library` | Project shape. An unknown value is an error that names the valid values. |
-| `--storybook true\|false` | `ui-library` only; default `true`. `false` drops the preview app. |
-| `--term "Name=Definition"` | Repeatable domain term. With none, `GLOSSARY.md` gets no invented placeholder. |
-| `--publish true\|false` | Default `true` for `core`, `false` otherwise. `ui-library` is always off and `--publish true` is an error. |
-| `--non-interactive` | Never prompt. Combine with the flags above. |
-| `--no-commit` | Switch off `main` but leave the commit to the caller; useful for the agent protocol. |
-| `--co-author "Name <email>"` | Repeatable `Co-Authored-By:` trailer for the bootstrap commit. |
-| `--force` | Allow running on the template repository itself (testing only). |
+| `check` | lint, typecheck, test, build and package lint, in that order |
+| `test` | `bun test ./src ./scripts` |
+| `typecheck` | strict TypeScript over the source and the tests |
+| `lint` / `format` | Biome check, or Biome auto-fix |
+| `build` / `lint:package` | tsdown build, then publint and are-the-types-wrong |
 
-Setup checks that it can proceed before changing anything. On `main` or `master` it switches to `feat/bootstrap`; a detached HEAD scaffolds without committing; a failed commit is reported instead of swallowed.
-
----
-
-## Available Scripts
-
-| Script | Command | Purpose |
-| --- | --- | --- |
-| `bun run setup` | `bun .agents/skills/setup-the-repo/scripts/setup.ts` | Interactive repository bootstrap wizard |
-| `bun run verify:setup` | `bun .agents/skills/setup-the-repo/scripts/verify.ts` | Scaffold every Archetype in a throwaway directory and run its checks (needs network, not part of CI) |
-| `bun run check` | Lint + Typecheck + Test + Build + Package Lint | Full CI verification pass |
-| `bun run test` | `bun test ./src ./scripts ./.agents/skills/setup-the-repo/scripts` | Run test suite with Bun test runner, including the setup logic |
-| `bun run typecheck` | `tsc -p tsconfig.json && tsc -p tsconfig.test.json` | Strict TypeScript typecheck |
-| `bun run lint` | `biome ci --error-on-warnings .` | Check formatting and lint rules |
-| `bun run format` | `biome check --write .` | Auto-format files and organize imports |
-| `bun run build` | `tsdown` | Compile dual ESM/CJS build into `dist/` |
-| `bun run lint:package`| `publint --strict && attw --pack . --profile node16` | Validate package exports & types |
-
----
-
-## Skills Architecture
-
-Skills are pinned in the root `skills-lock.json` of the monorepo, and the commands below run from the repository root:
-- Canonical skill files live in the root `.agents/skills/`.
-- Claude Code symlinks live in the root `.claude/skills/`.
-- Managed using the Vercel `skills` CLI:
-  ```bash
-  # Check skills status
-  bun run skills:check
-
-  # Update pinned skills
-  bun run skills:update
-  ```
-
----
-
-## License
-
-[MIT](./LICENSE)
+Agent rules: the root [AGENTS.md](../../AGENTS.md), then [AGENTS.md](./AGENTS.md).

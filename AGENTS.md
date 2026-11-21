@@ -19,7 +19,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 ## Rules
 
 1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...).
-2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only.
+2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only; Cloudflare credentials live in Cloudflare (Workers Builds), never in this repository.
 3. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
 4. Package design: keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
 5. Done means `bun run check` passes at the root (Turborepo). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
