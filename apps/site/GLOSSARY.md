@@ -84,6 +84,16 @@ _Avoid_: soft 404, error page
 The path `/__mf-preload.js`, owned by the router and never built by the Site.
 _Avoid_: preload script, client router
 
+## Consent
+
+**Consent**:
+The visitor's answer to the cookie banner, `granted` or `denied`, stored in `traj_consent` for 180 days. A browser that sends `Sec-GPC` or `DNT` is a `denied`, and a visitor who has not answered is `undecided`.
+_Avoid_: Cookie setting, opt-in
+
+**Visitor id**:
+The random UUID in `traj_vid` that a `granted` visitor carries, which the Worker writes into the home and the analytics uses as `distinct_id`. It is set only with consent ([ADR 0024](./docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)).
+_Avoid_: User id, account id
+
 ## Built site
 
 **Theme**:

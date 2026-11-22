@@ -1,0 +1,81 @@
+/*
+ * The cookie banner (ADR 0024): a slim bar, the hero stage's first row, in the page's own flow, with
+ * the question and two links on one row where they fit. It is never fixed over the page: axe cannot
+ * judge text that overlays different content on each of its lines, and ADR 0021 fails a page axe
+ * cannot judge. It keeps the phone's 16 px gutter and never scrolls sideways. The Worker leaves it out
+ * of the page once the visitor has answered. Colours are Theme roles, so both themes keep their contrast.
+ */
+
+.consent {
+	/* The header is fixed and 64 px tall (global.css), so the bar starts below it, not under it. */
+	margin-top: 4rem;
+	/* Above the stage's field, which sits at `z-index: -1` inside the same stage (blast.css). */
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 16px;
+	padding: 8px 16px;
+	border-block: 1px solid var(--ds-color-border);
+	background: var(--ds-color-card);
+	color: var(--ds-color-card-foreground);
+}
+
+/*
+ * The hero's copy is padded to clear the fixed header, and the bar has already cleared it, so while
+ * the bar is shown the copy keeps 8 px. That holds the demo window within a few pixels of where it
+ * stands on a visit without the bar, so it still starts playing on a 1280 x 720 screen, as the demo's
+ * in-view trigger (120 px above the fold) expects, even when a wider font wraps the question onto a
+ * third line.
+ */
+html:not([data-consent]) .consent + .hero-rise {
+	padding-top: 0.5rem;
+}
+
+.consent-text {
+	max-width: 60rem;
+	margin: 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.consent-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.consent-link {
+	display: inline-flex;
+	min-height: 32px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 14px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-sm);
+	color: var(--ds-color-foreground);
+	font-size: 0.875rem;
+	text-decoration: none;
+}
+
+.consent-link-allow {
+	border-color: var(--ds-color-primary);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.consent-link:hover {
+	text-decoration: underline;
+}
+
+.consent-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+/* The Worker writes `data-consent` for a visitor who has answered, so the banner is never painted. */
+html[data-consent] .consent {
+	display: none;
+}

@@ -1,3 +1,4 @@
+import type { ConsentChoice } from "../analytics/consent"
 import type { Language } from "../language/language"
 
 /** One probe: the request the local Worker is asked, and the answer it must give. */
@@ -20,6 +21,14 @@ export interface Probe {
 	readonly etag: boolean | null
 	/** The Language choice the answer must store in exactly one cookie, or `null` for none. */
 	readonly storesChoice: Language | null
+	/** The `Sec-GPC` header the request carries, or `null` when it sends none. */
+	readonly secGpc: string | null
+	/** The consent choice the answer must store in its two consent cookies, or `null` for none. */
+	readonly setsConsent: ConsentChoice | "reset" | "visitor" | null
+	/** Text the answer's body must contain, in any order. */
+	readonly contains: readonly string[]
+	/** Text the answer's body must not contain. */
+	readonly lacks: readonly string[]
 }
 
 /** What the local Worker answered for one probe, reduced to the facts the probe judges. */
@@ -48,6 +57,7 @@ export type ProbeFailureCode =
 	| "PROBE_SET_COOKIE_MISSING"
 	| "PROBE_SET_COOKIE_COUNT_WRONG"
 	| "PROBE_SET_COOKIE_WRONG"
+	| "PROBE_BODY_WRONG"
 	| "PROBE_VARY_WRONG"
 	| "PROBE_CACHE_CONTROL_WRONG"
 	| "PROBE_ETAG_MISSING"

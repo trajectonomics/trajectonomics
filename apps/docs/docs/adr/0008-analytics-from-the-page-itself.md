@@ -31,3 +31,7 @@ The Portal is a static build served under `/docs` by a Worker, and it navigates 
 - The Portal now writes to a third party on the reader's behalf. It sends no cookie, no id that survives the tab, and no content of the page; it sends the address, the referrer, the title and the `lang`.
 - A reader with JavaScript off is not measured at all. That is an absence of evidence, not zero readers.
 - Reading the numbers needs a PostHog credential, which only the owner holds. A Factory pass reads them through the PostHog MCP server, not through this repository.
+
+## Amendment (2026-11-22): the `sessionStorage` id is gone
+
+Decision 4 is superseded: the Portal no longer keeps a tab-scoped id in `sessionStorage`. Storing an identifier needs the visitor's yes, and only the Site asks for it ([site ADR 0024](https://github.com/trajectonomics/trajectonomics/blob/main/apps/site/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)). A reader who granted consent on the Site is counted under the Site's visitor id; anyone else is counted once per pageview with a fresh id. See [ADR 0016](./0016-the-portal-follows-the-sites-cookie-choice.md).

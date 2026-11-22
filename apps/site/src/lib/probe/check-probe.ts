@@ -7,6 +7,7 @@ import {
 	checkMediaType,
 	checkStatus,
 } from "./probe-answer-checks"
+import { checkBody } from "./probe-body-checks"
 import { checkSetCookie } from "./probe-cookie-checks"
 import { checkCacheControl, checkVary } from "./probe-header-checks"
 import { PROBES } from "./probes"
@@ -29,6 +30,7 @@ export function checkProbeResponses(responses: readonly ProbeResponse[]): readon
 			...checkCacheControl(response),
 			...checkEtag(response),
 			...checkSetCookie(response),
+			...checkBody(response),
 			...checkContentSecurityPolicy(response),
 		]),
 	]

@@ -71,10 +71,15 @@
 /*
  * The layer the field drifts on (motion.css moves it): the squares and the ripple share it, so a ripple
  * lights the squares the visitor sees, not a second set that slides against them.
+ *
+ * It overhangs the stage so the drift never shows an edge. Below, 2 % is enough: the drift moves it up
+ * by at most 1 % of its own height, and the stage's mask fades the bottom out anyway. A deeper overhang
+ * reaches the section under the hero, where axe, which does not see the stage's clip, finds the field
+ * under one line of a heading and not the next and cannot judge its contrast (ADR 0021, ADR 0024).
  */
 .hero-blast-drift {
 	position: absolute;
-	inset: -6%;
+	inset: -6% -6% -2%;
 	will-change: transform;
 }
 
