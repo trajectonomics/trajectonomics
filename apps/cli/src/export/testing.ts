@@ -1,12 +1,11 @@
-import { mkdtempSync } from "node:fs"
-import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { ledgerHome } from "../store/testing"
+import { makeTempDir } from "../temp-dir"
 import { capture } from "../test-support"
 
 /** A directory path that does not exist yet, so the command is the one that creates it. */
 export function outPath(): string {
-	return join(mkdtempSync(join(tmpdir(), "traj-export-")), "out")
+	return join(makeTempDir("traj-export-"), "out")
 }
 
 /** The seeded entity is the only row on a fresh database; every other table is empty. */

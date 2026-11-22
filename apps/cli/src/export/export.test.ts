@@ -1,13 +1,13 @@
 import { describe, expect, it, setSystemTime } from "bun:test"
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import { goldenHome, goldenJsonl } from "../interchange/testing"
 import { ledgerHome } from "../store/testing"
+import { makeTempDir } from "../temp-dir"
 import { capture } from "../test-support"
 
 /** A directory path that does not exist yet, so the command is the one that creates it. */
-const outPath = () => join(mkdtempSync(join(tmpdir(), "traj-export-")), "out")
+const outPath = () => join(makeTempDir("traj-export-"), "out")
 
 const SEEDED =
 	'{"record":"entity","id":"00000000-0000-7000-8000-000000000001","name":"Personal","version":1,' +
@@ -102,7 +102,7 @@ describe("export's refusals", () => {
 	})
 
 	it("names the path and a stable code when the write cannot happen", async () => {
-		const file = join(mkdtempSync(join(tmpdir(), "traj-export-")), "afile")
+		const file = join(makeTempDir("traj-export-"), "afile")
 		writeFileSync(file, "")
 		const out = join(file, "out")
 		const res = await capture(["export", "--out", out, "--json"], { TRAJ_HOME: await goldenHome() })

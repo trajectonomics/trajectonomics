@@ -1,8 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import { mkdtempSync } from "node:fs"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
 import pkg from "../package.json"
+import { makeTempDir } from "./temp-dir"
 
 async function traj(args: string[], env: Record<string, string> = {}) {
 	const proc = Bun.spawn(["bun", "src/index.ts", ...args], {
@@ -33,7 +31,7 @@ describe("process", () => {
 	})
 
 	it("exits 2 for a bare group, with the envelope on stderr and nothing on stdout", async () => {
-		const env = { TRAJ_HOME: mkdtempSync(join(tmpdir(), "traj-test-")) }
+		const env = { TRAJ_HOME: makeTempDir("traj-test-") }
 		const res = await traj(["report", "--json"], env)
 		expect(res.code).toBe(2)
 		expect(res.out).toBe("")

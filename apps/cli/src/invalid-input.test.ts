@@ -1,11 +1,9 @@
 import { describe, expect, it } from "bun:test"
-import { mkdtempSync } from "node:fs"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
 import type { Leaf } from "./command"
 import { root } from "./commands"
 import type { RegistryEntry } from "./error-listing"
 import { SENTENCES } from "./sentences"
+import { makeTempDir } from "./temp-dir"
 import { capture, type ErrorBody, errorOf } from "./test-support"
 import { leavesOf } from "./tree"
 import { ledgerHome } from "./tx-test-support"
@@ -89,7 +87,7 @@ describe("every leaf with no arguments", () => {
 			// The config home is a temporary one, so `telemetry on` and `off` never write a real one.
 			const res = await capture([...path, "--json"], {
 				TRAJ_HOME: ledgerHome(),
-				XDG_CONFIG_HOME: mkdtempSync(join(tmpdir(), "traj-invalid-input-")),
+				XDG_CONFIG_HOME: makeTempDir("traj-invalid-input-"),
 			})
 			if (SUCCEEDING.has(name)) {
 				expect({ name, code: res.code }).toEqual({ name, code: 0 })

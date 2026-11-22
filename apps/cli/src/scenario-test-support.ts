@@ -1,7 +1,7 @@
-import { mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { ledgerHome } from "./store/testing"
+import { makeTempDir } from "./temp-dir"
 import { type Captured, capture } from "./test-support"
 
 /** A fresh data directory for one Scenario test. */
@@ -31,7 +31,7 @@ export function applyScenario(
 
 /** Writes a document to a temporary file and returns its path. */
 export function documentFile(document: unknown): string {
-	const file = join(mkdtempSync(join(tmpdir(), "traj-scenario-doc-")), "doc.json")
+	const file = join(makeTempDir("traj-scenario-doc-"), "doc.json")
 	writeFileSync(file, typeof document === "string" ? document : JSON.stringify(document))
 	return file
 }
