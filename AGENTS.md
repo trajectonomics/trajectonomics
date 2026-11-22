@@ -42,6 +42,8 @@ Saving the owner's attention is part of the job, so finish a task instead of ask
 
 - Finish end-to-end: commit, push, open the PR, get an independent review, `gh pr merge` when the work is green or the owner said to proceed, then do the follow-up steps the change implies. Do not stop for small permission questions, and do not end with a `## Not done yet` list.
 - When unsure, consult subagents on other models (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`, `deepseek-v4.1-flash`) instead of asking the owner. The model rules above still decide which one a session may itself run.
+- Merge only on CI that ran against the current `main`. A pull request whose CI ran before another merge touched the same package is merged with `main` first and checked again: on 2026-11-23 #249 and #257 each passed alone and together broke `packages/core/sim`'s check on `main`.
+- Any `traj` an agent runs for a test, validation or eval sets `DO_NOT_TRACK=1`, so it never counts as a person using `traj` in the usage telemetry that goal G1 is measured by.
 - Verify before calling something blocked: read live GitHub state (`gh issue view`, `gh pr view`) and the real CLI/API schema first.
 - Keep replies short and lead with what only the owner must do; add detail when asked.
 - Record every durable lesson here, in the package's `AGENTS.md` or in `docs/`, never only in agent memory.
