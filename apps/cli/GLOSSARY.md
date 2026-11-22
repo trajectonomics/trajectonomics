@@ -134,6 +134,14 @@ _Avoid_: Patch, edit
 Money moved from cash flow into an investment or retirement account. It is not an expense, so net worth does not change at that instant.
 _Avoid_: Investment expense, savings
 
+**Household**:
+The people a Scenario's plan belongs to, stored beside its document: one holder, at most one partner and any dependents, each with a birth month and a life expectancy. It never changes the document's own fields; its Anchors do (ADR-0048).
+_Avoid_: Profile, family
+
+**Anchor**:
+A household's pin of one Scenario date field to a person's age, to their life's end or to a partner's join month. The date is written into the Scenario when the household is set; a later apply or fork keeps it, fills it, or refuses a value that disagrees (ADR-0048).
+_Avoid_: Link, binding, age field
+
 **Template**:
 The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
 _Avoid_: Sample, skeleton, example

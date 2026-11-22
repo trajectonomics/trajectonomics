@@ -34,6 +34,7 @@ describe("schema", () => {
 			"scenario apply",
 			"scenario diff",
 			"scenario fork",
+			"scenario household",
 			"scenario list",
 			"scenario rm",
 			"scenario show",

@@ -39,7 +39,7 @@ describe("scenarios", () => {
 			],
 		}
 		const same = must(store.saveScenario({ name: "base", document: reordered }))
-		expect(same).toEqual({ status: "unchanged", scenario: first.scenario })
+		expect(same).toEqual({ status: "unchanged", scenario: first.scenario, droppedAnchors: [] })
 		const changed = must(
 			store.saveScenario({ name: "base", document: { ...DOC, economy: { inflation: 100 } } }),
 		)
@@ -87,6 +87,7 @@ describe("scenarios", () => {
 		expect(must(store.forkScenario(base.id, "early"))).toEqual({
 			status: "name_taken",
 			scenario: fork.scenario,
+			droppedAnchors: [],
 		})
 		expect(must(store.forkScenario("nope", "late"))).toEqual({ status: "not_found" })
 	})

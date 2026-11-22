@@ -32,8 +32,8 @@ describe("doctor", () => {
 		expect(data.database).toMatchObject({
 			path: join(home, "traj.db"),
 			exists: true,
-			schemaVersion: 2,
-			head: 2,
+			schemaVersion: 3,
+			head: 3,
 		})
 		expect(data.database.bytes).toBeGreaterThan(0)
 		expect(data.rows).toEqual(GOLDEN)

@@ -6,6 +6,7 @@ import { isAppError } from "../errors"
 import { capture } from "../test-support"
 import { HEAD, openStore } from "./index"
 import { schemaV1 } from "./schema-v1"
+import { schemaV2 } from "./schema-v2"
 import { ledgerHome, mustOpen, steppingClock, tempHome } from "./testing"
 
 /**
@@ -23,6 +24,15 @@ const fixtures: Record<number, (home: string) => Promise<void>> = {
 		const db = new Database(join(home, "traj.db"))
 		schemaV1(db)
 		db.run("PRAGMA user_version = 1")
+		db.close()
+	},
+	// Version 2 adds the correction kind; it has no household column yet.
+	2: async (home) => {
+		expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
+		const db = new Database(join(home, "traj.db"))
+		schemaV1(db)
+		schemaV2(db)
+		db.run("PRAGMA user_version = 2")
 		db.close()
 	},
 }

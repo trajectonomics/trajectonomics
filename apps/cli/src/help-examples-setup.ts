@@ -24,6 +24,22 @@ function decimalText(document: object): string {
 	return JSON.stringify(converted)
 }
 
+/**
+ * The household the base fixture takes: the holder's age pins the salary's end, and their life's end
+ * the investment's, so each anchor names a Flow the fixture holds (cli ADR-0048).
+ */
+const BASE_HOUSEHOLD = {
+	schemaVersion: 1,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 90, joins: "2028-01" },
+	],
+	anchors: [
+		{ path: "flows.salary.end", person: "me", age: 60 },
+		{ path: "flows.invest.end", person: "me", at: "lifeEnd" },
+	],
+}
+
 /** The default: a ledger with the fixture's accounts, transactions and the projection Scenarios. */
 export const DEFAULT_SETUP: Setup = { ledger: "projection" }
 
@@ -46,6 +62,7 @@ export const SETUP: Record<string, Setup> = {
 			["data", "remove", "--confirm", "~/.traj", "--backup", "backup"],
 		],
 	},
+	"scenario household": { files: { "household.json": JSON.stringify(BASE_HOUSEHOLD) } },
 	"scenario apply": {
 		files: {
 			"base.json": JSON.stringify(PROJECTION_SCENARIO),

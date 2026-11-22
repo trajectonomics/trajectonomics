@@ -4,9 +4,10 @@ import { abort, write } from "./guard"
 import { isFileFailure } from "./io-errors"
 import { schemaV1 } from "./schema-v1"
 import { schemaV2 } from "./schema-v2"
+import { schemaV3 } from "./schema-v3"
 
 /** Ordered, forward-only steps. Step `n` takes the database from version `n` to `n + 1`. */
-const STEPS: readonly ((db: Database) => void)[] = [schemaV1, schemaV2]
+const STEPS: readonly ((db: Database) => void)[] = [schemaV1, schemaV2, schemaV3]
 
 /** The schema version this build writes: `PRAGMA user_version` after every step has run. */
 export const HEAD: number = STEPS.length
