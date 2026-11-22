@@ -41,7 +41,7 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 		notes: [
 			...prepared.notes,
 			...fundingNotes(projection.unfundedContributions, currency),
-			...withdrawNotes(prepared.document, projection.runsOut, currency),
+			...withdrawNotes(prepared.document, projection, currency),
 		],
 		horizon: timeline.horizon,
 		currency,

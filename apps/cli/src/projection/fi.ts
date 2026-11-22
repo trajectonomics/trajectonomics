@@ -70,7 +70,7 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 		notes: [
 			...prepared.notes,
 			...fundingNotes(result.projection.unfundedContributions, prepared.currency),
-			...withdrawNotes(prepared.document, result.projection.runsOut, prepared.currency),
+			...withdrawNotes(prepared.document, result.projection, prepared.currency),
 		],
 		horizon: prepared.timeline.horizon,
 		currency: prepared.currency,

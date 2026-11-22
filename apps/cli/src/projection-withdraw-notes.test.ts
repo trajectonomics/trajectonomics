@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test"
-import type { Scenario } from "@trajectonomics/core/sim"
+import type { ProjectionRow, Scenario } from "@trajectonomics/core/sim"
 import type { CompareView } from "./projection/compare-view"
-import { dateFlags, projection, projectionHome } from "./projection/testing"
+import type { FiView } from "./projection/fi-view"
+import { baseFlags, dateFlags, fi, projection, projectionHome } from "./projection/testing"
 import { withdrawNotes } from "./projection/withdraw-notes"
 import { runBody } from "./projection-run-support"
 
@@ -21,31 +22,60 @@ const DOCUMENT = {
 const HUGE_RENT = ["--set", "flows.rent.amount=900000000"]
 const RAN_OUT = { date: "2027-03-31", unmet: 12_500_000 }
 
+/** The row a Projection keeps on a date, holding each Account's balance in minor units. */
+function rowOn(date: string, held: Record<string, number>): ProjectionRow {
+	const balances = Object.entries(held).map(([account, amount]) => ({
+		account,
+		amount,
+		capitalised: amount,
+		accruedInterest: 0,
+	}))
+	return {
+		date,
+		balances,
+		netWorth: 0,
+		accessibleNetWorth: 0,
+		realBalances: balances,
+		realNetWorth: 0,
+		realAccessibleNetWorth: 0,
+	}
+}
+const HELD = [rowOn("2027-03-31", { cash: 50_000_000, vault: 7_000_000, loan: -1_000_000 })]
+const RUN = { runsOut: RAN_OUT, rows: HELD }
+
 describe("the withdraw sentence", () => {
-	it("names the unlisted asset Account, the amount, and the exact change to make", () => {
-		const [note] = withdrawNotes(DOCUMENT, RAN_OUT, "THB")
-		expect(note).toContain("125000.00")
-		expect(note).toContain("2027-03-31")
-		expect(note).toContain("not in it: cash.")
+	it("names the unlisted asset Account, what it held, the amount, and the exact change to make", () => {
+		const [note] = withdrawNotes(DOCUMENT, RUN, "THB")
+		expect(note).toContain("125000.00 unmet on 2027-03-31")
+		expect(note).toContain("not in it, holding on that day: cash (500000.00).")
 		expect(note).toContain(`--set 'cashflow.withdraw=["cash"]'`)
+	})
+
+	it("skips an unlisted asset Account that held nothing on the day, since adding it would change nothing", () => {
+		const drained = { runsOut: RAN_OUT, rows: [rowOn("2027-03-31", { cash: 0 })] }
+		expect(withdrawNotes(DOCUMENT, drained, "THB")).toEqual([])
+		expect(withdrawNotes(DOCUMENT, { runsOut: RAN_OUT, rows: [] }, "THB")).toEqual([])
 	})
 
 	it("skips a locked Account, a liability, and an Account already listed", () => {
 		const listed = { ...DOCUMENT, cashflow: { ...DOCUMENT.cashflow, withdraw: ["cash"] } }
-		expect(withdrawNotes(listed, RAN_OUT, "THB")).toEqual([])
+		expect(withdrawNotes(listed, RUN, "THB")).toEqual([])
 	})
 
 	it("counts a locked Account once its lock has passed", () => {
-		const note = withdrawNotes(DOCUMENT, { ...RAN_OUT, date: "2030-02-01" }, "THB").join(" ")
-		expect(note).toContain("not in it: cash, vault.")
+		const later = { ...RAN_OUT, date: "2030-02-01" }
+		const rows = [rowOn("2030-02-01", { cash: 50_000_000, vault: 7_000_000 })]
+		const note = withdrawNotes(DOCUMENT, { runsOut: later, rows }, "THB").join(" ")
+		expect(note).toContain("holding on that day: cash (500000.00), vault (70000.00).")
+		expect(note).toContain(`--set 'cashflow.withdraw=["cash","vault"]'`)
 	})
 
 	it("says nothing when the Projection never ran out", () => {
-		expect(withdrawNotes(DOCUMENT, undefined, "THB")).toEqual([])
+		expect(withdrawNotes(DOCUMENT, { runsOut: undefined, rows: HELD }, "THB")).toEqual([])
 	})
 
 	it("names the side in a compare", () => {
-		expect(withdrawNotes(DOCUMENT, RAN_OUT, "THB", "B").join(" ")).toStartWith("Side B's Scenario")
+		expect(withdrawNotes(DOCUMENT, RUN, "THB", "B").join(" ")).toStartWith("Side B's Scenario")
 	})
 })
 
@@ -56,7 +86,7 @@ describe("a Projection that ran out beside Accounts outside the withdraw list", 
 		expect(res.code).toBe(0)
 		const body = runBody(res)
 		expect(body.runsOut).not.toBeNull()
-		expect(body.notes.join(" ")).toContain("Expenses and tax Settlements are paid only from")
+		expect(body.notes.join(" ")).toContain("is paid only from the Accounts in cashflow.withdraw")
 	})
 
 	it("adds nothing when the Projection holds out", async () => {
@@ -73,5 +103,13 @@ describe("a Projection that ran out beside Accounts outside the withdraw list", 
 		const notes = (JSON.parse(res.out) as CompareView).notes.join(" ")
 		expect(notes).toContain("Side B's Scenario had")
 		expect(notes).not.toContain("Side A's Scenario")
+	})
+
+	it("tells the reader in the notes of fi when the plan cannot hold out", async () => {
+		const home = await projectionHome()
+		const res = await fi(home, baseFlags("unreachable"))
+		expect(res.code).toBe(0)
+		const body = JSON.parse(res.out) as FiView
+		expect(body.notes.join(" ")).toContain("is paid only from the Accounts in cashflow.withdraw")
 	})
 })

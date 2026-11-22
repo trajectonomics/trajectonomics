@@ -67,6 +67,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 		prepared,
 		fi: solution,
 		runsOut,
+		rows,
 		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 		unfunded: result.projection.unfundedContributions,
 		final,
@@ -107,8 +108,8 @@ export function compareOf(input: CompareInput): CompareView | AppError {
 			...tax.notes,
 			...fundingNotes(dataA.unfunded, a.currency, "A"),
 			...fundingNotes(dataB.unfunded, b.currency, "B"),
-			...withdrawNotes(a.document, dataA.runsOut, a.currency, "A"),
-			...withdrawNotes(b.document, dataB.runsOut, b.currency, "B"),
+			...withdrawNotes(a.document, dataA, a.currency, "A"),
+			...withdrawNotes(b.document, dataB, b.currency, "B"),
 		],
 	}
 }

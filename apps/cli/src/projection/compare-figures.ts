@@ -12,6 +12,8 @@ export type SideData = {
 	prepared: Placed
 	fi: FiSolution
 	runsOut: RunsOut | undefined
+	/** Every row the Projection kept, the one on its run-out date included. */
+	rows: readonly ProjectionRow[]
 	taxYears: TaxYearView[]
 	/** The Contributions the engine could not fund, per Account. */
 	unfunded: readonly AccountAmount[]
