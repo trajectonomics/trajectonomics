@@ -42,6 +42,19 @@ describe("personFromDraft", () => {
 		})
 	})
 
+	test("a role left blank is a problem, never a default", () => {
+		const draft = {
+			...personDraftOf(undefined, ""),
+			name: "mali",
+			born: "2027-09",
+			lifeExpectancy: "90",
+		}
+		expect(draft.role).toBe("")
+		const result = personFromDraft(draft, { taken: ["me"] })
+		expect(result.ok).toBe(false)
+		if (!result.ok) expect(result.problems["role"]).toBe("Choose the person's role.")
+	})
+
 	test("a dependent without a chosen relation is a problem at the relation field", () => {
 		expect(
 			personFromDraft(draft({ role: "dependent", relation: "", joins: "" }), { taken: [] }),

@@ -1,13 +1,14 @@
 /**
  * The text of the person form, and the person it saves. Every check is a shape check: `traj` decides
  * whether the household is valid, and its refusal is shown at the field it names. The form invents no
- * fact about a person: a blank birth month, life expectancy or relation stays a problem.
+ * fact about a person: a blank role, birth month, life expectancy or relation stays a problem.
  */
 import type { HouseholdPerson } from "../../contract"
 import { slugId, uniqueId } from "../plan-items/form"
 import type { Problems } from "../plan-items/problems"
 
 const MONTH_TEXT = /^\d{4}-(0[1-9]|1[0-2])$/
+const ROLES: readonly string[] = ["holder", "partner", "dependent"]
 const WHOLE_TEXT = /^\d{1,15}$/
 
 /** The relations a dependent may have to the account holder (cli ADR-0048). */
@@ -50,6 +51,7 @@ export function relationOf(text: string): Relation | null {
 function personProblems(draft: PersonDraft, isNew: boolean): Map<string, string> {
 	const problems = new Map<string, string>()
 	if (isNew && slugId(draft.name) === "") problems.set("name", "Enter a name for the person.")
+	if (!ROLES.includes(draft.role)) problems.set("role", "Choose the person's role.")
 	if (!MONTH_TEXT.test(draft.born.trim())) problems.set("born", "Enter the birth month as YYYY-MM.")
 	if (!WHOLE_TEXT.test(draft.lifeExpectancy.trim())) {
 		problems.set("lifeExpectancy", "Enter the age at which life ends, as a whole number.")

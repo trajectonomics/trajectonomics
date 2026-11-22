@@ -26,7 +26,9 @@ interface Props {
 let { name, household, existing, onDone }: Props = $props()
 /** The relation is chosen, never assumed: the first choice says so. */
 const RELATION_CHOICES_WITH_BLANK = [{ value: "", label: "Choose a relation" }, ...RELATION_CHOICES]
-const initial = () => personDraftOf(existing, household === null ? "holder" : "dependent")
+const ROLE_CHOICES_WITH_BLANK = [{ value: "", label: "Choose a role" }, ...ROLE_CHOICES]
+// The first person is the account holder, which a household must have; any later one has no role until chosen.
+const initial = () => personDraftOf(existing, household === null ? "holder" : "")
 let draft: PersonDraft = $state(initial())
 let problems: Problems = $state({})
 const FIELDS = ["name", "role", "relation", "born", "lifeExpectancy", "joins"]
@@ -63,7 +65,7 @@ async function removePerson(): Promise<void> {
 	{:else}
 		<Field id="person-name" label="Name" hint="A short name for the person, such as me or partner" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
-	<Field id="person-role" label="Role" options={ROLE_CHOICES} bind:value={draft.role} problem={shown.at("role")} />
+	<Field id="person-role" label="Role" options={existing || household === null ? ROLE_CHOICES : ROLE_CHOICES_WITH_BLANK} bind:value={draft.role} problem={shown.at("role")} />
 	{#if draft.role === "dependent"}
 		<Field id="person-relation" label="Relation to the account holder" options={RELATION_CHOICES_WITH_BLANK} bind:value={draft.relation} problem={shown.at("relation")} />
 	{/if}
