@@ -8,11 +8,20 @@ import type { DashboardDeps } from "./run"
 type Started = Parameters<DashboardDeps["start"]>[0]
 
 const read = (argv: string[], ok: boolean) => ({ argv, ok })
+const single = (leaf: string) => read([leaf, "--json"], true)
 const SNAPSHOT = {
 	reads: {
-		doctor: read(["doctor", "--json"], true),
+		doctor: single("doctor"),
+		accounts: single("account"),
+		balance: single("balance"),
+		netWorth: single("report"),
+		pnl: single("report"),
+		transactions: single("tx"),
+		baseline: single("baseline"),
+		scenarios: single("scenario"),
 		netWorthHistory: [read(["report", "networth", "--json"], true)],
 		projections: { base: read(["projection", "run", "--scenario", "base", "--json"], false) },
+		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
 	},
 } as unknown as Snapshot
@@ -50,7 +59,7 @@ describe("traj dashboard", () => {
 			url: "http://127.0.0.1:4321/",
 			asOf: "2026-11-30",
 			horizon: "2056-11-30",
-			reads: 3,
+			reads: 11,
 			failedReads: ["traj projection run --scenario base --json"],
 		})
 		expect(calls[0]?.port).toBe(DEFAULT_PORT)
@@ -106,6 +115,13 @@ describe("traj dashboard", () => {
 			hint: "traj init",
 		})
 		expect(stops).toEqual([])
+	})
+
+	it("refuses a port outside 0 to 65535 before it reads anything", async () => {
+		const { root, calls } = harness(SERVED)
+		const res = await capture(["dashboard", ...DATES, "--port", "70000", "--json"], {}, root)
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "--port" })
+		expect(calls).toEqual([])
 	})
 
 	it("turns a taken port into invalid input on --port", async () => {

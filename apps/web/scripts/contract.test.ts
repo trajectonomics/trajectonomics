@@ -2,7 +2,8 @@ import { describe, expect, test } from "bun:test"
 import { existsSync } from "node:fs"
 import { readFile } from "node:fs/promises"
 import { fileURLToPath } from "node:url"
-import { type Read, type Snapshot, snapshot } from "../src/lib/contract"
+import { snapshot } from "../src/lib/contract"
+import { readsOf } from "../src/lib/snapshot"
 import { type DemoRun, runDemo } from "./demo-run"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
@@ -16,24 +17,6 @@ let demo: Promise<DemoRun> | null = null
 function demoRun(): Promise<DemoRun> {
 	demo ??= runDemo(BINARY)
 	return demo
-}
-
-/** Every Read a Snapshot holds, whatever its slot. */
-function readsOf(document: Snapshot): Read<unknown>[] {
-	const { reads } = document
-	const single = [
-		reads.doctor,
-		reads.accounts,
-		reads.balance,
-		reads.netWorth,
-		reads.pnl,
-		reads.transactions,
-		reads.baseline,
-		reads.scenarios,
-	]
-	const maps = [...Object.values(reads.projections), ...Object.values(reads.fi)]
-	const compare = reads.compare === null ? [] : [reads.compare]
-	return [...single, ...reads.netWorthHistory, ...maps, ...compare]
 }
 
 describe("the Snapshot against the real traj", () => {

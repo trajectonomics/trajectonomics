@@ -39,6 +39,9 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 			carryIn: carryInFlag,
 			port: z
 				.number()
+				.int()
+				.min(0)
+				.max(65535)
 				.default(DEFAULT_PORT)
 				.describe("The loopback port to listen on; 0 lets the system pick a free one."),
 		}),

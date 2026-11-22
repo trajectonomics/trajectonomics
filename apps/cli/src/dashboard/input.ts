@@ -1,4 +1,4 @@
-import { checkParams, type PlanParams, type Snapshot } from "@trajectonomics/web/serve"
+import { checkParams, type PlanParams, readsOf, type Snapshot } from "@trajectonomics/web/serve"
 import { z } from "zod"
 import { type AppError, fail } from "../errors"
 
@@ -56,18 +56,6 @@ export const dashboardOutput: z.ZodType<DashboardSummary> = z.strictObject({
 		.array(z.string())
 		.describe("The command of each read that failed; its page showed the error instead."),
 })
-
-type AnyRead = { ok: boolean; argv: string[] }
-
-/** Every Read the Snapshot holds, flattened from its single, listed and per-Scenario reads. */
-function readsOf(snapshot: Snapshot): AnyRead[] {
-	return Object.values(snapshot.reads).flatMap((value): AnyRead[] => {
-		if (value === null) return []
-		if (Array.isArray(value)) return value
-		if ("ok" in value && "argv" in value) return [value as AnyRead]
-		return Object.values(value as Record<string, AnyRead>)
-	})
-}
 
 /** The result once the server has stopped: where it was, and which reads failed. */
 export function summaryOf(url: string, params: PlanParams, snapshot: Snapshot): DashboardSummary {

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "bun:test"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
-import type { Snapshot } from "@trajectonomics/web/serve"
+import { type Snapshot, snapshotSchema } from "@trajectonomics/web/serve"
 import { ledgerHome } from "../store/testing"
 import { capture } from "../test-support"
 
@@ -53,6 +53,8 @@ describe("traj dashboard, served", () => {
 		expect(await page.text()).toContain("<html")
 		expect((await fetch(`${url}net-worth/`)).status).toBe(200)
 		const snapshot = (await (await fetch(`${url}snapshot.json`)).json()) as Snapshot
+		// The strict contract apps/web renders: a change in a read's --json output fails here too.
+		expect(snapshotSchema.safeParse(snapshot).error).toBeUndefined()
 		expect(snapshot.snapshotVersion).toBe(1)
 		expect(snapshot.params.asOf).toBe("2026-03-31")
 		expect(snapshot.reads.accounts.ok).toBe(true)

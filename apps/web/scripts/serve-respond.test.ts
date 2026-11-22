@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { respond } from "./serve"
+import { respond } from "./serve-respond"
 
 const PACK = new Map([
 	["/index.html", new TextEncoder().encode("<html>home</html>")],
