@@ -1,6 +1,6 @@
 ---
 name: traj
-description: "Operate `traj`, the Trajectonomics ledger and projection CLI, on someone's own money: record what they earned and spent, read balances and reports, and answer what-if and financial-independence questions. Use when the user talks about their accounts, spending, budget, net worth, savings plan, Thai tax, or planning a purchase."
+description: "Operate `traj`, the Trajectonomics command-line ledger, on someone's own money: record what they earned and spent, keep their accounts, check that the ledger balances, and read balances and reports. Use when someone wants to track their spending from a terminal, set up their accounts (for example to work out their Thai income tax estimate), record an expense or income, check their ledger, or asks about net worth or financial-independence questions; also whenever they name `traj`. It computes from a ledger and nothing else: it is no spreadsheet, gives no investment advice, and does not prepare, file or check a tax return."
 metadata:
   cli: ">=0.2.0 <0.8.0"
 ---
