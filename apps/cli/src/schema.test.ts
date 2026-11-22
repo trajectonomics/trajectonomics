@@ -25,6 +25,7 @@ describe("schema", () => {
 			"help",
 			"init",
 			"inspect",
+			"projection chance",
 			"projection compare",
 			"projection run",
 			"report networth",

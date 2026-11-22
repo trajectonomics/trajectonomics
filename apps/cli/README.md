@@ -173,6 +173,18 @@ and where it came from, and one that starts on a period boundary needs nothing:
 ]
 ```
 
+## Chance of success
+
+> **Ships in 0.7.0.**
+
+`traj projection chance` runs one Scenario over seeded Market paths and reports
+the share that never run out before the Horizon, with the net-worth Bands at each
+year. The paths draw from a Return model you state in a JSON file, with
+`--return-model`, and `--paths` and `--seed` are required, so the same model,
+seed and count always give the same answer. The CLI ships no Return model: which
+market history a plan is tested against is your decision, and every figure is
+only as good as that choice. `traj schema projection chance` describes the file.
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.
