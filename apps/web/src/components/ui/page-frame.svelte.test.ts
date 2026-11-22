@@ -21,7 +21,7 @@ describe("PageFrame", () => {
 
 	test("shows the exact command and a demo link when no Snapshot is there", () => {
 		const html = frame({ status: "missing", url: "/snapshot.json" }).body
-		expect(html).toContain("bun run dashboard -- --as-of YYYY-MM-DD --horizon YYYY-MM-DD")
+		expect(html).toContain("traj dashboard --as-of YYYY-MM-DD --horizon YYYY-MM-DD")
 		expect(html).toContain('href="/net-worth/?demo=1"')
 		expect(html).toContain("View the demo")
 	})
