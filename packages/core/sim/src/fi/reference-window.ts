@@ -10,7 +10,7 @@ export interface ReferenceMoney {
 	readonly real: boolean
 }
 
-/** Deflates each measurement from its own Landed date before summing, as ADR 0007 fixes. */
+/** Deflates each measurement from its own Landed date before summing, as ADR 0013 fixes. */
 export function deflated(window: ExpenseWindow, money: ReferenceMoney): WindowOutcome {
 	const measurements: { readonly date: DateString; readonly amount: bigint }[] = []
 	for (let index = 0; index < window.dates.length; index++) {

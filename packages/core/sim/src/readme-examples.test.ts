@@ -77,7 +77,6 @@ describe("README examples", () => {
 		const steps = String(manifest.scripts.check)
 			.split("&&")
 			.map((part) => part.trim().split(/\s+/).at(-1))
-			// `build-unless-turbo.ts` is the build step: a direct check builds, a turbo one does not.
 			.map((step) => (step?.endsWith("build-unless-turbo.ts") ? "build" : step))
 		const bullet = readme.split("\n").find((line) => line.startsWith("- `bun run check`")) ?? ""
 		expect(steps).toEqual(["lint", "typecheck", "test", "build", "parity", "lint:package"])
