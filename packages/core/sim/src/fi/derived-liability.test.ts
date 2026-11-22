@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { addDays, addMonthsClamped } from "../calendar/arith"
 import { project } from "../engine/project"
 import {
 	contribution,
@@ -9,6 +10,7 @@ import {
 	income,
 } from "../engine/test-flows"
 import { makeFixture } from "../engine/test-helpers"
+import type { Fixture } from "../fixtures/fixture"
 import { financialIndependence } from "../index"
 import type { Derive, Scenario, SurvivalOptions } from "../types"
 
@@ -23,6 +25,25 @@ function portion(flow: string, percent: number): Derive {
 }
 
 const survival: SurvivalOptions = { method: "survival" }
+const spending = { amount: 5_000_000, growth: { bps: 0 } }
+
+/** The refusal of the debt payment, which every case here writes as the third Flow. */
+const refused = {
+	ok: false,
+	problems: [
+		{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
+	],
+}
+
+/** Whether the plan never runs out once earned income stops on the day before `month`. */
+function survivesFrom(fixture: Fixture, month: string): boolean {
+	const last = addDays(month, -1)
+	const flows = fixture.scenario.flows.map((flow) =>
+		flow.kind === "income" && flow.earned ? { ...flow, end: last } : flow,
+	)
+	const result = project(fixture.baseline, { ...fixture.scenario, flows }, fixture.timeline)
+	return result.ok && result.projection.runsOut === undefined
+}
 
 /** Salary and living expenses; the mortgage is `payment`, passed in as the Flow under test. */
 function mortgageCase(payment: Scenario["flows"][number], extra: Scenario["flows"] = []) {
@@ -61,18 +82,15 @@ describe("a Derived debt payment in the Financial Independence test", () => {
 			ok: true,
 			financialIndependence: { reachable: true, month: "2028-06-01" },
 		})
+		expect(survivesFrom(fixed, "2028-06-01")).toBe(true)
+		expect(survivesFrom(fixed, addMonthsClamped("2028-06-01", -1))).toBe(false)
 
 		const derived = mortgageCase(
 			derivedContribution("payment", "mortgage", portion("salary", 40), monthly),
 		)
 		expect(
 			financialIndependence(derived.baseline, derived.scenario, derived.timeline, survival),
-		).toEqual({
-			ok: false,
-			problems: [
-				{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
-			],
-		})
+		).toEqual(refused)
 	})
 
 	it("refuses the derived debt payment even when retirement spending is set", () => {
@@ -82,14 +100,9 @@ describe("a Derived debt payment in the Financial Independence test", () => {
 		expect(
 			financialIndependence(derived.baseline, derived.scenario, derived.timeline, {
 				method: "survival",
-				retirementSpending: { amount: 5_000_000, growth: { bps: 0 } },
+				retirementSpending: spending,
 			}),
-		).toEqual({
-			ok: false,
-			problems: [
-				{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
-			],
-		})
+		).toEqual(refused)
 	})
 
 	it("still returns the month for a derived contribution into an asset", () => {
@@ -133,12 +146,7 @@ describe("a Derived debt payment in the Financial Independence test", () => {
 		)
 		expect(
 			financialIndependence(fixture.baseline, fixture.scenario, fixture.timeline, survival),
-		).toEqual({
-			ok: false,
-			problems: [
-				{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
-			],
-		})
+		).toEqual(refused)
 	})
 
 	it("refuses probabilityThreshold before the return model is checked", () => {
@@ -152,12 +160,7 @@ describe("a Derived debt payment in the Financial Independence test", () => {
 				paths: 10,
 				seed: "0000000000000000",
 			}),
-		).toEqual({
-			ok: false,
-			problems: [
-				{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
-			],
-		})
+		).toEqual(refused)
 	})
 
 	it("reports the expense refusal first, and the debt-payment refusal once retirement spending waives the expense", () => {
@@ -175,14 +178,9 @@ describe("a Derived debt payment in the Financial Independence test", () => {
 		expect(
 			financialIndependence(baseline, scenario, timeline, {
 				method: "survival",
-				retirementSpending: { amount: 5_000_000, growth: { bps: 0 } },
+				retirementSpending: spending,
 			}),
-		).toEqual({
-			ok: false,
-			problems: [
-				{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
-			],
-		})
+		).toEqual(refused)
 	})
 
 	it("still projects the refused Scenario, with no runsOut on the plain Projection", () => {
