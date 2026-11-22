@@ -3,13 +3,7 @@ import type { Levy, Tallies } from "@trajectonomics/sim"
 import { evaluateMeasures } from "@trajectonomics/sim"
 import { TaxValidationError } from "../../core/money"
 import { ThLevyGraph } from "../levy/graph"
-import {
-	capAt,
-	flooredToBaht,
-	rateCapAt,
-	rateFlooredToBaht,
-	sumMeasures,
-} from "../levy/graph-rates"
+import { capAt, rateCapAt, rateFlooredToSatang, sumMeasures } from "../levy/graph-rates"
 import { type ThLevy, ThLevyRounding, ThLevyTallyBasis } from "../levy/graph-types"
 import { ThLevyMeasureId } from "../levy/measure-ids"
 import { levyValues, simTallies } from "./levy-sim"
@@ -73,15 +67,15 @@ describe("ThLevyGraph measures", () => {
 		expect(measureValue(levy, missing, tallies)).toBe(0)
 	})
 
-	it("floors a percentage to whole baht the way Math.floor(major * rate) does", () => {
+	it("floors a percentage to the satang the way floorByRateToSatang does", () => {
 		const graph = new ThLevyGraph()
 		const base = graph.tally("base", ThLevyTallyBasis.Gross)
-		const half = rateFlooredToBaht(graph, base, 0.5)
-		const whole = flooredToBaht(graph, base)
+		const half = rateFlooredToSatang(graph, base, 0.5)
+		const sixty = rateFlooredToSatang(graph, base, 0.6)
 		const levy = build(graph, half)
 		const tallies = emptyTallies([["base", 10_001]])
 		expect(measureValue(levy, half, tallies)).toBe(5000)
-		expect(measureValue(levy, whole, tallies)).toBe(10_000)
+		expect(measureValue(levy, sixty, tallies)).toBe(6000)
 	})
 
 	it("caps a percentage at a satang ceiling with half-up rounding", () => {

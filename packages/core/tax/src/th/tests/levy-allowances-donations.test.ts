@@ -45,9 +45,9 @@ describe("TH 2026 Levy donation allowances", () => {
 		expect(donations(0, 100_000, 100_000)).toEqual(expected(0, 100_000, 100_000))
 	})
 
-	it("rounds the 10% caps down to whole baht", () => {
+	it("floors the 10% caps to the satang, not the whole baht", () => {
 		const net = toSatang(100_009)
 		expect(donations(net, 100_000, 0)).toEqual(expected(net, 100_000, 0))
-		expect(donations(net, 100_000, 0).total).toBe(toSatang(10_000))
+		expect(donations(net, 100_000, 0).total).toBe(toSatang(10_000.9))
 	})
 })

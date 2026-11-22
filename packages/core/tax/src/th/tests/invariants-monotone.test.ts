@@ -2,16 +2,16 @@ import { describe, expect, it } from "bun:test"
 import { calculateThTax } from "../calculate"
 import { raiseSlot, toTaxInput } from "./invariants-input"
 import { type IncomeSlotId, type InvariantProfile, randomProfile } from "./invariants-profile"
-import { forAllSeeded, type SeededRandom } from "./invariants-random"
+import { forAllSeeded, type SeededRandom, seededRandom } from "./invariants-random"
 
 const SEED = 52_001
 const CASES = 250
 /**
  * Smallest income increase the monotonicity property asserts, in baht.
  *
- * Each whole-baht floor on a standard deduction (for example 60% of income under 40(8)) can add one
- * baht to the deduction, so a step under about 2.5 baht can lower net income. Steps of 3 baht or more
- * held in 40,000 seeded draws; the smaller steps are the known violation in the skipped test below.
+ * Percentage deductions floor to the satang (owner ruling 2026-11-22, trajectonomics/trajectonomics#52),
+ * so a step of 3 baht or more holds in 40,000 seeded draws. Sub-3-baht steps hold in 40,000 draws too
+ * (checked outside the suite), and the allowances stage subtracts in integer satang (see the test below).
  */
 const MIN_STEP_BAHT = 3
 const SLOT_IDS: readonly IncomeSlotId[] = [
@@ -71,11 +71,10 @@ describe("Thai PIT invariant: more income of one class never lowers tax", () => 
 		}
 	})
 
-	// KNOWN VIOLATION, skipped so the suite stays green. Seed 1, case 18 of the sub-3-baht draws:
-	// raising 40(8) general income by 0.84 baht lowers total tax from 2,263,556.60 to 2,263,556.55,
-	// because the standard 60% deduction is floored to whole baht (electable-expense.ts:31).
-	// Tracked in the PR body and on trajectonomics/trajectonomics#52.
-	it.skip("KNOWN VIOLATION: tax can fall for a sub-3-baht increase (seed 1, case 18)", () => {
+	// Regression for seed 1, case 18: before the satang floor, raising 40(8) general income by 0.84
+	// baht lowered total tax from 2,263,556.60 to 2,263,556.55, because the standard 60% deduction was
+	// floored to whole baht (electable-expense.ts). Tracked on trajectonomics/trajectonomics#52.
+	it("tax never falls for a sub-3-baht increase (seed 1, case 18)", () => {
 		forAllSeeded(
 			"income monotonicity, sub-3-baht steps",
 			1,
@@ -89,5 +88,18 @@ describe("Thai PIT invariant: more income of one class never lowers tax", () => 
 				expect(totalTax(raiseSlot(profile, slot, delta))).toBeGreaterThanOrEqual(totalTax(profile))
 			},
 		)
+	})
+
+	// Seed 52004, profile 403, with 40(8) general at 11,993.04 then 11,993.05 baht: a float subtraction
+	// before the donation cap once made total tax fall by a satang. The allowances stage now subtracts
+	// in integer satang (#52).
+	it("never falls by a satang from float subtraction before the donation floor (seed 52004, profile 403)", () => {
+		const rng = seededRandom(52_004)
+		let base = randomProfile(rng)
+		for (let index = 0; index < 403; index++) base = randomProfile(rng)
+		const taxAt = (x: number): number =>
+			calculateThTax(toTaxInput({ ...base, slots: { ...base.slots, general: { amount: x } } }))
+				.totalTax
+		expect(taxAt(11_993.05)).toBeGreaterThanOrEqual(taxAt(11_993.04))
 	})
 })

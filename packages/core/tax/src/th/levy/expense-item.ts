@@ -2,7 +2,7 @@ import { validateMonetaryAmount } from "../../core/money"
 import type { ThExpenseField } from "../types"
 import { toSatang } from "../units"
 import type { ThLevyGraph } from "./graph"
-import { capAt, rateFlooredToBaht, sumMeasures } from "./graph-rates"
+import { capAt, rateFlooredToSatang, sumMeasures } from "./graph-rates"
 import type { ThLevyExpenseChoice } from "./profile-types"
 
 /**
@@ -57,7 +57,7 @@ export function addActualExpense(
  *
  * Purpose: Selects the election branch and applies the item's statutory formula.
  * Math: Actual election gives `min(actual, income)`; otherwise `min(floor(income * rate), cap)`
- * expressed in whole baht, reproducing the calculator's `Math.floor(major * rate)` step.
+ * floored to the satang, reproducing the calculator's `floorByRateToSatang` step.
  * Units: Measures are integer satang; `rate` is dimensionless.
  * Throws: TaxValidationError if the actual expense is invalid.
  *
@@ -69,7 +69,7 @@ export function addItemExpense(graph: ThLevyGraph, line: ThLevyExpenseLine): str
 	if (line.choice?.election === "actual") {
 		return addActualExpense(graph, line.tally, line.choice, line.field)
 	}
-	const standard = rateFlooredToBaht(graph, line.tally, line.rate)
+	const standard = rateFlooredToSatang(graph, line.tally, line.rate)
 	return line.capSatang === undefined ? standard : capAt(graph, standard, line.capSatang)
 }
 

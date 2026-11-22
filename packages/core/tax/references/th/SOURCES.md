@@ -32,7 +32,7 @@ change (OD5); no row carries it.
 
 ## Coverage
 
-`TH_2026_PARAMETERS` holds 125 scalar leaves, 73 collapsed paths and 71 statutory figures.
+`TH_2026_PARAMETERS` holds 124 scalar leaves, 72 collapsed paths and 70 statutory figures.
 `taxYear` and `currency` are not figures and are exempt (`src/th/references/exemptions.ts`).
 This manifest has one row per remaining path.
 
@@ -64,6 +64,7 @@ then the row's result is `reported`.
 | `rd.go.th/english/6045.html` | 200, labelled 2013-2014 | 40(5), 40(6) rates only |
 | `rd.go.th/english/37771.html` | 500 | the income tax schedule page |
 | `rd.go.th/1603.html` (Royal Decree index) | 200, Thai, lists decrees to No. 812 (B.E. 2569) | finding the decree PDFs |
+| `fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf` (PND 90 instructions, tax year 2567) | 200, text (18 pages) | the GPF ceiling (2026-11-22) |
 | `fileadmin/.../p44.pdf`, `p46.pdf` | 200, text | Acts No. 44 and 46 |
 | `fileadmin/.../dc470.pdf`, `dc480.pdf`, `dc629.pdf`, `dc634.pdf` | 200, text | Royal Decrees 470, 480, 629, 634 |
 | `fileadmin/.../126.pdf` (M.R. No. 126) | 200, **image scan** | named, not read |
@@ -76,10 +77,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 
 ## Findings
 
-- **Recorded, not changed (OD5).** `allowances.retirementCluster.gpf.maxRate` applies 30 per cent
-  of wages; the only 2026 figure read (Raidaai) prints 15 per cent for the provident-fund,
-  government-pension-fund and teacher-fund group. The row records the disagreement. No corpus case
-  asserts the rate.
+- **GPF: ruled on 2026-11-22 (OD5); no share-of-wages limit.** The owner ruled that the correct GPF rule is used. The Revenue Department's PND 90 instructions for tax year 2567 (https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf) cap GPF contributions in baht only (item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท"), while they cap the provident fund at 15 per cent of wages (item 8: "ไม่เกินร้อยละ 15 ของค่าจ้าง") and RMF at 30 per cent of assessable income (item 10.4). The engine therefore dropped `gpf.maxRate` (it applied 30 per cent of wages) and allows the GPF contribution actually paid, up to 500,000 baht, inside the combined retirement ceiling. The contribution rate a member may pay is set by the GPF Act, not by the tax rule. No corpus case asserted the old rate.
 - **`digitalAssetRate` is unsourced** (OD6). No 2026 rate was read; the code keeps 15 per cent with
   its assumption comment, and no corpus case asserts it.
 - **Two citations in the code were wrong; every comment that carried them is corrected.** The header of
@@ -104,6 +102,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | --- | --- | --- |
 | 2026-11-17 | none (first sweep) | 71 rows written; 32 `match`, 6 `derived`, 28 `reported`, 5 `unsourced` |
 | 2026-11-22 | none | Comments only: the `src/th/parameters.ts` header and the `src/th/stages/separate-sheet.ts` `@statute` line, and every other comment with the same two citations, now cite the sources in the findings above |
+| 2026-11-22 | `allowances.retirementCluster.gpf.maxRate` removed; `gpf.ceiling` now `match` | Owner ruling on #52: percentage expense deductions and donation caps floor to the satang (`floorByRateToSatang`; levy graph mirrors it), and the allowances and donation stages subtract in integer satang. GPF: the PND 90 instructions cap GPF at 500,000 baht with no percentage (item 12(2)), so the 30 per cent share-of-wages cap is removed from the calculator and the Levy |
 
 <!-- factory:th-source-rows v1 -->
 
@@ -124,8 +123,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | `allowances.parentHealthInsuranceCeiling` | not exceeding 15,000 baht in total | M.R. No. 126 (B.E. 2509) clause 2(61); the clause text is a scan | https://www.rd.go.th/fileadmin/user_upload/kormor/newlaw/126.pdf | 2026-11-17 | reported (2026 cap from Raidaai; clause unreadable) |
 | `allowances.personal` | 60,000 baht | Section 47(1)(a), as amended by Act No. 44 (B.E. 2560) s.5 | https://www.rd.go.th/fileadmin/user_upload/kormor/newlaw/p44.pdf | 2026-11-17 | match |
 | `allowances.retirementCluster.combinedCeiling` | not exceeding 500,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61) retirement clause; text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
-| `allowances.retirementCluster.gpf.ceiling` | not exceeding 500,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
-| `allowances.retirementCluster.gpf.maxRate` | 15 per cent of wages | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai prints 15 per cent for the pension fund group; engine applies 30 — recorded, not changed) |
+| `allowances.retirementCluster.gpf.ceiling` | not exceeding 500,000 baht | PND 90 instructions, tax year 2567, item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท" (only the part not exceeding 500,000 baht); the same cap applies to the combined provident-fund, GPF and teacher-fund contributions (item 10.4). The instructions are for tax year 2567; the 2026 figure is assumed unchanged | https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf | 2026-11-22 | match |
 | `allowances.retirementCluster.nsf.ceiling` | not exceeding 30,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.ceiling` | not exceeding 200,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.maxRate` | 15 per cent of assessable income | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |

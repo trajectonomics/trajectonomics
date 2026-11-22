@@ -1,3 +1,5 @@
+import { fromMinorUnits, toMinorUnits } from "../../core/money"
+import { TH_2026_PARAMETERS } from "../parameters"
 import type { ThAllowancesBreakdown, ThAllowancesInput, ThFilingStatus } from "../types"
 import { calculateDonationAllowances } from "./allowances-donations"
 import { calculateFamilyAllowances } from "./allowances-family"
@@ -39,7 +41,14 @@ export function calculateAllowances(
 		ret.allowedClusterTotal +
 		ret.allowedThaiEsgTotal
 
-	const netBeforeDonations = Math.max(0, assessableTotal - expensesTotal - nonDonationTotal)
+	// Subtract in integer satang: a float subtraction can land a hair under the exact satang, and the
+	// donation cap's satang floor would then lose a satang as income rises (#52).
+	const currency = TH_2026_PARAMETERS.currency
+	const netMinor =
+		toMinorUnits(assessableTotal, currency) -
+		toMinorUnits(expensesTotal, currency) -
+		toMinorUnits(nonDonationTotal, currency)
+	const netBeforeDonations = fromMinorUnits(Math.max(0, netMinor), currency)
 	const don = calculateDonationAllowances(input.donation2x, input.donation1x, netBeforeDonations)
 
 	const total = nonDonationTotal + don.allowedDonationsTotal

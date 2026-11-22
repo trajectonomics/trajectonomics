@@ -44,4 +44,16 @@ describe("Thailand Donation Allowances (calculateDonationAllowances)", () => {
 		expect(() => calculateDonationAllowances(-500, 0, 100_000)).toThrow(TaxValidationError)
 		expect(() => calculateDonationAllowances(0, -100, 100_000)).toThrow(TaxValidationError)
 	})
+
+	it("floors the 10% cap to the satang, so 100,009 baht of net gives a 10,000.90 baht cap", () => {
+		expect(calculateDonationAllowances(undefined, 50_000, 100_009).breakdown.donation1x.cap).toBe(
+			10_000.9,
+		)
+	})
+
+	it("subtracts the 2x allowance in satang, so 300,000.10 net less 0.20 leaves a 29,999.99 cap", () => {
+		const res = calculateDonationAllowances(0.1, 200_000, 300_000.1)
+		expect(res.breakdown.donation1x.cap).toBe(29_999.99)
+		expect(res.netTaxableIncome).toBe(269_999.91)
+	})
 })

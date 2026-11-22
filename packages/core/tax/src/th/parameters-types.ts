@@ -53,7 +53,7 @@ export interface ThParameters {
 			readonly rmf: { readonly maxRate: number; readonly ceiling: number }
 			readonly ssf: { readonly maxRate: number; readonly ceiling: number }
 			readonly pvd: { readonly maxRate: number; readonly ceiling: number }
-			readonly gpf: { readonly maxRate: number; readonly ceiling: number }
+			readonly gpf: { readonly ceiling: number }
 			readonly nsf: { readonly ceiling: number }
 			readonly pensionLifeInsurance: {
 				readonly maxRate: number

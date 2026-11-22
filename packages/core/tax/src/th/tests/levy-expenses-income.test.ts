@@ -19,13 +19,13 @@ function sharedExpense(income: ReadonlyMap<string, number>): number {
 }
 
 describe("TH 2026 Levy Section 40(1)/(2) expense", () => {
-	it("halves the combined income and caps it at 100,000 THB", () => {
+	it("halves the combined income to the satang and caps it at 100,000 THB", () => {
 		const below = new Map([[S1, toSatang(100_001)]])
 		const atCap = new Map([
 			[S1, toSatang(200_000)],
 			[S2, toSatang(50_000)],
 		])
-		expect(sharedExpense(below)).toBe(toSatang(50_000))
+		expect(sharedExpense(below)).toBe(toSatang(50_000.5))
 		expect(sharedExpense(atCap)).toBe(toSatang(100_000))
 		expect(sharedExpense(below)).toBe(
 			satangOf(breakdownOf({}, below).expenseDeductions.section40_1_2.allowed),

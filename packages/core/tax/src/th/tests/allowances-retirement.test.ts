@@ -11,7 +11,7 @@ describe("Thailand Retirement Cluster and ThaiESG Allowances", () => {
 				rmf: 350_000, // 30% of 1M is 300k, capped at 500k -> allowed 300k
 				ssf: 250_000, // 30% of 1M is 300k, capped at 200k -> allowed 200k
 				pvd: 200_000, // 15% of 1M is 150k, capped at 500k -> allowed 150k
-				gpf: 350_000, // 30% of 1M is 300k, capped at 500k -> allowed 300k
+				gpf: 350_000, // no share-of-wages limit, under the 500k ceiling -> allowed 350k
 				nsf: 40_000, // capped at 30k -> allowed 30k
 				pensionLifeInsurance: 200_000, // 15% of 1M is 150k, capped at 200k -> allowed 150k
 			},
@@ -28,8 +28,8 @@ describe("Thailand Retirement Cluster and ThaiESG Allowances", () => {
 		expect(res.retirementCluster.pvd.allowed).toBe(150_000)
 		expect(res.retirementCluster.pvd.wasClamped).toBe(true)
 
-		expect(res.retirementCluster.gpf.allowed).toBe(300_000)
-		expect(res.retirementCluster.gpf.wasClamped).toBe(true)
+		expect(res.retirementCluster.gpf.allowed).toBe(350_000)
+		expect(res.retirementCluster.gpf.wasClamped).toBe(false)
 
 		expect(res.retirementCluster.nsf.allowed).toBe(30_000)
 		expect(res.retirementCluster.nsf.wasClamped).toBe(true)

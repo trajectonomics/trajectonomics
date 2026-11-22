@@ -47,8 +47,6 @@ export const TH_UNCONFIRMED_ALLOWANCES: readonly ThUnconfirmedFigure[] = [
 	figure(R, `${P}.ssf.maxRate`, "SSF limit, share of assessable income.", F.ClaimSsf),
 	figure(R, `${P}.pvd.ceiling`, "Provident fund ceiling, baht a year.", F.ClaimPvd),
 	figure(R, `${P}.pvd.maxRate`, "Provident fund limit, share of wages.", F.ClaimPvd),
-	figure(R, `${P}.gpf.ceiling`, "Government pension fund ceiling, baht a year.", F.ClaimGpf),
-	figure(R, `${P}.gpf.maxRate`, "Government pension fund limit, share of wages.", F.ClaimGpf),
 	figure(R, `${P}.nsf.ceiling`, "National Savings Fund ceiling, baht a year.", F.ClaimNsf),
 	figure(
 		R,

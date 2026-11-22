@@ -28,7 +28,7 @@ export interface ThRetirementAllowanceMeasures {
  *
  * Purpose: Mirrors the percentage and ceiling caps of both retirement allowances.
  * Math: RMF/SSF/PVD/GPF and pension life insurance are capped at `min(income * rate, ceiling)`
- * (PVD/GPF on Section 40(1) wage, the rest on assessable income); NSF at its flat ceiling; the
+ * (PVD on Section 40(1) wage, GPF at its baht ceiling only, the rest on assessable income); NSF at its flat ceiling; the
  * six are then capped at the 500,000 THB cluster ceiling. ThaiESG is capped at
  * `min(assessable * 30%, 300,000)`.
  * Units: Integer satang Measures.
@@ -60,9 +60,10 @@ export function addRetirementAllowances(
 		funded[ThLevyContributionLabel.Pvd],
 		rateCapAt(graph, wage, p.pvd.maxRate, toSatang(p.pvd.ceiling, ThAllowanceField.Pvd)),
 	)
+	// GPF has a baht ceiling and no share-of-wages limit (PND 90 instructions, item 12(2); owner ruling 2026-11-22).
 	const gpf = graph.min(
 		funded[ThLevyContributionLabel.Gpf],
-		rateCapAt(graph, wage, p.gpf.maxRate, toSatang(p.gpf.ceiling, ThAllowanceField.Gpf)),
+		graph.constant(toSatang(p.gpf.ceiling, ThAllowanceField.Gpf)),
 	)
 	const nsf = graph.min(
 		funded[ThLevyContributionLabel.Nsf],

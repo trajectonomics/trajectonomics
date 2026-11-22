@@ -1,7 +1,21 @@
 import type { ClampedAmount } from "../../core/caps"
-import { floorByRate, validateMonetaryAmount } from "../../core/money"
+import {
+	floorByRateToSatang,
+	fromMinorUnits,
+	toMinorUnits,
+	validateMonetaryAmount,
+} from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { ThAllowanceField, type ThDonationsBreakdown } from "../types"
+
+/** `a - b` floored at zero, computed in integer satang so no float tail reaches a satang floor. */
+function satangMinus(a: number, b: number): number {
+	const currency = TH_2026_PARAMETERS.currency
+	return fromMinorUnits(
+		Math.max(0, toMinorUnits(a, currency) - toMinorUnits(b, currency)),
+		currency,
+	)
+}
 
 export interface ThDonationAllowancesResult {
 	readonly breakdown: ThDonationsBreakdown
@@ -13,6 +27,8 @@ export interface ThDonationAllowancesResult {
  * Calculates qualified 2x and general 1x donation allowances.
  *
  * Math: 2x donations capped at 10% of net before donations; 1x donations capped at 10% of remaining net.
+ * Each cap is floored to the satang (owner ruling 2026-11-22, trajectonomics/trajectonomics#52), and
+ * every subtraction is in integer satang, matching the Levy graph.
  * Units: THB major units.
  *
  * @statute Thailand Revenue Code Section 47(7); Royal Decrees No. 428, 558.
@@ -28,7 +44,7 @@ export function calculateDonationAllowances(
 	const raw2x = donation2x ?? 0
 	validateMonetaryAmount(raw2x, ThAllowanceField.Donation2x)
 	const eligible2x = raw2x * p.donation2xMultiplier
-	const cap2x = floorByRate(net, p.donation2xMaxRate)
+	const cap2x = floorByRateToSatang(net, p.donation2xMaxRate)
 	const allowed2x = Math.min(eligible2x, cap2x)
 	const clamped2x: ClampedAmount = {
 		requested: raw2x,
@@ -37,10 +53,10 @@ export function calculateDonationAllowances(
 		wasClamped: eligible2x > cap2x,
 	}
 
-	const remainingNet = Math.max(0, net - allowed2x)
+	const remainingNet = satangMinus(net, allowed2x)
 	const raw1x = donation1x ?? 0
 	validateMonetaryAmount(raw1x, ThAllowanceField.Donation1x)
-	const cap1x = floorByRate(remainingNet, p.donation1xMaxRate)
+	const cap1x = floorByRateToSatang(remainingNet, p.donation1xMaxRate)
 	const allowed1x = Math.min(raw1x, cap1x)
 	const clamped1x: ClampedAmount = {
 		requested: raw1x,
@@ -52,10 +68,14 @@ export function calculateDonationAllowances(
 	const breakdown: ThDonationsBreakdown = {
 		donation2x: clamped2x,
 		donation1x: clamped1x,
-		total: allowed2x + allowed1x,
+		total: fromMinorUnits(
+			toMinorUnits(allowed2x, TH_2026_PARAMETERS.currency) +
+				toMinorUnits(allowed1x, TH_2026_PARAMETERS.currency),
+			TH_2026_PARAMETERS.currency,
+		),
 	}
 
-	const netTaxableIncome = Math.max(0, remainingNet - allowed1x)
+	const netTaxableIncome = satangMinus(remainingNet, allowed1x)
 
 	return {
 		breakdown,

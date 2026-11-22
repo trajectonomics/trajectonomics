@@ -3,7 +3,7 @@ import { TH_2026_PARAMETERS } from "../parameters"
 import { ThAllowanceField } from "../types"
 import { toSatang } from "../units"
 import type { ThLevyGraph } from "./graph"
-import { rateFlooredToBaht } from "./graph-rates"
+import { rateFlooredToSatang } from "./graph-rates"
 import { ThLevyMeasureId } from "./measure-ids"
 
 /**
@@ -54,10 +54,10 @@ export function addDonationAllowances(
 		ThAllowanceField.Donation2x,
 	)
 	const net = graph.max(netBefore, graph.constant(0))
-	const cap2x = rateFlooredToBaht(graph, net, p.donation2xMaxRate)
+	const cap2x = rateFlooredToSatang(graph, net, p.donation2xMaxRate)
 	const allowed2x = graph.min(graph.constant(doubled), cap2x)
 	const remaining = graph.max(graph.sub(net, allowed2x), graph.constant(0))
-	const cap1x = rateFlooredToBaht(graph, remaining, p.donation1xMaxRate)
+	const cap1x = rateFlooredToSatang(graph, remaining, p.donation1xMaxRate)
 	const allowed1x = graph.min(graph.constant(toSatang(raw1x, ThAllowanceField.Donation1x)), cap1x)
 	const total = graph.add(allowed2x, allowed1x, ThLevyMeasureId.Donations)
 	const netTaxable = graph.max(
