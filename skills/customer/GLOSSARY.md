@@ -31,3 +31,7 @@ The oldest `@trajectonomics/cli` release whose command surface a published Skill
 ### Ledger File
 The SQLite file at `${TRAJ_HOME:-~/.traj}/traj.db`, whose presence means the ledger has been opened on this machine at least once, and never that it holds data: `traj init` and every store-opening command create it empty on the way. The onboarding Skill tests for it and hands the read to the operating Skill.
 _Avoid_: database, data directory
+
+### Tax Baseline
+The Scenario a `traj-plan` tax comparison starts from: a fork whose tax Levy the Skill wrote in this conversation, with the person's stated facts. Both sides of a comparison are Levies written by the installed `traj`, so one rule set taxes both; a Levy stored by an earlier session is never a side, because `traj schema` cannot say which release wrote it ([ADR 0006](./docs/adr/0006-a-tax-comparison-uses-levies-written-in-the-conversation.md)).
+_Avoid_: base plan, stored baseline
