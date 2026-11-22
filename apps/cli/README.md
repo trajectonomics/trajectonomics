@@ -98,7 +98,7 @@ bun test
 bun run build             # single-file binary at dist/traj
 bun run lint              # Biome, zero warnings
 bun run format            # Biome format + import order, writes files
-bun run check             # lint + typecheck + test + build, what CI runs
+bun run check             # lint + typecheck + test; turbo builds first, so use `bunx turbo run check --filter=@trajectonomics/cli`
 ```
 
 From a checkout, run the CLI with `bun run dev -- …`. The npm launcher refuses the

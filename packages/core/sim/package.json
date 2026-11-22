@@ -45,8 +45,8 @@
 		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
 		"lint": "biome ci --colors=off --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun test && bun run build && bun run parity && bun run lint:package",
-		"check:ci": "bun run check && npm pack --dry-run",
+		"check": "bun run lint && bun run typecheck && bun test && bun run parity && bun run lint:package",
+		"check:ci": "bun run build && bun run check && npm pack --dry-run",
 		"parity": "node scripts/parity-check.mjs",
 		"parity:update": "bun scripts/parity-update.ts && biome format --write parity/cases.json",
 		"lint:package": "publint --strict && attw --pack . --profile node16"

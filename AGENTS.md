@@ -23,7 +23,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only; Cloudflare credentials live in Cloudflare (Workers Builds), never in this repository.
 3. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
 4. Package design: keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
-5. Done means `bun run check` passes at the root (Turborepo). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
+5. Done means `bun run check` passes at the root (Turborepo). `check` depends on the package's own `build`, so each package's `dist/` has one writer per run and a `check` script never rebuilds; `apps/docs`, `apps/blog` and `apps/site` opt out (their `check` builds, because Workers Builds runs it alone). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
 6. Never edit `version` in a `package.json` by hand and never run `npm publish` locally. Release versions are set by the release process.
 7. Model & Pi (`pi.dev`) rules:
    - Never use `gemini-3.8-flash` anywhere; use `gemini-4-hydrogen` instead for Antigravity tasks and reviews (and `gemini-4-argon` where configured).

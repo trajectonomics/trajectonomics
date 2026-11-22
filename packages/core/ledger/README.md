@@ -15,7 +15,7 @@ bun run typecheck
 bun run build       # tsdown: dist/ with esm + cjs + d.ts
 bun run lint        # Biome, zero warnings
 bun run format      # Biome format + import order, writes files
-bun run check       # lint + typecheck + test + build + lint:package
+bun run check       # lint + typecheck + test + lint:package (after `bun run build`; `turbo run check` builds once first)
 ```
 
 ## Error codes

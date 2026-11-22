@@ -23,7 +23,7 @@
 		"test": "bun test ./src ./scripts",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build",
+		"check": "bun run lint && bun run typecheck && bun run test",
 		"snapshot": "bun scripts/snapshot.ts",
 		"demo": "bun scripts/demo.ts",
 		"dashboard": "bun scripts/dashboard.ts"

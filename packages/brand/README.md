@@ -53,5 +53,5 @@ A customer's brand lives in a private mirror of this repo that only adds its fol
 ## Commands
 
 - `bun run test`: all tests, including the per-brand checks.
-- `bun run check`: lint, typecheck, tests and build.
+- `bun run check`: lint, typecheck and tests (turbo builds first).
 - `bun run generate:tailwind`: regenerates `tailwind.css` from the Contract.

@@ -67,7 +67,7 @@ Projection is unaffected. See [ADR 0008](docs/adr/0008-levy-extensions.md).
 
 ## Scripts
 
-- `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `lint:package`).
+- `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `lint:package`, against the `dist/` turbo builds first).
 - `bun run build`: Build ESM and CJS bundles via `tsdown`.
 - `bun test`: Run test suite.
 - `bun run typecheck`: Run strict TypeScript compiler checks.
