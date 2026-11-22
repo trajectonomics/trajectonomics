@@ -7,6 +7,7 @@ import { doctor } from "./doctor"
 import { fi } from "./fi"
 import { netWorth } from "./net-worth"
 import { pnl } from "./pnl"
+import { projectionChance } from "./projection-chance"
 import { projectionCompare } from "./projection-compare"
 import { projectionRun } from "./projection-run"
 import { readOf } from "./read"
@@ -42,6 +43,8 @@ export const snapshotReads = z.strictObject({
 	projections: z.record(z.string(), readOf(projectionRun)),
 	fi: z.record(z.string(), readOf(fi)),
 	compare: readOf(projectionCompare).nullable(),
+	// Absent from a Snapshot made without a Return model, so a document that never had the key reads as none.
+	chance: z.record(z.string(), readOf(projectionChance)).default({}),
 })
 export type SnapshotReads = z.infer<typeof snapshotReads>
 

@@ -1,6 +1,7 @@
 // Icons from Lucide (https://lucide.dev), licensed under the ISC licence, Copyright (c) Lucide Contributors.
 // `calendar` and `x` derive from Feather (https://feathericons.com), licensed under the MIT licence,
 // Copyright (c) 2013-2023 Cole Bemis. Each icon is its SVG elements, copied from the Lucide icon set.
+// `target` is copied from the Lucide icon set as well, so it adds no licence beyond ISC.
 // The Dashboard draws them as SVG elements, never as HTML.
 
 import type { IconName } from "../../lib/view/routes"
@@ -77,6 +78,11 @@ export const ICON_NODES: Readonly<Record<IconName, readonly IconElement[]>> = {
 		["path", { d: "M21 5h-7" }],
 		["path", { d: "M8 10v4" }],
 		["path", { d: "M8 12H3" }],
+	],
+	target: [
+		["circle", { cx: "12", cy: "12", r: "10" }],
+		["circle", { cx: "12", cy: "12", r: "6" }],
+		["circle", { cx: "12", cy: "12", r: "2" }],
 	],
 	wallet: [
 		[

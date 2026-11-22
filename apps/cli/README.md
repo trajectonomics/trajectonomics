@@ -184,6 +184,8 @@ year. The paths draw from a Return model you state in a JSON file, with
 seed and count always give the same answer. The CLI ships no Return model: which
 market history a plan is tested against is your decision, and every figure is
 only as good as that choice. `traj schema projection chance` describes the file.
+Pass the same three flags to `traj dashboard` to add the chance of success to the
+Dashboard, as a page of its own.
 
 ## Money as decimals in a Scenario
 

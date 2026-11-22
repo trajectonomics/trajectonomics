@@ -1,0 +1,78 @@
+import { describe, expect, test } from "bun:test"
+import { chanceFixture } from "./fixtures.test-support"
+import { chanceSummaryOf, chanceViewOf, fanSeriesOf, runsOutBarsOf } from "./page"
+
+describe("chanceSummaryOf", () => {
+	test("states the share from the CLI's basis points, with the paths, the horizon and the currency", () => {
+		expect(chanceSummaryOf(chanceFixture())).toEqual({
+			share: "87.00%",
+			succeeded: 174,
+			paths: 200,
+			horizon: "31 Dec 2028",
+			currency: "THB",
+		})
+	})
+})
+
+describe("fanSeriesOf", () => {
+	test("draws one series per Percentile, with a point at each roll-up in the CLI's order", () => {
+		const series = fanSeriesOf(chanceFixture().bands)
+		expect(series.map((line) => line.name)).toEqual(["P10", "P25", "P50", "P75", "P90"])
+		const p50 = series.find((line) => line.name === "P50")
+		expect(p50?.points).toEqual([
+			{ x: 0, xLabel: "2026", y: 50000, display: "50,000.00" },
+			{ x: 1, xLabel: "2027", y: 50100, display: "50,100.00" },
+			{ x: 2, xLabel: "2028", y: 50200, display: "50,200.00" },
+		])
+	})
+
+	test("places a negative net worth as a negative number, shown with the true minus sign", () => {
+		const bands = chanceFixture().bands.map((band) => ({
+			...band,
+			netWorth: band.netWorth.map((percentile) => ({ ...percentile, value: "-1200.50" })),
+		}))
+		const p10 = fanSeriesOf(bands).find((line) => line.name === "P10")
+		expect(p10?.points[0]).toMatchObject({ y: -1200.5, display: "−1,200.50" })
+	})
+})
+
+describe("runsOutBarsOf", () => {
+	test("labels every fifth roll-up with its year and leaves the rest unlabelled", () => {
+		const rows = [0, 1, 2, 3, 4, 5].map((index) => ({
+			index,
+			to: `${2026 + index}-12-31`,
+			paths: index,
+		}))
+		expect(runsOutBarsOf(rows).map((bar) => bar.label)).toEqual([
+			"2026",
+			null,
+			null,
+			null,
+			null,
+			"2031",
+		])
+	})
+
+	test("titles each bar with its count, in the singular for one path", () => {
+		expect(runsOutBarsOf([{ index: 1, to: "2027-12-31", paths: 1 }])[0]?.title).toBe(
+			"1 failing path runs out in 2027",
+		)
+		expect(runsOutBarsOf([{ index: 1, to: "2027-12-31", paths: 3 }])[0]?.title).toBe(
+			"3 failing paths run out in 2027",
+		)
+	})
+})
+
+describe("chanceViewOf", () => {
+	test("carries the CLI's definition and notes beside the share and the bars", () => {
+		const view = chanceViewOf(chanceFixture())
+		expect(view.share).toBe("87.00%")
+		expect(view.definition).toEqual({
+			modelId: "illustrative-demo-model",
+			seed: "0123456789abcdef",
+			paths: 200,
+		})
+		expect(view.notes).toEqual(["Every figure is nominal."])
+		expect(view.runsOut.map((bar) => bar.paths)).toEqual([0, 12, 14])
+	})
+})

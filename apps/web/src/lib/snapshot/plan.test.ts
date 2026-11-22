@@ -14,6 +14,9 @@ const base: PlanInput = {
 	ages: [],
 	monthly: false,
 	carryIn: false,
+	returnModel: null,
+	paths: null,
+	seed: null,
 }
 
 /** Every combination of the optional flags, each planned for both stages. */

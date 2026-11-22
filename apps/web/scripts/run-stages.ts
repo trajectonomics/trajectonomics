@@ -7,6 +7,7 @@ import {
 	fi,
 	netWorth,
 	pnl,
+	projectionChance,
 	projectionCompare,
 	projectionRun,
 	type Read,
@@ -90,5 +91,8 @@ export async function runStageTwo(
 			plan.compare === null
 				? null
 				: await runPlanned(context, plan.compare, projectionCompare, records),
+		chance: await recordOf(plan.chance, (planned) =>
+			runPlanned(context, planned, projectionChance, records),
+		),
 	}
 }

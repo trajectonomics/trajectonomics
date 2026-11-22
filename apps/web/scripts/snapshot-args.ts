@@ -11,7 +11,19 @@ export type SnapshotOptions = {
 
 export type ArgsResult = { ok: true; options: SnapshotOptions } | { ok: false; message: string }
 
-const ONE_VALUE = ["as-of", "horizon", "scenario", "birth-date", "age", "traj", "out", "carry-in"]
+const ONE_VALUE = [
+	"as-of",
+	"horizon",
+	"scenario",
+	"birth-date",
+	"age",
+	"traj",
+	"out",
+	"carry-in",
+	"return-model",
+	"paths",
+	"seed",
+]
 
 /** Reads the command line: value flags take one value, `--compare` takes two, `--monthly` takes none. */
 export function parseSnapshotArgs(argv: readonly string[]): ArgsResult {
@@ -25,6 +37,9 @@ export function parseSnapshotArgs(argv: readonly string[]): ArgsResult {
 			ages: [],
 			monthly: false,
 			carryIn: false,
+			returnModel: null,
+			paths: null,
+			seed: null,
 		},
 		traj: null,
 		out: null,

@@ -53,6 +53,25 @@ export function planFi(params: PlanParams, names: string[]): Record<string, Plan
 }
 
 /**
+ * One `projection chance` per Scenario, when the caller stated a Return model. The model is read from its
+ * file by the CLI, so only its path is in the argv; the Carry-in goes on standard input, as for a run.
+ */
+export function planChance(params: PlanParams, names: string[]): Record<string, PlannedRead> {
+	const chance = params.chance
+	if (chance === null) return {}
+	return perScenario(params, names, (name) => [
+		"projection",
+		"chance",
+		scenarioFlag(name),
+		...projectionFlags(params),
+		`--return-model=${chance.returnModel}`,
+		`--paths=${chance.paths}`,
+		`--seed=${chance.seed}`,
+		"--json",
+	])
+}
+
+/**
  * The `projection compare` of two Scenarios, when the caller asked for one. The two names come last,
  * after `--`, so a name that starts with a dash is still read as a name.
  */

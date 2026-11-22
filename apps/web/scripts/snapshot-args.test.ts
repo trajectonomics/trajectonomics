@@ -35,6 +35,9 @@ describe("the snapshot command line", () => {
 			ages: [45, 60],
 			monthly: true,
 			carryIn: false,
+			returnModel: null,
+			paths: null,
+			seed: null,
 		})
 		expect(result.options.traj).toBe("/bin/traj")
 		expect(result.options.out).toBe("x.json")
@@ -73,5 +76,24 @@ describe("the snapshot command line", () => {
 		if (!result.ok) return
 		expect(result.options.carryIn).toBe("carry.json")
 		expect(result.options.input.carryIn).toBe(true)
+	})
+
+	test("--return-model, --paths and --seed state the chance flags, and --paths must be a whole number", () => {
+		const result = parseSnapshotArgs([
+			"--return-model",
+			"model.json",
+			"--paths",
+			"200",
+			"--seed",
+			"0123456789abcdef",
+		])
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.options.input).toMatchObject({
+			returnModel: "model.json",
+			paths: 200,
+			seed: "0123456789abcdef",
+		})
+		expect(parseSnapshotArgs(["--paths", "2e2"]).ok).toBe(false)
 	})
 })

@@ -4,6 +4,7 @@ import { formatArgv } from "./argv"
 import { formatDate, formatMonth } from "./date"
 import { AMOUNT_MASK, maskMoney } from "./mask"
 import { formatMoney } from "./money"
+import { formatShare } from "./share"
 
 describe("formatMoney", () => {
 	test("groups the digits of a negative amount and uses the true minus sign", () => {
@@ -97,5 +98,14 @@ describe("maskMoney", () => {
 	test("keeps the sign of a negative amount in front of the mask", () => {
 		expect(maskMoney("−184,000.00")).toBe(`−${AMOUNT_MASK}`)
 		expect(maskMoney("-184000.00")).toBe(`−${AMOUNT_MASK}`)
+	})
+})
+
+describe("formatShare", () => {
+	test("writes basis points as a percentage with two places", () => {
+		expect(formatShare(8730)).toBe("87.30%")
+		expect(formatShare(10000)).toBe("100.00%")
+		expect(formatShare(5)).toBe("0.05%")
+		expect(formatShare(0)).toBe("0.00%")
 	})
 })

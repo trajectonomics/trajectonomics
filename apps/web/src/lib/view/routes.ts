@@ -9,6 +9,7 @@ export type IconName =
 	| "menu"
 	| "receipt"
 	| "sliders-horizontal"
+	| "target"
 	| "wallet"
 	| "x"
 
@@ -26,7 +27,7 @@ export interface NavGroup {
 	readonly routes: readonly Route[]
 }
 
-/** The navigation in order: Home and Net worth, the Plan group, Tax, then the Records group. */
+/** The navigation in order: Home and Net worth, the Plan group, Chance of success, Tax, then the Records group. */
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		heading: null,
@@ -42,6 +43,10 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 			{ path: "/fi/", label: "FI date", page: "FiPage", icon: "calendar" },
 			{ path: "/compare/", label: "Compare", page: "ComparePage", icon: "git-compare" },
 		],
+	},
+	{
+		heading: null,
+		routes: [{ path: "/chance/", label: "Chance of success", page: "ChancePage", icon: "target" }],
 	},
 	{
 		heading: null,

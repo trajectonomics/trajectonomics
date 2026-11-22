@@ -41,7 +41,7 @@ async function idsOf(place: DemoLedgerPlace): Promise<DemoAccountIds> {
  * of monthly transactions imported from CSV, and two Scenarios, `base` and `retire-early`, with the Thai
  * Levy on both. Every name and figure is invented.
  */
-export async function buildDemoLedger(place: DemoLedgerPlace): Promise<void> {
+export async function buildDemoLedger(place: DemoLedgerPlace): Promise<DemoAccountIds> {
 	await mkdir(place.home, { recursive: true })
 	await traj(place, ["init"])
 	for (const account of DEMO_ACCOUNTS) {
@@ -67,13 +67,15 @@ export async function buildDemoLedger(place: DemoLedgerPlace): Promise<void> {
 	const csv = join(place.scratch, "demo-transactions.csv")
 	await writeFile(csv, demoCsv())
 	await traj(place, ["tx", "import", csv])
-	await applyScenarios(place)
+	const ids = await idsOf(place)
+	await applyScenarios(place, ids)
+	return ids
 }
 
 /** Applies `base`, adds the Thai Levy to it, then forks `retire-early` from it with one changed flow. */
-async function applyScenarios(place: DemoLedgerPlace): Promise<void> {
+async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Promise<void> {
 	const file = join(place.scratch, "base.json")
-	const document = baseScenarioDocument(await idsOf(place))
+	const document = baseScenarioDocument(ids)
 	await writeFile(file, JSON.stringify(document, null, "\t"))
 	await traj(place, ["scenario", "apply", "base", "--file", file])
 	await traj(place, ["scenario", "tax", "base", "--tax", DEMO_TAX.tax, "--label", DEMO_TAX.label])

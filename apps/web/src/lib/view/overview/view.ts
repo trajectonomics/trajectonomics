@@ -1,4 +1,5 @@
 import type { Read, Snapshot } from "../../contract"
+import { type ChanceSummary, chanceSummaryOf } from "../chance/page"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
 import { type FiView, fiView } from "./fi"
 import { type HealthView, healthView } from "./health"
@@ -20,6 +21,7 @@ export interface OverviewView {
 	readonly assets: Read<NetWorthView>
 	readonly fi: ScenarioView<FiView>
 	readonly projection: ScenarioView<ProjectionView | null>
+	readonly chance: ScenarioView<ChanceSummary>
 	readonly tax: ScenarioView<TaxView>
 	readonly pnl: Read<PnlView>
 	readonly health: Read<HealthView>
@@ -39,6 +41,7 @@ export function overviewView(snapshot: Snapshot): OverviewView {
 		assets: netWorth,
 		fi: mapScenario(scenarioView(scenario, snapshot.reads.fi), fiView),
 		projection: mapScenario(projections, projectionView),
+		chance: mapScenario(scenarioView(scenario, snapshot.reads.chance), chanceSummaryOf),
 		tax: mapScenario(projections, taxView),
 		pnl: mapRead(snapshot.reads.pnl, pnlView),
 		health: mapRead(snapshot.reads.doctor, healthView),
