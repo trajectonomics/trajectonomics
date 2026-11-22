@@ -2,6 +2,64 @@
 
 Pure, deterministic personal-finance projection engine.
 
+## Quickstart
+
+Money is integer minor units and rates are integer basis points. This projects a year of one
+income, one expense and a monthly saving into a 3% Account.
+The import path is the bundled one, `@trajectonomics/core/sim`:
+
+```ts
+import {
+	type Baseline,
+	check,
+	project,
+	type Scenario,
+	type Timeline,
+} from "@trajectonomics/core/sim"
+
+const baseline = {
+	schemaVersion: 1,
+	balances: [
+		{ account: "cash", amount: 5_000_000 },
+		{ account: "savings", amount: 0 },
+	],
+} satisfies Baseline
+
+const scenario = {
+	schemaVersion: 4,
+	currency: "THB",
+	economy: { inflation: 0 },
+	accounts: [
+		{ id: "cash", kind: "asset", rate: 0 },
+		{ id: "savings", kind: "asset", rate: 300 },
+	],
+	flows: [
+		{ id: "salary", kind: "income", earned: true, amount: 6_000_000, frequency: "monthly", start: "2026-01-25", growth: { bps: 0 } },
+		{ id: "living", kind: "expense", amount: 2_500_000, frequency: "monthly", start: "2026-01-01", growth: { bps: 0 } },
+		{ id: "save", kind: "contribution", target: "savings", amount: 1_000_000, frequency: "monthly", start: "2026-01-25", growth: { bps: 0 } },
+	],
+	cashflow: { contribute: ["savings"], surplus: [{ account: "cash" }], withdraw: ["cash"] },
+} satisfies Scenario
+
+const timeline = {
+	start: "2026-01-01",
+	horizon: "2026-12-31",
+	resolution: "month",
+} satisfies Timeline
+
+console.log(check(baseline, scenario, timeline))
+
+const result = project(baseline, scenario, timeline)
+if (result.ok) console.log(result.projection.annual[0]?.closingNetWorth)
+```
+
+It prints the empty problem list and the year's closing net worth in minor units:
+
+```text
+[]
+47170237
+```
+
 ## Overview
 
 `sim-core` models personal-finance projection as it works in the real world:
@@ -29,7 +87,7 @@ Carry-in supplies (`UNSUPPLIED_TALLY_LABEL`), because every total it reads would
 Settlement period. A Flow's Prepayment credits one Levy per entry, and the shares are rounded cumulatively
 in Scenario Levy order so together they never exceed the gross:
 
-```ts
+```ts fragment
 { id: "salary", kind: "income", earned: true, amount: 1_000_000, frequency: "monthly",
   start: "2026-01-31", growth: { bps: 0 }, label: "salary",
   prepayments: [{ levy: "national", bps: 300 }, { levy: "local", bps: 200 }] }
@@ -39,7 +97,7 @@ A `const` Measure may step on given dates. A Settlement period reads the last st
 its own last day, not its Settlement date, so a fact that holds at the end of a period governs
 that period and a step between the two does not reopen it:
 
-```ts
+```ts fragment
 { id: "due", op: "const", value: 100_000,
   steps: [{ from: "2026-06-01", value: 200_000 }, { from: "2027-01-01", value: 300_000 }] }
 ```
@@ -48,7 +106,7 @@ A Flow takes `derive` instead of `amount` and `growth`: a Measure graph whose `f
 another Flow's planned gross amount on the same Landed date, before Prepayment and any cap, and
 0 when that Flow does not land then. Rent as 30% of salary follows a raise:
 
-```ts
+```ts fragment
 { id: "rent", kind: "expense", frequency: "monthly", start: "2026-01-31",
   derive: { measures: [
     { id: "salary", op: "flow", flow: "salary" },
@@ -67,7 +125,7 @@ Projection is unaffected. See [ADR 0014](docs/adr/0014-levy-extensions.md).
 
 ## Scripts
 
-- `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `lint:package`).
+- `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).
 - `bun run build`: Build ESM and CJS bundles via `tsdown`.
 - `bun test`: Run test suite.
 - `bun run typecheck`: Run strict TypeScript compiler checks.

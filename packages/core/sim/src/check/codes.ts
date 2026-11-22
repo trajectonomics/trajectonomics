@@ -69,9 +69,14 @@ const CODES = [
 	"INVALID_TERMS",
 	"INVALID_MULTIPLE",
 	"INVALID_COMBINE",
+	/** Found at run time, not by `check()`: a value left the safe integer range. */
+	"VALUE_OVERFLOW",
 ] as const
 
-/** The closed set of problem codes. Frozen so consumers cannot mutate it at runtime. */
+/**
+ * The closed set of problem codes: every `code` a `ProjectionProblem` or a `Problem` can carry.
+ * Frozen so consumers cannot mutate it at runtime.
+ */
 export const ERROR_CODES: typeof CODES = Object.freeze(CODES)
 
 export type ErrorCode = (typeof CODES)[number]

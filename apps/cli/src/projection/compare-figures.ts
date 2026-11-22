@@ -18,6 +18,8 @@ export type SideData = {
 	prepared: Placed
 	fi: FiSolution
 	runsOut: RunsOut | undefined
+	/** Every row the Projection kept, the one on its run-out date included. */
+	rows: readonly ProjectionRow[]
 	/** The engine's milestones in Scenario order; undefined when the Scenario declares none. */
 	milestones: readonly MilestoneResult[] | undefined
 	taxYears: TaxYearView[]
