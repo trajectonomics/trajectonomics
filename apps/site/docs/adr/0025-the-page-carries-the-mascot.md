@@ -4,7 +4,7 @@ status: superseded
 
 # The page carries the Mascot
 
-Items 1, 2 and the blink and arm wave in item 4 are superseded by [ADR 0026](./0026-the-mascot-is-a-rendered-cut-out.md): the Mascot is now a rendered cut-out, not an inline SVG. Its four poses, their places and its reduced-motion rule stand.
+Items 1, 2, 3 and 5, the blink and arm wave in item 4, and the rejected WebP cut-out below are superseded by [ADR 0026](./0026-the-mascot-is-a-rendered-cut-out.md): the Mascot is now a rendered cut-out shown as an image with an empty `alt`, not an inline SVG. Its four poses, their places and its reduced-motion rule stand.
 
 The owner asked on 2026-11-22 for more personality on the landing page, through the Mascot: the soft cream robot with a dark visor, orange eyes and an orange-tipped antenna that the blog's covers already draw ([blog design brief](../../../blog/docs/design/blog.md)). Before this record the Site had the robot nowhere. The chat's 12 px bot icon is a glyph, not the character.
 

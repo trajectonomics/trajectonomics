@@ -14,7 +14,7 @@ status: accepted
    - A despill caps green at the red and blue mean plus 4. This removes the screen's bounce light from the cream shell and leaves the orange eyes and bars as they are.
    - A one-pixel erosion of the matte takes the green-lit rim off with the screen.
 
-   Each cut-out is resized to twice its largest display size and saved as a lossy WebP with alpha, at quality 82 and alpha quality 90. Only the four WebPs are committed, in `public/mascot/`, about 46 KB in all. The green-screen sources are not committed.
+   Each cut-out is resized to about twice its largest display size and saved as a lossy WebP with alpha, at quality 82 and alpha quality 90. Only the four WebPs are committed, in `public/mascot/`, about 46 KB in all. The green-screen sources are not committed.
 3. **The page shows them as plain images.** `Mascot.astro` renders one `<img>` with an empty `alt`, its file's own `width` and `height` so no layout shifts, and `decoding="async"`. The hero's robot and the Not-found robot load eagerly. The Features and closing robots are below the first view, so they load lazily. An image adds nothing to the page weight budget's HTML and CSS bytes or to Program JavaScript ([ADR 0005](./0005-page-weight-and-web-font-budget.md)).
 4. **Placement stays as ADR 0025 set it, and the motion is the whole figure's.** A render cannot blink or move one arm, so:
    - The blink and the arm wave are gone.
