@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import {
 	capturePayload,
+	eventIdentity,
 	MEASURED_HOSTNAME,
 	PAGEVIEW_EVENT,
 	POSTHOG_KEY,
@@ -8,6 +9,28 @@ import {
 	SURFACE,
 	shouldSend,
 } from "./posthog"
+
+describe("the identity an event is sent under", () => {
+	const ID = "3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c"
+	const fresh = () => "fresh-id"
+
+	it("uses the visitor's id, and says so, when the visitor granted consent", () => {
+		expect(eventIdentity(ID, fresh)).toEqual({ distinctId: ID, consent: "granted" })
+	})
+
+	it("sends a fresh id, and says cookieless, when no visitor id is on the page", () => {
+		expect(eventIdentity(undefined, fresh)).toEqual({
+			distinctId: "fresh-id",
+			consent: "cookieless",
+		})
+	})
+
+	it("refuses an id the page carries that is not a strict UUID", () => {
+		for (const bad of ['"><script>', ID.toUpperCase(), ""]) {
+			expect(eventIdentity(bad, fresh)).toEqual({ distinctId: "fresh-id", consent: "cookieless" })
+		}
+	})
+})
 
 describe("shouldSend", () => {
 	it("measures a visitor on the production host who set no opt-out signal", () => {

@@ -1,3 +1,5 @@
+import { isVisitorId } from "./consent"
+
 /**
  * The event payloads the Site posts to PostHog, and the conditions under which it posts none.
  *
@@ -75,6 +77,25 @@ export function pageviewProperties(
 		language: source.language,
 		surface: SURFACE,
 	}
+}
+
+/** How an event's visitor is identified: `granted` when the visitor's id is used, `cookieless` otherwise. */
+export type ConsentProperty = "granted" | "cookieless"
+
+/** The `distinct_id` and the `consent` property one event carries. */
+export interface EventIdentity {
+	readonly distinctId: string
+	readonly consent: ConsentProperty
+}
+
+/**
+ * The identity one event is sent under. A visitor who granted consent has a valid id, which every event
+ * on the page shares, so visits can be told apart. Anyone else gets a fresh id per event, which
+ * counts visits without linking them. The id is validated here, not trusted from the page.
+ */
+export function eventIdentity(visitor: string | undefined, fresh: () => string): EventIdentity {
+	if (isVisitorId(visitor)) return { distinctId: visitor, consent: "granted" }
+	return { distinctId: fresh(), consent: "cookieless" }
 }
 
 /**
