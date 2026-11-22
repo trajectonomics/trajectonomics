@@ -74,13 +74,28 @@ A flag that carries a document takes a path or `-`. `-` is the only way to send 
 
 This is the contract, not a recipe, and it is not a router either: a Skill the agent has to hop through is one an unattended run skips.
 
-When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/main/skills/customer/skills.manifest.json) names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it:
+When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/<commit>/skills/customer/skills.manifest.json), at the commit this Skill's scope pinned, names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it. Three reads come before any install.
+
+1. **The scope.** Run `npx skills list --json` and `npx skills list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
+2. **The pin.** Read the `commit` the resolved scope's lock records for `traj`. A project lock is `./skills-lock.json`; a global lock is `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, and `~/.agents/.skill-lock.json` when it is not. The list reports no commit, so the lock is the only place it is read. Never install from `main`: a branch moves, and a person's setup must not.
+3. **The row.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at that commit, and take the job's row and its `cliRange`. When the resolved scope's list already names that row's Skill, install nothing and follow it.
+
+**The version compared** is the session's pinned command-line version: the number from `traj --version`, or from `npx -y @trajectonomics/cli@latest --version` on the fallback. This Skill cannot read another Skill's file at run time, so the comparison rule is stated here: read the first `X.Y.Z` token, keeping any `-prerelease` suffix; compare the three numbers in turn and never the strings, so `0.10.0` is above `0.9.0`; and treat a pre-release as below its release, so `1.4.0-rc.1` is below `1.4.0`.
+
+**Install** the row when the command line is at or above its CLI Range floor, the range's lower bound, using the pin and an explicit name:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer --skill <name> -y
+npx skills add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
 ```
 
-When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.
+Add `-g` to it in the global scope. Then confirm from the same scope's list that it landed. A row whose upper bound the command line has passed — a pre-release of that bound's minor counts as past it — is installed all the same, and you say so in one sentence: name the range the Skill was checked through, and that `traj schema` is authoritative where the two differ.
+
+Install nothing in these four cases:
+
+- **Below the floor.** Skip a row below its floor, and name the row, the range it wants and the reason in one sentence, then do the part the schema allows.
+- **No pin.** The lock is missing, or records no `commit` for `traj` in that scope because an older `skills` CLI wrote the entry, or the entry's `source` is `trajectonomics/skills`, which is archived and does not have that commit. Say in one sentence that there is no pin, and that the person should re-run setup with `traj-onboarding` to get a pinned copy; then do the part the schema allows.
+- **No manifest.** When `skills.manifest.json` cannot be fetched or read at the pin, say so in one sentence and do the part the schema allows: the contract stays authoritative, and nothing is installed blind.
+- **No row.** When the manifest has no row for the job, say `traj` has no Recipe for it yet and do the part the schema allows, rather than improvising the rest.
 
 ## What this version covers
 
