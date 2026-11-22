@@ -1,0 +1,37 @@
+[
+	{
+		"directory": "apps/cli/docs/adr",
+		"number": "0036",
+		"reason": "Two ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/docs/docs/adr",
+		"number": "0004",
+		"reason": "Two ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/docs/docs/adr",
+		"number": "0010",
+		"reason": "Three ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/site/docs/adr",
+		"number": "0004",
+		"reason": "Two ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/site/docs/adr",
+		"number": "0011",
+		"reason": "Two ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/site/docs/adr",
+		"number": "0017",
+		"reason": "Two ADRs share the number; renumbering needs each citation disambiguated by context."
+	},
+	{
+		"directory": "apps/site/docs/adr",
+		"number": "0019",
+		"reason": "Three ADRs share the number; renumbering needs each citation disambiguated by context."
+	}
+]

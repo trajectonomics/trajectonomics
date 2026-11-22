@@ -98,6 +98,31 @@ describe("the traj-plan Skill", () => {
 	})
 })
 
+/** One `### Step` of the flattened tax recipe, up to the next `###` heading. */
+function step(recipe: string, name: string): string {
+	const found = recipe
+		.split(" ### ")
+		.find((part) => part.startsWith(`### ${name}`) || part.startsWith(name))
+	if (found === undefined) throw new Error(`the tax recipe has no ${name}`)
+	return found
+}
+
+describe("the forks the traj-plan Skill makes", () => {
+	const forks = section(body, "Name every fork, and offer to remove it")
+
+	it("names each fork for its question, unique among the live Scenarios", () => {
+		expect(forks).toContain("`<scenario>-<question>`")
+		expect(codeSpans(forks)).toContain("traj scenario list --json")
+		expect(forks).toContain("a second question never collides with the first")
+	})
+
+	it("offers to remove only the forks it made, and only on the person's yes", () => {
+		expect(codeSpans(forks)).toContain("traj scenario rm <name>")
+		expect(forks).toContain("only on the person's yes")
+		expect(forks).toContain("the person's own Scenarios stay")
+	})
+})
+
 describe("the Thai tax recipe in the traj-plan Skill", () => {
 	const tax = section(
 		body,
@@ -136,16 +161,43 @@ describe("the Thai tax recipe in the traj-plan Skill", () => {
 	})
 
 	it("shows a deduction as a what-if fork, or as a --set on a contribution Flow", () => {
-		expect(codeSpans(tax)).toContain("traj scenario fork <baseline> <what-if>")
+		expect(codeSpans(tax)).toContain("traj scenario fork <name> <what-if>")
 		expect(codeSpans(tax)).toContain("traj scenario tax <what-if> --tax th-2026")
 		expect(codeSpans(tax)).toContain(
-			"traj projection compare <baseline> <what-if> --as-of <as-of> --horizon <horizon> --json",
+			"traj projection compare <name> <what-if> --as-of <as-of> --horizon <horizon> --json",
 		)
 		expect(codeSpans(tax)).toContain(
 			"traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json",
 		)
 		expect(tax).toContain("cannot add one")
 		expect(tax).toContain("100 THB is 10000 satang")
+	})
+
+	it("compares two Levies this conversation wrote, so a stored Levy from an older release is never a side", () => {
+		const t2 = step(tax, "Step T2")
+		expect(t2).toContain("the **Tax Baseline**")
+		expect(t2).toContain("written by the `traj` in front of you")
+		expect(t2).toContain("may have been written by an older release under older rules")
+		expect(t2).toContain("never run Step T3 or T4 against a Levy this conversation did not write")
+		const t4 = step(tax, "Step T4")
+		expect(t4).toContain("`<name>` is the Tax Baseline from Step T2")
+		// T4 uses T2's placeholder for the Tax Baseline, never `<baseline>`, the person's stored Scenario.
+		expect(codeSpans(t4)).toContain("traj scenario fork <name> <what-if>")
+		expect(codeSpans(t4)).toContain(
+			"traj projection compare <name> <what-if> --as-of <as-of> --horizon <horizon> --json",
+		)
+		expect(codeSpans(t4).some((span) => span.includes("<baseline>"))).toBe(false)
+	})
+
+	it("labels a contribution Flow it adds for --set by writing the Tax Baseline's Levy again", () => {
+		const t4 = step(tax, "Step T4")
+		expect(t4).toContain("Step T2's `--label` never covered that Flow")
+		expect(t4).toContain("Compare only after that")
+		expect(codeSpans(t4)).toContain("traj scenario tax <name> --tax th-2026")
+		expect(codeSpans(t4)).toContain("--label <flow>=<label>")
+		expect(t4.indexOf("traj scenario tax <name> --tax th-2026")).toBeLessThan(
+			t4.indexOf("Compare only after that"),
+		)
 	})
 
 	it("reports both owed figures side by side, and never subtracts them itself", () => {

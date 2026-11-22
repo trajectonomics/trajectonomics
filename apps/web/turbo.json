@@ -10,7 +10,7 @@
 			"dependsOn": ["^build", "@trajectonomics/cli#build"]
 		},
 		"check": {
-			"dependsOn": ["^build", "^check", "@trajectonomics/cli#build"]
+			"dependsOn": ["build", "^build", "^check", "@trajectonomics/cli#build"]
 		}
 	}
 }

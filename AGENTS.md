@@ -23,7 +23,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only; Cloudflare credentials live in Cloudflare (Workers Builds), never in this repository.
 3. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
 4. Package design: keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
-5. Done means `bun run check` passes at the root (Turborepo). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
+5. Done means `bun run check` passes at the root (Turborepo). `check` depends on the package's own `build` in turbo, so each package's `dist/` has one writer per run. A package's `check` script still builds, through `tooling/scripts/build-unless-turbo.ts`: a no-op under turbo (which sets `TURBO_HASH`), a `bun run build` when `bun run check` runs inside the package, so a direct run never reads a stale `dist/`. `apps/docs`, `apps/blog` and `apps/site` opt out of the turbo dependency: their `check` builds and scans the built site, and nothing depends on them (`turbo run build check` would still run their build twice). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
 6. Never edit `version` in a `package.json` by hand and never run `npm publish` locally. Release versions are set by the release process.
 7. Model & Pi (`pi.dev`) rules:
    - Never use `gemini-3.8-flash` anywhere; use `gemini-4-hydrogen` instead for Antigravity tasks and reviews (and `gemini-4-argon` where configured).
@@ -81,7 +81,7 @@ Antigravity quota is short this week, so this block overrides step 3 of the ladd
 - The canonical copy of every installed skill is `.agents/skills/` at the root. `.claude/skills/<name>` (Claude Code) and `.vibe/skills/<name>` (Mistral Vibe) are relative symlinks to `../../.agents/skills/<name>`, and `.grok/skills/goal-setting-okrs` is one more. Never edit the external copies or the symlinks by hand.
 - Edit an internal skill in `skills/internal/skills/<name>/`, the source of truth. Its `.agents/skills/` entry is a symlink, so the change is picked up everywhere.
 - A first-party customer skill is hand-edited in `skills/customer/skills/`. It is never in `skills-lock.json` and never copied into `.agents/skills/`: a lock entry would stop `npx skills add trajectonomics/trajectonomics/skills/customer --skill <name>` from installing it.
-- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
+- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock, then list the copy in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (a new upstream also needs its own section with its licence), or `bun run check` fails; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
 
 ### Commands
 
