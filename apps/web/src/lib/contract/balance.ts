@@ -7,6 +7,9 @@ import { money } from "./money"
 /** `traj balance --as-of --trial-balance --json`: every balance, net worth and the trial balance. */
 export const balance = z.strictObject({
 	asOf: dateString,
+	// Optional: a traj that predates the pair (cli#95) does not print them.
+	firstTransactionDate: dateString.nullable().optional(),
+	noTransactionsBefore: z.boolean().optional(),
 	rows: z.array(amountRow),
 	netWorth: z.array(currencyTotal),
 	trialBalance: z

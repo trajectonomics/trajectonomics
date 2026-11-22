@@ -9,6 +9,8 @@ describe("baseline show", () => {
 		expect(res.err).toBe("")
 		expect(JSON.parse(res.out)).toEqual({
 			asOf: FIXTURE_AS_OF,
+			firstTransactionDate: "2026-01-01",
+			noTransactionsBefore: false,
 			currency: "THB",
 			rows: [
 				{
