@@ -23,7 +23,8 @@ The output depends on the machine it runs on, so it is not a checked example. It
 checkout).
 
 A `TRAJ_TELEMETRY` of `0`, `off` or `false` in the environment turns counting off for that one
-command, and `status` names it as the reason, even where `CI` is also set:
+command, and `status` names it as the reason unless `DO_NOT_TRACK` is also set, even where `CI`
+is set:
 
 ```bash exec
 TRAJ_TELEMETRY=0 traj telemetry status --json | jq '{enabled, reason}'

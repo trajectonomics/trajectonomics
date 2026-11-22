@@ -20,7 +20,7 @@ export {
 /** Variables a page names that the CLI itself does not read: the install scripts' and the launcher's. */
 const NOT_THE_CLIS = new Set(["TRAJ_VERSION", "TRAJ_INSTALL_DIR", "TRAJ_BINARY_PATH"])
 
-/** The configuration page's `## NAME` sections (`TRAJ_*` and `DO_NOT_TRACK`) against the root help's environment. */
+/** The configuration page's all-caps `## NAME` sections against the root help's environment. */
 function environmentProblems(
 	file: ContentFile,
 	release: CliRelease,
