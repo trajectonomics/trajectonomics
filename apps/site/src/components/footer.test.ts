@@ -85,6 +85,7 @@ describe("the Footer component in every Language", () => {
 				[dictionary.footerDocsLink, DOCS_PATH],
 				[dictionary.footerCliDocsLink, DOCS_CLI_PATH],
 				[dictionary.footerInstallLink, DOCS_CLI_INSTALL_PATH],
+				[dictionary.footerCookieLink, "/?consent=reset"],
 				[dictionary.footerCliRepo, GITHUB_CLI_URL],
 				[dictionary.footerSkillsRepo, GITHUB_SKILLS_URL],
 				[dictionary.org, GITHUB_ORG_URL],

@@ -157,6 +157,16 @@ export interface Dictionary {
 	readonly footerIssues: string
 	/** The footer link to the CLI's releases. */
 	readonly footerReleases: string
+	/** The banner's landmark name, which a screen reader announces before its text. */
+	readonly consentLabel: string
+	/** The banner's question: what is counted, and what one cookie would add. */
+	readonly consentText: string
+	/** The banner link that stores the visitor's yes, which reloads the page without the banner. */
+	readonly consentAllow: string
+	/** The banner link that stores the visitor's no, which keeps the page without a cookie. */
+	readonly consentDecline: string
+	/** The footer link that clears the choice, so the banner is asked again. */
+	readonly footerCookieLink: string
 	readonly notFoundHeading: string
 	readonly notFoundBody: string
 }

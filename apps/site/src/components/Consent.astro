@@ -1,0 +1,38 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+// The banner is plain links, so both choices work with JavaScript off: the Worker's redirect returns
+// the visitor to the page without the banner. The script below only spares a reload: it stores the
+// choice through the same link, then hides the banner.
+const { dictionary } = Astro.props
+---
+
+<aside class="consent" aria-label={dictionary.consentLabel}>
+	<p class="consent-text">{dictionary.consentText}</p>
+	<div class="consent-actions">
+		<a class="consent-link consent-link-allow" href="/?consent=granted" rel="nofollow" data-consent-choice="granted">{dictionary.consentAllow}</a>
+		<a class="consent-link" href="/?consent=denied" rel="nofollow" data-consent-choice="denied">{dictionary.consentDecline}</a>
+	</div>
+</aside>
+
+<script>
+	document.addEventListener("click", (event) => {
+		const link = (event.target as Element).closest<HTMLAnchorElement>("[data-consent-choice]")
+		if (link === null) return
+		event.preventDefault()
+		fetch(link.href, { redirect: "manual" }).then(
+			() => {
+				document.documentElement.dataset["consent"] = link.dataset["consentChoice"] ?? ""
+			},
+			() => {
+				location.href = link.href
+			},
+		)
+	})
+</script>

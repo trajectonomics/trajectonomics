@@ -1,0 +1,68 @@
+/*
+ * The cookie banner (ADR 0024): a compact card fixed to the bottom edge, one line of text and two
+ * links. It keeps the phone's 16 px gutter, never scrolls sideways, and sits over the page only until
+ * the visitor answers. Colours are Theme roles, so light and dark both keep their contrast.
+ */
+
+.consent {
+	position: fixed;
+	right: 1rem;
+	bottom: max(1rem, env(safe-area-inset-bottom));
+	left: 1rem;
+	z-index: 40;
+	display: flex;
+	max-width: 26rem;
+	flex-direction: column;
+	gap: 12px;
+	margin-inline: auto;
+	padding: 16px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-card);
+	color: var(--ds-color-card-foreground);
+}
+
+.consent-text {
+	margin: 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.consent-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.consent-link {
+	display: inline-flex;
+	min-height: 40px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 14px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-sm);
+	color: var(--ds-color-foreground);
+	font-size: 0.875rem;
+	text-decoration: none;
+}
+
+.consent-link-allow {
+	border-color: var(--ds-color-primary);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.consent-link:hover {
+	text-decoration: underline;
+}
+
+.consent-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 2px;
+}
+
+/* A visitor who has answered, in the page or in this tab, never sees the banner again. */
+html[data-consent] .consent {
+	display: none;
+}

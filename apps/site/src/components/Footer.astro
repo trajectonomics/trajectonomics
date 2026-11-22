@@ -24,13 +24,21 @@ interface Props {
 const { dictionary } = Astro.props
 
 /** One link column: a mono label and its links. The page's one `nav` is the header's, so these are lists. */
-const columns = [
+interface FooterLink {
+	readonly text: string
+	readonly href: string
+	/** `nofollow` on a link that changes the visitor's state rather than naming a page. */
+	readonly rel?: string
+}
+
+const columns: readonly { readonly label: string; readonly links: readonly FooterLink[] }[] = [
 	{
 		label: dictionary.footerProductLabel,
 		links: [
 			{ text: dictionary.footerDocsLink, href: DOCS_PATH },
 			{ text: dictionary.footerCliDocsLink, href: DOCS_CLI_PATH },
 			{ text: dictionary.footerInstallLink, href: DOCS_CLI_INSTALL_PATH },
+			{ text: dictionary.footerCookieLink, href: "/?consent=reset", rel: "nofollow" },
 		],
 	},
 	{
@@ -49,7 +57,7 @@ const columns = [
 			{ text: dictionary.licence, href: SKILLS_LICENCE_URL },
 		],
 	},
-] as const
+]
 ---
 
 <footer class="site-footer border-t border-border bg-stage text-stage-foreground">
@@ -67,7 +75,7 @@ const columns = [
 							<ul class="footer-links">
 								{column.links.map((link) => (
 									<li>
-										<a class="footer-link" href={link.href}>
+										<a class="footer-link" href={link.href} rel={link.rel}>
 											{link.text}
 										</a>
 									</li>

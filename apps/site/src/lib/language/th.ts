@@ -1,5 +1,6 @@
 import { releaseFor } from "../site/release-snapshot"
 import type { LanguageEntry } from "./language"
+import { THAI_CONSENT } from "./th-consent"
 import { THAI_SECTIONS } from "./th-sections"
 
 /** The release strings Thai prints, from the committed Release snapshot. */
@@ -13,6 +14,7 @@ export const THAI: LanguageEntry = Object.freeze({
 	countries: Object.freeze(["TH"]),
 	dictionary: Object.freeze({
 		...THAI_SECTIONS,
+		...THAI_CONSENT,
 		documentTitle: "traj — เครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent",
 		description:
 			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent — CLI และสกิลที่ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด",
