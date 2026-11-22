@@ -48,7 +48,7 @@ jobs:
       channel: ${{ steps.plan.outputs.channel }}
       stable_cli: ${{ steps.plan.outputs.stable_cli }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # the diff of a push, and the tags
       - id: plan
@@ -123,7 +123,7 @@ jobs:
       EXTRA_PATHS: ${{ join(matrix.extraPaths, ' ') }}
       GITHUB_LATEST: ${{ matrix.githubLatest }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # tags and commit messages drive the version
           # Nothing here pushes with git: the tag and release go through gh and GH_TOKEN. Keeping the
