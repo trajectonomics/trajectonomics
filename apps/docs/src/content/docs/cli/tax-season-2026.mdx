@@ -1,0 +1,176 @@
+---
+title: Estimate your 2026 tax with your agent
+description: Tell your agent your 2026 income and allowances, let traj compute Thailand's 2026 personal income tax, and read what you owe and what one more deduction would change.
+---
+
+This page is for tax year 2026 (B.E. 2569) only. Your Agent gathers the facts, `traj` computes the
+tax, and you check the result against the Revenue Department's own form. The figures are estimates,
+not a return.
+
+The Thai version of this page is [ประมาณภาษีปี 2569 กับ AI agent ของคุณ](/cli/tax-season-2026-th/).
+
+## What to tell your agent
+
+Give your Agent these facts for 2026 before it runs anything:
+
+- **Income by type.** Salary (Section 40(1)), freelance or other self-employed income (Section 40(8)),
+  and any other income, each for the whole year, in baht.
+- **What was already withheld.** The tax your employer or another payer already deducted at source in
+  2026. `traj` records it as prepaid tax, so it reduces what you still owe. It goes in through the
+  `--carry-in` flag of [`traj projection`](/cli/commands/projection/).
+- **Allowances you have.** Only the ones that apply to you:
+  - social security contributions paid (`--social-security`)
+  - life insurance premiums (`--life-insurance`)
+  - your own health insurance premiums (`--health-insurance`), and premiums paid for your parents
+    (`--parent-health-insurance`)
+  - home-loan interest (`--mortgage-interest`)
+  - donations counted twice (`--donation2x`) and counted once (`--donation1x`)
+  - children (`--children`), parents you support (`--parents`), a relative in your care with a
+    disability (`--disabled-care`), and your filing status (`--filing-status`)
+  - retirement funds you paid into in 2026: RMF, SSF, provident fund, pension life insurance, and
+    ThaiESG units
+
+Retirement funds and ThaiESG are not flags. The Agent labels the contribution flow instead, such as
+`rmf=allowance.retirement.rmf`, so `traj` deducts the amount you actually paid.
+
+Your Agent converts Buddhist Era years in your documents (B.E. 2569 is 2026), and it asks you when a
+fact is missing rather than guessing.
+
+## What traj computes
+
+The Agent writes your income and contributions into a Scenario, the named what-if `traj` keeps. This
+example is a fictional person on a salary of 85,000 baht a month. The document's amounts are in
+satang, so 85,000 baht is `8500000`. The RMF flow starts at zero, so the same Scenario can show the
+case without RMF and then the case with it.
+
+A Scenario must declare every ledger account the Baseline reads, by the account's id. This example
+uses the `Cash` account from the Quickstart, so the first line looks its id up. Your own ledger may
+have more accounts, and each one needs an entry.
+
+```bash exec
+cash=$(traj account show Cash --json | jq -r .account.id)
+cat > salary.json <<EOF
+{
+  "schemaVersion": 4,
+  "currency": "THB",
+  "economy": { "inflation": 0 },
+  "accounts": [
+    { "id": "$cash", "kind": "asset", "rate": 0 },
+    { "id": "rmf", "kind": "asset", "rate": 0 }
+  ],
+  "flows": [
+    { "id": "salary", "kind": "income", "earned": true, "amount": 8500000, "frequency": "monthly", "start": "2026-01-01", "growth": "inflation" },
+    { "id": "rmf", "kind": "contribution", "target": "rmf", "amount": 0, "frequency": "annual", "start": "2026-01-01", "growth": "inflation" }
+  ],
+  "cashflow": {
+    "surplus": [ { "account": "$cash" } ],
+    "contribute": [ "rmf" ],
+    "withdraw": []
+  }
+}
+EOF
+traj scenario apply base --file salary.json --json | jq -r .status
+```
+
+```text output
+created
+```
+
+Next, `traj` writes the tax Levy into that Scenario. `--label` says which Section 40 class each income
+flow belongs to, because `traj` never guesses a label. The flags state what was paid, and the tax core
+applies the statutory ceilings.
+
+```bash exec
+traj scenario tax base --tax th-2026 --label salary=income.section40_1 --label rmf=allowance.retirement.rmf --social-security 9000 --life-insurance 20000 --json | jq .allowances.stated
+```
+
+```json output
+[
+  "socialSecurity",
+  "lifeInsurance",
+  "retirementContributions"
+]
+```
+
+`allowances.stated` lists the deduction classes your flags and labels set. `allowances.notStated`
+lists the classes this release supports that you left out, so the figure leaves them out. Without
+`--json`, the command prints the whole Scenario row, and `--none` removes the Levy again.
+
+## Read what you owe
+
+The owed figure sits in `taxYears`, one entry per tax year. This command runs the Projection from
+2026-01-01 to 2026-12-31 and keeps the 2026 entry.
+
+```bash exec
+traj projection run --scenario base --as-of 2026-01-01 --horizon 2026-12-31 --json | jq '.taxYears[] | select(.from == "2026-01-01") | {due, prepaid, owed, settled}'
+```
+
+```json output
+{
+  "due": "81200.00",
+  "prepaid": "0.00",
+  "owed": "81200.00",
+  "settled": false
+}
+```
+
+- `due` is the tax the year owes after your allowances, before anything already paid.
+- `prepaid` is what was already withheld. This example gives none, so it is zero.
+- `owed` is `due` minus `prepaid`. A negative figure is a refund.
+- `settled` is true when the day the tax is due, `settlementDate` (2027-03-31 for 2026), falls inside
+  the Projection. Here it does not, so the 2026 tax is shown as owed but its charge is not in the
+  Projection's figures.
+
+Every figure states the as-of date and the horizon you passed, so read them with it.
+
+## What one more deduction changes
+
+`traj projection compare` sets two Projections side by side. Here side `a` is the Scenario as it is,
+and side `b` is a what-if with 50,000 baht of RMF. `--set` replaces a value that already exists in the
+document, which is why the RMF flow starts at zero. Amounts are in satang, so 50,000 baht is
+`5000000`.
+
+```bash exec
+traj projection compare base --set flows.rmf.amount=5000000 --as-of 2026-01-01 --horizon 2026-12-31 --json | jq '.sides | map_values(.taxYears[] | select(.from == "2026-01-01") | {due, prepaid, owed, settled})'
+```
+
+```json output
+{
+  "a": {
+    "due": "81200.00",
+    "prepaid": "0.00",
+    "owed": "81200.00",
+    "settled": false
+  },
+  "b": {
+    "due": "71200.00",
+    "prepaid": "0.00",
+    "owed": "71200.00",
+    "settled": false
+  }
+}
+```
+
+In this example, 50,000 baht of RMF would change the owed figure from 81,200 baht to 71,200 baht, a
+change of 10,000 baht. The 50,000 baht sits in the 20% bracket at this income, so the change is
+20% of it. Change the income or the amount and `traj` gives the new answer. This is an answer to what
+a deduction would change, not advice to buy any fund.
+
+## What traj does not do
+
+- **It does not file your return.** It does not use e-Filing. You file the ภ.ง.ด.90 or ภ.ง.ด.91 form
+  yourself, using the figures you have checked.
+- **It gives no fund or investment recommendation.** Recommending a specific fund in Thailand is
+  regulated investment advice. `traj` answers what an amount would change, never which fund to buy.
+- **Its numbers are estimates.** Check them against the Revenue Department's own form before you file.
+- **It covers tax year 2026 (B.E. 2569) only.** Other years are not computed.
+- **Deductible retirement and ThaiESG units have a purchase deadline.** Buy them in the last business
+  days of December, and check the cut-off with your fund house.
+
+## Your data stays on your machine
+
+The ledger and every Scenario live in your data directory, and the ledger sends nothing. `traj` never
+calls a model. Your Agent is different: it sends what you type to the model service it runs on. Read
+that service's privacy terms before you share a payslip or a national ID number.
+
+Previous: [Agent](/cli/agent/) · Next: [Configuration](/cli/configuration/).
