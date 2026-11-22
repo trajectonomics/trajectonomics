@@ -41,7 +41,14 @@ describe("anchorable paths", () => {
 			"accounts.*.lockedUntil",
 			"flows.*.start",
 			"flows.*.end",
+			"milestones.*.criteria.*.on",
 		])
+	})
+
+	it("reach a date criterion inside a Milestone, but not its other keys", () => {
+		expect(anchorableSegments(["milestones", "retire", "criteria", "when", "on"])).toBe(true)
+		expect(anchorableSegments(["milestones", "retire", "criteria", "wealth", "amount"])).toBe(false)
+		expect(anchorableSegments(["milestones", "retire", "combine"])).toBe(false)
 	})
 
 	it("accept a field under an item's id and refuse any other", () => {

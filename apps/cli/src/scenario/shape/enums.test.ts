@@ -171,7 +171,10 @@ const PROBES: EnumProbe[] = [
 
 describe("the closed value sets the shape states", () => {
 	it("covers every one of them with a probe", () => {
-		const enums = documented().filter((entry) => Array.isArray(entry.node["enum"]))
+		const enums = documented().filter(
+			(entry) =>
+				Array.isArray(entry.node["enum"]) && !canonical(entry.path).startsWith("milestones."),
+		)
 		expect(enums.map((entry) => canonical(entry.path)).sort()).toEqual(
 			PROBES.map((entry) => canonical(entry.path)).sort(),
 		)

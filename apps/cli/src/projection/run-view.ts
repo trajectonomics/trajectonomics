@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
+import { type MilestoneRow, milestoneRow } from "./milestones"
 import { dateField } from "./money"
 import { type AnnualRow, annualRow, type MonthlyRow, monthlyRow } from "./rows-view"
 import { type TaxYearView, taxYearsField } from "./tax-view"
@@ -18,10 +19,11 @@ import {
 export type { AnnualRow, MonthlyRow } from "./rows-view"
 export type { TaxYearView } from "./tax-view"
 
-/** The Projection's annual roll-up, or its monthly rows with `--monthly`. */
+/** The Projection's annual roll-up, its monthly rows with `--monthly`, and its milestones (cli ADR-0049). */
 export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
 	| { name: "monthly"; count: number; rows: MonthlyRow[] }
+	| { name: "milestones"; count: number; rows: MilestoneRow[] }
 
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
 export type ProjectionRunView = Echo & {
@@ -43,6 +45,13 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 		count: z.number().int().describe("The number of monthly rows."),
 		rows: z.array(monthlyRow).describe("One row per month, in order."),
 	}),
+	z.strictObject({
+		name: z
+			.literal("milestones")
+			.describe("Each Milestone's fire date, present only when the Scenario declares Milestones."),
+		count: z.number().int().describe("The number of Milestones."),
+		rows: z.array(milestoneRow).describe("One row per Milestone, in Scenario order."),
+	}),
 ])
 
 export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
@@ -61,5 +70,7 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	taxYears: taxYearsField,
 	tables: z
 		.array(projectionTable)
-		.describe("The annual roll-up, and the monthly rows when --monthly was given."),
+		.describe(
+			"The annual roll-up, the monthly rows when --monthly was given, and the milestones when the Scenario declares them.",
+		),
 })

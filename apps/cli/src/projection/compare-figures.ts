@@ -1,9 +1,15 @@
-import type { AccountAmount, ProjectionRow, RunsOut } from "@trajectonomics/core/sim"
+import type {
+	AccountAmount,
+	MilestoneResult,
+	ProjectionRow,
+	RunsOut,
+} from "@trajectonomics/core/sim"
 import type { Placed } from "./carryin-apply"
 import type { CompareSide } from "./compare-side"
 import type { CompareDeltas } from "./compare-view"
 import { monthsBetween, yearsBetween } from "./dates"
 import type { FiSolution } from "./fi"
+import { milestoneRowsOf } from "./milestones"
 import { runsOutView } from "./rows"
 import type { TaxYearView } from "./tax-view"
 
@@ -12,6 +18,8 @@ export type SideData = {
 	prepared: Placed
 	fi: FiSolution
 	runsOut: RunsOut | undefined
+	/** The engine's milestones in Scenario order; undefined when the Scenario declares none. */
+	milestones: readonly MilestoneResult[] | undefined
 	taxYears: TaxYearView[]
 	/** The Contributions the engine could not fund, per Account. */
 	unfunded: readonly AccountAmount[]
@@ -28,6 +36,7 @@ export function sideView(data: SideData, money: (minor: number) => string): Comp
 		fi: data.fi.fi,
 		taxYears: data.taxYears,
 		runOut: runsOutView(data.runsOut, data.prepared.currency),
+		...(data.milestones === undefined ? {} : { milestones: milestoneRowsOf(data.milestones) }),
 		netWorth: {
 			final: {
 				date: data.final.date,

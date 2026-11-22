@@ -2,7 +2,9 @@
  * The one worked example `traj schema scenario apply` publishes: a salary, rent, a monthly
  * investment, a debt payment and a locked retirement Account, so every unit and every kind appears
  * in a document a person can edit into their own. It carries no Levy, because `traj scenario tax`
- * writes one (ADR-0032), and `lockedUntil` names the retirement Account's lock. `schemaVersion` is
+ * writes one (ADR-0032), and `lockedUntil` names the retirement Account's lock. Its one Milestone
+ * fires when the accessible net worth reaches 500,000 THB in start-of-plan money and the date
+ * passes; the monthly investment stops when it fires (`endAt`). `schemaVersion` is
  * stamped by the caller for the same reason the template's is (ADR-0024): the pin's number is
  * asked of the core, never written down here.
  */
@@ -41,6 +43,7 @@ const EXAMPLE_BODY = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+			endAt: "retire",
 		},
 		{
 			id: "pay",
@@ -50,6 +53,23 @@ const EXAMPLE_BODY = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+		},
+	],
+	milestones: [
+		{
+			id: "retire",
+			combine: "all",
+			criteria: [
+				{
+					id: "wealth",
+					kind: "metric",
+					metric: "accessibleNetWorth",
+					op: "atLeast",
+					amount: 50_000_000,
+					terms: "real",
+				},
+				{ id: "age", kind: "date", on: "2045-01-01" },
+			],
 		},
 	],
 	cashflow: { surplus: [{ account: "cash" }], contribute: ["index"], withdraw: ["cash"] },

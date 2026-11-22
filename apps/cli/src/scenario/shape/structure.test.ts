@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { scenarioExample } from "./index"
+import { FULL_MILESTONES } from "./milestone-fixture"
 import { documented, PROPERTIES, refusalsOf, replaceAt, resolves, VERSION } from "./testing"
 
 /*
@@ -39,6 +40,7 @@ const FULL: Record<string, unknown> = {
 			start: "2026-01-01",
 			end: "2046-01-01",
 			growth: { bps: 200 },
+			startAt: "retire",
 		},
 		{
 			id: "rent",
@@ -64,6 +66,7 @@ const FULL: Record<string, unknown> = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+			endAt: "downsize",
 		},
 		{
 			id: "pay",
@@ -103,6 +106,7 @@ const FULL: Record<string, unknown> = {
 			carryIn: [{ periodStart: "2025-01-01", tallies: [], prepaid: 0 }],
 		},
 	],
+	milestones: FULL_MILESTONES,
 	calendar: { dayRule: "next", holidays: ["2026-04-13"] },
 }
 
@@ -115,6 +119,8 @@ const OBJECT_PATHS: (string | number)[][] = [
 	["flows", 0, "prepayments", 0],
 	["flows", 0, "cappedPrepayment"],
 	["flows", 6, "derive"],
+	["milestones", 0],
+	["milestones", 0, "criteria", 0],
 	["cashflow"],
 	["cashflow", "surplus", 0],
 	["levies", 0],
