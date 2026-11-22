@@ -1,11 +1,14 @@
 import { z } from "zod"
+import type { PersonAge } from "../scenario/household/ages"
 import { dateField, moneyField } from "./money"
+import { personAges } from "./person-ages"
 
 /** One year of the engine's roll-up, nominal, beside the real figure at its own date. */
 export type AnnualRow = {
 	index: number
 	from: string
 	to: string
+	ages: PersonAge[]
 	openingNetWorth: string
 	closingNetWorth: string
 	income: string
@@ -21,6 +24,7 @@ export type AnnualRow = {
 /** One monthly row of the Projection, nominal and real. */
 export type MonthlyRow = {
 	date: string
+	ages: PersonAge[]
 	netWorth: string
 	realNetWorth: string
 	accessibleNetWorth: string
@@ -31,6 +35,7 @@ export const annualRow: z.ZodType<AnnualRow> = z.strictObject({
 	index: z.number().int().describe("The roll-up's index, from 0."),
 	from: dateField("The roll-up's first day"),
 	to: dateField("The roll-up's last day"),
+	ages: personAges,
 	openingNetWorth: moneyField("Net worth on the roll-up's first day"),
 	closingNetWorth: moneyField("Net worth on the roll-up's last day"),
 	income: moneyField("Income the roll-up landed"),
@@ -54,6 +59,7 @@ export const annualRow: z.ZodType<AnnualRow> = z.strictObject({
 
 export const monthlyRow: z.ZodType<MonthlyRow> = z.strictObject({
 	date: dateField("The row's date"),
+	ages: personAges,
 	netWorth: moneyField("Net worth on the row's date"),
 	realNetWorth: moneyField("Net worth in start-of-timeline terms"),
 	accessibleNetWorth: moneyField("Net worth that is not locked"),

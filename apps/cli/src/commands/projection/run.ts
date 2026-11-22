@@ -22,6 +22,7 @@ import { projectionRunView } from "../../projection/run-view"
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
+	note: "Each person's age on the rows ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({

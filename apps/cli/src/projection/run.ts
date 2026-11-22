@@ -1,6 +1,7 @@
 import { project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
+import { agesOn } from "../scenario/household/ages"
 import type { Placed } from "./carryin-apply"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
@@ -20,7 +21,7 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 	const { projection } = result
 	const annual = []
 	for (const rollup of projection.annual) {
-		const row = annualRow(rollup, projection.rows, currency)
+		const row = annualRow(rollup, projection.rows, currency, agesOn(prepared.household, rollup.to))
 		if (isAppError(row)) return row
 		annual.push(row)
 	}
@@ -29,7 +30,9 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 		tables.push({
 			name: "monthly",
 			count: projection.rows.length,
-			rows: projection.rows.map((row) => monthlyRow(row, currency)),
+			rows: projection.rows.map((row) =>
+				monthlyRow(row, currency, agesOn(prepared.household, row.date)),
+			),
 		})
 	}
 	return {

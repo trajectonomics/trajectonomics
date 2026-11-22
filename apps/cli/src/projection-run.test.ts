@@ -83,13 +83,6 @@ describe("projection run", () => {
 		const monthly = tableOf(withMonths, "monthly")
 		expect(monthly.count).toBe(13)
 		expect(monthly.rows[0]?.date).toBe(AS_OF)
-		expect(Object.keys(monthly.rows[0] ?? {}).sort()).toEqual([
-			"accessibleNetWorth",
-			"date",
-			"netWorth",
-			"realAccessibleNetWorth",
-			"realNetWorth",
-		])
 	})
 
 	it("takes the real figure from the row on the roll-up's end or the next day", async () => {

@@ -12,6 +12,8 @@ const UNRELEASED: readonly (readonly string[])[] = [
 	["scenario", "show"],
 	["scenario", "apply"],
 	["scenario", "household"],
+	["projection", "run"],
+	["fi"],
 ]
 
 describe("usage", () => {
