@@ -9,7 +9,7 @@ import {
 	OPENCODE_FREE_MODEL,
 	opencodeArgs,
 } from "./agents"
-import { finalTextOf } from "./final-answer"
+import { finalTextOf, modelOf } from "./final-answer"
 
 describe("argv builders", () => {
 	it("runs Claude headless with streamed events and only traj for Bash", () => {
@@ -18,6 +18,14 @@ describe("argv builders", () => {
 		expect(args).toContain("stream-json")
 		expect(args[args.indexOf("--allowedTools") + 1]).toBe("Bash(traj:*)")
 		expect(args).toContain("Read")
+	})
+
+	it("denies every Claude Code call but traj: Bash is the only tool, user settings are skipped, nothing prompts", () => {
+		const args = claudeArgs("PROMPT")
+		expect(args[args.indexOf("--tools") + 1]).toBe("Bash")
+		expect(args[args.indexOf("--setting-sources") + 1]).toBe("project")
+		expect(args[args.indexOf("--permission-mode") + 1]).toBe("dontAsk")
+		expect(args).toContain("--strict-mcp-config")
 	})
 
 	it("runs agy in print mode with text output, on the Hydrogen model", () => {
@@ -89,6 +97,37 @@ describe("finalTextOf", () => {
 
 	it("returns an empty string when Claude emitted no result event", () => {
 		expect(finalTextOf("claude", JSON.stringify({ type: "assistant" }))).toBe("")
+	})
+})
+
+describe("modelOf", () => {
+	const init = JSON.stringify({
+		type: "system",
+		subtype: "init",
+		cwd: "/work",
+		session_id: "s",
+		tools: ["Bash"],
+		model: "claude-opus-5-5",
+	})
+
+	it("reads the model from Claude's first system init event", () => {
+		const stdout = [
+			JSON.stringify({ type: "system", subtype: "hook_started", hook_name: "SessionStart" }),
+			init,
+			JSON.stringify({ type: "result", result: "done" }),
+		].join("\n")
+		expect(modelOf("claude", stdout)).toBe("claude-opus-5-5")
+	})
+
+	it("is null when the stream has no init event or names no model", () => {
+		expect(modelOf("claude", JSON.stringify({ type: "result", result: "x" }))).toBeNull()
+		expect(modelOf("claude", JSON.stringify({ type: "system", subtype: "init" }))).toBeNull()
+		expect(modelOf("claude", "")).toBeNull()
+	})
+
+	it("is null for agents whose output does not name the model", () => {
+		expect(modelOf("opencode", init)).toBeNull()
+		expect(modelOf("antigravity", init)).toBeNull()
 	})
 })
 
