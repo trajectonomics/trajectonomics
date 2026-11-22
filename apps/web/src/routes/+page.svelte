@@ -3,7 +3,7 @@ import OverviewPage from "../components/pages/OverviewPage.svelte"
 </script>
 
 <svelte:head>
-	<title>Overview · Dashboard</title>
+	<title>Home · Dashboard</title>
 </svelte:head>
 
 <OverviewPage />
