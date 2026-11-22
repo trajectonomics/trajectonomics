@@ -28,6 +28,7 @@
 	},
 	"scripts": {
 		"dev": "bun run src/index.ts",
+		"eval": "bun run evals/adr-0002/run.ts",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome ci --error-on-warnings .",
