@@ -1,0 +1,31 @@
+# `traj dashboard` edits Scenarios through traj on loopback
+
+[ADR-0041](0041-traj-dashboard-serves-the-dashboard-on-loopback.md) made `traj dashboard` a server that only reads: it answered GET and HEAD, and it ran read leaves and nothing else. On 2026-11-22 the owner decided that the Dashboard edits plans, and every edit goes through `traj`. So the server now accepts writes from its own page, and each one runs a `traj` write. The Dashboard's record is `apps/web` [ADR 0008](../../../web/docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md).
+
+The server answers three routes it did not answer before. `GET /edit-session` gives the page a token, to this machine's Host only, never cached and never readable across origins. `POST /edit` runs one Edit: a copy of a plan (`scenario fork`), an applied Scenario document (`scenario apply --file -`), or a deleted plan (`scenario rm`). Each runs first with `--dry-run` ([ADR-0019](0019-dry-run-executes-and-rolls-back.md)), then for real, and then the Snapshot is read again. The answer is the new Snapshot, or the error envelope the CLI printed, as data. Every other request is answered as before.
+
+## What a request must hold
+
+Each refusal has its own test in `apps/web/scripts/serve-edit.test.ts`:
+
+- a Host other than `127.0.0.1`, `localhost` or `[::1]` on the server's port: 403;
+- an `Origin` other than `http://127.0.0.1:<port>`, a missing one included: 403;
+- a missing or wrong `x-traj-edit-token` header: 403. The token is random, made when the server starts, and given only to a page that asks for it from this machine;
+- a `Content-Type` other than `application/json`: 415. A cross-site form or a simple request cannot send that type without a preflight, and no preflight is answered;
+- an Edit before the first Snapshot is read: 503;
+- a second Edit while one runs: 409, which `apps/web/scripts/edit.test.ts` runs against the workspace `traj`.
+
+## Considered options
+
+- **A second command that writes.** Rejected: another process to start and to guard, and the page already talks to this one.
+- **Read-only, and the owner's plan edits in the terminal.** Rejected: the owner decided the page edits plans, and a page that only shows them asks the person to switch windows for each change.
+- **The Host check alone.** Rejected. It stops DNS rebinding, but another website open in the same browser can still send a request to `127.0.0.1`, so the Origin, the token and the Content-Type each close a route of their own.
+
+## Consequences
+
+- `traj dashboard` changes the ledger while it runs. Its result still lists the reads, and it does not list the Edits: they are answered to the page that made them, and the ledger keeps the record like any other write.
+- An Edit takes the writer lock as any write does, so a busy database answers `database_busy` (exit 5) as data, and the page shows it.
+- The binary grows by the Edit list and its guards, which is small. Its pages come from `apps/web` as before.
+- The Dashboard's `bun run dashboard` checkout preview still has no server, so it has no edits.
+- `scripts/smoke.sh` checks reads only, as before. An Edit is checked by the end-to-end test in `apps/web`, which runs the workspace `traj`.
+- The help for `traj dashboard` still says it serves the Dashboard on loopback until Ctrl-C. It does not yet say that the page can change plans. That wording is a follow-up with the Docs Portal release.

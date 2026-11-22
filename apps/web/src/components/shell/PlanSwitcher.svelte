@@ -1,13 +1,17 @@
 <script lang="ts">
+import PlanActions from "./PlanActions.svelte"
+
 interface Props {
 	/** The Scenario names the Snapshot holds. The switcher is hidden when there are none. */
 	names: readonly string[]
 	/** The Scenario the pages show. */
 	selected: string
 	onChange: (name: string) => void
+	/** Whether the server answers Edits: then the plan can be copied and deleted. */
+	editable?: boolean
 }
 
-let { names, selected, onChange }: Props = $props()
+let { names, selected, onChange, editable = false }: Props = $props()
 </script>
 
 <!-- The plan switcher: a labelled select of the Scenarios. The pages that show a Scenario follow it. -->
@@ -29,5 +33,8 @@ let { names, selected, onChange }: Props = $props()
 				<option value={name}>{name}</option>
 			{/each}
 		</select>
+		{#if editable}
+			<PlanActions {names} {selected} onPlan={onChange} />
+		{/if}
 	</div>
 {/if}

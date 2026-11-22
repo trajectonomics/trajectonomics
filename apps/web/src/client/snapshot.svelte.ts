@@ -1,4 +1,5 @@
-import { snapshotUrl } from "../lib/view/snapshot-url"
+import type { Snapshot } from "../lib/contract"
+import { SNAPSHOT_PATH, snapshotUrl } from "../lib/view/snapshot-url"
 import { LOADING, type SnapshotState } from "../lib/view/state"
 import { snapshotLoader } from "./browser"
 
@@ -20,4 +21,9 @@ export function currentSnapshot(): SnapshotState {
 /** Shows the Snapshot a query string names. Each file is read once; a second call for the same one does nothing. */
 export function loadSnapshot(search: string): void {
 	void snapshotLoader.load(snapshotUrl(search))
+}
+
+/** Shows the Snapshot an Edit answered with: the one the server re-read after the write. */
+export function replaceSnapshot(snapshot: Snapshot): void {
+	snapshotLoader.replace({ status: "ready", url: SNAPSHOT_PATH, snapshot })
 }

@@ -107,3 +107,17 @@ describe("SiteLink", () => {
 		expect(body).toContain('href="/ledger/"')
 	})
 })
+
+describe("the plan actions", () => {
+	test("are offered only when the server answers Edits, never in the Demo snapshot", () => {
+		const names = ["base"]
+		const readOnly = render(PlanSwitcher, { props: { names, selected: "base", onChange: noop } })
+		expect(readOnly.body).not.toContain("Copy plan")
+		expect(readOnly.body).not.toContain("Delete plan")
+		const editing = render(PlanSwitcher, {
+			props: { names, selected: "base", onChange: noop, editable: true },
+		})
+		expect(editing.body).toContain("Copy plan")
+		expect(editing.body).toContain("Delete plan")
+	})
+})

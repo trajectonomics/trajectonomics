@@ -27,3 +27,7 @@ _Avoid_: bundle, archive, assets
 **Plan**:
 The list of argv a Snapshot needs, computed from the parameters alone. Stage one reads the Scenarios, the accounts and the first transaction date; stage two reads everything else.
 _Avoid_: pipeline, workflow, job, script
+
+**Edit**:
+A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` scenario commands, copy a plan, apply a Scenario document or delete a plan. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot or the CLI's error envelope.
+_Avoid_: save, mutation, update, PATCH, request, write

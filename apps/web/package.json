@@ -1,7 +1,7 @@
 {
 	"name": "@trajectonomics/web",
 	"version": "0.0.0-development",
-	"description": "The Dashboard: a read-only static web app that renders a Snapshot of traj --json results on 127.0.0.1. Never published to npm, never hosted.",
+	"description": "The Dashboard: a static web app that renders a Snapshot of traj --json results on 127.0.0.1, and sends Edits through traj. Never published to npm, never hosted.",
 	"license": "MIT",
 	"repository": {
 		"type": "git",

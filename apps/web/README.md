@@ -1,6 +1,6 @@
 # Dashboard
 
-A read-only web app that shows what `traj` already computed. It reads one Snapshot, a JSON document made only of `traj … --json` results, and renders it on `127.0.0.1`. It never does arithmetic on money and never sends anything anywhere.
+A web app that shows what `traj` already computed, and changes a plan through `traj` when the person asks. It reads one Snapshot, a JSON document made only of `traj … --json` results, and renders it on `127.0.0.1`. It never does arithmetic on money and never sends anything anywhere. Its only writes are Edits, each one a `traj` command run by the server on `127.0.0.1`.
 
 With `traj` installed, no checkout is needed: `traj dashboard --as-of 2026-10-31 --horizon 2060-12-31` reads your ledger and serves the Dashboard on `http://127.0.0.1:4321/` until Ctrl-C (it ships in `traj` 0.5.0; [ADR 0007](docs/adr/0007-traj-dashboard-serves-the-dashboard-on-loopback.md)). The rest of this page is for working on the Dashboard from a checkout.
 
@@ -30,6 +30,7 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 - `src/lib/snapshot/`: the pure Plan, which decides the argv and assembles the Snapshot.
 - `scripts/`: the I/O: spawning `traj`, reading the ledger for the demo, writing files, packing the build, and the loopback server `traj dashboard` runs (`serve.ts`, exported as `@trajectonomics/web/serve`).
 - `src/lib/serve/`: the server's pure rules: which packed file answers a path, its type, and the Host check.
+- `src/lib/edit/`: the Edits, a closed list, each mapped to one `traj` write, and the guards of the write path.
 - `src/lib/view/`, `src/lib/format/`, `src/lib/chart/`: pure functions from a Snapshot to what a page shows, the formatting of the CLI's strings, and the chart geometry.
 - `src/client/`: the browser: storage, the address bar, `fetch`, and the Svelte modules (`.svelte.ts`) that hold the reactive state over them.
 - `src/routes/`: the eight routes, one `+page.svelte` each, and the root layout (the shell, prerendered as static files).
@@ -41,6 +42,10 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 ## Pages
 
 Overview, Net worth, Ledger, Projection, FI date, Compare, Tax and Health. Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
+
+## Edits
+
+The plan switcher in the side navigation can copy a plan ("Copy plan", which asks for a name) and delete one ("Delete plan", which asks first). Each runs `traj scenario fork` or `traj scenario rm` through the server, dry first, and then shows the new Snapshot. The controls appear only when `traj dashboard` answers the page's token, so they are hidden in the Demo snapshot and under `bun run dashboard`, which has no server. The rules of the write path are in [ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md).
 
 ## Licence
 

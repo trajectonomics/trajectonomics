@@ -1,10 +1,10 @@
 ---
-status: accepted
+status: superseded in part by 0008 (the read-only parts)
 ---
 
 # The Dashboard renders a Snapshot
 
-The Dashboard shows what `traj` computed. A script runs read leaves of the CLI (`traj … --json`), keeps each result verbatim with the argv that produced it, and writes one JSON document, the Snapshot. The Dashboard is static pages and React islands that render that one file and nothing else.
+The Dashboard shows what `traj` computed. [ADR 0008](0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md) supersedes its read-only parts: the Dashboard now also sends Edits, each a `traj` write, through its server. A script runs read leaves of the CLI (`traj … --json`), keeps each result verbatim with the argv that produced it, and writes one JSON document, the Snapshot. The Dashboard is static pages and React islands that render that one file and nothing else.
 
 The Snapshot is version 1 and is closed: a field it does not name is not in it. Each Read is either the parsed data of a successful call or the error envelope of a failed one. A page shows an error only where it needs the failed Read, so one missing figure does not blank the others.
 
