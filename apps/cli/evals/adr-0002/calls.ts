@@ -16,12 +16,18 @@ export function flagsIn(helpText: string): Set<string> {
 }
 
 /**
- * The longest command name (from `traj schema`) the call's leading words spell, as `""` for the
- * root. Words that start with `-` end the command name.
+ * The longest command name (from `traj schema`) the call's words spell, as `""` for the root. A
+ * global flag (one the root help lists, such as `--json`) is skipped wherever it stands, the way
+ * the CLI's own walk skips it; any other word that starts with `-` ends the command name.
  */
-export function commandPathOf(argv: readonly string[], commandNames: readonly string[]): string {
+export function commandPathOf(
+	argv: readonly string[],
+	commandNames: readonly string[],
+	globalFlags: ReadonlySet<string> = new Set(),
+): string {
 	const words: string[] = []
 	for (const word of argv) {
+		if (globalFlags.has(word)) continue
 		if (word.startsWith("-")) break
 		words.push(word)
 	}
@@ -41,14 +47,18 @@ export function flagsOfCall(argv: readonly string[]): string[] {
 		.map((word) => word.split("=")[0] ?? word)
 }
 
-/** Flags a call used that its command's help does not list: the invented ones. */
+/**
+ * Flags a call used that its command's help does not list: the invented ones. The root help's
+ * flags are the global flags, which every command accepts, so they are known for every command.
+ */
 export function inventedFlagsOf(
 	argv: readonly string[],
 	commandNames: readonly string[],
 	table: FlagTable,
 ): string[] {
-	const path = commandPathOf(argv, commandNames)
-	const known = table[path] ?? new Set<string>()
+	const globals = table[""] ?? new Set<string>()
+	const path = commandPathOf(argv, commandNames, globals)
+	const known = new Set([...globals, ...(table[path] ?? [])])
 	return flagsOfCall(argv).filter((flag) => !known.has(flag))
 }
 

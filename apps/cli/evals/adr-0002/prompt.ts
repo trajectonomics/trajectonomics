@@ -17,6 +17,7 @@ export function promptFor(persona: Persona): string {
 		"- Use `traj` for every number. Do not estimate, and do not do any tax or financial independence arithmetic yourself.",
 		"- Start with `traj help` and `traj schema`. `traj help <command>` describes one command and its flags.",
 		"- Do not read, search or open any file on this computer, and do not look for source code, a repository or documentation. Work from the conversation below and from what `traj` tells you.",
+		"- Do not write any file outside your working directory, and do not keep scratch files in /tmp or anywhere else. Keep any notes in your working directory only.",
 		`- The plan starts on ${persona.asOf} and is projected to ${persona.horizon}.`,
 		"",
 		"The conversation:",

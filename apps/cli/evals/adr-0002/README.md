@@ -43,7 +43,7 @@ For each persona the runner:
 
 Before the first persona the runner reads the release's own `traj schema --json` and `traj help <command>` for every command. Invented flags are the flags a call used that its command's help does not list.
 
-The prompt forbids reading files, searching, or looking for the repository, but it does not forbid writing scratch files. The OpenCode smoke run wrote its scenario documents to `/tmp/opencode/`. That is outside the sandbox and is on the shared tmpfs, so a future prompt revision should add a rule for it. Changing the prompt means rerunning the smoke test, so it is recorded here rather than changed in place. The prompt is a request, not a sandbox. The sandbox is the working directory, the PATH and the `TRAJ_HOME`. Each agent is also configured to refuse file and web tools (Claude: `Read`, `Glob`, `Grep`, `Edit`, `Write`, `WebFetch`, `WebSearch` disallowed; OpenCode: bash denied except `traj`, edit and web denied). Antigravity has no per-tool allow-list in print mode, so it runs with `--dangerously-skip-permissions`. Its shell is not restricted beyond the PATH and the prompt. Read its `calls.jsonl` to see what it actually ran.
+The prompt forbids reading files, searching, or looking for the repository, and forbids writing any file outside the agent's working directory. The OpenCode smoke run (`results/0.4.0-opencode.md`) predates the write rule: it wrote its scenario documents to `/tmp/opencode/`, on the shared tmpfs. Its figures were produced with the earlier prompt and persona wording, so it is kept as a record, not as a result for the current prompt. The prompt is a request, not a sandbox. The sandbox is the working directory, the PATH and the `TRAJ_HOME`. Each agent is also configured to refuse file and web tools (Claude: `Read`, `Glob`, `Grep`, `Edit`, `Write`, `WebFetch`, `WebSearch` disallowed; OpenCode: bash denied except `traj`, and `read`, `glob`, `grep`, `list`, `edit` and `webfetch` denied). Antigravity has no per-tool allow-list in print mode, so it runs with `--dangerously-skip-permissions`. Its shell is not restricted beyond the PATH and the prompt. Read its `calls.jsonl` to see what it actually ran.
 
 Each agent still loads its own user-level configuration from `HOME` (for example a global `CLAUDE.md`). That is intentional, because the logins live there, and it is outside this eval's control.
 
@@ -58,6 +58,15 @@ Each agent still loads its own user-level configuration from `HOME` (for example
 | `pim-krit-couple-mortgage` | Married, one income, two children, a home loan | Married allowances, children (one born 2018 or later), mortgage interest |
 
 Each file has the `conversation` the agent is given, and the structured `accounts`, `flows`, `cashflow`, `tax` and `whatIf` the oracle computes from. The persona test checks that every amount in the structured facts appears in the conversation, so the agent is given the same numbers the oracle uses.
+
+Each conversation also states the facts the oracle assumes that a bare amount does not carry:
+
+- which amounts grow with inflation: salary, living costs and business costs;
+- which stay fixed in baht: each monthly fund contribution and the home-loan payment;
+- that insurance and social security payments are already inside the stated living costs, so the oracle has no separate flow for them;
+- that nothing from 2025 carries into the plan, which matches the empty Levy carry-in.
+
+`oracle.test.ts` checks that the oracle reads these facts as the conversation states them.
 
 Every persona asks three things:
 
@@ -110,8 +119,8 @@ The raw files are in the run's directory under `~/.cache/eval-harness/runs/`: `t
 
 ## Status of the agent adapters
 
-- **OpenCode** was run live once: the free model on `nok-salaried-employee`, release 0.4.0. The result is `results/0.4.0-opencode.md`: 1 of 3 correct. The 2026 tax matched the oracle exactly (32,450 baht). FI came out at 2043-03 against the oracle's 2043-08, and the what-if at 2040-02 against 2040-05. The agent applied the tax Levy (four `scenario tax` calls). The cause of the FI gap has not been traced; the call log in the run's `calls.jsonl` is the place to start.
+- **OpenCode** was run live once: the free model on `nok-salaried-employee`, release 0.4.0. The result is `results/0.4.0-opencode.md`, produced with the persona wording from before the review fixes: 1 of 3 correct. The 2026 tax matched the oracle exactly (32,450 baht). FI came out at 2043-03 against the oracle's 2043-08, and the what-if at 2040-02 against 2040-05. The agent applied the tax Levy (four `scenario tax` calls). The gap came from the persona, not the engine: the earlier wording did not say the 15,000 baht contribution stays fixed, and the agent grew it with inflation. Growing that one contribution gives 2043-03 and 2040-02, the smoke run's figures. The current persona states that the contribution is fixed, so the oracle's 2043-08 and 2040-05 are the expected answers. No run of the current persona is committed yet.
 - **Claude Code** flags were taken from `claude --help` on Claude Code 2.1.330. They have not been run live by the author.
-- **Antigravity** flags were taken from `agy --help` on agy 1.5.13. They have not been run live by the author, and its JSON output is not parsed: the runner reads its text output as the answer.
+- **Antigravity** flags were taken from `agy --help` on agy 1.5.13. They have not been run live by the author, and its JSON output is not parsed: the runner reads its text output as the answer. The runner passes `--model gemini-4-hydrogen-medium`. `agy models` lists the Hydrogen family only with an effort suffix (`-low`, `-medium`, `-high`, `-xhigh`), and has no bare `gemini-4-hydrogen`, so the medium-effort model is the one named (root AGENTS.md rule 7). Change `ANTIGRAVITY_MODEL` in `agents.ts` to run another effort level.
 
 Run `--dry-run` to see the exact argv for each.

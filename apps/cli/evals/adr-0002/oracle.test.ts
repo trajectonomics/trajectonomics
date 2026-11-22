@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "bun:test"
 import { type Expected, expectedAnswers, TOLERANCE, taxBahtOf } from "./oracle"
 import { loadPersonas, type Persona } from "./persona"
+import { scenarioOf } from "./scenario"
 
 const personas = loadPersonas(`${import.meta.dir}/personas`)
 const byId = (id: string): Persona => {
@@ -67,6 +68,55 @@ describe("oracle FI under the survival definition", () => {
 		const first = answerOf("nok-salaried-employee")
 		expect(expectedAnswers(byId("nok-salaried-employee"))).toEqual(first)
 	}, 60_000)
+})
+
+describe("oracle reads the facts each conversation states", () => {
+	it("grows salary, living costs and business costs with inflation, and keeps monthly fund and loan payments fixed", () => {
+		const nok = scenarioOf(byId("nok-salaried-employee")).flows
+		expect(nok).toContainEqual(expect.objectContaining({ id: "salary", growth: "inflation" }))
+		expect(nok).toContainEqual(expect.objectContaining({ id: "living", growth: "inflation" }))
+		expect(nok).toContainEqual(expect.objectContaining({ id: "invest", growth: { bps: 0 } }))
+		const pim = scenarioOf(byId("pim-krit-couple-mortgage")).flows
+		expect(pim).toContainEqual(
+			expect.objectContaining({ id: "mortgage-payment", growth: { bps: 0 } }),
+		)
+		const ploy = scenarioOf(byId("ploy-freelancer-40-8")).flows
+		expect(ploy).toContainEqual(expect.objectContaining({ id: "business", growth: "inflation" }))
+	})
+
+	it("states that insurance and social security sit inside living costs, where the oracle has no separate flow", () => {
+		for (const persona of personas) {
+			const allowances = Object.keys(persona.tax.allowances)
+			if (allowances.some((key) => key !== "mortgageInterest")) {
+				expect(persona.conversation).toContain("already inside")
+			}
+			expect(persona.flows.map((flow) => flow.id).join(" ")).not.toMatch(/insurance|social/)
+		}
+	})
+
+	it("states that nothing from 2025 carries into the plan, matching the empty Levy carry-in", () => {
+		for (const persona of personas) {
+			expect(persona.conversation).toContain("Nothing from 2025 carries into")
+		}
+	})
+
+	it("gives the FI months the stated facts produce, base and what-if", () => {
+		expect(answerOf("nok-salaried-employee")).toEqual({
+			fiMonth: "2043-08",
+			tax2026Baht: 32_450,
+			whatIfFiMonth: "2040-05",
+		})
+		expect(answerOf("pim-krit-couple-mortgage")).toEqual({
+			fiMonth: "2046-12",
+			tax2026Baht: 22_600,
+			whatIfFiMonth: "2043-12",
+		})
+		expect(answerOf("ploy-freelancer-40-8")).toEqual({
+			fiMonth: "2043-10",
+			tax2026Baht: 20_800,
+			whatIfFiMonth: "2042-12",
+		})
+	})
 })
 
 describe("tolerances", () => {

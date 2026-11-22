@@ -3,7 +3,9 @@
  * usage-limit refusal. Nothing here talks to a model; reading the answer is in final-answer.ts.
  */
 
+/** The agent CLIs the eval can drive, by the names `--agent` takes. */
 export const AGENTS = ["claude", "antigravity", "opencode"] as const
+/** One of AGENTS: the agent a run is driven by. */
 export type AgentName = (typeof AGENTS)[number]
 
 /** The executable each agent is looked up as on PATH. */
@@ -39,9 +41,24 @@ export function claudeArgs(prompt: string): string[] {
 	]
 }
 
-/** Antigravity's `agy`: one print-mode turn with plain text out; shell permissions are skipped in the sandbox cwd. */
+/**
+ * The Gemini model `agy` runs. `agy models` lists the Hydrogen family only with an effort suffix
+ * (there is no bare `gemini-4-hydrogen`), so this names the medium-effort model (root AGENTS.md
+ * rule 7).
+ */
+export const ANTIGRAVITY_MODEL = "gemini-4-hydrogen-medium"
+
+/** Antigravity's `agy`: one print-mode turn with plain text out, on ANTIGRAVITY_MODEL; shell permissions are skipped in the sandbox cwd. */
 export function antigravityArgs(prompt: string): string[] {
-	return ["-p", prompt, "--output-format", "text", "--dangerously-skip-permissions"]
+	return [
+		"-p",
+		prompt,
+		"--output-format",
+		"text",
+		"--model",
+		ANTIGRAVITY_MODEL,
+		"--dangerously-skip-permissions",
+	]
 }
 
 /** OpenCode: JSON events on stdout, with permissions not denied auto-approved. */
@@ -49,11 +66,18 @@ export function opencodeArgs(prompt: string, model: string): string[] {
 	return ["run", "-m", model, "--format", "json", "--auto", prompt]
 }
 
-/** The OpenCode permission config passed through `OPENCODE_CONFIG_CONTENT`: bash only for `traj`. */
+/**
+ * The OpenCode permission config passed through `OPENCODE_CONFIG_CONTENT`: bash only for `traj`,
+ * and no file reads, listings, searches, edits or web fetches.
+ */
 export const OPENCODE_CONFIG: string = JSON.stringify({
 	permission: {
 		bash: { "*": "deny", "traj *": "allow", traj: "allow" },
 		edit: "deny",
+		read: "deny",
+		glob: "deny",
+		grep: "deny",
+		list: "deny",
 		webfetch: "deny",
 	},
 })

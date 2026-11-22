@@ -18,9 +18,19 @@ describe("commandPathOf", () => {
 		expect(commandPathOf(["fi", "--scenario", "base"], names)).toBe("fi")
 	})
 
-	it("stops at the first flag and returns the root when nothing matches", () => {
+	it("stops at a flag that is not global, and returns the root when nothing matches", () => {
 		expect(commandPathOf(["--json"], names)).toBe("")
-		expect(commandPathOf(["scenario", "--json", "tax"], names)).toBe("")
+		expect(commandPathOf(["scenario", "--as-of", "tax"], names)).toBe("")
+	})
+
+	it("skips a global flag before the command name", () => {
+		const globals = new Set(["--json"])
+		expect(commandPathOf(["--json", "fi", "--as-of", "2026-01-01"], names, globals)).toBe("fi")
+	})
+
+	it("skips a global flag inside a command path, as the CLI's own walk does", () => {
+		const globals = new Set(["--json"])
+		expect(commandPathOf(["scenario", "--json", "tax"], names, globals)).toBe("scenario tax")
 	})
 })
 
@@ -46,6 +56,12 @@ describe("flags", () => {
 			"--when",
 		])
 		expect(inventedFlagsOf(["--json"], names, table)).toEqual([])
+	})
+
+	it("does not report a global flag placed before the command name as invented", () => {
+		const table: FlagTable = { fi: new Set(["--as-of"]), "": new Set(["--json"]) }
+		expect(inventedFlagsOf(["--json", "fi", "--as-of", "2026-01-01"], names, table)).toEqual([])
+		expect(inventedFlagsOf(["--json", "fi", "--when", "x"], names, table)).toEqual(["--when"])
 	})
 })
 

@@ -1,11 +1,14 @@
 import { afterAll, describe, expect, it } from "bun:test"
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs"
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs"
 import { homedir } from "node:os"
 import { join } from "node:path"
 import { installTrajWrapper, makeRunDirs, sandboxPath, wrapperSource } from "./sandbox"
 
-// Scratch space lives under the cache, never under /tmp (AGENTS.md rule 8).
-const scratch = mkdtempSync(join(homedir(), ".cache", "eval-harness", "test-sandbox-"))
+// Scratch space lives under the cache, never under /tmp (AGENTS.md rule 8). A clean CI runner has
+// no `.cache/eval-harness` yet, so the parent is created first.
+const cacheRoot = join(homedir(), ".cache", "eval-harness")
+mkdirSync(cacheRoot, { recursive: true })
+const scratch = mkdtempSync(join(cacheRoot, "test-sandbox-"))
 afterAll(() => rmSync(scratch, { recursive: true, force: true }))
 
 describe("sandbox", () => {

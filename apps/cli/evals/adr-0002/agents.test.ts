@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import {
+	ANTIGRAVITY_MODEL,
 	antigravityArgs,
 	claudeArgs,
 	isFreeLimit,
@@ -19,14 +20,21 @@ describe("argv builders", () => {
 		expect(args).toContain("Read")
 	})
 
-	it("runs agy in print mode with text output", () => {
+	it("runs agy in print mode with text output, on the Hydrogen model", () => {
 		expect(antigravityArgs("PROMPT")).toEqual([
 			"-p",
 			"PROMPT",
 			"--output-format",
 			"text",
+			"--model",
+			"gemini-4-hydrogen-medium",
 			"--dangerously-skip-permissions",
 		])
+	})
+
+	it("never runs agy on gemini-3.8-flash (root AGENTS.md rule 7)", () => {
+		expect(ANTIGRAVITY_MODEL.startsWith("gemini-4-hydrogen")).toBe(true)
+		expect(antigravityArgs("PROMPT")).not.toContain("gemini-3.8-flash")
 	})
 
 	it("runs OpenCode with the model, JSON events and auto-approval", () => {
@@ -46,6 +54,13 @@ describe("argv builders", () => {
 		const config = JSON.parse(OPENCODE_CONFIG) as { permission: { bash: Record<string, string> } }
 		expect(config.permission.bash["*"]).toBe("deny")
 		expect(config.permission.bash["traj *"]).toBe("allow")
+	})
+
+	it("denies OpenCode file reads, listings, searches, edits and web fetches", () => {
+		const { permission } = JSON.parse(OPENCODE_CONFIG) as { permission: Record<string, string> }
+		for (const tool of ["read", "glob", "grep", "list", "edit", "webfetch"]) {
+			expect(permission[tool]).toBe("deny")
+		}
 	})
 })
 

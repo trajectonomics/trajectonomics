@@ -8,6 +8,7 @@ import type { Released } from "./release"
 
 const DEFAULT_TIMEOUT_MINUTES = 40
 
+/** The parsed command line of the eval runner. */
 export interface Options {
 	readonly agent: AgentName
 	readonly personas: readonly string[] | undefined
@@ -17,7 +18,7 @@ export interface Options {
 	readonly dryRun: boolean
 }
 
-/** Reads the command line; throws with a plain message when a value is missing or unknown. */
+/** Reads the command line; throws with a plain message when a value is missing, unknown or out of range. */
 export function parseOptions(argv: readonly string[]): Options {
 	const { values } = parseArgs({
 		args: argv.filter((word) => word !== "--"),
@@ -36,16 +37,21 @@ export function parseOptions(argv: readonly string[]): Options {
 	if (agent === undefined || !(AGENTS as readonly string[]).includes(agent)) {
 		throw new Error(`--agent must be one of ${AGENTS.join(", ")}`)
 	}
+	const minutes = Number(values["timeout-minutes"] ?? DEFAULT_TIMEOUT_MINUTES)
+	if (!Number.isFinite(minutes) || minutes <= 0) {
+		throw new Error("--timeout-minutes must be a positive number of minutes")
+	}
 	return {
 		agent: agent as AgentName,
 		personas: values.persona,
 		release: values.release,
 		trajCommand: values["traj-command"],
-		timeoutMs: Number(values["timeout-minutes"] ?? DEFAULT_TIMEOUT_MINUTES) * 60_000,
+		timeoutMs: minutes * 60_000,
 		dryRun: values["dry-run"],
 	}
 }
 
+/** The personas whose ids were asked for, or all of them when no id was given; throws when none match. */
 export function selectPersonas(
 	all: readonly Persona[],
 	ids: readonly string[] | undefined,
@@ -55,6 +61,7 @@ export function selectPersonas(
 	return chosen
 }
 
+/** Writes the dry run's plan: the release under test, then each persona's exact agent argv and workspace. */
 export function printPlan(
 	released: Released,
 	agent: AgentName,

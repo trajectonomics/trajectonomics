@@ -32,7 +32,7 @@ function flowOf(flow: PersonaFlow, monthlyBaht: number, asOf: string): Flow {
 		return flow.label === undefined ? base : { ...base, label: flow.label }
 	}
 	if (flow.kind === "expense") return { ...common, kind: "expense", amount, growth }
-	return { ...common, kind: "contribution", target: flow.target ?? "", amount, growth: { bps: 0 } }
+	return { ...common, kind: "contribution", target: flow.target ?? "", amount, growth }
 }
 
 /** Asset accounts a contribution Flow pays into; the engine needs them routed in `cashflow.contribute`. */

@@ -33,6 +33,7 @@ export interface Persona {
 	}
 }
 
+/** An account the persona holds at the As-of: an asset or a liability, with its rate and opening balance. */
 export interface PersonaAccount {
 	readonly id: string
 	readonly name: string
@@ -41,6 +42,7 @@ export interface PersonaAccount {
 	readonly openingBaht: number
 }
 
+/** A recurring monthly money flow the persona states: income, an expense, or a contribution to an account. */
 export interface PersonaFlow {
 	readonly id: string
 	readonly kind: "income" | "expense" | "contribution"
