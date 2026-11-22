@@ -44,3 +44,10 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - The planner pages (Income, Expenses, and Assets and debts) are the controls for `apply-plan`. Each opens a right-side drawer, saves one change as one Edit, and closes when the Edit ran. A refusal stays in the drawer at the field it names.
 - The Edit controls appear only when the server answers the token, and never in the Demo snapshot or under `vite preview`, as the plan actions do.
 - Deleting an item is an `apply-plan` of the document without it, after a confirmation. It is not a new Edit kind.
+
+## Amendment (2026-11-23): the household has controls
+
+- `set-household` is `traj scenario household <name> --file -` with the household document on stdin, and `remove-household` is `traj scenario household <name> --none`. Each is one write, run with `--dry-run` first like every Edit, and its argv is pinned in `edit.test.ts`. Neither changes the plans the Snapshot projects, so `followPlan` returns the list as it was.
+- The household card on the Overview (`/projection/`) is the control for both. Its person form saves the whole household with one person put in or taken out, and its anchor form saves one anchor, which replaces the one that pins the same path. Each refusal stays in its form at the field it names.
+- The page computes no age and no date. Ages come from the rows and the `fi` answer, and an anchor's label ("at me, age 60") is the stored anchor's text. An anchored start or end is disabled in the Flow form, with a link to the household card, because `traj` would refuse a different date there (cli ADR-0048).
+- The household controls appear only when the server answers the token, and never in the Demo snapshot or under `vite preview`, as the other Edit controls do.

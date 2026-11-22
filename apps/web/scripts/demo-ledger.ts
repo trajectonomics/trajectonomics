@@ -4,6 +4,7 @@ import { accountList } from "../src/lib/contract"
 import { DEMO_ACCOUNTS, DEMO_OPENING_DATE, DEMO_OPENINGS } from "./demo/accounts"
 import {
 	baseScenarioDocument,
+	DEMO_HOUSEHOLD,
 	DEMO_TAX,
 	type DemoAccountIds,
 	RETIRE_EARLY_SALARY_END,
@@ -78,6 +79,9 @@ async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Prom
 	const document = baseScenarioDocument(ids)
 	await writeFile(file, JSON.stringify(document, null, "\t"))
 	await traj(place, ["scenario", "apply", "base", "--file", file])
+	const household = join(place.scratch, "household.json")
+	await writeFile(household, JSON.stringify(DEMO_HOUSEHOLD, null, "\t"))
+	await traj(place, ["scenario", "household", "base", "--file", household])
 	await traj(place, ["scenario", "tax", "base", "--tax", DEMO_TAX.tax, "--label", DEMO_TAX.label])
 	await traj(place, [
 		"scenario",

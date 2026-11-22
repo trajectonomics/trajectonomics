@@ -1,5 +1,6 @@
 <script lang="ts">
 import { formatDate } from "../../lib/format"
+import { agesText } from "../../lib/view/household/model"
 import type { AnnualRow } from "../../lib/view/projection/annual"
 import Badge from "../ui/Badge.svelte"
 import DataTable from "../ui/DataTable.svelte"
@@ -24,6 +25,7 @@ const columns: Column<AnnualRow>[] = [
 	{ key: "unfunded", header: "Unfunded contributions", numeric: true, cell: unfunded },
 	{ key: "interest", header: "Interest", numeric: true, cell: interest },
 	{ key: "unmet", header: "Unmet", numeric: true, cell: unmet },
+	{ key: "ages", header: "Ages", cell: ages },
 	{ key: "real", header: "Real net worth, in As-of terms", numeric: true, cell: real },
 ]
 </script>
@@ -43,6 +45,7 @@ const columns: Column<AnnualRow>[] = [
 {#snippet unfunded(row: AnnualRow)}<Money amount={row.unfundedContributions} />{/snippet}
 {#snippet interest(row: AnnualRow)}<Money amount={row.interest} />{/snippet}
 {#snippet unmet(row: AnnualRow)}<Money amount={row.unmet} />{/snippet}
+{#snippet ages(row: AnnualRow)}{agesText(row.ages) || "—"}{/snippet}
 
 {#snippet real(row: AnnualRow)}
 	<Money amount={row.realNetWorth.amount} />

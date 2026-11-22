@@ -32,3 +32,30 @@ export const COMPOUNDING_CHOICES: readonly Choice[] = [
 	{ value: "semiannual", label: "Every six months" },
 	{ value: "annual", label: "Yearly" },
 ]
+
+/** The roles a person in a household may hold (cli ADR-0048). */
+export const ROLE_CHOICES: readonly Choice[] = [
+	{ value: "holder", label: "Account holder" },
+	{ value: "partner", label: "Partner" },
+	{ value: "dependent", label: "Dependent" },
+]
+
+/** How a dependent relates to the account holder. */
+export const RELATION_CHOICES: readonly Choice[] = [
+	{ value: "child", label: "Child" },
+	{ value: "parent", label: "Parent" },
+	{ value: "other", label: "Other" },
+]
+
+/** The date of a Flow an anchor pins: its start or its end. */
+export const EDGE_CHOICES: readonly Choice[] = [
+	{ value: "start", label: "Starts" },
+	{ value: "end", label: "Ends" },
+]
+
+/** What an anchor pins the date to: a person's age, their life end, or a partner's joining. */
+export const WHEN_CHOICES: readonly Choice[] = [
+	{ value: "age", label: "At an age" },
+	{ value: "lifeEnd", label: "At life end" },
+	{ value: "joins", label: "At joining" },
+]

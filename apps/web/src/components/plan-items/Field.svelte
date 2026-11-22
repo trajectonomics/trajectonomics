@@ -15,6 +15,8 @@ interface Props {
 	problem?: string | undefined
 	/** A short hint under the label, such as the form a date takes. */
 	hint?: string
+	/** Whether the field is read-only here, such as a date a household pins. */
+	disabled?: boolean
 }
 
 let {
@@ -25,6 +27,7 @@ let {
 	inputmode = "text",
 	problem,
 	hint,
+	disabled = false,
 }: Props = $props()
 </script>
 
@@ -34,6 +37,7 @@ let {
 	{#if options}
 		<select
 			{id}
+			{disabled}
 			bind:value
 			aria-describedby={problem ? `${id}-problem` : undefined}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
@@ -45,6 +49,7 @@ let {
 	{:else}
 		<input
 			{id}
+			{disabled}
 			bind:value
 			{inputmode}
 			autocomplete="off"
