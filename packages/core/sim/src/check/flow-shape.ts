@@ -1,5 +1,5 @@
 import { FLOW_KINDS, FREQUENCIES } from "../vocab"
-import type { AccountIndex } from "./codes"
+import type { AccountIndex, Check } from "./codes"
 import { derive } from "./derive"
 import { cappedPrepayment, label, NOT_ALLOWED } from "./flow-fields"
 import { prepayments } from "./prepayments"
@@ -7,11 +7,20 @@ import { accountRef } from "./refs"
 import { amount, bool, date, growth, oneOf, str } from "./scalars"
 import { opt, req, type Shape } from "./shape"
 
-/** What a Flow's fields may reference: the Accounts, and the Levies a label or share needs. */
+/** What a Flow's fields may reference: the Accounts, the Levies a label or share needs, and Milestones. */
 export interface FlowContext {
 	readonly accounts: AccountIndex | undefined
 	readonly hasLevy: boolean
 	readonly levyIds: ReadonlySet<string>
+	readonly milestoneIds: ReadonlySet<string>
+}
+
+/** A Milestone id a Flow gates on: a string that names a declared Milestone. */
+function milestoneRef(ids: ReadonlySet<string>): Check {
+	return (value, path, emit) => {
+		if (typeof value !== "string") emit("WRONG_TYPE", path)
+		else if (!ids.has(value)) emit("UNKNOWN_MILESTONE", path)
+	}
 }
 
 const base: Shape = {
@@ -25,21 +34,28 @@ const base: Shape = {
 	derive: opt(derive),
 }
 
+function gates(context: FlowContext): Shape {
+	const ref = milestoneRef(context.milestoneIds)
+	return { startAt: opt(ref), endAt: opt(ref) }
+}
+
 /**
  * Keys allowed per flow kind; an invalid kind accepts every optional kind-specific key.
  * `label`, `prepayments` and `cappedPrepayment` need a Levy in the Scenario (`hasLevy`).
  */
 export function flowShape(kind: unknown, context: FlowContext): Shape {
 	const target = accountRef(context.accounts)
+	const shared = { ...base, ...gates(context) }
 	const levied = {
 		label: label(context.hasLevy),
 		prepayments: prepayments(context.hasLevy, context.levyIds),
 	}
 	const capped = cappedPrepayment(context.hasLevy)
-	if (kind === "income") return { ...base, earned: req(bool), ...levied, cappedPrepayment: capped }
+	if (kind === "income")
+		return { ...shared, earned: req(bool), ...levied, cappedPrepayment: capped }
 	if (kind === "contribution") {
 		return {
-			...base,
+			...shared,
 			target: req(target),
 			label: label(context.hasLevy),
 			prepayments: NOT_ALLOWED,
@@ -48,11 +64,11 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	}
 	if (kind === "expense") {
 		return {
-			...base,
+			...shared,
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
 		}
 	}
-	return { ...base, earned: opt(bool), target: opt(target), ...levied, cappedPrepayment: capped }
+	return { ...shared, earned: opt(bool), target: opt(target), ...levied, cappedPrepayment: capped }
 }

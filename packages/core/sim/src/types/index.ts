@@ -68,6 +68,7 @@ export type {
 	TallyBasis,
 	TallyMeasure,
 } from "./measure"
+export type * from "./milestone"
 export type {
 	AccountAmount,
 	AnnualRollup,
