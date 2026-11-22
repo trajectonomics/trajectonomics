@@ -1,4 +1,5 @@
 import { type ClampedAmount, clampCap } from "../../core/caps"
+import { floorByRate } from "../../core/money"
 import type { ThExpenseElectableIncome } from "../types"
 
 /**
@@ -28,6 +29,6 @@ export function calculateElectableItemExpense(
 		const req = item.actualExpense ?? 0
 		return clampCap(req, amount, field)
 	}
-	const req = Math.floor(amount * standardRate)
+	const req = floorByRate(amount, standardRate)
 	return { requested: req, allowed: req, cap: amount, wasClamped: false }
 }

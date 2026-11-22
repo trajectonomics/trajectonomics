@@ -1,4 +1,5 @@
 import { type ClampedAmount, clampCap } from "../../core/caps"
+import { floorByRate } from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { ThExpenseField } from "../types"
 
@@ -12,7 +13,7 @@ import { ThExpenseField } from "../types"
  */
 export function calculateExpenses40_1_2(s1: number, s2: number): ClampedAmount {
 	const combined = s1 + s2
-	const requested = Math.floor(combined * TH_2026_PARAMETERS.expenses.section40_1_2.rate)
+	const requested = floorByRate(combined, TH_2026_PARAMETERS.expenses.section40_1_2.rate)
 	return clampCap(
 		requested,
 		TH_2026_PARAMETERS.expenses.section40_1_2.ceiling,

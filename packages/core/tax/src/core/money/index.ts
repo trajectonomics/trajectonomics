@@ -1,5 +1,6 @@
 import type { TaxSupportedCurrency } from "./currency"
 import { TaxValidationError } from "./errors"
+import { floorByRate } from "./floor-rate"
 import { fromMinorUnits, toMinorUnits } from "./minor-units"
 import { applyGrossUp, applyPercentage, type RoundingMode, roundHalfUp } from "./rounding"
 import { type Money, money, thb, usd } from "./types"
@@ -15,6 +16,7 @@ import {
 export {
 	applyGrossUp,
 	applyPercentage,
+	floorByRate,
 	fromMinorUnits,
 	type Money,
 	money,
