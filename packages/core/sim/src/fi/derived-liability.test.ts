@@ -28,7 +28,7 @@ const survival: SurvivalOptions = { method: "survival" }
 const spending = { amount: 5_000_000, growth: { bps: 0 } }
 
 /** The refusal of the debt payment, which every case here writes as the third Flow. */
-const refused = {
+const refused: ReturnType<typeof financialIndependence> = {
 	ok: false,
 	problems: [
 		{ code: "DERIVED_DEBT_PAYMENT_READS_EARNED", path: ["scenario", "flows", 2, "derive"] },
