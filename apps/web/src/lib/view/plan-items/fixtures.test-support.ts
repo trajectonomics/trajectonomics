@@ -78,6 +78,7 @@ export function documentRead(document: ScenarioDocument = planDocument()): Read<
 				createdAt: "2026-11-22T17:25:38.908Z",
 				updatedAt: "2026-11-22T17:25:39.095Z",
 				document,
+				household: null,
 			},
 		},
 	}

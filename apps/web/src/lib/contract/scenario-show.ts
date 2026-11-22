@@ -50,6 +50,8 @@ export const scenarioShow = z.strictObject({
 		createdAt: z.string(),
 		updatedAt: z.string(),
 		document: scenarioDocument,
+		/** The household's document, or null when no household is set (cli ADR-0048). Not read here yet. */
+		household: z.record(z.string(), z.unknown()).nullable(),
 	}),
 })
 export type ScenarioShow = z.infer<typeof scenarioShow>
