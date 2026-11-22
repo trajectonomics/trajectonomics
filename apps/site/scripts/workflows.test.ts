@@ -3,7 +3,12 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 type Step = { run?: string; with?: Record<string, unknown>; env?: Record<string, unknown> }
-type Job = { uses?: string; steps?: Step[]; "timeout-minutes"?: number }
+type Job = {
+	uses?: string
+	permissions?: Record<string, string>
+	steps?: Step[]
+	"timeout-minutes"?: number
+}
 type Workflow = {
 	on?: Record<string, unknown>
 	permissions?: Record<string, string>
@@ -112,8 +117,9 @@ describe("release-drift.yml, the weekly release report", () => {
 		expect(workflow.on).toHaveProperty("workflow_dispatch")
 	})
 
-	it("grants contents to read the snapshot and issues to report drift", () => {
-		expect(workflow.permissions).toEqual({ contents: "read", issues: "write" })
+	it("reads contents for the whole workflow, and grants issues to the drift job alone", () => {
+		expect(workflow.permissions).toEqual({ contents: "read" })
+		expect(soleJob(workflow).permissions).toEqual({ contents: "read", issues: "write" })
 	})
 
 	it("is one job that runs the check in apps/site, and opens no branch, pull request or deploy", () => {

@@ -19,7 +19,6 @@ on:
 
 permissions:
   contents: read # read the committed snapshot and the script that judges it
-  issues: write # open, update and close the release-drift issue
 
 concurrency:
   group: release-drift-${{ github.repository }}
@@ -30,13 +29,17 @@ jobs:
     name: Release drift
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Job-level permissions replace the workflow's, so contents is restated here.
+    permissions:
+      contents: read # read the committed snapshot and the script that judges it
+      issues: write # open, update and close the release-drift issue
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # No `bun install`: the check reads two feeds and the committed snapshot, so it needs no package.
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.4.4
 
