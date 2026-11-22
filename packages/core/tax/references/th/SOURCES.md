@@ -64,6 +64,7 @@ then the row's result is `reported`.
 | `rd.go.th/english/6045.html` | 200, labelled 2013-2014 | 40(5), 40(6) rates only |
 | `rd.go.th/english/37771.html` | 500 | the income tax schedule page |
 | `rd.go.th/1603.html` (Royal Decree index) | 200, Thai, lists decrees to No. 812 (B.E. 2569) | finding the decree PDFs |
+| `fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf` (PND 90 instructions, tax year 2567) | 200, text (18 pages) | the GPF ceiling (2026-11-22) |
 | `fileadmin/.../p44.pdf`, `p46.pdf` | 200, text | Acts No. 44 and 46 |
 | `fileadmin/.../dc470.pdf`, `dc480.pdf`, `dc629.pdf`, `dc634.pdf` | 200, text | Royal Decrees 470, 480, 629, 634 |
 | `fileadmin/.../126.pdf` (M.R. No. 126) | 200, **image scan** | named, not read |
@@ -76,10 +77,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 
 ## Findings
 
-- **Recorded, not changed (OD5).** `allowances.retirementCluster.gpf.maxRate` applies 30 per cent
-  of wages; the only 2026 figure read (Raidaai) prints 15 per cent for the provident-fund,
-  government-pension-fund and teacher-fund group. The row records the disagreement. No corpus case
-  asserts the rate.
+- **GPF rate: ruled on 2026-11-22 (OD5); the rate stays open.** The owner ruled that the correct GPF rate is used. The Revenue Department's PND 90 instructions for tax year 2567 (https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf) confirm the 500,000 baht ceiling for GPF contributions (item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท") but print no percentage for GPF. The 15 per cent is the provident fund's rate (item 8: "ไม่เกินร้อยละ 15 ของค่าจ้าง"), and the 30 per cent in those instructions (item 10.4) is the RMF's, of assessable income. The instructions therefore do not confirm the engine's 30 per cent of wages for GPF, and the base stays wages. The rate needs the statute itself (M.R. No. 126 (B.E. 2509) clause 2(61), an image scan that this host cannot read). No corpus case asserts the GPF rate.
 - **`digitalAssetRate` is unsourced** (OD6). No 2026 rate was read; the code keeps 15 per cent with
   its assumption comment, and no corpus case asserts it.
 - **Two citations in the code were wrong; every comment that carried them is corrected.** The header of
@@ -104,6 +102,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | --- | --- | --- |
 | 2026-11-17 | none (first sweep) | 71 rows written; 32 `match`, 6 `derived`, 28 `reported`, 5 `unsourced` |
 | 2026-11-22 | none | Comments only: the `src/th/parameters.ts` header and the `src/th/stages/separate-sheet.ts` `@statute` line, and every other comment with the same two citations, now cite the sources in the findings above |
+| 2026-11-22 | none (GPF rate and base unchanged; ceiling row now `match`) | Owner ruling on #52: percentage expense deductions and donation caps floor to the satang (`floorByRateToSatang`; levy graph mirrors it). GPF: PND 90 instructions read; ceiling confirmed, rate not printed for GPF, so the rate and base stay as they were |
 
 <!-- factory:th-source-rows v1 -->
 
@@ -124,8 +123,8 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | `allowances.parentHealthInsuranceCeiling` | not exceeding 15,000 baht in total | M.R. No. 126 (B.E. 2509) clause 2(61); the clause text is a scan | https://www.rd.go.th/fileadmin/user_upload/kormor/newlaw/126.pdf | 2026-11-17 | reported (2026 cap from Raidaai; clause unreadable) |
 | `allowances.personal` | 60,000 baht | Section 47(1)(a), as amended by Act No. 44 (B.E. 2560) s.5 | https://www.rd.go.th/fileadmin/user_upload/kormor/newlaw/p44.pdf | 2026-11-17 | match |
 | `allowances.retirementCluster.combinedCeiling` | not exceeding 500,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61) retirement clause; text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
-| `allowances.retirementCluster.gpf.ceiling` | not exceeding 500,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
-| `allowances.retirementCluster.gpf.maxRate` | 15 per cent of wages | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai prints 15 per cent for the pension fund group; engine applies 30 — recorded, not changed) |
+| `allowances.retirementCluster.gpf.ceiling` | not exceeding 500,000 baht | PND 90 instructions, tax year 2567, item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท" (only the part not exceeding 500,000 baht); the same cap applies to the combined provident-fund, GPF and teacher-fund contributions (item 10.4). The instructions are for tax year 2567; the 2026 figure is assumed unchanged | https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf | 2026-11-22 | match |
+| `allowances.retirementCluster.gpf.maxRate` | 30 per cent of wages | Not printed for GPF in PND 90 instructions, tax year 2567: item 8 "ไม่เกินร้อยละ 15 ของค่าจ้าง" is the provident fund's rate, and item 10.4 "ไม่เกินร้อยละ 30 ของเงินได้พึงประเมิน" is the RMF's. M.R. No. 126 (B.E. 2509) clause 2(61) is a scan | https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf | 2026-11-22 | reported (owner ruled 2026-11-22; PND 90 gives no GPF percentage, so 30 is unconfirmed and the wages base is unchanged; Raidaai's 15 per cent is the provident fund's rate) |
 | `allowances.retirementCluster.nsf.ceiling` | not exceeding 30,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.ceiling` | not exceeding 200,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.maxRate` | 15 per cent of assessable income | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
