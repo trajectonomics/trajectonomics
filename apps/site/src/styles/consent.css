@@ -1,6 +1,6 @@
 /*
  * The cookie banner (ADR 0024, placed by ADR 0028): a small card fixed to the bottom-left corner of the screen, so it
- * never pushes the hero down and stays clear of the copy toast at the bottom right. Its background is opaque, so the
+ * never pushes the hero down; from 40 rem up it stays clear of the copy toast at the bottom right. Its background is opaque, so the
  * question is judged against the card alone and never against what scrolls under it. On a phone it spans the width
  * inside the 16 px gutter and never scrolls sideways. The Worker writes `data-consent` once the visitor has answered,
  * so the card is never painted. Colours are Theme roles, so both themes keep their contrast.
@@ -71,15 +71,16 @@
 	outline-offset: 2px;
 }
 
-/* While the card is up, the footer ends with room for it, so it never hides the footer's last line. */
-html:not([data-consent]):has(.consent) .site-footer {
-	padding-bottom: 11rem;
+/*
+ * While the card is up, the footer's words end with room for it, so the card covers only the cropped wordmark below
+ * them, and a focused link is scrolled clear of the card rather than under it (WCAG 2.4.11).
+ */
+html:not([data-consent]):has(.consent) {
+	scroll-padding-bottom: 11rem;
 }
 
-@media (min-width: 40rem) {
-	html:not([data-consent]):has(.consent) .site-footer {
-		padding-bottom: 6rem;
-	}
+html:not([data-consent]):has(.consent) .footer-inner {
+	padding-bottom: 10rem;
 }
 
 /* The Worker writes `data-consent` for a visitor who has answered, so the banner is never painted. */

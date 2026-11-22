@@ -15,9 +15,9 @@ This record amends [ADR 0024](./0024-the-site-asks-before-it-sets-an-analytics-c
 
 ## Decision
 
-1. **The cookie banner is a small card fixed to the bottom-left corner.** It is 22 rem wide from 40 rem up. On a phone it spans the width inside the 16 px gutter. It stays clear of the copy toast at the bottom right. It renders last in `main`, so its place in the reading order matches its place on screen. It no longer pushes the hero down, so the hero's copy keeps its own top padding with or without it.
+1. **The cookie banner is a small card fixed to the bottom-left corner.** It is 22 rem wide from 40 rem up. On a phone it spans the width inside the 16 px gutter. From 40 rem up it stays clear of the copy toast at the bottom right; on a phone the short-lived toast passes over it. It renders last in `main`, so its place in the reading order matches its place on screen. It no longer pushes the hero down, so the hero's copy keeps its own top padding with or without it.
    - The card's background is opaque, so what scrolls under it never changes its contrast. Axe still cannot judge fixed text whose lines sit over different page content: it reports `elmPartiallyObscuring`, the concern behind ADR 0024's in-flow bar. So the axe checks lay the card into the page's flow (`position: static`) before they judge it. Its pixels and colours are the same there, and nothing is excluded from the scan.
-   - While the card is up, the footer gains bottom padding, so the card never hides the footer's last line.
+   - While the card is up, the footer's words gain bottom padding, so the card covers only the cropped wordmark under them. The page also gains `scroll-padding-bottom`, so a link reached by Tab scrolls clear of the card instead of under it.
    - The question is shorter. It names the cookie, what it holds and how long it lasts. It drops the sentence about cookieless counting and the one about the answer cookie. The footer's "Cookie choice" link and ADR 0024's mechanics are unchanged.
 2. **The `hello` robot waves over the traj chat's verdict.** Its hand rests on the verdict's top hairline at the right, and it lands with the verdict. The transcript ends 40 px lower to leave it room, so it never covers a word of the answer.
 3. **The Agent-operated card loses `twins`.** The file is deleted.
@@ -27,7 +27,8 @@ This record amends [ADR 0024](./0024-the-site-asks-before-it-sets-an-analytics-c
    - `open` (05, Open source): peers through a magnifying glass. Read the code.
    - `tax` (06, Tax on request): raises a hand and holds out a percent sign. Tax when you ask for it.
 
-   They hold still, and they load lazily.
+   They hold still, and they load lazily. `same` shipped first. The image quota ran out after it, so `local`, `open` and `tax` follow in a second change.
+5. **ADR 0027's rule is relaxed between the Features heading and card 03.** Taking `twins` out leaves the two wide cards with no robot of their own. On a phone, that is roughly a screen of scroll between the heading's `chart` and card 03's `same`. The owner asked for the change, so this record accepts that stretch.
 
 ## Considered Options
 
