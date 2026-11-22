@@ -122,7 +122,8 @@ describe("the Thai tax recipe in the traj-plan Skill", () => {
 
 	it("writes the Levy to a Scenario of its own, and reports what the flags left out", () => {
 		expect(codeSpans(tax)).toContain("traj scenario tax <name> --tax th-2026")
-		expect(tax).toContain("a fork of the baseline, so the baseline stays untouched")
+		expect(codeSpans(tax)).toContain("traj scenario fork <baseline> <name>")
+		expect(tax).toContain("so the baseline stays untouched")
 		expect(tax).toContain("The result's `allowances` lists what the flags stated")
 	})
 

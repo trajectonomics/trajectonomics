@@ -122,7 +122,7 @@ describe("the feedback question at the end of a check-in", () => {
 
 	it("removes every ledger figure, balance and account name before the draft is shown", () => {
 		expect(step).toContain(
-			"remove every ledger figure, balance, account name, merchant name and other personal detail",
+			"remove every ledger figure, balance, account name, merchant name, other personal detail and path under the person's home directory",
 		)
 		expect(step).toContain("describe it in general words")
 	})

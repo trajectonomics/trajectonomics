@@ -194,8 +194,8 @@ sent unless you send it." Setup does not wait for the answer.
 When they accept, draft the issue on the project's "I tried traj and stopped" form, the issue template
 `tried-and-stopped.yml` at `https://github.com/trajectonomics/trajectonomics/issues/new?template=tried-and-stopped.yml`:
 a title beginning `Stopped: `, the "Where did you stop?" boxes their words match, and their own words
-for "What happened?". Leave out every figure, balance, account name and path under their home
-directory. Show the complete draft, and never submit it: the person sends it or not. Do not offer again
+for "What happened?". Leave out every figure, balance, account name, merchant name and path under
+their home directory. Show the complete draft, and never submit it: the person sends it or not. Do not offer again
 in this conversation.
 
 ## What setup leaves behind

@@ -111,8 +111,8 @@ text. The draft uses the project's "I tried traj and stopped" form, the issue te
   Terminal, Agent setup, The skill, Tax coverage, Currency (THB only), Trust, Time and Other;
 - the "What happened?" text, in the person's own words, a sentence or two long.
 
-Before you show the draft, remove every ledger figure, balance, account name, merchant name and other
-personal detail the person mentioned. When the feedback needs one of them, describe it in general
+Before you show the draft, remove every ledger figure, balance, account name, merchant name, other
+personal detail and path under the person's home directory that the person mentioned. When the feedback needs one of them, describe it in general
 words, such as "the balance looked wrong", and leave the number out.
 
 Show the complete draft in your reply. Then say the person may open the form, paste the title and the

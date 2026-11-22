@@ -111,8 +111,9 @@ Done when every fact is answered, or its default is stated.
 
 ### Step T2: write the tax Levy, and say what it leaves out
 
-Write the Levy to a Scenario of its own name, a fork of the baseline, so the baseline stays untouched.
-Run `traj scenario tax <name> --tax th-2026` with the flags for the facts the person gave, and one
+Make the Scenario first, as a fork of the baseline with `traj scenario fork <baseline> <name>`, so the
+baseline stays untouched. Then write the Levy to that fork: run `traj scenario tax <name> --tax th-2026`
+with the flags for the facts the person gave, and one
 `--label <flow>=<label>` for each classified Flow. Dry-run it with `--dry-run` first, then write it.
 
 The result's `allowances` lists what the flags stated, and what the figure leaves out. Report the
