@@ -1,3 +1,5 @@
+import { allowedValues, type ErrorCode, type MetricName } from "@trajectonomics/core/sim"
+
 /*
  * The units and the closed value sets the published Scenario document states. They are the words a
  * person needs to write a document by hand, kept apart from the shapes that use them so a unit is
@@ -30,24 +32,41 @@ export const BASIS_POINTS =
 
 export const DATE = "YYYY-MM-DD, Gregorian, never the Buddhist calendar."
 
-export const COMPOUNDING = ["monthly", "quarterly", "semiannual", "annual"] as const
-export const FREQUENCIES = [
-	"once",
-	"daily",
-	"weekly",
-	"biweekly",
-	"monthly",
-	"quarterly",
-	"annual",
-] as const
-export const DAY_RULES = ["exact", "next"] as const
+/**
+ * A closed list the Scenario document states, read from the vocabulary `check()` tests against
+ * through `allowedValues`, so the schema and the refusals name the same values and the CLI copies
+ * none of them (AGENTS rule 3, ADR-0052). `path` says which list a code shared by several is.
+ */
+function closed(code: ErrorCode, path: readonly string[] = []): readonly string[] {
+	const values = allowedValues(code, path)
+	if (values === undefined) throw new Error(`The engine lists no values for ${code}.`)
+	return values
+}
+
+export const ACCOUNT_KINDS: readonly string[] = closed("INVALID_KIND", ["accounts"])
+export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"])
+export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")
+export const FREQUENCIES: readonly string[] = closed("INVALID_FREQUENCY")
+export const DAY_RULES: readonly string[] = closed("INVALID_DAY_RULE")
+/** How a `scale` or `mul` Measure rounds its quotient: down, to nearest with halves up, or up. */
+export const ROUNDINGS: readonly string[] = closed("INVALID_ROUNDING")
 /** The kinds of criterion a Milestone may hold; each kind takes its own keys (sim's ADR 0012). */
-export const CRITERION_KINDS = ["date", "milestone", "metric", "multiple"] as const
+export const CRITERION_KINDS: readonly string[] = closed("INVALID_KIND", ["criteria"])
 /** How a Milestone's criteria combine: every one must hold, or any one of them. */
-export const MILESTONE_COMBINES = ["all", "any"] as const
+export const MILESTONE_COMBINES: readonly string[] = closed("INVALID_COMBINE")
 /** A metric or multiple criterion's comparison: at least the figure, or at most it. */
-export const COMPARISONS = ["atLeast", "atMost"] as const
-/** The named balances a Metric may read; `{ accounts }` and `{ expenses }` are the other forms. */
+export const COMPARISONS: readonly string[] = closed("INVALID_COMPARISON")
+/** The twelve-month window an expense Metric reads: the twelve months after, or before, the date. */
+export const REFERENCE_WINDOWS: readonly string[] = closed("INVALID_REFERENCE_WINDOW")
+/** Nominal money, or real money deflated to the Timeline's start, for a metric criterion. */
+export const MILESTONE_TERMS: readonly string[] = closed("INVALID_TERMS")
+/** The operations a Flow's own Measure graph may hold; `tally` belongs to a Levy (ADR-0032). */
+export const DERIVE_MEASURE_OPS: readonly string[] = closed("INVALID_OP", ["derive"])
+/**
+ * The named balances a Metric may read; `{ accounts }` and `{ expenses }` are the other forms. The
+ * engine lists no values for `INVALID_METRIC` (its other form is an object), so this one stays
+ * written here and `milestone-enums.test.ts` probes it against the pinned core.
+ */
 export const METRIC_NAMES = [
 	"netWorth",
 	"accessibleNetWorth",
@@ -55,19 +74,10 @@ export const METRIC_NAMES = [
 	"unlockedAssets",
 	"liabilities",
 ] as const
-/** The twelve-month window an expense Metric reads: the twelve months after, or before, the date. */
-export const REFERENCE_WINDOWS = ["next12Months", "trailing12Months"] as const
-/** Nominal money, or real money deflated to the Timeline's start, for a metric criterion. */
-export const MILESTONE_TERMS = ["nominal", "real"] as const
-/** The operations a Flow's own Measure graph may hold; `tally` belongs to a Levy (ADR-0032). */
-export const DERIVE_MEASURE_OPS = [
-	"const",
-	"add",
-	"sub",
-	"min",
-	"max",
-	"scale",
-	"mul",
-	"pick",
-	"flow",
-] as const
+
+/** Fails typecheck when the engine adds a Metric name `METRIC_NAMES` lacks. */
+export const METRIC_NAMES_COMPLETE: [Exclude<MetricName, (typeof METRIC_NAMES)[number]>] extends [
+	never,
+]
+	? true
+	: false = true

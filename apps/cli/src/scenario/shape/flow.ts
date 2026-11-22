@@ -1,6 +1,6 @@
 import { labelSetsSentence } from "../tax/labels"
 import { cappedPrepaymentShape, deriveShape, prepaymentsShape } from "./flow-parts"
-import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FREQUENCIES, MINOR_UNITS } from "./terms"
+import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UNITS } from "./terms"
 
 /** One Stream, Event or Contribution, with the unit of every number it states. */
 export const flowShape: Record<string, unknown> = {
@@ -13,7 +13,7 @@ export const flowShape: Record<string, unknown> = {
 			description: "The name this document gives the Flow, unique within it and never changed.",
 		},
 		kind: {
-			enum: ["income", "expense", "contribution"],
+			enum: [...FLOW_KINDS],
 			description:
 				"`income` earns, `expense` spends, and `contribution` moves money into the Account its `target` names.",
 		},

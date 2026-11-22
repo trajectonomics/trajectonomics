@@ -2,7 +2,8 @@ import type { ProjectionProblem } from "@trajectonomics/core/sim"
 import { version as cliVersion } from "../../package.json"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
-import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { refusalOf } from "../scenario/document"
+import { REFUSALS, sentenceFor } from "./refusal-table"
 
 /**
  * The engine's package and the exact version this build runs on (ADR-0030). The engine
@@ -60,11 +61,23 @@ const AGREE_HINT =
 	"The Baseline, the Scenario and the Timeline must agree; details lists every problem."
 
 /**
- * A Baseline Account the Scenario does not declare is the one refusal a template repairs: the
- * template declares every asset and liability Account (ADR-0044), so it names that command instead.
+ * The words for one problem: the table's sentence, or for a code the document check answers (a
+ * Scenario stored before a newer rule and run without `--set` is not re-checked) the document's own
+ * sentence with the allowed values (ADR-0052).
  */
-const DECLARE_HINT =
-	'Run "traj scenario apply --template --as-of <date>" to print a Scenario that declares every asset and liability Account.'
+function wordsFor(problem: ProjectionProblem): { message: string; hint?: string } | undefined {
+	const table = sentenceFor(problem)
+	if (table !== undefined) return table
+	const entry = REFUSALS[problem.code]
+	if (entry === undefined || !("elsewhere" in entry) || entry.elsewhere !== "document")
+		return undefined
+	if (!("path" in problem) || problem.path[0] !== "scenario") return undefined
+	const { message, hint } = refusalOf(
+		{ code: problem.code, segments: problem.path.slice(1) },
+		"document",
+	)
+	return { message, hint }
+}
 
 /**
  * What the engine refuses becomes `projection_refused` at exit 3, with the engine's codes and
@@ -73,20 +86,15 @@ const DECLARE_HINT =
 export function refusal(problems: readonly ProjectionProblem[]): AppError {
 	const timeline = timelineFailure(problems)
 	if (timeline !== null) return timeline
-	const overflow = overflowOf(problems)
-	if (overflow !== undefined) {
-		return fail("projection_refused", {
-			message: overflowSentence(overflow),
-			hint: OVERFLOW_HINT,
-			details: problems.map(detailOf),
-		})
-	}
-	const first = problems[0]
-	const path = first === undefined ? undefined : problemPath(first)
-	const undeclared = problems.some((problem) => problem.code === "UNDECLARED_BALANCE_ACCOUNT")
+	// The first problem with words says what went wrong, and `path` is where that one is.
+	const found = problems.map((problem) => ({ problem, said: wordsFor(problem) }))
+	const chosen = found.find((entry) => entry.said !== undefined) ?? found[0]
+	const path = chosen === undefined ? undefined : problemPath(chosen.problem)
+	const said = chosen?.said
 	return fail("projection_refused", {
 		...(path === undefined ? {} : { path }),
+		...(said === undefined ? {} : { message: said.message }),
 		details: problems.map(detailOf),
-		hint: undeclared ? DECLARE_HINT : AGREE_HINT,
+		hint: said?.hint ?? AGREE_HINT,
 	})
 }

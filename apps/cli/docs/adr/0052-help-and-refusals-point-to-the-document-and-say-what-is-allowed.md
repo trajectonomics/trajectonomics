@@ -15,6 +15,19 @@ Every change is additive to the `--json` envelopes.
   The lists are `sim-core`'s own, read through `allowedValues(code, path)`, which `sim` exports from the
   vocabulary `check()` tests against, so the CLI restates none of them (AGENTS rule 3). `INVALID_GROWTH` names
   its two forms, and `NOT_SAFE_INTEGER` on a rate adds `basis points, a whole number: 2% is 200`.
+- **The schema lists the same values.** Every closed list the Scenario document states, a Measure's `rounding`
+  included, is read through `allowedValues` too (`scenario/shape/terms.ts`), so an agent's first try names a value
+  the engine accepts. The one exception is the Metric names, which `allowedValues` does not list.
+- **An engine refusal says what went wrong.** `projection_refused` takes its message and hint from one table
+  keyed by the engine's code (`projection/refusal-said.ts`), `VALUE_OVERFLOW` and
+  `DERIVED_EXPENSE_READS_EARNED` among them, and `path` is where that problem sits. A code without a sentence is
+  listed in `refusal-elsewhere.ts` with who answers it instead: `document` (`scenario apply`, the Store and
+  `--set` refuse it as `invalid_input` before an engine runs), `input` (a flag, the path count, the seed or the
+  Return model) or `never` (an option the CLI does not pass). A test fails when the engine gains a code in
+  neither list, or one is in both. A Scenario stored before a newer engine rule and run without `--set` is not
+  re-checked, so it can still reach `refusal()` with a `document` code: `refusal()` then words it with the
+  document's own sentence and its allowed values. Only `fi` and `projection compare`, which ask for the FI
+  answer, raise the two `DERIVED_*_READS_EARNED` codes, and the document's `derive` description says so (#298).
 - **The horizon is a choice, and says so.** `fi` describes `--horizon` as the last date the plan has to fund
   (the age-95 date), and its result carries a note naming the horizon the answer is for.
 - **A result says what a write dropped or a figure used.** `scenario apply` carries `notes`, which names a Levy
