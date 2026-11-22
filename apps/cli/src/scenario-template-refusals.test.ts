@@ -5,6 +5,7 @@ import { AS_OF, HORIZON, PROJECTION_SCENARIO, projection } from "./projection/te
 import { applyScenario, documentFile, errorOf, scenarioHome } from "./scenario-test-support"
 import { ledgerHome } from "./store/testing"
 import { capture } from "./test-support"
+import { accounts, cli } from "./tx-test-support"
 
 const TEMPLATE_ARGS = ["scenario", "apply", "--template", "--as-of", AS_OF] as const
 
@@ -15,7 +16,7 @@ describe("scenario apply --template --as-of refusals", () => {
 		expect(errorOf(res)).toMatchObject({
 			code: "invalid_input",
 			path: "--as-of",
-			message: "--as-of: the Ledger records no Transaction yet",
+			message: "The Ledger records no Transaction yet",
 			hint: 'Run "traj tx add" to record a Transaction, then print the template again.',
 		})
 	})
@@ -31,7 +32,39 @@ describe("scenario apply --template --as-of refusals", () => {
 		expect(errorOf(res)).toMatchObject({
 			code: "invalid_input",
 			path: "--as-of",
+			message: "The Ledger's first Transaction is on 2026-01-01, after 2020-01-01",
 			hint: 'Run "traj scenario apply --template --as-of 2026-01-01" to start from that date.',
+		})
+	})
+
+	it("refuses a Ledger with a Transaction but no asset Account, with a hint to open one", async () => {
+		const home = ledgerHome()
+		const traj = cli(home)
+		await accounts(traj, [
+			["Opening", "equity"],
+			["Food", "expense"],
+		])
+		const written = await traj([
+			"tx",
+			"add",
+			"--from",
+			"Opening",
+			"--to",
+			"Food",
+			"--amount",
+			"10.00",
+			"--date",
+			"2026-01-01",
+			"--json",
+		])
+		expect(written.code).toBe(0)
+		const res = await capture([...TEMPLATE_ARGS, "--json"], { TRAJ_HOME: home })
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "--as-of",
+			message: "The Ledger holds no asset Account to route surplus into",
+			hint: 'Run "traj account add <name> --type asset --currency THB" to open one.',
 		})
 	})
 
@@ -53,7 +86,7 @@ describe("scenario apply --template --as-of refusals", () => {
 		expect(errorOf(res)).toMatchObject({
 			code: "invalid_input",
 			path: "--as-of",
-			message: "--as-of: pre-fills a template, so it needs --template",
+			message: "Pre-fills a template, so it needs --template",
 			hint: 'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline at that date.',
 		})
 	})

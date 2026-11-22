@@ -46,8 +46,8 @@ export function exclusive(input: ApplyFlags): AppError | undefined {
 	}
 	if (input.asOf !== undefined && input.template !== true) {
 		return fail("invalid_input", {
-			path: "--as-of",
-			message: "--as-of: pre-fills a template, so it needs --template",
+			path: "asOf",
+			message: "asOf: pre-fills a template, so it needs --template",
 			hint: 'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline at that date.',
 		})
 	}

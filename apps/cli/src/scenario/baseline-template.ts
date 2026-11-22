@@ -6,8 +6,11 @@ import { type AppError, fail, isAppError } from "../errors"
 import type { AccountRow, Ledger } from "../store"
 import { acceptedScenarioSchemaVersion } from "./document"
 
-/** The flag a refusal names: `--as-of` is what the caller typed, so it is the input path (ADR-0013). */
-const AS_OF_PATH = "--as-of"
+/**
+ * The schema field a refusal names. The dispatch step rewrites it to `--as-of`, the flag the caller
+ * typed, and strips the prefix from the message (ADR-0013).
+ */
+const AS_OF_FIELD = "asOf"
 
 /**
  * The earned and spending Streams the template carries at zero. The Baseline states no run-rate
@@ -63,22 +66,22 @@ function refusalOf(ledger: Ledger, asOf: string, assets: readonly AccountRow[]):
 	const first = firstTransactionDate(ledger)
 	if (first === null) {
 		return fail("invalid_input", {
-			path: AS_OF_PATH,
-			message: `${AS_OF_PATH}: the Ledger records no Transaction yet`,
+			path: AS_OF_FIELD,
+			message: `${AS_OF_FIELD}: the Ledger records no Transaction yet`,
 			hint: 'Run "traj tx add" to record a Transaction, then print the template again.',
 		})
 	}
 	if (first > asOf) {
 		return fail("invalid_input", {
-			path: AS_OF_PATH,
-			message: `${AS_OF_PATH}: the Ledger's first Transaction is on ${first}, after ${asOf}`,
+			path: AS_OF_FIELD,
+			message: `${AS_OF_FIELD}: the Ledger's first Transaction is on ${first}, after ${asOf}`,
 			hint: `Run "traj scenario apply --template --as-of ${first}" to start from that date.`,
 		})
 	}
 	if (assets.length === 0) {
 		return fail("invalid_input", {
-			path: "accounts",
-			message: "accounts: the Ledger holds no asset Account to route surplus into",
+			path: AS_OF_FIELD,
+			message: `${AS_OF_FIELD}: the Ledger holds no asset Account to route surplus into`,
 			hint: 'Run "traj account add <name> --type asset --currency THB" to open one.',
 		})
 	}

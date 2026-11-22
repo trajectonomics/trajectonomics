@@ -53,6 +53,16 @@ describe("scenario apply --template --as-of", () => {
 		expect(declared.has(FIXTURE_ACCOUNTS.locked)).toBe(true)
 	})
 
+	it("declares a zero-balance leaf Account, and no header Account", async () => {
+		const declared = new Set(
+			JSON.parse(await templateOf(fixtureHome())).accounts.map(
+				(account: { id: string }) => account.id,
+			),
+		)
+		expect(declared.has(FIXTURE_ACCOUNTS.savings)).toBe(true)
+		expect(declared.has(FIXTURE_ACCOUNTS.assets)).toBe(false)
+	})
+
 	it("states each Baseline balance nowhere in the document, so the balances stay in the Baseline", async () => {
 		const home = fixtureHome()
 		const text = await templateOf(home)

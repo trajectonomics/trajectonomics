@@ -43,7 +43,7 @@ export function scenarioTemplate(): string | undefined {
 }
 
 /**
- * `scenario apply --template`: the static skeleton with no As-of, which opens no data directory,
+ * `scenario apply --template`: the minimal document with no As-of, which opens no data directory,
  * or the Baseline's pre-fill at one As-of, which reads the Ledger and writes nothing (ADR-0044).
  * The As-of is checked before the store opens, so a bad date wins over a corrupt row (ADR-0029).
  */
