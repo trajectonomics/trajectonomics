@@ -2,6 +2,7 @@ import type { ProjectionProblem } from "@trajectonomics/core/sim"
 import { version as cliVersion } from "../../package.json"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
+import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
 
 /**
  * The engine's package and the exact version this build runs on (ADR-0030). The engine
@@ -72,6 +73,14 @@ const DECLARE_HINT =
 export function refusal(problems: readonly ProjectionProblem[]): AppError {
 	const timeline = timelineFailure(problems)
 	if (timeline !== null) return timeline
+	const overflow = overflowOf(problems)
+	if (overflow !== undefined) {
+		return fail("projection_refused", {
+			message: overflowSentence(overflow),
+			hint: OVERFLOW_HINT,
+			details: problems.map(detailOf),
+		})
+	}
 	const first = problems[0]
 	const path = first === undefined ? undefined : problemPath(first)
 	const undeclared = problems.some((problem) => problem.code === "UNDECLARED_BALANCE_ACCOUNT")

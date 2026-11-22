@@ -42,7 +42,11 @@ const table = {
 	backup_unreadable: { exit: 1, message: "The backup could not be read." },
 	backup_stale: { exit: 3, message: "The backup does not match the data in the ledger." },
 	restore_target_not_empty: { exit: 5, message: "The database already holds data." },
-	projection_refused: { exit: 3, message: "The projection engine refused its input." },
+	projection_refused: {
+		exit: 3,
+		message:
+			"The projection engine refused its input; details names each problem by code, and VALUE_OVERFLOW means a figure grew past the largest amount the engine can hold.",
+	},
 	SINGLE_POSTING: { exit: 3, message: "A transaction needs at least two postings." },
 	INVALID_AMOUNT: { exit: 3, message: "The amount is not a safe integer of minor units." },
 	ZERO_AMOUNT_POSTING: { exit: 3, message: "A posting amount cannot be zero." },
