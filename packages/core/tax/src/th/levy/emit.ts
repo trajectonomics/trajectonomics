@@ -1,6 +1,7 @@
 import { addAllowanceMeasures } from "./allowances"
 import { addAssessableMeasures } from "./assessable"
 import { addMinimumGrossTax, addProgressiveTax, addRegularTax } from "./brackets"
+import { addClaimMeasures } from "./claims"
 import { addExpenseMeasures } from "./expenses"
 import { ThLevyGraph } from "./graph"
 import type { ThLevy, ThLevyMonthDay } from "./graph-types"
@@ -46,6 +47,7 @@ export function emitThLevy(profile: ThLevyProfile = {}): ThLevy {
 	const total = graph.add(regular, section40_4.finalWithholdingTax, ThLevyMeasureId.TotalTax)
 	const credits = graph.add(section40_4.finalWithholdingTax, section40_4.dividendCredit)
 	const netPayable = graph.sub(total, credits, ThLevyMeasureId.NetTaxPayable)
+	addClaimMeasures(graph, profile.allowances)
 	return graph.build(
 		profile.levy?.id ?? DEFAULT_ID,
 		profile.levy?.period ?? DEFAULT_PERIOD,
