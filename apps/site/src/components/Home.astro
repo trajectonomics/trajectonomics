@@ -5,7 +5,6 @@ import Layout from "../layouts/Layout.astro"
 import type { Language } from "../lib/language/language"
 import { dictionaryFor } from "../lib/language/languages"
 import Closing from "./Closing.astro"
-import Consent from "./Consent.astro"
 import Faq from "./Faq.astro"
 import Features from "./Features.astro"
 import Hero from "./Hero.astro"
@@ -20,7 +19,6 @@ const dictionary = dictionaryFor(language)
 ---
 
 <Layout language={language} title={dictionary.documentTitle} description={dictionary.description} indexed={true}>
-	<Consent dictionary={dictionary} />
 	<Hero dictionary={dictionary} />
 	<Features dictionary={dictionary} />
 	<Faq dictionary={dictionary} />
