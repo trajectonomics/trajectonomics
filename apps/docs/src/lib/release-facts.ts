@@ -20,13 +20,13 @@ export {
 /** Variables a page names that the CLI itself does not read: the install scripts' and the launcher's. */
 const NOT_THE_CLIS = new Set(["TRAJ_VERSION", "TRAJ_INSTALL_DIR", "TRAJ_BINARY_PATH"])
 
-/** The configuration page's `## TRAJ_*` sections against the root help's environment. */
+/** The configuration page's `## NAME` sections (`TRAJ_*` and `DO_NOT_TRACK`) against the root help's environment. */
 function environmentProblems(
 	file: ContentFile,
 	release: CliRelease,
 ): readonly ReleaseFactProblem[] {
 	const headed = new Set(
-		[...file.content.matchAll(/^## (TRAJ_[A-Z_]+)\s*$/gm)].map((match) => match[1] ?? ""),
+		[...file.content.matchAll(/^## ([A-Z][A-Z0-9_]+)\s*$/gm)].map((match) => match[1] ?? ""),
 	)
 	return release.environment
 		.filter((entry) => !headed.has(entry.name))

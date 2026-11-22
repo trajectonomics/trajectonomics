@@ -18,9 +18,23 @@ traj telemetry status  # Show the current choice and why.
 
 The output depends on the machine it runs on, so it is not a checked example. It prints three facts:
 `enabled`, the `reason`, and the path of the state file. The `reason` is one of `on`, `turned_off`
-(after `traj telemetry off`), `do_not_track` (`DO_NOT_TRACK` is set), `env_off` (a usage-count
-variable in the environment), `ci` (`CI` is set) or `development_build` (a build from a source
+(after `traj telemetry off`), `do_not_track` (`DO_NOT_TRACK` is set), `env_off` (`TRAJ_TELEMETRY` is
+`0`, `off` or `false`), `ci` (`CI` is set) or `development_build` (a build from a source
 checkout).
+
+A `TRAJ_TELEMETRY` of `0`, `off` or `false` in the environment turns counting off for that one
+command, and `status` names it as the reason, even where `CI` is also set:
+
+```bash exec
+TRAJ_TELEMETRY=0 traj telemetry status --json | jq '{enabled, reason}'
+```
+
+```json output
+{
+  "enabled": false,
+  "reason": "env_off"
+}
+```
 
 ## `traj telemetry off`
 
@@ -63,13 +77,15 @@ Windows it is in `%APPDATA%\traj`. That directory is outside the data directory,
 machine where that file cannot be written sends nothing, because an id that is not kept would count
 as a new person on every run.
 
-## Two ways to stop it
+## Three ways to stop it
 
 - `traj telemetry off`, which stores the choice for this machine
 - `DO_NOT_TRACK=1` in the environment of the command
+- `TRAJ_TELEMETRY=0` (or `off` or `false`) in the environment of the command
 
-`traj telemetry on` does not override the environment or the build: a `DO_NOT_TRACK` or `CI` setting,
-or a development build, still stops counting, and `status` says which one does.
+`traj telemetry on` does not override the environment or the build: a `DO_NOT_TRACK`,
+`TRAJ_TELEMETRY` or `CI` setting, or a development build, still stops counting, and `status` says
+which one does.
 
 CI runners, where `CI` is set, and development builds never send.
 
