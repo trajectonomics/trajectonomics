@@ -1,0 +1,60 @@
+{
+	"id": "pim-krit-couple-mortgage",
+	"title": "Couple with two children and a mortgage, one income, Nonthaburi",
+	"asOf": "2026-01-01",
+	"horizon": "2066-12-31",
+	"inflationBps": 250,
+	"conversation": "Hi, we're Pim and Krit, a married couple in Nonthaburi with two children, born in 2019 and 2023. Pim stays at home with the children and has no income. Krit is a site engineer and earns the whole household income. We're starting our plan on 1 January 2026.\n\nKrit's salary is 75,000 baht a month before tax. He pays social security of 9,000 baht a year. He also pays life insurance of 30,000 baht a year.\n\nWe owe 2,400,000 baht on our home loan, at an interest rate of about 6% a year. We pay 28,000 baht a month towards it, and we paid 118,000 baht of interest in 2025 that we expect to pay again in 2026. Our household spending, not counting the loan, is about 35,000 baht a month.\n\nWe have 600,000 baht in savings earning about 1% a year, and 1,200,000 baht in a mutual fund that has averaged about 5% a year. Inflation I'm assuming at 2.5%. Whatever is left over goes into savings.\n\nWe want to know two things. When can we stop working, meaning when could we live on our savings and fund without Krit's salary, while still paying the mortgage? And what is our 2026 income tax, as a married couple filing with one income and two children? After that, we'd like to know what changes if our household spending drops to 30,000 baht a month.",
+	"accounts": [
+		{
+			"id": "savings",
+			"name": "Joint savings",
+			"kind": "asset",
+			"rateBps": 100,
+			"openingBaht": 600000
+		},
+		{
+			"id": "fund",
+			"name": "Mutual fund",
+			"kind": "asset",
+			"rateBps": 500,
+			"openingBaht": 1200000
+		},
+		{
+			"id": "mortgage",
+			"name": "Home loan",
+			"kind": "liability",
+			"rateBps": 600,
+			"openingBaht": 2400000
+		}
+	],
+	"flows": [
+		{
+			"id": "salary",
+			"kind": "income",
+			"earned": true,
+			"label": "income.section40_1",
+			"monthlyBaht": 75000,
+			"growth": "inflation"
+		},
+		{ "id": "household", "kind": "expense", "monthlyBaht": 35000, "growth": "inflation" },
+		{
+			"id": "mortgage-payment",
+			"kind": "contribution",
+			"target": "mortgage",
+			"monthlyBaht": 28000,
+			"growth": "none"
+		}
+	],
+	"cashflow": { "surplusTo": "savings", "withdrawFrom": ["savings", "fund"] },
+	"tax": {
+		"filingStatus": "married_no_income_spouse",
+		"children": [{ "birthYear": 2019 }, { "birthYear": 2023 }],
+		"allowances": { "socialSecurity": 9000, "lifeInsurance": 30000, "mortgageInterest": 118000 }
+	},
+	"whatIf": {
+		"description": "our household spending drops to 30,000 baht a month",
+		"flowId": "household",
+		"monthlyBaht": 30000
+	}
+}

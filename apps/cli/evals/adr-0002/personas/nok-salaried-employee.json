@@ -1,0 +1,47 @@
+{
+	"id": "nok-salaried-employee",
+	"title": "Salaried office employee, single, Bangkok",
+	"asOf": "2026-01-01",
+	"horizon": "2066-12-31",
+	"inflationBps": 250,
+	"conversation": "Hi, I'm Nok. I'm 32, single, and I work as an admin officer at a logistics company in Bangkok. I'm starting my finances over on 1 January 2026, so let's use that as the starting date.\n\nMy salary is 60,000 baht a month before tax. Social security takes 750 baht a month, which comes to 9,000 baht a year. I pay life insurance of 12,000 baht a year and health insurance of 6,000 baht a year.\n\nI spend about 32,000 baht a month on rent, food, transport and bills. I put 15,000 baht a month into a mutual fund. Whatever is left over goes into my savings account.\n\nRight now I have 350,000 baht in savings earning about 1% a year, and 900,000 baht in the mutual fund, which has averaged about 5% a year. Inflation I'm assuming at 2.5%.\n\nI want to know two things. When can I stop working, meaning when could I live on my savings and fund without my salary? And what is my 2026 income tax? After that, I'd like to know what changes if my living costs drop to 27,000 baht a month.",
+	"accounts": [
+		{
+			"id": "savings",
+			"name": "Savings account",
+			"kind": "asset",
+			"rateBps": 100,
+			"openingBaht": 350000
+		},
+		{ "id": "fund", "name": "Mutual fund", "kind": "asset", "rateBps": 500, "openingBaht": 900000 }
+	],
+	"flows": [
+		{
+			"id": "salary",
+			"kind": "income",
+			"earned": true,
+			"label": "income.section40_1",
+			"monthlyBaht": 60000,
+			"growth": "inflation"
+		},
+		{ "id": "living", "kind": "expense", "monthlyBaht": 32000, "growth": "inflation" },
+		{
+			"id": "invest",
+			"kind": "contribution",
+			"target": "fund",
+			"monthlyBaht": 15000,
+			"growth": "none"
+		}
+	],
+	"cashflow": { "surplusTo": "savings", "withdrawFrom": ["savings", "fund"] },
+	"tax": {
+		"filingStatus": "single",
+		"children": [],
+		"allowances": { "socialSecurity": 9000, "lifeInsurance": 12000, "healthInsurance": 6000 }
+	},
+	"whatIf": {
+		"description": "my living costs drop to 27,000 baht a month",
+		"flowId": "living",
+		"monthlyBaht": 27000
+	}
+}

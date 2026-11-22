@@ -1,0 +1,41 @@
+{
+	"id": "ploy-freelancer-40-8",
+	"title": "Freelance designer under section 40(8), single, Chiang Mai",
+	"asOf": "2026-01-01",
+	"horizon": "2066-12-31",
+	"inflationBps": 250,
+	"conversation": "Hello, I'm Ploy. I'm 38, single, and I work as a freelance graphic designer in Chiang Mai. I get paid by clients, so my income is business income. Let's start the plan on 1 January 2026.\n\nMy clients pay me about 110,000 baht a month in total. I have no salary. I pay about 12,000 baht a month for software, a co-working desk and equipment. The business does not have to be taxed any other way; I just want the normal allowances. I pay life insurance of 20,000 baht a year and health insurance of 15,000 baht a year.\n\nMy living costs are about 35,000 baht a month.\n\nRight now I have 300,000 baht in a savings account earning about 1% a year, and 1,200,000 baht in a unit trust that has averaged about 5% a year. Inflation I'm assuming at 2.5%. Whatever is left over each month goes into the savings account.\n\nI want to know two things. When can I stop working, meaning when could I live on my savings and unit trust without my client income? And what is my 2026 income tax? After that, I'd like to know what changes if my business costs drop to 10,000 baht a month.",
+	"accounts": [
+		{
+			"id": "savings",
+			"name": "Savings account",
+			"kind": "asset",
+			"rateBps": 100,
+			"openingBaht": 300000
+		},
+		{ "id": "fund", "name": "Unit trust", "kind": "asset", "rateBps": 500, "openingBaht": 1200000 }
+	],
+	"flows": [
+		{
+			"id": "clients",
+			"kind": "income",
+			"earned": true,
+			"label": "income.section40_8.general",
+			"monthlyBaht": 110000,
+			"growth": "inflation"
+		},
+		{ "id": "business", "kind": "expense", "monthlyBaht": 12000, "growth": "inflation" },
+		{ "id": "living", "kind": "expense", "monthlyBaht": 35000, "growth": "inflation" }
+	],
+	"cashflow": { "surplusTo": "savings", "withdrawFrom": ["savings", "fund"] },
+	"tax": {
+		"filingStatus": "single",
+		"children": [],
+		"allowances": { "lifeInsurance": 20000, "healthInsurance": 15000 }
+	},
+	"whatIf": {
+		"description": "my business costs drop to 10,000 baht a month",
+		"flowId": "business",
+		"monthlyBaht": 10000
+	}
+}
