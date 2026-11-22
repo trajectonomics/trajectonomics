@@ -17,7 +17,7 @@ const { dictionary } = Astro.props
 <section class="consent" aria-label={dictionary.consentLabel}>
 	<p class="consent-text">{dictionary.consentText}</p>
 	<div class="consent-actions">
-		<a class="consent-link consent-link-allow" href="/?consent=granted" rel="nofollow" data-consent-choice="granted">{dictionary.consentAllow}</a>
-		<a class="consent-link" href="/?consent=denied" rel="nofollow" data-consent-choice="denied">{dictionary.consentDecline}</a>
+		<a class="consent-link consent-link-allow" href="/?consent=granted" rel="nofollow">{dictionary.consentAllow}</a>
+		<a class="consent-link" href="/?consent=denied" rel="nofollow">{dictionary.consentDecline}</a>
 	</div>
 </section>

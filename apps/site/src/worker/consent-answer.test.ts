@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { handleRequest } from "./handle-request"
-import { contentOf, fakeAssets, get } from "./testing/fake-assets"
+import { type Asked, contentOf, fakeAssets, get } from "./testing/fake-assets"
 
 /** A visitor id the tests mint, so a test can name the id the Worker should have written. */
 const MINTED = "11111111-2222-4333-8444-555555555555"
@@ -89,7 +89,7 @@ describe("the home for a visitor who has answered the banner", () => {
 		)
 		expect(response.headers.get("etag")).toBeNull()
 		expect(response.headers.get("last-modified")).toBeNull()
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
 		expect(response.headers.get("cache-control")).toBe("private, no-cache")
 		expect(setCookies(response)).toEqual([])
 	})
@@ -145,7 +145,7 @@ describe("the home for a visitor who has answered the banner", () => {
 		)
 		expect(response.status).toBe(200)
 		expect(await contentOf(response)).toBe("")
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
 	})
 })
 
@@ -172,5 +172,39 @@ describe("the cookie domain the Worker names", () => {
 			mint,
 		)
 		expect(setCookies(response)[1]).toStartWith(`traj_vid=${EXISTING};`)
+	})
+})
+
+describe("a consent answer another site tries to give", () => {
+	it("stores nothing for an embedded image or fetch, only for the visitor's own navigation", async () => {
+		for (const dest of ["image", "empty", "iframe"]) {
+			const response = await handleRequest(
+				get("/?consent=granted", { "sec-fetch-dest": dest }),
+				fakeAssets(),
+				mint,
+			)
+			expect(response.status).toBe(302)
+			expect(setCookies(response)).toEqual([])
+		}
+		const navigation = await handleRequest(
+			get("/?consent=granted", { "sec-fetch-dest": "document" }),
+			fakeAssets(),
+			mint,
+		)
+		expect(setCookies(navigation)).toHaveLength(2)
+	})
+})
+
+describe("a decided visitor's revalidation", () => {
+	it("is answered with the full rewritten home, never a 304 of the variant with the banner", async () => {
+		const asked: Asked[] = []
+		const response = await handleRequest(
+			get("/", { cookie: "traj_consent=denied", "if-none-match": '"root-en"' }),
+			fakeAssets(asked),
+			mint,
+		)
+		expect(asked[0]?.ifNoneMatch).toBeNull()
+		expect(response.status).toBe(200)
+		expect(await contentOf(response)).toContain('data-consent="denied"')
 	})
 })

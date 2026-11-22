@@ -65,7 +65,7 @@ describe("the Worker's answer from the Site's one address", () => {
 
 	it("names every signal the answer depends on", async () => {
 		const response = await handleRequest(get("/"), fakeAssets())
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
 	})
 
 	it("keeps the answer out of every shared cache, and asks the browser to revalidate", async () => {
@@ -93,7 +93,7 @@ describe("the Worker's answer from the Site's one address", () => {
 		expect(response.status).toBe(304)
 		expect(await contentOf(response)).toBe("")
 		expect(response.headers.get("etag")).toBe('"thai-home"')
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
 		expect(response.headers.get("cache-control")).toBe("private, no-cache")
 	})
 
@@ -103,7 +103,7 @@ describe("the Worker's answer from the Site's one address", () => {
 			fakeAssets(),
 		)
 		expect(response.status).toBe(200)
-		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
 		expect(await contentOf(response)).toBe("")
 	})
 })

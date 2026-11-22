@@ -28,7 +28,20 @@ export const PERSONALISED_DROPPED_HEADERS: readonly string[] = Object.freeze([
 	"ETag",
 	"Last-Modified",
 	"Content-Length",
+	// The rewriter reads decoded bytes, so a copied encoding would make the browser decode twice.
+	"Content-Encoding",
 ])
+
+/**
+ * Whether a request is the visitor's own navigation to the consent link. A browser names what it
+ * fetches in `Sec-Fetch-Dest`; an `<img>` or a `fetch` that another site embeds says so, and must
+ * never store an answer the visitor did not give. A client that sends no such header (an old
+ * browser, the probe) is taken at its word.
+ */
+function isNavigation(request: Request): boolean {
+	const destination = request.headers.get("sec-fetch-dest")
+	return destination === null || destination === "document"
+}
 
 /** The request headers consent is read from. */
 export function signalsOf(request: Request): ConsentSignals {
@@ -46,7 +59,7 @@ export function signalsOf(request: Request): ConsentSignals {
 export function consentResponse(request: Request, value: string | null, newId: IdSource): Response {
 	const choice = consentChoiceFrom(value)
 	const headers = new Headers({ Location: CLEAN_URL, "Cache-Control": CHOICE_CACHE_CONTROL })
-	if (choice !== undefined) {
+	if (choice !== undefined && isNavigation(request)) {
 		// The id is read from the cookie itself, not from the resolved state: a visitor whose browser
 		// sends `Sec-GPC` resolves to `denied` but keeps the id they already hold.
 		const visitorId = visitorIdFrom(request.headers.get("cookie")) ?? newId()

@@ -2,7 +2,7 @@
 export const ENGLISH_CONSENT = Object.freeze({
 	consentLabel: "Cookie choice",
 	consentText:
-		"We count visits without cookies. May we also set one cookie, so we can tell a returning visitor from a new one? It holds a random ID for six months and nothing else.",
+		"We count visits without cookies. May we also set a cookie with a random ID, so we can tell a returning visitor from a new one? It lasts six months and holds nothing else. A second cookie remembers your answer.",
 	consentAllow: "Allow cookie",
 	consentDecline: "No thanks",
 	footerCookieLink: "Cookie choice",

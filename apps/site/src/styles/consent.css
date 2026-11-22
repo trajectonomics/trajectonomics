@@ -1,7 +1,7 @@
 /*
  * The cookie banner (ADR 0024): a compact card fixed to the bottom edge, one line of text and two
- * links. It keeps the phone's 16 px gutter, never scrolls sideways, and sits over the page only until
- * the visitor answers. Colours are Theme roles, so light and dark both keep their contrast.
+ * links. It keeps the phone's 16 px gutter and never scrolls sideways. The Worker leaves it out of
+ * the page once the visitor has answered. Colours are Theme roles, so light and dark both keep their contrast.
  */
 
 .consent {
@@ -62,7 +62,7 @@
 	outline-offset: 2px;
 }
 
-/* A visitor who has answered, in the page or in this tab, never sees the banner again. */
+/* The Worker writes `data-consent` for a visitor who has answered, so the banner is never painted. */
 html[data-consent] .consent {
 	display: none;
 }

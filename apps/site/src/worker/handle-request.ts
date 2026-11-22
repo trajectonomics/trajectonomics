@@ -26,7 +26,7 @@ const OLD_PREFIXES: readonly string[] = Object.freeze(
 )
 
 /** What the answer at `/` depends on, in the order the response names them. */
-const VARY = "Cookie, Accept-Language, CF-IPCountry"
+const VARY = "Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT"
 
 /** `/` is private, so no shared cache hands one visitor's Language to another, and revalidated. */
 const HOME_CACHE_CONTROL = "private, no-cache"
