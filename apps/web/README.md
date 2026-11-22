@@ -22,7 +22,7 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 | `bun run demo` | Builds a fictional ledger in a temporary directory and rewrites `public/demo/snapshot.json`, the committed Demo snapshot. |
 | `bun run dashboard -- …` | Builds the pages, writes `dist/snapshot.json` with the same flags as `snapshot`, and previews with `vite preview`. |
 | `bun run build` | Builds the pages into `dist/` and packs them into `pack/dashboard.bin`, the file `traj dashboard` embeds. |
-| `bun run check` | Lint, typecheck (`svelte-check` with warnings as errors), tests (including the Svelte guard); turbo builds first. |
+| `bun run check` | Lint, typecheck (`svelte-check` with warnings as errors), tests (including the Svelte guard) and the build. |
 
 ## Where it lives
 

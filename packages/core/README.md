@@ -39,7 +39,7 @@ console.log(toMinorUnits(12.34, 2), totalTax)
 
 ## Development
 
-`bun run check` runs lint, typecheck, the import rules, publint and attw (turbo builds first). Each folder keeps its own tests and checks (`turbo run check --filter='./packages/core/*'`).
+`bun run check` runs lint, typecheck, the import rules, the build, publint and attw. Each folder keeps its own tests and checks (`turbo run check --filter='./packages/core/*'`).
 
 ## License
 

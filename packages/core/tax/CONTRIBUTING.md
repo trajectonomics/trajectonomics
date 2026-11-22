@@ -172,7 +172,8 @@ bunx turbo run check --filter=@trajectonomics/tax
 
 Or run them inside `packages/core/tax` with `bun run check`. The check runs these steps in order:
 `lint` (Biome, then the hardcoded-string check `check:strings`), `check:th-sources`, `typecheck`,
-`test` (with the 100% line-coverage floor), `build`, `check:readme` and `lint:package`.
+`test` (with the 100% line-coverage floor), `build`, `check:readme` and `lint:package`. Under turbo the
+`build` step does nothing, because the `build` task already ran; run directly, it builds.
 
 Run the core checks too when you change the bundle, its exports or the import rules:
 
