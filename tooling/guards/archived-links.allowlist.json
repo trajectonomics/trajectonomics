@@ -76,8 +76,8 @@
 	},
 	{
 		"path": "org/goals/GOALS.md",
-		"match": "trajectonomics/cli` repository",
-		"reason": "The owner's goals file names the cli repository's star target; agents never edit it."
+		"match": "the archived `trajectonomics/cli` no longer takes them",
+		"reason": "The owner's goals file says the archived cli repository no longer takes the star count; agents never edit it."
 	},
 	{
 		"path": "packages/brand/GLOSSARY.md",
@@ -93,6 +93,16 @@
 		"path": "skills/customer/skills/traj-onboarding/SKILL.md",
 		"match": "source` is `trajectonomics/skills`",
 		"reason": "Describes the lock entry an install from the former source leaves, so setup can detect it."
+	},
+	{
+		"path": "skills/customer/skills/traj/SKILL.md",
+		"match": "source` is `trajectonomics/skills`",
+		"reason": "Describes the lock entry an install from the former source leaves, so the handoff reads it as no pin."
+	},
+	{
+		"path": "skills/customer/scripts/traj-handoff.test.ts",
+		"match": "source` is `trajectonomics/skills`",
+		"reason": "Asserts the handoff names the former source's lock entry as no pin."
 	},
 	{
 		"path": "skills/internal/AGENTS.md",

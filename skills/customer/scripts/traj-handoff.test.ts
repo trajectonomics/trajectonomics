@@ -32,11 +32,16 @@ describe("the traj handoff section", () => {
 	})
 
 	it("reads the row's CLI Range from the manifest at that commit", () => {
+		expect(handoff).toContain(
+			"Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at that commit",
+		)
 		expect(handoff).toContain("`cliRange`")
 	})
 
-	it("installs nothing when the job's Skill is already listed in the resolved scope", () => {
-		expect(handoff).toContain("install nothing and follow it")
+	it("installs nothing when the row's Skill is already listed in the resolved scope", () => {
+		expect(handoff).toContain(
+			"When the resolved scope's list already names that row's Skill, install nothing and follow it.",
+		)
 	})
 
 	it("gates on the floor, one direction, in the same words as onboarding Step 2", () => {
@@ -46,6 +51,7 @@ describe("the traj handoff section", () => {
 	})
 
 	it("installs a row above its upper bound all the same, and discloses the range it was checked through", () => {
+		expect(handoff).toContain("a pre-release of that bound's minor counts as past it")
 		expect(handoff).toContain("installed all the same")
 		expect(handoff).toContain("the range the Skill was checked through")
 		expect(handoff).toContain("`traj schema` is authoritative where the two differ")
@@ -62,11 +68,17 @@ describe("the traj handoff section", () => {
 		expect(handoff).toContain("name the row, the range it wants and the reason")
 	})
 
-	it("states the no-pin case, covering an older CLI and the archived source, and points at setup", () => {
+	it("states the no-pin case, covering a missing lock, an older CLI and the archived source", () => {
 		expect(handoff).toContain("No pin.")
-		expect(handoff).toContain("lock records no `commit`")
+		expect(handoff).toContain("The lock is missing, or records no `commit` for `traj`")
 		expect(handoff).toContain("`source` is `trajectonomics/skills`")
 		expect(handoff).toContain("re-run setup with `traj-onboarding`")
+	})
+
+	it("states the no-manifest case, where nothing is installed blind", () => {
+		expect(handoff).toContain("No manifest.")
+		expect(handoff).toContain("cannot be fetched or read at the pin")
+		expect(handoff).toContain("nothing is installed blind")
 	})
 
 	it("keeps the no-row sentence word for word", () => {
@@ -75,8 +87,9 @@ describe("the traj handoff section", () => {
 		)
 	})
 
-	it("says the no-install cases do the part the schema allows", () => {
-		expect(handoff.match(/do the part the schema allows/g)?.length).toBe(3)
+	it("says each of the four no-install cases does the part the schema allows", () => {
+		expect(handoff).toContain("Install nothing in these four cases:")
+		expect(handoff.match(/do the part the schema allows/g)?.length).toBe(4)
 	})
 
 	it("never installs from a branch", () => {
