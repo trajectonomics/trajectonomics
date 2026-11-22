@@ -3,6 +3,7 @@ import type { Leaf } from "../command"
 import { defineCommand, ok } from "../command"
 import { isAppError } from "../errors"
 import { readCarryIn } from "../projection/carryin"
+import { returnModelFlagDocument } from "../projection/chance-model"
 import {
 	asOfFlag,
 	carryInFlag,
@@ -37,6 +38,21 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 			age: z.array(z.number()).optional().describe("An age a compare reports at."),
 			monthly: z.boolean().default(false).describe("Also read each projection's monthly rows."),
 			carryIn: carryInFlag,
+			returnModel: z
+				.string()
+				.optional()
+				.describe("The Return model JSON file the chance of success draws from."),
+			paths: z
+				.number()
+				.int()
+				.optional()
+				.describe(
+					"The Market paths the chance runs, from 1 to 10,000. Needs --return-model and --seed.",
+				),
+			seed: z
+				.string()
+				.optional()
+				.describe("Sixteen lower-case hex digits the Market paths are drawn from."),
 			port: z
 				.number()
 				.int()
@@ -45,7 +61,7 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 				.default(DEFAULT_PORT)
 				.describe("The loopback port to listen on; 0 lets the system pick a free one."),
 		}),
-		flagDocuments: [carryInFlagDocument],
+		flagDocuments: [carryInFlagDocument, returnModelFlagDocument],
 		output: dashboardOutput,
 		examples: [
 			{

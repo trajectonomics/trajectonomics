@@ -23,6 +23,7 @@ const SNAPSHOT = {
 		projections: { base: read(["projection", "run", "--scenario", "base", "--json"], false) },
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
+		chance: {},
 	},
 } as unknown as Snapshot
 

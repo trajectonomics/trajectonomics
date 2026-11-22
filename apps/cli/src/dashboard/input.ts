@@ -1,4 +1,10 @@
-import { checkParams, type PlanParams, readsOf, type Snapshot } from "@trajectonomics/web/serve"
+import {
+	checkParams,
+	type PlanInput,
+	type PlanParams,
+	readsOf,
+	type Snapshot,
+} from "@trajectonomics/web/serve"
 import { z } from "zod"
 import { type AppError, fail } from "../errors"
 
@@ -12,7 +18,20 @@ export type DashboardInput = {
 	age?: number[] | undefined
 	monthly: boolean
 	carryIn?: string | undefined
+	/** The three chance flags go together; a Return model's file, its Market path count and seed. */
+	returnModel?: string | undefined
+	paths?: number | undefined
+	seed?: string | undefined
 	port: number
+}
+
+/** The three chance flags as the Plan takes them: each one, or null when the flag is not given. */
+function chanceFlags(input: DashboardInput): Pick<PlanInput, "returnModel" | "paths" | "seed"> {
+	return {
+		returnModel: input.returnModel ?? null,
+		paths: input.paths ?? null,
+		seed: input.seed ?? null,
+	}
 }
 
 /** The Snapshot Plan's parameters from the flags, or the first rule they break. */
@@ -34,6 +53,7 @@ export function planOf(input: DashboardInput): PlanParams | AppError {
 		ages: input.age ?? [],
 		monthly: input.monthly,
 		carryIn: input.carryIn !== undefined,
+		...chanceFlags(input),
 	})
 	return plan.ok ? plan.params : fail("invalid_input", { message: plan.error.message })
 }
