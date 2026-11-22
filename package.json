@@ -20,7 +20,8 @@
 		"apps/blog",
 		"skills/customer",
 		"skills/internal",
-		"tooling/release"
+		"tooling/release",
+		"tooling/guards"
 	],
 	"scripts": {
 		"build": "turbo run build",

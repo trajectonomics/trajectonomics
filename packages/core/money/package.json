@@ -6,7 +6,8 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/money.git"
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "packages/core/money"
 	},
 	"type": "module",
 	"sideEffects": false,

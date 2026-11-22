@@ -212,6 +212,15 @@
         "install-skills-profile": "./scripts/install-profile.mjs",
       },
     },
+    "tooling/guards": {
+      "name": "@trajectonomics/guards",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@biomejs/biome": "2.6.3",
+        "@types/bun": "^1.4.4",
+        "typescript": "^7.0.2",
+      },
+    },
     "tooling/release": {
       "name": "@trajectonomics/release-tools",
       "version": "0.0.0",
@@ -839,6 +848,8 @@
     "@trajectonomics/core": ["@trajectonomics/core@workspace:packages/core"],
 
     "@trajectonomics/docs": ["@trajectonomics/docs@workspace:apps/docs"],
+
+    "@trajectonomics/guards": ["@trajectonomics/guards@workspace:tooling/guards"],
 
     "@trajectonomics/internal-skills": ["@trajectonomics/internal-skills@workspace:skills/internal"],
 

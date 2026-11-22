@@ -4,7 +4,8 @@
   "description": "Internal AI coding agent skills for Trajectonomics",
   "repository": {
     "type": "git",
-    "url": "https://github.com/trajectonomics/internal-skills.git"
+    "url": "git+https://github.com/trajectonomics/trajectonomics.git",
+    "directory": "skills/internal"
   },
   "license": "MIT",
   "private": false,

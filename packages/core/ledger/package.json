@@ -6,7 +6,8 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/ledger-core.git"
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "packages/core/ledger"
 	},
 	"type": "module",
 	"sideEffects": false,
