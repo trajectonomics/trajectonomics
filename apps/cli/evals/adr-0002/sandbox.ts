@@ -1,6 +1,13 @@
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 
+/**
+ * Set for every `traj` the eval starts (the shim, the agent's environment, the reference reads), so
+ * an eval run is never counted as real use by the usage telemetry (ADR-0045, goal G1).
+ * `DO_NOT_TRACK` is the standard opt-out and `TRAJ_TELEMETRY=off` is `traj`'s own.
+ */
+export const TELEMETRY_OFF = { DO_NOT_TRACK: "1", TRAJ_TELEMETRY: "off" } as const
+
 /** Where one persona's run keeps its data, its agent workspace, its `traj` shim and its call log. */
 export interface RunDirs {
 	readonly root: string
@@ -42,7 +49,7 @@ export function wrapperSource(
 		`const release = ${JSON.stringify(releaseArgv)}`,
 		`const args = process.argv.slice(2)`,
 		`const started = performance.now()`,
-		`const child = Bun.spawn([...release, ...args], { stdin: "inherit", stdout: "pipe", stderr: "pipe", env: process.env })`,
+		`const child = Bun.spawn([...release, ...args], { stdin: "inherit", stdout: "pipe", stderr: "pipe", env: { ...process.env, ...${JSON.stringify(TELEMETRY_OFF)} } })`,
 		`const [out, err] = await Promise.all([new Response(child.stdout).arrayBuffer(), new Response(child.stderr).arrayBuffer()])`,
 		`const code = await child.exited`,
 		`process.stdout.write(Buffer.from(out))`,
@@ -71,4 +78,21 @@ export function installTrajWrapper(
  */
 export function sandboxPath(binDir: string, nodeDir: string): string {
 	return [binDir, nodeDir, "/usr/local/bin", "/usr/bin", "/bin"].join(":")
+}
+
+/**
+ * The agent's whole environment: the caller's, then telemetry off (it wins over anything the
+ * caller set), the sandbox PATH and the run's own `TRAJ_HOME`.
+ */
+export function agentEnv(
+	base: Readonly<Record<string, string | undefined>>,
+	dirs: Pick<RunDirs, "bin" | "home">,
+	nodeDir: string,
+): Record<string, string | undefined> {
+	return {
+		...base,
+		...TELEMETRY_OFF,
+		PATH: sandboxPath(dirs.bin, nodeDir),
+		TRAJ_HOME: dirs.home,
+	}
 }
