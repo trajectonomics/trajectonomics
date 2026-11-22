@@ -70,10 +70,12 @@ describe("Step 2, installing the published set", () => {
 describe("what the person is told about their own numbers", () => {
 	const stepThree = section(body, "Step 3: Ask once, then hand over")
 
-	it("enters a debt as a negative opening balance until the CLI normalises the sign", () => {
+	it("enters a debt as a negative opening balance, the CLI refusing a positive one from 0.3.0", () => {
 		expect(stepThree).toContain("Enter a debt as a negative opening balance")
-		expect(stepThree).toContain("does not yet normalise the sign")
-		expect(stepThree).toContain("trajectonomics/cli#149")
+		expect(stepThree).toContain(
+			"from 0.3.0 the command line refuses a positive opening on a liability",
+		)
+		expect(stepThree).toContain("below 0.3.0 a debt")
 		expect(stepThree).toContain("reads as a gain")
 	})
 
@@ -99,8 +101,13 @@ describe("what setup leaves behind", () => {
 		expect(body.split("rm -rf ~/.traj")).toHaveLength(2)
 	})
 
-	it("names the guarded remove as the CLI's, not this Skill's, once it exists", () => {
-		expect(leaves).toContain("trajectonomics/cli#148")
-		expect(leaves).toContain("guarded")
+	it("names the guarded remove as the CLI's, not this Skill's, from 0.3.0", () => {
+		expect(leaves).toContain("no command below 0.3.0 removes the data for you")
+		expect(leaves).toContain("From 0.3.0 the CLI has its own guarded removal, which")
+		expect(leaves).toContain("refuses without a confirmation")
+	})
+
+	it("points at no archived issue: the CLI's releases say what it does now", () => {
+		expect(body).not.toContain("trajectonomics/cli#")
 	})
 })

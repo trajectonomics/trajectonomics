@@ -87,6 +87,28 @@ describe("contract", () => {
 				{ TRAJ_HOME: home },
 			)
 		},
+		same_account: async () => {
+			const home = ledgerHome()
+			await capture(["account", "add", "Cash", "--type", "asset", "--currency", "THB", "--json"], {
+				TRAJ_HOME: home,
+			})
+			return capture(
+				[
+					"tx",
+					"add",
+					"--from",
+					"Cash",
+					"--to",
+					"Cash",
+					"--amount",
+					"5.00",
+					"--date",
+					"2026-11-22",
+					"--json",
+				],
+				{ TRAJ_HOME: home },
+			)
+		},
 		projection_refused: async () => {
 			const home = fixtureHome()
 			await capture(

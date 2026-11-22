@@ -1,58 +1,12 @@
 /** The coarse class of a finished run. Closed: nothing outside this union can be constructed. */
 export type ExitCode = 0 | 1 | 2 | 3 | 4 | 5
 
-/** Every registered failure name, never reused: CLI codes are snake_case, core codes verbatim. */
-export type ErrorCode =
-	| "internal"
-	| "invalid_input"
-	| "unknown_command"
-	| "unknown_flag"
-	| "unknown_format"
-	| "not_found"
-	| "ledger_missing"
-	| "account_name_taken"
-	| "scenario_name_taken"
-	| "unsupported_currency"
-	| "account_archived"
-	| "liability_opening_positive"
-	| "external_ref_conflict"
-	| "database_busy"
-	| "database_corrupt"
-	| "database_too_new"
-	| "disk_full"
-	| "not_a_directory"
-	| "permission_denied"
-	| "migration_failed"
-	| "output_exists"
-	| "export_failed"
-	| "backup_unreadable"
-	| "backup_stale"
-	| "restore_target_not_empty"
-	| "projection_refused"
-	| "SINGLE_POSTING"
-	| "INVALID_AMOUNT"
-	| "ZERO_AMOUNT_POSTING"
-	| "UNKNOWN_ACCOUNT"
-	| "NON_LEAF_ACCOUNT"
-	| "CURRENCY_MISMATCH"
-	| "UNBALANCED_TRANSACTION"
-	| "INVALID_DATE"
-	| "INVALID_CURRENCY"
-	| "INVALID_DIMENSION"
-	| "INVALID_ACCOUNT_HIERARCHY"
-	| "NEGATIVE_AMOUNT"
-	| "DUPLICATE_TRANSACTION_ID"
-	| "REVERSAL_BEFORE_ORIGINAL"
-	| "NON_EQUITY_CONTRA"
-	| "INVALID_PERIOD"
-	| "AMOUNT_OVERFLOW"
-
 /**
  * The single source of truth for failures. The envelope's `exitCode`, `run()`'s return value,
  * `traj schema` and the tests all read this table. A code carries exactly one class; a case that
- * seems to need two classes is two codes.
+ * seems to need two classes is two codes. CLI codes are snake_case, core codes verbatim.
  */
-export const registry: Record<ErrorCode, { exit: ExitCode; message: string }> = {
+const table = {
 	internal: { exit: 1, message: "Unexpected internal error." },
 	invalid_input: { exit: 2, message: "The input is invalid." },
 	unknown_command: { exit: 2, message: "Unknown command." },
@@ -64,6 +18,10 @@ export const registry: Record<ErrorCode, { exit: ExitCode; message: string }> = 
 	scenario_name_taken: { exit: 5, message: "A scenario with this name already exists." },
 	unsupported_currency: { exit: 3, message: "The currency is not supported in v1." },
 	account_archived: { exit: 3, message: "The account is archived and accepts no postings." },
+	same_account: {
+		exit: 3,
+		message: "A transfer needs two different accounts: from and to name the same one.",
+	},
 	liability_opening_positive: {
 		exit: 3,
 		message: "A liability's opening balance is negative: enter the debt as a negative amount.",
@@ -105,4 +63,9 @@ export const registry: Record<ErrorCode, { exit: ExitCode; message: string }> = 
 	NON_EQUITY_CONTRA: { exit: 3, message: "An opening balance contra must be an equity account." },
 	INVALID_PERIOD: { exit: 3, message: "The period's start is after its end." },
 	AMOUNT_OVERFLOW: { exit: 3, message: "The total exceeds the safe integer range." },
-}
+} as const
+
+/** Every registered failure name, never reused: the keys of the table, so no code is listed twice. */
+export type ErrorCode = keyof typeof table
+
+export const registry: Record<ErrorCode, { exit: ExitCode; message: string }> = table

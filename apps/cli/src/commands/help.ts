@@ -2,7 +2,7 @@ import { z } from "zod"
 import type { Leaf } from "../command"
 import { defineCommand, ok } from "../command"
 import { fail } from "../errors"
-import { findNode, HELP_HINT } from "../tree"
+import { findNode, HELP_HINT, pathWords } from "../tree"
 import { usageOf } from "../usage"
 
 export const help: Leaf = defineCommand({
@@ -19,11 +19,12 @@ export const help: Leaf = defineCommand({
 	],
 	errorCodes: ["unknown_command"],
 	run: (input, ctx) => {
-		const node = findNode(ctx.root, input.path)
+		const path = pathWords(input.path)
+		const node = findNode(ctx.root, path)
 		if (!node) {
-			const message = `Unknown command: ${input.path.join(" ")}`
+			const message = `Unknown command: ${path.join(" ")}`
 			return fail("unknown_command", { message, hint: HELP_HINT })
 		}
-		return ok(usageOf(node, input.path))
+		return ok(usageOf(node, path))
 	},
 })

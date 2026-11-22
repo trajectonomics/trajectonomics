@@ -37,7 +37,7 @@ export const fi: Leaf = defineCommand({
 		},
 		{
 			command:
-				"traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000",
+				"traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000",
 			description: "The same date under one changed assumption.",
 		},
 	],
