@@ -44,4 +44,6 @@ export const carryInFlagDocument: FlagDocument = { flag: "carryIn", schema: carr
 export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
 	.array(z.string())
 	.optional()
-	.describe("Replace one existing dotted document path with a JSON value; repeatable.")
+	.describe(
+		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB); repeatable.",
+	)
