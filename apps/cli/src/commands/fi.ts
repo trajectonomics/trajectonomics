@@ -21,6 +21,7 @@ import { withProjection } from "../projection/leaf"
 export const fi: Leaf = defineCommand({
 	name: "fi",
 	summary: "Report the financial independence date under a Scenario",
+	note: "Each person's age at the FI date ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({

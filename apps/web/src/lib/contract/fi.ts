@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { fiResult } from "./fi-result"
+import { fiLeafResult } from "./fi-result"
 import { integer } from "./integer"
 import { projectionShape } from "./projection-shape"
 import { taxYear } from "./tax-year"
@@ -13,7 +13,7 @@ export const fi = z.strictObject({
 		definitionVersion: integer,
 		explanation: z.string(),
 	}),
-	fi: fiResult,
+	fi: fiLeafResult,
 	taxYears: z.array(taxYear),
 })
 export type Fi = z.infer<typeof fi>

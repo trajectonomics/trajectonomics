@@ -70,7 +70,7 @@ export function fiFixture(answer: FiResult, patch: Partial<Fi> = {}): Fi {
 		currency: "THB",
 		method: "survival",
 		definition: { method: "survival", definitionVersion: 1, explanation: "" },
-		fi: answer,
+		fi: answer.reachable ? { ...answer, ages: [] } : answer,
 		taxYears: [],
 		...patch,
 	}

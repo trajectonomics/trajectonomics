@@ -1,6 +1,7 @@
 import type { AnnualRollup, ProjectionRow, RunsOut } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"
+import type { PersonAge } from "../scenario/household/ages"
 import { addDays } from "./dates"
 import { moneyOf } from "./money"
 import type { AnnualRow, MonthlyRow } from "./run-view"
@@ -34,11 +35,15 @@ export function realNetWorthOf(
 	return { date: found.date, amount: moneyOf(currency)(found.realNetWorth) }
 }
 
-/** One roll-up row, money at the currency's own scale, real figure from the engine's own row. */
+/**
+ * One roll-up row, money at the currency's own scale, real figure from the engine's own row. Its
+ * ages are the people's ages on the roll-up's last day (cli ADR-0048).
+ */
 export function annualRow(
 	rollup: AnnualRollup,
 	rows: readonly ProjectionRow[],
 	currency: string,
+	ages: PersonAge[],
 ): AnnualRow | AppError {
 	const money = moneyOf(currency)
 	const realNetWorth = realNetWorthOf(rollup, rows, currency)
@@ -47,6 +52,7 @@ export function annualRow(
 		index: rollup.index,
 		from: rollup.from,
 		to: rollup.to,
+		ages,
 		openingNetWorth: money(rollup.openingNetWorth),
 		closingNetWorth: money(rollup.closingNetWorth),
 		income: money(rollup.income),
@@ -60,11 +66,12 @@ export function annualRow(
 	}
 }
 
-/** One monthly row: net worth and accessible net worth, nominal and real. */
-export function monthlyRow(row: ProjectionRow, currency: string): MonthlyRow {
+/** One monthly row: net worth and accessible net worth, nominal and real, and the ages on its date. */
+export function monthlyRow(row: ProjectionRow, currency: string, ages: PersonAge[]): MonthlyRow {
 	const money = moneyOf(currency)
 	return {
 		date: row.date,
+		ages,
 		netWorth: money(row.netWorth),
 		realNetWorth: money(row.realNetWorth),
 		accessibleNetWorth: money(row.accessibleNetWorth),

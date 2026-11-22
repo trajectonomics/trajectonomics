@@ -1,12 +1,13 @@
 import { financialIndependence, project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
+import { agesOn } from "../scenario/household/ages"
 import type { Placed } from "./carryin-apply"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { bestCaseView, referenceView } from "./fi-figures"
 import { FI_METHOD } from "./fi-method"
-import type { FiAnswer, FiView } from "./fi-view"
+import type { FiAnswer, FiLeafAnswer, FiView } from "./fi-view"
 import { fundingNotes } from "./funding"
 import { taxYearsOf } from "./tax-view"
 
@@ -49,6 +50,12 @@ export function fiAnswerOf(prepared: Placed): FiSolution | AppError {
 	}
 }
 
+/** A reachable answer states the household's ages on its FI date; the others carry none. */
+function withAges(answer: FiAnswer, prepared: Placed): FiLeafAnswer {
+	if (!answer.reachable) return answer
+	return { ...answer, ages: agesOn(prepared.household, answer.fiDate) }
+}
+
 /** `traj fi`: the survival answer with its definition echoed (ADR-0008). */
 export function independenceOf(prepared: Placed): FiView | AppError {
 	const solution = fiAnswerOf(prepared)
@@ -67,7 +74,7 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 		currency: prepared.currency,
 		method: solution.definition.method,
 		definition: { ...solution.definition, explanation: FI_METHOD },
-		fi: solution.fi,
+		fi: withAges(solution.fi, prepared),
 		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 	}
 }

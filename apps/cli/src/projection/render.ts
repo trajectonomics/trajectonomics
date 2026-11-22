@@ -4,6 +4,20 @@ import type { ColumnHint, RenderHint } from "../table"
 const column = (key: string, align?: ColumnHint["align"]): ColumnHint =>
 	align === undefined ? { key, label: key } : { key, label: key, align }
 
+/** `me 37, partner 35`: each person's age, in household order; empty without a household. */
+function agesText(value: unknown): unknown {
+	if (!Array.isArray(value)) return value
+	return value
+		.map((entry: unknown) => {
+			if (typeof entry !== "object" || entry === null) return ""
+			const { person, age } = entry as { person?: unknown; age?: unknown }
+			return `${String(person)} ${String(age)}`
+		})
+		.join(", ")
+}
+
+const agesColumn: ColumnHint = { key: "ages", label: "Ages", show: agesText }
+
 /**
  * `projection run`'s human view: the annual roll-up, the monthly rows when asked, the tax years the
  * Scenario's Levies settle, and the notes under them. Only the human Format reads it; `--json`
@@ -20,6 +34,7 @@ export const projectionHint: RenderHint = {
 			column("index", "right"),
 			column("from"),
 			column("to"),
+			agesColumn,
 			column("openingNetWorth", "right"),
 			column("closingNetWorth", "right"),
 			column("income", "right"),
@@ -33,6 +48,7 @@ export const projectionHint: RenderHint = {
 		],
 		monthly: [
 			column("date"),
+			agesColumn,
 			column("netWorth", "right"),
 			column("realNetWorth", "right"),
 			column("accessibleNetWorth", "right"),

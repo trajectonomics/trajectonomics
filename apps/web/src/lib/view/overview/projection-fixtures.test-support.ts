@@ -1,4 +1,4 @@
-import type { Fi, ProjectionRun } from "../../contract"
+import type { Fi, FiResult, ProjectionRun } from "../../contract"
 
 const SHAPE = {
 	asOf: "2026-10-31",
@@ -16,12 +16,12 @@ export function shape(horizon = "2060-12-31") {
 }
 
 /** A `fi` result for the base Scenario, with the given FI answer and no tax rows. */
-export function fi(result: Fi["fi"]): Fi {
+export function fi(result: FiResult): Fi {
 	return {
 		...shape(),
 		method: "survival",
 		definition: { method: "survival", definitionVersion: 1, explanation: "" },
-		fi: result,
+		fi: result.reachable ? { ...result, ages: [] } : result,
 		taxYears: [],
 	}
 }
@@ -54,6 +54,7 @@ export function annualRow(to: string, closing: string, real: string) {
 		index: 0,
 		from: "2026-10-31",
 		to,
+		ages: [],
 		openingNetWorth: "0.00",
 		closingNetWorth: closing,
 		income: "0.00",

@@ -23,6 +23,7 @@ export function annualRow(index: number, closing: string, real: string, to: stri
 		index,
 		from: "2026-10-31",
 		to,
+		ages: [],
 		openingNetWorth: "0.00",
 		closingNetWorth: closing,
 		income: "0.00",

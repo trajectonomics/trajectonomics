@@ -5,6 +5,11 @@ export type ColumnHint = {
 	key: string
 	label: string
 	align?: "left" | "right"
+	/**
+	 * How the value reads as text, for a value a plain cell cannot show, such as a list. It only
+	 * chooses the text: the cell is escaped and padded as any other.
+	 */
+	show?: (value: unknown) => unknown
 }
 
 type Cells = readonly (readonly string[])[]
@@ -15,7 +20,9 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 
 function cellsOf(row: unknown, columns: readonly ColumnHint[]): readonly string[] {
 	const record = isRecord(row) ? row : {}
-	return columns.map((column) => cell(record[column.key]))
+	return columns.map((column) =>
+		cell(column.show === undefined ? record[column.key] : column.show(record[column.key])),
+	)
 }
 
 function padded(value: string, width: number, align: ColumnHint["align"]): string {

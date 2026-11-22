@@ -1,8 +1,10 @@
 import type { Baseline, Scenario, Timeline } from "@trajectonomics/core/sim"
 import { BASELINE_CURRENCY } from "../baseline/kind"
-import { type AppError, isAppError } from "../errors"
+import { type AppError, fail, isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
 import { scenarioNotFound } from "../scenario/errors"
+import { householdDocument } from "../scenario/household/document"
+import type { Household } from "../scenario/household/model"
 import { applyScenarioSets } from "../scenario/set-apply"
 import type { AppliedOverride } from "../scenario/set-error"
 import type { Store } from "../store"
@@ -28,6 +30,8 @@ export type Prepared = {
 	tax: TaxStatus
 	/** The input field the Scenario's name came from, so a stored record names the flag. */
 	scenarioPath: string
+	/** The Scenario's household, parsed from its stored text; null when none is set (cli ADR-0048). */
+	household: Household | null
 }
 
 /** The caller's side of one prepared Projection: which Scenario, from where, under which Sets. */
@@ -72,6 +76,8 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	if (isAppError(applied)) return applied
 	const unsupported = thbOnly(applied.document)
 	if (unsupported !== null) return unsupported
+	const household = householdOfRow(row.household)
+	if (isAppError(household)) return household
 	const mapped = input.baseline()
 	if (isAppError(mapped)) return mapped
 	// The effective hash is the stored hash function applied to the document after the Overrides.
@@ -96,5 +102,16 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		timeline: { start: input.asOf, horizon: input.horizon, resolution: "month" },
 		tax: hasAnyLevy(applied.document) ? "applied" : "not_applied",
 		scenarioPath: input.scenarioPath,
+		household,
 	}
+}
+
+/** A stored household, parsed again: a row written by `scenario household` always parses. */
+function householdOfRow(stored: string | null): Household | null | AppError {
+	if (stored === null) return null
+	const parsed = householdDocument.safeParse(JSON.parse(stored))
+	if (!parsed.success) {
+		return fail("internal", { message: "The stored household does not parse as a household." })
+	}
+	return parsed.data
 }
