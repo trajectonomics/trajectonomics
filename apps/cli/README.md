@@ -175,7 +175,7 @@ and where it came from, and one that starts on a period boundary needs nothing:
 
 ## Chance of success
 
-> **Ships in 0.7.0.**
+> **Ships in 0.8.0.**
 
 `traj projection chance` runs one Scenario over seeded Market paths and reports
 the share that never run out before the Horizon, with the net-worth Bands at each

@@ -1,12 +1,20 @@
 import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
-import { isAppError } from "../../errors"
+import { fail, isAppError } from "../../errors"
+import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
 import { chanceOf } from "../../projection/chance"
 import { readReturnModel, returnModelFlagDocument } from "../../projection/chance-model"
 import { chanceHint, chanceView } from "../../projection/chance-view"
-import { asOfFlag, horizonFlag, PROJECTION_ERROR_CODES, scenarioFlag } from "../../projection/flags"
+import {
+	asOfFlag,
+	carryInFlag,
+	carryInFlagDocument,
+	horizonFlag,
+	PROJECTION_ERROR_CODES,
+	scenarioFlag,
+} from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
 
 /** The method in the words a help page prints: what runs, and what the result does not say. */
@@ -17,12 +25,13 @@ export const chance: Leaf = defineCommand({
 	name: "chance",
 	summary: "Report the chance a Scenario holds to its Horizon, over seeded Market paths",
 	description: CHANCE_METHOD,
-	note: "Chance of success ships in 0.7.0.",
+	note: "Chance of success ships in 0.8.0.",
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,
 		horizon: horizonFlag,
 		scenario: scenarioFlag,
+		carryIn: carryInFlag,
 		returnModel: z
 			.string()
 			.describe("The Return model JSON file the Market paths draw from, in the sim format."),
@@ -34,7 +43,7 @@ export const chance: Leaf = defineCommand({
 			.string()
 			.describe("Sixteen lower-case hex digits. The same seed and model give the same paths."),
 	}),
-	flagDocuments: [returnModelFlagDocument],
+	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
 	output: chanceView,
 	render: chanceHint,
 	examples: [
@@ -51,8 +60,18 @@ export const chance: Leaf = defineCommand({
 	],
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
+		// Standard input can be read once, so only one of the two documents may come from it.
+		if (input.returnModel === "-" && input.carryIn === "-") {
+			return fail("invalid_input", {
+				path: "--carry-in",
+				message: "--carry-in: standard input already holds the Return model",
+				hint: "Read one of the two documents from a file: --return-model PATH or --carry-in PATH.",
+			})
+		}
 		const model = await readReturnModel(input.returnModel, ctx.stdin)
 		if (isAppError(model)) return model
+		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
+		if (isAppError(records)) return records
 		return withProjection(input, ctx, (prepare) => {
 			const prepared = prepare({
 				scenario: input.scenario,
@@ -60,7 +79,7 @@ export const chance: Leaf = defineCommand({
 				sets: [],
 			})
 			if (isAppError(prepared)) return prepared
-			const placed = withCarryInSide({ prepared, records: [], asOf: input.asOf })
+			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
 			return chanceOf(placed, model, { seed: input.seed, paths: input.paths })
 		})
