@@ -28,6 +28,18 @@ describe("the Edit list", () => {
 		expect(editSchema.safeParse({ kind: "copy-plan", from: "base" }).success).toBe(false)
 		expect(editSchema.safeParse({ kind: "delete-plan", name: "" }).success).toBe(false)
 	})
+
+	test("the schema refuses a flag-shaped name in every field, so traj never reads one as a flag", () => {
+		for (const edit of [
+			{ kind: "copy-plan", from: "base", name: "--help" },
+			{ kind: "copy-plan", from: "--help", name: "early" },
+			{ kind: "apply-plan", name: "-h", document: {} },
+			{ kind: "delete-plan", name: "--dry-run" },
+			{ kind: "delete-plan", name: "a\nb" },
+		]) {
+			expect(editSchema.safeParse(edit).success).toBe(false)
+		}
+	})
 })
 
 describe("writeCommand", () => {

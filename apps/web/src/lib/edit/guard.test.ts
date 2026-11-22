@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { refuseEdit, refuseSession } from "./guard"
+import { refuseEdit, refuseSession, sameToken } from "./guard"
 
 const GOOD = {
 	method: "POST",
@@ -24,11 +24,32 @@ describe("refuseEdit", () => {
 		expect(refuseEdit({ ...GOOD, host: null })?.code).toBe("bad_host")
 	})
 
-	test("refuses an Origin other than this server's own, and a missing one", () => {
-		expect(refuseEdit({ ...GOOD, origin: "http://evil.example" })?.code).toBe("bad_origin")
-		expect(refuseEdit({ ...GOOD, origin: "http://localhost:4321" })?.code).toBe("bad_origin")
-		expect(refuseEdit({ ...GOOD, origin: "http://127.0.0.1:9999" })?.code).toBe("bad_origin")
-		expect(refuseEdit({ ...GOOD, origin: null })?.code).toBe("bad_origin")
+	test("refuses an Origin other than the Host the page was opened at, and a missing one", () => {
+		for (const origin of [
+			"http://evil.example",
+			"http://localhost:4321",
+			"http://127.0.0.1:9999",
+			"http://127.0.0.1:4321.evil.example",
+			"http://127.0.0.1:4321/",
+			"https://127.0.0.1:4321",
+			"null",
+			null,
+		]) {
+			expect(refuseEdit({ ...GOOD, origin })?.code).toBe("bad_origin")
+		}
+	})
+
+	test("accepts the page opened at localhost or [::1], when the Origin is that same Host", () => {
+		expect(
+			refuseEdit({ ...GOOD, host: "localhost:4321", origin: "http://localhost:4321" }),
+		).toBeNull()
+		expect(
+			refuseEdit({ ...GOOD, host: "LOCALHOST:4321", origin: "http://localhost:4321" }),
+		).toBeNull()
+		expect(refuseEdit({ ...GOOD, host: "[::1]:4321", origin: "http://[::1]:4321" })).toBeNull()
+		expect(
+			refuseEdit({ ...GOOD, host: "localhost:4321", origin: "http://127.0.0.1:4321" })?.code,
+		).toBe("bad_origin")
 	})
 
 	test("refuses a missing or wrong session token", () => {
@@ -55,6 +76,17 @@ describe("refuseEdit", () => {
 
 	test("checks the Host before the Origin, so a foreign Host is never told about the Origin", () => {
 		expect(refuseEdit({ ...GOOD, host: "evil.example:4321", origin: null })?.code).toBe("bad_host")
+	})
+})
+
+describe("sameToken", () => {
+	test("is true only for the same token, character for character", () => {
+		expect(sameToken("t-secret", "t-secret")).toBe(true)
+		expect(sameToken("t-secreT", "t-secret")).toBe(false)
+		expect(sameToken("t-secret-", "t-secret")).toBe(false)
+		expect(sameToken("t-secre", "t-secret")).toBe(false)
+		expect(sameToken("", "t-secret")).toBe(false)
+		expect(sameToken(null, "t-secret")).toBe(false)
 	})
 })
 

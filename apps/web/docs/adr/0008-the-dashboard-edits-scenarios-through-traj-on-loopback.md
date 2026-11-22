@@ -13,7 +13,8 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - **The page gets a token, and only the page.** `GET /edit-session` answers `{"token": …}` after the Host check, with `Cache-Control: no-store` and no CORS header, so a foreign page cannot read it. The token is a random value made when the server starts. The page holds it in memory and sends it in the `x-traj-edit-token` header of every Edit.
 - **`POST /edit` refuses, each refusal with its own test** (`src/lib/edit/guard.ts`, `scripts/serve-edit.test.ts`):
   - a Host other than this machine's, with 403;
-  - an `Origin` other than `http://127.0.0.1:<port>`, a missing one included, with 403;
+  - an `Origin` other than `http://` plus the request's own loopback Host (`127.0.0.1`, `localhost` or `[::1]` on the server's port), a missing one included, with 403;
+  - a plan name that starts with `-`, holds a control character or is over 100 characters, with 400 (`invalid_edit`): `traj` has no `--`, so `--help` would be read as a flag, print help, write nothing and exit 0;
   - a missing or wrong token, with 403;
   - a `Content-Type` other than `application/json`, with 415;
   - an Edit before the first Snapshot is in, with 503;

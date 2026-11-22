@@ -5,6 +5,13 @@
  * this list ever runs. `edit.test.ts` pins the list and the argv of each Edit.
  */
 import { z } from "zod"
+import { planNameShapeError } from "./name"
+
+/** A plan name as `traj` takes it: not empty, and never shaped like a flag (see `planNameShapeError`). */
+const planName = z
+	.string()
+	.min(1)
+	.refine((name) => planNameShapeError(name) === null, { message: "not a plan name traj can take" })
 
 /** The kinds of Edit, in the order the list names them. */
 export const EDIT_KINDS = ["copy-plan", "apply-plan", "delete-plan"] as const
@@ -13,17 +20,17 @@ export const EDIT_KINDS = ["copy-plan", "apply-plan", "delete-plan"] as const
 export const editSchema = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("copy-plan"),
-		from: z.string().min(1),
-		name: z.string().min(1),
+		from: planName,
+		name: planName,
 	}),
 	z.strictObject({
 		kind: z.literal("apply-plan"),
-		name: z.string().min(1),
+		name: planName,
 		document: z.record(z.string(), z.unknown()),
 	}),
 	z.strictObject({
 		kind: z.literal("delete-plan"),
-		name: z.string().min(1),
+		name: planName,
 	}),
 ])
 

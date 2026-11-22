@@ -60,6 +60,8 @@ export async function startDashboard(options: DashboardOptions): Promise<Dashboa
 		server = Bun.serve({
 			hostname: "127.0.0.1",
 			port: options.port,
+			// An Edit is a small JSON document; a body over 1 MiB is refused before it is read.
+			maxRequestBodySize: 1024 * 1024,
 			fetch: (request, self): Promise<Response> | Response => {
 				const port = self.port ?? options.port
 				const { pathname } = new URL(request.url)

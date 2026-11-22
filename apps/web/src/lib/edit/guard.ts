@@ -35,9 +35,26 @@ export type EditFacts = SessionFacts & {
 	busy: boolean
 }
 
-/** The Origin an Edit must come from: this server's own address, and no other. */
-export function ownOrigin(port: number): string {
-	return `http://127.0.0.1:${port}`
+/**
+ * The Origin an Edit must come from: the loopback address the page was opened at, which is the
+ * request's own Host. Called only after the Host check, so the Host is 127.0.0.1, localhost or [::1]
+ * on this server's port.
+ */
+export function ownOrigin(host: string): string {
+	return `http://${host.toLowerCase()}`
+}
+
+/**
+ * Whether the token sent equals the server's, comparing every character, so the time taken does not
+ * say where a guess first differs. Only the length can differ early, and the token's length is fixed.
+ */
+export function sameToken(given: string | null, expected: string): boolean {
+	if (given === null || given.length !== expected.length) return false
+	let difference = 0
+	for (let index = 0; index < expected.length; index++) {
+		difference |= given.charCodeAt(index) ^ expected.charCodeAt(index)
+	}
+	return difference === 0
 }
 
 /** The media type of a Content-Type header, without its parameters, lower-cased. */
@@ -53,16 +70,21 @@ export function refuseSession(facts: SessionFacts): Refusal | null {
 }
 
 /**
- * Refuses an Edit that does not hold every rule, checked in this order: POST, this Host, this Origin,
+ * Refuses an Edit that does not hold every rule, checked in this order: POST, this Host, an Origin that is that Host,
  * the session token, `application/json`, a Snapshot to re-read, and no Edit already running.
  */
 export function refuseEdit(facts: EditFacts): Refusal | null {
 	if (facts.method !== "POST") return refusal(405, "method_not_allowed", "Use POST.")
 	if (!isLoopbackHost(facts.host, facts.port)) return refusal(403, "bad_host", HOST_MESSAGE)
-	if (facts.origin !== ownOrigin(facts.port)) {
-		return refusal(403, "bad_origin", `An Edit must come from ${ownOrigin(facts.port)}.`)
+	const origin = ownOrigin(facts.host ?? "")
+	if (facts.origin === null || facts.origin.toLowerCase() !== origin) {
+		return refusal(
+			403,
+			"bad_origin",
+			`An Edit must come from ${origin}, the page it was opened at.`,
+		)
 	}
-	if (facts.token !== facts.expectedToken) {
+	if (!sameToken(facts.token, facts.expectedToken)) {
 		return refusal(403, "bad_token", "The Edit has no valid session token. Reload the Dashboard.")
 	}
 	if (mediaTypeOf(facts.contentType) !== "application/json") {
