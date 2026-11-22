@@ -8,6 +8,18 @@
  * A section on the page surface. The first one meets the hero's fade in the same flat colour and carries
  * no border, so there is no seam (ADR 0010); the sections after it alternate with the muted ones.
  */
+/*
+ * Every section is positioned, so it paints after the hero in the page's stacking order. The hero's
+ * drifting field overflows the hero by 6 % on every side (blast.css); the hero clips it from view, but
+ * axe models the field as covering the text just below the hero and cannot judge its contrast. A
+ * positioned section above it is what the page already looks like. Nothing in a section is laid out
+ * against an outer containing block, so this moves no pixel.
+ */
+.section-surface,
+.section-muted {
+	position: relative;
+}
+
 .section-surface {
 	background: var(--ds-color-background);
 	color: var(--ds-color-foreground);

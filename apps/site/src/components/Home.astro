@@ -20,9 +20,9 @@ const dictionary = dictionaryFor(language)
 ---
 
 <Layout language={language} title={dictionary.documentTitle} description={dictionary.description} indexed={true}>
+	<Consent dictionary={dictionary} />
 	<Hero dictionary={dictionary} />
 	<Features dictionary={dictionary} />
 	<Faq dictionary={dictionary} />
 	<Closing dictionary={dictionary} />
-	<Consent dictionary={dictionary} />
 </Layout>

@@ -1,28 +1,44 @@
 /*
- * The cookie banner (ADR 0024): a compact card fixed to the bottom edge, one line of text and two
- * links. It keeps the phone's 16 px gutter and never scrolls sideways. The Worker leaves it out of
- * the page once the visitor has answered. Colours are Theme roles, so light and dark both keep their contrast.
+ * The cookie banner (ADR 0024): a slim bar at the top of `main`, in the page's own flow, with the
+ * question and two links. It is never fixed over the page: axe cannot judge text that overlays
+ * different content on each of its lines, and ADR 0021 fails a page axe cannot judge. It keeps the
+ * phone's 16 px gutter and never scrolls sideways. The Worker leaves it out of the page once the
+ * visitor has answered. Colours are Theme roles, so both themes keep their contrast.
  */
 
 .consent {
-	position: fixed;
-	right: 1rem;
-	bottom: max(1rem, env(safe-area-inset-bottom));
-	left: 1rem;
-	z-index: 40;
+	/* The header is fixed and 64 px tall (global.css), so the bar starts below it, not under it. */
+	margin-top: 4rem;
+	/*
+	 * Above the hero in the stacking order: the hero's drifting field overflows the hero by 6 % on
+	 * every side (blast.css), and although the hero clips it from view, a bar painted under it would
+	 * be one axe cannot judge.
+	 */
+	position: relative;
+	z-index: 1;
 	display: flex;
-	max-width: 26rem;
-	flex-direction: column;
-	gap: 12px;
-	margin-inline: auto;
-	padding: 16px;
-	border: 1px solid var(--ds-color-border);
-	border-radius: var(--ds-radius-md);
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 12px 16px;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--ds-color-border);
 	background: var(--ds-color-card);
 	color: var(--ds-color-card-foreground);
 }
 
+/*
+ * The hero's top padding clears the fixed header, and the bar has already cleared it, so while the
+ * bar is shown the hero keeps 16 px. That holds the demo window within 46 px of where it stands on
+ * a visit without the bar, so it still starts playing on a 1280 x 720 screen, as the demo's
+ * in-view trigger (120 px above the fold) expects.
+ */
+html:not([data-consent]) .consent + [data-hero] .hero-rise {
+	padding-top: 1rem;
+}
+
 .consent-text {
+	max-width: 46rem;
 	margin: 0;
 	font-size: 0.875rem;
 	line-height: 1.5;
