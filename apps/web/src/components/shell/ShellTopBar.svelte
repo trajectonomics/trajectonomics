@@ -10,6 +10,16 @@ interface Props {
 }
 
 let { title }: Props = $props()
+let menuButton: HTMLButtonElement | undefined = $state()
+let wasOpen = false
+
+// When the menu drawer closes, focus goes back to the button that opened it, so a keyboard reader keeps
+// their place. The button is hidden on a wide screen, where the drawer never opens.
+$effect(() => {
+	const open = shellPanels.menu
+	if (wasOpen && !open) menuButton?.focus()
+	wasOpen = open
+})
 
 const BUTTON = cx(
 	"inline-flex shrink-0 items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm",
@@ -22,6 +32,7 @@ const BUTTON = cx(
 	<div class="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 pt-3 sm:px-6">
 		<button
 			type="button"
+			bind:this={menuButton}
 			class={cx(BUTTON, "lg:hidden")}
 			aria-controls="page-menu"
 			aria-expanded={shellPanels.menu}
