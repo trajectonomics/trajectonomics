@@ -24,8 +24,11 @@ Or paste this to your agent, which runs it for you:
 > so and give me the command above to run myself.
 
 The onboarding skill installs the `traj` command line and then the published skill set, from the one
-commit it was installed from. The `skills` CLI version this skill is checked against, `skills@1.9.0`,
-needs Node 22.20 or later. The `traj` command line the skill installs needs Node 20 or later.
+commit it was installed from, and tells you at the end which commit, which `traj` version and which
+CLI Range it set up. The `skills` CLI version this skill is checked against, `skills@1.9.0`, needs
+Node 22.20 or later, and it is the oldest that writes that `commit` into the lock. Where the lock
+has none (`skills@1.7.6` writes none), the skill runs the install again as `npx -y skills@1.9.0 add …`
+and reads the new entry. The `traj` command line the skill installs needs Node 20 or later.
 
 ---
 

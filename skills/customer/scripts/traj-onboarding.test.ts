@@ -67,11 +67,11 @@ describe("the traj-onboarding Skill", () => {
 		expect(stepTwo).toContain("skills-lock.json")
 		expect(stepTwo).toContain("Never install from `main`")
 		expect(stepTwo).toContain("skills.manifest.json")
-		expect(stepTwo).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name>`)
+		expect(stepTwo).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name>`)
 		expect(stepTwo).toContain("add `-g` when the project list did not name `traj-onboarding`")
 		expect(stepTwo).toContain("Skip a row below its floor")
 		expect(stepTwo).toContain("install `traj` alone from the pin")
-		expect(body).toContain("skills list --json")
+		expect(body).toContain("skills@1.9.0 list --json")
 		expect(body).not.toContain("internal-skills")
 	})
 
