@@ -36,9 +36,7 @@ if (record !== undefined) {
 		now: () => new Date().toISOString(),
 		newUuid: () => crypto.randomUUID(),
 		readState: () => readState(process.env),
-		writeState: (state) => {
-			writeState(process.env, state)
-		},
+		writeState: (state) => writeState(process.env, state) === undefined,
 		spawnSender,
 		notice: (line) => console.error(line),
 	})

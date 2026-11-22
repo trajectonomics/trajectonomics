@@ -26,6 +26,7 @@ function harness(overrides: Partial<AfterRunInput> & { state?: TelemetryState } 
 		writeState: (next) => {
 			state = next
 			calls.written.push(next)
+			return true
 		},
 		spawnSender: (body) => calls.spawned.push(body),
 		notice: (text) => calls.notices.push(text),
@@ -97,14 +98,26 @@ describe("afterRun", () => {
 		expect(() => afterRun(failingSpawn)).not.toThrow()
 	})
 
-	it("still sends when the id cannot be saved", () => {
-		const { input, calls } = harness({
+	it("sends nothing and prints nothing when a new id cannot be saved", () => {
+		const refused = harness({ writeState: () => false })
+		afterRun(refused.input)
+		expect(refused.calls.spawned).toEqual([])
+		expect(refused.calls.notices).toEqual([])
+		const throwing = harness({
 			writeState: () => {
 				throw new Error("read-only")
 			},
 		})
+		afterRun(throwing.input)
+		expect(throwing.calls.spawned).toEqual([])
+		expect(throwing.calls.notices).toEqual([])
+	})
+
+	it("still sends under a saved id when only the notice flag cannot be saved", () => {
+		const { input, calls } = harness({ state: { enabled: true, id: ID }, writeState: () => false })
 		afterRun(input)
 		expect(calls.spawned).toHaveLength(1)
+		expect(calls.notices).toEqual([NOTICE])
 	})
 })
 

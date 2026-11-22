@@ -217,7 +217,7 @@ traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 
 It never holds your ledger, arguments, flag values, account names, amounts, file paths, the data directory or any environment variable. As with any web request, PostHog sees the IP address the request comes from.
 
-The random id that groups one machine's events is in `telemetry.json`, in `$XDG_CONFIG_HOME/traj` (or `~/.config/traj`), or in `%APPDATA%\traj` on Windows. It lives outside the data directory, so `traj data remove` does not delete it. `traj telemetry off` deletes it.
+The random id that groups one machine's events is in `telemetry.json`, in `$XDG_CONFIG_HOME/traj` (or `~/.config/traj`), or in `%APPDATA%\traj` on Windows. It lives outside the data directory, so `traj data remove` does not delete it. `traj telemetry off` deletes it. A machine where that file cannot be written sends nothing.
 
 There are three ways to stop it:
 

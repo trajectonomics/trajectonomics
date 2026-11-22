@@ -14,11 +14,21 @@ export type AfterRunInput = {
 	now: () => string
 	newUuid: () => string
 	readState: () => TelemetryState
-	writeState: (state: TelemetryState) => void
+	/** Saves the state file, and says whether it was saved. */
+	writeState: (state: TelemetryState) => boolean
 	/** Starts the sender with the event body; it must not wait for the network. */
 	spawnSender: (body: string) => void
 	/** Writes the one-time notice; it goes to stderr and only on a successful run. */
 	notice: (text: string) => void
+}
+
+/** Saves the state through the injected writer; a writer that throws counts as not saved. */
+function saved(input: AfterRunInput, state: TelemetryState): boolean {
+	try {
+		return input.writeState(state)
+	} catch {
+		return false
+	}
 }
 
 /**
@@ -33,13 +43,10 @@ export function afterRun(input: AfterRunInput): void {
 		if (!decision.enabled) return
 		const id = current.id ?? input.newUuid()
 		const state: TelemetryState = { ...current, id }
-		if (current.id === undefined) {
-			try {
-				input.writeState(state)
-			} catch {
-				// The id lives in memory for this run; the next run starts a new one. The event still counts.
-			}
-		}
+		// An id that cannot be saved would be a new "person" on every run, which would inflate the
+		// weekly count and repeat the notice each time (a read-only home in an agent's sandbox, say).
+		// Such a machine sends nothing and prints nothing (ADR-0045).
+		if (current.id === undefined && !saved(input, state)) return
 		input.spawnSender(
 			JSON.stringify(
 				usageEvent({
@@ -55,11 +62,8 @@ export function afterRun(input: AfterRunInput): void {
 		)
 		if (input.record.exitCode === 0 && state.noticeShown !== true) {
 			input.notice(NOTICE)
-			try {
-				input.writeState({ ...state, noticeShown: true })
-			} catch {
-				// A state file that cannot be written shows the notice again next time, which is the honest outcome.
-			}
+			// A file that took the id but not this flag shows the notice again next time: the honest outcome.
+			saved(input, { ...state, noticeShown: true })
 		}
 	} catch {
 		// Telemetry never changes what a person sees from their command.
