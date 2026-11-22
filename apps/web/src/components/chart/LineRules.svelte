@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { LineLayout } from "../../lib/chart"
+import { type LineLayout, labelRows } from "../../lib/chart"
 import { HEIGHT, MARGIN } from "./geometry"
 
 interface Props {
@@ -8,9 +8,14 @@ interface Props {
 }
 
 let { layout, width }: Props = $props()
+/** Each label's row, so labels on the same or nearby dates never overlap. */
+const rows = $derived(labelRows(layout.markers, width))
+/** The height of one label row, in pixels. */
+const ROW_PX = 14
 </script>
 
-<!-- A vertical rule at each marker, labelled at its top. A label past the middle hangs to the left of its rule. -->
+<!-- A vertical rule at each marker, labelled near its top. A label past the middle hangs to the left of its
+rule, and a label that would overlap an earlier one moves down a row. -->
 {#each layout.markers as marker, index (index)}
 	{@const hangLeft = marker.x > width / 2}
 	<g>
@@ -25,7 +30,7 @@ let { layout, width }: Props = $props()
 		/>
 		<text
 			x={hangLeft ? marker.x - 4 : marker.x + 4}
-			y={MARGIN.top + 10}
+			y={MARGIN.top + 10 + (rows[index] ?? 0) * ROW_PX}
 			text-anchor={hangLeft ? "end" : "start"}
 			class="fill-foreground text-xs">{marker.label}</text
 		>
