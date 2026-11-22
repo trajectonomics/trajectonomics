@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { consentCookies } from "../analytics/consent"
+import { consentCookies, visitorCookie } from "../analytics/consent"
 import { languageChoiceCookie } from "../language/stored-choice"
 import { checkProbeResponses } from "./check-probe"
 import { PROBES, type Probe, type ProbeResponse } from "./probes"
@@ -9,6 +9,7 @@ const MINTED = "11111111-2222-4333-8444-555555555555"
 
 /** The cookies a healthy Worker sets for one probe: a Language choice, or a consent answer. */
 function cookiesOf(probe: Probe): readonly string[] {
+	if (probe.setsConsent === "visitor") return [visitorCookie(MINTED)]
 	if (probe.setsConsent !== null) {
 		return consentCookies(probe.setsConsent, probe.setsConsent === "granted" ? MINTED : "")
 	}

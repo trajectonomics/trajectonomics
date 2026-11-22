@@ -24,7 +24,7 @@ export interface Probe {
 	/** The `Sec-GPC` header the request carries, or `null` when it sends none. */
 	readonly secGpc: string | null
 	/** The consent choice the answer must store in its two consent cookies, or `null` for none. */
-	readonly setsConsent: ConsentChoice | "reset" | null
+	readonly setsConsent: ConsentChoice | "reset" | "visitor" | null
 	/** Text the answer's body must contain, in any order. */
 	readonly contains: readonly string[]
 	/** Text the answer's body must not contain. */

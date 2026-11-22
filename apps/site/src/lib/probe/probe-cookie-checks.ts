@@ -16,7 +16,10 @@ const MINTED_VISITOR = new RegExp(
  * The consent answer's cookies. A refusal and a reset are exact; a grant writes the answer and a
  * visitor id, which is minted, so only its shape is judged.
  */
-function checkConsentCookies(response: ProbeResponse, choice: "granted" | "denied" | "reset") {
+function checkConsentCookies(
+	response: ProbeResponse,
+	choice: "granted" | "denied" | "reset" | "visitor",
+) {
 	const { probe, setCookies } = response
 	const [first, second] = setCookies
 	const judged =
@@ -24,7 +27,9 @@ function checkConsentCookies(response: ProbeResponse, choice: "granted" | "denie
 			? setCookies.length === 2 &&
 				GRANTED_CONSENT.test(first ?? "") &&
 				MINTED_VISITOR.test(second ?? "")
-			: JSON.stringify(setCookies) === JSON.stringify(consentCookies(choice, ""))
+			: choice === "visitor"
+				? setCookies.length === 1 && MINTED_VISITOR.test(first ?? "")
+				: JSON.stringify(setCookies) === JSON.stringify(consentCookies(choice, ""))
 	if (judged) return []
 	return [
 		probeFailure(

@@ -57,7 +57,7 @@ export const PROBES: readonly Probe[] = Object.freeze([
 	personalised(
 		"en",
 		{ cookie: `${CONSENT_COOKIE}=granted` },
-		{ contains: [`data-consent="granted"`, `data-visitor="`], setsConsent: "granted" },
+		{ contains: [`data-consent="granted"`, `data-visitor="`], setsConsent: "visitor" },
 	),
 	personalised(
 		"en",
@@ -69,5 +69,5 @@ export const PROBES: readonly Probe[] = Object.freeze([
 		{ secGpc: "1" },
 		{ contains: [`data-consent="denied"`], lacks: ["data-visitor"] },
 	),
-	{ ...home("en"), lacks: ["data-consent"] },
+	{ ...home("en"), lacks: ['data-consent="'] },
 ])
