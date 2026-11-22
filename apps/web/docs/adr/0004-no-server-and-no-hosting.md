@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded in part by 0007 (the loopback server)
 ---
 
 # No server and no hosting

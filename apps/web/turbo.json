@@ -1,0 +1,15 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"outputs": ["dist/**", "pack/**"]
+		},
+		"test": {
+			"dependsOn": ["^build", "@trajectonomics/cli#build"]
+		},
+		"check": {
+			"dependsOn": ["^build", "^check", "@trajectonomics/cli#build"]
+		}
+	}
+}

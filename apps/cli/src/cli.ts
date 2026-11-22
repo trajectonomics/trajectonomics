@@ -60,10 +60,11 @@ async function dispatch(
 	env: Env,
 	root: Group,
 	stdin: Stdin,
+	notify: (line: string) => void,
 ): Promise<Dispatched | AppError> {
 	const invocation = await route(argv, root, stdin)
 	if (isAppError(invocation)) return invocation
-	const ctx: Context = { env, root, stdin }
+	const ctx: Context = { env, root, stdin, notify }
 	const result = await invocation.leaf.run(invocation.input, invocation.document, ctx)
 	// The dispatch step knows the leaf, so a command-raised failure follows ADR-0013's input paths.
 	if (isAppError(result)) return dispatchFailure(invocation.leaf, invocation.path, result)
@@ -99,7 +100,7 @@ export async function run(
 	const choice = resolveFormat(argv, env)
 	try {
 		if (choice.invalid !== undefined) return badFormat(choice.invalid, io)
-		const outcome = await dispatch(argv, env, root, stdin)
+		const outcome = await dispatch(argv, env, root, stdin, io.err)
 		if (isAppError(outcome)) return failureOf(outcome, choice.format, io)
 		io.out(renderResult(outcome.data, choice.format, outcome.hint))
 		return 0

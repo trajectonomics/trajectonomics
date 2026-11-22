@@ -4,6 +4,7 @@ import { account } from "./account"
 import { backup } from "./backup"
 import { balance } from "./balance"
 import { baseline } from "./baseline"
+import { dashboard } from "./dashboard"
 import { data } from "./data"
 import { doctor } from "./doctor"
 import { exportCommand } from "./export"
@@ -28,6 +29,7 @@ export const root: Group = defineGroup({
 		backup,
 		balance,
 		baseline,
+		dashboard,
 		data,
 		doctor,
 		exportCommand,

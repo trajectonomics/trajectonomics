@@ -21,6 +21,11 @@ export type Context = {
 	root: Group
 	/** Reads all of stdin; only a form that names `-` calls it: a document form, or `tx import -`. */
 	stdin: () => Promise<string>
+	/**
+	 * Writes one progress line to stderr while a command runs, outside its result. Only a leaf that
+	 * keeps running, such as `dashboard`, calls it; the result is still the one envelope on stdout.
+	 */
+	notify?: (line: string) => void
 }
 
 /** A field the document form cannot work without, and the sentence naming what is missing. It is

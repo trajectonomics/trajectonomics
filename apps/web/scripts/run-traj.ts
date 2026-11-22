@@ -3,9 +3,14 @@ import type { Read } from "../src/lib/contract"
 import { decodeRead } from "../src/lib/snapshot/decode-read"
 import { spawnCapture } from "./spawn"
 
-/** Where the `traj` binary is and the environment its calls run in (TRAJ_HOME selects the ledger). */
+/**
+ * Where the `traj` binary is and the environment its calls run in (TRAJ_HOME selects the ledger).
+ * `prefix` goes between the binary and the read's argv: `traj dashboard` run from source is
+ * `bun src/index.ts`, so its binary is Bun and its prefix is the entry file.
+ */
 export type RunContext = {
 	binary: string
+	prefix?: readonly string[]
 	env?: Record<string, string | undefined>
 }
 
@@ -20,7 +25,10 @@ export async function runTraj<T>(
 	stdin?: string,
 ): Promise<Read<T>> {
 	try {
-		const captured = await spawnCapture([context.binary, ...argv], { env: context.env, stdin })
+		const captured = await spawnCapture([context.binary, ...(context.prefix ?? []), ...argv], {
+			env: context.env,
+			stdin,
+		})
 		return decodeRead(argv, captured, schema)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
