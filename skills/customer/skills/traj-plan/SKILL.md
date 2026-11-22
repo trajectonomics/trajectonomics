@@ -39,6 +39,16 @@ The plan's baseline is the person's ledger, so a balance the tool refuses as und
 Scenario does not carry that account yet: declare the account the ledger already has, rather than
 renaming or dropping it.
 
+## Name every fork, and offer to remove it
+
+Every fork this conversation makes (the Tax Baseline, a what-if) is named `<scenario>-<question>`: the
+Scenario it came from, then a short slug of the question it answers, such as `base-tax-baseline` or
+`base-rmf-50000`. Run `traj scenario list --json` first and pick a name no live Scenario holds, so a
+second question never collides with the first. Keep a list of the names you made.
+
+When the answers are given, offer to remove those forks with `traj scenario rm <name>`, naming each.
+Remove one only on the person's yes, and only a name on your list: the person's own Scenarios stay.
+
 ## Step 1: the financial-independence date
 
 Run `traj fi --as-of <as-of> --horizon <horizon> --scenario <scenario> --json`, and report:
@@ -157,7 +167,10 @@ There are two ways to show a deduction, one for each kind:
   compare with `--set`, which replaces that Flow's amount:
   `traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json`.
   `--set` replaces a path that exists and cannot add one, so when the Scenario has no such Flow, add
-  it to the document first and then compare. Amounts are integer satang: 100 THB is 10000 satang.
+  it to the document first. Step T2's `--label` never covered that Flow, so write the Tax Baseline's
+  Levy again before comparing: `traj scenario tax <name> --tax th-2026` with the same flags and labels
+  as Step T2 plus `--label <flow>=<label>`, the class the person chose in Step T1. Compare only after
+  that. Amounts are integer satang: 100 THB is 10000 satang.
 
 Read the result. Its `deltas` carry net worth and financial-independence timing; they do not carry tax
 owed. Report each side's `owed` figure for tax year 2026, from that side's `taxYears`, side by side, as
