@@ -29,6 +29,8 @@ export interface Dictionary {
 	/** The release date as this Language writes it; the machine-readable date is the snapshot's `releasedOn`. */
 	readonly releaseDate: string
 	readonly docsLink: string
+	/** The header's link to the blog. */
+	readonly blogLink: string
 	/** The header's one repository link, heard with its star count: the GitHub mark, the count and an arrow. */
 	readonly repoLinkLabel: string
 	/** The See it in action section's small label, which the page no longer draws. */

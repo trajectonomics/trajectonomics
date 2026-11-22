@@ -33,6 +33,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 			"A coding agent that can run commands, such as Claude Code, Codex or Cursor.",
 		] as const),
 		docsLink: "Docs",
+		blogLink: "Blog",
 		repoLinkLabel: "GitHub stars",
 		cliInstallLink: "Install the CLI directly",
 		copy: "Copy prompt to your AI agents",
