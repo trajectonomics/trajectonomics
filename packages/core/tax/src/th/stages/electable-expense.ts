@@ -1,11 +1,11 @@
 import { type ClampedAmount, clampCap } from "../../core/caps"
-import { floorByRate } from "../../core/money"
+import { floorByRateToSatang } from "../../core/money"
 import type { ThExpenseElectableIncome } from "../types"
 
 /**
  * Computes expense deduction for an electable income item (standard % vs actual).
  *
- * Math: If actual, clamp to item income. If standard, apply percentage of item income.
+ * Math: If actual, clamp to item income. If standard, apply percentage of item income, floored to the satang.
  * Units: THB major units.
  *
  * @param item Income item number or configuration object.
@@ -29,6 +29,6 @@ export function calculateElectableItemExpense(
 		const req = item.actualExpense ?? 0
 		return clampCap(req, amount, field)
 	}
-	const req = floorByRate(amount, standardRate)
+	const req = floorByRateToSatang(amount, standardRate)
 	return { requested: req, allowed: req, cap: amount, wasClamped: false }
 }

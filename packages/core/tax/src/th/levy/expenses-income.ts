@@ -12,7 +12,7 @@ import type { ThLevyTallies } from "./tallies"
  * 100,000 THB.
  *
  * Purpose: Mirrors the shared employment/service expense deduction as Measures.
- * Math: `min(floor((s1 + s2) * 0.5), 100000)` in whole baht, summed before the percentage.
+ * Math: `min(floor((s1 + s2) * 0.5), 100000)` floored to the satang, summed before the percentage.
  * Units: Integer satang Measures.
  * Throws: Nothing; both tallies are caller-supplied integer satang.
  * @statute Thailand Revenue Code Section 42 bis.

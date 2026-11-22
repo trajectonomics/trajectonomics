@@ -17,4 +17,8 @@ describe("Section 40(1) & 40(2) Expense Deductions", () => {
 		expect(res.cap).toBe(100_000)
 		expect(res.wasClamped).toBe(true)
 	})
+
+	it("floors 50% of an odd-baht income to the satang", () => {
+		expect(calculateExpenses40_1_2(100_001, 0).requested).toBe(50_000.5)
+	})
 })

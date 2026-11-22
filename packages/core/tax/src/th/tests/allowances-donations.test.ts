@@ -44,4 +44,10 @@ describe("Thailand Donation Allowances (calculateDonationAllowances)", () => {
 		expect(() => calculateDonationAllowances(-500, 0, 100_000)).toThrow(TaxValidationError)
 		expect(() => calculateDonationAllowances(0, -100, 100_000)).toThrow(TaxValidationError)
 	})
+
+	it("floors the 10% cap to the satang, so 100,009 baht of net gives a 10,000.90 baht cap", () => {
+		expect(calculateDonationAllowances(undefined, 50_000, 100_009).breakdown.donation1x.cap).toBe(
+			10_000.9,
+		)
+	})
 })

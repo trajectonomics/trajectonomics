@@ -51,4 +51,8 @@ describe("Section 40(8) Business and Tiered Entertainer Expense Deductions", () 
 		expect(calculateExpenses40_8({ entertainer: 0 }).allowed).toBe(0)
 		expect(calculateExpenses40_8({ entertainer: { amount: 0 } }).allowed).toBe(0)
 	})
+
+	it("floors the entertainer second tier to the satang, so 300,001 baht gives 180,000.40", () => {
+		expect(calculateExpenses40_8({ entertainer: 300_001 }).allowed).toBeCloseTo(180_000.4, 6)
+	})
 })

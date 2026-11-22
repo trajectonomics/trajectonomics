@@ -1,5 +1,5 @@
 import type { ClampedAmount } from "../../core/caps"
-import { floorByRate, validateMonetaryAmount } from "../../core/money"
+import { floorByRateToSatang, validateMonetaryAmount } from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { ThAllowanceField, type ThDonationsBreakdown } from "../types"
 
@@ -13,6 +13,7 @@ export interface ThDonationAllowancesResult {
  * Calculates qualified 2x and general 1x donation allowances.
  *
  * Math: 2x donations capped at 10% of net before donations; 1x donations capped at 10% of remaining net.
+ * Each cap is floored to the satang (owner ruling 2026-11-22, trajectonomics/trajectonomics#52).
  * Units: THB major units.
  *
  * @statute Thailand Revenue Code Section 47(7); Royal Decrees No. 428, 558.
@@ -28,7 +29,7 @@ export function calculateDonationAllowances(
 	const raw2x = donation2x ?? 0
 	validateMonetaryAmount(raw2x, ThAllowanceField.Donation2x)
 	const eligible2x = raw2x * p.donation2xMultiplier
-	const cap2x = floorByRate(net, p.donation2xMaxRate)
+	const cap2x = floorByRateToSatang(net, p.donation2xMaxRate)
 	const allowed2x = Math.min(eligible2x, cap2x)
 	const clamped2x: ClampedAmount = {
 		requested: raw2x,
@@ -40,7 +41,7 @@ export function calculateDonationAllowances(
 	const remainingNet = Math.max(0, net - allowed2x)
 	const raw1x = donation1x ?? 0
 	validateMonetaryAmount(raw1x, ThAllowanceField.Donation1x)
-	const cap1x = floorByRate(remainingNet, p.donation1xMaxRate)
+	const cap1x = floorByRateToSatang(remainingNet, p.donation1xMaxRate)
 	const allowed1x = Math.min(raw1x, cap1x)
 	const clamped1x: ClampedAmount = {
 		requested: raw1x,

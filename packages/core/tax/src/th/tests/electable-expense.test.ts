@@ -26,4 +26,8 @@ describe("Electable Item Expense calculation", () => {
 		expect(actual.allowed).toBe(45_000)
 		expect(actual.wasClamped).toBe(false)
 	})
+
+	it("floors the standard percentage to the satang, not the whole baht", () => {
+		expect(calculateElectableItemExpense(1_001.01, 0.6, "test.field").requested).toBe(600.6)
+	})
 })

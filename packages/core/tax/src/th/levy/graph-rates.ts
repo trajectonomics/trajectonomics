@@ -20,30 +20,18 @@ export function sumMeasures(graph: ThLevyGraph, ids: readonly string[], name?: s
 }
 
 /**
- * Emits `of` rounded down to a whole baht while keeping satang units.
+ * Emits `floor(income * rate)` to the satang, the shape the calculator's `floorByRateToSatang` computes.
  *
- * Purpose: Reproduces the calculator's whole-baht `Math.floor` steps exactly.
- * Math: `100 * floor(x / 100)` via two integer scales.
- * Units: Integer satang in and out.
- * Throws: Nothing; `of` must name an emitted Measure.
- * @statute Thailand Revenue Code Section 42 bis (whole-baht expense rounding).
- */
-export function flooredToBaht(graph: ThLevyGraph, of: string): string {
-	return graph.scale(graph.scale(of, 1, 100, ThLevyRounding.Floor), 100, 1, ThLevyRounding.Floor)
-}
-
-/**
- * Emits `floor(income * rate)`, rounded down to a whole baht.
- *
- * Purpose: Mirrors the calculator's `Math.floor(major * rate)` expense deduction.
- * Math: `100 * floor(x * num / (den * 100))`.
+ * Purpose: Percentage deductions and donation caps floor to the satang, not the whole baht (owner
+ * ruling 2026-11-22, trajectonomics/trajectonomics#52).
+ * Math: `floor(x * num / den)` on integer satang, with `rate` as an exact fraction.
  * Units: Integer satang in and out; `rate` is dimensionless.
  * Throws: TaxValidationError if `rate` is outside [0, 1].
- * @statute Thailand Revenue Code Sections 42 bis, 42 ter, 43–46.
+ * @statute Thailand Revenue Code Sections 42 bis, 42 ter, 43–46, 47(7).
  */
-export function rateFlooredToBaht(graph: ThLevyGraph, of: string, rate: number): string {
+export function rateFlooredToSatang(graph: ThLevyGraph, of: string, rate: number): string {
 	const { num, den } = rateFraction(rate)
-	return flooredToBaht(graph, graph.scale(of, num, den, ThLevyRounding.Floor))
+	return graph.scale(of, num, den, ThLevyRounding.Floor)
 }
 
 /**

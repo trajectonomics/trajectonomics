@@ -1,5 +1,5 @@
 import { type ClampedAmount, clampCap } from "../../core/caps"
-import { floorByRate } from "../../core/money"
+import { floorByRateToSatang } from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { type ThExpenseElectableIncome, ThExpenseField, type ThSection40_8Input } from "../types"
 import { calculateElectableItemExpense } from "./electable-expense"
@@ -21,7 +21,8 @@ function calculateEntertainerExpense(
 	const tier1 = Math.min(amount, p.entertainerFirstTierThreshold)
 	const tier2 = Math.max(0, amount - p.entertainerFirstTierThreshold)
 	const computed =
-		floorByRate(tier1, p.entertainerFirstTierRate) + floorByRate(tier2, p.entertainerSecondTierRate)
+		floorByRateToSatang(tier1, p.entertainerFirstTierRate) +
+		floorByRateToSatang(tier2, p.entertainerSecondTierRate)
 	return clampCap(computed, p.entertainerCeiling, ThExpenseField.Section40_8_Entertainer)
 }
 
