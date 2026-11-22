@@ -2,7 +2,7 @@
 name: traj-review
 description: "Run a weekly or monthly check-in on someone's `traj` ledger: read the trial balance first, compare the period with the one before it, show every figure with its as-of and the entries behind it, keep refunds apart from gross spend, and apply one fixed rule for what counts as unusual. Use when someone asks how last week or last month went, wants a weekly or monthly review, or asks what changed in their spending."
 metadata:
-  cli: ">=0.2.0 <0.3.0"
+  cli: ">=0.2.0 <0.6.0"
 ---
 
 # traj-review

@@ -24,8 +24,8 @@ describe("the traj-plan Skill", () => {
 	it("is published from its own manifest row, at the release that carries the tax allowances", () => {
 		expect(row).toBeDefined()
 		// `scenario tax` takes its allowance flags from 0.3.0; 0.2.0 publishes only the tax flag itself.
-		expect(row?.cliRange).toBe(">=0.3.0 <0.4.0")
-		expect(block).toContain('cli: ">=0.3.0 <0.4.0"')
+		expect(row?.cliRange).toBe(">=0.3.0 <0.6.0")
+		expect(block).toContain('cli: ">=0.3.0 <0.6.0"')
 	})
 
 	it("asks for the as-of and the horizon, and never substitutes a default for either", () => {

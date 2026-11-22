@@ -22,7 +22,7 @@ describe("the traj-import Skill", () => {
 
 	it("is published from its own manifest row, with the range the recipe needs", () => {
 		expect(row).toBeDefined()
-		expect(row?.cliRange).toBe(">=0.2.0 <0.3.0")
+		expect(row?.cliRange).toBe(">=0.2.0 <0.6.0")
 	})
 
 	it("reads the template the release prints, and never restates its columns", () => {
