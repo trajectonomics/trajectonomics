@@ -3,6 +3,7 @@ import "../styles/global.css"
 import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { Snippet } from "svelte"
 import { page } from "$app/state"
+import { editSession } from "../client/edit.svelte.js"
 import { queryParam, setQueryParam } from "../client/query-param.svelte.js"
 import { shellPanels } from "../client/shell.svelte.js"
 import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
@@ -13,18 +14,26 @@ import SideNavigation from "../components/shell/SideNavigation.svelte"
 import { scenarioNames } from "../lib/view/plan"
 import { chooseScenario } from "../lib/view/projection/scenario"
 import { routeAt } from "../lib/view/routes"
+import { isDemo } from "../lib/view/snapshot-url"
 
 let { children }: { children: Snippet } = $props()
 const artwork = brandArtwork(mark)
 const names = $derived(scenarioNames(currentSnapshot()))
 const selected = $derived(chooseScenario(names, queryParam("scenario", "")) ?? "")
 const title = $derived(routeAt(page.url.pathname)?.label ?? "Dashboard")
+// Edit controls show only when the server answered the token, and never in the Demo snapshot.
+const editable = $derived(editSession.token !== null && !isDemo(page.url.search))
 
 // The Snapshot follows the address: this layout stays mounted across pages, so the read is started
 // again whenever the query string changes. The loader reads each file once, so a page change with the
 // same `demo` parameter costs nothing, and a switch to `?demo=1` loads the Demo snapshot.
 $effect(() => {
 	loadSnapshot(page.url.search)
+})
+
+// The token is asked for once per visit, and not at all for the Demo snapshot.
+$effect(() => {
+	if (!isDemo(page.url.search)) void editSession.open()
 })
 </script>
 
@@ -34,6 +43,7 @@ $effect(() => {
 	{names}
 	{selected}
 	onPlan={(name) => setQueryParam("scenario", name)}
+	{editable}
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60">

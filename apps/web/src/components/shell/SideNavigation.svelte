@@ -15,9 +15,11 @@ interface Props {
 	names: readonly string[]
 	selected: string
 	onPlan: (name: string) => void
+	/** Whether the server answers Edits, so the plan switcher offers to copy and delete a plan. */
+	editable?: boolean
 }
 
-let { brand, current, names, selected, onPlan }: Props = $props()
+let { brand, current, names, selected, onPlan, editable = false }: Props = $props()
 let closeButton: HTMLButtonElement | undefined = $state()
 
 function close(): void {
@@ -53,7 +55,7 @@ $effect(() => {
 	</div>
 	<SiteNavLinks {current} onNavigate={close} />
 	<div class="mt-auto">
-		<PlanSwitcher {names} {selected} onChange={onPlan} />
+		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} />
 	</div>
 </aside>
 {#if shellPanels.menu}
