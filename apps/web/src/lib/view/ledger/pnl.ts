@@ -1,0 +1,48 @@
+import type { AmountRow, Pnl } from "../../contract"
+import { formatDate } from "../../format"
+
+/** One P&L row: an income or expense account with the CLI's amount, sign unchanged. */
+export interface PnlLine {
+	readonly key: string
+	readonly account: string
+	readonly currency: string
+	readonly amount: string
+}
+
+/** The profit and loss page's view: its period, its income and expense rows, and the CLI's totals. */
+export interface PnlView {
+	/** The period as the heading reads it, such as "1 Jan 2026 to 31 Oct 2026". */
+	readonly period: string
+	readonly project: string | null
+	readonly income: readonly PnlLine[]
+	readonly expense: readonly PnlLine[]
+	readonly totals: readonly { readonly currency: string; readonly amount: string }[]
+}
+
+/** The P&L report as the page shows it: income rows first, then expense rows, then the totals. */
+export function pnlView(report: Pnl): PnlView {
+	return {
+		period: periodOf(report.since, report.until),
+		project: report.project,
+		income: linesOf(report.rows, "income"),
+		expense: linesOf(report.rows, "expense"),
+		totals: report.totals.map((total) => ({ ...total })),
+	}
+}
+
+/** The period of a report. A report with no start date runs from the start of the ledger. */
+export function periodOf(since: string | null, until: string): string {
+	const start = since === null ? "the start of the ledger" : formatDate(since)
+	return `${start} to ${formatDate(until)}`
+}
+
+function linesOf(rows: readonly AmountRow[], type: AmountRow["type"]): PnlLine[] {
+	return rows
+		.filter((row) => row.type === type)
+		.map((row, index) => ({
+			key: `${type}:${index}`,
+			account: row.account.name,
+			currency: row.currency,
+			amount: row.amount,
+		}))
+}

@@ -1,0 +1,6856 @@
+{
+	"snapshotVersion": 1,
+	"params": {
+		"asOf": "2026-10-31",
+		"horizon": "2060-12-31",
+		"scenarios": ["base", "retire-early"],
+		"compare": {
+			"a": "base",
+			"b": "retire-early"
+		},
+		"birthDate": "1990-05-15",
+		"ages": [45, 55, 60],
+		"historyDates": [
+			"2024-11-30",
+			"2024-12-31",
+			"2025-01-31",
+			"2025-02-28",
+			"2025-03-31",
+			"2025-04-30",
+			"2025-05-31",
+			"2025-06-30",
+			"2025-07-31",
+			"2025-08-31",
+			"2025-09-30",
+			"2025-10-31",
+			"2025-11-30",
+			"2025-12-31",
+			"2026-01-31",
+			"2026-02-28",
+			"2026-03-31",
+			"2026-04-30",
+			"2026-05-31",
+			"2026-06-30",
+			"2026-07-31",
+			"2026-08-31",
+			"2026-09-30",
+			"2026-10-31"
+		]
+	},
+	"cliVersion": "0.0.0",
+	"reads": {
+		"doctor": {
+			"argv": ["doctor", "--as-of", "2026-10-31", "--json"],
+			"ok": true,
+			"data": {
+				"ok": true,
+				"cliVersion": "0.0.0",
+				"directory": {
+					"path": "~/.traj",
+					"exists": true,
+					"writable": true
+				},
+				"database": {
+					"path": "~/.traj/traj.db",
+					"exists": true,
+					"bytes": 233472,
+					"schemaVersion": 2,
+					"head": 2
+				},
+				"rows": {
+					"entity": 1,
+					"account": 9,
+					"tx": 152,
+					"posting": 304,
+					"scenario": 2
+				},
+				"trialBalance": {
+					"asOf": "2026-10-31",
+					"totals": [
+						{
+							"currency": "THB",
+							"debit": "2575600.00",
+							"credit": "2575600.00"
+						}
+					],
+					"balanced": true
+				},
+				"checks": [
+					{
+						"name": "directory",
+						"status": "pass",
+						"detail": "~/.traj exists."
+					},
+					{
+						"name": "writable",
+						"status": "pass",
+						"detail": "A file could be written and removed."
+					},
+					{
+						"name": "database",
+						"status": "pass",
+						"detail": "~/.traj/traj.db opens at schema version 2 of 2."
+					},
+					{
+						"name": "integrity",
+						"status": "pass",
+						"detail": "SQLite found no problem."
+					},
+					{
+						"name": "ledger",
+						"status": "pass",
+						"detail": "152 transactions and 304 postings validate."
+					},
+					{
+						"name": "trialBalance",
+						"status": "pass",
+						"detail": "Debits equal credits at 2026-10-31."
+					}
+				]
+			}
+		},
+		"balance": {
+			"argv": ["balance", "--as-of", "2026-10-31", "--trial-balance", "--json"],
+			"ok": true,
+			"data": {
+				"asOf": "2026-10-31",
+				"rows": [
+					{
+						"account": {
+							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"name": "Bank"
+						},
+						"type": "asset",
+						"amount": "662300.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"name": "Car Loan"
+						},
+						"type": "liability",
+						"amount": "-184000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"name": "Fund"
+						},
+						"type": "asset",
+						"amount": "736600.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+							"name": "Fund Return"
+						},
+						"type": "income",
+						"amount": "-76600.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+							"name": "Living"
+						},
+						"type": "expense",
+						"amount": "762200.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+							"name": "Opening"
+						},
+						"type": "equity",
+						"amount": "-50000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+							"name": "Rent"
+						},
+						"type": "expense",
+						"amount": "336000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+							"name": "Salary"
+						},
+						"type": "income",
+						"amount": "-2265000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+							"name": "Travel"
+						},
+						"type": "expense",
+						"amount": "78500.00",
+						"currency": "THB"
+					}
+				],
+				"netWorth": [
+					{
+						"currency": "THB",
+						"amount": "1214900.00"
+					}
+				],
+				"trialBalance": {
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"debit": "662300.00",
+							"credit": "0.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"debit": "0.00",
+							"credit": "184000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"debit": "736600.00",
+							"credit": "0.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+								"name": "Fund Return"
+							},
+							"debit": "0.00",
+							"credit": "76600.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+								"name": "Living"
+							},
+							"debit": "762200.00",
+							"credit": "0.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+								"name": "Opening"
+							},
+							"debit": "0.00",
+							"credit": "50000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+								"name": "Rent"
+							},
+							"debit": "336000.00",
+							"credit": "0.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+								"name": "Salary"
+							},
+							"debit": "0.00",
+							"credit": "2265000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+								"name": "Travel"
+							},
+							"debit": "78500.00",
+							"credit": "0.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"debit": "2575600.00",
+							"credit": "2575600.00"
+						}
+					]
+				}
+			}
+		},
+		"pnl": {
+			"argv": ["report", "pnl", "--since", "2026-01-01", "--until", "2026-10-31", "--json"],
+			"ok": true,
+			"data": {
+				"since": "2026-01-01",
+				"until": "2026-10-31",
+				"project": null,
+				"rows": [
+					{
+						"account": {
+							"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+							"name": "Fund Return"
+						},
+						"type": "income",
+						"amount": "-23300.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+							"name": "Living"
+						},
+						"type": "expense",
+						"amount": "348500.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+							"name": "Rent"
+						},
+						"type": "expense",
+						"amount": "140000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+							"name": "Salary"
+						},
+						"type": "income",
+						"amount": "-900000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+							"name": "Travel"
+						},
+						"type": "expense",
+						"amount": "36500.00",
+						"currency": "THB"
+					}
+				],
+				"totals": [
+					{
+						"currency": "THB",
+						"amount": "398300.00"
+					}
+				]
+			}
+		},
+		"transactions": {
+			"argv": ["tx", "list", "--since", "2026-08-01", "--until", "2026-10-31", "--json"],
+			"ok": true,
+			"data": {
+				"transactions": [
+					{
+						"id": "01a1ff3a-728f-70fa-9092-3a2ee5ff6200",
+						"date": "2026-08-01",
+						"memo": "rent",
+						"linkedTo": null,
+						"externalRef": "demo-rent-2026-08-01",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"name": "Rent"
+								},
+								"amount": "14000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-14000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-70fd-bc7b-e281e6c805c2",
+						"date": "2026-08-05",
+						"memo": "living",
+						"linkedTo": null,
+						"externalRef": "demo-living-2026-08-05",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"name": "Living"
+								},
+								"amount": "30300.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-30300.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-70fb-b814-df18d8d7f41e",
+						"date": "2026-08-10",
+						"memo": "car loan",
+						"linkedTo": null,
+						"externalRef": "demo-car-2026-08-10",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"name": "Car Loan"
+								},
+								"amount": "9000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-9000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7110-956d-1a523c179188",
+						"date": "2026-08-15",
+						"memo": "new laptop",
+						"linkedTo": null,
+						"externalRef": "demo-laptop-2026-08-15",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"name": "Living"
+								},
+								"amount": "58000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-58000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-70fe-a8c4-ac15409ab154",
+						"date": "2026-08-25",
+						"memo": "salary",
+						"linkedTo": null,
+						"externalRef": "demo-salary-2026-08-25",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "90000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"name": "Salary"
+								},
+								"amount": "-90000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-70fc-97a7-141e5c56fdce",
+						"date": "2026-08-26",
+						"memo": "fund",
+						"linkedTo": null,
+						"externalRef": "demo-fund-2026-08-26",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "15000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-15000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-70ff-99e2-11289f9f3d7e",
+						"date": "2026-08-28",
+						"memo": "market move",
+						"linkedTo": null,
+						"externalRef": "demo-market-2026-08-28",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "9500.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"name": "Fund Return"
+								},
+								"amount": "-9500.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7100-88c5-a957d1889b4d",
+						"date": "2026-09-01",
+						"memo": "rent",
+						"linkedTo": null,
+						"externalRef": "demo-rent-2026-09-01",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"name": "Rent"
+								},
+								"amount": "14000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-14000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7103-835a-bb0333109ff2",
+						"date": "2026-09-05",
+						"memo": "living",
+						"linkedTo": null,
+						"externalRef": "demo-living-2026-09-05",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"name": "Living"
+								},
+								"amount": "26900.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-26900.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7101-869d-06237f63cc1a",
+						"date": "2026-09-10",
+						"memo": "car loan",
+						"linkedTo": null,
+						"externalRef": "demo-car-2026-09-10",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"name": "Car Loan"
+								},
+								"amount": "9000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-9000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7104-b4d5-da51f8ff9f78",
+						"date": "2026-09-25",
+						"memo": "salary",
+						"linkedTo": null,
+						"externalRef": "demo-salary-2026-09-25",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "90000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"name": "Salary"
+								},
+								"amount": "-90000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7102-b493-6a13c60928c4",
+						"date": "2026-09-26",
+						"memo": "fund",
+						"linkedTo": null,
+						"externalRef": "demo-fund-2026-09-26",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "15000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-15000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7105-81a3-4e33266a0553",
+						"date": "2026-09-28",
+						"memo": "market move",
+						"linkedTo": null,
+						"externalRef": "demo-market-2026-09-28",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"name": "Fund Return"
+								},
+								"amount": "12600.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "-12600.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7106-9032-2ec76ec3473d",
+						"date": "2026-10-01",
+						"memo": "rent",
+						"linkedTo": null,
+						"externalRef": "demo-rent-2026-10-01",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"name": "Rent"
+								},
+								"amount": "14000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-14000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7109-9f82-f2b9562dd2ef",
+						"date": "2026-10-05",
+						"memo": "living",
+						"linkedTo": null,
+						"externalRef": "demo-living-2026-10-05",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"name": "Living"
+								},
+								"amount": "28800.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-28800.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7107-ac51-240245e98c52",
+						"date": "2026-10-10",
+						"memo": "car loan",
+						"linkedTo": null,
+						"externalRef": "demo-car-2026-10-10",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"name": "Car Loan"
+								},
+								"amount": "9000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-9000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-710a-a451-21f2bbbed213",
+						"date": "2026-10-25",
+						"memo": "salary",
+						"linkedTo": null,
+						"externalRef": "demo-salary-2026-10-25",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "90000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"name": "Salary"
+								},
+								"amount": "-90000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-7108-8792-aa75364e768e",
+						"date": "2026-10-26",
+						"memo": "fund",
+						"linkedTo": null,
+						"externalRef": "demo-fund-2026-10-26",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "15000.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"name": "Bank"
+								},
+								"amount": "-15000.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					},
+					{
+						"id": "01a1ff3a-728f-710b-8821-ea9e20885898",
+						"date": "2026-10-28",
+						"memo": "market move",
+						"linkedTo": null,
+						"externalRef": "demo-market-2026-10-28",
+						"postings": [
+							{
+								"ordinal": 0,
+								"account": {
+									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"name": "Fund"
+								},
+								"amount": "7300.00",
+								"currency": "THB",
+								"dimensions": null
+							},
+							{
+								"ordinal": 1,
+								"account": {
+									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"name": "Fund Return"
+								},
+								"amount": "-7300.00",
+								"currency": "THB",
+								"dimensions": null
+							}
+						]
+					}
+				]
+			}
+		},
+		"baseline": {
+			"argv": ["baseline", "show", "--as-of", "2026-10-31", "--json"],
+			"ok": true,
+			"data": {
+				"asOf": "2026-10-31",
+				"currency": "THB",
+				"rows": [
+					{
+						"account": {
+							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"name": "Bank"
+						},
+						"kind": "asset",
+						"amount": "662300.00"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"name": "Fund"
+						},
+						"kind": "asset",
+						"amount": "736600.00"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"name": "Car Loan"
+						},
+						"kind": "liability",
+						"amount": "184000.00"
+					}
+				]
+			}
+		},
+		"netWorthHistory": [
+			{
+				"argv": ["report", "networth", "--as-of", "2024-11-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2024-11-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "169500.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-391000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "325800.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "104300.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2024-12-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2024-12-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "267400.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-382000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "345000.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "230400.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-01-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-01-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "282900.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-373000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "368200.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "278100.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-02-28", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-02-28",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "303100.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-364000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "377800.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "316900.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-03-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-03-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "322200.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-355000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "404100.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "371300.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-04-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-04-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "294000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-346000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "409300.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "357300.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-05-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-05-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "312600.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-337000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "430400.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "406000.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-06-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-06-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "332500.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-328000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "457800.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "462300.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-07-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-07-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "349900.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-319000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "469100.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "500000.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-08-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-08-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "366600.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-310000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "493600.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "550200.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-09-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-09-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "386700.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-301000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "496000.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "581700.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-10-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-10-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "404900.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-292000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "518300.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "631200.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-11-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-11-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "424400.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-283000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "544100.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "685500.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2025-12-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2025-12-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "527300.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-274000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "563300.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "816600.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-01-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-01-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "547800.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-265000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "586500.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "869300.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-02-28", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-02-28",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "536500.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-256000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "596100.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "876600.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-03-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-03-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "560600.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-247000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "622400.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "936000.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-04-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-04-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "579400.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-238000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "627600.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "969000.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-05-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-05-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "603000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-229000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "648700.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1022700.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-06-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-06-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "627900.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-220000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "676100.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1084000.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-07-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-07-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "650300.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-211000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "687400.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1126700.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-08-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-08-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "614000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-202000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "711900.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1123900.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-09-30", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-09-30",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "639100.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-193000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "714300.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1160400.00"
+						}
+					]
+				}
+			},
+			{
+				"argv": ["report", "networth", "--as-of", "2026-10-31", "--json"],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"firstTransactionDate": "2024-11-01",
+					"noTransactionsBefore": false,
+					"rows": [
+						{
+							"account": {
+								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"name": "Bank"
+							},
+							"type": "asset",
+							"amount": "662300.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"name": "Car Loan"
+							},
+							"type": "liability",
+							"amount": "-184000.00",
+							"currency": "THB"
+						},
+						{
+							"account": {
+								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"name": "Fund"
+							},
+							"type": "asset",
+							"amount": "736600.00",
+							"currency": "THB"
+						}
+					],
+					"totals": [
+						{
+							"currency": "THB",
+							"amount": "1214900.00"
+						}
+					]
+				}
+			}
+		],
+		"projections": {
+			"base": {
+				"argv": [
+					"projection",
+					"run",
+					"--scenario=base",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"name": "base",
+						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
+						"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"runsOut": null,
+					"taxYears": [
+						{
+							"levy": "th-2026-pit",
+							"from": "2026-01-01",
+							"to": "2026-12-31",
+							"settlementDate": "2027-03-31",
+							"due": "89000.00",
+							"prepaid": "0.00",
+							"owed": "89000.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2027-01-01",
+							"to": "2027-12-31",
+							"settlementDate": "2028-03-31",
+							"due": "100080.00",
+							"prepaid": "0.00",
+							"owed": "100080.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2028-01-01",
+							"to": "2028-12-31",
+							"settlementDate": "2029-03-31",
+							"due": "106592.40",
+							"prepaid": "0.00",
+							"owed": "106592.40",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2029-01-01",
+							"to": "2029-12-31",
+							"settlementDate": "2030-03-31",
+							"due": "113300.17",
+							"prepaid": "0.00",
+							"owed": "113300.17",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2030-01-01",
+							"to": "2030-12-31",
+							"settlementDate": "2031-03-31",
+							"due": "121511.47",
+							"prepaid": "0.00",
+							"owed": "121511.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2031-01-01",
+							"to": "2031-12-31",
+							"settlementDate": "2032-03-31",
+							"due": "130406.81",
+							"prepaid": "0.00",
+							"owed": "130406.81",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2032-01-01",
+							"to": "2032-12-31",
+							"settlementDate": "2033-03-31",
+							"due": "139569.03",
+							"prepaid": "0.00",
+							"owed": "139569.03",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2033-01-01",
+							"to": "2033-12-31",
+							"settlementDate": "2034-03-31",
+							"due": "149006.10",
+							"prepaid": "0.00",
+							"owed": "149006.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2034-01-01",
+							"to": "2034-12-31",
+							"settlementDate": "2035-03-31",
+							"due": "158726.28",
+							"prepaid": "0.00",
+							"owed": "158726.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2035-01-01",
+							"to": "2035-12-31",
+							"settlementDate": "2036-03-31",
+							"due": "168738.07",
+							"prepaid": "0.00",
+							"owed": "168738.07",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2036-01-01",
+							"to": "2036-12-31",
+							"settlementDate": "2037-03-31",
+							"due": "179050.21",
+							"prepaid": "0.00",
+							"owed": "179050.21",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2037-01-01",
+							"to": "2037-12-31",
+							"settlementDate": "2038-03-31",
+							"due": "189671.70",
+							"prepaid": "0.00",
+							"owed": "189671.70",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2038-01-01",
+							"to": "2038-12-31",
+							"settlementDate": "2039-03-31",
+							"due": "200611.87",
+							"prepaid": "0.00",
+							"owed": "200611.87",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2039-01-01",
+							"to": "2039-12-31",
+							"settlementDate": "2040-03-31",
+							"due": "211880.22",
+							"prepaid": "0.00",
+							"owed": "211880.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2040-01-01",
+							"to": "2040-12-31",
+							"settlementDate": "2041-03-31",
+							"due": "223486.62",
+							"prepaid": "0.00",
+							"owed": "223486.62",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2041-01-01",
+							"to": "2041-12-31",
+							"settlementDate": "2042-03-31",
+							"due": "235441.24",
+							"prepaid": "0.00",
+							"owed": "235441.24",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2042-01-01",
+							"to": "2042-12-31",
+							"settlementDate": "2043-03-31",
+							"due": "247754.47",
+							"prepaid": "0.00",
+							"owed": "247754.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2043-01-01",
+							"to": "2043-12-31",
+							"settlementDate": "2044-03-31",
+							"due": "260437.10",
+							"prepaid": "0.00",
+							"owed": "260437.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2044-01-01",
+							"to": "2044-12-31",
+							"settlementDate": "2045-03-31",
+							"due": "273500.22",
+							"prepaid": "0.00",
+							"owed": "273500.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2045-01-01",
+							"to": "2045-12-31",
+							"settlementDate": "2046-03-31",
+							"due": "286955.22",
+							"prepaid": "0.00",
+							"owed": "286955.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2046-01-01",
+							"to": "2046-12-31",
+							"settlementDate": "2047-03-31",
+							"due": "300813.86",
+							"prepaid": "0.00",
+							"owed": "300813.86",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2047-01-01",
+							"to": "2047-12-31",
+							"settlementDate": "2048-03-31",
+							"due": "315088.28",
+							"prepaid": "0.00",
+							"owed": "315088.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2048-01-01",
+							"to": "2048-12-31",
+							"settlementDate": "2049-03-31",
+							"due": "329790.93",
+							"prepaid": "0.00",
+							"owed": "329790.93",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2049-01-01",
+							"to": "2049-12-31",
+							"settlementDate": "2050-03-31",
+							"due": "344934.67",
+							"prepaid": "0.00",
+							"owed": "344934.67",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2050-01-01",
+							"to": "2050-12-31",
+							"settlementDate": "2051-03-31",
+							"due": "61717.09",
+							"prepaid": "0.00",
+							"owed": "61717.09",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2051-01-01",
+							"to": "2051-12-31",
+							"settlementDate": "2052-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2052-01-01",
+							"to": "2052-12-31",
+							"settlementDate": "2053-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2053-01-01",
+							"to": "2053-12-31",
+							"settlementDate": "2054-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2054-01-01",
+							"to": "2054-12-31",
+							"settlementDate": "2055-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2057-01-01",
+							"to": "2057-12-31",
+							"settlementDate": "2058-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2058-01-01",
+							"to": "2058-12-31",
+							"settlementDate": "2059-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2059-01-01",
+							"to": "2059-12-31",
+							"settlementDate": "2060-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2060-01-01",
+							"to": "2060-12-31",
+							"settlementDate": "2061-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": false,
+							"partial": false
+						}
+					],
+					"tables": [
+						{
+							"name": "annual",
+							"count": 35,
+							"rows": [
+								{
+									"index": 0,
+									"from": "2026-10-31",
+									"to": "2027-10-30",
+									"openingNetWorth": "1214900.00",
+									"closingNetWorth": "1744616.72",
+									"income": "1080000.00",
+									"expense": "504000.00",
+									"contributions": "288000.00",
+									"unfundedContributions": "0.00",
+									"interest": "42716.72",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2027-10-31",
+										"amount": "1693939.27"
+									}
+								},
+								{
+									"index": 1,
+									"from": "2027-10-31",
+									"to": "2028-10-30",
+									"openingNetWorth": "1744616.72",
+									"closingNetWorth": "2298965.09",
+									"income": "1112400.00",
+									"expense": "519120.00",
+									"contributions": "269308.37",
+									"unfundedContributions": "0.00",
+									"interest": "61148.37",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2028-10-31",
+										"amount": "2167174.17"
+									}
+								},
+								{
+									"index": 2,
+									"from": "2028-10-31",
+									"to": "2029-10-30",
+									"openingNetWorth": "2298965.09",
+									"closingNetWorth": "2881029.01",
+									"income": "1145772.00",
+									"expense": "534693.60",
+									"contributions": "190962.00",
+									"unfundedContributions": "0.00",
+									"interest": "77577.92",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2029-10-31",
+										"amount": "2636762.98"
+									}
+								},
+								{
+									"index": 3,
+									"from": "2029-10-31",
+									"to": "2030-10-30",
+									"openingNetWorth": "2881029.01",
+									"closingNetWorth": "3490954.75",
+									"income": "1180145.16",
+									"expense": "550734.48",
+									"contributions": "196690.92",
+									"unfundedContributions": "0.00",
+									"interest": "93815.23",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2030-10-31",
+										"amount": "3101915.91"
+									}
+								},
+								{
+									"index": 4,
+									"from": "2030-10-31",
+									"to": "2031-10-30",
+									"openingNetWorth": "3490954.75",
+									"closingNetWorth": "4128812.42",
+									"income": "1215549.48",
+									"expense": "567256.44",
+									"contributions": "202591.56",
+									"unfundedContributions": "0.00",
+									"interest": "111076.10",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2031-10-31",
+										"amount": "3561832.49"
+									}
+								},
+								{
+									"index": 5,
+									"from": "2031-10-31",
+									"to": "2032-10-30",
+									"openingNetWorth": "4128812.42",
+									"closingNetWorth": "4795558.01",
+									"income": "1252016.04",
+									"expense": "584274.12",
+									"contributions": "208669.32",
+									"unfundedContributions": "0.00",
+									"interest": "129410.48",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2032-10-31",
+										"amount": "4016522.06"
+									}
+								},
+								{
+									"index": 6,
+									"from": "2032-10-31",
+									"to": "2033-10-30",
+									"openingNetWorth": "4795558.01",
+									"closingNetWorth": "5492640.76",
+									"income": "1289576.52",
+									"expense": "601802.28",
+									"contributions": "214929.36",
+									"unfundedContributions": "0.00",
+									"interest": "148877.54",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2033-10-31",
+										"amount": "4466372.69"
+									}
+								},
+								{
+									"index": 7,
+									"from": "2033-10-31",
+									"to": "2034-10-30",
+									"openingNetWorth": "5492640.76",
+									"closingNetWorth": "6221583.34",
+									"income": "1328263.80",
+									"expense": "619856.40",
+									"contributions": "221377.32",
+									"unfundedContributions": "0.00",
+									"interest": "169541.28",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2034-10-31",
+										"amount": "4911764.18"
+									}
+								},
+								{
+									"index": 8,
+									"from": "2034-10-31",
+									"to": "2035-10-30",
+									"openingNetWorth": "6221583.34",
+									"closingNetWorth": "6983985.88",
+									"income": "1368111.72",
+									"expense": "638452.08",
+									"contributions": "228018.60",
+									"unfundedContributions": "0.00",
+									"interest": "191469.18",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2035-10-31",
+										"amount": "5353068.56"
+									}
+								},
+								{
+									"index": 9,
+									"from": "2035-10-31",
+									"to": "2036-10-30",
+									"openingNetWorth": "6983985.88",
+									"closingNetWorth": "7781529.63",
+									"income": "1409155.08",
+									"expense": "657605.64",
+									"contributions": "234859.20",
+									"unfundedContributions": "0.00",
+									"interest": "214732.38",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2036-10-31",
+										"amount": "5790650.21"
+									}
+								},
+								{
+									"index": 10,
+									"from": "2036-10-31",
+									"to": "2037-10-30",
+									"openingNetWorth": "7781529.63",
+									"closingNetWorth": "8615980.96",
+									"income": "1451429.64",
+									"expense": "677333.88",
+									"contributions": "241905.00",
+									"unfundedContributions": "0.00",
+									"interest": "239405.78",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2037-10-31",
+										"amount": "6224866.15"
+									}
+								},
+								{
+									"index": 11,
+									"from": "2037-10-31",
+									"to": "2038-10-30",
+									"openingNetWorth": "8615980.96",
+									"closingNetWorth": "9489196.28",
+									"income": "1494972.60",
+									"expense": "697653.84",
+									"contributions": "249162.12",
+									"unfundedContributions": "0.00",
+									"interest": "265568.26",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2038-10-31",
+										"amount": "6656066.76"
+									}
+								},
+								{
+									"index": 12,
+									"from": "2038-10-31",
+									"to": "2039-10-30",
+									"openingNetWorth": "9489196.28",
+									"closingNetWorth": "10403125.73",
+									"income": "1539821.76",
+									"expense": "718583.40",
+									"contributions": "256636.92",
+									"unfundedContributions": "0.00",
+									"interest": "293302.96",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2039-10-31",
+										"amount": "7084595.47"
+									}
+								},
+								{
+									"index": 13,
+									"from": "2039-10-31",
+									"to": "2040-10-30",
+									"openingNetWorth": "10403125.73",
+									"closingNetWorth": "11359818.37",
+									"income": "1586016.36",
+									"expense": "740140.92",
+									"contributions": "264336.12",
+									"unfundedContributions": "0.00",
+									"interest": "322697.42",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2040-10-31",
+										"amount": "7510789.35"
+									}
+								},
+								{
+									"index": 14,
+									"from": "2040-10-31",
+									"to": "2041-10-30",
+									"openingNetWorth": "11359818.37",
+									"closingNetWorth": "12361427.36",
+									"income": "1633596.96",
+									"expense": "762345.24",
+									"contributions": "272266.20",
+									"unfundedContributions": "0.00",
+									"interest": "353843.89",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2041-10-31",
+										"amount": "7934979.54"
+									}
+								},
+								{
+									"index": 15,
+									"from": "2041-10-31",
+									"to": "2042-10-30",
+									"openingNetWorth": "12361427.36",
+									"closingNetWorth": "13410214.78",
+									"income": "1682604.84",
+									"expense": "785215.56",
+									"contributions": "280434.12",
+									"unfundedContributions": "0.00",
+									"interest": "386839.38",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2042-10-31",
+										"amount": "8357491.23"
+									}
+								},
+								{
+									"index": 16,
+									"from": "2042-10-31",
+									"to": "2043-10-30",
+									"openingNetWorth": "13410214.78",
+									"closingNetWorth": "14508557.38",
+									"income": "1733082.96",
+									"expense": "808772.04",
+									"contributions": "288847.20",
+									"unfundedContributions": "0.00",
+									"interest": "421786.15",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2043-10-31",
+										"amount": "8778644.08"
+									}
+								},
+								{
+									"index": 17,
+									"from": "2043-10-31",
+									"to": "2044-10-30",
+									"openingNetWorth": "14508557.38",
+									"closingNetWorth": "15658952.44",
+									"income": "1785075.48",
+									"expense": "833035.20",
+									"contributions": "297512.52",
+									"unfundedContributions": "0.00",
+									"interest": "458791.88",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2044-10-31",
+										"amount": "9198752.51"
+									}
+								},
+								{
+									"index": 18,
+									"from": "2044-10-31",
+									"to": "2045-10-30",
+									"openingNetWorth": "15658952.44",
+									"closingNetWorth": "16864023.63",
+									"income": "1838627.76",
+									"expense": "858026.28",
+									"contributions": "306438.00",
+									"unfundedContributions": "0.00",
+									"interest": "497969.93",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2045-10-31",
+										"amount": "9618125.90"
+									}
+								},
+								{
+									"index": 19,
+									"from": "2045-10-31",
+									"to": "2046-10-30",
+									"openingNetWorth": "16864023.63",
+									"closingNetWorth": "18126527.53",
+									"income": "1893786.48",
+									"expense": "883767.00",
+									"contributions": "315631.08",
+									"unfundedContributions": "0.00",
+									"interest": "539439.64",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2046-10-31",
+										"amount": "10037068.80"
+									}
+								},
+								{
+									"index": 20,
+									"from": "2046-10-31",
+									"to": "2047-10-30",
+									"openingNetWorth": "18126527.53",
+									"closingNetWorth": "19449360.42",
+									"income": "1950600.12",
+									"expense": "910280.04",
+									"contributions": "325100.04",
+									"unfundedContributions": "0.00",
+									"interest": "583326.67",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2047-10-31",
+										"amount": "10455881.31"
+									}
+								},
+								{
+									"index": 21,
+									"from": "2047-10-31",
+									"to": "2048-10-30",
+									"openingNetWorth": "19449360.42",
+									"closingNetWorth": "20835565.07",
+									"income": "2009118.12",
+									"expense": "937588.44",
+									"contributions": "334853.04",
+									"unfundedContributions": "0.00",
+									"interest": "629763.25",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2048-10-31",
+										"amount": "10874859.16"
+									}
+								},
+								{
+									"index": 22,
+									"from": "2048-10-31",
+									"to": "2049-10-30",
+									"openingNetWorth": "20835565.07",
+									"closingNetWorth": "22288338.31",
+									"income": "2069391.72",
+									"expense": "965716.20",
+									"contributions": "344898.60",
+									"unfundedContributions": "0.00",
+									"interest": "678888.65",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2049-10-31",
+										"amount": "11294294.00"
+									}
+								},
+								{
+									"index": 23,
+									"from": "2049-10-31",
+									"to": "2050-10-30",
+									"openingNetWorth": "22288338.31",
+									"closingNetWorth": "22919312.46",
+									"income": "1243359.53",
+									"expense": "994687.56",
+									"contributions": "207226.60",
+									"unfundedContributions": "0.00",
+									"interest": "727236.85",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2050-10-31",
+										"amount": "11275783.65"
+									}
+								},
+								{
+									"index": 24,
+									"from": "2050-10-31",
+									"to": "2051-10-30",
+									"openingNetWorth": "22919312.46",
+									"closingNetWorth": "22586104.81",
+									"income": "0.00",
+									"expense": "1024528.20",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "753037.64",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2051-10-31",
+										"amount": "10788250.25"
+									}
+								},
+								{
+									"index": 25,
+									"from": "2051-10-31",
+									"to": "2052-10-30",
+									"openingNetWorth": "22586104.81",
+									"closingNetWorth": "22307226.00",
+									"income": "0.00",
+									"expense": "1055264.04",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "776385.23",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2052-10-31",
+										"amount": "10344745.52"
+									}
+								},
+								{
+									"index": 26,
+									"from": "2052-10-31",
+									"to": "2053-10-30",
+									"openingNetWorth": "22307226.00",
+									"closingNetWorth": "22021539.89",
+									"income": "0.00",
+									"expense": "1086922.08",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "801235.97",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2053-10-31",
+										"amount": "9914860.96"
+									}
+								},
+								{
+									"index": 27,
+									"from": "2053-10-31",
+									"to": "2054-10-30",
+									"openingNetWorth": "22021539.89",
+									"closingNetWorth": "21729414.28",
+									"income": "0.00",
+									"expense": "1119529.68",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "827404.07",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2054-10-31",
+										"amount": "9498429.46"
+									}
+								},
+								{
+									"index": 28,
+									"from": "2054-10-31",
+									"to": "2055-10-30",
+									"openingNetWorth": "21729414.28",
+									"closingNetWorth": "21431261.24",
+									"income": "0.00",
+									"expense": "1153115.52",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "854962.48",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2055-10-31",
+										"amount": "9095288.91"
+									}
+								},
+								{
+									"index": 29,
+									"from": "2055-10-31",
+									"to": "2056-10-30",
+									"openingNetWorth": "21431261.24",
+									"closingNetWorth": "21127540.47",
+									"income": "0.00",
+									"expense": "1187709.00",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "883988.23",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2056-10-31",
+										"amount": "8705282.29"
+									}
+								},
+								{
+									"index": 30,
+									"from": "2056-10-31",
+									"to": "2057-10-30",
+									"openingNetWorth": "21127540.47",
+									"closingNetWorth": "20818762.62",
+									"income": "0.00",
+									"expense": "1223340.24",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "914562.39",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2057-10-31",
+										"amount": "8328257.61"
+									}
+								},
+								{
+									"index": 31,
+									"from": "2057-10-31",
+									"to": "2058-10-30",
+									"openingNetWorth": "20818762.62",
+									"closingNetWorth": "20505492.54",
+									"income": "0.00",
+									"expense": "1260040.44",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "946770.36",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2058-10-31",
+										"amount": "7964067.82"
+									}
+								},
+								{
+									"index": 32,
+									"from": "2058-10-31",
+									"to": "2059-10-30",
+									"openingNetWorth": "20505492.54",
+									"closingNetWorth": "20185899.23",
+									"income": "0.00",
+									"expense": "1297841.76",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "978248.45",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2059-10-31",
+										"amount": "7611631.21"
+									}
+								},
+								{
+									"index": 33,
+									"from": "2059-10-31",
+									"to": "2060-10-30",
+									"openingNetWorth": "20185899.23",
+									"closingNetWorth": "19822735.60",
+									"income": "0.00",
+									"expense": "1336776.96",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "973613.33",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2060-10-31",
+										"amount": "7256981.25"
+									}
+								},
+								{
+									"index": 34,
+									"from": "2060-10-31",
+									"to": "2060-12-31",
+									"openingNetWorth": "19822735.60",
+									"closingNetWorth": "19756836.98",
+									"income": "0.00",
+									"expense": "229480.04",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "163581.42",
+									"unmet": "0.00",
+									"partial": true,
+									"realNetWorth": {
+										"date": "2060-12-31",
+										"amount": "7196252.23"
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			"retire-early": {
+				"argv": [
+					"projection",
+					"run",
+					"--scenario=retire-early",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"name": "retire-early",
+						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
+						"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"3083347.45 of Contributions could not be funded, so they were not made."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"runsOut": {
+						"date": "2056-05-01",
+						"unmet": "70359.24"
+					},
+					"taxYears": [
+						{
+							"levy": "th-2026-pit",
+							"from": "2026-01-01",
+							"to": "2026-12-31",
+							"settlementDate": "2027-03-31",
+							"due": "89000.00",
+							"prepaid": "0.00",
+							"owed": "89000.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2027-01-01",
+							"to": "2027-12-31",
+							"settlementDate": "2028-03-31",
+							"due": "100080.00",
+							"prepaid": "0.00",
+							"owed": "100080.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2028-01-01",
+							"to": "2028-12-31",
+							"settlementDate": "2029-03-31",
+							"due": "106592.40",
+							"prepaid": "0.00",
+							"owed": "106592.40",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2029-01-01",
+							"to": "2029-12-31",
+							"settlementDate": "2030-03-31",
+							"due": "113300.17",
+							"prepaid": "0.00",
+							"owed": "113300.17",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2030-01-01",
+							"to": "2030-12-31",
+							"settlementDate": "2031-03-31",
+							"due": "121511.47",
+							"prepaid": "0.00",
+							"owed": "121511.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2031-01-01",
+							"to": "2031-12-31",
+							"settlementDate": "2032-03-31",
+							"due": "130406.81",
+							"prepaid": "0.00",
+							"owed": "130406.81",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2032-01-01",
+							"to": "2032-12-31",
+							"settlementDate": "2033-03-31",
+							"due": "139569.03",
+							"prepaid": "0.00",
+							"owed": "139569.03",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2033-01-01",
+							"to": "2033-12-31",
+							"settlementDate": "2034-03-31",
+							"due": "149006.10",
+							"prepaid": "0.00",
+							"owed": "149006.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2034-01-01",
+							"to": "2034-12-31",
+							"settlementDate": "2035-03-31",
+							"due": "158726.28",
+							"prepaid": "0.00",
+							"owed": "158726.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2035-01-01",
+							"to": "2035-12-31",
+							"settlementDate": "2036-03-31",
+							"due": "168738.07",
+							"prepaid": "0.00",
+							"owed": "168738.07",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2036-01-01",
+							"to": "2036-12-31",
+							"settlementDate": "2037-03-31",
+							"due": "179050.21",
+							"prepaid": "0.00",
+							"owed": "179050.21",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2037-01-01",
+							"to": "2037-12-31",
+							"settlementDate": "2038-03-31",
+							"due": "189671.70",
+							"prepaid": "0.00",
+							"owed": "189671.70",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2038-01-01",
+							"to": "2038-12-31",
+							"settlementDate": "2039-03-31",
+							"due": "200611.87",
+							"prepaid": "0.00",
+							"owed": "200611.87",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2039-01-01",
+							"to": "2039-12-31",
+							"settlementDate": "2040-03-31",
+							"due": "211880.22",
+							"prepaid": "0.00",
+							"owed": "211880.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2040-01-01",
+							"to": "2040-12-31",
+							"settlementDate": "2041-03-31",
+							"due": "27626.02",
+							"prepaid": "0.00",
+							"owed": "27626.02",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2041-01-01",
+							"to": "2041-12-31",
+							"settlementDate": "2042-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2042-01-01",
+							"to": "2042-12-31",
+							"settlementDate": "2043-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2043-01-01",
+							"to": "2043-12-31",
+							"settlementDate": "2044-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2044-01-01",
+							"to": "2044-12-31",
+							"settlementDate": "2045-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2045-01-01",
+							"to": "2045-12-31",
+							"settlementDate": "2046-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2046-01-01",
+							"to": "2046-12-31",
+							"settlementDate": "2047-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2047-01-01",
+							"to": "2047-12-31",
+							"settlementDate": "2048-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2048-01-01",
+							"to": "2048-12-31",
+							"settlementDate": "2049-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2049-01-01",
+							"to": "2049-12-31",
+							"settlementDate": "2050-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2050-01-01",
+							"to": "2050-12-31",
+							"settlementDate": "2051-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2051-01-01",
+							"to": "2051-12-31",
+							"settlementDate": "2052-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2052-01-01",
+							"to": "2052-12-31",
+							"settlementDate": "2053-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2053-01-01",
+							"to": "2053-12-31",
+							"settlementDate": "2054-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2054-01-01",
+							"to": "2054-12-31",
+							"settlementDate": "2055-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": false,
+							"partial": true
+						}
+					],
+					"tables": [
+						{
+							"name": "annual",
+							"count": 30,
+							"rows": [
+								{
+									"index": 0,
+									"from": "2026-10-31",
+									"to": "2027-10-30",
+									"openingNetWorth": "1214900.00",
+									"closingNetWorth": "1744616.72",
+									"income": "1080000.00",
+									"expense": "504000.00",
+									"contributions": "288000.00",
+									"unfundedContributions": "0.00",
+									"interest": "42716.72",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2027-10-31",
+										"amount": "1693939.27"
+									}
+								},
+								{
+									"index": 1,
+									"from": "2027-10-31",
+									"to": "2028-10-30",
+									"openingNetWorth": "1744616.72",
+									"closingNetWorth": "2298965.09",
+									"income": "1112400.00",
+									"expense": "519120.00",
+									"contributions": "269308.37",
+									"unfundedContributions": "0.00",
+									"interest": "61148.37",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2028-10-31",
+										"amount": "2167174.17"
+									}
+								},
+								{
+									"index": 2,
+									"from": "2028-10-31",
+									"to": "2029-10-30",
+									"openingNetWorth": "2298965.09",
+									"closingNetWorth": "2881029.01",
+									"income": "1145772.00",
+									"expense": "534693.60",
+									"contributions": "190962.00",
+									"unfundedContributions": "0.00",
+									"interest": "77577.92",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2029-10-31",
+										"amount": "2636762.98"
+									}
+								},
+								{
+									"index": 3,
+									"from": "2029-10-31",
+									"to": "2030-10-30",
+									"openingNetWorth": "2881029.01",
+									"closingNetWorth": "3490954.75",
+									"income": "1180145.16",
+									"expense": "550734.48",
+									"contributions": "196690.92",
+									"unfundedContributions": "0.00",
+									"interest": "93815.23",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2030-10-31",
+										"amount": "3101915.91"
+									}
+								},
+								{
+									"index": 4,
+									"from": "2030-10-31",
+									"to": "2031-10-30",
+									"openingNetWorth": "3490954.75",
+									"closingNetWorth": "4128812.42",
+									"income": "1215549.48",
+									"expense": "567256.44",
+									"contributions": "202591.56",
+									"unfundedContributions": "0.00",
+									"interest": "111076.10",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2031-10-31",
+										"amount": "3561832.49"
+									}
+								},
+								{
+									"index": 5,
+									"from": "2031-10-31",
+									"to": "2032-10-30",
+									"openingNetWorth": "4128812.42",
+									"closingNetWorth": "4795558.01",
+									"income": "1252016.04",
+									"expense": "584274.12",
+									"contributions": "208669.32",
+									"unfundedContributions": "0.00",
+									"interest": "129410.48",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2032-10-31",
+										"amount": "4016522.06"
+									}
+								},
+								{
+									"index": 6,
+									"from": "2032-10-31",
+									"to": "2033-10-30",
+									"openingNetWorth": "4795558.01",
+									"closingNetWorth": "5492640.76",
+									"income": "1289576.52",
+									"expense": "601802.28",
+									"contributions": "214929.36",
+									"unfundedContributions": "0.00",
+									"interest": "148877.54",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2033-10-31",
+										"amount": "4466372.69"
+									}
+								},
+								{
+									"index": 7,
+									"from": "2033-10-31",
+									"to": "2034-10-30",
+									"openingNetWorth": "5492640.76",
+									"closingNetWorth": "6221583.34",
+									"income": "1328263.80",
+									"expense": "619856.40",
+									"contributions": "221377.32",
+									"unfundedContributions": "0.00",
+									"interest": "169541.28",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2034-10-31",
+										"amount": "4911764.18"
+									}
+								},
+								{
+									"index": 8,
+									"from": "2034-10-31",
+									"to": "2035-10-30",
+									"openingNetWorth": "6221583.34",
+									"closingNetWorth": "6983985.88",
+									"income": "1368111.72",
+									"expense": "638452.08",
+									"contributions": "228018.60",
+									"unfundedContributions": "0.00",
+									"interest": "191469.18",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2035-10-31",
+										"amount": "5353068.56"
+									}
+								},
+								{
+									"index": 9,
+									"from": "2035-10-31",
+									"to": "2036-10-30",
+									"openingNetWorth": "6983985.88",
+									"closingNetWorth": "7781529.63",
+									"income": "1409155.08",
+									"expense": "657605.64",
+									"contributions": "234859.20",
+									"unfundedContributions": "0.00",
+									"interest": "214732.38",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2036-10-31",
+										"amount": "5790650.21"
+									}
+								},
+								{
+									"index": 10,
+									"from": "2036-10-31",
+									"to": "2037-10-30",
+									"openingNetWorth": "7781529.63",
+									"closingNetWorth": "8615980.96",
+									"income": "1451429.64",
+									"expense": "677333.88",
+									"contributions": "241905.00",
+									"unfundedContributions": "0.00",
+									"interest": "239405.78",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2037-10-31",
+										"amount": "6224866.15"
+									}
+								},
+								{
+									"index": 11,
+									"from": "2037-10-31",
+									"to": "2038-10-30",
+									"openingNetWorth": "8615980.96",
+									"closingNetWorth": "9489196.28",
+									"income": "1494972.60",
+									"expense": "697653.84",
+									"contributions": "249162.12",
+									"unfundedContributions": "0.00",
+									"interest": "265568.26",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2038-10-31",
+										"amount": "6656066.76"
+									}
+								},
+								{
+									"index": 12,
+									"from": "2038-10-31",
+									"to": "2039-10-30",
+									"openingNetWorth": "9489196.28",
+									"closingNetWorth": "10403125.73",
+									"income": "1539821.76",
+									"expense": "718583.40",
+									"contributions": "256636.92",
+									"unfundedContributions": "0.00",
+									"interest": "293302.96",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2039-10-31",
+										"amount": "7084595.47"
+									}
+								},
+								{
+									"index": 13,
+									"from": "2039-10-31",
+									"to": "2040-10-30",
+									"openingNetWorth": "10403125.73",
+									"closingNetWorth": "10696290.14",
+									"income": "925176.21",
+									"expense": "740140.92",
+									"contributions": "154196.07",
+									"unfundedContributions": "110140.05",
+									"interest": "320009.34",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2040-10-31",
+										"amount": "7072099.21"
+									}
+								},
+								{
+									"index": 14,
+									"from": "2040-10-31",
+									"to": "2041-10-30",
+									"openingNetWorth": "10696290.14",
+									"closingNetWorth": "10235630.32",
+									"income": "0.00",
+									"expense": "762345.24",
+									"contributions": "0.00",
+									"unfundedContributions": "272266.20",
+									"interest": "329311.44",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2041-10-31",
+										"amount": "6570447.03"
+									}
+								},
+								{
+									"index": 15,
+									"from": "2041-10-31",
+									"to": "2042-10-30",
+									"openingNetWorth": "10235630.32",
+									"closingNetWorth": "9786487.86",
+									"income": "0.00",
+									"expense": "785215.56",
+									"contributions": "0.00",
+									"unfundedContributions": "280434.12",
+									"interest": "336073.10",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2042-10-31",
+										"amount": "6099196.14"
+									}
+								},
+								{
+									"index": 16,
+									"from": "2042-10-31",
+									"to": "2043-10-30",
+									"openingNetWorth": "9786487.86",
+									"closingNetWorth": "9321067.67",
+									"income": "0.00",
+									"expense": "808772.04",
+									"contributions": "0.00",
+									"unfundedContributions": "288847.20",
+									"interest": "343351.85",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2043-10-31",
+										"amount": "5639975.22"
+									}
+								},
+								{
+									"index": 17,
+									"from": "2043-10-31",
+									"to": "2044-10-30",
+									"openingNetWorth": "9321067.67",
+									"closingNetWorth": "8839091.35",
+									"income": "0.00",
+									"expense": "833035.20",
+									"contributions": "0.00",
+									"unfundedContributions": "297512.52",
+									"interest": "351058.88",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2044-10-31",
+										"amount": "5192606.58"
+									}
+								},
+								{
+									"index": 18,
+									"from": "2044-10-31",
+									"to": "2045-10-30",
+									"openingNetWorth": "8839091.35",
+									"closingNetWorth": "8340286.08",
+									"income": "0.00",
+									"expense": "858026.28",
+									"contributions": "0.00",
+									"unfundedContributions": "306438.00",
+									"interest": "359221.01",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2045-10-31",
+										"amount": "4756917.08"
+									}
+								},
+								{
+									"index": 19,
+									"from": "2045-10-31",
+									"to": "2046-10-30",
+									"openingNetWorth": "8340286.08",
+									"closingNetWorth": "7824385.70",
+									"income": "0.00",
+									"expense": "883767.00",
+									"contributions": "0.00",
+									"unfundedContributions": "315631.08",
+									"interest": "367866.62",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2046-10-31",
+										"amount": "4332738.08"
+									}
+								},
+								{
+									"index": 20,
+									"from": "2046-10-31",
+									"to": "2047-10-30",
+									"openingNetWorth": "7824385.70",
+									"closingNetWorth": "7280153.91",
+									"income": "0.00",
+									"expense": "910280.04",
+									"contributions": "0.00",
+									"unfundedContributions": "325100.04",
+									"interest": "366048.25",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2047-10-31",
+										"amount": "3913964.62"
+									}
+								},
+								{
+									"index": 21,
+									"from": "2047-10-31",
+									"to": "2048-10-30",
+									"openingNetWorth": "7280153.91",
+									"closingNetWorth": "6681546.78",
+									"income": "0.00",
+									"expense": "937588.44",
+									"contributions": "0.00",
+									"unfundedContributions": "334853.04",
+									"interest": "338981.31",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2048-10-31",
+										"amount": "3487515.31"
+									}
+								},
+								{
+									"index": 22,
+									"from": "2048-10-31",
+									"to": "2049-10-30",
+									"openingNetWorth": "6681546.78",
+									"closingNetWorth": "6024130.73",
+									"income": "0.00",
+									"expense": "965716.20",
+									"contributions": "0.00",
+									"unfundedContributions": "344898.60",
+									"interest": "308300.15",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2049-10-31",
+										"amount": "3052785.38"
+									}
+								},
+								{
+									"index": 23,
+									"from": "2049-10-31",
+									"to": "2050-10-30",
+									"openingNetWorth": "6024130.73",
+									"closingNetWorth": "5304099.20",
+									"income": "0.00",
+									"expense": "994687.56",
+									"contributions": "0.00",
+									"unfundedContributions": "207226.60",
+									"interest": "274656.03",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2050-10-31",
+										"amount": "2609614.14"
+									}
+								},
+								{
+									"index": 24,
+									"from": "2050-10-31",
+									"to": "2051-10-30",
+									"openingNetWorth": "5304099.20",
+									"closingNetWorth": "4517428.94",
+									"income": "0.00",
+									"expense": "1024528.20",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "237857.94",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2051-10-31",
+										"amount": "2157837.64"
+									}
+								},
+								{
+									"index": 25,
+									"from": "2051-10-31",
+									"to": "2052-10-30",
+									"openingNetWorth": "4517428.94",
+									"closingNetWorth": "3659868.94",
+									"income": "0.00",
+									"expense": "1055264.04",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "197704.04",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2052-10-31",
+										"amount": "1697288.79"
+									}
+								},
+								{
+									"index": 26,
+									"from": "2052-10-31",
+									"to": "2053-10-30",
+									"openingNetWorth": "3659868.94",
+									"closingNetWorth": "2726927.86",
+									"income": "0.00",
+									"expense": "1086922.08",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "153981.00",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2053-10-31",
+										"amount": "1227797.19"
+									}
+								},
+								{
+									"index": 27,
+									"from": "2053-10-31",
+									"to": "2054-10-30",
+									"openingNetWorth": "2726927.86",
+									"closingNetWorth": "1713861.76",
+									"income": "0.00",
+									"expense": "1119529.68",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "106463.58",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2054-10-31",
+										"amount": "749189.27"
+									}
+								},
+								{
+									"index": 28,
+									"from": "2054-10-31",
+									"to": "2055-10-30",
+									"openingNetWorth": "1713861.76",
+									"closingNetWorth": "615660.02",
+									"income": "0.00",
+									"expense": "1153115.52",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "54913.78",
+									"unmet": "0.00",
+									"partial": false,
+									"realNetWorth": {
+										"date": "2055-10-31",
+										"amount": "261288.02"
+									}
+								},
+								{
+									"index": 29,
+									"from": "2055-10-31",
+									"to": "2056-05-01",
+									"openingNetWorth": "615660.02",
+									"closingNetWorth": "0.00",
+									"income": "0.00",
+									"expense": "692830.25",
+									"contributions": "0.00",
+									"unfundedContributions": "0.00",
+									"interest": "6810.99",
+									"unmet": "70359.24",
+									"partial": true,
+									"realNetWorth": {
+										"date": "2056-05-01",
+										"amount": "0.00"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"fi": {
+			"base": {
+				"argv": [
+					"fi",
+					"--scenario=base",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"name": "base",
+						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
+						"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"method": "survival",
+					"definition": {
+						"method": "survival",
+						"definitionVersion": 1
+					},
+					"fi": {
+						"reachable": true,
+						"fiDate": "2042-10-01",
+						"reference": {
+							"label": "ruleOfThumb",
+							"date": "2042-10-01",
+							"multiplier": 25,
+							"basis": "unlockedAssets",
+							"window": "next12Months",
+							"terms": "nominal",
+							"unlockedAssets": "13303437.41",
+							"numerator": "13303437.41",
+							"annualExpenses": "806809.00",
+							"threshold": "20170225.00",
+							"multipleBps": 164889,
+							"partial": false,
+							"met": false
+						}
+					},
+					"taxYears": [
+						{
+							"levy": "th-2026-pit",
+							"from": "2026-01-01",
+							"to": "2026-12-31",
+							"settlementDate": "2027-03-31",
+							"due": "89000.00",
+							"prepaid": "0.00",
+							"owed": "89000.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2027-01-01",
+							"to": "2027-12-31",
+							"settlementDate": "2028-03-31",
+							"due": "100080.00",
+							"prepaid": "0.00",
+							"owed": "100080.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2028-01-01",
+							"to": "2028-12-31",
+							"settlementDate": "2029-03-31",
+							"due": "106592.40",
+							"prepaid": "0.00",
+							"owed": "106592.40",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2029-01-01",
+							"to": "2029-12-31",
+							"settlementDate": "2030-03-31",
+							"due": "113300.17",
+							"prepaid": "0.00",
+							"owed": "113300.17",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2030-01-01",
+							"to": "2030-12-31",
+							"settlementDate": "2031-03-31",
+							"due": "121511.47",
+							"prepaid": "0.00",
+							"owed": "121511.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2031-01-01",
+							"to": "2031-12-31",
+							"settlementDate": "2032-03-31",
+							"due": "130406.81",
+							"prepaid": "0.00",
+							"owed": "130406.81",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2032-01-01",
+							"to": "2032-12-31",
+							"settlementDate": "2033-03-31",
+							"due": "139569.03",
+							"prepaid": "0.00",
+							"owed": "139569.03",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2033-01-01",
+							"to": "2033-12-31",
+							"settlementDate": "2034-03-31",
+							"due": "149006.10",
+							"prepaid": "0.00",
+							"owed": "149006.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2034-01-01",
+							"to": "2034-12-31",
+							"settlementDate": "2035-03-31",
+							"due": "158726.28",
+							"prepaid": "0.00",
+							"owed": "158726.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2035-01-01",
+							"to": "2035-12-31",
+							"settlementDate": "2036-03-31",
+							"due": "168738.07",
+							"prepaid": "0.00",
+							"owed": "168738.07",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2036-01-01",
+							"to": "2036-12-31",
+							"settlementDate": "2037-03-31",
+							"due": "179050.21",
+							"prepaid": "0.00",
+							"owed": "179050.21",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2037-01-01",
+							"to": "2037-12-31",
+							"settlementDate": "2038-03-31",
+							"due": "189671.70",
+							"prepaid": "0.00",
+							"owed": "189671.70",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2038-01-01",
+							"to": "2038-12-31",
+							"settlementDate": "2039-03-31",
+							"due": "200611.87",
+							"prepaid": "0.00",
+							"owed": "200611.87",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2039-01-01",
+							"to": "2039-12-31",
+							"settlementDate": "2040-03-31",
+							"due": "211880.22",
+							"prepaid": "0.00",
+							"owed": "211880.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2040-01-01",
+							"to": "2040-12-31",
+							"settlementDate": "2041-03-31",
+							"due": "223486.62",
+							"prepaid": "0.00",
+							"owed": "223486.62",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2041-01-01",
+							"to": "2041-12-31",
+							"settlementDate": "2042-03-31",
+							"due": "235441.24",
+							"prepaid": "0.00",
+							"owed": "235441.24",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2042-01-01",
+							"to": "2042-12-31",
+							"settlementDate": "2043-03-31",
+							"due": "247754.47",
+							"prepaid": "0.00",
+							"owed": "247754.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2043-01-01",
+							"to": "2043-12-31",
+							"settlementDate": "2044-03-31",
+							"due": "260437.10",
+							"prepaid": "0.00",
+							"owed": "260437.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2044-01-01",
+							"to": "2044-12-31",
+							"settlementDate": "2045-03-31",
+							"due": "273500.22",
+							"prepaid": "0.00",
+							"owed": "273500.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2045-01-01",
+							"to": "2045-12-31",
+							"settlementDate": "2046-03-31",
+							"due": "286955.22",
+							"prepaid": "0.00",
+							"owed": "286955.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2046-01-01",
+							"to": "2046-12-31",
+							"settlementDate": "2047-03-31",
+							"due": "300813.86",
+							"prepaid": "0.00",
+							"owed": "300813.86",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2047-01-01",
+							"to": "2047-12-31",
+							"settlementDate": "2048-03-31",
+							"due": "315088.28",
+							"prepaid": "0.00",
+							"owed": "315088.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2048-01-01",
+							"to": "2048-12-31",
+							"settlementDate": "2049-03-31",
+							"due": "329790.93",
+							"prepaid": "0.00",
+							"owed": "329790.93",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2049-01-01",
+							"to": "2049-12-31",
+							"settlementDate": "2050-03-31",
+							"due": "344934.67",
+							"prepaid": "0.00",
+							"owed": "344934.67",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2050-01-01",
+							"to": "2050-12-31",
+							"settlementDate": "2051-03-31",
+							"due": "61717.09",
+							"prepaid": "0.00",
+							"owed": "61717.09",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2051-01-01",
+							"to": "2051-12-31",
+							"settlementDate": "2052-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2052-01-01",
+							"to": "2052-12-31",
+							"settlementDate": "2053-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2053-01-01",
+							"to": "2053-12-31",
+							"settlementDate": "2054-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2054-01-01",
+							"to": "2054-12-31",
+							"settlementDate": "2055-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2057-01-01",
+							"to": "2057-12-31",
+							"settlementDate": "2058-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2058-01-01",
+							"to": "2058-12-31",
+							"settlementDate": "2059-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2059-01-01",
+							"to": "2059-12-31",
+							"settlementDate": "2060-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2060-01-01",
+							"to": "2060-12-31",
+							"settlementDate": "2061-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": false,
+							"partial": false
+						}
+					]
+				}
+			},
+			"retire-early": {
+				"argv": [
+					"fi",
+					"--scenario=retire-early",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"name": "retire-early",
+						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
+						"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"3083347.45 of Contributions could not be funded, so they were not made."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"method": "survival",
+					"definition": {
+						"method": "survival",
+						"definitionVersion": 1
+					},
+					"fi": {
+						"reachable": false,
+						"binding": "insufficientMoney",
+						"bestCase": {
+							"month": "2040-06-01",
+							"runsOut": {
+								"date": "2056-05-01",
+								"unmet": "70359.24"
+							}
+						}
+					},
+					"taxYears": [
+						{
+							"levy": "th-2026-pit",
+							"from": "2026-01-01",
+							"to": "2026-12-31",
+							"settlementDate": "2027-03-31",
+							"due": "89000.00",
+							"prepaid": "0.00",
+							"owed": "89000.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2027-01-01",
+							"to": "2027-12-31",
+							"settlementDate": "2028-03-31",
+							"due": "100080.00",
+							"prepaid": "0.00",
+							"owed": "100080.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2028-01-01",
+							"to": "2028-12-31",
+							"settlementDate": "2029-03-31",
+							"due": "106592.40",
+							"prepaid": "0.00",
+							"owed": "106592.40",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2029-01-01",
+							"to": "2029-12-31",
+							"settlementDate": "2030-03-31",
+							"due": "113300.17",
+							"prepaid": "0.00",
+							"owed": "113300.17",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2030-01-01",
+							"to": "2030-12-31",
+							"settlementDate": "2031-03-31",
+							"due": "121511.47",
+							"prepaid": "0.00",
+							"owed": "121511.47",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2031-01-01",
+							"to": "2031-12-31",
+							"settlementDate": "2032-03-31",
+							"due": "130406.81",
+							"prepaid": "0.00",
+							"owed": "130406.81",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2032-01-01",
+							"to": "2032-12-31",
+							"settlementDate": "2033-03-31",
+							"due": "139569.03",
+							"prepaid": "0.00",
+							"owed": "139569.03",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2033-01-01",
+							"to": "2033-12-31",
+							"settlementDate": "2034-03-31",
+							"due": "149006.10",
+							"prepaid": "0.00",
+							"owed": "149006.10",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2034-01-01",
+							"to": "2034-12-31",
+							"settlementDate": "2035-03-31",
+							"due": "158726.28",
+							"prepaid": "0.00",
+							"owed": "158726.28",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2035-01-01",
+							"to": "2035-12-31",
+							"settlementDate": "2036-03-31",
+							"due": "168738.07",
+							"prepaid": "0.00",
+							"owed": "168738.07",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2036-01-01",
+							"to": "2036-12-31",
+							"settlementDate": "2037-03-31",
+							"due": "179050.21",
+							"prepaid": "0.00",
+							"owed": "179050.21",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2037-01-01",
+							"to": "2037-12-31",
+							"settlementDate": "2038-03-31",
+							"due": "189671.70",
+							"prepaid": "0.00",
+							"owed": "189671.70",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2038-01-01",
+							"to": "2038-12-31",
+							"settlementDate": "2039-03-31",
+							"due": "200611.87",
+							"prepaid": "0.00",
+							"owed": "200611.87",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2039-01-01",
+							"to": "2039-12-31",
+							"settlementDate": "2040-03-31",
+							"due": "211880.22",
+							"prepaid": "0.00",
+							"owed": "211880.22",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2040-01-01",
+							"to": "2040-12-31",
+							"settlementDate": "2041-03-31",
+							"due": "27626.02",
+							"prepaid": "0.00",
+							"owed": "27626.02",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2041-01-01",
+							"to": "2041-12-31",
+							"settlementDate": "2042-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2042-01-01",
+							"to": "2042-12-31",
+							"settlementDate": "2043-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2043-01-01",
+							"to": "2043-12-31",
+							"settlementDate": "2044-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2044-01-01",
+							"to": "2044-12-31",
+							"settlementDate": "2045-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2045-01-01",
+							"to": "2045-12-31",
+							"settlementDate": "2046-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2046-01-01",
+							"to": "2046-12-31",
+							"settlementDate": "2047-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2047-01-01",
+							"to": "2047-12-31",
+							"settlementDate": "2048-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2048-01-01",
+							"to": "2048-12-31",
+							"settlementDate": "2049-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2049-01-01",
+							"to": "2049-12-31",
+							"settlementDate": "2050-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2050-01-01",
+							"to": "2050-12-31",
+							"settlementDate": "2051-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2051-01-01",
+							"to": "2051-12-31",
+							"settlementDate": "2052-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2052-01-01",
+							"to": "2052-12-31",
+							"settlementDate": "2053-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2053-01-01",
+							"to": "2053-12-31",
+							"settlementDate": "2054-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2054-01-01",
+							"to": "2054-12-31",
+							"settlementDate": "2055-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2055-01-01",
+							"to": "2055-12-31",
+							"settlementDate": "2056-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": true,
+							"partial": false
+						},
+						{
+							"levy": "th-2026-pit",
+							"from": "2056-01-01",
+							"to": "2056-12-31",
+							"settlementDate": "2057-03-31",
+							"due": "0.00",
+							"prepaid": "0.00",
+							"owed": "0.00",
+							"settled": false,
+							"partial": true
+						}
+					]
+				}
+			}
+		},
+		"compare": {
+			"argv": [
+				"projection",
+				"compare",
+				"--as-of",
+				"2026-10-31",
+				"--horizon",
+				"2060-12-31",
+				"--birth-date",
+				"1990-05-15",
+				"--age",
+				"45",
+				"--age",
+				"55",
+				"--age",
+				"60",
+				"--carry-in",
+				"-",
+				"--json",
+				"--",
+				"base",
+				"retire-early"
+			],
+			"ok": true,
+			"data": {
+				"asOf": "2026-10-31",
+				"horizon": "2060-12-31",
+				"currency": "THB",
+				"engine": {
+					"package": "@trajectonomics/cli",
+					"version": "0.0.0"
+				},
+				"birthDate": "1990-05-15",
+				"sides": {
+					"a": {
+						"scenario": {
+							"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+							"name": "base",
+							"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
+							"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+						},
+						"overrides": [],
+						"carryIn": [
+							{
+								"levy": "th-2026-pit",
+								"periodStart": "2026-01-01",
+								"tallies": [
+									{
+										"label": "income.section40_1",
+										"basis": "gross",
+										"amount": "850000.00"
+									},
+									{
+										"label": "income.section40_2",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_3",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.interest",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.dividends",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.digitalAssets",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.building",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.agriculturalLand",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.nonAgriculturalLand",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.vehicles",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.other",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.medical",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.law",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.engineering",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.architecture",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.accounting",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.fineArts",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.other",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_7",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_8.general",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_8.entertainer",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.rmf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.ssf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.pvd",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.gpf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.nsf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.pension_life",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.thai_esg",
+										"basis": "funded",
+										"amount": "0.00"
+									}
+								],
+								"prepaid": "0.00",
+								"source": "flag"
+							}
+						],
+						"fi": {
+							"reachable": true,
+							"fiDate": "2042-10-01",
+							"reference": {
+								"label": "ruleOfThumb",
+								"date": "2042-10-01",
+								"multiplier": 25,
+								"basis": "unlockedAssets",
+								"window": "next12Months",
+								"terms": "nominal",
+								"unlockedAssets": "13303437.41",
+								"numerator": "13303437.41",
+								"annualExpenses": "806809.00",
+								"threshold": "20170225.00",
+								"multipleBps": 164889,
+								"partial": false,
+								"met": false
+							}
+						},
+						"taxYears": [
+							{
+								"levy": "th-2026-pit",
+								"from": "2026-01-01",
+								"to": "2026-12-31",
+								"settlementDate": "2027-03-31",
+								"due": "89000.00",
+								"prepaid": "0.00",
+								"owed": "89000.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2027-01-01",
+								"to": "2027-12-31",
+								"settlementDate": "2028-03-31",
+								"due": "100080.00",
+								"prepaid": "0.00",
+								"owed": "100080.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2028-01-01",
+								"to": "2028-12-31",
+								"settlementDate": "2029-03-31",
+								"due": "106592.40",
+								"prepaid": "0.00",
+								"owed": "106592.40",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2029-01-01",
+								"to": "2029-12-31",
+								"settlementDate": "2030-03-31",
+								"due": "113300.17",
+								"prepaid": "0.00",
+								"owed": "113300.17",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2030-01-01",
+								"to": "2030-12-31",
+								"settlementDate": "2031-03-31",
+								"due": "121511.47",
+								"prepaid": "0.00",
+								"owed": "121511.47",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2031-01-01",
+								"to": "2031-12-31",
+								"settlementDate": "2032-03-31",
+								"due": "130406.81",
+								"prepaid": "0.00",
+								"owed": "130406.81",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2032-01-01",
+								"to": "2032-12-31",
+								"settlementDate": "2033-03-31",
+								"due": "139569.03",
+								"prepaid": "0.00",
+								"owed": "139569.03",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2033-01-01",
+								"to": "2033-12-31",
+								"settlementDate": "2034-03-31",
+								"due": "149006.10",
+								"prepaid": "0.00",
+								"owed": "149006.10",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2034-01-01",
+								"to": "2034-12-31",
+								"settlementDate": "2035-03-31",
+								"due": "158726.28",
+								"prepaid": "0.00",
+								"owed": "158726.28",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2035-01-01",
+								"to": "2035-12-31",
+								"settlementDate": "2036-03-31",
+								"due": "168738.07",
+								"prepaid": "0.00",
+								"owed": "168738.07",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2036-01-01",
+								"to": "2036-12-31",
+								"settlementDate": "2037-03-31",
+								"due": "179050.21",
+								"prepaid": "0.00",
+								"owed": "179050.21",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2037-01-01",
+								"to": "2037-12-31",
+								"settlementDate": "2038-03-31",
+								"due": "189671.70",
+								"prepaid": "0.00",
+								"owed": "189671.70",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2038-01-01",
+								"to": "2038-12-31",
+								"settlementDate": "2039-03-31",
+								"due": "200611.87",
+								"prepaid": "0.00",
+								"owed": "200611.87",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2039-01-01",
+								"to": "2039-12-31",
+								"settlementDate": "2040-03-31",
+								"due": "211880.22",
+								"prepaid": "0.00",
+								"owed": "211880.22",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2040-01-01",
+								"to": "2040-12-31",
+								"settlementDate": "2041-03-31",
+								"due": "223486.62",
+								"prepaid": "0.00",
+								"owed": "223486.62",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2041-01-01",
+								"to": "2041-12-31",
+								"settlementDate": "2042-03-31",
+								"due": "235441.24",
+								"prepaid": "0.00",
+								"owed": "235441.24",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2042-01-01",
+								"to": "2042-12-31",
+								"settlementDate": "2043-03-31",
+								"due": "247754.47",
+								"prepaid": "0.00",
+								"owed": "247754.47",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2043-01-01",
+								"to": "2043-12-31",
+								"settlementDate": "2044-03-31",
+								"due": "260437.10",
+								"prepaid": "0.00",
+								"owed": "260437.10",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2044-01-01",
+								"to": "2044-12-31",
+								"settlementDate": "2045-03-31",
+								"due": "273500.22",
+								"prepaid": "0.00",
+								"owed": "273500.22",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2045-01-01",
+								"to": "2045-12-31",
+								"settlementDate": "2046-03-31",
+								"due": "286955.22",
+								"prepaid": "0.00",
+								"owed": "286955.22",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2046-01-01",
+								"to": "2046-12-31",
+								"settlementDate": "2047-03-31",
+								"due": "300813.86",
+								"prepaid": "0.00",
+								"owed": "300813.86",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2047-01-01",
+								"to": "2047-12-31",
+								"settlementDate": "2048-03-31",
+								"due": "315088.28",
+								"prepaid": "0.00",
+								"owed": "315088.28",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2048-01-01",
+								"to": "2048-12-31",
+								"settlementDate": "2049-03-31",
+								"due": "329790.93",
+								"prepaid": "0.00",
+								"owed": "329790.93",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2049-01-01",
+								"to": "2049-12-31",
+								"settlementDate": "2050-03-31",
+								"due": "344934.67",
+								"prepaid": "0.00",
+								"owed": "344934.67",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2050-01-01",
+								"to": "2050-12-31",
+								"settlementDate": "2051-03-31",
+								"due": "61717.09",
+								"prepaid": "0.00",
+								"owed": "61717.09",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2051-01-01",
+								"to": "2051-12-31",
+								"settlementDate": "2052-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2052-01-01",
+								"to": "2052-12-31",
+								"settlementDate": "2053-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2053-01-01",
+								"to": "2053-12-31",
+								"settlementDate": "2054-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2054-01-01",
+								"to": "2054-12-31",
+								"settlementDate": "2055-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2055-01-01",
+								"to": "2055-12-31",
+								"settlementDate": "2056-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2056-01-01",
+								"to": "2056-12-31",
+								"settlementDate": "2057-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2057-01-01",
+								"to": "2057-12-31",
+								"settlementDate": "2058-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2058-01-01",
+								"to": "2058-12-31",
+								"settlementDate": "2059-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2059-01-01",
+								"to": "2059-12-31",
+								"settlementDate": "2060-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2060-01-01",
+								"to": "2060-12-31",
+								"settlementDate": "2061-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": false,
+								"partial": false
+							}
+						],
+						"runOut": null,
+						"netWorth": {
+							"final": {
+								"date": "2060-12-31",
+								"nominal": "19756836.98",
+								"real": "7196252.23"
+							},
+							"atAges": [
+								{
+									"age": 45,
+									"nominal": "6520465.53",
+									"real": "5072417.00"
+								},
+								{
+									"age": 55,
+									"nominal": "16119241.91",
+									"real": "9330581.52"
+								},
+								{
+									"age": 60,
+									"nominal": "22869824.55",
+									"real": "11419334.85"
+								}
+							]
+						}
+					},
+					"b": {
+						"scenario": {
+							"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+							"name": "retire-early",
+							"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
+							"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+						},
+						"overrides": [],
+						"carryIn": [
+							{
+								"levy": "th-2026-pit",
+								"periodStart": "2026-01-01",
+								"tallies": [
+									{
+										"label": "income.section40_1",
+										"basis": "gross",
+										"amount": "850000.00"
+									},
+									{
+										"label": "income.section40_2",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_3",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.interest",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.dividends",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_4.digitalAssets",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.building",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.agriculturalLand",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.nonAgriculturalLand",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.vehicles",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_5.other",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.medical",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.law",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.engineering",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.architecture",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.accounting",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.fineArts",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_6.other",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_7",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_8.general",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "income.section40_8.entertainer",
+										"basis": "gross",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.rmf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.ssf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.pvd",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.gpf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.nsf",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.retirement.pension_life",
+										"basis": "funded",
+										"amount": "0.00"
+									},
+									{
+										"label": "allowance.thai_esg",
+										"basis": "funded",
+										"amount": "0.00"
+									}
+								],
+								"prepaid": "0.00",
+								"source": "flag"
+							}
+						],
+						"fi": {
+							"reachable": false,
+							"binding": "insufficientMoney",
+							"bestCase": {
+								"month": "2040-06-01",
+								"runsOut": {
+									"date": "2056-05-01",
+									"unmet": "70359.24"
+								}
+							}
+						},
+						"taxYears": [
+							{
+								"levy": "th-2026-pit",
+								"from": "2026-01-01",
+								"to": "2026-12-31",
+								"settlementDate": "2027-03-31",
+								"due": "89000.00",
+								"prepaid": "0.00",
+								"owed": "89000.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2027-01-01",
+								"to": "2027-12-31",
+								"settlementDate": "2028-03-31",
+								"due": "100080.00",
+								"prepaid": "0.00",
+								"owed": "100080.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2028-01-01",
+								"to": "2028-12-31",
+								"settlementDate": "2029-03-31",
+								"due": "106592.40",
+								"prepaid": "0.00",
+								"owed": "106592.40",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2029-01-01",
+								"to": "2029-12-31",
+								"settlementDate": "2030-03-31",
+								"due": "113300.17",
+								"prepaid": "0.00",
+								"owed": "113300.17",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2030-01-01",
+								"to": "2030-12-31",
+								"settlementDate": "2031-03-31",
+								"due": "121511.47",
+								"prepaid": "0.00",
+								"owed": "121511.47",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2031-01-01",
+								"to": "2031-12-31",
+								"settlementDate": "2032-03-31",
+								"due": "130406.81",
+								"prepaid": "0.00",
+								"owed": "130406.81",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2032-01-01",
+								"to": "2032-12-31",
+								"settlementDate": "2033-03-31",
+								"due": "139569.03",
+								"prepaid": "0.00",
+								"owed": "139569.03",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2033-01-01",
+								"to": "2033-12-31",
+								"settlementDate": "2034-03-31",
+								"due": "149006.10",
+								"prepaid": "0.00",
+								"owed": "149006.10",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2034-01-01",
+								"to": "2034-12-31",
+								"settlementDate": "2035-03-31",
+								"due": "158726.28",
+								"prepaid": "0.00",
+								"owed": "158726.28",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2035-01-01",
+								"to": "2035-12-31",
+								"settlementDate": "2036-03-31",
+								"due": "168738.07",
+								"prepaid": "0.00",
+								"owed": "168738.07",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2036-01-01",
+								"to": "2036-12-31",
+								"settlementDate": "2037-03-31",
+								"due": "179050.21",
+								"prepaid": "0.00",
+								"owed": "179050.21",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2037-01-01",
+								"to": "2037-12-31",
+								"settlementDate": "2038-03-31",
+								"due": "189671.70",
+								"prepaid": "0.00",
+								"owed": "189671.70",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2038-01-01",
+								"to": "2038-12-31",
+								"settlementDate": "2039-03-31",
+								"due": "200611.87",
+								"prepaid": "0.00",
+								"owed": "200611.87",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2039-01-01",
+								"to": "2039-12-31",
+								"settlementDate": "2040-03-31",
+								"due": "211880.22",
+								"prepaid": "0.00",
+								"owed": "211880.22",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2040-01-01",
+								"to": "2040-12-31",
+								"settlementDate": "2041-03-31",
+								"due": "27626.02",
+								"prepaid": "0.00",
+								"owed": "27626.02",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2041-01-01",
+								"to": "2041-12-31",
+								"settlementDate": "2042-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2042-01-01",
+								"to": "2042-12-31",
+								"settlementDate": "2043-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2043-01-01",
+								"to": "2043-12-31",
+								"settlementDate": "2044-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2044-01-01",
+								"to": "2044-12-31",
+								"settlementDate": "2045-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2045-01-01",
+								"to": "2045-12-31",
+								"settlementDate": "2046-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2046-01-01",
+								"to": "2046-12-31",
+								"settlementDate": "2047-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2047-01-01",
+								"to": "2047-12-31",
+								"settlementDate": "2048-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2048-01-01",
+								"to": "2048-12-31",
+								"settlementDate": "2049-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2049-01-01",
+								"to": "2049-12-31",
+								"settlementDate": "2050-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2050-01-01",
+								"to": "2050-12-31",
+								"settlementDate": "2051-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2051-01-01",
+								"to": "2051-12-31",
+								"settlementDate": "2052-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2052-01-01",
+								"to": "2052-12-31",
+								"settlementDate": "2053-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2053-01-01",
+								"to": "2053-12-31",
+								"settlementDate": "2054-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2054-01-01",
+								"to": "2054-12-31",
+								"settlementDate": "2055-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2055-01-01",
+								"to": "2055-12-31",
+								"settlementDate": "2056-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": true,
+								"partial": false
+							},
+							{
+								"levy": "th-2026-pit",
+								"from": "2056-01-01",
+								"to": "2056-12-31",
+								"settlementDate": "2057-03-31",
+								"due": "0.00",
+								"prepaid": "0.00",
+								"owed": "0.00",
+								"settled": false,
+								"partial": true
+							}
+						],
+						"runOut": {
+							"date": "2056-05-01",
+							"unmet": "70359.24"
+						},
+						"netWorth": {
+							"final": {
+								"date": "2056-05-01",
+								"nominal": "0.00",
+								"real": "0.00"
+							},
+							"atAges": [
+								{
+									"age": 45,
+									"nominal": "6520465.53",
+									"real": "5072417.00"
+								},
+								{
+									"age": 55,
+									"nominal": "8588148.13",
+									"real": "4971227.35"
+								},
+								{
+									"age": 60,
+									"nominal": "5668144.04",
+									"real": "2830211.25"
+								}
+							]
+						}
+					}
+				},
+				"deltas": {
+					"fiMonths": null,
+					"runOutYears": null,
+					"netWorth": null,
+					"atAges": [
+						{
+							"age": 45,
+							"nominal": "0.00",
+							"real": "0.00"
+						},
+						{
+							"age": 55,
+							"nominal": "-7531093.78",
+							"real": "-4359354.17"
+						},
+						{
+							"age": 60,
+							"nominal": "-17201680.51",
+							"real": "-8589123.60"
+						}
+					]
+				},
+				"tax": "applied",
+				"notes": [
+					"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+					"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+					"Side B could not fund 3083347.45 of Contributions, so they were not made."
+				]
+			}
+		},
+		"accounts": {
+			"argv": ["account", "list", "--json"],
+			"ok": true,
+			"data": {
+				"accounts": [
+					{
+						"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+						"name": "Bank",
+						"type": "asset",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:41.915Z",
+						"updatedAt": "2026-11-21T17:49:41.915Z"
+					},
+					{
+						"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+						"name": "Car Loan",
+						"type": "liability",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.077Z",
+						"updatedAt": "2026-11-21T17:49:42.077Z"
+					},
+					{
+						"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+						"name": "Fund",
+						"type": "asset",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:41.997Z",
+						"updatedAt": "2026-11-21T17:49:41.997Z"
+					},
+					{
+						"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+						"name": "Fund Return",
+						"type": "income",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.237Z",
+						"updatedAt": "2026-11-21T17:49:42.237Z"
+					},
+					{
+						"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+						"name": "Living",
+						"type": "expense",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.318Z",
+						"updatedAt": "2026-11-21T17:49:42.318Z"
+					},
+					{
+						"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+						"name": "Opening",
+						"type": "equity",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.559Z",
+						"updatedAt": "2026-11-21T17:49:42.559Z"
+					},
+					{
+						"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+						"name": "Rent",
+						"type": "expense",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.397Z",
+						"updatedAt": "2026-11-21T17:49:42.397Z"
+					},
+					{
+						"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+						"name": "Salary",
+						"type": "income",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.157Z",
+						"updatedAt": "2026-11-21T17:49:42.157Z"
+					},
+					{
+						"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+						"name": "Travel",
+						"type": "expense",
+						"currency": "THB",
+						"parentId": null,
+						"archivedAt": null,
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:42.478Z",
+						"updatedAt": "2026-11-21T17:49:42.478Z"
+					}
+				]
+			}
+		},
+		"netWorth": {
+			"argv": ["report", "networth", "--as-of", "2026-10-31", "--json"],
+			"ok": true,
+			"data": {
+				"asOf": "2026-10-31",
+				"firstTransactionDate": "2024-11-01",
+				"noTransactionsBefore": false,
+				"rows": [
+					{
+						"account": {
+							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"name": "Bank"
+						},
+						"type": "asset",
+						"amount": "662300.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"name": "Car Loan"
+						},
+						"type": "liability",
+						"amount": "-184000.00",
+						"currency": "THB"
+					},
+					{
+						"account": {
+							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"name": "Fund"
+						},
+						"type": "asset",
+						"amount": "736600.00",
+						"currency": "THB"
+					}
+				],
+				"totals": [
+					{
+						"currency": "THB",
+						"amount": "1214900.00"
+					}
+				]
+			}
+		},
+		"scenarios": {
+			"argv": ["scenario", "list", "--json"],
+			"ok": true,
+			"data": {
+				"scenarios": [
+					{
+						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"name": "base",
+						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
+						"forkedFrom": null,
+						"version": 2,
+						"createdAt": "2026-11-21T17:49:43.123Z",
+						"updatedAt": "2026-11-21T17:49:43.230Z"
+					},
+					{
+						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"name": "retire-early",
+						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
+						"forkedFrom": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"version": 1,
+						"createdAt": "2026-11-21T17:49:43.324Z",
+						"updatedAt": "2026-11-21T17:49:43.324Z"
+					}
+				]
+			}
+		}
+	}
+}

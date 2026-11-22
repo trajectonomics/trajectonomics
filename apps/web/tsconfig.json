@@ -1,0 +1,12 @@
+{
+	"extends": ["$app/tsconfig", "./tsconfig.base.json"],
+	"compilerOptions": {
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"types": ["bun", "$app/types"],
+		"isolatedDeclarations": false,
+		"resolveJsonModule": true,
+		"allowImportingTsExtensions": false,
+		"declaration": false
+	},
+	"include": ["src", "scripts", "vite.config.ts", ".svelte-kit/ambient.d.ts"]
+}

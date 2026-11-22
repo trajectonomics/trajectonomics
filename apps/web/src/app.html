@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<title>Dashboard</title>
+		<!-- Sets the Theme before first paint: the stored choice, else the system's preference. -->
+		<script>
+			;(() => {
+				let theme = "light"
+				try {
+					const stored = localStorage.getItem("traj.theme")
+					if (stored === "light" || stored === "dark") theme = stored
+					else if (matchMedia("(prefers-color-scheme: dark)").matches) theme = "dark"
+				} catch {
+					// Storage or matchMedia is unavailable: the light Theme stands.
+				}
+				document.documentElement.dataset.theme = theme
+			})()
+		</script>
+		%sveltekit.head%
+	</head>
+	<body class="flex min-h-screen flex-col bg-background font-sans text-foreground">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
