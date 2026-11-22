@@ -41,3 +41,7 @@ The two events are unchanged on the wire: the DOM signal, `site_command_copied` 
 detail keep their names and their values, because they are measured history and the value was always chosen to
 be stable "never by its text, which changes every release" — which is exactly why it survives the text changing.
 Only the code and comments around them say prompt.
+
+## Amendment (2026-11-22): the Site asks before it sets a cookie
+
+The page still measures every visitor, and the cookieless count is unchanged for every visitor who has not allowed a cookie. A visitor who allows one is given a random id in `traj_vid`, which the page hands to every event, so unique and returning visitors become a number for them. The question, the cookies and the rules are in [ADR 0024](./0024-the-site-asks-before-it-sets-an-analytics-cookie.md). The "nothing is stored" rule above now holds only for a visitor who has not answered, or who refused.
