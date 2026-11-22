@@ -17,6 +17,7 @@ describe("schema", () => {
 			"backup",
 			"balance",
 			"baseline show",
+			"dashboard",
 			"data remove",
 			"doctor",
 			"export",

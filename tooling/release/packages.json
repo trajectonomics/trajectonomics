@@ -3,7 +3,7 @@
 		"name": "@trajectonomics/cli",
 		"folder": "apps/cli",
 		"tagPrefix": "cli-v",
-		"extraPaths": ["packages/core"],
+		"extraPaths": ["packages/core", "apps/web"],
 		"githubLatest": true
 	}
 ]

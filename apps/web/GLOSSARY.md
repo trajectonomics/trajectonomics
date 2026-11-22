@@ -20,6 +20,10 @@ _Avoid_: fetch, request, query, call
 The committed Snapshot in `public/demo/snapshot.json`, built from a fictional ledger, so the Dashboard can be seen with no ledger of anyone's own.
 _Avoid_: sample data, mock, fixture, seed data
 
+**Pack**:
+The built pages of `dist/` in one file, `pack/dashboard.bin`: every file's bytes in base64 by its path, in one JSON document. The compiled `traj` embeds it so `traj dashboard` can serve the Dashboard without a checkout.
+_Avoid_: bundle, archive, assets
+
 **Plan**:
 The list of argv a Snapshot needs, computed from the parameters alone. Stage one reads the Scenarios, the accounts and the first transaction date; stage two reads everything else.
 _Avoid_: pipeline, workflow, job, script
