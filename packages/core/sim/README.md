@@ -63,7 +63,7 @@ and for a derived contribution into a liability, which is a debt payment and wou
 being paid. The FI entry rejects both: a derived expense unless `retirementSpending` replaces every
 expense after the FI month, and a derived debt payment unconditionally
 (`DERIVED_DEBT_PAYMENT_READS_EARNED`), because retirement spending replaces expenses only. The plain
-Projection is unaffected. See [ADR 0008](docs/adr/0008-levy-extensions.md).
+Projection is unaffected. See [ADR 0014](docs/adr/0014-levy-extensions.md).
 
 ## Scripts
 
