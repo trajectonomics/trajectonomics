@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { z } from "zod"
 import { defineCommand, defineGroup } from "./command"
@@ -9,6 +8,7 @@ import { FIXTURE_AS_OF, fixtureHome } from "./ledger-fixture"
 import { type StoreRaised, storeTriggers } from "./store/store-triggers"
 import { ledgerHome, SCENARIO_DOCUMENT, tempHome } from "./store/testing"
 import type { Trigger } from "./store/trigger-setup"
+import { makeTempDir } from "./temp-dir"
 import { type Captured, capture } from "./test-support"
 import { throwingRoot } from "./test-tree"
 
@@ -133,26 +133,26 @@ describe("contract", () => {
 			)
 		},
 		output_exists: async () => {
-			const out = join(mkdtempSync(join(tmpdir(), "traj-test-")), "out")
+			const out = join(makeTempDir("traj-test-"), "out")
 			mkdirSync(out)
 			const home = fixtureHome()
 			return capture(["export", "--out", out, "--json"], { TRAJ_HOME: home })
 		},
 		export_failed: async () => {
-			const file = join(mkdtempSync(join(tmpdir(), "traj-test-")), "afile")
+			const file = join(makeTempDir("traj-test-"), "afile")
 			writeFileSync(file, "")
 			const home = fixtureHome()
 			return capture(["export", "--out", join(file, "out"), "--json"], { TRAJ_HOME: home })
 		},
 		backup_unreadable: async () => {
 			// A directory where the backup file should be: the read fails however the mode is set.
-			const dir = mkdtempSync(join(tmpdir(), "traj-test-"))
+			const dir = makeTempDir("traj-test-")
 			mkdirSync(join(dir, "traj.jsonl"))
 			return capture(["restore", dir, "--json"], { TRAJ_HOME: tempHome() })
 		},
 		backup_stale: async () => {
 			const home = ledgerHome()
-			const out = join(mkdtempSync(join(tmpdir(), "traj-test-")), "out")
+			const out = join(makeTempDir("traj-test-"), "out")
 			const add = (name: string) =>
 				capture(["account", "add", name, "--type", "asset", "--currency", "THB", "--json"], {
 					TRAJ_HOME: home,

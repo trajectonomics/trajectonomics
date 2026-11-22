@@ -1,11 +1,11 @@
 import { afterAll, describe, expect, it } from "bun:test"
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { chmodSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { makeTempDir } from "./temp-dir"
 
 // install.sh picks where to download from before it fetches anything. A stub curl records the
 // first URL it is asked for and fails, so the script stops right after choosing.
-const scratch = mkdtempSync(join(tmpdir(), "traj-install-routing-"))
+const scratch = makeTempDir("traj-install-routing-")
 const urls = join(scratch, "urls")
 writeFileSync(
 	join(scratch, "curl"),
