@@ -3,8 +3,10 @@
 `profiles/factory.json` is the checked profile of upstream engineering skills
 that every Trajectonomics Factory repository installs. It names skills from
 [`mattpocock/skills`](https://github.com/mattpocock/skills) and
-[`cloudflare/skills`](https://github.com/cloudflare/skills); no upstream skill
-content is copied into this repository, so no Apache-2.0 NOTICE is needed.
+[`cloudflare/skills`](https://github.com/cloudflare/skills); the profile copies
+no `cloudflare/skills` content into this repository, so no Apache-2.0 NOTICE is
+needed here. The MIT skills vendored under `.agents/skills/` are credited in
+[`THIRD_PARTY_NOTICES.md`](../../../THIRD_PARTY_NOTICES.md).
 
 ## Install
 
