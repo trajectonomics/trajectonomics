@@ -60,6 +60,12 @@ const NOTICE_TIMEOUT_MS = 6000
 	</div>
 </div>
 
+{/*
+	Two notes live here rather than in the script, because every byte of an inline script ships against
+	the page's 10,000 (ADR 0005): the Copy button keeps its full width while it says the short word, so
+	the CLI link cannot jump up beside it on a phone and back down six seconds later; and the closing
+	section's link is parsed after this script runs, so it is revealed once the document is.
+*/}
 <script is:inline>
 	;(() => {
 		const prompt = document.querySelector("[data-install-prompt]")
@@ -89,6 +95,7 @@ const NOTICE_TIMEOUT_MS = 6000
 			// The button paints the accent role and shortens its word, or keeps both for a failed copy.
 			if (failed) button.removeAttribute("data-copy-state")
 			else button.setAttribute("data-copy-state", "copied")
+			if (notice === null) button.style.minWidth = `${button.getBoundingClientRect().width}px`
 			button.textContent = failed ? label : (button.dataset.copiedLabel ?? label)
 			// Re-attaching the state restarts the countdown, so a second copy gets its own six seconds.
 			toast.removeAttribute("data-visible")
@@ -100,6 +107,7 @@ const NOTICE_TIMEOUT_MS = 6000
 				toast.removeAttribute("data-visible")
 				button.removeAttribute("data-copy-state")
 				button.textContent = label
+				button.style.minWidth = ""
 				notice = null
 			}, timeoutMs)
 		}
@@ -108,8 +116,10 @@ const NOTICE_TIMEOUT_MS = 6000
 		// this one and the CLI link. With JavaScript off, the CLI link is the remaining way out.
 		button.hidden = false
 		// The closing section's link back up to this control appears only when the control does.
-		const back = document.querySelector("[data-closing-prompt]")
-		if (back instanceof HTMLElement) back.hidden = false
+		document.addEventListener("DOMContentLoaded", () => {
+			const back = document.querySelector("[data-closing-prompt]")
+			if (back instanceof HTMLElement) back.hidden = false
+		})
 		button.addEventListener("click", async () => {
 			const text = prompt.textContent?.trim() ?? ""
 			try {

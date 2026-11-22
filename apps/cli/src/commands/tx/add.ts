@@ -76,6 +76,7 @@ export const add: Leaf = defineCommand({
 		"external_ref_conflict",
 		"invalid_input",
 		"liability_opening_positive",
+		"same_account",
 		"unsupported_currency",
 	],
 	run: (input, document, ctx) =>

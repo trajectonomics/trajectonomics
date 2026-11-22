@@ -44,6 +44,7 @@ describe("tx import schema, help and listing", () => {
 				"database_busy",
 				"external_ref_conflict",
 				"invalid_input",
+				"same_account",
 				"unsupported_currency",
 			].sort(),
 		)

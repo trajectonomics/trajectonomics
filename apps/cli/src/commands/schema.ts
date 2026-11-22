@@ -5,7 +5,7 @@ import { registryListing } from "../error-listing"
 import { fail } from "../errors"
 import { NOT_SUPPORTED } from "../schema/limits"
 import { detailSchema, listingSchema } from "../schema/output"
-import { findNode, leavesOf } from "../tree"
+import { findNode, leavesOf, pathWords } from "../tree"
 
 export const schema: Leaf = defineCommand({
 	name: "schema",
@@ -24,21 +24,22 @@ export const schema: Leaf = defineCommand({
 	],
 	errorCodes: ["unknown_command"],
 	run: (input, ctx) => {
-		const node = findNode(ctx.root, input.path)
+		const path = pathWords(input.path)
+		const node = findNode(ctx.root, path)
 		if (!node) {
 			return fail("unknown_command", {
-				message: `Unknown command: ${input.path.join(" ")}`,
+				message: `Unknown command: ${path.join(" ")}`,
 				hint: 'Run "traj schema" to list commands.',
 			})
 		}
-		const placed = leavesOf(node, [...input.path])
+		const placed = leavesOf(node, [...path])
 		if (node.kind === "group") {
 			const commands = placed.map(({ path, leaf }) => ({
 				name: path.join(" "),
 				summary: leaf.summary,
 			}))
 			return ok(
-				input.path.length === 0
+				path.length === 0
 					? { commands, errors: registryListing(), notSupported: [...NOT_SUPPORTED] }
 					: { commands },
 			)
@@ -65,7 +66,7 @@ export const schema: Leaf = defineCommand({
 						})),
 					}
 		return ok({
-			name: input.path.join(" "),
+			name: path.join(" "),
 			summary: node.summary,
 			positionals: [...node.positionals],
 			input: z.toJSONSchema(node.input, { io: "input" }),

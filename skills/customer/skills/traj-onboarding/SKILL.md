@@ -75,9 +75,8 @@ Done when a version prints.
 
 The CLI version floor is `0.2.0`: the oldest `@trajectonomics/cli` release whose command surface the
 operating skill in step 2 assumes. That release carries `projection run`, `projection compare`, `fi`
-and `scenario tax` — named here for provenance only, since command shapes still come from
-`traj schema` — and the issue that tracks it is `trajectonomics/cli#117`. Below the floor the
-operating skill's `description` promises work the command line refuses.
+and `scenario tax`, named here for provenance only, since command shapes still come from
+`traj schema`. Below the floor the operating skill's `description` promises work the command line refuses.
 
 The version to compare is the first version that printed — `traj --version` when a binary is on
 `PATH`, otherwise the scoped package's. The unscoped `traj` on npm is a different, unrelated package:
@@ -136,7 +135,7 @@ disclosures come in every open, before any handover — the failed read included
 the handover, in these five facts: the version on this machine; the version the operating skill
 expects; the work that still works — recording, reading balances and reports, and testing a Scenario;
 the work that does not — a projection, a financial-independence date and a tax figure; and the release
-that closes that gap, tracked as `trajectonomics/cli#117`. Say the command line is older, not broken,
+that closes that gap, `@trajectonomics/cli` 0.2.0 or later. Say the command line is older, not broken,
 and that nothing is installed or downloaded to fix it. Setup still finishes.
 
 **Above a range.** Read the CLI Range each installed skill states in its own frontmatter. When the
@@ -173,7 +172,7 @@ document. Then report what it found before you ask anything, in one of three way
 
 **No ledger file yet.** Ask the person two things in one question: their financial situation, and
 their goal. **Enter a debt as a negative opening balance**, so that borrowing lowers net worth
-instead of raising it; the command line does not yet normalise the sign, tracked as `trajectonomics/cli#149`, and a debt
+instead of raising it; from 0.3.0 the command line refuses a positive opening on a liability, and below 0.3.0 a debt
 recorded the obvious way reads as a gain. Then read the `traj` skill at the `path` the list command reported, and
 follow it for the rest of this conversation.
 
@@ -194,5 +193,5 @@ Tell them, once, before the handover:
   reach the network, and only these two — the binary download, and the `skills` CLI that installs
   these skills. Say exactly that, and nothing broader.
 - **Never `rm -rf ~/.traj`.** That directory holds the ledger; removing it destroys every row, and no
-  command in this version removes the data for you. After `trajectonomics/cli#148` this becomes the CLI's
-  guarded command, and not before.
+  command below 0.3.0 removes the data for you. From 0.3.0 the CLI has its own guarded removal, which
+  refuses without a confirmation.

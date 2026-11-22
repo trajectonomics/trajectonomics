@@ -5,7 +5,6 @@ import {
 	type SearchTriggerProps,
 } from "fumadocs-ui/layouts/shared/slots/search-trigger"
 import type { FC, ReactNode } from "react"
-import { siteHomeButton } from "../lib/layout.shared"
 
 /** The header's Tab treatment: Fumadocs' own, carried over from the row this change removes. */
 const TAB_CLASS =
@@ -62,17 +61,17 @@ export interface DocsSidebarBannerProps {
 }
 
 /**
- * The sidebar's top block: the way back to the Site Home above the search trigger, a hairline under
- * them, then the header children Fumadocs passes a banner — its Tab dropdown, and in the drawer its
- * close button, drawn by the library rather than by this block. The tree follows the block; from
- * `lg` up it follows the hairline, because the dropdown is hidden there (ADR 0009). The Agent's
- * pointer to the page's Markdown twin is not here: no reader meets it (ADR 0010).
+ * The sidebar's top block: the search trigger, a hairline under it, then the header children
+ * Fumadocs passes a banner — its Tab dropdown, and in the drawer its close button, drawn by the
+ * library rather than by this block. The tree follows the block; from `lg` up it follows the
+ * hairline, because the dropdown is hidden there (ADR 0009). The way back to the Site Home is the
+ * header's glyph tile, not a sidebar control. The Agent's pointer to the page's Markdown twin is
+ * not here: no reader meets it (ADR 0010).
  */
 export function DocsSidebarBanner({ children }: DocsSidebarBannerProps) {
 	return (
 		<div data-sidebar-top-block="" className="flex flex-col">
 			<div className="flex flex-col gap-2 border-b p-3">
-				{siteHomeButton()}
 				<FullSearchTrigger hideIfDisabled />
 			</div>
 			<div data-sidebar-tabs="" className="flex items-center gap-2 p-3 empty:hidden">

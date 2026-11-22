@@ -8,7 +8,7 @@ import {
 } from "../src/lib/agent-line"
 import { DOCS_BASE_PATH, DOCS_INDEX_PATH, TABS, tabUrl } from "../src/lib/tabs"
 import { builtPages, NOT_FOUND_PATH, openPage, pageName } from "./built-site"
-import { openPhoneMenu, openSidebarDrawer, waitForIsland } from "./docs-portal"
+import { openSidebarDrawer, waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
 import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
 
@@ -127,16 +127,12 @@ test("a docs page's sidebar, header and drawer show no trace of the pointer at 3
 	await expectPointerAtTopOfBody(page, tabUrl(TABS[0]))
 })
 
-test("the Landing Page's header and menu show no trace of the pointer at 390px", async ({
-	page,
-}) => {
+test("the Landing Page's header shows no trace of the pointer at 390px", async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: TEST_VIEWPORT_HEIGHT_PX })
 	await openPage(page, LANDING_PATH)
 	await waitForIsland(page)
 	await expectPointer(page, LANDING_PATH)
 	await expectNoReaderChannel(page, LANDING_PATH)
-
-	await openPhoneMenu(page)
 
 	await expect(page.locator("#nd-nav")).not.toContainText(AGENT_LINE_PREFIX)
 	await expectPointerAtTopOfBody(page, LANDING_PATH)

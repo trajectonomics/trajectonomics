@@ -52,7 +52,7 @@
 
 /*
  * The header is one row of 56px. The Tabs are laid over that row and centred on the page, so the
- * wordmark at the start of the row cannot push them off centre (docs#91).
+ * brand at the start of the row cannot push them off centre (docs#91).
  */
 #nd-subnav [data-header-body] {
 	position: relative;
@@ -62,6 +62,15 @@
 	position: absolute;
 	inset-inline-start: 50%;
 	translate: -50% 0;
+}
+
+/*
+ * The home layout's header menu held only the way back to the Site Home, which the header's glyph
+ * tile now is (ADR 0009). With no link items it would open an empty panel, so its trigger is not
+ * drawn.
+ */
+#nd-nav button[aria-label="Toggle Menu"] {
+	display: none;
 }
 
 /*

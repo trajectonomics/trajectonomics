@@ -1,13 +1,16 @@
 /**
  * The way back to the Site Home, the page at the root of trajectonomics.com that `apps/site`
- * deploys: its words and how the link loads. Pure, so a browser test asserts the link without
+ * deploys: its name and how the link loads. Pure, so a browser test asserts the link without
  * loading the React shell.
  */
 
 import { APEX_ORIGIN } from "./site"
 
-/** Visible text of the link to the Site Home. */
-export const SITE_HOME_LABEL = "trajectonomics.com"
+/**
+ * Accessible name of the header's glyph tile, the way back to the Site Home, as the blog names
+ * its own (ADR 0009).
+ */
+export const SITE_HOME_NAME = "Trajectonomics home"
 
 /**
  * Absolute URL of the Site Home. The Docs Portal is its own host, so `/` is the Landing Page

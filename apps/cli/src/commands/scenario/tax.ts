@@ -48,6 +48,10 @@ export const tax: Leaf = defineCommand({
 		status: z
 			.enum(["created", "updated", "unchanged"])
 			.describe("Whether the document changed; `created` is never returned here."),
+		levy: z
+			.string()
+			.optional()
+			.describe("The Levy id the write states; absent when --none wrote no Levy."),
 		allowances: z
 			.strictObject({
 				stated: z

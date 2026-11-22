@@ -92,6 +92,17 @@ describe("schema", () => {
 		}
 	})
 
+	it("advertises same_account at exit 3 on the listing and on both transfer commands", async () => {
+		const listing = JSON.parse((await capture(["schema", "--json"])).out)
+		expect(listing.errors).toContainEqual(
+			expect.objectContaining({ code: "same_account", exitCode: 3, retryable: false }),
+		)
+		for (const name of ["tx add", "tx import"]) {
+			const data = JSON.parse((await capture(["schema", ...name.split(" "), "--json"])).out)
+			expect(data.errorCodes).toContain("same_account")
+		}
+	})
+
 	it("rejects an unknown command name with unknown_command", async () => {
 		const res = await capture(["schema", "nope", "--json"])
 		expect(res.code).toBe(2)
