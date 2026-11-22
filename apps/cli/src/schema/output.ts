@@ -56,6 +56,10 @@ export function detailSchema(): z.ZodType {
 	return z.strictObject({
 		name: z.string().describe("The full command path."),
 		summary: z.string(),
+		description: z
+			.string()
+			.optional()
+			.describe("Prose under the summary: what the command means, beyond its one line."),
 		positionals: z.array(z.string()).describe("Input fields filled from words, in order."),
 		input: jsonSchema.describe("JSON Schema of the command's input. Non-positionals are flags."),
 		document: document.optional(),

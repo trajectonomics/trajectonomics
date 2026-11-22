@@ -52,11 +52,11 @@ export const amend: Leaf = defineCommand({
 	examples: [
 		{
 			command:
-				"traj tx amend 0194a000-0003-7000-8000-000000000003 --from Cash --to Food --amount 100 --date 2026-03-02",
+				"traj tx amend 0194b000-0003-7000-8000-000000000003 --from Cash --to Food --amount 100 --date 2026-03-02",
 			description: "Reverse a transaction and record the corrected one.",
 		},
 		{
-			command: "traj tx amend 0194a000-0003-7000-8000-000000000003 --postings -",
+			command: "traj tx amend 0194b000-0004-7000-8000-000000000004 --postings -",
 			description: "Read the replacement's postings from stdin.",
 		},
 	],

@@ -49,8 +49,8 @@ export const apply: Leaf = defineCommand({
 			description: "Create a Scenario, or update it when the document changed.",
 		},
 		{
-			command: "traj scenario apply base --file - < base.json",
-			description: "Read the document from stdin.",
+			command: "traj scenario apply base --file -",
+			description: "Read the document from stdin, for example redirected from base.json.",
 		},
 		{
 			command: "traj scenario apply base --file base.json --dry-run",

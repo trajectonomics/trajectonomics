@@ -8,7 +8,11 @@ import { taxYear } from "./tax-year"
 export const fi = z.strictObject({
 	...projectionShape,
 	method: z.literal("survival"),
-	definition: z.strictObject({ method: z.literal("survival"), definitionVersion: integer }),
+	definition: z.strictObject({
+		method: z.literal("survival"),
+		definitionVersion: integer,
+		explanation: z.string(),
+	}),
 	fi: fiResult,
 	taxYears: z.array(taxYear),
 })

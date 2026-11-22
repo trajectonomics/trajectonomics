@@ -4,6 +4,7 @@ import { defineCommand } from "../../command"
 import { isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
+import { FI_METHOD } from "../../projection/fi-method"
 import {
 	asOfFlag,
 	carryInFlag,
@@ -21,6 +22,7 @@ import { projectionRunView } from "../../projection/run-view"
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
+	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,
