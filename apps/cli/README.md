@@ -175,8 +175,6 @@ and where it came from, and one that starts on a period boundary needs nothing:
 
 ## Seeing it in a browser
 
-> **Ships in 0.5.0.**
-
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.
 
 ## Keeping a backup, and removing the data
@@ -205,8 +203,6 @@ traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 ```
 
 ## Telemetry
-
-> **Ships in 0.6.0.**
 
 `traj` counts its own use, so the project can see how many people run it each week. After a command finishes, a detached process sends one anonymous event to PostHog (EU), so the command never waits for the network. The event holds:
 

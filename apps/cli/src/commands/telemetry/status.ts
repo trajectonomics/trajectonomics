@@ -6,7 +6,6 @@ import { statusOf, statusOutput } from "../../telemetry/status"
 export const status: Leaf = defineCommand({
 	name: "status",
 	summary: "Show whether this CLI counts its own use, and why",
-	note: "Ships in 0.6.0.",
 	positionals: [],
 	input: z.strictObject({}),
 	output: statusOutput,
