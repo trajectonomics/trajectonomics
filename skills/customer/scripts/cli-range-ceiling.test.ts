@@ -81,11 +81,12 @@ describe("recheckIssues", () => {
 		expect(() => recheckIssues([ROW], "", [])).toThrow("stable X.Y.Z")
 	})
 
-	it("checks the published manifest, which passes no ceiling at the release it ships with", () => {
+	it("checks the published manifest: no ceiling is passed below every floor, and every one far above", () => {
 		const manifest = parseSkillManifest(
 			readFileSync(new URL(`../${MANIFEST_PATH}`, import.meta.url), "utf8"),
 		)
-		expect(recheckIssues(manifest.skills, "0.2.9", [])).toEqual([])
-		expect(recheckIssues(manifest.skills, "0.3.0", [])).toHaveLength(manifest.skills.length)
+		// Rows carry their own ranges and move independently, so the test reads none of them.
+		expect(recheckIssues(manifest.skills, "0.0.1", [])).toEqual([])
+		expect(recheckIssues(manifest.skills, "999.0.0", [])).toHaveLength(manifest.skills.length)
 	})
 })
