@@ -10,7 +10,7 @@ import {
 	parseMinorUnits,
 	type Store,
 } from "../store"
-import { unknownAccount } from "./errors"
+import { sameAccount, unknownAccount } from "./errors"
 
 /** Names the input field a failure points at; a CSV row prefixes its own line. */
 export type FieldPath = (field: string) => string
@@ -97,6 +97,7 @@ export function preparedTransfer(
 	const to = store.getAccount(input.to)
 	if (isAppError(to)) return to
 	if (to === null) return unknownAccount(input.to, path("to"))
+	if (to.id === from.id) return sameAccount(to, path("to"))
 	const chart = store.chart()
 	if (isAppError(chart)) return chart
 	const amount = parseMinorUnits(input.amount, to.currency, path("amount"))
