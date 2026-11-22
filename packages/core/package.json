@@ -90,7 +90,7 @@
 		"format": "biome check --write scripts tsdown.config.ts",
 		"check:deps": "bun run scripts/check-deps.ts && bun test scripts",
 		"lint:package": "publint --strict && attw --pack . --profile node16",
-		"check": "bun run lint && bun run typecheck && bun run check:deps && bun run build && bun run lint:package"
+		"check": "bun run lint && bun run typecheck && bun run check:deps && bun run lint:package"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.5",
