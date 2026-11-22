@@ -8,7 +8,8 @@ interface Props {
 }
 
 // A labelled `section`, not an `aside`: the banner sits inside the page's `main`, where a
-// complementary landmark does not belong. The banner is plain links and no script (ADR 0024): each link's redirect stores the choice and
+// complementary landmark does not belong. It is a card fixed to the screen's bottom corner (ADR 0028).
+// It is plain links and no script (ADR 0024): each link's redirect stores the choice and
 // returns the visitor to the page without the banner. A script would only spare that one reload, and
 // the home's program JavaScript budget is 10,000 bytes (ADR 0005), which it does not fit.
 const { dictionary } = Astro.props

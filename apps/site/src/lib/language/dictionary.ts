@@ -159,7 +159,7 @@ export interface Dictionary {
 	readonly footerReleases: string
 	/** The banner's landmark name, which a screen reader announces before its text. */
 	readonly consentLabel: string
-	/** The banner's question: what is counted, and what one cookie would add. */
+	/** The banner's question: the one cookie it asks for, what it holds and how long it lasts. */
 	readonly consentText: string
 	/** The banner link that stores the visitor's yes, which reloads the page without the banner. */
 	readonly consentAllow: string
