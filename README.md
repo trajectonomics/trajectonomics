@@ -11,6 +11,8 @@ tax. Your ledger stays on your machine, in `~/.traj`.
 [Website](https://trajectonomics.com/) · [Docs](https://docs.trajectonomics.com/) ·
 [Releases](https://github.com/trajectonomics/trajectonomics/releases) · MIT licence
 
+![Terminal demo with a fictional ledger: traj records three accounts, shows net worth of 1,340,000 THB, then answers when its owner can stop working, which is financial independence on 2037-09-01.](docs/demo/traj-demo.gif)
+
 ## Get started
 
 Give a coding agent that can run commands (Claude Code, Codex, Cursor and similar) this one line:

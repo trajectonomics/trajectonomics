@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
+import { FI_METHOD } from "./fi-method"
 import { dateField } from "./money"
 import {
 	type BestCaseView,
@@ -38,7 +39,7 @@ export type FiView = Echo & {
 	horizon: string
 	currency: string
 	method: "survival"
-	definition: { method: "survival"; definitionVersion: number }
+	definition: { method: "survival"; definitionVersion: number; explanation: string }
 	fi: FiAnswer
 	taxYears: TaxYearView[]
 }
@@ -76,8 +77,11 @@ export const fiView: z.ZodType<FiView> = z.strictObject({
 	currency: z.string().describe("The Scenario's ISO 4217 currency; v1 is THB only."),
 	method: z.literal("survival").describe("The FI method, as the engine states it."),
 	definition: z.strictObject({
-		method: z.literal("survival").describe("The FI method; ADR-0008 fixes survival."),
+		method: z
+			.literal("survival")
+			.describe("The FI method: survival, the earliest month earned income could stop."),
 		definitionVersion: z.number().int().describe("The engine's version of that definition."),
+		explanation: z.string().describe(`What the method does, in three sentences: ${FI_METHOD}`),
 	}),
 	fi: fiAnswer,
 	taxYears: taxYearsField,

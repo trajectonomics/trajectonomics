@@ -20,8 +20,8 @@ export const close: Leaf = defineCommand({
 		account: accountRow,
 	}),
 	examples: [
-		{ command: "traj account close Cash", description: "Archive an account by name." },
 		{ command: "traj account close Cash --dry-run", description: "Show what closing would do." },
+		{ command: "traj account close Cash", description: "Archive an account by name." },
 	],
 	errorCodes: ["database_busy", "not_found"],
 	run: (input, ctx) =>

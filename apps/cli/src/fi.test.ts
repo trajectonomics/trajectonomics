@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import simPackage from "../package.json"
+import { FI_METHOD } from "./projection/fi-method"
 import type { FiView } from "./projection/fi-view"
 import { AS_OF, baseFlags, errorOf, fi, HORIZON, projectionHome } from "./projection/testing"
 import { type Captured, capture } from "./test-support"
@@ -21,7 +22,11 @@ describe("fi", () => {
 		expect(body.horizon).toBe(HORIZON)
 		expect(body.engine).toEqual({ package: "@trajectonomics/cli", version: simPackage.version })
 		expect(body.method).toBe("survival")
-		expect(body.definition).toEqual({ method: "survival", definitionVersion: 1 })
+		expect(body.definition).toEqual({
+			method: "survival",
+			definitionVersion: 1,
+			explanation: FI_METHOD,
+		})
 		expect(body.fi).toMatchObject({ reachable: true, fiDate: "2026-04-01" })
 	})
 
@@ -107,11 +112,21 @@ describe("fi", () => {
 		expect(errorOf(refused).code).toBe("invalid_input")
 	})
 
+	it("states the FI method in its help and in its result, in the same three sentences", async () => {
+		const help = await capture(["fi", "--help"])
+		expect(help.code).toBe(0)
+		expect(help.out).toContain(FI_METHOD)
+		expect(FI_METHOD.split(/(?<=\.) (?=[A-Z])/)).toHaveLength(3)
+		const home = await projectionHome()
+		expect(bodyOf(await fi(home, baseFlags())).definition.explanation).toBe(FI_METHOD)
+	})
+
 	it("describes its input and result in `traj schema`", async () => {
 		const res = await capture(["schema", "fi", "--json"])
 		expect(res.code).toBe(0)
 		const data = JSON.parse(res.out)
 		expect(data.name).toBe("fi")
+		expect(data.description).toBe(FI_METHOD)
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort()).toEqual([
 			"asOf",

@@ -23,7 +23,7 @@ export const init: Leaf = defineCommand({
 	}),
 	examples: [
 		{ command: "traj init", description: "Create ~/.traj/traj.db if it does not exist." },
-		{ command: "TRAJ_HOME=/tmp/traj traj init --json", description: "Use another directory." },
+		{ command: "TRAJ_HOME=~/traj-demo traj init --json", description: "Use another directory." },
 	],
 	errorCodes: ["database_corrupt", "disk_full", "not_a_directory", "permission_denied"],
 	run: (_input, ctx) => {

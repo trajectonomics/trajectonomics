@@ -22,7 +22,7 @@ export const exportCommand: Leaf = defineCommand({
 	examples: [
 		{ command: "traj export --out backup", description: "Write the canonical JSONL dump." },
 		{
-			command: "traj export --format jsonl --out backup --json",
+			command: "traj export --format jsonl --out backup-jsonl --json",
 			description: "Describe what was written, per table.",
 		},
 	],

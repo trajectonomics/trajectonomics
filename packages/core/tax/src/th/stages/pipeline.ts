@@ -1,6 +1,8 @@
 import { TaxValidationError, thb, validateMonetaryAmount } from "../../core/money"
-import type { TaxResult } from "../../core/system"
+import { thFactsOfCalculation } from "../assumptions/facts-input"
+import { thAssumptions } from "../assumptions/resolve"
 import { TH_2026_PARAMETERS } from "../parameters"
+import type { ThTaxResult } from "../result"
 import { ThBracketField, type ThBreakdown, ThTaxField, type ThTaxInput } from "../types"
 import { sumThAmounts } from "../units"
 import { calculateAllowances } from "./allowances"
@@ -26,7 +28,7 @@ function validateYear(year?: number): void {
  *
  * @statute Thailand Revenue Code Sections 40, 42 bis, 47, 47 bis, 48(1)–(5).
  */
-export function runThTaxPipeline(input: ThTaxInput = {}): TaxResult<"THB", ThBreakdown> {
+export function runThTaxPipeline(input: ThTaxInput = {}): ThTaxResult {
 	validateYear(input.taxYear)
 	const filingStatus = input.filingStatus ?? "single"
 	const withholding = input.withholdingTax ?? 0
@@ -102,5 +104,6 @@ export function runThTaxPipeline(input: ThTaxInput = {}): TaxResult<"THB", ThBre
 			allowNegative: true,
 		}),
 		breakdown,
+		assumptions: thAssumptions(thFactsOfCalculation(input, breakdown)),
 	}
 }

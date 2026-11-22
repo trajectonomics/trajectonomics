@@ -19,8 +19,8 @@ export const show: Leaf = defineCommand({
 	examples: [
 		{ command: "traj scenario show base", description: "Show a Scenario by name." },
 		{
-			command: "traj scenario show base --json | jq .scenario.document",
-			description: "Print only the document.",
+			command: "traj scenario show base --json",
+			description: "Print the Scenario as JSON; pipe it to jq to pick out the document.",
 		},
 	],
 	errorCodes: ["not_found"],

@@ -1,6 +1,6 @@
-import type { TaxResult } from "../core/system"
+import type { ThTaxResult } from "./result"
 import { runThTaxPipeline } from "./stages/pipeline"
-import type { ThBreakdown, ThTaxInput } from "./types"
+import type { ThTaxInput } from "./types"
 
 /**
  * Calculates Thailand Personal Income Tax (ภ.ง.ด.90/91) under Revenue Code.
@@ -8,10 +8,11 @@ import type { ThBreakdown, ThTaxInput } from "./types"
  * Defaults to tax year 2026 and single filing status.
  *
  * @param input Taxpayer assessable income, allowances, filing status, and withholding.
- * @returns Fully typed, immutable TaxResult with statutory breakdown.
+ * @returns Fully typed, immutable TaxResult with statutory breakdown and the `assumptions` it
+ * relied on.
  *
  * @statute Thailand Revenue Code Sections 40, 42 bis, 47, 48(1)–(2).
  */
-export function calculateThTax(input: ThTaxInput = {}): TaxResult<"THB", ThBreakdown> {
+export function calculateThTax(input: ThTaxInput = {}): ThTaxResult {
 	return runThTaxPipeline(input)
 }

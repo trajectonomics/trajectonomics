@@ -42,4 +42,10 @@ export enum ThLevyMeasureId {
 	DividendCredit = "credit.dividend",
 	TotalTax = "tax.total",
 	NetTaxPayable = "tax.net_payable",
+	ClaimSocialSecurity = "claim.social_security",
+	ClaimLifeInsurance = "claim.life_insurance",
+	ClaimHealthInsurance = "claim.health_insurance",
+	ClaimParentHealthInsurance = "claim.parent_health_insurance",
+	ClaimMortgageInterest = "claim.mortgage_interest",
+	ClaimDonation2x = "claim.donation_2x",
 }

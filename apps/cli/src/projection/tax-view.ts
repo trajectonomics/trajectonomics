@@ -1,5 +1,7 @@
-import type { LevyReport } from "@trajectonomics/core/sim"
+import type { LevyReport, Scenario } from "@trajectonomics/core/sim"
+import { thLevyAssumptions } from "@trajectonomics/core/tax/th"
 import { z } from "zod"
+import { type AssumptionView, assumptionsField, assumptionViews } from "../tax-assumptions"
 import { dateField, moneyField, moneyOf } from "./money"
 
 /**
@@ -16,6 +18,7 @@ export type TaxYearView = {
 	owed: string
 	settled: boolean
 	partial: boolean
+	assumptions: AssumptionView[]
 }
 
 export const taxYearView: z.ZodType<TaxYearView> = z.strictObject({
@@ -36,6 +39,7 @@ export const taxYearView: z.ZodType<TaxYearView> = z.strictObject({
 	partial: z
 		.boolean()
 		.describe("Whether the Projection ended before the period did, so the period is incomplete."),
+	assumptions: assumptionsField,
 })
 
 /** One entry per Levy period, in the engine's own Levy and period order. */
@@ -52,10 +56,12 @@ export const taxYearsField: z.ZodType<TaxYearView[]> = z
 export function taxYearsOf(
 	levies: readonly LevyReport[] | undefined,
 	currency: string,
+	document: Scenario,
 ): TaxYearView[] {
 	if (levies === undefined) return []
-	return levies.flatMap((levy) =>
-		levy.periods.map((period) => ({
+	return levies.flatMap((levy) => {
+		const rules = document.levies?.find((it) => it.id === levy.id)
+		return levy.periods.map((period) => ({
 			levy: levy.id,
 			from: period.from,
 			to: period.to,
@@ -65,6 +71,8 @@ export function taxYearsOf(
 			owed: moneyOf(currency)(period.settlement),
 			settled: period.settled,
 			partial: period.partial,
-		})),
-	)
+			assumptions:
+				rules === undefined ? [] : assumptionViews(thLevyAssumptions(rules, period.measures)),
+		}))
+	})
 }

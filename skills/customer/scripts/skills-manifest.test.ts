@@ -38,8 +38,11 @@ describe("the Skill Manifest", () => {
 		expect(manifest.formatVersion).toBe(FORMAT_VERSION)
 	})
 
-	it("authors the CLI Range once, and every current Skill expects the same one", () => {
-		for (const row of manifest.skills) expect(row.cliRange).toBe(">=0.2.0 <0.3.0")
+	it("authors the CLI Range once; every Skill expects the operating floor, except the planning Recipe", () => {
+		// traj-plan's Thai tax recipe needs the allowance flags, which only the 0.3.0 release publishes.
+		for (const row of manifest.skills) {
+			expect(row.cliRange).toBe(row.name === "traj-plan" ? ">=0.3.0 <0.4.0" : ">=0.2.0 <0.3.0")
+		}
 		expect(cliVersionFloor(manifest.skills)).toBe(CLI_VERSION_FLOOR)
 	})
 

@@ -5,6 +5,7 @@ import type { Placed } from "./carryin-apply"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { bestCaseView, referenceView } from "./fi-figures"
+import { FI_METHOD } from "./fi-method"
 import type { FiAnswer, FiView } from "./fi-view"
 import { fundingNotes } from "./funding"
 import { taxYearsOf } from "./tax-view"
@@ -65,8 +66,8 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 		horizon: prepared.timeline.horizon,
 		currency: prepared.currency,
 		method: solution.definition.method,
-		definition: solution.definition,
+		definition: { ...solution.definition, explanation: FI_METHOD },
 		fi: solution.fi,
-		taxYears: taxYearsOf(result.projection.levies, prepared.currency),
+		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 	}
 }

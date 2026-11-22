@@ -75,7 +75,7 @@ export const fork: Leaf = defineCommand({
 	examples: [
 		{ command: "traj scenario fork base early", description: "Copy a Scenario under a new name." },
 		{
-			command: "traj scenario fork base early --set flows.salary.amount=50000",
+			command: "traj scenario fork base raise --set flows.salary.amount=50000",
 			description: "Copy it with one assumption changed.",
 		},
 	],

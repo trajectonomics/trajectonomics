@@ -36,8 +36,9 @@ export const restore: Leaf = defineCommand({
 	examples: [
 		{ command: "traj restore backup", description: "Restore a backup directory." },
 		{
-			command: "traj restore backup/traj.jsonl --json",
-			description: "Restore the file itself and describe what was written.",
+			command: "TRAJ_HOME=~/restored traj restore backup/traj.jsonl --json",
+			description:
+				"Restore the file itself into a new data directory and describe what was written.",
 		},
 	],
 	// Every code a stored row can fail with: the interchange reader's, the restore's own, and

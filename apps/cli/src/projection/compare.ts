@@ -66,7 +66,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 		prepared,
 		fi: solution,
 		runsOut,
-		taxYears: taxYearsOf(result.projection.levies, prepared.currency),
+		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 		unfunded: result.projection.unfundedContributions,
 		final,
 		atAges: birthdays.map(({ age, birthday }) => ({

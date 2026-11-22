@@ -5,6 +5,7 @@ import { isAppError } from "../errors"
 import { readCarryIn } from "../projection/carryin"
 import { withCarryInSide } from "../projection/carryin-apply"
 import { independenceOf } from "../projection/fi"
+import { FI_METHOD } from "../projection/fi-method"
 import { fiView } from "../projection/fi-view"
 import {
 	asOfFlag,
@@ -20,6 +21,7 @@ import { withProjection } from "../projection/leaf"
 export const fi: Leaf = defineCommand({
 	name: "fi",
 	summary: "Report the financial independence date under a Scenario",
+	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,

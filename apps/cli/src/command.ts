@@ -74,6 +74,8 @@ export type Command<
 > = {
 	name: string
 	summary: string
+	/** Optional prose under the summary: what the command means, beyond its one line (usage and `traj schema`). */
+	description?: string
 	/**
 	 * An optional sentence naming the release that ships what this page describes, printed under
 	 * the summary (ADR-0034). It is reader-facing prose, never a field of `traj schema`.
@@ -108,6 +110,7 @@ export type Leaf = {
 	kind: "leaf"
 	name: string
 	summary: string
+	description?: string
 	note?: string
 	positionals: readonly string[]
 	input: z.ZodObject
