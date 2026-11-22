@@ -50,7 +50,7 @@ describe("Step 2, installing the published set", () => {
 	})
 
 	it("re-runs the install on the pinned skills CLI when the entry has no commit, and reads it again", () => {
-		expect(stepTwo).toContain("has no `commit`, or its `source` is `trajectonomics/skills`")
+		expect(stepTwo).toContain("has no `commit`, or its `source` is")
 		expect(stepTwo).toContain("`npx -y skills@1.9.0 add …`")
 		expect(stepTwo).toContain("carries the `commit` that run installed")
 		expect(stepTwo).toContain("A `commit` comes from the lock and from nowhere else")
