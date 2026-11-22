@@ -2,7 +2,6 @@ import type { Page } from "@playwright/test"
 import { DOCS_BASE_PATH } from "../src/lib/tabs"
 import { NOT_FOUND_PATH, openPage } from "./built-site"
 import {
-	openPhoneMenu,
 	openPhoneSearch,
 	openSearch,
 	openSidebarDrawer,
@@ -98,7 +97,6 @@ const SURFACES: readonly Surface[] = [
 	{ name: "the 404 page", path: NOT_FOUND_PATH, widthPx: 390, open: null },
 	{ name: "a docs page", path: DOCS_PAGE_PATH, widthPx: 390, open: null },
 	{ name: "the open search dialog", path: DOCS_PAGE_PATH, widthPx: 390, open: openPhoneSearch },
-	{ name: "the open phone menu", path: LANDING_PATH, widthPx: 390, open: openPhoneMenu },
 	{ name: "the open sidebar drawer", path: DOCS_PAGE_PATH, widthPx: 390, open: openSidebarDrawer },
 	{
 		name: "the open table-of-contents popover",

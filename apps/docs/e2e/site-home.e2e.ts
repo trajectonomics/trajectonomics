@@ -1,12 +1,10 @@
 import type { Page } from "@playwright/test"
-import { SITE_HOME_LABEL, SITE_HOME_PATH } from "../src/lib/site-home"
+import { SITE_HOME_NAME, SITE_HOME_PATH } from "../src/lib/site-home"
 import { DOCS_BASE_PATH, TABS, tabUrl } from "../src/lib/tabs"
 import { NOT_FOUND_PATH, openPage } from "./built-site"
 import { waitForIsland } from "./docs-portal"
 import { expect, test } from "./fixtures"
 import { TEST_VIEWPORT_HEIGHT_PX } from "./viewports"
-
-const LANDING_PATH = `${DOCS_BASE_PATH}/`
 
 /** Whether `url` is the Site Home. The link is absolute, so the path alone is not enough. */
 function isSiteHome(url: URL): boolean {
@@ -14,89 +12,42 @@ function isSiteHome(url: URL): boolean {
 	return url.origin === home.origin && url.pathname === home.pathname
 }
 
-/** A page that carries the Site Home link, where it lives, and the control that reveals a phone's. */
-interface PageWithSiteHomeLink {
-	readonly name: string
-	readonly path: string
-	/** The element the link sits in when the page is wide: the header, or the docs' sidebar top. */
-	readonly wideContainer: string
-	/** Accessible name of the control that opens the small-screen copy. */
-	readonly control: string
-	/** The element the small-screen copy lands in. */
-	readonly container: string
-}
+/** The pages of each layout: a docs page (notebook), the Landing Page and the 404 page (home). */
+const PAGES = [
+	{ name: "a Tab page", path: tabUrl(TABS[0]) },
+	{ name: "the Landing Page", path: `${DOCS_BASE_PATH}/` },
+	{ name: "the 404 page", path: NOT_FOUND_PATH },
+] as const
 
-const PAGES: readonly PageWithSiteHomeLink[] = [
-	{
-		name: "a Tab page",
-		path: tabUrl(TABS[0]),
-		// The docs pages carry the way back to the site at the top of the sidebar (ADR 0009).
-		wideContainer: "#nd-sidebar",
-		control: "Open Sidebar",
-		container: "#nd-sidebar-mobile",
-	},
-	{
-		name: "the Landing Page",
-		path: LANDING_PATH,
-		wideContainer: "header",
-		control: "Toggle Menu",
-		container: "#nd-nav",
-	},
-	{
-		name: "the 404 page",
-		path: NOT_FOUND_PATH,
-		wideContainer: "header",
-		control: "Toggle Menu",
-		container: "#nd-nav",
-	},
-]
+/** The header each layout renders: the home layout's, and the notebook layout's. */
+const HEADER = "#nd-nav, #nd-subnav"
 
 /** A Site Home document, so the browser test never asks the network for trajectonomics.com. */
 const SITE_HOME_DOCUMENT = "<!doctype html><html lang='en'><title>Site Home</title></html>"
 
-/** The Site Home link, in the header or wherever the small-screen control opened it. */
-function siteHomeLink(page: Page) {
-	return page.getByRole("link", { name: SITE_HOME_LABEL, exact: true })
+/** The header's glyph tile, the one way back to the Site Home. */
+function glyphTile(page: Page) {
+	return page.locator(HEADER).getByRole("link", { name: SITE_HOME_NAME, exact: true })
 }
 
-for (const widthPx of [1280, 2000]) {
+for (const widthPx of [390, 1280, 2000]) {
 	for (const pageUnderTest of PAGES) {
-		test(`the Site Home link is visible in ${pageUnderTest.wideContainer} on ${pageUnderTest.name} at ${widthPx}px`, async ({
+		test(`the header's glyph tile leads to the Site Home on ${pageUnderTest.name} at ${widthPx}px`, async ({
 			page,
 		}) => {
 			await page.setViewportSize({ width: widthPx, height: TEST_VIEWPORT_HEIGHT_PX })
 			await openPage(page, pageUnderTest.path)
+			await waitForIsland(page)
 
-			const placed = page
-				.locator(pageUnderTest.wideContainer)
-				.getByRole("link", { name: SITE_HOME_LABEL, exact: true })
-			await expect(placed).toHaveAttribute("href", SITE_HOME_PATH)
-			await expect(placed).toBeVisible()
-			await expect(siteHomeLink(page).filter({ visible: true })).toHaveCount(1)
+			// In the header itself at a phone's width too, never behind a menu, as on the blog.
+			await expect(glyphTile(page)).toHaveCount(1)
+			await expect(glyphTile(page)).toBeVisible()
+			await expect(glyphTile(page)).toHaveAttribute("href", SITE_HOME_PATH)
 		})
 	}
 }
 
-for (const pageUnderTest of PAGES) {
-	test(`the Site Home link is behind the ${pageUnderTest.control} control of ${pageUnderTest.name} at 390px`, async ({
-		page,
-	}) => {
-		await page.setViewportSize({ width: 390, height: TEST_VIEWPORT_HEIGHT_PX })
-		await openPage(page, pageUnderTest.path)
-		await waitForIsland(page)
-		await expect(siteHomeLink(page).filter({ visible: true })).toHaveCount(0)
-
-		await page.getByRole("button", { name: pageUnderTest.control }).click()
-
-		const revealed = page
-			.locator(pageUnderTest.container)
-			.getByRole("link", { name: SITE_HOME_LABEL, exact: true })
-		await expect(revealed).toBeVisible()
-		await expect(revealed).toHaveAttribute("href", SITE_HOME_PATH)
-	})
-}
-
-test("clicking the Site Home link loads trajectonomics.com as a new document", async ({ page }) => {
+test("clicking the glyph tile loads trajectonomics.com as a new document", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: TEST_VIEWPORT_HEIGHT_PX })
 	await openPage(page, tabUrl(TABS[0]))
 	await page.route(
@@ -111,7 +62,7 @@ test("clicking the Site Home link loads trajectonomics.com as a new document", a
 		}
 	})
 
-	const link = page.locator("#nd-sidebar").getByRole("link", { name: SITE_HOME_LABEL, exact: true })
+	const link = glyphTile(page)
 	await link.hover()
 	// Longer than Astro's 80ms hover prefetch debounce.
 	await page.waitForTimeout(300)

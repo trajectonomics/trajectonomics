@@ -142,7 +142,7 @@ describe("theme seam", () => {
 	test("the global stylesheet imports the assets font stylesheet and not the fontsource package", async () => {
 		const css = await Bun.file(GLOBAL_PATH).text()
 		const imports = [...css.matchAll(/@import\s+"([^"]+)"/g)].map((match) => match[1])
-		expect(imports).toContain("@trajectonomics/brand/current/fonts/inter.css")
+		expect(imports).toContain("@trajectonomics/brand/current/fonts/brand.css")
 		expect(imports).not.toContain("@fontsource-variable/inter/index.css")
 	})
 

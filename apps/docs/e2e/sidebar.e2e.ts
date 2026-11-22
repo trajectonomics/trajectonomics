@@ -35,20 +35,6 @@ async function visibleSidebarTabs(page: Page): Promise<number> {
 	)
 }
 
-/**
- * Whether the block shows the way back to the site above the search, the order the reference puts
- * them in.
- */
-async function siteComesFirst(block: ReturnType<Page["locator"]>): Promise<boolean> {
-	return block.evaluate((element) => {
-		const site = element.querySelector("[data-site-home]")
-		const search = element.querySelector("[data-search-full]")
-		if (site === null || search === null) return false
-		const following = site.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING
-		return following !== 0
-	})
-}
-
 for (const widthPx of [1280, WIDE_WIDTH_PX, PHONE_WIDTH_PX]) {
 	test(`the Tabs appear in exactly one place at ${widthPx}px`, async ({ page }) => {
 		await openDocsPage(page, widthPx)
@@ -89,27 +75,23 @@ test("the sidebar's tree keeps the reference's rhythm", async ({ page }) => {
 	expect(pitch, "the rows stand 6px apart").toBe(ROW_PITCH_PX)
 })
 
-test("the sidebar's top block carries the site button and the search", async ({ page }) => {
+test("the sidebar's top block carries the search and no way back to the site", async ({ page }) => {
 	await openDocsPage(page, 1280)
 	const block = page.locator("#nd-sidebar [data-sidebar-top-block]")
 
-	await expect(block.locator("[data-site-home]")).toBeVisible()
 	await expect(block.locator("[data-search-full]")).toBeVisible()
-	expect(await siteComesFirst(block), "the site button sits above the search").toBe(true)
+	// The way back is the header's glyph tile, as on the blog (ADR 0009).
+	await expect(block.locator("[data-site-home]")).toHaveCount(0)
 })
 
-test("the phone drawer opens with the site button, the search and the Tab dropdown", async ({
-	page,
-}) => {
+test("the phone drawer opens with the search and the Tab dropdown", async ({ page }) => {
 	await openDocsPage(page, PHONE_WIDTH_PX)
 	await openSidebarDrawer(page)
 
 	const block = page.locator("#nd-sidebar-mobile [data-sidebar-top-block]")
 	await expect(block).toBeVisible()
-	await expect(block.locator("[data-site-home]")).toBeVisible()
 	await expect(block.locator("[data-search-full]")).toBeVisible()
 	await expect(block.locator("[data-sidebar-tabs]")).toBeVisible()
-	expect(await siteComesFirst(block), "the drawer keeps the block's order").toBe(true)
 
 	// The drawer's own close button is the library's, rendered through the block, not one the shell
 	// drew: it closes the drawer (docs#91).
@@ -131,6 +113,6 @@ test(`the header of ${DOCS_PAGE_PATH} carries the header mark and the Tabs and n
 	const header = page.locator("#nd-subnav")
 
 	expect(await header.locator("[data-search], [data-search-full]").count()).toBe(0)
-	expect(await header.locator("[data-site-home]").count()).toBe(0)
+	await expect(header.locator("[data-site-home]")).toHaveCount(1)
 	await expect(header.locator("[data-shell-tabs] a")).toHaveCount(2)
 })

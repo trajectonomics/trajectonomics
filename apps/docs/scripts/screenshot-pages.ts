@@ -5,7 +5,7 @@
  */
 import { join } from "node:path"
 import type { Page } from "@playwright/test"
-import { openPhoneMenu, openSearch, openSidebarDrawer } from "../e2e/docs-portal"
+import { openSearch, openSidebarDrawer } from "../e2e/docs-portal"
 import { TEST_WIDTHS_PX } from "../e2e/viewports"
 
 /** Fumadocs' copy control on a code block: the "Copy Text" button in the block's figure. */
@@ -78,13 +78,6 @@ const PAGES: readonly CuratedPage[] = [
 		name: "search-dialog",
 		widthsPx: [1280],
 		drive: openSearch,
-		fullPage: false,
-	},
-	{
-		path: "/",
-		name: "phone-menu",
-		widthsPx: [390],
-		drive: openPhoneMenu,
 		fullPage: false,
 	},
 	{

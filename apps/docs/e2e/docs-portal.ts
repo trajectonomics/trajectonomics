@@ -62,14 +62,6 @@ export async function openPhoneSearch(page: Page): Promise<void> {
 	await page.locator('[role="dialog"]').waitFor()
 }
 
-/** Open the home layout's header menu, the navigation a phone shows below the lg breakpoint. */
-export async function openPhoneMenu(page: Page): Promise<void> {
-	await waitForIsland(page)
-	await page.getByRole("button", { name: "Toggle Menu" }).click()
-	// The trigger and the panel it opens carry the open state.
-	await page.locator("#nd-nav [data-state='open']").first().waitFor()
-}
-
 /** Open the notebook layout's sidebar drawer, the sidebar a phone reaches through the header. */
 export async function openSidebarDrawer(page: Page): Promise<void> {
 	await waitForIsland(page)
