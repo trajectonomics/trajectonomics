@@ -3,14 +3,14 @@ import { createHash } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import { project } from "../src/engine/project"
 import { PARITY_CASES } from "../src/golden/parity-cases"
-import { financialIndependence } from "../src/index"
+import { chanceOfSuccess, financialIndependence } from "../src/index"
 
 function hash(value: unknown): string {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex")
 }
 
 const cases = PARITY_CASES.map((testCase) => {
-	const { name, fixture, options } = testCase
+	const { name, fixture, options, chance } = testCase
 	const { baseline, scenario, timeline } = fixture
 	const base = {
 		name,
@@ -19,11 +19,19 @@ const cases = PARITY_CASES.map((testCase) => {
 		timeline,
 		sha256: hash(project(baseline, scenario, timeline)),
 	}
-	if (options === undefined) return base
+	const withFi =
+		options === undefined
+			? base
+			: {
+					...base,
+					options,
+					fiSha256: hash(financialIndependence(baseline, scenario, timeline, options)),
+				}
+	if (chance === undefined) return withFi
 	return {
-		...base,
-		options,
-		fiSha256: hash(financialIndependence(baseline, scenario, timeline, options)),
+		...withFi,
+		chance,
+		chanceSha256: hash(chanceOfSuccess(baseline, scenario, timeline, chance)),
 	}
 })
 writeFileSync(

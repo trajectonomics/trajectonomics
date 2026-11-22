@@ -3,6 +3,7 @@ export type { Balance, Baseline } from "./baseline"
 export type { Calendar, DayRule } from "./calendar"
 export type { CarryIn, CarryInTally } from "./carry-in"
 export type { Cashflow, SurplusStep } from "./cashflow"
+export type * from "./chance"
 export type {
 	AccountId,
 	BasisPoints,

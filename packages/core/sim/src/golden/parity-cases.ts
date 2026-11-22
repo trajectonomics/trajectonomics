@@ -1,8 +1,9 @@
 import type { Fixture } from "../fixtures/fixture"
 import { freelancer } from "../fixtures/freelancer"
 import { thaiEmployee } from "../fixtures/thai-employee"
-import type { SurvivalOptions } from "../types"
+import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
 import { calendarFiMonth, calendarShiftDay } from "./calendar-cases"
+import { freelancerChance } from "./chance-cases"
 import { capped } from "./contribution-cases"
 import { deriveRent } from "./derive-case"
 import { levyJointFilers, wageBaseCase } from "./levy-cap-cases"
@@ -25,6 +26,7 @@ export interface ParityCase {
 	readonly name: string
 	readonly fixture: Fixture
 	readonly options?: SurvivalOptions
+	readonly chance?: ChanceOfSuccessOptions
 }
 
 /** One year of 50% growth across Feb 29 2028: a rounding tie plus the No Leap day count. */
@@ -78,6 +80,7 @@ export const PARITY_CASES: readonly ParityCase[] = [
 	{ name: "calendar-shift-day", fixture: calendarShiftDay },
 	{ name: "calendar-fi", fixture: calendarFiMonth, options: { method: "survival" } },
 	{ name: "freelancer-fi", fixture: freelancer, options: { method: "survival" } },
+	{ name: "freelancer-chance", fixture: freelancer, chance: freelancerChance },
 	{ name: "freelancer-fi-reference", fixture: freelancer, options: configured },
 	{
 		name: "thai-employee-fi-buffer",

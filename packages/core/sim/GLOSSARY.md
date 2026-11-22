@@ -239,6 +239,14 @@ _Avoid_: Success probability, confidence
 The FI survival share a probability-threshold FI method requires, in basis points from 1 to 10000.
 _Avoid_: Confidence level, target
 
+**Chance of success**:
+The result of `chanceOfSuccess`: the Success probability of one plan over seeded Market paths, with its Bands and its Runs-out counts by Annual roll-up period. It is an Outcome distribution for one plan, not a Projection.
+_Avoid_: Confidence, forecast, simulation result
+
+**Band**:
+The net-worth Percentiles across Market paths at one Annual roll-up end, at levels 10, 25, 50, 75 and 90. A failed path contributes the net worth it died with.
+_Avoid_: Range, confidence interval, corridor
+
 ## Input Conventions
 
 - All dates are `YYYY-MM-DD`, in years 0001-9998. There are no ages in the core; callers convert ages to dates.

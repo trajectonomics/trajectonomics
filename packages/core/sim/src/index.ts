@@ -4,6 +4,7 @@
  * Vocabulary types, `check()`, the deterministic projection engine and the Levy Measure evaluator.
  */
 
+export { chanceOfSuccess } from "./chance/chance-of-success"
 export { check } from "./check"
 export type { ErrorCode, Path, Problem } from "./check/codes"
 export { ERROR_CODES } from "./check/codes"
