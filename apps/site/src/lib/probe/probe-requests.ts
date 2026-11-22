@@ -1,3 +1,4 @@
+import { CONSENT_PARAM, type ConsentChoice } from "../analytics/consent"
 import type { Language } from "../language/language"
 import { LANGUAGE_CHOICE_PARAM } from "../language/languages"
 import type { Probe } from "./probe"
@@ -38,6 +39,10 @@ const DEFAULT_ANSWER: Omit<Probe, "path" | "status"> = Object.freeze({
 	cacheControl: NONE,
 	etag: null,
 	storesChoice: null,
+	secGpc: null,
+	setsConsent: null,
+	contains: NONE,
+	lacks: NONE,
 })
 
 /** One probe, from the answer it asks for. */
@@ -46,7 +51,7 @@ function probe(facts: Pick<Probe, "path" | "status"> & Partial<Probe>): Probe {
 }
 
 /** The signals one request carries, filled in from its `null`s. */
-type Signals = Partial<Pick<Probe, "acceptLanguage" | "country" | "cookie">>
+type Signals = Partial<Pick<Probe, "acceptLanguage" | "country" | "cookie" | "secGpc">>
 
 /** A request for `/`, answered with that Language's home for the signals given. */
 export function home(language: Language, signals: Signals = {}): Probe {
@@ -70,6 +75,30 @@ export function choice(language: Language | null): Probe {
 		location: "/",
 		cacheControl: CHOICE_CACHE,
 		storesChoice: language,
+	})
+}
+
+/**
+ * A home that a consent answer personalised: it carries no validator, because the bytes now depend on the
+ * answer, and its body states the answer. `contains` and `lacks` are the text the body must and must not
+ * carry; `setsConsent` is set only when the request also has the answer's cookies written.
+ */
+export function personalised(
+	language: Language,
+	signals: Signals,
+	body: Partial<Pick<Probe, "contains" | "lacks" | "setsConsent">>,
+): Probe {
+	return { ...home(language, signals), etag: null, ...body }
+}
+
+/** The consent link, which stores the answer it names and returns to the address with no banner. */
+export function consent(choice: ConsentChoice | "reset"): Probe {
+	return probe({
+		path: `/?${CONSENT_PARAM}=${choice}`,
+		status: 302,
+		location: "/",
+		cacheControl: CHOICE_CACHE,
+		setsConsent: choice,
 	})
 }
 

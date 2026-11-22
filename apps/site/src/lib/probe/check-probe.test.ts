@@ -1,7 +1,19 @@
 import { describe, expect, it } from "bun:test"
+import { consentCookies } from "../analytics/consent"
 import { languageChoiceCookie } from "../language/stored-choice"
 import { checkProbeResponses } from "./check-probe"
 import { PROBES, type Probe, type ProbeResponse } from "./probes"
+
+/** The visitor id a healthy Worker mints for a grant that carries none. */
+const MINTED = "11111111-2222-4333-8444-555555555555"
+
+/** The cookies a healthy Worker sets for one probe: a Language choice, or a consent answer. */
+function cookiesOf(probe: Probe): readonly string[] {
+	if (probe.setsConsent !== null) {
+		return consentCookies(probe.setsConsent, probe.setsConsent === "granted" ? MINTED : "")
+	}
+	return probe.storesChoice === null ? [] : [languageChoiceCookie(probe.storesChoice)]
+}
 
 /** What a healthy local Worker answers for one probe. */
 function healthy(probe: Probe): ProbeResponse {
@@ -9,13 +21,16 @@ function healthy(probe: Probe): ProbeResponse {
 		probe,
 		status: probe.status,
 		location: probe.location,
-		setCookies: probe.storesChoice === null ? [] : [languageChoiceCookie(probe.storesChoice)],
+		setCookies: cookiesOf(probe),
 		vary: probe.vary.length === 0 ? null : probe.vary.join(", "),
 		cacheControl: probe.cacheControl.length === 0 ? null : probe.cacheControl.join(", "),
 		etag: probe.etag === true ? '"etag"' : null,
 		contentSecurityPolicy: null,
 		contentType: probe.mediaTypes[0] ?? null,
-		html: probe.language === null ? "" : `<html lang="${probe.language}">`,
+		html: [
+			probe.language === null ? "" : `<html lang="${probe.language}">`,
+			...probe.contains,
+		].join(" "),
 	}
 }
 

@@ -12,6 +12,7 @@ function headersOf(probe: Probe): Record<string, string> {
 	if (probe.acceptLanguage !== null) headers["Accept-Language"] = probe.acceptLanguage
 	if (probe.country !== null) headers["CF-IPCountry"] = probe.country
 	if (probe.cookie !== null) headers["Cookie"] = probe.cookie
+	if (probe.secGpc !== null) headers["Sec-GPC"] = probe.secGpc
 	return headers
 }
 
