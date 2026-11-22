@@ -3,11 +3,8 @@ title: tx
 description: Manage ledger transactions.
 ---
 
-`traj tx` manages ledger transactions. A transaction is a set of postings that sum to zero, dated
-by you: the date is one you pass
-([ADR 0018](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0018-no-clock-in-ledger-commands.md)).
-Corrections are new transactions: history is never edited
-([ADR 0016](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0016-three-deletion-stories.md)).
+`traj tx` manages ledger transactions. A transaction is a set of postings that sum to zero, dated by
+you: the date is one you pass. Corrections are new transactions: history is never edited.
 
 ## `traj tx add`
 
@@ -18,7 +15,8 @@ Record a transaction, either from flags or from a JSON transaction document.
 - `--amount <string>` — a magnitude in the accounts' currency, as a decimal string; required
 - `--date <string>` — the transaction's `YYYY-MM-DD` date; required
 - `--opening` — `--from` names the equity account, and `--amount` is signed: positive funds the
-  destination, negative opens it overdrawn; another kind of account is refused `NON_EQUITY_CONTRA`
+  destination, negative opens it overdrawn or opens a debt; another kind of account is refused
+  `NON_EQUITY_CONTRA`, and a positive amount on a liability is refused `liability_opening_positive`
 - `--project <string>` — tag every posting with this project
 - `--memo <string>` — free text kept with the transaction; part of its duplicate identity
 - `--external-ref <string>` — an idempotency key; replaying it is a duplicate
@@ -46,6 +44,17 @@ traj tx add --opening --from Opening --to Cash --amount -25.00 --date 2026-01-01
 A positive `--amount` funds the destination; a negative one opens it already overdrawn, and the
 sign is always yours to state. An asset opened that way refuses the Baseline with `NEGATIVE_AMOUNT`
 until a posting funds it, as [the baseline page](/cli/commands/baseline/) explains.
+
+A debt opens negative. A loan of 300.00 THB that you owe is `--amount -300.00` on the liability
+account:
+
+```bash exec
+traj account add Loan --type liability --currency THB                              # The account the debt is owed on.
+traj tx add --opening --from Opening --to Loan --amount -300.00 --date 2026-01-01  # Owe 300.00: a negative amount.
+```
+
+A positive amount on a liability is refused at exit code `3` with `liability_opening_positive`, and
+the hint gives the negative amount to type instead. The sign is never flipped for you.
 
 `--from` must be an equity account. Any other type is refused at exit code `3` with
 `NON_EQUITY_CONTRA`, which names the type it found.
@@ -95,11 +104,10 @@ traj tx add --postings - < receipt.json  # Read the same document from stdin.
 `-` is the only way to ask for stdin, and an empty document is invalid input. A file that cannot be
 read fails at `--postings`, before the document is parsed.
 
-A document replaces the flags: the two forms cannot be combined
-([ADR 0020](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0020-a-leaf-may-declare-a-document-schema.md)).
-Beside `--postings`, `traj tx add` accepts only `--dry-run` and refuses its other flags —
-`traj tx add --postings - --date 2026-07-02` exits `2` with "`--postings` cannot be combined with
-`--date`". Global options are not among the refused fields, so `--json` still applies.
+A document replaces the flags: the two forms cannot be combined. Beside `--postings`, `traj tx add`
+accepts only `--dry-run` and refuses its other flags — `traj tx add --postings - --date 2026-07-02`
+exits `2` with "`--postings` cannot be combined with `--date`". Global options are not among the
+refused fields, so `--json` still applies.
 
 `traj tx amend <id> --postings -` reads the replacement from the same shape. The document is the
 replacement in full: its `date` is the replacement's date, and `--void-date` defaults to that date,
@@ -142,8 +150,7 @@ traj tx amend 0194a000-0003-7000-8000-000000000003 --postings -  # Read the repl
 
 ## `traj tx import [file]`
 
-Import transactions from the one CSV template
-([ADR 0025](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0025-csv-import-is-one-template.md)).
+Import transactions from the one CSV template.
 
 - `--template` — print the CSV template and open no data directory
 - `--dry-run` — report the import and roll every write back
@@ -171,8 +178,7 @@ date,from,to,amount,memo,external_ref,project
 
 ## `traj tx list`
 
-List transactions by date. Date ranges are `--since` and `--until`, both inclusive
-([ADR 0022](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0022-date-ranges-are-since-and-until.md)).
+List transactions by date. Date ranges are `--since` and `--until`, both inclusive.
 
 - `--since <string>` — the earliest transaction date, inclusive, as `YYYY-MM-DD`
 - `--until <string>` — the latest transaction date, inclusive, as `YYYY-MM-DD`
@@ -204,13 +210,5 @@ Reverse a transaction, keeping both rows.
 traj tx void 0194a000-0003-7000-8000-000000000003 --date 2026-03-02            # Reverse a transaction by id.
 traj tx void 0194a000-0003-7000-8000-000000000003 --date 2026-03-02 --dry-run  # Show the reversal without writing it.
 ```
-
-## Decisions
-
-- [ADR 0016: deletion has three names, and only one is a tombstone](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0016-three-deletion-stories.md)
-- [ADR 0019: `--dry-run` executes the write and rolls it back](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)
-- [ADR 0020: a leaf may declare a document schema, and `-` reads it from stdin](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0020-a-leaf-may-declare-a-document-schema.md)
-- [ADR 0022: date ranges are `--since` and `--until`](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0022-date-ranges-are-since-and-until.md)
-- [ADR 0025: CSV import is one template, one transaction, keyed by external reference](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0025-csv-import-is-one-template.md)
 
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

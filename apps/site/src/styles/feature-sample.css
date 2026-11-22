@@ -1,0 +1,71 @@
+/*
+ * The sample: a small window of the CLI on the muted surface, above the card's text. Like the demo's
+ * terminal (ADR 0021) it wraps rather than scrolls, so it is never a scroll container and never a Tab stop.
+ */
+.feature-sample {
+	display: flex;
+	flex-direction: column;
+	margin: 0 0 20px;
+	overflow: hidden;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 10px;
+	font-family: var(--font-meta);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+@media (min-width: 64rem) {
+	.feature-sample {
+		min-height: 15rem;
+	}
+}
+
+.feature-sample-bar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.feature-sample-command {
+	min-width: 0;
+	font: inherit;
+	font-weight: 500;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.feature-sample-command::before {
+	content: "$ ";
+}
+
+.feature-sample-output {
+	flex: 1;
+	margin: 0;
+	padding: 12px 14px;
+	font: inherit;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.feature-sample-note {
+	padding: 0 14px 12px;
+	font-size: 11px;
+}
+
+/* On a phone the card gives the sample more of its width and a smaller face, so fewer lines wrap. */
+@media (max-width: 39.99rem) {
+	.feature-wide {
+		padding: 16px 16px 24px;
+	}
+
+	.feature-sample {
+		font-size: 11px;
+	}
+
+	.feature-sample-output,
+	.feature-sample-bar {
+		padding-inline: 10px;
+	}
+}

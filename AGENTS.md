@@ -7,6 +7,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 - [`apps/site`](apps/site/AGENTS.md): the Site at trajectonomics.com (Worker `site`, static HTML).
 - [`apps/docs`](apps/docs/AGENTS.md): the docs portal (Worker `docs`, `@trajectonomics/docs`).
 - [`apps/blog`](apps/blog/AGENTS.md): the blog at blog.trajectonomics.com (Worker `blog`, static Astro).
+- [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never hosted).
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
 - `packages/core`: `@trajectonomics/core`, the engine bundle the CLI builds on (private, not published). It bundles the four packages below as subpath exports (`/money`, `/ledger`, `/tax`, `/sim`).
   - [`packages/core/money`](packages/core/money/AGENTS.md), [`packages/core/ledger`](packages/core/ledger/AGENTS.md), [`packages/core/tax`](packages/core/tax/AGENTS.md), [`packages/core/sim`](packages/core/sim/AGENTS.md): private workspace packages.
@@ -29,6 +30,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
    - When running the Pi coding agent (`pi.dev`), strictly use **DeepSeek 4.1 Flash** only (e.g., `deepseek/deepseek-v4.1-flash`, `deepseek/deepseek-v4.1-flash-fast`), whether routed via Command Code GOAT (`command-code`) or OpenCode Go (`opencode`). Do not switch to or run any other models (Claude, GPT, Gemini, etc.) in Pi sessions for this repository. This rule is mechanically enforced via `.pi/settings.json`.
 8. Temporary files and scratch clones: `/tmp` is a shared, nearly full tmpfs. Never use fixed `/tmp` filenames (use `mktemp`, or `--body-file -` for `gh` bodies), and never install `node_modules` or clone scratch repositories under `/tmp`. Verification clones go under `~/.cache/<slug>`.
 9. Resource limits: run turbo with `--concurrency=2`, and wrap heavy builds in a memory cap, for example `systemd-run --user --scope -q -p MemoryMax=6G <command>`.
+10. UI frameworks: an app with a client-side interface is written in Svelte 5 (`apps/web`). React is allowed only in `apps/docs`, and there only because Fumadocs needs it; do not add React to another package. `apps/site` ships static HTML with no UI framework.
 
 ## Organisation goals
 
@@ -44,6 +46,18 @@ Saving the owner's attention is part of the job, so finish a task instead of ask
 - Keep replies short and lead with what only the owner must do; add detail when asked.
 - Record every durable lesson here, in the package's `AGENTS.md` or in `docs/`, never only in agent memory.
 - Settle your own T3 thread (`t3_thread_organize`, `action: "settle"`) when the work is done and nothing waits on the owner.
+
+## Subagents
+
+Delegate: the lead session plans, briefs, reviews the diffs and merges, and subagents do the legwork (reading, searching, editing, running checks). Brief each one with the files, the exact change and its completion criterion, because a subagent starts without your context. A Pi session keeps rule 7's DeepSeek-only models, and a package whose `AGENTS.md` names its own work model (such as `apps/site`) keeps it inside that package; this ladder is the default everywhere else.
+
+Pick the cheapest model that can finish the brief:
+
+1. `claude-haiku-5-5` for a Claude subagent (the `Agent` tool, `model: haiku`).
+2. `opencode/deepseek-v4.1-flash-free` for a task on OpenCode (`delegate_task`). When it fails with the free usage limit, rerun the brief on `opencode-go/deepseek-v4.1-flash`.
+3. A model from the Owner section's list (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`) only when a cheap one failed the brief, or for design and the independent review. The reviewer is a different model from the author.
+
+A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
 ## Agent skills
 

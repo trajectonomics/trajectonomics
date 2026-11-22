@@ -1,0 +1,44 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the icon and the paths it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+import { DOCS_CLI_INSTALL_PATH } from "../lib/site"
+import Arrow from "./icons/Arrow.astro"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/*
+ * The closing section: the demo's question put to the visitor's own agent, then the hero CTA's two
+ * controls once more. The page keeps one Copy control and no visible prompt (ADR 0015, amendment of
+ * 2026-11-19), so the filled link goes back up to it rather than copying a second time, and the outlined
+ * one goes to the hero's way out in its own words, because the keyboard check tells controls apart by them. The filled link ships `hidden` and the
+ * copy script shows it with the Copy control, so with JavaScript off it never leads to a control that is not there.
+ */}
+<section class="section-surface bg-background" data-closing>
+	<div class="section-inner closing">
+		<p class="eyebrow">{dictionary.ctaEyebrow}</p>
+		<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+			{dictionary.ctaHeading}
+		</h2>
+		<p class="section-lede closing-lede text-foreground">{dictionary.ctaLede}</p>
+		<div class="install-row closing-actions">
+			<a
+				class="closing-primary bg-primary text-primary-foreground"
+				data-bevel
+				data-closing-prompt
+				hidden
+				href="#install"
+			>
+				{dictionary.ctaPromptLink}
+			</a>
+			<a class="window-exit" data-bevel href={DOCS_CLI_INSTALL_PATH}>
+				{dictionary.ctaInstallLink}<Arrow class="window-exit-arrow" />
+			</a>
+		</div>
+	</div>
+</section>

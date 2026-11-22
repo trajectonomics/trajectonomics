@@ -3,11 +3,9 @@ title: Commands
 description: The command reference of the Trajectonomics CLI.
 ---
 
-`traj` has 18 top-level commands. Seven are groups with their own subcommands — `account`, `baseline`,
-`data`, `projection`, `report`, `scenario` and `tx` — and the other eleven are single commands. `traj help`
-lists them and `traj help <command>` shows one command's usage; both are generated from the same
-definitions that validate input, so the two cannot drift
-([ADR 0015](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0015-command-tree.md)).
+`traj help` lists the top-level commands below, and `traj help <command>` shows one command's usage;
+both are generated from the same definitions that validate input. A group, such as `tx` or
+`account`, has its own subcommands; the rest are single commands.
 
 ## The command tree
 
@@ -22,7 +20,7 @@ definitions that validate input, so the two cannot drift
 | [export](/cli/commands/export/) | Write the stored rows into a new directory |
 | [fi](/cli/commands/fi/) | Report the financial independence date under a Scenario |
 | [help](/cli/commands/help/) | Show usage for traj or for one command |
-| [init](/cli/commands/init/) | Create the data directory and an empty database |
+| [init](/cli/commands/init/) | Create an empty ledger; only restore may also create one |
 | [inspect](/cli/commands/inspect/) | Show the stored rows of one table, or of every table |
 | [projection](/cli/commands/projection/) | Project the future under a Scenario, and compare two of them |
 | [restore](/cli/commands/restore/) | Write a backup's rows into an empty database |
@@ -47,34 +45,45 @@ A bare `--` ends flag parsing: nothing after it counts as a flag.
 
 ## Exit codes
 
-`0` ok, `1` unexpected, `2` invalid input, `3` domain rejection, `4` not found, `5` conflict
-([ADR 0010](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0010-output-contract.md)).
+`0` ok, `1` unexpected, `2` invalid input, `3` domain rejection, `4` not found, `5` conflict.
 
 ## Errors
 
 In JSON mode a failure is a JSON envelope on stderr, where `code` names the failure and `exitCode`
-names its class; both come from one registry that `traj schema` prints
-([ADR 0013](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0013-self-describing-error-envelope.md)):
+names its class; both come from one registry that `traj schema` prints. `hint`, when present, says
+what to do next. `traj account show Nope --json` on a ledger with no such account prints:
 
 ```json
-{"error":{"code":"not_found","exitCode":4,"message":"The requested resource was not found."}}
+{"error":{"code":"not_found","exitCode":4,"message":"No account matches \"Nope\".","hint":"Run \"traj account list\" to see the chart.","details":{"resource":"account"}}}
 ```
 
 Outside JSON mode the same failure is text on stderr with the same exit code. Commands never prompt.
 
+These codes are worth retrying as they are: `database_busy` and `disk_full`. For every other
+failure, running the same command again unchanged gives the same answer. `traj help` lists the
+retryable codes, and each code in `traj schema`'s registry carries `retryable`.
+
+A command that reads or writes the ledger fails with `ledger_missing` (exit code `4`) until
+`traj init` has created one, and the hint names `traj init`. Only `init` and `restore` create a
+ledger; [`traj doctor`](/cli/commands/doctor/) reports a missing one instead of failing.
+
+## Next steps in a result
+
+A result with nothing to show because the ledger is empty ends with the command to run next: a
+`hint:` line in text, and a `hint` field in JSON. On a new ledger, `traj account list` prints:
+
+```text
+accounts:
+hint: Run "traj account add Cash --type asset --currency THB" to create your first account.
+```
+
+A result that is empty because of the date or filter you chose has no hint.
+
 ## Document input
 
 Some commands take a JSON document beside the flag form — `--postings` on `tx add` and `tx amend`,
-`--file` on `scenario apply` — named by a path, or `-` to read it from stdin
-([ADR 0020](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0020-a-leaf-may-declare-a-document-schema.md)).
-The transaction document those `--postings` flags read is on
+`--file` on `scenario apply` — named by a path, or `-` to read it from stdin. The transaction
+document those `--postings` flags read is on
 [the `tx` page](/cli/commands/tx/#the-transaction-document).
-
-## Decisions
-
-- [ADR 0010: explicit output format, JSON error envelope, fixed exit codes](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0010-output-contract.md)
-- [ADR 0013: the error envelope names its own exit class](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0013-self-describing-error-envelope.md)
-- [ADR 0015: commands form a tree, flags come from the input schema](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0015-command-tree.md)
-- [ADR 0020: a leaf may declare a document schema, and `-` reads it from stdin](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0020-a-leaf-may-declare-a-document-schema.md)
 
 Source: [`trajectonomics/trajectonomics/apps/cli`](https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli).

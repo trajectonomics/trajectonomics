@@ -1,0 +1,3 @@
+# bun test loads the Svelte compiler for .svelte and .svelte.ts files, so components render in tests.
+[test]
+preload = ["./scripts/svelte/preload.ts"]

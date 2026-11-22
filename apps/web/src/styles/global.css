@@ -1,0 +1,20 @@
+/*
+ * The Web Consumer Contract, in its documented order: Tailwind, the light Prebuilt Theme CSS, the dark
+ * Prebuilt Theme CSS, then the Tailwind Theme Stylesheet that turns the Semantic Token Roles into utility
+ * colours. The Theme's own type comes last. There is no `dark:` variant: the theme follows `data-theme`.
+ */
+@import "tailwindcss";
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
+@import "@trajectonomics/brand/tailwind.css";
+@import "@trajectonomics/brand/typography.css";
+
+@source not "../**/*.test.ts";
+
+[data-theme="light"] {
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	color-scheme: dark;
+}

@@ -1,0 +1,41 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Dictionary } from "../lib/language/dictionary"
+
+interface Props {
+	readonly dictionary: Dictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/*
+ * The FAQ: the heading holds the left column and the questions list on the right (Retool's FAQ on
+ * Mobbin), one column on a phone. Each question is a native disclosure, so it opens with no script, and
+ * its answer stays in the page for search engines and agents. A question is a summary, not a heading,
+ * because the page carries no heading deeper than h2 (ADR 0012).
+ */}
+<section class="section-muted bg-muted" data-faq>
+	<div class="section-inner faq-layout">
+		<div class="section-head faq-head">
+			<p class="eyebrow">{dictionary.faqEyebrow}</p>
+			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.faqHeading}
+			</h2>
+		</div>
+
+		<div class="faq-list">
+			{
+				dictionary.faqQuestions.map((question, index) => (
+					<details class="faq-item" data-faq-item>
+						<summary class="faq-question text-foreground">
+							<span>{question}</span>
+							<span class="faq-mark" aria-hidden="true" />
+						</summary>
+						<p class="faq-answer text-foreground">{dictionary.faqAnswers[index]}</p>
+					</details>
+				))
+			}
+		</div>
+	</div>
+</section>

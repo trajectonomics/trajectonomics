@@ -24,8 +24,18 @@ describe("the full Answer engine file", () => {
 	})
 
 	it("renders every section the page shows, under the page's own headings", () => {
-		for (const heading of [dictionary.actionHeading, dictionary.featuresHeading]) {
+		for (const heading of [
+			dictionary.actionHeading,
+			dictionary.featuresHeading,
+			dictionary.faqHeading,
+		]) {
 			expect(LLMS_FULL_TXT).toContain(`## ${heading}`)
+		}
+	})
+
+	it("carries every FAQ answer, so an agent reads what a visitor can open", () => {
+		for (const answer of dictionary.faqAnswers) {
+			expect(LLMS_FULL_TXT).toContain(answer)
 		}
 	})
 

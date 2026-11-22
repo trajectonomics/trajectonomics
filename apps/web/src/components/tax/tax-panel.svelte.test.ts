@@ -1,0 +1,58 @@
+import { describe, expect, test } from "bun:test"
+import { failed, ok, projectionRun } from "../../lib/view/compare/projection.test-support"
+import { panel, withLevy, year } from "./tax-panel.test-support"
+
+describe("TaxPanel: the Scenario", () => {
+	test("a Scenario with no Levy says so, that its figures are before tax, and gives the command", () => {
+		const body = panel({ base: ok(projectionRun({ tax: "not_applied", taxYears: [] })) })
+		expect(body).toContain("No Levy in this Scenario")
+		expect(body).toContain("before tax")
+		expect(body).toContain("traj scenario tax base --tax th-2026")
+	})
+
+	test("an unknown name says so and shows the first Scenario", () => {
+		const body = panel({ base: ok(withLevy), "retire-early": ok(withLevy) }, "ghost")
+		expect(body).toContain("There is no Scenario named ghost. Showing base.")
+	})
+
+	test("a failed Projection Read shows the CLI's message and keeps the picker", () => {
+		const body = panel({ base: failed("The Scenario is empty.") })
+		expect(body).toContain('role="alert"')
+		expect(body).toContain("The Scenario is empty.")
+		expect(body).toContain('name="scenario"')
+	})
+})
+
+describe("TaxPanel: the tax years", () => {
+	test("the headline says Owed for a positive figure", () => {
+		const body = panel({ base: ok(withLevy) })
+		expect(body).toContain(">Owed<")
+		expect(body).toContain("89,000.00")
+	})
+
+	test("a negative owed is a refund, in words, with its sign kept", () => {
+		const refund = year({ owed: "-12000.00", due: "0.00", prepaid: "12000.00" })
+		const body = panel({ base: ok(projectionRun({ taxYears: [refund] })) })
+		expect(body).toContain(">Refund<")
+		expect(body).toContain("−12,000.00")
+	})
+
+	test("settled and partial marks come with their explanations in the CLI's words", () => {
+		const late = year({
+			from: "2060-01-01",
+			to: "2060-12-31",
+			settlementDate: "2061-03-31",
+			settled: false,
+			partial: true,
+		})
+		const body = panel({ base: ok(projectionRun({ taxYears: [year(), late] })) })
+		expect(body).toContain(">Settled<")
+		expect(body).toContain(">Partial<")
+		expect(body).toContain(
+			"the settlement date falls inside the Projection, so its charge is included.",
+		)
+		expect(body).toContain(
+			"the Projection ended before the period did, so the period is incomplete.",
+		)
+	})
+})

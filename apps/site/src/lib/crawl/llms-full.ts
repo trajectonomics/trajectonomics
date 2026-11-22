@@ -56,6 +56,11 @@ const FEATURES = dictionary.featureTitles.map(
 	(title, index) => `- **${title}**: ${dictionary.featureCopies[index] ?? ""}`,
 )
 
+/** The FAQ as the page shows it: each question in bold, then its answer. */
+const FAQ = dictionary.faqQuestions.flatMap((question, index) => [
+	`- **${question}** ${dictionary.faqAnswers[index] ?? ""}`,
+])
+
 /** The Site's one address, named in full because the file is read away from the Site. */
 const ADDRESS_LINES = [linkLine(dictionary.documentTitle, ABSOLUTE_CLEAN_URL)]
 
@@ -77,6 +82,7 @@ export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.des
 		dictionary.actionExampleNote,
 	]),
 	section(dictionary.featuresHeading, FEATURES),
+	section(dictionary.faqHeading, FAQ),
 	section("Install", [INSTALL_PROMPT]),
 	section("License", [linkLine(dictionary.licence, SKILLS_LICENCE_URL)]),
 ])

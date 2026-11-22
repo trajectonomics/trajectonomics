@@ -8,12 +8,16 @@ name: Deploy
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
 #                         config, the lockfile), changed in the push.
 #   workflow_dispatch  -> deploys the app you pick, or both, from main.
+#   schedule (daily)   -> redeploys the Site alone, so the GitHub star count in its header is read again
+#                         (the Site's build refreshes the Star snapshot first; see "Refresh the star count").
 #
 # Safety switch: nothing runs until the repository variable DEPLOYS_ENABLED is true. It needs the
 # secrets CLOUDFLARE_API_TOKEN (Workers Scripts: Edit) and CLOUDFLARE_ACCOUNT_ID.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 3 * * *" # daily, off the hour
   workflow_dispatch:
     inputs:
       app:
@@ -45,7 +49,9 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          if [ "$EVENT" = "workflow_dispatch" ]; then
+          if [ "$EVENT" = "schedule" ]; then
+            apps='["site"]'
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
             if [ "$REF" != "refs/heads/main" ]; then
               echo "::error::Deploy from main, not $REF."
               exit 1
@@ -108,7 +114,17 @@ jobs:
       - name: Install the workspace
         run: bun install --frozen-lockfile
 
-      # turbo builds packages/brand first: every app imports its dist/current/.
+      # The Site prints the repository's star count from a committed snapshot. A deploy reads the live
+      # count into it before the build, without committing: the snapshot stays the fallback when GitHub
+      # is unreachable, and the Site's own build is still the only thing that renders it.
+      - name: Refresh the star count
+        if: matrix.app == 'site'
+        working-directory: apps/site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun run stars:update || echo "::warning::Could not read the star count; deploying the committed snapshot."
+
+            # turbo builds packages/brand first: every app imports its dist/current/.
       - name: Build
         env:
           APP: ${{ matrix.app }}

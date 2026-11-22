@@ -26,6 +26,9 @@
 @import "./conversation.css";
 @import "./terminal.css";
 @import "./features.css";
+@import "./feature-sample.css";
+@import "./faq.css";
+@import "./closing.css";
 @import "./footer.css";
 @import "./footer-legal.css";
 @import "./footer-facts.css";
@@ -71,6 +74,11 @@
 		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
 	/* `font-mono` reads the same variable, so the meta layer has one family. */
 	--font-mono: var(--font-meta);
+}
+
+/* The header is fixed and 64 px tall, so whatever is scrolled into view, a link's target or a focused control, lands below it. */
+html {
+	scroll-padding-top: 80px;
 }
 
 /* The inlined brand mark carries a viewBox and no intrinsic size, so the header's 40 px tile gives it one. */

@@ -3,8 +3,7 @@ title: report
 description: Report on the ledger over a period or at a date.
 ---
 
-`traj report` reports on the ledger. Both reports take their date from you, never from the clock
-([ADR 0029](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0029-reads-take-their-date-from-the-caller.md)).
+`traj report` reports on the ledger. Both reports take their date from you, never from the clock.
 
 ## `traj report networth`
 
@@ -57,8 +56,7 @@ Cash (asset), Loan (liability) and Opening Equity (equity) and one 1,000 THB ope
 
 ## `traj report pnl`
 
-Report income minus expenses over a period. Date ranges are `--since` and `--until`, both inclusive
-([ADR 0022](https://github.com/trajectonomics/trajectonomics/blob/cli-v0.2.0/apps/cli/docs/adr/0022-date-ranges-are-since-and-until.md)).
+Report income minus expenses over a period. Date ranges are `--since` and `--until`, both inclusive.
 
 - `--until <string>` — the period's inclusive end date, as `YYYY-MM-DD`; required
 - `--since <string>` — the period's inclusive start date; omit to start at the ledger's beginning
