@@ -19,6 +19,8 @@ interface Props {
 	editable?: boolean
 	/** Whether the Snapshot holds the selected plan's document, which the planner pages need. */
 	planDocument?: boolean
+	/** Whether the selected plan's projection has milestones, which the Milestones page needs. */
+	milestones?: boolean
 }
 
 let {
@@ -29,6 +31,7 @@ let {
 	onPlan,
 	editable = false,
 	planDocument = true,
+	milestones = true,
 }: Props = $props()
 let closeButton: HTMLButtonElement | undefined = $state()
 
@@ -63,7 +66,7 @@ $effect(() => {
 			<span class="sr-only">Close the menu</span>
 		</button>
 	</div>
-	<SiteNavLinks {current} onNavigate={close} {planDocument} />
+	<SiteNavLinks {current} onNavigate={close} {planDocument} {milestones} />
 	<div class="mt-auto">
 		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} />
 	</div>

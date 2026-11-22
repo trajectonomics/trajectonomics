@@ -39,3 +39,7 @@ _Avoid_: family, members, users, profile
 **Anchor**:
 One date of a Scenario item pinned to a person's age, life end or joining. The label reads "at me, age 60", and the date is the one the household wrote.
 _Avoid_: link, rule, trigger
+
+**Milestone**:
+A named target in a Scenario that fires on a date, on another Milestone, or when a figure such as net worth passes a level (sim ADR 0012). The Dashboard shows the date `traj projection run` reports for each one, or that it is not reached; it never works one out.
+_Avoid_: Goal, event, target date

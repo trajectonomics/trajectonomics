@@ -55,6 +55,16 @@ describe("SiteNavLinks", () => {
 		expect(hidden).not.toContain('href="/expenses/"')
 		expect(hidden).toContain('href="/fi/"')
 	})
+
+	test("lists the Milestones page only when the selected plan's projection has milestones", () => {
+		const shown = render(SiteNavLinks, { props: { current: "/", onNavigate: noop } }).body
+		expect(shown).toContain('href="/milestones/"')
+		const hidden = render(SiteNavLinks, {
+			props: { current: "/", onNavigate: noop, milestones: false },
+		}).body
+		expect(hidden).not.toContain('href="/milestones/"')
+		expect(hidden).toContain('href="/projection/"')
+	})
 })
 
 describe("PlanSwitcher", () => {

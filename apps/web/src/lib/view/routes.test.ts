@@ -24,11 +24,12 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the twelve pages are in navigation order, with unique paths", () => {
+	test("the thirteen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
 			"/projection/",
+			"/milestones/",
 			"/income/",
 			"/expenses/",
 			"/assets-and-debts/",
@@ -45,7 +46,10 @@ describe("the navigation's routes", () => {
 	test("the groups are Home and Net worth, then Plan, then Chance of success, then Tax, then Records", () => {
 		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
 			[null, ["Home", "Net worth"]],
-			["Plan", ["Overview", "Income", "Expenses", "Assets and debts", "FI date", "Compare"]],
+			[
+				"Plan",
+				["Overview", "Milestones", "Income", "Expenses", "Assets and debts", "FI date", "Compare"],
+			],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
 			["Records", ["Ledger", "Health"]],
@@ -60,16 +64,32 @@ describe("the navigation's routes", () => {
 	test("the planner pages need a plan's document, so a Snapshot without one hides them", () => {
 		const plan = NAV_GROUPS.find((group) => group.heading === "Plan")
 		if (plan === undefined) throw new Error("the Plan group exists")
-		expect(routesShown(plan, true).map((route) => route.label)).toEqual([
+		expect(routesShown(plan, true, true).map((route) => route.label)).toEqual([
 			"Overview",
+			"Milestones",
 			"Income",
 			"Expenses",
 			"Assets and debts",
 			"FI date",
 			"Compare",
 		])
-		expect(routesShown(plan, false).map((route) => route.label)).toEqual([
+		expect(routesShown(plan, false, true).map((route) => route.label)).toEqual([
 			"Overview",
+			"Milestones",
+			"FI date",
+			"Compare",
+		])
+	})
+
+	test("the Milestones page is listed after Overview only when the plan has milestones", () => {
+		const plan = NAV_GROUPS.find((group) => group.heading === "Plan")
+		if (plan === undefined) throw new Error("the Plan group exists")
+		expect(routeAt("/milestones/")?.icon).toBe("milestone")
+		expect(routesShown(plan, true, false).map((route) => route.label)).toEqual([
+			"Overview",
+			"Income",
+			"Expenses",
+			"Assets and debts",
 			"FI date",
 			"Compare",
 		])

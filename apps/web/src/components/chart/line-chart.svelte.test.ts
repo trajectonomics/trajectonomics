@@ -63,4 +63,19 @@ describe("LineChart", () => {
 		expect(body).toContain("Nothing to chart yet")
 		expect(body).not.toContain("<svg")
 	})
+
+	test("two markers on the same date draw their labels on two rows, not over each other", () => {
+		const markers = [
+			{ x: 0.5, label: "car-paid-off" },
+			{ x: 0.5, label: "kid-starts-school" },
+		]
+		const { body } = render(LineChart, {
+			props: { label: "Net worth", series: [net], hidden: false, markers },
+		})
+		const ys = [
+			...body.matchAll(/<text[^>]*y="([\d.]+)"[^>]*>(car-paid-off|kid-starts-school)</g),
+		].map((match) => Number(match[1]))
+		expect(ys).toHaveLength(2)
+		expect(ys[1]! - ys[0]!).toBe(14)
+	})
 })

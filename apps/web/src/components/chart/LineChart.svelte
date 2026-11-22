@@ -1,6 +1,6 @@
 <script lang="ts">
 import { preferences } from "../../client/preferences.svelte.js"
-import { type LineSeries, lineLayout } from "../../lib/chart"
+import { type LineMarker, type LineSeries, lineLayout } from "../../lib/chart"
 import EmptyState from "../ui/EmptyState.svelte"
 import { HEIGHT, MARGIN } from "./geometry"
 import LineHover from "./LineHover.svelte"
@@ -16,20 +16,22 @@ interface Props {
 	/** What the chart shows, read out by a screen reader, such as "Net worth by month". */
 	label: string
 	series: readonly LineSeries[]
+	/** Vertical rules with a label, such as the Milestones a plan reached. Each sits at its own x. */
+	markers?: readonly LineMarker[]
 	/** Whether the values are money. Money hides under the hide-amounts switch; other values do not. */
 	money?: boolean
 	/** Overrides the hide-amounts switch. Left out, the switch decides. */
 	hidden?: boolean
 }
 
-let { label, series, money = true, hidden }: Props = $props()
+let { label, series, markers = [], money = true, hidden }: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
 const width = $derived(
 	clientWidth > 0 ? Math.max(MIN_WIDTH, Math.floor(clientWidth)) : FALLBACK_WIDTH,
 )
 const masked = $derived((hidden ?? preferences.hidden) && money)
-const layout = $derived(lineLayout(series, { width, height: HEIGHT, margin: MARGIN }))
+const layout = $derived(lineLayout(series, { width, height: HEIGHT, margin: MARGIN }, markers))
 </script>
 
 <!--
