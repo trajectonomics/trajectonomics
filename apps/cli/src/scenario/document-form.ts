@@ -26,10 +26,7 @@ export const scenarioDocument: z.ZodType<unknown> = z
 				code: "custom",
 				message: refusal.message,
 				path: [...problem.segments],
-				params: {
-					code: problem.code,
-					...(refusal.hint === undefined ? {} : { hint: refusal.hint }),
-				},
+				params: { code: problem.code, hint: refusal.hint },
 			})
 		}
 	})

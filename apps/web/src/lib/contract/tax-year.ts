@@ -22,6 +22,10 @@ export const taxYear = z.strictObject({
 	owed: money,
 	settled: z.boolean(),
 	partial: z.boolean(),
+	/** The figures a reader checks by hand and a note when the minimum tax applied (cli ADR 0052). */
+	taxableIncome: money.optional(),
+	progressiveTax: money.optional(),
+	notes: z.array(z.string()).optional(),
 	assumptions: z.array(assumption),
 })
 export type TaxYear = z.infer<typeof taxYear>

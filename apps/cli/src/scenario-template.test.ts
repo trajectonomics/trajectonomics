@@ -150,7 +150,7 @@ describe("scenario apply --template", () => {
 		})
 	})
 
-	it("leaves another refusal's message and gives it no hint", async () => {
+	it("leaves another refusal's message and gives it the schema hint too", async () => {
 		const home = scenarioHome()
 		const cases: [unknown, string, string][] = [
 			[
@@ -169,7 +169,7 @@ describe("scenario apply --template", () => {
 			expect(res.code).toBe(2)
 			const error = errorOf(res)
 			expect(error.message).toBe(`${path}: ${code}`)
-			expect(error.hint).toBeUndefined()
+			expect(error.hint).toBe(SCHEMA_HINT)
 		}
 	})
 

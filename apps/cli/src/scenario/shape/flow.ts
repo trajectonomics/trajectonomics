@@ -1,6 +1,6 @@
 import { labelSetsSentence } from "../tax/labels"
 import { cappedPrepaymentShape, deriveShape, prepaymentsShape } from "./flow-parts"
-import { BASIS_POINTS, DATE, FREQUENCIES, MINOR_UNITS } from "./terms"
+import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FREQUENCIES, MINOR_UNITS } from "./terms"
 
 /** One Stream, Event or Contribution, with the unit of every number it states. */
 export const flowShape: Record<string, unknown> = {
@@ -62,8 +62,7 @@ export const flowShape: Record<string, unknown> = {
 		cappedPrepayment: cappedPrepaymentShape,
 		target: {
 			type: "string",
-			description:
-				"Contribution only: the Account the money moves into. A liability target is a debt payment, capped at the amount owed; an asset target is funded from `cashflow.contribute`.",
+			description: `Contribution only: the Account the money moves into. A liability target is a debt payment, capped at the amount owed; for an asset target ${CONTRIBUTION_CAP}: spread it as a monthly Flow instead, and list the asset in \`cashflow.contribute\`.`,
 		},
 		derive: {
 			...deriveShape,

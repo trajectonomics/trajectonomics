@@ -1,4 +1,4 @@
-import { check, type Problem } from "@trajectonomics/core/sim"
+import { allowedValues, check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
@@ -25,7 +25,7 @@ const NEUTRAL_BASELINE = { schemaVersion: 1, balances: [] } as const
  */
 const SCHEMA_VERSION_BOUND = 64
 
-/** The one hint an unsupported version carries: the channel that prints the document's shape. */
+/** The hint every document refusal carries: the channel that prints the document's shape. */
 const SCHEMA_HINT = 'Run "traj schema scenario apply" to see the document schema.'
 
 let memoizedVersion: { readonly value: number | undefined } | undefined
@@ -78,21 +78,40 @@ export function documentPath(base: string, segments: readonly (string | number)[
 }
 
 /** One refusal's envelope fields, built once so the command, the Store and a restore agree. */
-export type Refusal = { path: string; message: string; code: string; hint?: string }
+export type Refusal = { path: string; message: string; code: string; hint: string }
+
+/** The rate fields of a document: a rate is written in basis points, never as a fraction. */
+const RATE_SEGMENTS: ReadonlySet<string | number> = new Set(["rate", "bps", "inflation"])
+
+const GROWTH_FORMS = '"inflation", {"bps": <integer>}; {"bps": 0} is a fixed amount'
+
+/**
+ * What a reader needs to fix a refusal without trial and error, in the words ADR-0013 gives a
+ * closed flag: the accepted version, the allowed values of a closed list (read from `sim-core`,
+ * which owns them), the forms a growth takes, or the unit of a rate.
+ */
+function detailOf(problem: ScenarioProblem): string | undefined {
+	if (problem.code === "UNSUPPORTED_SCHEMA_VERSION") {
+		const accepted = acceptedScenarioSchemaVersion()
+		return accepted === undefined ? undefined : `the accepted version is ${accepted}`
+	}
+	if (problem.code === "INVALID_GROWTH") return `one of: ${GROWTH_FORMS}`
+	if (problem.code === "NOT_SAFE_INTEGER" && problem.segments.some((s) => RATE_SEGMENTS.has(s))) {
+		return "basis points, a whole number: 2% is 200"
+	}
+	const allowed = allowedValues(problem.code, problem.segments)
+	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
+}
 
 export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 	const path = documentPath(base, problem.segments)
-	const unsupported = problem.code === "UNSUPPORTED_SCHEMA_VERSION"
-	const accepted = unsupported ? acceptedScenarioSchemaVersion() : undefined
-	const suffix = accepted === undefined ? "" : ` (the accepted version is ${accepted})`
-	const refusal: Refusal = {
+	const detail = detailOf(problem)
+	return {
 		path,
-		message: `${path}: ${problem.code}${suffix}`,
+		message: `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`,
 		code: problem.code,
+		hint: SCHEMA_HINT,
 	}
-	// Only an unsupported version has a fix a caller cannot guess; every other code keeps no hint.
-	if (unsupported) refusal.hint = SCHEMA_HINT
-	return refusal
 }
 
 function detailsOf(problems: readonly ScenarioProblem[], base: string) {
@@ -111,7 +130,7 @@ export function scenarioDocumentError(value: unknown, base = "document"): AppErr
 	return fail("invalid_input", {
 		path: refusal.path,
 		message: refusal.message,
-		...(refusal.hint === undefined ? {} : { hint: refusal.hint }),
+		hint: refusal.hint,
 		details: detailsOf(problems, base),
 	})
 }

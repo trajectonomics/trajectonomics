@@ -2,6 +2,7 @@ import { z } from "zod"
 import { type Context, ok, type Result } from "../command"
 import { type AppError, isAppError } from "../errors"
 import { withStore } from "../with-store"
+import { removedLevyNotes } from "./apply-notes"
 import { fromDecimalForm, printedRow } from "./decimal"
 import { droppedAnchors, view, type WrittenScenario, writtenScenario } from "./view"
 
@@ -14,6 +15,7 @@ export type ApplyResult = {
 	status: "created" | "updated" | "unchanged"
 	scenario: WrittenScenario
 	droppedAnchors: string[]
+	notes: string[]
 }
 
 export const applyResult: z.ZodType<ApplyResult> = z.strictObject({
@@ -21,6 +23,11 @@ export const applyResult: z.ZodType<ApplyResult> = z.strictObject({
 	status: z.enum(["created", "updated", "unchanged"]).describe("What the apply found."),
 	scenario: writtenScenario,
 	droppedAnchors,
+	notes: z
+		.array(z.string())
+		.describe(
+			"What this write took away that the document did not state, such as a Levy it no longer holds; empty when none.",
+		),
 })
 
 /** The flags `scenario apply` passes on once the forms are chosen. */
@@ -40,6 +47,8 @@ export function writeApplied(ctx: Context, write: ApplyWrite): Result<ApplyResul
 	const stored = write.decimal ? fromDecimalForm(write.document) : write.document
 	if (isAppError(stored)) return stored
 	return withStore(ctx, (store) => {
+		const before = store.getScenario(write.name)
+		if (isAppError(before)) return before
 		const outcome = store.saveScenario(
 			{ name: write.name, document: stored },
 			{ dryRun: write.dryRun },
@@ -56,6 +65,7 @@ export function writeApplied(ctx: Context, write: ApplyWrite): Result<ApplyResul
 			status: outcome.status,
 			scenario,
 			droppedAnchors: outcome.droppedAnchors,
+			notes: removedLevyNotes(before?.document, stored, write.dryRun),
 		})
 	})
 }

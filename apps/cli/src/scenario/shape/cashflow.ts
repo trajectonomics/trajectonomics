@@ -1,4 +1,4 @@
-import { MINOR_UNITS } from "./terms"
+import { CONTRIBUTION_CAP, MINOR_UNITS } from "./terms"
 
 /** Where the Scenario's money goes, with the unit of every number it states. */
 export const cashflowShape: Record<string, unknown> = {
@@ -26,8 +26,7 @@ export const cashflowShape: Record<string, unknown> = {
 		contribute: {
 			type: "array",
 			items: { type: "string" },
-			description:
-				"The funding priority for asset Contributions: every asset a contribution Flow targets must appear here, and an extra entry is inert. A liability target is not listed: its Flow is the debt payment.",
+			description: `The funding priority for asset Contributions (${CONTRIBUTION_CAP}): every asset a contribution Flow targets must appear here, and an extra entry is inert. A liability target is not listed: its Flow is the debt payment.`,
 		},
 		withdraw: {
 			type: "array",

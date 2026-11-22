@@ -27,6 +27,9 @@ function documentDetail(document: DocumentSpec) {
 	}
 }
 
+/** The first line of the root listing: what to run next to see a command's flags and document. */
+const USAGE = "traj schema <command> prints a command's flags and the document it reads."
+
 export const schema: Leaf = defineCommand({
 	name: "schema",
 	summary: "Describe the commands and the error registry",
@@ -60,7 +63,7 @@ export const schema: Leaf = defineCommand({
 			}))
 			return ok(
 				path.length === 0
-					? { commands, errors: registryListing(), notSupported: [...NOT_SUPPORTED] }
+					? { usage: USAGE, commands, errors: registryListing(), notSupported: [...NOT_SUPPORTED] }
 					: { commands },
 			)
 		}

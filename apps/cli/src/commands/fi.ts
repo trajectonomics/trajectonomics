@@ -5,13 +5,13 @@ import { isAppError } from "../errors"
 import { readCarryIn } from "../projection/carryin"
 import { withCarryInSide } from "../projection/carryin-apply"
 import { independenceOf } from "../projection/fi"
-import { FI_METHOD } from "../projection/fi-method"
+import { FI_HORIZON, FI_METHOD } from "../projection/fi-method"
 import { fiView } from "../projection/fi-view"
 import {
 	asOfFlag,
 	carryInFlag,
 	carryInFlagDocument,
-	horizonFlag,
+	fiHorizonFlag,
 	PROJECTION_ERROR_CODES,
 	scenarioFlag,
 	setFlag,
@@ -22,11 +22,11 @@ export const fi: Leaf = defineCommand({
 	name: "fi",
 	summary: "Report the financial independence date under a Scenario",
 	note: "Each person's age at the FI date ships in 0.8.0.",
-	description: FI_METHOD,
+	description: `${FI_METHOD} ${FI_HORIZON}`,
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,
-		horizon: horizonFlag,
+		horizon: fiHorizonFlag,
 		scenario: scenarioFlag,
 		set: setFlag,
 		carryIn: carryInFlag,

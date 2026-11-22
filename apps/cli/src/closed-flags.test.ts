@@ -70,7 +70,7 @@ describe("a closed flag names the values it accepts", () => {
 	it("prints --label's description saying needs --tax, and repeatable once at the end", async () => {
 		const line = flagLine((await help(["scenario", "tax"])).out, "label") ?? ""
 		expect(line).toContain(
-			"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax. An income Flow takes one of ",
+			"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax. A label replaces that Flow's label and adds to the labels the other Flows already carry; --none clears them all. An income Flow takes one of ",
 		)
 		expect(line.match(/repeatable/g)).toHaveLength(1)
 		expect(line).toMatch(/; repeatable$/)
