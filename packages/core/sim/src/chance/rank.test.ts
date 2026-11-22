@@ -5,6 +5,15 @@ describe("nearest rank", () => {
 	it("returns the only value of a one-path sample at every level", () => {
 		expect(nearestRank([7], 10)).toBe(7)
 		expect(nearestRank([7], 90)).toBe(7)
+		expect(nearestRank([7], 100)).toBe(7)
+	})
+
+	it("takes the lower of two values up to level 50 and the upper above it", () => {
+		// ceil(10 × 2 / 100) = 1, ceil(50 × 2 / 100) = 1, ceil(51 × 2 / 100) = 2, ceil(100 × 2 / 100) = 2.
+		expect(nearestRank([3, 8], 10)).toBe(3)
+		expect(nearestRank([3, 8], 50)).toBe(3)
+		expect(nearestRank([3, 8], 51)).toBe(8)
+		expect(nearestRank([3, 8], 100)).toBe(8)
 	})
 
 	it("takes index ceil(level × N / 100) − 1 of ten values", () => {

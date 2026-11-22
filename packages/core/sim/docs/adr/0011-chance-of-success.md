@@ -34,6 +34,10 @@ adds no growth rule and no Projection. Every path is a `runEngine` call with tha
   counts are reported.
 - **Reuse.** Periods come from `buildPeriods` and closing worth from `buildRollups`, the same seams
   `project()` uses for one path. The engine is not copied.
+- **One failing run fails the call.** When the engine returns a problem on any path (a
+  `VALUE_OVERFLOW`, for example), the whole call returns `{ ok: false, problems: [that problem] }`,
+  as ADR-0005 states for one overflowing path. A partial Chance of success would hide which paths
+  were dropped.
 - **Echo.** The result carries `definition: { modelId, seed, paths }` as the FI probability result
   does.
 

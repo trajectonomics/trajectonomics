@@ -1,6 +1,7 @@
 # Seeded Monte Carlo as data on one growth seam
 
-Status: accepted
+Status: accepted. The first stochastic entry, ADR-0011 (chance of success), narrows the output described
+here: fixed Band levels, net worth only, no default path count, and Runs-out counts per Annual roll-up.
 
 A projection has one future today: `valuation` turns an Account's balance into money at a date by
 applying exactly one effective annual rate, `Account.rate`, through ADR-0001's integer growth rule.
