@@ -6,3 +6,4 @@ export const personAge = z.strictObject({ person: z.string(), age: integer })
 
 /** Each household person's age, in household order; empty without a household. */
 export const personAges = z.array(personAge)
+export type PersonAge = z.infer<typeof personAge>

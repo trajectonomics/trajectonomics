@@ -64,3 +64,35 @@ describe("ProjectionResult", () => {
 		expect(body).toContain("traj projection run --scenario base --as-of 2026-10-31 --json")
 	})
 })
+
+describe("the annual table's Ages column", () => {
+	test("shows each person's age on the row, from the CLI's ages", () => {
+		const run = projectionRunFixture()
+		const withAges = {
+			...run,
+			tables: run.tables.map((table) =>
+				table.name === "annual"
+					? {
+							...table,
+							rows: table.rows.map((row) => ({
+								...row,
+								ages: [
+									{ person: "me", age: 60 },
+									{ person: "partner", age: 58 },
+								],
+							})),
+						}
+					: table,
+			),
+		}
+		const body = renderResult(withAges)
+		expect(body).toContain("Ages")
+		expect(body).toContain("me 60, partner 58")
+	})
+
+	test("shows a dash on each row when the plan has no household", () => {
+		const body = renderResult(projectionRunFixture())
+		expect(body).toContain("Ages")
+		expect(body).toContain("—")
+	})
+})

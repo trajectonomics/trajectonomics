@@ -1,5 +1,7 @@
+import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
+import { flowAnchorLabels } from "../household/model"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
 export type FlowKind = "income" | "expense"
@@ -23,6 +25,10 @@ export interface FlowCard {
 	readonly frequency: string
 	readonly start: string
 	readonly end: string
+	/** The label of the start when the household pins it ("at me, age 60"), or null. */
+	readonly startAnchor: string | null
+	/** The label of the end when the household pins it, or null. */
+	readonly endAnchor: string | null
 	readonly growth: string
 	/** "Earned" or "Passive" for an income Flow; null for an expense. */
 	readonly earned: string | null
@@ -38,8 +44,18 @@ function growthText(flow: ScenarioFlow): string {
 	return `${formatBps(growth.bps)}% a year`
 }
 
-/** The Flows of one kind as cards, in the order the document holds them. */
-export function flowCards(flows: readonly ScenarioFlow[], kind: FlowKind): FlowCard[] {
+/** The anchor labels of one Flow's dates, as the card holds them. */
+function anchorsOf(household: HouseholdDocument | null, id: string) {
+	const labels = flowAnchorLabels(household, id)
+	return { startAnchor: labels.start, endAnchor: labels.end }
+}
+
+/** The Flows of one kind as cards, in the order the document holds them, each with its anchors' labels. */
+export function flowCards(
+	flows: readonly ScenarioFlow[],
+	kind: FlowKind,
+	household: HouseholdDocument | null = null,
+): FlowCard[] {
 	return flows
 		.filter((flow) => flow.kind === kind)
 		.map((flow) => ({
@@ -48,6 +64,7 @@ export function flowCards(flows: readonly ScenarioFlow[], kind: FlowKind): FlowC
 			frequency: flow.frequency,
 			start: flow.start,
 			end: flow.end ?? "To the horizon",
+			...anchorsOf(household, flow.id),
 			growth: flow.derive === undefined ? growthText(flow) : "Computed",
 			earned:
 				kind !== "income" || flow.earned === undefined ? null : flow.earned ? "Earned" : "Passive",

@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, test } from "bun:test"
 import { existsSync } from "node:fs"
+import { agesOf } from "./edit-ages.test-support"
 import {
 	BINARY,
 	copy,
@@ -9,6 +10,7 @@ import {
 	postEdit,
 	SLOW_MS,
 	setupEditor,
+	shownOf,
 } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
 
@@ -81,6 +83,72 @@ describe("an Edit against the real traj", () => {
 			if (!answer.ok) throw new Error(answer.error.message)
 			expect(answer.snapshot.params.scenarios).toContain("e2e-applied")
 			expect(ledgerShow("e2e-applied", false).scenario.document.flows[0]?.id).toBe("salary")
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"setting a household pins the date to the person's age, and the Snapshot shows the ages",
+		async () => {
+			const household = {
+				schemaVersion: 1,
+				people: [
+					{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+					{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+				],
+				anchors: [{ path: "flows.fund.end", person: "me", age: 61 }],
+			}
+			const { status, answer } = await postEdit(
+				JSON.stringify({ kind: "set-household", name: "base", household }),
+			)
+			expect(status).toBe(200)
+			if (!answer.ok) throw new Error(answer.error.message)
+			const shown = shownOf(answer, "base")
+			expect(shown.scenario.household?.anchors).toEqual([
+				{ path: "flows.fund.end", person: "me", age: 61 },
+			])
+			expect(shown.scenario.document.flows.find((flow) => flow.id === "fund")?.end).toBe(
+				"2051-06-30",
+			)
+			expect(agesOf(answer, "base").at(-1)).toBe("me 70,partner 68")
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"a household that names no person of the plan is refused as data, and changes nothing",
+		async () => {
+			const household = {
+				schemaVersion: 1,
+				people: [{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 }],
+				anchors: [{ path: "flows.fund.end", person: "nobody", age: 60 }],
+			}
+			const { status, answer } = await postEdit(
+				JSON.stringify({ kind: "set-household", name: "base", household }),
+			)
+			expect(status).toBe(200)
+			expect(answer.ok).toBe(false)
+			expect(ledgerShow("base", false).scenario.household?.anchors).toEqual([
+				{ path: "flows.fund.end", person: "me", age: 61 },
+			])
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"removing the household keeps the dates it pinned, and the Snapshot no longer shows ages",
+		async () => {
+			const { status, answer } = await postEdit(
+				JSON.stringify({ kind: "remove-household", name: "base" }),
+			)
+			expect(status).toBe(200)
+			if (!answer.ok) throw new Error(answer.error.message)
+			const shown = shownOf(answer, "base")
+			expect(shown.scenario.household).toBeNull()
+			expect(shown.scenario.document.flows.find((flow) => flow.id === "fund")?.end).toBe(
+				"2051-06-30",
+			)
+			expect(agesOf(answer, "base").at(-1)).toBe("")
 		},
 		SLOW_MS,
 	)

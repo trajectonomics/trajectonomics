@@ -1,6 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import type { Baseline, Read, ScenarioDocument } from "../../lib/contract"
+import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
 import { accountCards } from "../../lib/view/plan-items/accounts"
 import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
@@ -16,11 +16,13 @@ interface Props {
 	/** The plan the items belong to: the Edits save its document under this name. */
 	name: string
 	doc: ScenarioDocument
+	/** The household of the plan, whose anchored dates the forms show as read-only. Null without one. */
+	household: HouseholdDocument | null
 	baseline: Read<Baseline>
 	editable: boolean
 }
 
-let { kind, name, doc, baseline, editable }: Props = $props()
+let { kind, name, doc, household, baseline, editable }: Props = $props()
 /** The drawer: null when it is shut, else the item it edits, or no id for a new one. */
 let drawer = $state<{ id?: string } | null>(null)
 
@@ -33,7 +35,7 @@ const noun = $derived(PLAN_PAGES[kind].noun)
 const editingId = $derived(drawer === null ? undefined : drawer.id)
 const title = $derived(editingId === undefined ? `Add ${noun}` : `Edit ${editingId}`)
 const flowKind = $derived(kind === "expense" ? "expense" : "income")
-const cards = $derived(kind === "assets" ? [] : flowCards(doc.flows, flowKind))
+const cards = $derived(kind === "assets" ? [] : flowCards(doc.flows, flowKind, household))
 const accounts = $derived(accountCards(doc.accounts, baseline))
 const existingFlow = $derived(doc.flows.find((flow) => flow.id === editingId))
 const existingAccount = $derived(doc.accounts.find((account) => account.id === editingId))
@@ -69,7 +71,7 @@ const busy = $derived(editSession.busy)
 		{#if drawer !== null && kind === "assets"}
 			<AccountForm {name} {doc} existing={existingAccount} onDone={() => setDrawer(null)} />
 		{:else if drawer !== null}
-			<FlowForm kind={flowKind} {name} {doc} existing={existingFlow} onDone={() => setDrawer(null)} />
+			<FlowForm kind={flowKind} {name} {doc} {household} existing={existingFlow} onDone={() => setDrawer(null)} />
 		{/if}
 	</Drawer>
 </div>
