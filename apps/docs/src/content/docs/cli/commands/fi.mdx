@@ -19,4 +19,10 @@ traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json          
 traj fi --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000  # The same date under one changed assumption.
 ```
 
+From the FI month on, every earned income Flow stops, and tax keeps running on what remains. A
+Scenario that pays a debt from a share of earned income cannot keep paying it after the FI month, so
+`fi` refuses it: the command exits with code `3` and `projection_refused`, and `details` names the
+rule it broke: a derived debt payment that reads earned income. A result that uses Thai tax also carries the `assumptions` array
+described on [`traj scenario tax`](/cli/commands/scenario/).
+
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

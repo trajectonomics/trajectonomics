@@ -1,0 +1,32 @@
+---
+title: dashboard
+description: Serve the Dashboard of your ledger on 127.0.0.1 until Ctrl-C.
+---
+
+`traj dashboard` reads the ledger once and serves its Dashboard, with net worth, the ledger,
+projections, the FI date, a Scenario compare, tax and health, on `http://127.0.0.1:4321/` until you
+press Ctrl-C. It only reads: it writes nothing to the ledger. It listens on this machine only, so no
+other computer on your network can open it. Run the command again to see figures recorded since.
+
+- `--as-of <string>` — the date every figure is stated at, as `YYYY-MM-DD`; required
+- `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
+- `--scenario <string>` — a Scenario to project; without it, every Scenario; repeatable
+- `--compare <string>` — a Scenario to compare; pass `--compare` twice for two; repeatable
+- `--birth-date <string>` — the birth date ages count from, as `YYYY-MM-DD`
+- `--age <number>` — an age a compare reports at; repeatable
+- `--monthly` — also read each projection's monthly rows
+- `--carry-in <string>` — read what each Levy's period already tallied and prepaid from this JSON
+  path, or `-` for stdin
+- `--port <number>` — the loopback port to listen on; `0` lets the system pick a free one
+
+The port is bound before the ledger is read, so a port already in use fails at once.
+
+The command runs until you stop it, so it is shown as a plain block rather than a checked example.
+Open the address it prints in a browser:
+
+```bash
+traj dashboard --as-of 2026-11-30 --horizon 2056-11-30                                           # Read the ledger once and serve the Dashboard on port 4321.
+traj dashboard --as-of 2026-11-30 --horizon 2056-11-30 --compare base --compare frugal --port 0  # Compare two Scenarios, on whatever port is free.
+```
+
+See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

@@ -14,14 +14,21 @@ Create or update a Scenario from a JSON document.
 
 - `--file <string>` — the JSON document's path, or `-` for stdin; required unless `--template`
 - `--template` — print a complete document to start from and open no Data directory; takes no name
+- `--as-of <string>` — with `--template`, pre-fill the document from the Baseline at this date, as
+  `YYYY-MM-DD`
 - `--dry-run` — report the row and roll the write back
 
 ```bash
 traj scenario apply --template > base.json           # Print the document to start from.
+traj scenario apply --template --as-of 2026-03-31    # Print a Scenario pre-filled from the Baseline at one date, to edit and apply.
 traj scenario apply base --file base.json            # Create a Scenario, or update it when the document changed.
 traj scenario apply base --file - < base.json        # Read the document from stdin.
 traj scenario apply base --file base.json --dry-run  # Show the row and roll the write back.
 ```
+
+With `--as-of`, the template names the accounts of your ledger by id and sets each Flow's start to
+that date, so the document starts from what you hold on that day. The output contains your own
+account ids, so it is shown as a command rather than a checked example.
 
 `traj scenario apply --template` prints a complete document to start from: print it, edit it, then
 apply it. The latest release prints:
@@ -159,6 +166,12 @@ The filing statuses are `single`, `married_no_income_spouse`, `married_separate`
 `married_separate_40_1_joint_rest`. The deduction flags state what the taxpayer paid; the statutory
 ceilings are applied by the tax core, not by the command. `traj help scenario tax` lists every
 accepted `--label` value.
+
+A result that uses Thai tax carries an `assumptions` array: one entry per tax figure the
+computation used whose source is not yet confirmed, with its `path`, its `value`, its `status`
+(`reported` or `unsourced`) and one sentence of `note`. A figure that is later sourced leaves the
+list without a change to the command. The human form prints the same entries as an `Assumptions`
+block after the result.
 
 ```bash
 traj scenario tax base --tax th-2026 --label salary=income.section40_1                                                                                                                                     # Charge Thailand's 2026 income tax on the salary this Scenario declares.

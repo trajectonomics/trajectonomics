@@ -30,6 +30,10 @@ Two children matter:
 The install scripts do not use `bin/`: they put the binary where the platform expects it, and the
 directory then holds the ledger alone.
 
+The anonymous usage id is not in this directory. It is `telemetry.json` in your config directory
+(`$XDG_CONFIG_HOME/traj`, or `~/.config/traj`; `%APPDATA%\traj` on Windows), so `traj data remove`
+leaves it in place. [`traj telemetry off`](/cli/commands/telemetry/) deletes it.
+
 ## Back it up
 
 Before you delete anything, take the copy you would keep:
