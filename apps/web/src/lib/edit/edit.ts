@@ -13,6 +13,14 @@ const planName = z
 	.min(1)
 	.refine((name) => planNameShapeError(name) === null, { message: "not a plan name traj can take" })
 
+/**
+ * The content hash of the plan the page read, as the Snapshot states it (`contentHash`). A write that
+ * names it is refused when the stored plan has moved on (cli ADR 0051).
+ */
+const contentHash = z
+	.string()
+	.regex(/^jcs1:sha256:[0-9a-f]{64}$/, "not a content hash traj can take")
+
 /** The kinds of Edit, in the order the list names them. */
 export const EDIT_KINDS = [
 	"copy-plan",
@@ -32,6 +40,7 @@ export const editSchema = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("apply-plan"),
 		name: planName,
+		contentHash,
 		document: z.record(z.string(), z.unknown()),
 	}),
 	z.strictObject({
@@ -41,11 +50,13 @@ export const editSchema = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("set-household"),
 		name: planName,
+		contentHash,
 		household: z.record(z.string(), z.unknown()),
 	}),
 	z.strictObject({
 		kind: z.literal("remove-household"),
 		name: planName,
+		contentHash,
 	}),
 ])
 
@@ -57,7 +68,8 @@ export type WriteCommand = { argv: string[]; stdin?: string }
 
 /**
  * The `traj` write an Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
- * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)).
+ * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
+ * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0051).
  */
 export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]
@@ -67,7 +79,17 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 		case "apply-plan":
 			// The page holds decimal-form documents only, so the write reads that form (ADR-0047).
 			return {
-				argv: ["scenario", "apply", edit.name, "--file", "-", "--decimal", ...flags],
+				argv: [
+					"scenario",
+					"apply",
+					edit.name,
+					"--file",
+					"-",
+					"--decimal",
+					"--if-hash",
+					edit.contentHash,
+					...flags,
+				],
 				stdin: JSON.stringify(edit.document),
 			}
 		case "delete-plan":
@@ -75,29 +97,29 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 		case "set-household":
 			// The household document is read from stdin, and its anchored dates are written (cli ADR-0048).
 			return {
-				argv: ["scenario", "household", edit.name, "--file", "-", ...flags],
+				argv: [
+					"scenario",
+					"household",
+					edit.name,
+					"--file",
+					"-",
+					"--if-hash",
+					edit.contentHash,
+					...flags,
+				],
 				stdin: JSON.stringify(edit.household),
 			}
 		case "remove-household":
-			return { argv: ["scenario", "household", edit.name, "--none", ...flags] }
-	}
-}
-
-/**
- * The Scenario names the Snapshot projects after an Edit. A copy or an apply adds its name to an
- * explicit list; a delete takes its name out. An empty list means every Scenario, so it stays empty.
- */
-export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
-	switch (edit.kind) {
-		case "delete-plan":
-			return scenarios.filter((name) => name !== edit.name)
-		case "set-household":
-		case "remove-household":
-			return [...scenarios]
-		case "copy-plan":
-		case "apply-plan":
-			return scenarios.length === 0 || scenarios.includes(edit.name)
-				? [...scenarios]
-				: [...scenarios, edit.name]
+			return {
+				argv: [
+					"scenario",
+					"household",
+					edit.name,
+					"--none",
+					"--if-hash",
+					edit.contentHash,
+					...flags,
+				],
+			}
 	}
 }

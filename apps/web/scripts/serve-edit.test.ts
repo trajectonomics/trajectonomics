@@ -78,3 +78,20 @@ describe("POST /edit refusals", () => {
 		expect(response.status).toBe(405)
 	})
 })
+
+describe("POST /reread refusals", () => {
+	test("refuses a wrong token, as an Edit does", async () => {
+		const response = editor().reread(editRequest({ [EDIT_TOKEN_HEADER]: "guess" }, "{}"), PORT)
+		expect(await refusedWith(await response)).toEqual({ status: 403, code: "bad_token" })
+	})
+
+	test("refuses a bad Host", async () => {
+		const response = editor().reread(editRequest({ host: "evil.example:4321" }, "{}"), PORT)
+		expect(await refusedWith(await response)).toEqual({ status: 403, code: "bad_host" })
+	})
+
+	test("refuses a reread before the first Snapshot is read", async () => {
+		const response = editor().reread(editRequest({}, "{}"), PORT)
+		expect(await refusedWith(await response)).toEqual({ status: 503, code: "not_ready" })
+	})
+})

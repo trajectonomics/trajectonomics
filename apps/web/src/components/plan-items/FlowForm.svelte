@@ -13,6 +13,8 @@ interface Props {
 	kind: FlowKind
 	/** The plan's name, which the Edit saves the document under. */
 	name: string
+	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0051). */
+	contentHash: string
 	doc: ScenarioDocument
 	/** The household of the plan: a date it pins is read-only here. Null without one. */
 	household: HouseholdDocument | null
@@ -22,7 +24,7 @@ interface Props {
 	onDone: () => void
 }
 
-let { kind, name, doc, household, existing, onDone }: Props = $props()
+let { kind, name, doc, household, existing, onDone, contentHash }: Props = $props()
 const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
@@ -32,7 +34,7 @@ const shown = $derived(shownProblems(problems, editSession.failure, editSession.
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
 async function commit(next: ScenarioDocument): Promise<void> {
-	if (await editSession.run({ kind: "apply-plan", name, document: next })) onDone()
+	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
 }
 
 async function save(event: SubmitEvent): Promise<void> {

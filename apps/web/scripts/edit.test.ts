@@ -6,6 +6,7 @@ import {
 	copy,
 	disposeEditor,
 	drop,
+	hashOf,
 	ledgerShow,
 	postEdit,
 	SLOW_MS,
@@ -73,16 +74,21 @@ describe("an Edit against the real traj", () => {
 	)
 
 	test(
-		"applying a decimal-form document creates the plan, and the ledger holds it in minor units",
+		"an Edit to a plan the page did not read is refused as changed, and creates nothing",
 		async () => {
 			const document = ledgerShow("base", true).scenario.document
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "apply-plan", name: "e2e-applied", document }),
+				JSON.stringify({
+					kind: "apply-plan",
+					name: "e2e-unread",
+					contentHash: hashOf("base"),
+					document,
+				}),
 			)
 			expect(status).toBe(200)
-			if (!answer.ok) throw new Error(answer.error.message)
-			expect(answer.snapshot.params.scenarios).toContain("e2e-applied")
-			expect(ledgerShow("e2e-applied", false).scenario.document.flows[0]?.id).toBe("salary")
+			expect(answer.ok).toBe(false)
+			if (!answer.ok) expect(answer.error.code).toBe("scenario_changed")
+			expect((await setupEditor()).body).not.toContain('"e2e-unread"')
 		},
 		SLOW_MS,
 	)
@@ -99,7 +105,12 @@ describe("an Edit against the real traj", () => {
 				anchors: [{ path: "flows.fund.end", person: "me", age: 61 }],
 			}
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "set-household", name: "base", household }),
+				JSON.stringify({
+					kind: "set-household",
+					name: "base",
+					contentHash: hashOf("base"),
+					household,
+				}),
 			)
 			expect(status).toBe(200)
 			if (!answer.ok) throw new Error(answer.error.message)
@@ -124,7 +135,12 @@ describe("an Edit against the real traj", () => {
 				anchors: [{ path: "flows.fund.end", person: "nobody", age: 60 }],
 			}
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "set-household", name: "base", household }),
+				JSON.stringify({
+					kind: "set-household",
+					name: "base",
+					contentHash: hashOf("base"),
+					household,
+				}),
 			)
 			expect(status).toBe(200)
 			expect(answer.ok).toBe(false)
@@ -139,7 +155,7 @@ describe("an Edit against the real traj", () => {
 		"removing the household keeps the dates it pinned, and the Snapshot no longer shows ages",
 		async () => {
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "remove-household", name: "base" }),
+				JSON.stringify({ kind: "remove-household", name: "base", contentHash: hashOf("base") }),
 			)
 			expect(status).toBe(200)
 			if (!answer.ok) throw new Error(answer.error.message)

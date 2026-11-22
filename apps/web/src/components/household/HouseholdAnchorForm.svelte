@@ -15,13 +15,15 @@ interface Props {
 	/** The Scenario the household belongs to: the Edit saves its household under this name. */
 	name: string
 	household: HouseholdDocument
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0051). */
+	contentHash: string
 	/** The Flows the Scenario holds: the items a date may be pinned on. */
 	flows: readonly ScenarioFlow[]
 	/** Runs once the Edit has run, so the drawer closes. */
 	onDone: () => void
 }
 
-let { name, household, flows, onDone }: Props = $props()
+let { name, household, flows, onDone, contentHash }: Props = $props()
 /** The first choice of each select says nothing is chosen yet, so the form invents no item, person or date. */
 const BLANK = { value: "", label: "Choose" }
 const edgeChoices = [BLANK, ...EDGE_CHOICES]
@@ -44,7 +46,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	if (await editSession.run({ kind: "set-household", name, household: next })) onDone()
+	if (await editSession.run({ kind: "set-household", name, contentHash, household: next })) onDone()
 }
 </script>
 
