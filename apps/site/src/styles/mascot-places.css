@@ -61,7 +61,7 @@
 
 /*
  * The footer: the robot sits in the link grid's free cell, beside Help on a phone and under it on a wider screen. The
- * negative margin is the footer's own 32 px gap (footer.css), so it sits on the facts' hairline (footer-facts.css).
+ * negative margin is the footer's own 32 px gap at every width (footer.css), so it sits on the facts' hairline.
  */
 .mascot-sit {
 	width: 84px;

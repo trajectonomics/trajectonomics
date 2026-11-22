@@ -4,7 +4,7 @@ status: accepted
 
 # A phone always has the Mascot on screen
 
-[ADR 0025](./0025-the-page-carries-the-mascot.md) and [ADR 0026](./0026-the-mascot-is-a-rendered-cut-out.md) put the Mascot in four places. On 2026-11-22 the owner asked for more, by a rule of thumb: a visitor scrolling the home on a phone should always see the robot, so they learn that it is ours and remember it. They did not want it repeated across the width or floating over the page.
+[ADR 0025](./0025-the-page-carries-the-mascot.md) and [ADR 0026](./0026-the-mascot-is-a-rendered-cut-out.md) put the Mascot in four places; this record extends both. On 2026-11-22 the owner asked for more, by a rule of thumb: a visitor scrolling the home on a phone should always see the robot, so they learn that it is ours and remember it. They did not want it repeated across the width or floating over the page.
 
 Measured at 390 × 844, the four places left three stretches with no robot on screen. Between the hero and the Features heading the gap is about 1,200 px of scroll with reduced motion; with motion on, the demo shows one chat at a time and the stretch closes. Between the Features heading and the closing call to action it is about 1,800 px. In the footer it is the last screen.
 
@@ -15,7 +15,7 @@ Measured at 390 × 844, the four places left three stretches with no robot on sc
    - `hello` is in the demo's traj chat header, between the title and the tag. It is the head and one hand resting on the hairline, with the other hand waving where the traj skill joins the chat. It shows wherever that chat does.
    - `twins` is in the Agent-operated feature card, at the right of its words and under its sample. It holds up two checked cards, a command's described input and output. The card's index, title and copy leave it a 76 px column. It is the Agent-operated card rather than Deterministic because the third card sits about 150 px lower on a phone, which would leave a quarter screen with no robot.
    - `think` sits beside the FAQ heading, hand on chin under a lit bulb. On a wide screen it sits under the heading in the sticky left column.
-   - `sit` is in the footer's link grid. It takes the free cell beside Help on a phone, and the cell under Help on a wider screen. A negative margin equal to the footer's gap seats it on the facts' hairline.
+   - `sit` is in the footer's link grid. It takes the free cell beside Help on a phone, and the cell under Help on a wider screen. A negative margin equal to the gap below the link grid seats it on the facts' hairline.
 3. **Measured, not guessed.** With the eight places, the longest run of scroll with no robot on screen is:
 
    | Viewport | Motion | Longest run with no robot |
