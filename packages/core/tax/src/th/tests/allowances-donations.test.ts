@@ -50,4 +50,10 @@ describe("Thailand Donation Allowances (calculateDonationAllowances)", () => {
 			10_000.9,
 		)
 	})
+
+	it("subtracts the 2x allowance in satang, so 300,000.10 net less 0.20 leaves a 29,999.99 cap", () => {
+		const res = calculateDonationAllowances(0.1, 200_000, 300_000.1)
+		expect(res.breakdown.donation1x.cap).toBe(29_999.99)
+		expect(res.netTaxableIncome).toBe(269_999.91)
+	})
 })

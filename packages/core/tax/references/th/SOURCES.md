@@ -102,7 +102,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | --- | --- | --- |
 | 2026-11-17 | none (first sweep) | 71 rows written; 32 `match`, 6 `derived`, 28 `reported`, 5 `unsourced` |
 | 2026-11-22 | none | Comments only: the `src/th/parameters.ts` header and the `src/th/stages/separate-sheet.ts` `@statute` line, and every other comment with the same two citations, now cite the sources in the findings above |
-| 2026-11-22 | none (GPF rate and base unchanged; ceiling row now `match`) | Owner ruling on #52: percentage expense deductions and donation caps floor to the satang (`floorByRateToSatang`; levy graph mirrors it). GPF: PND 90 instructions read; ceiling confirmed, rate not printed for GPF, so the rate and base stay as they were |
+| 2026-11-22 | `allowances.retirementCluster.gpf.maxRate` removed; `gpf.ceiling` now `match` | Owner ruling on #52: percentage expense deductions and donation caps floor to the satang (`floorByRateToSatang`; levy graph mirrors it), and the allowances and donation stages subtract in integer satang. GPF: the PND 90 instructions cap GPF at 500,000 baht with no percentage (item 12(2)), so the 30 per cent share-of-wages cap is removed from the calculator and the Levy |
 
 <!-- factory:th-source-rows v1 -->
 
