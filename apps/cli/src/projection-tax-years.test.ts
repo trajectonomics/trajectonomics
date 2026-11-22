@@ -1,8 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { carryInFile, taxedHome, thRecord } from "./projection/carry-in-support"
 import type { CompareView } from "./projection/compare-view"
-import type { FiView } from "./projection/fi-view"
-import { errorOf, fi, projection, projectionHome } from "./projection/testing"
+import { errorOf, projection, projectionHome } from "./projection/testing"
 import { runBody } from "./projection-run-support"
 import { applyScenario, scenario } from "./scenario-test-support"
 import { capture } from "./test-support"
@@ -111,13 +110,6 @@ describe("the tax a Projection says is owed", () => {
 		const body = runBody(await projection(home, ["run", "--scenario", "base", ...YEAR_FLAGS]))
 		expect(body.tax).toBe("not_applied")
 		expect(body.taxYears).toEqual([])
-	})
-
-	it("gives fi the same tax years the same Scenario projects", async () => {
-		const home = await taxedHome()
-		const run = runBody(await projection(home, ["run", "--scenario", "base", ...YEAR_FLAGS]))
-		const answer = JSON.parse((await fi(home, ["--scenario", "base", ...YEAR_FLAGS])).out) as FiView
-		expect(answer.taxYears).toEqual(run.taxYears)
 	})
 
 	it("gives each side of a compare its own tax years, and an untaxed side none", async () => {

@@ -3,6 +3,7 @@ import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { BufferBreach } from "./buffer"
 import { cloneLevySet, cloneStates } from "./clone"
+import type { PrefixPoint } from "./prefix"
 import { gridDates, gridEvents, type ScanGrid } from "./scan-grid"
 import { stopsFlow } from "./scan-stop"
 import { processDay } from "./walk-day"
@@ -19,7 +20,7 @@ export interface Shortfall {
 }
 
 export type WalkOutcome =
-	| { readonly kind: "survived"; readonly windows: Windows }
+	| { readonly kind: "survived"; readonly windows: Windows; readonly point: PrefixPoint }
 	| { readonly kind: "buffer"; readonly breach: BufferBreach; readonly windows: Windows }
 	| { readonly kind: "shortfall"; readonly shortfall: Shortfall }
 	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
