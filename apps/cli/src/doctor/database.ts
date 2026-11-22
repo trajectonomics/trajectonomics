@@ -1,12 +1,10 @@
-import { existsSync, statSync } from "node:fs"
 import type { Context } from "../command"
 import { type AppError, isAppError } from "../errors"
 import { HEAD, openStore, type RestoreCounts, type Store } from "../store"
 import { sentenceOf, skipped, step } from "./checks"
+import { type DatabaseFacts, factsOf } from "./facts"
 import { integrityCheck, ledgerChecks } from "./ledger"
 import type { DoctorCheck, DoctorResult } from "./output"
-
-export type DatabaseFacts = DoctorResult["database"]
 
 const NO_ROWS: RestoreCounts = { entity: 0, account: 0, tx: 0, posting: 0, scenario: 0 }
 
@@ -15,17 +13,6 @@ export type DatabaseRead = {
 	rows: RestoreCounts
 	checks: DoctorCheck[]
 	trialBalance?: DoctorResult["trialBalance"] | undefined
-}
-
-function factsOf(database: string, schemaVersion: number | null): DatabaseFacts {
-	const exists = existsSync(database)
-	return {
-		path: database,
-		exists,
-		bytes: exists ? statSync(database).size : 0,
-		schemaVersion,
-		head: HEAD,
-	}
 }
 
 /** The database could not be read: one failure, and every check that needed it skipped. */
@@ -53,10 +40,18 @@ function readOpened(
 		return unreadable(factsOf(database, null), sentenceOf(version), "It could not be read.")
 	}
 	const facts = factsOf(database, version)
+	const copies = facts.preMigrationCopies.map(
+		(copy) => `${copy.path} (version ${copy.schemaVersion})`,
+	)
+	const kept = copies.length === 0 ? "" : ` Copies from before an upgrade: ${copies.join(", ")}.`
+	const unfinished =
+		facts.unfinishedCopies.length === 0
+			? ""
+			: ` Unfinished copies a crash left, safe to delete when no traj is running: ${facts.unfinishedCopies.join(", ")}.`
 	const opened = step(
 		"database",
 		"pass",
-		`${database} opens at schema version ${version} of ${HEAD}.`,
+		`${database} opens at schema version ${version} of ${HEAD}.${kept}${unfinished}`,
 	)
 	const integrity = integrityCheck(store)
 	const rows = store.counts()

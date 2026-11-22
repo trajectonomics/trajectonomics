@@ -14,6 +14,11 @@ export const doctor = z.strictObject({
 		bytes: integer,
 		schemaVersion: integer.nullable(),
 		head: integer,
+		// Optional: the committed Demo snapshot was written by a traj that did not report the copies.
+		preMigrationCopies: z
+			.array(z.strictObject({ path: z.string(), schemaVersion: integer, bytes: integer }))
+			.optional(),
+		unfinishedCopies: z.array(z.string()).optional(),
 	}),
 	rows: z.strictObject({
 		entity: integer,

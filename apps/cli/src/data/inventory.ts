@@ -4,7 +4,7 @@ import { counted } from "../counts"
 import { countsOf, viewDump } from "../dump/view"
 import { type AppError, isAppError } from "../errors"
 import { jsonlText } from "../interchange/write"
-import type { RestoreCounts, Store } from "../store"
+import { preMigrationCopies, type RestoreCounts, type Store } from "../store"
 
 /** Everything a guarded removal reports and checks, before it deletes anything. */
 export type Inventory = {
@@ -17,6 +17,8 @@ export type Inventory = {
 	current: string
 	/** The files the removal deletes, sidecars first and the database last. */
 	files: string[]
+	/** The pre-migration copies beside the database, which a removal leaves (cli ADR-0050). */
+	copies: string[]
 }
 
 /**
@@ -41,6 +43,7 @@ export function inventoryOf(store: Store): Inventory | AppError {
 		rows: countsOf(rows),
 		current: jsonlText(schemaVersion, viewDump(rows)),
 		files: filesOf(database),
+		copies: preMigrationCopies(database).map((copy) => copy.path),
 	}
 }
 

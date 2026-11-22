@@ -1,6 +1,8 @@
-import type { AccountType, ChartOfAccounts } from "@trajectonomics/core/ledger"
+import type { ChartOfAccounts } from "@trajectonomics/core/ledger"
 import type { AppError } from "../errors"
+import type { AccountClosed, AccountCreated, AccountDeleted, NewAccount } from "./account-types"
 import type { Ledger } from "./ledger"
+import type { PreMigrationCopy } from "./pre-migration-files"
 import type { RestoreCounts, RestoreRows } from "./restore-types"
 import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
 import type {
@@ -15,6 +17,7 @@ import type {
 import type { TxFilter } from "./tx-filter"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
 
+export type * from "./account-types"
 export type { Ledger } from "./ledger"
 export type * from "./restore-types"
 export type {
@@ -58,17 +61,6 @@ export type ListOptions<S> = {
 /** Runs the write for real, then rolls it back before commit (ADR-0019). */
 export type WriteOptions = { dryRun?: boolean }
 
-export type NewAccount = { name: string; type: AccountType; currency: string; parentId?: string }
-export type AccountCreated =
-	| { status: "created"; account: AccountRow }
-	| { status: "name_taken"; account: AccountRow }
-export type AccountClosed =
-	| { status: "archived" | "already_archived"; account: AccountRow }
-	| { status: "not_found" }
-export type AccountDeleted =
-	| { status: "deleted" | "has_postings" | "has_children"; account: AccountRow }
-	| { status: "not_found" }
-
 /**
  * The only code that reads or writes `traj.db`. Every method returns its value or an `AppError`
  * built by `fail()`; none throws for an expected failure.
@@ -76,6 +68,11 @@ export type AccountDeleted =
 export interface Store {
 	/** The database file this store owns. */
 	readonly path: string
+	/**
+	 * The copy written because opening this store migrated the database, so a caller can say where
+	 * to go back to. Absent for a database already at head and for a new one (cli ADR-0050).
+	 */
+	readonly upgradedFrom: PreMigrationCopy | undefined
 	/** The personal entity every account, transaction and scenario belongs to. */
 	readonly entityId: string
 	/** `PRAGMA user_version`: the schema version the export header carries. */

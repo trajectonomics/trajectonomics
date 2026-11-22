@@ -302,6 +302,10 @@ _Avoid_: Snapshot, Copy (a Backup is the directory that holds a Dump; the Dump i
 Writing a Backup's rows into an empty database, verbatim. It never merges and never overwrites.
 _Avoid_: Import (an Import writes new Ledger facts through the write path), load, sync
 
+**Pre-migration copy**:
+The file `traj.db.pre-v<N>.bak` beside the database, a plain SQLite copy written before an upgrade migrated a database that held schema version `N`. There is one per version, and the newest replaces the older. An older `traj` can open it; nothing in the current `traj` reads it, and it is not a Backup (cli ADR-0050).
+_Avoid_: Backup (a Backup is the JSONL Dump a restore reads), snapshot, rollback file
+
 **Stored data**:
 The database file in the Data directory, and nothing else there. `traj data remove` deletes it; the launcher's `bin/` cache and anything else in the directory stay.
 _Avoid_: Home, state, everything under `~/.traj`

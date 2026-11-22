@@ -16,6 +16,7 @@ export { LEDGER_READ_CODES } from "./ledger"
 export { fromLedgerError, ledgerFailure } from "./ledger-errors"
 export { HEAD } from "./migrations"
 export { formatMinorUnits, parseMinorUnits, supportedCurrency } from "./money"
+export { type PreMigrationCopy, preMigrationCopies, unfinishedCopies } from "./pre-migration-files"
 export { isTxCorrection, TX_CORRECTIONS } from "./rows"
 export { canonicalScenarioDocument } from "./scenario-rows"
 export { importRejections } from "./tx-import"
@@ -67,16 +68,13 @@ export function openStore(options: StoreOptions): Store | AppError {
 	if (isAppError(kind)) return kind
 	if (kind !== undefined && !kind.isDirectory()) return notADirectory(paths.directory)
 	if (!existsSync(paths.database)) return ledgerMissing(paths.database)
-	const db = connect(paths.database, options.busyTimeoutMs ?? 5000)
-	if (isAppError(db)) return db
+	const connected = connect(paths.database, options.busyTimeoutMs ?? 5000)
+	if (isAppError(connected)) return connected
+	const { db, copy } = connected
 	const restricted = privateLedger(paths)
 	if (isAppError(restricted)) {
 		db.close()
 		return restricted
 	}
-	return storeOver(paths.database, {
-		db,
-		clock: options.clock,
-		entityId: PERSONAL_ENTITY_ID,
-	})
+	return storeOver(paths.database, { db, clock: options.clock, entityId: PERSONAL_ENTITY_ID }, copy)
 }

@@ -8,6 +8,7 @@ import { read } from "./guard"
 import { integrityOf } from "./integrity"
 import { readLedger } from "./ledger"
 import { userVersion } from "./migrations"
+import type { PreMigrationCopy } from "./pre-migration-files"
 import { restore } from "./restore"
 import { deleteScenario } from "./scenario-delete"
 import { forkScenario } from "./scenario-fork"
@@ -21,9 +22,10 @@ import { voidTransaction } from "./tx-void"
 import type { Store } from "./types"
 
 /** Binds every operation to one connection, clock and entity. */
-export function storeOver(path: string, ctx: Ctx): Store {
+export function storeOver(path: string, ctx: Ctx, upgradedFrom?: PreMigrationCopy): Store {
 	return {
 		path,
+		upgradedFrom,
 		entityId: ctx.entityId,
 		schemaVersion: () => read(ctx.db, () => userVersion(ctx.db)),
 		chart: () => read(ctx.db, () => chartOf(ctx)),
