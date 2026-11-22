@@ -59,7 +59,7 @@ function recheckBody(row: ManifestRow, latest: string): string {
 	return [
 		`npm's \`latest\` for \`@trajectonomics/cli\` is ${latest}. The Skill \`${row.name}\` declares the CLI Range \`${row.cliRange}\` in \`skills/customer/skills.manifest.json\`.`,
 		"",
-		"The upper bound is a recheck marker, not a compatibility claim ([ADR 0004](skills/customer/docs/adr/0004-the-cli-range-ceiling-is-a-recheck-marker.md)).",
+		"The upper bound is a recheck marker, not a compatibility claim ([ADR 0004](https://github.com/trajectonomics/trajectonomics/blob/main/skills/customer/docs/adr/0004-the-cli-range-ceiling-is-a-recheck-marker.md)).",
 		"Check the Skill against `traj schema` for this release. Then either update the Skill and raise the range in the manifest, or record that it still holds.",
 		"",
 		"Opened by the CLI Range ceiling check. It opens no second issue while one with this title is open.",
