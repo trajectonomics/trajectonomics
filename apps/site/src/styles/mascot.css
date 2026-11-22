@@ -1,0 +1,122 @@
+/*
+ * The mascot (Mascot.astro): paint and placement. The stage pair is cream and near-black in both Themes, so the
+ * robot keeps the blog covers' look on either surface; a hairline of the stage role draws its edge on a light one.
+ */
+
+.mascot {
+	display: block;
+	overflow: visible;
+	pointer-events: none;
+	user-select: none;
+}
+
+.mascot-shell {
+	fill: var(--ds-color-stage-foreground);
+	stroke: var(--ds-color-stage);
+	stroke-opacity: 0.22;
+	stroke-width: 1.5;
+}
+
+.mascot-visor {
+	fill: var(--ds-color-stage);
+}
+
+.mascot-accent {
+	fill: var(--ds-color-accent);
+}
+
+.mascot-shadow {
+	fill: var(--ds-color-stage);
+	opacity: 0.16;
+}
+
+.mascot-shine {
+	fill: none;
+	stroke: var(--ds-color-stage-foreground);
+	stroke-linecap: round;
+	stroke-opacity: 0.35;
+	stroke-width: 2.5;
+}
+
+.mascot-mark {
+	fill: none;
+	stroke: var(--ds-color-accent);
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 4.5;
+}
+
+.mascot-head,
+.mascot-eyes,
+.mascot-arm,
+.mascot-wonder {
+	transform-box: view-box;
+}
+
+/* Lost: the head tilts towards the question and the eyes look up at it. */
+[data-mascot="lost"] .mascot-head {
+	transform: rotate(-9deg);
+	transform-origin: 60px 90px;
+}
+
+[data-mascot="lost"] .mascot-eyes {
+	transform: translate(3px, -3px);
+}
+
+/*
+ * The hero: the robot peeks over the demo window's top edge, its hands over the title bar. The frame clips it, so
+ * it climbs up from behind the edge (motion-mascot.css) and never covers a word of the chat.
+ */
+.mascot-peek {
+	position: absolute;
+	z-index: 1;
+	right: calc(1.25rem + 4px);
+	bottom: calc(100% - 8px);
+	width: 52px;
+	height: 44px;
+	overflow: clip;
+}
+
+@media (min-width: 40rem) {
+	.mascot-peek {
+		right: calc(1.5rem + 10%);
+		bottom: calc(100% - 9px);
+		width: 92px;
+		height: 77px;
+	}
+}
+
+/*
+ * Features: the robot stands on the cards' top edge, at the head's far end. The negative margin is the grid's own
+ * top margin (features.css) plus the 8/150 of the drawing under its soles, so they meet the hairline.
+ */
+.mascot-features {
+	position: relative;
+	z-index: 1;
+	width: 76px;
+	flex: none;
+	align-self: flex-end;
+	margin-bottom: -45px;
+}
+
+@media (min-width: 40rem) {
+	.mascot-features {
+		width: 104px;
+		margin-right: 2rem;
+		margin-bottom: -63px;
+	}
+}
+
+/* The closing section and the Not-found page: the robot stands above the eyebrow or the heading. */
+.mascot-closing,
+.mascot-lost {
+	width: 96px;
+	margin-bottom: 8px;
+}
+
+@media (min-width: 40rem) {
+	.mascot-closing,
+	.mascot-lost {
+		width: 120px;
+	}
+}

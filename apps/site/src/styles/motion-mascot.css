@@ -1,0 +1,90 @@
+/*
+ * The mascot's motion (ADR 0025). Small and idle: it blinks, the hero's robot climbs up once after the hero rises,
+ * the closing robot waves now and then, and the lost one wonders. Only transforms animate, nothing it draws is
+ * content, and every keyframe lives under `no-preference`, so a visitor who asks for less motion gets a still robot.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+	.mascot-eyes {
+		transform-origin: 60px 58px;
+		animation: mascot-blink 5.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+	}
+
+	[data-mascot="chart"] .mascot-eyes {
+		animation-delay: 1.7s;
+	}
+
+	[data-mascot="peek"] {
+		animation: mascot-climb 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 900ms both;
+	}
+
+	.mascot-arm {
+		transform-origin: 88px 97px;
+		animation: mascot-wave 6s cubic-bezier(0.4, 0, 0.2, 1) 600ms infinite;
+	}
+
+	.mascot-wonder {
+		transform-origin: 125px 40px;
+		animation: mascot-wonder 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+	}
+
+	[data-mascot="lost"] .mascot-eyes {
+		animation-name: mascot-blink-lost;
+	}
+}
+
+@keyframes mascot-blink {
+	0%,
+	92%,
+	100% {
+		transform: scaleY(1);
+	}
+	95% {
+		transform: scaleY(0.1);
+	}
+}
+
+@keyframes mascot-blink-lost {
+	0%,
+	92%,
+	100% {
+		transform: translate(3px, -3px) scaleY(1);
+	}
+	95% {
+		transform: translate(3px, -3px) scaleY(0.1);
+	}
+}
+
+@keyframes mascot-climb {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: none;
+	}
+}
+
+@keyframes mascot-wave {
+	0%,
+	30%,
+	100% {
+		transform: none;
+	}
+	6%,
+	18% {
+		transform: rotate(18deg);
+	}
+	12%,
+	24% {
+		transform: rotate(-10deg);
+	}
+}
+
+@keyframes mascot-wonder {
+	from {
+		transform: translateY(0) rotate(-6deg);
+	}
+	to {
+		transform: translateY(-4px) rotate(6deg);
+	}
+}

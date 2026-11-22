@@ -4,6 +4,7 @@
 import type { Dictionary } from "../lib/language/dictionary"
 import { DOCS_CLI_INSTALL_PATH } from "../lib/site"
 import Arrow from "./icons/Arrow.astro"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -21,6 +22,7 @@ const { dictionary } = Astro.props
  */}
 <section class="section-surface bg-background" data-closing>
 	<div class="section-inner closing">
+		<Mascot pose="wave" class="mascot-closing" />
 		<p class="eyebrow">{dictionary.ctaEyebrow}</p>
 		<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
 			{dictionary.ctaHeading}

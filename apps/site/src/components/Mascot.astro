@@ -1,0 +1,96 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+/**
+ * The mascot: the blog covers' cream robot with the dark visor, the orange eyes and the orange-tipped antenna,
+ * drawn flat in the Site's own language. It is decoration, so it is `aria-hidden` and says nothing a reader needs.
+ * Every paint is a Semantic Token Role named in `mascot.css`; the stage pair keeps it cream on a dark visor in
+ * both Themes. The poses:
+ * - `peek`: the head and two hands only, for the top edge of the hero's demo window.
+ * - `chart`: standing, holding a card with rising bars, beside the Features heading.
+ * - `wave`: standing, one arm up, above the closing call to action.
+ * - `lost`: standing with its head tilted and a question mark, on the Not-found page.
+ */
+interface Props {
+	readonly pose: "peek" | "chart" | "wave" | "lost"
+	readonly class?: string
+}
+
+const { pose, class: className } = Astro.props
+const VIEW_BOX = {
+	peek: "0 0 120 100",
+	chart: "0 0 120 150",
+	wave: "0 0 132 150",
+	lost: "0 0 140 150",
+}
+---
+
+<svg
+	class:list={["mascot", className]}
+	data-mascot={pose}
+	aria-hidden="true"
+	focusable="false"
+	viewBox={VIEW_BOX[pose]}
+>
+	{
+		pose !== "peek" && (
+			<g class="mascot-body">
+				<ellipse class="mascot-shadow" cx="60" cy="145" rx="30" ry="4" />
+				<rect class="mascot-shell" x="44" y="122" width="13" height="20" rx="6.5" />
+				<rect class="mascot-shell" x="63" y="122" width="13" height="20" rx="6.5" />
+				<rect class="mascot-shell" x="37" y="90" width="46" height="40" rx="17" />
+				{pose !== "chart" && (
+					<rect class="mascot-shell" x="27" y="96" width="13" height="27" rx="6.5" transform="rotate(14 33 99)" />
+				)}
+				{pose === "lost" && (
+					<rect class="mascot-shell" x="80" y="96" width="13" height="27" rx="6.5" transform="rotate(-14 86 99)" />
+				)}
+				{pose === "wave" && (
+					<g class="mascot-arm">
+						<rect class="mascot-shell" x="82" y="70" width="13" height="30" rx="6.5" transform="rotate(28 88 97)" />
+					</g>
+				)}
+				{pose === "chart" && (
+					<g class="mascot-chart">
+						<rect class="mascot-shell" x="30" y="98" width="60" height="38" rx="5" />
+						<rect class="mascot-accent" x="40" y="122" width="7" height="8" rx="1.5" />
+						<rect class="mascot-accent" x="51" y="116" width="7" height="14" rx="1.5" />
+						<rect class="mascot-accent" x="62" y="110" width="7" height="20" rx="1.5" />
+						<rect class="mascot-accent" x="73" y="104" width="7" height="26" rx="1.5" />
+						<circle class="mascot-shell" cx="30" cy="117" r="6" />
+						<circle class="mascot-shell" cx="90" cy="117" r="6" />
+					</g>
+				)}
+				<ellipse class="mascot-shadow" cx="60" cy="92" rx="22" ry="3.5" />
+			</g>
+		)
+	}
+	<g class="mascot-head">
+		<rect class="mascot-shell" x="57.5" y="10" width="5" height="22" rx="2.5" />
+		<circle class="mascot-accent mascot-bulb" cx="60" cy="10" r="5.5" />
+		<rect class="mascot-shell" x="10" y="50" width="12" height="20" rx="6" />
+		<rect class="mascot-shell" x="98" y="50" width="12" height="20" rx="6" />
+		<rect class="mascot-shell" x="16" y="28" width="88" height="62" rx="28" />
+		<rect class="mascot-visor" x="27" y="42" width="66" height="32" rx="16" />
+		<path class="mascot-shine" d="M37 49 Q 44 46 52 46" />
+		<g class="mascot-eyes">
+			<circle class="mascot-accent" cx="47" cy="58" r="5.5" />
+			<circle class="mascot-accent" cx="73" cy="58" r="5.5" />
+		</g>
+	</g>
+	{
+		pose === "peek" && (
+			<g class="mascot-hands">
+				<rect class="mascot-shell" x="18" y="84" width="20" height="16" rx="8" />
+				<rect class="mascot-shell" x="82" y="84" width="20" height="16" rx="8" />
+			</g>
+		)
+	}
+	{
+		pose === "lost" && (
+			<g class="mascot-wonder">
+				<path class="mascot-mark" d="M116 16 q0 -9 9 -9 q9 0 9 9 q0 6 -6.5 9 q-2.5 1.2 -2.5 5 v2" />
+				<circle class="mascot-accent" cx="125" cy="40" r="2.6" />
+			</g>
+		)
+	}
+</svg>
