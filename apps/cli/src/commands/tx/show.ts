@@ -31,7 +31,7 @@ export const show: Leaf = defineCommand({
 	}),
 	examples: [
 		{
-			command: "traj tx show 01940000-0000-7000-8000-000000000000 --json",
+			command: "traj tx show 0194b000-0003-7000-8000-000000000003 --json",
 			description: "Show a transaction by id.",
 		},
 	],

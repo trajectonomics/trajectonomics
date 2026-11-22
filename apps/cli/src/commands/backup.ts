@@ -17,7 +17,7 @@ export const backup: Leaf = defineCommand({
 	examples: [
 		{ command: "traj backup --out backup", description: "Write traj.jsonl, the restorable copy." },
 		{
-			command: "traj backup --out backup --json",
+			command: "traj backup --out backup-json --json",
 			description: "Describe the file written and its rows.",
 		},
 	],

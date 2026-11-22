@@ -68,6 +68,7 @@ export const schema: Leaf = defineCommand({
 		return ok({
 			name: path.join(" "),
 			summary: node.summary,
+			...(node.description === undefined ? {} : { description: node.description }),
 			positionals: [...node.positionals],
 			input: z.toJSONSchema(node.input, { io: "input" }),
 			...document,

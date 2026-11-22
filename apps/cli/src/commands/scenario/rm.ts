@@ -21,8 +21,8 @@ export const rm: Leaf = defineCommand({
 		scenario: scenarioView.describe("The row as it was, without its deletion field."),
 	}),
 	examples: [
-		{ command: "traj scenario rm early", description: "Retire a Scenario by name." },
 		{ command: "traj scenario rm early --dry-run", description: "Show what rm would do." },
+		{ command: "traj scenario rm early", description: "Retire a Scenario by name." },
 	],
 	errorCodes: ["database_busy", "not_found"],
 	run: (input, ctx) =>

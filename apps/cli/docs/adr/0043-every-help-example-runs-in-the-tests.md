@@ -1,0 +1,3 @@
+# Every help example runs in the test suite, and is part of the contract
+
+Each `examples` entry of a command's help is run by `src/help-examples.test.ts`, in order within its command, against a fresh data directory, and passes when it exits with the code its description documents (0 unless stated). A setup an example needs is declared in `src/help-examples-setup.ts`, never skipped. An example that cannot run as printed is fixed in the command, not in the test: a pipe, a redirect, a name or an id another example already took. The examples are the agent-facing contract, so a wrong example is a bug the suite must catch.

@@ -69,7 +69,7 @@ export function fiFixture(answer: FiResult, patch: Partial<Fi> = {}): Fi {
 		notes: ["Tax is not applied: no Levy."],
 		currency: "THB",
 		method: "survival",
-		definition: { method: "survival", definitionVersion: 1 },
+		definition: { method: "survival", definitionVersion: 1, explanation: "" },
 		fi: answer,
 		taxYears: [],
 		...patch,

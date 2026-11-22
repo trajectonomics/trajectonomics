@@ -20,7 +20,7 @@ export function fi(result: Fi["fi"]): Fi {
 	return {
 		...shape(),
 		method: "survival",
-		definition: { method: "survival", definitionVersion: 1 },
+		definition: { method: "survival", definitionVersion: 1, explanation: "" },
 		fi: result,
 		taxYears: [],
 	}

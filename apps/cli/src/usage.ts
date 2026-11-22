@@ -57,6 +57,7 @@ function leafUsage(leaf: Leaf, path: readonly string[]): string {
 		...usage,
 		"",
 		leaf.summary,
+		...(leaf.description === undefined ? [] : ["", leaf.description]),
 		...(leaf.note === undefined ? [] : ["", leaf.note]),
 		...(own.length > 0 ? ["", "Options:", ...table(own)] : []),
 		"",

@@ -21,12 +21,12 @@ export const voidTx: Leaf = defineCommand({
 	output: voidedTransaction,
 	examples: [
 		{
-			command: "traj tx void 0194a000-0003-7000-8000-000000000003 --date 2026-03-02",
-			description: "Reverse a transaction by id.",
+			command: "traj tx void 0194b000-0002-7000-8000-000000000002 --date 2026-03-02 --dry-run",
+			description: "Show the reversal without writing it.",
 		},
 		{
-			command: "traj tx void 0194a000-0003-7000-8000-000000000003 --date 2026-03-02 --dry-run",
-			description: "Show the reversal without writing it.",
+			command: "traj tx void 0194b000-0002-7000-8000-000000000002 --date 2026-03-02",
+			description: "Reverse a transaction by id.",
 		},
 	],
 	errorCodes: [
