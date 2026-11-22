@@ -7,9 +7,9 @@ interface Props {
 	readonly dictionary: Dictionary
 }
 
-// The banner is plain links, so both choices work with JavaScript off: the Worker's redirect returns
-// the visitor to the page without the banner. The script below only spares a reload: it stores the
-// choice through the same link, then hides the banner.
+// The banner is plain links and no script (ADR 0024): each link's redirect stores the choice and
+// returns the visitor to the page without the banner. A script would only spare that one reload, and
+// the home's program JavaScript budget is 10,000 bytes (ADR 0005), which it does not fit.
 const { dictionary } = Astro.props
 ---
 
@@ -20,19 +20,3 @@ const { dictionary } = Astro.props
 		<a class="consent-link" href="/?consent=denied" rel="nofollow" data-consent-choice="denied">{dictionary.consentDecline}</a>
 	</div>
 </aside>
-
-<script>
-	document.addEventListener("click", (event) => {
-		const link = (event.target as Element).closest<HTMLAnchorElement>("[data-consent-choice]")
-		if (link === null) return
-		event.preventDefault()
-		fetch(link.href, { redirect: "manual" }).then(
-			() => {
-				document.documentElement.dataset["consent"] = link.dataset["consentChoice"] ?? ""
-			},
-			() => {
-				location.href = link.href
-			},
-		)
-	})
-</script>
