@@ -1,16 +1,18 @@
 // Icons from Lucide (https://lucide.dev), licensed under the ISC licence, Copyright (c) Lucide Contributors.
 // `calendar` and `x` derive from Feather (https://feathericons.com), licensed under the MIT licence,
 // Copyright (c) 2013-2023 Cole Bemis. Each icon is its SVG elements, copied from the Lucide icon set.
-// `target` is copied from the Lucide icon set as well, so it adds no licence beyond ISC.
+// `target`, `landmark`, `trending-up` and `trending-down` are copied from the Lucide icon set as well, so they add no licence beyond ISC.
 // The Dashboard draws them as SVG elements, never as HTML.
 
 import type { IconName } from "../../lib/view/routes"
+import { PLAN_ICON_NODES, type PlanIconName } from "./nav-icons-plan"
 
 /** One element of an icon: its SVG tag and the attributes it is drawn with. */
 export type IconElement = readonly [tag: string, attrs: Readonly<Record<string, string>>]
 
 /** The elements of each icon the navigation draws, by name. */
-export const ICON_NODES: Readonly<Record<IconName, readonly IconElement[]>> = {
+/** The icons the navigation draws, except the planner pages' three (in `nav-icons-plan.ts`). */
+const BASE_ICON_NODES: Omit<Readonly<Record<IconName, readonly IconElement[]>>, PlanIconName> = {
 	activity: [
 		[
 			"path",
@@ -97,4 +99,10 @@ export const ICON_NODES: Readonly<Record<IconName, readonly IconElement[]>> = {
 		["path", { d: "M18 6 6 18" }],
 		["path", { d: "m6 6 12 12" }],
 	],
+}
+
+/** The elements of each icon the navigation draws, by name: the base set and the planner pages' icons. */
+export const ICON_NODES: Readonly<Record<IconName, readonly IconElement[]>> = {
+	...BASE_ICON_NODES,
+	...PLAN_ICON_NODES,
 }

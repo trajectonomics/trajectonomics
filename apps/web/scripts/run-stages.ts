@@ -13,6 +13,7 @@ import {
 	type Read,
 	type SnapshotReads,
 	scenarioList,
+	scenarioShow,
 	txList,
 } from "../src/lib/contract"
 import {
@@ -82,6 +83,9 @@ export async function runStageTwo(
 		baseline: await runPlanned(context, plan.baseline, baseline, records),
 		netWorthHistory: await sequential(plan.netWorthHistory, (planned) =>
 			runPlanned(context, planned, netWorth, records),
+		),
+		documents: await recordOf(plan.documents, (planned) =>
+			runPlanned(context, planned, scenarioShow, records),
 		),
 		projections: await recordOf(plan.projections, (planned) =>
 			runPlanned(context, planned, projectionRun, records),

@@ -61,11 +61,11 @@ describe("writeCommand", () => {
 		})
 	})
 
-	test("apply-plan is scenario apply --file -, and the document goes on stdin", () => {
+	test("apply-plan is scenario apply --file - --decimal, and the document goes on stdin", () => {
 		const document = { schemaVersion: 4, currency: "THB" }
 		const edit: Edit = { kind: "apply-plan", name: "early", document }
 		expect(writeCommand(edit, false)).toEqual({
-			argv: ["scenario", "apply", "early", "--file", "-", "--json"],
+			argv: ["scenario", "apply", "early", "--file", "-", "--decimal", "--json"],
 			stdin: JSON.stringify(document),
 		})
 		expect(writeCommand(edit, true).argv).toEqual([
@@ -74,6 +74,7 @@ describe("writeCommand", () => {
 			"early",
 			"--file",
 			"-",
+			"--decimal",
 			"--dry-run",
 			"--json",
 		])

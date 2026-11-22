@@ -1,0 +1,50 @@
+<script lang="ts">
+import { editSession } from "../../client/edit.svelte.js"
+import type { ScenarioDocument, ScenarioFlow } from "../../lib/contract"
+import { flowIds, withFlow, withoutFlow } from "../../lib/view/plan-items/document"
+import { flowFromDraft } from "../../lib/view/plan-items/flow-draft"
+import { type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
+import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import FlowFields from "./FlowFields.svelte"
+import ItemActions from "./ItemActions.svelte"
+
+interface Props {
+	kind: FlowKind
+	/** The plan's name, which the Edit saves the document under. */
+	name: string
+	doc: ScenarioDocument
+	/** The Flow to edit; absent for a new one. */
+	existing?: ScenarioFlow | undefined
+	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
+	onDone: () => void
+}
+
+let { kind, name, doc, existing, onDone }: Props = $props()
+const initial = () => flowDraftOf(existing)
+let draft = $state(initial())
+let problems: Problems = $state({})
+const FIELDS = ["name", "amount", "frequency", "start", "end", "growth", "rate", "earned"]
+const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
+
+/** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
+async function commit(next: ScenarioDocument): Promise<void> {
+	if (await editSession.run({ kind: "apply-plan", name, document: next })) onDone()
+}
+
+async function save(event: SubmitEvent): Promise<void> {
+	event.preventDefault()
+	const result = flowFromDraft(draft, { kind, existing, taken: flowIds(doc) })
+	if (!result.ok) {
+		editSession.clear()
+		problems = result.problems
+		return
+	}
+	problems = {}
+	await commit(withFlow(doc, result.flow))
+}
+</script>
+
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
+	<FlowFields bind:draft {kind} {existing} {shown} />
+	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} />
+</form>

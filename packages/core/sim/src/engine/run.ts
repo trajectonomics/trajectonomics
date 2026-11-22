@@ -1,4 +1,5 @@
 import { resolvedCalendar } from "../calendar/resolve"
+import { MilestoneGate } from "../milestone/gate"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import { collectDates } from "./dates"
 import { buildEvents, flowsAt } from "./events"
@@ -22,6 +23,19 @@ function attachLevies(
 	return { ok: true, run: { ...result.run, levies: finished.levies } }
 }
 
+/** Attaches the Levy and Milestone reports of a finished run, reading both as of `runEnd`. */
+function finish(
+	result: EngineResult,
+	states: StateMap,
+	levies: LevySet | undefined,
+	gate: MilestoneGate | undefined,
+	runEnd: DateString,
+): EngineResult {
+	const withLevies = attachLevies(result, states, levies, runEnd)
+	if (!withLevies.ok || gate === undefined) return withLevies
+	return { ok: true, run: { ...withLevies.run, milestones: gate.results(runEnd) } }
+}
+
 function endDate(result: EngineResult, timeline: Timeline): DateString {
 	if (!result.ok) return timeline.horizon
 	return result.run.runsOut?.date ?? timeline.horizon
@@ -38,11 +52,13 @@ export function runEngine(
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levies = planLevies(scenario, timeline, calendar)
+	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
 	const acc: RunAccumulator = {
 		snapshots: [],
 		totals: [],
 		wanted: new Set<DateString>(observations),
 		levies,
+		gate,
 	}
 	let index = 0
 	const settlements = levies === undefined ? [] : allSettlementDates(levies, timeline.horizon)
@@ -51,8 +67,8 @@ export function runEngine(
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
 		const result = stepDate(acc, states, scenario, date, dayEvents)
-		if (result !== undefined) return attachLevies(result, states, levies, endDate(result, timeline))
+		if (result !== undefined) return finish(result, states, levies, gate, endDate(result, timeline))
 	}
 	const run = { snapshots: acc.snapshots, totals: acc.totals }
-	return attachLevies({ ok: true, run }, states, levies, timeline.horizon)
+	return finish({ ok: true, run }, states, levies, gate, timeline.horizon)
 }

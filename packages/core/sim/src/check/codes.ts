@@ -60,6 +60,15 @@ const CODES = [
 	"INVALID_DAY_RULE",
 	"DUPLICATE_HOLIDAY",
 	"HOLIDAYS_UNUSABLE",
+	"UNKNOWN_MILESTONE",
+	"MILESTONE_CYCLE",
+	"MILESTONE_LOOKAHEAD",
+	"INVALID_METRIC",
+	"MIXED_METRIC_ACCOUNTS",
+	"INVALID_COMPARISON",
+	"INVALID_TERMS",
+	"INVALID_MULTIPLE",
+	"INVALID_COMBINE",
 ] as const
 
 /** The closed set of problem codes. Frozen so consumers cannot mutate it at runtime. */

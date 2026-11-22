@@ -17,9 +17,19 @@ interface Props {
 	onPlan: (name: string) => void
 	/** Whether the server answers Edits, so the plan switcher offers to copy and delete a plan. */
 	editable?: boolean
+	/** Whether the Snapshot holds the selected plan's document, which the planner pages need. */
+	planDocument?: boolean
 }
 
-let { brand, current, names, selected, onPlan, editable = false }: Props = $props()
+let {
+	brand,
+	current,
+	names,
+	selected,
+	onPlan,
+	editable = false,
+	planDocument = true,
+}: Props = $props()
 let closeButton: HTMLButtonElement | undefined = $state()
 
 function close(): void {
@@ -53,7 +63,7 @@ $effect(() => {
 			<span class="sr-only">Close the menu</span>
 		</button>
 	</div>
-	<SiteNavLinks {current} onNavigate={close} />
+	<SiteNavLinks {current} onNavigate={close} {planDocument} />
 	<div class="mt-auto">
 		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} />
 	</div>

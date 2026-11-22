@@ -18,6 +18,8 @@ import type {
 export interface FlowOptions {
 	readonly start?: DateString
 	readonly end?: DateString
+	readonly startAt?: string
+	readonly endAt?: string
 	readonly frequency?: Frequency
 	readonly growth?: Growth
 	readonly label?: string
@@ -50,6 +52,8 @@ function layout(id: string, options: FlowOptions): Omit<FlowBase, "amount" | "gr
 		frequency: options.frequency ?? "once",
 		start: options.start ?? "2026-01-01",
 		...(options.end === undefined ? {} : { end: options.end }),
+		...(options.startAt === undefined ? {} : { startAt: options.startAt }),
+		...(options.endAt === undefined ? {} : { endAt: options.endAt }),
 	}
 }
 

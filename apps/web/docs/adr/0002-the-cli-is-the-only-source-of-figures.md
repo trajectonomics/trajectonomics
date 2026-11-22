@@ -8,7 +8,15 @@ Every number on the Dashboard is one `traj` returned. The Dashboard never import
 
 A string is parsed to a number in one place only: to place a mark on a chart, where a rounding error cannot reach a figure a person reads. Deltas between two Scenarios come from `traj projection compare`, not from a subtraction in the page.
 
-Money types stay strings in the contract. A Scenario document holds integer minor units and integer rates, but the Dashboard does not read or write Scenario documents; it reads the CLI's results only.
+Money types stay strings in the contract. A Scenario document holds integer minor units and integer rates. The Dashboard reads and writes a Scenario document only in its decimal form (`traj scenario show --decimal`, `traj scenario apply --decimal`), where every money field is a string the CLI converted, and it never computes with one of them.
+
+## Amendment (2026-11-23): the planner pages edit Scenario documents
+
+The planner pages (Income, Expenses, and Assets and debts) list a plan's Flows and Accounts and save one change as one Edit. The page does three things with the decimal document, and no arithmetic:
+
+- **Money is text.** A typed amount has its commas and spaces removed, is checked for shape only, and is sent as the decimal string the person typed. `traj` accepts or refuses it, and a refusal is shown at the field its path names.
+- **A change is object editing.** An item is replaced, added or removed by its `id`, and every field the form does not show is kept as it came, so a save that changed nothing leaves the plan `unchanged`.
+- **A rate is a percent by moving the decimal point.** A rate stays an integer of basis points in the document. `formatBps` and `parseBps` in `src/lib/format/bps.ts` move the point in the text, refuse more than two places, and never make a float. A rate is not money, so this is not a figure the page computes.
 
 ## Considered Options
 

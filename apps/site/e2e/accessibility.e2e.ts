@@ -17,6 +17,11 @@ function axeOptions() {
 
 /** Fail on every axe violation the page has, and on every rule axe could not judge. */
 async function expectAxeReportsNothing(page: Page, path: string): Promise<void> {
+	// The cookie card is fixed to the screen's corner, so each line of its question lies over different page content,
+	// and axe cannot judge fixed text whose lines sit over different stacks. Its background is opaque, so its contrast
+	// does not depend on what is under it: the card is laid into the page's flow, where axe judges the same pixels
+	// ([ADR 0028](../docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md)).
+	await page.addStyleTag({ content: ".consent { position: static; }" })
 	// One options call: a later options() replaces the whole object, tags included.
 	const results = await new AxeBuilder({ page }).options(axeOptions()).analyze()
 	const violations = results.violations.map(

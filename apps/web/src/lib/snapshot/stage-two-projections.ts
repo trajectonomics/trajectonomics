@@ -42,6 +42,20 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 	])
 }
 
+/**
+ * One `scenario show --decimal` per Scenario: the document the planner pages edit, in the form where
+ * money is a decimal string. The name follows the flags, after `--`, so a name that starts with a dash
+ * is still read as a name.
+ */
+export function planDocuments(names: string[]): Record<string, PlannedRead> {
+	return Object.fromEntries(
+		names.map((name): [string, PlannedRead] => [
+			name,
+			{ argv: ["scenario", "show", "--decimal", "--json", "--", name], carryInFor: [] },
+		]),
+	)
+}
+
 /** One `fi` per Scenario. */
 export function planFi(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	return perScenario(params, names, (name) => [
