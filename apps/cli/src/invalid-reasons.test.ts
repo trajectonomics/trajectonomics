@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import { defineCommand, defineGroup, ok } from "./command"
+import { root } from "./commands"
 import { SENTENCES } from "./sentences"
 import { capture, errorOf } from "./test-support"
 import { ledgerHome } from "./tx-test-support"
@@ -33,6 +34,11 @@ const probe = defineGroup({
 })
 
 const probeRoot = defineGroup({ name: "traj", summary: "fixture", children: [probe] })
+const probeHelpRoot = defineGroup({
+	name: "traj",
+	summary: "fixture",
+	children: [...root.children, probe],
+})
 const runProbe = (argv: string[]) => capture(["probe", ...argv, "--json"], {}, probeRoot)
 
 describe("one case per validation reason", () => {
@@ -82,6 +88,13 @@ describe("one case per validation reason", () => {
 			path: "--kind",
 			message: "The value is not one of the allowed choices: a, b.",
 		})
+	})
+
+	it("prints the same allowed values on the help page, in the same order as the refusal", async () => {
+		const help = (await capture(["help", "probe", "choice"], {}, probeHelpRoot)).out
+		expect(help).toMatch(/^ +--kind <string> +one of a, b; required$/m)
+		const error = errorOf(await runProbe(["choice", "--kind", "c"]))
+		expect(error.message).toBe("The value is not one of the allowed choices: a, b.")
 	})
 
 	it("gives a missing required enum the required-flag sentence, not a choice", async () => {

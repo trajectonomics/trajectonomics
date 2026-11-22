@@ -48,11 +48,28 @@ const doc = defineCommand({
 	run: (input) => ok({ name: input.name }),
 })
 
+const pick = defineCommand({
+	name: "pick",
+	summary: "Pick closed kinds",
+	positionals: [],
+	input: z.strictObject({
+		kind: z.enum(["zeta", "alpha", "mid"]).optional().describe("A closed kind."),
+		kinds: z
+			.array(z.enum(["zeta", "alpha"]))
+			.optional()
+			.describe("Closed kinds."),
+	}),
+	output: z.unknown(),
+	examples: [],
+	errorCodes: [],
+	run: (input) => ok(input),
+})
+
 const demo = defineGroup({
 	name: "demo",
 	summary: "A fixture group",
 	note: "Fixture feature ships in 9.9.9.",
-	children: [doc, echo],
+	children: [doc, echo, pick],
 })
 
 const boom = defineCommand({

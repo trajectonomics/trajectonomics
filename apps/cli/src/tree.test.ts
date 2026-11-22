@@ -168,6 +168,7 @@ describe("schema addresses commands by path", () => {
 		expect(data.commands).toEqual([
 			{ name: "demo doc", summary: "Read a document under a name" },
 			{ name: "demo echo", summary: "Echo a word back" },
+			{ name: "demo pick", summary: "Pick closed kinds" },
 		])
 		expect(data.errors).toBeUndefined()
 	})

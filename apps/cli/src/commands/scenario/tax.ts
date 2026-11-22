@@ -20,7 +20,7 @@ export const tax: Leaf = defineCommand({
 		tax: z
 			.enum(["th-2026"])
 			.optional()
-			.describe("Write the tax Levy for this jurisdiction: `th-2026`, Thailand's 2026 income tax."),
+			.describe("Write the tax Levy for this jurisdiction: Thailand's 2026 income tax."),
 		filingStatus: z
 			.enum(FILING_STATUSES)
 			.optional()

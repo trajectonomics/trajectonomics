@@ -12,13 +12,14 @@ export function flagLabel(spec: FlagSpec): string {
 }
 
 /**
- * The note beside a flag: its description, then `repeatable` for a flag that takes it more than
- * once, unless the description already says so (`--set`, `--age`), so the word appears once.
+ * The note beside a flag: its description, then the closed set it accepts (`one of a, b, c`), then
+ * `repeatable` for a flag that takes it more than once, then `required`. The derived words are
+ * appended here only, so a description never repeats them.
  */
 export function flagNote(spec: FlagSpec): string {
 	const description = spec.description?.replace(/\.$/, "")
-	const says = description !== undefined && /\brepeatable\b/.test(description)
-	const notes = [description, spec.multiple && !says ? "repeatable" : undefined]
+	const choices = spec.choices === undefined ? undefined : `one of ${spec.choices.join(", ")}`
+	const notes = [description, choices, spec.multiple ? "repeatable" : undefined]
 	if (spec.required) notes.push("required")
 	return notes.filter(Boolean).join("; ")
 }

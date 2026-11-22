@@ -12,10 +12,7 @@ export const exportCommand: Leaf = defineCommand({
 	summary: "Write the stored rows into a new directory",
 	positionals: [],
 	input: z.strictObject({
-		format: z
-			.enum(EXPORT_FORMATS)
-			.default("jsonl")
-			.describe("The file format to write: jsonl, csv or md."),
+		format: z.enum(EXPORT_FORMATS).default("jsonl").describe("The file format to write."),
 		out: z.string().min(1).describe("A directory to create; it must not already exist."),
 	}),
 	output: exportOutput,
