@@ -1,18 +1,10 @@
 import { Database } from "bun:sqlite"
 import { describe, expect, it } from "bun:test"
-import {
-	chmodSync,
-	existsSync,
-	mkdirSync,
-	mkdtempSync,
-	readdirSync,
-	readFileSync,
-	writeFileSync,
-} from "node:fs"
-import { tmpdir } from "node:os"
+import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { ACCOUNT_HINT } from "./hint"
 import { fileMode, mustOpen, tempHome } from "./store/testing"
+import { makeTempDir } from "./temp-dir"
 import { capture } from "./test-support"
 
 describe("init", () => {
@@ -103,7 +95,7 @@ describe("init", () => {
 		expect(JSON.parse(write.err).error.code).toBe("ledger_missing")
 		expect(existsSync(missing)).toBe(false)
 
-		const empty = mkdtempSync(join(tmpdir(), "traj-test-"))
+		const empty = makeTempDir("traj-test-")
 		const read = await capture(["scenario", "list", "--json"], { TRAJ_HOME: empty })
 		expect(JSON.parse(read.err).error.code).toBe("ledger_missing")
 		expect(readdirSync(empty)).toEqual([])
@@ -127,7 +119,7 @@ describe("init", () => {
 	})
 
 	it("names a TRAJ_HOME that is a file as not a directory", async () => {
-		const file = join(mkdtempSync(join(tmpdir(), "traj-test-")), "afile")
+		const file = join(makeTempDir("traj-test-"), "afile")
 		writeFileSync(file, "")
 		const res = await capture(["init", "--json"], { TRAJ_HOME: file })
 		expect(res.code).toBe(1)

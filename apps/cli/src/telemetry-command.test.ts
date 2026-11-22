@@ -1,13 +1,13 @@
 import { describe, expect, it } from "bun:test"
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { makeTempDir } from "./temp-dir"
 import { capture, errorOf } from "./test-support"
 
 const ID = "0194b000-0000-7000-8000-00000000000a"
 
 /** A fresh config home, so each case reads and writes only its own telemetry.json. */
-const configHome = (): string => mkdtempSync(join(tmpdir(), "traj-telemetry-cmd-"))
+const configHome = (): string => makeTempDir("traj-telemetry-cmd-")
 
 /** The env every case runs under: its own config home and no opt-out or CI variable. */
 const envWith = (xdg: string): Record<string, string | undefined> => ({

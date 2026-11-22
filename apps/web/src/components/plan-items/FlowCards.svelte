@@ -39,9 +39,9 @@ let { cards, currency, editable, onEdit }: Props = $props()
 				<dt class="text-muted-foreground">How often</dt>
 				<dd>{card.frequency}</dd>
 				<dt class="text-muted-foreground">Starts</dt>
-				<dd>{card.start}</dd>
+				<dd>{card.start}{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
 				<dt class="text-muted-foreground">Ends</dt>
-				<dd>{card.end}</dd>
+				<dd>{card.end}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
 				<dt class="text-muted-foreground">Growth</dt>
 				<dd>{card.growth}</dd>
 				{#if card.earned !== null}

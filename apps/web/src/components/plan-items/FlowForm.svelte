@@ -1,6 +1,7 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import type { ScenarioDocument, ScenarioFlow } from "../../lib/contract"
+import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
+import { flowAnchorLabels } from "../../lib/view/household/model"
 import { flowIds, withFlow, withoutFlow } from "../../lib/view/plan-items/document"
 import { flowFromDraft } from "../../lib/view/plan-items/flow-draft"
 import { type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
@@ -13,13 +14,16 @@ interface Props {
 	/** The plan's name, which the Edit saves the document under. */
 	name: string
 	doc: ScenarioDocument
+	/** The household of the plan: a date it pins is read-only here. Null without one. */
+	household: HouseholdDocument | null
 	/** The Flow to edit; absent for a new one. */
 	existing?: ScenarioFlow | undefined
 	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
 	onDone: () => void
 }
 
-let { kind, name, doc, existing, onDone }: Props = $props()
+let { kind, name, doc, household, existing, onDone }: Props = $props()
+const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
@@ -45,6 +49,6 @@ async function save(event: SubmitEvent): Promise<void> {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
-	<FlowFields bind:draft {kind} {existing} {shown} />
+	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} />
 </form>

@@ -117,7 +117,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+							"id": "01a204c7-4990-7374-9519-048fa18bd242",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -126,7 +126,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,7 +135,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -144,7 +144,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+							"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -153,7 +153,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+							"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -162,7 +162,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-bbbd-7629-bb8c-6848603a977e",
+							"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -171,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+							"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -180,7 +180,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+							"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -189,7 +189,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-bb1b-753c-bf69-318a597e5c8c",
+							"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -207,7 +207,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"debit": "662300.00",
@@ -216,7 +216,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -225,7 +225,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"debit": "736600.00",
@@ -234,7 +234,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+								"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 								"name": "Fund Return"
 							},
 							"debit": "0.00",
@@ -243,7 +243,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+								"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 								"name": "Living"
 							},
 							"debit": "762200.00",
@@ -252,7 +252,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-bbbd-7629-bb8c-6848603a977e",
+								"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -261,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+								"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -270,7 +270,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+								"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 								"name": "Salary"
 							},
 							"debit": "0.00",
@@ -279,7 +279,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-bb1b-753c-bf69-318a597e5c8c",
+								"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
 								"name": "Travel"
 							},
 							"debit": "78500.00",
@@ -307,7 +307,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+							"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -316,7 +316,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+							"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -325,7 +325,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+							"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -334,7 +334,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+							"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -343,7 +343,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-bb1b-753c-bf69-318a597e5c8c",
+							"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -365,7 +365,7 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a204b8-bec9-77a3-85f9-c8ce08e986cb",
+						"id": "01a204c7-5415-71b7-9831-6a1ded7b2574",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -374,7 +374,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -384,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -394,7 +394,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a6-a3a1-f085de5ba091",
+						"id": "01a204c7-5415-71ba-a569-acea80b97bf6",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -403,7 +403,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 									"name": "Living"
 								},
 								"amount": "30300.00",
@@ -413,7 +413,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-30300.00",
@@ -423,7 +423,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a4-82d2-ad17813805f6",
+						"id": "01a204c7-5415-71b8-a099-86766d406436",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -432,7 +432,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -442,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -452,7 +452,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b9-bf19-3475b235a3b6",
+						"id": "01a204c7-5415-71cd-8ec7-f246ee0fdcf2",
 						"date": "2026-08-15",
 						"memo": "new laptop",
 						"linkedTo": null,
@@ -461,7 +461,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 									"name": "Living"
 								},
 								"amount": "58000.00",
@@ -471,7 +471,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-58000.00",
@@ -481,7 +481,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a7-928a-9f99b1a2a611",
+						"id": "01a204c7-5415-71bb-a774-69af9a48d8c7",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -490,7 +490,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -500,7 +500,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -510,7 +510,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a5-866c-c4a7aa34276d",
+						"id": "01a204c7-5415-71b9-b6fc-53f9b6215250",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -519,7 +519,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -529,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -539,7 +539,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a8-adc6-b0a7b8bdf4f2",
+						"id": "01a204c7-5415-71bc-962f-521fbdc70f1e",
 						"date": "2026-08-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -548,7 +548,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "9500.00",
@@ -558,7 +558,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 									"name": "Fund Return"
 								},
 								"amount": "-9500.00",
@@ -568,7 +568,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77a9-88db-9030e23af616",
+						"id": "01a204c7-5415-71bd-8b72-e3f961b0fca8",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -577,7 +577,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -587,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -597,7 +597,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77ac-9180-325df3b875ee",
+						"id": "01a204c7-5415-71c0-8822-098ce41bbaf7",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -606,7 +606,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 									"name": "Living"
 								},
 								"amount": "26900.00",
@@ -616,7 +616,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-26900.00",
@@ -626,7 +626,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77aa-9d7d-133a258eacec",
+						"id": "01a204c7-5415-71be-b05b-5430edae9673",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -635,7 +635,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -645,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -655,7 +655,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77ad-8960-59688fb54d28",
+						"id": "01a204c7-5415-71c1-b0fe-970cc3618ac3",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -664,7 +664,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -674,7 +674,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -684,7 +684,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77ab-b0a7-81c00709b186",
+						"id": "01a204c7-5415-71bf-91f2-4a2e9d116093",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -693,7 +693,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -703,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -713,7 +713,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77ae-88fd-60d359c237a1",
+						"id": "01a204c7-5415-71c2-996f-dd2ee1e41b7d",
 						"date": "2026-09-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -722,7 +722,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 									"name": "Fund Return"
 								},
 								"amount": "12600.00",
@@ -732,7 +732,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "-12600.00",
@@ -742,7 +742,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77af-8156-e588d43e4f47",
+						"id": "01a204c7-5415-71c3-835b-45982a7416fb",
 						"date": "2026-10-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -751,7 +751,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -761,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -771,7 +771,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b2-ac9f-4a39de05567f",
+						"id": "01a204c7-5415-71c6-a682-8a43f1fe8b18",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -780,7 +780,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 									"name": "Living"
 								},
 								"amount": "28800.00",
@@ -790,7 +790,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-28800.00",
@@ -800,7 +800,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b0-89fa-88c76707ebcf",
+						"id": "01a204c7-5415-71c4-ad89-74f9776c66e7",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -809,7 +809,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -819,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -829,7 +829,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b3-9712-6ac73a465f56",
+						"id": "01a204c7-5415-71c7-9f5e-7df3645d1725",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -838,7 +838,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -848,7 +848,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -858,7 +858,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b1-8ecc-d175b08fc1e0",
+						"id": "01a204c7-5415-71c5-b617-559ffbc5baa8",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -867,7 +867,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -877,7 +877,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -887,7 +887,7 @@
 						]
 					},
 					{
-						"id": "01a204b8-bec9-77b4-bdda-54b07daed8b7",
+						"id": "01a204c7-5415-71c8-bc4b-65224c767a68",
 						"date": "2026-10-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -896,7 +896,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"name": "Fund"
 								},
 								"amount": "7300.00",
@@ -906,7 +906,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 									"name": "Fund Return"
 								},
 								"amount": "-7300.00",
@@ -927,7 +927,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+							"id": "01a204c7-4990-7374-9519-048fa18bd242",
 							"name": "Bank"
 						},
 						"kind": "asset",
@@ -935,7 +935,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 							"name": "Fund"
 						},
 						"kind": "asset",
@@ -943,7 +943,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -963,7 +963,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -972,7 +972,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -981,7 +981,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1007,7 +1007,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1016,7 +1016,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1025,7 +1025,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1051,7 +1051,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1060,7 +1060,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1069,7 +1069,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1095,7 +1095,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1104,7 +1104,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1113,7 +1113,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1139,7 +1139,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1148,7 +1148,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1157,7 +1157,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1183,7 +1183,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1192,7 +1192,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1201,7 +1201,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1227,7 +1227,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1236,7 +1236,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1245,7 +1245,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1271,7 +1271,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1280,7 +1280,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1289,7 +1289,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1315,7 +1315,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1324,7 +1324,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1333,7 +1333,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1359,7 +1359,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1368,7 +1368,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1377,7 +1377,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1403,7 +1403,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1412,7 +1412,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1421,7 +1421,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1447,7 +1447,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1456,7 +1456,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1465,7 +1465,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1491,7 +1491,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1500,7 +1500,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1509,7 +1509,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1535,7 +1535,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1544,7 +1544,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1553,7 +1553,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1579,7 +1579,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1588,7 +1588,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1597,7 +1597,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1623,7 +1623,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1632,7 +1632,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1641,7 +1641,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1667,7 +1667,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1676,7 +1676,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1685,7 +1685,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1711,7 +1711,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1720,7 +1720,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1729,7 +1729,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1755,7 +1755,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1764,7 +1764,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1773,7 +1773,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1799,7 +1799,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1808,7 +1808,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1817,7 +1817,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1843,7 +1843,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1852,7 +1852,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1861,7 +1861,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1887,7 +1887,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1896,7 +1896,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1905,7 +1905,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1931,7 +1931,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1940,7 +1940,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1949,7 +1949,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1975,7 +1975,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+								"id": "01a204c7-4990-7374-9519-048fa18bd242",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1984,7 +1984,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1993,7 +1993,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -2016,13 +2016,13 @@
 				"ok": true,
 				"data": {
 					"scenario": {
-						"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"name": "base",
-						"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
+						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
 						"forkedFrom": null,
-						"version": 2,
-						"createdAt": "2026-11-22T19:25:46.390Z",
-						"updatedAt": "2026-11-22T19:25:46.564Z",
+						"version": 3,
+						"createdAt": "2026-11-22T19:41:42.246Z",
+						"updatedAt": "2026-11-22T19:41:42.692Z",
 						"document": {
 							"currency": "THB",
 							"flows": [
@@ -2054,6 +2054,14 @@
 									"growth": "inflation"
 								},
 								{
+									"id": "school",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2033-09-30",
+									"amount": "8000.00",
+									"growth": "inflation"
+								},
+								{
 									"id": "car",
 									"kind": "contribution",
 									"frequency": "monthly",
@@ -2063,47 +2071,47 @@
 									"growth": {
 										"bps": 0
 									},
-									"target": "01a204b8-b7d8-721f-8659-97dbb3735fbf"
+									"target": "01a204c7-4b6a-7585-b3c7-cb49e48d069a"
 								},
 								{
 									"id": "fund",
 									"kind": "contribution",
 									"frequency": "monthly",
 									"start": "2026-11-01",
-									"end": "2050-05-14",
+									"end": "2050-06-30",
 									"amount": "15000.00",
 									"growth": "inflation",
-									"target": "01a204b8-b6f8-735b-ad15-64fe425e477e"
+									"target": "01a204c7-4a5e-7560-abea-1d2438924ced"
 								}
 							],
 							"accounts": [
 								{
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"kind": "asset",
 									"rate": 100
 								},
 								{
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"kind": "asset",
 									"rate": 500
 								},
 								{
-									"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 									"kind": "liability",
 									"rate": 500,
 									"compounding": "monthly"
 								}
 							],
 							"cashflow": {
-								"contribute": ["01a204b8-b6f8-735b-ad15-64fe425e477e"],
+								"contribute": ["01a204c7-4a5e-7560-abea-1d2438924ced"],
 								"surplus": [
 									{
-										"account": "01a204b8-b644-72a8-86a8-cf0ae83d8c79"
+										"account": "01a204c7-4990-7374-9519-048fa18bd242"
 									}
 								],
 								"withdraw": [
-									"01a204b8-b644-72a8-86a8-cf0ae83d8c79",
-									"01a204b8-b6f8-735b-ad15-64fe425e477e"
+									"01a204c7-4990-7374-9519-048fa18bd242",
+									"01a204c7-4a5e-7560-abea-1d2438924ced"
 								]
 							},
 							"economy": {
@@ -3648,7 +3656,42 @@
 							],
 							"schemaVersion": 4
 						},
-						"household": null
+						"household": {
+							"schemaVersion": 1,
+							"people": [
+								{
+									"id": "me",
+									"born": "1990-06",
+									"lifeExpectancy": 90,
+									"role": "holder"
+								},
+								{
+									"id": "partner",
+									"born": "1992-02",
+									"lifeExpectancy": 88,
+									"role": "partner"
+								},
+								{
+									"id": "mali",
+									"born": "2027-09",
+									"lifeExpectancy": 90,
+									"role": "dependent",
+									"relation": "child"
+								}
+							],
+							"anchors": [
+								{
+									"path": "flows.fund.end",
+									"person": "me",
+									"age": 60
+								},
+								{
+									"path": "flows.school.start",
+									"person": "mali",
+									"age": 6
+								}
+							]
+						}
 					}
 				}
 			},
@@ -3657,13 +3700,13 @@
 				"ok": true,
 				"data": {
 					"scenario": {
-						"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-						"forkedFrom": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+						"forkedFrom": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:46.726Z",
-						"updatedAt": "2026-11-22T19:25:46.726Z",
+						"createdAt": "2026-11-22T19:41:42.922Z",
+						"updatedAt": "2026-11-22T19:41:42.922Z",
 						"document": {
 							"currency": "THB",
 							"flows": [
@@ -3695,6 +3738,14 @@
 									"growth": "inflation"
 								},
 								{
+									"id": "school",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2033-09-30",
+									"amount": "8000.00",
+									"growth": "inflation"
+								},
+								{
 									"id": "car",
 									"kind": "contribution",
 									"frequency": "monthly",
@@ -3704,47 +3755,47 @@
 									"growth": {
 										"bps": 0
 									},
-									"target": "01a204b8-b7d8-721f-8659-97dbb3735fbf"
+									"target": "01a204c7-4b6a-7585-b3c7-cb49e48d069a"
 								},
 								{
 									"id": "fund",
 									"kind": "contribution",
 									"frequency": "monthly",
 									"start": "2026-11-01",
-									"end": "2050-05-14",
+									"end": "2050-06-30",
 									"amount": "15000.00",
 									"growth": "inflation",
-									"target": "01a204b8-b6f8-735b-ad15-64fe425e477e"
+									"target": "01a204c7-4a5e-7560-abea-1d2438924ced"
 								}
 							],
 							"accounts": [
 								{
-									"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+									"id": "01a204c7-4990-7374-9519-048fa18bd242",
 									"kind": "asset",
 									"rate": 100
 								},
 								{
-									"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 									"kind": "asset",
 									"rate": 500
 								},
 								{
-									"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 									"kind": "liability",
 									"rate": 500,
 									"compounding": "monthly"
 								}
 							],
 							"cashflow": {
-								"contribute": ["01a204b8-b6f8-735b-ad15-64fe425e477e"],
+								"contribute": ["01a204c7-4a5e-7560-abea-1d2438924ced"],
 								"surplus": [
 									{
-										"account": "01a204b8-b644-72a8-86a8-cf0ae83d8c79"
+										"account": "01a204c7-4990-7374-9519-048fa18bd242"
 									}
 								],
 								"withdraw": [
-									"01a204b8-b644-72a8-86a8-cf0ae83d8c79",
-									"01a204b8-b6f8-735b-ad15-64fe425e477e"
+									"01a204c7-4990-7374-9519-048fa18bd242",
+									"01a204c7-4a5e-7560-abea-1d2438924ced"
 								]
 							},
 							"economy": {
@@ -5289,7 +5340,42 @@
 							],
 							"schemaVersion": 4
 						},
-						"household": null
+						"household": {
+							"schemaVersion": 1,
+							"people": [
+								{
+									"id": "me",
+									"born": "1990-06",
+									"lifeExpectancy": 90,
+									"role": "holder"
+								},
+								{
+									"id": "partner",
+									"born": "1992-02",
+									"lifeExpectancy": 88,
+									"role": "partner"
+								},
+								{
+									"id": "mali",
+									"born": "2027-09",
+									"lifeExpectancy": 90,
+									"role": "dependent",
+									"relation": "child"
+								}
+							],
+							"anchors": [
+								{
+									"path": "flows.fund.end",
+									"person": "me",
+									"age": 60
+								},
+								{
+									"path": "flows.school.start",
+									"person": "mali",
+									"age": 6
+								}
+							]
+						}
 					}
 				}
 			}
@@ -5316,10 +5402,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"name": "base",
-						"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
-						"effectiveContentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554"
+						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5480,7 +5566,8 @@
 					],
 					"notes": [
 						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
-						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year."
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"29603.80 of Contributions could not be funded, so they were not made."
 					],
 					"horizon": "2060-12-31",
 					"currency": "THB",
@@ -5916,7 +6003,20 @@
 									"index": 0,
 									"from": "2026-10-31",
 									"to": "2027-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 37
+										},
+										{
+											"person": "partner",
+											"age": 35
+										},
+										{
+											"person": "mali",
+											"age": 0
+										}
+									],
 									"openingNetWorth": "1214900.00",
 									"closingNetWorth": "1744616.72",
 									"income": "1080000.00",
@@ -5935,7 +6035,20 @@
 									"index": 1,
 									"from": "2027-10-31",
 									"to": "2028-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 38
+										},
+										{
+											"person": "partner",
+											"age": 36
+										},
+										{
+											"person": "mali",
+											"age": 1
+										}
+									],
 									"openingNetWorth": "1744616.72",
 									"closingNetWorth": "2298965.09",
 									"income": "1112400.00",
@@ -5954,7 +6067,20 @@
 									"index": 2,
 									"from": "2028-10-31",
 									"to": "2029-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 39
+										},
+										{
+											"person": "partner",
+											"age": 37
+										},
+										{
+											"person": "mali",
+											"age": 2
+										}
+									],
 									"openingNetWorth": "2298965.09",
 									"closingNetWorth": "2881029.01",
 									"income": "1145772.00",
@@ -5973,7 +6099,20 @@
 									"index": 3,
 									"from": "2029-10-31",
 									"to": "2030-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 40
+										},
+										{
+											"person": "partner",
+											"age": 38
+										},
+										{
+											"person": "mali",
+											"age": 3
+										}
+									],
 									"openingNetWorth": "2881029.01",
 									"closingNetWorth": "3490954.75",
 									"income": "1180145.16",
@@ -5992,7 +6131,20 @@
 									"index": 4,
 									"from": "2030-10-31",
 									"to": "2031-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 41
+										},
+										{
+											"person": "partner",
+											"age": 39
+										},
+										{
+											"person": "mali",
+											"age": 4
+										}
+									],
 									"openingNetWorth": "3490954.75",
 									"closingNetWorth": "4128812.42",
 									"income": "1215549.48",
@@ -6011,7 +6163,20 @@
 									"index": 5,
 									"from": "2031-10-31",
 									"to": "2032-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 42
+										},
+										{
+											"person": "partner",
+											"age": 40
+										},
+										{
+											"person": "mali",
+											"age": 5
+										}
+									],
 									"openingNetWorth": "4128812.42",
 									"closingNetWorth": "4795558.01",
 									"income": "1252016.04",
@@ -6030,551 +6195,928 @@
 									"index": 6,
 									"from": "2032-10-31",
 									"to": "2033-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 43
+										},
+										{
+											"person": "partner",
+											"age": 41
+										},
+										{
+											"person": "mali",
+											"age": 6
+										}
+									],
 									"openingNetWorth": "4795558.01",
-									"closingNetWorth": "5492640.76",
+									"closingNetWorth": "5476634.22",
 									"income": "1289576.52",
-									"expense": "601802.28",
+									"expense": "617802.28",
 									"contributions": "214929.36",
 									"unfundedContributions": "0.00",
-									"interest": "148877.54",
+									"interest": "148871.00",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2033-10-31",
-										"amount": "4466372.69"
+										"amount": "4453357.56"
 									}
 								},
 								{
 									"index": 7,
 									"from": "2033-10-31",
 									"to": "2034-10-30",
-									"ages": [],
-									"openingNetWorth": "5492640.76",
-									"closingNetWorth": "6221583.34",
+									"ages": [
+										{
+											"person": "me",
+											"age": 44
+										},
+										{
+											"person": "partner",
+											"age": 42
+										},
+										{
+											"person": "mali",
+											"age": 7
+										}
+									],
+									"openingNetWorth": "5476634.22",
+									"closingNetWorth": "6108496.79",
 									"income": "1328263.80",
-									"expense": "619856.40",
+									"expense": "716336.40",
 									"contributions": "221377.32",
 									"unfundedContributions": "0.00",
-									"interest": "169541.28",
+									"interest": "168941.27",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2034-10-31",
-										"amount": "4911764.18"
+										"amount": "4822490.19"
 									}
 								},
 								{
 									"index": 8,
 									"from": "2034-10-31",
 									"to": "2035-10-30",
-									"ages": [],
-									"openingNetWorth": "6221583.34",
-									"closingNetWorth": "6983985.88",
+									"ages": [
+										{
+											"person": "me",
+											"age": 45
+										},
+										{
+											"person": "partner",
+											"age": 43
+										},
+										{
+											"person": "mali",
+											"age": 8
+										}
+									],
+									"openingNetWorth": "6108496.79",
+									"closingNetWorth": "6769940.92",
 									"income": "1368111.72",
-									"expense": "638452.08",
+									"expense": "737826.48",
 									"contributions": "228018.60",
 									"unfundedContributions": "0.00",
-									"interest": "191469.18",
+									"interest": "189885.17",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2035-10-31",
-										"amount": "5353068.56"
+										"amount": "5189016.45"
 									}
 								},
 								{
 									"index": 9,
 									"from": "2035-10-31",
 									"to": "2036-10-30",
-									"ages": [],
-									"openingNetWorth": "6983985.88",
-									"closingNetWorth": "7781529.63",
+									"ages": [
+										{
+											"person": "me",
+											"age": 46
+										},
+										{
+											"person": "partner",
+											"age": 44
+										},
+										{
+											"person": "mali",
+											"age": 9
+										}
+									],
+									"openingNetWorth": "6769940.92",
+									"closingNetWorth": "7462521.81",
 									"income": "1409155.08",
-									"expense": "657605.64",
+									"expense": "759961.28",
 									"contributions": "234859.20",
 									"unfundedContributions": "0.00",
-									"interest": "214732.38",
+									"interest": "212125.16",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2036-10-31",
-										"amount": "5790650.21"
+										"amount": "5553271.96"
 									}
 								},
 								{
 									"index": 10,
 									"from": "2036-10-31",
 									"to": "2037-10-30",
-									"ages": [],
-									"openingNetWorth": "7781529.63",
-									"closingNetWorth": "8615980.96",
+									"ages": [
+										{
+											"person": "me",
+											"age": 47
+										},
+										{
+											"person": "partner",
+											"age": 45
+										},
+										{
+											"person": "mali",
+											"age": 10
+										}
+									],
+									"openingNetWorth": "7462521.81",
+									"closingNetWorth": "8187875.98",
 									"income": "1451429.64",
-									"expense": "677333.88",
+									"expense": "782760.22",
 									"contributions": "241905.00",
 									"unfundedContributions": "0.00",
-									"interest": "239405.78",
+									"interest": "235734.96",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2037-10-31",
-										"amount": "6224866.15"
+										"amount": "5915585.58"
 									}
 								},
 								{
 									"index": 11,
 									"from": "2037-10-31",
 									"to": "2038-10-30",
-									"ages": [],
-									"openingNetWorth": "8615980.96",
-									"closingNetWorth": "9489196.28",
+									"ages": [
+										{
+											"person": "me",
+											"age": 48
+										},
+										{
+											"person": "partner",
+											"age": 46
+										},
+										{
+											"person": "mali",
+											"age": 11
+										}
+									],
+									"openingNetWorth": "8187875.98",
+									"closingNetWorth": "8947726.00",
 									"income": "1494972.60",
-									"expense": "697653.84",
+									"expense": "806242.92",
 									"contributions": "249162.12",
 									"unfundedContributions": "0.00",
-									"interest": "265568.26",
+									"interest": "260792.04",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2038-10-31",
-										"amount": "6656066.76"
+										"amount": "6276280.05"
 									}
 								},
 								{
 									"index": 12,
 									"from": "2038-10-31",
 									"to": "2039-10-30",
-									"ages": [],
-									"openingNetWorth": "9489196.28",
-									"closingNetWorth": "10403125.73",
+									"ages": [
+										{
+											"person": "me",
+											"age": 49
+										},
+										{
+											"person": "partner",
+											"age": 47
+										},
+										{
+											"person": "mali",
+											"age": 12
+										}
+									],
+									"openingNetWorth": "8947726.00",
+									"closingNetWorth": "9743883.98",
 									"income": "1539821.76",
-									"expense": "718583.40",
+									"expense": "830430.14",
 									"contributions": "256636.92",
 									"unfundedContributions": "0.00",
-									"interest": "293302.96",
+									"interest": "287378.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2039-10-31",
-										"amount": "7084595.47"
+										"amount": "6635671.68"
 									}
 								},
 								{
 									"index": 13,
 									"from": "2039-10-31",
 									"to": "2040-10-30",
-									"ages": [],
-									"openingNetWorth": "10403125.73",
-									"closingNetWorth": "11359818.37",
+									"ages": [
+										{
+											"person": "me",
+											"age": 50
+										},
+										{
+											"person": "partner",
+											"age": 48
+										},
+										{
+											"person": "mali",
+											"age": 13
+										}
+									],
+									"openingNetWorth": "9743883.98",
+									"closingNetWorth": "10578256.71",
 									"income": "1586016.36",
-									"expense": "740140.92",
+									"expense": "855343.10",
 									"contributions": "264336.12",
 									"unfundedContributions": "0.00",
-									"interest": "322697.42",
+									"interest": "315579.69",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2040-10-31",
-										"amount": "7510789.35"
+										"amount": "6994070.94"
 									}
 								},
 								{
 									"index": 14,
 									"from": "2040-10-31",
 									"to": "2041-10-30",
-									"ages": [],
-									"openingNetWorth": "11359818.37",
-									"closingNetWorth": "12361427.36",
+									"ages": [
+										{
+											"person": "me",
+											"age": 51
+										},
+										{
+											"person": "partner",
+											"age": 49
+										},
+										{
+											"person": "mali",
+											"age": 14
+										}
+									],
+									"openingNetWorth": "10578256.71",
+									"closingNetWorth": "11452850.78",
 									"income": "1633596.96",
-									"expense": "762345.24",
+									"expense": "881003.46",
 									"contributions": "272266.20",
 									"unfundedContributions": "0.00",
-									"interest": "353843.89",
+									"interest": "345487.19",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2041-10-31",
-										"amount": "7934979.54"
+										"amount": "7351782.91"
 									}
 								},
 								{
 									"index": 15,
 									"from": "2041-10-31",
 									"to": "2042-10-30",
-									"ages": [],
-									"openingNetWorth": "12361427.36",
-									"closingNetWorth": "13410214.78",
+									"ages": [
+										{
+											"person": "me",
+											"age": 52
+										},
+										{
+											"person": "partner",
+											"age": 50
+										},
+										{
+											"person": "mali",
+											"age": 15
+										}
+									],
+									"openingNetWorth": "11452850.78",
+									"closingNetWorth": "12369777.12",
 									"income": "1682604.84",
-									"expense": "785215.56",
+									"expense": "907433.54",
 									"contributions": "280434.12",
 									"unfundedContributions": "0.00",
-									"interest": "386839.38",
+									"interest": "377196.28",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2042-10-31",
-										"amount": "8357491.23"
+										"amount": "7709107.20"
 									}
 								},
 								{
 									"index": 16,
 									"from": "2042-10-31",
 									"to": "2043-10-30",
-									"ages": [],
-									"openingNetWorth": "13410214.78",
-									"closingNetWorth": "14508557.38",
+									"ages": [
+										{
+											"person": "me",
+											"age": 53
+										},
+										{
+											"person": "partner",
+											"age": 51
+										},
+										{
+											"person": "mali",
+											"age": 16
+										}
+									],
+									"openingNetWorth": "12369777.12",
+									"closingNetWorth": "13331256.76",
 									"income": "1733082.96",
-									"expense": "808772.04",
+									"expense": "934656.60",
 									"contributions": "288847.20",
 									"unfundedContributions": "0.00",
-									"interest": "421786.15",
+									"interest": "410807.75",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2043-10-31",
-										"amount": "8778644.08"
+										"amount": "8066338.42"
 									}
 								},
 								{
 									"index": 17,
 									"from": "2043-10-31",
 									"to": "2044-10-30",
-									"ages": [],
-									"openingNetWorth": "14508557.38",
-									"closingNetWorth": "15658952.44",
+									"ages": [
+										{
+											"person": "me",
+											"age": 54
+										},
+										{
+											"person": "partner",
+											"age": 52
+										},
+										{
+											"person": "mali",
+											"age": 17
+										}
+									],
+									"openingNetWorth": "13331256.76",
+									"closingNetWorth": "14339626.51",
 									"income": "1785075.48",
-									"expense": "833035.20",
+									"expense": "962696.24",
 									"contributions": "297512.52",
 									"unfundedContributions": "0.00",
-									"interest": "458791.88",
+									"interest": "446427.61",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2044-10-31",
-										"amount": "9198752.51"
+										"amount": "8423766.45"
 									}
 								},
 								{
 									"index": 18,
 									"from": "2044-10-31",
 									"to": "2045-10-30",
-									"ages": [],
-									"openingNetWorth": "15658952.44",
-									"closingNetWorth": "16864023.63",
+									"ages": [
+										{
+											"person": "me",
+											"age": 55
+										},
+										{
+											"person": "partner",
+											"age": 53
+										},
+										{
+											"person": "mali",
+											"age": 18
+										}
+									],
+									"openingNetWorth": "14339626.51",
+									"closingNetWorth": "15397344.54",
 									"income": "1838627.76",
-									"expense": "858026.28",
+									"expense": "991577.16",
 									"contributions": "306438.00",
 									"unfundedContributions": "0.00",
-									"interest": "497969.93",
+									"interest": "484167.65",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2045-10-31",
-										"amount": "9618125.90"
+										"amount": "8781676.50"
 									}
 								},
 								{
 									"index": 19,
 									"from": "2045-10-31",
 									"to": "2046-10-30",
-									"ages": [],
-									"openingNetWorth": "16864023.63",
-									"closingNetWorth": "18126527.53",
+									"ages": [
+										{
+											"person": "me",
+											"age": 56
+										},
+										{
+											"person": "partner",
+											"age": 54
+										},
+										{
+											"person": "mali",
+											"age": 19
+										}
+									],
+									"openingNetWorth": "15397344.54",
+									"closingNetWorth": "16506996.95",
 									"income": "1893786.48",
-									"expense": "883767.00",
+									"expense": "1021324.44",
 									"contributions": "315631.08",
 									"unfundedContributions": "0.00",
-									"interest": "539439.64",
+									"interest": "524145.59",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2046-10-31",
-										"amount": "10037068.80"
+										"amount": "9140349.54"
 									}
 								},
 								{
 									"index": 20,
 									"from": "2046-10-31",
 									"to": "2047-10-30",
-									"ages": [],
-									"openingNetWorth": "18126527.53",
-									"closingNetWorth": "19449360.42",
+									"ages": [
+										{
+											"person": "me",
+											"age": 57
+										},
+										{
+											"person": "partner",
+											"age": 55
+										},
+										{
+											"person": "mali",
+											"age": 20
+										}
+									],
+									"openingNetWorth": "16506996.95",
+									"closingNetWorth": "17671304.28",
 									"income": "1950600.12",
-									"expense": "910280.04",
+									"expense": "1051964.18",
 									"contributions": "325100.04",
 									"unfundedContributions": "0.00",
-									"interest": "583326.67",
+									"interest": "566485.25",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2047-10-31",
-										"amount": "10455881.31"
+										"amount": "9500062.46"
 									}
 								},
 								{
 									"index": 21,
 									"from": "2047-10-31",
 									"to": "2048-10-30",
-									"ages": [],
-									"openingNetWorth": "19449360.42",
-									"closingNetWorth": "20835565.07",
+									"ages": [
+										{
+											"person": "me",
+											"age": 58
+										},
+										{
+											"person": "partner",
+											"age": 56
+										},
+										{
+											"person": "mali",
+											"age": 21
+										}
+									],
+									"openingNetWorth": "17671304.28",
+									"closingNetWorth": "18893128.20",
 									"income": "2009118.12",
-									"expense": "937588.44",
+									"expense": "1083523.12",
 									"contributions": "334853.04",
 									"unfundedContributions": "0.00",
-									"interest": "629763.25",
+									"interest": "611317.20",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2048-10-31",
-										"amount": "10874859.16"
+										"amount": "9861088.29"
 									}
 								},
 								{
 									"index": 22,
 									"from": "2048-10-31",
 									"to": "2049-10-30",
-									"ages": [],
-									"openingNetWorth": "20835565.07",
-									"closingNetWorth": "22288338.31",
+									"ages": [
+										{
+											"person": "me",
+											"age": 59
+										},
+										{
+											"person": "partner",
+											"age": 57
+										},
+										{
+											"person": "mali",
+											"age": 22
+										}
+									],
+									"openingNetWorth": "18893128.20",
+									"closingNetWorth": "20175478.96",
 									"income": "2069391.72",
-									"expense": "965716.20",
+									"expense": "1116028.90",
 									"contributions": "344898.60",
 									"unfundedContributions": "0.00",
-									"interest": "678888.65",
+									"interest": "658778.87",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2049-10-31",
-										"amount": "11294294.00"
+										"amount": "10223696.42"
 									}
 								},
 								{
 									"index": 23,
 									"from": "2049-10-31",
 									"to": "2050-10-30",
-									"ages": [],
-									"openingNetWorth": "22288338.31",
-									"closingNetWorth": "22919312.46",
+									"ages": [
+										{
+											"person": "me",
+											"age": 60
+										},
+										{
+											"person": "partner",
+											"age": 58
+										},
+										{
+											"person": "mali",
+											"age": 23
+										}
+									],
+									"openingNetWorth": "20175478.96",
+									"closingNetWorth": "20629796.45",
 									"income": "1243359.53",
-									"expense": "994687.56",
+									"expense": "1149509.62",
 									"contributions": "207226.60",
-									"unfundedContributions": "0.00",
-									"interest": "727236.85",
+									"unfundedContributions": "29603.80",
+									"interest": "705402.25",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2050-10-31",
-										"amount": "11275783.65"
+										"amount": "10149462.78"
 									}
 								},
 								{
 									"index": 24,
 									"from": "2050-10-31",
 									"to": "2051-10-30",
-									"ages": [],
-									"openingNetWorth": "22919312.46",
-									"closingNetWorth": "22586104.81",
+									"ages": [
+										{
+											"person": "me",
+											"age": 61
+										},
+										{
+											"person": "partner",
+											"age": 59
+										},
+										{
+											"person": "mali",
+											"age": 24
+										}
+									],
+									"openingNetWorth": "20629796.45",
+									"closingNetWorth": "20113499.75",
 									"income": "0.00",
-									"expense": "1024528.20",
+									"expense": "1183994.92",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "753037.64",
+									"interest": "729415.31",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2051-10-31",
-										"amount": "10788250.25"
+										"amount": "9607288.11"
 									}
 								},
 								{
 									"index": 25,
 									"from": "2051-10-31",
 									"to": "2052-10-30",
-									"ages": [],
-									"openingNetWorth": "22586104.81",
-									"closingNetWorth": "22307226.00",
+									"ages": [
+										{
+											"person": "me",
+											"age": 62
+										},
+										{
+											"person": "partner",
+											"age": 60
+										},
+										{
+											"person": "mali",
+											"age": 25
+										}
+									],
+									"openingNetWorth": "20113499.75",
+									"closingNetWorth": "19644895.19",
 									"income": "0.00",
-									"expense": "1055264.04",
+									"expense": "1219514.74",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "776385.23",
+									"interest": "750910.18",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2052-10-31",
-										"amount": "10344745.52"
+										"amount": "9110203.11"
 									}
 								},
 								{
 									"index": 26,
 									"from": "2052-10-31",
 									"to": "2053-10-30",
-									"ages": [],
-									"openingNetWorth": "22307226.00",
-									"closingNetWorth": "22021539.89",
+									"ages": [
+										{
+											"person": "me",
+											"age": 63
+										},
+										{
+											"person": "partner",
+											"age": 61
+										},
+										{
+											"person": "mali",
+											"age": 26
+										}
+									],
+									"openingNetWorth": "19644895.19",
+									"closingNetWorth": "19162636.04",
 									"income": "0.00",
-									"expense": "1086922.08",
+									"expense": "1256100.36",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "801235.97",
+									"interest": "773841.21",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2053-10-31",
-										"amount": "9914860.96"
+										"amount": "8627778.64"
 									}
 								},
 								{
 									"index": 27,
 									"from": "2053-10-31",
 									"to": "2054-10-30",
-									"ages": [],
-									"openingNetWorth": "22021539.89",
-									"closingNetWorth": "21729414.28",
+									"ages": [
+										{
+											"person": "me",
+											"age": 64
+										},
+										{
+											"person": "partner",
+											"age": 62
+										},
+										{
+											"person": "mali",
+											"age": 27
+										}
+									],
+									"openingNetWorth": "19162636.04",
+									"closingNetWorth": "18666873.14",
 									"income": "0.00",
-									"expense": "1119529.68",
+									"expense": "1293783.30",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "827404.07",
+									"interest": "798020.40",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2054-10-31",
-										"amount": "9498429.46"
+										"amount": "8159827.43"
 									}
 								},
 								{
 									"index": 28,
 									"from": "2054-10-31",
 									"to": "2055-10-30",
-									"ages": [],
-									"openingNetWorth": "21729414.28",
-									"closingNetWorth": "21431261.24",
+									"ages": [
+										{
+											"person": "me",
+											"age": 65
+										},
+										{
+											"person": "partner",
+											"age": 63
+										},
+										{
+											"person": "mali",
+											"age": 28
+										}
+									],
+									"openingNetWorth": "18666873.14",
+									"closingNetWorth": "18157794.99",
 									"income": "0.00",
-									"expense": "1153115.52",
+									"expense": "1332596.78",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "854962.48",
+									"interest": "823518.63",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2055-10-31",
-										"amount": "9095288.91"
+										"amount": "7706167.55"
 									}
 								},
 								{
 									"index": 29,
 									"from": "2055-10-31",
 									"to": "2056-10-30",
-									"ages": [],
-									"openingNetWorth": "21431261.24",
-									"closingNetWorth": "21127540.47",
+									"ages": [
+										{
+											"person": "me",
+											"age": 66
+										},
+										{
+											"person": "partner",
+											"age": 64
+										},
+										{
+											"person": "mali",
+											"age": 29
+										}
+									],
+									"openingNetWorth": "18157794.99",
+									"closingNetWorth": "17635337.21",
 									"income": "0.00",
-									"expense": "1187709.00",
+									"expense": "1372574.68",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "883988.23",
+									"interest": "850116.90",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2056-10-31",
-										"amount": "8705282.29"
+										"amount": "7266496.69"
 									}
 								},
 								{
 									"index": 30,
 									"from": "2056-10-31",
 									"to": "2057-10-30",
-									"ages": [],
-									"openingNetWorth": "21127540.47",
-									"closingNetWorth": "20818762.62",
+									"ages": [
+										{
+											"person": "me",
+											"age": 67
+										},
+										{
+											"person": "partner",
+											"age": 65
+										},
+										{
+											"person": "mali",
+											"age": 30
+										}
+									],
+									"openingNetWorth": "17635337.21",
+									"closingNetWorth": "17066387.56",
 									"income": "0.00",
-									"expense": "1223340.24",
+									"expense": "1413751.84",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "914562.39",
+									"interest": "844802.19",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2057-10-31",
-										"amount": "8328257.61"
+										"amount": "6827248.19"
 									}
 								},
 								{
 									"index": 31,
 									"from": "2057-10-31",
 									"to": "2058-10-30",
-									"ages": [],
-									"openingNetWorth": "20818762.62",
-									"closingNetWorth": "20505492.54",
+									"ages": [
+										{
+											"person": "me",
+											"age": 68
+										},
+										{
+											"person": "partner",
+											"age": 66
+										},
+										{
+											"person": "mali",
+											"age": 31
+										}
+									],
+									"openingNetWorth": "17066387.56",
+									"closingNetWorth": "16425468.95",
 									"income": "0.00",
-									"expense": "1260040.44",
+									"expense": "1456164.38",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "946770.36",
+									"interest": "815245.77",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2058-10-31",
-										"amount": "7964067.82"
+										"amount": "6379470.60"
 									}
 								},
 								{
 									"index": 32,
 									"from": "2058-10-31",
 									"to": "2059-10-30",
-									"ages": [],
-									"openingNetWorth": "20505492.54",
-									"closingNetWorth": "20185899.23",
+									"ages": [
+										{
+											"person": "me",
+											"age": 69
+										},
+										{
+											"person": "partner",
+											"age": 67
+										},
+										{
+											"person": "mali",
+											"age": 32
+										}
+									],
+									"openingNetWorth": "16425468.95",
+									"closingNetWorth": "15707677.16",
 									"income": "0.00",
-									"expense": "1297841.76",
+									"expense": "1499849.42",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "978248.45",
+									"interest": "782057.63",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2059-10-31",
-										"amount": "7611631.21"
+										"amount": "5922998.25"
 									}
 								},
 								{
 									"index": 33,
 									"from": "2059-10-31",
 									"to": "2060-10-30",
-									"ages": [],
-									"openingNetWorth": "20185899.23",
-									"closingNetWorth": "19822735.60",
+									"ages": [
+										{
+											"person": "me",
+											"age": 70
+										},
+										{
+											"person": "partner",
+											"age": 68
+										},
+										{
+											"person": "mali",
+											"age": 33
+										}
+									],
+									"openingNetWorth": "15707677.16",
+									"closingNetWorth": "14907823.85",
 									"income": "0.00",
-									"expense": "1336776.96",
+									"expense": "1544844.88",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "973613.33",
+									"interest": "744991.57",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2060-10-31",
-										"amount": "7256981.25"
+										"amount": "5457662.37"
 									}
 								},
 								{
 									"index": 34,
 									"from": "2060-10-31",
 									"to": "2060-12-31",
-									"ages": [],
-									"openingNetWorth": "19822735.60",
-									"closingNetWorth": "19756836.98",
+									"ages": [
+										{
+											"person": "me",
+											"age": 70
+										},
+										{
+											"person": "partner",
+											"age": 68
+										},
+										{
+											"person": "mali",
+											"age": 33
+										}
+									],
+									"openingNetWorth": "14907823.85",
+									"closingNetWorth": "14765406.15",
 									"income": "0.00",
-									"expense": "229480.04",
+									"expense": "265020.66",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "163581.42",
+									"interest": "122602.96",
 									"unmet": "0.00",
 									"partial": true,
 									"realNetWorth": {
 										"date": "2060-12-31",
-										"amount": "7196252.23"
+										"amount": "5378167.93"
 									}
 								}
 							]
@@ -6591,7 +7133,7 @@
 								{
 									"id": "net-worth-ten-million",
 									"reached": true,
-									"date": "2039-07-01"
+									"date": "2040-01-30"
 								},
 								{
 									"id": "net-worth-ten-trillion",
@@ -6624,10 +7166,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-						"effectiveContentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2"
+						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -6789,13 +7331,13 @@
 					"notes": [
 						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
 						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
-						"3083347.45 of Contributions could not be funded, so they were not made."
+						"3112951.25 of Contributions could not be funded, so they were not made."
 					],
 					"horizon": "2060-12-31",
 					"currency": "THB",
 					"runsOut": {
-						"date": "2056-05-01",
-						"unmet": "70359.24"
+						"date": "2053-02-01",
+						"unmet": "21132.25"
 					},
 					"taxYears": [
 						{
@@ -7118,7 +7660,7 @@
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
-							"settled": true,
+							"settled": false,
 							"partial": false,
 							"assumptions": []
 						},
@@ -7130,42 +7672,6 @@
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2054-01-01",
-							"to": "2054-12-31",
-							"settlementDate": "2055-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2055-01-01",
-							"to": "2055-12-31",
-							"settlementDate": "2056-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2056-01-01",
-							"to": "2056-12-31",
-							"settlementDate": "2057-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
 							"settled": false,
 							"partial": true,
 							"assumptions": []
@@ -7174,13 +7680,26 @@
 					"tables": [
 						{
 							"name": "annual",
-							"count": 30,
+							"count": 27,
 							"rows": [
 								{
 									"index": 0,
 									"from": "2026-10-31",
 									"to": "2027-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 37
+										},
+										{
+											"person": "partner",
+											"age": 35
+										},
+										{
+											"person": "mali",
+											"age": 0
+										}
+									],
 									"openingNetWorth": "1214900.00",
 									"closingNetWorth": "1744616.72",
 									"income": "1080000.00",
@@ -7199,7 +7718,20 @@
 									"index": 1,
 									"from": "2027-10-31",
 									"to": "2028-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 38
+										},
+										{
+											"person": "partner",
+											"age": 36
+										},
+										{
+											"person": "mali",
+											"age": 1
+										}
+									],
 									"openingNetWorth": "1744616.72",
 									"closingNetWorth": "2298965.09",
 									"income": "1112400.00",
@@ -7218,7 +7750,20 @@
 									"index": 2,
 									"from": "2028-10-31",
 									"to": "2029-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 39
+										},
+										{
+											"person": "partner",
+											"age": 37
+										},
+										{
+											"person": "mali",
+											"age": 2
+										}
+									],
 									"openingNetWorth": "2298965.09",
 									"closingNetWorth": "2881029.01",
 									"income": "1145772.00",
@@ -7237,7 +7782,20 @@
 									"index": 3,
 									"from": "2029-10-31",
 									"to": "2030-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 40
+										},
+										{
+											"person": "partner",
+											"age": 38
+										},
+										{
+											"person": "mali",
+											"age": 3
+										}
+									],
 									"openingNetWorth": "2881029.01",
 									"closingNetWorth": "3490954.75",
 									"income": "1180145.16",
@@ -7256,7 +7814,20 @@
 									"index": 4,
 									"from": "2030-10-31",
 									"to": "2031-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 41
+										},
+										{
+											"person": "partner",
+											"age": 39
+										},
+										{
+											"person": "mali",
+											"age": 4
+										}
+									],
 									"openingNetWorth": "3490954.75",
 									"closingNetWorth": "4128812.42",
 									"income": "1215549.48",
@@ -7275,7 +7846,20 @@
 									"index": 5,
 									"from": "2031-10-31",
 									"to": "2032-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 42
+										},
+										{
+											"person": "partner",
+											"age": 40
+										},
+										{
+											"person": "mali",
+											"age": 5
+										}
+									],
 									"openingNetWorth": "4128812.42",
 									"closingNetWorth": "4795558.01",
 									"income": "1252016.04",
@@ -7294,455 +7878,671 @@
 									"index": 6,
 									"from": "2032-10-31",
 									"to": "2033-10-30",
-									"ages": [],
+									"ages": [
+										{
+											"person": "me",
+											"age": 43
+										},
+										{
+											"person": "partner",
+											"age": 41
+										},
+										{
+											"person": "mali",
+											"age": 6
+										}
+									],
 									"openingNetWorth": "4795558.01",
-									"closingNetWorth": "5492640.76",
+									"closingNetWorth": "5476634.22",
 									"income": "1289576.52",
-									"expense": "601802.28",
+									"expense": "617802.28",
 									"contributions": "214929.36",
 									"unfundedContributions": "0.00",
-									"interest": "148877.54",
+									"interest": "148871.00",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2033-10-31",
-										"amount": "4466372.69"
+										"amount": "4453357.56"
 									}
 								},
 								{
 									"index": 7,
 									"from": "2033-10-31",
 									"to": "2034-10-30",
-									"ages": [],
-									"openingNetWorth": "5492640.76",
-									"closingNetWorth": "6221583.34",
+									"ages": [
+										{
+											"person": "me",
+											"age": 44
+										},
+										{
+											"person": "partner",
+											"age": 42
+										},
+										{
+											"person": "mali",
+											"age": 7
+										}
+									],
+									"openingNetWorth": "5476634.22",
+									"closingNetWorth": "6108496.79",
 									"income": "1328263.80",
-									"expense": "619856.40",
+									"expense": "716336.40",
 									"contributions": "221377.32",
 									"unfundedContributions": "0.00",
-									"interest": "169541.28",
+									"interest": "168941.27",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2034-10-31",
-										"amount": "4911764.18"
+										"amount": "4822490.19"
 									}
 								},
 								{
 									"index": 8,
 									"from": "2034-10-31",
 									"to": "2035-10-30",
-									"ages": [],
-									"openingNetWorth": "6221583.34",
-									"closingNetWorth": "6983985.88",
+									"ages": [
+										{
+											"person": "me",
+											"age": 45
+										},
+										{
+											"person": "partner",
+											"age": 43
+										},
+										{
+											"person": "mali",
+											"age": 8
+										}
+									],
+									"openingNetWorth": "6108496.79",
+									"closingNetWorth": "6769940.92",
 									"income": "1368111.72",
-									"expense": "638452.08",
+									"expense": "737826.48",
 									"contributions": "228018.60",
 									"unfundedContributions": "0.00",
-									"interest": "191469.18",
+									"interest": "189885.17",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2035-10-31",
-										"amount": "5353068.56"
+										"amount": "5189016.45"
 									}
 								},
 								{
 									"index": 9,
 									"from": "2035-10-31",
 									"to": "2036-10-30",
-									"ages": [],
-									"openingNetWorth": "6983985.88",
-									"closingNetWorth": "7781529.63",
+									"ages": [
+										{
+											"person": "me",
+											"age": 46
+										},
+										{
+											"person": "partner",
+											"age": 44
+										},
+										{
+											"person": "mali",
+											"age": 9
+										}
+									],
+									"openingNetWorth": "6769940.92",
+									"closingNetWorth": "7462521.81",
 									"income": "1409155.08",
-									"expense": "657605.64",
+									"expense": "759961.28",
 									"contributions": "234859.20",
 									"unfundedContributions": "0.00",
-									"interest": "214732.38",
+									"interest": "212125.16",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2036-10-31",
-										"amount": "5790650.21"
+										"amount": "5553271.96"
 									}
 								},
 								{
 									"index": 10,
 									"from": "2036-10-31",
 									"to": "2037-10-30",
-									"ages": [],
-									"openingNetWorth": "7781529.63",
-									"closingNetWorth": "8615980.96",
+									"ages": [
+										{
+											"person": "me",
+											"age": 47
+										},
+										{
+											"person": "partner",
+											"age": 45
+										},
+										{
+											"person": "mali",
+											"age": 10
+										}
+									],
+									"openingNetWorth": "7462521.81",
+									"closingNetWorth": "8187875.98",
 									"income": "1451429.64",
-									"expense": "677333.88",
+									"expense": "782760.22",
 									"contributions": "241905.00",
 									"unfundedContributions": "0.00",
-									"interest": "239405.78",
+									"interest": "235734.96",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2037-10-31",
-										"amount": "6224866.15"
+										"amount": "5915585.58"
 									}
 								},
 								{
 									"index": 11,
 									"from": "2037-10-31",
 									"to": "2038-10-30",
-									"ages": [],
-									"openingNetWorth": "8615980.96",
-									"closingNetWorth": "9489196.28",
+									"ages": [
+										{
+											"person": "me",
+											"age": 48
+										},
+										{
+											"person": "partner",
+											"age": 46
+										},
+										{
+											"person": "mali",
+											"age": 11
+										}
+									],
+									"openingNetWorth": "8187875.98",
+									"closingNetWorth": "8947726.00",
 									"income": "1494972.60",
-									"expense": "697653.84",
+									"expense": "806242.92",
 									"contributions": "249162.12",
 									"unfundedContributions": "0.00",
-									"interest": "265568.26",
+									"interest": "260792.04",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2038-10-31",
-										"amount": "6656066.76"
+										"amount": "6276280.05"
 									}
 								},
 								{
 									"index": 12,
 									"from": "2038-10-31",
 									"to": "2039-10-30",
-									"ages": [],
-									"openingNetWorth": "9489196.28",
-									"closingNetWorth": "10403125.73",
+									"ages": [
+										{
+											"person": "me",
+											"age": 49
+										},
+										{
+											"person": "partner",
+											"age": 47
+										},
+										{
+											"person": "mali",
+											"age": 12
+										}
+									],
+									"openingNetWorth": "8947726.00",
+									"closingNetWorth": "9743883.98",
 									"income": "1539821.76",
-									"expense": "718583.40",
+									"expense": "830430.14",
 									"contributions": "256636.92",
 									"unfundedContributions": "0.00",
-									"interest": "293302.96",
+									"interest": "287378.23",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2039-10-31",
-										"amount": "7084595.47"
+										"amount": "6635671.68"
 									}
 								},
 								{
 									"index": 13,
 									"from": "2039-10-31",
 									"to": "2040-10-30",
-									"ages": [],
-									"openingNetWorth": "10403125.73",
-									"closingNetWorth": "10696290.14",
+									"ages": [
+										{
+											"person": "me",
+											"age": 50
+										},
+										{
+											"person": "partner",
+											"age": 48
+										},
+										{
+											"person": "mali",
+											"age": 13
+										}
+									],
+									"openingNetWorth": "9743883.98",
+									"closingNetWorth": "9914728.49",
 									"income": "925176.21",
-									"expense": "740140.92",
+									"expense": "855343.10",
 									"contributions": "154196.07",
 									"unfundedContributions": "110140.05",
-									"interest": "320009.34",
+									"interest": "312891.62",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2040-10-31",
-										"amount": "7072099.21"
+										"amount": "6555380.80"
 									}
 								},
 								{
 									"index": 14,
 									"from": "2040-10-31",
 									"to": "2041-10-30",
-									"ages": [],
-									"openingNetWorth": "10696290.14",
-									"closingNetWorth": "10235630.32",
+									"ages": [
+										{
+											"person": "me",
+											"age": 51
+										},
+										{
+											"person": "partner",
+											"age": 49
+										},
+										{
+											"person": "mali",
+											"age": 14
+										}
+									],
+									"openingNetWorth": "9914728.49",
+									"closingNetWorth": "9327053.77",
 									"income": "0.00",
-									"expense": "762345.24",
+									"expense": "881003.46",
 									"contributions": "0.00",
 									"unfundedContributions": "272266.20",
-									"interest": "329311.44",
+									"interest": "320954.76",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2041-10-31",
-										"amount": "6570447.03"
+										"amount": "5987250.41"
 									}
 								},
 								{
 									"index": 15,
 									"from": "2041-10-31",
 									"to": "2042-10-30",
-									"ages": [],
-									"openingNetWorth": "10235630.32",
-									"closingNetWorth": "9786487.86",
+									"ages": [
+										{
+											"person": "me",
+											"age": 52
+										},
+										{
+											"person": "partner",
+											"age": 50
+										},
+										{
+											"person": "mali",
+											"age": 15
+										}
+									],
+									"openingNetWorth": "9327053.77",
+									"closingNetWorth": "8746050.23",
 									"income": "0.00",
-									"expense": "785215.56",
+									"expense": "907433.54",
 									"contributions": "0.00",
 									"unfundedContributions": "280434.12",
-									"interest": "336073.10",
+									"interest": "326430.00",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2042-10-31",
-										"amount": "6099196.14"
+										"amount": "5450812.13"
 									}
 								},
 								{
 									"index": 16,
 									"from": "2042-10-31",
 									"to": "2043-10-30",
-									"ages": [],
-									"openingNetWorth": "9786487.86",
-									"closingNetWorth": "9321067.67",
+									"ages": [
+										{
+											"person": "me",
+											"age": 53
+										},
+										{
+											"person": "partner",
+											"age": 51
+										},
+										{
+											"person": "mali",
+											"age": 16
+										}
+									],
+									"openingNetWorth": "8746050.23",
+									"closingNetWorth": "8143767.08",
 									"income": "0.00",
-									"expense": "808772.04",
+									"expense": "934656.60",
 									"contributions": "0.00",
 									"unfundedContributions": "288847.20",
-									"interest": "343351.85",
+									"interest": "332373.45",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2043-10-31",
-										"amount": "5639975.22"
+										"amount": "4927669.58"
 									}
 								},
 								{
 									"index": 17,
 									"from": "2043-10-31",
 									"to": "2044-10-30",
-									"ages": [],
-									"openingNetWorth": "9321067.67",
-									"closingNetWorth": "8839091.35",
+									"ages": [
+										{
+											"person": "me",
+											"age": 54
+										},
+										{
+											"person": "partner",
+											"age": 52
+										},
+										{
+											"person": "mali",
+											"age": 17
+										}
+									],
+									"openingNetWorth": "8143767.08",
+									"closingNetWorth": "7519765.46",
 									"income": "0.00",
-									"expense": "833035.20",
+									"expense": "962696.24",
 									"contributions": "0.00",
 									"unfundedContributions": "297512.52",
-									"interest": "351058.88",
+									"interest": "338694.62",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2044-10-31",
-										"amount": "5192606.58"
+										"amount": "4417620.54"
 									}
 								},
 								{
 									"index": 18,
 									"from": "2044-10-31",
 									"to": "2045-10-30",
-									"ages": [],
-									"openingNetWorth": "8839091.35",
-									"closingNetWorth": "8340286.08",
+									"ages": [
+										{
+											"person": "me",
+											"age": 55
+										},
+										{
+											"person": "partner",
+											"age": 53
+										},
+										{
+											"person": "mali",
+											"age": 18
+										}
+									],
+									"openingNetWorth": "7519765.46",
+									"closingNetWorth": "6870726.66",
 									"income": "0.00",
-									"expense": "858026.28",
+									"expense": "991577.16",
 									"contributions": "0.00",
 									"unfundedContributions": "306438.00",
-									"interest": "359221.01",
+									"interest": "342538.36",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2045-10-31",
-										"amount": "4756917.08"
+										"amount": "3918803.20"
 									}
 								},
 								{
 									"index": 19,
 									"from": "2045-10-31",
 									"to": "2046-10-30",
-									"ages": [],
-									"openingNetWorth": "8340286.08",
-									"closingNetWorth": "7824385.70",
+									"ages": [
+										{
+											"person": "me",
+											"age": 56
+										},
+										{
+											"person": "partner",
+											"age": 54
+										},
+										{
+											"person": "mali",
+											"age": 19
+										}
+									],
+									"openingNetWorth": "6870726.66",
+									"closingNetWorth": "6166234.50",
 									"income": "0.00",
-									"expense": "883767.00",
+									"expense": "1021324.44",
 									"contributions": "0.00",
 									"unfundedContributions": "315631.08",
-									"interest": "367866.62",
+									"interest": "316832.28",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2046-10-31",
-										"amount": "4332738.08"
+										"amount": "3414550.94"
 									}
 								},
 								{
 									"index": 20,
 									"from": "2046-10-31",
 									"to": "2047-10-30",
-									"ages": [],
-									"openingNetWorth": "7824385.70",
-									"closingNetWorth": "7280153.91",
+									"ages": [
+										{
+											"person": "me",
+											"age": 57
+										},
+										{
+											"person": "partner",
+											"age": 55
+										},
+										{
+											"person": "mali",
+											"age": 20
+										}
+									],
+									"openingNetWorth": "6166234.50",
+									"closingNetWorth": "5395076.89",
 									"income": "0.00",
-									"expense": "910280.04",
+									"expense": "1051964.18",
 									"contributions": "0.00",
 									"unfundedContributions": "325100.04",
-									"interest": "366048.25",
+									"interest": "280806.57",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2047-10-31",
-										"amount": "3913964.62"
+										"amount": "2900507.37"
 									}
 								},
 								{
 									"index": 21,
 									"from": "2047-10-31",
 									"to": "2048-10-30",
-									"ages": [],
-									"openingNetWorth": "7280153.91",
-									"closingNetWorth": "6681546.78",
+									"ages": [
+										{
+											"person": "me",
+											"age": 58
+										},
+										{
+											"person": "partner",
+											"age": 56
+										},
+										{
+											"person": "mali",
+											"age": 21
+										}
+									],
+									"openingNetWorth": "5395076.89",
+									"closingNetWorth": "4552977.29",
 									"income": "0.00",
-									"expense": "937588.44",
+									"expense": "1083523.12",
 									"contributions": "0.00",
 									"unfundedContributions": "334853.04",
-									"interest": "338981.31",
+									"interest": "241423.52",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2048-10-31",
-										"amount": "3487515.31"
+										"amount": "2376482.35"
 									}
 								},
 								{
 									"index": 22,
 									"from": "2048-10-31",
 									"to": "2049-10-30",
-									"ages": [],
-									"openingNetWorth": "6681546.78",
-									"closingNetWorth": "6024130.73",
+									"ages": [
+										{
+											"person": "me",
+											"age": 59
+										},
+										{
+											"person": "partner",
+											"age": 57
+										},
+										{
+											"person": "mali",
+											"age": 22
+										}
+									],
+									"openingNetWorth": "4552977.29",
+									"closingNetWorth": "3635417.04",
 									"income": "0.00",
-									"expense": "965716.20",
+									"expense": "1116028.90",
 									"contributions": "0.00",
 									"unfundedContributions": "344898.60",
-									"interest": "308300.15",
+									"interest": "198468.65",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2049-10-31",
-										"amount": "3052785.38"
+										"amount": "1842282.06"
 									}
 								},
 								{
 									"index": 23,
 									"from": "2049-10-31",
 									"to": "2050-10-30",
-									"ages": [],
-									"openingNetWorth": "6024130.73",
-									"closingNetWorth": "5304099.20",
+									"ages": [
+										{
+											"person": "me",
+											"age": 60
+										},
+										{
+											"person": "partner",
+											"age": 58
+										},
+										{
+											"person": "mali",
+											"age": 23
+										}
+									],
+									"openingNetWorth": "3635417.04",
+									"closingNetWorth": "2637622.63",
 									"income": "0.00",
-									"expense": "994687.56",
+									"expense": "1149509.62",
 									"contributions": "0.00",
-									"unfundedContributions": "207226.60",
-									"interest": "274656.03",
+									"unfundedContributions": "236830.40",
+									"interest": "151715.21",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2050-10-31",
-										"amount": "2609614.14"
+										"amount": "1297709.01"
 									}
 								},
 								{
 									"index": 24,
 									"from": "2050-10-31",
 									"to": "2051-10-30",
-									"ages": [],
-									"openingNetWorth": "5304099.20",
-									"closingNetWorth": "4517428.94",
+									"ages": [
+										{
+											"person": "me",
+											"age": 61
+										},
+										{
+											"person": "partner",
+											"age": 59
+										},
+										{
+											"person": "mali",
+											"age": 24
+										}
+									],
+									"openingNetWorth": "2637622.63",
+									"closingNetWorth": "1554551.55",
 									"income": "0.00",
-									"expense": "1024528.20",
+									"expense": "1183994.92",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "237857.94",
+									"interest": "100923.84",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2051-10-31",
-										"amount": "2157837.64"
+										"amount": "742561.73"
 									}
 								},
 								{
 									"index": 25,
 									"from": "2051-10-31",
 									"to": "2052-10-30",
-									"ages": [],
-									"openingNetWorth": "4517428.94",
-									"closingNetWorth": "3659868.94",
+									"ages": [
+										{
+											"person": "me",
+											"age": 62
+										},
+										{
+											"person": "partner",
+											"age": 60
+										},
+										{
+											"person": "mali",
+											"age": 25
+										}
+									],
+									"openingNetWorth": "1554551.55",
+									"closingNetWorth": "380878.35",
 									"income": "0.00",
-									"expense": "1055264.04",
+									"expense": "1219514.74",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "197704.04",
+									"interest": "45841.54",
 									"unmet": "0.00",
 									"partial": false,
 									"realNetWorth": {
 										"date": "2052-10-31",
-										"amount": "1697288.79"
+										"amount": "176634.89"
 									}
 								},
 								{
 									"index": 26,
 									"from": "2052-10-31",
-									"to": "2053-10-30",
-									"ages": [],
-									"openingNetWorth": "3659868.94",
-									"closingNetWorth": "2726927.86",
-									"income": "0.00",
-									"expense": "1086922.08",
-									"contributions": "0.00",
-									"unfundedContributions": "0.00",
-									"interest": "153981.00",
-									"unmet": "0.00",
-									"partial": false,
-									"realNetWorth": {
-										"date": "2053-10-31",
-										"amount": "1227797.19"
-									}
-								},
-								{
-									"index": 27,
-									"from": "2053-10-31",
-									"to": "2054-10-30",
-									"ages": [],
-									"openingNetWorth": "2726927.86",
-									"closingNetWorth": "1713861.76",
-									"income": "0.00",
-									"expense": "1119529.68",
-									"contributions": "0.00",
-									"unfundedContributions": "0.00",
-									"interest": "106463.58",
-									"unmet": "0.00",
-									"partial": false,
-									"realNetWorth": {
-										"date": "2054-10-31",
-										"amount": "749189.27"
-									}
-								},
-								{
-									"index": 28,
-									"from": "2054-10-31",
-									"to": "2055-10-30",
-									"ages": [],
-									"openingNetWorth": "1713861.76",
-									"closingNetWorth": "615660.02",
-									"income": "0.00",
-									"expense": "1153115.52",
-									"contributions": "0.00",
-									"unfundedContributions": "0.00",
-									"interest": "54913.78",
-									"unmet": "0.00",
-									"partial": false,
-									"realNetWorth": {
-										"date": "2055-10-31",
-										"amount": "261288.02"
-									}
-								},
-								{
-									"index": 29,
-									"from": "2055-10-31",
-									"to": "2056-05-01",
-									"ages": [],
-									"openingNetWorth": "615660.02",
+									"to": "2053-02-01",
+									"ages": [
+										{
+											"person": "me",
+											"age": 62
+										},
+										{
+											"person": "partner",
+											"age": 60
+										},
+										{
+											"person": "mali",
+											"age": 25
+										}
+									],
+									"openingNetWorth": "380878.35",
 									"closingNetWorth": "0.00",
 									"income": "0.00",
-									"expense": "692830.25",
+									"expense": "404391.51",
 									"contributions": "0.00",
 									"unfundedContributions": "0.00",
-									"interest": "6810.99",
-									"unmet": "70359.24",
+									"interest": "2380.91",
+									"unmet": "21132.25",
 									"partial": true,
 									"realNetWorth": {
-										"date": "2056-05-01",
+										"date": "2053-02-01",
 										"amount": "0.00"
 									}
 								}
@@ -7760,7 +8560,7 @@
 								{
 									"id": "net-worth-ten-million",
 									"reached": true,
-									"date": "2039-07-01"
+									"date": "2040-01-30"
 								},
 								{
 									"id": "net-worth-ten-trillion",
@@ -7794,10 +8594,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"name": "base",
-						"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
-						"effectiveContentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554"
+						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -7958,7 +8758,8 @@
 					],
 					"notes": [
 						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
-						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year."
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"29603.80 of Contributions could not be funded, so they were not made."
 					],
 					"horizon": "2060-12-31",
 					"currency": "THB",
@@ -7970,23 +8771,36 @@
 					},
 					"fi": {
 						"reachable": true,
-						"fiDate": "2042-10-01",
+						"fiDate": "2044-12-01",
 						"reference": {
 							"label": "ruleOfThumb",
-							"date": "2042-10-01",
+							"date": "2044-12-01",
 							"multiplier": 25,
 							"basis": "unlockedAssets",
 							"window": "next12Months",
 							"terms": "nominal",
-							"unlockedAssets": "13303437.41",
-							"numerator": "13303437.41",
-							"annualExpenses": "806809.00",
-							"threshold": "20170225.00",
-							"multipleBps": 164889,
+							"unlockedAssets": "14451197.36",
+							"numerator": "14451197.36",
+							"annualExpenses": "994054.44",
+							"threshold": "24851361.00",
+							"multipleBps": 145376,
 							"partial": false,
 							"met": false
 						},
-						"ages": []
+						"ages": [
+							{
+								"person": "me",
+								"age": 54
+							},
+							{
+								"person": "partner",
+								"age": 52
+							},
+							{
+								"person": "mali",
+								"age": 17
+							}
+						]
 					},
 					"taxYears": [
 						{
@@ -8432,10 +9246,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-						"effectiveContentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2"
+						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -8597,7 +9411,7 @@
 					"notes": [
 						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
 						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
-						"3083347.45 of Contributions could not be funded, so they were not made."
+						"3112951.25 of Contributions could not be funded, so they were not made."
 					],
 					"horizon": "2060-12-31",
 					"currency": "THB",
@@ -8613,8 +9427,8 @@
 						"bestCase": {
 							"month": "2040-06-01",
 							"runsOut": {
-								"date": "2056-05-01",
-								"unmet": "70359.24"
+								"date": "2053-02-01",
+								"unmet": "21132.25"
 							}
 						}
 					},
@@ -8939,7 +9753,7 @@
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
-							"settled": true,
+							"settled": false,
 							"partial": false,
 							"assumptions": []
 						},
@@ -8948,42 +9762,6 @@
 							"from": "2053-01-01",
 							"to": "2053-12-31",
 							"settlementDate": "2054-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2054-01-01",
-							"to": "2054-12-31",
-							"settlementDate": "2055-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2055-01-01",
-							"to": "2055-12-31",
-							"settlementDate": "2056-03-31",
-							"due": "0.00",
-							"prepaid": "0.00",
-							"owed": "0.00",
-							"settled": true,
-							"partial": false,
-							"assumptions": []
-						},
-						{
-							"levy": "th-2026-pit",
-							"from": "2056-01-01",
-							"to": "2056-12-31",
-							"settlementDate": "2057-03-31",
 							"due": "0.00",
 							"prepaid": "0.00",
 							"owed": "0.00",
@@ -9031,10 +9809,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+							"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 							"name": "base",
-							"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
-							"effectiveContentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554"
+							"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+							"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -9194,19 +9972,19 @@
 						],
 						"fi": {
 							"reachable": true,
-							"fiDate": "2042-10-01",
+							"fiDate": "2044-12-01",
 							"reference": {
 								"label": "ruleOfThumb",
-								"date": "2042-10-01",
+								"date": "2044-12-01",
 								"multiplier": 25,
 								"basis": "unlockedAssets",
 								"window": "next12Months",
 								"terms": "nominal",
-								"unlockedAssets": "13303437.41",
-								"numerator": "13303437.41",
-								"annualExpenses": "806809.00",
-								"threshold": "20170225.00",
-								"multipleBps": 164889,
+								"unlockedAssets": "14451197.36",
+								"numerator": "14451197.36",
+								"annualExpenses": "994054.44",
+								"threshold": "24851361.00",
+								"multipleBps": 145376,
 								"partial": false,
 								"met": false
 							}
@@ -9643,7 +10421,7 @@
 							{
 								"id": "net-worth-ten-million",
 								"reached": true,
-								"date": "2039-07-01"
+								"date": "2040-01-30"
 							},
 							{
 								"id": "net-worth-ten-trillion",
@@ -9654,34 +10432,34 @@
 						"netWorth": {
 							"final": {
 								"date": "2060-12-31",
-								"nominal": "19756836.98",
-								"real": "7196252.23"
+								"nominal": "14765406.15",
+								"real": "5378167.93"
 							},
 							"atAges": [
 								{
 									"age": 45,
-									"nominal": "6520465.53",
-									"real": "5072417.00"
+									"nominal": "6357274.38",
+									"real": "4945466.93"
 								},
 								{
 									"age": 55,
-									"nominal": "16119241.91",
-									"real": "9330581.52"
+									"nominal": "14726773.34",
+									"real": "8524554.69"
 								},
 								{
 									"age": 60,
-									"nominal": "22869824.55",
-									"real": "11419334.85"
+									"nominal": "20669271.11",
+									"real": "10320557.01"
 								}
 							]
 						}
 					},
 					"b": {
 						"scenario": {
-							"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+							"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-							"effectiveContentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2"
+							"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+							"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -9845,8 +10623,8 @@
 							"bestCase": {
 								"month": "2040-06-01",
 								"runsOut": {
-									"date": "2056-05-01",
-									"unmet": "70359.24"
+									"date": "2053-02-01",
+									"unmet": "21132.25"
 								}
 							}
 						},
@@ -10171,7 +10949,7 @@
 								"due": "0.00",
 								"prepaid": "0.00",
 								"owed": "0.00",
-								"settled": true,
+								"settled": false,
 								"partial": false,
 								"assumptions": []
 							},
@@ -10183,50 +10961,14 @@
 								"due": "0.00",
 								"prepaid": "0.00",
 								"owed": "0.00",
-								"settled": true,
-								"partial": false,
-								"assumptions": []
-							},
-							{
-								"levy": "th-2026-pit",
-								"from": "2054-01-01",
-								"to": "2054-12-31",
-								"settlementDate": "2055-03-31",
-								"due": "0.00",
-								"prepaid": "0.00",
-								"owed": "0.00",
-								"settled": true,
-								"partial": false,
-								"assumptions": []
-							},
-							{
-								"levy": "th-2026-pit",
-								"from": "2055-01-01",
-								"to": "2055-12-31",
-								"settlementDate": "2056-03-31",
-								"due": "0.00",
-								"prepaid": "0.00",
-								"owed": "0.00",
-								"settled": true,
-								"partial": false,
-								"assumptions": []
-							},
-							{
-								"levy": "th-2026-pit",
-								"from": "2056-01-01",
-								"to": "2056-12-31",
-								"settlementDate": "2057-03-31",
-								"due": "0.00",
-								"prepaid": "0.00",
-								"owed": "0.00",
 								"settled": false,
 								"partial": true,
 								"assumptions": []
 							}
 						],
 						"runOut": {
-							"date": "2056-05-01",
-							"unmet": "70359.24"
+							"date": "2053-02-01",
+							"unmet": "21132.25"
 						},
 						"milestones": [
 							{
@@ -10237,7 +10979,7 @@
 							{
 								"id": "net-worth-ten-million",
 								"reached": true,
-								"date": "2039-07-01"
+								"date": "2040-01-30"
 							},
 							{
 								"id": "net-worth-ten-trillion",
@@ -10247,25 +10989,25 @@
 						],
 						"netWorth": {
 							"final": {
-								"date": "2056-05-01",
+								"date": "2053-02-01",
 								"nominal": "0.00",
 								"real": "0.00"
 							},
 							"atAges": [
 								{
 									"age": 45,
-									"nominal": "6520465.53",
-									"real": "5072417.00"
+									"nominal": "6357274.38",
+									"real": "4945466.93"
 								},
 								{
 									"age": 55,
-									"nominal": "8588148.13",
-									"real": "4971227.35"
+									"nominal": "7195679.60",
+									"real": "4165200.54"
 								},
 								{
 									"age": 60,
-									"nominal": "5668144.04",
-									"real": "2830211.25"
+									"nominal": "3142793.71",
+									"real": "1569256.19"
 								}
 							]
 						}
@@ -10283,13 +11025,13 @@
 						},
 						{
 							"age": 55,
-							"nominal": "-7531093.78",
-							"real": "-4359354.17"
+							"nominal": "-7531093.74",
+							"real": "-4359354.15"
 						},
 						{
 							"age": 60,
-							"nominal": "-17201680.51",
-							"real": "-8589123.60"
+							"nominal": "-17526477.40",
+							"real": "-8751300.82"
 						}
 					]
 				},
@@ -10297,7 +11039,8 @@
 				"notes": [
 					"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
 					"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
-					"Side B could not fund 3083347.45 of Contributions, so they were not made."
+					"Side A could not fund 29603.80 of Contributions, so they were not made.",
+					"Side B could not fund 3112951.25 of Contributions, so they were not made."
 				]
 			}
 		},
@@ -10326,10 +11069,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"name": "base",
-						"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
-						"effectiveContentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554"
+						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -10667,23 +11410,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "5325045.58"
+									"value": "5309030.42"
 								},
 								{
 									"level": 25,
-									"value": "5498139.03"
+									"value": "5482123.88"
 								},
 								{
 									"level": 50,
-									"value": "5634288.97"
+									"value": "5618273.83"
 								},
 								{
 									"level": 75,
-									"value": "5747552.42"
+									"value": "5731539.94"
 								},
 								{
 									"level": 90,
-									"value": "5903800.48"
+									"value": "5887785.33"
 								}
 							]
 						},
@@ -10693,23 +11436,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "6026514.72"
+									"value": "5913368.42"
 								},
 								{
 									"level": 25,
-									"value": "6177097.13"
+									"value": "6064609.04"
 								},
 								{
 									"level": 50,
-									"value": "6387485.91"
+									"value": "6274732.23"
 								},
 								{
 									"level": 75,
-									"value": "6553065.35"
+									"value": "6439722.53"
 								},
 								{
 									"level": 90,
-									"value": "6762314.17"
+									"value": "6648817.54"
 								}
 							]
 						},
@@ -10719,23 +11462,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "6798319.61"
+									"value": "6584850.41"
 								},
 								{
 									"level": 25,
-									"value": "6989676.64"
+									"value": "6777872.48"
 								},
 								{
 									"level": 50,
-									"value": "7202793.84"
+									"value": "6989530.47"
 								},
 								{
 									"level": 75,
-									"value": "7454120.72"
+									"value": "7241408.97"
 								},
 								{
 									"level": 90,
-									"value": "7686084.59"
+									"value": "7471367.75"
 								}
 							]
 						},
@@ -10745,23 +11488,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "7520515.70"
+									"value": "7204175.49"
 								},
 								{
 									"level": 25,
-									"value": "7784203.72"
+									"value": "7468061.47"
 								},
 								{
 									"level": 50,
-									"value": "8056167.49"
+									"value": "7739667.68"
 								},
 								{
 									"level": 75,
-									"value": "8297144.95"
+									"value": "7979597.19"
 								},
 								{
 									"level": 90,
-									"value": "8537201.17"
+									"value": "8220112.82"
 								}
 							]
 						},
@@ -10771,23 +11514,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "8287734.72"
+									"value": "7868969.95"
 								},
 								{
 									"level": 25,
-									"value": "8602618.16"
+									"value": "8179099.88"
 								},
 								{
 									"level": 50,
-									"value": "8957780.06"
+									"value": "8531201.15"
 								},
 								{
 									"level": 75,
-									"value": "9253476.09"
+									"value": "8830742.35"
 								},
 								{
 									"level": 90,
-									"value": "9518828.82"
+									"value": "9090960.76"
 								}
 							]
 						},
@@ -10797,23 +11540,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9132158.39"
+									"value": "8600534.11"
 								},
 								{
 									"level": 25,
-									"value": "9462535.73"
+									"value": "8935432.47"
 								},
 								{
 									"level": 50,
-									"value": "9910160.91"
+									"value": "9372311.23"
 								},
 								{
 									"level": 75,
-									"value": "10262393.79"
+									"value": "9723766.54"
 								},
 								{
 									"level": 90,
-									"value": "10449642.99"
+									"value": "9911830.43"
 								}
 							]
 						},
@@ -10823,23 +11566,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9947579.79"
+									"value": "9297337.53"
 								},
 								{
 									"level": 25,
-									"value": "10376429.16"
+									"value": "9733832.65"
 								},
 								{
 									"level": 50,
-									"value": "10888304.97"
+									"value": "10243521.02"
 								},
 								{
 									"level": 75,
-									"value": "11288051.51"
+									"value": "10631675.70"
 								},
 								{
 									"level": 90,
-									"value": "11564825.84"
+									"value": "10900527.93"
 								}
 							]
 						},
@@ -10849,23 +11592,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "10872141.18"
+									"value": "10127010.04"
 								},
 								{
 									"level": 25,
-									"value": "11387500.22"
+									"value": "10610582.12"
 								},
 								{
 									"level": 50,
-									"value": "11899398.51"
+									"value": "11131154.69"
 								},
 								{
 									"level": 75,
-									"value": "12461999.55"
+									"value": "11681588.60"
 								},
 								{
 									"level": 90,
-									"value": "12793259.50"
+									"value": "12014900.40"
 								}
 							]
 						},
@@ -10875,23 +11618,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "11942257.61"
+									"value": "11069193.89"
 								},
 								{
 									"level": 25,
-									"value": "12383448.24"
+									"value": "11501974.60"
 								},
 								{
 									"level": 50,
-									"value": "12971504.62"
+									"value": "12080058.48"
 								},
 								{
 									"level": 75,
-									"value": "13542317.41"
+									"value": "12657646.12"
 								},
 								{
 									"level": 90,
-									"value": "14035126.39"
+									"value": "13129523.67"
 								}
 							]
 						},
@@ -10901,23 +11644,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "12922886.93"
+									"value": "11921642.43"
 								},
 								{
 									"level": 25,
-									"value": "13571293.53"
+									"value": "12549820.87"
 								},
 								{
 									"level": 50,
-									"value": "14169631.92"
+									"value": "13155284.98"
 								},
 								{
 									"level": 75,
-									"value": "14757100.59"
+									"value": "13728733.69"
 								},
 								{
 									"level": 90,
-									"value": "15327018.52"
+									"value": "14292347.33"
 								}
 							]
 						},
@@ -10927,23 +11670,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "14076948.68"
+									"value": "12941251.51"
 								},
 								{
 									"level": 25,
-									"value": "14823429.25"
+									"value": "13673795.27"
 								},
 								{
 									"level": 50,
-									"value": "15447317.94"
+									"value": "14286325.06"
 								},
 								{
 									"level": 75,
-									"value": "16095046.95"
+									"value": "14924020.40"
 								},
 								{
 									"level": 90,
-									"value": "16726527.02"
+									"value": "15553043.11"
 								}
 							]
 						},
@@ -10953,23 +11696,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "15327516.65"
+									"value": "14050298.65"
 								},
 								{
 									"level": 25,
-									"value": "16058361.77"
+									"value": "14777369.09"
 								},
 								{
 									"level": 50,
-									"value": "16756142.36"
+									"value": "15451667.90"
 								},
 								{
 									"level": 75,
-									"value": "17395302.28"
+									"value": "16082898.32"
 								},
 								{
 									"level": 90,
-									"value": "18447854.07"
+									"value": "17127494.73"
 								}
 							]
 						},
@@ -10979,23 +11722,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "16538566.81"
+									"value": "15106470.07"
 								},
 								{
 									"level": 25,
-									"value": "17296405.40"
+									"value": "15886070.75"
 								},
 								{
 									"level": 50,
-									"value": "18083400.44"
+									"value": "16662198.31"
 								},
 								{
 									"level": 75,
-									"value": "19087804.78"
+									"value": "17637389.84"
 								},
 								{
 									"level": 90,
-									"value": "20049549.32"
+									"value": "18594498.44"
 								}
 							]
 						},
@@ -11005,23 +11748,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "17852714.00"
+									"value": "16311222.81"
 								},
 								{
 									"level": 25,
-									"value": "18662180.41"
+									"value": "17112027.15"
 								},
 								{
 									"level": 50,
-									"value": "19541595.16"
+									"value": "17962259.95"
 								},
 								{
 									"level": 75,
-									"value": "20596605.65"
+									"value": "19029086.64"
 								},
 								{
 									"level": 90,
-									"value": "21559159.47"
+									"value": "19938324.42"
 								}
 							]
 						},
@@ -11031,23 +11774,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "19099533.68"
+									"value": "17385795.86"
 								},
 								{
 									"level": 25,
-									"value": "20028532.42"
+									"value": "18321228.59"
 								},
 								{
 									"level": 50,
-									"value": "21061904.78"
+									"value": "19344173.99"
 								},
 								{
 									"level": 75,
-									"value": "22190890.98"
+									"value": "20443356.64"
 								},
 								{
 									"level": 90,
-									"value": "23550144.74"
+									"value": "21772997.72"
 								}
 							]
 						},
@@ -11057,23 +11800,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "20510087.96"
+									"value": "18663928.19"
 								},
 								{
 									"level": 25,
-									"value": "21403152.26"
+									"value": "19545178.11"
 								},
 								{
 									"level": 50,
-									"value": "22506142.23"
+									"value": "20626051.94"
 								},
 								{
 									"level": 75,
-									"value": "23941043.00"
+									"value": "22028803.24"
 								},
 								{
 									"level": 90,
-									"value": "25388412.49"
+									"value": "23475915.90"
 								}
 							]
 						},
@@ -11083,23 +11826,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21906978.81"
+									"value": "19925175.26"
 								},
 								{
 									"level": 25,
-									"value": "23025964.43"
+									"value": "20995166.90"
 								},
 								{
 									"level": 50,
-									"value": "24482924.24"
+									"value": "22447860.19"
 								},
 								{
 									"level": 75,
-									"value": "25856844.51"
+									"value": "23787816.44"
 								},
 								{
 									"level": 90,
-									"value": "27522364.25"
+									"value": "25426403.78"
 								}
 							]
 						},
@@ -11109,23 +11852,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22857796.54"
+									"value": "20698521.24"
 								},
 								{
 									"level": 25,
-									"value": "23692734.43"
+									"value": "21512460.45"
 								},
 								{
 									"level": 50,
-									"value": "25379661.00"
+									"value": "23157249.72"
 								},
 								{
 									"level": 75,
-									"value": "27022468.28"
+									"value": "24783915.48"
 								},
 								{
 									"level": 90,
-									"value": "28874295.16"
+									"value": "26612908.89"
 								}
 							]
 						},
@@ -11135,23 +11878,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22515415.71"
+									"value": "20158526.79"
 								},
 								{
 									"level": 25,
-									"value": "23692697.60"
+									"value": "21341200.10"
 								},
 								{
 									"level": 50,
-									"value": "25461661.78"
+									"value": "23041712.08"
 								},
 								{
 									"level": 75,
-									"value": "26984726.53"
+									"value": "24545755.39"
 								},
 								{
 									"level": 90,
-									"value": "28767131.66"
+									"value": "26301283.15"
 								}
 							]
 						},
@@ -11161,23 +11904,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22360923.46"
+									"value": "19846564.87"
 								},
 								{
 									"level": 25,
-									"value": "23477116.23"
+									"value": "20984832.16"
 								},
 								{
 									"level": 50,
-									"value": "25557761.56"
+									"value": "22987771.48"
 								},
 								{
 									"level": 75,
-									"value": "27465264.37"
+									"value": "24851955.13"
 								},
 								{
 									"level": 90,
-									"value": "29295063.45"
+									"value": "26643809.38"
 								}
 							]
 						},
@@ -11187,23 +11930,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22281925.56"
+									"value": "19583531.05"
 								},
 								{
 									"level": 25,
-									"value": "23658648.44"
+									"value": "20905061.73"
 								},
 								{
 									"level": 50,
-									"value": "25818582.22"
+									"value": "23070524.44"
 								},
 								{
 									"level": 75,
-									"value": "27983234.68"
+									"value": "25173188.25"
 								},
 								{
 									"level": 90,
-									"value": "29862619.45"
+									"value": "27069205.33"
 								}
 							]
 						},
@@ -11213,23 +11956,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22044276.52"
+									"value": "19177282.18"
 								},
 								{
 									"level": 25,
-									"value": "23649323.35"
+									"value": "20750905.39"
 								},
 								{
 									"level": 50,
-									"value": "26089156.80"
+									"value": "23152105.54"
 								},
 								{
 									"level": 75,
-									"value": "28120200.29"
+									"value": "25147793.03"
 								},
 								{
 									"level": 90,
-									"value": "30297517.09"
+									"value": "27304400.84"
 								}
 							]
 						},
@@ -11239,23 +11982,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21956291.83"
+									"value": "18900463.69"
 								},
 								{
 									"level": 25,
-									"value": "23826227.38"
+									"value": "20667279.19"
 								},
 								{
 									"level": 50,
-									"value": "26356534.46"
+									"value": "23216766.85"
 								},
 								{
 									"level": 75,
-									"value": "28508652.70"
+									"value": "25337729.77"
 								},
 								{
 									"level": 90,
-									"value": "30659880.45"
+									"value": "27465570.90"
 								}
 							]
 						},
@@ -11265,23 +12008,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21551976.04"
+									"value": "18380892.47"
 								},
 								{
 									"level": 25,
-									"value": "24018394.08"
+									"value": "20666366.62"
 								},
 								{
 									"level": 50,
-									"value": "26328375.71"
+									"value": "22969368.80"
 								},
 								{
 									"level": 75,
-									"value": "29020039.77"
+									"value": "25613243.97"
 								},
 								{
 									"level": 90,
-									"value": "31619584.30"
+									"value": "28127431.92"
 								}
 							]
 						},
@@ -11291,23 +12034,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22000615.95"
+									"value": "18413564.20"
 								},
 								{
 									"level": 25,
-									"value": "23925740.83"
+									"value": "20318261.39"
 								},
 								{
 									"level": 50,
-									"value": "26574893.93"
+									"value": "22928140.81"
 								},
 								{
 									"level": 75,
-									"value": "29976517.72"
+									"value": "26327708.09"
 								},
 								{
 									"level": 90,
-									"value": "32086335.40"
+									"value": "28336603.52"
 								}
 							]
 						},
@@ -11317,23 +12060,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21765459.47"
+									"value": "17496448.38"
 								},
 								{
 									"level": 25,
-									"value": "23893393.30"
+									"value": "19678833.63"
 								},
 								{
 									"level": 50,
-									"value": "27212731.29"
+									"value": "23097665.22"
 								},
 								{
 									"level": 75,
-									"value": "30269766.62"
+									"value": "26255902.58"
 								},
 								{
 									"level": 90,
-									"value": "33466109.87"
+									"value": "29322413.76"
 								}
 							]
 						},
@@ -11343,23 +12086,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21648947.20"
+									"value": "17450266.51"
 								},
 								{
 									"level": 25,
-									"value": "24465093.23"
+									"value": "20094228.74"
 								},
 								{
 									"level": 50,
-									"value": "27389762.50"
+									"value": "22982864.70"
 								},
 								{
 									"level": 75,
-									"value": "30651601.53"
+									"value": "26243563.11"
 								},
 								{
 									"level": 90,
-									"value": "34569760.10"
+									"value": "29996074.68"
 								}
 							]
 						},
@@ -11369,23 +12112,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "22181625.51"
+									"value": "17353978.62"
 								},
 								{
 									"level": 25,
-									"value": "24450065.45"
+									"value": "19435954.14"
 								},
 								{
 									"level": 50,
-									"value": "27946973.48"
+									"value": "22982781.61"
 								},
 								{
 									"level": 75,
-									"value": "31995923.44"
+									"value": "26884363.87"
 								},
 								{
 									"level": 90,
-									"value": "35086137.10"
+									"value": "30060942.05"
 								}
 							]
 						},
@@ -11395,23 +12138,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "21944106.46"
+									"value": "17124625.69"
 								},
 								{
 									"level": 25,
-									"value": "24571556.24"
+									"value": "19474918.80"
 								},
 								{
 									"level": 50,
-									"value": "27952296.40"
+									"value": "22778714.10"
 								},
 								{
 									"level": 75,
-									"value": "31757298.65"
+									"value": "26635834.93"
 								},
 								{
 									"level": 90,
-									"value": "35654188.63"
+									"value": "30433338.18"
 								}
 							]
 						}
@@ -11615,44 +12358,44 @@
 								{
 									"index": 9,
 									"to": "2036-10-30",
-									"p10": "7520515.70",
-									"p50": "8056167.49",
-									"p90": "8537201.17"
+									"p10": "7204175.49",
+									"p50": "7739667.68",
+									"p90": "8220112.82"
 								},
 								{
 									"index": 14,
 									"to": "2041-10-30",
-									"p10": "11942257.61",
-									"p50": "12971504.62",
-									"p90": "14035126.39"
+									"p10": "11069193.89",
+									"p50": "12080058.48",
+									"p90": "13129523.67"
 								},
 								{
 									"index": 19,
 									"to": "2046-10-30",
-									"p10": "17852714.00",
-									"p50": "19541595.16",
-									"p90": "21559159.47"
+									"p10": "16311222.81",
+									"p50": "17962259.95",
+									"p90": "19938324.42"
 								},
 								{
 									"index": 24,
 									"to": "2051-10-30",
-									"p10": "22515415.71",
-									"p50": "25461661.78",
-									"p90": "28767131.66"
+									"p10": "20158526.79",
+									"p50": "23041712.08",
+									"p90": "26301283.15"
 								},
 								{
 									"index": 29,
 									"to": "2056-10-30",
-									"p10": "21551976.04",
-									"p50": "26328375.71",
-									"p90": "31619584.30"
+									"p10": "18380892.47",
+									"p50": "22969368.80",
+									"p90": "28127431.92"
 								},
 								{
 									"index": 34,
 									"to": "2060-12-31",
-									"p10": "21944106.46",
-									"p50": "27952296.40",
-									"p90": "35654188.63"
+									"p10": "17124625.69",
+									"p50": "22778714.10",
+									"p90": "30433338.18"
 								}
 							]
 						}
@@ -11683,10 +12426,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-						"effectiveContentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2"
+						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -11848,7 +12591,7 @@
 					"notes": [
 						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
 						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
-						"The plan holds to 2060-12-31 on 55 of 200 seeded Market paths: a success share of 27.50%.",
+						"The plan holds to 2060-12-31 on 1 of 200 seeded Market paths: a success share of 0.50%.",
 						"The chance is over the return model \"illustrative-demo-model\" with seed 0123456789abcdef, and every figure is nominal."
 					],
 					"horizon": "2060-12-31",
@@ -11859,8 +12602,8 @@
 						"paths": 200
 					},
 					"paths": 200,
-					"succeeded": 55,
-					"successBps": 2750,
+					"succeeded": 1,
+					"successBps": 50,
 					"bands": [
 						{
 							"index": 0,
@@ -12024,23 +12767,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "5325045.58"
+									"value": "5309030.42"
 								},
 								{
 									"level": 25,
-									"value": "5498139.03"
+									"value": "5482123.88"
 								},
 								{
 									"level": 50,
-									"value": "5634288.97"
+									"value": "5618273.83"
 								},
 								{
 									"level": 75,
-									"value": "5747552.42"
+									"value": "5731539.94"
 								},
 								{
 									"level": 90,
-									"value": "5903800.48"
+									"value": "5887785.33"
 								}
 							]
 						},
@@ -12050,23 +12793,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "6026514.72"
+									"value": "5913368.42"
 								},
 								{
 									"level": 25,
-									"value": "6177097.13"
+									"value": "6064609.04"
 								},
 								{
 									"level": 50,
-									"value": "6387485.91"
+									"value": "6274732.23"
 								},
 								{
 									"level": 75,
-									"value": "6553065.35"
+									"value": "6439722.53"
 								},
 								{
 									"level": 90,
-									"value": "6762314.17"
+									"value": "6648817.54"
 								}
 							]
 						},
@@ -12076,23 +12819,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "6798319.61"
+									"value": "6584850.41"
 								},
 								{
 									"level": 25,
-									"value": "6989676.64"
+									"value": "6777872.48"
 								},
 								{
 									"level": 50,
-									"value": "7202793.84"
+									"value": "6989530.47"
 								},
 								{
 									"level": 75,
-									"value": "7454120.72"
+									"value": "7241408.97"
 								},
 								{
 									"level": 90,
-									"value": "7686084.59"
+									"value": "7471367.75"
 								}
 							]
 						},
@@ -12102,23 +12845,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "7520515.70"
+									"value": "7204175.49"
 								},
 								{
 									"level": 25,
-									"value": "7784203.72"
+									"value": "7468061.47"
 								},
 								{
 									"level": 50,
-									"value": "8056167.49"
+									"value": "7739667.68"
 								},
 								{
 									"level": 75,
-									"value": "8297144.95"
+									"value": "7979597.19"
 								},
 								{
 									"level": 90,
-									"value": "8537201.17"
+									"value": "8220112.82"
 								}
 							]
 						},
@@ -12128,23 +12871,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "8287734.72"
+									"value": "7868969.95"
 								},
 								{
 									"level": 25,
-									"value": "8602618.16"
+									"value": "8179099.88"
 								},
 								{
 									"level": 50,
-									"value": "8957780.06"
+									"value": "8531201.15"
 								},
 								{
 									"level": 75,
-									"value": "9253476.09"
+									"value": "8830742.35"
 								},
 								{
 									"level": 90,
-									"value": "9518828.82"
+									"value": "9090960.76"
 								}
 							]
 						},
@@ -12154,23 +12897,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9132158.39"
+									"value": "8600534.11"
 								},
 								{
 									"level": 25,
-									"value": "9462535.73"
+									"value": "8935432.47"
 								},
 								{
 									"level": 50,
-									"value": "9910160.91"
+									"value": "9372311.23"
 								},
 								{
 									"level": 75,
-									"value": "10262393.79"
+									"value": "9723766.54"
 								},
 								{
 									"level": 90,
-									"value": "10449642.99"
+									"value": "9911830.43"
 								}
 							]
 						},
@@ -12180,23 +12923,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9947579.79"
+									"value": "9297337.53"
 								},
 								{
 									"level": 25,
-									"value": "10376429.16"
+									"value": "9733832.65"
 								},
 								{
 									"level": 50,
-									"value": "10888304.97"
+									"value": "10243521.02"
 								},
 								{
 									"level": 75,
-									"value": "11288051.51"
+									"value": "10631675.70"
 								},
 								{
 									"level": 90,
-									"value": "11564825.84"
+									"value": "10900527.93"
 								}
 							]
 						},
@@ -12206,23 +12949,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "10215819.56"
+									"value": "9470688.01"
 								},
 								{
 									"level": 25,
-									"value": "10723373.71"
+									"value": "9946455.14"
 								},
 								{
 									"level": 50,
-									"value": "11236445.95"
+									"value": "10468201.74"
 								},
 								{
 									"level": 75,
-									"value": "11797228.09"
+									"value": "11017962.40"
 								},
 								{
 									"level": 90,
-									"value": "12127508.19"
+									"value": "11349592.64"
 								}
 							]
 						},
@@ -12232,23 +12975,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9822392.57"
+									"value": "8938003.73"
 								},
 								{
 									"level": 25,
-									"value": "10254899.33"
+									"value": "9373421.41"
 								},
 								{
 									"level": 50,
-									"value": "10875589.70"
+									"value": "9983453.98"
 								},
 								{
 									"level": 75,
-									"value": "11441676.42"
+									"value": "10535729.43"
 								},
 								{
 									"level": 90,
-									"value": "11891719.50"
+									"value": "10986113.04"
 								}
 							]
 						},
@@ -12258,23 +13001,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "9369453.83"
+									"value": "8371390.32"
 								},
 								{
 									"level": 25,
-									"value": "9942503.38"
+									"value": "8922740.58"
 								},
 								{
 									"level": 50,
-									"value": "10578391.55"
+									"value": "9559595.93"
 								},
 								{
 									"level": 75,
-									"value": "11128003.90"
+									"value": "10097431.98"
 								},
 								{
 									"level": 90,
-									"value": "11702419.84"
+									"value": "10670118.07"
 								}
 							]
 						},
@@ -12284,23 +13027,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "8907368.58"
+									"value": "7772076.65"
 								},
 								{
 									"level": 25,
-									"value": "9646397.66"
+									"value": "8485062.12"
 								},
 								{
 									"level": 50,
-									"value": "10226163.48"
+									"value": "9071803.77"
 								},
 								{
 									"level": 75,
-									"value": "10885320.54"
+									"value": "9720471.29"
 								},
 								{
 									"level": 90,
-									"value": "11515371.72"
+									"value": "10347224.48"
 								}
 							]
 						},
@@ -12310,23 +13053,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "8523354.05"
+									"value": "7247000.77"
 								},
 								{
 									"level": 25,
-									"value": "9336769.03"
+									"value": "8047892.98"
 								},
 								{
 									"level": 50,
-									"value": "9941579.04"
+									"value": "8646198.28"
 								},
 								{
 									"level": 75,
-									"value": "10599419.18"
+									"value": "9307821.42"
 								},
 								{
 									"level": 90,
-									"value": "11508725.28"
+									"value": "10182752.62"
 								}
 							]
 						},
@@ -12336,23 +13079,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "8043717.34"
+									"value": "6601812.91"
 								},
 								{
 									"level": 25,
-									"value": "8880853.27"
+									"value": "7413188.59"
 								},
 								{
 									"level": 50,
-									"value": "9603390.90"
+									"value": "8155270.19"
 								},
 								{
 									"level": 75,
-									"value": "10464084.79"
+									"value": "9031172.16"
 								},
 								{
 									"level": 90,
-									"value": "11427649.97"
+									"value": "9962722.36"
 								}
 							]
 						},
@@ -12362,23 +13105,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "7747696.74"
+									"value": "6126700.32"
 								},
 								{
 									"level": 25,
-									"value": "8493696.64"
+									"value": "6841023.63"
 								},
 								{
 									"level": 50,
-									"value": "9231242.77"
+									"value": "7612068.10"
 								},
 								{
 									"level": 75,
-									"value": "10216059.68"
+									"value": "8474674.53"
 								},
 								{
 									"level": 90,
-									"value": "11155730.20"
+									"value": "9487721.43"
 								}
 							]
 						},
@@ -12388,23 +13131,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "7174734.68"
+									"value": "5400673.31"
 								},
 								{
 									"level": 25,
-									"value": "8010346.19"
+									"value": "6172503.98"
 								},
 								{
 									"level": 50,
-									"value": "8792843.88"
+									"value": "6907262.95"
 								},
 								{
 									"level": 75,
-									"value": "10032098.05"
+									"value": "8126688.65"
 								},
 								{
 									"level": 90,
-									"value": "11056779.56"
+									"value": "9060130.42"
 								}
 							]
 						},
@@ -12414,23 +13157,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "6624868.66"
+									"value": "4515608.27"
 								},
 								{
 									"level": 25,
-									"value": "7413341.56"
+									"value": "5365651.38"
 								},
 								{
 									"level": 50,
-									"value": "8311594.29"
+									"value": "6067776.02"
 								},
 								{
 									"level": 75,
-									"value": "9674658.50"
+									"value": "7454217.68"
 								},
 								{
 									"level": 90,
-									"value": "10825228.83"
+									"value": "8669759.70"
 								}
 							]
 						},
@@ -12440,23 +13183,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "5948236.94"
+									"value": "3691321.69"
 								},
 								{
 									"level": 25,
-									"value": "6906347.47"
+									"value": "4558837.95"
 								},
 								{
 									"level": 50,
-									"value": "7943204.83"
+									"value": "5412549.30"
 								},
 								{
 									"level": 75,
-									"value": "9160711.28"
+									"value": "6666739.85"
 								},
 								{
 									"level": 90,
-									"value": "10580748.94"
+									"value": "8076172.55"
 								}
 							]
 						},
@@ -12466,23 +13209,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "5204785.70"
+									"value": "2685207.60"
 								},
 								{
 									"level": 25,
-									"value": "6276924.58"
+									"value": "3581794.38"
 								},
 								{
 									"level": 50,
-									"value": "7362693.31"
+									"value": "4611830.10"
 								},
 								{
 									"level": 75,
-									"value": "8776255.43"
+									"value": "6009925.02"
 								},
 								{
 									"level": 90,
-									"value": "10282971.90"
+									"value": "7370960.65"
 								}
 							]
 						},
@@ -12492,23 +13235,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "4553507.89"
+									"value": "1629190.22"
 								},
 								{
 									"level": 25,
-									"value": "5657651.99"
+									"value": "2649522.13"
 								},
 								{
 									"level": 50,
-									"value": "6833748.65"
+									"value": "3712386.82"
 								},
 								{
 									"level": 75,
-									"value": "8279633.57"
+									"value": "5147105.17"
 								},
 								{
 									"level": 90,
-									"value": "9891352.38"
+									"value": "6665852.09"
 								}
 							]
 						},
@@ -12518,23 +13261,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "3720702.07"
+									"value": "448283.39"
 								},
 								{
 									"level": 25,
-									"value": "4927002.92"
+									"value": "1551198.33"
 								},
 								{
 									"level": 50,
-									"value": "6237849.87"
+									"value": "2696287.38"
 								},
 								{
 									"level": 75,
-									"value": "7825620.25"
+									"value": "4237347.57"
 								},
 								{
 									"level": 90,
-									"value": "9656987.49"
+									"value": "5818120.30"
 								}
 							]
 						},
@@ -12544,23 +13287,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "2841940.47"
+									"value": "0.00"
 								},
 								{
 									"level": 25,
-									"value": "4075230.02"
+									"value": "365389.82"
 								},
 								{
 									"level": 50,
-									"value": "5593777.70"
+									"value": "1599925.98"
 								},
 								{
 									"level": 75,
-									"value": "7190492.26"
+									"value": "3231236.92"
 								},
 								{
 									"level": 90,
-									"value": "9043925.58"
+									"value": "5034880.98"
 								}
 							]
 						},
@@ -12570,23 +13313,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "1845488.57"
+									"value": "0.00"
 								},
 								{
 									"level": 25,
-									"value": "3244497.66"
+									"value": "0.00"
 								},
 								{
 									"level": 50,
-									"value": "4825442.16"
+									"value": "345908.30"
 								},
 								{
 									"level": 75,
-									"value": "6567864.81"
+									"value": "2170099.65"
 								},
 								{
 									"level": 90,
-									"value": "8502323.14"
+									"value": "3997370.78"
 								}
 							]
 						},
@@ -12596,23 +13339,23 @@
 							"netWorth": [
 								{
 									"level": 10,
-									"value": "733380.73"
+									"value": "0.00"
 								},
 								{
 									"level": 25,
-									"value": "2259767.17"
+									"value": "0.00"
 								},
 								{
 									"level": 50,
-									"value": "4019315.69"
+									"value": "0.00"
 								},
 								{
 									"level": 75,
-									"value": "5752018.33"
+									"value": "889413.33"
 								},
 								{
 									"level": 90,
-									"value": "7956719.67"
+									"value": "2893355.87"
 								}
 							]
 						},
@@ -12626,19 +13369,19 @@
 								},
 								{
 									"level": 25,
-									"value": "1223052.69"
+									"value": "0.00"
 								},
 								{
 									"level": 50,
-									"value": "3006087.56"
+									"value": "0.00"
 								},
 								{
 									"level": 75,
-									"value": "4866285.25"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "7022898.11"
+									"value": "1604684.14"
 								}
 							]
 						},
@@ -12652,19 +13395,19 @@
 								},
 								{
 									"level": 25,
-									"value": "20929.69"
+									"value": "0.00"
 								},
 								{
 									"level": 50,
-									"value": "1983417.15"
+									"value": "0.00"
 								},
 								{
 									"level": 75,
-									"value": "4000000.74"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "6136207.22"
+									"value": "285788.25"
 								}
 							]
 						},
@@ -12682,15 +13425,15 @@
 								},
 								{
 									"level": 50,
-									"value": "806966.11"
+									"value": "0.00"
 								},
 								{
 									"level": 75,
-									"value": "2864371.13"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "5361740.09"
+									"value": "0.00"
 								}
 							]
 						},
@@ -12712,11 +13455,11 @@
 								},
 								{
 									"level": 75,
-									"value": "1690456.24"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "4293482.65"
+									"value": "0.00"
 								}
 							]
 						},
@@ -12738,11 +13481,11 @@
 								},
 								{
 									"level": 75,
-									"value": "409382.63"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "3255466.30"
+									"value": "0.00"
 								}
 							]
 						},
@@ -12764,11 +13507,11 @@
 								},
 								{
 									"level": 75,
-									"value": "177986.74"
+									"value": "0.00"
 								},
 								{
 									"level": 90,
-									"value": "3081020.37"
+									"value": "0.00"
 								}
 							]
 						}
@@ -12902,52 +13645,52 @@
 						{
 							"index": 25,
 							"to": "2052-10-30",
-							"paths": 0
+							"paths": 16
 						},
 						{
 							"index": 26,
 							"to": "2053-10-30",
-							"paths": 0
+							"paths": 26
 						},
 						{
 							"index": 27,
 							"to": "2054-10-30",
-							"paths": 0
+							"paths": 43
 						},
 						{
 							"index": 28,
 							"to": "2055-10-30",
-							"paths": 9
+							"paths": 38
 						},
 						{
 							"index": 29,
 							"to": "2056-10-30",
-							"paths": 16
+							"paths": 39
 						},
 						{
 							"index": 30,
 							"to": "2057-10-30",
-							"paths": 23
+							"paths": 16
 						},
 						{
 							"index": 31,
 							"to": "2058-10-30",
-							"paths": 40
+							"paths": 10
 						},
 						{
 							"index": 32,
 							"to": "2059-10-30",
-							"paths": 23
+							"paths": 9
 						},
 						{
 							"index": 33,
 							"to": "2060-10-30",
-							"paths": 31
+							"paths": 2
 						},
 						{
 							"index": 34,
 							"to": "2060-12-31",
-							"paths": 3
+							"paths": 0
 						}
 					],
 					"tables": [
@@ -12972,44 +13715,44 @@
 								{
 									"index": 9,
 									"to": "2036-10-30",
-									"p10": "7520515.70",
-									"p50": "8056167.49",
-									"p90": "8537201.17"
+									"p10": "7204175.49",
+									"p50": "7739667.68",
+									"p90": "8220112.82"
 								},
 								{
 									"index": 14,
 									"to": "2041-10-30",
-									"p10": "9822392.57",
-									"p50": "10875589.70",
-									"p90": "11891719.50"
+									"p10": "8938003.73",
+									"p50": "9983453.98",
+									"p90": "10986113.04"
 								},
 								{
 									"index": 19,
 									"to": "2046-10-30",
-									"p10": "7747696.74",
-									"p50": "9231242.77",
-									"p90": "11155730.20"
+									"p10": "6126700.32",
+									"p50": "7612068.10",
+									"p90": "9487721.43"
 								},
 								{
 									"index": 24,
 									"to": "2051-10-30",
-									"p10": "4553507.89",
-									"p50": "6833748.65",
-									"p90": "9891352.38"
+									"p10": "1629190.22",
+									"p50": "3712386.82",
+									"p90": "6665852.09"
 								},
 								{
 									"index": 29,
 									"to": "2056-10-30",
 									"p10": "0.00",
-									"p50": "3006087.56",
-									"p90": "7022898.11"
+									"p50": "0.00",
+									"p90": "1604684.14"
 								},
 								{
 									"index": 34,
 									"to": "2060-12-31",
 									"p10": "0.00",
 									"p50": "0.00",
-									"p90": "3081020.37"
+									"p90": "0.00"
 								}
 							]
 						}
@@ -13023,103 +13766,103 @@
 			"data": {
 				"accounts": [
 					{
-						"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+						"id": "01a204c7-4990-7374-9519-048fa18bd242",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:43.876Z",
-						"updatedAt": "2026-11-22T19:25:43.876Z"
+						"createdAt": "2026-11-22T19:41:39.088Z",
+						"updatedAt": "2026-11-22T19:41:39.088Z"
 					},
 					{
-						"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+						"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.280Z",
-						"updatedAt": "2026-11-22T19:25:44.280Z"
+						"createdAt": "2026-11-22T19:41:39.562Z",
+						"updatedAt": "2026-11-22T19:41:39.562Z"
 					},
 					{
-						"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+						"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.056Z",
-						"updatedAt": "2026-11-22T19:25:44.056Z"
+						"createdAt": "2026-11-22T19:41:39.294Z",
+						"updatedAt": "2026-11-22T19:41:39.294Z"
 					},
 					{
-						"id": "01a204b8-b949-749b-8faf-2c8b2bd8f8c7",
+						"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
 						"name": "Fund Return",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.649Z",
-						"updatedAt": "2026-11-22T19:25:44.649Z"
+						"createdAt": "2026-11-22T19:41:40.032Z",
+						"updatedAt": "2026-11-22T19:41:40.032Z"
 					},
 					{
-						"id": "01a204b8-b9df-7379-8aed-d85966aa0254",
+						"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.799Z",
-						"updatedAt": "2026-11-22T19:25:44.799Z"
+						"createdAt": "2026-11-22T19:41:40.241Z",
+						"updatedAt": "2026-11-22T19:41:40.241Z"
 					},
 					{
-						"id": "01a204b8-bbbd-7629-bb8c-6848603a977e",
+						"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:45.277Z",
-						"updatedAt": "2026-11-22T19:25:45.277Z"
+						"createdAt": "2026-11-22T19:41:40.839Z",
+						"updatedAt": "2026-11-22T19:41:40.839Z"
 					},
 					{
-						"id": "01a204b8-ba7a-76f8-aad3-2d75413e4fff",
+						"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.954Z",
-						"updatedAt": "2026-11-22T19:25:44.954Z"
+						"createdAt": "2026-11-22T19:41:40.441Z",
+						"updatedAt": "2026-11-22T19:41:40.441Z"
 					},
 					{
-						"id": "01a204b8-b8a8-76a1-84f2-616546d26a4c",
+						"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:44.488Z",
-						"updatedAt": "2026-11-22T19:25:44.488Z"
+						"createdAt": "2026-11-22T19:41:39.821Z",
+						"updatedAt": "2026-11-22T19:41:39.821Z"
 					},
 					{
-						"id": "01a204b8-bb1b-753c-bf69-318a597e5c8c",
+						"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
 						"name": "Travel",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:45.115Z",
-						"updatedAt": "2026-11-22T19:25:45.115Z"
+						"createdAt": "2026-11-22T19:41:40.639Z",
+						"updatedAt": "2026-11-22T19:41:40.639Z"
 					}
 				]
 			}
@@ -13134,7 +13877,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204b8-b644-72a8-86a8-cf0ae83d8c79",
+							"id": "01a204c7-4990-7374-9519-048fa18bd242",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -13143,7 +13886,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b7d8-721f-8659-97dbb3735fbf",
+							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -13152,7 +13895,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204b8-b6f8-735b-ad15-64fe425e477e",
+							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -13174,22 +13917,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"name": "base",
-						"contentHash": "jcs1:sha256:bc4b7d4a60431203141f29b2dd9d14147e4555795b83d28f6a987580ede3c554",
+						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
 						"forkedFrom": null,
-						"version": 2,
-						"createdAt": "2026-11-22T19:25:46.390Z",
-						"updatedAt": "2026-11-22T19:25:46.564Z"
+						"version": 3,
+						"createdAt": "2026-11-22T19:41:42.246Z",
+						"updatedAt": "2026-11-22T19:41:42.692Z"
 					},
 					{
-						"id": "01a204b8-c166-75fc-8797-da81cd4ee77a",
+						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:68aa919c545413028e5f00e564ed7c1c6695c61252dae74b2ab87dcb0c13abd2",
-						"forkedFrom": "01a204b8-c016-70cc-9872-9758b2c31149",
+						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
+						"forkedFrom": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
 						"version": 1,
-						"createdAt": "2026-11-22T19:25:46.726Z",
-						"updatedAt": "2026-11-22T19:25:46.726Z"
+						"createdAt": "2026-11-22T19:41:42.922Z",
+						"updatedAt": "2026-11-22T19:41:42.922Z"
 					}
 				]
 			}

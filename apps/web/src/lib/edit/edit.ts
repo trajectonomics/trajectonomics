@@ -14,7 +14,13 @@ const planName = z
 	.refine((name) => planNameShapeError(name) === null, { message: "not a plan name traj can take" })
 
 /** The kinds of Edit, in the order the list names them. */
-export const EDIT_KINDS = ["copy-plan", "apply-plan", "delete-plan"] as const
+export const EDIT_KINDS = [
+	"copy-plan",
+	"apply-plan",
+	"delete-plan",
+	"set-household",
+	"remove-household",
+] as const
 
 /** One Edit, as the page sends it in the body of `POST /edit`. Strict: an unknown field is refused. */
 export const editSchema = z.discriminatedUnion("kind", [
@@ -30,6 +36,15 @@ export const editSchema = z.discriminatedUnion("kind", [
 	}),
 	z.strictObject({
 		kind: z.literal("delete-plan"),
+		name: planName,
+	}),
+	z.strictObject({
+		kind: z.literal("set-household"),
+		name: planName,
+		household: z.record(z.string(), z.unknown()),
+	}),
+	z.strictObject({
+		kind: z.literal("remove-household"),
 		name: planName,
 	}),
 ])
@@ -57,6 +72,14 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 			}
 		case "delete-plan":
 			return { argv: ["scenario", "rm", edit.name, ...flags] }
+		case "set-household":
+			// The household document is read from stdin, and its anchored dates are written (cli ADR-0048).
+			return {
+				argv: ["scenario", "household", edit.name, "--file", "-", ...flags],
+				stdin: JSON.stringify(edit.household),
+			}
+		case "remove-household":
+			return { argv: ["scenario", "household", edit.name, "--none", ...flags] }
 	}
 }
 
@@ -68,6 +91,9 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 	switch (edit.kind) {
 		case "delete-plan":
 			return scenarios.filter((name) => name !== edit.name)
+		case "set-household":
+		case "remove-household":
+			return [...scenarios]
 		case "copy-plan":
 		case "apply-plan":
 			return scenarios.length === 0 || scenarios.includes(edit.name)

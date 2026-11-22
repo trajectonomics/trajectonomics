@@ -4,6 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { createEditor, type Editor } from "./serve-edit"
@@ -26,7 +27,8 @@ export type ShownDocument = {
 	scenario: {
 		contentHash: string
 		version: number
-		document: { flows: { id: string; amount?: string }[] }
+		document: { flows: { id: string; amount?: string; end?: string }[] }
+		household: { anchors: { path: string; person: string; age?: number }[] } | null
 	}
 }
 
@@ -45,11 +47,12 @@ export async function setupEditor(): Promise<Editor> {
 	scratch = await mkdtemp(join(tmpdir(), "traj-web-edit-"))
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
+	// The demo ledger's Levy needs the Carry-in the demo states, or the projection of `base` is refused.
 	const next = createEditor({
 		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } },
 		cliVersion: "test",
-		params: { ...PARAMS, scenarios: ["base"] },
-		records: [],
+		params: { ...PARAMS, scenarios: ["base"], carryIn: true },
+		records: demoCarryIn(["base"]),
 		token: TOKEN,
 	})
 	const run = await next.refresh()

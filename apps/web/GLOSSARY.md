@@ -31,3 +31,11 @@ _Avoid_: pipeline, workflow, job, script
 **Edit**:
 A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` scenario commands, copy a plan, apply a Scenario document or delete a plan. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot or the CLI's error envelope.
 _Avoid_: save, mutation, update, PATCH, request, write
+
+**Household**:
+The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.
+_Avoid_: family, members, users, profile
+
+**Anchor**:
+One date of a Scenario item pinned to a person's age, life end or joining. The label reads "at me, age 60", and the date is the one the household wrote.
+_Avoid_: link, rule, trigger

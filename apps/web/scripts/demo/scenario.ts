@@ -10,6 +10,26 @@ export const DEMO_TAX = { tax: "th-2026", label: "salary=income.section40_1" }
 export const BASE_SALARY_END = "2050-05-14"
 export const RETIRE_EARLY_SALARY_END = "2040-05-14"
 
+/**
+ * The fictional household of `base`, whose ages pin two dates (cli ADR-0048). `me` is 60 on the last day
+ * of June 2050, and `mali` is 6 on the last day of September 2033; the Flows hold those dates, as the
+ * household writes them. The salary is not pinned, because `retire-early` moves its end.
+ */
+export const DEMO_HOUSEHOLD = {
+	schemaVersion: 1,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		{ id: "mali", role: "dependent", relation: "child", born: "2027-09", lifeExpectancy: 90 },
+	],
+	anchors: [
+		{ path: "flows.fund.end", person: "me", age: 60 },
+		{ path: "flows.school.start", person: "mali", age: 6 },
+	],
+}
+const FUND_END = "2050-06-30"
+const SCHOOL_START = "2033-09-30"
+
 /** The base Scenario document: integer minor units, integer basis points, the ledger's account ids. */
 export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknown> {
 	return {
@@ -49,6 +69,14 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 				growth: "inflation",
 			},
 			{
+				id: "school",
+				kind: "expense",
+				frequency: "monthly",
+				start: SCHOOL_START,
+				amount: 800000,
+				growth: "inflation",
+			},
+			{
 				id: "car",
 				kind: "contribution",
 				target: ids.loan,
@@ -64,7 +92,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 				target: ids.fund,
 				frequency: "monthly",
 				start: "2026-11-01",
-				end: BASE_SALARY_END,
+				end: FUND_END,
 				amount: 1500000,
 				growth: "inflation",
 			},

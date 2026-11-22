@@ -1,5 +1,5 @@
 {
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"leaves": [
 		{
 			"name": "account add",
@@ -326,6 +326,14 @@
 		{
 			"name": "TRAJ_DEBUG",
 			"summary": "Set to 1 to print diagnostics for unexpected errors"
+		},
+		{
+			"name": "TRAJ_TELEMETRY",
+			"summary": "0, off or false stops the anonymous usage count (see traj telemetry)"
+		},
+		{
+			"name": "DO_NOT_TRACK",
+			"summary": "Any value but empty, 0 or false stops the anonymous usage count"
 		}
 	],
 	"errors": [

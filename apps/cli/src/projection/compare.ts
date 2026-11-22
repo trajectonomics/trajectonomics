@@ -12,6 +12,7 @@ import { NO_TAX } from "./levies"
 import { moneyOf } from "./money"
 import { taxYearsOf } from "./tax-view"
 import type { TaxStatus } from "./view"
+import { withdrawNotes } from "./withdraw-notes"
 
 /** The same sentence twice is one sentence: two sides can share a Levy, a period or a year. */
 function both(a: readonly string[], b: readonly string[]): string[] {
@@ -66,6 +67,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 		prepared,
 		fi: solution,
 		runsOut,
+		rows,
 		milestones,
 		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 		unfunded: result.projection.unfundedContributions,
@@ -107,6 +109,8 @@ export function compareOf(input: CompareInput): CompareView | AppError {
 			...tax.notes,
 			...fundingNotes(dataA.unfunded, a.currency, "A"),
 			...fundingNotes(dataB.unfunded, b.currency, "B"),
+			...withdrawNotes(a.document, dataA, a.currency, "A"),
+			...withdrawNotes(b.document, dataB, b.currency, "B"),
 		],
 	}
 }

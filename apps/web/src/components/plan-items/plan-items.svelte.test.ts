@@ -21,11 +21,50 @@ function list(
 			kind,
 			name: "base",
 			doc,
+			household: null,
 			baseline: baselineRead(),
 			editable: options.editable ?? true,
 		},
 	}).body
 }
+
+describe("the household's anchored dates on the planner pages", () => {
+	test("a card shows the label of a date the household pins, beside the date", () => {
+		const household = {
+			schemaVersion: 1 as const,
+			people: [{ id: "me", role: "holder" as const, born: "1990-06", lifeExpectancy: 90 }],
+			anchors: [{ path: "flows.salary.end", person: "me", age: 60 }],
+		}
+		const body = render(PlanItemsList, {
+			props: {
+				kind: "income",
+				name: "base",
+				doc: planDocument(),
+				household,
+				baseline: baselineRead(),
+				editable: true,
+			},
+		}).body
+		expect(body).toContain("at me, age 60")
+	})
+
+	test("the Flow form disables a pinned date and links to the household card", () => {
+		const salary = planDocument().flows.find((flow) => flow.id === "salary")
+		const body = render(FlowFields, {
+			props: {
+				draft: flowDraftOf(salary),
+				kind: "income",
+				existing: salary,
+				shown: NO_PROBLEMS,
+				name: "base",
+				anchors: { start: null, end: "at me, age 60" },
+			},
+		}).body
+		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)
+		expect(body).not.toMatch(/<input[^>]*id="flow-start"[^>]*disabled/)
+		expect(body).toContain('href="/projection/?scenario=base#household"')
+	})
+})
 
 describe("the Income page's list", () => {
 	test("shows each income Flow as a card with its amount, its frequency, its growth and whether it is earned", () => {
@@ -96,7 +135,14 @@ describe("the form in the drawer", () => {
 			["amount"],
 		)
 		const body = render(FlowFields, {
-			props: { draft: flowDraftOf(salary), kind: "income", existing: salary, shown },
+			props: {
+				draft: flowDraftOf(salary),
+				kind: "income",
+				existing: salary,
+				shown,
+				name: "base",
+				anchors: { start: null, end: null },
+			},
 		}).body
 		expect(body).toContain('aria-invalid="true"')
 		expect(body).toContain("Too many decimal places.")
@@ -105,7 +151,13 @@ describe("the form in the drawer", () => {
 
 	test("a new Flow asks for its name, and shows no problem until the form finds one", () => {
 		const body = render(FlowFields, {
-			props: { draft: flowDraftOf(), kind: "expense", shown: NO_PROBLEMS },
+			props: {
+				draft: flowDraftOf(),
+				kind: "expense",
+				shown: NO_PROBLEMS,
+				name: "base",
+				anchors: { start: null, end: null },
+			},
 		}).body
 		expect(body).toContain('for="flow-name"')
 		expect(body).not.toContain("Earned income")
