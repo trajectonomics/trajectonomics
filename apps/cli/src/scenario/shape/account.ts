@@ -1,4 +1,4 @@
-import { BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
+import { ACCOUNT_KINDS, BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
 
 /** One Account the Scenario assumes, with the unit of every number it states. */
 export const accountShape: Record<string, unknown> = {
@@ -12,7 +12,7 @@ export const accountShape: Record<string, unknown> = {
 				"The name this document gives the Account, unique within it. A projection against the derived Baseline needs the Ledger Account's id here.",
 		},
 		kind: {
-			enum: ["asset", "liability"],
+			enum: [...ACCOUNT_KINDS],
 			description:
 				"`asset` holds value and earns `rate`; `liability` is money owed, and its Balance is stated as the positive amount owed.",
 		},

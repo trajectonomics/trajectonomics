@@ -15,6 +15,15 @@ Every change is additive to the `--json` envelopes.
   The lists are `sim-core`'s own, read through `allowedValues(code, path)`, which `sim` exports from the
   vocabulary `check()` tests against, so the CLI restates none of them (AGENTS rule 3). `INVALID_GROWTH` names
   its two forms, and `NOT_SAFE_INTEGER` on a rate adds `basis points, a whole number: 2% is 200`.
+- **The schema lists the same values.** Every closed list the Scenario document states, a Measure's `rounding`
+  included, is read through `allowedValues` too (`scenario/shape/terms.ts`), so an agent's first try names a value
+  the engine accepts. The one exception is the Metric names, which `allowedValues` does not list.
+- **An engine refusal says what went wrong.** `projection_refused` takes its message and hint from one table
+  keyed by the engine's code (`projection/refusal-table.ts`), `VALUE_OVERFLOW` and
+  `DERIVED_EXPENSE_READS_EARNED` among them. A code the table does not give a sentence marks who answers it
+  instead (`refusal-elsewhere.ts`: the document at `scenario apply`, or a flag), and a test fails when the
+  engine gains a code in neither. Only `fi` and `projection compare`, which ask for the FI answer, raise the two
+  `DERIVED_*_READS_EARNED` codes, and the document's `derive` description says so (#298).
 - **The horizon is a choice, and says so.** `fi` describes `--horizon` as the last date the plan has to fund
   (the age-95 date), and its result carries a note naming the horizon the answer is for.
 - **A result says what a write dropped or a figure used.** `scenario apply` carries `notes`, which names a Levy

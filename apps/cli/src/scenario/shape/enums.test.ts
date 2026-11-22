@@ -88,6 +88,11 @@ function deriveFlows(op: string): Record<string, unknown>[] {
 	]
 }
 
+/** The `scale` graph's one `"floor"`, swapped for the rounding probed. */
+function roundedFlows(rounding: string): Record<string, unknown>[] {
+	return JSON.parse(JSON.stringify(deriveFlows("scale")).replace('"floor"', `"${rounding}"`))
+}
+
 type EnumProbe = {
 	path: Path
 	/** One document per listed value, all accepted, together covering the whole set. */
@@ -153,6 +158,15 @@ const PROBES: EnumProbe[] = [
 			),
 		refused: () => probe({ flows: deriveFlows("nope") }),
 		code: "INVALID_OP",
+	},
+	{
+		path: ["flows", 1, "derive", "measures", 0, "rounding"],
+		accepted: () =>
+			(nodeAt(["flows", 1, "derive", "measures", 0, "rounding"])["enum"] as string[]).map(
+				(rounding) => probe({ flows: roundedFlows(rounding) }),
+			),
+		refused: () => probe({ flows: roundedFlows("halfEven") }),
+		code: "INVALID_ROUNDING",
 	},
 	{
 		path: ["calendar", "dayRule"],

@@ -2,7 +2,7 @@ import type { ProjectionProblem } from "@trajectonomics/core/sim"
 import { version as cliVersion } from "../../package.json"
 import type { AppError } from "../errors"
 import { fail } from "../errors"
-import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { sentenceFor } from "./refusal-table"
 
 /**
  * The engine's package and the exact version this build runs on (ADR-0030). The engine
@@ -60,33 +60,20 @@ const AGREE_HINT =
 	"The Baseline, the Scenario and the Timeline must agree; details lists every problem."
 
 /**
- * A Baseline Account the Scenario does not declare is the one refusal a template repairs: the
- * template declares every asset and liability Account (ADR-0044), so it names that command instead.
- */
-const DECLARE_HINT =
-	'Run "traj scenario apply --template --as-of <date>" to print a Scenario that declares every asset and liability Account.'
-
-/**
  * What the engine refuses becomes `projection_refused` at exit 3, with the engine's codes and
  * paths in `details` in its own order and the first at `path` (ADR-0013, ADR-0030).
  */
 export function refusal(problems: readonly ProjectionProblem[]): AppError {
 	const timeline = timelineFailure(problems)
 	if (timeline !== null) return timeline
-	const overflow = overflowOf(problems)
-	if (overflow !== undefined) {
-		return fail("projection_refused", {
-			message: overflowSentence(overflow),
-			hint: OVERFLOW_HINT,
-			details: problems.map(detailOf),
-		})
-	}
 	const first = problems[0]
 	const path = first === undefined ? undefined : problemPath(first)
-	const undeclared = problems.some((problem) => problem.code === "UNDECLARED_BALANCE_ACCOUNT")
+	// The first problem the table has a sentence for says what went wrong; `details` lists them all.
+	const said = problems.map(sentenceFor).find((found) => found !== undefined)
 	return fail("projection_refused", {
 		...(path === undefined ? {} : { path }),
+		...(said === undefined ? {} : { message: said.message }),
 		details: problems.map(detailOf),
-		hint: undeclared ? DECLARE_HINT : AGREE_HINT,
+		hint: said?.hint ?? AGREE_HINT,
 	})
 }
