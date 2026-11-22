@@ -19,7 +19,9 @@ describe("the traj handoff section", () => {
 	})
 
 	it("reads the scope from both lists before any install", () => {
-		expect(handoff).toContain("`npx skills list --json` and `npx skills list -g --json`")
+		expect(handoff).toContain(
+			"`npx -y skills@1.9.0 list --json` and `npx -y skills@1.9.0 list -g --json`",
+		)
 		expect(handoff).toContain("this session's copy")
 		expect(handoff).toContain("belongs to another setup")
 	})
@@ -58,7 +60,7 @@ describe("the traj handoff section", () => {
 	})
 
 	it("installs from the pin with an explicit name, adds -g in the global scope, and confirms the list", () => {
-		expect(handoff).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
+		expect(handoff).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
 		expect(handoff).toContain("Add `-g` to it in the global scope")
 		expect(handoff).toContain("Then confirm from the same scope's list")
 	})

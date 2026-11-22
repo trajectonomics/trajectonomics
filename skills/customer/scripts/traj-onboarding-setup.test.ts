@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { skillFrontmatter } from "./skill-frontmatter"
-import { ONBOARDING_SKILL_PATH, read, section } from "./skills-test-support"
+import { ONBOARDING_SKILL_PATH, read, section, WEBSITE_COMMAND } from "./skills-test-support"
 
 /**
  * The onboarding the council's release 1 asks for: the two gates before the first download, a set
@@ -60,8 +60,31 @@ describe("Step 2, installing the published set", () => {
 		expect(stepTwo).toContain("setup stopped here, with the entry's `source` and its hash")
 		expect(stepTwo).toContain("`computedHash` in a project lock, `skillFolderHash` in a global one")
 		expect(stepTwo).toContain("install nothing else")
-		expect(stepTwo).toContain("treat it as a failed step")
+		expect(stepTwo).toContain("Treat it as a failed step")
 		expect(section(body, "If a step fails")).toContain("the pin in step 2")
+	})
+
+	it("makes every skills call itself on skills@1.9.0, so a 1.7.6 never meets the version 2 lock", () => {
+		expect(body).toContain("`npx -y skills@1.9.0 list --json` and")
+		expect(body).toContain("`npx -y skills@1.9.0 list -g --json`")
+		expect(stepTwo).toContain(
+			"npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name>",
+		)
+		expect(stepTwo).toContain("Every `skills` call this skill makes is `npx -y skills@1.9.0 …`")
+		expect(stepTwo).toContain("refuses the version 2 lock that 1.9.0 writes")
+		const plain = body.split("\n").filter((line) => /npx (-y )?skills (add|list)/.test(line))
+		expect(plain).toEqual([WEBSITE_COMMAND])
+	})
+
+	it("reads this skill again after the re-run, which may have installed a newer copy", () => {
+		expect(stepTwo).toContain("newer `traj-onboarding`")
+		expect(stepTwo).toContain("read this skill again at the `path` the list reports")
+	})
+
+	it("tells the person the way on when the stop is reached: Node 22.20, run it themselves, set up again", () => {
+		expect(stepTwo).toContain("`skills@1.9.0` needs Node 22.20 or later")
+		expect(stepTwo).toContain("run `npx -y skills@1.9.0 add … -y` themselves")
+		expect(stepTwo).toContain("then run setup again")
 	})
 
 	it("is done only with the commit in hand", () => {
@@ -123,11 +146,13 @@ describe("what setup leaves behind", () => {
 
 	it("names what setup installed: the commit, the rows, the traj version and the CLI Range", () => {
 		expect(leaves).toContain("**What was installed.**")
-		expect(leaves).toContain("the `commit` from step 2 as the Skills' version")
+		expect(leaves).toContain("the `commit` from step 2 as the skills' version")
 		expect(leaves).toContain("installed (and any you skipped, with the range each wanted)")
 		expect(leaves).toContain("the `traj --version` that printed")
 		expect(leaves).toContain("this skill's own frontmatter `cli` states")
-		expect(leaves).toContain("no set version")
+		expect(leaves).toContain("The `commit` is the set's version")
+		expect(leaves).toContain("the version in this skill's frontmatter is this")
+		expect(leaves).toContain("skill's own, and is not the set's")
 		expect(leaves.indexOf("**What was installed.**")).toBeLessThan(
 			leaves.indexOf("**Where the data lives.**"),
 		)

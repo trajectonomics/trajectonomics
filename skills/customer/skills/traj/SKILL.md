@@ -76,7 +76,7 @@ This is the contract, not a recipe, and it is not a router either: a Skill the a
 
 When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/<commit>/skills/customer/skills.manifest.json), at the commit this Skill's scope pinned, names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it. Three reads come before any install.
 
-1. **The scope.** Run `npx skills list --json` and `npx skills list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
+1. **The scope.** Run `npx -y skills@1.9.0 list --json` and `npx -y skills@1.9.0 list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
 2. **The pin.** Read the `commit` the resolved scope's lock records for `traj`. A project lock is `./skills-lock.json`; a global lock is `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, and `~/.agents/.skill-lock.json` when it is not. The list reports no commit, so the lock is the only place it is read. Never install from `main`: a branch moves, and a person's setup must not.
 3. **The row.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at that commit, and take the job's row and its `cliRange`. When the resolved scope's list already names that row's Skill, install nothing and follow it.
 
@@ -85,7 +85,7 @@ When the user's request is a job with a Recipe — a bank import, a periodic rev
 **Install** the row when the command line is at or above its CLI Range floor, the range's lower bound, using the pin and an explicit name:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
+npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
 ```
 
 Add `-g` to it in the global scope. Then confirm from the same scope's list that it landed. A row whose upper bound the command line has passed — a pre-release of that bound's minor counts as past it — is installed all the same, and you say so in one sentence: name the range the Skill was checked through, and that `traj schema` is authoritative where the two differ.

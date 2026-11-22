@@ -139,7 +139,7 @@ describe("the traj operating Skill", () => {
 	})
 
 	it("hands a job to the Skill that owns it, installed by its explicit name from the pin", () => {
-		expect(body).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
+		expect(body).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
 		expect(body).not.toContain(`npx skills add ${SKILLS_SOURCE} --skill <name> -y`)
 		expect(body).toContain("is not a router either")
 	})
