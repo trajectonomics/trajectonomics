@@ -59,6 +59,13 @@ jobs:
           TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
         run: bunx turbo run check --affected --concurrency=2
 
+      # The guards read every tracked file, but `--affected` selects them only when a file inside
+      # tooling/guards changes. Run them on every pull request so an archived link in any folder
+      # fails before the merge, not after it.
+      - name: Run the repository guards
+        if: github.event_name == 'pull_request'
+        run: bun run --cwd tooling/guards test
+
       - name: Check every package
         if: github.event_name != 'pull_request'
         run: bunx turbo run check --concurrency=2
