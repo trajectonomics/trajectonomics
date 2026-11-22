@@ -1,15 +1,24 @@
 #!/usr/bin/env bun
 import pkg from "../package.json"
 import { run } from "./cli"
+import { telemetryDecision } from "./telemetry/decide"
 import type { RunRecord } from "./telemetry/event"
-import { afterRun, postEvent } from "./telemetry/send"
+import { isUsageBody, postEvent } from "./telemetry/post"
+import { afterRun } from "./telemetry/send"
 import { EVENT_VARIABLE, spawnSender } from "./telemetry/spawn"
 import { readState, writeState } from "./telemetry/state"
 
 // A detached telemetry child: post the one event it was given and exit, without running a command.
+// A value this CLI did not make is ignored and the command runs as usual, and the child checks the
+// environment's opt-outs again, so a stray export can never turn a command into a silent no-op.
 const pending = process.env[EVENT_VARIABLE]
-if (pending !== undefined) {
-	await postEvent(pending)
+if (pending !== undefined && isUsageBody(pending)) {
+	const decision = telemetryDecision({
+		env: process.env,
+		state: { enabled: true },
+		version: pkg.version,
+	})
+	if (decision.enabled) await postEvent(pending)
 	process.exit(0)
 }
 

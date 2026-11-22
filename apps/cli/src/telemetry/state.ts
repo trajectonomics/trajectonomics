@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { join, posix, win32 } from "node:path"
 import { z } from "zod"
 import type { Env } from "../command"
 import type { AppError } from "../errors"
@@ -30,6 +30,15 @@ export const stateSchema: z.ZodType<TelemetryState> = z.object({
 export const DEFAULT_STATE: TelemetryState = { enabled: true }
 
 /**
+ * A configured directory only when it is absolute. The XDG spec says a relative value is ignored:
+ * it would resolve against the working directory, so every folder would get its own id and file.
+ */
+function absolute(value: string | undefined, platform: string): string | undefined {
+	const rules = platform === "win32" ? win32 : posix
+	return value !== undefined && value !== "" && rules.isAbsolute(value) ? value : undefined
+}
+
+/**
  * The directory the state file lives in. It is deliberately outside the data directory: `traj data
  * remove` deletes `~/.traj`, and an opt-out must survive that (ADR-0045). Windows keeps config in
  * `%APPDATA%`; every other platform follows the XDG convention.
@@ -39,8 +48,9 @@ export function configDirectory(
 	platform: string = process.platform,
 	home: string = homedir(),
 ): string {
-	if (platform === "win32") return join(env["APPDATA"] ?? join(home, "AppData", "Roaming"), "traj")
-	return join(env["XDG_CONFIG_HOME"] || join(home, ".config"), "traj")
+	if (platform === "win32")
+		return join(absolute(env["APPDATA"], platform) ?? join(home, "AppData", "Roaming"), "traj")
+	return join(absolute(env["XDG_CONFIG_HOME"], platform) ?? join(home, ".config"), "traj")
 }
 
 /** The full path of the state file, as `traj telemetry` reports it. */
@@ -62,14 +72,18 @@ export function readState(
 	platform: string = process.platform,
 	home: string = homedir(),
 ): TelemetryState {
+	let raw: unknown
 	try {
-		const parsed = stateSchema.safeParse(
-			JSON.parse(readFileSync(stateFilePath(env, platform, home), "utf8")),
-		)
-		return parsed.success ? parsed.data : DEFAULT_STATE
+		raw = JSON.parse(readFileSync(stateFilePath(env, platform, home), "utf8"))
 	} catch {
 		return DEFAULT_STATE
 	}
+	const parsed = stateSchema.safeParse(raw)
+	if (parsed.success) return parsed.data
+	// A file that fails the schema still keeps an opt-out: a hand edit or a bad `id` must never turn
+	// counting back on for someone who ran `traj telemetry off`.
+	const enabled = (raw as { enabled?: unknown } | null)?.enabled
+	return enabled === false ? { enabled: false } : DEFAULT_STATE
 }
 
 /**

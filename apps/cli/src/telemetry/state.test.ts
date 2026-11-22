@@ -25,6 +25,15 @@ describe("configDirectory", () => {
 		)
 	})
 
+	it("ignores a relative XDG_CONFIG_HOME or APPDATA, as the XDG spec says", () => {
+		expect(configDirectory({ XDG_CONFIG_HOME: "rel" }, "linux", "/home/u")).toBe(
+			join("/home/u", ".config", "traj"),
+		)
+		expect(configDirectory({ APPDATA: "rel" }, "win32", "C:\\u")).toBe(
+			join("C:\\u", "AppData", "Roaming", "traj"),
+		)
+	})
+
 	it("uses APPDATA on Windows, and its default when APPDATA is unset", () => {
 		expect(configDirectory({ APPDATA: "C:\\Roaming" }, "win32", "C:\\u")).toBe(
 			join("C:\\Roaming", "traj"),
@@ -52,6 +61,16 @@ describe("readState", () => {
 		expect(readState({ XDG_CONFIG_HOME: config }, "linux")).toEqual(DEFAULT_STATE)
 		writeFileSync(join(config, "traj", STATE_FILE), JSON.stringify({ enabled: "no" }))
 		expect(readState({ XDG_CONFIG_HOME: config }, "linux")).toEqual(DEFAULT_STATE)
+	})
+
+	it("keeps an opt-out from a file that otherwise fails the schema", () => {
+		const config = fresh()
+		mkdirSync(join(config, "traj"))
+		writeFileSync(
+			join(config, "traj", STATE_FILE),
+			JSON.stringify({ enabled: false, id: "not-a-uuid" }),
+		)
+		expect(readState({ XDG_CONFIG_HOME: config }, "linux")).toEqual({ enabled: false })
 	})
 
 	it("reads a stored choice and id back", () => {

@@ -1,6 +1,6 @@
 import type { Env } from "../command"
 import { telemetryDecision } from "./decide"
-import { EVENT_NAME, NOTICE, POSTHOG_URL, type RunRecord, usageEvent } from "./event"
+import { NOTICE, type RunRecord, usageEvent } from "./event"
 import type { TelemetryState } from "./state"
 
 /** Everything `afterRun` touches from outside, passed in so a test can drive it without I/O. */
@@ -22,10 +22,16 @@ export type AfterRunInput = {
 	notice: (text: string) => void
 }
 
-/** Saves the state through the injected writer; a writer that throws counts as not saved. */
-function saved(input: AfterRunInput, state: TelemetryState): boolean {
+/**
+ * Saves one change on a fresh read of the state, so a `traj telemetry off` that finished while this
+ * run was going is never overwritten by this run's stale copy. A writer that throws counts as not
+ * saved, and so does a state that is off by now.
+ */
+function saved(input: AfterRunInput, change: Partial<TelemetryState>): boolean {
 	try {
-		return input.writeState(state)
+		const fresh = input.readState()
+		if (!fresh.enabled) return false
+		return input.writeState({ ...fresh, ...change })
 	} catch {
 		return false
 	}
@@ -46,7 +52,7 @@ export function afterRun(input: AfterRunInput): void {
 		// An id that cannot be saved would be a new "person" on every run, which would inflate the
 		// weekly count and repeat the notice each time (a read-only home in an agent's sandbox, say).
 		// Such a machine sends nothing and prints nothing (ADR-0045).
-		if (current.id === undefined && !saved(input, state)) return
+		if (current.id === undefined && !saved(input, { id })) return
 		input.spawnSender(
 			JSON.stringify(
 				usageEvent({
@@ -63,37 +69,9 @@ export function afterRun(input: AfterRunInput): void {
 		if (input.record.exitCode === 0 && state.noticeShown !== true) {
 			input.notice(NOTICE)
 			// A file that took the id but not this flag shows the notice again next time: the honest outcome.
-			saved(input, { ...state, noticeShown: true })
+			saved(input, { noticeShown: true })
 		}
 	} catch {
 		// Telemetry never changes what a person sees from their command.
-	}
-}
-
-/** The shape the sender accepts: a capture body for the one event this CLI sends. */
-export function isUsageBody(value: unknown): value is { event: typeof EVENT_NAME } {
-	return (
-		typeof value === "object" &&
-		value !== null &&
-		(value as { event?: unknown }).event === EVENT_NAME
-	)
-}
-
-/**
- * The sender's half of the detached child: posts one event body and swallows every failure, so a
- * dropped request costs one count and nothing else. A body that is not a usage event is dropped.
- */
-export async function postEvent(raw: string, fetcher: typeof fetch = fetch): Promise<void> {
-	try {
-		const parsed: unknown = JSON.parse(raw)
-		if (!isUsageBody(parsed)) return
-		await fetcher(POSTHOG_URL, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: raw,
-			signal: AbortSignal.timeout(5000),
-		})
-	} catch {
-		// Offline, slow or refused: the count is lost, and the command that spawned this was already done.
 	}
 }

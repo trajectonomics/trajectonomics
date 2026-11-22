@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
-import { NOTICE, POSTHOG_URL, type RunRecord } from "./event"
-import { type AfterRunInput, afterRun, postEvent } from "./send"
+import { NOTICE, POSTHOG_URL, type RunRecord, usageEvent } from "./event"
+import { isUsageBody, postEvent } from "./post"
+import { type AfterRunInput, afterRun } from "./send"
 import type { TelemetryState } from "./state"
 
 const ID = "0194b000-0000-7000-8000-00000000000a"
@@ -113,6 +114,22 @@ describe("afterRun", () => {
 		expect(throwing.calls.notices).toEqual([])
 	})
 
+	it("never writes back over a traj telemetry off that finished during the run", () => {
+		let reads = 0
+		const written: TelemetryState[] = []
+		const { input, calls } = harness({
+			// The first read sees counting on; by the time the run saves its id, `off` has landed.
+			readState: () => (reads++ === 0 ? { enabled: true } : { enabled: false }),
+			writeState: (next) => {
+				written.push(next)
+				return true
+			},
+		})
+		afterRun(input)
+		expect(written).toEqual([])
+		expect(calls.spawned).toEqual([])
+	})
+
 	it("still sends under a saved id when only the notice flag cannot be saved", () => {
 		const { input, calls } = harness({ state: { enabled: true, id: ID }, writeState: () => false })
 		afterRun(input)
@@ -121,10 +138,42 @@ describe("afterRun", () => {
 	})
 })
 
+/** A body exactly as `afterRun` would hand it to the sender. */
+const BODY = JSON.stringify(
+	usageEvent({
+		id: ID,
+		record: { command: "tx add", exitCode: 2, errorCode: "invalid_input", format: "json" },
+		version: "0.5.0",
+		platform: "linux",
+		arch: "x64",
+		timestamp: "2026-11-22T10:00:00.000Z",
+		uuid: ID,
+	}),
+)
+
+describe("isUsageBody", () => {
+	it("accepts a body usageEvent made", () => {
+		expect(isUsageBody(BODY)).toBe(true)
+	})
+
+	it("refuses an extra property, another key, another event, or a command with user text", () => {
+		const event = JSON.parse(BODY)
+		const variants = [
+			{ ...event, properties: { ...event.properties, path: "/home/u/.traj" } },
+			{ ...event, api_key: "phc_someone_else" },
+			{ ...event, event: "something_else" },
+			{ ...event, properties: { ...event.properties, command: "tx add 1500 THB" } },
+			{ ...event, extra: true },
+		]
+		for (const variant of variants) expect(isUsageBody(JSON.stringify(variant))).toBe(false)
+		expect(isUsageBody("not json")).toBe(false)
+	})
+})
+
 describe("postEvent", () => {
 	it("posts a usage event to the EU endpoint as JSON", async () => {
 		const requests: { url: string; init: RequestInit }[] = []
-		const body = JSON.stringify({ event: "traj_command_run", distinct_id: ID })
+		const body = BODY
 		await postEvent(body, (async (url: string | URL | Request, init?: RequestInit) => {
 			requests.push({ url: String(url), init: init ?? {} })
 			return new Response("{}")
@@ -150,8 +199,6 @@ describe("postEvent", () => {
 		const fetcher = (async () => {
 			throw new Error("offline")
 		}) as unknown as typeof fetch
-		await expect(
-			postEvent(JSON.stringify({ event: "traj_command_run" }), fetcher),
-		).resolves.toBeUndefined()
+		await expect(postEvent(BODY, fetcher)).resolves.toBeUndefined()
 	})
 })
