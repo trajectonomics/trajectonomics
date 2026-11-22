@@ -82,13 +82,13 @@ No OCR is available on this host, so the two scans above stay unread; their rows
   asserts the rate.
 - **`digitalAssetRate` is unsourced** (OD6). No 2026 rate was read; the code keeps 15 per cent with
   its assumption comment, and no corpus case asserts it.
-- **Two citations in the code were wrong; both are corrected in comments.** The header of
+- **Two citations in the code were wrong; every comment that carried them is corrected.** The header of
   `src/th/parameters.ts` named Royal Decree No. 650 for the bracket schedule, and
   `src/th/stages/separate-sheet.ts` named Section 42(1) for the severance exemption. R.D. No. 650
   is a 2017 flood-donation exemption, Section 42(1) is per-diem and transport expenses, and the
   schedule's instruments are Act No. 44 section 12 plus R.D. No. 470 section 4. Both comments now
   cite those sources, or say the instrument is unsourced. No figure and no stage changed.
-- **Same wrong citations still in other comments (not yet corrected).** R.D. No. 650 for the
+- **The same citations in other comments are corrected the same way.** R.D. No. 650 for the
   bracket schedule: `src/th/parameters-brackets.ts`, `src/th/levy/brackets.ts`. Section 42(1) for
   the severance exemption: `src/th/parameters-types.ts`, `src/th/parameters-special.ts`,
   `src/th/types/special-breakdown.ts`, `src/th/types/special-input.ts`.
@@ -103,7 +103,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | Date | Figures | What changed |
 | --- | --- | --- |
 | 2026-11-17 | none (first sweep) | 71 rows written; 32 `match`, 6 `derived`, 28 `reported`, 5 `unsourced` |
-| 2026-11-22 | none | Comments only: the `src/th/parameters.ts` header and the `src/th/stages/separate-sheet.ts` `@statute` line now cite the sources in the findings above |
+| 2026-11-22 | none | Comments only: the `src/th/parameters.ts` header and the `src/th/stages/separate-sheet.ts` `@statute` line, and every other comment with the same two citations, now cite the sources in the findings above |
 
 <!-- factory:th-source-rows v1 -->
 
