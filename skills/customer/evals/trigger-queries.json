@@ -1,0 +1,118 @@
+{
+	"source": "trajectonomics/factory docs/qa-trigger-queries.md: the twenty queries and their verdicts, fixed before a pass runs. Read it there; this copy is derived, never re-authored. `skills` lists the Skills whose firing is correct for a `trigger` query. Two Thai income tax estimate queries follow the twenty (`extra`): they pin that the estimate reaches `traj-plan`, whose tax steps carry the guardrails.",
+	"queries": [
+		{
+			"q": "help me set up traj",
+			"expect": "trigger",
+			"skills": ["traj-onboarding"]
+		},
+		{
+			"q": "I want to track my spending from a terminal",
+			"expect": "trigger",
+			"skills": ["traj", "traj-onboarding"]
+		},
+		{
+			"q": "install the trajectonomics cli",
+			"expect": "trigger",
+			"skills": ["traj-onboarding"]
+		},
+		{
+			"q": "how do I record an expense with traj",
+			"expect": "trigger",
+			"skills": ["traj"]
+		},
+		{
+			"q": "set up my accounts so I can do my Thai tax",
+			"expect": "trigger",
+			"skills": ["traj", "traj-onboarding", "traj-plan"]
+		},
+		{
+			"q": "import my bank CSV into traj",
+			"expect": "trigger",
+			"skills": ["traj-import"]
+		},
+		{
+			"q": "what will my net worth be at the end of next year",
+			"expect": "trigger",
+			"skills": ["traj-plan", "traj"]
+		},
+		{
+			"q": "can I work out when I can stop working",
+			"expect": "trigger",
+			"skills": ["traj-plan"]
+		},
+		{
+			"q": "check that my ledger balances",
+			"expect": "trigger",
+			"skills": ["traj", "traj-review"]
+		},
+		{
+			"q": "remove traj and the data it stored",
+			"expect": "trigger",
+			"skills": [],
+			"unclaimed": "traj-maintain (trajectonomics/trajectonomics#135) owns removal; no description claims it until that Skill lands"
+		},
+		{
+			"q": "how much Thai income tax will I owe for 2026?",
+			"expect": "trigger",
+			"skills": ["traj-plan"],
+			"extra": true
+		},
+		{
+			"q": "what would a 100,000 baht RMF contribution save me in tax this year?",
+			"expect": "trigger",
+			"skills": ["traj-plan"],
+			"extra": true
+		},
+		{
+			"q": "build me a spreadsheet budget",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "file my Thai tax return for me",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "which stock should I buy",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "write a SQL query over my invoices",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "set up a Postgres database",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "explain double-entry bookkeeping",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "convert 500 USD to THB",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "review my tax form for mistakes",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "install Node.js",
+			"expect": "silent",
+			"skills": []
+		},
+		{
+			"q": "summarise this PDF invoice",
+			"expect": "silent",
+			"skills": []
+		}
+	]
+}
