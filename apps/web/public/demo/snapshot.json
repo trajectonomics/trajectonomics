@@ -117,7 +117,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204c7-4990-7374-9519-048fa18bd242",
+							"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -126,7 +126,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+							"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,7 +135,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+							"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -144,7 +144,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+							"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -153,7 +153,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+							"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -162,7 +162,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
+							"id": "01a204cb-8801-72e7-850d-507408fe4ad8",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -171,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+							"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -180,7 +180,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+							"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -189,7 +189,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
+							"id": "01a204cb-86f0-75f1-bdfc-a99b47339721",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -207,7 +207,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"debit": "662300.00",
@@ -216,7 +216,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -225,7 +225,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"debit": "736600.00",
@@ -234,7 +234,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+								"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 								"name": "Fund Return"
 							},
 							"debit": "0.00",
@@ -243,7 +243,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+								"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 								"name": "Living"
 							},
 							"debit": "762200.00",
@@ -252,7 +252,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
+								"id": "01a204cb-8801-72e7-850d-507408fe4ad8",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -261,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+								"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -270,7 +270,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+								"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 								"name": "Salary"
 							},
 							"debit": "0.00",
@@ -279,7 +279,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
+								"id": "01a204cb-86f0-75f1-bdfc-a99b47339721",
 								"name": "Travel"
 							},
 							"debit": "78500.00",
@@ -307,7 +307,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+							"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -316,7 +316,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+							"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -325,7 +325,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+							"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -334,7 +334,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+							"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -343,7 +343,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
+							"id": "01a204cb-86f0-75f1-bdfc-a99b47339721",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -365,7 +365,7 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a204c7-5415-71b7-9831-6a1ded7b2574",
+						"id": "01a204cb-8c65-710f-ab22-ca95bac297b0",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -374,7 +374,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+									"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -384,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -394,7 +394,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71ba-a569-acea80b97bf6",
+						"id": "01a204cb-8c65-7112-be2d-88e381b37fca",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -403,7 +403,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+									"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 									"name": "Living"
 								},
 								"amount": "30300.00",
@@ -413,7 +413,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-30300.00",
@@ -423,7 +423,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71b8-a099-86766d406436",
+						"id": "01a204cb-8c65-7110-abef-8fd5ff9cb48b",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -432,7 +432,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+									"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -442,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -452,7 +452,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71cd-8ec7-f246ee0fdcf2",
+						"id": "01a204cb-8c65-7125-80db-404f32d78322",
 						"date": "2026-08-15",
 						"memo": "new laptop",
 						"linkedTo": null,
@@ -461,7 +461,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+									"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 									"name": "Living"
 								},
 								"amount": "58000.00",
@@ -471,7 +471,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-58000.00",
@@ -481,7 +481,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71bb-a774-69af9a48d8c7",
+						"id": "01a204cb-8c65-7113-aa51-47700db8f11f",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -490,7 +490,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -500,7 +500,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+									"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -510,7 +510,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71b9-b6fc-53f9b6215250",
+						"id": "01a204cb-8c65-7111-943a-1f5d871ac04a",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -519,7 +519,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -529,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -539,7 +539,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71bc-962f-521fbdc70f1e",
+						"id": "01a204cb-8c65-7114-9de6-dfeaa709b432",
 						"date": "2026-08-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -548,7 +548,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "9500.00",
@@ -558,7 +558,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+									"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 									"name": "Fund Return"
 								},
 								"amount": "-9500.00",
@@ -568,7 +568,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71bd-8b72-e3f961b0fca8",
+						"id": "01a204cb-8c65-7115-8171-a9cde1d0be11",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -577,7 +577,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+									"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -587,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -597,7 +597,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c0-8822-098ce41bbaf7",
+						"id": "01a204cb-8c65-7118-a6c7-a3419a894496",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -606,7 +606,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+									"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 									"name": "Living"
 								},
 								"amount": "26900.00",
@@ -616,7 +616,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-26900.00",
@@ -626,7 +626,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71be-b05b-5430edae9673",
+						"id": "01a204cb-8c65-7116-9207-1ddaea8e6398",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -635,7 +635,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+									"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -645,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -655,7 +655,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c1-b0fe-970cc3618ac3",
+						"id": "01a204cb-8c65-7119-ba66-4f0c5b905a7c",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -664,7 +664,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -674,7 +674,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+									"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -684,7 +684,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71bf-91f2-4a2e9d116093",
+						"id": "01a204cb-8c65-7117-9bf9-64b26152972e",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -693,7 +693,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -703,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -713,7 +713,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c2-996f-dd2ee1e41b7d",
+						"id": "01a204cb-8c65-711a-8eab-f55c44609475",
 						"date": "2026-09-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -722,7 +722,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+									"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 									"name": "Fund Return"
 								},
 								"amount": "12600.00",
@@ -732,7 +732,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "-12600.00",
@@ -742,7 +742,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c3-835b-45982a7416fb",
+						"id": "01a204cb-8c65-711b-b859-4afe4987e5ac",
 						"date": "2026-10-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -751,7 +751,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+									"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -761,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -771,7 +771,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c6-a682-8a43f1fe8b18",
+						"id": "01a204cb-8c65-711e-8915-f4a15211b694",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -780,7 +780,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+									"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 									"name": "Living"
 								},
 								"amount": "28800.00",
@@ -790,7 +790,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-28800.00",
@@ -800,7 +800,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c4-ad89-74f9776c66e7",
+						"id": "01a204cb-8c65-711c-8859-ba581e696e01",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -809,7 +809,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+									"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -819,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -829,7 +829,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c7-9f5e-7df3645d1725",
+						"id": "01a204cb-8c65-711f-9ccb-400a651c563c",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -838,7 +838,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -848,7 +848,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+									"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -858,7 +858,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c5-b617-559ffbc5baa8",
+						"id": "01a204cb-8c65-711d-996a-11b2694e8f71",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -867,7 +867,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -877,7 +877,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -887,7 +887,7 @@
 						]
 					},
 					{
-						"id": "01a204c7-5415-71c8-bc4b-65224c767a68",
+						"id": "01a204cb-8c65-7120-ae92-4d1305f20ac7",
 						"date": "2026-10-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -896,7 +896,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"name": "Fund"
 								},
 								"amount": "7300.00",
@@ -906,7 +906,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+									"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 									"name": "Fund Return"
 								},
 								"amount": "-7300.00",
@@ -927,7 +927,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204c7-4990-7374-9519-048fa18bd242",
+							"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 							"name": "Bank"
 						},
 						"kind": "asset",
@@ -935,7 +935,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+							"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 							"name": "Fund"
 						},
 						"kind": "asset",
@@ -943,7 +943,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+							"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -963,7 +963,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -972,7 +972,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -981,7 +981,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1007,7 +1007,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1016,7 +1016,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1025,7 +1025,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1051,7 +1051,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1060,7 +1060,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1069,7 +1069,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1095,7 +1095,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1104,7 +1104,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1113,7 +1113,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1139,7 +1139,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1148,7 +1148,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1157,7 +1157,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1183,7 +1183,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1192,7 +1192,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1201,7 +1201,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1227,7 +1227,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1236,7 +1236,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1245,7 +1245,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1271,7 +1271,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1280,7 +1280,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1289,7 +1289,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1315,7 +1315,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1324,7 +1324,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1333,7 +1333,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1359,7 +1359,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1368,7 +1368,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1377,7 +1377,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1403,7 +1403,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1412,7 +1412,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1421,7 +1421,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1447,7 +1447,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1456,7 +1456,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1465,7 +1465,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1491,7 +1491,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1500,7 +1500,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1509,7 +1509,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1535,7 +1535,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1544,7 +1544,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1553,7 +1553,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1579,7 +1579,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1588,7 +1588,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1597,7 +1597,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1623,7 +1623,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1632,7 +1632,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1641,7 +1641,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1667,7 +1667,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1676,7 +1676,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1685,7 +1685,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1711,7 +1711,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1720,7 +1720,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1729,7 +1729,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1755,7 +1755,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1764,7 +1764,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1773,7 +1773,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1799,7 +1799,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1808,7 +1808,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1817,7 +1817,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1843,7 +1843,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1852,7 +1852,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1861,7 +1861,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1887,7 +1887,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1896,7 +1896,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1905,7 +1905,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1931,7 +1931,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1940,7 +1940,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1949,7 +1949,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1975,7 +1975,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a204c7-4990-7374-9519-048fa18bd242",
+								"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1984,7 +1984,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+								"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1993,7 +1993,7 @@
 						},
 						{
 							"account": {
-								"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+								"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -2016,13 +2016,13 @@
 				"ok": true,
 				"data": {
 					"scenario": {
-						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"id": "01a204cb-9147-7722-9974-45760e09dedf",
 						"name": "base",
-						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+						"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
 						"forkedFrom": null,
 						"version": 3,
-						"createdAt": "2026-11-22T19:41:42.246Z",
-						"updatedAt": "2026-11-22T19:41:42.692Z",
+						"createdAt": "2026-11-22T19:46:19.591Z",
+						"updatedAt": "2026-11-22T19:46:20.912Z",
 						"document": {
 							"currency": "THB",
 							"flows": [
@@ -2071,7 +2071,7 @@
 									"growth": {
 										"bps": 0
 									},
-									"target": "01a204c7-4b6a-7585-b3c7-cb49e48d069a"
+									"target": "01a204cb-8072-7570-8957-9e128e9c983b"
 								},
 								{
 									"id": "fund",
@@ -2081,37 +2081,37 @@
 									"end": "2050-06-30",
 									"amount": "15000.00",
 									"growth": "inflation",
-									"target": "01a204c7-4a5e-7560-abea-1d2438924ced"
+									"target": "01a204cb-7e08-7507-8a6e-c00de4fdd451"
 								}
 							],
 							"accounts": [
 								{
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"kind": "asset",
 									"rate": 100
 								},
 								{
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"kind": "asset",
 									"rate": 500
 								},
 								{
-									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+									"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 									"kind": "liability",
 									"rate": 500,
 									"compounding": "monthly"
 								}
 							],
 							"cashflow": {
-								"contribute": ["01a204c7-4a5e-7560-abea-1d2438924ced"],
+								"contribute": ["01a204cb-7e08-7507-8a6e-c00de4fdd451"],
 								"surplus": [
 									{
-										"account": "01a204c7-4990-7374-9519-048fa18bd242"
+										"account": "01a204cb-7c59-7783-a85f-41c6ad7df864"
 									}
 								],
 								"withdraw": [
-									"01a204c7-4990-7374-9519-048fa18bd242",
-									"01a204c7-4a5e-7560-abea-1d2438924ced"
+									"01a204cb-7c59-7783-a85f-41c6ad7df864",
+									"01a204cb-7e08-7507-8a6e-c00de4fdd451"
 								]
 							},
 							"economy": {
@@ -3643,15 +3643,12 @@
 									"combine": "all",
 									"criteria": [
 										{
-											"amount": "10000000000000.00",
-											"id": "net-worth",
-											"kind": "metric",
-											"metric": "netWorth",
-											"op": "atLeast",
-											"terms": "nominal"
+											"id": "date",
+											"kind": "date",
+											"on": "2070-01-01"
 										}
 									],
-									"id": "net-worth-ten-trillion"
+									"id": "sabbatical"
 								}
 							],
 							"schemaVersion": 4
@@ -3700,13 +3697,13 @@
 				"ok": true,
 				"data": {
 					"scenario": {
-						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+						"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-						"forkedFrom": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+						"forkedFrom": "01a204cb-9147-7722-9974-45760e09dedf",
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:42.922Z",
-						"updatedAt": "2026-11-22T19:41:42.922Z",
+						"createdAt": "2026-11-22T19:46:22.111Z",
+						"updatedAt": "2026-11-22T19:46:22.111Z",
 						"document": {
 							"currency": "THB",
 							"flows": [
@@ -3755,7 +3752,7 @@
 									"growth": {
 										"bps": 0
 									},
-									"target": "01a204c7-4b6a-7585-b3c7-cb49e48d069a"
+									"target": "01a204cb-8072-7570-8957-9e128e9c983b"
 								},
 								{
 									"id": "fund",
@@ -3765,37 +3762,37 @@
 									"end": "2050-06-30",
 									"amount": "15000.00",
 									"growth": "inflation",
-									"target": "01a204c7-4a5e-7560-abea-1d2438924ced"
+									"target": "01a204cb-7e08-7507-8a6e-c00de4fdd451"
 								}
 							],
 							"accounts": [
 								{
-									"id": "01a204c7-4990-7374-9519-048fa18bd242",
+									"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 									"kind": "asset",
 									"rate": 100
 								},
 								{
-									"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+									"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 									"kind": "asset",
 									"rate": 500
 								},
 								{
-									"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+									"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 									"kind": "liability",
 									"rate": 500,
 									"compounding": "monthly"
 								}
 							],
 							"cashflow": {
-								"contribute": ["01a204c7-4a5e-7560-abea-1d2438924ced"],
+								"contribute": ["01a204cb-7e08-7507-8a6e-c00de4fdd451"],
 								"surplus": [
 									{
-										"account": "01a204c7-4990-7374-9519-048fa18bd242"
+										"account": "01a204cb-7c59-7783-a85f-41c6ad7df864"
 									}
 								],
 								"withdraw": [
-									"01a204c7-4990-7374-9519-048fa18bd242",
-									"01a204c7-4a5e-7560-abea-1d2438924ced"
+									"01a204cb-7c59-7783-a85f-41c6ad7df864",
+									"01a204cb-7e08-7507-8a6e-c00de4fdd451"
 								]
 							},
 							"economy": {
@@ -5327,15 +5324,12 @@
 									"combine": "all",
 									"criteria": [
 										{
-											"amount": "10000000000000.00",
-											"id": "net-worth",
-											"kind": "metric",
-											"metric": "netWorth",
-											"op": "atLeast",
-											"terms": "nominal"
+											"id": "date",
+											"kind": "date",
+											"on": "2070-01-01"
 										}
 									],
-									"id": "net-worth-ten-trillion"
+									"id": "sabbatical"
 								}
 							],
 							"schemaVersion": 4
@@ -5402,10 +5396,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"id": "01a204cb-9147-7722-9974-45760e09dedf",
 						"name": "base",
-						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
-						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
+						"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
+						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -7136,7 +7130,7 @@
 									"date": "2040-01-30"
 								},
 								{
-									"id": "net-worth-ten-trillion",
+									"id": "sabbatical",
 									"reached": false,
 									"date": null
 								}
@@ -7166,10 +7160,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+						"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
+						"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -8563,7 +8557,7 @@
 									"date": "2040-01-30"
 								},
 								{
-									"id": "net-worth-ten-trillion",
+									"id": "sabbatical",
 									"reached": false,
 									"date": null
 								}
@@ -8594,10 +8588,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"id": "01a204cb-9147-7722-9974-45760e09dedf",
 						"name": "base",
-						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
-						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
+						"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
+						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -9246,10 +9240,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+						"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
+						"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -9809,10 +9803,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+							"id": "01a204cb-9147-7722-9974-45760e09dedf",
 							"name": "base",
-							"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
-							"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
+							"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
+							"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -10424,7 +10418,7 @@
 								"date": "2040-01-30"
 							},
 							{
-								"id": "net-worth-ten-trillion",
+								"id": "sabbatical",
 								"reached": false,
 								"date": null
 							}
@@ -10456,10 +10450,10 @@
 					},
 					"b": {
 						"scenario": {
-							"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+							"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-							"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
+							"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+							"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -10982,7 +10976,7 @@
 								"date": "2040-01-30"
 							},
 							{
-								"id": "net-worth-ten-trillion",
+								"id": "sabbatical",
 								"reached": false,
 								"date": null
 							}
@@ -11069,10 +11063,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"id": "01a204cb-9147-7722-9974-45760e09dedf",
 						"name": "base",
-						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
-						"effectiveContentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2"
+						"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
+						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -12426,10 +12420,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+						"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-						"effectiveContentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9"
+						"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -13766,103 +13760,103 @@
 			"data": {
 				"accounts": [
 					{
-						"id": "01a204c7-4990-7374-9519-048fa18bd242",
+						"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:39.088Z",
-						"updatedAt": "2026-11-22T19:41:39.088Z"
+						"createdAt": "2026-11-22T19:46:14.233Z",
+						"updatedAt": "2026-11-22T19:46:14.233Z"
 					},
 					{
-						"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+						"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:39.562Z",
-						"updatedAt": "2026-11-22T19:41:39.562Z"
+						"createdAt": "2026-11-22T19:46:15.282Z",
+						"updatedAt": "2026-11-22T19:46:15.282Z"
 					},
 					{
-						"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+						"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:39.294Z",
-						"updatedAt": "2026-11-22T19:41:39.294Z"
+						"createdAt": "2026-11-22T19:46:14.664Z",
+						"updatedAt": "2026-11-22T19:46:14.664Z"
 					},
 					{
-						"id": "01a204c7-4d40-77a8-a4f2-9d42ca813c2c",
+						"id": "01a204cb-8308-754f-8ddf-913766840dc4",
 						"name": "Fund Return",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:40.032Z",
-						"updatedAt": "2026-11-22T19:41:40.032Z"
+						"createdAt": "2026-11-22T19:46:15.944Z",
+						"updatedAt": "2026-11-22T19:46:15.944Z"
 					},
 					{
-						"id": "01a204c7-4e11-7646-8f83-f4c5bc3cd623",
+						"id": "01a204cb-847a-77e6-80cf-ab46515f624f",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:40.241Z",
-						"updatedAt": "2026-11-22T19:41:40.241Z"
+						"createdAt": "2026-11-22T19:46:16.314Z",
+						"updatedAt": "2026-11-22T19:46:16.314Z"
 					},
 					{
-						"id": "01a204c7-5067-730a-bde2-36bafaed0eff",
+						"id": "01a204cb-8801-72e7-850d-507408fe4ad8",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:40.839Z",
-						"updatedAt": "2026-11-22T19:41:40.839Z"
+						"createdAt": "2026-11-22T19:46:17.217Z",
+						"updatedAt": "2026-11-22T19:46:17.217Z"
 					},
 					{
-						"id": "01a204c7-4ed9-76ef-897a-ea7f382585e5",
+						"id": "01a204cb-85b4-762e-bab5-e4956406d0c3",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:40.441Z",
-						"updatedAt": "2026-11-22T19:41:40.441Z"
+						"createdAt": "2026-11-22T19:46:16.628Z",
+						"updatedAt": "2026-11-22T19:46:16.628Z"
 					},
 					{
-						"id": "01a204c7-4c6d-74fb-afb5-5cd6e50f740e",
+						"id": "01a204cb-81a7-7053-a8e8-716f3e5c9354",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:39.821Z",
-						"updatedAt": "2026-11-22T19:41:39.821Z"
+						"createdAt": "2026-11-22T19:46:15.591Z",
+						"updatedAt": "2026-11-22T19:46:15.591Z"
 					},
 					{
-						"id": "01a204c7-4f9f-77e3-b4c0-22dd64c87780",
+						"id": "01a204cb-86f0-75f1-bdfc-a99b47339721",
 						"name": "Travel",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:40.639Z",
-						"updatedAt": "2026-11-22T19:41:40.639Z"
+						"createdAt": "2026-11-22T19:46:16.944Z",
+						"updatedAt": "2026-11-22T19:46:16.944Z"
 					}
 				]
 			}
@@ -13877,7 +13871,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a204c7-4990-7374-9519-048fa18bd242",
+							"id": "01a204cb-7c59-7783-a85f-41c6ad7df864",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -13886,7 +13880,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4b6a-7585-b3c7-cb49e48d069a",
+							"id": "01a204cb-8072-7570-8957-9e128e9c983b",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -13895,7 +13889,7 @@
 					},
 					{
 						"account": {
-							"id": "01a204c7-4a5e-7560-abea-1d2438924ced",
+							"id": "01a204cb-7e08-7507-8a6e-c00de4fdd451",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -13917,22 +13911,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"id": "01a204cb-9147-7722-9974-45760e09dedf",
 						"name": "base",
-						"contentHash": "jcs1:sha256:160fc32d2c8f5cae8c701d14f173962e29ace724860b535e7a6119b6dd1553e2",
+						"contentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919",
 						"forkedFrom": null,
 						"version": 3,
-						"createdAt": "2026-11-22T19:41:42.246Z",
-						"updatedAt": "2026-11-22T19:41:42.692Z"
+						"createdAt": "2026-11-22T19:46:19.591Z",
+						"updatedAt": "2026-11-22T19:46:20.912Z"
 					},
 					{
-						"id": "01a204c7-588a-73ad-b134-9d833bde7c46",
+						"id": "01a204cb-9b1f-72b8-8347-9e16230ea0ac",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:ea2b9244ce061cfd197b53ea8ec7b4b8447e63ba7ba60d9d95913070742e34d9",
-						"forkedFrom": "01a204c7-55e6-70d8-855d-22e8b07c7f90",
+						"contentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957",
+						"forkedFrom": "01a204cb-9147-7722-9974-45760e09dedf",
 						"version": 1,
-						"createdAt": "2026-11-22T19:41:42.922Z",
-						"updatedAt": "2026-11-22T19:41:42.922Z"
+						"createdAt": "2026-11-22T19:46:22.111Z",
+						"updatedAt": "2026-11-22T19:46:22.111Z"
 					}
 				]
 			}

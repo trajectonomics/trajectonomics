@@ -1,6 +1,8 @@
 /**
  * The fictional demo Scenario's Milestones: one fires on a date, one when net worth passes a figure, and one
- * that no plan of this size reaches. Amounts are integer minor units, as the document holds them.
+ * whose date falls after the demo's horizon, so it is never reached. Amounts are integer minor units, as
+ * the document holds them. Only one is a metric Milestone: each one makes every Market path of the
+ * chance read evaluate it on every date, and the demo must stay quick enough for the contract test.
  */
 export const DEMO_MILESTONES = [
 	{
@@ -23,17 +25,8 @@ export const DEMO_MILESTONES = [
 		],
 	},
 	{
-		id: "net-worth-ten-trillion",
+		id: "sabbatical",
 		combine: "all",
-		criteria: [
-			{
-				id: "net-worth",
-				kind: "metric",
-				metric: "netWorth",
-				op: "atLeast",
-				amount: 1_000_000_000_000_000,
-				terms: "nominal",
-			},
-		],
+		criteria: [{ id: "date", kind: "date", on: "2070-01-01" }],
 	},
 ]
