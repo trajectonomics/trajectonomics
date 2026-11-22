@@ -2,6 +2,7 @@ import type { Context, Result } from "../command"
 import { checkedAsOf } from "../date"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
+import { recordStartOf } from "../report/record"
 import { withLedger } from "../report/with-ledger"
 import type { Ledger } from "../store"
 import { formatMinorUnits } from "../store"
@@ -18,7 +19,7 @@ export function baselineShowOf(ledger: Ledger, asOf: string): BaselineShow | App
 		kind: balance.kind,
 		amount: formatMinorUnits(balance.amount, BASELINE_CURRENCY),
 	}))
-	return { asOf, currency: BASELINE_CURRENCY, rows }
+	return { asOf, ...recordStartOf(ledger.transactions, asOf), currency: BASELINE_CURRENCY, rows }
 }
 
 /**

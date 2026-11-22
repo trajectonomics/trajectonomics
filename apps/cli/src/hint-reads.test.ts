@@ -79,6 +79,8 @@ describe("a dead-end read names the next command", () => {
 		])
 		expect((await traj(["balance", "--as-of", FIXTURE_AS_OF])).out.split("\n")).toEqual([
 			`asOf: ${FIXTURE_AS_OF}`,
+			"firstTransactionDate: null",
+			"noTransactionsBefore: true",
 			"rows:",
 			"netWorth:",
 			`hint: ${ACCOUNT_HINT}`,
