@@ -2,7 +2,8 @@ import { Database } from "bun:sqlite"
 import { type AppError, isAppError } from "../errors"
 import { guardAt } from "./guard"
 import { HEAD, migrate, tooNew, userVersion } from "./migrations"
-import { copyBeforeMigrating, type PreMigrationCopy } from "./pre-migration"
+import { copyBeforeMigrating } from "./pre-migration"
+import type { PreMigrationCopy } from "./pre-migration-files"
 
 /** An open connection at head, and the copy that was written to get it there, if one was. */
 export type Connected = { db: Database; copy?: PreMigrationCopy }

@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite"
-import { afterEach, describe, expect, it } from "bun:test"
+import { describe, expect, it } from "bun:test"
 import {
 	chmodSync,
 	mkdirSync,
@@ -13,18 +13,10 @@ import { join } from "node:path"
 import { isAppError } from "../errors"
 import { capture } from "../test-support"
 import { HEAD, openStore, preMigrationCopies } from "./index"
-import { copyBeforeMigrating, copyPath } from "./pre-migration"
-import {
-	atVersion,
-	cleanUpHomes,
-	contentOf,
-	dbOf,
-	tracked,
-	versionOf,
-} from "./pre-migration-test-support"
+import { copyBeforeMigrating } from "./pre-migration"
+import { copyPath } from "./pre-migration-files"
+import { atVersion, contentOf, dbOf, versionOf } from "./pre-migration-test-support"
 import { ledgerHome, mustOpen, steppingClock, tempHome } from "./testing"
-
-afterEach(cleanUpHomes)
 
 const open = (home: string) => openStore({ env: { TRAJ_HOME: home }, clock: steppingClock() })
 
@@ -58,7 +50,7 @@ describe("the copy written before an upgrade migrates the database (cli ADR-0050
 	})
 
 	it("writes no copy for the empty database init leaves", async () => {
-		const home = tracked(tempHome())
+		const home = tempHome()
 		expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
 		const store = mustOpen(home)
 		expect(store.upgradedFrom).toBeUndefined()
@@ -68,7 +60,7 @@ describe("the copy written before an upgrade migrates the database (cli ADR-0050
 	})
 
 	it("writes no copy when no migration is needed", () => {
-		const home = tracked(ledgerHome())
+		const home = ledgerHome()
 		mustOpen(home).close()
 		const again = mustOpen(home)
 		expect(again.upgradedFrom).toBeUndefined()
@@ -90,6 +82,7 @@ describe("the copy written before an upgrade migrates the database (cli ADR-0050
 			exitCode: 1,
 			details: { from: 2, copy: target },
 		})
+		expect(store.body.message).toContain("unchanged")
 		expect(store.body.message).toContain(target)
 		expect(versionOf(dbOf(home))).toBe(2)
 		expect(readFileSync(dbOf(home)).equals(before)).toBe(true)
@@ -107,8 +100,9 @@ describe("the copy written before an upgrade migrates the database (cli ADR-0050
 			if (!isAppError(outcome)) throw new Error("expected permission_denied")
 			expect(outcome.body).toMatchObject({
 				code: "permission_denied",
-				details: { path: copyPath(dbOf(home), 2) },
+				details: { path: copyPath(dbOf(home), 2), from: 2 },
 			})
+			expect(outcome.body.message).toContain("unchanged")
 		} finally {
 			chmodSync(home, 0o700)
 			db.close()
@@ -131,7 +125,7 @@ describe("the copy written before an upgrade migrates the database (cli ADR-0050
 		const second = readFileSync(copyPath(dbOf(home), 1))
 		expect(second.equals(first)).toBe(false)
 		expect(preMigrationCopies(dbOf(home)).map((c) => c.schemaVersion)).toEqual([1])
-		const other = tracked(await atVersion(2))
+		const other = await atVersion(2)
 		mustOpen(other).close()
 		expect(readdirSync(other).filter((n) => n.endsWith(".bak"))).toEqual(["traj.db.pre-v2.bak"])
 	})

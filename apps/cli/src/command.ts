@@ -26,6 +26,12 @@ export type Context = {
 	 * keeps running, such as `dashboard`, calls it; the result is still the one envelope on stdout.
 	 */
 	notify?: (line: string) => void
+	/**
+	 * Lines to print on stderr only if the run succeeds, after its result: a note about something
+	 * the run did on the way, such as migrating the database (cli ADR-0050). A failed run answers
+	 * with its envelope alone, so nothing here is printed beside one.
+	 */
+	afterSuccess?: string[]
 }
 
 /** A field the document form cannot work without, and the sentence naming what is missing. It is

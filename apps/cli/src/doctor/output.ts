@@ -38,6 +38,7 @@ export type DoctorResult = {
 		schemaVersion: number | null
 		head: number
 		preMigrationCopies: { path: string; schemaVersion: number; bytes: number }[]
+		unfinishedCopies: string[]
 	}
 	rows: RestoreCounts
 	trialBalance?: DoctorTrialBalance | undefined
@@ -78,6 +79,11 @@ export const doctorOutput: z.ZodType<DoctorResult> = z.strictObject({
 			)
 			.describe(
 				"The copies traj wrote before an upgrade migrated the database, oldest schema version first; each is a database an older traj can open.",
+			),
+		unfinishedCopies: z
+			.array(z.string())
+			.describe(
+				"Half-written copies a crash left beside the database, as paths; safe to delete when no traj is running.",
 			),
 	}),
 	rows: countsSchema.describe("Every stored row, tombstones included; all zero when absent."),

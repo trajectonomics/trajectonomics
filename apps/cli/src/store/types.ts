@@ -2,7 +2,7 @@ import type { ChartOfAccounts } from "@trajectonomics/core/ledger"
 import type { AppError } from "../errors"
 import type { AccountClosed, AccountCreated, AccountDeleted, NewAccount } from "./account-types"
 import type { Ledger } from "./ledger"
-import type { PreMigrationCopy } from "./pre-migration"
+import type { PreMigrationCopy } from "./pre-migration-files"
 import type { RestoreCounts, RestoreRows } from "./restore-types"
 import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
 import type {

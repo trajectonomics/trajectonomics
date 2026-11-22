@@ -1,32 +1,15 @@
 import { Database } from "bun:sqlite"
 import { expect } from "bun:test"
-import { chmodSync, existsSync, rmSync } from "node:fs"
-import { dirname, join } from "node:path"
+import { join } from "node:path"
 import { capture } from "../test-support"
 import { PERSONAL_ENTITY_ID } from "./ids"
 import { schemaV1 } from "./schema-v1"
 import { schemaV2 } from "./schema-v2"
 import { tempHome } from "./testing"
 
-const made: string[] = []
-
-/** Removes every home these helpers made; the tests run it after each test. */
-export function cleanUpHomes(): void {
-	for (const home of made.splice(0)) {
-		if (existsSync(home)) chmodSync(home, 0o700)
-		rmSync(dirname(home), { recursive: true, force: true })
-	}
-}
-
-/** Removes `home` after the test too. */
-export function tracked(home: string): string {
-	made.push(home)
-	return home
-}
-
 /** A home at schema version 1 or 2 with one scenario row, so the copy has something to hold. */
 export async function atVersion(version: 1 | 2): Promise<string> {
-	const home = tracked(tempHome())
+	const home = tempHome()
 	expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
 	const db = new Database(dbOf(home))
 	schemaV1(db)

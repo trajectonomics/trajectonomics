@@ -18,6 +18,7 @@ export const doctor = z.strictObject({
 		preMigrationCopies: z
 			.array(z.strictObject({ path: z.string(), schemaVersion: integer, bytes: integer }))
 			.optional(),
+		unfinishedCopies: z.array(z.string()).optional(),
 	}),
 	rows: z.strictObject({
 		entity: integer,

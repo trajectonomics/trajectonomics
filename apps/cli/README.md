@@ -256,12 +256,21 @@ traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 
 When a newer `traj` has to migrate your database to a newer schema, it first copies it beside the
 original as `traj.db.pre-v<N>.bak`, where `N` is the schema version the copy holds, and says so once
-on stderr. An older `traj` refuses a database a newer one has migrated, so to go back, install a
-release that writes that schema version, delete `traj.db`, `traj.db-wal` and `traj.db-shm` in the
-data directory, and copy the `.bak` file to `traj.db`. If the copy cannot be written (a full disk, a
-directory that is not writable) the database is not migrated and nothing changes. A new, empty
-ledger is not copied. `traj doctor` lists the copies as `database.preMigrationCopies`, and
-`traj data remove` leaves them, because they are separate files you can delete when you no longer need them.
+on stderr. Each copy is about the size of the database, so the upgrade needs that much free space;
+if the copy cannot be written (a full disk, a directory that is not writable) the database is not
+migrated and nothing changes. A new, empty ledger is not copied.
+
+An older `traj` refuses a database a newer one has migrated, so to go back: stop every `traj`,
+install the release you used before (the
+[releases page](https://github.com/trajectonomics/trajectonomics/releases) lists them; `traj doctor`
+on it reports the schema version it writes as `head`, which must equal `N`), delete `traj.db`,
+`traj.db-wal` and `traj.db-shm` in the data directory, and copy the `.bak` file to `traj.db`.
+Changes made after the upgrade are lost: the copy is the database as it was.
+
+`traj doctor` lists the copies as `database.preMigrationCopies`, and any half-written one a crash
+left as `database.unfinishedCopies`. `traj data remove` leaves the copies, because they are separate
+files you can delete when you no longer need them, and its refusal names them: they hold your
+data in plain text.
 
 ## Telemetry
 
