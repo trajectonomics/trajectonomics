@@ -3,6 +3,7 @@ import type { Scenario } from "@trajectonomics/core/sim"
 import { BASELINE_CURRENCY, CROSSING } from "../baseline/kind"
 import { baselineOf } from "../baseline/mapping"
 import { type AppError, fail, isAppError } from "../errors"
+import { firstTransactionDateOf } from "../report/record"
 import type { AccountRow, Ledger } from "../store"
 import { acceptedScenarioSchemaVersion } from "./document"
 
@@ -49,21 +50,12 @@ function declaredAccounts(ledger: Ledger): AccountRow[] {
 		.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
 }
 
-/** The earliest dated Transaction, or null when the Ledger records none. */
-function firstTransactionDate(ledger: Ledger): string | null {
-	let first: string | null = null
-	for (const transaction of ledger.transactions) {
-		if (first === null || transaction.date < first) first = transaction.date
-	}
-	return first
-}
-
 /**
  * The refusals that keep a template from being a document the Baseline could never apply. Each
  * names the command that fixes it, because the caller's next step is always one of those.
  */
 function refusalOf(ledger: Ledger, asOf: string, assets: readonly AccountRow[]): AppError | null {
-	const first = firstTransactionDate(ledger)
+	const first = firstTransactionDateOf(ledger.transactions)
 	if (first === null) {
 		return fail("invalid_input", {
 			path: AS_OF_FIELD,
