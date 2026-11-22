@@ -48,8 +48,8 @@ describe("the Worker config", () => {
 		expect(config.assets?.html_handling).toBe("auto-trailing-slash")
 	})
 
-	it("runs on workers.dev, so a local Worker starts without an account", () => {
-		expect(config.workers_dev).toBe(true)
+	it("serves only its custom domain, so no *.workers.dev copy is published", () => {
+		expect(config.workers_dev).toBe(false)
 	})
 
 	it("pins the compatibility date", () => {

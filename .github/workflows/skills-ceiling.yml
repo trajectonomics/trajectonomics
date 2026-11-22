@@ -1,0 +1,74 @@
+name: Skills' CLI Range ceiling
+
+# A published Skill's CLI Range upper bound is a recheck marker (skills ADR 0004). When npm's `latest`
+# @trajectonomics/cli has reached one, this opens a recheck issue for that Skill, titled with the
+# release and the range, unless an open issue already carries that title. It runs after each stable
+# release and weekly. It changes no file and no branch, and merges nothing.
+on:
+  schedule:
+    - cron: "30 6 * * 2" # Tuesdays, half an hour after the release drift check
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+
+permissions:
+  contents: read # read the manifest and the script that judges it
+
+concurrency:
+  group: skills-ceiling-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  recheck:
+    name: Recheck the Skills whose CLI Range has been passed
+    # A release run counts only when it published a stable release and succeeded; schedule and
+    # workflow_dispatch always run.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Job-level permissions replace the workflow's, so contents is restated here. Only this job may
+    # write issues.
+    permissions:
+      contents: read # read the manifest and the script that judges it
+      issues: write # open the recheck issues
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - name: Read npm's latest command line
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest=$(npm view @trajectonomics/cli version)
+          [ -n "$latest" ] || { echo "::error::npm reported no version for @trajectonomics/cli."; exit 1; }
+          echo "LATEST=$latest" >> "$GITHUB_ENV"
+          echo "npm's latest @trajectonomics/cli is $latest."
+
+      - name: List the open issue titles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue list --state open --limit 1000 --json title --jq '.[].title' > "$RUNNER_TEMP/open-titles.txt"
+
+      - name: Open a recheck issue for each Skill the latest command line has passed
+        working-directory: skills/customer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          bun scripts/cli-range-ceiling.ts --latest "$LATEST" --open "$RUNNER_TEMP/open-titles.txt" > "$RUNNER_TEMP/recheck.jsonl"
+          while IFS= read -r line; do
+            [ -n "$line" ] || continue
+            title=$(jq -r .title <<<"$line")
+            jq -r .body <<<"$line" > "$RUNNER_TEMP/recheck-body.md"
+            echo "Opening: $title"
+            gh issue create --title "$title" --label needs-triage --body-file "$RUNNER_TEMP/recheck-body.md"
+          done < "$RUNNER_TEMP/recheck.jsonl"
+          [ -s "$RUNNER_TEMP/recheck.jsonl" ] || echo "No Skill's CLI Range has been passed by $LATEST, or each already has an open recheck issue."
