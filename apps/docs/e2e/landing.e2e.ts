@@ -74,11 +74,11 @@ test("the Landing Page ends with Site Home, Source and License links", async ({ 
 	)
 	await expect(page.getByRole("link", { name: "Source", exact: true })).toHaveAttribute(
 		"href",
-		"https://github.com/trajectonomics/docs",
+		"https://github.com/trajectonomics/trajectonomics/tree/main/apps/docs",
 	)
 	await expect(page.getByRole("link", { name: "License", exact: true })).toHaveAttribute(
 		"href",
-		"https://github.com/trajectonomics/docs/blob/main/LICENSE",
+		"https://github.com/trajectonomics/trajectonomics/blob/main/apps/docs/LICENSE",
 	)
 })
 
