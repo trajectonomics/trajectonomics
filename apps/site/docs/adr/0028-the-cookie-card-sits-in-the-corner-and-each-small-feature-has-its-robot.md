@@ -21,13 +21,13 @@ This record amends [ADR 0024](./0024-the-site-asks-before-it-sets-an-analytics-c
    - The question is shorter. It names the cookie, what it holds and how long it lasts. It drops the sentence about cookieless counting and the one about the answer cookie. The footer's "Cookie choice" link and ADR 0024's mechanics are unchanged.
 2. **The `hello` robot waves over the traj chat's verdict.** Its hand rests on the verdict's top hairline at the right, and it lands with the verdict. The transcript ends 40 px lower to leave it room, so it never covers a word of the answer.
 3. **The Agent-operated card loses `twins`.** The file is deleted.
-4. **Each small card has its own robot.** They are made the way ADR 0026 made the first poses: Gemini renders keyed out of a green screen, from ADR 0026's brief with `wave` and `peek` as the main references. Each is a transparent WebP in `public/mascot/`. Each sits in its card's top-right corner, 64 px wide, beside the index and the title. Only those two leave it a column, and the copy runs the card's full width.
+4. **Each small card has its own robot.** They are made the way ADR 0026 made the first poses: Gemini renders keyed out of a green screen, from ADR 0026's brief with `wave` and `peek` as the main references. Each is a transparent WebP in `public/mascot/`. Each sits in its card's top-right corner (amended by ADR 0029), 64 px wide, beside the index and the title. Only those two leave it a column, and the copy runs the card's full width.
    - `same` (03, Deterministic): holds up two identical cubes under an equals sign. Same input, same answer.
    - `local` (04, Local-first): hugs a laptop with a house on its lid. It runs on your machine.
    - `open` (05, Open source): peers through a magnifying glass. Read the code.
    - `tax` (06, Tax on request): raises a hand and holds out a percent sign. Tax when you ask for it.
 
-   They hold still, and they load lazily. `same` shipped first. The image quota ran out after it, so `local`, `open` and `tax` follow in a second change.
+   They hold still, and they load lazily. `same` shipped first. The image quota ran out after it, so `local`, `open` and `tax` follow in a second change. [ADR 0029](./0029-each-small-feature-card-puts-its-robot-somewhere-else.md) gives each card its own place, not only the top-right corner.
 5. **ADR 0027's rule is relaxed between the Features heading and card 03.** Taking `twins` out leaves the two wide cards with no robot of their own. On a phone, that is roughly a screen of scroll between the heading's `chart` and card 03's `same`. The owner asked for the change, so this record accepts that stretch.
 
 ## Considered Options
