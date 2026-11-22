@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { decimalDocument } from "./decimal-schema"
+import { decimalDocument, decimalRoot } from "./decimal-schema"
 import { moneyPathsOf, PUBLISHED } from "./money-fields"
 
 type Schema = Record<string, unknown>
@@ -40,5 +40,15 @@ describe("the decimal form's published schema", () => {
 		expect(examples.length).toBe(1)
 		const flows = examples[0]?.["flows"] as Schema[]
 		expect(flows[0]?.["amount"]).toBe("1000.00")
+	})
+})
+
+describe("the decimal form's root description", () => {
+	it("states decimal strings, and that derive graphs and Levies stay in minor units", () => {
+		const description = String(decimalRoot()["description"])
+		expect(description).not.toContain("Every amount is an integer of minor units")
+		expect(description).toContain("every money field is a decimal string")
+		expect(description).toContain("inside a Flow's `derive` graph and inside `levies`")
+		expect(String(PUBLISHED["description"])).toContain("Every amount is an integer of minor units")
 	})
 })

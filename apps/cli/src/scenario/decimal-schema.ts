@@ -2,6 +2,7 @@ import { z } from "zod"
 import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
 import { isMoney, isNode, type Node, PUBLISHED } from "./money-fields"
+import { DECIMAL_UNITS_SENTENCE, MINOR_UNITS_SENTENCE } from "./shape/description"
 import { DECIMAL_UNITS, MINOR_UNITS } from "./shape/terms"
 
 /*
@@ -37,10 +38,16 @@ function decimalNode(node: unknown): unknown {
 	}
 }
 
-/** The root of the decimal form's schema: its examples are converted with the same rule. */
-function decimalRoot(): Node {
+/**
+ * The root of the decimal form's schema: its units sentence says which numbers are decimal strings,
+ * and its examples are converted with the same rule.
+ */
+export function decimalRoot(): Node {
 	const root: Node = { ...PUBLISHED }
 	delete root["$schema"]
+	if (typeof root["description"] === "string") {
+		root["description"] = root["description"].replace(MINOR_UNITS_SENTENCE, DECIMAL_UNITS_SENTENCE)
+	}
 	const examples = Array.isArray(root["examples"]) ? root["examples"] : undefined
 	const converted = examples?.flatMap((example) => {
 		const decimal = isNode(example) ? toDecimalForm(example) : undefined
