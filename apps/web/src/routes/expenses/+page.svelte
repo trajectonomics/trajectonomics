@@ -1,0 +1,17 @@
+<script lang="ts">
+import { page } from "$app/state"
+import { editSession } from "../../client/edit.svelte.js"
+import { queryParam } from "../../client/query-param.svelte.js"
+import PlanItemsPage from "../../components/pages/PlanItemsPage.svelte"
+import { editsShown } from "../../lib/edit/shown"
+</script>
+
+<svelte:head>
+	<title>Expenses · Dashboard</title>
+</svelte:head>
+
+<PlanItemsPage
+	kind="expense"
+	scenario={queryParam("scenario", "")}
+	editable={editsShown(editSession.token, page.url.search)}
+/>

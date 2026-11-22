@@ -94,6 +94,20 @@ describe("stage two", () => {
 		])
 	})
 
+	test("each Scenario's document is read in the decimal form, with the name after the flags", () => {
+		const plan = planStageTwo(paramsOf({}), stageOne("2026-10-31", ["base", "retire-early"]))
+		expect(Object.keys(plan.documents)).toEqual(["base", "retire-early"])
+		expect(plan.documents["base"]?.argv).toEqual([
+			"scenario",
+			"show",
+			"--decimal",
+			"--json",
+			"--",
+			"base",
+		])
+		expect(plan.documents["base"]?.carryInFor).toEqual([])
+	})
+
 	test("a named Scenario replaces the ledger's list", () => {
 		const plan = planStageTwo(
 			paramsOf({ scenarios: ["retire-early"] }),

@@ -1,3 +1,4 @@
+import type { ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { Edit } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER } from "../lib/edit/guard"
@@ -11,6 +12,8 @@ class EditSession {
 	token = $state<string | null>(null)
 	busy = $state(false)
 	error = $state<string | null>(null)
+	/** The CLI's error envelope of the last refused Edit, so a form can show it at the field it names. */
+	failure = $state<ErrorBody | null>(null)
 	private opened: Promise<void> | null = null
 
 	/** Asks the server for the token once. A server that does not answer (`vite preview`) leaves it null. */
@@ -19,11 +22,18 @@ class EditSession {
 		return this.opened
 	}
 
+	/** Forgets the last Edit's error, so a form opened afterwards shows none of it. */
+	clear(): void {
+		this.error = null
+		this.failure = null
+	}
+
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
 	async run(edit: Edit): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
 		this.error = null
+		this.failure = null
 		try {
 			const response = await fetch(EDIT_PATH, {
 				method: "POST",
@@ -48,6 +58,7 @@ class EditSession {
 		}
 		if (!answer.ok) {
 			this.error = answer.error.message
+			this.failure = answer.error
 			return false
 		}
 		replaceSnapshot(answer.snapshot)

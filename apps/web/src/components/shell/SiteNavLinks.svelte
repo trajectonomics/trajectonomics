@@ -1,5 +1,5 @@
 <script lang="ts">
-import { NAV_GROUPS } from "../../lib/view/routes"
+import { NAV_GROUPS, routesShown } from "../../lib/view/routes"
 import { cx } from "../ui/cx"
 import SiteLink from "../ui/SiteLink.svelte"
 import NavIcon from "./NavIcon.svelte"
@@ -9,9 +9,11 @@ interface Props {
 	current: string
 	/** Runs when a link is followed, so the menu drawer on a narrow screen closes. */
 	onNavigate: () => void
+	/** Whether the Snapshot holds the selected plan's document: the planner pages are listed only then. */
+	planDocument?: boolean
 }
 
-let { current, onNavigate }: Props = $props()
+let { current, onNavigate, planDocument = true }: Props = $props()
 </script>
 
 <!-- The pages in groups: a group with a heading, then the pages that belong to no group. -->
@@ -24,7 +26,7 @@ let { current, onNavigate }: Props = $props()
 				</h2>
 			{/if}
 			<ul class="space-y-1">
-				{#each group.routes as route (route.path)}
+				{#each routesShown(group, planDocument) as route (route.path)}
 					{@const isCurrent = route.path === current}
 					<li>
 						<SiteLink
