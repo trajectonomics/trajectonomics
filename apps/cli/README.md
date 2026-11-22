@@ -185,6 +185,16 @@ seed and count always give the same answer. The CLI ships no Return model: which
 market history a plan is tested against is your decision, and every figure is
 only as good as that choice. `traj schema projection chance` describes the file.
 
+## Money as decimals in a Scenario
+
+> **Ships in 0.8.0.**
+
+`traj scenario show base --decimal` prints a Scenario with each amount as a decimal string of the
+Currency's major unit, such as `"1000.00"` for 100000 satang, and
+`traj scenario apply base --file base.json --decimal` reads that form back. The stored plan is the
+same either way: saving what `show --decimal` printed leaves it unchanged. A value with more places
+than the Currency has is refused, never rounded.
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.

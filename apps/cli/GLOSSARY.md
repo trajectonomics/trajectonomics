@@ -156,6 +156,10 @@ _Avoid_: Simulation, run, scenario path
 The net-worth Percentiles across Market paths at one annual roll-up end, at the 10th, 25th, 50th, 75th and 90th levels. Every Band value is one a path produced.
 _Avoid_: Range, interval, confidence band
 
+**Decimal form**:
+The Scenario document with each money field written as a decimal string of the Currency's major unit, such as `"350.00"`, as `scenario show --decimal` prints it and `scenario apply --decimal` reads it. The stored document is always minor units, so the two forms have one hash (ADR-0047).
+_Avoid_: Float form, human form, display form
+
 ### Financial independence
 
 **FI**:
