@@ -3,35 +3,44 @@
  * phone always has a robot on screen. Each sits in its section's own free space and moves nothing else.
  */
 
-/* The demo's traj chat: the robot waves from the header, between the title and the tag, its hand on the hairline. */
+/*
+ * The demo's traj chat: the robot waves over the verdict's top hairline at the right, its hand on the line, and lands
+ * with the verdict (ADR 0028). The transcript ends with room for it, so it never covers a word of the answer.
+ */
+.app-chat[data-chat="with"] .app-scroll {
+	padding-bottom: 40px;
+}
+
+.app-verdict[data-tone="good"] {
+	position: relative;
+}
+
 .mascot-hello {
+	position: absolute;
+	right: 16px;
+	bottom: calc(100% - 1px);
 	width: 48px;
-	flex: none;
-	align-self: flex-end;
-	margin: -4px 0 -11px auto;
 }
 
 /*
- * Agent-operated: the robot stands at the right of the card's words, under its sample. The anchor is a zero-height row
- * between the two that takes back the flex gap, so the card keeps its rhythm; the words leave the robot its column.
+ * The four small Features cards: each robot acts out its card's feature in the card's top-right corner, beside the
+ * index and the title (ADR 0028). The copy below runs the card's full width, so only the index and the title leave
+ * the robot its column.
  */
-.mascot-anchor {
+.feature-mascot {
 	position: relative;
-	height: 0;
-	margin-bottom: -10px;
 }
 
-.mascot-twins {
+.mascot-card {
 	position: absolute;
-	top: 8px;
-	right: 0;
-	width: 60px;
+	top: 14px;
+	right: 16px;
+	width: 64px;
 }
 
 .feature-mascot .feature-index,
-.feature-mascot .feature-title,
-.feature-mascot .feature-copy {
-	padding-right: 76px;
+.feature-mascot .feature-title {
+	padding-right: 72px;
 }
 
 /* The FAQ: the robot thinks beside the heading on a phone and under it beside the questions on a wide screen. */

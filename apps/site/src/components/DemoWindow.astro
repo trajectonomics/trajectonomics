@@ -135,8 +135,6 @@ const keys = (prompt: typeof typed.with, chars: number) =>
 			<div class="app-chat" data-chat="with" data-play-ms={guided.totalMs}>
 				<div class="app-chat-head">
 					<span class="app-chat-title">{dictionary.appTitleWith}</span>
-					{/* The Mascot waves from the header where traj joins the chat; its hand rests on the hairline (mascot-places.css). */}
-					<Mascot pose="hello" class="mascot-hello" />
 					<span class="app-chat-tag" data-tone="good">
 						<Check class="app-chat-mark" />{dictionary.actionWithLabel}
 					</span>
@@ -174,6 +172,8 @@ const keys = (prompt: typeof typed.with, chars: number) =>
 					</ol>
 				</div>
 				<p class="app-verdict text-foreground" data-tone="good" style={`--step-delay:${guided.totalMs}ms`}>
+					{/* The Mascot waves over the verdict's hairline once traj's answer lands, so it arrives with it (ADR 0028). */}
+					<Mascot pose="hello" class="mascot-hello" />
 					{dictionary.actionWithNote}
 				</p>
 				<div class="app-composer" aria-hidden="true" style={keys(typed.with, [...skilled].length)}>

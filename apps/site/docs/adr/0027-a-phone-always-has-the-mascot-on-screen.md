@@ -4,6 +4,8 @@ status: accepted
 
 # A phone always has the Mascot on screen
 
+[ADR 0028](./0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md) amends item 2: `hello` moves from the chat header to the verdict's hairline, `twins` is gone, and the four small Features cards each carry their own pose.
+
 [ADR 0025](./0025-the-page-carries-the-mascot.md) and [ADR 0026](./0026-the-mascot-is-a-rendered-cut-out.md) put the Mascot in four places; this record extends both. On 2026-11-22 the owner asked for more, by a rule of thumb: a visitor scrolling the home on a phone should always see the robot, so they learn that it is ours and remember it. They did not want it repeated across the width or floating over the page.
 
 Measured at 390 × 844, the four places left three stretches with no robot on screen. Between the hero and the Features heading the gap is about 1,200 px of scroll with reduced motion; with motion on, the demo shows one chat at a time and the stretch closes. Between the Features heading and the closing call to action it is about 1,800 px. In the footer it is the last screen.
