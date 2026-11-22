@@ -32,9 +32,9 @@ Set to `1` to print diagnostics for unexpected errors on stderr.
 
 ## TRAJ_TELEMETRY
 
-Set to `0`, `off` or `false`, in upper or lower case, to stop the anonymous usage count for the
-command that runs with it. Any other value leaves the count as it was. `traj telemetry status` reports it as the
-reason `env_off`. [Telemetry](/cli/commands/telemetry/) lists what the count holds:
+Set to `0`, `off` or `false`, in any letter case, to stop the anonymous usage count for the command
+that runs with it. Any other value leaves the count as it was. `traj telemetry status` reports it as
+the reason `env_off`. [Telemetry](/cli/commands/telemetry/) lists what the count holds:
 
 ```bash
 TRAJ_TELEMETRY=0 traj version  # Run one command without counting it.
