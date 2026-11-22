@@ -14,6 +14,8 @@ const ENVIRONMENT: readonly (readonly [string, string])[] = [
 	["TRAJ_FORMAT", "human (default) or json; --json takes precedence"],
 	["TRAJ_HOME", "Data directory (default ~/.traj)"],
 	["TRAJ_DEBUG", "Set to 1 to print diagnostics for unexpected errors"],
+	["TRAJ_TELEMETRY", "0, off or false stops the anonymous usage count (see traj telemetry)"],
+	["DO_NOT_TRACK", "Any value but empty, 0 or false stops the anonymous usage count"],
 ]
 
 function groupUsage(group: Group, path: readonly string[]): string {
