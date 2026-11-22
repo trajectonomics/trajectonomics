@@ -4,6 +4,8 @@ status: accepted
 
 # The Site asks before it sets an analytics cookie
 
+Item 1's placement is amended by [ADR 0028](./0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md): the banner is now a small card fixed to the bottom-left corner, out of the hero.
+
 The owner asked on 2026-11-22 for a cookie on the landing page, with consent. The Site's analytics has been cookieless since [ADR 0011](./0011-analytics-from-the-page-itself.md): every event carries an id made for that event alone. That keeps the Site free of any stored state, and it means a pageview and a copy are two counts that can never be linked. It also means the Site cannot tell a new visitor from a returning one, so the numbers say how many events happened and not how many people came back. Only a stored id can answer that, and only a visitor who agrees should be asked to store one.
 
 ## Decision

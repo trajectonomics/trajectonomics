@@ -131,7 +131,7 @@ One Account's value in a Projection row, split into `amount`, `capitalised` and 
 _Avoid_: Balance entry, row amount
 
 **Flow**:
-A dated cash movement of kind `income`, `expense` or `contribution`, with a frequency (including `once`), a start, an optional end, and growth. Replaces the former Stream and Event.
+A dated cash movement of kind `income`, `expense` or `contribution`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
@@ -188,6 +188,36 @@ _Avoid_: Emergency fund, cash reserve
 **Rule-of-thumb reference**:
 An informational multiple of annual expenses (25 by default) reported beside a reachable FI month. The caller may set the multiplier, which balances count, which twelve months of expenses it divides by, and nominal or real money. It never decides the FI answer.
 _Avoid_: FI threshold, target net worth, 25× reference
+
+## Milestones
+
+**Milestone**:
+A named point in the plan. Its Criteria are combined with `all` or `any`, and it fires on the first evaluation date (or, for a Static milestone, the date) its Criteria hold; it stays fired. A Flow gates on it with `startAt` (lands on or after the fire date) or `endAt` (lands strictly before it).
+_Avoid_: Event, trigger, goal, checkpoint
+
+**Criterion**:
+One condition of a Milestone: a `date`, an offset in months from another Milestone's fire date, a Metric compared with an amount, or a Metric compared with a multiple of another Metric.
+_Avoid_: Condition, rule, predicate
+
+**Metric**:
+A money figure read from the plan on a date: a named balance (net worth, accessible net worth, all assets, unlocked assets, liabilities), the sum of named Accounts, or an expense window (next or trailing twelve months). Read before that date's Flows land.
+_Avoid_: KPI, indicator, Measure
+
+**Fire date**:
+The date a Milestone fires. It is a Landed date: for a Static milestone it is known before the run; for a Dynamic milestone it is the evaluation date on which it first fires.
+_Avoid_: Trigger date, hit date, achieved date
+
+**Static milestone**:
+A Milestone whose Criteria name only dates and other Static milestones, so its Fire date is known before the run. It may fall before `Timeline.start`.
+_Avoid_: Fixed milestone, scheduled milestone
+
+**Dynamic milestone**:
+A Milestone with a Metric Criterion, or one that names a Dynamic milestone. It fires only on an Evaluation date.
+_Avoid_: Conditional milestone, live milestone
+
+**Evaluation date**:
+A date on which a Flow's recurrence lands or a Settlement falls, and so the only dates a Dynamic milestone can fire on. Observation rows are never evaluation dates, so `resolution` changes no fire date.
+_Avoid_: Tick, check date, observation date
 
 ## Market Paths and Stochastic Runs
 

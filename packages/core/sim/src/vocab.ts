@@ -38,3 +38,14 @@ export const REFERENCE_BASES = [
 ] as const
 export const REFERENCE_WINDOWS = ["next12Months", "trailing12Months"] as const
 export const REFERENCE_TERMS = ["nominal", "real"] as const
+export const CRITERION_KINDS = ["date", "milestone", "metric", "multiple"] as const
+export const MILESTONE_COMBINES = ["all", "any"] as const
+export const COMPARISONS = ["atLeast", "atMost"] as const
+export const MILESTONE_TERMS = ["nominal", "real"] as const
+export const METRIC_NAMES = [
+	"netWorth",
+	"accessibleNetWorth",
+	"allAssets",
+	"unlockedAssets",
+	"liabilities",
+] as const

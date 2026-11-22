@@ -61,6 +61,7 @@ export function addMonthsClamped(date: DateString, months: number): DateString {
 	const total = year * 12 + (month - 1) + months
 	const targetYear = Math.floor(total / 12)
 	if (targetYear > 9999) return LAST_DATE
+	if (targetYear < 1) return FIRST_DATE
 	const targetMonth = (((total % 12) + 12) % 12) + 1
 	return formatDate({
 		year: targetYear,

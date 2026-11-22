@@ -5,6 +5,7 @@ import type { BasisPoints, DateString, Timeline } from "../types"
 import type { FinancialIndependenceOptions } from "../types/financial-independence"
 import { retirementEvents, uniqueRetirementId } from "./retirement-spending"
 import { merge } from "./scan-merge"
+import { stopsFlow } from "./scan-stop"
 
 export interface ScanGrid {
 	/** Every original event the stop keeps, in date-then-id order. */
@@ -13,13 +14,10 @@ export interface ScanGrid {
 	/** The retirement expenses from the first candidate, in month order, with their amounts. */
 	readonly added: readonly DatedEvent[]
 	readonly firstMonth: DateString
+	/** Whether retirement spending replaces the original expenses from the first candidate. */
+	readonly retirement: boolean
 	/** Sorted unique dates of the whole scan: kept and added events, Settlements and the horizon. */
 	readonly dates: readonly DateString[]
-}
-
-function stopped(event: DatedEvent, retirement: boolean): boolean {
-	if (event.flow.kind === "income" && event.flow.earned) return true
-	return retirement && event.flow.kind === "expense"
 }
 
 export function lowerBound(dates: readonly DateString[], target: DateString): number {
@@ -58,7 +56,8 @@ export function scanGrid(
 	inflation: BasisPoints,
 ): ScanGrid {
 	const retirement = options.retirementSpending
-	const kept = events.filter((event) => !stopped(event, retirement !== undefined))
+	const stop = stopsFlow(retirement !== undefined)
+	const kept = events.filter((event) => !stop(event.flow))
 	const added =
 		retirement === undefined
 			? []
@@ -73,6 +72,7 @@ export function scanGrid(
 					amount: fixedAmountAt(event.flow as never, event.years, inflation),
 				}))
 	return {
+		retirement: retirement !== undefined,
 		kept,
 		keptDates: kept.map((event) => event.date),
 		added,

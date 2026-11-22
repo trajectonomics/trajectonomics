@@ -2,18 +2,21 @@ import type { ResolvedCalendar } from "../calendar/business"
 import { collectDates } from "../engine/dates"
 import { type DatedEvent, flowsAt } from "../engine/events"
 import { planLevies } from "../engine/levy-finish"
-import { allSettlementDates, closeReturnsOn, hasSettlement, type LevySet } from "../engine/levy-set"
-import { type EngineRunsOut, processDate } from "../engine/occurrence"
-import { isSafeInteger, overflow } from "../engine/overflow"
+import { allSettlementDates, type LevySet } from "../engine/levy-set"
+import type { EngineRunsOut } from "../engine/occurrence"
 import type { ResolvedReturns } from "../engine/returns"
 import { createStates, type StateMap } from "../engine/state"
+import { MilestoneGate } from "../milestone/gate"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { cloneLevySet, cloneStates } from "./clone"
+import { advance } from "./prefix-advance"
 
 export interface PrefixPoint {
 	readonly states: StateMap
 	readonly levies: LevySet | undefined
+	/** The Milestone state before this date, present only when the Scenario declares Milestones. */
+	readonly gate?: MilestoneGate
 }
 
 export interface Prefix {
@@ -39,29 +42,6 @@ export function levyPlan(
 	return { levies, settlementDates: allSettlementDates(levies, timeline.horizon) }
 }
 
-interface PrefixAdvance {
-	readonly problem?: ProjectionProblem
-	readonly runsOut?: EngineRunsOut
-}
-
-function advance(
-	states: StateMap,
-	scenario: Scenario,
-	date: DateString,
-	dayEvents: readonly DatedEvent[],
-	levies: LevySet | undefined,
-): PrefixAdvance {
-	if (dayEvents.length === 0 && !(levies !== undefined && hasSettlement(levies, date))) {
-		return {}
-	}
-	if (levies !== undefined) closeReturnsOn(levies, states, date)
-	const outcome = processDate(states, scenario, date, dayEvents, levies)
-	if (outcome.problem !== undefined) return { problem: outcome.problem }
-	if (outcome.runsOut === undefined) return {}
-	if (!isSafeInteger(outcome.runsOut.unmet)) return { problem: overflow(date) }
-	return { runsOut: outcome.runsOut }
-}
-
 /** Walks the unmodified Scenario once, saving states and Levy tallies before each candidate month. */
 export function baselinePrefix(
 	baseline: Baseline,
@@ -74,17 +54,19 @@ export function baselinePrefix(
 ): Prefix {
 	const states = createStates(baseline, scenario, timeline.start, series)
 	const { levies, settlementDates } = levyPlan(scenario, timeline, calendar)
+	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
 	const wanted = new Set(candidates)
 	const points = new Map<DateString, PrefixPoint>()
 	const dates = collectDates(events, candidates, settlementDates)
 	let index = 0
 	for (const date of dates) {
 		if (wanted.has(date)) {
-			points.set(date, { states: cloneStates(states), levies: cloneLevySet(levies) })
+			const gated = gate === undefined ? {} : { gate: gate.clone(events) }
+			points.set(date, { states: cloneStates(states), levies: cloneLevySet(levies), ...gated })
 		}
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
-		const stepped = advance(states, scenario, date, dayEvents, levies)
+		const stepped = advance(states, scenario, date, dayEvents, levies, gate)
 		if (stepped.problem !== undefined) {
 			return { points, runsOut: undefined, problem: stepped.problem, stoppedAt: date }
 		}

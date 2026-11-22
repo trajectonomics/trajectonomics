@@ -24,7 +24,7 @@ describe("the 25× reference beside a reachable month", () => {
 			fixture.scenario,
 			fixture.timeline,
 			emptyWindow,
-			undefined,
+			() => emptyWindow,
 		)
 		expect(ruleOfThumb(states, "2026-06-30", plan).ok).toBe(true)
 		expect(state.asOf).toBe("2026-01-01")

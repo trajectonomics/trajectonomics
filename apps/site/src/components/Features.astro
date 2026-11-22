@@ -11,10 +11,10 @@ interface Props {
 
 const { dictionary } = Astro.props
 /**
- * The card the Mascot stands in, holding up two checked cards, its input and its output: Agent-operated, the second.
- * It is the one that keeps a robot on a phone's screen between the Features heading and the FAQ (ADR 0027).
+ * The pose each small card's Mascot strikes to act out its feature (ADR 0028), by the card's index. The two wide cards
+ * carry a CLI sample instead, and the robot beside the heading already stands over them.
  */
-const MASCOT_CARD = 1
+const CARD_POSES = [undefined, undefined, "same"] as const
 ---
 
 <section class="section-surface bg-background">
@@ -34,11 +34,12 @@ const MASCOT_CARD = 1
 			{
 				dictionary.featureTitles.map((title, index) => {
 					const sample = FEATURE_SAMPLES[index]
+					const pose = CARD_POSES[index]
 					return (
 						<li
 							class:list={[
 								"feature bg-background text-foreground",
-								{ "feature-wide": sample !== undefined, "feature-mascot": index === MASCOT_CARD },
+								{ "feature-wide": sample !== undefined, "feature-mascot": pose !== undefined },
 							]}
 						>
 							{sample !== undefined && (
@@ -50,11 +51,7 @@ const MASCOT_CARD = 1
 									<figcaption class="feature-sample-note">{dictionary.actionExampleNote}</figcaption>
 								</figure>
 							)}
-							{index === MASCOT_CARD && (
-								<span class="mascot-anchor">
-									<Mascot pose="twins" class="mascot-twins" />
-								</span>
-							)}
+							{pose !== undefined && <Mascot pose={pose} class="mascot-card" />}
 							<span class="feature-index text-muted-foreground tabular-nums">
 								{String(index + 1).padStart(2, "0")}
 							</span>

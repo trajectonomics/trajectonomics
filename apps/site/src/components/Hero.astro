@@ -3,7 +3,6 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import Consent from "./Consent.astro"
 import CopyPrompt from "./CopyPrompt.astro"
 import DemoWindow from "./DemoWindow.astro"
 import Mascot from "./Mascot.astro"
@@ -29,11 +28,6 @@ const subline = sublineParts(dictionary.heroSubline)
 			</div>
 		</div>
 	</div>
-	{/*
-		The cookie banner (ADR 0024) is the stage's first row, so the hero still starts at the top of the
-		page and its field never reaches the header. The Worker leaves it out once the visitor has answered.
-	*/}
-	<Consent dictionary={dictionary} />
 	<div
 		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-5 pt-20 pb-10 text-center sm:px-6 sm:pt-28 sm:pb-14"
 	>
