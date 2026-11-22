@@ -44,6 +44,7 @@ export function taxYear(
 		owed,
 		settled,
 		partial,
+		assumptions: [],
 	}
 }
 

@@ -1,6 +1,8 @@
+import { assumptionLines } from "./assumptions-block"
 import type { Env } from "./command"
 import type { AppError } from "./errors"
 import { type RenderHint, renderTableResult } from "./table"
+import { ASSUMPTIONS_KEY } from "./tax-assumptions"
 
 /** How a command renders its result, chosen explicitly and never inferred from a terminal. */
 export type Format = "human" | "json"
@@ -46,11 +48,13 @@ function renderHumanLines(value: unknown, indent: string): string[] {
 		})
 	}
 	if (isRecord(value)) {
-		return Object.entries(value).flatMap(([key, child]) =>
-			isScalar(child)
-				? [`${indent}${key}: ${String(child)}`]
-				: [`${indent}${key}:`, ...renderHumanLines(child, `${indent}  `)],
-		)
+		return Object.entries(value)
+			.filter(([key]) => key !== ASSUMPTIONS_KEY)
+			.flatMap(([key, child]) =>
+				isScalar(child)
+					? [`${indent}${key}: ${String(child)}`]
+					: [`${indent}${key}:`, ...renderHumanLines(child, `${indent}  `)],
+			)
 	}
 	return [`${indent}${JSON.stringify(value)}`]
 }
@@ -60,7 +64,9 @@ export function renderResult(data: unknown, format: Format, hint?: RenderHint): 
 	if (format === "json") return JSON.stringify(data)
 	if (typeof data === "string") return data
 	const tables = hint === undefined ? null : renderTableResult(data, hint)
-	return tables ?? renderHumanLines(data, "").join("\n")
+	const body = tables ?? renderHumanLines(data, "").join("\n")
+	const assumptions = assumptionLines(data)
+	return assumptions.length === 0 ? body : `${body}\n\n${assumptions.join("\n")}`
 }
 
 /** One engine problem a refused projection lists: its code, and where it is. */

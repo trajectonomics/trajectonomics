@@ -56,3 +56,24 @@ describe("TaxPanel: the tax years", () => {
 		)
 	})
 })
+
+describe("TaxPanel: the assumptions", () => {
+	const gpf = {
+		path: "allowances.retirementCluster.gpf.maxRate",
+		value: 0.3,
+		status: "reported" as const,
+		note: "Government pension fund limit, share of wages.",
+	}
+
+	test("names each unconfirmed figure once, with its value and status", () => {
+		const years = [year({ assumptions: [gpf] }), year({ from: "2027-01-01", assumptions: [gpf] })]
+		const body = panel({ base: ok(projectionRun({ taxYears: years })) })
+		expect(body).toContain("Assumptions")
+		expect(body.split(gpf.path).length).toBe(2)
+		expect(body).toContain("Used 0.3; reported.")
+	})
+
+	test("says nothing about assumptions when every figure used is confirmed", () => {
+		expect(panel({ base: ok(withLevy) })).not.toContain("Assumptions")
+	})
+})

@@ -38,7 +38,7 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 		horizon: timeline.horizon,
 		currency,
 		runsOut: runsOutView(projection.runsOut, currency),
-		taxYears: taxYearsOf(projection.levies, currency),
+		taxYears: taxYearsOf(projection.levies, currency, prepared.document),
 		tables,
 	}
 }

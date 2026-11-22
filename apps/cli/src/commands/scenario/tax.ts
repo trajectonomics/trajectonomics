@@ -9,6 +9,7 @@ import {
 } from "../../scenario/tax"
 import { deductionFlags } from "../../scenario/tax/deduction-flags"
 import { writtenScenario } from "../../scenario/view"
+import { assumptionsField } from "../../tax-assumptions"
 
 export const tax: Leaf = defineCommand({
 	name: "tax",
@@ -66,6 +67,11 @@ export const tax: Leaf = defineCommand({
 			.optional()
 			.describe(
 				"The deduction classes the write stated; absent when --none wrote no Levy. It says what the flags said, not what tax-core applied.",
+			),
+		assumptions: assumptionsField
+			.optional()
+			.describe(
+				"The tax figures the stored Levy would use whose source is not yet confirmed, for the labels the Scenario's Flows carry; absent when --none wrote no Levy. A Projection's `taxYears` say which year used which.",
 			),
 		scenario: writtenScenario,
 	}),

@@ -1,9 +1,11 @@
 import { type Context, ok, type Result } from "../../command"
 import { type AppError, fail, isAppError } from "../../errors"
+import type { AssumptionView } from "../../tax-assumptions"
 import { withStore } from "../../with-store"
 import { type ScenarioDocument, scenarioDocumentError } from "../document"
 import { scenarioNotFound } from "../errors"
 import { view, type WrittenScenario } from "../view"
+import { taxAssumptionsOf } from "./assumptions"
 import { type TaxFlags, type TaxRequest, taxRequestOf } from "./flags"
 import { type FlowLabel, flowLabelOf } from "./labels"
 import { TAX_LEVY_ID, withTaxLevy } from "./levy"
@@ -18,6 +20,8 @@ export type TaxWritten = {
 	levy?: string | undefined
 	/** The allowance classes the flags stated; absent when --none wrote no Levy. */
 	allowances?: TaxProfileView | undefined
+	/** The unconfirmed tax figures the stored Levy would use; absent when --none wrote no Levy. */
+	assumptions?: AssumptionView[] | undefined
 	scenario: WrittenScenario
 }
 
@@ -83,7 +87,9 @@ function save(
 	return ok({
 		dryRun,
 		status: outcome.status,
-		...(profile === undefined ? {} : { levy: TAX_LEVY_ID, allowances: profile }),
+		...(profile === undefined
+			? {}
+			: { levy: TAX_LEVY_ID, allowances: profile, assumptions: taxAssumptionsOf(document) }),
 		scenario: { ...scenario, id },
 	})
 }
