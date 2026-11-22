@@ -53,6 +53,14 @@ export function walk(root: Group, argv: readonly string[]): Walk | AppError {
 	return { node, path, rest }
 }
 
+/**
+ * The words of a command path as the caller meant them: a quoted `"tx add"` is two words, the
+ * same as `tx add`, so `traj schema "tx add"` and `traj help "tx add"` answer.
+ */
+export function pathWords(path: readonly string[]): string[] {
+	return path.flatMap((arg) => arg.split(/\s+/)).filter((word) => word !== "")
+}
+
 export function findNode(root: Group, path: readonly string[]): Node | undefined {
 	let node: Node = root
 	for (const word of path) {
