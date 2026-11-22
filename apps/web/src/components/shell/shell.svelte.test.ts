@@ -3,21 +3,72 @@ import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import SiteLink from "../ui/SiteLink.svelte"
+import DisplayOptions from "./DisplayOptions.svelte"
+import PlanSwitcher from "./PlanSwitcher.svelte"
 import PreferenceControls from "./PreferenceControls.svelte"
 import SiteBrand from "./SiteBrand.svelte"
 import SiteNavLinks from "./SiteNavLinks.svelte"
 
 const label = createRawSnippet(() => ({ render: () => "Net worth" }))
+const noop = () => {}
 
 describe("SiteNavLinks", () => {
-	test("marks the current page with aria-current and lists the eight pages in order", () => {
-		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/" } })
+	beforeEach(() => setTestUrl("http://127.0.0.1/net-worth/"))
+
+	test("groups the pages under their headings, in order, in one labelled navigation", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
+		expect(body).toContain('<nav aria-label="Pages"')
+		const at = (text: string) => body.indexOf(text)
+		expect(at("Home")).toBeGreaterThan(-1)
+		expect(at("Net worth")).toBeGreaterThan(at("Home"))
+		expect(at(">Plan<")).toBeGreaterThan(at("Net worth"))
+		expect(at("Overview")).toBeGreaterThan(at(">Plan<"))
+		expect(at("FI date")).toBeGreaterThan(at("Overview"))
+		expect(at("Compare")).toBeGreaterThan(at("FI date"))
+		expect(at("Tax")).toBeGreaterThan(at("Compare"))
+		expect(at(">Records<")).toBeGreaterThan(at("Tax"))
+		expect(at("Ledger")).toBeGreaterThan(at(">Records<"))
+		expect(at("Health")).toBeGreaterThan(at("Ledger"))
+	})
+
+	test("marks the current page with aria-current, and only that page", () => {
+		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
 		expect(body).toMatch(/href="\/net-worth\/" aria-current="page"/)
 		expect(body.match(/aria-current="page"/g)?.length).toBe(1)
-		const overview = body.indexOf("Overview")
-		const health = body.indexOf("Health")
-		expect(overview).toBeGreaterThan(-1)
-		expect(health).toBeGreaterThan(overview)
+	})
+
+	test("keeps the scenario and demo parameters on every link, so the plan stays chosen", () => {
+		setTestUrl("http://127.0.0.1/net-worth/?demo=1&scenario=retire-early")
+		const { body } = render(SiteNavLinks, { props: { current: "/", onNavigate: noop } })
+		expect(body).toContain('href="/tax/?demo=1&amp;scenario=retire-early"')
+		expect(body).toContain('href="/projection/?demo=1&amp;scenario=retire-early"')
+	})
+})
+
+describe("PlanSwitcher", () => {
+	test("offers each Scenario name and selects the one the pages show", () => {
+		const { body } = render(PlanSwitcher, {
+			props: { names: ["base", "retire-early"], selected: "retire-early", onChange: noop },
+		})
+		expect(body).toContain("<select")
+		expect(body).toContain("Scenario")
+		expect(body).toMatch(/<option value="base"/)
+		expect(body).toMatch(/<option value="retire-early" selected/)
+	})
+
+	test("is hidden when the Snapshot names no Scenario", () => {
+		const { body } = render(PlanSwitcher, { props: { names: [], selected: "", onChange: noop } })
+		expect(body).not.toContain("<select")
+	})
+})
+
+describe("DisplayOptions", () => {
+	test("is a dialog that holds both switches, named and with their state", () => {
+		const { body } = render(DisplayOptions, {})
+		expect(body).toContain("<dialog")
+		expect(body).toContain("Display options")
+		expect(body).toContain("Hide amounts")
+		expect(body).toContain("Dark theme")
 	})
 })
 
@@ -31,7 +82,9 @@ describe("PreferenceControls", () => {
 })
 
 describe("SiteBrand", () => {
-	test("is the link back to Overview, with the artwork hidden from the reader", () => {
+	beforeEach(() => setTestUrl("http://127.0.0.1/"))
+
+	test("is the link back to Home, with the artwork hidden from the reader", () => {
 		const { body } = render(SiteBrand, { props: { artwork: '<svg focusable="false"></svg>' } })
 		expect(body).toContain('href="/"')
 		expect(body).toContain('aria-hidden="true"')

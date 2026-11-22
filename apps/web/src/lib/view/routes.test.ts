@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { ROUTES } from "./routes"
+import { NAV_GROUPS, ROUTES, routeAt } from "./routes"
 
 const ROUTES_DIR = join(import.meta.dir, "../../routes")
 
@@ -28,13 +28,27 @@ describe("the navigation's routes", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
-			"/ledger/",
 			"/projection/",
 			"/fi/",
 			"/compare/",
 			"/tax/",
+			"/ledger/",
 			"/health/",
 		])
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
+	})
+
+	test("the groups are Home and Net worth, then Plan, then Tax, then Records", () => {
+		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
+			[null, ["Home", "Net worth"]],
+			["Plan", ["Overview", "FI date", "Compare"]],
+			[null, ["Tax"]],
+			["Records", ["Ledger", "Health"]],
+		])
+	})
+
+	test("a route is found by its path, and an unknown path is none", () => {
+		expect(routeAt("/fi/")?.label).toBe("FI date")
+		expect(routeAt("/nowhere/")).toBeUndefined()
 	})
 })

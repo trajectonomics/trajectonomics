@@ -24,6 +24,15 @@ export function writeStored(key: string, value: string): void {
 	}
 }
 
+/** Calls the listener on each Escape key press in the page. Returns the unsubscribe. */
+export function subscribeEscape(listener: () => void): () => void {
+	const onKeydown = (event: KeyboardEvent) => {
+		if (event.key === "Escape") listener()
+	}
+	window.addEventListener("keydown", onKeydown)
+	return () => window.removeEventListener("keydown", onKeydown)
+}
+
 /** Whether the system asks for a dark Theme. False when the browser cannot say. */
 export function prefersDark(): boolean {
 	try {

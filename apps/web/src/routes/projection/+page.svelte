@@ -4,7 +4,7 @@ import ProjectionPage from "../../components/pages/ProjectionPage.svelte"
 </script>
 
 <svelte:head>
-	<title>Projection · Dashboard</title>
+	<title>Overview · Dashboard</title>
 </svelte:head>
 
 <ProjectionPage
