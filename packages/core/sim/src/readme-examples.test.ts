@@ -77,6 +77,7 @@ describe("README examples", () => {
 		const steps = String(manifest.scripts.check)
 			.split("&&")
 			.map((part) => part.trim().split(/\s+/).at(-1))
+			.map((step) => (step?.endsWith("build-unless-turbo.ts") ? "build" : step))
 		const bullet = readme.split("\n").find((line) => line.startsWith("- `bun run check`")) ?? ""
 		expect(steps).toEqual(["lint", "typecheck", "test", "build", "parity", "lint:package"])
 		for (const step of steps) expect(bullet).toContain(`\`${step}\``)
