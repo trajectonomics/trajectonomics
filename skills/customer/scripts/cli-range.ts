@@ -36,6 +36,26 @@ function upperBound(comparators: readonly string[], floor: string, range: string
 	}
 }
 
+/**
+ * The upper bound of a CLI Range: the version at which a new CLI needs the Skill rechecked. `inclusive`
+ * is true for `<=`. Null when the range states none. The lowest upper bound is the one that binds.
+ */
+export function cliRangeCeiling(range: string): { version: string; inclusive: boolean } | null {
+	cliFloor(range)
+	const uppers = range
+		.trim()
+		.split(/\s+/)
+		.filter((comparator) => comparator.startsWith("<"))
+		.map((comparator) => ({
+			version: comparator.replace(/^<=?/, ""),
+			inclusive: comparator.startsWith("<="),
+		}))
+	if (uppers.length === 0) return null
+	return uppers.reduce((lowest, upper) =>
+		Bun.semver.order(upper.version, lowest.version) < 0 ? upper : lowest,
+	)
+}
+
 /** The [CLI Version Floor](../GLOSSARY.md): the lower bound of the operating Skill's CLI Range. */
 export function cliVersionFloor(rows: readonly { name: string; cliRange: string }[]): string {
 	const operating = rows.find((row) => row.name === OPERATING_SKILL)

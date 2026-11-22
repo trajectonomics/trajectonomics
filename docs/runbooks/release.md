@@ -14,7 +14,13 @@ CLI bundles it into its binaries, so an engine change reaches users in the next 
   `tooling/release/version.ts` computes the version.
 - **Stable, by hand.** From main: publishes `<next>` under the dist-tag `latest`, creates the tag
   `cli-v<next>` and a GitHub release marked "latest", then builds and attaches the five binaries,
-  `install.sh`, `install.ps1` and the checksums (`binaries.yml`).
+  `install.sh`, `install.ps1` and the checksums (`binaries.yml`). Each binary carries a build
+  provenance attestation: `gh attestation verify <binary> --repo trajectonomics/trajectonomics`.
+- **After a stable release.** Three checks run on the completed Release run and only after a stable
+  one succeeds: `release-drift.yml` (the Site's snapshot), `release-docs.yml` (the freshness rule of
+  the CLI docs) and `skills-ceiling.yml`, which opens a `Recheck skill …` issue for each Skill whose
+  CLI Range upper bound npm's `latest` has reached. An issue with that title that is still open is
+  never duplicated; close it once the Skill is rechecked and its range is raised.
 - **Bump.** `auto` reads the conventional commits that touched `apps/cli` or `packages/core` since
   the last `cli-v` tag (`feat` is minor, a breaking change is major, anything else is a patch).
   Pass `patch`, `minor` or `major` to override it.

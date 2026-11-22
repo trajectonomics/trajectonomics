@@ -2,7 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "blog",
 	"compatibility_date": "2026-11-01",
-	"workers_dev": true,
+	"workers_dev": false,
 	// Static Assets only: no "main", so no script runs (ADR 0002). One Worker serves every collection.
 	// The Worker owns blog.trajectonomics.com and attaches it on deploy, as the Docs Portal does.
 	"routes": [{ "pattern": "blog.trajectonomics.com", "custom_domain": true }],

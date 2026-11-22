@@ -36,6 +36,10 @@ describe("the Worker config", () => {
 		expect(config.assets.run_worker_first).toBe(true)
 	})
 
+	test("serves only its custom domain, so no *.workers.dev copy is published", () => {
+		expect(config.workers_dev).toBe(false)
+	})
+
 	test("declares no Wrangler environment, so there is one Worker to deploy", () => {
 		expect(config.env).toBeUndefined()
 	})

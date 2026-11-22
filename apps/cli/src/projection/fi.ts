@@ -68,6 +68,6 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 		method: solution.definition.method,
 		definition: { ...solution.definition, explanation: FI_METHOD },
 		fi: solution.fi,
-		taxYears: taxYearsOf(result.projection.levies, prepared.currency),
+		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 	}
 }

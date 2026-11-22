@@ -1,6 +1,12 @@
 <script lang="ts">
 import type { ProjectionRun } from "../../lib/contract"
-import { addLevyCommand, carryInRows, taxBody, taxStatusWords } from "../../lib/view/tax"
+import {
+	addLevyCommand,
+	assumptionLines,
+	carryInRows,
+	taxBody,
+	taxStatusWords,
+} from "../../lib/view/tax"
 import Badge from "../ui/Badge.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import CarryInTable from "./CarryInTable.svelte"
@@ -16,6 +22,7 @@ interface Props {
 let { name, run }: Props = $props()
 const body = $derived(taxBody(run))
 const carry = $derived(carryInRows(run.carryIn ?? []))
+const assumptions = $derived(assumptionLines(run.taxYears))
 </script>
 
 <!-- One Scenario's projection as the Tax page shows it: its Levy's years, or the empty state. -->
@@ -37,6 +44,17 @@ const carry = $derived(carryInRows(run.carryIn ?? []))
 	{/if}
 	{#if carry.length > 0}
 		<CarryInTable rows={carry} currency={run.currency} />
+	{/if}
+	{#if assumptions.length > 0}
+		<section class="space-y-2">
+			<h3 class="text-sm font-medium">Assumptions</h3>
+			<p class="text-sm text-muted-foreground">Tax figures used whose source is not yet confirmed.</p>
+			<ul class="list-disc space-y-1 pl-5 text-sm">
+				{#each assumptions as line (line.key)}
+					<li><code class="font-mono text-xs">{line.path}</code>: {line.text}</li>
+				{/each}
+			</ul>
+		</section>
 	{/if}
 	{#if run.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">

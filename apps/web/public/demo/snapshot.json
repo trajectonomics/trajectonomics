@@ -117,7 +117,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -126,7 +126,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,7 +135,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -144,7 +144,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+							"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -153,7 +153,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+							"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -162,7 +162,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+							"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -171,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+							"id": "01a20290-f427-728f-9544-8e210090ff57",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -180,7 +180,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+							"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -189,7 +189,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+							"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -207,7 +207,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"debit": "662300.00",
@@ -216,7 +216,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -225,7 +225,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"debit": "736600.00",
@@ -234,7 +234,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+								"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 								"name": "Fund Return"
 							},
 							"debit": "0.00",
@@ -243,7 +243,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+								"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 								"name": "Living"
 							},
 							"debit": "762200.00",
@@ -252,7 +252,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+								"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -261,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+								"id": "01a20290-f427-728f-9544-8e210090ff57",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -270,7 +270,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+								"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 								"name": "Salary"
 							},
 							"debit": "0.00",
@@ -279,7 +279,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+								"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
 								"name": "Travel"
 							},
 							"debit": "78500.00",
@@ -307,7 +307,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+							"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -316,7 +316,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+							"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -325,7 +325,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+							"id": "01a20290-f427-728f-9544-8e210090ff57",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -334,7 +334,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+							"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -343,7 +343,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+							"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -365,7 +365,7 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a1ff3a-728f-70fa-9092-3a2ee5ff6200",
+						"id": "01a20290-f72d-756b-8146-ba17832e7928",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -374,7 +374,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"id": "01a20290-f427-728f-9544-8e210090ff57",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -384,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -394,7 +394,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-70fd-bc7b-e281e6c805c2",
+						"id": "01a20290-f72d-756e-ba06-ee4c074e9174",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -403,7 +403,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 									"name": "Living"
 								},
 								"amount": "30300.00",
@@ -413,7 +413,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-30300.00",
@@ -423,7 +423,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-70fb-b814-df18d8d7f41e",
+						"id": "01a20290-f72d-756c-85f9-78abfdec9729",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -432,7 +432,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -442,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -452,7 +452,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7110-956d-1a523c179188",
+						"id": "01a20290-f72d-7581-af4a-f02c6b2f43f5",
 						"date": "2026-08-15",
 						"memo": "new laptop",
 						"linkedTo": null,
@@ -461,7 +461,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 									"name": "Living"
 								},
 								"amount": "58000.00",
@@ -471,7 +471,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-58000.00",
@@ -481,7 +481,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-70fe-a8c4-ac15409ab154",
+						"id": "01a20290-f72d-756f-9831-ef27bca1ed1a",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -490,7 +490,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -500,7 +500,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -510,7 +510,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-70fc-97a7-141e5c56fdce",
+						"id": "01a20290-f72d-756d-8444-43f9ba02bbdb",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -519,7 +519,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -529,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -539,7 +539,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-70ff-99e2-11289f9f3d7e",
+						"id": "01a20290-f72d-7570-95c7-5ed4e81f5e5d",
 						"date": "2026-08-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -548,7 +548,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "9500.00",
@@ -558,7 +558,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 									"name": "Fund Return"
 								},
 								"amount": "-9500.00",
@@ -568,7 +568,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7100-88c5-a957d1889b4d",
+						"id": "01a20290-f72d-7571-bd84-c05b143c79ca",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -577,7 +577,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"id": "01a20290-f427-728f-9544-8e210090ff57",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -587,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -597,7 +597,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7103-835a-bb0333109ff2",
+						"id": "01a20290-f72d-7574-bdbe-204798b22959",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -606,7 +606,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 									"name": "Living"
 								},
 								"amount": "26900.00",
@@ -616,7 +616,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-26900.00",
@@ -626,7 +626,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7101-869d-06237f63cc1a",
+						"id": "01a20290-f72d-7572-a08e-e133adf758f6",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -635,7 +635,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -645,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -655,7 +655,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7104-b4d5-da51f8ff9f78",
+						"id": "01a20290-f72d-7575-b709-c35ee177790f",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -664,7 +664,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -674,7 +674,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -684,7 +684,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7102-b493-6a13c60928c4",
+						"id": "01a20290-f72d-7573-bca9-1737fe87e688",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -693,7 +693,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -703,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -713,7 +713,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7105-81a3-4e33266a0553",
+						"id": "01a20290-f72d-7576-8360-0d0b99ccc0cf",
 						"date": "2026-09-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -722,7 +722,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 									"name": "Fund Return"
 								},
 								"amount": "12600.00",
@@ -732,7 +732,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "-12600.00",
@@ -742,7 +742,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7106-9032-2ec76ec3473d",
+						"id": "01a20290-f72d-7577-be96-721981428869",
 						"date": "2026-10-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -751,7 +751,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+									"id": "01a20290-f427-728f-9544-8e210090ff57",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -761,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -771,7 +771,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7109-9f82-f2b9562dd2ef",
+						"id": "01a20290-f72d-757a-b75d-ad44e88e4ee6",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -780,7 +780,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 									"name": "Living"
 								},
 								"amount": "28800.00",
@@ -790,7 +790,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-28800.00",
@@ -800,7 +800,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7107-ac51-240245e98c52",
+						"id": "01a20290-f72d-7578-b222-395b8b13c577",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -809,7 +809,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -819,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -829,7 +829,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-710a-a451-21f2bbbed213",
+						"id": "01a20290-f72d-757b-8a40-1390d0a792c5",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -838,7 +838,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -848,7 +848,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -858,7 +858,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-7108-8792-aa75364e768e",
+						"id": "01a20290-f72d-7579-b9ab-351b853dd1f6",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -867,7 +867,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -877,7 +877,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -887,7 +887,7 @@
 						]
 					},
 					{
-						"id": "01a1ff3a-728f-710b-8821-ea9e20885898",
+						"id": "01a20290-f72d-757c-8b08-d88b7db1bfcb",
 						"date": "2026-10-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -896,7 +896,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 									"name": "Fund"
 								},
 								"amount": "7300.00",
@@ -906,7 +906,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 									"name": "Fund Return"
 								},
 								"amount": "-7300.00",
@@ -927,7 +927,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 							"name": "Bank"
 						},
 						"kind": "asset",
@@ -935,7 +935,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 							"name": "Fund"
 						},
 						"kind": "asset",
@@ -943,7 +943,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -963,7 +963,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -972,7 +972,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -981,7 +981,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1007,7 +1007,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1016,7 +1016,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1025,7 +1025,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1051,7 +1051,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1060,7 +1060,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1069,7 +1069,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1095,7 +1095,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1104,7 +1104,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1113,7 +1113,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1139,7 +1139,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1148,7 +1148,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1157,7 +1157,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1183,7 +1183,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1192,7 +1192,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1201,7 +1201,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1227,7 +1227,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1236,7 +1236,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1245,7 +1245,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1271,7 +1271,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1280,7 +1280,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1289,7 +1289,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1315,7 +1315,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1324,7 +1324,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1333,7 +1333,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1359,7 +1359,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1368,7 +1368,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1377,7 +1377,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1403,7 +1403,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1412,7 +1412,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1421,7 +1421,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1447,7 +1447,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1456,7 +1456,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1465,7 +1465,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1491,7 +1491,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1500,7 +1500,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1509,7 +1509,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1535,7 +1535,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1544,7 +1544,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1553,7 +1553,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1579,7 +1579,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1588,7 +1588,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1597,7 +1597,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1623,7 +1623,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1632,7 +1632,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1641,7 +1641,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1667,7 +1667,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1676,7 +1676,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1685,7 +1685,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1711,7 +1711,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1720,7 +1720,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1729,7 +1729,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1755,7 +1755,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1764,7 +1764,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1773,7 +1773,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1799,7 +1799,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1808,7 +1808,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1817,7 +1817,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1843,7 +1843,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1852,7 +1852,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1861,7 +1861,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1887,7 +1887,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1896,7 +1896,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1905,7 +1905,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1931,7 +1931,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1940,7 +1940,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1949,7 +1949,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1975,7 +1975,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1984,7 +1984,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1993,7 +1993,7 @@
 						},
 						{
 							"account": {
-								"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -2032,10 +2032,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
 						"name": "base",
-						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
-						"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
+						"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -2211,7 +2211,8 @@
 							"prepaid": "0.00",
 							"owed": "89000.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2222,7 +2223,8 @@
 							"prepaid": "0.00",
 							"owed": "100080.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2233,7 +2235,8 @@
 							"prepaid": "0.00",
 							"owed": "106592.40",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2244,7 +2247,8 @@
 							"prepaid": "0.00",
 							"owed": "113300.17",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2255,7 +2259,8 @@
 							"prepaid": "0.00",
 							"owed": "121511.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2266,7 +2271,8 @@
 							"prepaid": "0.00",
 							"owed": "130406.81",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2277,7 +2283,8 @@
 							"prepaid": "0.00",
 							"owed": "139569.03",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2288,7 +2295,8 @@
 							"prepaid": "0.00",
 							"owed": "149006.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2299,7 +2307,8 @@
 							"prepaid": "0.00",
 							"owed": "158726.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2310,7 +2319,8 @@
 							"prepaid": "0.00",
 							"owed": "168738.07",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2321,7 +2331,8 @@
 							"prepaid": "0.00",
 							"owed": "179050.21",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2332,7 +2343,8 @@
 							"prepaid": "0.00",
 							"owed": "189671.70",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2343,7 +2355,8 @@
 							"prepaid": "0.00",
 							"owed": "200611.87",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2354,7 +2367,8 @@
 							"prepaid": "0.00",
 							"owed": "211880.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2365,7 +2379,8 @@
 							"prepaid": "0.00",
 							"owed": "223486.62",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2376,7 +2391,8 @@
 							"prepaid": "0.00",
 							"owed": "235441.24",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2387,7 +2403,8 @@
 							"prepaid": "0.00",
 							"owed": "247754.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2398,7 +2415,8 @@
 							"prepaid": "0.00",
 							"owed": "260437.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2409,7 +2427,8 @@
 							"prepaid": "0.00",
 							"owed": "273500.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2420,7 +2439,8 @@
 							"prepaid": "0.00",
 							"owed": "286955.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2431,7 +2451,8 @@
 							"prepaid": "0.00",
 							"owed": "300813.86",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2442,7 +2463,8 @@
 							"prepaid": "0.00",
 							"owed": "315088.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2453,7 +2475,8 @@
 							"prepaid": "0.00",
 							"owed": "329790.93",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2464,7 +2487,8 @@
 							"prepaid": "0.00",
 							"owed": "344934.67",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2475,7 +2499,8 @@
 							"prepaid": "0.00",
 							"owed": "61717.09",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2486,7 +2511,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2497,7 +2523,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2508,7 +2535,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2519,7 +2547,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2530,7 +2559,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2541,7 +2571,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2552,7 +2583,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2563,7 +2595,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2574,7 +2607,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -2585,7 +2619,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": false,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						}
 					],
 					"tables": [
@@ -3249,10 +3284,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
-						"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
+						"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -3432,7 +3467,8 @@
 							"prepaid": "0.00",
 							"owed": "89000.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3443,7 +3479,8 @@
 							"prepaid": "0.00",
 							"owed": "100080.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3454,7 +3491,8 @@
 							"prepaid": "0.00",
 							"owed": "106592.40",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3465,7 +3503,8 @@
 							"prepaid": "0.00",
 							"owed": "113300.17",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3476,7 +3515,8 @@
 							"prepaid": "0.00",
 							"owed": "121511.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3487,7 +3527,8 @@
 							"prepaid": "0.00",
 							"owed": "130406.81",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3498,7 +3539,8 @@
 							"prepaid": "0.00",
 							"owed": "139569.03",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3509,7 +3551,8 @@
 							"prepaid": "0.00",
 							"owed": "149006.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3520,7 +3563,8 @@
 							"prepaid": "0.00",
 							"owed": "158726.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3531,7 +3575,8 @@
 							"prepaid": "0.00",
 							"owed": "168738.07",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3542,7 +3587,8 @@
 							"prepaid": "0.00",
 							"owed": "179050.21",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3553,7 +3599,8 @@
 							"prepaid": "0.00",
 							"owed": "189671.70",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3564,7 +3611,8 @@
 							"prepaid": "0.00",
 							"owed": "200611.87",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3575,7 +3623,8 @@
 							"prepaid": "0.00",
 							"owed": "211880.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3586,7 +3635,8 @@
 							"prepaid": "0.00",
 							"owed": "27626.02",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3597,7 +3647,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3608,7 +3659,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3619,7 +3671,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3630,7 +3683,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3641,7 +3695,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3652,7 +3707,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3663,7 +3719,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3674,7 +3731,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3685,7 +3743,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3696,7 +3755,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3707,7 +3767,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3718,7 +3779,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3729,7 +3791,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3740,7 +3803,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3751,7 +3815,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -3762,7 +3827,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": false,
-							"partial": true
+							"partial": true,
+							"assumptions": []
 						}
 					],
 					"tables": [
@@ -4337,10 +4403,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
 						"name": "base",
-						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
-						"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
+						"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -4540,7 +4606,8 @@
 							"prepaid": "0.00",
 							"owed": "89000.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4551,7 +4618,8 @@
 							"prepaid": "0.00",
 							"owed": "100080.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4562,7 +4630,8 @@
 							"prepaid": "0.00",
 							"owed": "106592.40",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4573,7 +4642,8 @@
 							"prepaid": "0.00",
 							"owed": "113300.17",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4584,7 +4654,8 @@
 							"prepaid": "0.00",
 							"owed": "121511.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4595,7 +4666,8 @@
 							"prepaid": "0.00",
 							"owed": "130406.81",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4606,7 +4678,8 @@
 							"prepaid": "0.00",
 							"owed": "139569.03",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4617,7 +4690,8 @@
 							"prepaid": "0.00",
 							"owed": "149006.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4628,7 +4702,8 @@
 							"prepaid": "0.00",
 							"owed": "158726.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4639,7 +4714,8 @@
 							"prepaid": "0.00",
 							"owed": "168738.07",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4650,7 +4726,8 @@
 							"prepaid": "0.00",
 							"owed": "179050.21",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4661,7 +4738,8 @@
 							"prepaid": "0.00",
 							"owed": "189671.70",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4672,7 +4750,8 @@
 							"prepaid": "0.00",
 							"owed": "200611.87",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4683,7 +4762,8 @@
 							"prepaid": "0.00",
 							"owed": "211880.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4694,7 +4774,8 @@
 							"prepaid": "0.00",
 							"owed": "223486.62",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4705,7 +4786,8 @@
 							"prepaid": "0.00",
 							"owed": "235441.24",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4716,7 +4798,8 @@
 							"prepaid": "0.00",
 							"owed": "247754.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4727,7 +4810,8 @@
 							"prepaid": "0.00",
 							"owed": "260437.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4738,7 +4822,8 @@
 							"prepaid": "0.00",
 							"owed": "273500.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4749,7 +4834,8 @@
 							"prepaid": "0.00",
 							"owed": "286955.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4760,7 +4846,8 @@
 							"prepaid": "0.00",
 							"owed": "300813.86",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4771,7 +4858,8 @@
 							"prepaid": "0.00",
 							"owed": "315088.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4782,7 +4870,8 @@
 							"prepaid": "0.00",
 							"owed": "329790.93",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4793,7 +4882,8 @@
 							"prepaid": "0.00",
 							"owed": "344934.67",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4804,7 +4894,8 @@
 							"prepaid": "0.00",
 							"owed": "61717.09",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4815,7 +4906,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4826,7 +4918,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4837,7 +4930,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4848,7 +4942,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4859,7 +4954,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4870,7 +4966,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4881,7 +4978,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4892,7 +4990,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4903,7 +5002,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -4914,7 +5014,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": false,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						}
 					]
 				}
@@ -4939,10 +5040,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
-						"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
+						"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5135,7 +5236,8 @@
 							"prepaid": "0.00",
 							"owed": "89000.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5146,7 +5248,8 @@
 							"prepaid": "0.00",
 							"owed": "100080.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5157,7 +5260,8 @@
 							"prepaid": "0.00",
 							"owed": "106592.40",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5168,7 +5272,8 @@
 							"prepaid": "0.00",
 							"owed": "113300.17",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5179,7 +5284,8 @@
 							"prepaid": "0.00",
 							"owed": "121511.47",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5190,7 +5296,8 @@
 							"prepaid": "0.00",
 							"owed": "130406.81",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5201,7 +5308,8 @@
 							"prepaid": "0.00",
 							"owed": "139569.03",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5212,7 +5320,8 @@
 							"prepaid": "0.00",
 							"owed": "149006.10",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5223,7 +5332,8 @@
 							"prepaid": "0.00",
 							"owed": "158726.28",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5234,7 +5344,8 @@
 							"prepaid": "0.00",
 							"owed": "168738.07",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5245,7 +5356,8 @@
 							"prepaid": "0.00",
 							"owed": "179050.21",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5256,7 +5368,8 @@
 							"prepaid": "0.00",
 							"owed": "189671.70",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5267,7 +5380,8 @@
 							"prepaid": "0.00",
 							"owed": "200611.87",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5278,7 +5392,8 @@
 							"prepaid": "0.00",
 							"owed": "211880.22",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5289,7 +5404,8 @@
 							"prepaid": "0.00",
 							"owed": "27626.02",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5300,7 +5416,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5311,7 +5428,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5322,7 +5440,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5333,7 +5452,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5344,7 +5464,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5355,7 +5476,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5366,7 +5488,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5377,7 +5500,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5388,7 +5512,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5399,7 +5524,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5410,7 +5536,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5421,7 +5548,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5432,7 +5560,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5443,7 +5572,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5454,7 +5584,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": true,
-							"partial": false
+							"partial": false,
+							"assumptions": []
 						},
 						{
 							"levy": "th-2026-pit",
@@ -5465,7 +5596,8 @@
 							"prepaid": "0.00",
 							"owed": "0.00",
 							"settled": false,
-							"partial": true
+							"partial": true,
+							"assumptions": []
 						}
 					]
 				}
@@ -5507,10 +5639,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+							"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
 							"name": "base",
-							"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
-							"effectiveContentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981"
+							"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
+							"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -5697,7 +5829,8 @@
 								"prepaid": "0.00",
 								"owed": "89000.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5708,7 +5841,8 @@
 								"prepaid": "0.00",
 								"owed": "100080.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5719,7 +5853,8 @@
 								"prepaid": "0.00",
 								"owed": "106592.40",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5730,7 +5865,8 @@
 								"prepaid": "0.00",
 								"owed": "113300.17",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5741,7 +5877,8 @@
 								"prepaid": "0.00",
 								"owed": "121511.47",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5752,7 +5889,8 @@
 								"prepaid": "0.00",
 								"owed": "130406.81",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5763,7 +5901,8 @@
 								"prepaid": "0.00",
 								"owed": "139569.03",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5774,7 +5913,8 @@
 								"prepaid": "0.00",
 								"owed": "149006.10",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5785,7 +5925,8 @@
 								"prepaid": "0.00",
 								"owed": "158726.28",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5796,7 +5937,8 @@
 								"prepaid": "0.00",
 								"owed": "168738.07",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5807,7 +5949,8 @@
 								"prepaid": "0.00",
 								"owed": "179050.21",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5818,7 +5961,8 @@
 								"prepaid": "0.00",
 								"owed": "189671.70",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5829,7 +5973,8 @@
 								"prepaid": "0.00",
 								"owed": "200611.87",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5840,7 +5985,8 @@
 								"prepaid": "0.00",
 								"owed": "211880.22",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5851,7 +5997,8 @@
 								"prepaid": "0.00",
 								"owed": "223486.62",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5862,7 +6009,8 @@
 								"prepaid": "0.00",
 								"owed": "235441.24",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5873,7 +6021,8 @@
 								"prepaid": "0.00",
 								"owed": "247754.47",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5884,7 +6033,8 @@
 								"prepaid": "0.00",
 								"owed": "260437.10",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5895,7 +6045,8 @@
 								"prepaid": "0.00",
 								"owed": "273500.22",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5906,7 +6057,8 @@
 								"prepaid": "0.00",
 								"owed": "286955.22",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5917,7 +6069,8 @@
 								"prepaid": "0.00",
 								"owed": "300813.86",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5928,7 +6081,8 @@
 								"prepaid": "0.00",
 								"owed": "315088.28",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5939,7 +6093,8 @@
 								"prepaid": "0.00",
 								"owed": "329790.93",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5950,7 +6105,8 @@
 								"prepaid": "0.00",
 								"owed": "344934.67",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5961,7 +6117,8 @@
 								"prepaid": "0.00",
 								"owed": "61717.09",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5972,7 +6129,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5983,7 +6141,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -5994,7 +6153,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6005,7 +6165,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6016,7 +6177,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6027,7 +6189,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6038,7 +6201,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6049,7 +6213,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6060,7 +6225,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6071,7 +6237,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": false,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							}
 						],
 						"runOut": null,
@@ -6102,10 +6269,10 @@
 					},
 					"b": {
 						"scenario": {
-							"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+							"id": "01a20290-f969-76b8-9978-424b7ffdc761",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
-							"effectiveContentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9"
+							"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
+							"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6284,7 +6451,8 @@
 								"prepaid": "0.00",
 								"owed": "89000.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6295,7 +6463,8 @@
 								"prepaid": "0.00",
 								"owed": "100080.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6306,7 +6475,8 @@
 								"prepaid": "0.00",
 								"owed": "106592.40",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6317,7 +6487,8 @@
 								"prepaid": "0.00",
 								"owed": "113300.17",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6328,7 +6499,8 @@
 								"prepaid": "0.00",
 								"owed": "121511.47",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6339,7 +6511,8 @@
 								"prepaid": "0.00",
 								"owed": "130406.81",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6350,7 +6523,8 @@
 								"prepaid": "0.00",
 								"owed": "139569.03",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6361,7 +6535,8 @@
 								"prepaid": "0.00",
 								"owed": "149006.10",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6372,7 +6547,8 @@
 								"prepaid": "0.00",
 								"owed": "158726.28",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6383,7 +6559,8 @@
 								"prepaid": "0.00",
 								"owed": "168738.07",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6394,7 +6571,8 @@
 								"prepaid": "0.00",
 								"owed": "179050.21",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6405,7 +6583,8 @@
 								"prepaid": "0.00",
 								"owed": "189671.70",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6416,7 +6595,8 @@
 								"prepaid": "0.00",
 								"owed": "200611.87",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6427,7 +6607,8 @@
 								"prepaid": "0.00",
 								"owed": "211880.22",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6438,7 +6619,8 @@
 								"prepaid": "0.00",
 								"owed": "27626.02",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6449,7 +6631,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6460,7 +6643,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6471,7 +6655,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6482,7 +6667,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6493,7 +6679,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6504,7 +6691,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6515,7 +6703,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6526,7 +6715,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6537,7 +6727,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6548,7 +6739,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6559,7 +6751,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6570,7 +6763,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6581,7 +6775,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6592,7 +6787,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6603,7 +6799,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": true,
-								"partial": false
+								"partial": false,
+								"assumptions": []
 							},
 							{
 								"levy": "th-2026-pit",
@@ -6614,7 +6811,8 @@
 								"prepaid": "0.00",
 								"owed": "0.00",
 								"settled": false,
-								"partial": true
+								"partial": true,
+								"assumptions": []
 							}
 						],
 						"runOut": {
@@ -6683,103 +6881,103 @@
 			"data": {
 				"accounts": [
 					{
-						"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+						"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:41.915Z",
-						"updatedAt": "2026-11-21T17:49:41.915Z"
+						"createdAt": "2026-11-22T09:23:03.131Z",
+						"updatedAt": "2026-11-22T09:23:03.131Z"
 					},
 					{
-						"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+						"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.077Z",
-						"updatedAt": "2026-11-21T17:49:42.077Z"
+						"createdAt": "2026-11-22T09:23:03.362Z",
+						"updatedAt": "2026-11-22T09:23:03.362Z"
 					},
 					{
-						"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+						"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:41.997Z",
-						"updatedAt": "2026-11-21T17:49:41.997Z"
+						"createdAt": "2026-11-22T09:23:03.239Z",
+						"updatedAt": "2026-11-22T09:23:03.239Z"
 					},
 					{
-						"id": "01a1ff3a-6fdd-70d4-b8f7-444175ba38cd",
+						"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
 						"name": "Fund Return",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.237Z",
-						"updatedAt": "2026-11-21T17:49:42.237Z"
+						"createdAt": "2026-11-22T09:23:03.600Z",
+						"updatedAt": "2026-11-22T09:23:03.600Z"
 					},
 					{
-						"id": "01a1ff3a-702e-736c-a16c-e5517e11477f",
+						"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.318Z",
-						"updatedAt": "2026-11-21T17:49:42.318Z"
+						"createdAt": "2026-11-22T09:23:03.723Z",
+						"updatedAt": "2026-11-22T09:23:03.723Z"
 					},
 					{
-						"id": "01a1ff3a-711f-71ef-b0f5-88b4402c15a6",
+						"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.559Z",
-						"updatedAt": "2026-11-21T17:49:42.559Z"
+						"createdAt": "2026-11-22T09:23:04.086Z",
+						"updatedAt": "2026-11-22T09:23:04.086Z"
 					},
 					{
-						"id": "01a1ff3a-707d-76e4-b872-9d0f6e2171b2",
+						"id": "01a20290-f427-728f-9544-8e210090ff57",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.397Z",
-						"updatedAt": "2026-11-21T17:49:42.397Z"
+						"createdAt": "2026-11-22T09:23:03.847Z",
+						"updatedAt": "2026-11-22T09:23:03.847Z"
 					},
 					{
-						"id": "01a1ff3a-6f8d-753d-a08b-a5d181b1bd50",
+						"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.157Z",
-						"updatedAt": "2026-11-21T17:49:42.157Z"
+						"createdAt": "2026-11-22T09:23:03.483Z",
+						"updatedAt": "2026-11-22T09:23:03.483Z"
 					},
 					{
-						"id": "01a1ff3a-70ce-7070-bcd1-ccf6813a0ba7",
+						"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
 						"name": "Travel",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:42.478Z",
-						"updatedAt": "2026-11-21T17:49:42.478Z"
+						"createdAt": "2026-11-22T09:23:03.969Z",
+						"updatedAt": "2026-11-22T09:23:03.969Z"
 					}
 				]
 			}
@@ -6794,7 +6992,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a1ff3a-6e9b-7395-a225-506ead7cdb10",
+							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -6803,7 +7001,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6f3d-777a-9cad-8693170456fd",
+							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -6812,7 +7010,7 @@
 					},
 					{
 						"account": {
-							"id": "01a1ff3a-6eed-76c6-ace1-2f07d1c73b0e",
+							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -6834,22 +7032,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
 						"name": "base",
-						"contentHash": "jcs1:sha256:d8e41d68e5a6542e23a9bb552d19c853fef9faad8539442dbac76d0606089981",
+						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
 						"forkedFrom": null,
 						"version": 2,
-						"createdAt": "2026-11-21T17:49:43.123Z",
-						"updatedAt": "2026-11-21T17:49:43.230Z"
+						"createdAt": "2026-11-22T09:23:04.886Z",
+						"updatedAt": "2026-11-22T09:23:05.028Z"
 					},
 					{
-						"id": "01a1ff3a-741c-7492-b1dd-6ffd69f9f13d",
+						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:2d5a1f2d88a144f0021a132f4d52a0af658a85bddad57373a0ddc2e0c05c20f9",
-						"forkedFrom": "01a1ff3a-7353-761e-97b6-de6a2ab64bac",
+						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
+						"forkedFrom": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
 						"version": 1,
-						"createdAt": "2026-11-21T17:49:43.324Z",
-						"updatedAt": "2026-11-21T17:49:43.324Z"
+						"createdAt": "2026-11-22T09:23:05.193Z",
+						"updatedAt": "2026-11-22T09:23:05.193Z"
 					}
 				]
 			}

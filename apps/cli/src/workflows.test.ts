@@ -11,7 +11,10 @@ import {
 	needs,
 	RELEASE,
 	RELEASE_DOCS,
+	RELEASE_DRIFT,
 	runs,
+	SKILLS_CEILING,
+	stepIndex,
 	type Workflow,
 } from "./workflow-support"
 
@@ -87,11 +90,12 @@ describe("release.yml, the one workflow that publishes core and cli", () => {
 })
 
 describe("release-docs.yml, the check that keeps the docs honest", () => {
-	it("runs on a pull request, weekly, and by dispatch", () => {
+	it("runs on a pull request, weekly, by dispatch, and after a stable release", () => {
 		expect(Object.keys(RELEASE_DOCS.on).sort()).toEqual([
 			"pull_request",
 			"schedule",
 			"workflow_dispatch",
+			"workflow_run",
 		])
 	})
 
@@ -102,7 +106,7 @@ describe("release-docs.yml, the check that keeps the docs honest", () => {
 		expect(command).toContain("SECONDS + 600")
 	})
 
-	it("adds the freshness rule on the schedule, and only there", () => {
+	it("adds the freshness rule on the schedule and after a stable release, and only there", () => {
 		const step = (RELEASE_DOCS.jobs["check"]?.steps ?? []).find((entry) =>
 			entry.run?.includes("release-docs-cli"),
 		)
@@ -115,5 +119,84 @@ describe("release-docs.yml, the check that keeps the docs honest", () => {
 			scripts: Record<string, string>
 		}
 		expect(pkg.scripts["check"]).not.toContain("release-docs")
+	})
+})
+
+describe("the checks that read what a release shipped run right after it", () => {
+	const AFTER_RELEASE = {
+		"release-drift.yml": RELEASE_DRIFT,
+		"release-docs.yml": RELEASE_DOCS,
+		"skills-ceiling.yml": SKILLS_CEILING,
+	}
+
+	for (const [file, workflow] of Object.entries(AFTER_RELEASE)) {
+		it(`${file} runs on a completed Release run, keeps its weekly schedule, and guards on a stable release`, () => {
+			expect(workflow.on["workflow_run"]?.workflows).toEqual(["Release"])
+			expect(workflow.on["workflow_run"]?.types).toEqual(["completed"])
+			expect(workflow.on["schedule"]).toBeDefined()
+			for (const job of Object.values(workflow.jobs)) {
+				expect(job.if).toContain("github.event.workflow_run.conclusion == 'success'")
+				expect(job.if).toContain("github.event.workflow_run.event == 'workflow_dispatch'")
+			}
+		})
+	}
+
+	it("gives issues: write to the recheck job alone, and nothing above it", () => {
+		expect(SKILLS_CEILING.permissions).toEqual({ contents: "read" })
+		for (const [name, job] of Object.entries(SKILLS_CEILING.jobs)) {
+			expect(job.permissions?.["issues"] === "write").toBe(name === "recheck")
+		}
+	})
+
+	it("runs the ceiling check against npm's latest, and opens issues only for titles no open one carries", () => {
+		const command = runs(SKILLS_CEILING.jobs["recheck"]!).join("\n")
+		expect(command).toContain("npm view @trajectonomics/cli version")
+		expect(command).toContain("gh issue list --state open")
+		expect(command).toContain("bun scripts/cli-range-ceiling.ts")
+		expect(command).toContain("--label needs-triage")
+	})
+})
+
+describe("release.yml's publish job, hardened", () => {
+	it("keeps the publish checkout from persisting the token in .git", () => {
+		const checkout = RELEASE.jobs["publish"]?.steps?.find((step) =>
+			step.uses?.startsWith("actions/checkout@"),
+		)
+		expect(checkout?.with?.["persist-credentials"]).toBe(false)
+	})
+
+	it("upgrades npm to one exact version, never a range", () => {
+		const text = runs(RELEASE.jobs["publish"]!).join("\n")
+		expect(text).toMatch(/npm install -g npm@\d+\.\d+\.\d+\s*$/m)
+		expect(text).not.toContain("npm@^")
+	})
+
+	it("grants the binaries job the attestation permissions its called workflow needs", () => {
+		expect(RELEASE.jobs["binaries"]?.permissions).toEqual({
+			contents: "write",
+			"id-token": "write",
+			attestations: "write",
+		})
+	})
+})
+
+describe("binaries.yml's attach job, the one that uploads", () => {
+	it("attests the five binaries before any upload, with the attestation permissions alone", () => {
+		const attach = BINARIES.jobs["attach"]!
+		expect(attach.permissions).toEqual({
+			contents: "write",
+			"id-token": "write",
+			attestations: "write",
+		})
+		const steps = attach.steps ?? []
+		const attest = steps.findIndex((step) =>
+			step.uses?.startsWith("actions/attest-build-provenance@"),
+		)
+		expect(attest).toBeGreaterThanOrEqual(0)
+		expect(attest).toBeLessThan(stepIndex(attach, "gh release upload"))
+		const subject = String(steps[attest]?.with?.["subject-path"] ?? "")
+		for (const asset of ["traj-darwin-arm64", "traj-linux-x64", "traj-windows-x64.exe"]) {
+			expect(subject).toContain(`apps/cli/assets/${asset}`)
+		}
 	})
 })

@@ -28,7 +28,13 @@ export type Job = {
 export type Workflow = {
 	on: Record<
 		string,
-		{ inputs?: Record<string, unknown>; paths?: string[]; branches?: string[] } | null
+		{
+			inputs?: Record<string, unknown>
+			paths?: string[]
+			branches?: string[]
+			workflows?: string[]
+			types?: string[]
+		} | null
 	>
 	permissions?: Record<string, string>
 	jobs: Record<string, Job>
@@ -56,6 +62,8 @@ export const RELEASE: Workflow = load("release.yml")
 export const BINARIES: Workflow = load("binaries.yml")
 export const INSTALLER: Workflow = load("installer-smoke.yml")
 export const RELEASE_DOCS: Workflow = load("release-docs.yml")
+export const RELEASE_DRIFT: Workflow = load("release-drift.yml")
+export const SKILLS_CEILING: Workflow = load("skills-ceiling.yml")
 
 /** Every job whose steps compile the CLI, wherever it lives. */
 export function compiling(workflow: Workflow): Job[] {

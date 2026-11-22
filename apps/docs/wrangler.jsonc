@@ -3,7 +3,8 @@
 	"name": "docs",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-11-01",
-	"workers_dev": true,
+	// The custom domain serves the Portal; the *.workers.dev copy stays off (infra#82).
+	"workers_dev": false,
 	// One Worker only: a merge to `main` deploys production (ADR 0007), so there is no `env` block.
 	// The Worker owns docs.trajectonomics.com. It does not attach the apex: the router still
 	// forwards /docs there, and this Worker redirects those paths (ADR 0013).

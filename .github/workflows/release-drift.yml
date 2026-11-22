@@ -12,10 +12,17 @@ name: Release drift (site)
 # GitHub turns a schedule off after 60 days without repository activity, and a disabled workflow
 # cannot be dispatched; turn it back on with `gh workflow enable release-drift.yml`.
 # This is the port of apps/site/.github/workflows/release-drift.yml.
+#
+# It also runs right after each stable release (release.yml's workflow_dispatch run), so a snapshot
+# that the release left behind is reported the same day rather than on the next Tuesday. Alpha publishes
+# on push to main never move `latest`, so they do not trigger it.
 on:
   schedule:
     - cron: "0 6 * * 2" # Tuesdays, the day after the tooling drift
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
 
 permissions:
   contents: read # read the committed snapshot and the script that judges it
@@ -27,6 +34,9 @@ concurrency:
 jobs:
   drift:
     name: Release drift
+    # A release run counts only when it published a stable release and succeeded; schedule and
+    # workflow_dispatch always run.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Job-level permissions replace the workflow's, so contents is restated here.

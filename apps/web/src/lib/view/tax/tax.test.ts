@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { TaxYear } from "../../contract"
 import { projectionRun } from "../compare/projection.test-support"
+import { assumptionLines } from "./assumptions"
 import { addLevyCommand, taxBody } from "./body"
 import { carryInRows } from "./carry-in"
 import { resolveScenario } from "./scenario"
@@ -19,6 +20,7 @@ function year(over: Partial<TaxYear> = {}): TaxYear {
 		owed: "89000.00",
 		settled: true,
 		partial: false,
+		assumptions: [],
 		...over,
 	}
 }
@@ -150,5 +152,30 @@ describe("carry-in and status", () => {
 		expect(taxStatusWords("applied")).toBe("Tax applied")
 		expect(taxStatusWords("not_applied")).toBe("Tax not applied")
 		expect(taxStatusWords("mixed")).toBe("Tax mixed across the two Scenarios")
+	})
+})
+
+describe("assumption lines", () => {
+	const gpf = {
+		path: "allowances.retirementCluster.gpf.maxRate",
+		value: 0.3,
+		status: "reported" as const,
+		note: "Government pension fund limit, share of wages.",
+	}
+
+	test("lists each figure once across the years, in the CLI's order", () => {
+		const lines = assumptionLines([
+			year({ assumptions: [gpf] }),
+			year({ from: "2027-01-01", assumptions: [gpf, { ...gpf, path: "a.b", value: [1, 2] }] }),
+		])
+		expect(lines.map((line) => line.path)).toEqual([gpf.path, "a.b"])
+		expect(lines[0]?.text).toBe(
+			"Government pension fund limit, share of wages. Used 0.3; reported.",
+		)
+		expect(lines[1]?.text).toContain("Used 1, 2;")
+	})
+
+	test("is empty when no year used an unconfirmed figure", () => {
+		expect(assumptionLines([year(), year()])).toEqual([])
 	})
 })

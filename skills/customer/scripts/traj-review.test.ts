@@ -86,11 +86,64 @@ describe("the traj-review Skill", () => {
 		const step = section(body, "Unattended")
 		expect(step).toContain("State the assumptions in the review instead of asking")
 		expect(step).toContain("An as-of the request does not carry is a stop, not a substitution")
+		expect(step).toContain("skip Step 7")
 	})
 
 	it("reads and never writes, and says so", () => {
 		const step = section(body, "What this Recipe never does")
 		expect(step).toContain("It never reads the clock")
 		expect(step).toContain("It never writes to the ledger")
+		expect(step).toContain("It never submits, posts or creates feedback")
+	})
+})
+
+describe("the feedback question at the end of a check-in", () => {
+	const step = section(body, "Step 7: ask once whether anything got in the way")
+
+	it("asks one question, once, after the review, and never again in the conversation", () => {
+		expect(step).toContain("ask one question, once")
+		expect(step).toContain("never again in the same conversation")
+		expect(step).toContain("When the person says nothing got in the way")
+	})
+
+	it("drafts the tried-and-stopped issue and shows the full text", () => {
+		expect(step).toContain("tried-and-stopped.yml")
+		expect(step).toContain(
+			"https://github.com/trajectonomics/trajectonomics/issues/new?template=tried-and-stopped.yml",
+		)
+		expect(step).toContain("`Stopped: `")
+		expect(step).toContain("Show the complete draft in your reply")
+	})
+
+	it("never submits the draft, and the person decides", () => {
+		expect(step).toContain("you never submit the draft or create the issue")
+		expect(step).toContain("the person chooses to send a draft they have read")
+	})
+
+	it("removes every ledger figure, balance and account name before the draft is shown", () => {
+		expect(step).toContain(
+			"remove every ledger figure, balance, account name, merchant name, other personal detail and path under the person's home directory",
+		)
+		expect(step).toContain("describe it in general words")
+	})
+
+	it("offers only the boxes the repository's issue form publishes", () => {
+		const template = read("../../.github/ISSUE_TEMPLATE/tried-and-stopped.yml")
+		expect(template).toContain('title: "Stopped: "')
+		for (const box of [
+			"Install",
+			"Terminal",
+			"Agent setup",
+			"The skill",
+			"Tax coverage",
+			"Trust",
+			"Time",
+		]) {
+			expect(template).toContain(`- label: ${box}\n`)
+			expect(step).toContain(box)
+		}
+		expect(template).toContain("- label: Currency (THB only)\n")
+		expect(template).toContain("- label: Other (say which in the box below)\n")
+		expect(step).toContain("Currency (THB only)")
 	})
 })

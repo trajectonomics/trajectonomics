@@ -13,6 +13,9 @@ name: Release
 #
 # Every publish needs the package on npm already (or NPM_TOKEN). Trusted publishing (OIDC) needs npm
 # >= 11.5.1, which the publish job installs. Tag and release only after npm accepted the version.
+#
+# Other workflows that check what a release shipped (release-drift.yml, release-docs.yml,
+# skills-ceiling.yml) run on workflow_run once this run completes, so they see the new latest.
 on:
   push:
     branches: [main]
@@ -123,6 +126,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0 # tags and commit messages drive the version
+          # Nothing here pushes with git: the tag and release go through gh and GH_TOKEN. Keeping the
+          # token out of .git/config means no later step can use it by accident.
+          persist-credentials: false
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: "1.4.4"
@@ -164,9 +170,10 @@ jobs:
           # the version field.
           (cd "$FOLDER" && npm pkg set version="$VERSION")
 
-      # Trusted publishing (OIDC) needs npm >= 11.5.1; setup-node 22 ships npm 10.x.
+      # Trusted publishing (OIDC) needs npm >= 11.5.1; setup-node 22 ships npm 10.x. Exact, so a
+      # release cannot pick up a newer npm the run never tested (bump it here on purpose).
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@^11.5.1
+        run: npm install -g npm@11.21.3
 
       # A package that is not on npm yet cannot have a Trusted Publisher, so without NPM_TOKEN the
       # publish below would die with a bare "need auth". Say what to do instead.
@@ -238,6 +245,10 @@ jobs:
     # The cli's binaries ride the stable cli release it just created. A core release has none.
     needs: [plan, publish]
     if: needs.plan.outputs.stable_cli == 'true' && needs.publish.result == 'success'
+    # A called workflow can use no more than these grant. attach in binaries.yml needs id-token and
+    # attestations to sign the build provenance of the binaries it uploads.
     permissions:
-      contents: write
+      contents: write # the release assets
+      id-token: write # the build provenance signature
+      attestations: write # stores the build provenance attestation
     uses: ./.github/workflows/binaries.yml

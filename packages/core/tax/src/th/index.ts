@@ -1,3 +1,17 @@
+export type {
+	ThAssumption,
+	ThAssumptionLevy,
+	ThAssumptionMeasureValue,
+	ThAssumptionStatus,
+	ThAssumptionValue,
+	ThUnconfirmedFigure,
+} from "./assumptions"
+export {
+	TH_UNCONFIRMED_FIGURES,
+	ThAssumptionFact,
+	thLevyAssumptions,
+	thLevyAssumptionsForLabels,
+} from "./assumptions"
 export { calculateThTax } from "./calculate"
 export type {
 	ThLevy,
@@ -21,6 +35,7 @@ export {
 	ThLevyTallyBasis,
 } from "./levy"
 export { TH_2026_PARAMETERS } from "./parameters"
+export type { ThTaxResult } from "./result"
 export { th } from "./system"
 export type {
 	ThAllowancesBreakdown,

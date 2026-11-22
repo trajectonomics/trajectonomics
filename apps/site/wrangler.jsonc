@@ -2,7 +2,8 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "site",
 	"compatibility_date": "2026-11-01",
-	"workers_dev": true,
+	// The custom domain serves the Site; the *.workers.dev copy stays off (trajectonomics/infra#82).
+	"workers_dev": false,
 	// The one script the Site has: `/` in the resolved Language, the choice link, the old prefixes (ADR 0020).
 	"main": "src/worker/index.ts",
 	// No "routes": the router attaches the public route, not this repository.

@@ -95,6 +95,14 @@ describe("what setup leaves behind", () => {
 		expect(body).not.toContain("nothing leaves your machine")
 	})
 
+	it("says a feedback draft leaves only when the person sends it, and setup never sends one", () => {
+		expect(leaves).toContain("A feedback draft is separate")
+		expect(leaves).toContain(
+			"only when the person sends it themselves, after reading the full text",
+		)
+		expect(leaves).toContain("setup never sends one")
+	})
+
 	it("warns never to rm -rf the directory that holds the ledger, once, with the reason", () => {
 		expect(leaves).toContain("Never `rm -rf ~/.traj`")
 		expect(leaves).toContain("destroys every row")
@@ -109,5 +117,31 @@ describe("what setup leaves behind", () => {
 
 	it("points at no archived issue: the CLI's releases say what it does now", () => {
 		expect(body).not.toContain("trajectonomics/cli#")
+	})
+})
+
+describe("the feedback offer when setup fails", () => {
+	const failed = section(body, "If a step fails")
+
+	it("reports the failure in the command line's words, then offers once without waiting", () => {
+		expect(failed).toContain("report what failed in the command line's own words")
+		expect(failed).toContain("Then offer once")
+		expect(failed).toContain("Setup does not wait for the answer")
+		expect(failed).toContain("Do not offer again in this conversation")
+	})
+
+	it("drafts on the same form, never submits, and leaves personal detail out", () => {
+		expect(failed).toContain("tried-and-stopped.yml")
+		expect(failed).toContain("Leave out every figure, balance, account name")
+		expect(failed).toContain("never submit it")
+		expect(failed).toContain("the person sends it or not")
+	})
+
+	it("names the feedback offer once, and no traj command of its own", () => {
+		expect(body.split("## If a step fails")).toHaveLength(2)
+		const commands = body.match(/`traj [^`]+`/g) ?? []
+		expect(commands.every((span) => ["`traj --version`", "`traj schema`"].includes(span))).toBe(
+			true,
+		)
 	})
 })
