@@ -45,7 +45,7 @@ describe("ComparePanel", () => {
 	test("with no comparison, it says a comparison needs two Scenarios and shows the flag", () => {
 		const body = panel({}, null)
 		expect(body).toContain("A comparison needs two Scenarios")
-		expect(body).toContain("--compare A B")
+		expect(body).toContain("--compare A --compare B")
 	})
 
 	test("A is solid and B dashed, and the difference column is labelled B minus A", () => {

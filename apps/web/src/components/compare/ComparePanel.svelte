@@ -15,7 +15,8 @@ interface Props {
 }
 
 /** The command that writes a Snapshot with a comparison of two Scenarios, run in apps/web. */
-const COMPARE_COMMAND = "bun run dashboard -- --as-of YYYY-MM-DD --horizon YYYY-MM-DD --compare A B"
+const COMPARE_COMMAND =
+	"traj dashboard --as-of YYYY-MM-DD --horizon YYYY-MM-DD --compare A --compare B"
 
 /** The sides, the chart, the figures and the notes, or the state of a page with no comparison. */
 let { compare, projections, terms, onTerms }: Props = $props()
@@ -25,7 +26,7 @@ let { compare, projections, terms, onTerms }: Props = $props()
 	<EmptyState title="No comparison yet">
 		<p>
 			A comparison needs two Scenarios. Ask for one with the flag{" "}
-			<code class="font-mono">--compare A B</code> on the Dashboard command:
+			<code class="font-mono">--compare A --compare B</code> on the Dashboard command:
 		</p>
 		<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code
 				>{COMPARE_COMMAND}</code
