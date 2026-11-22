@@ -2,7 +2,7 @@
 name: traj-plan
 description: "Answer planning questions with `traj`, the personal money command line: when someone can stop working, what a purchase or a raise would change, what their plan looks like at a horizon they name, and what their Thai income tax comes to for a tax year and what a deduction would change. Use when someone asks about financial independence, retiring early, a projection, a what-if, a savings plan, whether their money lasts, or Thai income tax."
 metadata:
-  cli: ">=0.3.0 <0.7.0"
+  cli: ">=0.3.0 <0.8.0"
 ---
 
 # traj-plan

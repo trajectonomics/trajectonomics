@@ -2,7 +2,7 @@
 name: traj
 description: "Operate `traj`, the Trajectonomics ledger and projection CLI, on someone's own money: record what they earned and spent, read balances and reports, and answer what-if and financial-independence questions. Use when the user talks about their accounts, spending, budget, net worth, savings plan, Thai tax, or planning a purchase."
 metadata:
-  cli: ">=0.2.0 <0.7.0"
+  cli: ">=0.2.0 <0.8.0"
 ---
 
 # traj
