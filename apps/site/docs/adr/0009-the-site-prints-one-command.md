@@ -8,7 +8,7 @@ status: superseded by ADR-0015
 > window prints no command now. "One way out" survives and "One command" does not. This text is kept as the
 > history of the decision the owner reversed; read 0015 for what governs.
 
-The Site's install window shows one command — `npx skills add trajectonomics/skills --skill traj-onboarding` — and the page prints no second one. That command needs a coding agent the skills CLI can install into, and Node 22.20 or later for the skills CLI itself (`skills@1.7.6`); `traj` needs Node 20. A visitor with neither the agent nor that Node had no next step: the three steps under the command restated the assumption instead of giving a check the visitor could pass, and the only other install-shaped link sat under the diagram, which explains the product rather than helping a visitor stuck at the command (site#38).
+The Site's install window shows one command — `npx skills add trajectonomics/skills --skill traj-onboarding` — and the page prints no second one. That command needs a coding agent the skills CLI can install into, and Node 22.20 or later for the skills CLI itself (`skills@1.7.6`); `traj` needs Node 20. A visitor with neither the agent nor that Node had no next step: the three steps under the command restated the assumption instead of giving a check the visitor could pass, and the only other install-shaped link sat under the diagram, which explains the product rather than helping a visitor stuck at the command (#111).
 
 ## Decision
 

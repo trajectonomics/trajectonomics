@@ -37,7 +37,7 @@ export function classesOf(levy: JsonRecord): CarryInClass[] {
 /**
  * The record's tallies in the Levy's own class order, with `rest` expanded to the classes it does
  * not name. A class the Levy does not read and a class stated twice are refused; a class nobody
- * stated is an error rather than a silent zero (the owner's #114 answer, ADR-0032).
+ * stated is an error rather than a silent zero (the owner's cli#114 answer, ADR-0032).
  */
 export function withAllClasses(
 	stated: readonly StatedTally[],

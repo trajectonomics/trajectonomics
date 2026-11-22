@@ -129,7 +129,7 @@ and its `14,280.00` figure, because those are product facts, not Language.
 
 Not adopted, and why: a downloaded display or mono face (forbidden until design-system#77; now adopted, see ADR 0007's amendment), the
 728 px tiled favicon (design-system#76), and moving the primitives into `@trajectonomics/design-system-svelte`
-(design-system#74, site#32).
+(#126, #112).
 
 ## Amendment (2026-11-16, owner)
 
