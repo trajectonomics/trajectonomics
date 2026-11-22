@@ -14,6 +14,7 @@ export function readsOf(document: Snapshot): Read<unknown>[] {
 		reads.scenarios,
 	]
 	const maps = [
+		...Object.values(reads.documents),
 		...Object.values(reads.projections),
 		...Object.values(reads.fi),
 		...Object.values(reads.chance),

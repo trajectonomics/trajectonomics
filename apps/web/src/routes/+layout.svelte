@@ -11,7 +11,9 @@ import { brandArtwork } from "../components/shell/brand-artwork"
 import DisplayOptions from "../components/shell/DisplayOptions.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
+import { editsShown } from "../lib/edit/shown"
 import { scenarioNames } from "../lib/view/plan"
+import { documentRead } from "../lib/view/plan-items/document"
 import { chooseScenario } from "../lib/view/projection/scenario"
 import { routeAt } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
@@ -22,7 +24,9 @@ const names = $derived(scenarioNames(currentSnapshot()))
 const selected = $derived(chooseScenario(names, queryParam("scenario", "")) ?? "")
 const title = $derived(routeAt(page.url.pathname)?.label ?? "Dashboard")
 // Edit controls show only when the server answered the token, and never in the Demo snapshot.
-const editable = $derived(editSession.token !== null && !isDemo(page.url.search))
+const editable = $derived(editsShown(editSession.token, page.url.search))
+// The planner pages are listed only when the Snapshot holds the selected plan's read of its items.
+const planDocument = $derived(documentRead(currentSnapshot(), selected) !== undefined)
 
 // The Snapshot follows the address: this layout stays mounted across pages, so the read is started
 // again whenever the query string changes. The loader reads each file once, so a page change with the
@@ -44,6 +48,7 @@ $effect(() => {
 	{selected}
 	onPlan={(name) => setQueryParam("scenario", name)}
 	{editable}
+	{planDocument}
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60">

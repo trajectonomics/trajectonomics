@@ -54,8 +54,8 @@
 					"path": "~/.traj/traj.db",
 					"exists": true,
 					"bytes": 225280,
-					"schemaVersion": 2,
-					"head": 2
+					"schemaVersion": 3,
+					"head": 3
 				},
 				"rows": {
 					"entity": 1,
@@ -89,7 +89,7 @@
 					{
 						"name": "database",
 						"status": "pass",
-						"detail": "~/.traj/traj.db opens at schema version 2 of 2."
+						"detail": "~/.traj/traj.db opens at schema version 3 of 3."
 					},
 					{
 						"name": "integrity",
@@ -117,7 +117,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a2042c-06e8-752d-b993-282c5924c461",
+							"id": "01a20469-a872-743e-b5c3-0822685fa209",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -126,7 +126,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+							"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,7 +135,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+							"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -144,7 +144,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+							"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -153,7 +153,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+							"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -162,7 +162,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
+							"id": "01a20469-aff8-7193-bc18-111a0f38ee33",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -171,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-094b-7675-8508-8a64006c4093",
+							"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -180,7 +180,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+							"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -189,7 +189,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-09af-77d7-8477-725867cbaae7",
+							"id": "01a20469-af26-70ea-90b9-da7c1c0dd057",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -207,7 +207,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"debit": "662300.00",
@@ -216,7 +216,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -225,7 +225,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"debit": "736600.00",
@@ -234,7 +234,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+								"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 								"name": "Fund Return"
 							},
 							"debit": "0.00",
@@ -243,7 +243,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+								"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 								"name": "Living"
 							},
 							"debit": "762200.00",
@@ -252,7 +252,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
+								"id": "01a20469-aff8-7193-bc18-111a0f38ee33",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -261,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-094b-7675-8508-8a64006c4093",
+								"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -270,7 +270,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+								"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 								"name": "Salary"
 							},
 							"debit": "0.00",
@@ -279,7 +279,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-09af-77d7-8477-725867cbaae7",
+								"id": "01a20469-af26-70ea-90b9-da7c1c0dd057",
 								"name": "Travel"
 							},
 							"debit": "78500.00",
@@ -307,7 +307,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+							"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -316,7 +316,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+							"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -325,7 +325,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-094b-7675-8508-8a64006c4093",
+							"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -334,7 +334,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+							"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -343,7 +343,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-09af-77d7-8477-725867cbaae7",
+							"id": "01a20469-af26-70ea-90b9-da7c1c0dd057",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -365,7 +365,7 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a2042c-0be5-75fd-85bb-0e0621daa364",
+						"id": "01a20469-b3c9-7773-b08c-b427fc379d98",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -374,7 +374,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-094b-7675-8508-8a64006c4093",
+									"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -384,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -394,7 +394,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7600-9bad-d44205150970",
+						"id": "01a20469-b3c9-7776-86ae-3fb4237babed",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -403,7 +403,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+									"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 									"name": "Living"
 								},
 								"amount": "30300.00",
@@ -413,7 +413,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-30300.00",
@@ -423,7 +423,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-75fe-b15b-bf0170773bf8",
+						"id": "01a20469-b3c9-7774-b498-47438188bdda",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -432,7 +432,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+									"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -442,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -452,7 +452,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7613-ad25-1aeefefea4d4",
+						"id": "01a20469-b3c9-7789-8d06-450c4260c8bf",
 						"date": "2026-08-15",
 						"memo": "new laptop",
 						"linkedTo": null,
@@ -461,7 +461,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+									"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 									"name": "Living"
 								},
 								"amount": "58000.00",
@@ -471,7 +471,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-58000.00",
@@ -481,7 +481,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7601-8f90-393deb3c2c5a",
+						"id": "01a20469-b3c9-7777-baa1-27a5903f429e",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -490,7 +490,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -500,7 +500,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+									"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -510,7 +510,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-75ff-bd8a-ee2f9815994e",
+						"id": "01a20469-b3c9-7775-a014-2b6f143e6b63",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -519,7 +519,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -529,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -539,7 +539,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7602-8f20-6131873a2c0a",
+						"id": "01a20469-b3c9-7778-a4d0-f92c9980b46e",
 						"date": "2026-08-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -548,7 +548,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "9500.00",
@@ -558,7 +558,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+									"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 									"name": "Fund Return"
 								},
 								"amount": "-9500.00",
@@ -568,7 +568,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7603-a2b3-f795132fd7f5",
+						"id": "01a20469-b3c9-7779-8e6c-2ef4910230fd",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -577,7 +577,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-094b-7675-8508-8a64006c4093",
+									"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -587,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -597,7 +597,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7606-ad28-3437507aecce",
+						"id": "01a20469-b3c9-777c-a642-35bca04110ef",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -606,7 +606,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+									"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 									"name": "Living"
 								},
 								"amount": "26900.00",
@@ -616,7 +616,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-26900.00",
@@ -626,7 +626,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7604-b1d5-4cd3391016b1",
+						"id": "01a20469-b3c9-777a-bb59-8cc3ca1f5e75",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -635,7 +635,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+									"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -645,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -655,7 +655,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7607-a246-3abe6ba839bb",
+						"id": "01a20469-b3c9-777d-9bd8-ffa5b6318c0a",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -664,7 +664,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -674,7 +674,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+									"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -684,7 +684,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7605-8bb0-c5e8c7d47eb9",
+						"id": "01a20469-b3c9-777b-97cd-a029923db759",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -693,7 +693,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -703,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -713,7 +713,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7608-be08-bf94a08161da",
+						"id": "01a20469-b3c9-777e-ab3d-7de5a54ab680",
 						"date": "2026-09-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -722,7 +722,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+									"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 									"name": "Fund Return"
 								},
 								"amount": "12600.00",
@@ -732,7 +732,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "-12600.00",
@@ -742,7 +742,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-7609-9949-ddba718c9c4c",
+						"id": "01a20469-b3c9-777f-9086-edceda163594",
 						"date": "2026-10-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -751,7 +751,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-094b-7675-8508-8a64006c4093",
+									"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -761,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -771,7 +771,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-760c-88af-6a92e42a0ade",
+						"id": "01a20469-b3c9-7782-a2c6-c2d5f9b3e6dc",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -780,7 +780,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+									"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 									"name": "Living"
 								},
 								"amount": "28800.00",
@@ -790,7 +790,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-28800.00",
@@ -800,7 +800,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-760a-aa6d-93ce34716483",
+						"id": "01a20469-b3c9-7780-a047-cddbfe55fa77",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -809,7 +809,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+									"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -819,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -829,7 +829,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-760d-ba95-a63e549d0e65",
+						"id": "01a20469-b3c9-7783-97e9-d379bb2133a3",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -838,7 +838,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -848,7 +848,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+									"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -858,7 +858,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-760b-a81c-c0bd2729c08f",
+						"id": "01a20469-b3c9-7781-9ab7-1c23c140c788",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -867,7 +867,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -877,7 +877,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-06e8-752d-b993-282c5924c461",
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -887,7 +887,7 @@
 						]
 					},
 					{
-						"id": "01a2042c-0be5-760e-9ee0-caf921c6aa4f",
+						"id": "01a20469-b3c9-7784-87bf-955211a4379f",
 						"date": "2026-10-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -896,7 +896,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 									"name": "Fund"
 								},
 								"amount": "7300.00",
@@ -906,7 +906,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+									"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 									"name": "Fund Return"
 								},
 								"amount": "-7300.00",
@@ -927,7 +927,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a2042c-06e8-752d-b993-282c5924c461",
+							"id": "01a20469-a872-743e-b5c3-0822685fa209",
 							"name": "Bank"
 						},
 						"kind": "asset",
@@ -935,7 +935,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+							"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 							"name": "Fund"
 						},
 						"kind": "asset",
@@ -943,7 +943,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+							"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -963,7 +963,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -972,7 +972,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -981,7 +981,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1007,7 +1007,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1016,7 +1016,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1025,7 +1025,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1051,7 +1051,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1060,7 +1060,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1069,7 +1069,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1095,7 +1095,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1104,7 +1104,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1113,7 +1113,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1139,7 +1139,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1148,7 +1148,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1157,7 +1157,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1183,7 +1183,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1192,7 +1192,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1201,7 +1201,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1227,7 +1227,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1236,7 +1236,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1245,7 +1245,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1271,7 +1271,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1280,7 +1280,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1289,7 +1289,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1315,7 +1315,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1324,7 +1324,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1333,7 +1333,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1359,7 +1359,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1368,7 +1368,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1377,7 +1377,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1403,7 +1403,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1412,7 +1412,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1421,7 +1421,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1447,7 +1447,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1456,7 +1456,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1465,7 +1465,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1491,7 +1491,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1500,7 +1500,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1509,7 +1509,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1535,7 +1535,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1544,7 +1544,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1553,7 +1553,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1579,7 +1579,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1588,7 +1588,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1597,7 +1597,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1623,7 +1623,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1632,7 +1632,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1641,7 +1641,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1667,7 +1667,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1676,7 +1676,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1685,7 +1685,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1711,7 +1711,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1720,7 +1720,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1729,7 +1729,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1755,7 +1755,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1764,7 +1764,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1773,7 +1773,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1799,7 +1799,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1808,7 +1808,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1817,7 +1817,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1843,7 +1843,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1852,7 +1852,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1861,7 +1861,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1887,7 +1887,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1896,7 +1896,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1905,7 +1905,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1931,7 +1931,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1940,7 +1940,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1949,7 +1949,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1975,7 +1975,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a2042c-06e8-752d-b993-282c5924c461",
+								"id": "01a20469-a872-743e-b5c3-0822685fa209",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1984,7 +1984,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+								"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1993,7 +1993,7 @@
 						},
 						{
 							"account": {
-								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+								"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -2010,6 +2010,3208 @@
 				}
 			}
 		],
+		"documents": {
+			"base": {
+				"argv": ["scenario", "show", "--decimal", "--json", "--", "base"],
+				"ok": true,
+				"data": {
+					"scenario": {
+						"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
+						"name": "base",
+						"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
+						"forkedFrom": null,
+						"version": 2,
+						"createdAt": "2026-11-22T17:59:26.660Z",
+						"updatedAt": "2026-11-22T17:59:26.911Z",
+						"document": {
+							"currency": "THB",
+							"flows": [
+								{
+									"id": "salary",
+									"kind": "income",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2050-05-14",
+									"amount": "90000.00",
+									"growth": "inflation",
+									"earned": true,
+									"label": "income.section40_1"
+								},
+								{
+									"id": "rent",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"amount": "14000.00",
+									"growth": "inflation"
+								},
+								{
+									"id": "living",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"amount": "28000.00",
+									"growth": "inflation"
+								},
+								{
+									"id": "car",
+									"kind": "contribution",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2030-12-31",
+									"amount": "9000.00",
+									"growth": {
+										"bps": 0
+									},
+									"target": "01a20469-aaf9-73f5-9105-96262ed4b15d"
+								},
+								{
+									"id": "fund",
+									"kind": "contribution",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2050-05-14",
+									"amount": "15000.00",
+									"growth": "inflation",
+									"target": "01a20469-a97e-7276-8214-a4735b0dbaf8"
+								}
+							],
+							"accounts": [
+								{
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
+									"kind": "asset",
+									"rate": 100
+								},
+								{
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
+									"kind": "asset",
+									"rate": 500
+								},
+								{
+									"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
+									"kind": "liability",
+									"rate": 500,
+									"compounding": "monthly"
+								}
+							],
+							"cashflow": {
+								"contribute": ["01a20469-a97e-7276-8214-a4735b0dbaf8"],
+								"surplus": [
+									{
+										"account": "01a20469-a872-743e-b5c3-0822685fa209"
+									}
+								],
+								"withdraw": [
+									"01a20469-a872-743e-b5c3-0822685fa209",
+									"01a20469-a97e-7276-8214-a4735b0dbaf8"
+								]
+							},
+							"economy": {
+								"inflation": 300
+							},
+							"levies": [
+								{
+									"due": "tax.net_payable",
+									"id": "th-2026-pit",
+									"measures": [
+										{
+											"basis": "gross",
+											"id": "auto.0",
+											"label": "income.section40_1",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.1",
+											"label": "income.section40_2",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.2",
+											"label": "income.section40_3",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.3",
+											"label": "income.section40_4",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.4",
+											"label": "income.section40_4.interest",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.5",
+											"label": "income.section40_4.dividends",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.6",
+											"label": "income.section40_4.digitalAssets",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.7",
+											"label": "income.section40_5.building",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.8",
+											"label": "income.section40_5.agriculturalLand",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.9",
+											"label": "income.section40_5.nonAgriculturalLand",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.10",
+											"label": "income.section40_5.vehicles",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.11",
+											"label": "income.section40_5.other",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.12",
+											"label": "income.section40_6.medical",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.13",
+											"label": "income.section40_6.law",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.14",
+											"label": "income.section40_6.engineering",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.15",
+											"label": "income.section40_6.architecture",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.16",
+											"label": "income.section40_6.accounting",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.17",
+											"label": "income.section40_6.fineArts",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.18",
+											"label": "income.section40_6.other",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.19",
+											"label": "income.section40_7",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.20",
+											"label": "income.section40_8.general",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.21",
+											"label": "income.section40_8.entertainer",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.22",
+											"label": "allowance.retirement.rmf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.23",
+											"label": "allowance.retirement.ssf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.24",
+											"label": "allowance.retirement.pvd",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.25",
+											"label": "allowance.retirement.gpf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.26",
+											"label": "allowance.retirement.nsf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.27",
+											"label": "allowance.retirement.pension_life",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.28",
+											"label": "allowance.thai_esg",
+											"op": "tally"
+										},
+										{
+											"id": "credit.dividend",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.3",
+											"b": "auto.4",
+											"id": "auto.29",
+											"op": "add"
+										},
+										{
+											"a": "auto.29",
+											"b": "auto.5",
+											"id": "auto.30",
+											"op": "add"
+										},
+										{
+											"a": "auto.30",
+											"b": "auto.6",
+											"id": "auto.31",
+											"op": "add"
+										},
+										{
+											"id": "auto.32",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"id": "auto.33",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.32",
+											"b": "auto.33",
+											"id": "tax.final_withholding",
+											"op": "add"
+										},
+										{
+											"a": "auto.7",
+											"b": "auto.8",
+											"id": "auto.34",
+											"op": "add"
+										},
+										{
+											"a": "auto.34",
+											"b": "auto.9",
+											"id": "auto.35",
+											"op": "add"
+										},
+										{
+											"a": "auto.35",
+											"b": "auto.10",
+											"id": "auto.36",
+											"op": "add"
+										},
+										{
+											"a": "auto.36",
+											"b": "auto.11",
+											"id": "auto.37",
+											"op": "add"
+										},
+										{
+											"a": "auto.12",
+											"b": "auto.13",
+											"id": "auto.38",
+											"op": "add"
+										},
+										{
+											"a": "auto.38",
+											"b": "auto.14",
+											"id": "auto.39",
+											"op": "add"
+										},
+										{
+											"a": "auto.39",
+											"b": "auto.15",
+											"id": "auto.40",
+											"op": "add"
+										},
+										{
+											"a": "auto.40",
+											"b": "auto.16",
+											"id": "auto.41",
+											"op": "add"
+										},
+										{
+											"a": "auto.41",
+											"b": "auto.17",
+											"id": "auto.42",
+											"op": "add"
+										},
+										{
+											"a": "auto.42",
+											"b": "auto.18",
+											"id": "auto.43",
+											"op": "add"
+										},
+										{
+											"a": "auto.20",
+											"b": "auto.21",
+											"id": "auto.44",
+											"op": "add"
+										},
+										{
+											"a": "auto.0",
+											"b": "auto.1",
+											"id": "auto.45",
+											"op": "add"
+										},
+										{
+											"a": "auto.45",
+											"b": "auto.2",
+											"id": "auto.46",
+											"op": "add"
+										},
+										{
+											"a": "auto.46",
+											"b": "auto.31",
+											"id": "auto.47",
+											"op": "add"
+										},
+										{
+											"a": "auto.47",
+											"b": "auto.37",
+											"id": "auto.48",
+											"op": "add"
+										},
+										{
+											"a": "auto.48",
+											"b": "auto.43",
+											"id": "auto.49",
+											"op": "add"
+										},
+										{
+											"a": "auto.49",
+											"b": "auto.19",
+											"id": "auto.50",
+											"op": "add"
+										},
+										{
+											"a": "auto.50",
+											"b": "auto.44",
+											"id": "auto.51",
+											"op": "add"
+										},
+										{
+											"id": "auto.52",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.51",
+											"b": "auto.52",
+											"id": "assessable.total",
+											"op": "add"
+										},
+										{
+											"a": "auto.1",
+											"b": "auto.2",
+											"id": "auto.53",
+											"op": "add"
+										},
+										{
+											"a": "auto.53",
+											"b": "auto.31",
+											"id": "auto.54",
+											"op": "add"
+										},
+										{
+											"a": "auto.54",
+											"b": "auto.37",
+											"id": "auto.55",
+											"op": "add"
+										},
+										{
+											"a": "auto.55",
+											"b": "auto.43",
+											"id": "auto.56",
+											"op": "add"
+										},
+										{
+											"a": "auto.56",
+											"b": "auto.19",
+											"id": "auto.57",
+											"op": "add"
+										},
+										{
+											"a": "auto.57",
+											"b": "auto.44",
+											"id": "auto.58",
+											"op": "add"
+										},
+										{
+											"id": "auto.59",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.58",
+											"b": "auto.59",
+											"id": "assessable.non_employment",
+											"op": "add"
+										},
+										{
+											"a": "auto.0",
+											"b": "auto.1",
+											"id": "auto.60",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.61",
+											"num": 5,
+											"of": "auto.60",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.62",
+											"op": "const",
+											"value": 10000000
+										},
+										{
+											"a": "auto.61",
+											"b": "auto.62",
+											"id": "auto.63",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.64",
+											"num": 5,
+											"of": "auto.2",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.65",
+											"op": "const",
+											"value": 10000000
+										},
+										{
+											"a": "auto.64",
+											"b": "auto.65",
+											"id": "auto.66",
+											"op": "min"
+										},
+										{
+											"id": "auto.67",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"den": 10,
+											"id": "auto.68",
+											"num": 3,
+											"of": "auto.7",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.69",
+											"num": 2,
+											"of": "auto.8",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 100,
+											"id": "auto.70",
+											"num": 15,
+											"of": "auto.9",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.71",
+											"num": 3,
+											"of": "auto.10",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.72",
+											"num": 1,
+											"of": "auto.11",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.68",
+											"b": "auto.69",
+											"id": "auto.73",
+											"op": "add"
+										},
+										{
+											"a": "auto.73",
+											"b": "auto.70",
+											"id": "auto.74",
+											"op": "add"
+										},
+										{
+											"a": "auto.74",
+											"b": "auto.71",
+											"id": "auto.75",
+											"op": "add"
+										},
+										{
+											"a": "auto.75",
+											"b": "auto.72",
+											"id": "auto.76",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.77",
+											"num": 6,
+											"of": "auto.12",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.78",
+											"num": 3,
+											"of": "auto.13",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.79",
+											"num": 3,
+											"of": "auto.14",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.80",
+											"num": 3,
+											"of": "auto.15",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.81",
+											"num": 3,
+											"of": "auto.16",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.82",
+											"num": 3,
+											"of": "auto.17",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.83",
+											"num": 3,
+											"of": "auto.18",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.77",
+											"b": "auto.78",
+											"id": "auto.84",
+											"op": "add"
+										},
+										{
+											"a": "auto.84",
+											"b": "auto.79",
+											"id": "auto.85",
+											"op": "add"
+										},
+										{
+											"a": "auto.85",
+											"b": "auto.80",
+											"id": "auto.86",
+											"op": "add"
+										},
+										{
+											"a": "auto.86",
+											"b": "auto.81",
+											"id": "auto.87",
+											"op": "add"
+										},
+										{
+											"a": "auto.87",
+											"b": "auto.82",
+											"id": "auto.88",
+											"op": "add"
+										},
+										{
+											"a": "auto.88",
+											"b": "auto.83",
+											"id": "auto.89",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.90",
+											"num": 6,
+											"of": "auto.19",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.91",
+											"num": 6,
+											"of": "auto.20",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.92",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.21",
+											"b": "auto.92",
+											"id": "auto.93",
+											"op": "min"
+										},
+										{
+											"id": "auto.94",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.21",
+											"b": "auto.94",
+											"id": "auto.95",
+											"op": "sub"
+										},
+										{
+											"id": "auto.96",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.95",
+											"b": "auto.96",
+											"id": "auto.97",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.98",
+											"num": 6,
+											"of": "auto.93",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.99",
+											"num": 4,
+											"of": "auto.97",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.98",
+											"b": "auto.99",
+											"id": "auto.100",
+											"op": "add"
+										},
+										{
+											"id": "auto.101",
+											"op": "const",
+											"value": 60000000
+										},
+										{
+											"a": "auto.100",
+											"b": "auto.101",
+											"id": "auto.102",
+											"op": "min"
+										},
+										{
+											"a": "auto.91",
+											"b": "auto.102",
+											"id": "auto.103",
+											"op": "add"
+										},
+										{
+											"a": "auto.63",
+											"b": "auto.66",
+											"id": "auto.104",
+											"op": "add"
+										},
+										{
+											"a": "auto.104",
+											"b": "auto.67",
+											"id": "auto.105",
+											"op": "add"
+										},
+										{
+											"a": "auto.105",
+											"b": "auto.76",
+											"id": "auto.106",
+											"op": "add"
+										},
+										{
+											"a": "auto.106",
+											"b": "auto.89",
+											"id": "auto.107",
+											"op": "add"
+										},
+										{
+											"a": "auto.107",
+											"b": "auto.90",
+											"id": "auto.108",
+											"op": "add"
+										},
+										{
+											"a": "auto.108",
+											"b": "auto.103",
+											"id": "auto.109",
+											"op": "add"
+										},
+										{
+											"id": "auto.110",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.109",
+											"b": "auto.110",
+											"id": "expenses.total",
+											"op": "add"
+										},
+										{
+											"id": "allowances.fixed",
+											"op": "const",
+											"value": 6000000
+										},
+										{
+											"den": 10,
+											"id": "auto.111",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.112",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.111",
+											"b": "auto.112",
+											"id": "auto.113",
+											"op": "min"
+										},
+										{
+											"a": "auto.22",
+											"b": "auto.113",
+											"id": "auto.114",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.115",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.116",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.115",
+											"b": "auto.116",
+											"id": "auto.117",
+											"op": "min"
+										},
+										{
+											"a": "auto.23",
+											"b": "auto.117",
+											"id": "auto.118",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.119",
+											"num": 15,
+											"of": "auto.0",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.120",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.119",
+											"b": "auto.120",
+											"id": "auto.121",
+											"op": "min"
+										},
+										{
+											"a": "auto.24",
+											"b": "auto.121",
+											"id": "auto.122",
+											"op": "min"
+										},
+										{
+											"id": "auto.123",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.25",
+											"b": "auto.123",
+											"id": "auto.124",
+											"op": "min"
+										},
+										{
+											"id": "auto.125",
+											"op": "const",
+											"value": 3000000
+										},
+										{
+											"a": "auto.26",
+											"b": "auto.125",
+											"id": "auto.126",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.127",
+											"num": 15,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.128",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.127",
+											"b": "auto.128",
+											"id": "auto.129",
+											"op": "min"
+										},
+										{
+											"a": "auto.27",
+											"b": "auto.129",
+											"id": "auto.130",
+											"op": "min"
+										},
+										{
+											"a": "auto.114",
+											"b": "auto.118",
+											"id": "auto.131",
+											"op": "add"
+										},
+										{
+											"a": "auto.131",
+											"b": "auto.122",
+											"id": "auto.132",
+											"op": "add"
+										},
+										{
+											"a": "auto.132",
+											"b": "auto.124",
+											"id": "auto.133",
+											"op": "add"
+										},
+										{
+											"a": "auto.133",
+											"b": "auto.126",
+											"id": "auto.134",
+											"op": "add"
+										},
+										{
+											"a": "auto.134",
+											"b": "auto.130",
+											"id": "auto.135",
+											"op": "add"
+										},
+										{
+											"id": "auto.136",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.135",
+											"b": "auto.136",
+											"id": "allowances.retirement_cluster",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.137",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.138",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.137",
+											"b": "auto.138",
+											"id": "auto.139",
+											"op": "min"
+										},
+										{
+											"a": "auto.28",
+											"b": "auto.139",
+											"id": "allowances.thai_esg",
+											"op": "min"
+										},
+										{
+											"a": "allowances.fixed",
+											"b": "allowances.retirement_cluster",
+											"id": "auto.140",
+											"op": "add"
+										},
+										{
+											"a": "auto.140",
+											"b": "allowances.thai_esg",
+											"id": "auto.141",
+											"op": "add"
+										},
+										{
+											"a": "assessable.total",
+											"b": "expenses.total",
+											"id": "auto.142",
+											"op": "sub"
+										},
+										{
+											"a": "auto.142",
+											"b": "auto.141",
+											"id": "auto.143",
+											"op": "sub"
+										},
+										{
+											"id": "auto.144",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.143",
+											"b": "auto.144",
+											"id": "auto.145",
+											"op": "max"
+										},
+										{
+											"id": "auto.146",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.145",
+											"b": "auto.146",
+											"id": "auto.147",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.148",
+											"num": 1,
+											"of": "auto.147",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.149",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.149",
+											"b": "auto.148",
+											"id": "auto.150",
+											"op": "min"
+										},
+										{
+											"a": "auto.147",
+											"b": "auto.150",
+											"id": "auto.151",
+											"op": "sub"
+										},
+										{
+											"id": "auto.152",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.151",
+											"b": "auto.152",
+											"id": "auto.153",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.154",
+											"num": 1,
+											"of": "auto.153",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.155",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.155",
+											"b": "auto.154",
+											"id": "auto.156",
+											"op": "min"
+										},
+										{
+											"a": "auto.150",
+											"b": "auto.156",
+											"id": "allowances.donations",
+											"op": "add"
+										},
+										{
+											"a": "auto.153",
+											"b": "auto.156",
+											"id": "auto.157",
+											"op": "sub"
+										},
+										{
+											"id": "auto.158",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.157",
+											"b": "auto.158",
+											"id": "taxable.income",
+											"op": "max"
+										},
+										{
+											"a": "auto.141",
+											"b": "allowances.donations",
+											"id": "allowances.total",
+											"op": "add"
+										},
+										{
+											"id": "auto.159",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.159",
+											"id": "auto.160",
+											"op": "sub"
+										},
+										{
+											"id": "auto.161",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.160",
+											"b": "auto.161",
+											"id": "auto.162",
+											"op": "max"
+										},
+										{
+											"id": "auto.163",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "auto.162",
+											"b": "auto.163",
+											"id": "auto.164",
+											"op": "min"
+										},
+										{
+											"den": 1,
+											"id": "auto.165",
+											"num": 0,
+											"of": "auto.164",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.166",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.166",
+											"id": "auto.167",
+											"op": "sub"
+										},
+										{
+											"id": "auto.168",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.167",
+											"b": "auto.168",
+											"id": "auto.169",
+											"op": "max"
+										},
+										{
+											"id": "auto.170",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "auto.169",
+											"b": "auto.170",
+											"id": "auto.171",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.172",
+											"num": 5,
+											"of": "auto.171",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.173",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.173",
+											"id": "auto.174",
+											"op": "sub"
+										},
+										{
+											"id": "auto.175",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.174",
+											"b": "auto.175",
+											"id": "auto.176",
+											"op": "max"
+										},
+										{
+											"id": "auto.177",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.176",
+											"b": "auto.177",
+											"id": "auto.178",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.179",
+											"num": 1,
+											"of": "auto.178",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.180",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.180",
+											"id": "auto.181",
+											"op": "sub"
+										},
+										{
+											"id": "auto.182",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.181",
+											"b": "auto.182",
+											"id": "auto.183",
+											"op": "max"
+										},
+										{
+											"id": "auto.184",
+											"op": "const",
+											"value": 25000000
+										},
+										{
+											"a": "auto.183",
+											"b": "auto.184",
+											"id": "auto.185",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.186",
+											"num": 15,
+											"of": "auto.185",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.187",
+											"op": "const",
+											"value": 75000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.187",
+											"id": "auto.188",
+											"op": "sub"
+										},
+										{
+											"id": "auto.189",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.188",
+											"b": "auto.189",
+											"id": "auto.190",
+											"op": "max"
+										},
+										{
+											"id": "auto.191",
+											"op": "const",
+											"value": 25000000
+										},
+										{
+											"a": "auto.190",
+											"b": "auto.191",
+											"id": "auto.192",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.193",
+											"num": 2,
+											"of": "auto.192",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.194",
+											"op": "const",
+											"value": 100000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.194",
+											"id": "auto.195",
+											"op": "sub"
+										},
+										{
+											"id": "auto.196",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.195",
+											"b": "auto.196",
+											"id": "auto.197",
+											"op": "max"
+										},
+										{
+											"id": "auto.198",
+											"op": "const",
+											"value": 100000000
+										},
+										{
+											"a": "auto.197",
+											"b": "auto.198",
+											"id": "auto.199",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.200",
+											"num": 25,
+											"of": "auto.199",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.201",
+											"op": "const",
+											"value": 200000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.201",
+											"id": "auto.202",
+											"op": "sub"
+										},
+										{
+											"id": "auto.203",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.202",
+											"b": "auto.203",
+											"id": "auto.204",
+											"op": "max"
+										},
+										{
+											"id": "auto.205",
+											"op": "const",
+											"value": 300000000
+										},
+										{
+											"a": "auto.204",
+											"b": "auto.205",
+											"id": "auto.206",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.207",
+											"num": 3,
+											"of": "auto.206",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.208",
+											"op": "const",
+											"value": 500000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.208",
+											"id": "auto.209",
+											"op": "sub"
+										},
+										{
+											"id": "auto.210",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.209",
+											"b": "auto.210",
+											"id": "auto.211",
+											"op": "max"
+										},
+										{
+											"den": 100,
+											"id": "auto.212",
+											"num": 35,
+											"of": "auto.211",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"a": "auto.165",
+											"b": "auto.172",
+											"id": "auto.213",
+											"op": "add"
+										},
+										{
+											"a": "auto.213",
+											"b": "auto.179",
+											"id": "auto.214",
+											"op": "add"
+										},
+										{
+											"a": "auto.214",
+											"b": "auto.186",
+											"id": "auto.215",
+											"op": "add"
+										},
+										{
+											"a": "auto.215",
+											"b": "auto.193",
+											"id": "auto.216",
+											"op": "add"
+										},
+										{
+											"a": "auto.216",
+											"b": "auto.200",
+											"id": "auto.217",
+											"op": "add"
+										},
+										{
+											"a": "auto.217",
+											"b": "auto.207",
+											"id": "auto.218",
+											"op": "add"
+										},
+										{
+											"a": "auto.218",
+											"b": "auto.212",
+											"id": "auto.219",
+											"op": "add"
+										},
+										{
+											"id": "auto.220",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.219",
+											"b": "auto.220",
+											"id": "tax.progressive",
+											"op": "add"
+										},
+										{
+											"den": 1000,
+											"id": "auto.221",
+											"num": 5,
+											"of": "assessable.non_employment",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.222",
+											"op": "const",
+											"value": 11999999
+										},
+										{
+											"id": "auto.223",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "assessable.non_employment",
+											"b": "auto.222",
+											"else": "auto.223",
+											"id": "tax.minimum",
+											"op": "pick",
+											"then": "auto.221"
+										},
+										{
+											"id": "auto.224",
+											"op": "const",
+											"value": 500000
+										},
+										{
+											"id": "auto.225",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "tax.minimum",
+											"b": "auto.224",
+											"else": "auto.225",
+											"id": "auto.226",
+											"op": "pick",
+											"then": "tax.minimum"
+										},
+										{
+											"a": "tax.progressive",
+											"b": "auto.226",
+											"id": "tax.regular",
+											"op": "max"
+										},
+										{
+											"a": "tax.regular",
+											"b": "tax.final_withholding",
+											"id": "tax.total",
+											"op": "add"
+										},
+										{
+											"a": "tax.final_withholding",
+											"b": "credit.dividend",
+											"id": "auto.227",
+											"op": "add"
+										},
+										{
+											"a": "tax.total",
+											"b": "auto.227",
+											"id": "tax.net_payable",
+											"op": "sub"
+										}
+									],
+									"period": {
+										"day": 1,
+										"month": 1
+									},
+									"settlement": {
+										"day": 31,
+										"month": 3
+									}
+								}
+							],
+							"schemaVersion": 4
+						},
+						"household": null
+					}
+				}
+			},
+			"retire-early": {
+				"argv": ["scenario", "show", "--decimal", "--json", "--", "retire-early"],
+				"ok": true,
+				"data": {
+					"scenario": {
+						"id": "01a20469-b8cf-774c-810f-b9db96904544",
+						"name": "retire-early",
+						"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+						"forkedFrom": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
+						"version": 1,
+						"createdAt": "2026-11-22T17:59:27.183Z",
+						"updatedAt": "2026-11-22T17:59:27.183Z",
+						"document": {
+							"currency": "THB",
+							"flows": [
+								{
+									"id": "salary",
+									"kind": "income",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2040-05-14",
+									"amount": "90000.00",
+									"growth": "inflation",
+									"earned": true,
+									"label": "income.section40_1"
+								},
+								{
+									"id": "rent",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"amount": "14000.00",
+									"growth": "inflation"
+								},
+								{
+									"id": "living",
+									"kind": "expense",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"amount": "28000.00",
+									"growth": "inflation"
+								},
+								{
+									"id": "car",
+									"kind": "contribution",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2030-12-31",
+									"amount": "9000.00",
+									"growth": {
+										"bps": 0
+									},
+									"target": "01a20469-aaf9-73f5-9105-96262ed4b15d"
+								},
+								{
+									"id": "fund",
+									"kind": "contribution",
+									"frequency": "monthly",
+									"start": "2026-11-01",
+									"end": "2050-05-14",
+									"amount": "15000.00",
+									"growth": "inflation",
+									"target": "01a20469-a97e-7276-8214-a4735b0dbaf8"
+								}
+							],
+							"accounts": [
+								{
+									"id": "01a20469-a872-743e-b5c3-0822685fa209",
+									"kind": "asset",
+									"rate": 100
+								},
+								{
+									"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
+									"kind": "asset",
+									"rate": 500
+								},
+								{
+									"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
+									"kind": "liability",
+									"rate": 500,
+									"compounding": "monthly"
+								}
+							],
+							"cashflow": {
+								"contribute": ["01a20469-a97e-7276-8214-a4735b0dbaf8"],
+								"surplus": [
+									{
+										"account": "01a20469-a872-743e-b5c3-0822685fa209"
+									}
+								],
+								"withdraw": [
+									"01a20469-a872-743e-b5c3-0822685fa209",
+									"01a20469-a97e-7276-8214-a4735b0dbaf8"
+								]
+							},
+							"economy": {
+								"inflation": 300
+							},
+							"levies": [
+								{
+									"due": "tax.net_payable",
+									"id": "th-2026-pit",
+									"measures": [
+										{
+											"basis": "gross",
+											"id": "auto.0",
+											"label": "income.section40_1",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.1",
+											"label": "income.section40_2",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.2",
+											"label": "income.section40_3",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.3",
+											"label": "income.section40_4",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.4",
+											"label": "income.section40_4.interest",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.5",
+											"label": "income.section40_4.dividends",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.6",
+											"label": "income.section40_4.digitalAssets",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.7",
+											"label": "income.section40_5.building",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.8",
+											"label": "income.section40_5.agriculturalLand",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.9",
+											"label": "income.section40_5.nonAgriculturalLand",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.10",
+											"label": "income.section40_5.vehicles",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.11",
+											"label": "income.section40_5.other",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.12",
+											"label": "income.section40_6.medical",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.13",
+											"label": "income.section40_6.law",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.14",
+											"label": "income.section40_6.engineering",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.15",
+											"label": "income.section40_6.architecture",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.16",
+											"label": "income.section40_6.accounting",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.17",
+											"label": "income.section40_6.fineArts",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.18",
+											"label": "income.section40_6.other",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.19",
+											"label": "income.section40_7",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.20",
+											"label": "income.section40_8.general",
+											"op": "tally"
+										},
+										{
+											"basis": "gross",
+											"id": "auto.21",
+											"label": "income.section40_8.entertainer",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.22",
+											"label": "allowance.retirement.rmf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.23",
+											"label": "allowance.retirement.ssf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.24",
+											"label": "allowance.retirement.pvd",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.25",
+											"label": "allowance.retirement.gpf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.26",
+											"label": "allowance.retirement.nsf",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.27",
+											"label": "allowance.retirement.pension_life",
+											"op": "tally"
+										},
+										{
+											"basis": "funded",
+											"id": "auto.28",
+											"label": "allowance.thai_esg",
+											"op": "tally"
+										},
+										{
+											"id": "credit.dividend",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.3",
+											"b": "auto.4",
+											"id": "auto.29",
+											"op": "add"
+										},
+										{
+											"a": "auto.29",
+											"b": "auto.5",
+											"id": "auto.30",
+											"op": "add"
+										},
+										{
+											"a": "auto.30",
+											"b": "auto.6",
+											"id": "auto.31",
+											"op": "add"
+										},
+										{
+											"id": "auto.32",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"id": "auto.33",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.32",
+											"b": "auto.33",
+											"id": "tax.final_withholding",
+											"op": "add"
+										},
+										{
+											"a": "auto.7",
+											"b": "auto.8",
+											"id": "auto.34",
+											"op": "add"
+										},
+										{
+											"a": "auto.34",
+											"b": "auto.9",
+											"id": "auto.35",
+											"op": "add"
+										},
+										{
+											"a": "auto.35",
+											"b": "auto.10",
+											"id": "auto.36",
+											"op": "add"
+										},
+										{
+											"a": "auto.36",
+											"b": "auto.11",
+											"id": "auto.37",
+											"op": "add"
+										},
+										{
+											"a": "auto.12",
+											"b": "auto.13",
+											"id": "auto.38",
+											"op": "add"
+										},
+										{
+											"a": "auto.38",
+											"b": "auto.14",
+											"id": "auto.39",
+											"op": "add"
+										},
+										{
+											"a": "auto.39",
+											"b": "auto.15",
+											"id": "auto.40",
+											"op": "add"
+										},
+										{
+											"a": "auto.40",
+											"b": "auto.16",
+											"id": "auto.41",
+											"op": "add"
+										},
+										{
+											"a": "auto.41",
+											"b": "auto.17",
+											"id": "auto.42",
+											"op": "add"
+										},
+										{
+											"a": "auto.42",
+											"b": "auto.18",
+											"id": "auto.43",
+											"op": "add"
+										},
+										{
+											"a": "auto.20",
+											"b": "auto.21",
+											"id": "auto.44",
+											"op": "add"
+										},
+										{
+											"a": "auto.0",
+											"b": "auto.1",
+											"id": "auto.45",
+											"op": "add"
+										},
+										{
+											"a": "auto.45",
+											"b": "auto.2",
+											"id": "auto.46",
+											"op": "add"
+										},
+										{
+											"a": "auto.46",
+											"b": "auto.31",
+											"id": "auto.47",
+											"op": "add"
+										},
+										{
+											"a": "auto.47",
+											"b": "auto.37",
+											"id": "auto.48",
+											"op": "add"
+										},
+										{
+											"a": "auto.48",
+											"b": "auto.43",
+											"id": "auto.49",
+											"op": "add"
+										},
+										{
+											"a": "auto.49",
+											"b": "auto.19",
+											"id": "auto.50",
+											"op": "add"
+										},
+										{
+											"a": "auto.50",
+											"b": "auto.44",
+											"id": "auto.51",
+											"op": "add"
+										},
+										{
+											"id": "auto.52",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.51",
+											"b": "auto.52",
+											"id": "assessable.total",
+											"op": "add"
+										},
+										{
+											"a": "auto.1",
+											"b": "auto.2",
+											"id": "auto.53",
+											"op": "add"
+										},
+										{
+											"a": "auto.53",
+											"b": "auto.31",
+											"id": "auto.54",
+											"op": "add"
+										},
+										{
+											"a": "auto.54",
+											"b": "auto.37",
+											"id": "auto.55",
+											"op": "add"
+										},
+										{
+											"a": "auto.55",
+											"b": "auto.43",
+											"id": "auto.56",
+											"op": "add"
+										},
+										{
+											"a": "auto.56",
+											"b": "auto.19",
+											"id": "auto.57",
+											"op": "add"
+										},
+										{
+											"a": "auto.57",
+											"b": "auto.44",
+											"id": "auto.58",
+											"op": "add"
+										},
+										{
+											"id": "auto.59",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.58",
+											"b": "auto.59",
+											"id": "assessable.non_employment",
+											"op": "add"
+										},
+										{
+											"a": "auto.0",
+											"b": "auto.1",
+											"id": "auto.60",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.61",
+											"num": 5,
+											"of": "auto.60",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.62",
+											"op": "const",
+											"value": 10000000
+										},
+										{
+											"a": "auto.61",
+											"b": "auto.62",
+											"id": "auto.63",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.64",
+											"num": 5,
+											"of": "auto.2",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.65",
+											"op": "const",
+											"value": 10000000
+										},
+										{
+											"a": "auto.64",
+											"b": "auto.65",
+											"id": "auto.66",
+											"op": "min"
+										},
+										{
+											"id": "auto.67",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"den": 10,
+											"id": "auto.68",
+											"num": 3,
+											"of": "auto.7",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.69",
+											"num": 2,
+											"of": "auto.8",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 100,
+											"id": "auto.70",
+											"num": 15,
+											"of": "auto.9",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.71",
+											"num": 3,
+											"of": "auto.10",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.72",
+											"num": 1,
+											"of": "auto.11",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.68",
+											"b": "auto.69",
+											"id": "auto.73",
+											"op": "add"
+										},
+										{
+											"a": "auto.73",
+											"b": "auto.70",
+											"id": "auto.74",
+											"op": "add"
+										},
+										{
+											"a": "auto.74",
+											"b": "auto.71",
+											"id": "auto.75",
+											"op": "add"
+										},
+										{
+											"a": "auto.75",
+											"b": "auto.72",
+											"id": "auto.76",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.77",
+											"num": 6,
+											"of": "auto.12",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.78",
+											"num": 3,
+											"of": "auto.13",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.79",
+											"num": 3,
+											"of": "auto.14",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.80",
+											"num": 3,
+											"of": "auto.15",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.81",
+											"num": 3,
+											"of": "auto.16",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.82",
+											"num": 3,
+											"of": "auto.17",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.83",
+											"num": 3,
+											"of": "auto.18",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.77",
+											"b": "auto.78",
+											"id": "auto.84",
+											"op": "add"
+										},
+										{
+											"a": "auto.84",
+											"b": "auto.79",
+											"id": "auto.85",
+											"op": "add"
+										},
+										{
+											"a": "auto.85",
+											"b": "auto.80",
+											"id": "auto.86",
+											"op": "add"
+										},
+										{
+											"a": "auto.86",
+											"b": "auto.81",
+											"id": "auto.87",
+											"op": "add"
+										},
+										{
+											"a": "auto.87",
+											"b": "auto.82",
+											"id": "auto.88",
+											"op": "add"
+										},
+										{
+											"a": "auto.88",
+											"b": "auto.83",
+											"id": "auto.89",
+											"op": "add"
+										},
+										{
+											"den": 10,
+											"id": "auto.90",
+											"num": 6,
+											"of": "auto.19",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.91",
+											"num": 6,
+											"of": "auto.20",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.92",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.21",
+											"b": "auto.92",
+											"id": "auto.93",
+											"op": "min"
+										},
+										{
+											"id": "auto.94",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.21",
+											"b": "auto.94",
+											"id": "auto.95",
+											"op": "sub"
+										},
+										{
+											"id": "auto.96",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.95",
+											"b": "auto.96",
+											"id": "auto.97",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.98",
+											"num": 6,
+											"of": "auto.93",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"den": 10,
+											"id": "auto.99",
+											"num": 4,
+											"of": "auto.97",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"a": "auto.98",
+											"b": "auto.99",
+											"id": "auto.100",
+											"op": "add"
+										},
+										{
+											"id": "auto.101",
+											"op": "const",
+											"value": 60000000
+										},
+										{
+											"a": "auto.100",
+											"b": "auto.101",
+											"id": "auto.102",
+											"op": "min"
+										},
+										{
+											"a": "auto.91",
+											"b": "auto.102",
+											"id": "auto.103",
+											"op": "add"
+										},
+										{
+											"a": "auto.63",
+											"b": "auto.66",
+											"id": "auto.104",
+											"op": "add"
+										},
+										{
+											"a": "auto.104",
+											"b": "auto.67",
+											"id": "auto.105",
+											"op": "add"
+										},
+										{
+											"a": "auto.105",
+											"b": "auto.76",
+											"id": "auto.106",
+											"op": "add"
+										},
+										{
+											"a": "auto.106",
+											"b": "auto.89",
+											"id": "auto.107",
+											"op": "add"
+										},
+										{
+											"a": "auto.107",
+											"b": "auto.90",
+											"id": "auto.108",
+											"op": "add"
+										},
+										{
+											"a": "auto.108",
+											"b": "auto.103",
+											"id": "auto.109",
+											"op": "add"
+										},
+										{
+											"id": "auto.110",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.109",
+											"b": "auto.110",
+											"id": "expenses.total",
+											"op": "add"
+										},
+										{
+											"id": "allowances.fixed",
+											"op": "const",
+											"value": 6000000
+										},
+										{
+											"den": 10,
+											"id": "auto.111",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.112",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.111",
+											"b": "auto.112",
+											"id": "auto.113",
+											"op": "min"
+										},
+										{
+											"a": "auto.22",
+											"b": "auto.113",
+											"id": "auto.114",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.115",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.116",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.115",
+											"b": "auto.116",
+											"id": "auto.117",
+											"op": "min"
+										},
+										{
+											"a": "auto.23",
+											"b": "auto.117",
+											"id": "auto.118",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.119",
+											"num": 15,
+											"of": "auto.0",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.120",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.119",
+											"b": "auto.120",
+											"id": "auto.121",
+											"op": "min"
+										},
+										{
+											"a": "auto.24",
+											"b": "auto.121",
+											"id": "auto.122",
+											"op": "min"
+										},
+										{
+											"id": "auto.123",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.25",
+											"b": "auto.123",
+											"id": "auto.124",
+											"op": "min"
+										},
+										{
+											"id": "auto.125",
+											"op": "const",
+											"value": 3000000
+										},
+										{
+											"a": "auto.26",
+											"b": "auto.125",
+											"id": "auto.126",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.127",
+											"num": 15,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.128",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.127",
+											"b": "auto.128",
+											"id": "auto.129",
+											"op": "min"
+										},
+										{
+											"a": "auto.27",
+											"b": "auto.129",
+											"id": "auto.130",
+											"op": "min"
+										},
+										{
+											"a": "auto.114",
+											"b": "auto.118",
+											"id": "auto.131",
+											"op": "add"
+										},
+										{
+											"a": "auto.131",
+											"b": "auto.122",
+											"id": "auto.132",
+											"op": "add"
+										},
+										{
+											"a": "auto.132",
+											"b": "auto.124",
+											"id": "auto.133",
+											"op": "add"
+										},
+										{
+											"a": "auto.133",
+											"b": "auto.126",
+											"id": "auto.134",
+											"op": "add"
+										},
+										{
+											"a": "auto.134",
+											"b": "auto.130",
+											"id": "auto.135",
+											"op": "add"
+										},
+										{
+											"id": "auto.136",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "auto.135",
+											"b": "auto.136",
+											"id": "allowances.retirement_cluster",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.137",
+											"num": 3,
+											"of": "assessable.total",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.138",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "auto.137",
+											"b": "auto.138",
+											"id": "auto.139",
+											"op": "min"
+										},
+										{
+											"a": "auto.28",
+											"b": "auto.139",
+											"id": "allowances.thai_esg",
+											"op": "min"
+										},
+										{
+											"a": "allowances.fixed",
+											"b": "allowances.retirement_cluster",
+											"id": "auto.140",
+											"op": "add"
+										},
+										{
+											"a": "auto.140",
+											"b": "allowances.thai_esg",
+											"id": "auto.141",
+											"op": "add"
+										},
+										{
+											"a": "assessable.total",
+											"b": "expenses.total",
+											"id": "auto.142",
+											"op": "sub"
+										},
+										{
+											"a": "auto.142",
+											"b": "auto.141",
+											"id": "auto.143",
+											"op": "sub"
+										},
+										{
+											"id": "auto.144",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.143",
+											"b": "auto.144",
+											"id": "auto.145",
+											"op": "max"
+										},
+										{
+											"id": "auto.146",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.145",
+											"b": "auto.146",
+											"id": "auto.147",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.148",
+											"num": 1,
+											"of": "auto.147",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.149",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.149",
+											"b": "auto.148",
+											"id": "auto.150",
+											"op": "min"
+										},
+										{
+											"a": "auto.147",
+											"b": "auto.150",
+											"id": "auto.151",
+											"op": "sub"
+										},
+										{
+											"id": "auto.152",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.151",
+											"b": "auto.152",
+											"id": "auto.153",
+											"op": "max"
+										},
+										{
+											"den": 10,
+											"id": "auto.154",
+											"num": 1,
+											"of": "auto.153",
+											"op": "scale",
+											"rounding": "floor"
+										},
+										{
+											"id": "auto.155",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.155",
+											"b": "auto.154",
+											"id": "auto.156",
+											"op": "min"
+										},
+										{
+											"a": "auto.150",
+											"b": "auto.156",
+											"id": "allowances.donations",
+											"op": "add"
+										},
+										{
+											"a": "auto.153",
+											"b": "auto.156",
+											"id": "auto.157",
+											"op": "sub"
+										},
+										{
+											"id": "auto.158",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.157",
+											"b": "auto.158",
+											"id": "taxable.income",
+											"op": "max"
+										},
+										{
+											"a": "auto.141",
+											"b": "allowances.donations",
+											"id": "allowances.total",
+											"op": "add"
+										},
+										{
+											"id": "auto.159",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.159",
+											"id": "auto.160",
+											"op": "sub"
+										},
+										{
+											"id": "auto.161",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.160",
+											"b": "auto.161",
+											"id": "auto.162",
+											"op": "max"
+										},
+										{
+											"id": "auto.163",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "auto.162",
+											"b": "auto.163",
+											"id": "auto.164",
+											"op": "min"
+										},
+										{
+											"den": 1,
+											"id": "auto.165",
+											"num": 0,
+											"of": "auto.164",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.166",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.166",
+											"id": "auto.167",
+											"op": "sub"
+										},
+										{
+											"id": "auto.168",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.167",
+											"b": "auto.168",
+											"id": "auto.169",
+											"op": "max"
+										},
+										{
+											"id": "auto.170",
+											"op": "const",
+											"value": 15000000
+										},
+										{
+											"a": "auto.169",
+											"b": "auto.170",
+											"id": "auto.171",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.172",
+											"num": 5,
+											"of": "auto.171",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.173",
+											"op": "const",
+											"value": 30000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.173",
+											"id": "auto.174",
+											"op": "sub"
+										},
+										{
+											"id": "auto.175",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.174",
+											"b": "auto.175",
+											"id": "auto.176",
+											"op": "max"
+										},
+										{
+											"id": "auto.177",
+											"op": "const",
+											"value": 20000000
+										},
+										{
+											"a": "auto.176",
+											"b": "auto.177",
+											"id": "auto.178",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.179",
+											"num": 1,
+											"of": "auto.178",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.180",
+											"op": "const",
+											"value": 50000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.180",
+											"id": "auto.181",
+											"op": "sub"
+										},
+										{
+											"id": "auto.182",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.181",
+											"b": "auto.182",
+											"id": "auto.183",
+											"op": "max"
+										},
+										{
+											"id": "auto.184",
+											"op": "const",
+											"value": 25000000
+										},
+										{
+											"a": "auto.183",
+											"b": "auto.184",
+											"id": "auto.185",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.186",
+											"num": 15,
+											"of": "auto.185",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.187",
+											"op": "const",
+											"value": 75000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.187",
+											"id": "auto.188",
+											"op": "sub"
+										},
+										{
+											"id": "auto.189",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.188",
+											"b": "auto.189",
+											"id": "auto.190",
+											"op": "max"
+										},
+										{
+											"id": "auto.191",
+											"op": "const",
+											"value": 25000000
+										},
+										{
+											"a": "auto.190",
+											"b": "auto.191",
+											"id": "auto.192",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.193",
+											"num": 2,
+											"of": "auto.192",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.194",
+											"op": "const",
+											"value": 100000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.194",
+											"id": "auto.195",
+											"op": "sub"
+										},
+										{
+											"id": "auto.196",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.195",
+											"b": "auto.196",
+											"id": "auto.197",
+											"op": "max"
+										},
+										{
+											"id": "auto.198",
+											"op": "const",
+											"value": 100000000
+										},
+										{
+											"a": "auto.197",
+											"b": "auto.198",
+											"id": "auto.199",
+											"op": "min"
+										},
+										{
+											"den": 100,
+											"id": "auto.200",
+											"num": 25,
+											"of": "auto.199",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.201",
+											"op": "const",
+											"value": 200000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.201",
+											"id": "auto.202",
+											"op": "sub"
+										},
+										{
+											"id": "auto.203",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.202",
+											"b": "auto.203",
+											"id": "auto.204",
+											"op": "max"
+										},
+										{
+											"id": "auto.205",
+											"op": "const",
+											"value": 300000000
+										},
+										{
+											"a": "auto.204",
+											"b": "auto.205",
+											"id": "auto.206",
+											"op": "min"
+										},
+										{
+											"den": 10,
+											"id": "auto.207",
+											"num": 3,
+											"of": "auto.206",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.208",
+											"op": "const",
+											"value": 500000000
+										},
+										{
+											"a": "taxable.income",
+											"b": "auto.208",
+											"id": "auto.209",
+											"op": "sub"
+										},
+										{
+											"id": "auto.210",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.209",
+											"b": "auto.210",
+											"id": "auto.211",
+											"op": "max"
+										},
+										{
+											"den": 100,
+											"id": "auto.212",
+											"num": 35,
+											"of": "auto.211",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"a": "auto.165",
+											"b": "auto.172",
+											"id": "auto.213",
+											"op": "add"
+										},
+										{
+											"a": "auto.213",
+											"b": "auto.179",
+											"id": "auto.214",
+											"op": "add"
+										},
+										{
+											"a": "auto.214",
+											"b": "auto.186",
+											"id": "auto.215",
+											"op": "add"
+										},
+										{
+											"a": "auto.215",
+											"b": "auto.193",
+											"id": "auto.216",
+											"op": "add"
+										},
+										{
+											"a": "auto.216",
+											"b": "auto.200",
+											"id": "auto.217",
+											"op": "add"
+										},
+										{
+											"a": "auto.217",
+											"b": "auto.207",
+											"id": "auto.218",
+											"op": "add"
+										},
+										{
+											"a": "auto.218",
+											"b": "auto.212",
+											"id": "auto.219",
+											"op": "add"
+										},
+										{
+											"id": "auto.220",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "auto.219",
+											"b": "auto.220",
+											"id": "tax.progressive",
+											"op": "add"
+										},
+										{
+											"den": 1000,
+											"id": "auto.221",
+											"num": 5,
+											"of": "assessable.non_employment",
+											"op": "scale",
+											"rounding": "halfUp"
+										},
+										{
+											"id": "auto.222",
+											"op": "const",
+											"value": 11999999
+										},
+										{
+											"id": "auto.223",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "assessable.non_employment",
+											"b": "auto.222",
+											"else": "auto.223",
+											"id": "tax.minimum",
+											"op": "pick",
+											"then": "auto.221"
+										},
+										{
+											"id": "auto.224",
+											"op": "const",
+											"value": 500000
+										},
+										{
+											"id": "auto.225",
+											"op": "const",
+											"value": 0
+										},
+										{
+											"a": "tax.minimum",
+											"b": "auto.224",
+											"else": "auto.225",
+											"id": "auto.226",
+											"op": "pick",
+											"then": "tax.minimum"
+										},
+										{
+											"a": "tax.progressive",
+											"b": "auto.226",
+											"id": "tax.regular",
+											"op": "max"
+										},
+										{
+											"a": "tax.regular",
+											"b": "tax.final_withholding",
+											"id": "tax.total",
+											"op": "add"
+										},
+										{
+											"a": "tax.final_withholding",
+											"b": "credit.dividend",
+											"id": "auto.227",
+											"op": "add"
+										},
+										{
+											"a": "tax.total",
+											"b": "auto.227",
+											"id": "tax.net_payable",
+											"op": "sub"
+										}
+									],
+									"period": {
+										"day": 1,
+										"month": 1
+									},
+									"settlement": {
+										"day": 31,
+										"month": 3
+									}
+								}
+							],
+							"schemaVersion": 4
+						},
+						"household": null
+					}
+				}
+			}
+		},
 		"projections": {
 			"base": {
 				"argv": [
@@ -2032,10 +5234,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 						"name": "base",
-						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
-						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
+						"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
+						"effectiveContentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -3284,10 +6486,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+						"id": "01a20469-b8cf-774c-810f-b9db96904544",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
-						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
+						"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+						"effectiveContentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -4403,10 +7605,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 						"name": "base",
-						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
-						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
+						"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
+						"effectiveContentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5040,10 +8242,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+						"id": "01a20469-b8cf-774c-810f-b9db96904544",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
-						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
+						"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+						"effectiveContentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5639,10 +8841,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+							"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 							"name": "base",
-							"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
-							"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
+							"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
+							"effectiveContentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6269,10 +9471,10 @@
 					},
 					"b": {
 						"scenario": {
-							"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+							"id": "01a20469-b8cf-774c-810f-b9db96904544",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
-							"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
+							"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+							"effectiveContentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6900,10 +10102,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 						"name": "base",
-						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
-						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
+						"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
+						"effectiveContentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -8257,10 +11459,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+						"id": "01a20469-b8cf-774c-810f-b9db96904544",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
-						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
+						"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+						"effectiveContentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -9597,103 +12799,103 @@
 			"data": {
 				"accounts": [
 					{
-						"id": "01a2042c-06e8-752d-b993-282c5924c461",
+						"id": "01a20469-a872-743e-b5c3-0822685fa209",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:03.944Z",
-						"updatedAt": "2026-11-22T16:52:03.944Z"
+						"createdAt": "2026-11-22T17:59:22.994Z",
+						"updatedAt": "2026-11-22T17:59:22.994Z"
 					},
 					{
-						"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+						"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.151Z",
-						"updatedAt": "2026-11-22T16:52:04.151Z"
+						"createdAt": "2026-11-22T17:59:23.641Z",
+						"updatedAt": "2026-11-22T17:59:23.641Z"
 					},
 					{
-						"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+						"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.049Z",
-						"updatedAt": "2026-11-22T16:52:04.049Z"
+						"createdAt": "2026-11-22T17:59:23.262Z",
+						"updatedAt": "2026-11-22T17:59:23.262Z"
 					},
 					{
-						"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
+						"id": "01a20469-acc5-740e-9e67-2c44cce98cfd",
 						"name": "Fund Return",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.353Z",
-						"updatedAt": "2026-11-22T16:52:04.353Z"
+						"createdAt": "2026-11-22T17:59:24.101Z",
+						"updatedAt": "2026-11-22T17:59:24.101Z"
 					},
 					{
-						"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
+						"id": "01a20469-ad92-71ec-b7b0-bbbd3e4cdb20",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.453Z",
-						"updatedAt": "2026-11-22T16:52:04.453Z"
+						"createdAt": "2026-11-22T17:59:24.306Z",
+						"updatedAt": "2026-11-22T17:59:24.306Z"
 					},
 					{
-						"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
+						"id": "01a20469-aff8-7193-bc18-111a0f38ee33",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.755Z",
-						"updatedAt": "2026-11-22T16:52:04.755Z"
+						"createdAt": "2026-11-22T17:59:24.920Z",
+						"updatedAt": "2026-11-22T17:59:24.920Z"
 					},
 					{
-						"id": "01a2042c-094b-7675-8508-8a64006c4093",
+						"id": "01a20469-ae73-75e6-9b5a-c01989595fbd",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.555Z",
-						"updatedAt": "2026-11-22T16:52:04.555Z"
+						"createdAt": "2026-11-22T17:59:24.531Z",
+						"updatedAt": "2026-11-22T17:59:24.531Z"
 					},
 					{
-						"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
+						"id": "01a20469-ac22-745e-b2e5-e83d1da4e5d1",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.251Z",
-						"updatedAt": "2026-11-22T16:52:04.251Z"
+						"createdAt": "2026-11-22T17:59:23.938Z",
+						"updatedAt": "2026-11-22T17:59:23.938Z"
 					},
 					{
-						"id": "01a2042c-09af-77d7-8477-725867cbaae7",
+						"id": "01a20469-af26-70ea-90b9-da7c1c0dd057",
 						"name": "Travel",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:04.655Z",
-						"updatedAt": "2026-11-22T16:52:04.655Z"
+						"createdAt": "2026-11-22T17:59:24.710Z",
+						"updatedAt": "2026-11-22T17:59:24.710Z"
 					}
 				]
 			}
@@ -9708,7 +12910,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a2042c-06e8-752d-b993-282c5924c461",
+							"id": "01a20469-a872-743e-b5c3-0822685fa209",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -9717,7 +12919,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
+							"id": "01a20469-aaf9-73f5-9105-96262ed4b15d",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -9726,7 +12928,7 @@
 					},
 					{
 						"account": {
-							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
+							"id": "01a20469-a97e-7276-8214-a4735b0dbaf8",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -9748,22 +12950,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"id": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 						"name": "base",
-						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
+						"contentHash": "jcs1:sha256:dcf71cde273fc981617f8f33208d6e0d52ac6d51c8fae41d2a346dd56188b4e0",
 						"forkedFrom": null,
 						"version": 2,
-						"createdAt": "2026-11-22T16:52:05.470Z",
-						"updatedAt": "2026-11-22T16:52:05.591Z"
+						"createdAt": "2026-11-22T17:59:26.660Z",
+						"updatedAt": "2026-11-22T17:59:26.911Z"
 					},
 					{
-						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+						"id": "01a20469-b8cf-774c-810f-b9db96904544",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
-						"forkedFrom": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"contentHash": "jcs1:sha256:8788e99fe25d0cac2b6d6644a0b6c005938163a5c2031958bc60c45c08503fbe",
+						"forkedFrom": "01a20469-b6c4-7210-bd6e-1ea8bf395080",
 						"version": 1,
-						"createdAt": "2026-11-22T16:52:05.706Z",
-						"updatedAt": "2026-11-22T16:52:05.706Z"
+						"createdAt": "2026-11-22T17:59:27.183Z",
+						"updatedAt": "2026-11-22T17:59:27.183Z"
 					}
 				]
 			}

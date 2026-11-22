@@ -33,7 +33,8 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 - `src/lib/edit/`: the Edits, a closed list, each mapped to one `traj` write, and the guards of the write path.
 - `src/lib/view/`, `src/lib/format/`, `src/lib/chart/`: pure functions from a Snapshot to what a page shows, the formatting of the CLI's strings, and the chart geometry.
 - `src/client/`: the browser: storage, the address bar, `fetch`, and the Svelte modules (`.svelte.ts`) that hold the reactive state over them.
-- `src/routes/`: the eight routes, one `+page.svelte` each, and the root layout (the shell, prerendered as static files).
+- `src/routes/`: one `+page.svelte` per route, and the root layout (the shell, prerendered as static files).
+- `src/lib/view/plan-items/`: the planner pages' view models, pure: their cards, their drafts and what a save sends. `src/components/plan-items/` and `src/components/ui/Drawer.svelte` render them.
 - `src/components/`: the Svelte components: `ui/` (shared), `chart/`, `shell/`, `net-worth/` and `pages/`.
 - `src/styles/`: the brand's CSS.
 - `scripts/svelte/`: the preload that lets `bun test` render components, and the test stand-in for SvelteKit's `$app` modules.
@@ -41,7 +42,7 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 
 ## Pages
 
-Overview, Net worth, Ledger, Projection, FI date, Compare, Chance of success, Tax and Health. Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
+Overview, Net worth, Ledger, Projection, Income, Expenses, Assets and debts, FI date, Compare, Chance of success, Tax and Health. Income, Expenses and Assets and debts list the selected plan's items and, with the server running, edit them in a drawer: each save is one `traj` Edit ([ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
 
 ## Edits
 

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { NAV_GROUPS, ROUTES, routeAt } from "./routes"
+import { NAV_GROUPS, ROUTES, routeAt, routesShown } from "./routes"
 
 const ROUTES_DIR = join(import.meta.dir, "../../routes")
 
@@ -24,11 +24,14 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the nine pages are in navigation order, with unique paths", () => {
+	test("the twelve pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
 			"/projection/",
+			"/income/",
+			"/expenses/",
+			"/assets-and-debts/",
 			"/fi/",
 			"/compare/",
 			"/chance/",
@@ -42,7 +45,7 @@ describe("the navigation's routes", () => {
 	test("the groups are Home and Net worth, then Plan, then Chance of success, then Tax, then Records", () => {
 		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
 			[null, ["Home", "Net worth"]],
-			["Plan", ["Overview", "FI date", "Compare"]],
+			["Plan", ["Overview", "Income", "Expenses", "Assets and debts", "FI date", "Compare"]],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
 			["Records", ["Ledger", "Health"]],
@@ -52,5 +55,23 @@ describe("the navigation's routes", () => {
 	test("a route is found by its path, and an unknown path is none", () => {
 		expect(routeAt("/fi/")?.label).toBe("FI date")
 		expect(routeAt("/nowhere/")).toBeUndefined()
+	})
+
+	test("the planner pages need a plan's document, so a Snapshot without one hides them", () => {
+		const plan = NAV_GROUPS.find((group) => group.heading === "Plan")
+		if (plan === undefined) throw new Error("the Plan group exists")
+		expect(routesShown(plan, true).map((route) => route.label)).toEqual([
+			"Overview",
+			"Income",
+			"Expenses",
+			"Assets and debts",
+			"FI date",
+			"Compare",
+		])
+		expect(routesShown(plan, false).map((route) => route.label)).toEqual([
+			"Overview",
+			"FI date",
+			"Compare",
+		])
 	})
 })

@@ -8,6 +8,7 @@ export const READ_LEAVES = [
 	"tx list",
 	"baseline show",
 	"scenario list",
+	"scenario show",
 	"projection run",
 	"fi",
 	"projection compare",

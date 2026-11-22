@@ -3,7 +3,13 @@ import { firstDayOfYear, firstDayTwoMonthsBack, monthEndsBetween } from "./dates
 import type { PlanParams } from "./params"
 import { type PlannedRead, plainRead } from "./planned"
 import type { StageOneReads } from "./stage-one"
-import { planChance, planCompare, planFi, planProjections } from "./stage-two-projections"
+import {
+	planChance,
+	planCompare,
+	planDocuments,
+	planFi,
+	planProjections,
+} from "./stage-two-projections"
 
 /** The argv of stage two, the reads that depend on the Scenarios and the first transaction date. */
 export type StageTwoPlan = {
@@ -17,6 +23,8 @@ export type StageTwoPlan = {
 	transactions: PlannedRead
 	baseline: PlannedRead
 	netWorthHistory: PlannedRead[]
+	/** One `scenario show --decimal` per Scenario, the documents the planner pages show and edit. */
+	documents: Record<string, PlannedRead>
 	projections: Record<string, PlannedRead>
 	fi: Record<string, PlannedRead>
 	compare: PlannedRead | null
@@ -66,6 +74,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		netWorthHistory: historyDates.map((date) =>
 			plainRead(["report", "networth", "--as-of", date, "--json"]),
 		),
+		documents: planDocuments(scenarios),
 		projections: planProjections(params, scenarios),
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),

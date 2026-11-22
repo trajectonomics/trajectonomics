@@ -43,6 +43,18 @@ describe("SiteNavLinks", () => {
 		expect(body).toContain('href="/tax/?demo=1&amp;scenario=retire-early"')
 		expect(body).toContain('href="/projection/?demo=1&amp;scenario=retire-early"')
 	})
+
+	test("lists the Income, Expenses and Assets and debts pages only when the plan's document is held", () => {
+		const shown = render(SiteNavLinks, { props: { current: "/", onNavigate: noop } }).body
+		expect(shown).toContain('href="/income/"')
+		expect(shown).toContain('href="/assets-and-debts/"')
+		const hidden = render(SiteNavLinks, {
+			props: { current: "/", onNavigate: noop, planDocument: false },
+		}).body
+		expect(hidden).not.toContain('href="/income/"')
+		expect(hidden).not.toContain('href="/expenses/"')
+		expect(hidden).toContain('href="/fi/"')
+	})
 })
 
 describe("PlanSwitcher", () => {

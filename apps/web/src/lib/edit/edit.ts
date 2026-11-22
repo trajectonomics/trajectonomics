@@ -50,8 +50,9 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 		case "copy-plan":
 			return { argv: ["scenario", "fork", edit.from, edit.name, ...flags] }
 		case "apply-plan":
+			// The page holds decimal-form documents only, so the write reads that form (ADR-0047).
 			return {
-				argv: ["scenario", "apply", edit.name, "--file", "-", ...flags],
+				argv: ["scenario", "apply", edit.name, "--file", "-", "--decimal", ...flags],
 				stdin: JSON.stringify(edit.document),
 			}
 		case "delete-plan":

@@ -8,7 +8,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 
 ## Decision
 
-- **An Edit is a closed list.** `src/lib/edit/edit.ts` holds the union: `copy-plan` (`scenario fork`), `apply-plan` (`scenario apply --file -`, with the document on stdin) and `delete-plan` (`scenario rm`). A pure function builds each one's argv, with and without `--dry-run`, and `edit.test.ts` pins the list and every argv, as `leaves.test.ts` pins the reads. The Plan that decides the reads stays read-only.
+- **An Edit is a closed list.** `src/lib/edit/edit.ts` holds the union: `copy-plan` (`scenario fork`), `apply-plan` (`scenario apply --file - --decimal`, with the document on stdin, in the decimal form of [cli ADR 0047](../../../cli/docs/adr/0047-a-scenario-has-a-decimal-form-the-cli-converts-exactly.md)) and `delete-plan` (`scenario rm`). A pure function builds each one's argv, with and without `--dry-run`, and `edit.test.ts` pins the list and every argv, as `leaves.test.ts` pins the reads. The Plan that decides the reads stays read-only.
 - **Every Edit is run in three steps.** The server runs the write with `--dry-run` first, so a refusal (a taken name, a missing plan) is answered before anything changes ([cli ADR 0019](../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). If the dry run holds, the write runs for real, and then the Snapshot Plan runs again. The answer is the new Snapshot, or the CLI's error envelope as data.
 - **The page gets a token, and only the page.** `GET /edit-session` answers `{"token": …}` after the Host check, with `Cache-Control: no-store` and no CORS header, so a foreign page cannot read it. The token is a random value made when the server starts. The page holds it in memory and sends it in the `x-traj-edit-token` header of every Edit.
 - **`POST /edit` refuses, each refusal with its own test** (`src/lib/edit/guard.ts`, `scripts/serve-edit.test.ts`):
@@ -22,7 +22,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
   A body that names no Edit of the list is refused with 400 before anything runs.
 - **Controls show only when the server answers.** The page shows Edit controls only when `/edit-session` gives a token, and never in the Demo snapshot. Under `bun run dashboard` (`vite preview`, no server) nothing answers, so the controls stay hidden.
 - **A plan list the person chose follows the Edits.** `traj dashboard --scenario` names the plans it projects. A copy or an apply adds its name to that list, and a delete takes it out, so the new plan is shown. An empty list means every Scenario, and it stays empty.
-- **The first controls are plan actions.** The plan switcher offers "Copy plan" (a name, then `copy-plan`, then the copy is shown) and "Delete plan" (a confirmation, then `delete-plan`). `apply-plan` is in the list and on the server, with no control yet.
+- **The first controls are plan actions.** The plan switcher offers "Copy plan" (a name, then `copy-plan`, then the copy is shown) and "Delete plan" (a confirmation, then `delete-plan`).
 
 ## Considered Options
 
@@ -36,4 +36,11 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - The `bun run dashboard` checkout preview has no server, so it cannot edit, and it says nothing about edits.
 - An Edit re-runs the whole Snapshot Plan, so it takes as long as one Snapshot (several seconds on a large ledger). One Edit runs at a time, and the page disables its controls while it runs.
 - The ledger's writer lock still decides a busy database: a write that meets it answers `database_busy` as data, as the CLI does.
-- Every new Edit kind is a change to `src/lib/edit/edit.ts`, its pinned list, and this ADR's list. A control for `apply-plan` is a follow-up.
+- Every new Edit kind is a change to `src/lib/edit/edit.ts`, its pinned list, and this ADR's list.
+
+## Amendment (2026-11-23): `apply-plan` has controls
+
+- `apply-plan` carries `--decimal`. The page holds only decimal-form documents, so it never sees or makes minor units, and a saved document keeps its hash when nothing changed.
+- The planner pages (Income, Expenses, and Assets and debts) are the controls for `apply-plan`. Each opens a right-side drawer, saves one change as one Edit, and closes when the Edit ran. A refusal stays in the drawer at the field it names.
+- The Edit controls appear only when the server answers the token, and never in the Demo snapshot or under `vite preview`, as the plan actions do.
+- Deleting an item is an `apply-plan` of the document without it, after a confirmation. It is not a new Edit kind.

@@ -12,6 +12,7 @@ import { projectionCompare } from "./projection-compare"
 import { projectionRun } from "./projection-run"
 import { readOf } from "./read"
 import { scenarioList } from "./scenario-list"
+import { scenarioShow } from "./scenario-show"
 import { txList } from "./tx-list"
 
 /** The version of the Snapshot document. A change to its shape bumps it. */
@@ -40,6 +41,8 @@ export const snapshotReads = z.strictObject({
 	transactions: readOf(txList),
 	baseline: readOf(baseline),
 	scenarios: readOf(scenarioList),
+	// Absent from a Snapshot made before the planner pages, so a document that never had the key reads as none.
+	documents: z.record(z.string(), readOf(scenarioShow)).default({}),
 	projections: z.record(z.string(), readOf(projectionRun)),
 	fi: z.record(z.string(), readOf(fi)),
 	compare: readOf(projectionCompare).nullable(),

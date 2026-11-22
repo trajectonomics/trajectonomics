@@ -12,6 +12,7 @@ describe("the read-leaf allowlist", () => {
 			"tx list",
 			"baseline show",
 			"scenario list",
+			"scenario show",
 			"projection run",
 			"fi",
 			"projection compare",
