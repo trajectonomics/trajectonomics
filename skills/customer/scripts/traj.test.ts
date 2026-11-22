@@ -138,8 +138,9 @@ describe("the traj operating Skill", () => {
 		expect(body).toContain("states the as-of date it was read at, and whether tax is in it")
 	})
 
-	it("hands a job to the Skill that owns it, installed by its explicit name", () => {
-		expect(body).toContain(`npx skills add ${SKILLS_SOURCE} --skill <name> -y`)
+	it("hands a job to the Skill that owns it, installed by its explicit name from the pin", () => {
+		expect(body).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
+		expect(body).not.toContain(`npx skills add ${SKILLS_SOURCE} --skill <name> -y`)
 		expect(body).toContain("is not a router either")
 	})
 
