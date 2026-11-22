@@ -6,6 +6,7 @@ import { SCENARIO_DOCUMENT } from "../store/testing"
 import { acceptedScenarioSchemaVersion, scenarioDocumentError, scenarioProblems } from "./document"
 import { scenarioTemplate } from "./template"
 
+const HINT = 'Run "traj schema scenario apply" to see the document schema.'
 const SALARY = SCENARIO_DOCUMENT.flows[0]
 const VALID = SCENARIO_DOCUMENT
 
@@ -44,6 +45,7 @@ describe("scenarioDocumentError", () => {
 		expect(error.body).toEqual({
 			code: "invalid_input",
 			exitCode: 2,
+			hint: HINT,
 			path: "line.24.document.flows.0.nope",
 			message: "line.24.document.flows.0.nope: UNKNOWN_KEY",
 			details: [
@@ -67,8 +69,6 @@ describe("scenarioDocumentError", () => {
 })
 
 describe("scenario document validation", () => {
-	const HINT = 'Run "traj schema scenario apply" to see the document schema.'
-
 	it("reports a non-object the same way from the document form and the store", async () => {
 		const cli = errorOf(await applyScenario(scenarioHome(), "base", "[]"))
 		expect(cli).toEqual({
@@ -76,6 +76,7 @@ describe("scenario document validation", () => {
 			exitCode: 2,
 			path: "document",
 			message: "document: NOT_AN_OBJECT",
+			hint: HINT,
 			details: [{ path: "document", message: "document: NOT_AN_OBJECT", code: "NOT_AN_OBJECT" }],
 		})
 		const stored = canonicalScenarioDocument([])

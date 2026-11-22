@@ -6,7 +6,7 @@ import type { Placed } from "./carryin-apply"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { bestCaseView, referenceView } from "./fi-figures"
-import { FI_METHOD } from "./fi-method"
+import { FI_METHOD, horizonNote } from "./fi-method"
 import type { FiAnswer, FiLeafAnswer, FiView } from "./fi-view"
 import { fundingNotes } from "./funding"
 import { taxYearsOf } from "./tax-view"
@@ -79,6 +79,7 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 			...fundingNotes(result.projection.unfundedContributions, prepared.currency),
 			...withdrawNotes(prepared.document, result.projection, prepared.currency),
 			...(solution.fi.reachable ? [] : [WORKING_PATH_NOTE]),
+			horizonNote(prepared.timeline.horizon),
 		],
 		horizon: prepared.timeline.horizon,
 		currency: prepared.currency,

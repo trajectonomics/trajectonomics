@@ -11,6 +11,10 @@ const jsonSchema = z.record(z.string(), z.unknown())
 
 export function listingSchema(): z.ZodType {
 	return z.strictObject({
+		usage: z
+			.string()
+			.optional()
+			.describe("How to read one command's flags and document. Only listed for the root."),
 		commands: z.array(z.strictObject({ name: z.string(), summary: z.string() })),
 		errors: z
 			.array(

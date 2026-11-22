@@ -34,7 +34,7 @@ export const carryInFlag: z.ZodOptional<z.ZodString> = z
 	.string()
 	.optional()
 	.describe(
-		'Read what each Levy\'s period already tallied and prepaid from this JSON path, or - for stdin: one record per Scenario, Levy and period, {"scenario", "levy", "periodStart", "tallies": [{"label", "basis", "amount"}], "prepaid", and "rest" instead of the classes left at zero}.',
+		'Read what each Levy\'s period already tallied and prepaid from this JSON path, or - for stdin: one record per Scenario, Levy and period, {"scenario", "levy", "periodStart", "tallies": [{"label", "basis", "amount"}], "prepaid", and "rest" instead of the classes left at zero}. Amounts are decimal strings in the Currency\'s major unit, as "1200000.00" in THB, not satang. The tallies are those of the period before --as-of: a Flow that lands on or after --as-of is projected and must not be in them.',
 	)
 
 /** The document `--carry-in` names, published under `flagDocuments` so its shape is not guessed. */
@@ -46,4 +46,11 @@ export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
 	.optional()
 	.describe(
 		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB).",
+	)
+
+/** `--horizon` for `fi`, where it moves the answer: it says which date the plan has to fund. */
+export const fiHorizonFlag: z.ZodString = z
+	.string()
+	.describe(
+		"The date the Projection ends at, as YYYY-MM-DD: the last date the plan has to fund, for example the age-95 date. FI means the money lasts until it, so a later horizon can move the FI date later.",
 	)

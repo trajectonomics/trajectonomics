@@ -54,6 +54,9 @@ describe("the tax a Projection says is owed", () => {
 			owed: "36500.00",
 			settled: true,
 			partial: false,
+			taxableIncome: "560000.00",
+			progressiveTax: "36500.00",
+			notes: [],
 			assumptions: [],
 		})
 		// The 2027 period is complete at the Horizon but its Settlement is after it, so the tax it

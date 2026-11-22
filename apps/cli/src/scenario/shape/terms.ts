@@ -16,6 +16,14 @@ export const MINOR_UNITS =
 export const DECIMAL_UNITS =
 	'A decimal string of `currency`\'s major unit, never a JSON number: "350.00" is 35000 satang, with at most as many places as the Currency has (two for THB).'
 
+/**
+ * The engine's cap on an asset Contribution, stated once (sim's `engine/occurrence.ts`): the day's
+ * income minus the tax prepaid, expenses, debt payments and tax settled that day. A lump sum from
+ * savings is therefore mostly not funded.
+ */
+export const CONTRIBUTION_CAP =
+	"an asset Contribution is capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day, so a lump sum from savings is not funded"
+
 /** The unit of every rate field. */
 export const BASIS_POINTS =
 	"Integer basis points (1 bps = 0.01%), so 3% is 300 and 0.01 is not a rate."

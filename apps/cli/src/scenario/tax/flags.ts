@@ -47,6 +47,7 @@ export const FILING_STATUSES: readonly [ThFilingStatus, ...ThFilingStatus[]] = [
 export function labelFlagDescription(): string {
 	return [
 		"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax.",
+		"A label replaces that Flow's label and adds to the labels the other Flows already carry; --none clears them all.",
 		labelSetsSentence(),
 	].join(" ")
 }

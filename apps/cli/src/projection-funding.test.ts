@@ -14,6 +14,9 @@ describe("a Projection that could not fund a Contribution", () => {
 		const res = await projection(home, ["run", "--scenario", "base", ...dateFlags(), ...TOO_BIG])
 		expect(res.code).toBe(0)
 		expect(runBody(res).notes.join(" ")).toContain("of Contributions could not be funded")
+		expect(runBody(res).notes.join(" ")).toContain(
+			"capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day",
+		)
 	})
 
 	it("names the side that could not fund it in a compare", async () => {
