@@ -1,0 +1,12 @@
+# Keeps the SHA pins of the workflows' actions current (see .github/workflows). Only the github-actions
+# ecosystem is updated here: the npm packages are pinned by bun.lock and updated by hand.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # The Conventional title check (pr-title.yml) reads these PR titles, so they must be `ci(deps): ...`.
+    commit-message:
+      prefix: ci
+      include: scope

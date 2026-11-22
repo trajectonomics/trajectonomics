@@ -14,7 +14,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: docs-release
@@ -26,10 +25,14 @@ jobs:
     # A stable release is a dispatched Release run; the alpha runs on push are skipped.
     if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    # Job-level permissions replace the workflow's, so contents is restated here.
+    permissions:
+      contents: read
+      issues: write # find, file, update and close the docs-behind issue
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # The tags cli-v<version> are needed to list the commits between two releases.
           fetch-depth: 0

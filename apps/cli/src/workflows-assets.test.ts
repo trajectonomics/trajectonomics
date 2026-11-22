@@ -10,7 +10,7 @@ describe("binaries.yml, the assets job", () => {
 
 	it("reads the whole history and the tags, so the tag the publisher made is visible", () => {
 		const resolve = BINARIES.jobs["resolve"]
-		const checkout = resolve?.steps?.find((step) => step.uses === "actions/checkout@v4")
+		const checkout = resolve?.steps?.find((step) => step.uses?.startsWith("actions/checkout@"))
 		expect(checkout?.with?.["fetch-depth"]).toBe(0)
 		expect(runs(resolve!).join("\n")).toContain("git fetch --tags --force origin")
 		expect(runs(resolve!).join("\n")).toContain("git rev-list -n 1")
@@ -23,8 +23,8 @@ describe("binaries.yml, the assets job", () => {
 	})
 
 	it("pins the Bun the repo's packageManager names", () => {
-		const setup = BINARIES.jobs["build"]?.steps?.find(
-			(step) => step.uses === "oven-sh/setup-bun@v2",
+		const setup = BINARIES.jobs["build"]?.steps?.find((step) =>
+			step.uses?.startsWith("oven-sh/setup-bun@"),
 		)
 		expect(setup?.with?.["bun-version"]).toBe("1.4.4")
 	})
