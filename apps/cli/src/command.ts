@@ -43,6 +43,8 @@ export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
 	schema: D
 	allowed?: readonly string[]
 	required?: readonly RequiredDocumentField[]
+	/** The hint a refusal of the document flag beside a flag it cannot take carries. */
+	hint?: string
 }
 
 /**

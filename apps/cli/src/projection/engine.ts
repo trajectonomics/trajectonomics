@@ -54,6 +54,17 @@ function timelineFailure(problems: readonly ProjectionProblem[]): AppError | nul
 	})
 }
 
+/** The sentence for any refusal the CLI cannot narrow to one cause (ADR-0030). */
+const AGREE_HINT =
+	"The Baseline, the Scenario and the Timeline must agree; details lists every problem."
+
+/**
+ * A Baseline Account the Scenario does not declare is the one refusal a template repairs: the
+ * template declares every asset and liability Account (ADR-0044), so it names that command instead.
+ */
+const DECLARE_HINT =
+	'Run "traj scenario apply --template --as-of <date>" to print a Scenario that declares every asset and liability Account.'
+
 /**
  * What the engine refuses becomes `projection_refused` at exit 3, with the engine's codes and
  * paths in `details` in its own order and the first at `path` (ADR-0013, ADR-0030).
@@ -63,9 +74,10 @@ export function refusal(problems: readonly ProjectionProblem[]): AppError {
 	if (timeline !== null) return timeline
 	const first = problems[0]
 	const path = first === undefined ? undefined : problemPath(first)
+	const undeclared = problems.some((problem) => problem.code === "UNDECLARED_BALANCE_ACCOUNT")
 	return fail("projection_refused", {
 		...(path === undefined ? {} : { path }),
 		details: problems.map(detailOf),
-		hint: "The Baseline, the Scenario and the Timeline must agree; details lists every problem.",
+		hint: undeclared ? DECLARE_HINT : AGREE_HINT,
 	})
 }

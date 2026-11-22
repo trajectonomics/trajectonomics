@@ -134,6 +134,10 @@ _Avoid_: Patch, edit
 Money moved from cash flow into an investment or retirement account. It is not an expense, so net worth does not change at that instant.
 _Avoid_: Investment expense, savings
 
+**Template**:
+The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
+_Avoid_: Sample, skeleton, example
+
 ### Financial independence
 
 **FI**:
