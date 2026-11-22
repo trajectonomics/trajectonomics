@@ -33,6 +33,24 @@ export const FREQUENCIES = [
 	"annual",
 ] as const
 export const DAY_RULES = ["exact", "next"] as const
+/** The kinds of criterion a Milestone may hold; each kind takes its own keys (sim's ADR 0012). */
+export const CRITERION_KINDS = ["date", "milestone", "metric", "multiple"] as const
+/** How a Milestone's criteria combine: every one must hold, or any one of them. */
+export const MILESTONE_COMBINES = ["all", "any"] as const
+/** A metric or multiple criterion's comparison: at least the figure, or at most it. */
+export const COMPARISONS = ["atLeast", "atMost"] as const
+/** The named balances a Metric may read; `{ accounts }` and `{ expenses }` are the other forms. */
+export const METRIC_NAMES = [
+	"netWorth",
+	"accessibleNetWorth",
+	"allAssets",
+	"unlockedAssets",
+	"liabilities",
+] as const
+/** The twelve-month window an expense Metric reads: the twelve months after, or before, the date. */
+export const REFERENCE_WINDOWS = ["next12Months", "trailing12Months"] as const
+/** Nominal money, or real money deflated to the Timeline's start, for a metric criterion. */
+export const MILESTONE_TERMS = ["nominal", "real"] as const
 /** The operations a Flow's own Measure graph may hold; `tally` belongs to a Levy (ADR-0032). */
 export const DERIVE_MEASURE_OPS = [
 	"const",
