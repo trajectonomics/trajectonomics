@@ -1,17 +1,17 @@
-import { type AppError, fail } from "../errors"
+import { type AppError, fail, isAppError } from "../errors"
 import { contentHash } from "./canonical"
 import { liveOnly, SCENARIO_COLUMNS, SCENARIO_ORDER } from "./columns"
 import type { Ctx } from "./context"
 import { read, write } from "./guard"
-import { canonicalDocument, insertScenario, liveScenario, replaceDocument } from "./scenario-rows"
-import type {
-	ListOptions,
-	NewScenario,
-	ScenarioRow,
-	ScenarioSaved,
-	ScenarioSort,
-	WriteOptions,
-} from "./types"
+import {
+	anchorsFor,
+	canonicalDocument,
+	insertScenario,
+	liveScenario,
+	replaceScenario,
+} from "./scenario-rows"
+import type { NewScenario, ScenarioSaved } from "./scenario-types"
+import type { ListOptions, ScenarioRow, ScenarioSort, WriteOptions } from "./types"
 
 /** The live Scenario this id or name names; an id is read first (ADR-0018). */
 export function getScenario(ctx: Ctx, idOrName: string): ScenarioRow | null | AppError {
@@ -21,7 +21,10 @@ export function getScenario(ctx: Ctx, idOrName: string): ScenarioRow | null | Ap
 	)
 }
 
-/** Creates the named scenario, or versions it when the canonical document changed. */
+/**
+ * Creates the named scenario, or versions it when the canonical document or its household changed.
+ * A Scenario's household anchors resolve onto the incoming document first (cli ADR-0048).
+ */
 export function saveScenario(
 	ctx: Ctx,
 	input: NewScenario,
@@ -31,18 +34,27 @@ export function saveScenario(
 	return write(
 		ctx.db,
 		() => {
-			const document = canonicalDocument(input.document)
 			const current = liveScenario(ctx, "name", input.name)
+			const resolved = anchorsFor(current, input.document, input.name)
+			if (isAppError(resolved)) return resolved
+			const document = canonicalDocument(resolved.document)
 			if (!current) {
-				return {
-					status: "created",
-					scenario: insertScenario(ctx, { name: input.name, document, forkedFrom: null }),
-				}
+				const scenario = insertScenario(ctx, {
+					name: input.name,
+					document,
+					forkedFrom: null,
+					household: null,
+				})
+				return { status: "created", scenario, droppedAnchors: [] }
 			}
-			if (current.contentHash === contentHash(document)) {
-				return { status: "unchanged", scenario: current }
+			if (
+				current.contentHash === contentHash(document) &&
+				current.household === resolved.household
+			) {
+				return { status: "unchanged", scenario: current, droppedAnchors: [] }
 			}
-			return { status: "updated", scenario: replaceDocument(ctx, current, document) }
+			const scenario = replaceScenario(ctx, current, document, resolved.household)
+			return { status: "updated", scenario, droppedAnchors: resolved.dropped }
 		},
 		options,
 	)

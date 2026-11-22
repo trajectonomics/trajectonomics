@@ -68,6 +68,8 @@ export type ScenarioRow = {
 	/** `jcs1:sha256:<hex>` of `document`. */
 	contentHash: string
 	forkedFrom: string | null
+	/** The household's RFC 8785 canonical JSON text, or null when none is set (cli ADR-0048). */
+	household: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

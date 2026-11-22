@@ -1,5 +1,7 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
+import { householdDocument } from "../scenario/household/document"
+import { canonicalHousehold } from "../scenario/household/model"
 import {
 	canonicalScenarioDocument,
 	formatMinorUnits,
@@ -60,6 +62,16 @@ function document(value: unknown, path: string): unknown | AppError {
 	return canonicalScenarioDocument(value, path)
 }
 
+/** A household document, checked by the rules `traj scenario household` applies, as canonical text. */
+function household(value: unknown, path: string): unknown | AppError {
+	const parsed = householdDocument.safeParse(value)
+	if (!parsed.success) {
+		const reason = parsed.error.issues[0]?.message ?? "does not match the household schema"
+		return invalid(path, `is not a household document: ${reason}`)
+	}
+	return canonicalHousehold(parsed.data)
+}
+
 function correction(value: unknown, path: string): unknown | AppError {
 	if (value === null || isTxCorrection(value)) return value
 	return invalid(path, `must be null or one of ${TX_CORRECTIONS.join(", ")}`)
@@ -75,5 +87,6 @@ export const DECODERS: Record<FieldKind, Decode> = {
 	amount,
 	dimensions: nullable(dimensions),
 	document,
+	"household?": nullable(household),
 	correction,
 }

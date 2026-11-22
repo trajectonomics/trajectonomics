@@ -57,6 +57,8 @@ export type DumpScenarioRow = {
 	document: string
 	contentHash: string
 	forkedFrom: string | null
+	/** The household's canonical JSON text, or null (cli ADR-0048). */
+	household: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

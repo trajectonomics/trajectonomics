@@ -1,7 +1,7 @@
 import { type AppError, isAppError } from "../errors"
 import type { RestoreCounts, Store } from "../store"
 import { addRow, checkRecord, type Decoded, decodeRecord, emptyRows, identityOf } from "./decode"
-import { FORMAT_VERSION } from "./format"
+import { FORMAT_VERSION, type Layout, READABLE_LAYOUTS } from "./format"
 import { exactKeys, invalid, parseLine } from "./invalid"
 
 /** Rows restored per record type, the seeded personal entity included. */
@@ -9,23 +9,32 @@ export type ImportCounts = RestoreCounts
 
 const HEADER_KEYS = ["record", "formatVersion", "schemaVersion"]
 
-function checkHeader(line: string, schemaVersion: number): AppError | null {
+/**
+ * The layout a header names. The format version must match exactly; the schema version must be one
+ * of the explicit layouts this build reads, never a guess (cli ADR-0048).
+ */
+function checkHeader(line: string, schemaVersion: number): AppError | Layout {
 	const path = "line.1"
 	const header = parseLine(line, path)
 	if (isAppError(header)) return header
 	if (header["record"] !== "header") return invalid(`${path}.record`, 'must be "header"')
 	const wrongKeys = exactKeys(header, HEADER_KEYS, path)
 	if (wrongKeys) return wrongKeys
-	// Exact equality on purpose, for the schema version too: this build knows only the current
-	// schema's record shape, so an older backup needs an explicit migration path, not a guess.
-	const known = { formatVersion: FORMAT_VERSION, schemaVersion }
-	for (const [key, expected] of Object.entries(known)) {
-		if (header[key] !== expected) {
-			const reason = `${JSON.stringify(header[key])} is not a version this build reads (${expected})`
-			return invalid(`${path}.${key}`, reason, { expected, actual: header[key] })
-		}
+	if (header["formatVersion"] !== FORMAT_VERSION) {
+		const reason = `${JSON.stringify(header["formatVersion"])} is not a version this build reads (${FORMAT_VERSION})`
+		return invalid(`${path}.formatVersion`, reason, {
+			expected: FORMAT_VERSION,
+			actual: header["formatVersion"],
+		})
 	}
-	return null
+	const readable = Object.keys(READABLE_LAYOUTS).map(Number)
+	const version = header["schemaVersion"]
+	const layout = typeof version === "number" ? READABLE_LAYOUTS[version] : undefined
+	if (layout === undefined) {
+		const reason = `${JSON.stringify(version)} is not a version this build reads (${readable.join(", ")}; the store is at ${schemaVersion})`
+		return invalid(`${path}.schemaVersion`, reason, { expected: readable, actual: version })
+	}
+	return layout
 }
 
 function linesOf(text: string): string[] {
@@ -44,7 +53,7 @@ function repeated(decoded: Decoded, seen: Map<string, number>, line: number): Ap
 	return invalid(`line.${line}.${field}`, reason, { firstLine })
 }
 
-function decodeAll(lines: readonly string[], entityId: string) {
+function decodeAll(lines: readonly string[], entityId: string, layout: Layout) {
 	const rows = emptyRows()
 	const seen = new Map<string, number>()
 	for (const [index, text] of lines.entries()) {
@@ -52,7 +61,7 @@ function decodeAll(lines: readonly string[], entityId: string) {
 		const path = `line.${line}`
 		const record = parseLine(text, path)
 		if (isAppError(record)) return record
-		const decoded = decodeRecord(record, path)
+		const decoded = decodeRecord(record, path, layout)
 		if (isAppError(decoded)) return decoded
 		const broken = checkRecord(decoded, entityId, path) ?? repeated(decoded, seen, line)
 		if (broken) return broken
@@ -73,8 +82,8 @@ export function importJsonl(text: string, store: Store): ImportCounts | AppError
 	const schemaVersion = store.schemaVersion()
 	if (isAppError(schemaVersion)) return schemaVersion
 	const [header = "", ...records] = linesOf(text)
-	const badHeader = checkHeader(header, schemaVersion)
-	if (badHeader) return badHeader
-	const rows = decodeAll(records, store.entityId)
+	const layout = checkHeader(header, schemaVersion)
+	if (isAppError(layout)) return layout
+	const rows = decodeAll(records, store.entityId, layout)
 	return isAppError(rows) ? rows : store.restore(rows)
 }

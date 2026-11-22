@@ -3,19 +3,24 @@ import { type Context, ok, type Result } from "../command"
 import { type AppError, isAppError } from "../errors"
 import { withStore } from "../with-store"
 import { fromDecimalForm, printedRow } from "./decimal"
-import { view, type WrittenScenario, writtenScenario } from "./view"
+import { droppedAnchors, view, type WrittenScenario, writtenScenario } from "./view"
 
-/** What `scenario apply` prints: whether the write was rolled back, what it found, and the row. */
+/**
+ * What `scenario apply` prints: whether the write was rolled back, what it found, the row, and the
+ * household anchors it dropped (cli ADR-0048).
+ */
 export type ApplyResult = {
 	dryRun: boolean
 	status: "created" | "updated" | "unchanged"
 	scenario: WrittenScenario
+	droppedAnchors: string[]
 }
 
 export const applyResult: z.ZodType<ApplyResult> = z.strictObject({
 	dryRun: z.boolean().describe("True when the write was rolled back."),
 	status: z.enum(["created", "updated", "unchanged"]).describe("What the apply found."),
 	scenario: writtenScenario,
+	droppedAnchors,
 })
 
 /** The flags `scenario apply` passes on once the forms are chosen. */
@@ -46,6 +51,11 @@ export function writeApplied(ctx: Context, write: ApplyWrite): Result<ApplyResul
 			...rendered,
 			id: write.dryRun && outcome.status === "created" ? null : rendered.id,
 		}
-		return ok({ dryRun: write.dryRun, status: outcome.status, scenario })
+		return ok({
+			dryRun: write.dryRun,
+			status: outcome.status,
+			scenario,
+			droppedAnchors: outcome.droppedAnchors,
+		})
 	})
 }
