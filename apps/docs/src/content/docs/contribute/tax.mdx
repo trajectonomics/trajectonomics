@@ -82,9 +82,10 @@ comment, for example "THB major units" or "inputs and outputs in THB major units
 satang". Read that line first, and keep it true when you change the stage. See
 [ADR 0002](https://github.com/trajectonomics/trajectonomics/blob/main/packages/core/tax/docs/adr/0002-minor-unit-integer-arithmetic-and-statutory-clamping.md).
 
-**Statutory rounding.** Where a statute rounds down in whole baht, a stage that works in baht rounds
-down with `Math.floor`. The Section 40(1) and (2) expense is one example, in
-`src/th/stages/expenses-40-1-2.ts`.
+**Statutory rounding.** Where a statute gives a percentage deduction or cap, the stage floors it to the
+satang with `floorByRateToSatang` (`src/core/money/floor-rate.ts`), never to the whole baht and never with
+`Math.floor` on a binary product. The Section 40(1) and (2) expense is one example, in
+`src/th/stages/expenses-40-1-2.ts`. See [ADR 0006](https://github.com/trajectonomics/trajectonomics/blob/main/packages/core/tax/docs/adr/0006-satang-floor-for-percentage-deductions.md).
 
 **No raw strings in stages.** Diagnostic paths and breakdown keys are typed enums, such as
 `ThTaxField` and `ThBracketField`. Currency comes from the parameters, never from a literal. See
