@@ -204,6 +204,29 @@ traj backup --out ~/traj-backup-2026-11-30
 traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 ```
 
+## Telemetry
+
+> **Ships in 0.6.0.**
+
+`traj` counts its own use, so the project can see how many people run it each week. After a command finishes, a detached process sends one anonymous event to PostHog (EU), so the command never waits for the network. The event holds:
+
+- `command`: the command name, such as `tx add`, or nothing when the command line named none
+- `exit_code` and `error_code`: how the run ended, such as `invalid_input`
+- `format`: `human` or `json`
+- `version`, `os` and `arch`: the CLI version and the platform
+
+It never holds your ledger, arguments, flag values, account names, amounts, file paths, the data directory or any environment variable. As with any web request, PostHog sees the IP address the request comes from.
+
+The random id that groups one machine's events is in `telemetry.json`, in `$XDG_CONFIG_HOME/traj` (or `~/.config/traj`), or in `%APPDATA%\traj` on Windows. It lives outside the data directory, so `traj data remove` does not delete it. `traj telemetry off` deletes it. A machine where that file cannot be written sends nothing.
+
+There are three ways to stop it:
+
+- `traj telemetry off`, which stores the choice for this machine
+- `DO_NOT_TRACK=1` in the environment of the command
+- `TRAJ_TELEMETRY=0` (or `off` or `false`) in the environment of the command
+
+CI runners (where `CI` is set) and development builds never send. The first successful command prints one line on stderr that says so, and it prints it once. `traj telemetry status` shows whether counting is on and why, and `traj telemetry on` turns it back on; a `DO_NOT_TRACK`, `TRAJ_TELEMETRY` or `CI` setting still stops it, and the status says which one.
+
 ## Docs
 
 - [`GLOSSARY.md`](GLOSSARY.md): the project's vocabulary.

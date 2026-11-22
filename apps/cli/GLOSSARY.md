@@ -293,3 +293,9 @@ _Avoid_: distribution method, delivery
 **Release marker**:
 A line in a document or a help page naming the release that ships what the text describes, so a reader of an older release is not sent to a command it cannot run (ADR-0034).
 _Avoid_: version note, TODO, roadmap marker
+
+### Usage
+
+**Usage count**:
+The anonymous event one finished run of `traj` sends, unless it is turned off: the command name, exit code, format, version and OS, keyed by a random id a person can delete (ADR-0045). It never holds the Ledger, arguments or paths.
+_Avoid_: tracking, analytics, telemetry data
