@@ -46,7 +46,8 @@ person who has done this before is noticed before anything is installed.
 
 When the two install checks pass and step 3 has ended — its question answered by the person directly
 or grounded in the Ledger File they already have, or, where the read failed, that failure reported and
-the handover made — and a below-floor command line has been disclosed where one exists, setup is done:
+the handover made — and a below-floor command line has been disclosed where one exists, as has a skill
+whose range the command line has passed, setup is done:
 this skill stops, and every later conversation about their money is the operating skill's.
 
 ## Step 1: Install the command line
@@ -113,10 +114,14 @@ row, from the pin:
 npx skills add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name>
 ```
 
-Skip a row whose CLI Range the command line does not satisfy, and name it with the range it wants and
-the reason: a person on an older release is never handed a skill that would describe a command that
-release lacks. When the manifest cannot be read, install `traj` alone from the pin and say in one
-plain sentence that the rest of the set could not be read, so nobody is left without the contract.
+Install a row when the command line is at or above its CLI Range floor, the range's lower bound,
+compared the way step 1 compares versions. Skip a row below its floor, and name it with the range it
+wants and the reason: a person on an older release is never handed a skill that would describe a
+command that release lacks. A row whose upper bound the command line has passed is installed all the
+same: that bound only marks when this repository rechecks the skill, and every skill takes its
+commands from `traj schema`. When the manifest cannot be read, install `traj` alone from the pin and
+say in one plain sentence that the rest of the set could not be read, so nobody is left without the
+contract.
 
 Done when that same scope's list names every row you installed, `traj` among them, and you hold the
 `path` each one reported.
@@ -124,8 +129,8 @@ Done when that same scope's list names every row you installed, `traj` among the
 ## Step 3: Ask once, then hand over
 
 Ask once, then hand over. Step 3 has one open for a machine with no Ledger File and one for a machine
-that has one, and each open starts with its lead-in sentence in bold. The below-floor disclosure comes
-in every open, before any handover — the failed read included.
+that has one, and each open starts with its lead-in sentence in bold. The below-floor and above-range
+disclosures come in every open, before any handover — the failed read included.
 
 **Below the floor.** When the version that printed is below the CLI version floor, disclose it before
 the handover, in these five facts: the version on this machine; the version the operating skill
@@ -133,6 +138,12 @@ expects; the work that still works — recording, reading balances and reports, 
 the work that does not — a projection, a financial-independence date and a tax figure; and the release
 that closes that gap, tracked as `trajectonomics/cli#117`. Say the command line is older, not broken,
 and that nothing is installed or downloaded to fix it. Setup still finishes.
+
+**Above a range.** Read the CLI Range each installed skill states in its own frontmatter. When the
+version that printed is past a range's upper bound — a pre-release of that bound's minor counts as
+past it — say so in one sentence before the handover: name each such skill, the range it was checked
+through, and that `traj schema` is authoritative where the two differ. Say nothing when every
+installed skill's range still covers the command line.
 
 - Every number you give them is one `traj` returned. The tool owns what its own command surface
   lists — balances, and, from the floor up, projections, a financial-independence date and Thai tax;
@@ -171,7 +182,8 @@ money, and that another machine needs setup once.
 
 Done when their answer is in hand — given directly, or confirmed against the Ledger File — or, where
 the read failed, the failure has been reported and the conversation handed over; a below-floor command
-line has been disclosed where one exists; and the operating skill is running the conversation.
+line has been disclosed where one exists, as has a skill whose range the command line has passed; and
+the operating skill is running the conversation.
 
 ## What setup leaves behind
 

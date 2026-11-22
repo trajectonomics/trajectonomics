@@ -13,6 +13,8 @@ import {
 const skill = read(ONBOARDING_SKILL_PATH)
 /** The sentence both rules that end setup must count. */
 const DISCLOSURE_COUNTED = "a below-floor command line has been disclosed"
+/** The above-range disclosure both rules that end setup must count too (skills ADR 0004). */
+const ABOVE_RANGE_COUNTED = "as has a skill whose range the command line has passed"
 
 /** The pinned floor the Skill must state; a Skill that states another fails naming both numbers. */
 function pinnedFloor(skillSource: string): string {
@@ -81,9 +83,25 @@ describe("the CLI Version Floor the traj-onboarding Skill declares", () => {
 		expect(stepThree).toContain("Below the floor, promise none of the last three.")
 	})
 
-	it("counts the disclosure in both rules that decide setup is done", () => {
-		expect(section(skill, "Check what is already done")).toContain(DISCLOSURE_COUNTED)
-		expect(section(skill, "Step 3: Ask once, then hand over")).toContain(DISCLOSURE_COUNTED)
+	it("discloses a skill whose range the command line has passed, in one sentence", () => {
+		const stepThree = section(skill, "Step 3: Ask once, then hand over")
+		for (const fact of [
+			"**Above a range.**",
+			"states in its own frontmatter",
+			"a pre-release of that bound's minor counts as",
+			"the range it was checked",
+			"`traj schema` is authoritative",
+			"Say nothing when every",
+		]) {
+			expect(stepThree).toContain(fact)
+		}
+	})
+
+	it("counts both disclosures in both rules that decide setup is done", () => {
+		for (const counted of [DISCLOSURE_COUNTED, ABOVE_RANGE_COUNTED]) {
+			expect(section(skill, "Check what is already done")).toContain(counted)
+			expect(section(skill, "Step 3: Ask once, then hand over")).toContain(counted)
+		}
 	})
 
 	it("rejects a Skill that drops the floor sentence", () => {
