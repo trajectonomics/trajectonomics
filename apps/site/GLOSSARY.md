@@ -105,6 +105,10 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 `background`/`foreground`, `muted`/`foreground`, `stage`/`stage-foreground` ([ADR 0008](docs/adr/0008-landmark-surface-roles.md)).
 _Avoid_: Background colour, band
 
+**Mascot**:
+The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is one inline SVG in four poses: peeking over the demo window, holding a chart on the Features cards, waving above the closing call to action, and lost on the Not-found page. It is decoration: `aria-hidden`, painted from Theme roles, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md)).
+_Avoid_: Bot icon, logo, avatar
+
 **Star snapshot**:
 The committed star count of the Site's one repository, plus the date it was read,
 written by `bun run stars:update` and never fetched at request time. The deploy workflow runs that script

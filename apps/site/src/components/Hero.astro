@@ -6,6 +6,7 @@ import { sublineParts } from "../lib/language/subline"
 import Consent from "./Consent.astro"
 import CopyPrompt from "./CopyPrompt.astro"
 import DemoWindow from "./DemoWindow.astro"
+import Mascot from "./Mascot.astro"
 import Badge from "./ui/Badge.astro"
 import Separator from "./ui/Separator.astro"
 
@@ -68,6 +69,10 @@ const subline = sublineParts(dictionary.heroSubline)
 	</div>
 	{/* The demonstration is the product itself in a window, in the landing view, as twenty.com's hero is. */}
 	<div class="hero-app relative mx-auto w-full max-w-[67rem] px-5 pb-16 sm:px-6 sm:pb-24">
+		{/* The mascot peeks over the window's top edge, clipped so it climbs up from behind it (mascot.css). */}
+		<div class="mascot-peek" aria-hidden="true">
+			<Mascot pose="peek" class="h-full w-full" />
+		</div>
 		<DemoWindow dictionary={dictionary} />
 	</div>
 </section>
