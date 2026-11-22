@@ -88,7 +88,7 @@ dd9bc2f0dd33caed788ad28b92742748ed95c3f683e332af577a6f466fb807ad
 Every run also gave the same closing net worth on 30 March 2056: 43,504,723.86 THB, or 17,924,821.75 THB in real terms after the plan's 3% inflation. Run it on your machine and you should see the same hash, down to the last satang. If you don't, that is a bug, and we want to hear about it.
 
 <figure>
-  <img src="/posts/one-answer-every-time/same-output.webp" alt="A robot drops blocks into a small cream machine, which hands out a card with a bar chart; a neat stack of identical cards lies behind it." width="1600" height="900" loading="lazy" />
+  <img src="/posts/one-answer-every-time/same-output.webp" alt="A robot drops blocks into a small cream machine, which prints a card with a bar chart; a row of identical cards lies on the sand beside it." width="1600" height="900" loading="lazy" />
   <figcaption>Same inputs in, the same card out, every time.</figcaption>
 </figure>
 

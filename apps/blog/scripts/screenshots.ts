@@ -1,6 +1,6 @@
 import { mkdir } from "node:fs/promises"
 import { join, resolve } from "node:path"
-import { chromium } from "playwright-core"
+import { chromium, type Page } from "playwright-core"
 
 /** The built assets root the Worker serves. */
 const BUILD_ROOT = resolve(import.meta.dir, "..", "dist")
@@ -34,6 +34,18 @@ async function answer(request: Request): Promise<Response> {
 	})
 }
 
+/**
+ * Loads the lazy images below the first screen. A full-page screenshot never scrolls,
+ * so without this a Post's figures would show as blank space.
+ */
+async function loadEveryImage(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		const images = [...document.images]
+		for (const image of images) image.loading = "eager"
+		await Promise.all(images.map((image) => image.decode()))
+	})
+}
+
 const server = Bun.serve({ port: 0, fetch: answer })
 const browser = await chromium.launch()
 try {
@@ -47,6 +59,7 @@ try {
 			const page = await context.newPage()
 			for (const { name, path } of PAGES) {
 				await page.goto(new URL(path, server.url).href, { waitUntil: "networkidle" })
+				await loadEveryImage(page)
 				await page.screenshot({
 					path: join(OUTPUT_ROOT, scheme, `${name}-${width}.png`),
 					fullPage: true,
