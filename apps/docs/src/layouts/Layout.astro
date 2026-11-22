@@ -6,6 +6,15 @@ import faviconSvg from "@trajectonomics/brand/current/favicon/favicon.svg?url"
 import icon192 from "@trajectonomics/brand/current/favicon/icon-192.png?url"
 import icon512 from "@trajectonomics/brand/current/favicon/icon-512.png?url"
 import AgentLine from "../components/AgentLine.astro"
+import {
+	OG_TYPE,
+	pageShare,
+	SHARE_IMAGE_HEIGHT,
+	SHARE_IMAGE_TYPE,
+	SHARE_IMAGE_WIDTH,
+	SITE_NAME,
+	TWITTER_CARD,
+} from "../lib/head-tags"
 import "../styles/global.css"
 
 interface Props {
@@ -16,9 +25,15 @@ interface Props {
 	 * body; a page with no twin passes none and carries neither.
 	 */
 	markdownTwin?: string | undefined
+	/**
+	 * The page's URL path on the Portal, which its canonical link and Open Graph and X card name as an
+	 * absolute URL. A page with no path (the 404 page, which has no URL to name) carries none of them.
+	 */
+	path?: string | undefined
 }
 
-const { title, description, markdownTwin } = Astro.props
+const { title, description, markdownTwin, path } = Astro.props
+const share = path === undefined ? undefined : pageShare(path, title, description)
 ---
 
 <!-- data-theme is the no-JS fallback; the theme provider (provider.tsx) forces the dark Theme and
@@ -29,6 +44,24 @@ const { title, description, markdownTwin } = Astro.props
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{title}</title>
 		{description && <meta name="description" content={description} />}
+		{
+			share && (
+				<>
+					<link rel="canonical" href={share.url} />
+					<meta property="og:title" content={share.title} />
+					<meta property="og:description" content={share.description} />
+					<meta property="og:url" content={share.url} />
+					<meta property="og:type" content={OG_TYPE} />
+					<meta property="og:site_name" content={SITE_NAME} />
+					<meta property="og:image" content={share.image} />
+					<meta property="og:image:width" content={String(SHARE_IMAGE_WIDTH)} />
+					<meta property="og:image:height" content={String(SHARE_IMAGE_HEIGHT)} />
+					<meta property="og:image:type" content={SHARE_IMAGE_TYPE} />
+					<meta name="twitter:card" content={TWITTER_CARD} />
+					<meta name="twitter:image" content={share.image} />
+				</>
+			)
+		}
 		{markdownTwin && <link rel="alternate" type="text/markdown" href={markdownTwin} />}
 		<link rel="icon" type="image/svg+xml" href={faviconSvg} />
 		<link rel="icon" type="image/x-icon" sizes="any" href={faviconIco} />

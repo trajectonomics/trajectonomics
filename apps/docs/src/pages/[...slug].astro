@@ -19,7 +19,12 @@ const title = page.data.title ?? "Trajectonomics Docs"
 const pageTree = await source.serializePageTree(source.getPageTree())
 ---
 
-<Layout title={title} description={page.data.description} markdownTwin={twinPath(page.url)}>
+<Layout
+	title={title}
+	description={page.data.description}
+	markdownTwin={twinPath(page.url)}
+	path={page.url}
+>
 	<Docs
 		client:load
 		transition:persist="docs"

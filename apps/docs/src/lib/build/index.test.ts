@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test"
 import { indexReference } from "../agent/index-reference"
+import {
+	pageShare,
+	SHARE_IMAGE_HEIGHT,
+	SHARE_IMAGE_TYPE,
+	SHARE_IMAGE_URL,
+	SHARE_IMAGE_WIDTH,
+} from "../head-tags"
 import { SITE_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import { checkBuild } from "./index"
@@ -17,6 +24,25 @@ function pointer(twin: string): string {
 	return `<p>For AI agents: <a href="${twin}">Markdown</a> · <a href="/llms.txt">Docs index</a></p>`
 }
 
+/** The canonical link and share tags a built page's head states for its path and title. */
+function shareTags(path: string, title: string): string {
+	const share = pageShare(path, title, undefined)
+	return [
+		`<link rel="canonical" href="${share.url}">`,
+		`<meta property="og:title" content="${title}">`,
+		`<meta property="og:description" content="${share.description}">`,
+		`<meta property="og:url" content="${share.url}">`,
+		'<meta property="og:type" content="website">',
+		'<meta property="og:site_name" content="Trajectonomics Docs">',
+		`<meta property="og:image" content="${SHARE_IMAGE_URL}">`,
+		`<meta property="og:image:width" content="${SHARE_IMAGE_WIDTH}">`,
+		`<meta property="og:image:height" content="${SHARE_IMAGE_HEIGHT}">`,
+		`<meta property="og:image:type" content="${SHARE_IMAGE_TYPE}">`,
+		'<meta name="twitter:card" content="summary_large_image">',
+		`<meta name="twitter:image" content="${SHARE_IMAGE_URL}">`,
+	].join("")
+}
+
 /** The alternate Markdown link in a page's head. */
 function alternate(twin: string): string {
 	return `<link rel="alternate" type="text/markdown" href="${twin}">`
@@ -24,6 +50,8 @@ function alternate(twin: string): string {
 
 const OPERATOR_TAB_PAGE = [
 	'<html data-theme="dark"><head>',
+	`<title>CLI &amp; Quickstart</title>`,
+	shareTags("/cli/", "CLI &amp; Quickstart"),
 	alternate("/cli.md"),
 	"</head><body>",
 	'<header id="nd-subnav">',
@@ -40,6 +68,8 @@ const RELEASE_LINE = "Docs for traj 0.4.0"
 
 const LANDING_PAGE = [
 	'<html data-theme="dark"><head>',
+	"<title>Trajectonomics Docs</title>",
+	shareTags("/", "Trajectonomics Docs"),
 	alternate("/index.md"),
 	"</head><body>",
 	'<header id="nd-nav"><a href="/" aria-label="Trajectonomics Docs"><svg></svg></a>',
@@ -114,6 +144,8 @@ const COMPLETE_BUILD: readonly BuiltFile[] = [
 		"cli/commands/tx/index.html",
 		[
 			'<html data-theme="dark"><head>',
+			"<title>tx</title>",
+			shareTags("/cli/commands/tx/", "tx"),
 			alternate("/cli/commands/tx.md"),
 			"</head><body>",
 			'<header id="nd-subnav"><a href="/" aria-label="Trajectonomics Docs"><svg></svg></a></header>',

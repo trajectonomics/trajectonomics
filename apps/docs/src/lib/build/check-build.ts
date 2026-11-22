@@ -3,6 +3,7 @@ import { checkAlternateLinks } from "./alternate-link"
 import type { BuiltFile } from "./built-files"
 import { checkDocsIndexPages } from "./docs-index-pages"
 import type { BuildFailure } from "./failures"
+import { checkHeadTags } from "./head-tags"
 import { checkHeaderMark } from "./header-mark"
 import { checkHeaderTabs } from "./header-tabs"
 import { checkImportTemplate } from "./import-template"
@@ -36,6 +37,7 @@ export function checkBuild(
 		...checkMarkdownTwins(files),
 		...checkAgentPointers(files),
 		...checkAlternateLinks(files),
+		...checkHeadTags(files),
 		...checkLandingPage(files, releaseLine),
 		...checkRedirects(files),
 		...checkTabAliases(files),
