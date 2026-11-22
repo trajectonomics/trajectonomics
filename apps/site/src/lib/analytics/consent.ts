@@ -51,6 +51,30 @@ const VISITOR_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 /** The attributes every consent cookie carries; `Secure` is what keeps them off plain HTTP. */
 const COOKIE_ATTRIBUTES = "Path=/; Secure; SameSite=Lax"
 
+/**
+ * The registrable domain the consent cookies are scoped to on production. The Docs Portal is served on
+ * `docs.trajectonomics.com` (docs ADR 0013), a different host, and a host-only cookie on the apex
+ * would never reach it.
+ */
+export const CONSENT_COOKIE_DOMAIN = "trajectonomics.com"
+
+/**
+ * The `Domain` a consent cookie names for a request host: the registrable domain on production and
+ * any of its subdomains, so the Docs Portal reads the same answer, and none elsewhere. A preview,
+ * `workers.dev` or `localhost` host would refuse a cookie for a domain it is not under.
+ */
+export function cookieDomainFor(hostname: string): string | undefined {
+	if (hostname === CONSENT_COOKIE_DOMAIN || hostname.endsWith(`.${CONSENT_COOKIE_DOMAIN}`)) {
+		return CONSENT_COOKIE_DOMAIN
+	}
+	return undefined
+}
+
+/** The attributes of one consent cookie, with its `Domain` when it has one. */
+function attributes(domain: string | undefined): string {
+	return domain === undefined ? COOKIE_ATTRIBUTES : `Domain=${domain}; ${COOKIE_ATTRIBUTES}`
+}
+
 /** Whether a value is a visitor id this Site issued: a strict lowercase UUID. */
 export function isVisitorId(value: string | undefined): value is string {
 	return value !== undefined && VISITOR_ID.test(value)
@@ -77,35 +101,34 @@ export function consentFromRequest(signals: ConsentSignals): ConsentState {
 }
 
 /** The `Set-Cookie` value of the visitor id: readable by the Docs Portal, so not `HttpOnly`. */
-export function visitorCookie(visitorId: string): string {
-	return `${VISITOR_COOKIE}=${visitorId}; ${COOKIE_ATTRIBUTES}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`
+export function visitorCookie(visitorId: string, domain?: string): string {
+	return `${VISITOR_COOKIE}=${visitorId}; ${attributes(domain)}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`
 }
 
 /**
  * The `Set-Cookie` values one choice writes. `granted` stores the answer and the id; `denied` stores
  * the answer and clears the id; `reset` clears both, so the banner is asked again. The id is read only
- * for `granted`.
+ * for `granted`. A clearing cookie names the same `Domain` as the one it clears, or it clears nothing.
  */
 export function consentCookies(
 	choice: ConsentChoice | "reset",
 	visitorId: string,
+	domain?: string,
 ): readonly string[] {
+	const scope = attributes(domain)
 	if (choice === "granted") {
 		return [
-			`${CONSENT_COOKIE}=granted; ${COOKIE_ATTRIBUTES}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`,
-			visitorCookie(visitorId),
+			`${CONSENT_COOKIE}=granted; ${scope}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`,
+			visitorCookie(visitorId, domain),
 		]
 	}
 	if (choice === "denied") {
 		return [
-			`${CONSENT_COOKIE}=denied; ${COOKIE_ATTRIBUTES}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`,
-			`${VISITOR_COOKIE}=; ${COOKIE_ATTRIBUTES}; Max-Age=0`,
+			`${CONSENT_COOKIE}=denied; ${scope}; Max-Age=${CONSENT_MAX_AGE_SECONDS}`,
+			`${VISITOR_COOKIE}=; ${scope}; Max-Age=0`,
 		]
 	}
-	return [
-		`${CONSENT_COOKIE}=; ${COOKIE_ATTRIBUTES}; Max-Age=0`,
-		`${VISITOR_COOKIE}=; ${COOKIE_ATTRIBUTES}; Max-Age=0`,
-	]
+	return [`${CONSENT_COOKIE}=; ${scope}; Max-Age=0`, `${VISITOR_COOKIE}=; ${scope}; Max-Age=0`]
 }
 
 /** The choice a `?consent=` value names, or `undefined` when it names none the Site offers. */

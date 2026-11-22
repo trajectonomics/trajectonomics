@@ -6,7 +6,7 @@
  * write events, so it is public by design and is committed here.
  *
  * A reader's id is the one the Site's banner wrote, and only when the reader granted consent
- * ([site ADR 0024](https://github.com/trajectonomics/site/blob/main/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)).
+ * ([site ADR 0024](https://github.com/trajectonomics/trajectonomics/blob/main/apps/site/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)).
  * The Portal stores nothing of its own, so a reader who never answered is counted per pageview.
  */
 

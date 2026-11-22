@@ -4,6 +4,7 @@ import {
 	consentChoiceFrom,
 	consentCookies,
 	consentFromRequest,
+	cookieDomainFor,
 	isVisitorId,
 	visitorCookie,
 	visitorIdFrom,
@@ -105,6 +106,14 @@ describe("the consent cookies a choice writes", () => {
 		])
 	})
 
+	it("names the same Domain on every cookie it writes or clears, when it has one", () => {
+		for (const choice of ["granted", "denied", "reset"] as const) {
+			for (const cookie of consentCookies(choice, ID, "trajectonomics.com")) {
+				expect(cookie).toContain("; Domain=trajectonomics.com; Path=/;")
+			}
+		}
+	})
+
 	it("never marks the id HttpOnly, because the Docs Portal reads it", () => {
 		expect(visitorCookie(ID)).not.toContain("HttpOnly")
 	})
@@ -122,5 +131,18 @@ describe("the choice a consent parameter names", () => {
 		expect(consentChoiceFrom("")).toBeUndefined()
 		expect(consentChoiceFrom("GRANTED")).toBeUndefined()
 		expect(consentChoiceFrom('"><script>')).toBeUndefined()
+	})
+})
+
+describe("the cookie domain a host names", () => {
+	it("is the registrable domain on production and its subdomains", () => {
+		expect(cookieDomainFor("trajectonomics.com")).toBe("trajectonomics.com")
+		expect(cookieDomainFor("docs.trajectonomics.com")).toBe("trajectonomics.com")
+	})
+
+	it("is none on a preview, a lookalike or localhost", () => {
+		expect(cookieDomainFor("site.example.workers.dev")).toBeUndefined()
+		expect(cookieDomainFor("nottrajectonomics.com")).toBeUndefined()
+		expect(cookieDomainFor("localhost")).toBeUndefined()
 	})
 })

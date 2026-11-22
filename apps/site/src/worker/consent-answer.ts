@@ -3,8 +3,9 @@ import {
 	type ConsentState,
 	consentChoiceFrom,
 	consentCookies,
-	consentFromRequest,
+	cookieDomainFor,
 	visitorCookie,
+	visitorIdFrom,
 } from "../lib/analytics/consent"
 import { CLEAN_URL } from "../lib/language/languages"
 import { bodyOf } from "./response-body"
@@ -46,10 +47,13 @@ export function consentResponse(request: Request, value: string | null, newId: I
 	const choice = consentChoiceFrom(value)
 	const headers = new Headers({ Location: CLEAN_URL, "Cache-Control": CHOICE_CACHE_CONTROL })
 	if (choice !== undefined) {
-		const state = consentFromRequest(signalsOf(request))
-		const visitorId =
-			state.kind === "granted" && state.visitorId !== undefined ? state.visitorId : newId()
-		for (const cookie of consentCookies(choice, visitorId)) headers.append("Set-Cookie", cookie)
+		// The id is read from the cookie itself, not from the resolved state: a visitor whose browser
+		// sends `Sec-GPC` resolves to `denied` but keeps the id they already hold.
+		const visitorId = visitorIdFrom(request.headers.get("cookie")) ?? newId()
+		const domain = cookieDomainFor(new URL(request.url).hostname)
+		for (const cookie of consentCookies(choice, visitorId, domain)) {
+			headers.append("Set-Cookie", cookie)
+		}
 	}
 	return new Response(null, { status: CHOICE_STATUS, headers })
 }
@@ -68,7 +72,10 @@ export async function personalisedHome(
 ): Promise<Response> {
 	const visitorId = state.kind === "granted" ? (state.visitorId ?? newId()) : undefined
 	if (state.kind === "granted" && state.visitorId === undefined && visitorId !== undefined) {
-		headers.append("Set-Cookie", visitorCookie(visitorId))
+		headers.append(
+			"Set-Cookie",
+			visitorCookie(visitorId, cookieDomainFor(new URL(request.url).hostname)),
+		)
 	}
 	const body = bodyOf(request, assetResponse)
 	if (body === null) {

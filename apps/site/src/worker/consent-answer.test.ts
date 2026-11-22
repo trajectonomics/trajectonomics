@@ -21,8 +21,8 @@ describe("the consent choice the Worker stores", () => {
 		expect(response.headers.get("location")).toBe("/")
 		expect(response.headers.get("cache-control")).toBe("no-store")
 		expect(setCookies(response)).toEqual([
-			"traj_consent=granted; Path=/; Secure; SameSite=Lax; Max-Age=15552000",
-			`traj_vid=${MINTED}; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
+			"traj_consent=granted; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=15552000",
+			`traj_vid=${MINTED}; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
 		])
 	})
 
@@ -33,7 +33,7 @@ describe("the consent choice the Worker stores", () => {
 			mint,
 		)
 		expect(setCookies(response)[1]).toBe(
-			`traj_vid=${EXISTING}; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
+			`traj_vid=${EXISTING}; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
 		)
 	})
 
@@ -50,16 +50,16 @@ describe("the consent choice the Worker stores", () => {
 		const response = await handleRequest(get("/?consent=denied"), fakeAssets(), mint)
 		expect(response.status).toBe(302)
 		expect(setCookies(response)).toEqual([
-			"traj_consent=denied; Path=/; Secure; SameSite=Lax; Max-Age=15552000",
-			"traj_vid=; Path=/; Secure; SameSite=Lax; Max-Age=0",
+			"traj_consent=denied; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=15552000",
+			"traj_vid=; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=0",
 		])
 	})
 
 	it("clears both cookies on a reset", async () => {
 		const response = await handleRequest(get("/?consent=reset"), fakeAssets(), mint)
 		expect(setCookies(response)).toEqual([
-			"traj_consent=; Path=/; Secure; SameSite=Lax; Max-Age=0",
-			"traj_vid=; Path=/; Secure; SameSite=Lax; Max-Age=0",
+			"traj_consent=; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=0",
+			"traj_vid=; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=0",
 		])
 	})
 
@@ -102,7 +102,7 @@ describe("the home for a visitor who has answered the banner", () => {
 		)
 		expect(await contentOf(response)).toContain(`data-visitor="${MINTED}"`)
 		expect(setCookies(response)).toEqual([
-			`traj_vid=${MINTED}; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
+			`traj_vid=${MINTED}; Domain=trajectonomics.com; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
 		])
 	})
 
@@ -146,5 +146,31 @@ describe("the home for a visitor who has answered the banner", () => {
 		expect(response.status).toBe(200)
 		expect(await contentOf(response)).toBe("")
 		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry")
+	})
+})
+
+describe("the cookie domain the Worker names", () => {
+	it("scopes the cookies to trajectonomics.com, so the Docs Portal's host reads them", async () => {
+		const response = await handleRequest(get("/?consent=denied"), fakeAssets(), mint)
+		for (const cookie of setCookies(response))
+			expect(cookie).toContain("Domain=trajectonomics.com;")
+	})
+
+	it("names no domain on a host outside it, which would refuse such a cookie", async () => {
+		const request = new Request("https://site.example.workers.dev/?consent=granted")
+		const response = await handleRequest(request, fakeAssets(), mint)
+		expect(setCookies(response)).toEqual([
+			"traj_consent=granted; Path=/; Secure; SameSite=Lax; Max-Age=15552000",
+			`traj_vid=${MINTED}; Path=/; Secure; SameSite=Lax; Max-Age=15552000`,
+		])
+	})
+
+	it("keeps the id of a visitor whose browser sends Sec-GPC", async () => {
+		const response = await handleRequest(
+			get("/?consent=granted", { cookie: `traj_vid=${EXISTING}`, "sec-gpc": "1" }),
+			fakeAssets(),
+			mint,
+		)
+		expect(setCookies(response)[1]).toStartWith(`traj_vid=${EXISTING};`)
 	})
 })

@@ -4,12 +4,12 @@ status: accepted
 
 # The Portal follows the Site's cookie choice
 
-[ADR 0008](./0008-analytics-from-the-page-itself.md) gave each tab an id in `sessionStorage`, so one visit's pageviews shared a `distinct_id` and two visits never did. That id was stored for the visitor without asking them. The owner's decision on 2026-11-22 is that the Site asks before it stores any identifier ([site ADR 0024](https://github.com/trajectonomics/site/blob/main/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)), and the Portal has no question of its own to ask.
+[ADR 0008](./0008-analytics-from-the-page-itself.md) gave each tab an id in `sessionStorage`, so one visit's pageviews shared a `distinct_id` and two visits never did. That id was stored for the visitor without asking them. The owner's decision on 2026-11-22 is that the Site asks before it stores any identifier ([site ADR 0024](https://github.com/trajectonomics/trajectonomics/blob/main/apps/site/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)), and the Portal has no question of its own to ask.
 
 ## Decision
 
 1. **The `sessionStorage` id is gone.** The Portal stores nothing, not in `sessionStorage`, `localStorage` or a cookie of its own. Storing an identifier needs the visitor's yes, and only the Site asks for it.
-2. **The Portal reads the Site's choice.** The Site writes `traj_consent` and `traj_vid` on the same origin, which the Portal shares, so the Portal reads `document.cookie`. It uses the visitor id as `distinct_id` only when `traj_consent=granted` and `traj_vid` is a strict lowercase UUID.
+2. **The Portal reads the Site's choice.** The Site writes `traj_consent` and `traj_vid` with `Domain=trajectonomics.com`, so they reach `docs.trajectonomics.com` ([ADR 0013](./0013-the-portal-is-served-on-its-own-host.md)) as well as the apex, and the Portal reads them from `document.cookie`. It uses the visitor id as `distinct_id` only when `traj_consent=granted` and `traj_vid` is a strict lowercase UUID.
 3. **Anyone else gets a fresh id per pageview.** A reader who never answered, refused, or set `Sec-GPC` or `DNT` is counted once per pageview with an id made for that pageview, and nothing is kept between pages.
 4. **Every event says which.** Each pageview carries `consent`: `granted` or `cookieless`, the same property the Site's events carry.
 5. **Nothing else changes.** The host check, the opt-out check, `$process_person_profile: false` and the Client Router pageview guard are as [ADR 0008](./0008-analytics-from-the-page-itself.md) records.
