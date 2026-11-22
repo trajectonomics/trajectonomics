@@ -116,6 +116,13 @@ baseline stays untouched. Then write the Levy to that fork: run `traj scenario t
 with the flags for the facts the person gave, and one
 `--label <flow>=<label>` for each classified Flow. Dry-run it with `--dry-run` first, then write it.
 
+This fork is the **tax baseline**: the one Scenario every tax comparison in this conversation starts
+from, because its Levy was written by the `traj` in front of you. A Levy stored in an earlier session
+may have been written by an older release under older rules, and nothing in `traj schema` or the
+Scenario's document says which. A person who arrives with a Scenario that already carries a Levy gets
+this step on a fork of it, with the facts they state now, and the stored Levy is never the side of a
+comparison.
+
 The result's `allowances` lists what the flags stated, and what the figure leaves out. Report the
 classes it leaves out, by the names the tool printed, as the figure's "not modelled" list.
 
@@ -136,15 +143,19 @@ Done when the year's `owed` is reported with its dates and the disclosures.
 
 ### Step T4: what one deduction changes
 
+Both sides of the comparison carry a Levy this conversation wrote, so they are taxed under one set of
+rules: the tax baseline from Step T2 is the baseline below, and the person's stored Scenario is
+never one side of a comparison.
+
 There are two ways to show a deduction, one for each kind:
 
-- **A deduction the `scenario tax` flags state.** Fork the baseline into a what-if of its own, write
-  its Levy again with that one flag changed, and compare:
+- **A deduction the `scenario tax` flags state.** Fork the tax baseline into a what-if of its own,
+  write its Levy again with that one flag changed, and compare:
   `traj scenario fork <baseline> <what-if>`, then `traj scenario tax <what-if> --tax th-2026` with the
-  same flags and that one change, then
+  same flags and labels as Step T2 and that one change, then
   `traj projection compare <baseline> <what-if> --as-of <as-of> --horizon <horizon> --json`.
 - **A retirement or ThaiESG contribution.** These are contribution Flows, classified in Step T1, and no
-  flag states them. Keep one contribution Flow of that class in the baseline at amount zero, then
+  flag states them. Keep one contribution Flow of that class in the tax baseline at amount zero, then
   compare with `--set`, which replaces that Flow's amount:
   `traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json`.
   `--set` replaces a path that exists and cannot add one, so when the Scenario has no such Flow, add

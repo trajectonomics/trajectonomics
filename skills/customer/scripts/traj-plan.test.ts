@@ -98,6 +98,15 @@ describe("the traj-plan Skill", () => {
 	})
 })
 
+/** One `### Step` of the flattened tax recipe, up to the next `###` heading. */
+function step(recipe: string, name: string): string {
+	const found = recipe
+		.split(" ### ")
+		.find((part) => part.startsWith(`### ${name}`) || part.startsWith(name))
+	if (found === undefined) throw new Error(`the tax recipe has no ${name}`)
+	return found
+}
+
 describe("the Thai tax recipe in the traj-plan Skill", () => {
 	const tax = section(
 		body,
@@ -146,6 +155,20 @@ describe("the Thai tax recipe in the traj-plan Skill", () => {
 		)
 		expect(tax).toContain("cannot add one")
 		expect(tax).toContain("100 THB is 10000 satang")
+	})
+
+	it("compares two Levies this conversation wrote, so a stored Levy from an older release is never one side", () => {
+		const t2 = step(tax, "Step T2")
+		expect(t2).toContain("the **tax baseline**")
+		expect(t2).toContain("written by the `traj` in front of you")
+		expect(t2).toContain("may have been written by an older release under older rules")
+		expect(t2).toContain("the stored Levy is never the side of a comparison")
+		const t4 = step(tax, "Step T4")
+		expect(t4).toContain("the tax baseline from Step T2 is the baseline below")
+		expect(t4).toContain("one set of")
+		expect(t4).toContain("never one side of a comparison")
+		expect(t4).toContain("Fork the tax baseline into a what-if")
+		expect(t4).toContain("same flags and labels as Step T2")
 	})
 
 	it("reports both owed figures side by side, and never subtracts them itself", () => {
