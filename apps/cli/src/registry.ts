@@ -14,6 +14,10 @@ const table = {
 	unknown_format: { exit: 2, message: "Unknown output format." },
 	not_found: { exit: 4, message: "The requested resource was not found." },
 	ledger_missing: { exit: 4, message: "The data directory holds no ledger." },
+	default_home_refused: {
+		exit: 3,
+		message: "A development build does not open the default data directory.",
+	},
 	account_name_taken: { exit: 5, message: "An account with this name already exists." },
 	scenario_name_taken: { exit: 5, message: "A scenario with this name already exists." },
 	unsupported_currency: { exit: 3, message: "The currency is not supported in v1." },

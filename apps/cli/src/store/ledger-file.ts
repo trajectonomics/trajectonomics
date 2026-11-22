@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite"
 import { chmodSync, existsSync, mkdirSync } from "node:fs"
 import { join } from "node:path"
 import type { Env } from "../command"
-import { DATABASE_FILE, dataDirectory } from "../data-directory"
+import { DATABASE_FILE, dataDirectory, defaultHomeRefusal } from "../data-directory"
 import { type AppError, isAppError } from "../errors"
 import { databaseStep, directoryStep, fileStep } from "./io-steps"
 
@@ -40,6 +40,8 @@ export type CreatedLedger = LedgerPaths & { created: boolean }
  * never invents an empty database (cli#146).
  */
 export function createLedger(env: Env): CreatedLedger | AppError {
+	const refused = defaultHomeRefusal(env)
+	if (refused !== undefined) return refused
 	const paths = ledgerPaths(env)
 	const created = !existsSync(paths.database)
 	const made = directoryStep(paths.directory, () =>

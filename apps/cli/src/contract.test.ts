@@ -59,6 +59,8 @@ describe("contract", () => {
 		not_found: () => capture(["account", "show", "Nope", "--json"], { TRAJ_HOME: fixtureHome() }),
 		// The one code raised before a connection exists: a read against a home with no ledger.
 		ledger_missing: () => capture(["account", "list", "--json"], { TRAJ_HOME: tempHome() }),
+		// A development build, which every test run is, with no TRAJ_HOME: the guard refuses (ADR-0053).
+		default_home_refused: () => capture(["account", "list", "--json"], {}),
 		liability_opening_positive: async () => {
 			const home = ledgerHome()
 			for (const [name, type] of [
