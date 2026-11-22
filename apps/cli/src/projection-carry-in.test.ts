@@ -22,7 +22,7 @@ describe("a Projection starting inside a tax period", () => {
 			periodStart: "2026-01-01",
 			missing: TH_CLASSES,
 		})
-		expect(error.hint).toContain('"0.00"')
+		expect(error.hint).toContain('"rest": "0.00" for every class the period had no income in')
 	})
 
 	it("takes the stated Carry-in, applies its tax and echoes every amount", async () => {

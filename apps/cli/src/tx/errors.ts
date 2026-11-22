@@ -15,6 +15,19 @@ export function unknownAccount(ref: string, path: string): AppError {
 	})
 }
 
+/**
+ * A transfer names one Account on both sides. It moves no balance and is almost always a slip, so
+ * the CLI refuses it at exit 3 (`same_account`) in every form that maps `from` and `to`.
+ */
+export function sameAccount(account: { id: string; name: string }, path: string): AppError {
+	return fail("same_account", {
+		path,
+		message: `${path}: "${account.name}" is both the from and the to account`,
+		hint: "Name two different accounts in --from and --to; a transfer from an account to itself moves nothing.",
+		details: { account: { id: account.id, name: account.name } },
+	})
+}
+
 /** `tx show` found no transaction with this id: a lookup miss at exit 4 (ADR-0021). */
 export function transactionNotFound(id: string): AppError {
 	return fail("not_found", {

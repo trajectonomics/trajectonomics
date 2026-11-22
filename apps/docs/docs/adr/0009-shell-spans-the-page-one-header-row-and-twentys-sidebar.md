@@ -64,3 +64,9 @@ The Portal publishes an Agent-readable form of every page, and each page says so
 ## Amendment (2026-11-21): the agent line leaves the shell
 
 The docs#77 amendment above put a visible agent line in the sidebar's top block and in the Landing Page's header link row. A reader has no use for a sentence addressed to an Agent, so it is withdrawn from both. The top block is again the Site Home button above the search, the Landing Page's header link row again carries the Site Home link alone, and the sidebar block no longer takes the page's path. The pointer for an Agent moves to the top of the page's body, where no reader meets it ([ADR 0010](./0010-the-portal-serves-markdown-by-request.md)).
+
+## Amendment (2026-11-22): the header brand is the blog's, and it is the way back
+
+The owner asked for the Portal's logo and its way back to the Site Home to work as the blog's do. The header's brand is now the blog's: the Site's glyph on a tile, 32 px and 40 px from `sm` up, links to the Site Home (`https://trajectonomics.com/`, full document load, no prefetch) under the name "Trajectonomics home", and a `Docs` marker in the brand's display face (Aleo, light) beside it links to the Landing Page under the accessible name "Trajectonomics Docs", which the built-page check still reads. This supersedes the docs#75 amendment's single tile linking to the Landing Page.
+
+The tile is the way back, so the sidebar's bordered `trajectonomics.com ↗` button and the home layout's header link go: the sidebar's top block is the search above the hairline, and the home layout carries no header link items. Its phone menu would then open an empty panel, so the menu's trigger is not drawn. A phone reaches the Site Home from the header at every width, as on the blog.

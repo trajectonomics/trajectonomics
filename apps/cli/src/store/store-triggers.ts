@@ -29,6 +29,8 @@ export type StoreRaised = Exclude<
 	| "projection_refused"
 	// Raised by tx add's opening form, before the store is asked to write anything.
 	| "liability_opening_positive"
+	// Raised by tx add and tx import from the two accounts they map, before the store is asked.
+	| "same_account"
 >
 
 function fixture() {

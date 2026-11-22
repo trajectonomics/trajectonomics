@@ -1,5 +1,12 @@
 node_modules/
-dist/
+/dist/
+.astro/
+.wrangler/
+.dev.vars
+# The Brand Typeface and the Favicon Set are copied from @trajectonomics/brand before every build;
+# the brand package is the source of truth and this folder commits no copies of them.
+public/fonts/
+public/favicon/
 coverage/
 *.tgz
 .scratch/

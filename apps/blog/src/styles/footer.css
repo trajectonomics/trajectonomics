@@ -1,0 +1,110 @@
+/*
+ * The dark footer, after the Site's: the stage roles in both Themes, a brand block beside the link
+ * columns, and the licence line under a hairline. Secondary text is the stage foreground at 72%.
+ */
+
+.blog-footer {
+	border-top: 1px solid var(--ds-color-border);
+	background: var(--ds-color-stage);
+	color: var(--ds-color-stage-foreground);
+}
+
+.blog-footer-inner {
+	display: flex;
+	max-width: 72rem;
+	flex-direction: column;
+	gap: 40px;
+	margin: 0 auto;
+	padding: 56px 1.25rem 32px;
+}
+
+@media (min-width: 40rem) {
+	.blog-footer-inner {
+		padding: 80px 1.5rem 40px;
+	}
+}
+
+.blog-footer-top {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+}
+
+@media (min-width: 64rem) {
+	.blog-footer-top {
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+}
+
+.blog-footer-brand {
+	display: flex;
+	max-width: 20rem;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.blog-footer-name {
+	font-family: var(--font-display);
+	font-size: 28px;
+	font-weight: 300;
+	letter-spacing: -0.02em;
+}
+
+.blog-footer-tagline,
+.blog-footer-licence {
+	font-size: 14px;
+	opacity: 0.72;
+}
+
+.blog-footer-columns {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 32px 24px;
+}
+
+@media (min-width: 40rem) {
+	.blog-footer-columns {
+		grid-template-columns: repeat(3, 11rem);
+		gap: 40px;
+	}
+}
+
+/* On the stage the label takes the stage foreground, not the page's muted role; the footer scope
+ * outranks the shared `.meta-label` colour, which global.css declares after this file. */
+.blog-footer .blog-footer-label {
+	color: var(--ds-color-stage-foreground);
+	opacity: 0.72;
+}
+
+.blog-footer-links {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 14px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.blog-footer-link {
+	font-size: 14px;
+	color: var(--ds-color-stage-foreground);
+	text-underline-offset: 4px;
+}
+
+.blog-footer-link:hover {
+	text-decoration: underline;
+}
+
+.blog-footer-link:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+.blog-footer-licence {
+	margin: 0;
+	padding-top: 24px;
+	border-top: 1px solid color-mix(in srgb, var(--ds-color-stage-foreground) 16%, transparent);
+}

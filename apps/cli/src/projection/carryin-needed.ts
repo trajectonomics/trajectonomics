@@ -13,7 +13,7 @@ function needsRecord(
 	return fail("invalid_input", {
 		path: CARRY_IN_FIELD,
 		message: `The Levy "${levy}" needs a Carry-in record for the period that started ${periodStart}, which this Projection starts inside of.`,
-		hint: 'State what that period tallied and prepaid before the As-of with --carry-in, and "0.00" for a class it had no income in.',
+		hint: 'State what that period tallied and prepaid before the As-of with --carry-in, and "rest": "0.00" for every class the period had no income in.',
 		details: { levy, periodStart, missing: classes },
 	})
 }

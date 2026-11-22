@@ -1,0 +1,104 @@
+/* The page body: a masthead over a hairline-ruled section, in the Site's flat, quiet language. */
+
+.masthead,
+.posts {
+	width: 100%;
+	max-width: 72rem;
+	margin: 0 auto;
+	padding: 0 1.25rem;
+}
+
+@media (min-width: 40rem) {
+	.masthead,
+	.posts {
+		padding: 0 1.5rem;
+	}
+}
+
+.masthead {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding-top: 72px;
+	padding-bottom: 56px;
+}
+
+@media (min-width: 40rem) {
+	.masthead {
+		padding-top: 112px;
+		padding-bottom: 72px;
+	}
+}
+
+.masthead-title {
+	max-width: 40rem;
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: 300;
+	letter-spacing: -0.03em;
+	line-height: 1.05;
+}
+
+.masthead-lede {
+	max-width: 36rem;
+	margin: 0;
+	font-size: 18px;
+	color: var(--ds-color-muted-foreground);
+}
+
+.posts {
+	padding-bottom: 96px;
+}
+
+.posts-title {
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+/* A section with nothing in it says so in one line, instead of disappearing. */
+.empty-state {
+	margin: 0;
+	padding: 24px 0;
+	border-bottom: 1px solid var(--ds-color-border);
+	color: var(--ds-color-muted-foreground);
+}
+
+.not-found-links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 20px;
+	margin: 16px 0 0;
+}
+
+/* The bevelled button: a 4 px radius with the bottom-right corner cut to 16 px where supported. */
+.button {
+	display: inline-flex;
+	min-height: 2.75rem;
+	align-items: center;
+	padding: 0 20px;
+	border-radius: 4px;
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+@supports (corner-shape: bevel) {
+	.button {
+		border-radius: 4px 4px 16px 4px;
+		corner-shape: round round bevel round;
+	}
+}
+
+.text-link {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 4px;
+}
+
+.button:focus-visible,
+.text-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

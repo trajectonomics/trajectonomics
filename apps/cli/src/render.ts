@@ -63,6 +63,18 @@ export function renderResult(data: unknown, format: Format, hint?: RenderHint): 
 	return tables ?? renderHumanLines(data, "").join("\n")
 }
 
+/** One engine problem a refused projection lists: its code, and where it is. */
+function problemLine(problem: unknown): string {
+	if (!isRecord(problem)) return `  - ${JSON.stringify(problem)}`
+	const parts = [
+		String(problem["code"]),
+		...(problem["path"] === undefined ? [] : [`at ${String(problem["path"])}`]),
+		...(problem["date"] === undefined ? [] : [`on ${String(problem["date"])}`]),
+		...(problem["account"] === undefined ? [] : [`account ${String(problem["account"])}`]),
+	]
+	return `  - ${parts.join(" ")}`
+}
+
 /** Renders a failure: the JSON envelope when the Format is json, otherwise text. */
 export function renderError(error: AppError, format: Format): string {
 	const { body } = error
@@ -70,5 +82,9 @@ export function renderError(error: AppError, format: Format): string {
 	const where = body.path === undefined ? "" : ` (${body.path})`
 	const lines = [`error: ${body.code}${where}: ${body.message}`]
 	if (body.hint !== undefined) lines.push(`hint: ${body.hint}`)
+	// A refused projection's hint says details lists every problem, so the human form lists them.
+	if (body.code === "projection_refused" && Array.isArray(body.details)) {
+		lines.push("details:", ...body.details.map(problemLine))
+	}
 	return lines.join("\n")
 }

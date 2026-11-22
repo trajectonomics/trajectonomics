@@ -15,7 +15,7 @@ export type LandingProps = ProviderProps & { readonly releaseLine?: string | und
 export function Landing({ releaseLine, ...props }: LandingProps) {
 	return (
 		<Provider {...props}>
-			<HomeLayout {...baseOptions("home")}>
+			<HomeLayout {...baseOptions()}>
 				<div className="mx-auto flex w-full max-w-(--fd-layout-width) flex-1 flex-col gap-20 px-4 py-16 md:px-6 md:py-24">
 					<div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
 						<Hero releaseLine={releaseLine} />

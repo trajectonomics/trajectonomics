@@ -40,7 +40,7 @@ export const run: Leaf = defineCommand({
 		},
 		{
 			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --monthly",
+				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --monthly",
 			description: "Try a raise without forking, and read the monthly rows.",
 		},
 	],

@@ -11,8 +11,14 @@ export function flagLabel(spec: FlagSpec): string {
 	return spec.kind === "boolean" ? `--${spec.flag}` : `--${spec.flag} <${spec.kind}>`
 }
 
+/**
+ * The note beside a flag: its description, then `repeatable` for a flag that takes it more than
+ * once, unless the description already says so (`--set`, `--age`), so the word appears once.
+ */
 export function flagNote(spec: FlagSpec): string {
-	const notes = [spec.description?.replace(/\.$/, ""), spec.multiple ? "repeatable" : undefined]
+	const description = spec.description?.replace(/\.$/, "")
+	const says = description !== undefined && /\brepeatable\b/.test(description)
+	const notes = [description, spec.multiple && !says ? "repeatable" : undefined]
 	if (spec.required) notes.push("required")
 	return notes.filter(Boolean).join("; ")
 }

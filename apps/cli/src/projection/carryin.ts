@@ -2,6 +2,7 @@ import type { TallyBasis } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import { parseDocument, readDocument } from "../document"
 import { type AppError, isAppError } from "../errors"
+import { TAX_LEVY_ID } from "../scenario/tax/levy"
 import { CARRY_IN_BASES } from "./carryin-view"
 
 /*
@@ -63,7 +64,7 @@ const recordForm: z.ZodType<CarryInRecordForm> = z.strictObject({
 export const CARRY_IN_EXAMPLE: readonly CarryInRecordForm[] = [
 	{
 		scenario: "base",
-		levy: "th-2026",
+		levy: TAX_LEVY_ID,
 		periodStart: "2025-01-01",
 		tallies: [{ label: "income.section40_1", basis: "gross", amount: "780000.00" }],
 		prepaid: "0.00",

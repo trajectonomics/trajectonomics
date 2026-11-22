@@ -1,0 +1,61 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import PostMeta from "../components/PostMeta.astro"
+import { readPosts } from "../content/read-posts"
+import Layout from "../layouts/Layout.astro"
+
+const [featured, ...rest] = await readPosts()
+---
+
+<Layout
+	title="Blog · Trajectonomics"
+	description="Comparisons, guides and news about traj, the free, open-source financial simulation tool for AI agents."
+	indexed={true}
+	isFrontPage={true}
+>
+	<section class="masthead" aria-labelledby="masthead-title">
+		<p class="meta-label">Trajectonomics blog</p>
+		<h1 id="masthead-title" class="masthead-title">Comparisons, guides and news</h1>
+		<p class="masthead-lede">
+			How traj compares with what you would otherwise do, with every number from a test you can rerun.
+		</p>
+	</section>
+	<section class="posts" aria-labelledby="posts-title">
+		<h2 id="posts-title" class="meta-label posts-title">Latest</h2>
+		{
+			featured === undefined ? (
+				<p class="empty-state">No posts yet.</p>
+			) : (
+				<a class="featured" href={featured.path}>
+					<img
+						class="featured-image"
+						src={featured.entry.data.cover.src}
+						alt=""
+						width={featured.entry.data.cover.width}
+						height={featured.entry.data.cover.height}
+					/>
+					<div class="featured-text">
+						<PostMeta post={featured} />
+						<span class="featured-title">{featured.entry.data.title}</span>
+						<span class="featured-description">{featured.entry.data.description}</span>
+					</div>
+				</a>
+			)
+		}
+		{
+			rest.length === 0 ? null : (
+				<ul class="post-rows">
+					{rest.map((post) => (
+						<li>
+							<a class="post-row" href={post.path}>
+								<PostMeta post={post} />
+								<span class="post-row-title">{post.entry.data.title}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</section>
+</Layout>
