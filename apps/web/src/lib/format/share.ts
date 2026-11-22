@@ -1,6 +1,7 @@
 /**
- * A share in basis points as a percentage with two places, with integer string work only: 8730 becomes
- * "87.30%" and 10000 becomes "100.00%". The CLI states the basis points; the Dashboard only writes them.
+ * A share in basis points as a percentage with two places: 8730 becomes "87.30%", 10000 "100.00%" and
+ * 5 "0.05%". The input is the CLI's integer, so the floor and remainder are exact. It is a share, not
+ * money (ADR 0002); the CLI states the basis points and the Dashboard only writes them.
  */
 export function formatShare(basisPoints: number): string {
 	const whole = Math.floor(basisPoints / 100)

@@ -184,10 +184,12 @@ year. The paths draw from a Return model you state in a JSON file, with
 seed and count always give the same answer. The CLI ships no Return model: which
 market history a plan is tested against is your decision, and every figure is
 only as good as that choice. `traj schema projection chance` describes the file.
+Pass the same three flags to `traj dashboard` to add the chance of success to the
+Dashboard, as a page of its own.
 
 ## Seeing it in a browser
 
-`traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Pass `--return-model FILE`, `--paths N` and `--seed HEX` together to add the chance of success, a page of its own in the Dashboard. Run it again to see new figures.
+`traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.
 
 ## Keeping a backup, and removing the data
 
