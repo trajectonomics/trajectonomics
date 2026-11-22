@@ -3,9 +3,9 @@ title: telemetry
 description: Show or change anonymous usage counting.
 ---
 
-`traj` counts its own use, so the project can see how many people run it each week. That count is
-the only thing `traj` sends over the network. Your ledger, Scenarios and Projections never leave the
-machine. `traj telemetry` shows whether counting is on and why, and turns it off or back on.
+`traj` counts its own use, so the project can see how many people run it each week. Apart from the
+npm launcher's one-time download of the binary, that count is the only thing `traj` sends over the
+network. Your ledger, Scenarios and Projections never leave the machine. `traj telemetry` shows whether counting is on and why, and turns it off or back on.
 
 ## `traj telemetry status`
 
@@ -53,20 +53,19 @@ request comes from.
 ## Where the random id lives
 
 Events from one machine are grouped by a random id, created on the first send. It is stored in
-`telemetry.json` in `$XDG_CONFIG_HOME/traj`, or `~/.config/traj` when `XDG_CONFIG_HOME` is not set;
-on Windows it is in `%APPDATA%\traj`. That directory is outside the data directory, so
+`telemetry.json` in `$XDG_CONFIG_HOME/traj`, or `~/.config/traj` when that variable is not set; on
+Windows it is in `%APPDATA%\traj`. That directory is outside the data directory, so
 [`traj data remove`](/cli/commands/data/) does not delete it. `traj telemetry off` deletes it. A
 machine where that file cannot be written sends nothing, because an id that is not kept would count
 as a new person on every run.
 
-## Three ways to stop it
+## Two ways to stop it
 
 - `traj telemetry off`, which stores the choice for this machine
 - `DO_NOT_TRACK=1` in the environment of the command
-- `TRAJ_TELEMETRY=0` in the environment of the command (`off` or `false` work too)
 
-`traj telemetry on` does not override the environment: a `DO_NOT_TRACK`, `TRAJ_TELEMETRY` or `CI`
-setting still stops counting, and `status` says which one does.
+`traj telemetry on` does not override the environment: a `DO_NOT_TRACK` or `CI` setting still stops
+counting, and `status` says which one does.
 
 CI runners, where `CI` is set, and development builds never send.
 

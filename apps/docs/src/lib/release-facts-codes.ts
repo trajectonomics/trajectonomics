@@ -2,8 +2,11 @@ import type { CliRelease } from "./cli-release"
 import type { ContentFile } from "./content-pages"
 import { CODE_TOKEN, problem, type ReleaseFactProblem } from "./release-fact-types"
 
-/** `UPPER_SNAKE` names a page may write that are not error codes: variables of other programs. */
-const NOT_ERROR_CODES = new Set(["NO_COLOR"])
+/**
+ * `UPPER_SNAKE` names a page may write that are not error codes: environment variables shared across
+ * programs. `DO_NOT_TRACK` is the cross-tool opt-out that traj's usage count honours too.
+ */
+const NOT_ERROR_CODES = new Set(["NO_COLOR", "DO_NOT_TRACK"])
 
 /** Words that make the code-shaped token right after them an error code. */
 const ERROR_CONTEXT = /refus\w*|\bfails?\b|failure|\berror\b|exit code/i
