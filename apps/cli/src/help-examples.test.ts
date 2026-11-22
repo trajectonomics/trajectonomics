@@ -14,7 +14,7 @@ import { capture } from "./test-support"
 import { leavesOf } from "./tree"
 
 /**
- * The real tree (ADR-0042), with the Dashboard's wait swapped for an immediate stop: it serves,
+ * The real tree (ADR-0043), with the Dashboard's wait swapped for an immediate stop: it serves,
  * then returns, so its example runs without blocking.
  */
 const CLI: Group = {
