@@ -4844,5 +4844,577 @@
 			"minBufferMonths": 3
 		},
 		"fiSha256": "b39dc4d354df8758bee908b877f8c6931ea8287b3499f9dde5032c5c1fdf19f2"
+	},
+	{
+		"name": "milestone-freelancer-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation",
+					"endAt": "retire"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			},
+			"milestones": [
+				{
+					"id": "retire",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "date",
+							"on": "2030-01-01"
+						}
+					]
+				},
+				{
+					"id": "rich",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "metric",
+							"metric": "allAssets",
+							"op": "atLeast",
+							"amount": 30000000,
+							"terms": "nominal"
+						}
+					]
+				},
+				{
+					"id": "later",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "milestone",
+							"milestone": "rich",
+							"months": 12
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2036-01-01",
+			"resolution": "month"
+		},
+		"sha256": "43cd8b0eb4e331776123ba0a316d655a0cdb5a6b583606c3ba5b83bf5ba38e18"
+	},
+	{
+		"name": "milestone-freelancer-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation",
+					"endAt": "retire"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			},
+			"milestones": [
+				{
+					"id": "retire",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "date",
+							"on": "2030-01-01"
+						}
+					]
+				},
+				{
+					"id": "rich",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "metric",
+							"metric": "allAssets",
+							"op": "atLeast",
+							"amount": 30000000,
+							"terms": "nominal"
+						}
+					]
+				},
+				{
+					"id": "later",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "milestone",
+							"milestone": "rich",
+							"months": 12
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2036-01-01",
+			"resolution": "month"
+		},
+		"sha256": "43cd8b0eb4e331776123ba0a316d655a0cdb5a6b583606c3ba5b83bf5ba38e18",
+		"options": {
+			"method": "survival"
+		},
+		"fiSha256": "ef00c4d4cdb8a7fb6a41a3dc0ccb766540f060fe75d25330bf20f6ddf58ddbda"
+	},
+	{
+		"name": "milestone-freelancer-chance",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation",
+					"endAt": "retire"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			},
+			"milestones": [
+				{
+					"id": "retire",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "date",
+							"on": "2030-01-01"
+						}
+					]
+				},
+				{
+					"id": "rich",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "metric",
+							"metric": "allAssets",
+							"op": "atLeast",
+							"amount": 30000000,
+							"terms": "nominal"
+						}
+					]
+				},
+				{
+					"id": "later",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "milestone",
+							"milestone": "rich",
+							"months": 12
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2036-01-01",
+			"resolution": "month"
+		},
+		"sha256": "43cd8b0eb4e331776123ba0a316d655a0cdb5a6b583606c3ba5b83bf5ba38e18",
+		"chance": {
+			"model": {
+				"id": "parity-market",
+				"accounts": ["brokerage"],
+				"buckets": [
+					{
+						"returnsBps": [0],
+						"weight": 2147483648
+					},
+					{
+						"returnsBps": [-1500],
+						"weight": 2147483648
+					}
+				]
+			},
+			"seed": "0123456789abcdef",
+			"paths": 4
+		},
+		"chanceSha256": "598dd5a30555273ac476f2e5c9e365114cc48c76023a7a9cb639dd0ecba97ed1"
 	}
 ]

@@ -1,3 +1,4 @@
+import type { MilestoneGate } from "../milestone/gate"
 import type { DateString, Scenario } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { DatedEvent } from "./events"
@@ -14,6 +15,7 @@ export interface RunAccumulator {
 	readonly totals: DayTotals[]
 	readonly wanted: ReadonlySet<DateString>
 	readonly levies: LevySet | undefined
+	readonly gate: MilestoneGate | undefined
 }
 
 function addSnapshot(
@@ -45,6 +47,7 @@ function handleDay(
 	if (events.length === 0 && !settlement) return undefined
 	const outcome = processDate(states, scenario, date, events, acc.levies)
 	acc.totals.push(outcome.totals)
+	acc.gate?.record(outcome.totals)
 	if (outcome.problem !== undefined) return { ok: false, problem: outcome.problem }
 	if (outcome.runsOut !== undefined) return finishRunout(acc, states, outcome.runsOut)
 	return undefined
@@ -69,7 +72,9 @@ export function stepDate(
 	events: readonly DatedEvent[],
 ): EngineResult | undefined {
 	if (acc.levies !== undefined) closeReturnsOn(acc.levies, states, date)
-	const dayResult = handleDay(acc, states, scenario, date, events)
+	const settled = acc.levies !== undefined && hasSettlement(acc.levies, date)
+	const landing = acc.gate === undefined ? events : acc.gate.apply(states, date, events, settled)
+	const dayResult = handleDay(acc, states, scenario, date, landing)
 	if (dayResult !== undefined) return dayResult
 	return handleSnapshot(acc, states, date)
 }

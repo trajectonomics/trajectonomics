@@ -19,33 +19,16 @@ import { levySeveral, levyStepped } from "./levy-extensions-cases"
 import { levyGainsDay } from "./levy-gains-case"
 import { levyReturnsDay } from "./levy-returns-case"
 import { levyCareCredit } from "./levy-us-cases"
+import { milestoneFreelancer } from "./milestone-cases"
 import { nominalLeapFebruary, nominalPartial, nominalReal, nominalZero } from "./nominal-cases"
 import { nominalMonthlyLoan } from "./nominal-flow-cases"
+import { configured, leapTie } from "./parity-fixtures"
 
 export interface ParityCase {
 	readonly name: string
 	readonly fixture: Fixture
 	readonly options?: SurvivalOptions
 	readonly chance?: ChanceOfSuccessOptions
-}
-
-/** One year of 50% growth across Feb 29 2028: a rounding tie plus the No Leap day count. */
-const leapTie: Fixture = {
-	baseline: { schemaVersion: 1, balances: [{ account: "cash", amount: 1 }] },
-	scenario: {
-		schemaVersion: 4,
-		currency: "THB",
-		economy: { inflation: 300 },
-		accounts: [{ id: "cash", kind: "asset", rate: 5000 }],
-		flows: [],
-		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
-	},
-	timeline: { start: "2027-02-28", horizon: "2029-03-01", resolution: "day" },
-}
-
-const configured: SurvivalOptions = {
-	method: "survival",
-	reference: { multiplier: 30, basis: "netWorth", window: "trailing12Months", terms: "real" },
 }
 
 /** Inputs whose Projection and Financial Independence must hash identically under every engine. */
@@ -100,5 +83,16 @@ export const PARITY_CASES: readonly ParityCase[] = [
 			retirementSpending: { amount: 2_000_000, growth: "inflation" },
 			minBufferMonths: 3,
 		},
+	},
+	{ name: "milestone-freelancer-month", fixture: milestoneFreelancer },
+	{
+		name: "milestone-freelancer-fi",
+		fixture: milestoneFreelancer,
+		options: { method: "survival" },
+	},
+	{
+		name: "milestone-freelancer-chance",
+		fixture: milestoneFreelancer,
+		chance: freelancerChance,
 	},
 ]

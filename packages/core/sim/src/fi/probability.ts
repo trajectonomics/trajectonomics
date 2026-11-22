@@ -17,7 +17,7 @@ function passes(input: SearchInput, month: DateString): boolean | ProjectionProb
 	const point = prefix.points.get(month)
 	if (point === undefined) return false
 	const walked = walkCandidate(
-		{ scenario: input.scenario, month, point, requirement: input.requirement },
+		{ scenario: input.scenario, month, point, windows: input.windows },
 		input.grid,
 	)
 	if (walked.kind === "problem") return walked.problem

@@ -43,6 +43,7 @@ export function buildProjection(
 			? {}
 			: { runsOut: { date: run.runsOut.date, unmet: Number(run.runsOut.unmet) } }),
 		...(levies.levies === undefined ? {} : { levies: levies.levies }),
+		...(run.milestones === undefined ? {} : { milestones: run.milestones }),
 	}
 	return { projection }
 }

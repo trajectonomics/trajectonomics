@@ -1,5 +1,6 @@
 import type { ResolvedCalendar } from "../calendar/business"
 import { occurrences } from "../calendar/occurrence"
+import { movedOnceStarts } from "../milestone/spec"
 import type { DateString, Flow, Scenario, Timeline } from "../types"
 import { isFixed } from "../types"
 import { fixedAmountAt } from "./amount"
@@ -11,6 +12,8 @@ export interface DatedEvent {
 	readonly years: number
 	/** The grown amount, when the scan computed it once per event instead of per candidate. */
 	readonly amount?: bigint
+	/** Lands on a static Milestone's fire date rather than its recurrence, so it is no evaluation date. */
+	readonly deferred?: boolean
 }
 
 /** All flow Occurrences in the timeline, on their Landed dates, sorted by date then flow id. */
@@ -20,9 +23,11 @@ export function buildEvents(
 	calendar: ResolvedCalendar | undefined,
 ): readonly DatedEvent[] {
 	const events: DatedEvent[] = []
+	const moved = movedOnceStarts(scenario, calendar)
 	for (const flow of scenario.flows) {
+		const shifted = moved.get(flow.id)
 		const found = occurrences(
-			flow.start,
+			shifted ?? flow.start,
 			flow.frequency,
 			flow.end,
 			timeline.start,
@@ -30,7 +35,12 @@ export function buildEvents(
 			calendar,
 		)
 		for (const occurrence of found) {
-			const event = { date: occurrence.date, flow, years: occurrence.years }
+			const event = {
+				date: occurrence.date,
+				flow,
+				years: occurrence.years,
+				...(shifted === undefined ? {} : { deferred: true }),
+			}
 			events.push(
 				isFixed(flow)
 					? { ...event, amount: fixedAmountAt(flow, occurrence.years, scenario.economy.inflation) }

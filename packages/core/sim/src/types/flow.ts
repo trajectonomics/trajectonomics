@@ -20,6 +20,10 @@ interface FlowBase {
 	readonly start: DateString
 	/** Omitted means the flow runs to `Timeline.horizon`. A `once` flow omits it or equals `start`. */
 	readonly end?: DateString
+	/** A Milestone id: the Flow lands only on or after that Milestone's fire date. */
+	readonly startAt?: string
+	/** A Milestone id: the Flow lands only strictly before that Milestone's fire date. */
+	readonly endAt?: string
 }
 
 /** A fixed amount, grown by whole annual steps from the Flow's start. */

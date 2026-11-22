@@ -1,3 +1,4 @@
+import type { MilestoneResult } from "../types/milestone"
 import type { ProjectionProblem } from "../types/projection"
 import type { EngineLevy } from "./levy-types"
 import type { DayTotals, EngineRunsOut } from "./occurrence"
@@ -8,6 +9,7 @@ export interface EngineRun {
 	readonly totals: readonly DayTotals[]
 	readonly runsOut?: EngineRunsOut
 	readonly levies?: readonly EngineLevy[]
+	readonly milestones?: readonly MilestoneResult[]
 }
 
 export type EngineResult =
