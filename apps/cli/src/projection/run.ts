@@ -9,6 +9,7 @@ import { fundingNotes } from "./funding"
 import { annualRow, monthlyRow, runsOutView } from "./rows"
 import type { ProjectionRunView, ProjectionTable } from "./run-view"
 import { taxYearsOf } from "./tax-view"
+import { withdrawNotes } from "./withdraw-notes"
 
 /**
  * `traj projection run`: the engine's Projection in the CLI's money, annual by default and with
@@ -37,7 +38,11 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 	}
 	return {
 		...echoOf(prepared),
-		notes: [...prepared.notes, ...fundingNotes(projection.unfundedContributions, currency)],
+		notes: [
+			...prepared.notes,
+			...fundingNotes(projection.unfundedContributions, currency),
+			...withdrawNotes(prepared.document, projection.runsOut, currency),
+		],
 		horizon: timeline.horizon,
 		currency,
 		runsOut: runsOutView(projection.runsOut, currency),
