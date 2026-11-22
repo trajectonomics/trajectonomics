@@ -46,7 +46,7 @@ export const compare: Leaf = defineCommand({
 		},
 		{
 			command:
-				"traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=90000 --birth-date 1985-06-15 --age 45 --age 50",
+				"traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --birth-date 1985-06-15 --age 45 --age 50",
 			description: "A what-if against the base, with net worth at two ages.",
 		},
 	],

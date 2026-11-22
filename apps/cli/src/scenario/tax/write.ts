@@ -6,7 +6,7 @@ import { scenarioNotFound } from "../errors"
 import { view, type WrittenScenario } from "../view"
 import { type TaxFlags, type TaxRequest, taxRequestOf } from "./flags"
 import { type FlowLabel, flowLabelOf } from "./labels"
-import { withTaxLevy } from "./levy"
+import { TAX_LEVY_ID, withTaxLevy } from "./levy"
 import { type TaxProfileView, taxProfileOf } from "./profile"
 import { withoutTaxLevy } from "./remove"
 
@@ -14,6 +14,8 @@ import { withoutTaxLevy } from "./remove"
 export type TaxWritten = {
 	dryRun: boolean
 	status: "created" | "updated" | "unchanged"
+	/** The Levy id the write states; absent when --none wrote no Levy. */
+	levy?: string | undefined
 	/** The allowance classes the flags stated; absent when --none wrote no Levy. */
 	allowances?: TaxProfileView | undefined
 	scenario: WrittenScenario
@@ -81,7 +83,7 @@ function save(
 	return ok({
 		dryRun,
 		status: outcome.status,
-		...(profile === undefined ? {} : { allowances: profile }),
+		...(profile === undefined ? {} : { levy: TAX_LEVY_ID, allowances: profile }),
 		scenario: { ...scenario, id },
 	})
 }
