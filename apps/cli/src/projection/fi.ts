@@ -10,6 +10,7 @@ import { FI_METHOD } from "./fi-method"
 import type { FiAnswer, FiLeafAnswer, FiView } from "./fi-view"
 import { fundingNotes } from "./funding"
 import { taxYearsOf } from "./tax-view"
+import { withdrawNotes } from "./withdraw-notes"
 
 /** The engine's survival answer in the CLI's money, with its own definition echo (ADR-0008). */
 export type FiSolution = {
@@ -69,6 +70,7 @@ export function independenceOf(prepared: Placed): FiView | AppError {
 		notes: [
 			...prepared.notes,
 			...fundingNotes(result.projection.unfundedContributions, prepared.currency),
+			...withdrawNotes(prepared.document, result.projection, prepared.currency),
 		],
 		horizon: prepared.timeline.horizon,
 		currency: prepared.currency,
