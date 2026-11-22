@@ -29,7 +29,7 @@ A plan says "when", not only "how much": stop working once investable assets cov
 
 ## Consequences
 
-- A Scenario without `milestones` keeps every number and parity hash. `Scenario.schemaVersion` stays 4, since the new keys are optional and additive (ADR 0006, ADR 0014).
+- A Scenario without `milestones` keeps every number and parity hash. `Scenario.schemaVersion` stays 4, since the new keys are optional and additive ([ADR 0006](./0006-business-day-shifting.md), [ADR 0008](./0008-levy-tally-sources-returns-and-gains.md)).
 - An FI month and a chance success count can change only through a gated Flow. `financialIndependence` and `chanceOfSuccess` have tests where a gate moves the answer, checked against a brute-force walk, and `src/golden/oracle-milestone-fi.ts` re-projects every candidate with its own stop and reads the buffer and reference from that projection.
 - The minimum buffer and the rule-of-thumb reference count a gated Flow only while its gates let it land (see FI windows). An FI month can therefore move for a Scenario with gated expenses, and the rule-of-thumb `annualExpenses` reports the gated figure.
 - The CLI and the Dashboard must spell `startAt`, `endAt` and each Criterion kind out in their own vocabulary (issues #215 and #216).
