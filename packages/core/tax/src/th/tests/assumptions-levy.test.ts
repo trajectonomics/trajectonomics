@@ -27,7 +27,6 @@ describe("thLevyAssumptions", () => {
 		const funded = valuesOf(levy, wage, [[ThLevyContributionLabel.Gpf, 5_000_000]])
 		expect(pathsOf(thLevyAssumptions(levy, funded))).toEqual([
 			"allowances.retirementCluster.combinedCeiling",
-			"allowances.retirementCluster.gpf.ceiling",
 			"allowances.retirementCluster.gpf.maxRate",
 		])
 		expect(thLevyAssumptions(levy, valuesOf(levy, wage))).toEqual([])

@@ -39,7 +39,6 @@ describe("calculateThTax assumptions", () => {
 		const claimed = paths({ income: { section40_1: 900_000 }, allowances: { gpf: 50_000 } })
 		expect(claimed).toEqual([
 			"allowances.retirementCluster.combinedCeiling",
-			"allowances.retirementCluster.gpf.ceiling",
 			"allowances.retirementCluster.gpf.maxRate",
 		])
 		expect(paths({ income: { section40_1: 900_000 }, allowances: { gpf: 0, rmf: 0 } })).toEqual([])
