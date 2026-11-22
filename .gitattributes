@@ -1,0 +1,2 @@
+# Biome formats with LF; keep every checkout LF so Windows runners do not see CRLF diffs.
+* text=auto eol=lf
