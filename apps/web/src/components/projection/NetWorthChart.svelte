@@ -1,5 +1,7 @@
 <script lang="ts">
 import type { ProjectionRun } from "../../lib/contract"
+import { formatDate } from "../../lib/format"
+import { milestoneMarkers, milestoneView } from "../../lib/view/milestones/milestones"
 import { netWorthSeries } from "../../lib/view/projection/chart"
 import { parseTerms, type Terms } from "../../lib/view/projection/terms"
 import LineChart from "../chart/LineChart.svelte"
@@ -19,10 +21,12 @@ interface Props {
 	onTerms: (value: string) => void
 }
 
-/** The net worth chart by year, with the choice of terms in the address bar. */
+/** The net worth chart by year, with the choice of terms in the address bar, and a mark for each reached Milestone. */
 let { run, terms, onTerms }: Props = $props()
 const chosen = $derived(parseTerms(terms))
 const series = $derived(netWorthSeries(run, chosen))
+const markers = $derived(milestoneMarkers(run))
+const reached = $derived(milestoneView(run)?.reached ?? [])
 </script>
 
 <section aria-labelledby="net-worth-chart" class="space-y-3">
@@ -36,5 +40,13 @@ const series = $derived(netWorthSeries(run, chosen))
 			onChange={onTerms}
 		/>
 	</div>
-	<LineChart label="Net worth at the close of each year" {series} />
+	<LineChart label="Net worth at the close of each year" {series} {markers} />
+	{#if reached.length > 0}
+		<!-- The marks above, in words, for a reader who cannot see them. -->
+		<ul class="sr-only">
+			{#each reached as milestone (milestone.id)}
+				<li>{milestone.id}: reached on {formatDate(milestone.date)}</li>
+			{/each}
+		</ul>
+	{/if}
 </section>

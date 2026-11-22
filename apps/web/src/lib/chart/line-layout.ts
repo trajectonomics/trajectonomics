@@ -1,8 +1,9 @@
 import { extent } from "./extent"
-import type { LineSeries } from "./line"
+import type { LineMarker, LineSeries } from "./line"
 import { linePath } from "./path"
 import { linearScale } from "./scale"
 import { niceTicks } from "./ticks"
+import { labelsFor, xTicksFor } from "./x-labels"
 
 /** The space around the plot, in pixels, for the axis labels. */
 export interface Margin {
@@ -34,13 +35,14 @@ export interface SeriesLayout {
 	readonly marks: readonly (Mark | null)[]
 }
 
-/** The whole chart laid out: positions, ticks and series, all in pixels. */
+/** The whole chart laid out: positions, ticks, series and markers, all in pixels. */
 export interface LineLayout {
 	readonly xLabels: readonly string[]
 	readonly xPixels: readonly number[]
 	readonly xTicks: readonly { readonly index: number; readonly label: string }[]
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
+	readonly markers: readonly { readonly x: number; readonly label: string }[]
 }
 
 /** The room one x label needs, in pixels, so neighbouring labels never touch. */
@@ -48,11 +50,16 @@ const X_LABEL_SPACE = 84
 
 /**
  * Lays a line chart out in pixels. The y axis always starts at zero and ends on a nice tick. Each
- * distinct x is one column; a series with no point at an x has a gap there. Null for no points.
+ * distinct x is one column; a series with no point at an x has a gap there. A marker may sit between
+ * columns, so the x axis widens to take it in. Null for no points.
  */
-export function lineLayout(series: readonly LineSeries[], plot: Plot): LineLayout | null {
+export function lineLayout(
+	series: readonly LineSeries[],
+	plot: Plot,
+	markers: readonly LineMarker[] = [],
+): LineLayout | null {
 	const xs = distinctSorted(series.flatMap((line) => line.points.map((point) => point.x)))
-	const xDomain = extent(xs)
+	const xDomain = xs.length === 0 ? null : extent([...xs, ...markers.map((marker) => marker.x)])
 	const yExtent = extent([0, ...series.flatMap((line) => line.points.map((point) => point.y))])
 	if (!xDomain || !yExtent) return null
 	const yTicks = niceTicks(yExtent)
@@ -69,32 +76,12 @@ export function lineLayout(series: readonly LineSeries[], plot: Plot): LineLayou
 		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
 		yTicks: yTicks.map((value) => ({ value, y: scaleY(value) })),
 		series: series.map((line) => seriesLayout(line, xs, scaleX, scaleY)),
+		markers: markers.map((marker) => ({ x: scaleX(marker.x), label: marker.label })),
 	}
 }
 
 function distinctSorted(values: readonly number[]): number[] {
 	return [...new Set(values)].sort((a, b) => a - b)
-}
-
-function labelsFor(series: readonly LineSeries[], xs: readonly number[]): string[] {
-	const labels = new Map<number, string>()
-	for (const line of series) {
-		for (const point of line.points) {
-			if (!labels.has(point.x)) labels.set(point.x, point.xLabel)
-		}
-	}
-	return xs.map((x) => labels.get(x) ?? "")
-}
-
-function xTicksFor(
-	labels: readonly string[],
-	pixels: readonly number[],
-	maxTicks: number,
-): { index: number; label: string }[] {
-	const every = Math.max(1, Math.ceil(labels.length / maxTicks))
-	return labels.flatMap((label, index) =>
-		index % every === 0 && pixels[index] !== undefined ? [{ index, label }] : [],
-	)
 }
 
 function seriesLayout(

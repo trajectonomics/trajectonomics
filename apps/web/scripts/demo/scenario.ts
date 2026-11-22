@@ -1,3 +1,5 @@
+import { DEMO_MILESTONES } from "./milestones"
+
 /** The ledger ids of the accounts a Scenario names. */
 export type DemoAccountIds = { bank: string; fund: string; loan: string }
 
@@ -67,6 +69,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 				growth: "inflation",
 			},
 		],
+		milestones: DEMO_MILESTONES,
 		cashflow: {
 			surplus: [{ account: ids.bank }],
 			contribute: [ids.fund],

@@ -1,7 +1,7 @@
 // Icons from Lucide (https://lucide.dev), licensed under the ISC licence, Copyright (c) Lucide Contributors.
 // `calendar` and `x` derive from Feather (https://feathericons.com), licensed under the MIT licence,
 // Copyright (c) 2013-2023 Cole Bemis. Each icon is its SVG elements, copied from the Lucide icon set.
-// `target`, `landmark`, `trending-up` and `trending-down` are copied from the Lucide icon set as well, so they add no licence beyond ISC.
+// `target`, `landmark`, `milestone`, `trending-up` and `trending-down` are copied from the Lucide icon set as well, so they add no licence beyond ISC.
 // The Dashboard draws them as SVG elements, never as HTML.
 
 import type { IconName } from "../../lib/view/routes"

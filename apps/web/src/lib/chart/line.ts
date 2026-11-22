@@ -12,3 +12,9 @@ export interface LineSeries {
 	readonly dashed?: boolean
 	readonly points: readonly LinePoint[]
 }
+
+/** A vertical rule on a line chart: its x position in the chart's own units, and the label it carries. */
+export interface LineMarker {
+	readonly x: number
+	readonly label: string
+}

@@ -3,6 +3,7 @@ import type { LineLayout } from "../../lib/chart"
 import { abbreviate, maskMoney } from "../../lib/format"
 import { HEIGHT, MARGIN } from "./geometry"
 import LineMarks from "./LineMarks.svelte"
+import LineRules from "./LineRules.svelte"
 import { dashPattern, strokeClass } from "./series-style"
 
 interface Props {
@@ -63,6 +64,7 @@ let { label, layout, width, masked, index }: Props = $props()
 			class={strokeClass(seriesIndex)}
 		/>
 	{/each}
+	<LineRules {layout} {width} />
 	{#if index !== null}
 		<LineMarks {layout} {index} />
 	{/if}
