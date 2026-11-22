@@ -1,4 +1,10 @@
 import type { ColumnHint, RenderHint } from "../table"
+import {
+	compareMilestoneBlocks,
+	compareMilestonesHidden,
+	milestoneColumns,
+	runMilestonesShown,
+} from "./milestones"
 
 /** One column of a table-shaped result, headed exactly as its row key is spelled. */
 const column = (key: string, align?: ColumnHint["align"]): ColumnHint =>
@@ -54,7 +60,9 @@ export const projectionHint: RenderHint = {
 			column("accessibleNetWorth", "right"),
 			column("realAccessibleNetWorth", "right"),
 		],
+		milestones: milestoneColumns,
 	},
+	display: runMilestonesShown,
 	note: "notes",
 	extra: [
 		{
@@ -73,4 +81,14 @@ export const projectionHint: RenderHint = {
 			],
 		},
 	],
+}
+
+/**
+ * `projection compare`'s human view: the same figures as before, and each side's milestones as a
+ * table of its own after them (cli ADR-0049). The milestones leave the listing, so they are not
+ * printed twice.
+ */
+export const compareHint: RenderHint = {
+	display: compareMilestonesHidden,
+	blocks: compareMilestoneBlocks,
 }

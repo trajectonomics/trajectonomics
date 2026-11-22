@@ -1,6 +1,9 @@
 <script lang="ts">
+import { page } from "$app/state"
+import { editSession } from "../../client/edit.svelte.js"
 import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
 import ProjectionPage from "../../components/pages/ProjectionPage.svelte"
+import { editsShown } from "../../lib/edit/shown"
 </script>
 
 <svelte:head>
@@ -9,6 +12,7 @@ import ProjectionPage from "../../components/pages/ProjectionPage.svelte"
 
 <ProjectionPage
 	scenario={queryParam("scenario", "")}
+	editable={editsShown(editSession.token, page.url.search)}
 	onScenario={(value) => setQueryParam("scenario", value)}
 	terms={queryParam("terms", "both")}
 	onTerms={(value) => setQueryParam("terms", value)}

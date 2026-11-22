@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import type { Group, Leaf } from "./command"
 import { root } from "./commands"
@@ -10,6 +9,7 @@ import { DEFAULT_SETUP, EXPECTED_EXIT, SETUP, type Setup, STDIN } from "./help-e
 import { fixtureHome } from "./ledger-fixture"
 import { projectionHome } from "./projection/testing"
 import { ledgerHome } from "./store/testing"
+import { makeTempDir } from "./temp-dir"
 import { capture } from "./test-support"
 import { leavesOf } from "./tree"
 
@@ -97,7 +97,7 @@ async function prepare(setup: Setup, env: Record<string, string>, user: string):
 
 /** Runs one leaf's examples in order, in its own data directory and working directory. */
 async function runExamples(path: string, leaf: Leaf): Promise<void> {
-	const work = mkdtempSync(join(tmpdir(), "traj-help-examples-"))
+	const work = makeTempDir("traj-help-examples-")
 	const user = join(work, "user")
 	const cwd = join(work, "cwd")
 	const original = process.cwd()

@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { dateString } from "./date"
+import { householdDocument } from "./household"
 import { money } from "./money"
 
 /**
@@ -50,8 +51,8 @@ export const scenarioShow = z.strictObject({
 		createdAt: z.string(),
 		updatedAt: z.string(),
 		document: scenarioDocument,
-		/** The household's document, or null when no household is set (cli ADR-0048). Not read here yet. */
-		household: z.record(z.string(), z.unknown()).nullable(),
+		/** The household's document, or null when no household is set (cli ADR-0048). */
+		household: householdDocument.nullable(),
 	}),
 })
 export type ScenarioShow = z.infer<typeof scenarioShow>

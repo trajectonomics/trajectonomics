@@ -6,6 +6,7 @@ import type { Placed } from "./carryin-apply"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { fundingNotes } from "./funding"
+import { milestoneRowsOf } from "./milestones"
 import { annualRow, monthlyRow, runsOutView } from "./rows"
 import type { ProjectionRunView, ProjectionTable } from "./run-view"
 import { taxYearsOf } from "./tax-view"
@@ -35,6 +36,11 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 				monthlyRow(row, currency, agesOn(prepared.household, row.date)),
 			),
 		})
+	}
+	// Present only when the Scenario declares Milestones, so an older Scenario's table list is unchanged.
+	if (projection.milestones !== undefined) {
+		const rows = milestoneRowsOf(projection.milestones)
+		tables.push({ name: "milestones", count: rows.length, rows })
 	}
 	return {
 		...echoOf(prepared),

@@ -26,7 +26,14 @@ const read = $derived(name === null ? undefined : snapshot.reads.documents[name]
 {:else}
 	<ReadView {read} label={`The plan ${name}`}>
 		{#snippet children(data)}
-			<PlanItemsList {kind} {name} doc={data.scenario.document} baseline={snapshot.reads.baseline} {editable} />
+			<PlanItemsList
+				{kind}
+				{name}
+				doc={data.scenario.document}
+				household={data.scenario.household}
+				baseline={snapshot.reads.baseline}
+				{editable}
+			/>
 		{/snippet}
 	</ReadView>
 {/if}

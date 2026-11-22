@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
-import { mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { makeTempDir } from "./temp-dir"
 import { accounts, cli, ledgerHome } from "./tx-test-support"
 
 const salary = {
@@ -97,7 +97,7 @@ describe("tx add document", () => {
 			["Loan", "liability"],
 			["Interest", "expense"],
 		])
-		const file = join(mkdtempSync(join(tmpdir(), "traj-doc-")), "loan.json")
+		const file = join(makeTempDir("traj-doc-"), "loan.json")
 		writeFileSync(file, JSON.stringify(loan))
 		const res = await traj(["tx", "add", "--postings", file, "--json"])
 		expect(res.code).toBe(0)

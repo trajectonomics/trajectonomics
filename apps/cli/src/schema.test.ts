@@ -132,6 +132,7 @@ describe("schema of the Scenario document", () => {
 			"economy",
 			"accounts",
 			"flows",
+			"milestones",
 			"cashflow",
 			"levies",
 			"calendar",

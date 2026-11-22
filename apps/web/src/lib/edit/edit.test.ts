@@ -3,7 +3,13 @@ import { EDIT_KINDS, type Edit, editSchema, followPlan, writeCommand } from "./e
 
 describe("the Edit list", () => {
 	test("is exactly the kinds the Dashboard may send, and no read", () => {
-		expect([...EDIT_KINDS]).toEqual(["copy-plan", "apply-plan", "delete-plan"])
+		expect([...EDIT_KINDS]).toEqual([
+			"copy-plan",
+			"apply-plan",
+			"delete-plan",
+			"set-household",
+			"remove-household",
+		])
 	})
 
 	test("each Edit is one scenario write, and the schema refuses any other kind", () => {
@@ -15,6 +21,8 @@ describe("the Edit list", () => {
 			{ kind: "copy-plan", from: "base", name: "early" },
 			{ kind: "apply-plan", name: "early", document: {} },
 			{ kind: "delete-plan", name: "early" },
+			{ kind: "set-household", name: "early", household: { schemaVersion: 1 } },
+			{ kind: "remove-household", name: "early" },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
 			expect(writeCommand(edit as Edit, false).argv[0]).toBe("scenario")
@@ -35,6 +43,8 @@ describe("the Edit list", () => {
 			{ kind: "copy-plan", from: "--help", name: "early" },
 			{ kind: "apply-plan", name: "-h", document: {} },
 			{ kind: "delete-plan", name: "--dry-run" },
+			{ kind: "set-household", name: "--file", household: {} },
+			{ kind: "remove-household", name: "--none" },
 			{ kind: "delete-plan", name: "a\nb" },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(false)
@@ -78,6 +88,40 @@ describe("writeCommand", () => {
 			"--dry-run",
 			"--json",
 		])
+	})
+})
+
+describe("the household Edits", () => {
+	const household = { schemaVersion: 1, people: [], anchors: [] }
+
+	test("set-household is scenario household --file -, with the document on stdin, and --dry-run first", () => {
+		const edit: Edit = { kind: "set-household", name: "early", household }
+		expect(writeCommand(edit, false)).toEqual({
+			argv: ["scenario", "household", "early", "--file", "-", "--json"],
+			stdin: JSON.stringify(household),
+		})
+		expect(writeCommand(edit, true)).toEqual({
+			argv: ["scenario", "household", "early", "--file", "-", "--dry-run", "--json"],
+			stdin: JSON.stringify(household),
+		})
+	})
+
+	test("remove-household is scenario household --none, with and without --dry-run", () => {
+		const edit: Edit = { kind: "remove-household", name: "early" }
+		expect(writeCommand(edit, false)).toEqual({
+			argv: ["scenario", "household", "early", "--none", "--json"],
+		})
+		expect(writeCommand(edit, true)).toEqual({
+			argv: ["scenario", "household", "early", "--none", "--dry-run", "--json"],
+		})
+	})
+
+	test("neither changes the list of plans the Snapshot projects", () => {
+		expect(followPlan(["base", "early"], { kind: "remove-household", name: "early" })).toEqual([
+			"base",
+			"early",
+		])
+		expect(followPlan([], { kind: "set-household", name: "early", household })).toEqual([])
 	})
 })
 

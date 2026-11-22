@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { makeTempDir } from "../temp-dir"
 import {
 	configDirectory,
 	DEFAULT_STATE,
@@ -11,7 +11,7 @@ import {
 	writeState,
 } from "./state"
 
-const fresh = (): string => mkdtempSync(join(tmpdir(), "traj-telemetry-state-"))
+const fresh = (): string => makeTempDir("traj-telemetry-state-")
 const ID = "0194b000-0000-7000-8000-00000000000a"
 
 describe("configDirectory", () => {

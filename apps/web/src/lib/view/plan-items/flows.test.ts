@@ -12,6 +12,8 @@ describe("flowCards", () => {
 			frequency: "monthly",
 			start: "2026-11-01",
 			end: "2050-05-14",
+			startAnchor: null,
+			endAnchor: null,
 			growth: "Follows inflation",
 			earned: "Earned",
 			editable: true,
@@ -35,6 +37,19 @@ describe("flowCards", () => {
 		expect(refund?.amount).toBeNull()
 		expect(refund?.growth).toBe("Computed")
 		expect(refund?.editable).toBe(false)
+	})
+})
+
+describe("flowCards with a household", () => {
+	test("labels a pinned date with the person it is pinned to, and leaves the others bare", () => {
+		const household = {
+			schemaVersion: 1 as const,
+			people: [{ id: "me", role: "holder" as const, born: "1990-06", lifeExpectancy: 90 }],
+			anchors: [{ path: "flows.salary.end", person: "me", age: 60 }],
+		}
+		const cards = flowCards(planDocument().flows, "income", household)
+		expect(cards[0]).toMatchObject({ startAnchor: null, endAnchor: "at me, age 60" })
+		expect(cards[1]).toMatchObject({ startAnchor: null, endAnchor: null })
 	})
 })
 

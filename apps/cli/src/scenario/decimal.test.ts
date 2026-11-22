@@ -51,7 +51,11 @@ function valuesAt(value: unknown, segments: readonly string[]): unknown[] {
 describe("the money fields of the decimal form", () => {
 	it("are exactly the fields the published schema marks as minor units", () => {
 		// A new money field fails here until it is reviewed for the decimal form (ADR-0047).
-		expect(moneyPathsOf(PUBLISHED)).toEqual(["flows[].amount", "cashflow.surplus[].upTo"])
+		expect(moneyPathsOf(PUBLISHED)).toEqual([
+			"flows[].amount",
+			"milestones[].criteria[].amount",
+			"cashflow.surplus[].upTo",
+		])
 	})
 
 	for (const path of moneyPathsOf(PUBLISHED)) {

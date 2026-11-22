@@ -69,6 +69,16 @@ export const flowShape: Record<string, unknown> = {
 			...deriveShape,
 			description: `${deriveShape["description"]} Required unless the Flow states \`amount\`, which it replaces along with \`growth\`.`,
 		},
+		startAt: {
+			type: "string",
+			description:
+				"A Milestone's id: the Flow lands only on or after that Milestone's fire date. Recurrence and growth stay anchored on `start`.",
+		},
+		endAt: {
+			type: "string",
+			description:
+				"A Milestone's id: the Flow lands only strictly before that Milestone's fire date. Recurrence and growth stay anchored on `start`.",
+		},
 	},
 	required: ["id", "kind", "frequency", "start"],
 	additionalProperties: false,

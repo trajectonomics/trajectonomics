@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto"
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { makeTempDir } from "./temp-dir"
 
 export const ROOT: string = join(import.meta.dir, "..")
 export const LAUNCHER: string = join(ROOT, "bin", "traj.js")
@@ -13,7 +13,7 @@ const created: string[] = []
 
 /** A temporary directory the caller fills; `cleanup` removes every one. */
 export function tempDir(prefix = "traj-"): string {
-	const dir = mkdtempSync(join(tmpdir(), prefix))
+	const dir = makeTempDir(prefix)
 	created.push(dir)
 	return dir
 }

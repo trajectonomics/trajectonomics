@@ -58,7 +58,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 	if (isAppError(solution)) return solution
 	const result = project(prepared.baseline, prepared.document, prepared.timeline)
 	if (!result.ok) return refusal(result.problems)
-	const { rows, runsOut } = result.projection
+	const { rows, runsOut, milestones } = result.projection
 	const final = rows.at(-1)
 	if (final === undefined) {
 		return fail("internal", { message: "The engine reported a Projection with no rows." })
@@ -68,6 +68,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 		fi: solution,
 		runsOut,
 		rows,
+		milestones,
 		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 		unfunded: result.projection.unfundedContributions,
 		final,
