@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { extent } from "./extent"
 import { nearestIndex } from "./nearest"
 import { toChartNumber } from "./number"
-import { areaPath, linePath } from "./path"
+import { areaPath, bandPath, linePath } from "./path"
 import { linearScale } from "./scale"
 import { shares } from "./shares"
 import { niceTicks } from "./ticks"
@@ -110,5 +110,24 @@ describe("nearestIndex", () => {
 	test("returns the earlier position on a tie, and -1 for no positions", () => {
 		expect(nearestIndex([0, 100], 50)).toBe(0)
 		expect(nearestIndex([], 50)).toBe(-1)
+	})
+})
+
+describe("bandPath", () => {
+	test("closes the upper line back along the lower one, reversed", () => {
+		const upper = [
+			{ x: 0, y: 10 },
+			{ x: 10, y: 20 },
+		]
+		const lower = [
+			{ x: 0, y: 0 },
+			{ x: 10, y: 5 },
+		]
+		expect(bandPath(upper, lower)).toBe("M0 10 L10 20 L10 5 L0 0 Z")
+	})
+
+	test("is empty when either line has no points", () => {
+		expect(bandPath([], [{ x: 0, y: 0 }])).toBe("")
+		expect(bandPath([{ x: 0, y: 0 }], [])).toBe("")
 	})
 })

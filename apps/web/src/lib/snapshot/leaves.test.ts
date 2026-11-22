@@ -15,6 +15,7 @@ describe("the read-leaf allowlist", () => {
 			"projection run",
 			"fi",
 			"projection compare",
+			"projection chance",
 		])
 		for (const write of ["tx add", "account add", "scenario apply", "scenario fork", "init"]) {
 			expect(READ_LEAVES as readonly string[]).not.toContain(write)

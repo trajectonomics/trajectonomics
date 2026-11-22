@@ -12,6 +12,9 @@ const input: PlanInput = {
 	ages: [],
 	monthly: false,
 	carryIn: false,
+	returnModel: null,
+	paths: null,
+	seed: null,
 }
 
 function paramsOf(overrides: Partial<PlanInput>): PlanParams {
@@ -135,6 +138,9 @@ describe("stage two", () => {
 				birthDate: "1990-05-15",
 				ages: [45, 60],
 				carryIn: true,
+				returnModel: null,
+				paths: null,
+				seed: null,
 			}),
 			stageOne("2026-10-31", ["base", "retire-early"]),
 		)

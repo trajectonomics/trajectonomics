@@ -53,7 +53,7 @@
 				"database": {
 					"path": "~/.traj/traj.db",
 					"exists": true,
-					"bytes": 233472,
+					"bytes": 225280,
 					"schemaVersion": 2,
 					"head": 2
 				},
@@ -117,7 +117,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+							"id": "01a2042c-06e8-752d-b993-282c5924c461",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -126,7 +126,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -135,7 +135,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -144,7 +144,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+							"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -153,7 +153,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+							"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -162,7 +162,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
+							"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
 							"name": "Opening"
 						},
 						"type": "equity",
@@ -171,7 +171,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f427-728f-9544-8e210090ff57",
+							"id": "01a2042c-094b-7675-8508-8a64006c4093",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -180,7 +180,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+							"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -189,7 +189,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
+							"id": "01a2042c-09af-77d7-8477-725867cbaae7",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -207,7 +207,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"debit": "662300.00",
@@ -216,7 +216,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"debit": "0.00",
@@ -225,7 +225,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"debit": "736600.00",
@@ -234,7 +234,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+								"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 								"name": "Fund Return"
 							},
 							"debit": "0.00",
@@ -243,7 +243,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+								"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 								"name": "Living"
 							},
 							"debit": "762200.00",
@@ -252,7 +252,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
+								"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
 								"name": "Opening"
 							},
 							"debit": "0.00",
@@ -261,7 +261,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f427-728f-9544-8e210090ff57",
+								"id": "01a2042c-094b-7675-8508-8a64006c4093",
 								"name": "Rent"
 							},
 							"debit": "336000.00",
@@ -270,7 +270,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+								"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 								"name": "Salary"
 							},
 							"debit": "0.00",
@@ -279,7 +279,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
+								"id": "01a2042c-09af-77d7-8477-725867cbaae7",
 								"name": "Travel"
 							},
 							"debit": "78500.00",
@@ -307,7 +307,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+							"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 							"name": "Fund Return"
 						},
 						"type": "income",
@@ -316,7 +316,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+							"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 							"name": "Living"
 						},
 						"type": "expense",
@@ -325,7 +325,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f427-728f-9544-8e210090ff57",
+							"id": "01a2042c-094b-7675-8508-8a64006c4093",
 							"name": "Rent"
 						},
 						"type": "expense",
@@ -334,7 +334,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+							"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 							"name": "Salary"
 						},
 						"type": "income",
@@ -343,7 +343,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
+							"id": "01a2042c-09af-77d7-8477-725867cbaae7",
 							"name": "Travel"
 						},
 						"type": "expense",
@@ -365,7 +365,7 @@
 			"data": {
 				"transactions": [
 					{
-						"id": "01a20290-f72d-756b-8146-ba17832e7928",
+						"id": "01a2042c-0be5-75fd-85bb-0e0621daa364",
 						"date": "2026-08-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -374,7 +374,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f427-728f-9544-8e210090ff57",
+									"id": "01a2042c-094b-7675-8508-8a64006c4093",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -384,7 +384,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -394,7 +394,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-756e-ba06-ee4c074e9174",
+						"id": "01a2042c-0be5-7600-9bad-d44205150970",
 						"date": "2026-08-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -403,7 +403,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 									"name": "Living"
 								},
 								"amount": "30300.00",
@@ -413,7 +413,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-30300.00",
@@ -423,7 +423,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-756c-85f9-78abfdec9729",
+						"id": "01a2042c-0be5-75fe-b15b-bf0170773bf8",
 						"date": "2026-08-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -432,7 +432,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -442,7 +442,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -452,7 +452,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7581-af4a-f02c6b2f43f5",
+						"id": "01a2042c-0be5-7613-ad25-1aeefefea4d4",
 						"date": "2026-08-15",
 						"memo": "new laptop",
 						"linkedTo": null,
@@ -461,7 +461,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 									"name": "Living"
 								},
 								"amount": "58000.00",
@@ -471,7 +471,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-58000.00",
@@ -481,7 +481,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-756f-9831-ef27bca1ed1a",
+						"id": "01a2042c-0be5-7601-8f90-393deb3c2c5a",
 						"date": "2026-08-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -490,7 +490,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -500,7 +500,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -510,7 +510,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-756d-8444-43f9ba02bbdb",
+						"id": "01a2042c-0be5-75ff-bd8a-ee2f9815994e",
 						"date": "2026-08-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -519,7 +519,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -529,7 +529,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -539,7 +539,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7570-95c7-5ed4e81f5e5d",
+						"id": "01a2042c-0be5-7602-8f20-6131873a2c0a",
 						"date": "2026-08-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -548,7 +548,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "9500.00",
@@ -558,7 +558,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 									"name": "Fund Return"
 								},
 								"amount": "-9500.00",
@@ -568,7 +568,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7571-bd84-c05b143c79ca",
+						"id": "01a2042c-0be5-7603-a2b3-f795132fd7f5",
 						"date": "2026-09-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -577,7 +577,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f427-728f-9544-8e210090ff57",
+									"id": "01a2042c-094b-7675-8508-8a64006c4093",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -587,7 +587,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -597,7 +597,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7574-bdbe-204798b22959",
+						"id": "01a2042c-0be5-7606-ad28-3437507aecce",
 						"date": "2026-09-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -606,7 +606,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 									"name": "Living"
 								},
 								"amount": "26900.00",
@@ -616,7 +616,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-26900.00",
@@ -626,7 +626,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7572-a08e-e133adf758f6",
+						"id": "01a2042c-0be5-7604-b1d5-4cd3391016b1",
 						"date": "2026-09-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -635,7 +635,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -645,7 +645,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -655,7 +655,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7575-b709-c35ee177790f",
+						"id": "01a2042c-0be5-7607-a246-3abe6ba839bb",
 						"date": "2026-09-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -664,7 +664,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -674,7 +674,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -684,7 +684,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7573-bca9-1737fe87e688",
+						"id": "01a2042c-0be5-7605-8bb0-c5e8c7d47eb9",
 						"date": "2026-09-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -693,7 +693,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -703,7 +703,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -713,7 +713,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7576-8360-0d0b99ccc0cf",
+						"id": "01a2042c-0be5-7608-be08-bf94a08161da",
 						"date": "2026-09-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -722,7 +722,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 									"name": "Fund Return"
 								},
 								"amount": "12600.00",
@@ -732,7 +732,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "-12600.00",
@@ -742,7 +742,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7577-be96-721981428869",
+						"id": "01a2042c-0be5-7609-9949-ddba718c9c4c",
 						"date": "2026-10-01",
 						"memo": "rent",
 						"linkedTo": null,
@@ -751,7 +751,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f427-728f-9544-8e210090ff57",
+									"id": "01a2042c-094b-7675-8508-8a64006c4093",
 									"name": "Rent"
 								},
 								"amount": "14000.00",
@@ -761,7 +761,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-14000.00",
@@ -771,7 +771,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-757a-b75d-ad44e88e4ee6",
+						"id": "01a2042c-0be5-760c-88af-6a92e42a0ade",
 						"date": "2026-10-05",
 						"memo": "living",
 						"linkedTo": null,
@@ -780,7 +780,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+									"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 									"name": "Living"
 								},
 								"amount": "28800.00",
@@ -790,7 +790,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-28800.00",
@@ -800,7 +800,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7578-b222-395b8b13c577",
+						"id": "01a2042c-0be5-760a-aa6d-93ce34716483",
 						"date": "2026-10-10",
 						"memo": "car loan",
 						"linkedTo": null,
@@ -809,7 +809,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+									"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 									"name": "Car Loan"
 								},
 								"amount": "9000.00",
@@ -819,7 +819,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-9000.00",
@@ -829,7 +829,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-757b-8a40-1390d0a792c5",
+						"id": "01a2042c-0be5-760d-ba95-a63e549d0e65",
 						"date": "2026-10-25",
 						"memo": "salary",
 						"linkedTo": null,
@@ -838,7 +838,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "90000.00",
@@ -848,7 +848,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+									"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 									"name": "Salary"
 								},
 								"amount": "-90000.00",
@@ -858,7 +858,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-7579-b9ab-351b853dd1f6",
+						"id": "01a2042c-0be5-760b-a81c-c0bd2729c08f",
 						"date": "2026-10-26",
 						"memo": "fund",
 						"linkedTo": null,
@@ -867,7 +867,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "15000.00",
@@ -877,7 +877,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+									"id": "01a2042c-06e8-752d-b993-282c5924c461",
 									"name": "Bank"
 								},
 								"amount": "-15000.00",
@@ -887,7 +887,7 @@
 						]
 					},
 					{
-						"id": "01a20290-f72d-757c-8b08-d88b7db1bfcb",
+						"id": "01a2042c-0be5-760e-9ee0-caf921c6aa4f",
 						"date": "2026-10-28",
 						"memo": "market move",
 						"linkedTo": null,
@@ -896,7 +896,7 @@
 							{
 								"ordinal": 0,
 								"account": {
-									"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+									"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 									"name": "Fund"
 								},
 								"amount": "7300.00",
@@ -906,7 +906,7 @@
 							{
 								"ordinal": 1,
 								"account": {
-									"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+									"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 									"name": "Fund Return"
 								},
 								"amount": "-7300.00",
@@ -927,7 +927,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+							"id": "01a2042c-06e8-752d-b993-282c5924c461",
 							"name": "Bank"
 						},
 						"kind": "asset",
@@ -935,7 +935,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 							"name": "Fund"
 						},
 						"kind": "asset",
@@ -943,7 +943,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 							"name": "Car Loan"
 						},
 						"kind": "liability",
@@ -963,7 +963,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -972,7 +972,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -981,7 +981,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1007,7 +1007,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1016,7 +1016,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1025,7 +1025,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1051,7 +1051,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1060,7 +1060,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1069,7 +1069,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1095,7 +1095,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1104,7 +1104,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1113,7 +1113,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1139,7 +1139,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1148,7 +1148,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1157,7 +1157,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1183,7 +1183,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1192,7 +1192,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1201,7 +1201,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1227,7 +1227,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1236,7 +1236,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1245,7 +1245,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1271,7 +1271,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1280,7 +1280,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1289,7 +1289,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1315,7 +1315,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1324,7 +1324,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1333,7 +1333,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1359,7 +1359,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1368,7 +1368,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1377,7 +1377,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1403,7 +1403,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1412,7 +1412,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1421,7 +1421,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1447,7 +1447,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1456,7 +1456,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1465,7 +1465,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1491,7 +1491,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1500,7 +1500,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1509,7 +1509,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1535,7 +1535,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1544,7 +1544,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1553,7 +1553,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1579,7 +1579,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1588,7 +1588,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1597,7 +1597,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1623,7 +1623,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1632,7 +1632,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1641,7 +1641,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1667,7 +1667,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1676,7 +1676,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1685,7 +1685,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1711,7 +1711,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1720,7 +1720,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1729,7 +1729,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1755,7 +1755,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1764,7 +1764,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1773,7 +1773,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1799,7 +1799,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1808,7 +1808,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1817,7 +1817,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1843,7 +1843,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1852,7 +1852,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1861,7 +1861,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1887,7 +1887,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1896,7 +1896,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1905,7 +1905,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1931,7 +1931,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1940,7 +1940,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1949,7 +1949,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -1975,7 +1975,7 @@
 					"rows": [
 						{
 							"account": {
-								"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+								"id": "01a2042c-06e8-752d-b993-282c5924c461",
 								"name": "Bank"
 							},
 							"type": "asset",
@@ -1984,7 +1984,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+								"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 								"name": "Car Loan"
 							},
 							"type": "liability",
@@ -1993,7 +1993,7 @@
 						},
 						{
 							"account": {
-								"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+								"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 								"name": "Fund"
 							},
 							"type": "asset",
@@ -2032,10 +2032,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
+						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
 						"name": "base",
-						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
-						"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
+						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
+						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -3284,10 +3284,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
+						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
-						"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
+						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
+						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -4403,10 +4403,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
+						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
 						"name": "base",
-						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
-						"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
+						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
+						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5040,10 +5040,10 @@
 						"version": "0.0.0"
 					},
 					"scenario": {
-						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
+						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
-						"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
+						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
+						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
 					},
 					"overrides": [],
 					"tax": "applied",
@@ -5639,10 +5639,10 @@
 				"sides": {
 					"a": {
 						"scenario": {
-							"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
+							"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
 							"name": "base",
-							"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
-							"effectiveContentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9"
+							"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
+							"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6269,10 +6269,10 @@
 					},
 					"b": {
 						"scenario": {
-							"id": "01a20290-f969-76b8-9978-424b7ffdc761",
+							"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
 							"name": "retire-early",
-							"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
-							"effectiveContentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500"
+							"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
+							"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
 						},
 						"overrides": [],
 						"carryIn": [
@@ -6875,109 +6875,2825 @@
 				]
 			}
 		},
+		"chance": {
+			"base": {
+				"argv": [
+					"projection",
+					"chance",
+					"--scenario=base",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--return-model=~/.traj/return-model.json",
+					"--paths=200",
+					"--seed=0123456789abcdef",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
+						"name": "base",
+						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
+						"effectiveContentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"The plan holds to 2060-12-31 on 200 of 200 seeded Market paths: a success share of 100.00%.",
+						"The chance is over the return model \"illustrative-demo-model\" with seed 0123456789abcdef, and every figure is nominal."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"definition": {
+						"modelId": "illustrative-demo-model",
+						"seed": "0123456789abcdef",
+						"paths": 200
+					},
+					"paths": 200,
+					"succeeded": 200,
+					"successBps": 10000,
+					"bands": [
+						{
+							"index": 0,
+							"to": "2027-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "1713817.96"
+								},
+								{
+									"level": 25,
+									"value": "1736883.31"
+								},
+								{
+									"level": 50,
+									"value": "1762578.88"
+								},
+								{
+									"level": 75,
+									"value": "1787538.70"
+								},
+								{
+									"level": 90,
+									"value": "1812035.81"
+								}
+							]
+						},
+						{
+							"index": 1,
+							"to": "2028-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "2251657.67"
+								},
+								{
+									"level": 25,
+									"value": "2285658.26"
+								},
+								{
+									"level": 50,
+									"value": "2325536.83"
+								},
+								{
+									"level": 75,
+									"value": "2362319.13"
+								},
+								{
+									"level": 90,
+									"value": "2398101.03"
+								}
+							]
+						},
+						{
+							"index": 2,
+							"to": "2029-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "2797538.63"
+								},
+								{
+									"level": 25,
+									"value": "2864424.06"
+								},
+								{
+									"level": 50,
+									"value": "2913066.32"
+								},
+								{
+									"level": 75,
+									"value": "2977921.40"
+								},
+								{
+									"level": 90,
+									"value": "3035272.25"
+								}
+							]
+						},
+						{
+							"index": 3,
+							"to": "2030-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "3405940.19"
+								},
+								{
+									"level": 25,
+									"value": "3473739.83"
+								},
+								{
+									"level": 50,
+									"value": "3538710.08"
+								},
+								{
+									"level": 75,
+									"value": "3623547.61"
+								},
+								{
+									"level": 90,
+									"value": "3683896.82"
+								}
+							]
+						},
+						{
+							"index": 4,
+							"to": "2031-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "4012679.74"
+								},
+								{
+									"level": 25,
+									"value": "4116329.74"
+								},
+								{
+									"level": 50,
+									"value": "4206098.91"
+								},
+								{
+									"level": 75,
+									"value": "4278127.90"
+								},
+								{
+									"level": 90,
+									"value": "4376497.14"
+								}
+							]
+						},
+						{
+							"index": 5,
+							"to": "2032-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "4636412.62"
+								},
+								{
+									"level": 25,
+									"value": "4777397.55"
+								},
+								{
+									"level": 50,
+									"value": "4905477.94"
+								},
+								{
+									"level": 75,
+									"value": "5002109.06"
+								},
+								{
+									"level": 90,
+									"value": "5082152.57"
+								}
+							]
+						},
+						{
+							"index": 6,
+							"to": "2033-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "5325045.58"
+								},
+								{
+									"level": 25,
+									"value": "5498139.03"
+								},
+								{
+									"level": 50,
+									"value": "5634288.97"
+								},
+								{
+									"level": 75,
+									"value": "5747552.42"
+								},
+								{
+									"level": 90,
+									"value": "5903800.48"
+								}
+							]
+						},
+						{
+							"index": 7,
+							"to": "2034-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "6026514.72"
+								},
+								{
+									"level": 25,
+									"value": "6177097.13"
+								},
+								{
+									"level": 50,
+									"value": "6387485.91"
+								},
+								{
+									"level": 75,
+									"value": "6553065.35"
+								},
+								{
+									"level": 90,
+									"value": "6762314.17"
+								}
+							]
+						},
+						{
+							"index": 8,
+							"to": "2035-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "6798319.61"
+								},
+								{
+									"level": 25,
+									"value": "6989676.64"
+								},
+								{
+									"level": 50,
+									"value": "7202793.84"
+								},
+								{
+									"level": 75,
+									"value": "7454120.72"
+								},
+								{
+									"level": 90,
+									"value": "7686084.59"
+								}
+							]
+						},
+						{
+							"index": 9,
+							"to": "2036-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "7520515.70"
+								},
+								{
+									"level": 25,
+									"value": "7784203.72"
+								},
+								{
+									"level": 50,
+									"value": "8056167.49"
+								},
+								{
+									"level": 75,
+									"value": "8297144.95"
+								},
+								{
+									"level": 90,
+									"value": "8537201.17"
+								}
+							]
+						},
+						{
+							"index": 10,
+							"to": "2037-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "8287734.72"
+								},
+								{
+									"level": 25,
+									"value": "8602618.16"
+								},
+								{
+									"level": 50,
+									"value": "8957780.06"
+								},
+								{
+									"level": 75,
+									"value": "9253476.09"
+								},
+								{
+									"level": 90,
+									"value": "9518828.82"
+								}
+							]
+						},
+						{
+							"index": 11,
+							"to": "2038-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9132158.39"
+								},
+								{
+									"level": 25,
+									"value": "9462535.73"
+								},
+								{
+									"level": 50,
+									"value": "9910160.91"
+								},
+								{
+									"level": 75,
+									"value": "10262393.79"
+								},
+								{
+									"level": 90,
+									"value": "10449642.99"
+								}
+							]
+						},
+						{
+							"index": 12,
+							"to": "2039-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9947579.79"
+								},
+								{
+									"level": 25,
+									"value": "10376429.16"
+								},
+								{
+									"level": 50,
+									"value": "10888304.97"
+								},
+								{
+									"level": 75,
+									"value": "11288051.51"
+								},
+								{
+									"level": 90,
+									"value": "11564825.84"
+								}
+							]
+						},
+						{
+							"index": 13,
+							"to": "2040-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "10872141.18"
+								},
+								{
+									"level": 25,
+									"value": "11387500.22"
+								},
+								{
+									"level": 50,
+									"value": "11899398.51"
+								},
+								{
+									"level": 75,
+									"value": "12461999.55"
+								},
+								{
+									"level": 90,
+									"value": "12793259.50"
+								}
+							]
+						},
+						{
+							"index": 14,
+							"to": "2041-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "11942257.61"
+								},
+								{
+									"level": 25,
+									"value": "12383448.24"
+								},
+								{
+									"level": 50,
+									"value": "12971504.62"
+								},
+								{
+									"level": 75,
+									"value": "13542317.41"
+								},
+								{
+									"level": 90,
+									"value": "14035126.39"
+								}
+							]
+						},
+						{
+							"index": 15,
+							"to": "2042-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "12922886.93"
+								},
+								{
+									"level": 25,
+									"value": "13571293.53"
+								},
+								{
+									"level": 50,
+									"value": "14169631.92"
+								},
+								{
+									"level": 75,
+									"value": "14757100.59"
+								},
+								{
+									"level": 90,
+									"value": "15327018.52"
+								}
+							]
+						},
+						{
+							"index": 16,
+							"to": "2043-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "14076948.68"
+								},
+								{
+									"level": 25,
+									"value": "14823429.25"
+								},
+								{
+									"level": 50,
+									"value": "15447317.94"
+								},
+								{
+									"level": 75,
+									"value": "16095046.95"
+								},
+								{
+									"level": 90,
+									"value": "16726527.02"
+								}
+							]
+						},
+						{
+							"index": 17,
+							"to": "2044-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "15327516.65"
+								},
+								{
+									"level": 25,
+									"value": "16058361.77"
+								},
+								{
+									"level": 50,
+									"value": "16756142.36"
+								},
+								{
+									"level": 75,
+									"value": "17395302.28"
+								},
+								{
+									"level": 90,
+									"value": "18447854.07"
+								}
+							]
+						},
+						{
+							"index": 18,
+							"to": "2045-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "16538566.81"
+								},
+								{
+									"level": 25,
+									"value": "17296405.40"
+								},
+								{
+									"level": 50,
+									"value": "18083400.44"
+								},
+								{
+									"level": 75,
+									"value": "19087804.78"
+								},
+								{
+									"level": 90,
+									"value": "20049549.32"
+								}
+							]
+						},
+						{
+							"index": 19,
+							"to": "2046-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "17852714.00"
+								},
+								{
+									"level": 25,
+									"value": "18662180.41"
+								},
+								{
+									"level": 50,
+									"value": "19541595.16"
+								},
+								{
+									"level": 75,
+									"value": "20596605.65"
+								},
+								{
+									"level": 90,
+									"value": "21559159.47"
+								}
+							]
+						},
+						{
+							"index": 20,
+							"to": "2047-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "19099533.68"
+								},
+								{
+									"level": 25,
+									"value": "20028532.42"
+								},
+								{
+									"level": 50,
+									"value": "21061904.78"
+								},
+								{
+									"level": 75,
+									"value": "22190890.98"
+								},
+								{
+									"level": 90,
+									"value": "23550144.74"
+								}
+							]
+						},
+						{
+							"index": 21,
+							"to": "2048-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "20510087.96"
+								},
+								{
+									"level": 25,
+									"value": "21403152.26"
+								},
+								{
+									"level": 50,
+									"value": "22506142.23"
+								},
+								{
+									"level": 75,
+									"value": "23941043.00"
+								},
+								{
+									"level": 90,
+									"value": "25388412.49"
+								}
+							]
+						},
+						{
+							"index": 22,
+							"to": "2049-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21906978.81"
+								},
+								{
+									"level": 25,
+									"value": "23025964.43"
+								},
+								{
+									"level": 50,
+									"value": "24482924.24"
+								},
+								{
+									"level": 75,
+									"value": "25856844.51"
+								},
+								{
+									"level": 90,
+									"value": "27522364.25"
+								}
+							]
+						},
+						{
+							"index": 23,
+							"to": "2050-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22857796.54"
+								},
+								{
+									"level": 25,
+									"value": "23692734.43"
+								},
+								{
+									"level": 50,
+									"value": "25379661.00"
+								},
+								{
+									"level": 75,
+									"value": "27022468.28"
+								},
+								{
+									"level": 90,
+									"value": "28874295.16"
+								}
+							]
+						},
+						{
+							"index": 24,
+							"to": "2051-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22515415.71"
+								},
+								{
+									"level": 25,
+									"value": "23692697.60"
+								},
+								{
+									"level": 50,
+									"value": "25461661.78"
+								},
+								{
+									"level": 75,
+									"value": "26984726.53"
+								},
+								{
+									"level": 90,
+									"value": "28767131.66"
+								}
+							]
+						},
+						{
+							"index": 25,
+							"to": "2052-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22360923.46"
+								},
+								{
+									"level": 25,
+									"value": "23477116.23"
+								},
+								{
+									"level": 50,
+									"value": "25557761.56"
+								},
+								{
+									"level": 75,
+									"value": "27465264.37"
+								},
+								{
+									"level": 90,
+									"value": "29295063.45"
+								}
+							]
+						},
+						{
+							"index": 26,
+							"to": "2053-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22281925.56"
+								},
+								{
+									"level": 25,
+									"value": "23658648.44"
+								},
+								{
+									"level": 50,
+									"value": "25818582.22"
+								},
+								{
+									"level": 75,
+									"value": "27983234.68"
+								},
+								{
+									"level": 90,
+									"value": "29862619.45"
+								}
+							]
+						},
+						{
+							"index": 27,
+							"to": "2054-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22044276.52"
+								},
+								{
+									"level": 25,
+									"value": "23649323.35"
+								},
+								{
+									"level": 50,
+									"value": "26089156.80"
+								},
+								{
+									"level": 75,
+									"value": "28120200.29"
+								},
+								{
+									"level": 90,
+									"value": "30297517.09"
+								}
+							]
+						},
+						{
+							"index": 28,
+							"to": "2055-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21956291.83"
+								},
+								{
+									"level": 25,
+									"value": "23826227.38"
+								},
+								{
+									"level": 50,
+									"value": "26356534.46"
+								},
+								{
+									"level": 75,
+									"value": "28508652.70"
+								},
+								{
+									"level": 90,
+									"value": "30659880.45"
+								}
+							]
+						},
+						{
+							"index": 29,
+							"to": "2056-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21551976.04"
+								},
+								{
+									"level": 25,
+									"value": "24018394.08"
+								},
+								{
+									"level": 50,
+									"value": "26328375.71"
+								},
+								{
+									"level": 75,
+									"value": "29020039.77"
+								},
+								{
+									"level": 90,
+									"value": "31619584.30"
+								}
+							]
+						},
+						{
+							"index": 30,
+							"to": "2057-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22000615.95"
+								},
+								{
+									"level": 25,
+									"value": "23925740.83"
+								},
+								{
+									"level": 50,
+									"value": "26574893.93"
+								},
+								{
+									"level": 75,
+									"value": "29976517.72"
+								},
+								{
+									"level": 90,
+									"value": "32086335.40"
+								}
+							]
+						},
+						{
+							"index": 31,
+							"to": "2058-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21765459.47"
+								},
+								{
+									"level": 25,
+									"value": "23893393.30"
+								},
+								{
+									"level": 50,
+									"value": "27212731.29"
+								},
+								{
+									"level": 75,
+									"value": "30269766.62"
+								},
+								{
+									"level": 90,
+									"value": "33466109.87"
+								}
+							]
+						},
+						{
+							"index": 32,
+							"to": "2059-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21648947.20"
+								},
+								{
+									"level": 25,
+									"value": "24465093.23"
+								},
+								{
+									"level": 50,
+									"value": "27389762.50"
+								},
+								{
+									"level": 75,
+									"value": "30651601.53"
+								},
+								{
+									"level": 90,
+									"value": "34569760.10"
+								}
+							]
+						},
+						{
+							"index": 33,
+							"to": "2060-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "22181625.51"
+								},
+								{
+									"level": 25,
+									"value": "24450065.45"
+								},
+								{
+									"level": 50,
+									"value": "27946973.48"
+								},
+								{
+									"level": 75,
+									"value": "31995923.44"
+								},
+								{
+									"level": 90,
+									"value": "35086137.10"
+								}
+							]
+						},
+						{
+							"index": 34,
+							"to": "2060-12-31",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "21944106.46"
+								},
+								{
+									"level": 25,
+									"value": "24571556.24"
+								},
+								{
+									"level": 50,
+									"value": "27952296.40"
+								},
+								{
+									"level": 75,
+									"value": "31757298.65"
+								},
+								{
+									"level": 90,
+									"value": "35654188.63"
+								}
+							]
+						}
+					],
+					"runsOut": [
+						{
+							"index": 0,
+							"to": "2027-10-30",
+							"paths": 0
+						},
+						{
+							"index": 1,
+							"to": "2028-10-30",
+							"paths": 0
+						},
+						{
+							"index": 2,
+							"to": "2029-10-30",
+							"paths": 0
+						},
+						{
+							"index": 3,
+							"to": "2030-10-30",
+							"paths": 0
+						},
+						{
+							"index": 4,
+							"to": "2031-10-30",
+							"paths": 0
+						},
+						{
+							"index": 5,
+							"to": "2032-10-30",
+							"paths": 0
+						},
+						{
+							"index": 6,
+							"to": "2033-10-30",
+							"paths": 0
+						},
+						{
+							"index": 7,
+							"to": "2034-10-30",
+							"paths": 0
+						},
+						{
+							"index": 8,
+							"to": "2035-10-30",
+							"paths": 0
+						},
+						{
+							"index": 9,
+							"to": "2036-10-30",
+							"paths": 0
+						},
+						{
+							"index": 10,
+							"to": "2037-10-30",
+							"paths": 0
+						},
+						{
+							"index": 11,
+							"to": "2038-10-30",
+							"paths": 0
+						},
+						{
+							"index": 12,
+							"to": "2039-10-30",
+							"paths": 0
+						},
+						{
+							"index": 13,
+							"to": "2040-10-30",
+							"paths": 0
+						},
+						{
+							"index": 14,
+							"to": "2041-10-30",
+							"paths": 0
+						},
+						{
+							"index": 15,
+							"to": "2042-10-30",
+							"paths": 0
+						},
+						{
+							"index": 16,
+							"to": "2043-10-30",
+							"paths": 0
+						},
+						{
+							"index": 17,
+							"to": "2044-10-30",
+							"paths": 0
+						},
+						{
+							"index": 18,
+							"to": "2045-10-30",
+							"paths": 0
+						},
+						{
+							"index": 19,
+							"to": "2046-10-30",
+							"paths": 0
+						},
+						{
+							"index": 20,
+							"to": "2047-10-30",
+							"paths": 0
+						},
+						{
+							"index": 21,
+							"to": "2048-10-30",
+							"paths": 0
+						},
+						{
+							"index": 22,
+							"to": "2049-10-30",
+							"paths": 0
+						},
+						{
+							"index": 23,
+							"to": "2050-10-30",
+							"paths": 0
+						},
+						{
+							"index": 24,
+							"to": "2051-10-30",
+							"paths": 0
+						},
+						{
+							"index": 25,
+							"to": "2052-10-30",
+							"paths": 0
+						},
+						{
+							"index": 26,
+							"to": "2053-10-30",
+							"paths": 0
+						},
+						{
+							"index": 27,
+							"to": "2054-10-30",
+							"paths": 0
+						},
+						{
+							"index": 28,
+							"to": "2055-10-30",
+							"paths": 0
+						},
+						{
+							"index": 29,
+							"to": "2056-10-30",
+							"paths": 0
+						},
+						{
+							"index": 30,
+							"to": "2057-10-30",
+							"paths": 0
+						},
+						{
+							"index": 31,
+							"to": "2058-10-30",
+							"paths": 0
+						},
+						{
+							"index": 32,
+							"to": "2059-10-30",
+							"paths": 0
+						},
+						{
+							"index": 33,
+							"to": "2060-10-30",
+							"paths": 0
+						},
+						{
+							"index": 34,
+							"to": "2060-12-31",
+							"paths": 0
+						}
+					],
+					"tables": [
+						{
+							"name": "bands",
+							"count": 8,
+							"rows": [
+								{
+									"index": 0,
+									"to": "2027-10-30",
+									"p10": "1713817.96",
+									"p50": "1762578.88",
+									"p90": "1812035.81"
+								},
+								{
+									"index": 4,
+									"to": "2031-10-30",
+									"p10": "4012679.74",
+									"p50": "4206098.91",
+									"p90": "4376497.14"
+								},
+								{
+									"index": 9,
+									"to": "2036-10-30",
+									"p10": "7520515.70",
+									"p50": "8056167.49",
+									"p90": "8537201.17"
+								},
+								{
+									"index": 14,
+									"to": "2041-10-30",
+									"p10": "11942257.61",
+									"p50": "12971504.62",
+									"p90": "14035126.39"
+								},
+								{
+									"index": 19,
+									"to": "2046-10-30",
+									"p10": "17852714.00",
+									"p50": "19541595.16",
+									"p90": "21559159.47"
+								},
+								{
+									"index": 24,
+									"to": "2051-10-30",
+									"p10": "22515415.71",
+									"p50": "25461661.78",
+									"p90": "28767131.66"
+								},
+								{
+									"index": 29,
+									"to": "2056-10-30",
+									"p10": "21551976.04",
+									"p50": "26328375.71",
+									"p90": "31619584.30"
+								},
+								{
+									"index": 34,
+									"to": "2060-12-31",
+									"p10": "21944106.46",
+									"p50": "27952296.40",
+									"p90": "35654188.63"
+								}
+							]
+						}
+					]
+				}
+			},
+			"retire-early": {
+				"argv": [
+					"projection",
+					"chance",
+					"--scenario=retire-early",
+					"--as-of",
+					"2026-10-31",
+					"--horizon",
+					"2060-12-31",
+					"--carry-in",
+					"-",
+					"--return-model=~/.traj/return-model.json",
+					"--paths=200",
+					"--seed=0123456789abcdef",
+					"--json"
+				],
+				"ok": true,
+				"data": {
+					"asOf": "2026-10-31",
+					"engine": {
+						"package": "@trajectonomics/cli",
+						"version": "0.0.0"
+					},
+					"scenario": {
+						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
+						"name": "retire-early",
+						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
+						"effectiveContentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb"
+					},
+					"overrides": [],
+					"tax": "applied",
+					"carryIn": [
+						{
+							"levy": "th-2026-pit",
+							"periodStart": "2026-01-01",
+							"tallies": [
+								{
+									"label": "income.section40_1",
+									"basis": "gross",
+									"amount": "850000.00"
+								},
+								{
+									"label": "income.section40_2",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_3",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.interest",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.dividends",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_4.digitalAssets",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.building",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.agriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.nonAgriculturalLand",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.vehicles",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_5.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.medical",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.law",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.engineering",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.architecture",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.accounting",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.fineArts",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_6.other",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_7",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.general",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "income.section40_8.entertainer",
+									"basis": "gross",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.rmf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.ssf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pvd",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.gpf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.nsf",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.retirement.pension_life",
+									"basis": "funded",
+									"amount": "0.00"
+								},
+								{
+									"label": "allowance.thai_esg",
+									"basis": "funded",
+									"amount": "0.00"
+								}
+							],
+							"prepaid": "0.00",
+							"source": "flag"
+						}
+					],
+					"notes": [
+						"Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy \"th-2026-pit\".",
+						"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+						"The plan holds to 2060-12-31 on 55 of 200 seeded Market paths: a success share of 27.50%.",
+						"The chance is over the return model \"illustrative-demo-model\" with seed 0123456789abcdef, and every figure is nominal."
+					],
+					"horizon": "2060-12-31",
+					"currency": "THB",
+					"definition": {
+						"modelId": "illustrative-demo-model",
+						"seed": "0123456789abcdef",
+						"paths": 200
+					},
+					"paths": 200,
+					"succeeded": 55,
+					"successBps": 2750,
+					"bands": [
+						{
+							"index": 0,
+							"to": "2027-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "1713817.96"
+								},
+								{
+									"level": 25,
+									"value": "1736883.31"
+								},
+								{
+									"level": 50,
+									"value": "1762578.88"
+								},
+								{
+									"level": 75,
+									"value": "1787538.70"
+								},
+								{
+									"level": 90,
+									"value": "1812035.81"
+								}
+							]
+						},
+						{
+							"index": 1,
+							"to": "2028-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "2251657.67"
+								},
+								{
+									"level": 25,
+									"value": "2285658.26"
+								},
+								{
+									"level": 50,
+									"value": "2325536.83"
+								},
+								{
+									"level": 75,
+									"value": "2362319.13"
+								},
+								{
+									"level": 90,
+									"value": "2398101.03"
+								}
+							]
+						},
+						{
+							"index": 2,
+							"to": "2029-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "2797538.63"
+								},
+								{
+									"level": 25,
+									"value": "2864424.06"
+								},
+								{
+									"level": 50,
+									"value": "2913066.32"
+								},
+								{
+									"level": 75,
+									"value": "2977921.40"
+								},
+								{
+									"level": 90,
+									"value": "3035272.25"
+								}
+							]
+						},
+						{
+							"index": 3,
+							"to": "2030-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "3405940.19"
+								},
+								{
+									"level": 25,
+									"value": "3473739.83"
+								},
+								{
+									"level": 50,
+									"value": "3538710.08"
+								},
+								{
+									"level": 75,
+									"value": "3623547.61"
+								},
+								{
+									"level": 90,
+									"value": "3683896.82"
+								}
+							]
+						},
+						{
+							"index": 4,
+							"to": "2031-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "4012679.74"
+								},
+								{
+									"level": 25,
+									"value": "4116329.74"
+								},
+								{
+									"level": 50,
+									"value": "4206098.91"
+								},
+								{
+									"level": 75,
+									"value": "4278127.90"
+								},
+								{
+									"level": 90,
+									"value": "4376497.14"
+								}
+							]
+						},
+						{
+							"index": 5,
+							"to": "2032-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "4636412.62"
+								},
+								{
+									"level": 25,
+									"value": "4777397.55"
+								},
+								{
+									"level": 50,
+									"value": "4905477.94"
+								},
+								{
+									"level": 75,
+									"value": "5002109.06"
+								},
+								{
+									"level": 90,
+									"value": "5082152.57"
+								}
+							]
+						},
+						{
+							"index": 6,
+							"to": "2033-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "5325045.58"
+								},
+								{
+									"level": 25,
+									"value": "5498139.03"
+								},
+								{
+									"level": 50,
+									"value": "5634288.97"
+								},
+								{
+									"level": 75,
+									"value": "5747552.42"
+								},
+								{
+									"level": 90,
+									"value": "5903800.48"
+								}
+							]
+						},
+						{
+							"index": 7,
+							"to": "2034-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "6026514.72"
+								},
+								{
+									"level": 25,
+									"value": "6177097.13"
+								},
+								{
+									"level": 50,
+									"value": "6387485.91"
+								},
+								{
+									"level": 75,
+									"value": "6553065.35"
+								},
+								{
+									"level": 90,
+									"value": "6762314.17"
+								}
+							]
+						},
+						{
+							"index": 8,
+							"to": "2035-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "6798319.61"
+								},
+								{
+									"level": 25,
+									"value": "6989676.64"
+								},
+								{
+									"level": 50,
+									"value": "7202793.84"
+								},
+								{
+									"level": 75,
+									"value": "7454120.72"
+								},
+								{
+									"level": 90,
+									"value": "7686084.59"
+								}
+							]
+						},
+						{
+							"index": 9,
+							"to": "2036-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "7520515.70"
+								},
+								{
+									"level": 25,
+									"value": "7784203.72"
+								},
+								{
+									"level": 50,
+									"value": "8056167.49"
+								},
+								{
+									"level": 75,
+									"value": "8297144.95"
+								},
+								{
+									"level": 90,
+									"value": "8537201.17"
+								}
+							]
+						},
+						{
+							"index": 10,
+							"to": "2037-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "8287734.72"
+								},
+								{
+									"level": 25,
+									"value": "8602618.16"
+								},
+								{
+									"level": 50,
+									"value": "8957780.06"
+								},
+								{
+									"level": 75,
+									"value": "9253476.09"
+								},
+								{
+									"level": 90,
+									"value": "9518828.82"
+								}
+							]
+						},
+						{
+							"index": 11,
+							"to": "2038-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9132158.39"
+								},
+								{
+									"level": 25,
+									"value": "9462535.73"
+								},
+								{
+									"level": 50,
+									"value": "9910160.91"
+								},
+								{
+									"level": 75,
+									"value": "10262393.79"
+								},
+								{
+									"level": 90,
+									"value": "10449642.99"
+								}
+							]
+						},
+						{
+							"index": 12,
+							"to": "2039-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9947579.79"
+								},
+								{
+									"level": 25,
+									"value": "10376429.16"
+								},
+								{
+									"level": 50,
+									"value": "10888304.97"
+								},
+								{
+									"level": 75,
+									"value": "11288051.51"
+								},
+								{
+									"level": 90,
+									"value": "11564825.84"
+								}
+							]
+						},
+						{
+							"index": 13,
+							"to": "2040-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "10215819.56"
+								},
+								{
+									"level": 25,
+									"value": "10723373.71"
+								},
+								{
+									"level": 50,
+									"value": "11236445.95"
+								},
+								{
+									"level": 75,
+									"value": "11797228.09"
+								},
+								{
+									"level": 90,
+									"value": "12127508.19"
+								}
+							]
+						},
+						{
+							"index": 14,
+							"to": "2041-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9822392.57"
+								},
+								{
+									"level": 25,
+									"value": "10254899.33"
+								},
+								{
+									"level": 50,
+									"value": "10875589.70"
+								},
+								{
+									"level": 75,
+									"value": "11441676.42"
+								},
+								{
+									"level": 90,
+									"value": "11891719.50"
+								}
+							]
+						},
+						{
+							"index": 15,
+							"to": "2042-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "9369453.83"
+								},
+								{
+									"level": 25,
+									"value": "9942503.38"
+								},
+								{
+									"level": 50,
+									"value": "10578391.55"
+								},
+								{
+									"level": 75,
+									"value": "11128003.90"
+								},
+								{
+									"level": 90,
+									"value": "11702419.84"
+								}
+							]
+						},
+						{
+							"index": 16,
+							"to": "2043-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "8907368.58"
+								},
+								{
+									"level": 25,
+									"value": "9646397.66"
+								},
+								{
+									"level": 50,
+									"value": "10226163.48"
+								},
+								{
+									"level": 75,
+									"value": "10885320.54"
+								},
+								{
+									"level": 90,
+									"value": "11515371.72"
+								}
+							]
+						},
+						{
+							"index": 17,
+							"to": "2044-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "8523354.05"
+								},
+								{
+									"level": 25,
+									"value": "9336769.03"
+								},
+								{
+									"level": 50,
+									"value": "9941579.04"
+								},
+								{
+									"level": 75,
+									"value": "10599419.18"
+								},
+								{
+									"level": 90,
+									"value": "11508725.28"
+								}
+							]
+						},
+						{
+							"index": 18,
+							"to": "2045-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "8043717.34"
+								},
+								{
+									"level": 25,
+									"value": "8880853.27"
+								},
+								{
+									"level": 50,
+									"value": "9603390.90"
+								},
+								{
+									"level": 75,
+									"value": "10464084.79"
+								},
+								{
+									"level": 90,
+									"value": "11427649.97"
+								}
+							]
+						},
+						{
+							"index": 19,
+							"to": "2046-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "7747696.74"
+								},
+								{
+									"level": 25,
+									"value": "8493696.64"
+								},
+								{
+									"level": 50,
+									"value": "9231242.77"
+								},
+								{
+									"level": 75,
+									"value": "10216059.68"
+								},
+								{
+									"level": 90,
+									"value": "11155730.20"
+								}
+							]
+						},
+						{
+							"index": 20,
+							"to": "2047-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "7174734.68"
+								},
+								{
+									"level": 25,
+									"value": "8010346.19"
+								},
+								{
+									"level": 50,
+									"value": "8792843.88"
+								},
+								{
+									"level": 75,
+									"value": "10032098.05"
+								},
+								{
+									"level": 90,
+									"value": "11056779.56"
+								}
+							]
+						},
+						{
+							"index": 21,
+							"to": "2048-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "6624868.66"
+								},
+								{
+									"level": 25,
+									"value": "7413341.56"
+								},
+								{
+									"level": 50,
+									"value": "8311594.29"
+								},
+								{
+									"level": 75,
+									"value": "9674658.50"
+								},
+								{
+									"level": 90,
+									"value": "10825228.83"
+								}
+							]
+						},
+						{
+							"index": 22,
+							"to": "2049-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "5948236.94"
+								},
+								{
+									"level": 25,
+									"value": "6906347.47"
+								},
+								{
+									"level": 50,
+									"value": "7943204.83"
+								},
+								{
+									"level": 75,
+									"value": "9160711.28"
+								},
+								{
+									"level": 90,
+									"value": "10580748.94"
+								}
+							]
+						},
+						{
+							"index": 23,
+							"to": "2050-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "5204785.70"
+								},
+								{
+									"level": 25,
+									"value": "6276924.58"
+								},
+								{
+									"level": 50,
+									"value": "7362693.31"
+								},
+								{
+									"level": 75,
+									"value": "8776255.43"
+								},
+								{
+									"level": 90,
+									"value": "10282971.90"
+								}
+							]
+						},
+						{
+							"index": 24,
+							"to": "2051-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "4553507.89"
+								},
+								{
+									"level": 25,
+									"value": "5657651.99"
+								},
+								{
+									"level": 50,
+									"value": "6833748.65"
+								},
+								{
+									"level": 75,
+									"value": "8279633.57"
+								},
+								{
+									"level": 90,
+									"value": "9891352.38"
+								}
+							]
+						},
+						{
+							"index": 25,
+							"to": "2052-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "3720702.07"
+								},
+								{
+									"level": 25,
+									"value": "4927002.92"
+								},
+								{
+									"level": 50,
+									"value": "6237849.87"
+								},
+								{
+									"level": 75,
+									"value": "7825620.25"
+								},
+								{
+									"level": 90,
+									"value": "9656987.49"
+								}
+							]
+						},
+						{
+							"index": 26,
+							"to": "2053-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "2841940.47"
+								},
+								{
+									"level": 25,
+									"value": "4075230.02"
+								},
+								{
+									"level": 50,
+									"value": "5593777.70"
+								},
+								{
+									"level": 75,
+									"value": "7190492.26"
+								},
+								{
+									"level": 90,
+									"value": "9043925.58"
+								}
+							]
+						},
+						{
+							"index": 27,
+							"to": "2054-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "1845488.57"
+								},
+								{
+									"level": 25,
+									"value": "3244497.66"
+								},
+								{
+									"level": 50,
+									"value": "4825442.16"
+								},
+								{
+									"level": 75,
+									"value": "6567864.81"
+								},
+								{
+									"level": 90,
+									"value": "8502323.14"
+								}
+							]
+						},
+						{
+							"index": 28,
+							"to": "2055-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "733380.73"
+								},
+								{
+									"level": 25,
+									"value": "2259767.17"
+								},
+								{
+									"level": 50,
+									"value": "4019315.69"
+								},
+								{
+									"level": 75,
+									"value": "5752018.33"
+								},
+								{
+									"level": 90,
+									"value": "7956719.67"
+								}
+							]
+						},
+						{
+							"index": 29,
+							"to": "2056-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "1223052.69"
+								},
+								{
+									"level": 50,
+									"value": "3006087.56"
+								},
+								{
+									"level": 75,
+									"value": "4866285.25"
+								},
+								{
+									"level": 90,
+									"value": "7022898.11"
+								}
+							]
+						},
+						{
+							"index": 30,
+							"to": "2057-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "20929.69"
+								},
+								{
+									"level": 50,
+									"value": "1983417.15"
+								},
+								{
+									"level": 75,
+									"value": "4000000.74"
+								},
+								{
+									"level": 90,
+									"value": "6136207.22"
+								}
+							]
+						},
+						{
+							"index": 31,
+							"to": "2058-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "0.00"
+								},
+								{
+									"level": 50,
+									"value": "806966.11"
+								},
+								{
+									"level": 75,
+									"value": "2864371.13"
+								},
+								{
+									"level": 90,
+									"value": "5361740.09"
+								}
+							]
+						},
+						{
+							"index": 32,
+							"to": "2059-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "0.00"
+								},
+								{
+									"level": 50,
+									"value": "0.00"
+								},
+								{
+									"level": 75,
+									"value": "1690456.24"
+								},
+								{
+									"level": 90,
+									"value": "4293482.65"
+								}
+							]
+						},
+						{
+							"index": 33,
+							"to": "2060-10-30",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "0.00"
+								},
+								{
+									"level": 50,
+									"value": "0.00"
+								},
+								{
+									"level": 75,
+									"value": "409382.63"
+								},
+								{
+									"level": 90,
+									"value": "3255466.30"
+								}
+							]
+						},
+						{
+							"index": 34,
+							"to": "2060-12-31",
+							"netWorth": [
+								{
+									"level": 10,
+									"value": "0.00"
+								},
+								{
+									"level": 25,
+									"value": "0.00"
+								},
+								{
+									"level": 50,
+									"value": "0.00"
+								},
+								{
+									"level": 75,
+									"value": "177986.74"
+								},
+								{
+									"level": 90,
+									"value": "3081020.37"
+								}
+							]
+						}
+					],
+					"runsOut": [
+						{
+							"index": 0,
+							"to": "2027-10-30",
+							"paths": 0
+						},
+						{
+							"index": 1,
+							"to": "2028-10-30",
+							"paths": 0
+						},
+						{
+							"index": 2,
+							"to": "2029-10-30",
+							"paths": 0
+						},
+						{
+							"index": 3,
+							"to": "2030-10-30",
+							"paths": 0
+						},
+						{
+							"index": 4,
+							"to": "2031-10-30",
+							"paths": 0
+						},
+						{
+							"index": 5,
+							"to": "2032-10-30",
+							"paths": 0
+						},
+						{
+							"index": 6,
+							"to": "2033-10-30",
+							"paths": 0
+						},
+						{
+							"index": 7,
+							"to": "2034-10-30",
+							"paths": 0
+						},
+						{
+							"index": 8,
+							"to": "2035-10-30",
+							"paths": 0
+						},
+						{
+							"index": 9,
+							"to": "2036-10-30",
+							"paths": 0
+						},
+						{
+							"index": 10,
+							"to": "2037-10-30",
+							"paths": 0
+						},
+						{
+							"index": 11,
+							"to": "2038-10-30",
+							"paths": 0
+						},
+						{
+							"index": 12,
+							"to": "2039-10-30",
+							"paths": 0
+						},
+						{
+							"index": 13,
+							"to": "2040-10-30",
+							"paths": 0
+						},
+						{
+							"index": 14,
+							"to": "2041-10-30",
+							"paths": 0
+						},
+						{
+							"index": 15,
+							"to": "2042-10-30",
+							"paths": 0
+						},
+						{
+							"index": 16,
+							"to": "2043-10-30",
+							"paths": 0
+						},
+						{
+							"index": 17,
+							"to": "2044-10-30",
+							"paths": 0
+						},
+						{
+							"index": 18,
+							"to": "2045-10-30",
+							"paths": 0
+						},
+						{
+							"index": 19,
+							"to": "2046-10-30",
+							"paths": 0
+						},
+						{
+							"index": 20,
+							"to": "2047-10-30",
+							"paths": 0
+						},
+						{
+							"index": 21,
+							"to": "2048-10-30",
+							"paths": 0
+						},
+						{
+							"index": 22,
+							"to": "2049-10-30",
+							"paths": 0
+						},
+						{
+							"index": 23,
+							"to": "2050-10-30",
+							"paths": 0
+						},
+						{
+							"index": 24,
+							"to": "2051-10-30",
+							"paths": 0
+						},
+						{
+							"index": 25,
+							"to": "2052-10-30",
+							"paths": 0
+						},
+						{
+							"index": 26,
+							"to": "2053-10-30",
+							"paths": 0
+						},
+						{
+							"index": 27,
+							"to": "2054-10-30",
+							"paths": 0
+						},
+						{
+							"index": 28,
+							"to": "2055-10-30",
+							"paths": 9
+						},
+						{
+							"index": 29,
+							"to": "2056-10-30",
+							"paths": 16
+						},
+						{
+							"index": 30,
+							"to": "2057-10-30",
+							"paths": 23
+						},
+						{
+							"index": 31,
+							"to": "2058-10-30",
+							"paths": 40
+						},
+						{
+							"index": 32,
+							"to": "2059-10-30",
+							"paths": 23
+						},
+						{
+							"index": 33,
+							"to": "2060-10-30",
+							"paths": 31
+						},
+						{
+							"index": 34,
+							"to": "2060-12-31",
+							"paths": 3
+						}
+					],
+					"tables": [
+						{
+							"name": "bands",
+							"count": 8,
+							"rows": [
+								{
+									"index": 0,
+									"to": "2027-10-30",
+									"p10": "1713817.96",
+									"p50": "1762578.88",
+									"p90": "1812035.81"
+								},
+								{
+									"index": 4,
+									"to": "2031-10-30",
+									"p10": "4012679.74",
+									"p50": "4206098.91",
+									"p90": "4376497.14"
+								},
+								{
+									"index": 9,
+									"to": "2036-10-30",
+									"p10": "7520515.70",
+									"p50": "8056167.49",
+									"p90": "8537201.17"
+								},
+								{
+									"index": 14,
+									"to": "2041-10-30",
+									"p10": "9822392.57",
+									"p50": "10875589.70",
+									"p90": "11891719.50"
+								},
+								{
+									"index": 19,
+									"to": "2046-10-30",
+									"p10": "7747696.74",
+									"p50": "9231242.77",
+									"p90": "11155730.20"
+								},
+								{
+									"index": 24,
+									"to": "2051-10-30",
+									"p10": "4553507.89",
+									"p50": "6833748.65",
+									"p90": "9891352.38"
+								},
+								{
+									"index": 29,
+									"to": "2056-10-30",
+									"p10": "0.00",
+									"p50": "3006087.56",
+									"p90": "7022898.11"
+								},
+								{
+									"index": 34,
+									"to": "2060-12-31",
+									"p10": "0.00",
+									"p50": "0.00",
+									"p90": "3081020.37"
+								}
+							]
+						}
+					]
+				}
+			}
+		},
 		"accounts": {
 			"argv": ["account", "list", "--json"],
 			"ok": true,
 			"data": {
 				"accounts": [
 					{
-						"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+						"id": "01a2042c-06e8-752d-b993-282c5924c461",
 						"name": "Bank",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.131Z",
-						"updatedAt": "2026-11-22T09:23:03.131Z"
+						"createdAt": "2026-11-22T16:52:03.944Z",
+						"updatedAt": "2026-11-22T16:52:03.944Z"
 					},
 					{
-						"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+						"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 						"name": "Car Loan",
 						"type": "liability",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.362Z",
-						"updatedAt": "2026-11-22T09:23:03.362Z"
+						"createdAt": "2026-11-22T16:52:04.151Z",
+						"updatedAt": "2026-11-22T16:52:04.151Z"
 					},
 					{
-						"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+						"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 						"name": "Fund",
 						"type": "asset",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.239Z",
-						"updatedAt": "2026-11-22T09:23:03.239Z"
+						"createdAt": "2026-11-22T16:52:04.049Z",
+						"updatedAt": "2026-11-22T16:52:04.049Z"
 					},
 					{
-						"id": "01a20290-f330-72db-9e10-16fe6d5265fe",
+						"id": "01a2042c-0881-7008-8089-6b1a92a47f79",
 						"name": "Fund Return",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.600Z",
-						"updatedAt": "2026-11-22T09:23:03.600Z"
+						"createdAt": "2026-11-22T16:52:04.353Z",
+						"updatedAt": "2026-11-22T16:52:04.353Z"
 					},
 					{
-						"id": "01a20290-f3ab-73d1-a152-79a3a9667f92",
+						"id": "01a2042c-08e5-71fa-b4e4-5ce503abf07f",
 						"name": "Living",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.723Z",
-						"updatedAt": "2026-11-22T09:23:03.723Z"
+						"createdAt": "2026-11-22T16:52:04.453Z",
+						"updatedAt": "2026-11-22T16:52:04.453Z"
 					},
 					{
-						"id": "01a20290-f516-7152-8b7c-2b2e0536afe1",
+						"id": "01a2042c-0a13-7798-a651-3a3343dc96aa",
 						"name": "Opening",
 						"type": "equity",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:04.086Z",
-						"updatedAt": "2026-11-22T09:23:04.086Z"
+						"createdAt": "2026-11-22T16:52:04.755Z",
+						"updatedAt": "2026-11-22T16:52:04.755Z"
 					},
 					{
-						"id": "01a20290-f427-728f-9544-8e210090ff57",
+						"id": "01a2042c-094b-7675-8508-8a64006c4093",
 						"name": "Rent",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.847Z",
-						"updatedAt": "2026-11-22T09:23:03.847Z"
+						"createdAt": "2026-11-22T16:52:04.555Z",
+						"updatedAt": "2026-11-22T16:52:04.555Z"
 					},
 					{
-						"id": "01a20290-f2bb-7126-b878-d3bf8f977784",
+						"id": "01a2042c-081b-7735-aa80-6320c2142fc3",
 						"name": "Salary",
 						"type": "income",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.483Z",
-						"updatedAt": "2026-11-22T09:23:03.483Z"
+						"createdAt": "2026-11-22T16:52:04.251Z",
+						"updatedAt": "2026-11-22T16:52:04.251Z"
 					},
 					{
-						"id": "01a20290-f4a1-7430-b9e3-815758a8e9e0",
+						"id": "01a2042c-09af-77d7-8477-725867cbaae7",
 						"name": "Travel",
 						"type": "expense",
 						"currency": "THB",
 						"parentId": null,
 						"archivedAt": null,
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:03.969Z",
-						"updatedAt": "2026-11-22T09:23:03.969Z"
+						"createdAt": "2026-11-22T16:52:04.655Z",
+						"updatedAt": "2026-11-22T16:52:04.655Z"
 					}
 				]
 			}
@@ -6992,7 +9708,7 @@
 				"rows": [
 					{
 						"account": {
-							"id": "01a20290-f15b-7782-ba90-035408bdc9fe",
+							"id": "01a2042c-06e8-752d-b993-282c5924c461",
 							"name": "Bank"
 						},
 						"type": "asset",
@@ -7001,7 +9717,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f242-721b-9f56-4dc340df51ef",
+							"id": "01a2042c-07b7-7005-a2bc-a61a75755312",
 							"name": "Car Loan"
 						},
 						"type": "liability",
@@ -7010,7 +9726,7 @@
 					},
 					{
 						"account": {
-							"id": "01a20290-f1c7-7167-838e-8d7a51a6e6df",
+							"id": "01a2042c-0751-70ce-9194-a43e1f09ca11",
 							"name": "Fund"
 						},
 						"type": "asset",
@@ -7032,22 +9748,22 @@
 			"data": {
 				"scenarios": [
 					{
-						"id": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
+						"id": "01a2042c-0cde-752d-af03-557c1df0b25a",
 						"name": "base",
-						"contentHash": "jcs1:sha256:6ec47e50607a8698fecfa16e483517f0d1118b15fc665e60778f58c1fa1418f9",
+						"contentHash": "jcs1:sha256:1c7242cc73b40d3f8ab1c6997ea5a541464e32f1b48df601c54e42527eba0a87",
 						"forkedFrom": null,
 						"version": 2,
-						"createdAt": "2026-11-22T09:23:04.886Z",
-						"updatedAt": "2026-11-22T09:23:05.028Z"
+						"createdAt": "2026-11-22T16:52:05.470Z",
+						"updatedAt": "2026-11-22T16:52:05.591Z"
 					},
 					{
-						"id": "01a20290-f969-76b8-9978-424b7ffdc761",
+						"id": "01a2042c-0dca-74d2-b3bf-5bcd0bf8a743",
 						"name": "retire-early",
-						"contentHash": "jcs1:sha256:31b679913cad4c050a68ff7a008e871c9097e88d5b2183a5ca2e800089582500",
-						"forkedFrom": "01a20290-f836-7278-bb5c-0a9eb9b4065e",
+						"contentHash": "jcs1:sha256:b0ef11384e87c3dae65b2e623db0c68ac756f76888cb3dbe3e96b731dec725eb",
+						"forkedFrom": "01a2042c-0cde-752d-af03-557c1df0b25a",
 						"version": 1,
-						"createdAt": "2026-11-22T09:23:05.193Z",
-						"updatedAt": "2026-11-22T09:23:05.193Z"
+						"createdAt": "2026-11-22T16:52:05.706Z",
+						"updatedAt": "2026-11-22T16:52:05.706Z"
 					}
 				]
 			}

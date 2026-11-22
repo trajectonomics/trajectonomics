@@ -1,10 +1,11 @@
-import { mkdtemp, rm } from "node:fs/promises"
+import { mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import type { Snapshot } from "../src/lib/contract"
 import { checkParams, type PlanInput } from "../src/lib/snapshot"
 import { redactDirectory } from "../src/lib/snapshot/redact"
 import { demoCarryIn } from "./demo/carry-in"
+import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
 import { runSnapshot } from "./snapshot-run"
 import { checkBinary } from "./traj-binary"
@@ -19,6 +20,9 @@ export const DEMO_INPUT: PlanInput = {
 	ages: [45, 55, 60],
 	monthly: false,
 	carryIn: true,
+	returnModel: null,
+	paths: null,
+	seed: null,
 }
 
 /** The demo's Scenarios, in the order their Carry-in records name them. */
@@ -39,10 +43,18 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 	const scratch = await mkdtemp(join(tmpdir(), "traj-web-demo-"))
 	try {
 		const home = join(scratch, "traj-home")
-		await buildDemoLedger({ binary, home, scratch })
+		const ids = await buildDemoLedger({ binary, home, scratch })
+		// The model sits in the data directory, so the Snapshot names it as `~/.traj/return-model.json`.
+		const model = join(home, "return-model.json")
+		await writeFile(model, `${JSON.stringify(demoReturnModel(ids), null, "\t")}\n`)
 		const check = await checkBinary(binary, process.env)
 		if (!check.ok) return { ok: false, message: check.message }
-		const params = checkParams(DEMO_INPUT)
+		const params = checkParams({
+			...DEMO_INPUT,
+			returnModel: model,
+			paths: DEMO_PATHS,
+			seed: DEMO_SEED,
+		})
 		if (!params.ok) return { ok: false, message: params.error.message }
 		const env = { ...process.env, TRAJ_HOME: home }
 		const run = await runSnapshot(

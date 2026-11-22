@@ -41,6 +41,16 @@ export function setValue(options: SnapshotOptions, name: string, value: string):
 			if (!/^\d+$/.test(value)) return `--age needs a whole number of years, not "${value}".`
 			input.ages = [...input.ages, Number(value)]
 			return null
+		case "return-model":
+			input.returnModel = value
+			return null
+		case "paths":
+			if (!/^\d+$/.test(value)) return `--paths needs a whole number of paths, not "${value}".`
+			input.paths = Number(value)
+			return null
+		case "seed":
+			input.seed = value
+			return null
 		case "traj":
 			options.traj = value
 			return null

@@ -23,3 +23,10 @@ export function areaPath(points: readonly PathPoint[], baseline: number): string
 	const base = pixel(baseline)
 	return `${linePath(points)} L${pixel(last.x)} ${base} L${pixel(first.x)} ${base} Z`
 }
+
+/** The shaded band between two series: the upper line left to right, then the lower line back. */
+export function bandPath(upper: readonly PathPoint[], lower: readonly PathPoint[]): string {
+	if (upper.length === 0 || lower.length === 0) return ""
+	const back = [...lower].reverse().map((point) => `L${pixel(point.x)} ${pixel(point.y)}`)
+	return `${linePath(upper)} ${back.join(" ")} Z`
+}
