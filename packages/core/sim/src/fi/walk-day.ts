@@ -4,9 +4,10 @@ import { processDate } from "../engine/occurrence"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
-import { type BufferBreach, checkBuffer } from "./buffer"
+import { accessibleAfter, type BufferBreach, checkBuffer } from "./buffer"
 import { lockedOrAbsentAssets } from "./undrawable"
-import type { Shortfall, WalkInput } from "./walk"
+import type { Shortfall } from "./walk"
+import type { DayInput } from "./walk-input"
 
 type DayOutcome =
 	| { readonly kind: "ok"; readonly breach?: BufferBreach }
@@ -14,7 +15,7 @@ type DayOutcome =
 	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
 
 function processFlows(
-	input: WalkInput,
+	input: DayInput,
 	date: DateString,
 	dayEvents: readonly DatedEvent[],
 	settled: boolean,
@@ -38,8 +39,16 @@ function processFlows(
 	}
 }
 
+/** Records the accessible net worth for a buffer check made once the walk has its fire dates. */
+function trace(input: DayInput, date: DateString): DayOutcome {
+	const valued = accessibleAfter(input.point.states, date)
+	if (valued.kind === "problem") return valued
+	input.trace.push({ date, accessible: valued.accessible })
+	return { kind: "ok" }
+}
+
 export function processDay(
-	input: WalkInput,
+	input: DayInput,
 	date: DateString,
 	dayEvents: readonly DatedEvent[],
 ): DayOutcome {
@@ -48,8 +57,9 @@ export function processDay(
 	const settled = levies !== undefined && hasSettlement(levies, date)
 	const landing = gate === undefined ? dayEvents : gate.apply(states, date, dayEvents, settled)
 	const flows = processFlows(input, date, landing, settled)
-	if (flows.kind !== "ok" || input.requirement.months === 0) return flows
-	const checked = checkBuffer(input.point.states, date, input.requirement)
+	if (flows.kind !== "ok" || input.months === 0) return flows
+	if (input.table === undefined) return trace(input, date)
+	const checked = checkBuffer(input.point.states, date, input.table)
 	if (checked.kind === "problem") return { kind: "problem", problem: checked.problem }
 	if (checked.kind === "breach") return { kind: "ok", breach: checked.breach }
 	return { kind: "ok" }

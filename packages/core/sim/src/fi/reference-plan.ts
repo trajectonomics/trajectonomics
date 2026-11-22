@@ -1,8 +1,6 @@
-import type { ResolvedCalendar } from "../calendar/business"
-import type { Baseline, Scenario, Timeline } from "../types"
+import type { Scenario, Timeline } from "../types"
 import type { ReferenceOptions } from "../types/reference"
 import type { WindowOutcome } from "./expense-window"
-import { originalExpenseWindow } from "./expenses"
 import { type ReferenceConfig, referenceConfig } from "./reference-config"
 import { deflated, type ReferenceMoney } from "./reference-window"
 
@@ -20,15 +18,15 @@ function termsWindow(outcome: WindowOutcome, money: ReferenceMoney): WindowOutco
 
 /**
  * Builds the reference's window and money. The default path wraps the scan's own expense window,
- * so it computes nothing extra; the trailing window and deflation exist only when asked for.
+ * so it computes nothing extra; the trailing window (from `trailing`) and deflation exist only when
+ * asked for.
  */
 export function referencePlan(
-	baseline: Baseline,
 	reference: ReferenceOptions | undefined,
 	scenario: Scenario,
 	timeline: Timeline,
 	expenses: WindowOutcome,
-	calendar: ResolvedCalendar | undefined,
+	trailing: () => WindowOutcome,
 ): ReferencePlan {
 	const config = referenceConfig(reference)
 	const money = {
@@ -36,9 +34,6 @@ export function referencePlan(
 		inflation: scenario.economy.inflation,
 		real: config.terms === "real",
 	}
-	const source =
-		config.window === "trailing12Months"
-			? originalExpenseWindow(baseline, scenario, timeline, calendar)
-			: expenses
+	const source = config.window === "trailing12Months" ? trailing() : expenses
 	return { config, money, window: termsWindow(source, money) }
 }

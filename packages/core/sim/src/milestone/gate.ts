@@ -76,6 +76,11 @@ export class MilestoneGate {
 		this.state.trail = [...this.state.trail.filter((item) => item.date >= cutoff), entry]
 	}
 
+	/** The fire dates so far, static ones included: what a candidate's expense windows are gated by. */
+	fires(): ReadonlyMap<string, DateString> {
+		return this.state.fires
+	}
+
 	/** Each Milestone's fire date by the run's end, or `reached: false`, in Scenario order. */
 	results(runEnd: DateString): readonly MilestoneResult[] {
 		return this.state.plan.milestones.map((milestone): MilestoneResult => {

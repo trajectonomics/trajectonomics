@@ -5,12 +5,10 @@ import type { ResolvedReturns } from "../engine/returns"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { FinancialIndependenceOptions } from "../types/financial-independence"
 import { candidateMonths } from "./candidates"
-import { expenseWindow } from "./expenses"
 import { baselinePrefix, levyPlan, type Prefix } from "./prefix"
-import { type ReferencePlan, referencePlan } from "./reference-plan"
-import { type RequirementTable, requirementTable } from "./required"
 import { type ScanGrid, scanGrid } from "./scan-grid"
 import type { SearchInput } from "./search"
+import { type WindowPlan, windowPlan } from "./windows"
 
 export interface ScanBase {
 	readonly baseline: Baseline
@@ -19,8 +17,7 @@ export interface ScanBase {
 	readonly events: readonly DatedEvent[]
 	readonly calendar: ResolvedCalendar | undefined
 	readonly candidates: readonly DateString[]
-	readonly requirement: RequirementTable
-	readonly reference: ReferencePlan
+	readonly windows: WindowPlan
 	readonly grid: ScanGrid
 }
 
@@ -36,7 +33,6 @@ export function planBase(
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levy = levyPlan(scenario, timeline, calendar)
-	const expenses = expenseWindow(baseline, scenario, timeline, options, candidates[0]!, calendar)
 	return {
 		baseline,
 		scenario,
@@ -44,15 +40,7 @@ export function planBase(
 		events,
 		calendar,
 		candidates,
-		requirement: requirementTable(expenses, options.minBufferMonths ?? 0),
-		reference: referencePlan(
-			baseline,
-			options.method === "survival" ? options.reference : undefined,
-			scenario,
-			timeline,
-			expenses,
-			calendar,
-		),
+		windows: windowPlan(scenario, timeline, options, candidates[0]!, calendar),
 		grid: scanGrid(
 			events,
 			timeline,
@@ -82,8 +70,7 @@ export function inputFor(base: ScanBase, prefix: Prefix): SearchInput {
 	return {
 		scenario: base.scenario,
 		prefix,
-		requirement: base.requirement,
-		reference: base.reference,
+		windows: base.windows,
 		grid: base.grid,
 	}
 }

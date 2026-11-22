@@ -1,13 +1,16 @@
 import { flowsAt } from "../engine/events"
-import type { DateString, Scenario } from "../types"
+import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { BufferBreach } from "./buffer"
 import { cloneLevySet, cloneStates } from "./clone"
-import type { PrefixPoint } from "./prefix"
-import type { RequirementTable } from "./required"
 import { gridDates, gridEvents, type ScanGrid } from "./scan-grid"
 import { stopsFlow } from "./scan-stop"
 import { processDay } from "./walk-day"
+import { finish } from "./walk-finish"
+import type { DayInput, WalkInput } from "./walk-input"
+import type { Windows } from "./windows"
+
+export type { WalkInput } from "./walk-input"
 
 export interface Shortfall {
 	readonly date: DateString
@@ -16,17 +19,10 @@ export interface Shortfall {
 }
 
 export type WalkOutcome =
-	| { readonly kind: "survived" }
-	| { readonly kind: "buffer"; readonly breach: BufferBreach }
+	| { readonly kind: "survived"; readonly windows: Windows }
+	| { readonly kind: "buffer"; readonly breach: BufferBreach; readonly windows: Windows }
 	| { readonly kind: "shortfall"; readonly shortfall: Shortfall }
 	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
-
-export interface WalkInput {
-	readonly scenario: Scenario
-	readonly month: DateString
-	readonly point: PrefixPoint
-	readonly requirement: RequirementTable
-}
 
 /** Continues a candidate from its unchanged prefix, checking survival and the optional buffer. */
 export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
@@ -38,7 +34,14 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 			gate: input.point.gate.clone(events, stopsFlow(grid.retirement)),
 		}),
 	}
-	const working: WalkInput = { ...input, point }
+	const { shared } = input.windows
+	const working: DayInput = {
+		scenario: input.scenario,
+		point,
+		months: input.windows.months,
+		table: shared?.requirement,
+		trace: [],
+	}
 	const dates = gridDates(grid, input.month)
 	let index = 0
 	let firstBreach: BufferBreach | undefined
@@ -49,5 +52,5 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 		if (day.kind !== "ok") return day
 		if (day.breach !== undefined && firstBreach === undefined) firstBreach = day.breach
 	}
-	return firstBreach === undefined ? { kind: "survived" } : { kind: "buffer", breach: firstBreach }
+	return finish(input, working, firstBreach)
 }
