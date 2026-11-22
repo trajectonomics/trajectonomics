@@ -82,6 +82,7 @@ describe("FiResult: unreachable", () => {
 			owed: "89000.00",
 			settled: true,
 			partial: false,
+			assumptions: [],
 		}
 		const body = renderFi(fiFixture(UNREACHABLE.minimumBuffer, { taxYears: [taxYear] }))
 		expect(body).toContain('href="/tax/"')

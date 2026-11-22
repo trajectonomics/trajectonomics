@@ -14,6 +14,7 @@ export function year(over: Partial<TaxYear> = {}): TaxYear {
 		owed: "89000.00",
 		settled: true,
 		partial: false,
+		assumptions: [],
 		...over,
 	}
 }

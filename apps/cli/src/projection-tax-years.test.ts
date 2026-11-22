@@ -55,6 +55,7 @@ describe("the tax a Projection says is owed", () => {
 			owed: "36500.00",
 			settled: true,
 			partial: false,
+			assumptions: [],
 		})
 		// The 2027 period is complete at the Horizon but its Settlement is after it, so the tax it
 		// owes is reported without a charge in the Projection.

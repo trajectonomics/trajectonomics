@@ -182,6 +182,10 @@ _Avoid_: Tax bill, balance due, refund amount
 A deduction class the flags of a tax write named, such as life insurance or home-loan interest. `scenario tax` reports the classes it stated and the ones it left out, so a deduction nobody named is visible instead of read as zero; what the Levy then allows is tax-core's rule, not the CLI's.
 _Avoid_: Modelled allowance, applied allowance, tax relief
 
+**Tax assumption**:
+A tax figure a result used whose source is not yet confirmed, named in the result's `assumptions` until it is sourced: `reported` when only a secondary source states it, `unsourced` when none was read. The tax core owns the list and the Levy's tallies decide which tax years used which figure; the CLI states them and holds no figure of its own (ADR-0042).
+_Avoid_: Warning, disclaimer, estimate
+
 ### Packages
 
 **Core**:

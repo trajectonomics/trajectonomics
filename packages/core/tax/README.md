@@ -46,6 +46,8 @@ USD 68900 19888.36
 
 Each call returns a Tax Result; its `breakdown` carries the itemized audit trail (allowances, bracket slices, credits) behind the summary figures above.
 
+`calculateThTax` also returns `assumptions`: the statutory figures the computation used whose source is not yet confirmed (`reported` when only a secondary source states the figure, `unsourced` when none was read), each as `{ path, value, status, note }`. It is empty when every figure used is confirmed, and it never changes a tax figure. `thLevyAssumptions` reads the same list from an emitted Levy and one period's Measure values.
+
 ## United States State Tax
 
 `calculateUsTax` accepts an optional `state` code (`AL` through `WY` plus `DC`). When present, the result includes `breakdown.state` with state taxable income, bracket slices, personal/dependent credits, state withholding, and net state tax, and the state liability is folded into the top-level `totalTax` and `netTaxPayable`.

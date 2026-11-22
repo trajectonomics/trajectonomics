@@ -1,3 +1,4 @@
+export { type AssumptionLine, assumptionLines } from "./assumptions"
 /** The Tax page's view model: pure functions from a projection to the rows, headline and chart it shows. */
 export { addLevyCommand, type TaxBody, taxBody } from "./body"
 export { type CarryInRow, type CarryInTally, carryInRows } from "./carry-in"
