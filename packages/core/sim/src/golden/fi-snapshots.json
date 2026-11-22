@@ -264,7 +264,566 @@
 						"threshold": 0,
 						"partial": false,
 						"met": true
-					}
+					},
+					"levies": [
+						{
+							"id": "th-like",
+							"periods": [
+								{
+									"from": "2025-01-01",
+									"to": "2025-12-31",
+									"settlementDate": "2026-03-31",
+									"measures": [
+										{
+											"id": "zero",
+											"value": 0
+										},
+										{
+											"id": "income",
+											"value": 0
+										},
+										{
+											"id": "saved",
+											"value": 0
+										},
+										{
+											"id": "half",
+											"value": 0
+										},
+										{
+											"id": "halfUnits",
+											"value": 0
+										},
+										{
+											"id": "halfWhole",
+											"value": 0
+										},
+										{
+											"id": "expenseCap",
+											"value": 10000000
+										},
+										{
+											"id": "deduction",
+											"value": 0
+										},
+										{
+											"id": "allowanceShare",
+											"value": 0
+										},
+										{
+											"id": "allowanceCeiling",
+											"value": 50000000
+										},
+										{
+											"id": "allowanceByShare",
+											"value": 0
+										},
+										{
+											"id": "allowance",
+											"value": 0
+										},
+										{
+											"id": "personal",
+											"value": 6000000
+										},
+										{
+											"id": "afterDeduction",
+											"value": 0
+										},
+										{
+											"id": "afterAllowance",
+											"value": 0
+										},
+										{
+											"id": "net",
+											"value": -6000000
+										},
+										{
+											"id": "lo1",
+											"value": 15000000
+										},
+										{
+											"id": "width1",
+											"value": 15000000
+										},
+										{
+											"id": "above1",
+											"value": -21000000
+										},
+										{
+											"id": "inside1",
+											"value": 0
+										},
+										{
+											"id": "capped1",
+											"value": 0
+										},
+										{
+											"id": "slice1",
+											"value": 0
+										},
+										{
+											"id": "lo2",
+											"value": 30000000
+										},
+										{
+											"id": "width2",
+											"value": 20000000
+										},
+										{
+											"id": "above2",
+											"value": -36000000
+										},
+										{
+											"id": "inside2",
+											"value": 0
+										},
+										{
+											"id": "capped2",
+											"value": 0
+										},
+										{
+											"id": "slice2",
+											"value": 0
+										},
+										{
+											"id": "lo3",
+											"value": 50000000
+										},
+										{
+											"id": "width3",
+											"value": 25000000
+										},
+										{
+											"id": "above3",
+											"value": -56000000
+										},
+										{
+											"id": "inside3",
+											"value": 0
+										},
+										{
+											"id": "capped3",
+											"value": 0
+										},
+										{
+											"id": "slice3",
+											"value": 0
+										},
+										{
+											"id": "lo4",
+											"value": 75000000
+										},
+										{
+											"id": "width4",
+											"value": 25000000
+										},
+										{
+											"id": "above4",
+											"value": -81000000
+										},
+										{
+											"id": "inside4",
+											"value": 0
+										},
+										{
+											"id": "capped4",
+											"value": 0
+										},
+										{
+											"id": "slice4",
+											"value": 0
+										},
+										{
+											"id": "s12",
+											"value": 0
+										},
+										{
+											"id": "s123",
+											"value": 0
+										},
+										{
+											"id": "owed",
+											"value": 0
+										}
+									],
+									"prepaid": 0,
+									"due": 0,
+									"settlement": 0,
+									"settled": true,
+									"partial": false
+								},
+								{
+									"from": "2026-01-01",
+									"to": "2026-12-31",
+									"settlementDate": "2027-03-31",
+									"measures": [
+										{
+											"id": "zero",
+											"value": 0
+										},
+										{
+											"id": "income",
+											"value": 0
+										},
+										{
+											"id": "saved",
+											"value": 0
+										},
+										{
+											"id": "half",
+											"value": 0
+										},
+										{
+											"id": "halfUnits",
+											"value": 0
+										},
+										{
+											"id": "halfWhole",
+											"value": 0
+										},
+										{
+											"id": "expenseCap",
+											"value": 10000000
+										},
+										{
+											"id": "deduction",
+											"value": 0
+										},
+										{
+											"id": "allowanceShare",
+											"value": 0
+										},
+										{
+											"id": "allowanceCeiling",
+											"value": 50000000
+										},
+										{
+											"id": "allowanceByShare",
+											"value": 0
+										},
+										{
+											"id": "allowance",
+											"value": 0
+										},
+										{
+											"id": "personal",
+											"value": 6000000
+										},
+										{
+											"id": "afterDeduction",
+											"value": 0
+										},
+										{
+											"id": "afterAllowance",
+											"value": 0
+										},
+										{
+											"id": "net",
+											"value": -6000000
+										},
+										{
+											"id": "lo1",
+											"value": 15000000
+										},
+										{
+											"id": "width1",
+											"value": 15000000
+										},
+										{
+											"id": "above1",
+											"value": -21000000
+										},
+										{
+											"id": "inside1",
+											"value": 0
+										},
+										{
+											"id": "capped1",
+											"value": 0
+										},
+										{
+											"id": "slice1",
+											"value": 0
+										},
+										{
+											"id": "lo2",
+											"value": 30000000
+										},
+										{
+											"id": "width2",
+											"value": 20000000
+										},
+										{
+											"id": "above2",
+											"value": -36000000
+										},
+										{
+											"id": "inside2",
+											"value": 0
+										},
+										{
+											"id": "capped2",
+											"value": 0
+										},
+										{
+											"id": "slice2",
+											"value": 0
+										},
+										{
+											"id": "lo3",
+											"value": 50000000
+										},
+										{
+											"id": "width3",
+											"value": 25000000
+										},
+										{
+											"id": "above3",
+											"value": -56000000
+										},
+										{
+											"id": "inside3",
+											"value": 0
+										},
+										{
+											"id": "capped3",
+											"value": 0
+										},
+										{
+											"id": "slice3",
+											"value": 0
+										},
+										{
+											"id": "lo4",
+											"value": 75000000
+										},
+										{
+											"id": "width4",
+											"value": 25000000
+										},
+										{
+											"id": "above4",
+											"value": -81000000
+										},
+										{
+											"id": "inside4",
+											"value": 0
+										},
+										{
+											"id": "capped4",
+											"value": 0
+										},
+										{
+											"id": "slice4",
+											"value": 0
+										},
+										{
+											"id": "s12",
+											"value": 0
+										},
+										{
+											"id": "s123",
+											"value": 0
+										},
+										{
+											"id": "owed",
+											"value": 0
+										}
+									],
+									"prepaid": 0,
+									"due": 0,
+									"settlement": 0,
+									"settled": true,
+									"partial": false
+								},
+								{
+									"from": "2027-01-01",
+									"to": "2027-12-31",
+									"settlementDate": "2028-03-31",
+									"measures": [
+										{
+											"id": "zero",
+											"value": 0
+										},
+										{
+											"id": "income",
+											"value": 0
+										},
+										{
+											"id": "saved",
+											"value": 0
+										},
+										{
+											"id": "half",
+											"value": 0
+										},
+										{
+											"id": "halfUnits",
+											"value": 0
+										},
+										{
+											"id": "halfWhole",
+											"value": 0
+										},
+										{
+											"id": "expenseCap",
+											"value": 10000000
+										},
+										{
+											"id": "deduction",
+											"value": 0
+										},
+										{
+											"id": "allowanceShare",
+											"value": 0
+										},
+										{
+											"id": "allowanceCeiling",
+											"value": 50000000
+										},
+										{
+											"id": "allowanceByShare",
+											"value": 0
+										},
+										{
+											"id": "allowance",
+											"value": 0
+										},
+										{
+											"id": "personal",
+											"value": 6000000
+										},
+										{
+											"id": "afterDeduction",
+											"value": 0
+										},
+										{
+											"id": "afterAllowance",
+											"value": 0
+										},
+										{
+											"id": "net",
+											"value": -6000000
+										},
+										{
+											"id": "lo1",
+											"value": 15000000
+										},
+										{
+											"id": "width1",
+											"value": 15000000
+										},
+										{
+											"id": "above1",
+											"value": -21000000
+										},
+										{
+											"id": "inside1",
+											"value": 0
+										},
+										{
+											"id": "capped1",
+											"value": 0
+										},
+										{
+											"id": "slice1",
+											"value": 0
+										},
+										{
+											"id": "lo2",
+											"value": 30000000
+										},
+										{
+											"id": "width2",
+											"value": 20000000
+										},
+										{
+											"id": "above2",
+											"value": -36000000
+										},
+										{
+											"id": "inside2",
+											"value": 0
+										},
+										{
+											"id": "capped2",
+											"value": 0
+										},
+										{
+											"id": "slice2",
+											"value": 0
+										},
+										{
+											"id": "lo3",
+											"value": 50000000
+										},
+										{
+											"id": "width3",
+											"value": 25000000
+										},
+										{
+											"id": "above3",
+											"value": -56000000
+										},
+										{
+											"id": "inside3",
+											"value": 0
+										},
+										{
+											"id": "capped3",
+											"value": 0
+										},
+										{
+											"id": "slice3",
+											"value": 0
+										},
+										{
+											"id": "lo4",
+											"value": 75000000
+										},
+										{
+											"id": "width4",
+											"value": 25000000
+										},
+										{
+											"id": "above4",
+											"value": -81000000
+										},
+										{
+											"id": "inside4",
+											"value": 0
+										},
+										{
+											"id": "capped4",
+											"value": 0
+										},
+										{
+											"id": "slice4",
+											"value": 0
+										},
+										{
+											"id": "s12",
+											"value": 0
+										},
+										{
+											"id": "s123",
+											"value": 0
+										},
+										{
+											"id": "owed",
+											"value": 0
+										}
+									],
+									"prepaid": 0,
+									"due": 0,
+									"settlement": 0,
+									"settled": false,
+									"partial": true
+								}
+							]
+						}
+					]
 				}
 			}
 		},

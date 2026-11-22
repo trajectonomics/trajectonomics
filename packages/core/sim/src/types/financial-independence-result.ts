@@ -6,7 +6,7 @@ import type {
 	SurvivalDefinition,
 	ThresholdMonth,
 } from "./financial-independence"
-import type { ProjectionProblem } from "./projection"
+import type { LevyReport, ProjectionProblem } from "./projection"
 import type { RuleOfThumbReference } from "./reference"
 
 export type SurvivalFinancialIndependence =
@@ -15,6 +15,12 @@ export type SurvivalFinancialIndependence =
 			readonly definition: SurvivalDefinition
 			readonly month: DateString
 			readonly reference: RuleOfThumbReference
+			/**
+			 * The Levy results of the path the answer describes: earned income as in the Scenario
+			 * before `month`, stopped from `month` on, with expenses replaced by `retirementSpending`
+			 * when the definition sets it. Present only when the Scenario declares Levies.
+			 */
+			readonly levies?: readonly LevyReport[]
 	  }
 	| {
 			readonly reachable: false

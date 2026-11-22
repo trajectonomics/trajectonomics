@@ -12,43 +12,9 @@ import type {
 	ProbabilityFinancialIndependenceResult,
 	SurvivalFinancialIndependenceResult,
 } from "../types/financial-independence-result"
-import { unreachable } from "./binding"
-import { survivalDefinition } from "./definition"
 import { derivedDebtPaymentProblem, derivedExpenseProblem } from "./derived-earned"
-import { planScan } from "./plan"
 import { runProbability } from "./probability-run"
-import { search } from "./search"
-
-function runSurvival(
-	baseline: Baseline,
-	scenario: Scenario,
-	timeline: Timeline,
-	options: SurvivalOptions,
-): SurvivalFinancialIndependenceResult {
-	const definition = survivalDefinition(options)
-	const plan = planScan(baseline, scenario, timeline, options)
-	if (plan === undefined)
-		return { ok: true, financialIndependence: unreachable(definition, undefined, undefined) }
-	const outcome = search(plan.input, plan.scanned)
-	if (outcome.kind === "problem") return { ok: false, problems: [outcome.problem] }
-	if (outcome.kind === "reachable") {
-		return {
-			ok: true,
-			financialIndependence: {
-				reachable: true,
-				definition,
-				month: outcome.month,
-				reference: outcome.reference,
-			},
-		}
-	}
-	const problem = plan.input.prefix.problem
-	if (problem !== undefined) return { ok: false, problems: [problem] }
-	return {
-		ok: true,
-		financialIndependence: unreachable(definition, outcome.buffer, outcome.shortfall),
-	}
-}
+import { runSurvival } from "./run-survival"
 
 /**
  * The earliest month at which stopping earned income passes the FI test: for `survival` on one
