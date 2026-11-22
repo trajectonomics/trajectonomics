@@ -183,10 +183,8 @@ document. Then report what it found before you ask anything, in one of three way
   already be recorded there.
 
 **No ledger file yet.** Ask the person two things in one question: their financial situation, and
-their goal. **Enter a debt as a negative opening balance**, so that borrowing lowers net worth
-instead of raising it; from 0.3.0 the command line refuses a positive opening on a liability, and below 0.3.0 a debt
-recorded the obvious way reads as a gain. Then read the `traj` skill at the `path` the list command reported, and
-follow it for the rest of this conversation.
+their goal. Then read the `traj` skill at the `path` the list command reported, and follow it for the
+rest of this conversation.
 
 Tell them, in every open, that a new session loads that skill by itself whenever they talk about their
 money, and that another machine needs setup once.
