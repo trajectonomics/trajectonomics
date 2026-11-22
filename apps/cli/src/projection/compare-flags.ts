@@ -4,13 +4,7 @@ import { type AppError, fail, isAppError } from "../errors"
 
 /** One `--age`, repeatable, which needs the birth date the months count from. */
 export const ageFlag: z.ZodOptional<z.ZodArray<z.ZodNumber>> = z
-	.array(
-		z
-			.number()
-			.int()
-			.min(0)
-			.describe("An age to report net worth at; repeatable and needs --birth-date."),
-	)
+	.array(z.number().int().min(0).describe("An age to report net worth at; needs --birth-date."))
 	.optional()
 
 /** Exactly one of the second Scenario and `--set` says what B is (ADR-0030). */

@@ -1,4 +1,4 @@
-import type { z } from "zod"
+import { z } from "zod"
 
 export type FlagKind = "string" | "number" | "boolean"
 
@@ -11,6 +11,8 @@ export type FlagSpec = {
 	multiple: boolean
 	required: boolean
 	description: string | undefined
+	/** The closed set of a zod `enum` flag, in declaration order; undefined for any other flag. */
+	choices: readonly string[] | undefined
 }
 
 /** Flags every command accepts; an input field may not use these names. */
@@ -41,10 +43,16 @@ function kindOf(field: string, type: z.ZodType): FlagKind {
 	throw new Error(`Input field "${field}" has type "${kind}", which cannot be a flag.`)
 }
 
+/** The values a zod `enum` accepts, in declaration order; undefined for any other type. */
+function choicesOf(type: z.ZodType): readonly string[] | undefined {
+	return type instanceof z.ZodEnum ? type.options.map(String) : undefined
+}
+
 function flagOf(field: string, schema: z.ZodType, taken: Set<string>): FlagSpec {
 	const { core, description } = unwrap(schema)
 	const multiple = core.def.type === "array"
 	const element = multiple ? (core.def as unknown as { element: z.ZodType }).element : core
+	const elementCore = unwrap(element)
 	const flag = toKebab(field)
 	if (RESERVED_FLAGS.includes(flag)) {
 		throw new Error(`Input field "${field}" collides with the global --${flag} flag.`)
@@ -54,10 +62,11 @@ function flagOf(field: string, schema: z.ZodType, taken: Set<string>): FlagSpec 
 	return {
 		field,
 		flag,
-		kind: kindOf(field, unwrap(element).core),
+		kind: kindOf(field, elementCore.core),
 		multiple,
 		required: !schema.safeParse(undefined).success,
-		description,
+		description: description ?? elementCore.description,
+		choices: choicesOf(elementCore.core),
 	}
 }
 

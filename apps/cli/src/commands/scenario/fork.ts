@@ -63,7 +63,7 @@ export const fork: Leaf = defineCommand({
 		set: z
 			.array(z.string())
 			.optional()
-			.describe("Replace one existing dotted document path with a JSON value; repeatable."),
+			.describe("Replace one existing dotted document path with a JSON value."),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
 	output: z.strictObject({
