@@ -95,12 +95,36 @@ In this order, and nothing before the trial balance:
 5. the unusual accounts, or **no baseline yet**, or "none";
 6. the rule from Step 5, printed once.
 
+## Step 7: ask once whether anything got in the way
+
+After the review is answered, ask one question, once: did anything get in the way of using `traj` this
+period? Ask it once per check-in, and never again in the same conversation.
+
+When the person says nothing got in the way, or does not answer, stop here.
+
+When they want the project to hear what got in the way, draft a feedback issue and show them the full
+text. The draft uses the project's "I tried traj and stopped" form, the issue template
+`tried-and-stopped.yml`, at `https://github.com/trajectonomics/trajectonomics/issues/new?template=tried-and-stopped.yml`:
+
+- a title in the form's shape, `Stopped: ` followed by a few words in the person's own terms;
+- the "Where did you stop?" boxes the person's words match, and no others. The boxes are Install,
+  Terminal, Agent setup, The skill, Tax coverage, Currency (THB only), Trust, Time and Other;
+- the "What happened?" text, in the person's own words, a sentence or two long.
+
+Before you show the draft, remove every ledger figure, balance, account name, merchant name and other
+personal detail the person mentioned. When the feedback needs one of them, describe it in general
+words, such as "the balance looked wrong", and leave the number out.
+
+Show the complete draft in your reply. Then say the person may open the form, paste the title and the
+text, tick the boxes and submit it themselves, or not submit it at all. The ledger sends nothing, and
+you never submit the draft or create the issue: the person chooses to send a draft they have read.
+
 ## Unattended
 
 State the assumptions in the review instead of asking: the period it read, that the as-of is the one
-supplied, that there is no prior period or no baseline when that is so. Ask nothing. An as-of the
-request does not carry is a stop, not a substitution, because the ledger has no clock and neither
-does this Recipe.
+supplied, that there is no prior period or no baseline when that is so. Ask nothing, so skip Step 7:
+no question and no draft. An as-of the request does not carry is a stop, not a substitution, because
+the ledger has no clock and neither does this Recipe.
 
 ## What this Recipe never does
 
@@ -108,3 +132,4 @@ does this Recipe.
 - It never reports a figure without its as-of and the entries behind it.
 - It never nets a refund into gross spend, and never invents a second rule for unusual.
 - It never writes to the ledger: a review reads, and every write belongs to another Recipe.
+- It never submits, posts or creates feedback. It shows a draft, and the person sends it or not.

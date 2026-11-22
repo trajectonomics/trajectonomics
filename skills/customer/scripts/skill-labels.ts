@@ -3,9 +3,9 @@
  *
  * A label is a dotted lowercase identifier, such as `income.section40_1`; a dotted span ending in a
  * file suffix (`traj.db`, `skills.manifest.json`) is a file this repository ships, not a label. Only a
- * value the schema lists is published, so on `@trajectonomics/cli@0.2.0` — whose `scenario tax`
- * carries `income.section40_1` only inside the `--label` flag's prose — every label a Skill names
- * fails, which is the rule that keeps the Thai tax recipe for the release that publishes it.
+ * value the schema lists is published. The published releases carry the labels only inside the
+ * `--label` flag's prose, so every label a Skill names fails. The Thai tax recipe therefore names none:
+ * it reads the classes from `traj schema` at run time and never picks one.
  */
 import type { PublishedSchema } from "./cli-schema"
 import { codeSpans } from "./skill-calls"

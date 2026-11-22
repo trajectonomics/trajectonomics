@@ -7,7 +7,7 @@ import { codeSpans, manifest, PLAN_SKILL_PATH, read, section } from "./skills-te
  * tasks 16, 17, 19 and 20). The command surface is checked at the CLI Range floor.
  */
 const source = read(PLAN_SKILL_PATH)
-const { fields, body } = skillFrontmatter(source, PLAN_SKILL_PATH)
+const { fields, block, body } = skillFrontmatter(source, PLAN_SKILL_PATH)
 const row = manifest.skills.find((candidate) => candidate.name === "traj-plan")
 
 describe("the traj-plan Skill", () => {
@@ -21,9 +21,11 @@ describe("the traj-plan Skill", () => {
 			expect(lower).toContain(trigger)
 	})
 
-	it("is published from its own manifest row, with the range the recipe needs", () => {
+	it("is published from its own manifest row, at the release that carries the tax allowances", () => {
 		expect(row).toBeDefined()
-		expect(row?.cliRange).toBe(">=0.2.0 <0.3.0")
+		// `scenario tax` takes its allowance flags from 0.3.0; 0.2.0 publishes only the tax flag itself.
+		expect(row?.cliRange).toBe(">=0.3.0 <0.4.0")
+		expect(block).toContain('cli: ">=0.3.0 <0.4.0"')
 	})
 
 	it("asks for the as-of and the horizon, and never substitutes a default for either", () => {
@@ -79,7 +81,8 @@ describe("the traj-plan Skill", () => {
 		const step = section(body, "What every answer discloses")
 		expect(step).toContain("This is an estimate, not a filing")
 		expect(step).toContain("What is not modelled")
-		expect(step).toContain("cannot produce a tax figure yet")
+		expect(step).toContain("does not file a return or use e-Filing")
+		expect(step).not.toContain("cannot produce a tax figure yet")
 		expect(step).toContain("THB")
 		expect(step).toContain("no Monte Carlo, no return shock")
 		expect(step).toContain("retire at 55")
@@ -92,5 +95,70 @@ describe("the traj-plan Skill", () => {
 		expect(step).toContain("never present an estimate as the tool's answer")
 		expect(step).toContain("Never report the 25-times figure as the FI date")
 		expect(step).toContain("Never hide an unfunded contribution or a run-out")
+	})
+})
+
+describe("the Thai tax recipe in the traj-plan Skill", () => {
+	const tax = section(
+		body,
+		"The Thai tax recipe: estimate a tax year, then show what a deduction changes",
+	)
+
+	it("runs against the one jurisdiction the schema publishes, and asks every fact first", () => {
+		expect(tax).toContain("the only value of `--tax`")
+		expect(tax).toContain("`th-2026`")
+		expect(tax).toContain(
+			"Ask every one of these in one question, and take no default for any of them",
+		)
+		expect(tax).toContain("a default they did not choose")
+		expect(tax).toContain("Zero is an answer")
+		expect(tax).toContain("Never pick a class to make a command pass")
+	})
+
+	it("marks the person's estimates rough and never marks a figure traj computed", () => {
+		expect(tax).toContain("rough — your estimate")
+		expect(tax).toContain("A figure `traj` computed is never marked rough")
+	})
+
+	it("writes the Levy to a Scenario of its own, and reports what the flags left out", () => {
+		expect(codeSpans(tax)).toContain("traj scenario tax <name> --tax th-2026")
+		expect(tax).toContain("a fork of the baseline, so the baseline stays untouched")
+		expect(tax).toContain("The result's `allowances` lists what the flags stated")
+	})
+
+	it("reads the tax year from the projection and says it is an estimate, not a filing", () => {
+		expect(codeSpans(tax)).toContain(
+			"traj projection run --as-of <as-of> --horizon <horizon> --scenario <name> --json",
+		)
+		expect(tax).toContain("estimate, not a filing")
+		expect(tax).toContain("`traj` does not file a return and does not use e-Filing")
+	})
+
+	it("shows a deduction as a what-if fork, or as a --set on a contribution Flow", () => {
+		expect(codeSpans(tax)).toContain("traj scenario fork <baseline> <what-if>")
+		expect(codeSpans(tax)).toContain("traj scenario tax <what-if> --tax th-2026")
+		expect(codeSpans(tax)).toContain(
+			"traj projection compare <baseline> <what-if> --as-of <as-of> --horizon <horizon> --json",
+		)
+		expect(codeSpans(tax)).toContain(
+			"traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json",
+		)
+		expect(tax).toContain("cannot add one")
+		expect(tax).toContain("100 THB is 10000 satang")
+	})
+
+	it("reports both owed figures side by side, and never subtracts them itself", () => {
+		expect(tax).toContain("Do not subtract the two figures yourself")
+		expect(tax).toContain("the figure is not the deduction alone")
+	})
+
+	it("answers what X baht of a retirement or ThaiESG class would change, and never names a fund", () => {
+		expect(tax).toContain("what would X baht of RMF or ThaiESG change")
+		expect(tax).toContain('never "buy this"')
+		expect(tax).toContain("Never name, compare, rank or recommend a fund or any investment product")
+	})
+
+	it("names no tax label, so the classes come from the schema at run time", () => {
+		expect(body).not.toMatch(/income\.section40|allowance\.retirement|allowance\.thai_esg/)
 	})
 })

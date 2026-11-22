@@ -184,14 +184,29 @@ the read failed, the failure has been reported and the conversation handed over;
 line has been disclosed where one exists, as has a skill whose range the command line has passed; and
 the operating skill is running the conversation.
 
+## If a step fails
+
+When a step cannot finish — the download of the command line, an install of a row, or the read in
+step 3 — report what failed in the command line's own words. Then offer once: "If you want the project
+to hear what got in the way, I can draft a GitHub issue for you to read and send yourself. Nothing is
+sent unless you send it." Setup does not wait for the answer.
+
+When they accept, draft the issue on the project's "I tried traj and stopped" form, the issue template
+`tried-and-stopped.yml` at `https://github.com/trajectonomics/trajectonomics/issues/new?template=tried-and-stopped.yml`:
+a title beginning `Stopped: `, the "Where did you stop?" boxes their words match, and their own words
+for "What happened?". Leave out every figure, balance, account name and path under their home
+directory. Show the complete draft, and never submit it: the person sends it or not. Do not offer again
+in this conversation.
+
 ## What setup leaves behind
 
 Tell them, once, before the handover:
 
 - **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger itself
-  makes no network connection: it computes on this machine and sends nothing anywhere. Two things do
-  reach the network, and only these two — the binary download, and the `skills` CLI that installs
-  these skills. Say exactly that, and nothing broader.
+  makes no network connection: it computes on this machine and sends nothing anywhere. Setup itself
+  reaches the network twice, and only twice — the binary download, and the `skills` CLI that installs
+  these skills. Say exactly that, and nothing broader. A feedback draft is separate: it leaves this
+  machine only when the person sends it themselves, after reading the full text, and setup never sends one.
 - **Never `rm -rf ~/.traj`.** That directory holds the ledger; removing it destroys every row, and no
   command below 0.3.0 removes the data for you. From 0.3.0 the CLI has its own guarded removal, which
   refuses without a confirmation.
