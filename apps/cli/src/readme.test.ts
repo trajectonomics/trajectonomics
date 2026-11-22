@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { root } from "./commands"
 import { ROOT } from "./launcher-test-support"
 import { checkReleaseDocs } from "./release-docs"
+import { capture } from "./test-support"
 import { leavesOf } from "./tree"
 
 const readme = readFileSync(join(ROOT, "README.md"), "utf8")
@@ -124,7 +125,12 @@ describe("the README first screen", () => {
 
 	it("links the landing page and the docs page, and no other site host", () => {
 		// A trajectonomics.com link is allowed only for the landing page and the docs host.
-		const siteUrls = ["https://trajectonomics.com/", "https://docs.trajectonomics.com/"]
+		const siteUrls = [
+			"https://trajectonomics.com/",
+			"https://docs.trajectonomics.com/",
+			// The `tx` page of the Docs Portal, which documents `traj tx import` (cli#96).
+			"https://docs.trajectonomics.com/cli/commands/tx/",
+		]
 		const linked =
 			beforeDevelopment.match(/https?:\/\/(?:docs\.)?trajectonomics\.com[^\s)\]]*/g) ?? []
 		expect(linked.length).toBeGreaterThan(0)
@@ -166,6 +172,42 @@ describe("the README says where the ledger lives", () => {
 	it("says --out must not exist yet and that JSONL is the only lossless format", () => {
 		expect(firstScreen).toContain("must not exist yet")
 		expect(firstScreen).toContain("JSONL is the only lossless export format")
+	})
+})
+
+// A person with a real ledger loads a statement with one command, so the front door names it (cli#96).
+const IMPORT_HEADING = "\n## Importing a statement\n"
+const [, afterImport = ""] = readme.split(IMPORT_HEADING)
+const importSection = afterImport.split("\n## ")[0] ?? ""
+
+describe("the README's import section", () => {
+	it("follows the first commands and comes before Development", () => {
+		const first = readme.indexOf("\n## Your first commands\n")
+		const importAt = readme.indexOf(IMPORT_HEADING)
+		expect(first).toBeGreaterThan(-1)
+		expect(importAt).toBeGreaterThan(first)
+		expect(readme.indexOf(DEVELOPMENT_HEADING)).toBeGreaterThan(importAt)
+	})
+
+	it("names the template, the dry run and stdin", () => {
+		expect(importSection).toContain("traj tx import --template")
+		expect(importSection).toContain("--dry-run")
+		expect(importSection).toContain("`-`")
+	})
+
+	it("prints the template header the importer reads, and that is all", async () => {
+		const header = "date,from,to,amount,memo,external_ref,project"
+		expect(importSection).toContain(`
+${header}
+`)
+		const printed = await capture(["tx", "import", "--template"], {})
+		expect(printed.out).toBe(header)
+	})
+
+	it("links the docs page for tx, and sample rows stay out of it", () => {
+		expect(importSection).toContain("https://docs.trajectonomics.com/cli/commands/tx/")
+		// ADR-0025: the template prints no sample row, so the README copies none.
+		expect(importSection).not.toMatch(/^\d{4}-\d{2}-\d{2},/m)
 	})
 })
 
