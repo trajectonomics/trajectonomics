@@ -1,4 +1,4 @@
-import { describe, it } from "bun:test"
+import { describe, expect, it } from "bun:test"
 import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -118,6 +118,7 @@ describe("help examples are part of the CLI contract", () => {
 	for (const { path, leaf } of leavesOf(root)) {
 		const name = path.join(" ")
 		it(`runs every example of traj ${name} and each exits as documented`, async () => {
+			expect(leaf.examples.length).toBeGreaterThan(0)
 			await runExamples(name, leaf)
 		}, 120_000)
 	}
