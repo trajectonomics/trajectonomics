@@ -1,0 +1,32 @@
+name: I tried traj and stopped
+description: Tell us where traj got in your way. This is not a bug report, and it needs no ledger figures.
+title: "Stopped: "
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for telling us. Tick each step that stopped you, then say what happened in your own words.
+        For a defect, use the bug report instead.
+  - type: checkboxes
+    id: where
+    attributes:
+      label: Where did you stop?
+      description: Tick every step that stopped you.
+      options:
+        - label: Install
+        - label: Terminal
+        - label: Agent setup
+        - label: The skill
+        - label: Tax coverage
+        - label: Currency (THB only)
+        - label: Trust
+        - label: Time
+        - label: Other (say which in the box below)
+  - type: textarea
+    id: details
+    attributes:
+      label: What happened?
+      description: In a sentence or two, what you tried and where it stopped. Please do not paste ledger figures, account names or other personal financial data.
+    validations:
+      required: true
