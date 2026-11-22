@@ -57,20 +57,21 @@ describe("a closed flag names the values it accepts", () => {
 		)
 	})
 
-	it("prints --set once on the fork and projection pages", async () => {
-		for (const path of [
-			["scenario", "fork"],
-			["projection", "compare"],
-		]) {
-			const line = flagLine((await help(path)).out, "set") ?? ""
-			expect(line).toMatch(/with a JSON value|satang \(100 per THB\)/)
-			expect(line.match(/repeatable/g)).toHaveLength(1)
+	it("prints --set's own description and repeatable once, on each of its four pages", async () => {
+		const plain = /Replace one existing dotted document path with a JSON value; repeatable$/
+		const satang =
+			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\); repeatable$/
+		expect(flagLine((await help(["scenario", "fork"])).out, "set")).toMatch(plain)
+		for (const path of [["fi"], ["projection", "run"], ["projection", "compare"]]) {
+			expect(flagLine((await help(path)).out, "set")).toMatch(satang)
 		}
 	})
 
-	it("prints --label's note once, with its clause saying needs --tax", async () => {
+	it("prints --label's description saying needs --tax, and repeatable once at the end", async () => {
 		const line = flagLine((await help(["scenario", "tax"])).out, "label") ?? ""
-		expect(line).toContain("needs --tax.")
+		expect(line).toContain(
+			"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax. An income Flow takes one of ",
+		)
 		expect(line.match(/repeatable/g)).toHaveLength(1)
 		expect(line).toMatch(/; repeatable$/)
 	})
