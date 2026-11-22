@@ -13,7 +13,7 @@ import {
 	noStoredData,
 } from "../../data/errors"
 import { inventoryOf, remainingOf } from "../../data/inventory"
-import { DATABASE_FILE, dataDirectory } from "../../data-directory"
+import { DATABASE_FILE, dataDirectory, defaultHomeRefusal } from "../../data-directory"
 import { isAppError } from "../../errors"
 import { directoryStep } from "../../store/io-steps"
 import { withStore } from "../../with-store"
@@ -56,6 +56,7 @@ export const remove: Leaf = defineCommand({
 		"backup_unreadable",
 		"database_busy",
 		"database_corrupt",
+		"default_home_refused",
 		"database_too_new",
 		"disk_full",
 		"invalid_input",
@@ -65,6 +66,8 @@ export const remove: Leaf = defineCommand({
 		"permission_denied",
 	],
 	run: (input, ctx) => {
+		const refused = defaultHomeRefusal(ctx.env)
+		if (refused !== undefined) return refused
 		const database = join(dataDirectory(ctx.env), DATABASE_FILE)
 		// It reports what it would delete, including nothing, rather than the store's ledger_missing.
 		if (!existsSync(database)) return noStoredData(database)

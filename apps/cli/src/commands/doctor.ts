@@ -24,7 +24,7 @@ export const doctor: Leaf = defineCommand({
 		},
 	],
 	// A check's finding is a result, not a failure (ADR-0038); only a bad --as-of is an input error.
-	errorCodes: ["AMOUNT_OVERFLOW", "INVALID_DATE"],
+	errorCodes: ["AMOUNT_OVERFLOW", "default_home_refused", "INVALID_DATE"],
 	run: (input, ctx) => {
 		const result = doctorOf(ctx, input.asOf)
 		return isAppError(result) ? result : ok(result)

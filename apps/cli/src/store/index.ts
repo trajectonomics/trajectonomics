@@ -1,5 +1,6 @@
 import { existsSync, statSync } from "node:fs"
 import type { Env } from "../command"
+import { defaultHomeRefusal } from "../data-directory"
 import { type AppError, type ErrorCode, fail, isAppError } from "../errors"
 import { connect } from "./connection"
 import { PERSONAL_ENTITY_ID } from "./ids"
@@ -29,6 +30,7 @@ export type * from "./types"
  * unwritable or corrupt.
  */
 export const LEDGER_OPEN_CODES: readonly ErrorCode[] = [
+	"default_home_refused",
 	"ledger_missing",
 	"not_a_directory",
 	"permission_denied",
@@ -61,6 +63,8 @@ function ledgerMissing(database: string): AppError {
  * until `close()`.
  */
 export function openStore(options: StoreOptions): Store | AppError {
+	const refused = defaultHomeRefusal(options.env)
+	if (refused !== undefined) return refused
 	const paths = ledgerPaths(options.env)
 	const kind = directoryStep(paths.directory, () =>
 		statSync(paths.directory, { throwIfNoEntry: false }),

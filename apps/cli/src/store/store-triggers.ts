@@ -20,6 +20,8 @@ export type StoreRaised = Exclude<
 	| "scenario_name_taken"
 	| "not_found"
 	| "ledger_missing"
+	// Raised by the data directory guard, before the store looks at any path (ADR-0053).
+	| "default_home_refused"
 	// Raised by the export command, which is the only writer outside the data directory.
 	| "output_exists"
 	| "export_failed"
