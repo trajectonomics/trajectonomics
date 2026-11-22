@@ -17,12 +17,14 @@ traj telemetry status  # Show the current choice and why.
 ```
 
 The output depends on the machine it runs on, so it is not a checked example. It prints three facts:
-`enabled`, the `reason` (for example `do_not_track` when the `DO_NOT_TRACK` variable is set), and the
-path of the state file.
+`enabled`, the `reason`, and the path of the state file. The `reason` is one of `on`, `turned_off`
+(after `traj telemetry off`), `do_not_track` (`DO_NOT_TRACK` is set), `env_off` (a usage-count
+variable in the environment), `ci` (`CI` is set) or `development_build` (a build from a source
+checkout).
 
 ## `traj telemetry off`
 
-Stop counting on this machine, and delete the random id it sent.
+Stop counting on this machine, and forget the random id it sent.
 
 ```bash
 traj telemetry off  # Stop counting on this machine.
@@ -39,12 +41,14 @@ traj telemetry on  # Count again.
 ## What one event holds
 
 After a command finishes, a detached process sends one anonymous event to PostHog (EU), so the
-command never waits for the network. The event holds:
+command never waits for the network. The event is named `traj_command_run`, carries the random id
+as its `distinct_id` and the time the command ended, and holds:
 
 - `command` — the command name, such as `tx add`, or nothing when the command line named none
 - `exit_code` and `error_code` — how the run ended, such as `invalid_input`
 - `format` — `human` or `json`
 - `version`, `os` and `arch` — the CLI version and the platform
+- `surface` — always `cli`
 
 It never holds your ledger, arguments, flag values, account names, amounts, file paths, the data
 directory or any environment variable. As with any web request, PostHog sees the IP address the
@@ -64,8 +68,8 @@ as a new person on every run.
 - `traj telemetry off`, which stores the choice for this machine
 - `DO_NOT_TRACK=1` in the environment of the command
 
-`traj telemetry on` does not override the environment: a `DO_NOT_TRACK` or `CI` setting still stops
-counting, and `status` says which one does.
+`traj telemetry on` does not override the environment or the build: a `DO_NOT_TRACK` or `CI` setting,
+or a development build, still stops counting, and `status` says which one does.
 
 CI runners, where `CI` is set, and development builds never send.
 
