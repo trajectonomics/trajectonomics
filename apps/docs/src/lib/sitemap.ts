@@ -3,7 +3,7 @@
  * built and read here by pure functions; `pages/sitemap.xml.ts` is the adapter that serves it.
  */
 
-import { SITE_ORIGIN } from "./site"
+import { pageUrl } from "./site"
 
 /** The sitemap protocol's namespace, which every `<urlset>` states. */
 const SITEMAP_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -15,12 +15,6 @@ const XML_ENTITIES: Readonly<Record<string, string>> = {
 	gt: ">",
 	quot: '"',
 	apos: "'",
-}
-
-/** The absolute URL of a page path, with exactly one trailing slash and no date. */
-function pageUrl(path: string): string {
-	const slug = path.replace(/^\/+|\/+$/g, "")
-	return slug.length === 0 ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/${slug}/`
 }
 
 /** `value` with the XML characters escaped, so a page path cannot break the document. */
