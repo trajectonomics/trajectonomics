@@ -82,6 +82,9 @@ is the ledger, and until `traj init` has created it every command that reads or 
 with `ledger_missing`. [Your data](/cli/data/) says what else is in the directory, what is safe to
 delete, and how to back it up.
 
+`traj` counts anonymous usage unless you turn it off. The first successful command prints one line on
+stderr about it; [`traj telemetry`](/cli/commands/telemetry/) says what is sent and how to stop it.
+
 ## What next
 
 - [Installation](/cli/installation/): the three install channels, the agent skill, release
@@ -90,6 +93,7 @@ delete, and how to back it up.
 - [Agent](/cli/agent/): what the Agent asks you for, where the tool stops, and what this release
   does.
 - [Configuration](/cli/configuration/): the environment variables the CLI reads.
+- [Telemetry](/cli/commands/telemetry/): the anonymous usage count, what it holds and how to stop it.
 - [Commands](/cli/commands/): the command reference.
 
 The source code lives in

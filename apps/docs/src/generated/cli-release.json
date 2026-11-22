@@ -1,5 +1,5 @@
 {
-	"version": "0.4.0",
+	"version": "0.6.0",
 	"leaves": [
 		{
 			"name": "account add",
@@ -28,6 +28,20 @@
 		{
 			"name": "baseline show",
 			"flags": ["--as-of"]
+		},
+		{
+			"name": "dashboard",
+			"flags": [
+				"--as-of",
+				"--horizon",
+				"--scenario",
+				"--compare",
+				"--birth-date",
+				"--age",
+				"--monthly",
+				"--carry-in",
+				"--port"
+			]
 		},
 		{
 			"name": "data remove",
@@ -79,7 +93,7 @@
 		},
 		{
 			"name": "scenario apply",
-			"flags": ["--file", "--template", "--dry-run"]
+			"flags": ["--file", "--template", "--as-of", "--dry-run"]
 		},
 		{
 			"name": "scenario diff",
@@ -125,6 +139,18 @@
 		},
 		{
 			"name": "schema",
+			"flags": []
+		},
+		{
+			"name": "telemetry off",
+			"flags": []
+		},
+		{
+			"name": "telemetry on",
+			"flags": []
+		},
+		{
+			"name": "telemetry status",
 			"flags": []
 		},
 		{
@@ -198,6 +224,10 @@
 			"summary": "Show the Baseline a Projection starts from"
 		},
 		{
+			"name": "dashboard",
+			"summary": "Serve the Dashboard of this ledger on 127.0.0.1 until Ctrl-C"
+		},
+		{
 			"name": "data",
 			"summary": "Manage the stored data itself"
 		},
@@ -244,6 +274,10 @@
 		{
 			"name": "schema",
 			"summary": "Describe the commands and the error registry"
+		},
+		{
+			"name": "telemetry",
+			"summary": "Show or change anonymous usage counting"
 		},
 		{
 			"name": "tx",
@@ -483,6 +517,11 @@
 		{
 			"code": "restore_target_not_empty",
 			"exitCode": 5,
+			"retryable": false
+		},
+		{
+			"code": "same_account",
+			"exitCode": 3,
 			"retryable": false
 		},
 		{

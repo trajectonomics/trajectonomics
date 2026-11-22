@@ -30,6 +30,18 @@ value falls back to `human` and is reported as text with exit code 2.
 
 Set to `1` to print diagnostics for unexpected errors on stderr.
 
+## DO_NOT_TRACK
+
+Set to any value other than empty, `0` or `false` to stop the anonymous usage count for the command
+that runs with it. [Telemetry](/cli/commands/telemetry/)
+lists what the count holds.
+
+## TRAJ_TELEMETRY
+
+Set to `0`, `off` or `false` (in any case) to stop the usage count for the command. Like
+`DO_NOT_TRACK`, it is read from the environment of the command, and `traj telemetry status` reports
+which setting stopped it.
+
 ## Building from source
 
 `TRAJ_BINARY_PATH` points the npm launcher at a binary you built yourself. Building the CLI from

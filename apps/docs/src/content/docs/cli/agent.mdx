@@ -79,6 +79,9 @@ Scenarios side by side, or one against a what-if, with the deltas in FI date, ne
 you name and run-out year. [`traj fi`](/cli/commands/fi/) answers the financial-independence
 question, with the 25× rule of thumb as a labelled reference.
 
+This release also serves the Dashboard. [`traj dashboard`](/cli/commands/dashboard/) reads the ledger once
+and serves it on 127.0.0.1 until you stop it, so only this machine can open it.
+
 Tax is the Scenario's. [`traj scenario tax`](/cli/commands/scenario/) writes Thailand's 2026
 personal income tax into a Scenario and classifies the income Flows it applies to. A Scenario
 without that Levy is projected before tax, and every result says which it is.

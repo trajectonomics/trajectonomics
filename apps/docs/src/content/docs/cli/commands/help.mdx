@@ -11,4 +11,8 @@ traj help         # List the commands.
 traj help schema  # Show how `schema` is used.
 ```
 
+A flag that takes one of a closed set of values lists them in its note, such as `one of a, b, c`,
+in the order the command accepts them. `traj help <command>` also shows the examples, and every
+example in it is run by the test suite, so an example you copy works as printed.
+
 See [Commands](/cli/commands/) for the global options, exit codes and error envelope.

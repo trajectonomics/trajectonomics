@@ -127,6 +127,10 @@ traj projection run --scenario base --as-of 2026-01-01 --horizon 2026-12-31 --js
 
 Every figure states the as-of date and the horizon you passed, so read them with it.
 
+Each `taxYears` row also carries an `assumptions` array. It names the tax figures that year's
+computation used whose source is not yet confirmed, such as a ceiling the Revenue Department has not
+yet published. Read those as estimates. An empty array means every figure the year used is confirmed.
+
 ## What one more deduction changes
 
 `traj projection compare` sets two Projections side by side. Here side `a` is the Scenario as it is,
@@ -173,8 +177,10 @@ a deduction would change, not advice to buy any fund.
 
 ## Your data stays on your machine
 
-The ledger and every Scenario live in your data directory, and the ledger sends nothing. `traj` never
-calls a model. Your Agent is different: it sends what you type to the model service it runs on. Read
+The ledger and every Scenario live in your data directory, and the ledger's figures never leave the
+machine. `traj` sends one anonymous usage count per command, with no figure, unless you turn it off
+with `traj telemetry off` or `DO_NOT_TRACK=1`; [Telemetry](/cli/commands/telemetry/) lists exactly what
+it holds. `traj` never calls a model. Your Agent is different: it sends what you type to the model service it runs on. Read
 that service's privacy terms before you share a payslip or a national ID number.
 
 Previous: [Agent](/cli/agent/) · Next: [ประมาณภาษีปี 2569 กับ AI agent ของคุณ](/cli/tax-season-2026-th/).
