@@ -15,6 +15,7 @@ import ChatMessage from "./ChatMessage.astro"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
 import Cross from "./icons/Cross.astro"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -134,6 +135,8 @@ const keys = (prompt: typeof typed.with, chars: number) =>
 			<div class="app-chat" data-chat="with" data-play-ms={guided.totalMs}>
 				<div class="app-chat-head">
 					<span class="app-chat-title">{dictionary.appTitleWith}</span>
+					{/* The Mascot waves from the header where traj joins the chat; its hand rests on the hairline (mascot-places.css). */}
+					<Mascot pose="hello" class="mascot-hello" />
 					<span class="app-chat-tag" data-tone="good">
 						<Check class="app-chat-mark" />{dictionary.actionWithLabel}
 					</span>

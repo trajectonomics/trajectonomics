@@ -4,6 +4,8 @@ status: accepted
 
 # The Mascot is a rendered cut-out, not a drawing
 
+[ADR 0027](./0027-a-phone-always-has-the-mascot-on-screen.md) adds four more poses made the same way, so `public/mascot/` now holds eight WebPs, about 90 KB in all.
+
 [ADR 0025](./0025-the-page-carries-the-mascot.md) put the Mascot on the page as a flat inline SVG drawn from Theme roles. The owner saw it live on 2026-11-22 and rejected it: it read as fake next to the soft 3D robot on the blog's covers, and it lost the character's cuteness. They asked for art made the way the blog's figures were made, by Gemini, and cut out.
 
 ## Decision

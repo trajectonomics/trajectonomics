@@ -16,6 +16,7 @@ import {
 } from "../lib/site"
 import { RELEASE_SNAPSHOT } from "../lib/site/release-snapshot"
 import Facts from "./Facts.astro"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -84,6 +85,8 @@ const columns: readonly { readonly label: string; readonly links: readonly Foote
 						</div>
 					))
 				}
+				{/* The Mascot sits in the grid's free cell, on the hairline under the links (mascot-places.css). */}
+				<Mascot pose="sit" class="mascot-sit" />
 			</div>
 		</div>
 		<Facts dictionary={dictionary} />
