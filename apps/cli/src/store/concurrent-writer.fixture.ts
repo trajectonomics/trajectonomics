@@ -1,11 +1,12 @@
-// Spawned by concurrency.test.ts as a separate `bun` process: argv is <home> <writer> <count>.
+// Spawned by concurrency.test.ts as a separate `bun` process: argv is <home> <writer> <count> [busy timeout ms].
 // Count 0 only opens the store, which is how concurrent first-opens are exercised. A refusal is
 // printed as its envelope and sets a non-zero exit code; only src/index.ts calls process.exit.
+// The busy timeout is the store's own `busyTimeoutMs` option; omitted, the store's default applies.
 import { type AppError, isAppError } from "../errors"
 import { openStore, type Store } from "./index"
 import { SCENARIO_DOCUMENT } from "./testing"
 
-const [home = "", writer = "0", count = "0"] = process.argv.slice(2)
+const [home = "", writer = "0", count = "0", busy] = process.argv.slice(2)
 
 function failed(outcome: unknown): outcome is AppError {
 	if (!isAppError(outcome)) return false
@@ -38,7 +39,11 @@ function write(store: Store): void {
 	}
 }
 
-const store = openStore({ env: { TRAJ_HOME: home }, clock: () => new Date() })
+const store = openStore({
+	env: { TRAJ_HOME: home },
+	clock: () => new Date(),
+	...(busy === undefined ? {} : { busyTimeoutMs: Number(busy) }),
+})
 if (!failed(store)) {
 	write(store)
 	store.close()
