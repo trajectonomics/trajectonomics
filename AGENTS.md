@@ -49,7 +49,7 @@ Saving the owner's attention is part of the job, so finish a task instead of ask
 
 ## Subagents
 
-Delegate: the lead session plans, briefs, reviews the diffs and merges, and subagents do the legwork (reading, searching, editing, running checks). Brief each one with the files, the exact change and its completion criterion, because a subagent starts without your context. A Pi session keeps rule 7's DeepSeek-only models, and a package whose `AGENTS.md` names its own work model (such as `apps/site`) keeps it inside that package; this ladder is the default everywhere else.
+Delegate by default: this section is the owner's standing request to use subagents, so spawn them without being asked again. The lead session plans, briefs, reviews the diffs and merges, and subagents on cheap models do the legwork (reading, searching, editing, running checks). Do a step yourself only when briefing it costs more than doing it, such as a one-line edit or a single command. Brief each one with the files, the exact change and its completion criterion, because a subagent starts without your context. A Pi session keeps rule 7's DeepSeek-only models, and a package whose `AGENTS.md` names its own work model (such as `apps/site`) keeps it inside that package; this ladder is the default everywhere else.
 
 Pick the cheapest model that can finish the brief:
 
