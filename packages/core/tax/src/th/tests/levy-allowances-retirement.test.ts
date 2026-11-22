@@ -57,13 +57,13 @@ describe("TH 2026 Levy retirement allowances", () => {
 		expect(retirement(income, contributions)).toEqual(expected({}, income, contributions))
 	})
 
-	it("uses the Section 40(1) wage for PVD and GPF percentage caps", () => {
+	it("caps PVD at a share of the Section 40(1) wage, and GPF only at its baht ceiling", () => {
 		const income = new Map([[S1, toSatang(300_000)]])
 		const contributions = new Map([
 			[ThLevyContributionLabel.Pvd, toSatang(100_000)],
 			[ThLevyContributionLabel.Gpf, toSatang(100_000)],
 		])
-		expect(retirement(income, contributions)).toEqual({ cluster: toSatang(135_000), thaiEsg: 0 })
+		expect(retirement(income, contributions)).toEqual({ cluster: toSatang(145_000), thaiEsg: 0 })
 		expect(retirement(income, contributions)).toEqual(expected({}, income, contributions))
 	})
 

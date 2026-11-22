@@ -11,7 +11,7 @@ const CASES = 250
  *
  * Percentage deductions floor to the satang (owner ruling 2026-11-22, trajectonomics/trajectonomics#52),
  * so a step of 3 baht or more holds in 40,000 seeded draws. Sub-3-baht steps hold in 40,000 draws too
- * (checked outside the suite), but a satang-level dip remains: see the skipped test below.
+ * (checked outside the suite), and the allowances stage subtracts in integer satang (see the test below).
  */
 const MIN_STEP_BAHT = 3
 const SLOT_IDS: readonly IncomeSlotId[] = [
@@ -90,15 +90,10 @@ describe("Thai PIT invariant: more income of one class never lowers tax", () => 
 		)
 	})
 
-	// KNOWN VIOLATION, skipped so the suite stays green. Seed 52004, profile 403 (the 404th draw), with
-	// 40(8) general set to 11,993.04 then 11,993.05 baht: total tax falls from 57,270.82 to 57,270.81.
-	// Not the deduction: the 60% floor and the donation floor are both exact on their inputs. The cause
-	// is binary floating-point subtraction in allowances.ts (netBeforeDonations = assessable - expenses -
-	// other allowances). At 11,993.04 it gives 776,080.0999999996 where the exact value is 776,080.10, so
-	// the satang floor of the 10% 1x donation cap (floorByRateToSatang) gives 77,608.00, not 77,608.01.
-	// Net income then falls by a satang. Clearing the allowances removes every dip in 1,200 such profiles.
-	// Fix: sum the allowances stage in integer satang. Tracked on trajectonomics/trajectonomics#52.
-	it.skip("KNOWN VIOLATION: tax falls by a satang from float subtraction before the donation floor (seed 52004, profile 403)", () => {
+	// Seed 52004, profile 403, with 40(8) general at 11,993.04 then 11,993.05 baht: a float subtraction
+	// before the donation cap once made total tax fall by a satang. The allowances stage now subtracts
+	// in integer satang (#52).
+	it("never falls by a satang from float subtraction before the donation floor (seed 52004, profile 403)", () => {
 		const rng = seededRandom(52_004)
 		let base = randomProfile(rng)
 		for (let index = 0; index < 403; index++) base = randomProfile(rng)

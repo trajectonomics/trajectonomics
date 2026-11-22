@@ -52,11 +52,8 @@ export function calculateRetirementAllowances(
 		{ base: wage, rate: p.pvd.maxRate, ceiling: p.pvd.ceiling, currency },
 		ThAllowanceField.Pvd,
 	)
-	const gpf = clampCap(
-		input.gpf ?? 0,
-		{ base: wage, rate: p.gpf.maxRate, ceiling: p.gpf.ceiling, currency },
-		ThAllowanceField.Gpf,
-	)
+	// GPF has a baht ceiling and no share-of-wages limit (PND 90 instructions, item 12(2); owner ruling 2026-11-22).
+	const gpf = clampCap(input.gpf ?? 0, p.gpf.ceiling, ThAllowanceField.Gpf)
 	const nsf = clampCap(input.nsf ?? 0, p.nsf.ceiling, ThAllowanceField.Nsf)
 	const pensionLifeInsurance = clampCap(
 		input.pensionLifeInsurance ?? 0,

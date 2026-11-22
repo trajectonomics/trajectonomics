@@ -32,7 +32,7 @@ change (OD5); no row carries it.
 
 ## Coverage
 
-`TH_2026_PARAMETERS` holds 125 scalar leaves, 73 collapsed paths and 71 statutory figures.
+`TH_2026_PARAMETERS` holds 124 scalar leaves, 72 collapsed paths and 70 statutory figures.
 `taxYear` and `currency` are not figures and are exempt (`src/th/references/exemptions.ts`).
 This manifest has one row per remaining path.
 
@@ -77,7 +77,7 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 
 ## Findings
 
-- **GPF rate: ruled on 2026-11-22 (OD5); the rate stays open.** The owner ruled that the correct GPF rate is used. The Revenue Department's PND 90 instructions for tax year 2567 (https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf) confirm the 500,000 baht ceiling for GPF contributions (item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท") but print no percentage for GPF. The 15 per cent is the provident fund's rate (item 8: "ไม่เกินร้อยละ 15 ของค่าจ้าง"), and the 30 per cent in those instructions (item 10.4) is the RMF's, of assessable income. The instructions therefore do not confirm the engine's 30 per cent of wages for GPF, and the base stays wages. The rate needs the statute itself (M.R. No. 126 (B.E. 2509) clause 2(61), an image scan that this host cannot read). No corpus case asserts the GPF rate.
+- **GPF: ruled on 2026-11-22 (OD5); no share-of-wages limit.** The owner ruled that the correct GPF rule is used. The Revenue Department's PND 90 instructions for tax year 2567 (https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf) cap GPF contributions in baht only (item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท"), while they cap the provident fund at 15 per cent of wages (item 8: "ไม่เกินร้อยละ 15 ของค่าจ้าง") and RMF at 30 per cent of assessable income (item 10.4). The engine therefore dropped `gpf.maxRate` (it applied 30 per cent of wages) and allows the GPF contribution actually paid, up to 500,000 baht, inside the combined retirement ceiling. The contribution rate a member may pay is set by the GPF Act, not by the tax rule. No corpus case asserted the old rate.
 - **`digitalAssetRate` is unsourced** (OD6). No 2026 rate was read; the code keeps 15 per cent with
   its assumption comment, and no corpus case asserts it.
 - **Two citations in the code were wrong; every comment that carried them is corrected.** The header of
@@ -124,7 +124,6 @@ No OCR is available on this host, so the two scans above stay unread; their rows
 | `allowances.personal` | 60,000 baht | Section 47(1)(a), as amended by Act No. 44 (B.E. 2560) s.5 | https://www.rd.go.th/fileadmin/user_upload/kormor/newlaw/p44.pdf | 2026-11-17 | match |
 | `allowances.retirementCluster.combinedCeiling` | not exceeding 500,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61) retirement clause; text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.gpf.ceiling` | not exceeding 500,000 baht | PND 90 instructions, tax year 2567, item 12(2): "เงินสะสม กบข. เฉพาะส่วนที่ไม่เกิน 500,000 บาท" (only the part not exceeding 500,000 baht); the same cap applies to the combined provident-fund, GPF and teacher-fund contributions (item 10.4). The instructions are for tax year 2567; the 2026 figure is assumed unchanged | https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf | 2026-11-22 | match |
-| `allowances.retirementCluster.gpf.maxRate` | 30 per cent of wages | Not printed for GPF in PND 90 instructions, tax year 2567: item 8 "ไม่เกินร้อยละ 15 ของค่าจ้าง" is the provident fund's rate, and item 10.4 "ไม่เกินร้อยละ 30 ของเงินได้พึงประเมิน" is the RMF's. M.R. No. 126 (B.E. 2509) clause 2(61) is a scan | https://www.rd.go.th/fileadmin/tax_pdf/pit/2567/Ins90_101067.pdf | 2026-11-22 | reported (owner ruled 2026-11-22; PND 90 gives no GPF percentage, so 30 is unconfirmed and the wages base is unchanged; Raidaai's 15 per cent is the provident fund's rate) |
 | `allowances.retirementCluster.nsf.ceiling` | not exceeding 30,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.ceiling` | not exceeding 200,000 baht | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |
 | `allowances.retirementCluster.pensionLifeInsurance.maxRate` | 15 per cent of assessable income | M.R. No. 126 (B.E. 2509) clause 2(61); text is a scan | https://raidaai.com/articles/2569/tax-deductions | 2026-11-17 | reported (Raidaai 2569) |

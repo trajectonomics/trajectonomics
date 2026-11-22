@@ -11,8 +11,8 @@ const CASES = 60
 const SWITCH_POINTS = [119_999.99, 120_000, 120_000.01, 999_999.99, 1_000_000, 1_000_000.01]
 /**
  * Points 3 baht apart around each switch, for sweeps whose base carries standard 40(8) deductions.
- * The standard deductions floor to the satang. The 3-baht sweep holds; a 0.01-baht satang dip from a
- * different source is recorded as a skipped test in invariants-monotone.test.ts.
+ * The standard deductions floor to the satang, and the allowances stage subtracts in integer satang,
+ * so the 3-baht sweep holds.
  */
 const SWITCH_POINTS_3_BAHT = [119_997, 120_000, 120_003, 999_997, 1_000_000, 1_000_003]
 

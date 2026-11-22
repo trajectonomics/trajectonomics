@@ -65,7 +65,7 @@ export const TH_2026_PARAMETERS: ThParameters = {
 			rmf: { maxRate: 0.3, ceiling: 500_000 },
 			ssf: { maxRate: 0.3, ceiling: 200_000 },
 			pvd: { maxRate: 0.15, ceiling: 500_000 },
-			gpf: { maxRate: 0.3, ceiling: 500_000 },
+			gpf: { ceiling: 500_000 },
 			nsf: { ceiling: 30_000 },
 			pensionLifeInsurance: { maxRate: 0.15, ceiling: 200_000 },
 		},
