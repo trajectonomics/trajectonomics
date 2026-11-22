@@ -1,0 +1,87 @@
+import { z } from "zod"
+import type { Leaf } from "../../command"
+import { defineCommand } from "../../command"
+import { fail, isAppError } from "../../errors"
+import { readCarryIn } from "../../projection/carryin"
+import { withCarryInSide } from "../../projection/carryin-apply"
+import { chanceOf } from "../../projection/chance"
+import { readReturnModel, returnModelFlagDocument } from "../../projection/chance-model"
+import { chanceHint, chanceView } from "../../projection/chance-view"
+import {
+	asOfFlag,
+	carryInFlag,
+	carryInFlagDocument,
+	horizonFlag,
+	PROJECTION_ERROR_CODES,
+	scenarioFlag,
+} from "../../projection/flags"
+import { withProjection } from "../../projection/leaf"
+
+/** The method in the words a help page prints: what runs, and what the result does not say. */
+const CHANCE_METHOD =
+	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up. The figures are nominal, and the CLI ships no Return model: the caller states one."
+
+export const chance: Leaf = defineCommand({
+	name: "chance",
+	summary: "Report the chance a Scenario holds to its Horizon, over seeded Market paths",
+	description: CHANCE_METHOD,
+	note: "Chance of success ships in 0.8.0.",
+	positionals: [],
+	input: z.strictObject({
+		asOf: asOfFlag,
+		horizon: horizonFlag,
+		scenario: scenarioFlag,
+		carryIn: carryInFlag,
+		returnModel: z
+			.string()
+			.describe("The Return model JSON file the Market paths draw from, in the sim format."),
+		paths: z
+			.number()
+			.int()
+			.describe("The number of Market paths to run, from 1 to 10,000. There is no default."),
+		seed: z
+			.string()
+			.describe("Sixteen lower-case hex digits. The same seed and model give the same paths."),
+	}),
+	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
+	output: chanceView,
+	render: chanceHint,
+	examples: [
+		{
+			command:
+				"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --json",
+			description: "The success share and the net-worth Bands of one Scenario, as JSON.",
+		},
+		{
+			command:
+				"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef",
+			description: "The same chance in the human form: the success share and a few Bands.",
+		},
+	],
+	errorCodes: PROJECTION_ERROR_CODES,
+	run: async (input, ctx) => {
+		// Standard input can be read once, so only one of the two documents may come from it.
+		if (input.returnModel === "-" && input.carryIn === "-") {
+			return fail("invalid_input", {
+				path: "--carry-in",
+				message: "--carry-in: standard input already holds the Return model",
+				hint: "Read one of the two documents from a file: --return-model PATH or --carry-in PATH.",
+			})
+		}
+		const model = await readReturnModel(input.returnModel, ctx.stdin)
+		if (isAppError(model)) return model
+		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
+		if (isAppError(records)) return records
+		return withProjection(input, ctx, (prepare) => {
+			const prepared = prepare({
+				scenario: input.scenario,
+				scenarioPath: "scenario",
+				sets: [],
+			})
+			if (isAppError(prepared)) return prepared
+			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
+			if (isAppError(placed)) return placed
+			return chanceOf(placed, model, { seed: input.seed, paths: input.paths })
+		})
+	},
+})

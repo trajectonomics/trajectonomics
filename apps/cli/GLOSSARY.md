@@ -138,6 +138,24 @@ _Avoid_: Investment expense, savings
 The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
 _Avoid_: Sample, skeleton, example
 
+### Chance
+
+**Chance of success**:
+The share of seeded Market paths on which a Scenario never runs out before its Horizon. It is a share of the paths a Return model produced, so it is only as meaningful as that model.
+_Avoid_: Probability, success rate, confidence
+
+**Return model**:
+The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none; a caller states one in a JSON file with `--return-model`.
+_Avoid_: Market history, returns table, assumptions
+
+**Market path**:
+One seeded run of a Return model's monthly draws over a Timeline. Paths differ only by their index, so the same seed and model always give the same set.
+_Avoid_: Simulation, run, scenario path
+
+**Band**:
+The net-worth Percentiles across Market paths at one annual roll-up end, at the 10th, 25th, 50th, 75th and 90th levels. Every Band value is one a path produced.
+_Avoid_: Range, interval, confidence band
+
 ### Financial independence
 
 **FI**:

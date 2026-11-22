@@ -1,3 +1,4 @@
+import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
 
 /**
@@ -24,6 +25,7 @@ export const SETUP: Record<string, Setup> = {
 		steps: [["account", "add", "Bank", "--type", "asset", "--currency", "THB"]],
 	},
 	init: { ledger: "none" },
+	"projection chance": { files: { "model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL) } },
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
 	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },
