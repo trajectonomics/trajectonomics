@@ -81,7 +81,7 @@ Antigravity quota is short this week, so this block overrides step 3 of the ladd
 - The canonical copy of every installed skill is `.agents/skills/` at the root. `.claude/skills/<name>` (Claude Code) and `.vibe/skills/<name>` (Mistral Vibe) are relative symlinks to `../../.agents/skills/<name>`, and `.grok/skills/goal-setting-okrs` is one more. Never edit the external copies or the symlinks by hand.
 - Edit an internal skill in `skills/internal/skills/<name>/`, the source of truth. Its `.agents/skills/` entry is a symlink, so the change is picked up everywhere.
 - A first-party customer skill is hand-edited in `skills/customer/skills/`. It is never in `skills-lock.json` and never copied into `.agents/skills/`: a lock entry would stop `npx skills add trajectonomics/trajectonomics/skills/customer --skill <name>` from installing it.
-- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
+- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock, then list the copy in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (a new upstream also needs its own section with its licence), or `bun run check` fails; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
 
 ### Commands
 

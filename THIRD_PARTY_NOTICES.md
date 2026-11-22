@@ -2,7 +2,9 @@
 
 This repository vendors third-party agent skills. Each is MIT-licensed, and the MIT licence requires its copyright and permission notice to travel with every copy, so they are reproduced here in full.
 
-The copies live under `.agents/skills/` and are pinned by content hash in [`skills-lock.json`](skills-lock.json) (`computedHash`; the lock records no upstream commit). They are the only third-party content copied into this repository. `bun run check` fails when a source in `skills-lock.json` has no section below.
+The copies live under `.agents/skills/` and are pinned by content hash in [`skills-lock.json`](skills-lock.json) (`computedHash`; the lock records no upstream commit). They are the only third-party skill content copied into this repository. `bun run check` fails when a source in `skills-lock.json` has no section below, or when a locked skill is missing from its source's `Copies:` list: add a new skill's `` `.agents/skills/<name>/` `` to that list, and give a new source its own `## owner/repo` section with its copyright line and licence text.
+
+Other third-party files carry their notice beside them: the Lucide icons in `apps/web/src/components/shell/nav-icons.ts` and `nav-icons-plan.ts` (ISC, inline), the brand fonts in `packages/brand/brands/trajectonomics/assets/fonts/` (SIL OFL 1.1, with their licence files), and `apps/site/e2e/fonts/NotoSansThai.ttf` (SIL OFL 1.1, in the font's own name table).
 
 The first-party skills in `skills/customer/` and `skills/internal/` are not copies of upstream content, and the published `@trajectonomics/skills` package ships none of the vendored skills. `skills/internal/profiles/factory.json` names `cloudflare/skills` (Apache-2.0) as an install source for other repositories, but no file of it is copied here.
 

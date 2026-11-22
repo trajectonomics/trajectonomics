@@ -25,6 +25,7 @@ describe("third-party notices", () => {
 	it("carries each source's copyright line and MIT permission notice", () => {
 		for (const source of sources) {
 			const section = sectionOf(source)
+			expect(section, `the ${source} section`).not.toBe("")
 			expect(section).toMatch(/^Copyright \(c\) \d{4} .+$/m)
 			expect(section).toContain("Permission is hereby granted, free of charge")
 			expect(section).toContain(
