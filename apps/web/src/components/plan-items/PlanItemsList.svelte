@@ -23,6 +23,12 @@ interface Props {
 let { kind, name, doc, baseline, editable }: Props = $props()
 /** The drawer: null when it is shut, else the item it edits, or no id for a new one. */
 let drawer = $state<{ id?: string } | null>(null)
+
+/** Opens or shuts the drawer. A refusal from an earlier save is forgotten, so it never shows on the next form. */
+function setDrawer(next: { id?: string } | null): void {
+	editSession.clear()
+	drawer = next
+}
 const noun = $derived(PLAN_PAGES[kind].noun)
 const editingId = $derived(drawer === null ? undefined : drawer.id)
 const title = $derived(editingId === undefined ? `Add ${noun}` : `Edit ${editingId}`)
@@ -40,7 +46,7 @@ const busy = $derived(editSession.busy)
 		{#if editable}
 			<button
 				type="button"
-				onclick={() => (drawer = {})}
+				onclick={() => setDrawer({})}
 				disabled={busy}
 				class="rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 			>
@@ -52,18 +58,18 @@ const busy = $derived(editSession.busy)
 		{#if accounts.length === 0}
 			<EmptyState title="No accounts in this plan" />
 		{:else}
-			<AccountCards cards={accounts} currency={doc.currency} {editable} onEdit={(id) => (drawer = { id })} />
+			<AccountCards cards={accounts} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
 		{/if}
 	{:else if cards.length === 0}
 		<EmptyState title="No {noun} in this plan" />
 	{:else}
-		<FlowCards {cards} currency={doc.currency} {editable} onEdit={(id) => (drawer = { id })} />
+		<FlowCards {cards} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
 	{/if}
-	<Drawer open={drawer !== null} {title} onClose={() => (drawer = null)}>
+	<Drawer open={drawer !== null} {title} onClose={() => setDrawer(null)}>
 		{#if drawer !== null && kind === "assets"}
-			<AccountForm {name} {doc} existing={existingAccount} onDone={() => (drawer = null)} />
+			<AccountForm {name} {doc} existing={existingAccount} onDone={() => setDrawer(null)} />
 		{:else if drawer !== null}
-			<FlowForm kind={flowKind} {name} {doc} existing={existingFlow} onDone={() => (drawer = null)} />
+			<FlowForm kind={flowKind} {name} {doc} existing={existingFlow} onDone={() => setDrawer(null)} />
 		{/if}
 	</Drawer>
 </div>

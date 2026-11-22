@@ -7,12 +7,18 @@
 const AMOUNT_TEXT = /^-?(0|[1-9]\d*)(\.\d+)?$/
 const DATE_TEXT = /^\d{4}-\d{2}-\d{2}$/
 
+/** Commas only as thousands separators: one to three digits, then groups of exactly three. */
+const GROUPED_TEXT = /^-?\d{1,3}(,\d{3})+(\.\d+)?$/
+
 /**
- * The amount as the person typed it, with thousands separators and spaces removed, or null when the
- * text is not a decimal number. The result is a string: it is never made into a number.
+ * The amount as the person typed it, trimmed, with commas removed only where they separate thousands
+ * ("9,000.50"), or null when the text is not a decimal number. A comma anywhere else ("9000,50", a
+ * decimal comma) is refused, never dropped: dropping it would send an amount a hundred times larger.
+ * The result is a string: it is never made into a number.
  */
 export function typedAmount(text: string): string | null {
-	const plain = text.replace(/[,\s]/g, "")
+	const trimmed = text.trim()
+	const plain = GROUPED_TEXT.test(trimmed) ? trimmed.replaceAll(",", "") : trimmed
 	return AMOUNT_TEXT.test(plain) ? plain : null
 }
 

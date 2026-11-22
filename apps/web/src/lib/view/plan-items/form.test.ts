@@ -2,11 +2,21 @@ import { describe, expect, test } from "bun:test"
 import { isDateText, slugId, typedAmount, uniqueId, withoutKeys } from "./form"
 
 describe("typedAmount", () => {
-	test("removes the commas and spaces, and keeps the digits as the person typed them", () => {
+	test("removes thousands commas and outer spaces, and keeps the digits as the person typed them", () => {
 		expect(typedAmount("9,000.50")).toBe("9000.50")
+		expect(typedAmount("1,234,567")).toBe("1234567")
+		expect(typedAmount("-1,000.5")).toBe("-1000.5")
 		expect(typedAmount(" 350 ")).toBe("350")
 		expect(typedAmount("-5")).toBe("-5")
-		expect(typedAmount("1 234,50")).toBe("123450")
+	})
+
+	test("refuses a comma that is not a thousands separator, so 9000,50 never becomes 900050", () => {
+		expect(typedAmount("9000,50")).toBeNull()
+		expect(typedAmount("9,00")).toBeNull()
+		expect(typedAmount("1,2345")).toBeNull()
+		expect(typedAmount("1 234,50")).toBeNull()
+		expect(typedAmount("1 234")).toBeNull()
+		expect(typedAmount(",500")).toBeNull()
 	})
 
 	test("refuses text that is not a decimal number", () => {
