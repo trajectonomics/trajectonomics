@@ -18,4 +18,4 @@
 ## Consequences
 
 - `projection compare` keeps its per-side `taxYears` from the Projection of each side as written, because a compare states both sides' FI answers beside a full Projection and does not claim the rows follow the FI date.
-- An existing `fi` golden for a taxed Scenario changes only in the rows after its FI date. A Scenario with no Levy is unchanged.
+- An existing `fi` golden for a taxed Scenario changes only in the rows from its FI year on. A Scenario with no Levy is unchanged.

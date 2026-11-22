@@ -17,7 +17,8 @@ export type SurvivalFinancialIndependence =
 			readonly reference: RuleOfThumbReference
 			/**
 			 * The Levy results of the path the answer describes: earned income as in the Scenario
-			 * before `month`, stopped from `month` on. Present only when the Scenario declares Levies.
+			 * before `month`, stopped from `month` on, with expenses replaced by `retirementSpending`
+			 * when the definition sets it. Present only when the Scenario declares Levies.
 			 */
 			readonly levies?: readonly LevyReport[]
 	  }

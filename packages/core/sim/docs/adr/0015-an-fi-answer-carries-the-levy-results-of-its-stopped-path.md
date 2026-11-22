@@ -11,8 +11,8 @@ income going to the horizon, so it describes a different path from the one the a
 
 - A reachable survival answer gains `levies`: the `LevyReport[]` of the winning candidate's whole path,
   read as of the horizon. The months before the FI month are the unchanged Scenario's, the months from
-  it on are the walk's, with earned income stopped by the same events and Milestone gate the survival
-  check used. The tallies are the ones the walk already holds, so nothing is recomputed by a second rule.
+  it on are the walk's, with earned income stopped (and expenses replaced by `retirementSpending` when the definition sets
+  it) by the same events and Milestone gate the survival check used. The tallies are the ones the walk already holds, so nothing is recomputed by a second rule.
 - `levies` is present only when the Scenario declares a Levy, so an answer without Levies is unchanged.
   An unreachable answer carries none: no candidate path is the answer.
 - The probability-threshold answer is unchanged. It describes a share of Market paths, not one path.
