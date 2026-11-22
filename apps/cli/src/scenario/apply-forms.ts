@@ -7,6 +7,7 @@ export type ApplyFlags = {
 	name?: string | undefined
 	file?: string | undefined
 	template?: boolean | undefined
+	asOf?: string | undefined
 	dryRun?: boolean | undefined
 }
 
@@ -16,11 +17,16 @@ export const REQUIRED_NAME: RequiredDocumentField = {
 	sentence: "name the Scenario to apply the document to",
 }
 
+/** What a caller should run instead of a document beside the flags it cannot take (ADR-0044). */
+const FORM_HINT =
+	'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline, or "traj scenario apply <name> --file <path>" to apply a document.'
+
 export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	flag: "file",
 	schema: scenarioDocument,
 	allowed: ["name", "dryRun"],
 	required: [REQUIRED_NAME],
+	hint: FORM_HINT,
 }
 
 /**
@@ -37,6 +43,13 @@ export function exclusive(input: ApplyFlags): AppError | undefined {
 	}
 	if (input.template === true && input.name !== undefined) {
 		return fail("invalid_input", { path: "name", message: "name: --template takes no name" })
+	}
+	if (input.asOf !== undefined && input.template !== true) {
+		return fail("invalid_input", {
+			path: "--as-of",
+			message: "--as-of: pre-fills a template, so it needs --template",
+			hint: 'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline at that date.',
+		})
 	}
 	if (input.template !== true && input.file === undefined) {
 		return fail("invalid_input", {

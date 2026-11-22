@@ -1,4 +1,4 @@
-import type { Leaf } from "./command"
+import type { DocumentSpec, Leaf } from "./command"
 import {
 	exclusiveFields,
 	missingFieldError,
@@ -51,6 +51,16 @@ function validate(
 
 type ParsedInput = { input: unknown; document?: unknown }
 
+/** A document flag beside a flag the document form cannot take, with the spec's hint if it has one. */
+function mixedFailure(spec: DocumentSpec, flag: string, mixed: readonly string[]): AppError {
+	const flags = mixed.map((field) => `--${toKebab(field)}`).join(", ")
+	return fail("invalid_input", {
+		path: spec.flag,
+		message: `${flag} cannot be combined with ${flags}`,
+		...(spec.hint === undefined ? {} : { hint: spec.hint }),
+	})
+}
+
 /** The document form: only its own flags, then the JSON document named by `flag` (ADR-0020). */
 async function documentForm(
 	leaf: Leaf,
@@ -67,13 +77,7 @@ async function documentForm(
 		return fail("invalid_input", { path: spec.flag, message: `${flag} must be a path` })
 	}
 	const mixed = exclusiveFields(leaf.input, spec).filter((field) => fields[field] !== undefined)
-	if (mixed.length > 0) {
-		const flags = mixed.map((field) => `--${toKebab(field)}`).join(", ")
-		return fail("invalid_input", {
-			path: spec.flag,
-			message: `${flag} cannot be combined with ${flags}`,
-		})
-	}
+	if (mixed.length > 0) return mixedFailure(spec, flag, mixed)
 	const selection = selectionSchema(leaf.input, spec).safeParse(fields, { reportInput: true })
 	if (!selection.success) return inputFailure(leaf, path, selection.error)
 	const missing = (spec.required ?? []).find((entry) => selection.data[entry.field] === undefined)

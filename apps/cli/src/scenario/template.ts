@@ -1,3 +1,9 @@
+import type { Context } from "../command"
+import { ok, type Result } from "../command"
+import { checkedAsOf } from "../date"
+import { type AppError, fail, isAppError } from "../errors"
+import { withLedger } from "../report/with-ledger"
+import { baselineTemplateOf } from "./baseline-template"
 import { acceptedScenarioSchemaVersion } from "./document"
 
 /**
@@ -34,4 +40,19 @@ export function scenarioTemplate(): string | undefined {
 	const version = acceptedScenarioSchemaVersion()
 	if (version === undefined) return undefined
 	return JSON.stringify({ schemaVersion: version, ...TEMPLATE_DOCUMENT }, null, 2)
+}
+
+/**
+ * `scenario apply --template`: the static skeleton with no As-of, which opens no data directory,
+ * or the Baseline's pre-fill at one As-of, which reads the Ledger and writes nothing (ADR-0044).
+ * The As-of is checked before the store opens, so a bad date wins over a corrupt row (ADR-0029).
+ */
+export function printTemplate(ctx: Context, asOf: string | undefined): Result<string> | AppError {
+	if (asOf === undefined) {
+		const template = scenarioTemplate()
+		return template === undefined ? fail("internal") : ok(template)
+	}
+	const checked = checkedAsOf(asOf)
+	if (isAppError(checked)) return checked
+	return withLedger(ctx, (ledger) => baselineTemplateOf(ledger, asOf))
 }

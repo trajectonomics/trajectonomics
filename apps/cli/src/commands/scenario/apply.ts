@@ -3,11 +3,12 @@ import { UUID_SHAPED } from "../../account/name"
 import type { Leaf } from "../../command"
 import { defineCommand, ok } from "../../command"
 import { missingFieldError } from "../../document"
-import { fail, isAppError } from "../../errors"
+import { isAppError } from "../../errors"
 import { DOCUMENT, exclusive, REQUIRED_NAME } from "../../scenario/apply-forms"
 import { invalidScenarioName } from "../../scenario/errors"
-import { scenarioTemplate } from "../../scenario/template"
+import { printTemplate } from "../../scenario/template"
 import { view, type WrittenScenario, writtenScenario } from "../../scenario/view"
+import { LEDGER_READ_CODES } from "../../store"
 import { withStore } from "../../with-store"
 
 const result = z.strictObject({
@@ -34,7 +35,16 @@ export const apply: Leaf = defineCommand({
 		template: z
 			.boolean()
 			.optional()
-			.describe("Print a minimal document to start from and open no data directory."),
+			.describe(
+				"Print a document to start from: a minimal one, which opens no data directory, or one pre-filled with --as-of.",
+			),
+		asOf: z
+			.string()
+			.min(1)
+			.optional()
+			.describe(
+				"With --template, pre-fill the document from the Baseline at this date, as YYYY-MM-DD.",
+			),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
 	document: DOCUMENT,
@@ -43,6 +53,10 @@ export const apply: Leaf = defineCommand({
 		{
 			command: "traj scenario apply --template",
 			description: "Print a minimal document to start from.",
+		},
+		{
+			command: "traj scenario apply --template --as-of 2026-03-31",
+			description: "Print a Scenario pre-filled from the Baseline at one date, to edit and apply.",
 		},
 		{
 			command: "traj scenario apply base --file base.json",
@@ -57,16 +71,19 @@ export const apply: Leaf = defineCommand({
 			description: "Show the row and roll the write back.",
 		},
 	],
-	errorCodes: ["database_busy", "invalid_input"],
+	errorCodes: [
+		"database_busy",
+		"invalid_input",
+		"INVALID_DATE",
+		"NEGATIVE_AMOUNT",
+		"AMOUNT_OVERFLOW",
+		"unsupported_currency",
+		...LEDGER_READ_CODES,
+	],
 	run: (input, document, ctx) => {
 		const wrong = exclusive(input)
 		if (wrong !== undefined) return wrong
-		if (input.template === true) {
-			// Text only: it returns before `withStore`, so it opens no data directory. Nothing names
-			// `--file`, so no document and no stdin is read either.
-			const template = scenarioTemplate()
-			return template === undefined ? fail("internal") : ok(template)
-		}
+		if (input.template === true) return printTemplate(ctx, input.asOf)
 		// The document form checks this before it reads the document; the guard keeps `name` a string.
 		const name = input.name
 		if (name === undefined) return missingFieldError(REQUIRED_NAME)

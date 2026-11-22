@@ -38,3 +38,7 @@ maintainer's problem, not a user's. The template form makes the name optional in
 while the document form still cannot work without it, so `DocumentSpec` gains the fields a document
 form requires, checked before the document is read (ADR-0020), which is also what keeps the document
 form's usage line showing a required name.
+
+## Addendum
+
+`--template` with `--as-of` pre-fills the document from the Baseline at that date instead of printing the static one, and it does open the data directory; the static form is unchanged. ADR-0044 records the pre-fill.
