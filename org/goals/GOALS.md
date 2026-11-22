@@ -59,5 +59,4 @@ No agent may decide or build any of these without the owner:
 ## Not now
 
 - CRM (Twenty). There are no clients to track yet.
-- Desktop app and web app. Not until `traj` and its agent skill are released (planned for 23 November 2026). In force until the owner deletes this line. The docs site at trajectonomics.com/docs is not covered by this line.
 - Mobile app. Not until the owner says the desktop app is mature.
