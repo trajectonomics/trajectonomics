@@ -49,8 +49,9 @@ describe("scenario list and show", () => {
 		const created = rowOf(resultOf(await applyScenario(home, "base", BASE)))
 		const byName = rowOf(resultOf(await scenario(home, ["show", "base"])))
 		const byId = rowOf(resultOf(await scenario(home, ["show", created.id as string])))
-		expect(byName).toEqual(created)
-		expect(byId).toEqual(created)
+		// A show carries the household too: none is set on a plain apply (cli ADR-0048).
+		expect<unknown>(byName).toEqual({ ...created, household: null })
+		expect<unknown>(byId).toEqual({ ...created, household: null })
 		const view = byName
 		expect(view.document).toEqual(SCENARIO_DOCUMENT)
 		expect(view).not.toHaveProperty("deletedAt")

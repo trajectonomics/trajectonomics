@@ -1,12 +1,22 @@
 import type { AccountType, ChartOfAccounts } from "@trajectonomics/core/ledger"
 import type { AppError } from "../errors"
-import type { ScenarioDocument } from "../scenario/document"
 import type { Ledger } from "./ledger"
+import type { RestoreCounts, RestoreRows } from "./restore-types"
 import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
+import type {
+	ForkOptions,
+	HouseholdPlanner,
+	HouseholdSet,
+	NewScenario,
+	ScenarioDeleted,
+	ScenarioForked,
+	ScenarioSaved,
+} from "./scenario-types"
 import type { TxFilter } from "./tx-filter"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
 
 export type { Ledger } from "./ledger"
+export type * from "./restore-types"
 export type {
 	AccountRow,
 	EntityRow,
@@ -15,6 +25,7 @@ export type {
 	TxCorrection,
 	TxRow,
 } from "./rows"
+export type * from "./scenario-types"
 export type { TxFilter } from "./tx-filter"
 export type {
 	ImportRejection,
@@ -57,31 +68,6 @@ export type AccountClosed =
 export type AccountDeleted =
 	| { status: "deleted" | "has_postings" | "has_children"; account: AccountRow }
 	| { status: "not_found" }
-
-export type NewScenario = { name: string; document: unknown }
-export type ScenarioSaved = { status: "created" | "updated" | "unchanged"; scenario: ScenarioRow }
-export type ScenarioForked =
-	| { status: "forked" | "name_taken"; scenario: ScenarioRow }
-	| { status: "not_found" }
-export type ScenarioDeleted = { status: "deleted"; scenario: ScenarioRow } | { status: "not_found" }
-
-/**
- * A pure change to a fork's copy, applied inside the fork's one write. Return an `AppError`
- * (usually `invalid_input`) and the whole write rolls back.
- */
-export type ScenarioTransform = (document: ScenarioDocument) => ScenarioDocument | AppError
-
-export type ForkOptions = WriteOptions & { transform?: ScenarioTransform }
-
-/** Every row of a lossless dump, by table, exactly as the list methods return them. */
-export type RestoreRows = {
-	entity: readonly EntityRow[]
-	account: readonly AccountRow[]
-	tx: readonly TxRow[]
-	posting: readonly PostingRow[]
-	scenario: readonly ScenarioRow[]
-}
-export type RestoreCounts = { [Table in keyof RestoreRows]: number }
 
 /**
  * The only code that reads or writes `traj.db`. Every method returns its value or an `AppError`
@@ -129,6 +115,15 @@ export interface Store {
 	saveScenario(input: NewScenario, options?: WriteOptions): ScenarioSaved | AppError
 	/** Copies a live Scenario by id; `transform` runs inside the same write (ADR-0019, ADR-0024). */
 	forkScenario(id: string, name: string, options?: ForkOptions): ScenarioForked | AppError
+	/**
+	 * Replaces a live Scenario's household and its document in one write. `plan` reads the document
+	 * inside that write and returns what to store; a refusal rolls the write back (cli ADR-0048).
+	 */
+	replaceHousehold(
+		id: string,
+		plan: HouseholdPlanner,
+		options?: WriteOptions,
+	): HouseholdSet | AppError
 	deleteScenario(id: string, options?: WriteOptions): ScenarioDeleted | AppError
 	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */
 	getScenario(idOrName: string): ScenarioRow | null | AppError

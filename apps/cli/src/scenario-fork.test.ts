@@ -28,7 +28,10 @@ describe("scenario fork", () => {
 		expect(fork.version).toBe(1)
 		expect(fork.contentHash).toBe(base.contentHash)
 		expect(fork.id).not.toBe(base.id)
-		expect(resultOf(await scenario(home, ["show", "base"])).scenario).toEqual(base)
+		expect(resultOf(await scenario(home, ["show", "base"])).scenario).toEqual({
+			...base,
+			household: null,
+		})
 		expect(rowOf(resultOf(await scenario(home, ["show", "early"]))).id).toBe(fork.id)
 	})
 

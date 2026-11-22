@@ -5,7 +5,7 @@ import { isAppError } from "../../errors"
 import { printedRow } from "../../scenario/decimal"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { scenarioNotFound } from "../../scenario/errors"
-import { scenarioView, view } from "../../scenario/view"
+import { householdOf, scenarioWithHousehold, view } from "../../scenario/view"
 import { withStore } from "../../with-store"
 
 export const show: Leaf = defineCommand({
@@ -18,7 +18,7 @@ export const show: Leaf = defineCommand({
 		decimal: decimalFlag,
 	}),
 	output: z.strictObject({
-		scenario: scenarioView,
+		scenario: scenarioWithHousehold,
 	}),
 	examples: [
 		{ command: "traj scenario show base", description: "Show a Scenario by name." },
@@ -38,6 +38,7 @@ export const show: Leaf = defineCommand({
 			if (isAppError(row)) return row
 			if (row === null) return scenarioNotFound(input.scenario)
 			const shown = printedRow(view(row), input.decimal === true)
-			return isAppError(shown) ? shown : ok({ scenario: shown })
+			if (isAppError(shown)) return shown
+			return ok({ scenario: { ...shown, household: householdOf(row) } })
 		}),
 })

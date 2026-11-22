@@ -7,7 +7,7 @@ import type { ScenarioDocument } from "../../scenario/document"
 import { invalidScenarioName, scenarioNameTaken, scenarioNotFound } from "../../scenario/errors"
 import { applyScenarioSets } from "../../scenario/set-apply"
 import type { AppliedOverride } from "../../scenario/set-error"
-import { view, type WrittenScenario, writtenScenario } from "../../scenario/view"
+import { droppedAnchors, view, type WrittenScenario, writtenScenario } from "../../scenario/view"
 import type { ForkOptions, ScenarioForked, ScenarioTransform } from "../../store"
 import { withStore } from "../../with-store"
 
@@ -21,6 +21,7 @@ type ForkResult = {
 	status: "forked"
 	overrides: AppliedOverride[]
 	scenario: WrittenScenario
+	droppedAnchors: string[]
 }
 
 /** Applies the sets inside the store's write, and keeps their echo for the result. */
@@ -47,7 +48,8 @@ function reply(
 	if (outcome.status === "name_taken") return scenarioNameTaken(outcome.scenario.id)
 	const rendered = view(outcome.scenario)
 	const scenario: WrittenScenario = { ...rendered, id: dryRun ? null : rendered.id }
-	return ok({ dryRun, status: "forked", overrides, scenario })
+	const { droppedAnchors } = outcome
+	return ok({ dryRun, status: "forked", overrides, scenario, droppedAnchors })
 }
 
 export const fork: Leaf = defineCommand({
@@ -71,6 +73,7 @@ export const fork: Leaf = defineCommand({
 		status: z.literal("forked").describe("The source was copied."),
 		overrides: z.array(appliedOverride).describe("The applied overrides, in command-line order."),
 		scenario: writtenScenario,
+		droppedAnchors,
 	}),
 	examples: [
 		{ command: "traj scenario fork base early", description: "Copy a Scenario under a new name." },

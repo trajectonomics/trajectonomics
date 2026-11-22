@@ -46,6 +46,38 @@ export const writtenScenario: z.ZodType<WrittenScenario> = z.strictObject({
 	id: z.string().nullable().describe("The Scenario's id; null under --dry-run."),
 	document: documentShape,
 })
+/** The household anchors a write dropped, because the document no longer holds their item. */
+export const droppedAnchors: z.ZodType<string[]> = z
+	.array(z.string())
+	.describe(
+		"The household anchors this write dropped, because the document no longer holds their item; empty when none.",
+	)
+
+/** The household a Scenario keeps, as the document it was set from; null when none is set. */
+export type HouseholdDocument = Record<string, unknown> | null
+
+const householdShape = z
+	.record(z.string(), z.unknown())
+	.nullable()
+	.describe("The household's document, or null when no household is set (cli ADR-0048).")
+
+/** `scenario show`: one live Scenario with its document and its household. */
+export const scenarioWithHousehold: z.ZodType<ScenarioView & { household: HouseholdDocument }> =
+	z.strictObject({
+		...summaryShape,
+		document: documentShape,
+		household: householdShape,
+	})
+
+/** A Scenario a household write reports: the written Scenario with its household and anchored dates. */
+export const writtenWithHousehold: z.ZodType<WrittenScenario & { household: HouseholdDocument }> =
+	z.strictObject({
+		...summaryShape,
+		id: z.string().nullable().describe("The Scenario's id; null under --dry-run."),
+		document: documentShape,
+		household: householdShape,
+	})
+
 export const scenarioRef: z.ZodType<ScenarioRef> = z.strictObject({
 	id: summaryShape.id,
 	name: summaryShape.name,
@@ -68,6 +100,14 @@ export function view(row: ScenarioRow): ScenarioView {
 	const document: unknown = JSON.parse(row.document)
 	if (!isPlainObject(document)) throw new Error(`Scenario ${row.id} does not hold a JSON object`)
 	return { ...summary(row), document }
+}
+
+/** The household a row keeps, parsed from its stored canonical text. */
+export function householdOf(row: ScenarioRow): HouseholdDocument {
+	if (row.household === null) return null
+	const household: unknown = JSON.parse(row.household)
+	if (!isPlainObject(household)) throw new Error(`Scenario ${row.id} holds no household object`)
+	return household
 }
 
 export function ref(row: ScenarioRow): ScenarioRef {
