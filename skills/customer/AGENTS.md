@@ -15,7 +15,7 @@ A Skill under `skills/customer/skills/` is first-party and hand-edited, and its 
 
 ## The trigger surface
 
-A Skill's frontmatter `description` is the only thing a customer's agent reads when it decides whether to load the Skill, so each one names the job its Skill does and no neighbouring job. [`evals/trigger-queries.json`](./evals/trigger-queries.json) holds the twenty fixed queries and their verdicts, derived from the Factory's `qa-trigger-queries.md` and never re-authored here. `scripts/trigger-descriptions.test.ts` pins the boundary offline (no description claims a must-stay-silent job); whether an agent actually fires is measured with a model, so it is not part of `bun run check`. After editing any description, measure it from this folder, one call at a time:
+A Skill's frontmatter `description` is the only thing a customer's agent reads when it decides whether to load the Skill, so each one names the job its Skill does and no neighbouring job. [`evals/trigger-queries.json`](./evals/trigger-queries.json) holds the Factory's twenty fixed queries and their verdicts, derived from `qa-trigger-queries.md` and never re-authored here, plus two Thai income tax estimate queries marked `extra` that pin the estimate to `traj-plan`. `scripts/trigger-descriptions.test.ts` pins the boundary offline (no description claims a must-stay-silent job); whether an agent actually fires is measured with a model, so it is not part of `bun run check`. After editing any description, measure it from this folder, one call at a time:
 
 ```bash
 bun scripts/measure-triggers.ts            # three runs per query on claude-haiku-5-5, about three minutes

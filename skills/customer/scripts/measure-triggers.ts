@@ -12,14 +12,16 @@ import {
 } from "./trigger-queries"
 
 /**
- * Measure the trigger surface: for each of the twenty fixed queries, ask a model which Skill it would
+ * Measure the trigger surface: for each fixed query, ask a model which Skill it would
  * load given exactly the five names and descriptions. It calls a model, one call at a time, so it is
- * never part of `bun run check`. Usage: `bun scripts/measure-triggers.ts [--runs 3] [--model <id>]`.
+ * never part of `bun run check`. Usage: `bun scripts/measure-triggers.ts [--runs 3] [--model <id>] [--only <query regex>]`.
  */
 const args = process.argv.slice(2)
-const flag = (name: string, fallback: string) => args[args.indexOf(name) + 1] ?? fallback
+const flag = (name: string, fallback: string) =>
+	args.includes(name) ? (args[args.indexOf(name) + 1] ?? fallback) : fallback
 const RUNS = Number(flag("--runs", "3"))
 const MODEL = flag("--model", "claude-haiku-5-5")
+const ONLY = new RegExp(flag("--only", "."), "i")
 
 /** One headless model call from an empty directory, with no tools, skills or settings of its own. */
 function ask(prompt: string, cwd: string): string {
@@ -58,7 +60,7 @@ try {
 	const skills = readListedSkills()
 	let total = 0
 	let claimed = 0
-	const queries = readTriggerQueries()
+	const queries = readTriggerQueries().filter((query) => ONLY.test(query.q))
 	for (const query of queries) {
 		const matched = report(query, measure(query, skills, scratch))
 		total += matched

@@ -33,16 +33,16 @@ const NEIGHBOUR_JOBS = [
 function claims(description: string): string {
 	return description
 		.split(/(?<=\.)\s+/)
-		.filter((sentence) => !/\b(no|not|neither|nor)\b/i.test(sentence))
+		.filter((sentence) => !/\b(no|not|never|neither|nor)\b/i.test(sentence))
 		.join(" ")
 }
 
 describe("the fixed trigger queries", () => {
-	it("are the twenty of the Factory's list: ten that fire and ten that stay silent", () => {
-		expect(queries).toHaveLength(20)
-		expect(queries.filter((query) => query.expect === "trigger")).toHaveLength(10)
+	it("are the Factory's twenty plus two tax estimates: twelve that fire and ten that stay silent", () => {
+		expect(queries).toHaveLength(22)
+		expect(queries.filter((query) => query.expect === "trigger")).toHaveLength(12)
 		expect(queries.filter((query) => query.expect === "silent")).toHaveLength(10)
-		expect(new Set(queries.map((query) => query.q)).size).toBe(20)
+		expect(new Set(queries.map((query) => query.q)).size).toBe(22)
 	})
 
 	it("name only published Skills, and none for a silent query", () => {
@@ -90,6 +90,16 @@ describe("the five descriptions", () => {
 		expect(traj).toMatch(/does not prepare, file or check a tax return/)
 	})
 
+	it("let any description that mentions tax say it only estimates, and never prepares, files or checks", () => {
+		const guard = /(never prepares, files or checks|does not prepare, file or check) a tax return/
+		const taxed = skills.filter((skill) => /\btax\b/i.test(skill.description))
+		expect(taxed.map((skill) => skill.name).sort()).toEqual(["traj", "traj-plan"])
+		for (const skill of taxed) expect(skill.description).toMatch(guard)
+		const plan = skills.find((skill) => skill.name === "traj-plan")?.description ?? ""
+		expect(plan).toMatch(/estimate what their Thai income tax comes to/)
+		expect(claims(plan)).toMatch(/Thai income tax/)
+	})
+
 	it("each name the job of their own recipe", () => {
 		const byName = new Map(skills.map((skill) => [skill.name, skill.description.toLowerCase()]))
 		expect(byName.get("traj-onboarding")).toContain("install")
@@ -109,7 +119,7 @@ describe("the measuring helpers", () => {
 
 	it("read an answer as a listed name, or none", () => {
 		expect(pickedSkill(" `traj-plan`.\n", skills)).toBe("traj-plan")
-		expect(pickedSkill("I would use traj-plan", skills)).toBe("none")
+		expect(pickedSkill("I would use traj-plan", skills)).toBe("unparsed")
 		expect(pickedSkill("none", skills)).toBe("none")
 	})
 
@@ -122,5 +132,6 @@ describe("the measuring helpers", () => {
 		expect(matchesVerdict(fires, "none")).toBe(false)
 		expect(matchesVerdict(silent, "none")).toBe(true)
 		expect(matchesVerdict(silent, "traj-plan")).toBe(false)
+		expect(matchesVerdict(silent, "unparsed")).toBe(false)
 	})
 })

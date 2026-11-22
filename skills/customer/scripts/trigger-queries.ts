@@ -12,6 +12,8 @@ export interface TriggerQuery {
 	skills: string[]
 	/** Set when no Skill claims the job yet, and who will. */
 	unclaimed?: string
+	/** Set on a query this repository added to the Factory's twenty. */
+	extra?: boolean
 }
 
 /** A Skill as an agent's skill listing shows it: its name and its description, nothing else. */
@@ -20,7 +22,7 @@ export interface ListedSkill {
 	description: string
 }
 
-/** The twenty fixed queries, derived from the Factory's `qa-trigger-queries.md`. */
+/** The fixed queries (the Factory's twenty, then two tax estimates), derived from the Factory's `qa-trigger-queries.md`. */
 export function readTriggerQueries(): TriggerQuery[] {
 	const file = join(repoRoot, "evals", "trigger-queries.json")
 	return (JSON.parse(readFileSync(file, "utf8")) as { queries: TriggerQuery[] }).queries
@@ -43,20 +45,22 @@ export function triggerPrompt(skills: ListedSkill[], message: string): string {
 		"You are an agent. These skills are available to load:",
 		listing,
 		`The user's message: ${JSON.stringify(message)}`,
-		"Which single skill would you load for this message? Answer with the skill name only, or `none` if no skill applies.",
+		`Which single skill would you load for this message? Answer with exactly one of: ${[...skills.map((skill) => skill.name), "none"].join(", ")}. No other words.`,
 	].join("\n\n")
 }
 
-/** The Skill name an answer picks, or `none` when it names no listed Skill. */
+/** The Skill name an answer picks, `none` when it says so, or `unparsed` when it is neither. */
 export function pickedSkill(answer: string, skills: ListedSkill[]): string {
 	const word = answer
 		.trim()
 		.replace(/[`'"*.]/g, "")
 		.toLowerCase()
-	return skills.find((skill) => skill.name === word)?.name ?? "none"
+	if (word === "none") return "none"
+	return skills.find((skill) => skill.name === word)?.name ?? "unparsed"
 }
 
-/** Whether a run matches the fixed verdict: any Skill for `trigger`, none for `silent`. */
+/** Whether a run matches the fixed verdict: any Skill for `trigger`, none for `silent`, never an unparsed answer. */
 export function matchesVerdict(query: TriggerQuery, picked: string): boolean {
+	if (picked === "unparsed") return false
 	return query.expect === "trigger" ? picked !== "none" : picked === "none"
 }

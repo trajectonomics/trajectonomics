@@ -1,6 +1,6 @@
 ---
 name: traj-plan
-description: "Work out when someone can stop working, or reach financial independence, from their own money with `traj`, the personal money command line: project their net worth to a date they name, and show what a purchase or a raise would change. Use when someone asks when they can stop working or retire, what their net worth will be next year, for a projection or a what-if on their money, or whether their money lasts."
+description: "Work out when someone can stop working, or reach financial independence, from their own money with `traj`, the personal money command line: project their net worth to a date they name, show what a purchase or a raise would change, and estimate what their Thai income tax comes to for a tax year and what one deduction (RMF, ThaiESG, an allowance) would change. Use when someone asks when they can stop working or retire, how much Thai income tax they will owe, what an RMF contribution would save them in tax, what their net worth will be next year, for a projection or a what-if on their money, or whether their money lasts. It estimates; it never prepares, files or checks a tax return."
 metadata:
   cli: ">=0.3.0 <0.8.0"
 ---

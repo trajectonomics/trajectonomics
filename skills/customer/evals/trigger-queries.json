@@ -1,5 +1,5 @@
 {
-	"source": "trajectonomics/factory docs/qa-trigger-queries.md: the twenty queries and their verdicts, fixed before a pass runs. Read it there; this copy is derived, never re-authored. `skills` lists the Skills whose firing is correct for a `trigger` query.",
+	"source": "trajectonomics/factory docs/qa-trigger-queries.md: the twenty queries and their verdicts, fixed before a pass runs. Read it there; this copy is derived, never re-authored. `skills` lists the Skills whose firing is correct for a `trigger` query. Two Thai income tax estimate queries follow the twenty (`extra`): they pin that the estimate reaches `traj-plan`, whose tax steps carry the guardrails.",
 	"queries": [
 		{
 			"q": "help me set up traj",
@@ -51,6 +51,18 @@
 			"expect": "trigger",
 			"skills": [],
 			"unclaimed": "traj-maintain (trajectonomics/trajectonomics#135) owns removal; no description claims it until that Skill lands"
+		},
+		{
+			"q": "how much Thai income tax will I owe for 2026?",
+			"expect": "trigger",
+			"skills": ["traj-plan"],
+			"extra": true
+		},
+		{
+			"q": "what would a 100,000 baht RMF contribution save me in tax this year?",
+			"expect": "trigger",
+			"skills": ["traj-plan"],
+			"extra": true
 		},
 		{
 			"q": "build me a spreadsheet budget",
