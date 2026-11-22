@@ -22,7 +22,7 @@ describe("the traj-review Skill", () => {
 
 	it("is published from its own manifest row, with the range the recipe needs", () => {
 		expect(row).toBeDefined()
-		expect(row?.cliRange).toBe(">=0.2.0 <0.3.0")
+		expect(row?.cliRange).toBe(">=0.2.0 <0.6.0")
 	})
 
 	it("takes the as-of and the period from the person, and never the clock", () => {
