@@ -2,7 +2,7 @@
 
 Trajectonomics documentation portal (Fumadocs + Astro) served at docs.trajectonomics.com
 
-[![CI](https://github.com/trajectonomics/docs/actions/workflows/ci.yml/badge.svg)](https://github.com/trajectonomics/docs/actions/workflows/ci.yml)
+[![CI](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml/badge.svg)](https://github.com/trajectonomics/trajectonomics/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 Part of the [Trajectonomics](https://github.com/trajectonomics) ecosystem.
@@ -13,8 +13,7 @@ Part of the [Trajectonomics](https://github.com/trajectonomics) ecosystem.
 
 The Docs Portal: public documentation for the Trajectonomics ecosystem, served at
 [`docs.trajectonomics.com`](https://docs.trajectonomics.com/)
-(see [issue #1](https://github.com/trajectonomics/docs/issues/1) and
-[ADR 0013](./docs/adr/0013-the-portal-is-served-on-its-own-host.md)). This package is a deployed site; it is
+(see [ADR 0013](./docs/adr/0013-the-portal-is-served-on-its-own-host.md)). This package is a deployed site; it is
 never published to npm.
 
 - Static [Astro](https://astro.build) site with [Fumadocs](https://fumadocs.dev) (React islands) and the built-in

@@ -189,11 +189,11 @@ A separate, pure package of real-world logic (ledger, simulation, or tax) that k
 _Avoid_: Library, plugin
 
 **Simulation core**:
-The core that projects the future from a baseline and a scenario. Package `@trajectonomics/sim`, repo `trajectonomics/sim-core`.
+The core that projects the future from a baseline and a scenario. Package `@trajectonomics/sim`, monorepo path `packages/core/sim`.
 _Avoid_: Sim, simulator
 
 **Tax core**:
-The core that computes statutory income tax for a jurisdiction and emits it as a Levy the simulation core charges. Package `@trajectonomics/tax`, repo `trajectonomics/tax-core`.
+The core that computes statutory income tax for a jurisdiction and emits it as a Levy the simulation core charges. Package `@trajectonomics/tax`, monorepo path `packages/core/tax`.
 _Avoid_: Tax engine, tax calculator
 
 ### Contract

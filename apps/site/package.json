@@ -5,7 +5,8 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/trajectonomics/site.git"
+		"url": "git+https://github.com/trajectonomics/trajectonomics.git",
+		"directory": "apps/site"
 	},
 	"type": "module",
 	"private": true,

@@ -6,6 +6,7 @@ import { root } from "./commands"
 const echo = defineCommand({
 	name: "echo",
 	summary: "Echo a word back",
+	note: "Echo ships in 9.9.9.",
 	positionals: ["word"],
 	input: z.strictObject({
 		word: z.string().describe("The word to echo."),
@@ -47,7 +48,12 @@ const doc = defineCommand({
 	run: (input) => ok({ name: input.name }),
 })
 
-const demo = defineGroup({ name: "demo", summary: "A fixture group", children: [doc, echo] })
+const demo = defineGroup({
+	name: "demo",
+	summary: "A fixture group",
+	note: "Fixture feature ships in 9.9.9.",
+	children: [doc, echo],
+})
 
 const boom = defineCommand({
 	name: "boom",

@@ -22,7 +22,12 @@ const TREE: Root = {
 			],
 		},
 		{ type: "separator", name: "Elsewhere" },
-		{ type: "page", name: "Source", url: "https://github.com/trajectonomics/docs", external: true },
+		{
+			type: "page",
+			name: "Source",
+			url: "https://github.com/trajectonomics/trajectonomics",
+			external: true,
+		},
 		{
 			type: "folder",
 			name: "Contribute",
@@ -43,7 +48,7 @@ describe("the order the Docs sidebar presents its pages in", () => {
 	})
 
 	test("a separator and an external link are not Docs pages", () => {
-		expect(sidebarPageUrls(TREE)).not.toContain("https://github.com/trajectonomics/docs")
+		expect(sidebarPageUrls(TREE)).not.toContain("https://github.com/trajectonomics/trajectonomics")
 	})
 
 	test("the order is frozen, so no caller can reorder the Tabs it came from", () => {
