@@ -69,7 +69,7 @@ describe("the CLI Version Floor the traj-onboarding Skill declares", () => {
 			"the version the operating skill expects",
 			"recording, reading balances and reports, and testing a Scenario",
 			"a projection, a financial-independence date and a tax figure",
-			"`trajectonomics/cli#117`",
+			"`@trajectonomics/cli` 0.2.0 or later",
 			"older, not broken",
 			"nothing is installed or downloaded to fix it",
 		]) {
