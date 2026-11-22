@@ -5,7 +5,7 @@ import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
 import { CLEAN_URL } from "../lib/language/languages"
-import { DOCS_PATH, SITE_NAME } from "../lib/site"
+import { BLOG_PATH, DOCS_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 import RepoLink from "./RepoLink.astro"
 
@@ -37,6 +37,7 @@ const artwork = mark
 		</a>
 		<div class="header-nav">
 			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
+			<a class="header-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
 		</div>
 		<div class="header-end">
 			<RepoLink dictionary={dictionary} />

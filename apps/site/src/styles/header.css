@@ -14,11 +14,12 @@
 
 /*
  * Three columns, so the nav stays centred between the mark and the repository link. The side columns
- * share the spare width; 40 px of padding from 640 px is the bar twenty draws.
+ * share the spare width, but never shrink below their content: on a narrow phone the nav moves off
+ * centre rather than under the repository link. 40 px of padding from 640 px is the bar twenty draws.
  */
 .header-bar {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
 	align-items: center;
 	column-gap: 1rem;
 	height: 100%;

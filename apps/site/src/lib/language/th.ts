@@ -33,6 +33,7 @@ export const THAI: LanguageEntry = Object.freeze({
 			"เอเจนต์เขียนโค้ดที่รันคำสั่งได้ เช่น Claude Code, Codex หรือ Cursor",
 		] as const),
 		docsLink: "เอกสาร",
+		blogLink: "บล็อก",
 		repoLinkLabel: "ดาวบน GitHub",
 		cliInstallLink: "ติดตั้ง CLI โดยตรง",
 		copy: "คัดลอกพรอมต์ให้เอเจนต์ของคุณ",

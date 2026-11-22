@@ -75,6 +75,14 @@ export const DOCS_CLI_PATH = `${DOCS_ORIGIN}/cli/`
 export const DOCS_CLI_INSTALL_PATH = `${DOCS_ORIGIN}/cli/installation/`
 
 /**
+ * The blog's origin. `apps/blog` builds it, and its Worker serves this host (ADR 0002 in `apps/blog`).
+ */
+export const BLOG_ORIGIN = "https://blog.trajectonomics.com"
+
+/** The blog's front page, the header's Blog link. */
+export const BLOG_PATH = `${BLOG_ORIGIN}/`
+
+/**
  * The monorepo the CLI is built and released from. Issues and releases live at its root, and it is the
  * one repository the header links, because its star is the count that link prints.
  */
