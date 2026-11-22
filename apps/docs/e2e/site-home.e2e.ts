@@ -47,6 +47,20 @@ for (const widthPx of [390, 1280, 2000]) {
 	}
 }
 
+for (const pageUnderTest of PAGES.filter((candidate) => candidate.name !== "a Tab page")) {
+	test(`${pageUnderTest.name} draws no empty phone menu at 390px`, async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: TEST_VIEWPORT_HEIGHT_PX })
+		await openPage(page, pageUnderTest.path)
+		await waitForIsland(page)
+
+		// The home layout's menu held only the way back, which the tile now is (ADR 0009), so no
+		// header button but the search is drawn. A renamed Fumadocs label would fail here.
+		const buttons = page.locator("#nd-nav button").filter({ visible: true })
+		await expect(buttons).toHaveCount(1)
+		await expect(buttons).toHaveAttribute("data-search", "")
+	})
+}
+
 test("clicking the glyph tile loads trajectonomics.com as a new document", async ({ page }) => {
 	await page.setViewportSize({ width: 1280, height: TEST_VIEWPORT_HEIGHT_PX })
 	await openPage(page, tabUrl(TABS[0]))

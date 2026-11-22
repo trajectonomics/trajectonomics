@@ -37,10 +37,9 @@ async function hoverCopyControl(page: Page): Promise<void> {
 }
 
 /**
- * The pages the set shows, each under the file name it is committed as. The search dialog and the
- * phone menu are here because they are the surfaces where a shadow becomes a hairline (docs#90);
- * the sidebar drawer is here because the phone reaches the Site Home button, the search and the Tab
- * dropdown through it (docs#91). Both Tab pages are here, because the shell reaches every Tab page.
+ * The pages the set shows, each under the file name it is committed as. The search dialog is here
+ * because it is a surface where a shadow becomes a hairline (docs#90); the sidebar drawer is here
+ * because the phone reaches the search and the Tab dropdown through it (docs#91). Both Tab pages are here, because the shell reaches every Tab page.
  */
 const PAGES: readonly CuratedPage[] = [
 	{ path: "/", name: "landing-page", widthsPx: TEST_WIDTHS_PX, drive: null, fullPage: true },
