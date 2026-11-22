@@ -197,6 +197,30 @@ Currency's major unit, such as `"1000.00"` for 100000 satang, and
 same either way: saving what `show --decimal` printed leaves it unchanged. A value with more places
 than the Currency has is refused, never rounded.
 
+## Milestones: points in the plan that a Flow waits for
+
+> **Ships in 0.8.0.**
+
+A Scenario may name points in the plan a Flow can wait for: a date, a number of months after another
+point, a net-worth or spending figure, or a multiple of spending. They are the `milestones` of the
+Scenario document, and `traj schema scenario apply` lists every key. A Flow's `startAt` lands it on
+or after a point's date, and its `endAt` before it. `traj projection run` reports each point's date,
+or that it was not reached, in a `milestones` table, and `traj projection compare` reports them under
+each side.
+
+```json
+"milestones": [
+  {
+    "id": "retire",
+    "combine": "all",
+    "criteria": [
+      { "id": "wealth", "kind": "metric", "metric": "accessibleNetWorth", "op": "atLeast", "amount": 50000000, "terms": "real" },
+      { "id": "age", "kind": "date", "on": "2045-01-01" }
+    ]
+  }
+]
+```
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.
