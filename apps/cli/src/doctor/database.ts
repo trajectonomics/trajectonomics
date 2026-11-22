@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "node:fs"
 import type { Context } from "../command"
 import { type AppError, isAppError } from "../errors"
-import { HEAD, openStore, type RestoreCounts, type Store } from "../store"
+import { HEAD, openStore, preMigrationCopies, type RestoreCounts, type Store } from "../store"
 import { sentenceOf, skipped, step } from "./checks"
 import { integrityCheck, ledgerChecks } from "./ledger"
 import type { DoctorCheck, DoctorResult } from "./output"
@@ -25,6 +25,7 @@ function factsOf(database: string, schemaVersion: number | null): DatabaseFacts 
 		bytes: exists ? statSync(database).size : 0,
 		schemaVersion,
 		head: HEAD,
+		preMigrationCopies: preMigrationCopies(database),
 	}
 }
 
@@ -53,10 +54,14 @@ function readOpened(
 		return unreadable(factsOf(database, null), sentenceOf(version), "It could not be read.")
 	}
 	const facts = factsOf(database, version)
+	const copies = facts.preMigrationCopies.map(
+		(copy) => `${copy.path} (version ${copy.schemaVersion})`,
+	)
+	const kept = copies.length === 0 ? "" : ` Copies from before an upgrade: ${copies.join(", ")}.`
 	const opened = step(
 		"database",
 		"pass",
-		`${database} opens at schema version ${version} of ${HEAD}.`,
+		`${database} opens at schema version ${version} of ${HEAD}.${kept}`,
 	)
 	const integrity = integrityCheck(store)
 	const rows = store.counts()

@@ -250,6 +250,19 @@ traj backup --out ~/traj-backup-2026-11-30
 traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 ```
 
+### Going back after an upgrade
+
+> **Ships in 0.8.0.**
+
+When a newer `traj` has to migrate your database to a newer schema, it first copies it beside the
+original as `traj.db.pre-v<N>.bak`, where `N` is the schema version the copy holds, and says so once
+on stderr. An older `traj` refuses a database a newer one has migrated, so to go back, install a
+release that writes that schema version, delete `traj.db`, `traj.db-wal` and `traj.db-shm` in the
+data directory, and copy the `.bak` file to `traj.db`. If the copy cannot be written (a full disk, a
+directory that is not writable) the database is not migrated and nothing changes. A new, empty
+ledger is not copied. `traj doctor` lists the copies as `database.preMigrationCopies`, and
+`traj data remove` leaves them, because they are separate files you can delete when you no longer need them.
+
 ## Telemetry
 
 `traj` counts its own use, so the project can see how many people run it each week. After a command finishes, a detached process sends one anonymous event to PostHog (EU), so the command never waits for the network. The event holds:
