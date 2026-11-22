@@ -4,7 +4,7 @@ status: accepted
 
 # The sections' motion plays once, and the static page is the whole story
 
-The owner asked for the two compare panels and the presentation-layer flow to move instead of being read (site#64), then re-cut them four times in the draft thread: the chat section argues that the agent is grounded rather than that it is deterministic, the panels are conversations rather than tables of runs, the flow names the step that is running, and its three outputs are drawn rather than labelled. A throwaway prototype in that thread settled the look before this record. What follows is the rule those re-cuts produced, so the next section can move without re-arguing it.
+The owner asked for the two compare panels and the presentation-layer flow to move instead of being read (#110), then re-cut them four times in the draft thread: the chat section argues that the agent is grounded rather than that it is deterministic, the panels are conversations rather than tables of runs, the flow names the step that is running, and its three outputs are drawn rather than labelled. A throwaway prototype in that thread settled the look before this record. What follows is the rule those re-cuts produced, so the next section can move without re-arguing it.
 
 ## Decision
 
@@ -33,7 +33,7 @@ The owner asked for the two compare panels and the presentation-layer flow to mo
 - A new animated section is a timeline entry, one attribute on its root and a block in the stylesheet
   that section owns (`src/styles/motion-compare.css`, `motion-flow.css`, `motion-steps.css`); nothing
   else. They are several files rather than one because a stylesheet has the same 100-line ceiling as a
-  module, and site#64 filled one.
+  module, and #110 filled one.
 - The budgets do not move: page weight stays under 50,000 bytes gzip, Program JavaScript under 10,000 bytes, and no new Invariant or Error Code is created, because no new invariant exists.
 - The `Replay` control is the only new control on the home. It is a `<button>` with a focus ring, it replays one section, and it is not in the tab order where there is no motion to replay.
 

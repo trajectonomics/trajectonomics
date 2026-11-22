@@ -30,7 +30,7 @@ answer; making the block keyboard-reachable left the contrast run unjudged and t
   so each JSON line is still its own line and a longer one wraps rather than clipping. The rule stays in
   `src/styles/terminal.css`, where the block already lives.
 - **The block is not a scroll container.** It carried `overflow-x: auto` as a valve for a future overflow.
-  site#64 put the block inside a chat bubble and measured the cost: while the Brand Typeface is still
+  #110 put the block inside a chat bubble and measured the cost: while the Brand Typeface is still
   loading the fallback face is wider, the box really does overflow for a moment, and the browser makes a
   scrollable region a Tab stop — so a keyboard visitor landed on the output as if it were a control, with
   no focus ring to say so. The wrap above guarantees there is nothing to scroll, so the valve was removed
@@ -78,11 +78,11 @@ answer; making the block keyboard-reachable left the contrast run unjudged and t
 
 ## Consequences
 
-- The comparison's phone layout moved twice after this record was written: #95 made the panels a tabbed
-  pair, #108 rewrote them as two chat transcripts, and #109 settled it on one panel at a time with a control
+- The comparison's phone layout moved twice after this record was written: site#95 made the panels a tabbed
+  pair, site#108 rewrote them as two chat transcripts, and site#109 settled it on one panel at a time with a control
   under them. With motion reduced — which is the setting the axe suite runs at — the page lays **both**
   panels out whole, so the demo output is in the judged tree and the After panel needs no interaction to be
-  reached. The tab pair #95 and #108 carried is gone, and with it the inert After button #108 left behind.
+  reached. The tab pair site#95 and site#108 carried is gone, and with it the inert After button site#108 left behind.
 - The two mobile home baselines move with the layout changes around the wrap, and the desktop and Not-found
   baselines do not change with the wrap itself, byte for byte.
 - The twelve `docs/screenshots/site-<language>-<width>-<scheme>.png` renders were refreshed, because a surface

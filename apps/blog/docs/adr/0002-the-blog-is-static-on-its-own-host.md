@@ -8,7 +8,7 @@ at `trajectonomics.com/blog` behind the router.
 ## Context
 
 The owner asked for a blog with compare pages first (trajectonomics/factory#120, its Spec in the
-archived trajectonomics/blog#1). The Spec mounted it at `/blog` through the router, copying the
+#140, moved here from the archived blog#1). The Spec mounted it at `/blog` through the router, copying the
 Docs Portal. On 2026-11-21 the Docs Portal moved to its own host (docs ADR 0013). On 2026-11-22 the
 owner moved the blog the same way: `blog.trajectonomics.com`, with no microfrontend.
 

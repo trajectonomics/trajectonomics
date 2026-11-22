@@ -86,7 +86,7 @@ change.
   the prompt: the Skill's own install still needs the skills CLI. The prompt removes the terminal, not the
   dependency.
 - The wizard script and the cloned workspace stay rejected, exactly as 0009 left them. Only the "keep one command"
-  half of site#38's answer reverses; site#43's way-out row and site#44's rule stand untouched.
+  half of #111's answer reverses; site#43's way-out row and site#44's rule stand untouched.
 - The copy rate is measured the same way it was: `site_command_copied` over `$pageview`.
 - The window's copy is the owner's, in both Languages, and the prompt is one English fixture in every Language
   because its reader is the agent.
