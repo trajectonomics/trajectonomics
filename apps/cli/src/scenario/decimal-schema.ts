@@ -1,0 +1,59 @@
+import { z } from "zod"
+import { isAppError } from "../errors"
+import { toDecimalForm } from "./decimal"
+import { isMoney, isNode, type Node, PUBLISHED } from "./money-fields"
+import { DECIMAL_UNITS, MINOR_UNITS } from "./shape/terms"
+
+/*
+ * The decimal form as `traj schema` publishes it (ADR-0047): the minor-unit form's own schema with
+ * each money field a decimal string. Its description is the same field's, with only the unit changed.
+ */
+
+/** A plain decimal: an optional minus, no grouping commas, no exponent, no leading `+`. */
+const DECIMAL_PATTERN = "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+
+/** The `--decimal` flag of `show` and `apply`: the form `show --decimal` prints and `apply` reads. */
+export const decimalFlag: z.ZodOptional<z.ZodBoolean> = z
+	.boolean()
+	.optional()
+	.describe(
+		'Money as decimal strings of the Currency\'s major unit, such as "350.00", not integer minor units (ADR-0047).',
+	)
+
+/** A schema node in the decimal form: a money field becomes a string with its unit stated. */
+function decimalNode(node: unknown): unknown {
+	if (Array.isArray(node)) return node.map(decimalNode)
+	if (!isNode(node)) return node
+	const copy = Object.fromEntries(
+		Object.entries(node).map(([key, value]) => [key, decimalNode(value)]),
+	)
+	if (!isMoney(node)) return copy
+	const rest = String(node["description"]).slice(MINOR_UNITS.length)
+	return {
+		...copy,
+		type: "string",
+		pattern: DECIMAL_PATTERN,
+		description: `${DECIMAL_UNITS}${rest}`,
+	}
+}
+
+/** The root of the decimal form's schema: its examples are converted with the same rule. */
+function decimalRoot(): Node {
+	const root: Node = { ...PUBLISHED }
+	delete root["$schema"]
+	const examples = Array.isArray(root["examples"]) ? root["examples"] : undefined
+	const converted = examples?.flatMap((example) => {
+		const decimal = isNode(example) ? toDecimalForm(example) : undefined
+		return decimal === undefined || isAppError(decimal) ? [] : [decimal]
+	})
+	const shaped = decimalNode(root) as Node
+	return converted === undefined ? shaped : { ...shaped, examples: converted }
+}
+
+/**
+ * The `scenario apply --decimal` form's input schema. It accepts any JSON value, like the minor
+ * form, because the conversion (and every refusal of it) runs after the document is read, so its
+ * failures can name a currency or an amount's places, which a schema check cannot. It is published
+ * by `traj schema` as the document's alternate form.
+ */
+export const decimalDocument: z.ZodType<unknown> = z.unknown().meta(decimalRoot())

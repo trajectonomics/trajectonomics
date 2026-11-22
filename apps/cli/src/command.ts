@@ -1,5 +1,5 @@
 import type { z } from "zod"
-import { checkDocument } from "./document"
+import { checkDocument, type FlagDocument } from "./document"
 import type { AppError, ErrorCode } from "./errors"
 import { checkPositionals, deriveFlags, type FlagSpec } from "./flags"
 import type { RenderHint } from "./table"
@@ -45,16 +45,12 @@ export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
 	required?: readonly RequiredDocumentField[]
 	/** The hint a refusal of the document flag beside a flag it cannot take carries. */
 	hint?: string
-}
-
-/**
- * A document a flag names beside the other flags, such as `--carry-in <path>` (ADR-0030). It is
- * not the document form: the flag may be combined with the rest, so it is published under its own
- * key instead of replacing the input schema the way `DocumentSpec` does.
- */
-export type FlagDocument = {
-	flag: string
-	schema: z.ZodType
+	/**
+	 * A second form of the same document, taken instead of `schema` when the boolean input field
+	 * `flag` is true, such as `--decimal` (ADR-0047). It is published by `traj schema` beside the
+	 * first, and the two never mix: the flag selects one schema before the document is read.
+	 */
+	alternate?: { flag: string; schema: z.ZodType }
 }
 
 type Outcome<T> = Result<T> | AppError | Promise<Result<T> | AppError>

@@ -1,5 +1,7 @@
+import { isAppError } from "./errors"
 import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
+import { toDecimalForm } from "./scenario/decimal"
 
 /**
  * What a leaf's examples need before they run, declared beside the test that runs them. Every
@@ -13,6 +15,13 @@ export type Setup = {
 	files?: Record<string, string>
 	/** Commands run first, as `traj` arguments; each must exit 0. */
 	steps?: readonly (readonly string[])[]
+}
+
+/** The fixture in decimal form. A fixture that cannot convert fails here, not in a person's first run. */
+function decimalText(document: object): string {
+	const converted = toDecimalForm(document as Record<string, unknown>)
+	if (isAppError(converted)) throw new Error(converted.body.message)
+	return JSON.stringify(converted)
 }
 
 /** The default: a ledger with the fixture's accounts, transactions and the projection Scenarios. */
@@ -37,7 +46,13 @@ export const SETUP: Record<string, Setup> = {
 			["data", "remove", "--confirm", "~/.traj", "--backup", "backup"],
 		],
 	},
-	"scenario apply": { files: { "base.json": JSON.stringify(PROJECTION_SCENARIO) } },
+	"scenario apply": {
+		files: {
+			"base.json": JSON.stringify(PROJECTION_SCENARIO),
+			// The same document in decimal form, as `scenario show base --decimal` prints it.
+			"base-decimal.json": decimalText(PROJECTION_SCENARIO),
+		},
+	},
 	"tx import": {
 		files: {
 			"statement.csv":

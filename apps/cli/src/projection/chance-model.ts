@@ -1,6 +1,6 @@
 import type { ReturnModel } from "@trajectonomics/core/sim"
 import { z } from "zod"
-import type { FlagDocument } from "../command"
+import type { FlagDocument } from "../document"
 import { parseDocument, readDocument } from "../document"
 import { type AppError, isAppError } from "../errors"
 

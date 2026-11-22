@@ -7,7 +7,11 @@ import { leavesOf } from "./tree"
 const demo = (argv: string[]) => capture(argv, {}, fixtureRoot)
 
 /** The commands this release does not ship yet, each with the note its page prints (ADR-0034). */
-const UNRELEASED: readonly (readonly string[])[] = [["projection", "chance"]]
+const UNRELEASED: readonly (readonly string[])[] = [
+	["projection", "chance"],
+	["scenario", "show"],
+	["scenario", "apply"],
+]
 
 describe("usage", () => {
 	it("lists groups next to commands at the root", async () => {

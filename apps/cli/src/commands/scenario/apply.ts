@@ -1,21 +1,13 @@
 import { z } from "zod"
 import { UUID_SHAPED } from "../../account/name"
-import type { Leaf } from "../../command"
-import { defineCommand, ok } from "../../command"
+import { defineCommand, type Leaf } from "../../command"
 import { missingFieldError } from "../../document"
-import { isAppError } from "../../errors"
 import { DOCUMENT, exclusive, REQUIRED_NAME } from "../../scenario/apply-forms"
+import { applyResult, writeApplied } from "../../scenario/apply-write"
+import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
 import { printTemplate } from "../../scenario/template"
-import { view, type WrittenScenario, writtenScenario } from "../../scenario/view"
 import { LEDGER_READ_CODES } from "../../store"
-import { withStore } from "../../with-store"
-
-const result = z.strictObject({
-	dryRun: z.boolean().describe("True when the write was rolled back."),
-	status: z.enum(["created", "updated", "unchanged"]).describe("What the apply found."),
-	scenario: writtenScenario,
-})
 
 export const apply: Leaf = defineCommand({
 	name: "apply",
@@ -46,9 +38,11 @@ export const apply: Leaf = defineCommand({
 				"With --template, pre-fill the document from the Baseline at this date, as YYYY-MM-DD.",
 			),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
+		decimal: decimalFlag,
 	}),
 	document: DOCUMENT,
-	output: z.union([z.string(), result]),
+	note: "The --decimal form ships in 0.8.0.",
+	output: z.union([z.string(), applyResult]),
 	examples: [
 		{
 			command: "traj scenario apply --template",
@@ -70,11 +64,16 @@ export const apply: Leaf = defineCommand({
 			command: "traj scenario apply base --file base.json --dry-run",
 			description: "Show the row and roll the write back.",
 		},
+		{
+			command: "traj scenario apply base --file base-decimal.json --decimal",
+			description: "Apply a document in decimal form, such as scenario show --decimal prints.",
+		},
 	],
 	errorCodes: [
 		"database_busy",
 		"invalid_input",
 		"INVALID_DATE",
+		"INVALID_AMOUNT",
 		"NEGATIVE_AMOUNT",
 		"AMOUNT_OVERFLOW",
 		"unsupported_currency",
@@ -88,16 +87,11 @@ export const apply: Leaf = defineCommand({
 		const name = input.name
 		if (name === undefined) return missingFieldError(REQUIRED_NAME)
 		if (UUID_SHAPED.test(name)) return invalidScenarioName()
-		const dryRun = input.dryRun === true
-		return withStore(ctx, (store) => {
-			const outcome = store.saveScenario({ name, document }, { dryRun })
-			if (isAppError(outcome)) return outcome
-			const rendered = view(outcome.scenario)
-			const scenario: WrittenScenario = {
-				...rendered,
-				id: dryRun && outcome.status === "created" ? null : rendered.id,
-			}
-			return ok({ dryRun, status: outcome.status, scenario })
+		return writeApplied(ctx, {
+			name,
+			document,
+			decimal: input.decimal === true,
+			dryRun: input.dryRun === true,
 		})
 	},
 })

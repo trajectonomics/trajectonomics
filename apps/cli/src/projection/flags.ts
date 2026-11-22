@@ -1,5 +1,5 @@
 import { z } from "zod"
-import type { FlagDocument } from "../command"
+import type { FlagDocument } from "../document"
 import type { ErrorCode } from "../errors"
 import { LEDGER_READ_CODES } from "../store"
 import { carryInDocument } from "./carryin"

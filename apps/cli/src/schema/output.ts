@@ -40,6 +40,15 @@ const document = z
 			.array(z.string())
 			.optional()
 			.describe("The input fields the document form requires, checked before it is read."),
+		alternate: z
+			.strictObject({
+				flag: z
+					.string()
+					.describe("The boolean input field that selects this form instead of the schema above."),
+				schema: jsonSchema.describe("JSON Schema of the document in this form."),
+			})
+			.optional()
+			.describe("A second form of the same document, selected by a boolean input field."),
 	})
 	.describe("The alternate document form, beside the flag form.")
 

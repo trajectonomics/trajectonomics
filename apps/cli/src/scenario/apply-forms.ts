@@ -1,5 +1,6 @@
 import type { DocumentSpec, RequiredDocumentField } from "../command"
 import { type AppError, fail } from "../errors"
+import { decimalDocument } from "./decimal-schema"
 import { scenarioDocument } from "./document-form"
 
 /** The input fields `scenario apply` reads; the two forms share one input schema. */
@@ -9,6 +10,7 @@ export type ApplyFlags = {
 	template?: boolean | undefined
 	asOf?: string | undefined
 	dryRun?: boolean | undefined
+	decimal?: boolean | undefined
 }
 
 /** The document form cannot work without a name, and says so before it reads the document. */
@@ -24,9 +26,10 @@ const FORM_HINT =
 export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	flag: "file",
 	schema: scenarioDocument,
-	allowed: ["name", "dryRun"],
+	allowed: ["name", "dryRun", "decimal"],
 	required: [REQUIRED_NAME],
 	hint: FORM_HINT,
+	alternate: { flag: "decimal", schema: decimalDocument },
 }
 
 /**
@@ -39,6 +42,13 @@ export function exclusive(input: ApplyFlags): AppError | undefined {
 		return fail("invalid_input", {
 			path: "dryRun",
 			message: "dryRun: --template takes no --dry-run",
+		})
+	}
+	if (input.template === true && input.decimal === true) {
+		return fail("invalid_input", {
+			path: "decimal",
+			message: "decimal: --template prints minor units, so it takes no --decimal",
+			hint: 'Run "traj scenario apply <name> --file <path> --decimal" to apply a document in decimal form.',
 		})
 	}
 	if (input.template === true && input.name !== undefined) {
