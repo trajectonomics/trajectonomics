@@ -27,7 +27,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		releaseLine: RELEASE.releaseLine,
 		releaseDate: RELEASE.releaseDate,
 		heroSubline:
-			"traj is a free, open-source financial simulation tool built for AI agents. Ship as a skill and CLI — local-first, no accounts, no dashboards, no subscriptions.",
+			"traj is a free, open-source financial simulation tool built for AI agents. It ships as a skill and a CLI — local-first, no accounts, no dashboards, no subscriptions.",
 		factLabels: Object.freeze(["Currency", "First run", "Agent"] as const),
 		factTexts: Object.freeze([
 			"Thai baht only, for now.",

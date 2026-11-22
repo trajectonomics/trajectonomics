@@ -9,7 +9,7 @@ describe("the strings the Dictionary states for its reader", () => {
 	it("keeps the English sub-line and disclaimer the owner approved", () => {
 		const english = dictionaryFor("en")
 		expect(english.heroSubline).toBe(
-			"traj is a free, open-source financial simulation tool built for AI agents. Ship as a skill and CLI — local-first, no accounts, no dashboards, no subscriptions.",
+			"traj is a free, open-source financial simulation tool built for AI agents. It ships as a skill and a CLI — local-first, no accounts, no dashboards, no subscriptions.",
 		)
 		// The owner settled the disclaimer on 2026-11-18: it opens at the bug clause, with no version and no stability claim.
 		expect(english.footerDisclaimer).toBe(
@@ -21,6 +21,11 @@ describe("the strings the Dictionary states for its reader", () => {
 		const thai = dictionaryFor("th")
 		expect(thai.heroSubline).toBe(
 			"traj คือเครื่องมือจำลองการเงินโอเพนซอร์สฟรีสำหรับ AI agent ใช้ได้ทั้งเป็นสกิลและ CLI — ทำงานบนเครื่องคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
+		)
+		// Feature 03's copy says something its title does not (#108).
+		expect(thai.featureTitles[3]).toBe("ทำงานบนเครื่องคุณ")
+		expect(thai.featureCopies[3]).toBe(
+			"ข้อมูลทั้งหมดอยู่ในเครื่องของคุณ ไม่ต้องสร้างบัญชี ไม่มีแดชบอร์ด ไม่ต้องสมัครสมาชิก",
 		)
 		expect(thai.footerDisclaimer).toBe(
 			"ยังอาจมีบั๊ก ระบบจะคำนวณภาษีเมื่อคุณขอเท่านั้น และทุกตัวเลขบอกว่ารวมภาษีหรือไม่ เชื่อตัวเลขที่ traj ส่งกลับ หากพบบั๊ก ให้เปิด issue ที่ https://github.com/trajectonomics/trajectonomics/tree/main/apps/cli แล้วเราจะอัปเดตโดยเร็ว",
