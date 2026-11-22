@@ -8,7 +8,7 @@ Scope: Trajectonomics (`trajectonomics/*`).
 
 Trajectonomics makes free, open-source money tools that help people make informed decisions easily and reach financial independence. AI agents operate the tools for the people they help.
 
-We build in this order: the `traj` command line with an agent skill first, then a desktop app and a web app that work with a backend the user brings, then a mobile app once the desktop app is mature.
+We build in this order: the `traj` command line with an agent skill first; then a sync relay, end-to-end encrypted and self-hostable before any hosted version; then a read-only MCP server on that relay, so chat apps can reach `traj`; then a desktop app for Linux and Windows (macOS once it can be built and tested) and a web app that work with a backend the user brings; then a mobile app once the desktop app is mature; then a LINE bot.
 
 ## Who it is for
 
@@ -37,7 +37,7 @@ Individuals who want to understand and plan their own money. We start with peopl
   - **31 December 2026.** 10 people.
 - If the owner finds a checkpoint missed, stop adding features and find out what stops people from using `traj`.
 
-**G2. By 31 December 2026, the `trajectonomics/cli` repository has about 100 GitHub stars, and the owner uses `traj` every day.** This is the success line in cli ADR 0002. It is a second goal beside G1, not a replacement.
+**G2. By 31 December 2026, the `trajectonomics/trajectonomics` repository has about 100 GitHub stars, and the owner uses `traj` every day.** Stars count on the monorepo; the archived `trajectonomics/cli` no longer takes them. This is the success line in cli ADR 0002. It is a second goal beside G1, not a replacement.
 
 - An idea serves G2 when it makes `traj` easier to find or worth a star, or makes it work better for the owner's own daily use.
 
@@ -59,4 +59,4 @@ No agent may decide or build any of these without the owner:
 ## Not now
 
 - CRM (Twenty). There are no clients to track yet.
-- Mobile app. Not until the owner says the desktop app is mature.
+- Mobile app. Not until the owner says the desktop app is mature. The moojot pilot (to be renamed openjot) is a separate experiment outside this line: it stays its own project until an Instagram reel about it passes 1,000 views with a comment showing interest, and then joins this monorepo as automatic transaction capture for budgeting (trajectonomics/trajectonomics#91).
