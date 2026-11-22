@@ -1,57 +1,24 @@
-import type { Context, Env, Group, Leaf } from "./command"
+import type { Context, Env, Group } from "./command"
 import { root as defaultRoot } from "./commands"
 import { type AppError, fail, isAppError } from "./errors"
-import { parseInput } from "./input"
 import { dispatchFailure } from "./invalid"
-import { type Parsed, parseNodeArgs } from "./parse"
-import { type Format, renderError, renderResult, resolveFormat } from "./render"
+import { type Format, renderResult, resolveFormat } from "./render"
+import { route, type Stdin } from "./route"
+import { badFormat, type Ended, failureOf, namedLeaf, type Seen } from "./run-outcome"
 import type { RenderHint } from "./table"
-import { findNode, missingCommand, unknownCommand, walk } from "./tree"
+import type { RunRecord } from "./telemetry/event"
 
 export interface Io {
 	out: (line: string) => void
 	err: (line: string) => void
+	/**
+	 * Told once per invocation, on every path, what ran and how it ended. It only reports: the
+	 * caller decides what to do with it, and `run()` never reads anything back.
+	 */
+	observe?: (record: RunRecord) => void
 }
-
-type Invocation = { leaf: Leaf; path: string[]; input: unknown; document?: unknown }
-type Stdin = () => Promise<string>
 
 const defaultStdin: Stdin = () => Bun.stdin.text()
-
-function builtIn(root: Group, name: string, input: unknown): Invocation | AppError {
-	const leaf = findNode(root, [name])
-	if (leaf?.kind !== "leaf") return fail("internal")
-	return { leaf, path: [name], input }
-}
-
-/**
- * A group named with no command under it: the root lists the commands, every other group is
- * invalid input, and a word left after a bare `--` is still an unknown command.
- */
-function atGroup(root: Group, path: string[], parsed: Parsed): Invocation | AppError {
-	const stray = parsed.positionals[0]
-	if (stray !== undefined) return unknownCommand(path, stray)
-	return path.length === 0 ? builtIn(root, "help", { path }) : missingCommand(path)
-}
-
-/**
- * Decides what to run: `--version` and `--help` win, the root lists the commands, and any other
- * group named with no command under it is invalid input.
- */
-async function route(argv: string[], root: Group, stdin: Stdin): Promise<Invocation | AppError> {
-	const landed = walk(root, argv)
-	if (isAppError(landed)) return landed
-	const { node, path, rest } = landed
-	const parsed = parseNodeArgs(node.kind === "leaf" ? node.flags : [], rest, path)
-	if (isAppError(parsed)) return parsed
-	if (parsed.version) return builtIn(root, "version", {})
-	if (parsed.help) return builtIn(root, "help", { path })
-	if (node.kind === "group") return atGroup(root, path, parsed)
-	const input = await parseInput(node, parsed, path, stdin)
-	if (isAppError(input)) return input
-	const document = input.document === undefined ? {} : { document: input.document }
-	return { leaf: node, path, input: input.input, ...document }
-}
 
 type Dispatched = { data: unknown; hint?: RenderHint }
 
@@ -61,9 +28,12 @@ async function dispatch(
 	root: Group,
 	stdin: Stdin,
 	notify: (line: string) => void,
+	seen: Seen,
 ): Promise<Dispatched | AppError> {
 	const invocation = await route(argv, root, stdin)
 	if (isAppError(invocation)) return invocation
+	// The leaf that actually runs, a built-in such as `help` included, is the one reported.
+	seen.command = invocation.path.join(" ")
 	const ctx: Context = { env, root, stdin, notify }
 	const result = await invocation.leaf.run(invocation.input, invocation.document, ctx)
 	// The dispatch step knows the leaf, so a command-raised failure follows ADR-0013's input paths.
@@ -74,17 +44,29 @@ async function dispatch(
 	return invocation.leaf.render === undefined ? { data } : { data, hint: invocation.leaf.render }
 }
 
-function failureOf(error: AppError, format: Format, io: Io): number {
-	io.err(renderError(error, format))
-	return error.body.exitCode
-}
-
-function badFormat(requested: string, io: Io): number {
-	const error = fail("unknown_format", {
-		message: `Unknown format: ${requested}`,
-		hint: "Set TRAJ_FORMAT to human or json, or pass --json.",
-	})
-	return failureOf(error, "human", io)
+async function execute(
+	argv: string[],
+	io: Io,
+	env: Env,
+	root: Group,
+	stdin: Stdin,
+	format: Format,
+	invalid: string | undefined,
+	seen: Seen,
+): Promise<Ended> {
+	try {
+		if (invalid !== undefined) return badFormat(invalid, io.err)
+		const outcome = await dispatch(argv, env, root, stdin, io.err, seen)
+		if (isAppError(outcome)) return failureOf(outcome, format, io.err)
+		io.out(renderResult(outcome.data, format, outcome.hint))
+		return { exitCode: 0 }
+	} catch (error) {
+		// The message is fixed text; diagnostics go to stderr only when TRAJ_DEBUG asks for them.
+		if (env["TRAJ_DEBUG"] === "1") {
+			io.err(error instanceof Error ? (error.stack ?? error.message) : String(error))
+		}
+		return failureOf(fail("internal"), format, io.err)
+	}
 }
 
 /** Runs the CLI and returns the exit code. Never calls process.exit, so tests can drive it. */
@@ -98,17 +80,13 @@ export async function run(
 	// The format is settled first, by a pre-scan that cannot fail, so even a malformed command
 	// line is answered in the format the caller asked for.
 	const choice = resolveFormat(argv, env)
-	try {
-		if (choice.invalid !== undefined) return badFormat(choice.invalid, io)
-		const outcome = await dispatch(argv, env, root, stdin, io.err)
-		if (isAppError(outcome)) return failureOf(outcome, choice.format, io)
-		io.out(renderResult(outcome.data, choice.format, outcome.hint))
-		return 0
-	} catch (error) {
-		// The message is fixed text; diagnostics go to stderr only when TRAJ_DEBUG asks for them.
-		if (env["TRAJ_DEBUG"] === "1") {
-			io.err(error instanceof Error ? (error.stack ?? error.message) : String(error))
-		}
-		return failureOf(fail("internal"), choice.format, io)
-	}
+	const seen: Seen = { command: namedLeaf(root, argv) }
+	const ended = await execute(argv, io, env, root, stdin, choice.format, choice.invalid, seen)
+	io.observe?.({
+		command: seen.command,
+		exitCode: ended.exitCode,
+		errorCode: ended.errorCode,
+		format: choice.format,
+	})
+	return ended.exitCode
 }
