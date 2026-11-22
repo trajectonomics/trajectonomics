@@ -27,8 +27,8 @@ describe("the blog Worker", () => {
 		expect(config.route).toBeUndefined()
 	})
 
-	test("keeps its workers.dev address, for checking a deploy before the domain answers", () => {
-		expect(config.workers_dev).toBe(true)
+	test("serves only its custom domain, so no *.workers.dev copy is published", () => {
+		expect(config.workers_dev).toBe(false)
 	})
 
 	test("declares no environment, so there is one Worker to deploy", () => {

@@ -5,6 +5,9 @@ name: Release docs
 # so a marker is removed once its release has shipped instead of rotting. The check reads the
 # published release's own schema, so it is a workflow job and never part of `bun run check`,
 # which stays offline and deterministic (AGENTS.md rule 4).
+#
+# The freshness rule also runs right after each stable release (release.yml's workflow_dispatch run):
+# a marker naming the release that just shipped is what the rule exists to catch.
 on:
   pull_request:
     branches: [main]
@@ -14,6 +17,9 @@ on:
   schedule:
     - cron: "0 6 * * 1" # Mondays, with the tooling drift job
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
 
 permissions:
   contents: read
@@ -24,6 +30,8 @@ defaults:
 
 jobs:
   check:
+    # A release run counts only when it published a stable release and succeeded.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -69,5 +77,5 @@ jobs:
           done
       - name: Check the README and the help notes against that release
         env:
-          RELEASE_DOCS_MODE: ${{ github.event_name == 'schedule' && 'freshness' || 'pull-request' }}
+          RELEASE_DOCS_MODE: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_run') && 'freshness' || 'pull-request' }}
         run: bun run src/release-docs-cli.ts
