@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
+import { personAges } from "./person-age"
 
 /** The rule-of-thumb reference an FI date is read against: its threshold and the figures it divides. */
 const reference = z.strictObject({
@@ -52,3 +53,11 @@ const unreachable = z.strictObject({
 /** The survival-method answer: reachable with a date, or unreachable with what binds. */
 export const fiResult = z.union([reachable, noCandidate, unreachable])
 export type FiResult = z.infer<typeof fiResult>
+
+/** The `fi` leaf's answer: a reachable date also states each person's age on that date (cli ADR-0048). */
+export const fiLeafResult = z.union([
+	reachable.extend({ ages: personAges }),
+	noCandidate,
+	unreachable,
+])
+export type FiLeafResult = z.infer<typeof fiLeafResult>

@@ -2,12 +2,14 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
+import { personAges } from "./person-age"
 
 /** One annual row: the roll-up of a year, with its real net worth measured at a monthly row. */
 const annualRow = z.strictObject({
 	index: integer,
 	from: dateString,
 	to: dateString,
+	ages: personAges,
 	openingNetWorth: money,
 	closingNetWorth: money,
 	income: money,
@@ -23,6 +25,7 @@ const annualRow = z.strictObject({
 /** One monthly row: net worth on the row's date, nominal and real, and the accessible share. */
 const monthlyRow = z.strictObject({
 	date: dateString,
+	ages: personAges,
 	netWorth: money,
 	realNetWorth: money,
 	accessibleNetWorth: money,
