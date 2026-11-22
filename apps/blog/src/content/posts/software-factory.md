@@ -62,7 +62,7 @@ grep -c '^factory/' heads.txt  # PR ที่มาจาก Factory Run
 - **ถ้า Run ไปต่อไม่ได้ มันจะหยุดแล้วเรียกคน** เช่น spec ไม่ชัดพอให้ทำ, มีเรื่องด่วน หรือรีวิวไม่ผ่าน ([Exit](https://github.com/trajectonomics/factory/blob/main/GLOSSARY.md)) กรณีหลังมันจะเปิด PR แบบ draft พร้อมสิ่งที่เจอ แล้วติด label `ready-for-human`
 - **งาน UI ต้องผ่านตาผมเสมอ** ต้องแนบภาพหน้าจอ และ merge ได้ก็ต่อเมื่อผมอนุมัติดีไซน์แล้ว ([ADR 0017](https://github.com/trajectonomics/factory/blob/main/docs/adr/0017-surface-design-gate.md))
 
-บทเรียนหนึ่งที่อยากเล่า: เดิมผมตั้งด่านก่อน merge ไว้เยอะ เช่น diff ห้ามเกิน 1,500 บรรทัด และห้ามแตะไฟล์สำคัญ แต่รอบแรกที่รันจริง 5 ใน 9 PR ติดด่านพวกนี้ งานเลยไม่เดิน ผมจึงยกเลิกด่าน merge ทั้งหมดใน [ADR 0015](https://github.com/trajectonomics/factory/blob/main/docs/adr/0015-no-merge-gate.md) ตอนนี้คุณภาพอยู่ที่ Spec ที่ชัด กับการรีวิวในขั้นตอนของ Run เอง ถ้ามีอะไรพลาดเข้า `main` ก็ revert
+บทเรียนหนึ่งที่อยากเล่า: เดิมผมตั้งด่านก่อน merge ไว้เยอะ เช่น diff ห้ามเกิน 1,500 บรรทัด และห้ามแตะไฟล์สำคัญ แต่รอบแรกที่รันจริง 5 ใน 9 PR ติดด่านพวกนี้ งานเลยไม่เดิน ผมจึงยกเลิกด่าน merge เกือบทั้งหมด (เหลือแค่ด่านดีไซน์ของงาน UI) ใน [ADR 0015](https://github.com/trajectonomics/factory/blob/main/docs/adr/0015-no-merge-gate.md) ตอนนี้คุณภาพอยู่ที่ Spec ที่ชัด กับการรีวิวในขั้นตอนของ Run เอง ถ้ามีอะไรพลาดเข้า `main` ก็ revert
 
 ## ถ้าจะเริ่มจากศูนย์
 
