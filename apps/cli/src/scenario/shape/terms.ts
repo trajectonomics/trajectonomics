@@ -8,6 +8,14 @@
 export const MINOR_UNITS =
 	"Integer minor units of `currency` (satang for THB): 35000 is 350.00 THB, and a Flow states it per occurrence, not per year."
 
+/**
+ * The unit of every money field in the decimal form (ADR-0047): a JSON string of the Currency's
+ * major unit. It replaces MINOR_UNITS' head in that form's published schema, so the two stay one
+ * statement of the same field.
+ */
+export const DECIMAL_UNITS =
+	'A decimal string of `currency`\'s major unit, never a JSON number: "350.00" is 35000 satang, with at most as many places as the Currency has (two for THB).'
+
 /** The unit of every rate field. */
 export const BASIS_POINTS =
 	"Integer basis points (1 bps = 0.01%), so 3% is 300 and 0.01 is not a rate."

@@ -1,11 +1,31 @@
 import { z } from "zod"
-import type { Leaf } from "../command"
+import type { DocumentSpec, Leaf } from "../command"
 import { defineCommand, ok } from "../command"
 import { registryListing } from "../error-listing"
 import { fail } from "../errors"
 import { NOT_SUPPORTED } from "../schema/limits"
 import { detailSchema, listingSchema } from "../schema/output"
 import { findNode, leavesOf, pathWords } from "../tree"
+
+/** The document form as `traj schema` prints it: its flag, its schema and its alternate form (ADR-0047). */
+function documentDetail(document: DocumentSpec) {
+	const alternate = document.alternate
+	return {
+		flag: document.flag,
+		schema: z.toJSONSchema(document.schema, { io: "input" }),
+		...(document.required === undefined
+			? {}
+			: { required: document.required.map((entry) => entry.field) }),
+		...(alternate === undefined
+			? {}
+			: {
+					alternate: {
+						flag: alternate.flag,
+						schema: z.toJSONSchema(alternate.schema, { io: "input" }),
+					},
+				}),
+	}
+}
 
 export const schema: Leaf = defineCommand({
 	name: "schema",
@@ -44,18 +64,7 @@ export const schema: Leaf = defineCommand({
 					: { commands },
 			)
 		}
-		const document =
-			node.document === undefined
-				? {}
-				: {
-						document: {
-							flag: node.document.flag,
-							schema: z.toJSONSchema(node.document.schema, { io: "input" }),
-							...(node.document.required === undefined
-								? {}
-								: { required: node.document.required.map((entry) => entry.field) }),
-						},
-					}
+		const document = node.document === undefined ? {} : { document: documentDetail(node.document) }
 		const documents =
 			node.flagDocuments === undefined
 				? {}

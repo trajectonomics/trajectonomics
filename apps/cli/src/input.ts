@@ -61,6 +61,14 @@ function mixedFailure(spec: DocumentSpec, flag: string, mixed: readonly string[]
 	})
 }
 
+/** The schema a document is read with: its alternate form when that flag is set (ADR-0047). */
+function formOf(spec: DocumentSpec, selected: Record<string, unknown>): DocumentSpec["schema"] {
+	const alternate = spec.alternate
+	return alternate !== undefined && selected[alternate.flag] === true
+		? alternate.schema
+		: spec.schema
+}
+
 /** The document form: only its own flags, then the JSON document named by `flag` (ADR-0020). */
 async function documentForm(
 	leaf: Leaf,
@@ -84,7 +92,7 @@ async function documentForm(
 	if (missing !== undefined) return missingFieldError(missing)
 	const text = await readDocument(ref, spec.flag, stdin)
 	if (isAppError(text)) return text
-	const document = parseDocument(spec, text, spec.flag)
+	const document = parseDocument(spec, text, spec.flag, formOf(spec, selection.data))
 	return isAppError(document) ? document : { input: selection.data, document }
 }
 
