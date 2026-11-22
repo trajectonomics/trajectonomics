@@ -29,11 +29,29 @@ const monthlyRow = z.strictObject({
 	realAccessibleNetWorth: money,
 })
 
-/** The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`. */
+/**
+ * One Milestone's fire date: the date it fired, or null when it did not fire by the Projection's end
+ * (cli ADR-0049). Rows come in Scenario order.
+ */
+export const milestoneRow = z.strictObject({
+	id: z.string(),
+	reached: z.boolean(),
+	date: dateString.nullable(),
+})
+
+/**
+ * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, and the
+ * milestones only when the Scenario declares them.
+ */
 export const projectionTables = z.array(
 	z.discriminatedUnion("name", [
 		z.strictObject({ name: z.literal("annual"), count: integer, rows: z.array(annualRow) }),
 		z.strictObject({ name: z.literal("monthly"), count: integer, rows: z.array(monthlyRow) }),
+		z.strictObject({
+			name: z.literal("milestones"),
+			count: integer,
+			rows: z.array(milestoneRow),
+		}),
 	]),
 )
 export type ProjectionTables = z.infer<typeof projectionTables>
