@@ -1,5 +1,5 @@
 /*
- * The mascot (Mascot.astro): paint and placement. The stage pair is cream and near-black in both Themes, so the
+ * The mascot (Mascot.astro): paint and placement. The stage pair is near-white and near-black in both Themes, so the
  * robot keeps the blog covers' look on either surface; a hairline of the stage role draws its edge on a light one.
  */
 
@@ -70,6 +70,7 @@
 .mascot-peek {
 	position: absolute;
 	z-index: 1;
+	pointer-events: none;
 	right: calc(1.25rem + 4px);
 	bottom: calc(100% - 8px);
 	width: 52px;
@@ -77,9 +78,17 @@
 	overflow: clip;
 }
 
+/* Until 64 rem the call-to-action row spans the column, 56 px above the window, so the robot stays small enough to fit. */
 @media (min-width: 40rem) {
 	.mascot-peek {
 		right: calc(1.5rem + 10%);
+		width: 60px;
+		height: 50px;
+	}
+}
+
+@media (min-width: 64rem) {
+	.mascot-peek {
 		bottom: calc(100% - 9px);
 		width: 92px;
 		height: 77px;
