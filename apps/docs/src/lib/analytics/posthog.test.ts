@@ -1,30 +1,20 @@
 import { describe, expect, it } from "bun:test"
 import {
+	CONSENT_COOKIE,
 	capturePayload,
 	MEASURED_HOSTNAME,
 	PAGEVIEW_EVENT,
 	POSTHOG_KEY,
 	pageviewProperties,
-	SESSION_STORAGE_KEY,
-	type SessionStore,
+	readerIdentity,
 	SURFACE,
-	sessionId,
 	shouldSend,
+	VISITOR_COOKIE,
 } from "./posthog"
 
-/** A `sessionStorage` that answers from a record, so a test reads what the page wrote. */
-function memoryStore(initial: Readonly<Record<string, string>> = {}): SessionStore & {
-	readonly entries: Map<string, string>
-} {
-	const entries = new Map(Object.entries(initial))
-	return {
-		entries,
-		getItem: (key) => entries.get(key) ?? null,
-		setItem: (key, value) => {
-			entries.set(key, value)
-		},
-	}
-}
+const ID = "3f2b8c1e-9a4d-4e7b-8c2a-1d5e6f7a8b9c"
+const FRESH = "fresh-id"
+const createFresh = () => FRESH
 
 describe("shouldSend", () => {
 	it("measures a reader on the production host who set no opt-out signal", () => {
@@ -75,7 +65,7 @@ describe("pageviewProperties", () => {
 })
 
 describe("capturePayload", () => {
-	const payload = capturePayload(PAGEVIEW_EVENT, "session-1", { language: "en" })
+	const payload = capturePayload(PAGEVIEW_EVENT, "reader-1", { language: "en" })
 
 	it("posts the project key, the event and the properties the endpoint reads", () => {
 		expect(payload.event).toBe("$pageview")
@@ -84,7 +74,7 @@ describe("capturePayload", () => {
 	})
 
 	it("carries the distinct id among the properties, and keeps no person", () => {
-		expect(payload.properties["distinct_id"]).toBe("session-1")
+		expect(payload.properties["distinct_id"]).toBe("reader-1")
 		expect(payload.properties["$process_person_profile"]).toBe(false)
 	})
 
@@ -93,15 +83,50 @@ describe("capturePayload", () => {
 	})
 })
 
-describe("sessionId", () => {
-	it("creates an id for a tab that has none and keeps it for the tab's next pageview", () => {
-		const store = memoryStore()
-		expect(sessionId(store, () => "new-id")).toBe("new-id")
-		expect(sessionId(store, () => "another-id")).toBe("new-id")
-		expect(store.entries.get(SESSION_STORAGE_KEY)).toBe("new-id")
+describe("readerIdentity", () => {
+	it("uses the Site's visitor id, and says granted, when the reader granted consent", () => {
+		expect(
+			readerIdentity(`${CONSENT_COOKIE}=granted; ${VISITOR_COOKIE}=${ID}`, createFresh),
+		).toEqual({
+			distinctId: ID,
+			consent: "granted",
+		})
 	})
 
-	it("reuses the id the tab already carries", () => {
-		expect(sessionId(memoryStore({ [SESSION_STORAGE_KEY]: "kept" }), () => "ignored")).toBe("kept")
+	it("reads the pair among other cookies, whatever their order", () => {
+		expect(
+			readerIdentity(`a=1; ${VISITOR_COOKIE}=${ID}; ${CONSENT_COOKIE}=granted`, createFresh),
+		).toEqual({
+			distinctId: ID,
+			consent: "granted",
+		})
+	})
+
+	it("sends a fresh id, and says cookieless, when the reader did not grant consent", () => {
+		expect(readerIdentity(`${VISITOR_COOKIE}=${ID}`, createFresh)).toEqual({
+			distinctId: FRESH,
+			consent: "cookieless",
+		})
+		expect(
+			readerIdentity(`${CONSENT_COOKIE}=denied; ${VISITOR_COOKIE}=${ID}`, createFresh),
+		).toEqual({
+			distinctId: FRESH,
+			consent: "cookieless",
+		})
+	})
+
+	it("sends a fresh id when the reader has no cookies at all", () => {
+		expect(readerIdentity("", createFresh)).toEqual({ distinctId: FRESH, consent: "cookieless" })
+	})
+
+	it("refuses a visitor id that is not a strict lowercase UUID", () => {
+		for (const bad of ['"><script>', ID.toUpperCase(), `${ID}x`, ""]) {
+			expect(
+				readerIdentity(`${CONSENT_COOKIE}=granted; ${VISITOR_COOKIE}=${bad}`, createFresh),
+			).toEqual({
+				distinctId: FRESH,
+				consent: "cookieless",
+			})
+		}
 	})
 })

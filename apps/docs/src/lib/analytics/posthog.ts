@@ -4,6 +4,10 @@
  * The Portal loads no third-party script, so it posts to PostHog's capture endpoint itself
  * ([ADR 0008](../../../docs/adr/0008-analytics-from-the-page-itself.md)). A project key can only
  * write events, so it is public by design and is committed here.
+ *
+ * A reader's id is the one the Site's banner wrote, and only when the reader granted consent
+ * ([site ADR 0024](https://github.com/trajectonomics/site/blob/main/docs/adr/0024-the-site-asks-before-it-sets-an-analytics-cookie.md)).
+ * The Portal stores nothing of its own, so a reader who never answered is counted per pageview.
  */
 
 import { SITE_ORIGIN } from "../site"
@@ -23,11 +27,17 @@ export const SURFACE = "docs"
 /** The event one page load sends, and the name PostHog's Web Analytics reads. */
 export const PAGEVIEW_EVENT = "$pageview"
 
-/** The key the tab-scoped Session id lives under. `sessionStorage` is not a cookie, and it dies with the tab. */
-export const SESSION_STORAGE_KEY = "traj-docs-session"
+/** The Site's consent cookie: `granted` once the reader agreed, `denied` once they refused. */
+export const CONSENT_COOKIE = "traj_consent"
+
+/** The Site's visitor cookie: a random id the reader granted, which the Portal reads and never writes. */
+export const VISITOR_COOKIE = "traj_vid"
 
 /** The Astro event the Client Router fires on the first page and after every client-side navigation. */
 export const PAGE_LOAD_EVENT = "astro:page-load"
+
+/** The strict lowercase UUID a visitor id must be before it is trusted as an event's `distinct_id`. */
+const VISITOR_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 /** The browser conditions that decide whether the page measures a reader at all. */
 export interface VisitorConditions {
@@ -47,10 +57,10 @@ export interface PageviewSource {
 	readonly title: string
 }
 
-/** The distinct id one pageview carries, so a visit's pageviews stay together without a cookie. */
-export interface SessionStore {
-	getItem(key: string): string | null
-	setItem(key: string, value: string): void
+/** How one event's reader is identified: `granted` when the Site's visitor id is used, `cookieless` otherwise. */
+export interface ReaderIdentity {
+	readonly distinctId: string
+	readonly consent: "granted" | "cookieless"
 }
 
 /** The body one event posts: the endpoint reads `api_key` and `event` beside the properties. */
@@ -104,14 +114,26 @@ export function capturePayload(
 	}
 }
 
+/** The value of one named cookie in a `document.cookie` string, or `undefined` when it is not there. */
+function cookieValue(cookies: string, name: string): string | undefined {
+	for (const part of cookies.split(";")) {
+		const separator = part.indexOf("=")
+		if (separator < 0) continue
+		if (part.slice(0, separator).trim() === name) return part.slice(separator + 1).trim()
+	}
+	return undefined
+}
+
 /**
- * The tab's distinct id, created on the first pageview and reused for the tab's later pageviews, so
- * one visit is one id and two visits are never the same one.
+ * The identity one pageview is sent under. A reader who granted consent on the Site has a valid visitor
+ * id, which the Portal uses so visits are told apart; anyone else gets a fresh id per pageview, and nothing
+ * is stored. The id is validated here, so a hostile cookie value never reaches an event.
  */
-export function sessionId(store: SessionStore, createId: () => string): string {
-	const stored = store.getItem(SESSION_STORAGE_KEY)
-	if (stored !== null && stored.length > 0) return stored
-	const created = createId()
-	store.setItem(SESSION_STORAGE_KEY, created)
-	return created
+export function readerIdentity(cookies: string, createId: () => string): ReaderIdentity {
+	const visitor = cookieValue(cookies, VISITOR_COOKIE)
+	const granted = cookieValue(cookies, CONSENT_COOKIE) === "granted"
+	if (granted && visitor !== undefined && VISITOR_ID.test(visitor)) {
+		return { distinctId: visitor, consent: "granted" }
+	}
+	return { distinctId: createId(), consent: "cookieless" }
 }
