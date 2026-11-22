@@ -30,6 +30,23 @@ function pathReturns(
 	}
 }
 
+/**
+ * Market paths one at a time, unresolved, in index order: the input `runEngine` takes. Lazy, so a
+ * caller holds one path's rows at once rather than every path's.
+ */
+export function* marketReturns(
+	model: ReturnModel,
+	seed: bigint,
+	paths: number,
+	timeline: Timeline,
+): Generator<Returns> {
+	const table = bucketTable(model.buckets.map((bucket) => bucket.weight))
+	const dates = marketRowDates(timeline).slice(0, MAX_MARKET_ROWS)
+	for (let index = 0; index < paths; index++) {
+		yield pathReturns(model, table, dates, seed, index)
+	}
+}
+
 /** Every Market path of a run, resolved once against the Timeline: the draw is shared by all Accounts. */
 export function marketPaths(
 	model: ReturnModel,
@@ -37,9 +54,7 @@ export function marketPaths(
 	paths: number,
 	timeline: Timeline,
 ): readonly ResolvedReturns[] {
-	const table = bucketTable(model.buckets.map((bucket) => bucket.weight))
-	const dates = marketRowDates(timeline).slice(0, MAX_MARKET_ROWS)
-	return Array.from({ length: paths }, (_unused, index) =>
-		resolveReturns(pathReturns(model, table, dates, seed, index), timeline),
+	return Array.from(marketReturns(model, seed, paths, timeline), (returns) =>
+		resolveReturns(returns, timeline),
 	)
 }

@@ -2,18 +2,11 @@ import { FI_METHODS } from "../vocab"
 import type { Check, Emit, Path, Problem } from "./codes"
 import { makeGuard } from "./guard"
 import { reference } from "./reference"
-import { amount, boundedInt, growth, oneOf } from "./scalars"
+import { amount, boundedInt, growth, oneOf, seed } from "./scalars"
 import { checkShape, isRecord, opt, req } from "./shape"
 
 const retirementSpending: Check = (value, path, emit) => {
 	checkShape(value, path, { amount: req(amount), growth: req(growth) }, emit)
-}
-
-const SEED = /^[0-9a-f]{16}$/
-
-/** Exactly 16 lower-case hex digits, as ADR-0005 fixes the Seed. */
-const seed: Check = (value, path, emit) => {
-	if (typeof value !== "string" || !SEED.test(value)) emit("INVALID_SEED", path)
 }
 
 const thresholdBps = boundedInt(1, 10000, "RATE_OUT_OF_RANGE")
