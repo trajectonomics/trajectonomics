@@ -70,6 +70,24 @@ Two write behaviours to use on purpose, wherever the schema lists them:
 
 A flag that carries a document takes a path or `-`. `-` is the only way to send a document on stdin; it is never inferred from a pipe.
 
+## Read a sign
+
+Every Skill reads a sign from this section and states none of its own. `traj balance`, `traj report networth`, `traj report pnl` and the trial balance print raw signed units, and each row's `type` says how to read its sign:
+
+| type | its normal sign | a figure on it reads as |
+| --- | --- | --- |
+| `asset` | positive | what they hold |
+| `expense` | positive | what they spent |
+| `liability` | negative | what they owe: `-2400.00` is a debt of 2,400.00 |
+| `income` | negative | what they earned |
+| `equity` | negative | the opening balances and offsets behind the other rows, never a figure about their wealth |
+
+- **Net worth already counts every debt.** It is assets minus liabilities, and `traj balance` prints it as `netWorth` and `traj report networth` as `totals`. Quote that figure; adding a liability row's size to it, or subtracting the row from it, counts the debt twice.
+- A liability whose balance moves towards `0` is being repaid, and one that moves further below `0` is borrowing.
+- `traj report pnl` prints raw rows, income negative and expense positive, and its total is income minus expenses: positive when they earned more than they spent. Report the printed figure, say in words which way it points, and never flip a sign to make a sentence read better.
+- **A write takes a magnitude, and the direction is `--from` and `--to`.** A negative `--amount` is refused with `NEGATIVE_AMOUNT`, exit `3`. Borrowing runs `--from` the liability `--to` the account that received the money; repaying runs `--from` the account that paid `--to` the liability.
+- **`--opening` is the one signed write.** It reads `--from` as equity and `--amount` as signed, so an opening debt is a negative amount, as in `traj tx add --opening --from Opening --to Mortgage --amount -2400.00 --date 2026-01-01`. From 0.3.0 the command line refuses a positive opening on a liability with `liability_opening_positive`, exit `3`, and its `hint` names the signed amount. On 0.2.0 a positive opening is accepted and the debt reads as a gain, in net worth too, so a negative amount is the only correct entry at every release in the CLI Range.
+
 ## Hand a job to the Skill that owns it
 
 This is the contract, not a recipe, and it is not a router either: a Skill the agent has to hop through is one an unattended run skips.

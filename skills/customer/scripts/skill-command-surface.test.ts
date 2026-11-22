@@ -166,6 +166,8 @@ describe("the command surface a Skill may name", () => {
 		])
 		expect(named.filter((call) => call.startsWith("traj tx"))).toEqual([
 			"traj tx import --template",
+			// The one worked write: the signed opening debt, whose sign no schema line can teach.
+			"traj tx add --opening --from Opening --to Mortgage --amount -2400.00 --date 2026-01-01",
 		])
 	})
 })

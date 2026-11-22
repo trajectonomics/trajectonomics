@@ -28,6 +28,10 @@ _Avoid_: supported versions, min version
 ### CLI Version Floor
 The oldest `@trajectonomics/cli` release whose command surface a published Skill assumes: the lower bound of that Skill's CLI Range in the [Skill Manifest](#skill-manifest), which is where the number is authored. The onboarding Skill states the floor of the Skill it hands over to and discloses a command line older than it, instead of handing the conversation over silently.
 
+### Sign Convention
+How a printed figure's sign reads, by account type: raw signed units where a liability, income and equity row is negative when normal, so a debt of 2,400.00 prints `-2400.00` and net worth is the printed sum that already counts it. The operating Skill's "Read a sign" section states it once and every other Skill reads from there. `tx add --opening` is the one signed write, and a negative amount opens a debt at every release in the CLI Range.
+_Avoid_: sign rules, debt rule
+
 ### Ledger File
 The SQLite file at `${TRAJ_HOME:-~/.traj}/traj.db`, whose presence means the ledger has been opened on this machine at least once, and never that it holds data: `traj init` and every store-opening command create it empty on the way. The onboarding Skill tests for it and hands the read to the operating Skill.
 _Avoid_: database, data directory

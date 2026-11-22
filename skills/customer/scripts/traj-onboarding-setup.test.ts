@@ -125,13 +125,12 @@ describe("Step 2, installing the published set", () => {
 describe("what the person is told about their own numbers", () => {
 	const stepThree = section(body, "Step 3: Ask once, then hand over")
 
-	it("enters a debt as a negative opening balance, the CLI refusing a positive one from 0.3.0", () => {
-		expect(stepThree).toContain("Enter a debt as a negative opening balance")
+	it("leaves the sign of a debt to the operating Skill, which states every sign convention once", () => {
+		expect(stepThree).not.toContain("negative opening balance")
+		expect(stepThree).not.toContain("reads as a gain")
 		expect(stepThree).toContain(
-			"from 0.3.0 the command line refuses a positive opening on a liability",
+			"Then read the `traj` skill at the `path` the list command reported",
 		)
-		expect(stepThree).toContain("below 0.3.0 a debt")
-		expect(stepThree).toContain("reads as a gain")
 	})
 
 	it("marks a number the person guessed as rough, and never one traj computed", () => {
