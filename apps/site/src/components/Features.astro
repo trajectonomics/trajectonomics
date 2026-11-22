@@ -44,12 +44,12 @@ const CARD_MASCOTS = [
 					const sample = FEATURE_SAMPLES[index]
 					const mascot = CARD_MASCOTS[index]
 					const robot = mascot && <Mascot pose={mascot.pose} class="mascot-card" />
-					const top = mascot?.place.startsWith("top") === true
+					const isTop = mascot?.place.startsWith("top") === true
 					return (
 						<li
 							class:list={[
 								"feature bg-background text-foreground",
-								{ "feature-wide": sample !== undefined, "feature-mascot": mascot !== undefined },
+								{ "feature-wide": sample !== undefined },
 							]}
 							data-mascot-place={mascot?.place}
 						>
@@ -62,13 +62,13 @@ const CARD_MASCOTS = [
 									<figcaption class="feature-sample-note">{dictionary.actionExampleNote}</figcaption>
 								</figure>
 							)}
-							{top && robot}
+							{isTop && robot}
 							<span class="feature-index text-muted-foreground tabular-nums">
 								{String(index + 1).padStart(2, "0")}
 							</span>
 							<span class="feature-title">{title}</span>
 							<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
-							{!top && robot}
+							{!isTop && robot}
 						</li>
 					)
 				})
