@@ -17,9 +17,10 @@ cannot detect it.
 1. Step T2's fork is the **Tax Baseline**: its Levy is written by the installed `traj`, with the facts
    the person states in Step T1. Step T4 compares that fork with a what-if forked from it, whose Levy is
    written again with the one change. The two sides then differ in one flag and share one rule set.
-2. A person who arrives with a Scenario that already holds a Levy gets Step T2 on a fork of it. The stored
-   Levy is never a side of a comparison, and the Skill never rewrites it.
-3. The `--set` route for a retirement or ThaiESG contribution compares the tax baseline with itself, so
+2. A person who arrives with a Scenario that already holds a Levy gets Steps T1 and T2 on a fork of it,
+   and Step T3 and T4 never run against a Levy the conversation did not write. The stored Levy is never
+   a side of a comparison, and the Skill never rewrites it.
+3. The `--set` route for a retirement or ThaiESG contribution compares the Tax Baseline with itself, so
    it follows the same rule.
 
 ## Considered Options
@@ -33,5 +34,6 @@ cannot detect it.
 ## Consequences
 
 - The comparison needs no detection and no consent, because it writes only forks the Skill made.
-- Every tax comparison costs one extra `scenario tax` on the baseline fork when the person's plan already
-  carried a Levy; Step T2 already does that write for a fresh plan.
+- The change is which Scenario Step T4 forks from and compares against: the Tax Baseline Step T2
+  wrote, where it used to fork the person's stored Scenario. Step T2 already forked and wrote a Levy
+  every time, so no step is added.
