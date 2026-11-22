@@ -1,0 +1,86 @@
+/* The front page's list: one featured Post with its cover, then newest-first rows under hairlines. */
+
+.featured {
+	display: grid;
+	gap: 24px;
+	padding: 32px 0;
+	border-bottom: 1px solid var(--ds-color-border);
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+@media (min-width: 48rem) {
+	.featured {
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+		align-items: center;
+		gap: 48px;
+	}
+}
+
+.featured-image {
+	width: 100%;
+	height: auto;
+	border-radius: var(--ds-radius-md);
+}
+
+.featured-text {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.featured-title {
+	font-family: var(--font-display);
+	font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	font-weight: 300;
+	letter-spacing: -0.02em;
+	line-height: 1.1;
+}
+
+.featured-description {
+	color: var(--ds-color-muted-foreground);
+}
+
+.post-rows {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.post-row {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 20px 0;
+	border-bottom: 1px solid var(--ds-color-border);
+	color: var(--ds-color-foreground);
+	text-decoration: none;
+}
+
+.post-row-title {
+	font-family: var(--font-display);
+	font-size: 22px;
+	font-weight: 300;
+}
+
+/* The meta line's parts sit on one baseline with a little air around the dots. */
+.post-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/* Hover underlines the title; keyboard focus rings the whole entry. */
+.featured:hover .featured-title,
+.post-row:hover .post-row-title {
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 6px;
+}
+
+.featured:focus-visible,
+.post-row:focus-visible {
+	border-radius: var(--ds-radius-sm);
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

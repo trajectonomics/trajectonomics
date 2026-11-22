@@ -1,0 +1,20 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import type { Post } from "../content/read-posts"
+import { displayDate, typeLabel } from "../lib/posts"
+
+interface Props {
+	readonly post: Post
+}
+
+const { post } = Astro.props
+---
+
+<p class="meta-label post-meta">
+	<span>{typeLabel(post.type)}</span>
+	<span aria-hidden="true">·</span>
+	<time datetime={post.publishedOn.toISOString().slice(0, 10)}>{displayDate(post.publishedOn)}</time>
+	<span aria-hidden="true">·</span>
+	<span>{post.minutes} min read</span>
+</p>

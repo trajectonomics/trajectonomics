@@ -1,0 +1,27 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
+import { decorativeMark } from "../lib/mark"
+import { BLOG_PATH, DOCS_URL, SITE_HOME_URL, SITE_NAME } from "../lib/site"
+
+interface Props {
+	/** The blog's front page marks its own link as the current page. */
+	readonly current: boolean
+}
+
+const { current } = Astro.props
+const artwork = decorativeMark(mark)
+---
+
+<header class="blog-header">
+	<nav class="blog-header-inner" aria-label="Main">
+		<div class="blog-header-brand">
+			<a class="brand" href={SITE_HOME_URL} aria-label={`${SITE_NAME} home`}>
+				<span class="brand-tile"><Fragment set:html={artwork} /></span>
+			</a>
+			<a class="blog-marker" href={BLOG_PATH} aria-current={current ? "page" : undefined}>Blog</a>
+		</div>
+		<a class="header-nav-link" href={DOCS_URL}>Docs</a>
+	</nav>
+</header>
