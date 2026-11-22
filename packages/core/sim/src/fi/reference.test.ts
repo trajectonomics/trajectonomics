@@ -20,6 +20,7 @@ describe("the 25× reference beside a reachable month", () => {
 		const state = states.get("deposit")
 		if (state === undefined) throw new Error("Missing deposit")
 		const plan = referencePlan(
+			fixture.baseline,
 			undefined,
 			fixture.scenario,
 			fixture.timeline,

@@ -36,7 +36,7 @@ export function planBase(
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levy = levyPlan(scenario, timeline, calendar)
-	const expenses = expenseWindow(scenario, timeline, options, candidates[0]!, calendar)
+	const expenses = expenseWindow(baseline, scenario, timeline, options, candidates[0]!, calendar)
 	return {
 		baseline,
 		scenario,
@@ -46,6 +46,7 @@ export function planBase(
 		candidates,
 		requirement: requirementTable(expenses, options.minBufferMonths ?? 0),
 		reference: referencePlan(
+			baseline,
 			options.method === "survival" ? options.reference : undefined,
 			scenario,
 			timeline,

@@ -1,5 +1,5 @@
 import type { ResolvedCalendar } from "../calendar/business"
-import type { Scenario, Timeline } from "../types"
+import type { Baseline, Scenario, Timeline } from "../types"
 import type { ReferenceOptions } from "../types/reference"
 import type { WindowOutcome } from "./expense-window"
 import { originalExpenseWindow } from "./expenses"
@@ -23,6 +23,7 @@ function termsWindow(outcome: WindowOutcome, money: ReferenceMoney): WindowOutco
  * so it computes nothing extra; the trailing window and deflation exist only when asked for.
  */
 export function referencePlan(
+	baseline: Baseline,
 	reference: ReferenceOptions | undefined,
 	scenario: Scenario,
 	timeline: Timeline,
@@ -37,7 +38,7 @@ export function referencePlan(
 	}
 	const source =
 		config.window === "trailing12Months"
-			? originalExpenseWindow(scenario, timeline, calendar)
+			? originalExpenseWindow(baseline, scenario, timeline, calendar)
 			: expenses
 	return { config, money, window: termsWindow(source, money) }
 }

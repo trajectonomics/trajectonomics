@@ -64,7 +64,7 @@ export class MilestoneGate {
 			fired,
 			date,
 			state.scenario.economy.inflation,
-		).filter((event) => landing(event.flow))
+		).filter((event) => landing(event.flow) && landsAt(state.fires, event.flow, date))
 		return injected.length === 0 ? kept : [...kept, ...injected].sort(byFlowId)
 	}
 

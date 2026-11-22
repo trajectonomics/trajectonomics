@@ -2,10 +2,10 @@ import { addMonthsClamped } from "../calendar/arith"
 import type { ResolvedCalendar } from "../calendar/business"
 import { plannedAmounts } from "../engine/derive"
 import type { DatedEvent } from "../engine/events"
-import { buildEvents } from "../engine/events"
-import type { DateString, Scenario, Timeline } from "../types"
+import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { FinancialIndependenceOptions } from "../types/financial-independence"
 import type { ProjectionProblem } from "../types/projection"
+import { gatedEvents } from "./gated-events"
 import { retirementMeasurements } from "./retirement-spending"
 
 const LAST_SUPPORTED_DATE = "9998-12-31"
@@ -37,14 +37,16 @@ function expensesOf(planned: ReturnType<typeof plannedAmounts>, events: readonly
 	return { ok: true as const, amount }
 }
 
-/** Expense amounts through `through`; a Derived expense is evaluated on its own Landed date. */
+/** Expense amounts through `through` on the gated plan; a Derived expense is evaluated on its own Landed date. */
 function originalExpenses(
+	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	through: DateString,
 	calendar: ResolvedCalendar | undefined,
 ): readonly Measurement[] | ProjectionProblem {
-	const events = buildEvents(scenario, { ...timeline, horizon: through }, calendar)
+	const events = gatedEvents(baseline, scenario, timeline, through, calendar)
+	if ("code" in events) return events
 	const measurements: Measurement[] = []
 	for (const [date, day] of byDate(events)) {
 		const planned = plannedAmounts(day, scenario.flows, date, scenario.economy.inflation)
@@ -62,6 +64,7 @@ interface Measurement {
 
 /** Post-stop expense amounts from the first candidate through a full extra year past the horizon. */
 export function expenseWindow(
+	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	options: FinancialIndependenceOptions,
@@ -73,7 +76,7 @@ export function expenseWindow(
 	const retirement = options.retirementSpending
 	const measurements =
 		retirement === undefined
-			? originalExpenses(scenario, timeline, through, calendar)
+			? originalExpenses(baseline, scenario, timeline, through, calendar)
 			: retirementMeasurements(
 					timeline,
 					retirement,
@@ -86,13 +89,14 @@ export function expenseWindow(
 	return { ok: true, window: buildWindow(measurements) }
 }
 
-/** Original-plan expenses through the horizon, ignoring retirement spending: the trailing window. */
+/** Original-plan expenses through the horizon, gated by its Milestones: the trailing window. */
 export function originalExpenseWindow(
+	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	calendar: ResolvedCalendar | undefined,
 ): WindowOutcome {
-	const measurements = originalExpenses(scenario, timeline, timeline.horizon, calendar)
+	const measurements = originalExpenses(baseline, scenario, timeline, timeline.horizon, calendar)
 	if ("code" in measurements) return { ok: false, problem: measurements }
 	return { ok: true, window: buildWindow(measurements) }
 }
