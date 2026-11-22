@@ -1,11 +1,18 @@
 import { describe, expect, it } from "bun:test"
 import { ERROR_CODES } from "@trajectonomics/core/sim"
+import { ELSEWHERE } from "./refusal-elsewhere"
+import { SAID } from "./refusal-said"
 import { REFUSALS, sentenceFor } from "./refusal-table"
 
 describe("the engine refusal table", () => {
 	it("covers every code the engine can raise, so a new one cannot ship bare", () => {
 		const missing = ERROR_CODES.filter((code) => !Object.hasOwn(REFUSALS, code))
 		expect(missing).toEqual([])
+	})
+
+	it("lists no code both as worded and as answered elsewhere, which would drop its sentence", () => {
+		const both = Object.keys(SAID).filter((code) => Object.hasOwn(ELSEWHERE, code))
+		expect(both).toEqual([])
 	})
 
 	it("holds no code the engine no longer raises", () => {

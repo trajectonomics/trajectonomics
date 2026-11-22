@@ -1,20 +1,24 @@
 import type { ErrorCode } from "@trajectonomics/core/sim"
 
 /**
- * A code that never reaches `refusal()` as a projection refusal, and who answers it instead:
+ * A code that is not a projection refusal in the usual run, and who answers it instead:
  * `document` is a Scenario problem `check()` finds in the document alone, so `scenario apply`, the
- * Store and `--set` refuse it as `invalid_input` before an engine runs (ADR-0024); `input` is a
- * problem in what the CLI builds from a flag, which `timelineFailure` and `chanceRefusal` refuse as
- * `invalid_input` at that flag (ADR-0013, ADR-0030).
+ * Store and `--set` refuse it as `invalid_input` before an engine runs (ADR-0024). The exception is
+ * a Scenario stored before a newer engine rule and run without `--set`, which nothing re-checks, so
+ * `refusal()` words it from the document's own sentence. `input` is a problem in what the CLI builds
+ * from a flag (the Timeline, the path count, the seed, the Return model), which `timelineFailure`
+ * and `chanceRefusal` refuse as `invalid_input` at that flag (ADR-0013, ADR-0030). `never` is a
+ * problem in an option the CLI does not pass, or fixes to a valid value, so no command raises it.
  */
-export type Elsewhere = { elsewhere: "document" | "input" }
+export type Elsewhere = { elsewhere: "document" | "input" | "never" }
 
 const document: Elsewhere = { elsewhere: "document" }
 const input: Elsewhere = { elsewhere: "input" }
+const never: Elsewhere = { elsewhere: "never" }
 
 /** The codes the CLI answers before, or beside, the projection refusal, each with who does. */
 export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
-	// The Scenario's own document: refused before an engine runs.
+	// The Scenario's own document: refused before an engine runs, but for a stale stored row.
 	UNSUPPORTED_SCHEMA_VERSION: document,
 	NOT_AN_OBJECT: document,
 	NOT_AN_ARRAY: document,
@@ -66,15 +70,15 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_COMBINE: document,
 	// What the CLI builds from a flag: the Timeline, the path count, the seed and the Return model.
 	HORIZON_BEFORE_START: input,
-	INVALID_RESOLUTION: input,
+	INVALID_RESOLUTION: never,
 	TOO_MANY_ENTRIES: input,
-	INVALID_FI_METHOD: input,
+	INVALID_FI_METHOD: never,
 	INVALID_PATH_COUNT: input,
 	INVALID_SEED: input,
-	REFERENCE_MULTIPLIER_OUT_OF_RANGE: input,
-	INVALID_REFERENCE_BASIS: input,
-	INVALID_REFERENCE_WINDOW: input,
-	INVALID_REFERENCE_TERMS: input,
+	REFERENCE_MULTIPLIER_OUT_OF_RANGE: never,
+	INVALID_REFERENCE_BASIS: never,
+	INVALID_REFERENCE_WINDOW: never,
+	INVALID_REFERENCE_TERMS: never,
 	INVALID_WEIGHT: input,
 	RETURN_WEIGHT_TOTAL: input,
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import type { Flow, Scenario } from "@trajectonomics/core/sim"
 import { SIM_SCENARIO } from "./baseline/fixture"
 import { FIXTURE_ACCOUNTS } from "./ledger-fixture"
+import { refusal } from "./projection/engine"
 import {
 	AS_OF,
 	baseFlags,
@@ -143,5 +144,33 @@ describe("an engine refusal says what went wrong", () => {
 		const error = errorOf(res)
 		expect(error.message).toContain("gainLabel has a positive opening balance")
 		expect(error.details).toMatchObject([{ code: "MISSING_BASIS" }])
+	})
+})
+
+describe("refusal() words and places a problem", () => {
+	it("takes path from the problem its sentence came from, not from the first one", () => {
+		const error = refusal([
+			{ code: "INVALID_SEED", path: ["options", "seed"] },
+			{ code: "UNDECLARED_BALANCE_ACCOUNT", path: ["baseline", "balances", 2, "account"] },
+		])
+		expect(error.body.path).toBe("baseline.balances.2.account")
+		expect(error.body.message).toContain("does not declare")
+		expect(error.body.details).toHaveLength(2)
+	})
+
+	it("words a document code from the document's own sentence, for a stored row nothing re-checked", () => {
+		const path = ["scenario", "flows", 0, "derive", "measures", 1, "rounding"]
+		const error = refusal([{ code: "INVALID_ROUNDING", path }])
+		expect(error.body.path).toBe(path.join("."))
+		expect(error.body.message).toBe(
+			"document.flows.0.derive.measures.1.rounding: INVALID_ROUNDING (one of: floor, halfUp, ceil)",
+		)
+		expect(error.body.hint).toContain("traj schema scenario apply")
+	})
+
+	it("keeps the generic hint for a code that has no words", () => {
+		const error = refusal([{ code: "INVALID_SEED", path: ["options", "seed"] }])
+		expect(error.body.message).toContain("The projection engine refused its input")
+		expect(error.body.hint).toContain("must agree")
 	})
 })

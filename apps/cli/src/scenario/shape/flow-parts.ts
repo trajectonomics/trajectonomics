@@ -64,7 +64,7 @@ const measureShape = {
 export const deriveShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"An amount computed per occurrence from a Measure graph, in place of `amount` and `growth`. A derived expense, or a derived contribution into a liability, cannot read an earned income Flow, directly or through other derived Flows: earned income stops at the FI date, so the amount would fall to 0 there. `traj fi` refuses it as DERIVED_EXPENSE_READS_EARNED (DERIVED_DEBT_PAYMENT_READS_EARNED for the liability), though `traj projection run` accepts it; derive it from a Flow that is not earned instead.",
+		"An amount computed per occurrence from a Measure graph, in place of `amount` and `growth`. A derived expense, or a derived contribution into a liability, cannot read an earned income Flow, directly or through other derived Flows: earned income stops at the FI date, so the amount would drop when earned income stops. `traj fi` and `traj projection compare` refuse it as DERIVED_EXPENSE_READS_EARNED (DERIVED_DEBT_PAYMENT_READS_EARNED for the liability), though `traj projection run` accepts it; derive it from a Flow that is not earned instead.",
 	properties: {
 		measures: {
 			type: "array",

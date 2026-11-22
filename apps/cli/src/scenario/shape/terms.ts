@@ -1,4 +1,4 @@
-import { allowedValues, type ErrorCode } from "@trajectonomics/core/sim"
+import { allowedValues, type ErrorCode, type MetricName } from "@trajectonomics/core/sim"
 
 /*
  * The units and the closed value sets the published Scenario document states. They are the words a
@@ -74,3 +74,10 @@ export const METRIC_NAMES = [
 	"unlockedAssets",
 	"liabilities",
 ] as const
+
+/** Fails typecheck when the engine adds a Metric name `METRIC_NAMES` lacks. */
+export const METRIC_NAMES_COMPLETE: [Exclude<MetricName, (typeof METRIC_NAMES)[number]>] extends [
+	never,
+]
+	? true
+	: false = true
