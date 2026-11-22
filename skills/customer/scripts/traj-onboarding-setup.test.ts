@@ -31,9 +31,41 @@ describe("Step 2, installing the published set", () => {
 	const stepTwo = section(body, "Step 2: Install the skill that operates `traj`")
 
 	it("pins the commit the lock records for this skill, and never installs from main", () => {
-		expect(stepTwo).toContain("records, in `skills-lock.json`, the `commit`")
+		expect(stepTwo).toContain("The entry's `commit` is")
 		expect(stepTwo).toContain("Never install from `main`")
 		expect(stepTwo).toContain("a branch moves")
+	})
+
+	it("reads the pin from the lock of the scope it installed in, project or global", () => {
+		expect(stepTwo).toContain("`./skills-lock.json` for the project")
+		expect(stepTwo).toContain(`\`\${XDG_STATE_HOME}/skills/.skill-lock.json\``)
+		expect(stepTwo).toContain("`~/.agents/.skill-lock.json` when it is not")
+		expect(stepTwo).toContain("the list reports none, so the lock is the only place it is read")
+	})
+
+	it("names the skills CLI that writes a commit, and what an older one writes", () => {
+		expect(stepTwo).toContain("`skills@1.9.0` writes a `commit`; `skills@1.7.6` and")
+		expect(stepTwo).toContain("older write none")
+		expect(read("README.md")).toContain("`skills@1.7.6` writes none")
+	})
+
+	it("re-runs the install on the pinned skills CLI when the entry has no commit, and reads it again", () => {
+		expect(stepTwo).toContain("has no `commit`, or its `source` is `trajectonomics/skills`")
+		expect(stepTwo).toContain("`npx -y skills@1.9.0 add …`")
+		expect(stepTwo).toContain("carries the `commit` that run installed")
+		expect(stepTwo).toContain("A `commit` comes from the lock and from nowhere else")
+	})
+
+	it("reports the source and hash, and stops, when the lock still has no commit", () => {
+		expect(stepTwo).toContain("setup stopped here, with the entry's `source` and its hash")
+		expect(stepTwo).toContain("`computedHash` in a project lock, `skillFolderHash` in a global one")
+		expect(stepTwo).toContain("install nothing else")
+		expect(stepTwo).toContain("treat it as a failed step")
+		expect(section(body, "If a step fails")).toContain("the pin in step 2")
+	})
+
+	it("is done only with the commit in hand", () => {
+		expect(stepTwo).toContain("and you hold the `commit` they installed from")
 	})
 
 	it("reads the manifest at that commit and installs one explicit --skill per row", () => {
@@ -88,6 +120,21 @@ describe("what the person is told about their own numbers", () => {
 
 describe("what setup leaves behind", () => {
 	const leaves = section(body, "What setup leaves behind")
+
+	it("names what setup installed: the commit, the rows, the traj version and the CLI Range", () => {
+		expect(leaves).toContain("**What was installed.**")
+		expect(leaves).toContain("the `commit` from step 2 as the Skills' version")
+		expect(leaves).toContain("installed (and any you skipped, with the range each wanted)")
+		expect(leaves).toContain("the `traj --version` that printed")
+		expect(leaves).toContain("this skill's own frontmatter `cli` states")
+		expect(leaves).toContain("no set version")
+		expect(leaves.indexOf("**What was installed.**")).toBeLessThan(
+			leaves.indexOf("**Where the data lives.**"),
+		)
+		expect(section(body, "Step 3: Ask once, then hand over")).toContain(
+			"with what was installed named",
+		)
+	})
 
 	it("states the two verified facts about the network, and nothing broader", () => {
 		expect(leaves).toContain("The ledger never leaves this machine")

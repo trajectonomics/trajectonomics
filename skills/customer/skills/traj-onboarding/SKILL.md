@@ -96,12 +96,19 @@ npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboar
 That is the command the Site prints. What this step installs is the published set, at the commit this
 copy came from.
 
-**Find the pin.** `skills@1.9.0` records, in `skills-lock.json`, the `commit` it installed this
-skill from. Read this skill's own entry and that `commit`: everything below installs from it. When
-that entry's `source` is `trajectonomics/skills`, this copy predates the move to this source and its
-`commit` does not exist here: run the command above again, with this skill's own scope, and read the
-new entry. Never install from `main`:
-a branch moves, and a person's setup must not.
+**Find the pin.** Read this skill's own entry, `traj-onboarding`, in the lock of the scope the list
+named: `./skills-lock.json` for the project; for global, `${XDG_STATE_HOME}/skills/.skill-lock.json`
+when `XDG_STATE_HOME` is set and `~/.agents/.skill-lock.json` when it is not. The entry's `commit` is
+the pin, and everything below installs from it. `skills@1.9.0` writes a `commit`; `skills@1.7.6` and
+older write none, and the list reports none, so the lock is the only place it is read. When the entry
+has no `commit`, or its `source` is `trajectonomics/skills` (this copy predates the move to this
+source, and its `commit` does not exist here), run the command above once more as
+`npx -y skills@1.9.0 add …`, with this skill's own scope and `-y`, and read the entry again: it now
+carries the `commit` that run installed. A `commit` comes from the lock and from nowhere else. When
+the entry still has none, report that setup stopped here, with the entry's `source` and its hash
+(`computedHash` in a project lock, `skillFolderHash` in a global one), install nothing else, and
+treat it as a failed step (see below). Never install from `main`: a branch moves, and a person's setup
+must not.
 
 **Read the set at that commit.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the
 pinned commit. It lists every published skill, its directory and the CLI Range it expects, in install
@@ -122,8 +129,8 @@ commands from `traj schema`. When the manifest cannot be read, install `traj` al
 say in one plain sentence that the rest of the set could not be read, so nobody is left without the
 contract.
 
-Done when that same scope's list names every row you installed, `traj` among them, and you hold the
-`path` each one reported.
+Done when that same scope's list names every row you installed, `traj` among them, you hold the
+`path` each one reported, and you hold the `commit` they installed from.
 
 ## Step 3: Ask once, then hand over
 
@@ -182,11 +189,11 @@ money, and that another machine needs setup once.
 Done when their answer is in hand — given directly, or confirmed against the Ledger File — or, where
 the read failed, the failure has been reported and the conversation handed over; a below-floor command
 line has been disclosed where one exists, as has a skill whose range the command line has passed; and
-the operating skill is running the conversation.
+the operating skill is running the conversation, with what was installed named.
 
 ## If a step fails
 
-When a step cannot finish — the download of the command line, an install of a row, or the read in
+When a step cannot finish — the download of the command line, the pin in step 2, an install of a row, or the read in
 step 3 — report what failed in the command line's own words. Then offer once: "If you want the project
 to hear what got in the way, I can draft a GitHub issue for you to read and send yourself. Nothing is
 sent unless you send it." Setup does not wait for the answer.
@@ -202,6 +209,11 @@ in this conversation.
 
 Tell them, once, before the handover:
 
+- **What was installed.** Name it in one short paragraph from what you hold, so they can say which
+  set they run when they come back: the `commit` from step 2 as the Skills' version, the rows you
+  installed (and any you skipped, with the range each wanted), the `traj --version` that printed, and
+  the CLI Range this skill's own frontmatter `cli` states, which is the command lines it expects.
+  Name nothing you did not read: no set version, and no number from memory.
 - **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger never
   leaves this machine: its figures, accounts and documents are computed and kept here, and no command
   sends them anywhere. Setup itself reaches the network twice, and only twice — the binary download,
