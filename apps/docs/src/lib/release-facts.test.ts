@@ -30,7 +30,10 @@ const RELEASE: CliRelease = {
 		{ name: "0", summary: "ok" },
 		{ name: "4", summary: "not found" },
 	],
-	environment: [{ name: "TRAJ_HOME", summary: "Data directory" }],
+	environment: [
+		{ name: "TRAJ_HOME", summary: "Data directory" },
+		{ name: "DO_NOT_TRACK", summary: "Stops the anonymous usage count" },
+	],
 	errors: [
 		{ code: "ledger_missing", exitCode: 4, retryable: false },
 		{ code: "database_busy", exitCode: 5, retryable: true },
@@ -117,11 +120,18 @@ describe("the configuration page", () => {
 	test("is reported when a variable traj help lists has no section, or a section names another", () => {
 		expect(rulesOf(CONFIGURATION_PAGE, "## TRAJ_COLOR\n\nText.\n")).toEqual([
 			"env-var-missing",
+			"env-var-missing",
 			"env-var-unknown",
 		])
 	})
 
 	test("is accepted for the install scripts' and the launcher's variables", () => {
-		expect(rulesOf(CONFIGURATION_PAGE, "## TRAJ_HOME\n\n## TRAJ_BINARY_PATH\n")).toEqual([])
+		expect(
+			rulesOf(CONFIGURATION_PAGE, "## TRAJ_HOME\n\n## DO_NOT_TRACK\n\n## TRAJ_BINARY_PATH\n"),
+		).toEqual([])
+	})
+
+	test("is reported when a variable that is not a TRAJ_ one has no section", () => {
+		expect(rulesOf(CONFIGURATION_PAGE, "## TRAJ_HOME\n")).toEqual(["env-var-missing"])
 	})
 })
