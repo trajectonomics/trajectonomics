@@ -73,6 +73,7 @@ export const importTx: Leaf = defineCommand({
 		"database_busy",
 		"external_ref_conflict",
 		"invalid_input",
+		"same_account",
 		"unsupported_currency",
 	],
 	run: async (input, ctx) => {
