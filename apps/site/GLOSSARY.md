@@ -106,7 +106,7 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 _Avoid_: Background colour, band
 
 **Mascot**:
-The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is four poses, each a Gemini render cut out of a green screen into a transparent WebP: peeking over the demo window, holding a chart on the Features cards, waving above the closing call to action, and lost on the Not-found page. It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
+The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eight poses, each a Gemini render cut out of a green screen into a transparent WebP. It peeks over the demo window and waves from its traj chat header. It holds a chart on the Features cards and two checked cards in the Agent-operated card. It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
 _Avoid_: Bot icon, logo, avatar
 
 **Star snapshot**:

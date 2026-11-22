@@ -1,0 +1,78 @@
+/*
+ * The Mascot's second set of places (ADR 0027): one in each stretch of the page that had none, so a visitor on a
+ * phone always has a robot on screen. Each sits in its section's own free space and moves nothing else.
+ */
+
+/* The demo's traj chat: the robot waves from the header, between the title and the tag, its hand on the hairline. */
+.mascot-hello {
+	width: 48px;
+	flex: none;
+	align-self: flex-end;
+	margin: -4px 0 -11px auto;
+}
+
+/*
+ * Agent-operated: the robot stands at the right of the card's words, under its sample. The anchor is a zero-height row
+ * between the two that takes back the flex gap, so the card keeps its rhythm; the words leave the robot its column.
+ */
+.mascot-anchor {
+	position: relative;
+	height: 0;
+	margin-bottom: -10px;
+}
+
+.mascot-twins {
+	position: absolute;
+	top: 8px;
+	right: 0;
+	width: 60px;
+}
+
+.feature-mascot .feature-index,
+.feature-mascot .feature-title,
+.feature-mascot .feature-copy {
+	padding-right: 76px;
+}
+
+/* The FAQ: the robot thinks beside the heading on a phone and under it beside the questions on a wide screen. */
+.faq-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.mascot-think {
+	width: 52px;
+	flex: none;
+}
+
+@media (min-width: 64rem) {
+	.faq-head {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 40px;
+	}
+
+	.mascot-think {
+		width: 64px;
+	}
+}
+
+/*
+ * The footer: the robot sits in the link grid's free cell, beside Help on a phone and under it on a wider screen. The
+ * negative margin is the footer's own 32 px gap (footer.css), so it sits on the facts' hairline (footer-facts.css).
+ */
+.mascot-sit {
+	width: 84px;
+	align-self: end;
+	justify-self: center;
+	margin-bottom: -32px;
+}
+
+@media (min-width: 40rem) {
+	.mascot-sit {
+		grid-column: 3;
+		justify-self: start;
+	}
+}

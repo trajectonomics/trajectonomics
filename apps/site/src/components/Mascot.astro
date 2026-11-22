@@ -8,9 +8,13 @@
  * - `chart`: standing, holding a card with rising bars, beside the Features heading.
  * - `wave`: standing, one arm up, above the closing call to action.
  * - `lost`: scratching its head under a question mark, on the Not-found page.
+ * - `hello`: the head, one hand on the edge and one waving, in the demo's traj chat header (ADR 0027).
+ * - `twins`: standing, holding up two identical cards, in the Deterministic feature card.
+ * - `think`: hand on chin under a lit bulb, beside the FAQ heading.
+ * - `sit`: sitting on the hairline in the footer's link grid.
  */
 interface Props {
-	readonly pose: "peek" | "chart" | "wave" | "lost"
+	readonly pose: "peek" | "chart" | "wave" | "lost" | "hello" | "twins" | "think" | "sit"
 	readonly class?: string
 }
 
@@ -21,6 +25,10 @@ const SIZE = {
 	chart: { width: 176, height: 300 },
 	wave: { width: 239, height: 340 },
 	lost: { width: 221, height: 380 },
+	hello: { width: 180, height: 120 },
+	twins: { width: 181, height: 240 },
+	think: { width: 134, height: 280 },
+	sit: { width: 209, height: 240 },
 }
 // Only the hero's robot is in the first view; the rest wait until the visitor scrolls near them.
 const eager = pose === "peek" || pose === "lost"
