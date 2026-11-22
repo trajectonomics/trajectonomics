@@ -27,6 +27,23 @@ function documentDetail(document: DocumentSpec) {
 	}
 }
 
+/**
+ * The input's JSON Schema with the exact flag spelling beside each flag property (ADR-0054). The
+ * names come from the leaf's derived flags, the table the parser reads, so they cannot drift; a
+ * positional has no flag and is left as it is.
+ */
+function inputDetail(leaf: Leaf): Record<string, unknown> {
+	const input = z.toJSONSchema(leaf.input, { io: "input" }) as Record<string, unknown>
+	const properties = input["properties"] as Record<string, Record<string, unknown>> | undefined
+	if (properties === undefined) return input
+	const flagged = { ...properties }
+	for (const spec of leaf.flags) {
+		const property = flagged[spec.field]
+		if (property !== undefined) flagged[spec.field] = { ...property, flag: `--${spec.flag}` }
+	}
+	return { ...input, properties: flagged }
+}
+
 /** The first line of the root listing: what to run next to see a command's flags and document. */
 const USAGE = "traj schema <command> prints a command's flags and the document it reads."
 
@@ -82,7 +99,7 @@ export const schema: Leaf = defineCommand({
 			summary: node.summary,
 			...(node.description === undefined ? {} : { description: node.description }),
 			positionals: [...node.positionals],
-			input: z.toJSONSchema(node.input, { io: "input" }),
+			input: inputDetail(node),
 			...document,
 			...documents,
 			output: z.toJSONSchema(node.output, { io: "output" }),

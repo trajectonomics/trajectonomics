@@ -74,7 +74,9 @@ export function detailSchema(): z.ZodType {
 			.optional()
 			.describe("Prose under the summary: what the command means, beyond its one line."),
 		positionals: z.array(z.string()).describe("Input fields filled from words, in order."),
-		input: jsonSchema.describe("JSON Schema of the command's input. Non-positionals are flags."),
+		input: jsonSchema.describe(
+			"JSON Schema of the command's input. Non-positionals are flags: each such property carries `flag`, its exact spelling, such as `--external-ref`.",
+		),
 		document: document.optional(),
 		flagDocuments: z
 			.array(flagDocument)
