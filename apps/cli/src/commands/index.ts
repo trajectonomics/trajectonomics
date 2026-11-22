@@ -17,6 +17,7 @@ import { report } from "./report"
 import { restore } from "./restore"
 import { scenario } from "./scenario"
 import { schema } from "./schema"
+import { telemetry } from "./telemetry"
 import { tx } from "./tx"
 import { version } from "./version"
 
@@ -42,6 +43,7 @@ export const root: Group = defineGroup({
 		restore,
 		scenario,
 		schema,
+		telemetry,
 		tx,
 		version,
 	],

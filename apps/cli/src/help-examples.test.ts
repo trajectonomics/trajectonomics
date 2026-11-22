@@ -103,7 +103,13 @@ async function runExamples(path: string, leaf: Leaf): Promise<void> {
 	const original = process.cwd()
 	mkdirSync(user)
 	mkdirSync(cwd)
-	const env = { HOME: user, TRAJ_HOME: join(user, ".traj") }
+	// The config directory moves into the temporary user too, so `traj telemetry` never writes a real one.
+	const env = {
+		HOME: user,
+		TRAJ_HOME: join(user, ".traj"),
+		XDG_CONFIG_HOME: join(user, ".config"),
+		APPDATA: join(user, "AppData", "Roaming"),
+	}
 	try {
 		process.chdir(cwd)
 		await prepare(SETUP[path] ?? DEFAULT_SETUP, env, user)

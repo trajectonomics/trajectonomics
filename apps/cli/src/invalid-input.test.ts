@@ -1,4 +1,7 @@
 import { describe, expect, it } from "bun:test"
+import { mkdtempSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import type { Leaf } from "./command"
 import { root } from "./commands"
 import type { RegistryEntry } from "./error-listing"
@@ -28,6 +31,9 @@ const SUCCEEDING = new Set([
 	"inspect",
 	"scenario list",
 	"schema",
+	"telemetry off",
+	"telemetry on",
+	"telemetry status",
 	"tx list",
 	"version",
 ])
@@ -79,7 +85,11 @@ describe("every leaf with no arguments", () => {
 	it("names the caller's input in a CLI sentence, or succeeds", async () => {
 		for (const { path, leaf } of leavesOf(root)) {
 			const name = path.join(" ")
-			const res = await capture([...path, "--json"], { TRAJ_HOME: ledgerHome() })
+			// The config home is a temporary one, so `telemetry on` and `off` never write a real one.
+			const res = await capture([...path, "--json"], {
+				TRAJ_HOME: ledgerHome(),
+				XDG_CONFIG_HOME: mkdtempSync(join(tmpdir(), "traj-invalid-input-")),
+			})
 			if (SUCCEEDING.has(name)) {
 				expect({ name, code: res.code }).toEqual({ name, code: 0 })
 				continue
