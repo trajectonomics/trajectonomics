@@ -50,6 +50,15 @@ test.describe("the built pages as screenshots", () => {
 				await expectShippedTheme(page)
 				await page.addStyleTag({ content: FONT_CSS })
 				await page.evaluate(() => document.fonts.ready)
+				// The Mascot's lower poses load lazily (ADR 0026); a full-page capture does not scroll, so load them first.
+				await page.evaluate(() =>
+					Promise.all(
+						[...document.images].map((image) => {
+							image.loading = "eager"
+							return image.decode().catch(() => undefined)
+						}),
+					),
+				)
 				const slug = underTest.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 				await expect(page).toHaveScreenshot(`${slug}-${snapshot}.png`, {
 					fullPage: true,
