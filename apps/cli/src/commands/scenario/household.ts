@@ -2,18 +2,19 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
 import { missingFieldError } from "../../document"
-import { type AppError, fail, isAppError } from "../../errors"
+import { fail, isAppError } from "../../errors"
 import { scenarioNotFound } from "../../scenario/errors"
 import { HOUSEHOLD, householdOutput, REQUIRED_SCENARIO, reply } from "../../scenario/household/form"
 import { canonicalHousehold, type Household } from "../../scenario/household/model"
 import { type AnchoredDate, placeHousehold } from "../../scenario/household/place"
+import { IF_HASH } from "../../scenario/if-hash"
 import { LEDGER_READ_CODES } from "../../store"
 import { withStore } from "../../with-store"
 
 export const household: Leaf = defineCommand({
 	name: "household",
 	summary: "Set the people whose ages pin a Scenario's dates, or remove them",
-	note: "The household ships in 0.8.0.",
+	note: "The household ships in 0.8.0, and so does --if-hash.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).optional().describe("The Scenario's exact name or its id."),
@@ -27,6 +28,7 @@ export const household: Leaf = defineCommand({
 			.optional()
 			.describe("Remove the household; the dates it anchored stay as they are."),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
+		ifHash: IF_HASH,
 	}),
 	document: HOUSEHOLD,
 	output: householdOutput,
@@ -43,8 +45,20 @@ export const household: Leaf = defineCommand({
 			command: "traj scenario household base --none",
 			description: "Remove the household; the dates it anchored stay as they are.",
 		},
+		{
+			command:
+				"traj scenario household base --none --if-hash jcs1:sha256:efa36213fb2018bcf7818839e27815bee3be1b5b4b8662b491421ed4c5368510",
+			description:
+				"Remove the household only if base still holds the contentHash the household wrote.",
+		},
 	],
-	errorCodes: ["database_busy", "invalid_input", "not_found", ...LEDGER_READ_CODES],
+	errorCodes: [
+		"database_busy",
+		"invalid_input",
+		"not_found",
+		"scenario_changed",
+		...LEDGER_READ_CODES,
+	],
 	run: (input, document, ctx) => {
 		// Without --file the document is absent, so --none must be the form the caller means.
 		const incoming: Household | undefined = document
@@ -72,9 +86,9 @@ export const household: Leaf = defineCommand({
 					anchored = placed.anchored
 					return { document: placed.document, household: canonicalHousehold(incoming) }
 				},
-				{ dryRun },
+				{ dryRun, expectedHash: input.ifHash },
 			)
-			return isAppError(outcome) ? (outcome as AppError) : reply(outcome, name, anchored, dryRun)
+			return isAppError(outcome) ? outcome : reply(outcome, name, anchored, dryRun)
 		})
 	},
 })

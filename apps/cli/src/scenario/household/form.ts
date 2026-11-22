@@ -24,7 +24,7 @@ export const REQUIRED_SCENARIO: RequiredDocumentField = {
 export const HOUSEHOLD: DocumentSpec<typeof householdDocument> = {
 	flag: "file",
 	schema: householdDocument,
-	allowed: ["scenario", "dryRun"],
+	allowed: ["scenario", "dryRun", "ifHash"],
 	required: [REQUIRED_SCENARIO],
 	hint: 'Run "traj scenario household <name> --none" with no --file to remove the household.',
 }

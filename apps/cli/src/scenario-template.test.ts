@@ -178,7 +178,7 @@ describe("scenario apply --template", () => {
 		expect(help.code).toBe(0)
 		expect(help.out.split("\n").filter((line) => line.startsWith("Usage:"))).toEqual([
 			"Usage: traj scenario apply [options] [name]",
-			"Usage: traj scenario apply <name> --file <file|-> [--dry-run] [--decimal]",
+			"Usage: traj scenario apply <name> --file <file|-> [--dry-run] [--decimal] [--if-hash <string>]",
 		])
 		expect(help.out).toContain("--template")
 		expect(help.out).toContain("traj scenario apply --template")

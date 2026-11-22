@@ -30,3 +30,8 @@ Each refusal has its own test in `apps/web/scripts/serve-edit.test.ts`:
 - The Dashboard's `bun run dashboard` checkout preview still has no server, so it has no edits.
 - `scripts/smoke.sh` checks reads only, as before. An Edit is checked by the end-to-end test in `apps/web`, which runs the workspace `traj`.
 - The help for `traj dashboard` still says it serves the Dashboard on loopback until Ctrl-C. It does not yet say that the page can change plans. That wording is a follow-up with the Docs Portal release.
+
+## Amendment (2026-11-23): a fourth route re-reads the Snapshot
+
+- `POST /reread` runs the same guards as `POST /edit` (Host, Origin, token, `application/json`, a Snapshot already read, no Edit running). It runs the Snapshot Plan again and answers the new Snapshot, or the error as data. It writes nothing, and it exists so the page can show a plan that changed elsewhere, after a `scenario_changed` refusal ([cli ADR 0051](0051-a-write-can-name-the-content-hash-it-read.md), [web ADR 0008](../../../web/docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+- The plan-changing Edits send `--if-hash` with the hash the page read, so a save over a plan another writer changed is refused and nothing is written.

@@ -1,4 +1,5 @@
 import { type AppError, fail, isAppError } from "../errors"
+import { scenarioChanged } from "../scenario/errors"
 import { contentHash } from "./canonical"
 import { liveOnly, SCENARIO_COLUMNS, SCENARIO_ORDER } from "./columns"
 import type { Ctx } from "./context"
@@ -35,6 +36,8 @@ export function saveScenario(
 		ctx.db,
 		() => {
 			const current = liveScenario(ctx, "name", input.name)
+			const stale = staleRefusal(current, input.name, input.expectedHash)
+			if (stale !== undefined) return stale
 			const resolved = anchorsFor(current, input.document, input.name)
 			if (isAppError(resolved)) return resolved
 			const document = canonicalDocument(resolved.document)
@@ -58,6 +61,16 @@ export function saveScenario(
 		},
 		options,
 	)
+}
+
+/** The refusal for a write that named a content hash the stored Scenario no longer has (cli ADR-0051). */
+function staleRefusal(
+	current: ScenarioRow | null,
+	name: string,
+	expected: string | undefined,
+): AppError | undefined {
+	if (expected === undefined || current?.contentHash === expected) return undefined
+	return scenarioChanged(name, expected, current?.contentHash ?? null)
 }
 
 export function listScenarios(
