@@ -2,7 +2,7 @@
 name: traj
 description: "Operate `traj`, the Trajectonomics ledger and projection CLI, on someone's own money: record what they earned and spent, read balances and reports, and answer what-if and financial-independence questions. Use when the user talks about their accounts, spending, budget, net worth, savings plan, Thai tax, or planning a purchase."
 metadata:
-  cli: ">=0.2.0 <0.6.0"
+  cli: ">=0.2.0 <0.7.0"
 ---
 
 # traj
@@ -26,7 +26,7 @@ Either way, get the version once and pin it: the number from `traj --version`, o
 
 The npm package is `@trajectonomics/cli`; the unscoped package of the same short name belongs to someone else.
 
-`npx -y` runs code neither of you reviewed, so say why it is the safe choice here: the launcher verifies the published SHA-256 of the release binary. Nothing about it sends the user's data anywhere — and you send nothing either, never uploading or pasting their ledger, documents or exports.
+`npx -y` runs code neither of you reviewed, so say why it is the safe choice here: the launcher verifies the published SHA-256 of the release binary. Nothing about it sends the user's data anywhere — and you send nothing either, never uploading or pasting their ledger, documents or exports. From 0.6.0 the CLI does send one anonymous usage count per command (the command's name, its exit code, the version and the operating system, never a figure or anything typed), and `DO_NOT_TRACK=1` stops it; the first successful command prints one line about it on stderr, which is a notice, not an error.
 
 When the user wants `traj` kept on `PATH`, give them the one-line install command for their platform from the CLI's README and let them run it. Handing them a remote script to pipe into a shell is their decision, not yours.
 

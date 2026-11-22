@@ -2,7 +2,7 @@
 name: traj-review
 description: "Run a weekly or monthly check-in on someone's `traj` ledger: read the trial balance first, compare the period with the one before it, show every figure with its as-of and the entries behind it, keep refunds apart from gross spend, and apply one fixed rule for what counts as unusual. Use when someone asks how last week or last month went, wants a weekly or monthly review, or asks what changed in their spending."
 metadata:
-  cli: ">=0.2.0 <0.6.0"
+  cli: ">=0.2.0 <0.7.0"
 ---
 
 # traj-review
@@ -116,7 +116,7 @@ personal detail and path under the person's home directory that the person menti
 words, such as "the balance looked wrong", and leave the number out.
 
 Show the complete draft in your reply. Then say the person may open the form, paste the title and the
-text, tick the boxes and submit it themselves, or not submit it at all. The ledger sends nothing, and
+text, tick the boxes and submit it themselves, or not submit it at all. Nothing in the ledger is sent, and
 you never submit the draft or create the issue: the person chooses to send a draft they have read.
 
 ## Unattended

@@ -90,9 +90,21 @@ describe("what setup leaves behind", () => {
 	const leaves = section(body, "What setup leaves behind")
 
 	it("states the two verified facts about the network, and nothing broader", () => {
-		expect(leaves).toContain("makes no network connection")
+		expect(leaves).toContain("The ledger never leaves this machine")
+		expect(leaves).not.toContain("sends nothing anywhere")
 		expect(leaves).toContain("the binary download, and the `skills` CLI")
 		expect(body).not.toContain("nothing leaves your machine")
+	})
+
+	it("names the usage counts from 0.6.0, what they hold, and the switch that works on every version", () => {
+		expect(leaves).toContain("**Usage counts, from 0.6.0.**")
+		expect(leaves).toContain(
+			"never sends a figure, an account, a path or anything the person typed",
+		)
+		expect(leaves).toContain(
+			"`DO_NOT_TRACK=1` in their shell's environment stops it on any version",
+		)
+		expect(leaves).toContain("it is a notice, not an error")
 	})
 
 	it("says a feedback draft leaves only when the person sends it, and setup never sends one", () => {

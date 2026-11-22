@@ -2,7 +2,7 @@
 name: traj-onboarding
 description: "Set up `traj`, the personal money command line, for someone starting out, or set it up again on a machine that already has a ledger: install the command line, install the skill that operates it, and start from their financial situation and their goal. Use when someone wants to get started with their money, asks to install `traj`, or tells you their financial situation and their goal while setup is not done."
 metadata:
-  cli: ">=0.2.0 <0.6.0"
+  cli: ">=0.2.0 <0.7.0"
   version: "0.1.0"
 ---
 
@@ -202,11 +202,19 @@ in this conversation.
 
 Tell them, once, before the handover:
 
-- **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger itself
-  makes no network connection: it computes on this machine and sends nothing anywhere. Setup itself
-  reaches the network twice, and only twice — the binary download, and the `skills` CLI that installs
-  these skills. Say exactly that, and nothing broader. A feedback draft is separate: it leaves this
-  machine only when the person sends it themselves, after reading the full text, and setup never sends one.
+- **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger never
+  leaves this machine: its figures, accounts and documents are computed and kept here, and no command
+  sends them anywhere. Setup itself reaches the network twice, and only twice — the binary download,
+  and the `skills` CLI that installs these skills. Say exactly that, and nothing broader. A feedback
+  draft is separate: it leaves this machine only when the person sends it themselves, after reading
+  the full text, and setup never sends one.
+- **Usage counts, from 0.6.0.** From 0.6.0, `traj` sends one anonymous count per command to the
+  project: the command's name, its exit code, the version and the operating system, under a random
+  id. It never sends a figure, an account, a path or anything the person typed. It is on unless they
+  turn it off. Tell them that once, and offer to turn it off: `DO_NOT_TRACK=1` in their shell's
+  environment stops it on any version, and from 0.6.0 the CLI's own help lists the command that stores
+  the choice for this machine. The first successful command after the install prints one
+  line about the counts on stderr; it is a notice, not an error.
 - **Never `rm -rf ~/.traj`.** That directory holds the ledger; removing it destroys every row, and no
   command below 0.3.0 removes the data for you. From 0.3.0 the CLI has its own guarded removal, which
   refuses without a confirmation.
