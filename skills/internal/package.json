@@ -13,6 +13,7 @@
     "install-skills-profile": "./scripts/install-profile.mjs"
   },
   "scripts": {
+    "check": "node --test",
     "test": "node --test"
   }
 }
