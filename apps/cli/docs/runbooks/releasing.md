@@ -12,9 +12,9 @@ The rest of this page is what is specific to the cli: the release docs check, th
 window, what a green cli release looks like, and how to re-run one. The decisions behind the
 binaries are in [ADR 0023](../adr/0023-release-artifacts.md).
 
-## 0.5.0 only: the onboarding skill's privacy sentence ships with it
+## 0.6.0 only: the onboarding skill's privacy sentence ships with it
 
-0.5.0 is the first release that counts anonymous usage ([ADR-0045](../adr/0045-traj-counts-its-own-use-and-one-command-turns-it-off.md)).
+0.6.0 is the first release that counts anonymous usage ([ADR-0045](../adr/0045-traj-counts-its-own-use-and-one-command-turns-it-off.md)).
 The published `traj-onboarding` skill says the ledger "sends nothing anywhere", which stops being the
 whole truth on that release. Land [#165](https://github.com/trajectonomics/trajectonomics/issues/165)
 right after the dispatch, in the same window as the marker-clearing pull request, and remove this

@@ -206,7 +206,7 @@ traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 
 ## Telemetry
 
-> **Ships in 0.5.0.**
+> **Ships in 0.6.0.**
 
 `traj` counts its own use, so the project can see how many people run it each week. After a command finishes, a detached process sends one anonymous event to PostHog (EU), so the command never waits for the network. The event holds:
 
