@@ -19,7 +19,19 @@ export const AGENT_BINARY: Record<AgentName, string> = {
 export const OPENCODE_FREE_MODEL = "opencode/deepseek-v4.1-flash-free"
 export const OPENCODE_FALLBACK_MODEL = "opencode-go/deepseek-v4.1-flash"
 
-/** Claude Code: headless, streamed events; only `traj` may run, and no file or web reads are offered. */
+/**
+ * Claude Code: headless, streamed events, and a shell that can run only `traj`. A deny rule cannot
+ * express "everything except traj", and the user's own settings may allow Bash, so four flags work
+ * together (probed on Claude Code 2.1.330):
+ * - `--tools Bash` offers no tool but Bash (no file, web, ToolSearch or MCP tools);
+ * - `--setting-sources project` skips the user's and local settings files, so their Bash allow rules
+ *   do not apply (the workspace has no project settings);
+ * - `--permission-mode dontAsk` denies every call not pre-approved, with no prompt in headless mode;
+ * - `--allowedTools Bash(traj:*)` pre-approves `traj`, the one thing that may run.
+ * Claude Code's built-in read-only commands (`ls`, `pwd`, `grep` inside the workspace) still run:
+ * they cannot write, and they cannot read outside the workspace. The prompt stays first because the
+ * flags after it take several values.
+ */
 export function claudeArgs(prompt: string): string[] {
 	return [
 		"-p",
@@ -27,6 +39,13 @@ export function claudeArgs(prompt: string): string[] {
 		"--output-format",
 		"stream-json",
 		"--verbose",
+		"--tools",
+		"Bash",
+		"--setting-sources",
+		"project",
+		"--strict-mcp-config",
+		"--permission-mode",
+		"dontAsk",
 		"--allowedTools",
 		"Bash(traj:*)",
 		"--disallowedTools",

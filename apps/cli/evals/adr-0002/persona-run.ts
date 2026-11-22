@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import type { AgentName } from "./agents"
 import { type FlagTable, inventedFlagsOf, parseCallLog } from "./calls"
-import { finalTextOf } from "./final-answer"
+import { finalTextOf, modelOf } from "./final-answer"
 import { type Invocation, invokeAgent } from "./invoke"
 import { expectedAnswers } from "./oracle"
 import type { Persona } from "./persona"
@@ -62,6 +62,6 @@ export async function runPersona(input: PersonaRunInput): Promise<RunRow> {
 		calls: calls.length,
 		errors: calls.filter((call) => call.exitCode !== 0).length,
 		invented,
-		model: invocation.model ?? "n/a",
+		model: invocation.model ?? modelOf(agent, invocation.stdout) ?? "n/a",
 	}
 }
