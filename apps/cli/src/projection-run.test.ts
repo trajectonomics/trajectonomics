@@ -149,6 +149,7 @@ describe("projection run", () => {
 		expect(data.name).toBe("projection run")
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort()).toEqual([
+			"accounts",
 			"asOf",
 			"breakdown",
 			"carryIn",

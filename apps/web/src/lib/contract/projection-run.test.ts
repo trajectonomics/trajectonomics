@@ -36,6 +36,20 @@ describe("the projection run contract against the CLI's goldens", () => {
 		expect(run.tables.map((table) => table.name)).toEqual(["annual"])
 	})
 
+	it("parses --accounts' output: each Account's value, nominal and real (cli ADR-0060)", async () => {
+		const run = projectionRun.parse(await golden("run-accounts.output"))
+		const balances = run.tables.find((table) => table.name === "balances")
+		if (balances?.name !== "balances") throw new Error("the output has no balances table")
+		const home = balances.rows.filter((row) => row.account === "home")
+		expect(home.map((row) => [row.date, row.amount])).toEqual([
+			["2027-01-01", "0.00"],
+			["2028-01-01", "15225.19"],
+			["2029-01-01", "15681.94"],
+			["2030-01-01", "16152.40"],
+			["2031-01-01", "0.00"],
+		])
+	})
+
 	it("refuses a section the contract does not name", async () => {
 		const body = (await golden("run-breakdown.output")) as {
 			tables: { name: string; rows?: { total?: string }[] }[]
