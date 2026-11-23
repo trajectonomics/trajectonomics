@@ -78,6 +78,16 @@ export interface FlowMeasure {
 	readonly flow: string
 }
 
+/**
+ * The value of one Account on the Landed date, read before that date's Flows land, with growth
+ * accrued to that date and Accrued interest included. A liability reads the positive amount owed.
+ */
+export interface AccountMeasure {
+	readonly id: string
+	readonly op: "account"
+	readonly account: string
+}
+
 export type Measure =
 	| ConstMeasure
 	| TallyMeasure
@@ -86,9 +96,10 @@ export type Measure =
 	| MulMeasure
 	| PickMeasure
 	| FlowMeasure
+	| AccountMeasure
 
-/** A Measure a Levy may hold: everything but a `flow` reference, which only a Derived amount has. */
-export type LevyMeasure = Exclude<Measure, FlowMeasure>
+/** A Measure a Levy may hold: neither a `flow` nor an `account` read, which only a Derived amount has. */
+export type LevyMeasure = Exclude<Measure, FlowMeasure | AccountMeasure>
 
 /** A Measure a Derived amount may hold: everything but a `tally`, which only a Levy has. */
 export type DeriveMeasure = Exclude<Measure, TallyMeasure>

@@ -27,6 +27,7 @@ export const MEASURE_OPS = [
 	"mul",
 	"pick",
 	"flow",
+	"account",
 ] as const
 export const TALLY_BASES = ["gross", "funded", "returns", "gains"] as const
 export const ROUNDINGS = ["floor", "halfUp", "ceil"] as const

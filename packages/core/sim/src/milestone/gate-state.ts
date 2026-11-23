@@ -16,6 +16,8 @@ export interface GateState {
 	readonly events: readonly DatedEvent[]
 	/** An FI candidate's stop: a deferred `once` Flow it removes never lands. */
 	readonly stop: ((flow: Flow) => boolean) | undefined
+	/** Fires no dynamic Milestone: the walk past the horizon, where the Projection has ended. */
+	readonly frozen?: boolean
 	readonly fires: Map<string, DateString>
 	trail: readonly TrailEntry[]
 }

@@ -13,7 +13,7 @@ export function finish(
 	breach: BufferBreach | undefined,
 ): WalkOutcome {
 	const { shared, forFires } = input.windows
-	const windows = shared ?? forFires(day.point.gate?.fires() ?? new Map())
+	const windows = shared ?? forFires(day.point.gate?.fires() ?? new Map(), day.values)
 	let first = breach
 	for (const point of day.table === undefined ? day.trace : []) {
 		const checked = breachAt(windows.requirement, point.date, point.accessible)

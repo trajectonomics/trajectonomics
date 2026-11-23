@@ -6,11 +6,11 @@ export type { DateOutcome, DayTotals, EngineRunsOut } from "./day-totals"
 import { aggregate } from "./aggregate"
 import { applyAssets, applyDebt } from "./contributions"
 import { dayLines, withLines } from "./day-lines"
-import { plannedAmounts } from "./derive"
 import type { DatedEvent } from "./events"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
 import { mergeFunded, tally, totalsOf } from "./levy-step"
 import { plannedFail } from "./planned-fail"
+import { plannedOn } from "./planned-on"
 import { applyPlannedWithdrawals } from "./planned-withdrawals"
 import { route } from "./route"
 import type { StateMap } from "./state"
@@ -24,7 +24,7 @@ export function processDate(
 	levies: LevySet | undefined,
 	breakdown = false,
 ): DateOutcome {
-	const planned = plannedAmounts(events, scenario.flows, date, scenario.economy.inflation)
+	const planned = plannedOn(events, scenario, date, states)
 	if (!planned.ok) return plannedFail(date, planned.problem)
 	const views = levies === undefined ? [] : settlementPeriodViews(levies, date)
 	const day = aggregate(events, planned.planned, views, date)

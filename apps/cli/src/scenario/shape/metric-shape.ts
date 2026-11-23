@@ -24,7 +24,7 @@ export const metricShape: Record<string, unknown> = {
 				expenses: {
 					enum: [...REFERENCE_WINDOWS],
 					description:
-						"The planned spending over one twelve-month window, from the date the criterion is judged.",
+						"The planned spending over one twelve-month window, from the date the criterion is judged. A Scenario in which any Flow's `derive` has an `account` Measure refuses `next12Months` here.",
 				},
 			},
 			required: ["expenses"],

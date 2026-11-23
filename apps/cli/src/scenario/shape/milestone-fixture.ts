@@ -25,7 +25,7 @@ export const FULL_MILESTONES: unknown[] = [
 				kind: "multiple",
 				metric: "netWorth",
 				op: "atLeast",
-				base: { expenses: "next12Months" },
+				base: { expenses: "trailing12Months" },
 				num: 25,
 				den: 1,
 				terms: "nominal",

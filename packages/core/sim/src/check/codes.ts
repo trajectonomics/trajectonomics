@@ -77,6 +77,8 @@ const CODES = [
 	"LEVEL_FREQUENCY_MISMATCH",
 	"LEVEL_PAYMENTS_OUT_OF_RANGE",
 	"LEVEL_PAYMENT_OVERFLOW",
+	"ACCOUNT_MEASURE_IN_LEVY",
+	"NEXT_12_MONTHS_READS_ACCOUNT",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const

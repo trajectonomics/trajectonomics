@@ -19,6 +19,7 @@ function measureValue(
 	read: (flow: string) => bigint,
 	date: DateString,
 	inflation: number,
+	readAccount: (account: string) => bigint,
 ): bigint {
 	switch (measure.op) {
 		case "const":
@@ -43,6 +44,8 @@ function measureValue(
 			return oracleGreater(get(measure.a), get(measure.b))
 		case "flow":
 			return read(measure.flow)
+		case "account":
+			return readAccount(measure.account)
 		default:
 			throw new Error("A Derived amount has no tally")
 	}
@@ -54,6 +57,7 @@ export function oracleDeriveValues(
 	read: (flow: string) => bigint,
 	date: DateString,
 	inflation: number,
+	readAccount: (account: string) => bigint = () => 0n,
 ): bigint {
 	const measures = new Map<string, DeriveMeasure>()
 	for (const measure of derive.measures) measures.set(measure.id, measure)
@@ -63,7 +67,7 @@ export function oracleDeriveValues(
 		if (cached !== undefined) return cached
 		const measure = measures.get(id)
 		if (measure === undefined) throw new Error(`No Measure ${id}`)
-		const value = measureValue(measure, get, read, date, inflation)
+		const value = measureValue(measure, get, read, date, inflation, readAccount)
 		memo.set(id, value)
 		return value
 	}

@@ -3,6 +3,7 @@ import { indexAccounts } from "./accounts"
 import { checkBaseline } from "./baseline"
 import { checkBaselineBasis } from "./baseline-basis"
 import type { Emit, Path, Problem } from "./codes"
+import { checkExpenseWindowReads } from "./expense-window-reads"
 import { makeGuard } from "./guard"
 import { checkLevyCarryIn } from "./levy-carry-in-required"
 import { checkTallySupply } from "./levy-tally-supply"
@@ -44,5 +45,6 @@ export function check(baseline: unknown, scenario: unknown, timeline: unknown): 
 	guard("timeline", undefined, () => checkTimeline(timeline, ["timeline"], emit))
 	guard("timeline", undefined, () => checkLevyCarryIn(scenario, timeline, emit))
 	guard("scenario", undefined, () => checkTallySupply(scenario, timeline, emit))
+	guard("scenario", undefined, () => checkExpenseWindowReads(scenario, emit))
 	return problems
 }
