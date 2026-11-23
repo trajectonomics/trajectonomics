@@ -40,12 +40,14 @@ const WORDS_PER_MINUTE = 220
 
 /**
  * Whole minutes to read a Post's text, and never less than one. Words are counted by the
- * Language's own word breaker, because Thai writes no space between words.
+ * Language's own word breaker, because Thai writes no space between words. A link's address and an
+ * HTML tag are not read, so they are not counted.
  */
 export function readingMinutes(text: string, language: Language): number {
+	const prose = text.replace(/\]\([^)]*\)/g, "]").replace(/<[^>]*>/g, " ")
 	const segmenter = new Intl.Segmenter(language, { granularity: "word" })
 	let words = 0
-	for (const segment of segmenter.segment(text)) {
+	for (const segment of segmenter.segment(prose)) {
 		if (segment.isWordLike === true) words += 1
 	}
 	return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))

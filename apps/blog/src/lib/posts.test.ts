@@ -57,6 +57,12 @@ describe("the reading time", () => {
 		expect(readingMinutes("", "en")).toBe(1)
 	})
 
+	test("does not count a link's address or an HTML tag", () => {
+		const linked = "[word](https://example.com/a/b/c/d/e/f/g/h) ".repeat(220)
+		expect(readingMinutes(linked, "en")).toBe(1)
+		expect(readingMinutes('<img src="/a/b/c/d/e.webp" alt="x" /> word'.repeat(220), "en")).toBe(1)
+	})
+
 	test("counts Thai words, which have no space between them", () => {
 		// สวัสดีครับ is two words and one run of letters; whitespace alone would count 221.
 		expect(readingMinutes("สวัสดีครับ ".repeat(221), "th")).toBe(3)
