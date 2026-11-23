@@ -3,6 +3,7 @@ import type { Baseline, EstateLine, Read, ScenarioDocument } from "../../lib/con
 import { NOT_MODELLED_NOTE } from "../../lib/view/estate/notes"
 import { lineWords } from "../../lib/view/estate/words"
 import { accountNameOf } from "../../lib/view/withdrawals/context"
+import Money from "../ui/Money.svelte"
 
 interface Props {
 	plan: ScenarioDocument
@@ -28,7 +29,8 @@ const groups: { title: string; lines: readonly EstateLine[] }[] = $derived([
 				<h4 class="text-sm font-medium">{group.title}, in the order they are taken</h4>
 				<ul class="mt-1 space-y-1 text-sm">
 					{#each group.lines as line (line.id)}
-						<li><span class="font-medium">{line.id}</span>: {lineWords(line, account)}</li>
+						{@const said = lineWords(line, account)}
+						<li><span class="font-medium">{line.id}</span>: {#if said.amount !== null}<Money amount={said.amount} /> {/if}{said.words}</li>
 					{/each}
 				</ul>
 			</div>

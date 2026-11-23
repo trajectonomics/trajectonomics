@@ -100,6 +100,13 @@ describe("what the form checks, and what it leaves to traj", () => {
 		expect(found.get("costs.0.accounts")).toBe("Choose at least one Account.")
 		expect(found.get("costs.1.name")).toBe("Another line already has this name.")
 	})
+
+	test("a name of digits only is a problem, since a refusal could read it as a place in the list", () => {
+		const share = { ...emptyLine(), how: "share", share: "1", rounding: "floor", of: "gross" }
+		const found = problemsOf({ costs: [{ ...share, name: "1" }], gifts: [] })
+		expect(found.get("costs.0.name")).toContain("at least one letter")
+		expect(problemsOf({ costs: [{ ...share, name: "fee-1" }], gifts: [] }).size).toBe(0)
+	})
 })
 
 describe("the block a draft saves as", () => {

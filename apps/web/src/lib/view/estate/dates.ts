@@ -22,7 +22,7 @@ export interface DateChoice {
 export interface EstateDates {
 	readonly choices: readonly DateChoice[]
 	readonly chosen: DateChoice
-	/** A sentence when the later life expectancy falls after the plan's last year, so the last year is shown. */
+	/** A sentence when the last year is shown instead of a life expectancy: the plan ends first, or the household names no adult. */
 	readonly beyond: string | null
 }
 
@@ -65,5 +65,5 @@ export function estateDates(
 	]
 	const standard = choices.find((one) => one.value === LIFE) ?? end
 	const chosen = choices.find((one) => one.value === requested) ?? standard
-	return { choices, chosen, beyond: chosen.value === LIFE ? life.beyond : null }
+	return { choices, chosen, beyond: chosen === standard ? life.beyond : null }
 }

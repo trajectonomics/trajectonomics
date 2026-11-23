@@ -5,13 +5,10 @@ import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/what-if.test-support"
 import type { Snapshot } from "../../lib/contract"
-import { demoPlan } from "../../lib/view/estate/fixtures.test-support"
 import { overviewView } from "../../lib/view/overview/view"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import EstateCard from "../overview/EstateCard.svelte"
-import OverviewGrid from "../overview/OverviewGrid.svelte"
 import EstateBody from "./EstateBody.svelte"
-import EstateForm from "./EstateForm.svelte"
 
 useSessionHooks()
 
@@ -28,11 +25,6 @@ const page = (
 			onAt: () => {},
 		},
 	}).body
-const form = (name = "base") =>
-	render(EstateForm, {
-		props: { name, contentHash: HASH, plan: demoPlan(name).doc, onDone: () => {} },
-	}).body
-
 afterEach(() => {
 	editSession.token = null
 	editSession.error = null
@@ -87,6 +79,32 @@ describe("the Estate page", () => {
 		])
 			expect(body).not.toContain(shown)
 		expect(body).toContain("amount hidden")
+	})
+
+	test("Hide amounts masks a fixed line's amount in the assumptions, and shows it otherwise", () => {
+		const assumptions = (body: string): string =>
+			body.slice(body.indexOf('aria-label="Your assumptions"'))
+		expect(assumptions(page())).toContain("50,000.00")
+		preferences.hidden = true
+		const hidden = assumptions(page())
+		expect(hidden).toContain("court-and-legal-fees")
+		expect(hidden).not.toMatch(/\d,\d{3}\.\d\d/)
+	})
+
+	test("under today's money the diagram says its bands are nominal; under the other terms it does not", () => {
+		expect(page({ terms: "real" })).toContain("Nominal: the bands")
+		expect(page({ terms: "both" })).not.toContain("Nominal: the bands")
+		expect(page({ terms: "nominal" })).not.toContain("Nominal: the bands")
+	})
+
+	test("a household with no adult says why the plan's last year is shown, on the page and the card", () => {
+		const snapshot = structuredClone(DEMO)
+		const doc = snapshot.reads.documents["base"]
+		if (doc?.ok) doc.data.scenario.household = null
+		expect(page({ snapshot })).toContain("names no adult")
+		expect(
+			render(EstateCard, { props: { scenario: overviewView(snapshot).estate } }).body,
+		).toContain("the household names no adult")
 	})
 
 	test("a negative net is said plainly: heirs receive nothing, the shortfall is stated, and there is no diagram", () => {
@@ -145,51 +163,5 @@ describe("the Estate page", () => {
 		expect(body).toContain("With your try")
 		expect(body).toContain("Saved plan")
 		whatIfSession.revert()
-	})
-})
-
-describe("the form", () => {
-	test("a plan with no block opens empty, says each line is the person's own, and that inheritance tax is a cost line", () => {
-		const body = form("retire-early")
-		expect(body).toContain("none is filled in for you")
-		expect(body).toContain("Inheritance tax is not worked out")
-		expect(body).toContain("Add a cost")
-		expect(body).toContain("Add a gift")
-		expect(body).not.toContain('value="1')
-		expect(body).toContain("Save your first line to try")
-		expect(body).not.toContain("Try as a what-if")
-	})
-
-	test("a plan with a block shows its lines as the document states them, and offers a try", () => {
-		const body = form()
-		expect(body).toContain('value="1.00"')
-		expect(body).toContain('value="50000.00"')
-		expect(body).toContain("Try as a what-if")
-		expect(body).toContain("Move up")
-	})
-})
-
-describe("the Home card: your heirs would receive", () => {
-	test("states what heirs receive on the default date, says why that date, and links to the page", () => {
-		const body = render(EstateCard, { props: { scenario: overviewView(DEMO).estate } }).body
-		expect(body).toContain("Your heirs would receive")
-		expect(body).toContain("15,682,084.15")
-		expect(body).toContain("the plan's last year")
-		expect(body).toContain('href="/estate/')
-		expect(render(OverviewGrid, { props: { view: overviewView(DEMO) } }).body).toContain("/estate/")
-	})
-
-	test("says when no settlement cost is set, and hides amounts", () => {
-		const other = overviewView({
-			...DEMO,
-			params: { ...DEMO.params, compare: null, scenarios: ["retire-early"] },
-		})
-		expect(render(EstateCard, { props: { scenario: other.estate } }).body).toContain(
-			"No settlement cost is set",
-		)
-		preferences.hidden = true
-		expect(
-			render(EstateCard, { props: { scenario: overviewView(DEMO).estate } }).body,
-		).not.toContain("15,682,084.15")
 	})
 })

@@ -2,6 +2,7 @@ import type { HouseholdDocument, HouseholdPerson, ProjectionRun } from "../../co
 import { formatDate } from "../../format"
 import { annualRowsOf } from "../projection/annual"
 import type { DateChoice } from "./dates"
+import { estateRowsOf, rowOn } from "./rows"
 
 /** The value of the later-life-expectancy choice, the page's default when the household names an adult. */
 export const LIFE = "life"
@@ -19,6 +20,10 @@ function lifeEndOf(run: ProjectionRun, person: HouseholdPerson): string | null {
 	return row?.to ?? null
 }
 
+/** Said when the household names no adult: the date cannot be a life expectancy. */
+export const NO_ADULT_NOTE =
+	"The household names no adult, so there is no life expectancy to read and the plan's last year is shown."
+
 /** The life-expectancy choices: each adult, and the later one as the default. */
 export function lifeChoices(
 	run: ProjectionRun,
@@ -29,12 +34,14 @@ export function lifeChoices(
 	const ends = people.map((person) => ({ person, date: lifeEndOf(run, person) }))
 	const reached = ends.flatMap((one) => (one.date === null ? [] : [{ ...one, date: one.date }]))
 	const single = people.length === 1
+	// A choice is worded with the estate row's own date, the one the table and the headline show.
+	const rowDate = (date: string): string => formatDate(rowOn(estateRowsOf(run), date)?.date ?? date)
 	const each = reached.map(({ person, date }) => ({
 		value: `person:${person.id}`,
-		label: `${person.id} at life expectancy, age ${person.lifeExpectancy} (${formatDate(date)})`,
+		label: `${person.id} at life expectancy, age ${person.lifeExpectancy} (${rowDate(date)})`,
 		date,
 	}))
-	if (people.length === 0) return { choices: [], beyond: null }
+	if (people.length === 0) return { choices: [], beyond: NO_ADULT_NOTE }
 	const missing = ends.filter((one) => one.date === null).map((one) => one.person.id)
 	if (missing.length > 0) {
 		const names = missing.join(" and ")
@@ -47,6 +54,6 @@ export function lifeChoices(
 		}
 	}
 	const later = reached.reduce((best, one) => (one.date > best.date ? one : best))
-	const label = `${single ? "Life expectancy" : "Later life expectancy"}: ${later.person.id}, age ${later.person.lifeExpectancy} (${formatDate(later.date)})`
+	const label = `${single ? "Life expectancy" : "Later life expectancy"}: ${later.person.id}, age ${later.person.lifeExpectancy} (${rowDate(later.date)})`
 	return { choices: [{ value: LIFE, label, date: later.date }, ...each], beyond: null }
 }

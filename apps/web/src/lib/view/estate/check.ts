@@ -28,6 +28,9 @@ function nameProblem(
 	const noun = list === "costs" ? "cost" : "gift"
 	if (id === "") return `Name this ${noun}, such as settlement.`
 	if (!ID_SHAPE.test(id)) return "Use letters, digits and dashes in the name."
+	// A refusal names a line by its id or its place; a name of digits only could be read as a place.
+	if (/^\d+$/.test(id))
+		return "Use at least one letter in the name, so it is not taken for a number."
 	return taken.filter((one) => one === id).length > 1
 		? "Another line already has this name."
 		: undefined

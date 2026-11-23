@@ -3,7 +3,6 @@
  * holds them. Text only: a share is shown as the document states it, never worked out (web ADR 0002).
  */
 import type { EstateLine } from "../../contract"
-import { formatMoney } from "../../format"
 import { formatBps } from "../../format/bps"
 
 const ROUNDING_WORDS: Readonly<Record<string, string>> = {
@@ -21,12 +20,19 @@ function ofWords(line: EstateLine, account: (id: string) => string): string {
 	return "an unchosen base"
 }
 
+/** One line in a sentence: the words, and a fixed line's amount apart, so the page can show it as money and hide it when asked. */
+export interface LineWords {
+	/** The CLI's decimal text of a fixed amount, or null for a share. It leads the sentence when present. */
+	readonly amount: string | null
+	readonly words: string
+}
+
 /** One line in a sentence: "1.00% of everything owned, rounded to the nearest, a half up". */
-export function lineWords(line: EstateLine, account: (id: string) => string): string {
+export function lineWords(line: EstateLine, account: (id: string) => string): LineWords {
 	if (line.bps !== undefined) {
 		const rounding =
 			line.rounding === undefined ? "" : `, ${ROUNDING_WORDS[line.rounding] ?? line.rounding}`
-		return `${line.bps}% of ${ofWords(line, account)}${rounding}`
+		return { amount: null, words: `${line.bps}% of ${ofWords(line, account)}${rounding}` }
 	}
 	if (line.amount !== undefined) {
 		const growth = line.growth
@@ -34,7 +40,7 @@ export function lineWords(line: EstateLine, account: (id: string) => string): st
 			growth === undefined || growth === "inflation"
 				? "keeping pace with inflation"
 				: `growing ${formatBps(growth.bps)}% a year`
-		return `${formatMoney(line.amount)} in the money of the plan's start, ${grows}`
+		return { amount: line.amount, words: `in the money of the plan's start, ${grows}` }
 	}
-	return "not set"
+	return { amount: null, words: "not set" }
 }

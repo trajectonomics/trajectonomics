@@ -9,10 +9,12 @@ interface Props {
 	list: ListName
 	accounts: readonly AccountChoice[]
 	shown: Shown
+	/** Called when a line is added, removed or moved: what the form said about a place no longer holds. */
+	onShape: () => void
 }
 
 /** The costs, or the gifts, in the order they are taken, each with its fields and an "Add" at the end. */
-let { draft = $bindable(), list, accounts, shown }: Props = $props()
+let { draft = $bindable(), list, accounts, shown, onShape }: Props = $props()
 const costs = $derived(list === "costs")
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
@@ -31,9 +33,18 @@ const button =
 			count={draft[list].length}
 			{accounts}
 			{shown}
-			onMove={(by) => (draft = moveLine(draft, list, index, by))}
-			onRemove={() => draft[list].splice(index, 1)}
+			onMove={(by) => {
+				draft = moveLine(draft, list, index, by)
+				onShape()
+			}}
+			onRemove={() => {
+				draft[list].splice(index, 1)
+				onShape()
+			}}
 		/>
 	{/each}
-	<button type="button" class={button} onclick={() => draft[list].push(emptyLine())}>{costs ? "Add a cost" : "Add a gift"}</button>
+	<button type="button" class={button} onclick={() => {
+		draft[list].push(emptyLine())
+		onShape()
+	}}>{costs ? "Add a cost" : "Add a gift"}</button>
 </section>

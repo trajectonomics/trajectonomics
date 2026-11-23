@@ -34,6 +34,9 @@ describe("the default date", () => {
 		expect(dates?.chosen.label).toContain("Life expectancy: me, age 40")
 		expect(dates?.beyond).toBeNull()
 		expect(figuresAt(base.run, "2030-10-30")?.date).toBe("2030-10-31")
+		// The choice reads the date of the row the table and the headline show.
+		expect(dates?.chosen.label).toContain("31 Oct 2030")
+		expect(dates?.choices.find((one) => one.value === "person:me")?.label).toContain("31 Oct 2030")
 	})
 
 	test("with two people it is the later one, and each is a choice of its own", () => {
@@ -61,7 +64,7 @@ describe("the default date", () => {
 	test("with no household, or when the plan ends before the life expectancy, it is the plan's last year, and says why", () => {
 		const none = estateDates(base.run, base.doc, null, "")
 		expect(none?.chosen).toMatchObject({ value: "end", date: "2053-12-31" })
-		expect(none?.beyond).toBeNull()
+		expect(none?.beyond).toContain("names no adult")
 		const demo = estateDates(base.run, base.doc, base.household, "")
 		expect(demo?.chosen).toMatchObject({ value: "life", date: "2053-12-31" })
 		expect(demo?.beyond).toContain("before me and partner reach")
@@ -180,5 +183,18 @@ describe("the notes and the Home card", () => {
 		})
 		const bare = demoPlan("retire-early")
 		expect(estateSummaryOf(bare.run, bare.doc, bare.household)?.noCost).toBe(true)
+	})
+
+	test("a household with no adult reads the plan's last year, and the card says why", () => {
+		expect(estateSummaryOf(base.run, base.doc, null)?.basis).toBe("no-adult")
+		expect(estateSummaryOf(base.run, base.doc, householdOf([]))?.basis).toBe("no-adult")
+	})
+
+	test("no diagram is drawn when the gross estate is nothing", () => {
+		const run = structuredClone(base.run)
+		for (const table of run.tables)
+			if (table.name === "estate") Object.assign(table.rows.at(-1) ?? {}, { gross: "0.00" })
+		expect(estateView(run, "2053-12-31", "both")?.flow).toBeNull()
+		expect(estateView(base.run, "2053-12-31", "both")?.flow).not.toBeNull()
 	})
 })

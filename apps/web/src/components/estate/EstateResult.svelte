@@ -35,6 +35,7 @@ const pick = (key: string): void => {
 	{#if layout !== null}
 		<section aria-label="Where the estate goes" class="space-y-3">
 			<h3 class="text-base font-semibold">Where it goes</h3>
+			{#if terms === "real"}<p class="text-xs text-muted-foreground">Nominal: the bands are in the money of each date, because only the net estate and what heirs receive are stated in today's money.</p>{/if}
 			<FlowDiagram {layout} {picked} onPick={pick} label={`The estate on ${view.figures.date}, from the gross estate to debts, costs, gifts and heirs`} />
 		</section>
 	{/if}

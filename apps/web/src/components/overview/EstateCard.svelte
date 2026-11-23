@@ -13,6 +13,7 @@ let { scenario }: Props = $props()
 const WHEN = {
 	life: ", the later life expectancy you set",
 	beyond: ", the plan's last year, which falls before the life expectancy you set",
+	"no-adult": ", the plan's last year, because the household names no adult",
 	end: ", the plan's last year",
 }
 // Shown when the plan states an estate: a Snapshot made without `--estate` has no card.

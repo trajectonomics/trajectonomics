@@ -10,15 +10,15 @@ export interface EstateSummary {
 	readonly currency: string
 	/** The plan states no settlement cost, so the figure is everything owned less debts, which the card says. */
 	readonly noCost: boolean
-	/** Which date this is: the later life expectancy, the plan's last year because that falls after it, or the plan's last year because the household names none. */
-	readonly basis: "life" | "beyond" | "end"
+	/** Which date this is: the later life expectancy, the plan's last year because that falls after it, the plan's last year because the household names no adult, or the plan's last year with no plan document to say more. */
+	readonly basis: "life" | "beyond" | "no-adult" | "end"
 	readonly short: boolean
 }
 
 /** Which of the three dates the default is. */
 function basisOf(dates: EstateDates | null): EstateSummary["basis"] {
-	if (dates?.beyond) return "beyond"
-	return dates?.chosen.value === "life" ? "life" : "end"
+	if (dates?.chosen.value === "life") return dates.beyond ? "beyond" : "life"
+	return dates?.beyond ? "no-adult" : "end"
 }
 
 /** The card's figures for the default date, or null when the run states no estate. */
