@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test"
-import { EDIT_KINDS, type Edit, editSchema, followPlan, writeCommand } from "./edit"
+import { EDIT_KINDS, type Edit, editSchema, writeCommand } from "./edit"
+import { followPlan } from "./follow"
+
+const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
 
 describe("the Edit list", () => {
 	test("is exactly the kinds the Dashboard may send, and no read", () => {
@@ -19,10 +22,10 @@ describe("the Edit list", () => {
 		}
 		for (const edit of [
 			{ kind: "copy-plan", from: "base", name: "early" },
-			{ kind: "apply-plan", name: "early", document: {} },
+			{ kind: "apply-plan", name: "early", contentHash: HASH, document: {} },
 			{ kind: "delete-plan", name: "early" },
-			{ kind: "set-household", name: "early", household: { schemaVersion: 1 } },
-			{ kind: "remove-household", name: "early" },
+			{ kind: "set-household", name: "early", contentHash: HASH, household: { schemaVersion: 1 } },
+			{ kind: "remove-household", name: "early", contentHash: HASH },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
 			expect(writeCommand(edit as Edit, false).argv[0]).toBe("scenario")
@@ -41,13 +44,22 @@ describe("the Edit list", () => {
 		for (const edit of [
 			{ kind: "copy-plan", from: "base", name: "--help" },
 			{ kind: "copy-plan", from: "--help", name: "early" },
-			{ kind: "apply-plan", name: "-h", document: {} },
+			{ kind: "apply-plan", name: "-h", contentHash: HASH, document: {} },
 			{ kind: "delete-plan", name: "--dry-run" },
-			{ kind: "set-household", name: "--file", household: {} },
-			{ kind: "remove-household", name: "--none" },
+			{ kind: "set-household", name: "--file", contentHash: HASH, household: {} },
+			{ kind: "remove-household", name: "--none", contentHash: HASH },
 			{ kind: "delete-plan", name: "a\nb" },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(false)
+		}
+	})
+
+	test("a plan-changing Edit names the hash the page read; a missing or flag-shaped one is refused", () => {
+		expect(editSchema.safeParse({ kind: "remove-household", name: "early" }).success).toBe(false)
+		for (const contentHash of ["--dry-run", "jcs1:sha256:short"]) {
+			expect(
+				editSchema.safeParse({ kind: "remove-household", name: "early", contentHash }).success,
+			).toBe(false)
 		}
 	})
 })
@@ -73,9 +85,9 @@ describe("writeCommand", () => {
 
 	test("apply-plan is scenario apply --file - --decimal, and the document goes on stdin", () => {
 		const document = { schemaVersion: 4, currency: "THB" }
-		const edit: Edit = { kind: "apply-plan", name: "early", document }
+		const edit: Edit = { kind: "apply-plan", name: "early", contentHash: HASH, document }
 		expect(writeCommand(edit, false)).toEqual({
-			argv: ["scenario", "apply", "early", "--file", "-", "--decimal", "--json"],
+			argv: ["scenario", "apply", "early", "--file", "-", "--decimal", "--if-hash", HASH, "--json"],
 			stdin: JSON.stringify(document),
 		})
 		expect(writeCommand(edit, true).argv).toEqual([
@@ -85,6 +97,8 @@ describe("writeCommand", () => {
 			"--file",
 			"-",
 			"--decimal",
+			"--if-hash",
+			HASH,
 			"--dry-run",
 			"--json",
 		])
@@ -95,33 +109,44 @@ describe("the household Edits", () => {
 	const household = { schemaVersion: 1, people: [], anchors: [] }
 
 	test("set-household is scenario household --file -, with the document on stdin, and --dry-run first", () => {
-		const edit: Edit = { kind: "set-household", name: "early", household }
+		const edit: Edit = { kind: "set-household", name: "early", contentHash: HASH, household }
 		expect(writeCommand(edit, false)).toEqual({
-			argv: ["scenario", "household", "early", "--file", "-", "--json"],
+			argv: ["scenario", "household", "early", "--file", "-", "--if-hash", HASH, "--json"],
 			stdin: JSON.stringify(household),
 		})
 		expect(writeCommand(edit, true)).toEqual({
-			argv: ["scenario", "household", "early", "--file", "-", "--dry-run", "--json"],
+			argv: [
+				"scenario",
+				"household",
+				"early",
+				"--file",
+				"-",
+				"--if-hash",
+				HASH,
+				"--dry-run",
+				"--json",
+			],
 			stdin: JSON.stringify(household),
 		})
 	})
 
 	test("remove-household is scenario household --none, with and without --dry-run", () => {
-		const edit: Edit = { kind: "remove-household", name: "early" }
+		const edit: Edit = { kind: "remove-household", name: "early", contentHash: HASH }
 		expect(writeCommand(edit, false)).toEqual({
-			argv: ["scenario", "household", "early", "--none", "--json"],
+			argv: ["scenario", "household", "early", "--none", "--if-hash", HASH, "--json"],
 		})
 		expect(writeCommand(edit, true)).toEqual({
-			argv: ["scenario", "household", "early", "--none", "--dry-run", "--json"],
+			argv: ["scenario", "household", "early", "--none", "--if-hash", HASH, "--dry-run", "--json"],
 		})
 	})
 
 	test("neither changes the list of plans the Snapshot projects", () => {
-		expect(followPlan(["base", "early"], { kind: "remove-household", name: "early" })).toEqual([
-			"base",
-			"early",
-		])
-		expect(followPlan([], { kind: "set-household", name: "early", household })).toEqual([])
+		expect(
+			followPlan(["base", "early"], { kind: "remove-household", name: "early", contentHash: HASH }),
+		).toEqual(["base", "early"])
+		expect(
+			followPlan([], { kind: "set-household", name: "early", contentHash: HASH, household }),
+		).toEqual([])
 	})
 })
 

@@ -11,6 +11,10 @@ import {
 	withAmount,
 } from "./edit-fixture.test-support"
 
+/** An apply-plan Edit of one plan, carrying the content hash the page read for it. */
+const applyEdit = (name: string, contentHash: string, document: unknown) =>
+	JSON.stringify({ kind: "apply-plan", name, contentHash, document })
+
 describe("saving a Flow of a plan's document, against the real traj", () => {
 	test(
 		"a changed amount runs apply --decimal: the Snapshot shows 9000.50, and the ledger holds 900050",
@@ -20,7 +24,7 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 			const before = shownOf(copied.answer, "e2e-edit")
 			const document = withAmount(before.scenario.document, "salary", "9000.50")
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "apply-plan", name: "e2e-edit", document }),
+				applyEdit("e2e-edit", before.scenario.contentHash, document),
 			)
 			expect(status).toBe(200)
 			if (!answer.ok) throw new Error(answer.error.message)
@@ -45,11 +49,7 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 			if (!copied.answer.ok) throw new Error(copied.answer.error.message)
 			const before = shownOf(copied.answer, "e2e-same")
 			const { status, answer } = await postEdit(
-				JSON.stringify({
-					kind: "apply-plan",
-					name: "e2e-same",
-					document: before.scenario.document,
-				}),
+				applyEdit("e2e-same", before.scenario.contentHash, before.scenario.document),
 			)
 			expect(status).toBe(200)
 			if (!answer.ok) throw new Error(answer.error.message)
@@ -76,7 +76,7 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 			const before = shownOf(copied.answer, "e2e-refused")
 			const document = withAmount(before.scenario.document, "salary", "9000.501")
 			const { status, answer } = await postEdit(
-				JSON.stringify({ kind: "apply-plan", name: "e2e-refused", document }),
+				applyEdit("e2e-refused", before.scenario.contentHash, document),
 			)
 			expect(status).toBe(200)
 			expect(answer.ok).toBe(false)

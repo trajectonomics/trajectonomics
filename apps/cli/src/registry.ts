@@ -20,6 +20,7 @@ const table = {
 	},
 	account_name_taken: { exit: 5, message: "An account with this name already exists." },
 	scenario_name_taken: { exit: 5, message: "A scenario with this name already exists." },
+	scenario_changed: { exit: 5, message: "The scenario changed since it was read." },
 	unsupported_currency: { exit: 3, message: "The currency is not supported in v1." },
 	account_archived: { exit: 3, message: "The account is archived and accepts no postings." },
 	same_account: {

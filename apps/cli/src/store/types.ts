@@ -7,6 +7,7 @@ import type { RestoreCounts, RestoreRows } from "./restore-types"
 import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
 import type {
 	ForkOptions,
+	HouseholdOptions,
 	HouseholdPlanner,
 	HouseholdSet,
 	NewScenario,
@@ -119,7 +120,7 @@ export interface Store {
 	replaceHousehold(
 		id: string,
 		plan: HouseholdPlanner,
-		options?: WriteOptions,
+		options?: HouseholdOptions,
 	): HouseholdSet | AppError
 	deleteScenario(id: string, options?: WriteOptions): ScenarioDeleted | AppError
 	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */

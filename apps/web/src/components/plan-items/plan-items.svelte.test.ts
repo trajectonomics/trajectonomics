@@ -10,6 +10,7 @@ import ItemActions from "./ItemActions.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
 
 const NO_PROBLEMS = { at: () => undefined, general: undefined }
+const HASH = "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 function list(
 	kind: "income" | "expense" | "assets",
@@ -24,6 +25,7 @@ function list(
 			household: null,
 			baseline: baselineRead(),
 			editable: options.editable ?? true,
+			contentHash: HASH,
 		},
 	}).body
 }
@@ -43,6 +45,7 @@ describe("the household's anchored dates on the planner pages", () => {
 				household,
 				baseline: baselineRead(),
 				editable: true,
+				contentHash: HASH,
 			},
 		}).body
 		expect(body).toContain("at me, age 60")

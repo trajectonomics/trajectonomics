@@ -2,7 +2,7 @@
 import type { ErrorCode } from "../errors"
 import { coreOnly } from "./core-triggers"
 import { HEAD } from "./migrations"
-import { ledgerHome, must, mustOpen } from "./testing"
+import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT } from "./testing"
 import type { Trigger } from "./trigger-setup"
 import { busy, corruptHome, fileHome, fullDisk, openAt, readonlyHome } from "./trigger-setup"
 import type { NewPosting, NewTransaction } from "./types"
@@ -59,6 +59,10 @@ const accountIn = (currency: string): Trigger =>
 
 /** Every code the store produces, each reached through the store itself. */
 export const storeTriggers: Record<StoreRaised, Trigger> = {
+	scenario_changed: posting(({ store }) => {
+		must(store.saveScenario({ name: "base", document: SCENARIO_DOCUMENT }))
+		return store.saveScenario({ name: "base", document: SCENARIO_DOCUMENT, expectedHash: "stale" })
+	}),
 	account_archived: posting(({ store, add, postingTo, cash, food }) => {
 		must(store.closeAccount(food))
 		return add([postingTo(food, 1), postingTo(cash, -1)])

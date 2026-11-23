@@ -11,6 +11,9 @@ export const EDIT_SESSION_PATH = "/edit-session"
 /** The path an Edit is posted to. */
 export const EDIT_PATH = "/edit"
 
+/** The path the page posts to when it asks for the Snapshot to be read again, after a refused plan. */
+export const REREAD_PATH = "/reread"
+
 /** The header that carries the session token on every Edit. */
 export const EDIT_TOKEN_HEADER = "x-traj-edit-token"
 
