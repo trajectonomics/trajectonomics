@@ -34,6 +34,7 @@ export function sideView(data: SideData, money: (minor: number) => string): Comp
 	return {
 		scenario: data.prepared.scenario,
 		overrides: data.prepared.overrides,
+		removals: data.prepared.removals,
 		...(data.prepared.carryIn.length === 0 ? {} : { carryIn: data.prepared.carryIn }),
 		fi: data.fi.fi,
 		taxYears: data.taxYears,

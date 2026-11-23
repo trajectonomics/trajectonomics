@@ -65,6 +65,7 @@ export function fiFixture(answer: FiResult, patch: Partial<Fi> = {}): Fi {
 			effectiveContentHash: "jcs1:sha256:0123456789abcdef0123456789abcdef",
 		},
 		overrides: [],
+		removals: [],
 		tax: "not_applied",
 		notes: ["Tax is not applied: no Levy."],
 		currency: "THB",

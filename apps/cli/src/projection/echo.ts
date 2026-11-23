@@ -9,6 +9,7 @@ export function echoOf(prepared: Placed): Echo {
 		engine: { package: SIM_PACKAGE, version: SIM_VERSION },
 		scenario: prepared.scenario,
 		overrides: prepared.overrides,
+		removals: prepared.removals,
 		tax: prepared.tax,
 		...(prepared.carryIn.length === 0 ? {} : { carryIn: prepared.carryIn }),
 		notes: prepared.notes,

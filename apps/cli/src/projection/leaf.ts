@@ -14,6 +14,10 @@ export type ScenarioRequest = {
 	/** The input field the name came from: `scenario`, `a` or `b`. */
 	scenarioPath: string
 	sets: readonly string[]
+	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
+	without?: readonly string[] | undefined
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
+	decimal?: boolean | undefined
 }
 
 /** The date flags every projection leaf takes: both are required and both come from the caller. */
@@ -65,6 +69,8 @@ export function withProjection<T>(
 				asOf: input.asOf,
 				horizon: input.horizon,
 				sets: request.sets,
+				without: request.without,
+				decimal: request.decimal,
 			})
 		const outcome = work(prepare)
 		return isAppError(outcome) ? outcome : ok(outcome)

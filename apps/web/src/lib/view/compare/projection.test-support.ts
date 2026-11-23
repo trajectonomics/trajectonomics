@@ -44,6 +44,7 @@ export function projectionRun(over: Partial<ProjectionRun> = {}): ProjectionRun 
 		engine: { package: "@trajectonomics/sim", version: "0.0.0" },
 		scenario: BASE,
 		overrides: [],
+		removals: [],
 		tax: "applied",
 		notes: [],
 		horizon: "2060-12-31",

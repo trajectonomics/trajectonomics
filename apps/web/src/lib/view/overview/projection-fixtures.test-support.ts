@@ -5,6 +5,7 @@ const SHAPE = {
 	engine: { package: "@trajectonomics/cli", version: "0.0.0" },
 	scenario: { id: "s-base", name: "base", contentHash: "h1", effectiveContentHash: "h1" },
 	overrides: [],
+	removals: [],
 	tax: "applied" as const,
 	notes: [],
 	currency: "THB",

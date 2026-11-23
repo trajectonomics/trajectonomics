@@ -131,9 +131,11 @@ describe("fi", () => {
 		expect(Object.keys(data.input.properties).sort()).toEqual([
 			"asOf",
 			"carryIn",
+			"decimal",
 			"horizon",
 			"scenario",
 			"set",
+			"without",
 		])
 		expect(data.output.properties.fi.anyOf).toHaveLength(3)
 		expect(data.errorCodes).toContain("projection_refused")

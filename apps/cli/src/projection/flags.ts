@@ -1,8 +1,11 @@
 import { z } from "zod"
 import type { FlagDocument } from "../document"
 import type { ErrorCode } from "../errors"
+import { setFlag } from "../scenario/override-flags"
 import { LEDGER_READ_CODES } from "../store"
 import { carryInDocument } from "./carryin"
+
+export { setFlag }
 
 /** Every code the projection leaves raise: flags, the Baseline and the engine (ADR-0030). */
 export const PROJECTION_ERROR_CODES: readonly ErrorCode[] = [
@@ -39,14 +42,6 @@ export const carryInFlag: z.ZodOptional<z.ZodString> = z
 
 /** The document `--carry-in` names, published under `flagDocuments` so its shape is not guessed. */
 export const carryInFlagDocument: FlagDocument = { flag: "carryIn", schema: carryInDocument }
-
-/** `--set`, one transient Override, repeatable and in command-line order (ADR-0024). */
-export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
-	.array(z.string())
-	.optional()
-	.describe(
-		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB).",
-	)
 
 /** `--horizon` for `fi`, where it moves the answer: it says which date the plan has to fund. */
 export const fiHorizonFlag: z.ZodString = z

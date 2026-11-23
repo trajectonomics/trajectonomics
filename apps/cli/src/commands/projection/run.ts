@@ -18,6 +18,7 @@ import { withProjection } from "../../projection/leaf"
 import { projectionHint } from "../../projection/render"
 import { projectionOf } from "../../projection/run"
 import { projectionRunView } from "../../projection/run-view"
+import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const run: Leaf = defineCommand({
 	name: "run",
@@ -30,6 +31,8 @@ export const run: Leaf = defineCommand({
 		horizon: horizonFlag,
 		scenario: scenarioFlag,
 		set: setFlag,
+		without: withoutFlag,
+		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		monthly: z.boolean().default(false).describe("Also report the monthly rows."),
 	}),
@@ -46,6 +49,11 @@ export const run: Leaf = defineCommand({
 				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --monthly",
 			description: "Try a raise without forking, and read the monthly rows.",
 		},
+		{
+			command:
+				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
+			description: "The annual roll-up with one Stream taken out, and nothing saved.",
+		},
 	],
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
@@ -56,6 +64,8 @@ export const run: Leaf = defineCommand({
 				scenario: input.scenario,
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
+				without: input.without ?? [],
+				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })

@@ -5402,6 +5402,7 @@
 						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
@@ -7166,6 +7167,7 @@
 						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
@@ -8594,6 +8596,7 @@
 						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
@@ -9246,6 +9249,7 @@
 						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
@@ -9809,6 +9813,7 @@
 							"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 						},
 						"overrides": [],
+						"removals": [],
 						"carryIn": [
 							{
 								"levy": "th-2026-pit",
@@ -10456,6 +10461,7 @@
 							"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 						},
 						"overrides": [],
+						"removals": [],
 						"carryIn": [
 							{
 								"levy": "th-2026-pit",
@@ -11069,6 +11075,7 @@
 						"effectiveContentHash": "jcs1:sha256:6f82cd025b87af2ad5977ff24c3bb6fb121725836e641d7093b25c5a0fbe4919"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
@@ -12426,6 +12433,7 @@
 						"effectiveContentHash": "jcs1:sha256:36f6382e582706447f8fac68eadb9f57ebf6a25747040f83470480a3d1ae2957"
 					},
 					"overrides": [],
+					"removals": [],
 					"tax": "applied",
 					"carryIn": [
 						{
