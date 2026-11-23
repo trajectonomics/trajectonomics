@@ -6,7 +6,6 @@ const S1 = "income.section40_1"
 
 const CONTRIBUTION_LIMITS: ReadonlyArray<readonly [ThLevyContributionLabel, number]> = [
 	[ThLevyContributionLabel.Rmf, 500_000],
-	[ThLevyContributionLabel.Ssf, 200_000],
 	[ThLevyContributionLabel.Pvd, 500_000],
 	[ThLevyContributionLabel.Gpf, 500_000],
 	[ThLevyContributionLabel.Nsf, 30_000],
@@ -16,7 +15,6 @@ const CONTRIBUTION_LIMITS: ReadonlyArray<readonly [ThLevyContributionLabel, numb
 
 const PERCENT_LIMITS: ReadonlyArray<readonly [ThLevyContributionLabel, number]> = [
 	[ThLevyContributionLabel.Rmf, 300_000],
-	[ThLevyContributionLabel.Ssf, 200_000],
 	[ThLevyContributionLabel.Pvd, 150_000],
 	[ThLevyContributionLabel.Gpf, 300_000],
 	[ThLevyContributionLabel.Nsf, 30_000],
@@ -43,7 +41,8 @@ function casesAt(
 
 /**
  * Contributions one satang either side of every absolute ceiling and every percentage-of-income
- * limit, plus the Retirement Cluster's combined 500,000 THB ceiling.
+ * limit, plus the Retirement Cluster's combined 500,000 THB ceiling. SSF has no limit to probe from the
+ * 2025 tax year (ADR 0007); `ssf-after-2024.test.ts` pins that it allows nothing.
  *
  * @statute Thailand Revenue Code Section 47; Ministerial Regulations No. 126, 390.
  */
@@ -55,8 +54,7 @@ export function contributionCases(): readonly ThLevyCase[] {
 			[[S1, toSatang(4_000_000)]],
 			[
 				[ThLevyContributionLabel.Rmf, toSatang(300_000)],
-				[ThLevyContributionLabel.Ssf, toSatang(200_000)],
-				[ThLevyContributionLabel.Pvd, toSatang(100_000) + delta],
+				[ThLevyContributionLabel.Pvd, toSatang(200_000) + delta],
 			],
 		),
 	)

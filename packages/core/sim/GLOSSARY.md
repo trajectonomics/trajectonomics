@@ -94,6 +94,10 @@ _Avoid_: Withholding, prepaid tax
 The one date after a Settlement period ends on which the Levy's due amount is reconciled against Prepayment. A balance due is paid like an expense and a refund lands like income. The date is the settlement rule's date moved forward to the next Business day, so a Settlement always falls after the period it closes. Settlements of several Levies on one Landed date are summed into one movement. A period the Projection ends before is still reported, with `settled: false`, and nothing is deducted.
 _Avoid_: Tax settlement, filing, payment
 
+**Contribution saving**:
+The fall in a Settlement period's `due` from extra funded contributions under one Tally label, found by raising that label's funded Tally in whole steps and re-evaluating the Levy while each step pays, and dropping a last step whose last grain saved nothing because it went past a cap (`contributionSavings`). It is a statement about one period's Levy, in the caller's label order, and never changes a Scenario.
+_Avoid_: tax saving, optimisation
+
 **Carry-in**:
 The tallies and Prepayment already recorded for a Settlement period that began before `start`, supplied by the caller because the Baseline holds balances only. It covers the period containing `start` and any earlier period whose Settlement falls after `start`, and it covers money that landed before `start`, not money that was due before it.
 _Avoid_: Year-to-date, opening income

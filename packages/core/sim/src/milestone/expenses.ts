@@ -1,6 +1,8 @@
 import { addDays, addMonthsClamped } from "../calendar/arith"
+import { readerAhead } from "../engine/account-values"
 import { plannedAmounts } from "../engine/derive"
 import type { DatedEvent } from "../engine/events"
+import type { StateMap } from "../engine/state"
 import type { BasisPoints, DateString, Flow, MilestoneTerms } from "../types"
 import { landsAt } from "./gating"
 import { termed } from "./metrics"
@@ -52,16 +54,14 @@ function firstOnOrAfter(events: readonly DatedEvent[], date: DateString): number
 	return low
 }
 
-/** `check()` refuses a `next12Months` Metric beside an `account` read (ADR 0020), so no window reads one. */
-const noAccount = (): bigint => 0n
-
 /** The planned expense of one Landed date's events, or `undefined` when a planned amount fails. */
 function expenseOn(
 	events: readonly DatedEvent[],
 	day: DateString,
 	plan: PlanView,
+	states: StateMap,
 ): bigint | undefined {
-	const planned = plannedAmounts(events, plan.flows, day, plan.inflation, noAccount)
+	const planned = plannedAmounts(events, plan.flows, day, plan.inflation, readerAhead(states, day))
 	if (!planned.ok) return undefined
 	let amount = 0n
 	for (const event of events) {
@@ -90,13 +90,16 @@ function landingDay(
 
 /**
  * Planned expenses over `[date, date + 12 months)` of the Flows that land as of `date`. Partial when
- * the window runs past the horizon, and `undefined` then or when a planned Derived amount fails.
+ * the window runs past the horizon, and `undefined` then or when a planned Derived amount fails. An
+ * `account` read is priced from `states` grown to the Landed date: `check()` lets a window beside
+ * only an Account nothing changes, whose later value is its state as it stands (ADR 0020).
  */
 export function plannedExpenses(
 	plan: PlanView,
 	fires: ReadonlyMap<string, DateString>,
 	date: DateString,
 	terms: MilestoneTerms,
+	states: StateMap,
 ): bigint | undefined {
 	const to = addMonthsClamped(date, 12)
 	if (to > addDays(plan.horizon, 1)) return undefined
@@ -106,7 +109,7 @@ export function plannedExpenses(
 		const { day, landing, next } = landingDay(plan.events, index, fires, date)
 		index = next
 		if (landing.length === 0) continue
-		const amount = expenseOn(landing, day, plan)
+		const amount = expenseOn(landing, day, plan, states)
 		if (amount === undefined) return undefined
 		total += termed(amount, day, plan.start, plan.inflation, terms)
 	}

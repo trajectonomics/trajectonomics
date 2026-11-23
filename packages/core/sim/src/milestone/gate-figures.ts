@@ -35,6 +35,6 @@ export function figuresOf(
 		expenses: (window, terms) =>
 			window === "trailing12Months"
 				? trailingExpenses(trail, date, view, terms)
-				: plannedExpenses(view, fires, date, terms),
+				: plannedExpenses(view, fires, date, terms, states),
 	}
 }
