@@ -33,6 +33,7 @@ describe("the reads of a what-if", () => {
 			"2026-10-31",
 			"--horizon",
 			"2060-12-31",
+			"--breakdown",
 			"--without=flows.gym",
 			'--set=flows.salary.amount="90000.50"',
 			"--decimal",
@@ -65,6 +66,15 @@ describe("the reads of a what-if", () => {
 			"base",
 		])
 		expect(reads.chance).toBeNull()
+	})
+
+	test("only the projection takes --breakdown, so the Cash flow page can show the session's lines and totals", () => {
+		const reads = whatIfReads({ ...PARAMS, monthly: true }, WHAT_IF)
+		expect(reads.projection.argv).toContain("--breakdown")
+		expect(reads.projection.argv.indexOf("--breakdown")).toBeLessThan(
+			reads.projection.argv.indexOf("--decimal"),
+		)
+		for (const other of [reads.fi, reads.compare]) expect(other.argv).not.toContain("--breakdown")
 	})
 
 	test("every read is a read leaf of the Snapshot allowlist", () => {

@@ -1,0 +1,77 @@
+import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../contract"
+import { overlayDocument } from "../../what-if/overlay"
+import type { SetChange } from "../../what-if/overrides"
+import { type AccountCard, accountCards } from "../plan-items/accounts"
+import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
+import type { PlanKind } from "../plan-items/kinds"
+import { type ItemMarks, type MarkMap, marksOf, shownCards, type WasField } from "./items"
+
+/** The session's changes to one plan, or null when no session is open on it. */
+export type PlanChanges = {
+	readonly sets: readonly SetChange[]
+	readonly removals: readonly string[]
+}
+
+const FLOW_FIELDS = ["amount", "frequency", "start", "end", "growth", "earned"] as const
+const ACCOUNT_FIELDS = ["rate", "compounding", "lockedUntil", "kind"] as const
+
+/** The cards of one planner page and what the session changes in each, by item id. */
+export interface ItemsView<T> {
+	readonly cards: readonly T[]
+	readonly marks: MarkMap
+}
+
+function marksFor<T extends { id: string }>(
+	baseline: readonly T[],
+	whatIf: readonly T[],
+	list: string,
+	changes: PlanChanges,
+	fields: readonly (keyof T & WasField)[],
+): Record<string, ItemMarks> {
+	return Object.fromEntries(
+		baseline.map((card) => [
+			card.id,
+			marksOf(
+				card,
+				whatIf.find((entry) => entry.id === card.id),
+				changes.removals.includes(`${list}.${card.id}`),
+				fields,
+			),
+		]),
+	)
+}
+
+/**
+ * The Flow cards of a page as the what-if holds them, with the baseline's text of each changed field. The
+ * Assets page lists no Flow, so its kind reads as income and its cards are not shown.
+ */
+export function flowItems(
+	doc: ScenarioDocument,
+	pageKind: PlanKind,
+	household: HouseholdDocument | null,
+	changes: PlanChanges | null,
+): ItemsView<FlowCard> {
+	const kind: FlowKind = pageKind === "expense" ? "expense" : "income"
+	const baseline = flowCards(doc.flows, kind, household)
+	if (changes === null) return { cards: baseline, marks: {} }
+	const whatIf = flowCards(overlayDocument(doc, changes).flows, kind, household)
+	return {
+		cards: shownCards(baseline, whatIf),
+		marks: marksFor(baseline, whatIf, "flows", changes, FLOW_FIELDS),
+	}
+}
+
+/** The Account cards as the what-if holds them, with the baseline's text of each changed field. */
+export function accountItems(
+	doc: ScenarioDocument,
+	baselineRead: Read<Baseline> | undefined,
+	changes: PlanChanges | null,
+): ItemsView<AccountCard> {
+	const baseline = accountCards(doc.accounts, baselineRead)
+	if (changes === null) return { cards: baseline, marks: {} }
+	const whatIf = accountCards(overlayDocument(doc, changes).accounts, baselineRead)
+	return {
+		cards: shownCards(baseline, whatIf),
+		marks: marksFor(baseline, whatIf, "accounts", changes, ACCOUNT_FIELDS),
+	}
+}
