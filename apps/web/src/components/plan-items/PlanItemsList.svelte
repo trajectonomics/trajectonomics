@@ -11,7 +11,7 @@ import { accountCards } from "../../lib/view/plan-items/accounts"
 import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
-import { loanCardsOf, unplacedFlows } from "../../lib/view/plan-items/loan-card"
+import { loanCardsOf, plainAccounts, unplacedFlows } from "../../lib/view/plan-items/loan-card"
 import { loanCards } from "../../lib/view/plan-items/loans"
 import EmptyState from "../ui/EmptyState.svelte"
 import AssetItems from "./AssetItems.svelte"
@@ -48,7 +48,7 @@ const cards = $derived(
 		? []
 		: flowCards(doc.flows, kind === "expense" ? "expense" : "income", household),
 )
-const accounts = $derived(accountCards(doc.accounts, baseline))
+const accounts = $derived(accountCards(plainAccounts(doc), baseline))
 const loans = $derived(kind === "assets" ? loanCardsOf(doc, run) : [])
 const other = $derived(kind === "assets" ? loanCards(unplacedFlows(doc)) : [])
 const busy = $derived(editSession.busy)

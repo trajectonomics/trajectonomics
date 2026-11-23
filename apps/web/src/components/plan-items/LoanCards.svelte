@@ -17,9 +17,9 @@ interface Props {
 let { cards, currency, editable, plan, contentHash, onEdit, onPay, onTry }: Props = $props()
 </script>
 
-<section class="space-y-3" aria-label="Loans">
+<section class="min-w-0 space-y-3" aria-label="Loans">
 	<h2 class="font-semibold">Loans</h2>
-	<ul class="grid gap-3 sm:grid-cols-2">
+	<ul class="grid min-w-0 gap-3 sm:grid-cols-2">
 		{#each cards as card (card.id)}
 			<LoanCard
 				{card}

@@ -15,7 +15,7 @@ let { years, currency }: Props = $props()
 {#if years.length === 0}
 	<p class="text-sm text-muted-foreground">No months in this Projection.</p>
 {:else}
-	<div class="mt-2 space-y-4 overflow-x-auto">
+	<div class="mt-2 min-w-0 max-w-full space-y-4 overflow-x-auto">
 		{#each years as year (year.year)}
 			<section aria-label="Schedule {year.year}">
 				<h4 class="text-sm font-medium">{year.year}</h4>

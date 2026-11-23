@@ -5,7 +5,7 @@
 import type { ProjectionRun, ScenarioDocument, ScenarioFlow } from "../../contract"
 import { formatBps } from "../../format/bps"
 import { type LoanParts, loanPartsOf } from "./loan-document"
-import { type LoanStatement, statementOf } from "./loan-statement"
+import { type LoanStatement, type LoanTerms, statementOf } from "./loan-statement"
 import type { LoanRow } from "./loans"
 
 /** The words a payment's rounding reads as on a card. */
@@ -49,6 +49,21 @@ function termsOf(loan: LoanParts): LoanRow[] {
 	]
 }
 
+/** What a loan's statement needs of the document: the first payment and the extra payments into the Account. */
+function termsOfStatement(doc: ScenarioDocument, loan: LoanParts): LoanTerms {
+	return {
+		firstPayment: loan.payment.start,
+		extras: doc.flows
+			.filter(
+				(flow) =>
+					flow.kind === "contribution" &&
+					flow.target === loan.account.id &&
+					flow.id !== loan.payment.id,
+			)
+			.map((flow) => ({ start: flow.start, end: flow.end, once: flow.frequency === "once" })),
+	}
+}
+
 /** The loan cards of a plan, in the order its document holds the loans, each with its statement. */
 export function loanCardsOf(doc: ScenarioDocument, run: ProjectionRun | undefined): LoanCardView[] {
 	return loanPartsOf(doc).map((loan) => ({
@@ -56,7 +71,7 @@ export function loanCardsOf(doc: ScenarioDocument, run: ProjectionRun | undefine
 		paymentId: loan.payment.id,
 		principal: loan.payment.level?.principal ?? "",
 		rows: termsOf(loan),
-		statement: statementOf(run, loan.account.id),
+		statement: statementOf(run, loan.account.id, termsOfStatement(doc, loan)),
 	}))
 }
 
@@ -69,4 +84,10 @@ export function unplacedFlows(doc: ScenarioDocument): ScenarioFlow[] {
 		]),
 	)
 	return doc.flows.filter((flow) => !placed.has(flow.id))
+}
+
+/** The Accounts a plain card shows: every Account except the debts a loan repays, which its loan card shows. */
+export function plainAccounts(doc: ScenarioDocument): ScenarioDocument["accounts"] {
+	const repaid = new Set(loanPartsOf(doc).map((loan) => loan.account.id))
+	return doc.accounts.filter((account) => !repaid.has(account.id))
 }

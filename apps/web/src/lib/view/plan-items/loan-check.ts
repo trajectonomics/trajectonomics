@@ -6,6 +6,7 @@
 import { parseBps } from "../../format/bps"
 import { isDateText, slugId, typedAmount } from "./form"
 import type { LoanDraft } from "./loan-draft"
+import { type OwedChoice, owedChoiceOf } from "./loan-owed"
 
 /** How often a loan's interest is added, which is also how often its payments fall. */
 export const LOAN_COMPOUNDINGS = ["monthly", "quarterly", "annual"] as const
@@ -24,10 +25,31 @@ function isWholeCount(text: string): boolean {
 	return count >= 1 && count <= MAX_PAYMENTS
 }
 
+/** The problems of the fields that name the loan: its name, or the debt it repays when it is already owed. */
+function identityProblems(
+	draft: LoanDraft,
+	options: { isNew: boolean; choices: readonly OwedChoice[]; keep?: string | undefined },
+	problems: Map<string, string>,
+): void {
+	if (draft.arrival !== "owed") {
+		if (options.isNew && slugId(draft.name) === "")
+			problems.set("name", "Enter a name for the loan.")
+		return
+	}
+	const known =
+		draft.owedAccount === options.keep || owedChoiceOf(options.choices, draft.owedAccount)
+	if (!known) {
+		problems.set("owedAccount", "Choose the debt the Baseline holds, which the loan repays.")
+	}
+}
+
 /** The problems a loan draft has at its fields: each text that is not a shape `traj` may take. */
-export function problemsOf(draft: LoanDraft, isNew: boolean): Map<string, string> {
+export function problemsOf(
+	draft: LoanDraft,
+	options: { isNew: boolean; choices: readonly OwedChoice[]; keep?: string | undefined },
+): Map<string, string> {
 	const problems = new Map<string, string>()
-	if (isNew && slugId(draft.name) === "") problems.set("name", "Enter a name for the loan.")
+	identityProblems(draft, options, problems)
 	if (typedAmount(draft.principal) === null) {
 		problems.set("principal", "Enter the amount borrowed as a decimal number, such as 500000.00.")
 	}

@@ -5,12 +5,21 @@ interface Props {
 }
 
 let { fields }: Props = $props()
+/** The label a loan's Try returns when the money's withdrawal would be added or taken out. */
+const MONEY = "the money"
+const cleared = $derived(fields.filter((field) => field !== MONEY))
 </script>
 
 <!-- traj replaces a path in a what-if and cannot delete one, so a cleared field is not tried; the Edit that saves the plan clears it. -->
-{#if fields.length > 0}
+{#if cleared.length > 0}
 	<p role="alert" class="text-sm text-destructive">
-		A what-if cannot clear {fields.join(", ")}: traj replaces a value and cannot delete one. The other changes
+		A what-if cannot clear {cleared.join(", ")}: traj replaces a value and cannot delete one. The other changes
 		are in the what-if. To clear it, close this and use Edit, which changes the plan itself.
+	</p>
+{/if}
+{#if fields.includes(MONEY)}
+	<p role="alert" class="text-sm text-destructive">
+		A what-if cannot add or take out the withdrawal that borrows the money. The other changes are in the
+		what-if. To change when the money arrives, close this and use Edit, which changes the plan itself.
 	</p>
 {/if}

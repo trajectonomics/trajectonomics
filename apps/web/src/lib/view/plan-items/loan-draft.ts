@@ -10,6 +10,7 @@ import { slugId, typedAmount } from "./form"
 import { accountOf, drawOf, loanIdOf, paymentOf } from "./loan-build"
 import { problemsOf } from "./loan-check"
 import type { LoanParts } from "./loan-document"
+import { type OwedChoice, owedChoiceOf } from "./loan-owed"
 import type { Problems } from "./problems"
 
 /** The text of a loan form. `arrival` is "owed" (the Baseline holds the debt) or "date" (it is borrowed on a date). */
@@ -24,10 +25,20 @@ export interface LoanDraft {
 	readonly rounding: string
 	readonly arrival: string
 	readonly arrivalDate: string
+	/** The Scenario id of the debt "I already owe it" attaches to: "" until the person chooses one. */
+	readonly owedAccount: string
 }
 
 /** The outcome of a loan form: the parts to save, or the problems it shows at its fields. */
 export type LoanResult = { ok: true; loan: LoanParts } | { ok: false; problems: Problems }
+
+/** The form's text for when the money arrives: a new loan, or one that borrows on a date, is borrowed on a date. */
+function arrivalOf(loan?: LoanParts): Pick<LoanDraft, "arrival" | "arrivalDate" | "owedAccount"> {
+	if (loan === undefined || loan.draw !== null) {
+		return { arrival: "date", arrivalDate: loan?.draw?.start ?? "", owedAccount: "" }
+	}
+	return { arrival: "owed", arrivalDate: "", owedAccount: loan.account.id }
+}
 
 /** The form's text for a loan to edit, or for a new one, which borrows on a date and is monthly. */
 export function loanDraftOf(loan?: LoanParts): LoanDraft {
@@ -40,27 +51,50 @@ export function loanDraftOf(loan?: LoanParts): LoanDraft {
 		payments: level === undefined ? "" : String(level.payments),
 		firstPayment: loan?.payment.start ?? "",
 		rounding: level?.rounding ?? "",
-		arrival: loan === undefined || loan.draw !== null ? "date" : "owed",
-		arrivalDate: loan?.draw?.start ?? "",
+		...arrivalOf(loan),
 	}
 }
 
+/** The ids a draft's loan takes: the Account it repays, and the key its payment and withdrawal ids start with. */
+function idsOf(
+	draft: LoanDraft,
+	options: { existing?: LoanParts | undefined; doc: ScenarioDocument },
+	owed: OwedChoice | undefined,
+): { id: string; key: string } {
+	const existing = options.existing?.account.id
+	const taken = [...accountIds(options.doc), ...flowIds(options.doc)]
+	const key = existing ?? loanIdOf(slugId(owed?.name ?? draft.name), taken)
+	return { id: existing ?? owed?.id ?? key, key }
+}
+
 /**
- * The loan a draft names. A new loan's id is made from its name, and an existing one keeps its ids and the
- * fields the form does not show. The checks are shape checks: `traj` refuses what it cannot accept.
+ * The loan a draft names. A new loan's ids are made from its name, or from the debt's name when the debt is
+ * already owed; an existing one keeps its ids and the fields the form does not show. "I already owe it"
+ * attaches the loan to the Baseline's debt the person chose (`choices`), so its statement opens at that
+ * balance. The checks are shape checks: `traj` refuses what it cannot accept.
  */
 export function loanFromDraft(
 	draft: LoanDraft,
-	options: { existing?: LoanParts | undefined; doc: ScenarioDocument },
+	options: {
+		existing?: LoanParts | undefined
+		doc: ScenarioDocument
+		choices?: readonly OwedChoice[]
+	},
 ): LoanResult {
-	const problems = problemsOf(draft, options.existing === undefined)
+	const { existing, doc } = options
+	const choices = options.choices ?? []
+	const problems = problemsOf(draft, {
+		isNew: existing === undefined,
+		choices,
+		keep: existing?.account.id,
+	})
 	if (problems.size > 0) return { ok: false, problems: Object.fromEntries(problems) }
-	const taken = [...accountIds(options.doc), ...flowIds(options.doc)]
-	const id = options.existing?.account.id ?? loanIdOf(slugId(draft.name), taken)
+	const owed = draft.arrival === "owed" ? owedChoiceOf(choices, draft.owedAccount) : undefined
+	const { id, key } = idsOf(draft, options, owed)
 	const principal = typedAmount(draft.principal) ?? ""
-	const account = accountOf(draft, options.existing, id)
-	const payment = paymentOf(draft, options.existing, id, principal)
-	const draw = draft.arrival === "date" ? drawOf(draft, options.existing, id, principal) : null
+	const account = accountOf(draft, existing?.account ?? doc.accounts.find((a) => a.id === id), id)
+	const payment = paymentOf(draft, existing, id, key, principal)
+	const draw = draft.arrival === "date" ? drawOf(draft, existing, id, key, principal) : null
 	if (account === null || payment === null || (draft.arrival === "date" && draw === null)) {
 		return { ok: false, problems: { general: "The loan cannot be saved as it is." } }
 	}

@@ -26,7 +26,7 @@ let { accounts, loans, other, currency, editable, plan, contentHash, open }: Pro
 </script>
 
 {#if accounts.length === 0}
-	<EmptyState title="No accounts in this plan" />
+	{#if loans.length === 0}<EmptyState title="No accounts in this plan" />{/if}
 {:else}
 	<AccountCards
 		cards={accounts}

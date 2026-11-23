@@ -47,6 +47,9 @@ async function save(event: SubmitEvent): Promise<void> {
 
 <!-- A payment into the loan, once or every month until an end. The engine caps it at what is owed. -->
 <form onsubmit={save} class="space-y-6" aria-label="Pay extra on {loanId}">
+	<p class="text-sm text-muted-foreground">
+		Pay extra is saved to the plan. A What-if cannot try it: it only changes values the plan already holds.
+	</p>
 	<div class="space-y-4">
 		<Field id="extra-amount" label="Amount" inputmode="decimal" hint="A decimal number, such as 10000.00" bind:value={draft.amount} problem={shown.at("amount")} />
 		<Field id="extra-mode" label="How often" options={EXTRA_MODE_CHOICES} bind:value={draft.mode} problem={shown.at("mode")} />

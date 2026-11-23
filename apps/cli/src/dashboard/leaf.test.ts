@@ -21,7 +21,10 @@ const SNAPSHOT = {
 		scenarios: single("scenario"),
 		netWorthHistory: [read(["report", "networth", "--json"], true)],
 		projections: {
-			base: read(["projection", "run", "--scenario", "base", "--breakdown", "--liabilities", "--json"], false),
+			base: read(
+				["projection", "run", "--scenario", "base", "--breakdown", "--liabilities", "--json"],
+				false,
+			),
 		},
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,

@@ -8,9 +8,11 @@ interface Props {
 	onDelete?: () => void
 	/** True when the drawer tries a value in the What-if session: the save is a Set, and nothing is deleted. */
 	trying?: boolean
+	/** What the delete removes and keeps, shown with the question when it is more than the item itself. */
+	note?: string | undefined
 }
 
-let { id, onDelete, trying = false }: Props = $props()
+let { id, onDelete, trying = false, note }: Props = $props()
 let confirming = $state(false)
 
 const button =
@@ -29,6 +31,7 @@ const button =
 	</div>
 	{#if id !== undefined && confirming}
 		<p class="text-sm text-foreground">Delete {id} from this plan?</p>
+		{#if note}<p class="text-sm text-muted-foreground">{note}</p>{/if}
 		<div class="flex flex-wrap gap-2">
 			<button type="button" onclick={onDelete} disabled={editSession.busy} class={button}>
 				Delete {id}

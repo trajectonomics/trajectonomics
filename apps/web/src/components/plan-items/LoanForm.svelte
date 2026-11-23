@@ -4,6 +4,7 @@ import type { Baseline, Read, ScenarioDocument } from "../../lib/contract"
 import { balanceOf } from "../../lib/view/plan-items/accounts"
 import { loanDocument, loanOf, withoutLoan } from "../../lib/view/plan-items/loan-document"
 import { type LoanDraft, loanDraftOf, loanFromDraft } from "../../lib/view/plan-items/loan-draft"
+import { owedChoicesOf } from "../../lib/view/plan-items/loan-owed"
 import { type LoanLayout, loanLayoutOf, loanShown } from "../../lib/view/plan-items/loan-refusal"
 import type { Problems } from "../../lib/view/plan-items/problems"
 import ItemActions from "./ItemActions.svelte"
@@ -29,7 +30,9 @@ interface Props {
 
 let { name, contentHash, doc, baseline, loanId, onDone, tryValue = false }: Props = $props()
 const existing = $derived(loanId === undefined ? undefined : loanOf(doc, loanId))
-const owed = $derived(existing === undefined ? null : balanceOf(existing.account, baseline))
+const choices = $derived(owedChoicesOf(doc, baseline, existing?.account.id))
+/** True when the Baseline holds a balance in the loan's Account: it stays declared, or no read can run. */
+const held = $derived(existing !== undefined && balanceOf(existing.account, baseline) !== null)
 const initial = () => loanDraftOf(existing)
 let draft: LoanDraft = $state(initial())
 let problems: Problems = $state({})
@@ -50,7 +53,7 @@ async function commit(next: ScenarioDocument, sent: LoanLayout): Promise<void> {
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = loanFromDraft(draft, { existing, doc })
+	const result = loanFromDraft(draft, { existing, doc, choices })
 	if (!result.ok) {
 		editSession.clear()
 		problems = result.problems
@@ -66,14 +69,33 @@ async function save(event: SubmitEvent): Promise<void> {
 	const next = loanDocument(doc, result.loan, existing)
 	await commit(next, loanLayoutOf(next, result.loan))
 }
+
+/** Takes the loan out of the plan, or says why it cannot be: nothing is sent when it is refused. */
+async function remove(): Promise<void> {
+	const removal = withoutLoan(doc, existing?.account.id ?? "", held)
+	if (removal.ok) await commit(removal.document, layout)
+	else {
+		editSession.clear()
+		problems = { general: removal.message }
+	}
+}
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit loan ${existing.account.id}` : "Add loan"}>
-	<LoanFields bind:draft editing={existing !== undefined} {owed} {shown} />
+	<LoanFields bind:draft editing={existing !== undefined} {choices} {shown} />
+	{#if tryValue}
+		<p class="text-sm text-muted-foreground">
+			A Try changes the loan's terms in the What-if. It cannot add or take out the withdrawal that borrows the
+			money, and it cannot pay extra.
+		</p>
+	{/if}
 	<TryNotice fields={cleared} />
 	<ItemActions
 		id={existing?.account.id}
-		onDelete={() => commit(withoutLoan(doc, existing?.account.id ?? ""), layout)}
+		onDelete={remove}
+		note={held
+			? `Its payments, extra payments and withdrawal are removed. The debt ${existing?.account.id} stays in the plan, because the ledger owes it.`
+			: undefined}
 		trying={tryValue}
 	/>
 </form>

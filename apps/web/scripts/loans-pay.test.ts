@@ -26,6 +26,8 @@ import { createEditor, type Editor } from "./serve-edit"
 
 const PLAN = "loan-pay"
 const LOAN = "boat-loan"
+/** What the statement needs of the boat loan: its first payment, and no extra payment yet. */
+const TERMS = { firstPayment: "2027-07-01", extras: [] }
 
 /** An Edit's answer: the new Snapshot, or the CLI's error envelope. */
 type Answer = {
@@ -111,6 +113,7 @@ const LOAN_DRAFT: LoanDraft = {
 	rounding: "halfUp",
 	arrival: "date",
 	arrivalDate: "2027-06-01",
+	owedAccount: "",
 }
 
 beforeAll(async () => {
@@ -149,8 +152,8 @@ describe("a loan saved from the planner, against the real traj", () => {
 			const after = documentOf(PLAN)
 			expect(loanOf(after, LOAN)).toBeDefined()
 			expect(after.flows.find((flow) => flow.id === `${LOAN}-draw`)?.start).toBe("2027-06-01")
-			expect(statementOf(run, LOAN).paidOff).not.toBeNull()
-			expect(statementOf(run, LOAN).payment).not.toBeNull()
+			expect(statementOf(run, LOAN, TERMS).paidOff).not.toBeNull()
+			expect(statementOf(run, LOAN, TERMS).payment).not.toBeNull()
 		},
 		SLOW_MS,
 	)
@@ -159,7 +162,7 @@ describe("a loan saved from the planner, against the real traj", () => {
 		"paying extra moves the paid-off date earlier",
 		async () => {
 			if (saved === null) throw new Error("the loan was not saved")
-			const paidOff = statementOf(saved, LOAN).paidOff
+			const paidOff = statementOf(saved, LOAN, TERMS).paidOff
 			if (paidOff === null) throw new Error("the loan has no paid-off date to move")
 			const current = documentOf(PLAN)
 			const extra = extraFromDraft(
@@ -169,7 +172,7 @@ describe("a loan saved from the planner, against the real traj", () => {
 			if (!extra.ok) throw new Error(JSON.stringify(extra.problems))
 			const answer = await saveDocument(withFlow(current, extra.flow))
 			if (!answer.ok) throw new Error(answer.error?.message)
-			const moved = statementOf(runOf(answer), LOAN).paidOff
+			const moved = statementOf(runOf(answer), LOAN, TERMS).paidOff
 			expect(moved).not.toBeNull()
 			expect(moved !== null && moved < paidOff).toBe(true)
 		},

@@ -49,11 +49,41 @@ export function loanDocument(
 	return { ...withParts, flows: loan.draw === null ? flows : upsert(flows, loan.draw) }
 }
 
-/** The document without a loan: its Account, and every Flow that pays it, borrows from it or repays it. */
-export function withoutLoan(doc: ScenarioDocument, id: string): ScenarioDocument {
+/** Whether a Measure graph (a Flow's `derive`) holds an `account` Measure that reads the Account of that id. */
+function readsAccount(node: unknown, id: string): boolean {
+	if (Array.isArray(node)) return node.some((item) => readsAccount(item, id))
+	if (typeof node !== "object" || node === null) return false
+	const record = node as Record<string, unknown>
+	if (record["op"] === "account" && record["account"] === id) return true
+	return Object.values(record).some((value) => readsAccount(value, id))
+}
+
+/** The outcome of taking a loan out of a plan: the document, or the reason it is refused. */
+export type LoanRemoval = { ok: true; document: ScenarioDocument } | { ok: false; message: string }
+
+/**
+ * The document without a loan: every Flow that pays it, borrows from it or repays it. Its Account goes too,
+ * unless the Baseline holds a balance in it (`baselineHolds`): a Baseline row whose Account the document does
+ * not declare makes every read fail (UNDECLARED_BALANCE_ACCOUNT), so that Account stays declared. An Account
+ * that another Flow's `derive` reads through an `account` Measure is refused by name, never left dangling.
+ */
+export function withoutLoan(
+	doc: ScenarioDocument,
+	id: string,
+	baselineHolds: boolean,
+): LoanRemoval {
+	const own = (flow: ScenarioFlow) => flow.target === id || flow.source === id
+	const flows = doc.flows.filter((flow) => !own(flow))
+	if (baselineHolds) return { ok: true, document: { ...doc, flows } }
+	const reader = flows.find((flow) => readsAccount(flow.derive, id))
+	if (reader !== undefined) {
+		return {
+			ok: false,
+			message: `The Flow ${reader.id} reads ${id} in its derived amount. Change or delete ${reader.id} first.`,
+		}
+	}
 	return {
-		...doc,
-		accounts: doc.accounts.filter((account) => account.id !== id),
-		flows: doc.flows.filter((flow) => flow.target !== id && flow.source !== id),
+		ok: true,
+		document: { ...doc, flows, accounts: doc.accounts.filter((a) => a.id !== id) },
 	}
 }

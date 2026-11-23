@@ -22,7 +22,7 @@ const button =
 	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 </script>
 
-<li class="rounded-lg border border-border bg-card p-4">
+<li class="min-w-0 rounded-lg border border-border bg-card p-4">
 	<div class="flex flex-wrap items-start justify-between gap-3">
 		<h3 class="font-semibold break-all">{card.id}</h3>
 		{#if editable}
@@ -40,9 +40,12 @@ const button =
 			<dt class="text-muted-foreground">{row.label}</dt>
 			<dd>{row.value}</dd>
 		{/each}
-		<dt class="text-muted-foreground">Payment</dt>
+		<dt class="text-muted-foreground">Paid in the first payment month</dt>
 		<dd>
-			{#if statement.payment !== null}<Money amount={statement.payment} {currency} />{:else}not reported{/if}
+			{#if statement.payment !== null}
+				<Money amount={statement.payment.amount} {currency} />
+				{#if statement.payment.withExtra}<span class="text-xs text-muted-foreground">(with an extra payment)</span>{/if}
+			{:else}not reported{/if}
 		</dd>
 	</dl>
 	<p class="mt-3 text-sm">
@@ -59,6 +62,9 @@ const button =
 		<LoanSchedule years={statement.years} {currency} />
 	</details>
 	{#if editable}
+		<p class="mt-3 text-xs text-muted-foreground">
+			A What-if tries this loan's terms. It cannot pay extra, and it cannot add or take out the withdrawal that borrows the money.
+		</p>
 		<ItemSwitch {plan} {contentHash} path="flows.{card.paymentId}" label={card.id} onTry={onTry} />
 	{/if}
 </li>

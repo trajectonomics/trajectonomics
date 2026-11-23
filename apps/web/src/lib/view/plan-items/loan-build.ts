@@ -22,14 +22,17 @@ export function loanIdOf(base: string, taken: readonly string[]): string {
 	}
 }
 
-/** The liability Account a draft names, or null when `traj`'s schema would refuse it. */
+/**
+ * The liability Account a draft names, or null when `traj`'s schema would refuse it. `base` is the Account the
+ * loan keeps the other fields of: its own, or the plan's declaration of the debt it attaches to.
+ */
 export function accountOf(
 	draft: LoanDraft,
-	existing: LoanParts | undefined,
+	base: ScenarioAccount | undefined,
 	id: string,
 ): ScenarioAccount | null {
 	const parsed = scenarioAccount.safeParse({
-		...withoutKeys(existing?.account ?? {}, ["rate", "compounding"]),
+		...withoutKeys(base ?? {}, ["rate", "compounding"]),
 		id,
 		kind: "liability",
 		rate: parseBps(draft.rate),
@@ -43,6 +46,7 @@ export function paymentOf(
 	draft: LoanDraft,
 	existing: LoanParts | undefined,
 	id: string,
+	key: string,
 	principal: string,
 ): ScenarioFlow | null {
 	const parsed = scenarioFlow.safeParse({
@@ -54,7 +58,7 @@ export function paymentOf(
 			"start",
 			"target",
 		]),
-		id: existing?.payment.id ?? `${id}-payment`,
+		id: existing?.payment.id ?? `${key}-payment`,
 		kind: "contribution",
 		target: id,
 		frequency: draft.compounding,
@@ -69,10 +73,11 @@ export function drawOf(
 	draft: LoanDraft,
 	existing: LoanParts | undefined,
 	id: string,
+	key: string,
 	principal: string,
 ): ScenarioFlow | null {
 	const parsed = scenarioFlow.safeParse({
-		id: existing?.draw?.id ?? `${id}-draw`,
+		id: existing?.draw?.id ?? `${key}-draw`,
 		kind: "withdrawal",
 		frequency: "once",
 		start: draft.arrivalDate.trim(),

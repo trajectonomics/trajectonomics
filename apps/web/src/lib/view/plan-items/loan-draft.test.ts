@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ErrorBody } from "../../contract"
 import { planDocument } from "./fixtures.test-support"
-import { loanDocument, loanOf, withoutLoan } from "./loan-document"
+import { loanDocument, loanOf } from "./loan-document"
 import { type LoanDraft, loanDraftOf, loanFromDraft } from "./loan-draft"
 import { loanPlanDocument } from "./loan-fixtures.test-support"
 import { loanFieldOfRefusal, loanLayoutOf, loanShown } from "./loan-refusal"
@@ -18,6 +18,7 @@ function newDraft(overrides: Partial<LoanDraft> = {}): LoanDraft {
 		rounding: "halfUp",
 		arrival: "date",
 		arrivalDate: "2027-06-01",
+		owedAccount: "",
 		...overrides,
 	}
 }
@@ -63,14 +64,6 @@ describe("a new loan's ids and parts", () => {
 		expect(result.loan.payment.id).toBe("loan-2-payment")
 	})
 
-	test("a loan the Baseline already holds is saved with no withdrawal", () => {
-		const result = loanFromDraft(newDraft({ arrival: "owed", arrivalDate: "" }), {
-			doc: planDocument(),
-		})
-		if (!result.ok) throw new Error(JSON.stringify(result.problems))
-		expect(result.loan.draw).toBeNull()
-	})
-
 	test("the document gains the three parts and keeps every other item of the plan", () => {
 		const doc = planDocument()
 		const result = loanFromDraft(newDraft(), { doc })
@@ -112,20 +105,17 @@ describe("editing and deleting a loan", () => {
 		const existing = loanOf(doc, "loan")
 		if (existing === undefined) throw new Error("the fixture has no loan")
 		const result = loanFromDraft(
-			{ ...loanDraftOf(existing), arrival: "owed", arrivalDate: "" },
-			{ existing, doc },
+			{ ...loanDraftOf(existing), arrival: "owed", arrivalDate: "", owedAccount: "loan" },
+			{
+				existing,
+				doc,
+				choices: [{ id: "loan", name: "Car Loan", balance: "184000.00", declared: true }],
+			},
 		)
 		if (!result.ok) throw new Error(JSON.stringify(result.problems))
 		const next = loanDocument(doc, result.loan, existing)
 		expect(next.flows.map((flow) => flow.id)).not.toContain("car-draw")
 		expect(next.flows.map((flow) => flow.id)).toContain("car-loan")
-	})
-
-	test("deleting a loan removes its Account and every Flow that pays it or borrows from it", () => {
-		const doc = loanPlanDocument()
-		const next = withoutLoan(doc, "loan")
-		expect(next.accounts.map((account) => account.id)).toEqual(["bank"])
-		expect(next.flows.map((flow) => flow.id)).toEqual(planDocument().flows.map((flow) => flow.id))
 	})
 })
 
