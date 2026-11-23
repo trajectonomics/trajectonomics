@@ -8,6 +8,7 @@ import type {
 	MinorUnits,
 } from "./common"
 import type { Derive, Rounding } from "./measure"
+import type { RuledAmount } from "./rule"
 
 /** One Levy's share of an income Occurrence, in basis points of the gross. */
 export interface Prepayment {
@@ -93,7 +94,7 @@ export interface ContributionRules {
 }
 
 export type IncomeFlow = FlowBase & IncomeRules & (FixedAmount | DerivedAmount)
-export type ExpenseFlow = FlowBase & ExpenseRules & (FixedAmount | DerivedAmount)
+export type ExpenseFlow = FlowBase & ExpenseRules & (FixedAmount | DerivedAmount | RuledAmount)
 /**
  * Cash moves into cashflow on each Landed date; it is not income. A liability `source` borrows (the
  * amount owed grows); an asset `source` is sold (`min(planned, value)` leaves it, ADR 0021).
@@ -118,6 +119,11 @@ export function isFixed(flow: Flow): flow is Flow & FixedAmount {
 /** Whether a Flow carries a `level` loan payment rather than an `amount` or `derive`. */
 export function isLevel(flow: Flow): flow is Flow & LevelAmount {
 	return "level" in flow
+}
+
+/** Whether a Flow carries a Spending `rule` rather than an `amount`, `derive` or `level`. */
+export function isRuled(flow: Flow): flow is Flow & RuledAmount {
+	return "rule" in flow
 }
 
 /** Whether a Flow carries a `derive` graph rather than a fixed `amount`. */

@@ -1,10 +1,11 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString, Derive, Flow } from "../types"
-import { isDerived, isFixed } from "../types"
+import { isDerived, isFixed, isRuled } from "../types"
 import { oracleAccountAt } from "./oracle-account"
 import { oracleCalendar } from "./oracle-calendar"
 import { oracleDeriveValues } from "./oracle-derive"
 import { type OracleEvent, oracleAmount, oracleEvents } from "./oracle-flow"
+import { type OracleRuleLog, oracleRulePay } from "./oracle-rule"
 
 /** The Flow ids a Derived amount reads, in Measure order, from the raw graph. */
 function flowReferences(derive: Derive): readonly string[] {
@@ -35,20 +36,48 @@ export function oracleOrdered(flows: readonly Flow[]): readonly Flow[] {
 	return out
 }
 
+/** One Occurrence's planned amount when its Flow is fixed or ruled, else `undefined`. */
+function oracleOccurrence(
+	event: OracleEvent,
+	at: { date: DateString; years: number; inflation: number },
+	readAccount: (account: string) => bigint,
+	rules: ReadonlyMap<string, OracleRuleLog>,
+): bigint | undefined {
+	const { flow } = event
+	if (isFixed(flow)) return oracleAmount(event, at.inflation)
+	const log = rules.get(flow.id)
+	return isRuled(flow) && log !== undefined ? oracleRulePay(log, flow, at, readAccount) : undefined
+}
+
+/** The fixed and rule totals of one date, and how many Occurrences each Flow has on it. */
+function oracleBaseTotals(
+	events: readonly OracleEvent[],
+	date: DateString,
+	inflation: number,
+	readAccount: (account: string) => bigint,
+	rules: ReadonlyMap<string, OracleRuleLog>,
+) {
+	const totals = new Map<string, bigint>()
+	const counts = new Map<string, number>()
+	for (const event of events) {
+		const id = event.flow.id
+		counts.set(id, (counts.get(id) ?? 0) + 1)
+		const at = { date, years: event.years, inflation }
+		const amount = oracleOccurrence(event, at, readAccount, rules)
+		if (amount !== undefined) totals.set(id, (totals.get(id) ?? 0n) + amount)
+	}
+	return { totals, counts }
+}
+
 export function oraclePlannedDay(
 	events: readonly OracleEvent[],
 	derivation: readonly Flow[],
 	date: DateString,
 	inflation: number,
 	readAccount: (account: string) => bigint,
+	rules: ReadonlyMap<string, OracleRuleLog> = new Map(),
 ): PlannedDay {
-	const totals = new Map<string, bigint>()
-	const counts = new Map<string, number>()
-	for (const event of events) {
-		counts.set(event.flow.id, (counts.get(event.flow.id) ?? 0) + 1)
-		if (!isFixed(event.flow)) continue
-		totals.set(event.flow.id, (totals.get(event.flow.id) ?? 0n) + oracleAmount(event, inflation))
-	}
+	const { totals, counts } = oracleBaseTotals(events, date, inflation, readAccount, rules)
 	for (const flow of derivation) {
 		const count = BigInt(counts.get(flow.id) ?? 0)
 		if (count === 0n || !isDerived(flow)) continue

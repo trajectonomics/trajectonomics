@@ -2,10 +2,11 @@ import { checkAssetFlow } from "./asset-flow"
 import type { Check, Emit, Path } from "./codes"
 import { isValidDate } from "./date"
 import { checkAccountReads } from "./flow-accounts"
-import { NOT_ALLOWED } from "./flow-fields"
+import { NOT_ALLOWED, NOT_EXPENSE } from "./flow-fields"
 import { checkFlowGraph } from "./flow-graph"
 import { type FlowContext, flowShape } from "./flow-shape"
 import { checkLoanFlow } from "./loans"
+import { checkRuleFlow } from "./rule-flow"
 import { checkShape, checkUnique, isRecord, list, type Shape } from "./shape"
 
 export type { FlowContext }
@@ -18,7 +19,7 @@ function checkDates(flow: Readonly<Record<string, unknown>>, path: Path, emit: E
 	else if (frequency === "once" && end !== start) emit("ONCE_FLOW_END_MISMATCH", [...path, "end"])
 }
 
-const AMOUNT_FORMS = ["amount", "derive", "level"] as const
+const AMOUNT_FORMS = ["amount", "derive", "level", "rule"] as const
 
 /** `growth` belongs to a fixed `amount` only; a derived or loan amount takes none. */
 function checkGrowth(
@@ -36,7 +37,9 @@ function checkGrowth(
 
 /** The amount forms the Flow's kind refuses outright: `checkShape` has already reported each one. */
 function refusedForms(shape: Shape): ReadonlySet<string> {
-	return new Set(AMOUNT_FORMS.filter((key) => shape[key] === NOT_ALLOWED))
+	return new Set(
+		AMOUNT_FORMS.filter((key) => shape[key] === NOT_ALLOWED || shape[key] === NOT_EXPENSE),
+	)
 }
 
 /**
@@ -65,6 +68,7 @@ function flowCheck(context: FlowContext): Check {
 		if (!flow) return
 		checkDates(flow, path, emit)
 		checkAmount(flow, path, refusedForms(shape), emit)
+		checkRuleFlow(flow, path, emit)
 		checkLoanFlow(flow, path, context.loans, emit)
 		checkAssetFlow(flow, path, context.loans, emit)
 	}

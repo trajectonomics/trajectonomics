@@ -1,5 +1,6 @@
 import { addDays, addMonthsClamped } from "../calendar/arith"
 import { readerAhead } from "../engine/account-values"
+import { occurrenceAmount } from "../engine/aggregate"
 import { plannedAmounts } from "../engine/derive"
 import type { DatedEvent } from "../engine/events"
 import type { StateMap } from "../engine/state"
@@ -66,7 +67,7 @@ function expenseOn(
 	let amount = 0n
 	for (const event of events) {
 		if (event.flow.kind !== "expense") continue
-		amount += event.amount ?? planned.planned.derived.get(event.flow.id) ?? 0n
+		amount += occurrenceAmount(event, planned.planned)
 	}
 	return amount
 }

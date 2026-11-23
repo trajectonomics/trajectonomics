@@ -8,6 +8,7 @@ import type { DayTotals, EngineRunsOut } from "./occurrence"
 import { processDate } from "./occurrence"
 import { isSafeInteger, overflow } from "./overflow"
 import type { EngineResult } from "./result"
+import type { RuleBook } from "./rule-book"
 import { type EngineSnapshot, snapshot } from "./snapshot"
 import type { StateMap } from "./state"
 
@@ -18,6 +19,8 @@ export interface RunAccumulator {
 	readonly levies: LevySet | undefined
 	readonly gate: MilestoneGate | undefined
 	readonly ledger: LiabilityLedger | undefined
+	/** The rule Flows' Rule years, present only when the Scenario declares one (ADR 0023). */
+	readonly rules?: RuleBook
 	/** Whether each date records its cash-flow lines; only the breakdown option turns it on. */
 	readonly breakdown: boolean
 }
@@ -49,7 +52,7 @@ function handleDay(
 ): EngineResult | undefined {
 	const settlement = acc.levies !== undefined && hasSettlement(acc.levies, date)
 	if (events.length === 0 && !settlement) return undefined
-	const outcome = processDate(states, scenario, date, events, acc.levies, acc.breakdown)
+	const outcome = processDate(states, scenario, date, events, acc.levies, acc.breakdown, acc.rules)
 	acc.totals.push(outcome.totals)
 	acc.gate?.record(outcome.totals)
 	if (acc.ledger !== undefined) recordMoves(acc.ledger, states, outcome.totals)

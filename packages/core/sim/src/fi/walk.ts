@@ -3,7 +3,7 @@ import { flowsAt } from "../engine/events"
 import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { BufferBreach } from "./buffer"
-import { cloneLevySet, cloneStates } from "./clone"
+import { cloneLevySet, cloneRules, cloneStates } from "./clone"
 import type { PrefixPoint } from "./prefix"
 import { recordReads } from "./read-dates"
 import { gridDates, gridEvents, lowerBound, type ScanGrid } from "./scan-grid"
@@ -34,6 +34,7 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 	const point = {
 		states: cloneStates(input.point.states),
 		levies: cloneLevySet(input.point.levies),
+		...(input.point.rules && { rules: cloneRules(input.point.rules) }),
 		...(input.point.gate && {
 			gate: input.point.gate.clone(events, stopsFlow(grid.retirement)),
 		}),

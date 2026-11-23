@@ -41,6 +41,7 @@ export function checkScenario(
 		levyIds: idsOf(levies),
 		milestoneIds: idsOf(milestones),
 		loans: loanIndex(isRecord(value) ? value["accounts"] : undefined),
+		illiquid: illiquidAccountIds(isRecord(value) ? value["accounts"] : undefined),
 	}
 	const shape = {
 		schemaVersion: req(anyVersion),
@@ -57,6 +58,5 @@ export function checkScenario(
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
 	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], path, emit)
-	const illiquid = illiquidAccountIds(isRecord(value) ? value["accounts"] : undefined)
-	checkIlliquidRouting(checked?.["cashflow"], illiquid, path, emit)
+	checkIlliquidRouting(checked?.["cashflow"], context.illiquid, path, emit)
 }

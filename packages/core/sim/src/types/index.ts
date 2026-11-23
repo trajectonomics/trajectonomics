@@ -50,6 +50,7 @@ export {
 	isDerived,
 	isFixed,
 	isLevel,
+	isRuled,
 	type LevelLoan,
 	type Prepayment,
 	type WithdrawalFlow,
@@ -84,6 +85,7 @@ export type {
 	RuleOfThumbReference,
 	TwentyFiveTimesReference,
 } from "./reference"
+export type * from "./rule"
 export type { LabelSaving, SavingStop, SavingsOptions, SavingsResult } from "./savings"
 export type { Economy, Scenario } from "./scenario"
 export type { LiabilityMonth, LiabilityStatement, ProjectionOptions } from "./statement"

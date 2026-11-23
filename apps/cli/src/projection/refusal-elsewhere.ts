@@ -90,4 +90,10 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	TOO_MANY_STEPS: never,
 	INVALID_OPTION: never,
 	PERIOD_DUE_MISMATCH: never,
+	// A Spending rule the CLI does not publish yet; the CLI change for #360 (#362) makes these user-facing.
+	RULE_NOT_EXPENSE: never,
+	RULE_PORTFOLIO_LIABILITY: never,
+	RULE_PORTFOLIO_ILLIQUID: never,
+	RULE_FREQUENCY: never,
+	RULE_FLOOR_ABOVE_CEILING: never,
 }

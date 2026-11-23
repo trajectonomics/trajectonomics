@@ -4,6 +4,7 @@ import { oracleFire, oracleWorth } from "./oracle-account-worth"
 import type { OracleEvent } from "./oracle-flow"
 import { type OracleFires, oracleLands } from "./oracle-milestone-walk"
 import { oraclePlannedDay, type PlannedDay } from "./oracle-planned"
+import type { OracleRuleLog } from "./oracle-rule"
 import { type OracleStates, oracleValuation } from "./oracle-state"
 
 /** A `once` Flow with a Milestone start waits for it, and lands on the first day it is open. */
@@ -32,6 +33,8 @@ export interface Context {
 	readonly known: OracleFires
 	readonly pending: Flow[]
 	readonly derivation: readonly Flow[]
+	/** The Rule years of each rule Flow, by id; empty when the Scenario has none. */
+	readonly rules: ReadonlyMap<string, OracleRuleLog>
 }
 
 /**
@@ -44,7 +47,7 @@ export function priceDay(
 	due: readonly OracleEvent[],
 	live: boolean,
 ): Day {
-	const { fixture, states, known, pending, derivation } = ctx
+	const { fixture, states, known, pending, derivation, rules } = ctx
 	const { scenario, timeline } = fixture
 	if (live && due.length > 0 && day <= timeline.horizon) {
 		oracleFire(known, scenario.milestones ?? [], day, oracleWorth(states, day))
@@ -56,6 +59,6 @@ export function priceDay(
 	const read = (account: string): bigint => oracleValuation(states.get(account)!, day)
 	return {
 		landing,
-		planned: oraclePlannedDay(landing, derivation, day, scenario.economy.inflation, read),
+		planned: oraclePlannedDay(landing, derivation, day, scenario.economy.inflation, read, rules),
 	}
 }

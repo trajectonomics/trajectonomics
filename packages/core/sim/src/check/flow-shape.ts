@@ -1,11 +1,13 @@
 import { FLOW_KINDS, FREQUENCIES, FUNDINGS } from "../vocab"
-import type { AccountIndex, Check } from "./codes"
+import type { AccountIndex } from "./codes"
 import { derive } from "./derive"
-import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED } from "./flow-fields"
+import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED, NOT_EXPENSE } from "./flow-fields"
+import { gates } from "./flow-gates"
 import { levelField } from "./level-loan"
 import type { LoanIndex } from "./loan-index"
 import { prepayments } from "./prepayments"
 import { accountRef } from "./refs"
+import { spendingRule } from "./rule"
 import { amount, bool, date, growth, oneOf, str } from "./scalars"
 import { opt, req, type Shape } from "./shape"
 
@@ -17,14 +19,8 @@ export interface FlowContext {
 	readonly milestoneIds: ReadonlySet<string>
 	/** The raw loan fields of each declared Account, for a withdrawal source and a level payment. */
 	readonly loans: LoanIndex
-}
-
-/** A Milestone id a Flow gates on: a string that names a declared Milestone. */
-function milestoneRef(ids: ReadonlySet<string>): Check {
-	return (value, path, emit) => {
-		if (typeof value !== "string") emit("WRONG_TYPE", path)
-		else if (!ids.has(value)) emit("UNKNOWN_MILESTONE", path)
-	}
+	/** The asset Accounts marked `liquid: false`, which a Spending rule's portfolio refuses. */
+	readonly illiquid: ReadonlySet<string>
 }
 
 const base: Shape = {
@@ -38,18 +34,13 @@ const base: Shape = {
 	derive: opt(derive),
 }
 
-function gates(context: FlowContext): Shape {
-	const ref = milestoneRef(context.milestoneIds)
-	return { startAt: opt(ref), endAt: opt(ref) }
-}
-
 /**
  * Keys allowed per flow kind; an invalid kind accepts every optional kind-specific key.
  * `label`, `prepayments` and `cappedPrepayment` need a Levy in the Scenario (`hasLevy`).
  */
 export function flowShape(kind: unknown, context: FlowContext): Shape {
 	const target = accountRef(context.accounts)
-	const shared = { ...base, ...gates(context) }
+	const shared = { ...base, ...gates(context), rule: NOT_EXPENSE }
 	const levied = {
 		label: label(context.hasLevy),
 		prepayments: prepayments(context.hasLevy, context.levyIds),
@@ -78,6 +69,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	if (kind === "expense") {
 		return {
 			...shared,
+			rule: opt(spendingRule(context)),
 			category: opt(expenseCategory),
 			funding: NOT_ALLOWED,
 			label: NOT_ALLOWED,
@@ -99,6 +91,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	}
 	return {
 		...shared,
+		rule: opt(spendingRule(context)),
 		category: opt(expenseCategory),
 		earned: opt(bool),
 		target: opt(target),

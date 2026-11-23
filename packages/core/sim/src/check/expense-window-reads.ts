@@ -42,6 +42,17 @@ function readsMoving(flows: unknown, moving: ReadonlySet<string>): boolean {
 	)
 }
 
+/** Whether any Flow carries a Spending `rule`, whose amount depends on the years before it (ADR 0023). */
+function hasRule(flows: unknown): boolean {
+	return Array.isArray(flows) && flows.some((flow) => isRecord(flow) && Object.hasOwn(flow, "rule"))
+}
+
+/** Whether a Flow's amount cannot be priced over a year the run has not walked. */
+function refusesWindow(scenario: Readonly<Record<string, unknown>>): boolean {
+	const flows = scenario["flows"]
+	return hasRule(flows) || readsMoving(flows, changeable(scenario))
+}
+
 /** Reports each `expenses: next12Months` Metric of one criterion, at the Metric's `expenses` key. */
 function reportCriterion(criterion: unknown, at: Path, emit: Emit): void {
 	if (!isRecord(criterion)) return
@@ -57,10 +68,11 @@ function reportCriterion(criterion: unknown, at: Path, emit: Emit): void {
  * A Milestone's `next12Months` expense window plans each Flow's amounts over a year it has not
  * walked. A Derived amount that reads an Account that nothing changes is priced from that Account's
  * state as it stands, grown to each date. One that reads an Account that can change on a future
- * date would need a forward walk, so the two do not meet in one Scenario (ADR 0020).
+ * date would need a forward walk, so the two do not meet in one Scenario (ADR 0020). A rule Flow
+ * never meets one: its amount carries last year's, which a window that has not walked cannot know.
  */
 export function checkExpenseWindowReads(scenario: unknown, emit: Emit): void {
-	if (!isRecord(scenario) || !readsMoving(scenario["flows"], changeable(scenario))) return
+	if (!isRecord(scenario) || !refusesWindow(scenario)) return
 	const milestones = scenario["milestones"]
 	if (!Array.isArray(milestones)) return
 	for (let index = 0; index < milestones.length; index++) {

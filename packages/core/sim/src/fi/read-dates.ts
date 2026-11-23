@@ -2,7 +2,7 @@ import type { RecordedValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import type { StateMap } from "../engine/state"
 import type { DateString } from "../types"
-import { isDerived } from "../types"
+import { isDerived, isRuled } from "../types"
 
 /** The dates a window reads an Account on, sorted: where the original plan has a Derived event. */
 export interface ReadDates {
@@ -10,10 +10,10 @@ export interface ReadDates {
 	readonly set: ReadonlySet<DateString>
 }
 
-/** The dates of the original plan's Derived events, which its windows price (ADR 0020). */
+/** The dates of the original plan's Derived and rule events, which its windows price (ADR 0020, 0023). */
 export function readDatesOf(events: readonly DatedEvent[]): ReadDates {
 	const set = new Set<DateString>()
-	for (const event of events) if (isDerived(event.flow)) set.add(event.date)
+	for (const event of events) if (isDerived(event.flow) || isRuled(event.flow)) set.add(event.date)
 	return { sorted: [...set].sort(), set }
 }
 

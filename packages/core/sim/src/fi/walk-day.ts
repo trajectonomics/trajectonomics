@@ -23,7 +23,15 @@ function processFlows(
 ): DayOutcome {
 	const { scenario, point } = input
 	if (dayEvents.length === 0 && !settled) return { kind: "ok" }
-	const outcome = processDate(point.states, scenario, date, dayEvents, point.levies)
+	const outcome = processDate(
+		point.states,
+		scenario,
+		date,
+		dayEvents,
+		point.levies,
+		false,
+		point.rules,
+	)
 	point.gate?.record(outcome.totals)
 	if (outcome.problem !== undefined) return { kind: "problem", problem: outcome.problem }
 	if (outcome.runsOut === undefined) return { kind: "ok" }
