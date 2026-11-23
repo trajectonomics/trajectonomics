@@ -20,7 +20,9 @@ const SNAPSHOT = {
 		baseline: single("baseline"),
 		scenarios: single("scenario"),
 		netWorthHistory: [read(["report", "networth", "--json"], true)],
-		projections: { base: read(["projection", "run", "--scenario", "base", "--json"], false) },
+		projections: {
+			base: read(["projection", "run", "--scenario", "base", "--breakdown", "--json"], false),
+		},
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
 		chance: {},
@@ -62,7 +64,7 @@ describe("traj dashboard", () => {
 			asOf: "2026-11-30",
 			horizon: "2056-11-30",
 			reads: 11,
-			failedReads: ["traj projection run --scenario base --json"],
+			failedReads: ["traj projection run --scenario base --breakdown --json"],
 		})
 		expect(calls[0]?.port).toBe(DEFAULT_PORT)
 		expect(calls[0]?.params.compare).toBeNull()

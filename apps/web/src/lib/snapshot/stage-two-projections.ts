@@ -29,7 +29,10 @@ function perScenario(
 	)
 }
 
-/** One `projection run` per Scenario, with the monthly rows when asked. */
+/**
+ * One `projection run` per Scenario, with the monthly rows when asked. Every run takes `--breakdown`, so
+ * the Cash flow page has each year's lines and section totals (cli ADR-0058, addendum).
+ */
 export function planProjections(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const monthly = params.monthly ? ["--monthly"] : []
 	return perScenario(params, names, (name) => [
@@ -38,6 +41,7 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 		scenarioFlag(name),
 		...projectionFlags(params),
 		...monthly,
+		"--breakdown",
 		"--json",
 	])
 }

@@ -43,3 +43,11 @@ _Avoid_: link, rule, trigger
 **Milestone**:
 A named target in a Scenario that fires on a date, on another Milestone, or when a figure such as net worth passes a level (sim ADR 0012). The Dashboard shows the date `traj projection run` reports for each one, or that it is not reached; it never works one out.
 _Avoid_: Goal, event, target date
+
+**Cash flow**:
+The lines and section totals of one Annual roll-up, as `projection run --breakdown` states them: where a year's money came from (income, withdrawals, money drawn) and where it went (tax, spending by category, saving per Flow, money left over), with any Shortfall as unmet.
+_Avoid_: budget, ledger, transactions
+
+**Flow diagram**:
+The picture of one year's cash flow on the Cash flow page: sources on the left, the cash node, and uses on the right, with each band's height its amount's share of the taller column. Pure geometry from `src/lib/chart/flow.ts`; it adds no figure of its own.
+_Avoid_: Sankey (as a name for the page), chart, graph
