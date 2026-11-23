@@ -79,7 +79,7 @@ The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow, co
 _Avoid_: Spending year, withdrawal year, rule period
 
 **Spending rule statement**:
-What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
+What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, both also in today's money (`real.amount`, `real.paid`, each deflated once at the year's first date), the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
 _Avoid_: Spending report, withdrawal schedule
 
 **Estate statement**:

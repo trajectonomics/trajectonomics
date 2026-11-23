@@ -8684,7 +8684,7 @@
 		"projectOptions": {
 			"spendingRules": true
 		},
-		"sha256": "821975864f5d25698792b31238a4f7905f0eb4fa5aa5787da0e8ce1602fc7e5f"
+		"sha256": "cee4e752525160cf49df1e4576f7243866a4e59003a250a8f72c468c2b64d571"
 	},
 	{
 		"name": "rule-current-rate-bounds",
@@ -8767,7 +8767,7 @@
 		"projectOptions": {
 			"spendingRules": true
 		},
-		"sha256": "34d4942a80434f37ddcc50776bba1105510f256bf0a9d8f341c0dce96aead475",
+		"sha256": "31580096ebeaa09a1abc1670ad5387c2d7034f95476a38d9bd0a31d6534c2d62",
 		"chance": {
 			"model": {
 				"id": "rule-market",
@@ -8861,7 +8861,7 @@
 		"projectOptions": {
 			"spendingRules": true
 		},
-		"sha256": "821975864f5d25698792b31238a4f7905f0eb4fa5aa5787da0e8ce1602fc7e5f"
+		"sha256": "cee4e752525160cf49df1e4576f7243866a4e59003a250a8f72c468c2b64d571"
 	},
 	{
 		"name": "rule-guardrails-chance",

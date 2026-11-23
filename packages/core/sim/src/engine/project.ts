@@ -42,7 +42,10 @@ export function project(
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
 	const ruled =
 		options.spendingRules === true
-			? { ...output.projection, spendingRules: ruleStatements(result.run.rules, scenario) }
+			? {
+					...output.projection,
+					spendingRules: ruleStatements(result.run.rules, scenario, timeline.start),
+				}
 			: output.projection
 	const estate = options.estate === true ? buildEstate(ruled.rows, scenario, timeline) : undefined
 	if (estate !== undefined && "problem" in estate) return { ok: false, problems: [estate.problem] }

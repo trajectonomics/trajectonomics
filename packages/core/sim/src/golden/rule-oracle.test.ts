@@ -5,7 +5,9 @@ import type { Flow, SpendingRule } from "../types"
 import { isRuled } from "../types"
 import { oracleAccountAt } from "./oracle-account"
 import { oracleCalendar } from "./oracle-calendar"
+import { oracleCountedDays } from "./oracle-date"
 import { oracleEvents } from "./oracle-flow"
+import { oracleDeflate } from "./oracle-money"
 import { oracleRuleLog, oracleRulePay } from "./oracle-rule"
 
 const base = { portfolio: ["inv"], rateBps: 400, rounding: "halfUp" } as const
@@ -32,6 +34,14 @@ function replay(fixture: Fixture, flow: Flow & { rule: SpendingRule }) {
 		portfolio: Number(year.portfolio),
 		amount: Number(year.amount),
 		paid: Number(year.paid),
+		real: {
+			amount: Number(
+				oracleDeflate(year.amount, inflation, oracleCountedDays(timeline.start, year.date)),
+			),
+			paid: Number(
+				oracleDeflate(year.paid, inflation, oracleCountedDays(timeline.start, year.date)),
+			),
+		},
 		action: year.action,
 	}))
 }
