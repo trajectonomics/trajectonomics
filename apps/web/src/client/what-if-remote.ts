@@ -14,32 +14,49 @@ const BUSY = "The Dashboard is busy with another request. Change the what-if aga
 const BUSY_RETRIES = 2
 const BUSY_WAIT_MS = 400
 
-/** Posts the session's Overrides to `POST /what-if` and parses the answer; a 409 is asked again after a wait. */
-async function postWhatIf(whatIf: WhatIf, token: string): Promise<WhatIfAnswer | string> {
-	for (let attempt = 0; ; attempt++) {
-		try {
-			const response = await fetch(WHAT_IF_PATH, {
-				method: "POST",
-				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: token },
-				body: JSON.stringify({ plan: whatIf.plan, ...overridesOf(whatIf) }),
-				cache: "no-store",
-			})
-			if (response.status === 409) {
-				if (attempt >= BUSY_RETRIES) return BUSY
-				await new Promise((resolve) => setTimeout(resolve, BUSY_WAIT_MS))
-				continue
-			}
-			const parsed = whatIfAnswer.safeParse(await response.json())
-			return parsed.success ? parsed.data : UNREADABLE
-		} catch {
-			return UNREACHABLE
-		}
+/** One `POST /what-if`: the parsed answer, the sentence of why there is none, or `"busy"` for a 409. */
+async function postOnce(whatIf: WhatIf, token: string): Promise<WhatIfAnswer | string | "busy"> {
+	try {
+		const response = await fetch(WHAT_IF_PATH, {
+			method: "POST",
+			headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: token },
+			body: JSON.stringify({ plan: whatIf.plan, ...overridesOf(whatIf) }),
+			cache: "no-store",
+		})
+		if (response.status === 409) return "busy"
+		const parsed = whatIfAnswer.safeParse(await response.json())
+		return parsed.success ? parsed.data : UNREADABLE
+	} catch {
+		return UNREACHABLE
 	}
 }
 
+/**
+ * Posts the session's Overrides to `POST /what-if` and parses the answer; a 409 is asked again after a wait.
+ * A state that a newer one replaced is not asked again, because its reply would be dropped.
+ */
+async function postWhatIf(
+	whatIf: WhatIf,
+	token: string,
+	isCurrent: () => boolean,
+): Promise<WhatIfAnswer | string> {
+	for (let attempt = 0; attempt <= BUSY_RETRIES; attempt++) {
+		const reply = await postOnce(whatIf, token)
+		if (reply !== "busy") return reply
+		if (attempt === BUSY_RETRIES || !isCurrent()) break
+		await new Promise((resolve) => setTimeout(resolve, BUSY_WAIT_MS))
+		if (!isCurrent()) break
+	}
+	return BUSY
+}
+
 /** Asks the server for the four reads of one state of the session. */
-export function readWhatIf(whatIf: WhatIf, token: string | null): Promise<WhatIfAnswer | string> {
-	return token === null ? Promise.resolve(UNREACHABLE) : postWhatIf(whatIf, token)
+export function readWhatIf(
+	whatIf: WhatIf,
+	token: string | null,
+	isCurrent: () => boolean,
+): Promise<WhatIfAnswer | string> {
+	return token === null ? Promise.resolve(UNREACHABLE) : postWhatIf(whatIf, token, isCurrent)
 }
 
 /** Saves the session as a new plan with its Overrides (`copy-plan`). True when the Edit ran. */

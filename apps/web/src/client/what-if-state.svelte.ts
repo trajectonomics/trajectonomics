@@ -14,10 +14,12 @@ export class WhatIfState {
 	/** True from a change until its read has been answered: the debounce, then the read in flight. */
 	private waiting = $state(false)
 	private inFlight = $state(false)
+	/** True while Apply or Save runs: the session is what was sent, so no change may be made until it answers. */
+	saving = $state(false)
 	timer: ReturnType<typeof setTimeout> | undefined
 	/** The reads, one at a time: the server refuses a second with 409, so a newer state waits its turn. */
 	private readonly reader = new SerialReader<WhatIf, WhatIfAnswer | string>({
-		transport: (whatIf) => readWhatIf(whatIf, editSession.token),
+		transport: (whatIf, isCurrent) => readWhatIf(whatIf, editSession.token, isCurrent),
 		deliver: (reply) => this.receive(reply),
 		onBusy: (busy) => {
 			this.inFlight = busy

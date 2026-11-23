@@ -1,5 +1,6 @@
 <script lang="ts" generics="T extends string">
 import { cx } from "./cx"
+import { radiosOf, restoreRadios } from "./restore"
 import type { SegmentedOption } from "./segmented-option"
 
 interface Props {
@@ -9,10 +10,16 @@ interface Props {
 	label: string
 	options: readonly SegmentedOption<T>[]
 	value: T
-	onChange: (value: T) => void
+	/** Returns false when the page refused the choice: the group then shows the value the page holds. */
+	onChange: (value: T) => unknown
 }
 
 let { name, label, options, value, onChange }: Props = $props()
+
+/** Passes the choice on; a refused one puts the group back on the value the page still holds. */
+function choose(option: T, group: HTMLFieldSetElement | null): void {
+	if (onChange(option) === false && group !== null) restoreRadios(radiosOf(group), value)
+}
 </script>
 
 <!-- A choice among a few options, as a row of native radio buttons. The arrow keys move the choice. -->
@@ -25,7 +32,7 @@ let { name, label, options, value, onChange }: Props = $props()
 				{name}
 				value={option.value}
 				checked={option.value === value}
-				onchange={() => onChange(option.value)}
+				onchange={(event) => choose(option.value, event.currentTarget.closest("fieldset"))}
 				class="peer sr-only"
 			/>
 			<span

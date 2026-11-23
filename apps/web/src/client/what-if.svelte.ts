@@ -1,4 +1,5 @@
 import { documentRead } from "../lib/view/plan-items/document"
+import type { WhatIf } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { currentSnapshot } from "./snapshot.svelte.js"
 import { WhatIfChanges } from "./what-if-changes.svelte.js"
@@ -8,21 +9,33 @@ import { applyWhatIf, keepWhatIf } from "./what-if-remote.js"
 class WhatIfSession extends WhatIfChanges {
 	/** Drops the session with nothing run. */
 	revert(): void {
-		this.end()
+		if (!this.saving) this.end()
 	}
 
 	/** Saves the session as a new plan. The session ends when the Edit ran. */
-	async keepAsPlan(name: string): Promise<boolean> {
-		if (this.whatIf === null || !this.active || this.reading) return false
-		const ran = await keepWhatIf(this.whatIf, name)
-		if (ran) this.end()
-		return ran
+	keepAsPlan(name: string): Promise<boolean> {
+		return this.send((whatIf) => keepWhatIf(whatIf, name))
 	}
 
 	/** Applies the session to its plan. The session ends when the Edit ran. */
-	async applyToPlan(): Promise<boolean> {
-		if (this.whatIf === null || !this.active || this.reading) return false
-		const ran = await applyWhatIf(this.whatIf)
+	applyToPlan(): Promise<boolean> {
+		return this.send(applyWhatIf)
+	}
+
+	/**
+	 * Sends the session as it is now. While the Edit runs the session takes no change (`saving`), so it is still
+	 * exactly what was sent when the Edit answers, and ending it drops nothing the person saw. When the Edit did
+	 * not run, the session stays and takes changes again.
+	 */
+	private async send(edit: (whatIf: WhatIf) => Promise<boolean>): Promise<boolean> {
+		if (this.whatIf === null || !this.active || this.reading || this.saving) return false
+		this.saving = true
+		let ran = false
+		try {
+			ran = await edit(this.whatIf)
+		} finally {
+			this.saving = false
+		}
 		if (ran) this.end()
 		return ran
 	}

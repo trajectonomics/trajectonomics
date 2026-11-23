@@ -26,9 +26,11 @@ export class WhatIfChanges extends WhatIfState {
 
 	/**
 	 * Switches an item off or back on, by its path (`flows.gym`, `accounts.cash`). A session belongs to one plan:
-	 * a change to another plan while this one holds changes is refused and asks first. True when it was made.
+	 * a change to another plan while this one holds changes is refused and asks first, and so is any change
+	 * while Apply or Save runs. True when it was made.
 	 */
 	setOff(plan: string, contentHash: string, path: string, off: boolean): boolean {
+		if (this.saving) return false
 		const base = this.sessionFor(plan, contentHash)
 		if (base === null) return false
 		this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
@@ -47,6 +49,7 @@ export class WhatIfChanges extends WhatIfState {
 		stored: Record<string, Json>,
 		edited: Record<string, Json>,
 	): string[] {
+		if (this.saving) return []
 		const base = this.sessionFor(plan, contentHash)
 		if (base === null) return []
 		let next = base
@@ -55,9 +58,9 @@ export class WhatIfChanges extends WhatIfState {
 		return clearedFields(stored, edited)
 	}
 
-	/** Takes one change out of the session. The session ends when none is left. */
+	/** Takes one change out of the session. The session ends when none is left. Refused while Apply or Save runs. */
 	removeChange(change: Change): void {
-		if (this.whatIf === null) return
+		if (this.whatIf === null || this.saving) return
 		this.keep(
 			change.kind === "off"
 				? switchedOn(this.whatIf, change.path)
@@ -74,6 +77,7 @@ export class WhatIfChanges extends WhatIfState {
 
 	/** Drops the pending changes and returns the plan that was asked for, for the caller to switch to. */
 	revertAndSwitch(): string | null {
+		if (this.saving) return null
 		const name = this.asking
 		this.end()
 		return name

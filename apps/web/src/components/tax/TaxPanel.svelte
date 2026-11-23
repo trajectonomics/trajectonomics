@@ -12,7 +12,7 @@ interface Props {
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
 	/** The Scenario the address bar asks for; empty or unknown falls back to the first one. */
 	requested: string
-	onScenario: (name: string) => void
+	onScenario: (name: string) => unknown
 }
 
 let { projections, requested, onScenario }: Props = $props()

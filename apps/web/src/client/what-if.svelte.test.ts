@@ -1,48 +1,11 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
-import { editSession } from "./edit.svelte.js"
 import { selectPlan } from "./select-plan.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
+import { fakeServer, HASH, held, settle, useSessionHooks } from "./what-if.test-support"
 
-const HASH = `jcs1:sha256:${"ab".repeat(32)}`
-const realFetch = globalThis.fetch
-
-/** The reads the fake server answers: each call is held until the test settles it. */
-type Held = { body: { plan: string; removals: string[] }; settle: (status?: number) => void }
-
-let held: Held[] = []
-
-/** Replaces `fetch` with a server that holds every `POST /what-if` until the test answers it. */
-function fakeServer(): void {
-	held = []
-	globalThis.fetch = ((_url: string, init: { body: string }) =>
-		new Promise<Response>((resolve) => {
-			held.push({
-				body: JSON.parse(init.body),
-				settle: (status = 200) =>
-					resolve(
-						new Response(
-							JSON.stringify({ ok: false, error: { code: "x", exitCode: 1, message: "stub" } }),
-							{ status },
-						),
-					),
-			})
-		})) as unknown as typeof fetch
-}
-
-/** Waits long enough for the debounce and the microtasks that follow. */
-const settle = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms))
-
-beforeEach(() => {
-	editSession.token = "token"
-})
-
-afterEach(() => {
-	whatIfSession.end()
-	editSession.token = null
-	globalThis.fetch = realFetch
-})
+useSessionHooks()
 
 describe("a session is bound to its plan", () => {
 	test("a switch is off only on the plan it was made on", () => {
@@ -176,6 +139,18 @@ describe("the reads of a session", () => {
 		whatIfSession.setOff("base", HASH, "flows.a", true)
 		expect(await whatIfSession.applyToPlan()).toBe(false)
 		expect(await whatIfSession.keepAsPlan("copy")).toBe(false)
+	})
+
+	test("a read answered 409 is not asked again once a newer state waits", async () => {
+		fakeServer()
+		whatIfSession.setOff("base", HASH, "flows.a", true)
+		await settle()
+		whatIfSession.setOff("base", HASH, "flows.b", true)
+		held[0]?.settle(409)
+		// The newer state reads at once after its debounce, not after the wait of a retry nobody needs.
+		await settle(300)
+		expect(held).toHaveLength(2)
+		expect(held[1]?.body.removals).toEqual(["flows.a", "flows.b"])
 	})
 
 	test("a read answered 409 is asked again, not shown as a lost answer", async () => {

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { restoreSelect } from "../ui/restore"
 import PlanActions from "./PlanActions.svelte"
 
 interface Props {
@@ -6,7 +7,8 @@ interface Props {
 	names: readonly string[]
 	/** The Scenario the pages show. */
 	selected: string
-	onChange: (name: string) => void
+	/** Returns false when the page refused the switch: the select then shows the plan the page still shows. */
+	onChange: (name: string) => unknown
 	/** Whether the server answers Edits: then the plan can be copied and deleted. */
 	editable?: boolean
 }
@@ -26,7 +28,9 @@ let { names, selected, onChange, editable = false }: Props = $props()
 		<select
 			id="scenario-switcher"
 			value={selected}
-			onchange={(event) => onChange(event.currentTarget.value)}
+			onchange={(event) => {
+				if (onChange(event.currentTarget.value) === false) restoreSelect(event.currentTarget, selected)
+			}}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		>
 			{#each names as name (name)}

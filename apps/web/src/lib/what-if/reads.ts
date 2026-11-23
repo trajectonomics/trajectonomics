@@ -5,7 +5,11 @@
  * and so is the reply of a read that began before the session ended. Pure: the transport is a function
  * the caller passes, so a test drives it with a fake.
  */
-export type ReadTransport<State, Reply> = (state: State) => Promise<Reply>
+export type ReadTransport<State, Reply> = (
+	state: State,
+	/** Whether this state is still the latest: false once a newer one is asked for or the session ended. */
+	isCurrent: () => boolean,
+) => Promise<Reply>
 
 export type SerialReaderOptions<State, Reply> = {
 	/** Asks the server for the reads of one state of the session. */
@@ -55,7 +59,7 @@ export class SerialReader<State, Reply> {
 		this.options.onBusy(true)
 		let reply: Reply | undefined
 		try {
-			reply = await this.options.transport(state)
+			reply = await this.options.transport(state, () => seq === this.latest)
 		} catch {
 			reply = undefined
 		}

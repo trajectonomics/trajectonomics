@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import { baselineRead, planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import PlanItemsList from "../plan-items/PlanItemsList.svelte"
 import ItemSwitch from "./ItemSwitch.svelte"
@@ -31,6 +32,25 @@ describe("the What-if controls", () => {
 		expect(body).toContain("Include gym in the what-if")
 		expect(body).toContain("Try a value")
 		expect(body).toContain("On")
+	})
+
+	test("the switch and Try a value are disabled while Apply or Save runs, so no change can start", () => {
+		const props = {
+			plan: "base",
+			contentHash: HASH,
+			path: "flows.gym",
+			label: "gym",
+			onTry: () => {},
+		}
+		expect(render(ItemSwitch, { props }).body).not.toContain('disabled=""')
+		whatIfSession.saving = true
+		try {
+			const body = render(ItemSwitch, { props }).body
+			expect(body).toMatch(/role="switch"[^>]*disabled/)
+			expect(body).toMatch(/disabled[^>]*>Try a value/)
+		} finally {
+			whatIfSession.saving = false
+		}
 	})
 
 	test("the planner list shows a switch and Try a value on each editable card, and none on a read-only page", () => {
