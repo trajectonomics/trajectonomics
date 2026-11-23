@@ -59,6 +59,7 @@ export function side(options: {
 	return {
 		scenario: options.scenario,
 		overrides: [],
+		removals: [],
 		fi: options.fi,
 		taxYears: [],
 		runOut: options.runOut,

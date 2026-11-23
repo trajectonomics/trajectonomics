@@ -77,6 +77,7 @@ export function projectionRunFixture(patch: Partial<ProjectionRun> = {}): Projec
 		engine: ENGINE,
 		scenario: SCENARIO,
 		overrides: [],
+		removals: [],
 		tax: "applied",
 		notes: ["Tax is applied: the fixture levy.", "A note the CLI states, in its own order."],
 		currency: "THB",
