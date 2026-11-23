@@ -3,11 +3,17 @@
 
 import type { IconElement } from "./nav-icons"
 
-/** The icons of the planner pages, by name. */
-export type PlanIconName = "landmark" | "milestone" | "trending-down" | "trending-up"
+/** The icons of the planner pages, by name. The Cash flow page is a planner page (#190). */
+export type PlanIconName = "landmark" | "milestone" | "trending-down" | "trending-up" | "workflow"
 
 /** The elements of the planner pages' icons, copied from the Lucide icon set. */
 export const PLAN_ICON_NODES: Readonly<Record<PlanIconName, readonly IconElement[]>> = {
+	// Lucide "workflow" (ISC), copied from lucide-static 0.460.0.
+	workflow: [
+		["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2" }],
+		["path", { d: "M7 11v4a2 2 0 0 0 2 2h4" }],
+		["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2" }],
+	],
 	milestone: [
 		["path", { d: "M12 13v8" }],
 		["path", { d: "M12 3v3" }],

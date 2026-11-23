@@ -1,6 +1,6 @@
 import type { NavGroup } from "./routes"
 
-/** The navigation in order: Home and Net worth, the Plan group, Chance of success, Tax, then the Records group. */
+/** The navigation in order: Home and Net worth, the Plan group, Cash flow, Chance of success, Tax, then the Records group. */
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		heading: null,
@@ -43,6 +43,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 			},
 			{ path: "/fi/", label: "FI date", page: "FiPage", icon: "calendar" },
 			{ path: "/compare/", label: "Compare", page: "ComparePage", icon: "git-compare" },
+		],
+	},
+	{
+		heading: null,
+		routes: [
+			{
+				path: "/cash-flow/",
+				label: "Cash flow",
+				page: "CashFlowPage",
+				icon: "workflow",
+				needsCashflow: true,
+			},
 		],
 	},
 	{

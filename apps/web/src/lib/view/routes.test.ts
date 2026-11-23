@@ -24,7 +24,7 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the thirteen pages are in navigation order, with unique paths", () => {
+	test("the fourteen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -35,6 +35,7 @@ describe("the navigation's routes", () => {
 			"/assets-and-debts/",
 			"/fi/",
 			"/compare/",
+			"/cash-flow/",
 			"/chance/",
 			"/tax/",
 			"/ledger/",
@@ -43,13 +44,14 @@ describe("the navigation's routes", () => {
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
 	})
 
-	test("the groups are Home and Net worth, then Plan, then Chance of success, then Tax, then Records", () => {
+	test("the groups are Home and Net worth, then Plan, then Cash flow, then Chance of success, then Tax, then Records", () => {
 		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
 			[null, ["Home", "Net worth"]],
 			[
 				"Plan",
 				["Overview", "Milestones", "Income", "Expenses", "Assets and debts", "FI date", "Compare"],
 			],
+			[null, ["Cash flow"]],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
 			["Records", ["Ledger", "Health"]],
@@ -93,5 +95,17 @@ describe("the navigation's routes", () => {
 			"FI date",
 			"Compare",
 		])
+	})
+
+	test("the Cash flow page is listed only when the selected plan's projection has the cash flow table", () => {
+		expect(routeAt("/cash-flow/")?.icon).toBe("workflow")
+		const cashFlow = NAV_GROUPS.find((group) =>
+			group.routes.some((route) => route.path === "/cash-flow/"),
+		)
+		if (cashFlow === undefined) throw new Error("the Cash flow group exists")
+		expect(routesShown(cashFlow, true, true, true).map((route) => route.label)).toEqual([
+			"Cash flow",
+		])
+		expect(routesShown(cashFlow, true, true, false)).toEqual([])
 	})
 })
