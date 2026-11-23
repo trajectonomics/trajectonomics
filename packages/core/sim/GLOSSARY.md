@@ -175,7 +175,11 @@ A dated cash movement of kind `income`, `expense`, `contribution` or `withdrawal
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
-A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a **target** (`funding` absent or `target`): it is limited to the Available cashflow on that Occurrence and is never funded from existing assets, and `cashflow.contribute` sets the funding priority. With `funding: "obligation"` it is a **purchase**: paid in full, subtracted before Available cashflow, drawn from the `withdraw` list when the day's cash is short or a Shortfall when that is short too, and not routed. An obligation's target may not be on the `withdraw` list (`OBLIGATION_TARGET_WITHDRAWN`). A Contribution that is a target and one that is an obligation into one Account are separate. Same-date amounts of one kind are summed per Account. `funding` on a liability is refused: a debt payment is already an obligation.
+A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a **target** (`funding` absent or `target`): it is limited to the Available cashflow on that Occurrence and is never funded from existing assets, and `cashflow.contribute` sets the funding priority. With `funding: "obligation"` it is a **purchase**: paid in full, subtracted before Available cashflow, drawn from the `withdraw` list when the day's cash is short or a Shortfall when that is short too, and not routed. An obligation's target may not be on the `withdraw` list (`OBLIGATION_TARGET_WITHDRAWN`). A Contribution that is a target and one that is an obligation into one Account are separate. Same-date amounts of one kind are summed per Account. `funding` on a liability is refused: a debt payment is already an obligation. With `funding: "employer"` it is an **Employer contribution**.
+
+**Employer contribution**:
+A Contribution with `funding: "employer"` into a liquid asset Account: money the employer pays into a provident fund. It lands in full on its Landed date from outside the household's cash, so it is not income, not an expense, never part of Available cashflow, never capped or unfunded, never drawn from the `withdraw` list and never a Shortfall, and its target need not be in `cashflow.contribute`. It adds to the Cost basis, may be locked, and is tallied only under the `label` its author gives. In the FI test it stops with Earned income, fixed or derived. The Annual roll-up reports `employerContributions` and the Cash-flow breakdown an `employer` list, both outside `income` and `contributions`. Refused into a liability (`EMPLOYER_INTO_LIABILITY`) and into an Illiquid asset (`EMPLOYER_INTO_ILLIQUID`).
+_Avoid_: match, employer match, free money
 
 **Available cashflow**:
 The income on one Occurrence minus its expenses, debt payments and obligations actually made, floored at zero. Cash from a Planned withdrawal, a sale's proceeds included, is left out: it pays what it was raised for and the rest lands in surplus, so borrowing or selling never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
@@ -202,7 +206,7 @@ The first Landed date on which a liability's amount owed reaches zero after bein
 _Avoid_: payoff date, maturity date, final payment date
 
 **Earned income**:
-Income from work, marked `earned: true`. It is the only income that stops in the FI test.
+Income from work, marked `earned: true`. With an Employer contribution, it is all that stops in the FI test.
 _Avoid_: Active income, salary income
 
 **Passive income**:

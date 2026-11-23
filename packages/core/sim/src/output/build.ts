@@ -1,3 +1,4 @@
+import { declaresEmployer } from "../engine/employer"
 import type { EngineRun } from "../engine/result"
 import { declaresWithdrawals } from "../loan/resolve"
 import type { Baseline, Scenario, Timeline } from "../types"
@@ -37,6 +38,7 @@ export function buildProjection(
 		periods,
 		openingNetWorth(baseline, rules),
 		declaresWithdrawals(scenario),
+		declaresEmployer(scenario),
 	)
 	if (rollups.problem !== undefined) return { problem: rollups.problem }
 	const unfunded = buildUnfunded(run.totals, end)

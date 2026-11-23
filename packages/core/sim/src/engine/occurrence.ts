@@ -4,6 +4,7 @@ import type { DateOutcome } from "./day-totals"
 export type { DateOutcome, DayTotals, EngineRunsOut } from "./day-totals"
 
 import { aggregate, type DayFlows } from "./aggregate"
+import { applyEmployer } from "./employer"
 import type { DatedEvent } from "./events"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
 import { totalsOf } from "./levy-step"
@@ -40,6 +41,17 @@ export function processDate(
 	const moves = applyPlannedWithdrawals(states, day.plannedBySource, date, levies)
 	const landed = { ...day, withdrawals: moves.cash, plannedBySource: moves.borrowedBy }
 	if (moves.problem !== undefined) return early(landed, moves.problem)
-	const dated = { scenario, states, date, events, levies, breakdown }
+	// An employer share lands in its Account first: it is outside cashflow, so nothing below reads it (ADR 0026).
+	const employer = applyEmployer(states, day.contributionEntries, date, levies)
+	if (employer.problem !== undefined) return early({ ...landed, employer: 0n }, employer.problem)
+	const dated = {
+		scenario,
+		states,
+		date,
+		events,
+		levies,
+		breakdown,
+		employerFunded: employer.funded,
+	}
 	return payOut(dated, planned.planned, landed, moves.soldBy, settlement)
 }

@@ -1,8 +1,8 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { addTo } from "./add"
-import type { ContributionEntry } from "./aggregate"
 import { grantAsset } from "./asset-grant"
+import type { ContributionEntry } from "./contribution-entries"
 import { appliedByLabel, groupEntries, plannedTotal } from "./contribution-entries"
 import type { LevySet } from "./levy-set"
 import { minBigInt } from "./min"
@@ -75,7 +75,8 @@ export function applyDebt(
 /**
  * Asset targets spend only `available` cashflow, in `contribute` priority order. The part that
  * does not fit is reported as unfunded and dropped; a zero grant never touches an account.
- * An obligation is not here: it is paid in full before `available` is computed.
+ * An obligation is not here: it is paid in full before `available` is computed. Nor is an employer
+ * share, which lands outside cashflow (ADR 0026).
  */
 export function applyAssets(
 	states: StateMap,
@@ -85,7 +86,7 @@ export function applyAssets(
 	date: DateString,
 	levies: LevySet | undefined,
 ): AssetResult {
-	const groups = groupEntries(entries.filter((entry) => !entry.obligation))
+	const groups = groupEntries(entries.filter((entry) => !entry.obligation && !entry.employer))
 	let remaining = available
 	let applied = 0n
 	const funded = new Map<string, bigint>()

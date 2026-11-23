@@ -1,9 +1,9 @@
 import type { AccountId, Scenario } from "../types"
 import { addTo } from "./add"
-import { occurrenceAmount } from "./aggregate"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import { minBigInt } from "./min"
+import { occurrenceAmount } from "./occurrence-amount"
 import type { StateMap } from "./state"
 
 /**

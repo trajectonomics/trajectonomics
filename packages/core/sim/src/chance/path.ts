@@ -1,3 +1,4 @@
+import { declaresEmployer } from "../engine/employer"
 import type { Returns } from "../engine/returns"
 import { runEngine } from "../engine/run"
 import { declaresWithdrawals } from "../loan/resolve"
@@ -68,6 +69,7 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 		periods,
 		inputs.opening,
 		declaresWithdrawals(inputs.scenario),
+		declaresEmployer(inputs.scenario),
 	)
 	if (rollups.problem !== undefined) return { ok: false, problem: rollups.problem }
 	const annual = rollups.annual!

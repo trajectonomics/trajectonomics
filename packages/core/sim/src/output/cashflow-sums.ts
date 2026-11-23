@@ -8,6 +8,7 @@ export interface PeriodSums {
 	readonly planned: ReadonlyMap<string, bigint>
 	readonly applied: ReadonlyMap<string, bigint>
 	readonly unfunded: ReadonlyMap<string, bigint>
+	readonly employer: ReadonlyMap<string, bigint>
 	readonly prepaid: ReadonlyMap<string, bigint>
 	readonly settled: ReadonlyMap<string, bigint>
 	readonly drawn: ReadonlyMap<string, bigint>
@@ -24,6 +25,7 @@ export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodS
 		planned: new Map<string, bigint>(),
 		applied: new Map<string, bigint>(),
 		unfunded: new Map<string, bigint>(),
+		employer: new Map<string, bigint>(),
 		prepaid: new Map<string, bigint>(),
 		settled: new Map<string, bigint>(),
 		drawn: new Map<string, bigint>(),
@@ -35,6 +37,7 @@ export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodS
 		addAll(sums.planned, lines.planned)
 		addAll(sums.applied, lines.applied)
 		addAll(sums.unfunded, lines.unfunded)
+		addAll(sums.employer, lines.employer)
 		addAll(sums.prepaid, lines.prepaid)
 		addAll(sums.settled, lines.settled)
 		addAll(sums.drawn, lines.drawn)

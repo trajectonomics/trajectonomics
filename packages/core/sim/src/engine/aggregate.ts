@@ -1,20 +1,15 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { addTo } from "./add"
+import type { ContributionEntry } from "./contribution-entries"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import { addIncome } from "./levy-prepaid"
 import type { SettlementPeriodView } from "./levy-shares"
+import { occurrenceAmount } from "./occurrence-amount"
 
-export interface ContributionEntry {
-	/** The contribution Flow's id, so a breakdown can split the Account's amount back to Flows. */
-	readonly flow: string
-	readonly target: AccountId
-	readonly amount: bigint
-	readonly label: string | undefined
-	/** Paid in full, outside Available cashflow, instead of capped by it (ADR 0021). */
-	readonly obligation: boolean
-}
+export { occurrenceAmount } from "./occurrence-amount"
+export type { ContributionEntry }
 
 export interface DayFlows {
 	/** Planned gross income before Prepayment. */
@@ -28,6 +23,8 @@ export interface DayFlows {
 	/** Planned gross income by Tally label. */
 	readonly gross: ReadonlyMap<string, bigint>
 	readonly prepaid: bigint
+	/** Employer Contributions landed on this date, summed; never part of income or Available cashflow. */
+	readonly employer: bigint
 	/** Each Levy's own Prepayment share. */
 	readonly prepaidByLevy: ReadonlyMap<string, bigint>
 	/** A capped Prepayment read a cap that is not a safe integer. */
@@ -38,6 +35,7 @@ interface Totals {
 	income: bigint
 	expense: bigint
 	prepaid: bigint
+	employer: bigint
 	readonly gross: Map<string, bigint>
 	readonly prepaidByLevy: Map<string, bigint>
 	readonly contributionEntries: ContributionEntry[]
@@ -74,20 +72,19 @@ function takeFlow(
 	else if (flow.kind === "withdrawal") {
 		addTo(totals.plannedBySource, flow.source, amount)
 		totals.withdrawals += amount
-	} else
+	} else {
+		const employer = flow.funding === "employer"
+		if (employer) totals.employer += amount
 		totals.contributionEntries.push({
 			flow: flow.id,
 			target: flow.target,
 			amount,
 			label: flow.label,
 			obligation: flow.funding === "obligation",
+			employer,
 		})
+	}
 	return undefined
-}
-
-/** The amount one Occurrence lands: a fixed Flow's grown amount, its rule's part, or its Derived amount for the date. */
-export function occurrenceAmount(event: DatedEvent, planned: Planned): bigint {
-	return event.amount ?? planned.ruled?.get(event) ?? planned.derived.get(event.flow.id) ?? 0n
 }
 
 /** Sums one Occurrence's flows, separating Prepayment and Tally labels from the cash amounts. */
@@ -101,6 +98,7 @@ export function aggregate(
 		income: 0n,
 		expense: 0n,
 		prepaid: 0n,
+		employer: 0n,
 		gross: new Map(),
 		prepaidByLevy: new Map(),
 		contributionEntries: [],

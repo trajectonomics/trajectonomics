@@ -453,6 +453,71 @@ answer cut short, and an unread label, a bad option or an overflow come back as
 `{ ok: false, problem }`. A step is whole, so a cap that is not a multiple of the step leaves some
 of its room unused; a smaller `step` fills more of it. See [ADR 0022](docs/adr/0022-contribution-savings-scan-steps.md).
 
+## Employer contribution
+
+A Contribution with `funding: "employer"` into a liquid asset Account is the employer's share of a
+provident fund. It lands in the Account on its Landed date and nowhere else: it is not income, not an
+expense, not subtracted from the day's cash, never capped by Available cashflow, never a Shortfall,
+and `cashflow.contribute` need not list its target. The Cost basis grows by it. It stops with earned
+income in the FI test, whether its amount is fixed or a Derived share of a salary's gross. The Annual
+roll-up reports it as `employerContributions` (outside `income`, `contributions` and `interest`) and the
+cash-flow breakdown as an `employer` list; both appear only when the Scenario declares one. See
+[ADR 0026](docs/adr/0026-employer-contribution.md).
+
+A salary of 5,000,000 against living of 4,000,000 leaves 1,000,000 a month for cash. The employer adds 5%
+of the salary's gross, 250,000, to the fund `pvd` each month, so after three months the fund holds
+750,000 and cash 3,000,000, and the roll-up's income is still 15,000,000:
+
+```ts
+import { project } from "@trajectonomics/core/sim"
+
+const monthly = { frequency: "monthly", start: "2026-01-31" } as const
+const result = project(
+	{ schemaVersion: 1, balances: [{ account: "cash", amount: 0 }, { account: "pvd", amount: 0 }] },
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: "cash", kind: "asset", rate: 0 },
+			{ id: "pvd", kind: "asset", rate: 0 },
+		],
+		flows: [
+			{ id: "salary", kind: "income", earned: true, amount: 5_000_000, growth: { bps: 0 }, ...monthly },
+			{ id: "living", kind: "expense", amount: 4_000_000, growth: { bps: 0 }, ...monthly },
+			{
+				id: "pvd-employer",
+				kind: "contribution",
+				target: "pvd",
+				funding: "employer",
+				derive: {
+					measures: [
+						{ id: "pay", op: "flow", flow: "salary" },
+						{ id: "share", op: "scale", of: "pay", num: 5, den: 100, rounding: "halfUp" },
+					],
+					result: "share",
+				},
+				...monthly,
+			},
+		],
+		cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: [] },
+	},
+	{ start: "2026-01-01", horizon: "2026-03-31", resolution: "month" },
+)
+
+if (result.ok) {
+	const { income, contributions, employerContributions } = result.projection.annual[0]!
+	const last = result.projection.rows[result.projection.rows.length - 1]!
+	console.log(income, contributions, employerContributions)
+	console.log(last.balances.map((item) => `${item.account}=${item.amount}`).join(" "))
+}
+```
+
+```text
+15000000 0 750000
+cash=3000000 pvd=750000
+```
+
 ## Scripts
 
 - `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).

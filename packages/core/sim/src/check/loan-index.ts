@@ -6,6 +6,7 @@ export interface LoanTarget {
 	readonly rate: unknown
 	readonly compounding: unknown
 	readonly lockedUntil: unknown
+	readonly liquid: unknown
 }
 
 /** The declared Accounts a loan Flow reads, by id: the first declaration of each id wins. */
@@ -17,8 +18,8 @@ export function loanIndex(accounts: unknown): LoanIndex {
 	if (!Array.isArray(accounts)) return index
 	for (const item of accounts) {
 		if (isRecord(item) && typeof item["id"] === "string" && !index.has(item["id"])) {
-			const { kind, rate, compounding, lockedUntil } = item
-			index.set(item["id"], { kind, rate, compounding, lockedUntil })
+			const { kind, rate, compounding, lockedUntil, liquid } = item
+			index.set(item["id"], { kind, rate, compounding, lockedUntil, liquid })
 		}
 	}
 	return index

@@ -1,7 +1,7 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { addTo } from "./add"
-import type { ContributionEntry } from "./aggregate"
+import type { ContributionEntry } from "./contribution-entries"
 import { appliedByLabel, groupEntries, plannedTotal } from "./contribution-entries"
 import type { LevySet } from "./levy-set"
 import { mutate } from "./mutate"

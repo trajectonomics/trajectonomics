@@ -5,8 +5,10 @@ import type { LoanIndex } from "./loan-index"
 
 /**
  * `funding` belongs to a Contribution into an asset: a debt payment is already an obligation, so any
- * stated value on a liability is `FUNDING_ON_LIABILITY`. A value outside the closed list is
- * `INVALID_FUNDING` from the shape check alone, so it is not reported a second time here.
+ * stated value on a liability is `FUNDING_ON_LIABILITY`, or `EMPLOYER_INTO_LIABILITY` for an employer
+ * share, which has its own words. An employer share into an Illiquid asset is `EMPLOYER_INTO_ILLIQUID`
+ * (ADR 0026). A value outside the closed list is `INVALID_FUNDING` from the shape check alone, so it
+ * is not reported a second time here.
  */
 function checkFunding(
 	flow: Readonly<Record<string, unknown>>,
@@ -18,8 +20,14 @@ function checkFunding(
 	const target = flow["target"]
 	const funding = flow["funding"]
 	if (typeof funding !== "string" || !(FUNDINGS as readonly string[]).includes(funding)) return
-	if (typeof target === "string" && index.get(target)?.kind === "liability") {
-		emit("FUNDING_ON_LIABILITY", [...path, "funding"])
+	const rule = typeof target === "string" ? index.get(target) : undefined
+	if (rule?.kind === "liability") {
+		emit(funding === "employer" ? "EMPLOYER_INTO_LIABILITY" : "FUNDING_ON_LIABILITY", [
+			...path,
+			"funding",
+		])
+	} else if (funding === "employer" && rule?.kind === "asset" && rule.liquid === false) {
+		emit("EMPLOYER_INTO_ILLIQUID", [...path, "funding"])
 	}
 }
 

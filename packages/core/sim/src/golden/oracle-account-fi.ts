@@ -17,11 +17,14 @@ function candidateMonths(fixture: Fixture): DateString[] {
 	return months
 }
 
-/** The candidate's flows: earned income ends the day before `month`. */
+/** The candidate's flows: earned income and the employer's share end the day before `month`. */
 function stopped(flows: readonly Flow[], month: DateString): Flow[] {
-	return flows.map((flow) =>
-		flow.kind === "income" && flow.earned ? { ...flow, end: oracleAddDays(month, -1) } : flow,
-	)
+	return flows.map((flow) => {
+		const work =
+			(flow.kind === "income" && flow.earned) ||
+			(flow.kind === "contribution" && flow.funding === "employer")
+		return work ? { ...flow, end: oracleAddDays(month, -1) } : flow
+	})
 }
 
 function expenseFrom(landings: readonly Landing[], from: DateString): bigint {

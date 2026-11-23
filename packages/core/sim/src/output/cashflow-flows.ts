@@ -1,5 +1,10 @@
 import type { Flow } from "../types"
-import type { ContributionLine, ExpenseLine, WithdrawalLine } from "../types/breakdown"
+import type {
+	ContributionLine,
+	EmployerLine,
+	ExpenseLine,
+	WithdrawalLine,
+} from "../types/breakdown"
 import type { PeriodSums } from "./cashflow-sums"
 
 /** Flows of one kind, in Scenario order. */
@@ -54,6 +59,15 @@ export function contributionLines(flows: readonly Flow[], sums: PeriodSums): Con
 		return [
 			{ flow: flow.id, account: flow.target, applied: Number(applied), unfunded: Number(unfunded) },
 		]
+	})
+}
+
+/** Each employer Contribution Flow's landed amount with its target Account, in Scenario order. */
+export function employerLines(flows: readonly Flow[], sums: PeriodSums): EmployerLine[] {
+	return ofKind(flows, "contribution").flatMap((flow): EmployerLine[] => {
+		const amount = sums.employer.get(flow.id) ?? 0n
+		if (flow.funding !== "employer" || amount === 0n) return []
+		return [{ flow: flow.id, account: flow.target, amount: Number(amount) }]
 	})
 }
 
