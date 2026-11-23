@@ -10,9 +10,9 @@ function hasControlCharacter(name: string): boolean {
 }
 
 /**
- * Why a name cannot travel to `traj` as a plan name, or null when it can. `traj` has no `--` to end its
- * flags, so a name that starts with "-" would be read as a flag: `--help` prints help and writes
- * nothing. The server's Edit schema refuses the same names, so no page can send one.
+ * Why a name cannot travel to `traj` as a plan name, or null when it can. An Edit's argv puts the name
+ * before its flags and without `--` (`traj` does take `--`, and the reads use it), so a name that starts
+ * with "-" would be read as a flag: `--help` prints help and writes nothing. The server's Edit schema refuses the same names, so no page can send one.
  */
 export function planNameShapeError(name: string): string | null {
 	if (name.startsWith("-")) return "A plan name cannot start with -."

@@ -1,6 +1,5 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { isOff } from "../../lib/what-if/session"
 
 interface Props {
 	/** The plan the switch changes in its session, and the content hash the page read for it. */
@@ -15,7 +14,7 @@ interface Props {
 }
 
 let { plan, contentHash, path, label, onTry }: Props = $props()
-const off = $derived(whatIfSession.whatIf !== null && isOff(whatIfSession.whatIf, path))
+const off = $derived(whatIfSession.isOffIn(plan, path))
 const button =
 	"rounded-md border border-border bg-card px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 </script>

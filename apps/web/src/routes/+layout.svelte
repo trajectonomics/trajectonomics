@@ -4,10 +4,10 @@ import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { Snippet } from "svelte"
 import { page } from "$app/state"
 import { editSession } from "../client/edit.svelte.js"
-import { queryParam, setQueryParam } from "../client/query-param.svelte.js"
+import { queryParam } from "../client/query-param.svelte.js"
+import { selectPlan } from "../client/select-plan.svelte.js"
 import { shellPanels } from "../client/shell.svelte.js"
 import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
-import { whatIfSession } from "../client/what-if.svelte.js"
 import { brandArtwork } from "../components/shell/brand-artwork"
 import DisplayOptions from "../components/shell/DisplayOptions.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
@@ -51,10 +51,7 @@ $effect(() => {
 	current={page.url.pathname}
 	{names}
 	{selected}
-	onPlan={(name) => {
-		// Changes pending in the What-if session on another plan ask first (WhatIfBar).
-		if (whatIfSession.requestSwitch(name)) void setQueryParam("scenario", name)
-	}}
+	onPlan={selectPlan}
 	{editable}
 	{planDocument}
 	{milestones}

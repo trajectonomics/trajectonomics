@@ -69,6 +69,11 @@ describe("POST /what-if refusals: the guards it shares with POST /edit", () => {
 	})
 })
 
+/** A JSON array nested `depth` levels deep, as one Set's value: the shape that overflows a recursive parser. */
+function nested(depth: number): string {
+	return `{"plan":"base","sets":[{"path":"flows.x","value":${"[".repeat(depth)}${"]".repeat(depth)}}],"removals":[]}`
+}
+
 describe("POST /what-if body refusals: the closed shape, refused before anything runs", () => {
 	const bodies: [string, string][] = [
 		["a body that is not JSON", "{"],
@@ -90,6 +95,8 @@ describe("POST /what-if body refusals: the closed shape, refused before anything
 		],
 		["an unknown field", JSON.stringify({ plan: "base", sets: [], removals: [], write: true })],
 		["a missing list", JSON.stringify({ plan: "base", sets: [] })],
+		["a value nested 100000 levels deep", nested(100_000)],
+		["a value nested just past the depth cap", nested(40)],
 	]
 	for (const [label, body] of bodies) {
 		test(

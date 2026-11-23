@@ -10,6 +10,7 @@ import { type Problems, shownProblems } from "../../lib/view/plan-items/problems
 import { recordOf } from "../../lib/what-if/session"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
+import TryNotice from "./TryNotice.svelte"
 
 interface Props {
 	kind: FlowKind
@@ -42,6 +43,8 @@ const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
+/** The fields a tried value cleared, which a what-if cannot hold. */
+let cleared: string[] = $state([])
 const FIELDS = ["name", "amount", "frequency", "start", "end", "growth", "rate", "earned"]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 
@@ -62,7 +65,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	if (tryValue) {
 		// A what-if: each changed field is a Set of the session, and the plan itself is not written.
 		if (existing !== undefined) {
-			whatIfSession.tryItem(
+			cleared = whatIfSession.tryItem(
 				name,
 				contentHash,
 				"flows",
@@ -71,7 +74,7 @@ async function save(event: SubmitEvent): Promise<void> {
 				recordOf(result.flow),
 			)
 		}
-		onDone()
+		if (cleared.length === 0) onDone()
 		return
 	}
 	await commit(withFlow(doc, result.flow))
@@ -80,5 +83,6 @@ async function save(event: SubmitEvent): Promise<void> {
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
 	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} />
+	<TryNotice fields={cleared} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

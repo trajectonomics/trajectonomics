@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import {
 	changesOf,
+	clearedFields,
 	hasChanges,
 	isOff,
 	itemSets,
@@ -83,5 +84,12 @@ describe("the What-if session", () => {
 		expect(itemSets("accounts", "cash", { id: "cash" }, { id: "cash", rate: 0.5 })).toEqual([
 			{ path: "accounts.cash.rate", value: 0.5 },
 		])
+	})
+
+	test("a field the form removed is a cleared field, and one stored as null or kept is not", () => {
+		expect(clearedFields({ amount: "1", end: "2030-01", note: null }, { amount: "2" })).toEqual([
+			"end",
+		])
+		expect(clearedFields({ amount: "1" }, { amount: "1" })).toEqual([])
 	})
 })

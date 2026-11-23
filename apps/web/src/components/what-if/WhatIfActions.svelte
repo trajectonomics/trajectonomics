@@ -1,6 +1,6 @@
 <script lang="ts">
 import { editSession, STALE_PLAN } from "../../client/edit.svelte.js"
-import { setQueryParam } from "../../client/query-param.svelte.js"
+import { selectPlan } from "../../client/select-plan.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { planNameError } from "../../lib/edit/name"
@@ -10,6 +10,7 @@ let name = $state("")
 const problem = $derived(
 	name.trim() === "" ? null : planNameError(name, scenarioNames(currentSnapshot())),
 )
+const blocked = $derived(editSession.busy || whatIfSession.reading || !whatIfSession.active)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
@@ -19,7 +20,7 @@ async function keep(event: SubmitEvent): Promise<void> {
 	const plan = name.trim()
 	if (!(await whatIfSession.keepAsPlan(plan))) return
 	name = ""
-	void setQueryParam("scenario", plan)
+	void selectPlan(plan)
 }
 </script>
 
@@ -34,12 +35,12 @@ async function keep(event: SubmitEvent): Promise<void> {
 				class="rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 			/>
 		</label>
-		<button type="submit" disabled={editSession.busy || name.trim() === "" || problem !== null} class={button}>
+		<button type="submit" disabled={blocked || name.trim() === "" || problem !== null} class={button}>
 			Save as new plan
 		</button>
 		{#if problem !== null}<p class="w-full text-sm text-destructive">{problem}</p>{/if}
 	</form>
-	<button type="button" onclick={() => whatIfSession.applyToPlan()} disabled={editSession.busy} class={button}>
+	<button type="button" onclick={() => whatIfSession.applyToPlan()} disabled={blocked} class={button}>
 		Apply to this plan
 	</button>
 	<button type="button" onclick={() => whatIfSession.revert()} disabled={editSession.busy} class={button}>

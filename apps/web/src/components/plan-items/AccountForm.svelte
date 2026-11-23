@@ -9,6 +9,7 @@ import { type Problems, shownProblems } from "../../lib/view/plan-items/problems
 import { recordOf } from "../../lib/what-if/session"
 import AccountFields from "./AccountFields.svelte"
 import ItemActions from "./ItemActions.svelte"
+import TryNotice from "./TryNotice.svelte"
 
 interface Props {
 	/** The plan's name, which the Edit saves the document under. */
@@ -28,6 +29,8 @@ let { name, doc, existing, onDone, contentHash, tryValue = false }: Props = $pro
 const initial = () => accountDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
+/** The fields a tried value cleared, which a what-if cannot hold. */
+let cleared: string[] = $state([])
 const FIELDS = ["name", "kind", "rate", "compounding", "lockedUntil"]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 
@@ -47,7 +50,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	problems = {}
 	if (tryValue) {
 		if (existing !== undefined) {
-			whatIfSession.tryItem(
+			cleared = whatIfSession.tryItem(
 				name,
 				contentHash,
 				"accounts",
@@ -56,7 +59,7 @@ async function save(event: SubmitEvent): Promise<void> {
 				recordOf(result.account),
 			)
 		}
-		onDone()
+		if (cleared.length === 0) onDone()
 		return
 	}
 	await commit(withAccount(doc, result.account))
@@ -65,5 +68,6 @@ async function save(event: SubmitEvent): Promise<void> {
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Add account"}>
 	<AccountFields bind:draft existingId={existing?.id} {shown} />
+	<TryNotice fields={cleared} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

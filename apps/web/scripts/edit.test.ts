@@ -74,6 +74,21 @@ describe("an Edit against the real traj", () => {
 	)
 
 	test(
+		"a body nested 100000 levels deep is refused with 400 in the server's own JSON, not a 500 page",
+		async () => {
+			const editing = await setupEditor()
+			const deep = `{"kind":"apply-plan","name":"base","contentHash":"x","document":${"[".repeat(100_000)}${"]".repeat(100_000)}}`
+			const response = await editing.edit(editRequest({}, deep), 4321)
+			expect(response.status).toBe(400)
+			expect(response.headers.get("content-type")).toContain("application/json")
+			expect(((await response.json()) as { error: { code: string } }).error.code).toBe(
+				"invalid_edit",
+			)
+		},
+		SLOW_MS,
+	)
+
+	test(
 		"an Edit to a plan the page did not read is refused as changed, and creates nothing",
 		async () => {
 			const document = ledgerShow("base", true).scenario.document

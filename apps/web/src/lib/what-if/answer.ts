@@ -60,3 +60,19 @@ export function namesChange(error: ErrorBody, whatIf: WhatIf, path: string): boo
 		(whatIf.removals.includes(path) || whatIf.sets.some((set) => set.path === path))
 	)
 }
+
+/**
+ * The failed reads of an answer that name no change of the session, each message once. A refusal such as
+ * `unsupported_currency`, `not_found`, `traj_unavailable` or `database_busy` has no `details.path`, so the
+ * bar shows it on its own line; the same refusal from all four reads is one line.
+ */
+export function unplacedRefusals(answer: WhatIfAnswer | null, whatIf: WhatIf): string[] {
+	if (answer === null) return []
+	const messages = failedReads(answer)
+		.filter((failed) => {
+			const path = pathNamed(failed.error)
+			return path === null || !namesChange(failed.error, whatIf, path)
+		})
+		.map((failed) => failed.error.message)
+	return [...new Set(messages)]
+}

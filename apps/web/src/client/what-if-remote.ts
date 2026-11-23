@@ -4,38 +4,42 @@ import { EDIT_TOKEN_HEADER, WHAT_IF_PATH } from "../lib/edit/guard"
 import { type WhatIfAnswer, whatIfAnswer } from "../lib/what-if/answer"
 import { overridesOf, type WhatIf } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
-import type { WhatIfState } from "./what-if-state.svelte.js"
 
 /** The sentence the bar shows when the reads cannot be had: the server did not answer, or said nothing usable. */
 const UNREACHABLE = "The Dashboard could not reach traj. Try again."
 const UNREADABLE = "The Dashboard could not read the answer to the what-if."
+const BUSY = "The Dashboard is busy with another request. Change the what-if again to read it."
 
-/** Posts the session's Overrides to `POST /what-if` and parses the answer. */
+/** How many times a read answered 409 (another Edit or what-if runs on the server) is asked again, and after how long. */
+const BUSY_RETRIES = 2
+const BUSY_WAIT_MS = 400
+
+/** Posts the session's Overrides to `POST /what-if` and parses the answer; a 409 is asked again after a wait. */
 async function postWhatIf(whatIf: WhatIf, token: string): Promise<WhatIfAnswer | string> {
-	try {
-		const response = await fetch(WHAT_IF_PATH, {
-			method: "POST",
-			headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: token },
-			body: JSON.stringify({ plan: whatIf.plan, ...overridesOf(whatIf) }),
-			cache: "no-store",
-		})
-		const parsed = whatIfAnswer.safeParse(await response.json())
-		return parsed.success ? parsed.data : UNREADABLE
-	} catch {
-		return UNREACHABLE
+	for (let attempt = 0; ; attempt++) {
+		try {
+			const response = await fetch(WHAT_IF_PATH, {
+				method: "POST",
+				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: token },
+				body: JSON.stringify({ plan: whatIf.plan, ...overridesOf(whatIf) }),
+				cache: "no-store",
+			})
+			if (response.status === 409) {
+				if (attempt >= BUSY_RETRIES) return BUSY
+				await new Promise((resolve) => setTimeout(resolve, BUSY_WAIT_MS))
+				continue
+			}
+			const parsed = whatIfAnswer.safeParse(await response.json())
+			return parsed.success ? parsed.data : UNREADABLE
+		} catch {
+			return UNREACHABLE
+		}
 	}
 }
 
-/** Reads the four reads of the session into its state. A reply for an older state of the session is dropped. */
-export async function readInto(session: WhatIfState): Promise<void> {
-	const whatIf = session.whatIf
-	const token = editSession.token
-	if (whatIf === null || token === null || !session.active) return
-	const seq = ++session.seq
-	const reply = await postWhatIf(whatIf, token)
-	if (seq !== session.seq) return
-	session.answer = typeof reply === "string" ? null : reply
-	session.error = typeof reply === "string" ? reply : reply.ok ? null : reply.error.message
+/** Asks the server for the four reads of one state of the session. */
+export function readWhatIf(whatIf: WhatIf, token: string | null): Promise<WhatIfAnswer | string> {
+	return token === null ? Promise.resolve(UNREACHABLE) : postWhatIf(whatIf, token)
 }
 
 /** Saves the session as a new plan with its Overrides (`copy-plan`). True when the Edit ran. */

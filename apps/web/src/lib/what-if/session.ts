@@ -77,6 +77,16 @@ export function itemSets(
 		.map((field) => ({ path: `${list}.${id}.${field}`, value: edited[field] ?? null }))
 }
 
+/** The fields a form cleared: stored with a value, and absent from the edited item. A what-if cannot try them. */
+export function clearedFields(
+	stored: Record<string, Json>,
+	edited: Record<string, Json>,
+): string[] {
+	return Object.keys(stored).filter(
+		(field) => stored[field] !== null && edited[field] === undefined,
+	)
+}
+
 /** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
 export type Change =
 	| { kind: "off"; path: string; label: string }

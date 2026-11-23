@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test"
 import type { ErrorBody } from "../contract"
-import { failedReads, namesChange, pathNamed, type WhatIfAnswer, whatIfAnswer } from "./answer"
+import {
+	failedReads,
+	namesChange,
+	pathNamed,
+	unplacedRefusals,
+	type WhatIfAnswer,
+	whatIfAnswer,
+} from "./answer"
 import { startWhatIf, switchedOff, withSet } from "./session"
 
 const OK_READ = { argv: ["fi"], ok: true, data: {} }
@@ -48,5 +55,24 @@ describe("the what-if answer", () => {
 		expect(
 			namesChange(error, withSet(session, "flows.salary.amount", "1"), "flows.salary.amount"),
 		).toBe(false)
+	})
+
+	test("a refusal that names no change is shown once on its own line, however many reads hold it", () => {
+		const session = switchedOff(startWhatIf("base", "jcs1:sha256:x"), "flows.gym")
+		const busy = FAILED("The database is busy.")
+		const mixed = whatIfAnswer.parse({
+			ok: true,
+			reads: {
+				projection: busy,
+				fi: busy,
+				compare: FAILED("no such flow", { path: "flows.gym" }),
+				chance: FAILED("Currency is not supported.", { currency: "XXX" }),
+			},
+		})
+		expect(unplacedRefusals(mixed, session)).toEqual([
+			"The database is busy.",
+			"Currency is not supported.",
+		])
+		expect(unplacedRefusals(null, session)).toEqual([])
 	})
 })

@@ -10,7 +10,7 @@ Each refusal has its own test in `apps/web/scripts/serve-edit.test.ts`:
 
 - a Host other than `127.0.0.1`, `localhost` or `[::1]` on the server's port: 403;
 - an `Origin` other than `http://` plus the request's own loopback Host (`127.0.0.1`, `localhost` or `[::1]` on the server's port), a missing one included: 403;
-- a plan name that starts with `-`, holds a control character or is over 100 characters: 400, because `traj` has no `--` and would read `--help` as a flag, print help, write nothing and exit 0;
+- a plan name that starts with `-`, holds a control character or is over 100 characters: 400, because an Edit's argv puts the name before its flags and without `--` (`traj` does take `--`), so `traj` would read `--help` as a flag, print help, write nothing and exit 0;
 - a missing or wrong `x-traj-edit-token` header: 403. The token is random, made when the server starts, and given only to a page that asks for it from this machine;
 - a `Content-Type` other than `application/json`: 415. A cross-site form or a simple request cannot send that type without a preflight, and no preflight is answered;
 - an Edit before the first Snapshot is read: 503;

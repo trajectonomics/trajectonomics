@@ -14,7 +14,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - **`POST /edit` refuses, each refusal with its own test** (`src/lib/edit/guard.ts`, `scripts/serve-edit.test.ts`):
   - a Host other than this machine's, with 403;
   - an `Origin` other than `http://` plus the request's own loopback Host (`127.0.0.1`, `localhost` or `[::1]` on the server's port), a missing one included, with 403;
-  - a plan name that starts with `-`, holds a control character or is over 100 characters, with 400 (`invalid_edit`): `traj` has no `--`, so `--help` would be read as a flag, print help, write nothing and exit 0;
+  - a plan name that starts with `-`, holds a control character or is over 100 characters, with 400 (`invalid_edit`): an Edit's argv puts the name before its flags and without `--`, so `--help` would be read as a flag, print help, write nothing and exit 0;
   - a missing or wrong token, with 403;
   - a `Content-Type` other than `application/json`, with 415;
   - an Edit before the first Snapshot is in, with 503;
@@ -37,6 +37,12 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - An Edit re-runs the whole Snapshot Plan, so it takes as long as one Snapshot (several seconds on a large ledger). One Edit runs at a time, and the page disables its controls while it runs.
 - The ledger's writer lock still decides a busy database: a write that meets it answers `database_busy` as data, as the CLI does.
 - Every new Edit kind is a change to `src/lib/edit/edit.ts`, its pinned list, and this ADR's list.
+
+## Amendment (2026-11-23): `traj` takes `--`, and the leading-`-` name rule stays
+
+- This ADR first said `traj` has no `--`. That was wrong: every `scenario` write and read ends its flags at `--` (checked against the workspace binary: `scenario fork -- base -dash`, `scenario rm -- --help` and `scenario apply --file … -- -d2` each treat the name as a name), and the Snapshot's `scenario show` and the what-if's `projection compare` already pass the name after `--` (`stage-two-projections.ts`, `what-if/argv.ts`).
+- The rule that a plan name never starts with `-` is **not redundant**, and it stays. `writeCommand` (`src/lib/edit/command.ts`) puts the name positionally, before `--json`, `--dry-run` and the override tokens, and passes no `--`. A name such as `--help` would be read as a flag there. Passing `--` would mean moving every name after the flags and re-pinning every argv in `edit.test.ts`, with no gain, since a plan named with a leading `-` is made only in a terminal.
+- A plan the ledger holds under a name that starts with `-` can be read (reads name it after `--` or in `--scenario=`) but not edited from the page. If a later change puts `--` into the write argv, this rule can go with it.
 
 ## Amendment (2026-11-23): `apply-plan` has controls
 

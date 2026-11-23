@@ -1,6 +1,7 @@
 // The answers of the write path that are not an Edit's own result: a refusal, and a body that is not an
 // Edit of the list. Both are the error envelope every write answer uses ([serve-edit.ts](serve-edit.ts)).
 import type { ErrorBody } from "../src/lib/contract"
+import { nestsPast } from "../src/lib/edit/depth"
 import { type Edit, editSchema } from "../src/lib/edit/edit"
 import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
@@ -18,6 +19,15 @@ export function refused(status: number, code: string, message: string): Response
 	return failure(status, { code, exitCode: REFUSED_EXIT_CODE, message })
 }
 
+/** Runs a schema read that a hostile body could make throw (a stack overflow); that is a refusal, never a 500. */
+function safely<T>(read: () => T): T | null {
+	try {
+		return read()
+	} catch {
+		return null
+	}
+}
+
 /** Reads the body as an Edit of the closed list: refused when it is not JSON, or names no Edit. */
 export async function readEdit(
 	request: Request,
@@ -32,8 +42,9 @@ export async function readEdit(
 	} catch {
 		return invalid("The Edit is not JSON.")
 	}
-	const parsed = editSchema.safeParse(value)
-	return parsed.success
+	if (nestsPast(value)) return invalid("The Edit nests deeper than the Dashboard sends.")
+	const parsed = safely(() => editSchema.safeParse(value))
+	return parsed?.success
 		? { ok: true, edit: parsed.data }
 		: invalid("The Edit is not one the Dashboard may send.")
 }
@@ -52,8 +63,9 @@ export async function readWhatIf(
 	} catch {
 		return invalid("The what-if is not JSON.")
 	}
-	const parsed = whatIfSchema.safeParse(value)
-	return parsed.success
+	if (nestsPast(value)) return invalid("The what-if nests deeper than the Dashboard sends.")
+	const parsed = safely(() => whatIfSchema.safeParse(value))
+	return parsed?.success
 		? { ok: true, whatIf: parsed.data }
 		: invalid("The what-if is not one the Dashboard may send.")
 }
