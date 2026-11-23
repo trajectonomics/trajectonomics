@@ -43,11 +43,36 @@ describe("the print stylesheet", () => {
 		expect(print.size).toBeGreaterThan(5)
 	})
 
-	test("fits a table to the page: no minimum width, the page's width, and cells that wrap", () => {
+	test("fits a table to the page: no minimum width, the page's width, and a header that may break", () => {
 		expect(rule("table")).toMatchObject({ width: "100%", "min-width": "0", "table-layout": "auto" })
 		expect(rule("table")["font-size"]).toBe("8pt")
-		expect(rule("th, td")["overflow-wrap"]).toBe("anywhere")
-		expect(rule('[class*="whitespace-nowrap"]')["white-space"]).toBe("normal")
+		expect(rule("th")["overflow-wrap"]).toBe("anywhere")
+	})
+
+	test("never splits a figure or a date over two lines", () => {
+		expect(rule("td")["overflow-wrap"]).toBe("normal")
+		const whole = rule("td.tabular-nums, td .tabular-nums, [data-report] td")
+		expect(whole["white-space"]).toBe("nowrap")
+		for (const [selector, declarations] of print) {
+			if (!/\btd\b/.test(selector)) continue
+			expect(declarations["white-space"]).not.toBe("normal")
+			expect(declarations["overflow-wrap"]).not.toBe("anywhere")
+		}
+		expect(print.has('[class*="whitespace-nowrap"]')).toBe(false)
+	})
+
+	test("keeps a figure cell and every cell of a Report on one line", () => {
+		const selectors = [...print.entries()]
+			.filter(([, declarations]) => declarations["white-space"] === "nowrap")
+			.map(([selector]) => selector)
+			.join(" | ")
+		expect(selectors).toContain("td.tabular-nums")
+		expect(selectors).toContain("td .tabular-nums")
+		expect(selectors).toContain("[data-report] td")
+	})
+
+	test("hides a picker, so its empty border does not print", () => {
+		expect(rule("fieldset:has(input)")["display"]).toBe("none")
 	})
 
 	test("removes a table's scroll box and a chart's minimum width", () => {
@@ -79,12 +104,14 @@ describe("the print stylesheet", () => {
 			expect(theme[`--ds-color-${token}`]).toBe(value)
 		}
 		expect(rule("html, body")).toMatchObject({ background: "#fff", color: "#000" })
-		expect(rule("html, body")["overflow-wrap"]).toBe("anywhere")
+		expect(theme["--ds-color-primary"]).toBe("#000")
+		expect(theme["--ds-color-primary-foreground"]).toBe("#fff")
 	})
 
 	test("hides select, input and button controls, but not a button inside a table cell", () => {
 		const hidden = [...print.entries()].find(
-			([, declarations]) => declarations["display"] === "none",
+			([selector, declarations]) =>
+				declarations["display"] === "none" && selector.includes("select"),
 		)
 		expect(hidden?.[0]).toContain("select")
 		expect(hidden?.[0]).toContain("input")

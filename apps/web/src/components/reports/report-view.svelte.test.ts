@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
@@ -20,6 +20,9 @@ if (PLAN === undefined || RUN === null) throw new Error("the Demo snapshot holds
 
 const props = { snapshot: DEMO, plan: PLAN, terms: "both", lens: null, changes: null }
 const view = (extra: object = {}) => render(ReportView, { props: { ...props, ...extra } }).body
+
+// The address is shared by every test file in the process, so it is put back as it was.
+afterAll(() => setTestUrl("http://127.0.0.1/"))
 
 describe("the Reports view, rendered from the Demo snapshot", () => {
 	beforeEach(() => setTestUrl("http://127.0.0.1/reports/?demo=1"))

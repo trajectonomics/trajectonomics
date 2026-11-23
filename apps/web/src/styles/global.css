@@ -46,6 +46,8 @@
 		--ds-color-secondary-foreground: #000;
 		--ds-color-muted: #fff;
 		--ds-color-muted-foreground: #000;
+		--ds-color-primary: #000;
+		--ds-color-primary-foreground: #fff;
 		--ds-color-border: #8a8a8a;
 	}
 
@@ -79,15 +81,30 @@
 		font-size: 8pt;
 	}
 
-	/* A figure that may not wrap keeps the table wider than the page, so on paper it may wrap, and the cell is tighter. */
-	th,
-	td {
+	/*
+	 * A header may break anywhere, but a cell does not: a figure or a date split over two lines reads as two
+	 * numbers. Figures and every cell of a Report keep to one line, and a page that is too wide is narrowed
+	 * by hiding fields, not by splitting values.
+	 */
+	th {
 		overflow-wrap: anywhere;
 		padding-inline: 4px;
 	}
 
-	[class*="whitespace-nowrap"] {
-		white-space: normal;
+	td {
+		overflow-wrap: normal;
+		padding-inline: 4px;
+	}
+
+	td.tabular-nums,
+	td .tabular-nums,
+	[data-report] td {
+		white-space: nowrap;
+	}
+
+	/* A picker of a few options is a control: with its inputs hidden, only its empty border would print. */
+	fieldset:has(input) {
+		display: none;
 	}
 
 	thead {

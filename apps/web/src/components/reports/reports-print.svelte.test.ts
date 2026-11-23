@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import SideNavigation from "../shell/SideNavigation.svelte"
@@ -8,6 +8,9 @@ import ReportPreview from "./ReportPreview.svelte"
 
 const noop = () => {}
 const file = { name: "base-annual-2026-10-31.csv", type: "text/csv", text: "" }
+
+// The address is shared by every test file in the process, so it is put back as it was.
+afterAll(() => setTestUrl("http://127.0.0.1/"))
 
 describe("the Reports page on paper", () => {
 	beforeEach(() => setTestUrl("http://127.0.0.1/reports/"))
@@ -42,6 +45,7 @@ describe("the Reports page on paper", () => {
 		for (const label of ["Download CSV", "Download JSON", "Download everything", "Print"]) {
 			expect(body).toContain(label)
 		}
+		expect(body).toContain("A landscape page fits about 15 fields.")
 	})
 
 	test("the screen heading is left out of paper, and a cell holds its text escaped", () => {
@@ -56,6 +60,7 @@ describe("the Reports page on paper", () => {
 		expect(body).toMatch(/<p class="print:hidden [^"]*">แผน · As of 2026-10-31 · Nominal<\/p>/)
 		expect(body).toContain("&lt;b&gt;ธนาคาร&lt;/b&gt; &amp; co")
 		expect(body).not.toContain("<b>ธนาคาร</b>")
+		expect(body).toContain('<div data-report="">')
 	})
 
 	test("the side navigation is left out of a printed page", () => {

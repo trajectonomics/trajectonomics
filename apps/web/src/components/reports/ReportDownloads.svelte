@@ -28,6 +28,9 @@ const button =
 		{/if}
 		<button type="button" class={button} onclick={() => saveFile(all())}>Download everything</button>
 		<button type="button" class={button} onclick={printPage}>Print</button>
+		<p class="self-center text-xs text-muted-foreground">
+			A landscape page fits about 15 fields. Hide fields to print each figure whole, or use the CSV.
+		</p>
 	</div>
 	<p class="max-w-prose text-xs text-muted-foreground">
 		An empty CSV cell means traj stated null for that figure, as the JSON shows. The JSON holds the same values

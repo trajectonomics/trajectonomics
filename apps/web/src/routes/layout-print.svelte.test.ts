@@ -21,6 +21,14 @@ afterAll(() => {
 })
 
 describe("the layout, printed", () => {
+	// The What-if bar renders only while a session holds a change and the server answers, so its markup is read.
+	test("leaves the What-if bar out of paper", async () => {
+		const source = await Bun.file(
+			`${import.meta.dir}/../components/what-if/WhatIfBar.svelte`,
+		).text()
+		expect(source).toMatch(/<section aria-label="What-if session" class="print:hidden /)
+	})
+
 	test("names the plan, the As-of date and the terms on a page that is not Reports", () => {
 		setTestUrl("http://127.0.0.1/projection/?demo=1&terms=real")
 		replaceSnapshot(DEMO)
@@ -30,6 +38,8 @@ describe("the layout, printed", () => {
 		expect(header?.[1]).toContain(`As of ${DEMO.params.asOf}`)
 		expect(header?.[1]).toContain("Real, in As-of terms")
 		expect(header?.[1]).toContain(DEMO.params.scenarios[0] ?? "no plan in the Demo snapshot")
+		expect(body).toContain('<header class="print:hidden')
+		expect(body).toMatch(/<dialog[^>]*class="print:hidden/)
 		expect(body).toMatch(/data-print-header[^>]*class="[^"]*\bhidden\b[^"]*\bprint:block\b/)
 	})
 })

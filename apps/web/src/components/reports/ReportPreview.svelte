@@ -19,9 +19,11 @@ const rows = $derived(records.map((record, id) => ({ id, record })))
 
 <!-- The printed header of the page names the plan, As-of date and terms; this line is for the screen. -->
 <p class="print:hidden text-sm text-muted-foreground">{heading}</p>
-<DataTable
-	caption={label}
-	columns={dataColumns(columns)}
-	{rows}
-	rowKey={(row) => String(row.id)}
-/>
+<div data-report>
+	<DataTable
+		caption={label}
+		columns={dataColumns(columns)}
+		{rows}
+		rowKey={(row) => String(row.id)}
+	/>
+</div>
