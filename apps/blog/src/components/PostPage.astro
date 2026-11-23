@@ -1,0 +1,99 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { render } from "astro:content"
+import { type Post, postPagePath, shownTranslation } from "../content/read-posts"
+import Layout from "../layouts/Layout.astro"
+import { dictionaryFor } from "../lib/dictionary"
+import { chooseTranslation, DEFAULT_LANGUAGE, type Language, perLanguage } from "../lib/languages"
+import { ISSUES_URL } from "../lib/site"
+import PostMeta from "./PostMeta.astro"
+
+interface Props {
+	readonly post: Post
+	/** The Interface Language: the tree this page is built in. */
+	readonly language: Language
+}
+
+const { post, language } = Astro.props
+const words = dictionaryFor(language)
+const translation = shownTranslation(post, language)
+const { title, description, cover } = translation.entry.data
+const { Content } = await render(translation.entry)
+
+// A page in its Post's own Language is the one search engines index. A page that falls back names
+// that one as its canonical, and only the native pages name each other as alternates.
+const native = translation.language === language
+const canonicalPath = postPagePath(post, translation.language)
+const alternates = native
+	? [
+			...post.languages.map((code) => ({ hreflang: code, path: postPagePath(post, code) })),
+			{
+				hreflang: "x-default" as const,
+				path: postPagePath(post, chooseTranslation(post.languages, DEFAULT_LANGUAGE)),
+			},
+		]
+	: []
+const languagePaths = perLanguage((tree) => postPagePath(post, tree))
+// Each Post Language links to the page in its own tree, so a reader who picks one reads it natively.
+const written = post.languages.map((code) => ({
+	code,
+	name: words.languageNames[code],
+	path: postPagePath(post, code),
+	// Only a native page is that Translation's own page; a fallback links to it.
+	current: native && code === translation.language,
+}))
+---
+
+<Layout
+	language={language}
+	languagePaths={languagePaths}
+	canonicalPath={canonicalPath}
+	alternates={alternates}
+	contentLanguage={translation.language}
+	title={`${title} · ${words.postTitleSuffix}`}
+	description={description}
+	indexed={true}
+	image={cover}
+	article={post.publishedOn}
+>
+	<article class="post">
+		<header class="post-header">
+			{
+				native ? null : (
+					<p class="language-notice" role="note">
+						{words.fallbackNotice(words.languageNames[language], words.languageNames[translation.language])}
+					</p>
+				)
+			}
+			<PostMeta post={post} translation={translation} language={language} />
+			<h1 class="post-title" lang={translation.language}>{title}</h1>
+			<p class="post-lede" lang={translation.language}>{description}</p>
+			<p class="post-byline">{words.byline}</p>
+			{
+				written.length < 2 && native ? null : (
+					<p class="meta-label post-languages">
+						<span>{words.availableIn}</span>
+						{written.map((entry) => (
+							<a
+								class="post-languages-link"
+								href={entry.path}
+								hreflang={entry.code}
+								aria-current={entry.current ? "true" : undefined}
+							>
+								{entry.name}
+							</a>
+						))}
+					</p>
+				)
+			}
+		</header>
+		<figure class="post-cover">
+			<img src={cover.src} alt={cover.alt} width={cover.width} height={cover.height} lang={translation.language} />
+		</figure>
+		<div class="post-body" lang={translation.language}><Content /></div>
+		<p class="post-fair-play">
+			{words.fairPlayBefore} <a href={ISSUES_URL}>{words.fairPlayLink}</a>{words.fairPlayAfter}
+		</p>
+	</article>
+</Layout>

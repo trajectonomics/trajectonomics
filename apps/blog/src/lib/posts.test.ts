@@ -5,7 +5,6 @@ import {
 	postPath,
 	publishedNewestFirst,
 	readingMinutes,
-	typeLabel,
 } from "./posts"
 
 /** A published guide, which each test varies. */
@@ -51,26 +50,31 @@ describe("the Posts a reader sees", () => {
 
 describe("the reading time", () => {
 	test("is whole minutes at 220 words a minute, rounded up", () => {
-		expect(readingMinutes("word ".repeat(221))).toBe(2)
+		expect(readingMinutes("word ".repeat(221), "en")).toBe(2)
 	})
 
 	test("is never less than one minute", () => {
-		expect(readingMinutes("")).toBe(1)
+		expect(readingMinutes("", "en")).toBe(1)
+	})
+
+	test("does not count a link's address or an HTML tag", () => {
+		const linked = "[word](https://example.com/a/b/c/d/e/f/g/h) ".repeat(220)
+		expect(readingMinutes(linked, "en")).toBe(1)
+		expect(readingMinutes('<img src="/a/b/c/d/e.webp" alt="x" /> word'.repeat(220), "en")).toBe(1)
+	})
+
+	test("counts Thai words, which have no space between them", () => {
+		// สวัสดีครับ is two words and one run of letters; whitespace alone would count 221.
+		expect(readingMinutes("สวัสดีครับ ".repeat(221), "th")).toBe(3)
 	})
 })
 
 describe("the publication date", () => {
 	test("reads as day, short month and year, whatever the reader's time zone", () => {
-		expect(displayDate(new Date("2026-11-22"))).toBe("22 Nov 2026")
+		expect(displayDate(new Date("2026-11-22"), "en-GB")).toBe("22 Nov 2026")
 	})
-})
 
-describe("the Post Type's label", () => {
-	test("names each type in the meta line", () => {
-		expect([typeLabel("compare"), typeLabel("guide"), typeLabel("news")]).toEqual([
-			"Compare",
-			"Guide",
-			"News",
-		])
+	test("reads in the Thai calendar for a Thai reader", () => {
+		expect(displayDate(new Date("2026-11-22"), "th-TH")).toBe("22 พ.ย. 2569")
 	})
 })

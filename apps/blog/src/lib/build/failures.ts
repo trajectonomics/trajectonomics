@@ -3,6 +3,8 @@ export type FailureCode =
 	| "not-found-page-missing"
 	| "page-title-missing"
 	| "page-canonical-missing"
+	| "page-canonical-unbuilt"
+	| "page-alternate-unbuilt"
 	| "page-image-missing"
 	| "page-image-alt-missing"
 	| "shell-home-link-missing"

@@ -9,6 +9,39 @@ are `packages/brand`'s.
 One published article on the blog, one Markdown file under `src/content/posts/`. Every Post has
 exactly one **Post Type**.
 
+## Translation
+
+One Post written in one **Post Language**: `src/content/posts/<slug>/<language>.md`. A Post's
+Translations share its type, publication date, draft flag and cover image.
+
+## Post Language
+
+A Language a Post is written in, one per **Translation**. Most Posts are not in every Language.
+
+## Interface Language
+
+The Language the Shell and a page's labels are read in. Each one has a **Dictionary** and a
+**Language Tree**. It is separate from a Post Language ([ADR 0003](docs/adr/0003-interface-language-and-post-language-are-separate.md)).
+
+## Language Tree
+
+Every page of the blog in one Interface Language: English at the root, every other Language under
+its own prefix, such as `/th/`. Every Post has a page in every tree.
+
+## Dictionary
+
+Every word one Interface Language shows outside a Post: `src/lib/dictionary-<language>.ts`.
+
+## Fallback
+
+What a page shows when its Post has no Translation in the page's Interface Language: the English
+Translation, else the Post's own, with a notice that says so. A page that falls back is not indexed
+in its own right: its canonical is the native page.
+
+## Language Menu
+
+The header's links to the same page in every Language Tree, each named in its own Language.
+
 ## Post Type
 
 What kind of Post it is: `compare`, `guide` or `news`. The front page filters by it, in one place

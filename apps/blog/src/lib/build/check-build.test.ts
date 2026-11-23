@@ -80,6 +80,34 @@ describe("the built blog", () => {
 		])
 	})
 
+	test("a page in a prefixed tree links to its own tree's front page", () => {
+		const thai = PAGE.replace('<a href="/">Blog</a>', '<a href="/th/">บล็อก</a>').replace(
+			'href="https://blog.trajectonomics.com/"',
+			'href="https://blog.trajectonomics.com/th/"',
+		)
+		expect(codes([...GOOD, { path: "th/index.html", text: thai }])).toEqual([])
+		expect(codes([...GOOD, { path: "th/index.html", text: PAGE }])).toEqual([
+			"shell-blog-link-missing",
+		])
+	})
+
+	test("a canonical the build lacks fails", () => {
+		const html = PAGE.replace(
+			"https://blog.trajectonomics.com/",
+			"https://blog.trajectonomics.com/guides/gone/",
+		)
+		expect(codes(withFrontPage(html))).toEqual(["page-canonical-unbuilt"])
+	})
+
+	test("an alternate the build lacks fails, and one it has passes", () => {
+		const alternate = (href: string) =>
+			PAGE.replace("</head>", `<link rel="alternate" hreflang="th" href="${href}"></head>`)
+		expect(codes(withFrontPage(alternate("https://blog.trajectonomics.com/")))).toEqual([])
+		expect(codes(withFrontPage(alternate("https://blog.trajectonomics.com/th/")))).toEqual([
+			"page-alternate-unbuilt",
+		])
+	})
+
 	test("a page with no footer fails", () => {
 		expect(codes(withFrontPage(PAGE.replace("<footer></footer>", "")))).toEqual([
 			"shell-footer-missing",

@@ -70,6 +70,16 @@
 	gap: 8px;
 }
 
+/* The Post Languages as short codes: plain text, not a link, so the meta line stays one quiet label. */
+.post-meta-languages {
+	display: inline-flex;
+	gap: 6px;
+}
+
+.post-meta-languages abbr {
+	text-decoration: none;
+}
+
 /* Hover underlines the title; keyboard focus rings the whole entry. */
 .featured:hover .featured-title,
 .post-row:hover .post-row-title {
