@@ -25,7 +25,7 @@ $effect(() => {
 	onclick={(event) => {
 		if (event.target === dialog) close()
 	}}
-	class="m-0 ml-auto h-dvh max-h-none w-80 max-w-[90vw] border-l border-border bg-card p-0 text-card-foreground backdrop:bg-black/40"
+	class="print:hidden m-0 ml-auto h-dvh max-h-none w-80 max-w-[90vw] border-l border-border bg-card p-0 text-card-foreground backdrop:bg-black/40"
 >
 	<div class="flex h-full flex-col gap-6 p-5">
 		<div class="flex items-center justify-between gap-2">

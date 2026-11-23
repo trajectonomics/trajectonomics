@@ -43,6 +43,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 			},
 			{ path: "/fi/", label: "FI date", page: "FiPage", icon: "calendar" },
 			{ path: "/compare/", label: "Compare", page: "ComparePage", icon: "git-compare" },
+			{ path: "/reports/", label: "Reports", page: "ReportsPage", icon: "file-text" },
 		],
 	},
 	{
