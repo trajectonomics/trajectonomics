@@ -1,4 +1,5 @@
 import type { Estate, EstateCost, EstateGift, Growth, Rounding } from "../types"
+import { oracleDeflate } from "./oracle-money"
 
 /** What one row owns and owes, by Account, in minor units (the oracle reads values, never code). */
 export interface OracleWorth {
@@ -71,13 +72,24 @@ export function oracleEstate(
 	return { gross, debts, costs, net, gifts, toHeirs: left }
 }
 
-/** `value` in today's money after `years` whole years of `inflation`: magnitude half up, sign kept. */
-export function oracleReal(value: bigint, years: number, inflation: number): bigint {
-	const step = 10_000n + BigInt(inflation)
-	const real = ratio(
-		(value < 0n ? -value : value) * 10_000n ** BigInt(years),
-		step ** BigInt(years),
-		"halfUp",
-	)
-	return value < 0n ? -real : real
+export interface OracleReal {
+	readonly net: bigint
+	readonly toHeirs: bigint
+}
+
+/**
+ * The real figures: the row's real net worth less each cost deflated once, and, when the nominal heirs'
+ * share is above zero, that less each gift deflated once, never below zero.
+ */
+export function oracleReal(
+	realWorth: bigint,
+	estate: OracleEstate,
+	days: number,
+	inflation: number,
+): OracleReal {
+	const deflated = (amounts: readonly bigint[]): bigint =>
+		sum(amounts.map((amount) => oracleDeflate(amount, inflation, days)))
+	const net = realWorth - deflated(estate.costs)
+	if (estate.toHeirs === 0n) return { net, toHeirs: 0n }
+	return { net, toHeirs: atLeastZero(net - deflated(estate.gifts)) }
 }

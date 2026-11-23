@@ -39,8 +39,11 @@ export interface EstateLine {
 	readonly amount: MinorUnits
 }
 
-/** The same figures in today's money, each deflated once like a row's `realNetWorth`. */
-export interface RealEstate {
+/**
+ * The same figures in today's money: `net` is the row's `realNetWorth` less each cost deflated once, and
+ * `toHeirs` that less each gift deflated once (0 when `toHeirs` is 0).
+ */
+export interface EstateInTodaysMoney {
 	readonly net: MinorUnits
 	readonly toHeirs: MinorUnits
 }
@@ -60,5 +63,5 @@ export interface EstateStatement {
 	readonly net: MinorUnits
 	readonly gifts: readonly EstateLine[]
 	readonly toHeirs: MinorUnits
-	readonly real: RealEstate
+	readonly real: EstateInTodaysMoney
 }

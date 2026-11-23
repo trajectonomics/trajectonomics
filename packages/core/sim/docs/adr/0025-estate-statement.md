@@ -40,11 +40,13 @@ Scenario and the Estate statement to the Projection. It is optional and additive
 - **A negative net.** When debts and costs exceed everything owned, `net` is negative and is stated as
   it is; every gift is 0 and `toHeirs` is 0. The shortfall is `−net`: the core states no claim on anyone
   but the estate.
-- **Real terms.** `real.net` and `real.toHeirs` are each deflated once by `economy.inflation` over the
-  counted days from `Timeline.start`, half up on the magnitude with the sign kept, as the row's
-  `realNetWorth` is deflated. They are not sums of deflated lines, so with an empty block `real.net` can
-  differ from `realNetWorth` by a rounding unit, and `real.toHeirs` can differ from `real.net` when there
-  are no gifts.
+- **Real terms.** `real.net` is the row's `realNetWorth` less each cost deflated once by `economy.inflation`
+  over the counted days from `Timeline.start` (half up), so it is deflated as the row is: each Account's two
+  parts separately, then summed signed, and each cost once. With an empty block `real.net` is exactly
+  `realNetWorth`. `real.toHeirs` is 0 when `toHeirs` is 0; otherwise it is `max(0, real.net − Σ deflated
+  gifts)`, so with no gifts and a positive net it equals `real.net`. Only a negative net makes it differ
+  (0 against a negative `real.net`). Deflating the finished `net` once would round differently from the
+  row, by a unit or two, and the two would disagree on an empty block.
 - **No tax rule.** An inheritance tax, a transfer fee, a sale tax or a stamp duty is a cost line the
   caller states. Thai inheritance tax falls on each heir above a per-heir threshold and depends on who the
   heir is, so it needs heirs and their relationship and is a tax rule, which is the owner's. The core

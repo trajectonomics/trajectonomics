@@ -106,4 +106,10 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 		message: "A level payment is too large to state as a whole number of minor units.",
 		hint: "Lower the principal, or spread it over more payments.",
 	},
+	// An estate block is part of the Scenario, so `scenario apply` and the Store state this sentence too.
+	ESTATE_ACCOUNT_LIABILITY: {
+		message:
+			"An estate cost names a liability Account, and a share of a cost is taken from asset Accounts only.",
+		hint: 'Name asset Accounts in "of.accounts", or use "gross" to take a share of every asset. A debt is already taken off as "debts".',
+	},
 }

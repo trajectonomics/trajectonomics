@@ -49,10 +49,12 @@ describe("an estate worked by hand: cash 1,000,000, home 5,000,000, locked fund 
 		expect(on(plan, "2026-12-01").costs[2]!.amount).toBe(100_000)
 	})
 
-	it("deflates net and toHeirs once: 4,487,000 / 1.03 and 4,038,300 / 1.03 at one year", () => {
+	it("deflates each part once at one year: real net 4,356,312 and real toHeirs 3,920,681", () => {
+		// realNetWorth = 970,874 + 4,854,369 + 1,941,748 − 2,912,621 = 4,854,370; the costs deflate to
+		// 155,340 + 242,718 + 100,000 = 498,058, and the gift 448,700 / 1.03 to 435,631.
 		const at = on(plan, "2027-01-01")
 		expect([at.net, at.toHeirs]).toEqual([4_487_000, 4_038_300])
-		expect(at.real).toEqual({ net: 4_356_311, toHeirs: 3_920_680 })
+		expect(at.real).toEqual({ net: 4_356_312, toHeirs: 3_920_681 })
 		expect(on(plan, "2026-01-01").real).toEqual({ net: 4_490_000, toHeirs: 4_041_000 })
 	})
 
@@ -100,7 +102,8 @@ describe("gifts and a shortfall", () => {
 			{ id: "fixed", amount: 0 },
 		])
 		expect([at.toHeirs, at.real.toHeirs]).toEqual([0, 0])
-		expect(on(plan, "2027-01-01").real.net).toBe(-1_126_214)
+		// 970,874 + 4,854,369 + 1,941,748 − 8,737,864 − 155,340 at one year
+		expect(on(plan, "2027-01-01").real.net).toBe(-1_126_213)
 	})
 
 	it("rounds a tie as the line says: 10% of 25 is 2.5, so floor 2, halfUp 3, ceil 3", () => {

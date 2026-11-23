@@ -1,9 +1,10 @@
 import { describe, expect, it } from "bun:test"
 import { growthYears } from "../calendar/arith"
 import { project } from "../engine/project"
-import { ACCOUNTS, household, withEstate } from "../estate/test-household"
+import { ACCOUNTS, growingHousehold, household, withEstate } from "../estate/test-household"
 import type { Fixture } from "../fixtures/fixture"
 import type { Estate, ProjectionRow } from "../types"
+import { oracleCountedDays } from "./oracle-date"
 import { type OracleWorth, oracleEstate, oracleReal } from "./oracle-estate"
 
 const BLOCKS: readonly Estate[] = [
@@ -61,6 +62,10 @@ function agreement(fixture: Fixture, years: (row: ProjectionRow) => number): voi
 		expect(BigInt(got.net)).toBe(want.net)
 		expect(got.gifts.map((line) => BigInt(line.amount))).toEqual([...want.gifts])
 		expect(BigInt(got.toHeirs)).toBe(want.toHeirs)
+		const days = oracleCountedDays(fixture.timeline.start, row.date)
+		const real = oracleReal(BigInt(row.realNetWorth), want, days, at.inflation)
+		expect([row.date, BigInt(got.real.net)]).toEqual([row.date, real.net])
+		expect([row.date, BigInt(got.real.toHeirs)]).toEqual([row.date, real.toHeirs])
 	})
 }
 
@@ -73,17 +78,13 @@ describe("the Estate statement against the independent oracle", () => {
 		},
 	)
 
-	it("deflates net and toHeirs by exact whole-year powers on each anniversary", () => {
-		const fixture = withEstate(household(), BLOCKS[2]!)
-		const result = project(fixture.baseline, fixture.scenario, fixture.timeline, { estate: true })
-		if (!result.ok) throw new Error("expected a projection")
-		for (const [years, date] of [
-			[1, "2027-01-01"],
-			[2, "2028-01-01"],
-		] as const) {
-			const at = result.projection.estate!.find((statement) => statement.date === date)!
-			expect(BigInt(at.real.net)).toBe(oracleReal(BigInt(at.net), years, 300))
-			expect(BigInt(at.real.toHeirs)).toBe(oracleReal(BigInt(at.toHeirs), years, 300))
-		}
-	})
+	it.each([false, true])(
+		"growing balances agree on every monthly row, nominal and real (loan repaid: %p)",
+		(repaid) => {
+			for (const block of BLOCKS) {
+				const fixture = withEstate(growingHousehold(repaid), block)
+				agreement(fixture, (row) => growthYears(fixture.timeline.start, row.date))
+			}
+		},
+	)
 })

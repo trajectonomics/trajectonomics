@@ -1,10 +1,8 @@
 import { growthYears } from "../calendar/arith"
 import { countedDays } from "../calendar/counted"
 import { isSafeInteger, overflow } from "../engine/overflow"
-import { deflate } from "../money/growth"
 import type {
 	AccountId,
-	BasisPoints,
 	Estate,
 	EstateLine,
 	EstateStatement,
@@ -14,6 +12,7 @@ import type {
 	Timeline,
 } from "../types"
 import { costAmount, type Footing, giftAmounts, type Worth } from "./line"
+import { realFigures } from "./real"
 
 export type StatementOutcome =
 	| { readonly statement: EstateStatement }
@@ -33,11 +32,6 @@ export function worthOf(row: ProjectionRow, liabilities: ReadonlySet<AccountId>)
 		}
 	}
 	return { gross, debts, byAccount }
-}
-
-/** Today's money: the magnitude is deflated once, half up, and the sign kept. */
-function real(value: bigint, inflation: BasisPoints, days: number): bigint {
-	return value < 0n ? -deflate(-value, inflation, days) : deflate(value, inflation, days)
 }
 
 function lines(block: readonly { readonly id: string }[], amounts: readonly bigint[]) {
@@ -60,9 +54,17 @@ export function estateStatement(
 	const gifts = giftAmounts(estate?.gifts ?? [], net, footing)
 	const toHeirs = gifts.reduce((rest, gift) => rest - gift, net < 0n ? 0n : net)
 	const days = countedDays(timeline.start, row.date)
-	const realNet = real(net, inflation, days)
-	const realToHeirs = real(toHeirs, inflation, days)
-	const figures = [worth.gross, worth.debts, net, toHeirs, realNet, realToHeirs, ...costs, ...gifts]
+	const real = realFigures(BigInt(row.realNetWorth), costs, gifts, toHeirs, inflation, days)
+	const figures = [
+		worth.gross,
+		worth.debts,
+		net,
+		toHeirs,
+		real.net,
+		real.toHeirs,
+		...costs,
+		...gifts,
+	]
 	if (!figures.every(isSafeInteger)) return { problem: overflow(row.date) }
 	return {
 		statement: {
@@ -73,7 +75,7 @@ export function estateStatement(
 			net: Number(net),
 			gifts: lines(estate?.gifts ?? [], gifts),
 			toHeirs: Number(toHeirs),
-			real: { net: Number(realNet), toHeirs: Number(realToHeirs) },
+			real: { net: Number(real.net), toHeirs: Number(real.toHeirs) },
 		},
 	}
 }

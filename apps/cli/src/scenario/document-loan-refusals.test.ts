@@ -30,6 +30,20 @@ function levelFlow(overrides: Record<string, unknown>, level: Record<string, unk
 	}
 }
 
+/** An estate block whose cost takes a share of a liability, which `scenario apply` refuses as a document. */
+const ESTATE_ON_LOAN = {
+	...documentWith({
+		id: "save",
+		kind: "contribution",
+		target: "cash",
+		frequency: "monthly",
+		start: "2026-01-01",
+		amount: 100,
+		growth: { bps: 0 },
+	}),
+	estate: { costs: [{ id: "fee", of: { accounts: ["loan"] }, bps: 100, rounding: "floor" }] },
+}
+
 const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 	[
 		"WITHDRAWAL_LOCKED",
@@ -98,6 +112,7 @@ const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 		documentWith(levelFlow({}, { payments: 0 })),
 		"document.flows.0.level.payments",
 	],
+	["ESTATE_ACCOUNT_LIABILITY", ESTATE_ON_LOAN, "document.estate.costs.0.of.accounts.0"],
 	[
 		"LEVEL_PAYMENT_OVERFLOW",
 		documentWith(levelFlow({}, { principal: 9_000_000_000_000_000, payments: 1 })),
