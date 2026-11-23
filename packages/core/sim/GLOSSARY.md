@@ -322,7 +322,7 @@ The net-worth Percentiles across Market paths at one Annual roll-up end, at leve
 _Avoid_: Range, confidence interval, corridor
 
 **Spending Band**:
-The Percentiles, at levels 10, 25, 50, 75 and 90 and by nearest rank, of what a plan's rule Flows paid across Market paths in one Annual roll-up (`spending.bands`), present in a Chance of success only when the Scenario has a rule Flow (ADR 0024). It counts what was paid, not the planned amount, in nominal terms: a path that ran out pays 0 in every later roll-up, and the roll-up it ran out in counts what was paid before it and the met share of the failing day. Its `lowestYear` is the same five Percentiles of each path's lowest roll-up spending, from the first roll-up a rule Flow paid in through the last full roll-up.
+The Percentiles, at levels 10, 25, 50, 75 and 90 and by nearest rank, of what a plan's rule Flows paid across Market paths in one Annual roll-up (`spending.bands`), present in a Chance of success only when the Scenario has a rule Flow (ADR 0024). It counts what was paid, not the planned amount, in nominal terms: a path that ran out pays 0 in every later roll-up, and the roll-up it ran out in counts what was paid before it and the met share of the failing day. Its `lowestYear` is the same five Percentiles of each path's lowest year, the least of its roll-ups that hold a whole year of the rule's payments (a partial first, last or clipped roll-up never counts); a path that ran out has a lowest year of 0, wherever it ran out, and is always in the sample.
 _Avoid_: Expense Band, income Band, withdrawal Band
 
 ## Input Conventions

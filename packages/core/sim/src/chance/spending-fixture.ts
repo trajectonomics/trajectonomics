@@ -28,17 +28,21 @@ export const TEN_PERCENT: SpendingRule = {
 	rounding: "halfUp",
 }
 
-/** 1,200,000 in cash; the rule and 10,000 of rent a month; the rule starts on `start`. */
+/** 1,200,000 in cash; the rule and 10,000 of rent a month; the rule runs from `start` to `end`. */
 export function cashPlan(
 	horizon: string,
 	rule: SpendingRule = TEN_PERCENT,
 	start?: string,
+	end?: string,
 ): Fixture {
 	return makeFixture({
 		accounts: [{ id: "cash", kind: "asset", rate: 0 }],
 		balances: { cash: 1_200_000 },
 		flows: [
-			ruledExpense("spend", rule, start === undefined ? {} : { start }),
+			ruledExpense("spend", rule, {
+				...(start === undefined ? {} : { start }),
+				...(end === undefined ? {} : { end }),
+			}),
 			expense("rent", 10_000, { frequency: "monthly" }),
 		],
 		surplus: [{ account: "cash" }],

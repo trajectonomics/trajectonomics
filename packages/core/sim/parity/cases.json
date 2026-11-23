@@ -8786,7 +8786,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "0306abfa6e82ca6f637254ecd8b1f8c220ecd093823900733d000daf4824b489"
+		"chanceSha256": "c38dbc9db88d7baccff2e4c1c68531c022b95382cbc062f6335901be2d509ee3"
 	},
 	{
 		"name": "rule-guardrails",
@@ -8952,7 +8952,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 6
 		},
-		"chanceSha256": "d41f35f505855a8addd5518bea812d154c388d0386958cde47ee93d9764259bc"
+		"chanceSha256": "8d033312ab2e7b7896904643ec337517b5142b7da47e7f47966348d6e012cc4c"
 	},
 	{
 		"name": "rule-fi",

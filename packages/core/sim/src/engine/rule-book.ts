@@ -41,7 +41,7 @@ export interface RuleOccurrence {
 }
 
 /** A Flow's Occurrences per Rule year: twelve for a monthly Flow, one for an annual one. */
-function perYear(flow: Flow): number {
+export function perYear(flow: Flow): number {
 	return flow.frequency === "monthly" ? 12 : 1
 }
 

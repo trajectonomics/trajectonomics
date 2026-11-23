@@ -1,18 +1,31 @@
+import type { SpendingRule } from "../types"
 import { oraclePathSeed, oracleWords } from "./oracle-prng"
+import { oracleFixYear } from "./oracle-rule-year"
 
 /**
  * A cash plan the oracle replays by brute force: one Account holding `opening`, a rent paid each month,
- * and a `currentRate` rule that reads the same Account on each twelfth month's first day and pays a
- * twelfth of `round(P × rateBps / 10000)` a month. Every month draws a bucket from the seeded stream.
+ * and a monthly rule Flow that reads the same Account on the first day of each of its twelve-month Rule
+ * years and pays a twelfth of the year's amount a month, from month `ruleStart` up to (not including)
+ * month `ruleEnd`. Every month draws a bucket from the seeded stream; roll-ups are calendar years from
+ * month 0, the last one clipped when `months` is not a multiple of twelve.
  */
 export interface OracleSpendingPlan {
 	readonly opening: bigint
 	readonly rent: bigint
-	readonly rateBps: bigint
-	/** A multiple of twelve: whole Annual roll-ups only. */
+	readonly rule: SpendingRule
+	readonly inflationBps?: number
 	readonly months: number
+	readonly ruleStart?: number
+	readonly ruleEnd?: number
 	readonly buckets: readonly { readonly returnBps: bigint; readonly weight: bigint }[]
 	readonly seed: bigint
+}
+
+export interface OraclePath {
+	/** What the rule paid in each roll-up. */
+	readonly spent: bigint[]
+	/** The path's lowest year; absent when it has no whole year and did not run out. */
+	readonly lowest?: bigint
 }
 
 /** `numerator / denominator`, ties away from zero, for a non-negative numerator. */
@@ -33,63 +46,67 @@ function returnsOf(plan: OracleSpendingPlan, index: number): bigint[] {
 	})
 }
 
-/** What the rule paid in each twelve-month roll-up on path `index`, month by month, stopping when cash runs out. */
-export function oraclePathSpending(plan: OracleSpendingPlan, index: number): bigint[] {
+/** The smaller of two amounts (`Math.min` takes no BigInt). */
+function least(a: bigint, b: bigint): bigint {
+	return a - b < 0n ? a : b
+}
+
+/** The lowest year: 0 if the walk broke; else the least roll-up that has all twelve of its months paid. */
+function lowestOf(plan: OracleSpendingPlan, spent: bigint[], lastMonth: number, broke: boolean) {
+	if (broke) return 0n
+	const first = plan.ruleStart ?? 0
+	const end = Math.min(plan.ruleEnd ?? plan.months, plan.months, lastMonth + 1)
+	const whole = spent.filter((_, year) => {
+		const paying = Math.min(end, 12 * year + 12) - Math.max(first, 12 * year)
+		return paying === 12
+	})
+	return whole.length === 0 ? undefined : whole.reduce(least)
+}
+
+/** The rule's amount for the Rule year that begins this month (the year's fixed `amount`, ADR 0023). */
+function yearAmount(plan: OracleSpendingPlan, since: number, cash: bigint, before: bigint[]) {
+	const input = { index: since / 12, date: "2026-01-01", years: since / 12, portfolio: cash }
+	const { amount } = oracleFixYear(plan.rule, {
+		...input,
+		inflation: plan.inflationBps ?? 0,
+		before,
+	})
+	before.push(amount)
+	return amount
+}
+
+/** Months since the rule began on `month`, or `undefined` before it begins or from its `end`. */
+function sinceOf(plan: OracleSpendingPlan, month: number): number | undefined {
+	const since = month - (plan.ruleStart ?? 0)
+	return since < 0 || month >= (plan.ruleEnd ?? plan.months) ? undefined : since
+}
+
+/** What the rule pays in the month `since` months into a Rule year fixed at `yearly`: a twelfth, exactly split. */
+function monthlyPay(yearly: bigint, since: number): bigint {
+	const k = BigInt((since % 12) + 1)
+	return (yearly * k) / 12n - (yearly * (k - 1n)) / 12n
+}
+
+/** What the rule paid in each roll-up on path `index`, month by month, stopping when cash runs out. */
+export function oraclePath(plan: OracleSpendingPlan, index: number): OraclePath {
 	const returns = returnsOf(plan, index)
-	const spent: bigint[] = Array.from({ length: plan.months / 12 }, () => 0n)
+	const spent: bigint[] = Array.from({ length: Math.ceil(plan.months / 12) }, () => 0n)
+	const amounts: bigint[] = []
 	let cash = plan.opening
 	let yearly = 0n
-	for (let month = 0; month < plan.months; month++) {
+	let broke = false
+	let month = 0
+	for (; month < plan.months && !broke; month++) {
 		if (month > 0) cash = halfUp(cash * (10000n + returns[month - 1]!), 10000n)
-		if (month % 12 === 0) yearly = halfUp(cash * plan.rateBps, 10000n)
-		const k = BigInt((month % 12) + 1)
-		const pay = (yearly * k) / 12n - (yearly * (k - 1n)) / 12n
+		const since = sinceOf(plan, month)
+		if (since !== undefined && since % 12 === 0) yearly = yearAmount(plan, since, cash, amounts)
+		const pay = since === undefined ? 0n : monthlyPay(yearly, since)
 		const outflow = pay + plan.rent
-		let met = outflow
-		if (outflow > cash) met = cash
+		const met = least(outflow, cash)
 		spent[Math.floor(month / 12)]! += (met * pay) / outflow
 		cash -= met
-		if (met < outflow) break
+		broke = met < outflow
 	}
-	return spent
-}
-
-function ascending(sample: readonly bigint[]): bigint[] {
-	return [...sample].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
-}
-
-/** The smallest sample value with at least `level` percent of the sample at or below it. */
-export function oraclePercentile(sample: readonly bigint[], level: number): bigint {
-	const distinct = [...new Set(ascending(sample))]
-	for (const value of distinct) {
-		const atOrBelow = sample.filter((other) => other <= value).length
-		if (atOrBelow * 100 >= level * sample.length) return value
-	}
-	throw new Error("empty sample")
-}
-
-export interface OracleSpendingBands {
-	readonly bands: bigint[][]
-	/** Each path's lowest year, for the paths that have one. */
-	readonly lows: bigint[]
-	readonly lowest: bigint[]
-}
-
-/** Every roll-up's five Percentiles, and the five Percentiles of each path's lowest year, over `paths` paths. */
-export function oracleSpendingBands(plan: OracleSpendingPlan, paths: number): OracleSpendingBands {
-	const levels = [10, 25, 50, 75, 90]
-	const spent = Array.from({ length: paths }, (_, index) => oraclePathSpending(plan, index))
-	const bands = spent[0]!.map((_, year) =>
-		levels.map((level) =>
-			oraclePercentile(
-				spent.map((path) => path[year]!),
-				level,
-			),
-		),
-	)
-	const lows = spent.flatMap((path) => {
-		const first = path.findIndex((value) => value > 0n)
-		return first < 0 ? [] : [ascending(path.slice(first))[0]!]
-	})
-	return { bands, lows, lowest: levels.map((level) => oraclePercentile(lows, level)) }
+	const lowest = lowestOf(plan, spent, month - 1, broke)
+	return { spent, ...(lowest === undefined ? {} : { lowest }) }
 }

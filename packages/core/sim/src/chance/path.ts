@@ -26,6 +26,8 @@ export interface PathOutcome {
 	readonly runsOutIndex?: number
 	/** What the rule Flows paid in each grid period; present only when the Scenario has a rule Flow. */
 	readonly spent?: readonly MinorUnits[]
+	/** The path's lowest year of that spending, absent when it has no whole year and did not run out. */
+	readonly lowest?: MinorUnits
 }
 
 export type PathResult =
@@ -56,9 +58,7 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 		timeline,
 		inputs.observations,
 		returns,
-		false,
-		false,
-		true,
+		{ recordRules: true },
 	)
 	if (!result.ok) return { ok: false, problem: result.problem }
 	const runsOut = result.run.runsOut
@@ -73,12 +73,13 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	const annual = rollups.annual!
 	const last = annual[annual.length - 1]!
 	const netWorth = inputs.grid.map((period) => (annual[period.index] ?? last).closingNetWorth)
-	const spent = spentBy(result.run, inputs.grid)
+	const spent = spentBy(result.run, inputs.scenario, inputs.grid)
 	if (!spent.ok) return { ok: false, problem: spent.problem }
 	const outcome: PathOutcome = {
 		netWorth,
 		...(runsOut === undefined ? {} : { runsOutIndex: last.index }),
 		...(spent.spent === undefined ? {} : { spent: spent.spent }),
+		...(spent.lowest === undefined ? {} : { lowest: spent.lowest }),
 	}
 	return { ok: true, outcome }
 }

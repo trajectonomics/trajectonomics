@@ -14,27 +14,9 @@ function spendingBandAt(
 	return { index: period.index, to: period.to, spending: percentiles(sorted) }
 }
 
-/** The last roll-up that is a whole year; only the final one can be clipped by the horizon. */
-function lastFull(grid: readonly Period[]): number {
-	return grid[grid.length - 1]!.partial ? grid.length - 2 : grid.length - 1
-}
-
-/**
- * One path's lowest roll-up spending, from the first roll-up its rule Flows paid something in through
- * the last full roll-up; `undefined` when it paid in none, or first paid after the last full one.
- */
-function lowestOf(spent: readonly MinorUnits[], last: number): MinorUnits | undefined {
-	const first = spent.findIndex((value) => value > 0)
-	if (first < 0 || first > last) return undefined
-	return Math.min(...spent.slice(first, last + 1))
-}
-
-function lowestYear(
-	spent: readonly (readonly MinorUnits[])[],
-	grid: readonly Period[],
-): ChanceLowestYear {
-	const last = lastFull(grid)
-	const lows = spent.flatMap((path) => lowestOf(path, last) ?? [])
+/** The lowest-year Percentiles over the paths that have one; the count says how many did. */
+function lowestYear(outcomes: readonly PathOutcome[]): ChanceLowestYear {
+	const lows = outcomes.flatMap((outcome) => outcome.lowest ?? [])
 	return { paths: lows.length, spending: lows.length === 0 ? [] : percentiles(ascending(lows)) }
 }
 
@@ -47,6 +29,6 @@ export function spendingOf(
 	if (spent.length === 0) return undefined
 	return {
 		bands: grid.map((period) => spendingBandAt(period, spent)),
-		lowestYear: lowestYear(spent, grid),
+		lowestYear: lowestYear(outcomes),
 	}
 }

@@ -74,10 +74,11 @@ describe("chanceOfSuccess spending", () => {
 		])
 	})
 
-	it("takes each path's lowest roll-up, which is 0 for every path that ran out before the last", () => {
-		// Lowest per path: 0 × 9, 48 (path 10), 30,045 (path 8), 120,000 (path 2).
+	it("reads 0 as the lowest year of every path that ran out, wherever it did", () => {
+		// Eleven paths ran out, in roll-up 0 or 1, so each reads 0; only path 2 (120,000, 120,000) lives.
+		// Ranks 2, 3, 6, 9, 11 of the twelve are all 0.
 		expect(spending!.lowestYear.paths).toBe(12)
-		expect(spending!.lowestYear.spending.map((point) => point.value)).toEqual([0, 0, 0, 0, 30_045])
+		expect(spending!.lowestYear.spending.map((point) => point.value)).toEqual([0, 0, 0, 0, 0])
 	})
 
 	it("still counts the one survivor in the chance of success, floored to 833 basis points", () => {

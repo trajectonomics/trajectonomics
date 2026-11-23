@@ -39,14 +39,17 @@ paths.
   90 by ADR 0011's integer rule (the element at index `ceil(level × N / 100) − 1` of the ascending sample),
   over every path, a failed path as 0 after it ran out. A tie reports the tied value and a two-value
   sample takes the lower at level 50 (a sample 1, 5, 5, 9 reads 1, 1, 5, 5, 9).
-- **The lowest year.** For each path, the lowest roll-up spending from the first roll-up a rule Flow
-  paid in (the first with a figure above 0) through the last full roll-up, the final roll-up being
-  excluded only when the horizon clips it. Then the same five Percentiles across the paths that have
-  one, with their count. A path that paid in no roll-up, or first paid after the last full one, has no
-  lowest year and is not in the sample; with no such path the Percentiles are an empty list and the
-  count is 0. A path that ran out has 0 in every later full roll-up, so its lowest year is 0: that is
-  the figure "how bad does a bad year get" reports, and the Percentile at level 10 is 0 whenever at
-  least a tenth of the sample ran out.
+- **The lowest year.** Per path, from the roll-ups that hold a whole year of the rule: a roll-up counts
+  only when each rule Flow that paid in it landed a whole year of Occurrences there (twelve for a
+  monthly Flow, one for an annual one, counted from the path's own log, the failing day's included). A
+  roll-up in which no rule Flow paid, one the horizon clips, and one a Flow starts or ends part-way
+  through (a Milestone gate, an `end` date, a start date that is not a roll-up's first day) do not count.
+  The path's lowest year is the least of those. A path that ran out has a lowest year of 0 and is always in the sample, wherever it ran out: before the rule
+  paid, inside a full roll-up, in the clipped final roll-up or on the horizon day. A path with neither
+  a whole year nor a run-out has no lowest year and is left out. Then the same five Percentiles across
+  the paths in the sample, with their count `paths`; with no path in it the Percentiles are an empty
+  list and the count is 0. So the Percentile at level 10 is 0 whenever at least a tenth of the paths
+  ran out, which is the "how bad does a bad year get" figure.
 - **Withdrawal rates are not capped.** The Band reports amounts, never rates; `withdrawalRateBps` of a
   Rule year stays above 10000 on a depleted portfolio (ADR 0023).
 - **Reuse.** No extra engine run: the path's own run carries a log of each rule Occurrence's date and
@@ -64,10 +67,13 @@ paths.
 - No new check codes. The existing Chance of success parity hash (`freelancer-chance`) is unchanged
   and so is every Projection hash. `rule-current-rate-bounds` carries a chance over a rule Flow, so its
   `chanceSha256` changes by design; `rule-guardrails-chance` is new and pins a guardrails plan.
-- Where the rule starts part-way through a roll-up (a Flow gated by a Milestone), that roll-up holds
-  only the Occurrences after the start, and the lowest year includes it, as the issue states. A caller
-  that wants a whole-year figure compares the Bands of the rule's first full roll-up.
+- A rule that starts part-way through a roll-up (a Flow gated by a Milestone, or a `start` that is not
+  a first of January) reports that roll-up's Band as it is, and leaves it out of the lowest year: its
+  first Percentile is not a year. A caller that wants the whole-year figure reads the Bands from the
+  rule's first full roll-up.
 - The independent check is `golden/oracle-spending.ts`: it replays seeded paths of a cash plan by its
-  own PRNG stream, month walk and rule year, computes each roll-up's spending and the Percentiles by a
-  count-at-or-below definition rather than by index, and agrees with every Band and lowest-year
-  Percentile of 40 paths over three seeds.
+  own PRNG stream, month walk and rule year, computes each roll-up's spending, each path's lowest year
+  (by counting the months a roll-up held) and the Percentiles by a count-at-or-below definition rather
+  than by index, and agrees with every Band and lowest-year Percentile of 40 paths over three seeds, for
+  `currentRate` and `guardrails`, a rule starting on 2026-10-01, a rule with an `end`, and a horizon that
+  clips the final roll-up.

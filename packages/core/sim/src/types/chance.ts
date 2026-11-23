@@ -31,9 +31,9 @@ export interface ChanceSpendingBand {
 	readonly spending: readonly ChancePercentile[]
 }
 
-/** The Percentiles, across the paths that have one, of each path's lowest roll-up spending. */
+/** The Percentiles, across the paths that have one, of each path's lowest year of spending (ADR 0024). */
 export interface ChanceLowestYear {
-	/** Paths with a lowest year: they paid in some roll-up that a full roll-up follows or is. */
+	/** Paths with a lowest year: every path that ran out, and each other path with a whole-year roll-up. */
 	readonly paths: number
 	/** The five Percentiles; empty when no path has a lowest year. */
 	readonly spending: readonly ChancePercentile[]
