@@ -52,7 +52,7 @@ $effect(() => {
 <aside
 	id="page-menu"
 	class={cx(
-		"fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col gap-6 overflow-y-auto border-r border-border bg-background px-4 py-5 transition-transform",
+		"print:hidden fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col gap-6 overflow-y-auto border-r border-border bg-background px-4 py-5 transition-transform",
 		"lg:visible lg:w-60 lg:max-w-none lg:translate-x-0",
 		shellPanels.menu ? "visible translate-x-0" : "invisible -translate-x-full",
 	)}

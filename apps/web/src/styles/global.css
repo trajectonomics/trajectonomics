@@ -18,3 +18,33 @@
 [data-theme="dark"] {
 	color-scheme: dark;
 }
+
+/*
+ * Print: every page prints in black on white, with its navigation and controls left out by the
+ * `print:hidden` classes. These rules are unlayered, so they win over Tailwind's layered utilities without
+ * `!important`. A scrolling table prints in full, its header repeats on each page, and a row is not split.
+ */
+@media print {
+	@page {
+		margin: 12mm;
+	}
+
+	html,
+	body {
+		background: #fff;
+		color: #000;
+	}
+
+	[class*="max-h-"] {
+		max-height: none;
+		overflow: visible;
+	}
+
+	thead {
+		display: table-header-group;
+	}
+
+	tr {
+		break-inside: avoid;
+	}
+}

@@ -5,6 +5,7 @@ export type IconName =
 	| "activity"
 	| "book-open"
 	| "calendar"
+	| "file-text"
 	| "chart-line"
 	| "git-compare"
 	| "house"

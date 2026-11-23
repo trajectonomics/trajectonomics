@@ -4,7 +4,13 @@
 import type { IconElement } from "./nav-icons"
 
 /** The icons of the planner pages, by name. The Cash flow page is a planner page (#190). */
-export type PlanIconName = "landmark" | "milestone" | "trending-down" | "trending-up" | "workflow"
+export type PlanIconName =
+	| "file-text"
+	| "landmark"
+	| "milestone"
+	| "trending-down"
+	| "trending-up"
+	| "workflow"
 
 /** The elements of the planner pages' icons, copied from the Lucide icon set. */
 export const PLAN_ICON_NODES: Readonly<Record<PlanIconName, readonly IconElement[]>> = {
@@ -13,6 +19,14 @@ export const PLAN_ICON_NODES: Readonly<Record<PlanIconName, readonly IconElement
 		["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2" }],
 		["path", { d: "M7 11v4a2 2 0 0 0 2 2h4" }],
 		["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2" }],
+	],
+	// Lucide "file-text" (ISC), copied from lucide-static 0.460.0.
+	"file-text": [
+		["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" }],
+		["path", { d: "M14 2v4a2 2 0 0 0 2 2h4" }],
+		["path", { d: "M10 9H8" }],
+		["path", { d: "M16 13H8" }],
+		["path", { d: "M16 17H8" }],
 	],
 	milestone: [
 		["path", { d: "M12 13v8" }],

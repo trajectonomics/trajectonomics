@@ -24,7 +24,7 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the fourteen pages are in navigation order, with unique paths", () => {
+	test("the fifteen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -35,6 +35,7 @@ describe("the navigation's routes", () => {
 			"/assets-and-debts/",
 			"/fi/",
 			"/compare/",
+			"/reports/",
 			"/cash-flow/",
 			"/chance/",
 			"/tax/",
@@ -49,7 +50,16 @@ describe("the navigation's routes", () => {
 			[null, ["Home", "Net worth"]],
 			[
 				"Plan",
-				["Overview", "Milestones", "Income", "Expenses", "Assets and debts", "FI date", "Compare"],
+				[
+					"Overview",
+					"Milestones",
+					"Income",
+					"Expenses",
+					"Assets and debts",
+					"FI date",
+					"Compare",
+					"Reports",
+				],
 			],
 			[null, ["Cash flow"]],
 			[null, ["Chance of success"]],
@@ -74,12 +84,14 @@ describe("the navigation's routes", () => {
 			"Assets and debts",
 			"FI date",
 			"Compare",
+			"Reports",
 		])
 		expect(routesShown(plan, false, true).map((route) => route.label)).toEqual([
 			"Overview",
 			"Milestones",
 			"FI date",
 			"Compare",
+			"Reports",
 		])
 	})
 
@@ -94,6 +106,7 @@ describe("the navigation's routes", () => {
 			"Assets and debts",
 			"FI date",
 			"Compare",
+			"Reports",
 		])
 	})
 

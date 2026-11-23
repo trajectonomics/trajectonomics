@@ -61,9 +61,13 @@ $effect(() => {
 	{cashflow}
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
-<div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60">
-	<ShellTopBar {title} />
-	<WhatIfBar />
+<div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">
+	<div class="print:hidden">
+		<ShellTopBar {title} />
+	</div>
+	<div class="print:hidden">
+		<WhatIfBar />
+	</div>
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
 		{@render children()}
 	</main>
@@ -73,4 +77,6 @@ $effect(() => {
 		</p>
 	</footer>
 </div>
-<DisplayOptions />
+<div class="print:hidden">
+	<DisplayOptions />
+</div>
