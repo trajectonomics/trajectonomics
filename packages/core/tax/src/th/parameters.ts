@@ -63,7 +63,8 @@ export const TH_2026_PARAMETERS: ThParameters = {
 		retirementCluster: {
 			combinedCeiling: 500_000,
 			rmf: { maxRate: 0.3, ceiling: 500_000 },
-			ssf: { maxRate: 0.3, ceiling: 200_000 },
+			// No SSF deduction: it ended with income received on 31 Dec 2024 (M.R. No. 126 cl. 2(102), as added by M.R. No. 357 (B.E. 2563)). See ADR 0007.
+			ssf: { maxRate: 0, ceiling: 0 },
 			pvd: { maxRate: 0.15, ceiling: 500_000 },
 			gpf: { ceiling: 500_000 },
 			nsf: { ceiling: 30_000 },

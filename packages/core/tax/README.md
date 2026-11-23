@@ -110,7 +110,7 @@ Section 40(4) is split into four labels because each source carries its own fina
 | Label | Allowance |
 | --- | --- |
 | `allowance.retirement.rmf` | RMF contribution |
-| `allowance.retirement.ssf` | SSF contribution |
+| `allowance.retirement.ssf` | SSF contribution; allows nothing for 2026, the deduction ended with income received on 31 December 2024 (ADR 0007) |
 | `allowance.retirement.pvd` | PVD contribution |
 | `allowance.retirement.gpf` | GPF contribution |
 | `allowance.retirement.nsf` | National Savings Fund contribution |
