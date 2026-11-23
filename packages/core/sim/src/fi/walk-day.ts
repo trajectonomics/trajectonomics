@@ -1,3 +1,4 @@
+import { recordLanding } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import { closeReturnsOn, hasSettlement } from "../engine/levy-set"
 import { processDate } from "../engine/occurrence"
@@ -53,10 +54,12 @@ export function processDay(
 	dayEvents: readonly DatedEvent[],
 ): DayOutcome {
 	const { levies, states, gate } = input.point
-	input.values?.record(date, states)
 	if (levies !== undefined) closeReturnsOn(levies, states, date)
 	const settled = levies !== undefined && hasSettlement(levies, date)
+	const firedBefore = gate?.fires().size
 	const landing = gate === undefined ? dayEvents : gate.apply(states, date, dayEvents, settled)
+	// A Milestone that fires here lands its deferred `once` Flows in a window, stopped or not.
+	recordLanding(input.values, date, states, landing, gate?.fires().size !== firedBefore)
 	const flows = processFlows(input, date, landing, settled)
 	if (flows.kind !== "ok" || input.months === 0) return flows
 	if (input.table === undefined) return trace(input, date)

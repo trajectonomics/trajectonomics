@@ -5,7 +5,8 @@ import type { ProjectionProblem } from "../types/projection"
 import type { BufferBreach } from "./buffer"
 import { cloneLevySet, cloneStates } from "./clone"
 import type { PrefixPoint } from "./prefix"
-import { gridDates, gridEvents, type ScanGrid } from "./scan-grid"
+import { recordReads } from "./read-dates"
+import { gridDates, gridEvents, lowerBound, type ScanGrid } from "./scan-grid"
 import { stopsFlow } from "./scan-stop"
 import { processDay } from "./walk-day"
 import { finish } from "./walk-finish"
@@ -37,10 +38,12 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 			gate: input.point.gate.clone(events, stopsFlow(grid.retirement)),
 		}),
 	}
-	const { shared, reads } = input.windows
+	const { shared, reads, readDates } = input.windows
 	const beneath = input.point.values && { from: input.month, values: input.point.values }
 	const working: DayInput = {
-		...(reads.length > 0 && { values: recordedValues(reads, point.states, beneath) }),
+		...(reads.length > 0 && {
+			values: recordedValues(reads, point.states, beneath, readDates.set),
+		}),
 		scenario: input.scenario,
 		point,
 		months: input.windows.months,
@@ -49,8 +52,10 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 	}
 	const dates = gridDates(grid, input.month)
 	let index = 0
+	let read = lowerBound(readDates.sorted, input.month)
 	let firstBreach: BufferBreach | undefined
 	for (const date of dates) {
+		read = recordReads(working.values, readDates.sorted, read, point.states, date)
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
 		const day = processDay(working, date, dayEvents)

@@ -1,12 +1,45 @@
 import type { Emit, Path } from "./codes"
-import { accountReadsOf } from "./flow-accounts"
+import { accountReadsOf, changedAccountOf } from "./flow-accounts"
 import { isRecord } from "./shape"
 
 const METRICS = ["metric", "base"] as const
 
-function readsAccount(flows: unknown): boolean {
+function strings(value: unknown): readonly string[] {
+	return Array.isArray(value) ? value.filter((item) => typeof item === "string") : []
+}
+
+/** The Accounts `cashflow.surplus`, `contribute` and `withdraw` can move. */
+function cashflowAccounts(cashflow: unknown): readonly string[] {
+	if (!isRecord(cashflow)) return []
+	const steps: unknown[] = Array.isArray(cashflow["surplus"]) ? cashflow["surplus"] : []
+	const surplus = steps.flatMap((step) =>
+		isRecord(step) && typeof step["account"] === "string" ? [step["account"]] : [],
+	)
+	return [...surplus, ...strings(cashflow["contribute"]), ...strings(cashflow["withdraw"])]
+}
+
+/**
+ * The Accounts that can change on a future date: the target of a Contribution (a debt payment, an
+ * obligation purchase), the source of a withdrawal (a sale, a loan draw), and every Account the
+ * cashflow's `surplus`, `contribute` or `withdraw` can move. Anything else holds its opening state
+ * and grows by its rate alone.
+ */
+function changeable(scenario: Readonly<Record<string, unknown>>): ReadonlySet<string> {
+	const flows: unknown[] = Array.isArray(scenario["flows"]) ? scenario["flows"] : []
+	const ids = new Set(cashflowAccounts(scenario["cashflow"]))
+	for (const flow of flows) {
+		const id = changedAccountOf(flow)
+		if (id !== undefined) ids.add(id)
+	}
+	return ids
+}
+
+/** Whether any Flow's Derived amount reads an Account in `moving`. */
+function readsMoving(flows: unknown, moving: ReadonlySet<string>): boolean {
 	if (!Array.isArray(flows)) return false
-	return flows.some((flow, index) => accountReadsOf(flow, ["scenario", "flows", index]).length > 0)
+	return flows.some((flow, index) =>
+		accountReadsOf(flow, ["scenario", "flows", index]).some((read) => moving.has(read.account)),
+	)
 }
 
 /** Reports each `expenses: next12Months` Metric of one criterion, at the Metric's `expenses` key. */
@@ -22,12 +55,12 @@ function reportCriterion(criterion: unknown, at: Path, emit: Emit): void {
 
 /**
  * A Milestone's `next12Months` expense window plans each Flow's amounts over a year it has not
- * walked, and a Derived amount that reads an Account would need that Account's value on each of
- * those dates from the run's own forecast. The window cannot have it, so the two do not meet in one
- * Scenario (ADR 0020).
+ * walked. A Derived amount that reads an Account that nothing changes is priced from that Account's
+ * state as it stands, grown to each date. One that reads an Account that can change on a future
+ * date would need a forward walk, so the two do not meet in one Scenario (ADR 0020).
  */
 export function checkExpenseWindowReads(scenario: unknown, emit: Emit): void {
-	if (!isRecord(scenario) || !readsAccount(scenario["flows"])) return
+	if (!isRecord(scenario) || !readsMoving(scenario["flows"], changeable(scenario))) return
 	const milestones = scenario["milestones"]
 	if (!Array.isArray(milestones)) return
 	for (let index = 0; index < milestones.length; index++) {

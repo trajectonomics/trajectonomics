@@ -71,21 +71,22 @@ export function baselinePrefix(
 	calendar: ResolvedCalendar | undefined,
 	series?: ResolvedReturns,
 	reads: readonly string[] = [],
+	readDates: ReadonlySet<DateString> = new Set(),
 ): Prefix {
 	const states = createStates(baseline, scenario, timeline.start, series)
 	const { levies, settlementDates } = levyPlan(scenario, timeline, calendar)
 	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
-	const recorded = reads.length === 0 ? undefined : recordedValues(reads, states)
+	const recorded =
+		reads.length === 0 ? undefined : recordedValues(reads, states, undefined, readDates)
 	const wanted = new Set(candidates)
 	const points = new Map<DateString, PrefixPoint>()
 	const dates = collectDates(events, candidates, settlementDates)
 	let index = 0
 	for (const date of dates) {
 		if (wanted.has(date)) points.set(date, pointOf(states, levies, gate, events, recorded))
-		recorded?.record(date, states)
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
-		const stepped = advance(states, scenario, date, dayEvents, levies, gate)
+		const stepped = advance(states, scenario, date, dayEvents, levies, gate, recorded)
 		if (stepped.problem !== undefined) {
 			return { points, runsOut: undefined, problem: stepped.problem, stoppedAt: date }
 		}
