@@ -12,7 +12,7 @@ cover:
 
 [MooJot](https://moojot.trajectonomics.com/) is a free, [open-source](https://github.com/trajectonomics/moojot) money tracker for Thai bank slips. You pay with your banking app and the app saves a slip to your phone. MooJot reads those slips and logs each expense with a category for you. It needs no account, and [your records stay on your phone](https://github.com/trajectonomics/moojot/blob/main/docs/privacy-policy.md).
 
-It isn't on Google Play yet, so you install it from its APK file. That takes about a minute, and the [two-minute video tutorial](YOUTUBE_URL) shows every tap. The video is in Thai. The same steps are written out below.
+It isn't on Google Play yet, so you install it from its APK file. That takes about a minute, and the [two-minute video tutorial](https://youtu.be/OIfqAEZv6_M) shows every tap. The video is in Thai. The same steps are written out below.
 
 <figure>
   <img src="/posts/install-moojot-on-android/steps.webp" alt="Three phone screens: Chrome asking whether to download moojot-android-arm64.apk anyway, Android asking whether to install moojot, and MooJot's home screen with the pig and the month's total, with the list of transactions blurred." width="1440" height="1070" loading="lazy" />
