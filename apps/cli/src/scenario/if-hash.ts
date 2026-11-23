@@ -6,7 +6,7 @@ import { z } from "zod"
  */
 export const IF_HASH: z.ZodOptional<z.ZodString> = z
 	.string()
-	.min(1)
+	.regex(/^jcs1:sha256:[0-9a-f]{64}$/, "a contentHash is jcs1:sha256: and 64 lower-case hex digits")
 	.optional()
 	.describe(
 		"Refuse the write unless the stored plan's contentHash is this one, as traj scenario show prints it (ADR-0051).",
