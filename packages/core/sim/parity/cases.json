@@ -5565,5 +5565,555 @@
 			"paths": 4
 		},
 		"chanceSha256": "598dd5a30555273ac476f2e5c9e365114cc48c76023a7a9cb639dd0ecba97ed1"
+	},
+	{
+		"name": "loan-statement-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "c0642fdeb49f9da42aca5a7f7d3e6c7bcf1cf34b3a4bbfbf9549ac3d2adb0392"
+	},
+	{
+		"name": "loan-statement-extra",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 3000000
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				},
+				{
+					"id": "extra",
+					"frequency": "once",
+					"start": "2026-04-30",
+					"amount": 3000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "loan"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "cfe76284cfd3a7bd4587cf8ea9f0892d0008d77b832d871fa73c5eaac7dad420"
+	},
+	{
+		"name": "loan-statement-mid-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-15",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-02-20",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "d75804c80210380b8636c91506225ef48334c4a6a9fe3491f70b193e26e11f86"
+	},
+	{
+		"name": "loan-statement-borrow",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "borrow",
+					"kind": "withdrawal",
+					"source": "loan",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 10000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-04-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "2978029ae3cc8113bc71ae24531cc67360a9a6763ab9098d56008b1b89659b9a"
+	},
+	{
+		"name": "loan-statement-zero-rate",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 1200000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 1200000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "9bccd8d3e47878a88709457b99de74135c1bbeb2ace811a9faf56694610ce136"
+	},
+	{
+		"name": "loan-statement-open",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 100000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 100000000,
+						"payments": 360,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-06-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "44b4e381304c30926eb0069ce08bac9be85c5f17e1715591623f19c3cca74f77"
+	},
+	{
+		"name": "loan-statement-run-out",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "rent",
+					"kind": "expense",
+					"frequency": "once",
+					"start": "2026-02-15",
+					"amount": 5000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-06-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "7e4817d55910979e65e7eebfb8f814a666eb4211f9dde5c8580c6cbd4fb13cbb"
 	}
 ]

@@ -1,7 +1,7 @@
 import type { Fixture } from "../fixtures/fixture"
 import { freelancer } from "../fixtures/freelancer"
 import { thaiEmployee } from "../fixtures/thai-employee"
-import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
+import type { ChanceOfSuccessOptions, ProjectionOptions, SurvivalOptions } from "../types"
 import { calendarFiMonth, calendarShiftDay } from "./calendar-cases"
 import { freelancerChance } from "./chance-cases"
 import { capped } from "./contribution-cases"
@@ -30,6 +30,7 @@ export interface ParityCase {
 	readonly fixture: Fixture
 	readonly options?: SurvivalOptions
 	readonly chance?: ChanceOfSuccessOptions
+	readonly projectOptions?: ProjectionOptions
 }
 
 /** Inputs whose Projection and Financial Independence must hash identically under every engine. */

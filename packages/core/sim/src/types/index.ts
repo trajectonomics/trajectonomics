@@ -96,4 +96,5 @@ export type {
 	TwentyFiveTimesReference,
 } from "./reference"
 export type { Economy, Scenario } from "./scenario"
+export type { LiabilityMonth, LiabilityStatement, ProjectionOptions } from "./statement"
 export type { Timeline } from "./timeline"

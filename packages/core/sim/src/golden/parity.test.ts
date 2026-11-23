@@ -5,6 +5,9 @@ import { project } from "../engine/project"
 import { chanceOfSuccess, financialIndependence } from "../index"
 import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
 import { PARITY_CASES } from "./parity-cases"
+import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
+
+const ALL_PARITY_CASES = [...PARITY_CASES, ...STATEMENT_PARITY_CASES]
 
 interface Recorded {
 	readonly name: string
@@ -25,15 +28,17 @@ function hash(value: unknown): string {
 
 describe("parity/cases.json", () => {
 	it("lists exactly the parity cases", () => {
-		expect(recorded.map((item) => item.name)).toEqual(PARITY_CASES.map((item) => item.name))
+		expect(recorded.map((item) => item.name)).toEqual(ALL_PARITY_CASES.map((item) => item.name))
 	})
 
-	it.each(PARITY_CASES.map((item) => [item.name, item] as const))(
+	it.each(ALL_PARITY_CASES.map((item) => [item.name, item] as const))(
 		"%s hashes as recorded (run `bun run parity:update` after an intended change)",
-		(name, { fixture, options, chance }) => {
+		(name, { fixture, options, chance, projectOptions }) => {
 			const { baseline, scenario, timeline } = fixture
 			const record = recorded.find((item) => item.name === name)
-			expect(hash(project(baseline, scenario, timeline))).toBe(record?.sha256 ?? "missing")
+			expect(hash(project(baseline, scenario, timeline, projectOptions))).toBe(
+				record?.sha256 ?? "missing",
+			)
 			if (options !== undefined) {
 				expect(hash(financialIndependence(baseline, scenario, timeline, options))).toBe(
 					record?.fiSha256 ?? "missing",
