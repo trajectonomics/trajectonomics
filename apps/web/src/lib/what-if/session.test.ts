@@ -80,6 +80,16 @@ describe("the What-if session", () => {
 		])
 	})
 
+	test("itemSets compares structurally: an object that differs only in key order is not a change", () => {
+		const stored = { id: "x-sale", derive: { op: "mul", measures: [{ account: "x", id: "a" }] } }
+		const edited = { id: "x-sale", derive: { measures: [{ id: "a", account: "x" }], op: "mul" } }
+		expect(itemSets("flows", "x-sale", stored, edited)).toEqual([])
+		const moved = { id: "x-sale", derive: { measures: [{ id: "b", account: "x" }], op: "mul" } }
+		expect(itemSets("flows", "x-sale", stored, moved)).toEqual([
+			{ path: "flows.x-sale.derive", value: moved.derive },
+		])
+	})
+
 	test("itemSets names a new field of the item too, and gives no Set for an unchanged one", () => {
 		expect(itemSets("accounts", "cash", { id: "cash" }, { id: "cash", rate: 0.5 })).toEqual([
 			{ path: "accounts.cash.rate", value: 0.5 },

@@ -5,6 +5,7 @@ import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import Drawer from "../ui/Drawer.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 import AccountForm from "./AccountForm.svelte"
+import AssetForm from "./AssetForm.svelte"
 import ExtraPaymentForm from "./ExtraPaymentForm.svelte"
 import FlowForm from "./FlowForm.svelte"
 import LoanForm from "./LoanForm.svelte"
@@ -36,6 +37,8 @@ const existingAccount = $derived(doc.accounts.find((account) => account.id === d
 	{#if drawer !== null && kind === "assets"}
 		{#if drawer.extra === true && drawer.id !== undefined}
 			<ExtraPaymentForm {name} {doc} {contentHash} loanId={drawer.id} onDone={onClose} />
+		{:else if drawer.asset === true}
+			<AssetForm {name} {doc} {household} {baseline} {contentHash} assetId={drawer.id} tryValue={trying} onDone={onClose} />
 		{:else if drawer.loan === true}
 			<LoanForm {name} {doc} {baseline} {contentHash} loanId={drawer.id} tryValue={trying} onDone={onClose} />
 		{:else}

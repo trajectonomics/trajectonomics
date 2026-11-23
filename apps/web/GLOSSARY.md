@@ -67,3 +67,7 @@ _Avoid_: debt schedule, amortization, mortgage (as a kind)
 **Report**:
 A table of the selected plan's projection as `traj` stated it, which the Reports page previews and writes as a CSV or JSON file, or prints. A CSV cell is exactly the string the Snapshot holds, and an empty cell is a figure `traj` stated as null. A cell is never guarded against a spreadsheet formula: the data is the person's own ledger, and a guard would change what `traj` stated. The JSON is value-equal to the Snapshot's Read, not byte-identical, because the loader keeps the parsed result and not the file's text.
 _Avoid_: export (as the name of the table), statement, extract
+
+**Real asset**:
+An asset Account that is not liquid (a home or a car), with the items that buy, finance, keep, rent out and sell it, written under one id convention. The page edits them together and groups them on one card; `traj` computes its value, its costs and its loan. An item that follows the convention's id but not its shape is an ordinary item.
+_Avoid_: property, holding, fixed asset (as a kind)

@@ -70,10 +70,10 @@ function candidateOf(
 }
 
 /** The problem shown at an expense's category that is not 1 to 64 characters, none a control character (cli schema). */
-const CATEGORY_PROBLEM = "Enter a category of 1 to 64 characters, or leave it empty."
+export const CATEGORY_PROBLEM = "Enter a category of 1 to 64 characters, or leave it empty."
 
 /** Whether a category is 1 to 64 characters, none of them a control character. */
-function isCategoryText(category: string): boolean {
+export function isCategoryText(category: string): boolean {
 	if (category.length < 1 || category.length > 64) return false
 	return [...category].every((char) => {
 		const code = char.charCodeAt(0)
