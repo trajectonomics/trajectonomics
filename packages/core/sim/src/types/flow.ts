@@ -66,6 +66,8 @@ export interface IncomeRules {
 
 export interface ExpenseRules {
 	readonly kind: "expense"
+	/** Free-text grouping for reports, 1 to 64 characters. The engine never reads it: no figure changes. */
+	readonly category?: string
 }
 
 /** Cash moves into `target`. A liability target is a debt payment capped at the amount owed; an asset target spends Available cashflow in `cashflow.contribute` order. */
