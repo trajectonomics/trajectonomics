@@ -28,8 +28,6 @@ const accounts = $derived(
 	accountChoices(plan, snapshot.status === "ready" ? snapshot.snapshot.reads.baseline : undefined),
 )
 const shown = $derived(estateShown(problems, editSession.failure, editSession.error, layout))
-// A what-if replaces a path the plan holds, so a plan with no estate block saves one first (cli ADR 0064).
-const canTry = $derived(plan.estate !== undefined)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
@@ -76,10 +74,7 @@ function tryIt(): void {
 	<LineList bind:draft list="costs" {accounts} {shown} onShape={forget} />
 	<LineList bind:draft list="gifts" {accounts} {shown} onShape={forget} />
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	{#if canTry}
-		<button type="button" class={button} disabled={editSession.busy || whatIfSession.saving} onclick={tryIt}>Try as a what-if</button>
-	{:else}
-		<p class="text-xs text-muted-foreground">Save your first line to try changes to it as a what-if: a what-if can change an estate the plan already states.</p>
-	{/if}
+	<!-- A what-if can begin the block on a plan that has none (cli ADR 0065), so every plan can try. -->
+	<button type="button" class={button} disabled={editSession.busy || whatIfSession.saving} onclick={tryIt}>Try as a what-if</button>
 	<ItemActions />
 </form>

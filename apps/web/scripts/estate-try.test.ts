@@ -64,13 +64,26 @@ describe("trying the estate block", () => {
 	})
 
 	slow(
-		"a plan with no block is refused by traj, which is why the form saves a first line before it offers a try",
+		"a plan with no block is tried as a new block (cli ADR 0065), and nothing is written",
 		async () => {
 			await withoutLines()
-			const { answer } = await tryDraft("1", "5")
-			const failed = failedReads(answer)
-			expect(failed.length).toBeGreaterThan(0)
-			expect(failed[0]?.error.message).toContain('No key or id "estate"')
+			const before = storedPlan()
+			expect(before.document.estate).toBeUndefined()
+			const { session, answer } = await tryDraft("1", "5")
+			expect(failedReads(answer)).toEqual([])
+			expect(session.sets.map((set) => set.path)).toEqual(["estate"])
+			const { run } = readsOf(answer)
+			if (run === null) throw new Error("the what-if has a run")
+			const dates = estateDates(run, before.document, householdDocument.parse(HOUSEHOLD), "")
+			// 1% of 1,391,400.00 is 13,914.00; the net 1,391,400.00 - 184,000.00 - 13,914.00 = 1,193,486.00;
+			// 5% of it is 59,674.30, so heirs receive 1,133,811.70.
+			expect(estateView(run, dates?.chosen.date ?? "", "both")?.figures.row).toMatchObject({
+				costs: "13914.00",
+				net: "1193486.00",
+				gifts: "59674.30",
+				toHeirs: "1133811.70",
+			})
+			expect(storedPlan()).toEqual(before)
 		},
 	)
 })
