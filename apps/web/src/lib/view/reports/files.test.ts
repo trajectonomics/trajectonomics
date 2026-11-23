@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { ProjectionRun, Read } from "../../contract"
+import { failedRead } from "../../snapshot/fixtures.test-support"
 import { projectionRunFixture } from "../projection/fixtures.test-support"
 import { parseCsv } from "./csv-parse.test-support"
 import {
@@ -12,7 +13,7 @@ import {
 	safeName,
 	tableFile,
 } from "./files"
-import { type ReportSource, reportSource } from "./source"
+import { noProjectionReason, type ReportSource, reportSource } from "./source"
 import { reportTables } from "./tables"
 
 const ARGV = ["projection", "run", "--scenario", "base", "--as-of", "2026-10-31", "--json"]
@@ -100,6 +101,34 @@ describe("report files", () => {
 			removals: ["expense.rent"],
 			projection: run,
 		})
+	})
+})
+
+describe("a plan whose projection read failed", () => {
+	const reads = { projections: { base: failedRead<ProjectionRun>(ARGV, "no_ledger") } }
+
+	test("has no source, and the reason is the CLI's own message", () => {
+		expect(reportSource(reads, "base", null)).toBeNull()
+		expect(noProjectionReason(reads, "base")).toBe("no_ledger message")
+		expect(noProjectionReason(reads, "missing")).toBe(
+			"The Snapshot holds no projection for this plan.",
+		)
+	})
+
+	test("still has an everything file, with the other reads and the failed one as the Snapshot holds them", () => {
+		const file = everythingFile(
+			{
+				projections: reads.projections,
+				fi: { base: failedRead(["fi"]) },
+				documents: {},
+				chance: {},
+			},
+			{ plan: "base", asOf: "2026-10-31", whatIf: false },
+			null,
+		)
+		expect(file.name).toBe("base-all-2026-10-31.json")
+		expect(JSON.parse(file.text).projections).toEqual({ base: reads.projections.base })
+		expect(JSON.parse(file.text).fi.base.ok).toBe(false)
 	})
 })
 

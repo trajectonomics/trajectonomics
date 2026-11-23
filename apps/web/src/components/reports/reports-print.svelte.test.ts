@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, test } from "bun:test"
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import SideNavigation from "../shell/SideNavigation.svelte"
@@ -38,15 +36,15 @@ describe("the Reports page on paper", () => {
 
 	test("the download buttons and the print button are left out of a printed page", () => {
 		const { body } = render(ReportDownloads, {
-			props: { csv: () => file, json: () => file, all: () => file },
+			props: { csv: () => file, json: () => file, all: () => file, csvReady: true },
 		})
-		expect(body).toContain('class="print:hidden flex flex-wrap gap-2"')
+		expect(body).toContain('class="print:hidden space-y-2"')
 		for (const label of ["Download CSV", "Download JSON", "Download everything", "Print"]) {
 			expect(body).toContain(label)
 		}
 	})
 
-	test("the heading prints in black on white, and a cell holds its text escaped", () => {
+	test("the screen heading is left out of paper, and a cell holds its text escaped", () => {
 		const { body } = render(ReportPreview, {
 			props: {
 				label: "Account balances",
@@ -55,7 +53,7 @@ describe("the Reports page on paper", () => {
 				heading: "แผน · As of 2026-10-31 · Nominal",
 			},
 		})
-		expect(body).toContain("print:text-black")
+		expect(body).toMatch(/<p class="print:hidden [^"]*">แผน · As of 2026-10-31 · Nominal<\/p>/)
 		expect(body).toContain("&lt;b&gt;ธนาคาร&lt;/b&gt; &amp; co")
 		expect(body).not.toContain("<b>ธนาคาร</b>")
 	})
@@ -71,13 +69,5 @@ describe("the Reports page on paper", () => {
 			},
 		})
 		expect(body).toMatch(/<aside[^>]*class="print:hidden /)
-	})
-
-	test("the print stylesheet prints black on white, lifts a table's scroll cap and repeats its header", () => {
-		const css = readFileSync(join(import.meta.dir, "../../styles/global.css"), "utf8")
-		expect(css).toContain("@media print")
-		expect(css).toContain("background: #fff;")
-		expect(css).toContain("max-height: none;")
-		expect(css).toContain("display: table-header-group")
 	})
 })

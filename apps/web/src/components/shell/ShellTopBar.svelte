@@ -28,7 +28,7 @@ const BUTTON = cx(
 </script>
 
 <!-- The page's label, the menu button (narrow screens only), the Snapshot's status, and Display options. -->
-<header class="sticky top-0 z-20 border-b border-border bg-background">
+<header class="print:hidden sticky top-0 z-20 border-b border-border bg-background">
 	<div class="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 pt-3 sm:px-6">
 		<button
 			type="button"

@@ -3,9 +3,13 @@ import type { ReportRecord, ReportTable } from "./table"
 /** The byte-order mark that starts the file, so a spreadsheet reads it as UTF-8 (the Thai text in it). */
 export const BYTE_ORDER_MARK = "﻿"
 
-/** One field as RFC 4180 writes it: quoted when it holds a comma, a double quote or a line break. */
+/**
+ * One field as RFC 4180 writes it: quoted when it holds a comma, a double quote or a line break, and also when
+ * it starts or ends in a space, which a spreadsheet would otherwise trim. The text is never guarded against a
+ * formula: a cell is exactly what the Snapshot holds (see "Report" in the GLOSSARY).
+ */
 export function csvField(text: string): string {
-	return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+	return /[",\r\n]/.test(text) || text !== text.trim() ? `"${text.replaceAll('"', '""')}"` : text
 }
 
 /**

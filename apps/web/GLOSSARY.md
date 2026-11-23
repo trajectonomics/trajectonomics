@@ -63,3 +63,7 @@ _Avoid_: preview, overlay, diff
 **Loan**:
 A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.
 _Avoid_: debt schedule, amortization, mortgage (as a kind)
+
+**Report**:
+A table of the selected plan's projection as `traj` stated it, which the Reports page previews and writes as a CSV or JSON file, or prints. A CSV cell is exactly the string the Snapshot holds, and an empty cell is a figure `traj` stated as null. A cell is never guarded against a spreadsheet formula: the data is the person's own ledger, and a guard would change what `traj` stated. The JSON is value-equal to the Snapshot's Read, not byte-identical, because the loader keeps the parsed result and not the file's text.
+_Avoid_: export (as the name of the table), statement, extract

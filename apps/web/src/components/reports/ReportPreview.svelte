@@ -17,7 +17,8 @@ let { label, columns, records, heading }: Props = $props()
 const rows = $derived(records.map((record, id) => ({ id, record })))
 </script>
 
-<p class="text-sm text-muted-foreground print:text-black">{heading}</p>
+<!-- The printed header of the page names the plan, As-of date and terms; this line is for the screen. -->
+<p class="print:hidden text-sm text-muted-foreground">{heading}</p>
 <DataTable
 	caption={label}
 	columns={dataColumns(columns)}

@@ -16,6 +16,14 @@ describe("csvField", () => {
 		expect(csvField("carriage\rreturn")).toBe('"carriage\rreturn"')
 	})
 
+	test("quotes a cell that starts or ends in a space, so a spreadsheet keeps it, and round-trips it", () => {
+		expect(csvField(" leading")).toBe('" leading"')
+		expect(csvField("trailing ")).toBe('"trailing "')
+		expect(csvField("inner space")).toBe("inner space")
+		const text = csvText(["name"], [{ name: " ธนาคาร " }, { name: "a  " }])
+		expect(parseCsv(text)).toEqual([["name"], [" ธนาคาร "], ["a  "]])
+	})
+
 	test("does not quote Thai text, which has no comma, quote or line break", () => {
 		expect(csvField("เงินสด")).toBe("เงินสด")
 	})

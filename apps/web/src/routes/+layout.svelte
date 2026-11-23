@@ -8,8 +8,10 @@ import { queryParam } from "../client/query-param.svelte.js"
 import { selectPlan } from "../client/select-plan.svelte.js"
 import { shellPanels } from "../client/shell.svelte.js"
 import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
+import { whatIfSession } from "../client/what-if.svelte.js"
 import { brandArtwork } from "../components/shell/brand-artwork"
 import DisplayOptions from "../components/shell/DisplayOptions.svelte"
+import PrintHeader from "../components/shell/PrintHeader.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
@@ -18,6 +20,7 @@ import { hasCashflow } from "../lib/view/cashflow/cashflow"
 import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones"
 import { scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
+import { printHeading } from "../lib/view/print-header"
 import { chooseScenario } from "../lib/view/projection/scenario"
 import { routeAt } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
@@ -35,6 +38,16 @@ const planDocument = $derived(documentRead(currentSnapshot(), selected) !== unde
 const milestones = $derived(hasMilestones(projectionRead(currentSnapshot(), selected)))
 // The Cash flow page is listed only when the selected plan's projection carries its cash flow table.
 const cashflow = $derived(hasCashflow(projectionRead(currentSnapshot(), selected)))
+
+// Every printed page opens with the plan, the As-of date and the terms (and says so for a What-if session).
+const printed = $derived(
+	printHeading(
+		currentSnapshot(),
+		selected,
+		queryParam("terms", "both"),
+		whatIfSession.lensFor(selected) !== null,
+	),
+)
 
 // The Snapshot follows the address: this layout stays mounted across pages, so the read is started
 // again whenever the query string changes. The loader reads each file once, so a page change with the
@@ -62,13 +75,10 @@ $effect(() => {
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">
-	<div class="print:hidden">
-		<ShellTopBar {title} />
-	</div>
-	<div class="print:hidden">
-		<WhatIfBar />
-	</div>
+	<ShellTopBar {title} />
+	<WhatIfBar />
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+		<PrintHeader heading={printed} />
 		{@render children()}
 	</main>
 	<footer class="border-t border-border">
@@ -77,6 +87,4 @@ $effect(() => {
 		</p>
 	</footer>
 </div>
-<div class="print:hidden">
-	<DisplayOptions />
-</div>
+<DisplayOptions />

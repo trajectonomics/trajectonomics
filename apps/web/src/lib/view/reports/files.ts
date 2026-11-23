@@ -1,7 +1,7 @@
-import type { Snapshot } from "../../contract"
+import type { ProjectionRun, Snapshot } from "../../contract"
 import type { WhatIf } from "../../what-if/session"
 import { tableCsv } from "./csv"
-import type { ReportSource } from "./source"
+import type { ReportSource, ReportTarget } from "./source"
 import type { ReportTable } from "./table"
 
 /** One file a download writes: its name, its media type and its text. */
@@ -31,7 +31,7 @@ export function safeName(plan: string): string {
 
 /** `<plan>-<part>-<as-of>.<extension>`, with `-what-if` before the extension when the figures are the session's. */
 export function reportFileName(
-	source: ReportSource,
+	source: ReportTarget,
 	part: string,
 	extension: "csv" | "json",
 ): string {
@@ -80,12 +80,14 @@ function entriesOf<T>(
  */
 export function everythingFile(
 	reads: Pick<Snapshot["reads"], "projections" | "fi" | "documents" | "chance">,
-	source: ReportSource,
+	source: ReportTarget & { readonly run?: ProjectionRun | undefined },
 	changes: SessionChanges | null,
 ): ReportFile {
 	const { plan } = source
 	const session =
-		source.whatIf && changes !== null ? { plan, ...changes, projection: source.run } : undefined
+		source.whatIf && changes !== null && source.run !== undefined
+			? { plan, ...changes, projection: source.run }
+			: undefined
 	const value = {
 		projections: entriesOf(reads.projections, plan),
 		fi: entriesOf(reads.fi, plan),
