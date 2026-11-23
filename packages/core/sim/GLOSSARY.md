@@ -82,6 +82,26 @@ _Avoid_: Spending year, withdrawal year, rule period
 What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
 _Avoid_: Spending report, withdrawal schedule
 
+**Estate statement**:
+What a Projection reports per row with `estate: true`, read from that row's own balances and changing no other figure: the Gross estate, the `debts` (every liability's amount owed), each Settlement cost, `net = gross − debts − Σcosts` (signed), each Gift, and What heirs receive, with `net` and `toHeirs` also in today's money. A plan with no `estate` block still has one, with no cost and no gift.
+_Avoid_: Legacy, estate report, estate tax
+
+**Gross estate**:
+Every asset Account's value on the row's date: locked and Illiquid Accounts included, as they are in Net worth. Liabilities are not netted from it.
+_Avoid_: Legacy, total assets, net worth
+
+**Settlement cost**:
+One line of the estate block's `costs`: a share (`bps` with a stated `rounding`) of the Gross estate or of named asset Accounts' value, or a fixed amount grown by whole years from `Timeline.start`. It is taken before any Gift. The core states no tax: an inheritance tax, a transfer fee or a sale tax is a cost line the caller types.
+_Avoid_: Estate tax, inheritance tax, fee, legacy cost
+
+**Gift**:
+One line of the estate block's `gifts`: a share of the net estate or a fixed amount, taken in order from `max(0, net)`. A later Gift takes only what earlier ones left, so Gifts never exceed it.
+_Avoid_: Bequest, donation, legacy
+
+**What heirs receive** (`toHeirs`):
+`max(0, net)` less the Gifts: 0 when net is not above 0, and then `−net` is the shortfall.
+_Avoid_: Inheritance, legacy, estate
+
 **Tally label**:
 A label on an income Flow, on a contribution Flow, or on an asset Account (`returnLabel`, `gainLabel`), that a Levy sums over a Settlement period. A Flow or Account with no label is never tallied, which is how a tax-sheltered Account is left out. Gross tallies use the planned income amount; funded tallies use the amount a contribution actually applied after any cap. A label is the unit of per-person scope: separate caps per earner are separate labels, and `add` sums their Measures. A Levy whose `due` graph reads tally labels and has none of them supplied anywhere in the Scenario is refused by `check()` (`UNSUPPLIED_TALLY_LABEL`), because every total it reads would be zero in every Settlement period.
 _Avoid_: Category, tag, tax category

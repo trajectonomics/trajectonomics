@@ -98,4 +98,6 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	RULE_PORTFOLIO_ILLIQUID: never,
 	RULE_FREQUENCY: never,
 	RULE_FLOOR_ABOVE_CEILING: never,
+	// An estate block the CLI does not publish yet; the CLI change for #365 makes this user-facing.
+	ESTATE_ACCOUNT_LIABILITY: never,
 }

@@ -35,4 +35,6 @@ export interface ProjectionOptions {
 	readonly cashflowBreakdown?: boolean
 	/** One Spending rule statement per rule Flow; present only when set. */
 	readonly spendingRules?: boolean
+	/** One Estate statement per row; present only when set. */
+	readonly estate?: boolean
 }

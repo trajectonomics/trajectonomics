@@ -9076,5 +9076,301 @@
 			"minBufferMonths": 12
 		},
 		"fiSha256": "dce7af7860a74629c307d4b506d29235d0c86a7b623efcbd3097a9750662d544"
+	},
+	{
+		"name": "estate-home-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "home",
+					"amount": 5000000
+				},
+				{
+					"account": "fund",
+					"amount": 2000000
+				},
+				{
+					"account": "loan",
+					"amount": 3000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0,
+					"liquid": false
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"lockedUntil": "2030-01-01"
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": []
+			},
+			"estate": {
+				"costs": [
+					{
+						"id": "settlement",
+						"of": "gross",
+						"bps": 200,
+						"rounding": "halfUp"
+					},
+					{
+						"id": "home-sale",
+						"of": {
+							"accounts": ["home"]
+						},
+						"bps": 500,
+						"rounding": "halfUp"
+					},
+					{
+						"id": "lawyer",
+						"amount": 100000,
+						"growth": "inflation"
+					}
+				],
+				"gifts": [
+					{
+						"id": "temple",
+						"of": "net",
+						"bps": 1000,
+						"rounding": "floor"
+					}
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2028-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"estate": true
+		},
+		"sha256": "3119ab2537e375b65409a87accee97c78a1fe391f9d80ab48e27664eb928dda2"
+	},
+	{
+		"name": "estate-gifts-capped",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "home",
+					"amount": 5000000
+				},
+				{
+					"account": "fund",
+					"amount": 2000000
+				},
+				{
+					"account": "loan",
+					"amount": 3000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0,
+					"liquid": false
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"lockedUntil": "2030-01-01"
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": []
+			},
+			"estate": {
+				"costs": [
+					{
+						"id": "settlement",
+						"of": "gross",
+						"bps": 200,
+						"rounding": "halfUp"
+					}
+				],
+				"gifts": [
+					{
+						"id": "charity",
+						"amount": 3000000,
+						"growth": {
+							"bps": 0
+						}
+					},
+					{
+						"id": "family",
+						"of": "net",
+						"bps": 5000,
+						"rounding": "halfUp"
+					}
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2028-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"estate": true
+		},
+		"sha256": "d86d74b67de8625c99326b8fb78c35b1f91ab5e080aea796e3db3a961e7af0bd"
+	},
+	{
+		"name": "estate-negative-net",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "home",
+					"amount": 5000000
+				},
+				{
+					"account": "fund",
+					"amount": 2000000
+				},
+				{
+					"account": "loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0,
+					"liquid": false
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"lockedUntil": "2030-01-01"
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": []
+			},
+			"estate": {
+				"costs": [
+					{
+						"id": "settlement",
+						"of": "gross",
+						"bps": 200,
+						"rounding": "halfUp"
+					}
+				],
+				"gifts": [
+					{
+						"id": "temple",
+						"of": "net",
+						"bps": 1000,
+						"rounding": "floor"
+					}
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2028-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"estate": true
+		},
+		"sha256": "30c3835e28d6c43e98602fff05dc25f2c1d45ea1e6b060623bdb6e055f163148"
 	}
 ]
