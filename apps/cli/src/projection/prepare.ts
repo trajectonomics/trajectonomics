@@ -22,6 +22,8 @@ export type Prepared = {
 	 */
 	document: Scenario
 	overrides: AppliedOverride[]
+	/** The `--without` paths taken out before the Overrides, in command-line order (cli ADR-0055). */
+	removals: string[]
 	scenario: ScenarioEcho
 	currency: string
 	baseline: Baseline
@@ -49,6 +51,10 @@ export type PrepareInput = {
 	asOf: string
 	horizon: string
 	sets: readonly string[]
+	/** The `--without` paths, taken out before the Sets (cli ADR-0055). */
+	without?: readonly string[] | undefined
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0055). */
+	decimal?: boolean | undefined
 }
 
 /**
@@ -72,7 +78,10 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	const row = input.store.getScenario(input.scenario)
 	if (isAppError(row)) return row
 	if (row === null) return scenarioNotFound(input.scenario, input.scenarioPath)
-	const applied = applyScenarioSets(JSON.parse(row.document) as ScenarioDocument, input.sets)
+	const applied = applyScenarioSets(JSON.parse(row.document) as ScenarioDocument, input.sets, {
+		without: input.without,
+		decimal: input.decimal,
+	})
 	if (isAppError(applied)) return applied
 	const unsupported = thbOnly(applied.document)
 	if (unsupported !== null) return unsupported
@@ -91,6 +100,7 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		// The one place the stored JSON becomes the engine's type; `check()` reads it again.
 		document: stored,
 		overrides: applied.overrides,
+		removals: applied.removals,
 		scenario: {
 			id: row.id,
 			name: row.name,

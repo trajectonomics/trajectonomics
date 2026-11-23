@@ -7,9 +7,25 @@ export const ageFlag: z.ZodOptional<z.ZodArray<z.ZodNumber>> = z
 	.array(z.number().int().min(0).describe("An age to report net worth at; needs --birth-date."))
 	.optional()
 
-/** Exactly one of the second Scenario and `--set` says what B is (ADR-0030). */
-export function whatIfProblem(b: string | undefined, sets: readonly string[]): AppError | null {
-	if ((b === undefined) === (sets.length === 0)) {
+/**
+ * Exactly one of the second Scenario and an Override says what B is (ADR-0030): `--set` or
+ * `--without` makes a what-if of A, and a second Scenario is compared as stored (cli ADR-0055).
+ */
+export function whatIfProblem(
+	b: string | undefined,
+	sets: readonly string[],
+	without: readonly string[] = [],
+): AppError | null {
+	const overriding = sets.length > 0 || without.length > 0
+	if (b !== undefined && overriding && sets.length === 0) {
+		return fail("invalid_input", {
+			path: "without",
+			message:
+				"compare takes --without for a what-if of one Scenario, not beside a second Scenario.",
+			hint: "Pass one Scenario and --without, or two Scenarios and no --without.",
+		})
+	}
+	if ((b === undefined) === !overriding) {
 		return fail("invalid_input", {
 			path: "b",
 			message: "compare needs exactly one of a second Scenario or --set.",

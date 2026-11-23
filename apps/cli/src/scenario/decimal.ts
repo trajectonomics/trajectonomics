@@ -11,7 +11,7 @@ import { formatPath } from "./path"
  */
 
 /** The one hint a money field in the wrong form carries: the two ways to say the same amount. */
-const MONEY_HINT =
+export const MONEY_HINT =
 	'write it as a decimal string such as "350.00", or drop --decimal to give minor units'
 
 /** The element a document path names: a list item's `id` when it has one, otherwise its index. */
@@ -26,7 +26,7 @@ function at(path: readonly string[]): string {
 }
 
 /** The Currency every amount is stated in. Missing or unsupported is refused before any field. */
-function currencyOf(document: Node): string | AppError {
+export function currencyOf(document: Node): string | AppError {
 	const path = "document.currency"
 	const raw = document["currency"]
 	if (typeof raw !== "string") {
@@ -46,7 +46,7 @@ type Convert = (value: unknown, path: readonly string[]) => unknown
  * value holds are visited, so an absent optional field stays absent. A failure stops the walk and
  * is returned as the value, so the caller checks `isAppError` once.
  */
-function mapMoney(
+export function mapMoney(
 	schema: unknown,
 	value: unknown,
 	path: readonly string[],

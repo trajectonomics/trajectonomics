@@ -151,10 +151,12 @@ describe("projection run", () => {
 		expect(Object.keys(data.input.properties).sort()).toEqual([
 			"asOf",
 			"carryIn",
+			"decimal",
 			"horizon",
 			"monthly",
 			"scenario",
 			"set",
+			"without",
 		])
 		expect(data.input.required.sort()).toEqual(["asOf", "horizon", "scenario"])
 		expect(data.output.properties.tables.type).toBe("array")

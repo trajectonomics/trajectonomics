@@ -16,6 +16,7 @@ import {
 	scenarioFlag,
 } from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
+import { decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
 
 /** The method in the words a help page prints: what runs, and what the result does not say. */
 const CHANCE_METHOD =
@@ -31,6 +32,9 @@ export const chance: Leaf = defineCommand({
 		asOf: asOfFlag,
 		horizon: horizonFlag,
 		scenario: scenarioFlag,
+		set: setFlag,
+		without: withoutFlag,
+		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		returnModel: z
 			.string()
@@ -76,7 +80,9 @@ export const chance: Leaf = defineCommand({
 			const prepared = prepare({
 				scenario: input.scenario,
 				scenarioPath: "scenario",
-				sets: [],
+				sets: input.set ?? [],
+				without: input.without ?? [],
+				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
