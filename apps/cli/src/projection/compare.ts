@@ -2,6 +2,7 @@ import { project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"
+import { compareAnnualRows } from "./compare-annual"
 import { deltasOf, type SideData, sideView } from "./compare-figures"
 import type { CompareView } from "./compare-view"
 import { birthdayAt, rowAt } from "./dates"
@@ -58,7 +59,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 	if (isAppError(solution)) return solution
 	const result = project(prepared.baseline, prepared.document, prepared.timeline)
 	if (!result.ok) return refusal(result.problems)
-	const { rows, runsOut, milestones } = result.projection
+	const { rows, runsOut, milestones, annual } = result.projection
 	const final = rows.at(-1)
 	if (final === undefined) {
 		return fail("internal", { message: "The engine reported a Projection with no rows." })
@@ -68,6 +69,7 @@ function dataOf(prepared: Placed, birthdays: readonly Birthday[]): SideData | Ap
 		fi: solution,
 		runsOut,
 		rows,
+		annual,
 		milestones,
 		taxYears: taxYearsOf(result.projection.levies, prepared.currency, prepared.document),
 		unfunded: result.projection.unfundedContributions,
@@ -95,6 +97,7 @@ export function compareOf(input: CompareInput): CompareView | AppError {
 	const dataB = dataOf(b, birthdays)
 	if (isAppError(dataB)) return dataB
 	const money = moneyOf(a.currency)
+	const annualRows = compareAnnualRows(dataA.annual, dataB.annual, money)
 	const tax = taxOf(input)
 	return {
 		asOf: a.timeline.start,
@@ -104,6 +107,7 @@ export function compareOf(input: CompareInput): CompareView | AppError {
 		birthDate: input.birthDate,
 		sides: { a: sideView(dataA, money), b: sideView(dataB, money) },
 		deltas: deltasOf(dataA, dataB, money),
+		tables: [{ name: "annual", count: annualRows.length, rows: annualRows }],
 		tax: tax.tax,
 		notes: [
 			...tax.notes,

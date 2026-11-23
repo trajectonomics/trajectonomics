@@ -43,3 +43,29 @@ existing paths, and `--decimal` converts a threshold amount in a criterion like 
 - A Scenario without Milestones keeps every Projection, compare and golden byte for byte, because the new
   keys are present only when the Scenario declares Milestones.
 - The Dashboard reads the same rows: `apps/web`'s contract accepts the table and the per-side field.
+
+## Amendment (0.8.0): compare reports the change per year and per Milestone
+
+The Decision above left deltas between the sides out. That is now reversed for two things, so a page
+never subtracts money (web ADR 0002):
+
+- **`tables.annual`.** `projection compare` gains an `annual` table, one row per Annual roll-up index
+  present on either side, in index order. Each row states each side's `closingNetWorth`, `income`,
+  `expense`, `contributions` and `interest`, and a `levy` when a side's Scenario holds one, each as
+  `{ a, b, delta }`. `delta` is b minus a, computed in the CLI from the engine's integer minor units and
+  printed at the Currency's scale. A side with no such year, or with no Levy, is `null` there.
+- **`deltas.milestones`.** One row per Milestone id declared on both sides, in side `a`'s Scenario order:
+  `{ id, a, b, months }`. `months` is `monthsBetween(a, b)` and is `null` when either side did not reach
+  it. An id on one side only is not listed; its row is under that side's `milestones`. The key is absent
+  when neither side declares Milestones, and an empty list when only one does.
+
+**Why a year that differs has no change.** A side that runs out part-way through a year ends its last
+period on the run-out day, so its period is partial and not the same span as the other side's. Two
+partial periods are not comparable, as the horizon net worth already says. So a row whose `from` and `to`
+differ between the sides, or that exists on one side only, has `delta: null`; each side's own figures
+stay, with its period in `periods`. The shared `from` and `to` are `null` in that row, because no one
+period is shared. The human table prints a blank change for such a year and says why.
+
+**Why a compare without Milestones is not byte-identical.** `tables.annual` is always present, so a
+compare gains the `tables` key even when no Milestone is declared. The bytes differ only by that added key,
+which the goldens record; the milestone part is absent exactly as the Decision above says.

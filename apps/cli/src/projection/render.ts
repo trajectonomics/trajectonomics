@@ -1,4 +1,5 @@
 import type { ColumnHint, RenderHint } from "../table"
+import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
 import {
 	compareMilestoneBlocks,
 	compareMilestonesHidden,
@@ -89,6 +90,6 @@ export const projectionHint: RenderHint = {
  * printed twice.
  */
 export const compareHint: RenderHint = {
-	display: compareMilestonesHidden,
-	blocks: compareMilestoneBlocks,
+	display: (data) => compareTablesHidden(compareMilestonesHidden(data)),
+	blocks: (data) => [...compareAnnualBlocks(data), ...compareMilestoneBlocks(data)],
 }
