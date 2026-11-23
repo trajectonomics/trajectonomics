@@ -1,5 +1,6 @@
 import { treeOf, treePath } from "../languages"
 import { SITE_HOME_URL, SITE_ORIGIN } from "../site"
+import { checkLlmsFile, checkPostStructuredData } from "./answer-engines"
 import { type BuiltFile, type Failure, failure } from "./failures"
 import { alternatesOf, canonicalOf, images, isNoindex, linkTargets, titleOf } from "./html"
 
@@ -89,11 +90,13 @@ export function checkBuild(files: readonly BuiltFile[]): readonly Failure[] {
 			...checkPage(file.path, file.text ?? ""),
 			...checkImages(file.path, file.text ?? "", built),
 			...checkLinkedPages(file.path, file.text ?? "", built),
+			...checkPostStructuredData(file.path, file.text ?? ""),
 		])
 	if (!built.has(NOT_FOUND_PAGE)) {
 		failures.push(
 			failure("not-found-page-missing", NOT_FOUND_PAGE, "is missing, so a miss is bare"),
 		)
 	}
+	failures.push(...checkLlmsFile(built))
 	return Object.freeze(failures)
 }

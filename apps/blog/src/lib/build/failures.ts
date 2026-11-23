@@ -10,6 +10,8 @@ export type FailureCode =
 	| "shell-home-link-missing"
 	| "shell-blog-link-missing"
 	| "shell-footer-missing"
+	| "llms-txt-missing"
+	| "post-structured-data-missing"
 
 /** A broken rule, the built file that breaks it, and a sentence a reader can act on. */
 export interface Failure {
