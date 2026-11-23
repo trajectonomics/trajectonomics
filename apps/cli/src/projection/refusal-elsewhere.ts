@@ -85,4 +85,8 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_REFERENCE_TERMS: never,
 	INVALID_WEIGHT: input,
 	RETURN_WEIGHT_TOTAL: input,
+	// Refused by `contributionSavings` only; the CLI leaf that calls it (#358) answers them at its flags.
+	UNKNOWN_FUNDED_LABEL: never,
+	TOO_MANY_STEPS: never,
+	INVALID_OPTION: never,
 }

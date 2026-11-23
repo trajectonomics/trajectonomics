@@ -217,6 +217,67 @@ expense after the FI month, and a derived debt payment unconditionally
 (`DERIVED_DEBT_PAYMENT_READS_EARNED`), because retirement spending replaces expenses only. The plain
 Projection is unaffected. See [ADR 0014](docs/adr/0014-levy-extensions.md).
 
+## Contribution savings
+
+`contributionSavings(levy, period, options)` states what raising one contribution label by whole
+steps would take off a Settlement period's `due`, under that Levy's own rules. It takes a Settlement
+period as `project()` reports it, rebuilds the period's Tallies from its `tally` Measure values and
+scans each label in the order given: a step is taken while `due` falls by more than 0 (and by at
+least `minSavingBps` of a step), within the `budget`. A label stops at the first step not taken, and
+the next label starts from what the earlier ones left. This Levy taxes net income at 10% up to
+400,000 and 20% above it, and allows `min(funded, 300,000)` off `fund`:
+
+```ts
+import { contributionSavings, type Levy } from "@trajectonomics/core/sim"
+
+const levy = {
+	id: "tax",
+	period: { month: 1, day: 1 },
+	settlement: { month: 3, day: 31 },
+	due: "due",
+	measures: [
+		{ id: "zero", op: "const", value: 0 },
+		{ id: "income", op: "tally", label: "salary", basis: "gross" },
+		{ id: "funded", op: "tally", label: "fund", basis: "funded" },
+		{ id: "cap", op: "const", value: 300_000 },
+		{ id: "allowance", op: "min", a: "funded", b: "cap" },
+		{ id: "net", op: "sub", a: "income", b: "allowance" },
+		{ id: "taxable", op: "pick", a: "net", b: "zero", then: "net", else: "zero" },
+		{ id: "bound", op: "const", value: 400_000 },
+		{ id: "low", op: "min", a: "taxable", b: "bound" },
+		{ id: "high", op: "sub", a: "taxable", b: "low" },
+		{ id: "lowTax", op: "scale", of: "low", num: 10, den: 100, rounding: "floor" },
+		{ id: "highTax", op: "scale", of: "high", num: 20, den: 100, rounding: "floor" },
+		{ id: "due", op: "add", a: "lowTax", b: "highTax" },
+	],
+} satisfies Levy
+
+const period = {
+	to: "2026-12-31",
+	measures: [
+		{ id: "income", value: 1_000_000 },
+		{ id: "funded", value: 0 },
+	],
+}
+
+console.log(
+	JSON.stringify(
+		contributionSavings(levy, period, { labels: ["fund"], step: 100_000, inflation: 0, maxSteps: 50 }),
+	),
+)
+```
+
+Three steps of 100,000 each save 20,000, then the cap is reached, so the fourth saves nothing:
+
+```text
+{"ok":true,"dueBefore":160000,"dueAfter":100000,"labels":[{"label":"fund","plannedFunded":0,"extra":300000,"saving":60000,"stoppedBy":"noSaving"}]}
+```
+
+The search is bounded: more than `maxSteps` steps in all returns `TOO_MANY_STEPS` instead of an
+answer cut short, and an unread label, a bad option or an overflow come back as
+`{ ok: false, problem }`. A step is whole, so one that straddles a cap is taken when it still saves
+something; raise `minSavingBps` to leave it out. See [ADR 0022](docs/adr/0022-contribution-savings-scan-steps.md).
+
 ## Scripts
 
 - `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).
