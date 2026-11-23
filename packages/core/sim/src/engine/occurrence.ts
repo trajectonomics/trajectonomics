@@ -1,4 +1,4 @@
-import type { DateString, Scenario } from "../types"
+import type { AccountId, DateString, Scenario } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { aggregate } from "./aggregate"
 import { applyAssets, applyDebt } from "./contributions"
@@ -18,6 +18,10 @@ export interface DayTotals {
 	readonly contributions: bigint
 	/** Planned withdrawals landed on this date. They are cash, not income, and not Available cashflow. */
 	readonly withdrawals: bigint
+	/** The planned withdrawals on this date, by the liability each one borrowed from. */
+	readonly drawnBy: ReadonlyMap<AccountId, bigint>
+	/** The debt payments on this date, by the liability each one paid; only nonzero payments. */
+	readonly paidBy: ReadonlyMap<AccountId, bigint>
 	readonly unfunded: ReadonlyMap<string, bigint>
 	/** Prepayment plus Settlements net of refunds on this date. */
 	readonly levy: bigint
@@ -39,7 +43,7 @@ const nothing = { income: 0n, expense: 0n, prepaid: 0n, withdrawals: 0n }
 /** A Derived-amount problem is reported before any Settlement, debt or tally work on the date. */
 function plannedFail(date: DateString, problem: ProjectionProblem): DateOutcome {
 	return {
-		totals: totalsOf(date, nothing, 0n, new Map(), { amount: 0n, problem: undefined }),
+		totals: totalsOf(date, nothing, 0n, new Map(), new Map(), { amount: 0n, problem: undefined }),
 		problem,
 		runsOut: undefined,
 	}
@@ -61,7 +65,7 @@ export function processDate(
 		levies === undefined ? { amount: 0n, problem: undefined } : settlementOn(levies, states, date)
 	if (day.problem !== undefined) {
 		return {
-			totals: totalsOf(date, day, 0n, new Map(), settlement),
+			totals: totalsOf(date, day, 0n, new Map(), new Map(), settlement),
 			problem: day.problem,
 			runsOut: undefined,
 		}
@@ -69,7 +73,7 @@ export function processDate(
 	const borrowing = applyPlannedWithdrawals(states, day.plannedBySource, date, levies)
 	if (borrowing !== undefined) {
 		return {
-			totals: totalsOf(date, day, 0n, new Map(), settlement),
+			totals: totalsOf(date, day, 0n, new Map(), new Map(), settlement),
 			problem: borrowing,
 			runsOut: undefined,
 		}
@@ -77,7 +81,7 @@ export function processDate(
 	const debt = applyDebt(states, day.contributionEntries, date, levies)
 	if (debt.problem !== undefined) {
 		tally(levies, date, day.gross, debt.funded, day.prepaidByLevy)
-		const totals = totalsOf(date, day, debt.paid, new Map(), settlement)
+		const totals = totalsOf(date, day, debt.paid, debt.paidBy, new Map(), settlement)
 		return { totals, problem: debt.problem, runsOut: undefined }
 	}
 	const cashflow = day.income - day.prepaid - day.expense - debt.paid - settlement.amount
@@ -91,7 +95,14 @@ export function processDate(
 		levies,
 	)
 	tally(levies, date, day.gross, mergeFunded(debt.funded, assets.funded), day.prepaidByLevy)
-	const totals = totalsOf(date, day, debt.paid + assets.applied, assets.unfunded, settlement)
+	const totals = totalsOf(
+		date,
+		day,
+		debt.paid + assets.applied,
+		debt.paidBy,
+		assets.unfunded,
+		settlement,
+	)
 	if (settlement.problem !== undefined)
 		return { totals, problem: settlement.problem, runsOut: undefined }
 	if (assets.problem !== undefined) return { totals, problem: assets.problem, runsOut: undefined }

@@ -1,6 +1,7 @@
 import type { ErrorCode, Path } from "../check/codes"
 import type { AccountId, DateString, MinorUnits } from "./common"
 import type { MilestoneResult } from "./milestone"
+import type { LiabilityStatement } from "./statement"
 
 export interface AccountAmount {
 	readonly account: AccountId
@@ -83,6 +84,8 @@ export interface Projection {
 	readonly levies?: readonly LevyReport[]
 	/** Scenario order; present only when the Scenario declares Milestones. */
 	readonly milestones?: readonly MilestoneResult[]
+	/** One statement per liability in Scenario order; present only with `liabilityStatements`. */
+	readonly liabilities?: readonly LiabilityStatement[]
 }
 
 export interface InputProblem {

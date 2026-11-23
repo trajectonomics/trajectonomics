@@ -39,6 +39,8 @@ const TOTALS = {
 	income: 0n,
 	expense: 10000n,
 	withdrawals: 0n,
+	drawnBy: new Map(),
+	paidBy: new Map(),
 	contributions: 0n,
 	unfunded: new Map(),
 	levy: 0n,

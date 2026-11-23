@@ -6,8 +6,18 @@ import { chanceOfSuccess, financialIndependence, project } from "../dist/index.m
 const cases = JSON.parse(readFileSync(new URL("../parity/cases.json", import.meta.url), "utf8"))
 const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex")
 const failed = cases.filter(
-	({ baseline, scenario, timeline, sha256, options, fiSha256, chance, chanceSha256 }) => {
-		if (digest(project(baseline, scenario, timeline)) !== sha256) return true
+	({
+		baseline,
+		scenario,
+		timeline,
+		sha256,
+		options,
+		fiSha256,
+		chance,
+		chanceSha256,
+		projectOptions,
+	}) => {
+		if (digest(project(baseline, scenario, timeline, projectOptions)) !== sha256) return true
 		if (options !== undefined) {
 			if (digest(financialIndependence(baseline, scenario, timeline, options)) !== fiSha256)
 				return true

@@ -15,6 +15,7 @@ interface DayParts {
 	readonly expense: bigint
 	readonly prepaid: bigint
 	readonly withdrawals: bigint
+	readonly plannedBySource?: ReadonlyMap<AccountId, bigint>
 }
 
 export function mergeFunded(
@@ -41,6 +42,7 @@ export function totalsOf(
 	date: DateString,
 	day: DayParts,
 	contributions: bigint,
+	paidBy: ReadonlyMap<AccountId, bigint>,
 	unfunded: ReadonlyMap<AccountId, bigint>,
 	settlement: Settlement,
 ): DayTotals {
@@ -49,7 +51,9 @@ export function totalsOf(
 		income: day.income,
 		expense: day.expense,
 		withdrawals: day.withdrawals,
+		drawnBy: day.plannedBySource ?? new Map(),
 		contributions,
+		paidBy,
 		unfunded,
 		levy: day.prepaid + settlement.amount,
 	}
