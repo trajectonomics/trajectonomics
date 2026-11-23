@@ -16,7 +16,7 @@ import { ruleDraftOf } from "./rule-draft"
 /** A floor or ceiling as text: an empty amount means the rule has none. */
 export interface BoundDraft {
 	amount: string
-	/** "inflation", or "fixed" for the percent in `rate`. */
+	/** "" until the person chooses, then "inflation", or "fixed" for the percent in `rate`. */
 	growth: string
 	rate: string
 }
@@ -36,6 +36,7 @@ export interface StepDraft {
 /** The text of a withdrawal form. `how` is "" until the person chooses, then "level" or a rule kind. */
 export interface WithdrawalDraft {
 	how: string
+	/** "" until the person chooses: "monthly" or "annual". */
 	frequency: string
 	amount: string
 	rate: string
@@ -87,7 +88,7 @@ export function draftOf(flow: ScenarioFlow | undefined, ctx: WithdrawalContext):
 	const start = startOf(flow, ctx)
 	return {
 		how: rule?.kind ?? (flow !== undefined && isLevelAmount(flow) ? "level" : ""),
-		frequency: flow?.frequency === "annual" ? "annual" : "monthly",
+		frequency: flow?.frequency === "annual" || flow?.frequency === "monthly" ? flow.frequency : "",
 		amount: flow?.amount ?? "",
 		...ruleDraftOf(rule),
 		portfolio: rule?.portfolio ?? defaultPortfolio(ctx),

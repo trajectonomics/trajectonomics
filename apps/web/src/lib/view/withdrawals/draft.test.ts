@@ -10,6 +10,7 @@ import { ruleOf } from "./rule"
 
 const typed = (patch: Partial<WithdrawalDraft>): WithdrawalDraft => ({
 	...draftOf(undefined, CTX),
+	frequency: "monthly",
 	...patch,
 })
 
@@ -21,10 +22,12 @@ describe("a new withdrawal form", () => {
 			rate: "",
 			amount: "",
 			rounding: "",
+			frequency: "",
 			steps: [],
 			stops: [],
 		})
-		expect(draft.floor.amount).toBe("")
+		expect(draft.floor).toEqual({ amount: "", growth: "", rate: "" })
+		expect(draft.ceiling.growth).toBe("")
 		expect(draft.upper).toEqual({ band: "", move: "" })
 	})
 
@@ -70,6 +73,18 @@ describe("the expenses that stop when the rule starts", () => {
 		expect(
 			again.ok && again.document.flows.find((flow) => flow.id === "rent")?.endAt,
 		).toBeUndefined()
+	})
+
+	test("a one-off paid before the start, and a Flow that ended before it, are not offered", () => {
+		const flows = [
+			{ id: "once-before", frequency: "once", start: "2027-01-01" },
+			{ id: "once-after", frequency: "once", start: "2050-01-01" },
+			{ id: "ended", frequency: "monthly", start: "2026-01-01", end: "2040-12-31" },
+		].map((flow) =>
+			scenarioFlow.parse({ ...flow, kind: "expense", amount: "1", growth: "inflation" }),
+		)
+		const ctx = { ...CTX, doc: { ...DOC, flows } }
+		expect(stoppableExpenses(ctx, form, "x").map((flow) => flow.id)).toEqual(["once-after"])
 	})
 
 	test("a date start offers none, and an expense is never touched when it was not offered", () => {

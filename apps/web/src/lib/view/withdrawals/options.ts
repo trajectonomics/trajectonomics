@@ -1,8 +1,9 @@
 /** The choices of the Withdrawals form's selects, with the words the person reads. */
 import type { Choice } from "../plan-items/options"
 
-/** How the rule's payments fall: a rule pays a year in twelve monthly parts or in one annual part (cli ADR 0063). */
+/** How the rule's payments fall (no default, the person chooses): a rule pays a year in twelve monthly parts or in one annual part (cli ADR 0063). */
 export const PAY_CHOICES: readonly Choice[] = [
+	{ value: "", label: "Choose how it is paid" },
 	{ value: "monthly", label: "Monthly, in twelve equal parts" },
 	{ value: "annual", label: "Once a year" },
 ]
@@ -21,8 +22,9 @@ export const START_CHOICES: readonly Choice[] = [
 	{ value: "date", label: "On a date" },
 ]
 
-/** How a floor or a ceiling grows from the Flow's start. */
+/** How a floor or a ceiling grows from the Flow's start. There is no default: the person chooses. */
 export const BOUND_GROWTH_CHOICES: readonly Choice[] = [
+	{ value: "", label: "Choose how it grows" },
 	{ value: "inflation", label: "Follows inflation" },
 	{ value: "fixed", label: "A fixed percent a year" },
 ]

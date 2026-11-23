@@ -43,12 +43,27 @@ describe("trying a spending Flow as a what-if", () => {
 		expect(whatIfSession.whatIf?.sets[0]?.value).toMatchObject({ rateBps: "3.00" })
 	})
 
-	test("a rule that becomes a level amount is a Removal and an Addition of the same id, since a Set cannot delete the rule", () => {
+	test("a rule that becomes a level amount is one Set of the whole Flow, never a Removal with an Addition of the same id", () => {
 		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: RULE })
 		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: LEVEL })
-		expect(whatIfSession.whatIf?.sets).toEqual([])
-		expect(whatIfSession.whatIf?.removals).toEqual(["flows.retirement-spending"])
-		expect(whatIfSession.whatIf?.additions).toEqual([{ list: "flows", item: LEVEL }])
+		expect(whatIfSession.whatIf?.sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
+		expect(whatIfSession.whatIf?.removals).toEqual([])
+		expect(whatIfSession.whatIf?.additions).toEqual([])
+	})
+
+	test("a field the stored Flow lacks (a stop) is one Set of the whole Flow", () => {
+		const rent = {
+			id: "rent",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2026-10-31",
+			amount: "5000.00",
+		}
+		const stopped = { ...rent, endAt: "retire" }
+		whatIfSession.tryFlow("base", HASH, { stored: rent, edited: stopped })
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.rent", value: stopped }])
 	})
 
 	test("trying the rule again after a level amount starts from the plan's own, not from the level amount", () => {
@@ -56,7 +71,9 @@ describe("trying a spending Flow as a what-if", () => {
 		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: RULE })
 		expect(whatIfSession.whatIf?.removals).toEqual([])
 		expect(whatIfSession.whatIf?.additions).toEqual([])
-		expect(whatIfSession.whatIf?.sets).toHaveLength(1)
+		expect(whatIfSession.whatIf?.sets.map((set) => set.path)).toEqual([
+			"flows.retirement-spending.rule",
+		])
 	})
 
 	test("another plan's pending changes ask first, as a switch does", () => {

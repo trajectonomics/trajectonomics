@@ -9,10 +9,12 @@ interface Props {
 	terms: Terms
 	/** Names the block when a what-if shows two: "With your try" or "Saved plan". Absent when there is one. */
 	title?: string | undefined
+	/** False when the plan holds no spending Flow at all, so a block with no rule years says that and not "a level amount". */
+	spends?: boolean
 }
 
 /** The Rule years of each rule Flow and, when the plan reads a Return model, what the rule pays in good and bad markets. */
-let { view, terms, title }: Props = $props()
+let { view, terms, title, spends = true }: Props = $props()
 </script>
 
 <div class="space-y-6">
@@ -27,7 +29,7 @@ let { view, terms, title }: Props = $props()
 		<section aria-label="In good and bad markets" class="space-y-4">
 			<h3 class="text-base font-semibold">In good and bad markets</h3>
 			<p class="text-sm"><span class="text-2xl font-semibold tracking-tight tabular-nums">{view.chance.share}</span> chance of success: {view.chance.succeeded} of {view.chance.paths} seeded Market paths hold to {view.chance.horizon}.</p>
-			{#if view.bands}<BandsSection bands={view.bands} currency={view.currency} />{:else if view.rules.length === 0}<p class="text-sm text-muted-foreground">A level amount has no rule years and no Bands: it pays the same in every market, so only the chance of success moves.</p>{/if}
+			{#if view.bands}<BandsSection bands={view.bands} currency={view.currency} />{:else if view.rules.length === 0}<p class="text-sm text-muted-foreground">{spends ? "A level amount has no rule years and no Bands: it pays the same in every market, so only the chance of success moves." : "There is no spending rule in this plan yet. Use \"Set how you spend in retirement\" above to add one."}</p>{/if}
 		</section>
 	{/if}
 </div>

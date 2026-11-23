@@ -9,8 +9,10 @@ import { CTX, DOC } from "./fixtures.test-support"
 const taken = DOC.flows.map((flow) => flow.id)
 const build = (draft: WithdrawalDraft, existing?: ReturnType<typeof scenarioFlow.parse>) =>
 	withdrawalFromDraft(draft, { existing, taken, asOf: CTX.asOf })
+/** A form as a person fills it in: they choose how it is paid, which the form never does for them. */
 const typed = (patch: Partial<WithdrawalDraft>): WithdrawalDraft => ({
 	...draftOf(undefined, CTX),
+	frequency: "monthly",
 	...patch,
 })
 
@@ -99,6 +101,20 @@ describe("a form that is not complete shows its problems at the fields", () => {
 				portfolio: expect.any(String),
 			},
 		})
+	})
+
+	test("how it is paid and how a limit grows are never chosen for the person: each unchosen is a problem", () => {
+		const unpaid = build({ ...typed({ how: "level", amount: "1" }), frequency: "" })
+		expect(unpaid).toMatchObject({ ok: false, problems: { frequency: expect.any(String) } })
+		const limit = build(
+			typed({
+				how: "currentRate",
+				rounding: "floor",
+				rate: "4",
+				floor: { amount: "900", growth: "", rate: "" },
+			}),
+		)
+		expect(limit).toMatchObject({ ok: false, problems: { floor: expect.any(String) } })
 	})
 
 	test("a rate with a third place, a negative one and a bound that is not a number are refused", () => {

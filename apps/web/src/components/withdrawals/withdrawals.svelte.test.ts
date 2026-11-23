@@ -7,11 +7,13 @@ import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/wh
 import { scenarioFlow } from "../../lib/contract"
 import { overviewView } from "../../lib/view/overview/view"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
+import { withdrawalsView } from "../../lib/view/withdrawals"
 import { CTX } from "../../lib/view/withdrawals/fixtures.test-support"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
 import WithdrawalsCard from "../overview/WithdrawalsCard.svelte"
 import SpendingForm from "./SpendingForm.svelte"
 import WithdrawalsBody from "./WithdrawalsBody.svelte"
+import WithdrawalsResult from "./WithdrawalsResult.svelte"
 
 useSessionHooks()
 
@@ -87,6 +89,19 @@ describe("the Withdrawals page", () => {
 		expect(bare).toContain("each is your own estimate")
 	})
 
+	test("a Saved plan block of a plan with no spending Flow says there is no rule yet, not that it is a level amount", () => {
+		const chance = DEMO.reads.chance["base"]
+		const view = withdrawalsView(
+			null,
+			chance?.ok ? { ...chance.data, spendingBands: undefined } : null,
+		)
+		const props = { view, terms: "both" as const, title: "Saved plan" }
+		const none = render(WithdrawalsResult, { props: { ...props, spends: false } }).body
+		expect(none).toContain("There is no spending rule in this plan yet")
+		expect(none).not.toContain("A level amount has no rule years")
+		expect(render(WithdrawalsResult, { props }).body).toContain("A level amount has no rule years")
+	})
+
 	test("the Edit control is shown only when the server answers a session", () => {
 		editSession.token = null
 		expect(page()).not.toContain("Change retirement-spending")
@@ -103,6 +118,27 @@ describe("the form", () => {
 		expect(body).toContain("Try as a what-if")
 		expect(body).toContain("each is your own estimate")
 		expect(body).not.toContain("Your own estimate. A percent")
+	})
+
+	test("how it is paid is a choice to make: a Flow paid some other way opens on it", () => {
+		const level = form("retirement-spending", {
+			...CTX,
+			doc: {
+				...CTX.doc,
+				flows: [
+					...CTX.doc.flows,
+					scenarioFlow.parse({
+						id: "retirement-spending",
+						kind: "expense",
+						frequency: "weekly",
+						start: "2026-10-31",
+						amount: "1.00",
+						growth: "inflation",
+					}),
+				],
+			},
+		})
+		expect(level).toContain("Choose how it is paid")
 	})
 
 	test("an edited rule shows its rate as the CLI states it, and says the rate is the person's own estimate", () => {

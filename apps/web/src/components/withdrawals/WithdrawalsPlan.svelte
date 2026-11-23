@@ -7,6 +7,7 @@ import { editsShown } from "../../lib/edit/shown"
 import { parseTerms, type Terms } from "../../lib/view/projection/terms"
 import { withdrawalsView } from "../../lib/view/withdrawals"
 import { milestoneDatesOf } from "../../lib/view/withdrawals/context"
+import { mainFlow } from "../../lib/view/withdrawals/rule"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
@@ -49,6 +50,7 @@ const ctx = $derived(
 			}
 		: null,
 )
+const spends = $derived(ctx === null ? true : mainFlow(ctx.doc.flows) !== undefined)
 </script>
 
 <!-- One plan: what its spending rule pays year by year, and in good and bad markets; a what-if shows both ways. -->
@@ -68,7 +70,7 @@ const ctx = $derived(
 					</EmptyState>
 				{/if}
 				{#if tried}<WithdrawalsResult view={tried} terms={chosen} title="With your try" />{/if}
-				{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} />{/if}
+				{#if showSaved}<WithdrawalsResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} {spends} />{/if}
 				{#if saved.rules.length > 0 && saved.bands === null}
 					<p class="text-sm text-muted-foreground">A Return model would show what the rule pays in good and bad markets: pass <code>--return-model FILE</code>, <code>--paths N</code> and <code>--seed HEX</code> to <code>traj dashboard</code>.</p>
 				{/if}

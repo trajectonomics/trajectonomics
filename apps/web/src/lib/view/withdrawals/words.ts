@@ -1,6 +1,6 @@
 /** The words of the Withdrawals page: what a rule does, what it did in a year, and what each level means. */
 import type { ScenarioFlow } from "../../contract/scenario-show"
-import { ruleOf } from "./rule"
+import { ruleOf, type SpendingRule } from "./rule"
 
 /** The how-to-spend choices the form offers, with the words the person reads. */
 export const HOW_CHOICES = [
@@ -36,7 +36,11 @@ export function levelWords(level: number): string {
  */
 export function ruleSummary(flow: ScenarioFlow): string | null {
 	const rule = ruleOf(flow)
-	if (rule === null) return null
+	return rule === null ? null : ruleSentence(rule)
+}
+
+/** A rule's kind and starting share in a sentence, with no amount in it. */
+export function ruleSentence(rule: SpendingRule): string {
 	const share = `${rule.rateBps}%`
 	if (rule.kind === "initialRate")
 		return `Spends ${share} of savings at the start, then level with inflation`
@@ -45,4 +49,12 @@ export function ruleSummary(flow: ScenarioFlow): string | null {
 		return `Spends ${share} of what savings are worth each year${limits}`
 	}
 	return `Spends ${share} of savings at the start, then cuts and raises by guardrails`
+}
+
+/** A rule with the Accounts it reads by name: "Spends 4% of savings at the start, then level, from Cash and Fund". */
+export function ruleWords(rule: SpendingRule, nameOf: (id: string) => string): string {
+	const names = rule.portfolio.map(nameOf)
+	const last = names.pop()
+	const from = names.length === 0 ? (last ?? "") : `${names.join(", ")} and ${last}`
+	return from === "" ? ruleSentence(rule) : `${ruleSentence(rule)}, from ${from}`
 }

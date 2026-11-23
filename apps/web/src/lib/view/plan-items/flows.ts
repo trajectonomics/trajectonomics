@@ -52,6 +52,11 @@ export function growthText(flow: ScenarioFlow): string {
 	return `${formatBps(growth.bps)}% a year`
 }
 
+/** The words for a date a Milestone sets: its id, which is the only name a Milestone has. A Flow with none shows its own date. */
+function dateWords(milestone: string | undefined, date: string): string {
+	return milestone === undefined ? date : `When ${milestone} fires`
+}
+
 /** The anchor labels of one Flow's dates, as the card holds them. */
 function anchorsOf(household: HouseholdDocument | null, id: string) {
 	const labels = flowAnchorLabels(household, id)
@@ -76,8 +81,9 @@ export function flowCards(
 			id: flow.id,
 			amount: flow.amount ?? null,
 			frequency: flow.frequency,
-			start: flow.start,
-			end: flow.end ?? "To the horizon",
+			// A Milestone date wins: `start` is then only where recurrence counts from (sim ADR 0012), not when the Flow begins.
+			start: dateWords(flow.startAt, flow.start),
+			end: dateWords(flow.endAt, flow.end ?? "To the horizon"),
 			...anchorsOf(household, flow.id),
 			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),

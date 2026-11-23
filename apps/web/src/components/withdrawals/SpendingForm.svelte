@@ -12,7 +12,7 @@ import {
 	type WithdrawalContext,
 } from "../../lib/view/withdrawals/context"
 import { draftOf } from "../../lib/view/withdrawals/draft"
-import { changedFlows, prepareWithdrawal } from "../../lib/view/withdrawals/plan"
+import { prepareWithdrawal, triedFlows } from "../../lib/view/withdrawals/plan"
 import { layoutOf, withdrawalShown } from "../../lib/view/withdrawals/refusal"
 import { WITHDRAWAL_ID } from "../../lib/view/withdrawals/rule"
 import ItemActions from "../plan-items/ItemActions.svelte"
@@ -65,9 +65,12 @@ async function save(event: SubmitEvent): Promise<void> {
 function tryIt(): void {
 	const result = prepare()
 	if (result === null) return
-	for (const one of changedFlows(ctx.doc, result.document)) {
-		whatIfSession.tryFlow(name, contentHash, one)
+	const tried = triedFlows(ctx.doc, result.document, household)
+	if (!tried.ok) {
+		problems = { general: tried.note }
+		return
 	}
+	for (const one of tried.flows) whatIfSession.tryFlow(name, contentHash, one)
 	onDone()
 }
 

@@ -19,6 +19,8 @@ const AMOUNT_WORDS = "Enter an amount as a decimal number, such as 40000.00."
 function boundProblem(bound: BoundDraft): string | undefined {
 	if (bound.amount.trim() === "") return undefined
 	if (typedAmount(bound.amount) === null) return AMOUNT_WORDS
+	if (bound.growth !== "inflation" && bound.growth !== "fixed")
+		return "Choose how it grows each year."
 	if (bound.growth === "fixed" && percentText(bound.rate) === null) return RATE_WORDS
 	return undefined
 }

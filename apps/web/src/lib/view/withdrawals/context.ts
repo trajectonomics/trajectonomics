@@ -58,7 +58,7 @@ export interface PortfolioChoice {
 }
 
 /** The Account's name the Baseline states for it, or its id when the Baseline does not know it. */
-function nameOf(id: string, baseline: Read<Baseline> | undefined): string {
+export function accountNameOf(id: string, baseline: Read<Baseline> | undefined): string {
 	if (baseline === undefined || !baseline.ok) return id
 	const row = baseline.data.rows.find((one) => one.account.id === id || one.account.name === id)
 	return row?.account.name ?? id
@@ -68,7 +68,7 @@ function nameOf(id: string, baseline: Read<Baseline> | undefined): string {
 export function portfolioChoices(ctx: WithdrawalContext): PortfolioChoice[] {
 	return ctx.doc.accounts
 		.filter((account) => account.kind === "asset" && account.liquid !== false)
-		.map((account) => ({ id: account.id, label: nameOf(account.id, ctx.baseline) }))
+		.map((account) => ({ id: account.id, label: accountNameOf(account.id, ctx.baseline) }))
 }
 
 /** The Accounts a new rule reads at first: the liquid assets of the plan's withdraw list, each removable. */
@@ -105,7 +105,13 @@ export function stoppableExpenses(
 	return ctx.doc.flows.filter((flow) => {
 		if (flow.kind !== "expense" || flow.id === ownId || ruleOf(flow) !== null) return false
 		if (flow.endAt === draft.milestone) return true
-		if (flow.endAt !== undefined) return false
-		return flow.end === undefined || date === null || flow.end >= date
+		return flow.endAt === undefined && stillRunning(flow, date)
 	})
+}
+
+/** Whether a Flow with no Milestone end has anything left to stop on `date`: not a one-off paid before it, not ended before it. */
+function stillRunning(flow: ScenarioFlow, date: string | null): boolean {
+	if (date === null) return true
+	if (flow.frequency === "once") return flow.start >= date
+	return flow.end === undefined || flow.end >= date
 }

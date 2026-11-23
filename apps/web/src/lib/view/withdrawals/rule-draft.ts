@@ -3,7 +3,7 @@ import { formatBps } from "../../format/bps"
 import type { BoundDraft, WithdrawalDraft } from "./draft"
 import type { RuleBound, SpendingRule } from "./rule"
 
-const NO_BOUND: BoundDraft = { amount: "", growth: "inflation", rate: "" }
+const NO_BOUND: BoundDraft = { amount: "", growth: "", rate: "" }
 
 /** The text of a bound the rule holds, or the empty one. */
 function boundOf(bound: RuleBound | undefined): BoundDraft {
