@@ -63,12 +63,21 @@ export { scenarioList } from "./scenario-list"
 export type { ScenarioRef } from "./scenario-ref"
 export { scenarioRef } from "./scenario-ref"
 export type {
+	EstateBlock,
+	EstateLine,
 	ScenarioAccount,
 	ScenarioDocument,
 	ScenarioFlow,
 	ScenarioShow,
 } from "./scenario-show"
-export { scenarioAccount, scenarioDocument, scenarioFlow, scenarioShow } from "./scenario-show"
+export {
+	estateBlock,
+	estateLine,
+	scenarioAccount,
+	scenarioDocument,
+	scenarioFlow,
+	scenarioShow,
+} from "./scenario-show"
 export type { Snapshot, SnapshotParams, SnapshotReads } from "./snapshot"
 export { SNAPSHOT_VERSION, snapshot, snapshotParams, snapshotReads } from "./snapshot"
 export type { Assumption, TaxYear } from "./tax-year"

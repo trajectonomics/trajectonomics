@@ -13,7 +13,7 @@ import { checkBinary } from "./traj-binary"
 /** The demo's parameters: fixed dates, so the committed Demo snapshot is reproducible. */
 export const DEMO_INPUT: PlanInput = {
 	asOf: "2026-10-31",
-	horizon: "2054-12-31",
+	horizon: "2053-12-31",
 	scenarios: [],
 	compare: { a: "base", b: "retire-early" },
 	birthDate: "1990-05-15",

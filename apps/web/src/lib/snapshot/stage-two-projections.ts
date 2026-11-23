@@ -35,7 +35,9 @@ export function perScenario(
  * `--liabilities` for the loans' statements (cli ADR 0059): the planner's loan cards show the schedule and
  * the paid-off date from those rows, so the page computes none of them. `--accounts` adds each Account's value
  * (cli ADR 0060), which the real-asset cards chart, and `--spending` states each Rule year of a spending rule
- * (cli ADR 0063), which the Withdrawals page reads: a plan with no rule gets an empty table.
+ * (cli ADR 0063), which the Withdrawals page reads: a plan with no rule gets an empty table. `--estate` states what
+ * heirs would receive on each roll-up end and each settlement cost and gift (cli ADR 0064), which the Estate page reads:
+ * a plan with no estate block still gets the tables, with its gross estate less its debts.
  */
 export function planProjections(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const monthly = params.monthly ? ["--monthly"] : []
@@ -49,6 +51,7 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 		"--liabilities",
 		"--accounts",
 		"--spending",
+		"--estate",
 		"--json",
 	])
 }

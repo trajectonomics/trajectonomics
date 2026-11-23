@@ -24,7 +24,7 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the seventeen pages are in navigation order, with unique paths", () => {
+	test("the eighteen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -38,6 +38,7 @@ describe("the navigation's routes", () => {
 			"/reports/",
 			"/optimize/allowances/",
 			"/optimize/withdrawals/",
+			"/estate/",
 			"/cash-flow/",
 			"/chance/",
 			"/tax/",
@@ -47,7 +48,7 @@ describe("the navigation's routes", () => {
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
 	})
 
-	test("the groups are Home and Net worth, then Plan, then Optimize, then Cash flow, then Chance of success, then Tax, then Records", () => {
+	test("the groups are Home and Net worth, then Plan, then Optimize, then Estate, then Cash flow, then Chance of success, then Tax, then Records", () => {
 		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
 			[null, ["Home", "Net worth"]],
 			[
@@ -64,6 +65,7 @@ describe("the navigation's routes", () => {
 				],
 			],
 			["Optimize", ["Tax allowances", "Withdrawals"]],
+			[null, ["Estate"]],
 			[null, ["Cash flow"]],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
@@ -145,5 +147,18 @@ describe("the navigation's routes", () => {
 		expect(routesShown(optimize, false, true, true, true)).toEqual([
 			expect.objectContaining({ label: "Tax allowances" }),
 		])
+	})
+})
+
+describe("the Estate page", () => {
+	test("is listed after Optimize when the selected plan has a document, and not without one", () => {
+		const group = NAV_GROUPS.find((one) => one.routes.some((route) => route.path === "/estate/"))
+		if (group === undefined) throw new Error("the Estate group exists")
+		expect(routeAt("/estate/")?.label).toBe("Estate")
+		expect(NAV_GROUPS.indexOf(group)).toBe(
+			NAV_GROUPS.findIndex((one) => one.heading === "Optimize") + 1,
+		)
+		expect(routesShown(group, true).map((route) => route.label)).toEqual(["Estate"])
+		expect(routesShown(group, false)).toEqual([])
 	})
 })

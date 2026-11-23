@@ -11,19 +11,11 @@ import {
 	switchedOn,
 	type WhatIf,
 	withAddition,
-	withoutAddition,
-	withoutSet,
 	withSet,
 } from "../lib/what-if/session"
+import { withoutChange } from "../lib/what-if/session-without"
 import { type TriedFlow, withTriedFlow } from "../lib/what-if/try-flow"
 import { WhatIfState } from "./what-if-state.svelte.js"
-
-/** The session without one change: a switch back on, an item not added, or a value back to the plan's. */
-function without(whatIf: WhatIf, change: Change): WhatIf {
-	if (change.kind === "off") return switchedOn(whatIf, change.path)
-	if (change.kind === "add") return withoutAddition(whatIf, change.path)
-	return withoutSet(whatIf, change.path)
-}
 
 /** How long the session waits after a change before it reads the what-if again. */
 const DEBOUNCE_MS = 250
@@ -69,11 +61,16 @@ export class WhatIfChanges extends WhatIfState {
 		return clearedFields(stored, edited)
 	}
 
+	/** Puts a change in the session unless Apply or Save runs or another plan's changes must be settled first. True when it was made. */
+	tryChange(plan: string, contentHash: string, change: (base: WhatIf) => WhatIf): boolean {
+		const base = this.saving ? null : this.sessionFor(plan, contentHash)
+		if (base !== null) this.keep(change(base))
+		return base !== null
+	}
+
 	/** Tries a Flow in the session, replacing any earlier try of it (`withTriedFlow`). True when it was tried. */
 	tryFlow(plan: string, contentHash: string, tried: TriedFlow): boolean {
-		const base = this.saving ? null : this.sessionFor(plan, contentHash)
-		if (base !== null) this.keep(withTriedFlow(base, tried))
-		return base !== null
+		return this.tryChange(plan, contentHash, (base) => withTriedFlow(base, tried))
 	}
 
 	/**
@@ -92,7 +89,7 @@ export class WhatIfChanges extends WhatIfState {
 	/** Takes one change out of the session. The session ends when none is left. Refused while Apply or Save runs. */
 	removeChange(change: Change): void {
 		if (this.whatIf === null || this.saving) return
-		this.keep(without(this.whatIf, change))
+		this.keep(withoutChange(this.whatIf, change))
 	}
 
 	/** A plan switch while changes are pending asks first. Returns true when the switch may run now. */

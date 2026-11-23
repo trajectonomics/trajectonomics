@@ -53,6 +53,28 @@ export const scenarioAccount = z.looseObject({
 })
 export type ScenarioAccount = z.infer<typeof scenarioAccount>
 
+/**
+ * One cost or gift of the estate block in the decimal form (cli ADR 0064): a share (`of`, `bps` as a percent string such
+ * as "1.00", `rounding`) or a fixed `amount` in major units that grows by `growth`. `view/estate/` reads it; any key it
+ * does not know is kept as it is.
+ */
+export const estateLine = z.looseObject({
+	id: z.string(),
+	of: z.union([z.string(), z.looseObject({ accounts: z.array(z.string()) })]).optional(),
+	bps: z.string().optional(),
+	rounding: z.enum(["floor", "halfUp", "ceil"]).optional(),
+	amount: money.optional(),
+	growth: z.union([z.literal("inflation"), z.looseObject({ bps: z.number().int() })]).optional(),
+})
+export type EstateLine = z.infer<typeof estateLine>
+
+/** The Scenario's optional `estate` block: the costs of settling what the plan leaves, then the gifts, each in order. */
+export const estateBlock = z.looseObject({
+	costs: z.array(estateLine).optional(),
+	gifts: z.array(estateLine).optional(),
+})
+export type EstateBlock = z.infer<typeof estateBlock>
+
 /** The Scenario document in its decimal form. Its other sections are kept as they are. */
 export const scenarioDocument = z.looseObject({
 	currency: z.string(),
@@ -60,6 +82,8 @@ export const scenarioDocument = z.looseObject({
 	accounts: z.array(scenarioAccount),
 	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
 	levies: z.array(z.unknown()).optional(),
+	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.
+	estate: estateBlock.optional(),
 })
 export type ScenarioDocument = z.infer<typeof scenarioDocument>
 
