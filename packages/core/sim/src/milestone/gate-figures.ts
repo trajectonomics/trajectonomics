@@ -1,3 +1,4 @@
+import type { AccountValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import type { StateMap } from "../engine/state"
 import type { DateString, Scenario, Timeline } from "../types"
@@ -9,9 +10,11 @@ export function planViewOf(
 	scenario: Scenario,
 	timeline: Timeline,
 	events: readonly DatedEvent[],
+	values: AccountValues,
 ): PlanView {
 	return {
 		events,
+		values,
 		flows: scenario.flows,
 		horizon: timeline.horizon,
 		start: timeline.start,

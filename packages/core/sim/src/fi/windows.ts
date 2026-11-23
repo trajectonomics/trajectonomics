@@ -1,7 +1,7 @@
 import { BoundedCache } from "../bounded-cache"
 import type { ResolvedCalendar } from "../calendar/business"
 import { planMilestones } from "../milestone/spec"
-import type { DateString, Scenario, Timeline } from "../types"
+import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { FinancialIndependenceOptions } from "../types/financial-independence"
 import { retirementWindow, windowThrough } from "./expenses"
 import { originalSource } from "./original-window"
@@ -34,6 +34,7 @@ function signature(fires: Fires): string {
 
 /** Builds the scan's windows; the work per distinct set of fire dates is done once. */
 export function windowPlan(
+	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	options: FinancialIndependenceOptions,
@@ -43,8 +44,8 @@ export function windowPlan(
 	const months = options.minBufferMonths ?? 0
 	const plan = planMilestones(scenario, calendar)
 	const retirement = options.retirementSpending
-	const next = originalSource(scenario, timeline, windowThrough(timeline), calendar)
-	const trailing = originalSource(scenario, timeline, timeline.horizon, calendar)
+	const next = originalSource(baseline, scenario, timeline, windowThrough(timeline), calendar)
+	const trailing = originalSource(baseline, scenario, timeline, timeline.horizon, calendar)
 	const fixed =
 		retirement === undefined
 			? undefined

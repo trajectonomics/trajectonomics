@@ -1,6 +1,7 @@
 import { resolvedCalendar } from "../calendar/resolve"
 import { MilestoneGate } from "../milestone/gate"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
+import { type Observed, unchangedValues } from "./account-values"
 import { collectDates } from "./dates"
 import { buildEvents, flowsAt } from "./events"
 import { finishLevies, planLevies } from "./levy-finish"
@@ -48,6 +49,13 @@ function endDate(result: EngineResult, timeline: Timeline): DateString {
 	return result.run.runsOut?.date ?? timeline.horizon
 }
 
+/** Options of a run that only an unchanged-plan read needs (ADR 0020). */
+export interface RunOptions {
+	readonly observe?: Observed
+	/** `false` runs the plan without its Milestone gate: the unchanged plan that Account windows read. */
+	readonly gated?: boolean
+}
+
 export function runEngine(
 	baseline: Baseline,
 	scenario: Scenario,
@@ -56,12 +64,19 @@ export function runEngine(
 	returns?: Returns,
 	tracked = false,
 	breakdown = false,
+	options: RunOptions = {},
 ): EngineResult {
 	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levies = planLevies(scenario, timeline, calendar)
-	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
+	const unchanged = unchangedValues((observe) =>
+		runEngine(baseline, scenario, timeline, [], returns, false, false, { observe, gated: false }),
+	)
+	const gate =
+		options.gated === false
+			? undefined
+			: MilestoneGate.create(scenario, timeline, calendar, events, unchanged)
 	const ledger = tracked ? openLedger(states, timeline.start) : undefined
 	const acc: RunAccumulator = {
 		snapshots: [],
@@ -78,6 +93,7 @@ export function runEngine(
 	for (const date of dates) {
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
+		options.observe?.(date, states)
 		const result = stepDate(acc, states, scenario, date, dayEvents)
 		if (result !== undefined) {
 			const end = endDate(result, timeline)

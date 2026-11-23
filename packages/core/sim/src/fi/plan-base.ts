@@ -40,7 +40,7 @@ export function planBase(
 		events,
 		calendar,
 		candidates,
-		windows: windowPlan(scenario, timeline, options, candidates[0]!, calendar),
+		windows: windowPlan(baseline, scenario, timeline, options, candidates[0]!, calendar),
 		grid: scanGrid(
 			events,
 			timeline,

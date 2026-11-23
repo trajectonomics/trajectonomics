@@ -1,10 +1,12 @@
 import type { ResolvedCalendar } from "../calendar/business"
+import { unchangedValues } from "../engine/account-values"
 import { collectDates } from "../engine/dates"
 import { type DatedEvent, flowsAt } from "../engine/events"
 import { planLevies } from "../engine/levy-finish"
 import { allSettlementDates, type LevySet } from "../engine/levy-set"
 import type { EngineRunsOut } from "../engine/occurrence"
 import type { ResolvedReturns } from "../engine/returns"
+import { runEngine } from "../engine/run"
 import { createStates, type StateMap } from "../engine/state"
 import { MilestoneGate } from "../milestone/gate"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
@@ -54,7 +56,10 @@ export function baselinePrefix(
 ): Prefix {
 	const states = createStates(baseline, scenario, timeline.start, series)
 	const { levies, settlementDates } = levyPlan(scenario, timeline, calendar)
-	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
+	const unchanged = unchangedValues((observe) =>
+		runEngine(baseline, scenario, timeline, [], undefined, false, false, { observe, gated: false }),
+	)
+	const gate = MilestoneGate.create(scenario, timeline, calendar, events, unchanged)
 	const wanted = new Set(candidates)
 	const points = new Map<DateString, PrefixPoint>()
 	const dates = collectDates(events, candidates, settlementDates)

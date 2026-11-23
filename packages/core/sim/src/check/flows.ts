@@ -1,5 +1,6 @@
 import type { Check, Emit, Path } from "./codes"
 import { isValidDate } from "./date"
+import { checkAccountReads } from "./flow-accounts"
 import { NOT_ALLOWED } from "./flow-fields"
 import { checkFlowGraph } from "./flow-graph"
 import { type FlowContext, flowShape } from "./flow-shape"
@@ -71,4 +72,5 @@ export function checkFlows(value: unknown, path: Path, context: FlowContext, emi
 	list(flowCheck(context))(value, path, emit)
 	checkUnique(value, path, "id", emit)
 	checkFlowGraph(value, path, emit)
+	checkAccountReads(value, path, context.accounts, emit)
 }

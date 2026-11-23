@@ -18,6 +18,8 @@ export interface DeriveContext {
 	readonly path: Path
 	/** The planned gross amount a Flow lands on this date, before Prepayment and any cap. */
 	readonly read: (flowId: string) => bigint
+	/** An Account's value on this date, read before the date's Flows land. */
+	readonly readAccount: (accountId: string) => bigint
 }
 
 function lesser(a: bigint, b: bigint): bigint {
@@ -58,6 +60,8 @@ function measureValue(
 			return get(measure.a) > get(measure.b) ? get(measure.then) : get(measure.else)
 		case "flow":
 			return context.read(measure.flow)
+		case "account":
+			return context.readAccount(measure.account)
 		default:
 			// `tally` in a Derived amount: `check()` rejects it, so this is unreachable.
 			return 0n

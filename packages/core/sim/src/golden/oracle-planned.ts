@@ -1,6 +1,7 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString, Derive, Flow } from "../types"
 import { isDerived, isFixed } from "../types"
+import { oracleAccountAt } from "./oracle-account"
 import { oracleCalendar } from "./oracle-calendar"
 import { oracleDeriveValues } from "./oracle-derive"
 import { type OracleEvent, oracleAmount, oracleEvents } from "./oracle-flow"
@@ -39,6 +40,7 @@ function plannedDay(
 	derivation: readonly Flow[],
 	date: DateString,
 	inflation: number,
+	readAccount: (account: string) => bigint,
 ): PlannedDay {
 	const totals = new Map<string, bigint>()
 	const counts = new Map<string, number>()
@@ -51,7 +53,7 @@ function plannedDay(
 		const count = BigInt(counts.get(flow.id) ?? 0)
 		if (count === 0n || !isDerived(flow)) continue
 		const read = (id: string): bigint => totals.get(id) ?? 0n
-		const value = oracleDeriveValues(flow.derive, read, date, inflation)
+		const value = oracleDeriveValues(flow.derive, read, date, inflation, readAccount)
 		totals.set(flow.id, value * count)
 	}
 	return totals
@@ -77,6 +79,9 @@ export function oraclePlanned(
 		byDate.set(event.date, day)
 	}
 	const planned = new Map<DateString, PlannedDay>()
-	for (const [date, day] of byDate) planned.set(date, plannedDay(day, derivation, date, inflation))
+	for (const [date, day] of byDate) {
+		const readAccount = (account: string) => oracleAccountAt(fixture, account, date)
+		planned.set(date, plannedDay(day, derivation, date, inflation, readAccount))
+	}
 	return planned
 }

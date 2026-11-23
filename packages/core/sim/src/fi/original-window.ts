@@ -1,10 +1,12 @@
 import type { ResolvedCalendar } from "../calendar/business"
+import { type AccountValues, readerOn, unchangedValues } from "../engine/account-values"
 import { plannedAmounts } from "../engine/derive"
 import { buildEvents, type DatedEvent } from "../engine/events"
+import { runEngine } from "../engine/run"
 import { onceEventsOn } from "../milestone/gate-once"
 import { landsAt } from "../milestone/gating"
 import { deferredOnces, planMilestones } from "../milestone/spec"
-import type { DateString, Scenario, Timeline } from "../types"
+import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import { buildWindow, type WindowOutcome } from "./expense-window"
 
 /** The ungated plan through one date, and what a set of fire dates keeps of it. */
@@ -34,8 +36,19 @@ function landing(
 }
 
 /** The expense one Landed date's events carry, or why their amounts cannot be planned. */
-function dayExpense(scenario: Scenario, date: DateString, day: readonly DatedEvent[]) {
-	const planned = plannedAmounts(day, scenario.flows, date, scenario.economy.inflation)
+function dayExpense(
+	scenario: Scenario,
+	date: DateString,
+	day: readonly DatedEvent[],
+	values: AccountValues,
+) {
+	const planned = plannedAmounts(
+		day,
+		scenario.flows,
+		date,
+		scenario.economy.inflation,
+		readerOn(values, date),
+	)
 	if (!planned.ok) return planned
 	let amount = 0n
 	for (const event of day) {
@@ -46,7 +59,11 @@ function dayExpense(scenario: Scenario, date: DateString, day: readonly DatedEve
 }
 
 /** One amount per Landed date, which is what an expense window sums over. */
-function measure(scenario: Scenario, events: readonly DatedEvent[]): WindowOutcome {
+function measure(
+	scenario: Scenario,
+	events: readonly DatedEvent[],
+	values: AccountValues,
+): WindowOutcome {
 	const days = new Map<DateString, DatedEvent[]>()
 	for (const event of events) {
 		const day = days.get(event.date) ?? []
@@ -55,7 +72,7 @@ function measure(scenario: Scenario, events: readonly DatedEvent[]): WindowOutco
 	}
 	const measurements: { readonly date: DateString; readonly amount: bigint }[] = []
 	for (const [date, day] of days) {
-		const measured = dayExpense(scenario, date, day)
+		const measured = dayExpense(scenario, date, day, values)
 		if (!measured.ok) return { ok: false, problem: measured.problem }
 		measurements.push({ date, amount: measured.amount })
 	}
@@ -68,6 +85,7 @@ function measure(scenario: Scenario, events: readonly DatedEvent[]): WindowOutco
  * Landed date.
  */
 export function originalSource(
+	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	last: DateString,
@@ -75,13 +93,18 @@ export function originalSource(
 ): OriginalSource {
 	const plan = planMilestones(scenario, calendar)
 	const deferred = plan === undefined ? [] : deferredOnces(scenario, plan, calendar)
+	const bounded = { ...timeline, horizon: last }
+	const values = unchangedValues((observe) =>
+		runEngine(baseline, scenario, bounded, [], undefined, false, false, { observe, gated: false }),
+	)
 	let events: readonly DatedEvent[] | undefined
 	return {
 		windowFor: (fires) => {
-			events ??= buildEvents(scenario, { ...timeline, horizon: last }, calendar)
+			events ??= buildEvents(scenario, bounded, calendar)
 			return measure(
 				scenario,
 				plan === undefined ? events : landing(scenario, events, deferred, fires),
+				values,
 			)
 		},
 	}

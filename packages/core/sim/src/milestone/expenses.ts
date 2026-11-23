@@ -1,6 +1,7 @@
 import { addDays, addMonthsClamped } from "../calendar/arith"
-import { plannedAmounts } from "../engine/derive"
+import type { AccountValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
+import { plannedWith } from "../engine/planned-on"
 import type { BasisPoints, DateString, Flow, MilestoneTerms } from "../types"
 import { landsAt } from "./gating"
 import { termed } from "./metrics"
@@ -19,6 +20,7 @@ export interface Money {
 /** The plan an expense window reads: its events in date order, its Flows and its bounds. */
 export interface PlanView extends Money {
 	readonly events: readonly DatedEvent[]
+	readonly values: AccountValues
 	readonly flows: readonly Flow[]
 	readonly horizon: DateString
 }
@@ -58,7 +60,7 @@ function expenseOn(
 	day: DateString,
 	plan: PlanView,
 ): bigint | undefined {
-	const planned = plannedAmounts(events, plan.flows, day, plan.inflation)
+	const planned = plannedWith(events, plan.flows, plan.inflation, day, plan.values)
 	if (!planned.ok) return undefined
 	let amount = 0n
 	for (const event of events) {

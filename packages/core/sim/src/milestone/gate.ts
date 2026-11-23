@@ -1,5 +1,6 @@
 import { addMonthsClamped } from "../calendar/arith"
 import type { ResolvedCalendar } from "../calendar/business"
+import type { AccountValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import { compareIds } from "../engine/order"
 import type { StateMap } from "../engine/state"
@@ -29,8 +30,9 @@ export class MilestoneGate {
 		timeline: Timeline,
 		calendar: ResolvedCalendar | undefined,
 		events: readonly DatedEvent[],
+		values: AccountValues,
 	): MilestoneGate | undefined {
-		const state = startState(scenario, timeline, calendar, events)
+		const state = startState(scenario, timeline, calendar, events, values)
 		return state === undefined ? undefined : new MilestoneGate(state)
 	}
 

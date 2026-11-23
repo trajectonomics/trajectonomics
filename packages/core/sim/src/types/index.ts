@@ -56,6 +56,7 @@ export {
 export type { Levy, LevyContext, MeasuresResult, MonthDay, Tallies } from "./levy"
 export type { MarketBucket, ReturnModel } from "./market"
 export type {
+	AccountMeasure,
 	BinaryMeasure,
 	ConstMeasure,
 	ConstStep,

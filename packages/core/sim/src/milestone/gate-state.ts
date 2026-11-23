@@ -1,4 +1,5 @@
 import type { ResolvedCalendar } from "../calendar/business"
+import type { AccountValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import type { StateMap } from "../engine/state"
 import type { DateString, Flow, Scenario, Timeline } from "../types"
@@ -14,6 +15,8 @@ export interface GateState {
 	readonly plan: MilestonePlan
 	readonly deferred: readonly DeferredOnce[]
 	readonly events: readonly DatedEvent[]
+	/** The Account values a planned expense window reads on each date (ADR 0020). */
+	readonly values: AccountValues
 	/** An FI candidate's stop: a deferred `once` Flow it removes never lands. */
 	readonly stop: ((flow: Flow) => boolean) | undefined
 	readonly fires: Map<string, DateString>
@@ -26,18 +29,19 @@ export function startState(
 	timeline: Timeline,
 	calendar: ResolvedCalendar | undefined,
 	events: readonly DatedEvent[],
+	values: AccountValues,
 ): GateState | undefined {
 	const plan = planMilestones(scenario, calendar)
 	if (plan === undefined) return undefined
 	const deferred = deferredOnces(scenario, plan, calendar)
 	const fires = new Map(plan.fires)
-	return { scenario, timeline, plan, deferred, events, stop: undefined, fires, trail: [] }
+	return { scenario, timeline, plan, deferred, events, values, stop: undefined, fires, trail: [] }
 }
 
 /** Fires, in dependency order, each dynamic Milestone whose criteria hold on `date`. */
 export function fireDynamic(state: GateState, states: StateMap, date: DateString): string[] {
-	const { scenario, timeline, events, fires, trail, plan } = state
-	const view = planViewOf(scenario, timeline, events)
+	const { scenario, timeline, events, fires, trail, plan, values } = state
+	const view = planViewOf(scenario, timeline, events, values)
 	const reading: Reading = { date, fires, figures: figuresOf(view, trail, fires, states, date) }
 	const fired: string[] = []
 	for (const milestone of plan.dynamic) {
