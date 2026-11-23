@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { TAX_CONTRIBUTION_LABELS, TAX_INCOME_LABELS } from "../tax/labels"
 import { scenarioExample } from "./index"
+import { graphOf } from "./probe-graphs"
 import { canonical, documented, nodeAt, type Path, probed, refusalsOf, VERSION } from "./testing"
 
 /*
@@ -50,35 +51,6 @@ const KIND_FLOWS: Record<string, Record<string, unknown>> = {
 		growth: { bps: 0 },
 	},
 	withdrawal: { ...EXPENSE, kind: "withdrawal", source: "debt" },
-}
-
-/** `then`, spelled out so the object holding it is not read as a thenable (biome noThenProperty). */
-const PICK_THEN = ["th", "en"].join("")
-
-/** A `pick` Measure: `then` is the Measure id chosen when `a` is above `b`. */
-function pickMeasure(op: string): Record<string, unknown> {
-	const measure: Record<string, unknown> = { id: "x", op, a: "c", b: "c", else: "c" }
-	measure[PICK_THEN] = "c"
-	return measure
-}
-
-/** One valid Measure graph per operation a Flow's `derive` may hold, its `op` Measure first. */
-function graphOf(op: string): Record<string, unknown> {
-	const constant = { id: "c", op: "const", value: 100 }
-	const graphs: Record<string, Record<string, unknown>> = {
-		add: { id: "x", op, a: "c", b: "c" },
-		sub: { id: "x", op, a: "c", b: "c" },
-		min: { id: "x", op, a: "c", b: "c" },
-		max: { id: "x", op, a: "c", b: "c" },
-		scale: { id: "x", op, of: "c", num: 1, den: 2, rounding: "floor" },
-		mul: { id: "x", op, a: "c", b: "c", den: 1, rounding: "floor" },
-		pick: pickMeasure(op),
-		flow: { id: "x", op, flow: "salary" },
-	}
-	if (op === "const") return { measures: [{ id: "x", op, value: 100 }], result: "x" }
-	// A value outside the set still needs a Measure the core can read, so its `op` is the only fault.
-	const measure = graphs[op] ?? { id: "x", op, value: 1 }
-	return { measures: [measure, constant], result: "x" }
 }
 
 /** The Flows a derived amount is probed with: an income Flow to reference, and the graph. */

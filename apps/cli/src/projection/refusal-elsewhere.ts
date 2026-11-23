@@ -50,6 +50,7 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	UNKNOWN_MEASURE: document,
 	UNKNOWN_LEVY: document,
 	UNKNOWN_FLOW: document,
+	ACCOUNT_MEASURE_IN_LEVY: document,
 	FLOW_CYCLE: document,
 	STEPS_NOT_ASCENDING: document,
 	CAP_NOT_CONST: document,
