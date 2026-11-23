@@ -1,7 +1,12 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
+import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { baselineRun } from "../../lib/view/what-if/baseline"
+import { ALL_YEAR_FIGURES } from "../../lib/view/what-if/years"
 import HouseholdSection from "../household/HouseholdSection.svelte"
 import ProjectionView from "../projection/ProjectionView.svelte"
 import PageShell from "../ui/PageShell.svelte"
+import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
 
 interface Props {
 	/** The Scenario the address bar asks for, and the setter that writes it. */
@@ -23,6 +28,11 @@ let { scenario, editable, onScenario, terms, onTerms }: Props = $props()
 	intro="One Scenario projected year by year, in nominal and real terms, with its notes and tax status."
 >
 	{#snippet children(snapshot)}
+		{@const plan = chooseScenario(projectionNames(snapshot.reads.projections), scenario)}
+		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
+		{#if lens && plan !== null}
+			<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} {terms} keys={ALL_YEAR_FIGURES} />
+		{/if}
 		<HouseholdSection {snapshot} {scenario} {editable} />
 		<ProjectionView
 			projections={snapshot.reads.projections}

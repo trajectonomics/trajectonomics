@@ -2,20 +2,10 @@ import { describe, expect, it } from "bun:test"
 import { project } from "../engine/project"
 import type { ProjectionOptions } from "../types"
 import { identitySides, rollupMismatches } from "./cashflow-check"
-import { CASHFLOW_PARITY_CASES } from "./cashflow-parity-cases"
-import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
-import { PARITY_CASES } from "./parity-cases"
-import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
-
-const EVERY_CASE = [
-	...PARITY_CASES,
-	...STATEMENT_PARITY_CASES,
-	...CATEGORY_PARITY_CASES,
-	...CASHFLOW_PARITY_CASES,
-]
+import { EVERY_PARITY_CASE } from "./every-parity-case"
 
 describe("the cash-flow breakdown on every parity fixture", () => {
-	it.each(EVERY_CASE.map((item) => [item.name, item] as const))(
+	it.each(EVERY_PARITY_CASE.map((item) => [item.name, item] as const))(
 		"%s: opt-in, every other figure unchanged, and the identity holds per roll-up",
 		(_name, { fixture, projectOptions }) => {
 			const { baseline, scenario, timeline } = fixture

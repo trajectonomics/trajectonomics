@@ -4,6 +4,7 @@ import {
 	type ProjectionProblem,
 } from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { SAID_TRADE } from "./refusal-trade"
 
 /**
  * A refusal the engine raises that the CLI states in words: a sentence, and a hint where one fix is
@@ -27,6 +28,7 @@ const CARRY_IN_HINT =
  * literal key type of both tables, and `isolatedDeclarations` makes an exported table state its type.
  */
 export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
+	...SAID_TRADE,
 	// What only a run against the Ledger and the flags can find.
 	UNDECLARED_BALANCE_ACCOUNT: {
 		message: "The Ledger holds a balance on an Account the Scenario does not declare.",
@@ -82,10 +84,6 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	},
 	// The loan rules are found by the document check alone, so `scenario apply` and the Store state
 	// these sentences too (scenarioDocumentError), as well as `projection run` on a stored row.
-	WITHDRAWAL_SOURCE_KIND: {
-		message: "A withdrawal borrows from a liability, and its source Account is not one.",
-		hint: "Name a liability Account as the withdrawal's source. A withdrawal from an asset is outside this version of the document.",
-	},
 	LEVEL_TARGET_NOT_LIABILITY: {
 		message: "A level payment repays a loan, and its target Account is not a liability.",
 		hint: "Name a liability Account with a compounding period as the target, or state the Flow as a fixed amount.",

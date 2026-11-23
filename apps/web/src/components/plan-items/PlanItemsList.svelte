@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type {
 	Baseline,
 	HouseholdDocument,
@@ -7,12 +8,11 @@ import type {
 	Read,
 	ScenarioDocument,
 } from "../../lib/contract"
-import { accountCards } from "../../lib/view/plan-items/accounts"
 import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
-import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
-import { loanCardsOf, plainAccounts, unplacedFlows } from "../../lib/view/plan-items/loan-card"
+import { loanCardsOf, unplacedFlows } from "../../lib/view/plan-items/loan-card"
 import { loanCards } from "../../lib/view/plan-items/loans"
+import { accountItems, flowItems } from "../../lib/view/what-if/plan-items"
 import EmptyState from "../ui/EmptyState.svelte"
 import AssetItems from "./AssetItems.svelte"
 import FlowCards from "./FlowCards.svelte"
@@ -43,12 +43,9 @@ function setDrawer(next: PlanDrawer | null): void {
 	drawer = next
 }
 const noun = $derived(PLAN_PAGES[kind].noun)
-const cards = $derived(
-	kind === "assets"
-		? []
-		: flowCards(doc.flows, kind === "expense" ? "expense" : "income", household),
-)
-const accounts = $derived(accountCards(plainAccounts(doc), baseline))
+const changes = $derived(whatIfSession.changesFor(name))
+const flows = $derived(flowItems(doc, kind, household, changes))
+const accounts = $derived(accountItems(doc, baseline, changes))
 const loans = $derived(kind === "assets" ? loanCardsOf(doc, run) : [])
 const other = $derived(kind === "assets" ? loanCards(unplacedFlows(doc)) : [])
 const busy = $derived(editSession.busy)
@@ -69,12 +66,23 @@ const button =
 		{/if}
 	</div>
 	{#if kind === "assets"}
-		<AssetItems {accounts} {loans} {other} currency={doc.currency} {editable} plan={name} {contentHash} open={setDrawer} />
-	{:else if cards.length === 0}
+		<AssetItems
+			accounts={accounts.cards}
+			marks={accounts.marks}
+			{loans}
+			{other}
+			currency={doc.currency}
+			{editable}
+			plan={name}
+			{contentHash}
+			open={setDrawer}
+		/>
+	{:else if flows.cards.length === 0}
 		<EmptyState title="No {noun} in this plan" />
 	{:else}
 		<FlowCards
-			{cards}
+			cards={flows.cards}
+			marks={flows.marks}
 			currency={doc.currency}
 			{editable}
 			plan={name}

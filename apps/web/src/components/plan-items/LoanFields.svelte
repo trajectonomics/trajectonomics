@@ -25,7 +25,8 @@ interface Props {
 }
 
 let { draft = $bindable(), editing, choices, shown }: Props = $props()
-const unavailable = $derived(owedUnavailable(choices))
+/** An edited loan with no debt named was borrowed on a date, and stays so (it has no debt to repay). */
+const unavailable = $derived(owedUnavailable(choices, editing && draft.owedAccount === ""))
 const arrivals = $derived(
 	unavailable !== null && draft.arrival !== "owed" ? ARRIVAL_CHOICES.slice(1) : ARRIVAL_CHOICES,
 )

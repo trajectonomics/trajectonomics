@@ -1,4 +1,5 @@
 import { labelSetsSentence } from "../tax/labels"
+import { fundingShape } from "./flow-funding"
 import { cappedPrepaymentShape, deriveShape, levelShape, prepaymentsShape } from "./flow-parts"
 import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UNITS } from "./terms"
 
@@ -6,7 +7,7 @@ import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UN
 export const flowShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `category` is an expense's alone; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
+		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `funding` is a contribution into an asset's alone; `category` is an expense's alone; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
 	properties: {
 		id: {
 			type: "string",
@@ -15,7 +16,7 @@ export const flowShape: Record<string, unknown> = {
 		kind: {
 			enum: [...FLOW_KINDS],
 			description:
-				"`income` earns, `expense` spends, `contribution` moves money into the Account its `target` names, and `withdrawal` borrows from the liability its `source` names.",
+				"`income` earns, `expense` spends, `contribution` moves money into the Account its `target` names, and `withdrawal` moves money into cashflow from the Account its `source` names: it borrows from a liability, or sells an asset.",
 		},
 		frequency: {
 			enum: [...FREQUENCIES],
@@ -69,8 +70,9 @@ export const flowShape: Record<string, unknown> = {
 		},
 		target: {
 			type: "string",
-			description: `Contribution only: the Account the money moves into. A liability target is a debt payment, capped at the amount owed; for an asset target ${CONTRIBUTION_CAP}: spread it as a monthly Flow instead, and list the asset in \`cashflow.contribute\`.`,
+			description: `Contribution only: the Account the money moves into. A liability target is a debt payment, capped at the amount owed; for an asset target ${CONTRIBUTION_CAP}: spread it as a monthly Flow instead, and list the asset in \`cashflow.contribute\`. To buy an asset that must be paid even when the day's income does not cover it, state \`funding: "obligation"\`.`,
 		},
+		funding: fundingShape,
 		derive: {
 			...deriveShape,
 			description: `${deriveShape["description"]} Required unless the Flow states \`amount\` or \`level\`.`,
@@ -79,7 +81,7 @@ export const flowShape: Record<string, unknown> = {
 		source: {
 			type: "string",
 			description:
-				"Withdrawal only: the liability Account the money is borrowed from. Its amount owed grows by each landed amount, and the same cash lands in cashflow, so net worth does not move. It is not income, and it must be a liability.",
+				"Withdrawal only: the Account the money comes from. A liability's amount owed grows by each landed amount and the same cash lands in cashflow, so net worth does not move. An asset is sold: `min(amount, value)` leaves it and lands in cashflow, nothing while it is locked, and a `derive` graph that reads the Account with an `account` Measure sells all of it. The cash is not income and never counts toward Available cashflow. A sale of an asset marked `liquid: false` raises accessible net worth by the cash that lands. A start before the asset's `lockedUntil`, with no `startAt`, is refused.",
 		},
 		startAt: {
 			type: "string",

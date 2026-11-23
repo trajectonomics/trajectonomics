@@ -20,12 +20,15 @@ import {
 	showOf,
 } from "./loans-ledger.test-support"
 
+/** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
+const realFetch = globalThis.fetch
 const TRY = "loan-try"
 const STALE = "loan-stale"
 
 beforeAll(() => setupLedger([TRY, STALE]), SLOW_MS)
 afterAll(async () => {
 	whatIfSession.end()
+	globalThis.fetch = realFetch
 	await disposeLedger()
 })
 

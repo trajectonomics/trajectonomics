@@ -1,10 +1,12 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionChance, Read } from "../../lib/contract"
 import { chanceViewOf } from "../../lib/view/chance/page"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
+import ChanceWhatIf from "../what-if/ChanceWhatIf.svelte"
 import ChanceResult from "./ChanceResult.svelte"
 
 interface Props {
@@ -20,6 +22,7 @@ let { chance, scenario, onScenario }: Props = $props()
 const names = $derived(projectionNames(chance))
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : chance[name])
+const lens = $derived(name === null ? null : whatIfSession.lensFor(name))
 const options = $derived(names.map((value) => ({ value, label: value })))
 </script>
 
@@ -42,6 +45,7 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 			value={name}
 			onChange={onScenario}
 		/>
+		{#if lens}<ChanceWhatIf {lens} baseline={read.ok ? read.data : null} />{/if}
 		<ReadView {read} label={`Chance of success for ${name}`}>
 			{#snippet children(data)}
 				<ChanceResult view={chanceViewOf(data)} argv={read.argv} />

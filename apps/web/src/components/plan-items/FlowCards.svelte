@@ -1,10 +1,14 @@
 <script lang="ts">
 import type { FlowCard } from "../../lib/view/plan-items/flows"
+import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
+import WasText from "../what-if/WasText.svelte"
 
 interface Props {
 	cards: readonly FlowCard[]
+	/** What the What-if session changes in each card, by item id: the baseline text struck through, or off. */
+	marks?: MarkMap
 	currency: string
 	editable: boolean
 	onEdit: (id: string) => void
@@ -14,12 +18,13 @@ interface Props {
 	onTry: (id: string) => void
 }
 
-let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
+let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
 </script>
 
 <ul class="grid gap-3 sm:grid-cols-2">
 	{#each cards as card (card.id)}
-		<li class="rounded-lg border border-border bg-card p-4">
+		{@const mark = marks[card.id] ?? NO_MARKS}
+		<li class="rounded-lg border border-border bg-card p-4 {mark.off ? 'opacity-60' : ''}">
 			<div class="flex items-start justify-between gap-3">
 				<h2 class="font-semibold break-all">{card.id}</h2>
 				{#if editable && card.editable}
@@ -39,16 +44,17 @@ let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $pr
 				{:else}
 					<span class="text-muted-foreground">computed</span>
 				{/if}
+				<WasText was={mark.was.amount} money {currency} />
 			</p>
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">How often</dt>
-				<dd>{card.frequency}</dd>
+				<dd>{card.frequency}<WasText was={mark.was.frequency} /></dd>
 				<dt class="text-muted-foreground">Starts</dt>
-				<dd>{card.start}{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
+				<dd>{card.start}<WasText was={mark.was.start} />{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
 				<dt class="text-muted-foreground">Ends</dt>
-				<dd>{card.end}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
+				<dd>{card.end}<WasText was={mark.was.end} />{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
 				<dt class="text-muted-foreground">Growth</dt>
-				<dd>{card.growth}</dd>
+				<dd>{card.growth}<WasText was={mark.was.growth} /></dd>
 				{#if card.category !== null}
 					<dt class="text-muted-foreground">Category</dt>
 					<dd>{card.category}</dd>

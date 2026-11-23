@@ -67,7 +67,7 @@ describe("scenarioDocumentError", () => {
 		expect(scenarioDocumentError(VALID)).toBeNull()
 	})
 
-	it("states a loan refusal in words, as projection run does, and keeps its path and code", () => {
+	it("states a sale refusal in words, as projection run does, and keeps its path and code", () => {
 		const draw = {
 			id: "draw",
 			kind: "withdrawal",
@@ -75,20 +75,25 @@ describe("scenarioDocumentError", () => {
 			start: "2026-01-01",
 			amount: 100,
 			growth: { bps: 0 },
-			source: "cash",
+			source: "vault",
 		}
-		const error = scenarioDocumentError({ ...VALID, flows: [...VALID.flows, draw] })
+		const vault = { id: "vault", kind: "asset", rate: 0, lockedUntil: "2027-01-01" }
+		const error = scenarioDocumentError({
+			...VALID,
+			accounts: [...VALID.accounts, vault],
+			flows: [...VALID.flows, draw],
+		})
 		if (error === null) throw new Error("the document was accepted")
-		expect(error.body.path).toBe(`document.flows.${VALID.flows.length}.source`)
+		expect(error.body.path).toBe(`document.flows.${VALID.flows.length}.start`)
 		expect(error.body.message).toBe(
-			"A withdrawal borrows from a liability, and its source Account is not one.",
+			"A withdrawal sells an asset that is locked on the withdrawal's first date, and no Milestone gate says to wait, so it could never move anything on that date.",
 		)
-		expect(error.body.hint).toContain("Name a liability Account as the withdrawal's source.")
+		expect(error.body.hint).toContain("Start the withdrawal on or after the asset's lockedUntil")
 		expect(error.body.details).toEqual([
 			{
-				path: `document.flows.${VALID.flows.length}.source`,
-				message: `document.flows.${VALID.flows.length}.source: WITHDRAWAL_SOURCE_KIND`,
-				code: "WITHDRAWAL_SOURCE_KIND",
+				path: `document.flows.${VALID.flows.length}.start`,
+				message: `document.flows.${VALID.flows.length}.start: WITHDRAWAL_LOCKED`,
+				code: "WITHDRAWAL_LOCKED",
 			},
 		])
 	})

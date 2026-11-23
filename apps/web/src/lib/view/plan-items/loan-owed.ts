@@ -54,9 +54,17 @@ export function owedSelectChoices(choices: readonly OwedChoice[]): readonly Choi
 	]
 }
 
-/** Why "I already owe it" is unavailable, or null when a debt can be chosen. */
-export function owedUnavailable(choices: readonly OwedChoice[]): string | null {
+/**
+ * Why "I already owe it" is unavailable, or null when a debt can be chosen. A loan saved as borrowed on a date
+ * stays one when edited: the form names no debt for a loan that exists, so it could not save the change.
+ */
+export function owedUnavailable(
+	choices: readonly OwedChoice[],
+	editingDateLoan = false,
+): string | null {
+	if (editingDateLoan)
+		return "this loan is borrowed on a date. To repay a debt the Baseline already holds, add a loan for that debt."
 	return choices.length > 0
 		? null
-		: "The Baseline holds no debt this plan could attach a loan to, so a loan can only be borrowed on a date."
+		: "The Baseline holds no debt that a loan does not already repay, so a loan can only be borrowed on a date."
 }

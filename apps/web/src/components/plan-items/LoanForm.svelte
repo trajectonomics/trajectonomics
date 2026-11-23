@@ -94,7 +94,7 @@ async function remove(): Promise<void> {
 		id={existing?.account.id}
 		onDelete={remove}
 		note={held
-			? `Its payments, extra payments and withdrawal are removed. The debt ${existing?.account.id} stays in the plan, because the ledger owes it.`
+			? `Its payments, extra payments and withdrawal are removed. The Account stays in the plan as a debt with no payments, because the ledger owes it, so its interest keeps adding up.`
 			: undefined}
 		trying={tryValue}
 	/>

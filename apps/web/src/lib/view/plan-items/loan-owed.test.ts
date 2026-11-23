@@ -59,6 +59,12 @@ describe("the debts a loan that is already owed can attach to", () => {
 		expect(owedUnavailable(owedChoicesOf(planDocument(), owingBaseline()))).toBeNull()
 	})
 
+	test("an edited loan borrowed on a date cannot become owed, even when a debt is free, and says why", () => {
+		const choices = owedChoicesOf(planDocument(), owingBaseline())
+		expect(choices.length).toBeGreaterThan(0)
+		expect(owedUnavailable(choices, true)).toContain("borrowed on a date")
+	})
+
 	test("choosing a declared debt attaches the loan to that Account, and a slug of the name is never made", () => {
 		const doc = planDocument()
 		const choices = owedChoicesOf(doc, owingBaseline())

@@ -50,6 +50,8 @@ function closed(code: ErrorCode, path: readonly string[] = []): readonly string[
 
 export const ACCOUNT_KINDS: readonly string[] = closed("INVALID_KIND", ["accounts"])
 export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"])
+/** How a Contribution into an asset is paid: a target spends Available cashflow, an obligation is paid in full (sim's ADR 0021). */
+export const FUNDINGS: readonly string[] = closed("INVALID_FUNDING")
 export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")
 export const FREQUENCIES: readonly string[] = closed("INVALID_FREQUENCY")
 export const DAY_RULES: readonly string[] = closed("INVALID_DAY_RULE")

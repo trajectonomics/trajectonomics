@@ -6,7 +6,11 @@ import PlanItemDrawer from "./PlanItemDrawer.svelte"
 import { assets, HASH, runWithLoan } from "./plan-loans.test-support"
 
 /** The loan drawer on a plan, read against a Baseline that holds the given liability rows. */
-function loanDrawer(rows: { id: string; name: string; amount: string }[], loanId?: string): string {
+function loanDrawer(
+	rows: { id: string; name: string; amount: string }[],
+	loanId?: string,
+	doc = planDocument(),
+): string {
 	const base = baselineRead()
 	if (!base.ok) throw new Error("the fixture is not ok")
 	const baseline = {
@@ -28,7 +32,7 @@ function loanDrawer(rows: { id: string; name: string; amount: string }[], loanId
 			drawer: { loan: true, ...(loanId === undefined ? {} : { id: loanId }) },
 			kind: "assets",
 			name: "base",
-			doc: planDocument(),
+			doc,
 			household: null,
 			baseline,
 			contentHash: HASH,
@@ -49,6 +53,13 @@ describe("the loan form's I already owe it", () => {
 		const body = loanDrawer([{ id: "01-car", name: "Car Loan", amount: "184000.00" }])
 		expect(body).toContain("I already owe it (the Baseline holds the debt)")
 		expect(body).not.toContain("is unavailable")
+	})
+
+	test("editing a loan borrowed on a date does not offer it, even with a free debt, and says why", () => {
+		const debt = [{ id: "01-car", name: "Car Loan", amount: "184000.00" }]
+		const body = loanDrawer(debt, "loan", loanPlanDocument())
+		expect(body).not.toContain("I already owe it (the Baseline holds the debt)")
+		expect(body).toContain("this loan is borrowed on a date")
 	})
 })
 

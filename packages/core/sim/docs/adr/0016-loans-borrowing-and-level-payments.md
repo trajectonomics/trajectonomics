@@ -76,4 +76,4 @@ principal, nominal rate and number of payments. Both keys are optional and addit
 - Existing parity hashes are unchanged. Two cases are added: `loan-level-month` (a level loan repaid on
   month ends, cleared by the 12th payment under `ceil`) and `loan-borrow-day` (a planned withdrawal with a
   same-day expense, showing the withdrawal is not Available cashflow).
-- Withdrawals from assets, sale proceeds and the CLI and Dashboard vocabulary are later slices.
+- Withdrawals from assets and sale proceeds are [ADR 0021](./0021-buy-and-sell-an-asset.md); `WITHDRAWAL_SOURCE_KIND` is removed there. The CLI and Dashboard vocabulary is a later slice.

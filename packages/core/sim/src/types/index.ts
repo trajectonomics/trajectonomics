@@ -11,6 +11,7 @@ export type {
 	CompoundingPeriod,
 	DateString,
 	Frequency,
+	Funding,
 	Growth,
 	MinorUnits,
 	Resolution,
