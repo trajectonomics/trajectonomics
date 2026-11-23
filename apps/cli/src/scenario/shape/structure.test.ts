@@ -18,6 +18,7 @@ const FULL: Record<string, unknown> = {
 		{ id: "gold", kind: "asset", rate: 200, returnLabel: "returns.gold" },
 		{ id: "loan", kind: "liability", rate: 500 },
 		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
+		{ id: "home", kind: "asset", rate: 0, liquid: false },
 	],
 	flows: [
 		{
