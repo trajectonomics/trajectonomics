@@ -127,7 +127,7 @@ The one date after a Settlement period ends on which the Levy's due amount is re
 _Avoid_: Tax settlement, filing, payment
 
 **Contribution saving**:
-The fall in a Settlement period's `due` from extra funded contributions under one Tally label, found by raising that label's funded Tally in whole steps and re-evaluating the Levy while each step pays, and dropping a last step whose last grain saved nothing because it went past a cap (`contributionSavings`). It is a statement about one period's Levy, in the caller's label order, and never changes a Scenario.
+The fall in a Settlement period's `due` from extra funded contributions under one Tally label, found by raising that label's funded Tally in whole steps and re-evaluating the Levy while each step pays, and dropping a last step whose last grain saved nothing because it went past a cap or past where `due` stops falling (`contributionSavings`). It is a statement about one period's Levy, in the caller's label order, and never changes a Scenario.
 _Avoid_: tax saving, optimisation
 
 **Carry-in**:

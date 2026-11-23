@@ -13,7 +13,9 @@ export function invalid(path: InputProblem["path"]): SavingsResult {
 /** The first option that is out of range, as a problem at its key. */
 export function badOption(options: SavingsOptions): SavingsResult | undefined {
 	if (!isCount(options.step, 1)) return invalid(["step"])
-	if (!isCount(options.grain, 1, options.step)) return invalid(["grain"])
+	// A grain as large as the step would turn the over-the-cap rule off: a taken step always saves
+	// something, so its last grain never equals the whole step.
+	if (!isCount(options.grain, 1, options.step - 1)) return invalid(["grain"])
 	if (!isCount(options.maxSteps, 1)) return invalid(["maxSteps"])
 	if (!Number.isSafeInteger(options.inflation)) return invalid(["inflation"])
 	if (options.budget !== undefined && !isCount(options.budget, 0)) return invalid(["budget"])
