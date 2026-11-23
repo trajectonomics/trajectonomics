@@ -32,6 +32,8 @@ export const MEASURE_OPS = [
 	"account",
 ] as const
 export const TALLY_BASES = ["gross", "funded", "returns", "gains"] as const
+/** The Spending rule kinds a Flow's `rule` takes (ADR 0023). */
+export const RULE_KINDS = ["initialRate", "currentRate", "guardrails"] as const
 export const ROUNDINGS = ["floor", "halfUp", "ceil"] as const
 export const REFERENCE_BASES = [
 	"unlockedAssets",

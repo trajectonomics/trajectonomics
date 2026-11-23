@@ -7,6 +7,8 @@ import type { ProjectionProblem } from "../types/projection"
 import { fixedAmountAt } from "./amount"
 import type { DatedEvent } from "./events"
 import { compareIds } from "./order"
+import { ruledAmounts } from "./planned-rules"
+import type { RuleBook } from "./rule-book"
 
 export interface DerivedEntry {
 	readonly id: string
@@ -47,6 +49,8 @@ export function derivedOrder(flows: readonly Flow[]): readonly DerivedEntry[] {
 export interface Planned {
 	readonly totals: ReadonlyMap<string, bigint>
 	readonly derived: ReadonlyMap<string, bigint>
+	/** What each rule Flow's Occurrence pays; absent when the Scenario has none (ADR 0023). */
+	readonly ruled?: ReadonlyMap<DatedEvent, bigint>
 }
 
 export type PlannedOutcome =
@@ -79,10 +83,14 @@ export function plannedAmounts(
 	date: DateString,
 	inflation: BasisPoints,
 	readAccount: (accountId: string) => bigint,
+	rules?: RuleBook,
 ): PlannedOutcome {
 	const totals = fixedTotals(events, inflation)
+	const set = ruledAmounts(events, totals, rules, date, { inflation, readAccount })
+	if (!set.ok) return set
+	const { ruled } = set
 	const order = derivedOrder(flows)
-	if (order.length === 0) return { ok: true, planned: { totals, derived: new Map() } }
+	if (order.length === 0) return { ok: true, planned: { totals, derived: new Map(), ruled } }
 	const counts = occurred(events)
 	const derived = new Map<string, bigint>()
 	for (const entry of order) {
@@ -99,5 +107,5 @@ export function plannedAmounts(
 		derived.set(entry.id, outcome.amount)
 		totals.set(entry.id, outcome.amount * BigInt(count))
 	}
-	return { ok: true, planned: { totals, derived } }
+	return { ok: true, planned: { totals, derived, ruled } }
 }

@@ -1,5 +1,6 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString, Flow } from "../types"
+import { isRuled } from "../types"
 import { oracleLandDay, oraclePlannedExpense } from "./oracle-account-day"
 import { type Context, priceDay, waiting } from "./oracle-account-price"
 import { oracleOpenStates, oracleWorth } from "./oracle-account-worth"
@@ -7,6 +8,7 @@ import { oracleCalendar } from "./oracle-calendar"
 import { oracleEvents } from "./oracle-flow"
 import type { OracleFires } from "./oracle-milestone-walk"
 import { oracleOrdered } from "./oracle-planned"
+import { oracleRuleLog } from "./oracle-rule"
 
 export interface Landing {
 	readonly date: DateString
@@ -49,6 +51,7 @@ export function oracleAccountWalk(
 		known: new Map(),
 		pending,
 		derivation: oracleOrdered(flows),
+		rules: new Map(flows.filter(isRuled).map((flow) => [flow.id, oracleRuleLog()])),
 	}
 	const dates = new Set([
 		timeline.horizon,

@@ -10,6 +10,9 @@ export const NOT_ALLOWED: Field = opt((_value, path, emit) => emit("FIELD_NOT_AL
 
 export const label: (hasLevy: boolean) => Field = tallyLabel
 
+/** A Spending `rule` on a Flow that is not an expense. */
+export const NOT_EXPENSE: Field = opt((_value, path, emit) => emit("RULE_NOT_EXPENSE", path))
+
 const MAX_CATEGORY_LENGTH = 64
 
 /** C0 and C1 control characters, which a category may not carry. */

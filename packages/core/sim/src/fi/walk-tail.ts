@@ -1,7 +1,7 @@
 import { collectDates } from "../engine/dates"
 import { flowsAt } from "../engine/events"
 import { allSettlementDates } from "../engine/levy-set"
-import { cloneLevySet, cloneStates } from "./clone"
+import { cloneLevySet, cloneRules, cloneStates } from "./clone"
 import { recordReads } from "./read-dates"
 import { processDay } from "./walk-day"
 import type { DayInput, WalkInput } from "./walk-input"
@@ -25,6 +25,7 @@ export function walkTail(input: WalkInput, walked: DayInput): void {
 		point: {
 			states: cloneStates(point.states),
 			levies,
+			...(point.rules && { rules: cloneRules(point.rules) }),
 			...(point.gate && { gate: point.gate.frozen() }),
 		},
 		months: 0,

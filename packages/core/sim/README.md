@@ -171,6 +171,101 @@ It prints the payment, the empty problem list and the loan's balance at 30 June 
 2026-12-31
 ```
 
+## Spending rules
+
+An expense Flow takes `rule` instead of `amount`, `derive` or `level`: its yearly amount follows what a
+portfolio of asset Accounts is worth. The rule reads the portfolio on the Flow's first Landed date and
+on each later one that is twelve Occurrences on (one for an annual Flow), before any Flow lands, and fixes that Rule year's amount `Y`. A
+monthly Flow pays `floor(Y × k / 12) − floor(Y × (k − 1) / 12)` on its k-th Occurrence of the year, so
+twelve add to `Y` exactly; an annual Flow pays `Y` once. The withdraw order, a Shortfall and tax
+Settlement are unchanged. A fixed amount that keeps its real value is an ordinary expense with
+`growth: "inflation"`. There is no default rate or rounding. See [ADR 0023](docs/adr/0023-spending-rules.md).
+
+`initialRate` fixes the first year from the portfolio and holds that amount level in real terms:
+
+```ts fragment
+{ id: "spending", kind: "expense", frequency: "monthly", start: "2026-01-01",
+  rule: { kind: "initialRate", portfolio: ["funds"], rateBps: 400, rounding: "halfUp" } }
+```
+
+`currentRate` takes a share of each year's portfolio, with optional dated rate `steps` and a `floor`
+and `ceiling` that grow like a fixed amount; where growth makes them cross, the ceiling wins:
+
+```ts fragment
+{ id: "spending", kind: "expense", frequency: "monthly", start: "2026-01-01",
+  rule: { kind: "currentRate", portfolio: ["funds", "rmf"], rateBps: 400, rounding: "halfUp",
+    steps: [{ from: "2030-01-01", bps: 450 }],
+    floor: { amount: 3_000_000, growth: "inflation" }, ceiling: { amount: 6_000_000, growth: "inflation" } } }
+```
+
+`guardrails` carries last year's amount forward with inflation, cuts it by `upper.adjustBps` when the
+withdrawal rate has risen `upper.bps` above `rateBps` (relative), and raises it by `lower.adjustBps`
+when it has fallen `lower.bps` below. With `lower` alone it only raises, never cuts:
+
+```ts fragment
+{ id: "spending", kind: "expense", frequency: "monthly", start: "2026-01-01",
+  rule: { kind: "guardrails", portfolio: ["funds"], rateBps: 400, rounding: "halfUp",
+    upper: { bps: 2000, adjustBps: 1000 }, lower: { bps: 2000, adjustBps: 1000 } } }
+```
+
+With `spendingRules: true`, a Projection reports one statement per rule Flow: for each Rule year its
+first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` and the
+`action` (`none`, `floor`, `ceiling`, `cut` or `raise`). A portfolio of 100,000,000 that falls 10% a year
+under a 4% guardrails rule is cut in its third year:
+
+```ts
+import { project, type SpendingRule } from "@trajectonomics/core/sim"
+
+const rule = {
+	kind: "guardrails",
+	portfolio: ["funds"],
+	rateBps: 400,
+	rounding: "halfUp",
+	upper: { bps: 2000, adjustBps: 1000 },
+	lower: { bps: 2000, adjustBps: 1000 },
+} satisfies SpendingRule
+
+const result = project(
+	{ schemaVersion: 1, balances: [{ account: "cash", amount: 10_000_000_000 }, { account: "funds", amount: 100_000_000 }] },
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: "cash", kind: "asset", rate: 0 },
+			{ id: "funds", kind: "asset", rate: -1000 },
+		],
+		flows: [{ id: "spending", kind: "expense", frequency: "monthly", start: "2026-01-01", rule }],
+		cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: ["cash"] },
+	},
+	{ start: "2026-01-01", horizon: "2028-12-31", resolution: "month" },
+	{ spendingRules: true },
+)
+
+if (result.ok) {
+	for (const year of result.projection.spendingRules ?? []) {
+		for (const { date, portfolio, amount, withdrawalRateBps, action } of year.years) {
+			console.log(date, portfolio, amount, withdrawalRateBps, action)
+		}
+	}
+}
+```
+
+The portfolio falls to 90,000,000 and then 81,000,000. In the second year the rate is 4.44%, inside the
+band; in the third the amount 4,000,000 is above 4.8% of the portfolio, so the year pays 90% of it:
+
+```text
+2026-01-01 100000000 4000000 400 none
+2027-01-01 90000000 4000000 444 none
+2028-01-01 81000000 3600000 444 cut
+```
+
+Financial Independence prices a rule Flow from each candidate's own walk, as it does a Derived amount
+that reads an Account. `chanceOfSuccess` runs the rule on every Market path. A `next12Months` Milestone
+Metric is refused beside a rule Flow (`NEXT_12_MONTHS_READS_ACCOUNT`) unless that Flow's `startAt`
+names the Milestone the Metric sits on, and `retirementSpending`
+replaces a rule Flow like any expense.
+
 ## Levies
 
 A Levy is a closed rule set: a twelve-month period rule, a settlement rule and a graph of

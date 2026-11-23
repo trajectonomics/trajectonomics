@@ -8618,5 +8618,372 @@
 			}
 		},
 		"savingsSha256": "5ebff16fda9afb882c4ecbd88720f9c57ce551410d22d7303c7c886f7eeeb50d"
+	},
+	{
+		"name": "rule-initial-rate",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "inv",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 250
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "inv",
+					"kind": "asset",
+					"rate": 400
+				}
+			],
+			"flows": [
+				{
+					"id": "spending",
+					"kind": "expense",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"rule": {
+						"kind": "initialRate",
+						"portfolio": ["inv"],
+						"rateBps": 400,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "inv"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "inv"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2030-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"spendingRules": true
+		},
+		"sha256": "821975864f5d25698792b31238a4f7905f0eb4fa5aa5787da0e8ce1602fc7e5f"
+	},
+	{
+		"name": "rule-current-rate-bounds",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "inv",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 250
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "inv",
+					"kind": "asset",
+					"rate": 400
+				}
+			],
+			"flows": [
+				{
+					"id": "spending",
+					"kind": "expense",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"rule": {
+						"kind": "currentRate",
+						"portfolio": ["inv"],
+						"rateBps": 400,
+						"rounding": "halfUp",
+						"steps": [
+							{
+								"from": "2027-01-01",
+								"bps": 500
+							}
+						],
+						"floor": {
+							"amount": 380000,
+							"growth": "inflation"
+						},
+						"ceiling": {
+							"amount": 520000,
+							"growth": {
+								"bps": 200
+							}
+						}
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "inv"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "inv"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2030-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"spendingRules": true
+		},
+		"sha256": "34d4942a80434f37ddcc50776bba1105510f256bf0a9d8f341c0dce96aead475",
+		"chance": {
+			"model": {
+				"id": "rule-market",
+				"accounts": ["inv"],
+				"buckets": [
+					{
+						"returnsBps": [0],
+						"weight": 2147483648
+					},
+					{
+						"returnsBps": [-1500],
+						"weight": 2147483648
+					}
+				]
+			},
+			"seed": "0123456789abcdef",
+			"paths": 4
+		},
+		"chanceSha256": "540486ead8990f25580c6312683f5809b37e9e66f7fa5fe1a8350a1c8a8a1b8f"
+	},
+	{
+		"name": "rule-guardrails",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "inv",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 250
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "inv",
+					"kind": "asset",
+					"rate": 400
+				}
+			],
+			"flows": [
+				{
+					"id": "spending",
+					"kind": "expense",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"rule": {
+						"kind": "guardrails",
+						"portfolio": ["inv"],
+						"rateBps": 400,
+						"rounding": "halfUp",
+						"upper": {
+							"bps": 1500,
+							"adjustBps": 800
+						},
+						"lower": {
+							"bps": 1500,
+							"adjustBps": 800
+						}
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "inv"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "inv"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2030-01-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"spendingRules": true
+		},
+		"sha256": "821975864f5d25698792b31238a4f7905f0eb4fa5aa5787da0e8ce1602fc7e5f"
+	},
+	{
+		"name": "rule-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 2000000
+				},
+				{
+					"account": "inv",
+					"amount": 3000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "inv",
+					"kind": "asset",
+					"rate": 500
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 800000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 150000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				},
+				{
+					"id": "save",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 500000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "inv"
+				},
+				{
+					"id": "spending",
+					"kind": "expense",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"startAt": "retire",
+					"rule": {
+						"kind": "currentRate",
+						"portfolio": ["inv"],
+						"rateBps": 400,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": ["inv"],
+				"withdraw": ["cash", "inv"]
+			},
+			"milestones": [
+				{
+					"id": "retire",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "when",
+							"kind": "date",
+							"on": "2026-04-01"
+						},
+						{
+							"id": "worth",
+							"kind": "metric",
+							"metric": "netWorth",
+							"op": "atLeast",
+							"amount": 0,
+							"terms": "nominal"
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2036-01-01",
+			"resolution": "month"
+		},
+		"sha256": "87b74b7838eae6b68ed5c1aa63cd8b2919ee8753da2989abc015e3771a70ae59",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 12
+		},
+		"fiSha256": "dce7af7860a74629c307d4b506d29235d0c86a7b623efcbd3097a9750662d544"
 	}
 ]
