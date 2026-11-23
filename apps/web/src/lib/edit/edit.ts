@@ -33,8 +33,8 @@ export const EDIT_KINDS = [
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
-const someChange = (edit: { sets: unknown[]; removals: unknown[] }) =>
-	edit.sets.length + edit.removals.length > 0
+const someChange = (edit: { sets: unknown[]; removals: unknown[]; additions: unknown[] }) =>
+	edit.sets.length + edit.removals.length + edit.additions.length > 0
 
 /** One Edit, as the page sends it in the body of `POST /edit`. Strict: an unknown field is refused. */
 export const editSchema = z.discriminatedUnion("kind", [
@@ -45,6 +45,7 @@ export const editSchema = z.discriminatedUnion("kind", [
 		// The Overrides a copy saves with (cli ADR 0056): none, and the copy is the plan as it is.
 		sets: overridesFields.sets.default([]),
 		removals: overridesFields.removals.default([]),
+		additions: overridesFields.additions.default([]),
 	}),
 	z
 		.strictObject({
@@ -53,6 +54,7 @@ export const editSchema = z.discriminatedUnion("kind", [
 			contentHash,
 			sets: overridesFields.sets,
 			removals: overridesFields.removals,
+			additions: overridesFields.additions.default([]),
 		})
 		.refine(someChange, { message: "a what-if applied with no change" }),
 	z.strictObject({

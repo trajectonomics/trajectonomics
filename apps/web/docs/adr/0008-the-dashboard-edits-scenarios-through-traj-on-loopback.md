@@ -71,3 +71,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - `copy-plan` gains optional `sets` and `removals`, the Overrides of a what-if. With them it runs `scenario fork <from> <name> --set=… --without=… --decimal`; without them its argv is unchanged.
 - `apply-overrides` is new: `scenario apply <name> --set=… --without=… --decimal --if-hash <contentHash>`, the what-if form of `scenario apply` ([cli ADR 0057](../../../cli/docs/adr/0057-a-what-if-applies-to-the-plan-it-came-from.md)). It carries at least one change, and it names the hash the session began with.
 - Both are pinned in `edit-what-if.test.ts`, and `followPlan` joins a copy or an apply to the plans the Snapshot projects, as `apply-plan` does. The session that makes them is [web ADR 0010](0010-the-what-if-session-reads-through-traj-on-loopback.md).
+
+## Amendment (2026-11-23): a reread can carry the allowance inputs
+
+- `POST /reread` takes `{}` as before, or `{ "allowances": <inputs or null> }`: the labels in order, the step and the two optional limits of the Tax allowances page ([ADR 0012](0012-the-tax-allowances-page-reads-what-traj-says-each-allowance-could-take.md)). The server keeps them with the Snapshot's parameters and reads again. It still writes nothing; the body is a strict schema with the depth cap, and a body that is not that shape is a 400 `invalid_reread`. The other guards are the Edit guards, unchanged.

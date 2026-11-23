@@ -3,8 +3,8 @@
  * the Sets and Removals the person has made. Pure: a reducer per change, and the words that name each
  * change. Nothing here is stored; the client module holds the value for the length of the tab.
  */
+import { type Addition, additionId, additionPath } from "./additions"
 import type { Json, SetChange } from "./overrides"
-import { sameJson } from "./same-json"
 
 export type WhatIf = {
 	/** The plan the changes are made against. */
@@ -13,16 +13,18 @@ export type WhatIf = {
 	contentHash: string
 	sets: SetChange[]
 	removals: string[]
+	/** The items the session puts on a list, which the plan does not hold (cli ADR 0062). */
+	additions: Addition[]
 }
 
 /** A session that has just begun on a plan: no change yet. */
 export function startWhatIf(plan: string, contentHash: string): WhatIf {
-	return { plan, contentHash, sets: [], removals: [] }
+	return { plan, contentHash, sets: [], removals: [], additions: [] }
 }
 
 /** Whether the session holds any change. */
 export function hasChanges(whatIf: WhatIf): boolean {
-	return whatIf.sets.length > 0 || whatIf.removals.length > 0
+	return whatIf.sets.length + whatIf.removals.length + whatIf.additions.length > 0
 }
 
 /** Whether an item's path is switched off in the session. */
@@ -60,35 +62,10 @@ export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
 	return { ...whatIf, removals: whatIf.removals.filter((removal) => removal !== path) }
 }
 
-/**
- * The Sets an edited item makes: one per field whose JSON value differs from the stored item (compared as data, not as text), at
- * `<list>.<id>.<field>`. A field the form removed is not a Set, because `traj` replaces a path and does not
- * delete one; such a change is left to the Edit that saves the document.
- */
-export function itemSets(
-	list: string,
-	id: string,
-	stored: Record<string, Json>,
-	edited: Record<string, Json>,
-): SetChange[] {
-	return Object.keys(edited)
-		.filter((field) => !sameJson(stored[field] ?? null, edited[field] ?? null))
-		.map((field) => ({ path: `${list}.${id}.${field}`, value: edited[field] ?? null }))
-}
-
-/** The fields a form cleared: stored with a value, and absent from the edited item. A what-if cannot try them. */
-export function clearedFields(
-	stored: Record<string, Json>,
-	edited: Record<string, Json>,
-): string[] {
-	return Object.keys(stored).filter(
-		(field) => stored[field] !== null && edited[field] === undefined,
-	)
-}
-
 /** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
 export type Change =
 	| { kind: "off"; path: string; label: string }
+	| { kind: "add"; path: string; label: string }
 	| { kind: "set"; path: string; label: string; value: string }
 
 /** The item name a path names: `flows.gym.amount` names `gym`, shown as `Gym`. */
@@ -103,13 +80,20 @@ function valueText(value: Json): string {
 	return JSON.stringify(value)
 }
 
-/** The changes, in the order the session holds them: removals first, then Sets. */
+/** The changes, in the order `traj` applies them: removals first, then Additions, then Sets. */
 export function changesOf(whatIf: WhatIf): Change[] {
 	const removals = whatIf.removals.map(
 		(path): Change => ({
 			kind: "off",
 			path,
 			label: `${itemLabel(path)} switched off`,
+		}),
+	)
+	const additions = whatIf.additions.map(
+		(one): Change => ({
+			kind: "add",
+			path: additionPath(one),
+			label: `Added ${one.list.replace(/s$/, "")} ${additionId(one)}`,
 		}),
 	)
 	const sets = whatIf.sets.map((set): Change => {
@@ -121,15 +105,22 @@ export function changesOf(whatIf: WhatIf): Change[] {
 			value: valueText(set.value),
 		}
 	})
-	return [...removals, ...sets]
+	return [...removals, ...additions, ...sets]
 }
 
-/** The Overrides of a session in the order `traj` takes them: removals, then Sets (cli ADR 0056). */
-export function overridesOf(whatIf: WhatIf): { sets: SetChange[]; removals: string[] } {
-	return { sets: whatIf.sets, removals: whatIf.removals }
+/** The Overrides of a session in the order `traj` takes them: removals, Additions, then Sets (cli ADR 0056, 0062). */
+export function overridesOf(whatIf: WhatIf): {
+	sets: SetChange[]
+	removals: string[]
+	additions: Addition[]
+} {
+	return { sets: whatIf.sets, removals: whatIf.removals, additions: whatIf.additions }
 }
 
-/** An item of the plan as a JSON record, so a form's edited item and the stored one compare field by field. */
-export function recordOf(item: object): Record<string, Json> {
-	return JSON.parse(JSON.stringify(item)) as Record<string, Json>
-}
+export {
+	clearedFields,
+	itemSets,
+	recordOf,
+	withAddition,
+	withoutAddition,
+} from "./session-items"

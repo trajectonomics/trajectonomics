@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { allowancePlan } from "../snapshot/allowance-params"
 import { accountList } from "./account-list"
 import { balance } from "./balance"
 import { baseline } from "./baseline"
@@ -7,6 +8,7 @@ import { doctor } from "./doctor"
 import { fi } from "./fi"
 import { netWorth } from "./net-worth"
 import { pnl } from "./pnl"
+import { projectionAllowances } from "./projection-allowances"
 import { projectionChance } from "./projection-chance"
 import { projectionCompare } from "./projection-compare"
 import { projectionRun } from "./projection-run"
@@ -27,6 +29,8 @@ export const snapshotParams = z.strictObject({
 	birthDate: dateString.nullable(),
 	ages: z.array(z.number().int().min(0).safe()),
 	historyDates: z.array(dateString),
+	// Absent from a Snapshot made before the allowance reads, so a document that never had the key reads as none.
+	allowances: allowancePlan.nullable().default(null),
 })
 export type SnapshotParams = z.infer<typeof snapshotParams>
 
@@ -48,6 +52,8 @@ export const snapshotReads = z.strictObject({
 	compare: readOf(projectionCompare).nullable(),
 	// Absent from a Snapshot made without a Return model, so a document that never had the key reads as none.
 	chance: z.record(z.string(), readOf(projectionChance)).default({}),
+	// One `projection allowances` per plan that has a Levy, when the Snapshot states allowance inputs.
+	allowances: z.record(z.string(), readOf(projectionAllowances)).default({}),
 })
 export type SnapshotReads = z.infer<typeof snapshotReads>
 

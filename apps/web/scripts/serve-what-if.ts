@@ -3,7 +3,7 @@
 import { z } from "zod"
 import type { PlanParams } from "../src/lib/snapshot"
 import { whatIfReads } from "../src/lib/what-if/argv"
-import { runPlanned } from "./run-stages"
+import { runPlanned } from "./run-planned"
 import type { RunContext } from "./run-traj"
 import { failure, readWhatIf } from "./serve-edit-answer"
 import { json } from "./serve-respond"

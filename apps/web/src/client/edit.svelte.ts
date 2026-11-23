@@ -2,6 +2,7 @@ import type { ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER, REREAD_PATH } from "../lib/edit/guard"
+import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
 /** The sentence a refused Edit shows when the plan moved on since the page read it. */
@@ -58,15 +59,20 @@ class EditSession {
 		}
 	}
 
-	/** Asks the server to read the Snapshot again and shows it. The form keeps what the person typed. */
-	async reread(): Promise<void> {
-		if (this.token === null || this.busy) return
+	/**
+	 * Asks the server to read the Snapshot again and shows it. The form keeps what the person typed. With
+	 * `allowances`, the read uses those inputs for the allowance reads (null clears them); nothing is written.
+	 * Returns true when the new Snapshot is shown.
+	 */
+	async reread(allowances?: AllowancePlan | null): Promise<boolean> {
+		if (this.token === null || this.busy) return false
 		this.busy = true
+		this.error = null
 		try {
 			const response = await fetch(REREAD_PATH, {
 				method: "POST",
 				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: this.token },
-				body: "{}",
+				body: JSON.stringify(allowances === undefined ? {} : { allowances }),
 				cache: "no-store",
 			})
 			const answer = editAnswer.safeParse(await response.json())
@@ -74,12 +80,14 @@ class EditSession {
 			else if (answer.data.ok) {
 				replaceSnapshot(answer.data.snapshot)
 				this.clear()
+				return true
 			} else this.error = answer.data.error.message
 		} catch {
 			this.error = "The Dashboard could not reach traj. Try again."
 		} finally {
 			this.busy = false
 		}
+		return false
 	}
 
 	private settle(answer: EditAnswer | null): boolean {

@@ -13,7 +13,7 @@ import { checkBinary } from "./traj-binary"
 /** The demo's parameters: fixed dates, so the committed Demo snapshot is reproducible. */
 export const DEMO_INPUT: PlanInput = {
 	asOf: "2026-10-31",
-	horizon: "2060-12-31",
+	horizon: "2054-12-31",
 	scenarios: [],
 	compare: { a: "base", b: "retire-early" },
 	birthDate: "1990-05-15",
@@ -23,6 +23,13 @@ export const DEMO_INPUT: PlanInput = {
 	returnModel: null,
 	paths: null,
 	seed: null,
+	// The allowances page reads RMF, then ThaiESG, a thousand baht at a time: the inputs a person would choose.
+	allowances: {
+		labels: ["allowance.retirement.rmf", "allowance.thai_esg"],
+		step: "1000",
+		budget: null,
+		minSaving: null,
+	},
 }
 
 /** The demo's Scenarios, in the order their Carry-in records name them. */

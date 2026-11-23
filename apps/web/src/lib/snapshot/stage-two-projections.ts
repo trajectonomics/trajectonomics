@@ -2,7 +2,7 @@ import type { PlanParams } from "./params"
 import type { PlannedRead } from "./planned"
 
 /** The flags every projection-shaped read takes: the dates, the horizon and the Carry-in. */
-function projectionFlags(params: PlanParams): string[] {
+export function projectionFlags(params: PlanParams): string[] {
 	const carry = params.carryIn ? ["--carry-in", "-"] : []
 	return ["--as-of", params.asOf, "--horizon", params.horizon, ...carry]
 }
@@ -11,12 +11,12 @@ function projectionFlags(params: PlanParams): string[] {
  * A Scenario name as one `--scenario=NAME` token. A name is the caller's or the ledger's, so it never
  * stands alone as a token: one that starts with a dash would otherwise be read as a flag.
  */
-function scenarioFlag(name: string): string {
+export function scenarioFlag(name: string): string {
 	return `--scenario=${name}`
 }
 
 /** One planned read per Scenario name, each taking that Scenario's Carry-in when the caller gave one. */
-function perScenario(
+export function perScenario(
 	params: PlanParams,
 	names: string[],
 	argvFor: (name: string) => string[],

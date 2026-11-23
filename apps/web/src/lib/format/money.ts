@@ -21,3 +21,11 @@ function groupThousands(digits: string): string {
 	}
 	return groups.join(",")
 }
+
+/**
+ * Whether a money string states an amount above zero, read from its digits and sign: a figure is never turned
+ * into a number. "0.00" and "-5.00" are not above zero.
+ */
+export function isAboveZero(amount: string): boolean {
+	return !amount.startsWith("-") && /[1-9]/.test(amount)
+}

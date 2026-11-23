@@ -5,38 +5,14 @@ import type { Read } from "../src/lib/contract"
 import { type Edit, writeCommand } from "../src/lib/edit/edit"
 import { followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
-import type { PlanParams } from "../src/lib/snapshot"
-import type { RunContext } from "./run-traj"
 import { runTraj } from "./run-traj"
-import { failure, readEdit, refused } from "./serve-edit-answer"
+import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
+import type { Editor, EditorOptions } from "./serve-editor"
 import { json } from "./serve-respond"
 import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
 
-/** What an editor needs: how to run traj, the Plan's parameters, the Carry-in, and the session token. */
-export type EditorOptions = {
-	traj: RunContext
-	cliVersion: string
-	params: PlanParams
-	records: readonly unknown[]
-	token: string
-}
-
-/** The editor: the Snapshot it serves, a refresh of it, and the two answers the write path gives. */
-export type Editor = {
-	/** The Snapshot JSON the server serves; null until the first read is in. */
-	readonly body: string | null
-	/** Runs the Snapshot Plan with the current parameters and keeps the result as the served body. */
-	refresh: () => Promise<SnapshotRun>
-	/** Answers GET /edit-session: the token, to this machine's page only. */
-	session: (request: Request, port: number) => Response
-	/** Answers POST /edit: refused, or run and answered with the new Snapshot or the error as data. */
-	edit: (request: Request, port: number) => Promise<Response>
-	/** Answers POST /reread: the same guards, then the Snapshot read again, with no write. */
-	reread: (request: Request, port: number) => Promise<Response>
-	/** Answers POST /what-if: the same guards, then four reads with the Overrides, and no write. */
-	whatIf: (request: Request, port: number) => Promise<Response>
-}
+export type { Editor, EditorOptions }
 
 /** Creates the editor for one server. The token is the one the server made at start. */
 export function createEditor(options: EditorOptions): Editor {
@@ -56,6 +32,13 @@ export function createEditor(options: EditorOptions): Editor {
 		return runTraj(options.traj, command.argv, z.unknown(), command.stdin)
 	}
 
+	/** Reads the Snapshot again and answers it, or the CLI's error as data. */
+	async function snapshotAnswer(): Promise<Response> {
+		const run = await refresh()
+		if (!run.ok) return failure(200, run.error)
+		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
+	}
+
 	/** The Edit's own run: dry first, then the real write, then the Snapshot read again. */
 	async function apply(request: Request): Promise<Response> {
 		const read = await readEdit(request)
@@ -66,16 +49,17 @@ export function createEditor(options: EditorOptions): Editor {
 		const real = await write(edit, false)
 		if (!real.ok) return failure(200, real.error)
 		params = { ...params, scenarios: followPlan(params.scenarios, edit) }
-		const run = await refresh()
-		if (!run.ok) return failure(200, run.error)
-		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
+		return snapshotAnswer()
 	}
 
-	/** Reads the Snapshot again and answers it, or the CLI's error as data. */
-	async function rereadAnswer(): Promise<Response> {
-		const run = await refresh()
-		if (!run.ok) return failure(200, run.error)
-		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
+	/** Reads the Snapshot again, with the allowance inputs the body states, and answers it, or the CLI's error as data. */
+	async function rereadAnswer(request: Request): Promise<Response> {
+		const read = await readReread(request)
+		if (!read.ok) return failure(400, read.error)
+		// The allowance inputs live with the Snapshot's parameters, so a change of them is a read and no write.
+		const { allowances } = read.reread
+		if (allowances !== undefined) params = { ...params, allowances }
+		return snapshotAnswer()
 	}
 
 	/**
@@ -117,7 +101,7 @@ export function createEditor(options: EditorOptions): Editor {
 			return json(200, JSON.stringify({ token: options.token }))
 		},
 		edit: (request, port) => admit(request, port, () => apply(request)),
-		reread: (request, port) => admit(request, port, rereadAnswer),
+		reread: (request, port) => admit(request, port, () => rereadAnswer(request)),
 		whatIf: (request, port) =>
 			admit(request, port, () => answerWhatIf(request, params, options.traj, options.records)),
 	}

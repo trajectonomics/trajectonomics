@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { OverviewView } from "../../lib/view/overview/view"
+import AllowancesCard from "./AllowancesCard.svelte"
 import AssetsCard from "./AssetsCard.svelte"
 import ChanceCard from "./ChanceCard.svelte"
 import FiCard from "./FiCard.svelte"
@@ -24,6 +25,7 @@ let { view }: Props = $props()
 	<ProjectionCard scenario={view.projection} />
 	<ChanceCard scenario={view.chance} />
 	<TaxCard scenario={view.tax} />
+	<AllowancesCard scenario={view.allowances} />
 	<PnlCard pnl={view.pnl} />
 	<HealthCard health={view.health} />
 </div>

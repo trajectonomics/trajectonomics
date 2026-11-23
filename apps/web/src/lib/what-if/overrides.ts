@@ -6,20 +6,10 @@
  */
 import { z } from "zod"
 import { planNameShapeError } from "../edit/name"
+import { additionsSchema } from "./additions"
+import { type Json, jsonValue } from "./json"
 
-/** A JSON value a Set replaces a path with. Money is a decimal string the person typed (cli ADR 0056). */
-export type Json = string | number | boolean | null | Json[] | { [key: string]: Json }
-
-const jsonValue: z.ZodType<Json> = z.lazy(() =>
-	z.union([
-		z.string(),
-		z.number().finite(),
-		z.boolean(),
-		z.null(),
-		z.array(jsonValue),
-		z.record(z.string(), jsonValue),
-	]),
-)
+export type { Json }
 
 /** The most Sets or Removals one what-if carries: the page sends one per changed field. */
 export const MAX_OVERRIDES = 50
@@ -85,6 +75,7 @@ const removalsSchema = z
 export const overridesFields = {
 	sets: setsSchema,
 	removals: removalsSchema,
+	additions: additionsSchema,
 }
 
 /** The body of `POST /what-if`: a plan and its Overrides. Strict: any other field is refused. */
@@ -97,6 +88,8 @@ export const whatIfSchema = z.strictObject({
 		}),
 	sets: setsSchema,
 	removals: removalsSchema,
+	// An older page sends none; `traj` reads the Additions after the removals and before the Sets (cli ADR 0062).
+	additions: additionsSchema.default([]),
 })
 
 /** One what-if as the page sends it. */

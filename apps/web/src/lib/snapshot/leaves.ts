@@ -13,6 +13,7 @@ export const READ_LEAVES = [
 	"fi",
 	"projection compare",
 	"projection chance",
+	"projection allowances",
 ] as const
 
 /** One of the read leaves the Plan may emit. */

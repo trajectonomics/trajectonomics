@@ -23,6 +23,8 @@ interface Props {
 	milestones?: boolean
 	/** Whether the selected plan's projection has its cash flow table, which the Cash flow page needs. */
 	cashflow?: boolean
+	/** Whether the selected plan has a Levy, which the Optimize pages need. */
+	levy?: boolean
 }
 
 let {
@@ -35,6 +37,7 @@ let {
 	planDocument = true,
 	milestones = true,
 	cashflow = true,
+	levy = true,
 }: Props = $props()
 let closeButton: HTMLButtonElement | undefined = $state()
 
@@ -69,7 +72,7 @@ $effect(() => {
 			<span class="sr-only">Close the menu</span>
 		</button>
 	</div>
-	<SiteNavLinks {current} onNavigate={close} {planDocument} {milestones} {cashflow} />
+	<SiteNavLinks {current} onNavigate={close} {planDocument} {milestones} {cashflow} {levy} />
 	<div class="mt-auto">
 		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} />
 	</div>

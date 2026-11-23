@@ -18,6 +18,7 @@ export function readsOf(document: Snapshot): Read<unknown>[] {
 		...Object.values(reads.projections),
 		...Object.values(reads.fi),
 		...Object.values(reads.chance),
+		...Object.values(reads.allowances),
 	]
 	const compare = reads.compare === null ? [] : [reads.compare]
 	return [...single, ...reads.netWorthHistory, ...maps, ...compare]

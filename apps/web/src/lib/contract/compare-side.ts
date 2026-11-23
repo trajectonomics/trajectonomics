@@ -24,6 +24,7 @@ export const compareSide = z.strictObject({
 	scenario: scenarioRef,
 	overrides: z.array(override),
 	removals: z.array(z.string()),
+	additions: z.array(override).optional(),
 	carryIn: z.array(carryInRecord).optional(),
 	fi: fiResult,
 	taxYears: z.array(taxYear),

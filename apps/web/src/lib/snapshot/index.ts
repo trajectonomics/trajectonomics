@@ -1,8 +1,10 @@
 /** The Plan: pure functions that decide which `traj` reads a Snapshot needs, and assemble the Snapshot. */
+export { type AllowancePlan, allowancePlan, checkAllowances } from "./allowance-params"
 export { type AssembleInput, assembleSnapshot } from "./assemble"
 export { carryInFor } from "./carry-in"
 export { addMonths, firstDayOfYear, firstDayTwoMonthsBack, monthEndsBetween } from "./dates"
 export { leafOf, READ_LEAVES, type ReadLeaf } from "./leaves"
+export { hasLevy } from "./levy"
 export {
 	checkParams,
 	type ParamsError,
