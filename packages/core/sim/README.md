@@ -312,6 +312,74 @@ expense after the FI month, and a derived debt payment unconditionally
 (`DERIVED_DEBT_PAYMENT_READS_EARNED`), because retirement spending replaces expenses only. The plain
 Projection is unaffected. See [ADR 0014](docs/adr/0014-levy-extensions.md).
 
+## Estate
+
+An optional `estate` block states what the plan would leave: everything owned, less what is owed, less
+what it costs to settle, less any gift. It is inert: no Projection row, FI answer or chance result
+changes with it. With `estate: true`, `project()` reports one statement per row, on that row's own
+balances. A cost is a share of the gross estate or of named asset Accounts (`bps` with a required
+`rounding`) or a fixed amount that grows by whole years from `Timeline.start`; a gift is a share of the
+net estate or a fixed amount. No tax rule is in it: an inheritance tax, a transfer fee or a sale tax is a
+cost line the caller states. See [ADR 0025](docs/adr/0025-estate-statement.md).
+
+A home of 5,000,000 beside 1,000,000 in cash and a loan of 3,000,000 gives a gross estate of 6,000,000
+and 3,000,000 after the loan. The settlement share is 2% of 6,000,000 = 120,000, the home's selling cost
+5% of 5,000,000 = 250,000 and the lawyer 100,000. Net is 3,000,000 − 470,000 = 2,530,000, the gift 10% of
+it, 253,000, and heirs receive 2,277,000:
+
+```ts
+import { project } from "@trajectonomics/core/sim"
+
+const result = project(
+	{
+		schemaVersion: 1,
+		balances: [
+			{ account: "cash", amount: 1_000_000 },
+			{ account: "home", amount: 5_000_000 },
+			{ account: "loan", amount: 3_000_000 },
+		],
+	},
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 300 },
+		accounts: [
+			{ id: "cash", kind: "asset", rate: 0 },
+			{ id: "home", kind: "asset", rate: 0, liquid: false },
+			{ id: "loan", kind: "liability", rate: 0 },
+		],
+		flows: [],
+		cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: [] },
+		estate: {
+			costs: [
+				{ id: "settlement", of: "gross", bps: 200, rounding: "halfUp" },
+				{ id: "home-sale", of: { accounts: ["home"] }, bps: 500, rounding: "halfUp" },
+				{ id: "lawyer", amount: 100_000, growth: "inflation" },
+			],
+			gifts: [{ id: "temple", of: "net", bps: 1000, rounding: "floor" }],
+		},
+	},
+	{ start: "2026-01-01", horizon: "2027-01-01", resolution: "month" },
+	{ estate: true },
+)
+
+if (result.ok) {
+	const { gross, debts, costs, net, gifts, toHeirs, real } = result.projection.estate![0]!
+	console.log(gross, debts, costs.map((line) => line.amount), net, gifts[0]!.amount, toHeirs)
+	console.log(JSON.stringify(real))
+}
+```
+
+```text
+6000000 3000000 [ 120000, 250000, 100000 ] 2530000 253000 2277000
+{"net":2530000,"toHeirs":2277000}
+```
+
+A negative net (debts and costs above everything owned) is stated as it is: every gift is 0, heirs
+receive 0 and `−net` is the shortfall. Without the option, or for a plan with no block, the Projection
+is byte for byte what it was; with the option and no block, `costs` and `gifts` are empty and `net` is
+`gross − debts`.
+
 ## Contribution savings
 
 `contributionSavings(levy, period, options)` states what raising one contribution label by whole

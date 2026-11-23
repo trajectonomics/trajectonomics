@@ -91,6 +91,7 @@ const CODES = [
 	"RULE_PORTFOLIO_ILLIQUID",
 	"RULE_FREQUENCY",
 	"RULE_FLOOR_ABOVE_CEILING",
+	"ESTATE_ACCOUNT_LIABILITY",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const

@@ -16,6 +16,7 @@ export type {
 	MinorUnits,
 	Resolution,
 } from "./common"
+export type * from "./estate"
 export type {
 	FiBestCase,
 	FiBinding,

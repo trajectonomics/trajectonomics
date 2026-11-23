@@ -1,6 +1,7 @@
 import type { ErrorCode, Path } from "../check/codes"
 import type { CashflowBreakdown } from "./breakdown"
 import type { AccountId, DateString, MinorUnits } from "./common"
+import type { EstateStatement } from "./estate"
 import type { MilestoneResult } from "./milestone"
 import type { SpendingRuleStatement } from "./rule"
 import type { LiabilityStatement } from "./statement"
@@ -92,6 +93,8 @@ export interface Projection {
 	readonly cashflow?: readonly CashflowBreakdown[]
 	/** One statement per rule Flow in Scenario order; present only with `spendingRules`. */
 	readonly spendingRules?: readonly SpendingRuleStatement[]
+	/** One statement per row in order; present only with `estate`. */
+	readonly estate?: readonly EstateStatement[]
 }
 
 export interface InputProblem {
