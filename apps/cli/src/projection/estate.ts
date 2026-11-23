@@ -12,14 +12,8 @@ import { moneyOf } from "./money"
 
 /*
  * `projection run --estate`'s rows (cli ADR-0064): the engine's Estate statements in the CLI's money.
- * Each figure is the engine's. The two totals are the exact integer sums of the engine's own lines,
- * the one place the table adds, as the cash-flow section totals do (cli ADR-0058).
+ * Each figure, the cost and gift totals included, is the engine's (sim ADR 0025): the table adds nothing.
  */
-
-/** The exact sum, in minor units, of an engine's lines. */
-function totalOf(lines: readonly EstateLine[]): number {
-	return lines.reduce((sum, line) => sum + line.amount, 0)
-}
 
 /** One statement as the estate table states it. */
 export function estateRowOf(statement: EstateStatement, currency: string): EstateRow {
@@ -28,9 +22,9 @@ export function estateRowOf(statement: EstateStatement, currency: string): Estat
 		date: statement.date,
 		gross: money(statement.gross),
 		debts: money(statement.debts),
-		costs: money(totalOf(statement.costs)),
+		costs: money(statement.costsTotal),
 		net: money(statement.net),
-		gifts: money(totalOf(statement.gifts)),
+		gifts: money(statement.giftsTotal),
 		toHeirs: money(statement.toHeirs),
 		realNet: money(statement.real.net),
 		realToHeirs: money(statement.real.toHeirs),

@@ -44,8 +44,10 @@ describe("the estate block is inert", () => {
 			gross: 8_000_000,
 			debts: 3_000_000,
 			costs: [],
+			costsTotal: 0,
 			net: 5_000_000,
 			gifts: [],
+			giftsTotal: 0,
 			toHeirs: 5_000_000,
 			real: { net: 5_000_000, toHeirs: 5_000_000 },
 		})

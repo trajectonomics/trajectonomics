@@ -35,6 +35,7 @@ function cashflowTablesOf(
 	}
 	const rows = cashflowRowsOf(projection.cashflow, currency)
 	const totals = cashflowTotalRowsOf(annual, rows, currency)
+	if (isAppError(totals)) return totals
 	return [
 		{ name: "cashflow", count: rows.length, rows },
 		{ name: "cashflowTotals", count: totals.length, rows: totals },

@@ -2,6 +2,7 @@ import { z } from "zod"
 import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
 import { isNode, moneyUnitOf, type Node, PUBLISHED, rateUnitOf } from "./money-fields"
+import { percentRanges } from "./percent"
 import { DECIMAL_UNITS_SENTENCE, MINOR_UNITS_SENTENCE } from "./shape/description"
 import { DECIMAL_UNITS } from "./shape/terms"
 
@@ -48,7 +49,7 @@ function decimalNode(node: unknown): unknown {
 		...copy,
 		type: "string",
 		pattern: PERCENT_PATTERN,
-		description: `${rate.percent}${rest}`,
+		description: `${rate.percent}${percentRanges(rest)}`,
 	}
 }
 

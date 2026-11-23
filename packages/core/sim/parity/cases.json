@@ -9201,7 +9201,7 @@
 		"projectOptions": {
 			"estate": true
 		},
-		"sha256": "871c53592f2cd2e081248de30e69e9b7b717f42ebfd62865e742797c63aa0cca"
+		"sha256": "18c7df365c660283f64469bf290f80001887b26f7957db504cb3b0480f3d282f"
 	},
 	{
 		"name": "estate-gifts-capped",
@@ -9300,7 +9300,7 @@
 		"projectOptions": {
 			"estate": true
 		},
-		"sha256": "3ff763152d42e778e1555158838d504229b63f87e84857a91db19775e3f248db"
+		"sha256": "c5c543cde93d5cb2d38d4ad19a315591904fc7f47500d2c119723318ef0bc623"
 	},
 	{
 		"name": "estate-negative-net",
@@ -9392,6 +9392,6 @@
 		"projectOptions": {
 			"estate": true
 		},
-		"sha256": "462e30e89ff677ab8618e37eaa51acf767039862c7dfc214b39c766f829cb1e6"
+		"sha256": "effcecdcb290f4cecc33779996c86c0ec3c733c4040d2c41a47d104d736c586b"
 	}
 ]

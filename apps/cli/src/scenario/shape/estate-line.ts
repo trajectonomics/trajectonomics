@@ -1,6 +1,7 @@
 import {
 	ESTATE_COST_BASES,
 	ESTATE_GIFT_BASES,
+	ESTATE_ONCE,
 	ESTATE_RATE_UNITS,
 	ESTATE_UNITS,
 } from "./estate-terms"
@@ -68,7 +69,7 @@ export function lineShape(kind: "cost" | "gift"): Record<string, unknown> {
 			},
 			amount: {
 				type: "integer",
-				description: `${ESTATE_UNITS} Fixed amount only: the same figure whatever the estate is worth.`,
+				description: `${ESTATE_UNITS} ${ESTATE_ONCE} Fixed amount only: the same figure whatever the estate is worth.`,
 			},
 			growth: {
 				anyOf: [

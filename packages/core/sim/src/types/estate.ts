@@ -51,7 +51,7 @@ export interface EstateInTodaysMoney {
 /**
  * What the estate would be on one row's date. `net = gross − debts − Σcosts` is signed; a negative net
  * leaves `gifts` at 0 and `toHeirs` 0, and `−net` is the shortfall. Otherwise
- * `gross − debts − Σcosts − Σgifts = toHeirs`.
+ * `gross − debts − Σcosts − Σgifts = toHeirs`, where `Σcosts` and `Σgifts` are `costsTotal` and `giftsTotal`.
  */
 export interface EstateStatement {
 	readonly date: DateString
@@ -60,8 +60,12 @@ export interface EstateStatement {
 	/** Every liability's amount owed. */
 	readonly debts: MinorUnits
 	readonly costs: readonly EstateLine[]
+	/** The exact sum of `costs`, 0 with none. */
+	readonly costsTotal: MinorUnits
 	readonly net: MinorUnits
 	readonly gifts: readonly EstateLine[]
+	/** The exact sum of `gifts`, 0 with none. */
+	readonly giftsTotal: MinorUnits
 	readonly toHeirs: MinorUnits
 	readonly real: EstateInTodaysMoney
 }

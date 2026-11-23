@@ -83,7 +83,7 @@ What a Projection reports per rule Flow with `spendingRules: true`: for each Rul
 _Avoid_: Spending report, withdrawal schedule
 
 **Estate statement**:
-What a Projection reports per row with `estate: true`, read from that row's own balances and changing no other figure: the Gross estate, the `debts` (every liability's amount owed), each Settlement cost, `net = gross − debts − Σcosts` (signed), each Gift, and What heirs receive, with `net` and `toHeirs` also in today's money (`real.net` is the row's `realNetWorth` less each cost deflated once, so an empty block states exactly `realNetWorth`). A plan with no `estate` block still has one, with no cost and no gift.
+What a Projection reports per row with `estate: true`, read from that row's own balances and changing no other figure: the Gross estate, the `debts` (every liability's amount owed), each Settlement cost and their exact total `costsTotal`, `net = gross − debts − costsTotal` (signed), each Gift and their exact total `giftsTotal`, and What heirs receive, with `net` and `toHeirs` also in today's money (`real.net` is the row's `realNetWorth` less each cost deflated once, so an empty block states exactly `realNetWorth`). A plan with no `estate` block still has one, with no cost and no gift.
 _Avoid_: Legacy, estate report, estate tax
 
 **Gross estate**:

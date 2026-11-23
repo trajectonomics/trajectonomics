@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import { decimalDocument, decimalRoot } from "./decimal-schema"
-import { moneyPathsOf, PUBLISHED } from "./money-fields"
+import { moneyPathsOf, PUBLISHED, ratePathsOf } from "./money-fields"
 
 type Schema = Record<string, unknown>
 
@@ -41,6 +41,40 @@ describe("the decimal form's published schema", () => {
 		const flows = examples[0]?.["flows"] as Schema[]
 		expect(flows[0]?.["amount"]).toBe("1000.00")
 	})
+})
+
+/** Every node of a schema whose description starts with `head`, found by walking the whole tree. */
+function nodesWithHead(schema: unknown, head: string, found: Schema[] = []): Schema[] {
+	if (typeof schema !== "object" || schema === null) return found
+	if (Array.isArray(schema)) {
+		for (const item of schema) nodesWithHead(item, head, found)
+		return found
+	}
+	const node = schema as Schema
+	if (typeof node["description"] === "string" && node["description"].startsWith(head)) {
+		found.push(node)
+	}
+	for (const value of Object.values(node)) nodesWithHead(value, head, found)
+	return found
+}
+
+describe("the decimal form's percent fields", () => {
+	const published = z.toJSONSchema(decimalDocument, { io: "input" }) as Schema
+	const percentNodes = nodesWithHead(published, "A percent string")
+
+	it("finds every rate that percentRanges rewrites", () => {
+		expect(percentNodes.length).toBe(ratePathsOf(PUBLISHED).length)
+		expect(percentNodes.length).toBeGreaterThan(0)
+	})
+
+	for (const path of ratePathsOf(PUBLISHED)) {
+		it(`states ${path} with no bare integer of three or more digits`, () => {
+			const description = String(nodeAt(published, path)["description"])
+			// Quoted strings are the percent forms ("0.00" to "100.00"); anything else is prose.
+			const prose = description.replace(/"[^"]*"/g, "")
+			expect(prose.match(/\b\d{3,}\b/g) ?? []).toEqual([])
+		})
+	}
 })
 
 describe("the decimal form's root description", () => {

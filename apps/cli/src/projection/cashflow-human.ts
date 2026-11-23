@@ -1,3 +1,4 @@
+import { type AppError, isAppError } from "../errors"
 import type { ColumnHint } from "../table/lines"
 import { isRecord, tableLines } from "../table/lines"
 import { type CashflowTotals, cashflowTotalsOf, type RollupFigures } from "./cashflow-totals"
@@ -72,14 +73,18 @@ function blockRows(
 	const money = moneyOf(currency)
 	const figures = figuresOf(annual)
 	const groupLines = (group: string) => lines.filter((line) => line["group"] === group)
-	const totals: CashflowTotals = cashflowTotalsOf(
+	const totals: CashflowTotals | AppError = cashflowTotalsOf(
 		figures,
 		lines.map((line) => ({
 			group: textOf(line["group"], "group"),
 			amount: textOf(line["amount"], "amount"),
 		})),
 		currency,
+		String(annual["to"]),
 	)
+	// The JSON table was built from the same function first, so a refusal never reaches the block.
+	if (isAppError(totals))
+		throw new Error("a cash-flow total the result states is past the safe integers")
 
 	const rows: BlockRow[] = [
 		{ line: "money in", amount: money(totals["money in"]) },

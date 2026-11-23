@@ -37,10 +37,10 @@ estate; it publishes the document form and states the engine's statements.
   amount owed; `net` is signed, and a negative one is stated as it is with `gifts` and `toHeirs` at `0.00`; `realNet` and
   `realToHeirs` are the engine's today's-money figures. `estateLines` has one row per date and line, `{ date, line,
   kind: "cost" | "gift", amount }`, each date's costs then its gifts, in the order the block states them.
-- **The one sum.** `costs` and `gifts` of an `estate` row are the exact integer sums, in minor units, of that date's
-  lines; the engine states each line and not their total, and the Dashboard must not add money (web ADR-0002). It is
-  the one addition, as the cash-flow section totals are (ADR-0058); a test checks `gross − debts − costs − gifts =
-  toHeirs`.
+- **The totals are the engine's.** `costs` and `gifts` of an `estate` row are the engine's `costsTotal` and
+  `giftsTotal` (sim ADR 0025), so the CLI adds nothing and the Dashboard must not add money (web ADR-0002); a test
+  checks `gross − debts − costs − gifts = toHeirs`, and that each total is the sum of that date's `estateLines`.
+  Until #393 the CLI summed the lines; the bytes are unchanged.
 - **A plan with no block is stated too.** The engine states the estate for every plan, so the table answers with
   `costs` and `gifts` at `0.00` and `estateLines` empty, and `net` is `gross − debts`; the result's notes then say that
   the Scenario states no settlement cost, name `estate.costs` as where one is written, and say that `traj` ships none
@@ -72,6 +72,6 @@ estate; it publishes the document form and states the engine's statements.
 - The worked example gained an `estate` block, so every document or golden that holds the example changed its hash;
   a test that replaces the example's Accounts states an empty `estate: {}` so its lines do not name an Account the test
   removed.
-- `costs` and `gifts` totals are derived from the engine's lines, not stated by the engine; an engine that states them
-  would replace the sum.
+- `costs` and `gifts` are the engine's totals, not the CLI's sums. The engine states no real gross, debts or costs:
+  the Estate page shows only `net` and `toHeirs` in today's money (#366).
 - The Estate page (#366) reads these two tables and no other estate figure.
