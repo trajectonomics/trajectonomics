@@ -7628,5 +7628,252 @@
 			"cashflowBreakdown": true
 		},
 		"sha256": "032b96e462e32cfd858f63ee6ce7377dd02969fe6e4bb80c307d8a2ec11f2690"
+	},
+	{
+		"name": "real-asset-home-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 300
+				},
+				{
+					"account": "home",
+					"amount": 6000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0,
+					"liquid": false
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 500,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 100,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-03-01",
+			"resolution": "day"
+		},
+		"sha256": "62de3d592704417495a47565d231bf046aa69625e26c9a47fd289df40c0b90b4",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 1
+		},
+		"fiSha256": "45b77ac9a934a691ced3a51dbe9c4e545895b95818e19bb0cf7e04e4099323df"
+	},
+	{
+		"name": "real-asset-unmarked-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 300
+				},
+				{
+					"account": "home",
+					"amount": 6000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 500,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 100,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-03-01",
+			"resolution": "day"
+		},
+		"sha256": "98848f0b13e5b693ee7d6980d63aa2b7bd0931b1492aad4ce3e13ca70d41152c",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 1
+		},
+		"fiSha256": "a978c1166cb146e1048aab07cdf5686043157a1fa7085232a2b928067a1dfaa8"
+	},
+	{
+		"name": "real-asset-home-milestone",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 300
+				},
+				{
+					"account": "home",
+					"amount": 6000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "home",
+					"kind": "asset",
+					"rate": 0,
+					"liquid": false
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 500,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 100,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			},
+			"milestones": [
+				{
+					"id": "invested",
+					"combine": "all",
+					"criteria": [
+						{
+							"id": "c",
+							"kind": "metric",
+							"metric": "accessibleNetWorth",
+							"op": "atLeast",
+							"amount": 500,
+							"terms": "nominal"
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-03-01",
+			"resolution": "day"
+		},
+		"sha256": "cc4e0d8732ace825270487a69b9b521e0c4c92a5474b9a2b65851bb700e676df"
 	}
 ]

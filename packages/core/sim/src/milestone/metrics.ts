@@ -1,5 +1,6 @@
 import { countedDays } from "../calendar/counted"
-import type { AccountState, StateMap } from "../engine/state"
+import { leftOutOfAccessible } from "../engine/accessible"
+import type { StateMap } from "../engine/state"
 import { valuation } from "../engine/value"
 import { deflate } from "../money/growth"
 import type {
@@ -34,29 +35,27 @@ export function termed(
 	return deflate(value, inflation, date < start ? 0 : countedDays(start, date))
 }
 
-function lockedOn(state: AccountState, date: DateString): boolean {
-	const rule = state.rule
-	return rule.kind === "asset" && rule.lockedUntil !== undefined && date < rule.lockedUntil
-}
-
 /** The sign each named balance gives an Account: 0 leaves it out. */
-const SIGN: Readonly<Record<MetricName, (liability: boolean, locked: boolean) => bigint>> = {
+const SIGN: Readonly<Record<MetricName, (liability: boolean, outside: boolean) => bigint>> = {
 	netWorth: (liability) => (liability ? -1n : 1n),
-	accessibleNetWorth: (liability, locked) => signedUnlessLocked(liability, locked),
+	accessibleNetWorth: (liability, outside) => signedUnlessOutside(liability, outside),
 	allAssets: (liability) => (liability ? 0n : 1n),
-	unlockedAssets: (liability, locked) => (liability || locked ? 0n : 1n),
+	unlockedAssets: (liability, outside) => (liability || outside ? 0n : 1n),
 	liabilities: (liability) => (liability ? 1n : 0n),
 }
 
-function signedUnlessLocked(liability: boolean, locked: boolean): bigint {
+function signedUnlessOutside(liability: boolean, outside: boolean): bigint {
 	if (liability) return -1n
-	return locked ? 0n : 1n
+	return outside ? 0n : 1n
 }
 
 function namedValue(name: MetricName, figures: Figures, terms: MilestoneTerms): bigint {
 	let total = 0n
 	for (const state of figures.states.values()) {
-		const sign = SIGN[name](state.rule.kind === "liability", lockedOn(state, figures.date))
+		const sign = SIGN[name](
+			state.rule.kind === "liability",
+			leftOutOfAccessible(state.rule, figures.date),
+		)
 		if (sign === 0n) continue
 		const value = valuation(state, figures.date)
 		total += sign * termed(value, figures.date, figures.start, figures.inflation, terms)

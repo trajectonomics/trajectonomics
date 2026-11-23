@@ -1,4 +1,5 @@
 import { countedDays } from "../calendar/counted"
+import { leftOutOfAccessible } from "../engine/accessible"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { StateMap } from "../engine/state"
 import { valuation } from "../engine/value"
@@ -22,17 +23,18 @@ interface Part {
 	readonly liability: boolean
 }
 
-function included(basis: ReferenceBasis, liability: boolean, locked: boolean): boolean {
+/** `outside` is true for an asset left out of Accessible net worth on the date (locked or illiquid). */
+function included(basis: ReferenceBasis, liability: boolean, outside: boolean): boolean {
 	if (basis === "netWorth") return true
 	if (basis === "allAssets") return !liability
-	if (basis === "accessibleNetWorth") return !locked
-	return !liability && !locked
+	if (basis === "accessibleNetWorth") return !outside
+	return !liability && !outside
 }
 
 function partOf(rule: Account, date: DateString, basis: ReferenceBasis): Part {
 	const liability = rule.kind === "liability"
-	const locked = !liability && rule.lockedUntil !== undefined && date < rule.lockedUntil
-	return { counted: !liability && !locked, counts: included(basis, liability, locked), liability }
+	const outside = !liability && leftOutOfAccessible(rule, date)
+	return { counted: !liability && !outside, counts: included(basis, liability, outside), liability }
 }
 
 function amountIn(value: bigint, date: DateString, money: ReferenceMoney): bigint {

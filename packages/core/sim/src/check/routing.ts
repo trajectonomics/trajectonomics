@@ -39,3 +39,27 @@ export function checkContributionRouting(
 		}
 	}
 }
+
+function isIlliquid(value: unknown, illiquid: ReadonlySet<string>): boolean {
+	return typeof value === "string" && illiquid.has(value)
+}
+
+/** Emits `ILLIQUID_ROUTED` for an illiquid Account that a withdrawal or a surplus step names. */
+export function checkIlliquidRouting(
+	cashflow: unknown,
+	illiquid: ReadonlySet<string>,
+	path: Path,
+	emit: Emit,
+): void {
+	if (!isRecord(cashflow) || illiquid.size === 0) return
+	const withdraw = Array.isArray(cashflow["withdraw"]) ? cashflow["withdraw"] : []
+	withdraw.forEach((id: unknown, index) => {
+		if (isIlliquid(id, illiquid)) emit("ILLIQUID_ROUTED", [...path, "cashflow", "withdraw", index])
+	})
+	const surplus = Array.isArray(cashflow["surplus"]) ? cashflow["surplus"] : []
+	surplus.forEach((step: unknown, index) => {
+		if (isRecord(step) && isIlliquid(step["account"], illiquid)) {
+			emit("ILLIQUID_ROUTED", [...path, "cashflow", "surplus", index, "account"])
+		}
+	})
+}
