@@ -22,7 +22,7 @@ describe("what the rule pays, year by year", () => {
 	test("each Rule year states its savings, its amount and what was paid, today's money, the share and the action in words", () => {
 		const [rule] = withdrawalsView(run, null).rules
 		expect(rule?.flow).toBe("retirement-spending")
-		expect(rule?.rows).toHaveLength(5)
+		expect(rule?.rows).toHaveLength(4)
 		expect(rule?.rows[0]).toMatchObject({
 			from: "1 Jun 2050",
 			portfolio: "21568998.89",
@@ -81,18 +81,18 @@ describe("in good and bad markets", () => {
 			share: "100.00%",
 			succeeded: 200,
 			paths: 200,
-			horizon: "31 Dec 2054",
+			horizon: "31 Dec 2053",
 		})
 	})
 
 	test("the lowest year is labelled by level in plain words and says how many paths it counts", () => {
 		expect(bands?.counted).toBe(200)
 		expect(bands?.lowest.map((one) => [one.level, one.words, one.amount])).toEqual([
-			[10, "Worst 1 in 10 paths", "793543.13"],
-			[25, "Worst 1 in 4 paths", "855844.91"],
-			[50, "Middle path", "924904.73"],
-			[75, "Best 1 in 4 paths", "1003286.81"],
-			[90, "Best 1 in 10 paths", "1071422.41"],
+			[10, "Worst 1 in 10 paths", "835913.64"],
+			[25, "Worst 1 in 4 paths", "882584.51"],
+			[50, "Middle path", "963414.26"],
+			[75, "Best 1 in 4 paths", "1024160.36"],
+			[90, "Best 1 in 10 paths", "1090453.31"],
 		])
 	})
 

@@ -95,3 +95,11 @@ _Avoid_: fiscal year, spending year (as a calendar year)
 **Spending Bands**:
 The Percentiles across Market paths of what a spending rule pays in each roll-up, and of each path's lowest whole year, as `projection chance` states them. A path that ran out counts 0, and a part year is not a whole one.
 _Avoid_: forecast, range of outcomes
+
+**Estate**:
+What the plan would leave on one date, as `projection run --estate` states it: the gross estate (everything owned), the debts, the settlement costs, the net estate, the gifts and what heirs receive, with each cost and gift line. Only the net estate and what heirs receive are also stated in today's money. Every cost and gift is the person's own, written in the plan's `estate` block; no tax is worked out, and an inheritance tax is a cost line the person types.
+_Avoid_: inheritance, will, legacy, probate
+
+**Estate date**:
+The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date.
+_Avoid_: death date, payout date

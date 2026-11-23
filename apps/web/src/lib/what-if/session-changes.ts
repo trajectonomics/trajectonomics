@@ -10,6 +10,8 @@ export type Change =
 	| { kind: "set"; path: string; label: string; value: string }
 	/** A Set of a whole Flow (`flows.rent`) or of its rule (`flows.rent.rule`): worded without its JSON, and without a figure. */
 	| { kind: "flow"; path: string; label: string; value: Json }
+	/** A Set of the whole estate block: worded without its lines, which hold the person's own shares and amounts. */
+	| { kind: "estate"; path: string; label: string }
 
 /** The item name a path names: `flows.gym.amount` names `gym`, shown as `Gym`. */
 function itemLabel(path: string): string {
@@ -47,6 +49,8 @@ export function changesOf(whatIf: WhatIf): Change[] {
 		}),
 	)
 	const sets = whatIf.sets.map((set): Change => {
+		if (set.path === "estate")
+			return { kind: "estate", path: set.path, label: "Estate lines tried as edited" }
 		if (isFlowTry(set.path)) {
 			const what = set.path.endsWith(".rule") ? "spending rule changed" : "tried as edited"
 			return {

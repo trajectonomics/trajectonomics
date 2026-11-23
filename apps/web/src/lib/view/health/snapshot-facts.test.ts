@@ -14,7 +14,7 @@ describe("snapshotFacts", () => {
 	test("states the As-of and horizon the Snapshot was planned from", () => {
 		const facts = snapshotFacts(demo)
 		expect(valueAt(facts, "As-of")).toBe("31 Oct 2026")
-		expect(valueAt(facts, "Horizon")).toBe("31 Dec 2054")
+		expect(valueAt(facts, "Horizon")).toBe("31 Dec 2053")
 	})
 
 	test("names the Scenarios and the compared pair", () => {

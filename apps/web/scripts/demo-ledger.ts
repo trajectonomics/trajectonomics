@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { accountList } from "../src/lib/contract"
 import { DEMO_ACCOUNTS, DEMO_OPENING_DATE, DEMO_OPENINGS } from "./demo/accounts"
+import { DEMO_ESTATE } from "./demo/estate"
 import { HOME_ACCOUNTS, HOME_FLOWS } from "./demo/home"
 import {
 	baseScenarioDocument,
@@ -96,7 +97,7 @@ async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Prom
 	await addHome(place, "base", demoSpendingFlows(ids))
 }
 
-/** Puts the condo and the spending rule (cli ADR 0063) into `base`, read back and applied; `retire-early` has neither. */
+/** Puts the condo, the spending rule (cli ADR 0063) and the estate block (cli ADR 0064) into `base`, read back and applied; `retire-early` has none. */
 async function addHome(place: DemoLedgerPlace, name: string, extra: unknown[]): Promise<void> {
 	const shown = JSON.parse(await traj(place, ["scenario", "show", name])) as {
 		scenario: { document: { accounts: unknown[]; flows: unknown[] } }
@@ -107,6 +108,7 @@ async function addHome(place: DemoLedgerPlace, name: string, extra: unknown[]): 
 		...document,
 		accounts: [...document.accounts, ...HOME_ACCOUNTS],
 		flows: [...document.flows, ...HOME_FLOWS, ...extra],
+		estate: DEMO_ESTATE,
 	}
 	await writeFile(file, JSON.stringify(withHome, null, "\t"))
 	await traj(place, ["scenario", "apply", name, "--file", file])

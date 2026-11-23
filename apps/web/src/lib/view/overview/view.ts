@@ -1,6 +1,7 @@
 import type { Read, Snapshot } from "../../contract"
 import { type AllowancesSummary, allowancesSummaryOf } from "../allowances/home"
 import { type ChanceSummary, chanceSummaryOf } from "../chance/page"
+import { type EstateSummary, estateSummaryOf } from "../estate/home"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
 import { type WithdrawalsSummary, withdrawalsSummaryOf } from "../withdrawals/home"
 import { type FiView, fiView } from "./fi"
@@ -28,6 +29,8 @@ export interface OverviewView {
 	readonly allowances: ScenarioView<AllowancesSummary | null>
 	/** What the plan's spending rule pays in its first year; shown only when the plan has one (null summary: not shown). */
 	readonly withdrawals: ScenarioView<WithdrawalsSummary | null>
+	/** What heirs would receive on the default date; shown whenever the run states an estate (null summary: not shown). */
+	readonly estate: ScenarioView<EstateSummary | null>
 	readonly tax: ScenarioView<TaxView>
 	readonly pnl: Read<PnlView>
 	readonly health: Read<HealthView>
@@ -39,6 +42,8 @@ export function overviewView(snapshot: Snapshot): OverviewView {
 	const history = snapshot.reads.netWorthHistory
 	const netWorth = mapRead(snapshot.reads.netWorth, netWorthView)
 	const projections = scenarioView(scenario, snapshot.reads.projections)
+	const planned = scenario === null ? undefined : snapshot.reads.documents[scenario]
+	const shown = planned?.ok ? planned.data.scenario : null
 	return {
 		netWorth: mapRead(snapshot.reads.netWorth, (data) => ({
 			...netWorthView(data),
@@ -50,6 +55,9 @@ export function overviewView(snapshot: Snapshot): OverviewView {
 		chance: mapScenario(scenarioView(scenario, snapshot.reads.chance), chanceSummaryOf),
 		allowances: mapScenario(scenarioView(scenario, snapshot.reads.allowances), allowancesSummaryOf),
 		withdrawals: mapScenario(projections, withdrawalsSummaryOf),
+		estate: mapScenario(projections, (run) =>
+			estateSummaryOf(run, shown?.document ?? null, shown?.household ?? null),
+		),
 		tax: mapScenario(projections, taxView),
 		pnl: mapRead(snapshot.reads.pnl, pnlView),
 		health: mapRead(snapshot.reads.doctor, healthView),

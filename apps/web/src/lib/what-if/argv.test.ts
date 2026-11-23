@@ -37,6 +37,7 @@ describe("the reads of a what-if", () => {
 			"2060-12-31",
 			"--breakdown",
 			"--spending",
+			"--estate",
 			"--without=flows.gym",
 			'--set=flows.salary.amount="90000.50"',
 			"--decimal",

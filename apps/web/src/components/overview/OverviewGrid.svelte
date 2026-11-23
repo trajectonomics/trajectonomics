@@ -3,6 +3,7 @@ import type { OverviewView } from "../../lib/view/overview/view"
 import AllowancesCard from "./AllowancesCard.svelte"
 import AssetsCard from "./AssetsCard.svelte"
 import ChanceCard from "./ChanceCard.svelte"
+import EstateCard from "./EstateCard.svelte"
 import FiCard from "./FiCard.svelte"
 import HealthCard from "./HealthCard.svelte"
 import NetWorthCard from "./NetWorthCard.svelte"
@@ -28,6 +29,7 @@ let { view }: Props = $props()
 	<TaxCard scenario={view.tax} />
 	<AllowancesCard scenario={view.allowances} />
 	<WithdrawalsCard scenario={view.withdrawals} />
+	<EstateCard scenario={view.estate} />
 	<PnlCard pnl={view.pnl} />
 	<HealthCard health={view.health} />
 </div>

@@ -1,3 +1,4 @@
+import { OPTIMIZE_GROUPS } from "./nav-optimize"
 import type { NavGroup } from "./routes"
 
 /** The navigation in order: Home and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group. */
@@ -46,25 +47,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 			{ path: "/reports/", label: "Reports", page: "ReportsPage", icon: "file-text" },
 		],
 	},
-	{
-		heading: "Optimize",
-		routes: [
-			{
-				path: "/optimize/allowances/",
-				label: "Tax allowances",
-				page: "AllowancesPage",
-				icon: "sliders-horizontal",
-				needsLevy: true,
-			},
-			{
-				path: "/optimize/withdrawals/",
-				label: "Withdrawals",
-				page: "WithdrawalsPage",
-				icon: "wallet",
-				needsDocument: true,
-			},
-		],
-	},
+	...OPTIMIZE_GROUPS,
 	{
 		heading: null,
 		routes: [
