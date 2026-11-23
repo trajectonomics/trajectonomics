@@ -15,13 +15,21 @@ function a Projection and a write share (ADR-0057), so what is projected is what
   (ADR-0040), and an item that skipped that would leave a Flow no Levy tallies. The first `=` splits the
   flag, as `--set` does.
 - **The item names itself.** It must carry a non-empty string `id`, and the id must not already be in the
-  list (an `--add` earlier on the command line counts). An id that exists is refused at the `--add`, with a
-  hint that names `--set`. A list the document leaves out (`milestones`) is begun.
+  list (an `--add` earlier on the command line counts) and must not be one the same call's `--without` took
+  out. An id that exists is refused at the `--add`, with a hint that names `--set`. A list the document
+  leaves out (`milestones`) is begun.
 - **The order is fixed, whatever order the flags are typed in: every `--without`, then every `--add`, then
   every `--set`**, each group in command-line order, an item appended to the end of its list. So a
-  `--set` reaches an item the same command adds; `--without flows.rent` with an `--add` of `rent` replaces
-  the item; and a `--without` of an item the same command adds is an unknown id at the `--without`, as a
-  `--set` on a removed item is (ADR-0056). The Dashboard builds its argv in this order.
+  `--set` reaches an item the same command adds, and a `--without` of an item the same command adds is an
+  unknown id at the `--without`, as a `--set` on a removed item is (ADR-0056); its hint says that every
+  `--without` runs before every `--add`. The Dashboard builds its argv in this order.
+- **An `--add` never replaces.** An `--add` whose `list.id` the same call's `--without` took out is
+  refused as `invalid_input` at `--add`, with `details.path` the item's path and a hint to change the
+  item with `--set` per field instead. A replace would silently drop every field the `--add` did not
+  restate, and it could disagree with a saved plan: the Store re-applies household anchors on every save
+  (ADR-0048), so a re-added id would get an anchored date back on `scenario apply` and `scenario fork`
+  that the projection of the same flags never had, and the saved plan and its `effectiveContentHash`
+  would differ from the plan projected.
 - **The engine checks it.** The document after all three groups goes to `check()`, as every Override's
   does, so an added item is refused for exactly what a stored one would be. A refusal is the `invalid_input`
   of ADR-0024 at `--add`, with `details.path` the added item's path (`flows.extra`), `details.documentPath`
@@ -43,13 +51,14 @@ function a Projection and a write share (ADR-0057), so what is projected is what
   as `--without` does, and is refused beside a second one. `scenario apply` refuses `--add` beside
   `--file` or `--template`, as it does `--set`.
 - **Household anchors are unaffected** (ADR-0048): an anchor names an existing item's date, and an added
-  item has none; one that replaces a removed item has its anchor dropped with the removal.
+  item has none, and an id taken out by `--without` cannot be added back in the same call, so no anchor can
+  attach to an addition.
 
 ## Considered options
 
 `--set flows.<new>=<json>` creating the item was rejected: a `--set` on an unknown id is how a typo is
-caught, and it would stop being one. An `--add` that replaces an existing id was rejected for the same
-reason, and `--set` is the flag that does it. Additions after the Sets was rejected because a `--set` could
+caught, and it would stop being one. An `--add` that replaces an existing id, with or without a `--without` of it, was rejected for the same
+reason and for the anchors above; `--set` is the flag that changes an item. Additions after the Sets was rejected because a `--set` could
 then never reach the item the same call adds. Always stating `additions` as `[]` was rejected because the
 Dashboard's strict decoding of today's results would break before it learns the field, and every
 projection golden would be re-recorded for a field nothing used.

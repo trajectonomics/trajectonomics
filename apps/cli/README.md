@@ -275,8 +275,9 @@ traj scenario apply base --add 'flows={...}' --decimal --if-hash <contentHash>
 
 The flags apply in a fixed order whatever order they are typed in: every `--without`, then every
 `--add`, then every `--set`. So a `--set` can reach an item the same command adds
-(`--add` then `--set flows.extra.amount=...`), and `--without flows.rent --add 'flows={"id":"rent",...}'`
-replaces the item. The result lists the items it added under `additions` (absent when none were), and
+(`--add` then `--set flows.extra.amount=...`). An `--add` never replaces: one whose `list.id` the same
+call's `--without` took out is refused, and `--set <path>.<key>=<value>` changes an item field by field,
+so no field is dropped by accident and the plan saved is the plan projected. The result lists the items it added under `additions` (absent when none were), and
 `effectiveContentHash` covers them. The engine checks the document with the item in it, so a refusal names
 `--add` and the item's path (`flows.extra`) with the document path inside it. Under `--decimal` the
 item's money is a decimal string of the Currency's major unit. Nothing is written until

@@ -26,9 +26,14 @@ const CLI: Group = {
 	),
 }
 
-/** The words of a command line as a shell splits them: on whitespace, except inside 'single quotes'. */
+/**
+ * The words of a command line as a shell splits them: on whitespace, except inside quotes. A 'single
+ * quoted' span is literal, and a "double quoted" span drops its quotes and keeps a single quote as a
+ * plain character. A backslash escape is not supported, because an example never needs one.
+ */
 function words(command: string): string[] {
-	return (command.match(/(?:[^\s']|'[^']*')+/g) ?? []).map((word) => word.replaceAll("'", ""))
+	const found = command.match(/(?:[^\s'"]|'[^']*'|"[^"]*")+/g) ?? []
+	return found.map((word) => word.replaceAll(/'([^']*)'|"([^"]*)"/g, "$1$2"))
 }
 
 /** A shell's view of a command line: leading NAME=value pairs, then the words after `traj`. */

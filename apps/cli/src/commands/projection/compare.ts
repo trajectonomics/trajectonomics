@@ -55,8 +55,7 @@ export const compare: Leaf = defineCommand({
 			description: "A what-if against the base, with net worth at two ages.",
 		},
 		{
-			command:
-				'traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount="90000.50" --decimal --json',
+			command: `traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set 'flows.salary.amount="90000.50"' --decimal --json`,
 			description: "A what-if whose salary is a decimal amount in THB, not satang.",
 		},
 	],

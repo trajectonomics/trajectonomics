@@ -3,11 +3,10 @@ import { isPlainObject } from "../json"
 import { setValueFromDecimal } from "./decimal-set"
 import { type ScenarioDocument, scenarioProblems } from "./document"
 import { formatPath } from "./path"
-import { applyAdditions } from "./set-addition"
 import type { ParsedSet } from "./set-assign"
 import { documentFailure, itemsOf } from "./set-document"
 import type { AppliedOverride } from "./set-error"
-import { applyRemovals } from "./set-removal"
+import { removeThenAdd } from "./set-remove-add"
 import { replaceAt } from "./set-replace"
 import { duplicatePath, parseSets } from "./set-sets"
 
@@ -73,10 +72,9 @@ export function applyOverrides(
 	options: OverrideOptions = {},
 ): AppliedOverrides | AppError {
 	if (noOverride(sets, options)) return { document, overrides: [], removals: [], additions: [] }
-	const removed = applyRemovals(document, options.without ?? [])
-	if (isAppError(removed)) return removed
-	const added = applyAdditions(removed.document, options.add ?? [], options.decimal === true)
-	if (isAppError(added)) return added
+	const grouped = removeThenAdd(document, options)
+	if (isAppError(grouped)) return grouped
+	const { removals, added } = grouped
 	const parsed = parseSets(sets)
 	if (isAppError(parsed)) return parsed
 	const duplicate = duplicatePath(parsed)
@@ -89,7 +87,7 @@ export function applyOverrides(
 		current = next
 		overrides.push({ path: formatPath(set.segments), value: set.value })
 	}
-	return { document: current, overrides, removals: removed.removals, additions: added.additions }
+	return { document: current, overrides, removals, additions: added.additions }
 }
 
 /**

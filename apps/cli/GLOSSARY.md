@@ -143,7 +143,7 @@ A list item taken out of a Scenario's document by its `id`, with `--without`, be
 _Avoid_: Delete, drop, exclude
 
 **Addition**:
-A new list item put on a Scenario's `accounts`, `flows` or `milestones` with `--add <list>=<json>`, after the Removals and before the Sets. It carries its own `id`, which must not already exist, so it never replaces anything; a Projection applies it transiently and `scenario fork` and `scenario apply` persist it (ADR-0062).
+A new list item put on a Scenario's `accounts`, `flows` or `milestones` with `--add <list>=<json>`, after the Removals and before the Sets. It carries its own `id`, which must not already exist and must not be one the same call's `--without` took out, so it never replaces anything (`--set` changes an item); a Projection applies it transiently and `scenario fork` and `scenario apply` persist it (ADR-0062).
 _Avoid_: Insert, create
 
 **What-if**:

@@ -77,7 +77,7 @@ describe("projection run --add", () => {
 		expect(body.removals).toEqual(["flows.rent"])
 	})
 
-	it("takes an item out and adds one with its id back, so --without then --add replaces it", async () => {
+	it("refuses an --add whose id the same call's --without took out, and names --set", async () => {
 		const home = await projectionHome()
 		const res = await projection(home, [
 			"run",
@@ -86,7 +86,14 @@ describe("projection run --add", () => {
 			"flows.rent",
 			...add("flows", { ...EXTRA, id: "rent" }),
 		])
-		expect(res.code).toBe(0)
+		expect(res.code).toBe(2)
+		const error = errorOf(res)
+		expect(error).toMatchObject({
+			code: "invalid_input",
+			path: "--add",
+			details: { index: 0, path: "flows.rent", list: "flows", id: "rent" },
+		})
+		expect(error.hint).toContain("--set flows.rent.<key>=<value>")
 	})
 
 	it("refuses to remove an item the same call adds, because removals come first", async () => {
@@ -99,7 +106,9 @@ describe("projection run --add", () => {
 			"flows.extra",
 		])
 		expect(res.code).toBe(2)
-		expect(errorOf(res)).toMatchObject({ path: "--without", details: { segment: "extra" } })
+		const error = errorOf(res)
+		expect(error).toMatchObject({ path: "--without", details: { segment: "extra" } })
+		expect(error.hint).toContain("Every --without runs before every --add")
 	})
 
 	it("refuses an id the list already holds, at the --add, and names --set", async () => {
