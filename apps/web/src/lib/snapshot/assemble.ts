@@ -23,6 +23,7 @@ export function assembleSnapshot(input: AssembleInput): Snapshot {
 			birthDate: params.birthDate,
 			ages: [...params.ages],
 			historyDates: [...input.historyDates],
+			allowances: params.allowances,
 		},
 		cliVersion: input.cliVersion,
 		reads: input.reads,

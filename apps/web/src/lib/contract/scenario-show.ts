@@ -53,6 +53,8 @@ export const scenarioDocument = z.looseObject({
 	currency: z.string(),
 	flows: z.array(scenarioFlow),
 	accounts: z.array(scenarioAccount),
+	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
+	levies: z.array(z.unknown()).optional(),
 })
 export type ScenarioDocument = z.infer<typeof scenarioDocument>
 

@@ -1,0 +1,32 @@
+---
+status: accepted
+---
+
+# The Tax allowances page reads what `traj` says each allowance could take, and tries or keeps it as Flows
+
+Most people who file in Thailand buy RMF or ThaiESG in December without knowing how much more would still lower their tax. `traj projection allowances` states it for every whole tax year of a taxed plan ([cli ADR 0061](../../../cli/docs/adr/0061-projection-allowances-states-what-more-each-tax-allowance-could-take-and-saves.md)). The page reads it, says it in plain words, and lets the person try a year on the whole plan before keeping it. Every figure is the CLI's decimal string ([ADR 0002](0002-the-cli-is-the-only-source-of-figures.md)).
+
+## Decision
+
+- **The inputs are the Snapshot's parameters.** The labels in the person's order, the step, an optional yearly budget and an optional least saving per step are `params.allowances` (`src/lib/snapshot/allowance-params.ts`), as typed text the CLI parses. They are not in the Scenario: changing them is a read. With none, the Snapshot holds no allowance read, and nothing is on before the person chooses. The page pre-fills the step with 1,000 (`traj` has none); no percentage is pre-filled. A step of one major unit or less is refused at the Step field and by the reread's schema, as the CLI refuses it (`largerThanOne`, text only).
+- **One read per plan with a Levy.** The Plan emits `projection allowances` for every plan name when inputs exist (`stage-two-allowances.ts`, one more read leaf in `leaves.test.ts`), with the Carry-in on standard input like every projection-shaped read. The runner (`scripts/run-allowances.ts`) asks only the plans whose document holds a Levy, because the CLI refuses a plan with none, so a plan with none leaves no failed read in the Snapshot. Allowances for a plan that the CLI refuses (a step it will not take) stay in the Snapshot as that read's own error.
+- **The page changes the inputs through `POST /reread`.** The reread body, `{}` or `{ "allowances": <inputs or null> }`, is a strict schema (`src/lib/edit/reread.ts`) behind the Edit guards (Host, Origin, token, `application/json`, 1 MiB, depth 32, one at a time). The server keeps the inputs with its parameters and reads again; nothing is written to the ledger. A `traj dashboard` that is restarted forgets them, as it forgets the other parameters it was not given by flag.
+- **The labels and their names.** The six labels the Thai Levy reads as funded contributions are in `src/lib/contract/allowance-labels.ts` with the names a person reads (RMF, ThaiESG, provident fund, government pension fund, National Savings Fund, pension life insurance). SSF is never offered and never a missed saving: from the 2025 tax year it allows nothing ([tax ADR 0007](../../../../packages/core/tax/docs/adr/0007-ssf-is-not-deductible-after-2024.md)), so a row for it says "SSF purchases are no longer deductible from 2025." and states no figure.
+- **Words, not codes.** `stoppedBy: "noSaving"` is both "the cap is reached" and "one more step saves nothing", because the engine reports them the same way, so one sentence says both. `belowMinSaving` and `budget` have their own. The page states no holding rule of any fund; it says the order decides which fund holds the money, not how much tax falls, and that each fund has its own rules.
+- **The current tax year first.** The year the As-of falls in (a date comparison on the CLI's own dates) is a card with the tax due now, the tax due with every suggestion, the saving, and a card per allowance; every later year is a table with the same columns and opens to its allowances, with the year's assumptions under one Details. A suggestion with no `target` shows the CLI's hint and a link to Assets and debts, and the year offers neither action.
+- **Add to plan is one `apply-plan` Edit.** The year's Flows, exactly as the CLI stated them, are appended to the plan's document and saved with `--if-hash` ([ADR 0008](0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). The page reads the ids as a convention only to say nothing about them: `traj` made them free against the plan's Flows.
+- **Try as what-if is a session with Additions.** See [ADR 0010](0010-the-what-if-session-reads-through-traj-on-loopback.md), amended. Every figure page then shows the plan with and without the year's Flows.
+- **Navigation and Home.** Optimize is a group in the side navigation with Tax allowances at `/optimize/allowances/`, listed only when the selected plan's document holds a Levy. The Home card "Tax you could still save this year" shows the current year's saving, only when the CLI states it above zero.
+- **The Demo.** The Demo snapshot states the inputs RMF then ThaiESG at 1,000 THB, so both of its plans have the read. The read added about 117 KB, which would have taken the file past Biome's 1 MiB formatter limit, so the Demo's horizon is 31 December 2054 (it was 2060) and the figures that moved are pinned again: the horizon, and the FI date of `base` (Feb 2041, it was Jun 2044). `retire-early` still runs out in February 2053, inside the horizon.
+
+## Considered Options
+
+- **Pre-select RMF and ThaiESG.** Rejected: the order is the person's choice, and it decides which fund holds the money.
+- **Put the inputs in the Scenario.** Rejected: a read would become a write, and a plan would carry a view's settings.
+- **Ask every plan, and show the refusal of one without a Levy.** Rejected: a plan with no Levy would show a failed read on the Health page for something that is not a fault.
+- **Compute the saving of a suggestion in the page.** Rejected by ADR 0002; the CLI states `saving` and `dueAfter`, and the page shows them.
+
+## Consequences
+
+- A change in the CLI's output fails `src/lib/contract/projection-allowances.test.ts`, which parses the CLI's own golden, and `scripts/allowances.test.ts`, which works one Thai tax year by hand against the real binary: a salary of 50,000.00 a month and 12,000.00 into RMF owes 20,300.00; 168,000.00 more RMF owes 5,500.00; 110,000.00 of ThaiESG then owes nothing.
+- A `traj` without `--add` ([cli ADR 0062](../../../cli/docs/adr/0062-a-what-if-adds-a-list-item-by-its-own-id-after-the-removals-and-before-the-sets.md)) refuses a what-if with an Addition as an unknown flag; the page shows that refusal at the item.

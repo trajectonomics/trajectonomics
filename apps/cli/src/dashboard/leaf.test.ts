@@ -29,6 +29,7 @@ const SNAPSHOT = {
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
 		chance: {},
+		allowances: {},
 		documents: {},
 	},
 } as unknown as Snapshot

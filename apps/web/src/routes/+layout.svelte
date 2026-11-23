@@ -16,6 +16,7 @@ import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { editsShown } from "../lib/edit/shown"
+import { hasLevy } from "../lib/snapshot"
 import { hasCashflow } from "../lib/view/cashflow/cashflow"
 import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones"
 import { scenarioNames } from "../lib/view/plan"
@@ -38,6 +39,8 @@ const planDocument = $derived(documentRead(currentSnapshot(), selected) !== unde
 const milestones = $derived(hasMilestones(projectionRead(currentSnapshot(), selected)))
 // The Cash flow page is listed only when the selected plan's projection carries its cash flow table.
 const cashflow = $derived(hasCashflow(projectionRead(currentSnapshot(), selected)))
+// The Optimize pages are listed only when the selected plan's document holds a Levy.
+const levy = $derived(hasLevy(documentRead(currentSnapshot(), selected)))
 
 // Every printed page opens with the plan, the As-of date and the terms (and says so for a What-if session).
 const printed = $derived(
@@ -72,6 +75,7 @@ $effect(() => {
 	{planDocument}
 	{milestones}
 	{cashflow}
+	{levy}
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">

@@ -3,6 +3,7 @@ import { firstDayOfYear, firstDayTwoMonthsBack, monthEndsBetween } from "./dates
 import type { PlanParams } from "./params"
 import { type PlannedRead, plainRead } from "./planned"
 import type { StageOneReads } from "./stage-one"
+import { planAllowances } from "./stage-two-allowances"
 import {
 	planChance,
 	planCompare,
@@ -30,6 +31,8 @@ export type StageTwoPlan = {
 	compare: PlannedRead | null
 	/** One `projection chance` per Scenario; empty when the caller stated no Return model. */
 	chance: Record<string, PlannedRead>
+	/** One `projection allowances` per Scenario; empty when the Snapshot states no allowance inputs. The runner reads only plans with a Levy. */
+	allowances: Record<string, PlannedRead>
 }
 
 /** The names of the Scenarios the list read holds, or none when that read failed. */
@@ -79,5 +82,6 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),
 		chance: planChance(params, scenarios),
+		allowances: planAllowances(params, scenarios),
 	}
 }

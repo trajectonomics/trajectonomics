@@ -36,6 +36,7 @@ describe("the what-if Edits", () => {
 			name: "early",
 			sets: [],
 			removals: [],
+			additions: [],
 		})
 		expect(writeCommand(plain, false)).toEqual({
 			argv: ["scenario", "fork", "base", "early", "--json"],
@@ -43,7 +44,14 @@ describe("the what-if Edits", () => {
 	})
 
 	test("apply-overrides is scenario apply with the what-if flags and --if-hash, and no document", () => {
-		const edit: Edit = { kind: "apply-overrides", name: "early", contentHash: HASH, sets, removals }
+		const edit: Edit = {
+			kind: "apply-overrides",
+			name: "early",
+			contentHash: HASH,
+			sets,
+			removals,
+			additions: [],
+		}
 		expect(editSchema.safeParse(edit).success).toBe(true)
 		expect(writeCommand(edit, false)).toEqual({
 			argv: [
@@ -63,7 +71,14 @@ describe("the what-if Edits", () => {
 	})
 
 	test("apply-overrides with no change, a bad hash, a flag-shaped name or an unknown field is refused", () => {
-		const base = { kind: "apply-overrides", name: "early", contentHash: HASH, sets, removals }
+		const base = {
+			kind: "apply-overrides",
+			name: "early",
+			contentHash: HASH,
+			sets,
+			removals,
+			additions: [],
+		}
 		expect(editSchema.safeParse({ ...base, sets: [], removals: [] }).success).toBe(false)
 		expect(editSchema.safeParse({ ...base, contentHash: "--dry-run" }).success).toBe(false)
 		expect(editSchema.safeParse({ ...base, name: "--help" }).success).toBe(false)
@@ -91,7 +106,14 @@ describe("the what-if Edits", () => {
 	})
 
 	test("apply-overrides joins the plans the Snapshot projects, as apply-plan does", () => {
-		const edit: Edit = { kind: "apply-overrides", name: "early", contentHash: HASH, sets, removals }
+		const edit: Edit = {
+			kind: "apply-overrides",
+			name: "early",
+			contentHash: HASH,
+			sets,
+			removals,
+			additions: [],
+		}
 		expect(followPlan(["base"], edit)).toEqual(["base", "early"])
 		expect(followPlan([], edit)).toEqual([])
 	})

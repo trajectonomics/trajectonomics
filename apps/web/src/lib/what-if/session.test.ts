@@ -69,6 +69,7 @@ describe("the What-if session", () => {
 		expect(overridesOf(session)).toEqual({
 			sets: [{ path: "flows.a.amount", value: 1 }],
 			removals: ["milestones.downsize"],
+			additions: [],
 		})
 	})
 

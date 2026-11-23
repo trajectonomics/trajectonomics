@@ -1,3 +1,4 @@
+import type { Addition } from "../lib/what-if/additions"
 import type { Json } from "../lib/what-if/overrides"
 import {
 	type Change,
@@ -9,10 +10,19 @@ import {
 	switchedOff,
 	switchedOn,
 	type WhatIf,
+	withAddition,
+	withoutAddition,
 	withoutSet,
 	withSet,
 } from "../lib/what-if/session"
 import { WhatIfState } from "./what-if-state.svelte.js"
+
+/** The session without one change: a switch back on, an item not added, or a value back to the plan's. */
+function without(whatIf: WhatIf, change: Change): WhatIf {
+	if (change.kind === "off") return switchedOn(whatIf, change.path)
+	if (change.kind === "add") return withoutAddition(whatIf, change.path)
+	return withoutSet(whatIf, change.path)
+}
 
 /** How long the session waits after a change before it reads the what-if again. */
 const DEBOUNCE_MS = 250
@@ -58,14 +68,23 @@ export class WhatIfChanges extends WhatIfState {
 		return clearedFields(stored, edited)
 	}
 
+	/**
+	 * Puts new items on the plan in the session: the "Try as what-if" of a suggestion (cli ADR 0062). The same
+	 * rules as a switch: another plan's pending changes ask first, and nothing changes while Apply or Save runs.
+	 * True when they were added.
+	 */
+	addItems(plan: string, contentHash: string, additions: readonly Addition[]): boolean {
+		if (this.saving || additions.length === 0) return false
+		const base = this.sessionFor(plan, contentHash)
+		if (base === null) return false
+		this.keep(additions.reduce(withAddition, base))
+		return true
+	}
+
 	/** Takes one change out of the session. The session ends when none is left. Refused while Apply or Save runs. */
 	removeChange(change: Change): void {
 		if (this.whatIf === null || this.saving) return
-		this.keep(
-			change.kind === "off"
-				? switchedOn(this.whatIf, change.path)
-				: withoutSet(this.whatIf, change.path),
-		)
+		this.keep(without(this.whatIf, change))
 	}
 
 	/** A plan switch while changes are pending asks first. Returns true when the switch may run now. */

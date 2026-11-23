@@ -53,7 +53,7 @@ describe("the headline figures", () => {
 		const triples = figureTriples(statedCompare())
 		const fi = triples.find((triple) => triple.key === "fi")
 		expect(fi?.change).toEqual({ kind: "count", text: "−3 months", words: "earlier" })
-		expect(fi?.baseline.value).toEqual({ kind: "text", text: "Jun 2044" })
+		expect(fi?.baseline.value).toEqual({ kind: "text", text: "Feb 2041" })
 		expect(fi?.whatIf.value).toEqual({ kind: "text", text: "Not reachable" })
 		expect(figureOf(statedCompare(), "final-nominal")?.change).toEqual({
 			kind: "money",

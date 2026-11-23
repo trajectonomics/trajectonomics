@@ -2,6 +2,7 @@ import type { ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER, REREAD_PATH } from "../lib/edit/guard"
+import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
 /** The sentence a refused Edit shows when the plan moved on since the page read it. */
@@ -15,6 +16,8 @@ class EditSession {
 	token = $state<string | null>(null)
 	busy = $state(false)
 	error = $state<string | null>(null)
+	/** Who sent the last request, so only that control shows its error: "form", or a year's key. */
+	source = $state<string>("form")
 	/** The CLI's error envelope of the last refused Edit, so a form can show it at the field it names. */
 	failure = $state<ErrorBody | null>(null)
 	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
@@ -35,9 +38,10 @@ class EditSession {
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
-	async run(edit: EditInput): Promise<boolean> {
+	async run(edit: EditInput, source = "form"): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
+		this.source = source
 		this.error = null
 		this.failure = null
 		this.stale = false
@@ -58,15 +62,21 @@ class EditSession {
 		}
 	}
 
-	/** Asks the server to read the Snapshot again and shows it. The form keeps what the person typed. */
-	async reread(): Promise<void> {
-		if (this.token === null || this.busy) return
+	/**
+	 * Asks the server to read the Snapshot again and shows it. The form keeps what the person typed. With
+	 * `allowances`, the read uses those inputs for the allowance reads (null clears them); nothing is written.
+	 * Returns true when the new Snapshot is shown.
+	 */
+	async reread(allowances?: AllowancePlan | null): Promise<boolean> {
+		if (this.token === null || this.busy) return false
 		this.busy = true
+		this.source = "form"
+		this.error = null
 		try {
 			const response = await fetch(REREAD_PATH, {
 				method: "POST",
 				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: this.token },
-				body: "{}",
+				body: JSON.stringify(allowances === undefined ? {} : { allowances }),
 				cache: "no-store",
 			})
 			const answer = editAnswer.safeParse(await response.json())
@@ -74,12 +84,14 @@ class EditSession {
 			else if (answer.data.ok) {
 				replaceSnapshot(answer.data.snapshot)
 				this.clear()
+				return true
 			} else this.error = answer.data.error.message
 		} catch {
 			this.error = "The Dashboard could not reach traj. Try again."
 		} finally {
 			this.busy = false
 		}
+		return false
 	}
 
 	private settle(answer: EditAnswer | null): boolean {
