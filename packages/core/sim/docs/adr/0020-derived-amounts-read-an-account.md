@@ -50,10 +50,17 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
     stopped, so those dates are read although the candidate lands nothing there: `WindowPlan.readDates`
     holds each date the original plan has a Derived event on, through the windows' last date, and a
     walk records on it as well as on every date its own landing plans a Derived amount (the Flows a
-    Milestone's gate lets land, a deferred `once` Flow on its fire date). A date the walk does not stand
-    on, because the candidate lands nothing there, is recorded between the dates it does stand on
-    (`fi/read-dates.ts`), from the states as they stand, which only growth has moved. Any other date is
-    never read, and records nothing. The shared prefix records them for the unchanged walk, and a
+    Milestone's gate lets land, and a deferred `once` Flow on its fire date when the candidate keeps
+    it) and on every date its own gate fires a Milestone. The last is for a deferred `once` Flow the
+    candidate stopped (an earned bonus): its gate never lands it, but a window lands it on the fire
+    date (`fi/original-window.ts` injects it for every fire date, stopped or not) and prices it
+    there, on a date the original plan's `readDates` do not hold since the Flow's own `start` is
+    earlier. A date the walk does not stand on, because the candidate lands nothing there, is
+    recorded between the dates it does stand on (`fi/read-dates.ts`), from the states as they stand,
+    which only growth has moved. So a date is read only if the original plan has a Derived event on
+    it, or the candidate's own landing plans a Derived amount on it, or the candidate's gate fires a
+    Milestone on it; any other date is never read, and records nothing. The shared prefix records them
+    for the unchanged walk, and a
     candidate's walk records them from its own month on; a date before the candidate's month reads the
     prefix, which is the candidate's own history. A row is the value on its own date, not grown to the
     date asked for, so a read of a date with no row on or before it is an internal error and throws.
@@ -145,7 +152,10 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   Actual/365 No Leap makes the growth one exact power; `src/golden/derive-account-golden.test.ts` checks the
   engine's cash against it. `src/golden/oracle-account-walk.ts` is the day-by-day walk (Accounts that
   change, Contributions, Milestones) that `oracle-account-fi.ts` re-runs per candidate, and
-  `src/golden/derive-account-read-dates.test.ts` (a bonus that only the original plan lands: a
+  `src/golden/derive-account-deferred-once.test.ts` (a stopped deferred `once` bonus read on its
+  Milestone's fire date: FI 2027-01-01 and 2027-02-01 with 1,800,000, where the window threw), `src/fi/original-window-price.test.ts`
+  (the FI window's annual expenses of an `inv`/1,000 upkeep equal the Projection's next 12 months, to the
+  unit, also past the horizon), `src/golden/derive-account-read-dates.test.ts` (a bonus that only the original plan lands: a
   window that prices it on 2026-06-15 reads inv there, and FI is 2026-01-01 with 1,800,000 for a buffer
   of 0 and of 3 months; the shape it failed with was `NEGATIVE_AMOUNT` at that date),
   `src/milestone/account-window-year.test.ts` (a window from each 1 January of 2026 to 2032 equals the

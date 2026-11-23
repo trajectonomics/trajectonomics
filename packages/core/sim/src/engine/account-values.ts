@@ -55,16 +55,18 @@ export function readsOn(landing: readonly DatedEvent[]): boolean {
 }
 
 /**
- * Records `date`'s values when its landing plans a Derived amount or a window reads the date: a
- * window prices the original plan's events, which a candidate that stopped them does not land.
+ * Records `date`'s values when its landing plans a Derived amount, a window reads the date, or a
+ * Milestone fired on it. A window prices the original plan's events, which a candidate that stopped
+ * them does not land: the deferred `once` Flow a fired Milestone lands on its fire date is one.
  */
 export function recordLanding(
 	values: RecordedValues | undefined,
 	date: DateString,
 	states: StateMap,
 	landing: readonly DatedEvent[],
+	fired = false,
 ): void {
-	if (values !== undefined && (values.reads.has(date) || readsOn(landing))) {
+	if (values !== undefined && (fired || values.reads.has(date) || readsOn(landing))) {
 		values.record(date, states)
 	}
 }
