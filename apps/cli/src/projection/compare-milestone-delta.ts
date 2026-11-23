@@ -8,8 +8,9 @@ function firedOn(milestone: MilestoneResult | undefined): string | null {
 }
 
 /**
- * One row per Milestone id declared on both sides, in side `a`'s order. `months` is the whole months
- * from a's date to b's (`monthsBetween`), null when either side did not reach it. An id on one side
+ * One row per Milestone id declared on both sides, in side `a`'s order. `months` is the calendar months
+ * from a's date to b's (`monthsBetween`: month boundaries crossed, so a one-day move across a month end
+ * is 1), null when either side did not reach it. An id on one side
  * only is not listed: its row is under that side's own `milestones` (cli ADR-0049, amended).
  */
 export function milestoneDeltasOf(

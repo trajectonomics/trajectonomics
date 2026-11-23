@@ -5,7 +5,7 @@ import { type CompareSide, compareSide } from "./compare-side"
 import { dateField, moneyField } from "./money"
 import { type EngineEcho, engineEcho, notesField, type TaxStatus, taxField } from "./view"
 
-/** One Milestone declared on both sides: each side's fire date and whole months from a to b (cli ADR-0049). */
+/** One Milestone declared on both sides: each side's fire date and the calendar months from a to b (cli ADR-0049). */
 export type MilestoneDelta = {
 	id: string
 	a: string | null

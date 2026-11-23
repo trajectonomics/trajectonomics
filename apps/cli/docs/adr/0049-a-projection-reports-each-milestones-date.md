@@ -55,7 +55,7 @@ never subtracts money (web ADR 0002):
   `{ a, b, delta }`. `delta` is b minus a, computed in the CLI from the engine's integer minor units and
   printed at the Currency's scale. A side with no such year, or with no Levy, is `null` there.
 - **`deltas.milestones`.** One row per Milestone id declared on both sides, in side `a`'s Scenario order:
-  `{ id, a, b, months }`. `months` is `monthsBetween(a, b)` and is `null` when either side did not reach
+  `{ id, a, b, months }`. `months` is `monthsBetween(a, b)`, the calendar months between the two dates (month boundaries crossed, so a one-day move across a month end is 1, as `fiMonths` counts), and is `null` when either side did not reach
   it. An id on one side only is not listed; its row is under that side's `milestones`. The key is absent
   when neither side declares Milestones, and an empty list when only one does.
 
