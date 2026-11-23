@@ -12,14 +12,30 @@ function isDoc(value: unknown): value is Doc {
 	return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-/** The worked example, with a capped surplus step so every money field carries a value. */
+/**
+ * The worked example, with a capped surplus step and a level loan, so every money field carries a
+ * value. The loan account gains its compounding period, which a level contribution needs.
+ */
 function worked(): Doc {
 	const version = acceptedScenarioSchemaVersion()
 	if (version === undefined) throw new Error("the pinned sim-core accepts no version")
 	const example = scenarioExample(version)
 	const cashflow = example["cashflow"] as Doc
+	const accounts = (example["accounts"] as Doc[]).map((account) =>
+		account["id"] === "loan" ? { ...account, compounding: "monthly" } : account,
+	)
+	const levelLoan: Doc = {
+		id: "car-loan",
+		kind: "contribution",
+		target: "loan",
+		frequency: "monthly",
+		start: "2026-01-31",
+		level: { principal: 123_456, payments: 12, rounding: "halfUp" },
+	}
 	return {
 		...example,
+		accounts,
+		flows: [...(example["flows"] as Doc[]), levelLoan],
 		cashflow: { ...cashflow, surplus: [{ account: "cash", upTo: 250_000 }, { account: "index" }] },
 	}
 }
@@ -53,6 +69,7 @@ describe("the money fields of the decimal form", () => {
 		// A new money field fails here until it is reviewed for the decimal form (ADR-0047).
 		expect(moneyPathsOf(PUBLISHED)).toEqual([
 			"flows[].amount",
+			"flows[].level.principal",
 			"milestones[].criteria[].amount",
 			"cashflow.surplus[].upTo",
 		])
@@ -88,7 +105,7 @@ describe("the money fields of the decimal form", () => {
 			{ id: "cash", kind: "asset", rate: 150 },
 			{ id: "index", kind: "asset", rate: 600, compounding: "annual" },
 			{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
-			{ id: "loan", kind: "liability", rate: 500 },
+			{ id: "loan", kind: "liability", rate: 500, compounding: "monthly" },
 		])
 		expect(decimal["economy"]).toEqual({ inflation: 300 })
 	})

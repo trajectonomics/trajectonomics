@@ -38,6 +38,7 @@ const TOTALS = {
 	date: "2023-06-30",
 	income: 0n,
 	expense: 10000n,
+	withdrawals: 0n,
 	contributions: 0n,
 	unfunded: new Map(),
 	levy: 0n,

@@ -2,6 +2,8 @@ import { FLOW_KINDS, FREQUENCIES } from "../vocab"
 import type { AccountIndex, Check } from "./codes"
 import { derive } from "./derive"
 import { cappedPrepayment, label, NOT_ALLOWED } from "./flow-fields"
+import { levelField } from "./level-loan"
+import type { LoanIndex } from "./loan-index"
 import { prepayments } from "./prepayments"
 import { accountRef } from "./refs"
 import { amount, bool, date, growth, oneOf, str } from "./scalars"
@@ -13,6 +15,8 @@ export interface FlowContext {
 	readonly hasLevy: boolean
 	readonly levyIds: ReadonlySet<string>
 	readonly milestoneIds: ReadonlySet<string>
+	/** The raw loan fields of each declared Account, for a withdrawal source and a level payment. */
+	readonly loans: LoanIndex
 }
 
 /** A Milestone id a Flow gates on: a string that names a declared Milestone. */
@@ -52,7 +56,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	}
 	const capped = cappedPrepayment(context.hasLevy)
 	if (kind === "income")
-		return { ...shared, earned: req(bool), ...levied, cappedPrepayment: capped }
+		return { ...shared, earned: req(bool), ...levied, cappedPrepayment: capped, level: NOT_ALLOWED }
 	if (kind === "contribution") {
 		return {
 			...shared,
@@ -60,6 +64,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 			label: label(context.hasLevy),
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
+			level: levelField,
 		}
 	}
 	if (kind === "expense") {
@@ -68,7 +73,25 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
+			level: NOT_ALLOWED,
 		}
 	}
-	return { ...shared, earned: opt(bool), target: opt(target), ...levied, cappedPrepayment: capped }
+	if (kind === "withdrawal") {
+		return {
+			...shared,
+			source: req(accountRef(context.accounts)),
+			label: NOT_ALLOWED,
+			prepayments: NOT_ALLOWED,
+			cappedPrepayment: NOT_ALLOWED,
+			level: NOT_ALLOWED,
+		}
+	}
+	return {
+		...shared,
+		earned: opt(bool),
+		target: opt(target),
+		...levied,
+		cappedPrepayment: capped,
+		level: levelField,
+	}
 }

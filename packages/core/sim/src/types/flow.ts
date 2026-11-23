@@ -1,5 +1,5 @@
 import type { AccountId, BasisPoints, DateString, Frequency, Growth, MinorUnits } from "./common"
-import type { Derive } from "./measure"
+import type { Derive, Rounding } from "./measure"
 
 /** One Levy's share of an income Occurrence, in basis points of the gross. */
 export interface Prepayment {
@@ -37,6 +37,21 @@ export interface DerivedAmount {
 	readonly derive: Derive
 }
 
+/** The loan a level payment pays off: `payments` equal payments of `principal` at the target's nominal rate. */
+export interface LevelLoan {
+	/** The amount borrowed, as the caller states it, in minor units. */
+	readonly principal: MinorUnits
+	/** The number of payments, a positive safe integer within the calendar's periods. */
+	readonly payments: number
+	/** How the one exact payment is rounded to a minor unit. Required; no default. */
+	readonly rounding: Rounding
+}
+
+/** A level payment computed once from a loan; it does not grow. */
+export interface LevelAmount {
+	readonly level: LevelLoan
+}
+
 export interface IncomeRules {
 	readonly kind: "income"
 	/** Earned (true) versus passive (false) income. */
@@ -63,13 +78,27 @@ export interface ContributionRules {
 
 export type IncomeFlow = FlowBase & IncomeRules & (FixedAmount | DerivedAmount)
 export type ExpenseFlow = FlowBase & ExpenseRules & (FixedAmount | DerivedAmount)
-export type ContributionFlow = FlowBase & ContributionRules & (FixedAmount | DerivedAmount)
+/** Cash moves out of a liability `source` into cashflow on each Landed date; it is not income. */
+export interface WithdrawalRules {
+	readonly kind: "withdrawal"
+	readonly source: AccountId
+}
 
-export type Flow = IncomeFlow | ExpenseFlow | ContributionFlow
+export type ContributionFlow = FlowBase &
+	ContributionRules &
+	(FixedAmount | DerivedAmount | LevelAmount)
+export type WithdrawalFlow = FlowBase & WithdrawalRules & (FixedAmount | DerivedAmount)
 
-/** Whether a Flow carries a fixed `amount` rather than a `derive` graph. */
+export type Flow = IncomeFlow | ExpenseFlow | ContributionFlow | WithdrawalFlow
+
+/** Whether a Flow carries a fixed `amount` rather than a `derive` graph or a `level` loan. */
 export function isFixed(flow: Flow): flow is Flow & FixedAmount {
 	return "amount" in flow
+}
+
+/** Whether a Flow carries a `level` loan payment rather than an `amount` or `derive`. */
+export function isLevel(flow: Flow): flow is Flow & LevelAmount {
+	return "level" in flow
 }
 
 /** Whether a Flow carries a `derive` graph rather than a fixed `amount`. */

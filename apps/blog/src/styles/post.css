@@ -47,6 +47,34 @@
 	font-size: 14px;
 }
 
+/* The Languages a Post is written in, each linking to its page in its own tree. */
+.post-languages {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 12px;
+}
+
+.post-languages-link {
+	color: var(--ds-color-foreground);
+	text-underline-offset: 4px;
+}
+
+.post-languages-link[aria-current="true"] {
+	text-decoration: none;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The notice on a page whose Post is not written in the Interface Language: a quiet panel, no colour of its own. */
+.language-notice {
+	margin: 0;
+	padding: 12px 16px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
+	background: var(--ds-color-secondary);
+	font-size: 15px;
+}
+
 .post-cover {
 	max-width: 52rem;
 	margin: 40px auto 48px;

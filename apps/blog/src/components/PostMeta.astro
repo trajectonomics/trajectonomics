@@ -1,20 +1,33 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
-import type { Post } from "../content/read-posts"
-import { displayDate, typeLabel } from "../lib/posts"
+import type { Post, Translation } from "../content/read-posts"
+import { dictionaryFor } from "../lib/dictionary"
+import type { Language } from "../lib/languages"
+import { displayDate } from "../lib/posts"
 
 interface Props {
 	readonly post: Post
+	/** The Translation the page or the row shows, whose reading time the line states. */
+	readonly translation: Translation
+	/** The Interface Language the line's words are in. */
+	readonly language: Language
 }
 
-const { post } = Astro.props
+const { post, translation, language } = Astro.props
+const words = dictionaryFor(language)
+// The Post Languages, as short codes: a reader sees which Languages a Post is written in before opening it.
+const codes = post.languages.map((code) => ({ code, name: words.languageNames[code] }))
 ---
 
-<p class="meta-label post-meta">
-	<span>{typeLabel(post.type)}</span>
+<p class="meta-label post-meta" lang={language}>
+	<span>{words.typeLabels[post.type]}</span>
 	<span aria-hidden="true">·</span>
-	<time datetime={post.publishedOn.toISOString().slice(0, 10)}>{displayDate(post.publishedOn)}</time>
+	<time datetime={post.publishedOn.toISOString().slice(0, 10)}>{displayDate(post.publishedOn, words.dateLocale)}</time>
 	<span aria-hidden="true">·</span>
-	<span>{post.minutes} min read</span>
+	<span>{words.minutesRead(translation.minutes)}</span>
+	<span aria-hidden="true">·</span>
+	<span class="post-meta-languages">
+		{codes.map((entry) => <abbr title={entry.name}>{entry.code}</abbr>)}
+	</span>
 </p>

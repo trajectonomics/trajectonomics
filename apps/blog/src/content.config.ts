@@ -11,9 +11,14 @@ const image = z.object({
 	height: z.number().int().positive(),
 })
 
-/** Every Post: one Markdown file under `src/content/posts/`, whose file name is its slug. */
+/**
+ * Every Translation of every Post: `src/content/posts/<slug>/<language>.md`. The folder is the Post's
+ * slug, the file name its Post Language, and the Translations of one Post agree on type, date, draft
+ * and cover image (`src/lib/translations.ts` refuses a build where they do not). Every Markdown file
+ * is loaded, so a file outside a Post's folder fails the build instead of vanishing.
+ */
 const posts = defineCollection({
-	loader: glob({ pattern: "*.md", base: "./src/content/posts" }),
+	loader: glob({ pattern: "**/*.md", base: "./src/content/posts" }),
 	schema: z.object({
 		title: z.string().min(1),
 		description: z.string().min(1),

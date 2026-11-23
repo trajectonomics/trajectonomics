@@ -6,12 +6,24 @@ import lightTheme from "@trajectonomics/brand/current/light.css?raw"
 import Footer from "../components/Footer.astro"
 import Header from "../components/Header.astro"
 import "../styles/global.css"
+import { dictionaryFor } from "../lib/dictionary"
+import type { Language } from "../lib/languages"
 import { canonicalUrl, fileUrl } from "../lib/page-url"
 import { SITE_NAME } from "../lib/site"
 import { themeRole } from "../lib/theme-role"
 import { FALLBACK_THEME, themeScript } from "../lib/themes"
 
+/** One `hreflang` alternate: a Language (or `x-default`) and the path of the page written in it. */
+export interface Alternate {
+	readonly hreflang: Language | "x-default"
+	readonly path: string
+}
+
 interface Props {
+	/** The Interface Language: the Shell's words and the page's `lang`. */
+	readonly language: Language
+	/** Where the Language menu takes a reader for each Interface Language. */
+	readonly languagePaths: Readonly<Record<Language, string>>
 	readonly title: string
 	/** An indexable page's one-line summary; the Not-found Page passes none. */
 	readonly description?: string
@@ -28,10 +40,29 @@ interface Props {
 	}
 	/** A Post's publication date, which makes the page an article to a share card. */
 	readonly article?: Date
+	/** The page search engines should index instead; a page that falls back names its Post's own. */
+	readonly canonicalPath?: string
+	/** The same page written in each other Language; only a page in its own Language names them. */
+	readonly alternates?: readonly Alternate[]
+	/** The Language the page's content is in, when it is not the Interface Language: a fallback. */
+	readonly contentLanguage?: Language
 }
 
-const { title, description, indexed, isFrontPage = false, image, article } = Astro.props
-const canonical = canonicalUrl(Astro.url.pathname)
+const {
+	language,
+	languagePaths,
+	title,
+	description,
+	indexed,
+	isFrontPage = false,
+	image,
+	article,
+	canonicalPath = Astro.url.pathname,
+	alternates = [],
+	contentLanguage = language,
+} = Astro.props
+const words = dictionaryFor(language)
+const canonical = canonicalUrl(canonicalPath)
 // The browser's bar takes each Theme's background, read from the brand's stylesheets.
 const themeColours = [
 	{ scheme: "light", colour: themeRole(lightTheme, "background") },
@@ -39,7 +70,7 @@ const themeColours = [
 ]
 ---
 
-<html lang="en" data-theme={FALLBACK_THEME}>
+<html lang={language} data-theme={FALLBACK_THEME}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -53,6 +84,9 @@ const themeColours = [
 				<>
 					{description === undefined ? null : <meta name="description" content={description} />}
 					<link rel="canonical" href={canonical} />
+					{alternates.map((alternate) => (
+						<link rel="alternate" hreflang={alternate.hreflang} href={canonicalUrl(alternate.path)} />
+					))}
 					<meta property="og:title" content={title} />
 					{description === undefined ? null : <meta property="og:description" content={description} />}
 					<meta property="og:url" content={canonical} />
@@ -61,6 +95,7 @@ const themeColours = [
 						<meta property="article:published_time" content={article.toISOString().slice(0, 10)} />
 					)}
 					<meta property="og:site_name" content={SITE_NAME} />
+					<meta property="og:locale" content={dictionaryFor(contentLanguage).ogLocale} />
 					{image === undefined ? null : (
 						<>
 							<meta property="og:image" content={fileUrl(image.src)} />
@@ -80,9 +115,9 @@ const themeColours = [
 		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
 	</head>
 	<body class="blog-body">
-		<a class="skip-link" href="#main">Skip to content</a>
-		<Header current={isFrontPage} />
+		<a class="skip-link" href="#main">{words.skipLink}</a>
+		<Header language={language} languagePaths={languagePaths} current={isFrontPage} />
 		<main id="main" class="blog-main"><slot /></main>
-		<Footer />
+		<Footer language={language} />
 	</body>
 </html>

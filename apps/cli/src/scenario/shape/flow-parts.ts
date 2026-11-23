@@ -1,10 +1,35 @@
-import { BASIS_POINTS, DERIVE_MEASURE_OPS, ROUNDINGS } from "./terms"
+import { MAX_LEVEL_PAYMENTS } from "@trajectonomics/core/sim"
+import { BASIS_POINTS, DERIVE_MEASURE_OPS, MINOR_UNITS, ROUNDINGS } from "./terms"
 
 /*
- * The three parts of a Flow whose keys are not simply a name and a unit: the two shapes a Levy reads
- * a share of each occurrence from, and the Measure graph a derived amount is computed by. They live
- * here so `flow.ts` stays one screen long, and every one of them states its `Needs a Levy` rule.
+ * The parts of a Flow whose keys are not simply a name and a unit: the two shapes a Levy reads a
+ * share of each occurrence from, the Measure graph a derived amount is computed by, and the loan a
+ * level payment is priced from. They live here so `flow.ts` stays one screen long, and every one of
+ * them states its kind or `Needs a Levy` rule.
  */
+
+/** Contribution into a nominal liability only: the loan one level payment pays off (ADR-0016). */
+export const levelShape: Record<string, unknown> = {
+	type: "object",
+	description:
+		"Contribution only, into a liability with a `compounding` period: the loan one level payment pays off. The payment is computed once, from `principal`, the liability's rate and `payments` equal payments, and it does not grow. It takes the place of `amount` and `growth`, and the Flow's `frequency` is that compounding period (`monthly`, `quarterly` or `annual`).",
+	properties: {
+		principal: { type: "integer", description: `${MINOR_UNITS} The amount borrowed.` },
+		payments: {
+			type: "integer",
+			minimum: 1,
+			maximum: MAX_LEVEL_PAYMENTS,
+			description: `The number of equal payments, a whole number from 1 to ${MAX_LEVEL_PAYMENTS}.`,
+		},
+		rounding: {
+			enum: [...ROUNDINGS],
+			description:
+				"How the one exact payment rounds to a minor unit: `floor` rounds down, `halfUp` to the nearest with a half rounding up, `ceil` up. Required, with no default.",
+		},
+	},
+	required: ["principal", "payments", "rounding"],
+	additionalProperties: false,
+}
 
 /** Income only: shares of each occurrence taken at source, one per Levy. */
 export const prepaymentsShape: Record<string, unknown> = {

@@ -47,7 +47,10 @@ export {
 	type IncomeRules,
 	isDerived,
 	isFixed,
+	isLevel,
+	type LevelLoan,
 	type Prepayment,
+	type WithdrawalFlow,
 } from "./flow"
 export type { Levy, LevyContext, MeasuresResult, MonthDay, Tallies } from "./levy"
 export type { MarketBucket, ReturnModel } from "./market"

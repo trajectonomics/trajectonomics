@@ -1,4 +1,5 @@
 import type { EngineRun } from "../engine/result"
+import { declaresWithdrawals } from "../loan/resolve"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
 import { buildLevies } from "./levy"
@@ -29,7 +30,12 @@ export function buildProjection(
 	if (rows.problem !== undefined) return { problem: rows.problem }
 	const end = run.runsOut?.date ?? timeline.horizon
 	const periods = buildPeriods(timeline.start, end, run.runsOut?.date)
-	const rollups = buildRollups(run, periods, openingNetWorth(baseline, rules))
+	const rollups = buildRollups(
+		run,
+		periods,
+		openingNetWorth(baseline, rules),
+		declaresWithdrawals(scenario),
+	)
 	if (rollups.problem !== undefined) return { problem: rollups.problem }
 	const unfunded = buildUnfunded(run.totals, end)
 	if (unfunded.problem !== undefined) return { problem: unfunded.problem }

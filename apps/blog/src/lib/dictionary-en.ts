@@ -1,0 +1,45 @@
+import type { Dictionary } from "./dictionary"
+
+/** English: the default Interface Language. */
+export const EN: Dictionary = Object.freeze({
+	nativeName: "English",
+	dateLocale: "en-GB",
+	ogLocale: "en_GB",
+	languageNames: Object.freeze({ en: "English", th: "Thai" }),
+	skipLink: "Skip to content",
+	blogMarker: "Blog",
+	docsLink: "Docs",
+	homeLabel: (siteName: string) => `${siteName} home`,
+	languageMenuLabel: "Language",
+	frontTitle: "Blog · Trajectonomics",
+	frontDescription:
+		"Comparisons, guides and news about traj, the free, open-source financial simulation tool for AI agents.",
+	mastheadLabel: "Trajectonomics blog",
+	mastheadTitle: "Comparisons, guides and news",
+	mastheadLede:
+		"How traj compares with what you would otherwise do, with every number from a test you can rerun.",
+	latest: "Latest",
+	noPosts: "No posts yet.",
+	postTitleSuffix: "Trajectonomics Blog",
+	typeLabels: Object.freeze({ compare: "Compare", guide: "Guide", news: "News" }),
+	minutesRead: (minutes: number) => `${minutes} min read`,
+	byline: "By the Trajectonomics team",
+	availableIn: "Available in",
+	fallbackNotice: (interfaceLanguage: string, shownLanguage: string) =>
+		`This post is not written in ${interfaceLanguage} yet, so you are reading it in ${shownLanguage}.`,
+	fairPlayBefore: "Found a wrong fact or a number you cannot reproduce?",
+	fairPlayLink: "Tell us",
+	fairPlayAfter: ", and we will correct the post.",
+	footerTagline: "Free, open-source financial simulation for AI agents.",
+	footerRead: "Read",
+	footerSource: "Source",
+	footerHelp: "Help",
+	footerBlog: "Blog",
+	footerDocs: "Docs",
+	footerSiteHome: "Site Home",
+	footerSourceCode: "Source code",
+	footerOrganisation: "Organisation",
+	footerReport: "Report a wrong fact",
+	footerLicence: "Licence",
+	footerLicenceLine: (siteName: string) => `${siteName}. The blog's source is MIT licensed.`,
+})

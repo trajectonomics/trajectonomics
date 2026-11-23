@@ -49,7 +49,7 @@ cover:
 
 ## 4 ข้อ Software Factory ของผม อยู่ตรงไหนบน pyramid
 
-ทั้ง 4 ข้อในคลิปของผมตรงกับ 4 ชั้นของ Poteto Pyramid และเราเห็นตรงกันว่า **ข้อสุดท้าย (validation) สำคัญที่สุด** ตัวอย่างในตารางมาจาก Factory ที่ผมใช้จริง ([เล่าไว้ในโพสต์นี้](/guides/software-factory/)) ซึ่งเปิดเป็น open source ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory)
+ทั้ง 4 ข้อในคลิปของผมตรงกับ 4 ชั้นของ Poteto Pyramid และเราเห็นตรงกันว่า **ข้อสุดท้าย (validation) สำคัญที่สุด** ตัวอย่างในตารางมาจาก Factory ที่ผมใช้จริง ([เล่าไว้ในโพสต์นี้](/th/guides/software-factory/)) ซึ่งเปิดเป็น open source ที่ [trajectonomics/factory](https://github.com/trajectonomics/factory)
 
 | ชั้นใน pyramid | ข้อในคลิป | ที่ Factory ของผมทำจริง |
 | --- | --- | --- |
@@ -65,4 +65,4 @@ cover:
 
 อยากเชื่อใจ agent ให้ลงทุนกับสภาพแวดล้อมของมัน ไม่ใช่นั่งอ่านโค้ดให้มากขึ้น เริ่มจากชั้นบนของ pyramid ที่ถูกที่สุด แล้วทำ verification ให้แข็งแรงก่อนสร้าง Software Factory
 
-อยากอ่านต่อว่าทำไม validation คือหัวใจ ดูข้อ 3 ของ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/guides/software-factory-7-things/) ส่วนทอล์กเต็มของ Lauren ยาว 17 นาที [ดูได้ที่ YouTube](https://www.youtube.com/watch?v=O_zcc6Xl12g) ถ้ามีเพื่อนที่กำลังทำ AI Agent อยู่ ส่งต่อให้เขาได้เลยครับ
+อยากอ่านต่อว่าทำไม validation คือหัวใจ ดูข้อ 3 ของ [7 สิ่งที่ควรรู้ ก่อนเริ่มทำ Software Factory](/th/guides/software-factory-7-things/) ส่วนทอล์กเต็มของ Lauren ยาว 17 นาที [ดูได้ที่ YouTube](https://www.youtube.com/watch?v=O_zcc6Xl12g) ถ้ามีเพื่อนที่กำลังทำ AI Agent อยู่ ส่งต่อให้เขาได้เลยครับ

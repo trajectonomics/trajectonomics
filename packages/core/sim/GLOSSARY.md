@@ -131,19 +131,27 @@ One Account's value in a Projection row, split into `amount`, `capitalised` and 
 _Avoid_: Balance entry, row amount
 
 **Flow**:
-A dated cash movement of kind `income`, `expense` or `contribution`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
+A dated cash movement of kind `income`, `expense`, `contribution` or `withdrawal`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
-A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation. Into an asset account it is a target: it is limited to the Available cashflow on that Occurrence and is never funded from existing assets. Same-date amounts are summed per Account, and `cashflow.contribute` sets the funding priority.
+A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a target: it is limited to the Available cashflow on that Occurrence and is never funded from existing assets. Same-date amounts are summed per Account, and `cashflow.contribute` sets the funding priority.
 
 **Available cashflow**:
-The income on one Occurrence minus its expenses and debt payments actually made, floored at zero. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
+The income on one Occurrence minus its expenses and debt payments actually made, floored at zero. Cash from a Planned withdrawal is left out: it pays what it was raised for and the rest lands in surplus, so borrowing never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
 _Avoid_: Free cashflow, disposable income
 
 **Unfunded contribution**:
 The part of an asset contribution's planned amount, after same-date summing per Account, that Available cashflow could not cover. It is dropped, not carried over, and a zero grant never touches the account. Debt planned above the amount owed is not unfunded.
 _Avoid_: Missed contribution
+
+**Planned withdrawal**:
+A Flow of kind `withdrawal` that borrows from a liability `source`: on each Landed date the amount owed grows by the amount and the same cash lands in cashflow, so net worth is unchanged that day. It is not income, is never tallied and does not stop in the FI test. Its source must be a liability; assets are a later slice.
+_Avoid_: draw, sale, transfer
+
+**Level payment**:
+The one payment a `level` Contribution makes into a nominal liability: the amount that repays a principal over a number of equal payments at the Account's nominal rate, computed once from principal, rate and term and rounded once as the caller states. It does not grow.
+_Avoid_: annuity payment, PMT, fixed payment, installment
 
 **Earned income**:
 Income from work, marked `earned: true`. It is the only income that stops in the FI test.

@@ -1,38 +1,13 @@
-import type { DayTotals } from "../engine/occurrence"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { EngineRun } from "../engine/result"
 import type { EngineSnapshot } from "../engine/snapshot"
 import type { AnnualRollup, ProjectionProblem } from "../types/projection"
 import type { Period } from "./periods"
-
-interface FlowSums {
-	readonly income: bigint
-	readonly expense: bigint
-	readonly contributions: bigint
-	readonly unfunded: bigint
-	readonly levy: bigint
-}
+import { type FlowSums, sumFlows } from "./rollup-sums"
 
 export interface RollupOutcome {
 	readonly annual: readonly AnnualRollup[] | undefined
 	readonly problem: ProjectionProblem | undefined
-}
-
-function sumFlows(totals: readonly DayTotals[], period: Period): FlowSums {
-	let income = 0n
-	let expense = 0n
-	let contributions = 0n
-	let unfunded = 0n
-	let levy = 0n
-	for (const total of totals) {
-		if (total.date < period.from || total.date > period.to) continue
-		income += total.income
-		expense += total.expense
-		contributions += total.contributions
-		for (const amount of total.unfunded.values()) unfunded += amount
-		levy += total.levy
-	}
-	return { income, expense, contributions, unfunded, levy }
 }
 
 function unsafe(values: readonly bigint[], date: string): ProjectionProblem | undefined {
@@ -46,7 +21,7 @@ function rollupOf(
 	opening: bigint,
 	closing: bigint,
 	unmet: bigint,
-	hasLevy: boolean,
+	declared: Declared,
 ): AnnualRollup {
 	const interest = closing - opening - sums.income + sums.expense + sums.levy - unmet
 	return {
@@ -59,22 +34,33 @@ function rollupOf(
 		expense: Number(sums.expense),
 		contributions: Number(sums.contributions),
 		unfundedContributions: Number(sums.unfunded),
-		...(hasLevy ? { levy: Number(sums.levy) } : {}),
+		...(declared.levy ? { levy: Number(sums.levy) } : {}),
+		...(declared.withdrawals ? { withdrawals: Number(sums.withdrawals) } : {}),
 		interest: Number(interest),
 		unmet: Number(unmet),
 		partial: period.partial,
 	}
 }
 
+/** Optional rollup fields, present only when the Scenario declares the Flow or Levy they report. */
+interface Declared {
+	readonly levy: boolean
+	readonly withdrawals: boolean
+}
+
 export function buildRollups(
 	run: EngineRun,
 	periods: readonly Period[],
 	opening: bigint,
+	withdrawals: boolean,
 ): RollupOutcome {
 	const snapshots = new Map<string, EngineSnapshot>()
 	for (const snapshot of run.snapshots) snapshots.set(snapshot.date, snapshot)
 	const annual: AnnualRollup[] = []
-	const hasLevy = run.levies !== undefined && run.levies.length > 0
+	const declared: Declared = {
+		levy: run.levies !== undefined && run.levies.length > 0,
+		withdrawals,
+	}
 	let openingWorth = opening
 	for (const period of periods) {
 		const sums = sumFlows(run.totals, period)
@@ -87,6 +73,7 @@ export function buildRollups(
 				closing,
 				sums.income,
 				sums.expense,
+				sums.withdrawals,
 				sums.contributions,
 				sums.unfunded,
 				sums.levy,
@@ -96,7 +83,7 @@ export function buildRollups(
 			period.to,
 		)
 		if (problem !== undefined) return { annual: undefined, problem }
-		annual.push(rollupOf(period, sums, openingWorth, closing, unmet, hasLevy))
+		annual.push(rollupOf(period, sums, openingWorth, closing, unmet, declared))
 		openingWorth = closing
 	}
 	return { annual, problem: undefined }

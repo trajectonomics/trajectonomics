@@ -17,6 +17,7 @@ const FULL: Record<string, unknown> = {
 		{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
 		{ id: "gold", kind: "asset", rate: 200, returnLabel: "returns.gold" },
 		{ id: "loan", kind: "liability", rate: 500 },
+		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
 	],
 	flows: [
 		{
@@ -90,6 +91,23 @@ const FULL: Record<string, unknown> = {
 				result: "tenth",
 			},
 		},
+		{
+			id: "borrow",
+			kind: "withdrawal",
+			source: "loan",
+			frequency: "once",
+			start: "2026-02-01",
+			amount: 1,
+			growth: { bps: 0 },
+		},
+		{
+			id: "car",
+			kind: "contribution",
+			target: "car-loan",
+			frequency: "monthly",
+			start: "2026-01-01",
+			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
+		},
 	],
 	cashflow: {
 		surplus: [{ account: "cash", upTo: 500_000 }, { account: "index" }],
@@ -125,6 +143,7 @@ const OBJECT_PATHS: (string | number)[][] = [
 	["flows", 0, "prepayments", 0],
 	["flows", 0, "cappedPrepayment"],
 	["flows", 6, "derive"],
+	["flows", 8, "level"],
 	["milestones", 0],
 	["milestones", 0, "criteria", 0],
 	["cashflow"],

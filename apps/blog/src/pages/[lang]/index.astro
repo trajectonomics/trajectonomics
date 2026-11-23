@@ -1,0 +1,19 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import FrontPage from "../../components/FrontPage.astro"
+import { type Language, PREFIXED_LANGUAGES } from "../../lib/languages"
+
+/** One front page per prefixed Language Tree, such as `/th/`. */
+export function getStaticPaths() {
+	return PREFIXED_LANGUAGES.map((lang) => ({ params: { lang }, props: { language: lang } }))
+}
+
+interface Props {
+	readonly language: Language
+}
+
+const { language } = Astro.props
+---
+
+<FrontPage language={language} />

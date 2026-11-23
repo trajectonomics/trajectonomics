@@ -1,12 +1,12 @@
 import { labelSetsSentence } from "../tax/labels"
-import { cappedPrepaymentShape, deriveShape, prepaymentsShape } from "./flow-parts"
+import { cappedPrepaymentShape, deriveShape, levelShape, prepaymentsShape } from "./flow-parts"
 import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UNITS } from "./terms"
 
-/** One Stream, Event or Contribution, with the unit of every number it states. */
+/** One income, expense, contribution or withdrawal Flow, with the unit of every number it states. */
 export const flowShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One Stream, Event or Contribution. `earned` is required on an income Flow and `target` on a contribution Flow; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount` and `derive` is required, the first bringing `growth` with it.",
+		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
 	properties: {
 		id: {
 			type: "string",
@@ -15,7 +15,7 @@ export const flowShape: Record<string, unknown> = {
 		kind: {
 			enum: [...FLOW_KINDS],
 			description:
-				"`income` earns, `expense` spends, and `contribution` moves money into the Account its `target` names.",
+				"`income` earns, `expense` spends, `contribution` moves money into the Account its `target` names, and `withdrawal` borrows from the liability its `source` names.",
 		},
 		frequency: {
 			enum: [...FREQUENCIES],
@@ -29,7 +29,7 @@ export const flowShape: Record<string, unknown> = {
 		},
 		amount: {
 			type: "integer",
-			description: `${MINOR_UNITS} The same figure every occurrence, grown from \`start\` by \`growth\`. Required unless the Flow states \`derive\`.`,
+			description: `${MINOR_UNITS} The same figure every occurrence, grown from \`start\` by \`growth\`. Required unless the Flow states \`derive\` or \`level\`.`,
 		},
 		growth: {
 			anyOf: [
@@ -47,7 +47,7 @@ export const flowShape: Record<string, unknown> = {
 				},
 			],
 			description:
-				'The yearly step applied to `amount` from `start`. Required wherever `amount` is stated, a `once` Flow included, where `{ "bps": 0 }` means no step; a Flow that states `derive` forbids it.',
+				'The yearly step applied to `amount` from `start`. Required wherever `amount` is stated, a `once` Flow included, where `{ "bps": 0 }` means no step; a Flow that states `derive` or `level` forbids it.',
 		},
 		earned: {
 			type: "boolean",
@@ -66,7 +66,13 @@ export const flowShape: Record<string, unknown> = {
 		},
 		derive: {
 			...deriveShape,
-			description: `${deriveShape["description"]} Required unless the Flow states \`amount\`, which it replaces along with \`growth\`.`,
+			description: `${deriveShape["description"]} Required unless the Flow states \`amount\` or \`level\`.`,
+		},
+		level: levelShape,
+		source: {
+			type: "string",
+			description:
+				"Withdrawal only: the liability Account the money is borrowed from. Its amount owed grows by each landed amount, and the same cash lands in cashflow, so net worth does not move. It is not income, and it must be a liability.",
 		},
 		startAt: {
 			type: "string",

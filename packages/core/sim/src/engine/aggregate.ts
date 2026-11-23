@@ -1,5 +1,6 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
+import { addTo } from "./add"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import { addIncome } from "./levy-prepaid"
@@ -16,6 +17,10 @@ export interface DayFlows {
 	readonly income: bigint
 	readonly expense: bigint
 	readonly contributionEntries: readonly ContributionEntry[]
+	/** Planned withdrawals on this date, by the liability each one borrows from. */
+	readonly plannedBySource: ReadonlyMap<AccountId, bigint>
+	/** Planned withdrawals on this date, summed. Not income and not Available cashflow. */
+	readonly withdrawals: bigint
 	/** Planned gross income by Tally label. */
 	readonly gross: ReadonlyMap<string, bigint>
 	readonly prepaid: bigint
@@ -32,6 +37,8 @@ interface Totals {
 	readonly gross: Map<string, bigint>
 	readonly prepaidByLevy: Map<string, bigint>
 	readonly contributionEntries: ContributionEntry[]
+	readonly plannedBySource: Map<AccountId, bigint>
+	withdrawals: bigint
 }
 
 function takeIncome(
@@ -50,6 +57,23 @@ function takeIncome(
 	return taken.problem
 }
 
+/** Adds one Occurrence's amount to the day's totals under the kind of its Flow. */
+function takeFlow(
+	totals: Totals,
+	flow: DatedEvent["flow"],
+	amount: bigint,
+	views: readonly SettlementPeriodView[],
+	date: DateString,
+): ProjectionProblem | undefined {
+	if (flow.kind === "income") return takeIncome(totals, flow, amount, views, date)
+	if (flow.kind === "expense") totals.expense += amount
+	else if (flow.kind === "withdrawal") {
+		addTo(totals.plannedBySource, flow.source, amount)
+		totals.withdrawals += amount
+	} else totals.contributionEntries.push({ target: flow.target, amount, label: flow.label })
+	return undefined
+}
+
 /** Sums one Occurrence's flows, separating Prepayment and Tally labels from the cash amounts. */
 export function aggregate(
 	events: readonly DatedEvent[],
@@ -64,18 +88,13 @@ export function aggregate(
 		gross: new Map(),
 		prepaidByLevy: new Map(),
 		contributionEntries: [],
+		plannedBySource: new Map(),
+		withdrawals: 0n,
 	}
 	for (const event of events) {
-		const flow = event.flow
-		const amount = event.amount ?? planned.derived.get(flow.id) ?? 0n
-		if (flow.kind === "income") {
-			const problem = takeIncome(totals, flow, amount, views, date)
-			if (problem !== undefined) return { ...totals, problem }
-		} else if (flow.kind === "expense") {
-			totals.expense += amount
-		} else {
-			totals.contributionEntries.push({ target: flow.target, amount, label: flow.label })
-		}
+		const amount = event.amount ?? planned.derived.get(event.flow.id) ?? 0n
+		const problem = takeFlow(totals, event.flow, amount, views, date)
+		if (problem !== undefined) return { ...totals, problem }
 	}
 	return totals
 }

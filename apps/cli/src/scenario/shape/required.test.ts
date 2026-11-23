@@ -19,6 +19,10 @@ const SALARY = (EXAMPLE["flows"] as Record<string, unknown>[])[0] as Record<stri
  */
 const FULL: Record<string, unknown> = {
 	...EXAMPLE,
+	accounts: [
+		...(EXAMPLE["accounts"] as Record<string, unknown>[]),
+		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
+	],
 	flows: [
 		{
 			...SALARY,
@@ -32,6 +36,23 @@ const FULL: Record<string, unknown> = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			derive: { measures: [{ id: "base", op: "const", value: 100 }], result: "base" },
+		},
+		{
+			id: "borrow",
+			kind: "withdrawal",
+			source: "loan",
+			frequency: "once",
+			start: "2026-02-01",
+			amount: 1,
+			growth: { bps: 0 },
+		},
+		{
+			id: "car",
+			kind: "contribution",
+			target: "car-loan",
+			frequency: "monthly",
+			start: "2026-01-01",
+			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
 		},
 	],
 	levies: [
