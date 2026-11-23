@@ -36,6 +36,8 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 The organisation's goals are in [`org/goals/GOALS.md`](org/goals/GOALS.md). Read them before proposing a new direction. Only the owner edits that file; never edit it.
 
+Product, growth and roadmap research lives in `research/` in the private `trajectonomics/marketing` repository, which replaced the retired `trajectonomics/growth`. Research that names a competitor stays there, never in this public repository.
+
 ## Owner
 
 Saving the owner's attention is part of the job, so finish a task instead of asking about it.
