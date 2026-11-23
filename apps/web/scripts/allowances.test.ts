@@ -39,6 +39,13 @@ describe("a reread body is a closed shape", () => {
 			expect(await refused(body)).toMatchObject({ status: 400, ok: false, code: "invalid_reread" })
 		}
 	})
+
+	test("a step of one major unit or less is refused before it is kept, as the CLI refuses it", async () => {
+		for (const step of ["0", "1", "1.00", "0.5"]) {
+			const body = JSON.stringify({ allowances: { ...INPUTS, step } })
+			expect(await refused(body)).toMatchObject({ status: 400, ok: false })
+		}
+	})
 })
 
 describe("the allowances of a hand-worked Thai year", () => {
@@ -75,8 +82,10 @@ describe("the allowances of a hand-worked Thai year", () => {
 				extra: "110000.00",
 				saving: "5500.00",
 			})
-			// No contribution carries the ThaiESG label, so that suggestion has no Account and says why.
-			expect(view.current?.addable).toBe(false)
+			// No contribution carries the ThaiESG label, so that suggestion has no Account and says why,
+			// while the RMF one still has its Account and is offered.
+			expect(view.current?.addable).toBe(true)
+			expect(view.current?.unplaced.map((one) => one.name)).toEqual(["ThaiESG"])
 			expect(esg?.hint).toContain("No contribution of this plan carries allowance.thai_esg")
 		},
 		SLOW_MS,
@@ -85,7 +94,8 @@ describe("the allowances of a hand-worked Thai year", () => {
 	test(
 		"a step the CLI refuses stays in the Snapshot as that read's own error, and the plan is kept",
 		async () => {
-			const answer = await post("reread", { allowances: { ...INPUTS, step: "1" } })
+			// THB has two decimal places, so the CLI refuses a third; a step of one unit or less never gets this far.
+			const answer = await post("reread", { allowances: { ...INPUTS, step: "1000.123" } })
 			const { reads } = snapshotOf(answer)
 			expect(reads.allowances[PLAN]?.ok).toBe(false)
 			expect(reads.projections[PLAN]?.ok).toBe(true)

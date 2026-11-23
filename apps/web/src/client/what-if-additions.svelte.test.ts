@@ -61,7 +61,7 @@ describe("trying a suggestion as a what-if", () => {
 			reads: { projection: read, fi: read, compare: read, chance: null },
 		})
 		await settle(50)
-		expect(bar()).toContain("The flow cannot pay into that Account.")
+		expect(bar().match(/The flow cannot pay into that Account\./g)).toHaveLength(1)
 	})
 
 	test("items for another plan are refused and ask first, as a switch does", () => {

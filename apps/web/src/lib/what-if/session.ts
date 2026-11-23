@@ -3,7 +3,7 @@
  * the Sets and Removals the person has made. Pure: a reducer per change, and the words that name each
  * change. Nothing here is stored; the client module holds the value for the length of the tab.
  */
-import { type Addition, additionId, additionPath } from "./additions"
+import { type Addition, additionId, additionPath, additionWords } from "./additions"
 import type { Json, SetChange } from "./overrides"
 
 export type WhatIf = {
@@ -65,7 +65,7 @@ export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
 /** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
 export type Change =
 	| { kind: "off"; path: string; label: string }
-	| { kind: "add"; path: string; label: string }
+	| { kind: "add"; path: string; label: string; title: string }
 	| { kind: "set"; path: string; label: string; value: string }
 
 /** The item name a path names: `flows.gym.amount` names `gym`, shown as `Gym`. */
@@ -93,7 +93,8 @@ export function changesOf(whatIf: WhatIf): Change[] {
 		(one): Change => ({
 			kind: "add",
 			path: additionPath(one),
-			label: `Added ${one.list.replace(/s$/, "")} ${additionId(one)}`,
+			label: additionWords(one),
+			title: `Added ${one.list.replace(/s$/, "")} ${additionId(one)}`,
 		}),
 	)
 	const sets = whatIf.sets.map((set): Change => {

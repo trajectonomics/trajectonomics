@@ -16,6 +16,8 @@ class EditSession {
 	token = $state<string | null>(null)
 	busy = $state(false)
 	error = $state<string | null>(null)
+	/** Who sent the last request, so only that control shows its error: "form", or a year's key. */
+	source = $state<string>("form")
 	/** The CLI's error envelope of the last refused Edit, so a form can show it at the field it names. */
 	failure = $state<ErrorBody | null>(null)
 	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
@@ -36,9 +38,10 @@ class EditSession {
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
-	async run(edit: EditInput): Promise<boolean> {
+	async run(edit: EditInput, source = "form"): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
+		this.source = source
 		this.error = null
 		this.failure = null
 		this.stale = false
@@ -67,6 +70,7 @@ class EditSession {
 	async reread(allowances?: AllowancePlan | null): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
+		this.source = "form"
 		this.error = null
 		try {
 			const response = await fetch(REREAD_PATH, {

@@ -57,6 +57,23 @@ describe("the inputs the person types", () => {
 		})
 	})
 
+	test("a step of one major unit or less is refused at the Step field, and a larger one is taken", () => {
+		const step = (text: string) =>
+			planFromDraft([{ label: RMF, name: "RMF", on: true }], {
+				step: text,
+				budget: "",
+				minSaving: "",
+			})
+		for (const text of ["0", "00", "0.5", "1", "1.0", "01", "1.000000"]) {
+			const result = step(text)
+			expect(result.ok).toBe(false)
+			if (!result.ok) expect(result.problems.step).toContain("larger than one major unit")
+		}
+		for (const text of ["2", "1.01", "01.5", "10", "1000", "1000.50", "0010"]) {
+			expect(step(text).ok).toBe(true)
+		}
+	})
+
 	test("each field with a problem says so at its own field", () => {
 		const result = planFromDraft(orderOf(null), { step: "a lot", budget: "-5", minSaving: "101" })
 		expect(result.ok).toBe(false)
@@ -93,11 +110,25 @@ describe("the reading of one allowances result", () => {
 		expect(rmf?.why).toBe("No more is saved: the cap is reached or the tax stops falling.")
 	})
 
-	test("a year with a target for every Flow can be added; one without says which Account to add first", () => {
-		expect(allowancesView(GOLDEN_ALLOWANCES).current?.addable).toBe(true)
+	test("a year offers the Flows that have an Account and lists the ones that do not with their hint", () => {
+		const whole = allowancesView(GOLDEN_ALLOWANCES).current
+		expect(whole?.addable).toBe(true)
+		expect(whole?.unplaced).toEqual([])
 		const lacking = allowancesView(withoutTarget()).current
-		expect(lacking?.addable).toBe(false)
-		expect(lacking?.hints[0]).toContain("Pick the asset Account")
+		expect(lacking?.addable).toBe(true)
+		expect(lacking?.placeable.map((flow) => flow.id)).toEqual(["esg-fund-thai-esg-2026"])
+		expect(lacking?.unplaced).toHaveLength(1)
+		expect(lacking?.unplaced[0]?.name).toBe("RMF")
+		expect(lacking?.unplaced[0]?.hint).toContain("Pick the asset Account")
+		const none = withoutTarget()
+		for (const row of none.allowances) delete row.flow?.target
+		expect(allowancesView(none).current?.addable).toBe(false)
+	})
+
+	test("the estimate sentence is said once: the CLI's note stands, ours is added only when it is missing", () => {
+		const said = (notes: readonly string[]) => notes.filter((note) => /tax advice/i.test(note))
+		expect(said(allowancesView(GOLDEN_ALLOWANCES).notes)).toHaveLength(1)
+		expect(said(allowancesView({ ...GOLDEN_ALLOWANCES, notes: [] }).notes)).toHaveLength(1)
 	})
 
 	test("SSF is stated as no longer deductible and never as a missed saving", () => {

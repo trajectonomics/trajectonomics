@@ -46,5 +46,5 @@ async function read(event: SubmitEvent): Promise<void> {
 	<button type="submit" disabled={editSession.busy} class="rounded-md border border-border bg-card px-3 py-1.5 text-sm outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50">
 		{editSession.busy ? "Reading…" : "Read the allowances"}
 	</button>
-	{#if editSession.error !== null}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
+	{#if editSession.error !== null && editSession.source === "form"}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
 </form>

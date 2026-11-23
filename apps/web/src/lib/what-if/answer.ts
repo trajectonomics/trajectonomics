@@ -5,6 +5,7 @@
  */
 import { z } from "zod"
 import { type ErrorBody, errorBody, readOf } from "../contract"
+import { additionPath } from "./additions"
 import type { WhatIf } from "./session"
 
 const anyRead = readOf(z.unknown())
@@ -57,7 +58,9 @@ export function pathNamed(error: ErrorBody): string | null {
 export function namesChange(error: ErrorBody, whatIf: WhatIf, path: string): boolean {
 	return (
 		pathNamed(error) === path &&
-		(whatIf.removals.includes(path) || whatIf.sets.some((set) => set.path === path))
+		(whatIf.removals.includes(path) ||
+			whatIf.sets.some((set) => set.path === path) ||
+			whatIf.additions.some((one) => additionPath(one) === path))
 	)
 }
 

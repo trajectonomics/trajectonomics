@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { ProjectionAllowances, ScenarioDocument } from "../../lib/contract"
-import { allowancesView, ESTIMATE_NOTE } from "../../lib/view/allowances"
+import { allowancesView } from "../../lib/view/allowances"
 import EmptyState from "../ui/EmptyState.svelte"
 import LaterYears from "./LaterYears.svelte"
 import YearCard from "./YearCard.svelte"
@@ -35,6 +35,5 @@ const view = $derived(allowancesView(data))
 	{/if}
 	<ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
 		{#each view.notes as note, index (index)}<li>{note}</li>{/each}
-		<li>{ESTIMATE_NOTE}</li>
 	</ul>
 </div>

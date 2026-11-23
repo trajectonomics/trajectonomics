@@ -7,7 +7,7 @@ import type {
 import { allowanceName, SSF_LABEL } from "../../contract/allowance-labels"
 import { formatDate } from "../../format"
 import { type AssumptionLine, assumptionLines } from "../tax/assumptions"
-import { SSF_WORDS, STOP_WORDS } from "./words"
+import { ESTIMATE_NOTE, SSF_WORDS, STOP_WORDS } from "./words"
 
 /** One allowance in one tax year, as the page reads it. An SSF line has words and no figure (tax ADR 0007). */
 export interface LineView {
@@ -34,7 +34,11 @@ export interface YearView {
 	readonly lines: readonly LineView[]
 	/** The Flows that apply the year's suggestions. */
 	readonly flows: readonly AllowanceFlow[]
-	/** True when there is a Flow to add and each has an Account to go into. */
+	/** The Flows with an Account to go into: the ones Try and Add offer. */
+	readonly placeable: readonly AllowanceFlow[]
+	/** The suggestions with no Account, each with the CLI's hint, so the year says which to add. */
+	readonly unplaced: readonly { readonly name: string; readonly hint: string }[]
+	/** True when at least one Flow has an Account to go into. */
 	readonly addable: boolean
 	readonly hints: readonly string[]
 }
@@ -67,6 +71,12 @@ function lineOf(row: AllowanceRow): LineView {
 function yearOf(year: AllowanceYear, rows: readonly AllowanceRow[]): YearView {
 	const lines = rows.filter((row) => row.levy === year.levy && row.from === year.from).map(lineOf)
 	const flows = lines.flatMap((line) => (line.flow === undefined ? [] : [line.flow]))
+	const placeable = flows.filter((flow) => flow.target !== undefined)
+	const unplaced = lines.flatMap((line) =>
+		line.flow !== undefined && line.flow.target === undefined
+			? [{ name: line.name, hint: line.hint ?? "" }]
+			: [],
+	)
 	return {
 		key: `${year.levy}:${year.from}`,
 		levy: year.levy,
@@ -77,7 +87,9 @@ function yearOf(year: AllowanceYear, rows: readonly AllowanceRow[]): YearView {
 		saving: year.saving,
 		lines,
 		flows,
-		addable: flows.length > 0 && flows.every((flow) => flow.target !== undefined),
+		placeable,
+		unplaced,
+		addable: placeable.length > 0,
 		hints: lines.flatMap((line) => (line.hint === undefined ? [] : [line.hint])),
 	}
 }
@@ -95,6 +107,8 @@ export function allowancesView(data: ProjectionAllowances): AllowancesView {
 		current: years[currentAt] ?? null,
 		later: years.filter((_, index) => index !== currentAt),
 		assumptions: assumptionLines(data.taxYears),
-		notes: data.notes,
+		notes: data.notes.some((note) => /tax advice/i.test(note))
+			? data.notes
+			: [...data.notes, ESTIMATE_NOTE],
 	}
 }

@@ -5,6 +5,7 @@
  * `--add=<list>=`, so no value can be read as a flag; its id passes the plan-name rules all the same.
  */
 import { z } from "zod"
+import { allowanceName } from "../contract/allowance-labels"
 import { planNameShapeError } from "../edit/name"
 import { type Json, jsonValue } from "./json"
 
@@ -48,3 +49,16 @@ export const additionsSchema = z
 	.refine((all) => new Set(all.map((one) => additionPath(one))).size === all.length, {
 		message: "an item is added more than once",
 	})
+
+/**
+ * How the session's list names an Addition: an allowance's Flow reads "Added RMF contribution, 2026" from its
+ * own label and start year, any other item "Added flow <id>". Text only; the id stays in the change's `title`.
+ */
+export function additionWords(addition: Addition): string {
+	const { label, start } = addition.item
+	const name = typeof label === "string" ? allowanceName(label) : null
+	if (name === null || name === label || typeof start !== "string") {
+		return `Added ${addition.list.replace(/s$/, "")} ${additionId(addition)}`
+	}
+	return `Added ${name} contribution, ${start.slice(0, 4)}`
+}

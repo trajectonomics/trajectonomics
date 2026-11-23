@@ -18,7 +18,7 @@ let { lines, currency }: Props = $props()
 			{#if line.ssf}
 				<p class="mt-1 text-muted-foreground">{line.why}</p>
 			{:else}
-				<dl class="mt-2 grid grid-cols-3 gap-2">
+				<dl class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
 					<div><dt class="text-muted-foreground">Planned</dt><dd><Money amount={line.planned} {currency} /></dd></div>
 					<div><dt class="text-muted-foreground">Could take more</dt><dd><Money amount={line.extra} {currency} /></dd></div>
 					<div><dt class="text-muted-foreground">Saves</dt><dd><Money amount={line.saving} {currency} /></dd></div>

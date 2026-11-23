@@ -131,7 +131,12 @@ describe("the session's Additions", () => {
 		const session = withAddition(startWhatIf("base", HASH), ADD)
 		expect(hasChanges(session)).toBe(true)
 		expect(changesOf(session)).toEqual([
-			{ kind: "add", path: "flows.rmf-fund-rmf-2026", label: "Added flow rmf-fund-rmf-2026" },
+			{
+				kind: "add",
+				path: "flows.rmf-fund-rmf-2026",
+				label: "Added RMF contribution, 2026",
+				title: "Added flow rmf-fund-rmf-2026",
+			},
 		])
 		expect(overridesOf(session).additions).toEqual([ADD])
 	})
