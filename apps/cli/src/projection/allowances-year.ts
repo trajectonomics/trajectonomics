@@ -25,10 +25,17 @@ export type YearInput = {
 	period: SettlementPeriod
 	request: AllowanceRequest
 	labels: readonly string[]
+	/** The Flow ids in use: the plan's, and those of the suggestions already made. */
+	taken: Set<string>
 }
 
-const NO_TARGET_HINT = (label: string): string =>
-	`No contribution of this plan carries ${label}. Add the asset Account that will hold it to the Scenario, then add this Flow with that Account as its target.`
+/** Why a suggestion has no target Account, and what the caller does about it (cli ADR-0061). */
+function noTargetHint(label: string, withdrawn: readonly string[]): string {
+	if (withdrawn.length > 0) {
+		return `The contribution of this plan that carries ${label} pays into ${withdrawn.join(", ")}, which the plan draws from (cashflow.withdraw), and the engine refuses a lump sum into it. Take the Account out of cashflow.withdraw, or add another asset Account for the purchase, then add this Flow with that Account as its target.`
+	}
+	return `No contribution of this plan carries ${label}. Pick the asset Account that will hold it, adding one to the Scenario if none fits, then add this Flow with that Account as its target.`
+}
 
 /** The engine's options for one year: the caller's, plus the Scenario's inflation and the step bound. */
 function optionsOf(input: YearInput) {
@@ -52,7 +59,8 @@ export function yearOf(input: YearInput): YearRows | AppError {
 	if (!said.ok)
 		return allowancesRefusal(said.problem, { levy: report.id, period, request: input.request })
 	const rows = said.labels.map((item): AllowanceRowView => {
-		const target = targetOf(placed.document.flows, item.label)
+		const found = targetOf(placed.document.flows, item.label, placed.document.cashflow.withdraw)
+		const target = found.target
 		const row = {
 			levy: report.id,
 			from: period.from,
@@ -70,9 +78,10 @@ export function yearOf(input: YearInput): YearRows | AppError {
 			to: period.to,
 			asOf: placed.timeline.start,
 			target,
+			taken: input.taken,
 		})
 		return target === undefined
-			? { ...row, flow, hint: NO_TARGET_HINT(item.label) }
+			? { ...row, flow, hint: noTargetHint(item.label, found.withdrawn) }
 			: { ...row, flow }
 	})
 	// The year's saving is the engine's own label savings added: its exact identity with

@@ -53,10 +53,20 @@ function basisPointsOf(text: string): number | AppError {
 	return bps
 }
 
+/** An amount flag the CLI cannot read, in the leaf's own sentence and with a hint (cli ADR-0061). */
+function unreadable(flag: string, path: string, text: string, error: AppError): AppError {
+	const places = error.body.code === "INVALID_AMOUNT"
+	return fail("invalid_input", {
+		path,
+		message: `${flag}: "${text}" is not an amount in major units${places ? " with no more decimal places than the Currency has" : ""}.`,
+		hint: "Give a plain decimal in major units, such as 1000 or 1000.50, with no thousands separator.",
+	})
+}
+
 /** The step, which must be larger than one major unit: the engine's grain cannot tell a cap's end from a flat step otherwise. */
 function stepOf(text: string, currency: string, grain: number): number | AppError {
 	const step = parseMinorUnits(text, currency, "step")
-	if (isAppError(step)) return step
+	if (isAppError(step)) return unreadable("--step", "step", text, step)
 	if (step <= grain) {
 		return fail("invalid_input", {
 			path: "step",
@@ -69,7 +79,7 @@ function stepOf(text: string, currency: string, grain: number): number | AppErro
 
 function budgetOf(text: string, currency: string): number | AppError {
 	const budget = parseMinorUnits(text, currency, "budget")
-	if (isAppError(budget)) return budget
+	if (isAppError(budget)) return unreadable("--budget", "budget", text, budget)
 	if (budget < 0) {
 		return fail("invalid_input", {
 			path: "budget",

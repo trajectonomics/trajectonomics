@@ -38,7 +38,13 @@ function leftOut(period: SettlementPeriod, placed: Placed): string | undefined {
 }
 
 /** What every tax year of every Levy gave, and the sentences for the years left out. */
-type Years = { taxYears: AllowanceYearView[]; allowances: AllowanceRowView[]; left: string[] }
+type Years = {
+	taxYears: AllowanceYearView[]
+	allowances: AllowanceRowView[]
+	left: string[]
+	/** The Flow ids the plan uses and the suggestions have taken. */
+	taken: Set<string>
+}
 
 function scanLevy(input: {
 	placed: Placed
@@ -57,7 +63,7 @@ function scanLevy(input: {
 			into.left.push(left)
 			continue
 		}
-		const found = yearOf({ placed, levy, report, period, request, labels })
+		const found = yearOf({ placed, levy, report, period, request, labels, taken: into.taken })
 		if (isAppError(found)) return found
 		into.taxYears.push(found.year)
 		into.allowances.push(...found.rows)
@@ -78,7 +84,8 @@ export function allowancesOf(placed: Placed, request: AllowanceRequest): Allowan
 	if (unread !== undefined) return unread
 	const result = project(placed.baseline, placed.document, placed.timeline)
 	if (!result.ok) return refusal(result.problems)
-	const into: Years = { taxYears: [], allowances: [], left: [] }
+	const taken = new Set(placed.document.flows.map((flow) => flow.id))
+	const into: Years = { taxYears: [], allowances: [], left: [], taken }
 	for (const report of result.projection.levies ?? []) {
 		const levy = levies.find((it) => it.id === report.id)
 		if (levy === undefined) continue

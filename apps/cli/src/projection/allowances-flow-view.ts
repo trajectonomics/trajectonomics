@@ -22,7 +22,7 @@ export const allowanceFlow: z.ZodType<AllowanceFlow> = z.strictObject({
 	id: z
 		.string()
 		.describe(
-			"`<target>-<label suffix>-<year>`: the Account, the label's last dot-separated part with `_` as `-`, and the tax year's last year. Without a target the id has no first part. The Dashboard reads it as a convention (cli ADR-0061).",
+			"`<target>-<label suffix>-<year>`: the Account, the label's last dot-separated part with `_` as `-`, and the tax year's last year. Without a target the id has no first part. A `-2`, `-3`, ... follows when the plan or an earlier suggestion already uses the id. The Dashboard reads it as a convention (cli ADR-0061).",
 		),
 	kind: z.literal("contribution").describe("Always a contribution."),
 	funding: z

@@ -71,7 +71,7 @@ export function allowancesRefusal(problem: ProjectionProblem, where: Where): App
 		const option = OPTION_FLAGS[key]
 		return fail("invalid_input", {
 			path: option?.path ?? "labels",
-			message: `${option?.flag ?? "The flags"}: the engine refused this input (${problem.code}).`,
+			message: `${option?.flag ?? "The flags"}: the engine did not accept this value; --labels, --step, --budget and --min-saving must be a list of labels, an amount larger than one unit, an amount of zero or more, and a percent from 0 to 100.`,
 			hint: "Check --labels, --step, --budget and --min-saving against traj schema projection allowances.",
 			details: {
 				code: problem.code,

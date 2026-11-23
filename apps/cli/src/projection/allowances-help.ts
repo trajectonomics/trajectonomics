@@ -1,6 +1,6 @@
 /** The method in the words a help page prints: what runs, and what the result does not say. */
 export const ALLOWANCES_METHOD: string =
-	"Runs the Scenario, then for each whole tax year after the As-of raises each contribution label, in the order given, by whole steps while a step still lowers the Levy's tax, never past a cap and within the budget. It reports the tax now and with every suggestion, and per label what is planned, how much more fits, what it saves and why it stopped. It writes nothing: each suggestion is a contribution Flow the caller applies. The figures are one plan's own tax rules, not tax advice, and each fund's holding rules are not checked."
+	"Runs the Scenario, then for each whole tax year the Projection holds (the current year included, a part of a year and a year that ended before the As-of left out) raises each contribution label, in the order given, by whole steps while a step still lowers the Levy's tax, never past a cap and within the budget. It reports the tax now and with every suggestion, and per label what is planned, how much more fits, what it saves and why it stopped. It writes nothing: each suggestion is a contribution Flow the caller applies. The figures are one plan's own tax rules, not tax advice, and each fund's holding rules are not checked."
 
 /** The examples `help-examples.test.ts` runs in order on the base plan with the Thai Levy (cli ADR-0043). */
 export const ALLOWANCES_EXAMPLES: readonly { command: string; description: string }[] = [

@@ -61,8 +61,10 @@ describe("projection allowances refuses what it cannot answer", () => {
 
 	it.each([
 		["--step", "1,000", "--step", 2],
-		// More places than the Currency has is INVALID_AMOUNT, as `tx add --amount` gives it (cli ADR-0047).
-		["--step", "10.001", "step", 3],
+		// More places than the Currency has is this leaf's own refusal, with the flag and a hint (cli ADR-0061).
+		["--step", "10.001", "--step", 2],
+		["--step", "1000.005", "--step", 2],
+		["--budget", "1.005", "--budget", 2],
 		["--budget", "-1", "--budget", 2],
 		["--budget", "ten", "--budget", 2],
 		["--min-saving", "101", "--min-saving", 2],
@@ -75,5 +77,17 @@ describe("projection allowances refuses what it cannot answer", () => {
 		const res = await allowances(home, withFlag(flag, value))
 		expect(res.code).toBe(code)
 		expect(errorOf(res).path).toBe(path)
+	})
+
+	it.each([
+		["--step", "1000.005"],
+		["--budget", "1.005"],
+	])("says %s %s has too many decimal places, with the flag and a hint", async (flag, value) => {
+		const home = await allowancesHome()
+		const error = errorOf(await allowances(home, withFlag(flag, value)))
+		expect(error.code).toBe("invalid_input")
+		expect(error.message).toStartWith(`${flag}: "${value}"`)
+		expect(error.message).toContain("decimal places")
+		expect(error.hint).toContain("major units")
 	})
 })

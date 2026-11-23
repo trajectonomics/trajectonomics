@@ -216,7 +216,7 @@ Dashboard, as a page of its own.
 > **Ships in 0.8.0.**
 
 `traj projection allowances` reads a Scenario that has a tax Levy and says, for each
-whole tax year after the As-of, how much more of each contribution label (RMF, ThaiESG
+whole tax year the Projection holds, how much more of each contribution label (RMF, ThaiESG
 and the others the Levy reads) would still lower the tax, and by how much. You name the
 labels in the order they should fill with `--labels`, and the size of one step with
 `--step`, in major units: the CLI ships no default. `--budget` caps what the extra
@@ -224,7 +224,10 @@ contributions may add up to in a year, and `--min-saving` is the least percent o
 a step must save. Each suggestion comes with the contribution Flow that would apply it,
 which you add to the Scenario yourself: the command writes nothing. The figures are one
 plan's own tax rules, an estimate and not tax advice, and each fund's holding rules are
-not checked. `traj schema projection allowances` describes the result.
+not checked. A year that ended before the As-of, and a year the horizon cuts short, are left out; the
+current year is included, and when the As-of falls mid-year it needs `--carry-in`, the
+record of what was already contributed in that year earlier. `traj schema projection allowances`
+describes the result.
 
 ## Money as decimals in a Scenario
 
