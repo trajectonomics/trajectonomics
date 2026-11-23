@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs"
 import { project } from "../engine/project"
 import { chanceOfSuccess, financialIndependence } from "../index"
 import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
+import { ASSET_TRADE_PARITY_CASES } from "./asset-trade-cases"
 import { CASHFLOW_PARITY_CASES } from "./cashflow-parity-cases"
 import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
 import { PARITY_CASES } from "./parity-cases"
@@ -16,6 +17,7 @@ const ALL_PARITY_CASES = [
 	...CATEGORY_PARITY_CASES,
 	...CASHFLOW_PARITY_CASES,
 	...REAL_ASSET_PARITY_CASES,
+	...ASSET_TRADE_PARITY_CASES,
 ]
 
 interface Recorded {

@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import { project } from "../src/engine/project"
+import { ASSET_TRADE_PARITY_CASES } from "../src/golden/asset-trade-cases"
 import { CASHFLOW_PARITY_CASES } from "../src/golden/cashflow-parity-cases"
 import { CATEGORY_PARITY_CASES } from "../src/golden/category-parity-cases"
 import { PARITY_CASES } from "../src/golden/parity-cases"
@@ -19,6 +20,7 @@ const cases = [
 	...CATEGORY_PARITY_CASES,
 	...CASHFLOW_PARITY_CASES,
 	...REAL_ASSET_PARITY_CASES,
+	...ASSET_TRADE_PARITY_CASES,
 ].map((testCase) => {
 	const { name, fixture, options, chance, projectOptions } = testCase
 	const { baseline, scenario, timeline } = fixture

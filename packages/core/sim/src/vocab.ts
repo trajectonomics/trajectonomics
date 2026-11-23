@@ -5,6 +5,8 @@ export const ACCOUNT_KINDS = ["asset", "liability"] as const
 export const COMPOUNDING_PERIODS = ["monthly", "quarterly", "semiannual", "annual"] as const
 export const FI_METHODS = ["survival", "probabilityThreshold"] as const
 export const FLOW_KINDS = ["income", "expense", "contribution", "withdrawal"] as const
+/** How a Contribution into an asset is paid: a `target` spends Available cashflow, an `obligation` is paid in full. */
+export const FUNDINGS = ["target", "obligation"] as const
 export const FREQUENCIES = [
 	"once",
 	"daily",

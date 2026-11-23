@@ -7,6 +7,7 @@ import {
 	FI_METHODS,
 	FLOW_KINDS,
 	FREQUENCIES,
+	FUNDINGS,
 	MEASURE_OPS,
 	MILESTONE_COMBINES,
 	MILESTONE_TERMS,
@@ -23,6 +24,7 @@ import { DERIVE_RULES, LEVY_RULES } from "./measure"
 /** The closed list a code names, for every code whose list does not depend on where it sits. */
 const BY_CODE: Partial<Record<ErrorCode, readonly string[]>> = {
 	INVALID_FREQUENCY: FREQUENCIES,
+	INVALID_FUNDING: FUNDINGS,
 	INVALID_COMPOUNDING: COMPOUNDING_PERIODS,
 	INVALID_RESOLUTION: RESOLUTIONS,
 	INVALID_DAY_RULE: DAY_RULES,

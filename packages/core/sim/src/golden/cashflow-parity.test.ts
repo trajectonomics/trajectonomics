@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { project } from "../engine/project"
 import type { ProjectionOptions } from "../types"
+import { ASSET_TRADE_PARITY_CASES } from "./asset-trade-cases"
 import { identitySides, rollupMismatches } from "./cashflow-check"
 import { CASHFLOW_PARITY_CASES } from "./cashflow-parity-cases"
 import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
@@ -12,6 +13,7 @@ const EVERY_CASE = [
 	...STATEMENT_PARITY_CASES,
 	...CATEGORY_PARITY_CASES,
 	...CASHFLOW_PARITY_CASES,
+	...ASSET_TRADE_PARITY_CASES,
 ]
 
 describe("the cash-flow breakdown on every parity fixture", () => {

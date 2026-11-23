@@ -18,7 +18,7 @@ in Net worth, and the measures that ask what a person can spend leave it out.
 - **Routing.** `check()` refuses an illiquid Account in `cashflow.withdraw` and in a
   `cashflow.surplus` step with `ILLIQUID_ROUTED` at the position that names it. A withdrawal cannot
   draw on it, so a Shortfall never sells it. `cashflow.contribute` is not refused: a contribution is
-  money from cashflow into the asset, not a draw on it. A planned sale is a later primitive.
+  money from cashflow into the asset, not a draw on it. A planned sale is ADR 0021.
 - **One definition.** `leftOutOfAccessible(rule, date)` in `src/engine/accessible.ts` says which
   asset values count toward Accessible net worth: a marked asset, or one still locked. Every reader
   below calls it.
@@ -80,7 +80,7 @@ Unchanged, with or without the mark:
 - A plan whose only asset is marked is refused with `SURPLUS_UNROUTED`: `cashflow.surplus` must name
   a liquid Account, and there is none. (Naming the marked Account there gives `ILLIQUID_ROUTED`.)
 - A plan whose cash runs out while its money sits in a marked asset ends in a Shortfall, with
-  `runsOut` on that date. Nothing sells the marked asset until the sale primitive (#286) lands, so the
-  money is not drawn, however large it is.
+  `runsOut` on that date. A Shortfall never sells the marked asset, however large it is; a planned sale does,
+  by a `withdrawal` from it ([ADR 0021](./0021-buy-and-sell-an-asset.md)).
 - The CLI's withdraw note does not suggest a marked Account, since `check()` would refuse it. The
   field texts that describe accessible figures now say "not locked and not marked illiquid".

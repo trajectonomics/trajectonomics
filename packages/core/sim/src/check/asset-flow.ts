@@ -1,0 +1,48 @@
+import type { Emit, Path } from "./codes"
+import { isValidDate } from "./date"
+import type { LoanIndex } from "./loan-index"
+
+/** `funding` belongs to a Contribution into an asset: a debt payment is already an obligation. */
+function checkFunding(
+	flow: Readonly<Record<string, unknown>>,
+	path: Path,
+	index: LoanIndex,
+	emit: Emit,
+): void {
+	if (!Object.hasOwn(flow, "funding")) return
+	const target = flow["target"]
+	if (typeof target === "string" && index.get(target)?.kind === "liability") {
+		emit("INVALID_FUNDING", [...path, "funding"])
+	}
+}
+
+/**
+ * A sale from an Account that is locked on the Flow's first date, with no Milestone to wait for,
+ * could never move anything on that date: `WITHDRAWAL_LOCKED` at `start`.
+ */
+function checkSaleLocked(
+	flow: Readonly<Record<string, unknown>>,
+	path: Path,
+	index: LoanIndex,
+	emit: Emit,
+): void {
+	const source = flow["source"]
+	const rule = typeof source === "string" ? index.get(source) : undefined
+	if (rule?.kind !== "asset" || Object.hasOwn(flow, "startAt")) return
+	const { lockedUntil } = rule
+	const { start } = flow
+	if (isValidDate(lockedUntil) && isValidDate(start) && start < lockedUntil) {
+		emit("WITHDRAWAL_LOCKED", [...path, "start"])
+	}
+}
+
+/** The asset rules of one Flow: what `funding` may name, and when a sale may start. */
+export function checkAssetFlow(
+	flow: Readonly<Record<string, unknown>>,
+	path: Path,
+	index: LoanIndex,
+	emit: Emit,
+): void {
+	if (flow["kind"] === "contribution") checkFunding(flow, path, index, emit)
+	if (flow["kind"] === "withdrawal") checkSaleLocked(flow, path, index, emit)
+}

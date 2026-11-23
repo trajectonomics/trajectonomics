@@ -70,7 +70,7 @@ describe("a valid loan passes check", () => {
 })
 
 describe("withdrawal refusals", () => {
-	it("refuses an asset as the source, at source", () => {
+	it("accepts an asset as the source: it is a sale (ADR 0021)", () => {
 		const flows = [
 			{
 				id: "borrow",
@@ -82,7 +82,7 @@ describe("withdrawal refusals", () => {
 				growth: { bps: 0 },
 			},
 		]
-		expect(codeAt(flows, at(0, "source"))).toBe("WITHDRAWAL_SOURCE_KIND")
+		expect(problemsOf(flows)).toEqual([])
 	})
 
 	it("refuses an undeclared source as an unknown account", () => {
@@ -174,22 +174,5 @@ describe("level payment refusals", () => {
 				at(0, "level"),
 			),
 		).toBe("FIELD_NOT_ALLOWED")
-	})
-})
-
-describe("loan refusal paths are plain data", () => {
-	it("reports a withdrawal source problem without a Projection", () => {
-		const flows = [
-			{
-				id: "borrow",
-				kind: "withdrawal",
-				source: "cash",
-				frequency: "once",
-				start: "2026-02-01",
-				amount: 500,
-				growth: { bps: 0 },
-			},
-		]
-		expect(problemsOf(flows).map((problem) => problem.code)).toEqual(["WITHDRAWAL_SOURCE_KIND"])
 	})
 })

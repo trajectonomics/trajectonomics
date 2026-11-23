@@ -54,3 +54,6 @@ into locked money.
   evaluated per Occurrence, not per month.
 - Voluntary extra debt principal stays an obligation; it is not capped by Available cashflow.
   Modelling a payment that is only made when affordable needs a separate primitive.
+- A purchase is paid even when the day's income does not cover it: a Contribution into an asset may be
+  an obligation, paid in full before Available cashflow is computed, and an asset may be sold with a
+  withdrawal. See [ADR 0021](./0021-buy-and-sell-an-asset.md).
