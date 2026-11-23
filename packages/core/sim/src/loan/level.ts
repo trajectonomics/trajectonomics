@@ -16,6 +16,7 @@ export const PERIODS_PER_YEAR: Readonly<Record<CompoundingPeriod, PeriodsPerYear
 	annual: 1,
 }
 
+/** The loan a level payment prices: its principal, nominal rate, periods per year and number of payments. */
 export interface LevelPaymentInput {
 	/** The amount borrowed, in minor units. */
 	readonly principal: MinorUnits

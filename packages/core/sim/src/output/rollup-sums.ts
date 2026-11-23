@@ -1,6 +1,7 @@
 import type { DayTotals } from "../engine/occurrence"
 import type { Period } from "./periods"
 
+/** The Flow totals of one period, in minor units: each field sums its Occurrences' amounts. */
 export interface FlowSums {
 	readonly income: bigint
 	readonly expense: bigint
@@ -10,6 +11,7 @@ export interface FlowSums {
 	readonly levy: bigint
 }
 
+/** Sums the Occurrences that land within `period`, both ends inclusive, into one set of totals. */
 export function sumFlows(totals: readonly DayTotals[], period: Period): FlowSums {
 	let income = 0n
 	let expense = 0n

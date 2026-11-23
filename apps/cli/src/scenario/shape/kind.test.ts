@@ -51,6 +51,13 @@ const FLOW_KIND_ONLY: {
 }[] = [
 	{ key: "earned", value: true, statement: "Income only", code: "UNKNOWN_KEY" },
 	{ key: "target", value: "cash", statement: "Contribution only", code: "UNKNOWN_KEY" },
+	{ key: "source", value: "debt", statement: "Withdrawal only", code: "UNKNOWN_KEY" },
+	{
+		key: "level",
+		value: { principal: 100_000, payments: 12, rounding: "halfUp" },
+		statement: "Contribution only",
+		code: "FIELD_NOT_ALLOWED",
+	},
 	{
 		key: "label",
 		value: "income.section40_1",

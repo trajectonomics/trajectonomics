@@ -19,7 +19,7 @@ principal, nominal rate and number of payments. Both keys are optional and addit
   the usual gates.
 - **Order on a date.** Planned withdrawals raise their liabilities first, in source-id order, so a
   same-date debt payment sees the amount owed the withdrawal created. Then the day's debt payments
-  are read and the cash is netted: drawn cash joins the net that pays a Shortfall or lands as surplus.
+  are read and the cash is netted: withdrawn cash joins the net that pays a Shortfall or lands as surplus.
 - **Owner decision: Available cashflow excludes withdrawn cash.** Cash from a planned withdrawal never
   counts toward Available cashflow, the ceiling on asset Contributions ([ADR 0003](./0003-cap-asset-contributions.md)).
   A loan pays for what it was raised for and the rest lands in surplus, but a plan never looks like it

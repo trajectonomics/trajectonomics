@@ -55,7 +55,7 @@ describe("a valid loan passes check", () => {
 	it("accepts a withdrawal from a liability and a level payment into one", () => {
 		const flows = [
 			{
-				id: "draw",
+				id: "borrow",
 				kind: "withdrawal",
 				source: "loan",
 				frequency: "once",
@@ -73,7 +73,7 @@ describe("withdrawal refusals", () => {
 	it("refuses an asset as the source, at source", () => {
 		const flows = [
 			{
-				id: "draw",
+				id: "borrow",
 				kind: "withdrawal",
 				source: "cash",
 				frequency: "once",
@@ -88,7 +88,7 @@ describe("withdrawal refusals", () => {
 	it("refuses an undeclared source as an unknown account", () => {
 		const flows = [
 			{
-				id: "draw",
+				id: "borrow",
 				kind: "withdrawal",
 				source: "nope",
 				frequency: "once",
@@ -181,7 +181,7 @@ describe("loan refusal paths are plain data", () => {
 	it("reports a withdrawal source problem without a Projection", () => {
 		const flows = [
 			{
-				id: "draw",
+				id: "borrow",
 				kind: "withdrawal",
 				source: "cash",
 				frequency: "once",

@@ -44,6 +44,55 @@ describe("levelPayment: hand-computed loans", () => {
 	})
 })
 
+describe("levelPayment: quarterly and annual loans", () => {
+	// 777,777 at 12.34% a year, compounded quarterly: i = 0.03085 a quarter and (1.03085)^40 ≈ 3.3710,
+	// so the payment is 777,777 × 0.03085 × 3.3710 / 2.3710 ≈ 34,112.38 minor units.
+	it.each([
+		["floor", 34_112],
+		["halfUp", 34_112],
+		["ceil", 34_113],
+	] as const)("prices 777,777 over 40 quarterly payments, %s", (rounding, expected) => {
+		expect(
+			levelPayment({
+				principal: 777_777,
+				rate: 1234,
+				periodsPerYear: 4,
+				payments: 40,
+				rounding,
+			}),
+		).toBe(expected)
+	})
+
+	// 100,000 at 5% a year, paid once a year: (1.05)^7 ≈ 1.4071, so the payment is
+	// 100,000 × 0.05 × 1.4071 / 0.4071 ≈ 17,281.98 minor units.
+	it.each([
+		["floor", 17_281],
+		["halfUp", 17_282],
+		["ceil", 17_282],
+	] as const)("prices 100,000 over 7 annual payments, %s", (rounding, expected) => {
+		expect(
+			levelPayment({ principal: 100_000, rate: 500, periodsPerYear: 1, payments: 7, rounding }),
+		).toBe(expected)
+	})
+})
+
+describe("levelPayment: an exact half", () => {
+	// 5 over 2 payments at no rate is exactly 2.5: a tie that halfUp rounds up, where floor does not.
+	it("rounds an exact half up under halfUp, and only then", () => {
+		const base = { rate: 0, ...monthly, payments: 2 } as const
+		expect(levelPayment({ ...base, principal: 5, rounding: "halfUp" })).toBe(3)
+		expect(levelPayment({ ...base, principal: 5, rounding: "floor" })).toBe(2)
+		expect(levelPayment({ ...base, principal: 5, rounding: "ceil" })).toBe(3)
+	})
+
+	// 7 over 2 payments is exactly 3.5, which halfUp takes to 4.
+	it("rounds 3.5 to 4 under halfUp", () => {
+		expect(
+			levelPayment({ principal: 7, rate: 0, ...monthly, payments: 2, rounding: "halfUp" }),
+		).toBe(4)
+	})
+})
+
 describe("levelPayment: zero rate", () => {
 	// 1,200.00 over 12 payments is exactly 100.00 each.
 	it("divides the principal evenly when the rate is zero", () => {

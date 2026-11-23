@@ -7,6 +7,7 @@ export interface LoanTarget {
 	readonly compounding: unknown
 }
 
+/** The declared Accounts a loan Flow reads, by id: the first declaration of each id wins. */
 export type LoanIndex = ReadonlyMap<string, LoanTarget>
 
 /** Declared Accounts (first declaration wins) with the fields a loan Flow reads. */

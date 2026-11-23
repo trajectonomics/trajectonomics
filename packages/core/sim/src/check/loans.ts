@@ -13,7 +13,7 @@ function checkWithdrawalSource(
 	emit("WITHDRAWAL_SOURCE_KIND", [...path, "source"])
 }
 
-/** The loan rules of one Flow: a withdrawal draws on a liability, a `level` payment is priced. */
+/** The loan rules of one Flow: a withdrawal borrows from a liability, a `level` payment is priced. */
 export function checkLoanFlow(
 	flow: Readonly<Record<string, unknown>>,
 	path: Path,

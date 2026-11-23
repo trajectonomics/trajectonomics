@@ -6,8 +6,8 @@ import { compareIds } from "./order"
 import type { StateMap } from "./state"
 
 /**
- * Raises each drawn liability by the planned withdrawal, in source id order, before the date's debt
- * payments are read: a same-date payment then sees the amount owed the draw created.
+ * Raises each liability a planned withdrawal borrows from, in source id order, before the date's
+ * debt payments are read: a same-date payment then sees the amount owed the withdrawal created.
  */
 export function applyPlannedWithdrawals(
 	states: StateMap,

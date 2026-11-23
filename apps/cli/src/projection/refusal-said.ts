@@ -1,4 +1,8 @@
-import type { ErrorCode, ProjectionProblem } from "@trajectonomics/core/sim"
+import {
+	type ErrorCode,
+	MAX_LEVEL_PAYMENTS,
+	type ProjectionProblem,
+} from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
 
 /**
@@ -75,5 +79,31 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 		message:
 			"A Levy reads tallies that no Flow, Account or Carry-in record supplies, so its tax would always be 0.",
 		hint: 'Give an income Flow the label the Levy reads (it tallies as "gross"), or state that tally in --carry-in.',
+	},
+	WITHDRAWAL_SOURCE_KIND: {
+		message: "A withdrawal borrows from a liability, and its source Account is not one.",
+		hint: "Name a liability Account as the withdrawal's source. A withdrawal from an asset is not supported yet.",
+	},
+	LEVEL_TARGET_NOT_LIABILITY: {
+		message: "A level payment repays a loan, and its target Account is not a liability.",
+		hint: "Name a liability Account with a compounding period as the target, or state the Flow as a fixed amount.",
+	},
+	LEVEL_TARGET_NOT_NOMINAL: {
+		message:
+			"A level payment is priced at a nominal rate, and its target liability states no compounding period.",
+		hint: 'Give the liability a "compounding" period, such as "monthly", or state the Flow as a fixed amount.',
+	},
+	LEVEL_FREQUENCY_MISMATCH: {
+		message:
+			"A level payment falls once per compounding period, and this Flow's frequency is not the target's.",
+		hint: "Set the Flow's frequency to the target's compounding period. A semiannual target has no matching frequency, so its loan cannot be a level payment.",
+	},
+	LEVEL_PAYMENTS_OUT_OF_RANGE: {
+		message: `The payments of a level loan must be a whole number from 1 to ${MAX_LEVEL_PAYMENTS}.`,
+		hint: "Give the number of equal payments as a whole number within that bound.",
+	},
+	LEVEL_PAYMENT_OVERFLOW: {
+		message: "A level payment is too large to state as a whole number of minor units.",
+		hint: "Lower the principal, or spread it over more payments.",
 	},
 }
