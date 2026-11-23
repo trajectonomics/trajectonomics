@@ -1,5 +1,5 @@
 import { MAX_LEVEL_PAYMENTS } from "@trajectonomics/core/sim"
-import { BASIS_POINTS, DERIVE_MEASURE_OPS, MINOR_UNITS, ROUNDINGS } from "./terms"
+import { BASIS_POINTS, DERIVE_MEASURE_OPS, PRINCIPAL_UNITS, ROUNDINGS } from "./terms"
 
 /*
  * The parts of a Flow whose keys are not simply a name and a unit: the two shapes a Levy reads a
@@ -14,7 +14,7 @@ export const levelShape: Record<string, unknown> = {
 	description:
 		"Contribution only, into a liability with a `compounding` period: the loan one level payment pays off. The payment is computed once, from `principal`, the liability's rate and `payments` equal payments, and it does not grow. It takes the place of `amount` and `growth`, and the Flow's `frequency` is that compounding period (`monthly`, `quarterly` or `annual`).",
 	properties: {
-		principal: { type: "integer", description: `${MINOR_UNITS} The amount borrowed.` },
+		principal: { type: "integer", description: `${PRINCIPAL_UNITS} The amount borrowed.` },
 		payments: {
 			type: "integer",
 			minimum: 1,

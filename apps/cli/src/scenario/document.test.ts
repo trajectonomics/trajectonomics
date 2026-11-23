@@ -66,6 +66,32 @@ describe("scenarioDocumentError", () => {
 	it("returns null for a document sim-core accepts", () => {
 		expect(scenarioDocumentError(VALID)).toBeNull()
 	})
+
+	it("states a loan refusal in words, as projection run does, and keeps its path and code", () => {
+		const draw = {
+			id: "draw",
+			kind: "withdrawal",
+			frequency: "once",
+			start: "2026-01-01",
+			amount: 100,
+			growth: { bps: 0 },
+			source: "cash",
+		}
+		const error = scenarioDocumentError({ ...VALID, flows: [...VALID.flows, draw] })
+		if (error === null) throw new Error("the document was accepted")
+		expect(error.body.path).toBe(`document.flows.${VALID.flows.length}.source`)
+		expect(error.body.message).toBe(
+			"A withdrawal borrows from a liability, and its source Account is not one.",
+		)
+		expect(error.body.hint).toContain("Name a liability Account as the withdrawal's source.")
+		expect(error.body.details).toEqual([
+			{
+				path: `document.flows.${VALID.flows.length}.source`,
+				message: `document.flows.${VALID.flows.length}.source: WITHDRAWAL_SOURCE_KIND`,
+				code: "WITHDRAWAL_SOURCE_KIND",
+			},
+		])
+	})
 })
 
 describe("scenario document validation", () => {

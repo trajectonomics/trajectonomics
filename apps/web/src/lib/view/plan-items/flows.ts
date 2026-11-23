@@ -36,8 +36,13 @@ export interface FlowCard {
 	readonly editable: boolean
 }
 
+/** Whether a Flow's amount is computed, so it has no amount the form could edit: a derived or a level one. */
+export function isComputed(flow: ScenarioFlow): boolean {
+	return flow.derive !== undefined || flow.level !== undefined
+}
+
 /** The growth of a Flow as the card shows it: inflation, or a percent a year moved from the basis points. */
-function growthText(flow: ScenarioFlow): string {
+export function growthText(flow: ScenarioFlow): string {
 	const growth = flow.growth
 	if (growth === undefined) return "No growth stated"
 	if (growth === "inflation") return "Follows inflation"
@@ -48,6 +53,12 @@ function growthText(flow: ScenarioFlow): string {
 function anchorsOf(household: HouseholdDocument | null, id: string) {
 	const labels = flowAnchorLabels(household, id)
 	return { startAnchor: labels.start, endAnchor: labels.end }
+}
+
+/** "Earned" or "Passive" for an income Flow that states it; null for any other. */
+function earnedOf(flow: ScenarioFlow, kind: FlowKind): string | null {
+	if (kind !== "income" || flow.earned === undefined) return null
+	return flow.earned ? "Earned" : "Passive"
 }
 
 /** The Flows of one kind as cards, in the order the document holds them, each with its anchors' labels. */
@@ -65,10 +76,10 @@ export function flowCards(
 			start: flow.start,
 			end: flow.end ?? "To the horizon",
 			...anchorsOf(household, flow.id),
-			growth: flow.derive === undefined ? growthText(flow) : "Computed",
-			earned:
-				kind !== "income" || flow.earned === undefined ? null : flow.earned ? "Earned" : "Passive",
-			editable: flow.derive === undefined,
+			growth: isComputed(flow) ? "Computed" : growthText(flow),
+			earned: earnedOf(flow, kind),
+			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
+			editable: !isComputed(flow) && flow.amount !== undefined,
 		}))
 }
 

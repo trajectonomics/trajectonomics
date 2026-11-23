@@ -80,9 +80,11 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 			"A Levy reads tallies that no Flow, Account or Carry-in record supplies, so its tax would always be 0.",
 		hint: 'Give an income Flow the label the Levy reads (it tallies as "gross"), or state that tally in --carry-in.',
 	},
+	// The loan rules are found by the document check alone, so `scenario apply` and the Store state
+	// these sentences too (scenarioDocumentError), as well as `projection run` on a stored row.
 	WITHDRAWAL_SOURCE_KIND: {
 		message: "A withdrawal borrows from a liability, and its source Account is not one.",
-		hint: "Name a liability Account as the withdrawal's source. A withdrawal from an asset is not supported yet.",
+		hint: "Name a liability Account as the withdrawal's source. A withdrawal from an asset is outside this version of the document.",
 	},
 	LEVEL_TARGET_NOT_LIABILITY: {
 		message: "A level payment repays a loan, and its target Account is not a liability.",

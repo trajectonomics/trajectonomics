@@ -4,6 +4,7 @@ import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../
 import { accountCards } from "../../lib/view/plan-items/accounts"
 import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
+import { loanCards } from "../../lib/view/plan-items/loans"
 import Drawer from "../ui/Drawer.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
@@ -11,6 +12,7 @@ import AccountCards from "./AccountCards.svelte"
 import AccountForm from "./AccountForm.svelte"
 import FlowCards from "./FlowCards.svelte"
 import FlowForm from "./FlowForm.svelte"
+import LoanCards from "./LoanCards.svelte"
 
 interface Props {
 	kind: PlanKind
@@ -40,6 +42,7 @@ const title = $derived(editingId === undefined ? `Add ${noun}` : `Edit ${editing
 const flowKind = $derived(kind === "expense" ? "expense" : "income")
 const cards = $derived(kind === "assets" ? [] : flowCards(doc.flows, flowKind, household))
 const accounts = $derived(accountCards(doc.accounts, baseline))
+const loans = $derived(kind === "assets" ? loanCards(doc.flows) : [])
 const existingFlow = $derived(doc.flows.find((flow) => flow.id === editingId))
 const existingAccount = $derived(doc.accounts.find((account) => account.id === editingId))
 const busy = $derived(editSession.busy)
@@ -64,6 +67,9 @@ const busy = $derived(editSession.busy)
 			<EmptyState title="No accounts in this plan" />
 		{:else}
 			<AccountCards cards={accounts} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
+		{/if}
+		{#if loans.length > 0}
+			<LoanCards cards={loans} currency={doc.currency} />
 		{/if}
 	{:else if cards.length === 0}
 		<EmptyState title="No {noun} in this plan" />

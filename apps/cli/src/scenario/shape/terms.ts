@@ -6,9 +6,14 @@ import { allowedValues, type ErrorCode, type MetricName } from "@trajectonomics/
  * stated once (ADR-0009, #151).
  */
 
-/** The unit of every money field: integer minor units, never the decimal string a result prints. */
-export const MINOR_UNITS =
-	"Integer minor units of `currency` (satang for THB): 35000 is 350.00 THB, and a Flow states it per occurrence, not per year."
+/** The head every money field's unit starts with: integer minor units, never the decimal string a result prints. */
+const MINOR_UNITS_HEAD = "Integer minor units of `currency` (satang for THB): 35000 is 350.00 THB"
+
+/** The unit of a Flow's money field: its amount, per occurrence. */
+export const MINOR_UNITS: string = `${MINOR_UNITS_HEAD}, and a Flow states it per occurrence, not per year.`
+
+/** The unit of a level loan's principal: stated once for the whole loan, so the per-occurrence tail does not apply. */
+export const PRINCIPAL_UNITS: string = `${MINOR_UNITS_HEAD}, and the principal is stated once for the whole loan, not per occurrence or per year.`
 
 /**
  * The unit of every money field in the decimal form (ADR-0047): a JSON string of the Currency's
