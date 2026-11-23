@@ -6,7 +6,7 @@ import { flagError } from "./set-parse"
 import { candidatesAt } from "./set-suggest"
 
 /*
- * `--without <path>` (cli ADR-0055): takes one id-addressed list item out of a Scenario document,
+ * `--without <path>` (cli ADR-0056): takes one id-addressed list item out of a Scenario document,
  * transiently for a Projection, persisted by `scenario fork`. The path must end at a list item by its
  * `id`; a key, a whole list or an index is refused, because `--set` is the flag that replaces a value.
  */
@@ -72,6 +72,26 @@ function removeFromList(
 	return node.map((item, at) => (at === found ? child : item))
 }
 
+/**
+ * The document's lists the core refuses empty but takes absent (sim `check()`: `MISSING_KEY` on `[]`).
+ * A removal that empties one drops its key, so switching off a plan's only Milestone or Levy works.
+ */
+const OPTIONAL_LISTS: ReadonlySet<string> = new Set(["milestones", "levies"])
+
+/** The object with its child replaced, or with the key dropped when an optional list was emptied. */
+function withChild(
+	node: Record<string, unknown>,
+	segment: string,
+	child: unknown,
+	prefix: readonly string[],
+): Record<string, unknown> {
+	const emptied = Array.isArray(child) && child.length === 0
+	if (prefix.length === 0 && emptied && OPTIONAL_LISTS.has(segment)) {
+		return Object.fromEntries(Object.entries(node).filter(([key]) => key !== segment))
+	}
+	return { ...node, [segment]: child }
+}
+
 function removeFromObject(
 	node: Record<string, unknown>,
 	depth: number,
@@ -84,5 +104,5 @@ function removeFromObject(
 	}
 	if (depth === ctx.segments.length - 1) return notAListItem(prefix, segment, ctx)
 	const child = removeAt(node[segment], depth + 1, [...prefix, segment], ctx)
-	return isAppError(child) ? child : { ...node, [segment]: child }
+	return isAppError(child) ? child : withChild(node, segment, child, prefix)
 }

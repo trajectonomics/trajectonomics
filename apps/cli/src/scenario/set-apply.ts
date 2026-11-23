@@ -12,7 +12,7 @@ import { replaceAt } from "./set-replace"
 
 /**
  * The document a command persists or projects, and the Overrides that produced it: the removals and
- * the Sets, each in command-line order (ADR-0024, cli ADR-0055).
+ * the Sets, each in command-line order (ADR-0024, cli ADR-0056).
  */
 export type AppliedOverrides = {
 	document: ScenarioDocument
@@ -71,7 +71,7 @@ function applyOne(
 
 /**
  * Applies the `--without` removals, then the `--set` Overrides, in command-line order, as one pure
- * function (ADR-0024, cli ADR-0055). It never mutates its input: each change copies the nodes on its
+ * function (ADR-0024, cli ADR-0056). It never mutates its input: each change copies the nodes on its
  * path. Under `--decimal` a Set's money value is converted here, and the echo keeps it as given.
  */
 export function applyOverrides(

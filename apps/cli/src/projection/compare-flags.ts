@@ -9,7 +9,7 @@ export const ageFlag: z.ZodOptional<z.ZodArray<z.ZodNumber>> = z
 
 /**
  * Exactly one of the second Scenario and an Override says what B is (ADR-0030): `--set` or
- * `--without` makes a what-if of A, and a second Scenario is compared as stored (cli ADR-0055).
+ * `--without` makes a what-if of A, and a second Scenario is compared as stored (cli ADR-0056).
  */
 export function whatIfProblem(
 	b: string | undefined,

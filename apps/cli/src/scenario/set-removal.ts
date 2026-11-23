@@ -6,11 +6,11 @@ import { flagError, parsePath } from "./set-parse"
 import { removeAt } from "./set-remove"
 
 /*
- * The `--without` list (cli ADR-0055): parsed, refused when repeated, then applied in command-line
+ * The `--without` list (cli ADR-0056): parsed, refused when repeated, then applied in command-line
  * order to one document. Each removal is the pure copy `set-remove.ts` makes.
  */
 
-/** Parses the `--without` paths, refusing an exact repeat, in command-line order (cli ADR-0055). */
+/** Parses the `--without` paths, refusing an exact repeat, in command-line order (cli ADR-0056). */
 export function parseWithouts(paths: readonly string[]): string[][] | AppError {
 	const parsed: string[][] = []
 	const seen = new Set<string>()

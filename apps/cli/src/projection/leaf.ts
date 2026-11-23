@@ -14,9 +14,9 @@ export type ScenarioRequest = {
 	/** The input field the name came from: `scenario`, `a` or `b`. */
 	scenarioPath: string
 	sets: readonly string[]
-	/** The `--without` paths, taken out before the Sets (cli ADR-0055). */
+	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
 	without?: readonly string[] | undefined
-	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0055). */
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
 }
 

@@ -6,7 +6,7 @@ import { flagError, type OverrideFlag } from "./set-parse"
 
 /**
  * One applied Override, in the order a command applies them: every `--without` removal, then every
- * `--set` (ADR-0024, cli ADR-0055). `flag` names the input field the Override came from.
+ * `--set` (ADR-0024, cli ADR-0056). `flag` names the input field the Override came from.
  */
 export type AppliedItem = { flag: OverrideFlag; path: string }
 

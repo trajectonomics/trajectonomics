@@ -6,7 +6,7 @@ import { formatPath } from "./path"
 import { badSet } from "./set-parse"
 
 /*
- * The decimal form of one `--set` value (cli ADR-0055): the same conversion `decimal.ts` makes for a
+ * The decimal form of one `--set` value (cli ADR-0056): the same conversion `decimal.ts` makes for a
  * whole document, applied to the value of one Scenario path. The node a path names is found by
  * walking the published schema, so a money field under `anyOf` is converted as well.
  */
@@ -66,7 +66,7 @@ function notDecimal(raw: unknown): string {
 }
 
 /**
- * One `--set` value read in the decimal form (cli ADR-0055): a value whose path names a money field
+ * One `--set` value read in the decimal form (cli ADR-0056): a value whose path names a money field
  * becomes minor units through the same exact parser `scenario apply --decimal` uses, and a value that
  * replaces an object or list converts every money field inside it. Any other value is returned as
  * given. The Override echoes the value as it was given; only the document receives the converted one.

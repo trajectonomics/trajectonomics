@@ -8,7 +8,7 @@ import { type AppliedOverrides, applyScenarioSets } from "./set-apply"
 import type { AppliedOverride } from "./set-error"
 import { view, type WrittenScenario } from "./view"
 
-/** What `scenario fork` returns: the Overrides it persisted, and the copy it wrote (cli ADR-0055). */
+/** What `scenario fork` returns: the Overrides it persisted, and the copy it wrote (cli ADR-0056). */
 export type ForkResult = {
 	dryRun: boolean
 	status: "forked"

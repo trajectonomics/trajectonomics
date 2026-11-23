@@ -18,7 +18,7 @@ import {
 export type CompareSide = {
 	scenario: ScenarioEcho
 	overrides: OverrideEcho[]
-	/** This side's `--without` removals, in command-line order (cli ADR-0055). */
+	/** This side's `--without` removals, in command-line order (cli ADR-0056). */
 	removals: string[]
 	/** This side's Carry-in, present only when it placed at least one record (ADR-0032). */
 	carryIn?: CarryInEcho[] | undefined

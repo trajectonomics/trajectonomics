@@ -22,7 +22,7 @@ export type Prepared = {
 	 */
 	document: Scenario
 	overrides: AppliedOverride[]
-	/** The `--without` paths taken out before the Overrides, in command-line order (cli ADR-0055). */
+	/** The `--without` paths taken out before the Overrides, in command-line order (cli ADR-0056). */
 	removals: string[]
 	scenario: ScenarioEcho
 	currency: string
@@ -51,9 +51,9 @@ export type PrepareInput = {
 	asOf: string
 	horizon: string
 	sets: readonly string[]
-	/** The `--without` paths, taken out before the Sets (cli ADR-0055). */
+	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
 	without?: readonly string[] | undefined
-	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0055). */
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
 }
 
