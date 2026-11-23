@@ -10,7 +10,7 @@ export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
 	.array(z.string())
 	.optional()
 	.describe(
-		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB), or decimal strings with --decimal.",
+		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB), or decimal strings with --decimal. The one path a plan may lack is the whole estate block, which --set estate=<json> begins.",
 	)
 
 /** `--without`, one list item taken out by its id, repeatable and applied before every `--set`. */

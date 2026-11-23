@@ -28,15 +28,15 @@ afterAll(() => {
 })
 
 describe("the form", () => {
-	test("a plan with no block opens empty, says each line is the person's own, and that inheritance tax is a cost line", () => {
+	test("a plan with no block opens empty, says each line is the person's own, that inheritance tax is a cost line, and offers a try", () => {
 		const body = form("retire-early")
 		expect(body).toContain("none is filled in for you")
 		expect(body).toContain("Inheritance tax is not worked out")
 		expect(body).toContain("Add a cost")
 		expect(body).toContain("Add a gift")
 		expect(body).not.toContain('value="1')
-		expect(body).toContain("Save your first line to try")
-		expect(body).not.toContain("Try as a what-if")
+		expect(body).not.toContain("Save your first line to try")
+		expect(body).toContain("Try as a what-if")
 	})
 
 	test("a plan with a block shows its lines as the document states them, and offers a try", () => {
