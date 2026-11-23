@@ -55,6 +55,7 @@ export function runEngine(
 	observations: readonly DateString[],
 	returns?: Returns,
 	tracked = false,
+	breakdown = false,
 ): EngineResult {
 	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
 	const calendar = resolvedCalendar(scenario)
@@ -69,6 +70,7 @@ export function runEngine(
 		levies,
 		gate,
 		ledger,
+		breakdown,
 	}
 	let index = 0
 	const settlements = levies === undefined ? [] : allSettlementDates(levies, timeline.horizon)

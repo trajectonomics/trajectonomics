@@ -173,6 +173,10 @@ _Avoid_: Investment income, unearned income
 An optional free-text label on an expense Flow, 1 to 64 characters with no control characters, for grouping spending in reports. It is inert: the engine never reads it, so no Projection, FI answer or chance result changes with it.
 _Avoid_: tag, label, Tally label
 
+**Cash-flow breakdown**:
+One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in equals money out exactly, and every total equals its roll-up field.
+_Avoid_: Sankey, statement, budget
+
 **Cashflow**:
 The routing rules for net money each time flows land: ordered `surplus` steps (account, optional fixed `upTo`), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list.
 _Avoid_: Income/expense delta

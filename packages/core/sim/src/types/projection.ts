@@ -1,4 +1,5 @@
 import type { ErrorCode, Path } from "../check/codes"
+import type { CashflowBreakdown } from "./breakdown"
 import type { AccountId, DateString, MinorUnits } from "./common"
 import type { MilestoneResult } from "./milestone"
 import type { LiabilityStatement } from "./statement"
@@ -86,6 +87,8 @@ export interface Projection {
 	readonly milestones?: readonly MilestoneResult[]
 	/** One statement per liability in Scenario order; present only with `liabilityStatements`. */
 	readonly liabilities?: readonly LiabilityStatement[]
+	/** One per Annual roll-up in order; present only with `cashflowBreakdown`. */
+	readonly cashflow?: readonly CashflowBreakdown[]
 }
 
 export interface InputProblem {

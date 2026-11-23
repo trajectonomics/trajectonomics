@@ -7,6 +7,8 @@ import { addIncome } from "./levy-prepaid"
 import type { SettlementPeriodView } from "./levy-shares"
 
 export interface ContributionEntry {
+	/** The contribution Flow's id, so a breakdown can split the Account's amount back to Flows. */
+	readonly flow: string
 	readonly target: AccountId
 	readonly amount: bigint
 	readonly label: string | undefined
@@ -70,8 +72,19 @@ function takeFlow(
 	else if (flow.kind === "withdrawal") {
 		addTo(totals.plannedBySource, flow.source, amount)
 		totals.withdrawals += amount
-	} else totals.contributionEntries.push({ target: flow.target, amount, label: flow.label })
+	} else
+		totals.contributionEntries.push({
+			flow: flow.id,
+			target: flow.target,
+			amount,
+			label: flow.label,
+		})
 	return undefined
+}
+
+/** The amount one Occurrence lands: a fixed Flow's grown amount, or its Derived amount for the date. */
+export function occurrenceAmount(event: DatedEvent, planned: Planned): bigint {
+	return event.amount ?? planned.derived.get(event.flow.id) ?? 0n
 }
 
 /** Sums one Occurrence's flows, separating Prepayment and Tally labels from the cash amounts. */
@@ -92,7 +105,7 @@ export function aggregate(
 		withdrawals: 0n,
 	}
 	for (const event of events) {
-		const amount = event.amount ?? planned.derived.get(event.flow.id) ?? 0n
+		const amount = occurrenceAmount(event, planned)
 		const problem = takeFlow(totals, event.flow, amount, views, date)
 		if (problem !== undefined) return { ...totals, problem }
 	}

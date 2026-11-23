@@ -31,4 +31,6 @@ export interface LiabilityStatement {
 /** Optional outputs of `project()`. Without an option, the Projection is byte-identical to before it existed. */
 export interface ProjectionOptions {
 	readonly liabilityStatements?: boolean
+	/** One cash-flow breakdown per Annual roll-up; present only when set. */
+	readonly cashflowBreakdown?: boolean
 }

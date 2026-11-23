@@ -1,53 +1,19 @@
-import type { AccountId, DateString, Scenario } from "../types"
-import type { ProjectionProblem } from "../types/projection"
+import type { DateString, Scenario } from "../types"
+import type { DateOutcome } from "./day-totals"
+
+export type { DateOutcome, DayTotals, EngineRunsOut } from "./day-totals"
+
 import { aggregate } from "./aggregate"
 import { applyAssets, applyDebt } from "./contributions"
+import { dayLines, withLines } from "./day-lines"
 import { plannedAmounts } from "./derive"
 import type { DatedEvent } from "./events"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
 import { mergeFunded, tally, totalsOf } from "./levy-step"
+import { plannedFail } from "./planned-fail"
 import { applyPlannedWithdrawals } from "./planned-withdrawals"
 import { route } from "./route"
 import type { StateMap } from "./state"
-
-export interface DayTotals {
-	readonly date: DateString
-	/** Planned gross income before Prepayment. */
-	readonly income: bigint
-	readonly expense: bigint
-	readonly contributions: bigint
-	/** Planned withdrawals landed on this date. They are cash, not income, and not Available cashflow. */
-	readonly withdrawals: bigint
-	/** The planned withdrawals on this date, by the liability each one borrowed from. */
-	readonly drawnBy: ReadonlyMap<AccountId, bigint>
-	/** The debt payments on this date, by the liability each one paid; only nonzero payments. */
-	readonly paidBy: ReadonlyMap<AccountId, bigint>
-	readonly unfunded: ReadonlyMap<string, bigint>
-	/** Prepayment plus Settlements net of refunds on this date. */
-	readonly levy: bigint
-}
-
-export interface EngineRunsOut {
-	readonly date: DateString
-	readonly unmet: bigint
-}
-
-export interface DateOutcome {
-	readonly totals: DayTotals
-	readonly problem: ProjectionProblem | undefined
-	readonly runsOut: EngineRunsOut | undefined
-}
-
-const nothing = { income: 0n, expense: 0n, prepaid: 0n, withdrawals: 0n }
-
-/** A Derived-amount problem is reported before any Settlement, debt or tally work on the date. */
-function plannedFail(date: DateString, problem: ProjectionProblem): DateOutcome {
-	return {
-		totals: totalsOf(date, nothing, 0n, new Map(), new Map(), { amount: 0n, problem: undefined }),
-		problem,
-		runsOut: undefined,
-	}
-}
 
 /** Applies one occurrence date in the canonical order of operations. */
 export function processDate(
@@ -56,13 +22,16 @@ export function processDate(
 	date: DateString,
 	events: readonly DatedEvent[],
 	levies: LevySet | undefined,
+	breakdown = false,
 ): DateOutcome {
 	const planned = plannedAmounts(events, scenario.flows, date, scenario.economy.inflation)
 	if (!planned.ok) return plannedFail(date, planned.problem)
 	const views = levies === undefined ? [] : settlementPeriodViews(levies, date)
 	const day = aggregate(events, planned.planned, views, date)
 	const settlement =
-		levies === undefined ? { amount: 0n, problem: undefined } : settlementOn(levies, states, date)
+		levies === undefined
+			? { amount: 0n, byLevy: new Map<string, bigint>(), problem: undefined }
+			: settlementOn(levies, states, date)
 	if (day.problem !== undefined) {
 		return {
 			totals: totalsOf(date, day, 0n, new Map(), new Map(), settlement),
@@ -106,6 +75,25 @@ export function processDate(
 	if (settlement.problem !== undefined)
 		return { totals, problem: settlement.problem, runsOut: undefined }
 	if (assets.problem !== undefined) return { totals, problem: assets.problem, runsOut: undefined }
+	const lines = breakdown
+		? dayLines({
+				scenario,
+				states,
+				events,
+				planned: planned.planned,
+				day,
+				settled: settlement.byLevy,
+				paidBy: debt.paidBy,
+				unfunded: assets.unfunded,
+			})
+		: undefined
 	// Planned-withdrawal cash joins the net that pays a Shortfall or lands as surplus, never Available cashflow.
-	return route(states, scenario, date, totals, cashflow + day.withdrawals - assets.applied, levies)
+	return route(
+		states,
+		scenario,
+		date,
+		withLines(totals, lines),
+		cashflow + day.withdrawals - assets.applied,
+		levies,
+	)
 }

@@ -18,6 +18,8 @@ export interface RunAccumulator {
 	readonly levies: LevySet | undefined
 	readonly gate: MilestoneGate | undefined
 	readonly ledger: LiabilityLedger | undefined
+	/** Whether each date records its cash-flow lines; only the breakdown option turns it on. */
+	readonly breakdown: boolean
 }
 
 function addSnapshot(
@@ -47,7 +49,7 @@ function handleDay(
 ): EngineResult | undefined {
 	const settlement = acc.levies !== undefined && hasSettlement(acc.levies, date)
 	if (events.length === 0 && !settlement) return undefined
-	const outcome = processDate(states, scenario, date, events, acc.levies)
+	const outcome = processDate(states, scenario, date, events, acc.levies, acc.breakdown)
 	acc.totals.push(outcome.totals)
 	acc.gate?.record(outcome.totals)
 	if (acc.ledger !== undefined) recordMoves(acc.ledger, states, outcome.totals)
