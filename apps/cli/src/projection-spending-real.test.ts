@@ -18,33 +18,18 @@ import { capture } from "./test-support"
  * states them as it states every figure; these tests check them by hand beside the nominal ones.
  */
 
-/** Feb 29s in `(from, to]`, which the engine's Actual/365 No Leap count leaves out. */
-function leapDaysBetween(from: string, to: string): number {
-	let count = 0
-	for (let year = Number(from.slice(0, 4)); year <= Number(to.slice(0, 4)); year++) {
-		const day = `${year}-02-29`
-		if (new Date(`${day}T00:00:00Z`).getUTCDate() === 29 && day > from && day <= to) count++
-	}
-	return count
-}
-
-/** The deflator the engine states: `(1 + rate)` to the power of counted days over 365, daily compounded (sim ADR-0023). */
-function deflator(from: string, to: string, percent: number): number {
-	const days =
-		(Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000 -
-		leapDaysBetween(from, to)
-	return (1 + percent / 100) ** (days / 365)
-}
-
 describe("the example's rule, in today's money", () => {
 	const run = async () =>
 		runBody(await projection(await exampleHome(), ["run", ...EXAMPLE_FLAGS, "--spending"]))
 
 	it("deflates the first year's amount by 3% from the plan's start as the engine counts it, to the satang", async () => {
 		const [first] = yearsOf(await run(), "retirement-spending")
-		const expected =
-			Number(minor(first?.amount ?? "0")) / deflator("2026-01-15", first?.date ?? "", 3) / 100
-		expect(Math.abs(Number(first?.realAmount) - expected)).toBeLessThan(0.02)
+		// By hand: 2026-01-15 to 2045-01-01 is 6,926 calendar days less 5 Feb 29s, 6,921 counted days. The
+		// amount is 1,187,523 satang and 1.03^(6921/365) = 1.7516..., so the real amount is 677,996.02,
+		// 677,996 satang once rounded, well clear of a tie. The check is on whole satang, no tolerance.
+		expect(first?.date).toBe("2045-01-01")
+		expect(minor(first?.amount ?? "0")).toBe(1_187_523n)
+		expect(minor(first?.realAmount ?? "0")).toBe(677_996n)
 		expect(first?.realPaid).toBe(first?.realAmount ?? "")
 	})
 

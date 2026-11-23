@@ -50,15 +50,19 @@ export function estateStatement(
 	const footing: Footing = { years: growthYears(timeline.start, row.date), inflation }
 	const worth = worthOf(row, liabilities)
 	const costs = (estate?.costs ?? []).map((cost) => costAmount(cost, worth, footing))
-	const net = costs.reduce((rest, cost) => rest - cost, worth.gross - worth.debts)
+	const costsTotal = costs.reduce((sum, cost) => sum + cost, 0n)
+	const net = worth.gross - worth.debts - costsTotal
 	const gifts = giftAmounts(estate?.gifts ?? [], net, footing)
-	const toHeirs = gifts.reduce((rest, gift) => rest - gift, net < 0n ? 0n : net)
+	const giftsTotal = gifts.reduce((sum, gift) => sum + gift, 0n)
+	const toHeirs = (net < 0n ? 0n : net) - giftsTotal
 	const days = countedDays(timeline.start, row.date)
 	const real = realFigures(BigInt(row.realNetWorth), costs, gifts, toHeirs, inflation, days)
 	const figures = [
 		worth.gross,
 		worth.debts,
+		costsTotal,
 		net,
+		giftsTotal,
 		toHeirs,
 		real.net,
 		real.toHeirs,
@@ -72,8 +76,10 @@ export function estateStatement(
 			gross: Number(worth.gross),
 			debts: Number(worth.debts),
 			costs: lines(estate?.costs ?? [], costs),
+			costsTotal: Number(costsTotal),
 			net: Number(net),
 			gifts: lines(estate?.gifts ?? [], gifts),
+			giftsTotal: Number(giftsTotal),
 			toHeirs: Number(toHeirs),
 			real: { net: Number(real.net), toHeirs: Number(real.toHeirs) },
 		},

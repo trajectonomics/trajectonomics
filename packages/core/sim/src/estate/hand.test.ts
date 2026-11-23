@@ -38,8 +38,9 @@ describe("an estate worked by hand: cash 1,000,000, home 5,000,000, locked fund 
 			{ id: "home-sale", amount: 250_000 },
 			{ id: "lawyer", amount: 100_000 },
 		])
-		expect(at.net).toBe(4_490_000)
+		expect([at.costsTotal, at.net]).toEqual([510_000, 4_490_000])
 		expect(at.gifts).toEqual([{ id: "temple", amount: 449_000 }])
+		expect(at.giftsTotal).toBe(449_000)
 		expect(at.toHeirs).toBe(4_041_000)
 	})
 

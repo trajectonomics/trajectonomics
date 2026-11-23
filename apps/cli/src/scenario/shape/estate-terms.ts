@@ -5,8 +5,12 @@ import { closed, MINOR_UNITS_HEAD } from "./terms"
  * `terms.ts` so each is stated once beside the shape that uses it.
  */
 
-/** The unit of an estate line's fixed amount: stated once, in the money of the plan's start, then grown by whole years. */
-export const ESTATE_UNITS: string = `${MINOR_UNITS_HEAD}, and an estate line states it once, in the money of the Timeline's start, not per occurrence or per year.`
+/** The unit of an estate line's fixed amount. The decimal form replaces it, so `ESTATE_ONCE` follows it in both forms. */
+export const ESTATE_UNITS: string = `${MINOR_UNITS_HEAD}.`
+
+/** What an estate line's fixed amount is stated in, once: the money of the plan's start, then grown by whole years. */
+export const ESTATE_ONCE =
+	"An estate line states it once, in the money of the Timeline's start, not per occurrence or per year."
 
 /** The unit of an estate line's share: basis points as the engine states them. The decimal form writes it as a percent. */
 export const ESTATE_RATE_UNITS =

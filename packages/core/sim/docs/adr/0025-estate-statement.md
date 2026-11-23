@@ -29,8 +29,9 @@ Scenario and the Estate statement to the Projection. It is optional and additive
   date.
 - **The figures.** `gross` is every asset Account's value, locked and Illiquid ones included
   ([ADR 0019](./0019-illiquid-assets.md): a home stays in Net worth). `debts` is every liability's amount
-  owed. `costs` lists each cost line's amount, in the block's order. `net = gross − debts − Σcosts` and is
-  signed. A cost's share base is `gross`, or the sum of the named Accounts' values (a base below 0 counts
+  owed. `costs` lists each cost line's amount, in the block's order, and `costsTotal` is their exact sum
+  (`giftsTotal` likewise for `gifts`), summed in BigInt and checked as the other figures are, so a caller
+  never adds the lines. `net = gross − debts − costsTotal` and is signed. A cost's share base is `gross`, or the sum of the named Accounts' values (a base below 0 counts
   as 0).
 - **The order.** Debts and costs come before gifts, and a gift is taken only from a positive net. Each
   gift in order wants a share of `max(0, net)` (the net estate, not what is left) or its grown fixed
@@ -47,6 +48,9 @@ Scenario and the Estate statement to the Projection. It is optional and additive
   gifts)`, so with no gifts and a positive net it equals `real.net`. Only a negative net makes it differ
   (0 against a negative `real.net`). Deflating the finished `net` once would round differently from the
   row, by a unit or two, and the two would disagree on an empty block.
+- **Only the totals, no more real figures.** `real` stays `net` and `toHeirs`: the Estate page shows only
+  those two in today's money and states debts and costs as separate nominal lines, so the engine does not
+  state a real gross, real debts or real costs. The two totals are what the page needs without adding.
 - **No tax rule.** An inheritance tax, a transfer fee, a sale tax or a stamp duty is a cost line the
   caller states. Thai inheritance tax falls on each heir above a per-heir threshold and depends on who the
   heir is, so it needs heirs and their relationship and is a tax rule, which is the owner's. The core
@@ -75,5 +79,6 @@ Scenario and the Estate statement to the Projection. It is optional and additive
 - Existing parity hashes are unchanged. Three cases are added: `estate-home-month` (a home, a loan, a
   locked fund, shares and a fixed cost, with a gift), `estate-gifts-capped` and `estate-negative-net`.
 - The independent oracle (`src/golden/oracle-estate.ts`) states each figure by its definition with plain
-  loops and exact rationals.
+  loops and exact rationals, `costsTotal` and `giftsTotal` included.
+- `costsTotal` and `giftsTotal` were added after the three parity cases; only those cases' hashes change.
 - The CLI states these figures without computing any; its estate table is a later slice.

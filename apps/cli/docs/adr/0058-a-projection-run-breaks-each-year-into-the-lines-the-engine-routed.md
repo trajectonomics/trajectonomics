@@ -76,7 +76,9 @@ kept them out of it. The human block and the JSON now come from one function, so
   human block calls it too. Each total is the exact integer sum of the roll-up's lines, or the engine's own
   field (`spending` is `expense`, `saving` is `contributions`, `not funded` is `unfundedContributions`, `unmet` is
   `unmet`); `money in` is `income` plus the withdrawal and drawn lines. Nothing is a float, and nothing is summed
-  in the page.
+  in the page. The sums are BigInt, and a total past the safe integers is refused as `VALUE_OVERFLOW` on the
+  roll-up's last date (`projection_refused`), as the engine's own figures are (#393). The estate's two totals are
+  not summed here at all: the engine states them (sim ADR 0025, cli ADR-0064).
 - **Zero is stated.** A section with no lines is `0.00` in the JSON, where the human block leaves the line out.
   The block's own rules (which lines it prints) are unchanged.
 - **Without the flag.** No `cashflowTotals` key is added, so a run without `--breakdown` keeps its bytes.

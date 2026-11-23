@@ -21,6 +21,14 @@ export function formatPercent(bps: number): string {
 	return `${sign}${text.slice(0, -2)}.${text.slice(-2)}`
 }
 
+/** A basis-point range as the decimal form writes it: `0 to 10000` is `"0.00" to "100.00"`, `1 to 10000` `"0.01" to "100.00"`. */
+export function percentRanges(text: string): string {
+	return text.replace(
+		/\b(\d+) to 10000\b/g,
+		(_, low: string) => `"${formatPercent(Number(low))}" to "${formatPercent(10_000)}"`,
+	)
+}
+
 /** `"4.00"` is `400`, or an `invalid_input` at `path` for text that is not a whole number of basis points. */
 export function parsePercent(value: string, path: string): number | AppError {
 	const match = PERCENT.exec(value)

@@ -11,8 +11,10 @@ export interface OracleEstate {
 	readonly gross: bigint
 	readonly debts: bigint
 	readonly costs: readonly bigint[]
+	readonly costsTotal: bigint
 	readonly net: bigint
 	readonly gifts: readonly bigint[]
+	readonly giftsTotal: bigint
 	readonly toHeirs: bigint
 }
 
@@ -57,7 +59,8 @@ export function oracleEstate(
 	const gross = sum(Object.values(worth.assets))
 	const debts = sum(Object.values(worth.owed))
 	const costs = (estate?.costs ?? []).map((line) => cost(line, worth, gross, at))
-	const net = gross - debts - sum(costs)
+	const costsTotal = sum(costs)
+	const net = gross - debts - costsTotal
 	let left = atLeastZero(net)
 	const gifts = (estate?.gifts ?? []).map((line: EstateGift) => {
 		const wanted =
@@ -69,7 +72,7 @@ export function oracleEstate(
 		left -= taken
 		return taken
 	})
-	return { gross, debts, costs, net, gifts, toHeirs: left }
+	return { gross, debts, costs, costsTotal, net, gifts, giftsTotal: sum(gifts), toHeirs: left }
 }
 
 export interface OracleReal {
