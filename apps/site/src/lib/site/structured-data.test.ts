@@ -31,6 +31,13 @@ function organization(language: string) {
 	return node
 }
 
+/** The FAQPage node, the questions the home page's FAQ shows. */
+function faq(language: string) {
+	const node = structuredData(language)["@graph"][3]
+	if (node === undefined) throw new Error("the block names no FAQPage")
+	return node
+}
+
 /** The SoftwareApplication node, traj itself. */
 function traj(language: string) {
 	const node = structuredData(language)["@graph"][2]
@@ -39,14 +46,41 @@ function traj(language: string) {
 }
 
 describe("the Structured data a Language home carries", () => {
-	it("names the WebSite, the Organization and traj in one graph", () => {
+	it("names the WebSite, the Organization, traj and the FAQ in one graph", () => {
 		const block = structuredData("en")
 		expect(block["@context"]).toBe("https://schema.org")
 		expect(block["@graph"].map((node) => node["@type"])).toEqual([
 			"WebSite",
 			"Organization",
 			"SoftwareApplication",
+			"FAQPage",
 		])
+	})
+
+	it("states the FAQ's questions and answers as the Dictionary gives them, in each Language", () => {
+		for (const language of ["en", "th"] as const) {
+			const dictionary = dictionaryFor(language)
+			const page = faq(language)
+			expect(page["@type"]).toBe("FAQPage")
+			expect(page.inLanguage).toBe(language)
+			expect(page.mainEntity.map((question) => question.name)).toEqual([...dictionary.faqQuestions])
+			expect(page.mainEntity.map((question) => question.acceptedAnswer.text)).toEqual([
+				...dictionary.faqAnswers,
+			])
+			for (const question of page.mainEntity) {
+				expect(question["@type"]).toBe("Question")
+				expect(question.acceptedAnswer["@type"]).toBe("Answer")
+			}
+		}
+	})
+
+	it("states no markup in any FAQ text, because the page would show the tags as text", () => {
+		for (const language of ["en", "th"] as const) {
+			const dictionary = dictionaryFor(language)
+			for (const text of [...dictionary.faqQuestions, ...dictionary.faqAnswers]) {
+				expect(text).not.toMatch(/[<>]/)
+			}
+		}
 	})
 
 	it("places the WebSite at the Site's one address, in its Language", () => {
@@ -91,9 +125,9 @@ describe("the Structured data a Language home carries", () => {
 		expect(traj("en").publisher).toEqual({ "@id": organization("en")["@id"] })
 	})
 
-	it("states no claim the page cannot support, such as a rating, a search action or an FAQ", () => {
+	it("states no claim the page cannot support, such as a rating or a search action", () => {
 		const written = structuredDataJson("en")
-		for (const claim of ["aggregateRating", "review", "SearchAction", "FAQPage"]) {
+		for (const claim of ["aggregateRating", "review", "SearchAction"]) {
 			expect(written).not.toContain(claim)
 		}
 	})
@@ -118,6 +152,7 @@ describe("the Structured data a Language home carries", () => {
 				{ ...website("en"), description: "a </script> inside a description" },
 				organization("en"),
 				traj("en"),
+				faq("en"),
 			],
 		}
 		const written = serializeStructuredData(hostile)
