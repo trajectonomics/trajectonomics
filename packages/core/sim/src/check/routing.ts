@@ -1,3 +1,4 @@
+import { FUNDINGS } from "../vocab"
 import type { AccountIndex, Emit, Path } from "./codes"
 import { isRecord } from "./shape"
 
@@ -18,7 +19,10 @@ function isUnroutedAsset(
 	accounts: AccountIndex | undefined,
 ): flow is Readonly<Record<string, unknown>> {
 	if (!isRecord(flow) || flow["kind"] !== "contribution") return false
-	if (flow["funding"] === "obligation") return false
+	const funding = flow["funding"]
+	if (funding === "obligation") return false
+	// An unknown funding is `INVALID_FUNDING` alone, as on a liability.
+	if (funding !== undefined && !(FUNDINGS as readonly string[]).includes(String(funding))) return false
 	const target = flow["target"]
 	return typeof target === "string" && accounts?.get(target) === "asset" && !routed.has(target)
 }

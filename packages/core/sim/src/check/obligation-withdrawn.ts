@@ -14,11 +14,13 @@ function withdrawIds(cashflow: unknown): ReadonlySet<string> {
  * Emits `OBLIGATION_TARGET_WITHDRAWN` at the `target` of an obligation Contribution into an Account
  * that `cashflow.withdraw` lists. The obligation is booked into its target before the day's negative
  * net is drawn, so the draw could take the purchase price back out of the Account it just bought:
- * the purchase would pay for itself (ADR 0021).
+ * the purchase would pay for itself (ADR 0021). An illiquid target is left to `ILLIQUID_ROUTED`: it
+ * already refuses the same `withdraw` entry, so the one mistake is reported once.
  */
 export function checkObligationWithdrawn(
 	flows: unknown,
 	cashflow: unknown,
+	illiquid: ReadonlySet<string>,
 	path: Path,
 	emit: Emit,
 ): void {
@@ -28,7 +30,7 @@ export function checkObligationWithdrawn(
 		if (!isRecord(flow) || flow["kind"] !== "contribution" || flow["funding"] !== "obligation")
 			return
 		const target = flow["target"]
-		if (typeof target === "string" && drawn.has(target)) {
+		if (typeof target === "string" && drawn.has(target) && !illiquid.has(target)) {
 			emit("OBLIGATION_TARGET_WITHDRAWN", [...path, "flows", index, "target"])
 		}
 	})
