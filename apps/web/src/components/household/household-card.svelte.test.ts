@@ -23,6 +23,7 @@ function card(options: { household?: HouseholdDocument | null; editable?: boolea
 			name: "base",
 			doc: planDocument(),
 			household: options.household === undefined ? household : options.household,
+			contentHash: "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 			editable: options.editable ?? true,
 		},
 	}).body

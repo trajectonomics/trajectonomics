@@ -11,6 +11,8 @@ import ItemActions from "./ItemActions.svelte"
 interface Props {
 	/** The plan's name, which the Edit saves the document under. */
 	name: string
+	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
+	contentHash: string
 	doc: ScenarioDocument
 	/** The Account to edit; absent for a new one. */
 	existing?: ScenarioAccount | undefined
@@ -18,7 +20,7 @@ interface Props {
 	onDone: () => void
 }
 
-let { name, doc, existing, onDone }: Props = $props()
+let { name, doc, existing, onDone, contentHash }: Props = $props()
 const initial = () => accountDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
@@ -27,7 +29,7 @@ const shown = $derived(shownProblems(problems, editSession.failure, editSession.
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
 async function commit(next: ScenarioDocument): Promise<void> {
-	if (await editSession.run({ kind: "apply-plan", name, document: next })) onDone()
+	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
 }
 
 async function save(event: SubmitEvent): Promise<void> {

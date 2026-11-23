@@ -103,6 +103,11 @@ export function withAmount(
 	}
 }
 
+/** The stored content hash of a plan: the one a page that read it now would send with its Edit. */
+export function hashOf(name: string): string {
+	return ledgerShow(name, true).scenario.contentHash
+}
+
 /** `traj scenario show --json` on the scratch ledger, for the ledger's own answer. */
 export function ledgerShow(name: string, decimal: boolean): ShownDocument {
 	const flags = decimal ? ["--decimal"] : []

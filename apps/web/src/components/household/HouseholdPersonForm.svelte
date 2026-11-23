@@ -17,13 +17,15 @@ interface Props {
 	name: string
 	/** The household as it is now, or null when there is none yet. */
 	household: HouseholdDocument | null
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
+	contentHash: string
 	/** The person to edit; absent for a new one. */
 	existing?: HouseholdPerson | undefined
 	/** Runs once the Edit has run, so the drawer closes. */
 	onDone: () => void
 }
 
-let { name, household, existing, onDone }: Props = $props()
+let { name, household, existing, onDone, contentHash }: Props = $props()
 /** The relation is chosen, never assumed: the first choice says so. */
 const RELATION_CHOICES_WITH_BLANK = [{ value: "", label: "Choose a relation" }, ...RELATION_CHOICES]
 const ROLE_CHOICES_WITH_BLANK = [{ value: "", label: "Choose a role" }, ...ROLE_CHOICES]
@@ -37,7 +39,7 @@ const taken = $derived((household?.people ?? []).map((person) => person.id))
 
 /** Saves the household as one Edit; the drawer closes only when it ran. */
 async function commit(next: HouseholdDocument): Promise<void> {
-	if (await editSession.run({ kind: "set-household", name, household: next })) onDone()
+	if (await editSession.run({ kind: "set-household", name, contentHash, household: next })) onDone()
 }
 
 async function save(event: SubmitEvent): Promise<void> {

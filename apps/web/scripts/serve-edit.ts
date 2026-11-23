@@ -2,7 +2,8 @@
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import { z } from "zod"
 import type { Read } from "../src/lib/contract"
-import { type Edit, followPlan, writeCommand } from "../src/lib/edit/edit"
+import { type Edit, writeCommand } from "../src/lib/edit/edit"
+import { followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
 import type { PlanParams } from "../src/lib/snapshot"
 import type { RunContext } from "./run-traj"
@@ -30,6 +31,8 @@ export type Editor = {
 	session: (request: Request, port: number) => Response
 	/** Answers POST /edit: refused, or run and answered with the new Snapshot or the error as data. */
 	edit: (request: Request, port: number) => Promise<Response>
+	/** Answers POST /reread: the same guards, then the Snapshot read again, with no write. */
+	reread: (request: Request, port: number) => Promise<Response>
 }
 
 /** Creates the editor for one server. The token is the one the server made at start. */
@@ -65,6 +68,37 @@ export function createEditor(options: EditorOptions): Editor {
 		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
 	}
 
+	/** Reads the Snapshot again and answers it, or the CLI's error as data. */
+	async function rereadAnswer(): Promise<Response> {
+		const run = await refresh()
+		if (!run.ok) return failure(200, run.error)
+		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
+	}
+
+	/**
+	 * Runs one request that changes or reads the Snapshot, after the guards: refused, or run with the busy
+	 * flag set. The guards and the flag are read and set before the first await, so a second request that
+	 * arrives while this one runs is refused rather than run beside it.
+	 */
+	function admit(request: Request, port: number, work: () => Promise<Response>): Promise<Response> {
+		const refusal = refuseEdit({
+			method: request.method,
+			host: request.headers.get("host"),
+			origin: request.headers.get("origin"),
+			token: request.headers.get(EDIT_TOKEN_HEADER),
+			contentType: request.headers.get("content-type"),
+			expectedToken: options.token,
+			ready: body !== null,
+			busy,
+			port,
+		})
+		if (refusal) return Promise.resolve(refused(refusal.status, refusal.code, refusal.message))
+		busy = true
+		return work().finally(() => {
+			busy = false
+		})
+	}
+
 	return {
 		get body() {
 			return body
@@ -79,25 +113,7 @@ export function createEditor(options: EditorOptions): Editor {
 			if (refusal) return refused(refusal.status, refusal.code, refusal.message)
 			return json(200, JSON.stringify({ token: options.token }))
 		},
-		edit(request, port) {
-			// The guards and the busy flag are read and set before the first await, so a second Edit that
-			// arrives while this one runs is refused rather than run beside it.
-			const refusal = refuseEdit({
-				method: request.method,
-				host: request.headers.get("host"),
-				origin: request.headers.get("origin"),
-				token: request.headers.get(EDIT_TOKEN_HEADER),
-				contentType: request.headers.get("content-type"),
-				expectedToken: options.token,
-				ready: body !== null,
-				busy,
-				port,
-			})
-			if (refusal) return Promise.resolve(refused(refusal.status, refusal.code, refusal.message))
-			busy = true
-			return apply(request).finally(() => {
-				busy = false
-			})
-		},
+		edit: (request, port) => admit(request, port, () => apply(request)),
+		reread: (request, port) => admit(request, port, rereadAnswer),
 	}
 }

@@ -6,6 +6,7 @@ import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import Drawer from "../ui/Drawer.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
+import StaleNotice from "../ui/StaleNotice.svelte"
 import AccountCards from "./AccountCards.svelte"
 import AccountForm from "./AccountForm.svelte"
 import FlowCards from "./FlowCards.svelte"
@@ -20,9 +21,11 @@ interface Props {
 	household: HouseholdDocument | null
 	baseline: Read<Baseline>
 	editable: boolean
+	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
+	contentHash: string
 }
 
-let { kind, name, doc, household, baseline, editable }: Props = $props()
+let { kind, name, doc, household, baseline, editable, contentHash }: Props = $props()
 /** The drawer: null when it is shut, else the item it edits, or no id for a new one. */
 let drawer = $state<{ id?: string } | null>(null)
 
@@ -68,10 +71,11 @@ const busy = $derived(editSession.busy)
 		<FlowCards {cards} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
 	{/if}
 	<Drawer open={drawer !== null} {title} onClose={() => setDrawer(null)}>
+		<StaleNotice />
 		{#if drawer !== null && kind === "assets"}
-			<AccountForm {name} {doc} existing={existingAccount} onDone={() => setDrawer(null)} />
+			<AccountForm {name} {doc} {contentHash} existing={existingAccount} onDone={() => setDrawer(null)} />
 		{:else if drawer !== null}
-			<FlowForm kind={flowKind} {name} {doc} {household} existing={existingFlow} onDone={() => setDrawer(null)} />
+			<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} onDone={() => setDrawer(null)} />
 		{/if}
 	</Drawer>
 </div>

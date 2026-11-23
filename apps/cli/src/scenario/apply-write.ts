@@ -36,6 +36,8 @@ export type ApplyWrite = {
 	document: unknown
 	decimal: boolean
 	dryRun: boolean
+	/** The content hash the caller read; the write is refused when the stored plan has another (cli ADR-0055). */
+	ifHash?: string | undefined
 }
 
 /**
@@ -50,7 +52,7 @@ export function writeApplied(ctx: Context, write: ApplyWrite): Result<ApplyResul
 		const before = store.getScenario(write.name)
 		if (isAppError(before)) return before
 		const outcome = store.saveScenario(
-			{ name: write.name, document: stored },
+			{ name: write.name, document: stored, expectedHash: write.ifHash },
 			{ dryRun: write.dryRun },
 		)
 		if (isAppError(outcome)) return outcome

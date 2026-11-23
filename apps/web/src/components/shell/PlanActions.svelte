@@ -2,6 +2,7 @@
 import { editSession } from "../../client/edit.svelte.js"
 import { planNameError } from "../../lib/edit/name"
 import { chooseScenario } from "../../lib/view/projection/scenario"
+import StaleNotice from "../ui/StaleNotice.svelte"
 
 interface Props {
 	/** The Scenario names the Snapshot holds: a copy's name must not repeat one of them. */
@@ -82,4 +83,6 @@ async function remove(): Promise<void> {
 	{#if problem ?? editSession.error}
 		<p role="alert" class="text-sm text-destructive">{problem ?? editSession.error}</p>
 	{/if}
+	<!-- A refused save from an action with no drawer open (Remove household, unpin a date) says so here. -->
+	<StaleNotice />
 </div>
