@@ -31,6 +31,7 @@ export function buildCashflow(
 			...sums.planned.values(),
 			...sums.applied.values(),
 			...sums.unfunded.values(),
+			...sums.employer.values(),
 			...sums.prepaid.values(),
 			...sums.settled.values(),
 			...sums.drawn.values(),

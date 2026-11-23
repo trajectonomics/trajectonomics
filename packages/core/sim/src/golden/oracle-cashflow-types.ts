@@ -5,6 +5,8 @@ export interface OracleTotals {
 	readonly applied: Map<string, bigint>
 	/** Unfunded amount per asset contribution Flow id. */
 	readonly unfunded: Map<string, bigint>
+	/** Landed amount per employer Contribution Flow id: outside cashflow, so not in `applied`. */
+	readonly employer: Map<string, bigint>
 	readonly prepaid: Map<string, bigint>
 	readonly drawn: Map<string, bigint>
 	readonly surplus: Map<string, bigint>

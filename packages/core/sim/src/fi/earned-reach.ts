@@ -1,6 +1,7 @@
 import { flowRefsOf } from "../levy/refs"
 import type { Flow } from "../types"
 import { isDerived } from "../types"
+import { isWork } from "./scan-stop"
 
 /** Each Flow id's position by its first declaration. */
 export function indexFlows(flows: readonly Flow[]): ReadonlyMap<string, number> {
@@ -21,7 +22,7 @@ function flowAt(
 	return position === undefined ? undefined : flows[position]
 }
 
-/** The ids of the earned income a Flow reads, directly or through a chain of Derived amounts. */
+/** The ids of the work (earned income, an employer Contribution) a Flow reads, directly or through a chain of Derived amounts. */
 export function earnedReachedFrom(
 	flows: readonly Flow[],
 	index: ReadonlyMap<string, number>,
@@ -36,7 +37,7 @@ export function earnedReachedFrom(
 		seen.add(id)
 		const flow = flowAt(flows, index, id)
 		if (flow === undefined) continue
-		if (flow.kind === "income" && flow.earned) earned.add(id)
+		if (isWork(flow)) earned.add(id)
 		if (isDerived(flow)) stack.push(...flowRefsOf(flow.derive))
 	}
 	return earned

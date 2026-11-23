@@ -20,7 +20,7 @@ function isUnroutedAsset(
 ): flow is Readonly<Record<string, unknown>> {
 	if (!isRecord(flow) || flow["kind"] !== "contribution") return false
 	const funding = flow["funding"]
-	if (funding === "obligation") return false
+	if (funding === "obligation" || funding === "employer") return false
 	// An unknown funding is `INVALID_FUNDING` alone, as on a liability.
 	if (funding !== undefined && !(FUNDINGS as readonly string[]).includes(String(funding)))
 		return false

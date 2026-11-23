@@ -1,13 +1,14 @@
 import type { AccountId, Scenario } from "../types"
 import { addTo } from "./add"
-import type { ContributionEntry, DayFlows } from "./aggregate"
-import { occurrenceAmount } from "./aggregate"
+import type { DayFlows } from "./aggregate"
 import { groupEntries, plannedTotal } from "./contribution-entries"
+import { employerLines } from "./day-employer"
 import { saleLines } from "./day-sales"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import { minBigInt } from "./min"
 import type { DayTotals } from "./occurrence"
+import { occurrenceAmount } from "./occurrence-amount"
 import type { StateMap } from "./state"
 
 /**
@@ -19,6 +20,8 @@ export interface DayLines {
 	readonly planned: ReadonlyMap<string, bigint>
 	/** Applied amount per contribution Flow id: a debt payment, an obligation or an asset grant, after the caps. */
 	readonly applied: ReadonlyMap<string, bigint>
+	/** Landed amount per employer Contribution Flow id: outside cashflow, so not in `applied` (ADR 0026). */
+	readonly employer: ReadonlyMap<string, bigint>
 	/** Unfunded amount per asset contribution Flow id. A debt payment capped at the owed amount is not. */
 	readonly unfunded: ReadonlyMap<string, bigint>
 	/** Prepayment per Levy id. */
@@ -79,7 +82,7 @@ function sales(results: DayResults): Map<string, bigint> {
 
 /** One Account's entries: an obligation is applied in full, a capped entry takes what is left of `remaining`. */
 function splitGroup(
-	group: readonly ContributionEntry[],
+	group: DayFlows["contributionEntries"],
 	remaining: bigint,
 	asset: boolean,
 	into: { readonly applied: Map<string, bigint>; readonly unfunded: Map<string, bigint> },
@@ -97,7 +100,7 @@ function splitGroup(
 function splitContributions(results: DayResults): Pick<DayLines, "applied" | "unfunded"> {
 	const { scenario, states, paidBy } = results
 	const position = new Map(scenario.flows.map((flow, index) => [flow.id, index] as const))
-	const entries = [...results.day.contributionEntries]
+	const entries = results.day.contributionEntries.filter((entry) => !entry.employer)
 	entries.sort((a, b) => position.get(a.flow)! - position.get(b.flow)!)
 	const lines = { applied: new Map<string, bigint>(), unfunded: new Map<string, bigint>() }
 	for (const [target, group] of groupEntries(entries)) {
@@ -116,6 +119,7 @@ export function dayLines(results: DayResults): DayLines {
 	return {
 		planned: new Map([...plannedLines(results), ...sales(results)]),
 		...splitContributions(results),
+		employer: employerLines(results.day.contributionEntries),
 		prepaid: results.day.prepaidByLevy,
 		settled: results.settled,
 		drawn: new Map(),

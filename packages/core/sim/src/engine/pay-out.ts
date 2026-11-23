@@ -19,6 +19,8 @@ export interface DatedRun {
 	readonly events: readonly DatedEvent[]
 	readonly levies: LevySet | undefined
 	readonly breakdown: boolean
+	/** The funded Tally labels of the employer shares that landed on the date (ADR 0026). */
+	readonly employerFunded: ReadonlyMap<string, bigint>
 }
 
 interface Paid {
@@ -29,7 +31,7 @@ interface Paid {
 function ends(run: DatedRun, day: DayFlows, paid: Paid, settlement: Settlement): DateOutcome {
 	const problem = paid.debt.problem ?? paid.obligations.problem
 	const { date, levies } = run
-	const funded = mergeFunded(paid.debt.funded, paid.obligations.funded)
+	const funded = mergeFunded(paid.debt.funded, paid.obligations.funded, run.employerFunded)
 	tally(levies, date, day.gross, funded, day.prepaidByLevy)
 	const contributions = paid.debt.paid + paid.obligations.paid
 	const totals = totalsOf(date, day, contributions, paid.debt.paidBy, new Map(), settlement)
@@ -63,7 +65,7 @@ export function payOut(
 	const available = cashflow > 0n ? cashflow : 0n
 	const { contribute } = scenario.cashflow
 	const assets = applyAssets(states, contribute, day.contributionEntries, available, date, levies)
-	const funded = mergeFunded(debt.funded, obligations.funded, assets.funded)
+	const funded = mergeFunded(debt.funded, obligations.funded, assets.funded, run.employerFunded)
 	tally(levies, date, day.gross, funded, day.prepaidByLevy)
 	const contributions = debt.paid + obligations.paid + assets.applied
 	const totals = totalsOf(date, day, contributions, debt.paidBy, assets.unfunded, settlement)

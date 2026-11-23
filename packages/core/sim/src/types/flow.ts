@@ -82,12 +82,13 @@ export interface ExpenseRules {
 /**
  * Cash moves into `target`. A liability target is a debt payment capped at the amount owed; an asset
  * target spends Available cashflow in `cashflow.contribute` order, unless `funding` is `obligation`:
- * then it is paid in full, drawing on savings if the day's cash is short (a purchase, ADR 0021).
+ * then it is paid in full, drawing on savings if the day's cash is short (a purchase, ADR 0021). With
+ * `funding` `employer` it lands in a liquid asset from outside the household's cash (ADR 0026).
  */
 export interface ContributionRules {
 	readonly kind: "contribution"
 	readonly target: AccountId
-	/** An asset target only: `target` (absent means the same) or `obligation`. Refused on a liability. */
+	/** An asset target only: `target` (absent means the same), `obligation` or `employer`. Refused on a liability. */
 	readonly funding?: Funding
 	/** Tally label a Levy sums over; without one the Flow is never tallied. Needs a Levy. */
 	readonly label?: string

@@ -9,7 +9,12 @@ function total(entries: readonly Landed[]): bigint {
 }
 
 function contributionsTo(landed: readonly Landed[], target: string): Landed[] {
-	return landed.filter((item) => item.flow.kind === "contribution" && item.flow.target === target)
+	return landed.filter(
+		(item) =>
+			item.flow.kind === "contribution" &&
+			item.flow.target === target &&
+			item.flow.funding !== "employer",
+	)
 }
 
 /** Splits `amount` over the contribution Flows in Scenario order, first come first served. */

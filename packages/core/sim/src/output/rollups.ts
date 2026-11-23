@@ -23,7 +23,8 @@ function rollupOf(
 	unmet: bigint,
 	declared: Declared,
 ): AnnualRollup {
-	const interest = closing - opening - sums.income + sums.expense + sums.levy - unmet
+	const interest =
+		closing - opening - sums.income + sums.expense + sums.levy - unmet - sums.employer
 	return {
 		index: period.index,
 		from: period.from,
@@ -33,6 +34,7 @@ function rollupOf(
 		income: Number(sums.income),
 		expense: Number(sums.expense),
 		contributions: Number(sums.contributions),
+		...(declared.employer ? { employerContributions: Number(sums.employer) } : {}),
 		unfundedContributions: Number(sums.unfunded),
 		...(declared.levy ? { levy: Number(sums.levy) } : {}),
 		...(declared.withdrawals ? { withdrawals: Number(sums.withdrawals) } : {}),
@@ -46,6 +48,7 @@ function rollupOf(
 interface Declared {
 	readonly levy: boolean
 	readonly withdrawals: boolean
+	readonly employer: boolean
 }
 
 export function buildRollups(
@@ -53,6 +56,7 @@ export function buildRollups(
 	periods: readonly Period[],
 	opening: bigint,
 	withdrawals: boolean,
+	employer: boolean,
 ): RollupOutcome {
 	const snapshots = new Map<string, EngineSnapshot>()
 	for (const snapshot of run.snapshots) snapshots.set(snapshot.date, snapshot)
@@ -60,13 +64,15 @@ export function buildRollups(
 	const declared: Declared = {
 		levy: run.levies !== undefined && run.levies.length > 0,
 		withdrawals,
+		employer,
 	}
 	let openingWorth = opening
 	for (const period of periods) {
 		const sums = sumFlows(run.totals, period)
 		const closing = snapshots.get(period.to)!.netWorth
 		const unmet = run.runsOut?.date === period.to ? run.runsOut.unmet : 0n
-		const interest = closing - openingWorth - sums.income + sums.expense + sums.levy - unmet
+		const interest =
+			closing - openingWorth - sums.income + sums.expense + sums.levy - unmet - sums.employer
 		const problem = unsafe(
 			[
 				openingWorth,
@@ -75,6 +81,7 @@ export function buildRollups(
 				sums.expense,
 				sums.withdrawals,
 				sums.contributions,
+				sums.employer,
 				sums.unfunded,
 				sums.levy,
 				interest,

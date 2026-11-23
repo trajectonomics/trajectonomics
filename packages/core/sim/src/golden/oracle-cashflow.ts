@@ -32,6 +32,7 @@ export function oracleCashflow(fixture: Fixture): OracleTotals {
 		planned: new Map(),
 		applied: new Map(),
 		unfunded: new Map(),
+		employer: new Map(),
 		prepaid: new Map(),
 		drawn: new Map(),
 		surplus: new Map(),

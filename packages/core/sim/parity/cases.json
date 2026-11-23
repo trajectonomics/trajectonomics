@@ -9393,5 +9393,219 @@
 			"estate": true
 		},
 		"sha256": "effcecdcb290f4cecc33779996c86c0ec3c733c4040d2c41a47d104d736c586b"
+	},
+	{
+		"name": "employer-year",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "pvd",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "pvd",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 500000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 400000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				},
+				{
+					"id": "pvd-member",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 20000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "pvd"
+				},
+				{
+					"id": "pvd-employer",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"kind": "contribution",
+					"target": "pvd",
+					"derive": {
+						"measures": [
+							{
+								"id": "source",
+								"op": "flow",
+								"flow": "salary"
+							},
+							{
+								"id": "share",
+								"op": "scale",
+								"of": "source",
+								"num": 5,
+								"den": 100,
+								"rounding": "halfUp"
+							}
+						],
+						"result": "share"
+					},
+					"funding": "employer"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": ["pvd"],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-12-31",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "6dbbb2a124f67522f1d3f2137c92a160c0d579b9f4cd8f508744c2af26ef55d2"
+	},
+	{
+		"name": "employer-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 5000000
+				},
+				{
+					"account": "pvd",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "pvd",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "rent",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 300000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": false
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				},
+				{
+					"id": "pvd-employer",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 200000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "pvd",
+					"funding": "employer"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "pvd"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2034-01-01",
+			"resolution": "month"
+		},
+		"sha256": "b92eb624b1b396d4002ccc30d243bb7a55e58c906ea5eed3cf7c27dc39d4d68e",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 6
+		},
+		"fiSha256": "2e7710f682494e904b6432bdbae9f61014e392392d3afc34cbda231637cd1dab"
 	}
 ]

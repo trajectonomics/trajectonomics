@@ -1,7 +1,7 @@
 import { readerAhead } from "../engine/account-values"
-import { occurrenceAmount } from "../engine/aggregate"
 import { plannedAmounts } from "../engine/derive"
 import type { DatedEvent } from "../engine/events"
+import { occurrenceAmount } from "../engine/occurrence-amount"
 import type { StateMap } from "../engine/state"
 import type { DateString } from "../types"
 import { type DayExpense, keep, pricedFrom } from "./expense-cache"

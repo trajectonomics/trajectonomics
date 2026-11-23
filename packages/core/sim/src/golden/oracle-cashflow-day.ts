@@ -33,6 +33,10 @@ function landOne(
 		day.withdrawn += amount
 		oracleMutate(states.get(flow.source)!, date, amount)
 	}
+	if (flow.kind === "contribution" && flow.funding === "employer") {
+		oracleMutate(states.get(flow.target)!, date, amount)
+		add(totals.employer, flow.id, amount)
+	}
 	if (flow.kind !== "income") return
 	day.income += amount
 	for (const share of flow.prepayments ?? []) {

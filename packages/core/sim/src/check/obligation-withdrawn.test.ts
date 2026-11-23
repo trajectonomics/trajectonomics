@@ -86,13 +86,14 @@ describe("funding on a liability", () => {
 		expect(allowedValues("OBLIGATION_TARGET_WITHDRAWN", ["flows", 0, "target"])).toBeUndefined()
 	})
 
-	it("is INVALID_FUNDING once for an unknown value, and names target and obligation", () => {
+	it("is INVALID_FUNDING once for an unknown value, and names target, obligation and employer", () => {
 		expect(codes(buy({ target: "loan", funding: "bogus" }), ["cash"])).toEqual([
 			"INVALID_FUNDING flows/0/funding",
 		])
 		expect(allowedValues("INVALID_FUNDING", ["flows", 0, "funding"])).toEqual([
 			"target",
 			"obligation",
+			"employer",
 		])
 	})
 })

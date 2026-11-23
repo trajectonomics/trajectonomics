@@ -38,6 +38,11 @@ export interface AnnualRollup {
 	readonly income: MinorUnits
 	readonly expense: MinorUnits
 	readonly contributions: MinorUnits
+	/**
+	 * Employer Contributions landed in Accounts in the period; present only when the Scenario declares one.
+	 * Not in `income` or `contributions`, and not part of `interest`: the money never entered cashflow.
+	 */
+	readonly employerContributions?: MinorUnits
 	readonly unfundedContributions: MinorUnits
 	/** Prepayment plus Settlements net of refunds; present only when the Scenario has a Levy. */
 	readonly levy?: MinorUnits
