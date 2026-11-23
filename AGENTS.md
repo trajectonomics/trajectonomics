@@ -19,7 +19,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 ## Rules
 
-1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...). A scope is optional, and when present it is one from the closed list in [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml): a package without its own scope uses the nearest one (`skills` for `skills/internal`, `ci` for `tooling/guards`).
+1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...). A scope is optional, and when present it is one from the closed list in [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml): a package without its own scope uses the nearest one (`skills` for `skills/internal`, `ci` for `tooling/guards`). Branch with `git switch --no-track -c <branch> origin/main` and push with `git push -u origin HEAD:<branch>`: a branch made from `origin/main` with tracking pushes to `main` on a bare `git push`, and `main` accepts a direct push (it took one on 2026-11-23).
 2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only; Cloudflare credentials live in Cloudflare (Workers Builds), never in this repository.
 3. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
 4. Package design: keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
