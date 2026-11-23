@@ -125,7 +125,8 @@ function detailsOf(problems: readonly ScenarioProblem[], base: string) {
 /**
  * The `invalid_input` for a document `sim-core` refuses, or null when it accepts the document. A code
  * the refusal table words (a loan's rules, ADR-0016) states its own sentence and hint, the same ones
- * `projection run` prints for a stored row; any other code keeps the code and its allowed values.
+ * `projection run` prints for a stored row, followed by the schema hint every document refusal carries
+ * (ADR-0052); any other code keeps the code and its allowed values.
  */
 export function scenarioDocumentError(value: unknown, base = "document"): AppError | null {
 	const problems = scenarioProblems(value)
@@ -139,7 +140,8 @@ export function scenarioDocumentError(value: unknown, base = "document"): AppErr
 	return fail("invalid_input", {
 		path: refusal.path,
 		message: said?.message ?? refusal.message,
-		hint: said?.hint ?? refusal.hint,
+		// A worded refusal keeps the schema hint every document refusal carries (ADR-0052).
+		hint: [said?.hint, refusal.hint].filter((part) => part !== undefined).join(" "),
 		details: detailsOf(problems, base),
 	})
 }
