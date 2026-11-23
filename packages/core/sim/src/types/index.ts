@@ -1,4 +1,4 @@
-export type { Account, AssetRule, LiabilityRule } from "./account"
+export type { Account, AssetRule, LiabilityRule, Payout } from "./account"
 export type { Balance, Baseline } from "./baseline"
 export type * from "./breakdown"
 export type { Calendar, DayRule } from "./calendar"

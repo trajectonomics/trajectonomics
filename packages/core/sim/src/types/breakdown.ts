@@ -38,6 +38,12 @@ export interface EmployerLine {
 	readonly amount: MinorUnits
 }
 
+/** One Account's payouts landed as passive income; they are in the identity as money in. */
+export interface PayoutLine {
+	readonly account: AccountId
+	readonly amount: MinorUnits
+}
+
 /** One planned withdrawal Flow's amount, with the liability it borrowed from. */
 export interface WithdrawalLine {
 	readonly flow: string
@@ -70,6 +76,11 @@ export interface CashflowBreakdown {
 	 * Contribution. Kept out of the identity: it never entered cashflow, so money in still equals money out.
 	 */
 	readonly employer?: readonly EmployerLine[]
+	/**
+	 * Payouts by Account, in Scenario order; present only when the Scenario declares a payout. Money in:
+	 * `income` lists the declared income Flows, so the identity adds `Σpayouts` to its money in.
+	 */
+	readonly payouts?: readonly PayoutLine[]
 	readonly withdrawals: readonly WithdrawalLine[]
 	readonly drawn: readonly AccountLine[]
 	readonly surplus: readonly AccountLine[]

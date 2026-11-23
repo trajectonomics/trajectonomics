@@ -76,3 +76,8 @@ slice of the yearly cash-flow breakdown (#190).
 - Every parity fixture is checked with the option on: every other figure is unchanged, and the identity
   and the roll-up totals hold.
 - A Levy's Settlement falling beyond the horizon is not in the breakdown, as its `levy` field is not.
+
+## Amended by ADR 0027
+
+A Scenario that declares a payout adds a `payouts` list (by Account) to the breakdown. `income` still lists the
+declared income Flows, so money in also sums `payouts`, and the roll-up's `income` is `Σincome + Σpayouts`.

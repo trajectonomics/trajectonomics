@@ -9,6 +9,7 @@ import type { DatedEvent } from "./events"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
 import { totalsOf } from "./levy-step"
 import { payOut } from "./pay-out"
+import { applyPayouts } from "./payout"
 import { plannedFail } from "./planned-fail"
 import { plannedOn } from "./planned-on"
 import { applyPlannedWithdrawals } from "./planned-withdrawals"
@@ -42,8 +43,16 @@ export function processDate(
 	// sell it, and nothing below reads it (ADR 0026).
 	const employer = applyEmployer(states, day.contributionEntries, date, levies)
 	if (employer.problem !== undefined) return early({ ...day, employer: 0n }, employer.problem)
+	// A payout leaves its Account on its date, before a sale or a payment reads the Account (ADR 0027).
+	const payout = applyPayouts(states, events, planned.planned, date, levies)
+	if (payout.problem !== undefined) return early(day, payout.problem)
 	const moves = applyPlannedWithdrawals(states, day.plannedBySource, date, levies)
-	const landed = { ...day, withdrawals: moves.cash, plannedBySource: moves.borrowedBy }
+	const landed = {
+		...day,
+		payouts: payout.paid,
+		withdrawals: moves.cash,
+		plannedBySource: moves.borrowedBy,
+	}
 	if (moves.problem !== undefined) return early(landed, moves.problem)
 	const dated = {
 		scenario,

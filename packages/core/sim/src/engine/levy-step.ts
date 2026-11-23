@@ -16,6 +16,7 @@ interface DayParts {
 	readonly prepaid: bigint
 	readonly withdrawals: bigint
 	readonly employer: bigint
+	readonly payouts?: bigint
 	readonly plannedBySource?: ReadonlyMap<AccountId, bigint>
 }
 
@@ -53,6 +54,7 @@ export function totalsOf(
 		expense: day.expense,
 		withdrawals: day.withdrawals,
 		employer: day.employer,
+		payouts: day.payouts ?? 0n,
 		drawnBy: day.plannedBySource ?? new Map(),
 		contributions,
 		paidBy,

@@ -14,7 +14,12 @@ export function identitySides(line: CashflowBreakdown): {
 	readonly moneyIn: number
 	readonly moneyOut: number
 } {
-	const moneyIn = sum(line.income) + sum(line.withdrawals) + sum(line.drawn) + line.unmet
+	const moneyIn =
+		sum(line.income) +
+		sum(line.payouts ?? []) +
+		sum(line.withdrawals) +
+		sum(line.drawn) +
+		line.unmet
 	const moneyOut =
 		sum(line.prepaid) +
 		sum(line.settlements) +
@@ -28,7 +33,8 @@ export function identitySides(line: CashflowBreakdown): {
 export function rollupMismatches(annual: AnnualRollup, line: CashflowBreakdown): readonly string[] {
 	const levy = sum(line.prepaid) + sum(line.settlements)
 	const checks: readonly (readonly [string, number, number])[] = [
-		["income", sum(line.income), annual.income],
+		["income", sum(line.income) + sum(line.payouts ?? []), annual.income],
+		["payouts", sum(line.payouts ?? []), annual.payouts ?? 0],
 		["expense", sum(line.expenses), annual.expense],
 		["categories", sum(line.categories), sum(line.expenses)],
 		["contributions", line.contributions.reduce((t, c) => t + c.applied, 0), annual.contributions],

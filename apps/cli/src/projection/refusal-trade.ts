@@ -36,4 +36,9 @@ export const SAID_TRADE: Readonly<Partial<Record<ErrorCode, Said>>> = {
 			"An employer Contribution pays into an Illiquid asset, and the employer's share lands in a liquid asset Account such as a provident fund.",
 		hint: "Name a liquid asset Account as the target.",
 	},
+	PAYOUT_ILLIQUID: {
+		message:
+			"An Illiquid asset carries a payout, and a payout pays part of an asset's value out as passive income, which a home or a car does not.",
+		hint: "Remove the payout from the Illiquid asset, or state the income it brings (rent) as an income Flow.",
+	},
 }
