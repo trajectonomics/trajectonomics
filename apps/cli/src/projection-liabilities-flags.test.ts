@@ -28,6 +28,7 @@ describe("--liabilities beside each other flag, once each", () => {
 		expect(body.tables.map((table) => table.name)).toEqual([
 			"annual",
 			"cashflow",
+			"cashflowTotals",
 			"liabilities",
 			"paidOff",
 		])

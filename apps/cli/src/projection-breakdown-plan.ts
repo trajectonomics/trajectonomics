@@ -65,3 +65,32 @@ export const BREAKDOWN_BARE: Scenario = {
 	...BREAKDOWN_SCENARIO,
 	levies: (BREAKDOWN_SCENARIO.levies ?? []).map(({ carryIn: _carryIn, ...levy }) => levy),
 }
+
+/**
+ * The plan with a car that the year's cash cannot pay (cli ADR-0058, addendum): the car is 1,000,000.00
+ * on 2026-09-15, so the investment Account is drawn dry and the rest is the year's Shortfall.
+ */
+export const BREAKDOWN_SHORTFALL: Scenario = {
+	...BREAKDOWN_SCENARIO,
+	flows: BREAKDOWN_FLOWS.map((flow) =>
+		flow.id === "car" ? { ...flow, amount: 100_000_000 } : flow,
+	),
+}
+
+/**
+ * The plan with a surplus that crosses a cap (cli ADR-0058, addendum): the salary is 30,000.00 a month,
+ * and cash takes surplus only up to 700,000.00, so the rest of the year's surplus goes to the bank.
+ */
+export const BREAKDOWN_SURPLUS: Scenario = {
+	...BREAKDOWN_SCENARIO,
+	flows: BREAKDOWN_FLOWS.map((flow) =>
+		flow.id === "salary" ? { ...flow, amount: 3_000_000 } : flow,
+	),
+	cashflow: {
+		...BREAKDOWN_SCENARIO.cashflow,
+		surplus: [
+			{ account: FIXTURE_ACCOUNTS.cash, upTo: 70_000_000 },
+			{ account: FIXTURE_ACCOUNTS.bank },
+		],
+	},
+}

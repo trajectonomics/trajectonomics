@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
+import { type CashflowTotalsTable, cashflowTotalsTable } from "./cashflow-totals-view"
 import { type CashflowRow, cashflowRow } from "./cashflow-view"
 import {
 	type LiabilityMonthsTable,
@@ -34,6 +35,7 @@ export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
 	| { name: "monthly"; count: number; rows: MonthlyRow[] }
 	| { name: "cashflow"; count: number; rows: CashflowRow[] }
+	| CashflowTotalsTable
 	| LiabilityMonthsTable
 	| PaidOffTable
 	| { name: "milestones"; count: number; rows: MilestoneRow[] }
@@ -66,9 +68,10 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 		rows: z
 			.array(cashflowRow)
 			.describe(
-				"One row per Annual roll-up and line, roll-up by roll-up in the engine's order. A line is a source (income, prepaid, settlement, expense, category, contribution, unfunded, withdrawal, drawn, surplus or unmet) and carries its id, account and category where it has them. Amounts are decimal strings at the Currency's scale, and a settlement keeps its sign. The totals are not in the table: the human form prints them.",
+				"One row per Annual roll-up and line, roll-up by roll-up in the engine's order. A line is a source (income, prepaid, settlement, expense, category, contribution, unfunded, withdrawal, drawn, surplus or unmet) and carries its id, account and category where it has them. Amounts are decimal strings at the Currency's scale, and a settlement keeps its sign. The section totals are in cashflowTotals.",
 			),
 	}),
+	cashflowTotalsTable,
 	liabilityMonthsTable,
 	paidOffTable,
 	z.strictObject({
@@ -97,6 +100,6 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, the cash flow when --breakdown was given, the loans when --liabilities was given, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, and the milestones when the Scenario declares them.",
 		),
 })

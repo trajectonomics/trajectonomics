@@ -56,3 +56,34 @@ output, and where the CLI does arithmetic at all.
   reads it yet; the Cash flow page is #284.
 - Every line is a row of the output schema, so the schema lists the groups and their meaning, and a new
   group is a schema change with its own decision.
+
+## Addendum: the section totals are in JSON too (#337)
+
+The Dashboard may not sum money (web ADR 0002), so the Cash flow page could not show a year's section totals
+from the lines alone. The totals therefore go into the JSON, and this addendum replaces the decision above that
+kept them out of it. The human block and the JSON now come from one function, so they cannot disagree.
+
+- **A table of its own, in long form.** The entry is `cashflowTotals`, beside `cashflow`, present only with
+  `--breakdown`. It has nine rows per Annual roll-up, one per section, in the order a person reads them: `money in`,
+  `tax`, `withdrawals`, `drawn`, `spending`, `saving`, `not funded`, `left over` and `unmet`. Every row carries
+  `index`, `from`, `to`, `total` and `amount`, so the table is one object like the `cashflow` table. It is not a
+  `group: "total"` in `cashflow`, because a total has no `id`, `account` or `category` and would leave those keys
+  null on every total row.
+- **Wide was rejected.** One row per roll-up with a column per section reads well, but the nine names are the
+  section list the human block shows, and a long table keeps the two shapes (lines and totals) the same way.
+- **One function.** `cashflowTotalsOf` (`src/projection/cashflow-totals.ts`) computes a roll-up's totals in minor
+  units from the annual row and that roll-up's lines. `cashflowTotalRowsOf` builds the JSON rows from it, and the
+  human block calls it too. Each total is the exact integer sum of the roll-up's lines, or the engine's own
+  field (`spending` is `expense`, `saving` is `contributions`, `not funded` is `unfundedContributions`, `unmet` is
+  `unmet`); `money in` is `income` plus the withdrawal and drawn lines. Nothing is a float, and nothing is summed
+  in the page.
+- **Zero is stated.** A section with no lines is `0.00` in the JSON, where the human block leaves the line out.
+  The block's own rules (which lines it prints) are unchanged.
+- **Without the flag.** No `cashflowTotals` key is added, so a run without `--breakdown` keeps its bytes.
+- **The identity.** Each roll-up satisfies `money in + unmet = tax + spending + saving + left over`, the sim ADR-0018
+  identity under the same names. `projection-breakdown-totals.test.ts` hand-checks a normal year, a Shortfall year
+  and a surplus that a cash cap splits across two Accounts, and pins each JSON total to the human block's figure.
+- **Category rows are not totals.** The human block still prints one line per category under `spending`, from the
+  engine's `category` lines. A category is not grouped by the totals, so a category of `" "` (a whitespace-only
+  name, which the Flow schema accepts) stays its own category: the JSON names it `" "`, and the human block prints
+  the line with a blank label, not as `(uncategorised)`, which is only for `null`. The engine is not changed.

@@ -20,7 +20,12 @@ describe("projection run --breakdown: combined with the other flags", () => {
 	it("--monthly keeps the cash flow beside the monthly rows", async () => {
 		const home = await breakdownHome()
 		const body = runBody(await projection(home, ["run", ...FLAGS, "--monthly", "--breakdown"]))
-		expect(body.tables.map((table) => table.name)).toEqual(["annual", "monthly", "cashflow"])
+		expect(body.tables.map((table) => table.name)).toEqual([
+			"annual",
+			"monthly",
+			"cashflow",
+			"cashflowTotals",
+		])
 		expect(yearLines(tableOf(body, "cashflow").rows)).toHaveLength(HAND_YEAR.length)
 	})
 
