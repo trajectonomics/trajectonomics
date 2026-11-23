@@ -51,7 +51,6 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	UNKNOWN_LEVY: document,
 	UNKNOWN_FLOW: document,
 	ACCOUNT_MEASURE_IN_LEVY: document,
-	NEXT_12_MONTHS_READS_ACCOUNT: document,
 	FLOW_CYCLE: document,
 	STEPS_NOT_ASCENDING: document,
 	CAP_NOT_CONST: document,
@@ -92,10 +91,4 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	TOO_MANY_STEPS: input,
 	INVALID_OPTION: input,
 	PERIOD_DUE_MISMATCH: never,
-	// A Spending rule the CLI does not publish yet; the CLI change for #360 (#362) makes these user-facing.
-	RULE_NOT_EXPENSE: never,
-	RULE_PORTFOLIO_LIABILITY: never,
-	RULE_PORTFOLIO_ILLIQUID: never,
-	RULE_FREQUENCY: never,
-	RULE_FLOOR_ABOVE_CEILING: never,
 }

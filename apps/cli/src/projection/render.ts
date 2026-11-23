@@ -9,6 +9,7 @@ import {
 	milestoneColumns,
 	runMilestonesShown,
 } from "./milestones"
+import { spendingBlocks, spendingHidden } from "./spending-human"
 
 /** One column of a table-shaped result, headed exactly as its row key is spelled. */
 const column = (key: string, align?: ColumnHint["align"]): ColumnHint =>
@@ -69,9 +70,15 @@ export const projectionHint: RenderHint = {
 		],
 		milestones: milestoneColumns,
 	},
-	// The long cash-flow, liability and balance tables are JSON's; the human form prints them as blocks after the body.
-	display: (data) => balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data)))),
-	blocks: (data) => [...cashflowBlocks(data), ...liabilityBlocks(data), ...balanceBlocks(data)],
+	// The long cash-flow, liability, balance and spending tables are JSON's; the human form prints them as blocks after the body.
+	display: (data) =>
+		spendingHidden(balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data))))),
+	blocks: (data) => [
+		...cashflowBlocks(data),
+		...liabilityBlocks(data),
+		...balanceBlocks(data),
+		...spendingBlocks(data),
+	],
 	note: "notes",
 	extra: [
 		{

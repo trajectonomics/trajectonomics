@@ -1,6 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import { scenarioExample } from "./index"
 import { FULL_MILESTONES } from "./milestone-fixture"
+import { OBJECT_PATHS } from "./object-paths"
+import { RULE_FLOWS } from "./rule-fixture"
 import { documented, PROPERTIES, refusalsOf, replaceAt, resolves, VERSION } from "./testing"
 import { TRADE_FLOWS } from "./trade-flows"
 
@@ -113,6 +115,7 @@ const FULL: Record<string, unknown> = {
 			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
 		},
 		...TRADE_FLOWS,
+		...RULE_FLOWS,
 	],
 	cashflow: {
 		surplus: [{ account: "cash", upTo: 500_000 }, { account: "index" }],
@@ -138,26 +141,6 @@ const FULL: Record<string, unknown> = {
 	milestones: FULL_MILESTONES,
 	calendar: { dayRule: "next", holidays: ["2026-04-13"] },
 }
-
-/** Every object the schema states as closed, as a path into `FULL`, so each is probed closed. */
-const OBJECT_PATHS: (string | number)[][] = [
-	[],
-	["economy"],
-	["accounts", 0],
-	["flows", 0],
-	["flows", 0, "prepayments", 0],
-	["flows", 0, "cappedPrepayment"],
-	["flows", 6, "derive"],
-	["flows", 8, "level"],
-	["milestones", 0],
-	["milestones", 0, "criteria", 0],
-	["cashflow"],
-	["cashflow", "surplus", 0],
-	["levies", 0],
-	["levies", 0, "period"],
-	["levies", 0, "settlement"],
-	["calendar"],
-]
 
 /** The objects whose keys a Measure's own `op` decides, which the schema states as open. */
 const OPEN_OBJECTS = ["flows.*.derive.measures.*"]

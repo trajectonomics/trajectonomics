@@ -1,56 +1,9 @@
 import { describe, expect, it } from "bun:test"
 import { isAppError } from "../errors"
-import { fromDecimalForm, toDecimalForm } from "./decimal"
-import { acceptedScenarioSchemaVersion } from "./document"
-import { moneyPathsOf, PUBLISHED } from "./money-fields"
-import { scenarioExample } from "./shape/example"
+import { fromDecimalForm } from "./decimal"
+import { type Doc, decimalOk, isDoc, withAmount, worked } from "./decimal-test-support"
+import { moneyPathsOf, PUBLISHED, ratePathsOf } from "./money-fields"
 import { scenarioTemplate } from "./template"
-
-type Doc = Record<string, unknown>
-
-function isDoc(value: unknown): value is Doc {
-	return typeof value === "object" && value !== null && !Array.isArray(value)
-}
-
-/**
- * The worked example, with a capped surplus step and a level loan, so every money field carries a
- * value. The loan account gains its compounding period, which a level contribution needs.
- */
-function worked(): Doc {
-	const version = acceptedScenarioSchemaVersion()
-	if (version === undefined) throw new Error("the pinned sim-core accepts no version")
-	const example = scenarioExample(version)
-	const cashflow = example["cashflow"] as Doc
-	const accounts = (example["accounts"] as Doc[]).map((account) =>
-		account["id"] === "loan" ? { ...account, compounding: "monthly" } : account,
-	)
-	const levelLoan: Doc = {
-		id: "car-loan",
-		kind: "contribution",
-		target: "loan",
-		frequency: "monthly",
-		start: "2026-01-31",
-		level: { principal: 123_456, payments: 12, rounding: "halfUp" },
-	}
-	return {
-		...example,
-		accounts,
-		flows: [...(example["flows"] as Doc[]), levelLoan],
-		cashflow: { ...cashflow, surplus: [{ account: "cash", upTo: 250_000 }, { account: "index" }] },
-	}
-}
-
-/** The worked example with its first Flow's amount replaced: the only field these cases vary. */
-function withAmount(base: Doc, amount: unknown): Doc {
-	const flows = base["flows"] as Doc[]
-	return { ...base, flows: [{ ...flows[0], amount }, ...flows.slice(1)] }
-}
-
-function decimalOk(doc: Doc): Doc {
-	const decimal = toDecimalForm(doc)
-	if (isAppError(decimal)) throw new Error(decimal.body.message)
-	return decimal
-}
 
 /** The values a money path names, as `flows[].amount` reads them; a list is walked item by item. */
 function valuesAt(value: unknown, segments: readonly string[]): unknown[] {
@@ -70,8 +23,22 @@ describe("the money fields of the decimal form", () => {
 		expect(moneyPathsOf(PUBLISHED)).toEqual([
 			"flows[].amount",
 			"flows[].level.principal",
+			"flows[].rule.floor.amount",
+			"flows[].rule.ceiling.amount",
 			"milestones[].criteria[].amount",
 			"cashflow.surplus[].upTo",
+		])
+	})
+
+	it("write a spending rule's rates, and no other rate, as percent strings", () => {
+		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063).
+		expect(ratePathsOf(PUBLISHED)).toEqual([
+			"flows[].rule.rateBps",
+			"flows[].rule.steps[].bps",
+			"flows[].rule.upper.bps",
+			"flows[].rule.upper.adjustBps",
+			"flows[].rule.lower.bps",
+			"flows[].rule.lower.adjustBps",
 		])
 	})
 

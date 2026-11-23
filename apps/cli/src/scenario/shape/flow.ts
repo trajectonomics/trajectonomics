@@ -1,13 +1,14 @@
 import { labelSetsSentence } from "../tax/labels"
 import { fundingShape } from "./flow-funding"
 import { cappedPrepaymentShape, deriveShape, levelShape, prepaymentsShape } from "./flow-parts"
+import { flowRuleShape } from "./rule-shape"
 import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UNITS } from "./terms"
 
 /** One income, expense, contribution or withdrawal Flow, with the unit of every number it states. */
 export const flowShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `funding` is a contribution into an asset's alone; `category` is an expense's alone; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
+		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `funding` is a contribution into an asset's alone; `category` is an expense's alone; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive`, `level` and `rule` is required, the first bringing `growth` with it and `rule` an expense's alone.",
 	properties: {
 		id: {
 			type: "string",
@@ -30,7 +31,7 @@ export const flowShape: Record<string, unknown> = {
 		},
 		amount: {
 			type: "integer",
-			description: `${MINOR_UNITS} The same figure every occurrence, grown from \`start\` by \`growth\`. Required unless the Flow states \`derive\` or \`level\`.`,
+			description: `${MINOR_UNITS} The same figure every occurrence, grown from \`start\` by \`growth\`. Required unless the Flow states \`derive\`, \`level\` or \`rule\`.`,
 		},
 		growth: {
 			anyOf: [
@@ -48,7 +49,7 @@ export const flowShape: Record<string, unknown> = {
 				},
 			],
 			description:
-				'The yearly step applied to `amount` from `start`. Required wherever `amount` is stated, a `once` Flow included, where `{ "bps": 0 }` means no step; a Flow that states `derive` or `level` forbids it.',
+				'The yearly step applied to `amount` from `start`. Required wherever `amount` is stated, a `once` Flow included, where `{ "bps": 0 }` means no step; a Flow that states `derive`, `level` or `rule` forbids it.',
 		},
 		earned: {
 			type: "boolean",
@@ -75,9 +76,10 @@ export const flowShape: Record<string, unknown> = {
 		funding: fundingShape,
 		derive: {
 			...deriveShape,
-			description: `${deriveShape["description"]} Required unless the Flow states \`amount\` or \`level\`.`,
+			description: `${deriveShape["description"]} Required unless the Flow states \`amount\`, \`level\` or \`rule\`.`,
 		},
 		level: levelShape,
+		rule: flowRuleShape,
 		source: {
 			type: "string",
 			description:
