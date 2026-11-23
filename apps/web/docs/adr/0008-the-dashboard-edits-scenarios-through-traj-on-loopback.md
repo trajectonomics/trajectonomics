@@ -59,3 +59,9 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - An Edit to a plan the page did not read is refused, so the page no longer creates a plan through `apply-plan`.
 - Known gap: the hash covers the document only (cli ADR 0055). A household change that moves no anchored date is not seen by a stale household save until the hash covers the household too.
 - Tests: `edit-stale.test.ts` runs a terminal change (`traj scenario tax base --none`, then a salary change) against the real binary, then a page save: it is refused and the stored plan is unchanged; after a reread the same Edit succeeds. `serve-edit.test.ts` pins the `/reread` refusals.
+
+## Amendment (2026-11-23): the what-if Edits
+
+- `copy-plan` gains optional `sets` and `removals`, the Overrides of a what-if. With them it runs `scenario fork <from> <name> --set=… --without=… --decimal`; without them its argv is unchanged.
+- `apply-overrides` is new: `scenario apply <name> --set=… --without=… --decimal --if-hash <contentHash>`, the what-if form of `scenario apply` ([cli ADR 0057](../../../cli/docs/adr/0057-a-what-if-applies-to-the-plan-it-came-from.md)). It carries at least one change, and it names the hash the session began with.
+- Both are pinned in `edit-what-if.test.ts`, and `followPlan` joins a copy or an apply to the plans the Snapshot projects, as `apply-plan` does. The session that makes them is [web ADR 0009](0009-the-what-if-session-reads-through-traj-on-loopback.md).

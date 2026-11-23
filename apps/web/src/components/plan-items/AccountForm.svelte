@@ -1,10 +1,12 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioAccount, ScenarioDocument } from "../../lib/contract"
 import { accountFromDraft } from "../../lib/view/plan-items/account-draft"
 import { accountDraftOf } from "../../lib/view/plan-items/accounts"
 import { accountIds, withAccount, withoutAccount } from "../../lib/view/plan-items/document"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import { recordOf } from "../../lib/what-if/session"
 import AccountFields from "./AccountFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 
@@ -18,9 +20,11 @@ interface Props {
 	existing?: ScenarioAccount | undefined
 	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
 	onDone: () => void
+	/** True when the drawer tries values in the What-if session, instead of saving them. */
+	tryValue?: boolean
 }
 
-let { name, doc, existing, onDone, contentHash }: Props = $props()
+let { name, doc, existing, onDone, contentHash, tryValue = false }: Props = $props()
 const initial = () => accountDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
@@ -41,11 +45,25 @@ async function save(event: SubmitEvent): Promise<void> {
 		return
 	}
 	problems = {}
+	if (tryValue) {
+		if (existing !== undefined) {
+			whatIfSession.tryItem(
+				name,
+				contentHash,
+				"accounts",
+				existing.id,
+				recordOf(existing),
+				recordOf(result.account),
+			)
+		}
+		onDone()
+		return
+	}
 	await commit(withAccount(doc, result.account))
 }
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Add account"}>
 	<AccountFields bind:draft existingId={existing?.id} {shown} />
-	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} />
+	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

@@ -43,3 +43,7 @@ _Avoid_: link, rule, trigger
 **Milestone**:
 A named target in a Scenario that fires on a date, on another Milestone, or when a figure such as net worth passes a level (sim ADR 0012). The Dashboard shows the date `traj projection run` reports for each one, or that it is not reached; it never works one out.
 _Avoid_: Goal, event, target date
+
+**What-if session**:
+The changes one tab holds against one plan, switched items off (Removals) and values set (Sets), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. It is held in the tab only.
+_Avoid_: scratch plan, draft, scenario copy, simulation

@@ -2,6 +2,7 @@
 // Edit of the list. Both are the error envelope every write answer uses ([serve-edit.ts](serve-edit.ts)).
 import type { ErrorBody } from "../src/lib/contract"
 import { type Edit, editSchema } from "../src/lib/edit/edit"
+import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
 
 /** The exit code a refusal carries: the write path refuses rather than runs, so none of traj's codes fits. */
@@ -35,4 +36,24 @@ export async function readEdit(
 	return parsed.success
 		? { ok: true, edit: parsed.data }
 		: invalid("The Edit is not one the Dashboard may send.")
+}
+
+/** Reads the body as a what-if of the closed shape: refused when it is not JSON, or names a bad plan or Override. */
+export async function readWhatIf(
+	request: Request,
+): Promise<{ ok: true; whatIf: WhatIfBody } | { ok: false; error: ErrorBody }> {
+	const invalid = (message: string) => ({
+		ok: false as const,
+		error: { code: "invalid_what_if", exitCode: REFUSED_EXIT_CODE, message },
+	})
+	let value: unknown
+	try {
+		value = await request.json()
+	} catch {
+		return invalid("The what-if is not JSON.")
+	}
+	const parsed = whatIfSchema.safeParse(value)
+	return parsed.success
+		? { ok: true, whatIf: parsed.data }
+		: invalid("The what-if is not one the Dashboard may send.")
 }

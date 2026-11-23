@@ -5,6 +5,7 @@
  * this list ever runs. `edit.test.ts` pins the list and the argv of each Edit.
  */
 import { z } from "zod"
+import { overridesFields } from "../what-if/overrides"
 import { planNameShapeError } from "./name"
 
 /** A plan name as `traj` takes it: not empty, and never shaped like a flag (see `planNameShapeError`). */
@@ -28,7 +29,12 @@ export const EDIT_KINDS = [
 	"delete-plan",
 	"set-household",
 	"remove-household",
+	"apply-overrides",
 ] as const
+
+/** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
+const someChange = (edit: { sets: unknown[]; removals: unknown[] }) =>
+	edit.sets.length + edit.removals.length > 0
 
 /** One Edit, as the page sends it in the body of `POST /edit`. Strict: an unknown field is refused. */
 export const editSchema = z.discriminatedUnion("kind", [
@@ -36,7 +42,19 @@ export const editSchema = z.discriminatedUnion("kind", [
 		kind: z.literal("copy-plan"),
 		from: planName,
 		name: planName,
+		// The Overrides a copy saves with (cli ADR 0056): none, and the copy is the plan as it is.
+		sets: overridesFields.sets.default([]),
+		removals: overridesFields.removals.default([]),
 	}),
+	z
+		.strictObject({
+			kind: z.literal("apply-overrides"),
+			name: planName,
+			contentHash,
+			sets: overridesFields.sets,
+			removals: overridesFields.removals,
+		})
+		.refine(someChange, { message: "a what-if applied with no change" }),
 	z.strictObject({
 		kind: z.literal("apply-plan"),
 		name: planName,
@@ -63,63 +81,7 @@ export const editSchema = z.discriminatedUnion("kind", [
 /** One Edit of the closed list. */
 export type Edit = z.infer<typeof editSchema>
 
-/** The argv of one write, which ends with `--json`, and the standard input the write reads. */
-export type WriteCommand = { argv: string[]; stdin?: string }
+/** An Edit as a caller writes it: a copy's Overrides may be left out, and the server reads them as none. */
+export type EditInput = z.input<typeof editSchema>
 
-/**
- * The `traj` write an Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
- * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
- * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055).
- */
-export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
-	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]
-	switch (edit.kind) {
-		case "copy-plan":
-			return { argv: ["scenario", "fork", edit.from, edit.name, ...flags] }
-		case "apply-plan":
-			// The page holds decimal-form documents only, so the write reads that form (ADR-0047).
-			return {
-				argv: [
-					"scenario",
-					"apply",
-					edit.name,
-					"--file",
-					"-",
-					"--decimal",
-					"--if-hash",
-					edit.contentHash,
-					...flags,
-				],
-				stdin: JSON.stringify(edit.document),
-			}
-		case "delete-plan":
-			return { argv: ["scenario", "rm", edit.name, ...flags] }
-		case "set-household":
-			// The household document is read from stdin, and its anchored dates are written (cli ADR-0048).
-			return {
-				argv: [
-					"scenario",
-					"household",
-					edit.name,
-					"--file",
-					"-",
-					"--if-hash",
-					edit.contentHash,
-					...flags,
-				],
-				stdin: JSON.stringify(edit.household),
-			}
-		case "remove-household":
-			return {
-				argv: [
-					"scenario",
-					"household",
-					edit.name,
-					"--none",
-					"--if-hash",
-					edit.contentHash,
-					...flags,
-				],
-			}
-	}
-}
+export { type WriteCommand, writeCommand } from "./command"

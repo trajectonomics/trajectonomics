@@ -35,3 +35,8 @@ Each refusal has its own test in `apps/web/scripts/serve-edit.test.ts`:
 
 - `POST /reread` runs the same guards as `POST /edit` (Host, Origin, token, `application/json`, a Snapshot already read, no Edit running). It runs the Snapshot Plan again and answers the new Snapshot, or the error as data. It writes nothing, and it exists so the page can show a plan that changed elsewhere, after a `scenario_changed` refusal ([cli ADR 0055](0055-a-write-can-name-the-content-hash-it-read.md), [web ADR 0008](../../../web/docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 - The plan-changing Edits send `--if-hash` with the hash the page read, so a save over a plan another writer changed is refused and nothing is written.
+
+## Amendment (2026-11-23): a fifth route reads a what-if
+
+- `POST /what-if` reads four figures for a what-if: `projection run`, `fi`, `projection compare` and, when the plan states a Return model, `projection chance`, each with the what-if's `--set`, `--without` and `--decimal`. It writes nothing, and each read is a read leaf of the Snapshot allowlist. It holds the guards of `POST /edit` (Host, Origin, the token compared in constant time, `application/json`, the 1 MiB body cap, and no Edit or what-if running: 409 for either). Its refusals are tested in `apps/web/scripts/serve-what-if.test.ts`, and its real-server body cap in `apps/web/scripts/serve-what-if-server.test.ts`. The Dashboard's record is [web ADR 0009](../../../web/docs/adr/0009-the-what-if-session-reads-through-traj-on-loopback.md).
+- The answer is the four reads as the Snapshot holds them, or the error envelope of a refused request. It is never saved to the Snapshot file.

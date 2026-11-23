@@ -7,10 +7,12 @@ import { editSession } from "../client/edit.svelte.js"
 import { queryParam, setQueryParam } from "../client/query-param.svelte.js"
 import { shellPanels } from "../client/shell.svelte.js"
 import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
+import { whatIfSession } from "../client/what-if.svelte.js"
 import { brandArtwork } from "../components/shell/brand-artwork"
 import DisplayOptions from "../components/shell/DisplayOptions.svelte"
 import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
+import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { editsShown } from "../lib/edit/shown"
 import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones"
 import { scenarioNames } from "../lib/view/plan"
@@ -49,7 +51,10 @@ $effect(() => {
 	current={page.url.pathname}
 	{names}
 	{selected}
-	onPlan={(name) => setQueryParam("scenario", name)}
+	onPlan={(name) => {
+		// Changes pending in the What-if session on another plan ask first (WhatIfBar).
+		if (whatIfSession.requestSwitch(name)) void setQueryParam("scenario", name)
+	}}
 	{editable}
 	{planDocument}
 	{milestones}
@@ -57,6 +62,7 @@ $effect(() => {
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60">
 	<ShellTopBar {title} />
+	<WhatIfBar />
 	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
 		{@render children()}
 	</main>
