@@ -27,8 +27,8 @@ export function advance(
 	if (dayEvents.length === 0 && !settled) return {}
 	if (levies !== undefined) closeReturnsOn(levies, states, date)
 	const landing = gate === undefined ? dayEvents : gate.apply(states, date, dayEvents, settled)
-	if (landing.length === 0 && !settled) return {}
 	recordLanding(values, date, states, landing)
+	if (landing.length === 0 && !settled) return {}
 	const outcome = processDate(states, scenario, date, landing, levies)
 	gate?.record(outcome.totals)
 	if (outcome.problem !== undefined) return { problem: outcome.problem }

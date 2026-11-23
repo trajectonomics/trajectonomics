@@ -8,6 +8,7 @@ import type { FinancialIndependenceOptions } from "../types/financial-independen
 import { readAccounts } from "./account-reads"
 import { retirementWindow, windowThrough } from "./expenses"
 import { originalSource } from "./original-window"
+import { type ReadDates, readDatesOf } from "./read-dates"
 import { type ReferencePlan, referencePlan } from "./reference-plan"
 import { type RequirementTable, requirementTable } from "./required"
 import { stopsFlow } from "./scan-stop"
@@ -37,8 +38,10 @@ export interface WindowPlan {
 	/** The Minimum buffer in months. */
 	readonly months: number
 	readonly shared: Windows | undefined
-	/** The Accounts a Derived amount reads: a walk records each one's value on every date it walks. */
+	/** The Accounts a Derived amount reads: a walk records each one's value on the dates a window reads. */
 	readonly reads: readonly string[]
+	/** The dates a window prices a Derived amount on, which a walk records though it lands none there. */
+	readonly readDates: ReadDates
 	/**
 	 * The candidate's events past the horizon through the windows' last date, which its walk
 	 * continues through to record the Account values its next-12-months window reads. Empty when
@@ -56,20 +59,12 @@ function signature(fires: Fires): string {
 }
 
 /** The candidate's events from the horizon through the windows' last date, for a walk to continue through. */
-function tailOf(
-	scenario: Scenario,
-	timeline: Timeline,
-	calendar: ResolvedCalendar | undefined,
-	wanted: boolean,
-): WindowTail {
-	const through = windowThrough(timeline)
+function tailOf(timeline: Timeline, original: readonly DatedEvent[], wanted: boolean): WindowTail {
 	const stop = stopsFlow(false)
 	const events = wanted
-		? buildEvents(scenario, { ...timeline, horizon: through }, calendar).filter(
-				(event) => event.date > timeline.horizon && !stop(event.flow),
-			)
+		? original.filter((event) => event.date > timeline.horizon && !stop(event.flow))
 		: []
-	return { events, horizon: timeline.horizon, through }
+	return { events, horizon: timeline.horizon, through: windowThrough(timeline) }
 }
 
 /** Builds the scan's windows; the work per distinct set of fire dates is done once. */
@@ -111,11 +106,16 @@ export function windowPlan(
 		return built
 	}
 	const shared = reads.length === 0 && (plan === undefined || plan.dynamic.length === 0)
-	const tail = tailOf(scenario, timeline, calendar, reads.length > 0 && retirement === undefined)
+	const original =
+		reads.length === 0
+			? []
+			: buildEvents(scenario, { ...timeline, horizon: windowThrough(timeline) }, calendar)
+	const tail = tailOf(timeline, original, reads.length > 0 && retirement === undefined)
 	return {
 		months,
 		shared: shared ? forFires(plan?.fires ?? new Map()) : undefined,
 		reads,
+		readDates: readDatesOf(original),
 		tail,
 		forFires,
 	}

@@ -2,6 +2,7 @@ import { collectDates } from "../engine/dates"
 import { flowsAt } from "../engine/events"
 import { allSettlementDates } from "../engine/levy-set"
 import { cloneLevySet, cloneStates } from "./clone"
+import { recordReads } from "./read-dates"
 import { processDay } from "./walk-day"
 import type { DayInput, WalkInput } from "./walk-input"
 
@@ -31,11 +32,17 @@ export function walkTail(input: WalkInput, walked: DayInput): void {
 		trace: [],
 	}
 	walked.values?.endWith(further.point.states)
+	const { sorted } = input.windows.readDates
+	const { states } = further.point
+	let read = sorted.findIndex((date) => date > horizon)
+	if (read < 0) read = sorted.length
 	let index = 0
 	for (const date of collectDates(events, [], settlements)) {
 		if (date <= horizon) continue
+		read = recordReads(further.values, sorted, read, states, date)
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
 		if (processDay(further, date, dayEvents).kind !== "ok") return
 	}
+	recordReads(further.values, sorted, read, states)
 }

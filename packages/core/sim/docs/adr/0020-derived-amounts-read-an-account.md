@@ -45,10 +45,18 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   window (`WindowPlan.shared` is `undefined`, as with a dynamic Milestone), and no window is cached,
   since a window now depends on values as well as fire dates.
   - Before each date's Flows land, a walk records the value of every Account a Derived amount reads
-    (`src/engine/account-values.ts`), on each date that plans a Derived amount: only those dates are
-    read by a window, so a date with none records nothing. The shared prefix records them for the unchanged
-    walk, and a candidate's walk records them from its own month on; a date before the candidate's
-    month reads the prefix, which is the candidate's own history.
+    (`src/engine/account-values.ts`), on each date a window reads. A window prices the **original**
+    plan's events (`fi/original-window.ts`), which still include the earned income the candidate
+    stopped, so those dates are read although the candidate lands nothing there: `WindowPlan.readDates`
+    holds each date the original plan has a Derived event on, through the windows' last date, and a
+    walk records on it as well as on every date its own landing plans a Derived amount (the Flows a
+    Milestone's gate lets land, a deferred `once` Flow on its fire date). A date the walk does not stand
+    on, because the candidate lands nothing there, is recorded between the dates it does stand on
+    (`fi/read-dates.ts`), from the states as they stand, which only growth has moved. Any other date is
+    never read, and records nothing. The shared prefix records them for the unchanged walk, and a
+    candidate's walk records them from its own month on; a date before the candidate's month reads the
+    prefix, which is the candidate's own history. A row is the value on its own date, not grown to the
+    date asked for, so a read of a date with no row on or before it is an internal error and throws.
   - The walk then continues its own events through the windows' last date, a year past the horizon
     (`src/fi/walk-tail.ts`), on copies of its states and Levy tallies, with the buffer check off and no
     dynamic Milestone fired: a Milestone unfired at the horizon stays unfired, as ADR 0012 says. The
@@ -62,13 +70,15 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
     through the horizon plus twelve months. Three plans (an account read whose Account a stopped
     salary funds, a home bought from the salary, a home bought when a Milestone fires) agree with it.
 - **Stated limitations.**
-  - A Return series (`chanceOfSuccess`) ends at the horizon, so an Account that holds one stays at its
-    value of that date through the year past it. The deterministic scan has no such gap.
+  - With a Return series (`chanceOfSuccess`) the window reads the read Account along the path's own
+    future rows, as the engine's walk does. A series ends at the horizon, so an Account that holds one
+    stays at its value of that date through the year past it. The deterministic scan has no such gap.
   - A Levy Settlement in the year past the horizon is settled only if the Levy's own periods reach it.
   - A walk that has a Shortfall or a problem in that year stops there, and the later dates read the
     states **that continued walk** ended with, grown to the date: the tail's own, not the horizon's
-    (a candidate that runs out on 2031-04-01 has already spent what the horizon's states still held,
-    so reading them priced a fee that would never be paid). A date the walk skipped reads the row at or
+    (in `golden/derive-account-tail.test.ts`, the candidate that stops the salary on 2026-04-01 survives
+    the horizon of 2031-01-01 and runs out in May 2031, so it has already spent what the horizon's
+    states still held, and reading them priced a fee that would never be paid). A date the walk skipped reads the row at or
     before it, never a later balance. The oracle prices the same dates the same way: it stops landing at
     the Shortfall but keeps planning every later date's amounts from the states it ended with
     (`oracle-account-walk.ts`).
@@ -135,6 +145,12 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   Actual/365 No Leap makes the growth one exact power; `src/golden/derive-account-golden.test.ts` checks the
   engine's cash against it. `src/golden/oracle-account-walk.ts` is the day-by-day walk (Accounts that
   change, Contributions, Milestones) that `oracle-account-fi.ts` re-runs per candidate, and
+  `src/golden/derive-account-read-dates.test.ts` (a bonus that only the original plan lands: a
+  window that prices it on 2026-06-15 reads inv there, and FI is 2026-01-01 with 1,800,000 for a buffer
+  of 0 and of 3 months; the shape it failed with was `NEGATIVE_AMOUNT` at that date),
+  `src/milestone/account-window-year.test.ts` (a window from each 1 January of 2026 to 2032 equals the
+  engine's annual expense for that year to the unit, across the 2028 leap day, for an effective, a
+  nominal-monthly and a liability Account under a weekly, monthly or annual upkeep from 31 January),
   `src/golden/derive-account-tail.test.ts` (a candidate that runs out in the year past the horizon: FI
   on 2026-04-01 with a reference of 2,587,636, which the engine now agrees on with the oracle, where
   the horizon's states gave 2026-05-01), and `src/golden/derive-account-fi.test.ts` holds the plans: 3,021,879 against the unchanged plan's 3,139,092;
@@ -142,13 +158,16 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   against 1,816,745 with a home bought when a Milestone fires.
 - **Cost.** On a 30-year monthly plan with one account read the FI scan takes about 140 ms against about
   95 ms for the same plan with a fixed amount (the cost of main), a recording per date, a copy of the
-  states per candidate and one window per candidate. A walk now records only on the dates that plan a
-  Derived amount, so a sparse read gets cheaper and a monthly one does not: at a 60-year horizon with a
-  yearly upkeep the scan went from about 360 ms to about 270 ms (four alternating runs each), and with a
-  monthly upkeep it stayed at about 470 ms, because every date is a read date. The rest of the gap to a
-  fixed amount is mostly that the read plan reaches FI later, so its scan walks more candidates
-  (68 against 36 on that plan), and that each date's valuation of the read Account is computed once by the
-  engine and once by the recording (`roundHalfUp` is a quarter of the scan's time).
+  states per candidate and one window per candidate. A walk now records only on the dates a window reads,
+  so a sparse read gets cheaper and a monthly one does not: at a 60-year horizon with a yearly upkeep
+  (a 500,000,000 home at 3%, 0.2% of its value a year, survival FI with no buffer, FI on 2037-12-01) the
+  scan's median over nine runs went from about 800 ms on main to about 460 ms, and with a monthly
+  upkeep it stayed at about 1,190 ms (main 1,187 ms), because every date is a read date. Before the
+  fix to the read dates the same yearly plan measured about 380 ms; the dates the original plan reads
+  and the candidate does not land cost the difference, within the noise of a loaded machine. The rest of
+  the gap to a fixed amount (about 220 ms) is that the read plan reaches FI later, so its scan walks
+  more candidates, and that each date's valuation of the read Account is computed once by the engine
+  and once by the recording.
 - The CLI publishes the `account` op in a Flow's `derive` graph (`apps/cli/src/scenario/shape/flow-parts.ts`),
   and `ACCOUNT_MEASURE_IN_LEVY` and `NEXT_12_MONTHS_READS_ACCOUNT` are filed as document refusals in
   `refusal-elsewhere.ts`. The op's description says accrued interest is included.

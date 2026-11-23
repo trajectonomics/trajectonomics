@@ -65,4 +65,23 @@ describe("the Account values a walk records before each date's Flows", () => {
 		values.endWith(new Map([["home", { ...home, balance: 515_000_000n, asOf: "2027-01-01" }]]))
 		expect(values.at("2026-07-01", "home")).toBe(500_000_000n)
 	})
+
+	it("holds a row as the value on its own date: a later date reads it, not grown", () => {
+		const held = states()
+		const values = recordedValues(["home"], held)
+		values.record(start, held)
+		const home = held.get("home")!
+		values.endWith(new Map([["home", { ...home, balance: 515_000_000n, asOf: "2027-01-01" }]]))
+		// 2026-12-31 is 364 days on: the row is still 500,000,000, not grown to that date.
+		expect(values.at("2026-12-31", "home")).toBe(500_000_000n)
+	})
+
+	it("refuses a date before the first row with a walk that ended later: a walk records every read date", () => {
+		const values = recordedValues(["home"], states())
+		const home = states().get("home")!
+		values.endWith(new Map([["home", { ...home, balance: 515_000_000n, asOf: "2027-01-01" }]]))
+		expect(() => values.at("2026-06-15", "home")).toThrow(
+			"No value of home recorded on or before 2026-06-15",
+		)
+	})
 })
