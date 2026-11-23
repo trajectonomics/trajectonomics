@@ -24,6 +24,6 @@ export const SAID_TRADE: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	OBLIGATION_TARGET_WITHDRAWN: {
 		message:
 			"An obligation Contribution buys into an Account that cashflow.withdraw lists, so the day's draw could take the price back out of it and the purchase would pay for itself.",
-		hint: "Take that Account out of cashflow.withdraw, so the purchase is paid from the other Accounts it lists.",
+		hint: "Take that Account out of cashflow.withdraw so the purchase is paid from the other Accounts it lists, or buy into an Account the list does not name.",
 	},
 }

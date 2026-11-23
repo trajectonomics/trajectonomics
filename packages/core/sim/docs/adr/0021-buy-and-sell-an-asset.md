@@ -35,7 +35,10 @@ date. This ADR adds both, as optional additive keys, so `Scenario.schemaVersion`
   for itself, and with a `gainLabel` and growth the round trip would tally a made-up Realised gain.
   Refusing the Scenario is simpler and clearer than excluding the target from that date's draw: the
   caller who wants to buy into an Account lets it stay out of the list, and the purchase then draws on
-  the others. A purchase into a home, or any Account not listed, draws savings as before.
+  the others. A purchase into a home, or any Account not listed, draws savings as before. An illiquid
+  target (a home) that `withdraw` lists is `ILLIQUID_ROUTED` alone: that refusal already names the
+  entry to remove, so one mistake is one refusal. An unknown `funding` on an asset is likewise
+  `INVALID_FUNDING` alone, never also `CONTRIBUTION_UNROUTED`.
 - **Bookkeeping.** The applied amount adds to the Cost basis of an Account with `gainLabel`, and counts
   in a `funded` tally, as for any applied Contribution (the same `mutate` path).
 - **Order on a date.** Planned amounts, planned withdrawals (loan draws and sales), debt payments,
@@ -125,9 +128,16 @@ The obligation's cash comes out of the day's net, like a debt payment. The net i
 
 - **A capped target that may borrow.** Rejected: ADR 0003's cap exists so saving never pulls on assets.
   A purchase is the other way round and needs its own word.
-- **Exclude the target from that date's draw instead of refusing.** Rejected: the draw order would
-  differ by date, the same `withdraw` list would mean two things, and the caller would not learn that
-  the Account cannot pay for its own purchase.
+- **Exclude the target from that date's draw instead of refusing.** Rejected, and re-decided in #354.
+  The first reason (the draw order would differ by date) was weak, since the list already skips a
+  locked Account by date. The standing reasons are these. Leaving the target out for the whole date
+  also bars an unrelated expense on that date from the Account's earlier balance, so a day with a
+  purchase into `brk` and a rent could end the run in a Shortfall while `brk` holds millions; a sound
+  version reserves only the price (draw the target down to its value before the purchase), which is a
+  second valuation inside every draw, a change to both oracles and to the FI count of what a Shortfall leaves undrawn (`lockedOrAbsentAssets`), and a
+  rule the caller cannot read off the `withdraw` list. And dropping the code would break every caller
+  that files `OBLIGATION_TARGET_WITHDRAWN`. The caller who wants to draw on `brk` decades later keeps
+  `brk` in a separate Account from the one the purchase goes into; revisit if that proves too costly.
 - **Carry an obligation's unmet part forward.** Rejected: a Shortfall ends the run, as for any expense.
 - **Count sale proceeds as Available cashflow.** Rejected by the owner's rule in ADR 0016: a sale would
   fund a savings target.

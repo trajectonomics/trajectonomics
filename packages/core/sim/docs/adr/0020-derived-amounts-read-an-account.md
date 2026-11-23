@@ -47,7 +47,7 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   - Before each date's Flows land, a walk records the value of every Account a Derived amount reads
     (`src/engine/account-values.ts`), on each date a window reads. A window prices the **original**
     plan's events (`fi/original-window.ts`), which still include the earned income the candidate
-    stopped, so those dates are read although the candidate lands nothing there: `WindowPlan.readDates`
+    stopped when an expense reads it (the other earned events are dropped, ADR 0012), so those dates are read although the candidate lands nothing there: `WindowPlan.readDates`
     holds each date the original plan has a Derived event on, through the windows' last date, and a
     walk records on it as well as on every date its own landing plans a Derived amount (the Flows a
     Milestone's gate lets land, and a deferred `once` Flow on its fire date when the candidate keeps

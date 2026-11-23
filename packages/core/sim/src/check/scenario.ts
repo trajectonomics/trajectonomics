@@ -59,6 +59,6 @@ export function checkScenario(
 	const checked = checkShape(value, path, shape, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
-	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], path, emit)
+	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], context.illiquid, path, emit)
 	checkIlliquidRouting(checked?.["cashflow"], context.illiquid, path, emit)
 }

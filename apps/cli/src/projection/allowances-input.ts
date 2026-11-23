@@ -5,7 +5,7 @@ import { labelsOf } from "./allowances-labels"
 /**
  * The most steps one tax year may take over every label (cli ADR-0061). The engine counts a step
  * before it knows whether the step is dropped for going past a cap, so a year whose answer is
- * this many steps or more is refused, and the refusal tells the caller to raise `--step`.
+ * more than this many steps is refused, and the refusal tells the caller to raise `--step`.
  */
 export const MAX_STEPS = 2000
 

@@ -44,7 +44,7 @@ describe("projection allowances refuses what it cannot answer", () => {
 		expect(res.code).toBe(2)
 		const error = errorOf(res)
 		expect(error).toMatchObject({ code: "invalid_input", path: "--step" })
-		expect(error.message).toContain("2000 steps or more")
+		expect(error.message).toContain("more than 2000 steps")
 		expect(error.hint).toContain("Raise --step")
 	})
 
