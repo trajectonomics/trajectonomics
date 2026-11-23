@@ -37,7 +37,6 @@ const RATE_LABELS: Readonly<Record<string, ThAssumptionFact>> = {
 
 const CLAIM_LABELS: Readonly<Record<string, ThAssumptionFact>> = {
 	[ThLevyContributionLabel.Rmf]: F.ClaimRmf,
-	[ThLevyContributionLabel.Ssf]: F.ClaimSsf,
 	[ThLevyContributionLabel.Pvd]: F.ClaimPvd,
 	[ThLevyContributionLabel.Gpf]: F.ClaimGpf,
 	[ThLevyContributionLabel.Nsf]: F.ClaimNsf,
