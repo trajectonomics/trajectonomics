@@ -31,6 +31,24 @@ export const DECIMAL_UNITS =
 export const CONTRIBUTION_CAP =
 	"an asset Contribution is capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day, so a lump sum from savings is not funded"
 
+/**
+ * The unit of a Spending rule's bound (its floor and ceiling): stated once per Rule year, so the
+ * per-occurrence tail of a Flow's unit does not apply (cli ADR-0063).
+ */
+export const YEARLY_UNITS: string = `${MINOR_UNITS_HEAD}, and a Spending rule's bound is the amount of a whole Rule year (twelve monthly occurrences, or one annual one), not of one occurrence.`
+
+/**
+ * The unit of a Spending rule's rate field: basis points as the engine states them. The decimal form
+ * (cli ADR-0047) writes these fields, and no other rate, as percent strings (cli ADR-0063), so the
+ * head is its own and `money-fields.ts` finds these fields by it.
+ */
+export const RULE_RATE_UNITS =
+	"Integer basis points of a Spending rule (1 bps = 0.01%), so 4% is 400. The rate is the caller's own figure: `traj` ships none."
+
+/** The unit of a Spending rule's rate in the decimal form: a percent string, exact to the basis point. */
+export const PERCENT_UNITS =
+	'A percent string of a Spending rule (never a JSON number), such as "4.00" for 4%, with at most two places: "4.00" is 400 basis points. The rate is the caller\'s own figure: `traj` ships none.'
+
 /** The unit of every rate field. */
 export const BASIS_POINTS =
 	"Integer basis points (1 bps = 0.01%), so 3% is 300 and 0.01 is not a rate."
@@ -55,6 +73,8 @@ export const FUNDINGS: readonly string[] = closed("INVALID_FUNDING")
 export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")
 export const FREQUENCIES: readonly string[] = closed("INVALID_FREQUENCY")
 export const DAY_RULES: readonly string[] = closed("INVALID_DAY_RULE")
+/** The kinds of Spending rule an expense Flow's `rule` takes (sim ADR 0023). */
+export const RULE_KINDS: readonly string[] = closed("INVALID_KIND", ["flows", "rule"])
 /** How a `scale` or `mul` Measure rounds its quotient: down, to nearest with halves up, or up. */
 export const ROUNDINGS: readonly string[] = closed("INVALID_ROUNDING")
 /** The kinds of criterion a Milestone may hold; each kind takes its own keys (sim's ADR 0012). */

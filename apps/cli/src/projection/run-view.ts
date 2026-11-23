@@ -9,9 +9,10 @@ import {
 	type PaidOffTable,
 	paidOffTable,
 } from "./liabilities-view"
-import { type MilestoneRow, milestoneRow } from "./milestones"
+import { type MilestonesTable, milestonesTable } from "./milestones-table"
 import { dateField } from "./money"
 import { type AnnualRow, annualRow, type MonthlyRow, monthlyRow } from "./rows-view"
+import { type SpendingRulesTable, spendingRulesTable } from "./spending-view"
 import { type TaxYearView, taxYearsField } from "./tax-view"
 import {
 	asOfField,
@@ -30,7 +31,7 @@ export type { TaxYearView } from "./tax-view"
 
 /**
  * The Projection's annual roll-up, its monthly rows with `--monthly`, its cash flow with `--breakdown`
- * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060) and its milestones (cli ADR-0049).
+ * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060), each spending rule's years with `--spending` (cli ADR-0063) and its milestones (cli ADR-0049).
  */
 export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
@@ -40,7 +41,8 @@ export type ProjectionTable =
 	| LiabilityMonthsTable
 	| PaidOffTable
 	| BalancesTable
-	| { name: "milestones"; count: number; rows: MilestoneRow[] }
+	| SpendingRulesTable
+	| MilestonesTable
 
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
 export type ProjectionRunView = Echo & {
@@ -77,13 +79,8 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 	liabilityMonthsTable,
 	paidOffTable,
 	balancesTable,
-	z.strictObject({
-		name: z
-			.literal("milestones")
-			.describe("Each Milestone's fire date, present only when the Scenario declares Milestones."),
-		count: z.number().int().describe("The number of Milestones."),
-		rows: z.array(milestoneRow).describe("One row per Milestone, in Scenario order."),
-	}),
+	spendingRulesTable,
+	milestonesTable,
 ])
 
 export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
@@ -103,6 +100,6 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, and the milestones when the Scenario declares them.",
 		),
 })

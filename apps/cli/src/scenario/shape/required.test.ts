@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { SCENARIO_SHAPE_REQUIRED, scenarioExample } from "./index"
+import { RULE_FLOWS } from "./rule-fixture"
 import { documented, type Path, refusalsOf, replaceAt, VERSION } from "./testing"
 
 /*
@@ -54,6 +55,7 @@ const FULL: Record<string, unknown> = {
 			start: "2026-01-01",
 			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
 		},
+		...RULE_FLOWS,
 	],
 	levies: [
 		{
@@ -174,5 +176,18 @@ describe("the required fields the shape states", () => {
 			path: "flows.0.growth",
 		})
 		expect(refusalsOf(flow({}))).toContainEqual({ code: "MISSING_KEY", path: "flows.0.amount" })
+	})
+
+	it("states that a rule takes the place of amount, growth and derive", () => {
+		const flow = (patch: Record<string, unknown>) => ({
+			...FULL,
+			flows: [{ id: "flow", kind: "expense", frequency: "monthly", start: "2026-01-01", ...patch }],
+		})
+		const rule = { kind: "initialRate", portfolio: ["cash"], rateBps: 400, rounding: "floor" }
+		const derive = { measures: [{ id: "base", op: "const", value: 100 }], result: "base" }
+		expect(refusalsOf(flow({ rule }))).toEqual([])
+		const refused = { code: "FIELD_NOT_ALLOWED", path: "flows.0.rule" }
+		expect(refusalsOf(flow({ rule, amount: 1, growth: { bps: 0 } }))).toContainEqual(refused)
+		expect(refusalsOf(flow({ rule, derive }))).toContainEqual(refused)
 	})
 })

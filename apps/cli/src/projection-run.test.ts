@@ -159,6 +159,7 @@ describe("projection run", () => {
 			"monthly",
 			"scenario",
 			"set",
+			"spending",
 			"without",
 		])
 		expect(data.input.required.sort()).toEqual(["asOf", "horizon", "scenario"])

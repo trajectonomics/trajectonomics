@@ -34,6 +34,10 @@ _Avoid_: Cash-flow statement, budget, flow report
 A home, a car or another thing owned that stays in net worth but is not spent: not a model of its own, but an asset Account marked `liquid: false` that no routing list names, an obligation Contribution that buys it, an optional loan, Flows whose amounts read its value, and a planned withdrawal that sells it, with a payoff that repays its loan from the sale (ADR-0060). Its ids follow `<asset>-purchase`, `-running`, `-rent`, `-sale`, `-loan` and `-loan-payoff`, a convention the Dashboard writes and reads that the core never sees.
 _Avoid_: Property (as a type), fixed asset, holding
 
+**Spending rule**:
+A fourth way to state an expense Flow's amount, `rule` beside `amount`, `derive` and `level`: its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year (sim ADR-0023). `initialRate` fixes the first year's amount as a share and grows it by inflation, `currentRate` takes a share of what the portfolio is worth each year (with optional dated rate steps, a floor and a ceiling), and `guardrails` cuts the amount after the share has grown too large and raises it after it has grown too small. The rule is the engine's, and `traj` ships no rate, band, bound or rounding for it: every figure is the caller's. `projection run --spending` states each Rule year (ADR-0063), and `projection chance` states what a rule pays across Market paths as spending Bands and a lowest year. A fixed amount that keeps pace with inflation is an ordinary expense with `growth: "inflation"`, not a rule.
+_Avoid_: Retirement plan, withdrawal strategy, safe withdrawal rate (a rate is the caller's, not a default)
+
 **As-of**:
 The date a result is evaluated at. Every result states it.
 _Avoid_: Today, now, snapshot date

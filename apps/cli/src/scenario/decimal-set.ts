@@ -1,6 +1,6 @@
 import { type AppError, fail, isAppError } from "../errors"
-import { parseMinorUnits } from "../store/money"
-import { currencyOf, MONEY_HINT, mapMoney } from "./decimal"
+import { currencyOf, mapDecimalFields } from "./decimal"
+import { hintOf, MONEY_HINT, notDecimal, parseField } from "./decimal-field"
 import { isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
 import { badSet } from "./set-parse"
@@ -58,13 +58,6 @@ function atSetFlag(error: AppError, index: number, path: string): AppError {
 	})
 }
 
-/** The reason a money value in the wrong form is refused, as the Override names it. */
-function notDecimal(raw: unknown): string {
-	return typeof raw === "number"
-		? "a money amount is a JSON number, not a decimal string"
-		: "a money amount is not a decimal string"
-}
-
 /**
  * One `--set` value read in the decimal form (cli ADR-0056): a value whose path names a money field
  * becomes minor units through the same exact parser `scenario apply --decimal` uses, and a value that
@@ -80,17 +73,17 @@ export function setValueFromDecimal(
 ): unknown | AppError {
 	const node = schemaAtPath(PUBLISHED, segments)
 	if (node === undefined) return value
-	return mapMoney(node, value, segments, (raw, at) => {
+	return mapDecimalFields(node, value, segments, (raw, at, kind) => {
 		const currency = currencyOf(document)
 		if (isAppError(currency)) return currency
 		const dotted = formatPath(at)
 		if (typeof raw !== "string") {
-			return badSet(index, `at ${dotted}, ${notDecimal(raw)}`, {
-				hint: MONEY_HINT,
+			return badSet(index, `at ${dotted}, ${notDecimal(raw, kind)}`, {
+				hint: hintOf(kind),
 				details: { path: dotted },
 			})
 		}
-		const minor = parseMinorUnits(raw, currency, dotted)
+		const minor = parseField(kind, raw, currency, dotted)
 		return isAppError(minor) ? atSetFlag(minor, index, path) : minor
 	})
 }

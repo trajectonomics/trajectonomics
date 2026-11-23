@@ -5,8 +5,9 @@ import { fail, isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
 import { chanceOf } from "../../projection/chance"
+import { chanceHint } from "../../projection/chance-hint"
 import { readReturnModel, returnModelFlagDocument } from "../../projection/chance-model"
-import { chanceHint, chanceView } from "../../projection/chance-view"
+import { chanceView } from "../../projection/chance-view"
 import {
 	asOfFlag,
 	carryInFlag,
@@ -20,7 +21,7 @@ import { decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags
 
 /** The method in the words a help page prints: what runs, and what the result does not say. */
 const CHANCE_METHOD =
-	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up. The figures are nominal, and the CLI ships no Return model: the caller states one."
+	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up; for a Scenario with a spending rule, spendingBands add what the rule paid in each roll-up and lowestYearSpending the least a path paid in a whole year, a path that ran out counting 0. The figures are nominal, and the CLI ships no Return model: the caller states one."
 
 export const chance: Leaf = defineCommand({
 	name: "chance",
@@ -60,6 +61,12 @@ export const chance: Leaf = defineCommand({
 			command:
 				"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef",
 			description: "The same chance in the human form: the success share and a few Bands.",
+		},
+		{
+			command:
+				"traj projection chance --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --json",
+			description:
+				"A Scenario with a spending rule: the Bands also say what the rule pays across Market paths, and the lowest year it pays in any path.",
 		},
 	],
 	errorCodes: PROJECTION_ERROR_CODES,

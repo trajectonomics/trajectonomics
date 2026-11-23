@@ -3,6 +3,13 @@ import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
 import { personAges } from "./person-age"
+import {
+	balanceRow,
+	liabilityRow,
+	milestoneRow,
+	paidOffRow,
+	spendingRuleRow,
+} from "./projection-rows"
 import { cashflowTotalRow } from "./projection-totals"
 
 /** One annual row: the roll-up of a year, with its real net worth measured at a monthly row. */
@@ -62,50 +69,11 @@ export const cashflowRow = z.strictObject({
 	amount: money,
 })
 
-/** One liability's month: the amount owed at each end, what was borrowed and paid, and the interest (cli ADR-0059). */
-export const liabilityRow = z.strictObject({
-	account: z.string(),
-	from: dateString,
-	to: dateString,
-	opening: money,
-	drawn: money,
-	paid: money,
-	interest: money,
-	closing: money,
-	partial: z.boolean(),
-})
-
-/** One liability's paid-off date, or null when it is not paid off by the end (cli ADR-0059). */
-export const paidOffRow = z.strictObject({
-	account: z.string(),
-	date: dateString.nullable(),
-})
-
-/**
- * One Account's value on the date of a roll-up's end, or of a monthly row, nominal and real (cli
- * ADR-0060). A liability's amount is what is owed, positive.
- */
-export const balanceRow = z.strictObject({
-	date: dateString,
-	account: z.string(),
-	amount: money,
-	real: money,
-})
-
-/**
- * One Milestone's fire date: the date it fired, or null when it did not fire by the Projection's end
- * (cli ADR-0049). Rows come in Scenario order.
- */
-export const milestoneRow = z.strictObject({
-	id: z.string(),
-	reached: z.boolean(),
-	date: dateString.nullable(),
-})
-
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
  * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
- * value only with `--accounts`, and the milestones only when the Scenario declares them.
+ * value only with `--accounts`, each spending rule's years only with `--spending`, and the milestones
+ * only when the Scenario declares them.
  */
 export const projectionTables = z.array(
 	z.discriminatedUnion("name", [
@@ -120,6 +88,11 @@ export const projectionTables = z.array(
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
 		z.strictObject({ name: z.literal("balances"), count: integer, rows: z.array(balanceRow) }),
+		z.strictObject({
+			name: z.literal("spendingRules"),
+			count: integer,
+			rows: z.array(spendingRuleRow),
+		}),
 		z.strictObject({
 			name: z.literal("milestones"),
 			count: integer,

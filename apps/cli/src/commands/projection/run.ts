@@ -24,7 +24,7 @@ import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
-	note: "Each person's age on the rows, and the --breakdown cash flow, --liabilities statements and --accounts values, ships in 0.8.0.",
+	note: "Each person's age on the rows, and the --breakdown cash flow, --liabilities statements, --accounts values and --spending rule years, ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({
@@ -67,6 +67,12 @@ export const run: Leaf = defineCommand({
 				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --accounts --json",
 			description:
 				"The annual roll-up with each Account's value, nominal and real, on the row at each year's end.",
+		},
+		{
+			command:
+				"traj projection run --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --spending --json",
+			description:
+				"The annual roll-up of a Scenario with a spending rule, with the portfolio, amount, withdrawal rate and action of each Rule year.",
 		},
 		{
 			command:
