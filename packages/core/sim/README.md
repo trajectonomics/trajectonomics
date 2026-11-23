@@ -89,6 +89,11 @@ With `liabilityStatements: true`, a Projection also reports one monthly statemen
 drawn and paid amounts, the interest and the amount owed, and the `paidOff` date once it is zero. See
 [ADR 0017](docs/adr/0017-liability-statements.md).
 
+With `cashflowBreakdown: true`, a Projection also reports one cash-flow breakdown per Annual roll-up:
+the income by Flow, the Prepayment and Settlement by Levy, the expenses by Flow and category, the
+contributions by Account, the withdrawals and surplus, with money in equal to money out exactly. See
+[ADR 0018](docs/adr/0018-cash-flow-breakdown.md).
+
 ```ts
 import {
 	type Baseline,
