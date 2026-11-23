@@ -3,6 +3,7 @@ import { render } from "svelte/server"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { HASH, useSessionHooks } from "../../client/what-if.test-support"
 import { scenarioDocument } from "../../lib/contract"
+import { assetCardsOf } from "../../lib/view/plan-items/asset-card"
 import { realAssetById } from "../../lib/view/plan-items/asset-document"
 import { homeDraft, planWithHome } from "../../lib/view/plan-items/asset-fixtures.test-support"
 import { assetFromDraft } from "../../lib/view/plan-items/asset-from-draft"
@@ -59,7 +60,7 @@ describe("the home on the Assets and debts page", () => {
 		expect(body).toContain("Value of home at the close of each year")
 		expect(body).toContain("Its loan is paid off on 2028-07-15.")
 		expect(body).toContain("Running costs")
-		expect(body).toContain('aria-label="Include Sale of home in the what-if"')
+		expect(body).toContain('aria-label="Include home in the what-if"')
 		expect(body).toContain("not taxed in this plan unless a Tally label is set")
 		expect(body).toContain("The engine reports money not funded")
 	})
@@ -156,11 +157,18 @@ describe("the form holds no percentage until the person types one", () => {
 describe("a home in a What-if session", () => {
 	useSessionHooks()
 
-	test("an item switched off says so on its switch, and the card still shows the plan as stored", () => {
-		whatIfSession.setOff("base", HASH, "flows.home-sale", true)
+	test("the asset has one switch, and switched off it says so, is dimmed and the card shows the plan as stored", () => {
+		const before = page("assets")
+		expect(before.match(/Include [^"]* of home in the what-if/g)).toBeNull()
+		expect(before).toContain('aria-label="Include home in the what-if"')
+		const card = assetCardsOf(doc, baselineRead(), homeRun())[0]
+		if (card === undefined) throw new Error("no home card")
+		whatIfSession.setGroupOff("base", HASH, card.switch.spec, card.switch.removals, true)
 		const body = page("assets")
-		expect(body).toContain("Sale: off in this what-if")
+		expect(body).toContain("Off in this what-if")
+		expect(body).toContain("opacity-60")
 		expect(body).toContain("Rises 3.00% a year")
+		expect(whatIfSession.changes.map((change) => change.label)).toEqual(["Asset home switched off"])
 	})
 
 	test("a tried value is a Set of each changed field, and an added item cannot be tried", () => {

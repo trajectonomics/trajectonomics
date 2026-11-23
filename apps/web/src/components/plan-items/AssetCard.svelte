@@ -1,9 +1,10 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { AssetCardView } from "../../lib/view/plan-items/asset-card"
 import LineChart from "../chart/LineChart.svelte"
 import Money from "../ui/Money.svelte"
+import GroupSwitch from "../what-if/GroupSwitch.svelte"
 import AssetFacts from "./AssetFacts.svelte"
-import AssetSwitches from "./AssetSwitches.svelte"
 
 interface Props {
 	card: AssetCardView
@@ -17,11 +18,12 @@ interface Props {
 }
 
 let { card, currency, editable, plan, contentHash, onEdit, onTry }: Props = $props()
+const off = $derived(whatIfSession.isGroupOffIn(plan, card.switch.spec))
 const button =
 	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 </script>
 
-<li class="min-w-0 rounded-lg border border-border bg-card p-4">
+<li class="min-w-0 rounded-lg border border-border bg-card p-4 {off ? 'opacity-60' : ''}">
 	<div class="flex flex-wrap items-start justify-between gap-3">
 		<h3 class="min-w-0 font-semibold break-all">{card.title}</h3>
 		{#if editable && card.outside.length === 0}
@@ -48,6 +50,9 @@ const button =
 	</div>
 	<AssetFacts {card} {currency} />
 	{#if editable}
-		<AssetSwitches switches={card.switches} asset={card.id} {plan} {contentHash} {onTry} />
+		<p class="mt-3 text-xs text-muted-foreground">
+			A What-if switches the asset off with its costs, rent, sale and loan, or tries its values together. It cannot add or take out one of them.
+		</p>
+		<GroupSwitch {plan} {contentHash} group={card.switch} label={card.title} {onTry} />
 	{/if}
 </li>

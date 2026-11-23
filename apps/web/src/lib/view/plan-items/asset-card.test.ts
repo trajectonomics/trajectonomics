@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import { assetCardsOf } from "./asset-card"
+import { realAssetsOf } from "./asset-document"
 import { homeDraft, planWithHome } from "./asset-fixtures.test-support"
 import { homeRun } from "./asset-run.test-support"
+import { assetSwitch } from "./group-switch"
 
 const doc = planWithHome(homeDraft({ saleDate: "2028-07-15" }))
 const [card] = assetCardsOf(doc, undefined, homeRun())
@@ -51,8 +53,27 @@ describe("a home's card", () => {
 		expect(bare?.rows.map((row) => row.label)).toContain("Bought")
 	})
 
-	test("each item of the asset has a what-if switch", () => {
-		expect(card?.switches.map((item) => item.id)).toContain("home-sale")
-		expect(card?.switches.map((item) => item.id)).not.toContain("home")
+	test("the asset has one what-if switch, which takes every item out together", () => {
+		const paths = card?.switch.spec.paths ?? []
+		expect(paths).toEqual(
+			expect.arrayContaining([
+				"accounts.home",
+				"accounts.home-loan",
+				"flows.home-purchase",
+				"flows.home-loan-draw",
+				"flows.home-loan-payment",
+				"flows.home-loan-payoff",
+				"flows.home-sale",
+			]),
+		)
+		expect(card?.switch.removals).toEqual(paths)
+	})
+
+	test("an Account the Baseline holds stays declared when the asset is switched off", () => {
+		const held = (id: string) => id === "home"
+		const kept = assetSwitch(doc, { parts: realAssetsOf(doc)[0]!.parts, outside: [] }, held)
+		expect(kept.removals).not.toContain("accounts.home")
+		expect(kept.removals).toContain("flows.home-sale")
+		expect(kept.spec.paths).toContain("accounts.home")
 	})
 })

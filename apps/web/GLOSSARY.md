@@ -56,6 +56,10 @@ _Avoid_: Sankey (as a name for the page), chart, graph
 The changes one tab holds against one plan, switched items off (Removals) and values set (Sets), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. It is held in the tab only.
 _Avoid_: scratch plan, draft, scenario copy, simulation
 
+**Group** (in a What-if session):
+A loan or a real asset changed as a whole: its parts (Account, Flows, debt) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself.
+_Avoid_: bundle, batch
+
 **What-if lens**:
 The four reads of a What-if session's answer, parsed against the contract and bound to the session's plan: what a figure page may show of the session. A page with no lens shows the baseline alone.
 _Avoid_: preview, overlay, diff
