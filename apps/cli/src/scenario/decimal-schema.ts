@@ -1,9 +1,9 @@
 import { z } from "zod"
 import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
-import { isMoney, isNode, type Node, PUBLISHED } from "./money-fields"
+import { isNode, moneyUnitOf, type Node, PUBLISHED } from "./money-fields"
 import { DECIMAL_UNITS_SENTENCE, MINOR_UNITS_SENTENCE } from "./shape/description"
-import { DECIMAL_UNITS, MINOR_UNITS } from "./shape/terms"
+import { DECIMAL_UNITS } from "./shape/terms"
 
 /*
  * The decimal form as `traj schema` publishes it (ADR-0047): the minor-unit form's own schema with
@@ -28,8 +28,9 @@ function decimalNode(node: unknown): unknown {
 	const copy = Object.fromEntries(
 		Object.entries(node).map(([key, value]) => [key, decimalNode(value)]),
 	)
-	if (!isMoney(node)) return copy
-	const rest = String(node["description"]).slice(MINOR_UNITS.length)
+	const unit = moneyUnitOf(node)
+	if (unit === undefined) return copy
+	const rest = String(node["description"]).slice(unit.length)
 	return {
 		...copy,
 		type: "string",

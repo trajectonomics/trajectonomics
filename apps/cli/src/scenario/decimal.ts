@@ -115,7 +115,7 @@ export function fromDecimalForm(document: unknown): unknown {
 		if (typeof value !== "string") {
 			const reason =
 				typeof value === "number"
-					? "a money amount is a JSON number, not a decimal string"
+					? "a money amount must be a decimal string, not a JSON number"
 					: "a money amount is not a decimal string"
 			return fail("invalid_input", {
 				path: named,
