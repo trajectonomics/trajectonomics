@@ -6,7 +6,7 @@ import { BASIS_POINTS, CONTRIBUTION_CAP, DATE, FLOW_KINDS, FREQUENCIES, MINOR_UN
 export const flowShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
+		"One income, expense, contribution or withdrawal Flow. `earned` is required on an income Flow, `target` on a contribution Flow and `source` on a withdrawal Flow; `category` is an expense's alone; `label`, `prepayments` and `cappedPrepayment` apply to the kinds they name; and exactly one of `amount`, `derive` and `level` is required, the first bringing `growth` with it.",
 	properties: {
 		id: {
 			type: "string",
@@ -60,6 +60,13 @@ export const flowShape: Record<string, unknown> = {
 		},
 		prepayments: prepaymentsShape,
 		cappedPrepayment: cappedPrepaymentShape,
+		category: {
+			type: "string",
+			minLength: 1,
+			maxLength: 64,
+			description:
+				"Expense only: a free-text group for reports, 1 to 64 characters with no control characters. It changes no figure; the engine never reads it.",
+		},
 		target: {
 			type: "string",
 			description: `Contribution only: the Account the money moves into. A liability target is a debt payment, capped at the amount owed; for an asset target ${CONTRIBUTION_CAP}: spread it as a monthly Flow instead, and list the asset in \`cashflow.contribute\`.`,

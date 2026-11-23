@@ -50,6 +50,7 @@ const FULL: Record<string, unknown> = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: { bps: 0 },
+			category: "housing",
 		},
 		{
 			id: "once",
