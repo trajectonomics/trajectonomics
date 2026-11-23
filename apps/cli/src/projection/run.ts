@@ -1,8 +1,9 @@
 import { project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
-import { isAppError } from "../errors"
+import { fail, isAppError } from "../errors"
 import { agesOn } from "../scenario/household/ages"
 import type { Placed } from "./carryin-apply"
+import { cashflowRowsOf } from "./cashflow"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { fundingNotes } from "./funding"
@@ -13,12 +14,19 @@ import { taxYearsOf } from "./tax-view"
 import { withdrawNotes } from "./withdraw-notes"
 
 /**
- * `traj projection run`: the engine's Projection in the CLI's money, annual by default and with
- * the monthly rows when asked. It computes nothing the engine does not report (ADR-0030).
+ * `traj projection run`: the engine's Projection in the CLI's money, annual by default, with the
+ * monthly rows when asked and with each roll-up's cash flow when `breakdown` is (cli ADR-0058). It
+ * computes nothing the engine does not report (ADR-0030).
  */
-export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunView | AppError {
+export function projectionOf(
+	prepared: Placed,
+	monthly: boolean,
+	breakdown = false,
+): ProjectionRunView | AppError {
 	const { timeline, baseline, currency } = prepared
-	const result = project(baseline, prepared.document, timeline)
+	// The engine records the lines only when asked, so a run without the flag keeps its bytes.
+	const options = breakdown ? { cashflowBreakdown: true } : {}
+	const result = project(baseline, prepared.document, timeline, options)
 	if (!result.ok) return refusal(result.problems)
 	const { projection } = result
 	const annual = []
@@ -36,6 +44,14 @@ export function projectionOf(prepared: Placed, monthly: boolean): ProjectionRunV
 				monthlyRow(row, currency, agesOn(prepared.household, row.date)),
 			),
 		})
+	}
+	// Present only with --breakdown, so a run without the flag keeps its table list.
+	if (breakdown) {
+		if (projection.cashflow === undefined) {
+			return fail("internal", { message: "The engine returned no cash flow for --breakdown." })
+		}
+		const rows = cashflowRowsOf(projection.cashflow, currency)
+		tables.push({ name: "cashflow", count: rows.length, rows })
 	}
 	// Present only when the Scenario declares Milestones, so an older Scenario's table list is unchanged.
 	if (projection.milestones !== undefined) {
