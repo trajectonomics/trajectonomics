@@ -3,22 +3,33 @@ import { createHash } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import { project } from "../src/engine/project"
 import { EVERY_PARITY_CASE } from "../src/golden/every-parity-case"
-import { chanceOfSuccess, financialIndependence } from "../src/index"
+import { chanceOfSuccess, contributionSavings, financialIndependence } from "../src/index"
 
 function hash(value: unknown): string {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex")
 }
 
 const cases = EVERY_PARITY_CASE.map((testCase) => {
-	const { name, fixture, options, chance, projectOptions } = testCase
+	const { name, fixture, options, chance, projectOptions, savings } = testCase
 	const { baseline, scenario, timeline } = fixture
+	const projection = project(baseline, scenario, timeline, projectOptions)
+	const levy = scenario.levies?.[0]
+	const period = (projection.ok ? projection.projection.levies?.[0]?.periods : undefined)?.find(
+		(item) => item.from === savings?.period,
+	)
 	const base = {
 		name,
 		baseline,
 		scenario,
 		timeline,
 		...(projectOptions === undefined ? {} : { projectOptions }),
-		sha256: hash(project(baseline, scenario, timeline, projectOptions)),
+		sha256: hash(projection),
+		...(savings === undefined || levy === undefined || period === undefined
+			? {}
+			: {
+					savings,
+					savingsSha256: hash(contributionSavings(levy, period, savings.options)),
+				}),
 	}
 	const withFi =
 		options === undefined

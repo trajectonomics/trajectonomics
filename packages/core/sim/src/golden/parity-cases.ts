@@ -24,6 +24,7 @@ import { milestoneFreelancer } from "./milestone-cases"
 import { nominalLeapFebruary, nominalPartial, nominalReal, nominalZero } from "./nominal-cases"
 import { nominalMonthlyLoan } from "./nominal-flow-cases"
 import { configured, leapTie } from "./parity-fixtures"
+import type { ParitySavings } from "./parity-savings"
 
 export interface ParityCase {
 	readonly name: string
@@ -31,6 +32,7 @@ export interface ParityCase {
 	readonly options?: SurvivalOptions
 	readonly chance?: ChanceOfSuccessOptions
 	readonly projectOptions?: ProjectionOptions
+	readonly savings?: ParitySavings
 }
 
 /** Inputs whose Projection and Financial Independence must hash identically under every engine. */
@@ -94,9 +96,5 @@ export const PARITY_CASES: readonly ParityCase[] = [
 		fixture: milestoneFreelancer,
 		options: { method: "survival" },
 	},
-	{
-		name: "milestone-freelancer-chance",
-		fixture: milestoneFreelancer,
-		chance: freelancerChance,
-	},
+	{ name: "milestone-freelancer-chance", fixture: milestoneFreelancer, chance: freelancerChance },
 ]
