@@ -27,6 +27,8 @@ Transition and clawback, which the Levy does not model because they concern unit
 
 This package emits only the 2026 year, so tests assert 2026 (`src/th/tests/ssf-after-2024.test.ts`). A package that emits an earlier year (2024 or before) must give that year its own 30 per cent and 200,000 baht figures, which this record sources.
 
+One path already reaches an earlier year: the CLI also charges the tax year before the As-of with this 2026 Levy while that year's settlement date is still ahead (`carryInStarts` in `apps/cli/src/projection/periods.ts`). An As-of from 1 January to 31 March 2025 therefore taxes 2024 with SSF allowing nothing, which overstates 2024 tax for a person who bought SSF that year. Reusing the one emitted Levy for the year before was already an approximation; SSF is where it now shows.
+
 ## Sources
 
 | Source | Read |

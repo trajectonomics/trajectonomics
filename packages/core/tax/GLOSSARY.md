@@ -55,7 +55,7 @@ A statutory personal, family, insurance, social security, housing, retirement fu
 _Avoid_: Expense deduction, credit
 
 **Retirement Cluster**:
-The group of Thai long-term retirement allowances (RMF, SSF, PVD, GPF, National Savings Fund, and pension life insurance) that are subject to both individual statutory limits and a combined 500,000 THB ceiling.
+The group of Thai long-term retirement allowances (RMF, SSF, PVD, GPF, National Savings Fund, and pension life insurance) that are subject to both individual statutory limits and a combined 500,000 THB ceiling. SSF allows nothing from the 2025 tax year (ADR 0007), so it takes no room in the ceiling.
 _Avoid_: Investment deduction
 
 **Separate Sheet**:
