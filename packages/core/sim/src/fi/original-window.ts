@@ -1,18 +1,20 @@
 import type { ResolvedCalendar } from "../calendar/business"
-import { type AccountValues, readerOn, unchangedValues } from "../engine/account-values"
+import { type AccountValues, readerOn } from "../engine/account-values"
 import { plannedAmounts } from "../engine/derive"
 import { buildEvents, type DatedEvent } from "../engine/events"
-import { runEngine } from "../engine/run"
 import { onceEventsOn } from "../milestone/gate-once"
 import { landsAt } from "../milestone/gating"
 import { deferredOnces, planMilestones } from "../milestone/spec"
-import type { Baseline, DateString, Scenario, Timeline } from "../types"
+import type { DateString, Scenario, Timeline } from "../types"
 import { buildWindow, type WindowOutcome } from "./expense-window"
 
-/** The ungated plan through one date, and what a set of fire dates keeps of it. */
+/** The plan through one date, and what a set of fire dates keeps of it. */
 export interface OriginalSource {
-	/** The plan's expense window when its gates open and close on `fires`. */
-	windowFor(fires: ReadonlyMap<string, DateString>): WindowOutcome
+	/**
+	 * The plan's expense window when its gates open and close on `fires`, with each Derived amount
+	 * reading the Account values `values` holds: the candidate's own, not the unchanged plan's.
+	 */
+	windowFor(fires: ReadonlyMap<string, DateString>, values: AccountValues): WindowOutcome
 }
 
 type Fires = ReadonlyMap<string, DateString>
@@ -85,7 +87,6 @@ function measure(
  * Landed date.
  */
 export function originalSource(
-	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
 	last: DateString,
@@ -94,12 +95,9 @@ export function originalSource(
 	const plan = planMilestones(scenario, calendar)
 	const deferred = plan === undefined ? [] : deferredOnces(scenario, plan, calendar)
 	const bounded = { ...timeline, horizon: last }
-	const values = unchangedValues((observe) =>
-		runEngine(baseline, scenario, bounded, [], undefined, false, false, { observe, gated: false }),
-	)
 	let events: readonly DatedEvent[] | undefined
 	return {
-		windowFor: (fires) => {
+		windowFor: (fires, values) => {
 			events ??= buildEvents(scenario, bounded, calendar)
 			return measure(
 				scenario,

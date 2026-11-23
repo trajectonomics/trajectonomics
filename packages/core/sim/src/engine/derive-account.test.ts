@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import type { Account, Derive, Flow } from "../types"
-import { derivedExpense } from "./test-flows"
+import { contribution, derivedExpense, income } from "./test-flows"
 import { amounts, problems, rowAt, run, type Setup } from "./test-helpers"
 
 const ACCOUNTS = [
@@ -72,6 +72,33 @@ describe("a Derived amount that reads an Account's value", () => {
 		// Each is 416,667 on the same opening value of 500,000,000.
 		expect(amounts(rowAt(forward, "2026-01-01"))["cash"]).toBe(1_000_000_000 - 2 * 416_667)
 		expect(amounts(rowAt(reverse, "2026-01-01"))["cash"]).toBe(1_000_000_000 - 2 * 416_667)
+	})
+
+	it("reads the value before a Contribution to the same Account lands on that date, whatever the order", () => {
+		// Pay of 101,000,000 funds a Contribution of 100,000,000 to home on the read date, in any
+		// order. The read stays on the opening value: 416,667 on 2026-01-01 and 429,167 on 2027-01-01
+		// (not the 500,000 and 515,000 that home's 600,000,000 and 615,000,000 would give).
+		const reads = [
+			{ date: "2026-01-01", read: 416_667, home: 600_000_000 },
+			{ date: "2027-01-01", read: 429_167, home: 615_000_000 },
+		]
+		for (const { date, read, home } of reads) {
+			const flow = once("read", date, upkeep("home"))
+			const fund = contribution("fund", "home", 100_000_000, { frequency: "once", start: date })
+			const pay = income("pay", 101_000_000, { frequency: "once", start: date })
+			const extra = { contribute: ["home"] }
+			for (const flows of [
+				[flow, fund, pay],
+				[pay, fund, flow],
+				[fund, flow, pay],
+			]) {
+				expect(amounts(rowAt(run(setup(flows, 300, extra)), date))).toEqual({
+					cash: 1_000_000_000 + 1_000_000 - read,
+					home,
+					loan: 1_000_000,
+				})
+			}
+		}
 	})
 
 	it("reads a locked and an illiquid Account at their full value", () => {

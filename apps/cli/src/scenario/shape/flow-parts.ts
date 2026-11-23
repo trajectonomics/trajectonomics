@@ -68,7 +68,7 @@ export const cappedPrepaymentShape: Record<string, unknown> = {
 const measureShape = {
 	type: "object",
 	description:
-		"One Measure: `const` reads `value` (with `asOf` and `growth`, or `steps`), `add`/`sub`/`min`/`max` read `a` and `b`, `scale` reads `of`, `num`, `den` and `rounding`, `mul` reads `a`, `b`, `den` and `rounding`, `pick` reads `a`, `b`, `then` and `else`, `flow` reads another Flow's landed amount, and `account` reads an Account's value on the Landed date, before that date's Flows land. A `tally` Measure belongs to a Levy, not to a Flow.",
+		"One Measure: `const` reads `value` (with `asOf` and `growth`, or `steps`), `add`/`sub`/`min`/`max` read `a` and `b`, `scale` reads `of`, `num`, `den` and `rounding`, `mul` reads `a`, `b`, `den` and `rounding`, `pick` reads `a`, `b`, `then` and `else`, `flow` reads another Flow's landed amount, and `account` reads an Account's value on the Landed date, with growth to that date and accrued interest included, before that date's Flows land. A `tally` Measure belongs to a Levy, not to a Flow.",
 	properties: {
 		id: { type: "string", description: "The Measure's id, local to this graph." },
 		op: {
@@ -79,7 +79,7 @@ const measureShape = {
 		account: {
 			type: "string",
 			description:
-				"`account` only: the id of the Account whose value the Measure reads, as the Scenario spells it. Its value is the balance a liability owes, read with growth to the date and before that date's Flows land.",
+				"`account` only: the id of the Account whose value the Measure reads, as the Scenario spells it. Its value includes growth to the date and accrued interest, is read before that date's Flows land, and for a liability is the positive amount owed.",
 		},
 		rounding: {
 			enum: [...ROUNDINGS],

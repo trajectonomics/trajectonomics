@@ -1,3 +1,4 @@
+import { recordedValues } from "../engine/account-values"
 import { flowsAt } from "../engine/events"
 import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
@@ -9,6 +10,7 @@ import { stopsFlow } from "./scan-stop"
 import { processDay } from "./walk-day"
 import { finish } from "./walk-finish"
 import type { DayInput, WalkInput } from "./walk-input"
+import { walkTail } from "./walk-tail"
 import type { Windows } from "./windows"
 
 export type { WalkInput } from "./walk-input"
@@ -35,8 +37,10 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 			gate: input.point.gate.clone(events, stopsFlow(grid.retirement)),
 		}),
 	}
-	const { shared } = input.windows
+	const { shared, reads } = input.windows
+	const beneath = input.point.values && { from: input.month, values: input.point.values }
 	const working: DayInput = {
+		...(reads.length > 0 && { values: recordedValues(reads, point.states, beneath) }),
 		scenario: input.scenario,
 		point,
 		months: input.windows.months,
@@ -53,5 +57,6 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 		if (day.kind !== "ok") return day
 		if (day.breach !== undefined && firstBreach === undefined) firstBreach = day.breach
 	}
+	walkTail(input, working)
 	return finish(input, working, firstBreach)
 }

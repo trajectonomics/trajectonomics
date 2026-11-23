@@ -17,7 +17,7 @@ function flowReferences(derive: Derive): readonly string[] {
 export type PlannedDay = ReadonlyMap<string, bigint>
 
 /** Derived Flows in dependency order, then Flow id, from a naive depth-first walk. */
-function ordered(flows: readonly Flow[]): readonly Flow[] {
+export function oracleOrdered(flows: readonly Flow[]): readonly Flow[] {
 	const byId = new Map<string, Flow>()
 	for (const flow of flows) if (!byId.has(flow.id)) byId.set(flow.id, flow)
 	const seen = new Set<string>()
@@ -35,7 +35,7 @@ function ordered(flows: readonly Flow[]): readonly Flow[] {
 	return out
 }
 
-function plannedDay(
+export function oraclePlannedDay(
 	events: readonly OracleEvent[],
 	derivation: readonly Flow[],
 	date: DateString,
@@ -71,7 +71,7 @@ export function oraclePlanned(
 	const inflation = scenario.economy.inflation
 	const calendar = oracleCalendar(fixture)
 	const events = oracleEvents(scenario.flows, timeline.start, through, calendar)
-	const derivation = ordered(scenario.flows)
+	const derivation = oracleOrdered(scenario.flows)
 	const byDate = new Map<DateString, OracleEvent[]>()
 	for (const event of events) {
 		const day = byDate.get(event.date) ?? []
@@ -81,7 +81,7 @@ export function oraclePlanned(
 	const planned = new Map<DateString, PlannedDay>()
 	for (const [date, day] of byDate) {
 		const readAccount = (account: string) => oracleAccountAt(fixture, account, date)
-		planned.set(date, plannedDay(day, derivation, date, inflation, readAccount))
+		planned.set(date, oraclePlannedDay(day, derivation, date, inflation, readAccount))
 	}
 	return planned
 }

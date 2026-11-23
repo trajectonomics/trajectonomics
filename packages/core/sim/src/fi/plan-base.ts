@@ -40,7 +40,7 @@ export function planBase(
 		events,
 		calendar,
 		candidates,
-		windows: windowPlan(baseline, scenario, timeline, options, candidates[0]!, calendar),
+		windows: windowPlan(scenario, timeline, options, candidates[0]!, calendar),
 		grid: scanGrid(
 			events,
 			timeline,
@@ -63,6 +63,7 @@ export function prefixFor(base: ScanBase, series?: ResolvedReturns): Prefix {
 		base.candidates,
 		base.calendar,
 		series,
+		base.windows.reads,
 	)
 }
 

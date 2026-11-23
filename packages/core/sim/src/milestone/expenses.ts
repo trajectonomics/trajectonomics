@@ -1,7 +1,6 @@
 import { addDays, addMonthsClamped } from "../calendar/arith"
-import type { AccountValues } from "../engine/account-values"
+import { plannedAmounts } from "../engine/derive"
 import type { DatedEvent } from "../engine/events"
-import { plannedWith } from "../engine/planned-on"
 import type { BasisPoints, DateString, Flow, MilestoneTerms } from "../types"
 import { landsAt } from "./gating"
 import { termed } from "./metrics"
@@ -20,7 +19,6 @@ export interface Money {
 /** The plan an expense window reads: its events in date order, its Flows and its bounds. */
 export interface PlanView extends Money {
 	readonly events: readonly DatedEvent[]
-	readonly values: AccountValues
 	readonly flows: readonly Flow[]
 	readonly horizon: DateString
 }
@@ -54,13 +52,16 @@ function firstOnOrAfter(events: readonly DatedEvent[], date: DateString): number
 	return low
 }
 
+/** `check()` refuses a `next12Months` Metric beside an `account` read (ADR 0020), so no window reads one. */
+const noAccount = (): bigint => 0n
+
 /** The planned expense of one Landed date's events, or `undefined` when a planned amount fails. */
 function expenseOn(
 	events: readonly DatedEvent[],
 	day: DateString,
 	plan: PlanView,
 ): bigint | undefined {
-	const planned = plannedWith(events, plan.flows, plan.inflation, day, plan.values)
+	const planned = plannedAmounts(events, plan.flows, day, plan.inflation, noAccount)
 	if (!planned.ok) return undefined
 	let amount = 0n
 	for (const event of events) {

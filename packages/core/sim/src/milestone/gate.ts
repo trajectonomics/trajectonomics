@@ -1,6 +1,5 @@
 import { addMonthsClamped } from "../calendar/arith"
 import type { ResolvedCalendar } from "../calendar/business"
-import type { AccountValues } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import { compareIds } from "../engine/order"
 import type { StateMap } from "../engine/state"
@@ -30,9 +29,8 @@ export class MilestoneGate {
 		timeline: Timeline,
 		calendar: ResolvedCalendar | undefined,
 		events: readonly DatedEvent[],
-		values: AccountValues,
 	): MilestoneGate | undefined {
-		const state = startState(scenario, timeline, calendar, events, values)
+		const state = startState(scenario, timeline, calendar, events)
 		return state === undefined ? undefined : new MilestoneGate(state)
 	}
 
@@ -43,6 +41,12 @@ export class MilestoneGate {
 	clone(events: readonly DatedEvent[], stop?: (flow: Flow) => boolean): MilestoneGate {
 		const { state } = this
 		return new MilestoneGate({ ...state, events, stop, fires: new Map(state.fires) })
+	}
+
+	/** An independent copy that fires no dynamic Milestone, for the walk past the horizon. */
+	frozen(): MilestoneGate {
+		const { state } = this
+		return new MilestoneGate({ ...state, frozen: true, fires: new Map(state.fires) })
 	}
 
 	/**
@@ -57,7 +61,8 @@ export class MilestoneGate {
 		settled: boolean,
 	): readonly DatedEvent[] {
 		const { state } = this
-		const evaluated = settled || dayEvents.some((event) => event.deferred !== true)
+		const evaluated =
+			state.frozen !== true && (settled || dayEvents.some((event) => event.deferred !== true))
 		const fired = evaluated ? fireDynamic(state, states, date) : []
 		const kept = dayEvents.filter((event) => landsAt(state.fires, event.flow, date))
 		const landing = (flow: Flow): boolean => state.stop?.(flow) !== true
