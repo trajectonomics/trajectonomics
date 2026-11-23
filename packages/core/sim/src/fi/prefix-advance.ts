@@ -1,3 +1,4 @@
+import { type RecordedValues, recordLanding } from "../engine/account-values"
 import type { DatedEvent } from "../engine/events"
 import { closeReturnsOn, hasSettlement, type LevySet } from "../engine/levy-set"
 import { type EngineRunsOut, processDate } from "../engine/occurrence"
@@ -20,12 +21,14 @@ export function advance(
 	dayEvents: readonly DatedEvent[],
 	levies: LevySet | undefined,
 	gate: MilestoneGate | undefined,
+	values?: RecordedValues,
 ): PrefixAdvance {
 	const settled = levies !== undefined && hasSettlement(levies, date)
 	if (dayEvents.length === 0 && !settled) return {}
 	if (levies !== undefined) closeReturnsOn(levies, states, date)
 	const landing = gate === undefined ? dayEvents : gate.apply(states, date, dayEvents, settled)
 	if (landing.length === 0 && !settled) return {}
+	recordLanding(values, date, states, landing)
 	const outcome = processDate(states, scenario, date, landing, levies)
 	gate?.record(outcome.totals)
 	if (outcome.problem !== undefined) return { problem: outcome.problem }

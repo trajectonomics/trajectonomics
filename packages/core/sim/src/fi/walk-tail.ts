@@ -10,7 +10,8 @@ import type { DayInput, WalkInput } from "./walk-input"
  * states and Levy tallies, so its recorded Account values cover the year its next-12-months window
  * reads (ADR 0020). The buffer is not checked and no dynamic Milestone fires: the Projection ends at
  * the horizon, so a Milestone unfired there stays unfired. The walk stops quietly at a Shortfall or
- * a problem, and the values after it are read from the states it ended with.
+ * a problem, and the values after it are read from the states this walk ended with: the tail's own,
+ * not the horizon's, which the tail has moved on from.
  */
 export function walkTail(input: WalkInput, walked: DayInput): void {
 	const { events, horizon, through } = input.windows.tail
@@ -29,6 +30,7 @@ export function walkTail(input: WalkInput, walked: DayInput): void {
 		table: undefined,
 		trace: [],
 	}
+	walked.values?.endWith(further.point.states)
 	let index = 0
 	for (const date of collectDates(events, [], settlements)) {
 		if (date <= horizon) continue

@@ -82,10 +82,9 @@ export function baselinePrefix(
 	let index = 0
 	for (const date of dates) {
 		if (wanted.has(date)) points.set(date, pointOf(states, levies, gate, events, recorded))
-		recorded?.record(date, states)
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
-		const stepped = advance(states, scenario, date, dayEvents, levies, gate)
+		const stepped = advance(states, scenario, date, dayEvents, levies, gate, recorded)
 		if (stepped.problem !== undefined) {
 			return { points, runsOut: undefined, problem: stepped.problem, stoppedAt: date }
 		}
