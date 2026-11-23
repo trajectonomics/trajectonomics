@@ -63,3 +63,7 @@ _Avoid_: preview, overlay, diff
 **Loan**:
 A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.
 _Avoid_: debt schedule, amortization, mortgage (as a kind)
+
+**Real asset**:
+An asset Account that is not liquid (a home or a car), with the items that buy, finance, keep, rent out and sell it, written under one id convention. The page edits them together and groups them on one card; `traj` computes its value, its costs and its loan. An item that follows the convention's id but not its shape is an ordinary item.
+_Avoid_: property, holding, fixed asset (as a kind)

@@ -50,7 +50,7 @@ export function loanDocument(
 }
 
 /** Whether a Measure graph (a Flow's `derive`) holds an `account` Measure that reads the Account of that id. */
-function readsAccount(node: unknown, id: string): boolean {
+export function readsAccount(node: unknown, id: string): boolean {
 	if (Array.isArray(node)) return node.some((item) => readsAccount(item, id))
 	if (typeof node !== "object" || node === null) return false
 	const record = node as Record<string, unknown>

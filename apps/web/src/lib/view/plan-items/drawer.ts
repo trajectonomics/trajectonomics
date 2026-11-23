@@ -11,15 +11,22 @@ export interface PlanDrawer {
 	readonly loan?: boolean
 	/** True when the drawer pays a loan extra, by the id of the loan. */
 	readonly extra?: boolean
+	/** True when the drawer edits a real asset (a home or car), by the id of its Account. */
+	readonly asset?: boolean
+}
+
+/** The heading of a form that edits one item: "Add" without an id, "Try a value for" or "Edit" with one. */
+function itemTitle(drawer: PlanDrawer, adding: string, thing: string): string {
+	if (drawer.id === undefined) return adding
+	return drawer.tryValue === true
+		? `Try a value for ${thing}${drawer.id}`
+		: `Edit ${thing}${drawer.id}`
 }
 
 /** The drawer's heading: what it does to which item, in the noun of its page. */
 export function drawerTitle(drawer: PlanDrawer, noun: string): string {
 	if (drawer.extra === true) return `Pay extra on ${drawer.id ?? ""}`
-	if (drawer.loan === true) {
-		if (drawer.id === undefined) return "Add loan"
-		return drawer.tryValue === true ? `Try a value for loan ${drawer.id}` : `Edit loan ${drawer.id}`
-	}
-	if (drawer.id === undefined) return `Add ${noun}`
-	return drawer.tryValue === true ? `Try a value for ${drawer.id}` : `Edit ${drawer.id}`
+	if (drawer.asset === true) return itemTitle(drawer, "Add a home or car", "")
+	if (drawer.loan === true) return itemTitle(drawer, "Add loan", "loan ")
+	return itemTitle(drawer, `Add ${noun}`, "")
 }
