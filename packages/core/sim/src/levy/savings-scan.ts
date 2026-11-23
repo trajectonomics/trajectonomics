@@ -1,5 +1,12 @@
 import type { LabelSaving, MinorUnits, Tallies } from "../types"
-import { giveBack, type Problem, pastFlatPoint, type Scan, type Trial, tryStep } from "./savings-step"
+import {
+	giveBack,
+	type Problem,
+	pastFlatPoint,
+	type Scan,
+	type Trial,
+	tryStep,
+} from "./savings-step"
 
 export type { Scan } from "./savings-step"
 

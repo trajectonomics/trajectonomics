@@ -110,7 +110,11 @@ export function originalSource(
 		windowFor: (fires, values) => {
 			events ??= buildEvents(scenario, bounded, calendar)
 			const landed = plan === undefined ? events : landing(scenario, events, deferred, fires)
-			return measure(scenario, retirement ? landed : landed.filter((event) => !stops(event.flow)), values)
+			return measure(
+				scenario,
+				retirement ? landed : landed.filter((event) => !stops(event.flow)),
+				values,
+			)
 		},
 	}
 }

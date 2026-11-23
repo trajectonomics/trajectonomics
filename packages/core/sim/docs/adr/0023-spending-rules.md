@@ -139,6 +139,15 @@ window, the candidate's own walk and its tail past the horizon carry the rule's 
   (`rule-initial-rate`, `rule-current-rate-bounds`, `rule-guardrails`), which gain `real`;
   `parity/cases.json` gains `rule-initial-rate`,
   `rule-current-rate-bounds` (with a chance of success), `rule-guardrails` and `rule-fi`.
+- **The statement guards its figures** (#387). A Rule year's `portfolio`, `amount`, `paid`, `real` figures
+  and withdrawal rate that leave the safe integers are `VALUE_OVERFLOW` at the Rule year's date, as an
+  Estate statement's are, so `project()` returns the problem instead of a wrong number. Only a real
+  figure can exceed its nominal, under negative inflation (down to −9999 bps, 10,000 times a year), and
+  a run's own balances usually overflow first; `engine/rule-overflow.test.ts` reaches it with a book kept
+  by hand. The `rule-guardrails` parity case now runs on `golden/rule-swing.ts`, a portfolio that a
+  3,000,000 cost and a 9,000,000 gift move, so its statement cuts in 2027 and raises from 2028 (it had
+  the same hash as `rule-initial-rate`, since a drawdown never moved far enough); its hash is re-pinned
+  on purpose. `rule-guardrails-chance` still runs on `drawdown` and is unchanged.
 - Hand-worked tests: `engine/rule-real.test.ts` (the 3% deflation above, the cut year, and `real` equal to nominal at zero inflation), `engine/rule-kinds.test.ts` (each kind on a constant-rate portfolio: 4,000,000,
   then 4,120,000 and 4,243,600 with 3% inflation; 4,200,000 and 4,410,000 on a portfolio growing 5%; a
   step to 5% giving 5,250,000; a floor of 4,300,000 and a ceiling of 4,400,000 binding; a cut to

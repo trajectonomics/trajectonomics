@@ -22,7 +22,8 @@ function isUnroutedAsset(
 	const funding = flow["funding"]
 	if (funding === "obligation") return false
 	// An unknown funding is `INVALID_FUNDING` alone, as on a liability.
-	if (funding !== undefined && !(FUNDINGS as readonly string[]).includes(String(funding))) return false
+	if (funding !== undefined && !(FUNDINGS as readonly string[]).includes(String(funding)))
+		return false
 	const target = flow["target"]
 	return typeof target === "string" && accounts?.get(target) === "asset" && !routed.has(target)
 }
