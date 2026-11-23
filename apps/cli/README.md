@@ -221,6 +221,24 @@ Currency's major unit, such as `"1000.00"` for 100000 satang, and
 same either way: saving what `show --decimal` printed leaves it unchanged. A value with more places
 than the Currency has is refused, never rounded.
 
+## A what-if, applied to the plan it came from
+
+> **Ships in 0.8.0.**
+
+`traj projection run --set` projects a change without saving it. `traj scenario apply` saves the same
+change to the stored plan, so the plan you keep is the one you projected. It takes the `--set`,
+`--without` and `--decimal` that `projection run` takes, and refuses what they would be refused for:
+
+```bash
+traj scenario apply base --set flows.salary.amount=9000000 --dry-run
+traj scenario apply base --set flows.salary.amount=9000000 --without flows.gym
+```
+
+The result names the Overrides it wrote. A change that leaves the plan as it is writes nothing and
+exits 0. `--if-hash <contentHash>` writes only when the stored plan still has that hash, as
+`traj scenario show` printed it, and refuses the write otherwise. Without `--file`, `--set` and
+`--without` never take a document, so the what-if cannot replace a plan you did not read.
+
 ## Milestones: points in the plan that a Flow waits for
 
 > **Ships in 0.8.0.**

@@ -28,3 +28,12 @@ export const decimalFlag: z.ZodDefault<z.ZodBoolean> = z
 	.describe(
 		'Read each money amount of a --set as a decimal string of the Currency\'s major unit, such as "90000.50", instead of satang.',
 	)
+
+/** One applied Override as a command echoes it: its path, escaped and canonical, and its value (ADR-0024). */
+export const appliedOverride: z.ZodObject<{
+	path: z.ZodString
+	value: z.ZodUnknown
+}> = z.strictObject({
+	path: z.string().describe("The dotted path, escaped and canonical."),
+	value: z.unknown().describe("The JSON value the path was set to."),
+})

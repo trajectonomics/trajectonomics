@@ -52,6 +52,11 @@ export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
 	/** The hint a refusal of the document flag beside a flag it cannot take carries. */
 	hint?: string
 	/**
+	 * The hint for one flag the document form cannot take, when that flag names a form of its own;
+	 * `hint` serves every other flag (cli ADR-0057).
+	 */
+	exclusiveHints?: Readonly<Record<string, string>>
+	/**
 	 * A second form of the same document, taken instead of `schema` when the boolean input field
 	 * `flag` is true, such as `--decimal` (ADR-0047). It is published by `traj schema` beside the
 	 * first, and the two never mix: the flag selects one schema before the document is read.
