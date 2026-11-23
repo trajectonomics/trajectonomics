@@ -30,6 +30,7 @@ describe("contributionSavings refusals", () => {
 		["grain", { grain: 0 }],
 		["grain", { grain: -1 }],
 		["grain", { grain: 0.5 }],
+		["grain", { grain: STEP }],
 		["grain", { grain: STEP + 1 }],
 		["inflation", { inflation: Number.POSITIVE_INFINITY }],
 	])("refuses an out-of-range %s", (key, more) => {
@@ -43,8 +44,8 @@ describe("contributionSavings refusals", () => {
 		expect(result).toEqual({ ok: false, problem: { code: "INVALID_OPTION", path: ["grain"] } })
 	})
 
-	it("accepts the bounds: minSavingBps 10,000 and a grain as large as the step", () => {
-		const edge = optionsOf(["a"], { minSavingBps: 10_000, grain: STEP })
+	it("accepts the bounds: minSavingBps 10,000 and a grain one less than the step", () => {
+		const edge = optionsOf(["a"], { minSavingBps: 10_000, grain: STEP - 1 })
 		expect(contributionSavings(levy, period, edge)).toMatchObject({ ok: true })
 	})
 
@@ -62,6 +63,17 @@ describe("contributionSavings refusals", () => {
 		expect(result).toEqual({ ok: false, problem: { code: "TOO_MANY_STEPS", path: ["maxSteps"] } })
 		const fits = contributionSavings(levy, period, optionsOf(["a"], { maxSteps: 5 }))
 		expect(fits).toMatchObject({ ok: true })
+	})
+
+	it("answers with maxSteps 2 when the third step tried is dropped, and refuses with 1", () => {
+		// Cap 250,000, step 100,000: two steps are taken and the third goes past the cap and is dropped.
+		const capped = taxLevy([["a", 250_000]])
+		const reports = reported(capped, { income: INCOME })
+		const fits = contributionSavings(capped, reports, optionsOf(["a"], { maxSteps: 2 }))
+		expect(fits).toMatchObject({ ok: true, dueAfter: 120_000 })
+		expect(fits.ok && fits.labels[0]).toMatchObject({ extra: 200_000, stoppedBy: "noSaving" })
+		const refused = contributionSavings(capped, reports, optionsOf(["a"], { maxSteps: 1 }))
+		expect(refused).toEqual({ ok: false, problem: { code: "TOO_MANY_STEPS", path: ["maxSteps"] } })
 	})
 
 	it("returns an unsafe reported tally as NOT_SAFE_INTEGER, as evaluateMeasures does", () => {

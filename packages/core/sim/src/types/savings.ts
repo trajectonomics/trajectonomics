@@ -8,8 +8,9 @@ export interface SavingsOptions {
 	/** The size of one step in minor units, at least 1. */
 	readonly step: MinorUnits
 	/**
-	 * One major unit in minor units, from 1 up to `step`. A step whose last `grain` saves nothing went
-	 * past a cap or the end of taxable income, and is dropped.
+	 * One major unit in minor units, from 1 up to one less than `step` (a grain as large as the step
+	 * could never be told from the step). A step whose last `grain` saves nothing went past a cap or
+	 * past where `due` stops falling, and is dropped.
 	 */
 	readonly grain: MinorUnits
 	/** The Scenario's inflation, which resolves `const` growth as the Projection did. */
@@ -18,7 +19,10 @@ export interface SavingsOptions {
 	readonly budget?: MinorUnits
 	/** The least share of a step, in basis points (0 to 10,000), a step must save to be taken; default 0. */
 	readonly minSavingBps?: BasisPoints
-	/** The most steps taken over every label; the search refuses past it. At least 1. */
+	/**
+	 * The most steps taken over every label; the search refuses past it. At least 1. A step that is
+	 * tried and dropped does not count, but one more step than this may be tried.
+	 */
 	readonly maxSteps: number
 }
 

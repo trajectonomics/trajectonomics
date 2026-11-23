@@ -8841,6 +8841,27 @@
 							"adjustBps": 800
 						}
 					}
+				},
+				{
+					"id": "tuition",
+					"frequency": "once",
+					"start": "2026-06-15",
+					"amount": 3000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				},
+				{
+					"id": "gift",
+					"frequency": "once",
+					"start": "2027-06-15",
+					"amount": 9000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": false
 				}
 			],
 			"cashflow": {
@@ -8861,7 +8882,7 @@
 		"projectOptions": {
 			"spendingRules": true
 		},
-		"sha256": "cee4e752525160cf49df1e4576f7243866a4e59003a250a8f72c468c2b64d571"
+		"sha256": "204e0aced7e4d08011dfdc7d102b14deb53427a22eb7ae7a152eb77660b52537"
 	},
 	{
 		"name": "rule-guardrails-chance",

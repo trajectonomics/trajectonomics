@@ -1,13 +1,14 @@
 import type { ParityCase } from "./parity-cases"
 import { drawdown, RULE_MARKET, savingPlan } from "./rule-cases"
+import { swing } from "./rule-swing"
 
 const base = { portfolio: ["inv"], rateBps: 400, rounding: "halfUp" } as const
 const band = { bps: 1500, adjustBps: 800 }
 const withRules = { spendingRules: true } as const
 
 /**
- * Spending rules (ADR 0023), pinned under every engine: each kind's Projection with its statement, a
- * chance of success over a two-bucket market, and Financial Independence with a rule Flow.
+ * Spending rules (ADR 0023), pinned under every engine: each kind's Projection with its statement (the
+ * guardrails one on a portfolio that moves enough to cut and to raise), a chance of success over a two-bucket market, and Financial Independence with a rule Flow.
  */
 export const RULE_PARITY_CASES: readonly ParityCase[] = [
 	{
@@ -29,7 +30,7 @@ export const RULE_PARITY_CASES: readonly ParityCase[] = [
 	},
 	{
 		name: "rule-guardrails",
-		fixture: drawdown({ kind: "guardrails", ...base, upper: band, lower: band }),
+		fixture: swing({ kind: "guardrails", ...base, upper: band, lower: band }),
 		projectOptions: withRules,
 	},
 	{

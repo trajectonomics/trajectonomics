@@ -8,6 +8,7 @@ import { onceEventsOn } from "../milestone/gate-once"
 import { landsAt } from "../milestone/gating"
 import { deferredOnces, planMilestones } from "../milestone/spec"
 import type { DateString, Scenario, Timeline } from "../types"
+import { earnedReadByExpenses } from "./earned-reach"
 import { buildWindow, type WindowOutcome } from "./expense-window"
 
 /** The plan through one date, and what a set of fire dates keeps of it. */
@@ -89,7 +90,11 @@ function measure(
 /**
  * The plan's events through `last`, built on first use and once. A Scenario without Milestones
  * keeps every event as `buildEvents` builds it, and a derived Expense is evaluated on its own
- * Landed date.
+ * Landed date. The plan's earned income is dropped unless an expense reads it, directly or through
+ * a chain of Derived amounts: a window sums only expenses, and a stopped Derived income that no
+ * expense reads, priced with the candidate's own depleted values, could come out negative and fail
+ * the run (#376). That holds under `retirementSpending` too, whose window replaces `next12Months`
+ * but not the `trailing12Months` reference.
  */
 export function originalSource(
 	scenario: Scenario,
@@ -100,15 +105,15 @@ export function originalSource(
 	const plan = planMilestones(scenario, calendar)
 	const deferred = plan === undefined ? [] : deferredOnces(scenario, plan, calendar)
 	const bounded = { ...timeline, horizon: last }
+	const read = earnedReadByExpenses(scenario.flows)
+	const kept = (event: DatedEvent): boolean =>
+		!(event.flow.kind === "income" && event.flow.earned) || read.has(event.flow.id)
 	let events: readonly DatedEvent[] | undefined
 	return {
 		windowFor: (fires, values) => {
 			events ??= buildEvents(scenario, bounded, calendar)
-			return measure(
-				scenario,
-				plan === undefined ? events : landing(scenario, events, deferred, fires),
-				values,
-			)
+			const landed = plan === undefined ? events : landing(scenario, events, deferred, fires)
+			return measure(scenario, landed.filter(kept), values)
 		},
 	}
 }
