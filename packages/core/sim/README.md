@@ -209,7 +209,7 @@ when it has fallen `lower.bps` below. With `lower` alone it only raises, never c
 ```
 
 With `spendingRules: true`, a Projection reports one statement per rule Flow: for each Rule year its
-first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` and the
+first date, the `portfolio` read, the `amount` fixed, what was `paid` (both also in today's money, as `real`), the `withdrawalRateBps` and the
 `action` (`none`, `floor`, `ceiling`, `cut` or `raise`). A portfolio of 100,000,000 that falls 10% a year
 under a 4% guardrails rule is cut in its third year:
 

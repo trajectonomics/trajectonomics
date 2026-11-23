@@ -73,6 +73,21 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
   which the Projection's expense also counts. The day's `unmet` is the whole day across every
   expense, so spending Bands (ADR 0024) split it by Flow, never subtract it from `paid`. Without the option the
   Projection is byte for byte what it was.
+- **Today's money.** Each year also states `real: { amount, paid }`: `amount` and `paid` deflated to the
+  Timeline start with `deflate` (`money/growth.ts`, half up), the function and rounding the row's
+  `realNetWorth` and the estate statement (ADR 0025) use. Each figure is deflated once, at the year's
+  first Occurrence date (`date`, the Landed date the amount was fixed on), over the counted days from the
+  Timeline start. `paid` is deflated as one sum, never part by part, so a year's `real.paid` is exactly
+  what `paid` is worth at that one date, and a year the horizon cuts short keeps that rule. With no
+  inflation, or on the Timeline start, `real` equals the nominal figures. Hand case at 3% inflation: a
+  `currentRate` rule on an untouched 100,000,000 pays 4,000,000 in 2026, 2027 and 2028, with first dates
+  2026-01-01, 2027-01-01 and 2028-01-01 (0, 365 and 730 counted days), so `real.amount` is 4,000,000,
+  `round(4,000,000 / 1.03) = 3,883,495` and `round(4,000,000 / 1.03²) = round(3,770,383.7) = 3,770,384`; a
+  2027 year cut after seven parts paid 2,333,333, whose `real.paid` is `round(2,333,333 / 1.03) =
+  2,265,372`. An `initialRate` year is level in real terms by construction: 4,120,000 at 3% is
+  4,000,000. The date is a decision: a Rule year's twelve payments land over its months, but the year's
+  amount is fixed on its first date and `realNetWorth` has no date between, so one date keeps the figure
+  a single deflation of the stated nominal.
 
 ### Financial Independence
 
@@ -115,16 +130,18 @@ window, the candidate's own walk and its tail past the horizon carry the rule's 
 - New codes in `ERROR_CODES`: `RULE_NOT_EXPENSE`, `RULE_PORTFOLIO_LIABILITY`, `RULE_PORTFOLIO_ILLIQUID`,
   `RULE_FREQUENCY`, `RULE_FLOOR_ABOVE_CEILING`. The CLI files them in `refusal-elsewhere.ts` until its
   own change makes them user-facing.
-- Existing parity hashes are unchanged; `parity/cases.json` gains `rule-initial-rate`,
+- Existing parity hashes are unchanged, except the three cases that ask for the statement
+  (`rule-initial-rate`, `rule-current-rate-bounds`, `rule-guardrails`), which gain `real`;
+  `parity/cases.json` gains `rule-initial-rate`,
   `rule-current-rate-bounds` (with a chance of success), `rule-guardrails` and `rule-fi`.
-- Hand-worked tests: `engine/rule-kinds.test.ts` (each kind on a constant-rate portfolio: 4,000,000,
+- Hand-worked tests: `engine/rule-real.test.ts` (the 3% deflation above, the cut year, and `real` equal to nominal at zero inflation), `engine/rule-kinds.test.ts` (each kind on a constant-rate portfolio: 4,000,000,
   then 4,120,000 and 4,243,600 with 3% inflation; 4,200,000 and 4,410,000 on a portfolio growing 5%; a
   step to 5% giving 5,250,000; a floor of 4,300,000 and a ceiling of 4,400,000 binding; a cut to
   3,600,000 and a raise to 4,400,000; `lower` alone never cutting; a tie of one half rounding to 1, 1
   and 0), `engine/rule-pay.test.ts` (the twelve parts, the 7-in-12 split, an annual Flow, a year cut by
   the horizon after seven parts, a Shortfall on 2026-04-01 paying four) and `check/rule.test.ts` (every
   code at its path).
-- `golden/rule-oracle.test.ts` replays each rule year from the oracle and agrees with every statement
+- `golden/rule-oracle.test.ts` replays each rule year from the oracle (its `real` figures from `oracleDeflate`) and agrees with every statement
   and with the Projection's annual expense; `golden/rule-fi.test.ts` agrees with the brute-force walk on
   the FI month and the reference expense for all three kinds, and shows a 4% rule moving the month from
   2027-03-01 to 2027-07-01 and the reference from 1,800,000 to 2,258,624.
