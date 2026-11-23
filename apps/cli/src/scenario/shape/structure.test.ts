@@ -88,6 +88,7 @@ const FULL: Record<string, unknown> = {
 			derive: {
 				measures: [
 					{ id: "base", op: "const", value: 100 },
+					{ id: "worth", op: "account", account: "cash" },
 					{ id: "tenth", op: "scale", of: "base", num: 1, den: 10, rounding: "floor" },
 				],
 				result: "tenth",

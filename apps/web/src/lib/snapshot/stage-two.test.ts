@@ -81,6 +81,7 @@ describe("stage two", () => {
 			"2026-10-31",
 			"--horizon",
 			"2060-12-31",
+			"--breakdown",
 			"--liabilities",
 			"--json",
 		])
@@ -138,6 +139,7 @@ describe("stage two", () => {
 			"--carry-in",
 			"-",
 			"--monthly",
+			"--breakdown",
 			"--liabilities",
 			"--json",
 		])

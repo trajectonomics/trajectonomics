@@ -63,6 +63,7 @@ export function prefixFor(base: ScanBase, series?: ResolvedReturns): Prefix {
 		base.candidates,
 		base.calendar,
 		series,
+		base.windows.reads,
 	)
 }
 

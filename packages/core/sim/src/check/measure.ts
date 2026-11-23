@@ -1,6 +1,6 @@
 import type { MeasureOp } from "../types"
 import { MEASURE_OPS, ROUNDINGS, TALLY_BASES } from "../vocab"
-import type { Check, Emit, Path } from "./codes"
+import type { Check, Emit, ErrorCode, Path } from "./codes"
 import { checkSteps, steps } from "./const-steps"
 import { boundedInt, date, growth, oneOf, safeInt, str } from "./scalars"
 import { checkShape, isRecord, opt, req, type Shape } from "./shape"
@@ -35,6 +35,7 @@ const OP_SHAPES: Readonly<Record<MeasureOp, Shape>> = {
 		else: req(str),
 	},
 	flow: { flow: req(str) },
+	account: { account: req(str) },
 }
 
 const ignore: Check = () => {}
@@ -51,14 +52,20 @@ const common: Shape = { id: req(str), op: req(oneOf(MEASURE_OPS, "INVALID_OP")) 
 const isOp = (op: unknown): op is MeasureOp =>
 	typeof op === "string" && (MEASURE_OPS as readonly string[]).includes(op)
 
-/** What a Measure list may name: a Levy takes `tally` and not `flow`, a Derived amount the reverse. */
+/** What a Measure list may name: a Levy takes `tally` and neither read; a Derived amount takes `flow` and `account`. */
 export interface MeasureRules {
 	readonly deny: readonly MeasureOp[]
+	/** The code a denied op reports at the Measure's own path, instead of `INVALID_OP` at its `op`. */
+	readonly denyCode?: Partial<Record<MeasureOp, ErrorCode>>
 	/** Keys a `const` may not carry here. */
 	readonly constDenied: readonly string[]
 }
 
-export const LEVY_RULES: MeasureRules = { deny: ["flow"], constDenied: [] }
+export const LEVY_RULES: MeasureRules = {
+	deny: ["flow", "account"],
+	denyCode: { account: "ACCOUNT_MEASURE_IN_LEVY" },
+	constDenied: [],
+}
 export const DERIVE_RULES: MeasureRules = {
 	deny: ["tally"],
 	constDenied: ["asOf", "growth", "steps"],
@@ -89,11 +96,18 @@ function checkConst(
 	if (Object.hasOwn(found, "steps")) checkSteps(found, path, emit)
 }
 
+/** A denied op reports its own code at the Measure when it has one, else `INVALID_OP` at its `op`. */
+function refuse(rules: MeasureRules, op: MeasureOp, path: Path, emit: Emit): void {
+	const code = rules.denyCode?.[op]
+	if (code === undefined) emit("INVALID_OP", [...path, "op"])
+	else emit(code, path)
+}
+
 /** A Measure check for one context: an op it does not allow reports `INVALID_OP` and nothing else. */
 export function measure(rules: MeasureRules): Check {
 	return (value, path, emit) => {
 		const op = isRecord(value) ? value["op"] : undefined
-		if (isOp(op) && rules.deny.includes(op)) return emit("INVALID_OP", [...path, "op"])
+		if (isOp(op) && rules.deny.includes(op)) return refuse(rules, op, path, emit)
 		const own = isOp(op) ? OP_SHAPES[op] : ANY_OP
 		const found = checkShape(value, path, { ...common, ...own }, emit)
 		if (found && op === "const") checkConst(found, rules, path, emit)

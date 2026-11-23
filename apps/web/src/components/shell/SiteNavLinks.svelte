@@ -13,9 +13,17 @@ interface Props {
 	planDocument?: boolean
 	/** Whether the selected plan's projection has milestones: the Milestones page is listed only then. */
 	milestones?: boolean
+	/** Whether the selected plan's projection has its cash flow table: the Cash flow page is listed only then. */
+	cashflow?: boolean
 }
 
-let { current, onNavigate, planDocument = true, milestones = true }: Props = $props()
+let {
+	current,
+	onNavigate,
+	planDocument = true,
+	milestones = true,
+	cashflow = true,
+}: Props = $props()
 </script>
 
 <!-- The pages in groups: a group with a heading, then the pages that belong to no group. -->
@@ -28,7 +36,7 @@ let { current, onNavigate, planDocument = true, milestones = true }: Props = $pr
 				</h2>
 			{/if}
 			<ul class="space-y-1">
-				{#each routesShown(group, planDocument, milestones) as route (route.path)}
+				{#each routesShown(group, planDocument, milestones, cashflow) as route (route.path)}
 					{@const isCurrent = route.path === current}
 					<li>
 						<SiteLink

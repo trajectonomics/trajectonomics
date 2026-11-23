@@ -29,4 +29,10 @@ describe("the read-leaf allowlist", () => {
 		expect(leafOf(["tx", "add", "--from", "Cash"])).toBeNull()
 		expect(leafOf(["projection"])).toBeNull()
 	})
+
+	test("the run the Cash flow page reads, with its breakdown, is still the projection run leaf", () => {
+		expect(leafOf(["projection", "run", "--scenario=base", "--breakdown", "--json"])).toBe(
+			"projection run",
+		)
+	})
 })

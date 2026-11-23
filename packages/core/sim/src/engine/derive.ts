@@ -78,6 +78,7 @@ export function plannedAmounts(
 	flows: readonly Flow[],
 	date: DateString,
 	inflation: BasisPoints,
+	readAccount: (accountId: string) => bigint,
 ): PlannedOutcome {
 	const totals = fixedTotals(events, inflation)
 	const order = derivedOrder(flows)
@@ -92,6 +93,7 @@ export function plannedAmounts(
 			inflation,
 			path: entry.path,
 			read: (id) => totals.get(id) ?? 0n,
+			readAccount,
 		})
 		if (!outcome.ok) return { ok: false, problem: outcome.problem }
 		derived.set(entry.id, outcome.amount)

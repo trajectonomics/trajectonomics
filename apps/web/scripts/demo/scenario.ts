@@ -55,6 +55,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 			{
 				id: "rent",
 				kind: "expense",
+				category: "housing",
 				frequency: "monthly",
 				start: "2026-11-01",
 				amount: 1400000,
@@ -63,6 +64,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 			{
 				id: "living",
 				kind: "expense",
+				category: "food",
 				frequency: "monthly",
 				start: "2026-11-01",
 				amount: 2800000,
@@ -71,6 +73,7 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 			{
 				id: "school",
 				kind: "expense",
+				category: "education",
 				frequency: "monthly",
 				start: SCHOOL_START,
 				amount: 800000,

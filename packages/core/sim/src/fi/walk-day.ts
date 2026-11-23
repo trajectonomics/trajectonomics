@@ -53,6 +53,7 @@ export function processDay(
 	dayEvents: readonly DatedEvent[],
 ): DayOutcome {
 	const { levies, states, gate } = input.point
+	input.values?.record(date, states)
 	if (levies !== undefined) closeReturnsOn(levies, states, date)
 	const settled = levies !== undefined && hasSettlement(levies, date)
 	const landing = gate === undefined ? dayEvents : gate.apply(states, date, dayEvents, settled)

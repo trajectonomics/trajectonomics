@@ -17,6 +17,7 @@ export type IconName =
 	| "trending-down"
 	| "trending-up"
 	| "wallet"
+	| "workflow"
 	| "x"
 
 /**
@@ -30,6 +31,7 @@ export interface Route {
 	readonly icon: IconName
 	readonly needsDocument?: true
 	readonly needsMilestones?: true
+	readonly needsCashflow?: true
 }
 
 /** A run of pages under one heading. A heading of null is a run of pages that belong to no group. */
@@ -48,15 +50,20 @@ export function routeAt(path: string): Route | undefined {
 	return ROUTES.find((route) => route.path === path)
 }
 
-/** The routes of a group the navigation lists: a page that needs a document or milestones is left out without them. */
+/**
+ * The routes of a group the navigation lists: a page that needs a document, milestones or the cash flow
+ * table is left out without them.
+ */
 export function routesShown(
 	group: NavGroup,
 	planDocument: boolean,
 	milestones = true,
+	cashflow = true,
 ): readonly Route[] {
 	return group.routes.filter(
 		(route) =>
 			(planDocument || route.needsDocument !== true) &&
-			(milestones || route.needsMilestones !== true),
+			(milestones || route.needsMilestones !== true) &&
+			(cashflow || route.needsCashflow !== true),
 	)
 }

@@ -52,13 +52,16 @@ function firstOnOrAfter(events: readonly DatedEvent[], date: DateString): number
 	return low
 }
 
+/** `check()` refuses a `next12Months` Metric beside an `account` read (ADR 0020), so no window reads one. */
+const noAccount = (): bigint => 0n
+
 /** The planned expense of one Landed date's events, or `undefined` when a planned amount fails. */
 function expenseOn(
 	events: readonly DatedEvent[],
 	day: DateString,
 	plan: PlanView,
 ): bigint | undefined {
-	const planned = plannedAmounts(events, plan.flows, day, plan.inflation)
+	const planned = plannedAmounts(events, plan.flows, day, plan.inflation, noAccount)
 	if (!planned.ok) return undefined
 	let amount = 0n
 	for (const event of events) {

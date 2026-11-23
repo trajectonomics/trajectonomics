@@ -1,3 +1,4 @@
+import type { RecordedValues } from "../engine/account-values"
 import type { DateString, Scenario } from "../types"
 import type { PrefixPoint } from "./prefix"
 import type { RequirementTable } from "./required"
@@ -23,4 +24,6 @@ export interface DayInput {
 	readonly months: number
 	readonly table: RequirementTable | undefined
 	readonly trace: TracePoint[]
+	/** The Account values the walk records before each date's Flows, when a Derived amount reads one. */
+	readonly values?: RecordedValues
 }

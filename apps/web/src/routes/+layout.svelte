@@ -14,6 +14,7 @@ import ShellTopBar from "../components/shell/ShellTopBar.svelte"
 import SideNavigation from "../components/shell/SideNavigation.svelte"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
 import { editsShown } from "../lib/edit/shown"
+import { hasCashflow } from "../lib/view/cashflow/cashflow"
 import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones"
 import { scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
@@ -32,6 +33,8 @@ const editable = $derived(editsShown(editSession.token, page.url.search))
 const planDocument = $derived(documentRead(currentSnapshot(), selected) !== undefined)
 // The Milestones page is listed only when the selected plan's projection carries a milestones table.
 const milestones = $derived(hasMilestones(projectionRead(currentSnapshot(), selected)))
+// The Cash flow page is listed only when the selected plan's projection carries its cash flow table.
+const cashflow = $derived(hasCashflow(projectionRead(currentSnapshot(), selected)))
 
 // The Snapshot follows the address: this layout stays mounted across pages, so the read is started
 // again whenever the query string changes. The loader reads each file once, so a page change with the
@@ -55,6 +58,7 @@ $effect(() => {
 	{editable}
 	{planDocument}
 	{milestones}
+	{cashflow}
 />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-60">

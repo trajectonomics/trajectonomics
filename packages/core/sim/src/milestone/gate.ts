@@ -43,6 +43,12 @@ export class MilestoneGate {
 		return new MilestoneGate({ ...state, events, stop, fires: new Map(state.fires) })
 	}
 
+	/** An independent copy that fires no dynamic Milestone, for the walk past the horizon. */
+	frozen(): MilestoneGate {
+		const { state } = this
+		return new MilestoneGate({ ...state, frozen: true, fires: new Map(state.fires) })
+	}
+
 	/**
 	 * The events that land on `date`. Fires the dynamic Milestones due on `date` when it is an
 	 * evaluation date (a Flow recurs or a Settlement falls there), gates the Flows, and adds the
@@ -55,7 +61,8 @@ export class MilestoneGate {
 		settled: boolean,
 	): readonly DatedEvent[] {
 		const { state } = this
-		const evaluated = settled || dayEvents.some((event) => event.deferred !== true)
+		const evaluated =
+			state.frozen !== true && (settled || dayEvents.some((event) => event.deferred !== true))
 		const fired = evaluated ? fireDynamic(state, states, date) : []
 		const kept = dayEvents.filter((event) => landsAt(state.fires, event.flow, date))
 		const landing = (flow: Flow): boolean => state.stop?.(flow) !== true

@@ -30,9 +30,10 @@ function perScenario(
 }
 
 /**
- * One `projection run` per Scenario, with the monthly rows when asked. Every run asks for the loans'
- * statements (`--liabilities`, cli ADR 0059): the planner's loan cards show the schedule and the paid-off
- * date from those rows, so the page computes none of them.
+ * One `projection run` per Scenario, with the monthly rows when asked. Every run takes `--breakdown`, so
+ * the Cash flow page has each year's lines and section totals (cli ADR-0058, addendum), and
+ * `--liabilities` for the loans' statements (cli ADR 0059): the planner's loan cards show the schedule and
+ * the paid-off date from those rows, so the page computes none of them.
  */
 export function planProjections(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const monthly = params.monthly ? ["--monthly"] : []
@@ -42,6 +43,7 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 		scenarioFlag(name),
 		...projectionFlags(params),
 		...monthly,
+		"--breakdown",
 		"--liabilities",
 		"--json",
 	])

@@ -59,7 +59,7 @@ A twelve-month period set by the Levy's period rule, over which the Levy tallies
 _Avoid_: Tax year, fiscal year, year, Annual roll-up
 
 **Measure**:
-A named value inside a Levy, or inside a Derived amount, computed in integer minor units from tallies (Levy only), Flow amounts (Derived amount only), constants and other Measures. The Measures form an acyclic graph, and the Levy names the Measure that is due.
+A named value inside a Levy, or inside a Derived amount, computed in integer minor units from tallies (Levy only), Flow amounts and Account values (Derived amount only), constants and other Measures. The Measures form an acyclic graph, and the Levy names the Measure that is due.
 _Avoid_: Variable, formula, derived flow
 
 **Dated constant**:
@@ -67,7 +67,7 @@ A `const` Measure whose value steps on given dates: a starting value and a list 
 _Avoid_: Time-varying parameter, schedule
 
 **Derived amount**:
-A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), before Prepayment and any cap. The Flows form an acyclic graph. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
+A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
 _Avoid_: Percentage flow, formula flow, linked flow
 
 **Tally label**:
