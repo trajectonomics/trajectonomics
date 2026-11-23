@@ -4,26 +4,29 @@ import type { HouseholdDocument, ScenarioDocument } from "../../lib/contract"
 import { householdWithoutAnchor } from "../../lib/view/household/document"
 import { personCards } from "../../lib/view/household/model"
 import Drawer from "../ui/Drawer.svelte"
+import StaleNotice from "../ui/StaleNotice.svelte"
 import HouseholdAnchorForm from "./HouseholdAnchorForm.svelte"
 import HouseholdAnchors from "./HouseholdAnchors.svelte"
 import HouseholdPeople from "./HouseholdPeople.svelte"
 import HouseholdPersonForm from "./HouseholdPersonForm.svelte"
+import HouseholdRemove from "./HouseholdRemove.svelte"
 
 interface Props {
 	/** The Scenario the household belongs to: the Edits save its household under this name. */
 	name: string
 	doc: ScenarioDocument
 	household: HouseholdDocument | null
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
+	contentHash: string
 	/** Whether the controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
 }
 
-let { name, doc, household, editable }: Props = $props()
+let { name, doc, household, editable, contentHash }: Props = $props()
 
 /** The drawer: the person form (for a new person, or the one of that id) or the anchor form; null when shut. */
 type Form = { form: "person"; id?: string } | { form: "anchor" }
 let shown = $state<Form | null>(null)
-let removing = $state(false)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 const busy = $derived(editSession.busy)
@@ -49,13 +52,9 @@ async function unpin(path: string): Promise<void> {
 	await editSession.run({
 		kind: "set-household",
 		name,
+		contentHash,
 		household: householdWithoutAnchor(household, path),
 	})
-}
-
-/** Removes the household; the dates it pinned stay as they are. */
-async function removeHousehold(): Promise<void> {
-	if (await editSession.run({ kind: "remove-household", name })) removing = false
 }
 </script>
 
@@ -86,22 +85,15 @@ async function removeHousehold(): Promise<void> {
 		<HouseholdPeople {people} {editable} onEdit={(id) => open({ form: "person", id })} />
 		<HouseholdAnchors anchors={household.anchors} {editable} onRemove={unpin} />
 		{#if editable}
-			{#if removing}
-				<p class="text-sm text-foreground">Remove the household of {name}? The dates it pinned stay as they are.</p>
-				<div class="flex flex-wrap gap-2">
-					<button type="button" disabled={busy} onclick={removeHousehold} class={button}>Remove household</button>
-					<button type="button" onclick={() => (removing = false)} class={button}>Keep household</button>
-				</div>
-			{:else}
-				<button type="button" disabled={busy} onclick={() => (removing = true)} class={button}>Remove household</button>
-			{/if}
+			<HouseholdRemove {name} {contentHash} />
 		{/if}
 	{/if}
 	<Drawer open={shown !== null} {title} onClose={() => open(null)}>
+		<StaleNotice />
 		{#if shown?.form === "anchor" && household !== null}
-			<HouseholdAnchorForm {name} {household} flows={doc.flows} onDone={() => open(null)} />
+			<HouseholdAnchorForm {name} {household} {contentHash} flows={doc.flows} onDone={() => open(null)} />
 		{:else if shown?.form === "person"}
-			<HouseholdPersonForm {name} {household} existing={existing} onDone={() => open(null)} />
+			<HouseholdPersonForm {name} {household} {contentHash} existing={existing} onDone={() => open(null)} />
 		{/if}
 	</Drawer>
 </section>

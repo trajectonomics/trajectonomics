@@ -5,7 +5,11 @@ import type { WriteOptions } from "./types"
 
 /** Scenario writes: their inputs and what each reports (ADR-0018, ADR-0021, cli ADR-0048). */
 
-export type NewScenario = { name: string; document: unknown }
+/**
+ * `expectedHash`, when given, is the content hash of the stored Scenario the caller read. A different
+ * one, or none when no Scenario of the name is stored, refuses the write (cli ADR-0055).
+ */
+export type NewScenario = { name: string; document: unknown; expectedHash?: string | undefined }
 /**
  * `droppedAnchors` names the household anchors whose item the written document no longer holds;
  * the household no longer keeps them (cli ADR-0048). It is empty when none was dropped.
@@ -30,6 +34,8 @@ export type HouseholdPlanner = (document: ScenarioDocument) => HouseholdPlan | A
 export type HouseholdSet =
 	| { status: "updated" | "unchanged"; scenario: ScenarioRow }
 	| { status: "not_found" }
+/** A household write's options: a dry run, and the content hash the caller read (cli ADR-0055). */
+export type HouseholdOptions = WriteOptions & { expectedHash?: string | undefined }
 
 /**
  * A pure change to a fork's copy, applied inside the fork's one write. Return an `AppError`

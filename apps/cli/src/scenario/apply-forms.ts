@@ -11,6 +11,7 @@ export type ApplyFlags = {
 	asOf?: string | undefined
 	dryRun?: boolean | undefined
 	decimal?: boolean | undefined
+	ifHash?: string | undefined
 }
 
 /** The document form cannot work without a name, and says so before it reads the document. */
@@ -26,7 +27,7 @@ const FORM_HINT =
 export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	flag: "file",
 	schema: scenarioDocument,
-	allowed: ["name", "dryRun", "decimal"],
+	allowed: ["name", "dryRun", "decimal", "ifHash"],
 	required: [REQUIRED_NAME],
 	hint: FORM_HINT,
 	alternate: { flag: "decimal", schema: decimalDocument },
@@ -37,7 +38,8 @@ export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
  * their paths and sentences stay CLI-owned; `--file` beside `--template` is refused earlier, by the
  * document form's own exclusivity check (ADR-0020, ADR-0033).
  */
-export function exclusive(input: ApplyFlags): AppError | undefined {
+/** `--template` takes none of the flags that write, and names each one it refuses (ADR-0033). */
+function templateRefusal(input: ApplyFlags): AppError | undefined {
 	if (input.template === true && input.dryRun === true) {
 		return fail("invalid_input", {
 			path: "dryRun",
@@ -51,9 +53,21 @@ export function exclusive(input: ApplyFlags): AppError | undefined {
 			hint: 'Run "traj scenario apply <name> --file <path> --decimal" to apply a document in decimal form.',
 		})
 	}
+	if (input.template === true && input.ifHash !== undefined) {
+		return fail("invalid_input", {
+			path: "ifHash",
+			message: "ifHash: --template writes nothing, so it takes no --if-hash",
+		})
+	}
 	if (input.template === true && input.name !== undefined) {
 		return fail("invalid_input", { path: "name", message: "name: --template takes no name" })
 	}
+	return undefined
+}
+
+export function exclusive(input: ApplyFlags): AppError | undefined {
+	const template = templateRefusal(input)
+	if (template !== undefined) return template
 	if (input.asOf !== undefined && input.template !== true) {
 		return fail("invalid_input", {
 			path: "asOf",

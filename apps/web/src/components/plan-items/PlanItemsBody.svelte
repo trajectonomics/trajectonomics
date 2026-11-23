@@ -31,6 +31,7 @@ const read = $derived(name === null ? undefined : snapshot.reads.documents[name]
 				{name}
 				doc={data.scenario.document}
 				household={data.scenario.household}
+				contentHash={data.scenario.contentHash}
 				baseline={snapshot.reads.baseline}
 				{editable}
 			/>

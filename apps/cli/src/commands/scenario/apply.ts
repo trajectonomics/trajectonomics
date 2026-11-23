@@ -2,10 +2,12 @@ import { z } from "zod"
 import { UUID_SHAPED } from "../../account/name"
 import { defineCommand, type Leaf } from "../../command"
 import { missingFieldError } from "../../document"
+import { APPLY_EXAMPLES } from "../../scenario/apply-examples"
 import { DOCUMENT, exclusive, REQUIRED_NAME } from "../../scenario/apply-forms"
 import { applyResult, writeApplied } from "../../scenario/apply-write"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
+import { IF_HASH } from "../../scenario/if-hash"
 import { printTemplate } from "../../scenario/template"
 import { LEDGER_READ_CODES } from "../../store"
 
@@ -41,36 +43,12 @@ export const apply: Leaf = defineCommand({
 			),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 		decimal: decimalFlag,
+		ifHash: IF_HASH,
 	}),
 	document: DOCUMENT,
-	note: "The --decimal form ships in 0.8.0.",
+	note: "The --decimal form ships in 0.8.0, and so does --if-hash.",
 	output: z.union([z.string(), applyResult]),
-	examples: [
-		{
-			command: "traj scenario apply --template",
-			description: "Print a minimal document to start from.",
-		},
-		{
-			command: "traj scenario apply --template --as-of 2026-03-31",
-			description: "Print a Scenario pre-filled from the Baseline at one date, to edit and apply.",
-		},
-		{
-			command: "traj scenario apply base --file base.json",
-			description: "Create a Scenario, or update it when the document changed.",
-		},
-		{
-			command: "traj scenario apply base --file -",
-			description: "Read the document from stdin, for example redirected from base.json.",
-		},
-		{
-			command: "traj scenario apply base --file base.json --dry-run",
-			description: "Show the row and roll the write back.",
-		},
-		{
-			command: "traj scenario apply base --file base-decimal.json --decimal",
-			description: "Apply a document in decimal form, such as scenario show --decimal prints.",
-		},
-	],
+	examples: APPLY_EXAMPLES,
 	errorCodes: [
 		"database_busy",
 		"invalid_input",
@@ -79,6 +57,7 @@ export const apply: Leaf = defineCommand({
 		"NEGATIVE_AMOUNT",
 		"AMOUNT_OVERFLOW",
 		"unsupported_currency",
+		"scenario_changed",
 		...LEDGER_READ_CODES,
 	],
 	run: (input, document, ctx) => {
@@ -94,6 +73,7 @@ export const apply: Leaf = defineCommand({
 			document,
 			decimal: input.decimal === true,
 			dryRun: input.dryRun === true,
+			ifHash: input.ifHash,
 		})
 	},
 })
