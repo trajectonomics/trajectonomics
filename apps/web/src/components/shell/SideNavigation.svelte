@@ -14,7 +14,7 @@ interface Props {
 	/** The Scenario names the Snapshot holds, and the one the pages show. */
 	names: readonly string[]
 	selected: string
-	onPlan: (name: string) => void
+	onPlan: (name: string) => unknown
 	/** Whether the server answers Edits, so the plan switcher offers to copy and delete a plan. */
 	editable?: boolean
 	/** Whether the Snapshot holds the selected plan's document, which the planner pages need. */

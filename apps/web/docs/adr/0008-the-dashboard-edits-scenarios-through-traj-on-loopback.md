@@ -14,7 +14,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - **`POST /edit` refuses, each refusal with its own test** (`src/lib/edit/guard.ts`, `scripts/serve-edit.test.ts`):
   - a Host other than this machine's, with 403;
   - an `Origin` other than `http://` plus the request's own loopback Host (`127.0.0.1`, `localhost` or `[::1]` on the server's port), a missing one included, with 403;
-  - a plan name that starts with `-`, holds a control character or is over 100 characters, with 400 (`invalid_edit`): `traj` has no `--`, so `--help` would be read as a flag, print help, write nothing and exit 0;
+  - a plan name that starts with `-`, holds a control character or is over 100 characters, with 400 (`invalid_edit`): an Edit's argv puts the name before its flags and without `--`, so `--help` would be read as a flag, print help, write nothing and exit 0;
   - a missing or wrong token, with 403;
   - a `Content-Type` other than `application/json`, with 415;
   - an Edit before the first Snapshot is in, with 503;
@@ -38,6 +38,12 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - The ledger's writer lock still decides a busy database: a write that meets it answers `database_busy` as data, as the CLI does.
 - Every new Edit kind is a change to `src/lib/edit/edit.ts`, its pinned list, and this ADR's list.
 
+## Amendment (2026-11-23): `traj` takes `--`, and the leading-`-` name rule stays
+
+- This ADR first said `traj` has no `--`. That was wrong: every `scenario` write and read ends its flags at `--` (checked against the workspace binary: `scenario fork -- base -dash`, `scenario rm -- --help` and `scenario apply --file … -- -d2` each treat the name as a name), and the Snapshot's `scenario show` and the what-if's `projection compare` already pass the name after `--` (`stage-two-projections.ts`, `what-if/argv.ts`).
+- The rule that a plan name never starts with `-` is **not redundant**, and it stays. `writeCommand` (`src/lib/edit/command.ts`) puts the name positionally, before `--json`, `--dry-run` and the override tokens, and passes no `--`. A name such as `--help` would be read as a flag there. Passing `--` would mean moving every name after the flags and re-pinning every argv in `edit.test.ts`, with no gain, since a plan named with a leading `-` is made only in a terminal.
+- A plan the ledger holds under a name that starts with `-` can be read (reads name it after `--` or in `--scenario=`) but not edited from the page. If a later change puts `--` into the write argv, this rule can go with it.
+
 ## Amendment (2026-11-23): `apply-plan` has controls
 
 - `apply-plan` carries `--decimal`. The page holds only decimal-form documents, so it never sees or makes minor units, and a saved document keeps its hash when nothing changed.
@@ -59,3 +65,9 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - An Edit to a plan the page did not read is refused, so the page no longer creates a plan through `apply-plan`.
 - Known gap: the hash covers the document only (cli ADR 0055). A household change that moves no anchored date is not seen by a stale household save until the hash covers the household too.
 - Tests: `edit-stale.test.ts` runs a terminal change (`traj scenario tax base --none`, then a salary change) against the real binary, then a page save: it is refused and the stored plan is unchanged; after a reread the same Edit succeeds. `serve-edit.test.ts` pins the `/reread` refusals.
+
+## Amendment (2026-11-23): the what-if Edits
+
+- `copy-plan` gains optional `sets` and `removals`, the Overrides of a what-if. With them it runs `scenario fork <from> <name> --set=… --without=… --decimal`; without them its argv is unchanged.
+- `apply-overrides` is new: `scenario apply <name> --set=… --without=… --decimal --if-hash <contentHash>`, the what-if form of `scenario apply` ([cli ADR 0057](../../../cli/docs/adr/0057-a-what-if-applies-to-the-plan-it-came-from.md)). It carries at least one change, and it names the hash the session began with.
+- Both are pinned in `edit-what-if.test.ts`, and `followPlan` joins a copy or an apply to the plans the Snapshot projects, as `apply-plan` does. The session that makes them is [web ADR 0010](0010-the-what-if-session-reads-through-traj-on-loopback.md).

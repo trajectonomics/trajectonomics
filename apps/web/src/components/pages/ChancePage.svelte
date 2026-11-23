@@ -5,7 +5,7 @@ import PageShell from "../ui/PageShell.svelte"
 interface Props {
 	/** The Scenario the address bar asks for, and the setter that writes it. */
 	scenario: string
-	onScenario: (value: string) => void
+	onScenario: (value: string) => unknown
 }
 
 /** The chance of success: the share of seeded Market paths a Scenario holds to its Horizon. */

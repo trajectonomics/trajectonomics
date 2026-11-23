@@ -6,9 +6,11 @@ interface Props {
 	id?: string | undefined
 	/** Removes the item from the plan. Runs after the person confirms the delete. */
 	onDelete: () => void
+	/** True when the drawer tries a value in the What-if session: the save is a Set, and nothing is deleted. */
+	trying?: boolean
 }
 
-let { id, onDelete }: Props = $props()
+let { id, onDelete, trying = false }: Props = $props()
 let confirming = $state(false)
 
 const button =
@@ -18,8 +20,8 @@ const button =
 <!-- Save sends the item's document as one Edit. Delete asks first, because a removed item cannot be undone here. -->
 <div class="space-y-3 border-t border-border pt-4">
 	<div class="flex flex-wrap gap-2">
-		<button type="submit" disabled={editSession.busy} class={button}>Save</button>
-		{#if id !== undefined && !confirming}
+		<button type="submit" disabled={editSession.busy} class={button}>{trying ? "Try this value" : "Save"}</button>
+		{#if id !== undefined && !confirming && !trying}
 			<button type="button" onclick={() => (confirming = true)} disabled={editSession.busy} class={button}>
 				Delete
 			</button>

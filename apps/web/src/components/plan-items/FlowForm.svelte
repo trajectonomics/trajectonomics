@@ -1,13 +1,16 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
 import { flowIds, withFlow, withoutFlow } from "../../lib/view/plan-items/document"
 import { flowFromDraft } from "../../lib/view/plan-items/flow-draft"
 import { type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import { recordOf } from "../../lib/what-if/session"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
+import TryNotice from "./TryNotice.svelte"
 
 interface Props {
 	kind: FlowKind
@@ -22,13 +25,26 @@ interface Props {
 	existing?: ScenarioFlow | undefined
 	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
 	onDone: () => void
+	/** True when the drawer tries values in the What-if session, instead of saving them. */
+	tryValue?: boolean
 }
 
-let { kind, name, doc, household, existing, onDone, contentHash }: Props = $props()
+let {
+	kind,
+	name,
+	doc,
+	household,
+	existing,
+	onDone,
+	contentHash,
+	tryValue = false,
+}: Props = $props()
 const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
 let problems: Problems = $state({})
+/** The fields a tried value cleared, which a what-if cannot hold. */
+let cleared: string[] = $state([])
 const FIELDS = ["name", "amount", "frequency", "start", "end", "growth", "rate", "earned"]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 
@@ -46,11 +62,27 @@ async function save(event: SubmitEvent): Promise<void> {
 		return
 	}
 	problems = {}
+	if (tryValue) {
+		// A what-if: each changed field is a Set of the session, and the plan itself is not written.
+		if (existing !== undefined) {
+			cleared = whatIfSession.tryItem(
+				name,
+				contentHash,
+				"flows",
+				existing.id,
+				recordOf(existing),
+				recordOf(result.flow),
+			)
+		}
+		if (cleared.length === 0) onDone()
+		return
+	}
 	await commit(withFlow(doc, result.flow))
 }
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
 	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} />
-	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} />
+	<TryNotice fields={cleared} />
+	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

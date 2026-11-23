@@ -51,3 +51,7 @@ _Avoid_: budget, ledger, transactions
 **Flow diagram**:
 The picture of one year's cash flow on the Cash flow page: sources on the left, the cash node, and uses on the right, with each band's height its amount's share of the taller column. Pure geometry from `src/lib/chart/flow.ts`; it adds no figure of its own.
 _Avoid_: Sankey (as a name for the page), chart, graph
+
+**What-if session**:
+The changes one tab holds against one plan, switched items off (Removals) and values set (Sets), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. It is held in the tab only.
+_Avoid_: scratch plan, draft, scenario copy, simulation

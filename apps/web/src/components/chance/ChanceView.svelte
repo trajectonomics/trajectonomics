@@ -12,7 +12,7 @@ interface Props {
 	chance: Readonly<Record<string, Read<ProjectionChance>>>
 	/** The Scenario the plan switcher asks for. An unknown one shows the first. */
 	scenario: string
-	onScenario: (value: string) => void
+	onScenario: (value: string) => unknown
 }
 
 /** The Scenario picker and the chance of the chosen Scenario. The choice lives in the address bar. */

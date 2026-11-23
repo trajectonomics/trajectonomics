@@ -11,7 +11,7 @@ interface Props {
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
 	/** The Scenario the address bar asks for. An unknown one shows the first. */
 	scenario: string
-	onScenario: (value: string) => void
+	onScenario: (value: string) => unknown
 	terms: string
 	onTerms: (value: string) => void
 }

@@ -12,6 +12,7 @@ describe("the Edit list", () => {
 			"delete-plan",
 			"set-household",
 			"remove-household",
+			"apply-overrides",
 		])
 	})
 
@@ -21,7 +22,7 @@ describe("the Edit list", () => {
 			expect(parsed.success).toBe(false)
 		}
 		for (const edit of [
-			{ kind: "copy-plan", from: "base", name: "early" },
+			{ kind: "copy-plan", from: "base", name: "early", sets: [], removals: [] },
 			{ kind: "apply-plan", name: "early", contentHash: HASH, document: {} },
 			{ kind: "delete-plan", name: "early" },
 			{ kind: "set-household", name: "early", contentHash: HASH, household: { schemaVersion: 1 } },
@@ -66,7 +67,7 @@ describe("the Edit list", () => {
 
 describe("writeCommand", () => {
 	test("copy-plan is scenario fork, with and without --dry-run", () => {
-		const edit: Edit = { kind: "copy-plan", from: "base", name: "early" }
+		const edit: Edit = { kind: "copy-plan", from: "base", name: "early", sets: [], removals: [] }
 		expect(writeCommand(edit, false)).toEqual({
 			argv: ["scenario", "fork", "base", "early", "--json"],
 		})
@@ -152,7 +153,7 @@ describe("the household Edits", () => {
 
 describe("followPlan", () => {
 	test("a copy or an apply joins an explicit list, and an empty list stays every Scenario", () => {
-		const copy: Edit = { kind: "copy-plan", from: "base", name: "early" }
+		const copy: Edit = { kind: "copy-plan", from: "base", name: "early", sets: [], removals: [] }
 		expect(followPlan(["base"], copy)).toEqual(["base", "early"])
 		expect(followPlan([], copy)).toEqual([])
 		expect(followPlan(["base", "early"], copy)).toEqual(["base", "early"])

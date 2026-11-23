@@ -2,7 +2,7 @@
 // the packed pages and that Snapshot on 127.0.0.1 until it is stopped
 // ([ADR 0007](../docs/adr/0007-traj-dashboard-serves-the-dashboard-on-loopback.md)).
 import type { ErrorBody, Snapshot } from "../src/lib/contract"
-import { EDIT_PATH, EDIT_SESSION_PATH, REREAD_PATH } from "../src/lib/edit/guard"
+import { EDIT_PATH, EDIT_SESSION_PATH, REREAD_PATH, WHAT_IF_PATH } from "../src/lib/edit/guard"
 import type { PlanParams } from "../src/lib/snapshot"
 import { loadPack } from "./load-pack"
 import type { RunContext } from "./run-traj"
@@ -57,6 +57,15 @@ export async function startDashboard(options: DashboardOptions): Promise<Dashboa
 	})
 	let server: ReturnType<typeof Bun.serve>
 	try {
+		const routes = new Map<
+			string,
+			(request: Request, port: number) => Response | Promise<Response>
+		>([
+			[EDIT_SESSION_PATH, editor.session],
+			[EDIT_PATH, editor.edit],
+			[REREAD_PATH, editor.reread],
+			[WHAT_IF_PATH, editor.whatIf],
+		])
 		server = Bun.serve({
 			hostname: "127.0.0.1",
 			port: options.port,
@@ -64,10 +73,8 @@ export async function startDashboard(options: DashboardOptions): Promise<Dashboa
 			maxRequestBodySize: 1024 * 1024,
 			fetch: (request, self): Promise<Response> | Response => {
 				const port = self.port ?? options.port
-				const { pathname } = new URL(request.url)
-				if (pathname === EDIT_SESSION_PATH) return editor.session(request, port)
-				if (pathname === EDIT_PATH) return editor.edit(request, port)
-				if (pathname === REREAD_PATH) return editor.reread(request, port)
+				const route = routes.get(new URL(request.url).pathname)
+				if (route !== undefined) return route(request, port)
 				const body = editor.body
 				return body === null
 					? text(503, "The Snapshot is still being read")

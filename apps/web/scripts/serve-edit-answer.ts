@@ -1,7 +1,9 @@
 // The answers of the write path that are not an Edit's own result: a refusal, and a body that is not an
 // Edit of the list. Both are the error envelope every write answer uses ([serve-edit.ts](serve-edit.ts)).
 import type { ErrorBody } from "../src/lib/contract"
+import { nestsPast } from "../src/lib/edit/depth"
 import { type Edit, editSchema } from "../src/lib/edit/edit"
+import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
 
 /** The exit code a refusal carries: the write path refuses rather than runs, so none of traj's codes fits. */
@@ -15,6 +17,15 @@ export function failure(status: number, error: ErrorBody): Response {
 /** A refused request: its status, its code and the sentence a person reads. */
 export function refused(status: number, code: string, message: string): Response {
 	return failure(status, { code, exitCode: REFUSED_EXIT_CODE, message })
+}
+
+/** Runs a schema read that a hostile body could make throw (a stack overflow); that is a refusal, never a 500. */
+function safely<T>(read: () => T): T | null {
+	try {
+		return read()
+	} catch {
+		return null
+	}
 }
 
 /** Reads the body as an Edit of the closed list: refused when it is not JSON, or names no Edit. */
@@ -31,8 +42,30 @@ export async function readEdit(
 	} catch {
 		return invalid("The Edit is not JSON.")
 	}
-	const parsed = editSchema.safeParse(value)
-	return parsed.success
+	if (nestsPast(value)) return invalid("The Edit nests deeper than the Dashboard sends.")
+	const parsed = safely(() => editSchema.safeParse(value))
+	return parsed?.success
 		? { ok: true, edit: parsed.data }
 		: invalid("The Edit is not one the Dashboard may send.")
+}
+
+/** Reads the body as a what-if of the closed shape: refused when it is not JSON, or names a bad plan or Override. */
+export async function readWhatIf(
+	request: Request,
+): Promise<{ ok: true; whatIf: WhatIfBody } | { ok: false; error: ErrorBody }> {
+	const invalid = (message: string) => ({
+		ok: false as const,
+		error: { code: "invalid_what_if", exitCode: REFUSED_EXIT_CODE, message },
+	})
+	let value: unknown
+	try {
+		value = await request.json()
+	} catch {
+		return invalid("The what-if is not JSON.")
+	}
+	if (nestsPast(value)) return invalid("The what-if nests deeper than the Dashboard sends.")
+	const parsed = safely(() => whatIfSchema.safeParse(value))
+	return parsed?.success
+		? { ok: true, whatIf: parsed.data }
+		: invalid("The what-if is not one the Dashboard may send.")
 }

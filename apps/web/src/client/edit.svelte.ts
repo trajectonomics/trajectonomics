@@ -1,6 +1,6 @@
 import type { ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
-import type { Edit } from "../lib/edit/edit"
+import type { EditInput } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER, REREAD_PATH } from "../lib/edit/guard"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -35,7 +35,7 @@ class EditSession {
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
-	async run(edit: Edit): Promise<boolean> {
+	async run(edit: EditInput): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
 		this.error = null
