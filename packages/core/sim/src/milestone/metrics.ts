@@ -1,7 +1,6 @@
 import { countedDays } from "../calendar/counted"
 import { leftOutOfAccessible } from "../engine/accessible"
-import type { StateMap } from "../engine/state"
-import { valuation } from "../engine/value"
+import type { AccountState, StateMap } from "../engine/state"
 import { deflate } from "../money/growth"
 import type {
 	AccountId,
@@ -19,6 +18,8 @@ export interface Figures {
 	readonly states: StateMap
 	readonly start: DateString
 	readonly inflation: BasisPoints
+	/** An Account's value on `date` in the requested terms. */
+	readonly account: (state: AccountState, terms: MilestoneTerms) => bigint
 	/** An expense window in the requested terms; `undefined` when the window is partial. */
 	readonly expenses: (window: ReferenceWindow, terms: MilestoneTerms) => bigint | undefined
 }
@@ -57,8 +58,7 @@ function namedValue(name: MetricName, figures: Figures, terms: MilestoneTerms): 
 			leftOutOfAccessible(state.rule, figures.date),
 		)
 		if (sign === 0n) continue
-		const value = valuation(state, figures.date)
-		total += sign * termed(value, figures.date, figures.start, figures.inflation, terms)
+		total += sign * figures.account(state, terms)
 	}
 	return total
 }
@@ -67,8 +67,7 @@ function accountsValue(ids: readonly AccountId[], figures: Figures, terms: Miles
 	let total = 0n
 	for (const state of figures.states.values()) {
 		if (!ids.includes(state.rule.id)) continue
-		const value = valuation(state, figures.date)
-		total += termed(value, figures.date, figures.start, figures.inflation, terms)
+		total += figures.account(state, terms)
 	}
 	return total
 }

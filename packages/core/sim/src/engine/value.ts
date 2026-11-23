@@ -26,14 +26,23 @@ export function activeNominalRule(state: AccountState): NominalRule | undefined 
 }
 
 /** A Return series replaces the rate, so an Account holding one takes this path. */
-function effectiveParts(state: AccountState, date: DateString): ValueParts {
+function growTo(state: AccountState, date: DateString): bigint {
 	const series = state.series
-	const amount =
-		series === undefined
-			? state.asOf === date
-				? state.balance
-				: grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
-			: walkRows(state.balance, state.asOf, date, series)
+	if (series !== undefined) {
+		const read = walkRows(state.balance, state.asOf, date, series, state.walked)
+		state.walked = read.walked
+		return read.amount
+	}
+	return grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
+}
+
+/** The grown value is read again and again on one date, so the last reading is kept (pure). */
+function effectiveParts(state: AccountState, date: DateString): ValueParts {
+	const { balance, asOf, grown } = state
+	if (asOf === date) return { capitalised: balance, accruedInterest: 0n, amount: balance }
+	const hit = grown?.date === date && grown.balance === balance && grown.asOf === asOf
+	const amount = hit ? grown.amount : growTo(state, date)
+	if (!hit) state.grown = { balance, asOf, date, amount }
 	return { capitalised: amount, accruedInterest: 0n, amount }
 }
 
