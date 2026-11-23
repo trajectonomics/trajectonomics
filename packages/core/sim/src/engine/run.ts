@@ -10,6 +10,7 @@ import type { EngineResult } from "./result"
 import { resolveReturns } from "./return-rows"
 import type { Returns } from "./returns"
 import { openRules, type RuleBook } from "./rule-book"
+import type { RunOptions } from "./run-options"
 import { type RunAccumulator, stepDate } from "./run-step"
 import { createStates, type StateMap } from "./state"
 
@@ -61,16 +62,16 @@ export function runEngine(
 	timeline: Timeline,
 	observations: readonly DateString[],
 	returns?: Returns,
-	tracked = false,
-	breakdown = false,
+	options: RunOptions = {},
 ): EngineResult {
+	const { tracked = false, breakdown = false, recordRules = false } = options
 	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levies = planLevies(scenario, timeline, calendar)
 	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
 	const ledger = tracked ? openLedger(states, timeline.start) : undefined
-	const rules = openRules(scenario)
+	const rules = openRules(scenario, recordRules)
 	const acc: RunAccumulator = {
 		snapshots: [],
 		totals: [],

@@ -12,10 +12,20 @@ export interface RuleYear {
 	readonly action: RuleAction
 }
 
-/** One rule Flow's progress: the Occurrences it has landed and the Rule years they began. */
+/** What one Occurrence of a rule Flow planned, on the Landed date it fell on. */
+export interface RulePay {
+	readonly date: DateString
+	readonly amount: bigint
+}
+
+/**
+ * One rule Flow's progress: the Occurrences it has landed and the Rule years they began. `pays`
+ * lists every Occurrence in order, and exists only in a book opened to record them (chance of success).
+ */
 export interface FlowRule {
 	count: number
 	readonly years: RuleYear[]
+	readonly pays?: RulePay[]
 }
 
 /** The state a run carries for its rule Flows (ADR 0023); `undefined` for a Scenario without one. */
@@ -31,14 +41,16 @@ export interface RuleOccurrence {
 }
 
 /** A Flow's Occurrences per Rule year: twelve for a monthly Flow, one for an annual one. */
-function perYear(flow: Flow): number {
+export function perYear(flow: Flow): number {
 	return flow.frequency === "monthly" ? 12 : 1
 }
 
-/** An empty book, or `undefined` when the Scenario declares no rule Flow. */
-export function openRules(scenario: Scenario): RuleBook | undefined {
+/** An empty book, or `undefined` when the Scenario declares no rule Flow; `record` also logs each payment. */
+export function openRules(scenario: Scenario, record = false): RuleBook | undefined {
 	const book: RuleBook = new Map()
-	for (const flow of scenario.flows) if (isRuled(flow)) book.set(flow.id, { count: 0, years: [] })
+	for (const flow of scenario.flows) {
+		if (isRuled(flow)) book.set(flow.id, { count: 0, years: [], ...(record && { pays: [] }) })
+	}
 	return book.size === 0 ? undefined : book
 }
 
@@ -47,7 +59,8 @@ export function cloneRules(book: RuleBook | undefined): RuleBook | undefined {
 	if (book === undefined) return undefined
 	const copy: RuleBook = new Map()
 	for (const [id, state] of book) {
-		copy.set(id, { count: state.count, years: state.years.map((year) => ({ ...year })) })
+		const years = state.years.map((year) => ({ ...year }))
+		copy.set(id, { count: state.count, years, ...(state.pays && { pays: [...state.pays] }) })
 	}
 	return copy
 }
@@ -101,5 +114,6 @@ export function ruleAmount(
 		per === 1 ? year.amount : (year.amount * part) / 12n - (year.amount * (part - 1n)) / 12n
 	state.count++
 	year.paid += pay
+	state.pays?.push({ date: occurrence.date, amount: pay })
 	return pay
 }

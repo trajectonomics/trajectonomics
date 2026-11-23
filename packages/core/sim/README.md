@@ -261,7 +261,7 @@ band; in the third the amount 4,000,000 is above 4.8% of the portfolio, so the y
 ```
 
 Financial Independence prices a rule Flow from each candidate's own walk, as it does a Derived amount
-that reads an Account. `chanceOfSuccess` runs the rule on every Market path. A `next12Months` Milestone
+that reads an Account. `chanceOfSuccess` runs the rule on every Market path and, for a plan with a rule Flow, reports Spending Bands: the Percentiles of what the rule paid in each Annual roll-up and of each path's lowest year (ADR 0024). A `next12Months` Milestone
 Metric is refused beside a rule Flow (`NEXT_12_MONTHS_READS_ACCOUNT`) unless that Flow's `startAt`
 names the Milestone the Metric sits on, and `retirementSpending`
 replaces a rule Flow like any expense.

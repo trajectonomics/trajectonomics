@@ -32,7 +32,10 @@ export function project(
 	if (problems.length > 0) return { ok: false, problems }
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
-	const result = runEngine(baseline, scenario, timeline, observed, undefined, statements, breakdown)
+	const result = runEngine(baseline, scenario, timeline, observed, undefined, {
+		tracked: statements,
+		breakdown,
+	})
 	if (!result.ok) return { ok: false, problems: [result.problem] }
 	const output = buildProjection(result.run, baseline, scenario, timeline, breakdown)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }

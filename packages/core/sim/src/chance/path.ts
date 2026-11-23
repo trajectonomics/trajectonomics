@@ -8,6 +8,7 @@ import { accountRules } from "../output/rules"
 import type { Baseline, DateString, MinorUnits, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { rollupGrid, rollupObservations } from "./grid"
+import { spentBy } from "./spent"
 
 /** What every Market path of one chance shares: the inputs, the roll-up grid and the opening worth. */
 export interface PathInputs {
@@ -23,6 +24,10 @@ export interface PathInputs {
 export interface PathOutcome {
 	readonly netWorth: readonly MinorUnits[]
 	readonly runsOutIndex?: number
+	/** What the rule Flows paid in each grid period; present only when the Scenario has a rule Flow. */
+	readonly spent?: readonly MinorUnits[]
+	/** The path's lowest year of that spending, absent when it has no whole year and did not run out. */
+	readonly lowest?: MinorUnits
 }
 
 export type PathResult =
@@ -47,7 +52,14 @@ export function pathInputs(baseline: Baseline, scenario: Scenario, timeline: Tim
  */
 export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	const { timeline } = inputs
-	const result = runEngine(inputs.baseline, inputs.scenario, timeline, inputs.observations, returns)
+	const result = runEngine(
+		inputs.baseline,
+		inputs.scenario,
+		timeline,
+		inputs.observations,
+		returns,
+		{ recordRules: true },
+	)
 	if (!result.ok) return { ok: false, problem: result.problem }
 	const runsOut = result.run.runsOut
 	const periods = buildPeriods(timeline.start, runsOut?.date ?? timeline.horizon, runsOut?.date)
@@ -61,6 +73,13 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	const annual = rollups.annual!
 	const last = annual[annual.length - 1]!
 	const netWorth = inputs.grid.map((period) => (annual[period.index] ?? last).closingNetWorth)
-	const outcome = runsOut === undefined ? { netWorth } : { netWorth, runsOutIndex: last.index }
+	const spent = spentBy(result.run, inputs.scenario, inputs.grid)
+	if (!spent.ok) return { ok: false, problem: spent.problem }
+	const outcome: PathOutcome = {
+		netWorth,
+		...(runsOut === undefined ? {} : { runsOutIndex: last.index }),
+		...(spent.spent === undefined ? {} : { spent: spent.spent }),
+		...(spent.lowest === undefined ? {} : { lowest: spent.lowest }),
+	}
 	return { ok: true, outcome }
 }
