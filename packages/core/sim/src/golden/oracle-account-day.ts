@@ -35,6 +35,11 @@ function plannedSums(landing: readonly OracleEvent[], planned: PlannedDay) {
 	return { income, expense, contributions }
 }
 
+/** The expense a day's landing plans, for a day priced from the states a run-out left (ADR 0013). */
+export function oraclePlannedExpense(landing: readonly OracleEvent[], planned: PlannedDay): bigint {
+	return plannedSums(landing, planned).expense
+}
+
 /**
  * Lands one day's Flows on the states in the engine's order: planned withdrawals (a loan draw or a
  * sale), debt payments, obligations paid in full, asset contributions from what the day's income
