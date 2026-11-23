@@ -9,6 +9,7 @@ import { landsAt } from "../milestone/gating"
 import { deferredOnces, planMilestones } from "../milestone/spec"
 import type { DateString, Scenario, Timeline } from "../types"
 import { buildWindow, type WindowOutcome } from "./expense-window"
+import { stopsFlow } from "./scan-stop"
 
 /** The plan through one date, and what a set of fire dates keeps of it. */
 export interface OriginalSource {
@@ -89,26 +90,27 @@ function measure(
 /**
  * The plan's events through `last`, built on first use and once. A Scenario without Milestones
  * keeps every event as `buildEvents` builds it, and a derived Expense is evaluated on its own
- * Landed date.
+ * Landed date. Unless `retirement` replaces the expenses, the plan's earned income is dropped: a
+ * window sums only expenses, none of which reads earned income, and a stopped Derived income priced
+ * with the candidate's own depleted values could come out negative and fail the run (#376).
  */
 export function originalSource(
 	scenario: Scenario,
 	timeline: Timeline,
 	last: DateString,
 	calendar: ResolvedCalendar | undefined,
+	retirement = false,
 ): OriginalSource {
 	const plan = planMilestones(scenario, calendar)
 	const deferred = plan === undefined ? [] : deferredOnces(scenario, plan, calendar)
 	const bounded = { ...timeline, horizon: last }
+	const stops = stopsFlow(false)
 	let events: readonly DatedEvent[] | undefined
 	return {
 		windowFor: (fires, values) => {
 			events ??= buildEvents(scenario, bounded, calendar)
-			return measure(
-				scenario,
-				plan === undefined ? events : landing(scenario, events, deferred, fires),
-				values,
-			)
+			const landed = plan === undefined ? events : landing(scenario, events, deferred, fires)
+			return measure(scenario, retirement ? landed : landed.filter((event) => !stops(event.flow)), values)
 		},
 	}
 }
