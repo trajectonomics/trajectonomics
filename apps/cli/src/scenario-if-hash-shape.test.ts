@@ -1,5 +1,5 @@
 // `--if-hash` takes a contentHash as `traj scenario show` prints it; any other text is a usage error, never
-// read as a plan that moved on (cli ADR-0051).
+// read as a plan that moved on (cli ADR-0055).
 import { describe, expect, it } from "bun:test"
 import { seedBase } from "./scenario-household-support"
 import { errorOf, scenarioHome } from "./scenario-test-support"

@@ -33,5 +33,5 @@ Each refusal has its own test in `apps/web/scripts/serve-edit.test.ts`:
 
 ## Amendment (2026-11-23): a fourth route re-reads the Snapshot
 
-- `POST /reread` runs the same guards as `POST /edit` (Host, Origin, token, `application/json`, a Snapshot already read, no Edit running). It runs the Snapshot Plan again and answers the new Snapshot, or the error as data. It writes nothing, and it exists so the page can show a plan that changed elsewhere, after a `scenario_changed` refusal ([cli ADR 0051](0051-a-write-can-name-the-content-hash-it-read.md), [web ADR 0008](../../../web/docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+- `POST /reread` runs the same guards as `POST /edit` (Host, Origin, token, `application/json`, a Snapshot already read, no Edit running). It runs the Snapshot Plan again and answers the new Snapshot, or the error as data. It writes nothing, and it exists so the page can show a plan that changed elsewhere, after a `scenario_changed` refusal ([cli ADR 0055](0055-a-write-can-name-the-content-hash-it-read.md), [web ADR 0008](../../../web/docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 - The plan-changing Edits send `--if-hash` with the hash the page read, so a save over a plan another writer changed is refused and nothing is written.

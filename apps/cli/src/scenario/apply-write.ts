@@ -36,7 +36,7 @@ export type ApplyWrite = {
 	document: unknown
 	decimal: boolean
 	dryRun: boolean
-	/** The content hash the caller read; the write is refused when the stored plan has another (cli ADR-0051). */
+	/** The content hash the caller read; the write is refused when the stored plan has another (cli ADR-0055). */
 	ifHash?: string | undefined
 }
 

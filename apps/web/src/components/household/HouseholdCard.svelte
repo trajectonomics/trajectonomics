@@ -16,7 +16,7 @@ interface Props {
 	name: string
 	doc: ScenarioDocument
 	household: HouseholdDocument | null
-	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0051). */
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 	/** Whether the controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean

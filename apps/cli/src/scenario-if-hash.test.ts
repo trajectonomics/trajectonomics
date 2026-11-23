@@ -1,5 +1,5 @@
 // `--if-hash`: a write names the contentHash its caller read, and is refused over a plan that has moved on
-// (cli ADR-0051). Each refusal writes nothing, dry or real.
+// (cli ADR-0055). Each refusal writes nothing, dry or real.
 import { describe, expect, it } from "bun:test"
 import { HOUSEHOLD, seedBase, setHousehold, shown } from "./scenario-household-support"
 import {

@@ -21,7 +21,7 @@ interface Props {
 	household: HouseholdDocument | null
 	baseline: Read<Baseline>
 	editable: boolean
-	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0051). */
+	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 }
 

@@ -11,7 +11,7 @@ import ItemActions from "./ItemActions.svelte"
 interface Props {
 	/** The plan's name, which the Edit saves the document under. */
 	name: string
-	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0051). */
+	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 	doc: ScenarioDocument
 	/** The Account to edit; absent for a new one. */

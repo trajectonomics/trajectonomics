@@ -17,7 +17,7 @@ interface Props {
 	name: string
 	/** The household as it is now, or null when there is none yet. */
 	household: HouseholdDocument | null
-	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0051). */
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 	/** The person to edit; absent for a new one. */
 	existing?: HouseholdPerson | undefined

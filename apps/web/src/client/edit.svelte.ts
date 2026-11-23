@@ -17,7 +17,7 @@ class EditSession {
 	error = $state<string | null>(null)
 	/** The CLI's error envelope of the last refused Edit, so a form can show it at the field it names. */
 	failure = $state<ErrorBody | null>(null)
-	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0051). */
+	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
 	stale = $state(false)
 	private opened: Promise<void> | null = null
 

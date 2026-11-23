@@ -4,7 +4,7 @@ import { editSession } from "../../client/edit.svelte.js"
 interface Props {
 	/** The Scenario whose household is removed. */
 	name: string
-	/** The content hash of the Scenario the page read (cli ADR 0051). */
+	/** The content hash of the Scenario the page read (cli ADR 0055). */
 	contentHash: string
 }
 

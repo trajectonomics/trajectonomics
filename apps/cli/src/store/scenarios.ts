@@ -63,7 +63,7 @@ export function saveScenario(
 	)
 }
 
-/** The refusal for a write that named a content hash the stored Scenario no longer has (cli ADR-0051). */
+/** The refusal for a write that named a content hash the stored Scenario no longer has (cli ADR-0055). */
 function staleRefusal(
 	current: ScenarioRow | null,
 	name: string,

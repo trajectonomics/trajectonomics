@@ -15,7 +15,7 @@ interface Props {
 	/** The Scenario the household belongs to: the Edit saves its household under this name. */
 	name: string
 	household: HouseholdDocument
-	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0051). */
+	/** The content hash of the Scenario the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 	/** The Flows the Scenario holds: the items a date may be pinned on. */
 	flows: readonly ScenarioFlow[]

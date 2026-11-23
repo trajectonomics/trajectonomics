@@ -7,7 +7,7 @@ import type { WriteOptions } from "./types"
 
 /**
  * `expectedHash`, when given, is the content hash of the stored Scenario the caller read. A different
- * one, or none when no Scenario of the name is stored, refuses the write (cli ADR-0051).
+ * one, or none when no Scenario of the name is stored, refuses the write (cli ADR-0055).
  */
 export type NewScenario = { name: string; document: unknown; expectedHash?: string | undefined }
 /**
@@ -34,7 +34,7 @@ export type HouseholdPlanner = (document: ScenarioDocument) => HouseholdPlan | A
 export type HouseholdSet =
 	| { status: "updated" | "unchanged"; scenario: ScenarioRow }
 	| { status: "not_found" }
-/** A household write's options: a dry run, and the content hash the caller read (cli ADR-0051). */
+/** A household write's options: a dry run, and the content hash the caller read (cli ADR-0055). */
 export type HouseholdOptions = WriteOptions & { expectedHash?: string | undefined }
 
 /**

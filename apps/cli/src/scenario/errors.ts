@@ -21,7 +21,7 @@ export function scenarioNameTaken(id: string): AppError {
 
 /**
  * A write that named the content hash it read, against a plan whose stored hash has moved on, or
- * against no plan at all (cli ADR-0051). Nothing is written; the hint says to read the plan again.
+ * against no plan at all (cli ADR-0055). Nothing is written; the hint says to read the plan again.
  */
 export function scenarioChanged(
 	name: string,

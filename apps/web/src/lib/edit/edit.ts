@@ -15,7 +15,7 @@ const planName = z
 
 /**
  * The content hash of the plan the page read, as the Snapshot states it (`contentHash`). A write that
- * names it is refused when the stored plan has moved on (cli ADR 0051).
+ * names it is refused when the stored plan has moved on (cli ADR 0055).
  */
 const contentHash = z
 	.string()
@@ -69,7 +69,7 @@ export type WriteCommand = { argv: string[]; stdin?: string }
 /**
  * The `traj` write an Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
  * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
- * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0051).
+ * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055).
  */
 export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]

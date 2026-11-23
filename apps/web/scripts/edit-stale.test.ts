@@ -1,4 +1,4 @@
-// A save over a plan that changed since the page read it (cli ADR 0051), against the real traj: the
+// A save over a plan that changed since the page read it (cli ADR 0055), against the real traj: the
 // refusal writes nothing, and a read again makes the same Edit succeed.
 import { afterAll, describe, expect, test } from "bun:test"
 import {
