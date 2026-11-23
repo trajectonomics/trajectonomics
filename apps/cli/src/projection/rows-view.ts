@@ -12,6 +12,8 @@ export type AnnualRow = {
 	openingNetWorth: string
 	closingNetWorth: string
 	income: string
+	/** Planned withdrawals landed in the roll-up; present only when the Scenario declares one (sim ADR-0016). */
+	withdrawals?: string | undefined
 	expense: string
 	contributions: string
 	unfundedContributions: string
@@ -39,6 +41,9 @@ export const annualRow: z.ZodType<AnnualRow> = z.strictObject({
 	openingNetWorth: moneyField("Net worth on the roll-up's first day"),
 	closingNetWorth: moneyField("Net worth on the roll-up's last day"),
 	income: moneyField("Income the roll-up landed"),
+	withdrawals: moneyField(
+		"Planned withdrawals the roll-up landed, borrowed from liabilities; present only when the Scenario declares a withdrawal Flow",
+	).optional(),
 	expense: moneyField("Expense the roll-up landed"),
 	contributions: moneyField("Contributions the roll-up funded"),
 	unfundedContributions: moneyField("Contributions the roll-up could not fund"),

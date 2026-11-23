@@ -1,6 +1,6 @@
 annual (1 row)
-index  from        to          Ages  openingNetWorth  closingNetWorth     income   expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
-    0  2026-03-31  2027-03-30              953449.51       1018549.51  120000.00  50700.00       64800.00               19200.00      0.00   0.00  false    {"date":"2027-03-30","amount":"1018549.51"}
+index  from        to          Ages  openingNetWorth  closingNetWorth     income  withdrawals   expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+    0  2026-03-31  2027-03-30              953449.51       1018549.51  120000.00      3000.00  50700.00       64800.00               19200.00      0.00   0.00  false    {"date":"2027-03-30","amount":"1018549.51"}
 
 taxYears (2 rows)
 levy      from        to          settlementDate      due  prepaid      owed  settled  partial

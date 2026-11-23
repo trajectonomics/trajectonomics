@@ -23,7 +23,7 @@ import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
-	note: "Each person's age on the rows, and the --breakdown cash flow, ships in 0.8.0.",
+	note: "Each person's age on the rows, and the --breakdown cash flow and --liabilities statements, ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({
@@ -40,6 +40,12 @@ export const run: Leaf = defineCommand({
 			.default(false)
 			.describe(
 				"Also report each Annual roll-up's cash flow by source, tax, category and Account.",
+			),
+		liabilities: z
+			.boolean()
+			.default(false)
+			.describe(
+				"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
 			),
 	}),
 	flagDocuments: [carryInFlagDocument],
@@ -63,6 +69,12 @@ export const run: Leaf = defineCommand({
 		},
 		{
 			command:
+				"traj projection run --scenario car-loan --as-of 2026-03-31 --horizon 2027-03-30 --liabilities --json",
+			description:
+				"The annual roll-up of a Scenario that borrows, with each loan's month by month and its paid-off date.",
+		},
+		{
+			command:
 				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
 			description: "The annual roll-up with one Stream taken out, and nothing saved.",
 		},
@@ -82,7 +94,7 @@ export const run: Leaf = defineCommand({
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
-			return projectionOf(placed, input.monthly, input.breakdown)
+			return projectionOf(placed, input.monthly, input.breakdown, input.liabilities)
 		})
 	},
 })

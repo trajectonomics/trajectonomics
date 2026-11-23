@@ -154,6 +154,7 @@ describe("projection run", () => {
 			"carryIn",
 			"decimal",
 			"horizon",
+			"liabilities",
 			"monthly",
 			"scenario",
 			"set",

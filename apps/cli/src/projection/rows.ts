@@ -56,6 +56,8 @@ export function annualRow(
 		openingNetWorth: money(rollup.openingNetWorth),
 		closingNetWorth: money(rollup.closingNetWorth),
 		income: money(rollup.income),
+		// Present only when the Scenario declares a withdrawal Flow, as the engine states it (sim ADR-0016).
+		...(rollup.withdrawals === undefined ? {} : { withdrawals: money(rollup.withdrawals) }),
 		expense: money(rollup.expense),
 		contributions: money(rollup.contributions),
 		unfundedContributions: money(rollup.unfundedContributions),

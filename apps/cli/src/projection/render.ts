@@ -1,6 +1,7 @@
 import type { ColumnHint, RenderHint } from "../table"
 import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
 import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
+import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
 import {
 	compareMilestoneBlocks,
 	compareMilestonesHidden,
@@ -47,6 +48,8 @@ export const projectionHint: RenderHint = {
 			column("openingNetWorth", "right"),
 			column("closingNetWorth", "right"),
 			column("income", "right"),
+			// Shown only when a row states it, so a Scenario without a withdrawal Flow prints as before.
+			{ ...column("withdrawals", "right"), optional: true },
 			column("expense", "right"),
 			column("contributions", "right"),
 			column("unfundedContributions", "right"),
@@ -65,9 +68,9 @@ export const projectionHint: RenderHint = {
 		],
 		milestones: milestoneColumns,
 	},
-	// The long cash-flow table is JSON's; the human form prints one block per roll-up after the body.
-	display: (data) => cashflowHidden(runMilestonesShown(data)),
-	blocks: cashflowBlocks,
+	// The long cash-flow and liability tables are JSON's; the human form prints them as blocks after the body.
+	display: (data) => liabilitiesHidden(cashflowHidden(runMilestonesShown(data))),
+	blocks: (data) => [...cashflowBlocks(data), ...liabilityBlocks(data)],
 	note: "notes",
 	extra: [
 		{

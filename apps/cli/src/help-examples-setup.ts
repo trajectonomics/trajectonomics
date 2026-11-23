@@ -1,6 +1,7 @@
 import { isAppError } from "./errors"
 import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
+import { LOAN_SCENARIO } from "./projection-liabilities-plan"
 import { toDecimalForm } from "./scenario/decimal"
 
 /**
@@ -52,6 +53,12 @@ export const SETUP: Record<string, Setup> = {
 	init: { ledger: "none" },
 	"projection chance": { files: { "model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL) } },
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
+	// The car loan the `--liabilities` example reads, stored as a Scenario beside the projection fixture.
+	"projection run": {
+		ledger: "projection",
+		files: { "car-loan.json": JSON.stringify(LOAN_SCENARIO) },
+		steps: [["scenario", "apply", "car-loan", "--file", "car-loan.json"]],
+	},
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
 	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },
 	"data remove": { steps: [["backup", "--out", "backup"]] },

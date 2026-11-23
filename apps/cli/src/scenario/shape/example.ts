@@ -1,7 +1,10 @@
 /**
  * The one worked example `traj schema scenario apply` publishes: a salary, rent, a monthly
- * investment, a debt payment and a locked retirement Account, so every unit and every kind appears
- * in a document a person can edit into their own. It carries no Levy, because `traj scenario tax`
+ * investment, a debt payment, a locked retirement Account and a car loan, so every unit and every
+ * kind appears in a document a person can edit into their own. The loan is the three parts a
+ * document already names (cli ADR-0059): a liability with a nominal `rate` and `compounding`, a
+ * `withdrawal` that borrows the money once the plan starts, and a Contribution into it with a
+ * `level` payment. It carries no Levy, because `traj scenario tax`
  * writes one (ADR-0032), and `lockedUntil` names the retirement Account's lock. Its one Milestone
  * fires when the accessible net worth reaches 500,000 THB in start-of-plan money and the date
  * passes; the monthly investment stops when it fires (`endAt`). `schemaVersion` is
@@ -16,6 +19,7 @@ const EXAMPLE_BODY = {
 		{ id: "index", kind: "asset", rate: 600, compounding: "annual" },
 		{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
 		{ id: "loan", kind: "liability", rate: 500 },
+		{ id: "car", kind: "liability", rate: 600, compounding: "monthly" },
 	],
 	flows: [
 		{
@@ -53,6 +57,23 @@ const EXAMPLE_BODY = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+		},
+		{
+			id: "car-loan",
+			kind: "withdrawal",
+			source: "car",
+			frequency: "once",
+			start: "2027-01-01",
+			amount: 2_400_000,
+			growth: { bps: 0 },
+		},
+		{
+			id: "car-pay",
+			kind: "contribution",
+			target: "car",
+			frequency: "monthly",
+			start: "2027-02-01",
+			level: { principal: 2_400_000, payments: 60, rounding: "ceil" },
 		},
 	],
 	milestones: [
