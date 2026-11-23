@@ -1,8 +1,8 @@
 import type { ResolvedCalendar } from "../calendar/business"
 import { type AccountValues, readerOn } from "../engine/account-values"
-import { occurrenceAmount } from "../engine/aggregate"
 import { plannedAmounts } from "../engine/derive"
 import { buildEvents, type DatedEvent } from "../engine/events"
+import { occurrenceAmount } from "../engine/occurrence-amount"
 import { openRules, type RuleBook } from "../engine/rule-book"
 import { onceEventsOn } from "../milestone/gate-once"
 import { landsAt } from "../milestone/gating"
@@ -10,6 +10,7 @@ import { deferredOnces, planMilestones } from "../milestone/spec"
 import type { DateString, Scenario, Timeline } from "../types"
 import { earnedReadByExpenses } from "./earned-reach"
 import { buildWindow, type WindowOutcome } from "./expense-window"
+import { isWork } from "./scan-stop"
 
 /** The plan through one date, and what a set of fire dates keeps of it. */
 export interface OriginalSource {
@@ -106,8 +107,7 @@ export function originalSource(
 	const deferred = plan === undefined ? [] : deferredOnces(scenario, plan, calendar)
 	const bounded = { ...timeline, horizon: last }
 	const read = earnedReadByExpenses(scenario.flows)
-	const kept = (event: DatedEvent): boolean =>
-		!(event.flow.kind === "income" && event.flow.earned) || read.has(event.flow.id)
+	const kept = (event: DatedEvent): boolean => !isWork(event.flow) || read.has(event.flow.id)
 	let events: readonly DatedEvent[] | undefined
 	return {
 		windowFor: (fires, values) => {

@@ -13,7 +13,10 @@ export type BasisPoints = number
 export type AccountId = string
 
 export type Frequency = (typeof FREQUENCIES)[number]
-/** `target` spends the Available cashflow of its Occurrence; `obligation` is paid in full (ADR 0021). */
+/**
+ * `target` spends the Available cashflow of its Occurrence; `obligation` is paid in full (ADR 0021); `employer`
+ * lands in the Account without touching household cash and stops with earned income (ADR 0026).
+ */
 export type Funding = (typeof FUNDINGS)[number]
 export type Resolution = (typeof RESOLUTIONS)[number]
 

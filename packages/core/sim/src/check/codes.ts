@@ -1,3 +1,5 @@
+import { TAIL } from "./codes-tail"
+
 const CODES = [
 	"UNSUPPORTED_SCHEMA_VERSION",
 	"NOT_AN_OBJECT",
@@ -86,22 +88,13 @@ const CODES = [
 	"TOO_MANY_STEPS",
 	"INVALID_OPTION",
 	"PERIOD_DUE_MISMATCH",
-	"RULE_NOT_EXPENSE",
-	"RULE_PORTFOLIO_LIABILITY",
-	"RULE_PORTFOLIO_ILLIQUID",
-	"RULE_FREQUENCY",
-	"RULE_FLOOR_ABOVE_CEILING",
-	"ESTATE_ACCOUNT_LIABILITY",
-	/** Found at run time, not by `check()`: a value left the safe integer range. */
-	"VALUE_OVERFLOW",
 ] as const
 
-/**
- * The closed set of problem codes: every `code` a `ProjectionProblem` or a `Problem` can carry.
- * Frozen so consumers cannot mutate it at runtime.
- */
-export const ERROR_CODES: typeof CODES = Object.freeze(CODES)
+/** The closed set of problem codes a `ProjectionProblem` or a `Problem` can carry, frozen. */
+export const ERROR_CODES: readonly [...typeof CODES, ...typeof TAIL] = Object.freeze([
+	...CODES,
+	...TAIL,
+] as const)
 
-export type ErrorCode = (typeof CODES)[number]
-
+export type ErrorCode = (typeof ERROR_CODES)[number]
 export type { AccountIndex, Check, Emit, Path, Problem } from "./codes-types"

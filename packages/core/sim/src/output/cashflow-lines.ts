@@ -1,3 +1,4 @@
+import { declaresEmployer } from "../engine/employer"
 import type { MinorUnits, Scenario } from "../types"
 import type {
 	AccountLine,
@@ -9,6 +10,7 @@ import type {
 import {
 	type CategoryTotal,
 	contributionLines,
+	employerLines,
 	expenseLines,
 	ofKind,
 	withdrawalLines,
@@ -55,6 +57,7 @@ export function breakdownOf(
 			(item): CategoryLine => ({ category: item.category, amount: Number(item.amount) }),
 		),
 		contributions: contributionLines(scenario.flows, sums),
+		...(declaresEmployer(scenario) ? { employer: employerLines(scenario.flows, sums) } : {}),
 		withdrawals: withdrawalLines(scenario.flows, sums.planned),
 		drawn: lines(scenario.cashflow.withdraw, sums.drawn, accountLine),
 		surplus: lines(

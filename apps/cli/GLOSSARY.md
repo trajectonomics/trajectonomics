@@ -39,7 +39,7 @@ A fourth way to state an expense Flow's amount, `rule` beside `amount`, `derive`
 _Avoid_: Retirement plan, withdrawal strategy, safe withdrawal rate (a rate is the caller's, not a default)
 
 **Estate**:
-What a plan would leave on a date: everything owned (locked and illiquid Accounts and a home included), less what is owed, less the settlement costs, less the gifts, which is what heirs receive (sim ADR-0025). The optional `estate` block of a Scenario states its costs and gifts, every one the caller's own: `traj` ships none and models no inheritance tax, so a tax or a transfer fee is a cost line the caller types. `projection run --estate` states each roll-up's end (ADR-0064). It changes no other figure of a Projection.
+What a plan would leave on a date: everything owned (locked and illiquid Accounts and a home included), less what is owed, less the settlement costs, less the gifts, which is what heirs receive (sim ADR-0025). The optional `estate` block of a Scenario states its costs and gifts, every one the caller's own: `traj` ships none and models no inheritance tax, so a tax or a transfer fee is a cost line the caller types. `projection run --estate` states each roll-up's end (ADR-0064). A what-if may begin the block on a plan that lacks it with `--set estate=<json>` (ADR-0065). It changes no other figure of a Projection.
 _Avoid_: Inheritance (as the figure), legacy, will
 
 **As-of**:

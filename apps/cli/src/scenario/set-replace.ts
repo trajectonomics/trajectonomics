@@ -1,5 +1,6 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
+import { isBeginnableBlock, unbegunBlock } from "./set-begin"
 import {
 	ambiguousSegment,
 	identityFailure,
@@ -24,6 +25,11 @@ function replaceInObject(
 	prefix: readonly string[],
 	ctx: SetContext,
 ): unknown | AppError {
+	if (!Object.hasOwn(node, segment) && prefix.length === 0 && isBeginnableBlock(segment)) {
+		// The one place a Set makes what is absent: a whole optional block, begun (cli ADR-0065).
+		if (rest === ctx.segments.length) return { ...node, [segment]: ctx.value }
+		return unbegunBlock(segment, ctx)
+	}
 	if (!Object.hasOwn(node, segment)) {
 		return unknownSegment(candidatesAt(node), segment, rest, prefix, ctx)
 	}

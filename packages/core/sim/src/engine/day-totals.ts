@@ -8,6 +8,8 @@ export interface DayTotals {
 	readonly income: bigint
 	readonly expense: bigint
 	readonly contributions: bigint
+	/** Employer Contributions landed on this date: money into Accounts that never passed through cashflow (ADR 0026). */
+	readonly employer: bigint
 	/** Planned withdrawals landed on this date. They are cash, not income, and not Available cashflow. */
 	readonly withdrawals: bigint
 	/** The planned withdrawals on this date, by the liability each one borrowed from. */

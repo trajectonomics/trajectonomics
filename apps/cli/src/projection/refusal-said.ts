@@ -4,6 +4,7 @@ import {
 	type ProjectionProblem,
 } from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { SAID_RATE } from "./refusal-rate"
 import { SAID_RULE } from "./refusal-rule"
 import { SAID_TRADE } from "./refusal-trade"
 
@@ -13,7 +14,7 @@ import { SAID_TRADE } from "./refusal-trade"
  */
 export type Said = {
 	message: string | ((problem: ProjectionProblem) => string)
-	hint?: string
+	hint?: string | ((problem: ProjectionProblem) => string)
 }
 
 /** A Baseline Account the Scenario does not declare is the one refusal a template repairs (ADR-0044). */
@@ -30,6 +31,7 @@ const CARRY_IN_HINT =
  */
 export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	...SAID_TRADE,
+	...SAID_RATE,
 	...SAID_RULE,
 	// What only a run against the Ledger and the flags can find.
 	UNDECLARED_BALANCE_ACCOUNT: {
@@ -52,12 +54,12 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	},
 	DERIVED_EXPENSE_READS_EARNED: {
 		message:
-			"A derived expense reads earned income, directly or through another derived Flow. Earned income stops at the FI date, so the expense would drop when earned income stops and FI would come too early.",
+			"A derived expense reads earned income or an employer Contribution, directly or through another derived Flow. Earned income and an employer Contribution stop at the FI date, so the expense would drop when earned income stops and FI would come too early.",
 		hint: "Give that expense a fixed amount, or derive it from a Flow that is not earned income, then run it again. traj fi and traj projection compare refuse it; traj projection run does not.",
 	},
 	DERIVED_DEBT_PAYMENT_READS_EARNED: {
 		message:
-			"A derived contribution into a liability reads earned income, directly or through another derived Flow. Earned income stops at the FI date, so the payment would drop when earned income stops and the debt would go unpaid.",
+			"A derived contribution into a liability reads earned income or an employer Contribution, directly or through another derived Flow. Earned income and an employer Contribution stop at the FI date, so the payment would drop when earned income stops and the debt would go unpaid.",
 		hint: "Give that payment a fixed amount, or derive it from a Flow that is not earned income, then run it again. traj fi and traj projection compare refuse it; traj projection run does not.",
 	},
 	// A Levy's Carry-in is placed at projection time, so the engine can still find it wanting.

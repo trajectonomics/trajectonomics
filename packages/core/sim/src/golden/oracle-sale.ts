@@ -30,6 +30,19 @@ export function oracleObligations(
 	)
 }
 
+/** Lands every employer share in its asset, in full, outside the day's cash: nothing is returned. */
+export function oracleLandEmployer(
+	states: OracleStates,
+	landing: readonly OracleEvent[],
+	planned: PlannedDay,
+	date: DateString,
+): void {
+	const shares = sumBy(landing, planned, ({ flow }) =>
+		flow.kind === "contribution" && flow.funding === "employer" ? flow.target : undefined,
+	)
+	for (const [account, amount] of shares) oracleMutate(states.get(account)!, date, amount)
+}
+
 /** The planned amount each source is asked for by a withdrawal, summed per Account. */
 export function oraclePlannedSources(
 	landing: readonly OracleEvent[],

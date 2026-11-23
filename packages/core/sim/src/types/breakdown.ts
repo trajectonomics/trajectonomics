@@ -31,6 +31,13 @@ export interface ContributionLine {
 	readonly unfunded: MinorUnits
 }
 
+/** One employer Contribution Flow's amount landed in its Account; it never entered cashflow. */
+export interface EmployerLine {
+	readonly flow: string
+	readonly account: AccountId
+	readonly amount: MinorUnits
+}
+
 /** One planned withdrawal Flow's amount, with the liability it borrowed from. */
 export interface WithdrawalLine {
 	readonly flow: string
@@ -58,6 +65,11 @@ export interface CashflowBreakdown {
 	readonly expenses: readonly ExpenseLine[]
 	readonly categories: readonly CategoryLine[]
 	readonly contributions: readonly ContributionLine[]
+	/**
+	 * Employer money into Accounts, by Flow; present only when the Scenario declares an employer
+	 * Contribution. Kept out of the identity: it never entered cashflow, so money in still equals money out.
+	 */
+	readonly employer?: readonly EmployerLine[]
 	readonly withdrawals: readonly WithdrawalLine[]
 	readonly drawn: readonly AccountLine[]
 	readonly surplus: readonly AccountLine[]
