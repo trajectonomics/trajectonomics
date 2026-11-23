@@ -32,6 +32,8 @@ export interface FlowCard {
 	readonly growth: string
 	/** "Earned" or "Passive" for an income Flow; null for an expense. */
 	readonly earned: string | null
+	/** An expense's category as the document states it, or null when it has none (or is not an expense). */
+	readonly category: string | null
 	/** False for a computed Flow, which the forms do not edit. */
 	readonly editable: boolean
 }
@@ -78,6 +80,7 @@ export function flowCards(
 			...anchorsOf(household, flow.id),
 			growth: isComputed(flow) ? "Computed" : growthText(flow),
 			earned: earnedOf(flow, kind),
+			category: kind === "expense" ? (flow.category ?? null) : null,
 			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
 			editable: !isComputed(flow) && flow.amount !== undefined,
 		}))
@@ -94,6 +97,8 @@ export interface FlowDraft {
 	readonly growth: string
 	readonly rate: string
 	readonly earned: boolean
+	/** An expense's group for reports, free text: empty for none. Suggested from the categories the plan holds. */
+	readonly category: string
 }
 
 /** The draft of a Flow to edit, or of a new one when there is no Flow. */
@@ -109,5 +114,14 @@ export function flowDraftOf(flow?: ScenarioFlow): FlowDraft {
 		growth: fixed ? "fixed" : "inflation",
 		rate: growth !== undefined && growth !== "inflation" ? formatBps(growth.bps) : "",
 		earned: flow?.earned !== false,
+		category: flow?.category ?? "",
 	}
+}
+
+/** The categories the expenses of a plan use, each once, in the order the document first names them. */
+export function categoriesOf(flows: readonly ScenarioFlow[]): string[] {
+	const names = flows.flatMap((flow) =>
+		flow.kind === "expense" && flow.category !== undefined ? [flow.category] : [],
+	)
+	return [...new Set(names)]
 }

@@ -80,14 +80,14 @@ export function baseScenarioDocument(ids: DemoAccountIds): Record<string, unknow
 				growth: "inflation",
 			},
 			{
+				// The car loan: the 184000.00 the ledger owes at the Baseline (2026-10-31), repaid in 23 equal monthly
+				// payments from November 2026 (cli ADR 0059). Amounts are minor units (satang) in this document.
 				id: "car",
 				kind: "contribution",
 				target: ids.loan,
 				frequency: "monthly",
 				start: "2026-11-01",
-				end: "2030-12-31",
-				amount: 900000,
-				growth: { bps: 0 },
+				level: { principal: 18400000, payments: 23, rounding: "halfUp" },
 			},
 			{
 				id: "fund",

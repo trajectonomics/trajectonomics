@@ -16,6 +16,7 @@ describe("flowCards", () => {
 			endAnchor: null,
 			growth: "Follows inflation",
 			earned: "Earned",
+			category: null,
 			editable: true,
 		})
 		expect(cards[1]?.earned).toBe("Passive")
@@ -56,6 +57,7 @@ describe("flowCards with a household", () => {
 describe("flowDraftOf", () => {
 	test("starts a new Flow monthly, following inflation and earned", () => {
 		expect(flowDraftOf()).toEqual({
+			category: "",
 			name: "",
 			frequency: "monthly",
 			start: "",

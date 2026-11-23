@@ -5,7 +5,7 @@ import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../li
 import { flowAnchorLabels } from "../../lib/view/household/model"
 import { flowIds, withFlow, withoutFlow } from "../../lib/view/plan-items/document"
 import { flowFromDraft } from "../../lib/view/plan-items/flow-draft"
-import { type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
+import { categoriesOf, type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { recordOf } from "../../lib/what-if/session"
 import FlowFields from "./FlowFields.svelte"
@@ -45,7 +45,17 @@ let draft = $state(initial())
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
 let cleared: string[] = $state([])
-const FIELDS = ["name", "amount", "frequency", "start", "end", "growth", "rate", "earned"]
+const FIELDS = [
+	"name",
+	"amount",
+	"frequency",
+	"start",
+	"end",
+	"growth",
+	"rate",
+	"earned",
+	"category",
+]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
@@ -82,7 +92,7 @@ async function save(event: SubmitEvent): Promise<void> {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
-	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} />
+	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} />
 	<TryNotice fields={cleared} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

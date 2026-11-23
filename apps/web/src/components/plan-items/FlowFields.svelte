@@ -16,9 +16,11 @@ interface Props {
 	name: string
 	/** The label of each date the household pins, or null for a date it does not pin. */
 	anchors: { start: string | null; end: string | null }
+	/** The categories the plan's expenses already use: suggestions only, never a preset list. */
+	categories?: readonly string[]
 }
 
-let { draft = $bindable(), kind, existing, shown, name, anchors }: Props = $props()
+let { draft = $bindable(), kind, existing, shown, name, anchors, categories = [] }: Props = $props()
 </script>
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
@@ -44,6 +46,17 @@ let { draft = $bindable(), kind, existing, shown, name, anchors }: Props = $prop
 			Earned income: it stops when earning stops
 		</label>
 		{#if shown.at("earned")}<p role="alert" class="text-sm text-destructive">{shown.at("earned")}</p>{/if}
+	{/if}
+	{#if kind === "expense"}
+		<div class="space-y-1.5">
+			<label for="flow-category" class="block text-sm font-medium text-foreground">Category</label>
+			<p id="flow-category-hint" class="text-xs text-muted-foreground">Groups this expense on the Expenses page. Optional.</p>
+			<input id="flow-category" list="flow-categories" bind:value={draft.category} autocomplete="off" aria-invalid={shown.at("category") ? "true" : undefined} aria-describedby="flow-category-hint" class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring" />
+			<datalist id="flow-categories">
+				{#each categories as category (category)}<option value={category}></option>{/each}
+			</datalist>
+			{#if shown.at("category")}<p role="alert" class="text-sm text-destructive">{shown.at("category")}</p>{/if}
+		</div>
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 </div>

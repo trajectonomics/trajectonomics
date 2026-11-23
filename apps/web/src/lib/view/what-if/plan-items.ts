@@ -4,6 +4,7 @@ import type { SetChange } from "../../what-if/overrides"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
 import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
 import type { PlanKind } from "../plan-items/kinds"
+import { plainAccounts } from "../plan-items/loan-card"
 import { type ItemMarks, type MarkMap, marksOf, shownCards, type WasField } from "./items"
 
 /** The session's changes to one plan, or null when no session is open on it. */
@@ -61,13 +62,16 @@ export function flowItems(
 	}
 }
 
-/** The Account cards as the what-if holds them, with the baseline's text of each changed field. */
+/**
+ * The plain Account cards as the what-if holds them, with the baseline's text of each changed field. A loan's
+ * Account is on its loan card, not here.
+ */
 export function accountItems(
 	doc: ScenarioDocument,
 	baselineRead: Read<Baseline> | undefined,
 	changes: PlanChanges | null,
 ): ItemsView<AccountCard> {
-	const baseline = accountCards(doc.accounts, baselineRead)
+	const baseline = accountCards(plainAccounts(doc), baselineRead)
 	if (changes === null) return { cards: baseline, marks: {} }
 	const whatIf = accountCards(overlayDocument(doc, changes).accounts, baselineRead)
 	return {

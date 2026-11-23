@@ -25,7 +25,7 @@ export const PLAN_PAGES: Readonly<Record<PlanKind, PlanPage>> = {
 	assets: {
 		title: "Assets and debts",
 		intro:
-			"The Accounts of the selected plan with their rates and each one's balance in the Baseline. Its loans are listed read-only below them.",
+			"The Accounts of the selected plan with their rates and each one's balance in the Baseline. Its loans are listed below them, each with its schedule.",
 		noun: "account",
 	},
 }

@@ -59,3 +59,7 @@ _Avoid_: scratch plan, draft, scenario copy, simulation
 **What-if lens**:
 The four reads of a What-if session's answer, parsed against the contract and bound to the session's plan: what a figure page may show of the session. A page with no lens shows the baseline alone.
 _Avoid_: preview, overlay, diff
+
+**Loan**:
+A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.
+_Avoid_: debt schedule, amortization, mortgage (as a kind)

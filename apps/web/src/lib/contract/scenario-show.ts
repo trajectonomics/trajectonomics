@@ -21,6 +21,8 @@ export const scenarioFlow = z.looseObject({
 	earned: z.boolean().optional(),
 	target: z.string().optional(),
 	source: z.string().optional(),
+	// An expense's free-text group (cli schema, #278). The engine never reads it.
+	category: z.string().optional(),
 	derive: z.looseObject({}).optional(),
 	level: z
 		.looseObject({

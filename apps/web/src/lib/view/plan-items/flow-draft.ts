@@ -36,6 +36,10 @@ export function flowFromDraft(
 ): FlowResult {
 	const problems = problemsOf(draft, options.existing === undefined)
 	if (problems.size > 0) return { ok: false, problems: Object.fromEntries(problems) }
+	const category = categoryOf(draft, options.kind)
+	if (category !== null && !isCategoryText(category)) {
+		return { ok: false, problems: { category: CATEGORY_PROBLEM } }
+	}
 	const candidate = candidateOf(draft, options)
 	const parsed = scenarioFlow.safeParse(candidate)
 	if (!parsed.success)
@@ -50,8 +54,9 @@ function candidateOf(
 ): Record<string, unknown> {
 	const end = draft.end.trim()
 	const rate = draft.growth === "inflation" ? "inflation" : parseBps(draft.rate)
+	const category = categoryOf(draft, options.kind)
 	return {
-		...withoutKeys(options.existing ?? {}, ["amount", "growth", "end", "earned"]),
+		...withoutKeys(options.existing ?? {}, ["amount", "growth", "end", "earned", "category"]),
 		id: options.existing?.id ?? uniqueId(slugId(draft.name), options.taken),
 		kind: options.kind,
 		frequency: draft.frequency,
@@ -60,5 +65,25 @@ function candidateOf(
 		growth: rate === "inflation" ? "inflation" : { bps: rate },
 		...(end === "" ? {} : { end }),
 		...(options.kind === "income" ? { earned: draft.earned } : {}),
+		...(category === null ? {} : { category }),
 	}
+}
+
+/** The problem shown at an expense's category that is not 1 to 64 characters, none a control character (cli schema). */
+const CATEGORY_PROBLEM = "Enter a category of 1 to 64 characters, or leave it empty."
+
+/** Whether a category is 1 to 64 characters, none of them a control character. */
+function isCategoryText(category: string): boolean {
+	if (category.length < 1 || category.length > 64) return false
+	return [...category].every((char) => {
+		const code = char.charCodeAt(0)
+		return code >= 32 && code !== 127
+	})
+}
+
+/** The category a draft names for an expense, trimmed; null for an empty one and for any other kind of Flow. */
+function categoryOf(draft: FlowDraft, kind: FlowKind): string | null {
+	if (kind !== "expense") return null
+	const category = draft.category.trim()
+	return category === "" ? null : category
 }
