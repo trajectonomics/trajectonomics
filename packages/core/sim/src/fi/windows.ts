@@ -79,9 +79,8 @@ export function windowPlan(
 	const plan = planMilestones(scenario, calendar)
 	const retirement = options.retirementSpending
 	const reads = readAccounts(scenario)
-	const replaced = retirement !== undefined
-	const next = originalSource(scenario, timeline, windowThrough(timeline), calendar, replaced)
-	const trailing = originalSource(scenario, timeline, timeline.horizon, calendar, replaced)
+	const next = originalSource(scenario, timeline, windowThrough(timeline), calendar)
+	const trailing = originalSource(scenario, timeline, timeline.horizon, calendar)
 	const fixed =
 		retirement === undefined
 			? undefined

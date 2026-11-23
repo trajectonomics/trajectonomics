@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { project } from "./project"
 import type { RuleBook, RuleYear } from "./rule-book"
 import { ruleFixture } from "./rule-fixture"
 import { ruleStatements } from "./rule-statement"
@@ -45,5 +46,30 @@ describe("a Rule year's real figures are guarded as an estate's are (#387)", () 
 		const flat = ruleFixture({ rule, inflation: 0 })
 		const outcome = ruleStatements(book, flat.scenario, flat.timeline.start)
 		expect(outcome).toEqual({ problem: { code: "VALUE_OVERFLOW", date: "2028-01-01" } })
+	})
+
+	it("is reached through project(): a currentRate floor with fixed growth outgrows the portfolio", () => {
+		// The floor stays 100,000,000 a year while the portfolio is empty, so the third year (2028-01-01)
+		// pays 100,000,000 and states it as 10^16 in real terms.
+		const floored = {
+			kind: "currentRate",
+			portfolio: ["inv"],
+			rateBps: 400,
+			rounding: "halfUp",
+			floor: { amount: 100_000_000, growth: { bps: 0 } },
+		} as const
+		const { baseline, scenario, timeline } = ruleFixture({
+			rule: floored,
+			inflation: -9999,
+			opening: 0,
+			cash: 200_000_000,
+			frequency: "annual",
+			horizon: "2028-03-31",
+		})
+		const result = project(baseline, scenario, timeline, { spendingRules: true })
+		expect(result).toEqual({
+			ok: false,
+			problems: [{ code: "VALUE_OVERFLOW", date: "2028-01-01" }],
+		})
 	})
 })

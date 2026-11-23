@@ -143,8 +143,9 @@ window, the candidate's own walk and its tail past the horizon carry the rule's 
   and withdrawal rate that leave the safe integers are `VALUE_OVERFLOW` at the Rule year's date, as an
   Estate statement's are, so `project()` returns the problem instead of a wrong number. Only a real
   figure can exceed its nominal, under negative inflation (down to −9999 bps, 10,000 times a year), and
-  a run's own balances usually overflow first; `engine/rule-overflow.test.ts` reaches it with a book kept
-  by hand. The `rule-guardrails` parity case now runs on `golden/rule-swing.ts`, a portfolio that a
+  a `currentRate` floor with fixed growth outgrows the portfolio: `engine/rule-overflow.test.ts` reaches it
+  through `project()` with an empty portfolio, a floor of 100,000,000 a year and inflation −9999 bps, which
+  states 10^16 in real terms on the third Rule year. The `rule-guardrails` parity case now runs on `golden/rule-swing.ts`, a portfolio that a
   3,000,000 cost and a 9,000,000 gift move, so its statement cuts in 2027 and raises from 2028 (it had
   the same hash as `rule-initial-rate`, since a drawdown never moved far enough); its hash is re-pinned
   on purpose. `rule-guardrails-chance` still runs on `drawdown` and is unchanged.

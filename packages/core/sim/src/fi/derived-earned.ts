@@ -1,46 +1,8 @@
 import type { ErrorCode, Path } from "../check/codes"
-import { flowRefsOf } from "../levy/refs"
 import type { Flow, Scenario } from "../types"
 import { isDerived } from "../types"
 import type { InputProblem } from "../types/projection"
-
-function indexFlows(flows: readonly Flow[]): ReadonlyMap<string, number> {
-	const index = new Map<string, number>()
-	for (let position = 0; position < flows.length; position++) {
-		const flow = flows[position]
-		if (flow !== undefined && !index.has(flow.id)) index.set(flow.id, position)
-	}
-	return index
-}
-
-function flowAt(
-	flows: readonly Flow[],
-	index: ReadonlyMap<string, number>,
-	id: string,
-): Flow | undefined {
-	const position = index.get(id)
-	return position === undefined ? undefined : flows[position]
-}
-
-/** Whether a Flow reads earned income, directly or through a chain of Derived amounts. */
-function readsEarned(
-	flows: readonly Flow[],
-	index: ReadonlyMap<string, number>,
-	start: string,
-): boolean {
-	const seen = new Set<string>()
-	const stack = [start]
-	while (stack.length > 0) {
-		const id = stack.pop()!
-		if (seen.has(id)) continue
-		seen.add(id)
-		const flow = flowAt(flows, index, id)
-		if (flow === undefined) continue
-		if (flow.kind === "income" && flow.earned) return true
-		if (isDerived(flow)) stack.push(...flowRefsOf(flow.derive))
-	}
-	return false
-}
+import { earnedReachedFrom, indexFlows } from "./earned-reach"
 
 /** The first Derived Flow that `offends` and reads earned income, as a problem with `code`. */
 function firstReadingEarned(
@@ -52,7 +14,7 @@ function firstReadingEarned(
 	for (let position = 0; position < scenario.flows.length; position++) {
 		const flow = scenario.flows[position]
 		if (flow === undefined || !isDerived(flow) || !offends(flow)) continue
-		if (readsEarned(scenario.flows, index, flow.id)) {
+		if (earnedReachedFrom(scenario.flows, index, flow.id).size > 0) {
 			const path: Path = ["scenario", "flows", position, "derive"]
 			return { code, path }
 		}
