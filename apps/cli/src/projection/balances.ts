@@ -12,7 +12,8 @@ import { rowAtEnd } from "./rows"
 
 /**
  * The engine lists a row's balances by Account id, so they are put in the order the Scenario
- * declares its Accounts (cli ADR-0060). An Account the Scenario does not list keeps its place after them.
+ * declares its Accounts (cli ADR-0060). The engine states only the Accounts the Scenario declares; the
+ * fallback that puts any other after them is a guard, not a case that happens.
  */
 function inScenarioOrder(
 	balances: readonly ProjectionBalance[],

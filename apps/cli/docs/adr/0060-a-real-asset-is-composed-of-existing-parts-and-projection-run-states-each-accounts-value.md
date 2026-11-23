@@ -21,12 +21,18 @@ worth per row, never one Account's value.
     by a share the caller states, and `<asset>-rent`, an income Flow;
   - `<asset>-sale`, a `withdrawal` from the asset whose Derived amount reads `account(<asset>)`, which sells
     all of it at its value. The running Flow and the rent end before the sale date, because the engine
-    reads the value on each date and a sold asset is worth nothing.
-- **The ids are a convention, not a rule.** `<asset>-purchase`, `-running`, `-rent`, `-sale` and `-loan` are
+    reads the value on each date and a sold asset is worth nothing;
+  - with a loan, `<asset>-loan-payoff`, a `once` Contribution into the liability on the sale date whose
+    Derived amount reads `account(<asset>)`. A debt payment is capped at what is owed, so it repays the whole
+    balance from the sale (or as much as the asset is worth), and the level payment ends before it. It reads
+    the asset, not the loan: a Contribution whose amount reads its own target is refused as a `FLOW_CYCLE`
+    (sim ADR 0020 allows a self-read only for a withdrawal reading its own source).
+- **The ids are a convention, not a rule.** `<asset>-purchase`, `-running`, `-rent`, `-sale`, `-loan` and
+  `-loan-payoff` are
   what the Dashboard writes and reads to recognise a real asset in a document. The core never sees them and
   `check()` does not require them; a document with other ids is valid and projects the same.
 - **The worked example teaches it.** `traj schema scenario apply` publishes one home in its example
-  (`home`, `home-loan` and the six Flows), so the example passes `scenario apply` and `--decimal` round-trips
+  (`home`, `home-loan` and the seven Flows), so the example passes `scenario apply` and `--decimal` round-trips
   it. Every rate, share, price and date in it is an example value; `traj` ships no default for any of them,
   and the schema text says so. The example states no Tally label: whether the rent or the gain of a sale is
   taxed under a Levy is the caller's choice.
@@ -53,9 +59,10 @@ worth per row, never one Account's value.
 
 ## Consequences
 
-- A sale does not repay the loan: the level payments go on as the schedule says, and the sale's cash goes to
-  cashflow. An early payoff is one more Contribution into the liability (cli ADR-0059).
+- A sale repays nothing by itself: without `<asset>-loan-payoff` the level payments go on as the schedule
+  says after the asset is gone. The payoff is what settles the loan from the sale.
 - On the purchase date the obligation is subtracted before Available cashflow (sim ADR 0021), so a target
-  Contribution due that day (the example's monthly `invest`) may be reported unfunded that month.
+  Contribution due that day may be reported unfunded that month. The example buys and sells on the 15th, a
+  day its monthly `invest` is not due, so it shows none.
 - A plan whose purchase the `cashflow.withdraw` list cannot pay is a Shortfall on that date, as for any expense.
 - The Dashboard's per-asset value is a read of this table, which the web contract accepts in the same change.

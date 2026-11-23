@@ -66,6 +66,6 @@ export const outputFlags: Record<"monthly" | "breakdown" | "liabilities" | "acco
 			"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
 		),
 		accounts: more(
-			"Also report each Account's value on each Annual roll-up's last day, or on every month with --monthly, nominal and real (cli ADR-0060).",
+			"Also report each Account's value on the row at each Annual roll-up's end (the date realNetWorth states), or on every month with --monthly, nominal and real (cli ADR-0060).",
 		),
 	}

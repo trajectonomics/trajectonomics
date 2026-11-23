@@ -42,12 +42,15 @@ describe("the projection run contract against the CLI's goldens", () => {
 		if (balances?.name !== "balances") throw new Error("the output has no balances table")
 		const home = balances.rows.filter((row) => row.account === "home")
 		expect(home.map((row) => [row.date, row.amount])).toEqual([
-			["2027-01-01", "0.00"],
-			["2028-01-01", "15225.19"],
-			["2029-01-01", "15681.94"],
-			["2030-01-01", "16152.40"],
+			["2027-01-15", "0.00"],
+			["2028-01-15", "15225.19"],
+			["2029-01-15", "15681.94"],
+			["2030-01-15", "16152.40"],
 			["2031-01-01", "0.00"],
 		])
+		// The loan is repaid from the sale, so nothing is owed at the end.
+		const loan = balances.rows.filter((row) => row.account === "home-loan")
+		expect(loan.at(-1)?.amount).toBe("0.00")
 	})
 
 	it("refuses a section the contract does not name", async () => {

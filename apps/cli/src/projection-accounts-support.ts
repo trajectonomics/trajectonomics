@@ -9,15 +9,16 @@ import { ledgerHome } from "./store/testing"
 /*
  * The fixtures and readers the `projection run --accounts` tests share (cli ADR-0060): the worked
  * example of `traj schema scenario apply`, stored over an empty Ledger so that its own Accounts are
- * the only ones, and run from the example's first day for five years, which holds the home's whole
- * life: bought and financed on 1 July 2027, let and run until 1 June 2030, and sold on 1 July 2030.
+ * the only ones, and run for five years from the 15th, the day the home is bought and sold, so each
+ * monthly row falls on its anniversaries: bought and financed on 15 July 2027, let and run until 1 June
+ * 2030, and sold, with its loan repaid, on 15 July 2030.
  */
 
 export const HOME_FLAGS: readonly string[] = [
 	"--scenario",
 	"example",
 	"--as-of",
-	"2026-01-01",
+	"2026-01-15",
 	"--horizon",
 	"2031-01-01",
 ]

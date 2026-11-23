@@ -66,7 +66,7 @@ export const run: Leaf = defineCommand({
 			command:
 				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --accounts --json",
 			description:
-				"The annual roll-up with each Account's value, nominal and real, on each year's last day.",
+				"The annual roll-up with each Account's value, nominal and real, on the row at each year's end.",
 		},
 		{
 			command:

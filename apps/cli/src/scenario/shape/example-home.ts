@@ -3,7 +3,7 @@
  * already has, and `traj` has no model of its own for it. The Accounts are an asset marked `liquid:
  * false` that no routing list names, and a liability that finances it. The Flows buy it (an
  * obligation Contribution, paid in full), borrow against it, repay the loan, carry its running
- * cost and its rent, and sell it. Every figure is a stated example value, in the units of the
+ * cost and its rent, sell it, and repay what the loan still owes from the sale. Every figure is a stated example value, in the units of the
  * rest of the example; none is a default, and `traj` ships no rate or share of an asset.
  */
 export const HOME_ACCOUNTS: readonly Record<string, unknown>[] = [
@@ -11,7 +11,11 @@ export const HOME_ACCOUNTS: readonly Record<string, unknown>[] = [
 	{ id: "home-loan", kind: "liability", rate: 500, compounding: "monthly" },
 ]
 
-/** The home's Flows: bought and borrowed on 1 July 2027, run and let for three years, sold on 1 July 2030. */
+/**
+ * The home's Flows: bought and borrowed on 15 July 2027, run and let for three years, sold and its loan repaid on
+ * 15 July 2030. The purchase and the sale fall on the 15th, a day the example's monthly `invest` is not due, so
+ * the obligation leaves no target Contribution unfunded (cli ADR-0060).
+ */
 export const HOME_FLOWS: readonly Record<string, unknown>[] = [
 	{
 		id: "home-purchase",
@@ -19,7 +23,7 @@ export const HOME_FLOWS: readonly Record<string, unknown>[] = [
 		target: "home",
 		funding: "obligation",
 		frequency: "once",
-		start: "2027-07-01",
+		start: "2027-07-15",
 		amount: 1_500_000,
 		growth: { bps: 0 },
 	},
@@ -28,7 +32,7 @@ export const HOME_FLOWS: readonly Record<string, unknown>[] = [
 		kind: "withdrawal",
 		source: "home-loan",
 		frequency: "once",
-		start: "2027-07-01",
+		start: "2027-07-15",
 		amount: 1_200_000,
 		growth: { bps: 0 },
 	},
@@ -38,6 +42,7 @@ export const HOME_FLOWS: readonly Record<string, unknown>[] = [
 		target: "home-loan",
 		frequency: "monthly",
 		start: "2027-08-01",
+		end: "2030-07-01",
 		level: { principal: 1_200_000, payments: 180, rounding: "ceil" },
 	},
 	{
@@ -71,7 +76,20 @@ export const HOME_FLOWS: readonly Record<string, unknown>[] = [
 		kind: "withdrawal",
 		source: "home",
 		frequency: "once",
-		start: "2030-07-01",
+		start: "2030-07-15",
+		derive: {
+			measures: [{ id: "value", op: "account", account: "home" }],
+			result: "value",
+		},
+	},
+	{
+		// Repaying the loan from the sale: a debt payment is capped at what is owed, so an amount that reads the
+		// home's value pays the whole balance. Reading `account(home-loan)` itself is refused as a FLOW_CYCLE.
+		id: "home-loan-payoff",
+		kind: "contribution",
+		target: "home-loan",
+		frequency: "once",
+		start: "2030-07-15",
 		derive: {
 			measures: [{ id: "value", op: "account", account: "home" }],
 			result: "value",

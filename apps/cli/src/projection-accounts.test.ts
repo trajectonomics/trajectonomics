@@ -36,36 +36,37 @@ describe("the home's value, read by hand from the engine's monthly rows", () => 
 			await projection(await exampleHome(), ["run", ...HOME_FLAGS, "--accounts", "--monthly"]),
 		)
 
-	it("holds nothing before the purchase, then the price: 15,000.00 on 1 July 2027", async () => {
+	it("holds nothing before the purchase, then the price: 15,000.00 on 15 July 2027", async () => {
 		const body = await run()
-		expect(balanceOn(body, "home", "2027-06-01").amount).toBe("0.00")
-		expect(balanceOn(body, "home", "2027-07-01").amount).toBe("15000.00")
+		expect(balanceOn(body, "home", "2027-06-15").amount).toBe("0.00")
+		expect(balanceOn(body, "home", "2027-07-15").amount).toBe("15000.00")
 	})
 
 	it("rises 3% a year from the purchase: 15,000.00 x 1.03 and x 1.03^2 on each anniversary", async () => {
 		const body = await run()
-		expect(balanceOn(body, "home", "2028-07-01").amount).toBe("15450.00")
-		expect(balanceOn(body, "home", "2029-07-01").amount).toBe("15913.50")
+		expect(balanceOn(body, "home", "2028-07-15").amount).toBe("15450.00")
+		expect(balanceOn(body, "home", "2029-07-15").amount).toBe("15913.50")
 	})
 
 	it("states the value in start-of-plan money too: 3% growth under 3% inflation is flat", async () => {
 		const body = await run()
-		expect(balanceOn(body, "home", "2028-07-01").real).toBe(
-			balanceOn(body, "home", "2029-07-01").real,
+		expect(balanceOn(body, "home", "2028-07-15").real).toBe(
+			balanceOn(body, "home", "2029-07-15").real,
 		)
 	})
 
 	it("states the loan as what is owed, positive: 12,000.00 drawn on the purchase date", async () => {
 		const body = await run()
-		expect(balanceOn(body, "home-loan", "2027-07-01").amount).toBe("12000.00")
-		expect(Number(balanceOn(body, "home-loan", "2030-07-01").amount)).toBeGreaterThan(0)
+		expect(balanceOn(body, "home-loan", "2027-07-15").amount).toBe("12000.00")
+		expect(balanceOn(body, "home-loan", "2030-06-15").amount).toBe("10306.00")
 	})
 
-	it("holds nothing after the sale, and the loan is still owed", async () => {
+	it("holds nothing after the sale, and the loan is repaid from it that day", async () => {
 		const body = await run()
-		expect(balanceOn(body, "home", "2030-07-01").amount).toBe("0.00")
-		expect(balanceOn(body, "home", "2030-08-01").amount).toBe("0.00")
-		expect(Number(balanceOn(body, "home-loan", "2030-08-01").amount)).toBeGreaterThan(0)
+		for (const date of ["2030-07-15", "2030-08-15"]) {
+			expect(balanceOn(body, "home", date).amount).toBe("0.00")
+			expect(balanceOn(body, "home-loan", date).amount).toBe("0.00")
+		}
 	})
 })
 
@@ -78,11 +79,37 @@ describe("the cash flow of the home, read by hand", () => {
 		expect(line("home-sale", 4)).toBe("16390.91")
 		expect(line("home-purchase", 1)).toBe("15000.00")
 		expect(line("home-loan-draw", 1)).toBe("12000.00")
-		// 12 payments of 94.90, a whole year; the draw's own year has five of them, 474.50.
+		// 12 payments of 94.90, a whole year; the draw's own year (to 14 January 2028) has six, 569.40.
 		expect(line("home-loan-payment", 2)).toBe("1138.80")
-		expect(line("home-loan-payment", 1)).toBe("474.50")
-		// Five months of 80.00 rent in 2027 (the Flow starts on 1 August).
-		expect(line("home-rent", 1)).toBe("400.00")
+		expect(line("home-loan-payment", 1)).toBe("569.40")
+		// Six months of 80.00 rent, August to January, in the draw's year (the Flow starts on 1 August).
+		expect(line("home-rent", 1)).toBe("480.00")
+	})
+
+	it("repays the loan from the sale: July 2030 opens at 10,327.43, adds 20.64 of interest, and 94.90 + 10,253.17 closes it", async () => {
+		const body = runBody(await projection(await exampleHome(), ["run", ...HOME_FLAGS, ...ALL]))
+		const payoff = tableOf(body, "cashflow").rows.find((entry) => entry.id === "home-loan-payoff")
+		expect(payoff?.amount).toBe("10253.17")
+		const july = tableOf(body, "liabilities").rows.find(
+			(row) => row.account === "home-loan" && row.from === "2030-07-01",
+		)
+		expect(july).toMatchObject({
+			opening: "10327.43",
+			interest: "20.64",
+			paid: "10348.07",
+			closing: "0.00",
+		})
+		expect(tableOf(body, "paidOff").rows).toContainEqual({
+			account: "home-loan",
+			date: "2030-07-15",
+		})
+	})
+
+	it("buys and sells on the 15th, when no target is due, so no Contribution is unfunded and nothing is unmet", async () => {
+		const body = runBody(await projection(await exampleHome(), ["run", ...HOME_FLAGS, ...ALL]))
+		for (const row of tableOf(body, "annual").rows) expect(row.unmet).toBe("0.00")
+		expect(tableOf(body, "cashflow").rows.filter((line) => line.group === "unfunded")).toEqual([])
+		expect(JSON.stringify(body)).not.toContain("lump sum")
 	})
 })
 

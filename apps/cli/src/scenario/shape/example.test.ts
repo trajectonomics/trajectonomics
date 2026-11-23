@@ -93,16 +93,23 @@ describe("the worked example's home", () => {
 		expect(routed).not.toContain("home")
 	})
 
-	it("is bought by an obligation, financed by a loan drawn that day, and sold by a withdrawal", () => {
+	it("is bought by an obligation, financed by a loan drawn that day, sold by a withdrawal, and its loan repaid from the sale", () => {
 		const purchase = flow("home-purchase")
 		expect(purchase).toMatchObject({ kind: "contribution", funding: "obligation" })
 		expect(flow("home-loan-draw")).toMatchObject({ source: "home-loan", start: purchase.start })
 		expect(flow("home-loan-payment").level).toBeDefined()
 		expect(flow("home-sale")).toMatchObject({ kind: "withdrawal", source: "home" })
+		const sale = flow("home-sale").start
+		expect(flow("home-loan-payoff")).toMatchObject({
+			kind: "contribution",
+			target: "home-loan",
+			start: sale,
+		})
+		expect((flow("home-loan-payment").end ?? "9999-12-31") < sale).toBe(true)
 	})
 
 	it("reads the home's value for its running cost and its sale, and ends both before the sale", () => {
-		for (const id of ["home-running", "home-sale"]) {
+		for (const id of ["home-running", "home-sale", "home-loan-payoff"]) {
 			expect(flow(id).derive?.measures).toContainEqual({
 				id: "value",
 				op: "account",
