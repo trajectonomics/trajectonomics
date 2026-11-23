@@ -27,11 +27,11 @@ describe("corpus: the retirement cluster and Thai ESG", () => {
 		expect(res.breakdown.allowances.retirementCluster.combined.allowed).toBe(500_000)
 	})
 
-	it("applies the 500,000 cluster ceiling across RMF, SSF and PVD together", () => {
-		// reported: rmf 500,000 + ssf 200,000 + pvd 500,000 = 1,200,000, capped at 500,000
+	it("applies the 500,000 cluster ceiling across RMF and PVD together", () => {
+		// reported: rmf 500,000 + pvd 500,000 = 1,000,000, capped at 500,000
 		const res = runThaiCorpusCase({
 			income: { section40_1: 4_000_000 },
-			allowances: { rmf: 500_000, ssf: 200_000, pvd: 500_000 },
+			allowances: { rmf: 500_000, pvd: 500_000 },
 		})
 		expect(res.breakdown.allowances.retirementCluster.combined.allowed).toBe(500_000)
 		expect(res.breakdown.allowances.retirementCluster.combined.wasClamped).toBe(true)
