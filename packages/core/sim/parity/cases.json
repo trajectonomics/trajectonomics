@@ -3455,6 +3455,155 @@
 		"fiSha256": "592e0500a75c50631c38970267ad57aee9d1fc8f16c5f6f86910272516b3f811"
 	},
 	{
+		"name": "loan-level-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"sha256": "55afe80c97947f37107e3fe4d27c16193a03ea0fadf15c6837118100373413c8"
+	},
+	{
+		"name": "loan-borrow-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "borrow",
+					"kind": "withdrawal",
+					"source": "loan",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 50000000,
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "rent",
+					"kind": "expense",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 3000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-03-14",
+			"horizon": "2026-03-16",
+			"resolution": "day"
+		},
+		"sha256": "0f365615a13a74a07ca5558d61ba775d2fbfd376142c826b239da86f26adb07c"
+	},
+	{
 		"name": "levy-wage-base",
 		"baseline": {
 			"schemaVersion": 1,

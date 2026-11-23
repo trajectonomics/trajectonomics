@@ -19,6 +19,7 @@ import { levySeveral, levyStepped } from "./levy-extensions-cases"
 import { levyGainsDay } from "./levy-gains-case"
 import { levyReturnsDay } from "./levy-returns-case"
 import { levyCareCredit } from "./levy-us-cases"
+import { borrowDay, levelLoanMonth } from "./loan-cases"
 import { milestoneFreelancer } from "./milestone-cases"
 import { nominalLeapFebruary, nominalPartial, nominalReal, nominalZero } from "./nominal-cases"
 import { nominalMonthlyLoan } from "./nominal-flow-cases"
@@ -58,6 +59,8 @@ export const PARITY_CASES: readonly ParityCase[] = [
 		options: { method: "survival", minBufferMonths: 3 },
 	},
 	{ name: "levy-several-fi", fixture: levySeveral, options: { method: "survival" } },
+	{ name: "loan-level-month", fixture: levelLoanMonth },
+	{ name: "loan-borrow-day", fixture: borrowDay },
 	{ name: "levy-wage-base", fixture: wageBaseCase(60_000_000) },
 	{ name: "levy-joint-filers", fixture: levyJointFilers },
 	{ name: "calendar-shift-day", fixture: calendarShiftDay },

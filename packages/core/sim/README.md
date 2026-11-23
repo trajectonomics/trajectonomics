@@ -77,6 +77,74 @@ with `prepayments`, renamed `Projection.levy` to `Projection.levies`, and added 
 (`monthly`, `quarterly`, `semiannual` or `annual`) to make its `rate` nominal; without it,
 `rate` is the effective annual rate. See [ADR 0007](docs/adr/0007-nominal-compounding.md).
 
+## Loans
+
+A liability borrows through a `withdrawal` Flow: the amount owed grows and the cash lands, so net
+worth is unchanged that day. A `contribution` into a nominal liability can carry a `level` amount
+instead of an `amount`: the one payment that repays `principal` over `payments` equal payments at
+the Account's nominal rate, rounded once with the stated `rounding`. `levelPayment` returns the same
+figure without a Projection. See [ADR 0016](docs/adr/0016-loans-borrowing-and-level-payments.md).
+
+```ts
+import {
+	type Baseline,
+	check,
+	levelPayment,
+	project,
+	type Scenario,
+	type Timeline,
+} from "@trajectonomics/core/sim"
+
+// A 100,000.00 loan at 6% nominal, compounded monthly, repaid over 12 month ends.
+console.log(levelPayment({ principal: 10_000_000, rate: 600, periodsPerYear: 12, payments: 12, rounding: "ceil" }))
+
+const baseline = {
+	schemaVersion: 1,
+	balances: [
+		{ account: "cash", amount: 0 },
+		{ account: "car-loan", amount: 0 },
+	],
+} satisfies Baseline
+
+const scenario = {
+	schemaVersion: 4,
+	currency: "THB",
+	economy: { inflation: 0 },
+	accounts: [
+		{ id: "cash", kind: "asset", rate: 0 },
+		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
+	],
+	flows: [
+		{ id: "pay", kind: "income", earned: true, amount: 2_000_000, frequency: "monthly", start: "2026-01-31", growth: { bps: 0 } },
+		{ id: "borrow", kind: "withdrawal", source: "car-loan", frequency: "once", start: "2026-01-31", amount: 10_000_000, growth: { bps: 0 } },
+		{ id: "repay", kind: "contribution", target: "car-loan", frequency: "monthly", start: "2026-01-31", level: { principal: 10_000_000, payments: 12, rounding: "ceil" } },
+	],
+	cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: ["cash"] },
+} satisfies Scenario
+
+const timeline = {
+	start: "2025-12-31",
+	horizon: "2026-12-31",
+	resolution: "month",
+} satisfies Timeline
+
+console.log(check(baseline, scenario, timeline))
+
+const result = project(baseline, scenario, timeline)
+if (result.ok) {
+	const owed = result.projection.rows.find((row) => row.date === "2026-06-30")?.balances.find((item) => item.account === "car-loan")
+	console.log(owed?.amount)
+}
+```
+
+It prints the payment, the empty problem list and the loan's balance at 30 June in minor units:
+
+```text
+860665
+[]
+5023542
+```
+
 ## Levies
 
 A Levy is a closed rule set: a twelve-month period rule, a settlement rule and a graph of

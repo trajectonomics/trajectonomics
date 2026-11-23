@@ -37,6 +37,12 @@ export interface AnnualRollup {
 	readonly unfundedContributions: MinorUnits
 	/** Prepayment plus Settlements net of refunds; present only when the Scenario has a Levy. */
 	readonly levy?: MinorUnits
+	/**
+	 * Planned withdrawals landed in the period, drawn from liabilities; present only when the Scenario
+	 * declares a withdrawal Flow. A draw that lands as cash leaves net worth unchanged, so it is not
+	 * part of `interest`.
+	 */
+	readonly withdrawals?: MinorUnits
 	readonly interest: MinorUnits
 	readonly unmet: MinorUnits
 	readonly partial: boolean
