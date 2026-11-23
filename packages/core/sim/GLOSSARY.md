@@ -67,7 +67,7 @@ A `const` Measure whose value steps on given dates: a starting value and a list 
 _Avoid_: Time-varying parameter, schedule
 
 **Derived amount**:
-A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
+A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph; a Planned withdrawal that reads its own `source` is no cycle, since the read precedes every landing. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
 _Avoid_: Percentage flow, formula flow, linked flow
 
 **Tally label**:
@@ -103,7 +103,7 @@ A named balance with an explicit rule in the Scenario: `kind` (`asset` or `liabi
 _Avoid_: Wallet, holding
 
 **Illiquid asset**:
-An asset Account marked `liquid: false`, such as a home or a car. It is in Net worth and `allAssets`, and left out of Accessible net worth, `unlockedAssets`, the Minimum buffer, the rule-of-thumb numerator on the unlocked and accessible bases, and the accessible Metrics. No `withdraw` or `surplus` step may name it, though a contribution may fund it. It is never sold by the simulation: a sale is a later primitive. Absent or `liquid: true` means liquid, and `liquid` on a liability is refused.
+An asset Account marked `liquid: false`, such as a home or a car. It is in Net worth and `allAssets`, and left out of Accessible net worth, `unlockedAssets`, the Minimum buffer, the rule-of-thumb numerator on the unlocked and accessible bases, and the accessible Metrics. No `withdraw` or `surplus` step may name it, though a contribution may fund it. It is sold only by a Planned withdrawal that names it, never by a Shortfall. Absent or `liquid: true` means liquid, and `liquid` on a liability is refused.
 _Avoid_: Real asset (the word `real` already means inflation-adjusted money), locked asset (a locked asset only waits for `lockedUntil`)
 
 **Nominal annual rate**:
@@ -139,10 +139,10 @@ A dated cash movement of kind `income`, `expense`, `contribution` or `withdrawal
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
-A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a target: it is limited to the Available cashflow on that Occurrence and is never funded from existing assets. Same-date amounts are summed per Account, and `cashflow.contribute` sets the funding priority.
+A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a **target** (`funding` absent or `target`): it is limited to the Available cashflow on that Occurrence and is never funded from existing assets, and `cashflow.contribute` sets the funding priority. With `funding: "obligation"` it is a **purchase**: paid in full, subtracted before Available cashflow, drawn from the `withdraw` list when the day's cash is short or a Shortfall when that is short too, and not routed. A Contribution that is a target and one that is an obligation into one Account are separate. Same-date amounts of one kind are summed per Account. `funding` on a liability is refused: a debt payment is already an obligation.
 
 **Available cashflow**:
-The income on one Occurrence minus its expenses and debt payments actually made, floored at zero. Cash from a Planned withdrawal is left out: it pays what it was raised for and the rest lands in surplus, so borrowing never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
+The income on one Occurrence minus its expenses, debt payments and obligations actually made, floored at zero. Cash from a Planned withdrawal, a sale's proceeds included, is left out: it pays what it was raised for and the rest lands in surplus, so borrowing or selling never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
 _Avoid_: Free cashflow, disposable income
 
 **Unfunded contribution**:
@@ -150,8 +150,8 @@ The part of an asset contribution's planned amount, after same-date summing per 
 _Avoid_: Missed contribution
 
 **Planned withdrawal**:
-A Flow of kind `withdrawal` that borrows from a liability `source`: on each Landed date the amount owed grows by the amount and the same cash lands in cashflow, so net worth is unchanged that day. It is not income, is never tallied and does not stop in the FI test. Its source must be a liability; assets are a later slice.
-_Avoid_: draw, sale, transfer
+A Flow of kind `withdrawal`. From a liability `source` it borrows: on each Landed date the amount owed grows by the amount and the same cash lands in cashflow, so net worth is unchanged that day. From an asset `source` it is a **sale**: `min(planned, value)` leaves the Account and lands in cashflow (nothing while the Account is locked), its Realised gain is tallied when the Account has a `gainLabel`, and a Derived amount that reads the Account sells all of it. It is not income, is never tallied as income and does not stop in the FI test. A sale of an Illiquid asset raises Accessible net worth by the cash that lands.
+_Avoid_: draw, transfer
 
 **Level payment**:
 The one payment a `level` Contribution makes into a nominal liability: the amount that repays a principal over a number of equal payments at the Account's nominal rate, computed once from principal, rate and term and rounded once as the caller states. It does not grow.

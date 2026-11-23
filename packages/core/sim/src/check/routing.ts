@@ -18,6 +18,7 @@ function isUnroutedAsset(
 	accounts: AccountIndex | undefined,
 ): flow is Readonly<Record<string, unknown>> {
 	if (!isRecord(flow) || flow["kind"] !== "contribution") return false
+	if (flow["funding"] === "obligation") return false
 	const target = flow["target"]
 	return typeof target === "string" && accounts?.get(target) === "asset" && !routed.has(target)
 }

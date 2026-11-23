@@ -1,4 +1,4 @@
-import { FLOW_KINDS, FREQUENCIES } from "../vocab"
+import { FLOW_KINDS, FREQUENCIES, FUNDINGS } from "../vocab"
 import type { AccountIndex, Check } from "./codes"
 import { derive } from "./derive"
 import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED } from "./flow-fields"
@@ -56,11 +56,19 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	}
 	const capped = cappedPrepayment(context.hasLevy)
 	if (kind === "income")
-		return { ...shared, earned: req(bool), ...levied, cappedPrepayment: capped, level: NOT_ALLOWED }
+		return {
+			...shared,
+			earned: req(bool),
+			...levied,
+			cappedPrepayment: capped,
+			funding: NOT_ALLOWED,
+			level: NOT_ALLOWED,
+		}
 	if (kind === "contribution") {
 		return {
 			...shared,
 			target: req(target),
+			funding: opt(oneOf(FUNDINGS, "INVALID_FUNDING")),
 			label: label(context.hasLevy),
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
@@ -71,6 +79,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 		return {
 			...shared,
 			category: opt(expenseCategory),
+			funding: NOT_ALLOWED,
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
@@ -81,6 +90,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 		return {
 			...shared,
 			source: req(accountRef(context.accounts)),
+			funding: NOT_ALLOWED,
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
@@ -92,6 +102,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 		category: opt(expenseCategory),
 		earned: opt(bool),
 		target: opt(target),
+		funding: opt(oneOf(FUNDINGS, "INVALID_FUNDING")),
 		...levied,
 		cappedPrepayment: capped,
 		level: levelField,

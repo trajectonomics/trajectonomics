@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { scenarioExample } from "./index"
 import { FULL_MILESTONES } from "./milestone-fixture"
 import { documented, PROPERTIES, refusalsOf, replaceAt, resolves, VERSION } from "./testing"
+import { TRADE_FLOWS } from "./trade-flows"
 
 /*
  * The structure the published document shape states, proved against the pinned core: every path it
@@ -111,6 +112,7 @@ const FULL: Record<string, unknown> = {
 			start: "2026-01-01",
 			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
 		},
+		...TRADE_FLOWS,
 	],
 	cashflow: {
 		surplus: [{ account: "cash", upTo: 500_000 }, { account: "index" }],

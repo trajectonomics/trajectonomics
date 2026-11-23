@@ -73,8 +73,9 @@ export function applyDebt(
 }
 
 /**
- * Asset contributions spend only `available` cashflow, in `contribute` priority order. The part
- * that does not fit is reported as unfunded and dropped; a zero grant never touches an account.
+ * Asset targets spend only `available` cashflow, in `contribute` priority order. The part that
+ * does not fit is reported as unfunded and dropped; a zero grant never touches an account.
+ * An obligation is not here: it is paid in full before `available` is computed.
  */
 export function applyAssets(
 	states: StateMap,
@@ -84,7 +85,7 @@ export function applyAssets(
 	date: DateString,
 	levies: LevySet | undefined,
 ): AssetResult {
-	const groups = groupEntries(entries)
+	const groups = groupEntries(entries.filter((entry) => !entry.obligation))
 	let remaining = available
 	let applied = 0n
 	const funded = new Map<string, bigint>()

@@ -4,6 +4,12 @@ import { oracleAssetContributions, oracleDebtPayments } from "./oracle-contribut
 import type { OracleEvent } from "./oracle-flow"
 import { oracleSurplus, oracleWithdraw } from "./oracle-ops"
 import type { PlannedDay } from "./oracle-planned"
+import {
+	oracleMoveSources,
+	oracleObligations,
+	oraclePayObligations,
+	oraclePlannedSources,
+} from "./oracle-sale"
 import type { OracleStates } from "./oracle-state"
 
 /** What one day's landed Flows were worth, and whether the money ran out paying them. */
@@ -22,7 +28,7 @@ function plannedSums(landing: readonly OracleEvent[], planned: PlannedDay) {
 		const total = planned.get(id) ?? 0n
 		if (flow.kind === "income") income += total
 		if (flow.kind === "expense") expense += total
-		if (flow.kind === "contribution") {
+		if (flow.kind === "contribution" && flow.funding !== "obligation") {
 			contributions.set(flow.target, (contributions.get(flow.target) ?? 0n) + total)
 		}
 	}
@@ -30,8 +36,10 @@ function plannedSums(landing: readonly OracleEvent[], planned: PlannedDay) {
 }
 
 /**
- * Lands one day's Flows on the states in the engine's order: debt payments, asset contributions
- * from what the day's income leaves, then the surplus or the withdrawal. Planned amounts are
+ * Lands one day's Flows on the states in the engine's order: planned withdrawals (a loan draw or a
+ * sale), debt payments, obligations paid in full, asset contributions from what the day's income
+ * leaves, then the surplus or the withdrawal. Cash a planned withdrawal brings never counts toward
+ * what the income leaves. Planned amounts are
  * already priced, so a Derived amount has read whatever it reads before any of this happens.
  */
 export function oracleLandDay(
@@ -43,11 +51,13 @@ export function oracleLandDay(
 ): OracleLanded {
 	const { income, expense, contributions } = plannedSums(landing, planned)
 	const { scenario } = fixture
+	const cash = oracleMoveSources(states, oraclePlannedSources(landing, planned), date)
 	const debt = oracleDebtPayments(states, contributions, date)
-	const cashflow = income - expense - debt
+	const owed = oraclePayObligations(states, oracleObligations(landing, planned), date)
+	const cashflow = income - expense - debt - owed
 	const budget = cashflow > 0n ? cashflow : 0n
 	const assets = oracleAssetContributions(states, scenario, contributions, budget, date)
-	const net = cashflow - assets.applied
+	const net = cashflow + cash - assets.applied
 	if (net > 0n) oracleSurplus(states, scenario.cashflow.surplus, date, net)
 	const unmet = net < 0n ? oracleWithdraw(states, scenario, date, -net) : 0n
 	return { expense, ranOut: unmet > 0n }

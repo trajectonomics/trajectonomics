@@ -1,3 +1,4 @@
+import { checkAssetFlow } from "./asset-flow"
 import type { Check, Emit, Path } from "./codes"
 import { isValidDate } from "./date"
 import { checkAccountReads } from "./flow-accounts"
@@ -65,6 +66,7 @@ function flowCheck(context: FlowContext): Check {
 		checkDates(flow, path, emit)
 		checkAmount(flow, path, refusedForms(shape), emit)
 		checkLoanFlow(flow, path, context.loans, emit)
+		checkAssetFlow(flow, path, context.loans, emit)
 	}
 }
 

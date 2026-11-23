@@ -36,9 +36,15 @@ export function changedAccountOf(flow: unknown): string | undefined {
 	return typeof value === "string" ? value : undefined
 }
 
+/** A sale that reads the Account it sells: the value is read before anything lands, so no cycle (ADR 0021). */
+function isSaleReadingItself(flow: unknown, read: AccountRead): boolean {
+	return isRecord(flow) && flow["kind"] === "withdrawal" && flow["source"] === read.account
+}
+
 /**
  * One edge from a Flow that reads an Account to each Flow that changes that Account, so a cycle
- * through a Flow that changes the Account it reads is reported as `FLOW_CYCLE`.
+ * through a Flow that changes the Account it reads is reported as `FLOW_CYCLE`. A withdrawal that
+ * reads its own source is no cycle.
  */
 export function accountEdges(
 	flows: readonly unknown[],
@@ -48,6 +54,7 @@ export function accountEdges(
 	const edges: { readonly to: number; readonly path: Path }[] = []
 	for (const read of accountReadsOf(flows[index], [...path, index])) {
 		for (let other = 0; other < flows.length; other++) {
+			if (other === index && isSaleReadingItself(flows[index], read)) continue
 			if (changedAccountOf(flows[other]) === read.account)
 				edges.push({ to: other, path: read.path })
 		}

@@ -14,7 +14,8 @@ export interface WithdrawResult {
 	readonly problem: ProjectionProblem | undefined
 }
 
-function isLocked(state: AccountState, date: DateString): boolean {
+/** Whether an asset is still locked on `date`: no draw and no sale moves anything from it. */
+export function isLocked(state: AccountState, date: DateString): boolean {
 	return (
 		state.rule.kind === "asset" &&
 		state.rule.lockedUntil !== undefined &&

@@ -12,6 +12,8 @@ export interface ContributionEntry {
 	readonly target: AccountId
 	readonly amount: bigint
 	readonly label: string | undefined
+	/** Paid in full, outside Available cashflow, instead of capped by it (ADR 0021). */
+	readonly obligation: boolean
 }
 
 export interface DayFlows {
@@ -78,6 +80,7 @@ function takeFlow(
 			target: flow.target,
 			amount,
 			label: flow.label,
+			obligation: flow.funding === "obligation",
 		})
 	return undefined
 }

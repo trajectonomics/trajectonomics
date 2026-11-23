@@ -140,13 +140,14 @@ describe("a plan that holds a loan, against the real traj", () => {
 	)
 
 	test(
-		"a withdrawal from an asset is refused in words, at the source it names, and changes nothing",
+		"a sale that starts before its asset unlocks is refused in words, at its start, and changes nothing",
 		async () => {
 			const document = loanDocument()
 			const asset = document.accounts.find((account) => account.kind === "asset")
 			if (asset === undefined) throw new Error("the demo base has no asset")
 			const draw = document.flows.find((flow) => flow.id === "car-draw")
 			if (draw === undefined) throw new Error("the loan document has no withdrawal")
+			Object.assign(asset, { lockedUntil: "2099-01-01" })
 			draw.source = asset.id
 			const index = document.flows.indexOf(draw)
 			const body = JSON.stringify({
@@ -162,9 +163,9 @@ describe("a plan that holds a loan, against the real traj", () => {
 			}
 			expect(answer.ok).toBe(false)
 			expect(answer.error?.code).toBe("invalid_input")
-			expect(answer.error?.path).toBe(`document.flows.${index}.source`)
+			expect(answer.error?.path).toBe(`document.flows.${index}.start`)
 			expect(answer.error?.message).toBe(
-				"A withdrawal borrows from a liability, and its source Account is not one.",
+				"A withdrawal sells an asset that is locked on the withdrawal's first date, and no Milestone gate says to wait, so it could never move anything on that date.",
 			)
 			expect(loansOf(PLAN)).toEqual(loans)
 		},

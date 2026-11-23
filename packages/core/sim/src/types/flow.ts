@@ -1,4 +1,12 @@
-import type { AccountId, BasisPoints, DateString, Frequency, Growth, MinorUnits } from "./common"
+import type {
+	AccountId,
+	BasisPoints,
+	DateString,
+	Frequency,
+	Funding,
+	Growth,
+	MinorUnits,
+} from "./common"
 import type { Derive, Rounding } from "./measure"
 
 /** One Levy's share of an income Occurrence, in basis points of the gross. */
@@ -70,17 +78,26 @@ export interface ExpenseRules {
 	readonly category?: string
 }
 
-/** Cash moves into `target`. A liability target is a debt payment capped at the amount owed; an asset target spends Available cashflow in `cashflow.contribute` order. */
+/**
+ * Cash moves into `target`. A liability target is a debt payment capped at the amount owed; an asset
+ * target spends Available cashflow in `cashflow.contribute` order, unless `funding` is `obligation`:
+ * then it is paid in full, drawing on savings if the day's cash is short (a purchase, ADR 0021).
+ */
 export interface ContributionRules {
 	readonly kind: "contribution"
 	readonly target: AccountId
+	/** An asset target only: `target` (absent means the same) or `obligation`. Refused on a liability. */
+	readonly funding?: Funding
 	/** Tally label a Levy sums over; without one the Flow is never tallied. Needs a Levy. */
 	readonly label?: string
 }
 
 export type IncomeFlow = FlowBase & IncomeRules & (FixedAmount | DerivedAmount)
 export type ExpenseFlow = FlowBase & ExpenseRules & (FixedAmount | DerivedAmount)
-/** Cash moves out of a liability `source` into cashflow on each Landed date; it is not income. */
+/**
+ * Cash moves into cashflow on each Landed date; it is not income. A liability `source` borrows (the
+ * amount owed grows); an asset `source` is sold (`min(planned, value)` leaves it, ADR 0021).
+ */
 export interface WithdrawalRules {
 	readonly kind: "withdrawal"
 	readonly source: AccountId

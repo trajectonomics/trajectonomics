@@ -1,4 +1,4 @@
-import type { COMPOUNDING_PERIODS, FREQUENCIES, RESOLUTIONS } from "../vocab"
+import type { COMPOUNDING_PERIODS, FREQUENCIES, FUNDINGS, RESOLUTIONS } from "../vocab"
 
 /** Calendar date, `YYYY-MM-DD`. */
 export type DateString = string
@@ -13,6 +13,8 @@ export type BasisPoints = number
 export type AccountId = string
 
 export type Frequency = (typeof FREQUENCIES)[number]
+/** `target` spends the Available cashflow of its Occurrence; `obligation` is paid in full (ADR 0021). */
+export type Funding = (typeof FUNDINGS)[number]
 export type Resolution = (typeof RESOLUTIONS)[number]
 
 /** The calendar period at whose end accrued interest is capitalised. */
