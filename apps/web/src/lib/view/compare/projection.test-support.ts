@@ -77,6 +77,7 @@ export function compareOf(a: CompareSide, b: CompareSide, deltas: Deltas): Proje
 		engine: { package: "@trajectonomics/sim", version: "0.0.0" },
 		birthDate: "1990-05-15",
 		sides: { a, b },
+		tables: [{ name: "annual", count: 0, rows: [] }],
 		deltas,
 		tax: "applied",
 		notes: ["Tax is applied: Thailand 2026 personal income tax."],
