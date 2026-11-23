@@ -134,6 +134,10 @@ _Avoid_: Patch, edit
 A list item taken out of a Scenario's document by its `id`, with `--without`, before any Override is applied. It names an item, never a value, so `--set` cannot stand in for it; a Projection applies it transiently and `scenario fork` persists it.
 _Avoid_: Delete, drop, exclude
 
+**What-if**:
+A set of Overrides and Removals applied to one stored Scenario. A Projection applies it transiently, `scenario fork` saves it as a new plan, and `scenario apply <name> --set/--without` saves it to the plan it came from (ADR-0057).
+_Avoid_: Draft, patch, edit
+
 **Contribution**:
 Money moved from cash flow into an investment or retirement account. It is not an expense, so net worth does not change at that instant.
 _Avoid_: Investment expense, savings
