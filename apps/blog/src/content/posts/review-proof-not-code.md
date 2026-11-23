@@ -10,7 +10,7 @@ cover:
   height: 1024
 ---
 
-คำถามที่ทุกคนที่ทำ AI Agent ต้องเจอคือ "จะเชื่อโค้ดที่ agent เขียนได้ยังไง" คำตอบของ Lauren Tan (poteto) จากทีม Grok Bot ในทอล์ก [All Code Is Slop (Except Mine)](https://www.youtube.com/watch?v=O_zcc6Xl12g) ที่งาน AI Engineer Code Summit คือ **อย่าไปนั่งอ่านโค้ดทุกบรรทัด ให้สร้างสภาพแวดล้อมที่ทำให้ agent ทำผิดยาก แล้วรีวิวหลักฐาน ไม่ใช่รีวิวโค้ด**
+คำถามที่ทุกคนที่ทำ AI Agent ต้องเจอคือ "จะเชื่อโค้ดที่ agent เขียนได้ยังไง" คำตอบของ Lauren Tan (poteto) จากทีม Grok Bot ในทอล์ก [All Code Is Slop (Except Mine)](https://www.youtube.com/watch?v=O_zcc6Xl12g) ที่งาน AI Engineer Code Summit คือ **ไม่ใช่เชื่อแบบหลับหูหลับตา แต่[ลงทุนกับสภาพแวดล้อมของ agent](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=92s) จนมันทำสิ่งที่ถูกเป็นค่าเริ่มต้น แล้วรีวิวหลักฐาน ไม่ใช่รีวิวโค้ด**
 
 ที่ควรฟังเธอเพราะตัวเลข: เดือนที่แล้วเธอ [ship 3,000 PR เข้า production คนเดียว](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=42s) ทั้งทีม [ship 11,000 PR ในเดือนเดียว](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=817s) แต่สัดส่วน PR ที่ถูก revert [คงที่อยู่ราวครึ่งเปอร์เซ็นต์](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=861s)
 
@@ -32,13 +32,13 @@ cover:
 
 ## Review proof, not code: verification คือขั้นที่สำคัญที่สุด
 
-สไลด์ของเธอเขียนตรง ๆ ว่า [**"verification is the most important step"**](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=583s) ทีมของเธอ[เลิกรีวิวด้วยการอ่าน diff](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=590s) แล้วหันมาดู verification artifact แทน เช่น วิดีโอ ภาพหน้าจอ diagram และผล formal verification
+สไลด์ของเธอเขียนตรง ๆ ว่า [**"verification is the most important step"**](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=583s) การรีวิวโค้ดของทีมเธอ[หดลงจนเหลือแค่การดู verification artifact](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=590s) เช่น วิดีโอ ภาพหน้าจอ diagram และผล formal verification
 
 - **Runtime verification:** [ให้ agent รันโค้ดเอง](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=602s) และใช้ debugging tool แบบที่ dev ใช้ เช่น Chrome DevTools Protocol ทีมทำ [feature map](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=617s) ที่เป็นเหมือน site map ของทุกฟีเจอร์จากมุมของผู้ใช้ agent จึงไม่ต้องเดาว่า "ปุ่มนั้นใน sidebar ซ้าย" หมายถึงอะไร และยังมี CLI ที่ agent เรียกใช้ซ้ำได้ ซึ่งช่วยประหยัด token และเขียน test ได้
 - **Formal verification:** [ใช้ TLA+ ทำ model checking](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=651s) กับ flow การแจ้งเตือนข้ามหลายอุปกรณ์ และใช้ Lean พิสูจน์ว่า virtualization library ที่ทีมเขียนเองไม่กระพริบหรือกระตุก เธอบอกว่าเจอ bug ไปหลายตัวแล้ว แต่[มันไม่ใช่ silver bullet](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=685s) เป็นแค่อีกชั้นหนึ่ง
 - **UI property-based testing:** [ใช้ library ชื่อ Bombadil](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=697s) ซึ่งจับ UI bug ได้แล้วหลายตัว
 
-ทำไมต้องลงทุนตรงนี้ เธอยกตัวอย่าง [Cindy Sridharan](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=712s) ที่เมื่อ 6 เดือนก่อนบ่นว่า PR ของ AI มี bug เนียน ๆ หลุดเข้าไป ต้องใช้หลายวันกว่าจะ verify ด้วยมือจนแก้เสร็จ วันนี้[ราว 70% ของ token ต่อวันของ Cindy](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=730s)ไปอยู่ที่การ verify และ Lauren บอกว่าของเธอก็เป็นแบบเดียวกัน เทคนิคพวกนี้ไม่ใช่ของใหม่ แค่เมื่อก่อนแพงเกินไป ตอนนี้ agent ทำให้ถูกลงมาก เธอเลยเรียกยุคนี้ว่า ["golden age of software testing and verification"](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=763s)
+ทำไมต้องลงทุนตรงนี้ เธอยกตัวอย่าง [ทวีตของ Cindy Sridharan](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=720s) เมื่อ 6 เดือนก่อน ที่บอกว่า PR ของ AI หลายอันมี bug เนียน ๆ หลุดเข้าไป และต้องใช้เวลาเพิ่มหลายวันกับการ verify ด้วยมือกว่าจะแก้เสร็จ วันนี้[ราว 70% ของ token ต่อวันของ Cindy](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=730s)ไปอยู่ที่การ verify และ Lauren บอกว่าของเธอก็เป็นแบบเดียวกัน เทคนิคพวกนี้ไม่ใช่ของใหม่ แค่เมื่อก่อนแพงเกินไป ตอนนี้ agent ทำให้ถูกลงมาก เธอเลยเรียกยุคนี้ว่า ["golden age of software testing and verification"](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=763s)
 
 ประโยคที่คนอยากทำ Software Factory ควรจำ: ["If your inner coding loop produces slop, then automating that loop just produces more slop"](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=936s) [ลำดับที่เธอแนะนำ](https://www.youtube.com/watch?v=O_zcc6Xl12g&t=911s)ก่อนจะ automate คือ
 
