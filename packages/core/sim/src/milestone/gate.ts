@@ -4,6 +4,7 @@ import type { DatedEvent } from "../engine/events"
 import { compareIds } from "../engine/order"
 import type { StateMap } from "../engine/state"
 import type { DateString, Flow, MilestoneResult, Scenario, Timeline } from "../types"
+import { planViewOf } from "./gate-figures"
 import { onceEventsOn } from "./gate-once"
 import { fireDynamic, type GateState, startState } from "./gate-state"
 import { landsAt } from "./gating"
@@ -40,7 +41,9 @@ export class MilestoneGate {
 	 */
 	clone(events: readonly DatedEvent[], stop?: (flow: Flow) => boolean): MilestoneGate {
 		const { state } = this
-		return new MilestoneGate({ ...state, events, stop, fires: new Map(state.fires) })
+		const { scenario, timeline, view } = state
+		const next = planViewOf(scenario, timeline, events, view.cache)
+		return new MilestoneGate({ ...state, view: next, stop, fires: new Map(state.fires) })
 	}
 
 	/** An independent copy that fires no dynamic Milestone, for the walk past the horizon. */
@@ -64,8 +67,11 @@ export class MilestoneGate {
 		const evaluated =
 			state.frozen !== true && (settled || dayEvents.some((event) => event.deferred !== true))
 		const fired = evaluated ? fireDynamic(state, states, date) : []
-		const kept = dayEvents.filter((event) => landsAt(state.fires, event.flow, date))
+		const kept = state.gated
+			? dayEvents.filter((event) => landsAt(state.fires, event.flow, date))
+			: dayEvents
 		const landing = (flow: Flow): boolean => state.stop?.(flow) !== true
+		if (fired.length === 0) return kept
 		const injected = onceEventsOn(
 			state.deferred,
 			fired,
@@ -77,7 +83,7 @@ export class MilestoneGate {
 
 	/** Records the expense a processed date landed, for the trailing window. */
 	record(totals: { readonly date: DateString; readonly expense: bigint }): void {
-		if (totals.expense === 0n) return
+		if (!this.state.trailing || totals.expense === 0n) return
 		const cutoff = addMonthsClamped(totals.date, -12)
 		const entry = { date: totals.date, expense: totals.expense }
 		this.state.trail = [...this.state.trail.filter((item) => item.date >= cutoff), entry]

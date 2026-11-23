@@ -42,6 +42,7 @@
 		"build": "tsdown",
 		"test": "bun test",
 		"bench": "bun scripts/bench-fi.ts",
+		"bench:milestones": "bun scripts/bench-milestones.ts",
 		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
 		"lint": "biome ci --colors=off --error-on-warnings .",
 		"format": "biome check --write .",

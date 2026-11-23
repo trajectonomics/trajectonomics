@@ -17,8 +17,29 @@ export interface DatedEvent {
 	readonly deferred?: boolean
 }
 
-/** All flow Occurrences in the timeline, on their Landed dates, sorted by date then flow id. */
+const built: WeakMap<Scenario, Map<string, readonly DatedEvent[]>> = new WeakMap()
+
+/**
+ * All flow Occurrences in the timeline, on their Landed dates, sorted by date then flow id. The
+ * `calendar` is the Scenario's own, so every run of a Scenario over one span shares its events, as
+ * its Market paths and FI candidates do.
+ */
 export function buildEvents(
+	scenario: Scenario,
+	timeline: Timeline,
+	calendar: ResolvedCalendar | undefined,
+): readonly DatedEvent[] {
+	const bySpan = built.get(scenario) ?? new Map<string, readonly DatedEvent[]>()
+	built.set(scenario, bySpan)
+	const key = `${timeline.start}|${timeline.horizon}|${calendar === undefined}`
+	const kept = bySpan.get(key)
+	if (kept !== undefined) return kept
+	const events = eventsOf(scenario, timeline, calendar)
+	bySpan.set(key, events)
+	return events
+}
+
+function eventsOf(
 	scenario: Scenario,
 	timeline: Timeline,
 	calendar: ResolvedCalendar | undefined,

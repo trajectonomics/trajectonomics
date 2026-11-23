@@ -48,10 +48,24 @@ export function criterionHolds(criterion: Criterion, reading: Reading): boolean 
 	return multipleHolds(criterion, reading)
 }
 
-/** Whether a Milestone fires on the reading's date: its criteria combined with `all` or `any`. */
+/** What reading a criterion costs: a date or Milestone is free, a balance sums Accounts, a window walks a year. */
+function cost(criterion: Criterion): number {
+	if (criterion.kind === "date" || criterion.kind === "milestone") return 0
+	const metrics =
+		criterion.kind === "metric" ? [criterion.metric] : [criterion.metric, criterion.base]
+	return metrics.some((metric) => typeof metric === "object" && "expenses" in metric) ? 2 : 1
+}
+
+/**
+ * Whether a Milestone fires on the reading's date: its criteria combined with `all` or `any`. The
+ * cheapest criteria are read first, so a decided combination never reads an expense window.
+ */
 export function firesOn(milestone: Milestone, reading: Reading): boolean {
-	const holds = (criterion: Criterion): boolean => criterionHolds(criterion, reading)
-	return milestone.combine === "all"
-		? milestone.criteria.every(holds)
-		: milestone.criteria.some(holds)
+	const all = milestone.combine === "all"
+	for (let rank = 0; rank <= 2; rank++) {
+		for (const criterion of milestone.criteria) {
+			if (cost(criterion) === rank && criterionHolds(criterion, reading) !== all) return !all
+		}
+	}
+	return all
 }
