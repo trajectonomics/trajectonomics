@@ -41,6 +41,24 @@ function lastMonthOf(
 	return months.filter((month) => month["account"] === account).at(-1)
 }
 
+/** Whether a closing amount, as the CLI prints it, is zero: text only, no arithmetic. */
+function isZero(amount: unknown): boolean {
+	return /^-?0+(\.0+)?$/.test(String(amount))
+}
+
+/**
+ * One loan's line. `paidOff` is the first date the balance reached zero (sim ADR 0017), so a loan
+ * borrowed against again after it says so, with what it owes at the end, read from its last month.
+ */
+function loanLine(row: Record<string, unknown>, last: Record<string, unknown> | undefined): string {
+	const account = String(row["account"])
+	const owes = last === undefined ? "" : `owes ${String(last["closing"])} at ${String(last["to"])}`
+	if (row["date"] === null)
+		return last === undefined ? `${account}: not paid off by the end` : `${account}: ${owes}`
+	const paid = `${account}: paid off on ${String(row["date"])}`
+	return last === undefined || isZero(last["closing"]) ? paid : `${paid}, then ${owes} again`
+}
+
 /**
  * One line per loan, then the month table, printed after the body when the result carries the
  * liability tables. Without `--liabilities` the result has none, and this prints nothing.
@@ -49,11 +67,6 @@ export function liabilityBlocks(data: Record<string, unknown>): string[] {
 	const paid = tableRows(data, "paidOff")
 	const months = tableRows(data, "liabilities")
 	if (paid === undefined || months === undefined || paid.length === 0) return []
-	const lines = paid.map((row) => {
-		if (row["date"] !== null) return `${String(row["account"])}: paid off on ${String(row["date"])}`
-		const last = lastMonthOf(months, row["account"])
-		if (last === undefined) return `${String(row["account"])}: not paid off by the end`
-		return `${String(row["account"])}: owes ${String(last["closing"])} at ${String(last["to"])}`
-	})
+	const lines = paid.map((row) => loanLine(row, lastMonthOf(months, row["account"])))
 	return [lines.join("\n"), tableLines("liabilities", months.length, months, MONTH_COLUMNS)]
 }

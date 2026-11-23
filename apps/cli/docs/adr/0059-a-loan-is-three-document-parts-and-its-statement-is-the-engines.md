@@ -40,6 +40,7 @@ and the one flag that prints the engine's statement of each loan.
 
 ## Consequences
 
+- `paidOff` is the first date a loan's balance reached zero (sim ADR 0017). A loan borrowed against again after that still has the date, so the human line reads the last month too: it says "paid off on D, then owes X at E again" when the loan ends the Projection owing money.
 - A loan's `paidOff` date is the first Landed date the amount owed reaches zero, so a mid-month payoff is
   dated to its day, while the month row reads its closing at the month's end (sim ADR-0017).
 - The flat-rate instalment loan and the daily-interest loan are not covered (#279). A Scenario that needs them
