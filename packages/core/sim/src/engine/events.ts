@@ -71,13 +71,15 @@ function eventsOf(
 			)
 		}
 	}
-	return events.sort((left, right) =>
+	events.sort((left, right) =>
 		left.date === right.date
 			? compareIds(left.flow.id, right.flow.id)
 			: left.date < right.date
 				? -1
 				: 1,
 	)
+	// Shared by every run of the Scenario over the span, so it is kept as built.
+	return Object.freeze(events)
 }
 
 /** The slice of events sharing `date`, starting at `index`, and the index just past them. */

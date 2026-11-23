@@ -55,9 +55,11 @@ export function figuresOf(
 		account,
 		start: view.start,
 		inflation: view.inflation,
-		// Every Milestone that reads a window on this date reads the same figure, so it is read once.
+		// Every Milestone that reads a window reads the same figure until another one fires on the
+		// date (a fire counts for the next, ADR 0012), and `fires` only grows, so its size keys the read.
 		expenses: (window, terms) => {
-			const key = (window === "trailing12Months" ? 2 : 0) + (terms === "real" ? 1 : 0)
+			const key =
+				(window === "trailing12Months" ? 2 : 0) + (terms === "real" ? 1 : 0) + 4 * fires.size
 			if (!read.has(key)) read.set(key, expenses(window, terms))
 			return read.get(key)
 		},

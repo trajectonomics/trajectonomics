@@ -35,7 +35,8 @@ export function planDays(events: readonly DatedEvent[]): PlanDays {
 		group.gated = true
 		gates.add(event.flow)
 	}
-	const days: PlanDays = { groups, gates: [...gates], totals: new Map() }
+	for (const group of groups) Object.freeze(group.events)
+	const days: PlanDays = { groups: Object.freeze(groups), gates: [...gates], totals: new Map() }
 	grouped.set(events, days)
 	return days
 }
