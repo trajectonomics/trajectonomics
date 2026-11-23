@@ -31,8 +31,8 @@ Scenario and the Estate statement to the Projection. It is optional and additive
   ([ADR 0019](./0019-illiquid-assets.md): a home stays in Net worth). `debts` is every liability's amount
   owed. `costs` lists each cost line's amount, in the block's order, and `costsTotal` is their exact sum
   (`giftsTotal` likewise for `gifts`), summed in BigInt and checked as the other figures are, so a caller
-  never adds the lines. `net = gross − debts − costsTotal` and is signed. A cost's share base is `gross`, or the sum of the named Accounts' values (a base below 0 counts
-  as 0).
+  never adds the lines. `net = gross − debts − costsTotal` and is signed. A cost's share base is `gross`,
+  or the sum of the named Accounts' values (a base below 0 counts as 0).
 - **The order.** Debts and costs come before gifts, and a gift is taken only from a positive net. Each
   gift in order wants a share of `max(0, net)` (the net estate, not what is left) or its grown fixed
   amount, and takes `min(wanted, left)`, where `left` starts at `max(0, net)`. A later gift therefore takes

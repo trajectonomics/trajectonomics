@@ -1,8 +1,8 @@
-import { type AppError, isAppError } from "../errors"
+import { type AppError, fail, isAppError } from "../errors"
 import { parseMinorUnits } from "../store/money"
 import { CASHFLOW_TOTALS, type CashflowTotal, type CashflowTotalRow } from "./cashflow-totals-view"
-import { refusal } from "./engine"
 import { moneyOf } from "./money"
+import { cashflowTotalSentence, OVERFLOW_HINT } from "./overflow"
 
 /*
  * The section totals of `projection run --breakdown` (cli ADR-0058, addendum). One function computes
@@ -41,12 +41,24 @@ function sumOf(lines: readonly LineFigures[], groups: readonly string[], currenc
 		.reduce((total, line) => total + minorOf(line.amount, currency), 0n)
 }
 
+/**
+ * The refusal for a section total past the safe integers: the same code, details and hint as the
+ * engine's own `VALUE_OVERFLOW`, with a sentence that names the cash-flow section.
+ */
+function totalOverflow(date: string): AppError {
+	return fail("projection_refused", {
+		message: cashflowTotalSentence(date),
+		details: [{ code: "VALUE_OVERFLOW", date }],
+		hint: OVERFLOW_HINT,
+	})
+}
+
 /** The totals as numbers, or the `VALUE_OVERFLOW` refusal on `date` when one leaves the safe integers. */
 function safeTotals(exact: Record<CashflowTotal, bigint>, date: string): CashflowTotals | AppError {
 	const totals = {} as CashflowTotals
 	for (const total of CASHFLOW_TOTALS) {
 		const value = Number(exact[total])
-		if (!Number.isSafeInteger(value)) return refusal([{ code: "VALUE_OVERFLOW", date }])
+		if (!Number.isSafeInteger(value)) return totalOverflow(date)
 		totals[total] = value
 	}
 	return totals

@@ -39,6 +39,8 @@ describe("an exact total", () => {
 		expect(isAppError(totals) ? totals.body : undefined).toMatchObject({
 			code: "projection_refused",
 			details: [{ code: "VALUE_OVERFLOW", date: "2030-12-31" }],
+			message:
+				"A cash-flow section total grew past the largest exact amount (9,007,199,254,740,991 satang) on 2030-12-31.",
 		})
 	})
 

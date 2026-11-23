@@ -10,6 +10,14 @@ const LIMIT = Number.MAX_SAFE_INTEGER.toLocaleString("en-US")
 export const OVERFLOW_HINT =
 	"The usual causes: a rate or growth far above basis points (500 is 5% a year, so 100000 is 1,000% and compounds past the limit within years); an amount in satang scaled by 100 a second time (amounts are satang, 100 per THB); or a long --horizon that lets a high rate run on. Check the Account and the Flows that feed it, then lower the figure or shorten --horizon."
 
+/**
+ * The sentence for a cash-flow section total past the safe integers. The CLI sums these itself
+ * (`cashflowTotalsOf`), so the figure is the section's, not one the engine computed.
+ */
+export function cashflowTotalSentence(date: string): string {
+	return `A cash-flow section total grew past the largest exact amount (${LIMIT} satang) on ${date}.`
+}
+
 /** The first overflow among the problems, or undefined when the engine refused for another reason. */
 export function overflowOf(
 	problems: readonly ProjectionProblem[],

@@ -27,7 +27,7 @@ export const ruleShape: Record<string, unknown> = {
 				"One or more distinct asset Accounts, as the Scenario spells their ids, summed on each Rule year's first date. Not a liability and not an Account marked `liquid: false`. An Account locked until a date is read at its full value, so the `cashflow.withdraw` list, not the portfolio, decides what can pay.",
 		},
 		rateBps: rate(
-			"The share of the portfolio the rule starts from, 1 to 10000: 400 is 4% of what the portfolio is worth.",
+			"The share of the portfolio the rule starts from, 1 to 10000: a 4% rate takes 4% of what the portfolio is worth.",
 		),
 		rounding: {
 			enum: [...ROUNDINGS],

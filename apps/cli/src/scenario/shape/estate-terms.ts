@@ -18,7 +18,7 @@ export const ESTATE_RATE_UNITS =
 
 /** The unit of an estate line's share in the decimal form: a percent string, exact to the basis point. */
 export const ESTATE_PERCENT_UNITS =
-	'A percent string of an estate line (never a JSON number), such as "1.00" for 1%, with at most two places: "1.00" is 100 basis points. The share is the caller\'s own figure: `traj` ships none.'
+	'A percent string of an estate line (never a JSON number), such as "1.00" for 1%, with at most two places, so every share is exact to the basis point. The share is the caller\'s own figure: `traj` ships none.'
 
 /** What a cost's `of` may be besides `{ accounts }`: read from the vocabulary `check()` tests against. */
 export const ESTATE_COST_BASES: readonly string[] = closed("INVALID_BASIS", ["estate", "costs"])

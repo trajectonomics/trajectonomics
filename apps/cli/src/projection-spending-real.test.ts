@@ -25,7 +25,7 @@ describe("the example's rule, in today's money", () => {
 	it("deflates the first year's amount by 3% from the plan's start as the engine counts it, to the satang", async () => {
 		const [first] = yearsOf(await run(), "retirement-spending")
 		// By hand: 2026-01-15 to 2045-01-01 is 6,926 calendar days less 5 Feb 29s, 6,921 counted days. The
-		// amount is 1,187,523 satang and 1.03^(6921/365) = 1.7516..., so the real amount is 677,996.02,
+		// amount is 1,187,523 satang and 1.03^(6921/365) = 1.7515..., so the real amount is 677,996.02,
 		// 677,996 satang once rounded, well clear of a tie. The check is on whole satang, no tolerance.
 		expect(first?.date).toBe("2045-01-01")
 		expect(minor(first?.amount ?? "0")).toBe(1_187_523n)

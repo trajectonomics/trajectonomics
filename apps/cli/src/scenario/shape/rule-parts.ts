@@ -54,10 +54,10 @@ export function bandShape(which: "upper" | "lower"): Record<string, unknown> {
 		description: `\`guardrails\` only: the ${which} guardrail. When last year's amount, grown one year by inflation, is ${past} the band around the rule's rate, the year's amount is ${move}. At least one of \`upper\` and \`lower\` is required: \`lower\` alone is a ratchet that never cuts.`,
 		properties: {
 			bps: rate(
-				`How far the withdrawal rate may drift ${past} \`rateBps\`, as a share of it: 2000 is 20% of the rate. 0 to 10000.`,
+				`How far the withdrawal rate may drift ${past} \`rateBps\`, as a share of it: a band of 20% of the rate. 0 to 10000.`,
 			),
 			adjustBps: rate(
-				`How far the amount moves when the rate leaves the band: 1000 ${which === "upper" ? "cuts it by" : "raises it by"} 10%. 0 to 10000.`,
+				`How far the amount moves when the rate leaves the band: ${which === "upper" ? "a 10% cut takes a tenth off it" : "a 10% raise adds a tenth to it"}. 0 to 10000.`,
 			),
 		},
 		required: ["bps", "adjustBps"],

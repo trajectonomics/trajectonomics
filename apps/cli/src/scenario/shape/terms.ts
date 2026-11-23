@@ -48,7 +48,7 @@ export const RULE_RATE_UNITS =
 
 /** The unit of a Spending rule's rate in the decimal form: a percent string, exact to the basis point. */
 export const PERCENT_UNITS =
-	'A percent string of a Spending rule (never a JSON number), such as "4.00" for 4%, with at most two places: "4.00" is 400 basis points. The rate is the caller\'s own figure: `traj` ships none.'
+	'A percent string of a Spending rule (never a JSON number), such as "4.00" for 4%, with at most two places, so every rate is exact to the basis point. The rate is the caller\'s own figure: `traj` ships none.'
 
 /** The unit of every rate field. */
 export const BASIS_POINTS =
