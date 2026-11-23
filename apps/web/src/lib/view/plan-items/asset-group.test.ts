@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { ErrorBody } from "../../contract"
-import { scenarioDocument } from "../../contract"
+import { type ScenarioDocument, scenarioDocument } from "../../contract"
 import { flowItems } from "../what-if/plan-items"
 import { assetCardsOf } from "./asset-card"
 import { assetDocument, realAssetById, realAssetsOf } from "./asset-document"
@@ -62,8 +62,13 @@ describe("an item edited by hand in the terminal", () => {
 	})
 })
 
+/** The plan fixture with no routing list naming an Account, so an owned asset can attach to the Baseline's bank. */
+function unrouted(): ScenarioDocument {
+	return { ...planDocument(), cashflow: { surplus: [], contribute: [], withdraw: [] } }
+}
+
 describe("an asset the Baseline holds", () => {
-	const choices = ownedChoicesOf(planDocument(), baselineRead())
+	const choices = ownedChoicesOf(unrouted(), baselineRead())
 	const draft = homeDraft({
 		ownership: "owned",
 		ownedAccount: "bank",
@@ -78,7 +83,7 @@ describe("an asset the Baseline holds", () => {
 	})
 
 	test("keeps its own id and is marked illiquid, with no purchase, and its card shows the Baseline's value", () => {
-		const base = planDocument()
+		const base = unrouted()
 		const parts = partsOf(draft, base, { isNew: true, ownedIds: ["bank"] })
 		expect(parts.account).toMatchObject({ id: "bank", liquid: false })
 		expect(parts.purchase).toBeNull()
@@ -88,7 +93,7 @@ describe("an asset the Baseline holds", () => {
 	})
 
 	test("deleting it keeps the Account declared, so the Baseline's balance still has its Account", () => {
-		const base = planDocument()
+		const base = unrouted()
 		const parts = partsOf(draft, base, { isNew: true, ownedIds: ["bank"] })
 		const removal = withoutAsset(assetDocument(base, parts, undefined), parts, true)
 		if (!removal.ok) throw new Error(removal.message)
@@ -99,7 +104,7 @@ describe("an asset the Baseline holds", () => {
 	test("is refused when no Baseline asset is chosen", () => {
 		const result = assetFromDraft(
 			{ ...draft, ownedAccount: "" },
-			{ doc: planDocument(), check: { isNew: true, ownedIds: ["bank"] } },
+			{ doc: unrouted(), check: { isNew: true, ownedIds: ["bank"] } },
 		)
 		expect(result.ok).toBe(false)
 	})

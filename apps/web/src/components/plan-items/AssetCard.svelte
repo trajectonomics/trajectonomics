@@ -36,7 +36,7 @@ const button =
 	<dl class="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
 		{#each card.rows as row (row.label)}
 			<dt class="text-muted-foreground">{row.label}</dt>
-			<dd class="min-w-0 break-words">{row.before}{#if row.amount !== null} <Money amount={row.amount} {currency} />{/if}{row.after ? ` ${row.after}` : ""}</dd>
+			<dd class="min-w-0 break-words">{row.before}{#if row.amount !== null}{" "}<Money amount={row.amount} {currency} />{/if}{row.after ? ` ${row.after}` : ""}</dd>
 		{/each}
 	</dl>
 	<div class="mt-3 min-w-0 overflow-x-auto">
@@ -48,6 +48,6 @@ const button =
 	</div>
 	<AssetFacts {card} {currency} />
 	{#if editable}
-		<AssetSwitches switches={card.switches} {plan} {contentHash} {onTry} />
+		<AssetSwitches switches={card.switches} asset={card.id} {plan} {contentHash} {onTry} />
 	{/if}
 </li>

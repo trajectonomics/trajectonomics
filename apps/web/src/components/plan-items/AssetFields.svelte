@@ -12,19 +12,21 @@ interface Props {
 	draft: AssetDraft
 	editing: boolean
 	choices: readonly OwnedChoice[]
+	/** The names of Baseline assets left out of the choices because the plan's routing names them. */
+	routed: readonly string[]
 	shown: Shown
 	/** The household's labels of the purchase and sale dates, or null where it pins none. */
 	anchors: { purchase: string | null; sale: string | null }
 	plan: string
 }
 
-let { draft = $bindable(), editing, choices, shown, anchors, plan }: Props = $props()
+let { draft = $bindable(), editing, choices, routed, shown, anchors, plan }: Props = $props()
 </script>
 
 <!-- A home or a car: every rate and share is the person's own, and none is filled in before they type it. -->
 <div class="space-y-4">
 	<p class="text-sm text-muted-foreground">Every rate and share here is your own estimate. Nothing is filled in for you.</p>
-	<AssetBasics bind:draft {editing} {choices} {shown} />
+	<AssetBasics bind:draft {editing} {choices} {routed} {shown} />
 	{#if draft.ownership === "buy"}
 		<AssetBuying bind:draft {shown} anchor={anchors.purchase} {plan} />
 	{/if}

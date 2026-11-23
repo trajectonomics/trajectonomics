@@ -5,6 +5,7 @@
  */
 import type { ErrorBody, ScenarioDocument } from "../../contract"
 import { type AssetIds, assetIds } from "./asset-ids"
+import { wordedRefusal } from "./asset-refusal-words"
 import type { Problems, Shown } from "./problems"
 
 /** The ids of the document a save sent, in list order, and the asset they belong to. */
@@ -13,11 +14,19 @@ export interface AssetLayout {
 	readonly owned: boolean
 	readonly accounts: readonly string[]
 	readonly flows: readonly string[]
+	/** The form's fields that work an amount out as a percent of the asset's value, in form order. */
+	readonly percents: readonly string[]
 }
 
 /** The layout of the document a save sends for the asset of that id. */
-export function assetLayoutOf(doc: ScenarioDocument, id: string, owned: boolean): AssetLayout {
-	return { id, owned, accounts: doc.accounts.map((a) => a.id), flows: doc.flows.map((f) => f.id) }
+export function assetLayoutOf(
+	doc: ScenarioDocument,
+	id: string,
+	owned: boolean,
+	percents: readonly string[] = [],
+): AssetLayout {
+	const accounts = doc.accounts.map((a) => a.id)
+	return { id, owned, accounts, flows: doc.flows.map((f) => f.id), percents }
 }
 
 /** The id a path segment names: the id itself, or the id at that index in the list. */
@@ -54,7 +63,7 @@ function paymentField(rest: readonly string[]): string | null {
 	return part === undefined ? "loan.principal" : `loan.${part}`
 }
 
-const NO_LAYOUT: AssetLayout = { id: "", owned: false, accounts: [], flows: [] }
+const NO_LAYOUT: AssetLayout = { id: "", owned: false, accounts: [], flows: [], percents: [] }
 
 type RoleField = (rest: readonly string[], layout: AssetLayout) => string | null
 
@@ -108,8 +117,10 @@ export function assetShown(
 	message: string | null,
 	layout: AssetLayout,
 ): Shown {
-	const refused = fieldOfAssetRefusal(refusal, layout)
-	const text = message ?? undefined
+	const named = fieldOfAssetRefusal(refusal, layout)
+	const worded = wordedRefusal(refusal, layout, named)
+	const refused = worded === null ? named : worded.field
+	const text = worded?.text ?? message ?? undefined
 	return {
 		at: (field) => problems[field] ?? (refused === field ? text : undefined),
 		general: problems["general"] ?? (refused === null ? text : undefined),

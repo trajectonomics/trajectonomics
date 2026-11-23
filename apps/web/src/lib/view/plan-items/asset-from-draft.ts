@@ -12,7 +12,7 @@ import { type AssetIds, assetIds, newAssetId } from "./asset-ids"
 import { keepingFlow } from "./asset-keeping"
 import type { AssetParts } from "./asset-parts"
 import { payoffFlow, saleCostFlow, saleFlow } from "./asset-selling"
-import { dayBefore } from "./date-before"
+import { dayBefore, monthAfter } from "./date-before"
 import { accountIds, flowIds } from "./document"
 import { slugId } from "./form"
 import type { Problems } from "./problems"
@@ -30,11 +30,20 @@ function idOf(draft: AssetDraft, existing: AssetParts | undefined, doc: Scenario
 	return newAssetId(slugId(draft.name), [...accountIds(doc), ...flowIds(doc)])
 }
 
+/**
+ * The date running costs and rent start: a month after a purchase, because the engine reads the value before that
+ * day's purchase lands and the first month would be 0.00; the typed date for an asset already owned.
+ */
+function keepingStart(draft: AssetDraft): string {
+	if (draft.ownership !== "buy") return draft.from.trim()
+	return monthAfter(draft.purchaseDate.trim()) ?? ""
+}
+
 /** The items a draft states, each over the item it replaces (`old`) so a field the form does not show is kept. */
 function itemsOf(draft: AssetDraft, ids: AssetIds, old: AssetParts | undefined): Items {
 	const buying = draft.ownership === "buy"
 	const end = draft.selling === "date" ? dayBefore(draft.saleDate.trim()) : null
-	const start = buying ? draft.purchaseDate.trim() : draft.from.trim()
+	const start = keepingStart(draft)
 	const keep = (kind: "expense" | "income", key: "running" | "rent") =>
 		keepingFlow(kind, draft, {
 			id: ids[key],

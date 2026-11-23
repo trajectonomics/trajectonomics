@@ -4,6 +4,7 @@
  * change. Nothing here is stored; the client module holds the value for the length of the tab.
  */
 import type { Json, SetChange } from "./overrides"
+import { sameJson } from "./same-json"
 
 export type WhatIf = {
 	/** The plan the changes are made against. */
@@ -60,7 +61,7 @@ export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
 }
 
 /**
- * The Sets an edited item makes: one per field whose JSON value differs from the stored item, at
+ * The Sets an edited item makes: one per field whose JSON value differs from the stored item (compared as data, not as text), at
  * `<list>.<id>.<field>`. A field the form removed is not a Set, because `traj` replaces a path and does not
  * delete one; such a change is left to the Edit that saves the document.
  */
@@ -71,9 +72,7 @@ export function itemSets(
 	edited: Record<string, Json>,
 ): SetChange[] {
 	return Object.keys(edited)
-		.filter(
-			(field) => JSON.stringify(stored[field] ?? null) !== JSON.stringify(edited[field] ?? null),
-		)
+		.filter((field) => !sameJson(stored[field] ?? null, edited[field] ?? null))
 		.map((field) => ({ path: `${list}.${id}.${field}`, value: edited[field] ?? null }))
 }
 

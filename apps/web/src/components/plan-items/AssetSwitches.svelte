@@ -5,12 +5,14 @@ import AssetSwitchItem from "./AssetSwitch.svelte"
 
 interface Props {
 	switches: readonly AssetSwitch[]
+	/** The asset the switches belong to, which each switch names. */
+	asset: string
 	plan: string
 	contentHash: string
 	onTry: () => void
 }
 
-let { switches, plan, contentHash, onTry }: Props = $props()
+let { switches, asset, plan, contentHash, onTry }: Props = $props()
 const button =
 	"rounded-md border border-border bg-card px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 </script>
@@ -20,7 +22,7 @@ const button =
 	<p class="text-xs text-muted-foreground">In a What-if, each item can be switched off, or its values tried.</p>
 	<div class="flex flex-wrap gap-x-4 gap-y-2">
 		{#each switches as item (item.id)}
-			<AssetSwitchItem {plan} {contentHash} id={item.id} label={item.label} />
+			<AssetSwitchItem {asset} {plan} {contentHash} id={item.id} label={item.label} />
 		{/each}
 	</div>
 	<button type="button" onclick={onTry} disabled={whatIfSession.saving} class={button}>Try a value</button>

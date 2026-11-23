@@ -31,6 +31,6 @@ const year = $derived(card.year)
 		<p class="text-xs text-muted-foreground">Rent and a sale are not taxed in this plan unless a Tally label is set, which this form does not set.</p>
 	{/if}
 	{#if card.outside.length > 0}
-		<p role="note" class="text-xs text-destructive">This asset was changed outside the form: {card.outside.join(", ")} no longer match what the form writes, so they are shown as ordinary items. Change it in the terminal.</p>
+		<p role="note" class="text-xs text-destructive">This asset was changed outside the form: {card.outside.join(", ")} {card.outside.length === 1 ? "no longer matches" : "no longer match"} what the form writes, so {card.outside.length === 1 ? "it is" : "they are"} shown as {card.outside.length === 1 ? "an ordinary item" : "ordinary items"}. Change it in the terminal.</p>
 	{/if}
 </div>

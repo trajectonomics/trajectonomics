@@ -4,13 +4,15 @@ import { restoreSwitch } from "../ui/restore"
 
 interface Props {
 	plan: string
+	/** The asset the item belongs to. */
+	asset: string
 	contentHash: string
 	/** The id of the asset's Flow: a switch off is a Removal of `flows.<id>`. */
 	id: string
 	label: string
 }
 
-let { plan, contentHash, id, label }: Props = $props()
+let { asset, plan, contentHash, id, label }: Props = $props()
 const path = $derived(`flows.${id}`)
 const off = $derived(whatIfSession.isOffIn(plan, path))
 
@@ -24,7 +26,7 @@ function change(control: HTMLInputElement): void {
 	<input
 		type="checkbox"
 		role="switch"
-		aria-label="Include {label} of {plan} in the what-if"
+		aria-label="Include {label} of {asset} in the what-if"
 		checked={!off}
 		disabled={whatIfSession.saving}
 		onchange={(event) => change(event.currentTarget)}

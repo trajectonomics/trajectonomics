@@ -2,6 +2,7 @@
 import { parseBps } from "../../format/bps"
 import type { AmountDraft, AssetDraft } from "./asset-draft"
 import { ROUNDINGS } from "./asset-shape"
+import { monthAfter } from "./date-before"
 import { CATEGORY_PROBLEM, isCategoryText } from "./flow-draft"
 import { isDateText, typedAmount } from "./form"
 
@@ -57,7 +58,7 @@ function keepingProblems(draft: AssetDraft, problems: Map<string, string>): void
 	}
 }
 
-/** The problems of the sale's date, which falls after the purchase when the asset is bought. */
+/** The problems of the sale's date: after the purchase, the first loan payment, and the month the costs and rent start. */
 function saleProblems(draft: AssetDraft, problems: Map<string, string>): void {
 	if (!isDateText(draft.saleDate)) {
 		problems.set("saleDate", "Enter the date as YYYY-MM-DD.")
@@ -66,6 +67,19 @@ function saleProblems(draft: AssetDraft, problems: Map<string, string>): void {
 	const bought = draft.ownership === "buy" && isDateText(draft.purchaseDate)
 	if (bought && draft.saleDate <= draft.purchaseDate) {
 		problems.set("saleDate", "The sale falls after the purchase.")
+		return
+	}
+	const first = draft.loan.firstPayment.trim()
+	if (bought && draft.paying === "loan" && isDateText(first) && draft.saleDate <= first) {
+		problems.set("saleDate", "The sale falls after the first loan payment.")
+		return
+	}
+	const kept = [draft.running, draft.rent].some((part) => part.mode !== "none")
+	if (bought && kept && draft.saleDate <= (monthAfter(draft.purchaseDate) ?? "")) {
+		problems.set(
+			"saleDate",
+			"Running costs and rent start a month after the purchase, so the sale falls after that.",
+		)
 	}
 }
 

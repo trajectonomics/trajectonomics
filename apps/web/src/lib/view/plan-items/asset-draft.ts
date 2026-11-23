@@ -83,3 +83,15 @@ export function newAssetDraft(): AssetDraft {
 		saleCost: NO_AMOUNT,
 	}
 }
+
+/** The fields of a draft that work an amount out as a percent of the asset's value, in the order the form lists them. */
+export function percentFields(draft: AssetDraft): string[] {
+	const parts: [string, AmountDraft][] = [
+		["running.rate", draft.running],
+		["rent.rate", draft.rent],
+		...(draft.selling === "date"
+			? [["saleCost.rate", draft.saleCost] as [string, AmountDraft]]
+			: []),
+	]
+	return parts.filter(([, part]) => part.mode === "percent").map(([field]) => field)
+}

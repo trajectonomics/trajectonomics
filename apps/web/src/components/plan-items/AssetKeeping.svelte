@@ -25,6 +25,9 @@ const computed = $derived(
 	{#if draft.ownership === "owned"}
 		<Field id="asset-from" label="Its costs and rent start on" hint="YYYY-MM-DD" bind:value={draft.from} problem={shown.at("from")} />
 	{/if}
+	{#if draft.ownership === "buy"}
+		<p class="text-xs text-muted-foreground">Running costs and rent start one month after the purchase, because the first month reads the value before it is bought.</p>
+	{/if}
 	<AmountFields bind:draft={draft.running} prefix="running" label="Running costs" choices={RUNNING_CHOICES} percentLabel="Percent of its value a year" growing {shown} />
 	{#if draft.running.mode !== "none"}
 		<Field id="asset-category" label="Expense category" hint="Groups its running costs on the Expenses page. Optional." bind:value={draft.category} problem={shown.at("category")} />

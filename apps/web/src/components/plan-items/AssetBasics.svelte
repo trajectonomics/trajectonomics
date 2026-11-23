@@ -17,11 +17,12 @@ interface Props {
 	editing: boolean
 	/** The assets of the Baseline an owned asset may attach to. */
 	choices: readonly OwnedChoice[]
+	routed: readonly string[]
 	shown: Shown
 }
 
-let { draft = $bindable(), editing, choices, shown }: Props = $props()
-const unavailable = $derived(ownedUnavailable(choices))
+let { draft = $bindable(), editing, choices, routed, shown }: Props = $props()
+const unavailable = $derived(ownedUnavailable(choices, routed))
 const ownerships = $derived(
 	unavailable !== null && !editing ? OWNERSHIP_CHOICES.slice(1) : OWNERSHIP_CHOICES,
 )

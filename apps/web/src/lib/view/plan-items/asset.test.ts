@@ -11,7 +11,7 @@ import {
 } from "./asset-fixtures.test-support"
 import { assetFromDraft } from "./asset-from-draft"
 import { assetDraftOf } from "./asset-read"
-import { dayBefore } from "./date-before"
+import { dayBefore, monthAfter } from "./date-before"
 import { planDocument } from "./fixtures.test-support"
 
 function ids(doc: { flows: { id: string }[]; accounts: { id: string }[] }) {
@@ -72,7 +72,7 @@ describe("the ids and items one home form writes", () => {
 		expect(flow("home-running")).toMatchObject({
 			kind: "expense",
 			frequency: "monthly",
-			start: "2027-07-15",
+			start: "2027-08-15",
 			end: "2030-07-14",
 			category: "housing",
 			derive: {
@@ -85,12 +85,20 @@ describe("the ids and items one home form writes", () => {
 		})
 	})
 
+	test("running costs and rent start one month after the purchase, which the engine reads before that day", () => {
+		expect(monthAfter("2027-07-15")).toBe("2027-08-15")
+		expect(monthAfter("2027-12-31")).toBe("2028-01-31")
+		expect(monthAfter("2027-01-31")).toBe("2027-02-28")
+		expect(monthAfter("2027-02-30")).toBeNull()
+	})
+
 	test("rent is passive income with its stated growth, and ends before the sale", () => {
 		expect(flow("home-rent")).toMatchObject({
 			kind: "income",
 			earned: false,
 			amount: "8000.00",
 			growth: { bps: 200 },
+			start: "2027-08-15",
 			end: "2030-07-14",
 		})
 	})

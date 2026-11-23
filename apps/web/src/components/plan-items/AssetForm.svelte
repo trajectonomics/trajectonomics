@@ -3,9 +3,9 @@ import { editSession } from "../../client/edit.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
 import { balanceOf } from "../../lib/view/plan-items/accounts"
 import { realAssetById } from "../../lib/view/plan-items/asset-document"
-import { newAssetDraft } from "../../lib/view/plan-items/asset-draft"
+import { newAssetDraft, percentFields } from "../../lib/view/plan-items/asset-draft"
 import { assetAnchors } from "../../lib/view/plan-items/asset-link"
-import { ownedChoicesOf } from "../../lib/view/plan-items/asset-owned"
+import { ownedChoicesOf, routedChoicesOf } from "../../lib/view/plan-items/asset-owned"
 import { assetDraftOf } from "../../lib/view/plan-items/asset-read"
 import {
 	type AssetLayout,
@@ -45,19 +45,20 @@ let {
 }: Props = $props()
 const existing = $derived(assetId === undefined ? undefined : realAssetById(doc, assetId)?.parts)
 const choices = $derived(ownedChoicesOf(doc, baseline, existing?.account.id))
+const routed = $derived(routedChoicesOf(doc, baseline, existing?.account.id))
 /** True when the Baseline holds a balance in the Account: it stays declared, or no read can run. */
 const held = $derived(existing !== undefined && balanceOf(existing.account, baseline) !== null)
 const anchors = $derived(assetAnchors(household, existing?.account.id ?? ""))
 const initial = () => (existing === undefined ? newAssetDraft() : assetDraftOf(existing))
 let draft = $state(initial())
 let problems: Problems = $state({})
-let layout: AssetLayout = $state({ id: "", owned: false, accounts: [], flows: [] })
+let layout: AssetLayout = $state({ id: "", owned: false, accounts: [], flows: [], percents: [] })
 let cleared: string[] = $state([])
 const shown = $derived(assetShown(problems, editSession.failure, editSession.error, layout))
 
 /** Saves the plan's document with the asset's change, as one Edit; the drawer closes only when it ran. */
 async function commit(next: ScenarioDocument, id: string, owned: boolean): Promise<void> {
-	layout = assetLayoutOf(next, id, owned)
+	layout = assetLayoutOf(next, id, owned, percentFields(draft))
 	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
 }
 
@@ -89,7 +90,7 @@ async function remove(): Promise<void> {
 </script>
 
 <form onsubmit={save} class="min-w-0 space-y-6" aria-label={existing ? `Edit asset ${existing.account.id}` : "Add a home or car"}>
-	<AssetFields bind:draft editing={existing !== undefined} {choices} {shown} {anchors} plan={name} />
+	<AssetFields bind:draft editing={existing !== undefined} {choices} {routed} {shown} {anchors} plan={name} />
 	{#if tryValue}
 		<p class="text-sm text-muted-foreground">A Try changes the asset's terms in the What-if. It cannot add or take out one of its items.</p>
 	{/if}

@@ -24,6 +24,21 @@ export function tryAssetInWhatIf(
 			recordOf(edited.account),
 		),
 	]
+	// A loan on both sides: its terms are Sets of its Account, as the loan form tries them. A loan that is added or
+	// taken out cannot be tried, so it is named.
+	const loan = [] as string[]
+	if (stored.loan !== null && edited.loan !== null) {
+		tried.push(
+			whatIfSession.tryItem(
+				name,
+				contentHash,
+				"accounts",
+				stored.loan.account.id,
+				recordOf(stored.loan.account),
+				recordOf(edited.loan.account),
+			),
+		)
+	} else if ((stored.loan === null) !== (edited.loan === null)) loan.push("the loan")
 	const editedFlows = flowsOf(edited)
 	const storedFlows = flowsOf(stored)
 	for (const flow of storedFlows) {
@@ -36,5 +51,5 @@ export function tryAssetInWhatIf(
 	}
 	const added = editedFlows.filter((flow) => !storedFlows.some((item) => item.id === flow.id))
 	const removed = storedFlows.filter((flow) => !editedFlows.some((item) => item.id === flow.id))
-	return [...tried.flat(), ...[...added, ...removed].map((flow) => flow.id)]
+	return [...tried.flat(), ...loan, ...[...added, ...removed].map((flow) => flow.id)]
 }
