@@ -5,6 +5,8 @@ import { money } from "./money"
 import { personAges } from "./person-age"
 import {
 	balanceRow,
+	estateLineRow,
+	estateRow,
 	liabilityRow,
 	milestoneRow,
 	paidOffRow,
@@ -72,7 +74,7 @@ export const cashflowRow = z.strictObject({
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
  * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
- * value only with `--accounts`, each spending rule's years only with `--spending`, and the milestones
+ * value only with `--accounts`, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
  * only when the Scenario declares them.
  */
 export const projectionTables = z.array(
@@ -92,6 +94,12 @@ export const projectionTables = z.array(
 			name: z.literal("spendingRules"),
 			count: integer,
 			rows: z.array(spendingRuleRow),
+		}),
+		z.strictObject({ name: z.literal("estate"), count: integer, rows: z.array(estateRow) }),
+		z.strictObject({
+			name: z.literal("estateLines"),
+			count: integer,
+			rows: z.array(estateLineRow),
 		}),
 		z.strictObject({
 			name: z.literal("milestones"),

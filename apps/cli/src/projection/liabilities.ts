@@ -10,16 +10,18 @@ import type { ProjectionTable } from "./run-view"
  * Each figure is the engine's own, formatted at the Currency's scale; none is recomputed here.
  */
 
-/** The engine's options for one run: each optional output is asked for only by its own flag (cli ADR-0058, ADR-0059). */
+/** The engine's options for one run: each optional output is asked for only by its own flag (cli ADR-0058, ADR-0059, ADR-0064). */
 export function optionsOf(
 	breakdown: boolean,
 	liabilities: boolean,
 	spending: boolean,
+	estate: boolean,
 ): ProjectionOptions {
 	return {
 		...(breakdown ? { cashflowBreakdown: true } : {}),
 		...(liabilities ? { liabilityStatements: true } : {}),
 		...(spending ? { spendingRules: true } : {}),
+		...(estate ? { estate: true } : {}),
 	}
 }
 

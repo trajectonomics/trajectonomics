@@ -2,6 +2,7 @@ import type { ProjectionRun } from "../../contract"
 import type { ReportTable } from "./table"
 import { annual, monthly } from "./table-annual"
 import { balances, milestones, paidOff, spendingRules, taxYears } from "./table-balances"
+import { estate, estateLines } from "./table-estate"
 import { cashflow, cashflowTotals, liabilities } from "./table-flows"
 
 /** The table of one projection table, as the CLI named it. */
@@ -23,6 +24,10 @@ function tableOf(table: ProjectionRun["tables"][number]): ReportTable {
 			return balances(table.rows)
 		case "spendingRules":
 			return spendingRules(table.rows)
+		case "estate":
+			return estate(table.rows)
+		case "estateLines":
+			return estateLines(table.rows)
 		case "milestones":
 			return milestones(table.rows)
 	}

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { FULL_ESTATE } from "./estate-fixture"
 import { scenarioExample } from "./index"
 import { FULL_MILESTONES } from "./milestone-fixture"
 import { OBJECT_PATHS } from "./object-paths"
@@ -140,6 +141,7 @@ const FULL: Record<string, unknown> = {
 	],
 	milestones: FULL_MILESTONES,
 	calendar: { dayRule: "next", holidays: ["2026-04-13"] },
+	estate: FULL_ESTATE,
 }
 
 /** The objects whose keys a Measure's own `op` decides, which the schema states as open. */

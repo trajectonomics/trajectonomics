@@ -33,6 +33,7 @@ export interface Route {
 	readonly needsDocument?: true
 	readonly needsMilestones?: true
 	readonly needsCashflow?: true
+	readonly needsLevy?: true
 }
 
 /** A run of pages under one heading. A heading of null is a run of pages that belong to no group. */
@@ -60,11 +61,13 @@ export function routesShown(
 	planDocument: boolean,
 	milestones = true,
 	cashflow = true,
+	levy = true,
 ): readonly Route[] {
 	return group.routes.filter(
 		(route) =>
 			(planDocument || route.needsDocument !== true) &&
 			(milestones || route.needsMilestones !== true) &&
-			(cashflow || route.needsCashflow !== true),
+			(cashflow || route.needsCashflow !== true) &&
+			(levy || route.needsLevy !== true),
 	)
 }

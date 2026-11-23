@@ -9,6 +9,7 @@ import {
 	whatIfAnswer,
 } from "./answer"
 import { startWhatIf, switchedOff, withSet } from "./session"
+import { withAddition } from "./session-items"
 
 const OK_READ = { argv: ["fi"], ok: true, data: {} }
 const FAILED = (message: string, details?: unknown) => ({
@@ -74,5 +75,23 @@ describe("the what-if answer", () => {
 			"Currency is not supported.",
 		])
 		expect(unplacedRefusals(null, session)).toEqual([])
+	})
+
+	test("a refusal naming an added item names a change, so the bar shows it only beside the item", () => {
+		const item = { id: "rmf-2026", kind: "contribution" }
+		const session = withAddition(startWhatIf("base", "jcs1:sha256:x"), { list: "flows", item })
+		const refused = whatIfAnswer.parse({
+			ok: true,
+			reads: {
+				projection: FAILED("cannot pay in", { path: "flows.rmf-2026" }),
+				fi: OK_READ,
+				compare: OK_READ,
+				chance: null,
+			},
+		})
+		const error = failedReads(refused)[0]?.error
+		if (error === undefined) throw new Error("the read failed")
+		expect(namesChange(error, session, "flows.rmf-2026")).toBe(true)
+		expect(unplacedRefusals(refused, session)).toEqual([])
 	})
 })

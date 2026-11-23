@@ -19,7 +19,9 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 		case "copy-plan": {
 			// A copy with no Overrides is the plan as it is, so its argv keeps no override flag.
 			const overrides =
-				edit.sets.length + edit.removals.length === 0 ? [] : [...overrideTokens(edit), "--decimal"]
+				edit.sets.length + edit.removals.length + edit.additions.length === 0
+					? []
+					: [...overrideTokens(edit), "--decimal"]
 			return { argv: ["scenario", "fork", edit.from, edit.name, ...overrides, ...flags] }
 		}
 		case "apply-overrides":

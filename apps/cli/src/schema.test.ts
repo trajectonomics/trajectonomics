@@ -137,6 +137,7 @@ describe("schema of the Scenario document", () => {
 			"cashflow",
 			"levies",
 			"calendar",
+			"estate",
 		])
 		expect(document.schema.additionalProperties).toBe(false)
 		expect(document.schema.description).toContain("minor units")

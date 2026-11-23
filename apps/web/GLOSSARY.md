@@ -71,3 +71,15 @@ _Avoid_: export (as the name of the table), statement, extract
 **Real asset**:
 An asset Account that is not liquid (a home or a car), with the items that buy, finance, keep, rent out and sell it, written under one id convention. The page edits them together and groups them on one card; `traj` computes its value, its costs and its loan. An item that follows the convention's id but not its shape is an ordinary item.
 _Avoid_: property, holding, fixed asset (as a kind)
+
+**Addition**:
+A new list item (a Flow, an Account or a Milestone) that a What-if session puts on the plan with its own id, which `traj` applies after the Removals and before the Sets (`--add`) and never writes until the person keeps or applies the session. The page sends the item as one argv token and lists it in the session with its own way to remove it.
+_Avoid_: new item, insert, patch
+
+**Allowance inputs**:
+The labels in the person's order, the step and the two optional limits (a yearly budget, a least saving per step) that the `projection allowances` reads are made with. They are kept with the Snapshot's parameters and never in a Scenario, so changing them is a read and writes nothing.
+_Avoid_: settings, preferences, options
+
+**Suggestion**:
+One Flow `traj projection allowances` states for a tax year and an allowance: a lump contribution of the extra that fits, with the Account it pays into, or a hint of why it has none. The page never makes one; it tries it as Additions or adds it to the plan.
+_Avoid_: recommendation, advice, tip

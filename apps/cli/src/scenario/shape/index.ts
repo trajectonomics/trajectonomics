@@ -1,6 +1,7 @@
 import { accountShape } from "./account"
 import { calendarShape } from "./calendar"
 import { cashflowShape } from "./cashflow"
+import { estateShape } from "./estate"
 import { flowShape } from "./flow"
 import { levyShape } from "./levy"
 import { milestoneShape } from "./milestone"
@@ -71,6 +72,7 @@ export function scenarioShapeProperties(version: number | undefined): Record<str
 			items: levyShape,
 		},
 		calendar: calendarShape,
+		estate: estateShape,
 	}
 }
 

@@ -57,7 +57,7 @@ const more = (what: string): OutputFlag => z.boolean().default(false).describe(w
 
 /** The flags that ask `projection run` for more than the annual roll-up (cli ADR-0027). */
 export const outputFlags: Record<
-	"monthly" | "breakdown" | "liabilities" | "accounts" | "spending",
+	"monthly" | "breakdown" | "liabilities" | "accounts" | "spending" | "estate",
 	OutputFlag
 > = {
 	monthly: more("Also report the monthly rows."),
@@ -71,6 +71,9 @@ export const outputFlags: Record<
 		"Also report each Account's value on the row at each Annual roll-up's end (the date realNetWorth states), or on every month with --monthly, nominal and real (cli ADR-0060).",
 	),
 	spending: more(
-		"Also report what each spending rule fixed and paid in each Rule year: the portfolio it read, its amount, its withdrawal rate and whether it cut, raised or hit a bound (cli ADR-0063). Without a rule Flow the table is empty.",
+		"Also report what each spending rule fixed and paid in each Rule year: the portfolio it read, its amount and what it paid (nominal and in today's money), its withdrawal rate and whether it cut, raised or hit a bound (cli ADR-0063). Without a rule Flow the table is empty.",
+	),
+	estate: more(
+		"Also report what the plan would leave on the row at each Annual roll-up's end (or on every month with --monthly): the gross estate, the debts, each cost and gift the Scenario's estate block states, and what heirs receive, nominal and in today's money (cli ADR-0064). A Scenario with no estate block is stated with no cost or gift.",
 	),
 }

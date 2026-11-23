@@ -63,10 +63,39 @@ describe("the projection run contract against the CLI's goldens", () => {
 				["2046-01-01", "12231.49", "4.19"],
 			],
 		)
+		// The same amounts in today's money, each deflated by the engine at the Rule year's first date (cli ADR-0063).
+		expect(rules.rows.slice(0, 2).map((row) => [row.realAmount, row.realPaid])).toEqual([
+			["6779.96", "6779.96"],
+			["6779.96", "6779.96"],
+		])
 		expect(rules.rows.map((row) => row.action)).toContain("cut")
 		const raised = projectionRun.parse(await golden("run-spending-raise.output"))
 		const years = raised.tables.find((table) => table.name === "spendingRules")
 		expect(years?.rows.map((row) => row.action)).toEqual(["none", "raise", "raise", "cut", "cut"])
+	})
+
+	it("parses --estate's output: the estate and each cost and gift on each roll-up's end (cli ADR-0064)", async () => {
+		const run = projectionRun.parse(await golden("run-estate.output"))
+		const estate = run.tables.find((table) => table.name === "estate")
+		if (estate?.name !== "estate") throw new Error("the output has no estate table")
+		expect(estate.rows[2]).toEqual({
+			date: "2029-01-15",
+			gross: "56310.72",
+			debts: "26445.43",
+			costs: "1033.57",
+			net: "28831.72",
+			gifts: "1441.59",
+			toHeirs: "27390.13",
+			realNet: "26385.10",
+			realToHeirs: "25065.84",
+		})
+		const lines = run.tables.find((table) => table.name === "estateLines")
+		if (lines?.name !== "estateLines") throw new Error("the output has no estateLines table")
+		expect(lines.rows.filter((row) => row.date === "2029-01-15").map((row) => row.line)).toEqual([
+			"settlement",
+			"home-selling",
+			"temple",
+		])
 	})
 
 	it("refuses a section the contract does not name", async () => {

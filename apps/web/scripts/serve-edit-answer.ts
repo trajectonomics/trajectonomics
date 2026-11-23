@@ -3,6 +3,7 @@
 import type { ErrorBody } from "../src/lib/contract"
 import { nestsPast } from "../src/lib/edit/depth"
 import { type Edit, editSchema } from "../src/lib/edit/edit"
+import { type Reread, rereadSchema } from "../src/lib/edit/reread"
 import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
 
@@ -68,4 +69,25 @@ export async function readWhatIf(
 	return parsed?.success
 		? { ok: true, whatIf: parsed.data }
 		: invalid("The what-if is not one the Dashboard may send.")
+}
+
+/** Reads the body of a reread: refused when it is not JSON, nests too deep, or holds more than the allowance inputs. */
+export async function readReread(
+	request: Request,
+): Promise<{ ok: true; reread: Reread } | { ok: false; error: ErrorBody }> {
+	const invalid = (message: string) => ({
+		ok: false as const,
+		error: { code: "invalid_reread", exitCode: REFUSED_EXIT_CODE, message },
+	})
+	let value: unknown
+	try {
+		value = await request.json()
+	} catch {
+		return invalid("The reread is not JSON.")
+	}
+	if (nestsPast(value)) return invalid("The reread nests deeper than the Dashboard sends.")
+	const parsed = safely(() => rereadSchema.safeParse(value))
+	return parsed?.success
+		? { ok: true, reread: parsed.data }
+		: invalid("The reread is not one the Dashboard may send.")
 }

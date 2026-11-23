@@ -17,6 +17,7 @@ export const PARAMS: PlanParams = {
 	monthly: false,
 	carryIn: false,
 	chance: null,
+	allowances: null,
 }
 
 /** Headers of a request the page sends: this Host, this Origin, the token, and application/json. */

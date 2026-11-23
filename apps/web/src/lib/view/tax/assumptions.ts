@@ -1,4 +1,4 @@
-import type { Assumption, TaxYear } from "../../contract"
+import type { Assumption } from "../../contract"
 
 /** One unconfirmed tax figure as the Tax page lists it: its path and a sentence saying what it is. */
 export interface AssumptionLine {
@@ -15,7 +15,9 @@ function figureOf(assumption: Assumption): string {
  * The assumptions of every tax year, each figure once, in the order the CLI states them. A figure
  * the CLI names is shown as the CLI states it: this page holds no figure and judges none.
  */
-export function assumptionLines(years: readonly TaxYear[]): readonly AssumptionLine[] {
+export function assumptionLines(
+	years: readonly { readonly assumptions: readonly Assumption[] }[],
+): readonly AssumptionLine[] {
 	const seen = new Map<string, AssumptionLine>()
 	for (const assumption of years.flatMap((year) => year.assumptions)) {
 		if (seen.has(assumption.path)) continue

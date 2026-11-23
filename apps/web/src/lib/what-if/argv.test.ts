@@ -14,12 +14,14 @@ const PARAMS: PlanParams = {
 	monthly: false,
 	carryIn: false,
 	chance: null,
+	allowances: null,
 }
 
 const WHAT_IF: WhatIfBody = {
 	plan: "base",
 	sets: [{ path: "flows.salary.amount", value: "90000.50" }],
 	removals: ["flows.gym"],
+	additions: [],
 }
 
 describe("the reads of a what-if", () => {
@@ -93,6 +95,7 @@ describe("the reads of a what-if", () => {
 			plan: " early",
 			sets: [{ path: "flows.a.name", value: "x=y" }],
 			removals: [],
+			additions: [],
 		})
 		expect(reads.projection.argv).toContain('--set=flows.a.name="x=y"')
 		expect(reads.projection.argv).toContain("--scenario= early")
@@ -130,7 +133,7 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("a what-if with no change reads the plan as it is, with no override flag but --decimal", () => {
-		const reads = whatIfReads(PARAMS, { plan: "base", sets: [], removals: [] })
+		const reads = whatIfReads(PARAMS, { plan: "base", sets: [], removals: [], additions: [] })
 		expect(reads.projection.argv).not.toContain("--without=flows.gym")
 		expect(reads.projection.argv.filter((token) => token.startsWith("--set"))).toEqual([])
 		expect(reads.projection.argv.at(-2)).toBe("--decimal")

@@ -2,8 +2,8 @@ import type { AnnualRollup, ProjectionBalance, ProjectionRow } from "@trajectono
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"
 import type { BalanceRow, BalancesTable } from "./balances-view"
+import { endRowsOf } from "./ends"
 import { moneyOf } from "./money"
-import { rowAtEnd } from "./rows"
 
 /*
  * `projection run --accounts`' rows (cli ADR-0060): the engine's own per-Account balances in the
@@ -63,17 +63,8 @@ export function balancesTableOf(
 	order: readonly string[],
 	currency: string,
 ): BalancesTable | AppError {
-	const ends: ProjectionRow[] = []
-	for (const rollup of rollups) {
-		const end = rowAtEnd(rollup, rows)
-		if (end === undefined) {
-			return fail("internal", {
-				message: `The roll-up ending ${rollup.to} has no monthly row on that day or the next.`,
-			})
-		}
-		// A one-day last roll-up ends on the row the one before it ended on: its balances are stated once.
-		if (ends.at(-1)?.date !== end.date) ends.push(end)
-	}
+	const ends = endRowsOf(rollups, rows)
+	if (isAppError(ends)) return ends
 	const out: BalanceRow[] = []
 	for (const row of monthly ? rows : ends) {
 		const balances = balanceRowsOf(row, order, currency)

@@ -148,21 +148,9 @@ describe("projection run", () => {
 		const data = JSON.parse(res.out)
 		expect(data.name).toBe("projection run")
 		expect(data.positionals).toEqual([])
-		expect(Object.keys(data.input.properties).sort()).toEqual([
-			"accounts",
-			"add",
-			"asOf",
-			"breakdown",
-			"carryIn",
-			"decimal",
-			"horizon",
-			"liabilities",
-			"monthly",
-			"scenario",
-			"set",
-			"spending",
-			"without",
-		])
+		expect(Object.keys(data.input.properties).sort().join(" ")).toBe(
+			"accounts add asOf breakdown carryIn decimal estate horizon liabilities monthly scenario set spending without",
+		)
 		expect(data.input.required.sort()).toEqual(["asOf", "horizon", "scenario"])
 		expect(data.output.properties.tables.type).toBe("array")
 		expect(data.output.properties.carryIn.type).toBe("array")

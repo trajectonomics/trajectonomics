@@ -15,6 +15,8 @@ interface Props {
 	milestones?: boolean
 	/** Whether the selected plan's projection has its cash flow table: the Cash flow page is listed only then. */
 	cashflow?: boolean
+	/** Whether the selected plan has a Levy: the Optimize pages are listed only then. */
+	levy?: boolean
 }
 
 let {
@@ -23,6 +25,7 @@ let {
 	planDocument = true,
 	milestones = true,
 	cashflow = true,
+	levy = true,
 }: Props = $props()
 </script>
 
@@ -36,7 +39,7 @@ let {
 				</h2>
 			{/if}
 			<ul class="space-y-1">
-				{#each routesShown(group, planDocument, milestones, cashflow) as route (route.path)}
+				{#each routesShown(group, planDocument, milestones, cashflow, levy) as route (route.path)}
 					{@const isCurrent = route.path === current}
 					<li>
 						<SiteLink

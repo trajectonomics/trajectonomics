@@ -3,7 +3,7 @@ import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
 import { isNode, moneyUnitOf, type Node, PUBLISHED, rateUnitOf } from "./money-fields"
 import { DECIMAL_UNITS_SENTENCE, MINOR_UNITS_SENTENCE } from "./shape/description"
-import { DECIMAL_UNITS, PERCENT_UNITS } from "./shape/terms"
+import { DECIMAL_UNITS } from "./shape/terms"
 
 /*
  * The decimal form as `traj schema` publishes it (ADR-0047): the minor-unit form's own schema with
@@ -43,12 +43,12 @@ function decimalNode(node: unknown): unknown {
 	}
 	const rate = rateUnitOf(node)
 	if (rate === undefined) return copy
-	const rest = String(node["description"]).slice(rate.length)
+	const rest = String(node["description"]).slice(rate.stored.length)
 	return {
 		...copy,
 		type: "string",
 		pattern: PERCENT_PATTERN,
-		description: `${PERCENT_UNITS}${rest}`,
+		description: `${rate.percent}${rest}`,
 	}
 }
 

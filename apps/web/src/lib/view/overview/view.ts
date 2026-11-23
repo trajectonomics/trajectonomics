@@ -1,4 +1,5 @@
 import type { Read, Snapshot } from "../../contract"
+import { type AllowancesSummary, allowancesSummaryOf } from "../allowances/home"
 import { type ChanceSummary, chanceSummaryOf } from "../chance/page"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
 import { type FiView, fiView } from "./fi"
@@ -22,6 +23,8 @@ export interface OverviewView {
 	readonly fi: ScenarioView<FiView>
 	readonly projection: ScenarioView<ProjectionView | null>
 	readonly chance: ScenarioView<ChanceSummary>
+	/** Tax the current year could still save; shown only when it is above zero (null summary: not shown). */
+	readonly allowances: ScenarioView<AllowancesSummary | null>
 	readonly tax: ScenarioView<TaxView>
 	readonly pnl: Read<PnlView>
 	readonly health: Read<HealthView>
@@ -42,6 +45,7 @@ export function overviewView(snapshot: Snapshot): OverviewView {
 		fi: mapScenario(scenarioView(scenario, snapshot.reads.fi), fiView),
 		projection: mapScenario(projections, projectionView),
 		chance: mapScenario(scenarioView(scenario, snapshot.reads.chance), chanceSummaryOf),
+		allowances: mapScenario(scenarioView(scenario, snapshot.reads.allowances), allowancesSummaryOf),
 		tax: mapScenario(projections, taxView),
 		pnl: mapRead(snapshot.reads.pnl, pnlView),
 		health: mapRead(snapshot.reads.doctor, healthView),

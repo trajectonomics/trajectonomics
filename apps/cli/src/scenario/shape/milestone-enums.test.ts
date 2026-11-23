@@ -17,6 +17,7 @@ const EXPENSE = { kind: "expense", amount: 1, frequency: "monthly", growth: { bp
 function probe(milestones: unknown[]): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: [CASH],
 		flows: [{ id: "flow", start: "2026-01-01", ...EXPENSE }],
 		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },

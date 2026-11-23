@@ -17,10 +17,16 @@ export type WhatIfReads = {
 	chance: PlannedRead | null
 }
 
-/** One `--without=<path>` per Removal, then one `--set=<path>=<json>` per Set: each value is one token. */
-export function overrideTokens(whatIf: Pick<WhatIfBody, "sets" | "removals">): string[] {
+/**
+ * One `--without=<path>` per Removal, then one `--add=<list>=<json>` per Addition, then one `--set=<path>=<json>`
+ * per Set: the order `traj` applies them in (cli ADR 0062), and each value is one token.
+ */
+export function overrideTokens(
+	whatIf: Pick<WhatIfBody, "sets" | "removals"> & { additions?: WhatIfBody["additions"] },
+): string[] {
 	return [
 		...whatIf.removals.map((path) => `--without=${path}`),
+		...(whatIf.additions ?? []).map((one) => `--add=${one.list}=${JSON.stringify(one.item)}`),
 		...whatIf.sets.map((set) => `--set=${set.path}=${JSON.stringify(set.value)}`),
 	]
 }

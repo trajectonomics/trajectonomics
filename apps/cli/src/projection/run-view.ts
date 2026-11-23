@@ -3,6 +3,7 @@ import { type BalancesTable, balancesTable } from "./balances-view"
 import { carryInField } from "./carryin-view"
 import { type CashflowTotalsTable, cashflowTotalsTable } from "./cashflow-totals-view"
 import { type CashflowRow, cashflowRow } from "./cashflow-view"
+import { type EstateTables, estateTables } from "./estate-view"
 import {
 	type LiabilityMonthsTable,
 	liabilityMonthsTable,
@@ -31,7 +32,7 @@ export type { TaxYearView } from "./tax-view"
 
 /**
  * The Projection's annual roll-up, its monthly rows with `--monthly`, its cash flow with `--breakdown`
- * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060), each spending rule's years with `--spending` (cli ADR-0063) and its milestones (cli ADR-0049).
+ * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059), each Account's value with `--accounts` (cli ADR-0060), each spending rule's years with `--spending` (cli ADR-0063), the estate with `--estate` (cli ADR-0064) and its milestones (cli ADR-0049).
  */
 export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
@@ -42,6 +43,7 @@ export type ProjectionTable =
 	| PaidOffTable
 	| BalancesTable
 	| SpendingRulesTable
+	| EstateTables
 	| MilestonesTable
 
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
@@ -80,6 +82,7 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 	paidOffTable,
 	balancesTable,
 	spendingRulesTable,
+	...estateTables,
 	milestonesTable,
 ])
 
@@ -100,6 +103,6 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, what the plan would leave and each cost and gift when --estate was given, and the milestones when the Scenario declares them.",
 		),
 })

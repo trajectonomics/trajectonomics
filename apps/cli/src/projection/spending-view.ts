@@ -11,7 +11,7 @@ import { dateField, moneyField } from "./money"
 export const RULE_ACTIONS = ["none", "floor", "ceiling", "cut", "raise"] as const
 
 /**
- * One Rule year of one rule Flow. Money is a decimal string; `withdrawalRate` is a percent string
+ * One Rule year of one rule Flow. Money is a decimal string, and `realAmount` and `realPaid` are the amount and what was paid in today's money; `withdrawalRate` is a percent string
  * (`"4.00"`), absent when the portfolio was worth nothing, and can be above 100 when the year's amount
  * is more than a depleted portfolio is worth.
  */
@@ -20,7 +20,9 @@ export type SpendingRuleRow = {
 	date: string
 	portfolio: string
 	amount: string
+	realAmount: string
 	paid: string
+	realPaid: string
 	withdrawalRate?: string | undefined
 	action: (typeof RULE_ACTIONS)[number]
 }
@@ -30,8 +32,14 @@ export const spendingRuleRow: z.ZodType<SpendingRuleRow> = z.strictObject({
 	date: dateField("The Landed date the Rule year began on, when its amount was fixed"),
 	portfolio: moneyField("What the rule's portfolio was worth on that date, before any Flow landed"),
 	amount: moneyField("The yearly amount the rule fixed for the Rule year"),
+	realAmount: moneyField(
+		"The same yearly amount in today's money (the start of the Timeline), deflated once at the Rule year's first date as the row's realNetWorth is",
+	),
 	paid: moneyField(
 		"What the year's occurrences paid: the whole amount, or fewer when the horizon or a Shortfall ends the year. An occurrence a Shortfall fell on counts in full",
+	),
+	realPaid: moneyField(
+		"What the year paid in today's money, deflated once at the Rule year's first date",
 	),
 	withdrawalRate: z
 		.string()
