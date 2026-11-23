@@ -14,17 +14,29 @@ export function runsOutView(runsOut: RunsOut | undefined, currency: string): Run
 }
 
 /**
- * The real figure at an annual roll-up's end. The engine's roll-up is nominal only and its last
- * day is the day before the anniversary, which has no monthly row, so this takes the row dated
- * that day, or the next day's row, and never presents it as `closingNetWorth` (ADR-0030).
+ * The monthly row a roll-up's end is read at. The roll-up's last day is the day before the
+ * anniversary, which has no monthly row, so this takes the row dated that day, or the next day's.
+ */
+export function rowAtEnd(
+	rollup: AnnualRollup,
+	rows: readonly ProjectionRow[],
+): ProjectionRow | undefined {
+	return (
+		rows.find((row) => row.date === rollup.to) ??
+		rows.find((row) => row.date === addDays(rollup.to, 1))
+	)
+}
+
+/**
+ * The real figure at an annual roll-up's end. The engine's roll-up is nominal only, so this takes
+ * the row at its end (`rowAtEnd`) and never presents it as `closingNetWorth` (ADR-0030).
  */
 export function realNetWorthOf(
 	rollup: AnnualRollup,
 	rows: readonly ProjectionRow[],
 	currency: string,
 ): AnnualRow["realNetWorth"] | AppError {
-	const onDay = rows.find((row) => row.date === rollup.to)
-	const found = onDay ?? rows.find((row) => row.date === addDays(rollup.to, 1))
+	const found = rowAtEnd(rollup, rows)
 	if (found === undefined) {
 		// The decided guard for an engine change (OD6): stop rather than print a figure that is not
 		// net worth at the roll-up's end.

@@ -107,6 +107,8 @@ describe("the money fields of the decimal form", () => {
 			{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
 			{ id: "loan", kind: "liability", rate: 500, compounding: "monthly" },
 			{ id: "car", kind: "liability", rate: 600, compounding: "monthly" },
+			{ id: "home", kind: "asset", rate: 300, liquid: false },
+			{ id: "home-loan", kind: "liability", rate: 500, compounding: "monthly" },
 		])
 		expect(decimal["economy"]).toEqual({ inflation: 300 })
 	})

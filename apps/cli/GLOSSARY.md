@@ -30,6 +30,10 @@ _Avoid_: Run, output
 The lines one Annual roll-up of a Projection is made of, by source, tax, category and Account, as the engine routed them (`projection run --breakdown`, ADR-0058). Each total is the engine's figure or an exact sum of its lines, and money in plus unmet equals money out.
 _Avoid_: Cash-flow statement, budget, flow report
 
+**Real asset**:
+A home, a car or another thing owned that stays in net worth but is not spent: not a model of its own, but an asset Account marked `liquid: false` that no routing list names, an obligation Contribution that buys it, an optional loan, Flows whose amounts read its value, and a planned withdrawal that sells it, with a payoff that repays its loan from the sale (ADR-0060). Its ids follow `<asset>-purchase`, `-running`, `-rent`, `-sale`, `-loan` and `-loan-payoff`, a convention the Dashboard writes and reads that the core never sees.
+_Avoid_: Property (as a type), fixed asset, holding
+
 **As-of**:
 The date a result is evaluated at. Every result states it.
 _Avoid_: Today, now, snapshot date

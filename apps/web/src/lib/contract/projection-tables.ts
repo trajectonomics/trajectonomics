@@ -82,6 +82,17 @@ export const paidOffRow = z.strictObject({
 })
 
 /**
+ * One Account's value on the date of a roll-up's end, or of a monthly row, nominal and real (cli
+ * ADR-0060). A liability's amount is what is owed, positive.
+ */
+export const balanceRow = z.strictObject({
+	date: dateString,
+	account: z.string(),
+	amount: money,
+	real: money,
+})
+
+/**
  * One Milestone's fire date: the date it fired, or null when it did not fire by the Projection's end
  * (cli ADR-0049). Rows come in Scenario order.
  */
@@ -93,8 +104,8 @@ export const milestoneRow = z.strictObject({
 
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
- * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, and the milestones only when the
- * Scenario declares them.
+ * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
+ * value only with `--accounts`, and the milestones only when the Scenario declares them.
  */
 export const projectionTables = z.array(
 	z.discriminatedUnion("name", [
@@ -108,6 +119,7 @@ export const projectionTables = z.array(
 		}),
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
+		z.strictObject({ name: z.literal("balances"), count: integer, rows: z.array(balanceRow) }),
 		z.strictObject({
 			name: z.literal("milestones"),
 			count: integer,

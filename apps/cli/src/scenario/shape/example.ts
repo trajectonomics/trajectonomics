@@ -1,3 +1,5 @@
+import { HOME_ACCOUNTS, HOME_FLOWS } from "./example-home"
+
 /**
  * The one worked example `traj schema scenario apply` publishes: a salary, rent, a monthly
  * investment, a debt payment, a locked retirement Account and a car loan, so every unit and every
@@ -20,6 +22,7 @@ const EXAMPLE_BODY = {
 		{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
 		{ id: "loan", kind: "liability", rate: 500 },
 		{ id: "car", kind: "liability", rate: 600, compounding: "monthly" },
+		...HOME_ACCOUNTS,
 	],
 	flows: [
 		{
@@ -75,6 +78,7 @@ const EXAMPLE_BODY = {
 			start: "2027-02-01",
 			level: { principal: 2_400_000, payments: 60, rounding: "ceil" },
 		},
+		...HOME_FLOWS,
 	],
 	milestones: [
 		{

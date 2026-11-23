@@ -49,3 +49,23 @@ export const fiHorizonFlag: z.ZodString = z
 	.describe(
 		"The date the Projection ends at, as YYYY-MM-DD: the last date the plan has to fund, for example the age-95 date. FI means the money lasts until it, so a later horizon can move the FI date later.",
 	)
+
+type OutputFlag = z.ZodDefault<z.ZodBoolean>
+
+/** One yes-or-no flag for more output: off unless given, so a run without it keeps its bytes. */
+const more = (what: string): OutputFlag => z.boolean().default(false).describe(what)
+
+/** The flags that ask `projection run` for more than the annual roll-up (cli ADR-0027). */
+export const outputFlags: Record<"monthly" | "breakdown" | "liabilities" | "accounts", OutputFlag> =
+	{
+		monthly: more("Also report the monthly rows."),
+		breakdown: more(
+			"Also report each Annual roll-up's cash flow by source, tax, category and Account.",
+		),
+		liabilities: more(
+			"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
+		),
+		accounts: more(
+			"Also report each Account's value on the row at each Annual roll-up's end (the date realNetWorth states), or on every month with --monthly, nominal and real (cli ADR-0060).",
+		),
+	}
