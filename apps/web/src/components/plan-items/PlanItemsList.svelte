@@ -1,10 +1,10 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
-import { accountCards } from "../../lib/view/plan-items/accounts"
-import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import { loanCards } from "../../lib/view/plan-items/loans"
+import { accountItems, flowItems } from "../../lib/view/what-if/plan-items"
 import EmptyState from "../ui/EmptyState.svelte"
 import AccountCards from "./AccountCards.svelte"
 import FlowCards from "./FlowCards.svelte"
@@ -37,12 +37,9 @@ function setDrawer(next: { id?: string; tryValue?: boolean } | null): void {
 	drawer = next
 }
 const noun = $derived(PLAN_PAGES[kind].noun)
-const cards = $derived(
-	kind === "assets"
-		? []
-		: flowCards(doc.flows, kind === "expense" ? "expense" : "income", household),
-)
-const accounts = $derived(accountCards(doc.accounts, baseline))
+const changes = $derived(whatIfSession.changesFor(name))
+const flows = $derived(flowItems(doc, kind, household, changes))
+const accounts = $derived(accountItems(doc, baseline, changes))
 const loans = $derived(kind === "assets" ? loanCards(doc.flows) : [])
 const busy = $derived(editSession.busy)
 </script>
@@ -62,11 +59,12 @@ const busy = $derived(editSession.busy)
 		{/if}
 	</div>
 	{#if kind === "assets"}
-		{#if accounts.length === 0}
+		{#if accounts.cards.length === 0}
 			<EmptyState title="No accounts in this plan" />
 		{:else}
 			<AccountCards
-			cards={accounts}
+			cards={accounts.cards}
+			marks={accounts.marks}
 			currency={doc.currency}
 			{editable}
 			plan={name}
@@ -78,11 +76,12 @@ const busy = $derived(editSession.busy)
 		{#if loans.length > 0}
 			<LoanCards cards={loans} currency={doc.currency} />
 		{/if}
-	{:else if cards.length === 0}
+	{:else if flows.cards.length === 0}
 		<EmptyState title="No {noun} in this plan" />
 	{:else}
 		<FlowCards
-			{cards}
+			cards={flows.cards}
+			marks={flows.marks}
 			currency={doc.currency}
 			{editable}
 			plan={name}

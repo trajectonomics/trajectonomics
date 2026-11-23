@@ -1,8 +1,10 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
+import MilestonesWhatIf from "../what-if/MilestonesWhatIf.svelte"
 import MilestonesBody from "./MilestonesBody.svelte"
 
 interface Props {
@@ -24,9 +26,13 @@ const read = $derived(name === null ? undefined : projections[name])
 {#if name === null || read === undefined}
 	<EmptyState title="No Scenario to show milestones for" />
 {:else}
+	{@const lens = whatIfSession.lensFor(name)}
+	<div class="space-y-8">
+	{#if lens}<MilestonesWhatIf {lens} />{/if}
 	<ReadView {read} label={`Milestones of ${name}`}>
 		{#snippet children(run)}
 			<MilestonesBody {run} argv={read.argv} {terms} {onTerms} />
 		{/snippet}
 	</ReadView>
+	</div>
 {/if}
