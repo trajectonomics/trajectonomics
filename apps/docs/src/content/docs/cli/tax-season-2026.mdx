@@ -31,11 +31,14 @@ Give your Agent these facts for 2026 before it runs anything:
   - donations counted twice (`--donation2x`) and counted once (`--donation1x`)
   - children (`--children`), parents you support (`--parents`), a relative in your care with a
     disability (`--disabled-care`), and your filing status (`--filing-status`)
-  - retirement funds you paid into in 2026: RMF, SSF, provident fund, pension life insurance, and
+  - retirement funds you paid into in 2026: RMF, provident fund, pension life insurance, and
     ThaiESG units
 
 Retirement funds and ThaiESG are not flags. The Agent labels the contribution flow instead, such as
 `rmf=allowance.retirement.rmf`, so `traj` deducts the amount you actually paid.
+
+SSF units bought in 2026 are not deductible. The SSF deduction covered income received from 2020 to
+2024 only, so `traj` deducts nothing on the SSF label for 2026.
 
 Your Agent converts Buddhist Era years in your documents (B.E. 2569 is 2026), and it asks you when a
 fact is missing rather than guessing.
