@@ -63,6 +63,11 @@ describe("the projection run contract against the CLI's goldens", () => {
 				["2046-01-01", "12231.49", "4.19"],
 			],
 		)
+		// The same amounts in today's money, each deflated by the engine at the Rule year's first date (cli ADR-0063).
+		expect(rules.rows.slice(0, 2).map((row) => [row.realAmount, row.realPaid])).toEqual([
+			["6779.96", "6779.96"],
+			["6779.96", "6779.96"],
+		])
 		expect(rules.rows.map((row) => row.action)).toContain("cut")
 		const raised = projectionRun.parse(await golden("run-spending-raise.output"))
 		const years = raised.tables.find((table) => table.name === "spendingRules")

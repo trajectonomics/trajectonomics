@@ -33,7 +33,7 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 		command:
 			"traj projection run --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --spending --json",
 		description:
-			"The annual roll-up of a Scenario with a spending rule, with the portfolio, amount, withdrawal rate and action of each Rule year.",
+			"The annual roll-up of a Scenario with a spending rule, with the portfolio, amount (nominal and in today's money), withdrawal rate and action of each Rule year.",
 	},
 	{
 		command:

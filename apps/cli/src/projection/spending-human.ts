@@ -10,7 +10,9 @@ const COLUMNS: readonly ColumnHint[] = [
 	{ key: "date", label: "date" },
 	{ key: "portfolio", label: "portfolio", align: "right" },
 	{ key: "amount", label: "amount", align: "right" },
+	{ key: "realAmount", label: "realAmount", align: "right" },
 	{ key: "paid", label: "paid", align: "right" },
+	{ key: "realPaid", label: "realPaid", align: "right" },
 	// Absent from a row whose portfolio was worth nothing; the column prints when any row states it.
 	{ key: "withdrawalRate", label: "withdrawalRate", align: "right", optional: true },
 	{ key: "action", label: "action" },

@@ -7,7 +7,7 @@ import type { SpendingRuleRow, SpendingRulesTable } from "./spending-view"
 
 /*
  * `projection run --spending`'s rows (cli ADR-0063): the engine's own Rule years in the CLI's money.
- * Each figure is the engine's; the withdrawal rate is its basis points written as a percent.
+ * Each figure is the engine's, the real ones deflated by the engine at the Rule year's first date; the withdrawal rate is its basis points written as a percent.
  */
 
 /** One row per rule Flow and Rule year, in the engine's order, which is the Scenario's for the Flows. */
@@ -22,7 +22,9 @@ export function spendingRowsOf(
 			date: year.date,
 			portfolio: money(year.portfolio),
 			amount: money(year.amount),
+			realAmount: money(year.real.amount),
 			paid: money(year.paid),
+			realPaid: money(year.real.paid),
 			// Absent when the engine states none: the portfolio was worth nothing that day.
 			...(year.withdrawalRateBps === undefined
 				? {}

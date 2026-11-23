@@ -50,7 +50,7 @@ export const milestoneRow = z.strictObject({
 
 /**
  * One Rule year of one spending-rule Flow (cli ADR-0063): the portfolio the rule read, the amount it
- * fixed, what the year paid, the amount's share of the portfolio as a percent string (absent when the
+ * fixed, what the year paid, each also in today's money, the amount's share of the portfolio as a percent string (absent when the
  * portfolio was worth nothing) and what the rule did to the amount.
  */
 export const spendingRuleRow = z.strictObject({
@@ -58,7 +58,9 @@ export const spendingRuleRow = z.strictObject({
 	date: dateString,
 	portfolio: money,
 	amount: money,
+	realAmount: money,
 	paid: money,
+	realPaid: money,
 	withdrawalRate: z.string().optional(),
 	action: z.enum(["none", "floor", "ceiling", "cut", "raise"]),
 })

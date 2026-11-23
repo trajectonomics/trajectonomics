@@ -47,8 +47,10 @@ one; it publishes the document form and states the engine's statement and Bands.
   sits on. `scenario apply` states a worded code's sentence as well (the document form's refusal read the code
   and its path only, so the sentences of the loan and trade codes now reach it too).
 - **`--spending` states each Rule year.** `projection run --spending` adds a `spendingRules` table (ADR-0027), present
-  only with the flag: one row per rule Flow and Rule year, in Scenario order, `{ flow, date, portfolio, amount, paid,
-  withdrawalRate, action }`. Money is a decimal string; `withdrawalRate` is the engine's `withdrawalRateBps` as a percent
+  only with the flag: one row per rule Flow and Rule year, in Scenario order, `{ flow, date, portfolio, amount,
+  realAmount, paid, realPaid, withdrawalRate, action }`. Money is a decimal string, and `realAmount` and `realPaid` are
+  the engine's figures in today's money (sim ADR-0023, #385), each deflated once at the Rule year's first date as the
+  row's `realNetWorth` is, so a full year's `realPaid` is its `realAmount`; `withdrawalRate` is the engine's `withdrawalRateBps` as a percent
   string, absent when the portfolio was worth nothing, and not capped (it exceeds `"100.00"` on a depleted
   portfolio); `action` is the engine's (`none`, `floor`, `ceiling`, `cut`, `raise`). `paid` is the engine's, which
   counts the Occurrence a Shortfall fell on in full. A plan with no rule Flow gets an empty table. The human form
@@ -80,10 +82,11 @@ one; it publishes the document form and states the engine's statement and Bands.
 
 ## Consequences
 
-- **`realAmount` is not stated.** The engine's Rule year has no real (start-of-timeline) amount, and the CLI computes
-  no money, so `--spending` states nominal figures only; a Dashboard that shows spending in real terms needs the
-  engine to state it, as it states `realNetWorth`. The `realBalances` of `--accounts` are not a substitute. #385 adds
-  it to the engine's Rule year; `--spending` states it in a follow-up.
+- **`realAmount` and `realPaid` are stated.** They were not at first: the engine's Rule year had no real
+  (start-of-timeline) amount, and the CLI computes no money, so `--spending` stated nominal figures only. #385 added
+  `real: { amount, paid }` to the engine's Rule year, and the table now states both as decimal strings, so a Dashboard
+  that shows spending in today's money reads them and adds nothing (web ADR-0002). A run without `--spending` is
+  unchanged. `projection chance`'s spending Bands stay nominal, as the engine states them.
 - **The example's wealth criterion changed**, so every document or golden that holds the example's `retire` Milestone
   changed with it (`run-accounts.output`'s Scenario hash); its figures did not, because that run ends before 2045.
 - **A Milestone with a `next12Months` Metric beside a home** is refused whatever a rule's `startAt` says, because the
