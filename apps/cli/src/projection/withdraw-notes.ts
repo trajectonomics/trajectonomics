@@ -6,9 +6,10 @@ type Unlisted = { id: string; amount: number }
 
 /**
  * The asset Accounts the engine could have drawn on at `runsOut.date` had `cashflow.withdraw`
- * listed them: unlocked, not listed, and holding money in the row the Projection keeps for that
- * date. The withdrawal step never touches an unlisted Account, so that row's balance is exactly
- * what it could have given.
+ * listed them: unlocked, not marked `liquid: false`, not listed, and holding money in the row the
+ * Projection keeps for that date. A marked Account is one `check()` refuses in `cashflow.withdraw`
+ * (ILLIQUID_ROUTED), so suggesting it would only be refused. The withdrawal step never touches an
+ * unlisted Account, so that row's balance is exactly what it could have given.
  */
 function unlistedAssets(
 	document: Scenario,
@@ -26,6 +27,7 @@ function unlistedAssets(
 		.filter(
 			(account) =>
 				account.kind === "asset" &&
+				account.liquid !== false &&
 				!listed.has(account.id) &&
 				(account.lockedUntil ?? runsOut.date) <= runsOut.date,
 		)

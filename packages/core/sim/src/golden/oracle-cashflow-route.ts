@@ -1,5 +1,6 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString } from "../types"
+import { oracleLeftOut } from "./oracle-access"
 import { add, min, type OracleTotals } from "./oracle-cashflow-types"
 import { type OracleState, oracleMutate, oracleValuation } from "./oracle-state"
 
@@ -25,7 +26,10 @@ export function fillSurplus(
 	}
 }
 
-/** Takes a shortfall from `withdraw` in order, skipping locked Accounts; returns what stays unmet. */
+/**
+ * Takes a shortfall from `withdraw` in order, skipping Accounts left out of accessible net worth;
+ * returns what stays unmet.
+ */
 export function drawFrom(
 	fixture: Fixture,
 	states: Map<string, OracleState>,
@@ -37,8 +41,7 @@ export function drawFrom(
 	for (const account of fixture.scenario.cashflow.withdraw) {
 		if (remaining === 0n) return 0n
 		const state = states.get(account)!
-		const rule = state.rule
-		if (rule.kind === "asset" && rule.lockedUntil !== undefined && date < rule.lockedUntil) continue
+		if (oracleLeftOut(state.rule, date)) continue
 		const take = min(remaining, oracleValuation(state, date))
 		if (take <= 0n) continue
 		oracleMutate(state, date, -take)

@@ -45,7 +45,8 @@ test's behaviour changes.
   runs-out date is before M; then `undrawableMoney` when locked or unrouted assets cover the
   unmet amount; otherwise `insufficientMoney`.
 - **25× reference.** On a reachable answer, the result reports unlocked assets at M before M's
-  flows, `E(M)`, `25 × E(M)`, and the floored multiple in basis points. It is informational and
+  flows, `E(M)`, `25 × E(M)`, and the floored multiple in basis points. An Illiquid asset
+  ([ADR 0019](./0019-illiquid-assets.md)) is left out of the unlocked sum. It is informational and
   never decides the FI month.
   [ADR 0013](./0013-fi-reference-is-configured-not-decided.md) makes the multiplier, balances,
   window and terms configurable; the reference stays informational.

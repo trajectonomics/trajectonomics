@@ -44,7 +44,7 @@ export function oracleExpenses(fixture: Fixture, span: OracleSpan, terms: Refere
 	const kinds = new Map(fixture.scenario.flows.map((flow) => [flow.id, flow.kind]))
 	const real = terms === "real"
 	let total = 0n
-	for (const [date, day] of oraclePlanned(fixture)) {
+	for (const [date, day] of oraclePlanned(fixture, span.to)) {
 		if (date < span.from || date >= span.to) continue
 		for (const [id, amount] of day) {
 			if (kinds.get(id) !== "expense") continue

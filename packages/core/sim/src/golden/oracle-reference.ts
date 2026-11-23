@@ -2,6 +2,7 @@ import type { Fixture } from "../fixtures/fixture"
 import type { DateString } from "../types"
 import type { Account } from "../types/account"
 import type { ReferenceBasis, ReferenceOptions } from "../types/reference"
+import { oracleLeftOut } from "./oracle-access"
 import { oracleAddDays } from "./oracle-date"
 import { oracleExpenses, oracleRealValue, oracleSpan } from "./oracle-reference-window"
 import { oracleRun } from "./oracle-sim"
@@ -17,11 +18,12 @@ export interface OracleReference {
 	readonly met: boolean
 }
 
-function included(basis: ReferenceBasis, liability: boolean, locked: boolean): boolean {
+/** `outside` is true for an asset left out of accessible net worth on the date (locked or illiquid). */
+function included(basis: ReferenceBasis, liability: boolean, outside: boolean): boolean {
 	if (basis === "netWorth") return true
 	if (basis === "allAssets") return !liability
-	if (basis === "accessibleNetWorth") return !locked
-	return !liability && !locked
+	if (basis === "accessibleNetWorth") return !outside
+	return !liability && !outside
 }
 
 interface Part {
@@ -32,8 +34,8 @@ interface Part {
 
 function partOf(rule: Account, date: DateString, basis: ReferenceBasis): Part {
 	const liability = rule.kind === "liability"
-	const locked = !liability && rule.lockedUntil !== undefined && date < rule.lockedUntil
-	return { counted: !liability && !locked, counts: included(basis, liability, locked), liability }
+	const outside = !liability && oracleLeftOut(rule, date)
+	return { counted: !liability && !outside, counts: included(basis, liability, outside), liability }
 }
 
 function floorDiv(numerator: bigint, denominator: bigint): bigint {

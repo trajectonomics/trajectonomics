@@ -3,7 +3,8 @@
 Status: accepted
 
 ADR 0004 reports a 25× rule-of-thumb figure beside a reachable FI month. It is fixed: multiplier 25,
-unlocked asset Accounts only, the next twelve months of expenses, nominal money. Callers who want
+unlocked asset Accounts only (a marked Illiquid asset is left out too, [ADR 0019](./0019-illiquid-assets.md)),
+the next twelve months of expenses, nominal money. Callers who want
 30×, a net-worth numerator or real money must recompute it. Issue #20 makes it configurable without
 making it the answer.
 

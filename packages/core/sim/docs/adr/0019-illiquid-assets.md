@@ -12,8 +12,9 @@ in Net worth, and the measures that ask what a person can spend leave it out.
 
 - **The mark.** An optional `liquid` key on an asset Account, a boolean. `liquid: false` marks an
   illiquid asset; absent or `true` means liquid, so every existing Scenario is unchanged. `liquid`
-  on a liability is `LIABILITY_MISUSE`, as `lockedUntil` already is. The key is a boolean because the
-  glossary's `Real asset` would collide with `real`, which already means inflation-adjusted money.
+  on a liability is `LIABILITY_MISUSE`, as `lockedUntil` already is. The key is a boolean because an
+  Account is either liquid or not, so no third state is needed. It is named `liquid`, not `real
+  asset`, because `real` already means inflation-adjusted money.
 - **Routing.** `check()` refuses an illiquid Account in `cashflow.withdraw` and in a
   `cashflow.surplus` step with `ILLIQUID_ROUTED` at the position that names it. A withdrawal cannot
   draw on it, so a Shortfall never sells it. `cashflow.contribute` is not refused: a contribution is
@@ -72,5 +73,14 @@ Unchanged, with or without the mark:
   1 Feb, and the reference figures), `src/milestone/illiquid-milestone.test.ts` (an accessible Milestone
   fires on 1 Apr instead of 1 Jan), `src/engine/illiquid-accessible.test.ts` (the rows) and
   `src/check/illiquid.test.ts` (the refusals).
+  `src/golden/illiquid-oracle.test.ts` checks the engine against the independent oracle on the same
+  home: the rows, the reference on each basis, the FI month with a buffer and the accessible Milestone.
 - The CLI shape publishes `liquid` in `apps/cli/src/scenario/shape/account.ts`. The new code
   `ILLIQUID_ROUTED` is filed in the CLI's refusal table.
+- A plan whose only asset is marked is refused with `SURPLUS_UNROUTED`: `cashflow.surplus` must name
+  a liquid Account, and there is none. (Naming the marked Account there gives `ILLIQUID_ROUTED`.)
+- A plan whose cash runs out while its money sits in a marked asset ends in a Shortfall, with
+  `runsOut` on that date. Nothing sells the marked asset until the sale primitive (#286) lands, so the
+  money is not drawn, however large it is.
+- The CLI's withdraw note does not suggest a marked Account, since `check()` would refuse it. The
+  field texts that describe accessible figures now say "not locked and not marked illiquid".
