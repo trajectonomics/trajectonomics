@@ -1,7 +1,7 @@
 import { FLOW_KINDS, FREQUENCIES } from "../vocab"
 import type { AccountIndex, Check } from "./codes"
 import { derive } from "./derive"
-import { cappedPrepayment, label, NOT_ALLOWED } from "./flow-fields"
+import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED } from "./flow-fields"
 import { levelField } from "./level-loan"
 import type { LoanIndex } from "./loan-index"
 import { prepayments } from "./prepayments"
@@ -70,6 +70,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	if (kind === "expense") {
 		return {
 			...shared,
+			category: opt(expenseCategory),
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
@@ -88,6 +89,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 	}
 	return {
 		...shared,
+		category: opt(expenseCategory),
 		earned: opt(bool),
 		target: opt(target),
 		...levied,

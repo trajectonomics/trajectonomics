@@ -4,10 +4,11 @@ import { readFileSync } from "node:fs"
 import { project } from "../engine/project"
 import { chanceOfSuccess, financialIndependence } from "../index"
 import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
+import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
 import { PARITY_CASES } from "./parity-cases"
 import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
 
-const ALL_PARITY_CASES = [...PARITY_CASES, ...STATEMENT_PARITY_CASES]
+const ALL_PARITY_CASES = [...PARITY_CASES, ...STATEMENT_PARITY_CASES, ...CATEGORY_PARITY_CASES]
 
 interface Recorded {
 	readonly name: string

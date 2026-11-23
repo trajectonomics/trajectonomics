@@ -169,6 +169,10 @@ _Avoid_: Active income, salary income
 Income marked `earned: false`. It continues when earned income stops.
 _Avoid_: Investment income, unearned income
 
+**Expense category**:
+An optional free-text label on an expense Flow, 1 to 64 characters with no control characters, for grouping spending in reports. It is inert: the engine never reads it, so no Projection, FI answer or chance result changes with it.
+_Avoid_: tag, label, Tally label
+
 **Cashflow**:
 The routing rules for net money each time flows land: ordered `surplus` steps (account, optional fixed `upTo`), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list.
 _Avoid_: Income/expense delta
