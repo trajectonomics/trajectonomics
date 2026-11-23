@@ -8,6 +8,7 @@ const demo = (argv: string[]) => capture(argv, {}, fixtureRoot)
 
 /** The commands this release does not ship yet, each with the note its page prints (ADR-0034). */
 const UNRELEASED: readonly (readonly string[])[] = [
+	["projection", "allowances"],
 	["projection", "chance"],
 	["scenario", "show"],
 	["scenario", "apply"],

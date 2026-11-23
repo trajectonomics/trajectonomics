@@ -211,6 +211,21 @@ only as good as that choice. `traj schema projection chance` describes the file.
 Pass the same three flags to `traj dashboard` to add the chance of success to the
 Dashboard, as a page of its own.
 
+## Tax allowances
+
+> **Ships in 0.8.0.**
+
+`traj projection allowances` reads a Scenario that has a tax Levy and says, for each
+whole tax year after the As-of, how much more of each contribution label (RMF, ThaiESG
+and the others the Levy reads) would still lower the tax, and by how much. You name the
+labels in the order they should fill with `--labels`, and the size of one step with
+`--step`, in major units: the CLI ships no default. `--budget` caps what the extra
+contributions may add up to in a year, and `--min-saving` is the least percent of a step
+a step must save. Each suggestion comes with the contribution Flow that would apply it,
+which you add to the Scenario yourself: the command writes nothing. The figures are one
+plan's own tax rules, an estimate and not tax advice, and each fund's holding rules are
+not checked. `traj schema projection allowances` describes the result.
+
 ## Money as decimals in a Scenario
 
 > **Ships in 0.8.0.**

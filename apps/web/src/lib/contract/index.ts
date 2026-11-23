@@ -35,6 +35,19 @@ export type { PersonAge } from "./person-age"
 export { personAge, personAges } from "./person-age"
 export type { Pnl } from "./pnl"
 export { pnl } from "./pnl"
+export type {
+	AllowanceFlow,
+	AllowanceRow,
+	AllowanceYear,
+	ProjectionAllowances,
+} from "./projection-allowances"
+export {
+	allowanceFlow,
+	allowanceRow,
+	allowanceYear,
+	projectionAllowances,
+	stoppedBy,
+} from "./projection-allowances"
 export type { ProjectionChance } from "./projection-chance"
 export { projectionChance } from "./projection-chance"
 export type { ProjectionCompare } from "./projection-compare"
