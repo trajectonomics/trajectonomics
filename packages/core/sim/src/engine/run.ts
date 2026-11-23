@@ -63,6 +63,7 @@ export function runEngine(
 	returns?: Returns,
 	tracked = false,
 	breakdown = false,
+	recordRules = false,
 ): EngineResult {
 	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
 	const calendar = resolvedCalendar(scenario)
@@ -70,7 +71,7 @@ export function runEngine(
 	const levies = planLevies(scenario, timeline, calendar)
 	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
 	const ledger = tracked ? openLedger(states, timeline.start) : undefined
-	const rules = openRules(scenario)
+	const rules = openRules(scenario, recordRules)
 	const acc: RunAccumulator = {
 		snapshots: [],
 		totals: [],

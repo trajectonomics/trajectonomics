@@ -24,6 +24,27 @@ export interface ChanceBand {
 	readonly netWorth: readonly ChancePercentile[]
 }
 
+/** The Percentiles of what the rule Flows paid across Market paths in one Annual roll-up (ADR 0024). */
+export interface ChanceSpendingBand {
+	readonly index: number
+	readonly to: DateString
+	readonly spending: readonly ChancePercentile[]
+}
+
+/** The Percentiles, across the paths that have one, of each path's lowest roll-up spending. */
+export interface ChanceLowestYear {
+	/** Paths with a lowest year: they paid in some roll-up that a full roll-up follows or is. */
+	readonly paths: number
+	/** The five Percentiles; empty when no path has a lowest year. */
+	readonly spending: readonly ChancePercentile[]
+}
+
+/** What the plan's rule Flows paid across Market paths; present only when the Scenario has one. */
+export interface ChanceSpending {
+	readonly bands: readonly ChanceSpendingBand[]
+	readonly lowestYear: ChanceLowestYear
+}
+
 /** How many failing Market paths first ran out in one Annual roll-up period. */
 export interface ChanceRunsOut {
 	readonly index: number
@@ -47,6 +68,8 @@ export interface ChanceOfSuccess {
 	readonly successBps: BasisPoints
 	readonly bands: readonly ChanceBand[]
 	readonly runsOut: readonly ChanceRunsOut[]
+	/** Spending Bands, present only when the Scenario declares a rule Flow (ADR 0024). */
+	readonly spending?: ChanceSpending
 }
 
 export type ChanceOfSuccessResult =

@@ -33,6 +33,11 @@ export const RULE_PARITY_CASES: readonly ParityCase[] = [
 		projectOptions: withRules,
 	},
 	{
+		name: "rule-guardrails-chance",
+		fixture: drawdown({ kind: "guardrails", ...base, upper: band, lower: band }),
+		chance: { model: RULE_MARKET, seed: "0123456789abcdef", paths: 6 },
+	},
+	{
 		name: "rule-fi",
 		fixture: savingPlan({ kind: "currentRate", ...base }),
 		options: { method: "survival", minBufferMonths: 12 },

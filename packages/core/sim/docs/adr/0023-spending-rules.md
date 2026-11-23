@@ -71,7 +71,7 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
   absent when `P` is 0, and above 10000 when `Y` exceeds a depleted portfolio) and `action`. `paid` is
   what the year's planned Occurrences added, including the Occurrence a Shortfall fell on in full,
   which the Projection's expense also counts. The day's `unmet` is the whole day across every
-  expense, so spending Bands (#361) must split it by Flow, never subtract it from `paid`. Without the option the
+  expense, so spending Bands (ADR 0024) split it by Flow, never subtract it from `paid`. Without the option the
   Projection is byte for byte what it was.
 
 ### Financial Independence
@@ -128,4 +128,4 @@ window, the candidate's own walk and its tail past the horizon carry the rule's 
   and with the Projection's annual expense; `golden/rule-fi.test.ts` agrees with the brute-force walk on
   the FI month and the reference expense for all three kinds, and shows a 4% rule moving the month from
   2027-03-01 to 2027-07-01 and the reference from 1,800,000 to 2,258,624.
-- **Chance of success** runs the rule on each Market path unchanged. Its spending Bands are #361.
+- **Chance of success** runs the rule on each Market path unchanged. Its spending Bands are ADR 0024.

@@ -8786,7 +8786,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "540486ead8990f25580c6312683f5809b37e9e66f7fa5fe1a8350a1c8a8a1b8f"
+		"chanceSha256": "0306abfa6e82ca6f637254ecd8b1f8c220ecd093823900733d000daf4824b489"
 	},
 	{
 		"name": "rule-guardrails",
@@ -8862,6 +8862,97 @@
 			"spendingRules": true
 		},
 		"sha256": "821975864f5d25698792b31238a4f7905f0eb4fa5aa5787da0e8ce1602fc7e5f"
+	},
+	{
+		"name": "rule-guardrails-chance",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 1000000
+				},
+				{
+					"account": "inv",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 250
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "inv",
+					"kind": "asset",
+					"rate": 400
+				}
+			],
+			"flows": [
+				{
+					"id": "spending",
+					"kind": "expense",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"rule": {
+						"kind": "guardrails",
+						"portfolio": ["inv"],
+						"rateBps": 400,
+						"rounding": "halfUp",
+						"upper": {
+							"bps": 1500,
+							"adjustBps": 800
+						},
+						"lower": {
+							"bps": 1500,
+							"adjustBps": 800
+						}
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "inv"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "inv"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2030-01-01",
+			"resolution": "month"
+		},
+		"sha256": "368cfd2a541db982480c4acb75ee11a19c6742220f86b6e6b6848c3585410d8d",
+		"chance": {
+			"model": {
+				"id": "rule-market",
+				"accounts": ["inv"],
+				"buckets": [
+					{
+						"returnsBps": [0],
+						"weight": 2147483648
+					},
+					{
+						"returnsBps": [-1500],
+						"weight": 2147483648
+					}
+				]
+			},
+			"seed": "0123456789abcdef",
+			"paths": 6
+		},
+		"chanceSha256": "d41f35f505855a8addd5518bea812d154c388d0386958cde47ee93d9764259bc"
 	},
 	{
 		"name": "rule-fi",
