@@ -1,0 +1,26 @@
+notes:
+  - Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy "th-2026-pit".
+  - Tax before 2026 is not recomputed; any tax still owed belongs in the Ledger as a liability.
+  - The tax year 2025-01-01 to 2025-12-31 is left out: it ended before the As-of 2026-01-01, so nothing can be added to it.
+  - These figures are what this plan's own tax rules would charge, an estimate and not tax advice. Each fund has holding rules of its own to check before buying.
+
+tax year 2026-01-01 to 2026-12-31 (th-2026-pit), settles 2027-03-31
+tax due now 28400.00, with every suggestion 300.00, saving 28100.00
+allowances (2 rows)
+label                      planned      extra    saving  start       target    stopped because
+allowance.retirement.rmf  45000.00  170000.00  17300.00  2026-12-15  rmf-fund  no more is saved (the cap is reached or the tax stops falling)
+allowance.thai_esg         9000.00  180000.00  10800.00  2026-12-15  esg-fund  no more is saved (the cap is reached or the tax stops falling)
+
+tax year 2027-01-01 to 2027-12-31 (th-2026-pit), settles 2028-03-31
+tax due now 64400.00, with every suggestion 4300.00, saving 60100.00
+allowances (2 rows)
+label                      planned      extra    saving  start       target    stopped because
+allowance.retirement.rmf  60000.00  230000.00  34500.00  2027-12-15  rmf-fund  no more is saved (the cap is reached or the tax stops falling)
+allowance.thai_esg        12000.00  280000.00  25600.00  2027-12-15  esg-fund  no more is saved (the cap is reached or the tax stops falling)
+
+Assumptions (tax figures used whose source is not yet confirmed):
+- allowances.retirementCluster.combinedCeiling = 500000 (reported): Retirement allowances combined ceiling, baht.
+- allowances.retirementCluster.rmf.ceiling = 500000 (reported): RMF ceiling, baht a year.
+- allowances.retirementCluster.rmf.maxRate = 0.3 (reported): RMF limit, share of assessable income.
+- allowances.thaiEsg.ceiling = 300000 (reported): ThaiESG ceiling, baht a year.
+- allowances.thaiEsg.maxRate = 0.3 (reported): ThaiESG limit, share of assessable income.
