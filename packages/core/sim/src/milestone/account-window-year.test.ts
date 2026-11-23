@@ -5,8 +5,8 @@ import { createStates } from "../engine/state"
 import { derivedExpense } from "../engine/test-flows"
 import { makeFixture } from "../engine/test-helpers"
 import type { Account, Derive, Frequency } from "../types"
-import { plannedExpenses } from "./expenses"
 import { planViewOf } from "./gate-figures"
+import { plannedExpenses } from "./planned-expenses"
 
 /** 1 / 1,000 of the read Account's value, on each upkeep. */
 const upkeep: Derive = {
