@@ -91,7 +91,8 @@ function blockRows(
 		rows.push({ line: `  ${name}`, amount: money(minorOf(line["amount"], currency)) })
 	}
 	rows.push({ line: "saving", amount: String(annual["contributions"]) })
-	if (unfunded !== 0) rows.push({ line: "  unfunded", amount: money(unfunded) })
+	// Not indented under saving: it is what the cash could not fund, not a part of saving.
+	if (unfunded !== 0) rows.push({ line: "not funded", amount: money(unfunded) })
 	rows.push({ line: "left over", amount: money(surplus) })
 	if (unmet !== 0) rows.push({ line: "unmet", amount: money(unmet) })
 	return rows

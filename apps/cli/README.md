@@ -287,12 +287,14 @@ spending            50700.00
   transport          1500.00
   (uncategorised)    1200.00
 saving              64800.00
-  unfunded          19200.00
+not funded          19200.00
 left over            4800.00
 ```
 
 Each total is the engine's figure, or an exact sum of the engine's own lines, so the CLI adds no figure of
-its own. Money in equals money out in every year: the engine routes every unit of cash.
+its own. In every year, money in plus `unmet` (the cash a Shortfall left unpaid) equals tax, spending,
+saving and left over: the engine routes every unit of cash. `not funded` is the part of the
+Contributions the cash could not fund; it is not in saving.
 
 ## Seeing it in a browser
 

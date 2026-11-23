@@ -108,9 +108,9 @@ describe("projection run --breakdown: the human block's totals are exact", () =>
 		expect(blockAmount(block, "housing")).toBe(3000000)
 		expect(blockAmount(block, "(uncategorised)")).toBe(120000)
 		expect(blockAmount(block, "saving")).toBe(6480000)
-		expect(blockAmount(block, "unfunded")).toBe(1920000)
+		expect(blockAmount(block, "not funded")).toBe(1920000)
 		expect(blockAmount(block, "left over")).toBe(480000)
-		// Money in is money out: tax + spending + saving + left over.
+		// With no unmet this year, money in is money out: tax + spending + saving + left over.
 		const out =
 			blockAmount(block, "tax") +
 			blockAmount(block, "spending") +
