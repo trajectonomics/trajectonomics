@@ -53,6 +53,22 @@ describe("the projection run contract against the CLI's goldens", () => {
 		expect(loan.at(-1)?.amount).toBe("0.00")
 	})
 
+	it("parses --spending's output: each Rule year's portfolio, amount, rate and action (cli ADR-0063)", async () => {
+		const run = projectionRun.parse(await golden("run-spending.output"))
+		const rules = run.tables.find((table) => table.name === "spendingRules")
+		if (rules?.name !== "spendingRules") throw new Error("the output has no spendingRules table")
+		expect(rules.rows.slice(0, 2).map((row) => [row.date, row.amount, row.withdrawalRate])).toEqual(
+			[
+				["2045-01-01", "11875.23", "3.99"],
+				["2046-01-01", "12231.49", "4.19"],
+			],
+		)
+		expect(rules.rows.map((row) => row.action)).toContain("cut")
+		const raised = projectionRun.parse(await golden("run-spending-raise.output"))
+		const years = raised.tables.find((table) => table.name === "spendingRules")
+		expect(years?.rows.map((row) => row.action)).toEqual(["none", "raise", "raise", "cut", "cut"])
+	})
+
 	it("refuses a section the contract does not name", async () => {
 		const body = (await golden("run-breakdown.output")) as {
 			tables: { name: string; rows?: { total?: string }[] }[]

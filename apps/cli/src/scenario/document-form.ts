@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { version as cliVersion } from "../../package.json"
+import { sentenceFor } from "../projection/refusal-table"
 import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
 import {
 	SCENARIO_SHAPE_REQUIRED,
@@ -22,11 +23,19 @@ export const scenarioDocument: z.ZodType<unknown> = z
 	.superRefine((value, ctx) => {
 		for (const problem of scenarioProblems(value)) {
 			const refusal = refusalOf(problem, "document")
+			// A code the refusal table words states its sentence and way out, then the schema hint (ADR-0052).
+			const said = sentenceFor({
+				code: problem.code,
+				path: ["scenario", ...problem.segments.map(String)],
+			})
 			ctx.addIssue({
 				code: "custom",
-				message: refusal.message,
+				message: said?.message ?? refusal.message,
 				path: [...problem.segments],
-				params: { code: problem.code, hint: refusal.hint },
+				params: {
+					code: problem.code,
+					hint: [said?.hint, refusal.hint].filter((part) => part !== undefined).join(" "),
+				},
 			})
 		}
 	})

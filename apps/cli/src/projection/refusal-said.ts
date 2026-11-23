@@ -4,6 +4,7 @@ import {
 	type ProjectionProblem,
 } from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { SAID_RULE } from "./refusal-rule"
 import { SAID_TRADE } from "./refusal-trade"
 
 /**
@@ -29,6 +30,7 @@ const CARRY_IN_HINT =
  */
 export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	...SAID_TRADE,
+	...SAID_RULE,
 	// What only a run against the Ledger and the flags can find.
 	UNDECLARED_BALANCE_ACCOUNT: {
 		message: "The Ledger holds a balance on an Account the Scenario does not declare.",

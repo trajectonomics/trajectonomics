@@ -56,16 +56,21 @@ type OutputFlag = z.ZodDefault<z.ZodBoolean>
 const more = (what: string): OutputFlag => z.boolean().default(false).describe(what)
 
 /** The flags that ask `projection run` for more than the annual roll-up (cli ADR-0027). */
-export const outputFlags: Record<"monthly" | "breakdown" | "liabilities" | "accounts", OutputFlag> =
-	{
-		monthly: more("Also report the monthly rows."),
-		breakdown: more(
-			"Also report each Annual roll-up's cash flow by source, tax, category and Account.",
-		),
-		liabilities: more(
-			"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
-		),
-		accounts: more(
-			"Also report each Account's value on the row at each Annual roll-up's end (the date realNetWorth states), or on every month with --monthly, nominal and real (cli ADR-0060).",
-		),
-	}
+export const outputFlags: Record<
+	"monthly" | "breakdown" | "liabilities" | "accounts" | "spending",
+	OutputFlag
+> = {
+	monthly: more("Also report the monthly rows."),
+	breakdown: more(
+		"Also report each Annual roll-up's cash flow by source, tax, category and Account.",
+	),
+	liabilities: more(
+		"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
+	),
+	accounts: more(
+		"Also report each Account's value on the row at each Annual roll-up's end (the date realNetWorth states), or on every month with --monthly, nominal and real (cli ADR-0060).",
+	),
+	spending: more(
+		"Also report what each spending rule fixed and paid in each Rule year: the portfolio it read, its amount, its withdrawal rate and whether it cut, raised or hit a bound (cli ADR-0063). Without a rule Flow the table is empty.",
+	),
+}

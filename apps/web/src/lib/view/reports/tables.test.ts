@@ -79,6 +79,44 @@ describe("reportTables", () => {
 		)
 	})
 
+	test("the spending rules are a table of the CLI's strings, the rate a figure column only when stated", () => {
+		const rows = [
+			{
+				flow: "spend",
+				date: "2045-01-01",
+				portfolio: "250000.00",
+				amount: "10000.00",
+				paid: "10000.00",
+				withdrawalRate: "4.00",
+				action: "none" as const,
+			},
+			{
+				flow: "spend",
+				date: "2046-01-01",
+				portfolio: "0.00",
+				amount: "10300.00",
+				paid: "0.00",
+				action: "cut" as const,
+			},
+		]
+		const run = projectionRunFixture({ tables: [{ name: "spendingRules", count: 2, rows }] })
+		const table = tableNamed(reportTables(run), "spendingRules")
+		const rate = table.columns.find((column) => column.key === "withdrawalRate")
+		expect(rate?.numeric).toBe(true)
+		expect(
+			table.records.map((record) => [cell(record, "withdrawalRate"), cell(record, "action")]),
+		).toEqual([
+			["4.00", "none"],
+			["", "cut"],
+		])
+		const plain = projectionRunFixture({
+			tables: [{ name: "spendingRules", count: 1, rows: [rows[1]!] }],
+		})
+		expect(
+			tableNamed(reportTables(plain), "spendingRules").columns.map((column) => column.key),
+		).not.toContain("withdrawalRate")
+	})
+
 	test("the monthly rows appear only when the run holds them, after the yearly rows", () => {
 		const tables = reportTables(withMonthlyTable(projectionRunFixture()))
 		expect(tables.map((table) => table.name)).toEqual(["annual", "monthly"])

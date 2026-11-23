@@ -26,14 +26,47 @@ const tableRow = z.strictObject({
 	p90: money,
 })
 
-/** The Bands table the human form prints: a few roll-ups, not every one. */
-const bandsTable = z.strictObject({
-	name: z.literal("bands"),
-	count: integer,
-	rows: z.array(tableRow),
+/** The spending Percentiles at one annual roll-up end, in level order (cli ADR-0063). */
+const spendingBand = z.strictObject({
+	index: integer,
+	to: dateString,
+	spending: z.array(percentile),
 })
 
-/** `traj projection chance --json`: the success share of one Scenario over seeded Market paths. */
+/**
+ * The Percentiles, across the Market paths that have one, of each path's lowest whole year of
+ * spending (cli ADR-0063). `paths` says how many have one; the Percentiles are empty when none does.
+ */
+const lowestYear = z.strictObject({ paths: integer, spending: z.array(percentile) })
+
+/** The lowest-year row the human form prints: the number of paths and the five Percentiles. */
+const lowestYearRow = z.strictObject({
+	paths: integer,
+	p10: money,
+	p25: money,
+	p50: money,
+	p75: money,
+	p90: money,
+})
+
+/**
+ * The tables the human form prints: a few Bands, not every roll-up, and for a plan with a spending
+ * rule a few of its spending Bands and the lowest year.
+ */
+const chanceTable = z.discriminatedUnion("name", [
+	z.strictObject({ name: z.literal("bands"), count: integer, rows: z.array(tableRow) }),
+	z.strictObject({ name: z.literal("spendingBands"), count: integer, rows: z.array(tableRow) }),
+	z.strictObject({
+		name: z.literal("lowestYearSpending"),
+		count: integer,
+		rows: z.array(lowestYearRow),
+	}),
+])
+
+/**
+ * `traj projection chance --json`: the success share of one Scenario over seeded Market paths and,
+ * for a plan with a spending rule, what the rule pays across them.
+ */
 export const projectionChance = z.strictObject({
 	...projectionShape,
 	definition: z.strictObject({ modelId: z.string(), seed: z.string(), paths: integer }),
@@ -42,6 +75,9 @@ export const projectionChance = z.strictObject({
 	successBps: integer,
 	bands: z.array(band),
 	runsOut: z.array(runsOut),
-	tables: z.array(bandsTable),
+	// Present only when the Scenario has a spending rule Flow (cli ADR-0063).
+	spendingBands: z.array(spendingBand).optional(),
+	lowestYearSpending: lowestYear.optional(),
+	tables: z.array(chanceTable),
 })
 export type ProjectionChance = z.infer<typeof projectionChance>

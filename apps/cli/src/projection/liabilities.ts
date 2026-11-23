@@ -11,10 +11,15 @@ import type { ProjectionTable } from "./run-view"
  */
 
 /** The engine's options for one run: each optional output is asked for only by its own flag (cli ADR-0058, ADR-0059). */
-export function optionsOf(breakdown: boolean, liabilities: boolean): ProjectionOptions {
+export function optionsOf(
+	breakdown: boolean,
+	liabilities: boolean,
+	spending: boolean,
+): ProjectionOptions {
 	return {
 		...(breakdown ? { cashflowBreakdown: true } : {}),
 		...(liabilities ? { liabilityStatements: true } : {}),
+		...(spending ? { spendingRules: true } : {}),
 	}
 }
 
