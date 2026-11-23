@@ -456,11 +456,12 @@ of its room unused; a smaller `step` fills more of it. See [ADR 0022](docs/adr/0
 ## Employer contribution
 
 A Contribution with `funding: "employer"` into a liquid asset Account is the employer's share of a
-provident fund. It lands in the Account on its Landed date and nowhere else: it is not income, not an
-expense, not subtracted from the day's cash, never capped by Available cashflow, never a Shortfall,
-and `cashflow.contribute` need not list its target. The Cost basis grows by it. It stops with earned
-income in the FI test, whether its amount is fixed or a Derived share of a salary's gross. The Annual
-roll-up reports it as `employerContributions` (outside `income`, `contributions` and `interest`) and the
+provident fund. (A real fund is locked until the member leaves or reaches the age limit, so give its
+Account a `lockedUntil`, as the example below does.) It lands in the Account on its Landed date and
+nowhere else: it is not income, not an expense, not subtracted from the day's cash, never capped by
+Available cashflow, never a Shortfall, and `cashflow.contribute` need not list its target. The Cost
+basis grows by it. It stops with earned income in the FI test, whether its amount is fixed or a Derived
+share of a salary's gross. A sale from the Account on the same date sells it too. The Annual roll-up reports it as `employerContributions` (outside `income`, `contributions` and `interest`) and the
 cash-flow breakdown as an `employer` list; both appear only when the Scenario declares one. See
 [ADR 0026](docs/adr/0026-employer-contribution.md).
 
@@ -480,7 +481,7 @@ const result = project(
 		economy: { inflation: 0 },
 		accounts: [
 			{ id: "cash", kind: "asset", rate: 0 },
-			{ id: "pvd", kind: "asset", rate: 0 },
+			{ id: "pvd", kind: "asset", rate: 0, lockedUntil: "2046-01-01" },
 		],
 		flows: [
 			{ id: "salary", kind: "income", earned: true, amount: 5_000_000, growth: { bps: 0 }, ...monthly },

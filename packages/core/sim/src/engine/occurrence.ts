@@ -38,12 +38,13 @@ export function processDate(
 		runsOut: undefined,
 	})
 	if (day.problem !== undefined) return early(day, day.problem)
+	// An employer share lands in its Account first: it is outside cashflow, so a sale on the same date can
+	// sell it, and nothing below reads it (ADR 0026).
+	const employer = applyEmployer(states, day.contributionEntries, date, levies)
+	if (employer.problem !== undefined) return early({ ...day, employer: 0n }, employer.problem)
 	const moves = applyPlannedWithdrawals(states, day.plannedBySource, date, levies)
 	const landed = { ...day, withdrawals: moves.cash, plannedBySource: moves.borrowedBy }
 	if (moves.problem !== undefined) return early(landed, moves.problem)
-	// An employer share lands in its Account first: it is outside cashflow, so nothing below reads it (ADR 0026).
-	const employer = applyEmployer(states, day.contributionEntries, date, levies)
-	if (employer.problem !== undefined) return early({ ...landed, employer: 0n }, employer.problem)
 	const dated = {
 		scenario,
 		states,

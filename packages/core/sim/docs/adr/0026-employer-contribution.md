@@ -31,7 +31,8 @@ stays 4 (precedent: ADR 0021).
   as any applied Contribution does (the same `mutate`), so selling the fund realises no gain on the
   employer's money. It counts in a Levy's `funded` Tally only under the `label` its author gives it: an
   unlabelled share is in no Tally, and a member's own label never picks it up. The caller decides
-  which label (the CLI refuses an `allowance.retirement.*` label on it, #409), because only the member's
+  which label (the CLI refuses any Thai contribution label on an employer share, #409: every
+  `ThLevyContributionLabel` is the member's own payment, ThaiESG included), because only the member's
   own money is deductible. An Account's `returnLabel` tallies its growth on the employer's money as on
   any money in it.
 - **Locked and Illiquid targets.** A locked target receives it and holds it until `lockedUntil`, as for
@@ -47,7 +48,8 @@ stopped salary; a fixed one stops by this rule.) A pension that keeps paying aft
 income Flow with `earned: false`, not this. Nothing is recomputed: the scan's `stopsFlow` drops its
 events as it drops earned income, and the expense window drops them unless an expense reads them, as
 for earned income (a derived expense or debt payment that reads one is `DERIVED_EXPENSE_READS_EARNED`
-or `DERIVED_DEBT_PAYMENT_READS_EARNED`). Vesting (a share forfeited by leaving early) is out of scope:
+or `DERIVED_DEBT_PAYMENT_READS_EARNED`). The FI hand cases draw an unlocked `pvd` for the example only:
+a real fund has a `lockedUntil`. Vesting (a share forfeited by leaving early) is out of scope:
 a person who expects to leave states a shorter `end`.
 
 ## Chance of success
