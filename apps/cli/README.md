@@ -263,6 +263,37 @@ each side.
 ]
 ```
 
+## Where each year's money went
+
+> **Ships in 0.8.0.**
+
+`traj projection run --breakdown` adds each Annual roll-up's cash flow as the engine routed it: each
+Flow's income, the tax taken at source and each Levy's settlement (a refund is negative), each expense
+and its category, each Contribution applied and the part the cash could not fund, each planned
+withdrawal, what `cashflow.withdraw` drew and what `cashflow.surplus` filled. In JSON it is the
+`cashflow` table, one row per line. In the human format it is one block per year, after the body:
+
+```
+cash flow 2026-03-31 to 2027-03-30 (13 rows)
+line                  amount
+money in           124500.00
+  income           120000.00
+  withdrawals        3000.00
+  drawn              1500.00
+tax                  4200.00
+spending            50700.00
+  housing           30000.00
+  food              18000.00
+  transport          1500.00
+  (uncategorised)    1200.00
+saving              64800.00
+  unfunded          19200.00
+left over            4800.00
+```
+
+Each total is the engine's figure, or an exact sum of the engine's own lines, so the CLI adds no figure of
+its own. Money in equals money out in every year: the engine routes every unit of cash.
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.

@@ -1,4 +1,5 @@
 import type { ColumnHint, RenderHint } from "../table"
+import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
 import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
 import {
 	compareMilestoneBlocks,
@@ -27,8 +28,9 @@ const agesColumn: ColumnHint = { key: "ages", label: "Ages", show: agesText }
 
 /**
  * `projection run`'s human view: the annual roll-up, the monthly rows when asked, the tax years the
- * Scenario's Levies settle, and the notes under them. Only the human Format reads it; `--json`
- * keeps the output schema as the contract.
+ * Scenario's Levies settle, the notes under them, and with `--breakdown` a cash-flow block per
+ * roll-up (cli ADR-0058). Only the human Format reads it; `--json` keeps the output schema as the
+ * contract.
  *
  * Every field of a row is a column, headed by its own key, so the table neither drops nor renames
  * a value (ADR-0027). The nested `realNetWorth` reads as its compact JSON.
@@ -63,7 +65,9 @@ export const projectionHint: RenderHint = {
 		],
 		milestones: milestoneColumns,
 	},
-	display: runMilestonesShown,
+	// The long cash-flow table is JSON's; the human form prints one block per roll-up after the body.
+	display: (data) => cashflowHidden(runMilestonesShown(data)),
+	blocks: cashflowBlocks,
 	note: "notes",
 	extra: [
 		{

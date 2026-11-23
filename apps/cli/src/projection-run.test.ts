@@ -150,6 +150,7 @@ describe("projection run", () => {
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort()).toEqual([
 			"asOf",
+			"breakdown",
 			"carryIn",
 			"decimal",
 			"horizon",

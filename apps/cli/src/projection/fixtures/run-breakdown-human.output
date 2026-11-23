@@ -1,0 +1,28 @@
+annual (1 row)
+index  from        to          Ages  openingNetWorth  closingNetWorth     income   expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+    0  2026-03-31  2027-03-30              953449.51       1018549.51  120000.00  50700.00       64800.00               19200.00      0.00   0.00  false    {"date":"2027-03-30","amount":"1018549.51"}
+
+taxYears (2 rows)
+levy      from        to          settlementDate      due  prepaid      owed  settled  partial
+national  2026-01-01  2026-12-31  2027-02-15      2700.00  4500.00  -1800.00  true     false
+national  2027-01-01  2027-12-31  2028-02-15       900.00  1500.00   -600.00  false    true
+
+Tax is applied: the Scenario's own Levy "national".
+The 2026 tax year is charged on the Flows from 2026-03-31 plus the stated Carry-in, not the whole year.
+19200.00 of Contributions could not be funded, so they were not made. An asset Contribution is capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day, so a lump sum from savings is not funded: use a monthly Flow.
+
+cash flow 2026-03-31 to 2027-03-30 (13 rows)
+line                  amount
+money in           124500.00
+  income           120000.00
+  withdrawals        3000.00
+  drawn              1500.00
+tax                  4200.00
+spending            50700.00
+  housing           30000.00
+  food              18000.00
+  transport          1500.00
+  (uncategorised)    1200.00
+saving              64800.00
+  unfunded          19200.00
+left over            4800.00
