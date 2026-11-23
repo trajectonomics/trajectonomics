@@ -2,6 +2,7 @@ import type { ColumnHint, RenderHint } from "../table"
 import { balanceBlocks, balancesHidden } from "./balances-human"
 import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
 import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
+import { estateBlocks, estateHidden } from "./estate-human"
 import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
 import {
 	compareMilestoneBlocks,
@@ -70,14 +71,17 @@ export const projectionHint: RenderHint = {
 		],
 		milestones: milestoneColumns,
 	},
-	// The long cash-flow, liability, balance and spending tables are JSON's; the human form prints them as blocks after the body.
+	// The long cash-flow, liability, balance, spending and estate tables are JSON's; the human form prints them as blocks after the body.
 	display: (data) =>
-		spendingHidden(balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data))))),
+		estateHidden(
+			spendingHidden(balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data))))),
+		),
 	blocks: (data) => [
 		...cashflowBlocks(data),
 		...liabilityBlocks(data),
 		...balanceBlocks(data),
 		...spendingBlocks(data),
+		...estateBlocks(data),
 	],
 	note: "notes",
 	extra: [

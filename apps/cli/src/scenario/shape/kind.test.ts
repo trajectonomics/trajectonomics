@@ -20,6 +20,7 @@ function documentOf(input: {
 }): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION_NUMBER),
+		estate: {},
 		accounts: input.accounts ?? [CASH],
 		flows: (input.flows ?? [EXPENSE]).map((flow) => ({ start: "2026-01-01", ...flow })),
 		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { FULL_ESTATE } from "./estate-fixture"
 import { SCENARIO_SHAPE_REQUIRED, scenarioExample } from "./index"
 import { RULE_FLOWS } from "./rule-fixture"
 import { documented, type Path, refusalsOf, replaceAt, VERSION } from "./testing"
@@ -71,6 +72,7 @@ const FULL: Record<string, unknown> = {
 		},
 	],
 	calendar: { dayRule: "exact", holidays: [] },
+	estate: FULL_ESTATE,
 }
 
 /** Every path a documented `*` reaches, with each array index written out. */

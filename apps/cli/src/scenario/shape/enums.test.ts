@@ -29,6 +29,7 @@ function probe(input: {
 }): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: input.accounts ?? [CASH],
 		flows: input.flows.map((flow) => ({ id: "flow", start: "2026-01-01", ...flow })),
 		cashflow: {
@@ -165,18 +166,20 @@ const PROBES: EnumProbe[] = [
 		accepted: () =>
 			(nodeAt(["calendar", "dayRule"])["enum"] as string[]).map((dayRule) => ({
 				...scenarioExample(VERSION ?? 0),
+				estate: {},
 				calendar: { dayRule, holidays: [] },
 			})),
 		refused: () => ({
 			...scenarioExample(VERSION ?? 0),
+			estate: {},
 			calendar: { dayRule: "nearest", holidays: [] },
 		}),
 		code: "INVALID_DAY_RULE",
 	},
 ]
 
-/** Paths probed in their own file: milestone criteria, the level rounding and a spending rule's kind and rounding (rule-enums.test.ts). */
-const PROBED_ELSEWHERE = /^(milestones|flows\.\*\.(level|rule))\./
+/** Paths probed in their own file: milestone criteria, the level rounding and a spending rule's kind and rounding (rule-enums.test.ts) and an estate line's rounding and base (estate-enums.test.ts). */
+const PROBED_ELSEWHERE = /^(milestones|estate|flows\.\*\.(level|rule))\./
 
 describe("the closed value sets the shape states", () => {
 	it("covers every one of them with a probe", () => {

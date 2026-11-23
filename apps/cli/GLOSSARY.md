@@ -38,6 +38,10 @@ _Avoid_: Property (as a type), fixed asset, holding
 A fourth way to state an expense Flow's amount, `rule` beside `amount`, `derive` and `level`: its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year (sim ADR-0023). `initialRate` fixes the first year's amount as a share and grows it by inflation, `currentRate` takes a share of what the portfolio is worth each year (with optional dated rate steps, a floor and a ceiling), and `guardrails` cuts the amount after the share has grown too large and raises it after it has grown too small. The rule is the engine's, and `traj` ships no rate, band, bound or rounding for it: every figure is the caller's. `projection run --spending` states each Rule year (ADR-0063), and `projection chance` states what a rule pays across Market paths as spending Bands and a lowest year. A fixed amount that keeps pace with inflation is an ordinary expense with `growth: "inflation"`, not a rule.
 _Avoid_: Retirement plan, withdrawal strategy, safe withdrawal rate (a rate is the caller's, not a default)
 
+**Estate**:
+What a plan would leave on a date: everything owned (locked and illiquid Accounts and a home included), less what is owed, less the settlement costs, less the gifts, which is what heirs receive (sim ADR-0025). The optional `estate` block of a Scenario states its costs and gifts, every one the caller's own: `traj` ships none and models no inheritance tax, so a tax or a transfer fee is a cost line the caller types. `projection run --estate` states each roll-up's end (ADR-0064). It changes no other figure of a Projection.
+_Avoid_: Inheritance (as the figure), legacy, will
+
 **As-of**:
 The date a result is evaluated at. Every result states it.
 _Avoid_: Today, now, snapshot date

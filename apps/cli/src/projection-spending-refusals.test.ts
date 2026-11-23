@@ -109,6 +109,7 @@ describe("a spending rule the document check refuses", () => {
 		// A plan with no home, whose own derived amounts would be refused beside the Metric as well.
 		const plan = (startAt: string): Doc => ({
 			...EXAMPLE,
+			estate: {},
 			accounts: [
 				{ id: "cash", kind: "asset", rate: 150 },
 				{ id: "index", kind: "asset", rate: 600 },

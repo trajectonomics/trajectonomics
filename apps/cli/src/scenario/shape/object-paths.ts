@@ -28,4 +28,7 @@ export const OBJECT_PATHS: (string | number)[][] = [
 	["levies", 0, "period"],
 	["levies", 0, "settlement"],
 	["calendar"],
+	["estate"],
+	["estate", "costs", 0],
+	["estate", "gifts", 0],
 ]

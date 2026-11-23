@@ -38,7 +38,9 @@ export function spendingRules(rows: Rows<"spendingRules">): ReportTable {
 			text("date", (r: Row) => r.date),
 			figure("portfolio", (r: Row) => r.portfolio),
 			figure("amount", (r: Row) => r.amount),
+			figure("realAmount", (r: Row) => r.realAmount),
 			figure("paid", (r: Row) => r.paid),
+			figure("realPaid", (r: Row) => r.realPaid),
 			...optional(
 				rows,
 				figure("withdrawalRate", (r: Row) => r.withdrawalRate),
