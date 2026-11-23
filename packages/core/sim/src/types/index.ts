@@ -1,5 +1,6 @@
 export type { Account, AssetRule, LiabilityRule } from "./account"
 export type { Balance, Baseline } from "./baseline"
+export type * from "./breakdown"
 export type { Calendar, DayRule } from "./calendar"
 export type { CarryIn, CarryInTally } from "./carry-in"
 export type { Cashflow, SurplusStep } from "./cashflow"
@@ -72,21 +73,7 @@ export type {
 	TallyMeasure,
 } from "./measure"
 export type * from "./milestone"
-export type {
-	AccountAmount,
-	AnnualRollup,
-	InputProblem,
-	LevyMeasureValue,
-	LevyReport,
-	Projection,
-	ProjectionBalance,
-	ProjectionProblem,
-	ProjectionResult,
-	ProjectionRow,
-	RunsOut,
-	SettlementPeriod,
-	ValueOverflowProblem,
-} from "./projection"
+export type * from "./projection"
 export type {
 	ReferenceBasis,
 	ReferenceOptions,

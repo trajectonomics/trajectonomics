@@ -1,4 +1,5 @@
 import type { DateString, Scenario } from "../types"
+import { withRouting } from "./day-lines"
 import type { LevySet } from "./levy-set"
 import type { DateOutcome, DayTotals } from "./occurrence"
 import type { StateMap } from "./state"
@@ -15,15 +16,19 @@ export function route(
 	levies: LevySet | undefined,
 ): DateOutcome {
 	if (net > 0n) {
-		const problem = applySurplus(states, scenario, date, net, levies)
-		return { totals, problem, runsOut: undefined }
+		const surplus = applySurplus(states, scenario, date, net, levies)
+		const routed = withRouting(totals, new Map(), surplus.filled)
+		return { totals: routed, problem: surplus.problem, runsOut: undefined }
 	}
 	if (net < 0n) {
 		const drawn = applyWithdraw(states, scenario, date, -net, levies)
-		if (drawn.problem !== undefined) return { totals, problem: drawn.problem, runsOut: undefined }
+		const routed = withRouting(totals, drawn.taken, new Map())
+		if (drawn.problem !== undefined)
+			return { totals: routed, problem: drawn.problem, runsOut: undefined }
 		if (drawn.remaining > 0n) {
-			return { totals, problem: undefined, runsOut: { date, unmet: drawn.remaining } }
+			return { totals: routed, problem: undefined, runsOut: { date, unmet: drawn.remaining } }
 		}
+		return { totals: routed, problem: undefined, runsOut: undefined }
 	}
 	return { totals, problem: undefined, runsOut: undefined }
 }
