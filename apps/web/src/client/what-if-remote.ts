@@ -1,5 +1,5 @@
 // The requests a What-if session makes: a read of its four reads, and the two Edits that keep it. Browser access
-// is here, in src/client, and nowhere in the pure model ([web ADR 0009](../../docs/adr/0009-the-what-if-session-reads-through-traj-on-loopback.md)).
+// is here, in src/client, and nowhere in the pure model ([web ADR 0010](../../docs/adr/0010-the-what-if-session-reads-through-traj-on-loopback.md)).
 import { EDIT_TOKEN_HEADER, WHAT_IF_PATH } from "../lib/edit/guard"
 import { type WhatIfAnswer, whatIfAnswer } from "../lib/what-if/answer"
 import { overridesOf, type WhatIf } from "../lib/what-if/session"

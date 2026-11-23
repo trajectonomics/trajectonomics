@@ -14,7 +14,7 @@ export const EDIT_PATH = "/edit"
 /** The path the page posts to when it asks for the Snapshot to be read again, after a refused plan. */
 export const REREAD_PATH = "/reread"
 
-/** The path a what-if is posted to: four reads with its Overrides, and nothing written ([web ADR 0009](../../../docs/adr/0009-the-what-if-session-reads-through-traj-on-loopback.md)). */
+/** The path a what-if is posted to: four reads with its Overrides, and nothing written ([web ADR 0010](../../../docs/adr/0010-the-what-if-session-reads-through-traj-on-loopback.md)). */
 export const WHAT_IF_PATH = "/what-if"
 
 /** The header that carries the session token on every Edit. */

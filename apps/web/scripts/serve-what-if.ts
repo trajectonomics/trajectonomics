@@ -1,5 +1,5 @@
 // The answer to POST /what-if: the four reads of a what-if, run one at a time with the Overrides, and answered as
-// data. Nothing here writes: each read is a read leaf ([web ADR 0009](../docs/adr/0009-the-what-if-session-reads-through-traj-on-loopback.md)).
+// data. Nothing here writes: each read is a read leaf ([web ADR 0010](../docs/adr/0010-the-what-if-session-reads-through-traj-on-loopback.md)).
 import { z } from "zod"
 import type { PlanParams } from "../src/lib/snapshot"
 import { whatIfReads } from "../src/lib/what-if/argv"
