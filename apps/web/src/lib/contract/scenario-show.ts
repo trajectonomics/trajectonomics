@@ -26,6 +26,11 @@ export const scenarioFlow = z.looseObject({
 	// An expense's free-text group (cli schema, #278). The engine never reads it.
 	category: z.string().optional(),
 	derive: z.looseObject({}).optional(),
+	// A Milestone's id: the Flow lands on or after (`startAt`) or strictly before (`endAt`) its fire date (sim ADR 0012).
+	startAt: z.string().optional(),
+	endAt: z.string().optional(),
+	// A spending rule in place of `amount` (cli ADR 0063); `view/withdrawals/rule.ts` reads it, so a shape it does not know stays untouched.
+	rule: z.looseObject({}).optional(),
 	level: z
 		.looseObject({
 			principal: money,

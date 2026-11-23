@@ -56,6 +56,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 				icon: "sliders-horizontal",
 				needsLevy: true,
 			},
+			{
+				path: "/optimize/withdrawals/",
+				label: "Withdrawals",
+				page: "WithdrawalsPage",
+				icon: "wallet",
+				needsDocument: true,
+			},
 		],
 	},
 	{

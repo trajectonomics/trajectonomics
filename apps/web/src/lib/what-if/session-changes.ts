@@ -1,0 +1,68 @@
+/** The changes of a session as the bar lists them, in the order `traj` applies them. Pure. */
+import { additionId, additionPath, additionWords } from "./additions"
+import type { Json } from "./overrides"
+import type { WhatIf } from "./session"
+
+/** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
+export type Change =
+	| { kind: "off"; path: string; label: string }
+	| { kind: "add"; path: string; label: string; title: string }
+	| { kind: "set"; path: string; label: string; value: string }
+	/** A Set of a whole Flow (`flows.rent`) or of its rule (`flows.rent.rule`): worded without its JSON, and without a figure. */
+	| { kind: "flow"; path: string; label: string; value: Json }
+
+/** The item name a path names: `flows.gym.amount` names `gym`, shown as `Gym`. */
+function itemLabel(path: string): string {
+	const id = path.split(".")[1] ?? path
+	return id.charAt(0).toUpperCase() + id.slice(1)
+}
+
+/** The value of a Set as the bar shows it: a decimal string or a number, as the person typed it. */
+function valueText(value: Json): string {
+	if (typeof value === "string") return value
+	return JSON.stringify(value)
+}
+
+/** Whether a Set's path names a whole Flow (`flows.rent`) or a Flow's rule (`flows.rent.rule`). */
+function isFlowTry(path: string): boolean {
+	const parts = path.split(".")
+	return parts[0] === "flows" && (parts.length === 2 || (parts.length === 3 && parts[2] === "rule"))
+}
+
+/** The changes, in the order `traj` applies them: removals first, then Additions, then Sets. */
+export function changesOf(whatIf: WhatIf): Change[] {
+	const removals = whatIf.removals.map(
+		(path): Change => ({
+			kind: "off",
+			path,
+			label: `${itemLabel(path)} switched off`,
+		}),
+	)
+	const additions = whatIf.additions.map(
+		(one): Change => ({
+			kind: "add",
+			path: additionPath(one),
+			label: additionWords(one),
+			title: `Added ${one.list.replace(/s$/, "")} ${additionId(one)}`,
+		}),
+	)
+	const sets = whatIf.sets.map((set): Change => {
+		if (isFlowTry(set.path)) {
+			const what = set.path.endsWith(".rule") ? "spending rule changed" : "tried as edited"
+			return {
+				kind: "flow",
+				path: set.path,
+				label: `${itemLabel(set.path)} ${what}`,
+				value: set.value,
+			}
+		}
+		const field = set.path.split(".").slice(2).join(".")
+		return {
+			kind: "set",
+			path: set.path,
+			label: `${itemLabel(set.path)} ${field} set to ${valueText(set.value)}`,
+			value: valueText(set.value),
+		}
+	})
+	return [...removals, ...additions, ...sets]
+}

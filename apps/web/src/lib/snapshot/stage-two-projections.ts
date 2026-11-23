@@ -34,7 +34,8 @@ export function perScenario(
  * the Cash flow page has each year's lines and section totals (cli ADR-0058, addendum), and
  * `--liabilities` for the loans' statements (cli ADR 0059): the planner's loan cards show the schedule and
  * the paid-off date from those rows, so the page computes none of them. `--accounts` adds each Account's value
- * (cli ADR 0060), which the real-asset cards chart.
+ * (cli ADR 0060), which the real-asset cards chart, and `--spending` states each Rule year of a spending rule
+ * (cli ADR 0063), which the Withdrawals page reads: a plan with no rule gets an empty table.
  */
 export function planProjections(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const monthly = params.monthly ? ["--monthly"] : []
@@ -47,6 +48,7 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 		"--breakdown",
 		"--liabilities",
 		"--accounts",
+		"--spending",
 		"--json",
 	])
 }

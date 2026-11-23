@@ -15,6 +15,7 @@ import {
 	withoutSet,
 	withSet,
 } from "../lib/what-if/session"
+import { type TriedFlow, withTriedFlow } from "../lib/what-if/try-flow"
 import { WhatIfState } from "./what-if-state.svelte.js"
 
 /** The session without one change: a switch back on, an item not added, or a value back to the plan's. */
@@ -66,6 +67,13 @@ export class WhatIfChanges extends WhatIfState {
 		for (const set of itemSets(list, id, stored, edited)) next = withSet(next, set.path, set.value)
 		if (next !== base) this.keep(next)
 		return clearedFields(stored, edited)
+	}
+
+	/** Tries a Flow in the session, replacing any earlier try of it (`withTriedFlow`). True when it was tried. */
+	tryFlow(plan: string, contentHash: string, tried: TriedFlow): boolean {
+		const base = this.saving ? null : this.sessionFor(plan, contentHash)
+		if (base !== null) this.keep(withTriedFlow(base, tried))
+		return base !== null
 	}
 
 	/**

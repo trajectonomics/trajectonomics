@@ -2,6 +2,7 @@ import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { flowAnchorLabels } from "../household/model"
+import { ruleSummary } from "../withdrawals/words"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
 export type FlowKind = "income" | "expense"
@@ -38,9 +39,9 @@ export interface FlowCard {
 	readonly editable: boolean
 }
 
-/** Whether a Flow's amount is computed, so it has no amount the form could edit: a derived or a level one. */
+/** Whether a Flow's amount is computed, so it has no amount the form could edit: a derived, a level or a spending-rule one. */
 export function isComputed(flow: ScenarioFlow): boolean {
-	return flow.derive !== undefined || flow.level !== undefined
+	return flow.derive !== undefined || flow.level !== undefined || flow.rule !== undefined
 }
 
 /** The growth of a Flow as the card shows it: inflation, or a percent a year moved from the basis points. */
@@ -49,6 +50,11 @@ export function growthText(flow: ScenarioFlow): string {
 	if (growth === undefined) return "No growth stated"
 	if (growth === "inflation") return "Follows inflation"
 	return `${formatBps(growth.bps)}% a year`
+}
+
+/** The words for a date a Milestone sets: its id, which is the only name a Milestone has. A Flow with none shows its own date. */
+function dateWords(milestone: string | undefined, date: string): string {
+	return milestone === undefined ? date : `When ${milestone} fires`
 }
 
 /** The anchor labels of one Flow's dates, as the card holds them. */
@@ -75,10 +81,11 @@ export function flowCards(
 			id: flow.id,
 			amount: flow.amount ?? null,
 			frequency: flow.frequency,
-			start: flow.start,
-			end: flow.end ?? "To the horizon",
+			// A Milestone date wins: `start` is then only where recurrence counts from (sim ADR 0012), not when the Flow begins.
+			start: dateWords(flow.startAt, flow.start),
+			end: dateWords(flow.endAt, flow.end ?? "To the horizon"),
 			...anchorsOf(household, flow.id),
-			growth: isComputed(flow) ? "Computed" : growthText(flow),
+			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),
 			category: kind === "expense" ? (flow.category ?? null) : null,
 			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.

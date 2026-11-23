@@ -3,7 +3,7 @@
  * the Sets and Removals the person has made. Pure: a reducer per change, and the words that name each
  * change. Nothing here is stored; the client module holds the value for the length of the tab.
  */
-import { type Addition, additionId, additionPath, additionWords } from "./additions"
+import type { Addition } from "./additions"
 import type { Json, SetChange } from "./overrides"
 
 export type WhatIf = {
@@ -62,53 +62,6 @@ export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
 	return { ...whatIf, removals: whatIf.removals.filter((removal) => removal !== path) }
 }
 
-/** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
-export type Change =
-	| { kind: "off"; path: string; label: string }
-	| { kind: "add"; path: string; label: string; title: string }
-	| { kind: "set"; path: string; label: string; value: string }
-
-/** The item name a path names: `flows.gym.amount` names `gym`, shown as `Gym`. */
-function itemLabel(path: string): string {
-	const id = path.split(".")[1] ?? path
-	return id.charAt(0).toUpperCase() + id.slice(1)
-}
-
-/** The value of a Set as the bar shows it: a decimal string or a number, as the person typed it. */
-function valueText(value: Json): string {
-	if (typeof value === "string") return value
-	return JSON.stringify(value)
-}
-
-/** The changes, in the order `traj` applies them: removals first, then Additions, then Sets. */
-export function changesOf(whatIf: WhatIf): Change[] {
-	const removals = whatIf.removals.map(
-		(path): Change => ({
-			kind: "off",
-			path,
-			label: `${itemLabel(path)} switched off`,
-		}),
-	)
-	const additions = whatIf.additions.map(
-		(one): Change => ({
-			kind: "add",
-			path: additionPath(one),
-			label: additionWords(one),
-			title: `Added ${one.list.replace(/s$/, "")} ${additionId(one)}`,
-		}),
-	)
-	const sets = whatIf.sets.map((set): Change => {
-		const field = set.path.split(".").slice(2).join(".")
-		return {
-			kind: "set",
-			path: set.path,
-			label: `${itemLabel(set.path)} ${field} set to ${valueText(set.value)}`,
-			value: valueText(set.value),
-		}
-	})
-	return [...removals, ...additions, ...sets]
-}
-
 /** The Overrides of a session in the order `traj` takes them: removals, Additions, then Sets (cli ADR 0056, 0062). */
 export function overridesOf(whatIf: WhatIf): {
 	sets: SetChange[]
@@ -118,10 +71,12 @@ export function overridesOf(whatIf: WhatIf): {
 	return { sets: whatIf.sets, removals: whatIf.removals, additions: whatIf.additions }
 }
 
+export { type Change, changesOf } from "./session-changes"
 export {
 	clearedFields,
 	itemSets,
 	recordOf,
 	withAddition,
 	withoutAddition,
+	withoutItemChanges,
 } from "./session-items"

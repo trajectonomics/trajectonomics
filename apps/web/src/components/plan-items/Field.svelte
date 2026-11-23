@@ -14,7 +14,7 @@ interface Props {
 	/** The message at this field: the form's own problem, or the CLI's refusal of it. */
 	problem?: string | undefined
 	/** A short hint under the label, such as the form a date takes. */
-	hint?: string
+	hint?: string | undefined
 	/** Whether the field is read-only here, such as a date a household pins. */
 	disabled?: boolean
 }
