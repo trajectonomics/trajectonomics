@@ -86,8 +86,13 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
   2027 year cut after seven parts paid 2,333,333, whose `real.paid` is `round(2,333,333 / 1.03) =
   2,265,372`. An `initialRate` year is level in real terms by construction: 4,120,000 at 3% is
   4,000,000. The date is a decision: a Rule year's twelve payments land over its months, but the year's
-  amount is fixed on its first date and `realNetWorth` has no date between, so one date keeps the figure
-  a single deflation of the stated nominal.
+  amount is fixed on its first date, so one date keeps the figure a single deflation of the stated nominal,
+  an `initialRate` year reads level in today's money, and a full year's `real.paid` equals its `real.amount`.
+  Considered and rejected for now: deflating each Occurrence at its own Landed date and summing, as ADR 0013's
+  `terms: "real"` does for an FI window. At 3% that states 3,946,570 for 2026, 3,831,621 for 2027 and
+  3,720,021 for 2028 (against 4,000,000, 3,883,495 and 3,770,384), and 2,248,895 for the cut 2027 year
+  (against 2,265,372): about 1.3% lower, growing with inflation, and a level `initialRate` year would no
+  longer read level.
 
 ### Financial Independence
 

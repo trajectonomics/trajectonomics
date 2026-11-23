@@ -10,6 +10,11 @@ import type {
 import { isRuled } from "../types"
 import type { RuleBook } from "./rule-book"
 
+/**
+ * A Rule year's figures in start-of-timeline money. The nominal figures are safe integers (`rule-book.ts`
+ * checks them); a real one exceeds its nominal only under negative inflation, and a run whose rule amount
+ * grows that large overflows the row's balances first, so no guard is reached here (#387 tracks a guard).
+ */
 function realYear(
 	year: { readonly amount: bigint; readonly paid: bigint },
 	inflation: BasisPoints,
@@ -23,8 +28,8 @@ function realYear(
 
 /**
  * One Spending rule statement per rule Flow in Scenario order: each Rule year it began, as a run kept it.
- * `real` deflates `amount` and `paid` once each from the Rule year's first date back to `start`, as a row's
- * `realNetWorth` deflates its parts (ADR 0023).
+ * `real` is one deflation of each stated nominal, `amount` and `paid`, from the Rule year's first date back
+ * to `start` (ADR 0023).
  */
 export function ruleStatements(
 	book: RuleBook | undefined,
