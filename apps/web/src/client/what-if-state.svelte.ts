@@ -1,6 +1,13 @@
 import type { WhatIfAnswer } from "../lib/what-if/answer"
+import { lensFor, readsOf, type WhatIfLens, type WhatIfReads } from "../lib/what-if/lens"
 import { SerialReader } from "../lib/what-if/reads"
-import { type Change, changesOf, hasChanges, type WhatIf } from "../lib/what-if/session"
+import {
+	type Change,
+	changesOf,
+	hasChanges,
+	overridesOf,
+	type WhatIf,
+} from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { readWhatIf } from "./what-if-remote.js"
 
@@ -8,6 +15,9 @@ import { readWhatIf } from "./what-if-remote.js"
 export class WhatIfState {
 	whatIf = $state<WhatIf | null>(null)
 	answer = $state<WhatIfAnswer | null>(null)
+	/** The state of the session the answer was read for, and the answer's four reads parsed against the contract. */
+	private answered = $state<WhatIf | null>(null)
+	private reads = $state<WhatIfReads | null>(null)
 	error = $state<string | null>(null)
 	/** The plan a person asked to switch to while changes were pending; null when none is asked. */
 	asking = $state<string | null>(null)
@@ -20,7 +30,7 @@ export class WhatIfState {
 	/** The reads, one at a time: the server refuses a second with 409, so a newer state waits its turn. */
 	private readonly reader = new SerialReader<WhatIf, WhatIfAnswer | string>({
 		transport: (whatIf, isCurrent) => readWhatIf(whatIf, editSession.token, isCurrent),
-		deliver: (reply) => this.receive(reply),
+		deliver: (reply, state) => this.receive(reply, state),
 		onBusy: (busy) => {
 			this.inFlight = busy
 		},
@@ -52,9 +62,25 @@ export class WhatIfState {
 		}, debounceMs)
 	}
 
+	/**
+	 * What a figure page on `plan` may show of the session: its reads, or null. Null on another plan (a page shows
+	 * the session only on the plan it belongs to), with no change, and while the reads answer an earlier state.
+	 */
+	lensFor(plan: string): WhatIfLens | null {
+		return lensFor(plan, this.whatIf, this.answered, this.reads)
+	}
+
 	/** The reply of the latest state: its reads, or the sentence of why they could not be had. */
-	private receive(reply: WhatIfAnswer | string): void {
+	/** The Sets and Removals of the session when it is open on `plan` and holds a change, else null. */
+	changesFor(plan: string): { sets: WhatIf["sets"]; removals: WhatIf["removals"] } | null {
+		if (this.whatIf === null || this.whatIf.plan !== plan || !this.active) return null
+		return overridesOf(this.whatIf)
+	}
+
+	private receive(reply: WhatIfAnswer | string, state: WhatIf): void {
 		this.answer = typeof reply === "string" ? null : reply
+		this.answered = typeof reply === "string" ? null : state
+		this.reads = typeof reply === "string" ? null : readsOf(reply)
 		this.error = typeof reply === "string" ? reply : reply.ok ? null : reply.error.message
 	}
 
@@ -65,6 +91,8 @@ export class WhatIfState {
 		this.reader.cancel()
 		this.whatIf = null
 		this.answer = null
+		this.answered = null
+		this.reads = null
 		this.error = null
 		this.asking = null
 		editSession.clear()

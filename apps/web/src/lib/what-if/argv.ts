@@ -37,7 +37,8 @@ function carryFor(params: PlanParams, plan: string): string[] {
 }
 
 /**
- * The reads of one what-if. The plan's name follows `--scenario=`, as the Snapshot's reads do, so a name
+ * The reads of one what-if. The projection takes `--breakdown`, as every run of the Snapshot does, so the
+ * Cash flow page can show the what-if's lines and section totals (cli ADR 0058, addendum). The plan's name follows `--scenario=`, as the Snapshot's reads do, so a name
  * that starts with a dash is still one token; `projection compare` takes its name after `--`.
  */
 export function whatIfReads(params: PlanParams, whatIf: WhatIfBody): WhatIfReads {
@@ -54,6 +55,7 @@ export function whatIfReads(params: PlanParams, whatIf: WhatIfBody): WhatIfReads
 				scenario,
 				...projectionFlags(params),
 				...monthly,
+				"--breakdown",
 				...overrides,
 				"--json",
 			],

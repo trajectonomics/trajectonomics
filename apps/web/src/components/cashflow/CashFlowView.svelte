@@ -1,9 +1,11 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
 import { accountNamesOf, hasCashflow } from "../../lib/view/cashflow/cashflow"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
+import CashFlowWhatIf from "../what-if/CashFlowWhatIf.svelte"
 import CashFlowBody from "./CashFlowBody.svelte"
 
 interface Props {
@@ -32,9 +34,13 @@ const names = $derived(accountNamesOf(accounts))
 		<p>The Snapshot holds this Scenario's projection without its cash flow.</p>
 	</EmptyState>
 {:else}
-	<ReadView {read} label={`Cash flow of ${name}`}>
-		{#snippet children(run)}
-			<CashFlowBody {run} {year} {onYear} accountNames={names} />
-		{/snippet}
-	</ReadView>
+	{@const lens = whatIfSession.lensFor(name)}
+	<div class="space-y-8">
+		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
+		<ReadView {read} label={`Cash flow of ${name}`}>
+			{#snippet children(run)}
+				<CashFlowBody {run} {year} {onYear} accountNames={names} />
+			{/snippet}
+		</ReadView>
+	</div>
 {/if}

@@ -1,10 +1,12 @@
 <script lang="ts">
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
 import { resolveScenario } from "../../lib/view/tax"
 import EmptyState from "../ui/EmptyState.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
+import TaxWhatIf from "../what-if/TaxWhatIf.svelte"
 import TaxBodyView from "./TaxBodyView.svelte"
 
 interface Props {
@@ -25,7 +27,9 @@ const read = $derived(name === null ? undefined : projections[name])
 
 <!-- The Tax page's body: a Scenario picker, then the chosen Scenario's tax years or its empty state. -->
 {#snippet taxScenario(scenario: string, scenarioRead: Read<ProjectionRun>)}
+	{@const lens = whatIfSession.lensFor(scenario)}
 	<div class="space-y-8">
+		{#if lens}<TaxWhatIf {lens} />{/if}
 		<ReadView read={scenarioRead} label={`The tax of ${scenario}`}>
 			{#snippet children(run)}
 				<TaxBodyView name={scenario} {run} />

@@ -1,10 +1,14 @@
 <script lang="ts">
 import type { AccountCard } from "../../lib/view/plan-items/accounts"
+import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
+import WasText from "../what-if/WasText.svelte"
 
 interface Props {
 	cards: readonly AccountCard[]
+	/** What the What-if session changes in each card, by item id: the baseline text struck through, or off. */
+	marks?: MarkMap
 	currency: string
 	editable: boolean
 	onEdit: (id: string) => void
@@ -14,12 +18,13 @@ interface Props {
 	onTry: (id: string) => void
 }
 
-let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
+let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
 </script>
 
 <ul class="grid gap-3 sm:grid-cols-2">
 	{#each cards as card (card.id)}
-		<li class="rounded-lg border border-border bg-card p-4">
+		{@const mark = marks[card.id] ?? NO_MARKS}
+		<li class="rounded-lg border border-border bg-card p-4 {mark.off ? 'opacity-60' : ''}">
 			<div class="flex items-start justify-between gap-3">
 				<h2 class="font-semibold break-all">{card.id}</h2>
 				{#if editable}
@@ -33,13 +38,13 @@ let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $pr
 					</button>
 				{/if}
 			</div>
-			<p class="mt-1 text-sm text-muted-foreground">{card.kind === "asset" ? "Asset" : "Debt"}</p>
+			<p class="mt-1 text-sm text-muted-foreground">{card.kind === "asset" ? "Asset" : "Debt"}<WasText was={mark.was.kind} /></p>
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">Rate</dt>
-				<dd>{card.rate}{card.compounding === null ? "" : `, ${card.compounding}`}</dd>
+				<dd>{card.rate}{card.compounding === null ? "" : `, ${card.compounding}`}<WasText was={mark.was.rate} /><WasText was={mark.was.compounding} /></dd>
 				{#if card.lockedUntil !== null}
 					<dt class="text-muted-foreground">Locked until</dt>
-					<dd>{card.lockedUntil}</dd>
+					<dd>{card.lockedUntil}<WasText was={mark.was.lockedUntil} /></dd>
 				{/if}
 				<dt class="text-muted-foreground">Baseline balance</dt>
 				<dd>

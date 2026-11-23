@@ -1,4 +1,5 @@
 <script lang="ts">
+import { queryParam } from "../../client/query-param.svelte.js"
 import NetWorthPage from "../../components/pages/NetWorthPage.svelte"
 </script>
 
@@ -6,4 +7,4 @@ import NetWorthPage from "../../components/pages/NetWorthPage.svelte"
 	<title>Net worth · Dashboard</title>
 </svelte:head>
 
-<NetWorthPage />
+<NetWorthPage scenario={queryParam("scenario", "")} />
