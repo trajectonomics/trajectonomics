@@ -47,3 +47,7 @@ _Avoid_: Goal, event, target date
 **What-if session**:
 The changes one tab holds against one plan, switched items off (Removals) and values set (Sets), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. It is held in the tab only.
 _Avoid_: scratch plan, draft, scenario copy, simulation
+
+**Loan**:
+A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.
+_Avoid_: debt schedule, amortization, mortgage (as a kind)

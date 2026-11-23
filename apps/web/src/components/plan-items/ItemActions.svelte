@@ -4,8 +4,8 @@ import { editSession } from "../../client/edit.svelte.js"
 interface Props {
 	/** The item's id when the form edits an item; absent for a new one, which has nothing to delete. */
 	id?: string | undefined
-	/** Removes the item from the plan. Runs after the person confirms the delete. */
-	onDelete: () => void
+	/** Removes the item from the plan. Runs after the person confirms the delete; absent for a form that deletes nothing. */
+	onDelete?: () => void
 	/** True when the drawer tries a value in the What-if session: the save is a Set, and nothing is deleted. */
 	trying?: boolean
 }

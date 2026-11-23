@@ -49,6 +49,10 @@ let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $pr
 				<dd>{card.end}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
 				<dt class="text-muted-foreground">Growth</dt>
 				<dd>{card.growth}</dd>
+				{#if card.category !== null}
+					<dt class="text-muted-foreground">Category</dt>
+					<dd>{card.category}</dd>
+				{/if}
 				{#if card.earned !== null}
 					<dt class="text-muted-foreground">Income</dt>
 					<dd>{card.earned}</dd>

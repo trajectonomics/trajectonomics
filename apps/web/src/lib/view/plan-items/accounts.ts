@@ -16,7 +16,10 @@ export interface AccountCard {
 }
 
 /** The Baseline's amount for an Account: its ledger id or its name is the Scenario's id for it. */
-function balanceOf(account: ScenarioAccount, baseline: Read<Baseline> | undefined): string | null {
+export function balanceOf(
+	account: ScenarioAccount,
+	baseline: Read<Baseline> | undefined,
+): string | null {
 	if (baseline === undefined || !baseline.ok) return null
 	const row = baseline.data.rows.find(
 		(item) => item.account.id === account.id || item.account.name === account.id,

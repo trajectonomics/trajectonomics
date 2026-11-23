@@ -17,6 +17,8 @@ interface Props {
 let { snapshot, kind, scenario, editable }: Props = $props()
 const name = $derived(chooseScenario(snapshot.params.scenarios, scenario))
 const read = $derived(name === null ? undefined : snapshot.reads.documents[name])
+/** The plan's Projection run, which states the loans' statements (cli ADR 0059), when it is read. */
+const projection = $derived(name === null ? undefined : snapshot.reads.projections[name])
 </script>
 
 {#if name === null || read === undefined}
@@ -33,6 +35,7 @@ const read = $derived(name === null ? undefined : snapshot.reads.documents[name]
 				household={data.scenario.household}
 				contentHash={data.scenario.contentHash}
 				baseline={snapshot.reads.baseline}
+				run={projection?.ok === true ? projection.data : undefined}
 				{editable}
 			/>
 		{/snippet}

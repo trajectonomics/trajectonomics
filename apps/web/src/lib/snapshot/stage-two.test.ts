@@ -81,6 +81,7 @@ describe("stage two", () => {
 			"2026-10-31",
 			"--horizon",
 			"2060-12-31",
+			"--liabilities",
 			"--json",
 		])
 		expect(plan.fi["base"]?.argv).toEqual([
@@ -133,10 +134,11 @@ describe("stage two", () => {
 			stageOne("2026-10-31", ["base"]),
 		)
 		expect(plan.projections["base"]?.argv).toContain("--monthly")
-		expect(plan.projections["base"]?.argv.slice(-4)).toEqual([
+		expect(plan.projections["base"]?.argv.slice(-5)).toEqual([
 			"--carry-in",
 			"-",
 			"--monthly",
+			"--liabilities",
 			"--json",
 		])
 		expect(plan.projections["base"]?.carryInFor).toEqual(["base"])

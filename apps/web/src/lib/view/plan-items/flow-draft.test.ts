@@ -4,6 +4,7 @@ import { flowFromDraft } from "./flow-draft"
 import { type FlowDraft, flowDraftOf } from "./flows"
 
 const blank: FlowDraft = {
+	category: "",
 	name: "",
 	frequency: "monthly",
 	start: "2027-01-01",

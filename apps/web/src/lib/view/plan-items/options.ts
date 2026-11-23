@@ -59,3 +59,30 @@ export const WHEN_CHOICES: readonly Choice[] = [
 	{ value: "lifeEnd", label: "At life end" },
 	{ value: "joins", label: "At joining" },
 ]
+
+/** How a loan's interest is added, which is also how often its payments fall (cli ADR 0059). */
+export const LOAN_COMPOUNDING_CHOICES: readonly Choice[] = [
+	{ value: "monthly", label: "Monthly: a payment each month" },
+	{ value: "quarterly", label: "Quarterly: a payment each quarter" },
+	{ value: "annual", label: "Yearly: a payment each year" },
+]
+
+/** How a payment rounds to a minor unit. The first choice is none: the person states the rule. */
+export const ROUNDING_CHOICES: readonly Choice[] = [
+	{ value: "", label: "Choose how a payment rounds" },
+	{ value: "floor", label: "Round down" },
+	{ value: "halfUp", label: "Round to the nearest" },
+	{ value: "ceil", label: "Round up" },
+]
+
+/** When a loan's money arrives: it is owed already, or it is borrowed on a date. */
+export const ARRIVAL_CHOICES: readonly Choice[] = [
+	{ value: "owed", label: "I already owe it (the Baseline holds the debt)" },
+	{ value: "date", label: "It is borrowed on a date" },
+]
+
+/** How an extra payment is made: once, or every month until an end. */
+export const EXTRA_MODE_CHOICES: readonly Choice[] = [
+	{ value: "once", label: "Once, on a date" },
+	{ value: "monthly", label: "Every month until an end" },
+]
