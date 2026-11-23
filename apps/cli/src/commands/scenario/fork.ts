@@ -5,15 +5,10 @@ import { defineCommand } from "../../command"
 import { isAppError } from "../../errors"
 import { invalidScenarioName, scenarioNotFound } from "../../scenario/errors"
 import { type Applied, reply, transformFor } from "../../scenario/fork-result"
-import { decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
+import { appliedOverride, decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { droppedAnchors, writtenScenario } from "../../scenario/view"
 import type { ForkOptions } from "../../store"
 import { withStore } from "../../with-store"
-
-const appliedOverride = z.strictObject({
-	path: z.string().describe("The dotted path, escaped and canonical."),
-	value: z.unknown().describe("The JSON value the path was set to."),
-})
 
 export const fork: Leaf = defineCommand({
 	name: "fork",

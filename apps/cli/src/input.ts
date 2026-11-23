@@ -51,13 +51,18 @@ function validate(
 
 type ParsedInput = { input: unknown; document?: unknown }
 
-/** A document flag beside a flag the document form cannot take, with the spec's hint if it has one. */
+/**
+ * A document flag beside a flag the document form cannot take. The hint names the form each refused
+ * flag takes: its own `exclusiveHints` entry, or the spec's hint (cli ADR-0057).
+ */
 function mixedFailure(spec: DocumentSpec, flag: string, mixed: readonly string[]): AppError {
 	const flags = mixed.map((field) => `--${toKebab(field)}`).join(", ")
+	const hints = [...new Set(mixed.map((field) => spec.exclusiveHints?.[field] ?? spec.hint))]
+	const present = hints.filter((hint): hint is string => hint !== undefined)
 	return fail("invalid_input", {
 		path: spec.flag,
 		message: `${flag} cannot be combined with ${flags}`,
-		...(spec.hint === undefined ? {} : { hint: spec.hint }),
+		...(present.length === 0 ? {} : { hint: present.join(" ") }),
 	})
 }
 

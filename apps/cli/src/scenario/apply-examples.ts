@@ -32,4 +32,9 @@ export const APPLY_EXAMPLES: Example[] = [
 		description:
 			"Write only if base still holds that contentHash; otherwise refuse and write nothing.",
 	},
+	{
+		command: "traj scenario apply base --set flows.salary.amount=9000000 --dry-run",
+		description:
+			"Apply a what-if to the stored base, as projection run --set would project it, and roll the write back.",
+	},
 ]
