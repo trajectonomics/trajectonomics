@@ -11,6 +11,8 @@ type CompareFlags = {
 	a: string
 	b?: string | undefined
 	set?: readonly string[] | undefined
+	without?: readonly string[] | undefined
+	decimal?: boolean | undefined
 	birthDate?: string | undefined
 	asOf: string
 }
@@ -29,7 +31,13 @@ export function compared(input: {
 	// as stored.
 	const b =
 		input.input.b === undefined
-			? prepare({ scenario: input.input.a, scenarioPath: "a", sets: input.input.set ?? [] })
+			? prepare({
+					scenario: input.input.a,
+					scenarioPath: "a",
+					sets: input.input.set ?? [],
+					without: input.input.without ?? [],
+					decimal: input.input.decimal ?? false,
+				})
 			: prepare({ scenario: input.input.b, scenarioPath: "b", sets: [] })
 	if (isAppError(b)) return b
 	const placed = withCarryIn({

@@ -13,6 +13,8 @@ import { valuation } from "./value"
 
 export interface DebtResult {
 	readonly paid: bigint
+	/** The debt payment each liability received on the date; only the nonzero payments. */
+	readonly paidBy: ReadonlyMap<AccountId, bigint>
 	readonly funded: ReadonlyMap<string, bigint>
 	readonly problem: ProjectionProblem | undefined
 }
@@ -24,7 +26,13 @@ export interface AssetResult {
 	readonly problem: ProjectionProblem | undefined
 }
 
-const NOTHING: DebtResult = { paid: 0n, funded: new Map(), problem: undefined }
+interface TargetPayment {
+	readonly paid: bigint
+	readonly funded: ReadonlyMap<string, bigint>
+	readonly problem: ProjectionProblem | undefined
+}
+
+const NOTHING: TargetPayment = { paid: 0n, funded: new Map(), problem: undefined }
 
 function applyDebtTarget(
 	states: StateMap,
@@ -32,7 +40,7 @@ function applyDebtTarget(
 	entries: readonly ContributionEntry[],
 	date: DateString,
 	levies: LevySet | undefined,
-): DebtResult {
+): TargetPayment {
 	const state = states.get(target)
 	const planned = plannedTotal(entries)
 	if (state?.rule.kind !== "liability" || planned === 0n) return NOTHING
@@ -52,14 +60,16 @@ export function applyDebt(
 ): DebtResult {
 	const groups = groupEntries(entries)
 	let paid = 0n
+	const paidBy = new Map<AccountId, bigint>()
 	const funded = new Map<string, bigint>()
 	for (const target of [...groups.keys()].sort(compareIds)) {
 		const result = applyDebtTarget(states, target, groups.get(target) ?? [], date, levies)
-		if (result.problem !== undefined) return { paid, funded, problem: result.problem }
+		if (result.problem !== undefined) return { paid, paidBy, funded, problem: result.problem }
 		paid += result.paid
+		if (result.paid > 0n) paidBy.set(target, result.paid)
 		for (const [label, amount] of result.funded) addTo(funded, label, amount)
 	}
-	return { paid, funded, problem: undefined }
+	return { paid, paidBy, funded, problem: undefined }
 }
 
 /**

@@ -1,56 +1,14 @@
 import { z } from "zod"
 import { UUID_SHAPED } from "../../account/name"
-import type { Leaf, Result } from "../../command"
-import { defineCommand, ok } from "../../command"
-import { type AppError, isAppError } from "../../errors"
-import type { ScenarioDocument } from "../../scenario/document"
-import { invalidScenarioName, scenarioNameTaken, scenarioNotFound } from "../../scenario/errors"
-import { applyScenarioSets } from "../../scenario/set-apply"
-import type { AppliedOverride } from "../../scenario/set-error"
-import { droppedAnchors, view, type WrittenScenario, writtenScenario } from "../../scenario/view"
-import type { ForkOptions, ScenarioForked, ScenarioTransform } from "../../store"
+import type { Leaf } from "../../command"
+import { defineCommand } from "../../command"
+import { isAppError } from "../../errors"
+import { invalidScenarioName, scenarioNotFound } from "../../scenario/errors"
+import { type Applied, reply, transformFor } from "../../scenario/fork-result"
+import { appliedOverride, decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
+import { droppedAnchors, writtenScenario } from "../../scenario/view"
+import type { ForkOptions } from "../../store"
 import { withStore } from "../../with-store"
-
-const appliedOverride = z.strictObject({
-	path: z.string().describe("The dotted path, escaped and canonical."),
-	value: z.unknown().describe("The JSON value the path was set to."),
-})
-
-type ForkResult = {
-	dryRun: boolean
-	status: "forked"
-	overrides: AppliedOverride[]
-	scenario: WrittenScenario
-	droppedAnchors: string[]
-}
-
-/** Applies the sets inside the store's write, and keeps their echo for the result. */
-function transformFor(
-	sets: readonly string[],
-	echo: (overrides: AppliedOverride[]) => void,
-): ScenarioTransform {
-	return (document: ScenarioDocument) => {
-		const applied = applyScenarioSets(document, sets)
-		if (isAppError(applied)) return applied
-		echo(applied.overrides)
-		return applied.document
-	}
-}
-
-function reply(
-	outcome: ScenarioForked | AppError,
-	from: string,
-	overrides: AppliedOverride[],
-	dryRun: boolean,
-): Result<ForkResult> | AppError {
-	if (isAppError(outcome)) return outcome
-	if (outcome.status === "not_found") return scenarioNotFound(from, "from")
-	if (outcome.status === "name_taken") return scenarioNameTaken(outcome.scenario.id)
-	const rendered = view(outcome.scenario)
-	const scenario: WrittenScenario = { ...rendered, id: dryRun ? null : rendered.id }
-	const { droppedAnchors } = outcome
-	return ok({ dryRun, status: "forked", overrides, scenario, droppedAnchors })
-}
 
 export const fork: Leaf = defineCommand({
 	name: "fork",
@@ -62,16 +20,18 @@ export const fork: Leaf = defineCommand({
 			.string()
 			.min(1)
 			.describe("The copy's name; exact, case-sensitive and not shaped like a UUID."),
-		set: z
-			.array(z.string())
-			.optional()
-			.describe("Replace one existing dotted document path with a JSON value."),
+		set: setFlag,
+		without: withoutFlag,
+		decimal: decimalFlag,
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
 	output: z.strictObject({
 		dryRun: z.boolean().describe("True when the write was rolled back."),
 		status: z.literal("forked").describe("The source was copied."),
 		overrides: z.array(appliedOverride).describe("The applied overrides, in command-line order."),
+		removals: z
+			.array(z.string())
+			.describe("The dotted paths of the list items taken out with --without, in order."),
 		scenario: writtenScenario,
 		droppedAnchors,
 	}),
@@ -86,20 +46,21 @@ export const fork: Leaf = defineCommand({
 	run: (input, ctx) => {
 		if (UUID_SHAPED.test(input.name)) return invalidScenarioName()
 		const sets = input.set ?? []
+		const without = input.without ?? []
 		const dryRun = input.dryRun === true
 		return withStore(ctx, (store) => {
 			const source = store.getScenario(input.from)
 			if (isAppError(source)) return source
 			if (source === null) return scenarioNotFound(input.from, "from")
-			let overrides: AppliedOverride[] = []
+			let applied: Applied = { overrides: [], removals: [] }
 			const options: ForkOptions = { dryRun }
-			if (sets.length > 0) {
-				options.transform = transformFor(sets, (applied) => {
-					overrides = applied
+			if (sets.length > 0 || without.length > 0) {
+				options.transform = transformFor({ sets, without, decimal: input.decimal }, (done) => {
+					applied = done
 				})
 			}
 			const outcome = store.forkScenario(source.id, input.name, options)
-			return reply(outcome, input.from, overrides, dryRun)
+			return reply(outcome, input.from, applied, dryRun)
 		})
 	},
 })

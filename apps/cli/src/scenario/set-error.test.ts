@@ -1,12 +1,12 @@
 import { describe, expect, it } from "bun:test"
 import { SCENARIO_DOCUMENT } from "../store/testing"
 import type { ScenarioProblem } from "./document"
-import { type AppliedOverride, documentFailure } from "./set-error"
+import { type AppliedItem, documentFailure } from "./set-document"
 
 const PROBLEM: ScenarioProblem = { code: "NEGATIVE_AMOUNT", segments: ["flows", 0, "amount"] }
 
-function overrides(...paths: string[]): AppliedOverride[] {
-	return paths.map((path) => ({ path, value: 1 }))
+function overrides(...paths: string[]): AppliedItem[] {
+	return paths.map((path) => ({ flag: "set", path }))
 }
 
 describe("documentFailure", () => {

@@ -20,6 +20,7 @@ export function chanceFixture(overrides: Partial<ProjectionChance> = {}): Projec
 			effectiveContentHash: "jcs1:sha256:aaa",
 		},
 		overrides: [],
+		removals: [],
 		tax: "applied",
 		notes: ["Every figure is nominal."],
 		horizon: "2028-12-31",

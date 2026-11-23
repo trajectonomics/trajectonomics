@@ -153,6 +153,14 @@ _Avoid_: draw, sale, transfer
 The one payment a `level` Contribution makes into a nominal liability: the amount that repays a principal over a number of equal payments at the Account's nominal rate, computed once from principal, rate and term and rounded once as the caller states. It does not grow.
 _Avoid_: annuity payment, PMT, fixed payment, installment
 
+**Liability statement**:
+One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each calendar month, cut by the Timeline start, the horizon or a run-out date, gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly.
+_Avoid_: amortization table, loan schedule, payment schedule
+
+**Paid-off date**:
+The first Landed date on which a liability's amount owed reaches zero after being above zero, reported as `paidOff` on its Liability statement. It is absent while the amount owed is never zero, such as a loan still owed at the horizon.
+_Avoid_: payoff date, maturity date, final payment date
+
 **Earned income**:
 Income from work, marked `earned: true`. It is the only income that stops in the FI test.
 _Avoid_: Active income, salary income
@@ -160,6 +168,14 @@ _Avoid_: Active income, salary income
 **Passive income**:
 Income marked `earned: false`. It continues when earned income stops.
 _Avoid_: Investment income, unearned income
+
+**Expense category**:
+An optional free-text label on an expense Flow, 1 to 64 characters with no control characters, for grouping spending in reports. It is inert: the engine never reads it, so no Projection, FI answer or chance result changes with it.
+_Avoid_: tag, label, Tally label
+
+**Cash-flow breakdown**:
+One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in equals money out exactly, and every total equals its roll-up field.
+_Avoid_: Sankey, statement, budget
 
 **Cashflow**:
 The routing rules for net money each time flows land: ordered `surplus` steps (account, optional fixed `upTo`), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list.

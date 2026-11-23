@@ -5,6 +5,7 @@ import { collectDates } from "./dates"
 import { buildEvents, flowsAt } from "./events"
 import { finishLevies, planLevies } from "./levy-finish"
 import { allSettlementDates, type LevySet } from "./levy-set"
+import { type LiabilityLedger, openLedger } from "./liability-ledger"
 import type { EngineResult } from "./result"
 import { resolveReturns } from "./return-rows"
 import type { Returns } from "./returns"
@@ -36,6 +37,12 @@ function finish(
 	return { ok: true, run: { ...withLevies.run, milestones: gate.results(runEnd) } }
 }
 
+/** Attaches the liability ledger's paid-off dates, when the run tracks liabilities. */
+function attachLedger(result: EngineResult, ledger: LiabilityLedger | undefined): EngineResult {
+	if (!result.ok || ledger === undefined) return result
+	return { ok: true, run: { ...result.run, paidOff: ledger.paidOff } }
+}
+
 function endDate(result: EngineResult, timeline: Timeline): DateString {
 	if (!result.ok) return timeline.horizon
 	return result.run.runsOut?.date ?? timeline.horizon
@@ -47,18 +54,23 @@ export function runEngine(
 	timeline: Timeline,
 	observations: readonly DateString[],
 	returns?: Returns,
+	tracked = false,
+	breakdown = false,
 ): EngineResult {
 	const states = createStates(baseline, scenario, timeline.start, resolveReturns(returns, timeline))
 	const calendar = resolvedCalendar(scenario)
 	const events = buildEvents(scenario, timeline, calendar)
 	const levies = planLevies(scenario, timeline, calendar)
 	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
+	const ledger = tracked ? openLedger(states, timeline.start) : undefined
 	const acc: RunAccumulator = {
 		snapshots: [],
 		totals: [],
 		wanted: new Set<DateString>(observations),
 		levies,
 		gate,
+		ledger,
+		breakdown,
 	}
 	let index = 0
 	const settlements = levies === undefined ? [] : allSettlementDates(levies, timeline.horizon)
@@ -67,8 +79,11 @@ export function runEngine(
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
 		const result = stepDate(acc, states, scenario, date, dayEvents)
-		if (result !== undefined) return finish(result, states, levies, gate, endDate(result, timeline))
+		if (result !== undefined) {
+			const end = endDate(result, timeline)
+			return attachLedger(finish(result, states, levies, gate, end), ledger)
+		}
 	}
 	const run = { snapshots: acc.snapshots, totals: acc.totals }
-	return finish({ ok: true, run }, states, levies, gate, timeline.horizon)
+	return attachLedger(finish({ ok: true, run }, states, levies, gate, timeline.horizon), ledger)
 }

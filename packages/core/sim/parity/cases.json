@@ -5565,5 +5565,2068 @@
 			"paths": 4
 		},
 		"chanceSha256": "598dd5a30555273ac476f2e5c9e365114cc48c76023a7a9cb639dd0ecba97ed1"
+	},
+	{
+		"name": "loan-statement-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "c0642fdeb49f9da42aca5a7f7d3e6c7bcf1cf34b3a4bbfbf9549ac3d2adb0392"
+	},
+	{
+		"name": "loan-statement-extra",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 3000000
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				},
+				{
+					"id": "extra",
+					"frequency": "once",
+					"start": "2026-04-30",
+					"amount": 3000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "loan"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "cfe76284cfd3a7bd4587cf8ea9f0892d0008d77b832d871fa73c5eaac7dad420"
+	},
+	{
+		"name": "loan-statement-mid-month",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-15",
+					"level": {
+						"principal": 10000000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-02-20",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "d75804c80210380b8636c91506225ef48334c4a6a9fe3491f70b193e26e11f86"
+	},
+	{
+		"name": "loan-statement-borrow",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "borrow",
+					"kind": "withdrawal",
+					"source": "loan",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 10000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-04-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "2978029ae3cc8113bc71ae24531cc67360a9a6763ab9098d56008b1b89659b9a"
+	},
+	{
+		"name": "loan-statement-zero-rate",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 1200000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 1200000,
+						"payments": 12,
+						"rounding": "ceil"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "9bccd8d3e47878a88709457b99de74135c1bbeb2ace811a9faf56694610ce136"
+	},
+	{
+		"name": "loan-statement-open",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 100000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "repay",
+					"kind": "contribution",
+					"target": "loan",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"level": {
+						"principal": 100000000,
+						"payments": 360,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-06-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "44b4e381304c30926eb0069ce08bac9be85c5f17e1715591623f19c3cca74f77"
+	},
+	{
+		"name": "loan-statement-run-out",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 10000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 600,
+					"compounding": "monthly"
+				}
+			],
+			"flows": [
+				{
+					"id": "rent",
+					"kind": "expense",
+					"frequency": "once",
+					"start": "2026-02-15",
+					"amount": 5000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2025-12-31",
+			"horizon": "2026-06-30",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"liabilityStatements": true
+		},
+		"sha256": "7e4817d55910979e65e7eebfb8f814a666eb4211f9dde5c8580c6cbd4fb13cbb"
+	},
+	{
+		"name": "freelancer-categorised-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation",
+					"category": "essentials"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2051-01-01",
+			"resolution": "day"
+		},
+		"sha256": "a2f7b7f7e6c709045fd0c4cb27be0e50fda465e844ca9c5f84859d97a45302dc"
+	},
+	{
+		"name": "cashflow-hand-year",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "savings",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 1000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true,
+					"label": "salary",
+					"prepayments": [
+						{
+							"levy": "th-like",
+							"bps": 500
+						}
+					]
+				},
+				{
+					"id": "passive",
+					"frequency": "once",
+					"start": "2026-06-15",
+					"amount": 300000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": false
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 200000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense",
+					"category": "essentials"
+				},
+				{
+					"id": "school",
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"amount": 150000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				},
+				{
+					"id": "car",
+					"frequency": "once",
+					"start": "2026-05-20",
+					"amount": 1200000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense",
+					"category": "car"
+				},
+				{
+					"id": "loan-payment",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 100000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "loan"
+				},
+				{
+					"id": "ssf",
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "contribution",
+					"target": "savings"
+				},
+				{
+					"id": "borrow",
+					"kind": "withdrawal",
+					"source": "loan",
+					"amount": 500000,
+					"frequency": "once",
+					"start": "2026-07-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash",
+						"upTo": 100000
+					},
+					{
+						"account": "savings"
+					}
+				],
+				"contribute": ["savings"],
+				"withdraw": ["savings", "cash"]
+			},
+			"levies": [
+				{
+					"id": "th-like",
+					"period": {
+						"month": 1,
+						"day": 1
+					},
+					"settlement": {
+						"month": 3,
+						"day": 31
+					},
+					"due": "owed",
+					"measures": [
+						{
+							"id": "zero",
+							"op": "const",
+							"value": 0
+						},
+						{
+							"id": "income",
+							"op": "tally",
+							"label": "salary",
+							"basis": "gross"
+						},
+						{
+							"id": "saved",
+							"op": "tally",
+							"label": "fund",
+							"basis": "funded"
+						},
+						{
+							"id": "half",
+							"op": "scale",
+							"of": "income",
+							"num": 1,
+							"den": 2,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfUnits",
+							"op": "scale",
+							"of": "half",
+							"num": 1,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfWhole",
+							"op": "scale",
+							"of": "halfUnits",
+							"num": 100,
+							"den": 1,
+							"rounding": "floor"
+						},
+						{
+							"id": "expenseCap",
+							"op": "const",
+							"value": 10000000
+						},
+						{
+							"id": "deduction",
+							"op": "min",
+							"a": "halfWhole",
+							"b": "expenseCap"
+						},
+						{
+							"id": "allowanceShare",
+							"op": "scale",
+							"of": "income",
+							"num": 15,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "allowanceCeiling",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "allowanceByShare",
+							"op": "min",
+							"a": "saved",
+							"b": "allowanceShare"
+						},
+						{
+							"id": "allowance",
+							"op": "min",
+							"a": "allowanceByShare",
+							"b": "allowanceCeiling"
+						},
+						{
+							"id": "personal",
+							"op": "const",
+							"value": 6000000
+						},
+						{
+							"id": "afterDeduction",
+							"op": "sub",
+							"a": "income",
+							"b": "deduction"
+						},
+						{
+							"id": "afterAllowance",
+							"op": "sub",
+							"a": "afterDeduction",
+							"b": "allowance"
+						},
+						{
+							"id": "net",
+							"op": "sub",
+							"a": "afterAllowance",
+							"b": "personal"
+						},
+						{
+							"id": "lo1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "width1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "above1",
+							"op": "sub",
+							"a": "net",
+							"b": "lo1"
+						},
+						{
+							"id": "inside1",
+							"op": "max",
+							"a": "above1",
+							"b": "zero"
+						},
+						{
+							"id": "capped1",
+							"op": "min",
+							"a": "inside1",
+							"b": "width1"
+						},
+						{
+							"id": "slice1",
+							"op": "scale",
+							"of": "capped1",
+							"num": 5,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo2",
+							"op": "const",
+							"value": 30000000
+						},
+						{
+							"id": "width2",
+							"op": "const",
+							"value": 20000000
+						},
+						{
+							"id": "above2",
+							"op": "sub",
+							"a": "net",
+							"b": "lo2"
+						},
+						{
+							"id": "inside2",
+							"op": "max",
+							"a": "above2",
+							"b": "zero"
+						},
+						{
+							"id": "capped2",
+							"op": "min",
+							"a": "inside2",
+							"b": "width2"
+						},
+						{
+							"id": "slice2",
+							"op": "scale",
+							"of": "capped2",
+							"num": 10,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo3",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "width3",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above3",
+							"op": "sub",
+							"a": "net",
+							"b": "lo3"
+						},
+						{
+							"id": "inside3",
+							"op": "max",
+							"a": "above3",
+							"b": "zero"
+						},
+						{
+							"id": "capped3",
+							"op": "min",
+							"a": "inside3",
+							"b": "width3"
+						},
+						{
+							"id": "slice3",
+							"op": "scale",
+							"of": "capped3",
+							"num": 15,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo4",
+							"op": "const",
+							"value": 75000000
+						},
+						{
+							"id": "width4",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above4",
+							"op": "sub",
+							"a": "net",
+							"b": "lo4"
+						},
+						{
+							"id": "inside4",
+							"op": "max",
+							"a": "above4",
+							"b": "zero"
+						},
+						{
+							"id": "capped4",
+							"op": "min",
+							"a": "inside4",
+							"b": "width4"
+						},
+						{
+							"id": "slice4",
+							"op": "scale",
+							"of": "capped4",
+							"num": 20,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "s12",
+							"op": "add",
+							"a": "slice1",
+							"b": "slice2"
+						},
+						{
+							"id": "s123",
+							"op": "add",
+							"a": "s12",
+							"b": "slice3"
+						},
+						{
+							"id": "owed",
+							"op": "add",
+							"a": "s123",
+							"b": "slice4"
+						}
+					],
+					"carryIn": [
+						{
+							"periodStart": "2025-01-01",
+							"tallies": [],
+							"prepaid": 0
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "6e80109de76a103bd06e783c233e6aecbc11711df0a2614a64d192f0e60f17cc"
+	},
+	{
+		"name": "cashflow-categorised-freelancer",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation",
+					"category": "essentials"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2051-01-01",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "01c7832646a60c415443b71a0c6504d31bfee8279fa0d40b6c224a303280c4ed"
+	},
+	{
+		"name": "cashflow-levy-refund-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"kind": "income",
+					"earned": true,
+					"amount": 10000000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": {
+						"bps": 0
+					},
+					"label": "salary",
+					"prepayments": [
+						{
+							"levy": "th-like",
+							"bps": 1000
+						}
+					]
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			},
+			"levies": [
+				{
+					"id": "th-like",
+					"period": {
+						"month": 1,
+						"day": 1
+					},
+					"settlement": {
+						"month": 3,
+						"day": 31
+					},
+					"due": "owed",
+					"measures": [
+						{
+							"id": "zero",
+							"op": "const",
+							"value": 0
+						},
+						{
+							"id": "income",
+							"op": "tally",
+							"label": "salary",
+							"basis": "gross"
+						},
+						{
+							"id": "saved",
+							"op": "tally",
+							"label": "fund",
+							"basis": "funded"
+						},
+						{
+							"id": "half",
+							"op": "scale",
+							"of": "income",
+							"num": 1,
+							"den": 2,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfUnits",
+							"op": "scale",
+							"of": "half",
+							"num": 1,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfWhole",
+							"op": "scale",
+							"of": "halfUnits",
+							"num": 100,
+							"den": 1,
+							"rounding": "floor"
+						},
+						{
+							"id": "expenseCap",
+							"op": "const",
+							"value": 10000000
+						},
+						{
+							"id": "deduction",
+							"op": "min",
+							"a": "halfWhole",
+							"b": "expenseCap"
+						},
+						{
+							"id": "allowanceShare",
+							"op": "scale",
+							"of": "income",
+							"num": 15,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "allowanceCeiling",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "allowanceByShare",
+							"op": "min",
+							"a": "saved",
+							"b": "allowanceShare"
+						},
+						{
+							"id": "allowance",
+							"op": "min",
+							"a": "allowanceByShare",
+							"b": "allowanceCeiling"
+						},
+						{
+							"id": "personal",
+							"op": "const",
+							"value": 6000000
+						},
+						{
+							"id": "afterDeduction",
+							"op": "sub",
+							"a": "income",
+							"b": "deduction"
+						},
+						{
+							"id": "afterAllowance",
+							"op": "sub",
+							"a": "afterDeduction",
+							"b": "allowance"
+						},
+						{
+							"id": "net",
+							"op": "sub",
+							"a": "afterAllowance",
+							"b": "personal"
+						},
+						{
+							"id": "lo1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "width1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "above1",
+							"op": "sub",
+							"a": "net",
+							"b": "lo1"
+						},
+						{
+							"id": "inside1",
+							"op": "max",
+							"a": "above1",
+							"b": "zero"
+						},
+						{
+							"id": "capped1",
+							"op": "min",
+							"a": "inside1",
+							"b": "width1"
+						},
+						{
+							"id": "slice1",
+							"op": "scale",
+							"of": "capped1",
+							"num": 5,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo2",
+							"op": "const",
+							"value": 30000000
+						},
+						{
+							"id": "width2",
+							"op": "const",
+							"value": 20000000
+						},
+						{
+							"id": "above2",
+							"op": "sub",
+							"a": "net",
+							"b": "lo2"
+						},
+						{
+							"id": "inside2",
+							"op": "max",
+							"a": "above2",
+							"b": "zero"
+						},
+						{
+							"id": "capped2",
+							"op": "min",
+							"a": "inside2",
+							"b": "width2"
+						},
+						{
+							"id": "slice2",
+							"op": "scale",
+							"of": "capped2",
+							"num": 10,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo3",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "width3",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above3",
+							"op": "sub",
+							"a": "net",
+							"b": "lo3"
+						},
+						{
+							"id": "inside3",
+							"op": "max",
+							"a": "above3",
+							"b": "zero"
+						},
+						{
+							"id": "capped3",
+							"op": "min",
+							"a": "inside3",
+							"b": "width3"
+						},
+						{
+							"id": "slice3",
+							"op": "scale",
+							"of": "capped3",
+							"num": 15,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo4",
+							"op": "const",
+							"value": 75000000
+						},
+						{
+							"id": "width4",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above4",
+							"op": "sub",
+							"a": "net",
+							"b": "lo4"
+						},
+						{
+							"id": "inside4",
+							"op": "max",
+							"a": "above4",
+							"b": "zero"
+						},
+						{
+							"id": "capped4",
+							"op": "min",
+							"a": "inside4",
+							"b": "width4"
+						},
+						{
+							"id": "slice4",
+							"op": "scale",
+							"of": "capped4",
+							"num": 20,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "s12",
+							"op": "add",
+							"a": "slice1",
+							"b": "slice2"
+						},
+						{
+							"id": "s123",
+							"op": "add",
+							"a": "s12",
+							"b": "slice3"
+						},
+						{
+							"id": "owed",
+							"op": "add",
+							"a": "s123",
+							"b": "slice4"
+						}
+					],
+					"carryIn": [
+						{
+							"periodStart": "2025-01-01",
+							"tallies": [],
+							"prepaid": 0
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2027-03-31",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "be5bfd75721df44707abba030b9afed9b7f04473b9194d4d6dfa8eb82f293dc7"
+	},
+	{
+		"name": "cashflow-levy-shortfall-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"kind": "income",
+					"earned": true,
+					"amount": 10000000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"end": "2026-12-31",
+					"growth": {
+						"bps": 0
+					},
+					"label": "salary",
+					"prepayments": [
+						{
+							"levy": "th-like",
+							"bps": 500
+						}
+					]
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": []
+			},
+			"levies": [
+				{
+					"id": "th-like",
+					"period": {
+						"month": 1,
+						"day": 1
+					},
+					"settlement": {
+						"month": 3,
+						"day": 31
+					},
+					"due": "owed",
+					"measures": [
+						{
+							"id": "zero",
+							"op": "const",
+							"value": 0
+						},
+						{
+							"id": "income",
+							"op": "tally",
+							"label": "salary",
+							"basis": "gross"
+						},
+						{
+							"id": "saved",
+							"op": "tally",
+							"label": "fund",
+							"basis": "funded"
+						},
+						{
+							"id": "half",
+							"op": "scale",
+							"of": "income",
+							"num": 1,
+							"den": 2,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfUnits",
+							"op": "scale",
+							"of": "half",
+							"num": 1,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "halfWhole",
+							"op": "scale",
+							"of": "halfUnits",
+							"num": 100,
+							"den": 1,
+							"rounding": "floor"
+						},
+						{
+							"id": "expenseCap",
+							"op": "const",
+							"value": 10000000
+						},
+						{
+							"id": "deduction",
+							"op": "min",
+							"a": "halfWhole",
+							"b": "expenseCap"
+						},
+						{
+							"id": "allowanceShare",
+							"op": "scale",
+							"of": "income",
+							"num": 15,
+							"den": 100,
+							"rounding": "floor"
+						},
+						{
+							"id": "allowanceCeiling",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "allowanceByShare",
+							"op": "min",
+							"a": "saved",
+							"b": "allowanceShare"
+						},
+						{
+							"id": "allowance",
+							"op": "min",
+							"a": "allowanceByShare",
+							"b": "allowanceCeiling"
+						},
+						{
+							"id": "personal",
+							"op": "const",
+							"value": 6000000
+						},
+						{
+							"id": "afterDeduction",
+							"op": "sub",
+							"a": "income",
+							"b": "deduction"
+						},
+						{
+							"id": "afterAllowance",
+							"op": "sub",
+							"a": "afterDeduction",
+							"b": "allowance"
+						},
+						{
+							"id": "net",
+							"op": "sub",
+							"a": "afterAllowance",
+							"b": "personal"
+						},
+						{
+							"id": "lo1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "width1",
+							"op": "const",
+							"value": 15000000
+						},
+						{
+							"id": "above1",
+							"op": "sub",
+							"a": "net",
+							"b": "lo1"
+						},
+						{
+							"id": "inside1",
+							"op": "max",
+							"a": "above1",
+							"b": "zero"
+						},
+						{
+							"id": "capped1",
+							"op": "min",
+							"a": "inside1",
+							"b": "width1"
+						},
+						{
+							"id": "slice1",
+							"op": "scale",
+							"of": "capped1",
+							"num": 5,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo2",
+							"op": "const",
+							"value": 30000000
+						},
+						{
+							"id": "width2",
+							"op": "const",
+							"value": 20000000
+						},
+						{
+							"id": "above2",
+							"op": "sub",
+							"a": "net",
+							"b": "lo2"
+						},
+						{
+							"id": "inside2",
+							"op": "max",
+							"a": "above2",
+							"b": "zero"
+						},
+						{
+							"id": "capped2",
+							"op": "min",
+							"a": "inside2",
+							"b": "width2"
+						},
+						{
+							"id": "slice2",
+							"op": "scale",
+							"of": "capped2",
+							"num": 10,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo3",
+							"op": "const",
+							"value": 50000000
+						},
+						{
+							"id": "width3",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above3",
+							"op": "sub",
+							"a": "net",
+							"b": "lo3"
+						},
+						{
+							"id": "inside3",
+							"op": "max",
+							"a": "above3",
+							"b": "zero"
+						},
+						{
+							"id": "capped3",
+							"op": "min",
+							"a": "inside3",
+							"b": "width3"
+						},
+						{
+							"id": "slice3",
+							"op": "scale",
+							"of": "capped3",
+							"num": 15,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "lo4",
+							"op": "const",
+							"value": 75000000
+						},
+						{
+							"id": "width4",
+							"op": "const",
+							"value": 25000000
+						},
+						{
+							"id": "above4",
+							"op": "sub",
+							"a": "net",
+							"b": "lo4"
+						},
+						{
+							"id": "inside4",
+							"op": "max",
+							"a": "above4",
+							"b": "zero"
+						},
+						{
+							"id": "capped4",
+							"op": "min",
+							"a": "inside4",
+							"b": "width4"
+						},
+						{
+							"id": "slice4",
+							"op": "scale",
+							"of": "capped4",
+							"num": 20,
+							"den": 100,
+							"rounding": "halfUp"
+						},
+						{
+							"id": "s12",
+							"op": "add",
+							"a": "slice1",
+							"b": "slice2"
+						},
+						{
+							"id": "s123",
+							"op": "add",
+							"a": "s12",
+							"b": "slice3"
+						},
+						{
+							"id": "owed",
+							"op": "add",
+							"a": "s123",
+							"b": "slice4"
+						}
+					],
+					"carryIn": [
+						{
+							"periodStart": "2025-01-01",
+							"tallies": [],
+							"prepaid": 0
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2027-03-31",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "2fa8b152a482e6fb22d57c40ba834ee565432894019f66773a1e20b5218145b7"
+	},
+	{
+		"name": "cashflow-loan-borrow-day",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "loan",
+					"amount": 0
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "loan",
+					"kind": "liability",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "borrow",
+					"kind": "withdrawal",
+					"source": "loan",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 50000000,
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "rent",
+					"kind": "expense",
+					"frequency": "once",
+					"start": "2026-03-15",
+					"amount": 3000000,
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-03-14",
+			"horizon": "2026-03-16",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "032b96e462e32cfd858f63ee6ce7377dd02969fe6e4bb80c307d8a2ec11f2690"
 	}
 ]

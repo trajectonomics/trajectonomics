@@ -85,6 +85,15 @@ instead of an `amount`: the one payment that repays `principal` over `payments` 
 the Account's nominal rate, rounded once with the stated `rounding`. `levelPayment` returns the same
 figure without a Projection. See [ADR 0016](docs/adr/0016-loans-borrowing-and-level-payments.md).
 
+With `liabilityStatements: true`, a Projection also reports one monthly statement per liability: the
+drawn and paid amounts, the interest and the amount owed, and the `paidOff` date once it is zero. See
+[ADR 0017](docs/adr/0017-liability-statements.md).
+
+With `cashflowBreakdown: true`, a Projection also reports one cash-flow breakdown per Annual roll-up:
+the income by Flow, the Prepayment and Settlement by Levy, the expenses by Flow and category, the
+contributions by Account, the withdrawals and surplus, with money in equal to money out exactly. See
+[ADR 0018](docs/adr/0018-cash-flow-breakdown.md).
+
 ```ts
 import {
 	type Baseline,
@@ -130,10 +139,13 @@ const timeline = {
 
 console.log(check(baseline, scenario, timeline))
 
-const result = project(baseline, scenario, timeline)
+const result = project(baseline, scenario, timeline, { liabilityStatements: true })
 if (result.ok) {
 	const owed = result.projection.rows.find((row) => row.date === "2026-06-30")?.balances.find((item) => item.account === "car-loan")
 	console.log(owed?.amount)
+	const statement = result.projection.liabilities?.find((item) => item.account === "car-loan")
+	for (const month of statement?.months ?? []) console.log(month.to, month.drawn, month.interest, month.paid, month.closing)
+	console.log(statement?.paidOff)
 }
 ```
 
@@ -143,6 +155,20 @@ It prints the payment, the empty problem list and the loan's balance at 30 June 
 860665
 []
 5023542
+2025-12-31 0 0 0 0
+2026-01-31 10000000 0 860665 9139335
+2026-02-28 0 45697 860665 8324367
+2026-03-31 0 41622 860665 7505324
+2026-04-30 0 37527 860665 6682186
+2026-05-31 0 33411 860665 5854932
+2026-06-30 0 29275 860665 5023542
+2026-07-31 0 25118 860665 4187995
+2026-08-31 0 20940 860665 3348270
+2026-09-30 0 16741 860665 2504346
+2026-10-31 0 12522 860665 1656203
+2026-11-30 0 8281 860665 803819
+2026-12-31 0 4019 807838 0
+2026-12-31
 ```
 
 ## Levies

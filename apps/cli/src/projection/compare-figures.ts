@@ -1,10 +1,12 @@
 import type {
 	AccountAmount,
+	AnnualRollup,
 	MilestoneResult,
 	ProjectionRow,
 	RunsOut,
 } from "@trajectonomics/core/sim"
 import type { Placed } from "./carryin-apply"
+import { milestoneDeltasOf } from "./compare-milestone-delta"
 import type { CompareSide } from "./compare-side"
 import type { CompareDeltas } from "./compare-view"
 import { monthsBetween, yearsBetween } from "./dates"
@@ -20,6 +22,8 @@ export type SideData = {
 	runsOut: RunsOut | undefined
 	/** Every row the Projection kept, the one on its run-out date included. */
 	rows: readonly ProjectionRow[]
+	/** The engine's Annual roll-up, one per year, in index order (cli ADR-0049, amended). */
+	annual: readonly AnnualRollup[]
 	/** The engine's milestones in Scenario order; undefined when the Scenario declares none. */
 	milestones: readonly MilestoneResult[] | undefined
 	taxYears: TaxYearView[]
@@ -34,6 +38,7 @@ export function sideView(data: SideData, money: (minor: number) => string): Comp
 	return {
 		scenario: data.prepared.scenario,
 		overrides: data.prepared.overrides,
+		removals: data.prepared.removals,
 		...(data.prepared.carryIn.length === 0 ? {} : { carryIn: data.prepared.carryIn }),
 		fi: data.fi.fi,
 		taxYears: data.taxYears,
@@ -85,5 +90,9 @@ export function deltasOf(
 				real: figure(figureA.row?.realNetWorth, figureB?.row?.realNetWorth),
 			}
 		}),
+		// Absent unless a side declares Milestones, so a compare without them keeps its bytes.
+		...(a.milestones === undefined && b.milestones === undefined
+			? {}
+			: { milestones: milestoneDeltasOf(a.milestones ?? [], b.milestones ?? []) }),
 	}
 }

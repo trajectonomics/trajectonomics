@@ -13,7 +13,10 @@ export interface LevySet {
 }
 
 export interface Settlement {
+	/** Settlements of every Levy on the date, summed: the signed movement cash sees. */
 	readonly amount: bigint
+	/** Each Levy's own Settlement on the date, by Levy id; zero Settlements are included. */
+	readonly byLevy: ReadonlyMap<string, bigint>
 	readonly problem: ProjectionProblem | undefined
 }
 
@@ -48,12 +51,14 @@ export function settlementPeriodViews(
 /** Settlements of every Levy on `date`, summed into the one signed movement cash sees. */
 export function settlementOn(set: LevySet, states: StateMap, date: DateString): Settlement {
 	let amount = 0n
+	const byLevy = new Map<string, bigint>()
 	for (const tracker of set.trackers) {
 		const outcome = settleAt(tracker, states, date)
-		if (outcome.problem !== undefined) return { amount: 0n, problem: outcome.problem }
+		if (outcome.problem !== undefined) return { amount: 0n, byLevy, problem: outcome.problem }
 		amount += outcome.settlement
+		byLevy.set(tracker.levy.id, outcome.settlement)
 	}
-	return { amount, problem: undefined }
+	return { amount, byLevy, problem: undefined }
 }
 
 export function closeReturnsOn(set: LevySet, states: StateMap, date: DateString): void {

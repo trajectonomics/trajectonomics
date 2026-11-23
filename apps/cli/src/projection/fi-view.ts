@@ -18,7 +18,7 @@ import {
 	type Echo,
 	engineEcho,
 	notesField,
-	overridesField,
+	overrideFields,
 	scenarioEcho,
 	taxField,
 } from "./view"
@@ -89,7 +89,7 @@ export const fiView: z.ZodType<FiView> = z.strictObject({
 	asOf: asOfField,
 	engine: engineEcho,
 	scenario: scenarioEcho,
-	overrides: overridesField,
+	...overrideFields,
 	tax: taxField,
 	carryIn: carryInField,
 	notes: notesField,

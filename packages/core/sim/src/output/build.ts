@@ -2,6 +2,7 @@ import type { EngineRun } from "../engine/result"
 import { declaresWithdrawals } from "../loan/resolve"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
+import { buildCashflow } from "./cashflow"
 import { buildLevies } from "./levy"
 import { openingNetWorth } from "./opening"
 import { buildPeriods } from "./periods"
@@ -20,6 +21,7 @@ export function buildProjection(
 	baseline: Baseline,
 	scenario: Scenario,
 	timeline: Timeline,
+	breakdown = false,
 ): BuildResult {
 	const rules = accountRules(scenario)
 	const reported = new Set<string>(rowDates(timeline))
@@ -39,6 +41,8 @@ export function buildProjection(
 	if (rollups.problem !== undefined) return { problem: rollups.problem }
 	const unfunded = buildUnfunded(run.totals, end)
 	if (unfunded.problem !== undefined) return { problem: unfunded.problem }
+	const cashflow = buildCashflow(run, periods, scenario, breakdown)
+	if (cashflow.problem !== undefined) return { problem: cashflow.problem }
 	const levies = buildLevies(run.levies)
 	if (levies.problem !== undefined) return { problem: levies.problem }
 	const projection: Projection = {
@@ -50,6 +54,7 @@ export function buildProjection(
 			: { runsOut: { date: run.runsOut.date, unmet: Number(run.runsOut.unmet) } }),
 		...(levies.levies === undefined ? {} : { levies: levies.levies }),
 		...(run.milestones === undefined ? {} : { milestones: run.milestones }),
+		...cashflow.fields,
 	}
 	return { projection }
 }

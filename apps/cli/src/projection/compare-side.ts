@@ -18,6 +18,8 @@ import {
 export type CompareSide = {
 	scenario: ScenarioEcho
 	overrides: OverrideEcho[]
+	/** This side's `--without` removals, in command-line order (cli ADR-0056). */
+	removals: string[]
 	/** This side's Carry-in, present only when it placed at least one record (ADR-0032). */
 	carryIn?: CarryInEcho[] | undefined
 	fi: FiAnswer
@@ -34,6 +36,9 @@ export type CompareSide = {
 export const compareSide: z.ZodType<CompareSide> = z.strictObject({
 	scenario: scenarioEcho,
 	overrides: z.array(overrideEcho).describe("The applied overrides for this side, in order."),
+	removals: z
+		.array(z.string())
+		.describe("The list items this side took out with --without, in order."),
 	carryIn: carryInField,
 	fi: fiAnswer.describe("This side's own FI answer."),
 	taxYears: taxYearsField,
