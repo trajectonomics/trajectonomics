@@ -1,15 +1,13 @@
-import { parseMinorUnits } from "../store/money"
 import type { ColumnHint } from "../table/lines"
 import { isRecord, tableLines } from "../table/lines"
+import { type CashflowTotals, cashflowTotalsOf, type RollupFigures } from "./cashflow-totals"
 import { moneyOf } from "./money"
 
 /*
- * `projection run --breakdown`'s human view (cli ADR-0058). The long table is for JSON; a person
- * reads one short block per Annual roll-up after the body. A total the engine gives as a field is
- * printed as that field: `income`, `expense`, `contributions` and `unfundedContributions` come from
- * the annual row. A total the engine gives no field for is the exact integer sum of the engine's own
- * lines (`money in`, `tax`, `withdrawals`, `drawn` and `left over`), so the CLI adds nothing the
- * engine did not route.
+ * `projection run --breakdown`'s human view (cli ADR-0058). The long tables are for JSON; a person
+ * reads one short block per Annual roll-up after the body. Every total the block prints comes from
+ * `cashflowTotalsOf`, the same function the JSON table is built with, so the block and the JSON cannot
+ * disagree (cli ADR-0058, addendum).
  */
 
 const BLOCK_COLUMNS: readonly ColumnHint[] = [
@@ -32,31 +30,37 @@ export function tableRows(
 	return table["rows"].filter(isRecord)
 }
 
-/** The result without its cash-flow table: the long table is for JSON, and the blocks print instead. */
+/** The cash-flow tables a person does not read: the long lines and the totals are JSON's; the blocks print instead. */
+const HIDDEN_TABLES = ["cashflow", "cashflowTotals"]
+
+/** The result without its cash-flow tables: the long tables are for JSON, and the blocks print instead. */
 export function cashflowHidden(data: Record<string, unknown>): Record<string, unknown> {
 	const tables = data["tables"]
 	if (!Array.isArray(tables)) return data
 	return {
 		...data,
-		tables: tables.filter((entry) => !(isRecord(entry) && entry["name"] === "cashflow")),
+		tables: tables.filter(
+			(entry) => !(isRecord(entry) && HIDDEN_TABLES.includes(String(entry["name"]))),
+		),
 	}
 }
 
-/** The minor units of an engine amount, which the result states as text at the Currency's scale. */
-function minorOf(text: unknown, currency: string): number {
-	const minor = typeof text === "string" ? parseMinorUnits(text, currency) : undefined
-	if (typeof minor !== "number") throw new Error(`a cash-flow amount is not money: ${String(text)}`)
-	return minor
+/** A field of a table row as the text the engine stated it; anything else is a broken result. */
+function textOf(value: unknown, field: string): string {
+	if (typeof value !== "string")
+		throw new Error(`a cash-flow ${field} is not text: ${String(value)}`)
+	return value
 }
 
-/** The exact integer sum of some engine amounts, in minor units. */
-function sumOf(amounts: readonly unknown[], currency: string): number {
-	return amounts.reduce<number>((total, amount) => total + minorOf(amount, currency), 0)
-}
-
-/** The amounts of the lines in one group. */
-function amountsOf(lines: readonly Record<string, unknown>[], group: string): unknown[] {
-	return lines.filter((line) => line["group"] === group).map((line) => line["amount"])
+/** One Annual roll-up's figures, as the totals read them. */
+function figuresOf(row: Record<string, unknown>): RollupFigures {
+	return {
+		income: textOf(row["income"], "income"),
+		expense: textOf(row["expense"], "expense"),
+		contributions: textOf(row["contributions"], "contributions"),
+		unfundedContributions: textOf(row["unfundedContributions"], "unfundedContributions"),
+		unmet: textOf(row["unmet"], "unmet"),
+	}
 }
 
 /** One roll-up's block rows: each section's total, then the lines a person reads under it. */
@@ -66,35 +70,39 @@ function blockRows(
 	currency: string,
 ): BlockRow[] {
 	const money = moneyOf(currency)
-	const income = minorOf(annual["income"], currency)
-	const withdrawals = sumOf(amountsOf(lines, "withdrawal"), currency)
-	const drawn = sumOf(amountsOf(lines, "drawn"), currency)
-	const tax = sumOf([...amountsOf(lines, "prepaid"), ...amountsOf(lines, "settlement")], currency)
-	const surplus = sumOf(amountsOf(lines, "surplus"), currency)
-	const unfunded = minorOf(annual["unfundedContributions"], currency)
-	const unmet = minorOf(annual["unmet"], currency)
+	const figures = figuresOf(annual)
+	const groupLines = (group: string) => lines.filter((line) => line["group"] === group)
+	const totals: CashflowTotals = cashflowTotalsOf(
+		figures,
+		lines.map((line) => ({
+			group: textOf(line["group"], "group"),
+			amount: textOf(line["amount"], "amount"),
+		})),
+		currency,
+	)
 
 	const rows: BlockRow[] = [
-		{ line: "money in", amount: money(income + withdrawals + drawn) },
-		{ line: "  income", amount: money(income) },
+		{ line: "money in", amount: money(totals["money in"]) },
+		{ line: "  income", amount: figures.income },
 	]
-	if (amountsOf(lines, "withdrawal").length > 0) {
-		rows.push({ line: "  withdrawals", amount: money(withdrawals) })
+	if (groupLines("withdrawal").length > 0) {
+		rows.push({ line: "  withdrawals", amount: money(totals.withdrawals) })
 	}
-	if (amountsOf(lines, "drawn").length > 0) rows.push({ line: "  drawn", amount: money(drawn) })
-	if (amountsOf(lines, "prepaid").length + amountsOf(lines, "settlement").length > 0) {
-		rows.push({ line: "tax", amount: money(tax) })
+	if (groupLines("drawn").length > 0) rows.push({ line: "  drawn", amount: money(totals.drawn) })
+	if (groupLines("prepaid").length + groupLines("settlement").length > 0) {
+		rows.push({ line: "tax", amount: money(totals.tax) })
 	}
-	rows.push({ line: "spending", amount: String(annual["expense"]) })
-	for (const line of lines.filter((entry) => entry["group"] === "category")) {
+	rows.push({ line: "spending", amount: money(totals.spending) })
+	for (const line of groupLines("category")) {
 		const name = line["id"] === null ? "(uncategorised)" : String(line["id"])
-		rows.push({ line: `  ${name}`, amount: money(minorOf(line["amount"], currency)) })
+		rows.push({ line: `  ${name}`, amount: textOf(line["amount"], "amount") })
 	}
-	rows.push({ line: "saving", amount: String(annual["contributions"]) })
+	rows.push({ line: "saving", amount: money(totals.saving) })
 	// Not indented under saving: it is what the cash could not fund, not a part of saving.
-	if (unfunded !== 0) rows.push({ line: "not funded", amount: money(unfunded) })
-	rows.push({ line: "left over", amount: money(surplus) })
-	if (unmet !== 0) rows.push({ line: "unmet", amount: money(unmet) })
+	if (totals["not funded"] !== 0)
+		rows.push({ line: "not funded", amount: money(totals["not funded"]) })
+	rows.push({ line: "left over", amount: money(totals["left over"]) })
+	if (totals.unmet !== 0) rows.push({ line: "unmet", amount: money(totals.unmet) })
 	return rows
 }
 

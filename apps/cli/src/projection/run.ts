@@ -4,12 +4,14 @@ import { fail, isAppError } from "../errors"
 import { agesOn } from "../scenario/household/ages"
 import type { Placed } from "./carryin-apply"
 import { cashflowRowsOf } from "./cashflow"
+import { cashflowTotalRowsOf } from "./cashflow-totals"
 import { echoOf } from "./echo"
 import { refusal } from "./engine"
 import { fundingNotes } from "./funding"
 import { liabilityTablesOf, optionsOf } from "./liabilities"
 import { milestoneRowsOf } from "./milestones"
 import { annualRow, monthlyRow, runsOutView } from "./rows"
+import type { AnnualRow } from "./rows-view"
 import type { ProjectionRunView, ProjectionTable } from "./run-view"
 import { taxYearsOf } from "./tax-view"
 import { withdrawNotes } from "./withdraw-notes"
@@ -38,7 +40,7 @@ export function projectionOf(
 		annual.push(row)
 	}
 	const tables: ProjectionTable[] = [{ name: "annual", count: annual.length, rows: annual }]
-	const extra = extraTablesOf(prepared, projection, monthly, breakdown, liabilities)
+	const extra = extraTablesOf(prepared, projection, annual, monthly, breakdown, liabilities)
 	if (isAppError(extra)) return extra
 	tables.push(...extra)
 	return {
@@ -58,12 +60,13 @@ export function projectionOf(
 
 /**
  * The tables a run adds beyond the annual roll-up, each present only when its flag or Scenario asks for it,
- * so a run without them keeps its table list: the monthly rows (`--monthly`), the cash flow (`--breakdown`,
- * cli ADR-0058), the loans (`--liabilities`, cli ADR-0059) and the milestones (cli ADR-0049).
+ * so a run without them keeps its table list: the monthly rows (`--monthly`), the cash flow and its section
+ * totals (`--breakdown`, cli ADR-0058), the loans (`--liabilities`, cli ADR-0059) and the milestones (cli ADR-0049).
  */
 function extraTablesOf(
 	prepared: Placed,
 	projection: Projection,
+	annual: readonly AnnualRow[],
 	monthly: boolean,
 	breakdown: boolean,
 	liabilities: boolean,
@@ -85,6 +88,8 @@ function extraTablesOf(
 		}
 		const rows = cashflowRowsOf(projection.cashflow, currency)
 		tables.push({ name: "cashflow", count: rows.length, rows })
+		const totals = cashflowTotalRowsOf(annual, rows, currency)
+		tables.push({ name: "cashflowTotals", count: totals.length, rows: totals })
 	}
 	if (liabilities) {
 		const liabilityTables = liabilityTablesOf(projection.liabilities, currency)

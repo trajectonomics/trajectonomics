@@ -3,6 +3,7 @@ import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
 import { personAges } from "./person-age"
+import { cashflowTotalRow } from "./projection-totals"
 
 /** One annual row: the roll-up of a year, with its real net worth measured at a monthly row. */
 const annualRow = z.strictObject({
@@ -92,7 +93,7 @@ export const milestoneRow = z.strictObject({
 
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
- * flow only with `--breakdown`, the loans only with `--liabilities`, and the milestones only when the
+ * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, and the milestones only when the
  * Scenario declares them.
  */
 export const projectionTables = z.array(
@@ -100,6 +101,11 @@ export const projectionTables = z.array(
 		z.strictObject({ name: z.literal("annual"), count: integer, rows: z.array(annualRow) }),
 		z.strictObject({ name: z.literal("monthly"), count: integer, rows: z.array(monthlyRow) }),
 		z.strictObject({ name: z.literal("cashflow"), count: integer, rows: z.array(cashflowRow) }),
+		z.strictObject({
+			name: z.literal("cashflowTotals"),
+			count: integer,
+			rows: z.array(cashflowTotalRow),
+		}),
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
 		z.strictObject({
