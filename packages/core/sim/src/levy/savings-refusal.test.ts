@@ -1,10 +1,10 @@
 import { describe, expect, it } from "bun:test"
-import type { Levy } from "../types"
+import type { Levy, SavingsOptions } from "../types"
 import { contributionSavings } from "./savings"
-import { INCOME, optionsOf, periodOf, taxLevy } from "./test-savings"
+import { INCOME, optionsOf, periodOf, reported, STEP, taxLevy } from "./test-savings"
 
 const levy = taxLevy([["a", 500_000]])
-const period = periodOf({ income: INCOME })
+const period = reported(levy, { income: INCOME })
 
 describe("contributionSavings refusals", () => {
 	it("refuses a label no funded tally reads, at its index", () => {
@@ -26,10 +26,35 @@ describe("contributionSavings refusals", () => {
 		["maxSteps", { maxSteps: 0 }],
 		["budget", { budget: -1 }],
 		["minSavingBps", { minSavingBps: Number.NaN }],
+		["minSavingBps", { minSavingBps: 10_001 }],
+		["grain", { grain: 0 }],
+		["grain", { grain: -1 }],
+		["grain", { grain: 0.5 }],
+		["grain", { grain: STEP + 1 }],
 		["inflation", { inflation: Number.POSITIVE_INFINITY }],
 	])("refuses an out-of-range %s", (key, more) => {
 		const result = contributionSavings(levy, period, optionsOf(["a"], more))
 		expect(result).toEqual({ ok: false, problem: { code: "INVALID_OPTION", path: [key] } })
+	})
+
+	it("refuses a missing grain", () => {
+		const { grain: _grain, ...without } = optionsOf(["a"])
+		const result = contributionSavings(levy, period, without as unknown as SavingsOptions)
+		expect(result).toEqual({ ok: false, problem: { code: "INVALID_OPTION", path: ["grain"] } })
+	})
+
+	it("accepts the bounds: minSavingBps 10,000 and a grain as large as the step", () => {
+		const edge = optionsOf(["a"], { minSavingBps: 10_000, grain: STEP })
+		expect(contributionSavings(levy, period, edge)).toMatchObject({ ok: true })
+	})
+
+	it("refuses a period whose due is not this Levy's due at the Due date, at the period's due", () => {
+		// The hand Levy owes 160,000 on 1,000,000 of income; a period reporting 150,000 is another Levy's.
+		const other = periodOf({ income: INCOME }, 150_000)
+		expect(contributionSavings(levy, other, optionsOf(["a"]))).toEqual({
+			ok: false,
+			problem: { code: "PERIOD_DUE_MISMATCH", path: ["period", "due"] },
+		})
 	})
 
 	it("refuses rather than run past maxSteps, naming the key", () => {
@@ -40,7 +65,7 @@ describe("contributionSavings refusals", () => {
 	})
 
 	it("returns an unsafe reported tally as NOT_SAFE_INTEGER, as evaluateMeasures does", () => {
-		const unsafe = periodOf({ income: INCOME, aFunded: 2 ** 53 })
+		const unsafe = periodOf({ income: INCOME, aFunded: 2 ** 53 }, 160_000)
 		expect(contributionSavings(levy, unsafe, optionsOf(["a"]))).toEqual({
 			ok: false,
 			problem: { code: "NOT_SAFE_INTEGER", path: ["funded", "a"] },
@@ -48,7 +73,7 @@ describe("contributionSavings refusals", () => {
 	})
 
 	it("returns a step that leaves the safe range as NOT_SAFE_INTEGER", () => {
-		const edge = periodOf({ income: INCOME, aFunded: Number.MAX_SAFE_INTEGER - 5 })
+		const edge = periodOf({ income: INCOME, aFunded: Number.MAX_SAFE_INTEGER - 5 }, 60_000)
 		const result = contributionSavings(levy, edge, optionsOf(["a"]))
 		expect(result).toEqual({
 			ok: false,
@@ -65,7 +90,7 @@ describe("contributionSavings refusals", () => {
 			],
 			due: "huge",
 		}
-		const result = contributionSavings(big, period, optionsOf(["a"]))
+		const result = contributionSavings(big, reported(levy, { income: INCOME }), optionsOf(["a"]))
 		expect(result).toEqual({ ok: false, problem: { code: "VALUE_OVERFLOW", date: "2027-03-31" } })
 	})
 })
@@ -84,11 +109,17 @@ describe("contributionSavings context", () => {
 			due: "due",
 		}
 		// 100 grown by 10% a year for the whole years from 2025-01-01 to the 2027-03-31 Due date: 121.
-		const result = contributionSavings(grown, periodOf({ funded: 0 }), {
-			...optionsOf(["a"], { step: 10, budget: 25 }),
+		const result = contributionSavings(grown, periodOf({ funded: 0 }, 121), {
+			...optionsOf(["a"], { step: 10, grain: 1, budget: 25 }),
 			inflation: 1000,
 		})
 		expect(result).toMatchObject({ ok: true, dueBefore: 121, dueAfter: 101 })
+		// A wrong inflation reads the constant as 100, not the 121 the period reported: refused.
+		const wrong = { ...optionsOf(["a"], { step: 10, grain: 1 }), inflation: 0 }
+		expect(contributionSavings(grown, periodOf({ funded: 0 }, 121), wrong)).toEqual({
+			ok: false,
+			problem: { code: "PERIOD_DUE_MISMATCH", path: ["period", "due"] },
+		})
 		expect(result.ok && result.labels[0]).toMatchObject({ extra: 20, stoppedBy: "budget" })
 	})
 })

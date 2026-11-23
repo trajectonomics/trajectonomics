@@ -85,6 +85,7 @@ const CODES = [
 	"UNKNOWN_FUNDED_LABEL",
 	"TOO_MANY_STEPS",
 	"INVALID_OPTION",
+	"PERIOD_DUE_MISMATCH",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const

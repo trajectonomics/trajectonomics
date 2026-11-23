@@ -221,11 +221,14 @@ Projection is unaffected. See [ADR 0014](docs/adr/0014-levy-extensions.md).
 
 `contributionSavings(levy, period, options)` states what raising one contribution label by whole
 steps would take off a Settlement period's `due`, under that Levy's own rules. It takes a Settlement
-period as `project()` reports it, rebuilds the period's Tallies from its `tally` Measure values and
-scans each label in the order given: a step is taken while `due` falls by more than 0 (and by at
-least `minSavingBps` of a step), within the `budget`. A label stops at the first step not taken, and
-the next label starts from what the earlier ones left. This Levy taxes net income at 10% up to
-400,000 and 20% above it, and allows `min(funded, 300,000)` off `fund`:
+period as `project()` reports it (it checks that the Levy reproduces the period's `due`), rebuilds
+the period's Tallies from its `tally` Measure values and scans each label in the order given: a step
+is taken while `due` falls by more than 0 (and by at least `minSavingBps` of a step), within the
+`budget`. A label stops at the first step not taken, and the next label starts from what the earlier
+ones left. When a label stops because a step saved nothing, the last step it took is kept only if
+its last `grain` (one major unit, in minor units) still saved something: a step that went past a cap
+is dropped, so no suggestion goes over a cap, and one that ends exactly on the cap is kept. This Levy
+taxes net income at 10% up to 400,000 and 20% above it, and allows `min(funded, 250,000)` off `fund`:
 
 ```ts
 import { contributionSavings, type Levy } from "@trajectonomics/core/sim"
@@ -239,7 +242,7 @@ const levy = {
 		{ id: "zero", op: "const", value: 0 },
 		{ id: "income", op: "tally", label: "salary", basis: "gross" },
 		{ id: "funded", op: "tally", label: "fund", basis: "funded" },
-		{ id: "cap", op: "const", value: 300_000 },
+		{ id: "cap", op: "const", value: 250_000 },
 		{ id: "allowance", op: "min", a: "funded", b: "cap" },
 		{ id: "net", op: "sub", a: "income", b: "allowance" },
 		{ id: "taxable", op: "pick", a: "net", b: "zero", then: "net", else: "zero" },
@@ -254,6 +257,7 @@ const levy = {
 
 const period = {
 	to: "2026-12-31",
+	due: 160_000,
 	measures: [
 		{ id: "income", value: 1_000_000 },
 		{ id: "funded", value: 0 },
@@ -262,21 +266,29 @@ const period = {
 
 console.log(
 	JSON.stringify(
-		contributionSavings(levy, period, { labels: ["fund"], step: 100_000, inflation: 0, maxSteps: 50 }),
+		contributionSavings(levy, period, {
+			labels: ["fund"],
+			step: 100_000,
+			grain: 1_000,
+			inflation: 0,
+			maxSteps: 50,
+		}),
 	),
 )
 ```
 
-Three steps of 100,000 each save 20,000, then the cap is reached, so the fourth saves nothing:
+Two steps of 100,000 save 20,000 each. The third (to 300,000) saves 10,000, but only the first
+50,000 of it is under the cap: its last 1,000 saves nothing, so it is dropped, and the fourth saves
+nothing either:
 
 ```text
-{"ok":true,"dueBefore":160000,"dueAfter":100000,"labels":[{"label":"fund","plannedFunded":0,"extra":300000,"saving":60000,"stoppedBy":"noSaving"}]}
+{"ok":true,"dueBefore":160000,"dueAfter":120000,"labels":[{"label":"fund","plannedFunded":0,"extra":200000,"saving":40000,"stoppedBy":"noSaving"}]}
 ```
 
 The search is bounded: more than `maxSteps` steps in all returns `TOO_MANY_STEPS` instead of an
 answer cut short, and an unread label, a bad option or an overflow come back as
-`{ ok: false, problem }`. A step is whole, so one that straddles a cap is taken when it still saves
-something; raise `minSavingBps` to leave it out. See [ADR 0022](docs/adr/0022-contribution-savings-scan-steps.md).
+`{ ok: false, problem }`. A step is whole, so a cap that is not a multiple of the step leaves some
+of its room unused; a smaller `step` fills more of it. See [ADR 0022](docs/adr/0022-contribution-savings-scan-steps.md).
 
 ## Scripts
 

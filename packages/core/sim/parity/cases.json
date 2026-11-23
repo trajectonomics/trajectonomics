@@ -8612,10 +8612,11 @@
 			"options": {
 				"labels": ["fund"],
 				"step": 5000000,
+				"grain": 100,
 				"inflation": 0,
 				"maxSteps": 100
 			}
 		},
-		"savingsSha256": "a5df6c87271e2e8fcf496c14348d798dc284edbc65d628bf27cb1d2fb4dae7ae"
+		"savingsSha256": "5ebff16fda9afb882c4ecbd88720f9c57ce551410d22d7303c7c886f7eeeb50d"
 	}
 ]

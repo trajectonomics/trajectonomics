@@ -12,6 +12,8 @@ export interface OracleSavingsInput {
 	readonly step: bigint
 	readonly budget: bigint | undefined
 	readonly minSavingBps: bigint
+	/** One major unit in minor units: a step whose last grain saves nothing went past its flat point. */
+	readonly grain: bigint
 	/** The most whole steps tried for one label; the cases keep every answer below it. */
 	readonly reach: number
 }
@@ -28,7 +30,7 @@ function dueWith(input: OracleSavingsInput, funded: Map<string, bigint>): bigint
 	return oracleMeasures(input.levy, tallies, input.date, input.inflation, input.periodEnd).due
 }
 
-/** Ceiling of `step * bps / 10000` by counting up, not dividing. */
+/** Ceiling of `step * bps / 10000`, counted up. */
 function leastFall(step: bigint, bps: bigint): bigint {
 	let least = 0n
 	while (least * 10000n < step * bps) least += 1n
@@ -59,6 +61,33 @@ function takenSteps(
 	throw new Error("reach is too small for this case")
 }
 
+/** Whether the last step, after a stop for want of saving, saved nothing in its last grain. */
+function wentPast(
+	input: OracleSavingsInput,
+	funded: Map<string, bigint>,
+	label: string,
+	found: { readonly steps: number; readonly stoppedBy: OracleLabel["stoppedBy"] },
+	dueAfter: bigint,
+): boolean {
+	if (found.steps === 0 || found.stoppedBy !== "noSaving") return false
+	const planned = funded.get(label) ?? 0n
+	const lessGrain = planned + BigInt(found.steps) * input.step - input.grain
+	return dueWith(input, new Map(funded).set(label, lessGrain)) === dueAfter
+}
+
+/** The whole steps a label keeps: those taken, less the last when it went past its flat point. */
+function keptSteps(
+	input: OracleSavingsInput,
+	funded: Map<string, bigint>,
+	label: string,
+	dues: readonly bigint[],
+	taken: ReturnType<typeof takenSteps>,
+): number {
+	return wentPast(input, funded, label, taken, dues[taken.steps] ?? 0n)
+		? taken.steps - 1
+		: taken.steps
+}
+
 /** Per label in order: the due after 0..reach whole steps, then the first count whose step is not taken. */
 export function oracleSavings(input: OracleSavingsInput): readonly OracleLabel[] {
 	const funded = new Map(input.tallies.funded)
@@ -70,10 +99,12 @@ export function oracleSavings(input: OracleSavingsInput): readonly OracleLabel[]
 		for (let count = 0; count <= input.reach; count++) {
 			dues.push(dueWith(input, new Map(funded).set(label, planned + BigInt(count) * input.step)))
 		}
-		const { steps, stoppedBy } = takenSteps(dues, input, budget)
+		const taken = takenSteps(dues, input, budget)
+		const steps = keptSteps(input, funded, label, dues, taken)
 		if (budget !== undefined) budget -= BigInt(steps) * input.step
 		funded.set(label, planned + BigInt(steps) * input.step)
-		found.push({ label, steps, saving: (dues[0] ?? 0n) - (dues[steps] ?? 0n), stoppedBy })
+		const saving = (dues[0] ?? 0n) - (dues[steps] ?? 0n)
+		found.push({ label, steps, saving, stoppedBy: taken.stoppedBy })
 	}
 	return found
 }

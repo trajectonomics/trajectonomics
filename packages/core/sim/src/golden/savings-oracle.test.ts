@@ -1,13 +1,14 @@
 import { describe, expect, it } from "bun:test"
 import { contributionSavings } from "../levy/savings"
-import { INCOME, periodOf, taxLevy } from "../levy/test-savings"
+import { INCOME, reported, taxLevy } from "../levy/test-savings"
 import type { SavingsOptions } from "../types"
 import { type OracleSavingsInput, oracleSavings } from "./oracle-savings"
 
 const CAPS = [100_000, 250_000, 600_000, 900_000] as const
 const STEPS = [50_000, 100_000, 150_000] as const
 const BUDGETS = [undefined, 0, 200_000, 450_000] as const
-const MINIMUMS = [0, 1000, 1500, 2000, 9999] as const
+const MINIMUMS = [0, 1500, 9999] as const
+const GRAINS = [1, 25_000] as const
 
 interface Case {
 	readonly first: number
@@ -15,13 +16,16 @@ interface Case {
 	readonly step: number
 	readonly budget: number | undefined
 	readonly minSavingBps: number
+	readonly grain: number
 }
 
 const cases: readonly Case[] = CAPS.flatMap((first) =>
 	CAPS.flatMap((second) =>
 		STEPS.flatMap((step) =>
 			BUDGETS.flatMap((budget) =>
-				MINIMUMS.map((minSavingBps) => ({ first, second, step, budget, minSavingBps })),
+				MINIMUMS.flatMap((minSavingBps) =>
+					GRAINS.map((grain) => ({ first, second, step, budget, minSavingBps, grain })),
+				),
 			),
 		),
 	),
@@ -42,10 +46,11 @@ function oracleInput(
 		step: BigInt(options.step),
 		budget: options.budget === undefined ? undefined : BigInt(options.budget),
 		minSavingBps: BigInt(options.minSavingBps ?? 0),
+		grain: BigInt(options.grain),
 	}
 }
 
-function agree({ first, second, step, budget, minSavingBps }: Case): void {
+function agree({ first, second, step, budget, minSavingBps, grain }: Case): void {
 	const levy = taxLevy(
 		[
 			["a", first],
@@ -57,11 +62,13 @@ function agree({ first, second, step, budget, minSavingBps }: Case): void {
 		labels: ["b", "a"],
 		step,
 		inflation: 0,
+		grain,
 		maxSteps: 100,
 		...(budget === undefined ? {} : { budget }),
 		minSavingBps,
 	}
-	const scan = contributionSavings(levy, periodOf({ income: INCOME, aFunded: 50_000 }), options)
+	const values = { income: INCOME, aFunded: 50_000 }
+	const scan = contributionSavings(levy, reported(levy, values), options)
 	if (!scan.ok) throw new Error(`refused: ${JSON.stringify(scan.problem)}`)
 	const got = scan.labels.map((item) => [
 		item.label,
@@ -79,18 +86,19 @@ function agree({ first, second, step, budget, minSavingBps }: Case): void {
 }
 
 describe("contributionSavings against the brute-force oracle", () => {
-	it(`agrees on ${cases.length} cases of two labels, a shared cap, a budget and a minimum`, () => {
+	it(`agrees on ${cases.length} cases of two labels, a shared cap, a budget, a minimum and a grain`, () => {
 		for (const item of cases) agree(item)
-	})
+	}, 20_000)
 
-	it("counts a hand case: cap 250,000 and step 100,000 take 3 steps, saving 20,000 + 20,000 + 10,000", () => {
+	it("counts a hand case: cap 250,000 and step 100,000 take 2 steps; the 3rd goes past the cap and is dropped", () => {
 		const input = oracleInput(taxLevy([["a", 250_000]]), {
 			labels: ["a"],
 			step: 100_000,
 			inflation: 0,
+			grain: 1_000,
 			maxSteps: 9,
 		})
 		const [only] = oracleSavings({ ...input, tallies: { gross: GROSS, funded: new Map() } })
-		expect(only).toEqual({ label: "a", steps: 3, saving: 50_000n, stoppedBy: "noSaving" })
+		expect(only).toEqual({ label: "a", steps: 2, saving: 40_000n, stoppedBy: "noSaving" })
 	})
 })

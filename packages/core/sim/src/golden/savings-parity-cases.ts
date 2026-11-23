@@ -5,8 +5,8 @@ import type { ParityCase } from "./parity-cases"
 
 /**
  * A 1,200,000.00 salary year under TH_LIKE with 60,000.00 already saved under `fund`. The allowance
- * is capped at 15% of income, 180,000.00, so 50,000.00 steps from there take three steps and the
- * third only partly pays.
+ * is capped at 15% of income, 180,000.00, so 50,000.00 steps from there reach 160,000.00 in two steps
+ * and the third (to 210,000.00) goes past the cap and is dropped, with a grain of 1.00.
  */
 const salaryWithSaving = makeFixture({
 	accounts: [
@@ -43,7 +43,7 @@ export const SAVINGS_PARITY_CASES: readonly ParityCase[] = [
 		fixture: salaryWithSaving,
 		savings: {
 			period: "2026-01-01",
-			options: { labels: ["fund"], step: 5_000_000, inflation: 0, maxSteps: 100 },
+			options: { labels: ["fund"], step: 5_000_000, grain: 100, inflation: 0, maxSteps: 100 },
 		},
 	},
 ]

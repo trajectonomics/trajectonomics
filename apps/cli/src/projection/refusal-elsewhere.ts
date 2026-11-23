@@ -89,4 +89,5 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	UNKNOWN_FUNDED_LABEL: never,
 	TOO_MANY_STEPS: never,
 	INVALID_OPTION: never,
+	PERIOD_DUE_MISMATCH: never,
 }

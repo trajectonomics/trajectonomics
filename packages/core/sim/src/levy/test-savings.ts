@@ -1,5 +1,7 @@
 /** TEST-ONLY hand-written Levies and periods for `contributionSavings`; not imported by `src/index.ts`. */
 import type { Levy, LevyMeasure, SavingsOptions, SettlementPeriod } from "../types"
+import { evaluateMeasures } from "./evaluate"
+import { talliesOfPeriod } from "./savings-tallies"
 
 export const INCOME = 1_000_000
 export const THRESHOLD = 400_000
@@ -47,26 +49,37 @@ export function taxLevy(caps: readonly (readonly [string, number])[], shared?: n
 	}
 }
 
-/** A 2026 Settlement period reporting these `tally` Measure values by id. */
-export function periodOf(values: Readonly<Record<string, number>>): SettlementPeriod {
+/** A 2026 Settlement period reporting these `tally` Measure values by id, and this `due`. */
+export function periodOf(values: Readonly<Record<string, number>>, due = 0): SettlementPeriod {
 	return {
 		from: "2026-01-01",
 		to: "2026-12-31",
 		settlementDate: "2027-03-31",
 		measures: Object.entries(values).map(([id, value]) => ({ id, value })),
 		prepaid: 0,
-		due: 0,
+		due,
 		settlement: 0,
 		settled: false,
 		partial: false,
 	}
 }
 
+/** The period the engine would report for `levy` and these `tally` values, `due` included. */
+export function reported(levy: Levy, values: Readonly<Record<string, number>>): SettlementPeriod {
+	const period = periodOf(values)
+	const context = { date: period.settlementDate, periodEnd: period.to, inflation: 0 }
+	const result = evaluateMeasures(levy, talliesOfPeriod(levy, period.measures), context)
+	if (!result.ok) throw new Error("the hand Levy does not evaluate")
+	return periodOf(values, result.due)
+}
+
 export const STEP = 100_000
+/** One major unit of a hand Levy; every cap but the 299,500 one is a whole number of them. */
+export const GRAIN = 1_000
 
 export function optionsOf(
 	labels: readonly string[],
 	more: Partial<SavingsOptions> = {},
 ): SavingsOptions {
-	return { labels, step: STEP, inflation: 0, maxSteps: 100, ...more }
+	return { labels, step: STEP, inflation: 0, grain: GRAIN, maxSteps: 100, ...more }
 }
