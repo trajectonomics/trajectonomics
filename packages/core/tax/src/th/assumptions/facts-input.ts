@@ -8,7 +8,6 @@ import { ThAssumptionFact as F, type ThAssumptionFact } from "./facts"
 
 type ClaimKey =
 	| "rmf"
-	| "ssf"
 	| "pvd"
 	| "gpf"
 	| "nsf"
@@ -25,7 +24,6 @@ type Item = number | ThExpenseElectableIncome | undefined
 
 const CLAIMS: readonly Claim[] = [
 	["rmf", F.ClaimRmf],
-	["ssf", F.ClaimSsf],
 	["pvd", F.ClaimPvd],
 	["gpf", F.ClaimGpf],
 	["nsf", F.ClaimNsf],

@@ -24,7 +24,7 @@ export const metricShape: Record<string, unknown> = {
 				expenses: {
 					enum: [...REFERENCE_WINDOWS],
 					description:
-						"The planned spending over one twelve-month window, from the date the criterion is judged. A Scenario in which any Flow's `derive` has an `account` Measure refuses `next12Months` here.",
+						"The planned spending over one twelve-month window, from the date the criterion is judged. `next12Months` is refused when a Flow's `derive` has an `account` Measure that reads an Account that can change on a later date: a Flow pays into or out of it (a purchase, a sale, a loan draw or payment) or `cashflow` names it in `surplus`, `contribute` or `withdraw`. An Account only its own rate moves is read as it stands.",
 				},
 			},
 			required: ["expenses"],

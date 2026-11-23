@@ -70,6 +70,18 @@ _Avoid_: Time-varying parameter, schedule
 A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph; a Planned withdrawal that reads its own `source` is no cycle, since the read precedes every landing. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
 _Avoid_: Percentage flow, formula flow, linked flow
 
+**Spending rule**:
+A fourth amount form of an expense Flow (`rule`, beside `amount`, `derive` and `level`): its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year. Three kinds: `initialRate` (a share of the first year's portfolio, kept level in real terms), `currentRate` (a share of each year's portfolio, with optional dated rate steps, a floor and a ceiling) and `guardrails` (last year's amount grown by inflation, cut when the withdrawal rate has risen past an upper band and raised when it has fallen past a lower one). It only sets the expense: the withdraw order, a Shortfall and Settlement are unchanged. A fixed real amount is an ordinary expense with `growth: "inflation"`, not a kind.
+_Avoid_: Withdrawal strategy, safe withdrawal rate, glide path
+
+**Rule year**:
+The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow, counted from its first Landed date: the thirteenth, twenty-fifth, ... Occurrence (the second, third, ... for an annual Flow) begins the next. On that date, before any Flow lands, the rule reads the portfolio and fixes the year's amount. This is a decision, not the anniversary rule: under a shifting Calendar the first Landed date on or after an anniversary can give a year of eleven or thirteen Occurrences, which would not sum to the year's amount. A year the horizon or a Shortfall cuts short pays only its Occurrences.
+_Avoid_: Spending year, withdrawal year, rule period
+
+**Spending rule statement**:
+What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
+_Avoid_: Spending report, withdrawal schedule
+
 **Tally label**:
 A label on an income Flow, on a contribution Flow, or on an asset Account (`returnLabel`, `gainLabel`), that a Levy sums over a Settlement period. A Flow or Account with no label is never tallied, which is how a tax-sheltered Account is left out. Gross tallies use the planned income amount; funded tallies use the amount a contribution actually applied after any cap. A label is the unit of per-person scope: separate caps per earner are separate labels, and `add` sums their Measures. A Levy whose `due` graph reads tally labels and has none of them supplied anywhere in the Scenario is refused by `check()` (`UNSUPPLIED_TALLY_LABEL`), because every total it reads would be zero in every Settlement period.
 _Avoid_: Category, tag, tax category
@@ -93,6 +105,10 @@ _Avoid_: Withholding, prepaid tax
 **Settlement**:
 The one date after a Settlement period ends on which the Levy's due amount is reconciled against Prepayment. A balance due is paid like an expense and a refund lands like income. The date is the settlement rule's date moved forward to the next Business day, so a Settlement always falls after the period it closes. Settlements of several Levies on one Landed date are summed into one movement. A period the Projection ends before is still reported, with `settled: false`, and nothing is deducted.
 _Avoid_: Tax settlement, filing, payment
+
+**Contribution saving**:
+The fall in a Settlement period's `due` from extra funded contributions under one Tally label, found by raising that label's funded Tally in whole steps and re-evaluating the Levy while each step pays, and dropping a last step whose last grain saved nothing because it went past a cap (`contributionSavings`). It is a statement about one period's Levy, in the caller's label order, and never changes a Scenario.
+_Avoid_: tax saving, optimisation
 
 **Carry-in**:
 The tallies and Prepayment already recorded for a Settlement period that began before `start`, supplied by the caller because the Baseline holds balances only. It covers the period containing `start` and any earlier period whose Settlement falls after `start`, and it covers money that landed before `start`, not money that was due before it.

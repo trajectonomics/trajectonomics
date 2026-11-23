@@ -11,6 +11,7 @@ import { payOut } from "./pay-out"
 import { plannedFail } from "./planned-fail"
 import { plannedOn } from "./planned-on"
 import { applyPlannedWithdrawals } from "./planned-withdrawals"
+import type { RuleBook } from "./rule-book"
 import type { StateMap } from "./state"
 
 const NO_SETTLEMENT = { amount: 0n, byLevy: new Map<string, bigint>(), problem: undefined }
@@ -23,8 +24,9 @@ export function processDate(
 	events: readonly DatedEvent[],
 	levies: LevySet | undefined,
 	breakdown = false,
+	rules?: RuleBook,
 ): DateOutcome {
-	const planned = plannedOn(events, scenario, date, states)
+	const planned = plannedOn(events, scenario, date, states, rules)
 	if (!planned.ok) return plannedFail(date, planned.problem)
 	const views = levies === undefined ? [] : settlementPeriodViews(levies, date)
 	const day = aggregate(events, planned.planned, views, date)

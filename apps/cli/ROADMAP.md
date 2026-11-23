@@ -12,7 +12,7 @@ History-derived baseline, liabilities and amortization, multiple goals.
 
 ## Phase 3: richer analysis
 
-Seeded Monte Carlo, Thai allowance optimizer (RMF, SSF, ThaiESG), additional FI methods.
+Seeded Monte Carlo, Thai allowance optimizer (RMF, ThaiESG, provident fund), additional FI methods.
 
 ## Phase 4: budgeting
 

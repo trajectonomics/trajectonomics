@@ -1,7 +1,9 @@
 import type { ResolvedCalendar } from "../calendar/business"
 import { type AccountValues, readerOn } from "../engine/account-values"
+import { occurrenceAmount } from "../engine/aggregate"
 import { plannedAmounts } from "../engine/derive"
 import { buildEvents, type DatedEvent } from "../engine/events"
+import { openRules, type RuleBook } from "../engine/rule-book"
 import { onceEventsOn } from "../milestone/gate-once"
 import { landsAt } from "../milestone/gating"
 import { deferredOnces, planMilestones } from "../milestone/spec"
@@ -43,6 +45,7 @@ function dayExpense(
 	date: DateString,
 	day: readonly DatedEvent[],
 	values: AccountValues,
+	rules: RuleBook | undefined,
 ) {
 	const planned = plannedAmounts(
 		day,
@@ -50,12 +53,13 @@ function dayExpense(
 		date,
 		scenario.economy.inflation,
 		readerOn(values, date),
+		rules,
 	)
 	if (!planned.ok) return planned
 	let amount = 0n
 	for (const event of day) {
 		if (event.flow.kind !== "expense") continue
-		amount += event.amount ?? planned.planned.derived.get(event.flow.id) ?? 0n
+		amount += occurrenceAmount(event, planned.planned)
 	}
 	return { ok: true as const, amount }
 }
@@ -66,6 +70,7 @@ function measure(
 	events: readonly DatedEvent[],
 	values: AccountValues,
 ): WindowOutcome {
+	const rules = openRules(scenario)
 	const days = new Map<DateString, DatedEvent[]>()
 	for (const event of events) {
 		const day = days.get(event.date) ?? []
@@ -74,7 +79,7 @@ function measure(
 	}
 	const measurements: { readonly date: DateString; readonly amount: bigint }[] = []
 	for (const [date, day] of days) {
-		const measured = dayExpense(scenario, date, day, values)
+		const measured = dayExpense(scenario, date, day, values, rules)
 		if (!measured.ok) return { ok: false, problem: measured.problem }
 		measurements.push({ date, amount: measured.amount })
 	}

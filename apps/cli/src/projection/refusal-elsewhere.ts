@@ -6,8 +6,8 @@ import type { ErrorCode } from "@trajectonomics/core/sim"
  * Store and `--set` refuse it as `invalid_input` before an engine runs (ADR-0024). The exception is
  * a Scenario stored before a newer engine rule and run without `--set`, which nothing re-checks, so
  * `refusal()` words it from the document's own sentence. `input` is a problem in what the CLI builds
- * from a flag (the Timeline, the path count, the seed, the Return model), which `timelineFailure`
- * and `chanceRefusal` refuse as `invalid_input` at that flag (ADR-0013, ADR-0030). `never` is a
+ * from a flag (the Timeline, the path count, the seed, the Return model, the allowance step and
+ * labels), which `timelineFailure`, `chanceRefusal` and `allowancesRefusal` refuse as `invalid_input` at that flag (ADR-0013, ADR-0030). `never` is a
  * problem in an option the CLI does not pass, or fixes to a valid value, so no command raises it.
  */
 export type Elsewhere = { elsewhere: "document" | "input" | "never" }
@@ -85,4 +85,17 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_REFERENCE_TERMS: never,
 	INVALID_WEIGHT: input,
 	RETURN_WEIGHT_TOTAL: input,
+	// Refused by `contributionSavings` only. `projection allowances` answers the first three at its
+	// flags (`allowancesRefusal`, cli ADR-0061); PERIOD_DUE_MISMATCH cannot happen on a correct call,
+	// since the period comes from the Projection of the same Levy, so it is an internal error.
+	UNKNOWN_FUNDED_LABEL: input,
+	TOO_MANY_STEPS: input,
+	INVALID_OPTION: input,
+	PERIOD_DUE_MISMATCH: never,
+	// A Spending rule the CLI does not publish yet; the CLI change for #360 (#362) makes these user-facing.
+	RULE_NOT_EXPENSE: never,
+	RULE_PORTFOLIO_LIABILITY: never,
+	RULE_PORTFOLIO_ILLIQUID: never,
+	RULE_FREQUENCY: never,
+	RULE_FLOOR_ABOVE_CEILING: never,
 }

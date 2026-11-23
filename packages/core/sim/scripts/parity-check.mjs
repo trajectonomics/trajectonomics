@@ -1,7 +1,12 @@
 // Runs the built package under Node (V8) against the hashes recorded under Bun (JavaScriptCore).
 import { createHash } from "node:crypto"
 import { readFileSync } from "node:fs"
-import { chanceOfSuccess, financialIndependence, project } from "../dist/index.mjs"
+import {
+	chanceOfSuccess,
+	contributionSavings,
+	financialIndependence,
+	project,
+} from "../dist/index.mjs"
 
 const cases = JSON.parse(readFileSync(new URL("../parity/cases.json", import.meta.url), "utf8"))
 const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex")
@@ -16,8 +21,18 @@ const failed = cases.filter(
 		chance,
 		chanceSha256,
 		projectOptions,
+		savings,
+		savingsSha256,
 	}) => {
-		if (digest(project(baseline, scenario, timeline, projectOptions)) !== sha256) return true
+		const projection = project(baseline, scenario, timeline, projectOptions)
+		if (digest(projection) !== sha256) return true
+		if (savings !== undefined) {
+			const period = projection.projection.levies[0].periods.find(
+				(item) => item.from === savings.period,
+			)
+			const said = contributionSavings(scenario.levies[0], period, savings.options)
+			if (digest(said) !== savingsSha256) return true
+		}
 		if (options !== undefined) {
 			if (digest(financialIndependence(baseline, scenario, timeline, options)) !== fiSha256)
 				return true

@@ -85,9 +85,9 @@ function takeFlow(
 	return undefined
 }
 
-/** The amount one Occurrence lands: a fixed Flow's grown amount, or its Derived amount for the date. */
+/** The amount one Occurrence lands: a fixed Flow's grown amount, its rule's part, or its Derived amount for the date. */
 export function occurrenceAmount(event: DatedEvent, planned: Planned): bigint {
-	return event.amount ?? planned.derived.get(event.flow.id) ?? 0n
+	return event.amount ?? planned.ruled?.get(event) ?? planned.derived.get(event.flow.id) ?? 0n
 }
 
 /** Sums one Occurrence's flows, separating Prepayment and Tally labels from the cash amounts. */

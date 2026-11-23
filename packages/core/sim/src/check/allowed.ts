@@ -16,6 +16,7 @@ import {
 	REFERENCE_WINDOWS,
 	RESOLUTIONS,
 	ROUNDINGS,
+	RULE_KINDS,
 	TALLY_BASES,
 } from "../vocab"
 import type { ErrorCode, Path } from "./codes"
@@ -42,6 +43,7 @@ const BY_CODE: Partial<Record<ErrorCode, readonly string[]>> = {
 /** `INVALID_KIND` is raised for an Account, a Flow and a Milestone criterion: the path says which. */
 function kindsAt(path: Path): readonly string[] | undefined {
 	if (path.includes("criteria")) return CRITERION_KINDS
+	if (path.includes("rule")) return RULE_KINDS
 	if (path.includes("accounts")) return ACCOUNT_KINDS
 	return path.includes("flows") ? FLOW_KINDS : undefined
 }

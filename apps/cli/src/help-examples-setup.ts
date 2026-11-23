@@ -51,6 +51,12 @@ export const SETUP: Record<string, Setup> = {
 		steps: [["account", "add", "Bank", "--type", "asset", "--currency", "THB"]],
 	},
 	init: { ledger: "none" },
+	// The Thai Levy on the base plan's salary, so there is a tax year to fill (cli ADR-0061).
+	"projection allowances": {
+		steps: [
+			["scenario", "tax", "base", "--tax", "th-2026", "--label", "salary=income.section40_1"],
+		],
+	},
 	"projection chance": { files: { "model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL) } },
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
 	// The car loan the `--liabilities` example reads, stored as a Scenario beside the projection fixture.

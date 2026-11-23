@@ -82,6 +82,15 @@ const CODES = [
 	"LEVEL_PAYMENT_OVERFLOW",
 	"ACCOUNT_MEASURE_IN_LEVY",
 	"NEXT_12_MONTHS_READS_ACCOUNT",
+	"UNKNOWN_FUNDED_LABEL",
+	"TOO_MANY_STEPS",
+	"INVALID_OPTION",
+	"PERIOD_DUE_MISMATCH",
+	"RULE_NOT_EXPENSE",
+	"RULE_PORTFOLIO_LIABILITY",
+	"RULE_PORTFOLIO_ILLIQUID",
+	"RULE_FREQUENCY",
+	"RULE_FLOOR_ABOVE_CEILING",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const
@@ -94,17 +103,4 @@ export const ERROR_CODES: typeof CODES = Object.freeze(CODES)
 
 export type ErrorCode = (typeof CODES)[number]
 
-/** Location of a problem: a segment is an object key or an array index. */
-export type Path = readonly (string | number)[]
-
-export interface Problem {
-	readonly code: ErrorCode
-	readonly path: Path
-}
-
-export type Emit = (code: ErrorCode, path: Path) => void
-
-export type Check = (value: unknown, path: Path, emit: Emit) => void
-
-/** Declared account id -> raw `kind` value from the scenario. */
-export type AccountIndex = ReadonlyMap<string, unknown>
+export type { AccountIndex, Check, Emit, Path, Problem } from "./codes-types"
