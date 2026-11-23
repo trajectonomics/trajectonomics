@@ -1,3 +1,4 @@
+import { EXAMPLE_ESTATE } from "./example-estate"
 import { HOME_ACCOUNTS, HOME_FLOWS } from "./example-home"
 import { RETIREMENT_FLOWS } from "./example-retirement"
 
@@ -13,7 +14,7 @@ import { RETIREMENT_FLOWS } from "./example-retirement"
  * passes; the salary, the rent and the monthly investment stop when it fires (`endAt`), and from then a
  * Spending rule pays for life out of the savings (`retirement-spending`, cli ADR-0063). `schemaVersion` is
  * stamped by the caller for the same reason the template's is (ADR-0024): the pin's number is
- * asked of the core, never written down here.
+ * asked of the core, never written down here. Its `estate` block (cli ADR-0064) states example shares only.
  */
 const EXAMPLE_BODY = {
 	currency: "THB",
@@ -103,6 +104,7 @@ const EXAMPLE_BODY = {
 		},
 	],
 	cashflow: { surplus: [{ account: "cash" }], contribute: ["index"], withdraw: ["cash"] },
+	estate: EXAMPLE_ESTATE,
 }
 
 /** The example document, stamped with the version the pinned core accepts. */

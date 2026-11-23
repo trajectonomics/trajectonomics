@@ -37,6 +37,12 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 	},
 	{
 		command:
+			"traj projection run --scenario estated --as-of 2026-03-31 --horizon 2029-03-30 --estate --json",
+		description:
+			"The annual roll-up of a Scenario with an estate block, with what the plan would leave each year: the gross estate, the debts, each cost and gift, and what heirs receive.",
+	},
+	{
+		command:
 			"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
 		description: "The annual roll-up with one Stream taken out, and nothing saved.",
 	},

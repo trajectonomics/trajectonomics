@@ -15,6 +15,7 @@ const LOAN = { id: "loan", kind: "liability", rate: 600, compounding: "monthly" 
 function levelDocument(rounding: unknown): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: [CASH, LOAN],
 		flows: [
 			{

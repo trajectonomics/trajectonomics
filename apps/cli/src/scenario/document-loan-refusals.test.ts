@@ -12,6 +12,7 @@ const LOAN = { id: "loan", kind: "liability", rate: 600, compounding: "monthly" 
 function documentWith(flow: Record<string, unknown>, loan: Record<string, unknown> = LOAN) {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: [CASH, loan],
 		flows: [flow],
 		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },

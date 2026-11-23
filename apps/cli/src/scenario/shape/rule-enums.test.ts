@@ -14,6 +14,7 @@ const CASH = { id: "cash", kind: "asset", rate: 0 }
 function ruleDocument(patch: Record<string, unknown>): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: [CASH],
 		flows: [
 			{

@@ -27,11 +27,13 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.ceiling.amount",
 			"milestones[].criteria[].amount",
 			"cashflow.surplus[].upTo",
+			"estate.costs[].amount",
+			"estate.gifts[].amount",
 		])
 	})
 
-	it("write a spending rule's rates, and no other rate, as percent strings", () => {
-		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063).
+	it("write a spending rule's rates and an estate share, and no other rate, as percent strings", () => {
+		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063, ADR-0064).
 		expect(ratePathsOf(PUBLISHED)).toEqual([
 			"flows[].rule.rateBps",
 			"flows[].rule.steps[].bps",
@@ -39,6 +41,8 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.upper.adjustBps",
 			"flows[].rule.lower.bps",
 			"flows[].rule.lower.adjustBps",
+			"estate.costs[].bps",
+			"estate.gifts[].bps",
 		])
 	})
 

@@ -1,6 +1,7 @@
 import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
 import { acceptedScenarioSchemaVersion } from "./document"
+import { FULL_ESTATE } from "./shape/estate-fixture"
 import { scenarioExample } from "./shape/example"
 
 /*
@@ -58,6 +59,7 @@ export function worked(): Doc {
 		accounts,
 		flows: [...(example["flows"] as Doc[]), levelLoan, bounded],
 		cashflow: { ...cashflow, surplus: [{ account: "cash", upTo: 250_000 }, { account: "index" }] },
+		estate: FULL_ESTATE,
 	}
 }
 

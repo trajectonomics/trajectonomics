@@ -7,7 +7,8 @@ import { allowedValues, type ErrorCode, type MetricName } from "@trajectonomics/
  */
 
 /** The head every money field's unit starts with: integer minor units, never the decimal string a result prints. */
-const MINOR_UNITS_HEAD = "Integer minor units of `currency` (satang for THB): 35000 is 350.00 THB"
+export const MINOR_UNITS_HEAD =
+	"Integer minor units of `currency` (satang for THB): 35000 is 350.00 THB"
 
 /** The unit of a Flow's money field: its amount, per occurrence. */
 export const MINOR_UNITS: string = `${MINOR_UNITS_HEAD}, and a Flow states it per occurrence, not per year.`
@@ -60,7 +61,7 @@ export const DATE = "YYYY-MM-DD, Gregorian, never the Buddhist calendar."
  * through `allowedValues`, so the schema and the refusals name the same values and the CLI copies
  * none of them (AGENTS rule 3, ADR-0052). `path` says which list a code shared by several is.
  */
-function closed(code: ErrorCode, path: readonly string[] = []): readonly string[] {
+export function closed(code: ErrorCode, path: readonly string[] = []): readonly string[] {
 	const values = allowedValues(code, path)
 	if (values === undefined) throw new Error(`The engine lists no values for ${code}.`)
 	return values

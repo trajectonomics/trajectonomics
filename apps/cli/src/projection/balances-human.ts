@@ -19,7 +19,7 @@ export function balancesHidden(data: Record<string, unknown>): Record<string, un
 }
 
 /** The dates the annual table reads its real figure at: the end of each roll-up, as the balances are read. */
-function endDatesOf(data: Record<string, unknown>): Set<string> {
+export function endDatesOf(data: Record<string, unknown>): Set<string> {
 	const dates = (tableRows(data, "annual") ?? []).map((row) => {
 		const real = row["realNetWorth"]
 		return typeof real === "object" && real !== null && "date" in real ? String(real.date) : ""

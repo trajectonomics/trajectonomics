@@ -1,10 +1,17 @@
 import { z } from "zod"
 import { scenarioDocument } from "./document-form"
-import { MINOR_UNITS, PRINCIPAL_UNITS, RULE_RATE_UNITS, YEARLY_UNITS } from "./shape/terms"
+import { ESTATE_PERCENT_UNITS, ESTATE_RATE_UNITS, ESTATE_UNITS } from "./shape/estate-terms"
+import {
+	MINOR_UNITS,
+	PERCENT_UNITS,
+	PRINCIPAL_UNITS,
+	RULE_RATE_UNITS,
+	YEARLY_UNITS,
+} from "./shape/terms"
 
 /*
- * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's rates
- * (cli ADR-0063). Nothing lists them by hand: a money field is a node of the published document
+ * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's or an
+ * estate line's rates (cli ADR-0063, ADR-0064). Nothing lists them by hand: a money field is a node of the published document
  * schema whose description starts with one of the money units (MINOR_UNITS, PRINCIPAL_UNITS for a
  * loan's principal, YEARLY_UNITS for a rule's bound), and a rule rate one whose description starts
  * with RULE_RATE_UNITS, so the decimal conversion and `traj schema` read the same schema and cannot
@@ -12,10 +19,16 @@ import { MINOR_UNITS, PRINCIPAL_UNITS, RULE_RATE_UNITS, YEARLY_UNITS } from "./s
  */
 
 /** The units a money field's description may start with. A new unit is added here and nowhere else. */
-const MONEY_UNITS: readonly string[] = [MINOR_UNITS, PRINCIPAL_UNITS, YEARLY_UNITS]
+const MONEY_UNITS: readonly string[] = [MINOR_UNITS, PRINCIPAL_UNITS, YEARLY_UNITS, ESTATE_UNITS]
+
+/** A rate field's stored unit, and the percent unit the decimal form replaces it with. */
+export type RateUnit = { stored: string; percent: string }
 
 /** The units a rate field's description may start with, and so the decimal form writes as a percent string. */
-const RATE_UNITS: readonly string[] = [RULE_RATE_UNITS]
+const RATE_UNITS: readonly RateUnit[] = [
+	{ stored: RULE_RATE_UNITS, percent: PERCENT_UNITS },
+	{ stored: ESTATE_RATE_UNITS, percent: ESTATE_PERCENT_UNITS },
+]
 
 /** How the decimal form writes a field: money as the Currency's major unit, a rule's rate as a percent. */
 export type FieldKind = "money" | "percent"
@@ -37,11 +50,11 @@ export function isMoney(node: Node): boolean {
 	return moneyUnitOf(node) !== undefined
 }
 
-/** The unit a node's description starts with, when the node is a rule's rate; otherwise undefined. */
-export function rateUnitOf(node: Node): string | undefined {
+/** The unit a node's description starts with, when the node is a rate the decimal form writes as a percent. */
+export function rateUnitOf(node: Node): RateUnit | undefined {
 	const description = node["description"]
 	if (typeof description !== "string") return undefined
-	return RATE_UNITS.find((unit) => description.startsWith(unit))
+	return RATE_UNITS.find((unit) => description.startsWith(unit.stored))
 }
 
 /** Which decimal form a node is written in, or undefined when the decimal form leaves it as stored. */
@@ -61,7 +74,7 @@ export function moneyPathsOf(schema: unknown, at = ""): string[] {
 	return fieldPathsOf(schema, "money", at)
 }
 
-/** Every rule rate of a schema, named as `moneyPathsOf` names a money field. */
+/** Every rate of a schema the decimal form writes as a percent, named as `moneyPathsOf` names a money field. */
 export function ratePathsOf(schema: unknown): string[] {
 	return fieldPathsOf(schema, "percent", "")
 }
