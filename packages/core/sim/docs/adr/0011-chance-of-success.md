@@ -55,7 +55,8 @@ divides a `Number`, so the result is the same under V8 and JavaScriptCore.
 - **Runs-out counts per date.** Rejected: at daily resolution a long horizon has thousands of dates,
   while the Annual roll-up is the unit a page draws.
 - **Income, expense and interest Bands.** Left out. Income and expense are deterministic until a path
-  is truncated, and the Runs-out counts already say where a path stopped.
+  is truncated, and the Runs-out counts already say where a path stopped. A Spending rule ends that
+  premise for an expense: ADR 0024 adds spending Bands for a plan with a rule Flow.
 
 ## Consequences
 

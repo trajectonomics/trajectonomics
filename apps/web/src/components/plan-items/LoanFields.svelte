@@ -6,14 +6,11 @@ import {
 	owedSelectChoices,
 	owedUnavailable,
 } from "../../lib/view/plan-items/loan-owed"
-import {
-	ARRIVAL_CHOICES,
-	LOAN_COMPOUNDING_CHOICES,
-	ROUNDING_CHOICES,
-} from "../../lib/view/plan-items/options"
+import { ARRIVAL_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import Money from "../ui/Money.svelte"
 import Field from "./Field.svelte"
+import LoanTermsFields from "./LoanTermsFields.svelte"
 
 interface Props {
 	draft: LoanDraft
@@ -40,12 +37,7 @@ const debt = $derived(owedChoiceOf(choices, draft.owedAccount))
 	{:else if draft.arrival === "date"}
 		<Field id="loan-name" label="Name" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
-	<Field id="loan-principal" label="Amount borrowed" inputmode="decimal" hint="A decimal number, such as 500000.00" bind:value={draft.principal} problem={shown.at("principal")} />
-	<Field id="loan-rate" label="Interest rate a year" inputmode="decimal" hint="A percent with at most two places, such as 6.25" bind:value={draft.rate} problem={shown.at("rate")} />
-	<Field id="loan-compounding" label="Interest is added" options={LOAN_COMPOUNDING_CHOICES} bind:value={draft.compounding} problem={shown.at("compounding")} />
-	<Field id="loan-payments" label="Number of payments" inputmode="decimal" hint="One payment each time interest is added" bind:value={draft.payments} problem={shown.at("payments")} />
-	<Field id="loan-first" label="First payment" hint="YYYY-MM-DD" bind:value={draft.firstPayment} problem={shown.at("firstPayment")} />
-	<Field id="loan-rounding" label="Each payment rounds" options={ROUNDING_CHOICES} bind:value={draft.rounding} problem={shown.at("rounding")} />
+	<LoanTermsFields bind:draft {shown} />
 	<Field id="loan-arrival" label="The money" options={arrivals} bind:value={draft.arrival} problem={shown.at("arrival")} />
 	{#if unavailable !== null && draft.arrival !== "owed"}
 		<p class="-mt-3 text-xs text-muted-foreground">"I already owe it" is unavailable: {unavailable}</p>

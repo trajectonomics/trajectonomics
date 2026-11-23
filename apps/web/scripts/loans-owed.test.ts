@@ -26,6 +26,8 @@ import {
 } from "./loans-ledger.test-support"
 
 const DEL = "loan-del"
+/** The id of the debt the Baseline holds, which the first test finds before it takes the loan's Flows out. */
+let debt = ""
 
 beforeAll(() => setupLedger([DEL]), SLOW_MS)
 afterAll(disposeLedger)
@@ -37,6 +39,7 @@ describe("deleting a loan the Baseline already owes", () => {
 			const doc = documentOf(DEL)
 			const [loan] = loanPartsOf(doc)
 			if (loan === undefined) throw new Error("the demo plan has no loan")
+			debt = loan.account.id
 			expect(balanceOf(loan.account, baselineOf())).toBe("184000.00")
 			// A Flow that reads the debt through an `account` Measure also keeps working: the debt stays declared.
 			const reader = {
@@ -72,7 +75,8 @@ describe("deleting a loan the Baseline already owes", () => {
 			const doc = documentOf(DEL)
 			const broken = {
 				...doc,
-				accounts: doc.accounts.filter((a) => a.kind !== "liability"),
+				// Only the debt the Baseline holds: the demo's condo and its loan stay declared.
+				accounts: doc.accounts.filter((a) => a.id !== debt),
 				flows: doc.flows.filter((flow) => flow.id !== "reader"),
 			}
 			// The Edit itself is accepted; every read of the plan after it is what fails.

@@ -7,6 +7,7 @@ import { statementPeriods } from "../output/statement-periods"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
 import type { ProjectionOptions } from "../types/statement"
+import { ruleStatements } from "./rule-statement"
 import { runEngine } from "./run"
 
 /** Report rows, the period ends the annual roll-ups close on, and the statement month ends. */
@@ -31,12 +32,19 @@ export function project(
 	if (problems.length > 0) return { ok: false, problems }
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
-	const result = runEngine(baseline, scenario, timeline, observed, undefined, statements, breakdown)
+	const result = runEngine(baseline, scenario, timeline, observed, undefined, {
+		tracked: statements,
+		breakdown,
+	})
 	if (!result.ok) return { ok: false, problems: [result.problem] }
 	const output = buildProjection(result.run, baseline, scenario, timeline, breakdown)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
-	if (!statements) return { ok: true, projection: output.projection }
+	const reported =
+		options.spendingRules === true
+			? { ...output.projection, spendingRules: ruleStatements(result.run.rules, scenario) }
+			: output.projection
+	if (!statements) return { ok: true, projection: reported }
 	const liabilities = buildLiabilities(result.run, baseline, scenario, timeline)
 	if (liabilities.problem !== undefined) return { ok: false, problems: [liabilities.problem] }
-	return { ok: true, projection: { ...output.projection, liabilities: liabilities.statements! } }
+	return { ok: true, projection: { ...reported, liabilities: liabilities.statements! } }
 }

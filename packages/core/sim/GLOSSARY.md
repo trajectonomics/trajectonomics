@@ -70,6 +70,18 @@ _Avoid_: Time-varying parameter, schedule
 A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph; a Planned withdrawal that reads its own `source` is no cycle, since the read precedes every landing. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
 _Avoid_: Percentage flow, formula flow, linked flow
 
+**Spending rule**:
+A fourth amount form of an expense Flow (`rule`, beside `amount`, `derive` and `level`): its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year. Three kinds: `initialRate` (a share of the first year's portfolio, kept level in real terms), `currentRate` (a share of each year's portfolio, with optional dated rate steps, a floor and a ceiling) and `guardrails` (last year's amount grown by inflation, cut when the withdrawal rate has risen past an upper band and raised when it has fallen past a lower one). It only sets the expense: the withdraw order, a Shortfall and Settlement are unchanged. A fixed real amount is an ordinary expense with `growth: "inflation"`, not a kind.
+_Avoid_: Withdrawal strategy, safe withdrawal rate, glide path
+
+**Rule year**:
+The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow, counted from its first Landed date: the thirteenth, twenty-fifth, ... Occurrence (the second, third, ... for an annual Flow) begins the next. On that date, before any Flow lands, the rule reads the portfolio and fixes the year's amount. This is a decision, not the anniversary rule: under a shifting Calendar the first Landed date on or after an anniversary can give a year of eleven or thirteen Occurrences, which would not sum to the year's amount. A year the horizon or a Shortfall cuts short pays only its Occurrences.
+_Avoid_: Spending year, withdrawal year, rule period
+
+**Spending rule statement**:
+What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
+_Avoid_: Spending report, withdrawal schedule
+
 **Tally label**:
 A label on an income Flow, on a contribution Flow, or on an asset Account (`returnLabel`, `gainLabel`), that a Levy sums over a Settlement period. A Flow or Account with no label is never tallied, which is how a tax-sheltered Account is left out. Gross tallies use the planned income amount; funded tallies use the amount a contribution actually applied after any cap. A label is the unit of per-person scope: separate caps per earner are separate labels, and `add` sums their Measures. A Levy whose `due` graph reads tally labels and has none of them supplied anywhere in the Scenario is refused by `check()` (`UNSUPPLIED_TALLY_LABEL`), because every total it reads would be zero in every Settlement period.
 _Avoid_: Category, tag, tax category
@@ -302,12 +314,16 @@ The FI survival share a probability-threshold FI method requires, in basis point
 _Avoid_: Confidence level, target
 
 **Chance of success**:
-The result of `chanceOfSuccess`: the Success probability of one plan over seeded Market paths, with its Bands and its Runs-out counts by Annual roll-up period. It is an Outcome distribution for one plan, not a Projection.
+The result of `chanceOfSuccess`: the Success probability of one plan over seeded Market paths, with its Bands, its Runs-out counts by Annual roll-up period and, for a plan with a rule Flow, its Spending Bands. It is an Outcome distribution for one plan, not a Projection.
 _Avoid_: Confidence, forecast, simulation result
 
 **Band**:
 The net-worth Percentiles across Market paths at one Annual roll-up end, at levels 10, 25, 50, 75 and 90. A failed path contributes the net worth it died with.
 _Avoid_: Range, confidence interval, corridor
+
+**Spending Band**:
+The Percentiles, at levels 10, 25, 50, 75 and 90 and by nearest rank, of what a plan's rule Flows paid across Market paths in one Annual roll-up (`spending.bands`), present in a Chance of success only when the Scenario has a rule Flow (ADR 0024). It counts what was paid, not the planned amount, in nominal terms: a path that ran out pays 0 in every later roll-up, and the roll-up it ran out in counts what was paid before it and the met share of the failing day. Its `lowestYear` is the same five Percentiles of each path's lowest year, the least of its roll-ups that hold a whole year of the rule's payments (a partial first, last or clipped roll-up never counts); a path that ran out has a lowest year of 0, wherever it ran out, and is always in the sample.
+_Avoid_: Expense Band, income Band, withdrawal Band
 
 ## Input Conventions
 

@@ -42,7 +42,7 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 
 ## Pages
 
-Overview, Net worth, Ledger, Projection, Milestones, Income, Expenses, Assets and debts, FI date, Compare, Chance of success, Tax and Health. Income, Expenses and Assets and debts list the selected plan's items and, with the server running, edit them in a drawer: each save is one `traj` Edit ([ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
+Overview, Net worth, Ledger, Projection, Milestones, Income, Expenses, Assets and debts, FI date, Compare, Chance of success, Tax and Health. Income, Expenses and Assets and debts list the selected plan's items and, with the server running, edit them in a drawer: each save is one `traj` Edit ([ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)). Assets and debts also adds a home or car, bought or owned already, financed, kept, let and sold, as one form ([ADR 0011](docs/adr/0011-a-real-asset-is-one-form-and-one-card-over-parts-the-cli-already-has.md)). Add `?demo=1` to any address to see the Demo snapshot instead of your own, for example after `bun run build && bunx vite preview --host 127.0.0.1`. The Scenario a page shows and the nominal or real choice live in the address bar, so a view is a link.
 
 ## Edits
 

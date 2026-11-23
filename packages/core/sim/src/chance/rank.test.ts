@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { percentiles } from "./band"
 import { ascending, nearestRank } from "./rank"
 
 describe("nearest rank", () => {
@@ -33,6 +34,18 @@ describe("nearest rank", () => {
 	it("reports a tied value and never interpolates between neighbours", () => {
 		expect(nearestRank([5, 5, 7], 50)).toBe(5)
 		expect(nearestRank([5, 5, 7], 75)).toBe(7)
+	})
+
+	it("takes the five levels of an even sample holding a tie", () => {
+		// [1, 5, 5, 9]: ranks ceil(0.4) = 1, ceil(1) = 1, ceil(2) = 2, ceil(3) = 3, ceil(3.6) = 4.
+		const levels = percentiles(ascending([5, 9, 5, 1]))
+		expect(levels).toEqual([
+			{ level: 10, value: 1 },
+			{ level: 25, value: 1 },
+			{ level: 50, value: 5 },
+			{ level: 75, value: 5 },
+			{ level: 90, value: 9 },
+		])
 	})
 
 	it("sorts safe integers by value, not as text", () => {

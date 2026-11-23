@@ -33,4 +33,6 @@ export interface ProjectionOptions {
 	readonly liabilityStatements?: boolean
 	/** One cash-flow breakdown per Annual roll-up; present only when set. */
 	readonly cashflowBreakdown?: boolean
+	/** One Spending rule statement per rule Flow; present only when set. */
+	readonly spendingRules?: boolean
 }

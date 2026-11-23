@@ -51,6 +51,11 @@ async function literalOf(code: string): Promise<{ readonly id: string }> {
 	}
 }
 
+/** Every illustrative fragment of the page, as the value it denotes. */
+function fragments(): Promise<readonly { readonly id: string }[]> {
+	return Promise.all(blocks.filter((b) => b.info === "ts fragment").map((b) => literalOf(b.code)))
+}
+
 describe("README examples", () => {
 	const modules = blocks.flatMap((block, i) => (block.info === "ts" ? [{ block, i }] : []))
 
@@ -65,12 +70,16 @@ describe("README examples", () => {
 	})
 
 	it("accepts the Levy, Dated constant and Derived amount fragments", async () => {
-		const values = await Promise.all(
-			blocks.filter((b) => b.info === "ts fragment").map((b) => literalOf(b.code)),
-		)
+		const values = (await fragments()).filter((v) => v.id !== "spending")
 		const byId = (id: string) => values.find((v) => v.id === id)
 		expect(values.map((v) => v.id).sort()).toEqual(["due", "rent", "salary"])
 		expect(check(...levyInputs(byId("salary"), byId("due"), byId("rent")))).toEqual([])
+	})
+
+	it("accepts the Spending rule fragments", async () => {
+		const rules = (await fragments()).filter((v) => v.id === "spending")
+		expect(rules).toHaveLength(3)
+		for (const rule of rules) expect(check(...ruleInputs(rule))).toEqual([])
 	})
 
 	it("lists every step of the check script in the Scripts section", () => {
@@ -83,6 +92,21 @@ describe("README examples", () => {
 		for (const step of steps) expect(bullet).toContain(`\`${step}\``)
 	})
 })
+
+/** The Baseline, Scenario and Timeline that a rule fragment sits in, over `funds` and `rmf`. */
+function ruleInputs(flow: unknown): [unknown, unknown, unknown] {
+	const asset = (id: string) => ({ id, kind: "asset", rate: 300 })
+	const scenario = {
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [asset("cash"), asset("funds"), asset("rmf")],
+		flows: [flow],
+		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: ["cash"] },
+	}
+	const baseline = { schemaVersion: 1, balances: [{ account: "cash", amount: 0 }] }
+	return [baseline, scenario, { start: "2026-01-01", horizon: "2036-12-31", resolution: "month" }]
+}
 
 /** The Baseline, Scenario and Timeline that the Levies fragments sit in. */
 function levyInputs(salary: unknown, due: unknown, rent: unknown): [unknown, unknown, unknown] {

@@ -7,8 +7,8 @@ import { money } from "./money"
  * A Flow of a Scenario document in the decimal form (`traj scenario show --decimal --json`). Only the
  * fields the planner pages show are typed; `looseObject` keeps every other field, so a save returns it
  * untouched. Every amount is the CLI's decimal string, and every rate an integer of basis points.
- * A `withdrawal` borrows from its `source`; a `level` Contribution takes the place of `amount` (cli
- * ADR-0016). Both are shown read-only until loans can be edited (#280).
+ * A `withdrawal` borrows from its `source`, or sells an asset; a `level` Contribution takes the place of
+ * `amount` (cli ADR-0016); a `derive` computes the amount from an Account's value (sim ADR 0020).
  */
 export const scenarioFlow = z.looseObject({
 	id: z.string(),
@@ -21,6 +21,8 @@ export const scenarioFlow = z.looseObject({
 	earned: z.boolean().optional(),
 	target: z.string().optional(),
 	source: z.string().optional(),
+	// "obligation" pays a Contribution in full on its date, before Available cashflow (sim ADR 0021).
+	funding: z.string().optional(),
 	// An expense's free-text group (cli schema, #278). The engine never reads it.
 	category: z.string().optional(),
 	derive: z.looseObject({}).optional(),
@@ -41,6 +43,8 @@ export const scenarioAccount = z.looseObject({
 	rate: z.number().int(),
 	compounding: z.enum(["monthly", "quarterly", "semiannual", "annual"]).optional(),
 	lockedUntil: dateString.optional(),
+	// false marks an asset that is in net worth but not accessible: a home or a car (sim ADR 0019).
+	liquid: z.boolean().optional(),
 })
 export type ScenarioAccount = z.infer<typeof scenarioAccount>
 

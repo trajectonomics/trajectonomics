@@ -1,5 +1,5 @@
 import type { DateString } from "../types"
-import { isDerived } from "../types"
+import { isDerived, isRuled } from "../types"
 import type { DatedEvent } from "./events"
 import type { StateMap } from "./state"
 import { valuation } from "./value"
@@ -49,9 +49,9 @@ export interface RecordedValues extends AccountValues {
 	readonly endWith: (states: StateMap) => void
 }
 
-/** Whether a Landed date plans a Derived amount, which reads a recorded value. */
+/** Whether a Landed date plans a Derived amount or a Spending rule, which read a recorded value. */
 export function readsOn(landing: readonly DatedEvent[]): boolean {
-	return landing.some((event) => isDerived(event.flow))
+	return landing.some((event) => isDerived(event.flow) || isRuled(event.flow))
 }
 
 /**
