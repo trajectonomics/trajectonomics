@@ -14,7 +14,12 @@ const GOOD: readonly BuiltFile[] = [
 	{ path: "index.html", text: PAGE },
 	{ path: "404.html", text: NOT_FOUND },
 	{ path: "posts/a/cover.webp" },
+	{ path: "llms.txt", text: "# Trajectonomics Blog\n" },
 ]
+
+/** A Post page: an article that states its BlogPosting in one JSON-LD block. */
+const BLOG_POSTING = `<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"A"}</script>`
+const POST = `<html><head><title>A</title><link rel="canonical" href="https://blog.trajectonomics.com/guides/a/"><meta property="og:type" content="article">${BLOG_POSTING}</head><body>${SHELL}</body></html>`
 
 /** The codes a build fails with. */
 function codes(files: readonly BuiltFile[]): readonly FailureCode[] {
@@ -118,6 +123,21 @@ describe("the built blog", () => {
 		expect(codes(GOOD.filter((file) => file.path !== "404.html"))).toEqual([
 			"not-found-page-missing",
 		])
+	})
+
+	test("a build with no llms.txt fails, so answer engines have no index", () => {
+		expect(codes(GOOD.filter((file) => file.path !== "llms.txt"))).toEqual(["llms-txt-missing"])
+	})
+
+	test("a Post page that states no BlogPosting fails", () => {
+		const bare = POST.replace(BLOG_POSTING, "")
+		expect(codes([...GOOD, { path: "guides/a/index.html", text: bare }])).toEqual([
+			"post-structured-data-missing",
+		])
+	})
+
+	test("a Post page that states its BlogPosting passes", () => {
+		expect(checkBuild([...GOOD, { path: "guides/a/index.html", text: POST }])).toEqual([])
 	})
 
 	test("each failure names the file that breaks the rule", () => {

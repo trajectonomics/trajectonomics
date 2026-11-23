@@ -10,6 +10,7 @@ import { dictionaryFor } from "../lib/dictionary"
 import type { Language } from "../lib/languages"
 import { canonicalUrl, fileUrl } from "../lib/page-url"
 import { SITE_NAME } from "../lib/site"
+import { blogPosting, serializeJsonLd, website } from "../lib/structured-data"
 import { themeRole } from "../lib/theme-role"
 import { FALLBACK_THEME, themeScript } from "../lib/themes"
 
@@ -25,6 +26,8 @@ interface Props {
 	/** Where the Language menu takes a reader for each Interface Language. */
 	readonly languagePaths: Readonly<Record<Language, string>>
 	readonly title: string
+	/** A Post's own title, without the title suffix; the headline its BlogPosting names. */
+	readonly headline?: string
 	/** An indexable page's one-line summary; the Not-found Page passes none. */
 	readonly description?: string
 	/** Whether search engines may index the page: every page but the Not-found Page. */
@@ -52,6 +55,7 @@ const {
 	language,
 	languagePaths,
 	title,
+	headline = title,
 	description,
 	indexed,
 	isFrontPage = false,
@@ -63,6 +67,20 @@ const {
 } = Astro.props
 const words = dictionaryFor(language)
 const canonical = canonicalUrl(canonicalPath)
+// A Post page states a BlogPosting; the front page states its WebSite; no other page states any.
+const structuredNode =
+	article !== undefined && description !== undefined
+		? blogPosting({
+				headline,
+				description,
+				datePublished: article.toISOString().slice(0, 10),
+				image: image === undefined ? undefined : fileUrl(image.src),
+				inLanguage: contentLanguage,
+				url: canonical,
+			})
+		: isFrontPage && description !== undefined
+			? website({ description, inLanguage: language, url: canonical })
+			: undefined
 // The browser's bar takes each Theme's background, read from the brand's stylesheets.
 const themeColours = [
 	{ scheme: "light", colour: themeRole(lightTheme, "background") },
@@ -105,6 +123,11 @@ const themeColours = [
 						</>
 					)}
 					<meta name="twitter:card" content={image === undefined ? "summary" : "summary_large_image"} />
+					{
+						structuredNode === undefined ? null : (
+							<script type="application/ld+json" set:html={serializeJsonLd(structuredNode)} />
+						)
+					}
 				</>
 			) : (
 				<meta name="robots" content="noindex" />
