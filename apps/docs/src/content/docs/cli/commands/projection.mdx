@@ -30,6 +30,15 @@ traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --se
 Compare two Projections, or one against a what-if, and report the deltas in FI date, net worth at
 the ages you name and run-out year.
 
+From 0.8.0, compare also reports the change for each year of the annual roll-up and for each
+Milestone declared on both sides. Each year's figures are each side's closing net worth, income,
+expense, contributions and interest, and a Levy's figure when a side holds one; the change is side
+B minus side A, computed from the engine's whole minor units. A year whose period differs between the
+sides, or that only one side has, states each side's figures but no change: a side that runs out part
+way through a year has a partial last period, and two partial periods are not comparable. A Milestone
+reports each side's date and the whole months from A's to B's, or no months when a side did not reach
+it.
+
 - `--as-of <string>` — the date the Projection starts at, as `YYYY-MM-DD`; required
 - `--horizon <string>` — the date the Projection ends at, as `YYYY-MM-DD`; required
 - `--set <string>` — replace one existing dotted document path with a JSON value; repeatable
