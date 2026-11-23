@@ -1,6 +1,7 @@
 <script lang="ts">
 import { preferences } from "../../client/preferences.svelte.js"
 import { FLOW_NODE_WIDTH, type FlowLayout } from "../../lib/chart/flow"
+import { fittedLabel } from "../../lib/chart/flow-label"
 import { formatMoney, maskMoney } from "../../lib/format"
 import { cx } from "../ui/cx"
 import { FLOW_FILL } from "./flow-style"
@@ -76,7 +77,7 @@ function keyed(event: KeyboardEvent, key: string): void {
 				aria-hidden="true"
 				class="fill-foreground"
 			>
-				{node.label} {shown(node.amount)}
+				{fittedLabel(node, shown(node.amount))}
 			</text>
 		{/each}
 	</svg>
