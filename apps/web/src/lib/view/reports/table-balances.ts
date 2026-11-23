@@ -41,7 +41,7 @@ export function spendingRules(rows: Rows<"spendingRules">): ReportTable {
 			figure("paid", (r: Row) => r.paid),
 			...optional(
 				rows,
-				text("withdrawalRate", (r: Row) => r.withdrawalRate),
+				figure("withdrawalRate", (r: Row) => r.withdrawalRate),
 			),
 			text("action", (r: Row) => r.action),
 		],

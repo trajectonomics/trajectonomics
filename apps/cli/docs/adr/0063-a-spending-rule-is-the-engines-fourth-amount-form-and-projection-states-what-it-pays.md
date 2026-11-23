@@ -40,8 +40,9 @@ one; it publishes the document form and states the engine's statement and Bands.
 - **The five rule codes are said in words.** `RULE_NOT_EXPENSE`, `RULE_PORTFOLIO_LIABILITY`,
   `RULE_PORTFOLIO_ILLIQUID`, `RULE_FREQUENCY` and `RULE_FLOOR_ABOVE_CEILING` leave `refusal-elsewhere.ts` (where they
   were `never`) for a table of sentences with a hint (`src/projection/refusal-rule.ts`), as the loan and trade codes are.
-  They are found by the document check alone, so `scenario apply`, `--set`, the Store and `projection run` on a stored
-  row state them at the path of the field that is wrong. `NEXT_12_MONTHS_READS_ACCOUNT` gets a sentence that names the
+  They are found by the document check alone, so `scenario apply`, the Store and `projection run` on a stored row
+  state them at the path of the field that is wrong; an override through `--set` names the code only, as it does for
+  the loan codes. `NEXT_12_MONTHS_READS_ACCOUNT` gets a sentence that names the
   rule Flow case and the way out: `trailing12Months`, or a rule Flow whose `startAt` names the Milestone the Metric
   sits on. `scenario apply` states a worded code's sentence as well (the document form's refusal read the code
   and its path only, so the sentences of the loan and trade codes now reach it too).
@@ -81,7 +82,8 @@ one; it publishes the document form and states the engine's statement and Bands.
 
 - **`realAmount` is not stated.** The engine's Rule year has no real (start-of-timeline) amount, and the CLI computes
   no money, so `--spending` states nominal figures only; a Dashboard that shows spending in real terms needs the
-  engine to state it, as it states `realNetWorth`. The `realBalances` of `--accounts` are not a substitute.
+  engine to state it, as it states `realNetWorth`. The `realBalances` of `--accounts` are not a substitute. #385 adds
+  it to the engine's Rule year; `--spending` states it in a follow-up.
 - **The example's wealth criterion changed**, so every document or golden that holds the example's `retire` Milestone
   changed with it (`run-accounts.output`'s Scenario hash); its figures did not, because that run ends before 2045.
 - **A Milestone with a `next12Months` Metric beside a home** is refused whatever a rule's `startAt` says, because the
