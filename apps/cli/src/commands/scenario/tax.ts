@@ -1,10 +1,13 @@
 import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
+import { IF_HASH } from "../../scenario/if-hash"
 import {
 	FILING_STATUSES,
 	labelFlagDescription,
+	MODE_FLAGS,
 	TAX_ALLOWANCE_CLASSES,
+	taxExamples,
 	writeTax,
 } from "../../scenario/tax"
 import { deductionFlags } from "../../scenario/tax/deduction-flags"
@@ -14,6 +17,7 @@ import { assumptionsField } from "../../tax-assumptions"
 export const tax: Leaf = defineCommand({
 	name: "tax",
 	summary: "Write or remove the tax Levy a Scenario's labelled Flows are taxed under",
+	note: "The stored tax profile ships in 0.8.0, and so do --merge, --from-stored and --if-hash.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).describe("The Scenario's exact name or its id."),
@@ -41,14 +45,17 @@ export const tax: Leaf = defineCommand({
 			),
 		...deductionFlags,
 		label: z.array(z.string()).optional().describe(labelFlagDescription()),
-		none: z.boolean().optional().describe("Remove the tax Levy instead of writing one."),
+		...MODE_FLAGS,
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
+		ifHash: IF_HASH,
 	}),
 	output: z.strictObject({
 		dryRun: z.boolean().describe("True when the write was rolled back."),
 		status: z
 			.enum(["created", "updated", "unchanged"])
-			.describe("Whether the document changed; `created` is never returned here."),
+			.describe(
+				"Whether the document or the stored profile changed; `created` is never returned here.",
+			),
 		levy: z
 			.string()
 			.optional()
@@ -75,26 +82,7 @@ export const tax: Leaf = defineCommand({
 			),
 		scenario: writtenScenario,
 	}),
-	examples: [
-		{
-			command: "traj scenario tax base --tax th-2026 --label salary=income.section40_1",
-			description: "Charge Thailand's 2026 income tax on the salary this Scenario declares.",
-		},
-		{
-			command:
-				"traj scenario tax base --tax th-2026 --filing-status married_joint --children 1 --label salary=income.section40_1",
-			description: "The same Levy under a married-joint profile with one child.",
-		},
-		{
-			command:
-				"traj scenario tax base --tax th-2026 --filing-status married_no_income_spouse --life-insurance 20000 --mortgage-interest 30000 --social-security 9000 --donation1x 5000 --label salary=income.section40_1",
-			description: "The same Levy with the deductions a Thai employee usually has.",
-		},
-		{
-			command: "traj scenario tax base --none",
-			description: "Take the tax Levy out, so the figures are pre-tax again.",
-		},
-	],
-	errorCodes: ["database_busy", "invalid_input", "not_found"],
+	examples: taxExamples,
+	errorCodes: ["database_busy", "invalid_input", "not_found", "scenario_changed"],
 	run: (input, ctx) => writeTax(input, ctx),
 })

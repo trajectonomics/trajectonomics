@@ -14,7 +14,7 @@ function recordType(record: Record<string, unknown>, path: string): RecordType |
 
 /**
  * Checks each field against the layout's declared kind and builds the store row from it. A
- * Scenario record of a layout without the household column restores with the household null.
+ * Scenario record of a layout without the household or tax column restores with it null.
  */
 export function decodeRecord(
 	record: Record<string, unknown>,
@@ -32,7 +32,10 @@ export function decodeRecord(
 		if (isAppError(value)) return value
 		row[key] = value
 	}
-	if (type === "scenario" && !("household" in row)) row["household"] = null
+	if (type === "scenario") {
+		if (!("household" in row)) row["household"] = null
+		if (!("tax" in row)) row["tax"] = null
+	}
 	return { type, row } as Decoded
 }
 

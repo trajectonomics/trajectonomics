@@ -13,6 +13,7 @@ import { restore } from "./restore"
 import { deleteScenario } from "./scenario-delete"
 import { forkScenario } from "./scenario-fork"
 import { replaceHousehold } from "./scenario-household"
+import { replaceTax } from "./scenario-tax"
 import { getScenario, listScenarios, saveScenario } from "./scenarios"
 import { addTransaction } from "./transactions"
 import { amendTransaction } from "./tx-amend"
@@ -47,6 +48,7 @@ export function storeOver(path: string, ctx: Ctx, upgradedFrom?: PreMigrationCop
 		saveScenario: (input, options) => saveScenario(ctx, input, options),
 		forkScenario: (id, name, options) => forkScenario(ctx, id, name, options),
 		replaceHousehold: (id, plan, options) => replaceHousehold(ctx, id, plan, options),
+		replaceTax: (id, plan, options) => replaceTax(ctx, id, plan, options),
 		deleteScenario: (id, options) => deleteScenario(ctx, id, options),
 		getScenario: (idOrName) => getScenario(ctx, idOrName),
 		listScenarios: (options) => listScenarios(ctx, options),

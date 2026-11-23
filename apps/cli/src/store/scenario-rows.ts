@@ -1,6 +1,7 @@
 import type { AppError } from "../errors"
 import { scenarioDocumentError } from "../scenario/document"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
+import { holdsTaxLevy } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
 import { SCENARIO_COLUMNS } from "./columns"
 import type { Ctx } from "./context"
@@ -48,11 +49,22 @@ export function anchorsFor(
 	return resolveHousehold(stored.household, document, owner)
 }
 
+/**
+ * The tax profile a Scenario keeps after a write that did not name one: the stored profile, unless
+ * the written document no longer holds the Levy it describes (cli ADR-0066). A profile of a Levy
+ * that is gone would tell a reader the plan is taxed when it is not.
+ */
+export function taxKept(stored: ScenarioRow | null, document: unknown): string | null {
+	if (stored?.tax == null) return null
+	return holdsTaxLevy(document) ? stored.tax : null
+}
+
 export type ScenarioDraft = {
 	name: string
 	document: string
 	forkedFrom: string | null
 	household: string | null
+	tax: string | null
 }
 
 export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
@@ -60,7 +72,7 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 	const id = newId(at)
 	ctx.db.run(
 		`INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, household,
-		version, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 1, ?8, ?8)`,
+		tax, version, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 1, ?9, ?9)`,
 		[
 			id,
 			ctx.entityId,
@@ -69,23 +81,34 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 			contentHash(draft.document),
 			draft.forkedFrom,
 			draft.household,
+			draft.tax,
 			iso(at),
 		],
 	)
 	return liveScenario(ctx, "id", id)!
 }
 
-/** Replaces a live Scenario's document and household; both are canonical text, household or null. */
+/** What a write leaves beside a Scenario's document: the household and the tax profile, or null. */
+export type Siblings = { household: string | null; tax: string | null }
+
+/** Replaces a live Scenario's document and its siblings; every one is canonical text or null. */
 export function replaceScenario(
 	ctx: Ctx,
 	current: ScenarioRow,
 	document: string,
-	household: string | null,
+	siblings: Siblings,
 ): ScenarioRow {
 	ctx.db.run(
-		`UPDATE scenario SET document = ?2, content_hash = ?3, household = ?4,
-		version = version + 1, updated_at = ?5 WHERE id = ?1`,
-		[current.id, document, contentHash(document), household, iso(ctx.clock())],
+		`UPDATE scenario SET document = ?2, content_hash = ?3, household = ?4, tax = ?5,
+		version = version + 1, updated_at = ?6 WHERE id = ?1`,
+		[
+			current.id,
+			document,
+			contentHash(document),
+			siblings.household,
+			siblings.tax,
+			iso(ctx.clock()),
+		],
 	)
 	return liveScenario(ctx, "id", current.id)!
 }

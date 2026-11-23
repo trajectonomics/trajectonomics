@@ -22,7 +22,15 @@ export type WrittenScenario = Omit<ScenarioView, "id"> & { id: string | null }
 /** A Scenario named by `scenario diff`, without its document. */
 export type ScenarioRef = { id: string; name: string; contentHash: string }
 
-const summaryShape = {
+export const summaryShape: {
+	id: z.ZodString
+	name: z.ZodString
+	contentHash: z.ZodString
+	forkedFrom: z.ZodNullable<z.ZodString>
+	version: z.ZodNumber
+	createdAt: z.ZodString
+	updatedAt: z.ZodString
+} = {
 	id: z.string().describe("The Scenario's UUIDv7 id."),
 	name: z.string().describe("The Scenario's exact, case-sensitive name."),
 	contentHash: z.string().describe("jcs1:sha256 of the canonical document."),
@@ -32,7 +40,7 @@ const summaryShape = {
 	updatedAt: z.string().describe("When the row was last changed."),
 }
 
-const documentShape = z
+export const documentShape: z.ZodRecord<z.ZodString, z.ZodUnknown> = z
 	.record(z.string(), z.unknown())
 	.describe("The document parsed from the stored canonical JSON.")
 
@@ -56,18 +64,10 @@ export const droppedAnchors: z.ZodType<string[]> = z
 /** The household a Scenario keeps, as the document it was set from; null when none is set. */
 export type HouseholdDocument = Record<string, unknown> | null
 
-const householdShape = z
+export const householdShape: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>> = z
 	.record(z.string(), z.unknown())
 	.nullable()
 	.describe("The household's document, or null when no household is set (cli ADR-0048).")
-
-/** `scenario show`: one live Scenario with its document and its household. */
-export const scenarioWithHousehold: z.ZodType<ScenarioView & { household: HouseholdDocument }> =
-	z.strictObject({
-		...summaryShape,
-		document: documentShape,
-		household: householdShape,
-	})
 
 /** A Scenario a household write reports: the written Scenario with its household and anchored dates. */
 export const writtenWithHousehold: z.ZodType<WrittenScenario & { household: HouseholdDocument }> =

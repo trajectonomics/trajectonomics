@@ -80,6 +80,8 @@ export {
 } from "./scenario-show"
 export type { Snapshot, SnapshotParams, SnapshotReads } from "./snapshot"
 export { SNAPSHOT_VERSION, snapshot, snapshotParams, snapshotReads } from "./snapshot"
+export type { TaxProfile } from "./tax-profile"
+export { taxProfile } from "./tax-profile"
 export type { Assumption, TaxYear } from "./tax-year"
 export { taxYear } from "./tax-year"
 export type { TxList } from "./tx-list"

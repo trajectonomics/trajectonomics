@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { householdDocument } from "./household"
 import { money } from "./money"
+import { taxProfile } from "./tax-profile"
 
 /**
  * A Flow of a Scenario document in the decimal form (`traj scenario show --decimal --json`). Only the
@@ -100,6 +101,13 @@ export const scenarioShow = z.strictObject({
 		document: scenarioDocument,
 		/** The household's document, or null when no household is set (cli ADR-0048). */
 		household: householdDocument.nullable(),
+		/**
+		 * The tax profile `scenario tax` was given, or null when none is stored (cli ADR-0066). Optional:
+		 * a Snapshot saved by a build before it keeps neither this nor `taxed`, and reads as null.
+		 */
+		tax: taxProfile.nullable().optional(),
+		/** True when the document holds a tax Levy, whether or not a profile is stored (cli ADR-0066). */
+		taxed: z.boolean().optional(),
 	}),
 })
 export type ScenarioShow = z.infer<typeof scenarioShow>
