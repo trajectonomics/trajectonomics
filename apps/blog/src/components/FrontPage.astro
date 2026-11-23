@@ -1,0 +1,88 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { postPagePath, readPosts, shownTranslation } from "../content/read-posts"
+import Layout from "../layouts/Layout.astro"
+import { dictionaryFor } from "../lib/dictionary"
+import { DEFAULT_LANGUAGE, LANGUAGES, type Language, perLanguage, treePath } from "../lib/languages"
+import { BLOG_PATH } from "../lib/site"
+import PostMeta from "./PostMeta.astro"
+
+interface Props {
+	/** The Interface Language of this tree's front page. */
+	readonly language: Language
+}
+
+const { language } = Astro.props
+const words = dictionaryFor(language)
+// Every Post is listed in every tree, in the Translation that tree's page shows.
+const entries = (await readPosts()).map((post) => {
+	const translation = shownTranslation(post, language)
+	return { post, translation, path: postPagePath(post, language) }
+})
+const [featured, ...rest] = entries
+const languagePaths = perLanguage((tree) => treePath(tree, BLOG_PATH))
+const alternates = [
+	...LANGUAGES.map((tree) => ({ hreflang: tree, path: languagePaths[tree] })),
+	{ hreflang: "x-default" as const, path: languagePaths[DEFAULT_LANGUAGE] },
+]
+---
+
+<Layout
+	language={language}
+	languagePaths={languagePaths}
+	alternates={alternates}
+	title={words.frontTitle}
+	description={words.frontDescription}
+	indexed={true}
+	isFrontPage={true}
+>
+	<section class="masthead" aria-labelledby="masthead-title">
+		<p class="meta-label">{words.mastheadLabel}</p>
+		<h1 id="masthead-title" class="masthead-title">{words.mastheadTitle}</h1>
+		<p class="masthead-lede">{words.mastheadLede}</p>
+	</section>
+	<section class="posts" aria-labelledby="posts-title">
+		<h2 id="posts-title" class="meta-label posts-title">{words.latest}</h2>
+		{
+			featured === undefined ? (
+				<p class="empty-state">{words.noPosts}</p>
+			) : (
+				<a class="featured" href={featured.path}>
+					<img
+						class="featured-image"
+						src={featured.translation.cover.src}
+						alt=""
+						width={featured.translation.cover.width}
+						height={featured.translation.cover.height}
+					/>
+					<div class="featured-text">
+						<PostMeta post={featured.post} translation={featured.translation} language={language} />
+						<span class="featured-title" lang={featured.translation.language}>
+							{featured.translation.entry.data.title}
+						</span>
+						<span class="featured-description" lang={featured.translation.language}>
+							{featured.translation.entry.data.description}
+						</span>
+					</div>
+				</a>
+			)
+		}
+		{
+			rest.length === 0 ? null : (
+				<ul class="post-rows">
+					{rest.map((entry) => (
+						<li>
+							<a class="post-row" href={entry.path}>
+								<PostMeta post={entry.post} translation={entry.translation} language={language} />
+								<span class="post-row-title" lang={entry.translation.language}>
+									{entry.translation.entry.data.title}
+								</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</section>
+</Layout>

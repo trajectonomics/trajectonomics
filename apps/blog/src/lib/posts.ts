@@ -1,3 +1,5 @@
+import type { Language } from "./languages"
+
 /** What kind of Post it is; the front page filters by it. */
 export const POST_TYPES = Object.freeze(["compare", "guide", "news"] as const)
 
@@ -10,18 +12,6 @@ const TYPE_FOLDERS: Readonly<Record<PostType, string>> = Object.freeze({
 	guide: "guides",
 	news: "news",
 })
-
-/** The label each Post Type's meta line shows. */
-const TYPE_LABELS: Readonly<Record<PostType, string>> = Object.freeze({
-	compare: "Compare",
-	guide: "Guide",
-	news: "News",
-})
-
-/** The label a Post Type's meta line shows. */
-export function typeLabel(type: PostType): string {
-	return TYPE_LABELS[type]
-}
 
 /** The facts about a Post the lists and its address need. */
 export interface PostSummary {
@@ -48,15 +38,25 @@ export function publishedNewestFirst<T extends PostSummary>(posts: readonly T[])
 /** The words a reader reads per minute, for the meta line's reading time. */
 const WORDS_PER_MINUTE = 220
 
-/** Whole minutes to read a Post's text, and never less than one. */
-export function readingMinutes(text: string): number {
-	const words = text.split(/\s+/).filter((word) => word !== "").length
+/**
+ * Whole minutes to read a Post's text, and never less than one. Words are counted by the
+ * Language's own word breaker, because Thai writes no space between words.
+ */
+export function readingMinutes(text: string, language: Language): number {
+	const segmenter = new Intl.Segmenter(language, { granularity: "word" })
+	let words = 0
+	for (const segment of segmenter.segment(text)) {
+		if (segment.isWordLike === true) words += 1
+	}
 	return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
 }
 
-/** A publication date as the meta line shows it, such as `22 Nov 2026`, read in UTC. */
-export function displayDate(date: Date): string {
-	return new Intl.DateTimeFormat("en-GB", {
+/**
+ * A publication date as the meta line shows it, read in UTC, in a Dictionary's date locale:
+ * `22 Nov 2026` in English, `22 พ.ย. 2569` in Thai.
+ */
+export function displayDate(date: Date, locale: string): string {
+	return new Intl.DateTimeFormat(locale, {
 		day: "numeric",
 		month: "short",
 		year: "numeric",

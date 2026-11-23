@@ -102,3 +102,17 @@
 	outline: 2px solid var(--ds-color-ring);
 	outline-offset: 4px;
 }
+
+/*
+ * Thai headlines: the brand's Thai rule sets 1.8 on every Thai element, which pulls a display
+ * headline's lines apart, and the Latin 1.05 clips Thai's stacked vowels and tone marks. Headlines
+ * in Thai take a line between the two.
+ */
+[data-theme] .masthead-title:lang(th),
+[data-theme] .post-title:lang(th),
+[data-theme] .featured-title:lang(th),
+[data-theme] .post-row-title:lang(th),
+[data-theme] .post-body h2:lang(th),
+[data-theme] .post-body h3:lang(th) {
+	line-height: 1.35;
+}

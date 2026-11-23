@@ -5,15 +5,29 @@ The Trajectonomics blog at [blog.trajectonomics.com](https://blog.trajectonomics
 `blog` with Static Assets only, on its own host
 ([ADR 0002](./docs/adr/0002-the-blog-is-static-on-its-own-host.md)). It is never published to npm.
 
-**Status:** the Shell, the front page, the Post page and the first Post, "One answer, every time".
-The type filter, the compare template, the Language work and the first Compare Page (`traj` vs
-vanilla agents) follow.
+**Status:** the Shell, the front page, the Post page, English and Thai Language Trees, and the
+first Posts. The type filter, the compare template, structured data and the first Compare Page
+(`traj` vs vanilla agents) follow.
 
 ## Write a Post
 
-Add `src/content/posts/<slug>.md` with `title`, `description`, `type` (`compare`, `guide` or
-`news`), `publishedOn`, `cover` (`src`, `alt`, `width`, `height`) and optionally `draft: true`.
-Its images go in `public/posts/<slug>/` as WebP. A `guide` is served at `/guides/<slug>/`.
+Add `src/content/posts/<slug>/<language>.md`, where `<language>` is `en` or `th`, with `title`,
+`description`, `type` (`compare`, `guide` or `news`), `publishedOn`, `cover` (`src`, `alt`,
+`width`, `height`) and optionally `draft: true`. Its images go in `public/posts/<slug>/` as WebP.
+
+To translate a Post, add another `<language>.md` in the same folder. Translate `title`,
+`description`, `cover.alt` and the body, and keep `type`, `publishedOn`, `cover.src`, the cover's
+size and `draft` exactly as the other Translations have them: the build refuses a mismatch.
+
+A `guide` is served at `/guides/<slug>/` in English and at `/th/guides/<slug>/` in Thai. Every Post
+has both pages. A page whose Language the Post is not written in shows the English Translation (or
+the Post's own Language when there is no English) with a notice, and lists the Languages the Post
+is written in ([ADR 0003](./docs/adr/0003-interface-language-and-post-language-are-separate.md)).
+
+## Add an Interface Language
+
+Add the code to `LANGUAGES` in `src/lib/languages.ts`, write `src/lib/dictionary-<code>.ts`, and
+add it to the table in `src/lib/dictionary.ts`. The type checker names every word still missing.
 
 ## Develop
 
@@ -29,7 +43,7 @@ bun run preview    # the build behind the real Worker config, with wrangler dev
 | --- | --- |
 | `check` | lint, typecheck, test, build and `verify:build`, in that order; the deploy runs it |
 | `build` | copies the brand's fonts and Favicon Set into `public/`, then builds `dist/` |
-| `verify:build` | checks the built files: titles, canonicals, the Shell, every image present with alt text, a Not-found Page |
+| `verify:build` | checks the built files: titles, canonicals and `hreflang` alternates that resolve, the Shell, every image present with alt text, a Not-found Page |
 | `screenshots` | builds, then writes `docs/screenshots/<theme>/<page>-<width>.png` at 1280, 2000 and 390 px |
 | `test` | `bun test ./src ./scripts` |
 | `typecheck` | `astro sync`, `tsc`, then `astro check` |

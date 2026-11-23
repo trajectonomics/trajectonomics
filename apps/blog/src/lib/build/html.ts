@@ -48,3 +48,13 @@ export function images(html: string): readonly { src: string; alt: string | unde
 		alt: attributes.get("alt"),
 	}))
 }
+
+/** The page's `hreflang` alternates, as each Language and its href. */
+export function alternatesOf(html: string): readonly { hreflang: string; href: string }[] {
+	return tags(html, "link")
+		.filter((attributes) => attributes.get("rel") === "alternate" && attributes.has("hreflang"))
+		.map((attributes) => ({
+			hreflang: attributes.get("hreflang") ?? "",
+			href: attributes.get("href") ?? "",
+		}))
+}

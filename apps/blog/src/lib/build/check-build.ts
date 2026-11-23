@@ -1,6 +1,7 @@
-import { SITE_HOME_URL } from "../site"
+import { treeOf, treePath } from "../languages"
+import { SITE_HOME_URL, SITE_ORIGIN } from "../site"
 import { type BuiltFile, type Failure, failure } from "./failures"
-import { canonicalOf, images, isNoindex, linkTargets, titleOf } from "./html"
+import { alternatesOf, canonicalOf, images, isNoindex, linkTargets, titleOf } from "./html"
 
 /** The blog's own Not-found Page, which the Worker's `404-page` handling finds for a miss. */
 const NOT_FOUND_PAGE = "404.html"
@@ -19,6 +20,41 @@ function checkImages(path: string, html: string, built: ReadonlySet<string>): Fa
 	})
 }
 
+/**
+ * The built file an absolute URL on the blog's host answers with, or `undefined` when the URL is on
+ * another host. A path that ends in a slash answers with its folder's `index.html`.
+ */
+function builtFileOf(url: string): string | undefined {
+	if (!url.startsWith(`${SITE_ORIGIN}/`)) return undefined
+	const path = new URL(url).pathname.slice(1)
+	return path === "" || path.endsWith("/") ? `${path}index.html` : path
+}
+
+/** A page's canonical and its `hreflang` alternates each name a page the build has. */
+function checkLinkedPages(path: string, html: string, built: ReadonlySet<string>): Failure[] {
+	const failures: Failure[] = []
+	const canonical = canonicalOf(html)
+	const canonicalFile = canonical === undefined ? undefined : builtFileOf(canonical)
+	if (canonical !== undefined && (canonicalFile === undefined || !built.has(canonicalFile))) {
+		failures.push(
+			failure("page-canonical-unbuilt", path, `names ${canonical}, which the build lacks`),
+		)
+	}
+	for (const alternate of alternatesOf(html)) {
+		const file = builtFileOf(alternate.href)
+		if (file === undefined || !built.has(file)) {
+			failures.push(
+				failure(
+					"page-alternate-unbuilt",
+					path,
+					`names ${alternate.href} for ${alternate.hreflang}, which the build lacks`,
+				),
+			)
+		}
+	}
+	return failures
+}
+
 /** The rules every built page meets: its head and the Shell around its body. */
 function checkPage(path: string, html: string): Failure[] {
 	const failures: Failure[] = []
@@ -32,8 +68,11 @@ function checkPage(path: string, html: string): Failure[] {
 	if (!targets.includes(SITE_HOME_URL)) {
 		failures.push(failure("shell-home-link-missing", path, `has no link to ${SITE_HOME_URL}`))
 	}
-	if (!targets.includes("/")) {
-		failures.push(failure("shell-blog-link-missing", path, "has no link to the blog's front page"))
+	const front = treePath(treeOf(path), "/")
+	if (!targets.includes(front)) {
+		failures.push(
+			failure("shell-blog-link-missing", path, `has no link to its front page ${front}`),
+		)
 	}
 	if (!/<footer\b/i.test(html)) {
 		failures.push(failure("shell-footer-missing", path, "has no footer"))
@@ -49,6 +88,7 @@ export function checkBuild(files: readonly BuiltFile[]): readonly Failure[] {
 		.flatMap((file) => [
 			...checkPage(file.path, file.text ?? ""),
 			...checkImages(file.path, file.text ?? "", built),
+			...checkLinkedPages(file.path, file.text ?? "", built),
 		])
 	if (!built.has(NOT_FOUND_PAGE)) {
 		failures.push(
