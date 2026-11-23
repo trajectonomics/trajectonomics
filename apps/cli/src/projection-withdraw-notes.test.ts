@@ -19,6 +19,8 @@ const DOCUMENT = {
 	flows: [],
 	cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
 } satisfies Scenario
+const CASH = { id: "cash", kind: "asset", rate: 0 } as const
+const HOME = { id: "home", kind: "asset", rate: 0, liquid: false } as const
 const HUGE_RENT = ["--set", "flows.rent.amount=900000000"]
 const RAN_OUT = { date: "2027-03-31", unmet: 12_500_000 }
 
@@ -60,6 +62,21 @@ describe("the withdraw sentence", () => {
 	it("skips a locked Account, a liability, and an Account already listed", () => {
 		const listed = { ...DOCUMENT, cashflow: { ...DOCUMENT.cashflow, withdraw: ["cash"] } }
 		expect(withdrawNotes(listed, RUN, "THB")).toEqual([])
+	})
+
+	it("never suggests a marked home, which check() refuses in cashflow.withdraw", () => {
+		// Cash is listed and runs out with 12,500.00 unmet. The home holds 6,000.00 (600,000 satang).
+		// Unmarked, the sentence would suggest the home; marked, it is left out and no note is made.
+		const plan = { ...DOCUMENT, accounts: [CASH, HOME] }
+		const listed = { ...plan, cashflow: { ...plan.cashflow, withdraw: ["cash"] } }
+		const rows = [rowOn("2027-03-31", { cash: 0, home: 600_000 })]
+		const marked = withdrawNotes(listed, { runsOut: RAN_OUT, rows }, "THB")
+		expect(marked).toEqual([])
+		expect(marked.join(" ")).not.toContain("home")
+		const bare = { id: "home", kind: "asset", rate: 0 } as const
+		const unmarked = { ...listed, accounts: [CASH, bare] }
+		const named = withdrawNotes(unmarked, { runsOut: RAN_OUT, rows }, "THB").join(" ")
+		expect(named).toContain("home (6000.00)")
 	})
 
 	it("counts a locked Account once its lock has passed", () => {

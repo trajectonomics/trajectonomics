@@ -2,6 +2,7 @@ import { countedDays } from "../calendar/counted"
 import { grow } from "../money/growth"
 import { accrualParts, capitaliseThrough, type NominalRule } from "../money/nominal"
 import type { Account, DateString } from "../types"
+import { leftOutOfAccessible } from "./accessible"
 import { walkRows } from "./span"
 import type { AccountState, StateMap } from "./state"
 
@@ -73,9 +74,7 @@ export function accessibleNetWorth(states: StateMap, date: DateString): bigint {
 	let total = 0n
 	for (const state of states.values()) {
 		if (state.rule.kind === "liability") total -= valuation(state, date)
-		else if (state.rule.lockedUntil === undefined || date >= state.rule.lockedUntil) {
-			total += valuation(state, date)
-		}
+		else if (!leftOutOfAccessible(state.rule, date)) total += valuation(state, date)
 	}
 	return total
 }

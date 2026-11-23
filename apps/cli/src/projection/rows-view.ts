@@ -62,6 +62,6 @@ export const monthlyRow: z.ZodType<MonthlyRow> = z.strictObject({
 	ages: personAges,
 	netWorth: moneyField("Net worth on the row's date"),
 	realNetWorth: moneyField("Net worth in start-of-timeline terms"),
-	accessibleNetWorth: moneyField("Net worth that is not locked"),
+	accessibleNetWorth: moneyField("Net worth that is not locked and not marked illiquid"),
 	realAccessibleNetWorth: moneyField("Accessible net worth in start-of-timeline terms"),
 })

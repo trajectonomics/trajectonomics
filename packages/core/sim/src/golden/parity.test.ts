@@ -7,6 +7,7 @@ import type { ChanceOfSuccessOptions, SurvivalOptions } from "../types"
 import { CASHFLOW_PARITY_CASES } from "./cashflow-parity-cases"
 import { CATEGORY_PARITY_CASES } from "./category-parity-cases"
 import { PARITY_CASES } from "./parity-cases"
+import { REAL_ASSET_PARITY_CASES } from "./real-asset-cases"
 import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
 
 const ALL_PARITY_CASES = [
@@ -14,6 +15,7 @@ const ALL_PARITY_CASES = [
 	...STATEMENT_PARITY_CASES,
 	...CATEGORY_PARITY_CASES,
 	...CASHFLOW_PARITY_CASES,
+	...REAL_ASSET_PARITY_CASES,
 ]
 
 interface Recorded {

@@ -57,12 +57,18 @@ function plannedDay(
 	return totals
 }
 
-/** The independent planner: every Landed date's planned gross amounts, before Prepayment. */
-export function oraclePlanned(fixture: Fixture): ReadonlyMap<DateString, PlannedDay> {
+/**
+ * The independent planner: every Landed date's planned gross amounts, before Prepayment, through
+ * `through`. The rule-of-thumb window can read planned expenses past the horizon (ADR 0013).
+ */
+export function oraclePlanned(
+	fixture: Fixture,
+	through: DateString = fixture.timeline.horizon,
+): ReadonlyMap<DateString, PlannedDay> {
 	const { scenario, timeline } = fixture
 	const inflation = scenario.economy.inflation
 	const calendar = oracleCalendar(fixture)
-	const events = oracleEvents(scenario.flows, timeline.start, timeline.horizon, calendar)
+	const events = oracleEvents(scenario.flows, timeline.start, through, calendar)
 	const derivation = ordered(scenario.flows)
 	const byDate = new Map<DateString, OracleEvent[]>()
 	for (const event of events) {

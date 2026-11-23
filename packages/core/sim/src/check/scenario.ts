@@ -1,4 +1,4 @@
-import { checkAccounts } from "./accounts"
+import { checkAccounts, illiquidAccountIds } from "./accounts"
 import { checkCalendar } from "./calendar"
 import { checkCashflow } from "./cashflow"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
@@ -7,7 +7,7 @@ import { checkFlows, type FlowContext } from "./flows"
 import { checkLevies } from "./levy"
 import { loanIndex } from "./loan-index"
 import { checkMilestones } from "./milestones"
-import { checkContributionRouting } from "./routing"
+import { checkContributionRouting, checkIlliquidRouting } from "./routing"
 import { rate, str } from "./scalars"
 import { anyVersion, checkShape, isRecord, opt, req } from "./shape"
 
@@ -55,4 +55,6 @@ export function checkScenario(
 	const checked = checkShape(value, path, shape, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
+	const illiquid = illiquidAccountIds(isRecord(value) ? value["accounts"] : undefined)
+	checkIlliquidRouting(checked?.["cashflow"], illiquid, path, emit)
 }

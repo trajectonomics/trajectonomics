@@ -5,6 +5,7 @@ import { project } from "../src/engine/project"
 import { CASHFLOW_PARITY_CASES } from "../src/golden/cashflow-parity-cases"
 import { CATEGORY_PARITY_CASES } from "../src/golden/category-parity-cases"
 import { PARITY_CASES } from "../src/golden/parity-cases"
+import { REAL_ASSET_PARITY_CASES } from "../src/golden/real-asset-cases"
 import { STATEMENT_PARITY_CASES } from "../src/golden/statement-parity-cases"
 import { chanceOfSuccess, financialIndependence } from "../src/index"
 
@@ -17,6 +18,7 @@ const cases = [
 	...STATEMENT_PARITY_CASES,
 	...CATEGORY_PARITY_CASES,
 	...CASHFLOW_PARITY_CASES,
+	...REAL_ASSET_PARITY_CASES,
 ].map((testCase) => {
 	const { name, fixture, options, chance, projectOptions } = testCase
 	const { baseline, scenario, timeline } = fixture

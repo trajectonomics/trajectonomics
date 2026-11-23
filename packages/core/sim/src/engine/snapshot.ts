@@ -1,5 +1,6 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
+import { leftOutOfAccessible } from "./accessible"
 import { isSafeInteger, overflow } from "./overflow"
 import type { StateMap } from "./state"
 import { valueParts } from "./value"
@@ -35,11 +36,7 @@ export function snapshot(states: StateMap, date: DateString): SnapshotOutcome {
 		balances.push({ account: state.rule.id, ...parts })
 		const signed = state.rule.kind === "liability" ? -parts.amount : parts.amount
 		net += signed
-		const unlocked =
-			state.rule.kind === "liability" ||
-			state.rule.lockedUntil === undefined ||
-			date >= state.rule.lockedUntil
-		if (unlocked) accessible += signed
+		if (!leftOutOfAccessible(state.rule, date)) accessible += signed
 	}
 	if (!isSafeInteger(net) || !isSafeInteger(accessible)) {
 		return { snapshot: undefined, problem: overflow(date) }
