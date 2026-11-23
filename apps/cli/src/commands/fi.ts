@@ -17,7 +17,7 @@ import {
 	setFlag,
 } from "../projection/flags"
 import { withProjection } from "../projection/leaf"
-import { decimalFlag, withoutFlag } from "../scenario/override-flags"
+import { addFlag, decimalFlag, withoutFlag } from "../scenario/override-flags"
 
 export const fi: Leaf = defineCommand({
 	name: "fi",
@@ -31,6 +31,7 @@ export const fi: Leaf = defineCommand({
 		scenario: scenarioFlag,
 		set: setFlag,
 		without: withoutFlag,
+		add: addFlag,
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
 	}),
@@ -57,6 +58,7 @@ export const fi: Leaf = defineCommand({
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
 				without: input.without ?? [],
+				add: input.add ?? [],
 				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared

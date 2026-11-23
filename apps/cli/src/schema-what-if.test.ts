@@ -23,6 +23,7 @@ describe("what-if overrides in traj schema", () => {
 		it(`publishes --without and --decimal on ${path.join(" ")}`, async () => {
 			const input = await inputOf(path)
 			expect(input.properties["without"]?.flag).toBe("--without")
+			expect(input.properties["add"]?.flag).toBe("--add")
 			expect(input.properties["decimal"]?.flag).toBe("--decimal")
 			expect(input.required).not.toContain("without")
 			expect(input.required).not.toContain("decimal")
@@ -38,6 +39,7 @@ describe("what-if overrides in traj schema", () => {
 		const data = await inputOf(["projection", "compare"])
 		expect(Object.keys(data.properties).sort()).toEqual([
 			"a",
+			"add",
 			"age",
 			"asOf",
 			"b",

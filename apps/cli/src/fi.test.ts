@@ -129,6 +129,7 @@ describe("fi", () => {
 		expect(data.description).toBe(`${FI_METHOD} ${FI_HORIZON}`)
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort()).toEqual([
+			"add",
 			"asOf",
 			"carryIn",
 			"decimal",

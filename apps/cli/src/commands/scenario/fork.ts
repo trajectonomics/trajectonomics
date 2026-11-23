@@ -5,7 +5,14 @@ import { defineCommand } from "../../command"
 import { isAppError } from "../../errors"
 import { invalidScenarioName, scenarioNotFound } from "../../scenario/errors"
 import { type Applied, reply, transformFor } from "../../scenario/fork-result"
-import { appliedOverride, decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
+import {
+	addFlag,
+	additionsField,
+	appliedOverride,
+	decimalFlag,
+	setFlag,
+	withoutFlag,
+} from "../../scenario/override-flags"
 import { droppedAnchors, writtenScenario } from "../../scenario/view"
 import type { ForkOptions } from "../../store"
 import { withStore } from "../../with-store"
@@ -22,6 +29,7 @@ export const fork: Leaf = defineCommand({
 			.describe("The copy's name; exact, case-sensitive and not shaped like a UUID."),
 		set: setFlag,
 		without: withoutFlag,
+		add: addFlag,
 		decimal: decimalFlag,
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
@@ -32,6 +40,7 @@ export const fork: Leaf = defineCommand({
 		removals: z
 			.array(z.string())
 			.describe("The dotted paths of the list items taken out with --without, in order."),
+		additions: additionsField,
 		scenario: writtenScenario,
 		droppedAnchors,
 	}),
@@ -47,15 +56,16 @@ export const fork: Leaf = defineCommand({
 		if (UUID_SHAPED.test(input.name)) return invalidScenarioName()
 		const sets = input.set ?? []
 		const without = input.without ?? []
+		const add = input.add ?? []
 		const dryRun = input.dryRun === true
 		return withStore(ctx, (store) => {
 			const source = store.getScenario(input.from)
 			if (isAppError(source)) return source
 			if (source === null) return scenarioNotFound(input.from, "from")
-			let applied: Applied = { overrides: [], removals: [] }
+			let applied: Applied = { overrides: [], removals: [], additions: [] }
 			const options: ForkOptions = { dryRun }
-			if (sets.length > 0 || without.length > 0) {
-				options.transform = transformFor({ sets, without, decimal: input.decimal }, (done) => {
+			if (sets.length > 0 || without.length > 0 || add.length > 0) {
+				options.transform = transformFor({ sets, without, add, decimal: input.decimal }, (done) => {
 					applied = done
 				})
 			}

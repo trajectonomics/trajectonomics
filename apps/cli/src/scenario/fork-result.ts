@@ -4,7 +4,7 @@ import { type AppError, isAppError } from "../errors"
 import type { ScenarioForked, ScenarioTransform } from "../store"
 import type { ScenarioDocument } from "./document"
 import { scenarioNameTaken, scenarioNotFound } from "./errors"
-import { type AppliedOverrides, applyScenarioSets } from "./set-apply"
+import { type AppliedOverrides, additionsOf, applyScenarioSets } from "./set-apply"
 import type { AppliedOverride } from "./set-error"
 import { view, type WrittenScenario } from "./view"
 
@@ -14,17 +14,20 @@ export type ForkResult = {
 	status: "forked"
 	overrides: AppliedOverride[]
 	removals: string[]
+	/** The items put on a list with --add; absent when none was (cli ADR-0062). */
+	additions?: AppliedOverride[]
 	scenario: WrittenScenario
 	droppedAnchors: string[]
 }
 
 /** The Overrides a fork applied, which the result echoes; empty when the fork applied none. */
-export type Applied = Pick<AppliedOverrides, "overrides" | "removals">
+export type Applied = Pick<AppliedOverrides, "overrides" | "removals" | "additions">
 
-/** The Overrides a fork is asked to persist: its Sets and removals, and whether Sets are decimal. */
+/** The Overrides a fork is asked to persist: its Sets, removals and additions, and whether their money is decimal. */
 export type ForkOverrides = {
 	sets: readonly string[]
 	without: readonly string[]
+	add: readonly string[]
 	decimal: boolean
 }
 
@@ -36,6 +39,7 @@ export function transformFor(
 	return (document: ScenarioDocument) => {
 		const applied = applyScenarioSets(document, override.sets, {
 			without: override.without,
+			add: override.add,
 			decimal: override.decimal,
 		})
 		if (isAppError(applied)) return applied
@@ -61,6 +65,7 @@ export function reply(
 		status: "forked",
 		overrides: applied.overrides,
 		removals: applied.removals,
+		...additionsOf(applied),
 		scenario,
 		droppedAnchors,
 	})

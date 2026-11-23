@@ -18,8 +18,9 @@ import {
 import { withProjection } from "../../projection/leaf"
 import { projectionHint } from "../../projection/render"
 import { projectionOf } from "../../projection/run"
+import { RUN_EXAMPLES } from "../../projection/run-examples"
 import { projectionRunView } from "../../projection/run-view"
-import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
+import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const run: Leaf = defineCommand({
 	name: "run",
@@ -33,6 +34,7 @@ export const run: Leaf = defineCommand({
 		scenario: scenarioFlag,
 		set: setFlag,
 		without: withoutFlag,
+		add: addFlag,
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		...outputFlags,
@@ -40,46 +42,7 @@ export const run: Leaf = defineCommand({
 	flagDocuments: [carryInFlagDocument],
 	output: projectionRunView,
 	render: projectionHint,
-	examples: [
-		{
-			command: "traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json",
-			description: "The annual roll-up of one Scenario.",
-		},
-		{
-			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --monthly",
-			description: "Try a raise without forking, and read the monthly rows.",
-		},
-		{
-			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --breakdown --json",
-			description:
-				"The annual roll-up with each year's cash flow by source, tax, category and Account.",
-		},
-		{
-			command:
-				"traj projection run --scenario car-loan --as-of 2026-03-31 --horizon 2027-03-30 --liabilities --json",
-			description:
-				"The annual roll-up of a Scenario that borrows, with each loan's month by month and its paid-off date.",
-		},
-		{
-			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --accounts --json",
-			description:
-				"The annual roll-up with each Account's value, nominal and real, on the row at each year's end.",
-		},
-		{
-			command:
-				"traj projection run --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --spending --json",
-			description:
-				"The annual roll-up of a Scenario with a spending rule, with the portfolio, amount, withdrawal rate and action of each Rule year.",
-		},
-		{
-			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
-			description: "The annual roll-up with one Stream taken out, and nothing saved.",
-		},
-	],
+	examples: RUN_EXAMPLES,
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
 		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
@@ -90,6 +53,7 @@ export const run: Leaf = defineCommand({
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
 				without: input.without ?? [],
+				add: input.add ?? [],
 				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared

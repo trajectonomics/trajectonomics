@@ -10,12 +10,12 @@ import { removedLevyNotes } from "./apply-notes"
 import { type ApplyResult, applyShape, replyOf } from "./apply-write"
 import type { ScenarioDocument } from "./document"
 import { invalidScenarioName, scenarioChanged, scenarioNotFound } from "./errors"
-import { appliedOverride } from "./override-flags"
-import { applyScenarioSets } from "./set-apply"
+import { additionsField, appliedOverride } from "./override-flags"
+import { additionsOf, applyScenarioSets } from "./set-apply"
 import type { AppliedOverride } from "./set-error"
 
 /*
- * `scenario apply <name> --set/--without` (cli ADR-0057): a what-if applied to the stored plan it came
+ * `scenario apply <name> --set/--without/--add` (cli ADR-0057, ADR-0062): a what-if applied to the stored plan it came
  * from. Its Overrides are the ones `projection run` applies, through the same function, so the plan
  * stored is the plan a projection would have run, and a refusal is the one a projection gives.
  */
@@ -24,6 +24,8 @@ import type { AppliedOverride } from "./set-error"
 export type WhatIfResult = ApplyResult & {
 	overrides: AppliedOverride[]
 	removals: string[]
+	/** The items put on a list with --add; absent when none was (cli ADR-0062). */
+	additions?: AppliedOverride[] | undefined
 }
 
 /** The document form prints none of these, so its output is unchanged (cli ADR-0057). */
@@ -33,6 +35,7 @@ export const whatIfResult: z.ZodType<WhatIfResult> = z.strictObject({
 	removals: z
 		.array(z.string())
 		.describe("The dotted paths of the list items taken out with --without, in order."),
+	additions: additionsField,
 })
 
 /** The flags of a what-if: the Overrides to apply to the stored plan, and the write's options. */
@@ -40,6 +43,7 @@ export type WhatIfWrite = {
 	name: string
 	sets: readonly string[]
 	without: readonly string[]
+	add: readonly string[]
 	decimal: boolean
 	dryRun: boolean
 	/** The content hash the caller read; the write is refused when the stored plan has another (cli ADR-0055). */
@@ -71,6 +75,7 @@ export function writeWhatIf(ctx: Context, write: WhatIfWrite): Result<WhatIfResu
 		if (isAppError(plan)) return plan
 		const applied = applyScenarioSets(JSON.parse(plan.document) as ScenarioDocument, write.sets, {
 			without: write.without,
+			add: write.add,
 			decimal: write.decimal,
 		})
 		if (isAppError(applied)) return applied
@@ -89,6 +94,7 @@ export function writeWhatIf(ctx: Context, write: WhatIfWrite): Result<WhatIfResu
 			...reply.data,
 			overrides: applied.overrides,
 			removals: applied.removals,
+			...additionsOf(applied),
 		})
 	})
 }
@@ -104,6 +110,7 @@ export function applyWhatIfFlags(ctx: Context, input: ApplyFlags): Result<WhatIf
 		name: input.name,
 		sets: input.set ?? [],
 		without: input.without ?? [],
+		add: input.add ?? [],
 		decimal: input.decimal === true,
 		dryRun: input.dryRun === true,
 		ifHash: input.ifHash,

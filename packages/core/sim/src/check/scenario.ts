@@ -2,6 +2,7 @@ import { checkAccounts, illiquidAccountIds } from "./accounts"
 import { checkCalendar } from "./calendar"
 import { checkCashflow } from "./cashflow"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
+import { checkEstate } from "./estate"
 import { checkFlowCaps } from "./flow-caps"
 import { checkFlows, type FlowContext } from "./flows"
 import { checkLevies } from "./levy"
@@ -53,6 +54,7 @@ export function checkScenario(
 		levies: opt(checkLevies),
 		milestones: opt((v, p, e) => checkMilestones(v, p, accounts, e)),
 		calendar: opt(checkCalendar),
+		estate: opt((v, p, e) => checkEstate(v, p, accounts, e)),
 	}
 	const checked = checkShape(value, path, shape, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)

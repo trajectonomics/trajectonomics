@@ -115,6 +115,7 @@ describe("traj schema scenario apply, for the what-if form", () => {
 		const described = JSON.parse(res.out)
 		expect(described.input.properties.set).toMatchObject({ flag: "--set" })
 		expect(described.input.properties.without).toMatchObject({ flag: "--without" })
-		expect(described.description).toContain("--set and --without")
+		expect(described.input.properties.add).toMatchObject({ flag: "--add" })
+		expect(described.description).toContain("--set, --without and --add")
 	})
 })

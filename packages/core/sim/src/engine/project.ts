@@ -1,4 +1,5 @@
 import { check } from "../check"
+import { buildEstate } from "../estate/build"
 import { buildProjection } from "../output/build"
 import { buildLiabilities } from "../output/liabilities"
 import { periodEndDates } from "../output/periods"
@@ -39,10 +40,13 @@ export function project(
 	if (!result.ok) return { ok: false, problems: [result.problem] }
 	const output = buildProjection(result.run, baseline, scenario, timeline, breakdown)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
-	const reported =
+	const ruled =
 		options.spendingRules === true
 			? { ...output.projection, spendingRules: ruleStatements(result.run.rules, scenario) }
 			: output.projection
+	const estate = options.estate === true ? buildEstate(ruled.rows, scenario, timeline) : undefined
+	if (estate !== undefined && "problem" in estate) return { ok: false, problems: [estate.problem] }
+	const reported = estate === undefined ? ruled : { ...ruled, estate: estate.statements }
 	if (!statements) return { ok: true, projection: reported }
 	const liabilities = buildLiabilities(result.run, baseline, scenario, timeline)
 	if (liabilities.problem !== undefined) return { ok: false, problems: [liabilities.problem] }

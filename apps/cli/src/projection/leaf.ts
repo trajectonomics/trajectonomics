@@ -16,6 +16,8 @@ export type ScenarioRequest = {
 	sets: readonly string[]
 	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
 	without?: readonly string[] | undefined
+	/** The `--add` items, put on a list after the removals and before the Sets (cli ADR-0062). */
+	add?: readonly string[] | undefined
 	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
 }
@@ -70,6 +72,7 @@ export function withProjection<T>(
 				horizon: input.horizon,
 				sets: request.sets,
 				without: request.without,
+				add: request.add,
 				decimal: request.decimal,
 			})
 		const outcome = work(prepare)
