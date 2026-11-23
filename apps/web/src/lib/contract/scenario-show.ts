@@ -7,10 +7,12 @@ import { money } from "./money"
  * A Flow of a Scenario document in the decimal form (`traj scenario show --decimal --json`). Only the
  * fields the planner pages show are typed; `looseObject` keeps every other field, so a save returns it
  * untouched. Every amount is the CLI's decimal string, and every rate an integer of basis points.
+ * A `withdrawal` borrows from its `source`; a `level` Contribution takes the place of `amount` (cli
+ * ADR-0016). Both are shown read-only until loans can be edited (#280).
  */
 export const scenarioFlow = z.looseObject({
 	id: z.string(),
-	kind: z.enum(["income", "expense", "contribution"]),
+	kind: z.enum(["income", "expense", "contribution", "withdrawal"]),
 	frequency: z.enum(["once", "daily", "weekly", "biweekly", "monthly", "quarterly", "annual"]),
 	start: dateString,
 	end: dateString.optional(),
@@ -18,7 +20,15 @@ export const scenarioFlow = z.looseObject({
 	growth: z.union([z.literal("inflation"), z.looseObject({ bps: z.number().int() })]).optional(),
 	earned: z.boolean().optional(),
 	target: z.string().optional(),
+	source: z.string().optional(),
 	derive: z.looseObject({}).optional(),
+	level: z
+		.looseObject({
+			principal: money,
+			payments: z.number().int().min(1).max(119976),
+			rounding: z.enum(["floor", "halfUp", "ceil"]),
+		})
+		.optional(),
 })
 export type ScenarioFlow = z.infer<typeof scenarioFlow>
 
