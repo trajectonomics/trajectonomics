@@ -1,9 +1,9 @@
 import { z } from "zod"
 import { isAppError } from "../errors"
 import { toDecimalForm } from "./decimal"
-import { isNode, moneyUnitOf, type Node, PUBLISHED } from "./money-fields"
+import { isNode, moneyUnitOf, type Node, PUBLISHED, rateUnitOf } from "./money-fields"
 import { DECIMAL_UNITS_SENTENCE, MINOR_UNITS_SENTENCE } from "./shape/description"
-import { DECIMAL_UNITS } from "./shape/terms"
+import { DECIMAL_UNITS, PERCENT_UNITS } from "./shape/terms"
 
 /*
  * The decimal form as `traj schema` publishes it (ADR-0047): the minor-unit form's own schema with
@@ -21,7 +21,10 @@ export const decimalFlag: z.ZodOptional<z.ZodBoolean> = z
 		'Money as decimal strings of the Currency\'s major unit, such as "350.00", not integer minor units (ADR-0047).',
 	)
 
-/** A schema node in the decimal form: a money field becomes a string with its unit stated. */
+/** A plain percent: an optional minus, no grouping, no exponent; the CLI refuses a third place that is not zero. */
+const PERCENT_PATTERN = "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+
+/** A schema node in the decimal form: a money field or a rule's rate becomes a string with its unit stated. */
 function decimalNode(node: unknown): unknown {
 	if (Array.isArray(node)) return node.map(decimalNode)
 	if (!isNode(node)) return node
@@ -29,13 +32,23 @@ function decimalNode(node: unknown): unknown {
 		Object.entries(node).map(([key, value]) => [key, decimalNode(value)]),
 	)
 	const unit = moneyUnitOf(node)
-	if (unit === undefined) return copy
-	const rest = String(node["description"]).slice(unit.length)
+	if (unit !== undefined) {
+		const rest = String(node["description"]).slice(unit.length)
+		return {
+			...copy,
+			type: "string",
+			pattern: DECIMAL_PATTERN,
+			description: `${DECIMAL_UNITS}${rest}`,
+		}
+	}
+	const rate = rateUnitOf(node)
+	if (rate === undefined) return copy
+	const rest = String(node["description"]).slice(rate.length)
 	return {
 		...copy,
 		type: "string",
-		pattern: DECIMAL_PATTERN,
-		description: `${DECIMAL_UNITS}${rest}`,
+		pattern: PERCENT_PATTERN,
+		description: `${PERCENT_UNITS}${rest}`,
 	}
 }
 

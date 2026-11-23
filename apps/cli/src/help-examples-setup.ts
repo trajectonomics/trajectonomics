@@ -1,7 +1,9 @@
 import { isAppError } from "./errors"
+import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
 import { LOAN_SCENARIO } from "./projection-liabilities-plan"
+import { chanceRulePlan } from "./projection-spending-chance-support"
 import { toDecimalForm } from "./scenario/decimal"
 
 /**
@@ -25,22 +27,6 @@ function decimalText(document: object): string {
 	return JSON.stringify(converted)
 }
 
-/**
- * The household the base fixture takes: the holder's age pins the salary's end, and their life's end
- * the investment's, so each anchor names a Flow the fixture holds (cli ADR-0048).
- */
-const BASE_HOUSEHOLD = {
-	schemaVersion: 1,
-	people: [
-		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
-		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 90, joins: "2028-01" },
-	],
-	anchors: [
-		{ path: "flows.salary.end", person: "me", age: 60 },
-		{ path: "flows.invest.end", person: "me", at: "lifeEnd" },
-	],
-}
-
 /** The default: a ledger with the fixture's accounts, transactions and the projection Scenarios. */
 export const DEFAULT_SETUP: Setup = { ledger: "projection" }
 
@@ -57,13 +43,26 @@ export const SETUP: Record<string, Setup> = {
 			["scenario", "tax", "base", "--tax", "th-2026", "--label", "salary=income.section40_1"],
 		],
 	},
-	"projection chance": { files: { "model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL) } },
+	// The plan with a spending rule that the `--spending` and spending Bands examples read (cli ADR-0063).
+	"projection chance": {
+		files: {
+			"model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL),
+			"ruled.json": JSON.stringify(chanceRulePlan(undefined)),
+		},
+		steps: [["scenario", "apply", "ruled", "--file", "ruled.json"]],
+	},
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
 	// The car loan the `--liabilities` example reads, stored as a Scenario beside the projection fixture.
 	"projection run": {
 		ledger: "projection",
-		files: { "car-loan.json": JSON.stringify(LOAN_SCENARIO) },
-		steps: [["scenario", "apply", "car-loan", "--file", "car-loan.json"]],
+		files: {
+			"car-loan.json": JSON.stringify(LOAN_SCENARIO),
+			"ruled.json": JSON.stringify(chanceRulePlan(undefined)),
+		},
+		steps: [
+			["scenario", "apply", "car-loan", "--file", "car-loan.json"],
+			["scenario", "apply", "ruled", "--file", "ruled.json"],
+		],
 	},
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
 	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },

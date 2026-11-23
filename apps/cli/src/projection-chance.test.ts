@@ -105,7 +105,9 @@ describe("projection chance", () => {
 		expect(body.bands).toHaveLength(20)
 		const table = body.tables[0]
 		expect(table?.name).toBe("bands")
-		expect(table?.rows.map((row) => row.index)).toEqual([0, 4, 9, 14, 19])
+		expect((table?.rows ?? []).flatMap((row) => ("index" in row ? [row.index] : []))).toEqual([
+			0, 4, 9, 14, 19,
+		])
 	})
 
 	it("counts a plan that runs out as failing paths in the roll-up it ran out in", async () => {

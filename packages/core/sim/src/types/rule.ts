@@ -59,6 +59,12 @@ export interface RuledAmount {
 /** What a Rule year did to the amount it started from. */
 export type RuleAction = "none" | "floor" | "ceiling" | "cut" | "raise"
 
+/** A Rule year's `amount` and `paid` deflated to the Timeline start, half up, as the row's `realNetWorth` is. */
+export interface RealRuleYear {
+	readonly amount: number
+	readonly paid: number
+}
+
 /** One Rule year of a Spending rule statement; money is in minor units. */
 export interface SpendingRuleYear {
 	/** The Landed date the year began on, when its amount was fixed. */
@@ -74,6 +80,8 @@ export interface SpendingRuleYear {
 	 * reader that wants what this Flow left unpaid must split `unmet` by Flow, never subtract it.
 	 */
 	readonly paid: number
+	/** `amount` and `paid` in today's money, each deflated once at `date` (ADR 0023). */
+	readonly real: RealRuleYear
 	/**
 	 * `floor(amount × 10000 / portfolio)`; absent when the portfolio is 0. It exceeds 10000 when the
 	 * amount is more than a depleted portfolio is worth.

@@ -47,7 +47,9 @@ export function tryStep(
 	if (!next.ok) return { kind: "refused", problem: next.problem }
 	const stoppedBy = refusedFor(scan, BigInt(due) - BigInt(next.due))
 	if (stoppedBy !== undefined) return { kind: "stopped", stoppedBy }
-	if (scan.taken === scan.maxSteps) {
+	// One step past maxSteps may be tried: the last step is dropped if it went past its flat point,
+	// and `scanLabel` refuses with `TOO_MANY_STEPS` when the count is still over after that.
+	if (scan.taken > scan.maxSteps) {
 		return { kind: "refused", problem: { code: "TOO_MANY_STEPS", path: ["maxSteps"] } }
 	}
 	scan.taken += 1

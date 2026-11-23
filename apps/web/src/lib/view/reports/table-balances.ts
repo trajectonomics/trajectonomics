@@ -27,6 +27,28 @@ export function balances(rows: Rows<"balances">): ReportTable {
 	)
 }
 
+/** What each spending rule fixed and paid in each Rule year (cli ADR-0063); the rate is stated only when the portfolio held something. */
+export function spendingRules(rows: Rows<"spendingRules">): ReportTable {
+	type Row = Rows<"spendingRules">[number]
+	return build(
+		"spendingRules",
+		"Spending rules",
+		[
+			text("flow", (r: Row) => r.flow),
+			text("date", (r: Row) => r.date),
+			figure("portfolio", (r: Row) => r.portfolio),
+			figure("amount", (r: Row) => r.amount),
+			figure("paid", (r: Row) => r.paid),
+			...optional(
+				rows,
+				figure("withdrawalRate", (r: Row) => r.withdrawalRate),
+			),
+			text("action", (r: Row) => r.action),
+		],
+		rows,
+	)
+}
+
 export function milestones(rows: Rows<"milestones">): ReportTable {
 	type Row = Rows<"milestones">[number]
 	return build(

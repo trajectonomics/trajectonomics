@@ -11,6 +11,7 @@ import { milestoneRowsOf } from "./milestones"
 import { monthlyRow } from "./rows"
 import type { AnnualRow } from "./rows-view"
 import type { ProjectionTable } from "./run-view"
+import { spendingTableOf } from "./spending"
 
 /** The optional outputs a run was asked for: each is a flag, and each is off by default. */
 export type Wants = {
@@ -18,6 +19,7 @@ export type Wants = {
 	breakdown: boolean
 	liabilities: boolean
 	accounts: boolean
+	spending: boolean
 }
 
 /** The cash flow's two tables (`--breakdown`, cli ADR-0058): each line, then the section totals. */
@@ -52,11 +54,23 @@ function milestoneTablesOf(projection: Projection): ProjectionTable[] {
 	return [{ name: "milestones", count: rows.length, rows }]
 }
 
+/** Each Account's value (`--accounts`, cli ADR-0060), the Accounts in the Scenario's order. */
+function balancesOf(prepared: Placed, projection: Projection, monthly: boolean) {
+	const order = prepared.document.accounts.map((account) => account.id)
+	return balancesTableOf(projection.annual, projection.rows, monthly, order, prepared.currency)
+}
+
+/** One table, or the failure that stopped it, as the list `extraTablesOf` gathers. */
+function oneTable(table: ProjectionTable | AppError): ProjectionTable[] | AppError {
+	return isAppError(table) ? table : [table]
+}
+
 /**
  * The tables a run adds beyond the annual roll-up, each present only when its flag or Scenario asks for it,
  * so a run without them keeps its table list: the monthly rows (`--monthly`), the cash flow and its section
  * totals (`--breakdown`, cli ADR-0058), the loans (`--liabilities`, cli ADR-0059), each Account's value
- * (`--accounts`, cli ADR-0060) and the milestones (cli ADR-0049).
+ * (`--accounts`, cli ADR-0060), what each spending rule paid (`--spending`, cli ADR-0063) and the milestones
+ * (cli ADR-0049).
  */
 export function extraTablesOf(
 	prepared: Placed,
@@ -69,17 +83,8 @@ export function extraTablesOf(
 	if (wants.monthly) asked.push([monthlyTableOf(prepared, projection)])
 	if (wants.breakdown) asked.push(cashflowTablesOf(projection, annual, currency))
 	if (wants.liabilities) asked.push(liabilityTablesOf(projection.liabilities, currency))
-	if (wants.accounts) {
-		const order = prepared.document.accounts.map((account) => account.id)
-		const balances = balancesTableOf(
-			projection.annual,
-			projection.rows,
-			wants.monthly,
-			order,
-			currency,
-		)
-		asked.push(isAppError(balances) ? balances : [balances])
-	}
+	if (wants.accounts) asked.push(oneTable(balancesOf(prepared, projection, wants.monthly)))
+	if (wants.spending) asked.push(oneTable(spendingTableOf(projection.spendingRules, currency)))
 	asked.push(milestoneTablesOf(projection))
 	const tables: ProjectionTable[] = []
 	for (const entry of asked) {

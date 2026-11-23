@@ -28,20 +28,24 @@ Settlement period reports each of its `tally` Measure values.
 - **A step must not go past a cap (the grain).** A step that straddles a cap still saves for the part
   under it, so "take any step that saves" would suggest more than the cap allows (a 350,000 RMF label
   with a 360,000 cap and 50,000 steps would end at 400,000). The caller states `grain`, one major
-  unit in minor units, from 1 up to `step`. When a label stops with `noSaving` after at least one
+  unit in minor units, from 1 up to `step − 1`. A grain as large as the step is refused: a taken step always saves something, so its last grain could never equal the whole step and the over-the-cap rule would be off. When a label stops with `noSaving` after at least one
   taken step, the scan evaluates `due` with the last taken step's last grain removed. If that equals
   the `due` with the whole step, the last grain saved nothing, so the step went past the flat point
-  (a cap, or the end of taxable income): the step is dropped and the Tallies, `due`, step count and
+  (a cap, the end of taxable income, or any other place where `due` stops falling, such as a rounding
+  step): the step is dropped and the Tallies, `due`, step count and
   budget go back to before it. A step that ends exactly on a cap is kept, since its last grain still
   saves. This is one extra evaluation per label, assumes no convexity, and keeps every amount a whole
   number of steps. A cap that is not a multiple of the step leaves room unused (up to one step); a
-  smaller step fills more of it. Hand case: salary 1,200,000, RMF cap 360,000, step 50,000, grain 1:
+  smaller step fills more of it. Hand case: salary 1,200,000, RMF cap 360,000, step 50,000, grain 100 satang (1 THB):
   RMF takes 350,000 (saving 69,000), not 400,000 (70,500).
 - **The period must be this Levy's.** The first evaluation's `due` must equal the period's reported
   `due`; a mismatch (a wrong `inflation`, or a period of another Levy) is `PERIOD_DUE_MISMATCH`.
-- **A bound, refused not cut.** `maxSteps` limits the steps taken over all labels. A step past it
-  returns `TOO_MANY_STEPS` at `["maxSteps"]`, so no answer is a guess cut short and the caller is
-  told to use a bigger step. `stoppedBy` is therefore one of `noSaving`, `belowMinSaving` and
+- **A bound, refused not cut.** `maxSteps` limits the steps taken over all labels. A dropped step is
+  not counted, and one step past the limit may be tried so that it can be dropped: a call whose
+  answer needs 2 steps succeeds with `maxSteps: 2` even if its third step goes past a cap. A label
+  that still holds more than `maxSteps` steps after that, or a step that pays after the limit is
+  reached, returns `TOO_MANY_STEPS` at `["maxSteps"]`, so no answer is a guess cut short and the
+  caller is told to use a bigger step. `stoppedBy` is therefore one of `noSaving`, `belowMinSaving` and
   `budget`; a stop by the bound cannot occur.
 - **No order search.** Every allowance lowers the same net income, so the order decides which funds
   hold the money, not how much tax falls. The caller's order is used as given, and a label starts
@@ -49,7 +53,7 @@ Settlement period reports each of its `tally` Measure values.
 - **Errors as data.** `INVALID_OPTION` (at the key, or `["labels", i]` for a repeated label),
   `UNKNOWN_FUNDED_LABEL` (at `["labels", i]`), `TOO_MANY_STEPS`, `PERIOD_DUE_MISMATCH` (at
   `["period", "due"]`), `VALUE_OVERFLOW` and `NOT_SAFE_INTEGER` come back as `{ ok: false, problem }`.
-  The first four join `ERROR_CODES`. A missing or non-positive `grain` is `INVALID_OPTION` at `["grain"]`.
+  The first four join `ERROR_CODES`. A missing or non-positive `grain`, and a `grain` not below `step`, are `INVALID_OPTION` at `["grain"]`.
 - **Exact identity.** `dueBefore − dueAfter` is the sum of the labels' savings, because each label's
   saving is the fall between the `due` it started from and the `due` it left.
 
@@ -57,7 +61,8 @@ Settlement period reports each of its `tally` Measure values.
 
 - The result is a statement about one period's Levy, not advice. It never writes a Scenario: the
   caller turns it into Flows if the person chooses, and holding rules of each fund are not checked.
-- The cost is at most `maxSteps + 2 × labels` Levy evaluations after the first (each label's stop
-  and its one probe).
+- The cost is at most `maxSteps + 3 × labels + 1` Levy evaluations after the first: each label's stop
+  and its one probe, one step per label that is tried and dropped (it frees a step for a later label),
+  and the one step tried past the limit before a refusal.
 - Checked against an oracle that evaluates every whole-step count from scratch, by hand on a
   Thai-shaped Levy and on the emitted Thai Levy through `project()` (in the CLI package), and pinned by a parity case under Bun and Node.

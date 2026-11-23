@@ -17,13 +17,18 @@ import { withdrawNotes } from "./withdraw-notes"
  * `traj projection run`: the engine's Projection in the CLI's money, annual by default, with the
  * monthly rows when asked, with each roll-up's cash flow when `breakdown` is (cli ADR-0058) and with
  * each loan's statement when `liabilities` is (cli ADR-0059) and each Account's value when `accounts`
- * is (cli ADR-0060). It computes nothing the engine does not report (ADR-0030).
+ * is (cli ADR-0060) and each spending rule's years when `spending` is (cli ADR-0063). It computes nothing the engine does not report (ADR-0030).
  */
 export function projectionOf(prepared: Placed, wants: Wants): ProjectionRunView | AppError {
-	const { breakdown, liabilities } = wants
+	const { breakdown, liabilities, spending } = wants
 	const { timeline, baseline, currency } = prepared
 	// The engine records each optional output only when asked, so a run without its flag keeps its bytes.
-	const result = project(baseline, prepared.document, timeline, optionsOf(breakdown, liabilities))
+	const result = project(
+		baseline,
+		prepared.document,
+		timeline,
+		optionsOf(breakdown, liabilities, spending),
+	)
 	if (!result.ok) return refusal(result.problems)
 	const { projection } = result
 	const annual = []

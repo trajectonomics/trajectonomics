@@ -1,4 +1,5 @@
 import { HOME_ACCOUNTS, HOME_FLOWS } from "./example-home"
+import { RETIREMENT_FLOWS } from "./example-retirement"
 
 /**
  * The one worked example `traj schema scenario apply` publishes: a salary, rent, a monthly
@@ -8,8 +9,9 @@ import { HOME_ACCOUNTS, HOME_FLOWS } from "./example-home"
  * `withdrawal` that borrows the money once the plan starts, and a Contribution into it with a
  * `level` payment. It carries no Levy, because `traj scenario tax`
  * writes one (ADR-0032), and `lockedUntil` names the retirement Account's lock. Its one Milestone
- * fires when the accessible net worth reaches 500,000 THB in start-of-plan money and the date
- * passes; the monthly investment stops when it fires (`endAt`). `schemaVersion` is
+ * fires when the accessible net worth reaches 100,000 THB in start-of-plan money and the date
+ * passes; the salary, the rent and the monthly investment stop when it fires (`endAt`), and from then a
+ * Spending rule pays for life out of the savings (`retirement-spending`, cli ADR-0063). `schemaVersion` is
  * stamped by the caller for the same reason the template's is (ADR-0024): the pin's number is
  * asked of the core, never written down here.
  */
@@ -33,6 +35,7 @@ const EXAMPLE_BODY = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+			endAt: "retire",
 		},
 		{
 			id: "rent",
@@ -41,6 +44,7 @@ const EXAMPLE_BODY = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: { bps: 200 },
+			endAt: "retire",
 		},
 		{
 			id: "invest",
@@ -79,6 +83,7 @@ const EXAMPLE_BODY = {
 			level: { principal: 2_400_000, payments: 60, rounding: "ceil" },
 		},
 		...HOME_FLOWS,
+		...RETIREMENT_FLOWS,
 	],
 	milestones: [
 		{
@@ -90,7 +95,7 @@ const EXAMPLE_BODY = {
 					kind: "metric",
 					metric: "accessibleNetWorth",
 					op: "atLeast",
-					amount: 50_000_000,
+					amount: 10_000_000,
 					terms: "real",
 				},
 				{ id: "age", kind: "date", on: "2045-01-01" },

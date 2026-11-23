@@ -8,7 +8,7 @@ import { statementPeriods } from "../output/statement-periods"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
 import type { ProjectionOptions } from "../types/statement"
-import { ruleStatements } from "./rule-statement"
+import { withRules } from "./rule-statement"
 import { runEngine } from "./run"
 
 /** Report rows, the period ends the annual roll-ups close on, and the statement month ends. */
@@ -40,10 +40,15 @@ export function project(
 	if (!result.ok) return { ok: false, problems: [result.problem] }
 	const output = buildProjection(result.run, baseline, scenario, timeline, breakdown)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
-	const ruled =
-		options.spendingRules === true
-			? { ...output.projection, spendingRules: ruleStatements(result.run.rules, scenario) }
-			: output.projection
+	const withRule = withRules(
+		output.projection,
+		options.spendingRules === true,
+		result.run.rules,
+		scenario,
+		timeline.start,
+	)
+	if ("problem" in withRule) return { ok: false, problems: [withRule.problem] }
+	const ruled = withRule.projection
 	const estate = options.estate === true ? buildEstate(ruled.rows, scenario, timeline) : undefined
 	if (estate !== undefined && "problem" in estate) return { ok: false, problems: [estate.problem] }
 	const reported = estate === undefined ? ruled : { ...ruled, estate: estate.statements }

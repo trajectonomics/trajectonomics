@@ -101,6 +101,7 @@ describe("the portfolio", () => {
 			portfolio: 0,
 			amount: 0,
 			paid: 0,
+			real: { amount: 0, paid: 0 },
 			action: "none",
 		})
 	})

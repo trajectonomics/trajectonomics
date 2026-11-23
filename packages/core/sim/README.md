@@ -209,7 +209,7 @@ when it has fallen `lower.bps` below. With `lower` alone it only raises, never c
 ```
 
 With `spendingRules: true`, a Projection reports one statement per rule Flow: for each Rule year its
-first date, the `portfolio` read, the `amount` fixed, what was `paid`, the `withdrawalRateBps` and the
+first date, the `portfolio` read, the `amount` fixed, what was `paid` (both also in today's money, as `real`), the `withdrawalRateBps` and the
 `action` (`none`, `floor`, `ceiling`, `cut` or `raise`). A portfolio of 100,000,000 that falls 10% a year
 under a 4% guardrails rule is cut in its third year:
 
@@ -390,7 +390,7 @@ is taken while `due` falls by more than 0 (and by at least `minSavingBps` of a s
 `budget`. A label stops at the first step not taken, and the next label starts from what the earlier
 ones left. When a label stops because a step saved nothing, the last step it took is kept only if
 its last `grain` (one major unit, in minor units) still saved something: a step that went past a cap
-is dropped, so no suggestion goes over a cap, and one that ends exactly on the cap is kept. This Levy
+(or past where `due` stops falling) is dropped, so no suggestion goes over a cap, and one that ends exactly on the cap is kept. This Levy
 taxes net income at 10% up to 400,000 and 20% above it, and allows `min(funded, 250,000)` off `fund`:
 
 ```ts

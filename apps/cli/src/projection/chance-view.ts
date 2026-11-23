@@ -1,6 +1,15 @@
 import { z } from "zod"
-import type { RenderHint } from "../table"
 import { carryInField } from "./carryin-view"
+import { spendingTables } from "./chance-spending-tables"
+import {
+	type ChanceLowestYearView,
+	type ChancePercentileView,
+	type ChanceSpendingBandView,
+	type ChanceSpendingTable,
+	type ChanceTableRow,
+	lowestYearField,
+	spendingBandField,
+} from "./chance-spending-view"
 import { dateField, moneyField } from "./money"
 import {
 	asOfField,
@@ -12,20 +21,19 @@ import {
 	taxField,
 } from "./view"
 
-/** The chance of success's Market paths and Bands, in the Scenario's currency (ADR-0011). */
-export type ChancePercentileView = { level: number; value: string }
-
 /** The net-worth Percentiles across Market paths at one annual roll-up end. */
 export type ChanceBandView = { index: number; to: string; netWorth: ChancePercentileView[] }
 
 /** How many failing Market paths first ran out in one annual roll-up. */
 export type ChanceRunsOutView = { index: number; to: string; paths: number }
 
-/** The Bands at the roll-ups a person reads, at the 10th, 50th and 90th Percentiles. */
-export type ChanceTableRow = { index: number; to: string; p10: string; p50: string; p90: string }
-
-/** The one table the human form prints: a few of the Bands, not every roll-up. */
-export type ChanceTable = { name: "bands"; count: number; rows: ChanceTableRow[] }
+/**
+ * The tables the human form prints: a few of the Bands, not every roll-up, and for a plan with a
+ * spending rule a few of its spending Bands and the lowest year (cli ADR-0063).
+ */
+export type ChanceTable =
+	| { name: "bands"; count: number; rows: ChanceTableRow[] }
+	| ChanceSpendingTable
 
 /** The inputs the chance was computed from: the Return model, the seed and the path count. */
 export type ChanceDefinitionView = { modelId: string; seed: string; paths: number }
@@ -41,6 +49,10 @@ export type ChanceView = Echo & {
 	successBps: number
 	bands: ChanceBandView[]
 	runsOut: ChanceRunsOutView[]
+	/** Present only when the plan has a spending rule Flow. */
+	spendingBands?: ChanceSpendingBandView[] | undefined
+	/** Present only when the plan has a spending rule Flow. */
+	lowestYearSpending?: ChanceLowestYearView | undefined
 	tables: ChanceTable[]
 }
 
@@ -72,11 +84,14 @@ const tableRow = z.strictObject({
 	p90: moneyField("Net worth at the 90th Percentile"),
 })
 
-const bandsTable = z.strictObject({
-	name: z.literal("bands").describe("The Bands the human form prints."),
-	count: z.number().int().describe("The number of rows."),
-	rows: z.array(tableRow).describe("A few roll-ups, the first, every fifth and the last."),
-})
+const bandsTable = z.union([
+	z.strictObject({
+		name: z.literal("bands").describe("The Bands the human form prints."),
+		count: z.number().int().describe("The number of rows."),
+		rows: z.array(tableRow).describe("A few roll-ups, the first, every fifth and the last."),
+	}),
+	...spendingTables,
+])
 
 export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	asOf: asOfField,
@@ -101,24 +116,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 		.describe("The floored success share in basis points: 8730 is 87.30%."),
 	bands: z.array(band).describe("One Band per annual roll-up end, in order."),
 	runsOut: z.array(runsOut).describe("One row per annual roll-up, zeros included."),
+	spendingBands: spendingBandField,
+	lowestYearSpending: lowestYearField,
 	tables: z.array(bandsTable).describe("The Bands the human form prints."),
 })
-
-/** The human form: the Bands table, then the notes that state the success share and definition. */
-const column = (key: string, align?: "right") =>
-	align === undefined ? { key, label: key } : { key, label: key, align }
-
-export const chanceHint: RenderHint = {
-	tables: "tables",
-	rows: "rows",
-	columns: {
-		bands: [
-			column("index", "right"),
-			column("to"),
-			column("p10", "right"),
-			column("p50", "right"),
-			column("p90", "right"),
-		],
-	},
-	note: "notes",
-}

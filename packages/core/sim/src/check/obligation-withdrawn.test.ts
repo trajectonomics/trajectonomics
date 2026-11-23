@@ -58,6 +58,25 @@ describe("an obligation into an Account that cashflow.withdraw lists", () => {
 	})
 })
 
+describe("one mistake is one refusal", () => {
+	it("reports an illiquid target in withdraw as ILLIQUID_ROUTED alone", () => {
+		expect(codes(buy({ target: "home" }), ["home", "cash"])).toEqual([
+			"ILLIQUID_ROUTED cashflow/withdraw/0",
+		])
+	})
+
+	it("reports an unknown funding on an asset as INVALID_FUNDING alone, though contribute is empty", () => {
+		expect(codes(buy({ funding: "bogus" }), ["cash"])).toEqual(["INVALID_FUNDING flows/0/funding"])
+	})
+
+	it("still reports an unrouted target Contribution when funding is absent or target", () => {
+		const unrouted = ["CONTRIBUTION_UNROUTED flows/0/target"]
+		expect(codes(buy({ funding: "target" }), ["cash"])).toEqual(unrouted)
+		const { funding: _, ...absent } = buy({})
+		expect(codes(absent, ["cash"])).toEqual(unrouted)
+	})
+})
+
 describe("funding on a liability", () => {
 	it("is FUNDING_ON_LIABILITY for a known value, and lists no allowed values", () => {
 		expect(codes(buy({ target: "loan" }), ["cash"])).toEqual([

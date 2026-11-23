@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { INITIAL_RATE_FLOW } from "./description"
 import { scenarioExample, scenarioShapeDescription } from "./index"
 import { nodeAt, type Path, refusalsOf, VERSION } from "./testing"
 
@@ -14,6 +15,14 @@ type Account = {
 	compounding?: string
 	lockedUntil?: string
 	liquid?: boolean
+}
+type Rule = {
+	kind?: string
+	portfolio?: string[]
+	upper?: unknown
+	lower?: unknown
+	rounding?: string
+	rateBps?: number
 }
 type Flow = {
 	id?: string
@@ -41,6 +50,10 @@ describe("the unit of every number the shape states", () => {
 			[["accounts", 0, "rate"], "basis points"],
 			[["economy", "inflation"], "basis points"],
 			[["flows", 0, "growth"], "bps"],
+			[["flows", "*", "rule", "rateBps"], "basis points"],
+			[["flows", "*", "rule", "floor", "amount"], "minor units"],
+			[["flows", "*", "rule", "steps", "*", "bps"], "basis points"],
+			[["flows", "*", "rule", "upper", "adjustBps"], "basis points"],
 		]
 		for (const [path, unit] of units) {
 			expect(String(nodeAt(path)["description"])).toContain(unit)
@@ -126,5 +139,44 @@ describe("the worked example's home", () => {
 		const prose = scenarioShapeDescription("0.0.0")
 		expect(prose).toContain("no model of its own")
 		expect(prose).toContain("`traj` ships none")
+	})
+})
+
+describe("the worked example's retirement spending", () => {
+	const flow = (id: string): Flow & { startAt?: string; endAt?: string; rule?: Rule } => {
+		const found = EXAMPLE.flows.find((entry) => entry.id === id)
+		if (found === undefined) throw new Error(`the example has no ${id} Flow`)
+		return found
+	}
+
+	it("is a guardrails rule gated by the retirement Milestone, over liquid assets", () => {
+		const spending = flow("retirement-spending")
+		expect(spending).toMatchObject({ kind: "expense", startAt: "retire" })
+		expect(spending.rule?.kind).toBe("guardrails")
+		for (const id of spending.rule?.portfolio ?? []) {
+			const account = EXAMPLE.accounts.find((entry) => entry.id === id)
+			expect(account).toMatchObject({ kind: "asset" })
+			expect(account?.liquid).not.toBe(false)
+		}
+		expect(spending.rule?.upper).toBeDefined()
+		expect(spending.rule?.lower).toBeDefined()
+	})
+
+	it("ends the salary, the rent and the monthly investment at the same Milestone", () => {
+		for (const id of ["salary", "rent", "invest"]) expect(flow(id).endAt).toBe("retire")
+	})
+
+	it("states its rounding and every rate, and the document says `traj` ships none", () => {
+		const { rule } = flow("retirement-spending")
+		expect(rule?.rounding).toBe("floor")
+		expect(typeof rule?.rateBps).toBe("number")
+		const prose = scenarioShapeDescription("0.0.0")
+		expect(prose).toContain("is the caller's own, and `traj` ships none")
+		expect(prose).toContain('growth: "inflation"')
+	})
+
+	it("also teaches the initialRate form, in a Flow the pin accepts beside the example's Accounts", () => {
+		expect(refusalsOf({ ...EXAMPLE, flows: [...EXAMPLE.flows, INITIAL_RATE_FLOW] })).toEqual([])
+		expect(scenarioShapeDescription("0.0.0")).toContain(JSON.stringify(INITIAL_RATE_FLOW))
 	})
 })

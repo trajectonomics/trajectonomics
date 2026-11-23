@@ -48,8 +48,8 @@ export function allowancesRefusal(problem: ProjectionProblem, where: Where): App
 	if (problem.code === "TOO_MANY_STEPS") {
 		return fail("invalid_input", {
 			path: "step",
-			message: `--step: the tax year ${year} of Levy "${where.levy}" needs ${MAX_STEPS} steps or more to fill the allowances.`,
-			hint: `Raise --step so each year needs fewer than ${MAX_STEPS} steps over every label: a larger step reads the same caps in fewer, coarser steps.`,
+			message: `--step: the tax year ${year} of Levy "${where.levy}" needs more than ${MAX_STEPS} steps to fill the allowances.`,
+			hint: `Raise --step so each year needs at most ${MAX_STEPS} steps over every label: a larger step reads the same caps in fewer, coarser steps.`,
 			details: {
 				code: problem.code,
 				levy: where.levy,
