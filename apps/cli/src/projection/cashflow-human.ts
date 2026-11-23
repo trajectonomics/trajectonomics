@@ -21,7 +21,7 @@ const BLOCK_COLUMNS: readonly ColumnHint[] = [
 type BlockRow = { line: string; amount: string }
 
 /** A named table's rows of the result, or nothing when the result has no such table. */
-function tableRows(
+export function tableRows(
 	data: Record<string, unknown>,
 	name: string,
 ): Record<string, unknown>[] | undefined {

@@ -296,6 +296,31 @@ its own. In every year, money in plus `unmet` (the cash a Shortfall left unpaid)
 saving and left over: the engine routes every unit of cash. `not funded` is the part of the
 Contributions the cash could not fund; it is not in saving.
 
+## Loans
+
+> **Ships in 0.8.0.**
+
+A loan is three parts of a Scenario document: a liability Account with a nominal `rate` and a `compounding`
+period, a `withdrawal` Flow from that liability when the money arrives, and a Contribution into the
+liability whose amount is a `level` payment. `traj schema scenario apply` publishes one as its worked example.
+
+`traj projection run --liabilities` adds the engine's statement of each loan: one month row per liability
+(`opening`, `drawn`, `paid`, `interest`, `closing`) and each loan's paid-off date. The rows shown are
+one loan's months, cut from the table; it lists every liability the Scenario holds. In JSON they are the
+`liabilities` and `paidOff` tables. The human format prints one line per loan, then its months:
+
+```
+car: paid off on 2026-12-01
+liabilities (26 rows)
+account                               from        to            opening     drawn     paid  interest    closing  partial
+car                                   2026-06-01  2026-06-30       0.00  12000.00     0.00     58.00   12058.00  false
+car                                   2026-07-01  2026-07-31   12058.00      0.00  2035.15     50.44   10073.29  false
+car                                   2026-12-01  2026-12-31       9.66      0.00     9.66      0.00       0.00  false
+```
+
+The figures are the engine's: `interest` is the residual of the month, so `opening + drawn − paid + interest`
+equals `closing` exactly. Without `--liabilities` the output is unchanged.
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.
