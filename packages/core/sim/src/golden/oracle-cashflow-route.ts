@@ -1,15 +1,7 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString } from "../types"
-import type { OracleTotals } from "./oracle-cashflow-types"
+import { add, min, type OracleTotals } from "./oracle-cashflow-types"
 import { type OracleState, oracleMutate, oracleValuation } from "./oracle-state"
-
-function min(left: bigint, right: bigint): bigint {
-	return left < right ? left : right
-}
-
-function add(map: Map<string, bigint>, key: string, amount: bigint): void {
-	map.set(key, (map.get(key) ?? 0n) + amount)
-}
 
 /** Fills the surplus steps in order; an unbounded step takes whatever is left. */
 export function fillSurplus(

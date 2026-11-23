@@ -46,9 +46,12 @@ slice of the yearly cash-flow breakdown (#190).
   `unmet`, and Σcategories equals Σexpenses.
 - **Same-date contributions split back to Flows.** [ADR 0003](./0003-cap-asset-contributions.md) sums
   same-date contributions per Account before its cap. The breakdown then splits each Account's applied
-  amount back to its Flows in Scenario order, first come first served. An asset Flow's unfunded part is
-  its planned amount less its applied amount. A debt payment capped at the amount owed is not
-  unfunded, which matches `unfundedContributions`, so the planned-but-owed gap is in no line.
+  amount back to its Flows in Scenario order, first come first served. The engine's Tally funding
+  (`appliedByLabel`) splits the same Account amount in engine order, so two labelled Flows into one capped
+  Account may split differently between the breakdown and the Levy tallies; balances are unaffected.
+  An asset Flow's unfunded part is its planned amount less its applied amount. A debt payment capped
+  at the amount owed is not unfunded, which matches `unfundedContributions`, so the planned-but-owed
+  gap is in no line.
 
 ## Considered options
 

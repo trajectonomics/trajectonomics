@@ -4,6 +4,7 @@ import type { LevySet } from "./levy-set"
 import type { DateOutcome, DayTotals } from "./occurrence"
 import type { StateMap } from "./state"
 import { applySurplus } from "./surplus"
+import { NO_ROUTING } from "./tracked"
 import { applyWithdraw } from "./withdraw"
 
 /** Routes a positive net to surplus, a negative net to the withdrawal list, or records a Shortfall. */
@@ -15,14 +16,15 @@ export function route(
 	net: bigint,
 	levies: LevySet | undefined,
 ): DateOutcome {
+	const track = totals.lines !== undefined
 	if (net > 0n) {
-		const surplus = applySurplus(states, scenario, date, net, levies)
-		const routed = withRouting(totals, new Map(), surplus.filled)
+		const surplus = applySurplus(states, scenario, date, net, levies, track)
+		const routed = withRouting(totals, NO_ROUTING, surplus.filled)
 		return { totals: routed, problem: surplus.problem, runsOut: undefined }
 	}
 	if (net < 0n) {
-		const drawn = applyWithdraw(states, scenario, date, -net, levies)
-		const routed = withRouting(totals, drawn.taken, new Map())
+		const drawn = applyWithdraw(states, scenario, date, -net, levies, track)
+		const routed = withRouting(totals, drawn.taken, NO_ROUTING)
 		if (drawn.problem !== undefined)
 			return { totals: routed, problem: drawn.problem, runsOut: undefined }
 		if (drawn.remaining > 0n) {

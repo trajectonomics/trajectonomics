@@ -49,8 +49,8 @@ principal, nominal rate and number of payments. Both keys are optional and addit
   only when the Scenario declares a withdrawal Flow, the same rule as `levy`, so a Scenario without one
   keeps every Projection byte-identical. `interest` keeps its formula: a withdrawal that lands as cash
   raises the liability and the cash together, so net worth does not move and the residual is unchanged.
-  Withdrawn cash that a capped surplus cannot take is dropped, and the residual reports it, as it
-  already reports unrouted income.
+  Withdrawn cash is never dropped: `check` requires the last surplus step to be unbounded
+  (`SURPLUS_UNROUTED`), so a capped step hands the rest to the next one and the last takes what is left.
 - **Export.** `levelPayment({ principal, rate, periodsPerYear, payments, rounding })` is exported from
   the package index. It returns the payment, or `undefined` when the input is out of range or the payment is
   not a safe integer, so the CLI can show a document's payment without a Projection.
