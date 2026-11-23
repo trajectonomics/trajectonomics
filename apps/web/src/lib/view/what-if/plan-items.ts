@@ -2,6 +2,7 @@ import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../
 import { overlayDocument } from "../../what-if/overlay"
 import type { SetChange } from "../../what-if/overrides"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
+import { groupedIds } from "../plan-items/asset-document"
 import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
 import type { PlanKind } from "../plan-items/kinds"
 import { plainAccounts } from "../plan-items/loan-card"
@@ -44,7 +45,8 @@ function marksFor<T extends { id: string }>(
 
 /**
  * The Flow cards of a page as the what-if holds them, with the baseline's text of each changed field. The
- * Assets page lists no Flow, so its kind reads as income and its cards are not shown.
+ * Assets page lists no Flow, so its kind reads as income and its cards are not shown. A real asset's Flows are
+ * on its card, so they are left out of the lists.
  */
 export function flowItems(
 	doc: ScenarioDocument,
@@ -53,9 +55,16 @@ export function flowItems(
 	changes: PlanChanges | null,
 ): ItemsView<FlowCard> {
 	const kind: FlowKind = pageKind === "expense" ? "expense" : "income"
-	const baseline = flowCards(doc.flows, kind, household)
+	const grouped = groupedIds(doc)
+	const listed = (flows: ScenarioDocument["flows"]) =>
+		flowCards(
+			flows.filter((flow) => !grouped.has(flow.id)),
+			kind,
+			household,
+		)
+	const baseline = listed(doc.flows)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = flowCards(overlayDocument(doc, changes).flows, kind, household)
+	const whatIf = listed(overlayDocument(doc, changes).flows)
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "flows", changes, FLOW_FIELDS),

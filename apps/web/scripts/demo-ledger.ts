@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { accountList } from "../src/lib/contract"
 import { DEMO_ACCOUNTS, DEMO_OPENING_DATE, DEMO_OPENINGS } from "./demo/accounts"
+import { HOME_ACCOUNTS, HOME_FLOWS } from "./demo/home"
 import {
 	baseScenarioDocument,
 	DEMO_HOUSEHOLD,
@@ -91,4 +92,21 @@ async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Prom
 		"--set",
 		`flows.salary.end="${RETIRE_EARLY_SALARY_END}"`,
 	])
+	await addHome(place, "base")
+}
+
+/** Puts the condo into a plan the ledger holds: its document is read back, and applied with the condo's parts. */
+async function addHome(place: DemoLedgerPlace, name: string): Promise<void> {
+	const shown = JSON.parse(await traj(place, ["scenario", "show", name])) as {
+		scenario: { document: { accounts: unknown[]; flows: unknown[] } }
+	}
+	const file = join(place.scratch, "base-with-home.json")
+	const { document } = shown.scenario
+	const withHome = {
+		...document,
+		accounts: [...document.accounts, ...HOME_ACCOUNTS],
+		flows: [...document.flows, ...HOME_FLOWS],
+	}
+	await writeFile(file, JSON.stringify(withHome, null, "\t"))
+	await traj(place, ["scenario", "apply", name, "--file", file])
 }

@@ -8,6 +8,8 @@ import type {
 	Read,
 	ScenarioDocument,
 } from "../../lib/contract"
+import { assetCardsOf } from "../../lib/view/plan-items/asset-card"
+import { assetsWithFlows } from "../../lib/view/plan-items/asset-link"
 import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import { loanCardsOf, unplacedFlows } from "../../lib/view/plan-items/loan-card"
@@ -15,8 +17,10 @@ import { loanCards } from "../../lib/view/plan-items/loans"
 import { accountItems, flowItems } from "../../lib/view/what-if/plan-items"
 import EmptyState from "../ui/EmptyState.svelte"
 import AssetItems from "./AssetItems.svelte"
+import AssetsNote from "./AssetsNote.svelte"
 import FlowCards from "./FlowCards.svelte"
 import PlanItemDrawer from "./PlanItemDrawer.svelte"
+import PlanToolbar from "./PlanToolbar.svelte"
 
 interface Props {
 	kind: PlanKind
@@ -46,29 +50,24 @@ const noun = $derived(PLAN_PAGES[kind].noun)
 const changes = $derived(whatIfSession.changesFor(name))
 const flows = $derived(flowItems(doc, kind, household, changes))
 const accounts = $derived(accountItems(doc, baseline, changes))
+const assets = $derived(kind === "assets" ? assetCardsOf(doc, baseline, run) : [])
+const grouped = $derived(kind === "assets" ? [] : assetsWithFlows(doc, kind))
 const loans = $derived(kind === "assets" ? loanCardsOf(doc, run) : [])
 const other = $derived(kind === "assets" ? loanCards(unplacedFlows(doc)) : [])
-const busy = $derived(editSession.busy)
-const button =
-	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 </script>
 
 <div class="space-y-4">
 	<div class="flex flex-wrap items-center justify-between gap-3">
 		<p class="text-sm text-muted-foreground">Plan {name}</p>
 		{#if editable}
-			<div class="flex flex-wrap gap-2">
-				<button type="button" onclick={() => setDrawer({})} disabled={busy} class={button}>Add {noun}</button>
-				{#if kind === "assets"}
-					<button type="button" onclick={() => setDrawer({ loan: true })} disabled={busy} class={button}>Add loan</button>
-				{/if}
-			</div>
+			<PlanToolbar {kind} {noun} open={setDrawer} />
 		{/if}
 	</div>
 	{#if kind === "assets"}
 		<AssetItems
 			accounts={accounts.cards}
 			marks={accounts.marks}
+			{assets}
 			{loans}
 			{other}
 			currency={doc.currency}
@@ -91,6 +90,7 @@ const button =
 			onTry={(id) => setDrawer({ id, tryValue: true })}
 		/>
 	{/if}
+	<AssetsNote assets={grouped} plan={name} />
 	<PlanItemDrawer
 		{drawer}
 		{kind}
