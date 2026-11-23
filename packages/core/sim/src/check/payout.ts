@@ -66,14 +66,22 @@ export function checkPayoutRules(
 	}
 }
 
+/** The id of an Account that pays out: one with a payout above 0 bps (a payout of 0 bps is none, ADR 0027). */
+export function payingAccountId(account: unknown): string | undefined {
+	if (!isRecord(account) || typeof account["id"] !== "string") return undefined
+	const payout = account["payout"]
+	return isRecord(payout) && typeof payout["bps"] === "number" && payout["bps"] > 0
+		? account["id"]
+		: undefined
+}
+
 /** Reports a declared Flow that carries the id an Account's payout takes. */
 export function checkPayoutIds(accounts: unknown, flows: unknown, path: Path, emit: Emit): void {
 	if (!Array.isArray(accounts) || !Array.isArray(flows)) return
 	const taken = new Set<string>()
 	for (const account of accounts) {
-		if (isRecord(account) && isRecord(account["payout"]) && typeof account["id"] === "string") {
-			taken.add(payoutFlowId(account["id"]))
-		}
+		const id = payingAccountId(account)
+		if (id !== undefined) taken.add(payoutFlowId(id))
 	}
 	for (let index = 0; index < flows.length; index++) {
 		const flow: unknown = flows[index]

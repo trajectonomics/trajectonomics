@@ -26,7 +26,10 @@ Account (#407), as an optional additive field, so `Scenario.schemaVersion` stays
   land: growth accrued to the date, Accrued interest included, a Return series' own path value. It is exact
   BigInt arithmetic with no float: 1,000,000,000 at 400 bps paid quarterly is 10,000,000, and 300 satang at
   50 bps paid yearly is 1.5, which `floor` makes 1 and `halfUp` and `ceil` make 2. The payout never exceeds
-  the value it is read from (`bps` is at most 10000), so no Account is overdrawn.
+  the value it is read from (`bps` is at most 10000), so no Account is overdrawn. On a nominal Account the
+  value includes Accrued interest not yet capitalised, so a payout share equal to the rate pays a little more
+  than the year's growth and the Account shrinks slightly (rate 500, bps 500, annual compounding, quarterly
+  payout: 50,581,083 paid against 48,908,238 grown).
 - **It leaves the Account.** The amount comes out of the Account on its date, after an employer share lands
   (ADR 0026) and before a planned withdrawal, a sale or a payment reads the Account, so a sale of the whole
   Account on a payout date sells what is left. It is a distribution, not a sale: it takes no Cost basis and
@@ -47,11 +50,12 @@ Account (#407), as an optional additive field, so `Scenario.schemaVersion` stays
   and a payout of a locked Account's value is no withdrawal. An Illiquid asset may not carry `payout`
   (`PAYOUT_ILLIQUID` at `payout`), nor may a liability (`LIABILITY_MISUSE` at `payout`).
 - **A payout of 0 bps is no payout.** The Projection is byte for byte the one without it, with no
-  `payouts` field and no list.
+  `payouts` field and no list, and `check()` treats it as none: it does not make the Account one that can
+  change for `NEXT_12_MONTHS_READS_ACCOUNT`, and it reserves no `payout:<account>` id.
 - **`check()`.** `bps` outside 0 to 10000 is `RATE_OUT_OF_RANGE`, an unknown `frequency` is
   `INVALID_FREQUENCY`, an unknown `rounding` is `INVALID_ROUNDING`, `end` before `start` is
   `END_BEFORE_START`, a `startAt` or `endAt` that is no Milestone is `UNKNOWN_MILESTONE`, and a declared Flow
-  with the id `payout:<account>` (the id a payout takes) is `DUPLICATE_ID`. An Account with a payout also
+  with the id `payout:<account>` (the id a payout above 0 bps takes) is `DUPLICATE_ID`. An Account with a payout above 0 bps also
   counts among those that "can change on a future date" for `NEXT_12_MONTHS_READS_ACCOUNT` (ADR 0020).
 
 ## How it is built, and why it is not a Flow

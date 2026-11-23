@@ -132,6 +132,8 @@ describe("what an Account may not do beside a payout", () => {
 		}
 		expect(codes(pays({}), { flows: [flow] })).toEqual(["DUPLICATE_ID flows/0/id"])
 		expect(codes({}, { flows: [flow] })).toEqual([])
+		// A payout of 0 bps is no payout (ADR 0027), so it takes no id.
+		expect(codes(pays({ bps: 0 }), { flows: [flow] })).toEqual([])
 	})
 
 	it("supplies the Levy's gross Tally with its label, so a Levy that reads only it is supplied", () => {

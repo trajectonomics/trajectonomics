@@ -1,5 +1,6 @@
 import type { Emit, Path } from "./codes"
 import { accountReadsOf, changedAccountOf } from "./flow-accounts"
+import { payingAccountId } from "./payout"
 import { isRecord } from "./shape"
 
 const METRICS = ["metric", "base"] as const
@@ -28,9 +29,8 @@ function changeable(scenario: Readonly<Record<string, unknown>>): ReadonlySet<st
 	const flows: unknown[] = Array.isArray(scenario["flows"]) ? scenario["flows"] : []
 	const ids = new Set(cashflowAccounts(scenario["cashflow"]))
 	for (const account of Array.isArray(scenario["accounts"]) ? scenario["accounts"] : []) {
-		if (isRecord(account) && isRecord(account["payout"]) && typeof account["id"] === "string") {
-			ids.add(account["id"])
-		}
+		const id = payingAccountId(account)
+		if (id !== undefined) ids.add(id)
 	}
 	for (const flow of flows) {
 		const id = changedAccountOf(flow)
