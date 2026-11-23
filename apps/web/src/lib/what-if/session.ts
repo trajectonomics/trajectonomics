@@ -124,4 +124,5 @@ export {
 	recordOf,
 	withAddition,
 	withoutAddition,
+	withoutItemChanges,
 } from "./session-items"

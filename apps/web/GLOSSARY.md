@@ -83,3 +83,15 @@ _Avoid_: settings, preferences, options
 **Suggestion**:
 One Flow `traj projection allowances` states for a tax year and an allowance: a lump contribution of the extra that fits, with the Account it pays into, or a hint of why it has none. The page never makes one; it tries it as Additions or adds it to the plan.
 _Avoid_: recommendation, advice, tip
+
+**Spending rule**:
+An expense Flow with a `rule` in place of an amount: a share of what the plan's savings are worth, kept level, or taken each year, or taken with limits that cut and raise. The rate, band, bound and rounding are the person's own estimate and `traj` ships none. The page writes it as one Flow and reads what it pays from `projection run --spending`; it computes no amount of one.
+_Avoid_: withdrawal strategy, safe withdrawal rate, drawdown
+
+**Rule year**:
+Twelve monthly occurrences, or one annual one, of a spending rule, counted from the Flow's first landed date. `traj` states for each the savings the rule read, the amount it fixed, what was paid (nominal and in today's money), the share of the savings and what the rule did (none, floor, ceiling, cut, raise).
+_Avoid_: fiscal year, spending year (as a calendar year)
+
+**Spending Bands**:
+The Percentiles across Market paths of what a spending rule pays in each roll-up, and of each path's lowest whole year, as `projection chance` states them. A path that ran out counts 0, and a part year is not a whole one.
+_Avoid_: forecast, range of outcomes

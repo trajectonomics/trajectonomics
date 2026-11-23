@@ -9,6 +9,7 @@ import NetWorthCard from "./NetWorthCard.svelte"
 import PnlCard from "./PnlCard.svelte"
 import ProjectionCard from "./ProjectionCard.svelte"
 import TaxCard from "./TaxCard.svelte"
+import WithdrawalsCard from "./WithdrawalsCard.svelte"
 
 interface Props {
 	view: OverviewView
@@ -26,6 +27,7 @@ let { view }: Props = $props()
 	<ChanceCard scenario={view.chance} />
 	<TaxCard scenario={view.tax} />
 	<AllowancesCard scenario={view.allowances} />
+	<WithdrawalsCard scenario={view.withdrawals} />
 	<PnlCard pnl={view.pnl} />
 	<HealthCard health={view.health} />
 </div>

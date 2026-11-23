@@ -24,7 +24,7 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the sixteen pages are in navigation order, with unique paths", () => {
+	test("the seventeen pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -37,6 +37,7 @@ describe("the navigation's routes", () => {
 			"/compare/",
 			"/reports/",
 			"/optimize/allowances/",
+			"/optimize/withdrawals/",
 			"/cash-flow/",
 			"/chance/",
 			"/tax/",
@@ -62,7 +63,7 @@ describe("the navigation's routes", () => {
 					"Reports",
 				],
 			],
-			["Optimize", ["Tax allowances"]],
+			["Optimize", ["Tax allowances", "Withdrawals"]],
 			[null, ["Cash flow"]],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
@@ -130,7 +131,19 @@ describe("the navigation's routes", () => {
 		expect(routeAt("/optimize/allowances/")?.label).toBe("Tax allowances")
 		expect(routesShown(optimize, true, true, true, true).map((route) => route.label)).toEqual([
 			"Tax allowances",
+			"Withdrawals",
 		])
-		expect(routesShown(optimize, true, true, true, false)).toEqual([])
+		expect(routesShown(optimize, true, true, true, false).map((route) => route.label)).toEqual([
+			"Withdrawals",
+		])
+	})
+
+	test("the Withdrawals page is listed when the selected plan has a document", () => {
+		const optimize = NAV_GROUPS.find((group) => group.heading === "Optimize")
+		if (optimize === undefined) throw new Error("the Optimize group exists")
+		expect(routeAt("/optimize/withdrawals/")?.label).toBe("Withdrawals")
+		expect(routesShown(optimize, false, true, true, true)).toEqual([
+			expect.objectContaining({ label: "Tax allowances" }),
+		])
 	})
 })

@@ -2,6 +2,7 @@ import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { flowAnchorLabels } from "../household/model"
+import { ruleSummary } from "../withdrawals/words"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
 export type FlowKind = "income" | "expense"
@@ -38,9 +39,9 @@ export interface FlowCard {
 	readonly editable: boolean
 }
 
-/** Whether a Flow's amount is computed, so it has no amount the form could edit: a derived or a level one. */
+/** Whether a Flow's amount is computed, so it has no amount the form could edit: a derived, a level or a spending-rule one. */
 export function isComputed(flow: ScenarioFlow): boolean {
-	return flow.derive !== undefined || flow.level !== undefined
+	return flow.derive !== undefined || flow.level !== undefined || flow.rule !== undefined
 }
 
 /** The growth of a Flow as the card shows it: inflation, or a percent a year moved from the basis points. */
@@ -78,7 +79,7 @@ export function flowCards(
 			start: flow.start,
 			end: flow.end ?? "To the horizon",
 			...anchorsOf(household, flow.id),
-			growth: isComputed(flow) ? "Computed" : growthText(flow),
+			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),
 			category: kind === "expense" ? (flow.category ?? null) : null,
 			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.

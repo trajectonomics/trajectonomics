@@ -10,6 +10,7 @@ import {
 	type DemoAccountIds,
 	RETIRE_EARLY_SALARY_END,
 } from "./demo/scenario"
+import { demoSpendingFlows } from "./demo/spending"
 import { demoCsv } from "./demo/transactions"
 import { spawnCapture } from "./spawn"
 
@@ -92,11 +93,11 @@ async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Prom
 		"--set",
 		`flows.salary.end="${RETIRE_EARLY_SALARY_END}"`,
 	])
-	await addHome(place, "base")
+	await addHome(place, "base", demoSpendingFlows(ids))
 }
 
-/** Puts the condo into a plan the ledger holds: its document is read back, and applied with the condo's parts. */
-async function addHome(place: DemoLedgerPlace, name: string): Promise<void> {
+/** Puts the condo and the spending rule (cli ADR 0063) into `base`, read back and applied; `retire-early` has neither. */
+async function addHome(place: DemoLedgerPlace, name: string, extra: unknown[]): Promise<void> {
 	const shown = JSON.parse(await traj(place, ["scenario", "show", name])) as {
 		scenario: { document: { accounts: unknown[]; flows: unknown[] } }
 	}
@@ -105,7 +106,7 @@ async function addHome(place: DemoLedgerPlace, name: string): Promise<void> {
 	const withHome = {
 		...document,
 		accounts: [...document.accounts, ...HOME_ACCOUNTS],
-		flows: [...document.flows, ...HOME_FLOWS],
+		flows: [...document.flows, ...HOME_FLOWS, ...extra],
 	}
 	await writeFile(file, JSON.stringify(withHome, null, "\t"))
 	await traj(place, ["scenario", "apply", name, "--file", file])

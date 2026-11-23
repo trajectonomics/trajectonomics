@@ -48,3 +48,17 @@ export function withAddition(whatIf: WhatIf, addition: Addition): WhatIf {
 export function withoutAddition(whatIf: WhatIf, path: string): WhatIf {
 	return { ...whatIf, additions: whatIf.additions.filter((one) => additionPath(one) !== path) }
 }
+
+/**
+ * The session without any earlier change to one item: its Removal, its Addition and its Sets. A new try of the
+ * item starts from the plan's own, so a later try replaces an earlier one and never meets it.
+ */
+export function withoutItemChanges(whatIf: WhatIf, list: string, id: string): WhatIf {
+	const path = `${list}.${id}`
+	return {
+		...whatIf,
+		removals: whatIf.removals.filter((removal) => removal !== path),
+		additions: whatIf.additions.filter((one) => additionPath(one) !== path),
+		sets: whatIf.sets.filter((set) => !set.path.startsWith(`${path}.`)),
+	}
+}
