@@ -17,5 +17,6 @@ export function sentenceFor(
 	const entry = REFUSALS[problem.code]
 	if (entry === undefined || !("message" in entry)) return undefined
 	const message = typeof entry.message === "string" ? entry.message : entry.message(problem)
-	return entry.hint === undefined ? { message } : { message, hint: entry.hint }
+	if (entry.hint === undefined) return { message }
+	return { message, hint: typeof entry.hint === "string" ? entry.hint : entry.hint(problem) }
 }

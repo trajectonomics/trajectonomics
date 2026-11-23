@@ -4,7 +4,7 @@ import type { Said } from "./refusal-said"
 /**
  * The sentences for a Spending rule (sim ADR 0023, cli ADR-0063). The document check alone finds them,
  * so `scenario apply` and the Store state them too (scenarioDocumentError), as well as `projection run`
- * on a stored row. An override through `--set` still names the code only, as it does for the loan codes. Each says what is wrong in the plan's own words and names the way out.
+ * on a stored row. A refusal through `--set` or `--add` states the code, then the sentence (cli ADR-0065). Each says what is wrong in the plan's own words and names the way out.
  */
 export const SAID_RULE: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	RULE_NOT_EXPENSE: {

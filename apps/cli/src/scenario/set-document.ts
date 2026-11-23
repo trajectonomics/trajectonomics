@@ -1,4 +1,5 @@
 import type { AppError } from "../errors"
+import { sentenceFor } from "../projection/refusal-table"
 import { documentPath, type ScenarioProblem } from "./document"
 import { formatPath, overrideSegments } from "./path"
 import type { AppliedOverrides } from "./set-apply"
@@ -51,12 +52,18 @@ export function documentFailure(
 	// The index counts occurrences of that input field, as its own list does.
 	const index = items.slice(0, at).filter((item) => item.flag === flag).length
 	const path = documentPath("document", chosen.problem.segments)
+	// A code the refusal table words states its sentence and way out, as `scenario apply --file` does.
+	const said = sentenceFor({
+		code: chosen.problem.code,
+		path: ["scenario", ...chosen.problem.segments.map(String)],
+	})
+	const own = `The overrides leave ${path} invalid; change that value or the path.`
 	return flagError(
 		flag,
 		index,
-		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}`,
+		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}${said === undefined ? "" : `. ${said.message}`}`,
 		{
-			hint: `The overrides leave ${path} invalid; change that value or the path.`,
+			hint: said?.hint === undefined ? own : `${said.hint} ${own}`,
 			details: {
 				index,
 				path: selected?.path ?? formatPath(overrideSegments(document, chosen.problem.segments)),

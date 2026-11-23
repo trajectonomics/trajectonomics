@@ -59,7 +59,7 @@ describe("a closed flag names the values it accepts", () => {
 
 	it("prints --set's own description and repeatable once, on each of its five pages", async () => {
 		const satang =
-			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\), or decimal strings with --decimal; repeatable$/
+			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\), or decimal strings with --decimal\. The one path a plan may lack is the whole estate block, which --set estate=<json> begins; repeatable$/
 		expect(flagLine((await help(["scenario", "fork"])).out, "set")).toMatch(satang)
 		for (const path of [
 			["fi"],

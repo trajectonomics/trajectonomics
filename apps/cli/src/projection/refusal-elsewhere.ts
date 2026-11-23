@@ -41,7 +41,6 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	SURPLUS_UNROUTED: document,
 	CONTRIBUTION_UNROUTED: document,
 	ILLIQUID_ROUTED: document,
-	RATE_OUT_OF_RANGE: document,
 	INVALID_OP: document,
 	INVALID_BASIS: document,
 	INVALID_ROUNDING: document,

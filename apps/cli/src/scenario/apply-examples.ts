@@ -42,4 +42,9 @@ export const APPLY_EXAMPLES: Example[] = [
 		description:
 			"Add one new Flow to the stored base, as projection run --add would project it, and roll the write back.",
 	},
+	{
+		command: `traj scenario apply base --set 'estate={"costs":[{"id":"settlement","of":"gross","bps":"1.00","rounding":"halfUp"}]}' --decimal --dry-run`,
+		description:
+			"Begin the estate block on a stored plan that has none, as projection run --set would project it, and roll the write back.",
+	},
 ]
