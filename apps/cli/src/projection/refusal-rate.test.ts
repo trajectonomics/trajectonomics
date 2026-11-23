@@ -74,7 +74,20 @@ describe("RATE_OUT_OF_RANGE as a sentence, for every field that can raise it", (
 			name: "a guardrail's band",
 			path: ["flows", 1, "rule", "upper", "adjustBps"],
 			message: /guardrail's band must be from 0% to 100%/,
-			hint: /basis points/,
+			// A trigger of 0 fires on any move past the initial rate (sim ADR 0023); only an adjustment of 0 is a no-op.
+			hint: /An adjustment of 0 leaves the year as it is; a trigger of 0 fires on any rise above \(or fall below\) the initial rate\./,
+		},
+		{
+			name: "a spending rule's rate, with its --decimal form",
+			path: ["flows", 1, "rule", "rateBps"],
+			message: /spending rule's rate must be from 0\.01% to 100%/,
+			hint: /Under --decimal it is a percent string such as "4\.00"/,
+		},
+		{
+			name: "a Measure's growth inside a Levy",
+			path: ["levies", 0, "measures", 2, "growth", "bps"],
+			message: /growth rate must be above -100%/,
+			hint: /-9999/,
 		},
 		{
 			name: "a Levy prepayment",

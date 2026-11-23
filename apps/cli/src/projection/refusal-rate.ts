@@ -48,16 +48,20 @@ const GIFT: Entry = {
 	hint: SHARE_HINT,
 }
 
+/** Under --decimal a rule's rates and bands are percent strings (cli ADR-0063). */
+const RULE_DECIMAL =
+	'Under --decimal it is a percent string such as "4.00", with at most two decimal places.'
+
 const RULE_RATE: Entry = {
 	message:
 		"A spending rule's rate must be from 0.01% to 100% of its portfolio a year (1 to 10000 basis points), and this one is not.",
-	hint: `${UNIT} A rule that pays nothing is a Flow with an amount of 0.`,
+	hint: `${UNIT} ${RULE_DECIMAL} A rule that pays nothing is a Flow with an amount of 0.`,
 }
 
 const RULE_BAND: Entry = {
 	message:
 		"A guardrail's band must be from 0% to 100%, in its trigger and in its adjustment, and this one is not.",
-	hint: `${UNIT} A band of 0 never triggers.`,
+	hint: `${UNIT} ${RULE_DECIMAL} An adjustment of 0 leaves the year as it is; a trigger of 0 fires on any rise above (or fall below) the initial rate.`,
 }
 
 const PREPAYMENTS: Entry = {
@@ -97,6 +101,8 @@ function flowEntry(segments: Segments): Entry {
 /** The entry for the field a `RATE_OUT_OF_RANGE` blames, by where it sits in the Scenario. */
 export function rateEntry(problem: ProjectionProblem): Entry {
 	const segments = segmentsOf(problem)
+	// A growth anywhere (a Flow's, a Measure's, an estate line's, FI's target) has the same range.
+	if (segments.includes("growth")) return GROWTH
 	switch (segments[0]) {
 		case "estate":
 			return estateEntry(segments)

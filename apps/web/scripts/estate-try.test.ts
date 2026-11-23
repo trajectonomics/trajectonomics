@@ -1,5 +1,5 @@
-// Trying the estate block as a what-if against the real traj (cli ADR 0064, web ADR 0014): one Set of the whole block,
-// nothing written, and a plan with no block cannot be tried because `traj` replaces a path the plan holds.
+// Trying the estate block as a what-if against the real traj (cli ADR 0065, web ADR 0014): one Set of the whole block,
+// nothing written, on a plan with a block and on one without (a Set may begin the block).
 import { afterAll, beforeAll, describe, expect } from "bun:test"
 import { householdDocument } from "../src/lib/contract"
 import { blockFromDraft, estateDates, estateView } from "../src/lib/view/estate"
