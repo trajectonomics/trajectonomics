@@ -19,7 +19,12 @@ describe("allowedValues", () => {
 	it("lists a Flow's kinds for a Flow, an Account's for an Account", () => {
 		const flow = problemOf("INVALID_KIND", { flows: [{ ...FLOW, kind: "payment" }] })
 		expect(flow.code).toBe("INVALID_KIND")
-		expect(allowedValues(flow.code, flow.path)).toEqual(["income", "expense", "contribution"])
+		expect(allowedValues(flow.code, flow.path)).toEqual([
+			"income",
+			"expense",
+			"contribution",
+			"withdrawal",
+		])
 		const account = problemOf("INVALID_KIND", { accounts: [{ id: "a", kind: "cash", rate: 0 }] })
 		expect(allowedValues(account.code, account.path)).toEqual(["asset", "liability"])
 	})

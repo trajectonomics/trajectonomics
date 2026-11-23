@@ -1,5 +1,6 @@
 import type { ResolvedCalendar } from "../calendar/business"
 import { occurrences } from "../calendar/occurrence"
+import { resolveLoan } from "../loan/resolve"
 import { movedOnceStarts } from "../milestone/spec"
 import type { DateString, Flow, Scenario, Timeline } from "../types"
 import { isFixed } from "../types"
@@ -24,7 +25,8 @@ export function buildEvents(
 ): readonly DatedEvent[] {
 	const events: DatedEvent[] = []
 	const moved = movedOnceStarts(scenario, calendar)
-	for (const flow of scenario.flows) {
+	for (const declared of scenario.flows) {
+		const flow = resolveLoan(declared, scenario.accounts)
 		const shifted = moved.get(flow.id)
 		const found = occurrences(
 			shifted ?? flow.start,

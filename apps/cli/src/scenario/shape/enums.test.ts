@@ -49,6 +49,7 @@ const KIND_FLOWS: Record<string, Record<string, unknown>> = {
 		frequency: "monthly",
 		growth: { bps: 0 },
 	},
+	withdrawal: { ...EXPENSE, kind: "withdrawal", source: "debt" },
 }
 
 /** `then`, spelled out so the object holding it is not read as a thenable (biome noThenProperty). */
@@ -135,6 +136,7 @@ const PROBES: EnumProbe[] = [
 			(nodeAt(["flows", 0, "kind"])["enum"] as string[]).map((kind) =>
 				probe({
 					flows: [KIND_FLOWS[kind] as Record<string, unknown>],
+					accounts: [CASH, { id: "debt", kind: "liability", rate: 0 }],
 					contribute: kind === "contribution" ? ["cash"] : [],
 				}),
 			),
@@ -183,11 +185,13 @@ const PROBES: EnumProbe[] = [
 	},
 ]
 
+/** Paths probed in their own file: milestone criteria, and the level rounding (level-enums.test.ts). */
+const PROBED_ELSEWHERE = /^(milestones|flows\.\*\.level)\./
+
 describe("the closed value sets the shape states", () => {
 	it("covers every one of them with a probe", () => {
 		const enums = documented().filter(
-			(entry) =>
-				Array.isArray(entry.node["enum"]) && !canonical(entry.path).startsWith("milestones."),
+			(entry) => Array.isArray(entry.node["enum"]) && !PROBED_ELSEWHERE.test(canonical(entry.path)),
 		)
 		expect(enums.map((entry) => canonical(entry.path)).sort()).toEqual(
 			PROBES.map((entry) => canonical(entry.path)).sort(),

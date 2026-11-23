@@ -5,6 +5,7 @@ import type { AccountIndex, Check, Emit, Path } from "./codes"
 import { checkFlowCaps } from "./flow-caps"
 import { checkFlows, type FlowContext } from "./flows"
 import { checkLevies } from "./levy"
+import { loanIndex } from "./loan-index"
 import { checkMilestones } from "./milestones"
 import { checkContributionRouting } from "./routing"
 import { rate, str } from "./scalars"
@@ -38,6 +39,7 @@ export function checkScenario(
 		hasLevy,
 		levyIds: idsOf(levies),
 		milestoneIds: idsOf(milestones),
+		loans: loanIndex(isRecord(value) ? value["accounts"] : undefined),
 	}
 	const shape = {
 		schemaVersion: req(anyVersion),

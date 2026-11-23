@@ -14,6 +14,7 @@ interface DayParts {
 	readonly income: bigint
 	readonly expense: bigint
 	readonly prepaid: bigint
+	readonly withdrawals: bigint
 }
 
 export function mergeFunded(
@@ -47,6 +48,7 @@ export function totalsOf(
 		date,
 		income: day.income,
 		expense: day.expense,
+		withdrawals: day.withdrawals,
 		contributions,
 		unfunded,
 		levy: day.prepaid + settlement.amount,

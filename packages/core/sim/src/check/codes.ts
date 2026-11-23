@@ -69,6 +69,12 @@ const CODES = [
 	"INVALID_TERMS",
 	"INVALID_MULTIPLE",
 	"INVALID_COMBINE",
+	"WITHDRAWAL_SOURCE_KIND",
+	"LEVEL_TARGET_NOT_LIABILITY",
+	"LEVEL_TARGET_NOT_NOMINAL",
+	"LEVEL_FREQUENCY_MISMATCH",
+	"LEVEL_PAYMENTS_OUT_OF_RANGE",
+	"LEVEL_PAYMENT_OVERFLOW",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const

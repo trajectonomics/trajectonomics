@@ -1,5 +1,6 @@
 import type { Returns } from "../engine/returns"
 import { runEngine } from "../engine/run"
+import { declaresWithdrawals } from "../loan/resolve"
 import { openingNetWorth } from "../output/opening"
 import { buildPeriods, type Period } from "../output/periods"
 import { buildRollups } from "../output/rollups"
@@ -50,7 +51,12 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	if (!result.ok) return { ok: false, problem: result.problem }
 	const runsOut = result.run.runsOut
 	const periods = buildPeriods(timeline.start, runsOut?.date ?? timeline.horizon, runsOut?.date)
-	const rollups = buildRollups(result.run, periods, inputs.opening)
+	const rollups = buildRollups(
+		result.run,
+		periods,
+		inputs.opening,
+		declaresWithdrawals(inputs.scenario),
+	)
 	if (rollups.problem !== undefined) return { ok: false, problem: rollups.problem }
 	const annual = rollups.annual!
 	const last = annual[annual.length - 1]!
