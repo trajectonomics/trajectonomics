@@ -3,52 +3,43 @@ import { isPlainObject } from "../json"
 import { setValueFromDecimal } from "./decimal-set"
 import { type ScenarioDocument, scenarioProblems } from "./document"
 import { formatPath } from "./path"
-import { type ParsedSet, parseSet } from "./set-assign"
+import type { ParsedSet } from "./set-assign"
 import { documentFailure, itemsOf } from "./set-document"
 import type { AppliedOverride } from "./set-error"
-import { badSet } from "./set-parse"
-import { applyRemovals } from "./set-removal"
+import { removeThenAdd } from "./set-remove-add"
 import { replaceAt } from "./set-replace"
+import { duplicatePath, parseSets } from "./set-sets"
 
 /**
- * The document a command persists or projects, and the Overrides that produced it: the removals and
- * the Sets, each in command-line order (ADR-0024, cli ADR-0056).
+ * The document a command persists or projects, and the Overrides that produced it: the removals, the
+ * additions and the Sets, each in command-line order (ADR-0024, cli ADR-0056, ADR-0062).
  */
 export type AppliedOverrides = {
 	document: ScenarioDocument
 	overrides: AppliedOverride[]
 	removals: string[]
+	additions: AppliedOverride[]
 }
 
-/** The Overrides beside `--set`: the `--without` paths, and whether a `--set` value is decimal. */
+/** The Overrides beside `--set`: the `--without` and `--add` values, and whether money in them is decimal. */
 export type OverrideOptions = {
 	without?: readonly string[] | undefined
+	add?: readonly string[] | undefined
 	decimal?: boolean | undefined
 }
 
-function parseSets(sets: readonly string[]): ParsedSet[] | AppError {
-	const parsed: ParsedSet[] = []
-	for (const [index, raw] of sets.entries()) {
-		const set = parseSet(raw, index)
-		if (isAppError(set)) return set
-		parsed.push(set)
-	}
-	return parsed
+/** The echo field a result states for the additions: absent when none was made, so a result keeps its bytes (cli ADR-0062). */
+export function additionsOf(applied: Pick<AppliedOverrides, "additions">): {
+	additions?: AppliedOverride[]
+} {
+	return applied.additions.length === 0 ? {} : { additions: applied.additions }
 }
 
-function duplicatePath(parsed: readonly ParsedSet[]): AppError | null {
-	const seen = new Set<string>()
-	for (const [index, set] of parsed.entries()) {
-		const path = formatPath(set.segments)
-		if (seen.has(path)) {
-			return badSet(index, `the path "${path}" is given twice`, {
-				hint: "Each --set path may appear once; later sets already see earlier ones.",
-				details: { index, path },
-			})
-		}
-		seen.add(path)
-	}
-	return null
+/** Whether no Override was given at all, so a command has nothing to apply or to blame. */
+function noOverride(sets: readonly string[], options: OverrideOptions): boolean {
+	return (
+		sets.length === 0 && (options.without ?? []).length === 0 && (options.add ?? []).length === 0
+	)
 }
 
 /** Applies one Set to the document it follows, converting its value first under `--decimal`. */
@@ -70,26 +61,25 @@ function applyOne(
 }
 
 /**
- * Applies the `--without` removals, then the `--set` Overrides, in command-line order, as one pure
- * function (ADR-0024, cli ADR-0056). It never mutates its input: each change copies the nodes on its
- * path. Under `--decimal` a Set's money value is converted here, and the echo keeps it as given.
+ * Applies the `--without` removals, then the `--add` items, then the `--set` Overrides, each in
+ * command-line order, as one pure function (ADR-0024, cli ADR-0056, ADR-0062). It never mutates its
+ * input: each change copies the nodes on its path. Under `--decimal` the money of a Set or an added item
+ * is converted here, and the echo keeps it as given.
  */
 export function applyOverrides(
 	document: ScenarioDocument,
 	sets: readonly string[],
 	options: OverrideOptions = {},
 ): AppliedOverrides | AppError {
-	const without = options.without ?? []
-	if (sets.length === 0 && without.length === 0) {
-		return { document, overrides: [], removals: [] }
-	}
-	const removed = applyRemovals(document, without)
-	if (isAppError(removed)) return removed
+	if (noOverride(sets, options)) return { document, overrides: [], removals: [], additions: [] }
+	const grouped = removeThenAdd(document, options)
+	if (isAppError(grouped)) return grouped
+	const { removals, added } = grouped
 	const parsed = parseSets(sets)
 	if (isAppError(parsed)) return parsed
 	const duplicate = duplicatePath(parsed)
 	if (duplicate !== null) return duplicate
-	let current = removed.document
+	let current = added.document
 	const overrides: AppliedOverride[] = []
 	for (const [index, set] of parsed.entries()) {
 		const next = applyOne(current, set, index, options.decimal === true)
@@ -97,7 +87,7 @@ export function applyOverrides(
 		current = next
 		overrides.push({ path: formatPath(set.segments), value: set.value })
 	}
-	return { document: current, overrides, removals: removed.removals }
+	return { document: current, overrides, removals, additions: added.additions }
 }
 
 /**
@@ -111,9 +101,7 @@ export function applyScenarioSets(
 	options: OverrideOptions = {},
 ): AppliedOverrides | AppError {
 	// A plain fork has no Override to blame: the Store's canonicaliser reports a stale row at `document`.
-	if (sets.length === 0 && (options.without ?? []).length === 0) {
-		return { document, overrides: [], removals: [] }
-	}
+	if (noOverride(sets, options)) return { document, overrides: [], removals: [], additions: [] }
 	const applied = applyOverrides(document, sets, options)
 	if (isAppError(applied)) return applied
 	const [first, ...rest] = scenarioProblems(applied.document)

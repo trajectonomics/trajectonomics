@@ -257,6 +257,32 @@ exits 0. `--if-hash <contentHash>` writes only when the stored plan still has th
 `traj scenario show` printed it, and refuses the write otherwise. Without `--file`, `--set` and
 `--without` never take a document, so the what-if cannot replace a plan you did not read.
 
+### Adding an item to a what-if
+
+> **Ships in 0.8.0.**
+
+`--add <list>=<json>` puts one new item on the end of `accounts`, `flows` or `milestones`, so a new
+loan, an extra payment or a new Flow can be tried before it is saved. The item carries its own `id`,
+and an `id` the list already holds is refused (`--set` is the flag that changes an item that exists).
+Every read that takes `--set` takes `--add` (`projection run`, `projection compare`, `fi`,
+`projection chance` and `projection allowances`), and `scenario fork` and `scenario apply` save it:
+
+```bash
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 \
+  --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal
+traj scenario apply base --add 'flows={...}' --decimal --if-hash <contentHash>
+```
+
+The flags apply in a fixed order whatever order they are typed in: every `--without`, then every
+`--add`, then every `--set`. So a `--set` can reach an item the same command adds
+(`--add` then `--set flows.extra.amount=...`). An `--add` never replaces: one whose `list.id` the same
+call's `--without` took out is refused, and `--set <path>.<key>=<value>` changes an item field by field,
+so no field is dropped by accident and the plan saved is the plan projected. The result lists the items it added under `additions` (absent when none were), and
+`effectiveContentHash` covers them. The engine checks the document with the item in it, so a refusal names
+`--add` and the item's path (`flows.extra`) with the document path inside it. Under `--decimal` the
+item's money is a decimal string of the Currency's major unit. Nothing is written until
+`scenario apply` or `scenario fork` is run with the same flags.
+
 ## Milestones: points in the plan that a Flow waits for
 
 > **Ships in 0.8.0.**

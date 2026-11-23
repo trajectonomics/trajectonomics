@@ -20,6 +20,8 @@ export type CompareSide = {
 	overrides: OverrideEcho[]
 	/** This side's `--without` removals, in command-line order (cli ADR-0056). */
 	removals: string[]
+	/** The items this side put on a list with --add, present only when it did (cli ADR-0062). */
+	additions?: OverrideEcho[] | undefined
 	/** This side's Carry-in, present only when it placed at least one record (ADR-0032). */
 	carryIn?: CarryInEcho[] | undefined
 	fi: FiAnswer
@@ -39,6 +41,12 @@ export const compareSide: z.ZodType<CompareSide> = z.strictObject({
 	removals: z
 		.array(z.string())
 		.describe("The list items this side took out with --without, in order."),
+	additions: z
+		.array(overrideEcho)
+		.optional()
+		.describe(
+			"The items this side put on a list with --add, in order; present only when an --add was given.",
+		),
 	carryIn: carryInField,
 	fi: fiAnswer.describe("This side's own FI answer."),
 	taxYears: taxYearsField,

@@ -9,7 +9,7 @@ import { applyResult, writeApplied } from "../../scenario/apply-write"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
 import { IF_HASH } from "../../scenario/if-hash"
-import { setFlag, withoutFlag } from "../../scenario/override-flags"
+import { addFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { printTemplate } from "../../scenario/template"
 import { LEDGER_READ_CODES } from "../../store"
 
@@ -17,7 +17,7 @@ export const apply: Leaf = defineCommand({
 	name: "apply",
 	summary: "Create or update a Scenario from a JSON document, or apply a what-if to its plan",
 	description:
-		"Three forms. --file stores a JSON document as the Scenario. --template prints a document to start from. --set and --without, with no --file, apply the same Overrides projection run applies to the stored Scenario and store the result, so a what-if that projects is the one that is saved; an apply that leaves the plan unchanged writes nothing.",
+		"Three forms. --file stores a JSON document as the Scenario. --template prints a document to start from. --set, --without and --add, with no --file, apply the same Overrides projection run applies to the stored Scenario and store the result, so a what-if that projects is the one that is saved (--add puts a new item on a list); an apply that leaves the plan unchanged writes nothing.",
 	positionals: ["name"],
 	input: z.strictObject({
 		name: z
@@ -52,9 +52,12 @@ export const apply: Leaf = defineCommand({
 		without: withoutFlag.describe(
 			"Take one list item out by its id, such as flows.gym, before any --set. Applied to the stored plan, the removal is saved.",
 		),
+		add: addFlag.describe(
+			'Add one new list item, as list=json, such as flows=\'{"id":"extra","kind":"expense",...}\', after any --without and before any --set. Applied to the stored plan, the item is saved.',
+		),
 	}),
 	document: DOCUMENT,
-	note: "The --decimal form ships in 0.8.0, and so do --if-hash and the what-if form with --set and --without.",
+	note: "The --decimal form ships in 0.8.0, and so do --if-hash and the what-if form with --set and --without. --add ships in 0.8.0 as well.",
 	output: z.union([z.string(), applyResult, whatIfResult]),
 	examples: APPLY_EXAMPLES,
 	errorCodes: [

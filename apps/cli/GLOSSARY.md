@@ -142,8 +142,12 @@ _Avoid_: Patch, edit
 A list item taken out of a Scenario's document by its `id`, with `--without`, before any Override is applied. It names an item, never a value, so `--set` cannot stand in for it; a Projection applies it transiently and `scenario fork` persists it.
 _Avoid_: Delete, drop, exclude
 
+**Addition**:
+A new list item put on a Scenario's `accounts`, `flows` or `milestones` with `--add <list>=<json>`, after the Removals and before the Sets. It carries its own `id`, which must not already exist and must not be one the same call's `--without` took out, so it never replaces anything (`--set` changes an item); a Projection applies it transiently and `scenario fork` and `scenario apply` persist it (ADR-0062).
+_Avoid_: Insert, create
+
 **What-if**:
-A set of Overrides and Removals applied to one stored Scenario. A Projection applies it transiently, `scenario fork` saves it as a new plan, and `scenario apply <name> --set/--without` saves it to the plan it came from (ADR-0057).
+A set of Overrides, Removals and Additions applied to one stored Scenario. A Projection applies it transiently, `scenario fork` saves it as a new plan, and `scenario apply <name> --set/--without/--add` saves it to the plan it came from (ADR-0057, ADR-0062).
 _Avoid_: Draft, patch, edit
 
 **Contribution**:

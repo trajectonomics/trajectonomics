@@ -16,7 +16,7 @@ import {
 } from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
 import { compareHint } from "../../projection/render"
-import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
+import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const compare: Leaf = defineCommand({
 	name: "compare",
@@ -27,6 +27,7 @@ export const compare: Leaf = defineCommand({
 		horizon: horizonFlag,
 		set: setFlag,
 		without: withoutFlag,
+		add: addFlag,
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		a: z.string().describe("The first Scenario's exact name or its id."),
@@ -54,8 +55,7 @@ export const compare: Leaf = defineCommand({
 			description: "A what-if against the base, with net worth at two ages.",
 		},
 		{
-			command:
-				'traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount="90000.50" --decimal --json',
+			command: `traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set 'flows.salary.amount="90000.50"' --decimal --json`,
 			description: "A what-if whose salary is a decimal amount in THB, not satang.",
 		},
 	],
@@ -65,7 +65,7 @@ export const compare: Leaf = defineCommand({
 		if (isAppError(records)) return records
 		const ages = input.age ?? []
 		const problem =
-			whatIfProblem(input.b, input.set ?? [], input.without ?? []) ??
+			whatIfProblem(input.b, input.set ?? [], input.without ?? [], input.add ?? []) ??
 			agesProblem(ages, input.birthDate)
 		if (problem !== null) return problem
 		return withProjection(input, ctx, (prepare) => compared({ input, records, ages, prepare }))

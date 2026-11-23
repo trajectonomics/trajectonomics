@@ -21,12 +21,20 @@ export const withoutFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
 		"Take one list item out by its id, such as flows.gym, before any --set. A projection only reads it; scenario fork saves it.",
 	)
 
-/** `--decimal`, which reads each money value of a `--set` as a decimal string (cli ADR-0047, ADR-0056). */
+/** `--add`, one new list item, repeatable; applied after every `--without` and before every `--set` (cli ADR-0062). */
+export const addFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
+	.array(z.string())
+	.optional()
+	.describe(
+		'Add one new list item, as list=json, such as flows=\'{"id":"extra","kind":"expense",...}\'; the list is accounts, flows or milestones and the item carries its own id, which must not exist. Applied after any --without and before any --set. A projection only reads it; scenario fork and scenario apply save it.',
+	)
+
+/** `--decimal`, which reads each money value of a `--set` or an `--add` item as a decimal string (cli ADR-0047, ADR-0056, ADR-0062). */
 export const decimalFlag: z.ZodDefault<z.ZodBoolean> = z
 	.boolean()
 	.default(false)
 	.describe(
-		'Read each money amount of a --set as a decimal string of the Currency\'s major unit, such as "90000.50", instead of satang.',
+		'Read each money amount of a --set or an --add item as a decimal string of the Currency\'s major unit, such as "90000.50", instead of satang.',
 	)
 
 /** One applied Override as a command echoes it: its path, escaped and canonical, and its value (ADR-0024). */
@@ -37,3 +45,11 @@ export const appliedOverride: z.ZodObject<{
 	path: z.string().describe("The dotted path, escaped and canonical."),
 	value: z.unknown().describe("The JSON value the path was set to."),
 })
+
+/** The items `--add` put on a list, in command-line order, as the echo states them; absent when none was (cli ADR-0062). */
+export const additionsField: z.ZodOptional<z.ZodArray<typeof appliedOverride>> = z
+	.array(appliedOverride)
+	.optional()
+	.describe(
+		"The items put on a list with --add, in command-line order, each as its path (list.id) and the item as given; present only when an --add was given.",
+	)

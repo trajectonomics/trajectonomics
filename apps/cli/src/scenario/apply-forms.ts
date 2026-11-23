@@ -14,6 +14,7 @@ export type ApplyFlags = {
 	ifHash?: string | undefined
 	set?: readonly string[] | undefined
 	without?: readonly string[] | undefined
+	add?: readonly string[] | undefined
 }
 
 /** The document form cannot work without a name, and says so before it reads the document. */
@@ -32,9 +33,9 @@ export const WHAT_IF_NAME: RequiredDocumentField = {
 const FORM_HINT =
 	'Run "traj scenario apply --template --as-of <date>" to print a Scenario pre-filled from the Baseline, or "traj scenario apply <name> --file <path>" to apply a document.'
 
-/** The form `--set` and `--without` take instead of a document, and what it writes (cli ADR-0057). */
+/** The form `--set`, `--without` and `--add` take instead of a document, and what it writes (cli ADR-0057, ADR-0062). */
 export const WHAT_IF_HINT =
-	'Run "traj scenario apply <name> --set <path=value>" to apply a what-if to the stored Scenario, with no document; --without <id> takes a list item out.'
+	'Run "traj scenario apply <name> --set <path=value>" to apply a what-if to the stored Scenario, with no document; --without <id> takes a list item out and --add <list=json> puts a new one in.'
 
 export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	flag: "file",
@@ -42,13 +43,13 @@ export const DOCUMENT: DocumentSpec<typeof scenarioDocument> = {
 	allowed: ["name", "dryRun", "decimal", "ifHash"],
 	required: [REQUIRED_NAME],
 	hint: FORM_HINT,
-	exclusiveHints: { set: WHAT_IF_HINT, without: WHAT_IF_HINT },
+	exclusiveHints: { set: WHAT_IF_HINT, without: WHAT_IF_HINT, add: WHAT_IF_HINT },
 	alternate: { flag: "decimal", schema: decimalDocument },
 }
 
-/** Whether the what-if form's Overrides were given: a removal or a Set, with or without `--decimal`. */
+/** Whether the what-if form's Overrides were given: a removal, an addition or a Set, with or without `--decimal`. */
 export function isWhatIf(input: ApplyFlags): boolean {
-	return (input.set?.length ?? 0) + (input.without?.length ?? 0) > 0
+	return (input.set?.length ?? 0) + (input.without?.length ?? 0) + (input.add?.length ?? 0) > 0
 }
 
 /**
@@ -86,10 +87,11 @@ function templateWritesRefusal(input: ApplyFlags): AppError | undefined {
 /** `--template` prints a document, so it takes no Set or removal: the what-if form does (cli ADR-0057). */
 function whatIfTemplateRefusal(input: ApplyFlags): AppError | undefined {
 	if (!isWhatIf(input)) return undefined
-	const path = (input.set?.length ?? 0) > 0 ? "set" : "without"
+	const path =
+		(input.set?.length ?? 0) > 0 ? "set" : (input.without?.length ?? 0) > 0 ? "without" : "add"
 	return fail("invalid_input", {
 		path,
-		message: `${path}: --template prints a document, so it takes no --set or --without`,
+		message: `${path}: --template prints a document, so it takes no --set, --without or --add`,
 		hint: WHAT_IF_HINT,
 	})
 }

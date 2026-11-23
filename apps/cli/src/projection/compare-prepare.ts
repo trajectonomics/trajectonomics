@@ -12,9 +12,26 @@ type CompareFlags = {
 	b?: string | undefined
 	set?: readonly string[] | undefined
 	without?: readonly string[] | undefined
+	add?: readonly string[] | undefined
 	decimal?: boolean | undefined
 	birthDate?: string | undefined
 	asOf: string
+}
+
+/**
+ * The what-if applies the Overrides to A and is compared with A; a second Scenario is compared as
+ * stored.
+ */
+function secondSide(flags: CompareFlags, prepare: Prepare): ReturnType<Prepare> {
+	if (flags.b !== undefined) return prepare({ scenario: flags.b, scenarioPath: "b", sets: [] })
+	return prepare({
+		scenario: flags.a,
+		scenarioPath: "a",
+		sets: flags.set ?? [],
+		without: flags.without ?? [],
+		add: flags.add ?? [],
+		decimal: flags.decimal ?? false,
+	})
 }
 
 /** Both sides prepared and placed, then compared: a what-if reuses A's Scenario and its record. */
@@ -27,18 +44,7 @@ export function compared(input: {
 	const { prepare } = input
 	const a = prepare({ scenario: input.input.a, scenarioPath: "a", sets: [] })
 	if (isAppError(a)) return a
-	// The what-if applies the Overrides to A and is compared with A; a second Scenario is compared
-	// as stored.
-	const b =
-		input.input.b === undefined
-			? prepare({
-					scenario: input.input.a,
-					scenarioPath: "a",
-					sets: input.input.set ?? [],
-					without: input.input.without ?? [],
-					decimal: input.input.decimal ?? false,
-				})
-			: prepare({ scenario: input.input.b, scenarioPath: "b", sets: [] })
+	const b = secondSide(input.input, prepare)
 	if (isAppError(b)) return b
 	const placed = withCarryIn({
 		sides: [a, b],
