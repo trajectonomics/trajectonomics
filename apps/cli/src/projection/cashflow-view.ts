@@ -47,7 +47,7 @@ export const cashflowRow: z.ZodType<CashflowRow> = z.strictObject({
 	group: z
 		.enum(CASHFLOW_GROUPS)
 		.describe(
-			"The line's source: income, prepaid (tax taken at source), settlement (a Levy's settlement, negative for a refund), expense, category (expenses summed per category), contribution (applied into an Account), unfunded (a Contribution the cash could not fund), withdrawal (a planned withdrawal borrowed from a liability), drawn (taken from an Account by cashflow.withdraw), surplus (filled into an Account by cashflow.surplus) or unmet (spending the run could not fund).",
+			"The line's source: income, prepaid (tax taken at source), settlement (a Levy's settlement, negative for a refund), expense, category (expenses summed per category), contribution (applied into an Account), unfunded (a Contribution the cash could not fund), withdrawal (a planned withdrawal, borrowed from a liability or sold from an asset), drawn (taken from an Account by cashflow.withdraw), surplus (filled into an Account by cashflow.surplus) or unmet (spending the run could not fund).",
 		),
 	id: z
 		.string()

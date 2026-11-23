@@ -39,6 +39,15 @@ function probe(input: {
 	}
 }
 
+/** A Contribution into the asset Account `cash`, which a `funding` value may be stated on. */
+const BUY = {
+	kind: "contribution",
+	target: "cash",
+	amount: 1,
+	frequency: "monthly",
+	growth: { bps: 0 },
+}
+
 /** One valid Flow per kind, because each kind requires and forbids its own keys. */
 const KIND_FLOWS: Record<string, Record<string, unknown>> = {
 	income: INCOME,
@@ -123,6 +132,15 @@ const PROBES: EnumProbe[] = [
 			),
 		refused: () => probe({ flows: [{ ...EXPENSE, frequency: "hourly" }] }),
 		code: "INVALID_FREQUENCY",
+	},
+	{
+		path: ["flows", 0, "funding"],
+		accepted: () =>
+			(nodeAt(["flows", 0, "funding"])["enum"] as string[]).map((funding) =>
+				probe({ flows: [{ ...BUY, funding }], contribute: ["cash"] }),
+			),
+		refused: () => probe({ flows: [{ ...BUY, funding: "sometimes" }] }),
+		code: "INVALID_FUNDING",
 	},
 	{
 		path: ["flows", 1, "derive", "measures", 0, "op"],

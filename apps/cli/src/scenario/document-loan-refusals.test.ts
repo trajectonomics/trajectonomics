@@ -3,7 +3,7 @@ import { scenarioDocumentError } from "./document"
 import { scenarioExample } from "./shape/index"
 import { VERSION } from "./shape/testing"
 
-// Each of the six loan codes (sim ADR-0016) is stated in words by `scenario apply`, at its path, and
+// Each of the six loan codes (sim ADR-0016), and the sale and funding codes (sim ADR-0021), is stated in words by `scenario apply`, at its path, and
 // keeps the schema hint every document refusal carries (ADR-0052).
 const SCHEMA_HINT = 'Run "traj schema scenario apply" to see the document schema.'
 const CASH = { id: "cash", kind: "asset", rate: 0 }
@@ -32,17 +32,34 @@ function levelFlow(overrides: Record<string, unknown>, level: Record<string, unk
 
 const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 	[
-		"WITHDRAWAL_SOURCE_KIND",
+		"WITHDRAWAL_LOCKED",
+		documentWith(
+			{
+				id: "sell",
+				kind: "withdrawal",
+				frequency: "once",
+				start: "2026-01-01",
+				amount: 100,
+				growth: { bps: 0 },
+				source: "vault",
+			},
+			{ id: "vault", kind: "asset", rate: 0, lockedUntil: "2027-01-01" },
+		),
+		"document.flows.0.start",
+	],
+	[
+		"INVALID_FUNDING",
 		documentWith({
-			id: "draw",
-			kind: "withdrawal",
-			frequency: "once",
+			id: "pay",
+			kind: "contribution",
+			target: "loan",
+			frequency: "monthly",
 			start: "2026-01-01",
 			amount: 100,
 			growth: { bps: 0 },
-			source: "cash",
+			funding: "obligation",
 		}),
-		"document.flows.0.source",
+		"document.flows.0.funding",
 	],
 	[
 		"LEVEL_TARGET_NOT_LIABILITY",
@@ -71,7 +88,7 @@ const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 	],
 ]
 
-describe("the six loan refusals of scenario apply", () => {
+describe("the loan, sale and funding refusals of scenario apply", () => {
 	for (const [code, document, path] of CASES) {
 		it(`states ${code} in words at ${path}, and keeps the schema hint`, () => {
 			const error = scenarioDocumentError(document)

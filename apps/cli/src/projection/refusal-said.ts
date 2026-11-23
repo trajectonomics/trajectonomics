@@ -82,9 +82,15 @@ export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	},
 	// The loan rules are found by the document check alone, so `scenario apply` and the Store state
 	// these sentences too (scenarioDocumentError), as well as `projection run` on a stored row.
-	WITHDRAWAL_SOURCE_KIND: {
-		message: "A withdrawal borrows from a liability, and its source Account is not one.",
-		hint: "Name a liability Account as the withdrawal's source. A withdrawal from an asset is outside this version of the document.",
+	WITHDRAWAL_LOCKED: {
+		message:
+			"A withdrawal sells an asset that is locked on the withdrawal's first date, and no Milestone gate says to wait, so it could never move anything on that date.",
+		hint: "Start the withdrawal on or after the asset's lockedUntil, or gate it with startAt on a Milestone.",
+	},
+	INVALID_FUNDING: {
+		message:
+			"A Contribution's funding is neither target nor obligation, or is stated on a debt payment, which is already an obligation.",
+		hint: 'Use "funding": "target" or "obligation" on a Contribution into an asset, and omit it on a Contribution into a liability.',
 	},
 	LEVEL_TARGET_NOT_LIABILITY: {
 		message: "A level payment repays a loan, and its target Account is not a liability.",

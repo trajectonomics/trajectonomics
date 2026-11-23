@@ -37,7 +37,7 @@ export const cashflowTotalRow: z.ZodType<CashflowTotalRow> = z.strictObject({
 	total: z
 		.enum(CASHFLOW_TOTALS)
 		.describe(
-			"The section: money in (income, withdrawals and drawn together), tax (prepaid and settlements together, a refund netting off), withdrawals (planned withdrawals borrowed from liabilities), drawn (taken from an Account by cashflow.withdraw), spending (the roll-up's expense), saving (contributions applied into Accounts), not funded (contributions the cash could not fund), left over (surplus filled into Accounts) or unmet (spending the run could not fund).",
+			"The section: money in (income, withdrawals and drawn together), tax (prepaid and settlements together, a refund netting off), withdrawals (planned withdrawals: borrowed from liabilities, or sold from assets), drawn (taken from an Account by cashflow.withdraw), spending (the roll-up's expense), saving (contributions applied into Accounts), not funded (contributions the cash could not fund), left over (surplus filled into Accounts) or unmet (spending the run could not fund).",
 		),
 	amount: moneyField(
 		"The section's total; a tax total is negative when refunds exceed prepayments",
