@@ -8,7 +8,7 @@ interface Props {
 	scenario: string
 	/** Whether the Edit controls show: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
-	onScenario: (value: string) => void
+	onScenario: (value: string) => unknown
 	/** The terms the address bar asks for, and the setter that writes them. */
 	terms: string
 	onTerms: (value: string) => void

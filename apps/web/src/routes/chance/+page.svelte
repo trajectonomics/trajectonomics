@@ -1,5 +1,6 @@
 <script lang="ts">
-import { queryParam, setQueryParam } from "../../client/query-param.svelte.js"
+import { queryParam } from "../../client/query-param.svelte.js"
+import { selectPlan } from "../../client/select-plan.svelte.js"
 import ChancePage from "../../components/pages/ChancePage.svelte"
 </script>
 
@@ -9,5 +10,5 @@ import ChancePage from "../../components/pages/ChancePage.svelte"
 
 <ChancePage
 	scenario={queryParam("scenario", "")}
-	onScenario={(value) => setQueryParam("scenario", value)}
+	onScenario={selectPlan}
 />

@@ -10,6 +10,7 @@ import type { RunContext } from "./run-traj"
 import { runTraj } from "./run-traj"
 import { failure, readEdit, refused } from "./serve-edit-answer"
 import { json } from "./serve-respond"
+import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
 
 /** What an editor needs: how to run traj, the Plan's parameters, the Carry-in, and the session token. */
@@ -33,6 +34,8 @@ export type Editor = {
 	edit: (request: Request, port: number) => Promise<Response>
 	/** Answers POST /reread: the same guards, then the Snapshot read again, with no write. */
 	reread: (request: Request, port: number) => Promise<Response>
+	/** Answers POST /what-if: the same guards, then four reads with the Overrides, and no write. */
+	whatIf: (request: Request, port: number) => Promise<Response>
 }
 
 /** Creates the editor for one server. The token is the one the server made at start. */
@@ -115,5 +118,7 @@ export function createEditor(options: EditorOptions): Editor {
 		},
 		edit: (request, port) => admit(request, port, () => apply(request)),
 		reread: (request, port) => admit(request, port, rereadAnswer),
+		whatIf: (request, port) =>
+			admit(request, port, () => answerWhatIf(request, params, options.traj, options.records)),
 	}
 }

@@ -6,7 +6,7 @@ interface Props {
 	/** The Scenario the address bar asks for, read by the route file. */
 	scenario: string
 	/** Sets the Scenario in the address bar. */
-	onScenario: (name: string) => void
+	onScenario: (name: string) => unknown
 }
 
 let { scenario, onScenario }: Props = $props()

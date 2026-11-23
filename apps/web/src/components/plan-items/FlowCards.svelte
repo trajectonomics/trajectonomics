@@ -1,15 +1,20 @@
 <script lang="ts">
 import type { FlowCard } from "../../lib/view/plan-items/flows"
 import Money from "../ui/Money.svelte"
+import ItemSwitch from "../what-if/ItemSwitch.svelte"
 
 interface Props {
 	cards: readonly FlowCard[]
 	currency: string
 	editable: boolean
 	onEdit: (id: string) => void
+	/** The plan and the content hash the page read for it: the what-if switch names both. */
+	plan: string
+	contentHash: string
+	onTry: (id: string) => void
 }
 
-let { cards, currency, editable, onEdit }: Props = $props()
+let { cards, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
 </script>
 
 <ul class="grid gap-3 sm:grid-cols-2">
@@ -49,6 +54,9 @@ let { cards, currency, editable, onEdit }: Props = $props()
 					<dd>{card.earned}</dd>
 				{/if}
 			</dl>
+			{#if editable && card.editable}
+				<ItemSwitch {plan} {contentHash} path="flows.{card.id}" label={card.id} onTry={() => onTry(card.id)} />
+			{/if}
 		</li>
 	{/each}
 </ul>

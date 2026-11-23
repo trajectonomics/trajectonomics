@@ -13,6 +13,7 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 			return [...scenarios]
 		case "copy-plan":
 		case "apply-plan":
+		case "apply-overrides":
 			return scenarios.length === 0 || scenarios.includes(edit.name)
 				? [...scenarios]
 				: [...scenarios, edit.name]

@@ -5,14 +5,11 @@ import { accountCards } from "../../lib/view/plan-items/accounts"
 import { flowCards } from "../../lib/view/plan-items/flows"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import { loanCards } from "../../lib/view/plan-items/loans"
-import Drawer from "../ui/Drawer.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
-import StaleNotice from "../ui/StaleNotice.svelte"
 import AccountCards from "./AccountCards.svelte"
-import AccountForm from "./AccountForm.svelte"
 import FlowCards from "./FlowCards.svelte"
-import FlowForm from "./FlowForm.svelte"
 import LoanCards from "./LoanCards.svelte"
+import PlanItemDrawer from "./PlanItemDrawer.svelte"
 
 interface Props {
 	kind: PlanKind
@@ -28,23 +25,25 @@ interface Props {
 }
 
 let { kind, name, doc, household, baseline, editable, contentHash }: Props = $props()
-/** The drawer: null when it is shut, else the item it edits, or no id for a new one. */
-let drawer = $state<{ id?: string } | null>(null)
+/**
+ * The drawer: null when it is shut, else the item it edits (or no id for a new one), and whether it tries a
+ * value in the What-if session rather than saving one.
+ */
+let drawer = $state<{ id?: string; tryValue?: boolean } | null>(null)
 
 /** Opens or shuts the drawer. A refusal from an earlier save is forgotten, so it never shows on the next form. */
-function setDrawer(next: { id?: string } | null): void {
+function setDrawer(next: { id?: string; tryValue?: boolean } | null): void {
 	editSession.clear()
 	drawer = next
 }
 const noun = $derived(PLAN_PAGES[kind].noun)
-const editingId = $derived(drawer === null ? undefined : drawer.id)
-const title = $derived(editingId === undefined ? `Add ${noun}` : `Edit ${editingId}`)
-const flowKind = $derived(kind === "expense" ? "expense" : "income")
-const cards = $derived(kind === "assets" ? [] : flowCards(doc.flows, flowKind, household))
+const cards = $derived(
+	kind === "assets"
+		? []
+		: flowCards(doc.flows, kind === "expense" ? "expense" : "income", household),
+)
 const accounts = $derived(accountCards(doc.accounts, baseline))
 const loans = $derived(kind === "assets" ? loanCards(doc.flows) : [])
-const existingFlow = $derived(doc.flows.find((flow) => flow.id === editingId))
-const existingAccount = $derived(doc.accounts.find((account) => account.id === editingId))
 const busy = $derived(editSession.busy)
 </script>
 
@@ -66,7 +65,15 @@ const busy = $derived(editSession.busy)
 		{#if accounts.length === 0}
 			<EmptyState title="No accounts in this plan" />
 		{:else}
-			<AccountCards cards={accounts} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
+			<AccountCards
+			cards={accounts}
+			currency={doc.currency}
+			{editable}
+			plan={name}
+			{contentHash}
+			onEdit={(id) => setDrawer({ id })}
+			onTry={(id) => setDrawer({ id, tryValue: true })}
+		/>
 		{/if}
 		{#if loans.length > 0}
 			<LoanCards cards={loans} currency={doc.currency} />
@@ -74,14 +81,23 @@ const busy = $derived(editSession.busy)
 	{:else if cards.length === 0}
 		<EmptyState title="No {noun} in this plan" />
 	{:else}
-		<FlowCards {cards} currency={doc.currency} {editable} onEdit={(id) => setDrawer({ id })} />
+		<FlowCards
+			{cards}
+			currency={doc.currency}
+			{editable}
+			plan={name}
+			{contentHash}
+			onEdit={(id) => setDrawer({ id })}
+			onTry={(id) => setDrawer({ id, tryValue: true })}
+		/>
 	{/if}
-	<Drawer open={drawer !== null} {title} onClose={() => setDrawer(null)}>
-		<StaleNotice />
-		{#if drawer !== null && kind === "assets"}
-			<AccountForm {name} {doc} {contentHash} existing={existingAccount} onDone={() => setDrawer(null)} />
-		{:else if drawer !== null}
-			<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} onDone={() => setDrawer(null)} />
-		{/if}
-	</Drawer>
+	<PlanItemDrawer
+		{drawer}
+		{kind}
+		{name}
+		{doc}
+		{household}
+		{contentHash}
+		onClose={() => setDrawer(null)}
+	/>
 </div>
