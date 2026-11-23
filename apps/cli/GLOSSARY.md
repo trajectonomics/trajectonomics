@@ -26,6 +26,10 @@ _Avoid_: Forecast, model
 The month-by-month result of running a baseline through a scenario. The same baseline and scenario always give the same projection.
 _Avoid_: Run, output
 
+**Cash-flow breakdown**:
+The lines one Annual roll-up of a Projection is made of, by source, tax, category and Account, as the engine routed them (`projection run --breakdown`, ADR-0058). Each total is the engine's figure or an exact sum of its lines, and money in plus unmet equals money out.
+_Avoid_: Cash-flow statement, budget, flow report
+
 **As-of**:
 The date a result is evaluated at. Every result states it.
 _Avoid_: Today, now, snapshot date

@@ -1,0 +1,58 @@
+# A projection run breaks each year into the lines the engine routed, and the CLI adds only the engine's own lines
+
+Status: accepted. Ships in 0.8.0 (`projection run --breakdown`).
+
+`sim` reports, per Annual roll-up, where the money came from and where it went (sim ADR-0018): each
+Flow's income, each Levy's prepayment and settlement, each expense with its category, each Contribution
+applied and dropped, each planned withdrawal, what `cashflow.withdraw` drew and what `cashflow.surplus`
+filled. The Dashboard may compute nothing (web ADR 0002) and the CLI cannot rebuild the routing (cli
+AGENTS rule 3), so the CLI shows the engine's lines and nothing else. This ADR records the shape of that
+output, and where the CLI does arithmetic at all.
+
+## Decision
+
+- **Opt-in.** `projection run --breakdown` passes `cashflowBreakdown` to the engine and adds a `cashflow`
+  entry to `tables` (ADR-0027). Without the flag the run is byte-identical to before: no key, no entry, no
+  block.
+- **A long table.** The entry is one row per Annual roll-up and line, roll-up by roll-up, in the engine's
+  group order: `income`, `prepaid`, `settlement`, `expense`, `category`, `contribution`, `unfunded`,
+  `withdrawal`, `drawn`, `surplus`, `unmet`. Every row carries the same keys (`index`, `from`, `to`,
+  `group`, `id`, `account`, `category`, `amount`), with `null` where a key does not apply, so the output
+  schema is one object and no line is a different shape. `id` is the Flow for Flow lines, the Levy for
+  `prepaid` and `settlement`, the category name for `category` (null for the uncategorised total), and null
+  for `drawn`, `surplus` and `unmet`. A `contribution` line is the applied amount and its `unfunded` line
+  the dropped part, each present only when non-zero. A line whose amount is zero is left out, as the
+  engine leaves it out.
+- **Amounts are the engine's.** Each amount is an engine minor-unit integer formatted at the Currency's
+  scale by the money formatter. A settlement keeps its sign, so a refund is negative.
+- **Human form: one block per roll-up.** Each block prints after the body. Its section totals are the
+  engine's figures where the engine gives one: `income`, `spending`, `saving` and `unfunded` come from the
+  annual row, which carries those `AnnualRollup` fields; `unmet` too, when non-zero. A total the engine gives
+  no field for is the exact integer sum of the engine's own lines, in minor units, and nothing else:
+  `money in` (income, withdrawals and drawn), `tax` (prepaid and settlements), `withdrawals`, `drawn` and
+  `left over` (surplus). Where the engine has a field for one of these (`levy`, `withdrawals`), its value
+  equals that sum by sim ADR-0018's identity; the sum is taken from the lines because the annual row, and so
+  the JSON, does not carry the field.
+- **Why no total of the CLI's own.** The CLI prints no figure that is neither an engine field nor an exact
+  sum of engine lines. The one arithmetic it does is that sum, and the identity in sim ADR-0018 is what makes
+  it correct; `projection-breakdown.test.ts` hand-checks each printed total against the plan's numbers.
+- **JSON carries the lines only.** The totals are not added to JSON: the long table is the contract, and a
+  total in JSON would be a second figure a caller could disagree with.
+
+## Considered options
+
+- **Totals in JSON.** Rejected: the table would then state figures beside its lines, and the annual row would
+  need `levy` and `withdrawals` to carry the same totals, which changes its bytes with the flag.
+- **The long table in the human form.** Rejected: a person reads a year, not a list of routed lines. The
+  block is that year; the table is the same lines for a program.
+- **A block per line group, with its own table.** Rejected: five headings per year reads worse than one block
+  with its totals and the lines under them.
+
+## Consequences
+
+- The blocks print after the body, which is after the annual table and the notes. A person reads the annual
+  table first and the block below it, but not directly beneath the annual row.
+- The web contract (`apps/web/src/lib/contract/projection-tables.ts`) accepts the `cashflow` table. No page
+  reads it yet; the Cash flow page is #284.
+- Every line is a row of the output schema, so the schema lists the groups and their meaning, and a new
+  group is a schema change with its own decision.

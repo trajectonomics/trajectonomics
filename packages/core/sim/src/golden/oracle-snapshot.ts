@@ -1,4 +1,5 @@
 import type { AccountId, DateString } from "../types"
+import { oracleLeftOut } from "./oracle-access"
 import { oracleCountedDays } from "./oracle-date"
 import { oracleDeflate } from "./oracle-money"
 import { type OracleStates, oracleValueParts } from "./oracle-state"
@@ -60,11 +61,7 @@ export function oracleSnapshot(
 		const realSigned = state.rule.kind === "liability" ? -real.amount : real.amount
 		net += signed
 		realNet += realSigned
-		const unlocked =
-			state.rule.kind !== "asset" ||
-			state.rule.lockedUntil === undefined ||
-			date >= state.rule.lockedUntil
-		if (unlocked) {
+		if (!oracleLeftOut(state.rule, date)) {
 			accessible += signed
 			realAccessible += realSigned
 		}

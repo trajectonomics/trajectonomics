@@ -1,5 +1,12 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
+import { type CashflowRow, cashflowRow } from "./cashflow-view"
+import {
+	type LiabilityMonthsTable,
+	liabilityMonthsTable,
+	type PaidOffTable,
+	paidOffTable,
+} from "./liabilities-view"
 import { type MilestoneRow, milestoneRow } from "./milestones"
 import { dateField } from "./money"
 import { type AnnualRow, annualRow, type MonthlyRow, monthlyRow } from "./rows-view"
@@ -19,10 +26,16 @@ import {
 export type { AnnualRow, MonthlyRow } from "./rows-view"
 export type { TaxYearView } from "./tax-view"
 
-/** The Projection's annual roll-up, its monthly rows with `--monthly`, and its milestones (cli ADR-0049). */
+/**
+ * The Projection's annual roll-up, its monthly rows with `--monthly`, its cash flow with `--breakdown`
+ * (cli ADR-0058), its loans with `--liabilities` (cli ADR-0059) and its milestones (cli ADR-0049).
+ */
 export type ProjectionTable =
 	| { name: "annual"; count: number; rows: AnnualRow[] }
 	| { name: "monthly"; count: number; rows: MonthlyRow[] }
+	| { name: "cashflow"; count: number; rows: CashflowRow[] }
+	| LiabilityMonthsTable
+	| PaidOffTable
 	| { name: "milestones"; count: number; rows: MilestoneRow[] }
 
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
@@ -45,6 +58,19 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 		count: z.number().int().describe("The number of monthly rows."),
 		rows: z.array(monthlyRow).describe("One row per month, in order."),
 	}),
+	z.strictObject({
+		name: z
+			.literal("cashflow")
+			.describe("Each Annual roll-up's cash flow by line, present only with --breakdown."),
+		count: z.number().int().describe("The number of cash-flow rows."),
+		rows: z
+			.array(cashflowRow)
+			.describe(
+				"One row per Annual roll-up and line, roll-up by roll-up in the engine's order. A line is a source (income, prepaid, settlement, expense, category, contribution, unfunded, withdrawal, drawn, surplus or unmet) and carries its id, account and category where it has them. Amounts are decimal strings at the Currency's scale, and a settlement keeps its sign. The totals are not in the table: the human form prints them.",
+			),
+	}),
+	liabilityMonthsTable,
+	paidOffTable,
 	z.strictObject({
 		name: z
 			.literal("milestones")
@@ -71,6 +97,6 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow when --breakdown was given, the loans when --liabilities was given, and the milestones when the Scenario declares them.",
 		),
 })

@@ -99,8 +99,12 @@ The tallies and Prepayment already recorded for a Settlement period that began b
 _Avoid_: Year-to-date, opening income
 
 **Account**:
-A named balance with an explicit rule in the Scenario: `kind` (`asset` or `liability`), rate in basis points, optional `lockedUntil`. Every account with a balance must have a rule. A liability's balance is the positive amount owed. Without `compounding`, `rate` is an **effective annual rate**: one year grows the balance by exactly the rate, whatever the compounding period, unless a Return series covers those dates. With `compounding`, `rate` is a **nominal annual rate** and the Account also carries the split of **Capitalised balance** and **Accrued interest**. A Return series replaces the rate for the dates it covers; the rate stays required and validated.
+A named balance with an explicit rule in the Scenario: `kind` (`asset` or `liability`), rate in basis points, optional `lockedUntil`, and optional `liquid`, where `liquid: false` marks an **Illiquid asset**. Every account with a balance must have a rule. A liability's balance is the positive amount owed. Without `compounding`, `rate` is an **effective annual rate**: one year grows the balance by exactly the rate, whatever the compounding period, unless a Return series covers those dates. With `compounding`, `rate` is a **nominal annual rate** and the Account also carries the split of **Capitalised balance** and **Accrued interest**. A Return series replaces the rate for the dates it covers; the rate stays required and validated.
 _Avoid_: Wallet, holding
+
+**Illiquid asset**:
+An asset Account marked `liquid: false`, such as a home or a car. It is in Net worth and `allAssets`, and left out of Accessible net worth, `unlockedAssets`, the Minimum buffer, the rule-of-thumb numerator on the unlocked and accessible bases, and the accessible Metrics. No `withdraw` or `surplus` step may name it, though a contribution may fund it. It is never sold by the simulation: a sale is a later primitive. Absent or `liquid: true` means liquid, and `liquid` on a liability is refused.
+_Avoid_: Real asset (the word `real` already means inflation-adjusted money), locked asset (a locked asset only waits for `lockedUntil`)
 
 **Nominal annual rate**:
 A rate stated by a contract or a law together with a **Compounding period**, such as "7% nominal, compounded monthly". It is not an effective annual rate: a full period earns exactly `rate / periodsPerYear`, and a year earns more when the interest is capitalised more often. An Account's `rate` is nominal exactly when it carries `compounding`; absent, the rate is effective annual.
@@ -190,7 +194,7 @@ The date of the first Shortfall, recorded with the unmet amount. Absent when mon
 _Avoid_: Depletion date, bankruptcy
 
 **Net worth / Accessible net worth**:
-Net worth is every Account's value with liabilities subtracted, including locked assets. Accessible net worth does the same but leaves out assets before their `lockedUntil`; it is not the same as the subset the `withdraw` list can draw on.
+Net worth is every Account's value with liabilities subtracted, including locked and Illiquid assets. Accessible net worth does the same but leaves out assets before their `lockedUntil` and every Illiquid asset; it is not the same as the subset the `withdraw` list can draw on.
 _Avoid_: Liquid assets, spendable
 
 **Financial Independence (FI)**:
@@ -206,7 +210,7 @@ The monthly spending that replaces planned expenses from the FI month onward whe
 _Avoid_: Post-retirement expenses, withdrawal rate
 
 **Minimum buffer**:
-The number of months of expenses the FI method requires as accessible net worth.
+The number of months of expenses the FI method requires as accessible net worth. An Illiquid asset does not count toward it.
 _Avoid_: Emergency fund, cash reserve
 
 **Rule-of-thumb reference**:

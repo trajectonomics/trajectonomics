@@ -1,6 +1,8 @@
 import type { Fixture } from "../fixtures/fixture"
-import type { Criterion, DateString, Flow, Milestone } from "../types"
+import type { DateString, Flow, Milestone } from "../types"
+import { oracleMarkedIds } from "./oracle-access"
 import { oracleAddDays, oracleAddMonthsClamped } from "./oracle-date"
+import { holds, type Opening } from "./oracle-milestone-criteria"
 
 /** Milestone id to fire date. */
 export type OracleFires = Map<string, DateString>
@@ -8,14 +10,15 @@ export type OracleFires = Map<string, DateString>
 export interface OracleWalk {
 	readonly survived: boolean
 	readonly fires: OracleFires
-	/** The cash left after each day's Flows, for every day of the walk. */
+	/** The accessible cash left after each day's Flows, for every day of the walk. */
 	readonly after: ReadonlyMap<DateString, number>
 }
 
 /**
- * The oracle for Milestone plans covers one asset Account at rate 0, zero inflation, monthly and
- * `once` Flows with a fixed amount on a day-of-month every month has, and Milestones made of
- * `date` and nominal `netWorth` criteria. Net worth is then the cash balance.
+ * The oracle for Milestone plans covers one liquid asset Account plus Accounts marked `liquid: false`
+ * at rate 0 that no Flow touches, zero inflation, monthly and `once` Flows with a fixed amount on a
+ * day-of-month every month has, and Milestones made of `date`, `netWorth` and `accessibleNetWorth`
+ * criteria. Accessible net worth is then the cash, and net worth adds the marked balances.
  */
 export function oracleAmount(flow: Flow): number {
 	if (!("amount" in flow)) throw new Error("the oracle takes fixed amounts only")
@@ -34,14 +37,6 @@ export function oracleDues(flow: Flow, last: DateString): DateString[] {
 	}
 }
 
-function holds(criterion: Criterion, date: DateString, cash: number): boolean {
-	if (criterion.kind === "date") return date >= criterion.on
-	if (criterion.kind !== "metric" || criterion.metric !== "netWorth") {
-		throw new Error("the oracle takes date and netWorth criteria only")
-	}
-	return criterion.op === "atLeast" ? cash >= criterion.amount : cash <= criterion.amount
-}
-
 /** A Milestone of dates only fires on a date known beforehand: its latest (`all`) or earliest (`any`). */
 function staticFire(milestone: Milestone): DateString | undefined {
 	if (milestone.criteria.some((criterion) => criterion.kind !== "date")) return undefined
@@ -49,8 +44,8 @@ function staticFire(milestone: Milestone): DateString | undefined {
 	return milestone.combine === "all" ? dates[dates.length - 1] : dates[0]
 }
 
-function fires(milestone: Milestone, date: DateString, cash: number): boolean {
-	const results = milestone.criteria.map((criterion) => holds(criterion, date, cash))
+function fires(milestone: Milestone, date: DateString, opening: Opening): boolean {
+	const results = milestone.criteria.map((criterion) => holds(criterion, date, opening))
 	return milestone.combine === "all" ? results.every(Boolean) : results.some(Boolean)
 }
 
@@ -86,9 +81,11 @@ function oracleDay(
 	due: readonly Flow[],
 	day: DateString,
 	opening: number,
+	marked: number,
 ): number {
+	const balances = { accessible: opening, net: opening + marked }
 	for (const milestone of due.length === 0 ? [] : milestones) {
-		if (!known.has(milestone.id) && fires(milestone, day, opening)) known.set(milestone.id, day)
+		if (!known.has(milestone.id) && fires(milestone, day, balances)) known.set(milestone.id, day)
 	}
 	let cash = opening
 	for (const flow of due.filter((item) => oracleLands(known, item, day))) {
@@ -104,9 +101,15 @@ export function oracleWalk(fixture: Fixture, flows: readonly Flow[]): OracleWalk
 	const known = startFires(milestones)
 	const dues = duesByDate(flows, timeline.horizon)
 	const after = new Map<DateString, number>()
-	let cash = fixture.baseline.balances.reduce((sum, balance) => sum + balance.amount, 0)
+	const markedIds = oracleMarkedIds(scenario.accounts)
+	let cash = 0
+	let illiquid = 0
+	for (const balance of fixture.baseline.balances) {
+		if (markedIds.has(balance.account)) illiquid += balance.amount
+		else cash += balance.amount
+	}
 	for (let day = timeline.start; day <= timeline.horizon; day = oracleAddDays(day, 1)) {
-		cash = oracleDay(known, milestones, dues.get(day) ?? [], day, cash)
+		cash = oracleDay(known, milestones, dues.get(day) ?? [], day, cash, illiquid)
 		if (cash < 0) return { survived: false, fires: known, after }
 		after.set(day, cash)
 	}

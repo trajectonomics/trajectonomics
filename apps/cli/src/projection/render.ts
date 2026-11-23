@@ -1,5 +1,7 @@
 import type { ColumnHint, RenderHint } from "../table"
+import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
 import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
+import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
 import {
 	compareMilestoneBlocks,
 	compareMilestonesHidden,
@@ -27,8 +29,9 @@ const agesColumn: ColumnHint = { key: "ages", label: "Ages", show: agesText }
 
 /**
  * `projection run`'s human view: the annual roll-up, the monthly rows when asked, the tax years the
- * Scenario's Levies settle, and the notes under them. Only the human Format reads it; `--json`
- * keeps the output schema as the contract.
+ * Scenario's Levies settle, the notes under them, and with `--breakdown` a cash-flow block per
+ * roll-up (cli ADR-0058). Only the human Format reads it; `--json` keeps the output schema as the
+ * contract.
  *
  * Every field of a row is a column, headed by its own key, so the table neither drops nor renames
  * a value (ADR-0027). The nested `realNetWorth` reads as its compact JSON.
@@ -45,6 +48,8 @@ export const projectionHint: RenderHint = {
 			column("openingNetWorth", "right"),
 			column("closingNetWorth", "right"),
 			column("income", "right"),
+			// Shown only when a row states it, so a Scenario without a withdrawal Flow prints as before.
+			{ ...column("withdrawals", "right"), optional: true },
 			column("expense", "right"),
 			column("contributions", "right"),
 			column("unfundedContributions", "right"),
@@ -63,7 +68,9 @@ export const projectionHint: RenderHint = {
 		],
 		milestones: milestoneColumns,
 	},
-	display: runMilestonesShown,
+	// The long cash-flow and liability tables are JSON's; the human form prints them as blocks after the body.
+	display: (data) => liabilitiesHidden(cashflowHidden(runMilestonesShown(data))),
+	blocks: (data) => [...cashflowBlocks(data), ...liabilityBlocks(data)],
 	note: "notes",
 	extra: [
 		{

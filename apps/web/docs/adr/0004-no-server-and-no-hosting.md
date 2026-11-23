@@ -1,5 +1,5 @@
 ---
-status: superseded in part by 0007 (the loopback server)
+status: superseded in part by 0007 (the loopback server) and 0009 (the hosted Demo)
 ---
 
 # No server and no hosting

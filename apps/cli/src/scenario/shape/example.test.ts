@@ -9,7 +9,7 @@ import { nodeAt, type Path, refusalsOf, VERSION } from "./testing"
  */
 
 type Account = { kind?: string; compounding?: string; lockedUntil?: string }
-type Flow = { kind?: string; growth?: unknown }
+type Flow = { kind?: string; growth?: unknown; level?: unknown }
 
 const EXAMPLE = scenarioExample(VERSION ?? 0) as {
 	accounts: Account[]
@@ -45,7 +45,11 @@ describe("the worked example", () => {
 		expect(EXAMPLE.accounts.some((account) => account.compounding !== undefined)).toBe(true)
 		expect(EXAMPLE.accounts.some((account) => account.lockedUntil !== undefined)).toBe(true)
 		const flows = EXAMPLE.flows.map((flow) => flow.kind)
-		expect(flows).toEqual(expect.arrayContaining(["income", "expense", "contribution"]))
+		expect(flows).toEqual(
+			expect.arrayContaining(["income", "expense", "contribution", "withdrawal"]),
+		)
+		// The loan's level payment is the one Flow that states `level` rather than `amount`.
+		expect(EXAMPLE.flows.some((flow) => flow.level !== undefined)).toBe(true)
 		expect(EXAMPLE.flows.map((flow) => flow.growth)).toEqual(
 			expect.arrayContaining(["inflation", { bps: 200 }]),
 		)

@@ -1,4 +1,5 @@
 import type { DateString, Scenario, SurplusStep } from "../types"
+import { oracleLeftOut } from "./oracle-access"
 import { type OracleEvent, oracleAmount } from "./oracle-flow"
 import { type OracleStates, oracleMutate, oracleValuation } from "./oracle-state"
 
@@ -52,11 +53,7 @@ export function oracleWithdraw(
 	for (const account of scenario.cashflow.withdraw) {
 		if (remaining === 0n) return 0n
 		const state = states.get(account)!
-		const locked =
-			state.rule.kind === "asset" &&
-			state.rule.lockedUntil !== undefined &&
-			date < state.rule.lockedUntil
-		if (locked) continue
+		if (oracleLeftOut(state.rule, date)) continue
 		const take = min(remaining, oracleValuation(state, date))
 		if (take > 0n) {
 			oracleMutate(state, date, -take)

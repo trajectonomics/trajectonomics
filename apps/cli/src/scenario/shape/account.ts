@@ -29,6 +29,11 @@ export const accountShape: Record<string, unknown> = {
 			type: "string",
 			description: `Assets only, ${DATE} Value held in the Account does not count toward accessible net worth until then.`,
 		},
+		liquid: {
+			type: "boolean",
+			description:
+				"Assets only: `false` marks an illiquid asset, such as a home or a car. It stays in net worth, but it does not count toward accessible net worth, the reference, the minimum buffer or the unlocked-asset and accessible-net-worth Metrics, and no withdrawal or surplus step may draw on it. Omit it, or give `true`, for a liquid asset.",
+		},
 		returnLabel: {
 			type: "string",
 			description:
