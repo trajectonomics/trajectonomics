@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test"
+import { LABEL_HALF, layoutFlow } from "../../chart/flow"
 import type { ProjectionRun, Read } from "../../contract"
 import { projectionRunFixture } from "../projection/fixtures.test-support"
 import {
 	accountNamesOf,
 	chooseRollup,
 	hasCashflow,
+	pickedKey,
 	rollupsOf,
 	sectionsOf,
 	yearLabel,
@@ -63,6 +65,16 @@ describe("rollupsOf and chooseRollup", () => {
 	})
 })
 
+describe("pickedKey", () => {
+	test("a pick shows in the year it was made in, and not in another", () => {
+		const pick = { index: 1, key: '["income","salary",null,null]' }
+		expect(pickedKey(pick, 1)).toBe(pick.key)
+		expect(pickedKey(pick, 0)).toBeNull()
+		expect(pickedKey(null, 1)).toBeNull()
+		expect(pickedKey(pick, undefined)).toBeNull()
+	})
+})
+
 describe("sectionsOf", () => {
 	const year = (index: number) => {
 		const rollup = rollupsOf(cashflowRunFixture()).find((entry) => entry.index === index)
@@ -91,13 +103,16 @@ describe("sectionsOf", () => {
 		expect(sections.find((section) => section.total === "money in")?.amount).toBeNull()
 	})
 
-	test("the spending section lists the categories first, then each Flow's expense", () => {
+	test("the spending section has two parts, by category and by expense, each a view of the same total", () => {
 		const spending = sectionsOf(year(0)).find((section) => section.total === "spending")
-		expect(spending?.lines.map((line) => [line.group, line.id])).toEqual([
+		expect(spending?.parts.map((part) => part.heading)).toEqual(["by category", "by expense"])
+		expect(spending?.parts[0]?.lines.map((line) => [line.group, line.id])).toEqual([
 			["category", "housing"],
 			["category", "food"],
 			["category", "transport"],
 			["category", null],
+		])
+		expect(spending?.parts[1]?.lines.map((line) => [line.group, line.id])).toEqual([
 			["expense", "rent"],
 			["expense", "food"],
 			["expense", "fees"],
@@ -107,7 +122,8 @@ describe("sectionsOf", () => {
 
 	test("the tax section groups the Prepayment and the settlement, which keeps its sign", () => {
 		const tax = sectionsOf(year(0)).find((section) => section.total === "tax")
-		expect(tax?.lines.map((line) => [line.group, line.amount])).toEqual([
+		expect(tax?.parts.map((part) => part.heading)).toEqual([null])
+		expect(tax?.parts[0]?.lines.map((line) => [line.group, line.amount])).toEqual([
 			["prepaid", "6000.00"],
 			["settlement", "-1800.00"],
 		])
@@ -142,6 +158,16 @@ describe("flowOf", () => {
 			["unmet", "500.00"],
 		])
 		expect(flow.uses.map((band) => band.kind)).toEqual(["spending"])
+	})
+
+	test("every label of each year's diagram lies inside the diagram's box", () => {
+		for (const rollup of rollupsOf(cashflowRunFixture())) {
+			const layout = layoutFlow(flowOf(rollup, ACCOUNTS))
+			for (const node of layout.nodes) {
+				expect(node.labelY - LABEL_HALF).toBeGreaterThanOrEqual(0)
+				expect(node.labelY + LABEL_HALF).toBeLessThanOrEqual(layout.height)
+			}
+		}
 	})
 
 	test("a band's key is its line's key, so a table row can name the band it shows", () => {

@@ -2,22 +2,38 @@ import type { FlowBand, FlowNode } from "./flow-types"
 import { toChartNumber } from "./number"
 
 /**
- * The geometry helpers of the flow diagram: stacking a column, spacing its labels, and the closed path of
- * a band. Pure: numbers in, numbers and path strings out. `flow.ts` assembles them into a layout.
+ * The geometry helpers of the flow diagram: stacking a column, centring it on the cash node, spacing its
+ * labels, and the closed path of a band. Pure: numbers in, numbers and path strings out. `flow.ts`
+ * assembles them into a layout.
  */
 
 /** The space above and below the diagram, so a label at the edge of a band is not cut off. */
 export const FLOW_MARGIN = 8
 /** The least height of a band whose amount is not zero, so a thin band stays visible. Its label keeps the true amount. */
 export const FLOW_MIN_HEIGHT = 3
+/** The gap between two bands of one column, so their edges do not run together. */
+export const FLOW_BAND_GAP = 4
 /** The least distance between two labels in one column, so their text does not overlap. */
 export const LABEL_SPACING = 14
+/** Half the height of a label's line (12px text on a 16px line), so a label's box is its y plus or minus this. */
+export const LABEL_HALF = 8
 
-/** A band placed in its column: its top and height. */
-export interface Placed<T> {
-	readonly band: T
+/** A band the caller states, with its magnitude in chart units. */
+export type Sized = FlowBand & { readonly value: number }
+
+/** A band stacked in its column: its top from the cash node's top, and its height. */
+export interface Placed {
+	readonly band: Sized
 	readonly y: number
 	readonly height: number
+}
+
+/** A band in its column, with the top where its ribbon meets the cash node and the top of its own node. */
+export interface Slot {
+	readonly band: Sized
+	readonly height: number
+	readonly top: number
+	readonly nodeTop: number
 }
 
 /** Rounds a coordinate to two decimals, so the path strings are stable. */
@@ -40,19 +56,37 @@ export function columnTotal(bands: readonly { readonly value: number }[]): numbe
 	return bands.reduce((sum, band) => sum + band.value, 0)
 }
 
-/** Stacks a column from the top: each band's height is its share of the scale, lifted to the minimum. */
-export function place<T extends { readonly value: number }>(
-	bands: readonly T[],
+/**
+ * Stacks a column from the top: each band's height is its share of the scale, lifted to the minimum, and
+ * a gap separates it from the next. `extent` is the column's height from its first band to its last.
+ */
+export function place(
+	bands: readonly Sized[],
 	scale: number,
-): { placed: Placed<T>[]; extent: number } {
+): { placed: Placed[]; extent: number } {
 	let y = FLOW_MARGIN
-	const placed = bands.map((band): Placed<T> => {
+	const placed = bands.map((band): Placed => {
 		const height = Math.max(FLOW_MIN_HEIGHT, band.value * scale)
 		const entry = { band, y, height }
-		y += height
+		y += height + FLOW_BAND_GAP
 		return entry
 	})
-	return { placed, extent: y - FLOW_MARGIN }
+	const extent = placed.length === 0 ? 0 : y - FLOW_BAND_GAP - FLOW_MARGIN
+	return { placed, extent }
+}
+
+/**
+ * Centres a column on the cash node. The taller column sits at the node's top; a shorter one moves down by
+ * half the difference, so its ribbons bend into the node rather than running flat.
+ */
+export function slotsOf(column: { placed: Placed[]; extent: number }, cashHeight: number): Slot[] {
+	const offset = round((cashHeight - column.extent) / 2)
+	return column.placed.map((entry) => ({
+		band: entry.band,
+		height: entry.height,
+		top: entry.y,
+		nodeTop: round(entry.y + offset),
+	}))
 }
 
 /** Each label's y, pushed down where it would sit on the one above. */
@@ -65,61 +99,26 @@ export function spreadLabels(centers: readonly number[]): number[] {
 	return ys
 }
 
-/** One closed path from a band on the left to a band on the right: its top and bottom edges, as cubic curves. */
-export function ribbon(
-	x1: number,
-	top1: number,
-	bottom1: number,
-	x2: number,
-	top2: number,
-	bottom2: number,
-): string {
-	const mid = (x1 + x2) / 2
-	const p = (n: number) => String(round(n))
-	return [
-		`M${p(x1)},${p(top1)}`,
-		`C${p(mid)},${p(top1)} ${p(mid)},${p(top2)} ${p(x2)},${p(top2)}`,
-		`L${p(x2)},${p(bottom2)}`,
-		`C${p(mid)},${p(bottom2)} ${p(mid)},${p(bottom1)} ${p(x1)},${p(bottom1)}`,
-		"Z",
-	].join(" ")
-}
-
-/** A band with its magnitude in chart units. */
-export type Sized = FlowBand & { readonly value: number }
-
-/** Each band's top and bottom edge at the cash node, stacked in order from the node's top. */
-export function cashEnds(
-	column: readonly Placed<Sized>[],
-): { entry: Placed<Sized>; top: number; bottom: number }[] {
-	let cursor = FLOW_MARGIN
-	return column.map((entry) => {
-		const top = cursor
-		cursor += entry.height
-		return { entry, top, bottom: cursor }
-	})
-}
-
 /** The nodes of one column, with their labels spread so they do not overlap. */
 export function nodesOf(
-	column: readonly Placed<Sized>[],
+	slots: readonly Slot[],
 	side: "source" | "use",
 	x: number,
 	labelX: number,
 	anchor: "start" | "end",
 ): FlowNode[] {
-	const labelYs = spreadLabels(column.map((entry) => entry.y + entry.height / 2))
-	return column.map((entry, index) => ({
-		key: entry.band.key,
-		kind: entry.band.kind,
-		label: entry.band.label,
-		amount: entry.band.amount,
+	const labelYs = spreadLabels(slots.map((slot) => slot.nodeTop + slot.height / 2))
+	return slots.map((slot, index) => ({
+		key: slot.band.key,
+		kind: slot.band.kind,
+		label: slot.band.label,
+		amount: slot.band.amount,
 		side,
 		x: round(x),
-		y: round(entry.y),
-		height: round(entry.height),
+		y: round(slot.nodeTop),
+		height: round(slot.height),
 		labelX: round(labelX),
-		labelY: round(labelYs[index] ?? entry.y),
+		labelY: round(labelYs[index] ?? slot.nodeTop + slot.height / 2),
 		anchor,
 	}))
 }

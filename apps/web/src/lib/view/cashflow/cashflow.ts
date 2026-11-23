@@ -27,31 +27,47 @@ export interface Rollup {
 	readonly totals: readonly CashflowTotal[]
 }
 
-/** One section of the table: its total's name, the CLI's amount for it, and the lines it groups. */
+/**
+ * One part of a section: its sub-heading, if the CLI's lines of the section come in two sets, and the
+ * lines of that part. A section's parts are each a full view of its total, so they are never added up.
+ */
+export interface SectionPart {
+	readonly heading: string | null
+	readonly lines: readonly CashflowLine[]
+}
+
+/** One section of the table: its total's name, the CLI's amount for it, and its parts in the order drawn. */
 export interface Section {
 	readonly total: CashflowTotal["total"]
 	readonly amount: string | null
-	readonly lines: readonly CashflowLine[]
+	readonly parts: readonly SectionPart[]
 }
 
 /**
  * The sections in the order a person reads them. Each names the total the CLI gives it and the line
  * groups that make up its rows. `money in` is income; withdrawals and drawn have their own sections,
- * which the engine's `money in` includes.
+ * which the engine's `money in` includes. Spending's categories and its per-Flow expenses are two views of
+ * the same total, so each is a part under its own heading.
  */
 const SECTIONS: readonly {
 	total: CashflowTotal["total"]
-	groups: readonly CashflowLine["group"][]
+	parts: readonly { heading: string | null; groups: readonly CashflowLine["group"][] }[]
 }[] = [
-	{ total: "money in", groups: ["income"] },
-	{ total: "tax", groups: ["prepaid", "settlement"] },
-	{ total: "withdrawals", groups: ["withdrawal"] },
-	{ total: "drawn", groups: ["drawn"] },
-	{ total: "spending", groups: ["category", "expense"] },
-	{ total: "saving", groups: ["contribution"] },
-	{ total: "not funded", groups: ["unfunded"] },
-	{ total: "left over", groups: ["surplus"] },
-	{ total: "unmet", groups: ["unmet"] },
+	{ total: "money in", parts: [{ heading: null, groups: ["income"] }] },
+	{ total: "tax", parts: [{ heading: null, groups: ["prepaid", "settlement"] }] },
+	{ total: "withdrawals", parts: [{ heading: null, groups: ["withdrawal"] }] },
+	{ total: "drawn", parts: [{ heading: null, groups: ["drawn"] }] },
+	{
+		total: "spending",
+		parts: [
+			{ heading: "by category", groups: ["category"] },
+			{ heading: "by expense", groups: ["expense"] },
+		],
+	},
+	{ total: "saving", parts: [{ heading: null, groups: ["contribution"] }] },
+	{ total: "not funded", parts: [{ heading: null, groups: ["unfunded"] }] },
+	{ total: "left over", parts: [{ heading: null, groups: ["surplus"] }] },
+	{ total: "unmet", parts: [{ heading: null, groups: ["unmet"] }] },
 ]
 
 /** Whether a Read carries the cash flow table, which only a run with `--breakdown` has. The navigation lists the page only then. */
@@ -81,6 +97,17 @@ export function chooseRollup(rollups: readonly Rollup[], requested: string): Rol
 	return rollups.find((rollup) => String(rollup.index) === requested) ?? rollups[0] ?? null
 }
 
+/** A band the person picked, with the index of the roll-up it was picked in. */
+export interface Pick {
+	readonly index: number
+	readonly key: string
+}
+
+/** The key of the band picked in the roll-up shown, or null when the pick was made in another year. */
+export function pickedKey(pick: Pick | null, index: number | undefined): string | null {
+	return pick !== null && pick.index === index ? pick.key : null
+}
+
 /** A year's label for the selector: its span, its household's ages, and a mark for a partial year. */
 export function yearLabel(rollup: Rollup): string {
 	const ages = agesText(rollup.ages)
@@ -99,11 +126,14 @@ export function accountNamesOf(read: Read<AccountList> | undefined): ReadonlyMap
 	return new Map(read.data.accounts.map((account) => [account.id, account.name]))
 }
 
-/** The sections of a roll-up: each with the CLI's total for it, and the lines it groups, in the CLI's order within a group. */
+/** The sections of a roll-up: each with the CLI's total for it, and its parts, whose lines keep the CLI's order. */
 export function sectionsOf(rollup: Rollup): Section[] {
 	return SECTIONS.map((section) => ({
 		total: section.total,
 		amount: rollup.totals.find((total) => total.total === section.total)?.amount ?? null,
-		lines: section.groups.flatMap((group) => rollup.lines.filter((line) => line.group === group)),
+		parts: section.parts.map((part) => ({
+			heading: part.heading,
+			lines: part.groups.flatMap((group) => rollup.lines.filter((line) => line.group === group)),
+		})),
 	}))
 }

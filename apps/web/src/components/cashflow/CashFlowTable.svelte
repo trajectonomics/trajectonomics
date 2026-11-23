@@ -5,10 +5,11 @@ import { cx } from "../ui/cx"
 import Money from "../ui/Money.svelte"
 
 interface Props {
-	/** The sections of the year, in the order a person reads them: each total, then its lines. */
+	/** The sections of the year, in the order a person reads them: each total, then its parts' lines. */
 	sections: readonly Section[]
 	/** The Accounts' names by id, for a line's label. */
 	accountNames: ReadonlyMap<string, string>
+	/** The key of the band the person picked, whose row is shown picked. */
 	picked: string | null
 	onPick: (key: string) => void
 }
@@ -19,6 +20,9 @@ let { sections, accountNames, picked, onPick }: Props = $props()
 function label(line: CashflowLine): string {
 	return lineLabel(line, accountNames)
 }
+
+const isEmpty = (section: Section): boolean =>
+	section.parts.every((part) => part.lines.length === 0)
 </script>
 
 <div class="max-w-full overflow-x-auto rounded-lg border border-border">
@@ -44,28 +48,36 @@ function label(line: CashflowLine): string {
 						{/if}
 					</td>
 				</tr>
-				{#each section.lines as line (lineKey(line))}
-					{@const key = lineKey(line)}
-					<tr class={cx("border-t border-border", picked === key && "bg-secondary")}>
-						<td class="px-3 py-2 align-top">
-							<button
-								type="button"
-								aria-pressed={picked === key}
-								onclick={() => onPick(key)}
-								class="text-left outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
-							>
-								{label(line)}
-							</button>
-						</td>
-						<td class="px-3 py-2 text-right align-top tabular-nums">
-							<Money amount={line.amount} />
-						</td>
-					</tr>
-				{:else}
+				{#each section.parts as part (part.heading)}
+					{#if part.heading !== null}
+						<tr>
+							<th scope="rowgroup" colspan="2" class="px-3 pt-2 text-left text-xs font-medium text-muted-foreground">{part.heading}</th>
+						</tr>
+					{/if}
+					{#each part.lines as line (lineKey(line))}
+						{@const key = lineKey(line)}
+						<tr class={cx("border-t border-border", picked === key && "bg-secondary")}>
+							<td class="px-3 py-2 align-top">
+								<button
+									type="button"
+									aria-pressed={picked === key}
+									onclick={() => onPick(key)}
+									class="text-left outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+								>
+									{label(line)}
+								</button>
+							</td>
+							<td class="px-3 py-2 text-right align-top tabular-nums">
+								<Money amount={line.amount} />
+							</td>
+						</tr>
+					{/each}
+				{/each}
+				{#if isEmpty(section)}
 					<tr class="border-t border-border">
 						<td colspan="2" class="px-3 py-2 text-muted-foreground">No lines</td>
 					</tr>
-				{/each}
+				{/if}
 			</tbody>
 		{/each}
 	</table>

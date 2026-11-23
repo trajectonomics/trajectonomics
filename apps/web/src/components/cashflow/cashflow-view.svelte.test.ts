@@ -61,6 +61,17 @@ describe("CashFlowView", () => {
 		expect(body).toMatch(/<option value="1"[^>]*selected/)
 	})
 
+	test("the hidden table sits inside an sr-only div, which is what the page clips", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		expect(body).toMatch(/<div class="sr-only">\s*<table>/)
+	})
+
+	test("the diagram's labels are hidden from a screen reader, which reads the bands and the table", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		expect(body).toContain("<text")
+		expect(body.match(/<text /g)?.length).toBe(body.match(/<text [^>]*aria-hidden="true"/g)?.length)
+	})
+
 	test("a Snapshot without the cash flow table says so, and draws no diagram", () => {
 		const body = renderView({ base: okRun(projectionRunFixture()) })
 		expect(body).toContain("No cash flow for base")

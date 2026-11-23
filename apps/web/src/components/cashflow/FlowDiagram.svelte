@@ -47,9 +47,9 @@ function keyed(event: KeyboardEvent, key: string): void {
 				onclick={() => onPick(link.key)}
 				onkeydown={(event) => keyed(event, link.key)}
 				class={cx(
-					"cursor-pointer opacity-80 outline-none hover:opacity-100 focus-visible:outline-2 focus-visible:outline-ring",
+					"cursor-pointer outline-none hover:opacity-85 focus-visible:outline-2 focus-visible:outline-ring",
 					FLOW_FILL[link.kind],
-					picked === link.key && "opacity-100",
+					picked === link.key && "stroke-foreground stroke-2",
 				)}
 			/>
 		{/each}
@@ -73,6 +73,7 @@ function keyed(event: KeyboardEvent, key: string): void {
 				y={node.labelY}
 				text-anchor={node.anchor}
 				dominant-baseline="middle"
+				aria-hidden="true"
 				class="fill-foreground"
 			>
 				{node.label} {shown(node.amount)}
@@ -81,22 +82,24 @@ function keyed(event: KeyboardEvent, key: string): void {
 	</svg>
 </div>
 
-<table class="sr-only">
-	<caption>{label}, each band and its amount</caption>
-	<thead>
-		<tr>
-			<th scope="col">Side</th>
-			<th scope="col">Band</th>
-			<th scope="col">Amount</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each layout.nodes as node (node.key)}
+<div class="sr-only">
+	<table>
+		<caption>{label}, each band and its amount</caption>
+		<thead>
 			<tr>
-				<td>{node.side === "source" ? "From" : "To"}</td>
-				<td>{node.label}</td>
-				<td>{shown(node.amount)}</td>
+				<th scope="col">Side</th>
+				<th scope="col">Band</th>
+				<th scope="col">Amount</th>
 			</tr>
-		{/each}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{#each layout.nodes as node (node.key)}
+				<tr>
+					<td>{node.side === "source" ? "From" : "To"}</td>
+					<td>{node.label}</td>
+					<td>{shown(node.amount)}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>
