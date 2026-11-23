@@ -3,7 +3,6 @@ import type { AccountCard } from "../../lib/view/plan-items/accounts"
 import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
-import OffNotice from "../what-if/OffNotice.svelte"
 import WasText from "../what-if/WasText.svelte"
 
 interface Props {
@@ -40,7 +39,6 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				{/if}
 			</div>
 			<p class="mt-1 text-sm text-muted-foreground">{card.kind === "asset" ? "Asset" : "Debt"}<WasText was={mark.was.kind} /></p>
-			<OffNotice off={mark.off} />
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">Rate</dt>
 				<dd>{card.rate}{card.compounding === null ? "" : `, ${card.compounding}`}<WasText was={mark.was.rate} /><WasText was={mark.was.compounding} /></dd>

@@ -15,6 +15,21 @@ function dateCell(rows: readonly Row[] | undefined, id: string): Cell {
 	return row.date === null ? textCell("Not reached") : textCell(formatDate(row.date))
 }
 
+/** Whether a side reaches a Milestone: it declares it and the CLI gave it a date. */
+function reached(rows: readonly Row[] | undefined, id: string): boolean {
+	const row = rows?.find((candidate) => candidate.id === id)
+	return row !== undefined && row.date !== null
+}
+
+/** Why a Milestone has no change: only one side declares it, or one side or neither reaches it. */
+function noChangeReason(data: ProjectionCompare, id: string, declared: boolean): string {
+	if (!declared) return "Only one side declares it"
+	const { a, b } = data.sides
+	return reached(a.milestones, id) || reached(b.milestones, id)
+		? "One side does not reach it"
+		: "Neither side reaches it"
+}
+
 /** The ids of both sides' Milestones: the baseline's in its Scenario order, then any only the what-if declares. */
 function idsOf(data: ProjectionCompare): readonly string[] {
 	const ids = (data.sides.a.milestones ?? []).map((row) => row.id)
@@ -31,7 +46,6 @@ export function milestoneTriples(data: ProjectionCompare): readonly Triple[] {
 	const { a, b } = data.sides
 	return idsOf(data).map((id) => {
 		const delta = data.deltas.milestones?.find((row) => row.id === id)
-		const declared = delta !== undefined
 		return {
 			key: id,
 			label: id,
@@ -41,7 +55,7 @@ export function milestoneTriples(data: ProjectionCompare): readonly Triple[] {
 				delta?.months,
 				"month",
 				EARLIER_LATER,
-				declared ? "One side does not reach it" : "Only one side declares it",
+				noChangeReason(data, id, delta !== undefined),
 			),
 		}
 	})

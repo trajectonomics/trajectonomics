@@ -46,7 +46,7 @@ export function countChange(
 
 /** The sentence a screen reader hears for a change, as the visible text reads. */
 export function changeSentence(change: ChangeView): string {
-	if (change.kind === "none") return `No change stated. ${change.reason}`
+	if (change.kind === "none") return `No change figure. ${change.reason}`
 	if (change.kind === "same") return "No change"
 	if (change.kind === "count") return `${change.text}, ${change.words}`
 	return `${change.amount.startsWith("-") ? "" : "+"}${change.amount}, ${change.words}`

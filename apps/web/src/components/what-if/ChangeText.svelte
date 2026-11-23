@@ -6,12 +6,15 @@ interface Props {
 	change: ChangeView
 }
 
-/** The change the CLI stated, with a sign and words, so it never relies on colour. A change with none says why. */
+/** The change the CLI stated, with a sign and words, so it never relies on colour. A change the CLI did not state says
+ * so, with its reason in view, so it never reads as "nothing changed". */
 let { change }: Props = $props()
 </script>
 
 {#if change.kind === "none"}
-	<span class="text-muted-foreground">No change stated<span class="sr-only">. {change.reason}</span></span>
+	<span class="text-muted-foreground"
+		>No change figure<span class="sr-only">. </span><span class="block max-w-64 text-xs">{change.reason}</span></span
+	>
 {:else if change.kind === "same"}
 	<span>No change</span>
 {:else if change.kind === "count"}

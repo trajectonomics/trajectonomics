@@ -68,11 +68,11 @@ describe("the Milestones page", () => {
 		expect(body).not.toContain("What-if on")
 	})
 
-	test("a compare with null months shows no change, with the reason for a screen reader", async () => {
+	test("a compare with null months says there is no change figure, with its reason in view", async () => {
 		await openSession(DEMO_COMPARE)
 		const body = render(MilestonesView, { props: run }).body
-		expect(body).toContain("No change stated")
-		expect(body).toContain("One side does not reach it")
+		expect(body).toContain("No change figure")
+		expect(body).toContain('<span class="block max-w-64 text-xs">Neither side reaches it</span>')
 	})
 
 	test("a what-if read that failed keeps the baseline and shows no panel", async () => {
@@ -178,7 +178,8 @@ describe("the Overview's what-if", () => {
 	test("is within a phone's width: no fixed width wider than the page", () => {
 		const body = render(OverviewWhatIf, { props }).body
 		expect(body).not.toMatch(/w-\[\d{4,}px\]/)
-		expect(body).toContain("overflow-auto")
+		// The year table's wrapper scrolls and is `relative`, so its screen-reader-only labels stay inside it.
+		expect(body).toMatch(/class="relative [^"]*overflow-auto/)
 	})
 })
 

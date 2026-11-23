@@ -25,7 +25,7 @@ describe("the planner pages while a What-if session is open", () => {
 	test("with no session a card shows the plan as stored, with nothing struck through", () => {
 		const body = list("expense")
 		expect(body).not.toContain("<s ")
-		expect(body).not.toContain("Off in this what-if</p>")
+		expect(body).not.toContain("Off in this what-if")
 	})
 
 	test("an overridden amount shows the session's value, with the baseline's struck through and named", () => {
@@ -56,11 +56,11 @@ describe("the planner pages while a What-if session is open", () => {
 		expect(body).toMatch(/<s [^>]*>.*3\.00% a year/s)
 	})
 
-	test("a switched-off item is dimmed and says it is off in this what-if", () => {
+	test("a switched-off item is dimmed and says once that it is off in this what-if", () => {
 		whatIfSession.setOff("base", HASH, "flows.rent", true)
 		const body = list("expense")
 		expect(body).toContain("opacity-60")
-		expect(body).toContain('<p class="mt-1 text-sm font-medium">Off in this what-if</p>')
+		expect(body.split("Off in this what-if").length - 1).toBe(1)
 	})
 
 	test("an Account's changed rate is struck through, and a switched-off Account is dimmed", () => {
@@ -76,6 +76,6 @@ describe("the planner pages while a What-if session is open", () => {
 		whatIfSession.setOff("base", HASH, "flows.rent", true)
 		const body = list("expense", "retire-early")
 		expect(body).not.toContain("opacity-60")
-		expect(body).not.toContain("Off in this what-if</p>")
+		expect(body).not.toContain("Off in this what-if")
 	})
 })

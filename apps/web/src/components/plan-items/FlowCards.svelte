@@ -3,7 +3,6 @@ import type { FlowCard } from "../../lib/view/plan-items/flows"
 import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
-import OffNotice from "../what-if/OffNotice.svelte"
 import WasText from "../what-if/WasText.svelte"
 
 interface Props {
@@ -47,7 +46,6 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				{/if}
 				<WasText was={mark.was.amount} money {currency} />
 			</p>
-			<OffNotice off={mark.off} />
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">How often</dt>
 				<dd>{card.frequency}<WasText was={mark.was.frequency} /></dd>

@@ -13,8 +13,9 @@ interface Props {
 let { rows, labels, caption }: Props = $props()
 </script>
 
-<!-- A year per row. The table scrolls inside its own wrapper, so the page never scrolls sideways. -->
-<div class="max-h-[70vh] max-w-full overflow-auto rounded-lg border border-border">
+<!-- A year per row. The table scrolls inside its own wrapper, so the page never scrolls sideways: `relative`
+     keeps the screen-reader-only labels in its cells inside the wrapper, not placed against the page. -->
+<div class="relative max-h-[70vh] max-w-full overflow-auto rounded-lg border border-border">
 	<table class="w-full min-w-max border-collapse text-sm">
 		<caption class="px-3 py-2 text-left text-sm font-medium text-muted-foreground">{caption}</caption>
 		<thead class="sticky top-0 z-10 bg-card">
