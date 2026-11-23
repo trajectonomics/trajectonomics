@@ -19,7 +19,7 @@ import { withProjection } from "../../projection/leaf"
 import { projectionHint } from "../../projection/render"
 import { projectionOf } from "../../projection/run"
 import { projectionRunView } from "../../projection/run-view"
-import { decimalFlag, withoutFlag } from "../../scenario/override-flags"
+import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const run: Leaf = defineCommand({
 	name: "run",
@@ -33,6 +33,7 @@ export const run: Leaf = defineCommand({
 		scenario: scenarioFlag,
 		set: setFlag,
 		without: withoutFlag,
+		add: addFlag,
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
 		...outputFlags,
@@ -73,6 +74,10 @@ export const run: Leaf = defineCommand({
 				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
 			description: "The annual roll-up with one Stream taken out, and nothing saved.",
 		},
+		{
+			command: `traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal --json`,
+			description: "The annual roll-up with one new Flow added, and nothing saved.",
+		},
 	],
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
@@ -84,6 +89,7 @@ export const run: Leaf = defineCommand({
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
 				without: input.without ?? [],
+				add: input.add ?? [],
 				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared

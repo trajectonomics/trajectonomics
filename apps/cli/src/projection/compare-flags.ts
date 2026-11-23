@@ -9,20 +9,22 @@ export const ageFlag: z.ZodOptional<z.ZodArray<z.ZodNumber>> = z
 
 /**
  * Exactly one of the second Scenario and an Override says what B is (ADR-0030): `--set` or
- * `--without` makes a what-if of A, and a second Scenario is compared as stored (cli ADR-0056).
+ * `--without` or `--add` makes a what-if of A, and a second Scenario is compared as stored (cli
+ * ADR-0056, ADR-0062).
  */
 export function whatIfProblem(
 	b: string | undefined,
 	sets: readonly string[],
 	without: readonly string[] = [],
+	add: readonly string[] = [],
 ): AppError | null {
-	const overriding = sets.length > 0 || without.length > 0
+	const overriding = sets.length > 0 || without.length > 0 || add.length > 0
 	if (b !== undefined && overriding && sets.length === 0) {
+		const flag = without.length > 0 ? "without" : "add"
 		return fail("invalid_input", {
-			path: "without",
-			message:
-				"compare takes --without for a what-if of one Scenario, not beside a second Scenario.",
-			hint: "Pass one Scenario and --without, or two Scenarios and no --without.",
+			path: flag,
+			message: `compare takes --${flag} for a what-if of one Scenario, not beside a second Scenario.`,
+			hint: `Pass one Scenario and --${flag}, or two Scenarios and no --${flag}.`,
 		})
 	}
 	if ((b === undefined) === !overriding) {

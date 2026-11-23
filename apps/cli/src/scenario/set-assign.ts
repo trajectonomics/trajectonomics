@@ -1,5 +1,5 @@
 import { type AppError, isAppError } from "../errors"
-import { badSet, parsePath } from "./set-parse"
+import { badSet, flagError, type OverrideFlag, parsePath } from "./set-parse"
 
 /** One parsed `--set`: the dotted segments and the JSON value they take. */
 export type ParsedSet = { segments: string[]; value: unknown }
@@ -8,19 +8,22 @@ export type ParsedSet = { segments: string[]; value: unknown }
 export function splitAssignment(
 	raw: string,
 	index: number,
+	flag: OverrideFlag = "set",
 ): { path: string; value: string } | AppError {
 	for (let at = 0; at < raw.length; at += 1) {
 		const char = raw[at]
 		if (char === "\\") {
 			if (at + 1 >= raw.length) {
-				return badSet(index, `"${raw}" ends with a dangling \\`, { details: { path: raw } })
+				return flagError(flag, index, `"${raw}" ends with a dangling \\`, {
+					details: { path: raw },
+				})
 			}
 			at += 1
 			continue
 		}
 		if (char === "=") return { path: raw.slice(0, at), value: raw.slice(at + 1) }
 	}
-	return badSet(index, `"${raw}" has no unescaped = between the path and the value`, {
+	return flagError(flag, index, `"${raw}" has no unescaped = between the path and the value`, {
 		details: { path: raw },
 	})
 }

@@ -1,10 +1,12 @@
 import { type AppError, fail, isAppError } from "../errors"
 
-/** The input field an Override error points at: a `--set`, or a `--without` removal (cli ADR-0054). */
-export type OverrideFlag = "set" | "without"
+/** The input field an Override error points at: a `--set`, a `--without` removal or an `--add` (cli ADR-0054, ADR-0062). */
+export type OverrideFlag = "set" | "without" | "add"
 
 const SET_HINT = "A --set is path=json, such as --set flows.salary.amount=50000."
 const WITHOUT_HINT = "A --without names one list item by its id, such as --without flows.gym."
+const ADD_HINT = `An --add is list=json, such as --add 'flows={"id":"gym","kind":"expense",...}'.`
+const HINTS: Record<OverrideFlag, string> = { set: SET_HINT, without: WITHOUT_HINT, add: ADD_HINT }
 
 /** An invalid Override points at its input field, never at a document path. */
 export function flagError(
@@ -16,7 +18,7 @@ export function flagError(
 	return fail("invalid_input", {
 		path: flag,
 		message: `${flag}: ${message}`,
-		hint: options.hint ?? (flag === "set" ? SET_HINT : WITHOUT_HINT),
+		hint: options.hint ?? HINTS[flag],
 		details: { index, ...options.details },
 	})
 }

@@ -26,19 +26,24 @@ const CLI: Group = {
 	),
 }
 
+/** The words of a command line as a shell splits them: on whitespace, except inside 'single quotes'. */
+function words(command: string): string[] {
+	return (command.match(/(?:[^\s']|'[^']*')+/g) ?? []).map((word) => word.replaceAll("'", ""))
+}
+
 /** A shell's view of a command line: leading NAME=value pairs, then the words after `traj`. */
 function parse(command: string): { env: Record<string, string>; argv: string[] } {
 	if (/[|<>;&`$()]/.test(command)) {
 		throw new Error(`not a plain command line, so it cannot run as printed: ${command}`)
 	}
-	const words = command.split(/\s+/)
+	const parts = words(command)
 	const env: Record<string, string> = {}
-	while (words.length > 0 && /^[A-Z_][A-Z0-9_]*=/.test(words[0]!)) {
-		const [name, ...value] = words.shift()!.split("=")
+	while (parts.length > 0 && /^[A-Z_][A-Z0-9_]*=/.test(parts[0]!)) {
+		const [name, ...value] = parts.shift()!.split("=")
 		env[name!] = value.join("=")
 	}
-	if (words.shift() !== "traj") throw new Error(`an example starts with traj: ${command}`)
-	return { env, argv: words }
+	if (parts.shift() !== "traj") throw new Error(`an example starts with traj: ${command}`)
+	return { env, argv: parts }
 }
 
 /** Unquoted `~` expands to the user's home, as the shell would before the CLI sees the word. */

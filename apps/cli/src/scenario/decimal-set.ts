@@ -3,7 +3,7 @@ import { parseMinorUnits } from "../store/money"
 import { currencyOf, MONEY_HINT, mapMoney } from "./decimal"
 import { isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
-import { badSet } from "./set-parse"
+import { flagError, type OverrideFlag } from "./set-parse"
 
 /*
  * The decimal form of one `--set` value (cli ADR-0056): the same conversion `decimal.ts` makes for a
@@ -42,8 +42,8 @@ function fromBranches(node: Node, segments: readonly string[]): unknown {
 	return undefined
 }
 
-/** A refusal from the conversion of one `--set` value, at the `--set` flag that carried it. */
-function atSetFlag(error: AppError, index: number, path: string): AppError {
+/** A refusal from the conversion of one value, at the flag (`--set` or `--add`) that carried it. */
+function atSetFlag(error: AppError, index: number, path: string, flag: OverrideFlag): AppError {
 	const body = error.body
 	const details = isNode(body.details) ? body.details : {}
 	const hint = body.hint ?? (body.code === "invalid_input" ? MONEY_HINT : undefined)
@@ -51,8 +51,8 @@ function atSetFlag(error: AppError, index: number, path: string): AppError {
 	const lead = `${path}: `
 	const reason = body.message.startsWith(lead) ? body.message.slice(lead.length) : body.message
 	return fail(body.code, {
-		message: `set: at ${path}, ${reason}`,
-		path: "--set",
+		message: `${flag}: at ${path}, ${reason}`,
+		path: `--${flag}`,
 		...(hint === undefined ? {} : { hint }),
 		details: { ...details, index, path },
 	})
@@ -66,7 +66,7 @@ function notDecimal(raw: unknown): string {
 }
 
 /**
- * One `--set` value read in the decimal form (cli ADR-0056): a value whose path names a money field
+ * One `--set` value, or one `--add` item (cli ADR-0062), read in the decimal form (cli ADR-0056): a value whose path names a money field
  * becomes minor units through the same exact parser `scenario apply --decimal` uses, and a value that
  * replaces an object or list converts every money field inside it. Any other value is returned as
  * given. The Override echoes the value as it was given; only the document receives the converted one.
@@ -77,6 +77,7 @@ export function setValueFromDecimal(
 	path: string,
 	segments: readonly string[],
 	value: unknown,
+	flag: OverrideFlag = "set",
 ): unknown | AppError {
 	const node = schemaAtPath(PUBLISHED, segments)
 	if (node === undefined) return value
@@ -85,12 +86,12 @@ export function setValueFromDecimal(
 		if (isAppError(currency)) return currency
 		const dotted = formatPath(at)
 		if (typeof raw !== "string") {
-			return badSet(index, `at ${dotted}, ${notDecimal(raw)}`, {
+			return flagError(flag, index, `at ${dotted}, ${notDecimal(raw)}`, {
 				hint: MONEY_HINT,
 				details: { path: dotted },
 			})
 		}
 		const minor = parseMinorUnits(raw, currency, dotted)
-		return isAppError(minor) ? atSetFlag(minor, index, path) : minor
+		return isAppError(minor) ? atSetFlag(minor, index, path, flag) : minor
 	})
 }

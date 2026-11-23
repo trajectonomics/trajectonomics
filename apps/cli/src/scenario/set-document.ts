@@ -6,7 +6,7 @@ import { flagError, type OverrideFlag } from "./set-parse"
 
 /**
  * One applied Override, in the order a command applies them: every `--without` removal, then every
- * `--set` (ADR-0024, cli ADR-0056). `flag` names the input field the Override came from.
+ * `--add`, then every `--set` (ADR-0024, cli ADR-0056, ADR-0062). `flag` names the input field the Override came from.
  */
 export type AppliedItem = { flag: OverrideFlag; path: string }
 
@@ -30,7 +30,7 @@ function matchingItem(
 
 /**
  * The error for a document the overrides left outside `sim-core`'s Scenario schema, at the input
- * field that caused it: a `--without` or a `--set`. It reports the first problem an Override covers,
+ * field that caused it: a `--without`, an `--add` or a `--set`. It reports the first problem an Override covers,
  * so a later problem cannot hide the one that names the cause; when none covers a problem it reports
  * the first and falls back to the last Override applied.
  */
@@ -67,10 +67,11 @@ export function documentFailure(
 	)
 }
 
-/** The applied Overrides in the order a command applied them: removals first, then Sets. */
+/** The applied Overrides in the order a command applied them: removals, additions, then Sets. */
 export function itemsOf(applied: AppliedOverrides): AppliedItem[] {
 	return [
 		...applied.removals.map((path) => ({ flag: "without" as const, path })),
+		...applied.additions.map((addition) => ({ flag: "add" as const, path: addition.path })),
 		...applied.overrides.map((override) => ({ flag: "set" as const, path: override.path })),
 	]
 }

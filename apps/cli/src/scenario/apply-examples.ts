@@ -37,4 +37,9 @@ export const APPLY_EXAMPLES: Example[] = [
 		description:
 			"Apply a what-if to the stored base, as projection run --set would project it, and roll the write back.",
 	},
+	{
+		command: `traj scenario apply base --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal --dry-run`,
+		description:
+			"Add one new Flow to the stored base, as projection run --add would project it, and roll the write back.",
+	},
 ]

@@ -35,6 +35,8 @@ export type Echo = {
 	overrides: OverrideEcho[]
 	/** The `--without` paths taken out, in command-line order, before the Overrides (cli ADR-0056). */
 	removals: string[]
+	/** The `--add` items put on a list, present only when an `--add` was given (cli ADR-0062). */
+	additions?: OverrideEcho[] | undefined
 	tax: TaxStatus
 	/** Present only when the Projection placed at least one record (ADR-0032). */
 	carryIn?: CarryInEcho[] | undefined
@@ -82,6 +84,14 @@ export const removalsField: z.ZodType<string[]> = z
 		"The dotted paths of the list items taken out with --without, in command-line order, before the overrides; empty when none were given.",
 	)
 
+/** The items `--add` put on a list, each as its path and the item as given (cli ADR-0062). */
+export const additionsEchoField: z.ZodType<OverrideEcho[] | undefined> = z
+	.array(overrideEcho)
+	.optional()
+	.describe(
+		"The items put on a list with --add, in command-line order, after the removals and before the overrides; each is its path (list.id) and the item as given. Present only when an --add was given.",
+	)
+
 /** The tax status is a closed enum, so a tax core adds a value rather than a flag. */
 export const taxField: z.ZodType<TaxStatus> = z
 	.enum(TAX_VALUES)
@@ -96,11 +106,13 @@ export const notesField: z.ZodType<string[]> = z
 		"Plain sentences a person should read before the figures; the human format prints them.",
 	)
 
-/** The echo fields an Override adds to a result: the overrides and the removals (cli ADR-0056). */
+/** The echo fields an Override adds to a result: the overrides, the removals and the additions (cli ADR-0056, ADR-0062). */
 export const overrideFields: {
 	overrides: z.ZodType<OverrideEcho[]>
 	removals: z.ZodType<string[]>
+	additions: z.ZodType<OverrideEcho[] | undefined>
 } = {
 	overrides: overridesField,
 	removals: removalsField,
+	additions: additionsEchoField,
 }

@@ -8,7 +8,7 @@ describe("applyScenarioSets", () => {
 		const stale = { draft: true }
 		const outcome = applyScenarioSets(stale, [])
 		if (isAppError(outcome)) throw new Error(JSON.stringify(outcome.body))
-		expect(outcome).toEqual({ document: stale, overrides: [], removals: [] })
+		expect(outcome).toEqual({ document: stale, overrides: [], removals: [], additions: [] })
 	})
 
 	it("refuses a final document sim-core rejects, at the set that covers the problem", () => {

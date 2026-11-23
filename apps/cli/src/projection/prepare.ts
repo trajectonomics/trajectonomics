@@ -24,6 +24,8 @@ export type Prepared = {
 	overrides: AppliedOverride[]
 	/** The `--without` paths taken out before the Overrides, in command-line order (cli ADR-0056). */
 	removals: string[]
+	/** The `--add` items put on a list after the removals and before the Overrides (cli ADR-0062). */
+	additions: AppliedOverride[]
 	scenario: ScenarioEcho
 	currency: string
 	baseline: Baseline
@@ -53,6 +55,8 @@ export type PrepareInput = {
 	sets: readonly string[]
 	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
 	without?: readonly string[] | undefined
+	/** The `--add` items, put on a list after the removals and before the Sets (cli ADR-0062). */
+	add?: readonly string[] | undefined
 	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
 	decimal?: boolean | undefined
 }
@@ -80,6 +84,7 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	if (row === null) return scenarioNotFound(input.scenario, input.scenarioPath)
 	const applied = applyScenarioSets(JSON.parse(row.document) as ScenarioDocument, input.sets, {
 		without: input.without,
+		add: input.add,
 		decimal: input.decimal,
 	})
 	if (isAppError(applied)) return applied
@@ -101,6 +106,7 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		document: stored,
 		overrides: applied.overrides,
 		removals: applied.removals,
+		additions: applied.additions,
 		scenario: {
 			id: row.id,
 			name: row.name,
