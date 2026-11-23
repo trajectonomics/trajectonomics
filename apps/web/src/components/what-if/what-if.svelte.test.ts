@@ -47,7 +47,9 @@ describe("the What-if controls", () => {
 		try {
 			const body = render(ItemSwitch, { props }).body
 			expect(body).toMatch(/role="switch"[^>]*disabled/)
-			expect(body).toMatch(/disabled[^>]*>Try a value/)
+			// The attribute on that button, not the `disabled:` Tailwind variant in its class list.
+			const tryButton = /<button([^>]*)>\s*Try a value\s*<\/button>/.exec(body)?.[1] ?? ""
+			expect(tryButton).toMatch(/\sdisabled=""/)
 		} finally {
 			whatIfSession.saving = false
 		}

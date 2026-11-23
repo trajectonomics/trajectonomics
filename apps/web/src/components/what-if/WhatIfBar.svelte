@@ -25,7 +25,7 @@ function switchNow(): void {
 			{#if whatIfSession.asking !== null}
 				<div role="alert" class="flex flex-wrap items-center gap-3 text-sm">
 					<span>Switching to {whatIfSession.asking} drops the changes on {whatIfSession.whatIf.plan}.</span>
-					<button type="button" onclick={switchNow} class="underline">Revert and switch</button>
+					<button type="button" onclick={switchNow} disabled={whatIfSession.saving} class="underline disabled:opacity-50">Revert and switch</button>
 					<button type="button" onclick={() => whatIfSession.stay()} class="underline">
 						Stay on {whatIfSession.whatIf.plan}
 					</button>

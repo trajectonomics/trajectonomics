@@ -34,4 +34,8 @@ describe("nestsPast", () => {
 		expect(nestsPast({ a: { b: { c: 1 } } }, 3)).toBe(false)
 		expect(nestsPast({ a: { b: { c: {} } } }, 3)).toBe(true)
 	})
+
+	test("the cap is 32 levels, as web ADR 0010 states", () => {
+		expect(MAX_BODY_DEPTH).toBe(32)
+	})
 })

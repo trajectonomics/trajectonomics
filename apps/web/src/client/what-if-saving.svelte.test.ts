@@ -43,6 +43,9 @@ describe("a change made while Apply or Save runs", () => {
 			expect(
 				whatIfSession.tryItem("base", HASH, "flows", "gym", { amount: "1" }, { amount: "2" }),
 			).toEqual([])
+			// The refused Try a value adds no Set: the session still holds only the change sent.
+			expect(whatIfSession.whatIf?.sets ?? []).toEqual([])
+			expect(whatIfSession.changes).toHaveLength(1)
 			const [rent] = whatIfSession.changes
 			if (rent === undefined) throw new Error("no change")
 			whatIfSession.removeChange(rent)
