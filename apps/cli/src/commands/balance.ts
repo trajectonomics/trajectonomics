@@ -2,12 +2,14 @@ import { z } from "zod"
 import type { Leaf } from "../command"
 import { defineCommand } from "../command"
 import { type BalanceResult, balanceOf } from "../report/balance"
+import { recordNoteBlocks, recordStartShape } from "../report/record"
 import { reportRow, totalView, trialBalanceView } from "../report/view"
 import { withLedger } from "../report/with-ledger"
 import { LEDGER_READ_CODES } from "../store"
 
 const resultSchema: z.ZodType<BalanceResult> = z.strictObject({
 	asOf: z.string().describe("The date the balances are stated at, as YYYY-MM-DD."),
+	...recordStartShape,
 	rows: z.array(reportRow).describe("One row per Leaf Account, in `account list` order."),
 	netWorth: z.array(totalView).describe("Assets minus liabilities, one entry per currency."),
 	trialBalance: trialBalanceView
@@ -33,6 +35,7 @@ export const balance: Leaf = defineCommand({
 			.describe("Add the Trial Balance and assert its debit and credit totals agree."),
 	}),
 	output: resultSchema,
+	render: { blocks: recordNoteBlocks },
 	examples: [
 		{
 			command: "traj balance --as-of 2026-03-31 --json",

@@ -33,6 +33,8 @@ async function expectEngineVersion(): Promise<void> {
 /** The hand-computed Baseline the fixture Ledger states at the As-of (see its arithmetic). */
 const HAND_COMPUTED: Shown = {
 	asOf: FIXTURE_AS_OF,
+	firstTransactionDate: "2026-01-01",
+	noTransactionsBefore: false,
 	currency: "THB",
 	rows: [
 		{ account: { id: FIXTURE_ACCOUNTS.bank, name: "Bank" }, kind: "asset", amount: "528549.50" },

@@ -87,6 +87,30 @@ date and never reads the clock, so the same command always answers the same ques
 `traj help` lists every command, `traj help <command>` lists one command's flags, and
 `traj schema --json` prints the whole contract: every command's input, output and error codes.
 
+## Importing a statement
+
+To load a bank statement, fill the one CSV template instead of adding each transaction by
+hand. `traj tx import` has been in every release since 0.1.0.
+
+```bash
+traj tx import --template     # print the template header and nothing else
+traj tx import statement.csv --dry-run
+traj tx import statement.csv
+```
+
+`--template` prints the header the importer reads, and it opens no data directory:
+
+```csv
+date,from,to,amount,memo,external_ref,project
+```
+
+Start your file with that header and write one row per transaction. `--dry-run` reports every
+row and rolls every write back, so run it first. A file name of `-` reads the CSV from stdin, as in
+`traj tx import - --dry-run`. The import is all or nothing, and `external_ref` is the duplicate
+key, so importing the same statement twice adds nothing the second time. Each command's flags and
+the rest of the columns are in
+[the `tx` page of the docs](https://docs.trajectonomics.com/cli/commands/tx/).
+
 ## Development
 
 The sources are Bun-only; a released binary needs nothing.

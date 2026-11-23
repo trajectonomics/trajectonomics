@@ -30,7 +30,7 @@ export function noTransactionsNote(data: NetWorth): string | null {
 	if (!data.noTransactionsBefore) return null
 	const asOf = formatDate(data.asOf)
 	if (data.firstTransactionDate === null) {
-		return `The As-of, ${asOf}, is before the first transaction, so the zero is not a real reading.`
+		return `The ledger records no transaction, so the zero at ${asOf} is not a real reading.`
 	}
 	const first = formatDate(data.firstTransactionDate)
 	return `The As-of, ${asOf}, is before the first transaction on ${first}, so the zero is not a real reading.`

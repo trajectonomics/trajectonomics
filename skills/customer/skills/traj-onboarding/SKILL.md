@@ -1,6 +1,6 @@
 ---
 name: traj-onboarding
-description: "Set up `traj`, the personal money command line, for someone starting out, or set it up again on a machine that already has a ledger: install the command line, install the skill that operates it, and start from their financial situation and their goal. Use when someone wants to get started with their money, asks to install `traj`, or tells you their financial situation and their goal while setup is not done."
+description: "Set up `traj`, the personal money command line, for someone starting out, or set it up again on a machine that already has a ledger: install the command line, install the skill that operates it, and start from their financial situation and their goal. Use when someone wants to get started tracking their money in a terminal, asks to install `traj` or the trajectonomics cli, or tells you their financial situation and their goal while setup is not done."
 metadata:
   cli: ">=0.2.0 <0.8.0"
   version: "0.1.0"
@@ -183,10 +183,8 @@ document. Then report what it found before you ask anything, in one of three way
   already be recorded there.
 
 **No ledger file yet.** Ask the person two things in one question: their financial situation, and
-their goal. **Enter a debt as a negative opening balance**, so that borrowing lowers net worth
-instead of raising it; from 0.3.0 the command line refuses a positive opening on a liability, and below 0.3.0 a debt
-recorded the obvious way reads as a gain. Then read the `traj` skill at the `path` the list command reported, and
-follow it for the rest of this conversation.
+their goal. Then read the `traj` skill at the `path` the list command reported, and follow it for the
+rest of this conversation.
 
 Tell them, in every open, that a new session loads that skill by itself whenever they talk about their
 money, and that another machine needs setup once.

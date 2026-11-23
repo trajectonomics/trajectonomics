@@ -20,7 +20,13 @@ export function show(home: string, ...args: string[]): Promise<Captured> {
 }
 
 export type Row = { account: { id: string; name: string }; kind: SimKind; amount: string }
-export type Shown = { asOf: string; currency: string; rows: Row[] }
+export type Shown = {
+	asOf: string
+	firstTransactionDate: string | null
+	noTransactionsBefore: boolean
+	currency: string
+	rows: Row[]
+}
 
 export const TX_ONE = "0194b000-0009-7000-8000-000000000009"
 export const TX_TWO = "0194b000-0010-7000-8000-000000000010"

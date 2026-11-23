@@ -82,7 +82,13 @@ const FULL: Record<string, unknown> = {
 			kind: "expense",
 			frequency: "monthly",
 			start: "2026-01-01",
-			derive: { measures: [{ id: "base", op: "const", value: 100 }], result: "base" },
+			derive: {
+				measures: [
+					{ id: "base", op: "const", value: 100 },
+					{ id: "tenth", op: "scale", of: "base", num: 1, den: 10, rounding: "floor" },
+				],
+				result: "tenth",
+			},
 		},
 	],
 	cashflow: {

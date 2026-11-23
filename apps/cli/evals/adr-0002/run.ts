@@ -1,8 +1,8 @@
 import { mkdirSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
 import { AGENT_BINARY, AGENTS } from "./agents"
-import { type Options, parseOptions, printPlan, selectPersonas } from "./cli"
+import { type Options, parseOptions, printPlan, resultsPath, selectPersonas } from "./cli"
 import { loadPersonas } from "./persona"
 import { runPersona } from "./persona-run"
 import { referenceOf, resolveRelease } from "./release"
@@ -20,7 +20,7 @@ export async function main(argv: readonly string[]): Promise<number> {
 	} catch (error) {
 		process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
 		process.stderr.write(
-			`usage: bun run eval -- --agent <${AGENTS.join("|")}> [--persona <id>] [--release <v>]\n`,
+			`usage: bun run eval -- --agent <${AGENTS.join("|")}> [--persona <id>] [--release <v>] [--out <file>]\n`,
 		)
 		return 2
 	}
@@ -34,8 +34,9 @@ export async function main(argv: readonly string[]): Promise<number> {
 	const personas = selectPersonas(loadPersonas(PERSONAS_DIR), options.personas)
 	const released = await resolveRelease(options)
 	const runRoot = join(RUNS_ROOT, new Date().toISOString().replace(/[:.]/g, "-"))
+	const out = resultsPath(options, released.label, RESULTS_DIR)
 	if (options.dryRun) {
-		printPlan(released, options.agent, personas, runRoot)
+		printPlan(released, options.agent, personas, runRoot, out)
 		return 0
 	}
 	const refHome = join(runRoot, "reference-home")
@@ -55,8 +56,7 @@ export async function main(argv: readonly string[]): Promise<number> {
 			}),
 		)
 	}
-	mkdirSync(RESULTS_DIR, { recursive: true })
-	const out = join(RESULTS_DIR, `${released.label}-${options.agent}.md`)
+	mkdirSync(dirname(out), { recursive: true })
 	writeFileSync(
 		out,
 		renderReport({

@@ -2,14 +2,14 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import type { AgentName } from "./agents"
 import { type FlagTable, inventedFlagsOf, parseCallLog } from "./calls"
-import { finalTextOf } from "./final-answer"
+import { finalTextOf, modelOf } from "./final-answer"
 import { type Invocation, invokeAgent } from "./invoke"
 import { expectedAnswers } from "./oracle"
 import type { Persona } from "./persona"
 import { promptFor } from "./prompt"
 import type { Released } from "./release"
 import type { RunRow } from "./report"
-import { installTrajWrapper, makeRunDirs, sandboxPath } from "./sandbox"
+import { agentEnv, installTrajWrapper, makeRunDirs } from "./sandbox"
 import { parseAnswer, scoreCorrectness } from "./score"
 
 /** Everything one persona's run needs from the runner. */
@@ -35,7 +35,7 @@ export async function runPersona(input: PersonaRunInput): Promise<RunRow> {
 	const dirs = makeRunDirs(join(input.runRoot, persona.id))
 	installTrajWrapper(dirs, process.execPath, released.argv)
 	const nodeDir = dirname(Bun.which("node") ?? "/usr/bin/node")
-	const env = { ...process.env, PATH: sandboxPath(dirs.bin, nodeDir), TRAJ_HOME: dirs.home }
+	const env = agentEnv(process.env, dirs, nodeDir)
 	const expected = expectedAnswers(persona)
 	const invocation = await invokeAgent({
 		agent,
@@ -62,6 +62,6 @@ export async function runPersona(input: PersonaRunInput): Promise<RunRow> {
 		calls: calls.length,
 		errors: calls.filter((call) => call.exitCode !== 0).length,
 		invented,
-		model: invocation.model ?? "n/a",
+		model: invocation.model ?? modelOf(agent, invocation.stdout) ?? "n/a",
 	}
 }

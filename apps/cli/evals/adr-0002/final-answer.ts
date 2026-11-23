@@ -7,6 +7,22 @@ export function finalTextOf(agent: AgentName, stdout: string): string {
 	return opencodeFinal(stdout)
 }
 
+/**
+ * The model the agent ran, when its output names it: Claude Code's first `system` `init` event
+ * carries `model`. Null for an agent whose output does not (OpenCode's model is known from the
+ * argv it ran with).
+ */
+export function modelOf(agent: AgentName, stdout: string): string | null {
+	if (agent !== "claude") return null
+	for (const event of linesAsJson(stdout)) {
+		if (event["type"] === "system" && event["subtype"] === "init") {
+			const model = event["model"]
+			return typeof model === "string" && model !== "" ? model : null
+		}
+	}
+	return null
+}
+
 function claudeFinal(stdout: string): string {
 	let result = ""
 	for (const event of linesAsJson(stdout)) {

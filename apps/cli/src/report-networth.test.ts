@@ -57,7 +57,7 @@ describe("report networth", () => {
 		expect(JSON.parse(res.out)).toEqual({
 			asOf: FIXTURE_AS_OF,
 			firstTransactionDate: null,
-			noTransactionsBefore: false,
+			noTransactionsBefore: true,
 			rows: [],
 			totals: [],
 			hint: ACCOUNT_HINT,

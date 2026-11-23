@@ -3,6 +3,7 @@ import { baselineShow } from "../../baseline/show"
 import { baselineShow as resultSchema } from "../../baseline/view"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
+import { recordNoteBlocks } from "../../report/record"
 import { LEDGER_READ_CODES } from "../../store"
 
 export const show: Leaf = defineCommand({
@@ -13,6 +14,7 @@ export const show: Leaf = defineCommand({
 		asOf: z.string().describe("The date the Baseline is stated at, as YYYY-MM-DD."),
 	}),
 	output: resultSchema,
+	render: { blocks: recordNoteBlocks },
 	examples: [
 		{
 			command: "traj baseline show --as-of 2026-03-31 --json",

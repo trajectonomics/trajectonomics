@@ -11,10 +11,18 @@ interface Props {
 
 const { dictionary } = Astro.props
 /**
- * The pose each small card's Mascot strikes to act out its feature (ADR 0028), by the card's index. The two wide cards
- * carry a CLI sample instead, and the robot beside the heading already stands over them.
+ * The Mascot each small card carries, by the card's index: the pose that acts out its feature, and the corner it takes
+ * (ADR 0028, ADR 0029). Each card puts its robot somewhere else, so the row reads as four scenes, not one repeated
+ * corner. The two wide cards carry a CLI sample instead, and the robot beside the heading already stands over them.
  */
-const CARD_POSES = [undefined, undefined, "same"] as const
+const CARD_MASCOTS = [
+	undefined,
+	undefined,
+	{ pose: "same", place: "top-right" },
+	{ pose: "local", place: "bottom-right" },
+	{ pose: "open", place: "bottom-left" },
+	{ pose: "tax", place: "top-left" },
+] as const
 ---
 
 <section class="section-surface bg-background">
@@ -34,13 +42,16 @@ const CARD_POSES = [undefined, undefined, "same"] as const
 			{
 				dictionary.featureTitles.map((title, index) => {
 					const sample = FEATURE_SAMPLES[index]
-					const pose = CARD_POSES[index]
+					const mascot = CARD_MASCOTS[index]
+					const robot = mascot && <Mascot pose={mascot.pose} class="mascot-card" />
+					const isTop = mascot?.place.startsWith("top") === true
 					return (
 						<li
 							class:list={[
 								"feature bg-background text-foreground",
-								{ "feature-wide": sample !== undefined, "feature-mascot": pose !== undefined },
+								{ "feature-wide": sample !== undefined },
 							]}
+							data-mascot-place={mascot?.place}
 						>
 							{sample !== undefined && (
 								<figure class="feature-sample bg-muted text-foreground" data-feature-sample>
@@ -51,12 +62,13 @@ const CARD_POSES = [undefined, undefined, "same"] as const
 									<figcaption class="feature-sample-note">{dictionary.actionExampleNote}</figcaption>
 								</figure>
 							)}
-							{pose !== undefined && <Mascot pose={pose} class="mascot-card" />}
+							{isTop && robot}
 							<span class="feature-index text-muted-foreground tabular-nums">
 								{String(index + 1).padStart(2, "0")}
 							</span>
 							<span class="feature-title">{title}</span>
 							<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
+							{!isTop && robot}
 						</li>
 					)
 				})

@@ -25,7 +25,9 @@ export const apply: Leaf = defineCommand({
 			.string()
 			.min(1)
 			.optional()
-			.describe("The JSON document's path, or - for stdin; --template prints one to start from."),
+			.describe(
+				"The JSON document's path, or - for stdin; its schema is `traj schema scenario apply`, and --template prints one to start from.",
+			),
 		template: z
 			.boolean()
 			.optional()

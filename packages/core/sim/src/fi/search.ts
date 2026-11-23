@@ -3,7 +3,7 @@ import type { ProjectionProblem } from "../types/projection"
 import type { RuleOfThumbReference } from "../types/reference"
 import { type Accumulator, consume } from "./accumulate"
 import type { BufferFailure, ShortfallFailure } from "./best"
-import type { Prefix } from "./prefix"
+import type { Prefix, PrefixPoint } from "./prefix"
 import { ruleOfThumb } from "./reference"
 import type { ScanGrid } from "./scan-grid"
 import { walkCandidate } from "./walk"
@@ -21,6 +21,8 @@ export type SearchOutcome =
 			readonly kind: "reachable"
 			readonly month: DateString
 			readonly reference: RuleOfThumbReference
+			/** The candidate's walked state: its Levy tallies cover the whole stopped path. */
+			readonly point: PrefixPoint
 	  }
 	| {
 			readonly kind: "unreachable"
@@ -34,6 +36,7 @@ export type CandidateOutcome =
 			readonly kind: "reachable"
 			readonly month: DateString
 			readonly reference: RuleOfThumbReference
+			readonly point: PrefixPoint
 	  }
 	| { readonly kind: "buffer"; readonly failure: BufferFailure }
 	| { readonly kind: "shortfall"; readonly failure: ShortfallFailure; readonly beforeStop: boolean }
@@ -58,7 +61,7 @@ function inspectCandidate(input: SearchInput, month: DateString): CandidateOutco
 	}
 	const reference = ruleOfThumb(point.states, month, walked.windows.reference)
 	if (!reference.ok) return { kind: "problem", problem: reference.problem, terminal: true }
-	return { kind: "reachable", month, reference: reference.reference }
+	return { kind: "reachable", month, reference: reference.reference, point: walked.point }
 }
 
 /** Ascending linear scan over `months`; returns the first pass, never assuming monotonicity. */

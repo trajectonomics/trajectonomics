@@ -83,6 +83,8 @@ describe("balance", () => {
 		expect(res.code).toBe(0)
 		expect(JSON.parse(res.out)).toEqual({
 			asOf: FIXTURE_AS_OF,
+			firstTransactionDate: null,
+			noTransactionsBefore: true,
 			rows: [],
 			netWorth: [],
 			hint: ACCOUNT_HINT,

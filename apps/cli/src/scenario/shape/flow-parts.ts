@@ -1,4 +1,4 @@
-import { BASIS_POINTS, DERIVE_MEASURE_OPS } from "./terms"
+import { BASIS_POINTS, DERIVE_MEASURE_OPS, ROUNDINGS } from "./terms"
 
 /*
  * The three parts of a Flow whose keys are not simply a name and a unit: the two shapes a Levy reads
@@ -51,6 +51,11 @@ const measureShape = {
 			description:
 				"Which operation it is. A `tally` Measure belongs to a Levy, so it is not one of these.",
 		},
+		rounding: {
+			enum: [...ROUNDINGS],
+			description:
+				"`scale` and `mul` only, and required there: how the quotient by `den` rounds. `floor` rounds down, `halfUp` to the nearest with a half rounding up, `ceil` up. No other word is accepted, `halfEven` included.",
+		},
 	},
 	required: ["id", "op"],
 }
@@ -59,7 +64,7 @@ const measureShape = {
 export const deriveShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"An amount computed per occurrence from a Measure graph, in place of `amount` and `growth`.",
+		"An amount computed per occurrence from a Measure graph, in place of `amount` and `growth`. A derived expense, or a derived contribution into a liability, cannot read an earned income Flow, directly or through other derived Flows: earned income stops at the FI date, so the amount would drop when earned income stops. `traj fi` and `traj projection compare` refuse it as DERIVED_EXPENSE_READS_EARNED (DERIVED_DEBT_PAYMENT_READS_EARNED for the liability), though `traj projection run` accepts it; derive it from a Flow that is not earned instead.",
 	properties: {
 		measures: {
 			type: "array",

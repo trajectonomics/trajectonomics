@@ -1,6 +1,6 @@
 ---
 name: traj
-description: "Operate `traj`, the Trajectonomics ledger and projection CLI, on someone's own money: record what they earned and spent, read balances and reports, and answer what-if and financial-independence questions. Use when the user talks about their accounts, spending, budget, net worth, savings plan, Thai tax, or planning a purchase."
+description: "Operate `traj`, the Trajectonomics command-line ledger, on someone's own money: record what they earned and spent, keep their accounts, check that the ledger balances, and read balances and reports. Use when someone wants to track their spending from a terminal, set up their accounts (for example to work out their Thai income tax estimate), record an expense or income, check their ledger, or asks about net worth or financial-independence questions; also whenever they name `traj`. It computes from a ledger and nothing else: it is no spreadsheet, gives no investment advice, and does not prepare, file or check a tax return."
 metadata:
   cli: ">=0.2.0 <0.8.0"
 ---
@@ -69,6 +69,24 @@ Two write behaviours to use on purpose, wherever the schema lists them:
 - **Set an external reference on every write.** Replaying the same reference reports a duplicate at exit `0` instead of writing twice, which is what makes a retried write safe.
 
 A flag that carries a document takes a path or `-`. `-` is the only way to send a document on stdin; it is never inferred from a pipe.
+
+## Read a sign
+
+Every Skill reads a sign from this section and states none of its own. `traj balance`, `traj report networth`, `traj report pnl` and the trial balance print raw signed units, and each row's `type` says how to read its sign:
+
+| type | its normal sign | a figure on it reads as |
+| --- | --- | --- |
+| `asset` | positive | what they hold |
+| `expense` | positive | what they spent |
+| `liability` | negative | what they owe: `-2400.00` is a debt of 2,400.00 |
+| `income` | negative | what they earned |
+| `equity` | negative | the opening balances and offsets behind the other rows, never a figure about their wealth |
+
+- **Net worth already counts every debt.** It is assets minus liabilities, and `traj balance` prints it as `netWorth` and `traj report networth` as `totals`. Quote that figure; adding a liability row's size to it, or subtracting the row from it, counts the debt twice.
+- A liability whose balance moves towards `0` is being repaid, and one that moves further below `0` is borrowing.
+- `traj report pnl` prints raw rows, income negative and expense positive, and its total is income minus expenses: positive when they earned more than they spent. Report the printed figure, say in words which way it points, and never flip a sign to make a sentence read better.
+- **A write takes a magnitude, and the direction is `--from` and `--to`.** A negative `--amount` is refused with `NEGATIVE_AMOUNT`, exit `3`. Borrowing runs `--from` the liability `--to` the account that received the money; repaying runs `--from` the account that paid `--to` the liability.
+- **`--opening` is the one signed write.** It reads `--from` as equity and `--amount` as signed, so an opening debt is a negative amount, as in `traj tx add --opening --from Opening --to Mortgage --amount -2400.00 --date 2026-01-01`. From 0.3.0 the command line refuses a positive opening on a liability with `liability_opening_positive`, exit `3`, and its `hint` names the signed amount. On 0.2.0 a positive opening is accepted and the debt reads as a gain, in net worth too, so a negative amount is the only correct entry at every release in the CLI Range.
 
 ## Hand a job to the Skill that owns it
 

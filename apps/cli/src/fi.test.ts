@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import simPackage from "../package.json"
-import { FI_METHOD } from "./projection/fi-method"
+import { FI_HORIZON, FI_METHOD } from "./projection/fi-method"
 import type { FiView } from "./projection/fi-view"
 import { AS_OF, baseFlags, errorOf, fi, HORIZON, projectionHome } from "./projection/testing"
 import { type Captured, capture } from "./test-support"
@@ -126,7 +126,7 @@ describe("fi", () => {
 		expect(res.code).toBe(0)
 		const data = JSON.parse(res.out)
 		expect(data.name).toBe("fi")
-		expect(data.description).toBe(FI_METHOD)
+		expect(data.description).toBe(`${FI_METHOD} ${FI_HORIZON}`)
 		expect(data.positionals).toEqual([])
 		expect(Object.keys(data.input.properties).sort()).toEqual([
 			"asOf",

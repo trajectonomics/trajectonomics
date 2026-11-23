@@ -6,6 +6,7 @@ import { hintField } from "../hint"
 import type { Ledger } from "../store"
 import { type FieldMap, type FieldRules, query, respell } from "./errors"
 import { reportHint } from "./hint"
+import { type RecordStart, recordStartOf } from "./record"
 import {
 	accountIndex,
 	inAccountOrder,
@@ -26,7 +27,7 @@ const FIELDS: FieldRules = [
 const fields: FieldMap = (field) => respell(field, FIELDS)
 
 /** `traj balance`: every Leaf Account's Balance, the net-worth total, and an optional Trial Balance. */
-export type BalanceResult = {
+export type BalanceResult = RecordStart & {
 	asOf: string
 	rows: ReportRow[]
 	netWorth: TotalView[]
@@ -88,6 +89,7 @@ export function balanceOf(
 	const hint = reportHint(ledger, rows)
 	return {
 		asOf: input.asOf,
+		...recordStartOf(ledger.transactions, input.asOf),
 		rows,
 		netWorth: totalsOf(read.totals),
 		...(trial === undefined ? {} : { trialBalance: trial }),

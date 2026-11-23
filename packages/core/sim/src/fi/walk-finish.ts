@@ -24,6 +24,6 @@ export function finish(
 		}
 	}
 	return first === undefined
-		? { kind: "survived", windows }
+		? { kind: "survived", windows, point: day.point }
 		: { kind: "buffer", breach: first, windows }
 }
