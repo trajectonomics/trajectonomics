@@ -1,5 +1,5 @@
 import type { BasisPoints, DateString, Flow, SpendingRule } from "../types"
-import { oracleFixYear, oracleYearOf } from "./oracle-rule-year"
+import { oracleFixYear } from "./oracle-rule-year"
 
 /** One Rule year as the oracle keeps it. */
 export interface OracleRuleYear {
@@ -22,14 +22,14 @@ export function oracleRuleLog(): OracleRuleLog {
 	return { dates: [], years: [] }
 }
 
-/** What one Occurrence of `flow` pays on `date`: the Rule year is counted by anniversaries of the first date. */
+/** What one Occurrence of `flow` pays on `date`: a Rule year is twelve Occurrences, or one for an annual Flow (ADR 0023). */
 export function oracleRulePay(
 	log: OracleRuleLog,
 	flow: Flow & { rule: SpendingRule },
 	at: { date: DateString; years: number; inflation: BasisPoints },
 	read: (account: string) => bigint,
 ): bigint {
-	const index = oracleYearOf(log.dates[0] ?? at.date, at.date)
+	const index = Math.floor(log.dates.length / (flow.frequency === "annual" ? 1 : 12))
 	if (index === log.years.length) {
 		const portfolio = flow.rule.portfolio.reduce((sum, id) => sum + read(id), 0n)
 		const before = log.years.map((year) => year.amount)

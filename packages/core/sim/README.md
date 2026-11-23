@@ -175,7 +175,7 @@ It prints the payment, the empty problem list and the loan's balance at 30 June 
 
 An expense Flow takes `rule` instead of `amount`, `derive` or `level`: its yearly amount follows what a
 portfolio of asset Accounts is worth. The rule reads the portfolio on the Flow's first Landed date and
-on each later one that is a year on, before any Flow lands, and fixes that Rule year's amount `Y`. A
+on each later one that is twelve Occurrences on (one for an annual Flow), before any Flow lands, and fixes that Rule year's amount `Y`. A
 monthly Flow pays `floor(Y × k / 12) − floor(Y × (k − 1) / 12)` on its k-th Occurrence of the year, so
 twelve add to `Y` exactly; an annual Flow pays `Y` once. The withdraw order, a Shortfall and tax
 Settlement are unchanged. A fixed amount that keeps its real value is an ordinary expense with
@@ -262,7 +262,8 @@ band; in the third the amount 4,000,000 is above 4.8% of the portfolio, so the y
 
 Financial Independence prices a rule Flow from each candidate's own walk, as it does a Derived amount
 that reads an Account. `chanceOfSuccess` runs the rule on every Market path. A `next12Months` Milestone
-Metric is refused beside any rule Flow (`NEXT_12_MONTHS_READS_ACCOUNT`), and `retirementSpending`
+Metric is refused beside a rule Flow (`NEXT_12_MONTHS_READS_ACCOUNT`) unless that Flow's `startAt`
+names the Milestone the Metric sits on, and `retirementSpending`
 replaces a rule Flow like any expense.
 
 ## Levies

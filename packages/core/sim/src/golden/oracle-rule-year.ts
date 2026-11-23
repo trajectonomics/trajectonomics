@@ -1,5 +1,4 @@
 import type { BasisPoints, DateString, Rounding, SpendingRule } from "../types"
-import { oracleAddMonthsClamped } from "./oracle-date"
 import { oracleGrow } from "./oracle-money"
 
 /** The inputs of one Rule year: its position, its portfolio, and the amounts of the years before it. */
@@ -26,13 +25,6 @@ export function oracleDivide(numerator: bigint, mode: Rounding): bigint {
 	return (numerator * 2n + 10000n) / 20000n
 }
 
-/** The Rule year a date falls in: how many anniversaries of the first Landed date it has reached. */
-export function oracleYearOf(first: DateString, date: DateString): number {
-	let index = 0
-	while (oracleAddMonthsClamped(first, 12 * (index + 1)) <= date) index++
-	return index
-}
-
 function rateOn(rule: SpendingRule, date: DateString): bigint {
 	let bps = rule.rateBps
 	if (rule.kind === "currentRate")
@@ -50,9 +42,10 @@ function clamp(rule: SpendingRule, raw: bigint, input: OracleYearInput): OracleF
 		)
 	const low = rule.floor && grow(rule.floor)
 	const high = rule.ceiling && grow(rule.ceiling)
-	let amount = low !== undefined && raw < low ? low : raw
-	if (high !== undefined && amount > high) amount = high
-	return { amount, action: amount === raw ? "none" : amount === high ? "ceiling" : "floor" }
+	const lifted = low !== undefined && raw < low ? low : raw
+	const capped = high !== undefined && lifted > high
+	const amount = capped ? high : lifted
+	return { amount, action: amount === raw ? "none" : capped ? "ceiling" : "floor" }
 }
 
 function guarded(rule: SpendingRule, input: OracleYearInput): OracleFixed {

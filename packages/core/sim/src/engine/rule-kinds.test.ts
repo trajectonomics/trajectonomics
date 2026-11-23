@@ -60,6 +60,20 @@ describe("currentRate follows the portfolio", () => {
 		])
 	})
 
+	it("a floor equal to the ceiling that lifts the year says `floor`, not `ceiling`", () => {
+		const pinned = {
+			...rule,
+			floor: { amount: 4_300_000, growth: { bps: 0 } },
+			ceiling: { amount: 4_300_000, growth: { bps: 0 } },
+		} as const
+		// 4,000,000 is lifted to 4,300,000 and stays there; 4,410,000 in 2028 is cut to it.
+		expect(years({ rule: pinned, rate: 500 })).toEqual([
+			[4_300_000, "floor"],
+			[4_300_000, "floor"],
+			[4_300_000, "ceiling"],
+		])
+	})
+
 	it("a ceiling of 4,400,000 cuts the third year from 4,410,000", () => {
 		const capped = { ...rule, ceiling: { amount: 4_400_000, growth: { bps: 0 } } } as const
 		expect(years({ rule: capped, rate: 500 })).toEqual([

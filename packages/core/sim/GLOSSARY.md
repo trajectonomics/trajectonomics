@@ -75,7 +75,7 @@ A fourth amount form of an expense Flow (`rule`, beside `amount`, `derive` and `
 _Avoid_: Withdrawal strategy, safe withdrawal rate, glide path
 
 **Rule year**:
-The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow after it first lands, counted from its first Landed date: the first Landed date on or after each anniversary begins the next. On that date, before any Flow lands, the rule reads the portfolio and fixes the year's amount. A year the horizon or a Shortfall cuts short pays only its Occurrences.
+The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow, counted from its first Landed date: the thirteenth, twenty-fifth, ... Occurrence (the second, third, ... for an annual Flow) begins the next. On that date, before any Flow lands, the rule reads the portfolio and fixes the year's amount. This is a decision, not the anniversary rule: under a shifting Calendar the first Landed date on or after an anniversary can give a year of eleven or thirteen Occurrences, which would not sum to the year's amount. A year the horizon or a Shortfall cuts short pays only its Occurrences.
 _Avoid_: Spending year, withdrawal year, rule period
 
 **Spending rule statement**:

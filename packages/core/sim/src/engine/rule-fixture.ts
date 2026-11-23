@@ -1,6 +1,12 @@
 /** TEST-ONLY: a portfolio `inv` that no Flow touches, and a `cash` Account the rule's expense draws on. */
 import type { Fixture } from "../fixtures/fixture"
-import type { Projection, SpendingRule, SpendingRuleStatement } from "../types"
+import type {
+	Calendar,
+	DateString,
+	Projection,
+	SpendingRule,
+	SpendingRuleStatement,
+} from "../types"
 import { project } from "./project"
 import { makeFixture } from "./test-helpers"
 import { ruledExpense } from "./test-rules"
@@ -14,6 +20,9 @@ export interface RuleSetup {
 	readonly frequency?: "monthly" | "annual"
 	readonly horizon?: string
 	readonly cash?: number
+	/** The Flow's `start` (default the Timeline start) and the Scenario's Calendar. */
+	readonly start?: DateString
+	readonly calendar?: Calendar
 }
 
 export function ruleFixture(setup: RuleSetup): Fixture {
@@ -23,10 +32,16 @@ export function ruleFixture(setup: RuleSetup): Fixture {
 			{ id: "inv", kind: "asset", rate: setup.rate ?? 0 },
 		],
 		balances: { cash: setup.cash ?? 10_000_000_000, inv: setup.opening ?? 100_000_000 },
-		flows: [ruledExpense("spend", setup.rule, { frequency: setup.frequency ?? "monthly" })],
+		flows: [
+			ruledExpense("spend", setup.rule, {
+				frequency: setup.frequency ?? "monthly",
+				...(setup.start === undefined ? {} : { start: setup.start }),
+			}),
+		],
 		surplus: [{ account: "cash" }],
 		withdraw: ["cash"],
 		inflation: setup.inflation ?? 0,
+		...(setup.calendar === undefined ? {} : { calendar: setup.calendar }),
 		start: "2026-01-01",
 		horizon: setup.horizon ?? "2028-12-31",
 		resolution: "month",

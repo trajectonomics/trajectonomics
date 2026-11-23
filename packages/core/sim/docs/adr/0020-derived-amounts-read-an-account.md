@@ -102,6 +102,10 @@ from a Projection it had not run. A sale of a whole asset needs the same read. T
   - **Refused**: a Flow's `derive` reads an Account that a Flow pays into or out of (a Contribution's
     `target`, which covers a debt payment and an obligation purchase; a withdrawal's `source`, which
     covers a sale and a loan draw), or that `cashflow.surplus`, `contribute` or `withdraw` names.
+  - **Refused**: a Spending rule Flow (ADR 0023), whose amount carries last year's, except one whose
+    `startAt` names the Milestone the Metric sits on: it lands only once that Milestone has fired,
+    and a criterion is evaluated only before, so the window prices it at 0, correctly. A rule Flow
+    with no gate, or gated on another Milestone, is refused for every kind.
   - **Accepted**: every other read. Only its opening state and its rate move that Account.
   - The worked case: a home already owned, never sold, read only by its upkeep (1% of its value, say)
     beside "investments at least 25 times the next 12 months of spending" is **accepted**. A home with

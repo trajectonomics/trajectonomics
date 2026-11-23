@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { ruled } from "../engine/rule-fixture"
 import type { Fixture } from "../fixtures/fixture"
 import { financialIndependence } from "../index"
 import type { SpendingRule, SurvivalOptions } from "../types"
@@ -51,5 +52,32 @@ describe("FI on a plan with a Spending rule agrees with the brute-force walk", (
 		const ruled = both(plan(kinds[1]![1]), 12)
 		expect(ruled.oracle).toEqual({ month: "2027-07-01", annualExpenses: 2_258_624n })
 		expect(ruled.engine).toEqual(ruled.oracle!)
+	})
+
+	describe("guardrails with both bands on a falling portfolio", () => {
+		// 60,000,000 falling 25% a year with 500,000 saved a month: every Rule year after the first
+		// cuts, and the reference window of 2031-01-01 (buffer 0) holds the cut of 2031-04-01, the
+		// one of 2031-12-01 (buffer 12) the cut of 2032-04-01.
+		const band = { bps: 500, adjustBps: 1000 }
+		const falling = plan(
+			{ kind: "guardrails", ...base, upper: band, lower: band },
+			60_000_000,
+			-2500,
+		)
+
+		it("cuts in the years the priced windows hold", () => {
+			const years = ruled(falling).spendingRules![0]!.years
+			const actions = new Map(years.map((year) => [year.date, year.action]))
+			expect(actions.get("2031-04-01")).toBe("cut")
+			expect(actions.get("2032-04-01")).toBe("cut")
+		})
+
+		for (const buffer of [0, 12]) {
+			it(`agrees on the month and the reference expense, buffer ${buffer} months`, () => {
+				const { engine, oracle } = both(falling, buffer)
+				expect(oracle).toBeDefined()
+				expect(engine).toEqual(oracle!)
+			})
+		}
 	})
 })

@@ -61,10 +61,11 @@ export function currentYear(rule: CurrentRateRule, input: YearInput): Fixed {
 			: grownAmount(bound.amount, bound.growth, input.years, input.inflation)
 	const low = grown(floor)
 	const high = grown(ceiling)
-	let amount = low !== undefined && raw < low ? low : raw
-	if (high !== undefined && amount > high) amount = high
+	const lifted = low !== undefined && raw < low ? low : raw
+	const capped = high !== undefined && lifted > high
+	const amount = capped ? high : lifted
 	if (amount === raw) return { amount, action: "none" }
-	return { amount, action: amount === high ? "ceiling" : "floor" }
+	return { amount, action: capped ? "ceiling" : "floor" }
 }
 
 /** Last year's amount grown a year, cut when the rate rose past `upper` and raised when it fell past `lower`. */

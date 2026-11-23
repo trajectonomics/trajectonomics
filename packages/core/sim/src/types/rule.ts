@@ -27,6 +27,11 @@ export interface RateStep {
 export interface CurrentRateRule extends RuleBase {
 	readonly kind: "currentRate"
 	readonly steps?: readonly RateStep[]
+	/**
+	 * A lower and an upper bound on a year's amount. Each grows from the Flow's `start`, not from the
+	 * Flow's first Landed date, so a Flow a Milestone gates meets a bound that has already grown by
+	 * the years before it lands.
+	 */
 	readonly floor?: FixedAmount
 	readonly ceiling?: FixedAmount
 }
@@ -62,9 +67,17 @@ export interface SpendingRuleYear {
 	readonly portfolio: number
 	/** The yearly amount `Y` the rule fixed. */
 	readonly amount: number
-	/** What the year's Occurrences paid: the whole `amount`, or fewer when the horizon or a Shortfall ends it. */
+	/**
+	 * What the year's Occurrences paid: the whole `amount`, or fewer when the horizon or a Shortfall
+	 * ends it. The Occurrence a Shortfall fell on counts in full, as the Projection's `expense` does,
+	 * though only part of it was met: the day's `unmet` is the whole day across every expense, so a
+	 * reader that wants what this Flow left unpaid must split `unmet` by Flow, never subtract it.
+	 */
 	readonly paid: number
-	/** `floor(amount × 10000 / portfolio)`; absent when the portfolio is 0. */
+	/**
+	 * `floor(amount × 10000 / portfolio)`; absent when the portfolio is 0. It exceeds 10000 when the
+	 * amount is more than a depleted portfolio is worth.
+	 */
 	readonly withdrawalRateBps?: BasisPoints
 	readonly action: RuleAction
 }

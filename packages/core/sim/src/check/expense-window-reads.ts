@@ -42,15 +42,21 @@ function readsMoving(flows: unknown, moving: ReadonlySet<string>): boolean {
 	)
 }
 
-/** Whether any Flow carries a Spending `rule`, whose amount depends on the years before it (ADR 0023). */
-function hasRule(flows: unknown): boolean {
-	return Array.isArray(flows) && flows.some((flow) => isRecord(flow) && Object.hasOwn(flow, "rule"))
-}
-
-/** Whether a Flow's amount cannot be priced over a year the run has not walked. */
-function refusesWindow(scenario: Readonly<Record<string, unknown>>): boolean {
-	const flows = scenario["flows"]
-	return hasRule(flows) || readsMoving(flows, changeable(scenario))
+/**
+ * Whether a Flow carries a Spending `rule` (ADR 0023) that a window on `milestone` cannot skip: a
+ * rule Flow gated by `startAt` on that same Milestone lands only once it has fired, and a Milestone's
+ * criterion is evaluated only before it fires, so the window correctly prices it at 0.
+ */
+function hasRule(flows: unknown, milestone: unknown): boolean {
+	return (
+		Array.isArray(flows) &&
+		flows.some(
+			(flow) =>
+				isRecord(flow) &&
+				Object.hasOwn(flow, "rule") &&
+				(typeof milestone !== "string" || flow["startAt"] !== milestone),
+		)
+	)
 }
 
 /** Reports each `expenses: next12Months` Metric of one criterion, at the Metric's `expenses` key. */
@@ -64,27 +70,31 @@ function reportCriterion(criterion: unknown, at: Path, emit: Emit): void {
 	}
 }
 
+/** Reports every criterion of one Milestone. */
+function reportMilestone(criteria: unknown, at: Path, emit: Emit): void {
+	if (!Array.isArray(criteria)) return
+	for (let position = 0; position < criteria.length; position++) {
+		reportCriterion(criteria[position], [...at, position], emit)
+	}
+}
+
 /**
  * A Milestone's `next12Months` expense window plans each Flow's amounts over a year it has not
  * walked. A Derived amount that reads an Account that nothing changes is priced from that Account's
  * state as it stands, grown to each date. One that reads an Account that can change on a future
  * date would need a forward walk, so the two do not meet in one Scenario (ADR 0020). A rule Flow
- * never meets one: its amount carries last year's, which a window that has not walked cannot know.
+ * never meets one: its amount carries last year's, which a window that has not walked cannot know,
+ * except a rule Flow whose `startAt` names the Milestone the Metric sits on (ADR 0023).
  */
 export function checkExpenseWindowReads(scenario: unknown, emit: Emit): void {
-	if (!isRecord(scenario) || !refusesWindow(scenario)) return
+	if (!isRecord(scenario)) return
 	const milestones = scenario["milestones"]
 	if (!Array.isArray(milestones)) return
+	const moving = readsMoving(scenario["flows"], changeable(scenario))
 	for (let index = 0; index < milestones.length; index++) {
 		const milestone: unknown = milestones[index]
-		const criteria = isRecord(milestone) ? milestone["criteria"] : undefined
-		if (!Array.isArray(criteria)) continue
-		for (let position = 0; position < criteria.length; position++) {
-			reportCriterion(
-				criteria[position],
-				["scenario", "milestones", index, "criteria", position],
-				emit,
-			)
-		}
+		if (!isRecord(milestone)) continue
+		if (!moving && !hasRule(scenario["flows"], milestone["id"])) continue
+		reportMilestone(milestone["criteria"], ["scenario", "milestones", index, "criteria"], emit)
 	}
 }

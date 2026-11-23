@@ -22,9 +22,13 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
     default (`INVALID_ROUNDING`). No rate or rounding exists in code, examples or the CLI.
   - `frequency` is `monthly` or `annual`: any other valid one is `RULE_FREQUENCY`, at `frequency`.
 - **Rule years.** A Rule year is twelve monthly Occurrences, or one annual Occurrence, counted from the
-  Flow's first Landed date (after its `start`, `startAt` and Calendar). Occurrences of a Flow are exactly
-  a year apart and unbroken once the gate opens, so this is the first Landed date on or after each
-  anniversary, without a rule that a business-day shift could break. On the first Occurrence of a year,
+  Flow's first Landed date (after its `start`, `startAt` and Calendar). That is a decision, not the
+  anniversary rule: under a shifting Calendar the first Landed date on or after an anniversary can give a
+  year of eleven or thirteen Occurrences (a monthly Flow from 2026-01-31 with `dayRule: "next"`
+  first lands on 2026-02-02, and its 13th Occurrence, 2027-01-31, a Sunday, lands on 2027-02-01, a day
+  before the anniversary). Counting Occurrences keeps "twelve parts sum to `Y` exactly", so every
+  year pays `Y` and a year begins on the first Landed date of a thirteenth, twenty-fifth, ...
+  Occurrence. With no shifting Calendar the two agree. On the first Occurrence of a year,
   before any Flow lands (the ADR 0020 valuation, `planned-on.ts`), the rule reads the portfolio `P` and
   fixes the year's amount `Y`. Two Occurrences on one date read one `P`.
 - **Paid in equal parts.** Monthly: the k-th Occurrence pays `floor(Y × k / 12) − floor(Y × (k − 1) /
@@ -35,7 +39,9 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
 - **`currentRate`.** `Yₖ = round(Pₖ × rate / 10000)`, where `rate` is `rateBps` or the last `steps`
   entry whose `from` is on or before the Rule year's first date (`STEPS_NOT_ASCENDING`, an empty list
   is `MISSING_KEY`). Optional `floor` and `ceiling`, each `{ amount, growth }` grown from the Flow's
-  `start` by the whole years at the year's first Occurrence like a fixed amount, clamp `Yₖ`. A floor
+  `start` by the whole years at the year's first Occurrence like a fixed amount, clamp `Yₖ` (so a
+  gated Flow's bound has already grown by the years before it lands). When the floor lifts the year
+  and the ceiling does not cut it, `action` is `floor`, also when the two amounts are equal. A floor
   amount above the ceiling amount is `RULE_FLOOR_ABOVE_CEILING` at `floor`; growth that later makes
   them cross is accepted, and the ceiling wins.
 - **`guardrails`.** `Y₀` as `initialRate`. Each later year starts from `Y′`, last year's `Y` grown one
@@ -62,8 +68,10 @@ read the portfolio once at the start of retirement. This ADR adds a fourth amoun
   walk and its tail copy it (`cloneRules`).
 - **The statement.** With `spendingRules: true` the Projection reports `spendingRules`: per rule Flow,
   per Rule year, `date`, `portfolio`, `amount`, `paid`, `withdrawalRateBps` (`floor(Y × 10000 / P)`,
-  absent when `P` is 0) and `action`. `paid` is what the year's planned Occurrences added, including the
-  Occurrence a Shortfall fell on, which the Projection's expense also counts. Without the option the
+  absent when `P` is 0, and above 10000 when `Y` exceeds a depleted portfolio) and `action`. `paid` is
+  what the year's planned Occurrences added, including the Occurrence a Shortfall fell on in full,
+  which the Projection's expense also counts. The day's `unmet` is the whole day across every
+  expense, so spending Bands (#361) must split it by Flow, never subtract it from `paid`. Without the option the
   Projection is byte for byte what it was.
 
 ### Financial Independence
@@ -78,17 +86,24 @@ window, the candidate's own walk and its tail past the horizon carry the rule's 
   events that land under the candidate's fire dates, with a book of its own per window
   (`fi/original-window.ts`). That is the same state the walk reached: a rule Flow is an expense, which
   FI never stops except under `retirementSpending`, and a window's events run from the Timeline start.
-- A `next12Months` Metric is refused beside any rule Flow, with `NEXT_12_MONTHS_READS_ACCOUNT` at the
+- A `next12Months` Metric is refused beside a rule Flow, with `NEXT_12_MONTHS_READS_ACCOUNT` at the
   Metric's `expenses` key: the line ADR 0020 draws for an Account something changes would let a rule on
   an untouched portfolio through, but a window that has not walked cannot know last year's amount a
-  guardrails year carries. The refusal is wider than ADR 0020's, on purpose. `trailing12Months` is
-  accepted.
+  guardrails year carries. The refusal is wider than ADR 0020's, on purpose, with one exception: a rule
+  Flow whose `startAt` names the Milestone the Metric sits on. A window keeps a Flow only if it has
+  landed as of the window's date (`landsAt`), which needs that Milestone to have fired, and a
+  Milestone's criterion is evaluated only before it fires, so such a Flow is priced at 0 in the window,
+  correctly. Every other rule Flow (no gate, or a gate on another Milestone) stays refused, for all
+  three kinds. `trailing12Months` is accepted. The same line is drawn in ADR 0020.
 - `retirementSpending` replaces a rule Flow like any expense.
-- The oracle `golden/oracle-rule.ts` (with `oracle-rule-year.ts`) counts Rule years by anniversaries of
-  the first Landed date and fixes each year with exact integers; `oracleAccountFi` runs it per candidate.
+- The oracle `golden/oracle-rule.ts` (with `oracle-rule-year.ts`) counts Rule years as twelve Occurrences (one
+  for an annual Flow) and fixes each year with exact integers; `oracleAccountFi` runs it per candidate.
 
 ## Considered options
 
+- **Rule years by anniversary.** Rejected: a business-day shift can put eleven or thirteen Occurrences
+  in a year, so a year would not sum to `Y`. The issue's "first Landed date on or after each
+  anniversary" holds only without a shifting Calendar.
 - **Rule years from the Flow's `start`.** Rejected: a gated Flow would begin in the middle of a year and
   its first year would pay a fraction of `Y`. The issue states the year from the first Landed date.
 - **A rule state kept in the `StateMap` or the Levy set.** Rejected: neither is what the state is, and
