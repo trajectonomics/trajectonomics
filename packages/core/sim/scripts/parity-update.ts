@@ -2,26 +2,14 @@
 import { createHash } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import { project } from "../src/engine/project"
-import { ASSET_TRADE_PARITY_CASES } from "../src/golden/asset-trade-cases"
-import { CASHFLOW_PARITY_CASES } from "../src/golden/cashflow-parity-cases"
-import { CATEGORY_PARITY_CASES } from "../src/golden/category-parity-cases"
-import { PARITY_CASES } from "../src/golden/parity-cases"
-import { REAL_ASSET_PARITY_CASES } from "../src/golden/real-asset-cases"
-import { STATEMENT_PARITY_CASES } from "../src/golden/statement-parity-cases"
+import { EVERY_PARITY_CASE } from "../src/golden/every-parity-case"
 import { chanceOfSuccess, financialIndependence } from "../src/index"
 
 function hash(value: unknown): string {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex")
 }
 
-const cases = [
-	...PARITY_CASES,
-	...STATEMENT_PARITY_CASES,
-	...CATEGORY_PARITY_CASES,
-	...CASHFLOW_PARITY_CASES,
-	...REAL_ASSET_PARITY_CASES,
-	...ASSET_TRADE_PARITY_CASES,
-].map((testCase) => {
+const cases = EVERY_PARITY_CASE.map((testCase) => {
 	const { name, fixture, options, chance, projectOptions } = testCase
 	const { baseline, scenario, timeline } = fixture
 	const base = {

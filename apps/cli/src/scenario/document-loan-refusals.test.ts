@@ -3,8 +3,8 @@ import { scenarioDocumentError } from "./document"
 import { scenarioExample } from "./shape/index"
 import { VERSION } from "./shape/testing"
 
-// Each of the six loan codes (sim ADR-0016), and the sale and funding codes (sim ADR-0021), is stated in words by `scenario apply`, at its path, and
-// keeps the schema hint every document refusal carries (ADR-0052).
+// Each of the six loan codes (sim ADR-0016), and the sale and funding codes (sim ADR-0021), is stated in
+// words by `scenario apply`, at its path, and keeps the schema hint every document refusal carries (ADR-0052).
 const SCHEMA_HINT = 'Run "traj schema scenario apply" to see the document schema.'
 const CASH = { id: "cash", kind: "asset", rate: 0 }
 const LOAN = { id: "loan", kind: "liability", rate: 600, compounding: "monthly" }
@@ -48,7 +48,7 @@ const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 		"document.flows.0.start",
 	],
 	[
-		"INVALID_FUNDING",
+		"FUNDING_ON_LIABILITY",
 		documentWith({
 			id: "pay",
 			kind: "contribution",
@@ -60,6 +60,23 @@ const CASES: readonly (readonly [string, Record<string, unknown>, string])[] = [
 			funding: "obligation",
 		}),
 		"document.flows.0.funding",
+	],
+	[
+		"OBLIGATION_TARGET_WITHDRAWN",
+		{
+			...documentWith({
+				id: "buy",
+				kind: "contribution",
+				target: "cash",
+				frequency: "once",
+				start: "2026-01-01",
+				amount: 100,
+				growth: { bps: 0 },
+				funding: "obligation",
+			}),
+			cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: ["cash"] },
+		},
+		"document.flows.0.target",
 	],
 	[
 		"LEVEL_TARGET_NOT_LIABILITY",

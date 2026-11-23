@@ -1,8 +1,13 @@
+import { FUNDINGS } from "../vocab"
 import type { Emit, Path } from "./codes"
 import { isValidDate } from "./date"
 import type { LoanIndex } from "./loan-index"
 
-/** `funding` belongs to a Contribution into an asset: a debt payment is already an obligation. */
+/**
+ * `funding` belongs to a Contribution into an asset: a debt payment is already an obligation, so any
+ * stated value on a liability is `FUNDING_ON_LIABILITY`. A value outside the closed list is
+ * `INVALID_FUNDING` from the shape check alone, so it is not reported a second time here.
+ */
 function checkFunding(
 	flow: Readonly<Record<string, unknown>>,
 	path: Path,
@@ -11,8 +16,10 @@ function checkFunding(
 ): void {
 	if (!Object.hasOwn(flow, "funding")) return
 	const target = flow["target"]
+	const funding = flow["funding"]
+	if (typeof funding !== "string" || !(FUNDINGS as readonly string[]).includes(funding)) return
 	if (typeof target === "string" && index.get(target)?.kind === "liability") {
-		emit("INVALID_FUNDING", [...path, "funding"])
+		emit("FUNDING_ON_LIABILITY", [...path, "funding"])
 	}
 }
 

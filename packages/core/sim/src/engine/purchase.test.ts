@@ -41,7 +41,7 @@ describe("a purchase is an obligation Contribution paid in full", () => {
 		])
 	})
 
-	it("with no loan, is drawn from the withdraw list in order: 100,000.00 cash, then 2,000,000.00 savings", () => {
+	it("with no loan, is drawn from the withdraw list in order: 1,000,000.00 cash, then 2,000,000.00 savings", () => {
 		const projection = buying({
 			accounts: [cash, savings, home],
 			balances: { cash: 100_000_000, savings: 250_000_000 },

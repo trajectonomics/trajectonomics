@@ -15,9 +15,11 @@ date. This ADR adds both, as optional additive keys, so `Scenario.schemaVersion`
 ### Buying: `funding: "obligation"`
 
 - **The key.** A Contribution into an asset may carry `funding`, one of `target` or `obligation`. Absent,
-  or `target`, it is today's target, unchanged. `funding` on a liability target is `INVALID_FUNDING` at
-  `funding` (a debt payment is already an obligation, whatever the value), and `funding` on an income,
-  expense or withdrawal is `FIELD_NOT_ALLOWED`. An unknown value is `INVALID_FUNDING` too.
+  or `target`, it is today's target, unchanged. Each rule has its own code. An unknown value is
+  `INVALID_FUNDING` at `funding`, and lists `target` and `obligation`. A known value on a liability
+  target is `FUNDING_ON_LIABILITY` at `funding` (a debt payment is already an obligation, whatever the
+  value), and lists none: an unknown value on a liability is `INVALID_FUNDING` alone, reported once.
+  `funding` on an income, expense or withdrawal is `FIELD_NOT_ALLOWED`.
 - **Paid in full.** An obligation is subtracted before Available cashflow is computed:
   `available = max(0, income − prepaid − expense − debt paid − obligations paid − Settlement)`. It is
   never capped and never unfunded. Same-date obligations into one Account are summed, and a Contribution
@@ -25,6 +27,15 @@ date. This ADR adds both, as optional additive keys, so `Scenario.schemaVersion`
   obligation is paid first, and the target is funded only from what is left.
 - **Not routed.** `cashflow.contribute` need not list an obligation's target, and `CONTRIBUTION_UNROUTED`
   does not apply to it. A target, written or implied, still needs routing.
+- **Not into an Account that `withdraw` lists.** An obligation whose target is named in
+  `cashflow.withdraw` is `OBLIGATION_TARGET_WITHDRAWN` at the Flow's `target`. The obligation is booked
+  into its target first, and then the negative net is drawn through `withdraw`, which could name the
+  same Account: with `cash` 0, `brk` 0 and `withdraw: [brk, cash]`, an obligation of 1,000.00 into `brk`
+  is booked (brk 1,000.00) and then drawn back out of it (brk 0), with no Shortfall. The purchase paid
+  for itself, and with a `gainLabel` and growth the round trip would tally a made-up Realised gain.
+  Refusing the Scenario is simpler and clearer than excluding the target from that date's draw: the
+  caller who wants to buy into an Account lets it stay out of the list, and the purchase then draws on
+  the others. A purchase into a home, or any Account not listed, draws savings as before.
 - **Bookkeeping.** The applied amount adds to the Cost basis of an Account with `gainLabel`, and counts
   in a `funded` tally, as for any applied Contribution (the same `mutate` path).
 - **Order on a date.** Planned amounts, planned withdrawals (loan draws and sales), debt payments,
@@ -36,8 +47,9 @@ The obligation's cash comes out of the day's net, like a debt payment. The net i
 `income − prepaid − expense − debt − obligations − Settlement + planned-withdrawal cash − asset targets applied`.
 
 - **Short of cash.** A negative net is drawn through `cashflow.withdraw` in order, as any expense is.
-  A purchase of 3,000,000.00 with 100,000.00 cash and 2,000,000.00 in the first `withdraw` Account draws
-  the 100,000.00 and then 2,000,000.00 from it, and the home holds 3,000,000.00.
+  A purchase of 3,000,000.00 with 1,000,000.00 cash and 2,500,000.00 in savings, `withdraw: [cash,
+  savings]`, draws the 1,000,000.00 and then 2,000,000.00 from savings, which keeps 500,000.00, and the
+  home holds 3,000,000.00.
 - **Shortfall.** When the `withdraw` list cannot cover it, the date is a Shortfall with the unmet
   amount, and the run ends on that date, as for an expense or a debt payment. The purchase is booked in
   full before the Shortfall is found, as a debt payment is: the Account holds the price on the run-out
@@ -113,6 +125,9 @@ The obligation's cash comes out of the day's net, like a debt payment. The net i
 
 - **A capped target that may borrow.** Rejected: ADR 0003's cap exists so saving never pulls on assets.
   A purchase is the other way round and needs its own word.
+- **Exclude the target from that date's draw instead of refusing.** Rejected: the draw order would
+  differ by date, the same `withdraw` list would mean two things, and the caller would not learn that
+  the Account cannot pay for its own purchase.
 - **Carry an obligation's unmet part forward.** Rejected: a Shortfall ends the run, as for any expense.
 - **Count sale proceeds as Available cashflow.** Rejected by the owner's rule in ADR 0016: a sale would
   fund a savings target.
@@ -128,8 +143,10 @@ The obligation's cash comes out of the day's net, like a debt payment. The net i
 - Hand-computed tests: `src/engine/purchase.test.ts` (the loan draw, the `withdraw` list, the Shortfall, an
   obligation beside a target), `src/engine/sale.test.ts` (a Realised gain of 1,000,000.00, a stated amount,
   a planned amount above the value, the owner's rule, a locked source), `src/engine/purchase-breakdown.test.ts`
-  (a worked year where the identity is 6,750,000 = 6,750,000), `src/check/asset-flow.test.ts` (the refusals).
+  (a worked year where the identity is 6,750,000 = 6,750,000), `src/check/asset-flow.test.ts` and
+  `src/check/obligation-withdrawn.test.ts` (the refusals).
   `src/golden/buy-sell-oracle.test.ts` and `src/golden/buy-sell-fi.test.ts` hold the oracle's agreement.
 - The CLI publishes `funding` on a contribution and lets a withdrawal name an asset
-  (`apps/cli/src/scenario/shape/flow-parts.ts`); `INVALID_FUNDING` and `WITHDRAWAL_LOCKED` are filed in its
-  refusal table, and `WITHDRAWAL_SOURCE_KIND` is gone from it.
+  (`apps/cli/src/scenario/shape/flow-funding.ts` and `flow.ts`); `INVALID_FUNDING`, `FUNDING_ON_LIABILITY`,
+  `OBLIGATION_TARGET_WITHDRAWN` and `WITHDRAWAL_LOCKED` are filed in its refusal table, and
+  `WITHDRAWAL_SOURCE_KIND` is gone from it.

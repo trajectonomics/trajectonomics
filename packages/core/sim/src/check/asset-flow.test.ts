@@ -72,10 +72,10 @@ describe("funding on a Contribution", () => {
 
 	it("refuses any funding on a liability target: a debt payment is already an obligation", () => {
 		expect(codes([buy({ target: "loan", funding: "obligation" })])).toEqual([
-			"INVALID_FUNDING flows/0/funding",
+			"FUNDING_ON_LIABILITY flows/0/funding",
 		])
 		expect(codes([buy({ target: "loan", funding: "target" })])).toEqual([
-			"INVALID_FUNDING flows/0/funding",
+			"FUNDING_ON_LIABILITY flows/0/funding",
 		])
 	})
 
