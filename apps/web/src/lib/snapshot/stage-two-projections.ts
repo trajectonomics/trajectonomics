@@ -82,11 +82,13 @@ export function planFi(params: PlanParams, names: string[]): Record<string, Plan
 
 /**
  * One `projection chance` per Scenario, when the caller stated a Return model. The model is read from its
- * file by the CLI, so only its path is in the argv; the Carry-in goes on standard input, as for a run.
+ * file by the CLI, so only its path is in the argv; the Carry-in goes on standard input, as for a run. It asks for
+ * `--outcomes` unless the parameters leave the futures out, so the Chance page can list every Market path (web ADR 0020).
  */
 export function planChance(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const chance = params.chance
 	if (chance === null) return {}
+	const outcomes = params.futures ? ["--outcomes"] : []
 	return perScenario(params, names, (name) => [
 		"projection",
 		"chance",
@@ -95,6 +97,7 @@ export function planChance(params: PlanParams, names: string[]): Record<string, 
 		`--return-model=${chance.returnModel}`,
 		`--paths=${chance.paths}`,
 		`--seed=${chance.seed}`,
+		...outcomes,
 		"--json",
 	])
 }

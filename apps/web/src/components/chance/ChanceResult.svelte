@@ -1,9 +1,11 @@
 <script lang="ts">
+import type { FuturesView } from "../../lib/view/chance/futures"
 import type { ChanceView } from "../../lib/view/chance/page"
 import ChanceSource from "../assumptions/ChanceSource.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import ChanceFan from "./ChanceFan.svelte"
+import FuturesSection from "./FuturesSection.svelte"
 import RunsOutBars from "./RunsOutBars.svelte"
 
 interface Props {
@@ -11,9 +13,12 @@ interface Props {
 	view: ChanceView
 	/** The argv of the read the figures come from. */
 	argv: readonly string[]
+	/** The plan the chance is of, and its futures when the read lists them (web ADR 0020). */
+	plan: string
+	futures: FuturesView | null
 }
 
-let { view, argv }: Props = $props()
+let { view, argv, plan, futures }: Props = $props()
 </script>
 
 <div class="space-y-8">
@@ -56,6 +61,7 @@ let { view, argv }: Props = $props()
 		<h2 id="chance-runs-out" class="text-base font-semibold">When the failing paths run out</h2>
 		<RunsOutBars bars={view.runsOut} label="Failing Market paths by the year they run out" />
 	</section>
+	<FuturesSection {futures} {plan} currency={view.currency} />
 	{#if view.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm">
 			{#each view.notes as note (note)}
