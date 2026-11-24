@@ -53,7 +53,7 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 {/if}
 {#if profile !== null}
 	<TaxGroupCards cards={groupCards(profile)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
-	<TaxNotStated items={notStated(profile, show.document)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
+	<TaxNotStated items={notStated(show.taxAllowances)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}
 <div class="flex flex-wrap gap-3">
 	{#if offered && profile === null}
