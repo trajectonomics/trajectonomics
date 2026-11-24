@@ -1,8 +1,8 @@
 import type { ColumnHint, ExtraTable } from "../table"
 
 /*
- * `projection chance --outcomes`' human view (cli ADR-0027, ADR-0069): every path's outcome, worst
- * closing net worth first, then the paths `representative` names. Only the human Format reads it;
+ * `projection chance --outcomes`' human view (cli ADR-0027, ADR-0069): the paths `representative` names,
+ * then every path's outcome, worst closing net worth first. Only the human Format reads it;
  * the JSON keeps the outcomes in path order, which is the order `--index` counts in.
  */
 

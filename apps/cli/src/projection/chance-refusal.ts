@@ -10,7 +10,7 @@ const MESSAGES: Readonly<Record<string, string>> = {
 	INVALID_PATH_COUNT: "The path count must be a whole number from 1 to 10,000.",
 	INVALID_SEED: "The seed must be exactly 16 lower-case hex digits.",
 	INVALID_BUCKETS: "The bucket count must be a power of two from 16 to 1024.",
-	INVALID_PATH_INDEX: "--index: the path index must be a whole number below the path count.",
+	INVALID_PATH_INDEX: "The path index must be a whole number below the path count.",
 	UNKNOWN_ACCOUNT: "The Return model names an Account the Scenario does not declare.",
 }
 

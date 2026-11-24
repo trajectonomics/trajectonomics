@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { type PlanModelView, planModelField } from "./chance-plan-view"
+import { type ChanceDefinitionView, chanceDefinition } from "./chance-view"
 import { dateField } from "./money"
 import { type ProjectionRunView, projectionRunFields } from "./run-view"
 
@@ -23,11 +24,8 @@ export type PathRollupReturnsView = {
 export type ProjectionPathView = ProjectionRunView & {
 	/** The path's 0-based position in the run under `seed`. */
 	index: number
-	/** The run's path count: `index` is below it. */
-	paths: number
-	seed: string
-	/** The Return model's id: the file's, or `plan-<buckets>` for `--return-model plan`. */
-	modelId: string
+	/** The run the path belongs to, as `projection chance` states it: `index` is below `definition.paths`. */
+	definition: ChanceDefinitionView
 	/** Present only for `--return-model plan`: the inputs the model was built from (cli ADR-0068). */
 	returnModel?: PlanModelView | undefined
 	returns: PathRollupReturnsView[]
@@ -55,13 +53,12 @@ export const projectionPathView: z.ZodType<ProjectionPathView> = z.strictObject(
 	index: z
 		.number()
 		.int()
-		.describe("The path's 0-based position in the run under the seed, from 0 to paths - 1."),
-	paths: z
-		.number()
-		.int()
-		.describe("The run's path count, as `projection chance --paths` states it."),
-	seed: z.string().describe("The run's seed, as 16 lower-case hex digits."),
-	modelId: z.string().describe("The Return model's id, as the file states it, or plan-<buckets>."),
+		.describe(
+			"The path's 0-based position in the run under the seed, from 0 to definition.paths - 1.",
+		),
+	definition: chanceDefinition.describe(
+		"The run this path belongs to, exactly as `projection chance` states it: the Return model's id (the file's, or plan-<buckets>), the seed and the path count.",
+	),
 	returnModel: planModelField,
 	returns: z
 		.array(rollupReturns)

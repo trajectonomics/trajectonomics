@@ -1,6 +1,6 @@
 # A Market path is named by its index under a seed, and `projection path` replays it
 
-Status: accepted. Ships in the release after 0.8.0.
+Status: accepted. Ships in 0.8.0.
 
 A chance of success of 82 per cent is hard to trust until a person has seen what a failing future looks like. Every
 Market path is seeded, so any one of them can be replayed exactly (sim ADR 0011, amended). The engine now reports
@@ -35,8 +35,9 @@ belongs to.
   (`--return-model` including `plan` and `--buckets`, `--paths`, `--seed`, the what-ifs and `--carry-in`), `projection
   run`'s opt-in flags (`--monthly`, `--breakdown`, `--liabilities`, `--accounts`, `--spending`, `--estate`) and
   `--index`, which is required. The engine's `projectPath` replays the one path, so only that path's draws are made.
-- **The result is `projection run`'s plus the run it is a path of.** `index`, `paths`, `seed`, `modelId` and, for
-  `plan`, the `returnModel` echo (ADR-0068), and `returns`: for each Annual roll-up, each Account's compounded market
+- **The result is `projection run`'s plus the run it is a path of.** `index`; `definition`, the run exactly as
+  `projection chance` states it (`{ modelId, seed, paths }`, one schema for both leaves); for `plan`, the `returnModel`
+  echo (ADR-0068); and `returns`: for each Annual roll-up, each Account's compounded market
   return in basis points (`{ index, from, to, accounts: [{ account, returnBps }] }`). `returns` is the market's growth
   from the roll-up's first day through its last, so it need not equal the change in an Account's balance, and it covers
   one day more than the roll-up's closing net worth, which is read before that day's growth (sim ADR 0011). The

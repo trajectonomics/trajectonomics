@@ -69,6 +69,13 @@ export type ChanceView = Echo & {
 	tables: ChanceTable[]
 }
 
+/** The run a chance or a path names: the Return model's id, the seed and the path count. */
+export const chanceDefinition: z.ZodType<ChanceDefinitionView> = z.strictObject({
+	modelId: z.string().describe("The Return model's id, as the file states it."),
+	seed: z.string().describe("The seed, as 16 lower-case hex digits."),
+	paths: z.number().int().describe("The number of Market paths run."),
+})
+
 export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	asOf: asOfField,
 	engine: engineEcho,
@@ -79,11 +86,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	notes: notesField,
 	horizon: dateField("The date the Projection ends at"),
 	currency: z.string().describe("The Scenario's ISO 4217 currency; v1 is THB only."),
-	definition: z.strictObject({
-		modelId: z.string().describe("The Return model's id, as the file states it."),
-		seed: z.string().describe("The seed, as 16 lower-case hex digits."),
-		paths: z.number().int().describe("The number of Market paths run."),
-	}),
+	definition: chanceDefinition,
 	returnModel: planModelField,
 	paths: z.number().int().describe("The number of Market paths run."),
 	succeeded: z.number().int().describe("Market paths that never run out through the horizon."),

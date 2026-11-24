@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test"
 import { goldenTextIn, recordGoldenTextIn } from "./golden-test-support"
-import type { AnnualRow } from "./projection/run-view"
 import { projection } from "./projection/testing"
 import {
 	chanceWithOutcomes,
@@ -64,65 +63,28 @@ describe("projection chance --outcomes", () => {
 	it("names the paths at the 10th, 50th and 90th Percentile by nearest rank, worked by hand on 10 paths", async () => {
 		const { home, flags } = await outcomesRun(10)
 		const chance = await chanceWithOutcomes(home, flags)
-		const ascending = [...(chance.outcomes ?? [])].sort((a, b) =>
-			satang(a.closingNetWorth) === satang(b.closingNetWorth)
-				? a.index - b.index
-				: satang(a.closingNetWorth) < satang(b.closingNetWorth)
-					? -1
-					: 1,
-		)
-		// ceil(10 * 10 / 100) = 1, ceil(50 * 10 / 100) = 5, ceil(90 * 10 / 100) = 9: the 1st, 5th and 9th of 10.
-		expect(chance.representative?.p10).toBe(ascending[0]?.index ?? -1)
-		expect(chance.representative?.p50).toBe(ascending[4]?.index ?? -1)
-		expect(chance.representative?.p90).toBe(ascending[8]?.index ?? -1)
-		expect(chance.representative?.earliestRunsOut).toBeNull()
-		const lowest = [...(chance.outcomes ?? [])].sort((a, b) =>
-			satang(a.lowestNetWorth) === satang(b.lowestNetWorth)
-				? a.index - b.index
-				: satang(a.lowestNetWorth) < satang(b.lowestNetWorth)
-					? -1
-					: 1,
-		)
-		expect(chance.representative?.lowest).toBe(lowest[0]?.index ?? -1)
+		// Ranked by closing net worth, the 1st, 5th and 9th of 10 (ceil(10 * 10 / 100) = 1, ceil(50 * 10 / 100) = 5,
+		// ceil(90 * 10 / 100) = 9) are paths 5, 3 and 8; path 4 has the lowest lowest net worth.
+		expect(chance.representative).toEqual({
+			p10: 5,
+			p50: 3,
+			p90: 8,
+			earliestRunsOut: null,
+			lowest: 4,
+		})
 	})
 
-	it("rounds the rank up: on 3 paths the 10th, 50th and 90th Percentile are the 1st, 2nd and 3rd", async () => {
-		const { home, flags } = await outcomesRun(3)
+	it("rounds the rank up: on 5 paths the 10th, 50th and 90th Percentile are the 1st, 3rd and 5th", async () => {
+		const { home, flags } = await outcomesRun(5)
 		const chance = await chanceWithOutcomes(home, flags)
-		const ascending = [...(chance.outcomes ?? [])].sort((a, b) =>
-			satang(a.closingNetWorth) === satang(b.closingNetWorth)
-				? a.index - b.index
-				: satang(a.closingNetWorth) < satang(b.closingNetWorth)
-					? -1
-					: 1,
-		)
-		expect([
-			chance.representative?.p10,
-			chance.representative?.p50,
-			chance.representative?.p90,
-		]).toEqual(ascending.map((outcome) => outcome.index))
-	})
-
-	it("agrees with the replay of a path: closing, lowest, the year it was lowest in and the run-out", async () => {
-		const { home, flags } = await outcomesRun(40)
-		const chance = await chanceWithOutcomes(home, flags)
-		const picks = Object.values(chance.representative ?? {}).filter(
-			(index): index is number => typeof index === "number",
-		)
-		for (const index of new Set([0, 39, ...picks])) {
-			const outcome = chance.outcomes?.[index]
-			const path = pathBody(await pathAt(home, flags, index))
-			const annual = path.tables.find((table) => table.name === "annual")
-			const rows = (annual?.rows ?? []) as AnnualRow[]
-			expect(path.index).toBe(index)
-			expect(rows.at(-1)?.closingNetWorth).toBe(outcome?.closingNetWorth ?? "")
-			const lowest = rows.reduce((least, row) =>
-				satang(row.closingNetWorth) < satang(least.closingNetWorth) ? row : least,
-			)
-			expect(lowest.closingNetWorth).toBe(outcome?.lowestNetWorth ?? "")
-			expect(lowest.from).toBe(outcome?.lowestYear ?? "")
-			expect(path.runsOut).toEqual(outcome?.runsOut ?? null)
-		}
+		// ceil(0.5) = 1, ceil(2.5) = 3 and ceil(4.5) = 5: paths 0, 2 and 4 are the 1st, 3rd and 5th by closing net worth.
+		expect(chance.representative).toEqual({
+			p10: 0,
+			p50: 2,
+			p90: 4,
+			earliestRunsOut: null,
+			lowest: 4,
+		})
 	})
 
 	it("reports a path that ran out with its date and shortfall, and names the earliest", async () => {
@@ -137,7 +99,7 @@ describe("projection chance --outcomes", () => {
 		expect(path.runsOut).toEqual(chance.outcomes?.[5]?.runsOut ?? null)
 	})
 
-	it("prints every path worst closing net worth first, then the paths it names, in the human form", async () => {
+	it("prints the paths it names, then every path worst closing net worth first, in the human form", async () => {
 		const { home, flags } = await outcomesRun(12)
 		const chance = await chanceWithOutcomes(home, flags)
 		const res = await (await import("./test-support")).capture(

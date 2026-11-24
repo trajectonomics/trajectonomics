@@ -48,9 +48,7 @@ export function pathOf(
 			...(built?.notes ?? []),
 		],
 		index: selection.index,
-		paths: selection.paths,
-		seed: selection.seed,
-		modelId: model.id,
+		definition: { modelId: model.id, seed: selection.seed, paths: selection.paths },
 		...(built === undefined ? {} : { returnModel: built.view }),
 		returns: projection.returns.map((rollup) => ({
 			index: rollup.index,

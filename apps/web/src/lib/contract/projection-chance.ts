@@ -67,7 +67,7 @@ const chanceTable = z.discriminatedUnion("name", [
  * What `--return-model plan` built the model from (cli ADR-0068): the bucket count and each asset
  * Account that swings, with its `rate` and `volatility` in basis points. Present only with `plan`.
  */
-const planReturnModel = z.strictObject({
+export const planReturnModel = z.strictObject({
 	source: z.literal("plan"),
 	buckets: integer,
 	accounts: z.array(z.strictObject({ id: z.string(), rate: integer, volatility: integer })),

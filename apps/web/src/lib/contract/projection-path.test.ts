@@ -15,7 +15,10 @@ async function golden(name: string): Promise<unknown> {
 describe("the projection path contract against the CLI's golden", () => {
 	it("parses a path: its annual table, the run it belongs to and the returns it drew", async () => {
 		const path = projectionPath.parse(await golden("path.output"))
-		expect(path).toMatchObject({ index: 7, paths: 20, modelId: "illustrative-four-months" })
+		expect(path).toMatchObject({
+			index: 7,
+			definition: { paths: 20, modelId: "illustrative-four-months" },
+		})
 		expect(path.tables.map((table) => table.name)).toEqual(["annual"])
 		expect(path.returns.map((rollup) => rollup.index)).toEqual([0, 1, 2])
 		expect(path.returns[0]?.accounts).toHaveLength(2)
@@ -25,6 +28,7 @@ describe("the projection path contract against the CLI's golden", () => {
 	it("is the path the chance's outcomes list at the same index", async () => {
 		const path = projectionPath.parse(await golden("path.output"))
 		const chance = projectionChance.parse(await golden("chance-outcomes.output"))
+		expect(path.definition).toEqual(chance.definition)
 		const outcome = chance.outcomes?.[path.index]
 		const annual = path.tables.find((table) => table.name === "annual")
 		expect(annual?.rows.at(-1)?.closingNetWorth).toBe(outcome?.closingNetWorth)

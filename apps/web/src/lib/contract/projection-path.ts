@@ -1,17 +1,8 @@
 import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
-import { money } from "./money"
-import { projectionShape } from "./projection-shape"
-import { projectionTables } from "./projection-tables"
-import { taxYear } from "./tax-year"
-
-/** What `--return-model plan` built the model from (cli ADR-0068). Present only with `plan`. */
-const planReturnModel = z.strictObject({
-	source: z.literal("plan"),
-	buckets: integer,
-	accounts: z.array(z.strictObject({ id: z.string(), rate: integer, volatility: integer })),
-})
+import { planReturnModel } from "./projection-chance"
+import { projectionRun } from "./projection-run"
 
 /** Each Account's market return over one annual roll-up of the path, in basis points. */
 const rollupReturns = z.strictObject({
@@ -23,17 +14,11 @@ const rollupReturns = z.strictObject({
 
 /**
  * `traj projection path --json`: the Projection of one seeded Market path, in `projection run`'s shape,
- * plus the run it is a path of and the returns it drew (cli ADR-0069).
+ * plus the run it is a path of, as `projection chance` echoes it, and the returns it drew (cli ADR-0069).
  */
-export const projectionPath = z.strictObject({
-	...projectionShape,
-	runsOut: z.strictObject({ date: dateString, unmet: money }).nullable(),
-	taxYears: z.array(taxYear),
-	tables: projectionTables,
+export const projectionPath = projectionRun.extend({
 	index: integer,
-	paths: integer,
-	seed: z.string(),
-	modelId: z.string(),
+	definition: z.strictObject({ modelId: z.string(), seed: z.string(), paths: integer }),
 	returnModel: planReturnModel.optional(),
 	returns: z.array(rollupReturns),
 })

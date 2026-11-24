@@ -1,6 +1,6 @@
 # An Account's payout and fee and an employer's share are the document's, and `projection run` states what each did
 
-Status: accepted. Ships in the release after 0.8.0.
+Status: accepted. Ships in 0.8.0.
 
 The engine pays an Account's value out as passive income (sim ADR 0027), charges it a fee on every path (sim ADR 0028)
 and lands an employer's share in an Account outside the household's cash (sim ADR 0026). They reach a person only
