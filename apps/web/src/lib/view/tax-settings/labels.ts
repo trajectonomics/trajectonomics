@@ -1,27 +1,24 @@
 /**
- * The Flows a plan's tax cannot read yet. `scenario tax` refuses a plan whose income Flow carries no tax label, and this page
- * does not set labels, so it names those Flows and the command that does ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
- * A label that is present counts as set: the closed list of labels is `traj`'s, and a wrong one is refused by `traj`. Pure.
+ * The Flows a plan's tax cannot read yet. `scenario tax` refuses a plan whose income Flow carries no tax label, so the page
+ * names those Flows and its label form sets them ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
+ * A label `traj` does not know counts as none, as it does in `traj` (`unlabelledIncome` in `apps/cli/src/scenario/tax/labels.ts`):
+ * the Levy would tally such a Flow as nothing. Pure.
  */
 import type { ScenarioDocument } from "../../contract"
+import { INCOME_LABEL_IDS } from "../../edit/tax-labels"
 
 /** The ids of the plan's income Flows. */
 export function incomeFlows(plan: ScenarioDocument): string[] {
 	return plan.flows.filter((flow) => flow.kind === "income").map((flow) => flow.id)
 }
 
-/** The ids of the plan's income Flows that carry no tax label. */
+/** The ids of the plan's income Flows that carry no tax label, or one `traj` does not know. */
 export function unlabelledIncome(plan: ScenarioDocument): string[] {
 	return plan.flows
-		.filter((flow) => flow.kind === "income" && (flow.label ?? "") === "")
+		.filter(
+			(flow) =>
+				flow.kind === "income" &&
+				!(INCOME_LABEL_IDS as readonly string[]).includes(flow.label ?? ""),
+		)
 		.map((flow) => flow.id)
-}
-
-/**
- * The command that gives a Flow its tax label: with a stored profile a merge keeps it, and without one the whole profile
- * is stated again. `<flow>` and `<label>` are the person's to fill in; `traj scenario tax --help` lists the labels.
- */
-export function labelCommand(name: string, stored: boolean): string {
-	const mode = stored ? "--merge" : "--tax th-2026"
-	return `traj scenario tax ${name} ${mode} --label <flow>=<label>`
 }

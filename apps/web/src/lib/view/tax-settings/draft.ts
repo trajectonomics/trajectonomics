@@ -4,7 +4,6 @@
  * which has no default here. `traj` parses and checks every value ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
  */
 import type { TaxProfile } from "../../contract"
-import type { EditInput } from "../../edit/edit"
 import { AMOUNT_SHAPE, COUNT_SHAPE, TAX_FLAG_KEYS, type TaxFlags } from "../../edit/tax-flags"
 import type { Problems } from "../plan-items/problems"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
@@ -104,29 +103,4 @@ export function wholeFlags(draft: TaxDraft): TaxResult {
 			return [field.key, item] as const
 		}),
 	])
-}
-
-/**
- * The Edit a draft makes, to merge into the stored profile or to set the profile whole, or the problems at its fields.
- * `origin` is the draft of the profile the form opened with, null when none was stored.
- */
-export function taxEdit(
-	target: { name: string; contentHash: string; origin: TaxDraft | null },
-	draft: TaxDraft,
-	whole: boolean,
-): { ok: true; edit: EditInput } | { ok: false; problems: Problems } {
-	const { name, contentHash, origin } = target
-	if (whole || origin === null) {
-		const result = wholeFlags(draft)
-		if (!result.ok) return result
-		const { filingStatus } = result.flags
-		if (filingStatus === undefined) {
-			return { ok: false, problems: { filingStatus: "Choose a filing status." } }
-		}
-		const flags = { ...result.flags, filingStatus }
-		return { ok: true, edit: { kind: "set-tax", name, contentHash, flags } }
-	}
-	const result = mergeFlags(origin, draft)
-	if (!result.ok) return result
-	return { ok: true, edit: { kind: "merge-tax", name, contentHash, flags: result.flags } }
 }

@@ -79,3 +79,4 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 ## Amendment (2026-11-24): the tax profile Edits
 
 - `merge-tax`, `set-tax` and `remove-tax` are `traj scenario tax <name> --merge <flags>`, `--tax th-2026 <flags>` and `--none`, each with `--if-hash`, run dry first. The flags are a closed, strict set whose values are digits only, so none is read as a flag. See [ADR 0016](0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md).
+- `set-tax` also takes `labels`, a list of `{ flow, label }` that becomes one `--label=<flow>=<label>` token each, after the profile flags. A label is one of the income labels `traj` lists. A Flow id is 1 to 256 characters with no `=` (`traj` splits a label on the first one) and no control character, so it can be any id the page makes, Thai script and punctuation included. The pair is a single token, so an id that starts with `-` can never be read as a flag; `merge-tax` takes none.
