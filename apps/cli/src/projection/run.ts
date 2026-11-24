@@ -9,6 +9,8 @@ import { estateNotes } from "./estate-notes"
 import { fundingNotes } from "./funding"
 import { optionsOf } from "./liabilities"
 import { lifetimeFieldsOf } from "./lifetime-view"
+import { routingOf } from "./routing"
+import type { RoutingView } from "./routing-view"
 import { annualRow, runsOutView } from "./rows"
 import { extraTablesOf, type Wants } from "./run-tables"
 import type { ProjectionRunView, ProjectionTable } from "./run-view"
@@ -66,9 +68,17 @@ export function runViewOf(
 		],
 		horizon: timeline.horizon,
 		currency,
+		// Present only for a share, a floor or a target that keeps its value, so a plain plan keeps its bytes (cli ADR-0070).
+		...routingEcho(prepared),
 		runsOut: runsOutView(projection.runsOut, currency),
 		taxYears: taxYearsOf(projection.levies, currency, prepared.document),
 		...lifetimeFieldsOf(projection, currency),
 		tables,
 	}
+}
+
+/** The `routing` field of a run, or nothing for a plain routing. */
+function routingEcho(prepared: Placed): { routing?: RoutingView } {
+	const routing = routingOf(prepared.document, prepared.currency)
+	return routing === undefined ? {} : { routing }
 }

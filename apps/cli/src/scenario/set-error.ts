@@ -83,3 +83,21 @@ export function identityFailure(segment: string, ctx: SegmentContext): AppError 
 		},
 	)
 }
+
+/** A position a routing list does not hold, or a segment that is not a position (cli ADR-0070). */
+export function unknownPosition(
+	segment: string,
+	length: number,
+	prefix: readonly string[],
+	ctx: SegmentContext,
+): AppError {
+	const where = `"${formatPath(prefix)}"`
+	const held =
+		length === 0
+			? `${where} holds no entries`
+			: `${where} holds ${length} ${length === 1 ? "entry" : "entries"}, numbered 0 to ${length - 1}`
+	return flagError(flagOf(ctx), ctx.index, `no entry "${segment}" under ${where}`, {
+		hint: `A step or entry of this list is addressed by its position, counted from 0, such as ${formatPath([...prefix, "0"])}; ${held}.`,
+		details: { index: ctx.index, path: ctx.path, segment, suggestion: null },
+	})
+}

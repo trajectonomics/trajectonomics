@@ -18,6 +18,8 @@ export type AnnualRow = {
 	payouts?: string | undefined
 	/** Employer Contributions landed in Accounts, outside `income`; present only when the Scenario declares one (sim ADR 0026). */
 	employerContributions?: string | undefined
+	/** Money moved between the plan's own Accounts, outside cashflow and every other figure; present only when the Scenario declares a transfer Flow (sim ADR 0031). */
+	transfers?: string | undefined
 	/** Fees charged to Accounts, outside cashflow; present only when an Account carries a fee above 0 bps (sim ADR 0028). */
 	fees?: string | undefined
 	expense: string
@@ -55,6 +57,9 @@ export const annualRow: z.ZodType<AnnualRow> = z.strictObject({
 	).optional(),
 	employerContributions: moneyField(
 		"Employer Contributions the roll-up landed in Accounts; outside income, contributions and interest, because the money never entered cashflow; present only when the Scenario declares one",
+	).optional(),
+	transfers: moneyField(
+		"Money the roll-up moved between the plan's own Accounts by transfer Flows; outside income, expense, contributions and interest, and net worth is unchanged by it; present only when the Scenario declares a transfer Flow",
 	).optional(),
 	fees: moneyField(
 		"Fees the roll-up charged to Accounts; they left the Accounts outside cashflow and are not in interest, which is growth before the fee; present only when an Account carries a fee above 0 bps",

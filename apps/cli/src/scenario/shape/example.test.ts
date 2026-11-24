@@ -47,7 +47,6 @@ describe("the unit of every number the shape states", () => {
 	it("is named in the description of the field that holds it", () => {
 		const units: [Path, string][] = [
 			[["flows", 0, "amount"], "minor units"],
-			[["cashflow", "surplus", 0, "upTo"], "minor units"],
 			[["accounts", 0, "rate"], "basis points"],
 			[["economy", "inflation"], "basis points"],
 			[["flows", 0, "growth"], "bps"],
@@ -59,6 +58,15 @@ describe("the unit of every number the shape states", () => {
 		for (const [path, unit] of units) {
 			expect(String(nodeAt(path)["description"])).toContain(unit)
 		}
+	})
+
+	it("is named in the plain form of a routing target, whose own description names no unit", () => {
+		// `upTo` is an `anyOf`: the unit heads the plain branch, and the decimal form swaps it there (cli ADR-0070).
+		const branches = nodeAt(["cashflow", "surplus", 0, "upTo"])["anyOf"] as Record<
+			string,
+			unknown
+		>[]
+		expect(String(branches[0]?.["description"])).toContain("minor units")
 	})
 })
 
