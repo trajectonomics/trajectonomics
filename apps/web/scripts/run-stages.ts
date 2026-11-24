@@ -24,6 +24,7 @@ import {
 	type StageTwoPlan,
 } from "../src/lib/snapshot"
 import { runAllowances } from "./run-allowances"
+import { runPaths } from "./run-paths"
 import { runPlanned } from "./run-planned"
 import type { RunContext } from "./run-traj"
 
@@ -74,6 +75,7 @@ export async function runStageTwo(
 	const documents = await recordOf(plan.documents, (planned) =>
 		runPlanned(context, planned, scenarioShow, records),
 	)
+	const chance = await runChance(context, plan, records)
 	return {
 		doctor: await runPlanned(context, plan.doctor, doctor, records),
 		balance: await runPlanned(context, plan.balance, balance, records),
@@ -92,7 +94,8 @@ export async function runStageTwo(
 			plan.compare === null
 				? null
 				: await runPlanned(context, plan.compare, projectionCompare, records),
-		chance: await runChance(context, plan, records),
+		chance,
+		paths: await runPaths(context, plan, chance, records),
 		allowances: await runAllowances(context, plan, documents, records),
 	}
 }

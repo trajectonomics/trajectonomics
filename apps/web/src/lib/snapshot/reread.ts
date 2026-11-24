@@ -38,7 +38,12 @@ export function stillCurrent(
 	const { reads } = held
 	const replaced = new Set<Read<unknown>>([
 		...(rerun.includes("allowances") ? Object.values(reads.allowances) : []),
-		...(rerun.includes("chance") ? Object.values(reads.chance) : []),
+		...(rerun.includes("chance")
+			? [
+					...Object.values(reads.chance),
+					...Object.values(reads.paths).flatMap((byIndex) => Object.values(byIndex)),
+				]
+			: []),
 	])
 	const kept = readsOf(held).filter((read) => !replaced.has(read))
 	return (
@@ -62,16 +67,20 @@ export function withAllowances(
 	}
 }
 
-/** The Snapshot with the new chance inputs and the reads they gave; every other Read stays as it was. */
+/**
+ * The Snapshot with the new chance inputs and the reads they gave, the chance reads and the paths read from them; every
+ * other Read stays as it was.
+ */
 export function withChance(
 	held: Snapshot,
 	chance: ChancePlan,
 	reads: SnapshotReads["chance"],
+	paths: SnapshotReads["paths"],
 ): Snapshot {
 	const stated = { source: chanceSourceOf(chance), paths: chance.paths, seed: chance.seed }
 	return {
 		...held,
 		params: { ...held.params, chance: stated },
-		reads: { ...held.reads, chance: reads },
+		reads: { ...held.reads, chance: reads, paths },
 	}
 }
