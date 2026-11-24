@@ -1,6 +1,6 @@
 // Deleting a loan the Baseline owes, and "I already owe it", against the real traj: the plan keeps projecting
 // after the delete, and an owed loan opens its statement at the Baseline's balance (cli ADR 0059).
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { scenarioDocument, snapshot } from "../src/lib/contract"
 import { balanceOf } from "../src/lib/view/plan-items/accounts"
 import { withFlow } from "../src/lib/view/plan-items/document"
@@ -24,12 +24,15 @@ import {
 	save,
 	setupLedger,
 } from "./loans-ledger.test-support"
+import { settle } from "./loans-running.test-support"
 
 const DEL = "loan-del"
 /** The id of the debt the Baseline holds, which the first test finds before it takes the loan's Flows out. */
 let debt = ""
 
 beforeAll(() => setupLedger([DEL]), SLOW_MS)
+// A test that timed out leaves its Edit holding the server: wait for it, so it fails no test after it.
+afterEach(settle, SLOW_MS)
 afterAll(disposeLedger)
 
 describe("deleting a loan the Baseline already owes", () => {

@@ -1,6 +1,6 @@
 // A What-if Try of a loan's principal, and a stale loan save, against the real traj: Apply and Save as new plan
 // store a plan whose draw and payment agree, and a save over a changed plan is refused (cli ADR 0055, 0056).
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { whatIfSession } from "../src/client/what-if.svelte"
 import { tryLoanInWhatIf } from "../src/components/plan-items/loan-what-if"
 import { loanDocument, loanOf } from "../src/lib/view/plan-items/loan-document"
@@ -19,6 +19,7 @@ import {
 	setupLedger,
 	showOf,
 } from "./loans-ledger.test-support"
+import { settle } from "./loans-running.test-support"
 
 /** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
 const realFetch = globalThis.fetch
@@ -26,6 +27,8 @@ const TRY = "loan-try"
 const STALE = "loan-stale"
 
 beforeAll(() => setupLedger([TRY, STALE]), SLOW_MS)
+// A test that timed out leaves its Edit holding the server: wait for it, so it fails no test after it.
+afterEach(settle, SLOW_MS)
 afterAll(async () => {
 	whatIfSession.end()
 	globalThis.fetch = realFetch

@@ -2,7 +2,7 @@
 // whose draw the terminal moved is no longer the asset's recognised loan, yet the asset's group claims it, so the
 // two never both hold its parts; and a debt the ledger holds has no switch, since its payments out leave it growing.
 // Each test makes its own plan, so each passes alone.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { whatIfSession } from "../src/client/what-if.svelte"
 import type { ScenarioDocument } from "../src/lib/contract"
 import { assetCardsOf } from "../src/lib/view/plan-items/asset-card"
@@ -10,6 +10,7 @@ import { assetDocument } from "../src/lib/view/plan-items/asset-document"
 import { homeDraft, partsOf } from "../src/lib/view/plan-items/asset-fixtures.test-support"
 import { loanCardsOf } from "../src/lib/view/plan-items/loan-card"
 import type { GroupSpec } from "../src/lib/what-if/session"
+import { forkHash } from "./loans-fork.test-support"
 import {
 	applyInTerminal,
 	baselineOf,
@@ -17,10 +18,10 @@ import {
 	documentOf,
 	hashOf,
 	SLOW_MS,
-	save,
 	send,
 	setupLedger,
 } from "./loans-ledger.test-support"
+import { settle } from "./loans-running.test-support"
 
 /** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
 const realFetch = globalThis.fetch
@@ -36,6 +37,9 @@ afterAll(async () => {
 	await disposeLedger()
 })
 
+// A test that timed out leaves its Edit holding the server: wait for it, so it fails no test after it.
+afterEach(settle, SLOW_MS)
+
 /** Starts a session on a plan with no server to read it. */
 function newSession(): void {
 	whatIfSession.end()
@@ -45,8 +49,7 @@ function newSession(): void {
 /** The plan with a home saved to it, then its loan's draw moved one day in the terminal, as a person editing the file would. */
 async function withMovedLoan(plan: string): Promise<ScenarioDocument> {
 	const doc = documentOf(plan)
-	const saved = await save(plan, assetDocument(doc, partsOf(homeDraft(), doc), undefined))
-	if (!saved.ok) throw new Error(saved.error?.message)
+	applyInTerminal(plan, assetDocument(doc, partsOf(homeDraft(), doc), undefined))
 	const home = documentOf(plan)
 	applyInTerminal(plan, {
 		...home,
@@ -57,12 +60,12 @@ async function withMovedLoan(plan: string): Promise<ScenarioDocument> {
 	return documentOf(plan)
 }
 
-/** The content hash of the plan the session's changes make: a fork carrying them. */
-async function effectiveHash(plan: string, copy: string): Promise<string> {
-	const changes = whatIfSession.changesFor(plan) ?? { sets: [], removals: [] }
-	const answer = await send({ kind: "copy-plan", from: plan, name: copy, ...changes })
-	if (!answer.ok) throw new Error(answer.error?.message)
-	return hashOf(copy)
+/**
+ * The content hash of the plan the session's changes make: a fork carrying them. The fork runs through
+ * `traj scenario fork` alone, with no Snapshot read after it, so each copy costs one write.
+ */
+function effectiveHash(plan: string, copy: string): string {
+	return forkHash(plan, copy, whatIfSession.changesFor(plan))
 }
 
 /** The ids of the plan's items that name the home. */
@@ -108,7 +111,7 @@ describe("a loan the terminal changed inside an asset", () => {
 			]) {
 				const last = switchBothOff(MOVED, hash, order)
 				expect(whatIfSession.whatIf?.removals ?? []).toEqual([])
-				expect(await effectiveHash(MOVED, `${MOVED_BACK}-${last}`)).toBe(hash)
+				expect(effectiveHash(MOVED, `${MOVED_BACK}-${last}`)).toBe(hash)
 			}
 		},
 		SLOW_MS,
