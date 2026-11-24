@@ -22,7 +22,6 @@ const PLAN = "home-plan"
 const EDIT = { isNew: false, ownedIds: [] }
 
 beforeAll(() => setupLedger([PLAN]), SLOW_MS)
-// A test that timed out leaves its Edit holding the server: wait for it, so it fails no test after it.
 afterEach(settle, SLOW_MS)
 afterAll(disposeLedger)
 

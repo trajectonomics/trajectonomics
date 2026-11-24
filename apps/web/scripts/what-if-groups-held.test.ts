@@ -37,7 +37,6 @@ afterAll(async () => {
 	await disposeLedger()
 })
 
-// A test that timed out leaves its Edit holding the server: wait for it, so it fails no test after it.
 afterEach(settle, SLOW_MS)
 
 /** Starts a session on a plan with no server to read it. */

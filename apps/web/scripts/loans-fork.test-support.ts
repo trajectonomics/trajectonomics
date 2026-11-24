@@ -1,7 +1,7 @@
 // Forks a plan with a What-if session's changes straight through `traj`, to read the content hash of the plan
 // they make, without the Snapshot read an Edit ends with.
 import { writeCommand } from "../src/lib/edit/command"
-import type { Edit } from "../src/lib/edit/edit"
+import { type Edit, editSchema } from "../src/lib/edit/edit"
 import { BINARY } from "./edit-fixture.test-support"
 import { env, hashOf } from "./loans-ledger.test-support"
 
@@ -17,17 +17,15 @@ export function forkHash(
 	name: string,
 	changes: Pick<Copy, "sets" | "removals"> | null,
 ): string {
-	const { argv } = writeCommand(
-		{
-			kind: "copy-plan",
-			from,
-			name,
-			sets: changes?.sets ?? [],
-			removals: changes?.removals ?? [],
-			additions: [],
-		},
-		false,
-	)
+	// Parsed as the server parses the body, so a change its guards refuse fails here too.
+	const edit = editSchema.parse({
+		kind: "copy-plan",
+		from,
+		name,
+		sets: changes?.sets ?? [],
+		removals: changes?.removals ?? [],
+	})
+	const { argv } = writeCommand(edit, false)
 	const run = Bun.spawnSync([BINARY, ...argv], { env: env() })
 	if (run.exitCode !== 0) throw new Error(run.stderr.toString() || run.stdout.toString())
 	return hashOf(name)
