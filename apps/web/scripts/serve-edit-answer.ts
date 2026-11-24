@@ -6,6 +6,7 @@ import { type Edit, editSchema } from "../src/lib/edit/edit"
 import { type Reread, rereadSchema } from "../src/lib/edit/reread"
 import { type WhatIfBody, whatIfSchema } from "../src/lib/what-if/overrides"
 import { json } from "./serve-respond"
+import type { SnapshotRun } from "./snapshot-run"
 
 /** The exit code a refusal carries: the write path refuses rather than runs, so none of traj's codes fits. */
 export const REFUSED_EXIT_CODE = 1
@@ -13,6 +14,12 @@ export const REFUSED_EXIT_CODE = 1
 /** An error envelope at a status: a failed Edit answers 200, with its error as data. */
 export function failure(status: number, error: ErrorBody): Response {
 	return json(status, JSON.stringify({ ok: false, error }))
+}
+
+/** Answers a Snapshot run: the Snapshot, or the CLI's error as data. */
+export function answerOf(run: SnapshotRun): Response {
+	if (!run.ok) return failure(200, run.error)
+	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
 }
 
 /** A refused request: its status, its code and the sentence a person reads. */

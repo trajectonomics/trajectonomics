@@ -7,8 +7,9 @@ import { followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
 import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
 import { runTraj } from "./run-traj"
-import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
+import { answerOf, failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
+import { answerPath } from "./serve-path"
 import { json } from "./serve-respond"
 import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
@@ -41,12 +42,6 @@ export function createEditor(options: EditorOptions): Editor {
 		return runTraj(options.traj, command.argv, z.unknown(), command.stdin)
 	}
 
-	/** Answers a Snapshot run: the Snapshot, or the CLI's error as data. */
-	function answerOf(run: SnapshotRun): Response {
-		if (!run.ok) return failure(200, run.error)
-		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
-	}
-
 	/** The Edit's own run: dry first, then the real write, then the Snapshot read again. */
 	async function apply(request: Request): Promise<Response> {
 		const read = await readEdit(request)
@@ -60,10 +55,14 @@ export function createEditor(options: EditorOptions): Editor {
 		return answerOf(await refresh())
 	}
 
-	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data. */
+	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */
 	async function rereadAnswer(request: Request): Promise<Response> {
 		const read = await readReread(request)
 		if (!read.ok) return failure(400, read.error)
+		// One path is read alone: nothing of the Snapshot, the parameters or the served body changes.
+		if (read.reread.path !== undefined) {
+			return answerPath(read.reread.path, params, held, options.traj, options.records)
+		}
 		params = paramsAfter(params, read.reread)
 		const changed = changedBy(read.reread)
 		// Only those inputs changed: run only the reads that depend on them, if nothing else moved (run-reread.ts).

@@ -21,7 +21,7 @@ export const PATHS = 300
 let scratch = ""
 let home = ""
 let editor: Editor | null = null
-let spy: { log: string; dispose: () => Promise<void> } | null = null
+let spy: Awaited<ReturnType<typeof spyContext>> | null = null
 
 function env(): NodeJS.ProcessEnv {
 	return { ...process.env, TRAJ_HOME: home }
@@ -59,12 +59,17 @@ export async function setupAssumptions(): Promise<Editor> {
 		["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"],
 		handDocument(base, { bank: bank.id, fund: fund.id, loan: demo.loan }),
 	)
-	const made = await spyContext(env())
-	spy = made
+	spy = await spyContext(env())
+	return startEditor(false)
+}
+
+/** A new editor over the same ledger, with the five paths read in advance or not (the offline Snapshot reads them, a live dashboard does not). */
+export async function startEditor(readPaths: boolean): Promise<Editor> {
+	if (spy === null) throw new Error("the ledger is not set up")
 	editor = createEditor({
-		traj: made.context,
+		traj: spy.context,
 		cliVersion: "test",
-		params: { ...PARAMS, asOf: AS_OF, horizon: "2030-12-31", scenarios: [PLAN] },
+		params: { ...PARAMS, asOf: AS_OF, horizon: "2030-12-31", scenarios: [PLAN], readPaths },
 		records: [],
 		token: TOKEN,
 	})

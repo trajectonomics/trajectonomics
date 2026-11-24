@@ -50,6 +50,26 @@ describe("columnLayout", () => {
 		expect(layout?.series[0]?.path).toBe("")
 	})
 
+	test("a marker of a bar chart stands inside the column of its period, a fraction of the way along it", () => {
+		const bars = [line("A", [10, 20, 30])].map((series) => ({
+			...series,
+			points: series.points.map((point, index) => ({ ...point, x: index })),
+		}))
+		const layout = columnLayout(bars, PLOT, "bars", [
+			{ x: -0.5, label: "half of the first" },
+			{ x: 1, label: "end of the second" },
+			{ x: 5, label: "beyond" },
+		])
+		const [first, second] = layout?.xPixels ?? []
+		const slot = ((layout?.xPixels[1] ?? 0) - (first ?? 0)) as number
+		expect(layout?.markers.map((marker) => marker.label)).toEqual([
+			"half of the first",
+			"end of the second",
+		])
+		expect(layout?.markers[0]?.x).toBeCloseTo(first ?? 0)
+		expect(layout?.markers[1]?.x).toBeCloseTo((second ?? 0) + slot / 2)
+	})
+
 	test("stacked bars rise from one another and the axis takes in the stack", () => {
 		const layout = columnLayout([line("A", [10]), line("B", [10])], PLOT, "stacked-bars")
 		const [a, b] = layout?.series ?? []
