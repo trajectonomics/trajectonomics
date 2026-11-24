@@ -1,7 +1,9 @@
 import type { ErrorCode, Path } from "../check/codes"
 import type { CashflowBreakdown } from "./breakdown"
+import type { ProjectionRouting } from "./cashflow"
 import type { AccountId, DateString, MinorUnits } from "./common"
 import type { EstateStatement } from "./estate"
+import type { LevyReport } from "./levy"
 import type { AccountLifetime } from "./lifetime"
 import type { MilestoneResult } from "./milestone"
 import type { SpendingRuleStatement } from "./rule"
@@ -83,28 +85,6 @@ export interface RunsOut {
 	readonly unmet: MinorUnits
 }
 
-export interface LevyMeasureValue {
-	readonly id: string
-	readonly value: MinorUnits
-}
-
-export interface SettlementPeriod {
-	readonly from: DateString
-	readonly to: DateString
-	readonly settlementDate: DateString
-	readonly measures: readonly LevyMeasureValue[]
-	readonly prepaid: MinorUnits
-	readonly due: MinorUnits
-	readonly settlement: MinorUnits
-	readonly settled: boolean
-	readonly partial: boolean
-}
-
-export interface LevyReport {
-	readonly id: string
-	readonly periods: readonly SettlementPeriod[]
-}
-
 export interface Projection {
 	readonly rows: readonly ProjectionRow[]
 	readonly annual: readonly AnnualRollup[]
@@ -114,10 +94,7 @@ export interface Projection {
 	 * when an Account carries a fee above 0 bps.
 	 */
 	readonly lifetimeFees?: MinorUnits
-	/**
-	 * Each Account that declares a fee or a payout above 0 bps, in Scenario order, with its totals over the
-	 * whole horizon; present only when there is one.
-	 */
+	/** Each Account that declares a fee or a payout above 0 bps, in Scenario order, with its horizon totals; only when there is one. */
 	readonly accountLifetimes?: readonly AccountLifetime[]
 	readonly runsOut?: RunsOut
 	readonly levies?: readonly LevyReport[]
@@ -127,6 +104,8 @@ export interface Projection {
 	readonly liabilities?: readonly LiabilityStatement[]
 	/** One per Annual roll-up in order; present only with `cashflowBreakdown`. */
 	readonly cashflow?: readonly CashflowBreakdown[]
+	/** Each routing target in force on the start and the horizon; only when one is `{ amount, growth }` (ADR 0030). */
+	readonly routing?: ProjectionRouting
 	/** One statement per rule Flow in Scenario order; present only with `spendingRules`. */
 	readonly spendingRules?: readonly SpendingRuleStatement[]
 	/** One statement per row in order; present only with `estate`. */

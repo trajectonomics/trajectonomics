@@ -6,7 +6,8 @@ import type {
 	SurvivalDefinition,
 	ThresholdMonth,
 } from "./financial-independence"
-import type { LevyReport, ProjectionProblem } from "./projection"
+import type { LevyReport } from "./levy"
+import type { ProjectionProblem } from "./projection"
 import type { RuleOfThumbReference } from "./reference"
 
 export type SurvivalFinancialIndependence =
