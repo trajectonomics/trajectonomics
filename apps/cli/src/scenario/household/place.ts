@@ -2,6 +2,7 @@ import { type AppError, fail, isAppError } from "../../errors"
 import { type ScenarioDocument, scenarioProblems } from "../document"
 import { formatPath } from "../path"
 import { parsePath } from "../set-parse"
+import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, type Household } from "./model"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
 
@@ -50,6 +51,7 @@ export function placeHousehold(
 	let current: unknown = document
 	const placed: Placed[] = []
 	const anchored: AnchoredDate[] = []
+	const pinned = anchoredSegments(household.anchors)
 	for (const [index, anchor] of household.anchors.entries()) {
 		const segments = parsePath(anchor.path, 0)
 		if (isAppError(segments)) return segments
@@ -72,6 +74,11 @@ export function placeHousehold(
 		}
 		current = setAt(current, locus.at, date)
 		placed.push({ anchor, date, item: locus.at.slice(0, -1) })
+		// The employer rule (cli ADR-0048): an employer Contribution reading this Flow takes its date.
+		for (const follower of employerFollowers(current, segments, pinned)) {
+			current = setAt(current, follower, date)
+			placed.push({ anchor, date, item: follower.slice(0, -1) })
+		}
 		anchored.push({ path: formatPath(segments), value: date })
 	}
 	const refusal = refusedAfterPlacing(current, placed, household)

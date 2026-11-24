@@ -1,5 +1,6 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import { parsePath } from "../set-parse"
+import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
 
@@ -42,7 +43,7 @@ function conflict(
 type Outcome = { document: unknown } | { dropped: true }
 
 function resolveOne(
-	people: Household["people"],
+	household: Household,
 	anchor: Anchor,
 	document: unknown,
 	owner: string,
@@ -50,7 +51,7 @@ function resolveOne(
 	const segments = parsePath(anchor.path, 0)
 	if (isAppError(segments)) return segments
 	// A validated household's anchors always resolve, so a null date is a bug, not a caller's input.
-	const date = anchorDate(people, anchor)
+	const date = anchorDate(household.people, anchor)
 	if (date === null) return fail("internal")
 	const locus = locate(document, segments)
 	if (locus.kind === "missing") return { dropped: true }
@@ -58,7 +59,32 @@ function resolveOne(
 		if (locus.value !== date) return conflict(owner, anchor, date, locus.at, locus.value)
 		return { document }
 	}
-	return { document: setAt(document, locus.at, date) }
+	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, household) }
+}
+
+/**
+ * A filled date also fills the same field of each employer Contribution reading that Flow (the
+ * employer rule, cli ADR-0048), but only where the document states none: a stated value is never
+ * rewritten here, because this path refuses a value rather than move it.
+ */
+function fillFollowers(
+	document: unknown,
+	segments: readonly string[],
+	date: string,
+	household: Household,
+): unknown {
+	let current = document
+	for (const follower of employerFollowers(
+		current,
+		segments,
+		anchoredSegments(household.anchors),
+	)) {
+		const [, position, field] = follower
+		const flow = (current as { flows: Record<string, unknown>[] }).flows[position as number]
+		if (flow !== undefined && flow[String(field)] === undefined)
+			current = setAt(current, follower, date)
+	}
+	return current
 }
 
 /**
@@ -76,7 +102,7 @@ export function resolveHousehold(
 	const kept: Anchor[] = []
 	const dropped: string[] = []
 	for (const anchor of household.anchors) {
-		const outcome = resolveOne(household.people, anchor, current, owner)
+		const outcome = resolveOne(household, anchor, current, owner)
 		if (isAppError(outcome)) return outcome
 		if ("dropped" in outcome) {
 			dropped.push(anchor.path)
