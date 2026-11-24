@@ -10,6 +10,7 @@ import TaxDrawer from "./TaxDrawer.svelte"
 import TaxLabelForm from "./TaxLabelForm.svelte"
 import TaxProfileCard from "./TaxProfileCard.svelte"
 import TaxSettingsBody from "./TaxSettingsBody.svelte"
+import { NOT_STATED } from "./tax-not-stated.test-support"
 
 useSessionHooks()
 afterEach(() => {
@@ -46,6 +47,8 @@ const show = (document: ScenarioDocument): ScenarioShow["scenario"] => ({
 	household: null,
 	tax: profile,
 	taxed: true,
+	// What `scenario show` reports for the profile above: the page lists the not-stated classes from it, and works none out.
+	taxAllowances: { stated: ["children", "lifeInsurance"], notStated: NOT_STATED },
 })
 const card = () =>
 	render(TaxProfileCard, { props: { name: "base", show: show(labelled()), editable: true } }).body

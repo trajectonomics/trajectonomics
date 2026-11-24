@@ -2,7 +2,7 @@
 // write, a taxed plan whose income Flow carries a label `traj` does not know, and the not-stated list of a plan with
 // retirement contributions. Each test sets up its own state, so each passes alone.
 import { afterAll, beforeAll, describe, expect } from "bun:test"
-import type { TaxProfile } from "../src/lib/contract"
+import type { TaxAllowances } from "../src/lib/contract"
 import { blankDraft } from "../src/lib/view/tax-settings/draft"
 import { labelEdit } from "../src/lib/view/tax-settings/label-edit"
 import { unlabelledIncome } from "../src/lib/view/tax-settings/labels"
@@ -116,12 +116,11 @@ describe("the tax labels through traj", () => {
 					flows: [...base.document.flows, ...flows],
 				})
 				const shown = JSON.parse(traj(["scenario", "show", "--json", "--", name])) as {
-					scenario: { tax: TaxProfile }
+					scenario: { taxAllowances?: TaxAllowances }
 				}
-				const page = notStated(shown.scenario.tax, storedPlan(name).document).map(
-					(one) => one.class,
-				)
-				expect(page).toEqual(reported(name).notStated as never)
+				expect(shown.scenario.taxAllowances).toEqual(reported(name))
+				const page = notStated(shown.scenario.taxAllowances).map((one) => one.class)
+				expect(page).toEqual(reported(name).notStated)
 				// The labels are read: a class a Flow states is not in the list, and one it does not is.
 				expect(page.includes("retirementContributions")).toBe(!pairs.some(([id]) => id === "rmf"))
 				expect(page.includes("thaiEsg")).toBe(!pairs.some(([id]) => id === "esg"))

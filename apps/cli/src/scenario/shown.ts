@@ -1,5 +1,7 @@
 import { z } from "zod"
 import type { ScenarioRow } from "../store"
+import type { TaxProfileView } from "./tax/profile"
+import { taxAllowancesShape } from "./tax/shown-allowances"
 import { parsedTax, type StoredTax, storedTax } from "./tax/stored"
 import {
 	documentShape,
@@ -34,6 +36,7 @@ export type ShownScenario = ScenarioView & {
 	household: HouseholdDocument
 	tax: StoredTax | null
 	taxed: boolean
+	taxAllowances?: TaxProfileView | undefined
 	notes: string | null
 	main: boolean
 }
@@ -49,6 +52,7 @@ export const scenarioWithHousehold: z.ZodType<ShownScenario> = z.strictObject({
 			"The tax profile `scenario tax` was given, or null when none is stored: no tax was written, or it was written before the profile was kept (cli ADR-0066).",
 		),
 	taxed: taxedShape,
+	taxAllowances: taxAllowancesShape.optional(),
 	notes: notesShape,
 	main: mainShape,
 })

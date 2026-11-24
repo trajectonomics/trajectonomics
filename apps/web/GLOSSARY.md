@@ -149,7 +149,7 @@ One of the six cards the Tax profile page shows (filing status, family, insuranc
 _Avoid_: section, category, tab
 
 **Not in your plan yet**:
-The deduction classes `scenario tax` reports as not stated for the stored profile (`allowances.notStated`), listed under the cards. Each opens the drawer on its group, except the two retirement classes, which link to the Tax allowances page.
+The deduction classes `scenario show` reports as not stated for the stored profile (`taxAllowances.notStated`, the list `scenario tax` reports as `allowances.notStated`), listed under the cards. Each opens the drawer on its group, except the two retirement classes, which link to the Tax allowances page.
 _Avoid_: missing deductions, unused allowances
 
 **Tax label**:
