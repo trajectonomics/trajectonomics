@@ -53,4 +53,23 @@ describe("the projection chance contract against the CLI's goldens", () => {
 		const bad = { ...body, spendingBands: [{ ...body.spendingBands[0], extra: 1 }] }
 		expect(projectionChance.safeParse(bad).success).toBe(false)
 	})
+
+	it("parses a chance with --outcomes: each path's result and the paths to open first (cli ADR-0069)", async () => {
+		const chance = projectionChance.parse(await golden("chance-outcomes.output"))
+		expect(chance.outcomes).toHaveLength(20)
+		expect(chance.outcomes?.map((outcome) => outcome.index)).toEqual([...Array(20).keys()])
+		expect(chance.outcomes?.[0]?.lowestYear).toBe("2026-03-31")
+		expect(chance.representative).toMatchObject({ earliestRunsOut: null })
+		const lowest = chance.representative?.lowest ?? -1
+		expect(chance.outcomes?.some((outcome) => outcome.index === lowest)).toBe(true)
+	})
+
+	it("leaves a chance without --outcomes with neither key, and refuses an outcome it does not name", async () => {
+		const plain = projectionChance.parse(await golden("chance.output"))
+		expect(plain.outcomes).toBeUndefined()
+		expect(plain.representative).toBeUndefined()
+		const body = (await golden("chance-outcomes.output")) as { outcomes: object[] }
+		const bad = { ...body, outcomes: [{ ...body.outcomes[0], extra: 1 }] }
+		expect(projectionChance.safeParse(bad).success).toBe(false)
+	})
 })

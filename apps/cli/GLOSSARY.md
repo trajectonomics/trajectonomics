@@ -188,6 +188,14 @@ _Avoid_: Market history, returns table, assumptions
 One seeded run of a Return model's monthly draws over a Timeline. Paths differ only by their index, so the same seed and model always give the same set.
 _Avoid_: Simulation, run, scenario path
 
+**Path outcome**:
+What one Market path came to: its closing net worth, its lowest net worth and the year it was lowest in, and when it ran out, if it did. `projection chance --outcomes` lists one per path, and `projection path --index` replays the path year by year. A path is named by its index under the seed (ADR-0069).
+_Avoid_: Trial, scenario, run
+
+**Representative path**:
+A Market path worth opening first, named by index in `representative`: the paths at the 10th, 50th and 90th Percentile of closing net worth by nearest rank, the earliest to run out, and the one with the lowest net worth (ADR-0069).
+_Avoid_: Typical path, sample
+
 **Band**:
 The net-worth Percentiles across Market paths at one annual roll-up end, at the 10th, 25th, 50th, 75th and 90th levels. Every Band value is one a path produced.
 _Avoid_: Range, interval, confidence band

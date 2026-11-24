@@ -1,6 +1,6 @@
 # The chance of success can draw from the plan's own return model, and `projection model` prints it
 
-Status: accepted. Ships in the release after 0.8.0.
+Status: accepted. Ships in 0.8.0.
 
 `projection chance` takes a Return model the caller writes (ADR-0030, sim ADR 0011). Nobody outside the project
 hand-writes a joint bucket table, so the chance of success was out of reach of a person and of an agent. Sim ADR 0029
@@ -62,6 +62,6 @@ Scenario to `planReturnModel`, and says what went in.
 
 ## Consequences
 
-- When a customer skill gains a chance recipe (CLI ≥ the release after 0.8.0), it uses `plan`; no customer skill has one
+- When a customer skill gains a chance recipe (CLI ≥ 0.8.0), it uses `plan`; no customer skill has one
   today. A person need not write a Return model.
 - A file still works unchanged, and every output without the new flags is byte for byte what it was.

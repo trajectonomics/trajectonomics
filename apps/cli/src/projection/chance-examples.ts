@@ -20,6 +20,12 @@ export const CHANCE_EXAMPLES: Example[] = [
 	},
 	{
 		command:
+			"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --outcomes",
+		description:
+			"The same chance with what each of the 200 paths came to, worst closing net worth first, and the paths worth opening with traj projection path --index.",
+	},
+	{
+		command:
 			"traj projection chance --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --json",
 		description:
 			"A Scenario with a spending rule: the Bands also say what the rule pays across Market paths, and the lowest year it pays in any path.",

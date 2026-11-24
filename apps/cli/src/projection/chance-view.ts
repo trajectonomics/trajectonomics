@@ -1,6 +1,12 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
 import { band, bandsTable, runsOut } from "./chance-band-view"
+import {
+	type ChanceOutcomeView,
+	type ChanceRepresentativeView,
+	outcomesField,
+	representativeField,
+} from "./chance-outcomes-view"
 import { type PlanModelView, planModelField } from "./chance-plan-view"
 import {
 	type ChanceLowestYearView,
@@ -56,8 +62,19 @@ export type ChanceView = Echo & {
 	spendingBands?: ChanceSpendingBandView[] | undefined
 	/** Present only when the plan has a spending rule Flow. */
 	lowestYearSpending?: ChanceLowestYearView | undefined
+	/** Present only with `--outcomes`: each Market path's result (cli ADR-0069). */
+	outcomes?: ChanceOutcomeView[] | undefined
+	/** Present only with `--outcomes`: the paths worth opening first. */
+	representative?: ChanceRepresentativeView | undefined
 	tables: ChanceTable[]
 }
+
+/** The run a chance or a path names: the Return model's id, the seed and the path count. */
+export const chanceDefinition: z.ZodType<ChanceDefinitionView> = z.strictObject({
+	modelId: z.string().describe("The Return model's id, as the file states it."),
+	seed: z.string().describe("The seed, as 16 lower-case hex digits."),
+	paths: z.number().int().describe("The number of Market paths run."),
+})
 
 export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	asOf: asOfField,
@@ -69,11 +86,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	notes: notesField,
 	horizon: dateField("The date the Projection ends at"),
 	currency: z.string().describe("The Scenario's ISO 4217 currency; v1 is THB only."),
-	definition: z.strictObject({
-		modelId: z.string().describe("The Return model's id, as the file states it."),
-		seed: z.string().describe("The seed, as 16 lower-case hex digits."),
-		paths: z.number().int().describe("The number of Market paths run."),
-	}),
+	definition: chanceDefinition,
 	returnModel: planModelField,
 	paths: z.number().int().describe("The number of Market paths run."),
 	succeeded: z.number().int().describe("Market paths that never run out through the horizon."),
@@ -85,5 +98,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	runsOut: z.array(runsOut).describe("One row per annual roll-up, zeros included."),
 	spendingBands: spendingBandField,
 	lowestYearSpending: lowestYearField,
+	outcomes: outcomesField,
+	representative: representativeField,
 	tables: z.array(bandsTable).describe("The Bands the human form prints."),
 })
