@@ -242,7 +242,7 @@ The routing rules for net money each time flows land: ordered `surplus` steps (a
 _Avoid_: Income/expense delta
 
 **Routing statement**:
-`Projection.routing`, present only when some `upTo` or `downTo` is `{ amount, growth }`: for every surplus step and `withdraw` entry in list order, its `entry` position and the target in force as `{ first, horizon }` (on the Timeline start and on the horizon date) or `null` when it has none. The same figure `routedTargetAt` returns, never re-derived by a caller (ADR 0030).
+`Projection.routing`, opt-in (the `routing` option of `project()`) and present only when some `upTo` or `downTo` is `{ amount, growth }`: for every surplus step and `withdraw` entry in list order, its `entry` position and the target in force as `{ first, horizon }` (on the Timeline start and on the horizon date) or `null` when it has none. The same figure `routedTargetAt` returns, never re-derived by a caller (ADR 0030).
 _Avoid_: Resolved target, routing echo
 
 **Reserve floor**:

@@ -10800,7 +10800,7 @@
 		"projectOptions": {
 			"cashflowBreakdown": true
 		},
-		"sha256": "7efb39d7b4b2f241b1f594d7d239763c8de9d4b274413a1cb84c85ee4bea1c59"
+		"sha256": "1f4987f13bee31e8f7b452bd3ff0ce0ab0033d537d5e00e572ab6eb4317a4f45"
 	},
 	{
 		"name": "routing-real-target",
@@ -10864,7 +10864,7 @@
 		"projectOptions": {
 			"cashflowBreakdown": true
 		},
-		"sha256": "4e3d13dde42510b270aa79826c148c2a7ef446ce232859a7c8b63daba47c3b60"
+		"sha256": "d7f6c9cecbb35a219b5c9caac83da20802a577bb07348c5683a976a18777cb8b"
 	},
 	{
 		"name": "routing-statement",
@@ -10970,7 +10970,8 @@
 			"resolution": "month"
 		},
 		"projectOptions": {
-			"cashflowBreakdown": true
+			"cashflowBreakdown": true,
+			"routing": true
 		},
 		"sha256": "13704952c73132411080917fd65ec6eddc6bc0cea035ea10d42ebb559bad0182"
 	},

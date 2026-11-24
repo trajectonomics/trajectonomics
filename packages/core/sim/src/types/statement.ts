@@ -44,4 +44,6 @@ export interface ProjectionOptions {
 	readonly spendingRules?: boolean
 	/** One Estate statement per row; present only when set. */
 	readonly estate?: boolean
+	/** Each routing target in force on the start and the horizon; present only when set and a target is `{ amount, growth }` (ADR 0030). */
+	readonly routing?: boolean
 }

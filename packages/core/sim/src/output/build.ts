@@ -8,7 +8,7 @@ import { buildLifetimes } from "./lifetime"
 import { openingNetWorth } from "./opening"
 import { buildPeriods, type Period } from "./periods"
 import { buildRollups } from "./rollups"
-import { buildRouting } from "./routing"
+import { buildRouting, type RoutingOutcome } from "./routing"
 import { rowDates } from "./row-dates"
 import { buildRows } from "./rows"
 import { accountRules } from "./rules"
@@ -18,21 +18,24 @@ export type BuildResult =
 	| { readonly projection: Projection }
 	| { readonly problem: ProjectionProblem }
 
+const NO_ROUTING: RoutingOutcome = { fields: {}, problem: undefined }
+
 interface ReportOutcome {
 	readonly fields: Partial<Projection>
 	readonly problem: ProjectionProblem | undefined
 }
 
-/** The optional reports that close a Projection: the breakdown and the routing statement, or the first problem. */
+/** The optional reports that close a Projection: the breakdown and, when asked, the routing statement, or the first problem. */
 function buildReports(
 	run: EngineRun,
 	periods: readonly Period[],
 	scenario: Scenario,
 	timeline: Timeline,
 	breakdown: boolean,
+	stateRouting: boolean,
 ): ReportOutcome {
 	const cashflow = buildCashflow(run, periods, scenario, breakdown)
-	const routing = buildRouting(scenario, timeline)
+	const routing = stateRouting ? buildRouting(scenario, timeline) : NO_ROUTING
 	const problem = cashflow.problem ?? routing.problem
 	if (problem !== undefined) return { fields: {}, problem }
 	return { fields: { ...cashflow.fields, ...routing.fields }, problem: undefined }
@@ -44,6 +47,7 @@ export function buildProjection(
 	scenario: Scenario,
 	timeline: Timeline,
 	breakdown = false,
+	stateRouting = false,
 ): BuildResult {
 	const rules = accountRules(scenario)
 	const reported = new Set<string>(rowDates(timeline))
@@ -66,7 +70,7 @@ export function buildProjection(
 		scenario.accounts.map((account) => account.id),
 	)
 	if (lifetimes.problem !== undefined) return { problem: lifetimes.problem }
-	const reports = buildReports(run, periods, scenario, timeline, breakdown)
+	const reports = buildReports(run, periods, scenario, timeline, breakdown, stateRouting)
 	if (reports.problem !== undefined) return { problem: reports.problem }
 	const levies = buildLevies(run.levies)
 	if (levies.problem !== undefined) return { problem: levies.problem }

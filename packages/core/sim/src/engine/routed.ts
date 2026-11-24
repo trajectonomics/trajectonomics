@@ -1,6 +1,7 @@
 import { growthYears } from "../calendar/arith"
 import type { AccountId, DateString, RoutedAmount, WithdrawEntry } from "../types"
 import { grownAmount } from "./amount"
+import { isSafeInteger } from "./overflow"
 import type { AccountState } from "./state"
 
 /**
@@ -21,8 +22,8 @@ export function routedValue(
 
 /**
  * The amount a routing target is in force at on `date`, in minor units: a number is itself, and
- * `{ amount, growth }` is `amount` grown by the whole years since `timelineStart` (ADR 0030). Pure; a
- * value beyond the safe integers is rounded to the nearest number the way any `Number` is.
+ * `{ amount, growth }` is `amount` grown by the whole years since `timelineStart` (ADR 0030). Pure.
+ * Throws a `RangeError` for a value beyond the safe integers, which a `number` cannot hold exactly.
  */
 export function routedTargetAt(
 	target: RoutedAmount,
@@ -30,7 +31,9 @@ export function routedTargetAt(
 	date: DateString,
 	inflation: number,
 ): number {
-	return Number(routedValue(target, timelineStart, date, inflation))
+	const value = routedValue(target, timelineStart, date, inflation)
+	if (!isSafeInteger(value)) throw new RangeError(`the target on ${date} is beyond 2^53: ${value}`)
+	return Number(value)
 }
 
 /** What a routing target is worth on `date` for the engine: `routedValue` from the Account's Timeline start. */

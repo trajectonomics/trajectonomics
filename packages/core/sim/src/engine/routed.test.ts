@@ -56,4 +56,10 @@ describe("a routing target in force on a date (ADR 0030)", () => {
 		expect(routedTargetAt(target, "2028-02-29", "2032-02-29", 300)).toBe(337_653)
 		expect(routedTargetAt(target, "2028-02-29", "2033-02-28", 300)).toBe(347_782)
 	})
+
+	it("throws a RangeError for a value beyond 2^53 rather than rounding it", () => {
+		const target = { amount: 9_000_000_000_000_000, growth: "inflation" } as const
+		expect(routedTargetAt(target, START, "2026-12-31", 300)).toBe(9_000_000_000_000_000)
+		expect(() => routedTargetAt(target, START, "2027-01-01", 300)).toThrow(RangeError)
+	})
 })
