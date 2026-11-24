@@ -10,8 +10,11 @@ import {
 import Badge from "../ui/Badge.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import CarryInTable from "./CarryInTable.svelte"
+import TaxBracketChart from "./TaxBracketChart.svelte"
 import TaxChart from "./TaxChart.svelte"
+import TaxCurrent from "./TaxCurrent.svelte"
 import TaxHeadline from "./TaxHeadline.svelte"
+import TaxRateTable from "./TaxRateTable.svelte"
 import TaxTable from "./TaxTable.svelte"
 
 interface Props {
@@ -37,10 +40,13 @@ const assumptions = $derived(assumptionLines(run.taxYears))
 		</EmptyState>
 	{:else}
 		<TaxHeadline headline={body.headline} currency={run.currency} />
+		{#if body.current}<TaxCurrent year={body.current} currency={run.currency} />{/if}
 		<TaxTable rows={body.rows} currency={run.currency} />
 		{#if body.chart}
 			<TaxChart series={body.chart} />
 		{/if}
+		{#if body.brackets}<TaxBracketChart chart={body.brackets} />{/if}
+		{#if body.rates.length > 0}<TaxRateTable rows={body.rates} currency={run.currency} />{/if}
 	{/if}
 	{#if carry.length > 0}
 		<CarryInTable rows={carry} currency={run.currency} />

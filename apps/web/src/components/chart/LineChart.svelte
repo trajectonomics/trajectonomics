@@ -3,9 +3,12 @@ import { preferences } from "../../client/preferences.svelte.js"
 import {
 	type ColumnKind,
 	columnLayout,
+	columnXs,
 	type LineMarker,
 	type LineSeries,
 	lineLayout,
+	type StepLine,
+	withStepLine,
 } from "../../lib/chart"
 import EmptyState from "../ui/EmptyState.svelte"
 import { HEIGHT, MARGIN } from "./geometry"
@@ -15,6 +18,8 @@ import { legendItems } from "./legend-items"
 
 /** The narrowest a chart is drawn, so its axis labels never collide. */
 const MIN_WIDTH = 240
+/** The room on the right for the labels of a second axis, in pixels. */
+const RIGHT_AXIS_MARGIN = 48
 /** The width before the chart is measured, which is also what a prerender would show. */
 const FALLBACK_WIDTH = 640
 
@@ -32,6 +37,8 @@ interface Props {
 	kind?: "line" | ColumnKind
 	/** Draws the series from the longer palette, for a chart of many series. A column chart always does. */
 	wide?: boolean
+	/** A column chart's step line on a second axis on the right, such as the rate of each period. Left out, there is none. */
+	step?: StepLine | undefined
 }
 
 let {
@@ -42,6 +49,7 @@ let {
 	hidden,
 	kind = "line",
 	wide = false,
+	step,
 }: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
@@ -49,11 +57,18 @@ const width = $derived(
 	clientWidth > 0 ? Math.max(MIN_WIDTH, Math.floor(clientWidth)) : FALLBACK_WIDTH,
 )
 const masked = $derived((hidden ?? preferences.hidden) && money)
-const plot = $derived({ width, height: HEIGHT, margin: MARGIN })
+const plot = $derived({
+	width,
+	height: HEIGHT,
+	margin: step ? { ...MARGIN, right: RIGHT_AXIS_MARGIN } : MARGIN,
+})
+const columns = $derived(kind === "line" ? null : columnLayout(series, plot, kind, markers))
 const layout = $derived(
 	kind === "line"
 		? lineLayout(series, plot, markers, wide ? "wide" : undefined)
-		: columnLayout(series, plot, kind, markers),
+		: columns && step
+			? withStepLine(columns, step, columnXs(series), plot)
+			: columns,
 )
 </script>
 
@@ -75,7 +90,7 @@ const layout = $derived(
 	{:else}
 		<EmptyState title="Nothing to chart yet" />
 	{/if}
-	{#if layout && series.length > 1}
-		<LineLegend items={legendItems(series, layout.palette === "wide")} />
+	{#if layout && (series.length > 1 || step)}
+		<LineLegend items={legendItems(step ? [...series, step.line] : series, layout.palette === "wide")} />
 	{/if}
 </div>
