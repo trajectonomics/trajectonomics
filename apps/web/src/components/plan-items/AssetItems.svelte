@@ -5,6 +5,7 @@ import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
 import type { LoanCard } from "../../lib/view/plan-items/loans"
 import type { MarkMap } from "../../lib/view/what-if/items"
+import type { LoanMarks } from "../../lib/view/what-if/loan-items"
 import EmptyState from "../ui/EmptyState.svelte"
 import AccountCards from "./AccountCards.svelte"
 import AssetCards from "./AssetCards.svelte"
@@ -18,6 +19,8 @@ interface Props {
 	/** The real assets (homes and cars) of the plan, each with its value and its terms. */
 	assets?: readonly AssetCardView[]
 	loans: readonly LoanCardView[]
+	/** What the What-if session changes in each loan card, by loan id. */
+	loanMarks?: Readonly<Record<string, LoanMarks>>
 	/** The loan Flows no loan card places, which are shown read-only. */
 	other: readonly LoanCard[]
 	currency: string
@@ -34,6 +37,7 @@ let {
 	marks = {},
 	assets = [],
 	loans,
+	loanMarks = {},
 	other,
 	currency,
 	editable,
@@ -71,6 +75,7 @@ let {
 {#if loans.length > 0}
 	<LoanCards
 		cards={loans}
+		marks={loanMarks}
 		{currency}
 		{editable}
 		{plan}

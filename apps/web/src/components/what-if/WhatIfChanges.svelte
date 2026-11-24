@@ -7,7 +7,7 @@ import { maskMoney } from "../../lib/format/mask"
 import { accountNameOf } from "../../lib/view/withdrawals/context"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
 import { failedReads, pathNamed } from "../../lib/what-if/answer"
-import { type Change } from "../../lib/what-if/session"
+import { type Change, namesChange } from "../../lib/what-if/session"
 import NavIcon from "../shell/NavIcon.svelte"
 
 const refusals = $derived(
@@ -19,9 +19,12 @@ const refusals = $derived(
 			})),
 )
 
-/** The refusal that names a change, if one does. */
+/** The refusal that names a change, or a part of the loan or asset it groups, if one does. */
 function refusalOf(change: Change): string | null {
-	return refusals.find((refusal) => refusal.path === change.path)?.message ?? null
+	return (
+		refusals.find((refusal) => refusal.path !== null && namesChange(change, refusal.path))
+			?.message ?? null
+	)
 }
 
 const baseline = $derived.by(() => {

@@ -28,11 +28,12 @@ export interface ScheduleYear {
 export interface LoanTerms {
 	/** The date of the first payment, as the document states it. */
 	readonly firstPayment: string
-	/** The extra payments into the loan: when each starts, and its last date when it repeats monthly. */
+	/** The extra payments into the loan: when each starts, how often it falls and, when it repeats, its last date. */
 	readonly extras: readonly {
 		readonly start: string
 		readonly end?: string | undefined
-		readonly once: boolean
+		/** The Flow's frequency, as the document states it: the form writes `once` and `monthly`. */
+		readonly frequency: string
 	}[]
 }
 
@@ -66,11 +67,16 @@ function isActive(row: LiabilityRow): boolean {
 	return !isZero(row.drawn) || !isZero(row.paid) || !isZero(row.interest)
 }
 
-/** Whether an extra payment lands in the month (`YYYY-MM`): dates are compared as the text they are. */
+/**
+ * Whether an extra payment lands in the month (`YYYY-MM`): dates are compared as the text they are. Only the two
+ * frequencies the form writes are read, `once` in its month and `monthly` in every month of its span; any other
+ * frequency falls on months this does not know, so it leaves the flag off rather than say the CLI's `paid` holds it.
+ */
 function extraIn(month: string, terms: LoanTerms): boolean {
 	return terms.extras.some((extra) => {
 		const start = extra.start.slice(0, 7)
-		if (extra.once) return start === month
+		if (extra.frequency === "once") return start === month
+		if (extra.frequency !== "monthly") return false
 		return start <= month && (extra.end === undefined || extra.end.slice(0, 7) >= month)
 	})
 }

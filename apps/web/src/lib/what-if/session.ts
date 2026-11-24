@@ -5,6 +5,7 @@
  */
 import type { Addition } from "./additions"
 import type { Json, SetChange } from "./overrides"
+import type { Group } from "./session-group"
 
 export type WhatIf = {
 	/** The plan the changes are made against. */
@@ -15,11 +16,13 @@ export type WhatIf = {
 	removals: string[]
 	/** The items the session puts on a list, which the plan does not hold (cli ADR 0062). */
 	additions: Addition[]
+	/** The loans and assets the session changes as a whole: their parts switch and try together (`session-group.ts`). */
+	groups: Group[]
 }
 
 /** A session that has just begun on a plan: no change yet. */
 export function startWhatIf(plan: string, contentHash: string): WhatIf {
-	return { plan, contentHash, sets: [], removals: [], additions: [] }
+	return { plan, contentHash, sets: [], removals: [], additions: [], groups: [] }
 }
 
 /** Whether the session holds any change. */
@@ -71,7 +74,17 @@ export function overridesOf(whatIf: WhatIf): {
 	return { sets: whatIf.sets, removals: whatIf.removals, additions: whatIf.additions }
 }
 
-export { type Change, changesOf } from "./session-changes"
+export { type Change, changesOf, namesChange } from "./session-changes"
+export {
+	type Group,
+	type GroupSpec,
+	groupId,
+	groupOf,
+	isGroupOff,
+	withGroupOff,
+	withGroupTried,
+	withoutGroup,
+} from "./session-group"
 export {
 	clearedFields,
 	itemSets,

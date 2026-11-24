@@ -72,14 +72,23 @@ describe("the statement of a loan, as the CLI prints it", () => {
 	})
 
 	test("an extra payment in the first payment month is said to be in that figure", () => {
-		const once = { start: "2027-02-15", once: true }
-		const monthly = { start: "2027-01-01", end: "2027-06-01", once: false }
-		const later = { start: "2027-03-01", once: true }
+		const once = { start: "2027-02-15", frequency: "once" }
+		const monthly = { start: "2027-01-01", end: "2027-06-01", frequency: "monthly" }
+		const later = { start: "2027-03-01", frequency: "once" }
 		const payment = (extras: LoanTerms["extras"]) =>
 			statementOf(runWith("2028-01-31", rows), "loan", { ...TERMS, extras }).payment?.withExtra
 		expect(payment([once])).toBe(true)
 		expect(payment([monthly])).toBe(true)
 		expect(payment([later])).toBe(false)
+	})
+
+	test("an extra payment of a frequency the form does not write is not said to be in that figure", () => {
+		const yearly = { start: "2027-02-01", frequency: "yearly" }
+		const weekly = { start: "2027-01-01", end: "2027-06-01", frequency: "weekly" }
+		const payment = (extras: LoanTerms["extras"]) =>
+			statementOf(runWith("2028-01-31", rows), "loan", { ...TERMS, extras }).payment?.withExtra
+		expect(payment([yearly])).toBe(false)
+		expect(payment([weekly])).toBe(false)
 	})
 
 	test("the schedule leaves out the empty months before the loan and after it is paid off", () => {
