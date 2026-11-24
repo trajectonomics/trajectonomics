@@ -3,7 +3,8 @@ import { isAppError } from "../errors"
 import { applyScenario, errorOf, scenarioHome } from "../scenario-test-support"
 import { canonicalScenarioDocument } from "../store"
 import { SCENARIO_DOCUMENT } from "../store/testing"
-import { acceptedScenarioSchemaVersion, scenarioDocumentError, scenarioProblems } from "./document"
+import { acceptedScenarioSchemaVersion, scenarioProblems } from "./document"
+import { scenarioDocumentError } from "./document-error"
 import { scenarioTemplate } from "./template"
 
 const HINT = 'Run "traj schema scenario apply" to see the document schema.'
@@ -92,7 +93,8 @@ describe("scenarioDocumentError", () => {
 		expect(error.body.details).toEqual([
 			{
 				path: `document.flows.${VALID.flows.length}.start`,
-				message: `document.flows.${VALID.flows.length}.start: WITHDRAWAL_LOCKED`,
+				// The same sentence `scenario apply` puts in each detail (cli ADR-0067).
+				message: error.body.message,
 				code: "WITHDRAWAL_LOCKED",
 			},
 		])
