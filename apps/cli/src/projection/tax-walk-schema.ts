@@ -39,7 +39,7 @@ const walkView: z.ZodType<TaxWalkView> = z.strictObject({
 	assessable: moneyField("The assessable income, before expenses and allowances"),
 	expenses: moneyField("The expenses deducted from the assessable income"),
 	allowances: moneyField("The allowances deducted after the expenses"),
-	taxableIncome: moneyField("The net taxable income the brackets apply to"),
+	taxableIncome: moneyField("The net taxable income the brackets apply to: assessable income less expenses and allowances, never below 0"),
 })
 
 /** The schema of {@link TaxWalkFields}, spread into a tax year's own object. */

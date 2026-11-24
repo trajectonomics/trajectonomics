@@ -36,6 +36,16 @@ export function breakdownOf(
 			`The brackets do not set the tax this year: the minimum tax does. The brackets and the marginal rate describe the progressive tax of ${money(progressive)} only.`,
 		)
 	}
+	if (
+		walk.walk !== undefined &&
+		walk.brackets === undefined &&
+		progressive !== undefined &&
+		taxable !== undefined
+	) {
+		notes.push(
+			`The brackets are not stated: this Levy's progressive tax of ${money(progressive)} is not what the Section 48(1) schedule gives on ${money(taxable)} of taxable income, so it was emitted from another table.`,
+		)
+	}
 	return {
 		...(taxable === undefined ? {} : { taxableIncome: money(taxable) }),
 		...(progressive === undefined ? {} : { progressiveTax: money(progressive) }),

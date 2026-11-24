@@ -2,7 +2,9 @@ import { describe, expect, it } from "bun:test"
 import { TaxValidationError } from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { thBracketWalk } from "../walk"
+import { addProgressiveTax } from "../levy/brackets"
 import { forAllSeeded } from "./invariants-random"
+import { measureOf } from "./levy-build"
 
 /** THB to satang, for readable hand-computed cases. */
 const baht = (amount: number): number => amount * 100
@@ -90,26 +92,40 @@ describe("thBracketWalk (hand-computed, Section 48(1) schedule)", () => {
 	})
 })
 
+/** Asserts every invariant of one walk, including that its tax is the Levy's own progressive tax. */
+function assertWalk(taxable: number): void {
+	const walk = thBracketWalk(taxable)
+	expect(walk.slices.reduce((sum, s) => sum + s.income, 0)).toBe(taxable)
+	expect(walk.slices.reduce((sum, s) => sum + s.tax, 0)).toBe(walk.progressiveTax)
+	expect(walk.slices).toHaveLength(TH_2026_PARAMETERS.brackets.length)
+	expect(walk.progressiveTax).toBe(
+		measureOf((graph, id) => addProgressiveTax(graph, id), taxable / 100),
+	)
+	// The bracket the last satang is in; no income is in the first bracket.
+	const home =
+		walk.slices.find((s) => taxable > s.from && (s.upTo === null || taxable <= s.upTo)) ??
+		walk.slices[0]
+	expect(walk.marginalRateBps).toBe(home?.rateBps ?? 0)
+	expect(walk.toNextBracket ?? null).toBe(
+		home?.upTo === undefined || home.upTo === null ? null : home.upTo - taxable,
+	)
+}
+
 describe("thBracketWalk (property)", () => {
-	it("slices sum to the taxable income and taxes to the progressive tax, and the marginal bracket holds the last satang", () => {
+	it("slices sum to the taxable income and taxes to the Levy's progressive tax, and the marginal bracket holds the last satang", () => {
 		forAllSeeded(
 			"the slices sum",
 			87_404,
 			2_000,
 			(rng) => (rng.bool(4) ? rng.int(0, baht(10_000_000)) : rng.int(0, baht(1_200_000))),
-			(taxable) => {
-				const walk = thBracketWalk(taxable)
-				expect(walk.slices.reduce((sum, s) => sum + s.income, 0)).toBe(taxable)
-				expect(walk.slices.reduce((sum, s) => sum + s.tax, 0)).toBe(walk.progressiveTax)
-				expect(walk.slices).toHaveLength(TH_2026_PARAMETERS.brackets.length)
-				const home = walk.slices.find(
-					(s) => taxable > s.from && (s.upTo === null || taxable <= s.upTo),
-				)
-				expect(walk.marginalRateBps).toBe(home?.rateBps ?? 0)
-				expect(walk.toNextBracket ?? null).toBe(
-					home?.upTo === undefined || home.upTo === null ? null : home.upTo - taxable,
-				)
-			},
+			assertWalk,
 		)
+	})
+
+	it("holds at no income and on, just below and just above every bracket edge", () => {
+		const edges = TH_2026_PARAMETERS.brackets.flatMap((b) =>
+			b.upTo === null ? [] : [baht(b.upTo) - 1, baht(b.upTo), baht(b.upTo) + 1],
+		)
+		for (const taxable of [0, 1, ...edges]) assertWalk(taxable)
 	})
 })

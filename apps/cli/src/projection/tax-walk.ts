@@ -12,7 +12,8 @@ function measureOf(measures: Measured, id: string): number | undefined {
  * The walk, brackets and rates of one tax year. Every figure is the Levy's own Measure or a result
  * of `@trajectonomics/core/tax/th`'s bracket functions; the CLI formats and subtracts nothing
  * (ADR-0036). A Levy that lacks one of the four walk Measures was not emitted by the CLI and gets
- * nothing, and so does one whose progressive tax is not the schedule's (a hand-written table).
+ * nothing. One whose progressive tax is not the schedule's (a hand-written table) keeps `walk` and the
+ * effective rate, which do not use the table, and gets no brackets; `breakdownOf` says why in a note.
  */
 export function taxWalkOf(
 	measures: Measured,
@@ -39,9 +40,10 @@ export function taxWalkOf(
 		allowances: money(allowances),
 		taxableIncome: money(taxable),
 	}
-	const bracketWalk = thBracketWalk(taxable)
-	if (bracketWalk.progressiveTax !== progressive) return { walk }
 	const effective = thEffectiveRateBps(due, assessable)
+	const rate = effective === undefined ? {} : { effectiveRateBps: effective }
+	const bracketWalk = thBracketWalk(taxable)
+	if (bracketWalk.progressiveTax !== progressive) return { walk, ...rate }
 	return {
 		walk,
 		brackets: bracketWalk.slices.map((slice) => ({
@@ -55,6 +57,6 @@ export function taxWalkOf(
 		...(bracketWalk.toNextBracket === undefined
 			? {}
 			: { toNextBracket: money(bracketWalk.toNextBracket) }),
-		...(effective === undefined ? {} : { effectiveRateBps: effective }),
+		...rate,
 	}
 }

@@ -202,7 +202,12 @@ describe("a tax year's walk, brackets and rates (ADR-0036)", () => {
 			1_000_000,
 		)
 		expect(year.walk?.taxableIncome).toBe("400000.00")
-		for (const field of ["brackets", "marginalRateBps", "toNextBracket", "effectiveRateBps"])
+		// The effective rate does not use the table: 1,000,000 x 10000 / 56,000,000 is 178.5, so 178.
+		expect(year.effectiveRateBps).toBe(178)
+		for (const field of ["brackets", "marginalRateBps", "toNextBracket"])
 			expect(year).not.toHaveProperty(field)
+		expect(year.notes).toEqual([
+			"The brackets are not stated: this Levy's progressive tax of 10000.00 is not what the Section 48(1) schedule gives on 400000.00 of taxable income, so it was emitted from another table.",
+		])
 	})
 })
