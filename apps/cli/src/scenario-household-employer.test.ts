@@ -1,6 +1,14 @@
 import { describe, expect, it } from "bun:test"
 import type { Household } from "./scenario/household/model"
-import { HOLDER, seedBase, setHousehold, shown } from "./scenario-household-support"
+import {
+	contribution,
+	flowsAfter,
+	plan,
+	retiresAt,
+	SALARY,
+	SHARE,
+} from "./scenario-household-employer-support"
+import { HOLDER, seedBase, setHousehold } from "./scenario-household-support"
 import { applyScenario, resultOf, scenario, scenarioHome } from "./scenario-test-support"
 
 /*
@@ -8,69 +16,6 @@ import { applyScenario, resultOf, scenario, scenarioHome } from "./scenario-test
  * whose `derive` reads that Flow's gross, with exactly the Flow's value, read from the document's
  * shape and not from an id.
  */
-
-const SHARE = {
-	measures: [
-		{ id: "pay", op: "flow", flow: "salary" },
-		{ id: "share", op: "scale", of: "pay", num: 5, den: 100, rounding: "floor" },
-	],
-	result: "share",
-} as const
-
-const SALARY = {
-	id: "salary",
-	kind: "income",
-	earned: true,
-	amount: 100_000,
-	frequency: "monthly",
-	growth: "inflation",
-	start: "2026-01-01",
-	end: "2040-01-01",
-} as const
-
-const contribution = (id: string, extra: Record<string, unknown>) => ({
-	id,
-	kind: "contribution",
-	target: "pension",
-	frequency: "monthly",
-	start: "2026-01-01",
-	end: "2040-01-01",
-	derive: SHARE,
-	...extra,
-})
-
-/** A salary, and `flows` after it, over a cash and a pension account. */
-function plan(...flows: unknown[]) {
-	return {
-		schemaVersion: 4,
-		currency: "THB",
-		economy: { inflation: 0 },
-		accounts: [
-			{ id: "cash", kind: "asset", rate: 0 },
-			{ id: "pension", kind: "asset", rate: 0 },
-		],
-		flows: [SALARY, ...flows],
-		cashflow: {
-			surplus: [{ account: "cash" }],
-			contribute: ["pension"],
-			withdraw: ["cash"],
-		},
-	}
-}
-
-function retiresAt(age: number): Household {
-	return {
-		schemaVersion: 1,
-		people: [HOLDER],
-		anchors: [{ path: "flows.salary.end", person: "me", age }],
-	}
-}
-
-type Flows = Record<string, unknown>[]
-
-async function flowsAfter(home: string): Promise<Flows> {
-	return (await shown(home)).document.flows
-}
 
 describe("scenario household and an employer's share", () => {
 	it("moves the employer Flow's end with the salary's when retirement moves", async () => {
@@ -83,9 +28,33 @@ describe("scenario household and an employer's share", () => {
 		])
 		const moved = resultOf(await setHousehold(home, retiresAt(62)))
 		expect(moved.anchored).toEqual([{ path: "flows.salary.end", value: "2052-06-30" }])
+		expect(moved.followed).toEqual([
+			{
+				path: "flows.salary-employer.end",
+				value: "2052-06-30",
+				follows: "flows.salary.end",
+			},
+		])
 		expect((await flowsAfter(home)).map((flow) => flow["end"])).toEqual([
 			"2052-06-30",
 			"2052-06-30",
+		])
+	})
+
+	it("states the dates it wrote for the share under --dry-run, and leaves the plan as it was", async () => {
+		const home = scenarioHome()
+		await seedBase(home, plan(contribution("salary-employer", { funding: "employer" })))
+		const res = resultOf(await setHousehold(home, retiresAt(60), ["--dry-run"]))
+		expect(res).toMatchObject({
+			dryRun: true,
+			anchored: [{ path: "flows.salary.end", value: "2050-06-30" }],
+			followed: [
+				{ path: "flows.salary-employer.end", value: "2050-06-30", follows: "flows.salary.end" },
+			],
+		})
+		expect((await flowsAfter(home)).map((flow) => flow["end"])).toEqual([
+			"2040-01-01",
+			"2040-01-01",
 		])
 	})
 
@@ -102,6 +71,8 @@ describe("scenario household and an employer's share", () => {
 		await setHousehold(home, retiresAt(60))
 		expect((await flowsAfter(home))[0]).toEqual({ ...SALARY, end: "2050-06-30" })
 		expect(await flowsAfter(home)).toHaveLength(1)
+		const bare = resultOf(await setHousehold(home, retiresAt(62)))
+		expect("followed" in bare).toBe(false)
 	})
 
 	it("does not move an employer Contribution that reads a different Flow", async () => {

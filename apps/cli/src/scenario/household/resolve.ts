@@ -44,6 +44,7 @@ type Outcome = { document: unknown } | { dropped: true }
 
 function resolveOne(
 	household: Household,
+	pinned: readonly (readonly string[])[],
 	anchor: Anchor,
 	document: unknown,
 	owner: string,
@@ -59,7 +60,7 @@ function resolveOne(
 		if (locus.value !== date) return conflict(owner, anchor, date, locus.at, locus.value)
 		return { document }
 	}
-	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, household) }
+	return { document: fillFollowers(setAt(document, locus.at, date), segments, date, pinned) }
 }
 
 /**
@@ -71,18 +72,13 @@ function fillFollowers(
 	document: unknown,
 	segments: readonly string[],
 	date: string,
-	household: Household,
+	pinned: readonly (readonly string[])[],
 ): unknown {
 	let current = document
-	for (const follower of employerFollowers(
-		current,
-		segments,
-		anchoredSegments(household.anchors),
-	)) {
-		const [, position, field] = follower
-		const flow = (current as { flows: Record<string, unknown>[] }).flows[position as number]
-		if (flow !== undefined && flow[String(field)] === undefined)
-			current = setAt(current, follower, date)
+	for (const follower of employerFollowers(current, segments, pinned)) {
+		if (locate(current, follower.segments).kind === "absent") {
+			current = setAt(current, follower.at, date)
+		}
 	}
 	return current
 }
@@ -98,11 +94,12 @@ export function resolveHousehold(
 	owner: string,
 ): ResolvedAnchors | AppError {
 	const household = JSON.parse(stored) as Household
+	const pinned = anchoredSegments(household.anchors)
 	let current: unknown = document
 	const kept: Anchor[] = []
 	const dropped: string[] = []
 	for (const anchor of household.anchors) {
-		const outcome = resolveOne(household, anchor, current, owner)
+		const outcome = resolveOne(household, pinned, anchor, current, owner)
 		if (isAppError(outcome)) return outcome
 		if ("dropped" in outcome) {
 			dropped.push(anchor.path)

@@ -1,5 +1,6 @@
 import { isAppError } from "../../errors"
 import { isPlainObject } from "../../json"
+import { formatPath } from "../path"
 import { parsePath } from "../set-parse"
 import type { Anchor } from "./model"
 import type { Step } from "./paths"
@@ -34,6 +35,9 @@ function followsSalary(flow: unknown, salary: string): boolean {
 
 const keyOf = (segments: readonly string[]) => segments.join("\u0000")
 
+/** An employer Contribution's date field the rule moves: where it sits in the document, and its path. */
+export type Follower = { at: Step[]; segments: string[]; path: string }
+
 /**
  * The addresses of the date field an anchor at `segments` also moves: that field on every employer
  * Contribution reading the anchored Flow. An anchor on the Contribution's own field wins over the rule,
@@ -43,19 +47,20 @@ export function employerFollowers(
 	document: unknown,
 	segments: readonly string[],
 	anchored: readonly (readonly string[])[],
-): Step[][] {
+): Follower[] {
 	const [list, salary, field] = segments
 	if (list !== "flows" || segments.length !== 3 || salary === undefined || field === undefined) {
 		return []
 	}
 	if (!isPlainObject(document) || !Array.isArray(document["flows"])) return []
 	const pinned = new Set(anchored.map(keyOf))
-	const out: Step[][] = []
+	const out: Follower[] = []
 	for (const [position, flow] of document["flows"].entries()) {
 		if (!followsSalary(flow, salary)) continue
 		const id = (flow as Record<string, unknown>)["id"]
 		if (typeof id !== "string" || pinned.has(keyOf(["flows", id, field]))) continue
-		out.push(["flows", position, field])
+		const own = ["flows", id, field]
+		out.push({ at: ["flows", position, field], segments: own, path: formatPath(own) })
 	}
 	return out
 }
