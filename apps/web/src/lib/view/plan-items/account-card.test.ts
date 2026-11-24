@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import type { ScenarioAccount } from "../../contract"
 import { scenarioAccount } from "../../contract"
 import { NO_INCOME_CONTEXT } from "./account-income"
-import { accountYears } from "./account-years"
+import { accountLifetimesOf, accountYears } from "./account-years"
 import { accountCards } from "./accounts"
 import { baselineRead, planDocument } from "./fixtures.test-support"
 
@@ -82,5 +82,30 @@ describe("the Account card", () => {
 		expect(read(fund(PAYS), run)?.years).toHaveLength(2)
 		expect(accountYears(undefined, "fund")).toEqual([])
 		expect(NO_INCOME_CONTEXT.taxed).toBe(false)
+	})
+})
+
+describe("the Account's totals over the plan", () => {
+	const run = {
+		accountLifetimes: [
+			{ account: "fund", lifetimeFees: "238.50", lifetimePayouts: "400.00" },
+			{ account: "fee-only", lifetimeFees: "9.00" },
+		],
+	} as never
+
+	test("are the engine's figures for the Account, as stated and not summed from the years", () => {
+		expect(accountLifetimesOf(run, "fund")).toEqual({ fees: "238.50", payouts: "400.00" })
+		expect(accountLifetimesOf(run, "fee-only")).toEqual({ fees: "9.00", payouts: null })
+		const card = accountCards([fund(PAYS)], baselineRead(), run)[0]
+		expect(card).toMatchObject({ lifetimeFees: "238.50", lifetimePayouts: "400.00" })
+	})
+
+	test("are none for an Account the run states none for, and without a run", () => {
+		expect(accountLifetimesOf(run, "bank")).toEqual({ fees: null, payouts: null })
+		expect(accountLifetimesOf(undefined, "fund")).toEqual({ fees: null, payouts: null })
+		expect(accountCards([fund({ id: "quiet" })], baselineRead(), run)[0]).toMatchObject({
+			lifetimeFees: null,
+			lifetimePayouts: null,
+		})
 	})
 })

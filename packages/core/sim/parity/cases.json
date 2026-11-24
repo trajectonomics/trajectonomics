@@ -10867,6 +10867,115 @@
 		"sha256": "d7f6c9cecbb35a219b5c9caac83da20802a577bb07348c5683a976a18777cb8b"
 	},
 	{
+		"name": "routing-statement",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "savings",
+					"amount": 500000
+				},
+				{
+					"account": "funds",
+					"amount": 200000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "emergency",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "invest",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "funds",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2028-03-15",
+					"amount": 500000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "emergency",
+						"upTo": {
+							"amount": 1000000,
+							"growth": "inflation"
+						}
+					},
+					{
+						"account": "invest",
+						"share": 5000,
+						"upTo": 250000
+					},
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": [
+					{
+						"account": "savings",
+						"downTo": {
+							"amount": 300000,
+							"growth": {
+								"bps": -100
+							}
+						}
+					},
+					{
+						"account": "funds",
+						"downTo": 50000
+					},
+					"savings"
+				]
+			}
+		},
+		"timeline": {
+			"start": "2028-02-29",
+			"horizon": "2031-03-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true,
+			"routing": true
+		},
+		"sha256": "13704952c73132411080917fd65ec6eddc6bc0cea035ea10d42ebb559bad0182"
+	},
+	{
 		"name": "transfer-rollover-month",
 		"baseline": {
 			"schemaVersion": 1,

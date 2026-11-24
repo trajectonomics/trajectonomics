@@ -49,7 +49,7 @@ The lines and section totals of one Annual roll-up, as `projection run --breakdo
 _Avoid_: budget, ledger, transactions
 
 **Flow diagram**:
-The picture of one year's cash flow on the Cash flow page: sources on the left, the cash node, and uses on the right, with each band's height its amount's share of the taller column. Pure geometry from `src/lib/chart/flow.ts`; it adds no figure of its own.
+The picture of one year's cash flow on the Cash flow page: sources on the left, the cash node, and uses on the right, with each band's height its amount's share of the taller column. Pure geometry from `src/lib/chart/flow.ts`; it adds no figure of its own. Below the `md` breakpoint the page draws the same year as two lists of bars instead (sources above, uses below, on one scale), from `src/lib/chart/flow-stack.ts` ([ADR 0019](docs/adr/0019-the-cash-flow-page-stacks-its-diagram-on-a-phone.md)).
 _Avoid_: Sankey (as a name for the page), chart, graph
 
 **What-if session**:

@@ -1,14 +1,15 @@
 <script lang="ts">
-import { preferences } from "../../client/preferences.svelte.js"
-import { FLOW_NODE_WIDTH, type FlowLayout } from "../../lib/chart/flow"
-import { fittedLabel } from "../../lib/chart/flow-label"
-import { formatMoney, maskMoney } from "../../lib/format"
-import { cx } from "../ui/cx"
-import { FLOW_FILL } from "./flow-style"
+import type { FlowLayout } from "../../lib/chart/flow"
+import type { StackLayout } from "../../lib/chart/flow-stack"
+import FlowStack from "./FlowStack.svelte"
+import FlowTable from "./FlowTable.svelte"
+import FlowWide from "./FlowWide.svelte"
 
 interface Props {
-	/** The geometry of the year, from `layoutFlow`. */
+	/** The geometry of the year for a wide screen, from `layoutFlow`. */
 	layout: FlowLayout
+	/** The geometry of the same year for a phone, from `layoutStack`. A diagram with none (the estate's) is the wide one on every screen. */
+	stack?: StackLayout
 	/** The key of the band the person picked, which its table row shows. */
 	picked: string | null
 	onPick: (key: string) => void
@@ -16,91 +17,10 @@ interface Props {
 	label: string
 }
 
-/** The flow diagram of one year. Each band is a control: a click, or Enter or Space, picks its table row. */
-let { layout, picked, onPick, label }: Props = $props()
-
-/** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
-const shown = (amount: string): string =>
-	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
-
-function keyed(event: KeyboardEvent, key: string): void {
-	if (event.key !== "Enter" && event.key !== " ") return
-	event.preventDefault()
-	onPick(key)
-}
+/** The flow diagram of one year: the wide one from a medium screen up, the stacked one below, and one table for a screen reader. */
+let { layout, stack, picked, onPick, label }: Props = $props()
 </script>
 
-<!-- The figures are the CLI's strings. A band is drawn by its share of the taller column; the table below repeats each one. -->
-<div class="max-w-full overflow-x-auto rounded-lg border border-border">
-	<svg
-		viewBox={`0 0 ${layout.width} ${layout.height}`}
-		role="group"
-		aria-label={label}
-		class="h-auto min-w-[640px] w-full text-xs"
-	>
-		{#each layout.links as link (link.key)}
-			<path
-				d={link.d}
-				role="button"
-				tabindex="0"
-				aria-label={`${link.label}, ${shown(link.amount)}`}
-				aria-pressed={picked === link.key}
-				onclick={() => onPick(link.key)}
-				onkeydown={(event) => keyed(event, link.key)}
-				class={cx(
-					"cursor-pointer outline-none hover:opacity-85 focus-visible:outline-2 focus-visible:outline-ring",
-					FLOW_FILL[link.kind],
-					picked === link.key && "stroke-foreground stroke-2",
-				)}
-			/>
-		{/each}
-		<rect
-			x={layout.cash.x}
-			y={layout.cash.y}
-			width={layout.cash.width}
-			height={layout.cash.height}
-			class="fill-foreground"
-		/>
-		{#each layout.nodes as node (node.key)}
-			<rect
-				x={node.x}
-				y={node.y}
-				width={FLOW_NODE_WIDTH}
-				height={node.height}
-				class="fill-foreground/70"
-			/>
-			<text
-				x={node.labelX}
-				y={node.labelY}
-				text-anchor={node.anchor}
-				dominant-baseline="middle"
-				aria-hidden="true"
-				class="fill-foreground"
-			>
-				{fittedLabel(node, shown(node.amount))}
-			</text>
-		{/each}
-	</svg>
-</div>
-
-<div class="sr-only">
-	<table>
-		<caption>{label}, each band and its amount</caption>
-		<thead>
-			<tr>
-				<th scope="col">Side</th>
-				<th scope="col">Band</th>
-				<th scope="col">Amount</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each layout.nodes as node (node.key)}
-				<tr>
-					<td>{node.side === "source" ? "From" : "To"}</td>
-					<td>{node.label}</td>
-					<td>{shown(node.amount)}</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-</div>
+<FlowWide {layout} {picked} {onPick} {label} stacked={stack !== undefined} />
+{#if stack}<FlowStack layout={stack} {picked} {onPick} {label} />{/if}
+<FlowTable {layout} {label} />

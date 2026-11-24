@@ -21,7 +21,16 @@ export type PlanChanges = {
 }
 
 const FLOW_FIELDS = ["amount", "frequency", "start", "end", "growth", "earned", "employer"] as const
-const ACCOUNT_FIELDS = ["rate", "compounding", "lockedUntil", "kind", "payout", "fee"] as const
+const ACCOUNT_FIELDS = [
+	"rate",
+	"compounding",
+	"lockedUntil",
+	"kind",
+	"payout",
+	"fee",
+	"lifetimeFees",
+	"lifetimePayouts",
+] as const
 
 /** The cards of one planner page and what the session changes in each, by item id. */
 export interface ItemsView<T> {

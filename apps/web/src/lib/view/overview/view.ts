@@ -2,7 +2,9 @@ import type { Read, Snapshot } from "../../contract"
 import { type AllowancesSummary, allowancesSummaryOf } from "../allowances/home"
 import { type ChanceSummary, chanceSummaryOf } from "../chance/page"
 import { type EstateSummary, estateSummaryOf } from "../estate/home"
+import { type FeesOverPlan, feesOverPlan } from "../lifetime"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
+import { baselineRun } from "../what-if/baseline"
 import { type WithdrawalsSummary, withdrawalsSummaryOf } from "../withdrawals/home"
 import { type FiView, fiView } from "./fi"
 import { type HealthView, healthView } from "./health"
@@ -13,9 +15,11 @@ import { type ProjectionView, projectionView } from "./projection"
 import { mapScenario, primaryScenario, type ScenarioView, scenarioView } from "./scenario"
 import { type TaxView, taxView } from "./tax"
 
-/** The net worth card: the net worth view, and the month-end values its sparkline draws. */
+/** The net worth card: the net worth view, the month-end values its sparkline draws, and the plan's fees. */
 export interface NetWorthCardView extends NetWorthView {
 	readonly sparkline: readonly number[]
+	/** The fees over the plan as the primary Scenario's run states them; null when it states none above zero. */
+	readonly fees: FeesOverPlan | null
 }
 
 /** Every card on the Overview. Each Read keeps its own error, so one failed card shows alone. */
@@ -48,6 +52,7 @@ export function overviewView(snapshot: Snapshot): OverviewView {
 		netWorth: mapRead(snapshot.reads.netWorth, (data) => ({
 			...netWorthView(data),
 			sparkline: monthEndValues(history),
+			fees: scenario === null ? null : feesOverPlan(baselineRun(snapshot, scenario)),
 		})),
 		assets: netWorth,
 		fi: mapScenario(scenarioView(scenario, snapshot.reads.fi), fiView),

@@ -1,5 +1,4 @@
-import type { DateString, MinorUnits } from "../types"
-import type { Projection, ProjectionRow, SettlementPeriod } from "../types/projection"
+import type { DateString, MinorUnits, Projection, ProjectionRow, SettlementPeriod } from "../types"
 
 export function periodFrom(projection: Projection, from: DateString): SettlementPeriod {
 	const period = projection.levies

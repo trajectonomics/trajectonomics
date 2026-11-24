@@ -52,7 +52,14 @@ export function projectChecked(
 		breakdown,
 	})
 	if (!result.ok) return { ok: false, problems: [result.problem] }
-	const output = buildProjection(result.run, baseline, scenario, timeline, breakdown)
+	const output = buildProjection(
+		result.run,
+		baseline,
+		scenario,
+		timeline,
+		breakdown,
+		options.routing === true,
+	)
 	if ("problem" in output) return { ok: false, problems: [output.problem] }
 	const withRule = withRules(
 		output.projection,
