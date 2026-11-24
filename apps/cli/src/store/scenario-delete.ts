@@ -7,7 +7,7 @@ import type { DeleteOptions, ScenarioDeleted } from "./types"
 
 /**
  * Tombstones a scenario: sync can then remove it elsewhere, and its name is free again. The main
- * plan is refused unless `force`, which clears the setting in the same write (cli ADR-0071).
+ * plan is refused unless `force`, which takes the mark off in the same write (cli ADR-0071).
  */
 export function deleteScenario(
 	ctx: Ctx,

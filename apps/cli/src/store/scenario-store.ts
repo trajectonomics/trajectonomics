@@ -49,7 +49,7 @@ export interface ScenarioStore {
 	setScenarioNotes(id: string, notes: string | null, options?: WriteOptions): NotesSet | AppError
 	/** Marks a live Scenario as the main plan, moving the mark from another; null clears it. */
 	setMainScenario(id: string | null, options?: WriteOptions): MainSet | AppError
-	/** Tombstones a live Scenario; the main plan only under `force`, which clears the setting. */
+	/** Tombstones a live Scenario; the main plan only under `force`, which takes the mark off. */
 	deleteScenario(id: string, options?: DeleteOptions): ScenarioDeleted | AppError
 	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */
 	getScenario(idOrName: string): ScenarioRow | null | AppError

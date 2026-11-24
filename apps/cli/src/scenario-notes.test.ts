@@ -11,6 +11,7 @@ import {
 } from "./scenario-test-support"
 import { SCENARIO_DOCUMENT } from "./store/testing"
 import { makeTempDir } from "./temp-dir"
+import { capture } from "./test-support"
 
 async function planWith(notes?: string): Promise<{ home: string; hash: string }> {
 	const home = scenarioHome()
@@ -69,6 +70,54 @@ describe("scenario notes (cli ADR-0071)", () => {
 		const { home } = await planWith()
 		await scenario(home, ["notes", "base", "--file", "-"], "a\r\nb")
 		expect(resultOf(await scenario(home, ["show", "base"])).scenario.notes).toBe("a\nb")
+	})
+
+	it("strips a leading byte order mark", async () => {
+		const { home } = await planWith()
+		await scenario(home, ["notes", "base", "--file", "-"], "\uFEFFwith a BOM")
+		expect(resultOf(await scenario(home, ["show", "base"])).scenario.notes).toBe("with a BOM")
+		const file = join(makeTempDir("traj-notes-"), "bom.txt")
+		writeFileSync(
+			file,
+			Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from("from a file")]),
+		)
+		await scenario(home, ["notes", "base", "--file", file])
+		expect(resultOf(await scenario(home, ["show", "base"])).scenario.notes).toBe("from a file")
+	})
+
+	it("refuses text that is not UTF-8, from a file and from stdin, and stores nothing", async () => {
+		const { home } = await planWith("kept")
+		// "ภาษา" in TIS-620: the bytes are not valid UTF-8.
+		const tis620 = Buffer.from([0xc0, 0xd2, 0xc9, 0xd2])
+		const file = join(makeTempDir("traj-notes-"), "tis620.txt")
+		writeFileSync(file, tis620)
+		const fromFile = await scenario(home, ["notes", "base", "--file", file])
+		expect(fromFile.code).toBe(2)
+		expect(errorOf(fromFile)).toMatchObject({
+			code: "invalid_input",
+			path: "--file",
+			hint: expect.stringContaining("UTF-8"),
+		})
+		expect(errorOf(fromFile).message).toContain("is not valid UTF-8 text")
+		const bad = await capture(
+			["scenario", "notes", "base", "--file", "-", "--json"],
+			{ TRAJ_HOME: home },
+			undefined,
+			"bad \uFFFD byte",
+		)
+		expect(errorOf(bad).message).toContain("is not valid UTF-8 text")
+		expect(resultOf(await scenario(home, ["show", "base"])).scenario.notes).toBe("kept")
+	})
+
+	it("names the flag in the path and not a different one in the message", async () => {
+		const { home } = await planWith()
+		const res = await scenario(home, ["notes", "base", "--text", "a", "--clear"])
+		const error = errorOf(res)
+		expect(error.path).toBe("--clear")
+		expect(error.message).not.toMatch(/^text:/i)
+		const none = errorOf(await scenario(home, ["notes", "base"]))
+		expect(none.path).toBe("--text")
+		expect(none.message).not.toMatch(/^clear:/i)
 	})
 
 	it("keeps notes through an apply of a changed document", async () => {

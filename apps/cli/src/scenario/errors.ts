@@ -49,7 +49,7 @@ export function scenarioIsMain(scenario: { id: string; name: string }): AppError
 		path: "scenario",
 		message: `The scenario "${scenario.name}" is the main plan and is not removed.`,
 		details: { scenarioId: scenario.id },
-		hint: `Choose another main plan with "traj scenario main <name>" or take the mark off with "traj scenario main --clear", then remove it; or remove it now with --force, which clears the main-plan setting.`,
+		hint: `Choose another main plan with "traj scenario main <name>" or take the mark off with "traj scenario main --clear", then remove it; or remove it now with --force, which takes the main-plan mark off.`,
 	})
 }
 

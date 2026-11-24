@@ -88,7 +88,7 @@ describe("scenario main (cli ADR-0071)", () => {
 		expect((await scenario(home, ["rm", "early"])).code).toBe(0)
 	})
 
-	it("removes the main plan under --force and clears the setting", async () => {
+	it("removes the main plan under --force and takes the mark off", async () => {
 		const home = await twoPlans()
 		await scenario(home, ["main", "base"])
 		const dry = resultOf(await scenario(home, ["rm", "base", "--force", "--dry-run"]))

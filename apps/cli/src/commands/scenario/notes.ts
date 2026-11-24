@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs"
 import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand, ok } from "../../command"
@@ -6,6 +5,7 @@ import { type AppError, fail, isAppError } from "../../errors"
 import { scenarioNotFound } from "../../scenario/errors"
 import { NOTES_MAX_CHARACTERS, normalisedNotes, notesProblem } from "../../scenario/notes"
 import { noted, notedScenario } from "../../scenario/shown"
+import { readUtf8Source } from "../../text-source"
 import { withStore } from "../../with-store"
 
 type Forms = { text?: string | undefined; file?: string | undefined; clear?: boolean | undefined }
@@ -14,24 +14,11 @@ type Forms = { text?: string | undefined; file?: string | undefined; clear?: boo
 function exclusive(input: Forms): AppError | undefined {
 	const named = [input.text !== undefined, input.file !== undefined, input.clear === true]
 	if (named.filter(Boolean).length === 1) return undefined
+	const path = named.some(Boolean) ? "clear" : "text"
 	return fail("invalid_input", {
-		path: named.some(Boolean) ? "clear" : "text",
-		message:
-			"text: name the notes with --text, --file (a path, or - for stdin), or take them off with --clear, and use one of the three",
+		path,
+		message: `${path}: name the notes with --text, --file (a path, or - for stdin), or take them off with --clear, and use one of the three`,
 	})
-}
-
-/** The text of `--file`: a path, or `-` for stdin. */
-async function readNotes(ref: string, stdin: () => Promise<string>): Promise<string | AppError> {
-	try {
-		return ref === "-" ? await stdin() : readFileSync(ref, "utf8")
-	} catch {
-		const where = ref === "-" ? "stdin" : `"${ref}"`
-		return fail("invalid_input", {
-			path: "file",
-			message: `file: cannot read the notes at ${where}`,
-		})
-	}
 }
 
 /** The notes to store, checked; null when `--clear` takes them off. */
@@ -40,7 +27,9 @@ async function textOf(
 	stdin: () => Promise<string>,
 ): Promise<string | null | AppError> {
 	if (input.clear === true) return null
-	const raw = input.text ?? (await readNotes(input.file ?? "-", stdin))
+	const raw =
+		input.text ??
+		(await readUtf8Source(input.file ?? "-", stdin, "Save the notes as UTF-8 and retry."))
 	if (isAppError(raw)) return raw
 	const text = normalisedNotes(raw)
 	const problem = notesProblem(text)

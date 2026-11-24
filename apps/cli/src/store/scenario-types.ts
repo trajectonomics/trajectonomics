@@ -30,7 +30,7 @@ export type ScenarioDeleted =
 	| { status: "deleted"; scenario: ScenarioRow; wasMain: boolean }
 	| { status: "is_main"; scenario: ScenarioRow }
 	| { status: "not_found" }
-/** A delete's options: a dry run, and `force`, which lets the main plan go and clears the setting. */
+/** A delete's options: a dry run, and `force`, which lets the main plan go and takes the mark off. */
 export type DeleteOptions = WriteOptions & { force?: boolean }
 
 /** A rename's options: a dry run, and the content hash the caller read (cli ADR-0055). */

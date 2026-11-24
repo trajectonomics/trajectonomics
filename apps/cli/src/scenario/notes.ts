@@ -5,12 +5,12 @@ export const NOTES_MAX_CHARACTERS = 10_000
 const FORBIDDEN_CONTROL = /[^\P{Cc}\n\t]/u
 
 /**
- * Notes as the person wrote them, with Windows line endings read as newlines, so a file saved on
- * any system stores the same text. A lone carriage return stays and is refused as a control
+ * Notes as the person wrote them, without a leading byte order mark and with Windows line endings
+ * read as newlines, so a file saved on any system stores the same text. A lone carriage return stays and is refused as a control
  * character.
  */
 export function normalisedNotes(text: string): string {
-	return text.replaceAll("\r\n", "\n")
+	return text.replace(/^\uFEFF/, "").replaceAll("\r\n", "\n")
 }
 
 /**

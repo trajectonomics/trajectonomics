@@ -30,7 +30,7 @@ export const rm: Leaf = defineCommand({
 		force: z
 			.boolean()
 			.optional()
-			.describe("Remove the main plan too, which clears the main-plan setting (ADR-0071)."),
+			.describe("Remove the main plan too, which takes the main-plan mark off (ADR-0071)."),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
 	output: z.strictObject({
@@ -53,7 +53,7 @@ export const rm: Leaf = defineCommand({
 		},
 		{
 			command: "traj scenario rm base --force",
-			description: "Remove the main plan anyway, which clears the main-plan setting.",
+			description: "Remove the main plan anyway, which takes the main-plan mark off.",
 		},
 	],
 	errorCodes: ["database_busy", "not_found", "scenario_is_main"],
