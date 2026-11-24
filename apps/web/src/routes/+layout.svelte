@@ -23,14 +23,14 @@ import { scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
 import { printHeading } from "../lib/view/print-header"
 import { chooseScenario } from "../lib/view/projection/scenario"
-import { routeAt } from "../lib/view/routes"
+import { navPath, routeAt } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
 
 let { children }: { children: Snippet } = $props()
 const artwork = brandArtwork(mark)
 const names = $derived(scenarioNames(currentSnapshot()))
 const selected = $derived(chooseScenario(names, queryParam("scenario", "")) ?? "")
-const title = $derived(routeAt(page.url.pathname)?.label ?? "Dashboard")
+const title = $derived(routeAt(navPath(page.url.pathname))?.label ?? "Dashboard")
 // Edit controls show only when the server answered the token, and never in the Demo snapshot.
 const editable = $derived(editsShown(editSession.token, page.url.search))
 // The planner pages are listed only when the Snapshot holds the selected plan's read of its items.
@@ -67,7 +67,7 @@ $effect(() => {
 
 <SideNavigation
 	brand={artwork}
-	current={page.url.pathname}
+	current={navPath(page.url.pathname)}
 	{names}
 	{selected}
 	onPlan={selectPlan}

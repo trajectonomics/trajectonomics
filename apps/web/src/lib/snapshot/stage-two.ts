@@ -1,6 +1,7 @@
 import type { Read } from "../contract"
 import { firstDayOfYear, firstDayTwoMonthsBack, monthEndsBetween } from "./dates"
 import type { PlanParams } from "./params"
+import { pathRead } from "./paths"
 import { type PlannedRead, plainRead } from "./planned"
 import type { StageOneReads } from "./stage-one"
 import { planAllowances } from "./stage-two-allowances"
@@ -31,6 +32,8 @@ export type StageTwoPlan = {
 	compare: PlannedRead | null
 	/** One `projection chance` per Scenario; empty when the caller stated no Return model. */
 	chance: Record<string, PlannedRead>
+	/** The `projection path` of one Scenario and one path index of its chance run; null when the Snapshot states no chance inputs. */
+	pathOf: (scenario: string, index: number) => PlannedRead | null
 	/** One `projection allowances` per Scenario; empty when the Snapshot states no allowance inputs. The runner reads only plans with a Levy. */
 	allowances: Record<string, PlannedRead>
 }
@@ -82,6 +85,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),
 		chance: planChance(params, scenarios),
+		pathOf: (scenario, index) => pathRead(params, scenario, index),
 		allowances: planAllowances(params, scenarios),
 	}
 }

@@ -75,9 +75,17 @@ describe("the chance reads the Plan emits", () => {
 			"--return-model=model.json",
 			"--paths=200",
 			"--seed=0123456789abcdef",
+			"--outcomes",
 			"--json",
 		])
 		expect(plan.chance["base"]?.carryInFor).toEqual([])
+	})
+
+	test("asks for the outcomes of every path, unless the parameters leave the futures out, as the Demo snapshot's do", () => {
+		const left = checkParams({ ...base, ...CHANCE, futures: false, scenarios: ["base"] })
+		if (!left.ok) throw new Error(left.error.message)
+		const plan = planStageTwo(left.params, stageOne("2026-10-31", ["base"]))
+		expect(plan.chance["base"]?.argv).not.toContain("--outcomes")
 	})
 
 	test("takes the Carry-in on standard input for each Scenario, as a projection run does", () => {

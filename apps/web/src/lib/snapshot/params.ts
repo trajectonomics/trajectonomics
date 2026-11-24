@@ -20,6 +20,12 @@ export type PlanInput = {
 	seed: string | null
 	/** The `projection allowances` reads' inputs; left out or null, the Snapshot reads none. */
 	allowances?: AllowancePlan | null | undefined
+	/**
+	 * Whether the chance reads list every Market path (`--outcomes`) and the Snapshot reads the five representative paths
+	 * ([web ADR 0020](../../../docs/adr/0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md)). Left out, it is true;
+	 * only the Demo snapshot says false, to stay under Biome's size limit.
+	 */
+	futures?: boolean | undefined
 }
 
 /** The parameters once every rule has held. */
@@ -36,6 +42,8 @@ export type PlanParams = {
 	chance: ChancePlan | null
 	/** The allowance reads' inputs, or null when none are stated: no `projection allowances` read is made. */
 	allowances: AllowancePlan | null
+	/** Whether the chance reads take `--outcomes` and the Snapshot holds the representative paths. */
+	futures: boolean
 }
 
 /** One code per rule the parameters can break. */
@@ -67,7 +75,7 @@ export function checkParams(
 		checkAllowances(input.allowances)
 	if (error) return { ok: false, error }
 	// checkDates has held, so both dates are set; the fallbacks below are never taken.
-	const { returnModel: _r, paths: _p, seed: _s, allowances: _a, ...rest } = input
+	const { returnModel: _r, paths: _p, seed: _s, allowances: _a, futures: _f, ...rest } = input
 	return {
 		ok: true,
 		params: {
@@ -76,6 +84,7 @@ export function checkParams(
 			horizon: input.horizon ?? "",
 			chance: chancePlanOf(input),
 			allowances: input.allowances ?? null,
+			futures: input.futures ?? true,
 		},
 	}
 }

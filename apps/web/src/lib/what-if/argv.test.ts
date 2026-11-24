@@ -15,6 +15,7 @@ const PARAMS: PlanParams = {
 	carryIn: false,
 	chance: null,
 	allowances: null,
+	futures: true,
 }
 
 const WHAT_IF: WhatIfBody = {

@@ -3,6 +3,7 @@
 // the partial answer equals the full one. The timings are printed for the ADR.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
+import { sameRun } from "../src/lib/snapshot/paths"
 import { calls, clearCalls } from "./allowances-spy.test-support"
 import {
 	disposeAssumptions,
@@ -29,15 +30,17 @@ async function reread(body: unknown): Promise<Snapshot> {
 
 /** The Snapshot without its chance reads and inputs: everything a chance change must leave alone. */
 function others(snapshot: Snapshot): string {
-	const { chance: _reads, ...reads } = snapshot.reads
+	const { chance: _reads, paths: _paths, ...reads } = snapshot.reads
 	const { chance: _inputs, ...params } = snapshot.params
 	return JSON.stringify({ ...snapshot, params, reads })
 }
 
 const chanceRuns = (ran: string[]) => ran.filter((line) => line.startsWith("projection chance"))
+/** The paths the chance read lists are read again with it: one `projection path` for each of its representative indexes. */
+const pathRuns = (ran: string[]) => ran.filter((line) => line.startsWith("projection path"))
 const checksOf = (ran: string[]) =>
 	ran
-		.filter((line) => !line.startsWith("projection chance"))
+		.filter((line) => !line.startsWith("projection chance") && !line.startsWith("projection path"))
 		.map((line) => CHECK.find((prefix) => line.startsWith(prefix)))
 
 beforeAll(async () => {
@@ -69,6 +72,13 @@ describe("a reread that changes only the chance inputs", () => {
 			expect(chanceRuns(ran)).toHaveLength(1)
 			expect(checksOf(ran)).toEqual(CHECK)
 			expect(ran.some((line) => line.startsWith("projection run"))).toBe(false)
+			// The five representative paths belong to the chance's run, so they are read again with it (web ADR 0020).
+			expect(pathRuns(ran).length).toBeGreaterThan(0)
+			expect(pathRuns(ran).length).toBeLessThanOrEqual(5)
+			const chanceRead = after.reads.chance[PLAN]
+			for (const read of Object.values(after.reads.paths[PLAN] ?? {})) {
+				expect(read.ok && chanceRead?.ok && sameRun(chanceRead.data, read.data)).toBe(true)
+			}
 			expect(others(after)).toBe(others(before))
 			expect(after.params.chance).toEqual({ source: "plan", ...SECOND })
 			const read = after.reads.chance[PLAN]

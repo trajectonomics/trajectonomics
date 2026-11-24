@@ -30,6 +30,7 @@ const PARAMS = {
 	carryIn: false,
 	chance: null,
 	allowances: null,
+	futures: true,
 }
 
 describe("the what-if body with Additions", () => {
