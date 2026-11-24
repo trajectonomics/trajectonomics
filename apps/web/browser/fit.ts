@@ -53,32 +53,50 @@ export function measureOverflow(page: Page, scroll: boolean): Promise<Overflow> 
 }
 
 /**
- * The tables whose box lets a screen-reader-only label escape and widen the page (#352). The Demo has no
- * What-if session, whose labels ("What-if: ", "Change: ") sit in the far-right cells of a year table, so
- * this puts a label of the same class (`sr-only`, which is `position: absolute`) in the last cell of each
- * table, one at a time, and reads the page's scroll width. A scroll box that is not itself positioned
- * (`relative`) leaves the label to the page: it is placed where its cell is, past the right edge, and the
- * page scrolls sideways. The label is removed again.
+ * The tables whose box lets a screen-reader-only label escape and widen the page (#352). A What-if
+ * session's labels ("What-if: ", "Change: ") sit in the far-right cells of its year table, and that table is
+ * never rendered in the Demo (it needs the edit server), so this puts a label of the same class (`sr-only`,
+ * which is `position: absolute`) in the last cell of the last row of each table, one at a time, and reads
+ * the page's scroll width. A table inside a scroll box is also made 200px wider than the screen for the
+ * moment, so the label is far past the edge whatever the fonts measure. A scroll box that is not itself
+ * positioned (`relative`) leaves the label to the page, and the page scrolls sideways; any widening fails.
+ * The label and the width are removed again.
+ *
+ * The last row, not a CSS `tr:last-child`: the sticky header row of a `DataTable` is the first row of
+ * its own `thead`, so that selector found the header and the label stayed inside a positioned cell.
  */
 export function labelsEscaping(page: Page): Promise<string[]> {
 	return page.evaluate(() => {
-		const page = document.documentElement
-		const escaping: string[] = []
-		for (const table of document.querySelectorAll("table")) {
-			const cell = table.querySelector("tr:last-child > :last-child")
-			if (cell === null) continue
+		const root = document.documentElement
+		const scrolls = (table: HTMLTableElement) => {
+			for (let box = table.parentElement; box !== null; box = box.parentElement) {
+				const { overflowX } = getComputedStyle(box)
+				if (overflowX === "auto" || overflowX === "scroll") return true
+			}
+			return false
+		}
+		// The page's scroll width with a label in the cell, and the table made wide when it scrolls.
+		const widthWithLabel = (table: HTMLTableElement, cell: Element) => {
 			const label = document.createElement("span")
 			label.className = "sr-only"
 			label.textContent = "label"
 			cell.append(label)
-			if (page.scrollWidth > page.clientWidth) {
-				const head = table.querySelector("th")?.textContent?.trim().slice(0, 30) ?? ""
-				escaping.push(
-					`table "${head}" lets a screen-reader-only label widen the page to ${page.scrollWidth}px`,
-				)
-			}
+			if (scrolls(table)) table.style.minWidth = "calc(100vw + 200px)"
+			const width = root.scrollWidth
+			table.style.minWidth = ""
 			label.remove()
+			return width
 		}
+		const probe = (table: HTMLTableElement): string | null => {
+			const cell = table.rows[table.rows.length - 1]?.lastElementChild ?? null
+			const width = cell === null ? 0 : widthWithLabel(table, cell)
+			if (width <= root.clientWidth) return null
+			const head = table.querySelector("th")?.textContent?.trim().slice(0, 30) ?? ""
+			return `table "${head}" lets a screen-reader-only label widen the page to ${width}px`
+		}
+		const escaping = [...document.querySelectorAll("table")]
+			.map(probe)
+			.filter((found): found is string => found !== null)
 		return escaping
 	})
 }

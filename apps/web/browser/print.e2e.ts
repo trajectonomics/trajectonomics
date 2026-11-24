@@ -38,7 +38,7 @@ async function faintText(page: Page): Promise<string[]> {
 for (const theme of THEMES) {
 	for (const path of PRINTED) {
 		test(`${path} prints on A4 in black on white, from the ${theme} theme`, async ({ page }) => {
-			await openDemo(page, path, theme)
+			await openDemo(page, path, { theme })
 			await page.emulateMedia({ media: "print" })
 			await page.setViewportSize({ width: A4_LANDSCAPE_CONTENT_PX, height: 800 })
 			const name = path.replaceAll("/", "")

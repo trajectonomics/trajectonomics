@@ -85,8 +85,8 @@ that the shard carries no `--`.
 the shards, which it runs beside.
 
 - **What it checks.** Every page of the Demo at 360px and 1280px in the light and the dark theme (no
-  horizontal page scroll, a wide table inside a scroll box that fits), a screen-reader-only label in each
-  table's last cell at 360px (it must not widen the page), and Reports, Projection and Cash flow in print on
+  horizontal page scroll, a wide table inside a scroll box that fits), a screen-reader-only label in the last cell of each
+  table at 360px, with amounts shown and hidden (it must not widen the page), and Reports, Projection and Cash flow in print on
   A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
   `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
 - **Steps.** The build is `bunx turbo run @trajectonomics/web#build --concurrency=2`, with no arguments after
@@ -99,8 +99,8 @@ the shards, which it runs beside.
   `web-playwright-report` (the HTML report and traces) is uploaded on failure only.
 - **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 125 s for the whole job,
   of which the build step 5 s (turbo cache hit), the browser cache 8 s, Chromium's system libraries 27 s, the
-  suite 54 s (121 tests, 2 workers) and the screenshot upload 3 s (17 MB, 98 files). The shards take 3.5
-  minutes, so the job is not on the critical path. A cold build adds about 40 s, a cold browser download about
+  suite 54 s (121 tests, 2 workers) and the screenshot upload 3 s (17 MB, 98 files). The shards take 2m47s to
+  6m03s, so the job (about 2 minutes) is not on the critical path. A cold build adds about 40 s, a cold browser download about
   30 s more.
 - **Locally.** `bun run check` never runs it. Build first, then `bun run test:browser` in `apps/web` (see
   `apps/web/AGENTS.md`).

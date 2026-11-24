@@ -14,7 +14,7 @@ for (const theme of THEMES) {
 		for (const path of PAGES) {
 			test(`${pageName(path)} fits a ${width}px screen in the ${theme} theme`, async ({ page }) => {
 				await page.setViewportSize({ width, height: HEIGHT_PX })
-				await openDemo(page, path, theme)
+				await openDemo(page, path, { theme })
 				await page.screenshot({
 					path: `${SCREENSHOTS}/screen/${width}/${theme}/${pageName(path)}.png`,
 					fullPage: true,
@@ -28,12 +28,22 @@ for (const theme of THEMES) {
 }
 
 // A scroll box around a table holds the screen-reader-only labels in its cells (#352). Only a phone shows it.
-for (const path of PAGES) {
-	test(`${pageName(path)} keeps screen-reader-only labels inside its tables at 360px`, async ({
-		page,
-	}) => {
-		await page.setViewportSize({ width: WIDTHS_PX[0], height: HEIGHT_PX })
-		await openDemo(page, path, "light")
-		expect(await labelsEscaping(page)).toEqual([])
-	})
+// Hiding amounts masks each figure with a label that is for a screen reader, so the second pass runs the
+// pages' own labels as well as the synthetic one.
+for (const hideAmounts of [false, true]) {
+	for (const path of PAGES) {
+		const state = hideAmounts ? ", with amounts hidden" : ""
+		test(`${pageName(path)} keeps screen-reader-only labels inside its tables at 360px${state}`, async ({
+			page,
+		}) => {
+			await page.setViewportSize({ width: WIDTHS_PX[0], height: HEIGHT_PX })
+			await openDemo(page, path, { theme: "light", hideAmounts })
+			expect(await labelsEscaping(page)).toEqual([])
+			if (hideAmounts) {
+				const fit = await measureOverflow(page, true)
+				expect(fit.tables, "tables outside a scroll box").toEqual([])
+				expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
+			}
+		})
+	}
 }

@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test"
 
+/** A colour as red, green and blue, each 0 to 255. */
 export type Rgb = readonly [number, number, number]
 
 /** A piece of text on paper: what it says, its colour and the opaque colour behind it, as sRGB. */
