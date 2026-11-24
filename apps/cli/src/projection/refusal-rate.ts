@@ -67,6 +67,12 @@ const PREPAYMENTS: Entry = {
 	hint: `${UNIT} Lower the shares so that the plain prepayments and the capped one add up to 10000 or less.`,
 }
 
+const ROUTING_SHARE: Entry = {
+	message:
+		"A surplus step's share must be from 0.01% to 100% of the money still unrouted (1 to 10000 basis points), and this one is not.",
+	hint: `${UNIT} A step that takes everything it can has no share. Under --decimal it is a percent string such as "30.00", with at most two decimal places.`,
+}
+
 const GENERAL: Entry = {
 	message: "A rate or share is outside the range its field allows.",
 	hint: `${UNIT} A share runs from 0 to 10000, and a rate that is not a share is above -10000.`,
@@ -109,6 +115,8 @@ export function rateEntry(problem: ProjectionProblem): Entry {
 			return accountEntry(segments, ACCOUNT_RATE, GENERAL)
 		case "economy":
 			return INFLATION
+		case "cashflow":
+			return ROUTING_SHARE
 		default:
 			return GENERAL
 	}

@@ -75,6 +75,8 @@ export function annualRow(
 		...(rollup.employerContributions === undefined
 			? {}
 			: { employerContributions: money(rollup.employerContributions) }),
+		// Present only when the Scenario declares a transfer Flow (sim ADR-0031), as the engine states it.
+		...(rollup.transfers === undefined ? {} : { transfers: money(rollup.transfers) }),
 		...(rollup.fees === undefined ? {} : { fees: money(rollup.fees) }),
 		expense: money(rollup.expense),
 		contributions: money(rollup.contributions),

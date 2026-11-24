@@ -3,7 +3,6 @@ import { currencyOf, mapDecimalFields } from "./decimal"
 import { hintOf, MONEY_HINT, notDecimal, parseField } from "./decimal-field"
 import { isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
-import { unshippedRoutingAt } from "./routing-unshipped"
 import { flagError, type OverrideFlag } from "./set-parse"
 
 /*
@@ -73,15 +72,6 @@ export function setValueFromDecimal(
 	value: unknown,
 	flag: OverrideFlag = "set",
 ): unknown | AppError {
-	// The published shape does not describe the routing keys the CLI refuses yet; refuse them before
-	// the conversion reads one in the wrong unit, or answers an object `upTo` with a unit hint.
-	const [unshipped] = unshippedRoutingAt(segments, value)
-	if (unshipped !== undefined) {
-		return flagError(flag, index, `the value at ${path} is refused. ${unshipped.said.message}`, {
-			hint: unshipped.said.hint,
-			details: { index, path },
-		})
-	}
 	const node = schemaAtPath(PUBLISHED, segments)
 	if (node === undefined) return value
 	return mapDecimalFields(node, value, segments, (raw, at, kind) => {

@@ -96,3 +96,16 @@ The engine's `payouts` and `employer` lists are two more groups, `payout` and `e
 roll-up's `income` already includes it, so `money in` is unchanged and the `payout` lines are what make the long table
 add up to it. An `employer` line is outside the identity, because the money never entered cashflow. Neither group
 adds a section total, and a plan with neither declares neither group.
+
+## Addendum: transfers and per-entry routing (#416, ADR-0070)
+
+A transfer moves money between the plan's own Accounts outside cashflow (sim ADR 0031), so it is in no line group and no section
+total, and the identity above is unchanged. Its lines are a table of their own, `transfers`, `{ index, from, to, flow, source, target,
+amount, unmoved }`, present with `--breakdown` only when the engine states one: a row carries one `account`, and a new key on every row
+would change the bytes of every breakdown. The human block adds `moved between accounts (not cash)`, the roll-up's own `transfers` field, with a
+line per transfer and what it did not move, under `left over`.
+
+A `drawn` line gains `entry`, the position of the `cashflow.withdraw` entry that drew it, present only when the list declares a Reserve
+floor (sim ADR 0030), so an Account listed twice reports once per entry. A surplus line has no entry, because the engine lists each Account
+once (`DUPLICATE_ID`): its step is the one whose Account it names, which the `routing` echo states by position. The CLI computes nothing new here: the
+echo's resolved figure for a target that keeps its value is not stated, because the engine does not state it (ADR-0070).

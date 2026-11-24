@@ -17,6 +17,10 @@ export function annual(rows: Rows<"annual">): ReportTable {
 				rows,
 				figure("withdrawals", (r: Rows<"annual">[number]) => r.withdrawals),
 			),
+			...optional(
+				rows,
+				figure("transfers", (r: Rows<"annual">[number]) => r.transfers),
+			),
 			figure("expense", (r: Rows<"annual">[number]) => r.expense),
 			figure("contributions", (r: Rows<"annual">[number]) => r.contributions),
 			figure("unfundedContributions", (r: Rows<"annual">[number]) => r.unfundedContributions),

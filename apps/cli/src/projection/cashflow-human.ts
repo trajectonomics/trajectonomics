@@ -8,6 +8,7 @@ import {
 	lineOf,
 	outsideCash,
 	textOf,
+	transferRows,
 } from "./cashflow-human-rows"
 import { type CashflowTotals, cashflowTotalsOf } from "./cashflow-totals"
 import { moneyOf } from "./money"
@@ -37,7 +38,7 @@ export function tableRows(
 }
 
 /** The cash-flow tables a person does not read: the long lines and the totals are JSON's; the blocks print instead. */
-const HIDDEN_TABLES = ["cashflow", "cashflowTotals"]
+const HIDDEN_TABLES = ["cashflow", "cashflowTotals", "transfers"]
 
 /** The result without its cash-flow tables: the long tables are for JSON, and the blocks print instead. */
 export function cashflowHidden(data: Record<string, unknown>): Record<string, unknown> {
@@ -55,6 +56,7 @@ export function cashflowHidden(data: Record<string, unknown>): Record<string, un
 function blockRows(
 	annual: Record<string, unknown>,
 	lines: readonly Record<string, unknown>[],
+	transfers: readonly Record<string, unknown>[],
 	currency: string,
 ): BlockRow[] {
 	const money = moneyOf(currency)
@@ -92,7 +94,7 @@ function blockRows(
 		rows.push({ line: "not funded", amount: money(totals["not funded"]) })
 	rows.push({ line: "left over", amount: money(totals["left over"]) })
 	if (totals.unmet !== 0) rows.push({ line: "unmet", amount: money(totals.unmet) })
-	rows.push(...outsideCash(annual))
+	rows.push(...transferRows(annual, transfers), ...outsideCash(annual))
 	return rows
 }
 
@@ -104,10 +106,12 @@ export function cashflowBlocks(data: Record<string, unknown>): string[] {
 	const lines = tableRows(data, "cashflow")
 	const annual = tableRows(data, "annual")
 	if (lines === undefined || annual === undefined) return []
+	const transfers = tableRows(data, "transfers") ?? []
 	const currency = String(data["currency"])
 	return annual.map((row) => {
 		const rollupLines = lines.filter((line) => line["index"] === row["index"])
-		const rows = blockRows(row, rollupLines, currency)
+		const rollupTransfers = transfers.filter((line) => line["index"] === row["index"])
+		const rows = blockRows(row, rollupLines, rollupTransfers, currency)
 		const heading = `cash flow ${String(row["from"])} to ${String(row["to"])}`
 		return tableLines(heading, rows.length, rows, BLOCK_COLUMNS)
 	})

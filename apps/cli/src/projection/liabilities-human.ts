@@ -14,6 +14,8 @@ const MONTH_COLUMNS: readonly ColumnHint[] = [
 	{ key: "opening", label: "opening", align: "right" },
 	{ key: "drawn", label: "drawn", align: "right" },
 	{ key: "paid", label: "paid", align: "right" },
+	// Shown only when a row states it, so a loan no transfer pays down prints as before (cli ADR-0070).
+	{ key: "transferred", label: "transferred", align: "right", optional: true },
 	{ key: "interest", label: "interest", align: "right" },
 	{ key: "closing", label: "closing", align: "right" },
 	{ key: "partial", label: "partial" },

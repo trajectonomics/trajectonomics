@@ -40,7 +40,8 @@ async function prepare(
 ): Promise<Prepared> {
 	const args = parseSnapshotArgs(argv)
 	if (!args.ok) return { ok: false, message: args.message }
-	const params = checkParams(args.options.input)
+	// The offline Snapshot opens its five representative futures with no server, so it reads them in advance (web ADR 0020).
+	const params = checkParams({ ...args.options.input, readPaths: true })
 	if (!params.ok) return { ok: false, message: params.error.message }
 	const binary = await checkBinary(args.options.traj, env)
 	if (!binary.ok) return { ok: false, message: binary.message }

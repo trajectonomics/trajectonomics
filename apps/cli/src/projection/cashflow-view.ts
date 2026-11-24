@@ -40,6 +40,8 @@ export type CashflowRow = {
 	account: string | null
 	category: string | null
 	amount: string
+	/** A `drawn` line's position in `cashflow.withdraw`, present only when the list declares a Reserve floor (sim ADR 0030). */
+	entry?: number | undefined
 }
 
 export const cashflowRow: z.ZodType<CashflowRow> = z.strictObject({
@@ -70,4 +72,11 @@ export const cashflowRow: z.ZodType<CashflowRow> = z.strictObject({
 			"The category an expense Flow declares; null when it declares none, and on every other line.",
 		),
 	amount: moneyField("The line's amount; a settlement keeps its sign, so a refund is negative"),
+	entry: z
+		.number()
+		.int()
+		.optional()
+		.describe(
+			"A drawn line's position in cashflow.withdraw, counted from 0, present only when the list declares a Reserve floor: an Account may then appear twice, once per entry, so the lines tell the draw down to the floor from the draw below it. Absent on every other line, and on every line of a list with no floor.",
+		),
 })

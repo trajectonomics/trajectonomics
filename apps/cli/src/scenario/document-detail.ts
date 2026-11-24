@@ -1,10 +1,9 @@
+import { allowedValues } from "@trajectonomics/core/sim"
 import type { ScenarioProblem } from "./document"
 import { isOwnCode } from "./own-problems"
-import { shippedValues } from "./problem-words"
-import { ROUTING_NOT_SHIPPED } from "./routing-unshipped"
 
 /** The rate fields of a document: a rate is written in basis points, never as a fraction. */
-const RATE_SEGMENTS: ReadonlySet<string | number> = new Set(["rate", "bps", "inflation"])
+const RATE_SEGMENTS: ReadonlySet<string | number> = new Set(["rate", "bps", "inflation", "share"])
 
 const GROWTH_FORMS = '"inflation", {"bps": <integer>}; {"bps": 0} is a fixed amount'
 
@@ -17,7 +16,6 @@ export function detailOf(
 	problem: ScenarioProblem,
 	acceptedVersion: () => number | undefined,
 ): string | undefined {
-	if (problem.code === ROUTING_NOT_SHIPPED) return undefined
 	if (problem.code === "UNSUPPORTED_SCHEMA_VERSION") {
 		const accepted = acceptedVersion()
 		return accepted === undefined ? undefined : `the accepted version is ${accepted}`
@@ -27,6 +25,6 @@ export function detailOf(
 		return "basis points, a whole number: 2% is 200"
 	}
 	if (isOwnCode(problem.code)) return undefined
-	const allowed = shippedValues(problem.code, problem.segments)
+	const allowed = allowedValues(problem.code, problem.segments)
 	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
 }

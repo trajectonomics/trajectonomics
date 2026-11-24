@@ -28,7 +28,7 @@ describe("applyOverrides suggestions", () => {
 		const body = failed(document, "zzzzzzzzzzzzz=1")
 		expect(body.details).toMatchObject({ suggestion: null })
 		expect(body.hint).toContain("key-0")
-		expect(body.hint).toContain("and 3 more")
+		expect(body.hint).toContain("and 4 more")
 	})
 
 	it("suggests a corrected path that keeps the caller's remaining segments", () => {

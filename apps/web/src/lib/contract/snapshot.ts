@@ -11,6 +11,7 @@ import { pnl } from "./pnl"
 import { projectionAllowances } from "./projection-allowances"
 import { projectionChance } from "./projection-chance"
 import { projectionCompare } from "./projection-compare"
+import { projectionPath } from "./projection-path"
 import { projectionRun } from "./projection-run"
 import { readOf } from "./read"
 import { scenarioList } from "./scenario-list"
@@ -61,6 +62,8 @@ export const snapshotReads = z.strictObject({
 	compare: readOf(projectionCompare).nullable(),
 	// Absent from a Snapshot made without a Return model, so a document that never had the key reads as none.
 	chance: z.record(z.string(), readOf(projectionChance)).default({}),
+	// One `projection path` per plan and per representative path index (web ADR 0020); absent from a Snapshot made without them.
+	paths: z.record(z.string(), z.record(z.string(), readOf(projectionPath))).default({}),
 	// One `projection allowances` per plan that has a Levy, when the Snapshot states allowance inputs.
 	allowances: z.record(z.string(), readOf(projectionAllowances)).default({}),
 })
