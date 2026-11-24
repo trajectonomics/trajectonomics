@@ -2,8 +2,9 @@
 // (cli ADR 0055 and 0066, web ADR 0016). Each test sets up its own state, so each passes alone.
 import { afterAll, beforeAll, describe, expect } from "bun:test"
 import type { TaxProfile } from "../src/lib/contract"
-import { blankDraft, draftOf, taxEdit } from "../src/lib/view/tax-settings/draft"
+import { blankDraft, draftOf } from "../src/lib/view/tax-settings/draft"
 import { unlabelledIncome } from "../src/lib/view/tax-settings/labels"
+import { taxEdit } from "../src/lib/view/tax-settings/profile-edit"
 import { flowsSentence } from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import { slow } from "./estate.test-support"
@@ -75,9 +76,9 @@ describe("the tax profile when the plan moves or has unlabelled income", () => {
 			const answer = await post("edit", whole.edit)
 			if (answer.ok) throw new Error("the CLI took an unlabelled income Flow")
 			expect(answer.error.path).toBe("document")
-			const sentence = flowsSentence(answer.error, { name: "salaried", stored: false })
+			const sentence = flowsSentence(answer.error)
 			expect(sentence).toContain("side-gig")
-			expect(sentence).toContain("--label <flow>=<label>")
+			expect(sentence).toContain("Tax labels")
 			expect(sentence).not.toContain("@trajectonomics")
 		},
 	)

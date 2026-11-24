@@ -52,6 +52,45 @@ describe("the tax profile Edits", () => {
 		])
 	})
 
+	test("set-tax writes the labels of income Flows as --label <flow>=<label>, after the profile and before the guard", () => {
+		const edit = editSchema.parse({
+			...whole({ filingStatus: "single" }),
+			labels: [
+				{ flow: "salary", label: "income.section40_1" },
+				{ flow: "side-gig", label: "income.section40_2" },
+			],
+		})
+		expect(writeCommand(edit, false).argv).toEqual([
+			"scenario",
+			"tax",
+			"early",
+			"--tax",
+			"th-2026",
+			"--filing-status",
+			"single",
+			"--label",
+			"salary=income.section40_1",
+			"--label",
+			"side-gig=income.section40_2",
+			"--if-hash",
+			HASH,
+			"--json",
+		])
+	})
+
+	test("a label is one of the income labels, on a Flow whose id cannot read as a flag", () => {
+		const labelled = (labels: unknown) =>
+			editSchema.safeParse({ ...whole({ filingStatus: "single" }), labels }).success
+		expect(labelled([{ flow: "salary", label: "income.section40_1" }])).toBe(true)
+		expect(labelled([{ flow: "salary", label: "allowance.thai_esg" }])).toBe(false)
+		expect(labelled([{ flow: "salary", label: "income.bogus" }])).toBe(false)
+		expect(labelled([{ flow: "--none", label: "income.section40_1" }])).toBe(false)
+		expect(labelled([{ flow: "a=b", label: "income.section40_1" }])).toBe(false)
+		expect(labelled([{ flow: "salary", label: "income.section40_1", extra: 1 }])).toBe(false)
+		// A merge carries no labels: the plan already has its tax, and its labels are set in the label form.
+		expect(editSchema.safeParse({ ...merge({ children: "2" }), labels: [] }).success).toBe(false)
+	})
+
 	test("remove-tax is scenario tax --none, and no tax Edit changes the plans the Snapshot projects", () => {
 		const edit = editSchema.parse({ kind: "remove-tax", name: "early", contentHash: HASH })
 		expect(writeCommand(edit, true).argv).toEqual([

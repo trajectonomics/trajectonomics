@@ -1,58 +1,64 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import type { TaxProfile } from "../../lib/contract"
-import Drawer from "../ui/Drawer.svelte"
-import StaleNotice from "../ui/StaleNotice.svelte"
-import TaxLabelNotice from "./TaxLabelNotice.svelte"
-import TaxProfileForm from "./TaxProfileForm.svelte"
+import { whatIfSession } from "../../client/what-if.svelte.js"
+import type { ScenarioShow } from "../../lib/contract"
+import { type GroupKey, groupCards } from "../../lib/view/tax-settings/groups"
+import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
+import { notStated } from "../../lib/view/tax-settings/not-stated"
+import { isTaxed } from "../../lib/view/tax-settings/rows"
+import TaxDrawer from "./TaxDrawer.svelte"
+import TaxGroupCards from "./TaxGroupCards.svelte"
+import TaxLabelForm from "./TaxLabelForm.svelte"
+import TaxNotStated from "./TaxNotStated.svelte"
 import TaxProfileRemove from "./TaxProfileRemove.svelte"
 
 interface Props {
 	name: string
-	/** The content hash of the plan the page read, which every Edit names (cli ADR 0055). */
-	contentHash: string
-	profile: TaxProfile | null
-	/** Whether the plan holds a tax Levy, with or without a stored profile. */
-	taxed: boolean
-	/** The income Flows without a tax label: while there are any, `scenario tax` refuses, so the form is not offered. */
-	unlabelled: readonly string[]
-	/** Every income Flow of the plan, which a removal leaves without a tax label. */
-	income: readonly string[]
+	/** The plan as `scenario show` reads it: its profile, whether it is taxed, its document and the hash every Edit names. */
+	show: ScenarioShow["scenario"]
+	/** Whether the page changes anything: the server answers, and the page is not the Demo snapshot. */
+	editable: boolean
 }
 
-let { name, contentHash, profile, taxed, unlabelled, income }: Props = $props()
+let { name, show, editable }: Props = $props()
+const profile = $derived(show.tax ?? null)
+const taxed = $derived(isTaxed(show))
+// While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
+// with none labels them in the write that gives it tax, which the profile form carries.
+const unlabelled = $derived(unlabelledIncome(show.document))
+// A What-if session of this plan tries a change and saves nothing, and tax settings are saved, so it waits.
+const trying = $derived(whatIfSession.active && whatIfSession.whatIf?.plan === name)
+const offered = $derived(editable && (unlabelled.length === 0 || !taxed))
+const wait = $derived(editSession.busy || trying)
 let open = $state(false)
-// The hash the form opened on: a plan that changed since is read again, and the form starts over from it.
+let group = $state<GroupKey | null>(null)
 let openedOn = $state("")
-const title = $derived(profile === null ? "Set the tax profile" : "Change the tax profile")
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
-/** Opens or shuts the drawer; a refusal from an earlier save is forgotten, so it never shows on the next form. */
-function show(next: boolean): void {
+/** Opens or shuts the drawer on a group; a refusal from an earlier save is forgotten, so it never shows on the next form. */
+function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	editSession.clear()
-	openedOn = contentHash
+	openedOn = show.contentHash
+	group = on
 	open = next
 }
 </script>
 
-{#if unlabelled.length > 0}
-	<TaxLabelNotice {name} flows={unlabelled} stored={profile !== null} />
+{#if editable && trying}
+	<p role="status" class="rounded-md border border-border bg-muted p-3 text-sm text-foreground">Tax settings are saved, not tried. Apply or revert the what-if first, then change them here.</p>
+{/if}
+{#if editable && taxed && unlabelled.length > 0}
+	<TaxLabelForm {name} {show} disabled={wait} />
+{/if}
+{#if profile !== null}
+	<TaxGroupCards cards={groupCards(profile)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
+	<TaxNotStated items={notStated(profile, show.document)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}
 <div class="flex flex-wrap gap-3">
-	{#if unlabelled.length === 0}
-		<button type="button" disabled={editSession.busy} onclick={() => show(true)} class={button}>{title}</button>
+	{#if offered && profile === null}
+		<button type="button" disabled={wait} onclick={() => showDrawer(true)} class={button}>Set the tax profile</button>
 	{/if}
-	{#if taxed}<TaxProfileRemove {name} {contentHash} {income} />{/if}
+	{#if editable && taxed}<TaxProfileRemove {name} contentHash={show.contentHash} income={incomeFlows(show.document)} disabled={wait} />{/if}
 </div>
-<Drawer {open} {title} onClose={() => show(false)}>
-	<StaleNotice />
-	{#if open && openedOn !== contentHash}
-		<p role="status" class="text-sm text-foreground">The plan changed since you opened this form, so it shows the stored profile again. Enter your change again.</p>
-	{/if}
-	{#if open}
-		{#key contentHash}
-			<TaxProfileForm {name} {contentHash} {profile} onDone={() => show(false)} />
-		{/key}
-	{/if}
-</Drawer>
+<TaxDrawer open={open && !trying} {name} contentHash={show.contentHash} {openedOn} {profile} {group} {unlabelled} onClose={() => showDrawer(false)} />

@@ -35,7 +35,7 @@ describe("the Edit list", () => {
 			{ kind: "remove-tax", name: "early", contentHash: HASH },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
-			expect(writeCommand(edit as Edit, false).argv[0]).toBe("scenario")
+			expect(writeCommand(editSchema.parse(edit), false).argv[0]).toBe("scenario")
 		}
 	})
 
