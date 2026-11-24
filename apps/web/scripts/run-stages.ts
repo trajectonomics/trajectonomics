@@ -5,10 +5,12 @@ import {
 	doctor,
 	fi,
 	netWorth,
+	type ProjectionChance,
 	pnl,
 	projectionChance,
 	projectionCompare,
 	projectionRun,
+	type Read,
 	type SnapshotReads,
 	scenarioList,
 	scenarioShow,
@@ -54,6 +56,15 @@ export async function runStageOne(context: RunContext, params: PlanParams): Prom
 	}
 }
 
+/** The chance reads of a plan, one at a time; none when the plan states no chance inputs. */
+export async function runChance(
+	context: RunContext,
+	plan: StageTwoPlan,
+	records: readonly unknown[],
+): Promise<Record<string, Read<ProjectionChance>>> {
+	return recordOf(plan.chance, (planned) => runPlanned(context, planned, projectionChance, records))
+}
+
 /** Stage two: every other read, planned from the Scenarios and the first transaction date. */
 export async function runStageTwo(
 	context: RunContext,
@@ -81,9 +92,7 @@ export async function runStageTwo(
 			plan.compare === null
 				? null
 				: await runPlanned(context, plan.compare, projectionCompare, records),
-		chance: await recordOf(plan.chance, (planned) =>
-			runPlanned(context, planned, projectionChance, records),
-		),
+		chance: await runChance(context, plan, records),
 		allowances: await runAllowances(context, plan, documents, records),
 	}
 }

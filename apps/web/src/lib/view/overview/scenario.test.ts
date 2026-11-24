@@ -12,6 +12,7 @@ const params = (scenarios: string[], compare: SnapshotParams["compare"]): Snapsh
 	ages: [],
 	historyDates: [],
 	allowances: null,
+	chance: null,
 })
 
 describe("primaryScenario", () => {

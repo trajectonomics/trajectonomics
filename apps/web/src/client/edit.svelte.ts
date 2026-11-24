@@ -1,8 +1,10 @@
 import type { ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
-import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER, REREAD_PATH } from "../lib/edit/guard"
+import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER } from "../lib/edit/guard"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
+import type { ChanceInputs } from "../lib/snapshot/chance-params"
+import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
 /** The sentence a refused Edit shows when the plan moved on since the page read it. */
@@ -67,31 +69,25 @@ class EditSession {
 	 * `allowances`, the read uses those inputs for the allowance reads (null clears them); nothing is written.
 	 * Returns true when the new Snapshot is shown.
 	 */
-	async reread(allowances?: AllowancePlan | null): Promise<boolean> {
+	reread(allowances?: AllowancePlan | null): Promise<boolean> {
+		return this.sendReread(allowances === undefined ? {} : { allowances })
+	}
+
+	/** A reread with new paths and seed for the chance reads (web ADR 0018); nothing is written. */
+	rereadChance(chance: ChanceInputs): Promise<boolean> {
+		return this.sendReread({ chance })
+	}
+
+	private async sendReread(body: RereadBody): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true
 		this.source = "form"
 		this.error = null
-		try {
-			const response = await fetch(REREAD_PATH, {
-				method: "POST",
-				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: this.token },
-				body: JSON.stringify(allowances === undefined ? {} : { allowances }),
-				cache: "no-store",
-			})
-			const answer = editAnswer.safeParse(await response.json())
-			if (!answer.success) this.error = "The Dashboard could not read the answer to the Edit."
-			else if (answer.data.ok) {
-				replaceSnapshot(answer.data.snapshot)
-				this.clear()
-				return true
-			} else this.error = answer.data.error.message
-		} catch {
-			this.error = "The Dashboard could not reach traj. Try again."
-		} finally {
-			this.busy = false
-		}
-		return false
+		const answer = await postReread(this.token, body)
+		this.busy = false
+		if (answer.ok) this.clear()
+		else this.error = answer.message
+		return answer.ok
 	}
 
 	private settle(answer: EditAnswer | null): boolean {
