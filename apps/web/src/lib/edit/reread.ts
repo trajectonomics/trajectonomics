@@ -7,21 +7,25 @@ import { z } from "zod"
 import { allowancePlan } from "../snapshot/allowance-params"
 import { chanceInputs } from "../snapshot/chance-params"
 import { pathRequest } from "../snapshot/paths"
+import { planName } from "./fields"
 
 /**
  * A reread: `{}` reads again as it is; `allowances` states the inputs of the allowance reads, null clears them; `chance`
  * states the paths and the seed of the chance reads (web ADR 0018). `path` reads one Market path with the plan and its
  * index and nothing else, and answers that one read, not the Snapshot (web ADR 0020): it is never sent with another field.
+ * `addPlan` adds a plan the ledger holds to the plans the Snapshot projects, and writes nothing (web ADR 0021).
  */
 export const rereadSchema = z
 	.strictObject({
 		allowances: allowancePlan.nullable().optional(),
 		chance: chanceInputs.optional(),
 		path: pathRequest.optional(),
+		addPlan: planName.optional(),
 	})
 	.refine(
 		(body) =>
-			body.path === undefined || (body.allowances === undefined && body.chance === undefined),
+			body.path === undefined ||
+			(body.allowances === undefined && body.chance === undefined && body.addPlan === undefined),
 		"a path is read alone",
 	)
 

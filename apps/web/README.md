@@ -46,7 +46,7 @@ Overview, Net worth, Ledger, Projection, Milestones, Income, Expenses, Assets an
 
 ## Edits
 
-The plan switcher in the side navigation can copy a plan ("Copy plan", which asks for a name) and delete one ("Delete plan", which asks first). Each runs `traj scenario fork` or `traj scenario rm` through the server, dry first, and then shows the new Snapshot. The controls appear only when `traj dashboard` answers the page's token, so they are hidden in the Demo snapshot and under `bun run dashboard`, which has no server. The rules of the write path are in [ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md).
+The plan switcher in the side navigation lists the plans, the main plan first, each with a menu: rename it ("Rename"), keep notes on it ("Notes"), mark it as the main plan, copy it or delete it (which asks first). "New plan" starts one from your accounts today or as a copy of another, and "See every plan" opens `/plans/`, which shows every plan side by side with the same menu, over a range of the next 10, 20 or 30 years or the whole plan. Each runs a `traj scenario` write (`rename`, `notes`, `main`, `apply`, `fork` or `rm`) through the server, dry first, and then shows the new Snapshot. The controls appear only when `traj dashboard` answers the page's token, so they are hidden in the Demo snapshot and under `bun run dashboard`, which has no server. The rules of the write path are in [ADR 0008](docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md) and [ADR 0023](docs/adr/0023-the-plans-page-shows-every-plan-side-by-side-and-the-switcher-manages-plans.md).
 
 ## Licence
 

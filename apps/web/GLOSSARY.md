@@ -29,7 +29,7 @@ The list of argv a Snapshot needs, computed from the parameters alone. Stage one
 _Avoid_: pipeline, workflow, job, script
 
 **Edit**:
-A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` scenario commands, copy a plan, apply a Scenario document or delete a plan. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot or the CLI's error envelope.
+A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` scenario commands, copy a plan, apply a Scenario document, delete a plan, rename it, keep notes on it or mark the main plan. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot or the CLI's error envelope.
 _Avoid_: save, mutation, update, PATCH, request, write
 
 **Household**:
@@ -172,3 +172,18 @@ _Avoid_: dividend (as the name of the field), distribution, withdrawal
 A yearly share of an asset Account's value charged a twelfth a month, outside cashflow, on every Market path, from the Account's `fee` field. The page lists each roll-up's charge as `traj` states it and adds none up.
 _Avoid_: cost, charge (as the name of the field), expense
 
+**Main plan**:
+The one plan the ledger marks as the person's real plan (`scenario main`). It is a label and not a default for a `traj` read: the Dashboard lists it first, opens its pages on it, and Home follows it unless the address bar names another plan.
+_Avoid_: default plan, primary plan, active plan
+
+**Plan notes**:
+The plain text a plan keeps about what it assumes (`scenario notes`), outside the Scenario document and its hash. A card shows the first line and opens the rest; the switcher shows a notes icon beside a plan that has some.
+_Avoid_: comment, description, memo
+
+**Plans page**:
+`/plans/`: one card for each plan the dashboard projects, side by side, the main plan first and then by name. A plan the ledger holds that the dashboard was not started with is listed by name as not projected, with an action to add it.
+_Avoid_: compare page, plan list, portfolio
+
+**Range**:
+The control of the Plans page that narrows every chart to the first 10, 20 or 30 yearly rows of its plan, or shows the whole plan. It chooses which of `traj`'s rows are drawn and computes no date or figure.
+_Avoid_: zoom, period, window

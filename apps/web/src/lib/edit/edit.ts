@@ -6,23 +6,10 @@
  */
 import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
-import { planNameShapeError } from "./name"
+import { contentHash, planName } from "./fields"
+import { planEditSchemas, startPlanSchema } from "./plan-edits"
 import { taxFlags } from "./tax-flags"
 import { taxLabels } from "./tax-labels"
-
-/** A plan name as `traj` takes it: not empty, and never shaped like a flag (see `planNameShapeError`). */
-const planName = z
-	.string()
-	.min(1)
-	.refine((name) => planNameShapeError(name) === null, { message: "not a plan name traj can take" })
-
-/**
- * The content hash of the plan the page read, as the Snapshot states it (`contentHash`). A write that
- * names it is refused when the stored plan has moved on (cli ADR 0055).
- */
-const contentHash = z
-	.string()
-	.regex(/^jcs1:sha256:[0-9a-f]{64}$/, "not a content hash traj can take")
 
 /** The kinds of Edit, in the order the list names them. */
 export const EDIT_KINDS = [
@@ -35,14 +22,17 @@ export const EDIT_KINDS = [
 	"merge-tax",
 	"set-tax",
 	"remove-tax",
+	"rename-plan",
+	"set-plan-notes",
+	"set-main-plan",
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
 const someChange = (edit: { sets: unknown[]; removals: unknown[]; additions: unknown[] }) =>
 	edit.sets.length + edit.removals.length + edit.additions.length > 0
 
-/** One Edit, as the page sends it in the body of `POST /edit`. Strict: an unknown field is refused. */
-export const editSchema = z.discriminatedUnion("kind", [
+/** The Edits that name a kind and a plan the page read. Strict: an unknown field is refused. */
+const savedEdit = z.discriminatedUnion("kind", [
 	z.strictObject({
 		kind: z.literal("copy-plan"),
 		from: planName,
@@ -68,6 +58,7 @@ export const editSchema = z.discriminatedUnion("kind", [
 		contentHash,
 		document: z.record(z.string(), z.unknown()),
 	}),
+	...planEditSchemas,
 	z.strictObject({
 		kind: z.literal("delete-plan"),
 		name: planName,
@@ -106,6 +97,12 @@ export const editSchema = z.discriminatedUnion("kind", [
 		contentHash,
 	}),
 ])
+
+/**
+ * One Edit, as the page sends it in the body of `POST /edit`: one of those, or a plan started from the ledger's
+ * accounts, which is an `apply-plan` with a template and no document.
+ */
+export const editSchema = z.union([savedEdit, startPlanSchema])
 
 /** One Edit of the closed list. */
 export type Edit = z.infer<typeof editSchema>

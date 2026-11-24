@@ -4,6 +4,7 @@
  */
 import { overrideTokens } from "../what-if/argv"
 import type { Edit } from "./edit"
+import { planCommand, startCommand } from "./plan-command"
 import { taxCommand } from "./tax-command"
 
 /** The argv of one write, which ends with `--json`, and the standard input the write reads. */
@@ -12,9 +13,10 @@ export type WriteCommand = { argv: string[]; stdin?: string }
 /**
  * The `traj` write an Edit runs. With `dryRun`, the argv carries `--dry-run`, so the write runs and is
  * rolled back ([cli ADR 0019](../../../../cli/docs/adr/0019-dry-run-executes-and-rolls-back.md)). The
- * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055).
+ * writes that change a plan name the hash the page read with `--if-hash` (cli ADR 0055). A plan started
+ * from the ledger's accounts also takes the template the server read (`templateRead`), which it applies.
  */
-export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
+export function writeCommand(edit: Edit, dryRun: boolean, template?: string): WriteCommand {
 	const flags = dryRun ? ["--dry-run", "--json"] : ["--json"]
 	switch (edit.kind) {
 		case "copy-plan": {
@@ -40,6 +42,10 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 				],
 			}
 		case "apply-plan":
+			if ("template" in edit) {
+				if (template === undefined) throw new Error("a new plan needs the template it starts from")
+				return startCommand(edit, template, flags)
+			}
 			// The page holds decimal-form documents only, so the write reads that form (ADR-0047).
 			return {
 				argv: [
@@ -88,5 +94,9 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 		case "set-tax":
 		case "remove-tax":
 			return taxCommand(edit, flags)
+		case "rename-plan":
+		case "set-plan-notes":
+		case "set-main-plan":
+			return planCommand(edit, flags)
 	}
 }

@@ -16,6 +16,9 @@ describe("the Edit list", () => {
 			"merge-tax",
 			"set-tax",
 			"remove-tax",
+			"rename-plan",
+			"set-plan-notes",
+			"set-main-plan",
 		])
 	})
 
@@ -33,9 +36,13 @@ describe("the Edit list", () => {
 			{ kind: "merge-tax", name: "early", contentHash: HASH, flags: { children: "2" } },
 			{ kind: "set-tax", name: "early", contentHash: HASH, flags: { filingStatus: "single" } },
 			{ kind: "remove-tax", name: "early", contentHash: HASH },
+			{ kind: "rename-plan", name: "early", newName: "later", contentHash: HASH },
+			{ kind: "set-plan-notes", name: "early", notes: "Retire at 55." },
+			{ kind: "set-main-plan", name: "early" },
+			{ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
-			expect(writeCommand(editSchema.parse(edit), false).argv[0]).toBe("scenario")
+			expect(writeCommand(editSchema.parse(edit), false, "{}").argv[0]).toBe("scenario")
 		}
 	})
 
