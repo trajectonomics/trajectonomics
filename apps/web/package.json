@@ -25,7 +25,7 @@
 		"test:scripts": "bun test ./scripts",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
+		"check": "bun run lint && bun run typecheck && bun scripts/demo-unless-turbo.ts && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
 		"snapshot": "bun scripts/snapshot.ts",
 		"demo": "bun scripts/demo.ts",
 		"dashboard": "bun scripts/dashboard.ts"

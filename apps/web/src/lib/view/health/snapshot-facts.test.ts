@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
-
+import { demoSnapshotJson } from "../../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot } from "../../contract"
 import { snapshotFacts } from "./snapshot-facts"
 
-const DEMO = await Bun.file(`${import.meta.dir}/../../../../public/demo/snapshot.json`).json()
+const DEMO = await demoSnapshotJson()
 const demo: Snapshot = snapshot.parse(DEMO)
 
 function valueAt(facts: ReturnType<typeof snapshotFacts>, label: string): string | undefined {

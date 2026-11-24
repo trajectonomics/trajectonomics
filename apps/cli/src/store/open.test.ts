@@ -44,6 +44,7 @@ describe("openStore", () => {
 			"account_parent",
 			"posting_account",
 			"scenario_live_name",
+			"scenario_one_main",
 			"tx_entity_date",
 			"tx_external_ref",
 			"tx_linked_to",

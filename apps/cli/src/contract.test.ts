@@ -172,6 +172,13 @@ describe("contract", () => {
 			await capture(apply, { TRAJ_HOME: home }, undefined, JSON.stringify(SCENARIO_DOCUMENT))
 			return capture(["scenario", "fork", "base", "base", "--json"], { TRAJ_HOME: home })
 		},
+		scenario_is_main: async () => {
+			const home = ledgerHome()
+			const apply = ["scenario", "apply", "base", "--file", "-", "--json"]
+			await capture(apply, { TRAJ_HOME: home }, undefined, JSON.stringify(SCENARIO_DOCUMENT))
+			await capture(["scenario", "main", "base", "--json"], { TRAJ_HOME: home })
+			return capture(["scenario", "rm", "base", "--json"], { TRAJ_HOME: home })
+		},
 		...probed(storeTriggers),
 	}
 

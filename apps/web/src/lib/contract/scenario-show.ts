@@ -135,6 +135,10 @@ export const scenarioShow = z.strictObject({
 		tax: taxProfile.nullable().optional(),
 		/** True when the document holds a tax Levy, whether or not a profile is stored (cli ADR-0066). */
 		taxed: z.boolean().optional(),
+		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */
+		notes: z.string().nullable().optional(),
+		/** True for the ledger's main plan, a label and not a default (cli ADR-0071); absent in an older Snapshot. */
+		main: z.boolean().optional(),
 	}),
 })
 export type ScenarioShow = z.infer<typeof scenarioShow>

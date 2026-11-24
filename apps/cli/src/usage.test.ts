@@ -17,6 +17,11 @@ const UNRELEASED: readonly (readonly string[])[] = [
 	["scenario", "tax"],
 	["scenario", "apply"],
 	["scenario", "household"],
+	["scenario", "fork"],
+	["scenario", "rm"],
+	["scenario", "rename"],
+	["scenario", "notes"],
+	["scenario", "main"],
 	["projection", "run"],
 	["fi"],
 ]

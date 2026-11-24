@@ -41,13 +41,18 @@ export function decodeRecord(
 }
 
 /**
- * Fills the household and tax a layout without the column leaves out with null, and refuses a tax
+ * Fills the household, tax and notes a layout without the column leaves out with null, and the main plan with false, and refuses a tax
  * profile beside a document that holds no Levy: a profile describes a Levy, so it cannot be kept
  * without one (cli ADR-0066).
  */
 function scenarioSiblings(row: Record<string, unknown>, path: string): AppError | null {
 	if (!("household" in row)) row["household"] = null
 	if (!("tax" in row)) row["tax"] = null
+	if (!("notes" in row)) row["notes"] = null
+	if (!("main" in row)) row["main"] = false
+	if (row["main"] === true && row["deletedAt"] !== null) {
+		return invalid(`${path}.main`, "must be false: a deleted scenario is not the main plan")
+	}
 	if (row["tax"] === null) return null
 	let document: unknown
 	try {

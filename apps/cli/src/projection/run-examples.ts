@@ -54,6 +54,11 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 			"What if the Account's fee were 0.5% a year instead of 1.5%: one override, and nothing saved.",
 	},
 	{
+		command: "traj projection run --scenario taxed --as-of 2026-01-01 --horizon 2027-12-31 --json",
+		description:
+			"The annual roll-up of a Scenario with the Thai Levy: each tax year's taxYears entry states its walk from assessable income to taxable income, every bracket with the income and tax inside it, the marginalRateBps, the toNextBracket income left before the next bracket starts, and the effectiveRateBps on assessable income.",
+	},
+	{
 		command:
 			"traj projection run --scenario routed --as-of 2026-03-31 --horizon 2027-03-30 --breakdown --json",
 		description:

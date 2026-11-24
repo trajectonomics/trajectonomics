@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
+import { demoSnapshotText } from "../../scripts/demo-snapshot"
 import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
@@ -8,9 +9,7 @@ import { type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
 import { LOADING } from "../lib/view/state"
 import Layout from "./+layout.svelte"
 
-const DEMO: Snapshot = snapshotSchema.parse(
-	JSON.parse(await Bun.file(`${import.meta.dir}/../../public/demo/snapshot.json`).text()),
-)
+const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(await demoSnapshotText()))
 
 const page = createRawSnippet(() => ({ render: () => "<p>the page</p>" }))
 

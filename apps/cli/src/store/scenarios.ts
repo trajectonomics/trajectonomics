@@ -4,6 +4,7 @@ import { contentHash } from "./canonical"
 import { liveOnly, SCENARIO_COLUMNS, SCENARIO_ORDER } from "./columns"
 import type { Ctx } from "./context"
 import { read, write } from "./guard"
+import { type RawScenarioRow, toScenarioRow } from "./scenario-read"
 import {
 	anchorsFor,
 	canonicalDocument,
@@ -50,6 +51,7 @@ export function saveScenario(
 					forkedFrom: null,
 					household: null,
 					tax: null,
+					notes: null,
 				})
 				return { status: "created", scenario, droppedAnchors: [] }
 			}
@@ -87,10 +89,11 @@ export function listScenarios(
 ): ScenarioRow[] | AppError {
 	return read(ctx.db, () =>
 		ctx.db
-			.query<ScenarioRow, [string]>(
+			.query<RawScenarioRow, [string]>(
 				`SELECT ${SCENARIO_COLUMNS} FROM scenario WHERE entity_id = ?1
 				${liveOnly(options.includeDeleted)} ORDER BY ${SCENARIO_ORDER[options.sort]}`,
 			)
-			.all(ctx.entityId),
+			.all(ctx.entityId)
+			.map(toScenarioRow),
 	)
 }

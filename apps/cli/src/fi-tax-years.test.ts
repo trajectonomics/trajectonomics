@@ -33,6 +33,8 @@ describe("the tax years `fi` prints", () => {
 			["2029-01-01", "0.00", "0.00"],
 		])
 		expect(body.notes).not.toContain(WORKING_PATH_NOTE)
+		// The `levied` Levy is hand-written, so its tax years carry none of the walk fields (ADR-0036).
+		for (const year of body.taxYears) expect(year).not.toHaveProperty("walk")
 	})
 
 	it("differ from the working path's, which keeps charging the salary it never stops", async () => {

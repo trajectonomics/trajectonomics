@@ -33,6 +33,8 @@ describe("scenario fork", () => {
 			household: null,
 			tax: null,
 			taxed: false,
+			notes: null,
+			main: false,
 		})
 		expect(rowOf(resultOf(await scenario(home, ["show", "early"]))).id).toBe(fork.id)
 	})
