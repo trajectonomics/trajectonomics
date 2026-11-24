@@ -12,6 +12,7 @@ import {
 import { type MilestonesTable, milestonesTable } from "./milestones-table"
 import { type AnnualRow, annualRow, type MonthlyRow, monthlyRow } from "./rows-view"
 import { type SpendingRulesTable, spendingRulesTable } from "./spending-view"
+import { type TransfersTable, transfersTable } from "./transfers-view"
 
 /**
  * The Projection's annual roll-up, its monthly rows with `--monthly`, its cash flow with `--breakdown`
@@ -22,6 +23,7 @@ export type ProjectionTable =
 	| { name: "monthly"; count: number; rows: MonthlyRow[] }
 	| { name: "cashflow"; count: number; rows: CashflowRow[] }
 	| CashflowTotalsTable
+	| TransfersTable
 	| LiabilityMonthsTable
 	| PaidOffTable
 	| BalancesTable
@@ -53,6 +55,7 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 			),
 	}),
 	cashflowTotalsTable,
+	transfersTable,
 	liabilityMonthsTable,
 	paidOffTable,
 	balancesTable,

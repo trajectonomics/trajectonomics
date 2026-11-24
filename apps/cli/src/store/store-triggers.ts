@@ -7,6 +7,9 @@ import type { Trigger } from "./trigger-setup"
 import { busy, corruptHome, fileHome, fullDisk, openAt, readonlyHome } from "./trigger-setup"
 import type { NewPosting, NewTransaction } from "./types"
 
+/** Codes a command maps from a store status; the store itself never raises them (ADR-0021). */
+type StatusMapped = "account_name_taken" | "scenario_name_taken" | "scenario_is_main"
+
 /** Every code the store raises itself; adding one fails typecheck until it has a trigger. */
 export type StoreRaised = Exclude<
 	ErrorCode,
@@ -16,8 +19,7 @@ export type StoreRaised = Exclude<
 	| "unknown_flag"
 	| "unknown_format"
 	// Commands map these from a store status; the store itself never raises them (ADR-0021).
-	| "account_name_taken"
-	| "scenario_name_taken"
+	| StatusMapped
 	| "not_found"
 	| "ledger_missing"
 	// Raised by the data directory guard, before the store looks at any path (ADR-0053).

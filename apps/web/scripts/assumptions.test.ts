@@ -102,7 +102,9 @@ describe("the Assumptions page through traj", () => {
 				],
 			})
 			expect(chance.bands.length).toBeGreaterThan(0)
-			const html = render(ChanceResult, { props: { argv: [], view: chanceViewOf(chance) } }).body
+			const html = render(ChanceResult, {
+				props: { argv: [], plan: PLAN, futures: null, view: chanceViewOf(chance) },
+			}).body
 			expect(html).toContain(formatShare(chance.successBps))
 			expect(html).toContain("Built from your plan")
 			expect(html).toContain(`${fund}: returns 6.00% a year, swings 15.00%`)

@@ -13,6 +13,7 @@ import {
 	monthlyRow,
 	paidOffRow,
 	spendingRuleRow,
+	transferRow,
 } from "./projection-rows"
 import { cashflowTotalRow } from "./projection-totals"
 
@@ -31,6 +32,8 @@ const annualRow = z.strictObject({
 	payouts: money.optional(),
 	employerContributions: money.optional(),
 	fees: money.optional(),
+	// Money moved between the plan's own Accounts, outside every other figure; present only when the Scenario declares a transfer Flow (cli ADR-0070).
+	transfers: money.optional(),
 	expense: money,
 	contributions: money,
 	unfundedContributions: money,
@@ -67,11 +70,13 @@ export const cashflowRow = z.strictObject({
 	account: z.string().nullable(),
 	category: z.string().nullable(),
 	amount: money,
+	// A drawn line's position in `cashflow.withdraw`; present only when the list declares a Reserve floor (cli ADR-0070, sim ADR 0030).
+	entry: integer.optional(),
 })
 
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
- * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
+ * flow, its section totals and the transfers only with `--breakdown`, the loans only with `--liabilities`, each Account's
  * value only with `--accounts`, each fee Account's charges only when an Account carries a fee, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
  * only when the Scenario declares them.
  */
@@ -85,6 +90,7 @@ export const projectionTables = z.array(
 			count: integer,
 			rows: z.array(cashflowTotalRow),
 		}),
+		z.strictObject({ name: z.literal("transfers"), count: integer, rows: z.array(transferRow) }),
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
 		z.strictObject({ name: z.literal("balances"), count: integer, rows: z.array(balanceRow) }),

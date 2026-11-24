@@ -23,6 +23,8 @@ export const DEMO_INPUT: PlanInput = {
 	returnModel: null,
 	paths: null,
 	seed: null,
+	// The Demo snapshot lists no future and reads no path: 200 outcomes would take it past Biome's 1 MiB formatter limit (#378, web ADR 0020).
+	futures: false,
 	// The allowances page reads RMF, then ThaiESG, a thousand baht at a time: the inputs a person would choose.
 	allowances: {
 		labels: ["allowance.retirement.rmf", "allowance.thai_esg"],

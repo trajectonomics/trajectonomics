@@ -2,20 +2,33 @@ import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import { decimalDocument, decimalRoot } from "./decimal-schema"
 import { moneyPathsOf, PUBLISHED, ratePathsOf } from "./money-fields"
+import { MINOR_UNITS_HEAD } from "./shape/terms"
 
 type Schema = Record<string, unknown>
 
+/** The branch of an `anyOf` a path goes on through (the object form) or ends at (the plain form, cli ADR-0070). */
+function branchOf(node: Schema, through: boolean): Schema {
+	const branches = node["anyOf"]
+	if (!Array.isArray(branches)) return node
+	const found = (branches as Schema[]).find(
+		(branch) => (branch["properties"] !== undefined) === through,
+	)
+	if (found === undefined) throw new Error("an anyOf has no branch for this path")
+	return found
+}
+
 /** The schema node a dotted money path names, following list items by `[]`. */
-function nodeAt(schema: Schema, path: string): Schema {
+function nodeAt(schema: Schema, path: string, plain = true): Schema {
 	let node: unknown = schema
 	for (const segment of path.split(".")) {
 		const listed = segment.endsWith("[]")
 		const key = listed ? segment.slice(0, -2) : segment
-		const props = (node as Schema)["properties"] as Schema
+		const props = branchOf(node as Schema, true)["properties"] as Schema
 		const child = props[key] as Schema
 		node = listed ? child["items"] : child
 	}
-	return node as Schema
+	// A field with two forms ends at the plain one, which is the money; its object form is a path of its own.
+	return plain ? branchOf(node as Schema, false) : (node as Schema)
 }
 
 describe("the decimal form's published schema", () => {
@@ -75,6 +88,23 @@ describe("the decimal form's percent fields", () => {
 			expect(prose.match(/\b\d{3,}\b/g) ?? []).toEqual([])
 		})
 	}
+})
+
+describe("the decimal form's cashflow", () => {
+	it('tells a reader to write major units: "minor units" is in no description, the unit head included', () => {
+		const published = z.toJSONSchema(decimalDocument, { io: "input" }) as Schema
+		const cashflow = (published["properties"] as Schema)["cashflow"]
+		const described = nodesWithHead(cashflow, "")
+		expect(described.length).toBeGreaterThan(5)
+		for (const node of described) expect(String(node["description"])).not.toMatch(/minor units?/i)
+		// The minor-unit form keeps the words, only inside the unit head.
+		const minor = nodesWithHead((PUBLISHED["properties"] as Schema)["cashflow"], "")
+		const heads = minor.filter((node) => /minor units?/i.test(String(node["description"])))
+		expect(heads.length).toBeGreaterThan(0)
+		for (const node of heads) {
+			expect(String(node["description"]).replace(MINOR_UNITS_HEAD, "")).not.toMatch(/minor units?/i)
+		}
+	})
 })
 
 describe("the decimal form's root description", () => {

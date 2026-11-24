@@ -35,7 +35,9 @@ function runsOf(job: Job): string[] {
 
 describe("ci.yml, the one CI for the monorepo", () => {
 	const workflow = load("ci.yml")
-	const job = () => workflow.jobs?.["check"] ?? { steps: [] }
+	// The packages job runs every package but the Dashboard, which has its own jobs (docs/runbooks/ci.md).
+	const job = () => workflow.jobs?.["packages"] ?? { steps: [] }
+	const WITHOUT_WEB = "--filter='!@trajectonomics/web'"
 
 	it("runs on every pull request, whatever its base, on pushes to main, and by hand", () => {
 		expect(workflow.on).toHaveProperty("pull_request")
@@ -47,7 +49,9 @@ describe("ci.yml, the one CI for the monorepo", () => {
 
 	it("checks only the packages a pull request affects, against its base commit", () => {
 		const affected = (job().steps ?? []).find((step) => step.run?.includes("--affected"))
-		expect(affected?.run).toContain("bunx turbo run check --affected --concurrency=2")
+		expect(affected?.run).toContain(
+			`bunx turbo run check --affected ${WITHOUT_WEB} --concurrency=2`,
+		)
 		expect(String(affected?.env?.["TURBO_SCM_BASE"])).toContain(
 			"github.event.pull_request.base.sha",
 		)
@@ -55,7 +59,7 @@ describe("ci.yml, the one CI for the monorepo", () => {
 
 	it("checks every package on main and by hand, two tasks at a time", () => {
 		const full = (job().steps ?? []).find(
-			(step) => step.run === "bunx turbo run check --concurrency=2",
+			(step) => step.run === `bunx turbo run check ${WITHOUT_WEB} --concurrency=2`,
 		)
 		expect(full).toBeDefined()
 	})

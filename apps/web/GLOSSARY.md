@@ -132,6 +132,18 @@ _Avoid_: simulation settings, iterations
 Where a chance read's Return model came from: built from the plan (the CLI's `returnModel` echo, "built from your plan") or read from a file the Dashboard was started with.
 _Avoid_: engine, data source
 
+**Future**:
+One seeded Market path of a chance read, named by its index under the run's seed and numbered from 0 as `--index` numbers it. The Chance page lists every one (closing net worth, lowest point, when it ran out or that it lasted) and opens one year by year on its own page, a replay of exactly that path (`projection path`). It is the CLI's replay, never a simulation of the page's.
+_Avoid_: scenario, simulation, run, trial, outcome (as the name of the page)
+
+**Futures worth a look**:
+The cards for the CLI's five `representative` paths: a bad future (10th percentile), a typical one, a good one, the earliest run-out and the deepest fall. The Snapshot reads each in advance, so the Demo and an offline Snapshot could open them.
+_Avoid_: top paths, samples, highlights
+
+**Path read**:
+The read of one future through `POST /reread` with `{ path: { plan, index } }`, for an index the Snapshot did not read. It answers that one Read and leaves the Snapshot, the parameters and the ledger alone, and it is shown only if it is of the chance on screen (the same model, seed, paths and plan content).
+_Avoid_: reread (it rereads nothing), fetch, simulate
+
 **Tax group**:
 One of the six cards the Tax profile page shows (filing status, family, insurance, home, giving, social security), each holding the profile items of its group and an Edit that opens the drawer on them. A deduction class `scenario tax` reports is placed in a group by `PLACE` in `src/lib/view/tax-settings/groups.ts`; the two retirement classes are stated by contribution Flows and sit in no group.
 _Avoid_: section, category, tab

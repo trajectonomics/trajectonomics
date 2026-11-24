@@ -46,7 +46,7 @@ describe("the way to the document schema", () => {
 describe("a refusal says what is allowed", () => {
 	it("lists the kinds of a Flow, the frequencies, and the forms of a growth", async () => {
 		expect((await refusalOf({ kind: "payment" })).message).toBe(
-			"document.flows.0.kind: INVALID_KIND (one of: income, expense, contribution, withdrawal)",
+			"document.flows.0.kind: INVALID_KIND (one of: income, expense, contribution, withdrawal, transfer)",
 		)
 		expect((await refusalOf({ frequency: "yearly" })).message).toBe(
 			"document.flows.0.frequency: INVALID_FREQUENCY (one of: once, daily, weekly, biweekly, monthly, quarterly, annual)",

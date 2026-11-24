@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Snapshot } from "../contract"
-import { stillCurrent, withAllowances } from "./reread"
+import { stillCurrent, withAllowances, withChance } from "./reread"
 import type { StageOneReads } from "./stage-one"
 
 const read = (value: string) => ({ argv: ["x"], ok: true as const, data: { value } })
@@ -26,6 +26,7 @@ function holding(over: Record<string, unknown> = {}): Snapshot {
 		projections: {},
 		fi: {},
 		chance: {},
+		paths: {},
 		allowances: {},
 		compare: null,
 		...over,
@@ -72,6 +73,29 @@ describe("stillCurrent", () => {
 		expect(stillCurrent(holding({ allowances: { hand: failed("database_busy") } }), same)).toBe(
 			true,
 		)
+	})
+})
+
+describe("stillCurrent with the paths", () => {
+	test("ignores a failed chance read and a failed path read, which a chance reread runs again anyway", () => {
+		const snapshot = holding({
+			chance: { hand: failed("database_busy") },
+			paths: { hand: { "3": failed("database_busy") } },
+		})
+		expect(stillCurrent(snapshot, same, ["chance"])).toBe(true)
+		expect(stillCurrent(snapshot, same, ["allowances"])).toBe(false)
+	})
+})
+
+describe("withChance", () => {
+	test("swaps the chance inputs, the chance reads and the paths, and keeps every other Read", () => {
+		const chance = { returnModel: "plan", paths: 10, seed: "0123456789abcdef" }
+		const next = withChance(held, chance, {}, {
+			hand: { "1": read("p") },
+		} as unknown as Snapshot["reads"]["paths"])
+		expect(next.params.chance).toEqual({ source: "plan", paths: 10, seed: "0123456789abcdef" })
+		expect(next.reads.paths as unknown).toEqual({ hand: { "1": read("p") } })
+		expect(next.reads.doctor).toBe(held.reads.doctor)
 	})
 })
 

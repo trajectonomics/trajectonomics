@@ -39,6 +39,23 @@ describe("the projection run contract against the CLI's goldens", () => {
 		])
 	})
 
+	it("parses a run whose tax years state their walk, brackets and rates (cli ADR-0036)", async () => {
+		const run = projectionRun.parse(await golden("run-carry-in.output"))
+		const [year] = run.taxYears
+		expect(year?.walk).toEqual({
+			assessable: "560000.00",
+			expenses: "100000.00",
+			allowances: "60000.00",
+			taxableIncome: "400000.00",
+		})
+		expect(year?.brackets).toHaveLength(8)
+		expect(year).toMatchObject({
+			marginalRateBps: 1000,
+			toNextBracket: "100000.00",
+			effectiveRateBps: 312,
+		})
+	})
+
 	it("states no total in a run without a fee or a payout", async () => {
 		const run = projectionRun.parse(await golden("run.output"))
 		expect(run.lifetimeFees).toBeUndefined()
@@ -110,6 +127,54 @@ describe("the projection run contract against the CLI's goldens", () => {
 			"home-selling",
 			"temple",
 		])
+	})
+
+	it("parses the routing plan's output: the echo, the transfers and the entries of the drawn lines (cli ADR-0070)", async () => {
+		const run = projectionRun.parse(await golden("run-routing.output"))
+		expect(run.routing?.surplus[0]).toEqual({
+			entry: 0,
+			account: "emergency",
+			upTo: { amount: "100000.00", growth: "inflation" },
+			share: null,
+		})
+		expect(run.routing?.surplus[1]).toMatchObject({ entry: 1, account: "funds", share: "50.00" })
+		expect(run.routing?.withdraw[1]).toEqual({ entry: 1, account: "funds", downTo: null })
+		const annual = run.tables.find((table) => table.name === "annual")
+		expect(annual?.rows.map((row) => ("transfers" in row ? row.transfers : undefined))).toEqual([
+			"33000.00",
+			"0.00",
+		])
+		const transfers = run.tables.find((table) => table.name === "transfers")
+		if (transfers?.name !== "transfers") throw new Error("the output has no transfers table")
+		expect(transfers.rows.map((row) => [row.flow, row.amount, row.unmoved])).toEqual([
+			["roll-pvd", "30000.00", "0.00"],
+			["pay-debt", "3000.00", "6000.00"],
+			["pay-debt", "0.00", "1000.00"],
+		])
+		const cashflow = run.tables.find((table) => table.name === "cashflow")
+		if (cashflow?.name !== "cashflow") throw new Error("the output has no cashflow table")
+		expect(
+			cashflow.rows.filter((row) => row.group === "drawn").map((row) => [row.entry, row.account]),
+		).toEqual([
+			[0, "emergency"],
+			[1, "funds"],
+			[2, "emergency"],
+		])
+		const loans = run.tables.find((table) => table.name === "liabilities")
+		if (loans?.name !== "liabilities") throw new Error("the output has no liabilities table")
+		expect(loans.rows.filter((row) => row.transferred === "1000.00")).toHaveLength(3)
+	})
+
+	it("states no routing and no transfers for a run without the new forms", async () => {
+		const run = projectionRun.parse(await golden("run-breakdown.output"))
+		expect(run.routing).toBeUndefined()
+		expect(run.tables.map((table) => table.name)).not.toContain("transfers")
+	})
+
+	it("refuses a routing entry the contract does not name", async () => {
+		const body = (await golden("run-routing.output")) as { routing: { surplus: object[] } }
+		body.routing.surplus.push({ entry: 9, account: "x", upTo: null, share: null, extra: 1 })
+		expect(projectionRun.safeParse(body).success).toBe(false)
 	})
 
 	it("refuses a section the contract does not name", async () => {

@@ -39,6 +39,8 @@ export function liabilityRowsOf(
 			opening: money(month.opening),
 			drawn: money(month.drawn),
 			paid: money(month.paid),
+			// Present only on a liability a transfer Flow targets, as the engine states it (sim ADR 0031).
+			...(month.transferred === undefined ? {} : { transferred: money(month.transferred) }),
 			interest: money(month.interest),
 			closing: money(month.closing),
 			partial: month.partial,

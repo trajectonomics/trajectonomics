@@ -22,7 +22,7 @@ interface Props {
 	/** What the chart shows, read out by a screen reader, such as "Net worth by month". */
 	label: string
 	series: readonly LineSeries[]
-	/** Vertical rules with a label, such as the Milestones a plan reached. Each sits at its own x. */
+	/** Vertical rules with a label, such as the Milestones a plan reached. Each sits at its own x; in a bar chart, inside the bar of its period. */
 	markers?: readonly LineMarker[]
 	/** Whether the values are money. Money hides under the hide-amounts switch; other values do not. */
 	money?: boolean
@@ -53,7 +53,7 @@ const plot = $derived({ width, height: HEIGHT, margin: MARGIN })
 const layout = $derived(
 	kind === "line"
 		? lineLayout(series, plot, markers, wide ? "wide" : undefined)
-		: columnLayout(series, plot, kind),
+		: columnLayout(series, plot, kind, markers),
 )
 </script>
 

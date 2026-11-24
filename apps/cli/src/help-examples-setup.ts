@@ -59,7 +59,14 @@ export const SETUP: Record<string, Setup> = {
 	// The car loan, the spending rule and the estate the `--liabilities`, `--spending` and `--estate` examples read, stored beside the projection fixture.
 	"projection run": RUN_SETUP,
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
-	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },
+	// The main plan is refused by `rm` until it is forced (cli ADR-0071).
+	"scenario rm": {
+		steps: [
+			["scenario", "fork", "base", "early"],
+			["scenario", "main", "base"],
+		],
+	},
+	"scenario rename": { steps: [["scenario", "fork", "base", "early"]] },
 	"data remove": { steps: [["backup", "--out", "backup"]] },
 	// A restore needs an empty data directory, so the leaf backs up, then removes the data first.
 	restore: {
@@ -67,6 +74,10 @@ export const SETUP: Record<string, Setup> = {
 			["backup", "--out", "backup"],
 			["data", "remove", "--confirm", "~/.traj", "--backup", "backup"],
 		],
+	},
+	"scenario notes": {
+		steps: [["scenario", "fork", "base", "early"]],
+		files: { "notes.txt": "Retire at 55.\nSell the condo in 2031.\n" },
 	},
 	"scenario household": { files: { "household.json": JSON.stringify(BASE_HOUSEHOLD) } },
 	"scenario apply": {
@@ -114,4 +125,5 @@ export const STDIN: Record<string, string> = {
  */
 export const EXPECTED_EXIT: Record<string, number> = {
 	"traj data remove": 2,
+	"traj scenario rm base": 5,
 }

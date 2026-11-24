@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { householdDocument } from "./household"
 import { money } from "./money"
+import { scenarioCashflow } from "./scenario-cashflow"
 import { taxProfile } from "./tax-profile"
 
 /**
@@ -13,7 +14,7 @@ import { taxProfile } from "./tax-profile"
  */
 export const scenarioFlow = z.looseObject({
 	id: z.string(),
-	kind: z.enum(["income", "expense", "contribution", "withdrawal"]),
+	kind: z.enum(["income", "expense", "contribution", "withdrawal", "transfer"]),
 	frequency: z.enum(["once", "daily", "weekly", "biweekly", "monthly", "quarterly", "annual"]),
 	start: dateString,
 	end: dateString.optional(),
@@ -24,6 +25,8 @@ export const scenarioFlow = z.looseObject({
 	label: z.string().optional(),
 	target: z.string().optional(),
 	source: z.string().optional(),
+	// A transfer's only: whether it tallies the source's Realised gain as a sale (sim ADR 0031, cli ADR-0070).
+	realise: z.boolean().optional(),
 	// "obligation" pays a Contribution in full on its date, before Available cashflow (sim ADR 0021); "employer" lands the employer's share outside the household's cash (sim ADR 0026).
 	funding: z.string().optional(),
 	// An expense's free-text group (cli schema, #278). The engine never reads it.
@@ -101,6 +104,8 @@ export const scenarioDocument = z.looseObject({
 	currency: z.string(),
 	flows: z.array(scenarioFlow),
 	accounts: z.array(scenarioAccount),
+	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
+	cashflow: scenarioCashflow.optional(),
 	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.
 	economy: z.looseObject({ inflation: z.number().int() }).optional(),
 	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
@@ -130,6 +135,10 @@ export const scenarioShow = z.strictObject({
 		tax: taxProfile.nullable().optional(),
 		/** True when the document holds a tax Levy, whether or not a profile is stored (cli ADR-0066). */
 		taxed: z.boolean().optional(),
+		/** The notes kept on the plan, or null when it has none (cli ADR-0071); absent in an older Snapshot. */
+		notes: z.string().nullable().optional(),
+		/** True for the ledger's main plan, a label and not a default (cli ADR-0071); absent in an older Snapshot. */
+		main: z.boolean().optional(),
 	}),
 })
 export type ScenarioShow = z.infer<typeof scenarioShow>

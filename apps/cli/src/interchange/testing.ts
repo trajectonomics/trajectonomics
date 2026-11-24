@@ -12,6 +12,18 @@ export function goldenJsonl(): Promise<string> {
 	return Bun.file(new URL("golden.jsonl", FIXTURES)).text()
 }
 
+/** The notes and the main mark the golden fixture's `base` carries (cli ADR-0071). */
+export const GOLDEN_NOTES = "แผนหลัก: เกษียณอายุ 55 ปี"
+
+/** The golden export as a schema 4 build wrote it: the same rows, none with notes or a main mark. */
+export async function goldenWithoutNotes(): Promise<string> {
+	return edit(
+		await goldenJsonl(),
+		`,"notes":${JSON.stringify(GOLDEN_NOTES)},"main":true}`,
+		',"notes":null,"main":false}',
+	)
+}
+
 /**
  * A fresh store holding the golden fixture database. The rows are literal SQL, so the database
  * is the same on every run and owes nothing to the reader under test.
