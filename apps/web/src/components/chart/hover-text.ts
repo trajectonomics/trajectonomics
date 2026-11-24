@@ -23,6 +23,6 @@ export function tooltipRows(layout: LineLayout, index: number, masked: boolean):
 	return layout.series.map((line, seriesIndex) => ({
 		name: line.name,
 		display: displayOf(line.marks[index]?.display, masked),
-		stroke: strokeClass(seriesIndex),
+		stroke: strokeClass(seriesIndex, layout.palette === "wide"),
 	}))
 }

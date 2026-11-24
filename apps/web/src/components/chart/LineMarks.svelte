@@ -31,7 +31,7 @@ const x = $derived(layout.xPixels[index])
 					cy={line.marks[index].y}
 					r={4}
 					stroke-width={2}
-					class={`fill-background ${strokeClass(seriesIndex)}`}
+					class={`fill-background ${strokeClass(seriesIndex, layout.palette === "wide")}`}
 				/>
 			{/if}
 		{/each}

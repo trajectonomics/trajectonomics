@@ -70,3 +70,13 @@ function matchMediaOrNull(): MediaQueryList | null {
 		return null
 	}
 }
+
+/** Stores a value and says whether the browser kept it: false in a private window or with site data blocked. */
+export function tryWriteStored(key: string, value: string): boolean {
+	try {
+		window.localStorage.setItem(key, value)
+		return true
+	} catch {
+		return false
+	}
+}

@@ -4,7 +4,7 @@ import { abbreviate, maskMoney } from "../../lib/format"
 import { HEIGHT, MARGIN } from "./geometry"
 import LineMarks from "./LineMarks.svelte"
 import LineRules from "./LineRules.svelte"
-import { dashPattern, strokeClass } from "./series-style"
+import { dashPattern, fillClass, fillOpacity, strokeClass } from "./series-style"
 
 interface Props {
 	label: string
@@ -54,6 +54,14 @@ let { label, layout, width, masked, index }: Props = $props()
 		>
 	{/each}
 	{#each layout.series as line, seriesIndex (line.name)}
+		{#if line.area}
+			<path d={line.area} class={fillClass(seriesIndex)} fill-opacity={fillOpacity(seriesIndex)} />
+		{/if}
+		{#each line.bars ?? [] as bar, column (column)}
+			{#if bar}
+				<rect x={bar.x} y={bar.y} width={bar.width} height={bar.height} class={fillClass(seriesIndex)} fill-opacity={fillOpacity(seriesIndex)} />
+			{/if}
+		{/each}
 		<path
 			d={line.path}
 			fill="none"
@@ -61,7 +69,7 @@ let { label, layout, width, masked, index }: Props = $props()
 			stroke-linejoin="round"
 			stroke-linecap="round"
 			stroke-dasharray={dashPattern(line.dashed ?? false)}
-			class={strokeClass(seriesIndex)}
+			class={strokeClass(seriesIndex, layout.palette === "wide")}
 		/>
 	{/each}
 	<LineRules {layout} {width} />

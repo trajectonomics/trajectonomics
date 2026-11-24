@@ -27,12 +27,25 @@ export interface Mark {
 	readonly display: string
 }
 
-/** One series laid out: its path, and a mark per distinct x (null where the series has no point). */
+/** One bar of a column chart, in pixels. */
+export interface Bar {
+	readonly x: number
+	readonly y: number
+	readonly width: number
+	readonly height: number
+}
+
+/**
+ * One series laid out: its path, and a mark per distinct x (null where the series has no point). A
+ * column chart's series also carry their bars, or the shaded band of a stacked line.
+ */
 export interface SeriesLayout {
 	readonly name: string
 	readonly dashed: boolean
 	readonly path: string
 	readonly marks: readonly (Mark | null)[]
+	readonly bars?: readonly (Bar | null)[]
+	readonly area?: string
 }
 
 /** The whole chart laid out: positions, ticks, series and markers, all in pixels. */
@@ -43,6 +56,8 @@ export interface LineLayout {
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
 	readonly markers: readonly { readonly x: number; readonly label: string }[]
+	/** "wide" draws series from a longer palette, for a chart of many series; left out, the first three. */
+	readonly palette?: "wide"
 }
 
 /** The room one x label needs, in pixels, so neighbouring labels never touch. */
