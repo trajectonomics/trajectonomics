@@ -19,6 +19,7 @@ import { getScenario, listScenarios, saveScenario } from "./scenarios"
 import { addTransaction } from "./transactions"
 import { amendTransaction } from "./tx-amend"
 import { importTransactions } from "./tx-import"
+import { writePlanned } from "./tx-planned"
 import { getTransaction, listPostings, listTransactions } from "./tx-reads"
 import { voidTransaction } from "./tx-void"
 import type { Store } from "./types"
@@ -41,6 +42,7 @@ export function storeOver(path: string, ctx: Ctx, upgradedFrom?: PreMigrationCop
 		deleteAccount: (id) => deleteAccount(ctx, id),
 		addTransaction: (input, options) => addTransaction(ctx, input, options),
 		importTransactions: (inputs, options) => importTransactions(ctx, inputs, options),
+		writePlanned: (plan, options) => writePlanned(ctx, plan, options),
 		voidTransaction: (id, input, options) => voidTransaction(ctx, id, input, options),
 		amendTransaction: (id, input, options) => amendTransaction(ctx, id, input, options),
 		listTransactions: (options) => listTransactions(ctx, options),
