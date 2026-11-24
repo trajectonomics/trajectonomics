@@ -3,6 +3,7 @@ import type { ResolvedCalendar } from "../calendar/business"
 import type { DatedEvent } from "../engine/events"
 import { compareIds } from "../engine/order"
 import type { StateMap } from "../engine/state"
+import { isFee } from "../fee/flows"
 import type { DateString, Flow, MilestoneResult, Scenario, Timeline } from "../types"
 import { planViewOf } from "./gate-figures"
 import { onceEventsOn } from "./gate-once"
@@ -54,8 +55,8 @@ export class MilestoneGate {
 
 	/**
 	 * The events that land on `date`. Fires the dynamic Milestones due on `date` when it is an
-	 * evaluation date (a Flow recurs or a Settlement falls there), gates the Flows, and adds the
-	 * deferred `once` Flows whose Milestone fired on `date`.
+	 * evaluation date (a Flow recurs or a Settlement falls there; a fee marker is neither, ADR 0028),
+	 * gates the Flows, and adds the deferred `once` Flows whose Milestone fired on `date`.
 	 */
 	apply(
 		states: StateMap,
@@ -65,7 +66,8 @@ export class MilestoneGate {
 	): readonly DatedEvent[] {
 		const { state } = this
 		const evaluated =
-			state.frozen !== true && (settled || dayEvents.some((event) => event.deferred !== true))
+			state.frozen !== true &&
+			(settled || dayEvents.some((event) => event.deferred !== true && !isFee(event.flow)))
 		const fired = evaluated ? fireDynamic(state, states, date) : []
 		const kept = state.gated
 			? dayEvents.filter((event) => landsAt(state.fires, event.flow, date))

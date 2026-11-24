@@ -9901,5 +9901,267 @@
 			"paths": 4
 		},
 		"chanceSha256": "065f028ecce42f44c4415fc992ca86e29c8a56ff4b51b12b898dba8c3d52388d"
+	},
+	{
+		"name": "fee-year",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 5000000
+				},
+				{
+					"account": "fund",
+					"amount": 1000000000
+				},
+				{
+					"account": "locked",
+					"amount": 200000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 600,
+					"fee": {
+						"bps": 150,
+						"rounding": "halfUp"
+					}
+				},
+				{
+					"id": "locked",
+					"kind": "asset",
+					"rate": 400,
+					"fee": {
+						"bps": 80,
+						"rounding": "floor"
+					},
+					"lockedUntil": "2030-01-01"
+				}
+			],
+			"flows": [
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 100000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2027-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true,
+			"estate": true
+		},
+		"sha256": "c6677aa06829d31e096d04dc968a1452adb968fddd925a251ad70fedad1f71ad"
+	},
+	{
+		"name": "fee-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "fund",
+					"amount": 50000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"fee": {
+						"bps": 150,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "fund"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2034-01-01",
+			"resolution": "month"
+		},
+		"sha256": "ed97ee1c2049dd5a25b0d5a891717dbde93b3f81bbe2b9392395b18e7935fc7c",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 0
+		},
+		"fiSha256": "6e6095fbe12f21dfdd22f5d4743a184048a7df058ce47ef788d6b799f592607a"
+	},
+	{
+		"name": "fee-chance",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "fund",
+					"amount": 50000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"fee": {
+						"bps": 150,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash", "fund"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2034-01-01",
+			"resolution": "month"
+		},
+		"sha256": "ed97ee1c2049dd5a25b0d5a891717dbde93b3f81bbe2b9392395b18e7935fc7c",
+		"chance": {
+			"model": {
+				"id": "fee-market",
+				"accounts": ["cash", "fund"],
+				"buckets": [
+					{
+						"returnsBps": [0, 0],
+						"weight": 2147483648
+					},
+					{
+						"returnsBps": [0, -1500],
+						"weight": 2147483648
+					}
+				]
+			},
+			"seed": "0123456789abcdef",
+			"paths": 4
+		},
+		"chanceSha256": "2e17288d31b16bd63683fcb544639cc95366d29656943206a3b5f2021fb438bb"
 	}
 ]

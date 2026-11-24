@@ -40,6 +40,8 @@ export function tally(
 	addFundedTallies(levies, date, funded)
 }
 
+const NO_FEES: ReadonlyMap<AccountId, bigint> = new Map()
+
 export function totalsOf(
 	date: DateString,
 	day: DayParts,
@@ -55,6 +57,8 @@ export function totalsOf(
 		withdrawals: day.withdrawals,
 		employer: day.employer,
 		payouts: day.payouts ?? 0n,
+		fees: 0n,
+		feesBy: NO_FEES,
 		drawnBy: day.plannedBySource ?? new Map(),
 		contributions,
 		paidBy,

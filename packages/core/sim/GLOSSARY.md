@@ -107,7 +107,7 @@ A label on an income Flow, on a contribution Flow, or on an asset Account (`retu
 _Avoid_: Category, tag, tax category
 
 **Returns tally**:
-The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. It is signed, and attributed from read-only valuations so it never changes a balance.
+The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. Net of its fee (ADR 0028). It is signed, and attributed from read-only valuations so it never changes a balance.
 _Avoid_: Interest income, investment income
 
 **Realised gain**:
@@ -180,6 +180,10 @@ A Flow that moves money from cashflow into an Account. Not an expense: net worth
 **Employer contribution**:
 A Contribution with `funding: "employer"` into a liquid asset Account: money the employer pays into a provident fund. It lands in full on its Landed date from outside the household's cash, so it is not income, not an expense, never part of Available cashflow, never capped or unfunded, never drawn from the `withdraw` list and never a Shortfall, and its target need not be in `cashflow.contribute`. It adds to the Cost basis, may be locked, and is tallied only under the `label` its author gives. In the FI test it stops with Earned income, fixed or derived. The Annual roll-up reports `employerContributions` and the Cash-flow breakdown an `employer` list, both outside `income` and `contributions`. Refused into a liability (`EMPLOYER_INTO_LIABILITY`) and into an Illiquid asset (`EMPLOYER_INTO_ILLIQUID`).
 _Avoid_: match, employer match, free money
+
+**Account fee**:
+A yearly share of an asset Account's value charged to it every month, stated as `fee` on the Account (`bps` a year, a required `rounding`). On the last day of each calendar month (a Due date, shifted to a Landed date by the Calendar) `value x bps / 120000` leaves the Account, where `value` is the valuation read before the date's Flows land, Accrued interest included. It is read first and taken last on the date, never more than the Account holds, and it goes nowhere: it is no expense and no income, is in no cashflow, causes no Shortfall, takes no Cost basis, is no Milestone evaluation date, is counted net under `returnLabel`, and is on every Market path, because a Return series replaces the rate and not the fee. A locked and an Illiquid Account are charged; a liability may not carry one (`LIABILITY_MISUSE`). The Annual roll-up reports `fees` and `accountFees`, and `interest` is the growth before the fee. A fee of 0 bps is no fee. A declared Flow may not take the id `fee:<account>` beside a fee above 0 bps.
+_Avoid_: expense ratio, TER, management fee
 
 **Payout**:
 A share of an asset Account's value paid out of it as passive income, stated as `payout` on the Account (`bps` a year, a `frequency` of monthly, quarterly, semiannual or annual, a required `rounding`, and the window, `label` and `prepayments` of a Flow). The Account's `rate` stays its total return: the payout leaves and the rest compounds. On the last day of each calendar period (a Due date, shifted to a Landed date by the Calendar) `value x bps / (10000 x periods a year)` leaves the Account, where `value` is the valuation read before the date's Flows land. It lands as income with `earned: false`: in `income` and Available cashflow, and it goes on in the FI test. It takes no Cost basis and realises no gain, a locked Account pays out too, and it is refused on an Illiquid asset (`PAYOUT_ILLIQUID`), a liability (`LIABILITY_MISUSE`) and beside `returnLabel` (`CONFLICTING_LABELS`). The Annual roll-up reports `payouts` (inside `income`) and the Cash-flow breakdown a `payouts` list by Account. A payout of 0 bps is no payout.

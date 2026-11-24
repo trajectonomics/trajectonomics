@@ -34,7 +34,7 @@ export function applyPayouts(
 		const amount = occurrenceAmount(event, planned)
 		const state = states.get(flow.payoutOf.account)
 		if (amount === 0n || state === undefined) continue
-		const problem = mutate(state, date, -amount, levies, true)
+		const problem = mutate(state, date, -amount, levies, "payout")
 		if (problem !== undefined) return { paid, problem }
 		paid += amount
 	}
