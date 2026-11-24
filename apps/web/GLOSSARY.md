@@ -104,6 +104,10 @@ _Avoid_: forecast, range of outcomes
 What the plan would leave on one date, as `projection run --estate` states it: the gross estate (everything owned), the debts, the settlement costs, the net estate, the gifts and what heirs receive, with each cost and gift line. Only the net estate and what heirs receive are also stated in today's money. Every cost and gift is the person's own, written in the plan's `estate` block; no tax is worked out, and an inheritance tax is a cost line the person types.
 _Avoid_: inheritance, will, legacy, probate
 
+**Tax profile**:
+The items a plan's tax assumes about the person (filing status, children, parents, disabled care and the deductions paid in the tax year), as `scenario show` states them in `tax`. They are the person's inputs, not figures: the Dashboard shows them as stored and sends a change as one `scenario tax` write.
+_Avoid_: tax settings, tax return, tax rules
+
 **Estate date**:
 The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date.
 _Avoid_: death date, payout date

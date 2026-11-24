@@ -1,7 +1,7 @@
 import { OPTIMIZE_GROUPS } from "./nav-optimize"
 import type { NavGroup } from "./routes"
 
-/** The navigation in order: Home and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group. */
+/** The navigation in order: Home and Net worth, the Plan group, the Optimize group, Cash flow, Chance of success, Tax, then the Records group, then the Settings group. */
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		heading: null,
@@ -73,6 +73,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 		routes: [
 			{ path: "/ledger/", label: "Ledger", page: "LedgerPage", icon: "book-open" },
 			{ path: "/health/", label: "Health", page: "HealthPage", icon: "activity" },
+		],
+	},
+	{
+		heading: "Settings",
+		routes: [
+			{
+				path: "/settings/tax/",
+				label: "Tax profile",
+				page: "TaxSettingsPage",
+				icon: "sliders-horizontal",
+				needsDocument: true,
+			},
 		],
 	},
 ]
