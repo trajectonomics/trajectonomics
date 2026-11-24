@@ -76,3 +76,5 @@ export {
 	ThRealEstateExpenseBasis,
 	ThSeparateSheetPaymentType,
 } from "./types"
+export type { ThBracketWalk, ThBracketWalkSlice } from "./walk"
+export { thBracketWalk, thEffectiveRateBps } from "./walk"
