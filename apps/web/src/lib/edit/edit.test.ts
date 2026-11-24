@@ -16,6 +16,7 @@ describe("the Edit list", () => {
 			"merge-tax",
 			"set-tax",
 			"remove-tax",
+			"record-values",
 		])
 	})
 
@@ -164,6 +165,31 @@ describe("the household Edits", () => {
 		expect(
 			followPlan([], { kind: "set-household", name: "early", contentHash: HASH, household }),
 		).toEqual([])
+	})
+})
+
+describe("record-values", () => {
+	const edit: Edit = {
+		kind: "record-values",
+		against: "gains-id",
+		values: [{ account: "bank-id", date: "2026-10-31", value: "1,000.5" }],
+	}
+
+	test("is account value --file -, with the batch as typed on stdin, and --dry-run first", () => {
+		const stdin = JSON.stringify({ against: "gains-id", values: edit.values })
+		expect(writeCommand(edit, false)).toEqual({
+			argv: ["account", "value", "--file", "-", "--json"],
+			stdin,
+		})
+		expect(writeCommand(edit, true)).toEqual({
+			argv: ["account", "value", "--file", "-", "--dry-run", "--json"],
+			stdin,
+		})
+	})
+
+	test("changes no plan the Snapshot projects", () => {
+		expect(followPlan(["base"], edit)).toEqual(["base"])
+		expect(followPlan([], edit)).toEqual([])
 	})
 })
 

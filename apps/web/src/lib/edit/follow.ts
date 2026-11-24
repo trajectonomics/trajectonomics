@@ -13,6 +13,7 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 		case "merge-tax":
 		case "set-tax":
 		case "remove-tax":
+		case "record-values":
 			return [...scenarios]
 		case "copy-plan":
 		case "apply-plan":

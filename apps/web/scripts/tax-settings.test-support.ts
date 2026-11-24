@@ -1,5 +1,5 @@
 // Helpers of the tax profile's end-to-end tests: the plan as the Snapshot shows its tax, and one tax Edit.
-import type { TaxProfile } from "../src/lib/contract"
+import type { TaxAllowances, TaxProfile } from "../src/lib/contract"
 import type { EditAnswer } from "../src/lib/edit/answer"
 import { PLAN, post, storedPlan } from "./estate-ledger.test-support"
 
@@ -7,11 +7,16 @@ import { PLAN, post, storedPlan } from "./estate-ledger.test-support"
 export function shownTax(answer: EditAnswer): {
 	tax: TaxProfile | null
 	taxed: boolean | undefined
+	taxAllowances: TaxAllowances | undefined
 } {
 	if (!answer.ok) throw new Error(answer.error.message)
 	const read = answer.snapshot.reads.documents[PLAN]
 	if (read === undefined || !read.ok) throw new Error("the plan has no document")
-	return { tax: read.data.scenario.tax ?? null, taxed: read.data.scenario.taxed }
+	return {
+		tax: read.data.scenario.tax ?? null,
+		taxed: read.data.scenario.taxed,
+		taxAllowances: read.data.scenario.taxAllowances,
+	}
 }
 
 /** One tax Edit, naming the hash of the plan as stored now. */

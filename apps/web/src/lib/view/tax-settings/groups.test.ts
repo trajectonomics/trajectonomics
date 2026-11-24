@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { ScenarioDocument, TaxProfile } from "../../contract"
+import type { TaxProfile } from "../../contract"
 import { TAX_FLAG_KEYS } from "../../edit/tax-flags"
 import { GROUPS, groupCards, PLACE, TAX_CLASSES } from "./groups"
 import { notStated } from "./not-stated"
@@ -12,16 +12,6 @@ const profile: TaxProfile = {
 	lifeInsurance: 20000,
 	donation1x: 5000,
 }
-
-const flow = (id: string, kind: string, label?: string) => ({
-	id,
-	kind,
-	frequency: "monthly",
-	start: "2026-01-01",
-	...(label === undefined ? {} : { label }),
-})
-const plan = (...flows: ReturnType<typeof flow>[]) =>
-	({ currency: "THB", accounts: [], flows }) as unknown as ScenarioDocument
 
 describe("the groups of the stored request", () => {
 	test("every item of the profile is in exactly one group, in the order the form lists them", () => {
@@ -84,9 +74,10 @@ describe("the groups of the stored request", () => {
 })
 
 describe("what the plan does not state yet", () => {
-	test("lists each class the profile leaves out, in the CLI's order, each with its place", () => {
-		const missing = notStated(profile, plan())
-		expect(missing.map((one) => one.class)).toEqual([
+	// What `scenario show` reports for the profile above and a plan with no contribution Flow.
+	const reported = {
+		stated: ["children", "lifeInsurance", "donation1x"],
+		notStated: [
 			"parents",
 			"disabledCare",
 			"socialSecurity",
@@ -97,52 +88,41 @@ describe("what the plan does not state yet", () => {
 			"donation2x",
 			"retirementContributions",
 			"thaiEsg",
-		])
+		],
+	}
+
+	test("lists the classes `traj` reports, in its order, each with its words and its place", () => {
+		const missing = notStated(reported)
+		expect(missing.map((one) => one.class)).toEqual(reported.notStated)
 		expect(missing[0]).toEqual({ class: "parents", label: "Parents you support", place: "family" })
 		expect(missing.find((one) => one.class === "mortgageInterest")?.place).toBe("home")
-		expect(missing.find((one) => one.class === "thaiEsg")?.place).toBe("flows")
+		expect(missing.find((one) => one.class === "thaiEsg")).toEqual({
+			class: "thaiEsg",
+			label: "ThaiESG contributions",
+			place: "flows",
+		})
 	})
 
-	test("a count or an amount of zero states nothing, and children are stated by a count above zero", () => {
-		const none = notStated({ ...profile, children: 0, lifeInsurance: 0 }, plan())
-		expect(none.map((one) => one.class)).toContain("children")
-		expect(none.map((one) => one.class)).toContain("lifeInsurance")
-		const stated = notStated(profile, plan()).map((one) => one.class)
-		expect(stated).not.toContain("children")
-		expect(stated).not.toContain("lifeInsurance")
-		expect(stated).not.toContain("donation1x")
+	test("works out nothing of its own: a class `traj` calls stated is never listed, whatever the profile holds", () => {
+		const missing = notStated({ stated: ["retirementContributions"], notStated: ["thaiEsg"] })
+		expect(missing.map((one) => one.class)).toEqual(["thaiEsg"])
 	})
 
-	test("a labelled contribution Flow states its class: ThaiESG on its own, any other label as retirement", () => {
-		const rmf = notStated(profile, plan(flow("rmf", "contribution", "allowance.retirement.rmf")))
-		expect(rmf.map((one) => one.class)).not.toContain("retirementContributions")
-		expect(rmf.map((one) => one.class)).toContain("thaiEsg")
-		const esg = notStated(profile, plan(flow("esg", "contribution", "allowance.thai_esg")))
-		expect(esg.map((one) => one.class)).not.toContain("thaiEsg")
-		expect(esg.map((one) => one.class)).toContain("retirementContributions")
-		const bare = notStated(
-			profile,
-			plan(flow("save", "contribution"), flow("pay", "income", "allowance.thai_esg")),
-		)
-		expect(bare.map((one) => one.class)).toContain("retirementContributions")
-		expect(bare.map((one) => one.class)).toContain("thaiEsg")
+	test("lists nothing when `traj` states no allowances, as for a plan with no stored profile", () => {
+		expect(notStated(undefined)).toEqual([])
+		expect(notStated({ stated: [], notStated: [] })).toEqual([])
 	})
 
-	test("a profile that states every flag leaves only the classes a Flow states", () => {
-		const full: TaxProfile = {
-			...profile,
-			parents: 1,
-			disabledCare: 1,
-			socialSecurity: 9000,
-			healthInsurance: 1,
-			parentHealthInsurance: 1,
-			spouseLifeInsurance: 1,
-			mortgageInterest: 1,
-			donation2x: 1,
-		}
-		expect(notStated(full, plan()).map((one) => one.class)).toEqual([
-			"retirementContributions",
-			"thaiEsg",
+	test("a class a later `traj` reports is listed by its name with no place, and never throws", () => {
+		expect(notStated({ stated: [], notStated: ["newClass", "toString"] })).toEqual([
+			{ class: "newClass", label: "newClass", place: null },
+			{ class: "toString", label: "toString", place: null },
 		])
+	})
+
+	test("every class of the list the page knows has a label and a place", () => {
+		const all = notStated({ stated: [], notStated: [...TAX_CLASSES] })
+		expect(all.map((one) => one.place).includes(null)).toBe(false)
+		expect(all.map((one) => one.label === one.class)).not.toContain(true)
 	})
 })
