@@ -22,6 +22,17 @@ export function isPayout(flow: Flow): flow is PayoutFlow {
 	return "payoutOf" in flow
 }
 
+/**
+ * The asset Accounts that pay out a share above 0 bps, in Scenario order, read from the Accounts so it
+ * holds for the declared Scenario as well as the one `withPayouts` expanded. A payout of 0 is none.
+ */
+export function payingAccounts(scenario: Scenario): readonly AssetRule[] {
+	return scenario.accounts.filter(
+		(account): account is AssetRule =>
+			account.kind === "asset" && account.payout !== undefined && account.payout.bps > 0,
+	)
+}
+
 /** Whether the Scenario's Accounts pay out, so its Projection reports payouts. */
 export function declaresPayouts(scenario: Scenario): boolean {
 	return scenario.flows.some(isPayout)
@@ -70,10 +81,7 @@ const expanded: WeakMap<Scenario, Scenario> = new WeakMap()
 export function withPayouts(scenario: Scenario): Scenario {
 	const kept = expanded.get(scenario)
 	if (kept !== undefined) return kept
-	const paying = scenario.accounts.filter(
-		(account): account is AssetRule =>
-			account.kind === "asset" && account.payout !== undefined && account.payout.bps > 0,
-	)
+	const paying = payingAccounts(scenario)
 	const result =
 		paying.length === 0
 			? scenario

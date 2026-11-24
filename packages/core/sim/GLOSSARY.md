@@ -50,6 +50,10 @@ _Avoid_: Tick, step, period
 Totals over one twelve-month period of a Projection, running from an anniversary of `start` to the day before the next one. The last period is cut short by the horizon or a Shortfall and marked partial.
 _Avoid_: Year, fiscal year
 
+**Lifetime totals**:
+What a Projection states over the whole horizon for the Accounts that declare a fee or a payout above 0 bps: `accountLifetimes`, one `{ account, lifetimeFees?, lifetimePayouts? }` per such Account in Scenario order (each figure only when the Account declares that item), and a plan-wide `lifetimeFees`, present only when a fee is declared. Each is the sum of the Annual roll-up figures of that Account and comes from the same run. Without a fee or a payout above 0 bps no field appears.
+_Avoid_: Cumulative, running total
+
 **Levy**:
 A closed rule set in the Scenario that charges an amount for each Settlement period from that period's Flows: a period rule, a settlement rule and a graph of Measures. A Scenario may hold several Levies, each with its own periods, Settlements and Carry-in; they share Tally labels but never read each other. The core does not know what a Levy represents; callers, or a rule-set emitter such as tax-core, author it as data.
 _Avoid_: Tax, tax rules, formula callback, plugin

@@ -29,6 +29,8 @@ export interface DayFlows {
 	readonly employer: bigint
 	/** Payouts landed on this date, once they have left their Accounts: inside `income` (ADR 0027). */
 	readonly payouts?: bigint
+	/** The same by Account, only the nonzero. */
+	readonly payoutsBy?: ReadonlyMap<string, bigint>
 	/** Each Levy's own Prepayment share. */
 	readonly prepaidByLevy: ReadonlyMap<string, bigint>
 	/** A capped Prepayment read a cap that is not a safe integer. */

@@ -1,6 +1,7 @@
 import { isPayout } from "../payout/flows"
-import type { DateString } from "../types"
+import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
+import { addTo } from "./add"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import type { LevySet } from "./levy-set"
@@ -17,8 +18,12 @@ import type { StateMap } from "./state"
 export interface Payouts {
 	/** What left the Accounts, summed: the payouts that landed as income on the date. */
 	readonly paid: bigint
+	/** The same, by the Account each left, only the nonzero. */
+	readonly by: ReadonlyMap<AccountId, bigint>
 	readonly problem: ProjectionProblem | undefined
 }
+
+const NONE: ReadonlyMap<AccountId, bigint> = new Map()
 
 export function applyPayouts(
 	states: StateMap,
@@ -28,6 +33,8 @@ export function applyPayouts(
 	levies: LevySet | undefined,
 ): Payouts {
 	let paid = 0n
+	// Made on the first payout, so a date (or a whole run) without one allocates nothing.
+	let by: Map<AccountId, bigint> | undefined
 	for (const event of events) {
 		const { flow } = event
 		if (!isPayout(flow)) continue
@@ -35,8 +42,10 @@ export function applyPayouts(
 		const state = states.get(flow.payoutOf.account)
 		if (amount === 0n || state === undefined) continue
 		const problem = mutate(state, date, -amount, levies, "payout")
-		if (problem !== undefined) return { paid, problem }
+		if (problem !== undefined) return { paid, by: by ?? NONE, problem }
 		paid += amount
+		by ??= new Map()
+		addTo(by, flow.payoutOf.account, amount)
 	}
-	return { paid, problem: undefined }
+	return { paid, by: by ?? NONE, problem: undefined }
 }

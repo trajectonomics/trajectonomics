@@ -604,7 +604,9 @@ Accrued interest included, before the date's Flows land). It is no expense: it i
 causes a Shortfall, it takes no Cost basis, and a locked or Illiquid Account is charged too. Because a Return
 series replaces `rate` and not the fee, every path of a chance of success run charges it. It is read first and
 taken last on its date, never more than the Account then holds. The Annual roll-up reports `fees` and
-`accountFees` only when an Account has a fee above 0 bps, and `interest` stays the growth before the fee.
+`accountFees` only when an Account has a fee above 0 bps, and `interest` stays the growth before the fee. The
+Projection also states `lifetimeFees` and, per Account, `accountLifetimes` (`lifetimeFees`, `lifetimePayouts`):
+the sums of the roll-up figures over the whole horizon, only for what an Account declares above 0 bps.
 See [ADR 0028](docs/adr/0028-account-fee.md).
 
 A fund of 1,000,000,000 at no growth that charges 150 bps a year pays 1,250,000 on 31 January and

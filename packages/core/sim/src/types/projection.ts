@@ -2,9 +2,12 @@ import type { ErrorCode, Path } from "../check/codes"
 import type { CashflowBreakdown } from "./breakdown"
 import type { AccountId, DateString, MinorUnits } from "./common"
 import type { EstateStatement } from "./estate"
+import type { AccountLifetime } from "./lifetime"
 import type { MilestoneResult } from "./milestone"
 import type { SpendingRuleStatement } from "./rule"
 import type { LiabilityStatement } from "./statement"
+
+export type { AccountLifetime }
 
 export interface AccountAmount {
 	readonly account: AccountId
@@ -106,6 +109,16 @@ export interface Projection {
 	readonly rows: readonly ProjectionRow[]
 	readonly annual: readonly AnnualRollup[]
 	readonly unfundedContributions: readonly AccountAmount[]
+	/**
+	 * Fees charged to every Account over the whole horizon, the sum of the roll-ups' `fees`; present only
+	 * when an Account carries a fee above 0 bps.
+	 */
+	readonly lifetimeFees?: MinorUnits
+	/**
+	 * Each Account that declares a fee or a payout above 0 bps, in Scenario order, with its totals over the
+	 * whole horizon; present only when there is one.
+	 */
+	readonly accountLifetimes?: readonly AccountLifetime[]
 	readonly runsOut?: RunsOut
 	readonly levies?: readonly LevyReport[]
 	/** Scenario order; present only when the Scenario declares Milestones. */

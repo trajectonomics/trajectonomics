@@ -9720,7 +9720,7 @@
 		"projectOptions": {
 			"cashflowBreakdown": true
 		},
-		"sha256": "5876f672e4ddb4c381a5feb7fc887deeb072c3631675f956fe7ace58cd7b2569"
+		"sha256": "9a61f6b99af08fb058bf3b98d693a9101af389740ee9ed58cf71ec2825603720"
 	},
 	{
 		"name": "payout-fi",
@@ -9798,7 +9798,7 @@
 			"horizon": "2034-01-01",
 			"resolution": "month"
 		},
-		"sha256": "ff60bbda72d8cee28f5c5bd12d1db243bccc3e806920fbfb8ffec22bafe79fc1",
+		"sha256": "96b5e8db781a310116f87d59b8ab08851402960c4c15228a42e8a954e80772d4",
 		"options": {
 			"method": "survival",
 			"minBufferMonths": 0
@@ -9881,7 +9881,7 @@
 			"horizon": "2034-01-01",
 			"resolution": "month"
 		},
-		"sha256": "ff60bbda72d8cee28f5c5bd12d1db243bccc3e806920fbfb8ffec22bafe79fc1",
+		"sha256": "96b5e8db781a310116f87d59b8ab08851402960c4c15228a42e8a954e80772d4",
 		"chance": {
 			"model": {
 				"id": "payout-market",
@@ -9984,7 +9984,7 @@
 			"cashflowBreakdown": true,
 			"estate": true
 		},
-		"sha256": "c6677aa06829d31e096d04dc968a1452adb968fddd925a251ad70fedad1f71ad"
+		"sha256": "20cb832273d6bacaf06789f629d81406a988be8d63f4f3d60db8d3e4fd48d6db"
 	},
 	{
 		"name": "fee-fi",
@@ -10061,7 +10061,7 @@
 			"horizon": "2034-01-01",
 			"resolution": "month"
 		},
-		"sha256": "ed97ee1c2049dd5a25b0d5a891717dbde93b3f81bbe2b9392395b18e7935fc7c",
+		"sha256": "63b7722f3f0bda44aebe27bae644203e2670aa1ab40b3973f585059334f513fa",
 		"options": {
 			"method": "survival",
 			"minBufferMonths": 0
@@ -10143,7 +10143,7 @@
 			"horizon": "2034-01-01",
 			"resolution": "month"
 		},
-		"sha256": "ed97ee1c2049dd5a25b0d5a891717dbde93b3f81bbe2b9392395b18e7935fc7c",
+		"sha256": "63b7722f3f0bda44aebe27bae644203e2670aa1ab40b3973f585059334f513fa",
 		"chance": {
 			"model": {
 				"id": "fee-market",
@@ -11542,5 +11542,68 @@
 			"outcomes": true
 		},
 		"chanceSha256": "0be5e029515231f977b46f34310d8547ddf8e90478b7a4cf9b673d49a96d73a4"
+	},
+	{
+		"name": "lifetime-year",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "fund",
+					"amount": 1000000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"payout": {
+						"bps": 350,
+						"frequency": "quarterly",
+						"rounding": "halfUp"
+					},
+					"fee": {
+						"bps": 100,
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"flows": [],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-12-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "22429258a182680b79c8d27edba98667bbe6bb0c39bf4df3811d66ad766d2170"
 	}
 ]
