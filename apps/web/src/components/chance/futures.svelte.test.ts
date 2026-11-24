@@ -76,7 +76,7 @@ describe("the Chance page's futures", () => {
 		expect(body).toContain("Only the ones that ran out (2)")
 		expect(body).toContain("Ran out in Mar 2028")
 		expect(body).toContain("Lasted")
-		expect(body).toContain("the year from Oct 2027")
+		expect(body).toContain("the year starting 31 Oct 2027")
 	})
 
 	test("shows the bar, the lowest point and the signed closing net worth of a path that fell below zero", () => {
@@ -106,11 +106,11 @@ describe("the Chance page's futures", () => {
 })
 
 describe("the path page", () => {
-	test("opens a path the Snapshot read: Future n of paths, the run-out, the lowest point, a way back", () => {
+	test("opens a path the Snapshot read: Future n, one of paths, the run-out, the lowest point, a way back", () => {
 		const body = pathPage("2")
-		expect(body).toContain("Future 2 of 6")
+		expect(body).toContain("Future 2, one of 6")
 		expect(body).toContain("Ran out in Mar 2028")
-		expect(body).toContain("in the year from Oct 2027")
+		expect(body).toContain("in the year ending Oct 2028")
 		expect(body).toContain("Back to Chance of success")
 		expect(body).toContain('href="/chance/?scenario=base"')
 	})
@@ -166,7 +166,7 @@ describe("the path page", () => {
 				read: { argv: ["live"], ok: true, data: pathFixture(3) },
 			},
 		}
-		expect(pathPage("3")).toContain("Future 3 of 6")
+		expect(pathPage("3")).toContain("Future 3, one of 6")
 		pathReads.entries = {}
 	})
 

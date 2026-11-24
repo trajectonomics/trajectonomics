@@ -32,6 +32,8 @@ export type StageTwoPlan = {
 	compare: PlannedRead | null
 	/** One `projection chance` per Scenario; empty when the caller stated no Return model. */
 	chance: Record<string, PlannedRead>
+	/** Whether the five representative paths are read in advance (the offline Snapshot only, web ADR 0020). */
+	readPaths: boolean
 	/** The `projection path` of one Scenario and one path index of its chance run; null when the Snapshot states no chance inputs. */
 	pathOf: (scenario: string, index: number) => PlannedRead | null
 	/** One `projection allowances` per Scenario; empty when the Snapshot states no allowance inputs. The runner reads only plans with a Levy. */
@@ -85,6 +87,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		fi: planFi(params, scenarios),
 		compare: planCompare(params),
 		chance: planChance(params, scenarios),
+		readPaths: params.readPaths,
 		pathOf: (scenario, index) => pathRead(params, scenario, index),
 		allowances: planAllowances(params, scenarios),
 	}

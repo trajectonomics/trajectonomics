@@ -31,6 +31,7 @@ const PARAMS = {
 	chance: null,
 	allowances: null,
 	futures: true,
+	readPaths: false,
 }
 
 describe("the what-if body with Additions", () => {

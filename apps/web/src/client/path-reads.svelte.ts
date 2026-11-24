@@ -6,11 +6,16 @@ import type { LiveEntry } from "../lib/view/chance/path-state"
 /** The sentences the page shows when a live read cannot be had. */
 const UNREACHABLE = "The Dashboard could not reach traj. Try again."
 const UNREADABLE = "The Dashboard could not read the answer to the future."
-const BUSY = "The Dashboard is busy with another request. Reload the page to open this future."
+const BUSY = "The Dashboard is still busy with an Edit. Try opening this future again in a moment."
 
-/** How many times a read answered 409 (another request runs on the server) is asked again, and after how long. */
-const BUSY_RETRIES = 2
-const BUSY_WAIT_MS = 400
+/** The code the server answers (409) while another request runs: the only 409 worth asking again. */
+const EDIT_RUNNING = "edit_running"
+
+/**
+ * How long a read waits before it asks again while an Edit runs, each wait longer than the last. An Edit that states a
+ * chance runs for up to ten seconds, so the waits add up to fifteen.
+ */
+export const BUSY_WAITS_MS: readonly number[] = [1000, 2000, 4000, 8000]
 
 /** How a live read ended: the path's read, or the sentence of why there is none. */
 type Settled =
@@ -22,7 +27,11 @@ function keyOf(plan: string, index: number): string {
 	return JSON.stringify([plan, index])
 }
 
-/** Posts one path read. The entry it ends in is "busy" for a 409, so the caller can ask again. */
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/** Posts one path read. The entry it ends in is "busy" for a 409 that says an Edit runs, so the caller can ask again; any other refusal shows the server's own sentence. */
 async function post(token: string, plan: string, index: number): Promise<Settled | "busy"> {
 	try {
 		const response = await fetch(REREAD_PATH, {
@@ -31,9 +40,11 @@ async function post(token: string, plan: string, index: number): Promise<Settled
 			body: JSON.stringify({ path: { plan, index } }),
 			cache: "no-store",
 		})
-		if (response.status === 409) return "busy"
 		const answer = pathAnswer.safeParse(await response.json())
 		if (!answer.success) return { status: "failed", message: UNREADABLE }
+		if (response.status === 409 && !answer.data.ok && answer.data.error.code === EDIT_RUNNING) {
+			return "busy"
+		}
 		if (!answer.data.ok) return { status: "failed", message: answer.data.error.message }
 		return { status: "done", read: answer.data.path }
 	} catch {
@@ -46,8 +57,11 @@ async function post(token: string, plan: string, index: number): Promise<Settled
  * each tagged with the run of the chance it was read for. Held in the tab only: a reload forgets them, and a read for another
  * run is never shown, so the Snapshot staying as it is while the server's inputs move cannot show a stale future.
  */
-class PathReads {
+export class PathReads {
 	entries = $state<Record<string, LiveEntry>>({})
+
+	/** `wait` is how a read lets time pass between two asks; a test passes one that does not. */
+	constructor(private readonly wait: (ms: number) => Promise<void> = sleep) {}
 
 	/** What this tab holds of one future. */
 	entry(plan: string, index: number): LiveEntry | undefined {
@@ -59,13 +73,14 @@ class PathReads {
 		const key = keyOf(plan, index)
 		if (this.entries[key]?.run === run) return
 		this.entries = { ...this.entries, [key]: { run, status: "loading" } }
-		for (let attempt = 0; attempt <= BUSY_RETRIES; attempt++) {
+		for (let attempt = 0; attempt <= BUSY_WAITS_MS.length; attempt++) {
 			const reply = await post(token, plan, index)
 			if (reply !== "busy") {
 				this.entries = { ...this.entries, [key]: { run, ...reply } }
 				return
 			}
-			if (attempt < BUSY_RETRIES) await new Promise((resolve) => setTimeout(resolve, BUSY_WAIT_MS))
+			const wait = BUSY_WAITS_MS[attempt]
+			if (wait !== undefined) await this.wait(wait)
 		}
 		this.entries = { ...this.entries, [key]: { run, status: "failed", message: BUSY } }
 	}

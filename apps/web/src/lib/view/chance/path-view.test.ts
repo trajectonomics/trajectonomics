@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { chanceWithOutcomes, pathFixture } from "./futures.test-support"
-import { pathHeaderOf, pathMarkers, pathRowsOf, returnAccounts, returnText } from "./path-view"
+import { pathHeaderOf, pathMarkers, pathRowsOf, returnAccounts } from "./path-view"
+import { lowestWhen, returnText } from "./path-words"
 
 describe("returnText", () => {
 	test("is a percent with two places and a true minus", () => {
@@ -13,12 +14,16 @@ describe("returnText", () => {
 describe("pathHeaderOf", () => {
 	const chance = chanceWithOutcomes()
 
-	test("says Future n of paths, and the month the money ran out with the shortfall the CLI states", () => {
+	test("says Future n, one of paths, and the month the money ran out with the shortfall the CLI states", () => {
 		const header = pathHeaderOf(pathFixture(2), chance)
-		expect(header.title).toBe("Future 2 of 6")
+		expect(header.title).toBe("Future 2, one of 6")
 		expect(header.ending).toMatchObject({ ranOut: "Mar 2028", unmet: "120.00" })
 		expect(header.closing).toBe("0.00")
-		expect(header.lowest).toEqual({ amount: "0.00", from: "Oct 2027", day: "2027-10-31" })
+		expect(header.lowest).toEqual({
+			amount: "0.00",
+			when: "in the year ending Oct 2028",
+			day: "2027-10-31",
+		})
 	})
 
 	test("says a path lasted, and states no lowest point when the chance lists no outcomes", () => {
@@ -26,6 +31,20 @@ describe("pathHeaderOf", () => {
 		expect(header.ending.ranOut).toBeNull()
 		expect(header.lowest).toBeNull()
 		expect(header.closing).toBeNull()
+	})
+})
+
+describe("lowestWhen", () => {
+	const path = pathFixture(2)
+
+	test("names the annual row that starts on the day the CLI states by the month it ends in", () => {
+		const rows = pathRowsOf(path, "2027-10-31")
+		const row = rows.findIndex((entry) => entry.marks.includes("Lowest point"))
+		expect(lowestWhen(path, "2027-10-31")).toBe(`in the year ending ${rows[row]?.ends}`)
+	})
+
+	test("says only when the year starts for a day that starts no row", () => {
+		expect(lowestWhen(path, "2051-10-31")).toBe("in the year starting 31 Oct 2051")
 	})
 })
 

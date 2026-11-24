@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import { chanceFixture } from "./fixtures.test-support"
-import { futuresViewOf, PAGE_SIZE, pageOfFutures } from "./futures"
+import { futuresViewOf } from "./futures"
 import { chanceWithOutcomes } from "./futures.test-support"
+import { PAGE_SIZE, pageOfFutures } from "./futures-page"
 
 const view = futuresViewOf(chanceWithOutcomes())
 
@@ -16,11 +17,12 @@ describe("futuresViewOf", () => {
 		expect(futures[2]).toMatchObject({
 			index: 2,
 			ranOut: "Mar 2028",
-			lowestFrom: "Oct 2027",
+			ranOutOn: "2028-03-15",
+			lowestStart: "31 Oct 2027",
 			below: false,
 		})
 		expect(futures[4]).toMatchObject({ index: 4, below: true, closing: "-5200.25" })
-		expect(futures[0]).toMatchObject({ ranOut: null, lowestFrom: "Oct 2028" })
+		expect(futures[0]).toMatchObject({ ranOut: null, lowestStart: "31 Oct 2028" })
 		expect(view?.ranOut).toBe(2)
 	})
 
@@ -55,15 +57,29 @@ describe("pageOfFutures", () => {
 	const futures = view?.futures ?? []
 	const indexes = (page: ReturnType<typeof pageOfFutures>) => page.rows.map((row) => row.index)
 
-	test("sorts by closing net worth, worst first, comparing the strings and breaking a tie by index", () => {
+	test("sorts by closing net worth, worst first, comparing the strings and breaking a tie by run-out, then index", () => {
 		const page = pageOfFutures(futures, { order: "worst", onlyRanOut: false, page: 1 })
-		// -5200.25, then the two zeros (0.00 and "-0.00") by index, then 75.10, 900.50, 1,250,000.00
-		expect(indexes(page)).toEqual([4, 1, 2, 5, 0, 3])
+		// -5200.25, then the two zeros (0.00 and "-0.00"): the one that ran out first, then 75.10, 900.50, 1,250,000.00
+		expect(indexes(page)).toEqual([4, 2, 1, 5, 0, 3])
 	})
 
-	test("sorts best first with the same tie rule", () => {
+	test("breaks a tie of closing net worth by the earlier run-out, a future that lasted after one that ran out, then by index", () => {
+		const base = futures[2] as (typeof futures)[number]
+		const tied = [
+			{ ...base, index: 0, closing: "0.00", ranOut: null, ranOutOn: null },
+			{ ...base, index: 1, closing: "0.00", ranOut: "Jun 2030", ranOutOn: "2030-06-10" },
+			{ ...base, index: 2, closing: "0.00", ranOut: "Mar 2028", ranOutOn: "2028-03-15" },
+			{ ...base, index: 3, closing: "0.00", ranOut: "Mar 2028", ranOutOn: "2028-03-15" },
+		]
+		for (const order of ["worst", "best"] as const) {
+			const page = pageOfFutures(tied, { order, onlyRanOut: false, page: 1 })
+			expect(indexes(page)).toEqual([2, 3, 1, 0])
+		}
+	})
+
+	test("sorts best first with the same tie rules", () => {
 		const page = pageOfFutures(futures, { order: "best", onlyRanOut: false, page: 1 })
-		expect(indexes(page)).toEqual([3, 0, 5, 1, 2, 4])
+		expect(indexes(page)).toEqual([3, 0, 5, 2, 1, 4])
 	})
 
 	test("keeps only the ones that ran out, and counts them", () => {

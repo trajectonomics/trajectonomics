@@ -17,7 +17,8 @@ function heldChance(held: Snapshot, plan: string): ProjectionChance | null {
 
 /**
  * Reads one Market path. Refused, with the sentence a person reads, when the request cannot name a path of the chance the
- * Snapshot holds: the plan is not one of its plans, the index is outside `paths`, or no chance is stated. The read is
+ * Snapshot holds: the plan is not one of its plans, no chance is stated, the parameters' paths or seed are no longer the
+ * held chance's own, or the index is outside that chance's `paths`. The read is
  * then checked against that chance, and a replay of another run is an error, never an answer.
  */
 export async function answerPath(
@@ -39,14 +40,6 @@ export async function answerPath(
 	if (!held.params.scenarios.includes(plan)) {
 		return refused(400, "unknown_plan", `The Snapshot holds no plan named ${plan}.`)
 	}
-	if (index >= params.chance.paths) {
-		const last = params.chance.paths - 1
-		return refused(
-			400,
-			"invalid_path_index",
-			`The chance has ${params.chance.paths} paths, numbered 0 to ${last}.`,
-		)
-	}
 	const chance = heldChance(held, plan)
 	const planned = pathRead(params, plan, index)
 	if (chance === null || planned === null) {
@@ -54,6 +47,22 @@ export async function answerPath(
 			409,
 			"no_chance_read",
 			`The Snapshot holds no chance read for ${plan}. Reload the Dashboard.`,
+		)
+	}
+	// The future is a replay of the chance on screen, so it is named by that chance's own paths and seed, not the parameters'.
+	const { seed, paths } = chance.definition
+	if (params.chance.seed !== seed || params.chance.paths !== paths) {
+		return refused(
+			409,
+			"chance_changed",
+			`The chance on screen drew ${paths} Market paths from seed ${seed}, and the Dashboard now holds other inputs, so that future would be of another run. Reload the Dashboard.`,
+		)
+	}
+	if (index >= paths) {
+		return refused(
+			400,
+			"invalid_path_index",
+			`The chance on screen has ${paths} paths, numbered 0 to ${paths - 1}.`,
 		)
 	}
 	const path = await runPlanned(traj, planned, projectionPath, records)

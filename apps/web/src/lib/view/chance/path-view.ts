@@ -1,9 +1,10 @@
 import { dayPosition, type LineMarker } from "../../chart"
 import type { ProjectionChance, ProjectionPath } from "../../contract"
-import { formatBps, formatMonth, MINUS } from "../../format"
+import { formatMonth } from "../../format"
 import { agesText } from "../household/model"
 import { milestoneMarkers } from "../milestones/milestones"
 import { type AnnualRow, annualRowsOf } from "../projection/annual"
+import { lowestWhen, pathTitle, returnText } from "./path-words"
 
 /** The label of the run-out rule on the chart. */
 export const RUN_OUT_LABEL = "Ran out"
@@ -19,8 +20,8 @@ export interface Ending {
 /** What the CLI stated of a path in the chance's `outcomes`, when the Snapshot lists them. */
 export interface Lowest {
 	readonly amount: string
-	/** The roll-up it was lowest in, by its first month. */
-	readonly from: string
+	/** The year it was lowest in, in the table's own terms: "in the year ending Oct 2052". */
+	readonly when: string
 	/** That roll-up's first day, as the CLI states it: the year row it marks in the table. */
 	readonly day: string
 }
@@ -54,16 +55,6 @@ export function returnAccounts(path: ProjectionPath): string[] {
 	return (path.returns[0]?.accounts ?? []).map((entry) => entry.account)
 }
 
-/** A return in basis points as a percent with two places, with the true minus: 118 as "1.18%". */
-export function returnText(bps: number): string {
-	return `${formatBps(bps).replace("-", MINUS)}%`
-}
-
-/** The index of a path in the header: the CLI numbers paths from zero, and so does the page. */
-export function pathTitle(index: number, paths: number): string {
-	return `Future ${index} of ${paths}`
-}
-
 /** The path's header: its title, how it ended, and the figures the chance's outcomes state of it. */
 export function pathHeaderOf(path: ProjectionPath, chance: ProjectionChance): PathHeader {
 	const outcome = chance.outcomes?.find((entry) => entry.index === path.index)
@@ -80,7 +71,7 @@ export function pathHeaderOf(path: ProjectionPath, chance: ProjectionChance): Pa
 				? null
 				: {
 						amount: outcome.lowestNetWorth,
-						from: formatMonth(outcome.lowestYear),
+						when: lowestWhen(path, outcome.lowestYear),
 						day: outcome.lowestYear,
 					},
 	}

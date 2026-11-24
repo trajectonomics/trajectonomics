@@ -10,6 +10,7 @@ import { demoCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS } from "./demo/return-model"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import {
+	answerChanged,
 	chanceOf,
 	disposeFutures,
 	editorOf,
@@ -70,13 +71,13 @@ describe("opening the earliest run-out from the Chance page", () => {
 		const index = chance.representative?.earliestRunsOut as number
 		const outcome = chance.outcomes?.[index]
 		const body = page(index)
-		expect(body).toContain(`Future ${index} of ${DEMO_PATHS}`)
+		expect(body).toContain(`Future ${index}, one of ${DEMO_PATHS}`)
 		const month = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" }).format(
 			new Date(`${outcome?.runsOut?.date}T00:00:00Z`),
 		)
 		expect(body).toContain(`Ran out in ${month} ${outcome?.runsOut?.date.slice(0, 4)}`)
 		expect(body).toContain("Lowest point")
-		expect(body).toContain("in the year from")
+		expect(body).toContain("in the year ending")
 		expect(body).toContain("Ran out: ")
 		expect(body).toContain("Fund return")
 	})
@@ -114,7 +115,7 @@ describe("a path the Snapshot did not read, through POST /reread", () => {
 					read: answer.path,
 				},
 			}
-			expect(page(index)).toContain(`Future ${index} of ${DEMO_PATHS}`)
+			expect(page(index)).toContain(`Future ${index}, one of ${DEMO_PATHS}`)
 			pathReads.entries = {}
 		},
 		SLOW_MS,
@@ -159,6 +160,33 @@ describe("a path the Snapshot did not read, through POST /reread", () => {
 		},
 		SLOW_MS,
 	)
+
+	test("refuses in words, before it runs, when the paths or the seed are no longer the chance on screen's", async () => {
+		for (const change of [{ paths: DEMO_PATHS + 1 }, { seed: "fedcba9876543210" }]) {
+			const { status, answer } = await answerChanged(snapshotOf(), 1, change)
+			expect(status).toBe(409)
+			expect(answer).toMatchObject({
+				ok: false,
+				error: { code: "chance_changed", message: expect.stringContaining("Reload the Dashboard") },
+			})
+		}
+	})
+
+	test("checks the index against the paths of the chance on screen, not the parameters'", async () => {
+		const held = structuredClone(snapshotOf()) as Snapshot
+		const read = held.reads.chance[PLAN]
+		if (read?.ok !== true) throw new Error("the chance read failed")
+		read.data.definition.paths = 5
+		const { status, answer } = await answerChanged(held, 5, { paths: 5 })
+		expect(status).toBe(400)
+		expect(answer).toMatchObject({
+			ok: false,
+			error: {
+				code: "invalid_path_index",
+				message: "The chance on screen has 5 paths, numbered 0 to 4.",
+			},
+		})
+	})
 
 	test("keeps every guard of a reread: the token, the Origin, the Host and the content type", async () => {
 		const body = { path: { plan: PLAN, index: 1 } }

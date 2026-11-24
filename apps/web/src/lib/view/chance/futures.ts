@@ -1,10 +1,6 @@
 import { toChartNumber } from "../../chart"
 import type { ProjectionChance } from "../../contract"
-import { formatMonth } from "../../format"
-import { compareMoney } from "./order"
-
-/** The rows a page of the table holds. */
-export const PAGE_SIZE = 25
+import { formatDate, formatMonth } from "../../format"
 
 type Outcome = NonNullable<ProjectionChance["outcomes"]>[number]
 
@@ -14,10 +10,12 @@ export interface Future {
 	/** The net worth the path closed at, as the CLI states it. */
 	readonly closing: string
 	readonly lowest: string
-	/** The roll-up the path was lowest in, by its first month: "Oct 2051". The CLI states the roll-up's first day. */
-	readonly lowestFrom: string
+	/** The first day of the roll-up the path was lowest in, "31 Oct 2051": all the CLI states, so the page says the year starts there. */
+	readonly lowestStart: string
 	/** The month the path ran out, "Jun 2052", or null when it lasted to the Horizon. */
 	readonly ranOut: string | null
+	/** The day the path ran out as the CLI states it (an ISO date, compared as text), or null when it lasted. */
+	readonly ranOutOn: string | null
 	/** Whether the closing net worth is below zero, read from its sign. */
 	readonly below: boolean
 	/** The bar's length as a share of the longest bar, 0 to 100: a mark, never shown as a figure. */
@@ -48,8 +46,9 @@ export function futureOf(outcome: Outcome, longest: number): Future {
 		index: outcome.index,
 		closing,
 		lowest: outcome.lowestNetWorth,
-		lowestFrom: formatMonth(outcome.lowestYear),
+		lowestStart: formatDate(outcome.lowestYear),
 		ranOut: outcome.runsOut === null ? null : formatMonth(outcome.runsOut.date),
+		ranOutOn: outcome.runsOut === null ? null : outcome.runsOut.date,
 		below,
 		bar: longest === 0 ? 0 : (Math.abs(toChartNumber(closing)) / longest) * 100,
 	}
@@ -85,52 +84,5 @@ export function futuresViewOf(read: ProjectionChance): FuturesView | null {
 		futures,
 		ranOut: futures.filter((future) => future.ranOut !== null).length,
 		cards,
-	}
-}
-
-/** How the table is ordered: the worst closing net worth first, as the CLI's own table lists them, or the best. */
-export type Order = "worst" | "best"
-
-/** What the table shows: the order, the filter and the page, counted from one. */
-export interface TableChoice {
-	readonly order: Order
-	readonly onlyRanOut: boolean
-	readonly page: number
-}
-
-/** One page of the table, with the counts the page says beside it. */
-export interface FuturesPage {
-	readonly rows: readonly Future[]
-	/** The rows the filter keeps, across every page. */
-	readonly total: number
-	readonly page: number
-	readonly pages: number
-	/** The first and last row of this page among the kept ones, counted from one; 0 and 0 for no rows. */
-	readonly from: number
-	readonly to: number
-}
-
-/**
- * The futures the table shows. They are sorted by closing net worth by comparing the CLI's strings (`compareMoney`, no
- * number is made of one), a tie going to the lower index as in the CLI's own table; the filter keeps the futures that ran
- * out; a page is `PAGE_SIZE` rows. Nothing here adds or converts a figure.
- */
-export function pageOfFutures(futures: readonly Future[], choice: TableChoice): FuturesPage {
-	const kept = choice.onlyRanOut ? futures.filter((future) => future.ranOut !== null) : futures
-	const sign = choice.order === "worst" ? 1 : -1
-	const sorted = [...kept].sort(
-		(a, b) => sign * compareMoney(a.closing, b.closing) || a.index - b.index,
-	)
-	const pages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE))
-	const page = Math.min(Math.max(1, choice.page), pages)
-	const start = (page - 1) * PAGE_SIZE
-	const rows = sorted.slice(start, start + PAGE_SIZE)
-	return {
-		rows,
-		total: sorted.length,
-		page,
-		pages,
-		from: rows.length === 0 ? 0 : start + 1,
-		to: start + rows.length,
 	}
 }

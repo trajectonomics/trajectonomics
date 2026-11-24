@@ -12,7 +12,9 @@ import type { RunContext } from "./run-traj"
 
 /**
  * The paths the Snapshot reads in advance, one at a time: for each plan whose chance read lists its representative
- * paths, those five (web ADR 0020). A plan whose chance failed, or was read without `--outcomes`, has none.
+ * paths, those five (web ADR 0020). A plan whose chance failed, or was read without `--outcomes`, has none. None at all
+ * unless the plan says `readPaths`: only the offline Snapshot reads them in advance; a live dashboard reads a future
+ * when it is opened.
  */
 export async function runPaths(
 	context: RunContext,
@@ -21,6 +23,7 @@ export async function runPaths(
 	records: readonly unknown[],
 ): Promise<SnapshotReads["paths"]> {
 	const paths: Record<string, Record<string, Read<ProjectionPath>>> = {}
+	if (!plan.readPaths) return paths
 	for (const [name, read] of Object.entries(chance)) {
 		const reads: Record<string, Read<ProjectionPath>> = {}
 		for (const index of representativeIndexes(read)) {

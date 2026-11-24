@@ -14,6 +14,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { createEditor, type Editor } from "./serve-edit"
+import { answerPath } from "./serve-path"
 
 export const PLAN = "retire-early"
 let scratch = ""
@@ -32,6 +33,7 @@ export async function setupFutures(): Promise<void> {
 	traj = { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } }
 	params = {
 		...PARAMS,
+		readPaths: true,
 		horizon: "2053-12-31",
 		scenarios: [PLAN],
 		carryIn: true,
@@ -88,4 +90,22 @@ export function page(index: number): string {
 			onTerms: () => {},
 		},
 	}).body
+}
+
+/** `answerPath` over a held Snapshot with the chance parameters changed: the refusals come before any traj run, so none runs. */
+export async function answerChanged(
+	snapshot: Snapshot,
+	index: number,
+	change: { paths?: number; seed?: string },
+) {
+	const chance = held(params).chance
+	if (chance === null) throw new Error("the futures ledger states a chance")
+	const response = await answerPath(
+		{ plan: PLAN, index },
+		{ ...held(params), chance: { ...chance, ...change } },
+		snapshot,
+		{ binary: "/nonexistent/traj", env: {} },
+		[],
+	)
+	return { status: response.status, answer: pathAnswer.parse(await response.json()) }
 }

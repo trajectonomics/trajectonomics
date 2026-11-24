@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { FuturesPage } from "../../lib/view/chance/futures"
+import type { FuturesPage } from "../../lib/view/chance/futures-page"
 
 interface Props {
 	shown: FuturesPage

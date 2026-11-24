@@ -12,6 +12,7 @@ import {
 	PLAN,
 	post,
 	setupAssumptions,
+	startEditor,
 	storedPlan,
 	terminal,
 } from "./assumptions-ledger.test-support"
@@ -72,13 +73,9 @@ describe("a reread that changes only the chance inputs", () => {
 			expect(chanceRuns(ran)).toHaveLength(1)
 			expect(checksOf(ran)).toEqual(CHECK)
 			expect(ran.some((line) => line.startsWith("projection run"))).toBe(false)
-			// The five representative paths belong to the chance's run, so they are read again with it (web ADR 0020).
-			expect(pathRuns(ran).length).toBeGreaterThan(0)
-			expect(pathRuns(ran).length).toBeLessThanOrEqual(5)
-			const chanceRead = after.reads.chance[PLAN]
-			for (const read of Object.values(after.reads.paths[PLAN] ?? {})) {
-				expect(read.ok && chanceRead?.ok && sameRun(chanceRead.data, read.data)).toBe(true)
-			}
+			// A live dashboard reads no path in advance: a future is read when it is opened (web ADR 0020).
+			expect(pathRuns(ran)).toHaveLength(0)
+			expect(after.reads.paths).toEqual({})
 			expect(others(after)).toBe(others(before))
 			expect(after.params.chance).toEqual({ source: "plan", ...SECOND })
 			const read = after.reads.chance[PLAN]
@@ -110,6 +107,28 @@ describe("a reread that changes only the chance inputs", () => {
 			expect(chanceRuns(await calls(logOf()))).toHaveLength(1)
 			expect(after.params.allowances).toBeNull()
 			expect(after.params.chance).toEqual({ source: "plan", ...SECOND })
+		},
+		SLOW_MS,
+	)
+})
+
+describe("a reread of the chance inputs for the offline Snapshot", () => {
+	test(
+		"reads the five representative paths again with the chance, all of the new run",
+		async () => {
+			await startEditor(true)
+			await reread({ chance: FIRST })
+			await clearCalls(logOf())
+			const after = await reread({ chance: SECOND })
+			const ran = await calls(logOf())
+			expect(chanceRuns(ran)).toHaveLength(1)
+			expect(pathRuns(ran).length).toBeGreaterThan(0)
+			expect(pathRuns(ran).length).toBeLessThanOrEqual(5)
+			const chanceRead = after.reads.chance[PLAN]
+			for (const read of Object.values(after.reads.paths[PLAN] ?? {})) {
+				expect(read.ok && chanceRead?.ok && sameRun(chanceRead.data, read.data)).toBe(true)
+			}
+			await startEditor(false)
 		},
 		SLOW_MS,
 	)

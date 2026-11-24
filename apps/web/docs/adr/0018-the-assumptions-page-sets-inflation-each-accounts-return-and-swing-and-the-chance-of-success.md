@@ -53,4 +53,4 @@ The two assumptions that move every figure in a plan are inflation and what each
 
 ## Amendment (2026-11-24): a chance reread also reads the paths again
 
-- The chance read takes `--outcomes`, and the Snapshot reads the five representative paths of each plan, so a reread of the paths or the seed runs the path reads after the chance reads; see [ADR 0020](0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md). The chance change measured above as 1.5 s takes 3.0 to 3.6 s with them.
+- The chance read takes `--outcomes`. Only the offline Snapshot reads the five representative paths of each plan in advance (`readPaths`), so a reread of the paths or the seed in a live dashboard runs no path read, and the chance change measured above stays at about 1.5 s; see [ADR 0020](0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md). (Reading them on every reread took 3.0 to 3.6 s.)

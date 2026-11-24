@@ -26,6 +26,12 @@ export type PlanInput = {
 	 * only the Demo snapshot says false, to stay under Biome's size limit.
 	 */
 	futures?: boolean | undefined
+	/**
+	 * Whether the Snapshot also reads the five representative paths in advance, so the offline Snapshot opens them with
+	 * no server. Left out, it is false: a live dashboard reads a future when it is opened (web ADR 0020). Only the
+	 * snapshot command says true.
+	 */
+	readPaths?: boolean | undefined
 }
 
 /** The parameters once every rule has held. */
@@ -44,6 +50,8 @@ export type PlanParams = {
 	allowances: AllowancePlan | null
 	/** Whether the chance reads take `--outcomes` and the Snapshot holds the representative paths. */
 	futures: boolean
+	/** Whether the five representative paths are read in advance, for the offline Snapshot (web ADR 0020). */
+	readPaths: boolean
 }
 
 /** One code per rule the parameters can break. */
@@ -75,7 +83,15 @@ export function checkParams(
 		checkAllowances(input.allowances)
 	if (error) return { ok: false, error }
 	// checkDates has held, so both dates are set; the fallbacks below are never taken.
-	const { returnModel: _r, paths: _p, seed: _s, allowances: _a, futures: _f, ...rest } = input
+	const {
+		returnModel: _r,
+		paths: _p,
+		seed: _s,
+		allowances: _a,
+		futures: _f,
+		readPaths: _w,
+		...rest
+	} = input
 	return {
 		ok: true,
 		params: {
@@ -85,6 +101,7 @@ export function checkParams(
 			chance: chancePlanOf(input),
 			allowances: input.allowances ?? null,
 			futures: input.futures ?? true,
+			readPaths: input.readPaths ?? false,
 		},
 	}
 }

@@ -88,6 +88,17 @@ describe("the chance reads the Plan emits", () => {
 		expect(plan.chance["base"]?.argv).not.toContain("--outcomes")
 	})
 
+	test("reads the representative paths in advance only when the parameters say so, as the offline Snapshot's do", () => {
+		const plan = (readPaths: boolean | undefined) => {
+			const checked = checkParams({ ...base, ...CHANCE, scenarios: ["base"], readPaths })
+			if (!checked.ok) throw new Error(checked.error.message)
+			return planStageTwo(checked.params, stageOne("2026-10-31", ["base"]))
+		}
+		expect(plan(undefined).readPaths).toBe(false)
+		expect(plan(false).readPaths).toBe(false)
+		expect(plan(true).readPaths).toBe(true)
+	})
+
 	test("takes the Carry-in on standard input for each Scenario, as a projection run does", () => {
 		const params = checkParams({ ...base, ...CHANCE, carryIn: true, scenarios: ["base"] })
 		if (!params.ok) throw new Error(params.error.message)

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { currentSearch } from "../../client/location.svelte.js"
-import { type Future, type Order, pageOfFutures } from "../../lib/view/chance/futures"
+import type { Future } from "../../lib/view/chance/futures"
+import { type Order, pageOfFutures } from "../../lib/view/chance/futures-page"
 import { futureHref } from "../../lib/view/chance/links"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
@@ -25,9 +26,9 @@ const shown = $derived(pageOfFutures(futures, { order, onlyRanOut, page }))
 
 const columns: Column<Future>[] = [
 	{ key: "future", header: "Future", cell: link },
+	{ key: "outcome", header: "Outcome", cell: outcome },
 	{ key: "closing", header: "Closing net worth", numeric: true, cell: closing },
 	{ key: "lowest", header: "Lowest point", numeric: true, cell: lowest },
-	{ key: "outcome", header: "Outcome", cell: outcome },
 ]
 </script>
 
@@ -49,7 +50,7 @@ const columns: Column<Future>[] = [
 
 {#snippet lowest(future: Future)}
 	<Money amount={future.lowest} signed />
-	<span class="block text-xs text-muted-foreground">in the year from {future.lowestFrom}</span>
+	<span class="block text-xs text-muted-foreground">in the year starting {future.lowestStart}</span>
 {/snippet}
 
 {#snippet outcome(future: Future)}<FutureOutcome {future} />{/snippet}

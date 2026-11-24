@@ -37,7 +37,7 @@ const { ending } = $derived(header)
 			<div>
 				<dt class="text-muted-foreground">Lowest point</dt>
 				<dd>
-					<Money amount={header.lowest.amount} signed />, in the year from {header.lowest.from}
+					<Money amount={header.lowest.amount} signed />, {header.lowest.when}
 				</dd>
 			</div>
 		</dl>
