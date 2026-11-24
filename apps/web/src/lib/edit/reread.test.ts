@@ -19,3 +19,22 @@ describe("the reread body", () => {
 		expect(rereadSchema.safeParse(body).success).toBe(false)
 	})
 })
+
+describe("the reread body that reads one path", () => {
+	test("is a plan and an index, alone", () => {
+		expect(rereadSchema.safeParse({ path: { plan: "base", index: 3 } }).success).toBe(true)
+	})
+
+	test.each([
+		["with the allowance inputs", { path: { plan: "base", index: 3 }, allowances: null }],
+		[
+			"with the chance inputs",
+			{ path: { plan: "base", index: 3 }, chance: { paths: 10, seed: "0123456789abcdef" } },
+		],
+		["with a flag as the plan", { path: { plan: "--help", index: 3 } }],
+		["with an index past the CLI's limit", { path: { plan: "base", index: 10000 } }],
+		["with another field inside", { path: { plan: "base", index: 3, argv: ["x"] } }],
+	])("refuses a path %s", (_name, body) => {
+		expect(rereadSchema.safeParse(body).success).toBe(false)
+	})
+})

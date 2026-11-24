@@ -30,6 +30,7 @@ const SNAPSHOT = {
 		compare: null,
 		chance: {},
 		allowances: {},
+		paths: {},
 		documents: {},
 	},
 } as unknown as Snapshot

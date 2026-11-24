@@ -13,6 +13,7 @@ export const READ_LEAVES = [
 	"fi",
 	"projection compare",
 	"projection chance",
+	"projection path",
 	"projection allowances",
 ] as const
 
