@@ -1,4 +1,5 @@
 // Test support for contract.test.ts: one real store path per code the store raises itself.
+import type { CommandRaised } from "../command-raised"
 import type { ErrorCode } from "../errors"
 import { coreOnly } from "./core-triggers"
 import { HEAD } from "./migrations"
@@ -6,6 +7,9 @@ import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT } from "./testing"
 import type { Trigger } from "./trigger-setup"
 import { busy, corruptHome, fileHome, fullDisk, openAt, readonlyHome } from "./trigger-setup"
 import type { NewPosting, NewTransaction } from "./types"
+
+/** Codes a command maps from a store status; the store itself never raises them (ADR-0021). */
+type StatusMapped = "account_name_taken" | "scenario_name_taken" | "scenario_is_main"
 
 /** Every code the store raises itself; adding one fails typecheck until it has a trigger. */
 export type StoreRaised = Exclude<
@@ -16,8 +20,7 @@ export type StoreRaised = Exclude<
 	| "unknown_flag"
 	| "unknown_format"
 	// Commands map these from a store status; the store itself never raises them (ADR-0021).
-	| "account_name_taken"
-	| "scenario_name_taken"
+	| StatusMapped
 	| "not_found"
 	| "ledger_missing"
 	// Raised by the data directory guard, before the store looks at any path (ADR-0053).
@@ -29,10 +32,7 @@ export type StoreRaised = Exclude<
 	| "backup_unreadable"
 	// Raised by the projection commands, from the engine's own problems.
 	| "projection_refused"
-	// Raised by tx add's opening form, before the store is asked to write anything.
-	| "liability_opening_positive"
-	// Raised by tx add and tx import from the two accounts they map, before the store is asked.
-	| "same_account"
+	| CommandRaised
 >
 
 function fixture() {

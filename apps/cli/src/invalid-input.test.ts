@@ -47,8 +47,10 @@ const STATE_FIRST: Record<string, { code: string; exit: number }> = {
 
 /** A command may raise its own CLI sentence for a missing input, outside the table. */
 const OWN_SENTENCES: Record<string, string> = {
+	"account value": "Name the account to value",
 	"scenario apply": "Name a JSON document, - for stdin, or --template",
 	"scenario household": "Name a household document, - for stdin, or --none",
+	"scenario main": "Name the Scenario to mark, or use --clear",
 	"tx import": "Name a CSV file, - for stdin, or --template",
 }
 

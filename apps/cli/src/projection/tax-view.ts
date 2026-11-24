@@ -1,14 +1,17 @@
-import type { LevyReport, Scenario, SettlementPeriod } from "@trajectonomics/core/sim"
-import { ThLevyMeasureId, thLevyAssumptions } from "@trajectonomics/core/tax/th"
+import type { LevyReport, Scenario } from "@trajectonomics/core/sim"
+import { thLevyAssumptions } from "@trajectonomics/core/tax/th"
 import { z } from "zod"
 import { type AssumptionView, assumptionsField, assumptionViews } from "../tax-assumptions"
 import { dateField, moneyField, moneyOf } from "./money"
+import { breakdownOf } from "./tax-breakdown"
+import type { TaxWalkFields } from "./tax-walk-schema"
+import { taxWalkShape } from "./tax-walk-schema"
 
 /**
  * One Levy period as a Projection reports it: what the period owed, what was prepaid, and what
  * settles. Every figure is the engine's own `SettlementPeriod`; the CLI only formats it (ADR-0036).
  */
-export type TaxYearView = {
+export type TaxYearView = TaxWalkFields & {
 	levy: string
 	from: string
 	to: string
@@ -48,6 +51,7 @@ export const taxYearView: z.ZodType<TaxYearView> = z.strictObject({
 	progressiveTax: moneyField(
 		"The tax the progressive brackets gave on that income; absent when the Levy does not report it",
 	).optional(),
+	...taxWalkShape,
 	notes: z
 		.array(z.string())
 		.describe("What a reader needs to check the figure, such as the minimum tax applying."),
@@ -60,36 +64,6 @@ export const taxYearsField: z.ZodType<TaxYearView[]> = z
 	.describe(
 		"One entry per Levy settlement period: what each tax year owed, was prepaid, and settles. Empty when the Scenario holds no Levy.",
 	)
-
-type Measured = SettlementPeriod["measures"]
-
-function measureValue(measures: Measured, id: string): number | undefined {
-	return measures.find((measure) => measure.id === id)?.value
-}
-
-/**
- * The figures a tax year's reader checks by hand, read from the Levy's own Measures: the taxable
- * income and the progressive tax, and a note when the Section 48(2) minimum tax is the larger and
- * so the one charged (a reader who sees an allowance stop mattering would otherwise suspect a cap).
- */
-function breakdownOf(measures: Measured, money: (value: number) => string) {
-	const taxable = measureValue(measures, ThLevyMeasureId.NetTaxableIncome)
-	const progressive = measureValue(measures, ThLevyMeasureId.ProgressiveTax)
-	// `tax.regular` is the larger of the progressive tax and the minimum tax once its floor applies;
-	// `tax.minimum` alone is the figure before the floor, so it cannot say the minimum was charged.
-	const minimum = measureValue(measures, ThLevyMeasureId.RegularTax)
-	const applied = progressive !== undefined && minimum !== undefined && minimum > progressive
-	const notes = applied
-		? [
-				`The minimum tax applied: ${money(minimum)} on Section 40(2)–(8) income (Section 48(2)) is more than the progressive tax of ${money(progressive)}, so the extra allowances change nothing.`,
-			]
-		: []
-	return {
-		...(taxable === undefined ? {} : { taxableIncome: money(taxable) }),
-		...(progressive === undefined ? {} : { progressiveTax: money(progressive) }),
-		notes,
-	}
-}
 
 /**
  * The Projection's Levy periods in the CLI's money. `owed` is the engine's own `settlement`, which
@@ -113,7 +87,7 @@ export function taxYearsOf(
 			owed: moneyOf(currency)(period.settlement),
 			settled: period.settled,
 			partial: period.partial,
-			...breakdownOf(period.measures, moneyOf(currency)),
+			...breakdownOf(period.measures, moneyOf(currency), period.due),
 			assumptions:
 				rules === undefined ? [] : assumptionViews(thLevyAssumptions(rules, period.measures)),
 		}))

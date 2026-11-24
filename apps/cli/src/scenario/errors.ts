@@ -10,6 +10,9 @@ export function scenarioNotFound(what: string, path = "scenario"): AppError {
 	})
 }
 
+/** The most characters a Scenario's new name may have when `scenario rename` gives it (cli ADR-0071). */
+export const SCENARIO_NAME_MAX = 100
+
 /** A new name that a live Scenario already holds (ADR-0021). */
 export function scenarioNameTaken(id: string): AppError {
 	return fail("scenario_name_taken", {
@@ -37,6 +40,16 @@ export function scenarioChanged(
 		message: `The scenario changed since it was read: the write expected ${expectedHash}.`,
 		hint: stored,
 		details: { expectedHash, storedHash },
+	})
+}
+
+/** A delete of the main plan without `--force`; the hint names the command that picks another. */
+export function scenarioIsMain(scenario: { id: string; name: string }): AppError {
+	return fail("scenario_is_main", {
+		path: "scenario",
+		message: `The scenario "${scenario.name}" is the main plan and is not removed.`,
+		details: { scenarioId: scenario.id },
+		hint: `Choose another main plan with "traj scenario main <name>" or take the mark off with "traj scenario main --clear", then remove it; or remove it now with --force, which takes the main-plan mark off.`,
 	})
 }
 

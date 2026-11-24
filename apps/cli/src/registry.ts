@@ -20,6 +20,7 @@ const table = {
 	},
 	account_name_taken: { exit: 5, message: "An account with this name already exists." },
 	scenario_name_taken: { exit: 5, message: "A scenario with this name already exists." },
+	scenario_is_main: { exit: 5, message: "The scenario is the main plan." },
 	scenario_changed: { exit: 5, message: "The scenario changed since it was read." },
 	unsupported_currency: { exit: 3, message: "The currency is not supported in v1." },
 	account_archived: { exit: 3, message: "The account is archived and accepts no postings." },
@@ -30,6 +31,20 @@ const table = {
 	liability_opening_positive: {
 		exit: 3,
 		message: "A liability's opening balance is negative: enter the debt as a negative amount.",
+	},
+	valuation_account_invalid: {
+		exit: 3,
+		message:
+			"Only an asset or a liability can be valued: it has a value that moves without a transaction.",
+	},
+	valuation_value_negative: {
+		exit: 3,
+		message: "A liability's value is what it still owes, stated as a positive amount.",
+	},
+	valuation_against_invalid: {
+		exit: 3,
+		message:
+			"A valuation is posted against an income or equity account in the valued account's currency.",
 	},
 	external_ref_conflict: {
 		exit: 5,

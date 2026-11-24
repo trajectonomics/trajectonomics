@@ -2,6 +2,7 @@ import { isAppError } from "./errors"
 import { CHANCE_SETUP } from "./help-examples-chance"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { RUN_SETUP } from "./help-examples-run"
+import { ACCOUNT_SETUPS } from "./help-examples-value"
 import { VOLATILE_PLAN } from "./projection/plan-model-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
 import { toDecimalForm } from "./scenario/decimal"
@@ -32,10 +33,7 @@ export const DEFAULT_SETUP: Setup = { ledger: "projection" }
 
 /** Setup by leaf path, as the usage prints it (`tx add`). A leaf not listed uses DEFAULT_SETUP. */
 export const SETUP: Record<string, Setup> = {
-	"account add": {
-		ledger: "empty",
-		steps: [["account", "add", "Bank", "--type", "asset", "--currency", "THB"]],
-	},
+	...ACCOUNT_SETUPS,
 	init: { ledger: "none" },
 	// The Thai Levy on the base plan's salary, so there is a tax year to fill (cli ADR-0061).
 	"projection allowances": {
@@ -59,7 +57,14 @@ export const SETUP: Record<string, Setup> = {
 	// The car loan, the spending rule and the estate the `--liabilities`, `--spending` and `--estate` examples read, stored beside the projection fixture.
 	"projection run": RUN_SETUP,
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
-	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },
+	// The main plan is refused by `rm` until it is forced (cli ADR-0071).
+	"scenario rm": {
+		steps: [
+			["scenario", "fork", "base", "early"],
+			["scenario", "main", "base"],
+		],
+	},
+	"scenario rename": { steps: [["scenario", "fork", "base", "early"]] },
 	"data remove": { steps: [["backup", "--out", "backup"]] },
 	// A restore needs an empty data directory, so the leaf backs up, then removes the data first.
 	restore: {
@@ -67,6 +72,10 @@ export const SETUP: Record<string, Setup> = {
 			["backup", "--out", "backup"],
 			["data", "remove", "--confirm", "~/.traj", "--backup", "backup"],
 		],
+	},
+	"scenario notes": {
+		steps: [["scenario", "fork", "base", "early"]],
+		files: { "notes.txt": "Retire at 55.\nSell the condo in 2031.\n" },
 	},
 	"scenario household": { files: { "household.json": JSON.stringify(BASE_HOUSEHOLD) } },
 	"scenario apply": {
@@ -114,4 +123,5 @@ export const STDIN: Record<string, string> = {
  */
 export const EXPECTED_EXIT: Record<string, number> = {
 	"traj data remove": 2,
+	"traj scenario rm base": 5,
 }

@@ -178,6 +178,14 @@ _Avoid_: Investment expense, savings
 The people a Scenario's plan belongs to, stored beside its document: one holder, at most one partner and any dependents, each with a birth month and a life expectancy. It never changes the document's own fields; its Anchors do (ADR-0048).
 _Avoid_: Profile, family
 
+**Notes**:
+Plain text a person keeps on a Scenario in `scenario.notes`: what the plan assumes and why it exists. They are outside the document and its `contentHash`, so writing them never changes what a projection reads or what `--if-hash` compares; `fork` copies them unless `--no-notes` (ADR-0071).
+_Avoid_: Description, comment, memo (a `tx` has a memo)
+
+**Main plan**:
+The one live Scenario a person marks as their real plan with `scenario main`, stored as `scenario.main` on its row. It is a label for people, agents and the Dashboard, not a default: every read still names its plan with `--scenario` (ADR-0071).
+_Avoid_: Default plan, active plan, current Scenario, baseline (the Baseline is the ledger's own starting figures)
+
 **Anchor**:
 A household's pin of one Scenario date field to a person's age, to their life's end or to a partner's join month. The date is written into the Scenario when the household is set; a later apply or fork keeps it, fills it, or refuses a value that disagrees (ADR-0048).
 _Avoid_: Link, binding, age field
@@ -251,6 +259,10 @@ _Avoid_: Category, tag, tax code
 **Tax year**:
 One period of a Tax Levy and its Settlement: what it owed, what was prepaid, and what settles. A result reports one row per Tax year, a year that began before the As-of included.
 _Avoid_: Tax period, fiscal year, assessment year
+
+**Bracket walk**:
+What a Tax year of an emitted Thai Levy states beside its figures (ADR-0036): the `walk` from assessable to taxable income, the `brackets` with the income and tax inside each, `marginalRateBps`, `toNextBracket` and `effectiveRateBps`, all from `thBracketWalk` and `thEffectiveRateBps` in the tax core. Its marginal rate is the rate of the bracket the last satang of taxable income falls in, so an income exactly on a bracket's upper edge is in the bracket the edge closes, with `toNextBracket` of `0.00`. This differs from the tax core's Tax Result, whose marginal rate is the rate of the next unit and so is the next bracket's rate on an edge. The effective rate is on assessable income.
+_Avoid_: Tax bracket table, marginal tax, tax slab
 
 **Prepayment**:
 Money already taken at source against a Tax year, such as payroll withholding. It reduces what the year owes at its Settlement but is not an expense.

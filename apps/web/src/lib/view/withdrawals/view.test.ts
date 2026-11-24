@@ -88,11 +88,11 @@ describe("in good and bad markets", () => {
 	test("the lowest year is labelled by level in plain words and says how many paths it counts", () => {
 		expect(bands?.counted).toBe(200)
 		expect(bands?.lowest.map((one) => [one.level, one.words, one.amount])).toEqual([
-			[10, "Worst 1 in 10 paths", "835913.64"],
-			[25, "Worst 1 in 4 paths", "882584.51"],
-			[50, "Middle path", "963414.26"],
-			[75, "Best 1 in 4 paths", "1024160.36"],
-			[90, "Best 1 in 10 paths", "1090453.31"],
+			[10, "Worst 1 in 10 paths", "834762.68"],
+			[25, "Worst 1 in 4 paths", "881429.72"],
+			[50, "Middle path", "961981.80"],
+			[75, "Best 1 in 4 paths", "1022563.40"],
+			[90, "Best 1 in 10 paths", "1088708.88"],
 		])
 	})
 

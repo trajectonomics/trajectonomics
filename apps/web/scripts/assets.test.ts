@@ -1,7 +1,7 @@
 // A home bought next year with a loan, kept, let and sold, against the real traj: its value comes back from the
 // `balances` table, an edit to the running-cost share changes what the plan pays, and deleting it leaves the plan as
 // it was (cli ADR 0060). The document is the one the form writes.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { balancesOf } from "../src/lib/view/plan-items/asset-chart"
 import { assetDocument, realAssetById } from "../src/lib/view/plan-items/asset-document"
 import { homeDraft } from "../src/lib/view/plan-items/asset-fixtures.test-support"
@@ -16,11 +16,13 @@ import {
 	save,
 	setupLedger,
 } from "./loans-ledger.test-support"
+import { settle } from "./loans-running.test-support"
 
 const PLAN = "home-plan"
 const EDIT = { isNew: false, ownedIds: [] }
 
 beforeAll(() => setupLedger([PLAN]), SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeLedger)
 
 /** The cash flow line of an item in the first year of a run, as the CLI states it. */

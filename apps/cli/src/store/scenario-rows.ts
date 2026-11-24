@@ -3,20 +3,13 @@ import { scenarioDocumentError } from "../scenario/document"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
 import { taxLevyIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
-import { SCENARIO_COLUMNS } from "./columns"
 import type { Ctx } from "./context"
 import { abort, guard } from "./guard"
 import { iso, newId } from "./ids"
+import { liveScenario } from "./scenario-read"
 import type { ScenarioRow } from "./types"
 
-export function liveScenario(ctx: Ctx, column: "id" | "name", value: string): ScenarioRow | null {
-	return ctx.db
-		.query<ScenarioRow, [string, string]>(
-			`SELECT ${SCENARIO_COLUMNS} FROM scenario
-			WHERE entity_id = ?1 AND ${column} = ?2 AND deleted_at IS NULL`,
-		)
-		.get(ctx.entityId, value)
-}
+export { liveScenario }
 
 /**
  * The document as canonical text. `sim-core`'s `check()` decides whether it is a Scenario
@@ -72,6 +65,7 @@ export type ScenarioDraft = {
 	forkedFrom: string | null
 	household: string | null
 	tax: string | null
+	notes: string | null
 }
 
 export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
@@ -79,7 +73,8 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 	const id = newId(at)
 	ctx.db.run(
 		`INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, household,
-		tax, version, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 1, ?9, ?9)`,
+		tax, notes, version, created_at, updated_at)
+		VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 1, ?10, ?10)`,
 		[
 			id,
 			ctx.entityId,
@@ -89,6 +84,7 @@ export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 			draft.forkedFrom,
 			draft.household,
 			draft.tax,
+			draft.notes,
 			iso(at),
 		],
 	)

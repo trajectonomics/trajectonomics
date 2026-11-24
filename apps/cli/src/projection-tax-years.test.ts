@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import { carryInFile, taxedHome, thRecord } from "./projection/carry-in-support"
 import type { CompareView } from "./projection/compare-view"
-import { errorOf, projection, projectionHome } from "./projection/testing"
+import type { FiView } from "./projection/fi-view"
+import { errorOf, fi, projection, projectionHome } from "./projection/testing"
 import { runBody } from "./projection-run-support"
 import { applyScenario, scenario } from "./scenario-test-support"
 import { capture } from "./test-support"
@@ -56,6 +57,33 @@ describe("the tax a Projection says is owed", () => {
 			partial: false,
 			taxableIncome: "560000.00",
 			progressiveTax: "36500.00",
+			// 720,000 assessable less 100,000 of expenses and 60,000 of allowances is 560,000: 0 + 7,500
+			// + 20,000 + 9,000 over the first four brackets; 36,500 / 720,000 is 5.069%, so 506 bps.
+			walk: {
+				assessable: "720000.00",
+				expenses: "100000.00",
+				allowances: "60000.00",
+				taxableIncome: "560000.00",
+			},
+			brackets: [
+				{ from: "0.00", upTo: "150000.00", rateBps: 0, income: "150000.00", tax: "0.00" },
+				{ from: "150000.00", upTo: "300000.00", rateBps: 500, income: "150000.00", tax: "7500.00" },
+				{
+					from: "300000.00",
+					upTo: "500000.00",
+					rateBps: 1000,
+					income: "200000.00",
+					tax: "20000.00",
+				},
+				{ from: "500000.00", upTo: "750000.00", rateBps: 1500, income: "60000.00", tax: "9000.00" },
+				{ from: "750000.00", upTo: "1000000.00", rateBps: 2000, income: "0.00", tax: "0.00" },
+				{ from: "1000000.00", upTo: "2000000.00", rateBps: 2500, income: "0.00", tax: "0.00" },
+				{ from: "2000000.00", upTo: "5000000.00", rateBps: 3000, income: "0.00", tax: "0.00" },
+				{ from: "5000000.00", upTo: null, rateBps: 3500, income: "0.00", tax: "0.00" },
+			],
+			marginalRateBps: 1500,
+			toNextBracket: "190000.00",
+			effectiveRateBps: 506,
 			notes: [],
 			assumptions: [],
 		})
@@ -123,6 +151,23 @@ describe("the tax a Projection says is owed", () => {
 		expect(body.tax).toBe("mixed")
 		expect(body.sides.a.taxYears).toHaveLength(3)
 		expect(body.sides.b.taxYears).toEqual([])
+		// The walk and the rates are stated per side, as they are by `projection run`.
+		expect(body.sides.a.taxYears[1]).toMatchObject({
+			walk: { assessable: "720000.00", taxableIncome: "560000.00" },
+			marginalRateBps: 1500,
+			toNextBracket: "190000.00",
+			effectiveRateBps: 506,
+		})
+	})
+
+	it("states the same walk and brackets in `fi`", async () => {
+		const home = await taxedHome()
+		const res = await fi(home, ["--scenario", "base", ...YEAR_FLAGS])
+		expect(res.code).toBe(0)
+		const body = JSON.parse(res.out) as FiView
+		expect(body.taxYears[0]).toHaveProperty("walk")
+		expect(body.taxYears[0]).toHaveProperty("brackets")
+		expect(body.taxYears[0]?.brackets).toHaveLength(8)
 	})
 
 	it("prints the tax years as a table in the human format", async () => {

@@ -14,6 +14,10 @@ export const scenarioList = z.strictObject({
 			updatedAt: z.string(),
 			/** True when the document holds a tax Levy (cli ADR-0066); absent in a Snapshot saved before it. */
 			taxed: z.boolean().optional(),
+			/** True when the plan has notes (cli ADR-0071); absent in a Snapshot saved before it. */
+			hasNotes: z.boolean().optional(),
+			/** True for the ledger's main plan, a label and not a default (cli ADR-0071); absent in an older Snapshot. */
+			main: z.boolean().optional(),
 		}),
 	),
 })

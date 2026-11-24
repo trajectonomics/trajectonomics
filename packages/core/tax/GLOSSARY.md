@@ -36,6 +36,10 @@ _Avoid_: Hard validation limit, maximum input
 The standardized output envelope produced by any Tax System, containing top-level summary figures (gross income, total deductions, taxable income, total tax, net tax payable or refund, effective rate, marginal rate, currency) and a jurisdiction-specific Breakdown.
 _Avoid_: Tax response, calculation summary
 
+**Bracket Walk**:
+Where a Thai net taxable income sits in the Section 48(1) schedule (`thBracketWalk`): one slice per bracket with the income inside it and its tax, the marginal rate and the income left before the next bracket. Its marginal rate is the rate of the bracket the last satang of the income falls in, so an income exactly on a bracket's upper edge is in the bracket the edge closes, with nothing left. This differs from the marginal rate of a Tax Result, which is the rate of the next unit (income plus one) and so is the next bracket's rate on an edge.
+_Avoid_: Marginal rate, bracket evaluation
+
 **Breakdown**:
 The itemized audit trail inside a Tax Result showing requested versus allowed deductions, bracket-by-bracket slices, special regime computations, and credits.
 _Avoid_: Debug log, trace

@@ -13,11 +13,13 @@ import { restore } from "./restore"
 import { deleteScenario } from "./scenario-delete"
 import { forkScenario } from "./scenario-fork"
 import { replaceHousehold } from "./scenario-household"
+import { renameScenario, setMainScenario, setScenarioNotes } from "./scenario-meta"
 import { replaceTax } from "./scenario-tax"
 import { getScenario, listScenarios, saveScenario } from "./scenarios"
 import { addTransaction } from "./transactions"
 import { amendTransaction } from "./tx-amend"
 import { importTransactions } from "./tx-import"
+import { writePlanned } from "./tx-planned"
 import { getTransaction, listPostings, listTransactions } from "./tx-reads"
 import { voidTransaction } from "./tx-void"
 import type { Store } from "./types"
@@ -40,6 +42,7 @@ export function storeOver(path: string, ctx: Ctx, upgradedFrom?: PreMigrationCop
 		deleteAccount: (id) => deleteAccount(ctx, id),
 		addTransaction: (input, options) => addTransaction(ctx, input, options),
 		importTransactions: (inputs, options) => importTransactions(ctx, inputs, options),
+		writePlanned: (plan, options) => writePlanned(ctx, plan, options),
 		voidTransaction: (id, input, options) => voidTransaction(ctx, id, input, options),
 		amendTransaction: (id, input, options) => amendTransaction(ctx, id, input, options),
 		listTransactions: (options) => listTransactions(ctx, options),
@@ -49,6 +52,9 @@ export function storeOver(path: string, ctx: Ctx, upgradedFrom?: PreMigrationCop
 		forkScenario: (id, name, options) => forkScenario(ctx, id, name, options),
 		replaceHousehold: (id, plan, options) => replaceHousehold(ctx, id, plan, options),
 		replaceTax: (id, plan, options) => replaceTax(ctx, id, plan, options),
+		renameScenario: (id, name, options) => renameScenario(ctx, id, name, options),
+		setScenarioNotes: (id, notes, options) => setScenarioNotes(ctx, id, notes, options),
+		setMainScenario: (id, options) => setMainScenario(ctx, id, options),
 		deleteScenario: (id, options) => deleteScenario(ctx, id, options),
 		getScenario: (idOrName) => getScenario(ctx, idOrName),
 		listScenarios: (options) => listScenarios(ctx, options),

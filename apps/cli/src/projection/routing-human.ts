@@ -2,7 +2,8 @@ import { isRecord, tableLines } from "../table/lines"
 
 /*
  * The human view of the `routing` echo (cli ADR-0070): one table of the entries, each by its position, read from
- * the echo the JSON states, so the text names no figure the echo does not carry.
+ * the echo the JSON states, so the text names no figure the echo does not carry. A grown target also reads what the
+ * engine says it is worth at the horizon (`resolved`); its first-day figure is the amount the line already states.
  */
 
 const COLUMNS = [
@@ -13,14 +14,19 @@ const COLUMNS = [
 	{ key: "target", label: "target" },
 ] as const
 
-/** A target as a person reads it: `up to 20000.00 at the start, grown by inflation`. */
-function targetText(prefix: string, value: unknown): string {
+/** What the engine says a grown target is worth at the horizon: `: 20600.00 at the horizon`. */
+function resolvedText(resolved: unknown): string {
+	return isRecord(resolved) ? `: ${String(resolved["horizon"])} at the horizon` : ""
+}
+
+/** A target as a person reads it: `up to 20000.00 at the start, grown by inflation: 20600.00 at the horizon`. */
+function targetText(prefix: string, value: unknown, resolved: unknown): string {
 	if (!isRecord(value)) return ""
 	const growth = value["growth"]
 	const amount = `${prefix} ${String(value["amount"])}`
 	if (growth === null || growth === undefined) return amount
 	const by = isRecord(growth) ? `${String(growth["bps"])} bps a year` : String(growth)
-	return `${amount} at the start, grown by ${by}`
+	return `${amount} at the start, grown by ${by}${resolvedText(resolved)}`
 }
 
 function rowsOf(list: string, entries: unknown, key: "upTo" | "downTo", prefix: string) {
@@ -30,7 +36,7 @@ function rowsOf(list: string, entries: unknown, key: "upTo" | "downTo", prefix: 
 		entry: entry["entry"],
 		account: entry["account"],
 		share: typeof entry["share"] === "string" ? `${entry["share"]}%` : "",
-		target: targetText(prefix, entry[key]),
+		target: targetText(prefix, entry[key], entry["resolved"]),
 	}))
 }
 
