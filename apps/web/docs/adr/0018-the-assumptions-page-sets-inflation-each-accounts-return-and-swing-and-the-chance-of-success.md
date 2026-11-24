@@ -50,3 +50,7 @@ The two assumptions that move every figure in a plan are inflation and what each
 - A change in the CLI's output fails `src/lib/contract/` and `scripts/contract.test.ts` as before; the chance read's `returnModel` echo is decoded by the contract (cli ADR 0068).
 - `scripts/assumptions.test.ts` sets inflation, a return and a volatility on two Accounts in one Edit and reads the Chance page's share and Bands from the plan's model, tries a lower volatility in a what-if (the stored plan is unchanged), adds a volatility to an Account that has none by a what-if, and checks a refusal at its row and a stale save, all against the real binary; `scripts/assumptions-reread.test.ts` pins the partial reread.
 - A `traj` older than `--return-model plan` refuses the chance read, which the page shows as the read's own error; the CLI the Dashboard ships with has it.
+
+## Amendment (2026-11-24): a chance reread also reads the paths again
+
+- The chance read takes `--outcomes`. Only the offline Snapshot reads the five representative paths of each plan in advance (`readPaths`), so a reread of the paths or the seed in a live dashboard runs no path read, and the chance change measured above stays at about 1.5 s; see [ADR 0020](0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md). (Reading them on every reread took 3.0 to 3.6 s.)

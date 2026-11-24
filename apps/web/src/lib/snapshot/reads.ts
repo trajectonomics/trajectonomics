@@ -19,6 +19,7 @@ export function readsOf(document: Snapshot): Read<unknown>[] {
 		...Object.values(reads.fi),
 		...Object.values(reads.chance),
 		...Object.values(reads.allowances),
+		...Object.values(reads.paths).flatMap((byIndex) => Object.values(byIndex)),
 	]
 	const compare = reads.compare === null ? [] : [reads.compare]
 	return [...single, ...reads.netWorthHistory, ...maps, ...compare]

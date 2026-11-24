@@ -18,6 +18,8 @@ export const PARAMS: PlanParams = {
 	carryIn: false,
 	chance: null,
 	allowances: null,
+	futures: true,
+	readPaths: false,
 }
 
 /** Headers of a request the page sends: this Host, this Origin, the token, and application/json. */
