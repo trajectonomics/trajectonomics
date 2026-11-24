@@ -107,7 +107,7 @@ A label on an income Flow, on a contribution Flow, or on an asset Account (`retu
 _Avoid_: Category, tag, tax category
 
 **Returns tally**:
-The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. It is signed, and attributed from read-only valuations so it never changes a balance.
+The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. Net of its fee (ADR 0028). It is signed, and attributed from read-only valuations so it never changes a balance.
 _Avoid_: Interest income, investment income
 
 **Realised gain**:
@@ -182,7 +182,7 @@ A Contribution with `funding: "employer"` into a liquid asset Account: money the
 _Avoid_: match, employer match, free money
 
 **Account fee**:
-A yearly share of an asset Account's value charged to it every month, stated as `fee` on the Account (`bps` a year, a required `rounding`). On the last day of each calendar month (a Due date, shifted to a Landed date by the Calendar) `value x bps / 120000` leaves the Account, where `value` is the valuation read before the date's Flows land, Accrued interest included. It is read first and taken last on the date, never more than the Account holds, and it goes nowhere: it is no expense and no income, is in no cashflow, causes no Shortfall, takes no Cost basis and is on every Market path, because a Return series replaces the rate and not the fee. A locked and an Illiquid Account are charged; a liability may not carry one (`LIABILITY_MISUSE`). The Annual roll-up reports `fees` and `accountFees`, and `interest` is the growth before the fee. A fee of 0 bps is no fee.
+A yearly share of an asset Account's value charged to it every month, stated as `fee` on the Account (`bps` a year, a required `rounding`). On the last day of each calendar month (a Due date, shifted to a Landed date by the Calendar) `value x bps / 120000` leaves the Account, where `value` is the valuation read before the date's Flows land, Accrued interest included. It is read first and taken last on the date, never more than the Account holds, and it goes nowhere: it is no expense and no income, is in no cashflow, causes no Shortfall, takes no Cost basis, is no Milestone evaluation date, is counted net under `returnLabel`, and is on every Market path, because a Return series replaces the rate and not the fee. A locked and an Illiquid Account are charged; a liability may not carry one (`LIABILITY_MISUSE`). The Annual roll-up reports `fees` and `accountFees`, and `interest` is the growth before the fee. A fee of 0 bps is no fee. A declared Flow may not take the id `fee:<account>` beside a fee above 0 bps.
 _Avoid_: expense ratio, TER, management fee
 
 **Payout**:

@@ -56,12 +56,23 @@ export function rebaseReturns(state: AccountState, date: DateString): void {
 	ledger.base = valuation(state, date)
 }
 
-/** Splits a commit's growth at every period end it crosses, then attributes the rest. */
-export function commitReturns(state: AccountState, tracker: LevyTracker, date: DateString): void {
+/**
+ * Splits a commit's growth at every period end it crosses, then attributes the rest. A `fee` the commit
+ * takes from the Account is taken from the return too: a fund's fee leaves its value, so the holder's
+ * return is net of it (ADR 0028).
+ */
+export function commitReturns(
+	state: AccountState,
+	tracker: LevyTracker,
+	date: DateString,
+	fee = 0n,
+): void {
 	const ledger = state.returns
 	if (ledger === undefined) return
 	attributeThrough(state, tracker, ledger, date)
 	ledger.attributed.set(tracker.levy.id, 0n)
+	const tally = tracker.tallies[settlementPeriodIndexAt(tracker.periods, date)]
+	if (fee > 0n && tally !== undefined) addTo(tally.returns, ledger.label, -fee)
 }
 
 /**

@@ -11,7 +11,7 @@ import { oracleAddMonthsClamped } from "./oracle-date"
 const MONTHLY = { frequency: "monthly", start: "2026-01-01" } as const
 
 /**
- * Salary 1,000,000 a month, living 600,000, a fund of 120,000,000 at 0% that the cashflow draws on, and
+ * Salary 1,000,000 a month, living 600,000, a fund of 50,000,000 at 0% that the cashflow draws on, and
  * cash at 0. FI is the first month a stop of the salary still leaves money that lasts to 2034-01-01.
  */
 function plan(account: AssetRule): Fixture {

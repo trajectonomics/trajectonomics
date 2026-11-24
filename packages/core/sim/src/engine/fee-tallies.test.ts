@@ -43,8 +43,28 @@ describe("a fee and the other Tallies", () => {
 		expect(gain({ id: "fund", kind: "asset", rate: 0, gainLabel: "gain" })).toBe(50_000_000)
 	})
 
-	it("counts growth under returnLabel, never the fee as a loss: 0 at a rate of 0", () => {
+	it("counts growth under returnLabel net of the fee: 0 at a rate of 0, minus the fees", () => {
+		// A fund of 1,000,000,000 at 0% grows by nothing and pays 14,897,305 in twelve fees at halfUp, so
+		// the year's return, growth less the fee, is -14,897,305.
 		const setup = chargingSetup([fund({}, { returnLabel: "growth" })], { levy: tax })
+		expect(measure("growth", periodFrom(projected(setup), "2026-01-01").measures)).toBe(-14_897_305)
+	})
+
+	it("counts growth less the fee in one month: 9,863,014 - 1,262,329 = 8,600,685", () => {
+		// 1,000,000,000 at 1,200 bps nominal grows 9,863,014 to 31 Jan and the fee reads that value:
+		// 1,009,863,014 / 800 = 1,262,329. The return is 9,863,014 - 1,262,329 = 8,600,685.
+		const nominal = { rate: 1200, compounding: "annual" } as const
+		const setup = chargingSetup([fund({}, { ...nominal, returnLabel: "growth" })], {
+			levy: tax,
+			horizon: "2026-01-31",
+		})
+		expect(measure("growth", periodFrom(projected(setup), "2026-01-01").measures)).toBe(8_600_685)
+	})
+
+	it("counts no fee under returnLabel when there is none: the Account's growth alone", () => {
+		const setup = chargingSetup([{ id: "fund", kind: "asset", rate: 0, returnLabel: "growth" }], {
+			levy: tax,
+		})
 		expect(measure("growth", periodFrom(projected(setup), "2026-01-01").measures)).toBe(0)
 	})
 })

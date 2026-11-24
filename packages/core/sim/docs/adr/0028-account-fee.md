@@ -31,9 +31,19 @@ measured. This ADR adds `fee` to an asset Account (#408), an optional additive f
   Account then holds, so a sale or payout of the whole Account on a month end leaves nothing to charge, and
   nothing a fee does can overdraw an Account or fail a withdrawal that was met.
 - **Distribution.** Like a payout it takes no Cost basis and realises no gain, so a later sale realises
-  against the whole basis. The Account's growth is attributed to its Returns tally up to the date and the
-  base resets to the value after, so `returnLabel` counts growth gross of the fee: a fee is never a
-  negative return, and no Levy deducts it.
+  against the whole basis. No Levy deducts it.
+- **`returnLabel` counts growth net of the fee.** A fund's fee is taken from its value, so the holder's
+  return is net of it, as Cost basis already makes `gainLabel` net within the same Account. The Returns
+  tally books the Account's growth up to the date, as before, and then takes the fee off, in the period
+  that holds the date: an Account's return under `returnLabel` is its growth less its fee for the period,
+  exact BigInt with no further rounding (the fee is already rounded). A year at a rate of 0 reads
+  -14,897,305 in the 1,000,000,000 case, and a month of 9,863,014 growth and a fee of 1,262,329 reads
+  8,600,685. Three facts decide it: a bank's interest has no share-of-value fee, so nothing else carries
+  this; a fund's gains are exempt for an individual, so nothing is taxed on them either way; and a
+  distribution is taxed through the payout `label` (ADR 0027), which is already net of the fee.
+- **A fee marker's id.** `fee:<account>` is the id of its marker, as `payout:<account>` is a payout's, so a
+  declared Flow with that id beside a fee above 0 bps is `DUPLICATE_ID` (at the Flow's `id`). A fee of 0 bps
+  reserves nothing.
 - **Locked and Illiquid.** Both are charged (a locked fund's fee is paid, and nothing forbids a fee on a home).
   A liability may not carry `fee` (`LIABILITY_MISUSE` at `fee`).
 - **A fee of 0 bps is no fee.** The Projection is byte for byte the one without it, with no `fees` field, and
@@ -50,9 +60,11 @@ replaces the rate, does not replace it. The engine adds, per Scenario and span, 
 Account on each month end (`feeEvents`): an income Flow of 0 that lives in no Scenario's `flows`, so no list
 of Flows shows it and it lands nothing. Because it is an event, everything that walks events reaches the
 date: `project`, every Market path of `chanceOfSuccess`, the Milestone gate, and each FI candidate's walk,
-which reads and charges its own Account. Two details follow: a fee date is an event date, so a Milestone
-that fires on an evaluation date is evaluated there too; and the estate statement (ADR 0025) reads the
-rows, so it states the Account after its fees and is unchanged in how it works.
+which reads and charges its own Account. Two details follow. **A marker is never an evaluation date**: a
+Milestone is evaluated on a Flow's recurrences and a Settlement's dates only (ADR 0012), so the gate
+ignores a marker when it asks whether a date is one, and a fee, charging or not, moves no fire date and no
+Flow gated on one. And the estate statement (ADR 0025) reads the rows, so it states the Account after its
+fees and is unchanged in how it works.
 
 ## Reported
 
@@ -90,3 +102,12 @@ rows, so it states the Account after its fees and is unchanged in how it works.
 - `src/golden/oracle-fee.ts` is an independent day-by-day walk that imports nothing from the engine;
   `fee-oracle.test.ts` agrees with it for every rounding at four rates and four fees across a leap year.
 - The schema, documents and outputs of the CLI are #409.
+- A marker costs the extra dates it makes the engine process (a month end that no Flow lands on). Measured
+  on 2026-11-24, median of 5 runs, with 150 bps on one Account (no fee, then fee), over two runs on a
+  shared machine: `freelancer-chance` 54 then 48 ms, 50 then 51 ms; `freelancer-fi` 104 then 143 ms, 138
+  then 162 ms; `thai-employee-fi-buffer` 267 then 335 ms, 413 then 440 ms. A fee on a long FI walk costs
+  about a third to a half more; one on a Return series run, little. No Account without a fee pays it.
+- `returnLabel` is net of the fee, tested by hand in `src/engine/fee-tallies.test.ts`; no existing Scenario
+  has a fee, so no existing parity hash changes.
+- A marker is no evaluation date: `src/milestone/fee-gate.test.ts` (cash 1,000, salary 1,000 on each 1st,
+  net worth at least 3,500, and an empty Account that charges a fee of 0: 1 Apr 2026, as with no fee).

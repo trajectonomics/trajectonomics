@@ -64,7 +64,7 @@ export function applyFees(
 		const held = valuation(state, date)
 		const taken = minBigInt(amount, held)
 		if (taken === 0n) continue
-		const problem = mutate(state, date, -taken, levies, true)
+		const problem = mutate(state, date, -taken, levies, "fee")
 		if (problem !== undefined) return { total, by, problem }
 		by.set(account, taken)
 		total += taken

@@ -21,3 +21,8 @@ export function chargingAccountId(account: unknown): string | undefined {
 		? account["id"]
 		: undefined
 }
+
+/** The Flow id an Account's fee marker takes, so no declared Flow may carry it (ADR 0028). */
+export function feeFlowId(account: string): string {
+	return `fee:${account}`
+}

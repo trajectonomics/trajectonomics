@@ -48,4 +48,21 @@ describe("an Account's fee", () => {
 	it("refuses a fee on a liability: LIABILITY_MISUSE", () => {
 		expect(codes({ kind: "liability", fee })).toEqual(["LIABILITY_MISUSE accounts/1/fee"])
 	})
+
+	it("takes the Flow id fee:<account>, so a declared Flow with it is a duplicate", () => {
+		const flow = {
+			id: "fee:fund",
+			kind: "expense",
+			frequency: "once",
+			start: "2026-02-01",
+			amount: 1,
+			growth: { bps: 0 },
+		}
+		expect(codes({ fee }, { flows: [flow] })).toEqual(["DUPLICATE_ID flows/0/id"])
+		expect(codes({}, { flows: [flow] })).toEqual([])
+		// A fee of 0 bps is no fee (ADR 0028), so it takes no id.
+		expect(codes({ fee: { ...fee, bps: 0 } }, { flows: [flow] })).toEqual([])
+		// The id is the Account's own: another Account's fee does not take it.
+		expect(codes({ fee }, { flows: [{ ...flow, id: "fee:cash" }] })).toEqual([])
+	})
 })
