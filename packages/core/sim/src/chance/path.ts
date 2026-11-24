@@ -1,12 +1,10 @@
-import { declaresEmployer } from "../engine/employer"
 import type { Returns } from "../engine/returns"
 import { runEngine } from "../engine/run"
-import { declaresWithdrawals } from "../loan/resolve"
+import { declaredBy } from "../output/declared"
 import { openingNetWorth } from "../output/opening"
 import { buildPeriods, type Period } from "../output/periods"
 import { buildRollups } from "../output/rollups"
 import { accountRules } from "../output/rules"
-import { declaresPayouts } from "../payout/flows"
 import type { Baseline, DateString, MinorUnits, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import { rollupGrid, rollupObservations } from "./grid"
@@ -65,14 +63,7 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	if (!result.ok) return { ok: false, problem: result.problem }
 	const runsOut = result.run.runsOut
 	const periods = buildPeriods(timeline.start, runsOut?.date ?? timeline.horizon, runsOut?.date)
-	const rollups = buildRollups(
-		result.run,
-		periods,
-		inputs.opening,
-		declaresWithdrawals(inputs.scenario),
-		declaresEmployer(inputs.scenario),
-		declaresPayouts(inputs.scenario),
-	)
+	const rollups = buildRollups(result.run, periods, inputs.opening, declaredBy(inputs.scenario))
 	if (rollups.problem !== undefined) return { ok: false, problem: rollups.problem }
 	const annual = rollups.annual!
 	const last = annual[annual.length - 1]!

@@ -1,4 +1,5 @@
 import type { ResolvedCalendar } from "../calendar/business"
+import { feeEvents } from "../fee/flows"
 import { resolveLoan } from "../loan/resolve"
 import { movedOnceStarts } from "../milestone/spec"
 import type { DateString, Flow, Scenario, Timeline } from "../types"
@@ -64,6 +65,7 @@ function eventsOf(
 			)
 		}
 	}
+	events.push(...feeEvents(scenario, timeline, calendar))
 	events.sort((left, right) =>
 		left.date === right.date
 			? compareIds(left.flow.id, right.flow.id)

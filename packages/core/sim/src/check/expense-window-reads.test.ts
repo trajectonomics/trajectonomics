@@ -113,6 +113,27 @@ describe("a next-12-months expense Milestone beside a Derived amount that reads 
 		expect(withPayout(100)).toEqual(["NEXT_12_MONTHS_READS_ACCOUNT"])
 	})
 
+	it("accepts an Account whose fee is 0 bps, which is no fee (ADR 0028), and refuses one that charges", () => {
+		const withFee = (bps: number) =>
+			check(
+				baseline,
+				{
+					schemaVersion: 4,
+					currency: "THB",
+					economy: { inflation: 0 },
+					accounts: accounts.map((account) =>
+						account.id === "home" ? { ...account, fee: { bps, rounding: "floor" } } : account,
+					),
+					flows: [living, upkeepOf("home")],
+					milestones: [metric],
+					cashflow,
+				},
+				timeline,
+			).map((item) => item.code)
+		expect(withFee(0)).toEqual([])
+		expect(withFee(150)).toEqual(["NEXT_12_MONTHS_READS_ACCOUNT"])
+	})
+
 	describe("is refused when the Account can change on a future date", () => {
 		const refused = ["NEXT_12_MONTHS_READS_ACCOUNT"]
 		const buy = { id: "home-purchase", kind: "contribution", target: "home", ...once }

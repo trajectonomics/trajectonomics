@@ -25,6 +25,17 @@ export interface Payout {
 	readonly prepayments?: readonly Prepayment[]
 }
 
+/**
+ * A yearly share of an asset's value charged to it every calendar month, and paid to nobody (ADR 0028).
+ * It is no expense of the household: it never enters cashflow, and it is charged on every path.
+ */
+export interface Fee {
+	/** The yearly share of value, 0 to 10000 bps; 0 is no fee. */
+	readonly bps: BasisPoints
+	/** How each monthly charge is rounded to a minor unit. Required; no default. */
+	readonly rounding: Rounding
+}
+
 /** Asset: `rate` is the expected return. Locked money does not count until `lockedUntil`. */
 export interface AssetRule {
 	readonly id: AccountId
@@ -45,6 +56,8 @@ export interface AssetRule {
 	readonly gainLabel?: string
 	/** Pays part of the total return out as passive income; absent means everything is reinvested. */
 	readonly payout?: Payout
+	/** Charges a yearly share of value every month, outside cashflow; absent means no fee. */
+	readonly fee?: Fee
 }
 
 /** Liability: `rate` is the interest on the outstanding balance. Cannot be locked. */

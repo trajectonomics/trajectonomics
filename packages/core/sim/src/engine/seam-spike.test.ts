@@ -44,6 +44,8 @@ const TOTALS = {
 	contributions: 0n,
 	employer: 0n,
 	payouts: 0n,
+	fees: 0n,
+	feesBy: new Map(),
 	unfunded: new Map(),
 	levy: 0n,
 }
