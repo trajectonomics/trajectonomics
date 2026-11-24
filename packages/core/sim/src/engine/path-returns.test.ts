@@ -32,7 +32,7 @@ const BY_GOOD_MONTHS: readonly (readonly [number, number])[] = [
 describe("the returns of a Market path", () => {
 	it("compounds the twelve months drawn, per Account, on a two-bucket model", () => {
 		const { baseline, scenario, timeline } = calendarYears
-		const selection = { model: twoBuckets, seed: SEED, index: 7 }
+		const selection = { model: twoBuckets, seed: SEED, paths: 10, index: 7 }
 		const result = projectPath(baseline, scenario, timeline, selection)
 		if (!result.ok) throw new Error("refused")
 		const fund = marketPath(twoBuckets, 0n, 7, timeline).series[0]!.rows
@@ -57,7 +57,12 @@ describe("the returns of a Market path", () => {
 			buckets: [{ returnsBps: [100, 100], weight: FULL }],
 		}
 		const { baseline, scenario, timeline } = calendarYears
-		const result = projectPath(baseline, scenario, timeline, { model, seed: SEED, index: 0 })
+		const result = projectPath(baseline, scenario, timeline, {
+			model,
+			seed: SEED,
+			paths: 1,
+			index: 0,
+		})
 		if (!result.ok) throw new Error("refused")
 		expect(result.projection.returns.map((entry) => entry.accounts[0]!.returnBps)).toEqual([
 			1268, 1268, 1268, 0,
@@ -81,10 +86,40 @@ describe("the returns of a Market path", () => {
 			horizon: "2028-01-16",
 			resolution: "month",
 		})
-		const result = projectPath(baseline, scenario, timeline, { model, seed: SEED, index: 0 })
+		const result = projectPath(baseline, scenario, timeline, {
+			model,
+			seed: SEED,
+			paths: 1,
+			index: 0,
+		})
 		if (!result.ok) throw new Error("refused")
 		expect(result.projection.returns.map((entry) => entry.accounts[0]!.returnBps)).toEqual([
 			250100, 0,
 		])
+	})
+
+	it.each([
+		["a month split across roll-ups multiplies back to 1 + r", 3100, 245420],
+		["1.1^12 − 1 for 1,000 bps from the 16th", 1000, 21384],
+	])("%s", (_, bps, expected) => {
+		// Roll-up 1 opens on Jan 16 2028, in the middle of the January row that roll-up 0 started: the
+		// two halves of that month multiply to the whole month, so twelve months compound exactly.
+		const model: ReturnModel = {
+			id: "steady",
+			accounts: ["fund"],
+			buckets: [{ returnsBps: [bps], weight: FULL }],
+		}
+		const { baseline, scenario, timeline } = makeFixture({
+			accounts: [{ id: "fund", kind: "asset", rate: 0 }],
+			balances: { fund: 1_000 },
+			surplus: [{ account: "fund" }],
+			start: "2027-01-16",
+			horizon: "2029-01-16",
+			resolution: "month",
+		})
+		const selection = { model, seed: SEED, paths: 1, index: 0 }
+		const result = projectPath(baseline, scenario, timeline, selection)
+		if (!result.ok) throw new Error("refused")
+		expect(result.projection.returns[1]!.accounts[0]!.returnBps).toBe(expected)
 	})
 })

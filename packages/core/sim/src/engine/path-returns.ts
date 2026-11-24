@@ -14,8 +14,10 @@ const earlier = (a: DateString, b: DateString): DateString => (a < b ? a : b)
 
 /**
  * The compounded return of one Return series over `[open, to]` in basis points, in exact BigInt
- * fractions: each row takes `held` of its `days` of its return (ADR 0005), the factors multiply, and
- * the one division rounds half away from zero.
+ * fractions. A row accrues linearly, as the engine does (ADR 0005): the `held` days of a row after
+ * `before` earlier days grow its balance by `(days + r·(before + held)) / (days + r·before)`, so the
+ * pieces of a row split across roll-ups multiply back to the row's `1 + r`. Rows multiply, and the one
+ * division rounds half away from zero.
  */
 function compounded(series: ResolvedSeries, open: DateString, to: DateString): number {
 	let top = 1n
@@ -24,8 +26,10 @@ function compounded(series: ResolvedSeries, open: DateString, to: DateString): n
 		const held = countedDays(later(open, row.from), earlier(to, row.to))
 		if (row.from >= to || row.to <= open || held <= 0) continue
 		const days = SCALE * BigInt(row.days)
-		top *= days + BigInt(row.returnBps) * BigInt(held)
-		bottom *= days
+		const before = BigInt(countedDays(row.from, later(open, row.from)))
+		const rate = BigInt(row.returnBps)
+		top *= days + rate * (before + BigInt(held))
+		bottom *= days + rate * before
 	}
 	const change = (top - bottom) * SCALE
 	const magnitude = ((change < 0n ? -change : change) * 2n + bottom) / (2n * bottom)
@@ -33,9 +37,10 @@ function compounded(series: ResolvedSeries, open: DateString, to: DateString): n
 }
 
 /**
- * Each Account's return over each Annual roll-up of a Market path: the days from the roll-up's first
- * day to its last, each day growing into the next, so a year of whole months compounds those twelve
- * months. A roll-up that starts on the horizon holds no day and returns 0.
+ * Each Account's return over each Annual roll-up of a Market path: the market's growth from the
+ * roll-up's first day through its last day, including the last day's growth. Months compound; days
+ * within a month accrue linearly. `closingNetWorth` is read on `to`, before that day's growth, so the
+ * two cover different days, and a roll-up that is only the horizon day reports 0.
  */
 export function pathReturnsOf(
 	returns: Returns,

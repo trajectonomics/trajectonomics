@@ -16,12 +16,14 @@ export interface ChancePathOutcome {
 	readonly runsOut?: RunsOut
 }
 
-/** Which Market path `projectPath` replays: path `index` of the run `model` and `seed` define. */
+/** Which Market path `projectPath` replays: path `index` of the run `model`, `seed` and `paths` define. */
 export interface PathSelection {
 	readonly model: ReturnModel
 	/** Exactly 16 lower-case hex digits. */
 	readonly seed: string
-	/** 0-based, 0..9,999: the cap on the paths of a run. */
+	/** The run's path count, 1..10,000, as in the chance-of-success options. */
+	readonly paths: number
+	/** 0-based and below `paths`: a path the run did not draw is refused. */
 	readonly index: number
 }
 

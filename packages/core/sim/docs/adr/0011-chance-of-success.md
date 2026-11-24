@@ -84,19 +84,24 @@ a number the entry already reported.
   `freelancer-chance-outcomes` parity case pins the extended result. `lowestAt` is the first roll-up
   that holds the least value, so a tie goes to the earliest. A path that ran out is pinned, so its
   `closingNetWorth` is the net worth it died with.
-- **`projectPath(baseline, scenario, timeline, { model, seed, index }, options)`.** It returns the
-  Projection of Market path `index` under the run's seed, with the options `project()` takes, plus
+- **`projectPath(baseline, scenario, timeline, { model, seed, paths, index }, options)`.** It
+  returns the Projection of Market path `index` under the run's seed, with the options `project()` takes, plus
   `returns`. The public handle is the index under the seed, not a per-path seed, which would leak the
-  generator's internals and let two runs name one path two ways. `index` is 0 to 9,999, the cap on a
-  run's paths, else `INVALID_PATH_INDEX`; the caller's own path count is not an input, so an index past
-  it replays a path the run did not draw. The path's draws start from its own seed (`pathSeed`), so path
-  `index` is built without any earlier path's rows. The path is the engine's own `Returns`, so closing
+  generator's internals and let two runs name one path two ways. `paths` is the run's path count,
+  checked as chance of success checks it (1 to 10,000, else `INVALID_PATH_COUNT`), and `index` is 0 to
+  `paths - 1`: an index at or past `paths` replays a path the run did not draw, so it is
+  `INVALID_PATH_INDEX`, reported at `["selection", "index"]`. The path's draws start from its own seed
+  (`pathSeed`), so path `index` is built without any earlier path's rows. The path is the engine's own `Returns`, so closing
   net worth and Runs-out equal `outcomes[index]` for every index (a test pins all 200 paths of a run).
 - **`returns`.** One entry per Annual roll-up, one return per Account of the model, in basis points:
-  the compounded span return over the roll-up's days, its first day to its last, each day growing into
-  the next. A row it holds part of takes its share of the days as the engine does (ADR 0005). The
-  product is exact BigInt fractions with one division, rounded half away from zero. A roll-up of a
-  Timeline that starts on the first of a month and is a whole year compounds twelve whole rows, and a
-  roll-up that starts on the horizon holds no day and returns 0. The figure is the market's return, not
-  the Account's: contributions and withdrawals are not in it, so it need not equal the change in an
-  Account's balance.
+  the market's growth from the roll-up's first day through its last day, including the last day's
+  growth. Months compound; days within a month accrue linearly, as the engine does (ADR 0005), so a
+  roll-up that opens in the middle of a month takes `(days + r·(before + held)) / (days + r·before)` of
+  it, and the pieces of a month split across roll-ups multiply back to `1 + r`. The product is exact
+  BigInt fractions with one division, rounded half away from zero. A roll-up of a Timeline that starts
+  on the first of a month and is a whole year compounds twelve whole rows, and a roll-up that is only
+  the horizon day holds no growth and returns 0. The figure is the market's return, not the Account's:
+  contributions and withdrawals are not in it, so it need not equal the change in an Account's
+  balance. It also covers a different day from the net-worth roll-ups: `closingNetWorth` is read on
+  `to`, before that day's growth, so `returns[k]` is one day of growth ahead of it as well as free of
+  Flows.

@@ -10,6 +10,7 @@ function pathOf(index: number, extra: Partial<PathSelection> = {}) {
 	return projectPath(baseline, scenario, timeline, {
 		model: twoBuckets,
 		seed: SEED,
+		paths: 200,
 		index,
 		...extra,
 	})
@@ -53,7 +54,7 @@ describe("projectPath", () => {
 			baseline,
 			scenario,
 			timeline,
-			{ model: twoBuckets, seed: SEED, index: 3 },
+			{ model: twoBuckets, seed: SEED, paths: 200, index: 3 },
 			{ cashflowBreakdown: true },
 		)
 		if (!result.ok || !withBreakdown.ok) throw new Error("refused")
@@ -81,27 +82,45 @@ describe("projectPath", () => {
 })
 
 describe("projectPath refusals", () => {
-	it.each([
-		["a negative index", -1],
-		["an index past the 10,000-path cap", 10000],
-	])("refuses %s as INVALID_PATH_INDEX", (_, index) => {
-		expect(codes({ model: twoBuckets, seed: SEED, index })).toEqual(["INVALID_PATH_INDEX"])
+	const base = { model: twoBuckets, seed: SEED, paths: 200 }
+
+	it("refuses a negative index as INVALID_PATH_INDEX", () => {
+		expect(codes({ ...base, index: -1 })).toEqual(["INVALID_PATH_INDEX"])
 	})
 
-	it("accepts the last index the cap allows", () => {
-		expect(pathOf(9999).ok).toBe(true)
+	it("refuses an index at the path count and accepts the one before it", () => {
+		expect(codes({ ...base, index: 200 })).toEqual(["INVALID_PATH_INDEX"])
+		expect(pathOf(199).ok).toBe(true)
+	})
+
+	it("reports a bad selection under `selection`, not `options`", () => {
+		const result = pathOf(200)
+		if (result.ok) throw new Error("expected a refusal")
+		expect(result.problems).toEqual([{ code: "INVALID_PATH_INDEX", path: ["selection", "index"] }])
+		const bad = projectPath(baseline, scenario, timeline, undefined as unknown as PathSelection)
+		if (bad.ok) throw new Error("expected a refusal")
+		expect(bad.problems).toEqual([{ code: "NOT_AN_OBJECT", path: ["selection"] }])
+	})
+
+	it("accepts the last index the cap of 10,000 paths allows", () => {
+		expect(pathOf(9999, { paths: 10000 }).ok).toBe(true)
+	})
+
+	it("checks the path count as chance of success does", () => {
+		expect(codes({ ...base, paths: 0, index: 0 })).toEqual(["INVALID_PATH_COUNT"])
+		expect(codes({ ...base, paths: 10001, index: 0 })).toEqual(["INVALID_PATH_COUNT"])
 	})
 
 	it("refuses a fractional index, a bad seed, a missing key and a stray key", () => {
-		expect(codes({ model: twoBuckets, seed: SEED, index: 1.5 })).toEqual(["NOT_SAFE_INTEGER"])
-		expect(codes({ model: twoBuckets, seed: "ABC", index: 0 })).toEqual(["INVALID_SEED"])
-		expect(codes({ model: twoBuckets, seed: SEED })).toEqual(["MISSING_KEY"])
-		expect(codes({ model: twoBuckets, seed: SEED, index: 0, paths: 4 })).toEqual(["UNKNOWN_KEY"])
+		expect(codes({ ...base, index: 1.5 })).toEqual(["NOT_SAFE_INTEGER"])
+		expect(codes({ ...base, seed: "ABC", index: 0 })).toEqual(["INVALID_SEED"])
+		expect(codes({ model: twoBuckets, seed: SEED, paths: 200 })).toEqual(["MISSING_KEY"])
+		expect(codes({ ...base, index: 0, outcomes: true })).toEqual(["UNKNOWN_KEY"])
 		expect(codes(undefined)).toEqual(["NOT_AN_OBJECT"])
 	})
 
 	it("refuses a Return model that names an Account the Scenario lacks", () => {
 		const model = { ...twoBuckets, accounts: ["fund", "ghost"] }
-		expect(codes({ model, seed: SEED, index: 0 })).toContain("UNKNOWN_ACCOUNT")
+		expect(codes({ ...base, model, index: 0 })).toContain("UNKNOWN_ACCOUNT")
 	})
 })
