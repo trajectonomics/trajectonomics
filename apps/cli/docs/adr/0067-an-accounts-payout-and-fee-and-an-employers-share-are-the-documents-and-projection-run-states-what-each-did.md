@@ -39,7 +39,16 @@ adds no rate and computes no figure of them.
   `@trajectonomics/core/tax` exports (every label of `ThLevyContributionLabel`), and never a prefix, which would miss
   ThaiESG. It is `EMPLOYER_MEMBER_LABEL`, found with the engine's problems by `scenarioProblems`
   (`src/scenario/own-problems.ts`), so `scenario apply`, the Store, `--set` and `scenario tax --label` state it, at the
-  label, with a sentence and a way out. A Contribution that is not an employer's keeps its labels.
+  label, with a sentence that names the label it found and a way out (the code `EMPLOYER_MEMBER_LABEL` is the
+  envelope's `code`, never in the hint a person reads). A Contribution that is not an employer's keeps its labels.
+  Any Levy triggers it, not only the Thai one the CLI emits: the labels are Thai-named, so the rule reads the label and
+  never the Levy, and a plan under another Levy that writes one on an employer's share is refused as well.
+- **A stored plan is re-checked on every read.** A plan saved before the rule existed (an unreleased build between
+  the Account fields and this rule) is not re-checked by the engine, which stays permissive. `applyScenarioSets`, the
+  one place every read, `scenario fork` and `projection model` take a stored document through, runs `ownProblems` on
+  it when there is no Override to blame, so `projection run`, `compare`, `fi`, `chance`, `path`, `allowances` and the
+  Estate refuse it in the words `scenario apply` uses. With a `--set`, the whole-document check already did. Each
+  `details` entry of a refusal carries the same sentence in `scenario fork` as in `scenario apply`.
 - **Four more refusals are said in words.** `CONFLICTING_LABELS` (a payout's `label` beside the Account's `returnLabel`,
   or `returnLabel` beside `gainLabel`, told apart by the path) and `RATE_OUT_OF_RANGE` at a payout's share, a fee's
   share and a payout's prepayments leave the unworded `document` answer for sentences, and `scenario tax` and the
@@ -58,7 +67,7 @@ adds no rate and computes no figure of them.
   the declared Flows' income plus the payouts, and `cashflowTotalsOf` still takes `money in` from it, so the lines add up
   to the total only with the `payout` group, and the identity test sums them (`projection-income.test.ts`). An employer line
   is outside the identity: the money never entered cashflow. The human block prints `payouts` beside the income it is
-  not part of, and the roll-up's employer and fee figures under the totals, marked as not cash.
+  part of, and the roll-up's employer and fee figures under the totals, marked as not cash.
 - **A `fees` table** states what each fee Account was charged in each roll-up (`{ index, from, to, account, amount }`,
   the engine's `accountFees`, zero when not charged), present only when an Account carries a fee above 0 bps. The
   roll-up's `fees` is the sum of its rows. It is a table of its own, not a column of `balances`, because a fee has no

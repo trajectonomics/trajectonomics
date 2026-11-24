@@ -172,7 +172,8 @@ describe("a document refused for a rate out of range", () => {
 		expect(body.details).toEqual([
 			{
 				path: "document.estate.costs.0.bps",
-				message: "document.estate.costs.0.bps: RATE_OUT_OF_RANGE",
+				// The same sentence `scenario apply` puts in each detail (cli ADR-0067).
+				message: body.message,
 				code: "RATE_OUT_OF_RANGE",
 			},
 		])

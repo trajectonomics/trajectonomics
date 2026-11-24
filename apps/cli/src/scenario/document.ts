@@ -100,8 +100,13 @@ export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 
 function detailsOf(problems: readonly ScenarioProblem[], base: string) {
 	return problems.map((problem) => {
-		const { path, message, code } = refusalOf(problem, base)
-		return { path, message, code }
+		const refusal = refusalOf(problem, base)
+		// The sentence a worded code carries is the one `scenario apply` puts in each detail too.
+		return {
+			path: refusal.path,
+			message: wordsOf(problem)?.message ?? refusal.message,
+			code: refusal.code,
+		}
 	})
 }
 
@@ -112,7 +117,20 @@ function detailsOf(problems: readonly ScenarioProblem[], base: string) {
  * (ADR-0052); any other code keeps the code and its allowed values.
  */
 export function scenarioDocumentError(value: unknown, base = "document"): AppError | null {
-	const problems = scenarioProblems(value)
+	return documentError(scenarioProblems(value), base)
+}
+
+/**
+ * The `invalid_input` for the one rule of a stored plan the engine does not state (cli ADR-0067), or
+ * null. A plan saved before the rule existed is not re-checked by `sim-core` on a read, so a read
+ * states it in the words `scenario apply` does.
+ */
+export function ownDocumentError(value: unknown, base = "document"): AppError | null {
+	return documentError(ownProblems(value), base)
+}
+
+/** The refusal for a list of problems: the first one's sentence and path, every one in `details`. */
+function documentError(problems: readonly ScenarioProblem[], base: string): AppError | null {
 	const first = problems[0]
 	if (first === undefined) return null
 	const refusal = refusalOf(first, base)

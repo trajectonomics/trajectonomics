@@ -92,7 +92,8 @@ describe("scenarioDocumentError", () => {
 		expect(error.body.details).toEqual([
 			{
 				path: `document.flows.${VALID.flows.length}.start`,
-				message: `document.flows.${VALID.flows.length}.start: WITHDRAWAL_LOCKED`,
+				// The same sentence `scenario apply` puts in each detail (cli ADR-0067).
+				message: error.body.message,
 				code: "WITHDRAWAL_LOCKED",
 			},
 		])
