@@ -16,6 +16,8 @@ person has to look up (#398).
   on it is not an optional object block the published schema declares, or has a household anchor, so the list
   cannot drift from `traj schema`. `calendar` is also an optional object block and is left off until a page needs
   it; a new block joins the list in the pull request that needs it.
+- **One item key may also be begun** (ADR-0068): an asset Account's `volatility`, which a `--set` adds where the
+  Account has none. A liability's, and any other absent key, is refused as below.
 - **Nothing else changes.** A `--set` of a part of an absent block (`--set estate.costs=[...]`) is refused at the
   flag, with a hint to begin the block whole. Any other absent key is still `No key or id "…"`. A `--set` of a
   present `estate` replaces it whole, as it always did.

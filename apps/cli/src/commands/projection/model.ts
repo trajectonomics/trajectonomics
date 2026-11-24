@@ -66,6 +66,7 @@ export const model: Leaf = defineCommand({
 				{
 					path: "scenario",
 					label: "projection model",
+					hintSuffix: "",
 				},
 			)
 			return isAppError(built) ? (built satisfies AppError) : ok(built.model)

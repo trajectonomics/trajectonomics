@@ -12,7 +12,7 @@ export type ChanceErrorCode =
 
 const MESSAGES: Record<ChanceErrorCode, string> = {
 	chance_needs_all_three:
-		"--return-model, --paths and --seed go together: pass all three to add the chance of success, or none.",
+		"--paths and --seed go together (--return-model is optional: the plan's own model by default); pass both, or none.",
 	invalid_return_model: "--return-model must be a file path, not standard input.",
 	invalid_paths: "--paths must be a whole number from 1 to 10,000.",
 	invalid_seed: "--seed must be sixteen lower-case hex digits.",

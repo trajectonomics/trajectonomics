@@ -24,7 +24,10 @@ const BUCKET_SIZES = "16, 32, 64, 128, 256, 512 or 1024"
 
 /** The way out of a plan with no volatility: the field, and the command that writes a document. */
 const NO_VOLATILITY_HINT =
-	"Give an asset Account a `volatility` in basis points (the standard deviation of its yearly return, so 15% is 1500): write it into the Scenario with traj scenario apply (traj scenario apply --template prints a document to start from), or test it as a what-if with --set accounts.<id>.volatility=1500. Or give projection chance a Return model file with --return-model."
+	"Give an asset Account a `volatility` in basis points (the standard deviation of its yearly return, so 15% is 1500): write it into the Scenario with traj scenario apply (traj scenario apply --template prints a document to start from), or test it as a what-if with --set accounts.<id>.volatility=1500."
+
+/** The way out that only `projection chance` has: a Return model file in place of the plan's own. */
+const FILE_HINT = " Or give projection chance a Return model file with --return-model."
 
 /**
  * The Return model the plan implies at `buckets`, or the refusal: a bucket count the engine does not
@@ -34,7 +37,11 @@ const NO_VOLATILITY_HINT =
 export function planModelOf(
 	scenario: Scenario,
 	buckets: number,
-	by: { path: string; label: string } = { path: "--return-model", label: "--return-model plan" },
+	by: { path: string; label: string; hintSuffix?: string } = {
+		path: "--return-model",
+		label: "--return-model plan",
+		hintSuffix: FILE_HINT,
+	},
 ): PlanModel | AppError {
 	const built = planReturnModel(scenario, { buckets })
 	if (!built.ok) {
@@ -49,7 +56,7 @@ export function planModelOf(
 		return fail("invalid_input", {
 			path: by.path,
 			message: `${by.label}: no Account of the Scenario has a volatility, so every Market path would be the same path.`,
-			hint: NO_VOLATILITY_HINT,
+			hint: `${NO_VOLATILITY_HINT}${by.hintSuffix ?? ""}`,
 		})
 	}
 	const accounts = built.model.accounts.flatMap((id) => {

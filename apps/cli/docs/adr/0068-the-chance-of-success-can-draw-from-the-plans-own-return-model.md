@@ -35,6 +35,11 @@ Scenario to `planReturnModel`, and says what went in.
   ships none. In `--decimal` it stays an integer of basis points, as `rate` does; only a payout's and a fee's shares
   are percent strings (ADR-0067), because they are an Account's costs and `volatility` is a sibling of the return it
   swings around.
+- **A `--set` may add an absent `volatility` to an asset Account** (amends ADR-0065), so the refusal's hint is a
+  command that works: no plan has a `volatility` until one is stated, and a `--set` could not create the key.
+  `--set accounts.<id>.volatility=1500` writes it when the parent is an `accounts[]` item of `kind: "asset"`; a
+  liability, and every other absent key, is still `No key or id "…"`. The value goes to the engine's `check()` like
+  any other, so 10001 is `RATE_OUT_OF_RANGE`. The rule lives with ADR-0065's begin entries, in `set-begin.ts`.
 - **`traj projection model --scenario <name> [--buckets N]` prints the model**, in the sim format and nothing else, so
   `--json > model.json` is a file `--return-model` reads and gives the same chance as `plan`. It takes the Overrides
   of the other projection leaves, reads no Ledger and takes no date: the model depends on the Scenario alone. A plan
@@ -57,5 +62,6 @@ Scenario to `planReturnModel`, and says what went in.
 
 ## Consequences
 
-- The setup skill's chance recipe uses `plan`, and a person need not write a Return model.
+- When a customer skill gains a chance recipe (CLI ≥ the release after 0.8.0), it uses `plan`; no customer skill has one
+  today. A person need not write a Return model.
 - A file still works unchanged, and every output without the new flags is byte for byte what it was.

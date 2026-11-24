@@ -64,6 +64,16 @@ const chanceTable = z.discriminatedUnion("name", [
 ])
 
 /**
+ * What `--return-model plan` built the model from (cli ADR-0068): the bucket count and each asset
+ * Account that swings, with its `rate` and `volatility` in basis points. Present only with `plan`.
+ */
+const planReturnModel = z.strictObject({
+	source: z.literal("plan"),
+	buckets: integer,
+	accounts: z.array(z.strictObject({ id: z.string(), rate: integer, volatility: integer })),
+})
+
+/**
  * `traj projection chance --json`: the success share of one Scenario over seeded Market paths and,
  * for a plan with a spending rule, what the rule pays across them.
  */
@@ -79,5 +89,6 @@ export const projectionChance = z.strictObject({
 	spendingBands: z.array(spendingBand).optional(),
 	lowestYearSpending: lowestYear.optional(),
 	tables: z.array(chanceTable),
+	returnModel: planReturnModel.optional(),
 })
 export type ProjectionChance = z.infer<typeof projectionChance>

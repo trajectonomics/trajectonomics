@@ -1,6 +1,6 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
-import { isBeginnableBlock, unbegunBlock } from "./set-begin"
+import { beginsAccountVolatility, isBeginnableBlock, unbegunBlock } from "./set-begin"
 import {
 	ambiguousSegment,
 	identityFailure,
@@ -29,6 +29,14 @@ function replaceInObject(
 		// The one place a Set makes what is absent: a whole optional block, begun (cli ADR-0065).
 		if (rest === ctx.segments.length) return { ...node, [segment]: ctx.value }
 		return unbegunBlock(segment, ctx)
+	}
+	if (
+		!Object.hasOwn(node, segment) &&
+		rest === ctx.segments.length &&
+		beginsAccountVolatility(node, segment, prefix)
+	) {
+		// The one key a Set adds to an item: an asset Account's volatility (cli ADR-0068).
+		return { ...node, [segment]: ctx.value }
 	}
 	if (!Object.hasOwn(node, segment)) {
 		return unknownSegment(candidatesAt(node), segment, rest, prefix, ctx)

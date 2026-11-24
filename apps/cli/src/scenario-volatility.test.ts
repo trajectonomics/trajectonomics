@@ -43,6 +43,9 @@ describe("an Account's volatility", () => {
 			accounts: accounts({ volatility: 100 }, loan),
 		})
 		expect(liability.code).toBe(2)
+		expect(errorOf(liability).details).toEqual(
+			expect.arrayContaining([expect.objectContaining({ code: "LIABILITY_MISUSE" })]),
+		)
 	})
 
 	it("is published by traj schema, in basis points, with the one command that reads it", async () => {
