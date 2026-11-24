@@ -32,6 +32,20 @@ const table = {
 		exit: 3,
 		message: "A liability's opening balance is negative: enter the debt as a negative amount.",
 	},
+	valuation_account_invalid: {
+		exit: 3,
+		message:
+			"Only an asset or a liability can be valued: it has a value that moves without a transaction.",
+	},
+	valuation_value_negative: {
+		exit: 3,
+		message: "A liability's value is what it still owes, stated as a positive amount.",
+	},
+	valuation_against_invalid: {
+		exit: 3,
+		message:
+			"A valuation is posted against an income or equity account in the valued account's currency.",
+	},
 	external_ref_conflict: {
 		exit: 5,
 		message: "A transaction with this external reference already exists with other content.",

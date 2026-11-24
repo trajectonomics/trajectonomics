@@ -30,3 +30,11 @@ export interface Account {
 /** `asset` and `expense` are debit-normal; `liability`, `equity` and `income` credit-normal. */
 export const normalBalance = (type: AccountType): NormalBalance =>
 	type === "asset" || type === "expense" ? "debit" : "credit"
+
+/**
+ * A signed Balance (Debit positive) on its account type's Normal Balance side: an asset's Debit
+ * balance, what a liability owes. The flip is its own inverse, so it also takes a stated value
+ * back to a signed one.
+ */
+export const statedAmount = (type: AccountType, amount: number): number =>
+	normalBalance(type) === "debit" ? amount : 0 - amount

@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { z } from "zod"
 import { defineCommand, defineGroup } from "./command"
+import { commandTriggers } from "./command-triggers.test-support"
 import { type ErrorCode, isAppError, registry } from "./errors"
 import { FIXTURE_AS_OF, fixtureHome } from "./ledger-fixture"
 import { type StoreRaised, storeTriggers } from "./store/store-triggers"
@@ -61,56 +62,7 @@ describe("contract", () => {
 		ledger_missing: () => capture(["account", "list", "--json"], { TRAJ_HOME: tempHome() }),
 		// A development build, which every test run is, with no TRAJ_HOME: the guard refuses (ADR-0053).
 		default_home_refused: () => capture(["account", "list", "--json"], {}),
-		liability_opening_positive: async () => {
-			const home = ledgerHome()
-			for (const [name, type] of [
-				["Opening", "equity"],
-				["Loan", "liability"],
-			] as const) {
-				await capture(["account", "add", name, "--type", type, "--currency", "THB", "--json"], {
-					TRAJ_HOME: home,
-				})
-			}
-			return capture(
-				[
-					"tx",
-					"add",
-					"--opening",
-					"--from",
-					"Opening",
-					"--to",
-					"Loan",
-					"--amount",
-					"300000.00",
-					"--date",
-					"2026-11-01",
-					"--json",
-				],
-				{ TRAJ_HOME: home },
-			)
-		},
-		same_account: async () => {
-			const home = ledgerHome()
-			await capture(["account", "add", "Cash", "--type", "asset", "--currency", "THB", "--json"], {
-				TRAJ_HOME: home,
-			})
-			return capture(
-				[
-					"tx",
-					"add",
-					"--from",
-					"Cash",
-					"--to",
-					"Cash",
-					"--amount",
-					"5.00",
-					"--date",
-					"2026-11-22",
-					"--json",
-				],
-				{ TRAJ_HOME: home },
-			)
-		},
+		...commandTriggers,
 		projection_refused: async () => {
 			const home = fixtureHome()
 			await capture(
