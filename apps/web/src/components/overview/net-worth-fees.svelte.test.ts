@@ -1,12 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
 import { overviewView } from "../../lib/view/overview/view"
 import NetWorthCard from "./NetWorthCard.svelte"
 
-const DEMO: Snapshot = snapshotSchema.parse(
-	JSON.parse(await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()),
-)
+const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(await demoSnapshotText()))
 
 /** The Demo with its primary Scenario's projection stating `fees` as the plan's fees over the horizon. */
 function withFees(fees: string | undefined): Snapshot {

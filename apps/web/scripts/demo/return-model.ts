@@ -6,7 +6,7 @@ import type { DemoAccountIds } from "./scenario"
  */
 export const DEMO_MODEL_ID = "illustrative-demo-model"
 
-/** The Market paths the demo runs, and the seed they are drawn from, so the committed Demo snapshot is reproducible. */
+/** The Market paths the demo runs, and the seed they are drawn from, so the Demo snapshot is reproducible. */
 export const DEMO_PATHS = 200
 export const DEMO_SEED = "0123456789abcdef"
 

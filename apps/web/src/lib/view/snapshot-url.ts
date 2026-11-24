@@ -1,4 +1,4 @@
-/** Where the Demo snapshot is served, as the committed file in public/demo/. */
+/** Where the Demo snapshot is served, as the generated file in public/demo/. */
 export const DEMO_SNAPSHOT_PATH = "/demo/snapshot.json"
 
 /** Where the Snapshot of the person's own ledger is written, next to the built pages. */

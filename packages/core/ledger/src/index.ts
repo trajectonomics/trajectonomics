@@ -7,7 +7,7 @@
  */
 
 export type { Account, AccountInput, AccountType, NormalBalance } from "./account"
-export { normalBalance } from "./account"
+export { normalBalance, statedAmount } from "./account"
 export { amend } from "./amend"
 export { balance } from "./balance"
 export type { BalanceRow } from "./balances"
@@ -52,3 +52,4 @@ export type { Transaction, TransactionInput } from "./transaction"
 export { validateTransaction } from "./transaction"
 export type { TrialBalance, TrialBalanceRow, TrialBalanceTotal } from "./trial-balance"
 export { trialBalance } from "./trial-balance"
+export { valuationEntry } from "./valuation-entry"
