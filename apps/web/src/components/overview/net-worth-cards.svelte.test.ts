@@ -4,6 +4,7 @@ import { render } from "svelte/server"
 import type { NetWorth } from "../../lib/contract"
 import { type NetWorthView, netWorthView } from "../../lib/view/net-worth/view"
 import { failedRead, netWorth, okRead, row } from "../../lib/view/overview/fixtures.test-support"
+import type { NetWorthCardView } from "../../lib/view/overview/view"
 import AssetsCard from "./AssetsCard.svelte"
 import NetWorthCard from "./NetWorthCard.svelte"
 
@@ -14,7 +15,7 @@ function netWorthCardRead(
 	rows = [row("Bank", "asset", "600.00"), row("Loan", "liability", "-200.00")],
 ) {
 	const data = netWorth("2026-10-31", rows, THB("400.00"))
-	return okRead(NW_ARGV, { ...netWorthView(data), sparkline: [1, 2, 3] })
+	return okRead(NW_ARGV, { ...netWorthView(data), sparkline: [1, 2, 3], fees: null })
 }
 
 describe("NetWorthCard", () => {
@@ -28,12 +29,12 @@ describe("NetWorthCard", () => {
 
 	test("says plainly when the As-of is before the first transaction", () => {
 		const data = netWorth("2024-10-31", [], THB("0.00"), "2024-11-01", true)
-		const read = okRead(NW_ARGV, { ...netWorthView(data), sparkline: [] })
+		const read = okRead(NW_ARGV, { ...netWorthView(data), sparkline: [], fees: null })
 		expect(render(NetWorthCard, { props: { netWorth: read } }).body).toContain("not a real reading")
 	})
 
 	test("shows only its own error when its Read failed, and keeps its title and link", () => {
-		const read = failedRead<NetWorthView & { sparkline: number[] }>(NW_ARGV)
+		const read = failedRead<NetWorthCardView>(NW_ARGV)
 		const { body } = render(NetWorthCard, { props: { netWorth: read } })
 		expect(body).toContain('role="alert"')
 		expect(body).toContain("Net worth could not be read")
@@ -44,7 +45,7 @@ describe("NetWorthCard", () => {
 
 	test("draws a sparkline only from two or more month-ends", () => {
 		const data = netWorth("2026-10-31", [], THB("1.00"))
-		const one = okRead(NW_ARGV, { ...netWorthView(data), sparkline: [1] })
+		const one = okRead(NW_ARGV, { ...netWorthView(data), sparkline: [1], fees: null })
 		expect(render(NetWorthCard, { props: { netWorth: one } }).body).not.toContain("<svg")
 	})
 })

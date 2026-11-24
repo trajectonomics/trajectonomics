@@ -3,6 +3,7 @@ import type { Read } from "../../lib/contract"
 import type { NetWorthCardView } from "../../lib/view/overview/view"
 import Sparkline from "../chart/Sparkline.svelte"
 import Card from "../ui/Card.svelte"
+import Money from "../ui/Money.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import Totals from "../ui/Totals.svelte"
 
@@ -22,6 +23,9 @@ let { netWorth }: Props = $props()
 					<Totals totals={view.totals} className="text-3xl font-semibold tracking-tight" />
 					<p class="mt-1 text-sm text-muted-foreground">As of {view.asOf}</p>
 				</div>
+				{#if view.fees}
+					<p class="text-sm">Fees over the plan: <Money amount={view.fees.amount} currency={view.fees.currency} /></p>
+				{/if}
 				{#if view.note}
 					<p class="text-sm">{view.note}</p>
 				{/if}

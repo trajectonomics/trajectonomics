@@ -10,7 +10,7 @@ import {
 	payoutDraftOf,
 } from "./account-income"
 import { payoutHowWords, payoutWords } from "./account-words"
-import { type AccountYear, accountYears } from "./account-years"
+import { type AccountYear, accountLifetimesOf, accountYears } from "./account-years"
 
 /** The compounding periods an Account's rate may name; none means an effective yearly rate. */
 export const COMPOUNDINGS = ["monthly", "quarterly", "semiannual", "annual"] as const
@@ -32,6 +32,10 @@ export interface AccountCard {
 	readonly fee: string | null
 	/** What `projection run` states for the Account by roll-up: its payouts and its fees. Empty when it states none. */
 	readonly years: readonly AccountYear[]
+	/** What the Account was charged over the whole plan, as `projection run` states it ("Fees over the plan"); null when it states none. */
+	readonly lifetimeFees: string | null
+	/** What the Account paid out over the whole plan, as `projection run` states it ("Paid out over the plan"); null when it states none. */
+	readonly lifetimePayouts: string | null
 }
 
 /** The Baseline's amount for an Account: its ledger id or its name is the Scenario's id for it. */
@@ -52,21 +56,26 @@ export function accountCards(
 	baseline: Read<Baseline> | undefined,
 	run?: ProjectionRun,
 ): AccountCard[] {
-	return accounts.map((account) => ({
-		id: account.id,
-		kind: account.kind,
-		rate: `${formatBps(account.rate)}%`,
-		compounding: account.compounding ?? null,
-		lockedUntil: account.lockedUntil ?? null,
-		balance: balanceOf(account, baseline),
-		payout: payoutWords(account),
-		payoutHow: payoutHowWords(account),
-		fee: account.fee === undefined ? null : `Fee ${percentWords(account.fee.bps)}% a year`,
-		years:
-			account.payout === undefined && account.fee === undefined
-				? []
-				: accountYears(run, account.id),
-	}))
+	return accounts.map((account) => {
+		const lifetimes = accountLifetimesOf(run, account.id)
+		return {
+			id: account.id,
+			kind: account.kind,
+			rate: `${formatBps(account.rate)}%`,
+			compounding: account.compounding ?? null,
+			lockedUntil: account.lockedUntil ?? null,
+			balance: balanceOf(account, baseline),
+			payout: payoutWords(account),
+			payoutHow: payoutHowWords(account),
+			fee: account.fee === undefined ? null : `Fee ${percentWords(account.fee.bps)}% a year`,
+			years:
+				account.payout === undefined && account.fee === undefined
+					? []
+					: accountYears(run, account.id),
+			lifetimeFees: lifetimes.fees,
+			lifetimePayouts: lifetimes.payouts,
+		}
+	})
 }
 
 /** The form's text for one Account. A new Account is an asset, with no compounding and no lock. */

@@ -12,6 +12,8 @@ export type WasField =
 	| "kind"
 	| "payout"
 	| "fee"
+	| "lifetimeFees"
+	| "lifetimePayouts"
 	| "employer"
 
 /** The baseline's text of each field the session changed. */

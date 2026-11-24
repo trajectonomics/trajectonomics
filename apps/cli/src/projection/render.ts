@@ -1,15 +1,10 @@
 import type { ColumnHint, RenderHint } from "../table"
 import { balanceBlocks, balancesHidden } from "./balances-human"
 import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
-import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
 import { estateBlocks, estateHidden } from "./estate-human"
 import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
-import {
-	compareMilestoneBlocks,
-	compareMilestonesHidden,
-	milestoneColumns,
-	runMilestonesShown,
-} from "./milestones"
+import { lifetimeBlocks } from "./lifetime-human"
+import { milestoneColumns, runMilestonesShown } from "./milestones"
 import { routingBlocks } from "./routing-human"
 import { spendingBlocks, spendingHidden } from "./spending-human"
 
@@ -73,6 +68,13 @@ export const projectionHint: RenderHint = {
 			column("realAccessibleNetWorth", "right"),
 		],
 		milestones: milestoneColumns,
+		fees: [
+			column("index", "right"),
+			column("from"),
+			column("to"),
+			column("account"),
+			column("amount", "right"),
+		],
 	},
 	// The long cash-flow, liability, balance, spending and estate tables are JSON's; the human form prints them as blocks after the body.
 	display: (data) =>
@@ -86,6 +88,7 @@ export const projectionHint: RenderHint = {
 		...balanceBlocks(data),
 		...spendingBlocks(data),
 		...estateBlocks(data),
+		...lifetimeBlocks(data),
 	],
 	note: "notes",
 	extra: [
@@ -105,14 +108,4 @@ export const projectionHint: RenderHint = {
 			],
 		},
 	],
-}
-
-/**
- * `projection compare`'s human view: the same figures as before, and each side's milestones as a
- * table of its own after them (cli ADR-0049). The milestones leave the listing, so they are not
- * printed twice.
- */
-export const compareHint: RenderHint = {
-	display: (data) => compareTablesHidden(compareMilestonesHidden(data)),
-	blocks: (data) => [...compareAnnualBlocks(data), ...compareMilestoneBlocks(data)],
 }

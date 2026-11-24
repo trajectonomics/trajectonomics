@@ -407,6 +407,34 @@ car                                   2026-12-01  2026-12-31       9.66      0.0
 The figures are the engine's: `interest` is the residual of the month, so `opening + drawn − paid + interest`
 equals `closing` exactly. Without `--liabilities` the output is unchanged.
 
+### What a fee and a payout came to over the plan
+
+> **Ships in 0.8.0.**
+
+An asset Account can pay out a share of its value as income (`payout`) and be charged a yearly `fee`.
+`traj projection run` states each one's total over the whole horizon, so nothing needs adding up: the
+engine sums them in the same run as the roll-ups (it is the sum of the `payouts` and `fees` of every
+roll-up). Two fields appear, and only when the Scenario declares the item above 0 bps (0 bps is none):
+
+- `accountLifetimes`: one `{ account, lifetimeFees?, lifetimePayouts? }` per Account that declares a fee or a payout,
+  in Scenario order. `lifetimeFees` is there when the Account carries a fee, `lifetimePayouts` when it carries a
+  payout; each is `0.00` if the Account never charged or paid.
+- `lifetimeFees`: the fees of all Accounts together, present only when an Account carries a fee.
+
+Both are money as every figure is, a decimal string at the currency's scale (`--decimal` changes what you
+write, not what is read). The human format prints the plan-wide fees on a line of their own, then each
+Account's totals as a table, and `projection path` states the same fields for a Market path:
+
+```
+Fees over the plan, all accounts: 1514.01
+
+accountLifetimes (1 row)
+account  lifetimeFees  lifetimePayouts
+fund          1514.01          4051.89
+```
+
+Without a fee or a payout the output is unchanged.
+
 ## Seeing it in a browser
 
 `traj dashboard --as-of 2026-11-30 --horizon 2056-11-30` reads your ledger once and serves the Dashboard (net worth, the ledger, projections, the FI date, a Scenario compare, tax and health) on `http://127.0.0.1:4321/` until you press Ctrl-C. It only reads, it listens on this machine only, and it takes the same Scenario flags as the projection reads (`--scenario`, `--compare` twice, `--monthly`, `--carry-in`); `--port 0` picks a free port. Run it again to see new figures.

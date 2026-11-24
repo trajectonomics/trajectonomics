@@ -31,6 +31,20 @@ describe("the projection run contract against the CLI's goldens", () => {
 		])
 	})
 
+	it("parses a run with a fee and a payout: each Account's totals and the plan's fees (cli ADR-0067)", async () => {
+		const run = projectionRun.parse(await golden("run-lifetime.output"))
+		expect(run.lifetimeFees).toBe("1514.01")
+		expect(run.accountLifetimes).toEqual([
+			{ account: "fund", lifetimeFees: "1514.01", lifetimePayouts: "4051.89" },
+		])
+	})
+
+	it("states no total in a run without a fee or a payout", async () => {
+		const run = projectionRun.parse(await golden("run.output"))
+		expect(run.lifetimeFees).toBeUndefined()
+		expect(run.accountLifetimes).toBeUndefined()
+	})
+
 	it("still parses a run without --breakdown, which has no totals table", async () => {
 		const run = projectionRun.parse(await golden("run.output"))
 		expect(run.tables.map((table) => table.name)).toEqual(["annual"])

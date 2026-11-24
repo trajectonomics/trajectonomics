@@ -8,6 +8,7 @@ import { refusal } from "./engine"
 import { estateNotes } from "./estate-notes"
 import { fundingNotes } from "./funding"
 import { optionsOf } from "./liabilities"
+import { lifetimeFieldsOf } from "./lifetime-view"
 import { routingOf } from "./routing"
 import type { RoutingView } from "./routing-view"
 import { annualRow, runsOutView } from "./rows"
@@ -71,6 +72,7 @@ export function runViewOf(
 		...routingEcho(prepared),
 		runsOut: runsOutView(projection.runsOut, currency),
 		taxYears: taxYearsOf(projection.levies, currency, prepared.document),
+		...lifetimeFieldsOf(projection, currency),
 		tables,
 	}
 }
