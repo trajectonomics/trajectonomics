@@ -4,6 +4,7 @@
  * asset attaches to is the one the Baseline names, so its value opens at that balance (cli ADR 0060).
  */
 import type { Baseline, Read, ScenarioDocument } from "../../contract"
+import { withdrawAccounts } from "../routing/entries"
 import { isRealAsset } from "./asset-parts"
 import type { Choice } from "./options"
 
@@ -29,7 +30,7 @@ function routedIds(doc: ScenarioDocument): ReadonlySet<string> {
 	const steps: unknown[] = Array.isArray(lists["surplus"]) ? lists["surplus"] : []
 	const surplus = steps.map((step) => (step as { account?: unknown } | null)?.account)
 	return new Set([
-		...stringsOf(lists["withdraw"]),
+		...withdrawAccounts(doc),
 		...stringsOf(lists["contribute"]),
 		...stringsOf(surplus),
 	])

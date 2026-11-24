@@ -4,6 +4,7 @@
  * own dates; it works no figure out (web ADR 0002).
  */
 import type { Baseline, ProjectionRun, Read, ScenarioDocument, ScenarioFlow } from "../../contract"
+import { withdrawAccounts } from "../routing/entries"
 import { ruleOf } from "./rule"
 
 /** What a form is made against: the saved document, the As-of, the date each reached Milestone fired, and the Baseline's names. */
@@ -73,9 +74,8 @@ export function portfolioChoices(ctx: WithdrawalContext): PortfolioChoice[] {
 
 /** The Accounts a new rule reads at first: the liquid assets of the plan's withdraw list, each removable. */
 export function defaultPortfolio(ctx: WithdrawalContext): string[] {
-	const withdraw: unknown =
-		ctx.doc["cashflow"] && (ctx.doc["cashflow"] as { withdraw?: unknown }).withdraw
-	const listed = Array.isArray(withdraw) ? withdraw : []
+	// An entry with a floor is `{ account, downTo }`, so the list is read by each entry's Account (web ADR 0021).
+	const listed = withdrawAccounts(ctx.doc)
 	return portfolioChoices(ctx)
 		.map((choice) => choice.id)
 		.filter((id) => listed.includes(id))

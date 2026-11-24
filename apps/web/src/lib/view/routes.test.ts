@@ -24,7 +24,7 @@ describe("the navigation's routes", () => {
 		expect(layout).toContain('export const trailingSlash = "always"')
 	})
 
-	test("the nineteen pages are in navigation order, with unique paths", () => {
+	test("the twenty-one pages are in navigation order, with unique paths", () => {
 		expect(ROUTES.map((route) => route.path)).toEqual([
 			"/",
 			"/net-worth/",
@@ -40,6 +40,7 @@ describe("the navigation's routes", () => {
 			"/optimize/withdrawals/",
 			"/estate/",
 			"/cash-flow/",
+			"/routing/",
 			"/chance/",
 			"/tax/",
 			"/ledger/",
@@ -68,7 +69,7 @@ describe("the navigation's routes", () => {
 			],
 			["Optimize", ["Tax allowances", "Withdrawals"]],
 			[null, ["Estate"]],
-			[null, ["Cash flow"]],
+			[null, ["Cash flow", "Where money goes"]],
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
 			["Records", ["Ledger", "Health"]],
@@ -126,8 +127,13 @@ describe("the navigation's routes", () => {
 		if (cashFlow === undefined) throw new Error("the Cash flow group exists")
 		expect(routesShown(cashFlow, true, true, true).map((route) => route.label)).toEqual([
 			"Cash flow",
+			"Where money goes",
 		])
-		expect(routesShown(cashFlow, true, true, false)).toEqual([])
+		// Where money goes needs the plan's document only, so it stays when the cash flow table is missing.
+		expect(routesShown(cashFlow, true, true, false).map((route) => route.label)).toEqual([
+			"Where money goes",
+		])
+		expect(routesShown(cashFlow, false, true, false)).toEqual([])
 	})
 
 	test("the Tax allowances page is listed only when the selected plan has a Levy", () => {
