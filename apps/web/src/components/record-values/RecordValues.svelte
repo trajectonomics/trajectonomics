@@ -5,6 +5,7 @@ import { valueSheetSession } from "../../client/record-values.svelte.js"
 import type { Snapshot } from "../../lib/contract"
 import { editsShown } from "../../lib/edit/shown"
 import { valueSheet } from "../../lib/view/record-values/sheet"
+import ImportHistory from "../import-values/ImportHistory.svelte"
 import ValueSheet from "./ValueSheet.svelte"
 
 interface Props {
@@ -16,9 +17,9 @@ const sheet = $derived(valueSheet(snapshot))
 const shown = $derived(editsShown(editSession.token, currentSearch()))
 </script>
 
-<!-- The button that opens the sheet. It is the Dashboard's first write to the ledger, so it shows only where an Edit does. -->
+<!-- The buttons that open the sheet and the import wizard. The sheet is the Dashboard's first write to the ledger, so it shows only where an Edit does. -->
 {#if shown && sheet}
-	<div class="flex justify-end">
+	<div class="flex flex-wrap justify-end gap-2">
 		<button
 			type="button"
 			onclick={() => valueSheetSession.show(sheet.asOf)}
@@ -26,6 +27,7 @@ const shown = $derived(editsShown(editSession.token, currentSearch()))
 		>
 			Record today's values
 		</button>
+		<ImportHistory {sheet} />
 	</div>
 	<ValueSheet {sheet} />
 {/if}
