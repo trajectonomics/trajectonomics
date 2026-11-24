@@ -15,12 +15,14 @@ type Namer = (line: CashflowLine, account: string) => string
 
 const NAMERS: Readonly<Record<CashflowLine["group"], Namer>> = {
 	income: (line) => line.id ?? "Income",
+	payout: (_line, account) => `Paid out by ${account}`,
 	prepaid: (line) => `Prepayment, ${line.id ?? ""}`,
 	settlement: (line) => `${isRefund(line) ? "Refund" : "Settlement"}, ${line.id ?? ""}`,
 	expense: (line) => line.id ?? "Expense",
 	category: (line) => line.id ?? "Uncategorised",
 	contribution: (line, account) => `${line.id ?? ""} into ${account}`,
 	unfunded: (line, account) => `${line.id ?? ""} not funded into ${account}`,
+	employer: (line, account) => `${line.id ?? ""} (employer) into ${account}`,
 	withdrawal: (line, account) => `${line.id ?? ""} from ${account}`,
 	drawn: (_line, account) => `Drawn from ${account}`,
 	surplus: (_line, account) => `Left over in ${account}`,

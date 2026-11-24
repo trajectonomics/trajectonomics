@@ -4,10 +4,9 @@ import {
 	type ProjectionProblem,
 } from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
-import { SAID_INCOME } from "./refusal-income"
+import { SAID_ACCOUNTS } from "./refusal-income"
 import { SAID_RATE } from "./refusal-rate"
 import { SAID_RULE } from "./refusal-rule"
-import { SAID_TRADE } from "./refusal-trade"
 
 /**
  * A refusal the engine raises that the CLI states in words: a sentence, and a hint where one fix is
@@ -31,8 +30,7 @@ const CARRY_IN_HINT =
  * literal key type of both tables, and `isolatedDeclarations` makes an exported table state its type.
  */
 export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
-	...SAID_TRADE,
-	...SAID_INCOME,
+	...SAID_ACCOUNTS,
 	...SAID_RATE,
 	...SAID_RULE,
 	// What only a run against the Ledger and the flags can find.

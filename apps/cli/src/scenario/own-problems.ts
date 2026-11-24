@@ -1,4 +1,5 @@
 import { TH_LEVY_MEMBER_ONLY_LABELS } from "@trajectonomics/core/tax/th"
+import { type AppError, fail } from "../errors"
 import { isPlainObject } from "../json"
 
 /*
@@ -48,4 +49,19 @@ export function ownSentence(code: OwnCode): { message: string; hint: string } {
 		message: `A Contribution with funding "employer" carries one of the Thai Levy's contribution labels (${[...MEMBER_ONLY].join(", ")}), and each of them is the member's own payment: the allowances are for what the member paid, never for the employer's share, so the label would lower tax by money the member never paid.`,
 		hint: `Remove "label" from the employer Contribution (${code}), and label only the member's own Contribution.`,
 	}
+}
+
+/** The sentences `--label` and the document's `label` field state about the labels an employer's share and a payout take. */
+export const LABEL_RULES: readonly string[] = [
+	"Each of those contribution labels is the member's own payment, so an employer Contribution (funding employer) takes none of them.",
+	"An Account's payout is labelled in the Account's own `payout.label`: a payout from a dividend Account is income.section40_4.dividends and one from interest is income.section40_4.interest.",
+]
+
+/** The refusal for `--label` writing a member's own label onto an employer Flow, or null when it does not. */
+export function employerLabelProblem(
+	target: Record<string, unknown>,
+	label: string,
+): AppError | null {
+	if (target["funding"] !== "employer" || !isMemberOnlyLabel(label)) return null
+	return fail("invalid_input", { ...ownSentence("EMPLOYER_MEMBER_LABEL"), path: "label" })
 }

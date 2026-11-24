@@ -1,7 +1,4 @@
 import type { Scenario } from "@trajectonomics/core/sim"
-import type { CashflowRow } from "./projection/cashflow-view"
-import type { ProjectionRunView } from "./projection/run-view"
-import { tableOf } from "./projection-run-support"
 import { applyScenario, scenario } from "./scenario-test-support"
 import { ledgerHome } from "./store/testing"
 
@@ -115,14 +112,4 @@ export async function taxedHome(): Promise<string> {
 	const applied = await applyScenario(home, "plan", document)
 	if (applied.code !== 0) throw new Error(applied.err)
 	return home
-}
-
-/** The exact sum, in satang, of decimal money strings. */
-export function satang(amounts: readonly string[]): bigint {
-	return amounts.reduce((sum, text) => sum + BigInt(text.replace(".", "")), 0n)
-}
-
-/** The cash-flow lines of one roll-up and group. */
-export function linesOf(body: ProjectionRunView, index: number, group: string): CashflowRow[] {
-	return tableOf(body, "cashflow").rows.filter((row) => row.index === index && row.group === group)
 }

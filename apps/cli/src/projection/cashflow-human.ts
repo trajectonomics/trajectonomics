@@ -1,7 +1,15 @@
 import { type AppError, isAppError } from "../errors"
 import type { ColumnHint } from "../table/lines"
 import { isRecord, tableLines } from "../table/lines"
-import { type CashflowTotals, cashflowTotalsOf, type RollupFigures, sumOf } from "./cashflow-totals"
+import {
+	type BlockRow,
+	figuresOf,
+	incomeRows,
+	lineOf,
+	outsideCash,
+	textOf,
+} from "./cashflow-human-rows"
+import { type CashflowTotals, cashflowTotalsOf } from "./cashflow-totals"
 import { moneyOf } from "./money"
 
 /*
@@ -15,9 +23,6 @@ const BLOCK_COLUMNS: readonly ColumnHint[] = [
 	{ key: "line", label: "line" },
 	{ key: "amount", label: "amount", align: "right" },
 ]
-
-/** One printed row of a block: a section total, or a line under it. */
-type BlockRow = { line: string; amount: string }
 
 /** A named table's rows of the result, or nothing when the result has no such table. */
 export function tableRows(
@@ -46,48 +51,6 @@ export function cashflowHidden(data: Record<string, unknown>): Record<string, un
 	}
 }
 
-/** A field of a table row as the text the engine stated it; anything else is a broken result. */
-function textOf(value: unknown, field: string): string {
-	if (typeof value !== "string")
-		throw new Error(`a cash-flow ${field} is not text: ${String(value)}`)
-	return value
-}
-
-/** One Annual roll-up's figures, as the totals read them. */
-function figuresOf(row: Record<string, unknown>): RollupFigures {
-	return {
-		income: textOf(row["income"], "income"),
-		expense: textOf(row["expense"], "expense"),
-		contributions: textOf(row["contributions"], "contributions"),
-		unfundedContributions: textOf(row["unfundedContributions"], "unfundedContributions"),
-		unmet: textOf(row["unmet"], "unmet"),
-	}
-}
-
-/** A field of a table row that may be absent, as the text the engine stated it. */
-function optionalText(value: unknown, field: string): string | undefined {
-	return value === undefined ? undefined : textOf(value, field)
-}
-
-/** An engine line as the totals read it. */
-function lineOf(line: Record<string, unknown>): { group: string; amount: string } {
-	return { group: textOf(line["group"], "group"), amount: textOf(line["amount"], "amount") }
-}
-
-/**
- * What moved in or out of Accounts without passing through the household's cash, under the roll-up's
- * totals: the employer's share that landed in Accounts and the fees charged to them. Each is the
- * engine's own figure, printed only when the Scenario declares it, and neither is in the identity.
- */
-function outsideCash(annual: Record<string, unknown>): BlockRow[] {
-	const employer = optionalText(annual["employerContributions"], "employerContributions")
-	const fees = optionalText(annual["fees"], "fees")
-	return [
-		...(employer === undefined ? [] : [{ line: "employer paid in (not cash)", amount: employer }]),
-		...(fees === undefined ? [] : [{ line: "fees charged (not cash)", amount: fees }]),
-	]
-}
-
 /** One roll-up's block rows: each section's total, then the lines a person reads under it. */
 function blockRows(
 	annual: Record<string, unknown>,
@@ -107,18 +70,10 @@ function blockRows(
 	if (isAppError(totals))
 		throw new Error("a cash-flow total the result states is past the safe integers")
 
-	const payouts = optionalText(annual["payouts"], "payouts")
-	// With payouts the engine's income includes them, so the line under money in is the Flows' own income
-	// (the exact sum of the income lines), and the payouts are the next line: the lines add up to money in.
-	const income =
-		payouts === undefined
-			? figures.income
-			: money(Number(sumOf(lines.map(lineOf), ["income"], currency)))
 	const rows: BlockRow[] = [
 		{ line: "money in", amount: money(totals["money in"]) },
-		{ line: "  income", amount: income },
+		...incomeRows(annual, lines, currency),
 	]
-	if (payouts !== undefined) rows.push({ line: "  payouts", amount: payouts })
 	if (groupLines("withdrawal").length > 0) {
 		rows.push({ line: "  withdrawals", amount: money(totals.withdrawals) })
 	}

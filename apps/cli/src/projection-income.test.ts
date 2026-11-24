@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { projection } from "./projection/testing"
-import { INCOME_FLAGS, linesOf, planHome, satang, taxedHome } from "./projection-income-support"
+import { linesOf, satang } from "./projection-income-read"
+import { INCOME_FLAGS, planHome, taxedHome } from "./projection-income-support"
 import { runBody, tableOf } from "./projection-run-support"
 
 /*

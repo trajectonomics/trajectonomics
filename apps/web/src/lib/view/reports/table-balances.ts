@@ -27,6 +27,23 @@ export function balances(rows: Rows<"balances">): ReportTable {
 	)
 }
 
+/** What each fee Account was charged in each Annual roll-up (cli ADR-0067). */
+export function fees(rows: Rows<"fees">): ReportTable {
+	type Row = Rows<"fees">[number]
+	return build(
+		"fees",
+		"Fees",
+		[
+			text("index", (r: Row) => String(r.index)),
+			text("from", (r: Row) => r.from),
+			text("to", (r: Row) => r.to),
+			text("account", (r: Row) => r.account),
+			figure("amount", (r: Row) => r.amount),
+		],
+		rows,
+	)
+}
+
 /** What each spending rule fixed and paid in each Rule year (cli ADR-0063); the rate is stated only when the portfolio held something. */
 export function spendingRules(rows: Rows<"spendingRules">): ReportTable {
 	type Row = Rows<"spendingRules">[number]

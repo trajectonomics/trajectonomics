@@ -1,17 +1,20 @@
 import type { ErrorCode, ProjectionProblem } from "@trajectonomics/core/sim"
 import type { Said } from "./refusal-said"
+import { SAID_TRADE } from "./refusal-trade"
 
-/**
- * The sentence for an Account's labels (sim ADR 0027, cli ADR-0067). One code names two mistakes, told
- * apart by the path the engine blames: a payout's `label` beside `returnLabel`, which would tally the same
- * money twice, and `returnLabel` beside `gainLabel`. The document check alone finds it, so
- * `scenario apply`, the Store and `--set` state it too, as well as `projection run` on a stored row.
- */
+/** Whether `CONFLICTING_LABELS` blames a payout's `label` (beside `returnLabel`), not `returnLabel` beside `gainLabel`. */
 function payoutLabel(problem: ProjectionProblem): boolean {
 	return "path" in problem && problem.path.includes("payout")
 }
 
-export const SAID_INCOME: Readonly<Partial<Record<ErrorCode, Said>>> = {
+/**
+ * The sentences for buying and selling an asset (sim ADR 0021) and for an Account's labels (sim ADR
+ * 0027, cli ADR-0067). `CONFLICTING_LABELS` names two mistakes, told apart by the path the engine blames.
+ * The document check alone finds each, so `scenario apply`, the Store and `--set` state it too, as well
+ * as `projection run` on a stored row.
+ */
+export const SAID_ACCOUNTS: Readonly<Partial<Record<ErrorCode, Said>>> = {
+	...SAID_TRADE,
 	CONFLICTING_LABELS: {
 		message: (problem) =>
 			payoutLabel(problem)

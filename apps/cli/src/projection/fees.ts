@@ -1,5 +1,5 @@
 import type { AnnualRollup } from "@trajectonomics/core/sim"
-import type { FeeRow, FeesTable } from "./fees-view"
+import type { FeeRow, FeesTable } from "./balances-view"
 import { moneyOf } from "./money"
 
 /*

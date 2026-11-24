@@ -1,10 +1,9 @@
 import { z } from "zod"
-import { type BalancesTable, balancesTable } from "./balances-view"
+import { type BalancesTable, balancesTable, type FeesTable, feesTable } from "./balances-view"
 import { carryInField } from "./carryin-view"
 import { type CashflowTotalsTable, cashflowTotalsTable } from "./cashflow-totals-view"
 import { type CashflowRow, cashflowRow } from "./cashflow-view"
 import { type EstateTables, estateTables } from "./estate-view"
-import { type FeesTable, feesTable } from "./fees-view"
 import {
 	type LiabilityMonthsTable,
 	liabilityMonthsTable,

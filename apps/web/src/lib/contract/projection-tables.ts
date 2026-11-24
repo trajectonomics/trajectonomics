@@ -10,6 +10,7 @@ import {
 	feeRow,
 	liabilityRow,
 	milestoneRow,
+	monthlyRow,
 	paidOffRow,
 	spendingRuleRow,
 } from "./projection-rows"
@@ -26,11 +27,9 @@ const annualRow = z.strictObject({
 	income: money,
 	// Present only when the Scenario declares a withdrawal Flow (cli ADR-0059).
 	withdrawals: money.optional(),
-	// Present only when an Account pays out; already inside `income` (cli ADR-0067, sim ADR 0027).
+	// Each present only when declared (cli ADR-0067): payouts are inside `income`, the others outside it.
 	payouts: money.optional(),
-	// Present only when the Scenario declares an employer Contribution; outside `income` (sim ADR 0026).
 	employerContributions: money.optional(),
-	// Present only when an Account carries a fee above 0 bps; outside cashflow (sim ADR 0028).
 	fees: money.optional(),
 	expense: money,
 	contributions: money,
@@ -39,16 +38,6 @@ const annualRow = z.strictObject({
 	unmet: money,
 	partial: z.boolean(),
 	realNetWorth: z.strictObject({ date: dateString, amount: money }),
-})
-
-/** One monthly row: net worth on the row's date, nominal and real, and the accessible share. */
-const monthlyRow = z.strictObject({
-	date: dateString,
-	ages: personAges,
-	netWorth: money,
-	realNetWorth: money,
-	accessibleNetWorth: money,
-	realAccessibleNetWorth: money,
 })
 
 /**

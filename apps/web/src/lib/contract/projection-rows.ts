@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
+import { personAges } from "./person-age"
 
 /*
  * The rows of the projection's optional tables (cli ADR-0049, ADR-0059, ADR-0060, ADR-0063): each
@@ -101,4 +102,14 @@ export const estateLineRow = z.strictObject({
 	line: z.string(),
 	kind: z.enum(["cost", "gift"]),
 	amount: money,
+})
+
+/** One monthly row: net worth on the row's date, nominal and real, and the accessible share. */
+export const monthlyRow = z.strictObject({
+	date: dateString,
+	ages: personAges,
+	netWorth: money,
+	realNetWorth: money,
+	accessibleNetWorth: money,
+	realAccessibleNetWorth: money,
 })
