@@ -29,7 +29,7 @@ describe("the lifetime totals of every parity case", () => {
 				...projectOptions,
 				cashflowBreakdown: true,
 			})
-			if (!result.ok) return
+			if (!result.ok) throw new Error(JSON.stringify(result.problems))
 			const { projection } = result
 			const assets = scenario.accounts.filter(
 				(account): account is AssetRule => account.kind === "asset",
@@ -62,7 +62,9 @@ describe("the lifetime totals of every parity case", () => {
 
 	it("covers every parity case that declares a fee or a payout", () => {
 		const declaring = EVERY_PARITY_CASE.filter(({ fixture }) =>
-			fixture.scenario.accounts.some((a) => a.kind === "asset" && (a.fee || a.payout)),
+			fixture.scenario.accounts.some(
+				(a) => a.kind === "asset" && ((a.fee?.bps ?? 0) > 0 || (a.payout?.bps ?? 0) > 0),
+			),
 		)
 		expect(declaring.map((item) => item.name)).toEqual(
 			expect.arrayContaining(["payout-year", "fee-year", "lifetime-year"]),

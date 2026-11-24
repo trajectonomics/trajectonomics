@@ -1,7 +1,7 @@
 import { declaresEmployer } from "../engine/employer"
 import { chargingAccounts } from "../fee/flows"
 import { declaresTransfers, declaresWithdrawals } from "../loan/resolve"
-import { declaresPayouts, isPayout } from "../payout/flows"
+import { declaresPayouts, payingAccounts } from "../payout/flows"
 import type { AccountId, Scenario } from "../types"
 
 /** What a Scenario declares, so its roll-ups report only the figures it has: each is absent otherwise. */
@@ -23,7 +23,7 @@ export function declaredBy(scenario: Scenario): Declared {
 		transfers: declaresTransfers(scenario),
 		employer: declaresEmployer(scenario),
 		payouts: declaresPayouts(scenario),
-		paying: scenario.flows.filter(isPayout).map((flow) => flow.payoutOf.account),
+		paying: payingAccounts(scenario).map((account) => account.id),
 		fees: chargingAccounts(scenario).map((account) => account.id),
 	}
 }

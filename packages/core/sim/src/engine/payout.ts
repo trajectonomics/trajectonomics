@@ -23,6 +23,8 @@ export interface Payouts {
 	readonly problem: ProjectionProblem | undefined
 }
 
+const NONE: ReadonlyMap<AccountId, bigint> = new Map()
+
 export function applyPayouts(
 	states: StateMap,
 	events: readonly DatedEvent[],
@@ -31,7 +33,8 @@ export function applyPayouts(
 	levies: LevySet | undefined,
 ): Payouts {
 	let paid = 0n
-	const by = new Map<AccountId, bigint>()
+	// Made on the first payout, so a date (or a whole run) without one allocates nothing.
+	let by: Map<AccountId, bigint> | undefined
 	for (const event of events) {
 		const { flow } = event
 		if (!isPayout(flow)) continue
@@ -39,9 +42,10 @@ export function applyPayouts(
 		const state = states.get(flow.payoutOf.account)
 		if (amount === 0n || state === undefined) continue
 		const problem = mutate(state, date, -amount, levies, "payout")
-		if (problem !== undefined) return { paid, by, problem }
+		if (problem !== undefined) return { paid, by: by ?? NONE, problem }
 		paid += amount
+		by ??= new Map()
 		addTo(by, flow.payoutOf.account, amount)
 	}
-	return { paid, by, problem: undefined }
+	return { paid, by: by ?? NONE, problem: undefined }
 }
