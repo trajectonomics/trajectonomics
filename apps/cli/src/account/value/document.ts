@@ -14,7 +14,7 @@ const entry: z.ZodType<ValueEntry> = z.strictObject({
 	value: z
 		.string()
 		.describe(
-			"A decimal string in the account's currency: an asset's value, or what a liability still owes.",
+			"A decimal string in the account's currency: an asset's value, which may be negative, or what a liability still owes, a positive amount.",
 		),
 })
 

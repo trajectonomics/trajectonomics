@@ -7,11 +7,6 @@ import type { Prepared, ValuedRow } from "./types"
 /** What the entries applied so far added: the core's entries, for the next Balance, and the rows to write. */
 export type Applied = { pending: Transaction[]; writes: NewTransaction[] }
 
-/** An asset's value is its Debit balance; a liability's is what it owes, the Credit side. */
-export function stated(account: AccountRow, balance: number): number {
-	return account.type === "liability" ? 0 - balance : balance
-}
-
 /** A draft id the core can tell apart; the store mints the real one when the row is written. */
 function draftId(position: number): string {
 	return `01940000-0000-7000-8000-${String(position).padStart(12, "0")}`
@@ -31,7 +26,7 @@ export function applyEntry(
 	const { account, date, value } = entry
 	const transactions = [...ledger.transactions, ...applied.pending]
 	const current = balanceAt(transactions, account.id, date, ledger.chart).amount
-	const built = valuationEntry(
+	const { transaction, before, difference } = valuationEntry(
 		{
 			id: draftId(applied.pending.length),
 			date,
@@ -42,17 +37,15 @@ export function applyEntry(
 		},
 		ledger.chart,
 	)
-	const before = stated(account, current)
 	const row = { index: entry.index, account, date, before, value }
-	if (built === undefined) return { ...row, difference: 0, write: null, notes: [] }
-	const difference = value - before
+	if (transaction === undefined) return { ...row, difference, write: null, notes: [] }
 	const memo = `${MEMO_PREFIX}${formatMinorUnits(value, account.currency)}`
-	applied.writes.push(written(built, { date, memo }))
-	applied.pending.push(built)
+	applied.writes.push(written(transaction, { date, memo }))
+	applied.pending.push(transaction)
 	const notes = laterNotes({
 		ledger,
 		stored,
-		transactions: [...transactions, built],
+		transactions: [...transactions, transaction],
 		account,
 		date,
 		difference,

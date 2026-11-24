@@ -7,7 +7,7 @@
  */
 
 export type { Account, AccountInput, AccountType, NormalBalance } from "./account"
-export { normalBalance } from "./account"
+export { normalBalance, statedAmount } from "./account"
 export { amend } from "./amend"
 export { balance } from "./balance"
 export type { BalanceRow } from "./balances"

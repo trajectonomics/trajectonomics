@@ -4,7 +4,13 @@ import { type AppError, fail, isAppError } from "../../errors"
 import { type AccountRow, type Ledger, parseMinorUnits } from "../../store"
 import { unknownAccount } from "../../tx/errors"
 import type { ValueEntry } from "./document"
-import { accountInvalid, againstInvalid, archivedAccount, headerAccount } from "./refusals"
+import {
+	accountInvalid,
+	againstInvalid,
+	archivedAccount,
+	headerAccount,
+	negativeLiability,
+} from "./refusals"
 import type { Positioned, Prepared, Refusal, ValueRequest } from "./types"
 
 const STATED_TYPES: ReadonlySet<string> = new Set(["asset", "liability"])
@@ -53,6 +59,9 @@ function prepare(
 	if (isAppError(date)) return date
 	const value = parseMinorUnits(entry.value, account.currency, at("value"))
 	if (isAppError(value)) return value
+	if (account.type === "liability" && value < 0) {
+		return negativeLiability(account, entry.value, at("value"))
+	}
 	return { index: entry.index, account, date, value }
 }
 

@@ -43,6 +43,19 @@ export function accountInvalid(account: AccountRow, path: string): AppError {
 	})
 }
 
+/**
+ * A negative value for a liability: `traj balance` shows one as negative, so a copied figure would
+ * state the debt twice over. The value is what it owes, positive, and is refused rather than flipped.
+ */
+export function negativeLiability(account: AccountRow, value: string, path: string): AppError {
+	return fail("valuation_value_negative", {
+		path,
+		message: `${path}: "${account.name}" is a liability, so its value is what it still owes, not ${value}`,
+		hint: "State what the liability still owes as a positive amount, such as 800.00.",
+		details: { account: { id: account.id, name: account.name }, value },
+	})
+}
+
 /** An account to value, or the one to post against, is archived and takes no postings. */
 export function archivedAccount(account: AccountRow, path: string): AppError {
 	return fail("account_archived", {

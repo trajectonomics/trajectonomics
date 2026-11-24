@@ -22,7 +22,7 @@ export const value: Leaf = defineCommand({
 			.string()
 			.optional()
 			.describe(
-				"What the account is worth on --date, as a decimal in its currency: an asset's value, or what a liability still owes.",
+				"What the account is worth on --date, as a decimal in its currency: an asset's value, which may be negative, or what a liability still owes, a positive amount.",
 			),
 		date: z
 			.string()
@@ -88,6 +88,7 @@ export const value: Leaf = defineCommand({
 		"invalid_input",
 		"valuation_account_invalid",
 		"valuation_against_invalid",
+		"valuation_value_negative",
 		...LEDGER_READ_CODES,
 	],
 	run: (input, document, ctx) => {

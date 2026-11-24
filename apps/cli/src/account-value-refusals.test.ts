@@ -127,4 +127,18 @@ describe("account value refusals", () => {
 		const res = await value(traj, "Home", "1.00", "2026-03-01")
 		expect(failure(res)).toMatchObject({ code: "account_archived", path: "account" })
 	})
+
+	it("refuses a negative value for a liability, which an asset may take", async () => {
+		const { traj } = await chartHome()
+		const res = await value(traj, "Loan", "-1800000.00", "2026-03-01")
+		expect(res.code).toBe(3)
+		const error = failure(res)
+		expect(error).toMatchObject({ code: "valuation_value_negative", exitCode: 3, path: "value" })
+		expect(error.hint).toBe(
+			"State what the liability still owes as a positive amount, such as 800.00.",
+		)
+		expect(await ledgerSize(traj)).toEqual({ transactions: 0, postings: 0 })
+		const asset = await value(traj, "Fund", "-250.00", "2026-03-01")
+		expect(asset.code).toBe(0)
+	})
 })

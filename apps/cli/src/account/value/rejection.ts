@@ -27,7 +27,7 @@ export function rejection(request: ValueRequest, refused: readonly Refusal[]): A
 	return fail(code, {
 		message: "The values were rejected and nothing was written.",
 		...(path === undefined ? {} : { path }),
-		hint: `Fix values.${first.index} first: ${first.error.body.message}`,
+		hint: `Fix document.values.${first.index} first: ${first.error.body.message}`,
 		details: { values },
 	})
 }

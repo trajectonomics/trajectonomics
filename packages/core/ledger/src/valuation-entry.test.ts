@@ -1,11 +1,11 @@
 import { describe, expect, it } from "bun:test"
 import { chart, codeOf } from "./builders.fixtures"
-import { balance, valuationEntry } from "./index"
+import { balance, statedAmount, valuationEntry } from "./index"
 
 const base = { id: "v1", date: "2026-03-01", against: "revenue" }
 const moves = (account: string, balanceNow: number, value: number, against = "revenue") => {
 	const entry = valuationEntry({ ...base, against, account, balance: balanceNow, value }, chart)
-	return entry?.postings.map((p) => [p.accountId as string, p.amount])
+	return entry.transaction?.postings.map((p) => [p.accountId as string, p.amount])
 }
 
 describe("valuationEntry", () => {
@@ -45,18 +45,29 @@ describe("valuationEntry", () => {
 		])
 	})
 
-	it("returns nothing when the stated value equals the Balance", () => {
-		expect(valuationEntry({ ...base, account: "bank", balance: 1000, value: 1000 }, chart)).toBe(
-			undefined,
+	it("returns no entry, a zero difference and the value as before when they agree", () => {
+		const asset = valuationEntry({ ...base, account: "bank", balance: 1000, value: 1000 }, chart)
+		expect(asset).toEqual({ transaction: undefined, before: 1000, difference: 0 })
+		const owed = valuationEntry({ ...base, account: "principal", balance: -800, value: 800 }, chart)
+		expect(owed).toEqual({ transaction: undefined, before: 800, difference: 0 })
+	})
+
+	it("states before and difference on the Normal Balance side, so before + difference is the value", () => {
+		const asset = valuationEntry({ ...base, account: "bank", balance: 1000, value: 400 }, chart)
+		expect([asset.before, asset.difference]).toEqual([1000, -600])
+		const owed = valuationEntry(
+			{ ...base, account: "principal", balance: -800, value: 1000 },
+			chart,
 		)
-		expect(
-			valuationEntry({ ...base, account: "principal", balance: -800, value: 800 }, chart),
-		).toBe(undefined)
+		expect([owed.before, owed.difference]).toEqual([800, 200])
 	})
 
 	it("leaves the account at exactly the stated value once the entry is added", () => {
-		const entry = valuationEntry({ ...base, account: "principal", balance: 0, value: 700 }, chart)
-		expect(balance([entry!], "principal", "2026-03-01", chart).amount).toBe(-700)
+		const { transaction } = valuationEntry(
+			{ ...base, account: "principal", balance: 0, value: 700 },
+			chart,
+		)
+		expect(balance([transaction!], "principal", "2026-03-01", chart).amount).toBe(-700)
 	})
 
 	it("rejects a contra in another currency with CURRENCY_MISMATCH, even when the figures agree", () => {
@@ -108,7 +119,18 @@ describe("valuationEntry", () => {
 			},
 			chart,
 		)
-		expect(entry?.postings[0]?.dimensions).toEqual({ project: "home" })
-		expect(entry?.postings[1]?.dimensions).toBeUndefined()
+		expect(entry.transaction?.postings[0]?.dimensions).toEqual({ project: "home" })
+		expect(entry.transaction?.postings[1]?.dimensions).toBeUndefined()
+	})
+})
+
+describe("statedAmount", () => {
+	it("keeps a Debit-normal type's sign and flips a Credit-normal one, and flips back", () => {
+		expect(statedAmount("asset", -250)).toBe(-250)
+		expect(statedAmount("expense", 7)).toBe(7)
+		expect(statedAmount("liability", -800)).toBe(800)
+		expect(statedAmount("income", 5)).toBe(-5)
+		expect(statedAmount("liability", statedAmount("liability", -800))).toBe(-800)
+		expect(Object.is(statedAmount("liability", 0), 0)).toBe(true)
 	})
 })

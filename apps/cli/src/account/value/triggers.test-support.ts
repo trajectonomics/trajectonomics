@@ -18,6 +18,21 @@ async function refused(
 	return capture(["account", "value", valued, ...flags], { TRAJ_HOME: home })
 }
 
+/** A liability valued at a negative amount, as `traj balance` shows one. */
+async function negative() {
+	const home = ledgerHome()
+	for (const [name, type] of [
+		["Loan", "liability"],
+		["Gains", "income"],
+	] as const) {
+		await capture(["account", "add", name, "--type", type, "--currency", "THB", "--json"], {
+			TRAJ_HOME: home,
+		})
+	}
+	const flags = ["--value", "-800.00", "--date", "2026-11-22", "--against", "Gains", "--json"]
+	return capture(["account", "value", "Loan", ...flags], { TRAJ_HOME: home })
+}
+
 /** One real command line per code `account value` raises itself (the contract test's triggers). */
 export const valuationTriggers: Record<ValuationRaised, () => ReturnType<typeof capture>> = {
 	valuation_account_invalid: () =>
@@ -29,6 +44,7 @@ export const valuationTriggers: Record<ValuationRaised, () => ReturnType<typeof 
 			"Food",
 			"Gains",
 		),
+	valuation_value_negative: negative,
 	valuation_against_invalid: () =>
 		refused(
 			[

@@ -70,6 +70,7 @@ describe("account value --file", () => {
 		expect(res.code).toBe(3)
 		const error = fail(res)
 		expect(error.code).toBe("UNKNOWN_ACCOUNT")
+		expect(error.hint).toStartWith("Fix document.values.1 first:")
 		expect(error.path).toBe("document.values.1.account")
 		expect(error.details.values.map((row: { index: number }) => row.index)).toEqual([1, 2, 3])
 		expect(error.details.values[2].reason).toMatchObject({
