@@ -22,7 +22,7 @@ export function documentPathOf(error: ErrorBody | null): string[] {
 		typeof details === "object" && details !== null && "documentPath" in details
 			? String((details as { documentPath: unknown }).documentPath)
 			: ""
-	const path = error?.path?.startsWith("document.") ? error.path : fromDetails
+	const path = /^document\./.test(error?.path ?? "") ? (error?.path ?? "") : fromDetails
 	return path === "" ? [] : path.split(".").slice(1)
 }
 
