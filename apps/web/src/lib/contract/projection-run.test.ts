@@ -119,8 +119,11 @@ describe("the projection run contract against the CLI's goldens", () => {
 			account: "emergency",
 			upTo: { amount: "100000.00", growth: "inflation" },
 			share: null,
+			resolved: { first: "100000.00", horizon: "103000.00" },
 		})
 		expect(run.routing?.surplus[1]).toMatchObject({ entry: 1, account: "funds", share: "50.00" })
+		expect(run.routing?.withdraw[0]?.resolved).toEqual({ first: "20000.00", horizon: "20600.00" })
+		// A plain Account states no target and so no resolved figure (cli ADR-0070).
 		expect(run.routing?.withdraw[1]).toEqual({ entry: 1, account: "funds", downTo: null })
 		const annual = run.tables.find((table) => table.name === "annual")
 		expect(annual?.rows.map((row) => ("transfers" in row ? row.transfers : undefined))).toEqual([
@@ -146,6 +149,25 @@ describe("the projection run contract against the CLI's goldens", () => {
 		const loans = run.tables.find((table) => table.name === "liabilities")
 		if (loans?.name !== "liabilities") throw new Error("the output has no liabilities table")
 		expect(loans.rows.filter((row) => row.transferred === "1000.00")).toHaveLength(3)
+	})
+
+	it("reads a routing echo written before `resolved`, which is optional", async () => {
+		const body = (await golden("run-routing.output")) as {
+			routing: { surplus: { resolved?: unknown }[]; withdraw: { resolved?: unknown }[] }
+		}
+		for (const entry of [...body.routing.surplus, ...body.routing.withdraw]) delete entry.resolved
+		expect(projectionRun.parse(body).routing?.surplus[0]?.resolved).toBeUndefined()
+	})
+
+	it("refuses a `resolved` that states anything but the first day and the horizon", async () => {
+		const body = (await golden("run-routing.output")) as {
+			routing: { surplus: { resolved: object }[] }
+		}
+		body.routing.surplus[0] = {
+			...body.routing.surplus[0],
+			resolved: { first: "1.00", horizon: "2.00", year: "3.00" },
+		} as never
+		expect(projectionRun.safeParse(body).success).toBe(false)
 	})
 
 	it("states no routing and no transfers for a run without the new forms", async () => {

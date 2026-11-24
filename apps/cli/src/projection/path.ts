@@ -5,6 +5,7 @@ import { type ModelSource, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { optionsOf } from "./liabilities"
 import type { ProjectionPathView } from "./path-view"
+import { routingOption } from "./routing"
 import { runViewOf } from "./run"
 import type { Wants } from "./run-tables"
 
@@ -34,7 +35,7 @@ export function pathOf(
 		placed.document,
 		placed.timeline,
 		{ model, ...selection },
-		optionsOf(breakdown, liabilities, spending, estate),
+		{ ...optionsOf(breakdown, liabilities, spending, estate), ...routingOption(placed.document) },
 	)
 	if (!result.ok) return chanceRefusal(result.problems, selection.paths)
 	const { projection } = result

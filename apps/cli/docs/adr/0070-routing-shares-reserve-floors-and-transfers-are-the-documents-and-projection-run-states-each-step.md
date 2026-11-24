@@ -57,12 +57,16 @@ Each is present only when the Scenario or the flag asks for it, so a run without
   `upTo` or `downTo` as `{ amount, growth }` (`growth` is null for a nominal figure), as the document states them. It is present only when
   the document uses a share, a floor or a target that keeps its value. In the human form it is a table before the cash-flow blocks, and each
   year's block adds `moved between accounts (not cash)` with a line per transfer and what it did not move.
-- **The echo does not state the amount a grown target is worth on a date.** The issue asked for the target resolved at the first roll-up
-  and at the horizon. The engine states no such figure: `routedAt` is internal to `sim`, and the Projection and its breakdown carry only
-  what was drawn and filled. Computing it here would be the CLI re-implementing the engine's whole-year growth and half-up rounding
-  (cli AGENTS rule 3, ADR-0058), so the echo carries the document's `{ amount, growth }` and no resolved figure. A resolved figure needs a
-  `sim` change first (a field on the Projection, or an exported resolver), and then an additive field on the echo. #458 is that follow-up:
-  it adds `resolved: { first, horizon }` to each grown target once `sim` states them.
+- **A grown target states what it is worth: `resolved: { first, horizon }`** (#458). The engine states it (sim ADR 0030, `Projection.routing`), so
+  the CLI works out nothing (cli AGENTS rule 3, ADR-0058): `first` is the target on the first day of the Timeline and `horizon` on the horizon
+  date, formatted as money like every other figure. The CLI passes the engine's `routing` option only for a run that prints the echo and
+  whose Scenario has an `upTo` or `downTo` that is `{ amount, growth }` (`projection run` and `projection path`; `fi` and `chance` never ask),
+  so every other output keeps its bytes. `resolved` sits on the entry, beside `upTo` or `downTo`, and is **omitted** for a nominal target and
+  for an entry with no target: a nominal figure is its own value on every date, so the echo does not repeat it, and `traj schema` says so.
+  `first` is the amount the document wrote, because the growth runs in whole years from the start of the Timeline and none has passed on
+  its first day; the figure a reader wants is `horizon`, and the human form states it beside the document's own figure ("down to 20000.00 at the start,
+  grown by inflation: 20600.00 at the horizon", adding the first day's figure only if it ever differs). A target past the safe integers is the engine's `VALUE_OVERFLOW` on the
+  horizon date, worded by the refusal table like any other (exit 3, `projection_refused`).
 - **The web contract** decodes each field, with no page change: `transfers` on the annual row, `entry` on a cash-flow line, the
   `transfers` table, `transferred` on a loan month, `routing` on the run, and the `transfer` Flow kind with `realise` and a typed
   `cashflow` on the document. A CLI-written golden (`run-routing.output`) is decoded by the contract's test.
