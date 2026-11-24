@@ -10,7 +10,6 @@ import {
 	setupAllowances,
 	terminal,
 } from "./allowances-ledger.test-support"
-import { post, snapshotOf } from "./allowances-requests.test-support"
 import { calls, clearCalls, spyContext } from "./allowances-spy.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
@@ -24,6 +23,7 @@ const CHECK = ["scenario list", "account list", "report networth"]
 
 let spy: Editor
 let log = ""
+let disposeSpy: () => Promise<void> = async () => {}
 
 /** One reread, posted to the spy editor as the page posts it, and its answer's Snapshot. */
 async function reread(body: unknown): Promise<Snapshot> {
@@ -31,6 +31,13 @@ async function reread(body: unknown): Promise<Snapshot> {
 	const answer = (await response.json()) as { ok: boolean; snapshot: Snapshot }
 	if (!answer.ok) throw new Error("the reread failed")
 	return answer.snapshot
+}
+
+/** The calls that are not `projection allowances`, reduced to the stage-one prefix each one starts with. */
+function checksOf(ran: string[]): (string | undefined)[] {
+	return ran
+		.filter((line) => !line.startsWith("projection allowances"))
+		.map((line) => CHECK.find((prefix) => line.startsWith(prefix)))
 }
 
 /** The Snapshot without its allowance reads and their inputs: everything a settings change must leave alone. */
@@ -44,9 +51,13 @@ beforeAll(async () => {
 	await setupAllowances()
 	const made = await spyContext(ledgerEnv())
 	log = made.log
+	disposeSpy = made.dispose
 	spy = await editorOver(made.context)
 }, SLOW_MS)
-afterAll(disposeAllowances)
+afterAll(async () => {
+	await disposeSpy()
+	await disposeAllowances()
+})
 
 describe("a reread that changes only the allowance inputs", () => {
 	test(
@@ -57,8 +68,7 @@ describe("a reread that changes only the allowance inputs", () => {
 			const after = await reread({ allowances: SECOND })
 			const ran = await calls(log)
 			expect(ran.filter((line) => line.startsWith("projection allowances"))).toHaveLength(1)
-			const rest = ran.filter((line) => !line.startsWith("projection allowances"))
-			expect(rest.map((line) => CHECK.find((prefix) => line.startsWith(prefix)))).toEqual(CHECK)
+			expect(checksOf(ran)).toEqual(CHECK)
 			expect(others(after)).toBe(others(before))
 			expect(after.params.allowances).toEqual(SECOND)
 			expect(after.reads.allowances[PLAN]?.ok).toBe(true)
@@ -70,11 +80,11 @@ describe("a reread that changes only the allowance inputs", () => {
 	)
 
 	test(
-		"clearing the inputs runs no allowance read and leaves none in the Snapshot",
+		"clearing the inputs runs no read and leaves no allowance read in the Snapshot",
 		async () => {
 			await clearCalls(log)
 			const after = await reread({ allowances: null })
-			expect((await calls(log)).some((line) => line.startsWith("projection"))).toBe(false)
+			expect(await calls(log)).toEqual([])
 			expect(after.reads.allowances).toEqual({})
 			expect(after.params.allowances).toBeNull()
 		},
@@ -82,11 +92,21 @@ describe("a reread that changes only the allowance inputs", () => {
 	)
 
 	test(
-		"a reread of the same Snapshot is the same as a full one",
+		"a kept reread equals a full read, and runs only the checks and the allowance reads",
 		async () => {
+			// The previous test left the inputs null, so this is the fast swap.
+			await clearCalls(log)
 			const kept = await reread({ allowances: FIRST })
-			const full = await post("reread", { allowances: FIRST })
-			expect(kept).toEqual(snapshotOf(full))
+			const keptRan = await calls(log)
+			expect(checksOf(keptRan)).toEqual(CHECK)
+			expect(keptRan.filter((line) => line.startsWith("projection allowances"))).toHaveLength(1)
+			expect(keptRan.some((line) => line.startsWith("projection run"))).toBe(false)
+
+			// The params hold FIRST now; `{}` runs the whole Plan.
+			await clearCalls(log)
+			const full = await reread({})
+			expect((await calls(log)).some((line) => line.startsWith("projection run"))).toBe(true)
+			expect(JSON.stringify(kept)).toBe(JSON.stringify(full))
 		},
 		SLOW_MS,
 	)

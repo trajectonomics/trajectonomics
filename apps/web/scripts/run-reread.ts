@@ -19,6 +19,8 @@ export async function rereadAllowances(
 	held: Snapshot,
 	records: readonly unknown[],
 ): Promise<SnapshotRun> {
+	// Clearing the inputs runs no read: the held Snapshot keeps every other Read and holds no allowance read.
+	if (params.allowances === null) return { ok: true, snapshot: withAllowances(held, null, {}) }
 	const one = await runStageOne(context, params)
 	const failure = firstStageOneFailure(one)
 	if (failure !== null) return { ok: false, error: failure }
