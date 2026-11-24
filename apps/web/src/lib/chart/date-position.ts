@@ -26,8 +26,8 @@ export function dayPosition(spans: readonly DaySpan[], day: string): number | nu
 	return null
 }
 
-/** The number of days from 1970-01-01 to a calendar day (proleptic Gregorian), by integer arithmetic. */
-function dayNumber(date: string): number {
+/** The number of days from 1970-01-01 to a calendar day (proleptic Gregorian), by integer arithmetic. It places a date on a time axis. */
+export function dayNumber(date: string): number {
 	const match = DAY.exec(date)
 	if (!match) throw new RangeError(`not a YYYY-MM-DD date: ${date}`)
 	const year = Number(match[1])

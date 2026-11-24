@@ -4,7 +4,7 @@ import { abbreviate, maskMoney } from "../../lib/format"
 import { HEIGHT, MARGIN } from "./geometry"
 import LineMarks from "./LineMarks.svelte"
 import LineRules from "./LineRules.svelte"
-import { dashPattern, strokeClass } from "./series-style"
+import { dashPattern, fillClass, fillOpacity, strokeClass } from "./series-style"
 
 interface Props {
 	label: string
@@ -17,6 +17,15 @@ interface Props {
 }
 
 let { label, layout, width, masked, index }: Props = $props()
+
+/** The room a date label needs on each side of its tick, so the last one is not cut off at the edge. */
+const HALF_LABEL = 36
+
+/** A label is centred on its tick, except near an edge, where it ends or starts there instead. */
+function anchorAt(x: number): "start" | "middle" | "end" {
+	if (x + HALF_LABEL > width) return "end"
+	return x - HALF_LABEL < 0 ? "start" : "middle"
+}
 </script>
 
 <!-- The chart drawn as one SVG: the grid, the axis labels, every series and the hover marks. -->
@@ -49,19 +58,27 @@ let { label, layout, width, masked, index }: Props = $props()
 		<text
 			x={layout.xPixels[tick.index]}
 			y={HEIGHT - 8}
-			text-anchor="middle"
+			text-anchor={anchorAt(layout.xPixels[tick.index] ?? 0)}
 			class="fill-muted-foreground text-xs">{tick.label}</text
 		>
 	{/each}
 	{#each layout.series as line, seriesIndex (line.name)}
+		{#if line.area}
+			<path d={line.area} class={fillClass(seriesIndex)} fill-opacity={fillOpacity(seriesIndex)} />
+		{/if}
+		{#each line.bars ?? [] as bar, column (column)}
+			{#if bar}
+				<rect x={bar.x} y={bar.y} width={bar.width} height={bar.height} class={fillClass(seriesIndex)} fill-opacity={fillOpacity(seriesIndex, bar.faded)} />
+			{/if}
+		{/each}
 		<path
 			d={line.path}
 			fill="none"
 			stroke-width={2}
 			stroke-linejoin="round"
 			stroke-linecap="round"
-			stroke-dasharray={dashPattern(line.dashed ?? false)}
-			class={strokeClass(seriesIndex)}
+			stroke-dasharray={dashPattern(line.dashed, line.dotted)}
+			class={strokeClass(seriesIndex, layout.palette === "wide")}
 		/>
 	{/each}
 	<LineRules {layout} {width} />

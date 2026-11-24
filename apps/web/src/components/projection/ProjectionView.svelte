@@ -1,5 +1,6 @@
 <script lang="ts">
-import type { ProjectionRun, Read } from "../../lib/contract"
+import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
+import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -14,13 +15,28 @@ interface Props {
 	onScenario: (value: string) => unknown
 	terms: string
 	onTerms: (value: string) => void
+	/** The custom chart the address bar names ("" for none), its setter, and the accounts Read that names Accounts. */
+	chart?: string
+	onChart?: (id: string) => void
+	accounts?: Read<AccountList>
 }
 
 /** The Scenario picker and the projection of the chosen Scenario. The choice lives in the address bar. */
-let { projections, scenario, onScenario, terms, onTerms }: Props = $props()
+let { projections, scenario, onScenario, terms, onTerms, chart, onChart, accounts }: Props =
+	$props()
 const names = $derived(projectionNames(projections))
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : projections[name])
+const charts = $derived(
+	onChart === undefined
+		? undefined
+		: {
+				chart: chart ?? "",
+				onChart,
+				runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
+				accountNames: accountNamesOf(accounts),
+			},
+)
 const options = $derived(names.map((value) => ({ value, label: value })))
 </script>
 
@@ -37,7 +53,7 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 		/>
 		<ReadView {read} label={`Projection of ${name}`}>
 			{#snippet children(run)}
-				<ProjectionResult {run} argv={read.argv} {terms} {onTerms} />
+				<ProjectionResult {run} argv={read.argv} {terms} {onTerms} {charts} />
 			{/snippet}
 		</ReadView>
 	</div>
