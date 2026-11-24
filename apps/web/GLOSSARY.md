@@ -107,3 +107,7 @@ _Avoid_: inheritance, will, legacy, probate
 **Estate date**:
 The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date.
 _Avoid_: death date, payout date
+
+**Custom chart**:
+A chart a person made of yearly figures `traj` states, a name, a kind and a list of series ids, kept in the browser and in no plan. A series a plan lacks is named as missing, not drawn.
+_Avoid_: report, widget, dashboard, saved view

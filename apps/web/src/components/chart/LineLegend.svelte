@@ -1,4 +1,5 @@
 <script lang="ts">
+import { dashPattern } from "./series-style"
 import type { LegendItem } from "./types"
 
 interface Props {
@@ -19,7 +20,7 @@ let { items }: Props = $props()
 					y1={4}
 					y2={4}
 					stroke-width={2}
-					stroke-dasharray={item.dashed ? "6 4" : undefined}
+					stroke-dasharray={dashPattern(item.dashed, item.dotted)}
 					class={item.stroke}
 				/>
 			</svg>

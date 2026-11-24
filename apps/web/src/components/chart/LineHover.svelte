@@ -56,7 +56,7 @@ function onKeyDown(event: KeyboardEvent): void {
 		<LineTooltip
 			x={layout.xPixels[index] ?? 0}
 			{width}
-			xLabel={layout.xLabels[index] ?? ""}
+			xLabel={layout.xTitles?.[index] ?? layout.xLabels[index] ?? ""}
 			rows={tooltipRows(layout, index, masked)}
 		/>
 	{/if}
