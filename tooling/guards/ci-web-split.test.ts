@@ -47,9 +47,32 @@ describe("the CI split of the web check", () => {
 			tokens.findIndex((t) => t.startsWith("--")),
 		)
 		expect(tasks.sort()).toEqual(["build", "lint", "test:src", "typecheck"])
-		const shard = commandsOf(workflow.jobs["web-scripts"] as Job)
-		expect(shard).toContain("turbo run test:scripts")
-		expect(shard).toContain("--shard=")
+		const shard = workflow.jobs["web-scripts"] as Job
+		expect(commandsOf(shard)).toContain("test:scripts")
+		expect(commandsOf(shard)).toContain("--shard=")
+	})
+
+	it("builds the command line and the Demo in a step of their own, then runs a shard without turbo", () => {
+		// Turbo hashes the arguments after `--` into every task of the graph, so a `--shard` on the turbo
+		// command made the shard's `demo` and builds miss the packages job's cache (#464). The prelude
+		// carries no `--`, and the shard step runs bun directly.
+		const runs = (workflow.jobs["web-scripts"] as Job).steps?.map((step) => step.run ?? "") ?? []
+		const prelude = runs.findIndex((run) => run.includes("turbo run"))
+		const test = runs.findIndex((run) => run.includes("test:scripts"))
+		expect(prelude).toBeGreaterThanOrEqual(0)
+		expect(test).toBeGreaterThan(prelude)
+		const preludeTasks = (runs[prelude] ?? "").split(/\s+/)
+		expect(preludeTasks).toContain("@trajectonomics/cli#build")
+		expect(preludeTasks).toContain("@trajectonomics/web#demo")
+		expect(runs[prelude]).not.toContain("--shard")
+		expect(runs[prelude]).not.toMatch(/\s--(\s|$)/)
+		expect(runs[test]).not.toContain("turbo")
+		expect(runs[test]).toContain("--cwd apps/web test:scripts")
+		// The step that runs the tests reads what test:scripts depends on in turbo, so everything that task
+		// waits for is what the prelude has built (cli build, which builds the packages, and the Demo).
+		const needs = webTurbo.tasks["test:scripts"]?.dependsOn ?? []
+		expect(needs).toContain("@trajectonomics/cli#build")
+		expect(needs).toContain("demo")
 	})
 
 	it("keeps the scripts tests behind a build of the command line they spawn", () => {

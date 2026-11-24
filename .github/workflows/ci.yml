@@ -178,7 +178,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Read only: these jobs build the command line from the packages job's cache and do not save.
+      # Read only: these jobs restore the packages job's cache and do not save.
       - name: Restore the Turborepo cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -190,12 +190,19 @@ jobs:
       - name: Setup the workspace
         uses: ./.github/actions/setup
 
-      # Builds the command line first (the tests spawn it), then runs this shard's files. bun splits
-      # the files the same way in every job, so the shards together run each file exactly once.
+      # Builds what the tests read: the command line they spawn and the Demo snapshot (and what both
+      # build on). This is a separate step, without `--shard`, on purpose: turbo adds the arguments after
+      # `--` to the hash of every task in the graph, so with `-- --shard=N/4` on one command the shard's
+      # `demo`, `core#build` and `cli#build` could never match what the packages job saved, and every
+      # shard rebuilt them (#464). Here the hashes are the packages job's, so they are cache hits.
+      - name: Build the command line and the Demo snapshot the tests read
+        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#demo --concurrency=2
+
+      # bun splits the files the same way in every job, so the shards together run each file exactly
+      # once. Run through bun, not turbo, so the shard argument reaches no task hash. The task graph of
+      # `test:scripts` (apps/web/turbo.json) is exactly what the step above ran; tooling/guards pins that.
       - name: Test the web scripts, shard ${{ matrix.shard }} of ${{ strategy.job-total }}
-        run: >-
-          bunx turbo run test:scripts --filter=@trajectonomics/web --concurrency=2
-          -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: bun run --cwd apps/web test:scripts --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
   # The browser checks (#377) go here as their own job, `needs: plan` and
   # `if: needs.plan.outputs.web == 'true'`, so they run only when apps/web or the command line
