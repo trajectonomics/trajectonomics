@@ -153,6 +153,8 @@ describe("the Chance page names its source", () => {
 		const body = render(ChanceResult, {
 			props: {
 				argv: [],
+				plan: "base",
+				futures: null,
 				view: view({
 					returnModel: {
 						source: "plan",
@@ -167,7 +169,9 @@ describe("the Chance page names its source", () => {
 	})
 
 	test("a file otherwise", () => {
-		const body = render(ChanceResult, { props: { argv: [], view: view() } }).body
+		const body = render(ChanceResult, {
+			props: { argv: [], plan: "base", futures: null, view: view() },
+		}).body
 		expect(body).toContain("Read from a Return model file")
 	})
 })

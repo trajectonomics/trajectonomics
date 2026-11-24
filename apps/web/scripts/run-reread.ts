@@ -12,6 +12,7 @@ import {
 } from "../src/lib/snapshot"
 import { PLAN_RETURN_MODEL } from "../src/lib/snapshot/chance-params"
 import { runAllowances } from "./run-allowances"
+import { runPaths } from "./run-paths"
 import { runChance, runStageOne } from "./run-stages"
 import type { RunContext } from "./run-traj"
 import { firstStageOneFailure, runFromStageOne, type SnapshotRun } from "./snapshot-run"
@@ -72,7 +73,9 @@ export async function rereadInputs(
 		snapshot = withAllowances(snapshot, params.allowances, reads)
 	}
 	if (changed.chance && params.chance !== null) {
-		snapshot = withChance(snapshot, params.chance, await runChance(context, plan, records))
+		const chance = await runChance(context, plan, records)
+		const paths = await runPaths(context, plan, chance, records)
+		snapshot = withChance(snapshot, params.chance, chance, paths)
 	}
 	return { ok: true, snapshot }
 }

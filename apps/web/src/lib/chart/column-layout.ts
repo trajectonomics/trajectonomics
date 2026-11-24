@@ -1,6 +1,6 @@
 import { type ColumnKind, type Frame, type Lane, seriesLayout } from "./column-series"
 import { extent } from "./extent"
-import type { LineSeries } from "./line"
+import type { LineMarker, LineSeries } from "./line"
 import type { LineLayout, Plot } from "./line-layout"
 import { linearScale } from "./scale"
 import { type Span, stackSpans } from "./stack"
@@ -14,12 +14,15 @@ const X_LABEL_SPACE = 84
 /**
  * Lays a column chart out in pixels, as a `LineLayout` whose series also carry their bars or their
  * band. Each distinct x is one column, evenly spaced. The y axis takes in zero and every span. Null for
- * no points. Stacking is for drawing only: a tooltip row is each series' own string.
+ * no points. Stacking is for drawing only: a tooltip row is each series' own string. A marker of a bar chart
+ * stands inside the column of the period it falls in, as `dayPosition` places it: a position `x` is in the column
+ * whose x is the first one at or after it, a fraction of the way along it.
  */
 export function columnLayout(
 	series: readonly LineSeries[],
 	plot: Plot,
 	kind: ColumnKind,
+	markers: readonly LineMarker[] = [],
 ): LineLayout | null {
 	const xs = [...new Set(series.flatMap((line) => line.points.map((point) => point.x)))].sort(
 		(a, b) => a - b,
@@ -53,7 +56,7 @@ export function columnLayout(
 		series: series.map((line, index) =>
 			seriesLayout(line, cells[index] ?? [], spans[index] ?? [], index, frame),
 		),
-		markers: [],
+		markers: kind === "stacked-line" ? [] : markersIn(markers, xs, xPixels, slot),
 		palette: "wide",
 	}
 }
@@ -78,4 +81,20 @@ function lanesOf(cells: readonly (readonly (unknown | null)[])[]): Lane[][] {
 		})
 	}
 	return lanes
+}
+
+/** The markers that fall inside a column, in pixels. A marker beyond every column is not drawn. */
+function markersIn(
+	markers: readonly LineMarker[],
+	xs: readonly number[],
+	xPixels: readonly number[],
+	slot: number,
+): { x: number; label: string }[] {
+	return markers.flatMap((marker) => {
+		const column = xs.findIndex((x) => marker.x > x - 1 && marker.x <= x)
+		const centre = xPixels[column]
+		const x = xs[column]
+		if (centre === undefined || x === undefined) return []
+		return [{ x: centre - slot / 2 + (marker.x - (x - 1)) * slot, label: marker.label }]
+	})
 }
