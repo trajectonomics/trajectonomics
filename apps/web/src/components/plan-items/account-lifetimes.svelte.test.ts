@@ -26,16 +26,27 @@ describe("an Account card's totals over the plan", () => {
 		expect(none.body).not.toContain("over the plan")
 	})
 
-	test("strikes the baseline's figure through when a what-if changes it, and not when it had none", () => {
+	test("strikes the baseline's figure through when a what-if changes it", () => {
 		const tried = render(AccountLifetimes, {
 			props: { fees: "20.00", payouts: null, wasFees: "9.00", currency: "THB" },
 		})
 		expect(tried.body).toContain("<s class")
 		expect(tried.body).toContain("9.00")
+	})
+
+	test("a fee tried on an Account that had none shows a struck 'none' beside 'Fees over the plan'", () => {
 		const added = render(AccountLifetimes, {
 			props: { fees: "20.00", payouts: null, wasFees: "", currency: "THB" },
 		})
-		expect(added.body).not.toContain("<s class")
+		expect(added.body).toContain("Fees over the plan")
+		expect(added.body).toMatch(/<s class[^>]*>.*none.*<\/s>/)
+	})
+
+	test("an untouched figure shows no struck text", () => {
+		const plain = render(AccountLifetimes, {
+			props: { fees: "20.00", payouts: null, wasFees: undefined, currency: "THB" },
+		})
+		expect(plain.body).not.toContain("<s class")
 	})
 
 	test("sits on the card beside the year-by-year list, in the one column of a phone", () => {

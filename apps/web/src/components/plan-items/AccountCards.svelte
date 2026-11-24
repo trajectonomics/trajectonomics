@@ -64,8 +64,8 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 						<Money amount={card.balance} {currency} />
 					{/if}
 				</dd>
+				<AccountLifetimes fees={card.lifetimeFees} payouts={card.lifetimePayouts} wasFees={mark.was.lifetimeFees} wasPayouts={mark.was.lifetimePayouts} {currency} />
 			</dl>
-			<AccountLifetimes fees={card.lifetimeFees} payouts={card.lifetimePayouts} wasFees={mark.was.lifetimeFees} wasPayouts={mark.was.lifetimePayouts} {currency} />
 			<AccountYears years={card.years} {currency} />
 			{#if editable}
 				<ItemSwitch {plan} {contentHash} path="accounts.{card.id}" label={card.id} onTry={() => onTry(card.id)} />

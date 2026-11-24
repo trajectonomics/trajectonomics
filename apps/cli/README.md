@@ -399,7 +399,7 @@ An asset Account can pay out a share of its value as income (`payout`) and be ch
 engine sums them in the same run as the roll-ups (it is the sum of the `payouts` and `fees` of every
 roll-up). Two fields appear, and only when the Scenario declares the item above 0 bps (0 bps is none):
 
-- `accountLifetimes`: one `{ account, lifetimeFees, lifetimePayouts }` per Account that declares a fee or a payout,
+- `accountLifetimes`: one `{ account, lifetimeFees?, lifetimePayouts? }` per Account that declares a fee or a payout,
   in Scenario order. `lifetimeFees` is there when the Account carries a fee, `lifetimePayouts` when it carries a
   payout; each is `0.00` if the Account never charged or paid.
 - `lifetimeFees`: the fees of all Accounts together, present only when an Account carries a fee.

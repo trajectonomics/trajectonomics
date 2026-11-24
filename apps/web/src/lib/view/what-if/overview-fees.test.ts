@@ -20,14 +20,35 @@ describe("the Overview's what-if states the fees over the plan", () => {
 		expect(fees?.change.kind).toBe("none")
 	})
 
-	test("names a baseline that charged none, and shows nothing when the what-if states none", () => {
+	test("names a baseline that charged none", () => {
 		const tried = { ...demoLens(), run: withFees(demoLens().run, "12.00") }
 		expect(overviewExtras(tried, null, baselineRun(DEMO, "base")).fees?.baseline.value).toEqual({
 			kind: "text",
 			text: "None",
 		})
-		expect(
-			overviewExtras(demoLens(), null, withFees(baselineRun(DEMO, "base"), "5.00")).fees,
-		).toBeNull()
+	})
+
+	test("a fee in the baseline and none in the tried run shows 'None' on the what-if side", () => {
+		const lens = { ...demoLens(), run: withFees(demoLens().run, undefined) }
+		const baseline = withFees(baselineRun(DEMO, "base"), "5.00")
+		const fees = overviewExtras(lens, null, baseline).fees
+		expect(fees?.label).toBe("Fees over the plan")
+		expect(fees?.whatIf.value).toEqual({ kind: "text", text: "None" })
+		expect(fees?.baseline.value).toEqual({ kind: "money", amount: "5.00" })
+		expect(fees?.change.kind).toBe("none")
+	})
+
+	test("no fee in the baseline and one in the tried run shows 'None' on the baseline side", () => {
+		const lens = { ...demoLens(), run: withFees(demoLens().run, "7.00") }
+		const baseline = withFees(baselineRun(DEMO, "base"), undefined)
+		const fees = overviewExtras(lens, null, baseline).fees
+		expect(fees?.whatIf.value).toEqual({ kind: "money", amount: "7.00" })
+		expect(fees?.baseline.value).toEqual({ kind: "text", text: "None" })
+	})
+
+	test("neither side states a fee: no row", () => {
+		const lens = { ...demoLens(), run: withFees(demoLens().run, undefined) }
+		const baseline = withFees(baselineRun(DEMO, "base"), undefined)
+		expect(overviewExtras(lens, null, baseline).fees).toBeNull()
 	})
 })

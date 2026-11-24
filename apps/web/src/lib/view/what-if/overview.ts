@@ -21,12 +21,12 @@ const NO_FEES_CHANGE = "The CLI states no change for the fees over the plan"
 /** The fees over the plan of the what-if's run beside the baseline's, each as `projection run` states it; no change is shown. */
 function feesTriple(lens: WhatIfLens, baseline: ProjectionRun | null): Triple | null {
 	const tried = feesOverPlan(lens.run)
-	if (tried === null) return null
 	const was = feesOverPlan(baseline)
+	if (tried === null && was === null) return null
 	return {
 		key: "lifetimeFees",
 		label: "Fees over the plan",
-		whatIf: moneyCell(tried.amount),
+		whatIf: tried === null ? textCell("None") : moneyCell(tried.amount),
 		baseline: was === null ? textCell("None") : moneyCell(was.amount),
 		change: { kind: "none", reason: NO_FEES_CHANGE },
 	}

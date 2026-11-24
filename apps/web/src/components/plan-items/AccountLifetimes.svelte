@@ -17,15 +17,12 @@ interface Props {
 let { fees, payouts, wasFees, wasPayouts, currency }: Props = $props()
 </script>
 
-{#if fees !== null || payouts !== null}
-	<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-		{#if payouts !== null}
-			<dt class="text-muted-foreground">Paid out over the plan</dt>
-			<dd><Money amount={payouts} {currency} /><WasText was={wasPayouts === "" ? undefined : wasPayouts} money {currency} /></dd>
-		{/if}
-		{#if fees !== null}
-			<dt class="text-muted-foreground">Fees over the plan</dt>
-			<dd><Money amount={fees} {currency} /><WasText was={wasFees === "" ? undefined : wasFees} money {currency} /></dd>
-		{/if}
-	</dl>
+<!-- Only dt/dd pairs: the card's own <dl> holds them, so they line up with its other rows. -->
+{#if payouts !== null}
+	<dt class="text-muted-foreground">Paid out over the plan</dt>
+	<dd><Money amount={payouts} {currency} /><WasText was={wasPayouts} money={wasPayouts !== ""} {currency} /></dd>
+{/if}
+{#if fees !== null}
+	<dt class="text-muted-foreground">Fees over the plan</dt>
+	<dd><Money amount={fees} {currency} /><WasText was={wasFees} money={wasFees !== ""} {currency} /></dd>
 {/if}
