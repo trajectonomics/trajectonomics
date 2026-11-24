@@ -31,6 +31,15 @@ export const snapshotParams = z.strictObject({
 	historyDates: z.array(dateString),
 	// Absent from a Snapshot made before the allowance reads, so a document that never had the key reads as none.
 	allowances: allowancePlan.nullable().default(null),
+	// The chance reads' paths, seed and where the Return model comes from; absent from a Snapshot made without them (web ADR 0018).
+	chance: z
+		.strictObject({
+			source: z.enum(["plan", "file"]),
+			paths: z.number().int(),
+			seed: z.string(),
+		})
+		.nullable()
+		.default(null),
 })
 export type SnapshotParams = z.infer<typeof snapshotParams>
 

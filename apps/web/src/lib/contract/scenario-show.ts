@@ -52,6 +52,8 @@ export const scenarioAccount = z.looseObject({
 	id: z.string(),
 	kind: z.enum(["asset", "liability"]),
 	rate: z.number().int(),
+	// An asset's yearly swing, in basis points (cli ADR 0068): only the chance of success reads it, from the plan's own model.
+	volatility: z.number().int().optional(),
 	compounding: z.enum(["monthly", "quarterly", "semiannual", "annual"]).optional(),
 	lockedUntil: dateString.optional(),
 	// false marks an asset that is in net worth but not accessible: a home or a car (sim ADR 0019).
@@ -104,6 +106,8 @@ export const scenarioDocument = z.looseObject({
 	accounts: z.array(scenarioAccount),
 	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
 	cashflow: scenarioCashflow.optional(),
+	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.
+	economy: z.looseObject({ inflation: z.number().int() }).optional(),
 	// The Levies the plan is taxed under; the page reads only whether there is one, so each is kept as it is.
 	levies: z.array(z.unknown()).optional(),
 	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.
