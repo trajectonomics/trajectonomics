@@ -64,14 +64,6 @@ Pick the cheapest model that can finish the brief:
 
 A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
-### Quota week: 2026-11-22 to 2026-11-29
-
-Antigravity quota is short this week, so this block overrides step 3 of the ladder until it expires on 2026-11-29. Delete the block then, and step 3 applies again.
-
-- Antigravity (`gemini-4-hydrogen`, `gemini-4-argon`) takes content tasks only: blog posts, site copy, docs prose, release notes. It does no code, design or review work.
-- Claude is the main sub. Step 3 becomes `claude-sonnet-5-5` for a failed cheap brief and for the independent review (the reviewer is still a different model from the author, so a Sonnet-authored diff goes to `claude-opus-5-5`). Design uses `claude-opus-5-5`.
-- T3 Code defaults to `claude-sonnet-5-5` on prameubuntu, homeserver1 and homeserver2, and the Antigravity favourites sit last in the picker.
-
 ## Agent skills
 
 ### Where the skills come from
