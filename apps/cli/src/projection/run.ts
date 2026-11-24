@@ -1,4 +1,4 @@
-import { project } from "@trajectonomics/core/sim"
+import { type Projection, project } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
 import { agesOn } from "../scenario/household/ages"
@@ -22,7 +22,7 @@ import { withdrawNotes } from "./withdraw-notes"
  */
 export function projectionOf(prepared: Placed, wants: Wants): ProjectionRunView | AppError {
 	const { breakdown, liabilities, spending, estate } = wants
-	const { timeline, baseline, currency } = prepared
+	const { timeline, baseline } = prepared
 	// The engine records each optional output only when asked, so a run without its flag keeps its bytes.
 	const result = project(
 		baseline,
@@ -31,7 +31,20 @@ export function projectionOf(prepared: Placed, wants: Wants): ProjectionRunView 
 		optionsOf(breakdown, liabilities, spending, estate),
 	)
 	if (!result.ok) return refusal(result.problems)
-	const { projection } = result
+	return runViewOf(prepared, wants, result.projection)
+}
+
+/**
+ * The result a Projection is reported as, whichever run made it: `traj projection run` and the replay of
+ * one Market path (`traj projection path`, cli ADR-0069) state the same view of it.
+ */
+export function runViewOf(
+	prepared: Placed,
+	wants: Wants,
+	projection: Projection,
+): ProjectionRunView | AppError {
+	const { estate } = wants
+	const { timeline, currency } = prepared
 	const annual = []
 	for (const rollup of projection.annual) {
 		const row = annualRow(rollup, projection.rows, currency, agesOn(prepared.household, rollup.to))

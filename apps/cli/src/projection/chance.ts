@@ -1,6 +1,7 @@
 import { type ChanceOfSuccess, chanceOfSuccess } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"
+import { outcomesOf } from "./chance-outcomes"
 import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { percentilesOf, shownRows, spendingOf } from "./chance-spending"
@@ -8,8 +9,11 @@ import type { ChanceBandView, ChanceView } from "./chance-view"
 import { echoOf } from "./echo"
 import { moneyOf } from "./money"
 
-/** The two numbers the caller states beside the Return model: the path count and the seed. */
-export type ChanceOptions = { seed: string; paths: number }
+/**
+ * The two numbers the caller states beside the Return model: the path count and the seed. With `outcomes`
+ * the result also lists each path's outcome (cli ADR-0069).
+ */
+export type ChanceOptions = { seed: string; paths: number; outcomes?: boolean }
 
 /**
  * `traj projection chance`: the engine's chance of success in the CLI's money. The engine reports
@@ -29,6 +33,8 @@ export function chanceOf(
 		model,
 		seed: options.seed,
 		paths: options.paths,
+		// Asked for only by its flag, so a run without it keeps the engine's old result.
+		...(options.outcomes === true ? { outcomes: true } : {}),
 	})
 	if (!result.ok) return chanceRefusal(result.problems)
 	return viewOf(placed, result.chance, built)
@@ -50,6 +56,7 @@ function viewOf(placed: Placed, chance: ChanceOfSuccess, plan?: PlanModel): Chan
 	// A plan with a spending rule adds its Bands, its lowest year and what they count (cli ADR-0063).
 	const spending = spendingOf(chance, money)
 	const echo = echoOf(placed)
+	const outcomes = outcomesOf(chance, placed.timeline.start, money)
 	return {
 		...echo,
 		notes: [
@@ -58,6 +65,7 @@ function viewOf(placed: Placed, chance: ChanceOfSuccess, plan?: PlanModel): Chan
 			`The chance is over the return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal.`,
 			...(plan === undefined ? [] : planNotes(plan)),
 			...spending.notes,
+			...(outcomes === undefined ? [] : [outcomesNote(chance.paths)]),
 		],
 		horizon: placed.timeline.horizon,
 		currency: placed.currency,
@@ -69,6 +77,7 @@ function viewOf(placed: Placed, chance: ChanceOfSuccess, plan?: PlanModel): Chan
 		bands,
 		runsOut: chance.runsOut.map((row) => ({ index: row.index, to: row.to, paths: row.paths })),
 		...spending.fields,
+		...outcomes,
 		tables: [{ name: "bands", count: rows.length, rows }, ...spending.tables],
 	}
 }
@@ -82,4 +91,9 @@ function planNotes(plan: PlanModel): string[] {
 		`The return model is the plan's own, built in ${plan.view.buckets} buckets from the Accounts that swing: ${accounts}. Every Account without a volatility keeps its rate.`,
 		...plan.notes,
 	]
+}
+
+/** What `--outcomes` lists, and the command that opens one path (cli ADR-0040, ADR-0069). */
+function outcomesNote(paths: number): string {
+	return `outcomes lists each of the ${paths} Market paths by index, and representative names the paths at the 10th, 50th and 90th Percentile of closing net worth, the earliest to run out and the lowest. traj projection path --index N, with the same flags, replays path N year by year.`
 }

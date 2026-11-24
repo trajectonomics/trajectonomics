@@ -1,10 +1,9 @@
 import { isAppError } from "./errors"
+import { CHANCE_SETUP } from "./help-examples-chance"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { RUN_SETUP } from "./help-examples-run"
-import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { VOLATILE_PLAN } from "./projection/plan-model-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
-import { chanceRulePlan } from "./projection-spending-chance-support"
 import { toDecimalForm } from "./scenario/decimal"
 
 /**
@@ -44,18 +43,9 @@ export const SETUP: Record<string, Setup> = {
 			["scenario", "tax", "base", "--tax", "th-2026", "--label", "salary=income.section40_1"],
 		],
 	},
-	// The plan with a spending rule that the `--spending` and spending Bands examples read (cli ADR-0063).
-	"projection chance": {
-		files: {
-			"model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL),
-			"ruled.json": JSON.stringify(chanceRulePlan(undefined)),
-			"volatile.json": JSON.stringify(VOLATILE_PLAN),
-		},
-		steps: [
-			["scenario", "apply", "ruled", "--file", "ruled.json"],
-			["scenario", "apply", "volatile", "--file", "volatile.json"],
-		],
-	},
+	// The plan with a spending rule, the volatile plan and a model file (cli ADR-0063, ADR-0068); `projection path` replays a path of the same chance (cli ADR-0069).
+	"projection chance": CHANCE_SETUP,
+	"projection path": CHANCE_SETUP,
 	// The base plan with a volatility on its investment Account, which `--return-model plan` builds a model from (cli ADR-0068).
 	"projection model": {
 		files: { "volatile.json": JSON.stringify(VOLATILE_PLAN) },

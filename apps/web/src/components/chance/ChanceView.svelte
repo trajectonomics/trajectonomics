@@ -6,6 +6,7 @@ import { chooseScenario, projectionNames } from "../../lib/view/projection/scena
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 import ChanceWhatIf from "../what-if/ChanceWhatIf.svelte"
 import ChanceResult from "./ChanceResult.svelte"
 
@@ -29,11 +30,9 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 {#if name === null || read === undefined}
 	<EmptyState title="No chance of success in this Snapshot">
 		<p>
-			Add a Return model to read it: pass <code>--return-model FILE</code>,
-			<code>--paths N</code> and <code>--seed HEX</code> together, to
-			<code>bun run snapshot</code>, <code>bun run dashboard</code> or <code>traj dashboard</code>.
-			The file is a Return model in the sim format; <code>traj schema projection chance</code>
-			describes it. The CLI ships none.
+			Set the market paths and the seed on <SiteLink href="/settings/assumptions/" class="underline">Assumptions</SiteLink>,
+			or start the Dashboard with <code>--paths N</code> and <code>--seed HEX</code>. The chance is built from your plan's own
+			returns and swings; a Return model file given with <code>--return-model FILE</code> is used instead. The CLI ships no model.
 		</p>
 	</EmptyState>
 {:else}
