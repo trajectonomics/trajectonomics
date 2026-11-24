@@ -10,6 +10,7 @@ import { runTraj } from "./run-traj"
 import { answerOf, failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
 import { answerPath } from "./serve-path"
+import { recordValues } from "./serve-record-values"
 import { json } from "./serve-respond"
 import { answerWhatIf } from "./serve-what-if"
 import { runSnapshot, type SnapshotRun } from "./snapshot-run"
@@ -47,6 +48,9 @@ export function createEditor(options: EditorOptions): Editor {
 		const read = await readEdit(request)
 		if (!read.ok) return failure(400, read.error)
 		const { edit } = read
+		if (edit.kind === "record-values") {
+			return recordValues({ traj: options.traj, held, refresh }, edit)
+		}
 		const dry = await write(edit, true)
 		if (!dry.ok) return failure(200, dry.error)
 		const real = await write(edit, false)

@@ -10,7 +10,7 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 | `Plan` | decides whether the web jobs run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
-| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`, through `turbo run test:scripts -- --shard=N/4` | same as `Check web` |
+| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/4` | same as `Check web` |
 | `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
@@ -59,10 +59,23 @@ Turborepo cache entry and runs a full check.
 Each job restores `.turbo/cache` from the newest entry for the lockfile (pull requests can read
 `main`'s entries and their own) and saves one entry for the commit, also when the job failed, so a
 retry skips the tasks that passed. `Check packages` and `Check web` have their own key prefix, since
-two jobs cannot save one key; the shards only restore. Unchanged packages are cache hits (in the
-recent runs read for #464, 6 and 12 of 16 or 17 tasks were hits, and every miss was a package whose
-inputs changed). A change to the command line, the engine or `sim` makes `web#test:scripts` run
-again, because it depends on `cli#build`.
+two jobs cannot save one key; the shards only restore the packages entry. Unchanged packages are cache
+hits (in the recent runs read for #464, 6 and 12 of 16 or 17 tasks were hits, and every miss was a
+package whose inputs changed). The jobs of one run start together and save at their end, so the entry a
+job restores comes from an earlier run: the first run after a change to the command line, the engine,
+`sim` or the Demo's inputs misses those tasks in every job, and a later run (a retry, a push that
+leaves them alone) hits them.
+
+**Never put `--shard` (or any argument after `--`) on a turbo command that has dependencies.** Turbo
+adds the arguments after `--` to the hash of every task in the graph. A shard that ran
+`turbo run test:scripts -- --shard=N/4` therefore hashed its `demo`, `core#build` and `cli#build`
+differently from `Check packages`, and missed them even when the packages job had them cached (run
+45468426958: `Check packages` hit all 16 tasks, including `demo`, and shard 1 missed all 10). A shard
+now builds in its own step, `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, whose
+hashes equal the packages job's, and runs its files with `bun run --cwd apps/web test:scripts
+--shard=N/4`, with no turbo around it. That is the whole task graph of `test:scripts` (its
+`dependsOn` in `apps/web/turbo.json`), and `tooling/guards/ci-web-split.test.ts` pins both steps and
+that the shard carries no `--`.
 
 ## Where the browser checks go (#377)
 
@@ -70,9 +83,48 @@ A new job in `ci.yml`, with `needs: plan` and `if: needs.plan.outputs.web == 'tr
 `needs` of `check`. It runs only when `apps/web` or the command line changed and does not lengthen
 `Check packages`.
 
+## The Demo snapshot is generated per job, not once per run (#464)
+
+Since #378 the Demo snapshot (`apps/web/public/demo/snapshot.json`) is a build output: the turbo `demo`
+task compiles `traj` and runs it against the fictional ledger, and `build`, `test:src`, `test:scripts`
+and `check` depend on it. Option 1 of #464 was to run it once in its own job and share the file with the
+jobs that need it. It was measured and **not done**, because it cannot shorten a run.
+
+Measured in the CI logs of five green runs after #378 (four pull request runs and one push to `main`,
+2026-11-24), before the fix above:
+
+| Job | `demo` task | Cache |
+|---|---|---|
+| `Check web scripts (1)` ... `(4)` | 13.9 s to 23.2 s each | miss in all 20 |
+| `Check packages` | 15.5 s to 20.4 s | miss in 4 of 5 runs |
+| `Check web` | runs beside lint and typecheck, so 3 s to 5 s past `typecheck` | miss in 4 of 5 runs |
+
+A shard took 3m01s to 7m06s, so `demo` was 3 to 13 percent of one (about 5 percent of the longest). The
+shards missed even when the packages job hit (run 45468426958) because of the `--shard` hash described
+above, not because nothing was cached.
+
+With the fix, in this pull request's own runs (seconds after the shard's first log line; the build
+step is `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`):
+
+| Run | Build step in a shard | Tests start |
+|---|---|---|
+| Before the fix (two runs, 8 shards) | 21 s to 35 s, `demo` and `cli#build` rebuilt | +32 s to +48 s |
+| Fix, first run (it changed `cli/src` through `main`; 3 of 10 tasks missed, in every job) | 24 s to 29 s | +39 s to +44 s |
+| Fix, second run (the entry the first run saved) | 0.3 s to 0.5 s, 10 of 10 hits (FULL TURBO) | +15 s to +26 s |
+
+So a run that follows one that built the same command line and Demo (a retry, a push to web files only)
+saves about 20 s on every shard, which is where the 3 to 13 percent went. The first run after a command
+line change still builds once per job, as it must.
+
+Why a shared job does not win the time back, even with that fixed: the shards are the critical path, and
+they would have to wait for the new job, which needs a checkout, the setup action, the engine build, the
+`demo` task and the upload (about 50 s, even started beside `Plan`). A shard starts its tests 30 to 50 s
+after it starts (the setup, then the build step), so with the artifact it would start them later, with one
+more job, an artifact to keep in step with the turbo task hash and one more entry in `needs`. The only
+gain is runner minutes. With the fix, `demo` is a cache hit in every job of a run that follows one that
+built it, which costs nothing.
+
 ## Not done here
 
 - #460 (`what-if-groups.test.ts` times out under load) and `bun test --parallel` or `--timings` for
   a better balance between the shards.
-- Generating the Demo snapshot once per run and sharing it as an artifact: it waits for #378, which
-  makes the Demo a build output.
