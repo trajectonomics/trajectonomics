@@ -39,6 +39,23 @@ describe("the projection run contract against the CLI's goldens", () => {
 		])
 	})
 
+	it("parses a run whose tax years state their walk, brackets and rates (cli ADR-0036)", async () => {
+		const run = projectionRun.parse(await golden("run-carry-in.output"))
+		const [year] = run.taxYears
+		expect(year?.walk).toEqual({
+			assessable: "560000.00",
+			expenses: "100000.00",
+			allowances: "60000.00",
+			taxableIncome: "400000.00",
+		})
+		expect(year?.brackets).toHaveLength(8)
+		expect(year).toMatchObject({
+			marginalRateBps: 1000,
+			toNextBracket: "100000.00",
+			effectiveRateBps: 312,
+		})
+	})
+
 	it("states no total in a run without a fee or a payout", async () => {
 		const run = projectionRun.parse(await golden("run.output"))
 		expect(run.lifetimeFees).toBeUndefined()

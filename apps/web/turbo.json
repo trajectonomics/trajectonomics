@@ -9,6 +9,13 @@
 		"test": {
 			"dependsOn": ["^build", "@trajectonomics/cli#build"]
 		},
+		"test:src": {
+			"dependsOn": ["^build"]
+		},
+		"test:scripts": {
+			"dependsOn": ["^build", "@trajectonomics/cli#build"],
+			"cache": false
+		},
 		"check": {
 			"dependsOn": ["build", "^build", "^check", "@trajectonomics/cli#build"]
 		}
