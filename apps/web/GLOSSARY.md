@@ -112,6 +112,26 @@ _Avoid_: death date, payout date
 The items a plan's tax assumes about the person (filing status, children, parents, disabled care and the deductions paid in the tax year), as `scenario show` states them in `tax`. They are the person's inputs, not figures: the Dashboard shows them as stored and sends a change as one `scenario tax` write.
 _Avoid_: tax settings, tax return, tax rules
 
+**Assumptions**:
+The figures a plan rests on that are the person's own, in one place: inflation per year, and each asset Account's expected yearly return and swing. They are the document's `economy.inflation` and each Account's `rate` and `volatility`, saved as one `apply-plan` Edit. None is filled in for the person: `traj` ships none, and nor does the page.
+_Avoid_: settings, parameters, defaults, market data
+
+**Swing**:
+How much an asset Account's yearly return varies, as the standard deviation of that return in percent (`volatility`, an integer of basis points in the document). Only the chance of success reads it. An Account with none is fixed at its return in every Market path.
+_Avoid_: risk, volatility score, beta
+
+**Swing choice**:
+One of three plain buttons beside a swing field (steady such as deposits, moderate such as mixed funds, large such as shares) that fills the field with a round percent. It holds no state of its own: the person changes the text at once, and the figure is a plan assumption, not advice.
+_Avoid_: risk profile, preset, risk level
+
+**Chance inputs**:
+The number of Market paths and the seed the chance of success is read with. They are the Snapshot's parameters, not the plan's, changed through `POST /reread` as the allowance inputs are, so a change reads again and writes nothing.
+_Avoid_: simulation settings, iterations
+
+**Model source**:
+Where a chance read's Return model came from: built from the plan (the CLI's `returnModel` echo, "built from your plan") or read from a file the Dashboard was started with.
+_Avoid_: engine, data source
+
 **Custom chart**:
 A chart a person made of yearly figures `traj` states, a name, a kind and a list of series ids, kept in the browser and in no plan. A series a plan lacks is named as missing, not drawn.
 _Avoid_: report, widget, dashboard, saved view

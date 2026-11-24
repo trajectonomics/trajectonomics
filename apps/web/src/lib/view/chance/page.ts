@@ -1,6 +1,7 @@
 import { FAN_LEVELS, fanSeriesName, type LineSeries, toChartNumber } from "../../chart"
 import type { ProjectionChance } from "../../contract"
 import { formatDate, formatMoney, formatShare } from "../../format"
+import { type ChanceSource, chanceSourceWords } from "../assumptions/chance"
 
 /** A roll-up's year is labelled on every fifth bar, so a row of many bars keeps a readable axis. */
 const LABEL_EVERY = 5
@@ -30,6 +31,8 @@ export interface ChanceView extends ChanceSummary {
 	readonly runsOut: readonly RunsOutBar[]
 	/** The CLI's plain sentences, which a person should read beside the figures. */
 	readonly notes: readonly string[]
+	/** Where the Return model came from: the plan's own Accounts, or a file (web ADR 0018). */
+	readonly source: ChanceSource
 }
 
 /** The summary of one chance read: the share and the facts beside it. */
@@ -51,6 +54,7 @@ export function chanceViewOf(read: ProjectionChance): ChanceView {
 		series: fanSeriesOf(read.bands),
 		runsOut: runsOutBarsOf(read.runsOut),
 		notes: read.notes,
+		source: chanceSourceWords(read),
 	}
 }
 

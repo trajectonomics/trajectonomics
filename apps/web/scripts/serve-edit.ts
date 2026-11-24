@@ -5,7 +5,7 @@ import type { Read, Snapshot } from "../src/lib/contract"
 import { type Edit, writeCommand } from "../src/lib/edit/edit"
 import { followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
-import { rereadAllowances } from "./run-reread"
+import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
 import { runTraj } from "./run-traj"
 import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
@@ -60,17 +60,16 @@ export function createEditor(options: EditorOptions): Editor {
 		return answerOf(await refresh())
 	}
 
-	/** Reads the Snapshot again, with the allowance inputs the body states, and answers it, or the CLI's error as data. */
+	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data. */
 	async function rereadAnswer(request: Request): Promise<Response> {
 		const read = await readReread(request)
 		if (!read.ok) return failure(400, read.error)
-		// The allowance inputs live with the Snapshot's parameters, so a change of them is a read and no write.
-		const { allowances } = read.reread
-		if (allowances !== undefined) params = { ...params, allowances }
-		// Only the allowance inputs changed: run only the allowance reads, if nothing else moved (run-reread.ts).
-		if (allowances === undefined || held === null) return answerOf(await refresh())
+		params = paramsAfter(params, read.reread)
+		const changed = changedBy(read.reread)
+		// Only those inputs changed: run only the reads that depend on them, if nothing else moved (run-reread.ts).
+		if ((!changed.allowances && !changed.chance) || held === null) return answerOf(await refresh())
 		const { traj, cliVersion, records } = options
-		return answerOf(keep(await rereadAllowances(traj, cliVersion, params, held, records)))
+		return answerOf(keep(await rereadInputs(traj, cliVersion, params, held, records, changed)))
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import { z } from "zod"
 import type { PlanInput } from "./params"
 
 /**
@@ -47,4 +48,21 @@ export function chancePlanOf(input: PlanInput): ChancePlan | null {
 		paths: input.paths,
 		seed: input.seed,
 	}
+}
+
+/**
+ * The paths and the seed a `POST /reread` changes (web ADR 0018): the same two rules the flags break, as a schema. The
+ * server keeps them with its parameters, beside the Return model it already holds (the plan's own, unless a file was given).
+ */
+export const chanceInputs = z.strictObject({
+	paths: z.number().int().min(1).max(10000),
+	seed: z.string().regex(SEED),
+})
+
+/** The chance reads' inputs a reread states. */
+export type ChanceInputs = z.infer<typeof chanceInputs>
+
+/** The source a chance plan reads its model from: the plan itself, or a file. */
+export function chanceSourceOf(chance: ChancePlan): "plan" | "file" {
+	return chance.returnModel === PLAN_RETURN_MODEL ? "plan" : "file"
 }
