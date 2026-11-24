@@ -19,4 +19,5 @@ export {
 	MAX_LEVEL_PAYMENTS,
 	type PeriodsPerYear,
 } from "./loan/level"
+export { planReturnModel } from "./market/plan-model"
 export type * from "./types"

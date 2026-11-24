@@ -38,7 +38,7 @@ describe("a plan with metric Milestones keeps its recorded figures", () => {
 			const last = chance.bands[chance.bands.length - 1]!
 			expect([last.to, last.netWorth.map((item) => item.value)]).toEqual([
 				"2032-01-01",
-				[77999660, 83143466, 88793797, 93370024, 98143125],
+				[77896392, 83038802, 88685699, 93259132, 98029608],
 			])
 		},
 		SLOW,

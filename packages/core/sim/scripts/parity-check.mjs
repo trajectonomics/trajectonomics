@@ -5,6 +5,7 @@ import {
 	chanceOfSuccess,
 	contributionSavings,
 	financialIndependence,
+	planReturnModel,
 	project,
 } from "../dist/index.mjs"
 
@@ -20,6 +21,8 @@ const failed = cases.filter(
 		fiSha256,
 		chance,
 		chanceSha256,
+		plan,
+		planSha256,
 		projectOptions,
 		savings,
 		savingsSha256,
@@ -36,6 +39,14 @@ const failed = cases.filter(
 		if (options !== undefined) {
 			if (digest(financialIndependence(baseline, scenario, timeline, options)) !== fiSha256)
 				return true
+		}
+		if (plan !== undefined) {
+			const built = planReturnModel(scenario, plan)
+			const run = { model: built.model, seed: plan.seed, paths: plan.paths }
+			return (
+				digest(built) !== planSha256 ||
+				digest(chanceOfSuccess(baseline, scenario, timeline, run)) !== chanceSha256
+			)
 		}
 		if (chance === undefined) return false
 		return digest(chanceOfSuccess(baseline, scenario, timeline, chance)) !== chanceSha256

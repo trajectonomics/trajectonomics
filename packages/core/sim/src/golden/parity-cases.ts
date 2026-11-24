@@ -31,6 +31,8 @@ export interface ParityCase {
 	readonly fixture: Fixture
 	readonly options?: SurvivalOptions
 	readonly chance?: ChanceOfSuccessOptions
+	/** A chance run over the Return model `planReturnModel` builds from the Scenario (ADR 0029). */
+	readonly plan?: { readonly buckets: number; readonly seed: string; readonly paths: number }
 	readonly projectOptions?: ProjectionOptions
 	readonly savings?: ParitySavings
 }

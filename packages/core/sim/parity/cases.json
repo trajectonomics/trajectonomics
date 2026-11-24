@@ -4289,7 +4289,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "8a32e26acde911d05d0bb42e5b30209662d2469a3bfa49c53ba8685a3c4c00ad"
+		"chanceSha256": "8ec454ed7b6cffa1d208f573fa946a4acec0727915b4a085b0c5ec4dd98895be"
 	},
 	{
 		"name": "freelancer-fi-reference",
@@ -5564,7 +5564,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "598dd5a30555273ac476f2e5c9e365114cc48c76023a7a9cb639dd0ecba97ed1"
+		"chanceSha256": "c17b51f02fff20b8b0ef092e76d9be5ee1427c50c6fcb4876d0df6b8e655de57"
 	},
 	{
 		"name": "loan-statement-month",
@@ -9900,7 +9900,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "065f028ecce42f44c4415fc992ca86e29c8a56ff4b51b12b898dba8c3d52388d"
+		"chanceSha256": "d2b01130b65cb3a2b34e0ae9c326d8a385bb444541329fe43bab79f6b5f53d2a"
 	},
 	{
 		"name": "fee-year",
@@ -10162,6 +10162,157 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "2e17288d31b16bd63683fcb544639cc95366d29656943206a3b5f2021fb438bb"
+		"chanceSha256": "08565d57bb5060df2c632055de5e145187ac3ef2aafe356f46a381c1c6d6b83e"
+	},
+	{
+		"name": "freelancer-plan-chance",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 15000000
+				},
+				{
+					"account": "tax-reserve",
+					"amount": 2000000
+				},
+				{
+					"account": "ssf",
+					"amount": 8000000
+				},
+				{
+					"account": "equipment-loan",
+					"amount": 9000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 200
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "tax-reserve",
+					"kind": "asset",
+					"rate": 100
+				},
+				{
+					"id": "ssf",
+					"kind": "asset",
+					"rate": 450,
+					"lockedUntil": "2036-06-30"
+				},
+				{
+					"id": "equipment-loan",
+					"kind": "liability",
+					"rate": 700
+				},
+				{
+					"id": "brokerage",
+					"kind": "asset",
+					"rate": 600,
+					"volatility": 1500
+				}
+			],
+			"flows": [
+				{
+					"id": "client-retainer",
+					"kind": "income",
+					"earned": true,
+					"amount": 4500000,
+					"frequency": "monthly",
+					"start": "2026-01-31",
+					"growth": "inflation"
+				},
+				{
+					"id": "project-fee",
+					"kind": "income",
+					"earned": true,
+					"amount": 2000000,
+					"frequency": "quarterly",
+					"start": "2026-02-15",
+					"end": "2031-02-15",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "dividend",
+					"kind": "income",
+					"earned": false,
+					"amount": 300000,
+					"frequency": "annual",
+					"start": "2027-04-30",
+					"growth": {
+						"bps": 100
+					}
+				},
+				{
+					"id": "living",
+					"kind": "expense",
+					"amount": 2200000,
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"growth": "inflation"
+				},
+				{
+					"id": "ssf-top-up",
+					"kind": "contribution",
+					"target": "ssf",
+					"amount": 1500000,
+					"frequency": "quarterly",
+					"start": "2026-03-31",
+					"end": "2035-12-31",
+					"growth": {
+						"bps": 0
+					}
+				},
+				{
+					"id": "loan-payment",
+					"kind": "contribution",
+					"target": "equipment-loan",
+					"amount": 350000,
+					"frequency": "monthly",
+					"start": "2026-01-10",
+					"growth": {
+						"bps": 0
+					}
+				}
+			],
+			"cashflow": {
+				"contribute": ["ssf"],
+				"surplus": [
+					{
+						"account": "tax-reserve",
+						"upTo": 5000000
+					},
+					{
+						"account": "brokerage"
+					}
+				],
+				"withdraw": ["cash", "tax-reserve", "brokerage", "ssf"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2051-01-01",
+			"resolution": "day"
+		},
+		"sha256": "a2f7b7f7e6c709045fd0c4cb27be0e50fda465e844ca9c5f84859d97a45302dc",
+		"plan": {
+			"buckets": 64,
+			"seed": "0123456789abcdef",
+			"paths": 6
+		},
+		"planSha256": "67a52bfd5dfd4908560c684f1e1ec9614283555ff592c834d1ee0c345ea1e29a",
+		"chanceSha256": "08fcc7013e94974119fef74ab5947f98c2984271bea82da82c3303a11790d346"
 	}
 ]

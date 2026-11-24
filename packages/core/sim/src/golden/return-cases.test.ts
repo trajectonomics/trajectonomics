@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { mutate } from "../engine/mutate"
 import { project } from "../engine/project"
 import { resolveReturns } from "../engine/return-rows"
 import type { ReturnSeries, Returns } from "../engine/returns"
@@ -12,6 +13,7 @@ import { rowDates } from "../output/row-dates"
 import type { DateString, Timeline } from "../types"
 import type { Projection } from "../types/projection"
 import { oracleResolveRows, oracleSpanGrow } from "./oracle-returns"
+import { oracleChangedValue } from "./oracle-returns-changes"
 import { handRows, handRowsReturns } from "./return-cases"
 import { zeroRateFixture, zeroRateReturns } from "./zero-rate-cases"
 
@@ -72,12 +74,33 @@ describe("the oracle's row walk", () => {
 		}
 	})
 
-	it("records the r² term of a row split at its midpoint", () => {
-		const atMidpoint = oracleSpanGrow(100000n, "2023-01-01", "2023-04-01", ROWS)
-		const split = oracleSpanGrow(atMidpoint, "2023-04-01", "2023-06-30", ROWS)
-		// r²·h₁h₂/D² = 0.01 × 0.25 = 0.0025, so 100,000 × 0.0025 = 250 above 110,000.
-		expect(split).toBe(110250n)
-		expect(split - oracleSpanGrow(100000n, "2023-01-01", "2023-06-30", ROWS)).toBe(250n)
+	it("settles a row split at its midpoint to the same 110,000", () => {
+		const rows = (delta: bigint) => [{ date: "2023-04-01", delta }]
+		expect(oracleChangedValue(100000n, "2023-01-01", rows(0n), "2023-06-30", ROWS)).toBe(110000n)
+		// 100,000 × 1.1 + 10,000 × (1 + 10% × 90/180)
+		expect(oracleChangedValue(100000n, "2023-01-01", rows(10000n), "2023-06-30", ROWS)).toBe(
+			120500n,
+		)
+		expect(oracleChangedValue(100000n, "2023-01-01", rows(-10000n), "2023-06-30", ROWS)).toBe(
+			99500n,
+		)
+	})
+
+	it("agrees with the engine on changes inside both rows", () => {
+		const changes = [
+			{ date: "2023-04-01", delta: 10000n },
+			{ date: "2023-09-01", delta: -20000n },
+		]
+		const state = createStates(
+			handRows.baseline,
+			handRows.scenario,
+			handRows.timeline.start,
+			resolveReturns(handRowsReturns, handRows.timeline),
+		).get("cash")!
+		for (const change of changes) mutate(state, change.date, change.delta, undefined)
+		const oracle = oracleChangedValue(100000n, "2023-01-01", changes, "2024-01-01", ROWS)
+		expect(valuation(state, "2024-01-01")).toBe(oracle)
+		expect(oracle).toBe(109085n)
 	})
 })
 

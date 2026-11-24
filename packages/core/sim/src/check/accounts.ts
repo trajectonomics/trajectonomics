@@ -3,13 +3,13 @@ import type { AccountIndex, Check, Emit, Path } from "./codes"
 import { feeField } from "./fee"
 import { tallyLabel } from "./levy-fields"
 import { checkPayoutRules, type PayoutContext, payoutField } from "./payout"
-import { bool, date, oneOf, safeInt, str } from "./scalars"
+import { bool, boundedInt, date, oneOf, safeInt, str } from "./scalars"
 import { checkShape, checkUnique, isRecord, list, opt, req, type Shape } from "./shape"
 
 const LABEL_KEYS = ["returnLabel", "gainLabel"] as const
 
 /** Keys an asset may carry and a liability may not. */
-const ASSET_ONLY_KEYS = ["lockedUntil", "liquid", "fee"] as const
+const ASSET_ONLY_KEYS = ["lockedUntil", "liquid", "fee", "volatility"] as const
 
 /** A valid compounding period, so the nominal-rate rule knows whether to apply. */
 function isCompoundingPeriod(value: unknown): boolean {
@@ -29,6 +29,7 @@ function shapeOf(context: PayoutContext): Shape {
 		gainLabel: tallyLabel(hasLevy),
 		payout: payoutField(context),
 		fee: feeField,
+		volatility: opt(boundedInt(0, 10_000, "RATE_OUT_OF_RANGE")),
 	}
 }
 

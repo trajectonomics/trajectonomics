@@ -3,7 +3,7 @@ import { checkUniqueValues, isRecord } from "./shape"
 
 const TWO_32 = 4294967296n
 const MAX_ACCOUNTS = 64
-const MAX_BUCKETS = 512
+const MAX_BUCKETS = 1024
 
 function validWeight(value: unknown): number | undefined {
 	return typeof value === "number" &&
