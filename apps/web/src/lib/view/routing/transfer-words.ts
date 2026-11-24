@@ -1,6 +1,6 @@
 /** A transfer in a sentence: "Move all of Provident fund to RMF on 30 Jun 2031", "Move 10% of Savings to Fixed deposit every year". */
 import type { ScenarioFlow } from "../../contract"
-import { formatDate, percentWords } from "../../format"
+import { formatBps, formatDate, percentWords } from "../../format"
 import { nameOf } from "./accounts"
 import { movesOf } from "./transfer-read"
 import type { Part } from "./words"
@@ -22,6 +22,14 @@ function whenWords(flow: ScenarioFlow): string {
 	return flow.startAt === undefined && flow.start === "" ? every : `${every}, from ${at}`
 }
 
+/** How an amount grows, in words: nothing for a rate of 0. */
+function growthWords(growth: ScenarioFlow["growth"]): string {
+	if (growth === "inflation") return " in today's money"
+	return growth === undefined || growth.bps === 0
+		? ""
+		: `, growing ${formatBps(growth.bps)}% a year,`
+}
+
 /** The transfer's sentence as parts, with its amount drawn by the page. */
 export function transferWords(flow: ScenarioFlow, names: ReadonlyMap<string, string>): Part[] {
 	const from = nameOf(names, flow.source ?? "")
@@ -32,6 +40,6 @@ export function transferWords(flow: ScenarioFlow, names: ReadonlyMap<string, str
 	if (moves.how === "all") return [`Move all of ${from} to ${to}${when}`]
 	if (moves.how === "share")
 		return [`Move ${percentWords(moves.share)}% of ${from} to ${to}${when}`]
-	const real = flow.growth === "inflation" ? " in today's money" : ""
+	const real = growthWords(flow.growth)
 	return ["Move ", { amount: flow.amount ?? "" }, `${real} from ${from} to ${to}${when}`]
 }

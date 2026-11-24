@@ -7,7 +7,7 @@ import { type ScenarioFlow, scenarioFlow } from "../../contract"
 import { parseBps } from "../../format"
 import { isDateText, typedAmount, uniqueId, withoutKeys } from "../plan-items/form"
 import type { Problems } from "../plan-items/problems"
-import { AMOUNT_WORDS } from "./targets"
+import { AMOUNT_WORDS, RATE_WORDS } from "./targets"
 import type { TransferContext, TransferDraft } from "./transfer-draft"
 import { allOf, shareOf } from "./transfer-read"
 
@@ -21,6 +21,9 @@ function whatProblems(draft: TransferDraft): Record<string, string> {
 	if (draft.source === "") found["source"] = "Choose the account the money leaves."
 	if (draft.target === "") found["target"] = "Choose the account or loan the money goes to."
 	if (draft.how === "amount" && typedAmount(draft.amount) === null) found["amount"] = AMOUNT_WORDS
+	if (draft.how === "amount" && draft.growth === "fixed" && parseBps(draft.rate) === null) {
+		found["rate"] = RATE_WORDS
+	}
 	if (draft.how === "share" && parseBps(draft.share) === null) {
 		found["share"] = "Enter a percent with at most two places, such as 10."
 	}
@@ -57,11 +60,18 @@ function startOf(
 	return { start: draft.when === "anchor" ? (anchor?.date ?? "") : draft.date.trim() }
 }
 
+/** The growth of an amount: none is a rate of 0, a fixed rate keeps the other keys of the stored growth. */
+function growthOf(draft: TransferDraft, old?: ScenarioFlow): unknown {
+	if (draft.growth === "inflation") return "inflation"
+	const kept = typeof old?.growth === "object" ? old.growth : {}
+	return { ...kept, bps: draft.growth === "none" ? 0 : (parseBps(draft.rate) ?? 0) }
+}
+
 /** The amount fields: a typed amount that stays or follows inflation, all of the source, or a share of it. */
-function amountOf(draft: TransferDraft): Record<string, unknown> {
+function amountOf(draft: TransferDraft, old?: ScenarioFlow): Record<string, unknown> {
 	if (draft.how === "all") return { derive: allOf(draft.source) }
 	if (draft.how === "share") return { derive: shareOf(draft.source, parseBps(draft.share) ?? 0) }
-	return { amount: typedAmount(draft.amount), growth: draft.real ? "inflation" : { bps: 0 } }
+	return { amount: typedAmount(draft.amount), growth: growthOf(draft, old) }
 }
 
 /** The transfer a draft names over the stored one; its other keys are kept, and a new one takes an id that is free. */
@@ -90,7 +100,7 @@ export function transferFromDraft(
 		frequency: draft.frequency,
 		...startOf(draft, options.ctx, existing),
 		...(end === "" ? {} : { end }),
-		...amountOf(draft),
+		...amountOf(draft, existing),
 		...(draft.realise ? { realise: true } : {}),
 	})
 	return parsed.success

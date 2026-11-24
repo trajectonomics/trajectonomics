@@ -74,7 +74,7 @@ export function portfolioChoices(ctx: WithdrawalContext): PortfolioChoice[] {
 
 /** The Accounts a new rule reads at first: the liquid assets of the plan's withdraw list, each removable. */
 export function defaultPortfolio(ctx: WithdrawalContext): string[] {
-	// An entry with a floor is `{ account, downTo }`, so the list is read by each entry's Account (web ADR 0021).
+	// An entry with a floor is `{ account, downTo }`, so the list is read by each entry's Account (web ADR 0022).
 	const listed = withdrawAccounts(ctx.doc)
 	return portfolioChoices(ctx)
 		.map((choice) => choice.id)

@@ -11,12 +11,31 @@ const words = (list: Parameters<typeof entryWords>[0], at: number) =>
 
 describe("a withdraw entry in its drawer", () => {
 	test("a floor is `{ account, downTo }`, sent as typed, and may keep its value in today's money", () => {
-		const draft = { ...entryDraftOf(), account: "bank", floor: true, amount: "300000", real: true }
+		const draft = {
+			...entryDraftOf(),
+			account: "bank",
+			floor: true,
+			amount: "300000",
+			growth: "inflation" as const,
+		}
 		expect(entryFromDraft(draft)).toEqual({
 			ok: true,
 			entry: { account: "bank", downTo: { amount: "300000", growth: "inflation" } },
 		})
-		expect(entryFromDraft({ ...draft, real: false })).toMatchObject({ entry: { downTo: "300000" } })
+		expect(entryFromDraft({ ...draft, growth: "none" as const })).toMatchObject({
+			entry: { downTo: "300000" },
+		})
+	})
+
+	test("a floor that grows by a fixed rate round trips, and an edited rate is written as basis points", () => {
+		const stored = { account: "bank", downTo: { amount: "100000.00", growth: { bps: 250 } } }
+		const draft = entryDraftOf(stored)
+		expect(draft).toMatchObject({ floor: true, growth: "fixed", rate: "2.50" })
+		expect(entryFromDraft(draft, stored)).toEqual({ ok: true, entry: stored })
+		expect(entryFromDraft({ ...draft, rate: "4" }, stored)).toEqual({
+			ok: true,
+			entry: { account: "bank", downTo: { amount: "100000.00", growth: { bps: 400 } } },
+		})
 	})
 
 	test("an entry with no floor is the Account's id; a floor with no amount is a problem at the amount", () => {

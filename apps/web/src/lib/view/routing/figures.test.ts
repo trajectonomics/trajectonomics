@@ -65,11 +65,22 @@ describe("the target a row keeps, from the routing echo", () => {
 	test("a target in today's money says it is grown by inflation, at the start; one with none says nothing", () => {
 		const note = targetNote(run, "surplus", 0)
 		expect(note && plainText(note, (amount) => amount)).toBe(
-			"At the start 100000.00, grown by inflation.",
+			"At the start 100000.00, grown by inflation: 103000.00 at the horizon.",
 		)
 		expect(targetNote(run, "surplus", 1)).toBeNull()
 		expect(targetNote(run, "withdraw", 0)).not.toBeNull()
 		expect(targetNote(undefined, "withdraw", 0)).toBeNull()
+		const floor = targetNote(run, "withdraw", 0)
+		expect(floor && plainText(floor, (amount) => amount)).toBe(
+			"At the start 20000.00, grown by inflation: 20600.00 at the horizon.",
+		)
+		const body = structuredClone(run)
+		const entry = body.routing?.surplus[0]
+		if (entry) delete entry.resolved
+		const bare = targetNote(body, "surplus", 0)
+		expect(bare && plainText(bare, (amount) => amount)).toBe(
+			"At the start 100000.00, grown by inflation.",
+		)
 	})
 })
 

@@ -1,8 +1,11 @@
 <script lang="ts">
-import type { Snippet } from "svelte"
+import { type Snippet, tick } from "svelte"
+import { keepFocus } from "../../client/focus"
 import type { Reorder } from "../../client/reorder.svelte.js"
 
 interface Props {
+	/** The row's key: it stays with the row as it moves, so a second press moves the same row. */
+	rowKey: number
 	index: number
 	count: number
 	/** What the row is called to a screen reader, such as "Take from Funds". */
@@ -18,7 +21,18 @@ interface Props {
 	actions?: Snippet
 }
 
-let { index, count, label, reorder, editable, problem, onDrop, children, actions }: Props = $props()
+let { rowKey, index, count, label, reorder, editable, problem, onDrop, children, actions }: Props =
+	$props()
+let up: HTMLButtonElement | undefined = $state()
+let down: HTMLButtonElement | undefined = $state()
+
+/** Moves this row, then hands focus to its other button when the one pressed has reached the edge and turned off. */
+async function press(by: -1 | 1): Promise<void> {
+	reorder.press(rowKey, by)
+	await tick()
+	if (by === -1) keepFocus(up, down)
+	else keepFocus(down, up)
+}
 const button =
 	"rounded-md border border-border bg-card px-2 py-1 text-xs text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-40"
 </script>
@@ -37,10 +51,10 @@ const button =
 		<span class="min-w-0 flex-1">{@render children()}</span>
 		{#if editable}
 			<span class="flex flex-wrap gap-1.5">
-				<button type="button" class={button} disabled={index === 0} onclick={() => reorder.nudge(index, -1)}>
+				<button bind:this={up} type="button" class={button} disabled={index === 0} onclick={() => press(-1)}>
 					Up<span class="sr-only">: move {label} up</span>
 				</button>
-				<button type="button" class={button} disabled={index === count - 1} onclick={() => reorder.nudge(index, 1)}>
+				<button bind:this={down} type="button" class={button} disabled={index === count - 1} onclick={() => press(1)}>
 					Down<span class="sr-only">: move {label} down</span>
 				</button>
 				{@render actions?.()}

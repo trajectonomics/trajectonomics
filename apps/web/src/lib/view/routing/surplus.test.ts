@@ -16,7 +16,7 @@ describe("a surplus step in its drawer", () => {
 			account: "emergency",
 			how: "upTo" as const,
 			amount: "300000",
-			real: true,
+			growth: "inflation" as const,
 		}
 		const made = stepFromDraft(draft)
 		expect(made).toEqual({
@@ -50,7 +50,7 @@ describe("a surplus step in its drawer", () => {
 			how: "shareUpTo",
 			share: "30.00",
 			amount: "500000.00",
-			real: false,
+			growth: "none",
 		})
 		expect(stepFromDraft(draft, stored)).toEqual({ ok: true, step: stored })
 		expect(amountOf(stored.upTo)).toBe("500000.00")
@@ -71,6 +71,20 @@ describe("a surplus step in its drawer", () => {
 				share: "Enter a percent with at most two places, such as 30.",
 			},
 		})
+	})
+})
+
+describe("a growth by a fixed rate is kept", () => {
+	test("a cap that grows by 3% a year reads as a fixed growth and writes the same cap back", () => {
+		const stored = { account: "fund", upTo: { amount: "500000.00", growth: { bps: 300 } } }
+		const draft = stepDraftOf(stored)
+		expect(draft).toMatchObject({ how: "upTo", growth: "fixed", rate: "3.00" })
+		expect(stepFromDraft(draft, stored)).toEqual({ ok: true, step: stored })
+		expect(stepFromDraft({ ...draft, rate: "3.005" })).toMatchObject({
+			ok: false,
+			problems: { rate: expect.any(String) },
+		})
+		if (stored.upTo) expect(text(stepWords(stored, 0, 2, NAMES))).toContain("growing 3.00% a year")
 	})
 })
 

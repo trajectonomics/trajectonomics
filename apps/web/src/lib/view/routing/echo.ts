@@ -1,7 +1,7 @@
 /**
- * The target a row keeps, from the run's `routing` echo (cli ADR 0070): the amount as the document writes it, and how it grows.
- * The echo does not yet state the amount in force at the first roll-up and at the horizon (#458), so the sentence says what
- * the echo says: "at the start, grown by inflation". Nothing is computed here.
+ * The target a row keeps, from the run's `routing` echo (cli ADR 0070): the amount as the document writes it, how it grows, and
+ * the engine's own `resolved` amount at the horizon (what the target is worth on the last day of the plan). Nothing is computed
+ * here: a run that states no `resolved` says only "at the start, grown by inflation".
  */
 import type { ProjectionRun } from "../../contract"
 import { formatBps } from "../../format"
@@ -15,10 +15,12 @@ export function targetNote(
 ): Part[] | null {
 	const echo = run?.routing?.[list].find((one) => one.entry === index)
 	const target = echo === undefined ? null : "upTo" in echo ? echo.upTo : echo.downTo
-	if (target === null || target.growth === null) return null
+	if (echo === undefined || target === null || target.growth === null) return null
 	const grown =
 		target.growth === "inflation"
 			? "grown by inflation"
 			: `grown by ${formatBps(target.growth.bps)}% a year`
-	return ["At the start ", { amount: target.amount }, `, ${grown}.`]
+	const horizon: Part[] =
+		echo.resolved === undefined ? [] : [": ", { amount: echo.resolved.horizon }, " at the horizon"]
+	return ["At the start ", { amount: target.amount }, `, ${grown}`, ...horizon, "."]
 }

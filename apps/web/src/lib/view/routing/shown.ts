@@ -13,16 +13,21 @@ export const STEP_FIELDS: Readonly<Record<string, string>> = {
 	upTo: "amount",
 	amount: "amount",
 	share: "share",
+	growth: "rate",
+	bps: "rate",
 }
 export const ENTRY_FIELDS: Readonly<Record<string, string>> = {
 	account: "account",
 	downTo: "amount",
 	amount: "amount",
+	growth: "rate",
+	bps: "rate",
 }
 export const TRANSFER_FIELDS: Readonly<Record<string, string>> = {
 	source: "source",
 	target: "target",
 	amount: "amount",
+	rate: "rate",
 	share: "share",
 	start: "start",
 	startAt: "start",

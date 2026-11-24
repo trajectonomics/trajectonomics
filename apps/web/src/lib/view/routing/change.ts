@@ -1,5 +1,5 @@
 /**
- * One change to a plan's routing, as data (web ADR 0021): a whole routing list in its new order and content, a transfer put
+ * One change to a plan's routing, as data (web ADR 0022): a whole routing list in its new order and content, a transfer put
  * in, or a transfer taken out. The same value is saved as one `apply-plan` Edit (`documentWith`) or tried in the What-if
  * session (`sessionWith`), so the two cannot disagree about what the change is.
  */

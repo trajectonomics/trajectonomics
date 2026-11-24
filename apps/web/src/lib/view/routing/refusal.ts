@@ -29,7 +29,7 @@ export function documentPathOf(error: ErrorBody | null): string[] {
 /** The field a path ends in; a path through `derive` or `growth` names the field the form shows it at. */
 function fieldOf(rest: readonly string[]): string {
 	if (rest.includes("derive")) return rest.includes("source") ? "source" : "share"
-	if (rest.includes("growth")) return "amount"
+	if (rest.includes("growth")) return "rate"
 	return rest.at(-1) ?? ""
 }
 

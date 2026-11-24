@@ -1,5 +1,5 @@
 /**
- * The routing of a plan in a What-if session (web ADR 0021). A routing list is tried whole, as one Set of `cashflow.<list>`
+ * The routing of a plan in a What-if session (web ADR 0022). A routing list is tried whole, as one Set of `cashflow.<list>`
  * (cli ADR 0070 replaces a path that exists), and a transfer is tried as any Flow is. `shownPlan` is the document as the
  * session shows it: the Sets put in, the removed Flows out and the added Flows in, so a drawer that tries a value starts from
  * the earlier tries and a new try keeps them. Object editing only: no figure is made.

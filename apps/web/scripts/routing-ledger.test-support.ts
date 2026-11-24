@@ -1,4 +1,4 @@
-// The plan the Where money goes end-to-end tests work (web ADR 0021): the withdrawals test's hand plan (no interest, no
+// The plan the Where money goes end-to-end tests work (web ADR 0022): the withdrawals test's hand plan (no interest, no
 // inflation stated as growth) with a salary that stops when `retire` fires, so money is left over before it and short after
 // it, and three more Accounts: an emergency fund, a provident fund and an RMF.
 import type { ProjectionRun, ScenarioDocument } from "../src/lib/contract"

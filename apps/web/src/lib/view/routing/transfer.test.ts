@@ -84,7 +84,7 @@ describe("a transfer in its drawer writes what the schema accepts", () => {
 			milestone: "retire",
 		}
 		const flat = make(draft)
-		const real = make({ ...draft, real: true, realise: true })
+		const real = make({ ...draft, growth: "inflation" as const, realise: true })
 		if (!flat.ok || !real.ok) throw new Error("refused")
 		expect(flat.flow).toMatchObject({
 			amount: "5000",
@@ -97,6 +97,30 @@ describe("a transfer in its drawer writes what the schema accepts", () => {
 		expect(said(real.flow)).toBe(
 			"Move 5,000 in today's money from Savings to Fixed deposit when retire fires",
 		)
+	})
+
+	test("an amount that grows by a fixed rate round trips: an untouched growth is never turned into none", () => {
+		const draft = {
+			...blank,
+			source: "bank",
+			target: "fd",
+			how: "amount" as const,
+			amount: "5000",
+			growth: "fixed" as const,
+			rate: "3",
+			date: "2030-01-01",
+		}
+		const made = make(draft)
+		if (!made.ok) throw new Error("refused")
+		expect(made.flow).toMatchObject({ amount: "5000", growth: { bps: 300 } })
+		const again = make(transferDraftOf(made.flow, ctx), made.flow)
+		expect(transferDraftOf(made.flow, ctx)).toMatchObject({ growth: "fixed", rate: "3.00" })
+		expect(again).toEqual({ ok: true, flow: made.flow })
+		expect(said(made.flow)).toContain("growing 3.00% a year")
+		expect(make({ ...draft, rate: "x" })).toMatchObject({
+			ok: false,
+			problems: { rate: expect.any(String) },
+		})
 	})
 
 	test("a date the household names is written as a plain date, and reads back as that choice", () => {

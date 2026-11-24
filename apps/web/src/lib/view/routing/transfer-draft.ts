@@ -1,6 +1,8 @@
 /** A transfer as the drawer states it: from, to, how much, how often, when, and whether a gain counts for tax. */
 import type { ScenarioFlow } from "../../contract"
+import { formatBps } from "../../format"
 import type { DateChoice } from "../estate/dates"
+import type { GrowthKind } from "./targets"
 import { movesOf } from "./transfer-read"
 
 export type Amount = "all" | "share" | "amount"
@@ -11,8 +13,10 @@ export interface TransferDraft {
 	target: string
 	how: Amount
 	amount: string
-	/** An amount that keeps its value in today's money grows with inflation; otherwise it stays as typed. */
-	real: boolean
+	/** How an amount grows: not at all, with inflation, or by a fixed percent a year. */
+	growth: GrowthKind
+	/** The percent a year of a fixed growth, as typed. */
+	rate: string
 	share: string
 	frequency: string
 	when: When
@@ -36,15 +40,22 @@ function whenOf(flow: ScenarioFlow | undefined, anchor: DateChoice | undefined):
 	return anchor === undefined ? "date" : "anchor"
 }
 
+/** A stored growth as a draft: no growth (a rate of 0, or none), inflation, or a fixed percent a year. */
+function growthDraft(growth: ScenarioFlow["growth"]): { growth: GrowthKind; rate: string } {
+	if (growth === "inflation") return { growth: "inflation", rate: "" }
+	if (growth === undefined || growth.bps === 0) return { growth: "none", rate: "" }
+	return { growth: "fixed", rate: formatBps(growth.bps) }
+}
+
 /** The fields that say how much a stored transfer moves. */
 function amountDraft(
 	flow: ScenarioFlow | undefined,
-): Pick<TransferDraft, "how" | "amount" | "real" | "share"> {
+): Pick<TransferDraft, "how" | "amount" | "growth" | "rate" | "share"> {
 	const moves = flow === undefined ? null : movesOf(flow)
 	return {
 		how: moves?.how ?? (flow === undefined ? "all" : "amount"),
 		amount: flow?.amount ?? "",
-		real: flow?.growth === "inflation",
+		...growthDraft(flow?.growth),
 		share: moves?.how === "share" ? moves.share : "",
 	}
 }

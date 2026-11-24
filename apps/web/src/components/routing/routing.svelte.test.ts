@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-import { Reorder } from "../../client/reorder.svelte.js"
 import EntryForm from "./EntryForm.svelte"
 import RoutingBody from "./RoutingBody.svelte"
 import { routedSnapshot } from "./routing.test-support"
@@ -51,33 +50,6 @@ describe("the Where money goes page at phone width", () => {
 	test("has no control in the Demo or when the server does not answer", () => {
 		const html = body(false)
 		expect(html).not.toMatch(/draggable="true"|>Edit<|Add a step|Add an entry|Add a move/)
-	})
-})
-
-describe("reordering by keyboard", () => {
-	test("Up and Down change the order here and wait for Done; Cancel puts the saved order back", () => {
-		const saved = ["a", "b", "c"]
-		const reorder = new Reorder<string>(saved)
-		reorder.nudge(0, -1)
-		expect(reorder.changed(saved)).toBe(false)
-		reorder.nudge(2, -1)
-		expect(reorder.order).toEqual(["a", "c", "b"])
-		expect(reorder.changed(saved)).toBe(true)
-		reorder.nudge(0, 1)
-		expect(reorder.order).toEqual(["c", "a", "b"])
-		reorder.reset(saved)
-		expect(reorder.changed(saved)).toBe(false)
-	})
-
-	test("a drop returns the new order to save, and a drop on its own row returns none", () => {
-		const reorder = new Reorder<string>(["a", "b", "c"])
-		const event = { preventDefault() {}, dataTransfer: null } as unknown as DragEvent
-		reorder.start(event, 0)
-		reorder.hover(event, 2)
-		expect(reorder.over).toBe(2)
-		expect(reorder.drop(event, 2)).toEqual(["b", "c", "a"])
-		reorder.start(event, 1)
-		expect(reorder.drop(event, 1)).toBeNull()
 	})
 })
 

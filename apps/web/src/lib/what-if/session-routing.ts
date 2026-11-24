@@ -1,4 +1,4 @@
-/** The change a Set of a whole routing list is, as the bar words it (web ADR 0021). */
+/** The change a Set of a whole routing list is, as the bar words it (web ADR 0022). */
 import type { Change } from "./session-changes"
 
 /** The words of a routing list tried whole: its rows are not repeated, as they hold the person's own targets and shares. */

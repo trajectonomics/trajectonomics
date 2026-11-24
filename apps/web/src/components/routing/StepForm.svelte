@@ -71,7 +71,7 @@ async function submit(event: SubmitEvent): Promise<void> {
 		<Field id="step-share" label="Share of what is left" inputmode="decimal" hint="A percent with at most two places, such as 30" bind:value={draft.share} problem={shown.at("share")} />
 	{/if}
 	{#if draft.how === "upTo" || draft.how === "shareUpTo"}
-		<TargetFields bind:draft id="step" label="Up to" problem={shown.at("amount")} />
+		<TargetFields bind:draft id="step" label="Up to" problem={shown.at("amount")} rateProblem={shown.at("rate")} />
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	<ItemActions trying={tryValue} />

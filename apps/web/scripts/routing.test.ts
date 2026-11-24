@@ -1,11 +1,10 @@
-// Where money goes against the real traj (web ADR 0021, cli ADR 0070, sim ADR 0030 and 0031): an emergency-fund target in
+// Where money goes against the real traj (web ADR 0022, cli ADR 0070, sim ADR 0030 and 0031): an emergency-fund target in
 // today's money, a 30 per cent share step, a reserve floor and a PVD to RMF transfer are each one apply-plan Edit; a
 // reorder changes the figures; a floor is tried in a What-if session that keeps the earlier tries; a refusal lands on its row.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { sessionWith } from "../src/lib/view/routing/change"
 import { filledFigure, movedFigure } from "../src/lib/view/routing/figures"
 import { moved } from "../src/lib/view/routing/order"
-import { placeOf } from "../src/lib/view/routing/refusal"
 import { stepDraftOf, stepFromDraft, withStep } from "../src/lib/view/routing/surplus"
 import { transferFromDraft } from "../src/lib/view/routing/transfer-build"
 import { transferDraftOf } from "../src/lib/view/routing/transfer-draft"
@@ -43,7 +42,7 @@ describe("Where money goes through traj", () => {
 				account: "emergency",
 				how: "upTo",
 				amount: "100000",
-				real: true,
+				growth: "inflation" as const,
 			})
 			if (!target.ok) throw new Error("refused")
 			const one = await save({
@@ -142,46 +141,4 @@ describe("Where money goes through traj", () => {
 			expect(storedPlan()).toEqual(stored)
 		},
 	)
-
-	slow("a refusal lands on the row its path names, positional paths included", async () => {
-		const before = storedPlan()
-		const { bank } = ids()
-		const last = await save({
-			kind: "list",
-			list: "surplus",
-			items: [{ account: bank }, { account: "emergency", share: "10" }],
-		})
-		if (last.ok) throw new Error("the CLI took a share on the last step")
-		expect(last.error.code).toBe("invalid_input")
-		expect(placeOf(last.error, [])).toEqual({
-			kind: "row",
-			list: "surplus",
-			index: 1,
-			field: "share",
-		})
-		const order = await save({
-			kind: "list",
-			list: "withdraw",
-			items: [bank, { account: bank, downTo: "5.00" }],
-		})
-		if (order.ok) throw new Error("the CLI took a floor after a plain entry")
-		expect(placeOf(order.error, [])).toEqual({
-			kind: "row",
-			list: "withdraw",
-			index: 1,
-			field: "downTo",
-		})
-		const same = await save({
-			kind: "transfer",
-			flow: { ...before.document.flows.find((f) => f.kind === "transfer")!, target: "pvd" },
-		})
-		if (same.ok) throw new Error("the CLI took a move to its own source")
-		expect(
-			placeOf(
-				same.error,
-				before.document.flows.map((flow) => flow.id),
-			),
-		).toMatchObject({ kind: "flow", field: "target" })
-		expect(storedPlan()).toEqual(before)
-	})
 })

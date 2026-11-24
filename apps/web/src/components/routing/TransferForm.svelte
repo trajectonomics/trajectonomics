@@ -70,7 +70,7 @@ async function submit(event: SubmitEvent): Promise<void> {
 	{#if draft.how === "share"}
 		<Field id="move-share" label="Share of what it holds" inputmode="decimal" hint="A percent with at most two places, such as 10" bind:value={draft.share} problem={shown.at("share")} />
 	{:else if draft.how === "amount"}
-		<TargetFields bind:draft id="move" label="Amount each time" problem={shown.at("amount")} />
+		<TargetFields bind:draft id="move" label="Amount each time" problem={shown.at("amount")} rateProblem={shown.at("rate")} />
 	{/if}
 	<TransferWhen bind:draft ctx={around} {shown} />
 	<label class="flex items-start gap-2 text-sm text-foreground">

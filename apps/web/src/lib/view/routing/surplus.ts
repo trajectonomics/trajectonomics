@@ -7,7 +7,7 @@
 import type { Problems } from "../plan-items/problems"
 import { percentText } from "../withdrawals/check"
 import type { Step } from "./entries"
-import { AMOUNT_WORDS, type TargetDraft, targetDraftOf, targetFromDraft } from "./targets"
+import { type TargetDraft, targetDraftOf, targetFromDraft, targetProblems } from "./targets"
 
 export type How = "all" | "upTo" | "share" | "shareUpTo"
 
@@ -42,10 +42,13 @@ export function takesAll(step: Step): boolean {
 export type StepResult = { ok: true; step: Step } | { ok: false; problems: Problems }
 
 /** The cap a draft names, null when it has none, or the problem at the amount. */
-function capOf(draft: StepDraft, old?: Step): { cap: Step["upTo"] | null; problem?: string } {
+function capOf(
+	draft: StepDraft,
+	old?: Step,
+): { cap: Step["upTo"] | null; problems?: Record<string, string> } {
 	if (draft.how !== "upTo" && draft.how !== "shareUpTo") return { cap: null }
 	const cap = targetFromDraft(draft, old?.upTo)
-	return cap === null ? { cap, problem: AMOUNT_WORDS } : { cap }
+	return cap === null ? { cap, problems: targetProblems(draft) } : { cap }
 }
 
 /** The share a draft names, null when it has none, or the problem at the share. */
@@ -59,11 +62,11 @@ const SHARE_WORDS = "Enter a percent with at most two places, such as 30."
 
 /** The step a draft names over the stored one, whose other keys are kept. */
 export function stepFromDraft(draft: StepDraft, old?: Step): StepResult {
-	const { cap, problem: capProblem } = capOf(draft, old)
+	const { cap, problems: capProblems } = capOf(draft, old)
 	const { share, problem: shareProblem } = shareOf(draft)
 	const problems: Record<string, string> = {}
 	if (draft.account === "") problems["account"] = "Choose an account."
-	if (capProblem !== undefined) problems["amount"] = capProblem
+	Object.assign(problems, capProblems)
 	if (shareProblem !== undefined) problems["share"] = shareProblem
 	if (Object.keys(problems).length > 0) return { ok: false, problems }
 	const { upTo: _cap, share: _share, ...kept } = old ?? { account: "" }

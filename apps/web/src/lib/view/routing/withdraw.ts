@@ -6,11 +6,11 @@
 import type { Problems } from "../plan-items/problems"
 import { type Entry, entryAccount } from "./entries"
 import {
-	AMOUNT_WORDS,
 	NO_TARGET,
 	type TargetDraft,
 	targetDraftOf,
 	targetFromDraft,
+	targetProblems,
 } from "./targets"
 
 export interface EntryDraft extends TargetDraft {
@@ -36,7 +36,7 @@ export function entryFromDraft(draft: EntryDraft, old?: Entry): EntryResult {
 	if (draft.account === "") return { ok: false, problems: { account: "Choose an account." } }
 	if (!draft.floor) return { ok: true, entry: draft.account }
 	const downTo = targetFromDraft(draft, typeof old === "object" ? old.downTo : undefined)
-	if (downTo === null) return { ok: false, problems: { amount: AMOUNT_WORDS } }
+	if (downTo === null) return { ok: false, problems: targetProblems(draft) }
 	const kept = typeof old === "object" ? old : {}
 	return { ok: true, entry: { ...kept, account: draft.account, downTo } }
 }

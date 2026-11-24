@@ -10,6 +10,7 @@ import { lastStepProblem } from "../../lib/view/routing/surplus"
 import { plainText, stepWords } from "../../lib/view/routing/words"
 import AddButton from "./AddButton.svelte"
 import FigureChart from "./FigureChart.svelte"
+import LockedNote from "./LockedNote.svelte"
 import ReorderList from "./ReorderList.svelte"
 import RoutingDrawer from "./RoutingDrawer.svelte"
 import RowButtons from "./RowButtons.svelte"
@@ -24,7 +25,9 @@ interface Props {
 let { ctx }: Props = $props()
 let drawer = $state<{ index: number | null; trying: boolean } | null>(null)
 let note: string | null = $state(null)
-const steps = $derived(ctx.doc.cashflow?.surplus ?? [])
+/** The steps as the session shows them, which the rows, the drawers that try and the figures read. */
+const steps = $derived(ctx.shown.cashflow?.surplus ?? [])
+const locked = $derived(!sameOrder(steps, ctx.doc.cashflow?.surplus ?? []))
 const filled = $derived(ctx.run === undefined ? null : filledFigure(ctx.run, ctx.names))
 const list = (items: readonly unknown[]) => ({ kind: "list", list: "surplus", items }) as const
 
@@ -39,7 +42,8 @@ function remove(index: number, trying: boolean): void {
 </script>
 
 <SectionFrame id="surplus" title="When there is money left over" intro="Each year's leftover money goes down this list, one step at a time. The last step must take everything that is left.">
-	<ReorderList items={steps} editable={ctx.editable} busy={false} rule={lastStepProblem}
+	{#key JSON.stringify(steps)}
+	<ReorderList items={steps} {locked} editable={ctx.editable} busy={false} rule={lastStepProblem}
 		labelOf={(step, order, at) => plainText(stepWords(step, at, order.length, ctx.names), formatMoney)}
 		refused={(at) => (drawer === null ? rowRefusal(routing.place, routing.message, "surplus", at) : undefined)}
 		onSave={(order) => routing.save(ctx, list(order))} onTry={(order) => void routing.tryIt(ctx, list(order))}>
@@ -51,12 +55,14 @@ function remove(index: number, trying: boolean): void {
 			{/if}
 		{/snippet}
 		{#snippet buttons(_step, at)}
-			<RowButtons label={`step ${at + 1}`} busy={false} onEdit={() => (drawer = { index: at, trying: false })}
+			<RowButtons label={`step ${at + 1}`} busy={false} {locked} onEdit={() => (drawer = { index: at, trying: false })}
 				onTry={() => (drawer = { index: at, trying: true })} onRemove={() => remove(at, false)} onTryRemove={() => remove(at, true)} />
 		{/snippet}
 	</ReorderList>
+	{/key}
+	<LockedNote {locked} />
 	{#if note}<p role="alert" class="text-sm text-destructive">{note}</p>{/if}
-	{#if ctx.editable}<AddButton label="Add a step" onclick={() => (drawer = { index: null, trying: false })} />{/if}
+	{#if ctx.editable}<AddButton label="Add a step" onclick={() => (drawer = { index: null, trying: locked })} />{/if}
 	{#snippet figure()}<FigureChart label="Money each step filled, by year" figure={filled} empty="No step filled an account in this run." />{/snippet}
 </SectionFrame>
 <RoutingDrawer open={drawer !== null} title={drawer?.index === null ? "Add a step" : "Change a step"} onClose={() => (drawer = null)}>

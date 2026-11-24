@@ -2,7 +2,7 @@
  * The sentence of each routing row, as parts: text, and the document's own amounts, which the page draws with `Money` so the
  * hide-amounts switch masks them. An amount is the document's decimal string as typed or stored, never computed (ADR 0002).
  */
-import { percentWords } from "../../format"
+import { formatBps, percentWords } from "../../format"
 import { nameOf } from "./accounts"
 import { amountOf, type Entry, entryAccount, isReal, type Step, type Target } from "./entries"
 
@@ -16,7 +16,9 @@ export function plainText(parts: readonly Part[], money: (amount: string) => str
 
 /** " in today's money" for a target that keeps its value, else nothing. */
 function realWords(target: Target | undefined): string {
-	return isReal(target) ? " in today's money" : ""
+	if (isReal(target)) return " in today's money"
+	const growth = typeof target === "object" ? target.growth : undefined
+	return typeof growth === "object" ? `, growing ${formatBps(growth.bps)}% a year` : ""
 }
 
 /** The surplus step at `index` of `count` in a sentence: "Fill Emergency fund up to 300,000 in today's money". */

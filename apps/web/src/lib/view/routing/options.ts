@@ -9,6 +9,13 @@ export const STEP_CHOICES: readonly Choice[] = [
 	{ value: "shareUpTo", label: "A share of what is left, up to an amount" },
 ]
 
+/** How an amount grows: it stays as typed, keeps its value in today's money, or grows by a fixed percent a year. */
+export const GROWTH_CHOICES: readonly Choice[] = [
+	{ value: "none", label: "Stays as typed" },
+	{ value: "inflation", label: "Keeps its value in today's money (grows with inflation)" },
+	{ value: "fixed", label: "Grows by a fixed percent a year" },
+]
+
 /** How much a transfer moves. */
 export const MOVE_CHOICES: readonly Choice[] = [
 	{ value: "all", label: "All of it" },
