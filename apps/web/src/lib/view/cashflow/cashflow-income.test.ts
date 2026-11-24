@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { layoutFlow } from "../../chart/flow"
+import { layoutStack } from "../../chart/flow-stack"
 import type { CashflowLine } from "./cashflow"
 import { rollupsOf, sectionsOf } from "./cashflow"
 import { flowOf } from "./cashflow-flow"
@@ -88,5 +89,19 @@ describe("the employer's money on the Cash flow page", () => {
 		expect(rowKeyOf(into?.key ?? "")).toBe(from?.key ?? "")
 		const keys = layoutFlow(flow).links.map((link) => link.key)
 		expect(new Set(keys).size).toBe(keys.length)
+	})
+
+	test("the phone layout has a row for every band of the wide one, each with the CLI's amount, and the employer's money in both lists", () => {
+		const flow = flowOf(rollup(), NAMES)
+		const wide = layoutFlow(flow)
+		const stack = layoutStack(flow)
+		expect(stack.rows.map((row) => [row.key, row.amount])).toEqual(
+			wide.nodes.map((node) => [node.key, node.amount]),
+		)
+		const sides = (kind: string) =>
+			stack.rows.filter((row) => row.kind === kind).map((row) => row.side)
+		expect(sides("employer")).toEqual(["source", "use"])
+		expect(sides("payout")).toEqual(["source"])
+		expect(stack.rows.find((row) => row.kind === "payout")?.label).toBe("Paid out by Dividend fund")
 	})
 })

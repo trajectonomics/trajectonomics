@@ -1,0 +1,61 @@
+<script lang="ts">
+import { preferences } from "../../client/preferences.svelte.js"
+import { type StackLayout, stackName } from "../../lib/chart/flow-stack"
+import { formatMoney, maskMoney } from "../../lib/format"
+import { cx } from "../ui/cx"
+import { keyed } from "./flow-keys"
+import { FLOW_FILL } from "./flow-style"
+
+interface Props {
+	/** The geometry of the year, from `layoutStack`. */
+	layout: StackLayout
+	/** The key of the band the person picked, which its table row shows. */
+	picked: string | null
+	onPick: (key: string) => void
+	/** Names the diagram for a screen reader, such as "Cash flow, 31 Oct 2026 to 30 Oct 2027". */
+	label: string
+}
+
+/** The phone flow diagram of one year: the sources above, the uses below, one bar for each band. Each bar is a control. */
+let { layout, picked, onPick, label }: Props = $props()
+
+/** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
+const shown = (amount: string): string =>
+	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
+</script>
+
+<!-- The figures are the CLI's strings. A bar is drawn by its share of the taller list; the table below repeats each one. -->
+<div class="mx-auto w-full max-w-md rounded-lg border border-border md:hidden">
+	<svg viewBox={`0 0 ${layout.width} ${layout.height}`} role="group" aria-label={label} class="h-auto w-full text-xs">
+		{#each layout.headings as heading (heading.side)}
+			<text x={heading.x} y={heading.y} dominant-baseline="middle" aria-hidden="true" class="fill-muted-foreground font-medium">
+				{heading.text}
+			</text>
+		{/each}
+		{#each layout.rows as row (row.key)}
+			<g
+				role="button"
+				tabindex="0"
+				aria-label={`${row.label}, ${shown(row.amount)}`}
+				aria-pressed={picked === row.key}
+				onclick={() => onPick(row.key)}
+				onkeydown={(event) => keyed(event, () => onPick(row.key))}
+				class="cursor-pointer outline-none hover:opacity-85 focus-visible:outline-2 focus-visible:outline-ring"
+			>
+				<text x={row.labelX} y={row.labelY} dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
+					{stackName(row.label, shown(row.amount))}
+				</text>
+				<text x={row.amountX} y={row.labelY} text-anchor="end" dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
+					{shown(row.amount)}
+				</text>
+				<rect
+					x={row.barX}
+					y={row.barY}
+					width={row.barWidth}
+					height={row.barHeight}
+					class={cx(FLOW_FILL[row.kind], picked === row.key && "stroke-foreground stroke-2")}
+				/>
+			</g>
+		{/each}
+	</svg>
+</div>

@@ -88,4 +88,49 @@ describe("CashFlowView", () => {
 		expect(body).toContain("no such Scenario")
 		expect(body).not.toContain("<svg")
 	})
+
+	test("the wide diagram is for a medium screen and up, and the stacked one for a phone, so neither scrolls sideways", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		expect(body.match(/<svg/g)?.length).toBe(2)
+		expect(body).toMatch(/class="max-w-full overflow-x-auto[^"]*hidden md:block"/)
+		expect(body).toMatch(/class="[^"]*md:hidden"/)
+		// The stacked one has no minimum width and no scroll box of its own.
+		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
+		expect(stacked).not.toContain("min-w-")
+		expect(stacked).not.toContain("overflow-x")
+	})
+
+	test("the stacked diagram names every band of the year and shows each CLI figure, grouped, once", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
+		expect(stacked).toContain("Money in")
+		expect(stacked).toContain("Where it goes")
+		// Year zero's sources and uses, from the CLI's lines and totals rows with no arithmetic: the figures
+		// are the lines' own amounts, grouped. The refund shows with its sign taken off, as in the wide diagram.
+		for (const amount of ["120,000.00", "1,800.00", "3,000.00", "1,500.00"]) {
+			expect(stacked).toContain(`>${amount}<`)
+		}
+		for (const amount of [
+			"6,000.00",
+			"30,000.00",
+			"18,000.00",
+			"36,000.00",
+			"28,800.00",
+			"4,800.00",
+		]) {
+			expect(stacked).toContain(`>${amount}<`)
+		}
+		// Each bar is a control with the name and the amount, and picks the same row as the wide one.
+		expect(stacked).toContain('aria-label="salary, 120,000.00"')
+		expect(stacked.match(/role="button"/g)?.length).toBe(
+			body.slice(0, body.indexOf("md:hidden")).match(/role="button"/g)?.length ?? -1,
+		)
+	})
+
+	test("the stacked diagram of a Shortfall year draws its unmet money, and the page keeps one table for a screen reader", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) }, "1")
+		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
+		expect(stacked).toContain(">500.00<")
+		expect(body.match(/<div class="sr-only">/g)?.length).toBe(1)
+	})
 })

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { layoutFlow } from "../../lib/chart/flow"
+import { layoutStack } from "../../lib/chart/flow-stack"
 import type { ProjectionRun } from "../../lib/contract"
 import {
 	chooseRollup,
@@ -33,7 +34,9 @@ let pickedIn: Pick | null = $state(null)
 
 const rollups = $derived(rollupsOf(run))
 const rollup = $derived(chooseRollup(rollups, year))
-const layout = $derived(rollup === null ? null : layoutFlow(flowOf(rollup, accountNames)))
+const flow = $derived(rollup === null ? null : flowOf(rollup, accountNames))
+const layout = $derived(flow === null ? null : layoutFlow(flow))
+const stack = $derived(flow === null ? null : layoutStack(flow))
 const sections = $derived(rollup === null ? [] : sectionsOf(rollup))
 const picked = $derived(pickedKey(pickedIn, rollup?.index))
 
@@ -46,13 +49,13 @@ function pick(band: string): void {
 }
 </script>
 
-{#if rollup === null || layout === null}
+{#if rollup === null || layout === null || stack === null}
 	<EmptyState title="No year to show" />
 {:else}
 	<div class="space-y-6">
 		<YearSelect {rollups} selected={rollup.index} {onYear} />
 		{#key rollup.index}
-			<FlowDiagram {layout} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup)}`} />
+			<FlowDiagram {layout} {stack} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup)}`} />
 			<p class="text-sm text-muted-foreground">
 				A refund is shown as money in, so the tax band is the tax paid, and the tax total is the tax paid
 				less the refund.
