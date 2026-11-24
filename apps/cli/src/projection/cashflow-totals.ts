@@ -28,14 +28,18 @@ export type LineFigures = { group: string; amount: string }
 export type CashflowTotals = Record<CashflowTotal, number>
 
 /** A decimal string as its minor units; the engine states every figure at the Currency's scale. */
-function minorOf(text: string, currency: string): bigint {
+export function minorOf(text: string, currency: string): bigint {
 	const minor = parseMinorUnits(text, currency)
 	if (typeof minor !== "number") throw new Error(`a cash-flow figure is not money: ${text}`)
 	return BigInt(minor)
 }
 
 /** The exact integer sum, in minor units, of the lines whose group is one of `groups`. */
-function sumOf(lines: readonly LineFigures[], groups: readonly string[], currency: string): bigint {
+export function sumOf(
+	lines: readonly LineFigures[],
+	groups: readonly string[],
+	currency: string,
+): bigint {
 	return lines
 		.filter((line) => groups.includes(line.group))
 		.reduce((total, line) => total + minorOf(line.amount, currency), 0n)

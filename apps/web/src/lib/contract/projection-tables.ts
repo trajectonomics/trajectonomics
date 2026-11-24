@@ -7,8 +7,10 @@ import {
 	balanceRow,
 	estateLineRow,
 	estateRow,
+	feeRow,
 	liabilityRow,
 	milestoneRow,
+	monthlyRow,
 	paidOffRow,
 	spendingRuleRow,
 } from "./projection-rows"
@@ -25,6 +27,10 @@ const annualRow = z.strictObject({
 	income: money,
 	// Present only when the Scenario declares a withdrawal Flow (cli ADR-0059).
 	withdrawals: money.optional(),
+	// Each present only when declared (cli ADR-0067): payouts are inside `income`, the others outside it.
+	payouts: money.optional(),
+	employerContributions: money.optional(),
+	fees: money.optional(),
 	expense: money,
 	contributions: money,
 	unfundedContributions: money,
@@ -32,16 +38,6 @@ const annualRow = z.strictObject({
 	unmet: money,
 	partial: z.boolean(),
 	realNetWorth: z.strictObject({ date: dateString, amount: money }),
-})
-
-/** One monthly row: net worth on the row's date, nominal and real, and the accessible share. */
-const monthlyRow = z.strictObject({
-	date: dateString,
-	ages: personAges,
-	netWorth: money,
-	realNetWorth: money,
-	accessibleNetWorth: money,
-	realAccessibleNetWorth: money,
 })
 
 /**
@@ -54,12 +50,14 @@ export const cashflowRow = z.strictObject({
 	to: dateString,
 	group: z.enum([
 		"income",
+		"payout",
 		"prepaid",
 		"settlement",
 		"expense",
 		"category",
 		"contribution",
 		"unfunded",
+		"employer",
 		"withdrawal",
 		"drawn",
 		"surplus",
@@ -74,7 +72,7 @@ export const cashflowRow = z.strictObject({
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
  * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
- * value only with `--accounts`, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
+ * value only with `--accounts`, each fee Account's charges only when an Account carries a fee, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
  * only when the Scenario declares them.
  */
 export const projectionTables = z.array(
@@ -90,6 +88,7 @@ export const projectionTables = z.array(
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
 		z.strictObject({ name: z.literal("balances"), count: integer, rows: z.array(balanceRow) }),
+		z.strictObject({ name: z.literal("fees"), count: integer, rows: z.array(feeRow) }),
 		z.strictObject({
 			name: z.literal("spendingRules"),
 			count: integer,

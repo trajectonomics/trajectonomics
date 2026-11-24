@@ -66,3 +66,9 @@ worth per row, never one Account's value.
   day its monthly `invest` is not due, so it shows none.
 - A plan whose purchase the `cashflow.withdraw` list cannot pay is a Shortfall on that date, as for any expense.
 - The Dashboard's per-asset value is a read of this table, which the web contract accepts in the same change.
+
+## Addendum: what an Account was charged (#409, ADR-0067)
+
+An Account with a fee above 0 bps adds a `fees` table (`{ index, from, to, account, amount }`, per roll-up and fee
+Account), present whether or not `--accounts` is given, because a fee is a cost of the plan and not a value on a date.
+`balances` is unchanged.

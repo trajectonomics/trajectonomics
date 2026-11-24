@@ -1,4 +1,5 @@
 import type { CashflowBreakdown } from "@trajectonomics/core/sim"
+import { employerLines, type Line, payoutLines } from "./cashflow-income"
 import type { CashflowRow } from "./cashflow-view"
 import { moneyOf } from "./money"
 
@@ -8,9 +9,6 @@ import { moneyOf } from "./money"
  * the lines in the long-table shape and formats the engine's integer minor units with the Currency's
  * formatter.
  */
-
-/** One engine line before it is named: its group, its names and its engine minor units. */
-type Line = Omit<CashflowRow, "index" | "from" | "to" | "amount"> & { minor: number }
 
 /**
  * Every line of one roll-up in the engine's order, the groups in the order `CASHFLOW_GROUPS` lists.
@@ -26,6 +24,7 @@ function linesOf(breakdown: CashflowBreakdown): Line[] {
 			id: line.flow,
 			minor: line.amount,
 		})),
+		payoutLines(breakdown),
 		breakdown.prepaid.map((line) => ({
 			...none,
 			group: "prepaid",
@@ -65,6 +64,7 @@ function linesOf(breakdown: CashflowBreakdown): Line[] {
 			account: line.account,
 			minor: line.unfunded,
 		})),
+		employerLines(breakdown),
 		breakdown.withdrawals.map((line) => ({
 			...none,
 			group: "withdrawal",

@@ -14,6 +14,12 @@ export type AnnualRow = {
 	income: string
 	/** Planned withdrawals landed in the roll-up; present only when the Scenario declares one (sim ADR-0016). */
 	withdrawals?: string | undefined
+	/** Payouts landed as passive income, already inside `income`; present only when an Account pays out (sim ADR 0027). */
+	payouts?: string | undefined
+	/** Employer Contributions landed in Accounts, outside `income`; present only when the Scenario declares one (sim ADR 0026). */
+	employerContributions?: string | undefined
+	/** Fees charged to Accounts, outside cashflow; present only when an Account carries a fee above 0 bps (sim ADR 0028). */
+	fees?: string | undefined
 	expense: string
 	contributions: string
 	unfundedContributions: string
@@ -43,6 +49,15 @@ export const annualRow: z.ZodType<AnnualRow> = z.strictObject({
 	income: moneyField("Income the roll-up landed"),
 	withdrawals: moneyField(
 		"Planned withdrawals the roll-up landed, borrowed from liabilities; present only when the Scenario declares a withdrawal Flow",
+	).optional(),
+	payouts: moneyField(
+		"Payouts the roll-up landed as passive income; already inside income, and outside interest; present only when an Account pays out",
+	).optional(),
+	employerContributions: moneyField(
+		"Employer Contributions the roll-up landed in Accounts; outside income, contributions and interest, because the money never entered cashflow; present only when the Scenario declares one",
+	).optional(),
+	fees: moneyField(
+		"Fees the roll-up charged to Accounts; they left the Accounts outside cashflow and are not in interest, which is growth before the fee; present only when an Account carries a fee above 0 bps",
 	).optional(),
 	expense: moneyField("Expense the roll-up landed"),
 	contributions: moneyField("Contributions the roll-up funded"),

@@ -43,6 +43,18 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 	},
 	{
 		command:
+			"traj projection run --scenario funded --as-of 2026-03-31 --horizon 2027-03-30 --breakdown --json",
+		description:
+			"The annual roll-up of a Scenario whose employer pays into an Account and whose Account pays out and charges a fee: the roll-up's payouts, employerContributions and fees, the payout and employer lines of the cash flow, and a fees table. The employer's money is outside money in; a payout is inside it.",
+	},
+	{
+		command:
+			"traj projection run --scenario funded --as-of 2026-03-31 --horizon 2027-03-30 --set accounts.0194a000-0004-7000-8000-000000000004.fee.bps=50 --json",
+		description:
+			"What if the Account's fee were 0.5% a year instead of 1.5%: one override, and nothing saved.",
+	},
+	{
+		command:
 			"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
 		description: "The annual roll-up with one Stream taken out, and nothing saved.",
 	},

@@ -1,10 +1,11 @@
+import { feeShape, payoutShape } from "./account-income"
 import { ACCOUNT_KINDS, BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
 
 /** One Account the Scenario assumes, with the unit of every number it states. */
 export const accountShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional.",
+		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional. `payout` and `fee` are an asset's alone, and every rate in them is the caller's.",
 	properties: {
 		id: {
 			type: "string",
@@ -44,6 +45,8 @@ export const accountShape: Record<string, unknown> = {
 			description:
 				"Assets only: the Tally label the Account's realised gains are reported under; omit to report none. Needs a Levy.",
 		},
+		payout: payoutShape,
+		fee: feeShape,
 	},
 	required: ["id", "kind", "rate"],
 	additionalProperties: false,

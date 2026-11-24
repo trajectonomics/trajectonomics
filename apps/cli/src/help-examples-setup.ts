@@ -1,9 +1,8 @@
 import { isAppError } from "./errors"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
+import { RUN_SETUP } from "./help-examples-run"
 import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
-import { ESTATE_PLAN } from "./projection-estate-plan"
-import { LOAN_SCENARIO } from "./projection-liabilities-plan"
 import { chanceRulePlan } from "./projection-spending-chance-support"
 import { toDecimalForm } from "./scenario/decimal"
 
@@ -54,19 +53,7 @@ export const SETUP: Record<string, Setup> = {
 	},
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
 	// The car loan, the spending rule and the estate the `--liabilities`, `--spending` and `--estate` examples read, stored beside the projection fixture.
-	"projection run": {
-		ledger: "projection",
-		files: {
-			"car-loan.json": JSON.stringify(LOAN_SCENARIO),
-			"ruled.json": JSON.stringify(chanceRulePlan(undefined)),
-			"estated.json": JSON.stringify(ESTATE_PLAN),
-		},
-		steps: [
-			["scenario", "apply", "car-loan", "--file", "car-loan.json"],
-			["scenario", "apply", "ruled", "--file", "ruled.json"],
-			["scenario", "apply", "estated", "--file", "estated.json"],
-		],
-	},
+	"projection run": RUN_SETUP,
 	"scenario diff": { steps: [["scenario", "fork", "base", "early"]] },
 	"scenario rm": { steps: [["scenario", "fork", "base", "early"]] },
 	"data remove": { steps: [["backup", "--out", "backup"]] },

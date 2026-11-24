@@ -70,6 +70,12 @@ export function annualRow(
 		income: money(rollup.income),
 		// Present only when the Scenario declares a withdrawal Flow, as the engine states it (sim ADR-0016).
 		...(rollup.withdrawals === undefined ? {} : { withdrawals: money(rollup.withdrawals) }),
+		// Each is present only when the Scenario declares its field, as the engine states it (sim ADR-0026, 0027, 0028).
+		...(rollup.payouts === undefined ? {} : { payouts: money(rollup.payouts) }),
+		...(rollup.employerContributions === undefined
+			? {}
+			: { employerContributions: money(rollup.employerContributions) }),
+		...(rollup.fees === undefined ? {} : { fees: money(rollup.fees) }),
 		expense: money(rollup.expense),
 		contributions: money(rollup.contributions),
 		unfundedContributions: money(rollup.unfundedContributions),

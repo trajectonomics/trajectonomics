@@ -178,8 +178,8 @@ const PROBES: EnumProbe[] = [
 	},
 ]
 
-/** Paths probed in their own file: milestone criteria, the level rounding and a spending rule's kind and rounding (rule-enums.test.ts) and an estate line's rounding and base (estate-enums.test.ts). */
-const PROBED_ELSEWHERE = /^(milestones|estate|flows\.\*\.(level|rule))\./
+/** Paths probed in their own file: milestone criteria, the level rounding and a spending rule's kind and rounding (rule-enums.test.ts), an estate line's rounding and base (estate-enums.test.ts) and an Account's payout and fee (account-enums.test.ts). */
+const PROBED_ELSEWHERE = /^(milestones|estate|flows\.\*\.(level|rule)|accounts\.\*\.(payout|fee))\./
 
 describe("the closed value sets the shape states", () => {
 	it("covers every one of them with a probe", () => {

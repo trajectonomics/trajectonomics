@@ -108,6 +108,24 @@ describe("RATE_OUT_OF_RANGE as a sentence, for every field that can raise it", (
 			hint: /10000 or less/,
 		},
 		{
+			name: "an Account's payout share",
+			path: ["accounts", 3, "payout", "bps"],
+			message: /share an Account pays out each year must be from 0% to 100%/,
+			hint: /basis points.*Under --decimal it is a percent string such as "1\.50".*A payout of 0 is none/,
+		},
+		{
+			name: "an Account's fee",
+			path: ["accounts", 3, "fee", "bps"],
+			message: /fee an Account charges each year must be from 0% to 100%/,
+			hint: /basis points.*Under --decimal.*A fee of 0 is none/,
+		},
+		{
+			name: "a payout's prepayment",
+			path: ["accounts", 3, "payout", "prepayments", 0, "bps"],
+			message: /prepayments of an Account's payout ask for more than 100%/,
+			hint: /10000 or less/,
+		},
+		{
 			name: "a field with no entry of its own",
 			path: ["fi", "thresholdBps"],
 			message: /rate or share is outside the range its field allows/,

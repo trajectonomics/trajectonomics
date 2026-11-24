@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { scenarioDocument } from "./document-form"
+import { ACCOUNT_PERCENT_UNITS, ACCOUNT_RATE_UNITS } from "./shape/account-terms"
 import { ESTATE_PERCENT_UNITS, ESTATE_RATE_UNITS, ESTATE_UNITS } from "./shape/estate-terms"
 import {
 	MINOR_UNITS,
@@ -10,8 +11,8 @@ import {
 } from "./shape/terms"
 
 /*
- * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's or an
- * estate line's rates (cli ADR-0063, ADR-0064). Nothing lists them by hand: a money field is a node of the published document
+ * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's, an
+ * estate line's or an Account's payout or fee rates (cli ADR-0063, ADR-0064, ADR-0067). Nothing lists them by hand: a money field is a node of the published document
  * schema whose description starts with one of the money units (MINOR_UNITS, PRINCIPAL_UNITS for a
  * loan's principal, YEARLY_UNITS for a rule's bound), and a rule rate one whose description starts
  * with RULE_RATE_UNITS, so the decimal conversion and `traj schema` read the same schema and cannot
@@ -28,6 +29,7 @@ export type RateUnit = { stored: string; percent: string }
 const RATE_UNITS: readonly RateUnit[] = [
 	{ stored: RULE_RATE_UNITS, percent: PERCENT_UNITS },
 	{ stored: ESTATE_RATE_UNITS, percent: ESTATE_PERCENT_UNITS },
+	{ stored: ACCOUNT_RATE_UNITS, percent: ACCOUNT_PERCENT_UNITS },
 ]
 
 /** How the decimal form writes a field: money as the Currency's major unit, a rule's rate as a percent. */

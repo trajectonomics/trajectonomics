@@ -89,3 +89,10 @@ kept them out of it. The human block and the JSON now come from one function, so
   engine's `category` lines. A category is not grouped by the totals, so a category of `" "` (a whitespace-only
   name, which the Flow schema accepts) stays its own category: the JSON names it `" "`, and the human block prints
   the line with a blank label, not as `(uncategorised)`, which is only for `null`. The engine is not changed.
+
+## Addendum: payouts and an employer's share (#409, ADR-0067)
+
+The engine's `payouts` and `employer` lists are two more groups, `payout` and `employer`. A payout is money in: the
+roll-up's `income` already includes it, so `money in` is unchanged and the `payout` lines are what make the long table
+add up to it. An `employer` line is outside the identity, because the money never entered cashflow. Neither group
+adds a section total, and a plan with neither declares neither group.

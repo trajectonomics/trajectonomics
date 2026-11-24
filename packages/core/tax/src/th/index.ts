@@ -28,6 +28,7 @@ export {
 	emitThLevy,
 	TH_LEVY_CONTRIBUTION_LABELS,
 	TH_LEVY_INCOME_LABELS,
+	TH_LEVY_MEMBER_ONLY_LABELS,
 	ThLevyContributionLabel,
 	ThLevyIncomeLabel,
 	ThLevyMeasureId,

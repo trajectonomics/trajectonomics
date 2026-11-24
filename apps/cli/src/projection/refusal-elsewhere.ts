@@ -56,7 +56,6 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	MEASURE_CYCLE: document,
 	FIELD_NOT_ALLOWED: document,
 	LEVY_REQUIRED: document,
-	CONFLICTING_LABELS: document,
 	INVALID_DAY_RULE: document,
 	DUPLICATE_HOLIDAY: document,
 	HOLIDAYS_UNUSABLE: document,

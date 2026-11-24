@@ -1,7 +1,7 @@
 /*
  * The objects the published shape states as closed, as paths into the document `structure.test.ts`
  * carries, so each is probed closed by the core. A list index names the item that document holds:
- * flow 8 is the level loan, flow 11 the `currentRate` rule and flow 12 the `guardrails` one.
+ * account 7 the fund that pays out and charges a fee, flow 8 is the level loan, flow 11 the `currentRate` rule and flow 12 the `guardrails` one.
  */
 
 /** Every object the schema states as closed, as a path into `FULL`, so each is probed closed. */
@@ -9,6 +9,9 @@ export const OBJECT_PATHS: (string | number)[][] = [
 	[],
 	["economy"],
 	["accounts", 0],
+	["accounts", 7, "payout"],
+	["accounts", 7, "payout", "prepayments", 0],
+	["accounts", 7, "fee"],
 	["flows", 0],
 	["flows", 0, "prepayments", 0],
 	["flows", 0, "cappedPrepayment"],

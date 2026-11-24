@@ -1,4 +1,6 @@
 import type { ErrorCode, ProjectionProblem } from "@trajectonomics/core/sim"
+import { accountEntry } from "./refusal-rate-account"
+import { type Entry, UNIT } from "./refusal-rate-unit"
 import type { Said } from "./refusal-said"
 
 /**
@@ -11,11 +13,6 @@ import type { Said } from "./refusal-said"
  */
 
 type Segments = readonly string[]
-
-/** A rate's unit, repeated in every hint: the document states rates in basis points, never as a fraction. */
-const UNIT = "Write it in basis points, a whole number: 2% is 200 and 100% is 10000."
-
-type Entry = { message: string; hint: string }
 
 const GROWTH: Entry = {
 	message:
@@ -109,7 +106,7 @@ export function rateEntry(problem: ProjectionProblem): Entry {
 		case "flows":
 			return flowEntry(segments)
 		case "accounts":
-			return segments[2] === "rate" ? ACCOUNT_RATE : GENERAL
+			return accountEntry(segments, ACCOUNT_RATE, GENERAL)
 		case "economy":
 			return INFLATION
 		default:
