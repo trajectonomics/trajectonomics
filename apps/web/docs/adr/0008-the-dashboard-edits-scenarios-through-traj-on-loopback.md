@@ -93,3 +93,10 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - **Shown only where an Edit is.** Never in the Demo snapshot, and hidden when `/edit-session` gives no token, as every control above.
 - **Later work.** Importing a balance history ([#403](https://github.com/trajectonomics/trajectonomics/issues/403)) can add `preview: true` to this Edit, which runs only the dry run and answers its result; the server's run (`scripts/serve-record-values.ts`) is one function with the dry run as its first step, so that is a small addition.
 - **Consequences.** `traj dashboard` now changes the ledger's Transactions as well as its Scenarios, which [cli ADR 0046](../../../cli/docs/adr/0046-traj-dashboard-edits-scenarios-on-loopback.md) did not say. The ledger's writer lock still decides a busy database, and the answer is `database_busy` as data.
+
+## Amendment (2026-11-25): the plan-managing Edits
+
+- `rename-plan` is `traj scenario rename <name> <new-name> --if-hash <hash>`, `set-plan-notes` is `traj scenario notes <name> --file -` with the text on stdin (or `--clear` when it is empty), and `set-main-plan` is `traj scenario main <name>`. Each is run dry first, and its argv is pinned in `edit.test.ts` and `plan-edit.test.ts`. A rename carries the plan's `contentHash`; notes and the main mark sit outside the document's hash, so they carry none.
+- `apply-plan` may carry `template: { asOf }` in place of a document and a hash. The server reads `scenario apply --template --as-of <asOf>` and applies it under the name; the write is refused as `scenario_name_taken` unless the dry run says `created`, because an apply with no `--if-hash` would replace a plan of that name.
+- A rename puts the new name into the `--scenario` list (`followPlan`) and into the comparison (`followCompare`). `POST /reread` takes `{ "addPlan": "<name>" }` to add a stored plan to the list; nothing is written. See [ADR 0023](0023-the-plans-page-shows-every-plan-side-by-side-and-the-switcher-manages-plans.md).
+- The plan switcher is a list with a menu for each plan, not a select, and "Copy plan" and "Delete plan" are in that menu.

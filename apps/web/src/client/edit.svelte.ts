@@ -82,6 +82,11 @@ class EditSession {
 		return this.sendReread({ chance })
 	}
 
+	/** Adds a plan the ledger holds to the plans the dashboard projects, and shows the new Snapshot. Nothing is written. */
+	addPlan(name: string): Promise<boolean> {
+		return this.sendReread({ addPlan: name })
+	}
+
 	private async sendReread(body: RereadBody): Promise<boolean> {
 		if (this.token === null || this.busy) return false
 		this.busy = true

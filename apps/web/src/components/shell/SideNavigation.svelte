@@ -1,5 +1,6 @@
 <script lang="ts">
 import { shellPanels } from "../../client/shell.svelte.js"
+import type { PlanRow } from "../../lib/view/plans/rows"
 import { cx } from "../ui/cx"
 import NavIcon from "./NavIcon.svelte"
 import PlanSwitcher from "./PlanSwitcher.svelte"
@@ -15,7 +16,9 @@ interface Props {
 	names: readonly string[]
 	selected: string
 	onPlan: (name: string) => unknown
-	/** Whether the server answers Edits, so the plan switcher offers to copy and delete a plan. */
+	/** What the Snapshot says of each plan, for the Main tag, the notes icon and the plan menus. */
+	rows?: readonly PlanRow[]
+	/** Whether the server answers Edits, so the plan switcher offers a plan's menu and a new plan. */
 	editable?: boolean
 	/** Whether the Snapshot holds the selected plan's document, which the planner pages need. */
 	planDocument?: boolean
@@ -33,6 +36,7 @@ let {
 	names,
 	selected,
 	onPlan,
+	rows = [],
 	editable = false,
 	planDocument = true,
 	milestones = true,
@@ -74,7 +78,7 @@ $effect(() => {
 	</div>
 	<SiteNavLinks {current} onNavigate={close} {planDocument} {milestones} {cashflow} {levy} />
 	<div class="mt-auto">
-		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} />
+		<PlanSwitcher {names} {selected} onChange={onPlan} {editable} {rows} />
 	</div>
 </aside>
 {#if shellPanels.menu}

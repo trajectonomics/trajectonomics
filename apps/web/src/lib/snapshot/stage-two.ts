@@ -45,6 +45,17 @@ function namesOf(read: Read<{ scenarios: { name: string }[] }>): string[] {
 	return read.ok ? read.data.scenarios.map((scenario) => scenario.name) : []
 }
 
+/**
+ * The names with the ledger's main plan first, when it is one of them and the list read holds it. The pages show the
+ * first plan unless the address names another, so the main plan is the one they open on (web ADR 0023). The rest keep their order.
+ */
+function mainFirst(names: string[], read: StageOneReads["scenarios"]): string[] {
+	const main = read.ok ? read.data.scenarios.find((plan) => plan.main === true)?.name : undefined
+	return main !== undefined && names.includes(main)
+		? [main, ...names.filter((name) => name !== main)]
+		: names
+}
+
 /** The first transaction date net worth reports, or null when the ledger has none. */
 function firstDateOf(read: StageOneReads["netWorth"]): string | null {
 	return read.ok ? read.data.firstTransactionDate : null
@@ -52,7 +63,8 @@ function firstDateOf(read: StageOneReads["netWorth"]): string | null {
 
 /** The argv of stage two, planned from the parameters and the results of stage one. */
 export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPlan {
-	const scenarios = params.scenarios.length > 0 ? [...params.scenarios] : namesOf(one.scenarios)
+	const named = params.scenarios.length > 0 ? [...params.scenarios] : namesOf(one.scenarios)
+	const scenarios = mainFirst(named, one.scenarios)
 	const first = firstDateOf(one.netWorth)
 	const historyDates = first === null ? [] : monthEndsBetween(first, params.asOf)
 	return {
