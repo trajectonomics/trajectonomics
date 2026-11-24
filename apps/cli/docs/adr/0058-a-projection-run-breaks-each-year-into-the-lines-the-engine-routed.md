@@ -36,7 +36,7 @@ output, and where the CLI does arithmetic at all.
 - **Why no total of the CLI's own.** The CLI prints no figure that is neither an engine field nor an exact
   sum of engine lines. The one arithmetic it does is that sum, and the identity in sim ADR-0018 is what makes
   it correct; `projection-breakdown.test.ts` hand-checks each printed total against the plan's numbers.
-- **JSON carries the lines only.** The totals are not added to JSON: the long table is the contract, and a
+- **JSON carries the lines only.** **Superseded by the addendum (#337):** The totals are not added to JSON: the long table is the contract, and a
   total in JSON would be a second figure a caller could disagree with.
 
 ## Considered options

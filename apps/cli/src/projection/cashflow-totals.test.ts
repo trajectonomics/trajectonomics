@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { isAppError } from "../errors"
-import { cashflowTotalsOf, type RollupFigures } from "./cashflow-totals"
+import { cashflowTotalRowsOf, cashflowTotalsOf, type RollupFigures } from "./cashflow-totals"
 
 /*
  * The section totals sum in BigInt (cli ADR-0058, addendum): each engine figure is a safe integer, but
@@ -48,5 +48,27 @@ describe("an exact total", () => {
 		const line = { group: "surplus", amount: LARGEST }
 		const totals = cashflowTotalsOf(NONE, [line, line], "THB", "2031-12-31")
 		expect(isAppError(totals)).toBe(true)
+	})
+
+	it("returns the refusal as an envelope with exit 3, and never throws, when the line sum overflows", () => {
+		const line = { group: "surplus", amount: LARGEST }
+		const annual = [{ ...NONE, index: 0, from: "2030-01-01", to: "2030-12-31" }]
+		const rows = () =>
+			cashflowTotalRowsOf(
+				annual,
+				[
+					{ ...line, index: 0 },
+					{ ...line, index: 0 },
+				],
+				"THB",
+			)
+		expect(rows).not.toThrow()
+		const refused = rows()
+		expect(isAppError(refused)).toBe(true)
+		expect(isAppError(refused) ? refused.body : undefined).toMatchObject({
+			code: "projection_refused",
+			exitCode: 3,
+			details: [{ code: "VALUE_OVERFLOW", date: "2030-12-31" }],
+		})
 	})
 })
