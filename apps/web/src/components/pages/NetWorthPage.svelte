@@ -4,6 +4,7 @@ import { netWorthPageView } from "../../lib/view/net-worth/page"
 import { chooseScenario } from "../../lib/view/projection/scenario"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
+import RecordValues from "../record-values/RecordValues.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
 
@@ -27,6 +28,7 @@ let { scenario }: Props = $props()
 			{#if lens && plan !== null}
 				<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} terms="nominal" keys={["closingNetWorth"]} />
 			{/if}
+			<RecordValues {snapshot} />
 			<NetWorthContent view={netWorthPageView(snapshot)} />
 		</div>
 	{/snippet}

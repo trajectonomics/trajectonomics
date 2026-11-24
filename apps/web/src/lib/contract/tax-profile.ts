@@ -32,3 +32,25 @@ export const taxProfile = z.strictObject({
 	donation1x: amount.optional(),
 })
 export type TaxProfile = z.infer<typeof taxProfile>
+
+/**
+ * Which deduction classes a taxed plan states and which it does not, as `scenario show` reports them (cli ADR-0073): the
+ * same lists `scenario tax` prints as `allowances`. A class is a name, kept as it is: a class a later `traj` adds still decodes,
+ * and the view model places the ones it knows.
+ */
+export const taxAllowances = z.strictObject({
+	stated: z.array(z.string()),
+	notStated: z.array(z.string()),
+})
+export type TaxAllowances = z.infer<typeof taxAllowances>
+
+/**
+ * The tax fields of `scenario show`, all optional so a Snapshot saved by an earlier build still decodes: the stored profile (null
+ * when none, cli ADR-0066), whether the document holds a Levy, and `taxAllowances`, absent when the plan is untaxed or holds a Levy
+ * with no stored profile (cli ADR-0073).
+ */
+export const taxShown = {
+	tax: taxProfile.nullable().optional(),
+	taxed: z.boolean().optional(),
+	taxAllowances: taxAllowances.optional(),
+}

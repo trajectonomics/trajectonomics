@@ -2,7 +2,6 @@
 // shows, the classes `scenario tax` reports are all placed and the not-stated list is the one `traj` reports, and the tax label
 // form's Edit gives an income Flow its label. Each test sets up its own state, so each passes alone.
 import { afterAll, beforeAll, describe, expect } from "bun:test"
-import type { TaxProfile } from "../src/lib/contract"
 import { TAX_FLAG_KEYS } from "../src/lib/edit/tax-flags"
 import { taxRows } from "../src/lib/view/tax"
 import { blankDraft } from "../src/lib/view/tax-settings/draft"
@@ -58,19 +57,22 @@ describe("the tax cards through traj", () => {
 		},
 	)
 
-	slow("the not-stated list is the one `traj` reports for the stored profile", async () => {
+	slow("the page lists exactly the classes `traj` reports for the stored profile", async () => {
 		taxedSalary()
 		await withProfile()
-		const names = (profile: TaxProfile) =>
-			notStated(profile, storedPlan().document).map((one) => one.class)
-		const first = shownTax(await post("reread", {})).tax
-		if (first === null) throw new Error("the profile is stored")
-		expect(names(first)).toEqual(reported(PLAN).notStated as never)
-		const next = shownTax(
-			await send("merge-tax", { socialSecurity: "9000", donation2x: "100", parents: "1" }),
-		).tax
-		if (next === null) throw new Error("the profile is stored")
-		expect(names(next)).toEqual(reported(PLAN).notStated as never)
+		// The page reads `taxAllowances` of `scenario show`; `scenario tax --from-stored --dry-run` is the other way to ask.
+		const names = (answer: Awaited<ReturnType<typeof post>>) =>
+			notStated(shownTax(answer).taxAllowances).map((one) => one.class)
+		const first = await post("reread", {})
+		expect(shownTax(first).taxAllowances).toEqual(reported(PLAN))
+		expect(names(first)).toEqual(reported(PLAN).notStated)
+		const next = await send("merge-tax", {
+			socialSecurity: "9000",
+			donation2x: "100",
+			parents: "1",
+		})
+		expect(shownTax(next).taxAllowances).toEqual(reported(PLAN))
+		expect(names(next)).toEqual(reported(PLAN).notStated)
 		expect(names(next)).not.toContain("parents")
 	})
 

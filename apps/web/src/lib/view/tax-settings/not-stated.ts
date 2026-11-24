@@ -1,57 +1,40 @@
 /**
- * The classes `scenario tax` reports in `notStated` for a stored profile and its plan, each with the group that states it
- * ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). Pure.
+ * The classes `scenario show` reports as `taxAllowances.notStated` for a taxed plan, each with the group that states it
+ * ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). The page works
+ * out none of it: `traj` says which classes the plan leaves out, and this names each one and says where it is stated. Pure.
  */
-import type { ScenarioDocument, TaxProfile } from "../../contract"
-import { ALLOWANCE_LABELS } from "../../contract/allowance-labels"
+import type { TaxAllowances } from "../../contract"
 import { AMOUNT_FIELDS, COUNT_FIELDS } from "./fields"
-import { type GroupKey, PLACE, TAX_CLASSES, type TaxClass } from "./groups"
+import { type GroupKey, PLACE, type TaxClass } from "./groups"
 
 /** One class the plan does not state: what a person reads, and where it is stated. */
 export interface NotStated {
-	readonly class: TaxClass
+	readonly class: string
 	readonly label: string
-	readonly place: GroupKey | "flows"
-}
-
-const THAI_ESG = "allowance.thai_esg"
-
-/** The classes the contribution Flows of the plan carry: a label the Levy reads, other than ThaiESG, is a retirement one. */
-function carried(plan: ScenarioDocument): { retirement: boolean; esg: boolean } {
-	const labels = plan.flows.filter((flow) => flow.kind === "contribution").map((flow) => flow.label)
-	const known = [...ALLOWANCE_LABELS.map((entry) => entry.label), "allowance.retirement.ssf"]
-	return {
-		retirement: labels.some(
-			(label) => label !== undefined && label !== THAI_ESG && known.includes(label),
-		),
-		esg: labels.includes(THAI_ESG),
-	}
+	/** The group of the drawer that states it, `flows` for a class a contribution Flow states, and `null` for a class this page has no place for yet. */
+	readonly place: GroupKey | "flows" | null
 }
 
 /** What the class is called: the item's own words, or the two the Levy reads from contributions. */
-function nameOf(klass: TaxClass): string {
+function nameOf(klass: string): string {
 	if (klass === "retirementContributions") return "Retirement fund contributions"
 	if (klass === "thaiEsg") return "ThaiESG contributions"
 	return [...COUNT_FIELDS, ...AMOUNT_FIELDS].find((field) => field.key === klass)?.label ?? klass
 }
 
+/** The place of a class, or `null` for one a later `traj` reports that `PLACE` does not list. */
+function placeOf(klass: string): GroupKey | "flows" | null {
+	return Object.hasOwn(PLACE, klass) ? PLACE[klass as TaxClass] : null
+}
+
 /**
- * The classes `scenario tax` reports in `notStated` for a stored profile and its plan: a count or an amount of zero or none
- * states nothing, and a retirement class is stated by a contribution Flow that carries a label the Levy reads. The page asks
- * `traj` for none of it, so `scripts/tax-cards.test.ts` pins this against the real answer.
+ * The classes `traj scenario show` says the plan does not state, in its order. A plan with no `taxAllowances` (an untaxed plan,
+ * a Levy with no stored profile, or a Snapshot from an earlier build) lists none: the page does not guess.
  */
-export function notStated(profile: TaxProfile, plan: ScenarioDocument): NotStated[] {
-	const given = profile as Record<string, unknown>
-	const flows = carried(plan)
-	const stated = (klass: TaxClass): boolean => {
-		if (klass === "retirementContributions") return flows.retirement
-		if (klass === "thaiEsg") return flows.esg
-		const value = given[klass]
-		return typeof value === "number" && value > 0
-	}
-	return TAX_CLASSES.filter((klass) => !stated(klass)).map((klass) => ({
+export function notStated(allowances: TaxAllowances | undefined): NotStated[] {
+	return (allowances?.notStated ?? []).map((klass) => ({
 		class: klass,
 		label: nameOf(klass),
-		place: PLACE[klass],
+		place: placeOf(klass),
 	}))
 }

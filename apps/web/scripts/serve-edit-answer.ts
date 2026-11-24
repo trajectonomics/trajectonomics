@@ -16,10 +16,11 @@ export function failure(status: number, error: ErrorBody): Response {
 	return json(status, JSON.stringify({ ok: false, error }))
 }
 
-/** Answers a Snapshot run: the Snapshot, or the CLI's error as data. */
-export function answerOf(run: SnapshotRun): Response {
+/** Answers a Snapshot run: the Snapshot, with the write's own result when it states one, or the CLI's error as data. */
+export function answerOf(run: SnapshotRun, result?: unknown): Response {
 	if (!run.ok) return failure(200, run.error)
-	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
+	const stated = result === undefined ? "" : `,"result":${JSON.stringify(result)}`
+	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}${stated}}`)
 }
 
 /** A refused request: its status, its code and the sentence a person reads. */
