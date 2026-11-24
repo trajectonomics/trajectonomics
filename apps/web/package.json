@@ -21,6 +21,8 @@
 		"build": "vite build && bun scripts/pack.ts",
 		"typecheck": "svelte-kit sync && tsc -p tsconfig.json && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
 		"test": "bun test ./src ./scripts",
+		"test:src": "bun test ./src",
+		"test:scripts": "bun test ./scripts",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
 		"check": "bun run lint && bun run typecheck && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
