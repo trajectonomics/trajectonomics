@@ -133,6 +133,49 @@ describe("Import and Cancel", () => {
 		expect(session.saved?.counts).toEqual({ added: 2, unchanged: 1 })
 	})
 
+	test("while the Import runs, Cancel and Back do nothing, and the answer still lands on the done screen", async () => {
+		session.toMatch(draft().parsed.sources, targets)
+		session.choose("2:Old", "skip")
+		let answer: (response: Response) => void = () => {}
+		globalThis.fetch = (() =>
+			new Promise<Response>((resolve) => {
+				answer = resolve
+			})) as unknown as typeof fetch
+		const running = session.commit(draft().plan, sheet)
+		expect(session.committing).toBe(true)
+		session.cancel()
+		session.back()
+		expect([session.open, session.step]).toEqual([true, "match"])
+		session.step = "review"
+		session.cancel()
+		session.back()
+		expect([session.open, session.step]).toEqual([true, "review"])
+		const result = accountValues.parse(JSON.parse(await Bun.file(GOLDEN).text()))
+		answer(new Response(JSON.stringify({ ok: true, snapshot: DEMO, result })))
+		await running
+		expect([session.committing, session.step as string]).toEqual([false, "done"])
+		session.cancel()
+		expect([session.open, session.saved]).toEqual([false, null])
+	})
+
+	test("Back does nothing while the dry run is running", async () => {
+		session.toMatch(draft().parsed.sources, targets)
+		session.choose("2:Old", "skip")
+		let answer: (response: Response) => void = () => {}
+		globalThis.fetch = (() =>
+			new Promise<Response>((resolve) => {
+				answer = resolve
+			})) as unknown as typeof fetch
+		const running = session.toReview(draft().plan, sheet)
+		expect(session.preview.state).toBe("running")
+		session.back()
+		expect(session.step).toBe("review")
+		answer(
+			new Response(JSON.stringify({ ok: false, error: { code: "x", exitCode: 1, message: "no" } })),
+		)
+		await running
+	})
+
 	test("Cancel discards the draft, the matches and the preview, and sends nothing", () => {
 		session.toMatch(draft().parsed.sources, targets)
 		session.cancel()

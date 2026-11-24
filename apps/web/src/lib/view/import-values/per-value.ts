@@ -1,5 +1,8 @@
 import { type Collector, columnName } from "./collector"
+import { readDate } from "./date"
 import type { TableRow } from "./delimited"
+
+type Columns = { date: number; account: number; value: number }
 
 const COLUMN_WORDS = {
 	date: ["date"],
@@ -8,11 +11,7 @@ const COLUMN_WORDS = {
 } as const
 
 /** The columns of the one-row-per-value layout: found by their header words, else the first three in order. */
-export function perValueColumns(header: TableRow): {
-	date: number
-	account: number
-	value: number
-} {
+export function perValueColumns(header: TableRow): Columns & { named: boolean } {
 	const lower = header.cells.map((cell) => cell.toLowerCase())
 	const find = (words: readonly string[]) => lower.findIndex((cell) => words.includes(cell))
 	const named = {
@@ -20,10 +19,10 @@ export function perValueColumns(header: TableRow): {
 		account: find(COLUMN_WORDS.account),
 		value: find(COLUMN_WORDS.value),
 	}
-	return Object.values(named).every((at) => at !== -1) ? named : { date: 0, account: 1, value: 2 }
+	return Object.values(named).every((at) => at !== -1)
+		? { ...named, named: true }
+		: { date: 0, account: 1, value: 2, named: false }
 }
-
-type Columns = { date: number; account: number; value: number }
 
 /** One row of the one-row-per-value layout: a date, an account and an amount. */
 function valueRow(header: TableRow, line: TableRow, at: Columns, out: Collector): void {
@@ -46,5 +45,12 @@ export function perValue(header: TableRow, body: readonly TableRow[], out: Colle
 		return
 	}
 	const at = perValueColumns(header)
+	if (!at.named && readDate(header.cells[0] ?? "").ok) {
+		out.problem(
+			header.row,
+			null,
+			"The first row must name the columns, and it starts with a date. Add a header row.",
+		)
+	}
 	for (const line of body) valueRow(header, line, at, out)
 }

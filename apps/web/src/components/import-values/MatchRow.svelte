@@ -2,15 +2,20 @@
 import { importSession as session } from "../../client/import-values.svelte.js"
 import { SKIP, type Target } from "../../lib/view/import-values/match"
 import type { ImportSource } from "../../lib/view/import-values/types"
-import { sourceLine } from "../../lib/view/import-values/words"
+import { OWED_NOTE, sourceLine } from "../../lib/view/import-values/words"
 
 interface Props {
 	source: ImportSource
+	/** The account's place in the table, which names its select: a name may be in any script. */
+	index: number
 	targets: readonly Target[]
 }
 
-let { source, targets }: Props = $props()
-const id = $derived(`import-match-${source.key.replace(/[^\w-]/g, "_")}`)
+let { source, index, targets }: Props = $props()
+const id = $derived(`import-match-${index}`)
+const owed = $derived(
+	targets.find((target) => target.id === session.matches[source.key])?.owed ?? false,
+)
 const groups = $derived([...new Set(targets.map((target) => target.group))])
 </script>
 
@@ -34,4 +39,5 @@ const groups = $derived([...new Set(targets.map((target) => target.group))])
 			</optgroup>
 		{/each}
 	</select>
+	{#if owed}<p class="text-xs text-muted-foreground">{OWED_NOTE}</p>{/if}
 </li>

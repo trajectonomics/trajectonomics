@@ -14,7 +14,8 @@ export const refusedRows = z.object({
 /** The refusal's sentence without the path prefix `traj` writes first, such as `document.values.1.value: `. */
 export function sentence(message: string, hint?: string): string {
 	const plain = message.replace(/^document\.[\w.]+: /, "")
-	return hint === undefined ? plain : `${plain} ${hint}`
+	const stop = /[.!?]$/.test(plain) ? plain : `${plain}.`
+	return hint === undefined ? plain : `${stop} ${hint}`
 }
 
 /**

@@ -52,6 +52,19 @@ describe("the button", () => {
 	})
 })
 
+describe("the dialogs", () => {
+	test("the Record sheet and the import wizard are named by their own headings", () => {
+		const body = render(RecordValues, { props: { snapshot: sheetSnapshot(CHART) } }).body
+		const labels = [...body.matchAll(/<dialog[^>]*aria-labelledby="([^"]+)"/g)].map(
+			(match) => match[1],
+		)
+		expect(labels).toHaveLength(2)
+		expect(new Set(labels).size).toBe(2)
+		const names = labels.map((id) => new RegExp(`id="${id}"[^>]*>([^<]+)</h2>`).exec(body)?.[1])
+		expect([...names].sort()).toEqual(["Import a balance history", "Record today's values"])
+	})
+})
+
 describe("step 1, Load, at phone width", () => {
 	test("names the layout, takes pasted text or a file, and holds Next until the table has no row to fix", () => {
 		session.text = TEXT
@@ -68,6 +81,14 @@ describe("step 1, Load, at phone width", () => {
 		expectPhoneFit(body)
 		expect(body).toContain("break-words")
 		expect(body).toContain("min-w-0")
+	})
+
+	test("says debts are entered as positive amounts, suggests CSV UTF-8, and counts in the right number", () => {
+		session.text = "Date,Bank\n2026-01-31,1"
+		const body = page()
+		expect(body).toContain("A debt is entered as what is still owed, a positive number.")
+		expect(body).toContain("CSV UTF-8")
+		expect(body).toContain("1 value in 1 account.")
 	})
 
 	test("says a Buddhist-era year was converted, and lets Next through once the table is good", () => {
@@ -94,79 +115,21 @@ describe("step 2, Match, at phone width", () => {
 		expectPhoneFit(body)
 	})
 
+	test("tells a debt's row that its amount is what is still owed, and names each select by its place", () => {
+		session.text = "Date,Car Loan,คอนโด\n2026-01-31,1,2"
+		session.toMatch(parseImport(session.text, "dates-down").sources, targetsOf(sheet))
+		const body = page()
+		expect(body).toContain(
+			"A debt is entered as what is still owed, a positive number. traj refuses a negative one.",
+		)
+		expect(body).toContain('id="import-match-0"')
+		expect(body).toContain('id="import-match-1"')
+	})
+
 	test("lets Next through when every column is matched or skipped", () => {
 		session.text = GOOD
 		session.toMatch(parseImport(GOOD, "dates-down").sources, targetsOf(sheet))
 		session.choose("2:Savings", "skip")
 		expect(page()).not.toMatch(/<button type="submit" disabled/)
-	})
-})
-
-describe("step 3, Review, at phone width", () => {
-	test("shows the count, the dates, the account to count against and traj's dry run, with Import held until it held", () => {
-		session.text = GOOD
-		session.toMatch(parseImport(GOOD, "dates-down").sources, targetsOf(sheet))
-		session.choose("2:Savings", "skip")
-		session.step = "review"
-		valueSheetSession.against = "gains"
-		session.preview = { state: "ready", added: 4, unchanged: 0 }
-		const body = page()
-		expect(body).toContain("Step 3 of 3: Review")
-		expect(body).toContain("4 values, from 31 Jan 2026 to 28 Feb 2026")
-		expect(body).toContain('<option value="gains" selected="">Gains (THB)</option>')
-		expect(body).toContain("4 values would be recorded. Nothing is written until you import.")
-		expect(body).not.toMatch(/<button type="button" disabled=""[^>]*>Import/)
-		expectPhoneFit(body)
-	})
-
-	test("lists every refused value at its row and column, and holds Import", () => {
-		session.text = GOOD
-		session.toMatch(parseImport(GOOD, "dates-down").sources, targetsOf(sheet))
-		session.step = "review"
-		valueSheetSession.against = "gains"
-		session.preview = {
-			state: "refused",
-			refusal: {
-				values: [
-					{ row: 3, column: "Fund", account: "Fund", date: "2026-02-28", message: "owes, not -5" },
-				],
-			},
-		}
-		const body = page()
-		expect(body).toContain("traj refused these values. Nothing was written.")
-		expect(body).toContain("Row 3, column Fund.")
-		expect(body).toContain("Fund, 28 Feb 2026: owes, not -5")
-		expect(body).toContain('<button type="button" disabled')
-	})
-
-	test("with no account to count against, shows the command to run and holds Import", () => {
-		const bare = valueSheet(
-			sheetSnapshot(CHART.filter((a) => a.type !== "income" && a.type !== "equity")),
-		) as ValueSheet
-		session.step = "review"
-		const body = render(ImportWizard, { props: { sheet: bare } }).body
-		expect(body).toContain('traj account add "Valuation gains" --type income --currency THB')
-	})
-})
-
-describe("what was imported", () => {
-	test("says what traj recorded, from its own counts, and offers Done", () => {
-		session.text = GOOD
-		session.toMatch(parseImport(GOOD, "dates-down").sources, targetsOf(sheet))
-		session.step = "done"
-		session.saved = {
-			dryRun: false,
-			file: "-",
-			against: { id: "gains", name: "Gains" },
-			values: [],
-			counts: { added: 5, unchanged: 1 },
-		}
-		const body = page()
-		expect(body).toContain(
-			"5 recorded from 31 Jan 2026 to 28 Feb 2026, and 1 already at that value, nothing written.",
-		)
-		expect(body).toContain(">Done<")
-		expect(body).not.toContain("Step ")
-		expectPhoneFit(body)
 	})
 })

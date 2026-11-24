@@ -21,6 +21,7 @@ const against = $derived(
 	sheet.choices.find((choice) => choice.id === valueSheetSession.against) ?? null,
 )
 const ready = $derived(preview.state === "ready" && !editSession.busy)
+const held = $derived(preview.state === "running" || session.committing)
 const refusedAgainst = $derived(preview.state === "refused" ? preview.refusal.against : undefined)
 </script>
 
@@ -30,11 +31,15 @@ const refusedAgainst = $derived(preview.state === "refused" ? preview.refusal.ag
 	{#if plan.tooMany}
 		<p role="alert" class="text-sm text-destructive">That is more than the {RECORD_VALUES_MAX_ROWS} values one import may hold. Go back and import fewer accounts or a shorter range of dates at a time.</p>
 	{/if}
-	<ReviewAgainst {sheet} {plan} problem={refusedAgainst} />
-	<PreviewResult {preview} askable={against === null && !plan.tooMany} />
+	<ReviewAgainst {sheet} {plan} problem={refusedAgainst} disabled={held} />
+	{#if session.committing}
+		<p role="status" class="text-sm text-muted-foreground">Importing {plan.sent.length} values. This can take a minute.</p>
+	{:else}
+		<PreviewResult {preview} count={plan.sent.length} askable={against === null && !plan.tooMany} />
+	{/if}
 	<div class="flex flex-wrap gap-2">
 		<button type="button" disabled={!ready} onclick={() => void session.commit(plan, sheet)} class={PRIMARY}>Import</button>
-		<button type="button" onclick={() => session.back()} class={BUTTON}>Back</button>
-		<button type="button" onclick={() => session.cancel()} class={BUTTON}>Cancel</button>
+		<button type="button" disabled={held} onclick={() => session.back()} class={BUTTON}>Back</button>
+		<button type="button" disabled={session.committing} onclick={() => session.cancel()} class={BUTTON}>Cancel</button>
 	</div>
 </div>

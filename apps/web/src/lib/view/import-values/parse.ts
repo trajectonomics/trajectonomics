@@ -6,6 +6,13 @@ import type { Layout, ParsedImport } from "./types"
 /** The most characters of pasted text the page reads: a long ledger fits in a fraction of it. */
 export const IMPORT_MAX_CHARS = 1_000_000
 
+/** The same bound for a file, in bytes: UTF-8 text is never fewer bytes than characters. */
+export const IMPORT_MAX_BYTES = IMPORT_MAX_CHARS
+
+/** A row with a value past the header's last column: an unquoted comma in an amount splits it. */
+const TOO_WIDE =
+	"This row has more cells than the header. Quote an amount that holds a comma, or paste tab-separated."
+
 const NOTHING: ParsedImport = { entries: [], sources: [], problems: [], notes: [] }
 
 /** What the Buddhist-era conversion changed, in a sentence, or none. */
@@ -33,6 +40,11 @@ export function parseImport(text: string, layout: Layout): ParsedImport {
 	const out = new Collector()
 	if (header === undefined) return NOTHING
 	LAYOUTS[layout](header, body, out)
+	for (const line of body) {
+		if (line.cells.slice(header.cells.length).some((cell) => cell !== "")) {
+			out.problem(line.row, null, TOO_WIDE)
+		}
+	}
 	if (table.unclosed !== null)
 		out.problem(table.unclosed, null, "A quote opened here is never closed.")
 	const entries = out.entries

@@ -1,5 +1,6 @@
 import type { AccountValues } from "../lib/contract"
-import { keepChoices, type Matches, type Target } from "../lib/view/import-values/match"
+import { FRESH } from "../lib/view/import-values/fresh"
+import { keepChoices, type Matches, type Target, withChoice } from "../lib/view/import-values/match"
 import { type ImportPlan, importEdit } from "../lib/view/import-values/plan"
 import {
 	IDLE,
@@ -33,6 +34,8 @@ class ImportSession {
 	preview = $state<ImportPreview>(IDLE)
 	/** What `traj` stated for the import; null until one ran. */
 	saved = $state<AccountValues | null>(null)
+	/** True while the Import is running: the wizard cannot be closed or stepped back until traj answers. */
+	committing = $state(false)
 	private asked = 0
 
 	show(): void {
@@ -41,14 +44,8 @@ class ImportSession {
 
 	/** Closes the wizard and forgets the draft: nothing was written before the import. */
 	cancel(): void {
-		this.open = false
-		this.step = "load"
-		this.text = ""
-		this.fileName = null
-		this.fileProblem = null
-		this.matches = {}
-		this.preview = IDLE
-		this.saved = null
+		if (this.committing) return
+		Object.assign(this, FRESH)
 		this.asked++
 	}
 
@@ -70,11 +67,11 @@ class ImportSession {
 	}
 
 	choose(key: string, choice: string): void {
-		const others = Object.entries(this.matches).filter(([other]) => other !== key)
-		this.matches = Object.fromEntries(choice === "" ? others : [...others, [key, choice]])
+		this.matches = withChoice(this.matches, key, choice)
 	}
 
 	back(): void {
+		if (this.committing || this.preview.state === "running") return
 		this.preview = IDLE
 		this.asked++
 		this.step = this.step === "review" ? "match" : "load"
@@ -107,8 +104,12 @@ class ImportSession {
 	async commit(plan: ImportPlan, sheet: ValueSheet): Promise<void> {
 		const against = chosenAgainst(valueSheetSession.draft(), sheet)
 		if (against === null) return
-		this.asked++
-		if (await editSession.run(importEdit(plan, against.id, false), "import-values")) {
+		const ask = ++this.asked
+		this.committing = true
+		const ran = await editSession.run(importEdit(plan, against.id, false), "import-values")
+		this.committing = false
+		if (ask !== this.asked) return
+		if (ran) {
 			this.saved = editSession.result
 			this.step = "done"
 			return

@@ -29,8 +29,8 @@ const complete = $derived(matchComplete(parsed.sources, session.matches))
 >
 	<p class="text-sm text-muted-foreground">Choose the ledger account each one is, or skip it. An account whose name or id matches exactly is already chosen.</p>
 	<ul class="min-w-0 divide-y divide-border">
-		{#each parsed.sources as source (source.key)}
-			<MatchRow {source} {targets} />
+		{#each parsed.sources as source, index (source.key)}
+			<MatchRow {source} {index} {targets} />
 		{/each}
 	</ul>
 	{#if !complete}

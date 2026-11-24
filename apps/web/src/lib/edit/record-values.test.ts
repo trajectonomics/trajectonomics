@@ -57,7 +57,7 @@ describe("the row bound", () => {
 		})
 		expect(editSchema.safeParse(JSON.parse(body)).success).toBe(true)
 		// `maxRequestBodySize` of scripts/serve.ts is 1 MiB, and the CLI's own document limit is 5,000 values.
-		expect(body.length).toBeLessThan(1024 * 1024)
+		expect(new TextEncoder().encode(body).length).toBeLessThan(1024 * 1024)
 	})
 })
 

@@ -74,3 +74,9 @@ export function matchComplete(sources: readonly ImportSource[], matches: Matches
 		matchedSources(sources, matches).length > 0
 	)
 }
+
+/** The choices with one source's choice set, or cleared when it is empty. */
+export function withChoice(matches: Matches, key: string, choice: string): Matches {
+	const others = Object.entries(matches).filter(([other]) => other !== key)
+	return Object.fromEntries(choice === "" ? others : [...others, [key, choice]])
+}

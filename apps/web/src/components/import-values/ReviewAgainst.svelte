@@ -10,9 +10,11 @@ interface Props {
 	plan: ImportPlan
 	/** The CLI's refusal of the account chosen, shown at the field. */
 	problem?: string | undefined
+	/** True while traj is checking or importing: the account cannot change under it. */
+	disabled?: boolean
 }
 
-let { sheet, plan, problem }: Props = $props()
+let { sheet, plan, problem, disabled = false }: Props = $props()
 </script>
 
 <!-- The account the differences count against: the one the Record today's values sheet uses, chosen once for this tab. -->
@@ -30,6 +32,7 @@ let { sheet, plan, problem }: Props = $props()
 		<p class="text-xs text-muted-foreground">The income or equity account a change in value is counted against.</p>
 		<select
 			id="import-against"
+			{disabled}
 			value={valueSheetSession.against}
 			onchange={(event) => {
 				valueSheetSession.against = event.currentTarget.value

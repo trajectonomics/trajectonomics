@@ -27,7 +27,7 @@ const YEAR_RANGE = { first: 1900, last: 2200 } as const
 
 const YEAR_FIRST = /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/
 const DAY_FIRST_NUMERIC = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/
-const DAY_MONTH_NAME = /^(\d{1,2})[ -/.]+([A-Za-z]{3,9})\.?,?[ -/.]+(\d{4})$/
+const DAY_MONTH_NAME = /^(\d{1,2})[ ./-]+([A-Za-z]{3,9})\.?,?[ ./-]+(\d{4})$/
 const MONTH_NAME_DAY = /^([A-Za-z]{3,9})\.? +(\d{1,2}),? +(\d{4})$/
 
 /** The month number (1 to 12) an English month name or its three-letter form names, or null. */
@@ -50,8 +50,12 @@ function gregorian(year: number): { year: number; converted: boolean } | null {
 /** The date of a year, month and day when it is a day that exists. */
 function made(text: string, year: number, month: number, day: number): DateRead {
 	const kept = gregorian(year)
-	const date = kept === null ? "" : formatDate(kept.year, month, day)
-	if (kept === null || !isValidDate(date)) {
+	if (kept === null) {
+		const years = `${YEAR_RANGE.first} to ${YEAR_RANGE.last}, or Buddhist-era ${BUDDHIST_YEARS.first} to ${BUDDHIST_YEARS.last}`
+		return { ok: false, message: `“${text}” has a year the page does not read. It reads ${years}.` }
+	}
+	const date = formatDate(kept.year, month, day)
+	if (!isValidDate(date)) {
 		return { ok: false, message: `“${text}” is not a date that exists.` }
 	}
 	return { ok: true, date, converted: kept.converted }

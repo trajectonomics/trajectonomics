@@ -101,6 +101,15 @@ describe("the amounts", () => {
 		])
 	})
 
+	test("a THB code before or after an amount is taken off, in any case", () => {
+		const text = 'Date,A,B,C\n2026-01-31,THB 1000,"2,000.50 thb",thb3000'
+		expect(valuesOf(text)).toEqual([
+			"0:A|2026-01-31|1000",
+			"1:B|2026-01-31|2000.50",
+			"2:C|2026-01-31|3000",
+		])
+	})
+
 	test("too long for traj is a row to fix, never cut", () => {
 		const parsed = parseImport(`Date,Bank\n2026-01-31,${"9".repeat(41)}`, "dates-down")
 		expect(parsed.entries).toEqual([])
@@ -131,6 +140,14 @@ describe("the dates", () => {
 		expect(valuesOf("Date,Bank\n05/05/2026,1")).toEqual(["0:Bank|2026-05-05|1"])
 		expect(parseImport("Date,Bank\n2026-02-30,1", "dates-down").problems).toHaveLength(1)
 		expect(parseImport("Date,Bank\nlast week,1", "dates-down").problems).toHaveLength(1)
+	})
+
+	test("a year outside the ranges the page reads names the ranges", () => {
+		for (const year of ["2559", "2601", "1899"]) {
+			const problem = parseImport(`Date,Bank\n${year}-01-31,1`, "dates-down").problems[0]
+			expect(problem?.message).toContain("1900 to 2200")
+			expect(problem?.message).toContain("2560 to 2600")
+		}
 	})
 
 	test("a Buddhist-era year (2560 to 2600) is converted, and a note says so", () => {
@@ -173,6 +190,30 @@ describe("what is wrong with the table", () => {
 		expect(parseImport("Date,Value\n2026-01-31,5", "per-value").problems[0]?.message).toContain(
 			"three columns",
 		)
+	})
+
+	test("a one-row-per-value table with no header, starting with a date, says to add one", () => {
+		const parsed = parseImport("2026-01-31,Bank,100\n2026-02-28,Bank,110", "per-value")
+		expect(parsed.problems[0]).toMatchObject({ row: 1, column: null })
+		expect(parsed.problems[0]?.message).toContain("Add a header row")
+		// A header that names its columns is a header, whatever order they are in.
+		expect(parseImport("Date,Account,Value\n2026-01-31,Bank,100", "per-value").problems).toEqual([])
+	})
+
+	test("a row with a value past the header's last column is a row to fix, in every layout", () => {
+		const wide = "has more cells than the header"
+		const tables = [
+			["Date,Bank\n2026-01-31,1,234.50", "dates-down"],
+			["Account,2026-01-31\nBank,1,234.50", "accounts-down"],
+			["Date,Account,Value\n2026-01-31,Bank,1,234.50", "per-value"],
+		] as const
+		for (const [text, layout] of tables) {
+			const problem = parseImport(text, layout).problems.find((each) => each.message.includes(wide))
+			expect(problem).toMatchObject({ row: 2, column: null })
+			expect(problem?.message).toContain("Quote an amount that holds a comma")
+		}
+		// An empty cell past the last column is nothing.
+		expect(parseImport("Date,Bank\n2026-01-31,1,,", "dates-down").problems).toEqual([])
 	})
 
 	test("more text than the page reads is one problem", () => {

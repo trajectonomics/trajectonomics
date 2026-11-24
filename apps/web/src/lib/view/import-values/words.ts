@@ -103,3 +103,18 @@ export function doneLine(
 		? `${recorded}.`
 		: `${recorded}, and ${unchanged} already at that value, nothing written.`
 }
+
+/** What a debt's amount is: what is still owed, a positive number. The page flips no sign (cli ADR 0072). */
+export const OWED_NOTE =
+	"A debt is entered as what is still owed, a positive number. traj refuses a negative one."
+
+/** The Load step's advice on saving a spreadsheet: Excel's plain CSV is not UTF-8 in every locale. */
+export const CSV_NOTE =
+	"Saving from a spreadsheet? Choose “CSV UTF-8”: Thai Excel's plain CSV is Windows-874, which the browser cannot read as Thai."
+
+/** How many values in how many accounts, with the nouns in the right number. */
+export function tableLine(values: number, accounts: number): string {
+	const v = values === 1 ? "1 value" : `${values} values`
+	const a = accounts === 1 ? "1 account" : `${accounts} accounts`
+	return `${v} in ${a}.`
+}

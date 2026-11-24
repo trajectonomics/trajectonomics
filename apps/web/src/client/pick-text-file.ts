@@ -1,4 +1,4 @@
-import { IMPORT_MAX_CHARS } from "../lib/view/import-values/parse"
+import { IMPORT_MAX_BYTES } from "../lib/view/import-values/parse"
 
 /** What choosing a file gave: its name and text, or why it was not read. Null when no file was chosen. */
 export type PickedText = { name: string; text: string } | { problem: string } | null
@@ -11,7 +11,7 @@ export async function readPickedText(input: HTMLInputElement): Promise<PickedTex
 	const file = input.files?.[0]
 	input.value = ""
 	if (file === undefined) return null
-	if (file.size > IMPORT_MAX_CHARS) {
+	if (file.size > IMPORT_MAX_BYTES) {
 		return {
 			problem: `${file.name} is too large to import. Import a smaller range of dates at a time.`,
 		}

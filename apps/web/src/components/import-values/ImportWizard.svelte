@@ -22,7 +22,7 @@ const plan = $derived(importPlan(parsed, session.matches))
 </script>
 
 <!-- Three steps in one drawer: Load, Match, Review. Cancel, the close button and Escape all discard the draft. -->
-<Drawer open={session.open} title="Import a balance history" onClose={() => session.cancel()}>
+<Drawer open={session.open} title="Import a balance history" onClose={() => session.cancel()} locked={session.committing} backdropCloses={session.text.trim() === ""}>
 	<div class="min-w-0 space-y-6">
 		{#if session.step !== "done"}
 			<p class="text-sm text-muted-foreground">{stepLine(session.step)}</p>

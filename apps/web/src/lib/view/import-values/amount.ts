@@ -1,4 +1,6 @@
 const CURRENCY_SYMBOLS = /[฿$€£¥₹]/g
+/** The code of the currency the Dashboard's ledgers use, when a spreadsheet writes it before or after an amount. */
+const CURRENCY_CODE = /^\s*THB\s*|\s*THB\s*$/i
 /** Digits grouped by commas in threes, with an optional sign and decimals: the only commas read as thousands separators. */
 const GROUPED = /^([-+]?)(\d{1,3}(?:,\d{3})+)(\.\d+)?$/
 
@@ -11,7 +13,7 @@ export { RECORD_VALUE_MAX_LENGTH as AMOUNT_MAX_LENGTH } from "../../edit/record-
  * was typed, so `traj` refuses it and the row is shown. The page parses no amount and does no arithmetic.
  */
 export function typedAmount(cell: string): string {
-	const text = cell.replace(CURRENCY_SYMBOLS, "").trim()
+	const text = cell.replace(CURRENCY_SYMBOLS, "").replace(CURRENCY_CODE, "").trim()
 	const grouped = GROUPED.exec(text)
 	return grouped
 		? `${grouped[1]}${(grouped[2] ?? "").replaceAll(",", "")}${grouped[3] ?? ""}`
