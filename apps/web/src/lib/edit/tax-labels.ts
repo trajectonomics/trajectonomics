@@ -32,18 +32,27 @@ export const INCOME_LABEL_IDS = [
 	"income.section40_8.entertainer",
 ] as const
 
-/** A Flow's id as a label can name it: it starts with a letter or digit and holds no `=`, so it never reads as a flag. */
-export const FLOW_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/
+/**
+ * A Flow's id as a label can name it: any id the page itself makes (Thai script and punctuation included) except one with a `=`,
+ * because `traj` splits a label on the first `=`, or a control character. The argv carries the label as one token
+ * (`--label=<flow>=<label>`), so an id that starts with `-` never reads as a flag.
+ */
+export const FLOW_ID = /^[^=\p{Cc}]+$/u
 
 /** The labels of one whole write: each names an income Flow and a label. */
 export const taxLabels = z
-	.array(z.strictObject({ flow: z.string().regex(FLOW_ID), label: z.enum(INCOME_LABEL_IDS) }))
+	.array(
+		z.strictObject({
+			flow: z.string().min(1).max(256).regex(FLOW_ID),
+			label: z.enum(INCOME_LABEL_IDS),
+		}),
+	)
 	.max(200)
 
 /** The labels of an Edit. */
 export type TaxLabels = z.infer<typeof taxLabels>
 
-/** The argv tokens of the labels: one `--label <flow>=<label>` each. */
+/** The argv tokens of the labels: one `--label=<flow>=<label>` each, a single token. */
 export function labelTokens(labels: TaxLabels): string[] {
-	return labels.flatMap((one) => ["--label", `${one.flow}=${one.label}`])
+	return labels.map((one) => `--label=${one.flow}=${one.label}`)
 }

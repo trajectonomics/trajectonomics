@@ -28,13 +28,21 @@ export function needsWholeProfile(error: ErrorBody | null): boolean {
 }
 
 /**
- * The sentence for a refusal of the document (path `document`) that names Flows: they carry no tax label the tax rules read,
- * and the CLI's own sentence names a flag and a package the person never typed. Null when the refusal is not that one.
+ * The sentence for a refusal of the document (path `document`) that names Flows, and the CLI's own sentence names a flag and a
+ * package the person never typed. Two refusals have that shape and are told apart by `details.labels`, the labels the CLI
+ * accepts: income labels mean income Flows with no tax label it knows (the Tax labels form sets them), and any other mean
+ * contribution Flows whose label it does not read (the Income page's contribution form edits them). Null when it is neither.
  */
 export function flowsSentence(error: ErrorBody | null): string | null {
-	const flows = (error?.details as { flows?: unknown } | null | undefined)?.flows
+	const details = error?.details as { flows?: unknown; labels?: unknown } | null | undefined
+	const flows = details?.flows
 	if (error?.path !== "document" || !Array.isArray(flows) || flows.length === 0) return null
 	if (!flows.every((flow) => typeof flow === "string")) return null
+	const labels = Array.isArray(details?.labels) ? details.labels : []
+	const contribution = labels.length > 0 && !labels.some((id) => String(id).startsWith("income."))
+	if (contribution) {
+		return `These contribution Flows carry a label the tax rules do not read: ${flows.join(", ")}. Edit the label from the contribution form on the Income page.`
+	}
 	return `These Flows need a tax label the tax rules read: ${flows.join(", ")}. Give each one a tax label under Tax labels on this page.`
 }
 

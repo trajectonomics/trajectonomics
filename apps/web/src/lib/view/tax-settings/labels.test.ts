@@ -18,15 +18,16 @@ describe("income Flows without a tax label", () => {
 			flow("salary", "income", "income.section40_1"),
 			flow("condo-rent", "income"),
 			flow("side", "income", ""),
+			flow("bonus", "income", "income.section40_9"),
 			flow("food", "expense"),
 			flow("rmf", "contribution"),
 		],
 	} as unknown as ScenarioDocument
 
-	test("names the income Flows with none, and not an expense or a contribution", () => {
-		expect(unlabelledIncome(document)).toEqual(["condo-rent", "side"])
+	test("names the income Flows with none or one `traj` does not know, and not an expense or a contribution", () => {
+		expect(unlabelledIncome(document)).toEqual(["condo-rent", "side", "bonus"])
 		expect(unlabelledIncome({ ...document, flows: [] })).toEqual([])
-		expect(incomeFlows(document)).toEqual(["salary", "condo-rent", "side"])
+		expect(incomeFlows(document)).toEqual(["salary", "condo-rent", "side", "bonus"])
 	})
 
 	test("a document refusal that names Flows is a sentence naming them and where the labels are set", () => {
@@ -46,5 +47,24 @@ describe("income Flows without a tax label", () => {
 		expect(flowsSentence({ ...refusal, details: undefined })).toBeNull()
 		expect(flowsSentence({ ...refusal, path: "--tax" })).toBeNull()
 		expect(flowsSentence({ ...refusal, details: { flows: [1] } })).toBeNull()
+	})
+
+	test("a refusal of contribution Flows sends the person to the Income page, not to the Tax labels form", () => {
+		const refusal = {
+			code: "invalid_input",
+			exitCode: 2,
+			message: "A contribution Flow carries a label tax-core does not read",
+			path: "document",
+			details: {
+				flows: ["rmf", "esg"],
+				labels: ["allowance.thai_esg", "allowance.retirement.rmf"],
+			},
+		}
+		const sentence = flowsSentence(refusal)
+		expect(sentence).toContain("rmf, esg")
+		expect(sentence).toContain("contribution form on the Income page")
+		expect(sentence).not.toContain("Tax labels")
+		expect(sentence).not.toContain("tax-core")
+		expect(taxShown({}, refusal, refusal.message).general).toBe(sentence ?? "")
 	})
 })

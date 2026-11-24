@@ -2,7 +2,7 @@
 // shows, the classes `scenario tax` reports are all placed and the not-stated list is the one `traj` reports, and the tax label
 // form's Edit gives an income Flow its label. Each test sets up its own state, so each passes alone.
 import { afterAll, beforeAll, describe, expect } from "bun:test"
-import type { ScenarioDocument, TaxProfile } from "../src/lib/contract"
+import type { TaxProfile } from "../src/lib/contract"
 import { TAX_FLAG_KEYS } from "../src/lib/edit/tax-flags"
 import { taxRows } from "../src/lib/view/tax"
 import { blankDraft } from "../src/lib/view/tax-settings/draft"
@@ -22,6 +22,7 @@ import {
 	storedPlan,
 	traj,
 } from "./estate-ledger.test-support"
+import { bare, income, reported, taxedSalary } from "./tax-cards.test-support"
 import { send, shownTax, withProfile } from "./tax-settings.test-support"
 
 beforeAll(async () => {
@@ -29,53 +30,8 @@ beforeAll(async () => {
 }, SLOW_MS)
 afterAll(disposeEstate)
 
-/** What `scenario tax --from-stored --dry-run` reports for a plan: its own classes, stated and not. */
-function reported(name: string): { stated: string[]; notStated: string[] } {
-	const out = traj(["scenario", "tax", name, "--from-stored", "--dry-run", "--json"])
-	return (JSON.parse(out) as { allowances: { stated: string[]; notStated: string[] } }).allowances
-}
-
 const owedByYear = (answer: Awaited<ReturnType<typeof post>>) =>
 	taxRows(runOf(answer).taxYears).map((row) => row.owed)
-
-/** An income Flow of 100,000.00 a month, with no tax label. */
-const income = (id: string) => ({
-	id,
-	kind: "income",
-	frequency: "monthly",
-	start: "2026-01-01",
-	amount: "100000.00",
-	growth: { bps: 0 },
-	earned: true,
-})
-
-/** The plan's document with no tax rules, no tax label and no income Flow of the tests: a plan with no tax. */
-function bare(name = PLAN): ScenarioDocument {
-	const { levies: _levies, ...document } = storedPlan(name).document
-	const flows = document.flows
-		.filter((flow) => flow.id !== "salary" && flow.id !== "side-gig")
-		.map(({ label: _label, ...flow }) => flow)
-	return { ...document, flows }
-}
-
-/** Gives the plan a salary and taxes it, so the projection has tax years: a Levy reads a label some Flow carries. */
-function taxedSalary(name = PLAN, from = PLAN): void {
-	const document = bare(from)
-	const flows = [...document.flows, income("salary")]
-	traj(["scenario", "apply", name, "--file", "-", "--decimal", "--json"], { ...document, flows })
-	traj([
-		"scenario",
-		"tax",
-		name,
-		"--tax",
-		"th-2026",
-		"--filing-status",
-		"single",
-		"--label",
-		"salary=income.section40_1",
-		"--json",
-	])
-}
 
 describe("the tax cards through traj", () => {
 	slow("adding a child with a merge changes the tax per year the page shows", async () => {
