@@ -180,6 +180,26 @@ _Avoid_: dividend (as the name of the field), distribution, withdrawal
 A yearly share of an asset Account's value charged a twelfth a month, outside cashflow, on every Market path, from the Account's `fee` field. The page lists each roll-up's charge as `traj` states it and adds none up.
 _Avoid_: cost, charge (as the name of the field), expense
 
+**Routing**:
+The plan's `cashflow` read as three lists the Where money goes page edits: the surplus steps (what happens to money left over), the `contribute` priority (which savings come first) and the `withdraw` entries (what is drawn when money is short). A step and an entry are addressed by position, since neither has an id.
+_Avoid_: waterfall, allocation, priority list
+
+**Surplus step**:
+One row of "When there is money left over": an Account, and everything, an amount it fills up to, or a share of what is left. The last step must take everything.
+_Avoid_: bucket, rule
+
+**Reserve floor**:
+The amount an entry of `withdraw` stops taking an Account down to, while later entries are used first. Setting one adds a later entry that takes the rest of the Account.
+_Avoid_: minimum balance, emergency fund (as the name of the field)
+
+**Target in today's money**:
+An amount of a step or a floor that keeps its value: `{ amount, growth: "inflation" }`. The page shows the document's amount and what the routing echo says of it, never a grown figure of its own.
+_Avoid_: real target, indexed amount
+
+**Planned move**:
+A `transfer` Flow: money moved between the plan's own Accounts, or onto a loan, outside income, spending and saving. It changes no net worth, and counts a gain for tax only when `realise` is on.
+_Avoid_: rebalance, switch, transfer (as a page word)
+
 **Main plan**:
 The one plan the ledger marks as the person's real plan (`scenario main`). It is a label and not a default for a `traj` read: the Dashboard lists it first, opens its pages on it, and Home follows it unless the address bar names another plan.
 _Avoid_: default plan, primary plan, active plan

@@ -3,6 +3,7 @@ import { additionId, additionPath, additionWords } from "./additions"
 import type { Json } from "./overrides"
 import type { WhatIf } from "./session"
 import { groupId, inGroup } from "./session-group"
+import { routingChange } from "./session-routing"
 
 /** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
 export type Change =
@@ -13,6 +14,8 @@ export type Change =
 	| { kind: "flow"; path: string; label: string; value: Json }
 	/** A Set of the whole estate block: worded without its lines, which hold the person's own shares and amounts. */
 	| { kind: "estate"; path: string; label: string }
+	/** A whole routing list of `cashflow` (`cashflow.surplus`): worded without its rows, which hold the person's own targets and shares. */
+	| { kind: "routing"; path: string; label: string }
 	/** A loan or an asset changed as a whole: its parts' Sets or Removals, worded as one change whose `path` is the group's id. */
 	| { kind: "group"; path: string; label: string; parts: readonly string[] }
 
@@ -95,6 +98,8 @@ export function changesOf(whatIf: WhatIf): Change[] {
 		.map((set): Change => {
 			if (set.path === "estate")
 				return { kind: "estate", path: set.path, label: "Estate lines tried as edited" }
+			const routing = routingChange(set.path)
+			if (routing !== null) return routing
 			if (isFlowTry(set.path)) {
 				const what = tryWhat(set.path)
 				return {
