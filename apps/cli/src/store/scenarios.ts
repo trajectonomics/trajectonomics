@@ -10,6 +10,7 @@ import {
 	insertScenario,
 	liveScenario,
 	replaceScenario,
+	taxKept,
 } from "./scenario-rows"
 import type { NewScenario, ScenarioSaved } from "./scenario-types"
 import type { ListOptions, ScenarioRow, ScenarioSort, WriteOptions } from "./types"
@@ -23,8 +24,9 @@ export function getScenario(ctx: Ctx, idOrName: string): ScenarioRow | null | Ap
 }
 
 /**
- * Creates the named scenario, or versions it when the canonical document or its household changed.
- * A Scenario's household anchors resolve onto the incoming document first (cli ADR-0048).
+ * Creates the named scenario, or versions it when the canonical document, its household or its
+ * tax profile changed. A Scenario's household anchors resolve onto the incoming document first (cli
+ * ADR-0048), and its tax profile is kept while the document keeps the Levy unchanged (cli ADR-0066).
  */
 export function saveScenario(
 	ctx: Ctx,
@@ -47,16 +49,22 @@ export function saveScenario(
 					document,
 					forkedFrom: null,
 					household: null,
+					tax: null,
 				})
 				return { status: "created", scenario, droppedAnchors: [] }
 			}
+			const tax = taxKept(current, resolved.document)
 			if (
 				current.contentHash === contentHash(document) &&
-				current.household === resolved.household
+				current.household === resolved.household &&
+				current.tax === tax
 			) {
 				return { status: "unchanged", scenario: current, droppedAnchors: [] }
 			}
-			const scenario = replaceScenario(ctx, current, document, resolved.household)
+			const scenario = replaceScenario(ctx, current, document, {
+				household: resolved.household,
+				tax,
+			})
 			return { status: "updated", scenario, droppedAnchors: resolved.dropped }
 		},
 		options,

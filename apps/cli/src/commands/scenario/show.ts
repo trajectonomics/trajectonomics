@@ -5,13 +5,14 @@ import { isAppError } from "../../errors"
 import { printedRow } from "../../scenario/decimal"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { scenarioNotFound } from "../../scenario/errors"
-import { householdOf, scenarioWithHousehold, view } from "../../scenario/view"
+import { isTaxed, scenarioWithHousehold, taxOf } from "../../scenario/shown"
+import { householdOf, view } from "../../scenario/view"
 import { withStore } from "../../with-store"
 
 export const show: Leaf = defineCommand({
 	name: "show",
 	summary: "Show one Scenario with its document",
-	note: "The --decimal form ships in 0.8.0.",
+	note: "The --decimal form ships in 0.8.0, and so does the stored tax profile.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().describe("The Scenario's exact name or its id."),
@@ -39,6 +40,13 @@ export const show: Leaf = defineCommand({
 			if (row === null) return scenarioNotFound(input.scenario)
 			const shown = printedRow(view(row), input.decimal === true)
 			if (isAppError(shown)) return shown
-			return ok({ scenario: { ...shown, household: householdOf(row) } })
+			return ok({
+				scenario: {
+					...shown,
+					household: householdOf(row),
+					tax: taxOf(row),
+					taxed: isTaxed(shown.document),
+				},
+			})
 		}),
 })

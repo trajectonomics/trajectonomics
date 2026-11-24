@@ -12,6 +12,8 @@ export const scenarioList = z.strictObject({
 			version: integer,
 			createdAt: z.string(),
 			updatedAt: z.string(),
+			/** True when the document holds a tax Levy (cli ADR-0066); absent in a Snapshot saved before it. */
+			taxed: z.boolean().optional(),
 		}),
 	),
 })

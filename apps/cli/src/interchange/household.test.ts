@@ -51,10 +51,10 @@ describe("a household through backup and restore", () => {
 	})
 
 	it("restores a version 2 backup, which has no household column, with the household null", async () => {
-		const version3 = await goldenJsonl()
-		const version2 = version3
-			.replace('"schemaVersion":3', '"schemaVersion":2')
-			.replaceAll(',"household":null}', "}")
+		const current = await goldenJsonl()
+		const version2 = current
+			.replace('"schemaVersion":4', '"schemaVersion":2')
+			.replaceAll(',"household":null,"tax":null}', "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version2, store))).toEqual({
 			entity: 1,
@@ -63,7 +63,7 @@ describe("a household through backup and restore", () => {
 			posting: 8,
 			scenario: 3,
 		})
-		expect(must(exportJsonl(store))).toBe(version3)
+		expect(must(exportJsonl(store))).toBe(current)
 		store.close()
 	})
 

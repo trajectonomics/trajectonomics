@@ -12,6 +12,9 @@ export interface DayTotals {
 	readonly employer: bigint
 	/** Payouts landed on this date: inside `income`, and out of their Accounts (ADR 0027). */
 	readonly payouts: bigint
+	/** Fees charged on this date, in total and by Account: out of their Accounts and into no cashflow (ADR 0028). */
+	readonly fees: bigint
+	readonly feesBy: ReadonlyMap<AccountId, bigint>
 	/** Planned withdrawals landed on this date. They are cash, not income, and not Available cashflow. */
 	readonly withdrawals: bigint
 	/** The planned withdrawals on this date, by the liability each one borrowed from. */

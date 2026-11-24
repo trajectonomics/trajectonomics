@@ -31,18 +31,25 @@ function commit(
 	if (levies !== undefined) rebaseReturns(state, date)
 }
 
-/** Books the growth since the last commit, and the gain a withdrawal realises unless it is a distribution. */
+/** What leaves an Account without a sale: a payout (ADR 0027) or a fee (ADR 0028). */
+export type Distribution = "payout" | "fee"
+
+/**
+ * Books the growth since the last commit, and the gain a withdrawal realises unless it is a distribution.
+ * A fee is taken off the growth it was charged on.
+ */
 function bookTallies(
 	state: AccountState,
 	levies: LevySet | undefined,
 	date: DateString,
 	delta: bigint,
 	valueBefore: bigint,
-	distribution: boolean,
+	distribution: Distribution | undefined,
 ): void {
 	if (levies === undefined) return
-	for (const tracker of levies.trackers) commitReturns(state, tracker, date)
-	if (!distribution) commitGains(state, levies, date, delta, valueBefore)
+	const fee = distribution === "fee" ? -delta : 0n
+	for (const tracker of levies.trackers) commitReturns(state, tracker, date, fee)
+	if (distribution === undefined) commitGains(state, levies, date, delta, valueBefore)
 }
 
 /** Nominal commit: completed periods capitalise first, then the delta applies to capitalised. */
@@ -52,7 +59,7 @@ function nominalCommit(
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
-	distribution: boolean,
+	distribution: Distribution | undefined,
 ): ProjectionProblem | undefined {
 	bookTallies(state, levies, date, delta, valuation(state, date), distribution)
 	const settled = capitaliseThrough(
@@ -80,14 +87,14 @@ function nominalCommit(
 /**
  * Commits accrued growth, then applies `delta`; returns a problem on overflow. The commit books
  * the tallies the change produces (returns attribution, later realised gains) before moving. A
- * `distribution` (a payout, ADR 0027) is no sale: it takes no Cost basis and realises no gain.
+ * `distribution` (a payout, ADR 0027, or a fee, ADR 0028) is no sale: it takes no Cost basis and realises no gain.
  */
 export function mutate(
 	state: AccountState,
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
-	distribution = false,
+	distribution?: Distribution,
 ): ProjectionProblem | undefined {
 	const rule = activeNominalRule(state)
 	if (rule !== undefined) return nominalCommit(state, rule, date, delta, levies, distribution)

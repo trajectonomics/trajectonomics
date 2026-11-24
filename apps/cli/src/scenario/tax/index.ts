@@ -1,4 +1,5 @@
 export { ALLOWANCE_FLAGS, allowancesOf, type TaxAllowances } from "./allowances"
+export { taxExamples } from "./examples"
 export {
 	FILING_STATUSES,
 	labelFlagDescription,
@@ -16,6 +17,7 @@ export {
 	TAX_INCOME_LABELS,
 } from "./labels"
 export { leviesOf, TAX_LEVY_ID, withTaxLevy } from "./levy"
+export { MODE_FLAGS } from "./mode-flags"
 export {
 	TAX_ALLOWANCE_CLASSES,
 	type TaxAllowanceClass,

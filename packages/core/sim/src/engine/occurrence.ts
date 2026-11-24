@@ -6,6 +6,7 @@ export type { DateOutcome, DayTotals, EngineRunsOut } from "./day-totals"
 import { aggregate, type DayFlows } from "./aggregate"
 import { applyEmployer } from "./employer"
 import type { DatedEvent } from "./events"
+import { applyFees, feesOwed } from "./fee"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
 import { totalsOf } from "./levy-step"
 import { payOut } from "./pay-out"
@@ -39,6 +40,8 @@ export function processDate(
 		runsOut: undefined,
 	})
 	if (day.problem !== undefined) return early(day, day.problem)
+	// A fee reads its Account before anything lands and is charged last (ADR 0028).
+	const owed = feesOwed(states, events, date)
 	// An employer share lands in its Account first: it is outside cashflow, so a sale on the same date can
 	// sell it, and nothing below reads it (ADR 0026).
 	const employer = applyEmployer(states, day.contributionEntries, date, levies)
@@ -63,5 +66,20 @@ export function processDate(
 		breakdown,
 		employerFunded: employer.funded,
 	}
-	return payOut(dated, planned.planned, landed, moves.soldBy, settlement)
+	const outcome = payOut(dated, planned.planned, landed, moves.soldBy, settlement)
+	return outcome.problem === undefined ? charge(outcome, states, owed, date, levies) : outcome
+}
+
+/** Takes the date's fees last, so nothing above reads an Account a fee has touched (ADR 0028). */
+function charge(
+	outcome: DateOutcome,
+	states: StateMap,
+	owed: ReadonlyMap<string, bigint>,
+	date: DateString,
+	levies: LevySet | undefined,
+): DateOutcome {
+	if (owed.size === 0) return outcome
+	const fees = applyFees(states, owed, date, levies)
+	const totals = { ...outcome.totals, fees: fees.total, feesBy: fees.by }
+	return { ...outcome, totals, problem: fees.problem }
 }

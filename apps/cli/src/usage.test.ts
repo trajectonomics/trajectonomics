@@ -10,7 +10,9 @@ const demo = (argv: string[]) => capture(argv, {}, fixtureRoot)
 const UNRELEASED: readonly (readonly string[])[] = [
 	["projection", "allowances"],
 	["projection", "chance"],
+	["scenario", "list"],
 	["scenario", "show"],
+	["scenario", "tax"],
 	["scenario", "apply"],
 	["scenario", "household"],
 	["projection", "run"],

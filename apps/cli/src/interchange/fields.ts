@@ -2,6 +2,7 @@ import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { householdDocument } from "../scenario/household/document"
 import { canonicalHousehold } from "../scenario/household/model"
+import { canonicalTax, requestOfStored, storedTax, storedTaxOf } from "../scenario/tax/stored"
 import {
 	canonicalScenarioDocument,
 	formatMinorUnits,
@@ -72,6 +73,16 @@ function household(value: unknown, path: string): unknown | AppError {
 	return canonicalHousehold(parsed.data)
 }
 
+/** A tax profile, checked by the rules `traj scenario tax` stores, as canonical text. */
+function tax(value: unknown, path: string): unknown | AppError {
+	const parsed = storedTax.safeParse(value)
+	if (!parsed.success) {
+		const reason = parsed.error.issues[0]?.message ?? "does not match the tax profile schema"
+		return invalid(path, `is not a tax profile: ${reason}`)
+	}
+	return canonicalTax(storedTaxOf(requestOfStored(parsed.data)))
+}
+
 function correction(value: unknown, path: string): unknown | AppError {
 	if (value === null || isTxCorrection(value)) return value
 	return invalid(path, `must be null or one of ${TX_CORRECTIONS.join(", ")}`)
@@ -88,5 +99,6 @@ export const DECODERS: Record<FieldKind, Decode> = {
 	dimensions: nullable(dimensions),
 	document,
 	"household?": nullable(household),
+	"tax?": nullable(tax),
 	correction,
 }

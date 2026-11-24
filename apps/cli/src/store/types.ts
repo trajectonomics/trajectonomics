@@ -14,6 +14,9 @@ import type {
 	ScenarioDeleted,
 	ScenarioForked,
 	ScenarioSaved,
+	TaxOptions,
+	TaxPlanner,
+	TaxSet,
 } from "./scenario-types"
 import type { TxFilter } from "./tx-filter"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
@@ -122,6 +125,12 @@ export interface Store {
 		plan: HouseholdPlanner,
 		options?: HouseholdOptions,
 	): HouseholdSet | AppError
+	/**
+	 * Replaces a live Scenario's tax profile and its document in one write. `plan` reads the
+	 * document and the stored profile inside that write and returns what to store; a refusal rolls
+	 * the write back (cli ADR-0066).
+	 */
+	replaceTax(id: string, plan: TaxPlanner, options?: TaxOptions): TaxSet | AppError
 	deleteScenario(id: string, options?: WriteOptions): ScenarioDeleted | AppError
 	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */
 	getScenario(idOrName: string): ScenarioRow | null | AppError

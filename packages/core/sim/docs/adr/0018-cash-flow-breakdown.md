@@ -81,3 +81,8 @@ slice of the yearly cash-flow breakdown (#190).
 
 A Scenario that declares a payout adds a `payouts` list (by Account) to the breakdown. `income` still lists the
 declared income Flows, so money in also sums `payouts`, and the roll-up's `income` is `Σincome + Σpayouts`.
+
+## Unchanged by ADR 0028
+
+An Account's fee leaves net worth outside cashflow, so the breakdown has no fee line and money in plus unmet
+still equals money out. The roll-up's `fees` is reported beside it, and `interest` is the growth before the fee.

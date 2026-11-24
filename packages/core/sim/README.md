@@ -575,6 +575,54 @@ if (result.ok) {
 cash=39403990 fund=960596010
 ```
 
+## Account fee
+
+An asset Account's `fee` charges a yearly share of its value, every month, and pays it to nobody. On the
+last day of each calendar month, `value x bps / 120000` leaves the Account, rounded as the fee's required
+`rounding` says, where `value` is what a Derived amount would read there (growth accrued to the date,
+Accrued interest included, before the date's Flows land). It is no expense: it is in no cashflow and never
+causes a Shortfall, it takes no Cost basis, and a locked or Illiquid Account is charged too. Because a Return
+series replaces `rate` and not the fee, every path of a chance of success run charges it. It is read first and
+taken last on its date, never more than the Account then holds. The Annual roll-up reports `fees` and
+`accountFees` only when an Account has a fee above 0 bps, and `interest` stays the growth before the fee.
+See [ADR 0028](docs/adr/0028-account-fee.md).
+
+A fund of 1,000,000,000 at no growth that charges 150 bps a year pays 1,250,000 on 31 January and
+1,248,438 on 28 February (998,750,000 / 800 = 1,248,437.5, half up), 14,897,305 over 2026, and ends at
+985,102,695:
+
+```ts
+import { project } from "@trajectonomics/core/sim"
+
+const result = project(
+	{ schemaVersion: 1, balances: [{ account: "cash", amount: 0 }, { account: "fund", amount: 1_000_000_000 }] },
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: "cash", kind: "asset", rate: 0 },
+			{ id: "fund", kind: "asset", rate: 0, fee: { bps: 150, rounding: "halfUp" } },
+		],
+		flows: [],
+		cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: [] },
+	},
+	{ start: "2026-01-01", horizon: "2026-12-31", resolution: "month" },
+)
+
+if (result.ok) {
+	const { fees, accountFees, interest } = result.projection.annual[0]!
+	const last = result.projection.rows[result.projection.rows.length - 1]!
+	console.log(fees, interest, accountFees![0]!.account)
+	console.log(last.balances.map((item) => `${item.account}=${item.amount}`).join(" "))
+}
+```
+
+```text
+14897305 0 fund
+cash=0 fund=985102695
+```
+
 ## Scripts
 
 - `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).

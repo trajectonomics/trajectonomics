@@ -1,4 +1,5 @@
 import type { Emit, Path } from "./codes"
+import { chargingAccountId } from "./fee"
 import { accountReadsOf, changedAccountOf } from "./flow-accounts"
 import { payingAccountId } from "./payout"
 import { isRecord } from "./shape"
@@ -22,14 +23,14 @@ function cashflowAccounts(cashflow: unknown): readonly string[] {
 /**
  * The Accounts that can change on a future date: the target of a Contribution (a debt payment, an
  * obligation purchase), the source of a withdrawal (a sale, a loan draw), and every Account the
- * cashflow's `surplus`, `contribute` or `withdraw` can move, and every Account that pays out (ADR 0027). Anything else holds its opening state
+ * cashflow's `surplus`, `contribute` or `withdraw` can move, and every Account that pays out (ADR 0027) or charges a fee (ADR 0028). Anything else holds its opening state
  * and grows by its rate alone.
  */
 function changeable(scenario: Readonly<Record<string, unknown>>): ReadonlySet<string> {
 	const flows: unknown[] = Array.isArray(scenario["flows"]) ? scenario["flows"] : []
 	const ids = new Set(cashflowAccounts(scenario["cashflow"]))
 	for (const account of Array.isArray(scenario["accounts"]) ? scenario["accounts"] : []) {
-		const id = payingAccountId(account)
+		const id = payingAccountId(account) ?? chargingAccountId(account)
 		if (id !== undefined) ids.add(id)
 	}
 	for (const flow of flows) {

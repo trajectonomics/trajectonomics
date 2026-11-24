@@ -48,6 +48,14 @@ export interface AnnualRollup {
 	 * with a share above 0. Already inside `income`, and outside `interest`: they left the Account.
 	 */
 	readonly payouts?: MinorUnits
+	/**
+	 * Fees charged to Accounts in the period; present only when an Account carries a fee above 0 bps.
+	 * The money left an Account and went nowhere: it is in no cashflow, and not in `interest`, which is
+	 * growth before the fee.
+	 */
+	readonly fees?: MinorUnits
+	/** What each fee Account was charged in the period, in Scenario order; present with `fees`. */
+	readonly accountFees?: readonly AccountAmount[]
 	readonly unfundedContributions: MinorUnits
 	/** Prepayment plus Settlements net of refunds; present only when the Scenario has a Levy. */
 	readonly levy?: MinorUnits

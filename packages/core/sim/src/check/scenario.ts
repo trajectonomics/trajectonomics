@@ -9,7 +9,7 @@ import { checkLevies } from "./levy"
 import { loanIndex } from "./loan-index"
 import { checkMilestones } from "./milestones"
 import { checkObligationWithdrawn } from "./obligation-withdrawn"
-import { checkPayoutIds } from "./payout"
+import { checkReservedFlowIds } from "./reserved-ids"
 import { checkContributionRouting, checkIlliquidRouting } from "./routing"
 import { rate, str } from "./scalars"
 import { anyVersion, checkShape, isRecord, opt, req } from "./shape"
@@ -58,7 +58,7 @@ export function checkScenario(
 		estate: opt((v, p, e) => checkEstate(v, p, accounts, e)),
 	}
 	const checked = checkShape(value, path, shape, emit)
-	checkPayoutIds(checked?.["accounts"], checked?.["flows"], path, emit)
+	checkReservedFlowIds(checked?.["accounts"], checked?.["flows"], path, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
 	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], context.illiquid, path, emit)

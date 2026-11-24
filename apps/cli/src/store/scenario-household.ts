@@ -37,7 +37,10 @@ export function replaceHousehold(
 			}
 			return {
 				status: "updated",
-				scenario: replaceScenario(ctx, current, document, planned.household),
+				scenario: replaceScenario(ctx, current, document, {
+					household: planned.household,
+					tax: current.tax,
+				}),
 			}
 		},
 		options,

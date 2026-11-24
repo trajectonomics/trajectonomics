@@ -74,19 +74,3 @@ export function payingAccountId(account: unknown): string | undefined {
 		? account["id"]
 		: undefined
 }
-
-/** Reports a declared Flow that carries the id an Account's payout takes. */
-export function checkPayoutIds(accounts: unknown, flows: unknown, path: Path, emit: Emit): void {
-	if (!Array.isArray(accounts) || !Array.isArray(flows)) return
-	const taken = new Set<string>()
-	for (const account of accounts) {
-		const id = payingAccountId(account)
-		if (id !== undefined) taken.add(payoutFlowId(id))
-	}
-	for (let index = 0; index < flows.length; index++) {
-		const flow: unknown = flows[index]
-		if (isRecord(flow) && typeof flow["id"] === "string" && taken.has(flow["id"])) {
-			emit("DUPLICATE_ID", [...path, "flows", index, "id"])
-		}
-	}
-}

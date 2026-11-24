@@ -38,6 +38,19 @@ export type HouseholdSet =
 export type HouseholdOptions = WriteOptions & { expectedHash?: string | undefined }
 
 /**
+ * What a tax write puts in a Scenario: the document with its Levy, and the tax profile's canonical
+ * text, or null when the profile is removed (cli ADR-0066).
+ */
+export type TaxPlan = { document: unknown; tax: string | null }
+/** Reads the Scenario's document and its stored profile inside a tax write and says what to store. */
+export type TaxPlanner = (document: ScenarioDocument, stored: string | null) => TaxPlan | AppError
+export type TaxSet =
+	| { status: "updated" | "unchanged"; scenario: ScenarioRow }
+	| { status: "not_found" }
+/** A tax write's options: a dry run, and the content hash the caller read (cli ADR-0055). */
+export type TaxOptions = WriteOptions & { expectedHash?: string | undefined }
+
+/**
  * A pure change to a fork's copy, applied inside the fork's one write. Return an `AppError`
  * (usually `invalid_input`) and the whole write rolls back.
  */

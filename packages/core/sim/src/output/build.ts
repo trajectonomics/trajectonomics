@@ -1,10 +1,8 @@
-import { declaresEmployer } from "../engine/employer"
 import type { EngineRun } from "../engine/result"
-import { declaresWithdrawals } from "../loan/resolve"
-import { declaresPayouts } from "../payout/flows"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
 import { buildCashflow } from "./cashflow"
+import { declaredBy } from "./declared"
 import { buildLevies } from "./levy"
 import { openingNetWorth } from "./opening"
 import { buildPeriods } from "./periods"
@@ -34,14 +32,7 @@ export function buildProjection(
 	if (rows.problem !== undefined) return { problem: rows.problem }
 	const end = run.runsOut?.date ?? timeline.horizon
 	const periods = buildPeriods(timeline.start, end, run.runsOut?.date)
-	const rollups = buildRollups(
-		run,
-		periods,
-		openingNetWorth(baseline, rules),
-		declaresWithdrawals(scenario),
-		declaresEmployer(scenario),
-		declaresPayouts(scenario),
-	)
+	const rollups = buildRollups(run, periods, openingNetWorth(baseline, rules), declaredBy(scenario))
 	if (rollups.problem !== undefined) return { problem: rollups.problem }
 	const unfunded = buildUnfunded(run.totals, end)
 	if (unfunded.problem !== undefined) return { problem: unfunded.problem }
