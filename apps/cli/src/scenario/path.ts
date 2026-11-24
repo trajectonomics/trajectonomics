@@ -3,6 +3,7 @@
 // `.`, `\` or `=` escaped with `\`. A path is always a list of unescaped segments.
 
 import { isPlainObject } from "../json"
+import { isPositionalList, positionOf } from "./positional"
 
 /** Escapes one segment so `formatPath` can join it back without changing its meaning. */
 export function escapeSegment(segment: string): string {
@@ -27,7 +28,8 @@ export function comparePaths(a: readonly string[], b: readonly string[]): number
 /**
  * The problem's path in the Override grammar (ADR-0024): a list item is addressed by its unique
  * string `id`, never by index, and a list whose items have no unique id is cut back to the list's
- * own path, the only path a `--set` may replace there.
+ * own path, the only path a `--set` may replace there. The two routing lists, whose items have no id at
+ * all, are addressed by position instead (`POSITIONAL_LISTS`, cli ADR-0070).
  */
 export function overrideSegments(
 	document: unknown,
@@ -36,17 +38,25 @@ export function overrideSegments(
 	const resolved: string[] = []
 	let current: unknown = document
 	for (const segment of segments) {
-		if (Array.isArray(current)) {
-			const step = listStep(current, segment)
-			if (step === null) return resolved
-			resolved.push(step.id)
-			current = step.item
-			continue
-		}
-		resolved.push(String(segment))
-		current = isPlainObject(current) ? current[String(segment)] : undefined
+		const step = Array.isArray(current)
+			? itemStep(current, segment, resolved)
+			: { id: String(segment), item: isPlainObject(current) ? current[String(segment)] : undefined }
+		if (step === null) return resolved
+		resolved.push(step.id)
+		current = step.item
 	}
 	return resolved
+}
+
+/** The item a list segment names: by position in a routing list, by unique `id` in any other. */
+function itemStep(
+	items: readonly unknown[],
+	segment: string | number,
+	prefix: readonly string[],
+): ListStep | null {
+	if (!isPositionalList(prefix)) return listStep(items, segment)
+	const at = positionOf(String(segment), items.length)
+	return at === null ? null : { id: String(at), item: items[at] }
 }
 
 type ListStep = { id: string; item: unknown }

@@ -10,6 +10,7 @@ import {
 	milestoneColumns,
 	runMilestonesShown,
 } from "./milestones"
+import { routingBlocks } from "./routing-human"
 import { spendingBlocks, spendingHidden } from "./spending-human"
 
 /** One column of a table-shaped result, headed exactly as its row key is spelled. */
@@ -53,6 +54,8 @@ export const projectionHint: RenderHint = {
 			column("income", "right"),
 			// Shown only when a row states it, so a Scenario without a withdrawal Flow prints as before.
 			{ ...column("withdrawals", "right"), optional: true },
+			// Money moved between the plan's own Accounts; shown only when the Scenario declares a transfer Flow (cli ADR-0070).
+			{ ...column("transfers", "right"), optional: true },
 			column("expense", "right"),
 			column("contributions", "right"),
 			column("unfundedContributions", "right"),
@@ -77,6 +80,7 @@ export const projectionHint: RenderHint = {
 			spendingHidden(balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data))))),
 		),
 	blocks: (data) => [
+		...routingBlocks(data),
 		...cashflowBlocks(data),
 		...liabilityBlocks(data),
 		...balanceBlocks(data),

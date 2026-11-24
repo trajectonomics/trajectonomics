@@ -76,6 +76,8 @@ function linesOf(breakdown: CashflowBreakdown): Line[] {
 			...none,
 			group: "drawn",
 			account: line.account,
+			// The engine numbers a draw only when the list declares a floor (sim ADR 0030).
+			...(line.entry === undefined ? {} : { entry: line.entry }),
 			minor: line.amount,
 		})),
 		breakdown.surplus.map((line) => ({

@@ -27,6 +27,9 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.ceiling.amount",
 			"milestones[].criteria[].amount",
 			"cashflow.surplus[].upTo",
+			"cashflow.surplus[].upTo.amount",
+			"cashflow.withdraw[].downTo",
+			"cashflow.withdraw[].downTo.amount",
 			"estate.costs[].amount",
 			"estate.gifts[].amount",
 		])
@@ -55,9 +58,10 @@ describe("the money fields of the decimal form", () => {
 			const segments = path.split(".")
 			const minorValues = valuesAt(minor, segments)
 			expect(minorValues.length).toBeGreaterThan(0)
-			// A list item may omit an optional money field; the values that are there are strings.
+			// A list item may omit an optional money field; the values that are there are strings, or the
+			// object form of a routing target, whose money is the path under it.
 			for (const value of valuesAt(decimal, segments)) {
-				if (value !== undefined) expect(typeof value).toBe("string")
+				if (value !== undefined && !isDoc(value)) expect(typeof value).toBe("string")
 			}
 			const back = fromDecimalForm(decimal)
 			expect(back).toEqual(minor)

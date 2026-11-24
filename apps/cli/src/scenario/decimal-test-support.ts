@@ -54,11 +54,35 @@ export function worked(): Doc {
 			ceiling: { amount: 9_000_050, growth: { bps: 0 } },
 		},
 	}
+	// A transfer's amount is a Flow's own: the decimal form converts it as any other.
+	const roll: Doc = {
+		id: "roll",
+		kind: "transfer",
+		source: "index",
+		target: "pension",
+		frequency: "monthly",
+		start: "2026-02-01",
+		amount: 123_457,
+		growth: { bps: 0 },
+	}
 	return {
 		...example,
 		accounts,
-		flows: [...(example["flows"] as Doc[]), levelLoan, bounded],
-		cashflow: { ...cashflow, surplus: [{ account: "cash", upTo: 250_000 }, { account: "index" }] },
+		flows: [...(example["flows"] as Doc[]), levelLoan, bounded, roll],
+		// Every routing form, so each money field of a step and an entry carries a value (cli ADR-0070).
+		cashflow: {
+			...cashflow,
+			surplus: [
+				{ account: "cash", upTo: 250_000 },
+				{ account: "index", share: 3_000, upTo: { amount: 1_000_050, growth: "inflation" } },
+				{ account: "home" },
+			],
+			withdraw: [
+				{ account: "cash", downTo: 50_025 },
+				{ account: "index", downTo: { amount: 120_075, growth: { bps: 100 } } },
+				"cash",
+			],
+		},
 		estate: FULL_ESTATE,
 	}
 }

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { isPlainObject } from "../json"
 import { scenarioDocument } from "./document-form"
 import { ACCOUNT_PERCENT_UNITS, ACCOUNT_RATE_UNITS } from "./shape/account-terms"
 import { ESTATE_PERCENT_UNITS, ESTATE_RATE_UNITS, ESTATE_UNITS } from "./shape/estate-terms"
@@ -6,6 +7,7 @@ import {
 	MINOR_UNITS,
 	PERCENT_UNITS,
 	PRINCIPAL_UNITS,
+	ROUTED_UNITS,
 	RULE_RATE_UNITS,
 	YEARLY_UNITS,
 } from "./shape/terms"
@@ -20,7 +22,13 @@ import {
  */
 
 /** The units a money field's description may start with. A new unit is added here and nowhere else. */
-const MONEY_UNITS: readonly string[] = [MINOR_UNITS, PRINCIPAL_UNITS, YEARLY_UNITS, ESTATE_UNITS]
+const MONEY_UNITS: readonly string[] = [
+	MINOR_UNITS,
+	PRINCIPAL_UNITS,
+	YEARLY_UNITS,
+	ROUTED_UNITS,
+	ESTATE_UNITS,
+]
 
 /** A rate field's stored unit, and the percent unit the decimal form replaces it with. */
 export type RateUnit = { stored: string; percent: string }
@@ -63,6 +71,19 @@ export function rateUnitOf(node: Node): RateUnit | undefined {
 export function fieldKindOf(node: Node): FieldKind | undefined {
 	if (isMoney(node)) return "money"
 	return rateUnitOf(node) === undefined ? undefined : "percent"
+}
+
+/**
+ * The branch of an `anyOf` a value is written in, so a field with two forms (a routing target is a
+ * number or `{ amount, growth }`, cli ADR-0070) is converted in the form it was given: an object by
+ * the branch with `properties`, a list by the branch with `items`, anything else by the branch with
+ * neither. A value no branch fits has none, and is left as it is for the engine to refuse.
+ */
+export function branchOf(branches: readonly unknown[], value: unknown): unknown {
+	const nodes = branches.filter(isNode)
+	if (isPlainObject(value)) return nodes.find((branch) => isNode(branch["properties"]))
+	if (Array.isArray(value)) return nodes.find((branch) => branch["items"] !== undefined)
+	return nodes.find((branch) => !isNode(branch["properties"]) && branch["items"] === undefined)
 }
 
 /** The published schema of the minor-unit form, the one `traj schema scenario apply` prints. */

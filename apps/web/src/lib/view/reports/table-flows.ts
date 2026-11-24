@@ -1,5 +1,5 @@
 import type { ReportTable } from "./table"
-import { build, figure, type Rows, text } from "./table-fields"
+import { build, figure, optional, type Rows, text } from "./table-fields"
 
 export function cashflow(rows: Rows<"cashflow">): ReportTable {
 	type Row = Rows<"cashflow">[number]
@@ -14,6 +14,10 @@ export function cashflow(rows: Rows<"cashflow">): ReportTable {
 			text("id", (r: Row) => r.id),
 			text("account", (r: Row) => r.account),
 			text("category", (r: Row) => r.category),
+			...optional(
+				rows,
+				text("entry", (r: Row) => (r.entry === undefined ? undefined : String(r.entry))),
+			),
 			figure("amount", (r: Row) => r.amount),
 		],
 		rows,
@@ -48,9 +52,33 @@ export function liabilities(rows: Rows<"liabilities">): ReportTable {
 			figure("opening", (r: Row) => r.opening),
 			figure("drawn", (r: Row) => r.drawn),
 			figure("paid", (r: Row) => r.paid),
+			...optional(
+				rows,
+				figure("transferred", (r: Row) => r.transferred),
+			),
 			figure("interest", (r: Row) => r.interest),
 			figure("closing", (r: Row) => r.closing),
 			text("partial", (r: Row) => r.partial),
+		],
+		rows,
+	)
+}
+
+/** What each transfer Flow moved between the plan's own Accounts in each Annual roll-up, and what it could not (cli ADR-0070). */
+export function transfers(rows: Rows<"transfers">): ReportTable {
+	type Row = Rows<"transfers">[number]
+	return build(
+		"transfers",
+		"Transfers",
+		[
+			text("index", (r: Row) => String(r.index)),
+			text("from", (r: Row) => r.from),
+			text("to", (r: Row) => r.to),
+			text("flow", (r: Row) => r.flow),
+			text("source", (r: Row) => r.source),
+			text("target", (r: Row) => r.target),
+			figure("amount", (r: Row) => r.amount),
+			figure("unmoved", (r: Row) => r.unmoved),
 		],
 		rows,
 	)

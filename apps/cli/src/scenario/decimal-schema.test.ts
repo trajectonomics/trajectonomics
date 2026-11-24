@@ -5,17 +5,29 @@ import { moneyPathsOf, PUBLISHED, ratePathsOf } from "./money-fields"
 
 type Schema = Record<string, unknown>
 
+/** The branch of an `anyOf` a path goes on through (the object form) or ends at (the plain form, cli ADR-0070). */
+function branchOf(node: Schema, through: boolean): Schema {
+	const branches = node["anyOf"]
+	if (!Array.isArray(branches)) return node
+	const found = (branches as Schema[]).find(
+		(branch) => (branch["properties"] !== undefined) === through,
+	)
+	if (found === undefined) throw new Error("an anyOf has no branch for this path")
+	return found
+}
+
 /** The schema node a dotted money path names, following list items by `[]`. */
-function nodeAt(schema: Schema, path: string): Schema {
+function nodeAt(schema: Schema, path: string, plain = true): Schema {
 	let node: unknown = schema
 	for (const segment of path.split(".")) {
 		const listed = segment.endsWith("[]")
 		const key = listed ? segment.slice(0, -2) : segment
-		const props = (node as Schema)["properties"] as Schema
+		const props = branchOf(node as Schema, true)["properties"] as Schema
 		const child = props[key] as Schema
 		node = listed ? child["items"] : child
 	}
-	return node as Schema
+	// A field with two forms ends at the plain one, which is the money; its object form is a path of its own.
+	return plain ? branchOf(node as Schema, false) : (node as Schema)
 }
 
 describe("the decimal form's published schema", () => {

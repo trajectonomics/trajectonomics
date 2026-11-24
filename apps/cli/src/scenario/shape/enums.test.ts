@@ -61,6 +61,7 @@ const KIND_FLOWS: Record<string, Record<string, unknown>> = {
 		growth: { bps: 0 },
 	},
 	withdrawal: { ...EXPENSE, kind: "withdrawal", source: "debt" },
+	transfer: { ...EXPENSE, kind: "transfer", source: "cash", target: "debt" },
 }
 
 /** The Flows a derived amount is probed with: an income Flow to reference, and the graph. */

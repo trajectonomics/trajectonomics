@@ -33,6 +33,13 @@ export const CONTRIBUTION_CAP =
 	"an asset Contribution is capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day, so a lump sum from savings is not funded"
 
 /**
+ * The unit of a routing target: the balance a surplus step fills an Account to (`upTo`) or a withdrawal entry
+ * keeps in it (`downTo`), held on a date, so neither the per-occurrence nor the per-year tail of a Flow's unit
+ * applies (cli ADR-0070).
+ */
+export const ROUTED_UNITS: string = `${MINOR_UNITS_HEAD}, and a routing target is the Account's balance, not an amount per occurrence or per year.`
+
+/**
  * The unit of a Spending rule's bound (its floor and ceiling): stated once per Rule year, so the
  * per-occurrence tail of a Flow's unit does not apply (cli ADR-0063).
  */
@@ -67,22 +74,9 @@ export function closed(code: ErrorCode, path: readonly string[] = []): readonly 
 	return values
 }
 
-/** The Flow kinds the engine lists that this release does not take (`transfer`, sim ADR 0031), left out of a list. */
-export function withoutUnshippedKinds(allowed: readonly string[]): readonly string[]
-export function withoutUnshippedKinds(
-	allowed: readonly string[] | undefined,
-): readonly string[] | undefined
-export function withoutUnshippedKinds(
-	allowed: readonly string[] | undefined,
-): readonly string[] | undefined {
-	return allowed?.filter((kind) => kind !== "transfer")
-}
-
 export const ACCOUNT_KINDS: readonly string[] = closed("INVALID_KIND", ["accounts"])
-/** The Flow kinds this release takes: the engine also has `transfer` (sim ADR 0031), which ships in a later release (routing-unshipped.ts). */
-export const FLOW_KINDS: readonly string[] = withoutUnshippedKinds(
-	closed("INVALID_KIND", ["flows"]),
-)
+/** The Flow kinds the engine lists: `income`, `expense`, `contribution`, `withdrawal` and `transfer` (sim ADR 0031). */
+export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"])
 /** How a Contribution into an asset is paid: a target spends Available cashflow, an obligation is paid in full (sim's ADR 0021). */
 export const FUNDINGS: readonly string[] = closed("INVALID_FUNDING")
 export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")
