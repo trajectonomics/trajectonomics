@@ -190,7 +190,7 @@ fails the whole call: a share over a shrunken sample would be a lie.
 
 ## Caps
 
-`paths` 1..10,000 (default 1,000); 64 Accounts per model; 512 buckets; 1,200 Return rows per series
+`paths` 1..10,000 (default 1,000); 64 Accounts per model; 512 buckets (1,024 since ADR 0029); 1,200 Return rows per series
 (a hundred years of months, which also bounds the year range `Timeline` leaves open); nine
 percentile levels. Rate validation follows `scalars.rate`: a non-integer rate is
 `NOT_SAFE_INTEGER`, an integer outside `-9999..10000` is `RATE_OUT_OF_RANGE`. The default is the
@@ -313,7 +313,7 @@ high half is the better distributed of the two, so no low-bit defect can bias th
 A Return model's buckets carry weights `w₀ … w_{k-1}` that are non-negative integers and whose
 **BigInt** sum is exactly `2^32`; a caller whose bucket count does not divide `2^32` apportions the
 remainder itself. Let `cumulative[i] = w₀ + … + w_i`. The bucket is the smallest `i` with
-`draw32 < cumulative[i]`, found by binary search over `k ≤ 512` entries. A zero weight leaves
+`draw32 < cumulative[i]`, found by binary search over `k ≤ 512` entries (`k ≤ 1,024` since ADR 0029). A zero weight leaves
 `cumulative[i] = cumulative[i-1]`, so such an `i` is never the smallest one that matches: a
 zero-weight bucket is never drawn. There is no modulo, rejection loop or float, so the mapping is
 exact and platform-independent. One draw per Return row serves every Account, because a Market

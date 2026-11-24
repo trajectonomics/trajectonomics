@@ -313,6 +313,14 @@ _Avoid_: Rate override, return stream
 A joint bucket table of month span returns, one entry per Account in the model. It carries no fitted distribution: lognormal, historical bootstrap and a hand-written table all arrive as bucket tables.
 _Avoid_: Distribution, market model
 
+**Volatility**:
+The standard deviation of an asset Account's yearly return, in basis points, stated as `volatility` on the Account (0 to 10000; a liability may not carry one, `LIABILITY_MISUSE`). Inert to `project()`, FI and every deterministic figure: only `planReturnModel` reads it (ADR 0029).
+_Avoid_: Risk, standard deviation, sigma
+
+**Plan return model**:
+The Return model `planReturnModel` builds from a Scenario: each Account with a Volatility above 0 has its `rate` as the mean of its month return and one shared standard normal factor per Market bucket, from a committed integer quantile table; an Account with none is left out and keeps its rate. The same Scenario and bucket count give the same model (ADR 0029).
+_Avoid_: Monte Carlo settings
+
 **Market bucket**:
 One month's span returns for every Account in a Return model, with an integer weight; the weights sum to exactly 2^32, which is what makes the draw unbiased without rejection.
 _Avoid_: Sample, scenario

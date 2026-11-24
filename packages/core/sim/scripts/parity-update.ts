@@ -3,14 +3,19 @@ import { createHash } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import { project } from "../src/engine/project"
 import { EVERY_PARITY_CASE } from "../src/golden/every-parity-case"
-import { chanceOfSuccess, contributionSavings, financialIndependence } from "../src/index"
+import {
+	chanceOfSuccess,
+	contributionSavings,
+	financialIndependence,
+	planReturnModel,
+} from "../src/index"
 
 function hash(value: unknown): string {
 	return createHash("sha256").update(JSON.stringify(value)).digest("hex")
 }
 
 const cases = EVERY_PARITY_CASE.map((testCase) => {
-	const { name, fixture, options, chance, projectOptions, savings } = testCase
+	const { name, fixture, options, chance, plan, projectOptions, savings } = testCase
 	const { baseline, scenario, timeline } = fixture
 	const projection = project(baseline, scenario, timeline, projectOptions)
 	const levy = scenario.levies?.[0]
@@ -39,6 +44,17 @@ const cases = EVERY_PARITY_CASE.map((testCase) => {
 					options,
 					fiSha256: hash(financialIndependence(baseline, scenario, timeline, options)),
 				}
+	if (plan !== undefined) {
+		const built = planReturnModel(scenario, plan)
+		if (!built.ok) throw new Error(`${name}: the plan model was refused`)
+		const run = { model: built.model, seed: plan.seed, paths: plan.paths }
+		return {
+			...withFi,
+			plan,
+			planSha256: hash(built),
+			chanceSha256: hash(chanceOfSuccess(baseline, scenario, timeline, run)),
+		}
+	}
 	if (chance === undefined) return withFi
 	return {
 		...withFi,
