@@ -97,11 +97,12 @@ the shards, which it runs beside.
 - **Artifacts.** `web-screenshots` (every page at both widths and both themes, and the three printed pages in
   both themes) is uploaded on every run, pass or fail, for 7 days: open it to look at what CI checked.
   `web-playwright-report` (the HTML report and traces) is uploaded on failure only.
-- **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 125 s for the whole job,
-  of which the build step 5 s (turbo cache hit), the browser cache 8 s, Chromium's system libraries 27 s, the
-  suite 54 s (121 tests, 2 workers) and the screenshot upload 3 s (17 MB, 98 files). The shards take 2m47s to
+- **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 102 s for the whole job,
+  of which the build step 8 s (turbo cache hit), the browser cache 3 s, Chromium's system libraries 8 s, the
+  suite 70 s (144 tests, 2 workers) and the screenshot upload about 3 s (17 MB). The shards take 2m47s to
   6m03s, so the job (about 2 minutes) is not on the critical path. A cold build adds about 40 s, a cold browser download about
   30 s more.
+- **The font.** Widths depend on the font, so the suite pins Liberation Sans (`playwright install-deps` installs it) and fails when it is missing.
 - **Locally.** `bun run check` never runs it. Build first, then `bun run test:browser` in `apps/web` (see
   `apps/web/AGENTS.md`).
 - **When it fails.** The message names the page, the width or the paper, and the table or the text, for
