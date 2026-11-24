@@ -4,7 +4,7 @@ import { applyScenario, resultOf, rowOf, scenario } from "../scenario-test-suppo
 import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT, tempHome } from "../store/testing"
 import { capture } from "../test-support"
 import { exportJsonl, importJsonl } from "./index"
-import { goldenJsonl, goldenStore } from "./testing"
+import { goldenStore, goldenWithoutNotes } from "./testing"
 
 const HOUSEHOLD = {
 	schemaVersion: 1,
@@ -51,10 +51,10 @@ describe("a household through backup and restore", () => {
 	})
 
 	it("restores a version 2 backup, which has no household column, with the household null", async () => {
-		const current = await goldenJsonl()
+		const current = await goldenWithoutNotes()
 		const version2 = current
-			.replace('"schemaVersion":4', '"schemaVersion":2')
-			.replaceAll(',"household":null,"tax":null}', "}")
+			.replace('"schemaVersion":5', '"schemaVersion":2')
+			.replaceAll(',"household":null,"tax":null,"notes":null,"main":false}', "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version2, store))).toEqual({
 			entity: 1,

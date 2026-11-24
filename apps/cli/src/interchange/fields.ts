@@ -2,6 +2,7 @@ import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { householdDocument } from "../scenario/household/document"
 import { canonicalHousehold } from "../scenario/household/model"
+import { notesProblem } from "../scenario/notes"
 import { canonicalTax, requestOfStored, storedTax, storedTaxOf } from "../scenario/tax/stored"
 import {
 	canonicalScenarioDocument,
@@ -83,6 +84,17 @@ function tax(value: unknown, path: string): unknown | AppError {
 	return canonicalTax(storedTaxOf(requestOfStored(parsed.data)))
 }
 
+/** A plan's notes, checked by the rules `traj scenario notes` stores them under. */
+function notes(value: unknown, path: string): unknown | AppError {
+	if (typeof value !== "string") return invalid(path, "must be a string or null")
+	const problem = notesProblem(value)
+	return problem === null ? value : invalid(path, problem)
+}
+
+function flag(value: unknown, path: string): unknown | AppError {
+	return typeof value === "boolean" ? value : invalid(path, "must be true or false")
+}
+
 function correction(value: unknown, path: string): unknown | AppError {
 	if (value === null || isTxCorrection(value)) return value
 	return invalid(path, `must be null or one of ${TX_CORRECTIONS.join(", ")}`)
@@ -100,5 +112,7 @@ export const DECODERS: Record<FieldKind, Decode> = {
 	document,
 	"household?": nullable(household),
 	"tax?": nullable(tax),
+	"notes?": nullable(notes),
+	flag,
 	correction,
 }

@@ -61,6 +61,10 @@ export type DumpScenarioRow = {
 	household: string | null
 	/** The tax profile's canonical JSON text, or null (cli ADR-0066). */
 	tax: string | null
+	/** The plan's notes, or null (cli ADR-0071). */
+	notes: string | null
+	/** True for the main plan (cli ADR-0071). */
+	main: boolean
 	version: number
 	createdAt: string
 	updatedAt: string

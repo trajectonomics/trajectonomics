@@ -49,6 +49,7 @@ const STATE_FIRST: Record<string, { code: string; exit: number }> = {
 const OWN_SENTENCES: Record<string, string> = {
 	"scenario apply": "Name a JSON document, - for stdin, or --template",
 	"scenario household": "Name a household document, - for stdin, or --none",
+	"scenario main": "Name the Scenario to mark, or use --clear",
 	"tx import": "Name a CSV file, - for stdin, or --template",
 }
 
