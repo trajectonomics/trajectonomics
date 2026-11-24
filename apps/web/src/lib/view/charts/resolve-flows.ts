@@ -2,7 +2,7 @@ import type { ProjectionRun } from "../../contract"
 import { lineKey, lineLabel } from "../cashflow/cashflow-labels"
 import { annualRowsOf } from "../projection/annual"
 import type { Resolved } from "./types"
-import { pointAt } from "./year"
+import { periodsOf, pointAt } from "./year"
 
 const PREFIX = {
 	income: "Income",
@@ -12,30 +12,37 @@ const PREFIX = {
 	withdrawal: "Withdrawal",
 } as const
 
+/** The cash-flow line's id and name, which is the same for every year it appears in. */
+function lineHeader(
+	line: Parameters<typeof lineKey>[0] & { group: string },
+	accountNames: ReadonlyMap<string, string>,
+): { id: string; name: string } | null {
+	const prefix = PREFIX[line.group as keyof typeof PREFIX]
+	if (prefix === undefined) return null
+	return { id: `cash:${lineKey(line)}`, name: `${prefix}: ${lineLabel(line, accountNames)}` }
+}
+
 /** The cash-flow lines by Flow and by category, each as one series that follows its line from year to year. */
 export function cashflowFigures(
 	run: ProjectionRun,
 	accountNames: ReadonlyMap<string, string>,
 ): Resolved[] {
 	const ends = new Map(annualRowsOf(run).map((row) => [row.index, row.to]))
+	const periods = periodsOf(run)
 	const byKey = new Map<string, Resolved & { nominal: Resolved["nominal"][number][] }>()
-	for (const table of run.tables) {
-		if (table.name !== "cashflow") continue
-		for (const line of table.rows) {
-			const prefix = PREFIX[line.group as keyof typeof PREFIX]
-			const end = ends.get(line.index)
-			if (prefix === undefined || end === undefined) continue
-			const id = `cash:${lineKey(line)}`
-			const found = byKey.get(id) ?? {
-				id,
-				name: `${prefix}: ${lineLabel(line, accountNames)}`,
-				group: "money" as const,
-				nominal: [],
-				real: null,
-			}
-			found.nominal.push(pointAt(end, line.amount))
-			byKey.set(id, found)
+	const lines = run.tables.flatMap((table) => (table.name === "cashflow" ? table.rows : []))
+	for (const line of lines) {
+		const head = lineHeader(line, accountNames)
+		const end = ends.get(line.index)
+		if (head === null || end === undefined) continue
+		const found = byKey.get(head.id) ?? {
+			...head,
+			group: "money" as const,
+			nominal: [],
+			real: null,
 		}
+		found.nominal.push(pointAt(end, line.amount, periods.get(end) ?? null))
+		byKey.set(head.id, found)
 	}
 	return [...byKey.values()]
 }
@@ -45,7 +52,7 @@ export function accountFigures(
 	run: ProjectionRun,
 	accountNames: ReadonlyMap<string, string>,
 ): Resolved[] {
-	const ends = new Set(annualRowsOf(run).map((row) => row.to))
+	const periods = periodsOf(run)
 	const byAccount = new Map<
 		string,
 		{ nominal: Resolved["nominal"][number][]; real: Resolved["nominal"][number][] }
@@ -53,10 +60,11 @@ export function accountFigures(
 	for (const table of run.tables) {
 		if (table.name !== "balances") continue
 		for (const row of table.rows) {
-			if (!ends.has(row.date)) continue
+			if (!periods.has(row.date)) continue
 			const found = byAccount.get(row.account) ?? { nominal: [], real: [] }
-			found.nominal.push(pointAt(row.date, row.amount))
-			found.real.push(pointAt(row.date, row.real))
+			const period = periods.get(row.date) ?? null
+			found.nominal.push(pointAt(row.date, row.amount, period))
+			found.real.push(pointAt(row.date, row.real, period))
 			byAccount.set(row.account, found)
 		}
 	}

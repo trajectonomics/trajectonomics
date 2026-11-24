@@ -32,13 +32,22 @@ export const GROUPS = [
 ] as const
 export type GroupId = (typeof GROUPS)[number]["id"]
 
-/** One value of a series: the calendar year its period ends in (the place on the x axis), and the CLI's string. */
+/** The period a figure covers, as `traj` states it: its first day, and whether it is only part of a year. */
+export interface Period {
+	readonly from: string
+	readonly partial: boolean
+}
+
+/** One value of a series: the day its period ends (counted, the place on the x axis), and the CLI's string. */
 export interface Pt {
 	readonly x: number
+	/** The period's end date, as the axis prints it. */
 	readonly label: string
 	/** The period's end date, as text. */
 	readonly date: string
 	readonly amount: string
+	/** The period it covers, or null for a figure `traj` states only for a day. */
+	readonly period: Period | null
 }
 
 /** One series a run states: its id (the same on every plan), its name, and its figures nominal and, when `traj` states one, real. */

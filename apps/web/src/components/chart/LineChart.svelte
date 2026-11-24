@@ -30,9 +30,19 @@ interface Props {
 	hidden?: boolean
 	/** How the series are drawn. Left out, each is a line; the others are the column charts of the custom charts. */
 	kind?: "line" | ColumnKind
+	/** Draws the series from the longer palette, for a chart of many series. A column chart always does. */
+	wide?: boolean
 }
 
-let { label, series, markers = [], money = true, hidden, kind = "line" }: Props = $props()
+let {
+	label,
+	series,
+	markers = [],
+	money = true,
+	hidden,
+	kind = "line",
+	wide = false,
+}: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
 const width = $derived(
@@ -41,7 +51,9 @@ const width = $derived(
 const masked = $derived((hidden ?? preferences.hidden) && money)
 const plot = $derived({ width, height: HEIGHT, margin: MARGIN })
 const layout = $derived(
-	kind === "line" ? lineLayout(series, plot, markers) : columnLayout(series, plot, kind),
+	kind === "line"
+		? lineLayout(series, plot, markers, wide ? "wide" : undefined)
+		: columnLayout(series, plot, kind),
 )
 </script>
 

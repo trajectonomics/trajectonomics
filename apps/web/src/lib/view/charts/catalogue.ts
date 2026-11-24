@@ -1,4 +1,5 @@
 import type { ProjectionRun } from "../../contract"
+import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
 import { GROUPS, type GroupId, type Resolved } from "./types"
 
@@ -32,17 +33,6 @@ const ALWAYS: readonly { id: string; name: string; group: GroupId }[] = [
 	{ id: "estate:heirs", name: "What heirs would receive", group: "retirement" },
 ]
 
-/** Why a plan lacks a series, by the kind of series, in the words the picker shows. */
-export function reasonFor(id: string): string {
-	if (id === "withdrawals") return "this plan has no withdrawal Flow"
-	if (id.startsWith("tax:")) return "this plan has no tax"
-	if (id.startsWith("rule:")) return "this plan has no such spending rule"
-	if (id === "estate:heirs") return "this plan states no estate"
-	if (id.startsWith("account:")) return "this plan has no such Account"
-	if (id.startsWith("cash:")) return "this plan has no such cash-flow line"
-	return "this plan does not state it"
-}
-
 /** What a plan has none of, said once per group instead of as a row of greyed lines. */
 const NOTES: readonly { group: GroupId; family: string; note: string }[] = [
 	{ group: "net-worth", family: "account:", note: "This plan states no Account values." },
@@ -74,7 +64,7 @@ export function buildCatalogue(
 	return GROUPS.map((group) => {
 		const entries = [...known]
 			.filter(([, item]) => item.group === group.id)
-			.map(([id, item]) => entryOf(id, item, has.has(id)))
+			.map(([id, item]) => entryOf(id, item, has))
 		return { id: group.id, title: group.title, entries, notes: notesFor(group.id, has) }
 	})
 }
@@ -82,13 +72,14 @@ export function buildCatalogue(
 function entryOf(
 	id: string,
 	item: { name: string; real: boolean },
-	available: boolean,
+	has: ReadonlySet<string>,
 ): CatalogueEntry {
+	const available = has.has(id)
 	return {
 		id,
 		name: item.name,
 		available,
-		reason: available ? null : reasonFor(id),
+		reason: available ? null : reasonFor(id, has),
 		real: item.real,
 	}
 }

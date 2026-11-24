@@ -1,11 +1,11 @@
-import { type ColumnKind, type Frame, seriesLayout } from "./column-series"
+import { type ColumnKind, type Frame, type Lane, seriesLayout } from "./column-series"
 import { extent } from "./extent"
 import type { LineSeries } from "./line"
 import type { LineLayout, Plot } from "./line-layout"
 import { linearScale } from "./scale"
 import { type Span, stackSpans } from "./stack"
 import { niceTicks } from "./ticks"
-import { labelsFor, xTicksFor } from "./x-labels"
+import { labelsFor, titlesFor, xTicksFor } from "./x-labels"
 
 export type { ColumnKind }
 
@@ -42,10 +42,11 @@ export function columnLayout(
 			? margin.left + (column / (xs.length - 1)) * plotWidth
 			: margin.left + (column + 0.5) * slot,
 	)
-	const frame: Frame = { xPixels, scaleY, slot, kind, count: series.length }
+	const frame: Frame = { xPixels, scaleY, slot, kind, lanes: lanesOf(cells) }
 	const xLabels = labelsFor(series, xs)
 	return {
 		xLabels,
+		xTitles: titlesFor(series, xs),
 		xPixels,
 		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
 		yTicks: ticks.map((value) => ({ value, y: scaleY(value) })),
@@ -63,4 +64,18 @@ function ownSpans(values: readonly (readonly (number | null)[])[]): (Span | null
 			value === null ? null : { lo: Math.min(0, value), hi: Math.max(0, value) },
 		),
 	)
+}
+
+/** Each series' lane in each column: the series with a point in a column share it, in the chart's order. */
+function lanesOf(cells: readonly (readonly (unknown | null)[])[]): Lane[][] {
+	const columns = cells[0]?.length ?? 0
+	const lanes = cells.map(() => Array.from({ length: columns }, () => ({ rank: 0, of: 1 })))
+	for (let column = 0; column < columns; column++) {
+		const present = cells.flatMap((row, index) => (row[column] ? [index] : []))
+		present.forEach((index, rank) => {
+			const lane = lanes[index]
+			if (lane) lane[column] = { rank, of: present.length }
+		})
+	}
+	return lanes
 }

@@ -27,11 +27,14 @@ export function fillClass(index: number): string {
 }
 
 /** The opacity of a bar or band: the palette's second round is lighter, so no colour is used twice alike. */
-export function fillOpacity(index: number): number {
-	return index >= WIDE_FILLS.length ? 0.5 : 0.9
+export function fillOpacity(index: number, faded = false): number {
+	const base = index >= WIDE_FILLS.length ? 0.5 : 0.9
+	return faded ? base * 0.45 : base
 }
 
-/** The dash pattern of a series: dashed or solid. */
-export function dashPattern(dashed: boolean): string | undefined {
+/** The dash pattern of a series: solid, dashed, dotted, or both (a dash and a dot), so four lines of one colour tell apart. */
+export function dashPattern(dashed: boolean, dotted = false): string | undefined {
+	if (dashed && dotted) return "10 3 2 3"
+	if (dotted) return "2 3"
 	return dashed ? "6 4" : undefined
 }

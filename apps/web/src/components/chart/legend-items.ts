@@ -7,6 +7,7 @@ export function legendItems(series: readonly LineSeries[], wide = false): Legend
 	return series.map((line, index) => ({
 		name: line.name,
 		dashed: line.dashed ?? false,
+		dotted: line.dotted ?? false,
 		stroke: strokeClass(index, wide),
 	}))
 }

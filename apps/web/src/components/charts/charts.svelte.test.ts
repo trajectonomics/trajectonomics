@@ -13,12 +13,12 @@ const CHART: ChartDef = {
 	series: ["income", "expenses", "tax:th-pit:due"],
 }
 
-function show(chart: string, run = withTax()): string {
-	chartStore.charts = [CHART]
+function show(chart: string, run = withTax(), made: ChartDef = CHART, terms = "both"): string {
+	chartStore.charts = [made]
 	return render(ProjectionCharts, {
 		props: {
 			run,
-			terms: "both",
+			terms,
 			onTerms: () => {},
 			charts: {
 				chart,
@@ -77,5 +77,48 @@ describe("the Projection's charts", () => {
 		expect(body).not.toContain("9,000.00")
 		expect(body).toContain("amount hidden")
 		expect(body).toContain("•")
+	})
+
+	test("a long chart name cannot widen the page: the picker may shrink and fills only its own box", () => {
+		const body = show("spend", withTax(), { ...CHART, name: "N".repeat(60) })
+		const heading = /<h2 id="net-worth-chart" class="([^"]*)"/.exec(body)?.[1] ?? ""
+		expect(heading).toContain("min-w-0")
+		expect(heading).toContain("max-w-full")
+		const select = /<select id="net-worth-chart-select"[^>]*class="([^"]*)"/.exec(body)?.[1] ?? ""
+		expect(select).toContain("w-full")
+		expect(select).toContain("max-w-full")
+		// The name also appears in the table's summary, where a long unbroken word must wrap.
+		expect(body).toMatch(/<summary class="[^"]*wrap-anywhere[^"]*">Values of N{60}/)
+	})
+
+	test("a line chart of seven series draws no two alike in colour and dash", () => {
+		const series = [
+			"net-worth",
+			"income",
+			"expenses",
+			"contributions",
+			"interest",
+			"unfunded",
+			"account:savings",
+		]
+		const body = show("spend", withTax(), { ...CHART, kind: "line", series }, "nominal")
+		const swatches = [...body.matchAll(/<line [^>]*stroke-width="2"[^>]*>/g)].map((m) => m[0])
+		const looks = swatches.map((tag) => {
+			const colour = /class="(stroke-[a-z-]+)"/.exec(tag)?.[1]
+			const dash = /stroke-dasharray="([^"]*)"/.exec(tag)?.[1] ?? "solid"
+			return `${colour}/${dash}`
+		})
+		expect(looks).toHaveLength(7)
+		expect(new Set(looks).size).toBe(7)
+		expect(looks.some((look) => look.startsWith("stroke-ring"))).toBe(true)
+	})
+
+	test("the table names each period, and the notes say what the columns hold", () => {
+		const body = show("spend")
+		expect(body).toContain("31 Oct – 31 Dec 2028, part year")
+		expect(body).toContain("1 Jan 2027 – 31 Dec 2027")
+		expect(body).toContain("faded column is a part year")
+		expect(body).toContain("each sits in its own column")
+		expect(body).not.toContain("`traj`")
 	})
 })

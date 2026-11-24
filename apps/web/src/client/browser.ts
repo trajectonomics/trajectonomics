@@ -15,6 +15,34 @@ export function readStored(key: string): string | null {
 	}
 }
 
+/** A stored value with whether the read worked: a blocked read is not the same as nothing stored. */
+export function readStoredResult(
+	key: string,
+): { readonly ok: true; readonly value: string | null } | { readonly ok: false } {
+	try {
+		return { ok: true, value: window.localStorage.getItem(key) }
+	} catch {
+		return { ok: false }
+	}
+}
+
+/**
+ * Calls the listener when another tab changes one stored key (or clears storage). The address and the
+ * colour scheme do not matter to a stored value, so only the `storage` event is heard. Returns the unsubscribe.
+ */
+export function subscribeStorageKey(key: string, listener: () => void): () => void {
+	const onStorage = (event: StorageEvent) => {
+		if (event.key === key || event.key === null) listener()
+	}
+	window.addEventListener("storage", onStorage)
+	return () => window.removeEventListener("storage", onStorage)
+}
+
+/** Moves focus to the element with this id, when it is in the page. */
+export function focusById(id: string): void {
+	document.getElementById(id)?.focus()
+}
+
 /** Stores a value. A refused write is ignored: the setting then lasts only for this page. */
 export function writeStored(key: string, value: string): void {
 	try {

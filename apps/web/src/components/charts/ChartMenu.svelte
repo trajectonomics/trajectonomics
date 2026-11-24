@@ -16,7 +16,7 @@ const BUTTON =
 <!-- What a person does with a chart of their own: edit it, copy it, or delete it after a question. -->
 <div role="group" aria-label="This chart" class="flex flex-wrap items-center gap-2">
 	{#if asking}
-		<span class="text-sm">Delete "{name}"?</span>
+		<span class="min-w-0 text-sm wrap-anywhere">Delete "{name}"?</span>
 		<button type="button" class={BUTTON} onclick={onDelete}>Delete</button>
 		<button type="button" class={BUTTON} onclick={() => (asking = false)}>Keep</button>
 	{:else}

@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "bun:test"
-import { CHARTS_KEY, serializeCharts } from "../lib/view/charts/stored"
+import { CHARTS_KEY, serializeCharts, UNREAD_KEY } from "../lib/view/charts/stored"
 import type { ChartDef } from "../lib/view/charts/types"
 import { chartStore } from "./charts.svelte"
 
@@ -13,7 +13,11 @@ const CHART: ChartDef = {
 	series: ["income", "tax:th:due"],
 }
 
+type Listener = (event: { key: string | null }) => void
+const heard = new Map<string, Listener>()
+
 function stubStorage(store: Map<string, string> | null): void {
+	heard.clear()
 	const localStorage = {
 		getItem: (key: string) => {
 			if (store === null) throw new Error("blocked")
@@ -25,7 +29,11 @@ function stubStorage(store: Map<string, string> | null): void {
 		},
 	}
 	Object.defineProperty(globalThis, "window", {
-		value: { localStorage },
+		value: {
+			localStorage,
+			addEventListener: (type: string, listener: Listener) => heard.set(type, listener),
+			removeEventListener: (type: string) => heard.delete(type),
+		},
 		configurable: true,
 		writable: true,
 	})
@@ -89,5 +97,45 @@ describe("the chart store", () => {
 		await chartStore.importFile(new File([serializeCharts([CHART])], "charts.json"))
 		expect(chartStore.notice).toBe("Imported 1 chart.")
 		expect(chartStore.charts).toEqual([CHART])
+	})
+
+	test("with storage blocked, charts made in this visit stay through a re-read", () => {
+		stubStorage(null)
+		chartStore.save(CHART)
+		chartStore.sync()
+		expect(chartStore.charts).toEqual([CHART])
+		expect(chartStore.unsaved).toBe(true)
+	})
+
+	test("only another tab's change to the charts re-reads: not the address, not the colour scheme", () => {
+		stubStorage(null)
+		chartStore.save(CHART)
+		const stop = chartStore.listen()
+		expect([...heard.keys()]).toEqual(["storage"])
+		heard.get("storage")?.({ key: "traj.theme" })
+		expect(chartStore.charts).toEqual([CHART])
+		heard.get("storage")?.({ key: CHARTS_KEY })
+		expect(chartStore.charts).toEqual([CHART])
+		stop()
+		expect(heard.size).toBe(0)
+		const store = new Map([[CHARTS_KEY, serializeCharts([])]])
+		stubStorage(store)
+		chartStore.listen()
+		heard.get("storage")?.({ key: CHARTS_KEY })
+		expect(chartStore.charts).toEqual([])
+	})
+
+	test("saved text that could not be read is kept aside before a save replaces it", () => {
+		const store = new Map([
+			[CHARTS_KEY, '{"format":"trajectonomics-charts","version":2,"charts":[]}'],
+		])
+		stubStorage(store)
+		chartStore.sync()
+		expect(chartStore.problem).toContain("version 2")
+		chartStore.save(CHART)
+		expect(store.get(UNREAD_KEY)).toContain('"version":2')
+		expect(store.get(CHARTS_KEY)).toBe(serializeCharts([CHART]))
+		expect(chartStore.notice).toContain(UNREAD_KEY)
+		expect(chartStore.problem).toBeNull()
 	})
 })

@@ -28,13 +28,13 @@ function choose(event: Event & { currentTarget: HTMLSelectElement }): void {
 </script>
 
 <!-- The chart's title is its picker: the net worth chart, the person's own charts, then a new one. -->
-<h2 {id} class="text-base font-semibold">
+<h2 {id} class="max-w-full min-w-0 text-base font-semibold">
 	<label class="sr-only" for="{id}-select">Chart</label>
 	<select
 		id="{id}-select"
 		{value}
 		onchange={choose}
-		class="max-w-full rounded-md border border-border bg-card px-2 py-1 text-base font-semibold outline-none focus-visible:outline-2 focus-visible:outline-ring"
+		class="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card px-2 py-1 text-base font-semibold outline-none focus-visible:outline-2 focus-visible:outline-ring"
 	>
 		<option value="">Net worth by year</option>
 		{#if charts.length > 0}

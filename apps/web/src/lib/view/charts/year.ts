@@ -1,27 +1,34 @@
-import type { Pt } from "./types"
+import { dayNumber } from "../../chart"
+import type { ProjectionRun } from "../../contract"
+import { formatDate } from "../../format"
+import { annualRowsOf } from "../projection/annual"
+import type { Period, Pt } from "./types"
 
-/** The calendar year of a YYYY-MM-DD date, read from its text: where a period ends on the x axis. Never a date computation. */
-export function yearOf(date: string): number {
-	return Number(date.slice(0, 4))
+/**
+ * A point at the day its period ends, carrying the CLI's string untouched. The x is that day counted as
+ * a whole number, so a part-year period sits where it ends and no period is moved or dropped.
+ */
+export function pointAt(date: string, amount: string, period: Period | null = null): Pt {
+	return { x: dayNumber(date), label: formatDate(date), date, amount, period }
 }
 
-/** A point at the year a period ends in, carrying the CLI's string untouched. */
-export function pointAt(date: string, amount: string): Pt {
-	return { x: yearOf(date), label: date.slice(0, 4), date, amount }
+/** The annual rows' periods by the day they end: where a figure stated on a date finds the period it closes. */
+export function periodsOf(run: ProjectionRun): ReadonlyMap<string, Period> {
+	return new Map(
+		annualRowsOf(run).map((row) => [row.to, { from: row.from, partial: row.partial }] as const),
+	)
 }
 
 /**
- * Gives each later point that ends in the same calendar year as an earlier one of its series its own
- * place just after it, and names it by month: a Projection that ends part-way into a year has two periods
- * ending in it, and neither is dropped. The figures are untouched.
+ * What a point covers, as the annual table prints it: "31 Oct 2026 – 30 Oct 2027", and for a part year
+ * "31 Oct – 31 Dec 2053, part year". A figure with no period of its own is the day it is stated for.
  */
-export function spread(points: readonly Pt[]): Pt[] {
-	const seen = new Map<number, number>()
-	return points.map((point) => {
-		const count = seen.get(point.x) ?? 0
-		seen.set(point.x, count + 1)
-		return count === 0
-			? point
-			: { ...point, x: point.x + count / 10, label: point.date.slice(0, 7) }
-	})
+export function periodText(point: Pt): string {
+	const { period } = point
+	if (period === null) return formatDate(point.date)
+	const from = formatDate(period.from)
+	const to = formatDate(point.date)
+	const sameYear = period.from.slice(0, 4) === point.date.slice(0, 4)
+	const start = period.partial && sameYear ? from.slice(0, from.length - 5) : from
+	return `${start} – ${to}${period.partial ? ", part year" : ""}`
 }

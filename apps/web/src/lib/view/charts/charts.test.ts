@@ -5,7 +5,7 @@ import { plain, withTax } from "./fixtures.test-support"
 import { resolveSeries } from "./resolve"
 import { parseCharts, readCharts, serializeCharts } from "./stored"
 import type { ChartDef } from "./types"
-import { chartView } from "./view"
+import { periodText } from "./year"
 
 const NAMES = new Map([["savings", "Savings"]])
 const CHART: ChartDef = {
@@ -37,12 +37,30 @@ describe("the series catalogue", () => {
 		expect(byId().get("income")?.real).toBeNull()
 	})
 
-	test("keeps the CLI's strings and places a point at the year its period ends in", () => {
+	test("keeps the CLI's strings and places a point at the day its period ends", () => {
 		const due = byId().get("tax:th-pit:due")
-		expect(due?.nominal.map((point) => [point.x, point.amount])).toEqual([
-			[2026, "9000.00"],
-			[2027, "9500.00"],
+		expect(due?.nominal.map((point) => [point.date, point.amount])).toEqual([
+			["2026-12-31", "9000.00"],
+			["2027-12-31", "9500.00"],
 		])
+		const income = byId().get("income")?.nominal
+		expect(income?.map((point) => point.date)).toEqual(["2027-10-30", "2028-10-30", "2028-12-31"])
+		const xs = income?.map((point) => point.x) ?? []
+		expect(xs.every((x, index) => index === 0 || x > (xs[index - 1] ?? 0))).toBe(true)
+	})
+
+	test("names a period by the dates it covers, and a part year as such", () => {
+		const income = byId().get("income")?.nominal ?? []
+		expect(income.map((point) => periodText(point))).toEqual([
+			"31 Oct 2026 – 30 Oct 2027",
+			"31 Oct 2027 – 30 Oct 2028",
+			"31 Oct – 31 Dec 2028, part year",
+		])
+		expect(
+			byId()
+				.get("tax:th-pit:due")
+				?.nominal.map((point) => periodText(point)),
+		).toEqual(["1 Jan 2026 – 31 Dec 2026", "1 Jan 2027 – 31 Dec 2027"])
 	})
 
 	test("greys out what the selected plan lacks, with the reason", () => {
@@ -57,60 +75,6 @@ describe("the series catalogue", () => {
 		expect(money?.find((entry) => entry.id === "withdrawals")?.reason).toBe(
 			"this plan has no withdrawal Flow",
 		)
-	})
-})
-
-describe("a chart on a plan", () => {
-	test("draws what the plan states, and names what it lacks", () => {
-		const view = chartView(
-			CHART,
-			byId(plain()),
-			new Map([["tax:th-pit:due", "Tax due, th-pit"]]),
-			"nominal",
-		)
-		expect(view.series.map((line) => line.name)).toEqual(["Income", "Expenses"])
-		expect(view.missing).toEqual([
-			{ id: "tax:th-pit:due", name: "Tax due, th-pit", reason: "this plan has no tax" },
-		])
-	})
-
-	test("the table holds the CLI's strings, a row per year", () => {
-		const view = chartView(CHART, byId(), new Map(), "nominal")
-		expect(view.table.headers).toEqual(["Income", "Expenses", "Tax due, th-pit"])
-		expect(view.table.rows.map((row) => row.label)).toEqual(["2026", "2027", "2028", "2028-12"])
-		expect(view.table.rows[1]).toEqual({
-			label: "2027",
-			cells: ["120000.00", "60000.00", "9500.00"],
-		})
-		expect(view.table.rows[3]?.cells).toEqual(["120000.00", "60000.00", null])
-	})
-
-	test("follows the terms only for a series with a real figure, and labels the others nominal", () => {
-		const chart: ChartDef = { id: "a", name: "A", kind: "line", series: ["net-worth", "income"] }
-		const real = chartView(chart, byId(), new Map(), "real")
-		expect(real.series.map((line) => line.name)).toEqual([
-			"Net worth at the close of the year, in As-of terms",
-			"Income (nominal)",
-		])
-		const both = chartView(chart, byId(), new Map(), "both")
-		expect(both.series.map((line) => line.name)).toHaveLength(3)
-		expect(real.notes).toHaveLength(1)
-	})
-
-	test("a stacked chart draws one set of terms, nominal for both", () => {
-		const view = chartView({ ...CHART, series: ["net-worth"] }, byId(), new Map(), "both")
-		expect(view.series).toHaveLength(1)
-		expect(view.notes).toContain("A stacked chart draws one set of terms, so it is nominal.")
-	})
-
-	test("shows each figure as the CLI's string with its sign", () => {
-		const view = chartView(
-			{ ...CHART, kind: "line", series: ["income"] },
-			byId(),
-			new Map(),
-			"nominal",
-		)
-		expect(view.series[0]?.points[0]?.display).toBe("120,000.00")
 	})
 })
 
@@ -157,6 +121,10 @@ describe("storage", () => {
 			ok: false,
 			reason: "This chart file is version 2; this page reads version 1.",
 		})
+		const reshaped = parseCharts(
+			JSON.stringify({ format: "trajectonomics-charts", version: 2, charts: [{ shape: "new" }] }),
+		)
+		expect(reshaped).toEqual(newer)
 	})
 
 	test("an import gets ids not yet used and is refused when it would not fit", () => {

@@ -1,11 +1,18 @@
 import { duplicateOf, mergeCharts, saveChart, uniqueId } from "../lib/view/charts/edit"
-import { CHARTS_KEY, parseCharts, readCharts, serializeCharts } from "../lib/view/charts/stored"
+import {
+	CHARTS_KEY,
+	parseCharts,
+	readCharts,
+	serializeCharts,
+	UNREAD_KEY,
+} from "../lib/view/charts/stored"
 import type { ChartDef } from "../lib/view/charts/types"
-import { readStored, subscribeExternal, tryWriteStored } from "./browser"
+import { readStoredResult, subscribeStorageKey, tryWriteStored } from "./browser"
 import { saveFile } from "./download"
 
 /** The most charts a person is told they have reached, in words. */
 const FULL = "You have reached the most charts this browser keeps (50). Delete one first."
+const KEPT_UNREAD = `The saved charts that could not be read are kept in this browser under ${UNREAD_KEY}.`
 
 /**
  * The charts a person made, kept in this browser (`localStorage`), never in a plan or the ledger. Every
@@ -20,23 +27,43 @@ class ChartStore {
 	unsaved = $state(false)
 	/** What the last import or save said, for a status line. */
 	notice = $state<string | null>(null)
+	/** Saved text that could not be read, held until a save would replace it. */
+	private unread: string | null = null
 
 	constructor() {
 		if (typeof window === "undefined") return
 		this.sync()
-		subscribeExternal(() => this.sync())
+		this.listen()
 	}
 
-	/** Reads the saved charts again, such as after another tab changed them. */
+	/** Reads the saved charts again when another tab changes them. Nothing else re-reads. */
+	listen(): () => void {
+		return subscribeStorageKey(CHARTS_KEY, () => this.sync())
+	}
+
+	/**
+	 * Reads the saved charts. A read the browser refuses leaves what is in memory alone: the charts of
+	 * this visit are not lost to storage that cannot be read.
+	 */
 	sync(): void {
-		const read = readCharts(readStored(CHARTS_KEY))
+		const stored = readStoredResult(CHARTS_KEY)
+		if (!stored.ok) return
+		const read = readCharts(stored.value)
 		this.charts = read.charts
 		this.problem = read.problem
+		this.unread = read.problem === null ? null : stored.value
 	}
 
+	/** Keeps the list. Text that could not be read is first put aside under `UNREAD_KEY`, never overwritten. */
 	private keep(next: readonly ChartDef[]): void {
+		const aside = this.unread
 		this.charts = next
 		this.unsaved = !tryWriteStored(CHARTS_KEY, serializeCharts(next))
+		if (aside === null || this.unsaved) return
+		tryWriteStored(UNREAD_KEY, aside)
+		this.unread = null
+		this.problem = null
+		this.notice = [this.notice, KEPT_UNREAD].filter(Boolean).join(" ")
 	}
 
 	/** The id a new chart of this name would get. */
@@ -61,8 +88,8 @@ class ChartStore {
 	}
 
 	remove(id: string): void {
-		this.keep(this.charts.filter((chart) => chart.id !== id))
 		this.notice = null
+		this.keep(this.charts.filter((chart) => chart.id !== id))
 	}
 
 	/** Takes in the charts of a file. A file that is not a chart file changes nothing. */

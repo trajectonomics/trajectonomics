@@ -25,7 +25,7 @@ const label = $derived(`${chart.name}, ${KIND_LABELS[chart.kind].toLowerCase()},
 		</div>
 	{/if}
 	{#if view.series.length > 0}
-		<LineChart {label} series={view.series} kind={chart.kind} />
+		<LineChart {label} series={view.series} kind={chart.kind} wide />
 		<ChartTable table={view.table} name={chart.name} />
 	{:else}
 		<p class="text-sm text-muted-foreground">Nothing to draw: this plan states none of the series of this chart.</p>

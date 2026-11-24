@@ -69,4 +69,21 @@ describe("columnLayout", () => {
 		expect(layout?.series[0]?.area).toContain("Z")
 		expect(layout?.series[1]?.marks[2]).toBeNull()
 	})
+
+	test("a column holds only the bars of series that have a value in it, and a part year is faded", () => {
+		const lone: LineSeries = {
+			name: "Lone",
+			points: [{ x: 5, xLabel: "5", y: 10, display: "10.00", partial: true }],
+		}
+		const layout = columnLayout([line("A", [10]), lone], PLOT, "bars")
+		const [a, b] = layout?.series ?? []
+		expect(a?.bars).toHaveLength(2)
+		const alone = b?.bars?.[0]
+		// Two columns of 350px: a bar alone in its column fills it (0.8 of 175), where side by side it would be half that.
+		expect(alone?.width).toBeCloseTo(140)
+		expect(a?.bars?.[0]).toBeNull()
+		expect(alone?.faded).toBe(true)
+		expect(a?.bars?.[1]?.faded).toBe(false)
+		expect(layout?.xTitles).toEqual(["5", "2026"])
+	})
 })

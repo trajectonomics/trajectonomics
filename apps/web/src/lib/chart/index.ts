@@ -2,7 +2,7 @@
 
 export { barHeights } from "./bars"
 export { type ColumnKind, columnLayout } from "./column-layout"
-export { type DaySpan, dayPosition } from "./date-position"
+export { type DaySpan, dayNumber, dayPosition } from "./date-position"
 export { type Extent, extent } from "./extent"
 export { FAN_LEVELS, type Fan, fanOf, fanSeriesName } from "./fan"
 export { keyTarget } from "./hover"

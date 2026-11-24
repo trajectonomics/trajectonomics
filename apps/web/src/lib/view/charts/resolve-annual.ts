@@ -1,7 +1,12 @@
 import type { ProjectionRun } from "../../contract"
 import { type AnnualRow, annualRowsOf } from "../projection/annual"
-import type { Resolved } from "./types"
+import type { Period, Resolved } from "./types"
 import { pointAt } from "./year"
+
+/** The period an annual row covers. */
+function periodOf(row: AnnualRow): Period {
+	return { from: row.from, partial: row.partial }
+}
 
 /** One annual figure as a series, or nothing when no row states it. */
 function annualSeries(
@@ -16,7 +21,7 @@ function annualSeries(
 ): Resolved[] {
 	const nominal = rows.flatMap((row) => {
 		const amount = spec.amount(row)
-		return amount === undefined ? [] : [pointAt(row.to, amount)]
+		return amount === undefined ? [] : [pointAt(row.to, amount, periodOf(row))]
 	})
 	if (nominal.length === 0) return []
 	const real = spec.real
@@ -26,7 +31,7 @@ function annualSeries(
 			name: spec.name,
 			group: spec.group,
 			nominal,
-			real: real ? rows.map((row) => pointAt(row.to, real(row))) : null,
+			real: real ? rows.map((row) => pointAt(row.to, real(row), periodOf(row))) : null,
 		},
 	]
 }
