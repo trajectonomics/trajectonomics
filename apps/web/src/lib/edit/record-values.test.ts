@@ -19,7 +19,7 @@ describe("the record-values schema", () => {
 	})
 
 	test("is strict: an extra field on the Edit or on a row is refused", () => {
-		expect(editSchema.safeParse({ ...edit, preview: true }).success).toBe(false)
+		expect(editSchema.safeParse({ ...edit, force: true }).success).toBe(false)
 		expect(editSchema.safeParse({ ...edit, values: [{ ...row, memo: "x" }] }).success).toBe(false)
 	})
 
@@ -37,6 +37,27 @@ describe("the record-values schema", () => {
 		const many = Array.from({ length: RECORD_VALUES_MAX_ROWS + 1 }, () => row)
 		expect(editSchema.safeParse({ ...edit, values: many }).success).toBe(false)
 		expect(editSchema.safeParse({ ...edit, values: many.slice(1) }).success).toBe(true)
+	})
+})
+
+describe("the row bound", () => {
+	test("holds a ten-year history of 33 accounts, and still fits the server's body cap in its worst case", () => {
+		expect(RECORD_VALUES_MAX_ROWS).toBe(4000)
+		expect(33 * 10 * 12).toBeLessThanOrEqual(RECORD_VALUES_MAX_ROWS)
+		const longest = {
+			account: "a".repeat(100),
+			date: "2026-10-31",
+			value: "9".repeat(RECORD_VALUE_MAX_LENGTH),
+		}
+		const body = JSON.stringify({
+			kind: "record-values",
+			against: "g".repeat(100),
+			values: Array.from({ length: RECORD_VALUES_MAX_ROWS }, () => longest),
+			preview: true,
+		})
+		expect(editSchema.safeParse(JSON.parse(body)).success).toBe(true)
+		// `maxRequestBodySize` of scripts/serve.ts is 1 MiB, and the CLI's own document limit is 5,000 values.
+		expect(body.length).toBeLessThan(1024 * 1024)
 	})
 })
 

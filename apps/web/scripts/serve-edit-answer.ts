@@ -23,6 +23,11 @@ export function answerOf(run: SnapshotRun, result?: unknown): Response {
 	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}${stated}}`)
 }
 
+/** Answers a preview: the dry run's own result, with no Snapshot, because nothing was written. */
+export function answerPreview(result: unknown): Response {
+	return json(200, `{"ok":true,"preview":true,"result":${JSON.stringify(result)}}`)
+}
+
 /** A refused request: its status, its code and the sentence a person reads. */
 export function refused(status: number, code: string, message: string): Response {
 	return failure(status, { code, exitCode: REFUSED_EXIT_CODE, message })

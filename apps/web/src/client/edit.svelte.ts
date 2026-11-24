@@ -1,9 +1,10 @@
 import type { AccountValues, ErrorBody } from "../lib/contract"
-import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
+import { type EditAnswer, editAnswer, type PreviewAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
-import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER } from "../lib/edit/guard"
+import { EDIT_SESSION_PATH } from "../lib/edit/guard"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
+import { postEdit, postPreview } from "./edit-post.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
@@ -52,17 +53,25 @@ class EditSession {
 		this.stale = false
 		this.result = null
 		try {
-			const response = await fetch(EDIT_PATH, {
-				method: "POST",
-				headers: { "content-type": "application/json", [EDIT_TOKEN_HEADER]: this.token },
-				body: JSON.stringify(edit),
-				cache: "no-store",
-			})
-			const answer = editAnswer.safeParse(await response.json())
+			const answer = editAnswer.safeParse(await postEdit(this.token, edit))
 			return this.settle(answer.success ? answer.data : null)
 		} catch {
 			this.error = "The Dashboard could not reach traj. Try again."
 			return false
+		} finally {
+			this.busy = false
+		}
+	}
+
+	/**
+	 * Sends a `record-values` Edit with `preview`: the server runs the dry run only and answers its result. Nothing
+	 * is written and no Snapshot is shown, so no error of the page's forms is touched. Null when it was not sent.
+	 */
+	async preview(edit: EditInput): Promise<PreviewAnswer | null> {
+		if (this.token === null || this.busy) return null
+		this.busy = true
+		try {
+			return await postPreview(this.token, edit)
 		} finally {
 			this.busy = false
 		}
