@@ -70,11 +70,9 @@ class EditSession {
 	async preview(edit: EditInput): Promise<PreviewAnswer | null> {
 		if (this.token === null || this.busy) return null
 		this.busy = true
-		try {
-			return await postPreview(this.token, edit)
-		} finally {
-			this.busy = false
-		}
+		const answer = await postPreview(this.token, edit)
+		this.busy = false
+		return answer
 	}
 
 	/**
