@@ -1,6 +1,7 @@
 import type { Period } from "../output/periods"
 import type { ChanceOfSuccess, ChanceOfSuccessOptions, ChanceRunsOut } from "../types/chance"
 import { bandAt } from "./band"
+import { pathOutcomes } from "./outcomes"
 import type { PathOutcome } from "./path"
 import { spendingOf } from "./spending"
 
@@ -30,5 +31,6 @@ export function summarise(
 		bands: grid.map((period) => bandAt(period, outcomes)),
 		runsOut: grid.map((period) => runsOutAt(period, outcomes)),
 		...(spending === undefined ? {} : { spending }),
+		...(options.outcomes === true ? { outcomes: pathOutcomes(outcomes) } : {}),
 	}
 }

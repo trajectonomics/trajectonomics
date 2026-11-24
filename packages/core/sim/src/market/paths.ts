@@ -30,6 +30,18 @@ function pathReturns(
 	}
 }
 
+/** Market path `index` alone: its draws come from its own seed, so no earlier path is built. */
+export function marketPath(
+	model: ReturnModel,
+	seed: bigint,
+	index: number,
+	timeline: Timeline,
+): Returns {
+	const table = bucketTable(model.buckets.map((bucket) => bucket.weight))
+	const dates = marketRows(timeline).slice(0, MAX_MARKET_ROWS)
+	return pathReturns(model, table, dates, seed, index)
+}
+
 /**
  * Market paths one at a time, unresolved, in index order: the input `runEngine` takes. Lazy, so a
  * caller holds one path's rows at once rather than every path's.

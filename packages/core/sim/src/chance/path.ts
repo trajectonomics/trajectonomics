@@ -6,8 +6,9 @@ import { buildPeriods, type Period } from "../output/periods"
 import { buildRollups } from "../output/rollups"
 import { accountRules } from "../output/rules"
 import type { Baseline, DateString, MinorUnits, Scenario, Timeline } from "../types"
-import type { ProjectionProblem } from "../types/projection"
+import type { ProjectionProblem, RunsOut } from "../types/projection"
 import { rollupGrid, rollupObservations } from "./grid"
+import { lowestOf } from "./lowest"
 import { spentBy } from "./spent"
 
 /** What every Market path of one chance shares: the inputs, the roll-up grid and the opening worth. */
@@ -24,10 +25,14 @@ export interface PathInputs {
 export interface PathOutcome {
 	readonly netWorth: readonly MinorUnits[]
 	readonly runsOutIndex?: number
+	/** The date and unmet amount the path ran out with; present only when it did. */
+	readonly runsOut?: RunsOut
+	/** The least net worth over the grid and the first period index that closed at it. */
+	readonly lowest: { readonly value: MinorUnits; readonly at: number }
 	/** What the rule Flows paid in each grid period; present only when the Scenario has a rule Flow. */
 	readonly spent?: readonly MinorUnits[]
 	/** The path's lowest year of that spending, absent when it has no whole year and did not run out. */
-	readonly lowest?: MinorUnits
+	readonly lowestYear?: MinorUnits
 }
 
 export type PathResult =
@@ -72,9 +77,15 @@ export function outcomeOf(inputs: PathInputs, returns: Returns): PathResult {
 	if (!spent.ok) return { ok: false, problem: spent.problem }
 	const outcome: PathOutcome = {
 		netWorth,
-		...(runsOut === undefined ? {} : { runsOutIndex: last.index }),
+		lowest: lowestOf(netWorth),
+		...(runsOut === undefined
+			? {}
+			: {
+					runsOutIndex: last.index,
+					runsOut: { date: runsOut.date, unmet: Number(runsOut.unmet) },
+				}),
 		...(spent.spent === undefined ? {} : { spent: spent.spent }),
-		...(spent.lowest === undefined ? {} : { lowest: spent.lowest }),
+		...(spent.lowest === undefined ? {} : { lowestYear: spent.lowest }),
 	}
 	return { ok: true, outcome }
 }

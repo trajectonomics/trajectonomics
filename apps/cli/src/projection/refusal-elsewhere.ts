@@ -75,6 +75,7 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	TOO_MANY_ENTRIES: input,
 	INVALID_FI_METHOD: never,
 	INVALID_PATH_COUNT: input,
+	INVALID_PATH_INDEX: never,
 	INVALID_SEED: input,
 	REFERENCE_MULTIPLIER_OUT_OF_RANGE: never,
 	INVALID_REFERENCE_BASIS: never,
