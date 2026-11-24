@@ -19,3 +19,7 @@ The committed Demo snapshot is built from a fictional ledger, so the built pages
 
 - A person who wants the Dashboard clones the repository, installs with Bun and runs the command.
 - Nothing in this package is published or deployed, and `org/goals/GOALS.md` still lists the desktop and web apps under "Not now".
+
+## Amendment (2026-11-24, #378)
+
+The Demo snapshot is generated at build and is not committed ([ADR 0021](0021-the-demo-snapshot-is-generated-at-build-and-not-committed.md)). The sentence above that calls it committed describes the state before that change.
