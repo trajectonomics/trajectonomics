@@ -1,6 +1,7 @@
 import { allowedValues, check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
 import { sentenceFor } from "../projection/refusal-table"
+import { isOwnCode, type OwnCode, ownProblems, ownSentence } from "./own-problems"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
 // a Scenario and a Timeline in one pass and returns `{ code, path }` problems, so the CLI validates
@@ -12,7 +13,7 @@ export type ScenarioDocument = Record<string, unknown>
 
 /** One reason `sim-core` refuses a document, with the path inside the document. */
 export type ScenarioProblem = {
-	readonly code: Problem["code"]
+	readonly code: Problem["code"] | OwnCode
 	readonly segments: readonly (string | number)[]
 }
 
@@ -68,9 +69,21 @@ const TIMELINE_CODES: ReadonlySet<string> = new Set(["MISSING_CARRY_IN"])
 
 /** The problems `sim-core` finds in a document alone, in its order, with `scenario.` stripped. */
 export function scenarioProblems(value: unknown): ScenarioProblem[] {
-	return check(NEUTRAL_BASELINE, value, null)
+	const found: ScenarioProblem[] = check(NEUTRAL_BASELINE, value, null)
 		.filter((problem) => problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code))
 		.map((problem) => ({ code: problem.code, segments: problem.path.slice(1) }))
+	return [...found, ...ownProblems(value)]
+}
+
+/**
+ * The sentence and hint a refusal states for a problem: the CLI's own for a rule it states itself, the
+ * refusal table's for a code of the engine's it words, and none for any other.
+ */
+export function sentenceOfProblem(
+	problem: ScenarioProblem,
+): { message: string; hint?: string } | undefined {
+	if (isOwnCode(problem.code)) return ownSentence(problem.code)
+	return sentenceFor({ code: problem.code, path: ["scenario", ...problem.segments.map(String)] })
 }
 
 /** The document path as the CLI prints it: `base` plus segments, a list index as a number. */
@@ -100,6 +113,7 @@ function detailOf(problem: ScenarioProblem): string | undefined {
 	if (problem.code === "NOT_SAFE_INTEGER" && problem.segments.some((s) => RATE_SEGMENTS.has(s))) {
 		return "basis points, a whole number: 2% is 200"
 	}
+	if (isOwnCode(problem.code)) return undefined
 	const allowed = allowedValues(problem.code, problem.segments)
 	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
 }
@@ -133,10 +147,7 @@ export function scenarioDocumentError(value: unknown, base = "document"): AppErr
 	const first = problems[0]
 	if (first === undefined) return null
 	const refusal = refusalOf(first, base)
-	const said = sentenceFor({
-		code: first.code,
-		path: ["scenario", ...first.segments.map(String)],
-	})
+	const said = sentenceOfProblem(first)
 	return fail("invalid_input", {
 		path: refusal.path,
 		message: said?.message ?? refusal.message,

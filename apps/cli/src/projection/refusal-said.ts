@@ -4,6 +4,7 @@ import {
 	type ProjectionProblem,
 } from "@trajectonomics/core/sim"
 import { OVERFLOW_HINT, overflowOf, overflowSentence } from "./overflow"
+import { SAID_INCOME } from "./refusal-income"
 import { SAID_RATE } from "./refusal-rate"
 import { SAID_RULE } from "./refusal-rule"
 import { SAID_TRADE } from "./refusal-trade"
@@ -31,6 +32,7 @@ const CARRY_IN_HINT =
  */
 export const SAID: Readonly<Partial<Record<ErrorCode, Said>>> = {
 	...SAID_TRADE,
+	...SAID_INCOME,
 	...SAID_RATE,
 	...SAID_RULE,
 	// What only a run against the Ledger and the flags can find.

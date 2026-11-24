@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { INITIAL_RATE_FLOW } from "./description"
+import { EMPLOYER_FLOW, PAYOUT_ACCOUNT } from "./example-income"
 import { scenarioExample, scenarioShapeDescription } from "./index"
 import { nodeAt, type Path, refusalsOf, VERSION } from "./testing"
 
@@ -178,5 +179,18 @@ describe("the worked example's retirement spending", () => {
 	it("also teaches the initialRate form, in a Flow the pin accepts beside the example's Accounts", () => {
 		expect(refusalsOf({ ...EXAMPLE, flows: [...EXAMPLE.flows, INITIAL_RATE_FLOW] })).toEqual([])
 		expect(scenarioShapeDescription("0.0.0")).toContain(JSON.stringify(INITIAL_RATE_FLOW))
+	})
+
+	it("also teaches a payout, a fee and an employer's share, in documents the pin accepts beside the example", () => {
+		const taught = {
+			...EXAMPLE,
+			accounts: [...EXAMPLE.accounts, PAYOUT_ACCOUNT],
+			flows: [...EXAMPLE.flows, EMPLOYER_FLOW],
+		}
+		expect(refusalsOf(taught)).toEqual([])
+		const prose = scenarioShapeDescription("0.0.0")
+		expect(prose).toContain(JSON.stringify(PAYOUT_ACCOUNT))
+		expect(prose).toContain(JSON.stringify(EMPLOYER_FLOW))
+		expect(prose).toContain("every rate in them is the caller's")
 	})
 })

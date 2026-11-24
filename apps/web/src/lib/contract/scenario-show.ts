@@ -22,7 +22,7 @@ export const scenarioFlow = z.looseObject({
 	earned: z.boolean().optional(),
 	target: z.string().optional(),
 	source: z.string().optional(),
-	// "obligation" pays a Contribution in full on its date, before Available cashflow (sim ADR 0021).
+	// "obligation" pays a Contribution in full on its date, before Available cashflow (sim ADR 0021); "employer" lands the employer's share outside the household's cash (sim ADR 0026).
 	funding: z.string().optional(),
 	// An expense's free-text group (cli schema, #278). The engine never reads it.
 	category: z.string().optional(),
@@ -51,6 +51,22 @@ export const scenarioAccount = z.looseObject({
 	lockedUntil: dateString.optional(),
 	// false marks an asset that is in net worth but not accessible: a home or a car (sim ADR 0019).
 	liquid: z.boolean().optional(),
+	// A share of the value paid out as passive income (sim ADR 0027); `bps` is a percent string such as "3.50" in the decimal form (cli ADR-0067).
+	payout: z
+		.looseObject({
+			bps: z.string(),
+			frequency: z.enum(["monthly", "quarterly", "semiannual", "annual"]),
+			rounding: z.enum(["floor", "halfUp", "ceil"]),
+			start: dateString.optional(),
+			end: dateString.optional(),
+			startAt: z.string().optional(),
+			endAt: z.string().optional(),
+			label: z.string().optional(),
+			prepayments: z.array(z.looseObject({ levy: z.string(), bps: z.number().int() })).optional(),
+		})
+		.optional(),
+	// A yearly share of the value charged every month, outside cashflow (sim ADR 0028); `bps` is a percent string in the decimal form.
+	fee: z.looseObject({ bps: z.string(), rounding: z.enum(["floor", "halfUp", "ceil"]) }).optional(),
 })
 export type ScenarioAccount = z.infer<typeof scenarioAccount>
 

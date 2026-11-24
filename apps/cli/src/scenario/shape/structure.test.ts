@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { FULL_FUND } from "./account-fixture"
 import { FULL_ESTATE } from "./estate-fixture"
 import { scenarioExample } from "./index"
 import { FULL_MILESTONES } from "./milestone-fixture"
@@ -23,6 +24,7 @@ const FULL: Record<string, unknown> = {
 		{ id: "loan", kind: "liability", rate: 500 },
 		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
 		{ id: "home", kind: "asset", rate: 0, liquid: false },
+		{ ...FULL_FUND, payout: { ...(FULL_FUND["payout"] as object), endAt: "downsize" } },
 	],
 	flows: [
 		{

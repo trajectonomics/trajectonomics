@@ -9,12 +9,14 @@ import { dateField, moneyField } from "./money"
 /** The source a line belongs to, in the order the engine reports them (sim ADR-0018). */
 export const CASHFLOW_GROUPS = [
 	"income",
+	"payout",
 	"prepaid",
 	"settlement",
 	"expense",
 	"category",
 	"contribution",
 	"unfunded",
+	"employer",
 	"withdrawal",
 	"drawn",
 	"surplus",
@@ -26,7 +28,7 @@ export type CashflowGroup = (typeof CASHFLOW_GROUPS)[number]
 /**
  * One line of one Annual roll-up. `id` is the Flow for Flow lines, the Levy for `prepaid` and
  * `settlement`, and the category name for `category` lines (null for the uncategorised total). It is
- * null for `drawn`, `surplus` and `unmet`. `account` is set for the Account lines, `category` for an
+ * null for `payout`, `drawn`, `surplus` and `unmet`. `account` is set for the Account lines, `category` for an
  * `expense` line that declares one.
  */
 export type CashflowRow = {
@@ -47,19 +49,19 @@ export const cashflowRow: z.ZodType<CashflowRow> = z.strictObject({
 	group: z
 		.enum(CASHFLOW_GROUPS)
 		.describe(
-			"The line's source: income, prepaid (tax taken at source), settlement (a Levy's settlement, negative for a refund), expense, category (expenses summed per category), contribution (applied into an Account), unfunded (a Contribution the cash could not fund), withdrawal (a planned withdrawal, borrowed from a liability or sold from an asset), drawn (taken from an Account by cashflow.withdraw), surplus (filled into an Account by cashflow.surplus) or unmet (spending the run could not fund).",
+			"The line's source: income, payout (an Account's payout, landed as passive income and in money in), prepaid (tax taken at source), settlement (a Levy's settlement, negative for a refund), expense, category (expenses summed per category), contribution (applied into an Account), unfunded (a Contribution the cash could not fund), employer (an employer Contribution landed in an Account, never in cash and not in money in), withdrawal (a planned withdrawal, borrowed from a liability or sold from an asset), drawn (taken from an Account by cashflow.withdraw), surplus (filled into an Account by cashflow.surplus) or unmet (spending the run could not fund).",
 		),
 	id: z
 		.string()
 		.nullable()
 		.describe(
-			"The Flow's id for a Flow line, the Levy's id for prepaid and settlement, the category name for a category line (null for the uncategorised total), and null for drawn, surplus and unmet.",
+			"The Flow's id for a Flow line, the Levy's id for prepaid and settlement, the category name for a category line (null for the uncategorised total), and null for payout, drawn, surplus and unmet.",
 		),
 	account: z
 		.string()
 		.nullable()
 		.describe(
-			"The Account a contribution, unfunded, withdrawal, drawn or surplus line moved money into or out of; null otherwise.",
+			"The Account a contribution, unfunded, employer, payout, withdrawal, drawn or surplus line moved money into or out of; null otherwise.",
 		),
 	category: z
 		.string()

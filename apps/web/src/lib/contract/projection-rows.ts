@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { dateString } from "./date"
+import { integer } from "./integer"
 import { money } from "./money"
 
 /*
@@ -36,6 +37,18 @@ export const balanceRow = z.strictObject({
 	account: z.string(),
 	amount: money,
 	real: money,
+})
+
+/**
+ * What one Account was charged in one Annual roll-up, zero when it was not charged that year (cli
+ * ADR-0067, sim ADR 0028).
+ */
+export const feeRow = z.strictObject({
+	index: integer,
+	from: dateString,
+	to: dateString,
+	account: z.string(),
+	amount: money,
 })
 
 /**

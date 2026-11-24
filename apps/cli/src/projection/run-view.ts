@@ -4,6 +4,7 @@ import { carryInField } from "./carryin-view"
 import { type CashflowTotalsTable, cashflowTotalsTable } from "./cashflow-totals-view"
 import { type CashflowRow, cashflowRow } from "./cashflow-view"
 import { type EstateTables, estateTables } from "./estate-view"
+import { type FeesTable, feesTable } from "./fees-view"
 import {
 	type LiabilityMonthsTable,
 	liabilityMonthsTable,
@@ -42,6 +43,7 @@ export type ProjectionTable =
 	| LiabilityMonthsTable
 	| PaidOffTable
 	| BalancesTable
+	| FeesTable
 	| SpendingRulesTable
 	| EstateTables
 	| MilestonesTable
@@ -81,6 +83,7 @@ export const projectionTable: z.ZodType<ProjectionTable> = z.union([
 	liabilityMonthsTable,
 	paidOffTable,
 	balancesTable,
+	feesTable,
 	spendingRulesTable,
 	...estateTables,
 	milestonesTable,
@@ -103,6 +106,6 @@ export const projectionRunView: z.ZodType<ProjectionRunView> = z.strictObject({
 	tables: z
 		.array(projectionTable)
 		.describe(
-			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, what the plan would leave and each cost and gift when --estate was given, and the milestones when the Scenario declares them.",
+			"The annual roll-up, the monthly rows when --monthly was given, the cash flow and its section totals when --breakdown was given, the loans when --liabilities was given, each Account's value when --accounts was given, what each spending rule paid when --spending was given, what the plan would leave and each cost and gift when --estate was given, what each fee Account was charged when an Account carries a fee, and the milestones when the Scenario declares them.",
 		),
 })

@@ -70,6 +70,28 @@ const PREPAYMENTS: Entry = {
 	hint: `${UNIT} Lower the shares so that the plain prepayments and the capped one add up to 10000 or less.`,
 }
 
+/** Under --decimal an Account's payout and fee are percent strings (cli ADR-0067). */
+const ACCOUNT_DECIMAL =
+	'Under --decimal it is a percent string such as "1.50", with at most two decimal places.'
+
+const PAYOUT: Entry = {
+	message:
+		"The share an Account pays out each year must be from 0% to 100% of its value, and this one is not.",
+	hint: `${UNIT} ${ACCOUNT_DECIMAL} A payout of 0 is none.`,
+}
+
+const FEE: Entry = {
+	message:
+		"The fee an Account charges each year must be from 0% to 100% of its value, and this one is not.",
+	hint: `${UNIT} ${ACCOUNT_DECIMAL} A fee of 0 is none.`,
+}
+
+const PAYOUT_PREPAYMENTS: Entry = {
+	message:
+		"The Levy prepayments of an Account's payout ask for more than 100% of each payout, or one share is outside 0% to 100%.",
+	hint: `${UNIT} Lower the shares so that they add up to 10000 or less.`,
+}
+
 const GENERAL: Entry = {
 	message: "A rate or share is outside the range its field allows.",
 	hint: `${UNIT} A share runs from 0 to 10000, and a rate that is not a share is above -10000.`,
@@ -98,6 +120,13 @@ function flowEntry(segments: Segments): Entry {
 	return segments.includes("growth") ? GROWTH : GENERAL
 }
 
+function accountEntry(segments: Segments): Entry {
+	if (segments[2] === "rate") return ACCOUNT_RATE
+	if (segments[2] === "fee") return FEE
+	if (segments[2] !== "payout") return GENERAL
+	return segments[3] === "prepayments" ? PAYOUT_PREPAYMENTS : PAYOUT
+}
+
 /** The entry for the field a `RATE_OUT_OF_RANGE` blames, by where it sits in the Scenario. */
 export function rateEntry(problem: ProjectionProblem): Entry {
 	const segments = segmentsOf(problem)
@@ -109,7 +138,7 @@ export function rateEntry(problem: ProjectionProblem): Entry {
 		case "flows":
 			return flowEntry(segments)
 		case "accounts":
-			return segments[2] === "rate" ? ACCOUNT_RATE : GENERAL
+			return accountEntry(segments)
 		case "economy":
 			return INFLATION
 		default:

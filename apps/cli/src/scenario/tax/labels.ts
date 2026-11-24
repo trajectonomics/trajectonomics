@@ -1,6 +1,7 @@
 import { TH_LEVY_CONTRIBUTION_LABELS, TH_LEVY_INCOME_LABELS } from "@trajectonomics/core/tax/th"
 import { type AppError, fail } from "../../errors"
 import type { ScenarioDocument } from "../document"
+import { isMemberOnlyLabel, ownSentence } from "../own-problems"
 import { type JsonRecord, records } from "./json"
 
 /*
@@ -14,6 +15,10 @@ import { type JsonRecord, records } from "./json"
 export const TAX_INCOME_LABELS: readonly string[] = TH_LEVY_INCOME_LABELS
 export const TAX_CONTRIBUTION_LABELS: readonly string[] = TH_LEVY_CONTRIBUTION_LABELS
 
+/** Which income label a payout takes, by what the Account holds: the Section 40(4) split the Levy reads. */
+const PAYOUT_LABELS =
+	"a payout from a dividend Account is income.section40_4.dividends and one from interest is income.section40_4.interest"
+
 /**
  * The two closed sets in one sentence, so the `--label` flag and the Scenario document's `label`
  * field both name them from here (ADR-0010, ADR-0032).
@@ -22,6 +27,8 @@ export function labelSetsSentence(): string {
 	return [
 		`An income Flow takes one of ${TAX_INCOME_LABELS.join(", ")}.`,
 		`A contribution Flow takes one of ${TAX_CONTRIBUTION_LABELS.join(", ")}.`,
+		"Each of those contribution labels is the member's own payment, so an employer Contribution (funding employer) takes none of them.",
+		`An Account's payout is labelled in the Account's own \`payout.label\`: ${PAYOUT_LABELS}.`,
 	].join(" ")
 }
 
@@ -60,6 +67,9 @@ function labelProblem(flow: string, target: JsonRecord, label: string): AppError
 			message: `--label applies to income and contribution Flows; "${flow}" is a ${String(target["kind"])} Flow.`,
 			path: "label",
 		})
+	}
+	if (target["funding"] === "employer" && isMemberOnlyLabel(label)) {
+		return fail("invalid_input", { ...ownSentence("EMPLOYER_MEMBER_LABEL"), path: "label" })
 	}
 	if (allowed.includes(label)) return null
 	return fail("invalid_input", {

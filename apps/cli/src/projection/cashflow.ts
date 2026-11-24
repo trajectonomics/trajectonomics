@@ -26,6 +26,12 @@ function linesOf(breakdown: CashflowBreakdown): Line[] {
 			id: line.flow,
 			minor: line.amount,
 		})),
+		(breakdown.payouts ?? []).map((line) => ({
+			...none,
+			group: "payout",
+			account: line.account,
+			minor: line.amount,
+		})),
 		breakdown.prepaid.map((line) => ({
 			...none,
 			group: "prepaid",
@@ -64,6 +70,13 @@ function linesOf(breakdown: CashflowBreakdown): Line[] {
 			id: line.flow,
 			account: line.account,
 			minor: line.unfunded,
+		})),
+		(breakdown.employer ?? []).map((line) => ({
+			...none,
+			group: "employer",
+			id: line.flow,
+			account: line.account,
+			minor: line.amount,
 		})),
 		breakdown.withdrawals.map((line) => ({
 			...none,

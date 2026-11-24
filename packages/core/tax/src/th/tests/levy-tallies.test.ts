@@ -4,6 +4,7 @@ import { ThLevyTallyBasis } from "../levy/graph-types"
 import {
 	TH_LEVY_CONTRIBUTION_LABELS,
 	TH_LEVY_INCOME_LABELS,
+	TH_LEVY_MEMBER_ONLY_LABELS,
 	ThLevyContributionLabel,
 	ThLevyIncomeLabel,
 } from "../levy/labels"
@@ -29,6 +30,11 @@ describe("TH 2026 Levy tally labels", () => {
 			ThLevyContributionLabel.ThaiEsg,
 		])
 		expect(TH_LEVY_CONTRIBUTION_LABELS).toHaveLength(7)
+	})
+
+	it("names every contribution label, ThaiESG included, as the member's own payment", () => {
+		expect([...TH_LEVY_MEMBER_ONLY_LABELS].sort()).toEqual([...TH_LEVY_CONTRIBUTION_LABELS].sort())
+		expect(TH_LEVY_MEMBER_ONLY_LABELS).toContain(ThLevyContributionLabel.ThaiEsg)
 	})
 
 	it("emits a gross tally per income label and a funded tally per contribution label", () => {

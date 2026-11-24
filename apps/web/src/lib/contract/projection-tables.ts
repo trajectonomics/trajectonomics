@@ -7,6 +7,7 @@ import {
 	balanceRow,
 	estateLineRow,
 	estateRow,
+	feeRow,
 	liabilityRow,
 	milestoneRow,
 	paidOffRow,
@@ -25,6 +26,12 @@ const annualRow = z.strictObject({
 	income: money,
 	// Present only when the Scenario declares a withdrawal Flow (cli ADR-0059).
 	withdrawals: money.optional(),
+	// Present only when an Account pays out; already inside `income` (cli ADR-0067, sim ADR 0027).
+	payouts: money.optional(),
+	// Present only when the Scenario declares an employer Contribution; outside `income` (sim ADR 0026).
+	employerContributions: money.optional(),
+	// Present only when an Account carries a fee above 0 bps; outside cashflow (sim ADR 0028).
+	fees: money.optional(),
 	expense: money,
 	contributions: money,
 	unfundedContributions: money,
@@ -54,12 +61,14 @@ export const cashflowRow = z.strictObject({
 	to: dateString,
 	group: z.enum([
 		"income",
+		"payout",
 		"prepaid",
 		"settlement",
 		"expense",
 		"category",
 		"contribution",
 		"unfunded",
+		"employer",
 		"withdrawal",
 		"drawn",
 		"surplus",
@@ -74,7 +83,7 @@ export const cashflowRow = z.strictObject({
 /**
  * The projection's tables: the annual roll-up always, the monthly rows only with `--monthly`, the cash
  * flow and its section totals only with `--breakdown`, the loans only with `--liabilities`, each Account's
- * value only with `--accounts`, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
+ * value only with `--accounts`, each fee Account's charges only when an Account carries a fee, each spending rule's years only with `--spending`, the estate and its lines only with `--estate`, and the milestones
  * only when the Scenario declares them.
  */
 export const projectionTables = z.array(
@@ -90,6 +99,7 @@ export const projectionTables = z.array(
 		z.strictObject({ name: z.literal("liabilities"), count: integer, rows: z.array(liabilityRow) }),
 		z.strictObject({ name: z.literal("paidOff"), count: integer, rows: z.array(paidOffRow) }),
 		z.strictObject({ name: z.literal("balances"), count: integer, rows: z.array(balanceRow) }),
+		z.strictObject({ name: z.literal("fees"), count: integer, rows: z.array(feeRow) }),
 		z.strictObject({
 			name: z.literal("spendingRules"),
 			count: integer,

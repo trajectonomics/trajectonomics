@@ -7,6 +7,7 @@ import type { Placed } from "./carryin-apply"
 import { cashflowRowsOf } from "./cashflow"
 import { cashflowTotalRowsOf } from "./cashflow-totals"
 import { estateTablesOf } from "./estate"
+import { feesTableOf } from "./fees"
 import { liabilityTablesOf } from "./liabilities"
 import { milestoneRowsOf } from "./milestones"
 import { monthlyRow } from "./rows"
@@ -63,6 +64,12 @@ function balancesOf(prepared: Placed, projection: Projection, monthly: boolean) 
 	return balancesTableOf(projection.annual, projection.rows, monthly, order, prepared.currency)
 }
 
+/** What each fee Account was charged, when an Account carries a fee (cli ADR-0067). */
+function feeTablesOf(projection: Projection, currency: string): ProjectionTable[] {
+	const table = feesTableOf(projection.annual, currency)
+	return table === undefined ? [] : [table]
+}
+
 /** One table, or the failure that stopped it, as the list `extraTablesOf` gathers. */
 function oneTable(table: ProjectionTable | AppError): ProjectionTable[] | AppError {
 	return isAppError(table) ? table : [table]
@@ -72,7 +79,7 @@ function oneTable(table: ProjectionTable | AppError): ProjectionTable[] | AppErr
  * The tables a run adds beyond the annual roll-up, each present only when its flag or Scenario asks for it,
  * so a run without them keeps its table list: the monthly rows (`--monthly`), the cash flow and its section
  * totals (`--breakdown`, cli ADR-0058), the loans (`--liabilities`, cli ADR-0059), each Account's value
- * (`--accounts`, cli ADR-0060), what each spending rule paid (`--spending`, cli ADR-0063), what the plan would leave (`--estate`, cli ADR-0064) and the milestones
+ * (`--accounts`, cli ADR-0060), what each fee Account was charged when one carries a fee (cli ADR-0067), what each spending rule paid (`--spending`, cli ADR-0063), what the plan would leave (`--estate`, cli ADR-0064) and the milestones
  * (cli ADR-0049).
  */
 export function extraTablesOf(
@@ -99,6 +106,7 @@ export function extraTablesOf(
 			),
 		)
 	}
+	asked.push(feeTablesOf(projection, currency))
 	asked.push(milestoneTablesOf(projection))
 	const tables: ProjectionTable[] = []
 	for (const entry of asked) {
