@@ -22,7 +22,7 @@ const CELL_FIGURE = "sticky left-0 z-10 bg-card px-3 py-2 text-left align-top"
 const CELL_NUMBER = "bg-card px-3 py-2 text-right align-top tabular-nums"
 </script>
 
-<div class="max-w-full overflow-x-auto rounded-lg border border-border">
+<div class="relative max-w-full overflow-x-auto rounded-lg border border-border">
 	<table class="w-full min-w-[32rem] border-collapse text-sm">
 		<caption class="bg-card px-3 py-2 text-left text-sm font-medium text-muted-foreground">
 			Figures in {currency}

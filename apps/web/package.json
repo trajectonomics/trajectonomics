@@ -23,6 +23,7 @@
 		"test": "bun test ./src ./scripts",
 		"test:src": "bun test ./src",
 		"test:scripts": "bun test ./scripts",
+		"test:browser": "playwright test",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
 		"check": "bun run lint && bun run typecheck && bun scripts/demo-unless-turbo.ts && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
@@ -32,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.3",
+		"@playwright/test": "1.65.0",
 		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.4.0",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",

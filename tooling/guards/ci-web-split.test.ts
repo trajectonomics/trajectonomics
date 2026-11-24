@@ -7,11 +7,13 @@ import { join } from "node:path"
 
 const ROOT = join(import.meta.dir, "..", "..")
 
-type Job = { name?: string; if?: string; needs?: string[]; steps?: { run?: string }[] }
+type Step = { name?: string; if?: string; uses?: string; run?: string; with?: { path?: string } }
+type Job = { name?: string; if?: string; needs?: string | string[]; steps?: Step[] }
 type Tasks = Record<string, { dependsOn?: string[] }>
 
 const web = (await Bun.file(join(ROOT, "apps/web/package.json")).json()) as {
 	scripts: Record<string, string>
+	devDependencies: Record<string, string>
 }
 const workflow = Bun.YAML.parse(await Bun.file(join(ROOT, ".github/workflows/ci.yml")).text()) as {
 	jobs: Record<string, Job>
@@ -89,13 +91,45 @@ describe("the CI split of the web check", () => {
 		}
 	})
 
+	it("runs the browser checks in a job of their own, only when the web jobs run", () => {
+		// apps/web/browser (web ADR 0026): Chromium over the built Demo. It stays out of `bun run check`, so
+		// the deploy-free local check needs no browser, and out of the shards, so it never lengthens them.
+		const job = workflow.jobs["web-browser"] as Job
+		expect(job.name).toBe("Check web browser")
+		expect(job.needs).toBe("plan")
+		expect(job.if).toBe((workflow.jobs["web"] as Job).if)
+		expect(web.scripts["test:browser"]).toBe("playwright test")
+		expect(web.scripts["check"]).not.toContain("browser")
+		expect(web.scripts["test"]).not.toContain("browser")
+		expect(Object.keys(web.devDependencies)).toContain("@playwright/test")
+	})
+
+	it("builds the web package for the browser job without arguments, so the build is a cache hit", () => {
+		// Arguments after `--` are hashed into every task of the graph (the same rule as the shards, #464).
+		const runs = ((workflow.jobs["web-browser"] as Job).steps ?? []).map((step) => step.run ?? "")
+		const build = runs.find((run) => run.includes("turbo run"))
+		expect(build).toBeDefined()
+		expect(build?.split(/\s+/)).toContain("@trajectonomics/web#build")
+		expect(build).not.toMatch(/\s--(\s|$)/)
+		const test = runs.findIndex((run) => run.includes("test:browser"))
+		expect(test).toBeGreaterThan(runs.indexOf(build ?? ""))
+	})
+
+	it("uploads the screenshots whether or not the checks passed", () => {
+		const upload = ((workflow.jobs["web-browser"] as Job).steps ?? []).find((step) =>
+			step.with?.path?.includes("screenshots"),
+		)
+		expect(upload?.uses).toContain("actions/upload-artifact@")
+		expect(upload?.if).toBe("always()")
+	})
+
 	it("keeps the required check named Check, waiting for every other job and reading `needs`", () => {
 		const check = workflow.jobs["check"] as Job
 		expect(check.name).toBe("Check")
 		// Not `!cancelled()`: a skipped required check counts as passing, so a cancelled run must fail it.
 		expect(check.if).toBe("always()")
 		const others = Object.keys(workflow.jobs).filter((id) => id !== "check")
-		expect([...(check.needs ?? [])].sort()).toEqual(others.sort())
+		expect([...(check.needs as string[])].sort()).toEqual(others.sort())
 		// It judges the whole `needs` object, so a job added to the list needs no edit to the script.
 		expect(JSON.stringify(check.steps)).toContain("toJSON(needs)")
 		expect(JSON.stringify(check.steps)).not.toMatch(/needs\.[\w-]+\.result/)
