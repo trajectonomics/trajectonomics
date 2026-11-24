@@ -1,14 +1,13 @@
 import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
 import { reportSource } from "../../lib/view/reports/source"
 import { reportTables } from "../../lib/view/reports/tables"
 import ReportView from "./ReportView.svelte"
 
-const DEMO: Snapshot = snapshotSchema.parse(
-	JSON.parse(await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()),
-)
+const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(await demoSnapshotText()))
 const PLAN = Object.keys(DEMO.reads.projections).find(
 	(name) => DEMO.reads.projections[name]?.ok === true,
 )

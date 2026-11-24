@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { snapshot } from "../contract"
 import { failedRead } from "./fixtures.test-support"
 import { hasLevy } from "./levy"
@@ -102,7 +103,7 @@ describe("which plans are asked", () => {
 
 describe("the Demo snapshot", () => {
 	test("states the allowance inputs and one allowances read per plan with a Levy", async () => {
-		const text = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+		const text = await demoSnapshotText()
 		const demo = snapshot.parse(JSON.parse(text))
 		expect(demo.params.allowances?.labels).toEqual(INPUTS.labels)
 		expect(Object.keys(demo.reads.allowances).sort()).toEqual(["base", "retire-early"])

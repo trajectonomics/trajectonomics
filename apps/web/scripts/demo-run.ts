@@ -10,7 +10,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { runSnapshot } from "./snapshot-run"
 import { checkBinary } from "./traj-binary"
 
-/** The demo's parameters: fixed dates, so the committed Demo snapshot is reproducible. */
+/** The demo's parameters: fixed dates, so the generated Demo snapshot is reproducible. */
 export const DEMO_INPUT: PlanInput = {
 	asOf: "2026-10-31",
 	horizon: "2053-12-31",
@@ -35,7 +35,7 @@ export const DEMO_INPUT: PlanInput = {
 /** The demo's Scenarios, in the order their Carry-in records name them. */
 const DEMO_SCENARIOS = ["base", "retire-early"]
 
-/** The stand-in for the scratch data directory in the committed Snapshot. */
+/** The stand-in for the scratch data directory in the Demo snapshot. */
 export const HOME_STAND_IN = "~/.traj"
 
 export type DemoRun =
@@ -71,7 +71,7 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 			demoCarryIn(DEMO_SCENARIOS),
 		)
 		if (!run.ok) return { ok: false, message: run.error.message }
-		const json = JSON.stringify(run.snapshot, null, "\t")
+		const json = JSON.stringify(run.snapshot)
 		return {
 			ok: true,
 			snapshot: run.snapshot,

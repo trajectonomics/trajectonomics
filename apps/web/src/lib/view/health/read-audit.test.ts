@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
-
+import { demoSnapshotJson } from "../../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot } from "../../contract"
 import { readAudit } from "./read-audit"
 
-const DEMO = await Bun.file(`${import.meta.dir}/../../../../public/demo/snapshot.json`).json()
+const DEMO = await demoSnapshotJson()
 const demo: Snapshot = snapshot.parse(DEMO)
 
 function withFailedPnl(source: Snapshot): Snapshot {
