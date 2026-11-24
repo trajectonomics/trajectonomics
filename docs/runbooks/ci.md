@@ -10,7 +10,7 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 | `Plan` | decides whether the web jobs run | always |
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
-| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`, through `turbo run test:scripts -- --shard=N/4` | same as `Check web` |
+| `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/4` | same as `Check web` |
 | `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
@@ -59,10 +59,23 @@ Turborepo cache entry and runs a full check.
 Each job restores `.turbo/cache` from the newest entry for the lockfile (pull requests can read
 `main`'s entries and their own) and saves one entry for the commit, also when the job failed, so a
 retry skips the tasks that passed. `Check packages` and `Check web` have their own key prefix, since
-two jobs cannot save one key; the shards only restore. Unchanged packages are cache hits (in the
-recent runs read for #464, 6 and 12 of 16 or 17 tasks were hits, and every miss was a package whose
-inputs changed). A change to the command line, the engine or `sim` makes `web#test:scripts` run
-again, because it depends on `cli#build`.
+two jobs cannot save one key; the shards only restore the packages entry. Unchanged packages are cache
+hits (in the recent runs read for #464, 6 and 12 of 16 or 17 tasks were hits, and every miss was a
+package whose inputs changed). The jobs of one run start together and save at their end, so the entry a
+job restores comes from an earlier run: the first run after a change to the command line, the engine,
+`sim` or the Demo's inputs misses those tasks in every job, and a later run (a retry, a push that
+leaves them alone) hits them.
+
+**Never put `--shard` (or any argument after `--`) on a turbo command that has dependencies.** Turbo
+adds the arguments after `--` to the hash of every task in the graph. A shard that ran
+`turbo run test:scripts -- --shard=N/4` therefore hashed its `demo`, `core#build` and `cli#build`
+differently from `Check packages`, and missed them even when the packages job had them cached (run
+45468426958: `Check packages` hit all 16 tasks, including `demo`, and shard 1 missed all 10). A shard
+now builds in its own step, `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, whose
+hashes equal the packages job's, and runs its files with `bun run --cwd apps/web test:scripts
+--shard=N/4`, with no turbo around it. That is the whole task graph of `test:scripts` (its
+`dependsOn` in `apps/web/turbo.json`), and `tooling/guards/ci-web-split.test.ts` pins both steps and
+that the shard carries no `--`.
 
 ## Where the browser checks go (#377)
 
@@ -78,7 +91,7 @@ and `check` depend on it. Option 1 of #464 was to run it once in its own job and
 jobs that need it. It was measured and **not done**, because it cannot shorten a run.
 
 Measured in the CI logs of five green runs after #378 (four pull request runs and one push to `main`,
-2026-11-24):
+2026-11-24), before the fix above:
 
 | Job | `demo` task | Cache |
 |---|---|---|
@@ -86,18 +99,17 @@ Measured in the CI logs of five green runs after #378 (four pull request runs an
 | `Check packages` | 15.5 s to 20.4 s | miss in 4 of 5 runs |
 | `Check web` | runs beside lint and typecheck, so 3 s to 5 s past `typecheck` | miss in 4 of 5 runs |
 
-The turbo cache does not make it free: a job restores the newest cache for the lockfile, saved by an
-earlier commit, and `demo`'s inputs include `apps/cli/src`, so any command line change misses. The jobs
-of one run start together, so none of them can read a file another one is still making. A shard takes
-4 to 7 minutes, so the 14 s to 23 s is 5 to 8 percent of its time.
+A shard took 3m01s to 7m06s, so `demo` was 3 to 13 percent of one (about 5 percent of the longest). The
+shards missed even when the packages job hit (run 45468426958) because of the `--shard` hash described
+above, not because nothing was cached.
 
-Why a shared job does not win the time back: the shards are the critical path, and they would have to
-wait for the new job, which needs a checkout, the setup action, the engine build, the `demo` task and
-the upload (about 50 s, even started beside `Plan`). Today a shard starts its tests about 75 s in; with
-the artifact it would start them about 75 s in too, with one more job, a new artifact to keep in step
-with the turbo task hash and one more entry in `needs`. The only gain is runner minutes: about 80 s to
-100 s saved, 50 s spent. Look again if `demo` grows past a minute, or if the shards stop being the
-critical path.
+Why a shared job does not win the time back, even with that fixed: the shards are the critical path, and
+they would have to wait for the new job, which needs a checkout, the setup action, the engine build, the
+`demo` task and the upload (about 50 s, even started beside `Plan`). A shard starts its tests 30 to 50 s
+after it starts (the setup, then the build step), so with the artifact it would start them later, with one
+more job, an artifact to keep in step with the turbo task hash and one more entry in `needs`. The only
+gain is runner minutes. With the fix, `demo` is a cache hit in every job of a run that follows one that
+built it, which costs nothing.
 
 ## Not done here
 
