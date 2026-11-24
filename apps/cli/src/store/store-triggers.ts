@@ -1,4 +1,5 @@
 // Test support for contract.test.ts: one real store path per code the store raises itself.
+import type { CommandRaised } from "../command-raised"
 import type { ErrorCode } from "../errors"
 import { coreOnly } from "./core-triggers"
 import { HEAD } from "./migrations"
@@ -31,10 +32,7 @@ export type StoreRaised = Exclude<
 	| "backup_unreadable"
 	// Raised by the projection commands, from the engine's own problems.
 	| "projection_refused"
-	// Raised by tx add's opening form, before the store is asked to write anything.
-	| "liability_opening_positive"
-	// Raised by tx add and tx import from the two accounts they map, before the store is asked.
-	| "same_account"
+	| CommandRaised
 >
 
 function fixture() {

@@ -7,6 +7,7 @@ import type { RestoreCounts, RestoreRows } from "./restore-types"
 import type { AccountRow, EntityRow, PostingRow, TxRow } from "./rows"
 import type { ScenarioStore } from "./scenario-store"
 import type { TxFilter } from "./tx-filter"
+import type { Planning } from "./tx-planning"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
 
 export type * from "./account-types"
@@ -23,6 +24,7 @@ export type {
 export type * from "./scenario-store"
 export type * from "./scenario-types"
 export type { TxFilter } from "./tx-filter"
+export type * from "./tx-planning"
 export type {
 	ImportRejection,
 	NewAmendment,
@@ -58,7 +60,7 @@ export type WriteOptions = { dryRun?: boolean }
  * The only code that reads or writes `traj.db`. Every method returns its value or an `AppError`
  * built by `fail()`; none throws for an expected failure.
  */
-export interface Store extends ScenarioStore {
+export interface Store extends ScenarioStore, Planning {
 	/** The database file this store owns. */
 	readonly path: string
 	/**

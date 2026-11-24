@@ -1,10 +1,13 @@
 /** The contract between `traj --json` and the Dashboard: one strict schema per read leaf and the Snapshot. */
+
 export type { AccountList } from "./account-list"
 export { accountList } from "./account-list"
 export type { AccountRef } from "./account-ref"
 export { accountRef } from "./account-ref"
 export type { AccountType } from "./account-type"
 export { accountType } from "./account-type"
+export type { AccountValue, AccountValues } from "./account-value"
+export { accountValue, accountValues } from "./account-value"
 export type { AmountRow, CurrencyTotal } from "./amount-row"
 export { amountRow, currencyTotal } from "./amount-row"
 export type { Balance } from "./balance"
