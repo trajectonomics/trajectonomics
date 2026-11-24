@@ -5,6 +5,7 @@ import { accountNamesOf, hasCashflow } from "../../lib/view/cashflow/cashflow"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 import CashFlowWhatIf from "../what-if/CashFlowWhatIf.svelte"
 import CashFlowBody from "./CashFlowBody.svelte"
 
@@ -36,6 +37,9 @@ const names = $derived(accountNamesOf(accounts))
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
 	<div class="space-y-8">
+		<p class="text-sm text-muted-foreground">
+			The order money is saved and drawn in is set on <SiteLink href="/routing/" class="underline">Where money goes</SiteLink>.
+		</p>
 		{#if lens}<CashFlowWhatIf {lens} baseline={read.ok ? read.data : null} {year} />{/if}
 		<ReadView {read} label={`Cash flow of ${name}`}>
 			{#snippet children(run)}

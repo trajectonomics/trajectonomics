@@ -196,3 +196,23 @@ _Avoid_: marginal tax rate (in a heading), bracket rate
 **Share of income paid in tax**:
 The tax due as a share of assessable income (`effectiveRateBps`), before expenses and allowances. It is absent when nothing was assessed.
 _Avoid_: effective rate (in a heading), tax rate, average rate
+
+**Routing**:
+The plan's `cashflow` read as three lists the Where money goes page edits: the surplus steps (what happens to money left over), the `contribute` priority (which savings come first) and the `withdraw` entries (what is drawn when money is short). A step and an entry are addressed by position, since neither has an id.
+_Avoid_: waterfall, allocation, priority list
+
+**Surplus step**:
+One row of "When there is money left over": an Account, and everything, an amount it fills up to, or a share of what is left. The last step must take everything.
+_Avoid_: bucket, rule
+
+**Reserve floor**:
+The amount an entry of `withdraw` stops taking an Account down to, while later entries are used first. Setting one adds a later entry that takes the rest of the Account.
+_Avoid_: minimum balance, emergency fund (as the name of the field)
+
+**Target in today's money**:
+An amount of a step or a floor that keeps its value: `{ amount, growth: "inflation" }`. The page shows the document's amount and what the routing echo says of it, never a grown figure of its own.
+_Avoid_: real target, indexed amount
+
+**Planned move**:
+A `transfer` Flow: money moved between the plan's own Accounts, or onto a loan, outside income, spending and saving. It changes no net worth, and counts a gain for tax only when `realise` is on.
+_Avoid_: rebalance, switch, transfer (as a page word)
