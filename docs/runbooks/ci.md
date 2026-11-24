@@ -103,6 +103,19 @@ A shard took 3m01s to 7m06s, so `demo` was 3 to 13 percent of one (about 5 perce
 shards missed even when the packages job hit (run 45468426958) because of the `--shard` hash described
 above, not because nothing was cached.
 
+With the fix, in this pull request's own runs (seconds after the shard's first log line; the build
+step is `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`):
+
+| Run | Build step in a shard | Tests start |
+|---|---|---|
+| Before the fix (two runs, 8 shards) | 21 s to 35 s, `demo` and `cli#build` rebuilt | +32 s to +48 s |
+| Fix, first run (it changed `cli/src` through `main`; 3 of 10 tasks missed, in every job) | 24 s to 29 s | +39 s to +44 s |
+| Fix, second run (the entry the first run saved) | 0.3 s to 0.5 s, 10 of 10 hits (FULL TURBO) | +15 s to +26 s |
+
+So a run that follows one that built the same command line and Demo (a retry, a push to web files only)
+saves about 20 s on every shard, which is where the 3 to 13 percent went. The first run after a command
+line change still builds once per job, as it must.
+
 Why a shared job does not win the time back, even with that fixed: the shards are the critical path, and
 they would have to wait for the new job, which needs a checkout, the setup action, the engine build, the
 `demo` task and the upload (about 50 s, even started beside `Plan`). A shard starts its tests 30 to 50 s
