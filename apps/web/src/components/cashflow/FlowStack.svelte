@@ -40,7 +40,7 @@ const shown = (amount: string): string =>
 				aria-pressed={picked === row.key}
 				onclick={() => onPick(row.key)}
 				onkeydown={(event) => keyed(event, () => onPick(row.key))}
-				class="cursor-pointer outline-none hover:opacity-85 focus-visible:outline-2 focus-visible:outline-ring"
+				class="group cursor-pointer outline-none hover:opacity-85"
 			>
 				<text x={row.labelX} y={row.labelY} dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
 					{stackName(row.label, shown(row.amount))}
@@ -53,7 +53,11 @@ const shown = (amount: string): string =>
 					y={row.barY}
 					width={row.barWidth}
 					height={row.barHeight}
-					class={cx(FLOW_FILL[row.kind], picked === row.key && "stroke-foreground stroke-2")}
+					class={cx(
+						FLOW_FILL[row.kind],
+						picked === row.key && "stroke-foreground stroke-2",
+						"group-focus-visible:stroke-ring group-focus-visible:stroke-2",
+					)}
 				/>
 			</g>
 		{/each}

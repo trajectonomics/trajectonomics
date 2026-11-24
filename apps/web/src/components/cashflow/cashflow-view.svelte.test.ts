@@ -103,7 +103,7 @@ describe("CashFlowView", () => {
 	test("the stacked diagram names every band of the year and shows each CLI figure, grouped, once", () => {
 		const body = renderView({ base: okRun(cashflowRunFixture()) })
 		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
-		expect(stacked).toContain("Money in")
+		expect(stacked).toContain("Where it comes from")
 		expect(stacked).toContain("Where it goes")
 		// Year zero's sources and uses, from the CLI's lines and totals rows with no arithmetic: the figures
 		// are the lines' own amounts, grouped. The refund shows with its sign taken off, as in the wide diagram.
@@ -132,5 +132,22 @@ describe("CashFlowView", () => {
 		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
 		expect(stacked).toContain(">500.00<")
 		expect(body.match(/<div class="sr-only">/g)?.length).toBe(1)
+	})
+
+	test("a focused band shows its ring: a stacked bar follows its group's focus, and a wide band draws its own stroke", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		const stacked = body.slice(body.indexOf("md:hidden"), body.indexOf('<div class="sr-only">'))
+		// The group is the focusable control, so the bar it holds reads the group's focus-visible state.
+		expect(stacked).toContain('class="group cursor-pointer outline-none hover:opacity-85"')
+		expect(stacked).toContain("group-focus-visible:stroke-ring group-focus-visible:stroke-2")
+		// The wide band is itself focusable, so its ring is its own stroke, not an outline SVG does not draw.
+		expect(body).toContain("hover:opacity-85 focus-visible:stroke-ring focus-visible:stroke-2")
+	})
+
+	test("the table's scroll box is a containing block, so the masked amount's screen-reader span cannot widen the page", () => {
+		const body = renderView({ base: okRun(cashflowRunFixture()) })
+		expect(body).toMatch(
+			/<div class="relative max-w-full overflow-x-auto rounded-lg border border-border">\s*<table/,
+		)
 	})
 })

@@ -45,7 +45,7 @@ const shown = (amount: string): string =>
 				onclick={() => onPick(link.key)}
 				onkeydown={(event) => keyed(event, () => onPick(link.key))}
 				class={cx(
-					"cursor-pointer outline-none hover:opacity-85 focus-visible:outline-2 focus-visible:outline-ring",
+					"cursor-pointer outline-none hover:opacity-85 focus-visible:stroke-ring focus-visible:stroke-2",
 					FLOW_FILL[link.kind],
 					picked === link.key && "stroke-foreground stroke-2",
 				)}

@@ -69,7 +69,7 @@ describe("the employer's money on the Cash flow page", () => {
 		expect(section?.amount).toBeNull()
 		expect(section?.note).toContain("never reaches your cash")
 		expect(section?.parts[0]?.lines.map((one) => [lineLabel(one, NAMES), one.amount])).toEqual([
-			["salary-employer (employer) into Provident fund", "6000.00"],
+			["From your employer into Provident fund (salary-employer)", "6000.00"],
 		])
 	})
 

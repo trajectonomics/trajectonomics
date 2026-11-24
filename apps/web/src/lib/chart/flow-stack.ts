@@ -72,7 +72,7 @@ export interface StackLayout {
 	readonly rows: readonly StackRow[]
 }
 
-const HEADINGS = { source: "Money in", use: "Where it goes" } as const
+const HEADINGS = { source: "Where it comes from", use: "Where it goes" } as const
 
 /**
  * The geometry of one year: a heading, then a row for each source from the top, then a heading and a row for

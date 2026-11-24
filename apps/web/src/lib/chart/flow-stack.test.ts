@@ -44,7 +44,7 @@ describe("layoutStack", () => {
 		})
 		expect(layout.width).toBe(320)
 		expect(layout.headings).toEqual([
-			{ side: "source", text: "Money in", x: 8, y: 16 },
+			{ side: "source", text: "Where it comes from", x: 8, y: 16 },
 			{ side: "use", text: "Where it goes", x: 8, y: 80 },
 		])
 		const row = (key: string) => layout.rows.find((entry) => entry.key === key)
