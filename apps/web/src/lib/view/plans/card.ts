@@ -68,12 +68,12 @@ function netWorthOf(run: ProjectionRun): CardNetWorth | null {
 /** The card of one projected plan over a range. Everything on it is a Read the Snapshot holds, shown as it stands. */
 export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCard {
 	const { reads } = snapshot
-	const document = reads.documents[row.name]
+	const shown = reads.documents[row.name]
 	const run = reads.projections[row.name]
 	const chart: PlanChart | null = run?.ok ? planChart(run.data, range) : null
 	return {
 		row,
-		notes: notesPreview(document?.ok ? document.data.scenario.notes : null),
+		notes: notesPreview(shown?.ok ? shown.data.scenario.notes : null),
 		fi: fiOf(reads.fi[row.name]),
 		chance: chanceOf(reads.chance[row.name]),
 		netWorth: run?.ok ? netWorthOf(run.data) : null,
