@@ -8,10 +8,10 @@ No tax is applied; figures are before tax.
 
 routing (6 rows)
 list      entry  account     share  target
-surplus       0  emergency          up to 100000.00 (grown by inflation)
+surplus       0  emergency          up to 100000.00 at the start, grown by inflation
 surplus       1  funds      50.00%
 surplus       2  cash
-withdraw      0  emergency          down to 20000.00 (grown by inflation)
+withdraw      0  emergency          down to 20000.00 at the start, grown by inflation
 withdraw      1  funds
 withdraw      2  emergency
 

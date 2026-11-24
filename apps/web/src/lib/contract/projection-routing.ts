@@ -19,7 +19,8 @@ export const surplusEntry = z.strictObject({
 	entry: integer,
 	account: z.string(),
 	upTo: routedTarget.nullable(),
-	share: integer.nullable(),
+	// The percent of the money still unrouted the step takes, as a string such as "30.00"; null when it takes everything it can.
+	share: z.string().nullable(),
 })
 
 /** One withdrawal entry, by its position in `cashflow.withdraw`. */

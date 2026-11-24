@@ -106,7 +106,7 @@ describe("the projection run contract against the CLI's goldens", () => {
 			upTo: { amount: "100000.00", growth: "inflation" },
 			share: null,
 		})
-		expect(run.routing?.surplus[1]).toMatchObject({ entry: 1, account: "funds", share: 5000 })
+		expect(run.routing?.surplus[1]).toMatchObject({ entry: 1, account: "funds", share: "50.00" })
 		expect(run.routing?.withdraw[1]).toEqual({ entry: 1, account: "funds", downTo: null })
 		const annual = run.tables.find((table) => table.name === "annual")
 		expect(annual?.rows.map((row) => ("transfers" in row ? row.transfers : undefined))).toEqual([

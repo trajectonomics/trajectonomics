@@ -143,8 +143,21 @@ describe("--set a share or a cap", () => {
 			entry: 0,
 			account: "emergency",
 			upTo: { amount: "50000.00", growth: "inflation" },
-			share: 2000,
+			share: "20.00",
 		})
+	})
+
+	it("reads a share as a percent string under --decimal, and refuses a number there", async () => {
+		const home = await routingHome()
+		const minor = await run(home, ["--set", "cashflow.surplus.1.share=2500"])
+		const decimal = await run(home, ["--decimal", "--set", 'cashflow.surplus.1.share="25.00"'])
+		expect(decimal.code).toBe(0)
+		expect(echoed(decimal).scenario.effectiveContentHash).toBe(
+			echoed(minor).scenario.effectiveContentHash,
+		)
+		const number = await run(home, ["--decimal", "--set", "cashflow.surplus.1.share=2500"])
+		expect(number.code).toBe(2)
+		expect(errorOf(number).message).toContain("JSON number")
 	})
 })
 

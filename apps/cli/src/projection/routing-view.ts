@@ -20,7 +20,7 @@ export type SurplusEntryView = {
 	entry: number
 	account: string
 	upTo: RoutedTargetView | null
-	share: number | null
+	share: string | null
 }
 
 /** One withdrawal entry, by its position in `cashflow.withdraw`. */
@@ -59,11 +59,10 @@ const surplusEntry: z.ZodType<SurplusEntryView> = z.strictObject({
 		.nullable()
 		.describe("The balance the step fills the Account to; null when it has no cap."),
 	share: z
-		.number()
-		.int()
+		.string()
 		.nullable()
 		.describe(
-			"Basis points of the money still unrouted the step takes (3000 is 30%); null when the step takes everything it can.",
+			'The percent of the money still unrouted the step takes, as a string with two places ("30.00" is 30%); null when the step takes everything it can.',
 		),
 })
 

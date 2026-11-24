@@ -25,7 +25,7 @@ const DOCUMENT = {
 	cashflow: {
 		surplus: [
 			{ account: "emergency", upTo: { amount: "100000.00", growth: "inflation" } },
-			{ account: "funds", share: 5000, upTo: "50000.00" },
+			{ account: "funds", share: "50.00", upTo: "50000.00" },
 			{ account: "cash" },
 		],
 		contribute: [],
@@ -56,10 +56,10 @@ describe("the Scenario document contract with the routing forms", () => {
 		expect(scenarioDocument.safeParse(without).success).toBe(true)
 	})
 
-	it("refuses a share that is not an integer and a target that is not money", () => {
+	it("refuses a share that is a number, not a percent string, and a target that is not money", () => {
 		const share = {
 			...DOCUMENT,
-			cashflow: { ...DOCUMENT.cashflow, surplus: [{ account: "cash", share: 2.5 }] },
+			cashflow: { ...DOCUMENT.cashflow, surplus: [{ account: "cash", share: 5000 }] },
 		}
 		expect(scenarioDocument.safeParse(share).success).toBe(false)
 		const target = {

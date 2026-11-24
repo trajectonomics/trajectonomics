@@ -15,7 +15,7 @@ export const routedAmount = z.union([
 
 /**
  * The Scenario's `cashflow` in the decimal form (sim ADR 0030, cli ADR-0070): the surplus steps, each with an optional
- * `upTo` and `share` in basis points, and the withdrawal entries, each an Account's id or `{ account, downTo }`. Any key
+ * `upTo` and `share` (a percent string such as "30.00", as a rate is in the decimal form), and the withdrawal entries, each an Account's id or `{ account, downTo }`. Any key
  * it does not know is kept as it is. Each list is optional, so a partial document a view builds still decodes; the engine requires all three.
  */
 export const scenarioCashflow = z.looseObject({
@@ -24,7 +24,7 @@ export const scenarioCashflow = z.looseObject({
 			z.looseObject({
 				account: z.string(),
 				upTo: routedAmount.optional(),
-				share: z.number().int().optional(),
+				share: z.string().optional(),
 			}),
 		)
 		.optional(),

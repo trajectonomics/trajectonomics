@@ -1,5 +1,5 @@
 import { growthShape } from "./growth-shape"
-import { BASIS_POINTS, CONTRIBUTION_CAP, ROUTED_UNITS } from "./terms"
+import { CONTRIBUTION_CAP, ROUTED_UNITS, ROUTING_SHARE_UNITS } from "./terms"
 
 /*
  * Where the Scenario's money goes (sim ADR 0030, cli ADR-0070). A surplus step may take a share of what is
@@ -15,7 +15,7 @@ const TARGET_GROWTH = growthShape(
 /** A routing target that keeps its value: the amount, grown by whole years from the Timeline start. */
 const grownTarget = (noun: string): Record<string, unknown> => ({
 	type: "object",
-	description: `The ${noun} as an amount that is grown by whole years from the start of the Timeline (half up each year, as a spending rule's floor is), so it keeps its value in today's money. Without growth, state it as a whole number of minor units.`,
+	description: `The ${noun} as an amount that is grown by whole years from the start of the Timeline (half up each year, as a spending rule's floor is), so it keeps its value in today's money. Without growth, state the amount alone.`,
 	properties: {
 		amount: {
 			type: "integer",
@@ -30,7 +30,7 @@ const grownTarget = (noun: string): Record<string, unknown> => ({
 /** An `upTo` or a `downTo`: a whole number of minor units, or `{ amount, growth }`. */
 const targetShape = (noun: string, plain: string): Record<string, unknown> => ({
 	anyOf: [{ type: "integer", description: `${ROUTED_UNITS} ${plain}` }, grownTarget(noun)],
-	description: `${plain} A whole number of minor units is nominal and stays what it says; \`{ "amount", "growth" }\` is grown by whole years from the start of the Timeline, so it keeps its value in today's money.`,
+	description: `${plain} A plain amount is nominal and stays what it says; \`{ "amount", "growth" }\` is grown by whole years from the start of the Timeline, so it keeps its value in today's money.`,
 })
 
 /** One surplus step. */
@@ -46,7 +46,7 @@ const surplusStepShape: Record<string, unknown> = {
 			type: "integer",
 			minimum: 1,
 			maximum: 10000,
-			description: `${BASIS_POINTS} The step takes this share of the money still unrouted when it is reached (floor of the left-over times \`share\` over 10000, never rounded up) and no more than \`upTo\` leaves room for; the rest moves to the next step. 3000 is 30%. Without \`share\` a step takes everything it can. A step with \`share\` cannot be the last step, which takes what is left.`,
+			description: `${ROUTING_SHARE_UNITS} The step takes this share of the money still unrouted when it is reached (rounded down, never up) and no more than \`upTo\` leaves room for; the rest moves to the next step. Without \`share\` a step takes everything it can. A step with \`share\` cannot be the last step, which takes what is left.`,
 		},
 	},
 	required: ["account"],

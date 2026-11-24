@@ -8,13 +8,15 @@ import {
 	PERCENT_UNITS,
 	PRINCIPAL_UNITS,
 	ROUTED_UNITS,
+	ROUTING_PERCENT_UNITS,
+	ROUTING_SHARE_UNITS,
 	RULE_RATE_UNITS,
 	YEARLY_UNITS,
 } from "./shape/terms"
 
 /*
  * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's, an
- * estate line's or an Account's payout or fee rates (cli ADR-0063, ADR-0064, ADR-0067). Nothing lists them by hand: a money field is a node of the published document
+ * estate line's or an Account's payout or fee rates, or a surplus step's share (cli ADR-0063, ADR-0064, ADR-0067, ADR-0070). Nothing lists them by hand: a money field is a node of the published document
  * schema whose description starts with one of the money units (MINOR_UNITS, PRINCIPAL_UNITS for a
  * loan's principal, YEARLY_UNITS for a rule's bound), and a rule rate one whose description starts
  * with RULE_RATE_UNITS, so the decimal conversion and `traj schema` read the same schema and cannot
@@ -38,6 +40,7 @@ const RATE_UNITS: readonly RateUnit[] = [
 	{ stored: RULE_RATE_UNITS, percent: PERCENT_UNITS },
 	{ stored: ESTATE_RATE_UNITS, percent: ESTATE_PERCENT_UNITS },
 	{ stored: ACCOUNT_RATE_UNITS, percent: ACCOUNT_PERCENT_UNITS },
+	{ stored: ROUTING_SHARE_UNITS, percent: ROUTING_PERCENT_UNITS },
 ]
 
 /** How the decimal form writes a field: money as the Currency's major unit, a rule's rate as a percent. */

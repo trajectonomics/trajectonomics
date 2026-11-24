@@ -42,7 +42,7 @@ describe("scenario apply, with a share, a floor, a target that keeps its value a
 		const decimal = documentOf(await scenario(home, ["show", "plan", "--decimal"]))
 		const cashflow = decimal["cashflow"] as { surplus: Doc[]; withdraw: unknown[] }
 		expect(cashflow.surplus[0]?.["upTo"]).toEqual({ amount: "100000.00", growth: "inflation" })
-		expect(cashflow.surplus[1]).toEqual({ account: "funds", share: 5000 })
+		expect(cashflow.surplus[1]).toEqual({ account: "funds", share: "50.00" })
 		expect(cashflow.withdraw[0]).toEqual({
 			account: "emergency",
 			downTo: { amount: "20000.00", growth: "inflation" },

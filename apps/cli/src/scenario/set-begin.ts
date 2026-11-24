@@ -93,3 +93,18 @@ export function beginsWithdrawFloor(
 		prefix[1] === "withdraw"
 	)
 }
+
+/**
+ * The keys a `--set` may begin on the object at `prefix`, so a refusal that lists the keys there names them
+ * too: the estate block at the root, an asset Account's `volatility`, a surplus step's `share` and `upTo`.
+ */
+export function beginnableKeysAt(
+	node: Record<string, unknown>,
+	prefix: readonly string[],
+): readonly string[] {
+	const keys = [...(prefix.length === 0 ? BEGINNABLE_BLOCKS : [])]
+	for (const key of ["volatility", ...STEP_KEYS]) {
+		if (beginsKey(node, key, prefix)) keys.push(key)
+	}
+	return keys.filter((key) => !Object.hasOwn(node, key))
+}

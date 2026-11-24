@@ -22,9 +22,10 @@ transfer did, so the Dashboard shows it without arithmetic (web ADR 0002). The C
   an amount per occurrence or per year. `growth` is the Flow's own two forms (`growth-shape.ts`).
 - **The decimal form reads the form it was given.** `mapDecimalFields` follows an `anyOf` by the value: an object by the branch with
   `properties`, anything else by the plain branch. So `downTo` and `upTo` are major units and `{ amount, growth }`'s `amount` too, and the
-  round trip is byte for byte (`scenario-routing.test.ts` hashes it). `share` stays an integer of basis points in both forms: it is a
-  share of what is left, as a Levy's prepayment is, and a `--set` that moves it is `cashflow.surplus.1.share=2500`. (ADR-0067's percent
-  form is for the rates a person types as per cent; a step's share is written beside the account it fills, in the unit the engine states.)
+  round trip is byte for byte (`scenario-routing.test.ts` hashes it). `share` is a percent string in the decimal form, as the rates of ADR-0063, ADR-0064 and ADR-0067 are: a share of a value the caller
+  types is written as a percent, `"30.00"` for 30%, and the integer of basis points is the stored form. A `--set` that moves it is
+  `cashflow.surplus.1.share=2500`, or `cashflow.surplus.1.share="25.00"` under `--decimal`. It is changed before 0.8.0 because a change after it would break every caller.
+  A rate of change (a `growth`'s `bps`) stays an integer. A surplus step's share is a share of the money still unrouted (`ROUTING_SHARE_UNITS`).
 - **`--set` addresses a routing step and entry by position.** The two routing lists have no `id`, so the one place the Override grammar
   names a list item by position is `cashflow.surplus` and `cashflow.withdraw` (`POSITIONAL_LISTS`, `src/scenario/positional.ts`):
   `cashflow.surplus.0.share`, `cashflow.surplus.1.upTo`, `cashflow.withdraw.0.downTo`, and a path under an object target
@@ -52,7 +53,7 @@ Each is present only when the Scenario or the flag asks for it, so a run without
   one moved or could not move something. `unmoved` is what the Flow planned and did not move: no Shortfall and in no net.
 - **The Liability statement** gains `transferred` on each month of a loan a transfer pays down, apart from `paid`:
   `opening + drawn + interest − paid − transferred = closing`. A loan no transfer targets has no such key.
-- **A `routing` echo**: each surplus step and withdraw entry by position (`entry`) with its Account, its `share` in basis points and its
+- **A `routing` echo**: each surplus step and withdraw entry by position (`entry`) with its Account, its `share` as a percent string (`null` when the step has none) and its
   `upTo` or `downTo` as `{ amount, growth }` (`growth` is null for a nominal figure), as the document states them. It is present only when
   the document uses a share, a floor or a target that keeps its value. In the human form it is a table before the cash-flow blocks, and each
   year's block adds `moved between accounts (not cash)` with a line per transfer and what it did not move.
@@ -60,7 +61,8 @@ Each is present only when the Scenario or the flag asks for it, so a run without
   and at the horizon. The engine states no such figure: `routedAt` is internal to `sim`, and the Projection and its breakdown carry only
   what was drawn and filled. Computing it here would be the CLI re-implementing the engine's whole-year growth and half-up rounding
   (cli AGENTS rule 3, ADR-0058), so the echo carries the document's `{ amount, growth }` and no resolved figure. A resolved figure needs a
-  `sim` change first (a field on the Projection, or an exported resolver), and then an additive field on the echo.
+  `sim` change first (a field on the Projection, or an exported resolver), and then an additive field on the echo. #458 is that follow-up:
+  it adds `resolved: { first, horizon }` to each grown target once `sim` states them.
 - **The web contract** decodes each field, with no page change: `transfers` on the annual row, `entry` on a cash-flow line, the
   `transfers` table, `transferred` on a loan month, `routing` on the run, and the `transfer` Flow kind with `realise` and a typed
   `cashflow` on the document. A CLI-written golden (`run-routing.output`) is decoded by the contract's test.
@@ -69,7 +71,8 @@ Each is present only when the Scenario or the flag asks for it, so a run without
 
 - **A group `transfer` in the cash-flow long table.** Rejected: a row carries one `account`, so a transfer's two Accounts and its
   `unmoved` would not fit, and a new key on every row would change the bytes of every `--breakdown` output. A table of its own does not.
-- **`share` as a percent string in the decimal form.** Rejected for now, as above: it is the engine's unit, and a page that moves it sends an integer.
+- **`share` as an integer of basis points in the decimal form too.** Rejected: every other share a person types is a percent string in that
+  form (ADR-0063, ADR-0064, ADR-0067), so an integer here would be the one exception, and a change after 0.8.0 would break callers.
 - **Addressing every id-less list by position.** Rejected: a spending rule's `steps` would become addressable with no need. The two
   routing lists are the explicit list `POSITIONAL_LISTS`, and a list joins it in the pull request that needs it.
 - **Computing the resolved target in the CLI.** Rejected, see above.

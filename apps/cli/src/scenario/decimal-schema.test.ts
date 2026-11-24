@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import { decimalDocument, decimalRoot } from "./decimal-schema"
 import { moneyPathsOf, PUBLISHED, ratePathsOf } from "./money-fields"
+import { MINOR_UNITS_HEAD } from "./shape/terms"
 
 type Schema = Record<string, unknown>
 
@@ -87,6 +88,23 @@ describe("the decimal form's percent fields", () => {
 			expect(prose.match(/\b\d{3,}\b/g) ?? []).toEqual([])
 		})
 	}
+})
+
+describe("the decimal form's cashflow", () => {
+	it('tells a reader to write major units: "minor units" is in no description, the unit head included', () => {
+		const published = z.toJSONSchema(decimalDocument, { io: "input" }) as Schema
+		const cashflow = (published["properties"] as Schema)["cashflow"]
+		const described = nodesWithHead(cashflow, "")
+		expect(described.length).toBeGreaterThan(5)
+		for (const node of described) expect(String(node["description"])).not.toMatch(/minor units?/i)
+		// The minor-unit form keeps the words, only inside the unit head.
+		const minor = nodesWithHead((PUBLISHED["properties"] as Schema)["cashflow"], "")
+		const heads = minor.filter((node) => /minor units?/i.test(String(node["description"])))
+		expect(heads.length).toBeGreaterThan(0)
+		for (const node of heads) {
+			expect(String(node["description"]).replace(MINOR_UNITS_HEAD, "")).not.toMatch(/minor units?/i)
+		}
+	})
 })
 
 describe("the decimal form's root description", () => {

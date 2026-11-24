@@ -1,7 +1,13 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { isPositionalList, positionOf } from "./positional"
-import { beginsKey, beginsWithdrawFloor, isBeginnableBlock, unbegunBlock } from "./set-begin"
+import {
+	beginnableKeysAt,
+	beginsKey,
+	beginsWithdrawFloor,
+	isBeginnableBlock,
+	unbegunBlock,
+} from "./set-begin"
 import {
 	ambiguousSegment,
 	identityFailure,
@@ -41,7 +47,9 @@ function replaceInObject(
 		return { ...node, [segment]: ctx.value }
 	}
 	if (!Object.hasOwn(node, segment)) {
-		return unknownSegment(candidatesAt(node), segment, rest, prefix, ctx)
+		// The keys a Set may begin here are known paths too, so a typo near `share` is told so.
+		const known = [...candidatesAt(node), ...beginnableKeysAt(node, prefix)]
+		return unknownSegment(known, segment, rest, prefix, ctx)
 	}
 	const child = replaceAt(node[segment], rest, [...prefix, segment], ctx)
 	return isAppError(child) ? child : { ...node, [segment]: child }

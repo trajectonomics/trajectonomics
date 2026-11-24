@@ -61,6 +61,14 @@ export const PERCENT_UNITS =
 export const BASIS_POINTS =
 	"Integer basis points (1 bps = 0.01%), so 3% is 300 and 0.01 is not a rate."
 
+/** The unit of a surplus step's `share`: basis points of what is still unrouted. The decimal form writes it as a percent (cli ADR-0070). */
+export const ROUTING_SHARE_UNITS =
+	"Integer basis points of the money still unrouted (1 bps = 0.01%), so 30% is 3000."
+
+/** The unit of a surplus step's `share` in the decimal form: a percent string, exact to the basis point. */
+export const ROUTING_PERCENT_UNITS =
+	'A percent string of the money still unrouted (never a JSON number), such as "30.00" for 30%, with at most two places.'
+
 export const DATE = "YYYY-MM-DD, Gregorian, never the Buddhist calendar."
 
 /**

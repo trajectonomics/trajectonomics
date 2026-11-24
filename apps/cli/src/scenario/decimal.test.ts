@@ -35,8 +35,8 @@ describe("the money fields of the decimal form", () => {
 		])
 	})
 
-	it("write a spending rule's rates, an estate share and an Account's payout and fee, and no other rate, as percent strings", () => {
-		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063, ADR-0064, ADR-0067).
+	it("write a spending rule's rates, an estate share, an Account's payout and fee and a surplus step's share, and no other rate, as percent strings", () => {
+		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063, ADR-0064, ADR-0067, ADR-0070).
 		expect(ratePathsOf(PUBLISHED)).toEqual([
 			"accounts[].payout.bps",
 			"accounts[].fee.bps",
@@ -46,9 +46,23 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.upper.adjustBps",
 			"flows[].rule.lower.bps",
 			"flows[].rule.lower.adjustBps",
+			"cashflow.surplus[].share",
 			"estate.costs[].bps",
 			"estate.gifts[].bps",
 		])
+	})
+
+	it("round-trips a surplus step's share, every basis point from 1 to 10000", () => {
+		for (let bps = 1; bps <= 10_000; bps++) {
+			const minor = {
+				currency: "THB",
+				cashflow: { surplus: [{ account: "a", share: bps }, { account: "b" }] },
+			}
+			const decimal = decimalOk(minor)
+			const share = ((decimal["cashflow"] as Doc)["surplus"] as Doc[])[0]?.["share"]
+			expect(typeof share, String(bps)).toBe("string")
+			expect(fromDecimalForm(decimal), String(bps)).toEqual(minor)
+		}
 	})
 
 	for (const path of moneyPathsOf(PUBLISHED)) {

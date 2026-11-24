@@ -1,4 +1,5 @@
 import type { RoutedAmount, Scenario } from "@trajectonomics/core/sim"
+import { formatPercent } from "../scenario/percent"
 import { moneyOf } from "./money"
 import type {
 	RoutedTargetView,
@@ -37,7 +38,7 @@ export function routingOf(document: Scenario, currency: string): RoutingView | u
 		entry,
 		account: step.account,
 		upTo: step.upTo === undefined ? null : targetOf(step.upTo, money),
-		share: step.share ?? null,
+		share: step.share === undefined ? null : formatPercent(step.share),
 	}))
 	const withdraw: WithdrawEntryView[] = cashflow.withdraw.map((item, entry) =>
 		typeof item === "string"

@@ -1,8 +1,10 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { formatPath } from "./path"
+import { isPositionalList } from "./positional"
 import { ambiguousSegment, type SegmentContext, scalarPrefix, unknownSegment } from "./set-error"
 import { flagError } from "./set-parse"
+import { refusedRoutingItem } from "./set-routing-refusal"
 import { candidatesAt } from "./set-suggest"
 
 /*
@@ -57,6 +59,7 @@ function removeFromList(
 	ctx: SegmentContext,
 ): unknown | AppError {
 	const segment = ctx.segments[depth] ?? ""
+	if (isPositionalList(prefix)) return refusedRoutingItem(segment, prefix, ctx)
 	if (/^[0-9]+$/.test(segment)) return indexSegment(segment, ctx)
 	const matches = node.flatMap((item, at) =>
 		isPlainObject(item) && item["id"] === segment ? [at] : [],

@@ -1,4 +1,3 @@
-import { formatPercent } from "../scenario/percent"
 import { isRecord, tableLines } from "../table/lines"
 
 /*
@@ -14,14 +13,14 @@ const COLUMNS = [
 	{ key: "target", label: "target" },
 ] as const
 
-/** A target as a person reads it: `up to 200000.00 (in today's money, grown by inflation)`. */
+/** A target as a person reads it: `up to 20000.00 at the start, grown by inflation`. */
 function targetText(prefix: string, value: unknown): string {
 	if (!isRecord(value)) return ""
 	const growth = value["growth"]
 	const amount = `${prefix} ${String(value["amount"])}`
 	if (growth === null || growth === undefined) return amount
 	const by = isRecord(growth) ? `${String(growth["bps"])} bps a year` : String(growth)
-	return `${amount} (grown by ${by})`
+	return `${amount} at the start, grown by ${by}`
 }
 
 function rowsOf(list: string, entries: unknown, key: "upTo" | "downTo", prefix: string) {
@@ -30,7 +29,7 @@ function rowsOf(list: string, entries: unknown, key: "upTo" | "downTo", prefix: 
 		list,
 		entry: entry["entry"],
 		account: entry["account"],
-		share: typeof entry["share"] === "number" ? `${formatPercent(entry["share"])}%` : "",
+		share: typeof entry["share"] === "string" ? `${entry["share"]}%` : "",
 		target: targetText(prefix, entry[key]),
 	}))
 }

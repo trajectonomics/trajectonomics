@@ -370,7 +370,7 @@ Contributions the cash could not fund; it is not in saving.
 > **Ships in 0.8.0.**
 
 `cashflow` takes three more forms, every figure in them the caller's own (`traj` ships none): a surplus step's `share`, which takes that
-many basis points of what is still unrouted instead of everything; a `withdraw` entry that is `{ account, downTo }`, which keeps a Reserve floor
+many basis points of what is still unrouted instead of everything (a percent string such as `"30.00"` under `--decimal`); a `withdraw` entry that is `{ account, downTo }`, which keeps a Reserve floor
 in the Account while the others are drawn; and an `upTo` or `downTo` that is `{ amount, growth }`, which keeps its value in today's money. A
 Flow of `kind: "transfer"` moves money between two of the plan's own Accounts, outside cashflow: a provident fund rolled into a locked RMF, or
 a monthly amount from savings paying a loan down. `traj schema scenario apply` describes each, and `--set` reaches a step or an entry by
