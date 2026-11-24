@@ -1,3 +1,4 @@
+import { MONEY_GROUP } from "./nav-money"
 import { OPTIMIZE_GROUPS } from "./nav-optimize"
 import type { NavGroup } from "./routes"
 
@@ -48,18 +49,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 		],
 	},
 	...OPTIMIZE_GROUPS,
-	{
-		heading: null,
-		routes: [
-			{
-				path: "/cash-flow/",
-				label: "Cash flow",
-				page: "CashFlowPage",
-				icon: "workflow",
-				needsCashflow: true,
-			},
-		],
-	},
+	MONEY_GROUP,
 	{
 		heading: null,
 		routes: [{ path: "/chance/", label: "Chance of success", page: "ChancePage", icon: "target" }],
