@@ -2,9 +2,11 @@
  * One loan as a card on the Assets and debts page: its terms as the document states them, and its statement
  * as `traj` prints it. Every amount is the CLI's decimal string; the card computes nothing.
  */
-import type { ProjectionRun, ScenarioDocument, ScenarioFlow } from "../../contract"
+import type { Baseline, ProjectionRun, Read, ScenarioDocument, ScenarioFlow } from "../../contract"
 import { formatBps } from "../../format/bps"
+import { balanceOf } from "./accounts"
 import { groupedIds } from "./asset-document"
+import { type GroupSwitch, loanSwitch } from "./group-switch"
 import { type LoanParts, loanPartsOf } from "./loan-document"
 import { type LoanStatement, type LoanTerms, statementOf } from "./loan-statement"
 import type { LoanRow } from "./loans"
@@ -27,6 +29,8 @@ export interface LoanCardView {
 	/** The loan's terms as text rows: its rate, when it borrows, its payments, its first payment and rounding. */
 	readonly rows: readonly LoanRow[]
 	readonly statement: LoanStatement
+	/** What a What-if switch takes out with the loan: its parts go together, and so does a Try. */
+	readonly switch: GroupSwitch
 }
 
 /** The rows of a loan's terms, from its document parts alone. */
@@ -61,13 +65,21 @@ function termsOfStatement(doc: ScenarioDocument, loan: LoanParts): LoanTerms {
 					flow.target === loan.account.id &&
 					flow.id !== loan.payment.id,
 			)
-			.map((flow) => ({ start: flow.start, end: flow.end, once: flow.frequency === "once" })),
+			.map((flow) => ({ start: flow.start, end: flow.end, frequency: flow.frequency })),
 	}
 }
 
 /** The loan cards of a plan, in the order its document holds the loans, each with its statement. */
-export function loanCardsOf(doc: ScenarioDocument, run: ProjectionRun | undefined): LoanCardView[] {
+export function loanCardsOf(
+	doc: ScenarioDocument,
+	run: ProjectionRun | undefined,
+	baseline?: Read<Baseline>,
+): LoanCardView[] {
 	const grouped = groupedIds(doc)
+	const held = (id: string) => {
+		const account = doc.accounts.find((item) => item.id === id)
+		return account !== undefined && balanceOf(account, baseline) !== null
+	}
 	return loanPartsOf(doc)
 		.filter((loan) => !grouped.has(loan.account.id))
 		.map((loan) => ({
@@ -76,6 +88,7 @@ export function loanCardsOf(doc: ScenarioDocument, run: ProjectionRun | undefine
 			principal: loan.payment.level?.principal ?? "",
 			rows: termsOf(loan),
 			statement: statementOf(run, loan.account.id, termsOfStatement(doc, loan)),
+			switch: loanSwitch(doc, loan, held),
 		}))
 }
 

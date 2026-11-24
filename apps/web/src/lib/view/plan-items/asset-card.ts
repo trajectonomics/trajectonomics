@@ -7,16 +7,10 @@ import type { Baseline, ProjectionRun, Read, ScenarioDocument, ScenarioFlow } fr
 import { balanceOf } from "./accounts"
 import { type AssetChart, assetChartOf } from "./asset-chart"
 import { realAssetsOf } from "./asset-document"
-import { assetIds } from "./asset-ids"
-import { type AssetParts, flowsOf } from "./asset-parts"
+import type { AssetParts } from "./asset-parts"
 import { type AssetRow, assetRows } from "./asset-rows"
 import { type AssetYear, assetYearOf, unfundedYearsOf } from "./asset-year"
-
-/** An item of the asset a What-if switch can take out, by the Flow's id. */
-export interface AssetSwitch {
-	readonly id: string
-	readonly label: string
-}
+import { assetSwitch, type GroupSwitch } from "./group-switch"
 
 /** One real asset's card. */
 export interface AssetCardView {
@@ -38,31 +32,13 @@ export interface AssetCardView {
 	readonly untaxed: boolean
 	/** The ids that follow the asset's convention but were changed outside the form. */
 	readonly outside: readonly string[]
-	readonly switches: readonly AssetSwitch[]
+	/** What a What-if switch takes out with the asset: its parts go together, and so does a Try. */
+	readonly switch: GroupSwitch
 }
 
 /** Whether a Flow is there and carries no Tally label, so a Levy does not tax it (the form sets none). */
 function unlabelled(flow: ScenarioFlow | null): boolean {
 	return flow !== null && typeof flow["label"] !== "string"
-}
-
-const LABELS: Readonly<Record<string, string>> = {
-	purchase: "Purchase",
-	buyCost: "Buying costs",
-	loanDraw: "Loan",
-	loanPayment: "Loan payments",
-	running: "Running costs",
-	rent: "Rent",
-	sale: "Sale",
-	saleCost: "Selling costs",
-	loanPayoff: "Loan repaid from the sale",
-}
-
-/** The Flows of the asset a What-if can switch off, each with its label. */
-function switchesOf(parts: AssetParts): AssetSwitch[] {
-	const ids = assetIds(parts.account.id)
-	const roleOf = (flowId: string) => Object.entries(ids).find(([, id]) => id === flowId)?.[0] ?? ""
-	return flowsOf(parts).map((flow) => ({ id: flow.id, label: LABELS[roleOf(flow.id)] ?? flow.id }))
 }
 
 /** The loan's paid-off date from the run's `paidOff` table. */
@@ -80,9 +56,17 @@ function loanOf(run: ProjectionRun | undefined, parts: AssetParts): AssetCardVie
 function cardOf(
 	parts: AssetParts,
 	outside: readonly string[],
-	context: { baseline: Read<Baseline> | undefined; run: ProjectionRun | undefined },
+	context: {
+		doc: ScenarioDocument
+		baseline: Read<Baseline> | undefined
+		run: ProjectionRun | undefined
+	},
 ): AssetCardView {
-	const { baseline, run } = context
+	const { doc, baseline, run } = context
+	const held = (id: string) => {
+		const account = doc.accounts.find((item) => item.id === id)
+		return account !== undefined && balanceOf(account, baseline) !== null
+	}
 	const owned = parts.purchase === null
 	const baselineValue = owned ? balanceOf(parts.account, baseline) : null
 	const named = baseline?.ok
@@ -101,7 +85,7 @@ function cardOf(
 		untaxed:
 			run !== undefined && run.tax !== "not_applied" && [parts.rent, parts.sale].some(unlabelled),
 		outside,
-		switches: switchesOf(parts),
+		switch: assetSwitch(doc, { parts, outside }, held),
 	}
 }
 
@@ -111,5 +95,7 @@ export function assetCardsOf(
 	baseline: Read<Baseline> | undefined,
 	run: ProjectionRun | undefined,
 ): AssetCardView[] {
-	return realAssetsOf(doc).map((asset) => cardOf(asset.parts, asset.outside, { baseline, run }))
+	return realAssetsOf(doc).map((asset) =>
+		cardOf(asset.parts, asset.outside, { doc, baseline, run }),
+	)
 }

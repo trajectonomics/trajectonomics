@@ -36,7 +36,12 @@ export function runWithLoan(): ProjectionRun {
 }
 
 export function assets(
-	options: { doc?: ScenarioDocument; editable?: boolean; run?: ProjectionRun } = {},
+	options: {
+		doc?: ScenarioDocument
+		editable?: boolean
+		run?: ProjectionRun
+		baseline?: ReturnType<typeof baselineRead>
+	} = {},
 ): string {
 	return render(PlanItemsList, {
 		props: {
@@ -44,7 +49,7 @@ export function assets(
 			name: "base",
 			doc: options.doc ?? loanPlanDocument(),
 			household: null,
-			baseline: baselineRead(),
+			baseline: options.baseline ?? baselineRead(),
 			run: options.run,
 			editable: options.editable ?? true,
 			contentHash: HASH,

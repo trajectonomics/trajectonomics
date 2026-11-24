@@ -113,7 +113,7 @@ export class WhatIfChanges extends WhatIfState {
 	}
 
 	/** The session a change to `plan` goes into: this one, a new one, or null when changes on another plan must be settled first. */
-	private sessionFor(plan: string, contentHash: string): WhatIf | null {
+	protected sessionFor(plan: string, contentHash: string): WhatIf | null {
 		if (this.whatIf !== null && this.whatIf.plan === plan) return this.whatIf
 		if (this.active) {
 			this.asking = plan
@@ -123,7 +123,7 @@ export class WhatIfChanges extends WhatIfState {
 	}
 
 	/** Holds the session after a change and reads it again; a session with no change left ends, on every path. */
-	private keep(next: WhatIf): void {
+	protected keep(next: WhatIf): void {
 		if (!hasChanges(next)) {
 			this.end()
 			return

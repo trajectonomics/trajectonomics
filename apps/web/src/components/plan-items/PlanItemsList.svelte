@@ -12,8 +12,7 @@ import { assetCardsOf } from "../../lib/view/plan-items/asset-card"
 import { assetsWithFlows } from "../../lib/view/plan-items/asset-link"
 import type { PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
-import { loanCardsOf, unplacedFlows } from "../../lib/view/plan-items/loan-card"
-import { loanCards } from "../../lib/view/plan-items/loans"
+import { loanPage } from "../../lib/view/what-if/loan-items"
 import { accountItems, flowItems } from "../../lib/view/what-if/plan-items"
 import EmptyState from "../ui/EmptyState.svelte"
 import AssetItems from "./AssetItems.svelte"
@@ -52,8 +51,7 @@ const flows = $derived(flowItems(doc, kind, household, changes))
 const accounts = $derived(accountItems(doc, baseline, changes))
 const assets = $derived(kind === "assets" ? assetCardsOf(doc, baseline, run) : [])
 const grouped = $derived(kind === "assets" ? [] : assetsWithFlows(doc, kind))
-const loans = $derived(kind === "assets" ? loanCardsOf(doc, run) : [])
-const other = $derived(kind === "assets" ? loanCards(unplacedFlows(doc)) : [])
+const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
 </script>
 
 <div class="space-y-4">
@@ -68,8 +66,9 @@ const other = $derived(kind === "assets" ? loanCards(unplacedFlows(doc)) : [])
 			accounts={accounts.cards}
 			marks={accounts.marks}
 			{assets}
-			{loans}
-			{other}
+			loans={loans.cards}
+			loanMarks={loans.marks}
+			other={loans.other}
 			currency={doc.currency}
 			{editable}
 			plan={name}

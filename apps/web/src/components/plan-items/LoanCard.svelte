@@ -1,11 +1,15 @@
 <script lang="ts">
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
+import { type LoanMarks, NO_LOAN_MARKS } from "../../lib/view/what-if/loan-items"
 import Money from "../ui/Money.svelte"
-import ItemSwitch from "../what-if/ItemSwitch.svelte"
+import GroupSwitch from "../what-if/GroupSwitch.svelte"
+import WasText from "../what-if/WasText.svelte"
 import LoanSchedule from "./LoanSchedule.svelte"
 
 interface Props {
 	card: LoanCardView
+	/** What the What-if session changes in the card: the baseline's text struck through, or off. */
+	marks?: LoanMarks
 	currency: string
 	editable: boolean
 	/** The plan and the content hash the page read for it: the what-if switch names both. */
@@ -16,13 +20,23 @@ interface Props {
 	onTry: () => void
 }
 
-let { card, currency, editable, plan, contentHash, onEdit, onPay, onTry }: Props = $props()
+let {
+	card,
+	marks = NO_LOAN_MARKS,
+	currency,
+	editable,
+	plan,
+	contentHash,
+	onEdit,
+	onPay,
+	onTry,
+}: Props = $props()
 const statement = $derived(card.statement)
 const button =
 	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 </script>
 
-<li class="min-w-0 rounded-lg border border-border bg-card p-4">
+<li class="min-w-0 rounded-lg border border-border bg-card p-4 {marks.off ? 'opacity-60' : ''}">
 	<div class="flex flex-wrap items-start justify-between gap-3">
 		<h3 class="font-semibold break-all">{card.id}</h3>
 		{#if editable}
@@ -33,12 +47,12 @@ const button =
 		{/if}
 	</div>
 	<p class="text-sm text-muted-foreground">Loan</p>
-	<p class="mt-2 text-lg"><Money amount={card.principal} {currency} /></p>
+	<p class="mt-2 text-lg"><Money amount={card.principal} {currency} /><WasText was={marks.principal} money {currency} /></p>
 	<p class="text-xs text-muted-foreground">Amount borrowed</p>
 	<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 		{#each card.rows as row (row.label)}
 			<dt class="text-muted-foreground">{row.label}</dt>
-			<dd>{row.value}</dd>
+			<dd>{row.value}<WasText was={marks.rows[row.label]} /></dd>
 		{/each}
 		<dt class="text-muted-foreground">Paid in the first payment month</dt>
 		<dd>
@@ -63,8 +77,11 @@ const button =
 	</details>
 	{#if editable}
 		<p class="mt-3 text-xs text-muted-foreground">
-			A What-if tries this loan's terms. It cannot pay extra, and it cannot add or take out the withdrawal that borrows the money.
+			A What-if tries this loan's terms and switches the loan off with its payments and its withdrawal. It cannot pay extra, and it cannot add or take out the withdrawal that borrows the money.
 		</p>
-		<ItemSwitch {plan} {contentHash} path="flows.{card.paymentId}" label={card.id} onTry={onTry} />
+		{#if marks.off || Object.keys(marks.rows).length > 0 || marks.principal !== undefined}
+			<p class="mt-1 text-xs text-muted-foreground">The schedule and what the loan owes are the plan's own, not the what-if's.</p>
+		{/if}
+		<GroupSwitch {plan} {contentHash} group={card.switch} label={card.id} {onTry} />
 	{/if}
 </li>
