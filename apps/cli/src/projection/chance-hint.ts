@@ -1,4 +1,5 @@
 import type { ColumnHint, RenderHint } from "../table"
+import { OUTCOME_EXTRA, outcomesShown } from "./chance-outcomes-human"
 
 /** The columns of the two spending tables in the human form, headed as their row keys are spelled. */
 const SPENDING_COLUMNS: Record<"spendingBands" | "lowestYearSpending", ColumnHint[]> = {
@@ -36,5 +37,8 @@ export const chanceHint: RenderHint = {
 		],
 		...SPENDING_COLUMNS,
 	},
+	// With --outcomes: the paths `representative` names, then every path's outcome, worst first (cli ADR-0069).
+	extra: OUTCOME_EXTRA,
+	display: outcomesShown,
 	note: "notes",
 }

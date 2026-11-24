@@ -223,6 +223,15 @@ size (a power of two from 16 to 1024, 256 by default), the result echoes what it
 was built from as `returnModel`, and `traj projection model --scenario NAME`
 prints the model as JSON, a file `--return-model` reads back. A plan with no
 `volatility` is refused, because every path would be the same path.
+Add `--outcomes` to see what each path came to: its closing and lowest net
+worth, the year it was lowest and when it ran out, with the paths at the 10th,
+50th and 90th percentile, the earliest to run out and the lowest named as
+`representative` (the human form prints every path, worst first). Then
+`traj projection path --index N`, with the same flags, replays path N year by
+year: `projection run`'s result, with the same flags for the cash flow and each
+Account's value, plus the market return each Account drew in each year as
+`returns`. An index is a path's name under the seed, so it is from 0 to
+`--paths` minus 1.
 Pass `--paths` and `--seed` to `traj dashboard` to add the chance of success to the
 Dashboard, as a page of its own: it uses `plan` unless you name a
 `--return-model` file.

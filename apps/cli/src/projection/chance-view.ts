@@ -1,6 +1,12 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
 import { band, bandsTable, runsOut } from "./chance-band-view"
+import {
+	type ChanceOutcomeView,
+	type ChanceRepresentativeView,
+	outcomesField,
+	representativeField,
+} from "./chance-outcomes-view"
 import { type PlanModelView, planModelField } from "./chance-plan-view"
 import {
 	type ChanceLowestYearView,
@@ -56,6 +62,10 @@ export type ChanceView = Echo & {
 	spendingBands?: ChanceSpendingBandView[] | undefined
 	/** Present only when the plan has a spending rule Flow. */
 	lowestYearSpending?: ChanceLowestYearView | undefined
+	/** Present only with `--outcomes`: each Market path's result (cli ADR-0069). */
+	outcomes?: ChanceOutcomeView[] | undefined
+	/** Present only with `--outcomes`: the paths worth opening first. */
+	representative?: ChanceRepresentativeView | undefined
 	tables: ChanceTable[]
 }
 
@@ -85,5 +95,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	runsOut: z.array(runsOut).describe("One row per annual roll-up, zeros included."),
 	spendingBands: spendingBandField,
 	lowestYearSpending: lowestYearField,
+	outcomes: outcomesField,
+	representative: representativeField,
 	tables: z.array(bandsTable).describe("The Bands the human form prints."),
 })

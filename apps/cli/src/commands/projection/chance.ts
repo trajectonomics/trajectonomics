@@ -8,6 +8,7 @@ import { chanceOf } from "../../projection/chance"
 import { CHANCE_EXAMPLES } from "../../projection/chance-examples"
 import { chanceHint } from "../../projection/chance-hint"
 import { returnModelFlagDocument } from "../../projection/chance-model"
+import { outcomesFlag } from "../../projection/chance-outcomes-view"
 import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
 import { chanceView } from "../../projection/chance-view"
 import {
@@ -23,7 +24,7 @@ import { addFlag, decimalFlag, setFlag, withoutFlag } from "../../scenario/overr
 
 /** The method in the words a help page prints: what runs, and what the result does not say. */
 const CHANCE_METHOD =
-	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up; for a Scenario with a spending rule, spendingBands add what the rule paid in each roll-up and lowestYearSpending the least a path paid in a whole year, a path that ran out counting 0. The figures are nominal, and the CLI ships no Return model: the caller states one, as a file, or as `plan`, which builds it from the Scenario's own Accounts (each asset's `rate` and `volatility`, cli ADR-0068)."
+	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up; for a Scenario with a spending rule, spendingBands add what the rule paid in each roll-up and lowestYearSpending the least a path paid in a whole year, a path that ran out counting 0. With --outcomes the result also lists what each Market path came to (closing and lowest net worth, the roll-up it was lowest in, when it ran out) and names the paths worth opening first, and `traj projection path --index N` replays one of them year by year (cli ADR-0069). The figures are nominal, and the CLI ships no Return model: the caller states one, as a file, or as `plan`, which builds it from the Scenario's own Accounts (each asset's `rate` and `volatility`, cli ADR-0068)."
 
 export const chance: Leaf = defineCommand({
 	name: "chance",
@@ -49,6 +50,7 @@ export const chance: Leaf = defineCommand({
 		seed: z
 			.string()
 			.describe("Sixteen lower-case hex digits. The same seed and model give the same paths."),
+		outcomes: outcomesFlag,
 	}),
 	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
 	output: chanceView,
@@ -80,7 +82,11 @@ export const chance: Leaf = defineCommand({
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
-			return chanceOf(placed, source, { seed: input.seed, paths: input.paths })
+			return chanceOf(placed, source, {
+				seed: input.seed,
+				paths: input.paths,
+				outcomes: input.outcomes,
+			})
 		})
 	},
 })

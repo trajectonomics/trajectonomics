@@ -74,6 +74,27 @@ const planReturnModel = z.strictObject({
 })
 
 /**
+ * One Market path's result, with `--outcomes` (cli ADR-0069): closing and lowest net worth, the first
+ * day of the roll-up it was lowest in, and when it ran out, or null.
+ */
+const pathOutcome = z.strictObject({
+	index: integer,
+	closingNetWorth: money,
+	lowestNetWorth: money,
+	lowestYear: dateString,
+	runsOut: z.strictObject({ date: dateString, unmet: money }).nullable(),
+})
+
+/** The path indexes to open first, with `--outcomes`: the 10th, 50th and 90th Percentile, the earliest to run out, the lowest. */
+const representative = z.strictObject({
+	p10: integer,
+	p50: integer,
+	p90: integer,
+	earliestRunsOut: integer.nullable(),
+	lowest: integer,
+})
+
+/**
  * `traj projection chance --json`: the success share of one Scenario over seeded Market paths and,
  * for a plan with a spending rule, what the rule pays across them.
  */
@@ -90,5 +111,8 @@ export const projectionChance = z.strictObject({
 	lowestYearSpending: lowestYear.optional(),
 	tables: z.array(chanceTable),
 	returnModel: planReturnModel.optional(),
+	// Present only with --outcomes (cli ADR-0069).
+	outcomes: z.array(pathOutcome).optional(),
+	representative: representative.optional(),
 })
 export type ProjectionChance = z.infer<typeof projectionChance>
