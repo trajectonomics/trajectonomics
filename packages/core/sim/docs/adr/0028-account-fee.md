@@ -73,6 +73,14 @@ fees and is unchanged in how it works.
   0 bps. Lifetime fees are their sum. The fee leaves net worth outside cashflow, so `interest` stays the
   growth before the fee:
   `interest = closing − opening − income + expense + levy − unmet − employerContributions + payouts + fees`.
+- **Over the plan (#443).** `Projection.lifetimeFees`, the plan's fees over the whole horizon (the sum of
+  the roll-ups' `fees`), and `Projection.accountLifetimes`, one `{ account, lifetimeFees }` per fee Account in
+  Scenario order beside any `lifetimePayouts` (ADR 0027). An Account's `lifetimeFees` is the sum of its
+  `accountFees` over the roll-ups, 0 if it was never charged, and the entries' sum is `lifetimeFees`. Both
+  are summed from the same days as the roll-ups, in the one run, so FI and chance of success are untouched.
+  They are absent unless a fee above 0 bps is declared (`lifetimeFees` absent without one, an Account's
+  `lifetimeFees` absent without its own), so a Projection with no fee is byte for byte unchanged. A sum
+  that leaves the safe integers is `VALUE_OVERFLOW` at the last date, as a roll-up is.
 - **Cash-flow breakdown (ADR 0018).** Unchanged: the fee never enters cashflow, so the identity
   `money in + unmet = money out` holds with no new line.
 
@@ -89,7 +97,8 @@ fees and is unchanged in how it works.
 
 ## Consequences
 
-- Existing parity hashes are unchanged. Three cases are added: `fee-year` (two fee Accounts, one locked,
+- The Projection hash of each case that declares a fee moves by the totals of #443; every other hash is
+  unchanged. Three cases are added: `fee-year` (two fee Accounts, one locked,
   with the breakdown and the estate), `fee-fi` and `fee-chance`.
 - Hand-worked: `src/engine/fee.test.ts` (the twelve charges of each rounding, 14,897,305 at `halfUp`),
   `src/engine/fee-edges.test.ts` (0 bps; locked; Illiquid; Accrued interest, 1,262,329; the Business day;
@@ -99,6 +108,10 @@ fees and is unchanged in how it works.
   against 1,716,100,000, and every Band is lower with the fee), `src/golden/fee-fi.test.ts` (FI 1 Oct
   2026, 1 Jan 2027 and 1 Dec 2027 at 0, 150 and 600 bps, each agreeing with a brute-force walk) and
   `src/check/fee.test.ts`.
+- `lifetime-year` (parity) and `src/output/lifetime.test.ts`: a fund of 1,000,000,000 at 0% with a 100 bps
+  fee and a 350 bps quarterly payout, both half up, over 2026: fees 9,824,566, payouts 8,735,423 +
+  8,637,295 + 8,540,269 + 8,444,333 = 34,357,320, the fund ends at 955,818,114.
+  `src/golden/lifetime-parity.test.ts` pins the identity with the roll-ups for every parity case.
 - `src/golden/oracle-fee.ts` is an independent day-by-day walk that imports nothing from the engine;
   `fee-oracle.test.ts` agrees with it for every rounding at four rates and four fees across a leap year.
 - The schema, documents and outputs of the CLI are #409.

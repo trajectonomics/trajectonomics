@@ -12,6 +12,8 @@ export interface DayTotals {
 	readonly employer: bigint
 	/** Payouts landed on this date: inside `income`, and out of their Accounts (ADR 0027). */
 	readonly payouts: bigint
+	/** The same payouts by the Account each left, only the nonzero (ADR 0027). */
+	readonly payoutsBy: ReadonlyMap<AccountId, bigint>
 	/** Fees charged on this date, in total and by Account: out of their Accounts and into no cashflow (ADR 0028). */
 	readonly fees: bigint
 	readonly feesBy: ReadonlyMap<AccountId, bigint>

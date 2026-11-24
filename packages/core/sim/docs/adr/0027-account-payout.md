@@ -89,6 +89,15 @@ read from, and taken out of, that path's own valuation, and what stays grows on 
   `Σincome + Σpayouts + Σwithdrawals + Σdrawn + unmet = Σprepaid + Σsettlements + Σexpenses + Σapplied + Σsurplus`,
   and the roll-up's `income` is `Σincome + Σpayouts`.
 - **Returns tally.** Unchanged: it counts growth.
+- **Over the plan (#443).** `Projection.accountLifetimes`, a list beside the roll-ups, holds one
+  `{ account, lifetimePayouts }` for each Account that pays out above 0 bps, in Scenario order (an Account
+  with a fee too carries `lifetimeFees` on the same entry, ADR 0028). `lifetimePayouts` is the sum of that
+  Account's payouts over the horizon, 0 if it never paid, and equals the sum of its `payouts` lines in the
+  Cash-flow breakdown; the entries' sum is the sum of the roll-ups' `payouts`. The engine adds each date's
+  payout by Account to the totals of the one `processDate` run (`payoutsBy`), as it does a fee, so the
+  Projection states the totals and nothing is walked again: FI, chance of success and the estate statement
+  are untouched. With no payout above 0 bps the list and the fields are absent, so that Projection is byte
+  for byte the one it was.
 
 ## Considered options
 
@@ -102,7 +111,8 @@ read from, and taken out of, that path's own valuation, and what stays grows on 
 
 ## Consequences
 
-- Existing parity hashes are unchanged. Three cases are added: `payout-year` (with the breakdown, a label and
+- The Projection hash of each case that declares a payout moves by the totals of #443; every other hash is
+  unchanged. Three cases are added: `payout-year` (with the breakdown, a label and
   a 10% prepayment under a 15% Levy), `payout-fi` and `payout-chance`.
 - Hand-worked: `src/engine/payout.test.ts` (quarterly 10,000,000 + 9,900,000 + 9,801,000 + 9,702,990 =
   39,403,990 on 1,000,000,000, closing 960,596,010, interest 0; a 10% Account that pays 300 bps a year,
@@ -113,6 +123,10 @@ read from, and taken out of, that path's own valuation, and what stays grows on 
   sale's 16,718,372 gain; Returns tally the same), `src/chance/payout-chance.test.ts` (a Return series path
   ends at 1,715,829,700), `src/golden/payout-fi.test.ts` (FI 1 Feb 2027 with the payout, 1 Dec 2030 without,
   each agreeing with a brute-force walk that runs the Projection for every month), and `src/check/payout.test.ts`.
+- `lifetime-year` (parity) and `src/output/lifetime.test.ts`: a fund of 1,000,000,000 at 0% with a 100 bps
+  fee and a 350 bps quarterly payout, both half up, over 2026: fees 9,824,566, payouts 8,735,423 +
+  8,637,295 + 8,540,269 + 8,444,333 = 34,357,320, the fund ends at 955,818,114.
+  `src/golden/lifetime-parity.test.ts` pins the identity with the roll-ups for every parity case.
 - `src/golden/oracle-payout.ts` is an independent day-by-day walk that imports nothing from the engine;
   `payout-oracle.test.ts` agrees with it for every frequency and rounding at four rates across a leap year.
 - The CLI files `PAYOUT_ILLIQUID` in its refusal table; the schema, documents and outputs are #409.

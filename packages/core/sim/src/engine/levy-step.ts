@@ -17,6 +17,7 @@ interface DayParts {
 	readonly withdrawals: bigint
 	readonly employer: bigint
 	readonly payouts?: bigint
+	readonly payoutsBy?: ReadonlyMap<AccountId, bigint>
 	readonly plannedBySource?: ReadonlyMap<AccountId, bigint>
 }
 
@@ -40,7 +41,7 @@ export function tally(
 	addFundedTallies(levies, date, funded)
 }
 
-const NO_FEES: ReadonlyMap<AccountId, bigint> = new Map()
+const NO_AMOUNTS: ReadonlyMap<AccountId, bigint> = new Map()
 
 export function totalsOf(
 	date: DateString,
@@ -57,11 +58,12 @@ export function totalsOf(
 		withdrawals: day.withdrawals,
 		employer: day.employer,
 		payouts: day.payouts ?? 0n,
+		payoutsBy: day.payoutsBy ?? NO_AMOUNTS,
 		fees: 0n,
-		feesBy: NO_FEES,
+		feesBy: NO_AMOUNTS,
 		drawnBy: day.plannedBySource ?? new Map(),
 		transfers: 0n,
-		transferredTo: NO_FEES,
+		transferredTo: NO_AMOUNTS,
 		contributions,
 		paidBy,
 		unfunded,

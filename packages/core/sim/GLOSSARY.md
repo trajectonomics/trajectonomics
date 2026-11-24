@@ -46,6 +46,10 @@ _Avoid_: Forecast, prediction, simulation run
 A date on which at least one Flow lands or a Settlement falls; its dates are Landed dates. Only Occurrences change balances; the Timeline's `start` and `horizon` are both inclusive.
 _Avoid_: Tick, step, period
 
+**Lifetime totals**:
+What a Projection states over the whole horizon for the Accounts that declare a fee or a payout above 0 bps: `accountLifetimes`, one `{ account, lifetimeFees?, lifetimePayouts? }` per such Account in Scenario order (each figure only when the Account declares that item), and a plan-wide `lifetimeFees`, present only when a fee is declared. Each is the sum of the Annual roll-up figures of that Account and comes from the same run. Without a fee or a payout above 0 bps no field appears.
+_Avoid_: Cumulative, running total
+
 **Annual roll-up**:
 Totals over one twelve-month period of a Projection, running from an anniversary of `start` to the day before the next one. The last period is cut short by the horizon or a Shortfall and marked partial.
 _Avoid_: Year, fiscal year

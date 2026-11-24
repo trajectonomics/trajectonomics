@@ -53,6 +53,7 @@ export function processDate(
 	const landed = {
 		...day,
 		payouts: payout.paid,
+		payoutsBy: payout.by,
 		withdrawals: moves.cash,
 		plannedBySource: moves.borrowedBy,
 	}
