@@ -63,6 +63,10 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 					<dt class="text-muted-foreground">Income</dt>
 					<dd>{card.earned}</dd>
 				{/if}
+				{#if card.employer !== null}
+					<dt class="text-muted-foreground">Employer</dt>
+					<dd>{card.employer}<WasText was={mark.was.employer} /></dd>
+				{/if}
 			</dl>
 			{#if editable && card.editable}
 				<ItemSwitch {plan} {contentHash} path="flows.{card.id}" label={card.id} onTry={() => onTry(card.id)} />

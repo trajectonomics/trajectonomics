@@ -5,6 +5,18 @@ export function lineKey(line: CashflowLine): string {
 	return JSON.stringify([line.group, line.id, line.account, line.category])
 }
 
+const INTO = "|into"
+
+/** The key of the band an employer's line has on the right of the diagram, where it goes on into its account. */
+export function intoKey(key: string): string {
+	return `${key}${INTO}`
+}
+
+/** The key of the line a band stands for: an employer's band on the right is the same line as its band on the left. */
+export function rowKeyOf(key: string): string {
+	return key.endsWith(INTO) ? key.slice(0, -INTO.length) : key
+}
+
 /** Whether a settlement is a refund: its CLI string keeps the minus sign. */
 export function isRefund(line: CashflowLine): boolean {
 	return line.group === "settlement" && line.amount.startsWith("-")

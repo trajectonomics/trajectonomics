@@ -3,20 +3,10 @@ import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { flowAnchorLabels } from "../household/model"
 import { ruleSummary } from "../withdrawals/words"
+import { employerText } from "./employer"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
 export type FlowKind = "income" | "expense"
-
-/** The frequencies a Flow may take, in the order the form offers them. */
-export const FREQUENCIES = [
-	"once",
-	"daily",
-	"weekly",
-	"biweekly",
-	"monthly",
-	"quarterly",
-	"annual",
-] as const
 
 /** One Flow as a card: every figure is the CLI's text. A computed amount has none, so it reads "computed". */
 export interface FlowCard {
@@ -35,6 +25,8 @@ export interface FlowCard {
 	readonly earned: string | null
 	/** An expense's category as the document states it, or null when it has none (or is not an expense). */
 	readonly category: string | null
+	/** "Employer adds 5% to Provident fund" for a salary whose employer pays into an Account; null for any other Flow. */
+	readonly employer: string | null
 	/** False for a computed Flow, which the forms do not edit. */
 	readonly editable: boolean
 }
@@ -69,11 +61,15 @@ function earnedOf(flow: ScenarioFlow, kind: FlowKind): string | null {
 	return flow.earned ? "Earned" : "Passive"
 }
 
-/** The Flows of one kind as cards, in the order the document holds them, each with its anchors' labels. */
+/**
+ * The Flows of one kind as cards, in the order the document holds them, each with its anchors' labels. `all` is every Flow of
+ * the plan, where a salary's employer Flow is found (it is a contribution, so it is no card of its own).
+ */
 export function flowCards(
 	flows: readonly ScenarioFlow[],
 	kind: FlowKind,
 	household: HouseholdDocument | null = null,
+	all: readonly ScenarioFlow[] = flows,
 ): FlowCard[] {
 	return flows
 		.filter((flow) => flow.kind === kind)
@@ -88,6 +84,7 @@ export function flowCards(
 			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),
 			category: kind === "expense" ? (flow.category ?? null) : null,
+			employer: employerText(all, flow, kind),
 			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
 			editable: !isComputed(flow) && flow.amount !== undefined,
 		}))

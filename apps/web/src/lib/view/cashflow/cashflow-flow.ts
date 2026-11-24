@@ -1,6 +1,6 @@
 import type { FlowBand, FlowInput, FlowKind } from "../../chart/flow"
 import type { CashflowLine, Rollup } from "./cashflow"
-import { isRefund, lineKey, lineLabel } from "./cashflow-labels"
+import { intoKey, isRefund, lineKey, lineLabel } from "./cashflow-labels"
 
 /**
  * The bands of a roll-up's flow diagram. Sources are income, withdrawals, money drawn, tax refunds and
@@ -20,6 +20,8 @@ export function flowOf(rollup: Rollup, accountName: ReadonlyMap<string, string>)
 		rollup.lines.filter((line) => line.group === group)
 	const sources = [
 		...linesIn("income").map((line) => band(line, "income")),
+		...linesIn("payout").map((line) => band(line, "payout")),
+		...linesIn("employer").map((line) => band(line, "employer")),
 		...linesIn("withdrawal").map((line) => band(line, "withdrawal")),
 		...linesIn("drawn").map((line) => band(line, "drawn")),
 		...linesIn("settlement")
@@ -34,6 +36,11 @@ export function flowOf(rollup: Rollup, accountName: ReadonlyMap<string, string>)
 			.map((line) => band(line, "tax")),
 		...linesIn("category").map((line) => band(line, "spending")),
 		...linesIn("contribution").map((line) => band(line, "saving")),
+		// The employer's money never enters cash, so its band stands on both sides: in from the employer, on into the account.
+		...linesIn("employer").map((line) => ({
+			...band(line, "employer"),
+			key: intoKey(lineKey(line)),
+		})),
 		...linesIn("surplus").map((line) => band(line, "left-over")),
 	]
 	return { sources, uses }
