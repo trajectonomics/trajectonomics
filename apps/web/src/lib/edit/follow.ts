@@ -10,6 +10,9 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 			return scenarios.filter((name) => name !== edit.name)
 		case "set-household":
 		case "remove-household":
+		case "merge-tax":
+		case "set-tax":
+		case "remove-tax":
 			return [...scenarios]
 		case "copy-plan":
 		case "apply-plan":
