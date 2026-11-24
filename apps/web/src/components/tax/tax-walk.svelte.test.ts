@@ -31,7 +31,18 @@ describe("the Tax page when the CLI walked the tax", () => {
 		const note = "The minimum tax applied: 6,000.00 (Section 48(2))."
 		const body = page([walkedYear({ notes: [note] })])
 		expect(body).toContain(note)
+		expect(body.indexOf(note)).toBeLessThan(body.indexOf("Top rate"))
 		expect(body.indexOf(note)).toBeLessThan(body.indexOf("Your top rate"))
+	})
+
+	test("lists the note alone when the CLI left the brackets and the top rate out", () => {
+		const note = "The brackets do not set this year's tax."
+		const { brackets: _b, marginalRateBps: _m, toNextBracket: _t, ...rest } = walkedYear()
+		const body = page([{ ...rest, notes: [note] }])
+		expect(body).toContain(note)
+		expect(body).not.toContain("Your brackets")
+		expect(body).not.toContain("The rate on the last baht")
+		expect(body).not.toContain("Taxable income by bracket")
 	})
 
 	test("links to the allowances page", () => {

@@ -24,15 +24,11 @@ export function withStepLine(
 	plot: Plot,
 ): LineLayout {
 	const { margin } = plot
-	const plotWidth = plot.width - margin.left - margin.right
-	const half = plotWidth / xs.length / 2
+	const half = (plot.width - margin.left - margin.right) / xs.length / 2
 	const ticks = niceTicks(
 		extent([0, ...step.line.points.map((point) => point.y)]) ?? { min: 0, max: 0 },
 	)
-	const scaleY = linearScale(
-		{ min: ticks[0] ?? 0, max: ticks[ticks.length - 1] ?? 0 },
-		{ from: plot.height - margin.bottom, to: margin.top },
-	)
+	const scaleY = scaleOf(ticks, plot)
 	const marks = xs.map((x, column): Mark | null => {
 		const point = step.line.points.find((candidate) => candidate.x === x)
 		const centre = layout.xPixels[column]
@@ -40,6 +36,36 @@ export function withStepLine(
 			? { x: centre, y: scaleY(point.y), display: point.display }
 			: null
 	})
+	const drawn: SeriesLayout = {
+		name: step.line.name,
+		dashed: step.line.dashed ?? false,
+		dotted: step.line.dotted ?? false,
+		path: linePath(stepPoints(marks, half)),
+		marks,
+		plain: true,
+	}
+	const axisTicks = ticks
+		.filter((value) => Number.isInteger(value))
+		.map((value) => ({ label: step.label(value), y: scaleY(value) }))
+	return {
+		...layout,
+		series: [...layout.series, drawn],
+		rightAxis: { edge: plot.width - margin.right, ticks: axisTicks },
+	}
+}
+
+/** The axis from zero to the last tick. A flat zero has one tick and sits on the baseline, not mid-chart. */
+function scaleOf(ticks: readonly number[], plot: Plot): (value: number) => number {
+	const baseline = plot.height - plot.margin.bottom
+	if (ticks.length < 2) return () => baseline
+	return linearScale(
+		{ min: ticks[0] ?? 0, max: ticks[ticks.length - 1] ?? 0 },
+		{ from: baseline, to: plot.margin.top },
+	)
+}
+
+/** The corners of the step line: each value held across its column, with a vertical step at the edge to the next. */
+function stepPoints(marks: readonly (Mark | null)[], half: number): PathPoint[] {
 	const path: PathPoint[] = []
 	for (const mark of marks) {
 		if (!mark) continue
@@ -47,22 +73,5 @@ export function withStepLine(
 		if (previous) path.push({ x: mark.x - half, y: previous.y })
 		path.push({ x: mark.x - half, y: mark.y }, { x: mark.x + half, y: mark.y })
 	}
-	const drawn: SeriesLayout = {
-		name: step.line.name,
-		dashed: step.line.dashed ?? false,
-		dotted: step.line.dotted ?? false,
-		path: linePath(path),
-		marks,
-		plain: true,
-	}
-	return {
-		...layout,
-		series: [...layout.series, drawn],
-		rightAxis: {
-			edge: plot.width - margin.right,
-			ticks: ticks
-				.filter((value) => Number.isInteger(value))
-				.map((value) => ({ label: step.label(value), y: scaleY(value) })),
-		},
-	}
+	return path
 }

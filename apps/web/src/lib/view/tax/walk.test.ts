@@ -102,18 +102,46 @@ describe("the bracket bars", () => {
 })
 
 describe("the bracket chart", () => {
-	test("stacks a series per rate, lowest first, with nominal figures as the CLI wrote them", () => {
-		const chart = bracketChart([walkedYear(), walkedYear(NEXT)])
-		expect(chart?.series.map((line) => line.name).slice(0, 3)).toEqual([
+	test("stacks a series per rate a year reached, lowest first, with nominal figures as the CLI wrote them", () => {
+		const deeper = walkedYear({
+			...NEXT,
+			brackets: schedule([
+				["150000.00", "0.00"],
+				["150000.00", "7500.00"],
+				["200000.00", "20000.00"],
+				["50000.00", "7500.00"],
+			]),
+		})
+		const chart = bracketChart([walkedYear(), deeper])
+		expect(chart?.series.map((line) => line.name)).toEqual([
+			"Taxed at 0%",
+			"Taxed at 5%",
+			"Taxed at 10%",
+			"Taxed at 15%",
+		])
+		expect(chart?.series[2]?.points.map((point) => point.display)).toEqual([
+			"100,000.00",
+			"200,000.00",
+		])
+		expect(chart?.series[3]?.points.map((point) => point.display)).toEqual(["0.00", "50,000.00"])
+	})
+
+	test("has no series for a bracket no year reached, so the legend lists none", () => {
+		const chart = bracketChart([walkedYear()])
+		expect(chart?.series.map((line) => line.name)).toEqual([
 			"Taxed at 0%",
 			"Taxed at 5%",
 			"Taxed at 10%",
 		])
-		expect(chart?.series[2]?.points.map((point) => point.display)).toEqual([
-			"100,000.00",
-			"100,000.00",
-		])
-		expect(chart?.series[3]?.points[0]?.display).toBe("0.00")
+	})
+
+	test("is absent when every year's brackets are empty: no income to stack", () => {
+		const empty = walkedYear({
+			brackets: schedule([]),
+			marginalRateBps: 0,
+			toNextBracket: "150000.00",
+		})
+		expect(bracketChart([empty])).toBeNull()
 	})
 
 	test("draws the top rate of each year as a step line on a second axis", () => {

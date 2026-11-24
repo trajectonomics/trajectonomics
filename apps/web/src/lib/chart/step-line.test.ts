@@ -69,4 +69,17 @@ describe("withStepLine", () => {
 		)
 		expect(gap.series[1]?.marks[1]).toBeNull()
 	})
+
+	test("puts a flat zero on the baseline, not in the middle of the chart", () => {
+		const base = columnLayout(bars, plot, "stacked-bars")
+		if (!base) throw new Error("no layout")
+		const flat: LineSeries = {
+			name: "Top rate",
+			points: rate.points.map((point) => ({ ...point, y: 0, display: "0%" })),
+		}
+		const layout = withStepLine(base, { line: flat, label: String }, columnXs(bars), plot)
+		const baseline = plot.height - plot.margin.bottom
+		expect(layout.series[1]?.marks.map((mark) => mark?.y)).toEqual([baseline, baseline])
+		expect(layout.rightAxis?.ticks).toEqual([{ label: "0", y: baseline }])
+	})
 })

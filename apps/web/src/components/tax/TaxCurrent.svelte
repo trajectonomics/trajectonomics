@@ -18,13 +18,12 @@ let { year, currency }: Props = $props()
 		<h2 id="tax-current-title" class="text-base font-semibold">This tax year</h2>
 		<p class="text-sm text-muted-foreground">{year.levy}, {year.period}</p>
 	</div>
+	{#each year.notes as note, index (index)}
+		<p role="note" class="rounded-md bg-muted p-3 text-sm">{note}</p>
+	{/each}
 	{#if year.walk}<TaxWalk lines={year.walk} {currency} />{/if}
 	<TaxRates topRate={year.topRate} shareOfIncome={year.shareOfIncome} />
 	{#if year.bars}
-		<TaxBrackets bars={year.bars} notes={year.notes} toNextBracket={year.toNextBracket} {currency} />
-	{:else if year.notes.length > 0}
-		<ul class="list-disc space-y-1 pl-5 text-sm">
-			{#each year.notes as note, index (index)}<li>{note}</li>{/each}
-		</ul>
+		<TaxBrackets bars={year.bars} toNextBracket={year.toNextBracket} {currency} />
 	{/if}
 </section>

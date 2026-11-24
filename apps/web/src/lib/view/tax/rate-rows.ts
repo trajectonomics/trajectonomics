@@ -1,4 +1,5 @@
 import type { TaxYear } from "../../contract"
+import { hasWalk } from "./current-year"
 import { rateWords } from "./rate-words"
 import { periodOf } from "./tax-rows"
 
@@ -18,8 +19,7 @@ export interface RateRow {
  * page adds no table to a plan it knows nothing more about.
  */
 export function rateRows(years: readonly TaxYear[]): readonly RateRow[] {
-	if (!years.some((year) => year.walk !== undefined || year.marginalRateBps !== undefined))
-		return []
+	if (!years.some(hasWalk)) return []
 	return years.map((year) => ({
 		key: `${year.levy}-${year.from}`,
 		period: periodOf(year),
