@@ -21,7 +21,7 @@ export function account(
 	}
 }
 
-/** A chart of accounts with a header per group, a debt, an archived one and the accounts to count against. */
+/** A chart of accounts with three top-level headers (one Thai), assets with no parent, a debt, an archived one and the accounts to count against. */
 export const CHART: ListedAccount[] = [
 	account("debt", "Car Loan", { type: "liability" }),
 	account("old-debt", "Old Loan", { type: "liability", archivedAt: "2026-02-01T00:00:00.000Z" }),
@@ -29,6 +29,8 @@ export const CHART: ListedAccount[] = [
 	account("bank", "Bank", { parentId: "cash-header" }),
 	account("invest-header", "Investments"),
 	account("index", "Index tracker", { parentId: "invest-header" }),
+	account("thai-header", "ทรัพย์สิน"),
+	account("condo", "คอนโด", { parentId: "thai-header" }),
 	account("fund", "Fund"),
 	account("home", "Home"),
 	account("mystery", "Mystery box"),

@@ -36,7 +36,7 @@ const noAccount = $derived(needsAgainstAccount(sheet))
 		<p class="text-sm text-muted-foreground">The ledger has no open asset or debt to value.</p>
 	{/each}
 	{#if session.problems.general}<p role="alert" class="text-sm text-destructive">{session.problems.general}</p>{/if}
-	<div class="sticky bottom-0 -mx-5 space-y-3 border-t border-border bg-card px-5 py-4">
+	<div class="sticky -bottom-5 -mx-5 -mb-5 space-y-3 border-t border-border bg-card px-5 pt-4 pb-5">
 		<p class="text-sm text-muted-foreground">{footerLine(changed, against, noAccount)}</p>
 		<button
 			type="submit"

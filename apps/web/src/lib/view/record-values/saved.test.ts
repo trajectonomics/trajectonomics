@@ -30,6 +30,34 @@ describe("the saved rows", () => {
 	})
 })
 
+describe("a debt's saved row", () => {
+	const entry = (id: string, name: string) => ({
+		index: 0,
+		status: "added",
+		account: { id, name },
+		date: "2026-10-31",
+		before: "1500000.00",
+		value: "1480000.00",
+		difference: "-20000.00",
+		transaction: null,
+		notes: [],
+	})
+	const result = (id: string, name: string) =>
+		accountValues.parse({
+			dryRun: false,
+			file: "-",
+			against: { id: "gains", name: "Gains" },
+			values: [entry(id, name)],
+			counts: { added: 1, unchanged: 0 },
+		})
+
+	test("is marked as owed, with the CLI's difference untouched; an asset's row is not", () => {
+		const debt = savedView(result("debt", "Car Loan"), sheet).rows[0]
+		expect(debt).toMatchObject({ owed: true, difference: "-20000.00" })
+		expect(savedView(result("bank", "Bank"), sheet).rows[0]?.owed).toBe(false)
+	})
+})
+
 describe("the sheet's words", () => {
 	const row = { id: "x", name: "X", currency: "THB", balance: null, owed: false }
 

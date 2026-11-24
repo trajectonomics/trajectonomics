@@ -33,11 +33,11 @@ export async function recordValues(
 	const accounts = run.held?.reads.accounts
 	if (accounts === undefined || !accounts.ok) {
 		const message = "The Dashboard has no chart of accounts to check these values against."
-		return failure(400, { code: "invalid_edit", exitCode: 1, message })
+		return failure(400, { code: "no_accounts", exitCode: 1, message })
 	}
 	if (unknownAccountIds(edit, accounts.data.accounts).length > 0) {
 		const message = "The Edit names an account the Dashboard's Snapshot does not hold."
-		return failure(400, { code: "invalid_edit", exitCode: 1, message })
+		return failure(400, { code: "unknown_account", exitCode: 1, message })
 	}
 	const dry = await write(run, edit, true)
 	if (!dry.ok) return failure(200, dry.error)

@@ -33,7 +33,7 @@ A write the page asks the server to run: one of a closed list (`src/lib/edit/edi
 _Avoid_: save, mutation, update, PATCH, request, write
 
 **Value sheet**:
-The drawer on the Net worth page, "Record today's values": one row per open asset and liability Leaf Account, grouped as cash, investments, property and things, other assets and debts, each with its last Balance, the date of its last Transaction and a field for today's value. A row with a typed value is changed, and Save sends every changed row as one `record-values` Edit. The page sends the text as typed and shows `before → value` and the difference as `traj` stated them.
+The drawer on the Net worth page, "Record today's values": one row per open asset and liability Leaf Account, grouped by the top-level account each asset sits under (or "Assets" when it has no parent) and "Debts", each with its last Balance, the date of its last Transaction and a field for today's value. A row with a typed value is changed, and Save sends every changed row as one `record-values` Edit. The page sends the text as typed and shows `before → value` and the difference as `traj` stated them.
 _Avoid_: form, import, reconciliation, balance update
 
 **Count against**:

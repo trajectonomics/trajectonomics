@@ -1,7 +1,6 @@
 import type { Snapshot } from "../../contract"
 import type { ListedAccount } from "../ledger/account-tree"
 import { periodOfRead } from "../ledger/transactions"
-import { SHEET_GROUPS } from "./groups"
 import { rowsByGroup } from "./rows"
 import type { AgainstChoice, ValueSheet } from "./types"
 
@@ -28,15 +27,12 @@ function againstChoices(listed: readonly ListedAccount[]): AgainstChoice[] {
 export function valueSheet(snapshot: Snapshot): ValueSheet | null {
 	const { accounts, transactions } = snapshot.reads
 	if (!accounts.ok) return null
-	const rowsOf = rowsByGroup(snapshot, accounts.data.accounts)
+	const groups = rowsByGroup(snapshot, accounts.data.accounts)
 	const choices = againstChoices(accounts.data.accounts)
-	const currencies = [...new Set([...rowsOf.values()].flat().map((row) => row.currency))]
+	const currencies = [...new Set(groups.flatMap((group) => group.rows.map((row) => row.currency)))]
 	return {
 		asOf: snapshot.params.asOf,
-		groups: SHEET_GROUPS.flatMap(({ key, title }) => {
-			const rows = rowsOf.get(key)
-			return rows === undefined ? [] : [{ key, title, rows }]
-		}),
+		groups,
 		choices,
 		addCommands: choices.length > 0 ? [] : currencies.map(addAgainstCommand),
 		since: transactions.ok ? periodOfRead(transactions.argv).since : null,

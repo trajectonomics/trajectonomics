@@ -41,7 +41,7 @@ describe("the Record today's values button", () => {
 describe("the sheet", () => {
 	test("lists each account in its group with its Balance, its last Transaction, and an empty field", () => {
 		const body = page()
-		for (const title of ["Cash", "Investments", "Property and things", "Debts"]) {
+		for (const title of ["Cash", "Investments", "ทรัพย์สิน", "Assets", "Debts"]) {
 			expect(body).toContain(`>${title}</h3>`)
 		}
 		expect(body).toContain("1,500.00")
@@ -100,6 +100,32 @@ describe("after a save", () => {
 	})
 })
 
+describe("a saved debt", () => {
+	test("reads as a change in what you owe, and an asset's as a difference", () => {
+		const entry = (id: string, name: string, index: number) => ({
+			index,
+			status: "added",
+			account: { id, name },
+			date: "2026-10-31",
+			before: "10.00",
+			value: "8.00",
+			difference: "-2.00",
+			transaction: null,
+			notes: [],
+		})
+		session.saved = accountValues.parse({
+			dryRun: false,
+			file: "-",
+			against: { id: "gains", name: "Gains" },
+			values: [entry("debt", "Car Loan", 0), entry("bank", "Bank", 1)],
+			counts: { added: 2, unchanged: 0 },
+		})
+		const body = page()
+		expect(body).toContain("Change in what you owe")
+		expect(body.match(/Difference/g)).toHaveLength(1)
+	})
+})
+
 describe("the sheet at phone width", () => {
 	test("fills the drawer, lets every row shrink, and holds no fixed width", () => {
 		const body = page()
@@ -108,6 +134,7 @@ describe("the sheet at phone width", () => {
 		expect(body).toMatch(/<li class="min-w-0 /)
 		expect(body).toMatch(/<ul class="min-w-0 /)
 		expect(body).toContain("truncate")
+		expect(body).toContain("sticky -bottom-5 -mx-5 -mb-5")
 		expect(body).not.toMatch(/(?:w|min-w)-\[(?:[4-9]\d\d|\d{4,})px\]/)
 	})
 })

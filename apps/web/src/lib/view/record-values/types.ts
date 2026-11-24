@@ -1,5 +1,3 @@
-import type { GroupKey } from "./groups"
-
 /** One account the sheet takes a value for. */
 export interface SheetRow {
 	readonly id: string
@@ -14,7 +12,8 @@ export interface SheetRow {
 }
 
 export interface SheetGroup {
-	readonly key: GroupKey
+	/** The id of the top-level account the group sits under, or "assets" (no parent) or "debts". */
+	readonly key: string
 	readonly title: string
 	readonly rows: readonly SheetRow[]
 }

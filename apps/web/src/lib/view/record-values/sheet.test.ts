@@ -10,15 +10,32 @@ const sheet = () => {
 }
 
 describe("the sheet's rows", () => {
-	test("group the open asset and liability Leaf Accounts as cash, investments, property, other and debts", () => {
-		const groups = sheet().groups.map((group) => [group.key, group.rows.map((row) => row.name)])
-		expect(groups).toEqual([
-			["cash", ["Bank"]],
-			["investments", ["Index tracker", "Fund"]],
-			["property", ["Home"]],
-			["other", ["Mystery box"]],
-			["debts", ["Car Loan"]],
+	test("group the open asset Leaf Accounts by their top-level account, in tree order, and every debt under Debts", () => {
+		const groups = sheet().groups.map((group) => [
+			group.key,
+			group.title,
+			group.rows.map((r) => r.name),
 		])
+		expect(groups).toEqual([
+			["cash-header", "Cash", ["Bank"]],
+			["invest-header", "Investments", ["Index tracker"]],
+			["thai-header", "ทรัพย์สิน", ["คอนโด"]],
+			["assets", "Assets", ["Fund", "Home", "Mystery box"]],
+			["debts", "Debts", ["Car Loan"]],
+		])
+	})
+
+	test("read no word in a name: a Thai parent titles its group, and a leaf with no parent is under Assets", () => {
+		const rows = sheet().groups.flatMap((group) => group.rows)
+		expect(rows.find((row) => row.name === "คอนโด")?.id).toBe("condo")
+		const deep = valueSheet(
+			sheetSnapshot([
+				account("a", "Emergency fund"),
+				account("b", "Savings", { parentId: "a" }),
+				account("c", "Pot", { parentId: "b" }),
+			]),
+		)
+		expect(deep?.groups.map((group) => [group.key, group.title])).toEqual([["a", "Emergency fund"]])
 	})
 
 	test("leave out header accounts, archived accounts and every account that is not an asset or a debt", () => {
@@ -83,11 +100,10 @@ describe("the sheet of a Snapshot", () => {
 		expect(valueSheet(snapshot)).toBeNull()
 	})
 
-	test("holds the Demo's accounts: Bank as cash, Fund as an investment, Car Loan as a debt", () => {
+	test("holds the Demo's accounts: Bank and Fund under Assets, Car Loan under Debts", () => {
 		const demo = valueSheet(DEMO)
 		expect(demo?.groups.map((group) => [group.key, group.rows.map((row) => row.name)])).toEqual([
-			["cash", ["Bank"]],
-			["investments", ["Fund"]],
+			["assets", ["Bank", "Fund"]],
 			["debts", ["Car Loan"]],
 		])
 		expect(demo?.choices.map((choice) => choice.name)).toContain("Fund Return")

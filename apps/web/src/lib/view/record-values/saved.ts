@@ -9,6 +9,8 @@ export interface SavedRow {
 	readonly before: string
 	readonly value: string
 	readonly difference: string
+	/** A debt's row: its figures are what is owed, so its difference is a change in what you owe, not a gain or a loss. */
+	readonly owed: boolean
 	/** False when the value equalled the Balance, so nothing was written. */
 	readonly written: boolean
 	/** The CLI's notes, such as a later valuation this one moves. */
@@ -23,9 +25,7 @@ export interface SavedView {
 
 /** The save's result as the sheet shows it: each row's `before → value` and `difference` from the CLI. */
 export function savedView(result: AccountValues, sheet: ValueSheet): SavedView {
-	const currencies = new Map(
-		sheet.groups.flatMap((group) => group.rows).map((row) => [row.id, row.currency]),
-	)
+	const rows = new Map(sheet.groups.flatMap((group) => group.rows).map((row) => [row.id, row]))
 	const { added, unchanged } = result.counts
 	const parts = [
 		`${added} recorded`,
@@ -35,7 +35,8 @@ export function savedView(result: AccountValues, sheet: ValueSheet): SavedView {
 		rows: result.values.map((row) => ({
 			key: `${row.index}`,
 			name: row.account.name,
-			currency: currencies.get(row.account.id) ?? "",
+			currency: rows.get(row.account.id)?.currency ?? "",
+			owed: rows.get(row.account.id)?.owed ?? false,
 			before: row.before,
 			value: row.value,
 			difference: row.difference,

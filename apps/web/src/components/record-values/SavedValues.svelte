@@ -23,7 +23,7 @@ let { view, onDone }: Props = $props()
 					<Money amount={row.value} currency={row.currency} />
 				</p>
 				<p class="text-xs text-muted-foreground">
-					{#if row.written}Difference <Money amount={row.difference} currency={row.currency} />{:else}No change, nothing written{/if}
+					{#if row.written}{row.owed ? "Change in what you owe" : "Difference"} <Money amount={row.difference} currency={row.currency} />{:else}No change, nothing written{/if}
 				</p>
 				{#each row.notes as note (note)}<p class="text-xs text-muted-foreground">{note}</p>{/each}
 			</li>

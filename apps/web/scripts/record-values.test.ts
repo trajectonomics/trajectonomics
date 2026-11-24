@@ -2,6 +2,7 @@
 // the CLI's own differences, an equal value writes no Transaction, and a refusal writes nothing (web ADR 0008).
 import { afterAll, describe, expect, test } from "bun:test"
 import { accountValues } from "../src/lib/contract"
+import { recordValuesSchema } from "../src/lib/edit/record-values"
 import {
 	BINARY,
 	disposeEditor,
@@ -10,6 +11,7 @@ import {
 	SLOW_MS,
 	setupEditor,
 } from "./edit-fixture.test-support"
+import { recordValues } from "./serve-record-values"
 
 type Reads = {
 	accounts: { data: { accounts: { id: string; name: string }[] } }
@@ -121,9 +123,30 @@ describe("the record-values Edit", () => {
 			})
 			const { status, answer } = await postEdit(body)
 			expect(status).toBe(400)
-			expect(answer.ok).toBe(false)
+			expect(answer.ok || answer.error.code).toBe("unknown_account")
 			expect(transactionCount()).toBe(written)
 		},
 		SLOW_MS,
 	)
+})
+
+describe("an Edit the Snapshot cannot check", () => {
+	test("is refused as no_accounts, before traj runs, when the Snapshot holds no chart of accounts", async () => {
+		const edit = recordValuesSchema.parse({
+			kind: "record-values",
+			against: "a",
+			values: [{ account: "b", date: "2026-10-31", value: "1" }],
+		})
+		const response = await recordValues(
+			{
+				traj: { binary: "/no/such/traj" },
+				held: null,
+				refresh: () => Promise.reject(new Error("ran")),
+			},
+			edit,
+		)
+		const answer = (await response.json()) as { ok: boolean; error: { code: string } }
+		expect(response.status).toBe(400)
+		expect(answer.error.code).toBe("no_accounts")
+	})
 })
