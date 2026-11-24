@@ -70,6 +70,8 @@ export type ScenarioRow = {
 	forkedFrom: string | null
 	/** The household's RFC 8785 canonical JSON text, or null when none is set (cli ADR-0048). */
 	household: string | null
+	/** The tax profile's RFC 8785 canonical JSON text, or null when none is stored (cli ADR-0066). */
+	tax: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

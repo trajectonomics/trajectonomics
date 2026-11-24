@@ -168,6 +168,14 @@ deduction nobody stated is visible rather than assumed to be zero. It states
 what the flags said, never what tax-core applied: a premium the statute does
 not allow for the filing status is still stated, and the Levy zeroes it.
 
+The write keeps that profile beside the Scenario, and `traj scenario show` prints
+it back as `tax`. `--merge` then changes only the flags it carries
+(`traj scenario tax base --merge --children 2`) and keeps the rest, and
+`--from-stored` writes the Levy again from the profile, for example after a
+tax-year update. Both need a stored profile: a plan taxed before it was kept
+states its profile whole once. `--if-hash` refuses a write over a plan that
+changed since you read it, as on `scenario apply`.
+
 ```json
 {
   "status": "updated",

@@ -59,6 +59,8 @@ export type DumpScenarioRow = {
 	forkedFrom: string | null
 	/** The household's canonical JSON text, or null (cli ADR-0048). */
 	household: string | null
+	/** The tax profile's canonical JSON text, or null (cli ADR-0066). */
+	tax: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

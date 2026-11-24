@@ -38,6 +38,7 @@ describe("scenario list and show", () => {
 				"forkedFrom",
 				"id",
 				"name",
+				"taxed",
 				"updatedAt",
 				"version",
 			])
@@ -50,8 +51,8 @@ describe("scenario list and show", () => {
 		const byName = rowOf(resultOf(await scenario(home, ["show", "base"])))
 		const byId = rowOf(resultOf(await scenario(home, ["show", created.id as string])))
 		// A show carries the household too: none is set on a plain apply (cli ADR-0048).
-		expect<unknown>(byName).toEqual({ ...created, household: null })
-		expect<unknown>(byId).toEqual({ ...created, household: null })
+		expect<unknown>(byName).toEqual({ ...created, household: null, tax: null, taxed: false })
+		expect<unknown>(byId).toEqual({ ...created, household: null, tax: null, taxed: false })
 		const view = byName
 		expect(view.document).toEqual(SCENARIO_DOCUMENT)
 		expect(view).not.toHaveProperty("deletedAt")
