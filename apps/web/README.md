@@ -12,6 +12,8 @@ bunx turbo run build --filter=@trajectonomics/cli   # builds apps/cli/dist/traj
 bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-05-15 --age 45 --age 60
 ```
 
+The Demo snapshot is not in git. A fresh clone runs `bunx turbo run demo --filter=@trajectonomics/web` (or `bunx turbo run check --filter=@trajectonomics/web`, which runs it first) before `bun test`, and `bun run demo` in this directory regenerates it after a change to the CLI or the Demo ledger. A test that finds it missing says so.
+
 `dashboard` builds the pages with Vite, writes the Snapshot to `dist/snapshot.json` from your own ledger (`TRAJ_HOME`, or `~/.traj`), and previews on `127.0.0.1:4321`. Run it again to see new figures.
 
 ## Commands
@@ -19,7 +21,7 @@ bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-0
 | Command | What it does |
 |---|---|
 | `bun run snapshot -- --as-of DATE --horizon DATE [--scenario NAME]... [--compare A B] [--birth-date DATE] [--age N]... [--monthly] [--carry-in PATH] [--paths N --seed HEX [--return-model PATH]] [--traj PATH] [--out FILE]` | Runs the Plan and writes a Snapshot. `traj` is taken from `--traj`, then `TRAJ_BINARY_PATH`, then `PATH`. |
-| `bun run demo` | Builds a fictional ledger in a temporary directory and rewrites `public/demo/snapshot.json`, the committed Demo snapshot. |
+| `bun run demo` | Builds a fictional ledger in a temporary directory and writes `public/demo/snapshot.json`, the Demo snapshot, as compact JSON. The file is generated and git-ignored ([ADR 0021](docs/adr/0021-the-demo-snapshot-is-generated-at-build-and-not-committed.md)). |
 | `bun run dashboard -- …` | Builds the pages, writes `dist/snapshot.json` with the same flags as `snapshot`, and previews with `vite preview`. |
 | `bun run build` | Builds the pages into `dist/` and packs them into `pack/dashboard.bin`, the file `traj dashboard` embeds. |
 | `bun run check` | Lint, typecheck (`svelte-check` with warnings as errors), tests (including the Svelte guard) and the build. |

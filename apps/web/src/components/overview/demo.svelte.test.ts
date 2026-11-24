@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
-
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
 import { formatMoney } from "../../lib/format"
 import { overviewView } from "../../lib/view/overview/view"
 import OverviewGrid from "./OverviewGrid.svelte"
 
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 // The figures are read from the same Snapshot the page renders, so the test survives a rebuilt Demo.
