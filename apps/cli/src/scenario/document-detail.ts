@@ -1,6 +1,6 @@
-import { allowedValues } from "@trajectonomics/core/sim"
 import type { ScenarioProblem } from "./document"
 import { isOwnCode } from "./own-problems"
+import { shippedValues } from "./problem-words"
 import { ROUTING_NOT_SHIPPED } from "./routing-unshipped"
 
 /** The rate fields of a document: a rate is written in basis points, never as a fraction. */
@@ -27,6 +27,6 @@ export function detailOf(
 		return "basis points, a whole number: 2% is 200"
 	}
 	if (isOwnCode(problem.code)) return undefined
-	const allowed = allowedValues(problem.code, problem.segments)
+	const allowed = shippedValues(problem.code, problem.segments)
 	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
 }

@@ -41,6 +41,8 @@ const TOTALS = {
 	withdrawals: 0n,
 	drawnBy: new Map(),
 	paidBy: new Map(),
+	transfers: 0n,
+	transferredTo: new Map(),
 	contributions: 0n,
 	employer: 0n,
 	payouts: 0n,

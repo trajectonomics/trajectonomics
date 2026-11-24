@@ -2,7 +2,8 @@ import type { AccountId, DateString, MinorUnits } from "./common"
 
 /**
  * One calendar month of one liability, or the part of a month that the Projection covers. The
- * identity `opening + drawn + interest − paid = closing` holds exactly for every month.
+ * identity `opening + drawn + interest − paid − transferred = closing` holds exactly for every month, where
+ * `transferred` is 0 for a liability no transfer pays down.
  */
 export interface LiabilityMonth {
 	readonly from: DateString
@@ -13,6 +14,12 @@ export interface LiabilityMonth {
 	readonly drawn: MinorUnits
 	/** Debt payments applied in the month, after the cap at the amount owed. */
 	readonly paid: MinorUnits
+	/**
+	 * Transfers that paid this liability down in the month, from the plan's own Accounts (ADR 0031); present only
+	 * when a transfer Flow targets it. A payment, kept apart from `paid`: `opening + drawn + interest − paid −
+	 * transferred = closing`.
+	 */
+	readonly transferred?: MinorUnits
 	/** Interest the engine accrued and capitalised in the month, plus any Accrued interest left at its end. */
 	readonly interest: MinorUnits
 	/** Amount owed at the end, Accrued interest included. */

@@ -1,0 +1,42 @@
+<script lang="ts">
+import type { ScenarioShow } from "../../lib/contract"
+import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
+import { isTaxed } from "../../lib/view/tax-settings/rows"
+import TaxProfileActions from "./TaxProfileActions.svelte"
+import TaxProfileRows from "./TaxProfileRows.svelte"
+import TaxScope from "./TaxScope.svelte"
+
+interface Props {
+	/** The plan the profile belongs to: the Edits save under this name. */
+	name: string
+	/** The plan as `scenario show` reads it: its tax profile, whether it is taxed, and the hash every Edit names. */
+	show: ScenarioShow["scenario"]
+	editable: boolean
+}
+
+let { name, show, editable }: Props = $props()
+const profile = $derived(show.tax ?? null)
+// A Snapshot saved before profiles were kept states no `taxed`; the plan's own tax rules say it.
+const taxed = $derived(isTaxed(show))
+const unlabelled = $derived(unlabelledIncome(show.document))
+const income = $derived(incomeFlows(show.document))
+</script>
+
+<section id="tax-profile" class="space-y-4 rounded-lg border border-border bg-card p-5">
+	<div class="space-y-2">
+		<h2 class="font-semibold">Tax profile of {name}</h2>
+		<TaxScope />
+	</div>
+	{#if profile !== null}
+		<TaxProfileRows {profile} />
+	{:else if taxed}
+		<p class="text-sm text-foreground">
+			Plan {name} is taxed, but its tax profile is not stored: it was taxed before profiles were kept, or its tax rules were changed by hand since. Set the profile whole to change it here; that writes the tax rules again from what you state.
+		</p>
+	{:else}
+		<p class="text-sm text-foreground">Plan {name} is not taxed, so its figures are before tax.</p>
+	{/if}
+	{#if editable}
+		<TaxProfileActions {name} contentHash={show.contentHash} {profile} {taxed} {unlabelled} {income} />
+	{/if}
+</section>

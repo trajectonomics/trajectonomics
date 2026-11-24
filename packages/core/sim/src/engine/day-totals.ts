@@ -21,6 +21,9 @@ export interface DayTotals {
 	readonly drawnBy: ReadonlyMap<AccountId, bigint>
 	/** The debt payments on this date, by the liability each one paid; only nonzero payments. */
 	readonly paidBy: ReadonlyMap<AccountId, bigint>
+	/** The money transfers moved on this date, in total and into each liability they paid down (ADR 0031). */
+	readonly transfers: bigint
+	readonly transferredTo: ReadonlyMap<AccountId, bigint>
 	readonly unfunded: ReadonlyMap<string, bigint>
 	/** Prepayment plus Settlements net of refunds on this date. */
 	readonly levy: bigint

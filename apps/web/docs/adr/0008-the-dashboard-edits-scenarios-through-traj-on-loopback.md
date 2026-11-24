@@ -75,3 +75,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 ## Amendment (2026-11-23): a reread can carry the allowance inputs
 
 - `POST /reread` takes `{}` as before, or `{ "allowances": <inputs or null> }`: the labels in order, the step and the two optional limits of the Tax allowances page ([ADR 0012](0012-the-tax-allowances-page-reads-what-traj-says-each-allowance-could-take.md)). The server keeps them with the Snapshot's parameters and reads again. It still writes nothing; the body is a strict schema with the depth cap, and a body that is not that shape is a 400 `invalid_reread`. The other guards are the Edit guards, unchanged.
+
+## Amendment (2026-11-24): the tax profile Edits
+
+- `merge-tax`, `set-tax` and `remove-tax` are `traj scenario tax <name> --merge <flags>`, `--tax th-2026 <flags>` and `--none`, each with `--if-hash`, run dry first. The flags are a closed, strict set whose values are digits only, so none is read as a flag. See [ADR 0016](0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md).

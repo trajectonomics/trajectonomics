@@ -65,6 +65,11 @@ export interface AnnualRollup {
 	 * part of `interest`.
 	 */
 	readonly withdrawals?: MinorUnits
+	/**
+	 * Money moved between the plan's own Accounts by transfer Flows in the period; present only when the
+	 * Scenario declares one (ADR 0031). Outside cashflow and net worth: it is in no other figure here.
+	 */
+	readonly transfers?: MinorUnits
 	readonly interest: MinorUnits
 	readonly unmet: MinorUnits
 	readonly partial: boolean

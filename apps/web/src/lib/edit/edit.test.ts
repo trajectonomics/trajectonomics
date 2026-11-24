@@ -13,6 +13,9 @@ describe("the Edit list", () => {
 			"set-household",
 			"remove-household",
 			"apply-overrides",
+			"merge-tax",
+			"set-tax",
+			"remove-tax",
 		])
 	})
 
@@ -27,6 +30,9 @@ describe("the Edit list", () => {
 			{ kind: "delete-plan", name: "early" },
 			{ kind: "set-household", name: "early", contentHash: HASH, household: { schemaVersion: 1 } },
 			{ kind: "remove-household", name: "early", contentHash: HASH },
+			{ kind: "merge-tax", name: "early", contentHash: HASH, flags: { children: "2" } },
+			{ kind: "set-tax", name: "early", contentHash: HASH, flags: { filingStatus: "single" } },
+			{ kind: "remove-tax", name: "early", contentHash: HASH },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
 			expect(writeCommand(edit as Edit, false).argv[0]).toBe("scenario")
@@ -50,6 +56,9 @@ describe("the Edit list", () => {
 			{ kind: "set-household", name: "--file", contentHash: HASH, household: {} },
 			{ kind: "remove-household", name: "--none", contentHash: HASH },
 			{ kind: "delete-plan", name: "a\nb" },
+			{ kind: "merge-tax", name: "--none", contentHash: HASH, flags: { children: "2" } },
+			{ kind: "set-tax", name: "-h", contentHash: HASH, flags: { filingStatus: "single" } },
+			{ kind: "remove-tax", name: "--merge", contentHash: HASH },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(false)
 		}

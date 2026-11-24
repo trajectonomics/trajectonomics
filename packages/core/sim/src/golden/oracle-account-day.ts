@@ -12,9 +12,10 @@ import {
 	oraclePlannedSources,
 } from "./oracle-sale"
 import type { OracleStates } from "./oracle-state"
+import { type OracleMoved, oracleTransfers } from "./oracle-transfer"
 
 /** What one day's landed Flows were worth, and whether the money ran out paying them. */
-export interface OracleLanded {
+export interface OracleLanded extends OracleMoved {
 	readonly expense: bigint
 	readonly ranOut: boolean
 }
@@ -51,8 +52,8 @@ export function oraclePlannedExpense(landing: readonly OracleEvent[], planned: P
 /**
  * Lands one day's Flows on the states in the engine's order: employer shares (outside cash), planned withdrawals (a loan draw or a
  * sale), debt payments, obligations paid in full, asset contributions from what the day's income
- * leaves, then the surplus or the withdrawal. Cash a planned withdrawal brings never counts toward
- * what the income leaves. Planned amounts are
+ * leaves, then, with a net below zero, the withdrawal and then the transfers (outside cash, so the net is the same), otherwise the
+ * transfers and then the surplus. Cash a planned withdrawal brings never counts toward what the income leaves. Planned amounts are
  * already priced, so a Derived amount has read whatever it reads before any of this happens.
  */
 export function oracleLandDay(
@@ -72,7 +73,9 @@ export function oracleLandDay(
 	const budget = cashflow > 0n ? cashflow : 0n
 	const assets = oracleAssetContributions(states, scenario, contributions, budget, date)
 	const net = cashflow + cash - assets.applied
-	if (net > 0n) oracleSurplus(states, scenario, fixture.timeline.start, date, net)
+	// A net below zero draws the withdrawal first and the transfers move what is left; otherwise they move first (ADR 0031).
 	const unmet = net < 0n ? oracleWithdraw(states, scenario, fixture.timeline.start, date, -net) : 0n
-	return { expense, ranOut: unmet > 0n }
+	const moves = oracleTransfers(states, landing, planned, date)
+	if (net > 0n) oracleSurplus(states, scenario, fixture.timeline.start, date, net)
+	return { expense, ranOut: unmet > 0n, ...moves }
 }

@@ -24,6 +24,7 @@ describe("allowedValues", () => {
 			"expense",
 			"contribution",
 			"withdrawal",
+			"transfer",
 		])
 		const account = problemOf("INVALID_KIND", { accounts: [{ id: "a", kind: "cash", rate: 0 }] })
 		expect(allowedValues(account.code, account.path)).toEqual(["asset", "liability"])

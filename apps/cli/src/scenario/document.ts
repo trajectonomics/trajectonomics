@@ -80,6 +80,7 @@ const TIMELINE_CODES: ReadonlySet<string> = new Set(["MISSING_CARRY_IN"])
  * told to fix it.
  */
 export function scenarioProblems(value: unknown): ScenarioProblem[] {
+	// ROUTING_NOT_SHIPPED covers any shape the engine takes and this release does not publish yet: routing keys and the `transfer` Flow.
 	const found: ScenarioProblem[] = unshippedRouting(value).map(({ segments, said }) => ({
 		code: ROUTING_NOT_SHIPPED,
 		segments,

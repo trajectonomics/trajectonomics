@@ -108,6 +108,10 @@ _Avoid_: inheritance, will, legacy, probate
 The date the Estate page reads: the later life expectancy of the household's holder and partner by default, a Milestone, a household anchor or the plan's last year. The page reads the `estate` row on that date or the first roll-up end after it, and computes no date.
 _Avoid_: death date, payout date
 
+**Tax profile**:
+The items a plan's tax assumes about the person (filing status, children, parents, disabled care and the deductions paid in the tax year), as `scenario show` states them in `tax`. They are the person's inputs, not figures: the Dashboard shows them as stored and sends a change as one `scenario tax` write.
+_Avoid_: tax settings, tax return, tax rules
+
 **Custom chart**:
 A chart a person made of yearly figures `traj` states, a name, a kind and a list of series ids, kept in the browser and in no plan. A series a plan lacks is named as missing, not drawn.
 _Avoid_: report, widget, dashboard, saved view
