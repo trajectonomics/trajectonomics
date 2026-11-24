@@ -22,8 +22,12 @@ export function titlesFor(series: readonly LineSeries[], xs: readonly number[]):
 	return xs.map((x) => titles.get(x) ?? "")
 }
 
-/** The least room between two drawn x labels, in pixels, so a part-year period beside its neighbour stays readable. */
-const MIN_GAP = 64
+/**
+ * The least room between two drawn x labels, in pixels, so a part-year period beside its neighbour stays
+ * readable. The last label sits against the chart's edge, where it ends instead of being centred, so it needs more.
+ */
+const MIN_GAP = 70
+const LAST_GAP = 106
 
 /** The x labels a chart draws, spaced so that at most `maxTicks` of them fit and no two touch. */
 export function xTicksFor(
@@ -35,7 +39,8 @@ export function xTicksFor(
 	let last = Number.NEGATIVE_INFINITY
 	return labels.flatMap((label, index) => {
 		const at = pixels[index]
-		if (index % every !== 0 || at === undefined || at - last < MIN_GAP) return []
+		const need = index === labels.length - 1 ? LAST_GAP : MIN_GAP
+		if (index % every !== 0 || at === undefined || at - last < need) return []
 		last = at
 		return [{ index, label }]
 	})

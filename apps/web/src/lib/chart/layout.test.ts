@@ -69,6 +69,16 @@ describe("x labels", () => {
 		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["30 Oct", "30 Oct next"])
 	})
 
+	test("the last label, which ends at the edge, needs more room than the others", () => {
+		const point = (x: number, label: string) => ({ x, xLabel: label, y: 1, display: "1.00" })
+		const layout = lineLayout(
+			[{ name: "A", points: [point(0, "a"), point(700, "b"), point(780, "last")] }],
+			{ ...PLOT, width: 900 },
+		)
+		// "last" is 86px from "b": room enough for a label in the middle, not for one against the edge.
+		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["a", "b"])
+	})
+
 	test("a chart of many series asks for the wide palette", () => {
 		const series = [{ name: "A", points: [{ x: 0, xLabel: "0", y: 1, display: "1.00" }] }]
 		expect(lineLayout(series, PLOT, [], "wide")?.palette).toBe("wide")
