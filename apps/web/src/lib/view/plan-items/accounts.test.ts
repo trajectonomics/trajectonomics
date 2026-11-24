@@ -17,6 +17,8 @@ describe("accountCards", () => {
 			payoutHow: null,
 			fee: null,
 			years: [],
+			lifetimeFees: null,
+			lifetimePayouts: null,
 		})
 		expect(cards[1]).toEqual({
 			id: "loan",
@@ -29,6 +31,8 @@ describe("accountCards", () => {
 			payoutHow: null,
 			fee: null,
 			years: [],
+			lifetimeFees: null,
+			lifetimePayouts: null,
 		})
 	})
 

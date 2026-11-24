@@ -4,6 +4,7 @@ import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
 import WasText from "../what-if/WasText.svelte"
+import AccountLifetimes from "./AccountLifetimes.svelte"
 import AccountYears from "./AccountYears.svelte"
 
 interface Props {
@@ -64,6 +65,7 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 					{/if}
 				</dd>
 			</dl>
+			<AccountLifetimes fees={card.lifetimeFees} payouts={card.lifetimePayouts} wasFees={mark.was.lifetimeFees} wasPayouts={mark.was.lifetimePayouts} {currency} />
 			<AccountYears years={card.years} {currency} />
 			{#if editable}
 				<ItemSwitch {plan} {contentHash} path="accounts.{card.id}" label={card.id} onTry={() => onTry(card.id)} />

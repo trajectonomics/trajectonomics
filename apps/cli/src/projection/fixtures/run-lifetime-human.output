@@ -1,0 +1,17 @@
+annual (2 rows)
+index  from        to          Ages  openingNetWorth  closingNetWorth      income  expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+    0  2026-01-01  2026-12-31                   0.00       1265306.71  1204051.89     0.00      100000.00                   0.00   6820.72   0.00  false    {"date":"2027-01-01","amount":"1370327.65"}
+    1  2027-01-01  2027-01-01             1265306.71       1370327.65   100000.00     0.00           0.00                   0.00     20.94   0.00  true     {"date":"2027-01-01","amount":"1370327.65"}
+
+fees (2 rows)
+index  from        to          account   amount
+    0  2026-01-01  2026-12-31  fund     1514.01
+    1  2027-01-01  2027-01-01  fund        0.00
+
+No tax is applied; figures are before tax.
+
+Fees over the plan, all accounts: 1514.01
+
+accountLifetimes (1 row)
+account  lifetimeFees  lifetimePayouts
+fund          1514.01          4051.89
