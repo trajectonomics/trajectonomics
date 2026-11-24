@@ -1,12 +1,10 @@
 // The write path of the loopback server: the session token, and POST /edit, which runs one Edit through
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
-import { z } from "zod"
-import type { Read, Snapshot } from "../src/lib/contract"
-import { type Edit, writeCommand } from "../src/lib/edit/edit"
-import { followPlan } from "../src/lib/edit/follow"
+import type { Snapshot } from "../src/lib/contract"
+import { followCompare, followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
 import { changedBy, paramsAfter, rereadInputs } from "./run-reread"
-import { runTraj } from "./run-traj"
+import { runEdit } from "./serve-apply"
 import { answerOf, failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
 import { answerPath } from "./serve-path"
@@ -37,12 +35,6 @@ export function createEditor(options: EditorOptions): Editor {
 		return keep(await runSnapshot(options.traj, options.cliVersion, params, options.records))
 	}
 
-	/** Runs one write through traj, dry or real, and keeps its Read. */
-	async function write(edit: Edit, dryRun: boolean): Promise<Read<unknown>> {
-		const command = writeCommand(edit, dryRun)
-		return runTraj(options.traj, command.argv, z.unknown(), command.stdin)
-	}
-
 	/** The Edit's own run: dry first, then the real write, then the Snapshot read again. */
 	async function apply(request: Request): Promise<Response> {
 		const read = await readEdit(request)
@@ -51,11 +43,13 @@ export function createEditor(options: EditorOptions): Editor {
 		if (edit.kind === "record-values") {
 			return recordValues({ traj: options.traj, held, refresh }, edit)
 		}
-		const dry = await write(edit, true)
-		if (!dry.ok) return failure(200, dry.error)
-		const real = await write(edit, false)
-		if (!real.ok) return failure(200, real.error)
-		params = { ...params, scenarios: followPlan(params.scenarios, edit) }
+		const error = await runEdit(options.traj, edit)
+		if (error !== null) return failure(200, error)
+		params = {
+			...params,
+			scenarios: followPlan(params.scenarios, edit),
+			compare: followCompare(params.compare, edit),
+		}
 		return answerOf(await refresh())
 	}
 
@@ -67,7 +61,10 @@ export function createEditor(options: EditorOptions): Editor {
 		if (read.reread.path !== undefined) {
 			return answerPath(read.reread.path, params, held, options.traj, options.records)
 		}
-		params = paramsAfter(params, read.reread)
+		const stored = held?.reads.scenarios.ok
+			? held.reads.scenarios.data.scenarios.map((plan) => plan.name)
+			: []
+		params = paramsAfter(params, read.reread, stored)
 		const changed = changedBy(read.reread)
 		// Only those inputs changed: run only the reads that depend on them, if nothing else moved (run-reread.ts).
 		if ((!changed.allowances && !changed.chance) || held === null) return answerOf(await refresh())
