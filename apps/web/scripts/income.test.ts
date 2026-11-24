@@ -5,7 +5,6 @@ import { afterAll, beforeAll, describe, expect } from "bun:test"
 import { chooseRollup, rollupsOf, sectionsOf } from "../src/lib/view/cashflow/cashflow"
 import { lineLabel } from "../src/lib/view/cashflow/cashflow-labels"
 import { fieldOfRefusal, namedRefusal } from "../src/lib/view/plan-items/refusal"
-import { idsAfterSave } from "../src/lib/view/plan-items/salary-draft"
 import { accountItems, flowItems } from "../src/lib/view/what-if/plan-items"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import {
@@ -108,7 +107,10 @@ describe("the employer's 5% of a salary", () => {
 				"employerShare",
 				"employerRounding",
 			]
-			const named = namedRefusal(answer.error, idsAfterSave(stored.document, "salary"))
+			const named = namedRefusal(
+				answer.error,
+				flows.map((flow) => flow.id),
+			)
 			expect(fieldOfRefusal(named, fields)).toBe("employerAccount")
 		},
 	)

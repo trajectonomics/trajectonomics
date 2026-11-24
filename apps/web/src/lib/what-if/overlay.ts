@@ -37,6 +37,9 @@ function listWith(
 		)
 }
 
+/** The changes of a session that holds none. */
+export const NO_CHANGES = { sets: [], removals: [] } as const
+
 /** The document the what-if reads: its Flows and Accounts without the removed items and with the Sets put in. */
 export function overlayDocument(
 	doc: ScenarioDocument,
@@ -51,4 +54,13 @@ export function overlayDocument(
 			changes,
 		) as unknown as ScenarioDocument["accounts"],
 	}
+}
+
+/** The Account with this id as the session shows it, or null: where a drawer that tries a value starts its form, so a new try carries the earlier ones. */
+export function shownAccount(
+	doc: ScenarioDocument,
+	changes: { sets: readonly SetChange[]; removals: readonly string[] } | null,
+	id: string | undefined,
+): ScenarioDocument["accounts"][number] | undefined {
+	return overlayDocument(doc, changes ?? NO_CHANGES).accounts.find((one) => one.id === id)
 }

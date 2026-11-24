@@ -75,3 +75,13 @@ export function employerText(
 	const share = employerOf(all, flow.id)
 	return share === null ? null : employerWords(share)
 }
+
+/** What deleting a salary takes with it besides the salary: the employer's Flow it carries, or none when it has none of the form's shape. */
+export function salaryDeleteNote(
+	flows: readonly ScenarioFlow[],
+	salaryId: string,
+): string | undefined {
+	return employerOf(flows, salaryId) === null
+		? undefined
+		: `Its employer share (${employerIdOf(salaryId)}) is deleted with it.`
+}

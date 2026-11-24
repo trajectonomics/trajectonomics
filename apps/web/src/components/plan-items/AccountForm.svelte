@@ -8,6 +8,7 @@ import { accountDraftOf } from "../../lib/view/plan-items/accounts"
 import { accountIds, withAccount, withoutAccount } from "../../lib/view/plan-items/document"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { milestoneIds } from "../../lib/view/withdrawals/context"
+import { shownAccount } from "../../lib/what-if/overlay"
 import { recordOf } from "../../lib/what-if/session"
 import AccountFields from "./AccountFields.svelte"
 import ItemActions from "./ItemActions.svelte"
@@ -43,7 +44,11 @@ const income = $derived({
 	milestones: milestoneIds(doc),
 	anchors: anchorChoices(doc, household, "9999-12-31"),
 })
-const initial = () => accountDraftOf(existing, income)
+/** The Account the form starts from: as the session shows it while a value is tried, so a new try carries the earlier ones. */
+const start = $derived(
+	tryValue ? shownAccount(doc, whatIfSession.changesFor(name), existing?.id) : existing,
+)
+const initial = () => accountDraftOf(start, income)
 let draft = $state(initial())
 let problems: Problems = $state({})
 const FIELDS = [
@@ -69,7 +74,7 @@ async function commit(next: ScenarioDocument): Promise<void> {
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = accountFromDraft(draft, { existing, taken: accountIds(doc), income })
+	const result = accountFromDraft(draft, { existing: start, taken: accountIds(doc), income })
 	if (!result.ok) {
 		editSession.clear()
 		problems = result.problems

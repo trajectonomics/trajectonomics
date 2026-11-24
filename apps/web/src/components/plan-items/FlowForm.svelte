@@ -1,15 +1,15 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { deleteFlow, saveFlow } from "../../client/flow-save.js"
+import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
-import { employerOf, employerTargets } from "../../lib/view/plan-items/employer"
+import { employerOf, employerTargets, salaryDeleteNote } from "../../lib/view/plan-items/employer"
 import { employerDraftOf } from "../../lib/view/plan-items/employer-draft"
 import { categoriesOf, type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
-import { slugId } from "../../lib/view/plan-items/form"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { namedRefusal } from "../../lib/view/plan-items/refusal"
-import { idsAfterSave } from "../../lib/view/plan-items/salary-draft"
+import { NO_CHANGES, overlayDocument } from "../../lib/what-if/overlay"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -44,9 +44,12 @@ let {
 const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
+/** The plan's Flows as the form starts from them: as the session shows them while a value is tried, so a new try carries the earlier ones. */
+const startFlows = () =>
+	tryValue ? overlayDocument(doc, whatIfSession.changesFor(name) ?? NO_CHANGES).flows : doc.flows
 /** What the employer adds on top of a salary: nothing until the person fills it in. */
 const initialEmployer = () =>
-	employerDraftOf(existing === undefined ? null : employerOf(doc.flows, existing.id))
+	employerDraftOf(existing === undefined ? null : employerOf(startFlows(), existing.id))
 let employer = $state(initialEmployer())
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
@@ -65,10 +68,10 @@ const FIELDS = [
 	"employerShare",
 	"employerRounding",
 ]
+/** The ids of the Flows of the document the last save sent, in order, which a refusal's position in its path names. */
+let sent: string[] = $state([])
 /** The refusal with the Flow's position in its path named by id, so one on the employer's Flow lands in its section. */
-const refusal = $derived(
-	namedRefusal(editSession.failure, idsAfterSave(doc, existing?.id ?? slugId(draft.name))),
-)
+const refusal = $derived(namedRefusal(editSession.failure, sent))
 const shown = $derived(shownProblems(problems, refusal, editSession.error, FIELDS))
 
 async function save(event: SubmitEvent): Promise<void> {
@@ -85,6 +88,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	})
 	problems = saved.problems
 	cleared = saved.cleared
+	sent = saved.sent
 	if (saved.done) onDone()
 }
 
@@ -96,5 +100,5 @@ async function remove(): Promise<void> {
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
 	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
 	<TryNotice fields={cleared} />
-	<ItemActions id={existing?.id} onDelete={remove} trying={tryValue} />
+	<ItemActions id={existing?.id} onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
 </form>

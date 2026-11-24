@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { scenarioDocument } from "../../contract"
-import { employerOf, employerTargets, employerText } from "./employer"
+import { employerOf, employerTargets, employerText, salaryDeleteNote } from "./employer"
 import { employerDraftOf } from "./employer-draft"
 import { planDocument } from "./fixtures.test-support"
 import { flowDraftOf } from "./flows"
@@ -162,5 +162,22 @@ describe("saving a salary with an employer share", () => {
 		})
 		expect(result).toEqual({ ok: true, flow: salary, employer: null, dropped: null })
 		expect(withSalary(doc, result as never)).toEqual(doc)
+	})
+})
+
+describe("what deleting a salary says it takes with it", () => {
+	test("a salary that carries an employer share names the Flow deleted with it, and one without says nothing", () => {
+		const doc = plan()
+		expect(salaryDeleteNote(doc.flows, "salary")).toBeUndefined()
+		const salary = salaryOf(doc)
+		const saved = salaryFromDraft(flowDraftOf(salary), FIVE, {
+			kind: "income",
+			existing: salary,
+			doc,
+		})
+		if (!saved.ok) throw new Error(JSON.stringify(saved.problems))
+		expect(salaryDeleteNote(withSalary(doc, saved).flows, "salary")).toBe(
+			"Its employer share (salary-employer) is deleted with it.",
+		)
 	})
 })

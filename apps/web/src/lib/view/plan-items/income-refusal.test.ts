@@ -51,4 +51,12 @@ describe("where a refusal of a payout, a fee or an employer's share lands", () =
 		expect(at("document.flows.salary-employer.start")).toBe("start")
 		expect(at("document.flows.salary.amount")).toBe("amount")
 	})
+
+	test("a refusal deeper under a payout is no field of it: the key straight after `payout` names the field", () => {
+		const at = (path: string) => fieldOfRefusal(refusal(path), ACCOUNT)
+		expect(at("document.accounts.fund.payout.prepayments.0.bps")).toBeNull()
+		expect(at("document.accounts.fund.payout.prepayments.0.rounding")).toBeNull()
+		expect(at("document.accounts.fund.payout.bps")).toBe("payoutRate")
+		expect(at("document.accounts.fund.fee.bps")).toBe("feeRate")
+	})
 })

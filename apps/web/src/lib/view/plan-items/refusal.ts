@@ -19,11 +19,14 @@ const EMPLOYER_FIELDS: Readonly<Record<string, string>> = {
 	rounding: "employerRounding",
 }
 
-/** The field of a refusal under an Account's `payout` or `fee`, or null. */
+/**
+ * The field of a refusal under an Account's `payout` or `fee`, or null. The key straight after the section names the field, so
+ * `payout.prepayments.0.bps` is no share: it is not a field of the form and falls to the general problem.
+ */
 function sectionField(segments: readonly string[], fields: readonly string[]): string | null {
-	const last = segments[segments.length - 1] ?? ""
 	for (const [section, names] of Object.entries(SECTION_FIELDS)) {
-		const field = segments.includes(section) ? names[last] : undefined
+		const at = segments.indexOf(section)
+		const field = at < 0 ? undefined : names[segments[at + 1] ?? section]
 		if (field !== undefined && fields.includes(field)) return field
 	}
 	return null

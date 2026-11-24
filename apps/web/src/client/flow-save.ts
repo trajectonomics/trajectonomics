@@ -25,11 +25,15 @@ export interface FlowSave {
 	tryValue: boolean
 }
 
-/** What the form shows after a save: whether it is done, the problems at its fields, and the fields a tried value cleared. */
+/**
+ * What the form shows after a save: whether it is done, the problems at its fields, the fields a tried value cleared, and the ids of
+ * the Flows of the document the Edit sent, in order, which name the position a refusal's path holds.
+ */
 export interface FlowSaved {
 	done: boolean
 	problems: Problems
 	cleared: string[]
+	sent: string[]
 }
 
 /** Tries the employer's Flow beside the salary: a new one is an Addition, an edited one a Set, a cleared one is switched off. */
@@ -55,14 +59,14 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 	const result = salaryFromDraft(input.draft, input.employer, { kind: input.kind, existing, doc })
 	if (!result.ok) {
 		editSession.clear()
-		return { done: false, problems: result.problems, cleared: [] }
+		return { done: false, problems: result.problems, cleared: [], sent: [] }
 	}
 	if (!input.tryValue) {
 		const document = withSalary(doc, result)
 		const done = await editSession.run({ kind: "apply-plan", name, contentHash, document })
-		return { done, problems: {}, cleared: [] }
+		return { done, problems: {}, cleared: [], sent: document.flows.map((flow) => flow.id) }
 	}
-	if (existing === undefined) return { done: true, problems: {}, cleared: [] }
+	if (existing === undefined) return { done: true, problems: {}, cleared: [], sent: [] }
 	const cleared = whatIfSession.tryItem(
 		name,
 		contentHash,
@@ -72,7 +76,7 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 		recordOf(result.flow),
 	)
 	tryEmployer(input, result)
-	return { done: cleared.length === 0, problems: {}, cleared }
+	return { done: cleared.length === 0, problems: {}, cleared, sent: [] }
 }
 
 /** Deletes a Flow, and the employer's Flow it carries, as one Edit. True when it ran. */

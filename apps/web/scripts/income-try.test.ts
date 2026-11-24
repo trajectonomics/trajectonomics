@@ -3,6 +3,7 @@
 import { afterAll, beforeAll, describe, expect } from "bun:test"
 import { accountItems } from "../src/lib/view/what-if/plan-items"
 import { readsOf } from "../src/lib/what-if/lens"
+import { shownAccount } from "../src/lib/what-if/overlay"
 import { overridesOf, recordOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedItem } from "../src/lib/what-if/try-flow"
 import { SLOW_MS } from "./edit-fixture.test-support"
@@ -81,6 +82,37 @@ describe("the fee changed in a What-if session", () => {
 				edited: { ...recordOf(bare), id: ids.fund, fee: { bps: "2.00", rounding: "floor" } },
 			})
 			expect(session.sets.map((set) => set.path)).toEqual([`accounts.${ids.fund}`])
+			const lens = readsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
+			expect(lens.run?.tables.some((table) => table.name === "fees")).toBe(true)
+		},
+	)
+
+	slow(
+		"a rate and then a fee tried on the same fund both stay in the session, and traj takes the two",
+		async () => {
+			const stored = storedPlan()
+			const fund = stored.document.accounts.find((one) => one.id === ids.fund)
+			if (fund === undefined) throw new Error("no fund")
+			const rate = { ...recordOf(fund), id: ids.fund, rate: 700 }
+			const first = withTriedItem(startWhatIf(PLAN, stored.hash), "accounts", {
+				stored: recordOf(fund),
+				edited: rate,
+			})
+			// The drawer starts its form from the Account as the session shows it, then tries the fee on top.
+			const start = shownAccount(stored.document, overridesOf(first), ids.fund)
+			if (start === undefined) throw new Error("no shown fund")
+			const session = withTriedItem(first, "accounts", {
+				stored: recordOf(fund),
+				edited: { ...recordOf(start), id: ids.fund, fee: { bps: "0.50", rounding: "floor" } },
+			})
+			expect(session.sets.map((set) => set.path).sort()).toEqual([
+				`accounts.${ids.fund}.fee`,
+				`accounts.${ids.fund}.rate`,
+			])
+			expect(shownAccount(stored.document, overridesOf(session), ids.fund)).toMatchObject({
+				rate: 700,
+				fee: { bps: "0.50" },
+			})
 			const lens = readsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
 			expect(lens.run?.tables.some((table) => table.name === "fees")).toBe(true)
 		},

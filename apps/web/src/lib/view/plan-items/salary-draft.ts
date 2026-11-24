@@ -96,9 +96,3 @@ export function withoutSalary(doc: ScenarioDocument, id: string): ScenarioDocume
 	const gone = new Set([id, ...(share === null ? [] : [share.flow.id])])
 	return { ...doc, flows: doc.flows.filter((flow) => !gone.has(flow.id)) }
 }
-
-/** The ids of the Flows of the document a save sends, in order: the plan's, then the salary if it is new, then its employer Flow. */
-export function idsAfterSave(doc: ScenarioDocument, salaryId: string): string[] {
-	const ids = doc.flows.map((flow) => flow.id)
-	return [...ids, ...(ids.includes(salaryId) ? [] : [salaryId]), employerIdOf(salaryId)]
-}
