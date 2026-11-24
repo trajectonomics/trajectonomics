@@ -1,4 +1,5 @@
 import { isSafeInteger, overflow } from "../engine/overflow"
+import { entryAccount } from "../engine/routed"
 import type { StateMap } from "../engine/state"
 import { valuation } from "../engine/value"
 import type { DateString, Scenario } from "../types"
@@ -12,7 +13,7 @@ export function lockedOrAbsentAssets(
 	scenario: Scenario,
 	date: DateString,
 ): AssetValue {
-	const withdraw = new Set(scenario.cashflow.withdraw)
+	const withdraw = new Set(scenario.cashflow.withdraw.map(entryAccount))
 	let total = 0n
 	for (const state of states.values()) {
 		if (state.rule.kind !== "asset") continue

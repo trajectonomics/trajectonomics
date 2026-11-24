@@ -58,9 +58,13 @@ export function checkIlliquidRouting(
 	emit: Emit,
 ): void {
 	if (!isRecord(cashflow) || illiquid.size === 0) return
-	const withdraw = Array.isArray(cashflow["withdraw"]) ? cashflow["withdraw"] : []
-	withdraw.forEach((id: unknown, index) => {
-		if (isIlliquid(id, illiquid)) emit("ILLIQUID_ROUTED", [...path, "cashflow", "withdraw", index])
+	const withdraw: unknown[] = Array.isArray(cashflow["withdraw"]) ? cashflow["withdraw"] : []
+	withdraw.forEach((entry, index) => {
+		const floored = isRecord(entry)
+		if (isIlliquid(floored ? entry["account"] : entry, illiquid)) {
+			const at = [...path, "cashflow", "withdraw", index]
+			emit("ILLIQUID_ROUTED", floored ? [...at, "account"] : at)
+		}
 	})
 	const surplus = Array.isArray(cashflow["surplus"]) ? cashflow["surplus"] : []
 	surplus.forEach((step: unknown, index) => {

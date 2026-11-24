@@ -3,6 +3,7 @@ import type { ProjectionProblem } from "../types/projection"
 import type { LevySet } from "./levy-set"
 import { minBigInt } from "./min"
 import { mutate } from "./mutate"
+import { routedAt } from "./routed"
 import type { StateMap } from "./state"
 import { addTracked, NO_ROUTING } from "./tracked"
 import { valuation } from "./value"
@@ -20,17 +21,29 @@ export interface SurplusResult {
 	readonly problem: ProjectionProblem | undefined
 }
 
+const WHOLE = 10_000n
+
+/** What a step would take of `remaining`: all of it, or `floor(remaining × share / 10000)` (ADR 0030). */
+function wanted(step: SurplusStep, remaining: bigint): bigint {
+	return step.share === undefined ? remaining : (remaining * BigInt(step.share)) / WHOLE
+}
+
 function fillStep(
 	states: StateMap,
+	scenario: Scenario,
 	step: SurplusStep,
 	date: DateString,
 	remaining: bigint,
 	levies: LevySet | undefined,
 ): FillResult {
 	const state = states.get(step.account)!
-	const headroom = step.upTo === undefined ? remaining : BigInt(step.upTo) - valuation(state, date)
+	const want = wanted(step, remaining)
+	const room =
+		step.upTo === undefined
+			? want
+			: routedAt(step.upTo, state, date, scenario.economy.inflation) - valuation(state, date)
 	let fill = 0n
-	if (headroom > 0n) fill = minBigInt(remaining, headroom)
+	if (room > 0n) fill = minBigInt(want, room)
 	if (fill === 0n) return { remaining, filled: 0n, problem: undefined }
 	const problem = mutate(state, date, fill, levies)
 	return problem === undefined
@@ -63,7 +76,7 @@ function fillSteps(
 	let remaining = amount
 	for (const step of scenario.cashflow.surplus) {
 		if (remaining === 0n) break
-		const result = fillStep(states, step, date, remaining, levies)
+		const result = fillStep(states, scenario, step, date, remaining, levies)
 		remaining = result.remaining
 		addTracked(filled, step.account, result.filled)
 		if (result.problem !== undefined) return result.problem
