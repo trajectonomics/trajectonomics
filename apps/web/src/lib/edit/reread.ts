@@ -13,7 +13,7 @@ import { planName } from "./fields"
  * A reread: `{}` reads again as it is; `allowances` states the inputs of the allowance reads, null clears them; `chance`
  * states the paths and the seed of the chance reads (web ADR 0018). `path` reads one Market path with the plan and its
  * index and nothing else, and answers that one read, not the Snapshot (web ADR 0020): it is never sent with another field.
- * `addPlan` adds a plan the ledger holds to the plans the Snapshot projects, and writes nothing (web ADR 0021).
+ * `addPlan` adds a plan the ledger holds to the plans the Snapshot projects, and writes nothing (web ADR 0023), and is sent alone.
  */
 export const rereadSchema = z
 	.strictObject({
@@ -24,9 +24,12 @@ export const rereadSchema = z
 	})
 	.refine(
 		(body) =>
-			body.path === undefined ||
-			(body.allowances === undefined && body.chance === undefined && body.addPlan === undefined),
-		"a path is read alone",
+			(body.path === undefined ||
+				(body.allowances === undefined &&
+					body.chance === undefined &&
+					body.addPlan === undefined)) &&
+			(body.addPlan === undefined || (body.allowances === undefined && body.chance === undefined)),
+		"a path and a plan to add are each sent alone",
 	)
 
 /** One reread request, parsed. */

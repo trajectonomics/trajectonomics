@@ -1,10 +1,23 @@
 import { describe, expect, test } from "bun:test"
-import { type Edit, editSchema } from "./edit"
+import { type Edit, editSchema, writeCommand } from "./edit"
 import { followCompare, followPlan } from "./follow"
 import { rereadSchema } from "./reread"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
 const rename: Edit = { kind: "rename-plan", name: "early", newName: "later", contentHash: HASH }
+
+describe("each plan Edit is one scenario write", () => {
+	test.each([
+		rename,
+		{ kind: "set-plan-notes", name: "early", notes: "Retire at 55." },
+		{ kind: "set-main-plan", name: "early" },
+		{ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } },
+	])("%o", (edit) => {
+		const parsed = editSchema.parse(edit)
+		expect(writeCommand(parsed, false, "{}").argv[0]).toBe("scenario")
+		expect(writeCommand(parsed, true, "{}").argv).toContain("--dry-run")
+	})
+})
 
 describe("the plan Edits are strict", () => {
 	test.each([
@@ -70,8 +83,16 @@ describe("what the server keeps after a plan Edit", () => {
 		expect(followCompare({ a: "early", b: "base" }, rename)).toEqual({ a: "later", b: "base" })
 		expect(followCompare({ a: "base", b: "early" }, rename)).toEqual({ a: "base", b: "later" })
 		expect(followCompare(null, rename)).toBeNull()
-		const other: Edit = { kind: "delete-plan", name: "early" }
+		const other: Edit = { kind: "set-main-plan", name: "early" }
 		expect(followCompare({ a: "early", b: "base" }, other)).toEqual({ a: "early", b: "base" })
+	})
+
+	test("a delete of either plan of a comparison takes the comparison out, and a delete of another leaves it", () => {
+		const compare = { a: "early", b: "base" }
+		expect(followCompare(compare, { kind: "delete-plan", name: "early" })).toBeNull()
+		expect(followCompare(compare, { kind: "delete-plan", name: "base" })).toBeNull()
+		expect(followCompare(compare, { kind: "delete-plan", name: "other" })).toEqual(compare)
+		expect(followCompare(null, { kind: "delete-plan", name: "early" })).toBeNull()
 	})
 
 	test("notes and the main plan change no list, and a new plan joins an explicit one", () => {
@@ -96,6 +117,11 @@ describe("the reread that adds a plan", () => {
 		["an empty plan", { addPlan: "" }],
 		["a path read beside it", { addPlan: "early", path: { plan: "base", index: 1 } }],
 		["a field it does not take", { addPlan: "early", remove: "base" }],
+		["the allowance inputs beside it", { addPlan: "early", allowances: null }],
+		[
+			"the chance inputs beside it",
+			{ addPlan: "early", chance: { paths: 10, seed: "0123456789abcdef" } },
+		],
 	])("refuses %s", (_name, body) => {
 		expect(rereadSchema.safeParse(body).success).toBe(false)
 	})

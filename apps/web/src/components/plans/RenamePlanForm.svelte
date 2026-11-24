@@ -1,7 +1,6 @@
 <script lang="ts">
-import { editSession } from "../../client/edit.svelte.js"
-import { selectPlan } from "../../client/select-plan.svelte.js"
-import { renameEdit, renameError } from "../../lib/view/plans/edits"
+import { renamePlan } from "../../client/plan-actions.svelte.js"
+import { renameError } from "../../lib/view/plans/edits"
 import type { PlanRow } from "../../lib/view/plans/rows"
 import PlanForm from "./PlanForm.svelte"
 import { FIELD } from "./styles"
@@ -27,8 +26,8 @@ $effect(() => {
 async function save(): Promise<void> {
 	problem = renameError(row, draft, stored)
 	if (problem !== null) return
-	if (await editSession.run(renameEdit(row, draft))) {
-		if (shown) selectPlan(draft.trim())
+	// `shown` is read now: once the Edit has run, the Snapshot no longer holds the old name.
+	if (await renamePlan(row, draft, shown)) {
 		onDone()
 	}
 }

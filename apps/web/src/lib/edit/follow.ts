@@ -23,6 +23,7 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 		case "remove-tax":
 		case "set-plan-notes":
 		case "set-main-plan":
+		case "record-values":
 			return [...scenarios]
 		case "copy-plan":
 		case "apply-plan":
@@ -33,12 +34,19 @@ export function followPlan(scenarios: readonly string[], edit: Edit): string[] {
 	}
 }
 
-/** The two plans a comparison names after an Edit: a rename carries the name into the comparison. */
+/**
+ * The two plans a comparison names after an Edit: a rename carries the name into the comparison, and a delete of
+ * either plan takes the comparison out, since it would name a plan that is gone.
+ */
 export function followCompare(
 	compare: { a: string; b: string } | null,
 	edit: Edit,
 ): { a: string; b: string } | null {
-	if (compare === null || edit.kind !== "rename-plan") return compare
+	if (compare === null) return compare
+	if (edit.kind === "delete-plan") {
+		return compare.a === edit.name || compare.b === edit.name ? null : compare
+	}
+	if (edit.kind !== "rename-plan") return compare
 	const swap = (name: string) => (name === edit.name ? edit.newName : name)
 	return { a: swap(compare.a), b: swap(compare.b) }
 }

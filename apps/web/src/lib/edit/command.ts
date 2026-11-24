@@ -1,10 +1,11 @@
 /**
  * The `traj` write each Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
- * `edit.ts`, and each Edit maps to one `scenario` write here ([web ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
+ * `edit.ts`, and each Edit maps to one `traj` write here (a `scenario` write, or `account value` for the ledger) ([web ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
  */
 import { overrideTokens } from "../what-if/argv"
 import type { Edit } from "./edit"
 import { planCommand, startCommand } from "./plan-command"
+import { valuesDocument } from "./record-values"
 import { taxCommand } from "./tax-command"
 
 /** The argv of one write, which ends with `--json`, and the standard input the write reads. */
@@ -98,5 +99,11 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 		case "set-plan-notes":
 		case "set-main-plan":
 			return planCommand(edit, flags)
+		case "record-values":
+			// The batch is read from stdin: `against` and every value as typed, which traj parses (cli ADR 0072).
+			return {
+				argv: ["account", "value", "--file", "-", ...flags],
+				stdin: JSON.stringify(valuesDocument(edit)),
+			}
 	}
 }

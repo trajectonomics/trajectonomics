@@ -1,6 +1,5 @@
 <script lang="ts">
-import { editSession } from "../../client/edit.svelte.js"
-import { selectPlan } from "../../client/select-plan.svelte.js"
+import { deletePlan } from "../../client/plan-actions.svelte.js"
 import type { PlanRow } from "../../lib/view/plans/rows"
 import PlanForm from "./PlanForm.svelte"
 
@@ -15,11 +14,8 @@ interface Props {
 let { row, names, shown, onDone }: Props = $props()
 
 async function remove(): Promise<void> {
-	const left = names.filter((name) => name !== row.name)
-	if (await editSession.run({ kind: "delete-plan", name: row.name })) {
-		if (shown) selectPlan(left[0] ?? "")
-		onDone()
-	}
+	// `shown` is read now: once the Edit has run, the Snapshot no longer holds the deleted plan.
+	if (await deletePlan(row.name, names, shown)) onDone()
 }
 </script>
 

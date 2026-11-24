@@ -25,7 +25,7 @@ const button =
 				<li>
 					{#if item.place === "flows"}
 						<SiteLink href="/optimize/allowances/" class="inline-block rounded-md border border-border px-3 py-1.5 text-sm underline">{item.label} (a contribution Flow)</SiteLink>
-					{:else if onEdit}
+					{:else if onEdit && item.place !== null}
 						{@const group = item.place}
 						<button type="button" {disabled} onclick={() => onEdit(group)} class={button}>{item.label}</button>
 					{:else}

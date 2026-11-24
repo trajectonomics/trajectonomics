@@ -1,4 +1,4 @@
-import type { ErrorBody } from "../lib/contract"
+import type { AccountValues, ErrorBody } from "../lib/contract"
 import { type EditAnswer, editAnswer, sessionAnswer } from "../lib/edit/answer"
 import type { EditInput } from "../lib/edit/edit"
 import { EDIT_PATH, EDIT_SESSION_PATH, EDIT_TOKEN_HEADER } from "../lib/edit/guard"
@@ -24,6 +24,8 @@ class EditSession {
 	failure = $state<ErrorBody | null>(null)
 	/** True when the CLI refused an Edit over a plan that changed since the page read it (cli ADR 0055). */
 	stale = $state(false)
+	/** What the last Edit that ran stated, as the CLI stated it: the batch of `record-values`. Null for any other. */
+	result = $state<AccountValues | null>(null)
 	private opened: Promise<void> | null = null
 
 	/** Asks the server for the token once. A server that does not answer (`vite preview`) leaves it null. */
@@ -37,6 +39,7 @@ class EditSession {
 		this.error = null
 		this.failure = null
 		this.stale = false
+		this.result = null
 	}
 
 	/** Sends one Edit and shows the Snapshot it answers with. Returns true when the Edit ran. */
@@ -47,6 +50,7 @@ class EditSession {
 		this.error = null
 		this.failure = null
 		this.stale = false
+		this.result = null
 		try {
 			const response = await fetch(EDIT_PATH, {
 				method: "POST",
@@ -107,6 +111,7 @@ class EditSession {
 			else this.error = answer.error.message
 			return false
 		}
+		this.result = answer.result ?? null
 		replaceSnapshot(answer.snapshot)
 		return true
 	}

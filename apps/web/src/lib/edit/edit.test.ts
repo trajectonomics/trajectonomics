@@ -19,6 +19,7 @@ describe("the Edit list", () => {
 			"rename-plan",
 			"set-plan-notes",
 			"set-main-plan",
+			"record-values",
 		])
 	})
 
@@ -36,10 +37,6 @@ describe("the Edit list", () => {
 			{ kind: "merge-tax", name: "early", contentHash: HASH, flags: { children: "2" } },
 			{ kind: "set-tax", name: "early", contentHash: HASH, flags: { filingStatus: "single" } },
 			{ kind: "remove-tax", name: "early", contentHash: HASH },
-			{ kind: "rename-plan", name: "early", newName: "later", contentHash: HASH },
-			{ kind: "set-plan-notes", name: "early", notes: "Retire at 55." },
-			{ kind: "set-main-plan", name: "early" },
-			{ kind: "apply-plan", name: "fresh", template: { asOf: "2026-11-25" } },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
 			expect(writeCommand(editSchema.parse(edit), false, "{}").argv[0]).toBe("scenario")
@@ -171,6 +168,31 @@ describe("the household Edits", () => {
 		expect(
 			followPlan([], { kind: "set-household", name: "early", contentHash: HASH, household }),
 		).toEqual([])
+	})
+})
+
+describe("record-values", () => {
+	const edit: Edit = {
+		kind: "record-values",
+		against: "gains-id",
+		values: [{ account: "bank-id", date: "2026-10-31", value: "1,000.5" }],
+	}
+
+	test("is account value --file -, with the batch as typed on stdin, and --dry-run first", () => {
+		const stdin = JSON.stringify({ against: "gains-id", values: edit.values })
+		expect(writeCommand(edit, false)).toEqual({
+			argv: ["account", "value", "--file", "-", "--json"],
+			stdin,
+		})
+		expect(writeCommand(edit, true)).toEqual({
+			argv: ["account", "value", "--file", "-", "--dry-run", "--json"],
+			stdin,
+		})
+	})
+
+	test("changes no plan the Snapshot projects", () => {
+		expect(followPlan(["base"], edit)).toEqual(["base"])
+		expect(followPlan([], edit)).toEqual([])
 	})
 })
 

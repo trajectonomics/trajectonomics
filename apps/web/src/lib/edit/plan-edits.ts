@@ -1,6 +1,6 @@
 /**
  * The Edits that manage plans, apart from copy and delete: rename, notes, the main plan, and a new plan from
- * the ledger ([web ADR 0021](../../../docs/adr/0021-the-plans-page-shows-every-plan-side-by-side.md)).
+ * the ledger ([web ADR 0023](../../../docs/adr/0023-the-plans-page-shows-every-plan-side-by-side-and-the-switcher-manages-plans.md)).
  */
 import { z } from "zod"
 import { dateString } from "../contract/date"

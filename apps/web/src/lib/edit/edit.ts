@@ -8,6 +8,7 @@ import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
 import { contentHash, planName } from "./fields"
 import { planEditSchemas, startPlanSchema } from "./plan-edits"
+import { recordValuesSchema } from "./record-values"
 import { taxFlags } from "./tax-flags"
 import { taxLabels } from "./tax-labels"
 
@@ -25,6 +26,7 @@ export const EDIT_KINDS = [
 	"rename-plan",
 	"set-plan-notes",
 	"set-main-plan",
+	"record-values",
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
@@ -96,6 +98,8 @@ const savedEdit = z.discriminatedUnion("kind", [
 		name: planName,
 		contentHash,
 	}),
+	// The first write to the ledger itself: values stated as of a date, which traj turns into Transactions (cli ADR 0072).
+	recordValuesSchema,
 ])
 
 /**

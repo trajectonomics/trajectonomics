@@ -52,6 +52,18 @@ describe("the scenario contract against the CLI's goldens", () => {
 		expect(scenarioList.safeParse({ scenarios: [olderRow] }).success).toBe(true)
 	})
 
+	it("decodes the tax allowances of a taxed plan, and a Snapshot saved without them (cli ADR-0073)", async () => {
+		const plain = ((await golden("show-plain.output")) as { scenario: Record<string, unknown> })
+			.scenario
+		expect(scenarioShow.parse({ scenario: plain }).scenario.taxAllowances).toBeUndefined()
+		const taxAllowances = { stated: ["children"], notStated: ["parents", "someLaterClass"] }
+		const shown = scenarioShow.parse({ scenario: { ...plain, taxAllowances } })
+		expect(shown.scenario.taxAllowances).toEqual(taxAllowances)
+		expect(
+			scenarioShow.safeParse({ scenario: { ...plain, taxAllowances: { stated: [] } } }).success,
+		).toBe(false)
+	})
+
 	it("refuses a key the contract does not name", async () => {
 		const body = (await golden("show-main.output")) as { scenario: object }
 		const wrong = { scenario: { ...body.scenario, extra: 1 } }

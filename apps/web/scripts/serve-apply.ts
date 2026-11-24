@@ -26,6 +26,12 @@ function nameTaken(name: string): ErrorBody {
 	}
 }
 
+/** Whether a write's answer says the plan was created, as a new plan's must. */
+function wasCreated(data: unknown): boolean {
+	const status = applyStatus.safeParse(data)
+	return status.success && status.data.status === "created"
+}
+
 /** Runs one Edit, dry and then real. Null when it ran, else the CLI's error (or the refusal) as data. */
 export async function runEdit(context: RunContext, edit: Edit): Promise<ErrorBody | null> {
 	let template: string | undefined
@@ -41,10 +47,13 @@ export async function runEdit(context: RunContext, edit: Edit): Promise<ErrorBod
 	const dry = await run(true)
 	if (!dry.ok) return dry.error
 	// A new plan must be new: `scenario apply` under a taken name would replace that plan's document.
-	const status = applyStatus.safeParse(dry.data)
-	if (startsPlan(edit) && !(status.success && status.data.status === "created")) {
-		return nameTaken(edit.name)
-	}
+	if (startsPlan(edit) && !wasCreated(dry.data)) return nameTaken(edit.name)
 	const real = await run(false)
-	return real.ok ? null : real.error
+	if (!real.ok) return real.error
+	// A plan of the name made between the dry run and this write (a window of milliseconds) is replaced: say so, as the write is done.
+	if (startsPlan(edit) && !wasCreated(real.data)) {
+		const message = `A plan named ${edit.name} was made while this ran, and this write replaced it.`
+		return { ...nameTaken(edit.name), message }
+	}
+	return null
 }
