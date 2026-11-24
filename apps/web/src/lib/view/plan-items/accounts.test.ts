@@ -13,6 +13,10 @@ describe("accountCards", () => {
 			compounding: null,
 			lockedUntil: "2030-01-01",
 			balance: "662300.00",
+			payout: null,
+			payoutHow: null,
+			fee: null,
+			years: [],
 		})
 		expect(cards[1]).toEqual({
 			id: "loan",
@@ -21,6 +25,10 @@ describe("accountCards", () => {
 			compounding: "monthly",
 			lockedUntil: null,
 			balance: null,
+			payout: null,
+			payoutHow: null,
+			fee: null,
+			years: [],
 		})
 	})
 

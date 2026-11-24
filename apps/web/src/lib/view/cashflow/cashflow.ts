@@ -1,6 +1,7 @@
 import type { AccountList, ProjectionRun, Read } from "../../contract"
 import { formatDate } from "../../format/date"
 import { agesText } from "../household/model"
+import { EMPLOYER_NOTE, EMPLOYER_SECTION, SECTIONS } from "./cashflow-sections"
 
 /**
  * The Cash flow page's view model. Pure: it groups the lines and section totals the CLI gives
@@ -38,37 +39,12 @@ export interface SectionPart {
 
 /** One section of the table: its total's name, the CLI's amount for it, and its parts in the order drawn. */
 export interface Section {
-	readonly total: CashflowTotal["total"]
+	readonly total: CashflowTotal["total"] | typeof EMPLOYER_SECTION
 	readonly amount: string | null
+	/** Why the section has no total, when it is not part of the cash: the employer's money goes straight into an account. */
+	readonly note: string | null
 	readonly parts: readonly SectionPart[]
 }
-
-/**
- * The sections in the order a person reads them. Each names the total the CLI gives it and the line
- * groups that make up its rows. `money in` is income; withdrawals and drawn have their own sections,
- * which the engine's `money in` includes. Spending's categories and its per-Flow expenses are two views of
- * the same total, so each is a part under its own heading.
- */
-const SECTIONS: readonly {
-	total: CashflowTotal["total"]
-	parts: readonly { heading: string | null; groups: readonly CashflowLine["group"][] }[]
-}[] = [
-	{ total: "money in", parts: [{ heading: null, groups: ["income"] }] },
-	{ total: "tax", parts: [{ heading: null, groups: ["prepaid", "settlement"] }] },
-	{ total: "withdrawals", parts: [{ heading: null, groups: ["withdrawal"] }] },
-	{ total: "drawn", parts: [{ heading: null, groups: ["drawn"] }] },
-	{
-		total: "spending",
-		parts: [
-			{ heading: "by category", groups: ["category"] },
-			{ heading: "by expense", groups: ["expense"] },
-		],
-	},
-	{ total: "saving", parts: [{ heading: null, groups: ["contribution"] }] },
-	{ total: "not funded", parts: [{ heading: null, groups: ["unfunded"] }] },
-	{ total: "left over", parts: [{ heading: null, groups: ["surplus"] }] },
-	{ total: "unmet", parts: [{ heading: null, groups: ["unmet"] }] },
-]
 
 /** Whether a Read carries the cash flow table, which only a run with `--breakdown` has. The navigation lists the page only then. */
 export function hasCashflow(read: Read<ProjectionRun> | undefined): boolean {
@@ -126,14 +102,18 @@ export function accountNamesOf(read: Read<AccountList> | undefined): ReadonlyMap
 	return new Map(read.data.accounts.map((account) => [account.id, account.name]))
 }
 
-/** The sections of a roll-up: each with the CLI's total for it, and its parts, whose lines keep the CLI's order. */
+/** The sections of a roll-up: each with the CLI's total for it, and its parts, whose lines keep the CLI's order. The employer's section shows only when it has lines. */
 export function sectionsOf(rollup: Rollup): Section[] {
 	return SECTIONS.map((section) => ({
 		total: section.total,
 		amount: rollup.totals.find((total) => total.total === section.total)?.amount ?? null,
+		note: section.total === EMPLOYER_SECTION ? EMPLOYER_NOTE : null,
 		parts: section.parts.map((part) => ({
 			heading: part.heading,
 			lines: part.groups.flatMap((group) => rollup.lines.filter((line) => line.group === group)),
 		})),
-	}))
+	})).filter(
+		(section) =>
+			section.total !== EMPLOYER_SECTION || section.parts.some((part) => part.lines.length > 0),
+	)
 }

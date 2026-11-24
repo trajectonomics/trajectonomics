@@ -18,6 +18,7 @@ describe("flowCards", () => {
 			growth: "Follows inflation",
 			earned: "Earned",
 			category: null,
+			employer: null,
 			editable: true,
 		})
 		expect(cards[1]?.earned).toBe("Passive")

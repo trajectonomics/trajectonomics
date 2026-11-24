@@ -5,6 +5,8 @@
 /** What a band is, which the page styles and names. */
 export type FlowKind =
 	| "income"
+	| "payout"
+	| "employer"
 	| "withdrawal"
 	| "drawn"
 	| "refund"
