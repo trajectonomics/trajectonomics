@@ -132,6 +132,18 @@ _Avoid_: simulation settings, iterations
 Where a chance read's Return model came from: built from the plan (the CLI's `returnModel` echo, "built from your plan") or read from a file the Dashboard was started with.
 _Avoid_: engine, data source
 
+**Tax group**:
+One of the six cards the Tax profile page shows (filing status, family, insurance, home, giving, social security), each holding the profile items of its group and an Edit that opens the drawer on them. A deduction class `scenario tax` reports is placed in a group by `PLACE` in `src/lib/view/tax-settings/groups.ts`; the two retirement classes are stated by contribution Flows and sit in no group.
+_Avoid_: section, category, tab
+
+**Not in your plan yet**:
+The deduction classes `scenario tax` reports as not stated for the stored profile (`allowances.notStated`), listed under the cards. Each opens the drawer on its group, except the two retirement classes, which link to the Tax allowances page.
+_Avoid_: missing deductions, unused allowances
+
+**Tax label**:
+The Tally label an income Flow carries so that the tax rules read it. A taxed plan takes a label on a Flow in the Tax labels form (an `apply-plan` Edit); a plan with no tax takes its labels in the `set-tax` write that gives it tax, because `traj` writes a label only beside a Levy.
+_Avoid_: tag, category, income type
+
 **Custom chart**:
 A chart a person made of yearly figures `traj` states, a name, a kind and a list of series ids, kept in the browser and in no plan. A series a plan lacks is named as missing, not drawn.
 _Avoid_: report, widget, dashboard, saved view

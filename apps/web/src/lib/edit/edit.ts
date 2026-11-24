@@ -8,6 +8,7 @@ import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
 import { planNameShapeError } from "./name"
 import { taxFlags } from "./tax-flags"
+import { taxLabels } from "./tax-labels"
 
 /** A plan name as `traj` takes it: not empty, and never shaped like a flag (see `planNameShapeError`). */
 const planName = z
@@ -96,6 +97,8 @@ export const editSchema = z.discriminatedUnion("kind", [
 		name: planName,
 		contentHash,
 		flags: taxFlags.required({ filingStatus: true }),
+		// The labels of income Flows that have none: a plan with no Levy takes its labels in the write that gives it one.
+		labels: taxLabels.default([]),
 	}),
 	z.strictObject({
 		kind: z.literal("remove-tax"),

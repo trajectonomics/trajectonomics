@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import type { TaxProfile } from "../../contract"
-import { blankDraft, draftOf, mergeFlags, taxEdit, wholeFlags } from "./draft"
+import { blankDraft, draftOf, mergeFlags, wholeFlags } from "./draft"
+import { taxEdit } from "./profile-edit"
 import { needsWholeProfile, taxFieldOfRefusal, taxShown } from "./refusal"
 import { groupDigits, profileRows } from "./rows"
 
 const HASH = `jcs1:sha256:${"0123456789abcdef".repeat(4)}`
-const PLAN = { name: "base", stored: true }
 const stored: TaxProfile = {
 	tax: "th-2026",
 	filingStatus: "married_joint",
@@ -126,10 +126,35 @@ describe("the draft", () => {
 		const whole = { ...blankDraft(), filingStatus: "single" }
 		const set = {
 			ok: true,
-			edit: { kind: "set-tax", name: "base", contentHash: HASH, flags: { filingStatus: "single" } },
-		} as const
+			edit: {
+				kind: "set-tax",
+				name: "base",
+				contentHash: HASH,
+				flags: { filingStatus: "single" },
+				labels: [],
+			},
+		} as unknown as ReturnType<typeof taxEdit>
 		expect(taxEdit(target, whole, true)).toEqual(set)
 		expect(taxEdit({ ...target, origin: null }, whole, false)).toEqual(set)
+	})
+
+	test("a whole write labels each income Flow that has none, and asks for the ones left out", () => {
+		const whole = { ...blankDraft(), filingStatus: "single" }
+		const target = { name: "base", contentHash: HASH, origin: null, unlabelled: ["a", "b"] }
+		const bare = taxEdit(target, whole, true, { a: "income.section40_1" })
+		expect(bare).toEqual({ ok: false, problems: { "label:b": "Choose a tax label." } })
+		const both = taxEdit(target, whole, true, { a: "income.section40_1", b: "income.section40_2" })
+		expect(both).toMatchObject({
+			ok: true,
+			edit: {
+				labels: [
+					{ flow: "a", label: "income.section40_1" },
+					{ flow: "b", label: "income.section40_2" },
+				],
+			},
+		})
+		const wrong = taxEdit(target, whole, true, { a: "allowance.thai_esg", b: "" })
+		expect(wrong.ok).toBe(false)
 	})
 })
 
@@ -150,14 +175,20 @@ describe("a refusal lands at its field, in the CLI's words", () => {
 	})
 
 	test("the refusal is shown at its field, and any other for the whole form", () => {
-		const at = taxShown({}, refusal("--children-at-higher-rate"), "the CLI's sentence", PLAN)
+		const at = taxShown({}, refusal("--children-at-higher-rate"), "the CLI's sentence")
 		expect(at.at("childrenAtHigherRate")).toBe("the CLI's sentence")
 		expect(at.at("children")).toBeUndefined()
 		expect(at.general).toBeUndefined()
-		expect(taxShown({}, refusal("--tax"), "the CLI's sentence", PLAN).general).toBe(
-			"the CLI's sentence",
-		)
-		expect(taxShown({ children: "own" }, null, null, PLAN).at("children")).toBe("own")
+		expect(taxShown({}, refusal("--tax"), "the CLI's sentence").general).toBe("the CLI's sentence")
+		expect(taxShown({ children: "own" }, null, null).at("children")).toBe("own")
+	})
+
+	test("a refusal at an item the form does not show is shown for the whole form", () => {
+		const shown = taxShown({}, refusal("--children-at-higher-rate"), "the CLI's sentence", [
+			"children",
+		])
+		expect(shown.at("childrenAtHigherRate")).toBeUndefined()
+		expect(shown.general).toBe("the CLI's sentence")
 	})
 
 	test("a merge over a plan with no stored profile asks for the profile whole", () => {

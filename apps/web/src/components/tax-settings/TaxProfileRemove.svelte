@@ -1,6 +1,5 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { labelCommand } from "../../lib/view/tax-settings/labels"
 import StaleNotice from "../ui/StaleNotice.svelte"
 
 interface Props {
@@ -8,9 +7,11 @@ interface Props {
 	contentHash: string
 	/** Every income Flow of the plan: taking the tax out clears their tax labels. */
 	income: readonly string[]
+	/** True while an Edit runs or a What-if session is open: the buttons stay, and wait. */
+	disabled: boolean
 }
 
-let { name, contentHash, income }: Props = $props()
+let { name, contentHash, income, disabled }: Props = $props()
 let confirming = $state(false)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
@@ -27,17 +28,17 @@ async function remove(): Promise<void> {
 	<div class="space-y-3">
 		<p class="text-sm text-foreground">Remove the tax of plan {name}? Its tax rules, the stored profile and the tax labels on its Flows are taken out, and its figures are before tax again.</p>
 		{#if income.length > 0}
-			<p class="text-sm text-foreground">Putting tax back then needs a tax label on each income Flow ({income.join(", ")}). This page does not set labels; in a terminal, run <code>{labelCommand(name, false)}</code>.</p>
+			<p class="text-sm text-foreground">Putting tax back then needs a tax label on each income Flow ({income.join(", ")}), which you set under Tax labels on this page.</p>
 		{/if}
 		{#if editSession.source === "remove-tax"}
 			{#if editSession.error}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
 			<StaleNotice />
 		{/if}
 		<div class="flex flex-wrap gap-2">
-			<button type="button" disabled={editSession.busy} onclick={remove} class={button}>Remove tax</button>
+			<button type="button" disabled={editSession.busy || disabled} onclick={remove} class={button}>Remove tax</button>
 			<button type="button" onclick={() => (confirming = false)} class={button}>Keep tax</button>
 		</div>
 	</div>
 {:else}
-	<button type="button" disabled={editSession.busy} onclick={() => (confirming = true)} class={button}>Remove tax</button>
+	<button type="button" disabled={editSession.busy || disabled} onclick={() => (confirming = true)} class={button}>Remove tax</button>
 {/if}

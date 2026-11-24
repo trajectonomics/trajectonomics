@@ -4,6 +4,8 @@ import { AMOUNT_FIELDS, COUNT_FIELDS, filingLabel } from "./fields"
 
 /** One row: the item and what the profile states for it. */
 export interface ProfileRow {
+	/** The profile key of the item, so a group takes its own rows. */
+	readonly key: string
 	readonly label: string
 	readonly value: string
 }
@@ -20,14 +22,18 @@ export function profileRows(profile: TaxProfile): ProfileRow[] {
 	const stated = (key: string): number | undefined =>
 		(profile as Record<string, unknown>)[key] as number | undefined
 	return [
-		{ label: "Filing status", value: filingLabel(profile.filingStatus) },
+		{ key: "filingStatus", label: "Filing status", value: filingLabel(profile.filingStatus) },
 		...COUNT_FIELDS.map(({ key, label }) => {
 			const counted = stated(key)
-			return { label, value: counted === undefined || counted === 0 ? "None" : String(counted) }
+			return {
+				key,
+				label,
+				value: counted === undefined || counted === 0 ? "None" : String(counted),
+			}
 		}),
 		...AMOUNT_FIELDS.map(({ key, label }) => {
 			const amount = stated(key)
-			return { label, value: amount === undefined ? "None" : `${groupDigits(amount)} THB` }
+			return { key, label, value: amount === undefined ? "None" : `${groupDigits(amount)} THB` }
 		}),
 	]
 }

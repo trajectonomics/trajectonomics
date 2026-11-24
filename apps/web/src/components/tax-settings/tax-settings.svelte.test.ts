@@ -51,11 +51,11 @@ describe("the tax profile card", () => {
 		expect(body).toContain("SSF is not deductible from 2025")
 	})
 
-	test("shows the stored profile as stored, with the controls to change and remove it", () => {
+	test("shows the stored profile as stored, with an Edit on each card and Remove", () => {
 		const body = card({ tax: profile, taxed: true })
 		expect(body).toContain("Married, filing jointly")
 		expect(body).toContain("20,000 THB")
-		expect(body).toMatch(/<button[^>]*>\s*Change the tax profile\s*<\/button>/)
+		expect(body).toMatch(/<button[^>]*>\s*Edit family\s*<\/button>/)
 		expect(body).toMatch(/<button[^>]*>\s*Remove tax\s*<\/button>/)
 	})
 
@@ -83,31 +83,46 @@ describe("the tax profile card", () => {
 		expect(body).toContain("its tax profile is not stored")
 	})
 
-	test("a plan with an income Flow that has no tax label names it and the command, and offers no form", () => {
+	test("a plan with no tax and an unlabelled income Flow labels it in the profile form, not in a form of its own", () => {
 		const unlabelled = { ...show({ tax: null, taxed: false }), document: planDocument() }
 		const body = render(TaxProfileCard, {
 			props: { name: "base", show: unlabelled, editable: true },
 		}).body
-		expect(body).toContain("pension, tax-refund")
-		expect(body).toContain("traj scenario tax base --tax th-2026 --label &lt;flow>=&lt;label>")
-		expect(body).not.toMatch(/<button[^>]*>\s*Set the tax profile/)
+		expect(body).not.toContain('aria-label="Tax labels"')
+		expect(body).toMatch(/<button[^>]*>\s*Set the tax profile\s*<\/button>/)
 		expect(body).not.toContain("Remove tax")
+		const form = render(TaxProfileForm, {
+			props: {
+				name: "base",
+				contentHash: HASH,
+				profile: null,
+				unlabelled: ["pension", "tax-refund"],
+				onDone: () => {},
+			},
+		}).body
+		expect(form).toContain('id="tax-flow-pension"')
+		expect(form).toContain('id="tax-flow-tax-refund"')
+		expect(form).toContain("Tax label of pension")
+		expect(form).toContain('value="income.section40_1"')
+		expect(form).not.toContain("allowance.retirement")
 	})
 
-	test("a taxed plan with an unlabelled income Flow offers Remove, whose confirmation names the command", () => {
+	test("a taxed plan with an unlabelled income Flow offers Remove and the label form, and no Edit", () => {
 		const unlabelled = { ...show({ tax: profile, taxed: true }), document: planDocument() }
 		const body = render(TaxProfileCard, {
 			props: { name: "base", show: unlabelled, editable: true },
 		}).body
-		expect(body).toContain("traj scenario tax base --merge --label")
-		expect(body).not.toMatch(/<button[^>]*>\s*Change the tax profile/)
+		expect(body).toContain('aria-label="Tax labels"')
+		expect(body).toContain('value="pension"')
+		expect(body).not.toMatch(/<button[^>]*>\s*Edit family/)
 		expect(body).toMatch(/<button[^>]*>\s*Remove tax\s*<\/button>/)
 	})
 
 	test("shows no controls when the server does not answer Edits", () => {
 		const body = card({ tax: profile, taxed: true }, false)
 		expect(body).toContain("Married, filing jointly")
-		expect(body).not.toContain("Change the tax profile")
+		expect(body).not.toContain("Edit family")
+		expect(body).not.toMatch(/<button[^>]*>\s*Parents you support/)
 		expect(body).not.toContain("Remove tax")
 	})
 })
