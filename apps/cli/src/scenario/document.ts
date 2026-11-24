@@ -3,7 +3,6 @@ import { type AppError, fail } from "../errors"
 import { detailOf } from "./document-detail"
 import { type OwnProblem, ownProblems } from "./own-problems"
 import { wordsOf } from "./problem-words"
-import { ROUTING_NOT_SHIPPED, type UnshippedProblem, unshippedRouting } from "./routing-unshipped"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
 // a Scenario and a Timeline in one pass and returns `{ code, path }` problems, so the CLI validates
@@ -15,13 +14,8 @@ export type ScenarioDocument = Record<string, unknown>
 
 /** One reason `sim-core` refuses a document, with the path inside the document. */
 export type ScenarioProblem =
-	| {
-			readonly code: Problem["code"]
-			readonly segments: readonly (string | number)[]
-			readonly said?: undefined
-	  }
-	| UnshippedProblem
-	| (OwnProblem & { readonly said?: undefined })
+	| { readonly code: Problem["code"]; readonly segments: readonly (string | number)[] }
+	| OwnProblem
 
 /** An empty Baseline v1: valid on its own, and it names no Account the Scenario could rely on. */
 const NEUTRAL_BASELINE = { schemaVersion: 1, balances: [] } as const
@@ -73,19 +67,9 @@ function rejectsVersion(version: number): boolean {
  */
 const TIMELINE_CODES: ReadonlySet<string> = new Set(["MISSING_CARRY_IN"])
 
-/**
- * The routing keys `sim-core` accepts that this release does not take yet (routing-unshipped.ts),
- * then the problems it finds in a document alone, in its order, with `scenario.` stripped. The
- * unshipped keys come first, so a document the engine refuses for one of them is told that, not
- * told to fix it.
- */
+/** The problems `sim-core` finds in a document alone, in its order, with `scenario.` stripped, then the CLI's own (cli ADR-0067). */
 export function scenarioProblems(value: unknown): ScenarioProblem[] {
-	// ROUTING_NOT_SHIPPED covers any shape the engine takes and this release does not publish yet: routing keys and the `transfer` Flow.
-	const found: ScenarioProblem[] = unshippedRouting(value).map(({ segments, said }) => ({
-		code: ROUTING_NOT_SHIPPED,
-		segments,
-		said,
-	}))
+	const found: ScenarioProblem[] = []
 	for (const problem of check(NEUTRAL_BASELINE, value, null)) {
 		if (problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code)) {
 			found.push({ code: problem.code, segments: problem.path.slice(1) })
@@ -108,10 +92,7 @@ export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 	const detail = detailOf(problem, acceptedScenarioSchemaVersion)
 	return {
 		path,
-		message:
-			problem.said === undefined
-				? `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`
-				: `${path}: ${problem.said.message}`,
+		message: `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`,
 		code: problem.code,
 		hint: SCHEMA_HINT,
 	}

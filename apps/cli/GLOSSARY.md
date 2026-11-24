@@ -30,6 +30,18 @@ _Avoid_: Run, output
 The lines one Annual roll-up of a Projection is made of, by source, tax, category and Account, as the engine routed them (`projection run --breakdown`, ADR-0058). Each total is the engine's figure or an exact sum of its lines, and money in plus unmet equals money out.
 _Avoid_: Cash-flow statement, budget, flow report
 
+**Routing**:
+Where a Scenario's money goes: `cashflow.surplus` fills Accounts in order, a step taking a `share` of what is still unrouted and filling up to an `upTo`; `cashflow.withdraw` draws them in order, an entry optionally keeping a Reserve floor with `downTo`. An `upTo` or `downTo` is a whole number (nominal) or `{ amount, growth }`, grown by whole years from the start of the Timeline so it keeps its value in today's money (sim ADR-0030). A `--set` names a step or an entry by its position, such as `cashflow.withdraw.0.downTo` (ADR-0070). `projection run` states it as the `routing` echo.
+_Avoid_: Allocation, waterfall, budget
+
+**Reserve floor**:
+The balance a `withdraw` entry leaves in an Account, `downTo`: the draw takes the Account only down to it and moves on, and a Shortfall the floors stop is unmet, never taken from below the floor. The same Account may be listed again with a lower floor, and a `drawn` cash-flow line carries the position of its entry (sim ADR-0030, ADR-0070).
+_Avoid_: Minimum balance, emergency fund (the floor is the mechanism; what it protects is the caller's)
+
+**Transfer**:
+A Flow of `kind: "transfer"` that moves money between two of the plan's own Accounts, outside cashflow: it is no income, spending or saving, net worth is unchanged by it, and it never makes a Shortfall. What it could not move is `unmoved` in the `transfers` table of `projection run --breakdown`, and a loan it pays down states `transferred` (sim ADR-0031, ADR-0070).
+_Avoid_: Withdrawal plus contribution, rollover (a rollover is a transfer a plan states)
+
 **Real asset**:
 A home, a car or another thing owned that stays in net worth but is not spent: not a model of its own, but an asset Account marked `liquid: false` that no routing list names, an obligation Contribution that buys it, an optional loan, Flows whose amounts read its value, and a planned withdrawal that sells it, with a payoff that repays its loan from the sale (ADR-0060). Its ids follow `<asset>-purchase`, `-running`, `-rent`, `-sale`, `-loan` and `-loan-payoff`, a convention the Dashboard writes and reads that the core never sees.
 _Avoid_: Property (as a type), fixed asset, holding

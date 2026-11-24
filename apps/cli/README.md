@@ -381,6 +381,23 @@ its own. In every year, money in plus `unmet` (the cash a Shortfall left unpaid)
 saving and left over: the engine routes every unit of cash. `not funded` is the part of the
 Contributions the cash could not fund; it is not in saving.
 
+## Where the money goes, and moving it between Accounts
+
+> **Ships in 0.8.0.**
+
+`cashflow` takes three more forms, every figure in them the caller's own (`traj` ships none): a surplus step's `share`, which takes that
+many basis points of what is still unrouted instead of everything (a percent string such as `"30.00"` under `--decimal`); a `withdraw` entry that is `{ account, downTo }`, which keeps a Reserve floor
+in the Account while the others are drawn; and an `upTo` or `downTo` that is `{ amount, growth }`, which keeps its value in today's money. A
+Flow of `kind: "transfer"` moves money between two of the plan's own Accounts, outside cashflow: a provident fund rolled into a locked RMF, or
+a monthly amount from savings paying a loan down. `traj schema scenario apply` describes each, and `--set` reaches a step or an entry by
+its position, so "what if I kept 100,000.00 in savings before touching the funds" is
+`traj projection run --scenario plan --set cashflow.withdraw.0.downTo=10000000`.
+
+`traj projection run` states what each did: the annual row's `transfers`, a `routing` echo of every step and entry by position,
+and with `--breakdown` the `entry` each drawn line came from and a `transfers` table (what moved and what could not); with
+`--liabilities`, `transferred` on a loan's months. The amount a target that keeps its value is worth on a later date is the engine's
+and is not stated yet. A plan without these forms prints exactly as before.
+
 ## Loans
 
 > **Ships in 0.8.0.**

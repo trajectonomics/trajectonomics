@@ -14,6 +14,7 @@ import { monthlyRow } from "./rows"
 import type { AnnualRow } from "./rows-view"
 import type { ProjectionTable } from "./run-view"
 import { spendingTableOf } from "./spending"
+import { transfersTableOf } from "./transfers"
 
 /** The optional outputs a run was asked for: each is a flag, and each is off by default. */
 export type Wants = {
@@ -37,9 +38,12 @@ function cashflowTablesOf(
 	const rows = cashflowRowsOf(projection.cashflow, currency)
 	const totals = cashflowTotalRowsOf(annual, rows, currency)
 	if (isAppError(totals)) return totals
+	const transfers = transfersTableOf(projection.cashflow, currency)
 	return [
 		{ name: "cashflow", count: rows.length, rows },
 		{ name: "cashflowTotals", count: totals.length, rows: totals },
+		// Present only when a transfer Flow moved, or could not move, something (cli ADR-0070).
+		...(transfers === undefined ? [] : [transfers]),
 	]
 }
 

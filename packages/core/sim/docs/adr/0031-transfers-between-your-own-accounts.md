@@ -129,7 +129,7 @@ runs byte for byte as before, and every existing parity hash is unchanged.
 
 - New codes in `ERROR_CODES`: `TRANSFER_FROM_ILLIQUID`, `TRANSFER_FROM_LIABILITY` and `TRANSFER_SAME_ACCOUNT`,
   worded in the CLI's `refusal-transfer.ts`. Until the CLI publishes the shape, it refuses a `transfer` Flow
-  with "ships in a later release" (`routing-unshipped.ts`), so it never stores an unpublished shape.
+  with "ships in a later release" (`routing-unshipped.ts`), so it never stores an unpublished shape (lifted by cli ADR-0070).
 - Five cases join `parity/cases.json`: `transfer-rollover-month`, `transfer-shares-month`, `transfer-loan-month`,
   `transfer-short-month` and `transfer-locked-fi`. No existing case changes.
 - Hand-worked tests: `engine/transfer.test.ts` (a whole fund into a locked RMF; a yearly tenth of 1,000,000 as

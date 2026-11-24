@@ -2,10 +2,9 @@ import { type AppError, fail, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { formatMinorUnits, supportedCurrency } from "../store/money"
 import { hintOf, notDecimal, parseField } from "./decimal-field"
-import { type FieldKind, fieldKindOf, isNode, type Node, PUBLISHED } from "./money-fields"
+import { branchOf, type FieldKind, fieldKindOf, isNode, type Node, PUBLISHED } from "./money-fields"
 import { formatPath } from "./path"
 import { formatPercent } from "./percent"
-import { unshippedRouting, unshippedRoutingError } from "./routing-unshipped"
 
 /*
  * The decimal form of a Scenario document (ADR-0047): the same document with every money field
@@ -55,6 +54,9 @@ export function mapDecimalFields(
 	if (!isNode(schema)) return value
 	const kind = fieldKindOf(schema)
 	if (kind !== undefined) return convert(value, path, kind)
+	if (Array.isArray(schema["anyOf"])) {
+		return mapDecimalFields(branchOf(schema["anyOf"], value), value, path, convert)
+	}
 	if (isNode(schema["properties"]) && isPlainObject(value)) {
 		return mapFields(schema["properties"], value, path, convert)
 	}
@@ -109,10 +111,6 @@ export function toDecimalForm(document: Node): Node | AppError {
  */
 export function fromDecimalForm(document: unknown): unknown {
 	if (!isNode(document)) return document
-	// The conversion reads the published shape, which does not describe the routing keys the CLI
-	// refuses yet, so they are refused first, before any of them is read in the wrong unit.
-	const unshipped = unshippedRoutingError(unshippedRouting(document))
-	if (unshipped !== null) return unshipped
 	const currency = currencyOf(document)
 	if (isAppError(currency)) return currency
 	return mapDecimalFields(PUBLISHED, document, [], (value, path, kind) => {
