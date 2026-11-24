@@ -109,14 +109,14 @@ gh issue view <n> -R trajectonomics/<repo> --json number,title,body,labels,comme
 
 ส่วนตอนร่าง Spec ระบบจะถามผมในแชตเป็น [Owner question](https://github.com/trajectonomics/factory/blob/main/docs/adr/0024-the-owner-answers-questions-in-the-chat.md) เฉพาะเรื่องที่เปลี่ยนวิธีทำงานขององค์กรหรือย้อนกลับยาก **และ** โมเดลที่ปรึกษาเห็นไม่ตรงกันเท่านั้น เรื่องอื่นมันตัดสินใจเองและจดไว้ และเมื่อคิวงานอัตโนมัติว่างลง Dispatcher จะเปิด **Owner assistant** (`assist/<group>`) มารวมรายการ `ready-for-human` อธิบายเป็นภาษาคนให้ผมตอบทีเดียว
 
-## ตัวอย่าง PR จริงที่ Factory สร้างและ merge
+## ตัวอย่าง PR จริงที่ระบบสร้างและ merge
 
-ไม่ใช่แค่ diagram บนสไลด์ นี่คือตัวอย่าง PR จริงที่รันจาก branch `factory/` ข้ามหลาย repo:
+ไม่ใช่แค่ diagram บนสไลด์ นี่คือตัวอย่าง PR จริงใน repo ที่ยังเปิดใช้งานอยู่ ([trajectonomics/factory](https://github.com/trajectonomics/factory) และ monorepo [trajectonomics/trajectonomics](https://github.com/trajectonomics/trajectonomics)):
 
-- [trajectonomics/factory#113](https://github.com/trajectonomics/factory/pull/113) — `factory/spec-101-read-live-threads-on-both-hosts`: อ่าน live thread ข้าม host เพื่อวางแผน Pass
-- [trajectonomics/sim-core#113](https://github.com/trajectonomics/sim-core/pull/113) — `factory/110-refuse-zero-only-levy`: แก้พฤติกรรม engine ใน `sim-core`
-- [trajectonomics/cli#166](https://github.com/trajectonomics/cli/pull/166) — `factory/spec-145-first-run-always-names-the-next-command`: ปรับประสบการณ์รันครั้งแรกของ `traj` CLI
-- [trajectonomics/design-system#92](https://github.com/trajectonomics/design-system/pull/92) — `factory/spec-83-hold-builtin-themes-to-wcag-contrast`: บังคับ theme ให้ผ่าน WCAG AA contrast
+- [trajectonomics/factory#113](https://github.com/trajectonomics/factory/pull/113) — `factory/spec-101-read-live-threads-on-both-hosts`: Factory Run อ่าน live thread ข้าม host เพื่อวางแผน Pass
+- [trajectonomics/factory#130](https://github.com/trajectonomics/factory/pull/130) — `docs/retire-mistral-review-provider`: ย้ายระบบรีวิวข้ามโมเดลขึ้น Grok 4.7 + Gemini 4 Hydrogen (ADR 0028)
+- [trajectonomics/trajectonomics#454](https://github.com/trajectonomics/trajectonomics/pull/454) — `feat/lifetime-totals`: คำนวณค่าธรรมเนียมและเงินปันผลตลอดแผนใน engine และหน้าเว็บ
+- [trajectonomics/trajectonomics#451](https://github.com/trajectonomics/trajectonomics/pull/451) — `feat/cli-chance-outcomes`: เพิ่มผลลัพธ์ path simulation ลงใน `traj` CLI
 
 ## ถ้าจะเริ่มจากศูนย์
 
