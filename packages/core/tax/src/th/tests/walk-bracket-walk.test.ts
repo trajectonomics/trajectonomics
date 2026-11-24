@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import { TaxValidationError } from "../../core/money"
+import { addProgressiveTax } from "../levy/brackets"
 import { TH_2026_PARAMETERS } from "../parameters"
 import { thBracketWalk } from "../walk"
-import { addProgressiveTax } from "../levy/brackets"
 import { forAllSeeded } from "./invariants-random"
 import { measureOf } from "./levy-build"
 
