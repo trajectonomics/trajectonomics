@@ -171,6 +171,26 @@ It prints the payment, the empty problem list and the loan's balance at 30 June 
 2026-12-31
 ```
 
+## Routing
+
+A `surplus` step may take a `share` of what is left (`floor(left × share / 10000)`, never on the last
+step), and a `withdraw` entry may keep a Reserve floor in an Account with `{ account, downTo }`. An `upTo`
+or `downTo` may be `{ amount, growth }`, so it keeps its value in today's money. A Shortfall the floors
+stop is unmet, never taken from below a floor. See
+[ADR 0030](docs/adr/0030-routing-shares-floors-and-real-targets.md).
+
+```ts fragment
+{
+	surplus: [
+		{ account: "emergency", upTo: { amount: 1_000_000, growth: "inflation" } },
+		{ account: "invest", share: 5000 },
+		{ account: "savings" },
+	],
+	contribute: [],
+	withdraw: [{ account: "savings", downTo: 300_000 }, "funds", "savings"],
+}
+```
+
 ## Spending rules
 
 An expense Flow takes `rule` instead of `amount`, `derive` or `level`: its yearly amount follows what a

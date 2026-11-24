@@ -28,8 +28,8 @@ export interface DayLines {
 	readonly prepaid: ReadonlyMap<string, bigint>
 	/** Signed Settlement per Levy id. */
 	readonly settled: ReadonlyMap<string, bigint>
-	/** Taken through `cashflow.withdraw`, by Account id. */
-	readonly drawn: ReadonlyMap<AccountId, bigint>
+	/** Taken through `cashflow.withdraw`, by each entry's position in the list as a string (ADR 0030). */
+	readonly drawn: ReadonlyMap<string, bigint>
 	/** Filled through `cashflow.surplus`, by Account id. */
 	readonly surplus: ReadonlyMap<AccountId, bigint>
 }
@@ -56,7 +56,7 @@ export function withLines(totals: DayTotals, lines: DayLines | undefined): DayTo
 /** Replaces the routing figures of a day's lines: what `withdraw` took and what `surplus` filled. */
 export function withRouting(
 	totals: DayTotals,
-	drawn: ReadonlyMap<AccountId, bigint>,
+	drawn: ReadonlyMap<string, bigint>,
 	surplus: ReadonlyMap<AccountId, bigint>,
 ): DayTotals {
 	if (totals.lines === undefined) return totals
