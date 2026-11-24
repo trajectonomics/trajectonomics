@@ -4,6 +4,7 @@ import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
 import WasText from "../what-if/WasText.svelte"
+import AccountYears from "./AccountYears.svelte"
 
 interface Props {
 	cards: readonly AccountCard[]
@@ -46,6 +47,14 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 					<dt class="text-muted-foreground">Locked until</dt>
 					<dd>{card.lockedUntil}<WasText was={mark.was.lockedUntil} /></dd>
 				{/if}
+				{#if card.payout !== null}
+					<dt class="text-muted-foreground">Payout</dt>
+					<dd>{card.payout}<WasText was={mark.was.payout} />{#if card.payoutHow !== null}<span class="block text-xs text-muted-foreground">{card.payoutHow}</span>{/if}</dd>
+				{/if}
+				{#if card.fee !== null}
+					<dt class="text-muted-foreground">Fee</dt>
+					<dd>{card.fee}<WasText was={mark.was.fee} /></dd>
+				{/if}
 				<dt class="text-muted-foreground">Baseline balance</dt>
 				<dd>
 					{#if card.balance === null}
@@ -55,6 +64,7 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 					{/if}
 				</dd>
 			</dl>
+			<AccountYears years={card.years} {currency} />
 			{#if editable}
 				<ItemSwitch {plan} {contentHash} path="accounts.{card.id}" label={card.id} onTry={() => onTry(card.id)} />
 			{/if}

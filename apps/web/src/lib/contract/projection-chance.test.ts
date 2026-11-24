@@ -34,6 +34,20 @@ describe("the projection chance contract against the CLI's goldens", () => {
 		])
 	})
 
+	it("parses a chance drawn from the plan's own return model, and says what it was built from (cli ADR-0068)", async () => {
+		const chance = projectionChance.parse(await golden("chance-plan.output"))
+		expect(chance.returnModel).toMatchObject({ source: "plan", buckets: 16 })
+		expect(chance.returnModel?.accounts[0]).toMatchObject({ volatility: 1500 })
+		expect(chance.definition.modelId).toBe("plan-16")
+	})
+
+	it("leaves the file model's read without a returnModel, and refuses one it does not name", async () => {
+		expect(projectionChance.parse(await golden("chance.output")).returnModel).toBeUndefined()
+		const body = (await golden("chance-plan.output")) as { returnModel: object }
+		const bad = { ...body, returnModel: { ...body.returnModel, extra: 1 } }
+		expect(projectionChance.safeParse(bad).success).toBe(false)
+	})
+
 	it("refuses a spending Band the contract does not name", async () => {
 		const body = (await golden("chance-spending.output")) as { spendingBands: object[] }
 		const bad = { ...body, spendingBands: [{ ...body.spendingBands[0], extra: 1 }] }

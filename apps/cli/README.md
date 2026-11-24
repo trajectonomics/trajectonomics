@@ -216,8 +216,16 @@ year. The paths draw from a Return model you state in a JSON file, with
 seed and count always give the same answer. The CLI ships no Return model: which
 market history a plan is tested against is your decision, and every figure is
 only as good as that choice. `traj schema projection chance` describes the file.
-Pass the same three flags to `traj dashboard` to add the chance of success to the
-Dashboard, as a page of its own.
+Or pass `--return-model plan` to build the model from the plan itself: each asset
+Account's `rate` and its `volatility` (the standard deviation of its yearly
+return, in basis points, which you write into the Scenario). `--buckets` sets its
+size (a power of two from 16 to 1024, 256 by default), the result echoes what it
+was built from as `returnModel`, and `traj projection model --scenario NAME`
+prints the model as JSON, a file `--return-model` reads back. A plan with no
+`volatility` is refused, because every path would be the same path.
+Pass `--paths` and `--seed` to `traj dashboard` to add the chance of success to the
+Dashboard, as a page of its own: it uses `plan` unless you name a
+`--return-model` file.
 
 ## Tax allowances
 

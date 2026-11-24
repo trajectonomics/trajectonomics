@@ -42,7 +42,7 @@ const existingAccount = $derived(doc.accounts.find((account) => account.id === d
 		{:else if drawer.loan === true}
 			<LoanForm {name} {doc} {baseline} {contentHash} loanId={drawer.id} tryValue={trying} onDone={onClose} />
 		{:else}
-			<AccountForm {name} {doc} {contentHash} existing={existingAccount} tryValue={trying} onDone={onClose} />
+			<AccountForm {name} {doc} {household} {contentHash} existing={existingAccount} tryValue={trying} onDone={onClose} />
 		{/if}
 	{:else if drawer !== null}
 		<FlowForm kind={flowKind} {name} {doc} {household} {contentHash} existing={existingFlow} tryValue={trying} onDone={onClose} />

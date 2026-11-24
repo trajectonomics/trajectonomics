@@ -2,6 +2,7 @@ import { isAppError } from "./errors"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { RUN_SETUP } from "./help-examples-run"
 import { ILLUSTRATIVE_RETURN_MODEL } from "./projection/chance-testing"
+import { VOLATILE_PLAN } from "./projection/plan-model-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
 import { chanceRulePlan } from "./projection-spending-chance-support"
 import { toDecimalForm } from "./scenario/decimal"
@@ -48,8 +49,21 @@ export const SETUP: Record<string, Setup> = {
 		files: {
 			"model.json": JSON.stringify(ILLUSTRATIVE_RETURN_MODEL),
 			"ruled.json": JSON.stringify(chanceRulePlan(undefined)),
+			"volatile.json": JSON.stringify(VOLATILE_PLAN),
 		},
-		steps: [["scenario", "apply", "ruled", "--file", "ruled.json"]],
+		steps: [
+			["scenario", "apply", "ruled", "--file", "ruled.json"],
+			["scenario", "apply", "volatile", "--file", "volatile.json"],
+		],
+	},
+	// The base plan with a volatility on its investment Account, which `--return-model plan` builds a model from (cli ADR-0068).
+	"projection model": {
+		files: { "volatile.json": JSON.stringify(VOLATILE_PLAN) },
+		steps: [["scenario", "apply", "volatile", "--file", "volatile.json"]],
+	},
+	dashboard: {
+		files: { "volatile.json": JSON.stringify(VOLATILE_PLAN) },
+		steps: [["scenario", "apply", "volatile", "--file", "volatile.json"]],
 	},
 	"projection compare": { steps: [["scenario", "fork", "base", "early"]] },
 	// The car loan, the spending rule and the estate the `--liabilities`, `--spending` and `--estate` examples read, stored beside the projection fixture.

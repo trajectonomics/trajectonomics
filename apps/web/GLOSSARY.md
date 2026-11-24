@@ -127,3 +127,16 @@ _Avoid_: tag, category, income type
 **Custom chart**:
 A chart a person made of yearly figures `traj` states, a name, a kind and a list of series ids, kept in the browser and in no plan. A series a plan lacks is named as missing, not drawn.
 _Avoid_: report, widget, dashboard, saved view
+
+**Employer's share**:
+What an employer pays into an Account on top of a salary: one Contribution Flow with `funding: "employer"` that reads the salary's gross. It lands in the Account outside the household's cash and stops with the salary, so it is no income and no spending. The page writes it with the salary in one Edit and keeps the two in step.
+_Avoid_: match, employer contribution (as a Flow kind), PVD
+
+**Payout**:
+A yearly share of an asset Account's value that leaves it on the last day of each period and lands as passive income, from the Account's `payout` field. The share, the period, the start and the rounding are the person's own; `traj` ships none.
+_Avoid_: dividend (as the name of the field), distribution, withdrawal
+
+**Account fee**:
+A yearly share of an asset Account's value charged a twelfth a month, outside cashflow, on every Market path, from the Account's `fee` field. The page lists each roll-up's charge as `traj` states it and adds none up.
+_Avoid_: cost, charge (as the name of the field), expense
+

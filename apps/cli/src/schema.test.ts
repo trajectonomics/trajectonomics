@@ -28,6 +28,7 @@ describe("schema", () => {
 			"projection allowances",
 			"projection chance",
 			"projection compare",
+			"projection model",
 			"projection run",
 			"report networth",
 			"report pnl",

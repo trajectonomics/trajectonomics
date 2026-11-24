@@ -6,6 +6,7 @@ export const FULL_FUND: Record<string, unknown> = {
 	id: "fund",
 	kind: "asset",
 	rate: 500,
+	volatility: 1500,
 	payout: {
 		bps: 350,
 		frequency: "quarterly",
