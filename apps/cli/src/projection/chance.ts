@@ -1,6 +1,7 @@
-import { type ChanceOfSuccess, chanceOfSuccess, type ReturnModel } from "@trajectonomics/core/sim"
-import type { AppError } from "../errors"
+import { type ChanceOfSuccess, chanceOfSuccess } from "@trajectonomics/core/sim"
+import { type AppError, fail, isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"
+import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { percentilesOf, shownRows, spendingOf } from "./chance-spending"
 import type { ChanceBandView, ChanceView } from "./chance-view"
@@ -16,16 +17,21 @@ export type ChanceOptions = { seed: string; paths: number }
  */
 export function chanceOf(
 	placed: Placed,
-	model: ReturnModel,
+	source: ModelSource,
 	options: ChanceOptions,
 ): ChanceView | AppError {
+	// The plan after the what-ifs: a `--set` on a volatility changes the model it builds.
+	const built = source.kind === "plan" ? planModelOf(placed.document, source.buckets) : undefined
+	if (isAppError(built)) return built
+	const model = built === undefined && source.kind === "file" ? source.model : built?.model
+	if (model === undefined) return fail("internal", { message: "The chance has no Return model." })
 	const result = chanceOfSuccess(placed.baseline, placed.document, placed.timeline, {
 		model,
 		seed: options.seed,
 		paths: options.paths,
 	})
 	if (!result.ok) return chanceRefusal(result.problems)
-	return viewOf(placed, result.chance)
+	return viewOf(placed, result.chance, built)
 }
 
 /** The success share as a decimal percentage, from the floored basis points with no float. */
@@ -33,7 +39,7 @@ function shareOf(bps: number): string {
 	return `${Math.floor(bps / 100)}.${String(bps % 100).padStart(2, "0")}%`
 }
 
-function viewOf(placed: Placed, chance: ChanceOfSuccess): ChanceView {
+function viewOf(placed: Placed, chance: ChanceOfSuccess, plan?: PlanModel): ChanceView {
 	const money = moneyOf(placed.currency)
 	const bands: ChanceBandView[] = chance.bands.map((band) => ({
 		index: band.index,
@@ -50,11 +56,13 @@ function viewOf(placed: Placed, chance: ChanceOfSuccess): ChanceView {
 			...echo.notes,
 			`The plan holds to ${placed.timeline.horizon} on ${chance.succeeded} of ${chance.paths} seeded Market paths: a success share of ${shareOf(chance.successBps)}.`,
 			`The chance is over the return model "${chance.definition.modelId}" with seed ${chance.definition.seed}, and every figure is nominal.`,
+			...(plan === undefined ? [] : planNotes(plan)),
 			...spending.notes,
 		],
 		horizon: placed.timeline.horizon,
 		currency: placed.currency,
 		definition: chance.definition,
+		...(plan === undefined ? {} : { returnModel: plan.view }),
 		paths: chance.paths,
 		succeeded: chance.succeeded,
 		successBps: chance.successBps,
@@ -63,4 +71,15 @@ function viewOf(placed: Placed, chance: ChanceOfSuccess): ChanceView {
 		...spending.fields,
 		tables: [{ name: "bands", count: rows.length, rows }, ...spending.tables],
 	}
+}
+
+/** What a plan-built model says beside the chance: where it came from, and what the engine clamped. */
+function planNotes(plan: PlanModel): string[] {
+	const accounts = plan.view.accounts
+		.map((a) => `${a.id} (rate ${a.rate} bps, volatility ${a.volatility} bps)`)
+		.join(", ")
+	return [
+		`The return model is the plan's own, built in ${plan.view.buckets} buckets from the Accounts that swing: ${accounts}. Every Account without a volatility keeps its rate.`,
+		...plan.notes,
+	]
 }

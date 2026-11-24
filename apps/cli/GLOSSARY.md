@@ -181,7 +181,7 @@ The share of seeded Market paths on which a Scenario never runs out before its H
 _Avoid_: Probability, success rate, confidence
 
 **Return model**:
-The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none; a caller states one in a JSON file with `--return-model`.
+The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none: a caller states one in a JSON file with `--return-model`, or says `--return-model plan` to build it from the Scenario's own Accounts, each asset's `rate` and `volatility` (ADR-0068; `traj projection model` prints it).
 _Avoid_: Market history, returns table, assumptions
 
 **Market path**:
