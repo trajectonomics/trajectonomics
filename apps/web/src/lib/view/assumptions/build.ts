@@ -57,7 +57,7 @@ function accountWith(
 /**
  * The document a draft states: the plan's own over the page's text, which only moves digits. The rates are text shaped for
  * `traj` (basis points); whether a value is allowed is `traj`'s to say, so a range is not checked here. A volatility left empty is
- * removed, and an inflation left empty takes the `economy` block out.
+ * removed. The inflation is required, because the sim reads it: an empty field is a problem at the page.
  */
 export function documentFromDraft(
 	doc: ScenarioDocument,
@@ -73,12 +73,10 @@ export function documentFromDraft(
 				)
 			: account,
 	)
-	const inflation = bpsOf(draft.inflation, true)
-	if (inflation === "problem") problems["inflation"] = PERCENT
-	if (inflation === "problem" || Object.keys(problems).length > 0) return { ok: false, problems }
-	const { economy: _stored, ...rest } = doc
-	return {
-		ok: true,
-		document: { ...rest, accounts, ...(inflation === null ? {} : { economy: { inflation } }) },
+	const inflation = bpsOf(draft.inflation, false)
+	if (inflation === "problem" || inflation === null) problems["inflation"] = PERCENT
+	if (typeof inflation !== "number" || Object.keys(problems).length > 0) {
+		return { ok: false, problems }
 	}
+	return { ok: true, document: { ...doc, accounts, economy: { ...doc.economy, inflation } } }
 }

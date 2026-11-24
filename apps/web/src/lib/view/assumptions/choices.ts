@@ -1,3 +1,5 @@
+import { parseBps } from "../../format/bps"
+
 /**
  * The three plain choices beside an Account's volatility. A choice is a starting point: it fills the field with text, and the
  * person changes it as any other text (web ADR 0018). The figures are plan assumptions, not advice, and `traj` ships none: they
@@ -27,5 +29,7 @@ export function fillWith(choice: SwingChoice): string {
 
 /** The choice whose text the field holds now, so the page can show it as picked; null when the text is the person's own. */
 export function chosenOf(text: string): SwingChoice["id"] | null {
-	return SWING_CHOICES.find((choice) => choice.text === text.trim())?.id ?? null
+	const bps = parseBps(text)
+	if (bps === null) return null
+	return SWING_CHOICES.find((choice) => parseBps(choice.text) === bps)?.id ?? null
 }

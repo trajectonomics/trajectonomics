@@ -19,8 +19,15 @@ function plan(over: Record<string, unknown> = {}): ScenarioDocument {
 	})
 }
 
-function saved(doc: ScenarioDocument, change: (draft: ReturnType<typeof draftOf>) => void) {
+/** The draft of a plan as a person opens it, with an inflation stated when the plan states none: the sim requires one. */
+function drafted(doc: ScenarioDocument): ReturnType<typeof draftOf> {
 	const draft = draftOf(doc)
+	if (draft.inflation === "") draft.inflation = "3"
+	return draft
+}
+
+function saved(doc: ScenarioDocument, change: (draft: ReturnType<typeof draftOf>) => void) {
+	const draft = drafted(doc)
 	change(draft)
 	const result = documentFromDraft(doc, draft)
 	if (!result.ok) throw new Error(JSON.stringify(result.problems))
@@ -86,12 +93,20 @@ describe("what the page states", () => {
 		expect(next.accounts[2]).toMatchObject({ rate: 250, volatility: 900 })
 	})
 
-	test("an inflation left empty takes the economy block out", () => {
+	test("an empty inflation is a problem at its field, because the sim requires one, and nothing is built", () => {
 		const doc = plan({ economy: { inflation: 300 } })
-		const next = saved(doc, (draft) => {
-			draft.inflation = ""
-		})
-		expect("economy" in next).toBe(false)
+		const draft = draftOf(doc)
+		draft.inflation = " "
+		const result = documentFromDraft(doc, draft)
+		expect(result.ok).toBe(false)
+		expect(!result.ok && Object.keys(result.problems)).toEqual(["inflation"])
+		expect(!result.ok && result.problems["inflation"]).toContain("Enter a percent")
+	})
+
+	test("the economy block always carries the inflation, and keeps any other key it holds", () => {
+		const doc = plan({ economy: { inflation: 300, other: 1 } })
+		expect(saved(doc, () => {}).economy).toEqual({ inflation: 300, other: 1 })
+		expect(saved(plan(), () => {}).economy).toEqual({ inflation: 300 })
 	})
 
 	test("a value that is not a percent with at most two places is a problem at its own field", () => {
@@ -121,7 +136,7 @@ describe("the three choices", () => {
 
 	test("only fill text: the draft is the text, and the person's own text replaces it", () => {
 		const doc = plan()
-		const draft = draftOf(doc)
+		const draft = drafted(doc)
 		const fund = draft.accounts[1]
 		const large = SWING_CHOICES[2]
 		if (fund === undefined || large === undefined) throw new Error("rows and choices")
@@ -134,6 +149,20 @@ describe("the three choices", () => {
 		expect(JSON.stringify(doc)).toBe(before)
 		const result = documentFromDraft(doc, draft)
 		expect(result.ok && result.document.accounts[1]).toMatchObject({ volatility: 1750 })
+	})
+
+	test("a stored volatility is picked by its value, not its text: 18.00 is large, 1800 basis points too", () => {
+		expect(chosenOf("18.00")).toBe("large")
+		expect(chosenOf("10.0")).toBe("moderate")
+		expect(chosenOf("1")).toBe("steady")
+		expect(chosenOf("18.01")).toBeNull()
+		expect(chosenOf("")).toBeNull()
+		expect(
+			chosenOf(
+				draftOf(plan({ accounts: [{ id: "f", kind: "asset", rate: 1, volatility: 1800 }] }))
+					.accounts[0]?.volatility ?? "",
+			),
+		).toBe("large")
 	})
 
 	test("name a kind of holding each, and state no advice", () => {
@@ -182,7 +211,7 @@ describe("the fee column (the Account form's fee, web ADR 0017)", () => {
 
 	test("a share without a rounding is a problem at the row's fee field", () => {
 		const doc = plan()
-		const draft = draftOf(doc)
+		const draft = drafted(doc)
 		const bank = draft.accounts[0]
 		if (bank) bank.fee = { rate: "1.5", rounding: "" }
 		const result = documentFromDraft(doc, draft)

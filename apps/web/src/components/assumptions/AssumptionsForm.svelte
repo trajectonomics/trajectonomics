@@ -6,10 +6,10 @@ import { draftOf } from "../../lib/view/assumptions/draft"
 import { assumptionsShown } from "../../lib/view/assumptions/refusal"
 import { accountIds } from "../../lib/view/plan-items/document"
 import Field from "../plan-items/Field.svelte"
-import TryNotice from "../plan-items/TryNotice.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 import AccountRow from "./AccountRow.svelte"
-import { type TriedValues, tryValues } from "./try-values"
+import AssumptionsActions from "./AssumptionsActions.svelte"
+import { tryValues } from "./try-values"
 
 interface Props {
 	/** The plan the values belong to: the Edit saves under this name, over the hash the page read. */
@@ -20,30 +20,34 @@ interface Props {
 }
 
 let { name, show, editable }: Props = $props()
+const SOURCE = "assumptions"
 // The form is made again when the plan's hash changes (see AssumptionsBody), so it opens on the stored values.
 const initial = () => draftOf(show.document)
 let draft = $state(initial())
 let problems: Readonly<Record<string, string>> = $state({})
-let tried: TriedValues | null = $state(null)
+// An error shows here only while this form sent the request (the Chance form sends as "form").
+const mine = $derived(editSession.source === SOURCE)
 const ids = $derived(accountIds(show.document))
-const shown = $derived(assumptionsShown(problems, editSession.failure, editSession.error, ids))
-const button =
-	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+const shown = $derived(
+	assumptionsShown(
+		problems,
+		mine ? editSession.failure : null,
+		mine ? editSession.error : null,
+		ids,
+	),
+)
 
 /** Saves every value as one Edit over the document the page read. A refusal lands on the row its path names. */
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
 	const result = documentFromDraft(show.document, draft)
 	editSession.clear()
-	tried = null
 	problems = result.ok ? {} : result.problems
 	if (result.ok) {
-		await editSession.run({
-			kind: "apply-plan",
-			name,
-			contentHash: show.contentHash,
-			document: result.document,
-		})
+		await editSession.run(
+			{ kind: "apply-plan", name, contentHash: show.contentHash, document: result.document },
+			SOURCE,
+		)
 	}
 }
 
@@ -52,7 +56,7 @@ function tryThem(): void {
 	const result = documentFromDraft(show.document, draft)
 	editSession.clear()
 	problems = result.ok ? {} : result.problems
-	tried = result.ok ? tryValues(name, show.contentHash, show.document, result.document) : null
+	if (result.ok) tryValues(name, show.contentHash, show.document, result.document)
 }
 </script>
 
@@ -65,7 +69,7 @@ function tryThem(): void {
 				id="inflation"
 				label="Inflation a year"
 				inputmode="decimal"
-				hint="A percent, such as 3. Empty states none."
+				hint="A percent, such as 3."
 				bind:value={draft.inflation}
 				problem={shown.at("inflation")}
 				disabled={!editable}
@@ -89,15 +93,6 @@ function tryThem(): void {
 			<p class="text-sm text-muted-foreground">This plan states no asset Account.</p>
 		{/each}
 	</section>
-	<TryNotice fields={tried?.cleared ?? []} />
-	{#if tried?.inflationUntried}
-		<p role="alert" class="text-sm text-destructive">A what-if replaces a value the plan holds, and this plan states no inflation yet. Save one first to try another.</p>
-	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	{#if editable}
-		<div class="flex flex-wrap gap-2 border-t border-border pt-4">
-			<button type="submit" disabled={editSession.busy} class={button}>Save</button>
-			<button type="button" disabled={editSession.busy} onclick={tryThem} class={button}>Try as what-if</button>
-		</div>
-	{/if}
+	{#if editable}<AssumptionsActions busy={editSession.busy} ontry={tryThem} />{/if}
 </form>

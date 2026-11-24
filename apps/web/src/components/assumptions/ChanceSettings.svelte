@@ -17,6 +17,8 @@ let { params, read, editable }: Props = $props()
 const initial = () => chanceTextOf(params)
 let text = $state(initial())
 let problems: Readonly<Record<string, string>> = $state({})
+// An error shows here only while this form sent the request (the Assumptions form sends as "assumptions").
+const mine = $derived(editSession.source === "form")
 const source = $derived(read?.ok ? chanceSourceWords(read.data) : null)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
@@ -46,7 +48,7 @@ async function apply(event: SubmitEvent): Promise<void> {
 	{:else if !read}
 		<p class="text-sm text-muted-foreground">No chance of success is read yet: enter the paths and the seed.</p>
 	{/if}
-	{#if editSession.error}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
+	{#if mine && editSession.error}<p role="alert" class="text-sm text-destructive">{editSession.error}</p>{/if}
 	{#if editable}
 		<button type="submit" disabled={editSession.busy} class={button}>Read the chance again</button>
 	{/if}

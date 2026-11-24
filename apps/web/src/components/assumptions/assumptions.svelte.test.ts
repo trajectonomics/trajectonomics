@@ -7,10 +7,14 @@ import { chanceViewOf } from "../../lib/view/chance/page"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import ChanceResult from "../chance/ChanceResult.svelte"
 import AssumptionsBody from "./AssumptionsBody.svelte"
+import AssumptionsForm from "./AssumptionsForm.svelte"
+import ChanceSettings from "./ChanceSettings.svelte"
 
 afterEach(() => {
 	editSession.token = null
 	editSession.error = null
+	editSession.failure = null
+	editSession.source = "form"
 })
 
 const page = (snapshot: Snapshot = DEMO, editable = true) =>
@@ -106,6 +110,39 @@ describe("the Assumptions page", () => {
 		expect(body).toContain("w-full rounded-md")
 		expect(body).not.toMatch(/min-w-\[|(?<!max-)w-\[\d/)
 		expect(body).not.toContain("overflow-x")
+	})
+})
+
+describe("an error is shown once, in the form that sent it", () => {
+	const show = (() => {
+		const read = DEMO.reads.documents["base"]
+		if (read === undefined || !read.ok) throw new Error("the Demo has a document")
+		return read.data.scenario
+	})()
+	const first = show.document.accounts.find((one) => one.kind === "asset")?.id
+	const refusal = {
+		code: "invalid",
+		exitCode: 1,
+		message: "volatility out of range",
+		path: `document.accounts.${first}.volatility`,
+	}
+	const form = () => render(AssumptionsForm, { props: { name: "base", show, editable: true } }).body
+	const chance = () =>
+		render(ChanceSettings, { props: { params: DEMO.params, read: undefined, editable: true } }).body
+
+	test("a refusal of a swing shows at its row only, not under Chance of success", () => {
+		editSession.source = "assumptions"
+		editSession.error = refusal.message
+		editSession.failure = refusal
+		expect(form().split(refusal.message)).toHaveLength(2)
+		expect(chance()).not.toContain(refusal.message)
+	})
+
+	test("a failed chance reread shows under Chance of success only, not in the Assumptions form", () => {
+		editSession.source = "form"
+		editSession.error = "reread failed"
+		expect(chance().split("reread failed")).toHaveLength(2)
+		expect(form()).not.toContain("reread failed")
 	})
 })
 
