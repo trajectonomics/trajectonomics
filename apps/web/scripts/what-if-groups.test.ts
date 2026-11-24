@@ -4,9 +4,11 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { whatIfSession } from "../src/client/what-if.svelte"
 import { tryLoanInWhatIf } from "../src/components/plan-items/loan-what-if"
+import type { ScenarioDocument } from "../src/lib/contract"
 import { assetCardsOf } from "../src/lib/view/plan-items/asset-card"
 import { assetDocument } from "../src/lib/view/plan-items/asset-document"
 import { homeDraft, partsOf } from "../src/lib/view/plan-items/asset-fixtures.test-support"
+import { loanCardsOf } from "../src/lib/view/plan-items/loan-card"
 import { loanDocument, loanOf } from "../src/lib/view/plan-items/loan-document"
 import { loanFromDraft } from "../src/lib/view/plan-items/loan-draft"
 import { BOAT } from "./loans-boat.test-support"
@@ -102,11 +104,28 @@ describe("a loan Try, then removed", () => {
 			whatIfSession.removeChange(change)
 			expect(whatIfSession.whatIf?.groups).toEqual([])
 			expect(await effectiveHash(LOAN, "group-loan-removed")).toBe(none)
+			// The independent Set outlives the group: removing it took nothing but its own parts.
+			const independent = [{ path: "flows.salary.amount", value: salary }]
+			expect(whatIfSession.whatIf?.sets).toEqual(independent)
+			// Switched off and back on, the loan leaves the independent Set as it was too.
+			const loan = assetLoanSwitch(doc)
+			expect(whatIfSession.setGroupOff(LOAN, hash, loan.spec, loan.removals, true)).toBe(true)
+			expect(await effectiveHash(LOAN, "group-loan-off")).not.toBe(none)
+			expect(whatIfSession.setGroupOff(LOAN, hash, loan.spec, loan.removals, false)).toBe(true)
+			expect(whatIfSession.whatIf?.sets).toEqual(independent)
+			expect(await effectiveHash(LOAN, "group-loan-on")).toBe(none)
 			expect(documentOf(LOAN)).toEqual(doc)
 		},
 		SLOW_MS,
 	)
 })
+
+/** The boat loan's switch, as its card states it. */
+function assetLoanSwitch(doc: ScenarioDocument) {
+	const card = loanCardsOf(doc, undefined, baselineOf()).find((one) => one.id === "boat-loan")
+	if (card === undefined) throw new Error("no boat loan card")
+	return card.switch
+}
 
 /** The plan with the home saved to it: bought with a loan, sold in 2030 with the loan repaid from the sale. */
 async function withHome(plan: string): Promise<void> {

@@ -54,13 +54,38 @@ export function withoutGroup(whatIf: WhatIf, id: string): WhatIf {
 	}
 }
 
+/** Whether two groups claim a path in common, a field of a part counting as the part. */
+function overlap(a: Pick<GroupSpec, "paths">, b: Pick<GroupSpec, "paths">): boolean {
+	return a.paths.some((path) => inGroup(b, path)) || b.paths.some((path) => inGroup(a, path))
+}
+
 /**
- * The session with the group switched off: `removals` take its parts out together, and any earlier try of it is
- * dropped, because a Set of a part that is gone would be refused. A plan can keep a part declared (the Account
- * a Baseline row holds), so the removals are the caller's, and `spec.paths` are all the group's parts.
+ * The session with the paths of `spec` handed to a new group: every group that claims one of them goes, whole, and
+ * so does every Removal, Addition and Set under the paths of those groups and of `spec`, an independent Set made
+ * before the group included. A path belongs to at most one group, so taking one group back never undoes part of
+ * another, and a Set of a part that a switch takes out is never left to be refused.
+ */
+function takenOver(whatIf: WhatIf, spec: GroupSpec): WhatIf {
+	const gone = whatIf.groups.filter((one) => groupId(one) === groupId(spec) || overlap(one, spec))
+	const owners = [...gone, spec]
+	const owned = (path: string) => owners.some((one) => inGroup(one, path))
+	return {
+		...whatIf,
+		groups: whatIf.groups.filter((one) => !gone.includes(one)),
+		removals: whatIf.removals.filter((path) => !owned(path)),
+		additions: whatIf.additions.filter((one) => !owned(additionPath(one))),
+		sets: whatIf.sets.filter((set) => !owned(set.path)),
+	}
+}
+
+/**
+ * The session with the group switched off: `removals` take its parts out together, and any earlier try or switch of
+ * the group, of a group that shares a part with it and of a part alone is dropped, because a Set of a part that is
+ * gone would be refused. A plan can keep a part declared (the Account a Baseline row holds), so the removals are
+ * the caller's, and `spec.paths` are all the group's parts.
  */
 export function withGroupOff(whatIf: WhatIf, spec: GroupSpec, removals: readonly string[]): WhatIf {
-	const base = withoutGroup(whatIf, groupId(spec))
+	const base = takenOver(whatIf, spec)
 	return {
 		...base,
 		removals: [...base.removals, ...removals.filter((path) => !base.removals.includes(path))],
@@ -70,14 +95,14 @@ export function withGroupOff(whatIf: WhatIf, spec: GroupSpec, removals: readonly
 
 /**
  * The session with the group tried: `sets` are the edited fields of its parts, and they replace any earlier try
- * or switch of the group. No Set leaves the group as the plan stores it.
+ * or switch of the group or of a group that shares a part with it. No Set leaves the group as the plan stores it.
  */
 export function withGroupTried(
 	whatIf: WhatIf,
 	spec: GroupSpec,
 	sets: readonly { path: string; value: Json }[],
 ): WhatIf {
-	const base = withoutGroup(whatIf, groupId(spec))
+	const base = takenOver(whatIf, spec)
 	if (sets.length === 0) return base
 	return {
 		...base,

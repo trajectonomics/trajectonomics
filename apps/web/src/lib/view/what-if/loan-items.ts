@@ -56,7 +56,11 @@ export function loanItems(
 	if (changes === null) return { cards: baseline, marks: {} }
 	const whatIf = loanCardsOf(overlayDocument(doc, changes), context.run, context.baseline)
 	return {
-		cards: baseline.map((card) => whatIf.find((entry) => entry.id === card.id) ?? card),
+		cards: baseline.map((card) => {
+			const tried = whatIf.find((entry) => entry.id === card.id)
+			// The switch is the stored plan's: the session's removals name its paths, whatever a Try makes of the loan.
+			return tried === undefined ? card : { ...tried, switch: card.switch }
+		}),
 		marks: Object.fromEntries(
 			baseline.map((card) => [
 				card.id,

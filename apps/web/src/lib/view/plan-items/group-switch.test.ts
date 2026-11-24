@@ -1,10 +1,17 @@
 import { describe, expect, test } from "bun:test"
-import { type Baseline, type Read, type ScenarioDocument, scenarioDocument } from "../../contract"
+import {
+	type Baseline,
+	type Read,
+	type ScenarioDocument,
+	scenarioDocument,
+	scenarioFlow,
+} from "../../contract"
 import { overlayDocument } from "../../what-if/overlay"
 import { startWhatIf, withGroupOff } from "../../what-if/session"
 import { flowItems } from "../what-if/plan-items"
 import { assetCardsOf } from "./asset-card"
 import { homeDraft, planWithHome } from "./asset-fixtures.test-support"
+import { withFlow } from "./document"
 import { baselineRead } from "./fixtures.test-support"
 import type { GroupSwitch } from "./group-switch"
 import { loanCardsOf, plainAccounts, unplacedFlows } from "./loan-card"
@@ -73,13 +80,57 @@ describe("a loan's switch takes its parts out together", () => {
 		expect(dangling(switchedOff(extra, withExtra))).toEqual([])
 	})
 
-	test("an Account the Baseline holds stays declared, so every read still has it", () => {
-		const [kept] = loanCardsOf(doc, undefined, holding("loan"))
-		expect(kept?.switch.spec.paths).toContain("accounts.loan")
-		expect(kept?.switch.removals).toEqual(["flows.car-loan", "flows.car-draw"])
-		if (kept === undefined) throw new Error("no loan card")
-		const next = switchedOff(doc, { switch: kept.switch })
-		expect(next.accounts.map((account) => account.id)).toContain("loan")
+	test("a debt the Baseline holds has no switch and says why, and its terms can still be tried", () => {
+		const [owed] = loanCardsOf(doc, undefined, holding("loan"))
+		expect(owed?.switch.refused).toBe(
+			"Already owed: the ledger holds this debt, so a what-if cannot take it out. Try its terms instead.",
+		)
+		expect(owed?.switch.spec.paths).toContain("accounts.loan")
+		expect(card?.switch.refused).toBeNull()
+	})
+
+	test("a loan another Flow reads in its derived amount has no switch, and names that Flow", () => {
+		const reader = scenarioFlow.parse({
+			id: "tax-on-loan",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2027-01-01",
+			derive: {
+				measures: [
+					{ id: "worth", op: "account", account: "loan" },
+					{ id: "tenth", op: "scale", of: "worth", num: 1, den: 100000, rounding: "floor" },
+				],
+				result: "tenth",
+			},
+		})
+		const [read] = loanCardsOf(withFlow(doc, reader), undefined, NOTHING_HELD)
+		expect(read?.switch.refused).toContain("The Flow tax-on-loan reads loan in its derived amount")
+	})
+})
+
+describe("a loan the terminal changed inside an asset follows the asset", () => {
+	/** The home with its loan's draw moved a day, so the asset no longer recognises its loan. */
+	const moved = ((): ScenarioDocument => {
+		const doc = planWithHome(homeDraft({ saleDate: "2028-07-15" }))
+		return {
+			...doc,
+			flows: doc.flows.map((flow) =>
+				flow.id === "home-loan-draw" ? { ...flow, start: "2027-07-16" } : flow,
+			),
+		}
+	})()
+
+	test("the asset's group claims the loan's parts, and the loan card has no switch of its own", () => {
+		const [asset] = assetCardsOf(moved, undefined, undefined)
+		const loan = loanCardsOf(moved, undefined, NOTHING_HELD).find((one) => one.id === "home-loan")
+		expect(asset?.outside).toContain("home-loan")
+		expect(asset?.switch.spec.paths).toContain("accounts.home-loan")
+		expect(loan?.switch.owner?.name).toBe("home")
+		expect(loan?.switch.refused).toBe("Part of asset home: it switches with the asset.")
+		if (asset === undefined) throw new Error("no asset card")
+		const next = switchedOff(moved, asset)
+		expect(next.accounts.map((account) => account.id)).not.toContain("home-loan")
+		expect(next.flows.map((flow) => flow.id).filter((id) => id.startsWith("home"))).toEqual([])
 		expect(dangling(next)).toEqual([])
 	})
 })
@@ -94,6 +145,12 @@ describe("an asset's switch takes its parts out together", () => {
 		expect(next.accounts.map((account) => account.id)).not.toContain("home-loan")
 		expect(next.flows.map((flow) => flow.id).filter((id) => id.startsWith("home"))).toEqual([])
 		expect(dangling(next)).toEqual([])
+	})
+
+	test("an asset whose loan the Baseline holds has no switch and says why", () => {
+		const [owed] = assetCardsOf(home, holding("home-loan"), undefined)
+		expect(owed?.switch.refused).toContain("Already owed")
+		expect(card?.switch.refused).toBeNull()
 	})
 
 	test("the Account the Baseline holds stays declared, with its loan gone", () => {

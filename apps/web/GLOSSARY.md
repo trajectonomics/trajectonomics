@@ -57,7 +57,7 @@ The changes one tab holds against one plan, switched items off (Removals) and va
 _Avoid_: scratch plan, draft, scenario copy, simulation
 
 **Group** (in a What-if session):
-A loan or a real asset changed as a whole: its parts (Account, Flows, debt) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself.
+A loan or a real asset changed as a whole: its parts (Account, Flows, debt) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself. A path is in at most one group, and a debt the Baseline holds has no switch.
 _Avoid_: bundle, batch
 
 **What-if lens**:

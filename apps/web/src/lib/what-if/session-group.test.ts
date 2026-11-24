@@ -107,3 +107,63 @@ describe("a loan switched off is one group", () => {
 		])
 	})
 })
+
+describe("a path belongs to at most one group", () => {
+	const asset = {
+		kind: "asset",
+		name: "condo",
+		paths: [
+			"accounts.condo",
+			"accounts.condo-loan",
+			"flows.condo-loan-payment",
+			"flows.condo-sale",
+		],
+	} as const
+	const loan = {
+		kind: "loan",
+		name: "condo-loan",
+		paths: ["accounts.condo-loan", "flows.condo-loan-payment"],
+	} as const
+	const loanOff = withGroupOff(start, loan, loan.paths)
+	const assetOff = withGroupOff(start, asset, asset.paths)
+
+	test("loan off, then asset off: the asset takes the loan's parts over, and removing it leaves nothing", () => {
+		const both = withGroupOff(loanOff, asset, asset.paths)
+		expect(both.groups.map(groupId)).toEqual(["asset:condo"])
+		expect(both.removals).toEqual([...asset.paths])
+		expect(hasChanges(withoutGroup(both, "asset:condo"))).toBe(false)
+		expect(withoutGroup(both, "loan:condo-loan")).toBe(both)
+	})
+
+	test("asset off, then loan off: the loan takes them over, and the asset's other parts are back", () => {
+		const both = withGroupOff(assetOff, loan, loan.paths)
+		expect(both.groups.map(groupId)).toEqual(["loan:condo-loan"])
+		expect(both.removals).toEqual([...loan.paths])
+		expect(hasChanges(withoutGroup(both, "loan:condo-loan"))).toBe(false)
+		expect(withoutGroup(both, "asset:condo")).toBe(both)
+	})
+
+	test("a try takes over the parts of an off group the same way", () => {
+		const tried = withGroupTried(assetOff, loan, [{ path: "accounts.condo-loan.rate", value: 700 }])
+		expect(tried.groups.map(groupId)).toEqual(["loan:condo-loan"])
+		expect(tried.removals).toEqual([])
+		expect(hasChanges(withoutGroup(tried, "loan:condo-loan"))).toBe(false)
+	})
+})
+
+describe("a Set made before a group", () => {
+	const salary = { path: "flows.salary.amount", value: "1.00" }
+	const before = withSet(withSet(start, "flows.boat-loan-draw.amount", "9.00"), salary.path, "1.00")
+
+	test("under the group's paths leaves with a switch off, and outside them stays through the switch and its removal", () => {
+		const off = withGroupOff(before, SPEC, SPEC.paths)
+		expect(off.sets).toEqual([salary])
+		expect(withoutGroup(off, groupId(SPEC)).sets).toEqual([salary])
+	})
+
+	test("switching the group off and back on leaves an independent Set exactly as it was", () => {
+		const back = withoutGroup(withGroupOff(before, SPEC, SPEC.paths), groupId(SPEC))
+		expect(back.sets).toEqual([salary])
+		expect(back.removals).toEqual([])
+	})
+})

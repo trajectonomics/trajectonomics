@@ -79,7 +79,7 @@ const button =
 		<p class="mt-3 text-xs text-muted-foreground">
 			A What-if tries this loan's terms and switches the loan off with its payments and its withdrawal. It cannot pay extra, and it cannot add or take out the withdrawal that borrows the money.
 		</p>
-		{#if Object.keys(marks.rows).length > 0 || marks.principal !== undefined}
+		{#if marks.off || Object.keys(marks.rows).length > 0 || marks.principal !== undefined}
 			<p class="mt-1 text-xs text-muted-foreground">The schedule and what the loan owes are the plan's own, not the what-if's.</p>
 		{/if}
 		<GroupSwitch {plan} {contentHash} group={card.switch} label={card.id} {onTry} />
