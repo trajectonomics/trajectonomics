@@ -12,6 +12,7 @@ import { ROUTING_PARITY_CASES } from "./routing-parity-cases"
 import { RULE_PARITY_CASES } from "./rule-parity-cases"
 import { SAVINGS_PARITY_CASES } from "./savings-parity-cases"
 import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
+import { TRANSFER_PARITY_CASES } from "./transfer-parity-cases"
 
 /**
  * Every parity fixture, in the order `parity/cases.json` records them. A new list of cases is added
@@ -32,4 +33,5 @@ export const EVERY_PARITY_CASE: readonly ParityCase[] = [
 	...FEE_PARITY_CASES,
 	...PLAN_MODEL_PARITY_CASES,
 	...ROUTING_PARITY_CASES,
+	...TRANSFER_PARITY_CASES,
 ]

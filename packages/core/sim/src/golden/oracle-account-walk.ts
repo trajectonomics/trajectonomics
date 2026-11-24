@@ -9,6 +9,7 @@ import { oracleEvents } from "./oracle-flow"
 import type { OracleFires } from "./oracle-milestone-walk"
 import { oracleOrdered } from "./oracle-planned"
 import { oracleRuleLog } from "./oracle-rule"
+import type { OracleStates } from "./oracle-state"
 
 export interface Landing {
 	readonly date: DateString
@@ -23,6 +24,15 @@ export interface AccountWalk {
 	readonly after: ReadonlyMap<DateString, bigint>
 	/** The expense each day landed, through the end of the walk. */
 	readonly expenses: readonly Landing[]
+	/** The Accounts as the walk left them: read each at the date it asks with `oracleValuation`. */
+	readonly states: OracleStates
+	/** What each transfer Flow moved, and could not move, over the walk, by Flow id (ADR 0031). */
+	readonly moved: ReadonlyMap<string, bigint>
+	readonly unmoved: ReadonlyMap<string, bigint>
+}
+
+function addAll(into: Map<string, bigint>, from: ReadonlyMap<string, bigint>): void {
+	for (const [id, amount] of from) into.set(id, (into.get(id) ?? 0n) + amount)
 }
 
 /**
@@ -60,6 +70,17 @@ export function oracleAccountWalk(
 	])
 	const after = new Map<DateString, bigint>()
 	const expenses: Landing[] = []
+	const moved = new Map<string, bigint>()
+	const unmoved = new Map<string, bigint>()
+	const walk = (survived: boolean): AccountWalk => ({
+		survived,
+		fires: ctx.known,
+		after,
+		expenses,
+		states: ctx.states,
+		moved,
+		unmoved,
+	})
 	let ranOut = false
 	for (const day of [...dates].sort()) {
 		const due = events.filter((event) => event.date === day)
@@ -70,11 +91,13 @@ export function oracleAccountWalk(
 		}
 		const landed = oracleLandDay(ctx.states, fixture, day, landing, planned)
 		expenses.push({ date: day, amount: landed.expense })
+		addAll(moved, landed.moved)
+		addAll(unmoved, landed.unmoved)
 		after.set(day, oracleWorth(ctx.states, day).accessible)
 		if (landed.ranOut && day <= timeline.horizon) {
-			return { survived: false, fires: ctx.known, after, expenses }
+			return walk(false)
 		}
 		ranOut = landed.ranOut
 	}
-	return { survived: true, fires: ctx.known, after, expenses }
+	return walk(true)
 }

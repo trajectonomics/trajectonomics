@@ -60,6 +60,8 @@ export function totalsOf(
 		fees: 0n,
 		feesBy: NO_FEES,
 		drawnBy: day.plannedBySource ?? new Map(),
+		transfers: 0n,
+		transferredTo: NO_FEES,
 		contributions,
 		paidBy,
 		unfunded,

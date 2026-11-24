@@ -6,6 +6,7 @@ export interface FlowSums {
 	readonly income: bigint
 	readonly expense: bigint
 	readonly withdrawals: bigint
+	readonly transfers: bigint
 	readonly contributions: bigint
 	readonly employer: bigint
 	readonly payouts: bigint
@@ -19,6 +20,7 @@ export function sumFlows(totals: readonly DayTotals[], period: Period): FlowSums
 	let income = 0n
 	let expense = 0n
 	let withdrawals = 0n
+	let transfers = 0n
 	let contributions = 0n
 	let employer = 0n
 	let payouts = 0n
@@ -30,6 +32,7 @@ export function sumFlows(totals: readonly DayTotals[], period: Period): FlowSums
 		income += total.income
 		expense += total.expense
 		withdrawals += total.withdrawals
+		transfers += total.transfers
 		contributions += total.contributions
 		employer += total.employer
 		payouts += total.payouts
@@ -37,5 +40,16 @@ export function sumFlows(totals: readonly DayTotals[], period: Period): FlowSums
 		for (const amount of total.unfunded.values()) unfunded += amount
 		levy += total.levy
 	}
-	return { income, expense, withdrawals, contributions, employer, payouts, fees, unfunded, levy }
+	return {
+		income,
+		expense,
+		withdrawals,
+		transfers,
+		contributions,
+		employer,
+		payouts,
+		fees,
+		unfunded,
+		levy,
+	}
 }

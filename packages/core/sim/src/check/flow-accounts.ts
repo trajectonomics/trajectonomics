@@ -24,21 +24,19 @@ export function accountReadsOf(flow: unknown, at: Path): readonly AccountRead[] 
 	return reads
 }
 
-/** The Account a Flow changes: a contribution's `target`, a withdrawal's `source`. */
-export function changedAccountOf(flow: unknown): string | undefined {
-	if (!isRecord(flow)) return undefined
-	const value =
-		flow["kind"] === "contribution"
-			? flow["target"]
-			: flow["kind"] === "withdrawal"
-				? flow["source"]
-				: undefined
-	return typeof value === "string" ? value : undefined
+/** The Accounts a Flow changes: a contribution's `target`, a withdrawal's `source`, a transfer's both. */
+export function changedAccountsOf(flow: unknown): readonly string[] {
+	if (!isRecord(flow)) return []
+	const { kind, target, source } = flow
+	const named = kind === "contribution" ? [target] : kind === "withdrawal" ? [source] : []
+	if (kind === "transfer") named.push(source, target)
+	return named.filter((value): value is string => typeof value === "string")
 }
 
-/** A sale that reads the Account it sells: the value is read before anything lands, so no cycle (ADR 0021). */
+/** A sale or a transfer that reads its own source: the value is read before anything lands, so no cycle (ADR 0021, 0031). */
 function isSaleReadingItself(flow: unknown, read: AccountRead): boolean {
-	return isRecord(flow) && flow["kind"] === "withdrawal" && flow["source"] === read.account
+	if (!isRecord(flow) || flow["source"] !== read.account) return false
+	return flow["kind"] === "withdrawal" || flow["kind"] === "transfer"
 }
 
 /**
@@ -55,7 +53,7 @@ export function accountEdges(
 	for (const read of accountReadsOf(flows[index], [...path, index])) {
 		for (let other = 0; other < flows.length; other++) {
 			if (other === index && isSaleReadingItself(flows[index], read)) continue
-			if (changedAccountOf(flows[other]) === read.account)
+			if (changedAccountsOf(flows[other]).includes(read.account))
 				edges.push({ to: other, path: read.path })
 		}
 	}

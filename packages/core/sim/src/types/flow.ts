@@ -105,12 +105,30 @@ export interface WithdrawalRules {
 	readonly source: AccountId
 }
 
+/**
+ * Money moves from `source` to `target`, both the plan's own Accounts, outside cashflow (ADR 0031): it is
+ * not income, an expense or a Contribution, and net worth is unchanged on its date. The amount moved is
+ * `min(planned, what the source holds, what a liability target still owes)`, none while the source is locked.
+ * Cost basis moves with the money; `realise` tallies the source's Realised gain on it as a sale's.
+ */
+export interface TransferRules {
+	readonly kind: "transfer"
+	/** An asset Account that is not Illiquid. */
+	readonly source: AccountId
+	/** An asset Account, or a liability the transfer pays down. */
+	readonly target: AccountId
+	/** Tally the Realised gain on the amount moved, as a sale; absent or `false` moves the Cost basis untaxed. */
+	readonly realise?: boolean
+}
+
 export type ContributionFlow = FlowBase &
 	ContributionRules &
 	(FixedAmount | DerivedAmount | LevelAmount)
 export type WithdrawalFlow = FlowBase & WithdrawalRules & (FixedAmount | DerivedAmount)
 
-export type Flow = IncomeFlow | ExpenseFlow | ContributionFlow | WithdrawalFlow
+export type TransferFlow = FlowBase & TransferRules & (FixedAmount | DerivedAmount)
+
+export type Flow = IncomeFlow | ExpenseFlow | ContributionFlow | WithdrawalFlow | TransferFlow
 
 /** Whether a Flow carries a fixed `amount` rather than a `derive` graph or a `level` loan. */
 export function isFixed(flow: Flow): flow is Flow & FixedAmount {

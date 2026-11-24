@@ -26,7 +26,7 @@ export function openLedger(states: StateMap, start: DateString): LiabilityLedger
 
 /** Records the date's moves: a liability whose owed amount falls from above zero to zero is paid off. */
 export function recordMoves(ledger: LiabilityLedger, states: StateMap, day: DayTotals): void {
-	const moved = new Set([...day.drawnBy.keys(), ...day.paidBy.keys()])
+	const moved = new Set([...day.drawnBy.keys(), ...day.paidBy.keys(), ...day.transferredTo.keys()])
 	for (const id of moved) {
 		const after = valuation(states.get(id)!, day.date)
 		const before = ledger.owed.get(id) ?? 0n

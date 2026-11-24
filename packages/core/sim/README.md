@@ -643,6 +643,70 @@ if (result.ok) {
 cash=0 fund=985102695
 ```
 
+## Transfers
+
+A `transfer` Flow moves money between the plan's own Accounts, outside cashflow: it is not income, an
+expense or a Contribution, net worth is unchanged on its date, and it never enters Available cashflow, the
+`withdraw` list or a Shortfall. The `source` is an asset that is not Illiquid (a sale is a Planned
+withdrawal), the `target` an asset, an Illiquid or locked one included, or a liability, which the transfer
+pays down (never below zero owed). The amount moved is `min(planned, what the source holds)`, nothing while
+the source is locked, so it never overdraws; the breakdown lists what could not move as `unmoved`. A
+Derived amount reads the source before anything lands, so "all of it" is a `derive` over an `account`
+Measure. A transfer lands after the date's income, expenses and contributions and before its surplus and
+`withdraw` routing, and several on one date apply in Scenario order. The Cost basis moves with the money
+(average cost): the source's falls by the moved share and the target's rises by it. `realise: true` instead
+tallies the source's Realised gain on the amount, as a sale, and starts the target's basis at the amount;
+it is off by default. The Annual roll-up reports `transfers` and the cash-flow breakdown a `transfers` list,
+both only when the Scenario declares a transfer. See [ADR 0031](docs/adr/0031-transfers-between-your-own-accounts.md).
+
+A provident fund of 3,000,000 rolled whole into a locked RMF on 30 June leaves 0 and 3,000,000, and net
+worth stays 3,000,000:
+
+```ts
+import { project } from "@trajectonomics/core/sim"
+
+const result = project(
+	{ schemaVersion: 1, balances: [{ account: "pvd", amount: 3_000_000 }, { account: "rmf", amount: 0 }] },
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: "pvd", kind: "asset", rate: 0 },
+			{ id: "rmf", kind: "asset", rate: 0, lockedUntil: "2031-01-01" },
+		],
+		flows: [
+			{
+				id: "roll",
+				kind: "transfer",
+				source: "pvd",
+				target: "rmf",
+				frequency: "once",
+				start: "2026-06-30",
+				derive: { measures: [{ id: "all", op: "account", account: "pvd" }], result: "all" },
+			},
+		],
+		cashflow: { contribute: [], surplus: [{ account: "pvd" }], withdraw: [] },
+	},
+	{ start: "2026-01-01", horizon: "2026-12-31", resolution: "month" },
+	{ cashflowBreakdown: true },
+)
+
+if (result.ok) {
+	const { transfers, closingNetWorth } = result.projection.annual[0]!
+	const last = result.projection.rows[result.projection.rows.length - 1]!
+	console.log(transfers, closingNetWorth)
+	console.log(last.balances.map((item) => `${item.account}=${item.amount}`).join(" "))
+	console.log(JSON.stringify(result.projection.cashflow![0]!.transfers))
+}
+```
+
+```text
+3000000 3000000
+pvd=0 rmf=3000000
+[{"flow":"roll","source":"pvd","target":"rmf","amount":3000000,"unmoved":0}]
+```
+
 ## Scripts
 
 - `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).

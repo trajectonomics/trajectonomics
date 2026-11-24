@@ -36,6 +36,8 @@ export function buildCashflow(
 			...sums.settled.values(),
 			...sums.drawn.values(),
 			...sums.surplus.values(),
+			...sums.transfers.values(),
+			...sums.unmoved.values(),
 			...categories.map((item) => item.amount),
 			unmet,
 		]

@@ -1,6 +1,6 @@
-import { allowedValues, check, type Problem } from "@trajectonomics/core/sim"
+import { check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
-import { wordsOf } from "./problem-words"
+import { shippedValues, wordsOf } from "./problem-words"
 import { ROUTING_NOT_SHIPPED, type UnshippedProblem, unshippedRouting } from "./routing-unshipped"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
@@ -118,7 +118,7 @@ function detailOf(problem: ScenarioProblem): string | undefined {
 	if (problem.code === "NOT_SAFE_INTEGER" && problem.segments.some((s) => RATE_SEGMENTS.has(s))) {
 		return "basis points, a whole number: 2% is 200"
 	}
-	const allowed = allowedValues(problem.code, problem.segments)
+	const allowed = shippedValues(problem.code, problem.segments)
 	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
 }
 

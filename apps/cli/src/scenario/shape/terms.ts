@@ -68,7 +68,10 @@ export function closed(code: ErrorCode, path: readonly string[] = []): readonly 
 }
 
 export const ACCOUNT_KINDS: readonly string[] = closed("INVALID_KIND", ["accounts"])
-export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"])
+/** The Flow kinds this release takes: the engine also has `transfer` (sim ADR 0031), which ships in a later release (routing-unshipped.ts). */
+export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"]).filter(
+	(kind) => kind !== "transfer",
+)
 /** How a Contribution into an asset is paid: a target spends Available cashflow, an obligation is paid in full (sim's ADR 0021). */
 export const FUNDINGS: readonly string[] = closed("INVALID_FUNDING")
 export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")
