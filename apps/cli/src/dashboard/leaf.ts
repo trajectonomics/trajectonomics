@@ -41,13 +41,15 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 			returnModel: z
 				.string()
 				.optional()
-				.describe("The Return model JSON file the chance of success draws from."),
+				.describe(
+					"The Return model JSON file the chance of success draws from. Left out with --paths and --seed given, it is `plan`: the model built from each Scenario's own Accounts. A file wins when given.",
+				),
 			paths: z
 				.number()
 				.int()
 				.optional()
 				.describe(
-					"The Market paths the chance runs, from 1 to 10,000. Needs --return-model and --seed.",
+					"The Market paths the chance runs, from 1 to 10,000. Needs --seed, and --return-model unless the Scenarios state a volatility (then `plan`).",
 				),
 			seed: z
 				.string()
@@ -67,6 +69,12 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 			{
 				command: "traj dashboard --as-of 2026-11-30 --horizon 2056-11-30",
 				description: "Read the ledger once and open http://127.0.0.1:4321/ in a browser.",
+			},
+			{
+				command:
+					"traj dashboard --as-of 2026-11-30 --horizon 2056-11-30 --scenario volatile --paths 200 --seed 0123456789abcdef --port 0",
+				description:
+					"Add the chance of success from the plan's own return model (--return-model plan is the default with --paths and --seed).",
 			},
 			{
 				command:

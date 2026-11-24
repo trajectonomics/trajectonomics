@@ -5,7 +5,7 @@ import { ACCOUNT_KINDS, BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
 export const accountShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional. `payout` and `fee` are an asset's alone, and every rate in them is the caller's.",
+		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional. `payout`, `fee` and `volatility` are an asset's alone, and every rate in them is the caller's.",
 	properties: {
 		id: {
 			type: "string",
@@ -44,6 +44,10 @@ export const accountShape: Record<string, unknown> = {
 			type: "string",
 			description:
 				"Assets only: the Tally label the Account's realised gains are reported under; omit to report none. Needs a Levy.",
+		},
+		volatility: {
+			type: "integer",
+			description: `${BASIS_POINTS} Assets only, 0 to 10000: how much the Account's yearly return swings, as the standard deviation of that return, so 15% is 1500. Only the chance of success reads it: \`traj projection chance --return-model plan\` builds its Market paths from each Account's \`rate\` and \`volatility\`, and every Account with a \`volatility\` above 0 moves with one shared market factor. An Account without one keeps its \`rate\` on every path, and every other projection ignores it. The figure is the caller's own: \`traj\` ships none.`,
 		},
 		payout: payoutShape,
 		fee: feeShape,

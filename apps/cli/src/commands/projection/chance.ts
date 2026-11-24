@@ -5,8 +5,10 @@ import { fail, isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
 import { chanceOf } from "../../projection/chance"
+import { CHANCE_EXAMPLES } from "../../projection/chance-examples"
 import { chanceHint } from "../../projection/chance-hint"
-import { readReturnModel, returnModelFlagDocument } from "../../projection/chance-model"
+import { returnModelFlagDocument } from "../../projection/chance-model"
+import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
 import { chanceView } from "../../projection/chance-view"
 import {
 	asOfFlag,
@@ -21,7 +23,7 @@ import { addFlag, decimalFlag, setFlag, withoutFlag } from "../../scenario/overr
 
 /** The method in the words a help page prints: what runs, and what the result does not say. */
 const CHANCE_METHOD =
-	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up; for a Scenario with a spending rule, spendingBands add what the rule paid in each roll-up and lowestYearSpending the least a path paid in a whole year, a path that ran out counting 0. The figures are nominal, and the CLI ships no Return model: the caller states one."
+	"Runs the Scenario through the Market paths of one Return model, each drawn from a seed, and reports the share of paths that never run out before the Horizon. The Bands are the net-worth Percentiles across paths at each annual roll-up; for a Scenario with a spending rule, spendingBands add what the rule paid in each roll-up and lowestYearSpending the least a path paid in a whole year, a path that ran out counting 0. The figures are nominal, and the CLI ships no Return model: the caller states one, as a file, or as `plan`, which builds it from the Scenario's own Accounts (each asset's `rate` and `volatility`, cli ADR-0068)."
 
 export const chance: Leaf = defineCommand({
 	name: "chance",
@@ -38,9 +40,8 @@ export const chance: Leaf = defineCommand({
 		add: addFlag,
 		decimal: decimalFlag,
 		carryIn: carryInFlag,
-		returnModel: z
-			.string()
-			.describe("The Return model JSON file the Market paths draw from, in the sim format."),
+		returnModel: returnModelFlag,
+		buckets: bucketsFlag,
 		paths: z
 			.number()
 			.int()
@@ -52,24 +53,7 @@ export const chance: Leaf = defineCommand({
 	flagDocuments: [returnModelFlagDocument, carryInFlagDocument],
 	output: chanceView,
 	render: chanceHint,
-	examples: [
-		{
-			command:
-				"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --json",
-			description: "The success share and the net-worth Bands of one Scenario, as JSON.",
-		},
-		{
-			command:
-				"traj projection chance --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef",
-			description: "The same chance in the human form: the success share and a few Bands.",
-		},
-		{
-			command:
-				"traj projection chance --scenario ruled --as-of 2026-03-31 --horizon 2029-03-30 --return-model model.json --paths 200 --seed 0123456789abcdef --json",
-			description:
-				"A Scenario with a spending rule: the Bands also say what the rule pays across Market paths, and the lowest year it pays in any path.",
-		},
-	],
+	examples: CHANCE_EXAMPLES,
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
 		// Standard input can be read once, so only one of the two documents may come from it.
@@ -80,8 +64,8 @@ export const chance: Leaf = defineCommand({
 				hint: "Read one of the two documents from a file: --return-model PATH or --carry-in PATH.",
 			})
 		}
-		const model = await readReturnModel(input.returnModel, ctx.stdin)
-		if (isAppError(model)) return model
+		const source = await modelSourceOf(input, ctx.stdin)
+		if (isAppError(source)) return source
 		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
 		if (isAppError(records)) return records
 		return withProjection(input, ctx, (prepare) => {
@@ -96,7 +80,7 @@ export const chance: Leaf = defineCommand({
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
-			return chanceOf(placed, model, { seed: input.seed, paths: input.paths })
+			return chanceOf(placed, source, { seed: input.seed, paths: input.paths })
 		})
 	},
 })

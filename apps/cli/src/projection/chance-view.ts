@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
-import { spendingTables } from "./chance-spending-tables"
+import { band, bandsTable, runsOut } from "./chance-band-view"
+import { type PlanModelView, planModelField } from "./chance-plan-view"
 import {
 	type ChanceLowestYearView,
 	type ChancePercentileView,
@@ -10,7 +11,7 @@ import {
 	lowestYearField,
 	spendingBandField,
 } from "./chance-spending-view"
-import { dateField, moneyField } from "./money"
+import { dateField } from "./money"
 import {
 	asOfField,
 	type Echo,
@@ -43,6 +44,8 @@ export type ChanceView = Echo & {
 	horizon: string
 	currency: string
 	definition: ChanceDefinitionView
+	/** Present only for `--return-model plan`: the inputs the model was built from (cli ADR-0068). */
+	returnModel?: PlanModelView | undefined
 	paths: number
 	succeeded: number
 	/** The floored share of Market paths that never run out, in basis points. */
@@ -55,43 +58,6 @@ export type ChanceView = Echo & {
 	lowestYearSpending?: ChanceLowestYearView | undefined
 	tables: ChanceTable[]
 }
-
-const percentile = z.strictObject({
-	level: z
-		.number()
-		.int()
-		.describe("The Percentile, from the engine's fixed set: 10, 25, 50, 75, 90."),
-	value: moneyField("Closing net worth at this Percentile across Market paths"),
-})
-
-const band = z.strictObject({
-	index: z.number().int().describe("The roll-up's index, from 0."),
-	to: dateField("The roll-up's last day"),
-	netWorth: z.array(percentile).describe("The Percentiles of closing net worth, in level order."),
-})
-
-const runsOut = z.strictObject({
-	index: z.number().int().describe("The roll-up in which the failing paths first ran out, from 0."),
-	to: dateField("The roll-up's last day"),
-	paths: z.number().int().describe("Failing Market paths whose Runs-out falls in that roll-up."),
-})
-
-const tableRow = z.strictObject({
-	index: z.number().int().describe("The roll-up's index, from 0."),
-	to: dateField("The roll-up's last day"),
-	p10: moneyField("Net worth at the 10th Percentile"),
-	p50: moneyField("Net worth at the 50th Percentile"),
-	p90: moneyField("Net worth at the 90th Percentile"),
-})
-
-const bandsTable = z.union([
-	z.strictObject({
-		name: z.literal("bands").describe("The Bands the human form prints."),
-		count: z.number().int().describe("The number of rows."),
-		rows: z.array(tableRow).describe("A few roll-ups, the first, every fifth and the last."),
-	}),
-	...spendingTables,
-])
 
 export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 	asOf: asOfField,
@@ -108,6 +74,7 @@ export const chanceView: z.ZodType<ChanceView> = z.strictObject({
 		seed: z.string().describe("The seed, as 16 lower-case hex digits."),
 		paths: z.number().int().describe("The number of Market paths run."),
 	}),
+	returnModel: planModelField,
 	paths: z.number().int().describe("The number of Market paths run."),
 	succeeded: z.number().int().describe("Market paths that never run out through the horizon."),
 	successBps: z

@@ -29,3 +29,22 @@ export function unbegunBlock(segment: string, ctx: SegmentContext): AppError {
 		},
 	)
 }
+
+/**
+ * The one key of an item a `--set` may add when the item leaves it out (cli ADR-0068, amending ADR-0065):
+ * an asset Account's `volatility`, which no plan states by default, so `--set accounts.<id>.volatility=1500`
+ * is the what-if that gives the chance of success its first swing. A liability has no volatility (the
+ * engine refuses it), and every other absent key is still `No key or id`.
+ */
+export function beginsAccountVolatility(
+	node: Record<string, unknown>,
+	segment: string,
+	prefix: readonly string[],
+): boolean {
+	return (
+		segment === "volatility" &&
+		prefix.length === 2 &&
+		prefix[0] === "accounts" &&
+		node["kind"] === "asset"
+	)
+}

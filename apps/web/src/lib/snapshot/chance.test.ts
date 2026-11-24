@@ -26,9 +26,20 @@ function codeOf(overrides: Partial<PlanInput>): string | null {
 }
 
 describe("the chance flags", () => {
-	test("are all three or none: a partial set is refused by its own rule", () => {
-		expect(codeOf({ returnModel: "model.json" })).toBe("chance_needs_all_three")
-		expect(codeOf({ returnModel: "model.json", paths: 200 })).toBe("chance_needs_all_three")
+	test("paths and seed are both or neither: a partial set is refused by its own rule", () => {
+		expect(codeOf({ returnModel: "model.json" })).toBe("chance_needs_paths_and_seed")
+		expect(codeOf({ returnModel: "model.json", paths: 200 })).toBe("chance_needs_paths_and_seed")
+		expect(codeOf({ paths: 200 })).toBe("chance_needs_paths_and_seed")
+		expect(codeOf({ seed: "0123456789abcdef" })).toBe("chance_needs_paths_and_seed")
+	})
+
+	test("without a Return model file, paths and seed read the plan's own model, as traj dashboard does", () => {
+		const result = checkParams({ ...base, paths: 200, seed: "0123456789abcdef" })
+		expect(result.ok && result.params.chance).toEqual({
+			returnModel: "plan",
+			paths: 200,
+			seed: "0123456789abcdef",
+		})
 	})
 
 	test("the three together state the chance plan, and none states none", () => {
