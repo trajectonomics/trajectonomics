@@ -14,7 +14,7 @@ export const taxAllowancesShape: z.ZodType<TaxProfileView> = z
 		notStated: z
 			.array(z.enum(TAX_ALLOWANCE_CLASSES))
 			.describe(
-				"The deduction classes this build supports that the plan leaves out, so its tax leaves them out. It is the `allowances.notStated` that `scenario tax --from-stored --dry-run` reports.",
+				"The deduction classes this build supports that the plan leaves out, so its tax leaves them out. It equals `scenario tax --from-stored --dry-run`'s `allowances.notStated` while the stored Levy is the one this build writes; after a tax-year update it describes the Levy the plan holds until `--from-stored` is run (cli ADR-0073).",
 			),
 	})
 	.describe(
