@@ -1,7 +1,7 @@
 /**
  * The form's draft of a tax profile, and the flags it makes. Every item is the text the person typed. A change to a stored
  * profile sends only the items that differ (`--merge`); a profile set whole sends what is filled and chooses the filing status,
- * which has no default here. `traj` parses and checks every value ([web ADR 0015](../../../../docs/adr/0015-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
+ * which has no default here. `traj` parses and checks every value ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)).
  */
 import type { TaxProfile } from "../../contract"
 import type { EditInput } from "../../edit/edit"
@@ -72,18 +72,18 @@ function collect(items: readonly (readonly [string, Item])[]): TaxResult {
 }
 
 /**
- * The flags of a change to the stored profile: each item whose text differs from the stored one. Nothing changed is a
+ * The flags of a change: each item whose text differs from `origin`, the draft the form opened with. Comparing with the
+ * origin and not with the profile stored now keeps an item someone else changed since untouched. Nothing changed is a
  * problem, because a merge needs one item.
  */
-export function mergeFlags(stored: TaxProfile, draft: TaxDraft): TaxResult {
-	const before = draftOf(stored)
+export function mergeFlags(origin: TaxDraft, draft: TaxDraft): TaxResult {
 	const status: Item =
-		draft.filingStatus === before.filingStatus ? null : statusItem(draft.filingStatus)
+		draft.filingStatus === origin.filingStatus ? null : statusItem(draft.filingStatus)
 	const result = collect([
 		["filingStatus", status],
 		...FIELDS.map(
 			(field) =>
-				[field.key, changedItem(field, draft[field.key].trim(), before[field.key])] as const,
+				[field.key, changedItem(field, draft[field.key].trim(), origin[field.key])] as const,
 		),
 	])
 	if (result.ok && Object.keys(result.flags).length === 0) {
@@ -106,14 +106,17 @@ export function wholeFlags(draft: TaxDraft): TaxResult {
 	])
 }
 
-/** The Edit a draft makes, to merge into the stored profile or to set the profile whole, or the problems at its fields. */
+/**
+ * The Edit a draft makes, to merge into the stored profile or to set the profile whole, or the problems at its fields.
+ * `origin` is the draft of the profile the form opened with, null when none was stored.
+ */
 export function taxEdit(
-	target: { name: string; contentHash: string; stored: TaxProfile | null },
+	target: { name: string; contentHash: string; origin: TaxDraft | null },
 	draft: TaxDraft,
 	whole: boolean,
 ): { ok: true; edit: EditInput } | { ok: false; problems: Problems } {
-	const { name, contentHash, stored } = target
-	if (whole || stored === null) {
+	const { name, contentHash, origin } = target
+	if (whole || origin === null) {
 		const result = wholeFlags(draft)
 		if (!result.ok) return result
 		const { filingStatus } = result.flags
@@ -123,7 +126,7 @@ export function taxEdit(
 		const flags = { ...result.flags, filingStatus }
 		return { ok: true, edit: { kind: "set-tax", name, contentHash, flags } }
 	}
-	const result = mergeFlags(stored, draft)
+	const result = mergeFlags(origin, draft)
 	if (!result.ok) return result
 	return { ok: true, edit: { kind: "merge-tax", name, contentHash, flags: result.flags } }
 }

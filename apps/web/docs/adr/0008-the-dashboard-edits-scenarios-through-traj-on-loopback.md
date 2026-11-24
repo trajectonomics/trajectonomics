@@ -78,4 +78,4 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 
 ## Amendment (2026-11-24): the tax profile Edits
 
-- `merge-tax`, `set-tax` and `remove-tax` are `traj scenario tax <name> --merge <flags>`, `--tax th-2026 <flags>` and `--none`, each with `--if-hash`, run dry first. The flags are a closed, strict set whose values are digits only, so none is read as a flag. See [ADR 0015](0015-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md).
+- `merge-tax`, `set-tax` and `remove-tax` are `traj scenario tax <name> --merge <flags>`, `--tax th-2026 <flags>` and `--none`, each with `--if-hash`, run dry first. The flags are a closed, strict set whose values are digits only, so none is read as a flag. See [ADR 0016](0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md).

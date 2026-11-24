@@ -15,13 +15,16 @@ export function groupDigits(value: number): string {
 	return part === undefined ? grouped : `${grouped}.${part}`
 }
 
-/** The filing status, then each count and amount; an item the profile does not state reads "None" (an absent key is zero). */
+/** The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None". */
 export function profileRows(profile: TaxProfile): ProfileRow[] {
 	const stated = (key: string): number | undefined =>
 		(profile as Record<string, unknown>)[key] as number | undefined
 	return [
 		{ label: "Filing status", value: filingLabel(profile.filingStatus) },
-		...COUNT_FIELDS.map(({ key, label }) => ({ label, value: String(stated(key) ?? "None") })),
+		...COUNT_FIELDS.map(({ key, label }) => {
+			const counted = stated(key)
+			return { label, value: counted === undefined || counted === 0 ? "None" : String(counted) }
+		}),
 		...AMOUNT_FIELDS.map(({ key, label }) => {
 			const amount = stated(key)
 			return { label, value: amount === undefined ? "None" : `${groupDigits(amount)} THB` }

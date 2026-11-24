@@ -16,13 +16,17 @@ interface Props {
 }
 
 let { name, contentHash, profile, onDone }: Props = $props()
-// A stored profile is changed one item at a time; with none stored (or by choice) the whole profile is stated.
+// A stored profile is changed one item at a time; with none stored (or by choice) the whole profile is stated. The form is
+// made again when the plan changes, so `origin` is the profile this form opened with and a save sends what differs from it.
 const initial = () => draftOf(profile)
 const unstored = () => profile === null
+const origin = initial()
 let whole = $state(unstored())
 let draft = $state(initial())
 let problems: Readonly<Record<string, string>> = $state({})
-const shown = $derived(taxShown(problems, editSession.failure, editSession.error))
+const shown = $derived(
+	taxShown(problems, editSession.failure, editSession.error, { name, stored: profile !== null }),
+)
 const merging = $derived(profile !== null && !whole)
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
@@ -37,7 +41,7 @@ function switchTo(next: boolean): void {
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = taxEdit({ name, contentHash, stored: profile }, draft, whole)
+	const result = taxEdit({ name, contentHash, origin: unstored() ? null : origin }, draft, whole)
 	editSession.clear()
 	problems = result.ok ? {} : result.problems
 	if (result.ok && (await editSession.run(result.edit))) onDone()
@@ -53,7 +57,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	<TaxProfileFields bind:draft {shown} />
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	{#if needsWholeProfile(editSession.failure)}
-		<button type="button" class={button} onclick={() => { editSession.clear(); whole = true }}>Set the whole profile</button>
+		<button type="button" class={button} onclick={() => switchTo(true)}>Set the whole profile</button>
 	{/if}
 	{#if profile !== null}
 		<button type="button" class={button} onclick={() => switchTo(merging)}>

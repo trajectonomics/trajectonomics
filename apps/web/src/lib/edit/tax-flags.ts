@@ -1,6 +1,6 @@
 /**
  * The flags `traj scenario tax` takes for a tax profile, as an Edit carries them
- * ([web ADR 0015](../../../docs/adr/0015-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). Each value is
+ * ([web ADR 0016](../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). Each value is
  * the text the person typed, shaped so that `traj` can read it and never as a flag: only digits, with a point for an amount.
  * `traj` parses and checks every value, so nothing here is a rate or a limit. Pure.
  */

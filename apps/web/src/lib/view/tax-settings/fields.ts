@@ -1,6 +1,6 @@
 /**
  * The items of a tax profile the page shows and the form takes, in words a person reads
- * ([web ADR 0015](../../../../docs/adr/0015-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). A value is an
+ * ([web ADR 0016](../../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). A value is an
  * input the person states, never a figure: no allowance, limit or rate is named here, because `traj` holds them.
  */
 

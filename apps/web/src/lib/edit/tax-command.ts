@@ -1,4 +1,4 @@
-/** The `traj scenario tax` write of each tax-profile Edit ([web ADR 0015](../../../docs/adr/0015-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). Pure. */
+/** The `traj scenario tax` write of each tax-profile Edit ([web ADR 0016](../../../docs/adr/0016-the-tax-profile-page-changes-one-item-through-scenario-tax-merge.md)). Pure. */
 import type { Edit } from "./edit"
 import { taxTokens } from "./tax-flags"
 

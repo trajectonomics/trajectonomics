@@ -15,7 +15,7 @@ const choices = [{ value: "", label: "Choose a filing status" }, ...FILING_CHOIC
 
 <Field id="tax-filing-status" label="Filing status" options={choices} bind:value={draft.filingStatus} problem={shown.at("filingStatus")} />
 {#each COUNT_FIELDS as field (field.key)}
-	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} />
+	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="numeric" bind:value={draft[field.key]} problem={shown.at(field.key)} />
 {/each}
 <p class="text-sm text-muted-foreground">Amounts are what you paid in the tax year, in baht.</p>
 {#each AMOUNT_FIELDS as field (field.key)}

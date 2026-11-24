@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { ScenarioShow } from "../../lib/contract"
+import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import { isTaxed } from "../../lib/view/tax-settings/rows"
 import TaxProfileActions from "./TaxProfileActions.svelte"
 import TaxProfileRows from "./TaxProfileRows.svelte"
@@ -17,6 +18,8 @@ let { name, show, editable }: Props = $props()
 const profile = $derived(show.tax ?? null)
 // A Snapshot saved before profiles were kept states no `taxed`; the plan's own tax rules say it.
 const taxed = $derived(isTaxed(show))
+const unlabelled = $derived(unlabelledIncome(show.document))
+const income = $derived(incomeFlows(show.document))
 </script>
 
 <section id="tax-profile" class="space-y-4 rounded-lg border border-border bg-card p-5">
@@ -34,6 +37,6 @@ const taxed = $derived(isTaxed(show))
 		<p class="text-sm text-foreground">Plan {name} is not taxed, so its figures are before tax.</p>
 	{/if}
 	{#if editable}
-		<TaxProfileActions {name} contentHash={show.contentHash} {profile} {taxed} />
+		<TaxProfileActions {name} contentHash={show.contentHash} {profile} {taxed} {unlabelled} {income} />
 	{/if}
 </section>

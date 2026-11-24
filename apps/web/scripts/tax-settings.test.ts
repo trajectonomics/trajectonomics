@@ -1,40 +1,17 @@
-// The Tax profile page's Edits against the real traj (cli ADR 0066, web ADR 0015): a merge changes one item and keeps the rest,
+// The Tax profile page's Edits against the real traj (cli ADR 0066, web ADR 0016): a merge changes one item and keeps the rest,
 // a whole set states the profile, a remove takes it out, a refusal names its field, and a stale save is refused. Each test
 // sets up its own state, so each passes alone.
 import { afterAll, beforeAll, describe, expect } from "bun:test"
-import type { TaxProfile } from "../src/lib/contract"
-import type { EditAnswer } from "../src/lib/edit/answer"
 import { needsWholeProfile, taxFieldOfRefusal } from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import { slow } from "./estate.test-support"
 import { disposeEstate, PLAN, post, setupEstate, storedPlan } from "./estate-ledger.test-support"
+import { send, shownTax, withProfile } from "./tax-settings.test-support"
 
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
 afterAll(disposeEstate)
-
-/** The plan as the Snapshot shows it: its stored profile and whether it is taxed. */
-function shownTax(answer: EditAnswer): { tax: TaxProfile | null; taxed: boolean | undefined } {
-	if (!answer.ok) throw new Error(answer.error.message)
-	const read = answer.snapshot.reads.documents[PLAN]
-	if (read === undefined || !read.ok) throw new Error("the plan has no document")
-	return { tax: read.data.scenario.tax ?? null, taxed: read.data.scenario.taxed }
-}
-
-/** One tax Edit, naming the hash of the plan as stored now. */
-const send = (kind: string, flags?: object) =>
-	post("edit", { kind, name: PLAN, contentHash: storedPlan().hash, ...(flags ? { flags } : {}) })
-
-/** The plan with a whole profile of two children, one at the higher rate, and a life insurance premium. */
-async function withProfile(): Promise<EditAnswer> {
-	return send("set-tax", {
-		filingStatus: "married_joint",
-		children: "2",
-		childrenAtHigherRate: "1",
-		lifeInsurance: "20000",
-	})
-}
 
 describe("the tax profile through traj", () => {
 	slow("a whole set states the profile, and the Snapshot reads it back", async () => {
