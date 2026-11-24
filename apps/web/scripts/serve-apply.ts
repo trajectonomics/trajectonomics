@@ -5,7 +5,6 @@ import type { ErrorBody } from "../src/lib/contract"
 import { type Edit, writeCommand } from "../src/lib/edit/edit"
 import { templateRead } from "../src/lib/edit/plan-command"
 import { type RunContext, runTraj } from "./run-traj"
-import { REFUSED_EXIT_CODE } from "./serve-edit-answer"
 
 /** Whether the Edit starts a plan from the ledger's accounts, so the server reads the template first. */
 function startsPlan(edit: Edit): edit is Extract<Edit, { template: unknown }> {
@@ -15,11 +14,14 @@ function startsPlan(edit: Edit): edit is Extract<Edit, { template: unknown }> {
 /** The CLI's own answer to a dry run of an apply: `created` when no plan of the name was stored. */
 const applyStatus = z.looseObject({ status: z.string() })
 
+/** The exit code `traj` gives a taken name (cli ADR-0021: a conflict with what the ledger holds). */
+const NAME_TAKEN_EXIT_CODE = 5
+
 /** The refusal of a new plan whose name is taken: the page checks the names, and this holds when a terminal took it since. */
 function nameTaken(name: string): ErrorBody {
 	return {
 		code: "scenario_name_taken",
-		exitCode: REFUSED_EXIT_CODE,
+		exitCode: NAME_TAKEN_EXIT_CODE,
 		message: `A plan named ${name} already exists.`,
 	}
 }
