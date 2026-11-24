@@ -238,7 +238,7 @@ The `downTo` of a `withdraw` entry: the entry draws its Account only down to tha
 _Avoid_: Emergency fund, buffer, minimum balance
 
 **Shortfall**:
-Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
+Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply above its floor. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
 _Avoid_: Overdraft, deficit
 
 **Runs-out date**:
