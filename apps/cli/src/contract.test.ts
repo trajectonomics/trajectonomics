@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { z } from "zod"
+import { valuationTriggers } from "./account/value/triggers.test-support"
 import { defineCommand, defineGroup } from "./command"
 import { type ErrorCode, isAppError, registry } from "./errors"
 import { FIXTURE_AS_OF, fixtureHome } from "./ledger-fixture"
@@ -111,6 +112,7 @@ describe("contract", () => {
 				{ TRAJ_HOME: home },
 			)
 		},
+		...valuationTriggers,
 		projection_refused: async () => {
 			const home = fixtureHome()
 			await capture(
