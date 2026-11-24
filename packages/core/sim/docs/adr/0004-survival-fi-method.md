@@ -83,7 +83,7 @@ not change the survival test. It is built on the growth seam and PRNG of ADR-000
   `id` and `accounts` are validated, every bucket carries one `returnsBps` per Account in
   `-9999..10000`, and the weights are non-negative safe integers summing to exactly 2^32.
   `INVALID_WEIGHT`, `RETURN_WEIGHT_TOTAL` and `TOO_MANY_ENTRIES` are the ADR-0005 codes this input
-  uses; 64 Accounts, 512 buckets and 1,200 month rows are its caps. A missing model is
+  uses; 64 Accounts, 512 buckets (1,024 since ADR 0029) and 1,200 month rows are its caps. A missing model is
   `MISSING_KEY` at `["model"]`. An Account the model does not name keeps its `Account.rate`.
 - **Paths.** One draw per month row picks one Market bucket for every Account in the model. Path
   `i` starts from `pathSeed(seed, i)` and its rows run from `Timeline.start` to the horizon, one
