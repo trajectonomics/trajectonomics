@@ -13,7 +13,12 @@ import { isPlainObject } from "../json"
 export type OwnCode = "EMPLOYER_MEMBER_LABEL"
 
 /** One such problem, with the path inside the document, as the engine's own are. */
-export type OwnProblem = { readonly code: OwnCode; readonly segments: readonly (string | number)[] }
+export type OwnProblem = {
+	readonly code: OwnCode
+	readonly segments: readonly (string | number)[]
+	/** The member-only label the employer Contribution carries, which the sentence names. */
+	readonly label: string
+}
 
 /** The member-only labels, as the tax package lists them: every one is the member's own payment. */
 const MEMBER_ONLY: ReadonlySet<string> = new Set(TH_LEVY_MEMBER_ONLY_LABELS)
@@ -21,6 +26,11 @@ const MEMBER_ONLY: ReadonlySet<string> = new Set(TH_LEVY_MEMBER_ONLY_LABELS)
 /** Whether a code is one the CLI finds itself rather than the engine. */
 export function isOwnCode(code: string): code is OwnCode {
 	return code === "EMPLOYER_MEMBER_LABEL"
+}
+
+/** Whether a problem is one the CLI found itself, which carries the label it found. */
+export function isOwnProblem(problem: { readonly code: string }): problem is OwnProblem {
+	return isOwnCode(problem.code)
 }
 
 /** Whether a label is one only the member's own payment may carry. */
@@ -38,16 +48,23 @@ export function ownProblems(value: unknown): OwnProblem[] {
 		flow["funding"] === "employer" &&
 		typeof flow["label"] === "string" &&
 		isMemberOnlyLabel(flow["label"])
-			? [{ code: "EMPLOYER_MEMBER_LABEL" as const, segments: ["flows", index, "label"] }]
+			? [
+					{
+						code: "EMPLOYER_MEMBER_LABEL" as const,
+						segments: ["flows", index, "label"],
+						label: flow["label"],
+					},
+				]
 			: [],
 	)
 }
 
 /** The sentence and way out of an own problem, as the refusal table words the engine's. */
-export function ownSentence(code: OwnCode): { message: string; hint: string } {
+export function ownSentence(label: string): { message: string; hint: string } {
 	return {
-		message: `A Contribution with funding "employer" carries one of the Thai Levy's contribution labels (${[...MEMBER_ONLY].join(", ")}), and each of them is the member's own payment: the allowances are for what the member paid, never for the employer's share, so the label would lower tax by money the member never paid.`,
-		hint: `Remove "label" from the employer Contribution (${code}), and label only the member's own Contribution.`,
+		message: `A Contribution with funding "employer" carries the label ${label}, one of the Thai Levy's contribution labels (${[...MEMBER_ONLY].join(", ")}), and each of them is the member's own payment: the allowances are for what the member paid, never for the employer's share, so the label would lower tax by money the member never paid.`,
+		// The code is each `details[].code`; a person reads the way out, not the code.
+		hint: `Remove "label" from the employer Contribution, and label only the member's own Contribution.`,
 	}
 }
 
@@ -63,5 +80,10 @@ export function employerLabelProblem(
 	label: string,
 ): AppError | null {
 	if (target["funding"] !== "employer" || !isMemberOnlyLabel(label)) return null
-	return fail("invalid_input", { ...ownSentence("EMPLOYER_MEMBER_LABEL"), path: "label" })
+	const said = ownSentence(label)
+	return fail("invalid_input", {
+		...said,
+		path: "label",
+		details: [{ path: "label", message: said.message, code: "EMPLOYER_MEMBER_LABEL" }],
+	})
 }

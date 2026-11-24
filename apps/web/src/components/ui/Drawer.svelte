@@ -14,6 +14,8 @@ interface Props {
 
 let { open, title, onClose, children }: Props = $props()
 let dialog: HTMLDialogElement | undefined = $state()
+/** Unique to this drawer, so a page with several names each by its own heading. */
+const titleId = $props.id()
 
 // showModal traps focus in the dialog, and Escape closes it through the dialog's own close event.
 $effect(() => {
@@ -26,7 +28,7 @@ $effect(() => {
 <!-- A drawer on the right: full width on a phone, a column on a wider screen. -->
 <dialog
 	bind:this={dialog}
-	aria-labelledby="drawer-title"
+	aria-labelledby="{titleId}-title"
 	onclose={onClose}
 	onclick={(event) => {
 		if (event.target === dialog) onClose()
@@ -35,7 +37,7 @@ $effect(() => {
 >
 	<div class="flex h-full flex-col gap-5 overflow-y-auto p-5">
 		<div class="flex items-center justify-between gap-2">
-			<h2 id="drawer-title" class="text-base font-semibold">{title}</h2>
+			<h2 id="{titleId}-title" class="text-base font-semibold">{title}</h2>
 			<button
 				type="button"
 				onclick={onClose}

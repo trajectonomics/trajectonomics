@@ -185,7 +185,7 @@ describe("the Drawer", () => {
 			props: { open: true, title: "Edit salary", onClose: () => {}, children },
 		}).body
 		expect(body).toContain("<dialog")
-		expect(body).toContain('aria-labelledby="drawer-title"')
+		expect(body).toMatch(/aria-labelledby="([^"]+)-title"[\s\S]*<h2 id="\1-title"/)
 		expect(body).toContain("Edit salary")
 		expect(body).toContain("Close the drawer")
 		expect(body).toContain("the form")
