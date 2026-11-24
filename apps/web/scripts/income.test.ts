@@ -65,7 +65,7 @@ describe("the employer's 5% of a salary", () => {
 			const employer = sections.find((section) => section.total === "from your employer")
 			expect(
 				employer?.parts[0]?.lines.map((line) => [lineLabel(line, new Map()), line.amount]),
-			).toEqual([[`salary-employer (employer) into ${PROVIDENT}`, "30000.00"]])
+			).toEqual([[`From your employer into ${PROVIDENT} (salary-employer)`, "30000.00"]])
 			expect(sections.find((section) => section.total === "money in")?.amount).toBe("600000.00")
 		},
 	)
