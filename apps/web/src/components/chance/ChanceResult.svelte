@@ -1,6 +1,8 @@
 <script lang="ts">
 import type { ChanceView } from "../../lib/view/chance/page"
+import ChanceSource from "../assumptions/ChanceSource.svelte"
 import Provenance from "../ui/Provenance.svelte"
+import SiteLink from "../ui/SiteLink.svelte"
 import ChanceFan from "./ChanceFan.svelte"
 import RunsOutBars from "./RunsOutBars.svelte"
 
@@ -35,6 +37,13 @@ let { view, argv }: Props = $props()
 				<dd class="font-mono break-all">{view.definition.modelId}</dd>
 			</div>
 		</dl>
+	</section>
+	<section aria-labelledby="chance-source" class="space-y-2">
+		<h2 id="chance-source" class="sr-only">Where the Return model comes from</h2>
+		<ChanceSource source={view.source} />
+		<p class="text-sm text-muted-foreground">
+			Change the returns, the swings, the paths or the seed on <SiteLink href="/settings/assumptions/" class="underline">Assumptions</SiteLink>.
+		</p>
 	</section>
 	<section aria-labelledby="chance-bands" class="space-y-3">
 		<h2 id="chance-bands" class="text-base font-semibold">Net worth Bands by year</h2>

@@ -85,6 +85,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 				icon: "sliders-horizontal",
 				needsDocument: true,
 			},
+			{
+				path: "/settings/assumptions/",
+				label: "Assumptions",
+				page: "AssumptionsPage",
+				icon: "sliders-horizontal",
+				needsDocument: true,
+			},
 		],
 	},
 ]

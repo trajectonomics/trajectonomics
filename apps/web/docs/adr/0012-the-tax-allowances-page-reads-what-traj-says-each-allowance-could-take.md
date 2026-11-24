@@ -31,3 +31,7 @@ Most people who file in Thailand buy RMF or ThaiESG in December without knowing 
 
 - A change in the CLI's output fails `src/lib/contract/projection-allowances.test.ts`, which parses the CLI's own golden, and `scripts/allowances.test.ts`, which works one Thai tax year by hand against the real binary: a salary of 50,000.00 a month and 12,000.00 into RMF owes 20,300.00; 168,000.00 more RMF owes 5,500.00; 110,000.00 of ThaiESG then owes nothing.
 - A `traj` without `--add` ([cli ADR 0062](../../../cli/docs/adr/0062-a-what-if-adds-a-list-item-by-its-own-id-after-the-removals-and-before-the-sets.md)) refuses a what-if with an Addition as an unknown flag; the page shows that refusal at the item.
+
+## Amendment (2026-11-24): the reread also takes the chance inputs
+
+- The strict body of `POST /reread` is `{}`, `{ "allowances": … }`, `{ "chance": { "paths", "seed" } }` or both. A reread that states only one of them runs only the reads that depend on it, under the same staleness check; see [ADR 0018](0018-the-assumptions-page-sets-inflation-each-accounts-return-and-swing-and-the-chance-of-success.md).

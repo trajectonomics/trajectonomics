@@ -45,6 +45,7 @@ describe("the navigation's routes", () => {
 			"/ledger/",
 			"/health/",
 			"/settings/tax/",
+			"/settings/assumptions/",
 		])
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
 	})
@@ -71,7 +72,7 @@ describe("the navigation's routes", () => {
 			[null, ["Chance of success"]],
 			[null, ["Tax"]],
 			["Records", ["Ledger", "Health"]],
-			["Settings", ["Tax profile"]],
+			["Settings", ["Tax profile", "Assumptions"]],
 		])
 	})
 
