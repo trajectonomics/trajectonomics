@@ -33,3 +33,30 @@ export interface Cashflow {
 	/** Ordered withdrawal sources; locked accounts are skipped. An Account may repeat with a lower floor. */
 	readonly withdraw: readonly WithdrawEntry[]
 }
+
+/** What a routing target is in force at: on the first roll-up's first day, and on the horizon date. */
+export interface RoutedResolved {
+	readonly first: MinorUnits
+	readonly horizon: MinorUnits
+}
+
+/** One surplus step, by its position in `cashflow.surplus`; `upTo` is null when the step has none. */
+export interface SurplusRouting {
+	readonly entry: number
+	readonly upTo: RoutedResolved | null
+}
+
+/** One withdraw entry, by its position in `cashflow.withdraw`; `downTo` is null for a plain Account. */
+export interface WithdrawRouting {
+	readonly entry: number
+	readonly downTo: RoutedResolved | null
+}
+
+/**
+ * Every routing target resolved to the amount in force (ADR 0030): a number as it is, `{ amount, growth }`
+ * grown by whole years from the Timeline start. A step or entry without a target states `null`.
+ */
+export interface ProjectionRouting {
+	readonly surplus: readonly SurplusRouting[]
+	readonly withdraw: readonly WithdrawRouting[]
+}

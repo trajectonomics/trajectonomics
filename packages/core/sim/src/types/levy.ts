@@ -50,3 +50,25 @@ export interface Levy {
 	/** Required for periods that began before `Timeline.start`; see `CarryIn`. */
 	readonly carryIn?: readonly CarryIn[]
 }
+
+export interface LevyMeasureValue {
+	readonly id: string
+	readonly value: MinorUnits
+}
+
+export interface SettlementPeriod {
+	readonly from: DateString
+	readonly to: DateString
+	readonly settlementDate: DateString
+	readonly measures: readonly LevyMeasureValue[]
+	readonly prepaid: MinorUnits
+	readonly due: MinorUnits
+	readonly settlement: MinorUnits
+	readonly settled: boolean
+	readonly partial: boolean
+}
+
+export interface LevyReport {
+	readonly id: string
+	readonly periods: readonly SettlementPeriod[]
+}

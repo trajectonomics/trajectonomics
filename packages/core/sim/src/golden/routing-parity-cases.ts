@@ -9,6 +9,7 @@ import {
 	shareThenRest,
 	topUpThenShare,
 } from "./routing-cases"
+import { routingStatement } from "./routing-statement-case"
 
 const withBreakdown = { cashflowBreakdown: true } as const
 
@@ -22,4 +23,5 @@ export const ROUTING_PARITY_CASES: readonly ParityCase[] = [
 	{ name: "routing-locked-floor", fixture: lockedFloor, projectOptions: withBreakdown },
 	{ name: "routing-real-floor", fixture: realFloor, projectOptions: withBreakdown },
 	{ name: "routing-real-target", fixture: realTarget, projectOptions: withBreakdown },
+	{ name: "routing-statement", fixture: routingStatement, projectOptions: withBreakdown },
 ]

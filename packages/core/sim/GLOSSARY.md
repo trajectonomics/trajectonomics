@@ -241,6 +241,10 @@ _Avoid_: Sankey, statement, budget
 The routing rules for net money each time flows land: ordered `surplus` steps (account, optional `upTo`, optional `share` of what is left), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list whose entries are an Account or an Account with a Reserve floor. An `upTo` and a floor are a number, or `{ amount, growth }` grown by whole years from the Timeline start so it keeps its value in today's money (ADR 0030).
 _Avoid_: Income/expense delta
 
+**Routing statement**:
+`Projection.routing`, present only when some `upTo` or `downTo` is `{ amount, growth }`: for every surplus step and `withdraw` entry in list order, its `entry` position and the target in force as `{ first, horizon }` (on the Timeline start and on the horizon date) or `null` when it has none. The same figure `routedTargetAt` returns, never re-derived by a caller (ADR 0030).
+_Avoid_: Resolved target, routing echo
+
 **Reserve floor**:
 The `downTo` of a `withdraw` entry: the entry draws its Account only down to that value, then the draw moves on, so an emergency fund is kept while other Accounts are drawn first. The same Account may appear again later with a lower floor or none. A Shortfall the floors stop is unmet, never taken from below the floor.
 _Avoid_: Emergency fund, buffer, minimum balance

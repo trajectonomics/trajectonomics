@@ -6,8 +6,9 @@ import { declaredBy } from "./declared"
 import { buildLevies } from "./levy"
 import { buildLifetimes } from "./lifetime"
 import { openingNetWorth } from "./opening"
-import { buildPeriods } from "./periods"
+import { buildPeriods, type Period } from "./periods"
 import { buildRollups } from "./rollups"
+import { buildRouting } from "./routing"
 import { rowDates } from "./row-dates"
 import { buildRows } from "./rows"
 import { accountRules } from "./rules"
@@ -16,6 +17,26 @@ import { buildUnfunded } from "./unfunded"
 export type BuildResult =
 	| { readonly projection: Projection }
 	| { readonly problem: ProjectionProblem }
+
+interface ReportOutcome {
+	readonly fields: Partial<Projection>
+	readonly problem: ProjectionProblem | undefined
+}
+
+/** The optional reports that close a Projection: the breakdown and the routing statement, or the first problem. */
+function buildReports(
+	run: EngineRun,
+	periods: readonly Period[],
+	scenario: Scenario,
+	timeline: Timeline,
+	breakdown: boolean,
+): ReportOutcome {
+	const cashflow = buildCashflow(run, periods, scenario, breakdown)
+	const routing = buildRouting(scenario, timeline)
+	const problem = cashflow.problem ?? routing.problem
+	if (problem !== undefined) return { fields: {}, problem }
+	return { fields: { ...cashflow.fields, ...routing.fields }, problem: undefined }
+}
 
 export function buildProjection(
 	run: EngineRun,
@@ -45,8 +66,8 @@ export function buildProjection(
 		scenario.accounts.map((account) => account.id),
 	)
 	if (lifetimes.problem !== undefined) return { problem: lifetimes.problem }
-	const cashflow = buildCashflow(run, periods, scenario, breakdown)
-	if (cashflow.problem !== undefined) return { problem: cashflow.problem }
+	const reports = buildReports(run, periods, scenario, timeline, breakdown)
+	if (reports.problem !== undefined) return { problem: reports.problem }
 	const levies = buildLevies(run.levies)
 	if (levies.problem !== undefined) return { problem: levies.problem }
 	const projection: Projection = {
@@ -59,7 +80,7 @@ export function buildProjection(
 			: { runsOut: { date: run.runsOut.date, unmet: Number(run.runsOut.unmet) } }),
 		...(levies.levies === undefined ? {} : { levies: levies.levies }),
 		...(run.milestones === undefined ? {} : { milestones: run.milestones }),
-		...cashflow.fields,
+		...reports.fields,
 	}
 	return { projection }
 }

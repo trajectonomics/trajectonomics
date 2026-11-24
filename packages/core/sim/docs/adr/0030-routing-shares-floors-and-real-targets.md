@@ -52,6 +52,19 @@ does not use one runs byte for byte as before (the parity hashes of every existi
   inflation is 337,653 for the fifth year (4 anniversaries passed) and 347,782 from the fifth
   anniversary; an `upTo` of 1,000,000 is 1,159,274 then. The Timeline start is held on each Account's
   state (`AccountState.opened`) so the routing reads it without a new argument on every walk.
+- **The target in force, stated.** `routedTargetAt(target, timelineStart, date, inflation)` is exported from
+  the package root and is the engine's own figure: a number is itself, `{ amount, growth }` is the grown
+  amount above, as a `number` of minor units (the engine's `routedAt` reads the same exact value as a
+  BigInt). A caller never re-derives it, so the CLI and the Dashboard cannot drift from the engine.
+  `Projection.routing` states it, present only when some `upTo` or `downTo` is `{ amount, growth }`:
+  `{ surplus: { entry, upTo }[], withdraw: { entry, downTo }[] }`, one item per step or entry in list order,
+  `entry` its position, the target `{ first, horizon }` or `null` for a step or entry without one. `first` is
+  the target on the Timeline start, the first roll-up's first day; `horizon` is the target on the horizon
+  date, whatever the run-out. A nominal target beside a grown one states itself on both. A figure past the
+  safe integers is `VALUE_OVERFLOW` on the horizon date, as any other. A Scenario with no grown target has no
+  `routing` key, so every parity hash but the two grown cases is unchanged; `routing-real-floor` and
+  `routing-real-target` moved only by the key (`routing-hashes.test.ts` holds each hash on `main` and shows
+  it back once the key is left out).
 - **Breakdown.** The breakdown's `surplus` lists are as before. `drawn` has one line per entry that drew
   money, in list order. When the list declares any floor, a line carries `entry`, the entry's position in
   `withdraw`, so an Account that appears twice reports once per entry and the page can show "drawn to the
@@ -85,7 +98,9 @@ does not use one runs byte for byte as before (the parity hashes of every existi
   `refusal-routing.ts`.
 - Eight cases join `parity/cases.json`: `routing-share-then-rest`, `routing-share-capped`,
   `routing-top-up-then-share`, `routing-floor-then-funds`, `routing-floor-stops-draw`,
-  `routing-locked-floor`, `routing-real-floor` and `routing-real-target`. No existing case changes.
+  `routing-locked-floor`, `routing-real-floor` and `routing-real-target`. No existing case changes. A ninth, `routing-statement`, joins with the statement: a Timeline from 29 February
+  2028, a grown `upTo` of 1,000,000 (1,092,727 after three anniversaries), a nominal `upTo`, a floor at -100 bps
+  (291,090), a nominal floor and a plain entry.
 - Hand-worked tests (`golden/routing-hand.test.ts`): 1,000,001 splits 300,000 and 700,001; a share of 3000
   capped at 250,000 leaves 750,000; a top-up of 50,000 then half of 950,000 gives 475,000 and 475,000;
   savings 500,000 and funds 200,000 against a 600,000 bill draw 200,000, 200,000 and 200,000; a lone floor

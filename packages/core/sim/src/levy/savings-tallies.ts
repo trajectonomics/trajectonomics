@@ -1,5 +1,4 @@
-import type { Levy, MinorUnits, Tallies, TallyBasis } from "../types"
-import type { LevyMeasureValue } from "../types/projection"
+import type { Levy, LevyMeasureValue, MinorUnits, Tallies, TallyBasis } from "../types"
 
 /** The `funded` labels some `tally` Measure of the Levy reads. */
 export function fundedLabels(levy: Levy): ReadonlySet<string> {
