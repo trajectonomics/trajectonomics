@@ -1,13 +1,15 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { whatIfSession } from "../../client/what-if.svelte.js"
+import { deleteFlow, saveFlow } from "../../client/flow-save.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
-import { flowIds, withFlow, withoutFlow } from "../../lib/view/plan-items/document"
-import { flowFromDraft } from "../../lib/view/plan-items/flow-draft"
+import { employerOf, employerTargets } from "../../lib/view/plan-items/employer"
+import { employerDraftOf } from "../../lib/view/plan-items/employer-draft"
 import { categoriesOf, type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
+import { slugId } from "../../lib/view/plan-items/form"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
-import { recordOf } from "../../lib/what-if/session"
+import { namedRefusal } from "../../lib/view/plan-items/refusal"
+import { idsAfterSave } from "../../lib/view/plan-items/salary-draft"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -42,6 +44,10 @@ let {
 const anchors = $derived(flowAnchorLabels(household, existing?.id ?? ""))
 const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
+/** What the employer adds on top of a salary: nothing until the person fills it in. */
+const initialEmployer = () =>
+	employerDraftOf(existing === undefined ? null : employerOf(doc.flows, existing.id))
+let employer = $state(initialEmployer())
 let problems: Problems = $state({})
 /** The fields a tried value cleared, which a what-if cannot hold. */
 let cleared: string[] = $state([])
@@ -55,44 +61,40 @@ const FIELDS = [
 	"rate",
 	"earned",
 	"category",
+	"employerAccount",
+	"employerShare",
+	"employerRounding",
 ]
-const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
-
-/** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
-async function commit(next: ScenarioDocument): Promise<void> {
-	if (await editSession.run({ kind: "apply-plan", name, contentHash, document: next })) onDone()
-}
+/** The refusal with the Flow's position in its path named by id, so one on the employer's Flow lands in its section. */
+const refusal = $derived(
+	namedRefusal(editSession.failure, idsAfterSave(doc, existing?.id ?? slugId(draft.name))),
+)
+const shown = $derived(shownProblems(problems, refusal, editSession.error, FIELDS))
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = flowFromDraft(draft, { kind, existing, taken: flowIds(doc) })
-	if (!result.ok) {
-		editSession.clear()
-		problems = result.problems
-		return
-	}
-	problems = {}
-	if (tryValue) {
-		// A what-if: each changed field is a Set of the session, and the plan itself is not written.
-		if (existing !== undefined) {
-			cleared = whatIfSession.tryItem(
-				name,
-				contentHash,
-				"flows",
-				existing.id,
-				recordOf(existing),
-				recordOf(result.flow),
-			)
-		}
-		if (cleared.length === 0) onDone()
-		return
-	}
-	await commit(withFlow(doc, result.flow))
+	const saved = await saveFlow({
+		name,
+		contentHash,
+		doc,
+		kind,
+		existing,
+		draft,
+		employer,
+		tryValue,
+	})
+	problems = saved.problems
+	cleared = saved.cleared
+	if (saved.done) onDone()
+}
+
+async function remove(): Promise<void> {
+	if (await deleteFlow({ name, contentHash, doc }, existing?.id ?? "")) onDone()
 }
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
-	<FlowFields bind:draft {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} />
+	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
 	<TryNotice fields={cleared} />
-	<ItemActions id={existing?.id} onDelete={() => commit(withoutFlow(doc, existing?.id ?? ""))} trying={tryValue} />
+	<ItemActions id={existing?.id} onDelete={remove} trying={tryValue} />
 </form>

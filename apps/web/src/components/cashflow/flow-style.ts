@@ -7,6 +7,8 @@ import type { FlowKind } from "../../lib/chart/flow"
  */
 export const FLOW_FILL: Readonly<Record<FlowKind, string>> = {
 	income: "fill-primary/70",
+	payout: "fill-primary/40",
+	employer: "fill-accent/50",
 	withdrawal: "fill-accent/80",
 	drawn: "fill-accent",
 	refund: "fill-primary/50",

@@ -14,7 +14,7 @@ import {
 	withSet,
 } from "../lib/what-if/session"
 import { withoutChange } from "../lib/what-if/session-without"
-import { type TriedFlow, withTriedFlow } from "../lib/what-if/try-flow"
+import { type TriedFlow, withTriedFlow, withTriedItem } from "../lib/what-if/try-flow"
 import { WhatIfState } from "./what-if-state.svelte.js"
 
 /** How long the session waits after a change before it reads the what-if again. */
@@ -71,6 +71,11 @@ export class WhatIfChanges extends WhatIfState {
 	/** Tries a Flow in the session, replacing any earlier try of it (`withTriedFlow`). True when it was tried. */
 	tryFlow(plan: string, contentHash: string, tried: TriedFlow): boolean {
 		return this.tryChange(plan, contentHash, (base) => withTriedFlow(base, tried))
+	}
+
+	/** Tries an Account in the session, replacing any earlier try of it: a first payout or fee is one Set of the whole Account (`withTriedItem`). True when it was tried. */
+	tryAccount(plan: string, contentHash: string, tried: TriedFlow): boolean {
+		return this.tryChange(plan, contentHash, (base) => withTriedItem(base, "accounts", tried))
 	}
 
 	/**

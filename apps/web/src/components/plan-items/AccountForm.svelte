@@ -1,15 +1,16 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import type { ScenarioAccount, ScenarioDocument } from "../../lib/contract"
+import type { HouseholdDocument, ScenarioAccount, ScenarioDocument } from "../../lib/contract"
+import { anchorChoices } from "../../lib/view/estate/anchors"
 import { accountFromDraft } from "../../lib/view/plan-items/account-draft"
 import { accountDraftOf } from "../../lib/view/plan-items/accounts"
 import { accountIds, withAccount, withoutAccount } from "../../lib/view/plan-items/document"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
+import { milestoneIds } from "../../lib/view/withdrawals/context"
 import { recordOf } from "../../lib/what-if/session"
 import AccountFields from "./AccountFields.svelte"
 import ItemActions from "./ItemActions.svelte"
-import TryNotice from "./TryNotice.svelte"
 
 interface Props {
 	/** The plan's name, which the Edit saves the document under. */
@@ -17,6 +18,8 @@ interface Props {
 	/** The content hash of the plan the page read, which every Edit to it names (cli ADR 0055). */
 	contentHash: string
 	doc: ScenarioDocument
+	/** The household of the plan, whose named dates a payout may start from. Null without one. */
+	household?: HouseholdDocument | null
 	/** The Account to edit; absent for a new one. */
 	existing?: ScenarioAccount | undefined
 	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
@@ -25,13 +28,38 @@ interface Props {
 	tryValue?: boolean
 }
 
-let { name, doc, existing, onDone, contentHash, tryValue = false }: Props = $props()
-const initial = () => accountDraftOf(existing)
+let {
+	name,
+	doc,
+	household = null,
+	existing,
+	onDone,
+	contentHash,
+	tryValue = false,
+}: Props = $props()
+/** What a payout reads of the plan: whether a Levy taxes it, its Milestones and the dates the household names. */
+const income = $derived({
+	taxed: (doc.levies?.length ?? 0) > 0,
+	milestones: milestoneIds(doc),
+	anchors: anchorChoices(doc, household, "9999-12-31"),
+})
+const initial = () => accountDraftOf(existing, income)
 let draft = $state(initial())
 let problems: Problems = $state({})
-/** The fields a tried value cleared, which a what-if cannot hold. */
-let cleared: string[] = $state([])
-const FIELDS = ["name", "kind", "rate", "compounding", "lockedUntil"]
+const FIELDS = [
+	"name",
+	"kind",
+	"rate",
+	"compounding",
+	"lockedUntil",
+	"payoutRate",
+	"payoutFrequency",
+	"payoutRounding",
+	"payoutStart",
+	"payoutKind",
+	"feeRate",
+	"feeRounding",
+]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 
 /** Saves the plan's document with one change, as one Edit; the drawer closes only when it ran. */
@@ -41,7 +69,7 @@ async function commit(next: ScenarioDocument): Promise<void> {
 
 async function save(event: SubmitEvent): Promise<void> {
 	event.preventDefault()
-	const result = accountFromDraft(draft, { existing, taken: accountIds(doc) })
+	const result = accountFromDraft(draft, { existing, taken: accountIds(doc), income })
 	if (!result.ok) {
 		editSession.clear()
 		problems = result.problems
@@ -49,17 +77,14 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	if (tryValue) {
+		// A first payout or fee, or one taken away, is one Set of the whole Account, which a field Set cannot make.
 		if (existing !== undefined) {
-			cleared = whatIfSession.tryItem(
-				name,
-				contentHash,
-				"accounts",
-				existing.id,
-				recordOf(existing),
-				recordOf(result.account),
-			)
+			whatIfSession.tryAccount(name, contentHash, {
+				stored: recordOf(existing),
+				edited: { ...recordOf(result.account), id: existing.id },
+			})
 		}
-		if (cleared.length === 0) onDone()
+		onDone()
 		return
 	}
 	await commit(withAccount(doc, result.account))
@@ -67,7 +92,6 @@ async function save(event: SubmitEvent): Promise<void> {
 </script>
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Add account"}>
-	<AccountFields bind:draft existingId={existing?.id} {shown} />
-	<TryNotice fields={cleared} />
+	<AccountFields bind:draft existingId={existing?.id} {shown} illiquid={existing?.liquid === false} {...income} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

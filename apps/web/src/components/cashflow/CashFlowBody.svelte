@@ -10,6 +10,7 @@ import {
 	yearLabel,
 } from "../../lib/view/cashflow/cashflow"
 import { flowOf } from "../../lib/view/cashflow/cashflow-flow"
+import { rowKeyOf } from "../../lib/view/cashflow/cashflow-labels"
 import EmptyState from "../ui/EmptyState.svelte"
 import CashFlowTable from "./CashFlowTable.svelte"
 import FlowDiagram from "./FlowDiagram.svelte"
@@ -37,7 +38,8 @@ const sections = $derived(rollup === null ? [] : sectionsOf(rollup))
 const picked = $derived(pickedKey(pickedIn, rollup?.index))
 
 /** A pick selects its band and its row; a second pick on the same one clears it. */
-function pick(key: string): void {
+function pick(band: string): void {
+	const key = rowKeyOf(band)
 	const index = rollup?.index
 	if (index === undefined) return
 	pickedIn = picked === key ? null : { index, key }

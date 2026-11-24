@@ -1,9 +1,11 @@
 <script lang="ts">
 import type { ScenarioFlow } from "../../lib/contract"
 import { householdHref } from "../../lib/view/household/model"
+import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
 
 interface Props {
@@ -18,9 +20,22 @@ interface Props {
 	anchors: { start: string | null; end: string | null }
 	/** The categories the plan's expenses already use: suggestions only, never a preset list. */
 	categories?: readonly string[]
+	/** What the employer adds to a salary, and the Accounts it may pay into. */
+	employer?: EmployerDraft
+	targets?: readonly string[]
 }
 
-let { draft = $bindable(), kind, existing, shown, name, anchors, categories = [] }: Props = $props()
+let {
+	draft = $bindable(),
+	kind,
+	existing,
+	shown,
+	name,
+	anchors,
+	categories = [],
+	employer = $bindable({ account: "", share: "", rounding: "" }),
+	targets = [],
+}: Props = $props()
 </script>
 
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
@@ -46,6 +61,7 @@ let { draft = $bindable(), kind, existing, shown, name, anchors, categories = []
 			Earned income: it stops when earning stops
 		</label>
 		{#if shown.at("earned")}<p role="alert" class="text-sm text-destructive">{shown.at("earned")}</p>{/if}
+		{#if draft.earned}<EmployerFields bind:draft={employer} {shown} {targets} />{/if}
 	{/if}
 	{#if kind === "expense"}
 		<div class="space-y-1.5">

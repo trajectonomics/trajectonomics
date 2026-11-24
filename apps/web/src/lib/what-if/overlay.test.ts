@@ -39,3 +39,14 @@ describe("a plan's document with the session's changes put in", () => {
 		expect(out.flows).toEqual([DOC.flows[1] as never])
 	})
 })
+
+describe("a whole item Set", () => {
+	test("takes the item's place, so an Account's first fee shows in the what-if", () => {
+		const fee = { id: "cash", kind: "asset", rate: 100, fee: { bps: "1.50", rounding: "floor" } }
+		const out = overlayDocument(DOC, {
+			sets: [{ path: "accounts.cash", value: fee }],
+			removals: [],
+		})
+		expect(out.accounts).toEqual([fee as never])
+	})
+})

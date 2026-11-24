@@ -10,6 +10,9 @@ export type WasField =
 	| "compounding"
 	| "lockedUntil"
 	| "kind"
+	| "payout"
+	| "fee"
+	| "employer"
 
 /** The baseline's text of each field the session changed. */
 export type Was = { readonly [K in WasField]?: string }

@@ -30,9 +30,9 @@ function listWith(
 		.map((item) =>
 			changes.sets.reduce((edited, set) => {
 				const [name, id, ...field] = set.path.split(".")
-				return name === list && id === item.id && field.length > 0
-					? (put(edited, field, set.value) as Item)
-					: edited
+				if (name !== list || id !== item.id) return edited
+				// A whole item Set (`accounts.fund`) takes the item's place; a field Set puts the value at its path.
+				return field.length === 0 ? (set.value as Item) : (put(edited, field, set.value) as Item)
 			}, item),
 		)
 }

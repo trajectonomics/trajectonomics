@@ -1,10 +1,19 @@
-import { FREQUENCIES } from "./flows"
-
 /** One choice of a select: the value the draft holds and the label the person reads. */
 export interface Choice {
 	readonly value: string
 	readonly label: string
 }
+
+/** The frequencies a Flow may take, in the order the form offers them. */
+export const FREQUENCIES = [
+	"once",
+	"daily",
+	"weekly",
+	"biweekly",
+	"monthly",
+	"quarterly",
+	"annual",
+] as const
 
 /** How often a Flow lands, in the order the CLI lists them. */
 export const FREQUENCY_CHOICES: readonly Choice[] = FREQUENCIES.map((frequency) => ({
@@ -85,4 +94,29 @@ export const ARRIVAL_CHOICES: readonly Choice[] = [
 export const EXTRA_MODE_CHOICES: readonly Choice[] = [
 	{ value: "once", label: "Once, on a date" },
 	{ value: "monthly", label: "Every month until an end" },
+]
+
+/** How often an Account pays out, as the calendar period whose last day it is paid on (sim ADR 0027). The first choice is none: the person states it. */
+export const PAYOUT_FREQUENCY_CHOICES: readonly Choice[] = [
+	{ value: "", label: "Choose how often" },
+	{ value: "monthly", label: "Monthly" },
+	{ value: "quarterly", label: "Quarterly" },
+	{ value: "semiannual", label: "Twice a year" },
+	{ value: "annual", label: "Yearly" },
+]
+
+/** From when an Account pays out. A Milestone and a household date are offered only when the plan has one. */
+export const PAYOUT_FROM_CHOICES: readonly Choice[] = [
+	{ value: "now", label: "From now" },
+	{ value: "milestone", label: "From a Milestone" },
+	{ value: "anchor", label: "From a date the household names" },
+	{ value: "date", label: "From a date" },
+]
+
+/** The kind of income a payout is for tax, which picks its Thai Tally label (cli ADR 0067). The first choice is none: no label is written. */
+export const PAYOUT_KIND_CHOICES: readonly Choice[] = [
+	{ value: "", label: "Choose the kind of income" },
+	{ value: "dividends", label: "Dividends" },
+	{ value: "interest", label: "Interest" },
+	{ value: "other", label: "Other investment income" },
 ]

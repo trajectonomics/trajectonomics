@@ -28,10 +28,26 @@ function valueText(value: Json): string {
 	return JSON.stringify(value)
 }
 
-/** Whether a Set's path names a whole Flow (`flows.rent`) or a Flow's rule (`flows.rent.rule`). */
+/**
+ * Whether a Set's path names a whole Flow (`flows.rent`), a Flow's rule (`flows.rent.rule`), a whole Account
+ * (`accounts.fund`) or an Account's payout or fee (`accounts.fund.fee`): worded without the person's own shares.
+ */
 function isFlowTry(path: string): boolean {
 	const parts = path.split(".")
-	return parts[0] === "flows" && (parts.length === 2 || (parts.length === 3 && parts[2] === "rule"))
+	if (parts.length === 2) return parts[0] === "flows" || parts[0] === "accounts"
+	if (parts.length !== 3) return false
+	return (
+		(parts[0] === "flows" && parts[2] === "rule") ||
+		(parts[0] === "accounts" && (parts[2] === "payout" || parts[2] === "fee"))
+	)
+}
+
+/** What a tried part is called in the bar: "tried as edited" for a whole item. */
+function tryWhat(path: string): string {
+	const last = path.split(".")[2]
+	if (last === "rule") return "spending rule changed"
+	if (last === "payout" || last === "fee") return `${last} changed`
+	return "tried as edited"
 }
 
 /** Whether a refusal that names this path (`details.path`) is about the change: its own path, or a part of its group. */
@@ -80,7 +96,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 			if (set.path === "estate")
 				return { kind: "estate", path: set.path, label: "Estate lines tried as edited" }
 			if (isFlowTry(set.path)) {
-				const what = set.path.endsWith(".rule") ? "spending rule changed" : "tried as edited"
+				const what = tryWhat(set.path)
 				return {
 					kind: "flow",
 					path: set.path,

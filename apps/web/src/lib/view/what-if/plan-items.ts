@@ -1,4 +1,10 @@
-import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../contract"
+import type {
+	Baseline,
+	HouseholdDocument,
+	ProjectionRun,
+	Read,
+	ScenarioDocument,
+} from "../../contract"
 import { overlayDocument } from "../../what-if/overlay"
 import type { SetChange } from "../../what-if/overrides"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
@@ -14,8 +20,8 @@ export type PlanChanges = {
 	readonly removals: readonly string[]
 }
 
-const FLOW_FIELDS = ["amount", "frequency", "start", "end", "growth", "earned"] as const
-const ACCOUNT_FIELDS = ["rate", "compounding", "lockedUntil", "kind"] as const
+const FLOW_FIELDS = ["amount", "frequency", "start", "end", "growth", "earned", "employer"] as const
+const ACCOUNT_FIELDS = ["rate", "compounding", "lockedUntil", "kind", "payout", "fee"] as const
 
 /** The cards of one planner page and what the session changes in each, by item id. */
 export interface ItemsView<T> {
@@ -61,6 +67,7 @@ export function flowItems(
 			flows.filter((flow) => !grouped.has(flow.id)),
 			kind,
 			household,
+			flows,
 		)
 	const baseline = listed(doc.flows)
 	if (changes === null) return { cards: baseline, marks: {} }
@@ -79,10 +86,12 @@ export function accountItems(
 	doc: ScenarioDocument,
 	baselineRead: Read<Baseline> | undefined,
 	changes: PlanChanges | null,
+	runs: { run?: ProjectionRun | undefined; tried?: ProjectionRun | undefined } = {},
 ): ItemsView<AccountCard> {
-	const baseline = accountCards(plainAccounts(doc), baselineRead)
+	const { run, tried = run } = runs
+	const baseline = accountCards(plainAccounts(doc), baselineRead, run)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = accountCards(overlayDocument(doc, changes).accounts, baselineRead)
+	const whatIf = accountCards(overlayDocument(doc, changes).accounts, baselineRead, tried)
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "accounts", changes, ACCOUNT_FIELDS),

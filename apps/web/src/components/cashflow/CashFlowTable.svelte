@@ -42,12 +42,17 @@ const isEmpty = (section: Section): boolean =>
 					<th scope="rowgroup" class="px-3 py-2 text-left font-semibold">{section.total}</th>
 					<td class="px-3 py-2 text-right tabular-nums font-semibold">
 						{#if section.amount === null}
-							<span class="font-normal text-muted-foreground">No total</span>
+							<span class="font-normal text-muted-foreground">{section.note === null ? "No total" : "Not in cash"}</span>
 						{:else}
 							<Money amount={section.amount} />
 						{/if}
 					</td>
 				</tr>
+				{#if section.note !== null}
+					<tr>
+						<td colspan="2" class="px-3 pt-2 text-xs text-muted-foreground">{section.note}</td>
+					</tr>
+				{/if}
 				{#each section.parts as part (part.heading)}
 					{#if part.heading !== null}
 						<tr>
