@@ -1,6 +1,7 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionChance, Read } from "../../lib/contract"
+import { futuresViewOf } from "../../lib/view/chance/futures"
 import { chanceViewOf } from "../../lib/view/chance/page"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -47,7 +48,7 @@ const options = $derived(names.map((value) => ({ value, label: value })))
 		{#if lens}<ChanceWhatIf {lens} baseline={read.ok ? read.data : null} />{/if}
 		<ReadView {read} label={`Chance of success for ${name}`}>
 			{#snippet children(data)}
-				<ChanceResult view={chanceViewOf(data)} argv={read.argv} />
+				<ChanceResult view={chanceViewOf(data)} argv={read.argv} plan={name} futures={futuresViewOf(data)} />
 			{/snippet}
 		</ReadView>
 	</div>

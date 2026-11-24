@@ -71,3 +71,11 @@ export function routesShown(
 			(levy || route.needsLevy !== true),
 	)
 }
+
+/** Pages that are opened from a page in the navigation and are not listed in it: each stands under its parent. */
+const CHILD_PAGES: Readonly<Record<string, string>> = { "/chance/path/": "/chance/" }
+
+/** The navigation's page a path belongs to: the page itself, or the parent of a page opened from it. */
+export function navPath(path: string): string {
+	return CHILD_PAGES[path] ?? path
+}

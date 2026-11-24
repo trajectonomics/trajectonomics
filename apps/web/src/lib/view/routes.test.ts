@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { NAV_GROUPS, ROUTES, routeAt, routesShown } from "./routes"
+import { NAV_GROUPS, navPath, ROUTES, routeAt, routesShown } from "./routes"
 
 const ROUTES_DIR = join(import.meta.dir, "../../routes")
 
@@ -163,5 +163,15 @@ describe("the Estate page", () => {
 		)
 		expect(routesShown(group, true).map((route) => route.label)).toEqual(["Estate"])
 		expect(routesShown(group, false)).toEqual([])
+	})
+})
+
+describe("a page opened from a page in the navigation", () => {
+	test("stands under its parent, and has a route file of its own that sets its title", () => {
+		expect(navPath("/chance/path/")).toBe("/chance/")
+		expect(navPath("/chance/")).toBe("/chance/")
+		expect(routeAt("/chance/path/")).toBeUndefined()
+		const source = readFileSync(join(ROUTES_DIR, "chance/path/+page.svelte"), "utf8")
+		expect(source).toContain("Future · Dashboard")
 	})
 })

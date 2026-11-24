@@ -35,3 +35,7 @@ Most people who file in Thailand buy RMF or ThaiESG in December without knowing 
 ## Amendment (2026-11-24): the reread also takes the chance inputs
 
 - The strict body of `POST /reread` is `{}`, `{ "allowances": … }`, `{ "chance": { "paths", "seed" } }` or both. A reread that states only one of them runs only the reads that depend on it, under the same staleness check; see [ADR 0018](0018-the-assumptions-page-sets-inflation-each-accounts-return-and-swing-and-the-chance-of-success.md).
+
+## Amendment (2026-11-24): the reread can also read one path
+
+- The body may instead be `{ "path": { "plan", "index" } }`, alone, which reads one Market path and answers that one read without touching the Snapshot; see [ADR 0020](0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md).
