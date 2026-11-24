@@ -1,15 +1,15 @@
 import type { AccountId, Scenario } from "../types"
 import { addTo } from "./add"
 import type { DayFlows } from "./aggregate"
-import { groupEntries, plannedTotal } from "./contribution-entries"
+import { splitContributions } from "./day-contributions"
 import { employerLines } from "./day-employer"
 import { saleLines } from "./day-sales"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
-import { minBigInt } from "./min"
 import type { DayTotals } from "./occurrence"
 import { occurrenceAmount } from "./occurrence-amount"
 import type { StateMap } from "./state"
+import type { Moved } from "./transfers"
 
 /**
  * What one date landed, by Flow, Levy and Account, for the cash-flow breakdown. Built only when a run
@@ -32,6 +32,10 @@ export interface DayLines {
 	readonly drawn: ReadonlyMap<string, bigint>
 	/** Filled through `cashflow.surplus`, by Account id. */
 	readonly surplus: ReadonlyMap<AccountId, bigint>
+	/** Moved by each transfer Flow, outside cashflow (ADR 0031). */
+	readonly transfers: ReadonlyMap<string, bigint>
+	/** Planned by each transfer Flow and not moved: the source held less, was locked, or the loan owed less. */
+	readonly unmoved: ReadonlyMap<string, bigint>
 }
 
 /** The date's results the breakdown reads, all computed by the engine before routing. */
@@ -46,6 +50,8 @@ export interface DayResults {
 	readonly unfunded: ReadonlyMap<AccountId, bigint>
 	/** What each asset gave up to a sale on the date, by Account id. */
 	readonly sold: ReadonlyMap<AccountId, bigint>
+	/** What the date's transfers moved. */
+	readonly moved: Moved
 }
 
 /** Attaches the lines to the day's totals; without them the totals are returned unchanged. */
@@ -67,7 +73,7 @@ function plannedLines(results: DayResults): Map<string, bigint> {
 	const lines = new Map<string, bigint>()
 	for (const event of results.events) {
 		const { flow } = event
-		if (flow.kind === "contribution") continue
+		if (flow.kind === "contribution" || flow.kind === "transfer") continue
 		if (flow.kind === "withdrawal" && results.states.get(flow.source)?.rule.kind === "asset")
 			continue
 		addTo(lines, flow.id, occurrenceAmount(event, results.planned))
@@ -80,40 +86,6 @@ function sales(results: DayResults): Map<string, bigint> {
 	return saleLines(scenario, states, events, planned, sold)
 }
 
-/** One Account's entries: an obligation is applied in full, a capped entry takes what is left of `remaining`. */
-function splitGroup(
-	group: DayFlows["contributionEntries"],
-	remaining: bigint,
-	asset: boolean,
-	into: { readonly applied: Map<string, bigint>; readonly unfunded: Map<string, bigint> },
-): void {
-	let left = remaining
-	for (const entry of group) {
-		const taken = entry.obligation ? entry.amount : minBigInt(entry.amount, left)
-		if (!entry.obligation) left -= taken
-		addTo(into.applied, entry.flow, taken)
-		if (asset) addTo(into.unfunded, entry.flow, entry.amount - taken)
-	}
-}
-
-/** Each contribution Flow's share of its target's applied amount, in Scenario order, first come first served. */
-function splitContributions(results: DayResults): Pick<DayLines, "applied" | "unfunded"> {
-	const { scenario, states, paidBy } = results
-	const position = new Map(scenario.flows.map((flow, index) => [flow.id, index] as const))
-	const entries = results.day.contributionEntries.filter((entry) => !entry.employer)
-	entries.sort((a, b) => position.get(a.flow)! - position.get(b.flow)!)
-	const lines = { applied: new Map<string, bigint>(), unfunded: new Map<string, bigint>() }
-	for (const [target, group] of groupEntries(entries)) {
-		const asset = states.get(target)?.rule.kind !== "liability"
-		const capped = plannedTotal(group.filter((entry) => !entry.obligation))
-		const remaining = asset
-			? capped - (results.unfunded.get(target) ?? 0n)
-			: (paidBy.get(target) ?? 0n)
-		splitGroup(group, remaining, asset, lines)
-	}
-	return lines
-}
-
 /** The lines of one date, read from the engine's own totals, its Flows and its Accounts. */
 export function dayLines(results: DayResults): DayLines {
 	return {
@@ -124,5 +96,7 @@ export function dayLines(results: DayResults): DayLines {
 		settled: results.settled,
 		drawn: new Map(),
 		surplus: new Map(),
+		transfers: results.moved.by,
+		unmoved: results.moved.unmoved,
 	}
 }

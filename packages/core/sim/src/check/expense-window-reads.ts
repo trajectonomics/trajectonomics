@@ -1,6 +1,6 @@
 import type { Emit, Path } from "./codes"
 import { chargingAccountId } from "./fee"
-import { accountReadsOf, changedAccountOf } from "./flow-accounts"
+import { accountReadsOf, changedAccountsOf } from "./flow-accounts"
 import { payingAccountId } from "./payout"
 import { isRecord } from "./shape"
 import { withdrawAccountIds } from "./withdraw-entries"
@@ -27,7 +27,7 @@ function cashflowAccounts(cashflow: unknown): readonly string[] {
 
 /**
  * The Accounts that can change on a future date: the target of a Contribution (a debt payment, an
- * obligation purchase), the source of a withdrawal (a sale, a loan draw), and every Account the
+ * obligation purchase), the source of a withdrawal (a sale, a loan draw), both Accounts of a transfer (ADR 0031), and every Account the
  * cashflow's `surplus`, `contribute` or `withdraw` can move, and every Account that pays out (ADR 0027) or charges a fee (ADR 0028). Anything else holds its opening state
  * and grows by its rate alone.
  */
@@ -39,8 +39,7 @@ function changeable(scenario: Readonly<Record<string, unknown>>): ReadonlySet<st
 		if (id !== undefined) ids.add(id)
 	}
 	for (const flow of flows) {
-		const id = changedAccountOf(flow)
-		if (id !== undefined) ids.add(id)
+		for (const id of changedAccountsOf(flow)) ids.add(id)
 	}
 	return ids
 }

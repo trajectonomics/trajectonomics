@@ -1,37 +1,17 @@
-import type { DayTotals } from "../engine/occurrence"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { EngineRun } from "../engine/result"
 import type { EngineSnapshot } from "../engine/snapshot"
+import { isTransferTarget } from "../loan/resolve"
 import type { AccountId, Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { LiabilityMonth, LiabilityStatement } from "../types/statement"
+import type { Moves } from "./liability-moves"
+import { monthRow, movesOf } from "./liability-moves"
 import { type StatementPeriod, statementPeriods } from "./statement-periods"
 
 export interface LiabilityOutcome {
 	readonly statements?: readonly LiabilityStatement[]
 	readonly problem?: ProjectionProblem
-}
-
-interface Moves {
-	readonly drawn: readonly bigint[]
-	readonly paid: readonly bigint[]
-}
-
-/** Sums one liability's borrowing and payments into each period. Totals are in date order. */
-function movesOf(
-	totals: readonly DayTotals[],
-	periods: readonly StatementPeriod[],
-	id: AccountId,
-): Moves {
-	const drawn = periods.map(() => 0n)
-	const paid = periods.map(() => 0n)
-	let index = 0
-	for (const day of totals) {
-		while (index < periods.length - 1 && periods[index]!.to < day.date) index++
-		drawn[index] = drawn[index]! + (day.drawnBy.get(id) ?? 0n)
-		paid[index] = paid[index]! + (day.paidBy.get(id) ?? 0n)
-	}
-	return { drawn, paid }
 }
 
 /** The month rows of one liability; `interest` is the residual, so the identity holds exactly. */
@@ -41,6 +21,7 @@ function monthsOf(
 	periods: readonly StatementPeriod[],
 	snapshots: ReadonlyMap<DateString, EngineSnapshot>,
 	moves: Moves,
+	listed: boolean,
 ): { readonly months: LiabilityMonth[]; readonly problem?: ProjectionProblem } {
 	const months: LiabilityMonth[] = []
 	let before = opening
@@ -48,20 +29,13 @@ function monthsOf(
 		const closing = snapshots.get(period.to)!.balances.find((item) => item.account === id)!.amount
 		const drawn = moves.drawn[index]!
 		const paid = moves.paid[index]!
-		const interest = closing - before - drawn + paid
-		for (const value of [before, drawn, paid, interest, closing]) {
+		const transferred = moves.transferred[index]!
+		const interest = closing - before - drawn + paid + transferred
+		const figures = { before, drawn, paid, transferred, interest, closing }
+		for (const value of Object.values(figures)) {
 			if (!isSafeInteger(value)) return { months, problem: overflow(period.to, id) }
 		}
-		months.push({
-			from: period.from,
-			to: period.to,
-			opening: Number(before),
-			drawn: Number(drawn),
-			paid: Number(paid),
-			interest: Number(interest),
-			closing: Number(closing),
-			partial: period.partial,
-		})
+		months.push(monthRow(period, figures, listed))
 		before = closing
 	}
 	return { months }
@@ -82,7 +56,15 @@ export function buildLiabilities(
 		if (account.kind !== "liability") continue
 		const opened = baseline.balances.find((item) => item.account === account.id)
 		const moves = movesOf(run.totals, periods, account.id)
-		const built = monthsOf(account.id, BigInt(opened?.amount ?? 0), periods, snapshots, moves)
+		const listed = isTransferTarget(scenario, account.id)
+		const built = monthsOf(
+			account.id,
+			BigInt(opened?.amount ?? 0),
+			periods,
+			snapshots,
+			moves,
+			listed,
+		)
 		if (built.problem !== undefined) return { problem: built.problem }
 		const paidOff = run.paidOff?.get(account.id)
 		statements.push({

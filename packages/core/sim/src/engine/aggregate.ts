@@ -1,12 +1,12 @@
 import type { AccountId, DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
-import { addTo } from "./add"
+import { type Totals, takeFlow } from "./aggregate-take"
 import type { ContributionEntry } from "./contribution-entries"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
-import { addIncome } from "./levy-prepaid"
 import type { SettlementPeriodView } from "./levy-shares"
 import { occurrenceAmount } from "./occurrence-amount"
+import type { TransferEntry } from "./transfer-entry"
 
 export { occurrenceAmount } from "./occurrence-amount"
 export type { ContributionEntry }
@@ -20,6 +20,8 @@ export interface DayFlows {
 	readonly plannedBySource: ReadonlyMap<AccountId, bigint>
 	/** Planned withdrawals on this date, summed. Not income and not Available cashflow. */
 	readonly withdrawals: bigint
+	/** Transfers on this date, in the order their Flows landed: outside cashflow, so in no sum (ADR 0031). */
+	readonly transfers: readonly TransferEntry[]
 	/** Planned gross income by Tally label. */
 	readonly gross: ReadonlyMap<string, bigint>
 	readonly prepaid: bigint
@@ -31,62 +33,6 @@ export interface DayFlows {
 	readonly prepaidByLevy: ReadonlyMap<string, bigint>
 	/** A capped Prepayment read a cap that is not a safe integer. */
 	readonly problem?: ProjectionProblem
-}
-
-interface Totals {
-	income: bigint
-	expense: bigint
-	prepaid: bigint
-	employer: bigint
-	readonly gross: Map<string, bigint>
-	readonly prepaidByLevy: Map<string, bigint>
-	readonly contributionEntries: ContributionEntry[]
-	readonly plannedBySource: Map<AccountId, bigint>
-	withdrawals: bigint
-}
-
-function takeIncome(
-	totals: Totals,
-	flow: Extract<DatedEvent["flow"], { kind: "income" }>,
-	amount: bigint,
-	views: readonly SettlementPeriodView[],
-	date: DateString,
-): ProjectionProblem | undefined {
-	totals.income += amount
-	const taken = addIncome(flow, amount, totals.gross, views, date)
-	for (const [levy, share] of taken.byLevy) {
-		totals.prepaidByLevy.set(levy, (totals.prepaidByLevy.get(levy) ?? 0n) + share)
-	}
-	totals.prepaid += taken.prepaid
-	return taken.problem
-}
-
-/** Adds one Occurrence's amount to the day's totals under the kind of its Flow. */
-function takeFlow(
-	totals: Totals,
-	flow: DatedEvent["flow"],
-	amount: bigint,
-	views: readonly SettlementPeriodView[],
-	date: DateString,
-): ProjectionProblem | undefined {
-	if (flow.kind === "income") return takeIncome(totals, flow, amount, views, date)
-	if (flow.kind === "expense") totals.expense += amount
-	else if (flow.kind === "withdrawal") {
-		addTo(totals.plannedBySource, flow.source, amount)
-		totals.withdrawals += amount
-	} else {
-		const employer = flow.funding === "employer"
-		if (employer) totals.employer += amount
-		totals.contributionEntries.push({
-			flow: flow.id,
-			target: flow.target,
-			amount,
-			label: flow.label,
-			obligation: flow.funding === "obligation",
-			employer,
-		})
-	}
-	return undefined
 }
 
 /** Sums one Occurrence's flows, separating Prepayment and Tally labels from the cash amounts. */
@@ -105,6 +51,7 @@ export function aggregate(
 		prepaidByLevy: new Map(),
 		contributionEntries: [],
 		plannedBySource: new Map(),
+		transfers: [],
 		withdrawals: 0n,
 	}
 	for (const event of events) {

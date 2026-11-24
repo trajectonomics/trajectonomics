@@ -1,5 +1,6 @@
 import { type AppError, fail } from "../errors"
 import { isPlainObject } from "../json"
+import { flows, unshippedFlowAt } from "./transfer-unshipped"
 
 /*
  * The routing keys the engine accepts and the CLI does not take yet (sim ADR 0030): a surplus step's
@@ -10,6 +11,10 @@ import { isPlainObject } from "../json"
  * `traj schema`. The CLI refuses them until the shape publishes them, with the decimal conversion
  * for them. This is not a second validator: the engine's `check()` already accepts these keys, and
  * every other refusal of a document is still the engine's.
+ *
+ * A `transfer` Flow (sim ADR 0031) is refused the same way: the engine accepts the kind and its
+ * `source`, `target` and `realise`, and the published shape does not describe them yet, so a stored
+ * one would be shown wrongly by `traj schema` and its amounts read in the wrong unit.
  */
 
 /** The code of a refusal the CLI states itself, beside the engine's. */
@@ -82,7 +87,9 @@ function cashflow(value: unknown, path: readonly (string | number)[], out: Unshi
  */
 export function unshippedRouting(document: unknown): Unshipped[] {
 	const out: Unshipped[] = []
-	if (isPlainObject(document)) cashflow(document["cashflow"], ["cashflow"], out)
+	if (!isPlainObject(document)) return out
+	flows(document["flows"], ["flows"], out)
+	cashflow(document["cashflow"], ["cashflow"], out)
 	return out
 }
 
@@ -94,6 +101,7 @@ export function unshippedRouting(document: unknown): Unshipped[] {
 export function unshippedRoutingAt(segments: readonly string[], value: unknown): Unshipped[] {
 	if (segments.length === 0) return unshippedRouting(value)
 	const [first, second] = segments
+	if (first === "flows") return unshippedFlowAt(segments, value)
 	if (first !== "cashflow" || segments.length > 2) return []
 	const out: Unshipped[] = []
 	if (second === undefined) cashflow(value, ["cashflow"], out)

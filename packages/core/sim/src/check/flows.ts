@@ -8,6 +8,7 @@ import { type FlowContext, flowShape } from "./flow-shape"
 import { checkLoanFlow } from "./loans"
 import { checkRuleFlow } from "./rule-flow"
 import { checkShape, checkUnique, isRecord, list, type Shape } from "./shape"
+import { checkTransferFlow } from "./transfer"
 
 export type { FlowContext }
 
@@ -71,6 +72,7 @@ function flowCheck(context: FlowContext): Check {
 		checkRuleFlow(flow, path, emit)
 		checkLoanFlow(flow, path, context.loans, emit)
 		checkAssetFlow(flow, path, context.loans, emit)
+		checkTransferFlow(flow, path, context.loans, emit)
 	}
 }
 

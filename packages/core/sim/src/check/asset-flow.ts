@@ -32,7 +32,7 @@ function checkFunding(
 }
 
 /**
- * A sale from an Account that is locked on the Flow's first date, with no Milestone to wait for,
+ * A sale, or a transfer, from an Account that is locked on the Flow's first date, with no Milestone to wait for,
  * could never move anything on that date: `WITHDRAWAL_LOCKED` at `start`.
  */
 function checkSaleLocked(
@@ -59,5 +59,7 @@ export function checkAssetFlow(
 	emit: Emit,
 ): void {
 	if (flow["kind"] === "contribution") checkFunding(flow, path, index, emit)
-	if (flow["kind"] === "withdrawal") checkSaleLocked(flow, path, index, emit)
+	if (flow["kind"] === "withdrawal" || flow["kind"] === "transfer") {
+		checkSaleLocked(flow, path, index, emit)
+	}
 }

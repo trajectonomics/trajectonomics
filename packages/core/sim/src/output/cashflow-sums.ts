@@ -13,6 +13,8 @@ export interface PeriodSums {
 	readonly settled: ReadonlyMap<string, bigint>
 	readonly drawn: ReadonlyMap<string, bigint>
 	readonly surplus: ReadonlyMap<string, bigint>
+	readonly transfers: ReadonlyMap<string, bigint>
+	readonly unmoved: ReadonlyMap<string, bigint>
 }
 
 function addAll(into: Map<string, bigint>, from: ReadonlyMap<string, bigint>): void {
@@ -30,6 +32,8 @@ export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodS
 		settled: new Map<string, bigint>(),
 		drawn: new Map<string, bigint>(),
 		surplus: new Map<string, bigint>(),
+		transfers: new Map<string, bigint>(),
+		unmoved: new Map<string, bigint>(),
 	}
 	for (const total of totals) {
 		if (total.lines === undefined || total.date < period.from || total.date > period.to) continue
@@ -42,6 +46,8 @@ export function sumPeriod(totals: readonly DayTotals[], period: Period): PeriodS
 		addAll(sums.settled, lines.settled)
 		addAll(sums.drawn, lines.drawn)
 		addAll(sums.surplus, lines.surplus)
+		addAll(sums.transfers, lines.transfers)
+		addAll(sums.unmoved, lines.unmoved)
 	}
 	return sums
 }
