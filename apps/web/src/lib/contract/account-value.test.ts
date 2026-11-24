@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { accountValue, accountValues } from "./account-value"
 
 /*
- * The CLI's own `account value` goldens, parsed by the Dashboard's contract (cli ADR-0071). The
+ * The CLI's own `account value` goldens, parsed by the Dashboard's contract (cli ADR-0072). The
  * goldens are the CLI's bytes, so a field the CLI adds or renames fails here before it reaches a page.
  */
 const CLI_FIXTURES = new URL("../../../../cli/src/account/value/fixtures/", import.meta.url)

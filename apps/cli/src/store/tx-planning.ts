@@ -20,7 +20,7 @@ export interface Planning {
 	/**
 	 * Reads the Ledger and appends what `plan` derives from it, all in one IMMEDIATE transaction,
 	 * so what the plan read is what the rows were computed against. A refusal from `plan` rolls the
-	 * write back; the batch reads the clock once (cli ADR-0071).
+	 * write back; the batch reads the clock once (cli ADR-0072).
 	 */
 	writePlanned<T>(plan: TxPlanner<T>, options?: WriteOptions): PlannedWrite<T> | AppError
 }

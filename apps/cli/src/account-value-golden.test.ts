@@ -4,7 +4,7 @@ import { goldenTextIn, recordGoldenTextIn } from "./golden-test-support"
 import { cli } from "./tx-test-support"
 
 /*
- * `account value`'s bytes in both result shapes, pinned (cli ADR-0071) and decoded by the Dashboard's
+ * `account value`'s bytes in both result shapes, pinned (cli ADR-0072) and decoded by the Dashboard's
  * contract. Re-baseline deliberately with TRAJ_UPDATE_GOLDEN=1 bun test src/account-value-golden.test.ts
  */
 const GOLDENS = new URL("./account/value/fixtures/", import.meta.url)

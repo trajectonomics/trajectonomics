@@ -308,6 +308,22 @@ so no field is dropped by accident and the plan saved is the plan projected. The
 item's money is a decimal string of the Currency's major unit. Nothing is written until
 `scenario apply` or `scenario fork` is run with the same flags.
 
+## Naming plans, keeping notes on them, and marking the main one
+
+> **Ships in 0.8.0.**
+
+A person who compares "retire at 55" with "retire at 60 and buy a condo" ends up with several plans.
+`traj scenario rename early retire-at-55` gives a plan a better name and keeps its id, document and
+`contentHash`. `traj scenario notes retire-at-55 --text "Sell the condo in 2031."` keeps plain text
+on it (`--file <path>` or `--file -` reads it, `--clear` removes it), and `scenario show` prints it
+back as `notes`. Notes are not part of the plan, so they never change its `contentHash`, and a
+`scenario fork` copies them unless it is given `--no-notes`.
+
+`traj scenario main retire-at-55` marks one plan as your main plan, and `scenario list` and
+`scenario show` print `main`. It is a label and not a default: `projection run` and every other read
+still need `--scenario`. `scenario rm` of the main plan is refused until another is chosen
+(`scenario main --clear` takes the mark off), or removed anyway with `--force`.
+
 ## Milestones: points in the plan that a Flow waits for
 
 > **Ships in 0.8.0.**
