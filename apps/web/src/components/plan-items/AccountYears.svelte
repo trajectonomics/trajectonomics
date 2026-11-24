@@ -9,7 +9,7 @@ interface Props {
 	currency: string
 }
 
-/** What `traj projection run` states for the Account year by year. The page adds nothing: the engine states no lifetime total. */
+/** What `traj projection run` states for the Account year by year. The page adds nothing; the totals over the plan are the engine's, drawn above it. */
 let { years, currency }: Props = $props()
 const hasPayout = $derived(years.some((year) => year.payout !== null))
 const hasFee = $derived(years.some((year) => year.fee !== null))

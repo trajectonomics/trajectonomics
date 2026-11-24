@@ -66,12 +66,25 @@ adds no rate and computes no figure of them.
 - **`compare` and `fi`** are unchanged: `compare`'s annual figures are a fixed list of fields and `fi` prints no roll-up.
 - **Without the fields every output is byte for byte what it was.**
 - **The Dashboard's contract decodes the new fields** (the three annual keys, the two groups, the `fees` table and an
-  Account's `payout` and `fee`), with no page change.
+  Account's `payout` and `fee`).
+- **The lifetime totals (amended).** The engine states what each fee and payout Account came to over the whole horizon
+  (sim ADR-0027, ADR-0028: `accountLifetimes` and the plan-wide `lifetimeFees`), and `projection run` carries them as the
+  top-level fields `accountLifetimes` (`{ account, lifetimeFees?, lifetimePayouts? }`, in Scenario order) and
+  `lifetimeFees`, each money figure formatted as every other (`--decimal` concerns input only, so the figures are the
+  same strings with and without it). `runViewOf` adds them, so `projection path` states them as `run` does. The CLI
+  adds nothing (ADR-0058): each is the engine's sum, which equals the sum of that Account's `fees` rows and payout
+  figures (the tests check the identity on the result). Each field is absent unless the Scenario declares a fee or a
+  payout above 0 bps, so a run without them keeps its bytes. `traj schema` describes both from the same definitions.
+  The human form prints the plan-wide fees on its own line, "Fees over the plan, all accounts: X", apart from
+  `accountLifetimes`, a table of each Account's totals; the `fees` table gained the column hint it lacked, so a plan with
+  a fee prints its tables as every other plan does and not as the generic listing. A golden pins both forms
+  (`run-lifetime.output`, `run-lifetime-human.output`).
 
 ## Considered options
 
-- **A lifetime total per Account, in the result.** Deferred: the engine states none, and a sum in the CLI is a figure
-  the CLI computes. A page that needs "fees over the plan" adds the `fees` rows, which #410 decides with the Dashboard.
+- **A lifetime total per Account, in the result.** First deferred: the engine stated none, and a sum in the CLI is a
+  figure the CLI computes. It now does (sim ADR-0027, ADR-0028, #443), so the CLI states the engine's figure and no
+  page adds the `fees` rows.
 - **Refusing a payout label in the engine.** Rejected for the label of an employer's share, for the reasons above.
 - **Percent strings only in the form.** Rejected: the stored unit is the engine's basis points and a percent is a
   presentation of it, as major units are of minor ones (ADR-0063).
