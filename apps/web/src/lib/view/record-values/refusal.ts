@@ -2,7 +2,7 @@ import { z } from "zod"
 import type { ErrorBody } from "../../contract"
 import type { SentRows, SheetProblems } from "./draft"
 
-const refusedRows = z.object({
+export const refusedRows = z.object({
 	values: z.array(
 		z.object({
 			index: z.number().int(),
@@ -12,9 +12,10 @@ const refusedRows = z.object({
 })
 
 /** The refusal's sentence without the path prefix `traj` writes first, such as `document.values.1.value: `. */
-function sentence(message: string, hint?: string): string {
+export function sentence(message: string, hint?: string): string {
 	const plain = message.replace(/^document\.[\w.]+: /, "")
-	return hint === undefined ? plain : `${plain} ${hint}`
+	const stop = /[.!?]$/.test(plain) ? plain : `${plain}.`
+	return hint === undefined ? plain : `${stop} ${hint}`
 }
 
 /**
