@@ -54,18 +54,25 @@ runs byte for byte as before, and every existing parity hash is unchanged.
   caller's Levy.
 - **Order on a date.** Planned amounts (all read before anything lands), the employer shares ([ADR 0026](./0026-employer-contribution.md)),
   payouts ([ADR 0027](./0027-account-payout.md)), planned withdrawals (loan draws and sales), debt payments, obligations, asset
-  Contributions, then the transfers, then the net routes to surplus or the `withdraw` list, and last the fees
-  ([ADR 0028](./0028-account-fee.md)), which read their Account first. So a transfer sees a payout that has left, a sale that has
-  sold, and a Contribution that has landed, and it is gone before surplus or a Shortfall are decided: a
-  transfer that empties an Account does not race a Contribution into it, and the surplus fills the emptied
-  Account. Several transfers on one date apply in Scenario order (the order the Flows are listed, not their
-  ids), each reading the Accounts as the one before left them. A fixed amount is not clipped by the date's
-  reads; a Derived amount read the source before anything landed, so it can plan more than is left and moves
-  what is left.
-- **The withdraw list sees what is left.** A transfer lands before the date's Shortfall is drawn, so it can
-  empty an Account the `withdraw` list would have drawn: with `withdraw: ["a"]`, a transfer of all of `a` and
-  an 80,000 bill the same date is a Shortfall of 80,000, and with `["a", "b"]` the bill is drawn from `b`.
-  That is the plan's own choice, stated in its Flows.
+  Contributions, and then the sign of the date's net decides. A net at or above zero lands the transfers
+  first and then routes the surplus, so the surplus fills an Account a transfer emptied and a transfer does
+  not race a Contribution into it. A net below zero draws the `withdraw` list first, and the transfers then
+  move what is left, so a transfer never takes the money a bill needed. The fees ([ADR 0028](./0028-account-fee.md)),
+  which read their Account first, are last either way. So a transfer sees a payout that has left, a sale that
+  has sold and a Contribution that has landed. Several transfers on one date apply in Scenario order (the
+  order the Flows are listed, not their ids), each reading the Accounts as the one before left them. A fixed
+  amount is not clipped by the date's reads; a Derived amount read the source before anything landed, so it
+  can plan more than is left and moves what is left.
+- **A transfer never makes a Shortfall.** On a date with a bill the `withdraw` list can pay, the bill is
+  paid first and the transfer moves what remains: cash 100,000 with `withdraw: ["cash"]`, an 80,000 bill and a
+  fixed 50,000 transfer the same date pays the bill, moves 20,000 and reports 30,000 `unmoved`, and the run
+  goes on. A Shortfall is only ever the bill the plan could not pay without any transfer.
+- **A Derived read and `unmoved`.** "All of it" reads the source before anything lands, so `unmoved` counts
+  what left the Account before the transfer (a same-day payout, sale or bill drawn through `withdraw`) as well
+  as what it could not give: a page should not read `unmoved` as "could not move" for a Derived amount.
+- **A Return series.** A transfer between two Accounts that follow a Return series, in the middle of a row,
+  can settle one unit away from exact neutrality: the half-up commit at the transfer date happens in each
+  Account, as for any change in the middle of a row ([ADR 0005](./0005-seeded-monte-carlo-seams.md)). Net worth on the date is unchanged.
 - **Gifts.** A gift to someone outside the plan is an expense. A transfer is only between the plan's own
   Accounts.
 
@@ -107,8 +114,11 @@ runs byte for byte as before, and every existing parity hash is unchanged.
   toward Available cashflow and cannot fund a target Contribution, and an obligation Contribution is limited
   by cash, so there is no way to state it once, and the Cost basis would be realised on the way.
 - **Realise by default.** Rejected: see `realise`. The cost is a flag a plan that needs the gain sets.
-- **Transfers after routing.** Rejected: a Shortfall could then be drawn from money the plan has moved away.
-  The cost is that a transfer can leave the `withdraw` list short, which the plan can read from its Flows.
+- **Transfers before routing, always.** Rejected: a transfer could then empty an Account the `withdraw` list
+  needed for the date's bill and turn a bill the plan can pay into a Shortfall, against the rule that a
+  transfer is never a Shortfall. It is kept only for a net at or above zero, where there is no Shortfall to
+  turn and the surplus can refill the emptied source. Transfers after routing for every net was also
+  rejected: a surplus would then land in an Account the transfer was about to empty.
 - **A Shortfall when the source holds less.** Rejected: a transfer asked for more than there is is a plan the
   Accounts did not follow, not an unmet need. `unmoved` says so without ending the run.
 - **Id order for same-date transfers.** Rejected: ids are names, and a plan reads its Flows in the order it lists them.

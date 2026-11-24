@@ -43,10 +43,3 @@ export function unshippedFlowAt(segments: readonly string[], value: unknown): Un
 	}
 	return out
 }
-
-/** The Flow kinds the engine lists that this release does not take, left out of an "one of" list. */
-export function withoutUnshippedKinds(
-	allowed: readonly string[] | undefined,
-): readonly string[] | undefined {
-	return allowed?.filter((kind) => kind !== "transfer")
-}

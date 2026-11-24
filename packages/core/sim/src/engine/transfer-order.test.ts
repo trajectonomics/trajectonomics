@@ -65,8 +65,8 @@ describe("the order of a date: a transfer lands after contributions and before r
 		expect(amounts(rowAt(projection, DAY))).toEqual({ a: 100_000, b: 500_000 })
 	})
 
-	// An 80,000 expense draws on `a` and then `b`; the transfer has already emptied `a`, so `b` pays it.
-	it("lands before the withdraw list, which then draws on what is left", () => {
+	// A net below zero draws the `withdraw` list first: the 80,000 bill takes `a`, then the transfer of all of it moves the 20,000 left.
+	it("draws the withdraw list before moving, when the date's net is below zero", () => {
 		const projection = projected({
 			...YEAR,
 			accounts: [a, b],
@@ -82,21 +82,28 @@ describe("the order of a date: a transfer lands after contributions and before r
 		expect(projection.runsOut).toBeUndefined()
 	})
 
-	// The same plan with only `a` to draw on: the transfer took its money, so the 80,000 bill is a Shortfall.
-	it("can leave the withdraw list short, which is the plan's own choice and then a Shortfall", () => {
-		const projection = projected({
-			...YEAR,
-			accounts: [a, b],
-			balances: { a: 100_000 },
-			flows: [
-				expense("bill", 80_000, { start: DAY }),
-				transferAll("move", "a", "b", { start: DAY }),
-			],
-			surplus: [{ account: "a" }],
-			withdraw: ["a"],
-		})
-		expect(projection.runsOut).toEqual({ date: DAY, unmet: 80_000 })
-		expect(amounts(rowAt(projection, DAY))).toEqual({ a: 0, b: 100_000 })
+	// Cash 100,000, an 80,000 bill and a fixed 50,000 transfer: the bill is paid, the transfer moves the 20,000 left and no Shortfall follows.
+	it("never turns a bill the plan can pay into a Shortfall, and reports what it could not move", () => {
+		const projection = projected(
+			{
+				...YEAR,
+				accounts: [a, b],
+				balances: { a: 100_000 },
+				flows: [
+					expense("bill", 80_000, { start: DAY }),
+					transfer("move", "a", "b", 50_000, { start: DAY }),
+				],
+				surplus: [{ account: "a" }],
+				withdraw: ["a"],
+			},
+			{ cashflowBreakdown: true },
+		)
+		expect(projection.runsOut).toBeUndefined()
+		expect(amounts(rowAt(projection, DAY))).toEqual({ a: 0, b: 20_000 })
+		expect(projection.cashflow![0]!.transfers).toEqual([
+			{ flow: "move", source: "a", target: "b", amount: 20_000, unmoved: 30_000 },
+		])
+		expect(projection.cashflow![0]!.unmet).toBe(0)
 	})
 
 	// `a` holds 100,000 and Scenario order is z-first then a-second: 70,000 to b, then the 30,000 left to c.

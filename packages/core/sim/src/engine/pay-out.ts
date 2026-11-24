@@ -1,16 +1,16 @@
 import type { AccountId, DateString, Scenario } from "../types"
 import type { DayFlows } from "./aggregate"
 import { applyAssets, applyDebt, type DebtResult } from "./contributions"
-import { dayLines, withLines } from "./day-lines"
+import { dayLines } from "./day-lines"
 import type { Planned } from "./derive"
 import type { DatedEvent } from "./events"
 import type { LevySet, Settlement } from "./levy-set"
 import { mergeFunded, tally, totalsOf } from "./levy-step"
 import { applyObligations, type ObligationResult } from "./obligations"
 import type { DateOutcome } from "./occurrence"
-import { route } from "./route"
+import { routeNet } from "./pay-net"
 import type { StateMap } from "./state"
-import { applyTransfers, withTransfers } from "./transfers"
+import type { Moved } from "./transfers"
 
 /** What one date's payments read: the run's states, the date and the Flows that landed on it. */
 export interface DatedRun {
@@ -72,27 +72,23 @@ export function payOut(
 	const totals = totalsOf(date, day, contributions, debt.paidBy, assets.unfunded, settlement)
 	const problem = settlement.problem ?? assets.problem
 	if (problem !== undefined) return { totals, problem, runsOut: undefined }
-	// Transfers land after the contributions and before the routing, outside the net (ADR 0031).
-	const moved = applyTransfers(states, scenario, day.transfers, date, levies)
-	const booked = withTransfers(totals, moved)
-	if (moved.problem !== undefined) {
-		return { totals: booked, problem: moved.problem, runsOut: undefined }
-	}
-	const lines = run.breakdown
-		? dayLines({
-				scenario,
-				states,
-				events,
-				planned,
-				day,
-				settled: settlement.byLevy,
-				paidBy: debt.paidBy,
-				unfunded: assets.unfunded,
-				sold,
-				moved,
-			})
-		: undefined
 	// Planned-withdrawal cash joins the net that pays a Shortfall or lands as surplus, never Available cashflow.
 	const net = cashflow + day.withdrawals - assets.applied
-	return route(states, scenario, date, withLines(booked, lines), net, levies)
+	// Transfers move outside the net: before surplus, after a drawn Shortfall (ADR 0031).
+	const lines = (moved: Moved) =>
+		run.breakdown
+			? dayLines({
+					scenario,
+					states,
+					events,
+					planned,
+					day,
+					settled: settlement.byLevy,
+					paidBy: debt.paidBy,
+					unfunded: assets.unfunded,
+					sold,
+					moved,
+				})
+			: undefined
+	return routeNet({ states, scenario, date, levies, totals, transfers: day.transfers, lines }, net)
 }
