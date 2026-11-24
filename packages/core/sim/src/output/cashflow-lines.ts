@@ -8,6 +8,7 @@ import type {
 	FlowLine,
 	LevyLine,
 } from "../types/breakdown"
+import { drawnLines } from "./cashflow-drawn"
 import {
 	type CategoryTotal,
 	contributionLines,
@@ -64,7 +65,7 @@ export function breakdownOf(
 		...(declaresEmployer(scenario) ? { employer: employerLines(scenario.flows, sums) } : {}),
 		...(declaresPayouts(scenario) ? { payouts: payoutLines(scenario.flows, sums) } : {}),
 		withdrawals: withdrawalLines(scenario.flows, sums.planned),
-		drawn: lines(scenario.cashflow.withdraw, sums.drawn, accountLine),
+		drawn: drawnLines(scenario.cashflow.withdraw, sums.drawn),
 		surplus: lines(
 			scenario.cashflow.surplus.map((step) => step.account),
 			sums.surplus,

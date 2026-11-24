@@ -7,7 +7,12 @@ function resolveSeries(series: ReturnSeries, horizon: DateString): readonly Reso
 	return series.rows.map((row, index) => {
 		const next = series.rows[index + 1]
 		const to = next === undefined ? horizon : next.from
-		return { from: row.from, to, returnBps: row.returnBps, days: countedDays(row.from, to) }
+		return {
+			from: row.from,
+			to,
+			returnBps: row.returnBps,
+			days: row.span ?? countedDays(row.from, to),
+		}
 	})
 }
 

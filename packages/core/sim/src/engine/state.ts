@@ -25,6 +25,8 @@ export interface GrownValue {
 	readonly asOf: DateString
 	readonly date: DateString
 	readonly amount: bigint
+	/** The part of `amount` still to earn in the row `date` falls in; only an Account on a Return series reads it. */
+	readonly earning: bigint
 }
 
 export interface AccountState {
@@ -33,10 +35,17 @@ export interface AccountState {
 	/** An effective Account's value, or a nominal Account's capitalised balance. */
 	balance: bigint
 	asOf: DateString
+	/** The Timeline start the run opened on: a routed target keeps its value in today's money from here (ADR 0030). */
+	readonly opened: DateString
+	/**
+	 * An Account on a Return series: the part of `balance` still to earn in the row `asOf` falls in.
+	 * Absent, all of it. A change mid-row moves it by the change, so it adds no `r²` term (ADR 0005).
+	 */
+	earning?: bigint
 	/** A nominal Account's exact capitalised-days numerator; always 0 for an effective Account. */
 	capitalisedDays: bigint
 	/** The last grown value read, so the Milestones and the engine share one reading of a date. */
-	grown?: GrownValue
+	grown?: GrownValue | undefined
 	/** An Account on a Return series: its value after the last whole row a read passed. */
 	walked?: Walked
 	/** Present only for an asset Account with `returnLabel`. */
@@ -79,6 +88,7 @@ function stateOf(opened: Opened): AccountState {
 		rule,
 		balance: BigInt(amount),
 		asOf: start,
+		opened: start,
 		capitalisedDays: 0n,
 		...(series === undefined ? {} : { series }),
 		...(returns === undefined ? {} : { returns }),

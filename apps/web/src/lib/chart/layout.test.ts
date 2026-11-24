@@ -59,6 +59,33 @@ describe("lineLayout", () => {
 	})
 })
 
+describe("x labels", () => {
+	test("a label too close to the one before it is left out, so a part year beside its neighbour stays readable", () => {
+		const point = (x: number, label: string) => ({ x, xLabel: label, y: 1, display: "1.00" })
+		const layout = lineLayout(
+			[{ name: "A", points: [point(0, "30 Oct"), point(10, "31 Dec"), point(400, "30 Oct next")] }],
+			PLOT,
+		)
+		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["30 Oct", "30 Oct next"])
+	})
+
+	test("the last label, which ends at the edge, needs more room than the others", () => {
+		const point = (x: number, label: string) => ({ x, xLabel: label, y: 1, display: "1.00" })
+		const layout = lineLayout(
+			[{ name: "A", points: [point(0, "a"), point(700, "b"), point(780, "last")] }],
+			{ ...PLOT, width: 900 },
+		)
+		// "last" is 86px from "b": room enough for a label in the middle, not for one against the edge.
+		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["a", "b"])
+	})
+
+	test("a chart of many series asks for the wide palette", () => {
+		const series = [{ name: "A", points: [{ x: 0, xLabel: "0", y: 1, display: "1.00" }] }]
+		expect(lineLayout(series, PLOT, [], "wide")?.palette).toBe("wide")
+		expect(lineLayout(series, PLOT)?.palette).toBeUndefined()
+	})
+})
+
 describe("sparklinePath", () => {
 	test("is empty for no values", () => {
 		expect(sparklinePath([], 100, 20)).toBe("")

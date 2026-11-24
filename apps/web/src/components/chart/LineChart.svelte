@@ -1,6 +1,12 @@
 <script lang="ts">
 import { preferences } from "../../client/preferences.svelte.js"
-import { type LineMarker, type LineSeries, lineLayout } from "../../lib/chart"
+import {
+	type ColumnKind,
+	columnLayout,
+	type LineMarker,
+	type LineSeries,
+	lineLayout,
+} from "../../lib/chart"
 import EmptyState from "../ui/EmptyState.svelte"
 import { HEIGHT, MARGIN } from "./geometry"
 import LineHover from "./LineHover.svelte"
@@ -22,16 +28,33 @@ interface Props {
 	money?: boolean
 	/** Overrides the hide-amounts switch. Left out, the switch decides. */
 	hidden?: boolean
+	/** How the series are drawn. Left out, each is a line; the others are the column charts of the custom charts. */
+	kind?: "line" | ColumnKind
+	/** Draws the series from the longer palette, for a chart of many series. A column chart always does. */
+	wide?: boolean
 }
 
-let { label, series, markers = [], money = true, hidden }: Props = $props()
+let {
+	label,
+	series,
+	markers = [],
+	money = true,
+	hidden,
+	kind = "line",
+	wide = false,
+}: Props = $props()
 let clientWidth = $state(0)
 let active = $state<number | null>(null)
 const width = $derived(
 	clientWidth > 0 ? Math.max(MIN_WIDTH, Math.floor(clientWidth)) : FALLBACK_WIDTH,
 )
 const masked = $derived((hidden ?? preferences.hidden) && money)
-const layout = $derived(lineLayout(series, { width, height: HEIGHT, margin: MARGIN }, markers))
+const plot = $derived({ width, height: HEIGHT, margin: MARGIN })
+const layout = $derived(
+	kind === "line"
+		? lineLayout(series, plot, markers, wide ? "wide" : undefined)
+		: columnLayout(series, plot, kind),
+)
 </script>
 
 <!--
@@ -53,6 +76,6 @@ const layout = $derived(lineLayout(series, { width, height: HEIGHT, margin: MARG
 		<EmptyState title="Nothing to chart yet" />
 	{/if}
 	{#if layout && series.length > 1}
-		<LineLegend items={legendItems(series)} />
+		<LineLegend items={legendItems(series, layout.palette === "wide")} />
 	{/if}
 </div>

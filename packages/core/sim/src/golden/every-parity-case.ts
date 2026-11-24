@@ -8,6 +8,7 @@ import { PARITY_CASES, type ParityCase } from "./parity-cases"
 import { PAYOUT_PARITY_CASES } from "./payout-cases"
 import { PLAN_MODEL_PARITY_CASES } from "./plan-model-cases"
 import { REAL_ASSET_PARITY_CASES } from "./real-asset-cases"
+import { ROUTING_PARITY_CASES } from "./routing-parity-cases"
 import { RULE_PARITY_CASES } from "./rule-parity-cases"
 import { SAVINGS_PARITY_CASES } from "./savings-parity-cases"
 import { STATEMENT_PARITY_CASES } from "./statement-parity-cases"
@@ -30,4 +31,5 @@ export const EVERY_PARITY_CASE: readonly ParityCase[] = [
 	...PAYOUT_PARITY_CASES,
 	...FEE_PARITY_CASES,
 	...PLAN_MODEL_PARITY_CASES,
+	...ROUTING_PARITY_CASES,
 ]

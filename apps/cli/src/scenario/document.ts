@@ -1,6 +1,7 @@
 import { allowedValues, check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
-import { sentenceFor } from "../projection/refusal-table"
+import { wordsOf } from "./problem-words"
+import { ROUTING_NOT_SHIPPED, type UnshippedProblem, unshippedRouting } from "./routing-unshipped"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
 // a Scenario and a Timeline in one pass and returns `{ code, path }` problems, so the CLI validates
@@ -11,10 +12,13 @@ import { sentenceFor } from "../projection/refusal-table"
 export type ScenarioDocument = Record<string, unknown>
 
 /** One reason `sim-core` refuses a document, with the path inside the document. */
-export type ScenarioProblem = {
-	readonly code: Problem["code"]
-	readonly segments: readonly (string | number)[]
-}
+export type ScenarioProblem =
+	| {
+			readonly code: Problem["code"]
+			readonly segments: readonly (string | number)[]
+			readonly said?: undefined
+	  }
+	| UnshippedProblem
 
 /** An empty Baseline v1: valid on its own, and it names no Account the Scenario could rely on. */
 const NEUTRAL_BASELINE = { schemaVersion: 1, balances: [] } as const
@@ -66,11 +70,24 @@ function rejectsVersion(version: number): boolean {
  */
 const TIMELINE_CODES: ReadonlySet<string> = new Set(["MISSING_CARRY_IN"])
 
-/** The problems `sim-core` finds in a document alone, in its order, with `scenario.` stripped. */
+/**
+ * The routing keys `sim-core` accepts that this release does not take yet (routing-unshipped.ts),
+ * then the problems it finds in a document alone, in its order, with `scenario.` stripped. The
+ * unshipped keys come first, so a document the engine refuses for one of them is told that, not
+ * told to fix it.
+ */
 export function scenarioProblems(value: unknown): ScenarioProblem[] {
-	return check(NEUTRAL_BASELINE, value, null)
-		.filter((problem) => problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code))
-		.map((problem) => ({ code: problem.code, segments: problem.path.slice(1) }))
+	const found: ScenarioProblem[] = unshippedRouting(value).map(({ segments, said }) => ({
+		code: ROUTING_NOT_SHIPPED,
+		segments,
+		said,
+	}))
+	for (const problem of check(NEUTRAL_BASELINE, value, null)) {
+		if (problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code)) {
+			found.push({ code: problem.code, segments: problem.path.slice(1) })
+		}
+	}
+	return found
 }
 
 /** The document path as the CLI prints it: `base` plus segments, a list index as a number. */
@@ -92,6 +109,7 @@ const GROWTH_FORMS = '"inflation", {"bps": <integer>}; {"bps": 0} is a fixed amo
  * which owns them), the forms a growth takes, or the unit of a rate.
  */
 function detailOf(problem: ScenarioProblem): string | undefined {
+	if (problem.code === ROUTING_NOT_SHIPPED) return undefined
 	if (problem.code === "UNSUPPORTED_SCHEMA_VERSION") {
 		const accepted = acceptedScenarioSchemaVersion()
 		return accepted === undefined ? undefined : `the accepted version is ${accepted}`
@@ -109,7 +127,10 @@ export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 	const detail = detailOf(problem)
 	return {
 		path,
-		message: `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`,
+		message:
+			problem.said === undefined
+				? `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`
+				: `${path}: ${problem.said.message}`,
 		code: problem.code,
 		hint: SCHEMA_HINT,
 	}
@@ -133,10 +154,7 @@ export function scenarioDocumentError(value: unknown, base = "document"): AppErr
 	const first = problems[0]
 	if (first === undefined) return null
 	const refusal = refusalOf(first, base)
-	const said = sentenceFor({
-		code: first.code,
-		path: ["scenario", ...first.segments.map(String)],
-	})
+	const said = wordsOf(first)
 	return fail("invalid_input", {
 		path: refusal.path,
 		message: said?.message ?? refusal.message,

@@ -10,6 +10,8 @@ export const TAIL = [
 	"EMPLOYER_INTO_ILLIQUID",
 	"PAYOUT_ILLIQUID",
 	"INVALID_BUCKETS",
+	"SURPLUS_SHARE_LAST",
+	"WITHDRAW_FLOOR_ORDER",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const

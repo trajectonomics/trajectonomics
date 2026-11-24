@@ -17,4 +17,6 @@ import { editsShown } from "../../lib/edit/shown"
 	onScenario={selectPlan}
 	terms={queryParam("terms", "both")}
 	onTerms={(value) => setQueryParam("terms", value)}
+	chart={queryParam("chart", "")}
+	onChart={(id) => setQueryParam("chart", id)}
 />

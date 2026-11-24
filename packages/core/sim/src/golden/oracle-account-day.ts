@@ -72,7 +72,7 @@ export function oracleLandDay(
 	const budget = cashflow > 0n ? cashflow : 0n
 	const assets = oracleAssetContributions(states, scenario, contributions, budget, date)
 	const net = cashflow + cash - assets.applied
-	if (net > 0n) oracleSurplus(states, scenario.cashflow.surplus, date, net)
-	const unmet = net < 0n ? oracleWithdraw(states, scenario, date, -net) : 0n
+	if (net > 0n) oracleSurplus(states, scenario, fixture.timeline.start, date, net)
+	const unmet = net < 0n ? oracleWithdraw(states, scenario, fixture.timeline.start, date, -net) : 0n
 	return { expense, ranOut: unmet > 0n }
 }

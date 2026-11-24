@@ -10,6 +10,7 @@ export interface CompositionSegment {
 export interface LegendItem {
 	readonly name: string
 	readonly dashed: boolean
+	readonly dotted?: boolean
 	readonly stroke: string
 }
 

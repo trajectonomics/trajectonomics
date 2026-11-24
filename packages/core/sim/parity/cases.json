@@ -4289,7 +4289,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "8a32e26acde911d05d0bb42e5b30209662d2469a3bfa49c53ba8685a3c4c00ad"
+		"chanceSha256": "8ec454ed7b6cffa1d208f573fa946a4acec0727915b4a085b0c5ec4dd98895be"
 	},
 	{
 		"name": "freelancer-fi-reference",
@@ -5564,7 +5564,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "598dd5a30555273ac476f2e5c9e365114cc48c76023a7a9cb639dd0ecba97ed1"
+		"chanceSha256": "c17b51f02fff20b8b0ef092e76d9be5ee1427c50c6fcb4876d0df6b8e655de57"
 	},
 	{
 		"name": "loan-statement-month",
@@ -9900,7 +9900,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "065f028ecce42f44c4415fc992ca86e29c8a56ff4b51b12b898dba8c3d52388d"
+		"chanceSha256": "d2b01130b65cb3a2b34e0ae9c326d8a385bb444541329fe43bab79f6b5f53d2a"
 	},
 	{
 		"name": "fee-year",
@@ -10162,7 +10162,7 @@
 			"seed": "0123456789abcdef",
 			"paths": 4
 		},
-		"chanceSha256": "2e17288d31b16bd63683fcb544639cc95366d29656943206a3b5f2021fb438bb"
+		"chanceSha256": "08565d57bb5060df2c632055de5e145187ac3ef2aafe356f46a381c1c6d6b83e"
 	},
 	{
 		"name": "freelancer-plan-chance",
@@ -10313,6 +10313,557 @@
 			"paths": 6
 		},
 		"planSha256": "67a52bfd5dfd4908560c684f1e1ec9614283555ff592c834d1ee0c345ea1e29a",
-		"chanceSha256": "c7909a606df7dc4862b23009d3ad8e2a8338a501f72d297831bd86214ff3c070"
+		"chanceSha256": "08fcc7013e94974119fef74ab5947f98c2984271bea82da82c3303a11790d346"
+	},
+	{
+		"name": "routing-share-then-rest",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": []
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "invest",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2026-01-15",
+					"amount": 1000001,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "invest",
+						"share": 3000
+					},
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "76e7564e47aacd34ef5a1452302261d9ee2d4b81513f0756e59846ded6404b7b"
+	},
+	{
+		"name": "routing-share-capped",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": []
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "invest",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2026-01-15",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "invest",
+						"share": 3000,
+						"upTo": 250000
+					},
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "ced8e51d21a62c92ed6ac39ab8b6e61c6cdfda42640d9db9ee0e3aa1ae668943"
+	},
+	{
+		"name": "routing-top-up-then-share",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "emergency",
+					"amount": 150000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "emergency",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "invest",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2026-01-15",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "emergency",
+						"upTo": 200000
+					},
+					{
+						"account": "invest",
+						"share": 5000
+					},
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "4ccb3549d6905f59f0a503a5d49fff6f3b07e063466db64a8e92e0e12a51a418"
+	},
+	{
+		"name": "routing-floor-then-funds",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "savings",
+					"amount": 500000
+				},
+				{
+					"account": "funds",
+					"amount": 200000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "funds",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "bill",
+					"frequency": "once",
+					"start": "2026-02-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": [
+					{
+						"account": "savings",
+						"downTo": 300000
+					},
+					"funds",
+					"savings"
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "fb327c1a06e0f63ca405881eed36a1926c4b4699abc1e7c5fc391215cfa41536"
+	},
+	{
+		"name": "routing-floor-stops-draw",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "savings",
+					"amount": 500000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "bill",
+					"frequency": "once",
+					"start": "2026-02-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": [
+					{
+						"account": "savings",
+						"downTo": 300000
+					}
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "a0e7ac03528bb9fc187894f37a5b5c6536d3d068f5dfc737b007f41e5c4bd936"
+	},
+	{
+		"name": "routing-locked-floor",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "rmf",
+					"amount": 900000
+				},
+				{
+					"account": "savings",
+					"amount": 500000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "rmf",
+					"kind": "asset",
+					"rate": 0,
+					"lockedUntil": "2027-01-01"
+				},
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "bill",
+					"frequency": "once",
+					"start": "2026-02-01",
+					"amount": 100000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": [
+					{
+						"account": "rmf",
+						"downTo": 0
+					},
+					"savings"
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2026-02-28",
+			"resolution": "day"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "6150b059526f5094c40b263c0aadbea3e33ee9d249f6803d98a69b2625342a2f"
+	},
+	{
+		"name": "routing-real-floor",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "savings",
+					"amount": 500000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "savings",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "bill",
+					"frequency": "once",
+					"start": "2031-02-01",
+					"amount": 200000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": [
+					{
+						"account": "savings",
+						"downTo": {
+							"amount": 300000,
+							"growth": "inflation"
+						}
+					}
+				]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2031-03-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "1f4987f13bee31e8f7b452bd3ff0ce0ab0033d537d5e00e572ab6eb4317a4f45"
+	},
+	{
+		"name": "routing-real-target",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": []
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 300
+			},
+			"accounts": [
+				{
+					"id": "emergency",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				}
+			],
+			"flows": [
+				{
+					"id": "pay",
+					"frequency": "once",
+					"start": "2031-02-01",
+					"amount": 2000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "emergency",
+						"upTo": {
+							"amount": 1000000,
+							"growth": "inflation"
+						}
+					},
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2031-03-01",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "d7f6c9cecbb35a219b5c9caac83da20802a577bb07348c5683a976a18777cb8b"
 	}
 ]

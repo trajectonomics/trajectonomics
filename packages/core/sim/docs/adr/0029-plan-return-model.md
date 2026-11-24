@@ -34,14 +34,18 @@ hand-written model file.
   expected value of a year's compounded growth is then `(1 + m)^12`, the stated rate, within 1 bp, for the
   table and for a row with no change to the Account in the middle of it. The median is lower by about
   `volatility^2 / 2`, as for any volatile return.
-- **A mid-row change adds a second-order term.** The engine restarts a row's linear walk from a mid-row
-  deposit, withdrawal or payout, so the row's factor is `1 + r + r²·h₁h₂/D²` ([ADR 0005](0005-seeded-monte-carlo-seams.md)).
-  With volatility, `E[r²] ≈ s²` is no longer small. Measured for a fund at 7% and 15% volatility from the built
-  model (256 buckets): 700.02 bps a year with no mid-month change, 738.8 with a change on the 25th of 30,
-  760.7 with a change mid-month, 791.2 with four weekly changes. Issue #432 makes a mid-row change neutral;
-  until it lands, `traj dashboard` must not default to this model (#412).
-- **A Timeline that starts mid-month.** Its first row gets a full month's return over a part month: about
-  +30 bps in year one. Tracked in #432.
+- **A mid-row change is neutral.** The engine used to restart a row's linear walk from a mid-row deposit,
+  withdrawal or payout, so the row's factor was `1 + r + r²·h₁h₂/D²`, which with volatility (`E[r²] ≈ s²`) is not
+  small. Measured for a fund at 7% and 15% volatility from the built model (256 buckets) before the fix: 700.02
+  bps a year with no mid-month change, 738.8 with a change on the 25th of 30, 760.7 with a change mid-month, 791.2
+  with four weekly changes. Issue #432 fixed it ([ADR 0005](0005-seeded-monte-carlo-seams.md), "A change inside a
+  row is neutral"): the row's start balance takes the full `1 + r`, an amount added or taken mid-row takes
+  `1 + r·h₂/D`, and the figure is now 700.02 bps for every one of those cases. This unblocks `traj dashboard`
+  defaulting to this model (#412).
+- **A Timeline that starts or ends mid-month.** Its first row used to get a full month's return over a part
+  month: about +30 bps in year one, and the last row had the same flaw. Each Market row now carries `span`, the
+  counted days of its whole month, so a part row takes its share of the return (ADR 0005, "A row cut by the
+  Timeline"). It is exact, not rounded to a basis point.
 - **The quantile table.** `z_b` is the standard normal quantile at the midpoint `(b + 1/2) / buckets` of
   bucket `b`, stored as an integer in millionths in `src/market/normal-table.ts` for the seven sizes. The
   table is odd-symmetric, so only the upper half is stored and the sum is exactly 0, which makes the weighted
@@ -94,6 +98,6 @@ hand-written model file.
 ## Consequences
 
 - `parity/cases.json` records one `freelancer-plan-chance` case, which hashes the built model and the chance
-  run over it under Bun and Node. The existing hashes are unchanged.
+  run over it under Bun and Node. The model hash is unchanged; #432 moved the chance hash (ADR 0005).
 - A plan with no volatile Account builds a model with no Accounts, so every path is identical. The caller
   decides what to say (the CLI refuses it).

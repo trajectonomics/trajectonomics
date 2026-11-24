@@ -3,7 +3,7 @@ import type { LineMarker, LineSeries } from "./line"
 import { linePath } from "./path"
 import { linearScale } from "./scale"
 import { niceTicks } from "./ticks"
-import { labelsFor, xTicksFor } from "./x-labels"
+import { labelsFor, titlesFor, xTicksFor } from "./x-labels"
 
 /** The space around the plot, in pixels, for the axis labels. */
 export interface Margin {
@@ -27,22 +27,42 @@ export interface Mark {
 	readonly display: string
 }
 
-/** One series laid out: its path, and a mark per distinct x (null where the series has no point). */
+/** One bar of a column chart, in pixels. */
+export interface Bar {
+	readonly x: number
+	readonly y: number
+	readonly width: number
+	readonly height: number
+	/** True when the bar covers part of a period, so it is drawn faded. */
+	readonly faded?: boolean
+}
+
+/**
+ * One series laid out: its path, and a mark per distinct x (null where the series has no point). A
+ * column chart's series also carry their bars, or the shaded band of a stacked line.
+ */
 export interface SeriesLayout {
 	readonly name: string
 	readonly dashed: boolean
+	readonly dotted: boolean
 	readonly path: string
 	readonly marks: readonly (Mark | null)[]
+	readonly bars?: readonly (Bar | null)[]
+	readonly area?: string
 }
 
 /** The whole chart laid out: positions, ticks, series and markers, all in pixels. */
 export interface LineLayout {
 	readonly xLabels: readonly string[]
+	/** The longer name of each x for the tooltip, such as the period it covers; absent when the labels say it all. */
+	readonly xTitles?: readonly string[]
 	readonly xPixels: readonly number[]
 	readonly xTicks: readonly { readonly index: number; readonly label: string }[]
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
 	readonly markers: readonly { readonly x: number; readonly label: string }[]
+	/** "wide" draws series from a longer palette, for a chart of many series; left out, the first three. */
+	readonly palette?: "wide"
 }
 
 /** The room one x label needs, in pixels, so neighbouring labels never touch. */
@@ -57,6 +77,7 @@ export function lineLayout(
 	series: readonly LineSeries[],
 	plot: Plot,
 	markers: readonly LineMarker[] = [],
+	palette?: "wide",
 ): LineLayout | null {
 	const xs = distinctSorted(series.flatMap((line) => line.points.map((point) => point.x)))
 	const xDomain = xs.length === 0 ? null : extent([...xs, ...markers.map((marker) => marker.x)])
@@ -72,11 +93,13 @@ export function lineLayout(
 	const plotWidth = plot.width - margin.left - margin.right
 	return {
 		xLabels,
+		xTitles: titlesFor(series, xs),
 		xPixels,
 		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
 		yTicks: yTicks.map((value) => ({ value, y: scaleY(value) })),
 		series: series.map((line) => seriesLayout(line, xs, scaleX, scaleY)),
 		markers: markers.map((marker) => ({ x: scaleX(marker.x), label: marker.label })),
+		...(palette ? { palette } : {}),
 	}
 }
 
@@ -98,6 +121,7 @@ function seriesLayout(
 	return {
 		name: line.name,
 		dashed: line.dashed ?? false,
+		dotted: line.dotted ?? false,
 		path: linePath(drawn),
 		marks,
 	}

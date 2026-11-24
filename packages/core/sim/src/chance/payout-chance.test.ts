@@ -16,10 +16,11 @@ const rising: ReturnModel = {
 describe("chance of success with a payout on an Account that follows a Return series", () => {
 	// A 1% a month payout (1200 bps, monthly) of 1,000,000,000. On 31 Jan the series has held 30 of the
 	// January row's 31 days: 1,000,000,000 x (310000 + 3100 x 30) / 310000 = 1,300,000,000, paid
-	// 13,000,000, leaving 1,287,000,000. On 28 Feb it holds 1 more day of January and all 27 days of the
-	// February row (it ends at the horizon): 1,287,000,000 x 313100 / 310000 = 1,299,870,000, then
-	// x (270000 + 3100 x 27) / 270000 = 1,702,829,700, paid 17,028,297, leaving 1,685,801,403. Net worth
-	// ends at that and the cash 13,000,000 + 17,028,297, which is 1,715,829,700, on every path.
+	// 13,000,000, leaving 1,287,000,000. The 13,000,000 takes its last day of growth with it, so 987,000,000
+	// still earns 100 bps: 1,296,870,000 on 1 Feb. On 28 Feb the February row holds 27 of its 28 days, so it
+	// takes 27/28 of the month's return: 1,296,870,000 x (280000 + 3100 x 27) / 280000 = 1,684,541,496, paid
+	// 16,845,415, leaving 1,667,696,081. Net worth ends at that and the cash 13,000,000 + 16,845,415, which is
+	// 1,697,541,496, on every path.
 	const setup = payingSetup([fund({ bps: 1200, frequency: "monthly" })], {
 		horizon: "2026-02-28",
 		resolution: "month",
@@ -34,7 +35,7 @@ describe("chance of success with a payout on an Account that follows a Return se
 	it("pays out of each path's own valuation and keeps the rest growing on it", () => {
 		if (!result.ok) throw new Error(JSON.stringify(result.problems))
 		const last = result.chance.bands[0]?.netWorth.map((point) => point.value)
-		expect(last).toEqual(Array(5).fill(1_715_829_700))
+		expect(last).toEqual(Array(5).fill(1_697_541_496))
 		expect(result.chance.successBps).toBe(10_000)
 	})
 })

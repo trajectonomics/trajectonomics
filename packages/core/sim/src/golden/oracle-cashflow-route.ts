@@ -1,10 +1,10 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString } from "../types"
-import { oracleLeftOut } from "./oracle-access"
-import { add, min, type OracleTotals } from "./oracle-cashflow-types"
-import { type OracleState, oracleMutate, oracleValuation } from "./oracle-state"
+import { add, type OracleTotals } from "./oracle-cashflow-types"
+import { oracleDraw, oracleFill } from "./oracle-routing"
+import type { OracleState } from "./oracle-state"
 
-/** Fills the surplus steps in order; an unbounded step takes whatever is left. */
+/** Fills the surplus steps in order; the totals keep what each Account took. */
 export function fillSurplus(
 	fixture: Fixture,
 	states: Map<string, OracleState>,
@@ -12,23 +12,13 @@ export function fillSurplus(
 	date: DateString,
 	amount: bigint,
 ): void {
-	let remaining = amount
-	for (const step of fixture.scenario.cashflow.surplus) {
-		if (remaining === 0n) return
-		const state = states.get(step.account)!
-		const headroom =
-			step.upTo === undefined ? remaining : BigInt(step.upTo) - oracleValuation(state, date)
-		const fill = headroom > 0n ? min(remaining, headroom) : 0n
-		if (fill === 0n) continue
-		oracleMutate(state, date, fill)
-		add(totals.surplus, step.account, fill)
-		remaining -= fill
-	}
+	const filled = oracleFill(states, fixture.scenario, fixture.timeline.start, date, amount)
+	for (const [account, fill] of filled) add(totals.surplus, account, fill)
 }
 
 /**
- * Takes a shortfall from `withdraw` in order, skipping Accounts left out of accessible net worth;
- * returns what stays unmet.
+ * Takes a shortfall from `withdraw` in order, skipping Accounts left out of accessible net worth and
+ * keeping each floor; the totals key each take by the entry's position. Returns what stays unmet.
  */
 export function drawFrom(
 	fixture: Fixture,
@@ -37,16 +27,7 @@ export function drawFrom(
 	date: DateString,
 	amount: bigint,
 ): bigint {
-	let remaining = amount
-	for (const account of fixture.scenario.cashflow.withdraw) {
-		if (remaining === 0n) return 0n
-		const state = states.get(account)!
-		if (oracleLeftOut(state.rule, date)) continue
-		const take = min(remaining, oracleValuation(state, date))
-		if (take <= 0n) continue
-		oracleMutate(state, date, -take)
-		add(totals.drawn, account, take)
-		remaining -= take
-	}
-	return remaining
+	const drawn = oracleDraw(states, fixture.scenario, fixture.timeline.start, date, amount)
+	for (const [position, take] of drawn.taken) add(totals.drawn, String(position), take)
+	return drawn.unmet
 }
