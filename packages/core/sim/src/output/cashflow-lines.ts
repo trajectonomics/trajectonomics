@@ -1,4 +1,5 @@
 import { declaresEmployer } from "../engine/employer"
+import { declaresTransfers } from "../loan/resolve"
 import { declaresPayouts, isPayout } from "../payout/flows"
 import type { MinorUnits, Scenario } from "../types"
 import type {
@@ -16,6 +17,7 @@ import {
 	expenseLines,
 	ofKind,
 	payoutLines,
+	transferLines,
 	withdrawalLines,
 } from "./cashflow-flows"
 import type { PeriodSums } from "./cashflow-sums"
@@ -65,6 +67,7 @@ export function breakdownOf(
 		...(declaresEmployer(scenario) ? { employer: employerLines(scenario.flows, sums) } : {}),
 		...(declaresPayouts(scenario) ? { payouts: payoutLines(scenario.flows, sums) } : {}),
 		withdrawals: withdrawalLines(scenario.flows, sums.planned),
+		...(declaresTransfers(scenario) ? { transfers: transferLines(scenario.flows, sums) } : {}),
 		drawn: drawnLines(scenario.cashflow.withdraw, sums.drawn),
 		surplus: lines(
 			scenario.cashflow.surplus.map((step) => step.account),

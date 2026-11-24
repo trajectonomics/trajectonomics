@@ -67,8 +67,22 @@ export function closed(code: ErrorCode, path: readonly string[] = []): readonly 
 	return values
 }
 
+/** The Flow kinds the engine lists that this release does not take (`transfer`, sim ADR 0031), left out of a list. */
+export function withoutUnshippedKinds(allowed: readonly string[]): readonly string[]
+export function withoutUnshippedKinds(
+	allowed: readonly string[] | undefined,
+): readonly string[] | undefined
+export function withoutUnshippedKinds(
+	allowed: readonly string[] | undefined,
+): readonly string[] | undefined {
+	return allowed?.filter((kind) => kind !== "transfer")
+}
+
 export const ACCOUNT_KINDS: readonly string[] = closed("INVALID_KIND", ["accounts"])
-export const FLOW_KINDS: readonly string[] = closed("INVALID_KIND", ["flows"])
+/** The Flow kinds this release takes: the engine also has `transfer` (sim ADR 0031), which ships in a later release (routing-unshipped.ts). */
+export const FLOW_KINDS: readonly string[] = withoutUnshippedKinds(
+	closed("INVALID_KIND", ["flows"]),
+)
 /** How a Contribution into an asset is paid: a target spends Available cashflow, an obligation is paid in full (sim's ADR 0021). */
 export const FUNDINGS: readonly string[] = closed("INVALID_FUNDING")
 export const COMPOUNDING: readonly string[] = closed("INVALID_COMPOUNDING")

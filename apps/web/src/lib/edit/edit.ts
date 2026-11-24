@@ -7,6 +7,7 @@
 import { z } from "zod"
 import { overridesFields } from "../what-if/overrides"
 import { planNameShapeError } from "./name"
+import { taxFlags } from "./tax-flags"
 
 /** A plan name as `traj` takes it: not empty, and never shaped like a flag (see `planNameShapeError`). */
 const planName = z
@@ -30,6 +31,9 @@ export const EDIT_KINDS = [
 	"set-household",
 	"remove-household",
 	"apply-overrides",
+	"merge-tax",
+	"set-tax",
+	"remove-tax",
 ] as const
 
 /** An Edit that saves a what-if must carry at least one change: a save of nothing is not a what-if. */
@@ -75,6 +79,26 @@ export const editSchema = z.discriminatedUnion("kind", [
 	}),
 	z.strictObject({
 		kind: z.literal("remove-household"),
+		name: planName,
+		contentHash,
+	}),
+	// The tax profile (cli ADR 0066): a merge changes the items it names, a set states the whole profile, a remove takes it out.
+	z.strictObject({
+		kind: z.literal("merge-tax"),
+		name: planName,
+		contentHash,
+		flags: taxFlags.refine((flags) => Object.keys(flags).length > 0, {
+			message: "a merge that changes nothing",
+		}),
+	}),
+	z.strictObject({
+		kind: z.literal("set-tax"),
+		name: planName,
+		contentHash,
+		flags: taxFlags.required({ filingStatus: true }),
+	}),
+	z.strictObject({
+		kind: z.literal("remove-tax"),
 		name: planName,
 		contentHash,
 	}),

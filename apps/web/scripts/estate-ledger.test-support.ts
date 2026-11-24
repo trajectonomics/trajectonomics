@@ -29,16 +29,16 @@ function env(): NodeJS.ProcessEnv {
 	return { ...process.env, TRAJ_HOME: home }
 }
 
-function traj(argv: string[], stdin?: unknown): string {
+export function traj(argv: string[], stdin?: unknown): string {
 	const input = stdin === undefined ? undefined : new TextEncoder().encode(JSON.stringify(stdin))
 	const run = Bun.spawnSync([BINARY, ...argv], { env: env(), stdin: input })
 	if (run.exitCode !== 0) throw new Error(run.stderr.toString() || run.stdout.toString())
 	return run.stdout.toString()
 }
 
-/** The plan as the ledger holds it. */
-export function storedPlan(): { hash: string; document: ScenarioDocument } {
-	const shown = JSON.parse(traj(["scenario", "show", "--decimal", "--json", "--", PLAN])) as {
+/** The plan as the ledger holds it (the estate plan unless a name is given). */
+export function storedPlan(name = PLAN): { hash: string; document: ScenarioDocument } {
+	const shown = JSON.parse(traj(["scenario", "show", "--decimal", "--json", "--", name])) as {
 		scenario: { contentHash: string; document: unknown }
 	}
 	return {

@@ -4,6 +4,7 @@
  */
 import { overrideTokens } from "../what-if/argv"
 import type { Edit } from "./edit"
+import { taxCommand } from "./tax-command"
 
 /** The argv of one write, which ends with `--json`, and the standard input the write reads. */
 export type WriteCommand = { argv: string[]; stdin?: string }
@@ -83,5 +84,9 @@ export function writeCommand(edit: Edit, dryRun: boolean): WriteCommand {
 					...flags,
 				],
 			}
+		case "merge-tax":
+		case "set-tax":
+		case "remove-tax":
+			return taxCommand(edit, flags)
 	}
 }

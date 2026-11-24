@@ -31,8 +31,11 @@ function commit(
 	if (levies !== undefined) rebaseReturns(state, date)
 }
 
-/** What leaves an Account without a sale: a payout (ADR 0027) or a fee (ADR 0028). */
-export type Distribution = "payout" | "fee"
+/**
+ * What changes an Account without a sale or a purchase: a payout (ADR 0027), a fee (ADR 0028) or an untaxed
+ * transfer (ADR 0031), which moves the Cost basis itself.
+ */
+export type Distribution = "payout" | "fee" | "transfer"
 
 /**
  * Books the growth since the last commit, and the gain a withdrawal realises unless it is a distribution.

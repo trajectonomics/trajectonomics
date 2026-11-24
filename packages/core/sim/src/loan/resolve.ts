@@ -7,6 +7,16 @@ export function declaresWithdrawals(scenario: Scenario): boolean {
 	return scenario.flows.some((flow) => flow.kind === "withdrawal")
 }
 
+/** Whether the Scenario declares a transfer Flow, so its Projection reports transfers (ADR 0031). */
+export function declaresTransfers(scenario: Scenario): boolean {
+	return scenario.flows.some((flow) => flow.kind === "transfer")
+}
+
+/** Whether a transfer Flow pays `account` down, so its liability statement lists what was transferred. */
+export function isTransferTarget(scenario: Scenario, account: string): boolean {
+	return scenario.flows.some((flow) => flow.kind === "transfer" && flow.target === account)
+}
+
 /**
  * The Flow the engine runs: a `level` contribution becomes a fixed amount of its one exact payment,
  * which does not grow. Any other Flow is returned as it is.

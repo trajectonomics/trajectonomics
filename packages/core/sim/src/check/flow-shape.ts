@@ -10,6 +10,7 @@ import { accountRef } from "./refs"
 import { spendingRule } from "./rule"
 import { amount, bool, date, growth, oneOf, str } from "./scalars"
 import { opt, req, type Shape } from "./shape"
+import { transferShape } from "./transfer"
 
 /** What a Flow's fields may reference: the Accounts, the Levies a label or share needs, and Milestones. */
 export interface FlowContext {
@@ -78,6 +79,7 @@ export function flowShape(kind: unknown, context: FlowContext): Shape {
 			level: NOT_ALLOWED,
 		}
 	}
+	if (kind === "transfer") return transferShape(shared, context)
 	if (kind === "withdrawal") {
 		return {
 			...shared,

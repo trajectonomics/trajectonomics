@@ -111,11 +111,11 @@ The growth an Account with a `returnLabel` accrued inside a Settlement period, c
 _Avoid_: Interest income, investment income
 
 **Realised gain**:
-The gain of a withdrawal from an Account with a `gainLabel`: the amount withdrawn minus the Cost basis it used up. It is signed and tallied in the Settlement period of the withdrawal's Landed date.
+The gain of a withdrawal from an Account with a `gainLabel`: the amount withdrawn minus the Cost basis it used up. It is signed and tallied in the Settlement period of the withdrawal's Landed date. A Transfer realises it only with `realise: true`.
 _Avoid_: Capital gain, profit
 
 **Cost basis**:
-The pooled amount put into an Account (average cost): applied Contributions and surplus fills add to it, growth does not, and a withdrawal uses up a proportional share. The opening value is given in the Baseline.
+The pooled amount put into an Account (average cost): applied Contributions and surplus fills add to it, growth does not, and a withdrawal uses up a proportional share. A Transfer carries that share from its source to a gain-tracked target. The opening value is given in the Baseline.
 _Avoid_: Purchase price, lot
 
 **Prepayment**:
@@ -171,7 +171,7 @@ One Account's value in a Projection row, split into `amount`, `capitalised` and 
 _Avoid_: Balance entry, row amount
 
 **Flow**:
-A dated cash movement of kind `income`, `expense`, `contribution` or `withdrawal`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
+A dated cash movement of kind `income`, `expense`, `contribution`, `withdrawal` or `transfer`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
@@ -199,14 +199,18 @@ _Avoid_: Missed contribution
 
 **Planned withdrawal**:
 A Flow of kind `withdrawal`. From a liability `source` it borrows: on each Landed date the amount owed grows by the amount and the same cash lands in cashflow, so net worth is unchanged that day. From an asset `source` it is a **sale**: `min(planned, value)` leaves the Account and lands in cashflow (nothing while the Account is locked), its Realised gain is tallied when the Account has a `gainLabel`, and a Derived amount that reads the Account sells all of it. It is not income, is never tallied as income and does not stop in the FI test. A sale of an Illiquid asset raises Accessible net worth by the cash that lands.
-_Avoid_: draw, transfer
+_Avoid_: draw
+
+**Transfer**:
+A Flow of kind `transfer`: money moved from an asset `source` that is not Illiquid to an asset or liability `target`, both the plan's own Accounts, outside cashflow. It is not income, an expense, a Contribution or a Planned withdrawal, never enters Available cashflow, the `withdraw` list or a Shortfall, and leaves net worth unchanged on its date. `min(planned, what the source holds)` moves (nothing while the source is locked, and no more than a liability target owes), so it never overdraws; what could not move is `unmoved` in the Cash-flow breakdown. The Cost basis moves with the money, and `realise: true` tallies the source's Realised gain on it as a sale does (off by default). It lands after the date's income, expenses and Contributions: before the surplus when the date's net is zero or above, after the `withdraw` list has drawn when it is below zero (so it never turns a bill the plan can pay into a Shortfall); several of one date apply in Scenario order. Into a liability it is a payment line marked `transferred` on the Liability statement. A gift to someone outside the plan is an expense, not a Transfer.
+_Avoid_: draw, rebalance, internal payment
 
 **Level payment**:
 The one payment a `level` Contribution makes into a nominal liability: the amount that repays a principal over a number of equal payments at the Account's nominal rate, computed once from principal, rate and term and rounded once as the caller states. It does not grow.
 _Avoid_: annuity payment, PMT, fixed payment, installment
 
 **Liability statement**:
-One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each calendar month, cut by the Timeline start, the horizon or a run-out date, gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly.
+One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each calendar month, cut by the Timeline start, the horizon or a run-out date, gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly (a liability a Transfer pays down also lists `transferred`, taken off the same way).
 _Avoid_: amortization table, loan schedule, payment schedule
 
 **Paid-off date**:

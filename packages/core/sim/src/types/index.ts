@@ -54,6 +54,7 @@ export {
 	isRuled,
 	type LevelLoan,
 	type Prepayment,
+	type TransferFlow,
 	type WithdrawalFlow,
 } from "./flow"
 export type { Levy, LevyContext, MeasuresResult, MonthDay, Tallies } from "./levy"

@@ -5,6 +5,7 @@ import type {
 	EmployerLine,
 	ExpenseLine,
 	PayoutLine,
+	TransferLine,
 	WithdrawalLine,
 } from "../types/breakdown"
 import type { PeriodSums } from "./cashflow-sums"
@@ -90,5 +91,16 @@ export function payoutLines(flows: readonly Flow[], sums: PeriodSums): PayoutLin
 		return !isPayout(flow) || amount === 0n
 			? []
 			: [{ account: flow.payoutOf.account, amount: Number(amount) }]
+	})
+}
+
+/** Each transfer Flow's moved and unmoved amounts with its Accounts, in Scenario order (ADR 0031). */
+export function transferLines(flows: readonly Flow[], sums: PeriodSums): TransferLine[] {
+	return ofKind(flows, "transfer").flatMap((flow): TransferLine[] => {
+		const amount = sums.transfers.get(flow.id) ?? 0n
+		const unmoved = sums.unmoved.get(flow.id) ?? 0n
+		if (amount === 0n && unmoved === 0n) return []
+		const { source, target } = flow
+		return [{ flow: flow.id, source, target, amount: Number(amount), unmoved: Number(unmoved) }]
 	})
 }

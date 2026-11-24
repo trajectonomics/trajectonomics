@@ -51,6 +51,15 @@ export interface WithdrawalLine {
 	readonly amount: MinorUnits
 }
 
+/** One transfer Flow's amount moved between its Accounts, outside cashflow; `unmoved` is planned and not moved. */
+export interface TransferLine {
+	readonly flow: string
+	readonly source: AccountId
+	readonly target: AccountId
+	readonly amount: MinorUnits
+	readonly unmoved: MinorUnits
+}
+
 /** One Account's amount moved through `cashflow.withdraw` or `cashflow.surplus`. */
 export interface AccountLine {
 	readonly account: AccountId
@@ -90,6 +99,11 @@ export interface CashflowBreakdown {
 	 */
 	readonly payouts?: readonly PayoutLine[]
 	readonly withdrawals: readonly WithdrawalLine[]
+	/**
+	 * Transfers by Flow, in Scenario order; present only when the Scenario declares a transfer (ADR 0031). Money
+	 * moved between the plan's own Accounts: outside the identity, which it enters on neither side.
+	 */
+	readonly transfers?: readonly TransferLine[]
 	readonly drawn: readonly DrawnLine[]
 	readonly surplus: readonly AccountLine[]
 	readonly unmet: MinorUnits

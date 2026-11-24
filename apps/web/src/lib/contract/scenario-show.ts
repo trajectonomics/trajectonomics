@@ -20,6 +20,8 @@ export const scenarioFlow = z.looseObject({
 	amount: money.optional(),
 	growth: z.union([z.literal("inflation"), z.looseObject({ bps: z.number().int() })]).optional(),
 	earned: z.boolean().optional(),
+	// The Tally label a Levy reads the Flow under, such as an income class for tax (cli ADR-0010).
+	label: z.string().optional(),
 	target: z.string().optional(),
 	source: z.string().optional(),
 	// "obligation" pays a Contribution in full on its date, before Available cashflow (sim ADR 0021).
