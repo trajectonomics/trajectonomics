@@ -52,7 +52,7 @@ describe("renaming the plan the pages show", () => {
 		globalThis.fetch = (async () =>
 			new Response(
 				JSON.stringify({ ok: false, error: { code: "x", exitCode: 5, message: "no" } }),
-			)) as typeof fetch
+			)) as unknown as typeof fetch
 		expect(await renamePlan(row("early"), "later", true)).toBe(false)
 		expect(navigations).toEqual([])
 	})
