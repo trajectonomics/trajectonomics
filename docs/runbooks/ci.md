@@ -70,9 +70,36 @@ A new job in `ci.yml`, with `needs: plan` and `if: needs.plan.outputs.web == 'tr
 `needs` of `check`. It runs only when `apps/web` or the command line changed and does not lengthen
 `Check packages`.
 
+## The Demo snapshot is generated per job, not once per run (#464)
+
+Since #378 the Demo snapshot (`apps/web/public/demo/snapshot.json`) is a build output: the turbo `demo`
+task compiles `traj` and runs it against the fictional ledger, and `build`, `test:src`, `test:scripts`
+and `check` depend on it. Option 1 of #464 was to run it once in its own job and share the file with the
+jobs that need it. It was measured and **not done**, because it cannot shorten a run.
+
+Measured in the CI logs of five green runs after #378 (four pull request runs and one push to `main`,
+2026-11-24):
+
+| Job | `demo` task | Cache |
+|---|---|---|
+| `Check web scripts (1)` ... `(4)` | 13.9 s to 23.2 s each | miss in all 20 |
+| `Check packages` | 15.5 s to 20.4 s | miss in 4 of 5 runs |
+| `Check web` | runs beside lint and typecheck, so 3 s to 5 s past `typecheck` | miss in 4 of 5 runs |
+
+The turbo cache does not make it free: a job restores the newest cache for the lockfile, saved by an
+earlier commit, and `demo`'s inputs include `apps/cli/src`, so any command line change misses. The jobs
+of one run start together, so none of them can read a file another one is still making. A shard takes
+4 to 7 minutes, so the 14 s to 23 s is 5 to 8 percent of its time.
+
+Why a shared job does not win the time back: the shards are the critical path, and they would have to
+wait for the new job, which needs a checkout, the setup action, the engine build, the `demo` task and
+the upload (about 50 s, even started beside `Plan`). Today a shard starts its tests about 75 s in; with
+the artifact it would start them about 75 s in too, with one more job, a new artifact to keep in step
+with the turbo task hash and one more entry in `needs`. The only gain is runner minutes: about 80 s to
+100 s saved, 50 s spent. Look again if `demo` grows past a minute, or if the shards stop being the
+critical path.
+
 ## Not done here
 
 - #460 (`what-if-groups.test.ts` times out under load) and `bun test --parallel` or `--timings` for
   a better balance between the shards.
-- Generating the Demo snapshot once per run and sharing it as an artifact: it waits for #378, which
-  makes the Demo a build output.
