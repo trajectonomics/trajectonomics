@@ -25,6 +25,7 @@ describe("the Assumptions page", () => {
 		expect(body.match(/<label for="rate-/g)).toHaveLength(3)
 		expect(body.match(/<label for="volatility-/g)).toHaveLength(2)
 		expect(body).toContain("An asset you cannot sell at once shows its return only.")
+		expect(body.match(/<label for="fee-rate-/g)).toHaveLength(2)
 	})
 
 	test("states the stored inflation and rates, and fills in no volatility: an empty one reads fixed at its return", () => {

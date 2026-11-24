@@ -17,6 +17,12 @@ describe("a refusal lands on the row its path names", () => {
 		)
 		expect(assumptionFieldOfRefusal(refusal("accounts.0.rate"), ids)).toBe("rate:bank")
 		expect(assumptionFieldOfRefusal(refusal("document.economy.inflation"), ids)).toBe("inflation")
+		expect(assumptionFieldOfRefusal(refusal("document.accounts.fund.fee.bps"), ids)).toBe(
+			"feeRate:fund",
+		)
+		expect(assumptionFieldOfRefusal(refusal("accounts.1.fee.rounding"), ids)).toBe(
+			"feeRounding:fund",
+		)
 		expect(assumptionFieldOfRefusal(refusal("document.accounts.9.rate"), ids)).toBeNull()
 		expect(assumptionFieldOfRefusal(refusal("document.accounts.fund.compounding"), ids)).toBeNull()
 	})

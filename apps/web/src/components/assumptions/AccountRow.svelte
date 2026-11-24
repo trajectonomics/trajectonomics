@@ -2,6 +2,7 @@
 import { fieldKey } from "../../lib/view/assumptions/draft"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
+import AccountFee from "./AccountFee.svelte"
 import SwingChoices from "./SwingChoices.svelte"
 
 interface Props {
@@ -12,6 +13,9 @@ interface Props {
 	/** The text of its return and of its volatility; an empty volatility is none. */
 	rate: string
 	volatility: string
+	/** The fee's share and rounding, for a liquid asset. */
+	feeRate: string
+	feeRounding: string
 	shown: Shown
 	disabled?: boolean
 }
@@ -21,6 +25,8 @@ let {
 	swings,
 	rate = $bindable(),
 	volatility = $bindable(),
+	feeRate = $bindable(),
+	feeRounding = $bindable(),
 	shown,
 	disabled = false,
 }: Props = $props()
@@ -56,6 +62,14 @@ let {
 			<p class="text-sm text-muted-foreground">Empty: fixed at its return in every path.</p>
 		{/if}
 		{#if !disabled}<SwingChoices forId="volatility-{id}" bind:value={volatility} />{/if}
+		<AccountFee
+			{id}
+			bind:rate={feeRate}
+			bind:rounding={feeRounding}
+			rateProblem={shown.at(fieldKey("feeRate", id))}
+			roundingProblem={shown.at(fieldKey("feeRounding", id))}
+			{disabled}
+		/>
 	{:else}
 		<p class="text-sm text-muted-foreground">An asset you cannot sell at once shows its return only.</p>
 	{/if}

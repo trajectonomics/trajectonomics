@@ -80,6 +80,8 @@ function tryThem(): void {
 				swings={account.swings}
 				bind:rate={() => account.rate, (value) => (account.rate = value)}
 				bind:volatility={() => account.volatility, (value) => (account.volatility = value)}
+				bind:feeRate={() => account.fee.rate, (value) => (account.fee.rate = value)}
+				bind:feeRounding={() => account.fee.rounding, (value) => (account.fee.rounding = value)}
 				{shown}
 				disabled={!editable}
 			/>

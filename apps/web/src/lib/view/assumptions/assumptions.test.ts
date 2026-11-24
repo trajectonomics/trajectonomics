@@ -144,3 +144,48 @@ describe("the three choices", () => {
 		])
 	})
 })
+
+describe("the fee column (the Account form's fee, web ADR 0017)", () => {
+	const funded = () =>
+		plan({
+			accounts: [
+				{ id: "fund", kind: "asset", rate: 500, fee: { bps: "1.50", rounding: "floor" } },
+				{
+					id: "home",
+					kind: "asset",
+					rate: 200,
+					liquid: false,
+					fee: { bps: "0.50", rounding: "ceil" },
+				},
+			],
+		})
+
+	test("shows the stored fee as the form does, and none as empty", () => {
+		expect(draftOf(funded()).accounts[0]?.fee).toEqual({ rate: "1.50", rounding: "floor" })
+		expect(draftOf(plan()).accounts[0]?.fee).toEqual({ rate: "", rounding: "" })
+	})
+
+	test("a fee is stated, changed and taken out as the Account form does; an illiquid asset keeps its own", () => {
+		const doc = funded()
+		const next = saved(doc, (draft) => {
+			const fund = draft.accounts[0]
+			if (fund) fund.fee = { rate: "2", rounding: "halfUp" }
+		})
+		expect(next.accounts[0]?.fee).toEqual({ bps: "2", rounding: "halfUp" })
+		expect(next.accounts[1]).toEqual(doc.accounts[1])
+		const none = saved(doc, (draft) => {
+			const fund = draft.accounts[0]
+			if (fund) fund.fee = { rate: "", rounding: "" }
+		})
+		expect("fee" in (none.accounts[0] ?? {})).toBe(false)
+	})
+
+	test("a share without a rounding is a problem at the row's fee field", () => {
+		const doc = plan()
+		const draft = draftOf(doc)
+		const bank = draft.accounts[0]
+		if (bank) bank.fee = { rate: "1.5", rounding: "" }
+		const result = documentFromDraft(doc, draft)
+		expect(!result.ok && Object.keys(result.problems)).toEqual([fieldKey("feeRounding", "bank")])
+	})
+})

@@ -51,7 +51,8 @@ const typed = (draft: AssumptionsDraft, fund = "15") => {
 	draft.inflation = "3"
 	const [bank, other] = draft.accounts
 	if (bank) Object.assign(bank, { rate: "1.5", volatility: "1" })
-	if (other) Object.assign(other, { rate: "6", volatility: fund })
+	if (other)
+		Object.assign(other, { rate: "6", volatility: fund, fee: { rate: "1.5", rounding: "floor" } })
 }
 
 function chanceOf(answer: EditAnswer): ProjectionChance {
@@ -82,6 +83,7 @@ describe("the Assumptions page through traj", () => {
 			const answer = await save((draft) => typed(draft))
 			const stored = storedPlan().document
 			expect(stored.economy).toEqual({ inflation: 300 })
+			expect(stored.accounts.find((a) => a.id === fund)?.fee).toMatchObject({ rounding: "floor" })
 			expect(
 				stored.accounts.filter((a) => a.kind === "asset").map((a) => [a.id, a.rate, a.volatility]),
 			).toEqual([

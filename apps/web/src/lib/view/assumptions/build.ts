@@ -1,5 +1,6 @@
 import type { ScenarioAccount, ScenarioDocument } from "../../contract"
 import { parseBps } from "../../format/bps"
+import { feeFromDraft } from "../plan-items/account-income-save"
 import { withoutKeys } from "../plan-items/form"
 import type { Problems } from "../plan-items/problems"
 import { type AccountText, type AssumptionsDraft, fieldKey } from "./draft"
@@ -18,7 +19,19 @@ function bpsOf(text: string, canBeEmpty: boolean): number | null | "problem" {
 	return bps === null ? "problem" : bps
 }
 
-/** An asset Account as the page states it: its return, and its volatility when it has the field and the text is not empty. */
+/** The fee a row states, or its problems at the row's own fee fields (the Account form's rules, `feeFromDraft`). */
+function feeWith(account: ScenarioAccount, text: AccountText, problems: Record<string, string>) {
+	const fee = feeFromDraft(text.fee)
+	for (const [field, message] of Object.entries(fee.problems)) {
+		problems[fieldKey(field === "feeRate" ? "feeRate" : "feeRounding", account.id)] = message
+	}
+	return fee.fee === null ? {} : { fee: fee.fee }
+}
+
+/**
+ * An asset Account as the page states it: its return, and for a liquid asset its volatility and fee when their text is not
+ * empty. An illiquid asset keeps what it holds besides its return.
+ */
 function accountWith(
 	account: ScenarioAccount,
 	text: AccountText | undefined,
@@ -27,17 +40,17 @@ function accountWith(
 	if (text === undefined) return account
 	const rate = bpsOf(text.rate, false)
 	if (rate === "problem" || rate === null) problems[fieldKey("rate", account.id)] = PERCENT
-	if (account.liquid === false)
-		return rate === "problem" || rate === null ? account : { ...account, rate }
+	const stated = typeof rate === "number" ? rate : account.rate
+	if (account.liquid === false) return { ...account, rate: stated }
 	const swing = bpsOf(text.volatility, true)
 	if (swing === "problem") problems[fieldKey("volatility", account.id)] = PERCENT
-	const kept = withoutKeys(account, ["rate", "volatility"])
 	return {
-		...kept,
+		...withoutKeys(account, ["rate", "volatility", "fee"]),
 		id: account.id,
 		kind: account.kind,
-		rate: typeof rate === "number" ? rate : account.rate,
+		rate: stated,
 		...(typeof swing === "number" ? { volatility: swing } : {}),
+		...feeWith(account, text, problems),
 	}
 }
 
