@@ -27,6 +27,7 @@ describe("the CI split of the web check", () => {
 		expect(web.scripts["check"]?.split(" && ")).toEqual([
 			"bun run lint",
 			"bun run typecheck",
+			"bun scripts/demo-unless-turbo.ts",
 			"bun run test",
 			"bun ../../tooling/scripts/build-unless-turbo.ts",
 		])
@@ -54,6 +55,15 @@ describe("the CI split of the web check", () => {
 	it("keeps the scripts tests behind a build of the command line they spawn", () => {
 		const tasks = webTurbo.tasks
 		expect(tasks["test:scripts"]?.dependsOn).toContain("@trajectonomics/cli#build")
+	})
+
+	it("generates the Demo snapshot before every task CI runs that reads it", () => {
+		// The check script's demo step does nothing under turbo (scripts/demo-unless-turbo.ts), so the
+		// CI jobs rely on these turbo edges to have the generated snapshot (web ADR on the Demo at build).
+		const tasks = webTurbo.tasks
+		for (const task of ["build", "test:src", "test:scripts"]) {
+			expect(tasks[task]?.dependsOn).toContain("demo")
+		}
 	})
 
 	it("keeps the required check named Check, waiting for every other job and reading `needs`", () => {
