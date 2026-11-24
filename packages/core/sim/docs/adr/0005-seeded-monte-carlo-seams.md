@@ -90,9 +90,13 @@ Now a row's growth is linear in `r`, whatever changes inside it:
   so it earns nothing more until the next row. A row's start (a row boundary) makes `earning` the whole balance again.
 - **A change moves `earning` by its own size.** `mutate` sets `earning' = earning + delta`: a deposit, a
   withdrawal, a payout (ADR-0027) and a fee (ADR-0028) all go through it, so a withdrawal gives up the
-  `r·h₂/D` it would have earned. A withdrawal larger than `earning` takes the rest from what the row has earned,
-  and `earning` goes negative. The growth never takes a balance below zero, so a withdrawal of the whole balance
-  mid-row leaves exactly 0 (the row's remaining growth of the negative `earning` is floored there).
+  `r·h₂/D` it would have earned. `earning` is never negative, with two edges:
+  - A withdrawal larger than `earning` took the rest from growth the row had already earned, so `earning` stops
+    at 0 and what is left of the balance earns nothing more in the row.
+  - When the Account was worth nothing before the change (its value was floored at 0), or the change leaves it
+    at 0, `earning` restarts from the new balance, so a later deposit takes its own `1 + r·h₂/D` and is
+    never charged, or credited, the growth a drain gave up. Withdrawing the whole balance mid-row leaves exactly
+    0, and `earning` is 0 too.
 - **A read mid-row is consistent with the settlement.** `valuation(state, date)` is `balance + r·earning·held/D`,
   with `held` the counted days from `asOf` to `date` inside the row, rounded once, half-up. The Derived `account`
   reads, Milestone metrics, payouts, fees, the estate and the Levy returns tally (ADR-0020) all read that value, and
@@ -101,8 +105,8 @@ Now a row's growth is linear in `r`, whatever changes inside it:
 - **Rounding.** One half-up rounding per read, as before. With no change in a row, the number is the value the
   first version gave.
 
-`src/engine/returns.test.ts` pins the hand cases (110,000 exact, the deposit, the withdrawal, the whole
-balance), `src/golden/oracle-returns-changes.ts` is the oracle (lot by lot, exact rationals) and
+`src/engine/returns.test.ts` and `src/engine/returns-drain.test.ts` pin the hand cases (110,000 exact, the
+deposit, the withdrawal, the whole balance, a deposit after a drain, a remainder after a near-drain), `src/golden/oracle-returns-changes.ts` is the oracle (lot by lot, exact rationals) and
 `src/market/neutral-growth.test.ts` measures E[year] for the 7% / 15% fund at 256 buckets: 700.02 bps with no change,
 one change mid-month, or four weekly changes.
 

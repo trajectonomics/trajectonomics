@@ -25,7 +25,7 @@ export interface GrownValue {
 	readonly asOf: DateString
 	readonly date: DateString
 	readonly amount: bigint
-	/** An Account on a Return series: the part of `amount` still to earn in the row `date` falls in. */
+	/** The part of `amount` still to earn in the row `date` falls in; only an Account on a Return series reads it. */
 	readonly earning: bigint
 }
 

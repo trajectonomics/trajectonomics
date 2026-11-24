@@ -1,6 +1,6 @@
 import type { DateString } from "../types"
 import { oracleCountedDays } from "./oracle-date"
-import type { OracleRow, OracleSeries } from "./oracle-returns"
+import type { OracleSeries } from "./oracle-returns"
 
 /** An amount added (or, negative, taken) on a date. */
 export interface OracleChange {
@@ -13,6 +13,17 @@ interface Lot {
 	readonly from: DateString
 }
 
+/** One row's money: what it has earned and keeps (`fixed`) and the lots still earning, all over `whole`. */
+interface Pool {
+	readonly fixed: bigint
+	readonly lots: readonly Lot[]
+}
+
+interface Scale {
+	readonly whole: bigint
+	readonly bps: bigint
+}
+
 function later(a: DateString, b: DateString): DateString {
 	return a > b ? a : b
 }
@@ -21,21 +32,29 @@ function earlier(a: DateString, b: DateString): DateString {
 	return a < b ? a : b
 }
 
-/** The lots inside one row: the carried balance, then each change that lands in `[row.from, end)`. */
-function lotsOf(
-	carried: bigint,
-	start: DateString,
-	row: OracleRow,
-	end: DateString,
-	changes: readonly OracleChange[],
-): Lot[] {
-	const lots: Lot[] = [{ amount: carried, from: later(start, row.from) }]
-	for (const change of changes) {
-		if (change.date > start && change.date >= row.from && change.date < end) {
-			lots.push({ amount: change.delta, from: change.date })
-		}
+/** The pool's value on `date`, times `whole`, never below zero: each lot is worth `a·(1 + r·held/D)`. */
+function worth(pool: Pool, date: DateString, scale: Scale): bigint {
+	let sum = pool.fixed
+	for (const lot of pool.lots) {
+		sum += lot.amount * (scale.whole + scale.bps * BigInt(oracleCountedDays(lot.from, date)))
 	}
-	return lots
+	return sum < 0n ? 0n : sum
+}
+
+/**
+ * A change takes its own lot. Where the pool was worth nothing, it starts again from the change; where the
+ * change empties it, nothing is left to earn; where it takes more than the lots hold, the excess came out of
+ * what the row had earned, so the rest is kept and earns nothing.
+ */
+function changed(pool: Pool, change: OracleChange, scale: Scale): Pool {
+	const value = worth(pool, change.date, scale)
+	const next = value + change.delta * scale.whole
+	if (value === 0n || next === 0n) {
+		return { fixed: 0n, lots: [{ amount: next === 0n ? 0n : change.delta, from: change.date }] }
+	}
+	const earning = pool.lots.reduce((sum, lot) => sum + lot.amount, 0n) + change.delta
+	if (earning < 0n) return { fixed: next, lots: [] }
+	return { fixed: pool.fixed, lots: [...pool.lots, { amount: change.delta, from: change.date }] }
 }
 
 /**
@@ -54,13 +73,15 @@ export function oracleChangedValue(
 	for (const row of rows) {
 		const end = earlier(date, row.to)
 		if (end <= row.from || end <= start) continue
-		const whole = BigInt(10000 * row.days)
-		let numerator = 0n
-		for (const lot of lotsOf(carried, start, row, end, changes)) {
-			const held = BigInt(oracleCountedDays(lot.from, end))
-			numerator += lot.amount * (whole + BigInt(row.returnBps) * held)
+		const scale = { whole: BigInt(10000 * row.days), bps: BigInt(row.returnBps) }
+		const from = later(start, row.from)
+		let pool: Pool = { fixed: 0n, lots: [{ amount: carried, from }] }
+		for (const change of changes) {
+			if (change.date > start && change.date >= row.from && change.date < end) {
+				pool = changed(pool, change, scale)
+			}
 		}
-		carried = numerator < 0n ? 0n : (2n * numerator + whole) / (2n * whole)
+		carried = (2n * worth(pool, end, scale) + scale.whole) / (2n * scale.whole)
 	}
 	return carried
 }

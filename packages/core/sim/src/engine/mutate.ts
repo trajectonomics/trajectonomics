@@ -87,11 +87,13 @@ function nominalCommit(
 /**
  * A change inside a Return row (ADR 0005): an amount added or taken takes `r * h2 / D` from its date
  * to the row's end, so it moves the part still to earn by its own size; what the row already earned
- * stays out. The whole part moves at a row's start. The valuation clamps at zero, so a withdrawal of
- * the whole balance leaves nothing to grow.
+ * stays out. The whole part moves at a row's start. Where nothing is left (the Account was worth
+ * nothing, or the change empties it) the part restarts from the new balance, and a withdrawal larger
+ * than the part took the rest from what the row had earned, so the part stops at zero.
  */
-function moveEarning(state: AccountState, date: DateString, delta: bigint): void {
-	state.earning = earningAt(state, date) + delta
+function moveEarning(state: AccountState, date: DateString, committed: bigint, next: bigint): void {
+	const moved = earningAt(state, date) + next - committed
+	state.earning = committed === 0n || next === 0n ? next : moved < 0n ? 0n : moved
 	state.grown = undefined
 }
 
@@ -115,7 +117,7 @@ export function mutate(
 	if (next < 0n) throw negative(state.rule.id, date)
 	if (!isSafeInteger(next)) return overflow(date, state.rule.id)
 	bookTallies(state, levies, date, delta, committed, distribution)
-	if (state.series !== undefined) moveEarning(state, date, delta)
+	if (state.series !== undefined) moveEarning(state, date, committed, next)
 	state.balance = next
 	state.asOf = date
 	if (levies !== undefined) rebaseReturns(state, date)
