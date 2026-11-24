@@ -1,10 +1,11 @@
 // POST /what-if: the guards it shares with POST /edit (each refusal has its own test here), the closed body,
 // one at a time, and a what-if run against the real traj: its reads carry the Overrides and nothing is written,
 // and the Edits that keep a what-if are checked against the ledger.
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { EDIT_TOKEN_HEADER } from "../src/lib/edit/guard"
 import { disposeEditor, SLOW_MS, setupEditor } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, PORT, TOKEN } from "./edit-request.test-support"
+import { settle } from "./loans-running.test-support"
 import { createEditor } from "./serve-edit"
 
 /** A what-if that switches off `car`, the demo ledger's Flow that nothing else reads. */
@@ -111,6 +112,7 @@ describe("POST /what-if body refusals: the closed shape, refused before anything
 	}
 })
 
+afterEach(settle, SLOW_MS)
 afterAll(async () => {
 	await disposeEditor()
 })

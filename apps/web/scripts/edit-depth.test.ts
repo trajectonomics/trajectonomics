@@ -1,7 +1,8 @@
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { MAX_BODY_DEPTH } from "../src/lib/edit/depth"
 import { disposeEditor, SLOW_MS, setupEditor } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
+import { settle } from "./loans-running.test-support"
 
 describe("POST /edit refuses a body that nests too deep", () => {
 	// The Edit is valid in every field but one Set's value, which nests: only the depth cap refuses it, so a
@@ -38,4 +39,5 @@ describe("POST /edit refuses a body that nests too deep", () => {
 	}
 })
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)

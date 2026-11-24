@@ -1,6 +1,6 @@
 // A save over a plan that changed since the page read it (cli ADR 0055), against the real traj: the
 // refusal writes nothing, and a read again makes the same Edit succeed.
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import {
 	BINARY,
 	disposeEditor,
@@ -14,6 +14,7 @@ import {
 	withAmount,
 } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
+import { settle } from "./loans-running.test-support"
 
 /** `traj scenario tax base --none` in the scratch ledger, as someone at a terminal would run it. */
 function removeLevyInTerminal(): void {
@@ -127,4 +128,5 @@ describe("an Edit over a plan that changed since the page read it", () => {
 	)
 })
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)

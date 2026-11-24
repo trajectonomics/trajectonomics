@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { existsSync } from "node:fs"
 import { agesOf } from "./edit-ages.test-support"
 import {
@@ -14,6 +14,7 @@ import {
 	shownOf,
 } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
+import { settle } from "./loans-running.test-support"
 
 describe("an Edit against the real traj", () => {
 	test("the workspace traj binary is built", () => {
@@ -40,20 +41,6 @@ describe("an Edit against the real traj", () => {
 			expect(answer.ok).toBe(false)
 			if (!answer.ok) expect(answer.error.code).toBe("not_found")
 			expect((await setupEditor()).body).toContain('"scenarios":["base","e2e-copy"]')
-		},
-		SLOW_MS,
-	)
-
-	test(
-		"a second Edit that arrives while one runs is refused with 409",
-		async () => {
-			const editing = await setupEditor()
-			const first = editing.edit(editRequest({}, copy("e2e-first")), 4321)
-			const second = editing.edit(editRequest({}, copy("e2e-second")), 4321)
-			const [one, two] = await Promise.all([first, second])
-			expect(one.status).toBe(200)
-			expect(two.status).toBe(409)
-			expect(((await two.json()) as { error: { code: string } }).error.code).toBe("edit_running")
 		},
 		SLOW_MS,
 	)
@@ -179,6 +166,21 @@ describe("an Edit against the real traj", () => {
 		},
 		SLOW_MS,
 	)
+
+	test(
+		"a second Edit that arrives while one runs is refused with 409",
+		async () => {
+			const editing = await setupEditor()
+			const first = editing.edit(editRequest({}, copy("e2e-first")), 4321)
+			const second = editing.edit(editRequest({}, copy("e2e-second")), 4321)
+			const [one, two] = await Promise.all([first, second])
+			expect(one.status).toBe(200)
+			expect(two.status).toBe(409)
+			expect(((await two.json()) as { error: { code: string } }).error.code).toBe("edit_running")
+		},
+		SLOW_MS,
+	)
 })
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)
