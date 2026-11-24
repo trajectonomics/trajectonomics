@@ -64,9 +64,16 @@ Each is present only when the Scenario or the flag asks for it, so a run without
   so every other output keeps its bytes. `resolved` sits on the entry, beside `upTo` or `downTo`, and is **omitted** for a nominal target and
   for an entry with no target: a nominal figure is its own value on every date, so the echo does not repeat it, and `traj schema` says so.
   `first` is the amount the document wrote, because the growth runs in whole years from the start of the Timeline and none has passed on
-  its first day; the figure a reader wants is `horizon`, and the human form states it beside the document's own figure ("down to 20000.00 at the start,
-  grown by inflation: 20600.00 at the horizon", adding the first day's figure only if it ever differs). A target past the safe integers is the engine's `VALUE_OVERFLOW` on the
-  horizon date, worded by the refusal table like any other (exit 3, `projection_refused`).
+  its first day; the figure a reader wants is `horizon`, so the human form always states it beside the document's own figure ("down to 20000.00 at the start,
+  grown by inflation: 20600.00 at the horizon").
+- **A target the engine cannot state does not fail the run.** With the option, a figure past the safe integers is `VALUE_OVERFLOW` on the horizon
+  date, but sim ADR 0030 says such a target can still be a valid floor or cap, and without the option the same run succeeds. A run must not
+  fail for a figure it only reports, so when the engine refuses with `VALUE_OVERFLOW` that names no Account and falls on the horizon date,
+  and the engine's own `routedTargetAt` finds a grown target that it cannot state there (it throws a `RangeError`, so the CLI works out
+  nothing), the run goes again without the option. The echo then carries no `resolved` on any entry, and one note per such target says which:
+  "What the target at cashflow.surplus[0].upTo is worth at the horizon, 2027-01-01, cannot be stated: grown by inflation, it passes the
+  largest amount the engine holds. The plan still runs with it." (`projection run` and `projection path`; `fi` and `chance` never ask.) An overflow with no such target is the engine's
+  refusal as before, worded by the refusal table (exit 3, `projection_refused`).
 - **The web contract** decodes each field, with no page change: `transfers` on the annual row, `entry` on a cash-flow line, the
   `transfers` table, `transferred` on a loan month, `routing` on the run, and the `transfer` Flow kind with `realise` and a typed
   `cashflow` on the document. A CLI-written golden (`run-routing.output`) is decoded by the contract's test.

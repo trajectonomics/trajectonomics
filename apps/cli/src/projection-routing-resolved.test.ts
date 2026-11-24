@@ -1,10 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import type { Scenario } from "@trajectonomics/core/sim"
-import { OVERFLOW_HINT, overflowSentence } from "./projection/overflow"
-import { projection } from "./projection/testing"
+import { fi, projection } from "./projection/testing"
 import { ROUTING_FLAGS, ROUTING_PLAN, routingHome } from "./projection-routing-plan"
 import { runBody } from "./projection-run-support"
-import { errorOf } from "./scenario-test-support"
 import { capture } from "./test-support"
 
 /*
@@ -96,21 +94,37 @@ describe("a grown target past the largest amount", () => {
 		],
 	})
 
-	it("is the engine's VALUE_OVERFLOW on the horizon date, in the refusal table's own words", async () => {
+	it("still runs: the echo states no `resolved` and one note names the target it could not state", async () => {
 		const res = await projection(await routingHome(OVERFLOWING), ["run", ...until("2027-01-01")])
-		expect(res.code).toBe(3)
-		const error = errorOf(res)
-		expect(error.code).toBe("projection_refused")
-		expect(error.message).toBe(overflowSentence({ date: "2027-01-01" }))
-		expect(error.hint).toBe(OVERFLOW_HINT)
-		expect(error.details).toMatchObject([{ code: "VALUE_OVERFLOW", date: "2027-01-01" }])
+		expect(res.err).toBe("")
+		expect(res.code).toBe(0)
+		const body = runBody(res)
+		expect(body.routing?.surplus[0]?.upTo).toEqual({
+			amount: "90000000000000.00",
+			growth: "inflation",
+		})
+		for (const entry of [...(body.routing?.surplus ?? []), ...(body.routing?.withdraw ?? [])]) {
+			expect("resolved" in entry).toBe(false)
+		}
+		expect(body.notes.filter((note) => note.includes("cannot be stated"))).toEqual([
+			"What the target at cashflow.surplus[0].upTo is worth at the horizon, 2027-01-01, cannot be stated: grown by inflation, it passes the largest amount the engine holds. The plan still runs with it.",
+		])
 	})
 
-	it("does not refuse a run that never prints the routing: the same plan with the target nominal", async () => {
-		const nominal = planWith({
-			surplus: [{ account: "emergency", upTo: 9e15 }, { account: "cash" }],
+	it("names a growth in basis points as the document does", async () => {
+		const bps = planWith({
+			surplus: [
+				{ account: "emergency", upTo: { amount: 9_000_000_000_000_000, growth: { bps: 500 } } },
+				{ account: "cash" },
+			],
 		})
-		const res = await projection(await routingHome(nominal), ["run", ...until("2027-01-01")])
+		const body = runBody(await projection(await routingHome(bps), ["run", ...until("2027-01-01")]))
+		expect(body.notes.join(" ")).toContain("grown by 500 bps a year, it passes")
+	})
+
+	it("is not asked of `fi`, which never states the routing: the same plan runs there too", async () => {
+		const res = await fi(await routingHome(OVERFLOWING), until("2027-01-01"))
+		expect(res.err).toBe("")
 		expect(res.code).toBe(0)
 	})
 })

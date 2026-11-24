@@ -5,7 +5,7 @@ import { type ModelSource, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { optionsOf } from "./liabilities"
 import type { ProjectionPathView } from "./path-view"
-import { routingOption } from "./routing"
+import { routedRun } from "./routing-overflow"
 import { runViewOf } from "./run"
 import type { Wants } from "./run-tables"
 
@@ -30,12 +30,15 @@ export function pathOf(
 	const model = built === undefined && source.kind === "file" ? source.model : built?.model
 	if (model === undefined) return fail("internal", { message: "The path has no Return model." })
 	const { breakdown, liabilities, spending, estate } = wants
-	const result = projectPath(
-		placed.baseline,
-		placed.document,
-		placed.timeline,
-		{ model, ...selection },
-		{ ...optionsOf(breakdown, liabilities, spending, estate), ...routingOption(placed.document) },
+	const options = optionsOf(breakdown, liabilities, spending, estate)
+	const { result, notes: unstated } = routedRun(placed.document, placed.timeline, (routing) =>
+		projectPath(
+			placed.baseline,
+			placed.document,
+			placed.timeline,
+			{ model, ...selection },
+			{ ...options, ...routing },
+		),
 	)
 	if (!result.ok) return chanceRefusal(result.problems, selection.paths)
 	const { projection } = result
@@ -45,6 +48,7 @@ export function pathOf(
 		...view,
 		notes: [
 			...view.notes,
+			...unstated,
 			`This is path ${selection.index} of ${selection.paths} seeded Market paths, over the return model "${model.id}" with seed ${selection.seed}: the one projection chance --outcomes lists as outcomes[${selection.index}]. The figures are nominal.`,
 			...(built?.notes ?? []),
 		],
