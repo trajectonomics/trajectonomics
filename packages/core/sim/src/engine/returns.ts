@@ -4,6 +4,12 @@ import type { AccountId, BasisPoints, DateString } from "../types"
 export interface ReturnRow {
 	readonly from: DateString
 	readonly returnBps: BasisPoints
+	/**
+	 * The counted days the return is stated over, when the row holds only part of them: a row cut
+	 * by the Timeline's start or horizon. The row then takes its share of the return. Absent, the
+	 * row's own counted days.
+	 */
+	readonly span?: number
 }
 
 /** The Return rows for one Account, ascending and contiguous over a Timeline. */
