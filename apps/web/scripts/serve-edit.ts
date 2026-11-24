@@ -1,10 +1,11 @@
 // The write path of the loopback server: the session token, and POST /edit, which runs one Edit through
 // traj, re-reads the Snapshot and answers it ([ADR 0008](../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
 import { z } from "zod"
-import type { Read } from "../src/lib/contract"
+import type { Read, Snapshot } from "../src/lib/contract"
 import { type Edit, writeCommand } from "../src/lib/edit/edit"
 import { followPlan } from "../src/lib/edit/follow"
 import { EDIT_TOKEN_HEADER, refuseEdit, refuseSession } from "../src/lib/edit/guard"
+import { rereadAllowances } from "./run-reread"
 import { runTraj } from "./run-traj"
 import { failure, readEdit, readReread, refused } from "./serve-edit-answer"
 import type { Editor, EditorOptions } from "./serve-editor"
@@ -18,12 +19,20 @@ export type { Editor, EditorOptions }
 export function createEditor(options: EditorOptions): Editor {
 	let params = options.params
 	let body: string | null = null
+	let held: Snapshot | null = null
 	let busy = false
 
-	async function refresh(): Promise<SnapshotRun> {
-		const run = await runSnapshot(options.traj, options.cliVersion, params, options.records)
-		if (run.ok) body = JSON.stringify(run.snapshot)
+	/** Keeps a Snapshot that ran as the served body and as the one a later reread may keep reads of. */
+	function keep(run: SnapshotRun): SnapshotRun {
+		if (run.ok) {
+			body = JSON.stringify(run.snapshot)
+			held = run.snapshot
+		}
 		return run
+	}
+
+	async function refresh(): Promise<SnapshotRun> {
+		return keep(await runSnapshot(options.traj, options.cliVersion, params, options.records))
 	}
 
 	/** Runs one write through traj, dry or real, and keeps its Read. */
@@ -32,9 +41,8 @@ export function createEditor(options: EditorOptions): Editor {
 		return runTraj(options.traj, command.argv, z.unknown(), command.stdin)
 	}
 
-	/** Reads the Snapshot again and answers it, or the CLI's error as data. */
-	async function snapshotAnswer(): Promise<Response> {
-		const run = await refresh()
+	/** Answers a Snapshot run: the Snapshot, or the CLI's error as data. */
+	function answerOf(run: SnapshotRun): Response {
 		if (!run.ok) return failure(200, run.error)
 		return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}}`)
 	}
@@ -49,7 +57,7 @@ export function createEditor(options: EditorOptions): Editor {
 		const real = await write(edit, false)
 		if (!real.ok) return failure(200, real.error)
 		params = { ...params, scenarios: followPlan(params.scenarios, edit) }
-		return snapshotAnswer()
+		return answerOf(await refresh())
 	}
 
 	/** Reads the Snapshot again, with the allowance inputs the body states, and answers it, or the CLI's error as data. */
@@ -59,7 +67,10 @@ export function createEditor(options: EditorOptions): Editor {
 		// The allowance inputs live with the Snapshot's parameters, so a change of them is a read and no write.
 		const { allowances } = read.reread
 		if (allowances !== undefined) params = { ...params, allowances }
-		return snapshotAnswer()
+		// Only the allowance inputs changed: run only the allowance reads, if nothing else moved (run-reread.ts).
+		if (allowances === undefined || held === null) return answerOf(await refresh())
+		const { traj, cliVersion, records } = options
+		return answerOf(keep(await rereadAllowances(traj, cliVersion, params, held, records)))
 	}
 
 	/**

@@ -4,9 +4,11 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
+import { handDocument } from "./allowances-document.test-support"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
+import type { RunContext } from "./run-traj"
 import { createEditor, type Editor } from "./serve-edit"
 
 export const PLAN = "hand"
@@ -53,40 +55,7 @@ export async function setupAllowances(): Promise<Editor> {
 	scratch = await mkdtemp(join(tmpdir(), "traj-web-allowances-"))
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
-	const base = storedPlan("base").document
-	const [bank, fund] = base.accounts
-	if (bank === undefined || fund === undefined) throw new Error("the demo plan has its accounts")
-	const document = {
-		...base,
-		accounts: base.accounts.filter(
-			(account) => account.id !== "condo" && account.id !== "condo-loan",
-		),
-		economy: { inflation: 0 },
-		cashflow: { surplus: [{ account: bank.id }], contribute: [fund.id], withdraw: [bank.id] },
-		flows: [
-			{
-				id: "salary",
-				kind: "income",
-				earned: true,
-				frequency: "monthly",
-				start: AS_OF,
-				end: "2027-12-31",
-				amount: "50000.00",
-				growth: { bps: 0 },
-			},
-			{
-				id: "rmf",
-				kind: "contribution",
-				target: fund.id,
-				frequency: "monthly",
-				start: AS_OF,
-				end: "2027-12-31",
-				amount: "1000.00",
-				growth: { bps: 0 },
-			},
-		],
-	}
-	delete (document as { milestones?: unknown }).milestones
+	const document = handDocument(storedPlan("base").document, AS_OF)
 	traj(["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"], document)
 	traj([
 		"scenario",
@@ -99,16 +68,32 @@ export async function setupAllowances(): Promise<Editor> {
 		"--label",
 		"rmf=allowance.retirement.rmf",
 	])
-	editor = createEditor({
-		traj: { binary: BINARY, env: env() },
+	editor = await editorOver({ binary: BINARY, env: env() })
+	return editor
+}
+
+/** An editor over the scratch ledger that runs traj as the context says, with its first read done. */
+export async function editorOver(traj: RunContext): Promise<Editor> {
+	const next = createEditor({
+		traj,
 		cliVersion: "test",
 		params: { ...PARAMS, asOf: AS_OF, horizon: "2027-12-31", scenarios: [PLAN] },
 		records: [],
 		token: TOKEN,
 	})
-	const first = await editor.refresh()
+	const first = await next.refresh()
 	if (!first.ok) throw new Error(first.error.message)
-	return editor
+	return next
+}
+
+/** The environment the scratch ledger's traj runs in. */
+export function ledgerEnv(): NodeJS.ProcessEnv {
+	return env()
+}
+
+/** `traj <argv>` on the scratch ledger, as someone at a terminal would run it. */
+export function terminal(argv: string[], stdin?: unknown): string {
+	return traj(argv, stdin)
 }
 
 export async function disposeAllowances(): Promise<void> {

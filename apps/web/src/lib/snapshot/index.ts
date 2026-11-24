@@ -14,5 +14,6 @@ export {
 } from "./params"
 export { type PlannedRead, plainRead } from "./planned"
 export { readsOf } from "./reads"
+export { stillCurrent, withAllowances } from "./reread"
 export { planStageOne, type StageOneReads } from "./stage-one"
 export { planStageTwo, type StageTwoPlan } from "./stage-two"

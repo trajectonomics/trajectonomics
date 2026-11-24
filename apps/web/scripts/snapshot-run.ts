@@ -12,7 +12,7 @@ import type { RunContext } from "./run-traj"
 export type SnapshotRun = { ok: true; snapshot: Snapshot } | { ok: false; error: ErrorBody }
 
 /** The first failed read of stage one, whose error stops the run; null when all three hold. */
-function firstStageOneFailure(one: StageOneReads): ErrorBody | null {
+export function firstStageOneFailure(one: StageOneReads): ErrorBody | null {
 	for (const read of [one.scenarios, one.accounts, one.netWorth]) {
 		if (!read.ok) return read.error
 	}
@@ -32,6 +32,17 @@ export async function runSnapshot(
 	const one = await runStageOne(context, params)
 	const failure = firstStageOneFailure(one)
 	if (failure !== null) return { ok: false, error: failure }
+	return runFromStageOne(context, cliVersion, params, one, records)
+}
+
+/** Stage two and the assembly, from a stage one that already ran and held. */
+export async function runFromStageOne(
+	context: RunContext,
+	cliVersion: string,
+	params: PlanParams,
+	one: StageOneReads,
+	records: readonly unknown[],
+): Promise<SnapshotRun> {
 	const plan = planStageTwo(params, one)
 	const two = await runStageTwo(context, plan, records)
 	const snapshot = assembleSnapshot({
