@@ -3,6 +3,7 @@ import { chargingAccountId } from "./fee"
 import { accountReadsOf, changedAccountOf } from "./flow-accounts"
 import { payingAccountId } from "./payout"
 import { isRecord } from "./shape"
+import { withdrawAccountIds } from "./withdraw-entries"
 
 const METRICS = ["metric", "base"] as const
 
@@ -17,7 +18,11 @@ function cashflowAccounts(cashflow: unknown): readonly string[] {
 	const surplus = steps.flatMap((step) =>
 		isRecord(step) && typeof step["account"] === "string" ? [step["account"]] : [],
 	)
-	return [...surplus, ...strings(cashflow["contribute"]), ...strings(cashflow["withdraw"])]
+	return [
+		...surplus,
+		...strings(cashflow["contribute"]),
+		...withdrawAccountIds(cashflow["withdraw"]),
+	]
 }
 
 /**

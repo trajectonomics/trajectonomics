@@ -14,6 +14,7 @@ import type {
 	Scenario,
 	SurplusStep,
 	Timeline,
+	WithdrawEntry,
 } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
 import { project } from "./project"
@@ -26,7 +27,7 @@ export interface Setup {
 	readonly flows?: readonly Flow[]
 	readonly surplus: readonly SurplusStep[]
 	readonly contribute?: readonly AccountId[]
-	readonly withdraw?: readonly AccountId[]
+	readonly withdraw?: readonly WithdrawEntry[]
 	readonly start?: DateString
 	readonly horizon?: DateString
 	readonly resolution?: Resolution

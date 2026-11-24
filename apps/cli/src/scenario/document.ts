@@ -1,7 +1,9 @@
-import { allowedValues, check, type Problem } from "@trajectonomics/core/sim"
+import { check, type Problem } from "@trajectonomics/core/sim"
 import { type AppError, fail } from "../errors"
-import { sentenceFor } from "../projection/refusal-table"
-import { isOwnCode, type OwnCode, ownProblems, ownSentence } from "./own-problems"
+import { detailOf } from "./document-detail"
+import { type OwnProblem, ownProblems } from "./own-problems"
+import { wordsOf } from "./problem-words"
+import { ROUTING_NOT_SHIPPED, type UnshippedProblem, unshippedRouting } from "./routing-unshipped"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
 // a Scenario and a Timeline in one pass and returns `{ code, path }` problems, so the CLI validates
@@ -12,10 +14,14 @@ import { isOwnCode, type OwnCode, ownProblems, ownSentence } from "./own-problem
 export type ScenarioDocument = Record<string, unknown>
 
 /** One reason `sim-core` refuses a document, with the path inside the document. */
-export type ScenarioProblem = {
-	readonly code: Problem["code"] | OwnCode
-	readonly segments: readonly (string | number)[]
-}
+export type ScenarioProblem =
+	| {
+			readonly code: Problem["code"]
+			readonly segments: readonly (string | number)[]
+			readonly said?: undefined
+	  }
+	| UnshippedProblem
+	| (OwnProblem & { readonly said?: undefined })
 
 /** An empty Baseline v1: valid on its own, and it names no Account the Scenario could rely on. */
 const NEUTRAL_BASELINE = { schemaVersion: 1, balances: [] } as const
@@ -67,23 +73,25 @@ function rejectsVersion(version: number): boolean {
  */
 const TIMELINE_CODES: ReadonlySet<string> = new Set(["MISSING_CARRY_IN"])
 
-/** The problems `sim-core` finds in a document alone, in its order, with `scenario.` stripped. */
-export function scenarioProblems(value: unknown): ScenarioProblem[] {
-	const found: ScenarioProblem[] = check(NEUTRAL_BASELINE, value, null)
-		.filter((problem) => problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code))
-		.map((problem) => ({ code: problem.code, segments: problem.path.slice(1) }))
-	return [...found, ...ownProblems(value)]
-}
-
 /**
- * The sentence and hint a refusal states for a problem: the CLI's own for a rule it states itself, the
- * refusal table's for a code of the engine's it words, and none for any other.
+ * The routing keys `sim-core` accepts that this release does not take yet (routing-unshipped.ts),
+ * then the problems it finds in a document alone, in its order, with `scenario.` stripped. The
+ * unshipped keys come first, so a document the engine refuses for one of them is told that, not
+ * told to fix it.
  */
-export function sentenceOfProblem(
-	problem: ScenarioProblem,
-): { message: string; hint?: string } | undefined {
-	if (isOwnCode(problem.code)) return ownSentence(problem.code)
-	return sentenceFor({ code: problem.code, path: ["scenario", ...problem.segments.map(String)] })
+export function scenarioProblems(value: unknown): ScenarioProblem[] {
+	const found: ScenarioProblem[] = unshippedRouting(value).map(({ segments, said }) => ({
+		code: ROUTING_NOT_SHIPPED,
+		segments,
+		said,
+	}))
+	for (const problem of check(NEUTRAL_BASELINE, value, null)) {
+		if (problem.path[0] === "scenario" && !TIMELINE_CODES.has(problem.code)) {
+			found.push({ code: problem.code, segments: problem.path.slice(1) })
+		}
+	}
+	found.push(...ownProblems(value))
+	return found
 }
 
 /** The document path as the CLI prints it: `base` plus segments, a list index as a number. */
@@ -94,36 +102,15 @@ export function documentPath(base: string, segments: readonly (string | number)[
 /** One refusal's envelope fields, built once so the command, the Store and a restore agree. */
 export type Refusal = { path: string; message: string; code: string; hint: string }
 
-/** The rate fields of a document: a rate is written in basis points, never as a fraction. */
-const RATE_SEGMENTS: ReadonlySet<string | number> = new Set(["rate", "bps", "inflation"])
-
-const GROWTH_FORMS = '"inflation", {"bps": <integer>}; {"bps": 0} is a fixed amount'
-
-/**
- * What a reader needs to fix a refusal without trial and error, in the words ADR-0013 gives a
- * closed flag: the accepted version, the allowed values of a closed list (read from `sim-core`,
- * which owns them), the forms a growth takes, or the unit of a rate.
- */
-function detailOf(problem: ScenarioProblem): string | undefined {
-	if (problem.code === "UNSUPPORTED_SCHEMA_VERSION") {
-		const accepted = acceptedScenarioSchemaVersion()
-		return accepted === undefined ? undefined : `the accepted version is ${accepted}`
-	}
-	if (problem.code === "INVALID_GROWTH") return `one of: ${GROWTH_FORMS}`
-	if (problem.code === "NOT_SAFE_INTEGER" && problem.segments.some((s) => RATE_SEGMENTS.has(s))) {
-		return "basis points, a whole number: 2% is 200"
-	}
-	if (isOwnCode(problem.code)) return undefined
-	const allowed = allowedValues(problem.code, problem.segments)
-	return allowed === undefined ? undefined : `one of: ${allowed.join(", ")}`
-}
-
 export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 	const path = documentPath(base, problem.segments)
-	const detail = detailOf(problem)
+	const detail = detailOf(problem, acceptedScenarioSchemaVersion)
 	return {
 		path,
-		message: `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`,
+		message:
+			problem.said === undefined
+				? `${path}: ${problem.code}${detail === undefined ? "" : ` (${detail})`}`
+				: `${path}: ${problem.said.message}`,
 		code: problem.code,
 		hint: SCHEMA_HINT,
 	}
@@ -147,7 +134,7 @@ export function scenarioDocumentError(value: unknown, base = "document"): AppErr
 	const first = problems[0]
 	if (first === undefined) return null
 	const refusal = refusalOf(first, base)
-	const said = sentenceOfProblem(first)
+	const said = wordsOf(first)
 	return fail("invalid_input", {
 		path: refusal.path,
 		message: said?.message ?? refusal.message,

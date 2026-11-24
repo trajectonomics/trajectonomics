@@ -94,7 +94,9 @@ describe("the hand-worked year of the breakdown", () => {
 		expect(pairs(line.prepaid.map((item) => [item.levy, item.amount]))).toEqual(
 			pairs([...oracle.prepaid]),
 		)
-		expect(pairs(line.drawn.map((item) => [item.account, item.amount]))).toEqual(
+		// The oracle keys a take by its entry's position in `withdraw`; this plan lists each Account once.
+		const at = (account: string) => String(handCase.scenario.cashflow.withdraw.indexOf(account))
+		expect(pairs(line.drawn.map((item) => [at(item.account), item.amount]))).toEqual(
 			pairs([...oracle.drawn]),
 		)
 		expect(pairs(line.surplus.map((item) => [item.account, item.amount]))).toEqual(

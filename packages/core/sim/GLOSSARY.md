@@ -230,11 +230,15 @@ One Annual roll-up's report of where its money came from and went, reported as `
 _Avoid_: Sankey, statement, budget
 
 **Cashflow**:
-The routing rules for net money each time flows land: ordered `surplus` steps (account, optional fixed `upTo`), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list.
+The routing rules for net money each time flows land: ordered `surplus` steps (account, optional `upTo`, optional `share` of what is left), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list whose entries are an Account or an Account with a Reserve floor. An `upTo` and a floor are a number, or `{ amount, growth }` grown by whole years from the Timeline start so it keeps its value in today's money (ADR 0030).
 _Avoid_: Income/expense delta
 
+**Reserve floor**:
+The `downTo` of a `withdraw` entry: the entry draws its Account only down to that value, then the draw moves on, so an emergency fund is kept while other Accounts are drawn first. The same Account may appear again later with a lower floor or none. A Shortfall the floors stop is unmet, never taken from below the floor.
+_Avoid_: Emergency fund, buffer, minimum balance
+
 **Shortfall**:
-Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
+Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply above its floor. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
 _Avoid_: Overdraft, deficit
 
 **Runs-out date**:

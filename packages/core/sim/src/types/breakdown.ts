@@ -58,6 +58,14 @@ export interface AccountLine {
 }
 
 /**
+ * One entry of `cashflow.withdraw` that drew money. `entry` is its position in the list and is present only
+ * when the list declares a Reserve floor, where an Account may appear twice (ADR 0030).
+ */
+export interface DrawnLine extends AccountLine {
+	readonly entry?: number
+}
+
+/**
  * One Annual roll-up's cash-flow breakdown, with the same `index`, `from` and `to`. Every total
  * equals its roll-up field, and the identity in `docs/adr/0018` holds exactly in minor units.
  */
@@ -82,7 +90,7 @@ export interface CashflowBreakdown {
 	 */
 	readonly payouts?: readonly PayoutLine[]
 	readonly withdrawals: readonly WithdrawalLine[]
-	readonly drawn: readonly AccountLine[]
+	readonly drawn: readonly DrawnLine[]
 	readonly surplus: readonly AccountLine[]
 	readonly unmet: MinorUnits
 }

@@ -13,6 +13,7 @@ import { allowancesRefusal } from "./allowances-refusal"
 import type { AllowanceRowView, AllowanceYearView } from "./allowances-rows-view"
 import type { Placed } from "./carryin-apply"
 import { moneyOf } from "./money"
+import { withdrawAccount } from "./withdraw-account"
 
 /** What one tax year's scan gave, in the CLI's money. */
 export type YearRows = { year: AllowanceYearView; rows: AllowanceRowView[] }
@@ -59,7 +60,11 @@ export function yearOf(input: YearInput): YearRows | AppError {
 	if (!said.ok)
 		return allowancesRefusal(said.problem, { levy: report.id, period, request: input.request })
 	const rows = said.labels.map((item): AllowanceRowView => {
-		const found = targetOf(placed.document.flows, item.label, placed.document.cashflow.withdraw)
+		const found = targetOf(
+			placed.document.flows,
+			item.label,
+			placed.document.cashflow.withdraw.map(withdrawAccount),
+		)
 		const target = found.target
 		const row = {
 			levy: report.id,

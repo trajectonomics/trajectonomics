@@ -1,13 +1,10 @@
 import type { Emit, Path } from "./codes"
 import { isRecord } from "./shape"
+import { withdrawAccountIds } from "./withdraw-entries"
 
 /** Account ids in `cashflow.withdraw`, or none when the list is unusable. */
 function withdrawIds(cashflow: unknown): ReadonlySet<string> {
-	const list = isRecord(cashflow) ? cashflow["withdraw"] : undefined
-	const ids = new Set<string>()
-	if (!Array.isArray(list)) return ids
-	for (const item of list) if (typeof item === "string") ids.add(item)
-	return ids
+	return new Set(withdrawAccountIds(isRecord(cashflow) ? cashflow["withdraw"] : undefined))
 }
 
 /**

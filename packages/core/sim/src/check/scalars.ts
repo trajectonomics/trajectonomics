@@ -54,3 +54,9 @@ export const growth: Check = (value, path, emit) => {
 	if (!isRecord(value)) return emit("INVALID_GROWTH", path)
 	checkShape(value, path, { bps: req(rate) }, emit)
 }
+
+/** A routing target: a non-negative number, or `{ amount, growth }` that keeps its value over the years (ADR 0030). */
+export const routed: Check = (value, path, emit) => {
+	if (!isRecord(value)) return amount(value, path, emit)
+	checkShape(value, path, { amount: req(amount), growth: req(growth) }, emit)
+}

@@ -1,5 +1,6 @@
 import type { ProjectionRow, RunsOut, Scenario } from "@trajectonomics/core/sim"
 import { moneyOf } from "./money"
+import { withdrawAccount } from "./withdraw-account"
 
 /** An asset Account outside `cashflow.withdraw` and what it held on the day the run ran out. */
 type Unlisted = { id: string; amount: number }
@@ -16,7 +17,7 @@ function unlistedAssets(
 	runsOut: RunsOut,
 	rows: readonly ProjectionRow[],
 ): Unlisted[] {
-	const listed = new Set(document.cashflow.withdraw)
+	const listed = new Set(document.cashflow.withdraw.map(withdrawAccount))
 	const held = new Map(
 		(rows.find((row) => row.date === runsOut.date)?.balances ?? []).map((balance) => [
 			balance.account,

@@ -1,11 +1,7 @@
 import { z } from "zod"
 import { version as cliVersion } from "../../package.json"
-import {
-	acceptedScenarioSchemaVersion,
-	refusalOf,
-	scenarioProblems,
-	sentenceOfProblem,
-} from "./document"
+import { acceptedScenarioSchemaVersion, refusalOf, scenarioProblems } from "./document"
+import { wordsOf } from "./problem-words"
 import {
 	SCENARIO_SHAPE_REQUIRED,
 	scenarioExample,
@@ -28,7 +24,7 @@ export const scenarioDocument: z.ZodType<unknown> = z
 		for (const problem of scenarioProblems(value)) {
 			const refusal = refusalOf(problem, "document")
 			// A code the refusal table words states its sentence and way out, then the schema hint (ADR-0052).
-			const said = sentenceOfProblem(problem)
+			const said = wordsOf(problem)
 			ctx.addIssue({
 				code: "custom",
 				message: said?.message ?? refusal.message,

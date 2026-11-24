@@ -1,5 +1,6 @@
 import type { ErrorCode, ProjectionProblem } from "@trajectonomics/core/sim"
 import { ELSEWHERE, type Elsewhere } from "./refusal-elsewhere"
+import { SAID_ROUTING } from "./refusal-routing"
 import { SAID, type Said } from "./refusal-said"
 
 export type RefusalEntry = Said | Elsewhere
@@ -7,6 +8,7 @@ export type RefusalEntry = Said | Elsewhere
 /** Every engine problem code, once: its sentence, or who answers it instead. */
 export const REFUSALS: Readonly<Partial<Record<ErrorCode, RefusalEntry>>> = {
 	...SAID,
+	...SAID_ROUTING,
 	...ELSEWHERE,
 }
 

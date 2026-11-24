@@ -1,16 +1,20 @@
-import type { AccountId, DateString, Scenario } from "../types"
+import type { DateString, Scenario, WithdrawEntry } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { LevySet } from "./levy-set"
 import { minBigInt } from "./min"
 import { mutate } from "./mutate"
+import { entryAccount, routedAt } from "./routed"
 import type { AccountState, StateMap } from "./state"
 import { addTracked, NO_ROUTING } from "./tracked"
 import { valuation } from "./value"
 
 export interface WithdrawResult {
 	readonly remaining: bigint
-	/** What each Account gave up on the date, by Account id; only the nonzero takes, none unless tracked. */
-	readonly taken: ReadonlyMap<AccountId, bigint>
+	/**
+	 * What each entry of `cashflow.withdraw` gave up on the date, by its position in the list as a string
+	 * (an Account may appear twice, ADR 0030); only the nonzero takes, none unless tracked.
+	 */
+	readonly taken: ReadonlyMap<string, bigint>
 	readonly problem: ProjectionProblem | undefined
 }
 
@@ -29,14 +33,26 @@ interface TakeResult {
 	readonly problem: ProjectionProblem | undefined
 }
 
+/** What an entry may take: the Account's value above its Reserve floor, or all of it when it has none. */
+function drawable(
+	state: AccountState,
+	entry: WithdrawEntry,
+	date: DateString,
+	inflation: number,
+): bigint {
+	const value = valuation(state, date)
+	if (typeof entry === "string") return value
+	return value - routedAt(entry.downTo, state, date, inflation)
+}
+
 function takeFrom(
 	state: AccountState,
+	available: bigint,
 	date: DateString,
 	remaining: bigint,
 	levies: LevySet | undefined,
 ): TakeResult {
-	const value = valuation(state, date)
-	const take = minBigInt(remaining, value)
+	const take = available > 0n ? minBigInt(remaining, available) : 0n
 	if (take === 0n) return { remaining, take: 0n, problem: undefined }
 	const problem = mutate(state, date, -take, levies)
 	return problem === undefined
@@ -53,7 +69,7 @@ export function applyWithdraw(
 	levies: LevySet | undefined,
 	track: boolean,
 ): WithdrawResult {
-	const taken = track ? new Map<AccountId, bigint>() : undefined
+	const taken = track ? new Map<string, bigint>() : undefined
 	const outcome = takeSteps(states, scenario, date, amount, levies, taken)
 	return { remaining: outcome.remaining, taken: taken ?? NO_ROUTING, problem: outcome.problem }
 }
@@ -64,16 +80,19 @@ function takeSteps(
 	date: DateString,
 	amount: bigint,
 	levies: LevySet | undefined,
-	taken: Map<AccountId, bigint> | undefined,
+	taken: Map<string, bigint> | undefined,
 ): { readonly remaining: bigint; readonly problem: ProjectionProblem | undefined } {
 	let remaining = amount
-	for (const account of scenario.cashflow.withdraw) {
+	const { withdraw } = scenario.cashflow
+	for (let position = 0; position < withdraw.length; position++) {
 		if (remaining === 0n) break
-		const state = states.get(account)!
+		const entry = withdraw[position]!
+		const state = states.get(entryAccount(entry))!
 		if (isLocked(state, date)) continue
-		const result = takeFrom(state, date, remaining, levies)
+		const available = drawable(state, entry, date, scenario.economy.inflation)
+		const result = takeFrom(state, available, date, remaining, levies)
 		remaining = result.remaining
-		addTracked(taken, account, result.take)
+		addTracked(taken, String(position), result.take)
 		if (result.problem !== undefined) return { remaining, problem: result.problem }
 	}
 	return { remaining, problem: undefined }
