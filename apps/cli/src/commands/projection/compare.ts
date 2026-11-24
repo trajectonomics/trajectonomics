@@ -15,7 +15,7 @@ import {
 	setFlag,
 } from "../../projection/flags"
 import { withProjection } from "../../projection/leaf"
-import { compareHint } from "../../projection/render"
+import { compareHint } from "../../projection/render-compare"
 import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const compare: Leaf = defineCommand({

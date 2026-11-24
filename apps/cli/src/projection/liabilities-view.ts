@@ -18,6 +18,8 @@ export type LiabilityRow = {
 	opening: string
 	drawn: string
 	paid: string
+	/** What transfers paid the liability down by in the month, apart from `paid`; present only when a transfer Flow targets it (sim ADR 0031). */
+	transferred?: string | undefined
 	interest: string
 	closing: string
 	partial: boolean
@@ -36,8 +38,11 @@ export const liabilityRow: z.ZodType<LiabilityRow> = z.strictObject({
 	opening: moneyField("The amount owed at the start, Accrued interest included"),
 	drawn: moneyField("Planned withdrawals that borrowed into the liability in the month"),
 	paid: moneyField("Debt payments applied in the month, after the cap at the amount owed"),
+	transferred: moneyField(
+		"What transfer Flows paid the liability down by in the month, from the plan's own Accounts: a payment kept apart from paid, so opening + drawn + interest − paid − transferred = closing; present only on a liability a transfer Flow targets",
+	).optional(),
 	interest: moneyField(
-		"The interest of the month: closing less opening, drawn and paid, so the four add up exactly",
+		"The interest of the month: closing less opening, drawn, paid and transferred, so they add up exactly",
 	),
 	closing: moneyField("The amount owed at the end, Accrued interest included"),
 	partial: z

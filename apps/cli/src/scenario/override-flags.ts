@@ -10,7 +10,7 @@ export const setFlag: z.ZodOptional<z.ZodArray<z.ZodString>> = z
 	.array(z.string())
 	.optional()
 	.describe(
-		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB), or decimal strings with --decimal. The one path a plan may lack is the whole estate block, which --set estate=<json> begins.",
+		"Replace one existing dotted document path with a JSON value; amounts are in satang (100 per THB), or decimal strings with --decimal. The paths a plan may lack are the estate block (--set estate=<json> begins it whole), an asset Account's volatility, a surplus step's share and upTo, and a withdraw entry's downTo. Items of cashflow.surplus and cashflow.withdraw are addressed by position from 0, such as cashflow.withdraw.0.downTo.",
 	)
 
 /** `--without`, one list item taken out by its id, repeatable and applied before every `--set`. */

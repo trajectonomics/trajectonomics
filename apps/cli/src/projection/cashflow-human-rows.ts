@@ -70,3 +70,28 @@ export function incomeRows(
 		{ line: "  payouts", amount: payouts },
 	]
 }
+
+/**
+ * What the roll-up's transfers moved between the plan's own Accounts, under its totals: the engine's own
+ * `transfers` figure, then one line per transfer the engine states, with what it could not move. Printed only
+ * when the Scenario declares a transfer Flow, and outside the totals above it, because a transfer is no cash in or
+ * out (cli ADR-0070).
+ */
+export function transferRows(
+	annual: Record<string, unknown>,
+	transfers: readonly Record<string, unknown>[],
+): BlockRow[] {
+	const moved = optionalText(annual["transfers"], "transfers")
+	if (moved === undefined) return []
+	return [
+		{ line: "moved between accounts (not cash)", amount: moved },
+		...transfers.flatMap((line) => {
+			const name = `  ${textOf(line["flow"], "flow")}: ${textOf(line["source"], "source")} to ${textOf(line["target"], "target")}`
+			const unmoved = textOf(line["unmoved"], "unmoved")
+			const rows = [{ line: name, amount: textOf(line["amount"], "amount") }]
+			return /^-?0+(\.0+)?$/.test(unmoved)
+				? rows
+				: [...rows, { line: `  ${textOf(line["flow"], "flow")}: not moved`, amount: unmoved }]
+		}),
+	]
+}

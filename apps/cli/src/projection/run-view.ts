@@ -2,6 +2,7 @@ import { z } from "zod"
 import { carryInField } from "./carryin-view"
 import { type AccountLifetimeView, accountLifetimesField, lifetimeFeesField } from "./lifetime-view"
 import { dateField } from "./money"
+import { type RoutingView, routingField } from "./routing-view"
 import { type ProjectionTable, projectionTable } from "./run-table-view"
 import { type TaxYearView, taxYearsField } from "./tax-view"
 import {
@@ -24,6 +25,8 @@ export type { TaxYearView } from "./tax-view"
 export type ProjectionRunView = Echo & {
 	horizon: string
 	currency: string
+	/** The routing as the document states it; present only for a share, a floor or a target that keeps its value (cli ADR-0070). */
+	routing?: RoutingView | undefined
 	runsOut: RunsOutView | null
 	taxYears: TaxYearView[]
 	/** The plan's fees over the horizon, present only when an Account carries a fee (cli ADR-0067). */
@@ -46,6 +49,7 @@ export const projectionRunFields: {
 	notes: notesField,
 	horizon: dateField("The date the Projection ends at"),
 	currency: z.string().describe("The Scenario's ISO 4217 currency; v1 is THB only."),
+	routing: routingField,
 	runsOut: runsOut
 		.nullable()
 		.describe("The month the Projection ran out of money, or null when it never does."),
