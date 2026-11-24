@@ -519,6 +519,62 @@ if (result.ok) {
 cash=3000000 pvd=750000
 ```
 
+## Account payout
+
+An asset Account's `payout` pays part of its value out as passive income. The Account's `rate` stays its
+total return: what is paid out leaves and the rest compounds, so a fund that grows 8% and pays out 3.5%
+keeps 4.5% (and the interest on it). On the last day of each calendar period, `value x bps / (10000 x
+periods a year)` leaves the Account, rounded as the payout's required `rounding` says, where `value` is
+what a Derived amount would read there (growth accrued to the date, before the date's Flows land). It
+lands as income with `earned: false`, so it is in `income` and Available cashflow and goes on in the FI
+test after work stops. It takes no Cost basis and realises no gain, a locked Account pays out too, and an
+Illiquid asset may not carry one (`PAYOUT_ILLIQUID`). `label` and `prepayments` mean what they mean on an
+income Flow, so a Levy can tally the payout and take its withholding at source; `start`, `end`, `startAt`
+and `endAt` mean what they mean on a Flow. The Annual roll-up reports `payouts` (inside `income`) and
+the cash-flow breakdown a `payouts` list by Account, both only when the Scenario declares a payout. See
+[ADR 0027](docs/adr/0027-account-payout.md).
+
+A fund of 1,000,000,000 that pays 400 bps a year each quarter at no growth pays 10,000,000 on 31 March,
+9,900,000 on 30 June, 9,801,000 on 30 September and 9,702,990 on 31 December, 39,403,990 in all, and the
+fund ends at 960,596,010:
+
+```ts
+import { project } from "@trajectonomics/core/sim"
+
+const result = project(
+	{ schemaVersion: 1, balances: [{ account: "cash", amount: 0 }, { account: "fund", amount: 1_000_000_000 }] },
+	{
+		schemaVersion: 4,
+		currency: "THB",
+		economy: { inflation: 0 },
+		accounts: [
+			{ id: "cash", kind: "asset", rate: 0 },
+			{
+				id: "fund",
+				kind: "asset",
+				rate: 0,
+				payout: { bps: 400, frequency: "quarterly", rounding: "halfUp" },
+			},
+		],
+		flows: [],
+		cashflow: { contribute: [], surplus: [{ account: "cash" }], withdraw: [] },
+	},
+	{ start: "2026-01-01", horizon: "2026-12-31", resolution: "month" },
+)
+
+if (result.ok) {
+	const { income, payouts } = result.projection.annual[0]!
+	const last = result.projection.rows[result.projection.rows.length - 1]!
+	console.log(income, payouts)
+	console.log(last.balances.map((item) => `${item.account}=${item.amount}`).join(" "))
+}
+```
+
+```text
+39403990 39403990
+cash=39403990 fund=960596010
+```
+
 ## Scripts
 
 - `bun run check`: Complete verification suite (`lint`, `typecheck`, `test`, `build`, `parity`, `lint:package`).

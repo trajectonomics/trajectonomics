@@ -1,4 +1,5 @@
 import { declaresEmployer } from "../engine/employer"
+import { declaresPayouts, isPayout } from "../payout/flows"
 import type { MinorUnits, Scenario } from "../types"
 import type {
 	AccountLine,
@@ -13,6 +14,7 @@ import {
 	employerLines,
 	expenseLines,
 	ofKind,
+	payoutLines,
 	withdrawalLines,
 } from "./cashflow-flows"
 import type { PeriodSums } from "./cashflow-sums"
@@ -41,7 +43,9 @@ export function breakdownOf(
 	unmet: bigint,
 ): CashflowBreakdown {
 	const levyIds = (scenario.levies ?? []).map((levy) => levy.id)
-	const incomeIds = ofKind(scenario.flows, "income").map((flow) => flow.id)
+	const incomeIds = ofKind(scenario.flows, "income")
+		.filter((flow) => !isPayout(flow))
+		.map((flow) => flow.id)
 	const levyLine = (levy: string, amount: MinorUnits): LevyLine => ({ levy, amount })
 	const flowLine = (flow: string, amount: MinorUnits): FlowLine => ({ flow, amount })
 	const accountLine = (account: string, amount: MinorUnits): AccountLine => ({ account, amount })
@@ -58,6 +62,7 @@ export function breakdownOf(
 		),
 		contributions: contributionLines(scenario.flows, sums),
 		...(declaresEmployer(scenario) ? { employer: employerLines(scenario.flows, sums) } : {}),
+		...(declaresPayouts(scenario) ? { payouts: payoutLines(scenario.flows, sums) } : {}),
 		withdrawals: withdrawalLines(scenario.flows, sums.planned),
 		drawn: lines(scenario.cashflow.withdraw, sums.drawn, accountLine),
 		surplus: lines(

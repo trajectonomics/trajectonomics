@@ -181,6 +181,10 @@ A Flow that moves money from cashflow into an Account. Not an expense: net worth
 A Contribution with `funding: "employer"` into a liquid asset Account: money the employer pays into a provident fund. It lands in full on its Landed date from outside the household's cash, so it is not income, not an expense, never part of Available cashflow, never capped or unfunded, never drawn from the `withdraw` list and never a Shortfall, and its target need not be in `cashflow.contribute`. It adds to the Cost basis, may be locked, and is tallied only under the `label` its author gives. In the FI test it stops with Earned income, fixed or derived. The Annual roll-up reports `employerContributions` and the Cash-flow breakdown an `employer` list, both outside `income` and `contributions`. Refused into a liability (`EMPLOYER_INTO_LIABILITY`) and into an Illiquid asset (`EMPLOYER_INTO_ILLIQUID`).
 _Avoid_: match, employer match, free money
 
+**Payout**:
+A share of an asset Account's value paid out of it as passive income, stated as `payout` on the Account (`bps` a year, a `frequency` of monthly, quarterly, semiannual or annual, a required `rounding`, and the window, `label` and `prepayments` of a Flow). The Account's `rate` stays its total return: the payout leaves and the rest compounds. On the last day of each calendar period (a Due date, shifted to a Landed date by the Calendar) `value x bps / (10000 x periods a year)` leaves the Account, where `value` is the valuation read before the date's Flows land. It lands as income with `earned: false`: in `income` and Available cashflow, and it goes on in the FI test. It takes no Cost basis and realises no gain, a locked Account pays out too, and it is refused on an Illiquid asset (`PAYOUT_ILLIQUID`), a liability (`LIABILITY_MISUSE`) and beside `returnLabel` (`CONFLICTING_LABELS`). The Annual roll-up reports `payouts` (inside `income`) and the Cash-flow breakdown a `payouts` list by Account. A payout of 0 bps is no payout.
+_Avoid_: dividend, distribution, yield
+
 **Available cashflow**:
 The income on one Occurrence minus its expenses, debt payments and obligations actually made, floored at zero. Cash from a Planned withdrawal, a sale's proceeds included, is left out: it pays what it was raised for and the rest lands in surplus, so borrowing or selling never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
 _Avoid_: Free cashflow, disposable income
@@ -210,7 +214,7 @@ Income from work, marked `earned: true`. With an Employer contribution, it is al
 _Avoid_: Active income, salary income
 
 **Passive income**:
-Income marked `earned: false`. It continues when earned income stops.
+Income marked `earned: false`, such as rent or an Account's Payout. It continues when earned income stops.
 _Avoid_: Investment income, unearned income
 
 **Expense category**:
@@ -218,7 +222,7 @@ An optional free-text label on an expense Flow, 1 to 64 characters with no contr
 _Avoid_: tag, label, Tally label
 
 **Cash-flow breakdown**:
-One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in equals money out exactly, and every total equals its roll-up field.
+One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, a Payout list by Account, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in (income and payouts) equals money out exactly, and every total equals its roll-up field, `income` with the payouts added.
 _Avoid_: Sankey, statement, budget
 
 **Cashflow**:

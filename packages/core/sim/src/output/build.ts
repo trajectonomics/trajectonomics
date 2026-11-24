@@ -1,6 +1,7 @@
 import { declaresEmployer } from "../engine/employer"
 import type { EngineRun } from "../engine/result"
 import { declaresWithdrawals } from "../loan/resolve"
+import { declaresPayouts } from "../payout/flows"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { Projection, ProjectionProblem } from "../types/projection"
 import { buildCashflow } from "./cashflow"
@@ -39,6 +40,7 @@ export function buildProjection(
 		openingNetWorth(baseline, rules),
 		declaresWithdrawals(scenario),
 		declaresEmployer(scenario),
+		declaresPayouts(scenario),
 	)
 	if (rollups.problem !== undefined) return { problem: rollups.problem }
 	const unfunded = buildUnfunded(run.totals, end)

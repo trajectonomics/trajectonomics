@@ -90,6 +90,29 @@ describe("a next-12-months expense Milestone beside a Derived amount that reads 
 		})
 	})
 
+	it("accepts an Account whose payout is 0 bps, which is no payout (ADR 0027), and refuses one that pays", () => {
+		const withPayout = (bps: number) =>
+			check(
+				baseline,
+				{
+					schemaVersion: 4,
+					currency: "THB",
+					economy: { inflation: 0 },
+					accounts: accounts.map((account) =>
+						account.id === "home"
+							? { ...account, payout: { bps, frequency: "annual", rounding: "floor" } }
+							: account,
+					),
+					flows: [living, upkeepOf("home")],
+					milestones: [metric],
+					cashflow,
+				},
+				timeline,
+			).map((item) => item.code)
+		expect(withPayout(0)).toEqual([])
+		expect(withPayout(100)).toEqual(["NEXT_12_MONTHS_READS_ACCOUNT"])
+	})
+
 	describe("is refused when the Account can change on a future date", () => {
 		const refused = ["NEXT_12_MONTHS_READS_ACCOUNT"]
 		const buy = { id: "home-purchase", kind: "contribution", target: "home", ...once }

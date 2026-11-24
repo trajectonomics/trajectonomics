@@ -31,6 +31,20 @@ function commit(
 	if (levies !== undefined) rebaseReturns(state, date)
 }
 
+/** Books the growth since the last commit, and the gain a withdrawal realises unless it is a distribution. */
+function bookTallies(
+	state: AccountState,
+	levies: LevySet | undefined,
+	date: DateString,
+	delta: bigint,
+	valueBefore: bigint,
+	distribution: boolean,
+): void {
+	if (levies === undefined) return
+	for (const tracker of levies.trackers) commitReturns(state, tracker, date)
+	if (!distribution) commitGains(state, levies, date, delta, valueBefore)
+}
+
 /** Nominal commit: completed periods capitalise first, then the delta applies to capitalised. */
 function nominalCommit(
 	state: AccountState,
@@ -38,12 +52,9 @@ function nominalCommit(
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
+	distribution: boolean,
 ): ProjectionProblem | undefined {
-	const valueBefore = valuation(state, date)
-	if (levies !== undefined) {
-		for (const tracker of levies.trackers) commitReturns(state, tracker, date)
-		commitGains(state, levies, date, delta, valueBefore)
-	}
+	bookTallies(state, levies, date, delta, valuation(state, date), distribution)
 	const settled = capitaliseThrough(
 		{ capitalised: state.balance, capitalisedDays: state.capitalisedDays, asOf: state.asOf },
 		rule,
@@ -68,25 +79,24 @@ function nominalCommit(
 
 /**
  * Commits accrued growth, then applies `delta`; returns a problem on overflow. The commit books
- * the tallies the change produces (returns attribution, later realised gains) before moving.
+ * the tallies the change produces (returns attribution, later realised gains) before moving. A
+ * `distribution` (a payout, ADR 0027) is no sale: it takes no Cost basis and realises no gain.
  */
 export function mutate(
 	state: AccountState,
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
+	distribution = false,
 ): ProjectionProblem | undefined {
 	const rule = activeNominalRule(state)
-	if (rule !== undefined) return nominalCommit(state, rule, date, delta, levies)
+	if (rule !== undefined) return nominalCommit(state, rule, date, delta, levies, distribution)
 	const committed = valuation(state, date)
 	if (!isSafeInteger(committed)) return overflow(date, state.rule.id)
 	const next = committed + delta
 	if (next < 0n) throw negative(state.rule.id, date)
 	if (!isSafeInteger(next)) return overflow(date, state.rule.id)
-	if (levies !== undefined) {
-		for (const tracker of levies.trackers) commitReturns(state, tracker, date)
-		commitGains(state, levies, date, delta, committed)
-	}
+	bookTallies(state, levies, date, delta, committed, distribution)
 	state.balance = next
 	state.asOf = date
 	if (levies !== undefined) rebaseReturns(state, date)

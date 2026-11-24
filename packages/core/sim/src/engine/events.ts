@@ -1,10 +1,10 @@
 import type { ResolvedCalendar } from "../calendar/business"
-import { occurrences } from "../calendar/occurrence"
 import { resolveLoan } from "../loan/resolve"
 import { movedOnceStarts } from "../milestone/spec"
 import type { DateString, Flow, Scenario, Timeline } from "../types"
 import { isFixed } from "../types"
 import { fixedAmountAt } from "./amount"
+import { flowOccurrences } from "./flow-occurrences"
 import { compareIds } from "./order"
 
 export interface DatedEvent {
@@ -49,14 +49,7 @@ function eventsOf(
 	for (const declared of scenario.flows) {
 		const flow = resolveLoan(declared, scenario.accounts)
 		const shifted = moved.get(flow.id)
-		const found = occurrences(
-			shifted ?? flow.start,
-			flow.frequency,
-			flow.end,
-			timeline.start,
-			timeline.horizon,
-			calendar,
-		)
+		const found = flowOccurrences(flow, shifted, timeline, calendar)
 		for (const occurrence of found) {
 			const event = {
 				date: occurrence.date,

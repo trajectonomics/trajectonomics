@@ -19,13 +19,15 @@ function flowPairs(flows: readonly unknown[], pairs: Set<string>): void {
 	}
 }
 
-/** Pairs the Scenario's Accounts supply: an asset's `returnLabel` is returns, `gainLabel` gains. */
+/** Pairs the Scenario's Accounts supply: `returnLabel` is returns, `gainLabel` gains, a payout's `label` gross. */
 function accountPairs(accounts: readonly unknown[], pairs: Set<string>): void {
 	for (let index = 0; index < accounts.length; index++) {
 		const account: unknown = accounts[index]
 		if (!isRecord(account) || account["kind"] !== "asset") continue
 		addLabel(pairs, "returns", account["returnLabel"])
 		addLabel(pairs, "gains", account["gainLabel"])
+		const payout = account["payout"]
+		if (isRecord(payout)) addLabel(pairs, "gross", payout["label"])
 	}
 }
 

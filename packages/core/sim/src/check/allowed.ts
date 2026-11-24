@@ -65,6 +65,8 @@ function opsAt(path: Path): readonly string[] {
  */
 export function allowedValues(code: ErrorCode, path: Path): readonly string[] | undefined {
 	if (code === "INVALID_KIND") return kindsAt(path)
+	// A payout's `frequency` is a calendar period, not a Flow's recurrence (ADR 0027).
+	if (code === "INVALID_FREQUENCY" && path.includes("payout")) return COMPOUNDING_PERIODS
 	if (code === "INVALID_BASIS" && path.includes("estate"))
 		return path.includes("gifts") ? ["net"] : ["gross"]
 	return code === "INVALID_OP" ? opsAt(path) : BY_CODE[code]

@@ -1,8 +1,10 @@
+import { isPayout } from "../payout/flows"
 import type { Flow } from "../types"
 import type {
 	ContributionLine,
 	EmployerLine,
 	ExpenseLine,
+	PayoutLine,
 	WithdrawalLine,
 } from "../types/breakdown"
 import type { PeriodSums } from "./cashflow-sums"
@@ -78,5 +80,15 @@ export function withdrawalLines(
 	return ofKind(flows, "withdrawal").flatMap((flow): WithdrawalLine[] => {
 		const amount = planned.get(flow.id) ?? 0n
 		return amount === 0n ? [] : [{ flow: flow.id, account: flow.source, amount: Number(amount) }]
+	})
+}
+
+/** Each paying Account's payouts landed over the period, in Scenario order (ADR 0027). */
+export function payoutLines(flows: readonly Flow[], sums: PeriodSums): PayoutLine[] {
+	return flows.flatMap((flow): PayoutLine[] => {
+		const amount = isPayout(flow) ? (sums.planned.get(flow.id) ?? 0n) : 0n
+		return !isPayout(flow) || amount === 0n
+			? []
+			: [{ account: flow.payoutOf.account, amount: Number(amount) }]
 	})
 }
