@@ -252,6 +252,10 @@ _Avoid_: Category, tag, tax code
 One period of a Tax Levy and its Settlement: what it owed, what was prepaid, and what settles. A result reports one row per Tax year, a year that began before the As-of included.
 _Avoid_: Tax period, fiscal year, assessment year
 
+**Bracket walk**:
+What a Tax year of an emitted Thai Levy states beside its figures (ADR-0036): the `walk` from assessable to taxable income, the `brackets` with the income and tax inside each, `marginalRateBps`, `toNextBracket` and `effectiveRateBps`, all from `thBracketWalk` and `thEffectiveRateBps` in the tax core. Its marginal rate is the rate of the bracket the last satang of taxable income falls in, so an income exactly on a bracket's upper edge is in the bracket the edge closes, with `toNextBracket` of `0.00`. This differs from the tax core's Tax Result, whose marginal rate is the rate of the next unit and so is the next bracket's rate on an edge. The effective rate is on assessable income.
+_Avoid_: Tax bracket table, marginal tax, tax slab
+
 **Prepayment**:
 Money already taken at source against a Tax year, such as payroll withholding. It reduces what the year owes at its Settlement but is not an expense.
 _Avoid_: Withholding tax, advance payment
