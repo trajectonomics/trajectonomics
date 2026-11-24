@@ -41,7 +41,10 @@ describe("the CI split of the web check", () => {
 	it("runs lint, typecheck, test:src and build in the web job, and the scripts in shards", () => {
 		const command = commandsOf(workflow.jobs["web"] as Job)
 		const tokens = command.split(/\s+/)
-		const tasks = tokens.slice(tokens.indexOf("run") + 1, tokens.findIndex((t) => t.startsWith("--")))
+		const tasks = tokens.slice(
+			tokens.indexOf("run") + 1,
+			tokens.findIndex((t) => t.startsWith("--")),
+		)
 		expect(tasks.sort()).toEqual(["build", "lint", "test:src", "typecheck"])
 		const shard = commandsOf(workflow.jobs["web-scripts"] as Job)
 		expect(shard).toContain("turbo run test:scripts")
