@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { scenarioDocumentError } from "../scenario/document"
+import { scenarioDocumentError } from "../scenario/document-error"
 import { scenarioExample } from "../scenario/shape"
 import { FULL_ESTATE } from "../scenario/shape/estate-fixture"
 import { RULE_FLOWS } from "../scenario/shape/rule-fixture"

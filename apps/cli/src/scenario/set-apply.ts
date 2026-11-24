@@ -1,7 +1,8 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
 import { setValueFromDecimal } from "./decimal-set"
-import { ownDocumentError, type ScenarioDocument, scenarioProblems } from "./document"
+import { type ScenarioDocument, scenarioProblems } from "./document"
+import { ownDocumentError } from "./document-error"
 import { formatPath } from "./path"
 import type { ParsedSet } from "./set-assign"
 import { documentFailure, itemsOf } from "./set-document"
@@ -71,10 +72,7 @@ export function applyOverrides(
 	sets: readonly string[],
 	options: OverrideOptions = {},
 ): AppliedOverrides | AppError {
-	if (noOverride(sets, options)) {
-		// A stored plan is read as stored, so the CLI's own rule is stated here, once, for every read (cli ADR-0067).
-		return ownDocumentError(document) ?? { document, overrides: [], removals: [], additions: [] }
-	}
+	if (noOverride(sets, options)) return { document, overrides: [], removals: [], additions: [] }
 	const grouped = removeThenAdd(document, options)
 	if (isAppError(grouped)) return grouped
 	const { removals, added } = grouped
@@ -104,13 +102,13 @@ export function applyScenarioSets(
 	options: OverrideOptions = {},
 ): AppliedOverrides | AppError {
 	// A plain fork has no Override to blame: the Store's canonicaliser reports a stale row at `document`.
+	// A stored plan is read as stored, so the CLI's own rule is stated here, once, for every read (cli ADR-0067).
 	if (noOverride(sets, options)) {
-		// A stored plan is read as stored, so the CLI's own rule is stated here, once, for every read (cli ADR-0067).
 		return ownDocumentError(document) ?? { document, overrides: [], removals: [], additions: [] }
 	}
 	const applied = applyOverrides(document, sets, options)
 	if (isAppError(applied)) return applied
 	const [first, ...rest] = scenarioProblems(applied.document)
 	if (first === undefined) return applied
-	return documentFailure(itemsOf(applied), [first, ...rest], applied.document)
+	return documentFailure(itemsOf(applied), [first, ...rest], applied.document, document)
 }

@@ -71,6 +71,13 @@ describe("a stored plan whose employer Contribution carries a member's own label
 			expect(res.code, name).toBe(2)
 			expect(errorOf(res), name).toEqual(applied)
 		}
+		// An unrelated Override does not take the blame for the stored plan's own problem.
+		const overridden = await capture(
+			[...READS[0]![1], "--set", "flows.salary.amount=9000000", "--json"],
+			{ TRAJ_HOME: home },
+		)
+		expect(overridden.code).toBe(2)
+		expect(errorOf(overridden)).toEqual(applied)
 		const unlabelled = await labelled(home, "")
 		const { label: _label, ...clean } = (unlabelled["flows"] as Record<string, unknown>[])[2] ?? {}
 		stored(home, {
@@ -149,6 +156,9 @@ describe("an employer Contribution that carries a member's own label", () => {
 		])
 		expect(res.code).toBe(2)
 		expect(errorOf(res).message).toContain(SENTENCE)
+		expect(errorOf(res).details).toMatchObject([
+			{ message: errorOf(res).message, code: "EMPLOYER_MEMBER_LABEL" },
+		])
 	})
 
 	it("refuses a --set that turns a member's labelled Contribution into the employer's, at the flag", async () => {

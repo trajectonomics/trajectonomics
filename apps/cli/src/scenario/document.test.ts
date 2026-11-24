@@ -3,7 +3,8 @@ import { isAppError } from "../errors"
 import { applyScenario, errorOf, scenarioHome } from "../scenario-test-support"
 import { canonicalScenarioDocument } from "../store"
 import { SCENARIO_DOCUMENT } from "../store/testing"
-import { acceptedScenarioSchemaVersion, scenarioDocumentError, scenarioProblems } from "./document"
+import { acceptedScenarioSchemaVersion, scenarioProblems } from "./document"
+import { scenarioDocumentError } from "./document-error"
 import { scenarioTemplate } from "./template"
 
 const HINT = 'Run "traj schema scenario apply" to see the document schema.'

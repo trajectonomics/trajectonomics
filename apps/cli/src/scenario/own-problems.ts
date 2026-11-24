@@ -63,7 +63,7 @@ export function ownProblems(value: unknown): OwnProblem[] {
 export function ownSentence(label: string): { message: string; hint: string } {
 	return {
 		message: `A Contribution with funding "employer" carries the label ${label}, one of the Thai Levy's contribution labels (${[...MEMBER_ONLY].join(", ")}), and each of them is the member's own payment: the allowances are for what the member paid, never for the employer's share, so the label would lower tax by money the member never paid.`,
-		// The code stays in the envelope's `code`; a person reads the way out, not the code.
+		// The code is each `details[].code`; a person reads the way out, not the code.
 		hint: `Remove "label" from the employer Contribution, and label only the member's own Contribution.`,
 	}
 }
@@ -80,5 +80,10 @@ export function employerLabelProblem(
 	label: string,
 ): AppError | null {
 	if (target["funding"] !== "employer" || !isMemberOnlyLabel(label)) return null
-	return fail("invalid_input", { ...ownSentence(label), path: "label" })
+	const said = ownSentence(label)
+	return fail("invalid_input", {
+		...said,
+		path: "label",
+		details: [{ path: "label", message: said.message, code: "EMPLOYER_MEMBER_LABEL" }],
+	})
 }

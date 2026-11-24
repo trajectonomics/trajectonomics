@@ -39,8 +39,8 @@ adds no rate and computes no figure of them.
   `@trajectonomics/core/tax` exports (every label of `ThLevyContributionLabel`), and never a prefix, which would miss
   ThaiESG. It is `EMPLOYER_MEMBER_LABEL`, found with the engine's problems by `scenarioProblems`
   (`src/scenario/own-problems.ts`), so `scenario apply`, the Store, `--set` and `scenario tax --label` state it, at the
-  label, with a sentence that names the label it found and a way out (the code `EMPLOYER_MEMBER_LABEL` is the
-  envelope's `code`, never in the hint a person reads). A Contribution that is not an employer's keeps its labels.
+  label, with a sentence that names the label it found and a way out (the code `EMPLOYER_MEMBER_LABEL` is each
+  `details[].code`, never in the hint a person reads). A Contribution that is not an employer's keeps its labels.
   Any Levy triggers it, not only the Thai one the CLI emits: the labels are Thai-named, so the rule reads the label and
   never the Levy, and a plan under another Levy that writes one on an employer's share is refused as well.
 - **A stored plan is re-checked on every read.** A plan saved before the rule existed (an unreleased build between
@@ -102,3 +102,6 @@ adds no rate and computes no figure of them.
 
 - The employer's money is stated twice by design: `employerContributions` on the row and the `employer` lines, each
   the engine's, and neither is in `money in`.
+- `details[].message` of a document refusal states the table's sentence for a worded code, in `scenario fork`, `scenario
+  tax`, `scenario household` and the Store's other refusals too; in 0.7.0 it was `<path>: <CODE>`. A reader that
+  matched the code there reads `details[].code` (ADR-0065 made the same move for the top-level `message`).
