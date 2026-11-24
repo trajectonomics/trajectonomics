@@ -6,7 +6,11 @@ import { fail, isAppError } from "../../errors"
 import { scenarioNotFound } from "../../scenario/errors"
 import { HOUSEHOLD, householdOutput, REQUIRED_SCENARIO, reply } from "../../scenario/household/form"
 import { canonicalHousehold, type Household } from "../../scenario/household/model"
-import { type AnchoredDate, placeHousehold } from "../../scenario/household/place"
+import {
+	type AnchoredDate,
+	type FollowedDate,
+	placeHousehold,
+} from "../../scenario/household/place"
 import { IF_HASH } from "../../scenario/if-hash"
 import { LEDGER_READ_CODES } from "../../store"
 import { withStore } from "../../with-store"
@@ -77,6 +81,7 @@ export const household: Leaf = defineCommand({
 			if (isAppError(row)) return row
 			if (row === null) return scenarioNotFound(name)
 			let anchored: AnchoredDate[] = []
+			let followed: FollowedDate[] = []
 			const outcome = store.replaceHousehold(
 				row.id,
 				(current) => {
@@ -84,11 +89,12 @@ export const household: Leaf = defineCommand({
 					const placed = placeHousehold(incoming, current)
 					if (isAppError(placed)) return placed
 					anchored = placed.anchored
+					followed = placed.followed
 					return { document: placed.document, household: canonicalHousehold(incoming) }
 				},
 				{ dryRun, expectedHash: input.ifHash },
 			)
-			return isAppError(outcome) ? outcome : reply(outcome, name, anchored, dryRun)
+			return isAppError(outcome) ? outcome : reply(outcome, name, anchored, followed, dryRun)
 		})
 	},
 })
