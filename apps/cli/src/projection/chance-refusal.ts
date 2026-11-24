@@ -9,11 +9,16 @@ const INPUT_ROOTS: ReadonlySet<string> = new Set(["options", "model"])
 const MESSAGES: Readonly<Record<string, string>> = {
 	INVALID_PATH_COUNT: "The path count must be a whole number from 1 to 10,000.",
 	INVALID_SEED: "The seed must be exactly 16 lower-case hex digits.",
+	INVALID_BUCKETS: "The bucket count must be a power of two from 16 to 1024.",
 	UNKNOWN_ACCOUNT: "The Return model names an Account the Scenario does not declare.",
 }
 
 /** The flag each engine option is stated by, so a refusal names the spelling the caller typed. */
-const OPTION_FLAGS: Readonly<Record<string, string>> = { paths: "--paths", seed: "--seed" }
+const OPTION_FLAGS: Readonly<Record<string, string>> = {
+	paths: "--paths",
+	seed: "--seed",
+	buckets: "--buckets",
+}
 
 /**
  * An engine path as the caller's input names it. `options.paths` is the `--paths` flag; the model

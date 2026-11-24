@@ -41,6 +41,7 @@
 	"scripts": {
 		"build": "tsdown",
 		"test": "bun test",
+		"normal-table:update": "bun scripts/normal-table-update.ts",
 		"bench": "bun scripts/bench-fi.ts",
 		"bench:milestones": "bun scripts/bench-milestones.ts",
 		"typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",

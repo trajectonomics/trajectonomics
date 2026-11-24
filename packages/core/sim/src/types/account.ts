@@ -58,6 +58,11 @@ export interface AssetRule {
 	readonly payout?: Payout
 	/** Charges a yearly share of value every month, outside cashflow; absent means no fee. */
 	readonly fee?: Fee
+	/**
+	 * The yearly standard deviation of the return, 0 to 10000 bps (ADR 0029). Inert to `project()` and every
+	 * deterministic figure; only `planReturnModel` reads it. Absent or 0 means the Account does not swing.
+	 */
+	readonly volatility?: BasisPoints
 }
 
 /** Liability: `rate` is the interest on the outstanding balance. Cannot be locked. */

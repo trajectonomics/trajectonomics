@@ -83,6 +83,7 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_REFERENCE_TERMS: never,
 	INVALID_WEIGHT: input,
 	RETURN_WEIGHT_TOTAL: input,
+	INVALID_BUCKETS: input,
 	// Refused by `contributionSavings` only. `projection allowances` answers the first three at its
 	// flags (`allowancesRefusal`, cli ADR-0061); PERIOD_DUE_MISMATCH cannot happen on a correct call,
 	// since the period comes from the Projection of the same Levy, so it is an internal error.

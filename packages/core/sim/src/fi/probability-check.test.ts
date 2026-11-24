@@ -170,7 +170,7 @@ describe("Return model validation", () => {
 		})
 	})
 
-	it("rejects more than 64 accounts and more than 512 buckets", () => {
+	it("rejects more than 64 accounts and more than 1,024 buckets", () => {
 		const accounts = Array.from({ length: 65 }, (_unused, index) => `ghost-${index}`)
 		const tooManyAccounts = run(base, modelWith({ accounts }))
 		if (tooManyAccounts.ok) throw new Error("expected a failure")
@@ -178,7 +178,7 @@ describe("Return model validation", () => {
 			code: "TOO_MANY_ENTRIES",
 			path: ["model", "accounts"],
 		})
-		const buckets = Array.from({ length: 513 }, () => ({ returnsBps: [0], weight: 1 }))
+		const buckets = Array.from({ length: 1025 }, () => ({ returnsBps: [0], weight: 1 }))
 		const tooManyBuckets = run(base, modelWith({ buckets }))
 		if (tooManyBuckets.ok) throw new Error("expected a failure")
 		expect(tooManyBuckets.problems).toContainEqual({
