@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url"
  *
  * Turbo sets `TURBO_HASH` for every task it runs.
  */
-if (process.env["TURBO_HASH"]) {
+if (process.env.TURBO_HASH) {
 	process.exit(0)
 }
 

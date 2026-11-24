@@ -27,8 +27,6 @@ describe("the CI split of the web check", () => {
 		expect(web.scripts["check"]?.split(" && ")).toEqual([
 			"bun run lint",
 			"bun run typecheck",
-			// Under turbo the `demo` task runs first (every web task depends on it); this step is for a direct run.
-			"bun scripts/demo-unless-turbo.ts",
 			"bun run test",
 			"bun ../../tooling/scripts/build-unless-turbo.ts",
 		])
