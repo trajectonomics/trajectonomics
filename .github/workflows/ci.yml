@@ -203,25 +203,23 @@ jobs:
 
   check:
     name: Check
-    # Branch protection requires this name. It runs after every job above, whatever they did, and
-    # fails unless each one that had to run succeeded.
-    if: ${{ !cancelled() }}
+    # Branch protection requires this name. It runs after every job in `needs`, whatever they did
+    # (`always()`, not `!cancelled()`: a cancelled run must fail this check, since GitHub counts a
+    # skipped required check as passing). It reads `needs`, so a job added to the list below is
+    # judged without editing the script: it must succeed, and may be skipped only when `Plan` said
+    # to skip the web jobs.
+    if: always()
     needs: [plan, packages, web, web-scripts]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require every job
         env:
-          PLAN: ${{ needs.plan.result }}
-          PACKAGES: ${{ needs.packages.result }}
-          WEB: ${{ needs.web.result }}
-          WEB_SCRIPTS: ${{ needs.web-scripts.result }}
+          NEEDS: ${{ toJSON(needs) }}
           WEB_REQUIRED: ${{ needs.plan.outputs.web }}
         run: |
           set -euo pipefail
-          want_web=success
-          [ "$WEB_REQUIRED" = true ] || want_web=skipped
-          echo "plan=$PLAN packages=$PACKAGES web=$WEB (want $want_web) web-scripts=$WEB_SCRIPTS (want $want_web)"
-          [ "$PLAN" = success ] && [ "$PACKAGES" = success ] \
-            && [ "$WEB" = "$want_web" ] && [ "$WEB_SCRIPTS" = "$want_web" ] \
-            || { echo "::error::A CI job did not pass."; exit 1; }
+          jq -r 'to_entries[] | "\(.key)=\(.value.result)"' <<< "$NEEDS"
+          jq -e --arg web "$WEB_REQUIRED" 'to_entries | all(.value.result == "success"
+            or (.value.result == "skipped" and $web != "true" and (.key | IN("plan", "packages") | not)))' \
+            <<< "$NEEDS" > /dev/null || { echo "::error::A CI job did not pass."; exit 1; }

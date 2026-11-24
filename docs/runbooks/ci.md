@@ -16,6 +16,14 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
 id of any new job to its `needs`: `tooling/guards/ci-web-split.test.ts` fails when it is missing.
 
+- **`Check` judges all of `needs`, not a list of job names.** Its script reads `toJSON(needs)`: every
+  job must be `success`, and a job may be `skipped` only when `Plan` said to skip the web jobs (`Plan`
+  and `Check packages` may never be skipped). A job added to `needs` is therefore judged with no edit
+  to the script, and a failing one fails `Check`.
+- **`Check` runs with `if: always()`,** not `!cancelled()`. A cancelled run (a new push, or a person)
+  then fails `Check`. GitHub counts a skipped required check as passing, so a skipped `Check` would let a
+  cancelled run look green.
+
 ## Why the web tests are split
 
 `apps/web/scripts/` holds the end-to-end tests. They run the workspace's own `traj` binary hundreds
@@ -37,6 +45,14 @@ before, through `cli#build`).
 - **Drift guard.** CI does not run the web `check` script itself. `tooling/guards/ci-web-split.test.ts`
   fails when that script gains a step, when `test` stops being `test:src` plus `test:scripts`, or when
   the workflow stops running them. Update the workflow in the same pull request.
+
+## Files outside every package
+
+`tooling/config/**` (the shared Biome and TypeScript config) and `tooling/scripts/**` are
+`globalDependencies` in the root `turbo.json`: a change to them affects every package, so
+`turbo run check --affected` checks everything. Before, a pull request that changed only those files
+affected no package and CI checked nothing. The price is intended: such a change invalidates every
+Turborepo cache entry and runs a full check.
 
 ## The Turborepo cache
 

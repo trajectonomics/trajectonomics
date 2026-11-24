@@ -7,7 +7,8 @@ import { join } from "node:path"
 
 const ROOT = join(import.meta.dir, "..", "..")
 
-type Job = { name?: string; needs?: string[]; steps?: { run?: string }[] }
+type Job = { name?: string; if?: string; needs?: string[]; steps?: { run?: string }[] }
+type Tasks = Record<string, { dependsOn?: string[] }>
 
 const web = (await Bun.file(join(ROOT, "apps/web/package.json")).json()) as {
 	scripts: Record<string, string>
@@ -15,6 +16,8 @@ const web = (await Bun.file(join(ROOT, "apps/web/package.json")).json()) as {
 const workflow = Bun.YAML.parse(await Bun.file(join(ROOT, ".github/workflows/ci.yml")).text()) as {
 	jobs: Record<string, Job>
 }
+
+const webTurbo = (await Bun.file(join(ROOT, "apps/web/turbo.json")).json()) as { tasks: Tasks }
 
 /** The shell commands of a job's `run` steps, joined. */
 const commandsOf = (job: Job) => (job.steps ?? []).map((step) => step.run ?? "").join("\n")
@@ -36,17 +39,29 @@ describe("the CI split of the web check", () => {
 	})
 
 	it("runs lint, typecheck, test:src and build in the web job, and the scripts in shards", () => {
-		const tasks = commandsOf(workflow.jobs["web"] as Job).match(/turbo run ([^-]+)--filter/)?.[1]
-		expect(tasks?.trim().split(/\s+/).sort()).toEqual(["build", "lint", "test:src", "typecheck"])
+		const command = commandsOf(workflow.jobs["web"] as Job)
+		const tokens = command.split(/\s+/)
+		const tasks = tokens.slice(tokens.indexOf("run") + 1, tokens.findIndex((t) => t.startsWith("--")))
+		expect(tasks.sort()).toEqual(["build", "lint", "test:src", "typecheck"])
 		const shard = commandsOf(workflow.jobs["web-scripts"] as Job)
 		expect(shard).toContain("turbo run test:scripts")
 		expect(shard).toContain("--shard=")
 	})
 
-	it("keeps the required check named Check and waiting for every other job", () => {
+	it("keeps the scripts tests behind a build of the command line they spawn", () => {
+		const tasks = webTurbo.tasks
+		expect(tasks["test:scripts"]?.dependsOn).toContain("@trajectonomics/cli#build")
+	})
+
+	it("keeps the required check named Check, waiting for every other job and reading `needs`", () => {
 		const check = workflow.jobs["check"] as Job
 		expect(check.name).toBe("Check")
+		// Not `!cancelled()`: a skipped required check counts as passing, so a cancelled run must fail it.
+		expect(check.if).toBe("always()")
 		const others = Object.keys(workflow.jobs).filter((id) => id !== "check")
 		expect([...(check.needs ?? [])].sort()).toEqual(others.sort())
+		// It judges the whole `needs` object, so a job added to the list needs no edit to the script.
+		expect(JSON.stringify(check.steps)).toContain("toJSON(needs)")
+		expect(JSON.stringify(check.steps)).not.toMatch(/needs\.[\w-]+\.result/)
 	})
 })
