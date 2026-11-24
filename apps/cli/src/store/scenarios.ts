@@ -26,7 +26,7 @@ export function getScenario(ctx: Ctx, idOrName: string): ScenarioRow | null | Ap
 /**
  * Creates the named scenario, or versions it when the canonical document, its household or its
  * tax profile changed. A Scenario's household anchors resolve onto the incoming document first (cli
- * ADR-0048), and its tax profile is kept while the document still holds the Levy (cli ADR-0066).
+ * ADR-0048), and its tax profile is kept while the document keeps the Levy unchanged (cli ADR-0066).
  */
 export function saveScenario(
 	ctx: Ctx,

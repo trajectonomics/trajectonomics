@@ -52,6 +52,28 @@ describe("scenario tax --merge", () => {
 		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "--children-at-higher-rate" })
 	})
 
+	it("checks --children-at-higher-rate against the stored children, not the flags alone", async () => {
+		const home = await taxedHome()
+		await tax(home, ["base", "--merge", "--children", "3"])
+		const merged = await tax(home, ["base", "--merge", "--children-at-higher-rate", "2"])
+		expect(merged.code).toBe(0)
+		expect(await shown(home)).toMatchObject({
+			tax: { children: 3, childrenAtHigherRate: 2 },
+		})
+		const refused = await tax(home, ["base", "--merge", "--children", "1"])
+		expect(refused.code).toBe(2)
+		expect(errorOf(refused)).toMatchObject({ path: "--children-at-higher-rate" })
+	})
+
+	it("takes --tax only when it names the stored jurisdiction", async () => {
+		const home = await taxedHome()
+		const same = await tax(home, ["base", "--merge", "--tax", "th-2026", "--children", "2"])
+		expect(same.code).toBe(0)
+		const other = await tax(home, ["base", "--merge", "--tax", "xx-2026", "--children", "3"])
+		expect(other.code).toBe(2)
+		expect((await shown(home)).tax).toMatchObject({ children: 2 })
+	})
+
 	it("refuses a plan with no stored profile and names the full form", async () => {
 		const home = await projectionHome()
 		const res = await tax(home, ["base", "--merge", "--children", "2"])

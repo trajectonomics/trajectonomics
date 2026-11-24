@@ -10,7 +10,7 @@ export const MODE_FLAGS: {
 		.boolean()
 		.optional()
 		.describe(
-			"Change only the profile flags given and keep the rest of the stored tax profile; needs a stored profile and at least one profile flag, and takes no --tax.",
+			"Change only the profile flags given and keep the rest of the stored tax profile; needs a stored profile and at least one profile flag, and takes --tax only when it names the stored jurisdiction.",
 		),
 	fromStored: z
 		.boolean()

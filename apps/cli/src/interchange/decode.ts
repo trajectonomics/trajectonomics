@@ -1,4 +1,5 @@
 import { type AppError, isAppError } from "../errors"
+import { holdsTaxLevy } from "../scenario/tax/holds"
 import { ACCOUNT_TYPES, contentHash, isAccountType, type RestoreRows } from "../store"
 import { DECODERS } from "./fields"
 import { FIELDS, type Layout, RECORD_ORDER, type RecordRows, type RecordType } from "./format"
@@ -33,10 +34,29 @@ export function decodeRecord(
 		row[key] = value
 	}
 	if (type === "scenario") {
-		if (!("household" in row)) row["household"] = null
-		if (!("tax" in row)) row["tax"] = null
+		const refused = scenarioSiblings(row, path)
+		if (refused !== null) return refused
 	}
 	return { type, row } as Decoded
+}
+
+/**
+ * Fills the household and tax a layout without the column leaves out with null, and refuses a tax
+ * profile beside a document that holds no Levy: a profile describes a Levy, so it cannot be kept
+ * without one (cli ADR-0066).
+ */
+function scenarioSiblings(row: Record<string, unknown>, path: string): AppError | null {
+	if (!("household" in row)) row["household"] = null
+	if (!("tax" in row)) row["tax"] = null
+	if (row["tax"] === null) return null
+	let document: unknown
+	try {
+		document = JSON.parse(String(row["document"]))
+	} catch {
+		return null
+	}
+	if (holdsTaxLevy(document)) return null
+	return invalid(`${path}.tax`, "must be null: the scenario's document holds no tax Levy")
 }
 
 /** The personal entity owns every record, and no name is empty. */

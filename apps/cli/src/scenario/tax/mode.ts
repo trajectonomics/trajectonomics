@@ -1,13 +1,6 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import { ALLOWANCE_FLAGS } from "./allowances"
-import {
-	changesProfile,
-	higherRateConflict,
-	type TaxFlags,
-	type TaxRequest,
-	taxRequestOf,
-	writesLevy,
-} from "./flags"
+import { changesProfile, type TaxFlags, type TaxRequest, taxRequestOf, writesLevy } from "./flags"
 import { requestOfStored, type StoredTax } from "./stored"
 
 /**
@@ -88,7 +81,7 @@ export function taxModeOf(flags: TaxFlags): TaxMode | AppError {
 	if (refused !== null) return refused
 	if (flags.fromStored === true) return storedConflict(flags) ?? { kind: "stored" }
 	if (flags.merge === true) {
-		return mergeWithoutChange(flags) ?? higherRateConflict(flags) ?? { kind: "merge", flags }
+		return mergeWithoutChange(flags) ?? { kind: "merge", flags }
 	}
 	const request = taxRequestOf(flags)
 	if (request === null) return flags.none === true ? { kind: "remove" } : noChoice()
@@ -103,7 +96,7 @@ export function taxModeOf(flags: TaxFlags): TaxMode | AppError {
  */
 export function noStoredProfile(flag: "--merge" | "--from-stored", taxed: boolean): AppError {
 	const why = taxed
-		? "this plan's tax was written before its profile was kept, so there is nothing to build on"
+		? "this plan's tax was written before its profile was kept, or its Levy was changed by hand since, so there is nothing to build on"
 		: "this plan has no tax profile stored"
 	return fail("invalid_input", {
 		path: flag === "--merge" ? "merge" : "fromStored",
@@ -115,6 +108,13 @@ export function noStoredProfile(flag: "--merge" | "--from-stored", taxed: boolea
 /** The request a merge states: the stored profile, with each flag the caller gave laid over it. */
 export function mergedRequest(stored: StoredTax, flags: TaxFlags): TaxRequest | AppError {
 	const base = requestOfStored(stored)
+	if (flags.tax !== undefined && flags.tax !== base.jurisdiction) {
+		return conflict(
+			"tax",
+			`--merge changes the profile stored for ${base.jurisdiction}, so --tax ${flags.tax} cannot name another jurisdiction.`,
+			"To switch jurisdiction, state the profile whole with --tax and every flag it needs.",
+		)
+	}
 	const allowances = Object.fromEntries(
 		ALLOWANCE_FLAGS.map((field) => [field, flags[field] ?? base.allowances[field]]),
 	)

@@ -90,4 +90,26 @@ describe("a tax profile through backup and restore", () => {
 		expect(refused).toMatchObject({ body: { code: "invalid_input" } })
 		store.close()
 	})
+
+	it("refuses a profile beside a document with no tax Levy, at its path", async () => {
+		const home = await homeWithTax()
+		const out = backupPath()
+		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
+		const text = await Bun.file(`${out}/traj.jsonl`).text()
+		const lines = text.split("\n").map((line) => {
+			if (!line.includes('"record":"scenario"') || !line.includes('"tax":{')) return line
+			const record = JSON.parse(line) as {
+				document: { levies?: unknown; flows: Record<string, unknown>[] }
+			}
+			delete record.document.levies
+			for (const flow of record.document.flows) delete flow["label"]
+			return JSON.stringify(record)
+		})
+		const store = mustOpen(ledgerHome())
+		const refused = importJsonl(lines.join("\n"), store)
+		expect(refused).toMatchObject({
+			body: { code: "invalid_input", message: expect.stringContaining("holds no tax Levy") },
+		})
+		store.close()
+	})
 })

@@ -15,7 +15,7 @@ import type { ForkOptions, ScenarioForked } from "./types"
  * Copies a live scenario under a new name; the original keeps existing (ADR-0016). The read, the
  * optional transform and the insert are one snapshot, so a concurrent apply cannot split them. The
  * copy keeps the household, its anchors resolved onto the transformed document (cli ADR-0048), and
- * the tax profile while the transformed document still holds the Levy (cli ADR-0066).
+ * the tax profile while the transformed document keeps the Levy unchanged (cli ADR-0066).
  */
 export function forkScenario(
 	ctx: Ctx,

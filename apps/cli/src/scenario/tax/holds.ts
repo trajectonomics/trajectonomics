@@ -7,6 +7,11 @@ import { TAX_LEVY_ID } from "./levy"
  * (cli ADR-0066).
  */
 export function holdsTaxLevy(document: unknown): boolean {
-	if (!isRecord(document) || !Array.isArray(document["levies"])) return false
-	return document["levies"].some((levy) => isRecord(levy) && levy["id"] === TAX_LEVY_ID)
+	return taxLevyIn(document) !== undefined
+}
+
+/** The tax Levy a document holds, or `undefined` when it holds none. */
+export function taxLevyIn(document: unknown): Record<string, unknown> | undefined {
+	if (!isRecord(document) || !Array.isArray(document["levies"])) return undefined
+	return document["levies"].find((levy) => isRecord(levy) && levy["id"] === TAX_LEVY_ID)
 }

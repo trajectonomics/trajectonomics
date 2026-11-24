@@ -1,7 +1,7 @@
 import type { AppError } from "../errors"
 import { scenarioDocumentError } from "../scenario/document"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
-import { holdsTaxLevy } from "../scenario/tax/holds"
+import { taxLevyIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
 import { SCENARIO_COLUMNS } from "./columns"
 import type { Ctx } from "./context"
@@ -50,13 +50,20 @@ export function anchorsFor(
 }
 
 /**
- * The tax profile a Scenario keeps after a write that did not name one: the stored profile, unless
- * the written document no longer holds the Levy it describes (cli ADR-0066). A profile of a Levy
- * that is gone would tell a reader the plan is taxed when it is not.
+ * The tax profile a Scenario keeps after a write that did not name one: the stored profile, while
+ * the written document holds the Levy `th-2026-pit` exactly as the stored document does (compared
+ * as canonical JSON, the form the content hash uses). A Levy that is gone, or one changed by hand
+ * or through `--set`, is no longer the one the profile describes, so a later `--merge` or
+ * `--from-stored` would silently overwrite the change (cli ADR-0066). A write that leaves the Levy
+ * alone, and a tax-year update of the emitter, keep it. Must run inside `guard`.
  */
 export function taxKept(stored: ScenarioRow | null, document: unknown): string | null {
 	if (stored?.tax == null) return null
-	return holdsTaxLevy(document) ? stored.tax : null
+	const written = taxLevyIn(document)
+	if (written === undefined) return null
+	const before = taxLevyIn(JSON.parse(stored.document))
+	if (before === undefined) return null
+	return canonicalJson(written, "levies") === canonicalJson(before, "levies") ? stored.tax : null
 }
 
 export type ScenarioDraft = {
