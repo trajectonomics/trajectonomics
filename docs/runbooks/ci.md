@@ -97,7 +97,11 @@ the shards, which it runs beside.
 - **Artifacts.** `web-screenshots` (every page at both widths and both themes, and the three printed pages in
   both themes) is uploaded on every run, pass or fail, for 7 days: open it to look at what CI checked.
   `web-playwright-report` (the HTML report and traces) is uploaded on failure only.
-- **Budget.** 10 minutes, as the job's `timeout-minutes`. TIMINGS
+- **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 125 s for the whole job,
+  of which the build step 5 s (turbo cache hit), the browser cache 8 s, Chromium's system libraries 27 s, the
+  suite 54 s (121 tests, 2 workers) and the screenshot upload 3 s (17 MB, 98 files). The shards take 3.5
+  minutes, so the job is not on the critical path. A cold build adds about 40 s, a cold browser download about
+  30 s more.
 - **Locally.** `bun run check` never runs it. Build first, then `bun run test:browser` in `apps/web` (see
   `apps/web/AGENTS.md`).
 - **When it fails.** The message names the page, the width or the paper, and the table or the text, for
