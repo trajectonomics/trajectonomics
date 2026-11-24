@@ -4,6 +4,7 @@ import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
 import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
 import { estateBlocks, estateHidden } from "./estate-human"
 import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
+import { lifetimeBlocks } from "./lifetime-human"
 import {
 	compareMilestoneBlocks,
 	compareMilestonesHidden,
@@ -70,6 +71,13 @@ export const projectionHint: RenderHint = {
 			column("realAccessibleNetWorth", "right"),
 		],
 		milestones: milestoneColumns,
+		fees: [
+			column("index", "right"),
+			column("from"),
+			column("to"),
+			column("account"),
+			column("amount", "right"),
+		],
 	},
 	// The long cash-flow, liability, balance, spending and estate tables are JSON's; the human form prints them as blocks after the body.
 	display: (data) =>
@@ -82,6 +90,7 @@ export const projectionHint: RenderHint = {
 		...balanceBlocks(data),
 		...spendingBlocks(data),
 		...estateBlocks(data),
+		...lifetimeBlocks(data),
 	],
 	note: "notes",
 	extra: [

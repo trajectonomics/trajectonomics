@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { carryInField } from "./carryin-view"
+import { type AccountLifetimeView, accountLifetimesField, lifetimeFeesField } from "./lifetime-view"
 import { dateField } from "./money"
 import { type ProjectionTable, projectionTable } from "./run-table-view"
 import { type TaxYearView, taxYearsField } from "./tax-view"
@@ -25,6 +26,10 @@ export type ProjectionRunView = Echo & {
 	currency: string
 	runsOut: RunsOutView | null
 	taxYears: TaxYearView[]
+	/** The plan's fees over the horizon, present only when an Account carries a fee (cli ADR-0067). */
+	lifetimeFees?: string | undefined
+	/** Each fee or payout Account's totals over the horizon, present only when one carries a fee or a payout. */
+	accountLifetimes?: AccountLifetimeView[] | undefined
 	tables: ProjectionTable[]
 }
 
@@ -45,6 +50,8 @@ export const projectionRunFields: {
 		.nullable()
 		.describe("The month the Projection ran out of money, or null when it never does."),
 	taxYears: taxYearsField,
+	lifetimeFees: lifetimeFeesField,
+	accountLifetimes: accountLifetimesField,
 	tables: z
 		.array(projectionTable)
 		.describe(

@@ -14,7 +14,7 @@ interface Props {
 
 /** The Overview's what-if: the headline figures, the chance, the first tax year, the chart and the closing net worth. */
 let { lens, baseline, baselineChance }: Props = $props()
-const extras = $derived(overviewExtras(lens, baselineChance))
+const extras = $derived(overviewExtras(lens, baselineChance, baseline))
 </script>
 
 <ProjectionWhatIf {lens} {baseline} terms="nominal" keys={["closingNetWorth"]}>
@@ -24,6 +24,12 @@ const extras = $derived(overviewExtras(lens, baselineChance))
 				<div>
 					<h3 class="text-sm text-muted-foreground">Chance of success</h3>
 					<div class="mt-1"><ChanceFigure chance={extras.chance} /></div>
+				</div>
+			{/if}
+			{#if extras.fees}
+				<div>
+					<h3 class="text-sm text-muted-foreground">{extras.fees.label}</h3>
+					<div class="mt-1"><FigureTriple triple={extras.fees} large /></div>
 				</div>
 			{/if}
 			{#if extras.tax}
