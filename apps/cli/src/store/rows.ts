@@ -72,6 +72,10 @@ export type ScenarioRow = {
 	household: string | null
 	/** The tax profile's RFC 8785 canonical JSON text, or null when none is stored (cli ADR-0066). */
 	tax: string | null
+	/** What a person wrote about the plan: plain text, outside the document and its hash (cli ADR-0071). */
+	notes: string | null
+	/** True for the ledger's main plan, at most one live Scenario (cli ADR-0071). */
+	main: boolean
 	version: number
 	createdAt: string
 	updatedAt: string

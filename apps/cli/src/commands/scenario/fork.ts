@@ -20,6 +20,7 @@ import { withStore } from "../../with-store"
 export const fork: Leaf = defineCommand({
 	name: "fork",
 	summary: "Copy a Scenario under a new name",
+	note: "Copying the notes ships in 0.8.0, and so does --no-notes.",
 	positionals: ["from", "name"],
 	input: z.strictObject({
 		from: z.string().min(1).describe("The source Scenario's exact name or its id."),
@@ -31,6 +32,10 @@ export const fork: Leaf = defineCommand({
 		without: withoutFlag,
 		add: addFlag,
 		decimal: decimalFlag,
+		noNotes: z
+			.boolean()
+			.optional()
+			.describe("Leave the source's notes behind; by default the copy keeps them (ADR-0071)."),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
 	}),
 	output: z.strictObject({
@@ -46,6 +51,10 @@ export const fork: Leaf = defineCommand({
 	}),
 	examples: [
 		{ command: "traj scenario fork base early", description: "Copy a Scenario under a new name." },
+		{
+			command: "traj scenario fork base fresh --no-notes",
+			description: "Copy it without the notes kept on the source.",
+		},
 		{
 			command: "traj scenario fork base raise --set flows.salary.amount=50000",
 			description: "Copy it with one assumption changed.",
@@ -63,7 +72,7 @@ export const fork: Leaf = defineCommand({
 			if (isAppError(source)) return source
 			if (source === null) return scenarioNotFound(input.from, "from")
 			let applied: Applied = { overrides: [], removals: [], additions: [] }
-			const options: ForkOptions = { dryRun }
+			const options: ForkOptions = { dryRun, notes: input.noNotes !== true }
 			if (sets.length > 0 || without.length > 0 || add.length > 0) {
 				options.transform = transformFor({ sets, without, add, decimal: input.decimal }, (done) => {
 					applied = done

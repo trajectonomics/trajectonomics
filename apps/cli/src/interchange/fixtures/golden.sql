@@ -75,3 +75,7 @@ INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, 
 	'{"accounts":[{"id":"draft-cash","kind":"asset","rate":125}],"cashflow":{"contribute":[],"surplus":[{"account":"draft-cash"}],"withdraw":["draft-cash"]},"currency":"THB","economy":{"inflation":0},"flows":[{"amount":1,"earned":true,"frequency":"monthly","growth":"inflation","id":"draft-salary","kind":"income","start":"2026-01-01"}],"schemaVersion":4}',
 	'jcs1:sha256:9c0c34cbd372d2b578ecd76b27bf3f61779b1558f0d1465f28f9ffd29fa9e39f',
 	NULL, 2, '2026-02-02T10:00:00.020Z', '2026-02-04T10:00:00.040Z', '2026-02-04T10:00:00.040Z');
+
+-- The main plan, with notes: they are outside the document, so its hash is unchanged (cli ADR-0071).
+UPDATE scenario SET notes = 'แผนหลัก: เกษียณอายุ 55 ปี', main = 1
+WHERE id = '0194c000-0002-7000-8000-000000000002';

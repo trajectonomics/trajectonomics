@@ -4,7 +4,7 @@ import { applyScenario, resultOf, scenario } from "../scenario-test-support"
 import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT, tempHome } from "../store/testing"
 import { capture } from "../test-support"
 import { exportJsonl, importJsonl } from "./index"
-import { goldenJsonl } from "./testing"
+import { goldenJsonl, goldenWithoutNotes } from "./testing"
 
 /** A data directory with one taxed plan, whose profile is stored, and one plan with none. */
 async function homeWithTax(): Promise<string> {
@@ -56,17 +56,17 @@ describe("a tax profile through backup and restore", () => {
 		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
 		const text = await Bun.file(`${out}/traj.jsonl`).text()
 		const lines = text.split("\n").filter((line) => line.includes('"record":"scenario"'))
-		expect(lines.some((line) => line.endsWith(',"tax":null}'))).toBe(true)
+		expect(lines.some((line) => line.endsWith(',"tax":null,"notes":null,"main":false}'))).toBe(true)
 		expect(text).toContain(
-			'"tax":{"children":1,"childrenAtHigherRate":0,"filingStatus":"single","mortgageInterest":30000,"tax":"th-2026"}}',
+			'"tax":{"children":1,"childrenAtHigherRate":0,"filingStatus":"single","mortgageInterest":30000,"tax":"th-2026"},"notes"',
 		)
 	})
 
 	it("restores a version 3 backup, which has no tax column, with every profile null", async () => {
-		const current = await goldenJsonl()
+		const current = await goldenWithoutNotes()
 		const version3 = current
-			.replace('"schemaVersion":4', '"schemaVersion":3')
-			.replaceAll(',"tax":null}', "}")
+			.replace('"schemaVersion":5', '"schemaVersion":3')
+			.replaceAll(',"tax":null,"notes":null,"main":false}', "}")
 		const store = mustOpen(ledgerHome())
 		expect(must(importJsonl(version3, store))).toEqual({
 			entity: 1,
@@ -82,8 +82,8 @@ describe("a tax profile through backup and restore", () => {
 	it("refuses a record whose profile is not one this build stores, at its path", async () => {
 		const current = await goldenJsonl()
 		const bad = current.replace(
-			'"household":null,"tax":null}',
-			'"household":null,"tax":{"tax":"th-2026","children":-1}}',
+			'"household":null,"tax":null,',
+			'"household":null,"tax":{"tax":"th-2026","children":-1},',
 		)
 		const store = mustOpen(ledgerHome())
 		const refused = importJsonl(bad, store)
