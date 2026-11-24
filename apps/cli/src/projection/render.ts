@@ -1,16 +1,11 @@
 import type { ColumnHint, RenderHint } from "../table"
 import { balanceBlocks, balancesHidden } from "./balances-human"
 import { cashflowBlocks, cashflowHidden } from "./cashflow-human"
-import { compareAnnualBlocks, compareTablesHidden } from "./compare-annual-human"
 import { estateBlocks, estateHidden } from "./estate-human"
 import { liabilitiesHidden, liabilityBlocks } from "./liabilities-human"
 import { lifetimeBlocks } from "./lifetime-human"
-import {
-	compareMilestoneBlocks,
-	compareMilestonesHidden,
-	milestoneColumns,
-	runMilestonesShown,
-} from "./milestones"
+import { milestoneColumns, runMilestonesShown } from "./milestones"
+import { routingBlocks } from "./routing-human"
 import { spendingBlocks, spendingHidden } from "./spending-human"
 
 /** One column of a table-shaped result, headed exactly as its row key is spelled. */
@@ -54,6 +49,8 @@ export const projectionHint: RenderHint = {
 			column("income", "right"),
 			// Shown only when a row states it, so a Scenario without a withdrawal Flow prints as before.
 			{ ...column("withdrawals", "right"), optional: true },
+			// Money moved between the plan's own Accounts; shown only when the Scenario declares a transfer Flow (cli ADR-0070).
+			{ ...column("transfers", "right"), optional: true },
 			column("expense", "right"),
 			column("contributions", "right"),
 			column("unfundedContributions", "right"),
@@ -85,6 +82,7 @@ export const projectionHint: RenderHint = {
 			spendingHidden(balancesHidden(liabilitiesHidden(cashflowHidden(runMilestonesShown(data))))),
 		),
 	blocks: (data) => [
+		...routingBlocks(data),
 		...cashflowBlocks(data),
 		...liabilityBlocks(data),
 		...balanceBlocks(data),
@@ -110,14 +108,4 @@ export const projectionHint: RenderHint = {
 			],
 		},
 	],
-}
-
-/**
- * `projection compare`'s human view: the same figures as before, and each side's milestones as a
- * table of its own after them (cli ADR-0049). The milestones leave the listing, so they are not
- * printed twice.
- */
-export const compareHint: RenderHint = {
-	display: (data) => compareTablesHidden(compareMilestonesHidden(data)),
-	blocks: (data) => [...compareAnnualBlocks(data), ...compareMilestoneBlocks(data)],
 }

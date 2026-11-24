@@ -18,6 +18,8 @@ export const liabilityRow = z.strictObject({
 	opening: money,
 	drawn: money,
 	paid: money,
+	// What transfers paid the liability down by, apart from `paid`; present only on a liability a transfer Flow targets (cli ADR-0070, sim ADR 0031).
+	transferred: money.optional(),
 	interest: money,
 	closing: money,
 	partial: z.boolean(),
@@ -50,6 +52,21 @@ export const feeRow = z.strictObject({
 	to: dateString,
 	account: z.string(),
 	amount: money,
+})
+
+/**
+ * What one transfer Flow moved between the plan's own Accounts in one Annual roll-up, and what it planned and did
+ * not move (cli ADR-0070, sim ADR 0031). A transfer is outside cashflow: it is in no cash-flow line or total.
+ */
+export const transferRow = z.strictObject({
+	index: integer,
+	from: dateString,
+	to: dateString,
+	flow: z.string(),
+	source: z.string(),
+	target: z.string(),
+	amount: money,
+	unmoved: money,
 })
 
 /**

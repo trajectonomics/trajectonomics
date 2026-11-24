@@ -60,6 +60,24 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 	},
 	{
 		command:
+			"traj projection run --scenario routed --as-of 2026-03-31 --horizon 2027-03-30 --breakdown --json",
+		description:
+			"The annual roll-up of a Scenario with a share step, a Reserve floor, a target that keeps its value and two transfers: the routing echo (each step and entry by position), each year's transfers (moved and unmoved, outside the cash flow), and the entry each drawn line came from.",
+	},
+	{
+		command:
+			"traj projection run --scenario routed --as-of 2026-03-31 --horizon 2027-03-30 --set cashflow.withdraw.0.downTo=1000000 --breakdown --json",
+		description:
+			"What if the first withdrawal entry kept 10,000.00 in the Account before the rest are drawn: one override by the entry's position, and nothing saved.",
+	},
+	{
+		command:
+			"traj projection run --scenario routed --as-of 2026-03-31 --horizon 2027-03-30 --liabilities --json",
+		description:
+			"The loan's months in a Scenario whose transfers pay it down: each month's `transferred`, apart from the debt payments it states as `paid`.",
+	},
+	{
+		command:
 			"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
 		description: "The annual roll-up with one Stream taken out, and nothing saved.",
 	},

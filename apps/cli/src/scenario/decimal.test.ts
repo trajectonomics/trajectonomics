@@ -27,13 +27,16 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.ceiling.amount",
 			"milestones[].criteria[].amount",
 			"cashflow.surplus[].upTo",
+			"cashflow.surplus[].upTo.amount",
+			"cashflow.withdraw[].downTo",
+			"cashflow.withdraw[].downTo.amount",
 			"estate.costs[].amount",
 			"estate.gifts[].amount",
 		])
 	})
 
-	it("write a spending rule's rates, an estate share and an Account's payout and fee, and no other rate, as percent strings", () => {
-		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063, ADR-0064, ADR-0067).
+	it("write a spending rule's rates, an estate share, an Account's payout and fee and a surplus step's share, and no other rate, as percent strings", () => {
+		// A new rate field fails here until it is reviewed for the decimal form (cli ADR-0063, ADR-0064, ADR-0067, ADR-0070).
 		expect(ratePathsOf(PUBLISHED)).toEqual([
 			"accounts[].payout.bps",
 			"accounts[].fee.bps",
@@ -43,9 +46,23 @@ describe("the money fields of the decimal form", () => {
 			"flows[].rule.upper.adjustBps",
 			"flows[].rule.lower.bps",
 			"flows[].rule.lower.adjustBps",
+			"cashflow.surplus[].share",
 			"estate.costs[].bps",
 			"estate.gifts[].bps",
 		])
+	})
+
+	it("round-trips a surplus step's share, every basis point from 1 to 10000", () => {
+		for (let bps = 1; bps <= 10_000; bps++) {
+			const minor = {
+				currency: "THB",
+				cashflow: { surplus: [{ account: "a", share: bps }, { account: "b" }] },
+			}
+			const decimal = decimalOk(minor)
+			const share = ((decimal["cashflow"] as Doc)["surplus"] as Doc[])[0]?.["share"]
+			expect(typeof share, String(bps)).toBe("string")
+			expect(fromDecimalForm(decimal), String(bps)).toEqual(minor)
+		}
 	})
 
 	for (const path of moneyPathsOf(PUBLISHED)) {
@@ -55,9 +72,10 @@ describe("the money fields of the decimal form", () => {
 			const segments = path.split(".")
 			const minorValues = valuesAt(minor, segments)
 			expect(minorValues.length).toBeGreaterThan(0)
-			// A list item may omit an optional money field; the values that are there are strings.
+			// A list item may omit an optional money field; the values that are there are strings, or the
+			// object form of a routing target, whose money is the path under it.
 			for (const value of valuesAt(decimal, segments)) {
-				if (value !== undefined) expect(typeof value).toBe("string")
+				if (value !== undefined && !isDoc(value)) expect(typeof value).toBe("string")
 			}
 			const back = fromDecimalForm(decimal)
 			expect(back).toEqual(minor)
