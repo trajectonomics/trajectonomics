@@ -69,14 +69,50 @@ only when a series is present, ADR-0001 carries a cross-reference to it, and the
 that no equality test can compare a series run with a rate run: the only equality test is the
 rate-0 case, where the factor is the identity.
 
-A span return is bounded to `-9999..10000` bps. The bound cannot keep the arithmetic fully neutral:
-because a split is linear in `r`, a row cut by a mid-row Flow gains a second-order term,
-`(1 + r·h₁/D)(1 + r·h₂/D) = 1 + r + r²·h₁h₂/D²`. The number is small but not zero: a 1,000 bps
-row on 100,000 minor units split exactly at its midpoint gives `105,000 × 1.05 = 110,250`, where
-the unsplit row gives `100,000 × 1.1 = 110,000`, so the term is 250 minor units
-(`r²·h₁h₂/D² = 0.01 × 0.25 = 0.0025`). At realistic monthly returns it is negligible relative to
-the balance; it is recorded as a limit rather than fixed, and
-`src/golden/return-cases.test.ts` pins the number.
+A span return is bounded to `-9999..10000` bps.
+
+## A change inside a row is neutral (amended by #432)
+
+This section replaces the first version of the row walk, kept here as history. That version restarted
+the walk from the date of any change to the Account, so a row cut by a mid-row Flow gained a second-order
+term, `(1 + r·h₁/D)(1 + r·h₂/D) = 1 + r + r²·h₁h₂/D²`: a 1,000 bps row on 100,000 minor units split at its
+midpoint gave `105,000 × 1.05 = 110,250` where the unsplit row gave 110,000. It was recorded as negligible at
+realistic monthly returns. With the volatility of ADR-0029, `E[r²] ≈ s²` is no longer small: a fund at 7% and
+15% volatility grew 760.7 bps a year with one change mid-month and 791.2 with four weekly changes, against the
+stated 700.
+
+Now a row's growth is linear in `r`, whatever changes inside it:
+
+- **The row's start balance takes the full `1 + r`.** An amount added or taken mid-row takes `1 + r·h₂/D`
+  from its date to the row's end, where `h₂` is the counted days left in the row and `D` the row's days.
+- **The state keeps what still earns.** An Account on a series carries `earning`, the part of `balance` still to
+  earn in the row `asOf` falls in; absent, all of it. What the Account has already earned inside the row stays out,
+  so it earns nothing more until the next row. A row's start (a row boundary) makes `earning` the whole balance again.
+- **A change moves `earning` by its own size.** `mutate` sets `earning' = earning + delta`: a deposit, a
+  withdrawal, a payout (ADR-0027) and a fee (ADR-0028) all go through it, so a withdrawal gives up the
+  `r·h₂/D` it would have earned. A withdrawal larger than `earning` takes the rest from what the row has earned,
+  and `earning` goes negative. The growth never takes a balance below zero, so a withdrawal of the whole balance
+  mid-row leaves exactly 0 (the row's remaining growth of the negative `earning` is floored there).
+- **A read mid-row is consistent with the settlement.** `valuation(state, date)` is `balance + r·earning·held/D`,
+  with `held` the counted days from `asOf` to `date` inside the row, rounded once, half-up. The Derived `account`
+  reads, Milestone metrics, payouts, fees, the estate and the Levy returns tally (ADR-0020) all read that value, and
+  the row settles to the same linear sum: `100,000` at 1,000 bps with `+10,000` at the midpoint is `115,000` there and
+  `120,500` at the row's end, `100,000 × 1.1 + 10,000 × 1.05`.
+- **Rounding.** One half-up rounding per read, as before. With no change in a row, the number is the value the
+  first version gave.
+
+`src/engine/returns.test.ts` pins the hand cases (110,000 exact, the deposit, the withdrawal, the whole
+balance), `src/golden/oracle-returns-changes.ts` is the oracle (lot by lot, exact rationals) and
+`src/market/neutral-growth.test.ts` measures E[year] for the 7% / 15% fund at 256 buckets: 700.02 bps with no change,
+one change mid-month, or four weekly changes.
+
+### A row cut by the Timeline
+
+A Market row that starts at a mid-month Timeline start, or ends at a mid-month horizon, holds part of its month.
+It is given a `span`, the counted days of the whole month the return is stated over, so the row takes the same share
+of the month's return as it holds of the month's days: `r × held / span`. Before, it took the full month's return over a
+part month, about +30 bps in year one for a Timeline that starts on the 16th. The proration is exact, with no
+rounded basis point. A row from a series a caller wrote has no `span` and keeps its own days.
 
 ## Returns as a run input
 
@@ -239,7 +275,7 @@ behind a closed enum of one, not hooks.
 - Deterministic runs stay the no-series case forever; the fixtures, oracles and parity hashes are
   the guard that Monte Carlo was added beside the engine and not into it.
 - A series is tied to its horizon, and its last window is shorter than a month.
-- A mid-row Flow splits a row and adds the `r²` term; a per-row rounding freezes a tiny balance once
+- A mid-row Flow no longer adds an `r²` term (amended by #432); a per-row rounding freezes a tiny balance once
   its gain rounds to zero, at 4% annually below roughly 1,500 minor units — the effect ADR-0001
   already accepts for lazy commits.
 - Series arithmetic and the PRNG are asserted under Bun only: an unexported module is not in `dist`,

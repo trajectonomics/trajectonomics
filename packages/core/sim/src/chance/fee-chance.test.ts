@@ -40,17 +40,18 @@ function chance(account: AssetRule, model: ReturnModel, horizon: string) {
 const plain: AssetRule = { id: "fund", kind: "asset", rate: 0 }
 
 describe("a fee on an Account that follows a Return series", () => {
-	// Without a fee the same path ends at 1,000,000,000 x 1.31 x 1.31 = 1,716,100,000. A 1,200 bps fee is 1% a month. On 31 Jan the series has held 30 of January's 31 days:
-	// 1,000,000,000 x (310000 + 3100 x 30) / 310000 = 1,300,000,000, charged 13,000,000, leaving
-	// 1,287,000,000. On 28 Feb it holds 1 more day of January and all 27 days of February's row:
-	// 1,287,000,000 x 313100 / 310000 = 1,299,870,000, then x (270000 + 3100 x 27) / 270000 =
-	// 1,702,829,700, charged 17,028,297, leaving 1,685,801,403 on every path.
-	it("charges each path's own value: 13,000,000 then 17,028,297, ending at 1,685,801,403", () => {
+	// Without a fee the same path ends at 1,000,000,000 x 1.31 x (1 + 0.31 x 27/28) = 1,701,596,429: the
+	// February row holds 27 of its 28 days, so it takes 27/28 of the month's return. A 1,200 bps fee is 1% a month.
+	// On 31 Jan the series has held 30 of January's 31 days: 1,000,000,000 x (310000 + 3100 x 30) / 310000
+	// = 1,300,000,000, charged 13,000,000, leaving 1,287,000,000. The 13,000,000 leaves no growth for the rest of the row:
+	// 987,000,000 still earns 100 bps for the last day, so 1,296,870,000 on 1 Feb. On 28 Feb the row's 27 days
+	// give 1,296,870,000 x (280000 + 3100 x 27) / 280000 = 1,684,541,496, charged 16,845,415, leaving 1,667,696,081.
+	it("charges each path's own value: 13,000,000 then 16,845,415, ending at 1,667,696,081", () => {
 		const ended = chance(fund({ bps: 1200 }), rising, "2026-02-28")
 		expect(ended.bands[0]?.netWorth.map((point) => point.value)).toEqual(
-			Array(5).fill(1_685_801_403),
+			Array(5).fill(1_667_696_081),
 		)
-		expect(chance(plain, rising, "2026-02-28").bands[0]?.netWorth.at(-1)?.value).toBe(1_716_100_000)
+		expect(chance(plain, rising, "2026-02-28").bands[0]?.netWorth.at(-1)?.value).toBe(1_701_596_429)
 	})
 
 	it("lowers every Band against the same seed without it", () => {

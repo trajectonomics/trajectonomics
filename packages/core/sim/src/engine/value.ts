@@ -26,14 +26,20 @@ export function activeNominalRule(state: AccountState): NominalRule | undefined 
 }
 
 /** A Return series replaces the rate, so an Account holding one takes this path. */
-function growTo(state: AccountState, date: DateString): bigint {
+function growTo(state: AccountState, date: DateString): GrownRead {
 	const series = state.series
 	if (series !== undefined) {
-		const read = walkRows(state.balance, state.asOf, date, series, state.walked)
+		const read = walkRows(state, date, series, state.walked)
 		state.walked = read.walked
-		return read.amount
+		return read
 	}
-	return grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
+	const amount = grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
+	return { amount, earning: amount }
+}
+
+interface GrownRead {
+	readonly amount: bigint
+	readonly earning: bigint
 }
 
 /** The grown value is read again and again on one date, so the last reading is kept (pure). */
@@ -41,9 +47,19 @@ function effectiveParts(state: AccountState, date: DateString): ValueParts {
 	const { balance, asOf, grown } = state
 	if (asOf === date) return { capitalised: balance, accruedInterest: 0n, amount: balance }
 	const hit = grown?.date === date && grown.balance === balance && grown.asOf === asOf
-	const amount = hit ? grown.amount : growTo(state, date)
-	if (!hit) state.grown = { balance, asOf, date, amount }
-	return { capitalised: amount, accruedInterest: 0n, amount }
+	const read = hit ? grown : growTo(state, date)
+	if (!hit) state.grown = { balance, asOf, date, ...read }
+	return { capitalised: read.amount, accruedInterest: 0n, amount: read.amount }
+}
+
+/**
+ * The part of a Return series Account's value on `date` still to earn in the row `date` falls in:
+ * what a change on `date` leaves earning the rest of that row (ADR 0005).
+ */
+export function earningAt(state: AccountState, date: DateString): bigint {
+	if (state.asOf === date) return state.earning ?? state.balance
+	effectiveParts(state, date)
+	return state.grown!.earning
 }
 
 /**
