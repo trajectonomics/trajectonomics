@@ -30,16 +30,41 @@ Claude Pro รายปีอยู่ที่ $17 ต่อเดือน แ
 
 [Claude Pro](https://claude.com/pricing) ราคาป้าย $20 ถ้าจ่ายรายเดือน หรือ $17 ต่อเดือนเมื่อจ่ายรายปี $200 ล่วงหน้า [หน้าช่วยเหลือของ Claude](https://support.claude.com/en/articles/8325606-what-is-the-pro-plan) บอกว่าราคาท้องถิ่นอาจต่างจากราคาดอลลาร์ และ Pro รวมการใช้งาน Claude Code
 
+<figure>
+  <img src="/posts/ai-subscribe-1000-baht/claude-pro.webp" alt="หน้าราคาของ Claude แสดงแผน Free ($0), Pro ($17 ต่อเดือนเมื่อจ่ายรายปี $200 หรือ $20 ต่อเดือนเมื่อจ่ายรายเดือน รวม Claude Code), Max ($100) และ Ultra ($200)" width="1440" height="810" loading="lazy" />
+  <figcaption>หน้าราคาแผนบุคคลของ Claude: แผน Pro ราคา $20 ต่อเดือนเมื่อจ่ายรายเดือน และรวม Claude Code</figcaption>
+</figure>
+
 ที่เรตวันที่ 24 พ.ย. 2026 ราคาจ่ายรายเดือนคือ 678.88 บาท อยู่ในงบ 1,000 บาท งานที่ผมชี้ไว้สำหรับตัวนี้คืองานเขียนโค้ด
 
 ## เอเจนต์: OpenCode Go กับ Hermes Agent หรือ MausBot
 
 ตัวที่เสียเงินในงานนี้คือ [OpenCode Go](https://opencode.ai/console/go) แผน Go ราคา **$10 ต่อเดือน** ([เอกสาร Go](https://opencode.ai/docs/console/go/)) ที่เรตเดียวกันคือ 339.44 บาท
 
+<figure>
+  <img src="/posts/ai-subscribe-1000-baht/opencode-go.webp" alt="หน้าเอกสาร OpenCode Go แสดงตารางราคาสามแผน: Go ($10 ต่อเดือน), Go Plus ($40 ต่อเดือน) และ Go Teams ($20 ต่อคนต่อเดือน ขั้นต่ำ 2 คน) พร้อมวิธีเชื่อมต่อคีย์" width="1440" height="810" loading="lazy" />
+  <figcaption>หน้าเอกสาร OpenCode Go: แผน Go เริ่มต้น $10 ต่อเดือน</figcaption>
+</figure>
+
 แอปที่รันเอเจนต์ผมใช้ได้สองทาง และทั้งคู่เป็นแอปฟรี:
 
-- [Hermes Agent](https://hermes-agent.nousresearch.com/) ของ Nous Research เปิดซอร์สสัญญาอนุญาต MIT หน้าเว็บระบุว่าตัวเอเจนต์ฟรี และคีย์ OpenCode Go ใช้เป็นผู้ให้บริการโมเดลได้ ([เปรียบเทียบกับ OpenCode](https://hermes-agent.nousresearch.com/compare/opencode)) หน้า Go เองก็บอกว่า Hermes เป็นไคลเอนต์ที่ตรวจแล้ว แม้จะไม่รับประกันว่าจะใช้ได้ตลอดไป
-- [MausBot](https://mausbot.com/) แอปเดสก์ท็อปฟรี สัญญาอนุญาต Apache 2.0 หน้าแรกบอกว่าข้อมูลอยู่ที่ `~/.openmausbot` [เอกสารเอนจิน](https://docs.openmausbot.com/docs/providers) ระบุ OpenCode และ Hermes เป็นเอนจินที่ใช้ได้ แผนคลาวด์ของ MausBot เริ่มที่ $15 ต่อเดือน ([หน้าราคา](https://mausbot.com/pricing)) อันนั้นเป็นทางเลือกเพิ่ม ไม่ใช่ตัวที่อยู่ในงบก้อนนี้
+### Hermes Agent
+
+[Hermes Agent](https://hermes-agent.nousresearch.com/) ของ Nous Research เปิดซอร์สสัญญาอนุญาต MIT หน้าเว็บระบุว่าตัวเอเจนต์ฟรี และคีย์ OpenCode Go ใช้เป็นผู้ให้บริการโมเดลได้ ([เปรียบเทียบกับ OpenCode](https://hermes-agent.nousresearch.com/compare/opencode)) หน้า Go เองก็บอกว่า Hermes เป็นไคลเอนต์ที่ตรวจแล้ว แม้จะไม่รับประกันว่าจะใช้ได้ตลอดไป
+
+<figure>
+  <img src="/posts/ai-subscribe-1000-baht/hermes-agent.webp" alt="หน้าแรกของ Hermes Agent จาก Nous Research แสดงหัวข้อ The Agent That Grows With You พร้อมคำสั่งติดตั้งผ่านเทอร์มินัลสำหรับ macOS, Linux และ Windows" width="1440" height="810" loading="lazy" />
+  <figcaption>หน้าแรกของ Hermes Agent (Nous Research) แอปเอเจนต์โอเพนซอร์สที่ติดตั้งฟรี</figcaption>
+</figure>
+
+### MausBot
+
+[MausBot](https://mausbot.com/) แอปเดสก์ท็อปฟรี สัญญาอนุญาต Apache 2.0 หน้าแรกบอกว่าข้อมูลอยู่ที่ `~/.openmausbot` [เอกสารเอนจิน](https://docs.openmausbot.com/docs/providers) ระบุ OpenCode และ Hermes เป็นเอนจินที่ใช้ได้ แผนคลาวด์ของ MausBot เริ่มที่ $15 ต่อเดือน ([หน้าราคา](https://mausbot.com/pricing)) อันนั้นเป็นทางเลือกเพิ่ม ไม่ใช่ตัวที่อยู่ในงบก้อนนี้
+
+<figure>
+  <img src="/posts/ai-subscribe-1000-baht/mausbot.webp" alt="หน้าแรกของ MausBot แสดงข้อความว่าฟรีและเปิดซอร์ส นำบัญชี AI หรือ API key มาใช้เองได้ พร้อมตัวอย่างหน้าต่างแอปเดสก์ท็อป" width="1440" height="810" loading="lazy" />
+  <figcaption>หน้าแรกของ MausBot แอปเดสก์ท็อปฟรีที่นำคีย์ OpenCode Go หรือ Hermes มาต่อได้</figcaption>
+</figure>
 
 Nous Portal ของ Hermes มีแผนเสียเงินเริ่มที่ $20 ต่อเดือนบนหน้าเดียวกัน แผนนั้นก็ไม่ได้อยู่ในตัวเลือกของคลิป ตัวที่ชี้คือแอปฟรีบวก OpenCode Go
 
@@ -48,6 +73,11 @@ Claude Pro กับ OpenCode Go พร้อมกันคือ $30 หรื
 ## ครีเอทีฟ: Google AI Pro
 
 แผนที่สมัครสำหรับงานภาพและวิดีโอคือ **Google AI Pro** ราคาป้าย **$19.99 ต่อเดือน** บน [หน้าแผนภาษาอังกฤษของสหรัฐ](https://one.google.com/intl/en_us/about/google-ai-plans/) ที่เรตวันที่ 24 พ.ย. คือ 678.54 บาท
+
+<figure>
+  <img src="/posts/ai-subscribe-1000-baht/google-ai-pro.webp" alt="หน้าแผน Google AI ฝั่งสหรัฐ แสดงสามแผน: Google AI Plus ($4.99 ต่อเดือน), Google AI Pro ($19.99 ต่อเดือน รวม Gemini 4 Neon และพื้นที่ 5 TB) และ Google AI Ultra (เริ่มต้น $99.99 ต่อเดือน)" width="1440" height="810" loading="lazy" />
+  <figcaption>หน้าแผน Google AI ฝั่งสหรัฐ: แผน Google AI Pro ราคาป้าย $19.99 ต่อเดือน</figcaption>
+</figure>
 
 หน้าเดียวกันบอกว่าแผน Pro ได้สิทธิ์สร้างภาพ เพลง และวิดีโอใน Gemini, Search และ Google Flow แบบขยาย (expanded) ไม่ใช่ระดับสูงขึ้นของแผน Ultra และมี Gemini 4 ในแอป Gemini ชื่อที่คนเรียกกันว่า Gemini Pro ในคลิปคือแผนนี้ ไม่ใช่ชื่อโมเดลแยกต่างหาก
 
