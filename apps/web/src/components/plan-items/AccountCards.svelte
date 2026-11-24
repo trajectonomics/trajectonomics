@@ -48,13 +48,13 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 					<dt class="text-muted-foreground">Locked until</dt>
 					<dd>{card.lockedUntil}<WasText was={mark.was.lockedUntil} /></dd>
 				{/if}
-				{#if card.payout !== null}
+				{#if card.payout !== null || mark.was.payout !== undefined}
 					<dt class="text-muted-foreground">Payout</dt>
-					<dd>{card.payout}<WasText was={mark.was.payout} />{#if card.payoutHow !== null}<span class="block text-xs text-muted-foreground">{card.payoutHow}</span>{/if}</dd>
+					<dd>{card.payout ?? "none"}<WasText was={mark.was.payout} />{#if card.payoutHow !== null}<span class="block text-xs text-muted-foreground">{card.payoutHow}</span>{/if}</dd>
 				{/if}
-				{#if card.fee !== null}
+				{#if card.fee !== null || mark.was.fee !== undefined}
 					<dt class="text-muted-foreground">Fee</dt>
-					<dd>{card.fee}<WasText was={mark.was.fee} /></dd>
+					<dd>{card.fee ?? "none"}<WasText was={mark.was.fee} /></dd>
 				{/if}
 				<dt class="text-muted-foreground">Baseline balance</dt>
 				<dd>
