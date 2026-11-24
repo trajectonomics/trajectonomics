@@ -43,6 +43,7 @@ const TOTALS = {
 	paidBy: new Map(),
 	contributions: 0n,
 	employer: 0n,
+	payouts: 0n,
 	unfunded: new Map(),
 	levy: 0n,
 }

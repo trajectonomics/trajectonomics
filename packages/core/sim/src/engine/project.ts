@@ -5,6 +5,7 @@ import { buildLiabilities } from "../output/liabilities"
 import { periodEndDates } from "../output/periods"
 import { rowDates } from "../output/row-dates"
 import { statementPeriods } from "../output/statement-periods"
+import { withPayouts } from "../payout/flows"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
 import type { ProjectionOptions } from "../types/statement"
@@ -24,13 +25,14 @@ function observationDates(timeline: Timeline, statements: boolean): readonly Dat
 /** Runs `check` first, then the deterministic engine; never throws on valid inputs. */
 export function project(
 	baseline: Baseline,
-	scenario: Scenario,
+	declared: Scenario,
 	timeline: Timeline,
 	options: ProjectionOptions = {},
 ): ProjectionResult {
 	const statements = options.liabilityStatements === true
-	const problems = check(baseline, scenario, timeline)
+	const problems = check(baseline, declared, timeline)
 	if (problems.length > 0) return { ok: false, problems }
+	const scenario = withPayouts(declared)
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
 	const result = runEngine(baseline, scenario, timeline, observed, undefined, {

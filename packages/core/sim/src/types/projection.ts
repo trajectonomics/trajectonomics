@@ -43,6 +43,11 @@ export interface AnnualRollup {
 	 * Not in `income` or `contributions`, and not part of `interest`: the money never entered cashflow.
 	 */
 	readonly employerContributions?: MinorUnits
+	/**
+	 * Payouts landed as passive income in the period; present only when the Scenario declares a payout
+	 * with a share above 0. Already inside `income`, and outside `interest`: they left the Account.
+	 */
+	readonly payouts?: MinorUnits
 	readonly unfundedContributions: MinorUnits
 	/** Prepayment plus Settlements net of refunds; present only when the Scenario has a Levy. */
 	readonly levy?: MinorUnits

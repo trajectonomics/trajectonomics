@@ -9,6 +9,7 @@ import { checkLevies } from "./levy"
 import { loanIndex } from "./loan-index"
 import { checkMilestones } from "./milestones"
 import { checkObligationWithdrawn } from "./obligation-withdrawn"
+import { checkPayoutIds } from "./payout"
 import { checkContributionRouting, checkIlliquidRouting } from "./routing"
 import { rate, str } from "./scalars"
 import { anyVersion, checkShape, isRecord, opt, req } from "./shape"
@@ -48,7 +49,7 @@ export function checkScenario(
 		schemaVersion: req(anyVersion),
 		currency: req(str),
 		economy: req(economy),
-		accounts: req((v, p, e) => checkAccounts(v, p, e, hasLevy)),
+		accounts: req((v, p, e) => checkAccounts(v, p, e, context)),
 		flows: req((v, p, e) => checkFlows(v, p, context, e)),
 		cashflow: req((v, p, e) => checkCashflow(v, p, accounts, e)),
 		levies: opt(checkLevies),
@@ -57,6 +58,7 @@ export function checkScenario(
 		estate: opt((v, p, e) => checkEstate(v, p, accounts, e)),
 	}
 	const checked = checkShape(value, path, shape, emit)
+	checkPayoutIds(checked?.["accounts"], checked?.["flows"], path, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
 	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], context.illiquid, path, emit)

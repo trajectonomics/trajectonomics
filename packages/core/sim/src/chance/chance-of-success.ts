@@ -2,6 +2,7 @@ import { check } from "../check"
 import { checkChanceOptions } from "../check/chance"
 import { checkReturnModel } from "../check/market"
 import { marketReturns } from "../market/paths"
+import { withPayouts } from "../payout/flows"
 import type { Baseline, Scenario, Timeline } from "../types"
 import type { ChanceOfSuccessOptions, ChanceOfSuccessResult } from "../types/chance"
 import { outcomeOf, type PathInputs, type PathOutcome, pathInputs } from "./path"
@@ -19,7 +20,7 @@ export function chanceOfSuccess(
 	const accounts = scenario.accounts.map((account) => account.id)
 	const modelProblems = checkReturnModel(options.model, accounts, timeline)
 	if (modelProblems.length > 0) return { ok: false, problems: modelProblems }
-	return outcomesOf(pathInputs(baseline, scenario, timeline), options)
+	return outcomesOf(pathInputs(baseline, withPayouts(scenario), timeline), options)
 }
 
 function outcomesOf(inputs: PathInputs, options: ChanceOfSuccessOptions): ChanceOfSuccessResult {

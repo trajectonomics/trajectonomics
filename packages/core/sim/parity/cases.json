@@ -9607,5 +9607,299 @@
 			"minBufferMonths": 6
 		},
 		"fiSha256": "2e7710f682494e904b6432bdbae9f61014e392392d3afc34cbda231637cd1dab"
+	},
+	{
+		"name": "payout-year",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 5000000
+				},
+				{
+					"account": "fund",
+					"amount": 1000000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 800,
+					"payout": {
+						"bps": 350,
+						"frequency": "quarterly",
+						"rounding": "halfUp",
+						"label": "dividends",
+						"prepayments": [
+							{
+								"levy": "tax",
+								"bps": 1000
+							}
+						]
+					}
+				}
+			],
+			"flows": [
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 100000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			},
+			"levies": [
+				{
+					"id": "tax",
+					"period": {
+						"month": 1,
+						"day": 1
+					},
+					"settlement": {
+						"month": 3,
+						"day": 31
+					},
+					"measures": [
+						{
+							"id": "gross",
+							"op": "tally",
+							"label": "dividends",
+							"basis": "gross"
+						},
+						{
+							"id": "due",
+							"op": "scale",
+							"of": "gross",
+							"num": 1500,
+							"den": 10000,
+							"rounding": "halfUp"
+						}
+					],
+					"due": "due",
+					"carryIn": [
+						{
+							"periodStart": "2025-01-01",
+							"tallies": [],
+							"prepaid": 0
+						}
+					]
+				}
+			]
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2027-03-31",
+			"resolution": "month"
+		},
+		"projectOptions": {
+			"cashflowBreakdown": true
+		},
+		"sha256": "5876f672e4ddb4c381a5feb7fc887deeb072c3631675f956fe7ace58cd7b2569"
+	},
+	{
+		"name": "payout-fi",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "fund",
+					"amount": 120000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"payout": {
+						"bps": 600,
+						"frequency": "monthly",
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2034-01-01",
+			"resolution": "month"
+		},
+		"sha256": "ff60bbda72d8cee28f5c5bd12d1db243bccc3e806920fbfb8ffec22bafe79fc1",
+		"options": {
+			"method": "survival",
+			"minBufferMonths": 0
+		},
+		"fiSha256": "d5e7ece587f5edc2aff0fbd7df2e8c9ec38e53cd64cf0e448a3e96f2e53cb60d"
+	},
+	{
+		"name": "payout-chance",
+		"baseline": {
+			"schemaVersion": 1,
+			"balances": [
+				{
+					"account": "cash",
+					"amount": 0
+				},
+				{
+					"account": "fund",
+					"amount": 120000000
+				}
+			]
+		},
+		"scenario": {
+			"schemaVersion": 4,
+			"currency": "THB",
+			"economy": {
+				"inflation": 0
+			},
+			"accounts": [
+				{
+					"id": "cash",
+					"kind": "asset",
+					"rate": 0
+				},
+				{
+					"id": "fund",
+					"kind": "asset",
+					"rate": 0,
+					"payout": {
+						"bps": 600,
+						"frequency": "monthly",
+						"rounding": "halfUp"
+					}
+				}
+			],
+			"flows": [
+				{
+					"id": "salary",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 1000000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "income",
+					"earned": true
+				},
+				{
+					"id": "living",
+					"frequency": "monthly",
+					"start": "2026-01-01",
+					"amount": 600000,
+					"growth": {
+						"bps": 0
+					},
+					"kind": "expense"
+				}
+			],
+			"cashflow": {
+				"surplus": [
+					{
+						"account": "cash"
+					}
+				],
+				"contribute": [],
+				"withdraw": ["cash"]
+			}
+		},
+		"timeline": {
+			"start": "2026-01-01",
+			"horizon": "2034-01-01",
+			"resolution": "month"
+		},
+		"sha256": "ff60bbda72d8cee28f5c5bd12d1db243bccc3e806920fbfb8ffec22bafe79fc1",
+		"chance": {
+			"model": {
+				"id": "payout-market",
+				"accounts": ["cash", "fund"],
+				"buckets": [
+					{
+						"returnsBps": [0, 0],
+						"weight": 2147483648
+					},
+					{
+						"returnsBps": [0, -1500],
+						"weight": 2147483648
+					}
+				]
+			},
+			"seed": "0123456789abcdef",
+			"paths": 4
+		},
+		"chanceSha256": "065f028ecce42f44c4415fc992ca86e29c8a56ff4b51b12b898dba8c3d52388d"
 	}
 ]

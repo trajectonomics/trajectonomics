@@ -3,7 +3,7 @@ import type { FlowContext } from "./flow-shape"
 import { opt, type Shape } from "./shape"
 
 /** A Milestone id a Flow gates on: a string that names a declared Milestone. */
-function milestoneRef(ids: ReadonlySet<string>): Check {
+export function milestoneRef(ids: ReadonlySet<string>): Check {
 	return (value, path, emit) => {
 		if (typeof value !== "string") emit("WRONG_TYPE", path)
 		else if (!ids.has(value)) emit("UNKNOWN_MILESTONE", path)

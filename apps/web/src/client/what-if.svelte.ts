@@ -2,11 +2,11 @@ import { documentRead } from "../lib/view/plan-items/document"
 import type { WhatIf } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { currentSnapshot } from "./snapshot.svelte.js"
-import { WhatIfChanges } from "./what-if-changes.svelte.js"
+import { WhatIfGroups } from "./what-if-groups.svelte.js"
 import { applyWhatIf, keepWhatIf } from "./what-if-remote.js"
 
 /** The What-if session of this tab, and how it ends. Nothing is stored: closing the tab ends it. */
-class WhatIfSession extends WhatIfChanges {
+class WhatIfSession extends WhatIfGroups {
 	/** Drops the session with nothing run. */
 	revert(): void {
 		if (!this.saving) this.end()

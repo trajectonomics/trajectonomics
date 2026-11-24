@@ -15,6 +15,12 @@ function unsafe(values: readonly bigint[], date: string): ProjectionProblem | un
 	return undefined
 }
 
+/** Growth: what net worth gained beyond the money that came in and left; a payout moved, so it is added back. */
+function interestOf(sums: FlowSums, opening: bigint, closing: bigint, unmet: bigint): bigint {
+	const gained = closing - opening - sums.income + sums.expense + sums.levy - unmet
+	return gained - sums.employer + sums.payouts
+}
+
 function rollupOf(
 	period: Period,
 	sums: FlowSums,
@@ -23,8 +29,7 @@ function rollupOf(
 	unmet: bigint,
 	declared: Declared,
 ): AnnualRollup {
-	const interest =
-		closing - opening - sums.income + sums.expense + sums.levy - unmet - sums.employer
+	const interest = interestOf(sums, opening, closing, unmet)
 	return {
 		index: period.index,
 		from: period.from,
@@ -35,6 +40,7 @@ function rollupOf(
 		expense: Number(sums.expense),
 		contributions: Number(sums.contributions),
 		...(declared.employer ? { employerContributions: Number(sums.employer) } : {}),
+		...(declared.payouts ? { payouts: Number(sums.payouts) } : {}),
 		unfundedContributions: Number(sums.unfunded),
 		...(declared.levy ? { levy: Number(sums.levy) } : {}),
 		...(declared.withdrawals ? { withdrawals: Number(sums.withdrawals) } : {}),
@@ -49,6 +55,7 @@ interface Declared {
 	readonly levy: boolean
 	readonly withdrawals: boolean
 	readonly employer: boolean
+	readonly payouts: boolean
 }
 
 export function buildRollups(
@@ -57,6 +64,7 @@ export function buildRollups(
 	opening: bigint,
 	withdrawals: boolean,
 	employer: boolean,
+	payouts: boolean,
 ): RollupOutcome {
 	const snapshots = new Map<string, EngineSnapshot>()
 	for (const snapshot of run.snapshots) snapshots.set(snapshot.date, snapshot)
@@ -65,14 +73,14 @@ export function buildRollups(
 		levy: run.levies !== undefined && run.levies.length > 0,
 		withdrawals,
 		employer,
+		payouts,
 	}
 	let openingWorth = opening
 	for (const period of periods) {
 		const sums = sumFlows(run.totals, period)
 		const closing = snapshots.get(period.to)!.netWorth
 		const unmet = run.runsOut?.date === period.to ? run.runsOut.unmet : 0n
-		const interest =
-			closing - openingWorth - sums.income + sums.expense + sums.levy - unmet - sums.employer
+		const interest = interestOf(sums, openingWorth, closing, unmet)
 		const problem = unsafe(
 			[
 				openingWorth,
@@ -82,6 +90,7 @@ export function buildRollups(
 				sums.withdrawals,
 				sums.contributions,
 				sums.employer,
+				sums.payouts,
 				sums.unfunded,
 				sums.levy,
 				interest,

@@ -1,6 +1,7 @@
 import { ACCOUNT_KINDS, COMPOUNDING_PERIODS } from "../vocab"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
 import { tallyLabel } from "./levy-fields"
+import { checkPayoutRules, type PayoutContext, payoutField } from "./payout"
 import { bool, date, oneOf, safeInt, str } from "./scalars"
 import { checkShape, checkUnique, isRecord, list, opt, req, type Shape } from "./shape"
 
@@ -14,7 +15,8 @@ function isCompoundingPeriod(value: unknown): boolean {
 	return typeof value === "string" && COMPOUNDING_PERIODS.some((period) => period === value)
 }
 
-function shapeOf(hasLevy: boolean): Shape {
+function shapeOf(context: PayoutContext): Shape {
+	const { hasLevy } = context
 	return {
 		id: req(str),
 		kind: req(oneOf(ACCOUNT_KINDS, "INVALID_KIND")),
@@ -24,6 +26,7 @@ function shapeOf(hasLevy: boolean): Shape {
 		liquid: opt(bool),
 		returnLabel: tallyLabel(hasLevy),
 		gainLabel: tallyLabel(hasLevy),
+		payout: payoutField(context),
 	}
 }
 
@@ -63,17 +66,23 @@ function checkAssetOnlyKeys(checked: Readonly<Record<string, unknown>>, path: Pa
 }
 
 const account =
-	(hasLevy: boolean): Check =>
+	(context: PayoutContext): Check =>
 	(value, path, emit) => {
-		const checked = checkShape(value, path, shapeOf(hasLevy), emit)
+		const checked = checkShape(value, path, shapeOf(context), emit)
 		if (checked === undefined) return
 		checkAssetOnlyKeys(checked, path, emit)
-		if (hasLevy) checkLabelRules(checked, path, emit)
+		checkPayoutRules(checked, path, emit)
+		if (context.hasLevy) checkLabelRules(checked, path, emit)
 		checkRate(value, path, emit)
 	}
 
-export function checkAccounts(value: unknown, path: Path, emit: Emit, hasLevy: boolean): void {
-	list(account(hasLevy))(value, path, emit)
+export function checkAccounts(
+	value: unknown,
+	path: Path,
+	emit: Emit,
+	context: PayoutContext,
+): void {
+	list(account(context))(value, path, emit)
 	checkUnique(value, path, "id", emit)
 }
 

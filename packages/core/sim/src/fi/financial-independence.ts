@@ -1,6 +1,7 @@
 import { check } from "../check"
 import { checkFinancialIndependenceOptions } from "../check/financial-independence"
 import { checkReturnModel } from "../check/market"
+import { withPayouts } from "../payout/flows"
 import type { Baseline, ReturnModel, Scenario, Timeline } from "../types"
 import type {
 	FinancialIndependenceOptions,
@@ -43,16 +44,17 @@ export function financialIndependence(
 ): FinancialIndependenceResult
 export function financialIndependence(
 	baseline: Baseline,
-	scenario: Scenario,
+	declared: Scenario,
 	timeline: Timeline,
 	options: FinancialIndependenceOptions,
 	model?: ReturnModel,
 ): FinancialIndependenceResult {
 	const problems = [
-		...check(baseline, scenario, timeline),
+		...check(baseline, declared, timeline),
 		...checkFinancialIndependenceOptions(options),
 	]
 	if (problems.length > 0) return { ok: false, problems }
+	const scenario = withPayouts(declared)
 	const derived =
 		(options.retirementSpending === undefined ? derivedExpenseProblem(scenario) : undefined) ??
 		derivedDebtPaymentProblem(scenario)
