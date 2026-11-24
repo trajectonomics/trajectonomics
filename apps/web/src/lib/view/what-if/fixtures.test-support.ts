@@ -1,9 +1,10 @@
+import { demoSnapshotText } from "../../../../scripts/demo-snapshot"
 import { type ProjectionCompare, type Snapshot, snapshot as snapshotSchema } from "../../contract"
 import type { WhatIfLens } from "../../what-if/lens"
 
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 
-/** The committed Demo snapshot: its `base` is the baseline, and its `retire-early` stands in for the what-if. */
+/** The Demo snapshot (generated at build, ADR 0021): its `base` is the baseline, and its `retire-early` stands in for the what-if. */
 export const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 function dataOf<T>(read: { ok: true; data: T } | { ok: false } | null | undefined): T {

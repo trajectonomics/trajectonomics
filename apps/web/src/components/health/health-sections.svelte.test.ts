@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import {
 	type Doctor,
 	type Read,
@@ -13,7 +14,7 @@ import SnapshotSection from "./SnapshotSection.svelte"
 
 // The Demo supplies only the shape of a Snapshot and its dates: each assertion reads them from it, so the
 // test survives a rebuilt Demo. Every figure asserted in the sections below is a hand-made fixture.
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 const demo: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 const doctor: Doctor = {

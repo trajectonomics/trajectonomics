@@ -2,22 +2,42 @@
 	"$schema": "https://turbo.build/schema.json",
 	"extends": ["//"],
 	"tasks": {
+		"demo": {
+			"dependsOn": ["@trajectonomics/core#build"],
+			"inputs": [
+				"package.json",
+				"scripts/demo*.ts",
+				"scripts/demo/**",
+				"scripts/run-*.ts",
+				"scripts/snapshot-run.ts",
+				"scripts/spawn.ts",
+				"scripts/traj-binary.ts",
+				"src/lib/contract/**",
+				"src/lib/snapshot/**",
+				"!**/*.test.ts",
+				"!**/*.test-support.ts",
+				"../cli/src/**",
+				"!../cli/src/**/*.test.ts",
+				"../cli/package.json"
+			],
+			"outputs": ["public/demo/snapshot.json"]
+		},
 		"build": {
-			"dependsOn": ["^build", "@trajectonomics/brand#check"],
+			"dependsOn": ["^build", "@trajectonomics/brand#check", "demo"],
 			"outputs": ["dist/**", "pack/**"]
 		},
 		"test": {
-			"dependsOn": ["^build", "@trajectonomics/cli#build"]
+			"dependsOn": ["^build", "@trajectonomics/cli#build", "demo"]
 		},
 		"test:src": {
-			"dependsOn": ["^build"]
+			"dependsOn": ["^build", "demo"]
 		},
 		"test:scripts": {
-			"dependsOn": ["^build", "@trajectonomics/cli#build"],
+			"dependsOn": ["^build", "@trajectonomics/cli#build", "demo"],
 			"cache": false
 		},
 		"check": {
-			"dependsOn": ["build", "^build", "^check", "@trajectonomics/cli#build"]
+			"dependsOn": ["build", "^build", "^check", "@trajectonomics/cli#build", "demo"]
 		}
 	}
 }
