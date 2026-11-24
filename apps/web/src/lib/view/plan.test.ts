@@ -1,15 +1,14 @@
 import { describe, expect, test } from "bun:test"
-import { readFileSync } from "node:fs"
-import { join } from "node:path"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import type { Snapshot } from "../contract"
 import { parseSnapshotText } from "./parse-snapshot"
 import { scenarioNames } from "./plan"
 import { LOADING } from "./state"
 
-const DEMO = join(import.meta.dir, "../../../public/demo/snapshot.json")
+const DEMO_TEXT = await demoSnapshotText()
 
 function demoSnapshot(): Snapshot {
-	const result = parseSnapshotText(readFileSync(DEMO, "utf8"))
+	const result = parseSnapshotText(DEMO_TEXT)
 	if (!result.ok) throw new Error(`the Demo snapshot does not parse: ${result.reason}`)
 	return result.snapshot
 }

@@ -144,6 +144,8 @@ describe("--set a share or a cap", () => {
 			account: "emergency",
 			upTo: { amount: "50000.00", growth: "inflation" },
 			share: "20.00",
+			// The short horizon is inside the first year, so no whole year of growth has passed (sim ADR-0030).
+			resolved: { first: "50000.00", horizon: "50000.00" },
 		})
 	})
 

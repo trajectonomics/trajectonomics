@@ -9,7 +9,8 @@ export const FORMAT_VERSION = 1
  * `null`, never `{}`; `document` is a JSON object written as its RFC 8785 canonical text;
  * `correction` is `reversal`, `replacement` or `null`; `household?` is a household document, which
  * is `null` when none is set (cli ADR-0048); `tax?` is a tax profile, which is `null` when none is
- * stored (cli ADR-0066).
+ * stored (cli ADR-0066); `notes?` is a plan's notes, which is `null` when it has none, and `flag` is
+ * a JSON boolean (cli ADR-0071).
  */
 export type FieldKind =
 	| "text"
@@ -22,6 +23,8 @@ export type FieldKind =
 	| "document"
 	| "household?"
 	| "tax?"
+	| "notes?"
+	| "flag"
 	| "correction"
 
 type Fields<Row> = { readonly [K in keyof Row]-?: FieldKind }
@@ -51,7 +54,7 @@ export const RECORD_ORDER: readonly RecordType[] = [
 const SYNC = { version: "int", createdAt: "time", updatedAt: "time" } as const
 
 /** A Scenario's columns before the household (schema version 2). */
-const SCENARIO_V2: Omit<Fields<ScenarioRow>, "household" | "tax"> = {
+const SCENARIO_V2: Omit<Fields<ScenarioRow>, "household" | "tax" | "notes" | "main"> = {
 	id: "text",
 	entityId: "text",
 	name: "text",
@@ -63,10 +66,16 @@ const SCENARIO_V2: Omit<Fields<ScenarioRow>, "household" | "tax"> = {
 }
 
 /** A Scenario's columns with the household and before the tax profile (schema version 3). */
-const SCENARIO_V3: Omit<Fields<ScenarioRow>, "tax"> = { ...SCENARIO_V2, household: "household?" }
+const SCENARIO_V3: Omit<Fields<ScenarioRow>, "tax" | "notes" | "main"> = {
+	...SCENARIO_V2,
+	household: "household?",
+}
 
 /** A Scenario's columns with the tax profile beside the household (schema version 4). */
-const SCENARIO_V4: Fields<ScenarioRow> = { ...SCENARIO_V3, tax: "tax?" }
+const SCENARIO_V4: Omit<Fields<ScenarioRow>, "notes" | "main"> = { ...SCENARIO_V3, tax: "tax?" }
+
+/** A Scenario's columns with the notes and the main-plan flag after the tax profile (schema version 5). */
+const SCENARIO_V5: Fields<ScenarioRow> = { ...SCENARIO_V4, notes: "notes?", main: "flag" }
 
 /**
  * The writer's declared key order for each record, after its leading `"record"` key. The reader
@@ -103,17 +112,19 @@ export const FIELDS: { readonly [T in RecordType]: Fields<RecordRows[T]> } = {
 		currency: "text",
 		dimensions: "dimensions",
 	},
-	scenario: SCENARIO_V4,
+	scenario: SCENARIO_V5,
 }
 
 /**
  * The record layouts this build reads, by the schema version a header states. Schema 2 predates
  * the household column and schema 3 the tax column, so their Scenario records have none and restore
- * with it null (cli ADR-0048, ADR-0066).
+ * with it null, and schema 4 the notes and the main plan, so its records restore with no notes and
+ * no main plan (cli ADR-0048, ADR-0066, ADR-0071).
  * Any other version is refused: a restore never guesses a layout.
  */
 export const READABLE_LAYOUTS: Readonly<Record<number, Layout>> = {
 	2: { ...FIELDS, scenario: SCENARIO_V2 },
 	3: { ...FIELDS, scenario: SCENARIO_V3 },
-	4: FIELDS,
+	4: { ...FIELDS, scenario: SCENARIO_V4 },
+	5: FIELDS,
 }

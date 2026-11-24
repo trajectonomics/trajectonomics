@@ -10,6 +10,7 @@ import { fundingNotes } from "./funding"
 import { optionsOf } from "./liabilities"
 import { lifetimeFieldsOf } from "./lifetime-view"
 import { routingOf } from "./routing"
+import { routedRun } from "./routing-overflow"
 import type { RoutingView } from "./routing-view"
 import { annualRow, runsOutView } from "./rows"
 import { extraTablesOf, type Wants } from "./run-tables"
@@ -27,14 +28,13 @@ export function projectionOf(prepared: Placed, wants: Wants): ProjectionRunView 
 	const { breakdown, liabilities, spending, estate } = wants
 	const { timeline, baseline } = prepared
 	// The engine records each optional output only when asked, so a run without its flag keeps its bytes.
-	const result = project(
-		baseline,
-		prepared.document,
-		timeline,
-		optionsOf(breakdown, liabilities, spending, estate),
+	const options = optionsOf(breakdown, liabilities, spending, estate)
+	const { result, notes } = routedRun(prepared.document, timeline, (routing) =>
+		project(baseline, prepared.document, timeline, { ...options, ...routing }),
 	)
 	if (!result.ok) return refusal(result.problems)
-	return runViewOf(prepared, wants, result.projection)
+	const view = runViewOf(prepared, wants, result.projection)
+	return isAppError(view) ? view : { ...view, notes: [...view.notes, ...notes] }
 }
 
 /**
@@ -69,7 +69,7 @@ export function runViewOf(
 		horizon: timeline.horizon,
 		currency,
 		// Present only for a share, a floor or a target that keeps its value, so a plain plan keeps its bytes (cli ADR-0070).
-		...routingEcho(prepared),
+		...routingEcho(prepared, projection),
 		runsOut: runsOutView(projection.runsOut, currency),
 		taxYears: taxYearsOf(projection.levies, currency, prepared.document),
 		...lifetimeFieldsOf(projection, currency),
@@ -78,7 +78,7 @@ export function runViewOf(
 }
 
 /** The `routing` field of a run, or nothing for a plain routing. */
-function routingEcho(prepared: Placed): { routing?: RoutingView } {
-	const routing = routingOf(prepared.document, prepared.currency)
+function routingEcho(prepared: Placed, projection: Projection): { routing?: RoutingView } {
+	const routing = routingOf(prepared.document, prepared.currency, projection.routing)
 	return routing === undefined ? {} : { routing }
 }

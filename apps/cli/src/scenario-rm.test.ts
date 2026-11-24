@@ -76,6 +76,6 @@ describe("scenario rm", () => {
 		const described = resultOf(await capture(["schema", "scenario", "rm", "--json"]))
 		expect(described.name).toBe("scenario rm")
 		const input = described.input as { properties: Record<string, unknown> }
-		expect(Object.keys(input.properties)).toEqual(["scenario", "dryRun"])
+		expect(Object.keys(input.properties)).toEqual(["scenario", "force", "dryRun"])
 	})
 })

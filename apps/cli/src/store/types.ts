@@ -4,20 +4,8 @@ import type { AccountClosed, AccountCreated, AccountDeleted, NewAccount } from "
 import type { Ledger } from "./ledger"
 import type { PreMigrationCopy } from "./pre-migration-files"
 import type { RestoreCounts, RestoreRows } from "./restore-types"
-import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
-import type {
-	ForkOptions,
-	HouseholdOptions,
-	HouseholdPlanner,
-	HouseholdSet,
-	NewScenario,
-	ScenarioDeleted,
-	ScenarioForked,
-	ScenarioSaved,
-	TaxOptions,
-	TaxPlanner,
-	TaxSet,
-} from "./scenario-types"
+import type { AccountRow, EntityRow, PostingRow, TxRow } from "./rows"
+import type { ScenarioStore } from "./scenario-store"
 import type { TxFilter } from "./tx-filter"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
 
@@ -32,6 +20,7 @@ export type {
 	TxCorrection,
 	TxRow,
 } from "./rows"
+export type * from "./scenario-store"
 export type * from "./scenario-types"
 export type { TxFilter } from "./tx-filter"
 export type {
@@ -69,7 +58,7 @@ export type WriteOptions = { dryRun?: boolean }
  * The only code that reads or writes `traj.db`. Every method returns its value or an `AppError`
  * built by `fail()`; none throws for an expected failure.
  */
-export interface Store {
+export interface Store extends ScenarioStore {
 	/** The database file this store owns. */
 	readonly path: string
 	/**
@@ -113,28 +102,6 @@ export interface Store {
 	/** The transaction with this id in the personal entity, or null. */
 	getTransaction(id: string): TxRow | null | AppError
 	listPostings(options: { sort: PostingSort; filter?: TxFilter }): PostingRow[] | AppError
-	saveScenario(input: NewScenario, options?: WriteOptions): ScenarioSaved | AppError
-	/** Copies a live Scenario by id; `transform` runs inside the same write (ADR-0019, ADR-0024). */
-	forkScenario(id: string, name: string, options?: ForkOptions): ScenarioForked | AppError
-	/**
-	 * Replaces a live Scenario's household and its document in one write. `plan` reads the document
-	 * inside that write and returns what to store; a refusal rolls the write back (cli ADR-0048).
-	 */
-	replaceHousehold(
-		id: string,
-		plan: HouseholdPlanner,
-		options?: HouseholdOptions,
-	): HouseholdSet | AppError
-	/**
-	 * Replaces a live Scenario's tax profile and its document in one write. `plan` reads the
-	 * document and the stored profile inside that write and returns what to store; a refusal rolls
-	 * the write back (cli ADR-0066).
-	 */
-	replaceTax(id: string, plan: TaxPlanner, options?: TaxOptions): TaxSet | AppError
-	deleteScenario(id: string, options?: WriteOptions): ScenarioDeleted | AppError
-	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */
-	getScenario(idOrName: string): ScenarioRow | null | AppError
-	listScenarios(options: ListOptions<ScenarioSort>): ScenarioRow[] | AppError
 	/**
 	 * Every row of every table, tombstones included, in the export's canonical order, read inside
 	 * one deferred read transaction so one dump never mixes two snapshots.
