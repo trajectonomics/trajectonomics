@@ -1,7 +1,7 @@
 import type { Setup } from "./help-examples-setup"
 
 /** An income account takes the difference, and a document states two more values for the batch form. */
-export const VALUE_SETUP: Setup = {
+const VALUE_SETUP: Setup = {
 	files: {
 		"values.json": JSON.stringify({
 			against: "Market gains",
@@ -12,4 +12,13 @@ export const VALUE_SETUP: Setup = {
 		}),
 	},
 	steps: [["account", "add", "Market gains", "--type", "income", "--currency", "THB"]],
+}
+
+/** The `account` leaves' setups: `add` starts from an empty ledger, `value` from the fixture. */
+export const ACCOUNT_SETUPS: Record<string, Setup> = {
+	"account add": {
+		ledger: "empty",
+		steps: [["account", "add", "Bank", "--type", "asset", "--currency", "THB"]],
+	},
+	"account value": VALUE_SETUP,
 }

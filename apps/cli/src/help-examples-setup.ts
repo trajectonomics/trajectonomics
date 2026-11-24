@@ -2,7 +2,7 @@ import { isAppError } from "./errors"
 import { CHANCE_SETUP } from "./help-examples-chance"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { RUN_SETUP } from "./help-examples-run"
-import { VALUE_SETUP } from "./help-examples-value"
+import { ACCOUNT_SETUPS } from "./help-examples-value"
 import { VOLATILE_PLAN } from "./projection/plan-model-testing"
 import { PROJECTION_SCENARIO } from "./projection/testing"
 import { toDecimalForm } from "./scenario/decimal"
@@ -33,11 +33,7 @@ export const DEFAULT_SETUP: Setup = { ledger: "projection" }
 
 /** Setup by leaf path, as the usage prints it (`tx add`). A leaf not listed uses DEFAULT_SETUP. */
 export const SETUP: Record<string, Setup> = {
-	"account value": VALUE_SETUP,
-	"account add": {
-		ledger: "empty",
-		steps: [["account", "add", "Bank", "--type", "asset", "--currency", "THB"]],
-	},
+	...ACCOUNT_SETUPS,
 	init: { ledger: "none" },
 	// The Thai Levy on the base plan's salary, so there is a tax year to fill (cli ADR-0061).
 	"projection allowances": {
