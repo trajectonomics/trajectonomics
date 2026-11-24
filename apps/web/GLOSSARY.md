@@ -180,6 +180,23 @@ _Avoid_: dividend (as the name of the field), distribution, withdrawal
 A yearly share of an asset Account's value charged a twelfth a month, outside cashflow, on every Market path, from the Account's `fee` field. The page lists each roll-up's charge as `traj` states it and adds none up.
 _Avoid_: cost, charge (as the name of the field), expense
 
+
+**Tax walk**:
+How a tax year's assessable income became its taxable income, as the Levy's own measures state it and `taxYears[].walk` carries it: assessable income, less expenses, less allowances, equals taxable income. The Tax page lists the four figures for the current tax year and adds none.
+_Avoid_: calculation, tax computation, waterfall
+
+**Bracket bar**:
+One bar of the Tax page's card of brackets, for each progressive bracket the taxable income reached: its rate, the income taxed in it and its tax, as `taxYears[].brackets` states them. The bar's width is that bracket's income against the largest bracket's, for drawing only. The last bar is marked "Your top rate".
+_Avoid_: tier, band, slab
+
+**Top rate**:
+The rate of the bracket the last baht of taxable income falls in (`marginalRateBps`), so what one more baht of income, or one baht less through an allowance, is worth in tax. The CLI reads income exactly on a bracket's edge as in the bracket it closes, and states `toNextBracket` as the taxable income left before the next rate; the highest bracket has none.
+_Avoid_: marginal tax rate (in a heading), bracket rate
+
+**Share of income paid in tax**:
+The tax due as a share of assessable income (`effectiveRateBps`), before expenses and allowances. It is absent when nothing was assessed.
+_Avoid_: effective rate (in a heading), tax rate, average rate
+
 **Routing**:
 The plan's `cashflow` read as three lists the Where money goes page edits: the surplus steps (what happens to money left over), the `contribute` priority (which savings come first) and the `withdraw` entries (what is drawn when money is short). A step and an entry are addressed by position, since neither has an id.
 _Avoid_: waterfall, allocation, priority list
