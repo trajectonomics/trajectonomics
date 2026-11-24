@@ -16,7 +16,7 @@ function spendingBandAt(
 
 /** The lowest-year Percentiles over the paths that have one; the count says how many did. */
 function lowestYear(outcomes: readonly PathOutcome[]): ChanceLowestYear {
-	const lows = outcomes.flatMap((outcome) => outcome.lowest ?? [])
+	const lows = outcomes.flatMap((outcome) => outcome.lowestYear ?? [])
 	return { paths: lows.length, spending: lows.length === 0 ? [] : percentiles(ascending(lows)) }
 }
 

@@ -67,7 +67,7 @@ describe("a path that ran out has a lowest year of 0 and is always in the sample
 		return [...marketReturns(model, 0n, paths, plan.timeline)].map((returns) => {
 			const result = outcomeOf(inputs, returns)
 			if (!result.ok) throw new Error("path failed")
-			return result.outcome.lowest
+			return result.outcome.lowestYear
 		})
 	}
 

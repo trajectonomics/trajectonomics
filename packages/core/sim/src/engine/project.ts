@@ -9,6 +9,7 @@ import { withPayouts } from "../payout/flows"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
 import type { ProjectionOptions } from "../types/statement"
+import type { Returns } from "./returns"
 import { withRules } from "./rule-statement"
 import { runEngine } from "./run"
 
@@ -29,13 +30,24 @@ export function project(
 	timeline: Timeline,
 	options: ProjectionOptions = {},
 ): ProjectionResult {
-	const statements = options.liabilityStatements === true
 	const problems = check(baseline, declared, timeline)
 	if (problems.length > 0) return { ok: false, problems }
+	return projectChecked(baseline, declared, timeline, options)
+}
+
+/** The Projection of inputs `check` has accepted, grown by `returns` when given (one Market path). */
+export function projectChecked(
+	baseline: Baseline,
+	declared: Scenario,
+	timeline: Timeline,
+	options: ProjectionOptions,
+	returns?: Returns,
+): ProjectionResult {
+	const statements = options.liabilityStatements === true
 	const scenario = withPayouts(declared)
 	const observed = observationDates(timeline, statements)
 	const breakdown = options.cashflowBreakdown === true
-	const result = runEngine(baseline, scenario, timeline, observed, undefined, {
+	const result = runEngine(baseline, scenario, timeline, observed, returns, {
 		tracked: statements,
 		breakdown,
 	})
