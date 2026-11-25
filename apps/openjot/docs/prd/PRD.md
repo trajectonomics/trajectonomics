@@ -83,14 +83,14 @@ Instead of requiring cloud subscriptions, paid OCR APIs, or external slip-verifi
 
 ```bash
 # Type-check & Svelte diagnostics
-pnpm check
+bun run check
 
 # Build frontend bundle
-pnpm build
+bun run build
 
 # Build Android debug APK (requires Android NDK 28+ for 16 KB page alignment)
 NDK_HOME=/path/to/Android/Sdk/ndk/28.2.13676358 ANDROID_HOME=/path/to/Android/Sdk \
-  pnpm tauri android build --apk --debug --target aarch64
+  bun run tauri android build --apk --debug --target aarch64
 
 # Install debug APK to connected Android device
 adb install -r src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
