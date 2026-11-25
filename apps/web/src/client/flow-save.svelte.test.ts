@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test"
-import { scenarioDocument } from "../lib/contract"
+import { type ScenarioFlow, scenarioDocument } from "../lib/contract"
+import { scenarioFlow } from "../lib/contract/scenario-show"
 import { employerOf } from "../lib/view/plan-items/employer"
 import { employerDraftOf } from "../lib/view/plan-items/employer-draft"
 import { planDocument } from "../lib/view/plan-items/fixtures.test-support"
-import { flowDraftOf } from "../lib/view/plan-items/flows"
+import { type FlowDraft, flowDraftOf } from "../lib/view/plan-items/flows"
 import { fieldOfRefusal, namedRefusal } from "../lib/view/plan-items/refusal"
 import { lensDocument, NO_CHANGES } from "../lib/what-if/lens-document"
 import { editSession } from "./edit.svelte.js"
@@ -70,6 +71,49 @@ async function trySalary(edit: {
 }
 
 const paths = () => whatIfSession.whatIf?.sets.map((set) => set.path).sort()
+
+/** Tries an edited Flow as the drawer does, and returns the session's Sets by path. */
+async function tryFlow(
+	existing: ScenarioFlow | undefined,
+	draft: FlowDraft,
+): Promise<Map<string, unknown>> {
+	const saved = await saveFlow({
+		name: "base",
+		contentHash: HASH,
+		doc,
+		kind: "income",
+		existing,
+		draft,
+		employer: employerDraftOf(null),
+		tryValue: true,
+	})
+	expect(saved.done).toBe(true)
+	return new Map((whatIfSession.whatIf?.sets ?? []).map((set) => [set.path, set.value] as const))
+}
+
+describe("trying a once value on a Flow whose stored end would be left behind", () => {
+	test("a monthly Flow tried once sends its end as its start, which the CLI accepts", async () => {
+		const sets = await tryFlow(salary, { ...flowDraftOf(salary), frequency: "once" })
+		expect(sets.get("flows.salary.frequency")).toBe("once")
+		// A what-if cannot clear the stored end, and `traj` refuses a once Flow that keeps it (ONCE_FLOW_END_MISMATCH).
+		expect(sets.get("flows.salary.end")).toBe("2026-11-01")
+	})
+
+	test("moving a once Flow's date moves its end with it, so neither END_BEFORE_START nor ONCE_FLOW_END_MISMATCH is refused", async () => {
+		const once = scenarioFlow.parse({
+			id: "bonus",
+			kind: "income",
+			frequency: "once",
+			start: "2027-01-01",
+			end: "2027-01-01",
+			amount: "1000.00",
+			earned: false,
+		})
+		const sets = await tryFlow(once, { ...flowDraftOf(once), start: "2027-02-01" })
+		expect(sets.get("flows.bonus.start")).toBe("2027-02-01")
+		expect(sets.get("flows.bonus.end")).toBe("2027-02-01")
+	})
+})
 
 describe("trying a salary after trying what its employer adds", () => {
 	test("an amount and then an employer share keep both", async () => {
