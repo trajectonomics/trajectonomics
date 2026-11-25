@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { routing } from "../../client/routing.svelte.js"
 import type { ScenarioFlow } from "../../lib/contract"
 import { formatMoney } from "../../lib/format"
@@ -19,6 +20,7 @@ interface Props {
 }
 
 let { ctx }: Props = $props()
+const items = $derived(currentItemNames())
 let drawer = $state<{ id: string | null; trying: boolean } | null>(null)
 const moves = (flows: readonly ScenarioFlow[]) => flows.filter((flow) => flow.kind === "transfer")
 const stored = $derived(moves(ctx.doc.flows))
@@ -40,10 +42,10 @@ const remove = (id: string) => ({ kind: "remove", id }) as const
 			{@const isTried = tried.includes(flow)}
 			<li class="space-y-2 rounded-md border border-border bg-card p-3 text-sm">
 				<div class="flex flex-wrap items-center justify-between gap-2">
-					<span class="min-w-0 flex-1"><Sentence parts={transferWords(flow, ctx.names)} currency={ctx.doc.currency} />{isTried ? " (tried)" : ""}</span>
+					<span class="min-w-0 flex-1"><Sentence parts={transferWords(flow, ctx.names, items)} currency={ctx.doc.currency} />{isTried ? " (tried)" : ""}</span>
 					{#if ctx.editable}
 						<span class="flex flex-wrap gap-1.5">
-							<RowButtons label={plainText(transferWords(flow, ctx.names), formatMoney)} busy={false}
+							<RowButtons label={plainText(transferWords(flow, ctx.names, items), formatMoney)} busy={false}
 								onEdit={() => (drawer = { id: flow.id, trying: isTried })} onTry={() => (drawer = { id: flow.id, trying: true })}
 								onRemove={() => (isTried ? routing.tryIt(ctx, remove(flow.id)) : routing.save(ctx, remove(flow.id)))}
 								onTryRemove={() => routing.tryIt(ctx, remove(flow.id))} />

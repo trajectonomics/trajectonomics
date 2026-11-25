@@ -6,6 +6,7 @@
  */
 import type { HouseholdDocument, ProjectionRun, ScenarioDocument } from "../../contract"
 import { formatDate } from "../../format"
+import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
 import { milestoneView } from "../milestones/milestones"
 import { anchorChoices } from "./anchors"
 import { LIFE, lifeChoices } from "./life"
@@ -29,12 +30,12 @@ export interface EstateDates {
 export const END = "end"
 
 /** The reached Milestones of the run that fall inside the plan, in date order. */
-function milestoneChoices(run: ProjectionRun, lastDate: string): DateChoice[] {
+function milestoneChoices(run: ProjectionRun, lastDate: string, names: ItemNames): DateChoice[] {
 	return (milestoneView(run)?.reached ?? [])
 		.filter((one) => one.date <= lastDate)
 		.map((one) => ({
 			value: `milestone:${one.id}`,
-			label: `When ${one.id} fires (${formatDate(one.date)})`,
+			label: `When ${itemText(names, "milestone", one.id)} fires (${formatDate(one.date)})`,
 			date: one.date,
 		}))
 }
@@ -48,6 +49,7 @@ export function estateDates(
 	doc: ScenarioDocument,
 	household: HouseholdDocument | null,
 	requested: string,
+	names: ItemNames = NO_ITEM_NAMES,
 ): EstateDates | null {
 	const lastDate = estateRowsOf(run).at(-1)?.date
 	if (lastDate === undefined) return null
@@ -59,7 +61,7 @@ export function estateDates(
 	}
 	const choices = [
 		...life.choices,
-		...milestoneChoices(run, lastDate),
+		...milestoneChoices(run, lastDate, names),
 		...anchorChoices(doc, household, lastDate),
 		end,
 	]

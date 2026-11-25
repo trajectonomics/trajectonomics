@@ -1,6 +1,7 @@
 import type { Baseline, ProjectionRun, Read, ScenarioAccount } from "../../contract"
 import { formatBps } from "../../format/bps"
 import { percentWords } from "../../format/percent"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import {
 	type FeeDraft,
 	feeDraftOf,
@@ -55,6 +56,7 @@ export function accountCards(
 	accounts: readonly ScenarioAccount[],
 	baseline: Read<Baseline> | undefined,
 	run?: ProjectionRun,
+	names: ItemNames = NO_ITEM_NAMES,
 ): AccountCard[] {
 	return accounts.map((account) => {
 		const lifetimes = accountLifetimesOf(run, account.id)
@@ -65,7 +67,7 @@ export function accountCards(
 			compounding: account.compounding ?? null,
 			lockedUntil: account.lockedUntil ?? null,
 			balance: balanceOf(account, baseline),
-			payout: payoutWords(account),
+			payout: payoutWords(account, names),
 			payoutHow: payoutHowWords(account),
 			fee: account.fee === undefined ? null : `Fee ${percentWords(account.fee.bps)}% a year`,
 			years:

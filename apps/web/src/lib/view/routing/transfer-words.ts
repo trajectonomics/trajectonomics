@@ -2,6 +2,7 @@
 import type { ScenarioFlow } from "../../contract"
 import { formatBps, formatDate, percentWords } from "../../format"
 import { type AccountNames, nameOf } from "../account-names"
+import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
 import { movesOf } from "./transfer-read"
 import type { Part } from "./words"
 
@@ -15,8 +16,11 @@ const EVERY: Readonly<Record<string, string>> = {
 }
 
 /** When the transfer lands: its date, or the Milestone that fires it, with its frequency. */
-function whenWords(flow: ScenarioFlow): string {
-	const at = flow.startAt === undefined ? formatDate(flow.start) : `when ${flow.startAt} fires`
+function whenWords(flow: ScenarioFlow, names: ItemNames): string {
+	const at =
+		flow.startAt === undefined
+			? formatDate(flow.start)
+			: `when ${itemText(names, "milestone", flow.startAt)} fires`
 	const every = EVERY[flow.frequency]
 	if (every === undefined) return flow.startAt === undefined ? `on ${at}` : at
 	return flow.startAt === undefined && flow.start === "" ? every : `${every}, from ${at}`
@@ -31,11 +35,15 @@ function growthWords(growth: ScenarioFlow["growth"]): string {
 }
 
 /** The transfer's sentence as parts, with its amount drawn by the page. */
-export function transferWords(flow: ScenarioFlow, names: AccountNames): Part[] {
+export function transferWords(
+	flow: ScenarioFlow,
+	names: AccountNames,
+	items: ItemNames = NO_ITEM_NAMES,
+): Part[] {
 	const from = nameOf(names, flow.source ?? "")
 	const to = nameOf(names, flow.target ?? "")
 	const moves = movesOf(flow)
-	const when = ` ${whenWords(flow)}`
+	const when = ` ${whenWords(flow, items)}`
 	if (moves === null) return [`Move money from ${from} to ${to} by a computed amount${when}`]
 	if (moves.how === "all") return [`Move all of ${from} to ${to}${when}`]
 	if (moves.how === "share")

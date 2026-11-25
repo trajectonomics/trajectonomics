@@ -1,7 +1,7 @@
 import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
-import { type AccountNames, NO_NAMES } from "../account-names"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { ruleSummary } from "../withdrawals/words"
 import { employerText } from "./employer"
 import { datesOfCard } from "./flow-dates"
@@ -63,7 +63,7 @@ export function flowCards(
 	kind: FlowKind,
 	household: HouseholdDocument | null = null,
 	all: readonly ScenarioFlow[] = flows,
-	names: AccountNames = NO_NAMES,
+	names: ItemNames = NO_ITEM_NAMES,
 ): FlowCard[] {
 	return flows
 		.filter((flow) => flow.kind === kind)
@@ -71,11 +71,11 @@ export function flowCards(
 			id: flow.id,
 			amount: flow.amount ?? null,
 			frequency: flow.frequency,
-			...datesOfCard(flow, household),
+			...datesOfCard(flow, household, names),
 			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),
 			category: kind === "expense" ? (flow.category ?? null) : null,
-			employer: employerText(all, flow, kind, names),
+			employer: employerText(all, flow, kind, names.accounts),
 			// A form edits a fixed amount only: a computed Flow has none to show, so it is read-only.
 			editable: !isComputed(flow) && flow.amount !== undefined,
 		}))

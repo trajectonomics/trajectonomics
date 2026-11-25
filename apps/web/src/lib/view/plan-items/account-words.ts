@@ -2,6 +2,7 @@
 import type { ScenarioAccount } from "../../contract/scenario-show"
 import { formatDate } from "../../format/date"
 import { percentWords } from "../../format/percent"
+import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
 import { PAYOUT_LABELS } from "./account-income"
 
 const FREQUENCY_WORDS: Readonly<Record<string, string>> = {
@@ -12,12 +13,15 @@ const FREQUENCY_WORDS: Readonly<Record<string, string>> = {
 }
 
 /** The words of a payout from its stored text: the share, and where it starts when it does not start now. */
-export function payoutWords(account: ScenarioAccount): string | null {
+export function payoutWords(
+	account: ScenarioAccount,
+	names: ItemNames = NO_ITEM_NAMES,
+): string | null {
 	const payout = account.payout
 	if (payout === undefined) return null
 	const from =
 		payout.startAt !== undefined
-			? ` from ${payout.startAt}`
+			? ` from ${itemText(names, "milestone", payout.startAt)}`
 			: payout.start === undefined
 				? ""
 				: ` from ${formatDate(payout.start)}`

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioAccount } from "../../contract"
 import { scenarioAccount } from "../../contract"
+import { itemNames } from "../item-names"
 import { NO_INCOME_CONTEXT } from "./account-income"
 import { accountLifetimesOf, accountYears } from "./account-years"
 import { accountCards } from "./accounts"
@@ -30,6 +31,19 @@ describe("the Account card", () => {
 		expect(card?.payout).toBe("Pays out 3.5% a year from retire")
 		expect(card?.payoutHow).toBe("Paid quarterly, counted as dividends")
 		expect(card?.fee).toBe("Fee 1.5% a year")
+	})
+
+	test("a payout that starts at a Milestone reads the name the plan states, or its id", () => {
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		})
+		expect(accountCards([fund(PAYS)], baselineRead(), undefined, names)[0]?.payout).toBe(
+			"Pays out 3.5% a year from Retirement",
+		)
+		expect(read(fund(PAYS))?.payout).toBe("Pays out 3.5% a year from retire")
 	})
 
 	test("a payout from a date says the date, and an Account with neither says nothing", () => {

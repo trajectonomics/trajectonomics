@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
+import { itemNames } from "../item-names"
 import { planDocument } from "./fixtures.test-support"
 import { flowCards, flowDraftOf } from "./flows"
 
@@ -101,6 +102,26 @@ describe("flowCards with a Milestone date", () => {
 		const [card] = flowCards([rule as ScenarioFlow], "expense")
 		expect(card?.start).toBe("When retire fires")
 		expect(card?.end).toBe("To the horizon")
+	})
+
+	test("a Milestone date reads the name the plan states for it, or its id when it states none", () => {
+		const rule = {
+			id: "retirement-spending",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2026-10-31",
+			startAt: "retire",
+		} as ScenarioFlow
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		})
+		expect(flowCards([rule], "expense", null, [rule], names)[0]?.start).toBe(
+			"When Retirement fires",
+		)
+		expect(flowCards([rule], "expense")[0]?.start).toBe("When retire fires")
 	})
 
 	test("an expense stopped at a Milestone reads when it fires, not 'To the horizon'", () => {

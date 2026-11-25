@@ -1,6 +1,6 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type {
 	Baseline,
@@ -48,9 +48,9 @@ function setDrawer(next: PlanDrawer | null): void {
 }
 const noun = $derived(PLAN_PAGES[kind].noun)
 const changes = $derived(whatIfSession.changesFor(name))
-const flows = $derived(flowItems(doc, kind, household, changes, currentAccountNames()))
+const flows = $derived(flowItems(doc, kind, household, changes, currentItemNames()))
 const tried = $derived(whatIfSession.lensFor(name)?.run ?? undefined)
-const accounts = $derived(accountItems(doc, baseline, changes, { run, tried }))
+const accounts = $derived(accountItems(doc, baseline, changes, { run, tried }, currentItemNames()))
 const assets = $derived(kind === "assets" ? assetCardsOf(doc, baseline, run) : [])
 const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
 </script>

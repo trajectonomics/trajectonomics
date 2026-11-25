@@ -1,6 +1,7 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { deleteFlow, saveFlow } from "../../client/flow-save.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioDocument, ScenarioFlow } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
@@ -25,7 +26,6 @@ interface Props {
 	household: HouseholdDocument | null
 	/** The Flow to edit; absent for a new one. */
 	existing?: ScenarioFlow | undefined
-	/** Runs once the Edit has run, so the drawer closes and the page shows the new Snapshot. */
 	onDone: () => void
 	/** True when the drawer tries values in the What-if session, instead of saving them. */
 	tryValue?: boolean
@@ -98,7 +98,7 @@ async function remove(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : `Add ${kind}`}>
 	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
 	<TryNotice fields={cleared} />
 	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />

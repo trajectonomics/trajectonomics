@@ -1,8 +1,23 @@
 import { describe, expect, test } from "bun:test"
+import { itemNames, NO_ITEM_NAMES } from "../item-names"
 import { DEMO_COMPARE, statedCompare } from "./fixtures.test-support"
 import { milestoneTriples } from "./milestones"
 
+const LABELLED = itemNames(new Map(), null, {
+	currency: "THB",
+	accounts: [],
+	flows: [],
+	milestones: [{ id: "car-paid-off", displayLabel: "Car paid off" }],
+})
+
 describe("the milestones", () => {
+	test("a Milestone reads the name the plan states for it, or its id when it states none", () => {
+		const labelled = milestoneTriples(statedCompare(), LABELLED)
+		expect(labelled.find((triple) => triple.key === "car-paid-off")?.label).toBe("Car paid off")
+		const bare = milestoneTriples(statedCompare(), NO_ITEM_NAMES)
+		expect(bare.find((triple) => triple.key === "car-paid-off")?.label).toBe("car-paid-off")
+	})
+
 	test("a milestone moved shows the CLI's months; one reached only in the what-if reads not reached beside it", () => {
 		const triples = milestoneTriples(statedCompare())
 		expect(triples.map((triple) => triple.key)).toEqual([
