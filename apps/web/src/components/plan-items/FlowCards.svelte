@@ -53,9 +53,9 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				<dd>{card.frequency}<WasText was={mark.was.frequency} /></dd>
 				<dt class="text-muted-foreground">{card.startLabel}</dt>
 				<dd>{card.start}<WasText was={mark.was.start} />{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
-				{#if card.end !== null}
+				{#if card.end !== null || mark.was.end !== undefined}
 					<dt class="text-muted-foreground">Ends</dt>
-					<dd>{card.end}<WasText was={mark.was.end} />{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
+					<dd>{card.end ?? "none"}{#if mark.was.end}<WasText was={mark.was.end} />{/if}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
 				{/if}
 				<dt class="text-muted-foreground">Growth</dt>
 				<dd>{card.growth}<WasText was={mark.was.growth} /></dd>
