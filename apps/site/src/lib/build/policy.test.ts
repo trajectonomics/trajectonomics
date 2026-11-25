@@ -29,4 +29,27 @@ describe("the content security policy the router relies on", () => {
 			]),
 		).toEqual(["CONTENT_SECURITY_POLICY_PRESENT"])
 	})
+
+	it("passes the hosted Demo's policy, scoped to /demo/*", () => {
+		expect(
+			codes([
+				{
+					path: "_headers",
+					content: "/demo/*\n  Content-Security-Policy: default-src 'self'\n",
+				},
+			]),
+		).toEqual([])
+	})
+
+	it("fails a headers file whose Demo policy also covers another path", () => {
+		expect(
+			codes([
+				{
+					path: "_headers",
+					content:
+						"/demo/*\n  Content-Security-Policy: default-src 'self'\n/*\n  Content-Security-Policy: default-src 'self'\n",
+				},
+			]),
+		).toEqual(["CONTENT_SECURITY_POLICY_PRESENT"])
+	})
 })
