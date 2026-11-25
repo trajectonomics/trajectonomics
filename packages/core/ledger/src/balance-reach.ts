@@ -23,17 +23,21 @@ export const reachOf = (series: Series): Reach => {
 		high[at] = top
 		low[at] = bottom
 	}
-	return Object.freeze({ high, low })
+	return Object.freeze({ high: Object.freeze(high), low: Object.freeze(low) })
 }
 
 /** What an Account's Balance reaches the first time it is not a safe integer: on which date, and at what sum. */
 export type Overflow = { readonly date: string; readonly sum: bigint }
 
+const magnitude = (sum: bigint): bigint => (sum < 0n ? -sum : sum)
+
 /**
  * The first date from `from` (inclusive) to `before` (exclusive; none means no end) on which the
  * Account's Balance, with `shift` added, is not a safe integer. Its Balance changes only on the
- * dates of its Postings, so those and `from` are the dates it can overflow on. `reach` is read only
- * when a later Balance could overflow, and the dates are scanned only when one does.
+ * dates of its Postings, so those and `from` are the dates it can overflow on. With `worse`, a date
+ * on which the Balance without `shift` is already not a safe integer, and `shift` leaves it no
+ * further out, is not counted: the shift did not cause that overflow. `reach` is read only when a
+ * later Balance could overflow, and the dates are scanned only when one does.
  */
 export const firstOverflow = (
 	series: Series | undefined,
@@ -41,9 +45,12 @@ export const firstOverflow = (
 	shift: bigint,
 	from: string,
 	before?: string,
+	worse = false,
 ): Overflow | undefined => {
-	const start = sumUpTo(series, from) + shift
-	if (unsafe(start)) return Object.freeze({ date: from, sum: start })
+	const over = (base: bigint): boolean =>
+		unsafe(base + shift) && (!worse || !unsafe(base) || magnitude(base + shift) > magnitude(base))
+	const start = sumUpTo(series, from)
+	if (over(start)) return Object.freeze({ date: from, sum: start + shift })
 	if (series === undefined) return undefined
 	const first = rowsUpTo(series, from)
 	const end = before === undefined ? series.dates.length : rowsBefore(series, before)
@@ -51,9 +58,8 @@ export const firstOverflow = (
 	const { high, low } = reach()
 	if (!unsafe(high[first]! + shift) && !unsafe(low[first]! + shift)) return undefined
 	for (let at = first; at < end; at++) {
-		const sum = series.sums[at]! + shift
-		if (endsDate(series, at) && unsafe(sum)) {
-			return Object.freeze({ date: series.dates[at]!, sum })
+		if (endsDate(series, at) && over(series.sums[at]!)) {
+			return Object.freeze({ date: series.dates[at]!, sum: series.sums[at]! + shift })
 		}
 	}
 	return undefined

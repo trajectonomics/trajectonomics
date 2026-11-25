@@ -106,6 +106,27 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 		expect(res.code).toBe(0)
 	})
 
+	it("accepts a write that cures the first overflow and shrinks a later one", async () => {
+		const { home, traj } = await chartHome()
+		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
+		await own(traj, "Equity", "Fund", "0.30", "2026-01-06")
+		await own(traj, "Equity", "Fund", "0.70", "2026-01-07")
+		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
+		expect(res.code).toBe(0)
+	})
+
+	it("refuses a write that shrinks the first overflow and worsens a later one the other way", async () => {
+		const { home, traj } = await chartHome()
+		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
+		await own(traj, "Equity", "Fund", "1.00", "2026-01-06")
+		await own(traj, "Fund", "Food", MOST, "2026-01-07")
+		await own(traj, "Fund", "Food", MOST, "2026-01-07")
+		await own(traj, "Fund", "Food", "2.00", "2026-01-07")
+		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
+		expect(res.code).not.toBe(0)
+		expect(says(error(res))).toContain('"Fund" on 2026-01-07')
+	})
+
 	it("accepts a batch that stays in range at every later date", async () => {
 		const { home, traj } = await chartHome()
 		await own(traj, "Equity", "Fund", "1.00", "2026-01-05")

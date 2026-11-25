@@ -68,4 +68,37 @@ describe("balanceHistory overflow", () => {
 			Object.isFrozen(balanceHistory(held, chart).overflow("cash", BigInt(MOST), "2024-01-01")),
 		).toBe(true)
 	})
+
+	describe("with `worse`, an overflow the Ledger holds is not the shift's unless it makes it larger", () => {
+		const shrunk = [
+			post("a", "2024-01-05", MOST),
+			post("b", "2024-01-06", 30),
+			post("c", "2024-01-07", 70),
+		]
+
+		it("skips a date the shift cures the first overflow of and leaves a later one smaller", () => {
+			const history = balanceHistory(shrunk, chart)
+			expect(history.overflow("cash", -50n, "2024-01-01")?.date).toBe("2024-01-07")
+			expect(history.overflow("cash", -50n, "2024-01-01", undefined, true)).toBeUndefined()
+		})
+
+		it("names a date where the shift pushes an overflow further out, in the other direction", () => {
+			const out = [
+				post("a", "2024-01-05", MOST),
+				post("b", "2024-01-06", 1),
+				post("c", "2024-01-07", -MOST),
+				post("d", "2024-01-07", -MOST),
+				post("e", "2024-01-07", -102),
+			]
+			const found = balanceHistory(out, chart).overflow("cash", -50n, "2024-01-01", undefined, true)
+			expect(found).toEqual({ date: "2024-01-07", sum: -BigInt(MOST) - 151n })
+		})
+
+		it("counts a date the Ledger holds in range as it does without `worse`", () => {
+			const history = balanceHistory(held, chart)
+			expect(history.overflow("cash", BigInt(MOST), "2024-01-01", undefined, true)).toEqual(
+				history.overflow("cash", BigInt(MOST), "2024-01-01"),
+			)
+		})
+	})
 })

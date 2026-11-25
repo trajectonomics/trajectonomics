@@ -67,8 +67,10 @@ Ledger had it. The refusal is `AMOUNT_OVERFLOW` at the entry's `value` field (th
 in), it names the account and the first date that overflows, and a batch that refuses writes nothing. The wording says "a later Balance"
 only when that date is after the entry's own. Dates the batch's own writes cut apart are checked each against its own total, so a later
 entry of the same batch that brings the Balance back in range is accepted, and an entry that pushes a Balance over is the one named.
-An overflow the Ledger already holds on that date, at least as large as the one the write leaves, is not the entry's, so a write that
-shrinks it is accepted (the ledger stays as unreadable as it was; that is not this command's to cure).
+An overflow the Ledger already holds on a date, at least as large as the one the write leaves there, is not the entry's: each date of
+the stretch is compared with the Ledger's own Balance that day, so a write that shrinks an overflow, or cures the first date and
+shrinks a later one, is accepted (the ledger stays as unreadable as it was; that is not this command's to cure), and one that makes
+any date's overflow larger, in either direction, is refused.
 
 The check keeps the batch's constant cost per entry: the ledger's `balanceHistory` notes the most and least each account's Balance
 reaches from each Posting on, once, the first time it is asked about the account, and answers each stretch from that note; it scans

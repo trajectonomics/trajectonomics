@@ -3,8 +3,6 @@ import { ledgerFailure } from "../../store"
 import type { Batch, Step } from "./batch"
 import type { Refusal } from "./types"
 
-const magnitude = (sum: bigint): bigint => (sum < 0n ? -sum : sum)
-
 /** The refusal of the entry whose write begins stretch `at` of an account's writes, if it earns one. */
 function refusalOf(
 	batch: Batch,
@@ -15,10 +13,8 @@ function refusalOf(
 	const step = steps[at]!
 	const next = steps[at + 1]
 	if (next?.date === step.date) return undefined
-	const found = batch.history?.overflow(step.account.id, step.total, step.date, next?.date)
+	const found = batch.history?.overflow(step.account.id, step.total, step.date, next?.date, true)
 	if (found === undefined) return undefined
-	const held = batch.history?.overflow(step.account.id, 0n, step.date, next?.date)
-	if (held?.date === found.date && magnitude(found.sum) <= magnitude(held.sum)) return undefined
 	const which = found.date > step.date ? "a later Balance" : "the Balance"
 	const error = new LedgerValidationError(
 		"AMOUNT_OVERFLOW",
@@ -35,8 +31,9 @@ function refusalOf(
  * in, and worse than the Ledger left it. Each account's writes cut its dates into stretches the
  * batch holds one total over, and the history answers each stretch from the reach it noted once,
  * so an entry costs no scan of the Ledger. A refusal names the account and the first date that
- * overflows, at the entry that began the stretch. An overflow the Ledger already holds on that date,
- * at least as large, is not the entry's: it is left as it was, as it was before the batch.
+ * overflows, at the entry that began the stretch. An overflow the Ledger already holds on a date, at
+ * least as large as the one the write leaves there, is not the entry's, so the dates it is judged on
+ * are each compared with the Ledger's own Balance that day, not only the first.
  */
 export function laterOverflows(batch: Batch, path: (index: number) => string): Refusal[] {
 	const refused = new Map<number, Refusal>()
