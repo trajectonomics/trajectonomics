@@ -59,18 +59,17 @@ Delegate by default: this section is the owner's standing request to use subagen
 Pick the cheapest model that can finish the brief:
 
 1. `claude-haiku-5-5` for a Claude subagent (the `Agent` tool, `model: haiku`).
-2. `opencode-go/deepseek-v4.1-flash` for a task on OpenCode (`delegate_task`, or `t3_thread_launch` with the `opencode` provider on a linked machine). From 2026-11-25 this is the main implementor; see "DeepSeek on OpenCode Go implements" below.
+2. `opencode-go/deepseek-v4.1-flash` for a task on OpenCode (`delegate_task`, or `t3_thread_launch` with the `opencode` provider on a linked machine). See "DeepSeek on OpenCode Go implements" below.
 3. A model from the Owner section's list (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`) only when a cheap one failed the brief, or for design and the independent review. The reviewer is a different model from the author.
 
-A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
+A brief to DeepSeek, on OpenCode Go or on the free tier (`opencode/deepseek-v4.1-flash-free`, used when the paid route is out), carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
 ### DeepSeek on OpenCode Go implements (from 2026-11-25, until the owner says otherwise)
 
 On 2026-11-25 the owner subscribed to OpenCode Go and made `opencode-go/deepseek-v4.1-flash` the main implementor. Earlier that day every DeepSeek route had run dry, and Muse (`muse-ember-1.0`) used up its allowance, so Claude implemented for a few hours. Muse is not used.
 
-- Implementation briefs go to `opencode-go/deepseek-v4.1-flash` first. A brief DeepSeek cannot finish goes to `claude-sonnet-5-5`.
-- `apps/site`'s work model is the same DeepSeek model, on OpenCode Go or Pi.
-- The independent review stays on Claude (`claude-opus-5-5` or `claude-sonnet-5-5`), a different model from the DeepSeek author.
+- An implementation brief goes to `opencode-go/deepseek-v4.1-flash` before `claude-haiku-5-5`, which keeps reading, searching and cheap checks. A brief DeepSeek cannot finish goes to `claude-sonnet-5-5`.
+- The independent review stays on Claude, on `claude-opus-5-5` when `claude-sonnet-5-5` wrote the diff.
 
 ## Agent skills
 
