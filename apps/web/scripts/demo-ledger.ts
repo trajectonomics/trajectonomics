@@ -25,7 +25,7 @@ export type DemoLedgerPlace = { binary: string; home: string; scratch: string }
  */
 async function traj(place: DemoLedgerPlace, argv: string[]): Promise<string> {
 	const captured = await spawnCapture([place.binary, ...argv, "--json"], {
-		env: { ...process.env, TRAJ_HOME: place.home, ...nextFixedSource(place) },
+		env: { ...process.env, TRAJ_HOME: place.home, DO_NOT_TRACK: "1", ...nextFixedSource(place) },
 	})
 	if (captured.code !== 0) {
 		throw new Error(`traj ${argv.join(" ")} failed: ${captured.stderr.trim()}`)

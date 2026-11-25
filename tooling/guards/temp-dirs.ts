@@ -21,9 +21,19 @@ export function isChecked(path: string): boolean {
 	return SOURCE.test(path) && !SKIPPED.test(path)
 }
 
-/** The file's text without its comments, so an `rm` mentioned in prose is not a removal. */
+/**
+ * One pass over the parts of source that can hide code from the guard: a block comment, a line
+ * comment, or a string. Strings stay, because a path such as `"**\/*.ts"` is code and an `rm` may be
+ * inside one; comments go, because an `rm` named in prose is not a removal. Matching them together
+ * means a `/*` inside a string or a line comment does not read as the start of a block comment, and
+ * an escaped quote does not end a string early. Template literals count as strings (#609).
+ */
+const TOKEN =
+	/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|`(?:\\[\s\S]|[^`\\])*`/g
+
+/** The file's text with its comments blanked and its strings kept, so an `rm` in prose is not a removal. */
 function withoutComments(text: string): string {
-	return text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1")
+	return text.replace(TOKEN, (token) => (token.startsWith("/") ? "" : token))
 }
 
 /**
