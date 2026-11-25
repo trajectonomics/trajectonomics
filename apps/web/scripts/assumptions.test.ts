@@ -1,7 +1,7 @@
 // The Assumptions page against the real traj (cli ADR 0068, web ADR 0018): inflation, a return and a volatility on two
 // Accounts are one apply-plan Edit; the chance of success is read from the plan's own model and the Chance page says so; a
 // lower volatility is tried in a what-if without a write; a refusal lands on its row. Each test sets up its own state.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import ChanceResult from "../src/components/chance/ChanceResult.svelte"
 import type { ProjectionChance } from "../src/lib/contract"
@@ -23,11 +23,13 @@ import {
 	tryWhatIf,
 } from "./assumptions-ledger.test-support"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 
 beforeAll(async () => {
 	await setupAssumptions()
 }, SLOW_MS)
 afterAll(disposeAssumptions)
+afterEach(settle, SLOW_MS)
 
 const slow = (name: string, run: () => Promise<void>) => test(name, run, SLOW_MS)
 

@@ -1,12 +1,13 @@
 // The fee tried in a What-if session against the real traj: nothing is written, and the fund is charged what the tried
 // share says (cli ADR 0062, 0067; web ADR 0010, 0017).
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { accountItems } from "../src/lib/view/what-if/plan-items"
 import { readsOf } from "../src/lib/what-if/lens"
 import { shownAccount } from "../src/lib/what-if/overlay"
 import { overridesOf, recordOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedItem } from "../src/lib/what-if/try-flow"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	minor,
 	oracle,
@@ -29,6 +30,7 @@ beforeAll(async () => {
 	ids = await setupIncome()
 }, SLOW_MS)
 afterAll(disposeIncome)
+afterEach(settle, SLOW_MS)
 
 describe("the fee changed in a What-if session", () => {
 	slow(

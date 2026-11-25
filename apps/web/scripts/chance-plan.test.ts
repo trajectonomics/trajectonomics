@@ -2,7 +2,7 @@
 // turns --paths and --seed into `--return-model plan`, so the Dashboard's chance read is `projection chance
 // --return-model plan`, whose result carries a `returnModel` echo. The contract is a closed shape, so a field it does
 // not name fails the read as `contract_mismatch`; this test keeps that from recurring unseen.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -10,6 +10,7 @@ import { DEMO_PATHS, DEMO_SEED } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded, settle } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
@@ -48,19 +49,21 @@ async function setup(): Promise<Editor> {
 		),
 	}
 	traj(["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"], swinging)
-	return createEditor({
-		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } },
-		cliVersion: "test",
-		params: {
-			...PARAMS,
-			asOf: AS_OF,
-			horizon: "2030-12-31",
-			scenarios: [PLAN],
-			chance: { returnModel: "plan", paths: DEMO_PATHS, seed: DEMO_SEED },
-		},
-		records: [],
-		token: TOKEN,
-	})
+	return recorded(
+		createEditor({
+			traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } },
+			cliVersion: "test",
+			params: {
+				...PARAMS,
+				asOf: AS_OF,
+				horizon: "2030-12-31",
+				scenarios: [PLAN],
+				chance: { returnModel: "plan", paths: DEMO_PATHS, seed: DEMO_SEED },
+			},
+			records: [],
+			token: TOKEN,
+		}),
+	)
 }
 
 beforeAll(async () => {
@@ -69,6 +72,7 @@ beforeAll(async () => {
 afterAll(async () => {
 	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
 })
+afterEach(settle, SLOW_MS)
 
 describe("the Dashboard's chance read with --paths and --seed on a volatile plan", () => {
 	test(
