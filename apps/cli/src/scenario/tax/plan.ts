@@ -1,29 +1,35 @@
-import { type AppError, isAppError } from "../../errors"
+import { type AppError, fail, isAppError } from "../../errors"
 import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
+import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
+import { coupleOf, holderIdOf } from "./couple"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
 import type { FlowLabel } from "./labels"
-import { withTaxLevy } from "./levy"
-import { mergedRequest, noStoredProfile, type TaxMode } from "./mode"
+import { type TaxLevyWritten, withTaxLevy } from "./levy"
+import { noStoredProfile, type TaxMode } from "./mode"
 import { withoutTaxLevy } from "./remove"
-import { canonicalTax, parsedTax, requestOfStored, storedTaxOf } from "./stored"
+import { canonicalTax, parsedTax, storedTaxOf } from "./stored"
 
-/** What a write that wrote a Levy leaves for the reply: the request it built and the document it wrote. */
-export type Written = {
-	request: TaxRequest
-	document: ScenarioDocument
-	/** The Filers of a joint Return; absent for a plan that keeps bare labels (cli ADR-0075). */
-	filers?: string[]
-}
+/** What a write that wrote a Levy leaves for the reply. */
+export type Written = TaxLevyWritten
 
 /** The request a mode states for this plan: its own flags, or the stored profile they build on. */
 function requestFor(
 	mode: Exclude<TaxMode, { kind: "remove" }>,
 	document: ScenarioDocument,
 	stored: string | null,
+	household: string | null,
 ): TaxRequest | AppError {
-	if (mode.kind === "write") return mode.request
+	const couple = coupleOf(household)
+	if (mode.kind === "write") {
+		const request = taxRequestOf(mode.flags, couple)
+		if (isAppError(request)) return request
+		if (request === null) {
+			return fail("internal", { message: "A write mode stated no tax jurisdiction." })
+		}
+		return request
+	}
 	const profile = parsedTax(stored)
 	if (profile === null) {
 		return noStoredProfile(
@@ -31,7 +37,10 @@ function requestFor(
 			holdsTaxLevy(document),
 		)
 	}
-	return mode.kind === "merge" ? mergedRequest(profile, mode.flags) : requestOfStored(profile)
+	const filing = { couple, holder: holderIdOf(household) }
+	return mode.kind === "merge"
+		? mergedRequest(profile, mode.flags, filing)
+		: fromStoredRequest(profile, filing)
 }
 
 /**
@@ -45,11 +54,11 @@ export function plannerOf(
 ): TaxPlanner {
 	return (document, stored, household) => {
 		if (mode.kind === "remove") return { document: withoutTaxLevy(document) ?? document, tax: null }
-		const request = requestFor(mode, document, stored)
+		const request = requestFor(mode, document, stored, household)
 		if (isAppError(request)) return request
 		const next = withTaxLevy(document, request, labels, household)
 		if (isAppError(next)) return next
-		done({ request, ...next })
-		return { document: next.document, tax: canonicalTax(storedTaxOf(request)) }
+		done(next)
+		return { document: next.document, tax: canonicalTax(storedTaxOf(next.request)) }
 	}
 }

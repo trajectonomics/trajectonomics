@@ -12,7 +12,7 @@ import {
 	SURVIVAL_BINDINGS,
 	type SurvivalBinding,
 } from "./reference-view"
-import { type TaxYearView, taxYearsField } from "./tax-view"
+import { type TaxYearView, taxYearsField } from "./tax-year-view"
 import {
 	asOfField,
 	type Echo,
@@ -28,7 +28,7 @@ export type {
 	RuleOfThumbView,
 	SurvivalBinding,
 } from "./reference-view"
-export type { TaxYearView } from "./tax-view"
+export type { TaxYearView } from "./tax-year-view"
 
 /** The survival answer, in the engine's own three shapes (ADR-0008). */
 export type FiAnswer =
