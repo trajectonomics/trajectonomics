@@ -25,6 +25,8 @@ describe("the fixed source", () => {
 			`${INSTANT}#-1`,
 			`${INSTANT}#1.5`,
 			`${INSTANT}#${2n ** 62n}`,
+			`${INSTANT}#5-`,
+			`${INSTANT}#5-x`,
 			`1969-12-31T23:59:59.999Z#0`,
 		]) {
 			expect(parseFixedSource(bad)).toBeUndefined()
@@ -59,6 +61,20 @@ describe("the fixed source", () => {
 		const a = must(`${INSTANT}#7`)
 		const b = must(`${INSTANT}#7`)
 		for (let i = 0; i < 3; i++) expect(a.newId(a.clock())).toBe(b.newId(b.clock()))
+	})
+
+	it("throws when a run mints as many ids as its limit allows, before the next run's seed", () => {
+		const { clock, newId } = must(`${INSTANT}#10-12`)
+		expect(newId(clock()).endsWith("-00000000000a")).toBe(true)
+		expect(newId(clock()).endsWith("-00000000000b")).toBe(true)
+		expect(() => newId(clock())).toThrow("the fixed source ran out of ids")
+	})
+
+	it("refuses a limit that is not above the seed, or above the 62 random bits", () => {
+		for (const bad of [`${INSTANT}#5-5`, `${INSTANT}#5-4`, `${INSTANT}#5-${(1n << 62n) + 1n}`]) {
+			expect(parseFixedSource(bad)).toBeUndefined()
+		}
+		expect(parseFixedSource(`${INSTANT}#5-${1n << 62n}`)).toBeDefined()
 	})
 
 	it("keeps the counter inside the 62 random bits", () => {

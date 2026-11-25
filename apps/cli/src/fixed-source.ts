@@ -1,9 +1,10 @@
 import type { Source } from "./store/types"
 
 /**
- * The one test-only variable of the fixed source (cli ADR-0074): `<instant>#<seed>`, such as
- * `2026-10-31T00:00:00.000Z#1000000`. The instant is the clock's only reading, and the seed is the
- * first value of the counter that makes up the random part of each UUIDv7 id. Only `demo-entry.ts`
+ * The one test-only variable of the fixed source (cli ADR-0074): `<instant>#<seed>` or
+ * `<instant>#<seed>-<limit>`, such as `2026-10-31T00:00:00.000Z#1000000-2000000`. The instant is the
+ * clock's only reading, the seed is the first value of the counter that makes up the random part of
+ * each UUIDv7 id, and the limit is the first value it may not reach (2^62 when none is given). Only `demo-entry.ts`
  * reads it, so a shipped `traj` (built from `index.ts`) neither contains nor honours it.
  */
 export const FIXED_SOURCE_VARIABLE = "TRAJ_FIXED_SOURCE"
@@ -11,7 +12,7 @@ export const FIXED_SOURCE_VARIABLE = "TRAJ_FIXED_SOURCE"
 /** The random part of a UUIDv7 id after its variant bits: 62 bits. */
 const SEED_LIMIT = 1n << 62n
 
-const SHAPE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)#(\d{1,19})$/
+const SHAPE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)#(\d{1,19})(?:-(\d{1,19}))?$/
 
 /** Hex of `value`, padded on the left to `width` digits. */
 function hex(value: bigint, width: number): string {
@@ -30,27 +31,30 @@ export function counterId(at: Date, counter: bigint): string {
 
 /**
  * The fixed source a value names, or `undefined` when it is not `<instant>#<seed>`: the instant
- * must be an ISO instant that reads back the same, and the seed a decimal number below 2^62. The
- * clock always answers the instant, and each id takes the next counter from the seed on, so a run
- * given the same value writes the same ids in the same order.
+ * must be an ISO instant that reads back the same, and the seed a decimal number below the limit,
+ * which is itself at most 2^62. The clock always answers the instant, and each id takes the next
+ * counter from the seed on, so a run given the same value writes the same ids in the same order. A
+ * run that mints the limit's worth of ids throws, so it never runs into the next run's seed.
  */
 export function parseFixedSource(value: string): Source | undefined {
 	const match = SHAPE.exec(value)
 	if (match === null) return undefined
 	const instant = new Date(match[1] ?? "")
 	const seed = BigInt(match[2] ?? "")
+	const limit = match[3] === undefined ? SEED_LIMIT : BigInt(match[3])
 	const valid =
 		!Number.isNaN(instant.getTime()) &&
 		instant.toISOString() === match[1] &&
 		instant.getTime() >= 0 &&
 		instant.getTime() < 2 ** 48 &&
-		seed < SEED_LIMIT
+		seed < limit &&
+		limit <= SEED_LIMIT
 	if (!valid) return undefined
 	let next = seed
 	return {
 		clock: () => new Date(instant),
 		newId: (at) => {
-			if (next >= SEED_LIMIT) throw new Error("the fixed source ran out of ids")
+			if (next >= limit) throw new Error("the fixed source ran out of ids")
 			const id = counterId(at, next)
 			next += 1n
 			return id

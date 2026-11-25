@@ -1,6 +1,6 @@
 import type { Context, Result } from "./command"
 import { type AppError, isAppError } from "./errors"
-import { HEAD, openStore, type PreMigrationCopy, type Store } from "./store"
+import { HEAD, openStore, type PreMigrationCopy, type Store, type StoreOptions } from "./store"
 
 const RELEASES = "https://github.com/trajectonomics/trajectonomics/releases"
 
@@ -20,6 +20,14 @@ export function upgradeNotice(copy: PreMigrationCopy): string {
 	)
 }
 
+/** The clock and ids a command's store reads: the context's fixed source, or the machine's. */
+export function storeSourceOf(ctx: Context): Pick<StoreOptions, "clock" | "newId"> {
+	return {
+		clock: ctx.source?.clock ?? (() => new Date()),
+		...(ctx.source === undefined ? {} : { newId: ctx.source.newId }),
+	}
+}
+
 /**
  * Opens the store for one command and closes it again, even when the command throws. When the
  * open upgraded the database, the notice is queued on the run, and `run()` prints it only after a
@@ -30,11 +38,7 @@ export function withStore<T>(
 	ctx: Context,
 	work: (store: Store) => Result<T> | AppError,
 ): Result<T> | AppError {
-	const store = openStore({
-		env: ctx.env,
-		clock: ctx.source?.clock ?? (() => new Date()),
-		...(ctx.source === undefined ? {} : { newId: ctx.source.newId }),
-	})
+	const store = openStore({ env: ctx.env, ...storeSourceOf(ctx) })
 	if (isAppError(store)) return store
 	try {
 		if (store.upgradedFrom !== undefined) ctx.afterSuccess?.push(upgradeNotice(store.upgradedFrom))
