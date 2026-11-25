@@ -14,4 +14,7 @@ let { history }: Props = $props()
 	<h2 id="history-title" class="text-base font-semibold">Month-end history</h2>
 	<LineChart label="Net worth at each month-end" series={[history.series]} />
 	<p class="text-sm text-muted-foreground">{history.line}</p>
+	{#if history.cut !== null}
+		<p class="text-sm text-muted-foreground">{history.cut}</p>
+	{/if}
 </section>

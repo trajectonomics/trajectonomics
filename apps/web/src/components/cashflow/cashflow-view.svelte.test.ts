@@ -29,6 +29,7 @@ const ACCOUNTS: Read<AccountList> = {
 function renderView(projections: Readonly<Record<string, Read<ProjectionRun>>>, year = ""): string {
 	return render(CashFlowView, {
 		props: {
+			names: Object.keys(projections),
 			projections,
 			accounts: ACCOUNTS,
 			scenario: "base",

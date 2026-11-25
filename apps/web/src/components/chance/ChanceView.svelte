@@ -3,7 +3,7 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionChance, Read } from "../../lib/contract"
 import { futuresViewOf } from "../../lib/view/chance/futures"
 import { chanceViewOf } from "../../lib/view/chance/page"
-import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
@@ -12,6 +12,8 @@ import ChanceWhatIf from "../what-if/ChanceWhatIf.svelte"
 import ChanceResult from "./ChanceResult.svelte"
 
 interface Props {
+	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
+	names: readonly string[]
 	/** The chance reads of the Snapshot, by Scenario name. */
 	chance: Readonly<Record<string, Read<ProjectionChance>>>
 	/** The Scenario the plan switcher asks for. An unknown one shows the first. */
@@ -20,8 +22,7 @@ interface Props {
 }
 
 /** The Scenario picker and the chance of the chosen Scenario. The choice lives in the address bar. */
-let { chance, scenario, onScenario }: Props = $props()
-const names = $derived(projectionNames(chance))
+let { names, chance, scenario, onScenario }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : chance[name])
 const lens = $derived(name === null ? null : whatIfSession.lensFor(name))

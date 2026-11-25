@@ -58,7 +58,7 @@ describe("MilestonesBody", () => {
 describe("MilestonesView", () => {
 	test("says there is no Scenario to show when the Snapshot holds no projection", () => {
 		const body = render(MilestonesView, {
-			props: { projections: {}, scenario: "", terms: "both", onTerms: () => {} },
+			props: { names: [], projections: {}, scenario: "", terms: "both", onTerms: () => {} },
 		}).body
 		expect(body).toContain("No Scenario to show milestones for")
 	})
@@ -66,7 +66,13 @@ describe("MilestonesView", () => {
 	test("shows the chosen Scenario's milestones, and the first one when the request names none", () => {
 		const read = { argv: ARGV, ok: true as const, data: withMilestones(MILESTONE_ROWS) }
 		const body = render(MilestonesView, {
-			props: { projections: { base: read }, scenario: "", terms: "both", onTerms: () => {} },
+			props: {
+				names: ["base"],
+				projections: { base: read },
+				scenario: "",
+				terms: "both",
+				onTerms: () => {},
+			},
 		}).body
 		expect(body).toContain("Not reached by")
 		expect(body).toContain("first-year")
