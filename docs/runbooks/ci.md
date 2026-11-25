@@ -11,6 +11,7 @@ because the Dashboard (`apps/web`) is slow enough that one job for everything no
 | `Check packages` | `turbo run check` for every package except `@trajectonomics/web`, then the repository guards | always |
 | `Check web` | the web package's lint, typecheck, `./src` tests and build (`turbo run lint typecheck test:src build`) | a pull request that affects `@trajectonomics/web` or `@trajectonomics/cli`, or that changes `ci.yml` or `.github/actions/`; every push to main and manual run |
 | `Check web scripts (1)` ... `(4)` | one shard of `bun test ./scripts` in `apps/web`: `turbo run @trajectonomics/cli#build @trajectonomics/web#demo`, then `bun run test:scripts --shard=N/4` | same as `Check web` |
+| `Check web browser` | the browser checks over the built Demo: `turbo run @trajectonomics/web#build`, then `bun run test:browser` in `apps/web` | same as `Check web` |
 | `Check` | fails unless every job above passed (a skipped web job passes only when `Plan` said to skip it) | always |
 
 Branch protection requires `Check` and `Conventional title`. Keep the job named `Check`, and add the
@@ -77,11 +78,36 @@ hashes equal the packages job's, and runs its files with `bun run --cwd apps/web
 `dependsOn` in `apps/web/turbo.json`), and `tooling/guards/ci-web-split.test.ts` pins both steps and
 that the shard carries no `--`.
 
-## Where the browser checks go (#377)
+## The browser checks (#377)
 
-A new job in `ci.yml`, with `needs: plan` and `if: needs.plan.outputs.web == 'true'`, added to the
-`needs` of `check`. It runs only when `apps/web` or the command line changed and does not lengthen
-`Check packages`.
+`Check web browser` runs a headless Chromium over the built Demo ([web ADR 0026](../../apps/web/docs/adr/0026-a-headless-browser-checks-the-demo-at-phone-width-and-in-print.md)). It has `needs: plan` and
+`if: needs.plan.outputs.web == 'true'`, is in the `needs` of `Check`, and does not lengthen `Check packages` or
+the shards, which it runs beside.
+
+- **What it checks.** Every page of the Demo at 360px and 1280px in the light and the dark theme (no
+  horizontal page scroll, a wide table inside a scroll box that fits), a screen-reader-only label in the last cell of each
+  table at 360px, with amounts shown and hidden (it must not widen the page), and Reports, Projection and Cash flow in print on
+  A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
+  `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
+- **Steps.** The build is `bunx turbo run @trajectonomics/web#build --concurrency=2`, with no arguments after
+  `--` for the reason in the cache section below. Chromium comes from `actions/cache` on `~/.cache/ms-playwright`
+  with the same key as `browser.yml` and `docs-browser.yml` (`playwright-<os>-<version>`), so one download serves
+  all three; a cache hit still runs `playwright install-deps`, because the system libraries are not cached. The
+  suite is `bun run test:browser` in `apps/web`.
+- **Artifacts.** `web-screenshots` (every page at both widths and both themes, and the three printed pages in
+  both themes) is uploaded on every run, pass or fail, for 7 days: open it to look at what CI checked.
+  `web-playwright-report` (the HTML report and traces) is uploaded on failure only.
+- **Budget.** 10 minutes, as the job's `timeout-minutes`. Measured in this pull request's own green run (#497): 102 s for the whole job,
+  of which the build step 8 s (turbo cache hit), the browser cache 3 s, Chromium's system libraries 8 s, the
+  suite 70 s (144 tests, 2 workers) and the screenshot upload about 3 s (17 MB). The shards take 2m47s to
+  6m03s, so the job (about 2 minutes) is not on the critical path. A cold build adds about 40 s, a cold browser download about
+  30 s more.
+- **The font.** Widths depend on the font, so the suite pins Liberation Sans (`playwright install-deps` installs it) and fails when it is missing.
+- **Locally.** `bun run check` never runs it. Build first, then `bun run test:browser` in `apps/web` (see
+  `apps/web/AGENTS.md`).
+- **When it fails.** The message names the page, the width or the paper, and the table or the text, for
+  example `table "Period" is 1355px wide`. Open the screenshot of that page in the artifact, fix the page,
+  and do not loosen the rule. A rule that is wrong goes through its own pull request and ADR.
 
 ## The Demo snapshot is generated per job, not once per run (#464)
 

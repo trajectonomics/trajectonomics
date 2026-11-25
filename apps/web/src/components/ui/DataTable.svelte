@@ -14,8 +14,8 @@ let { caption, columns, rows, rowKey }: Props = $props()
 </script>
 
 <!-- A semantic table with a sticky header. It scrolls inside its own wrapper, both ways, so the page
-never scrolls sideways. -->
-<div class="max-h-[70vh] max-w-full overflow-auto rounded-lg border border-border">
+never scrolls sideways. The wrapper is `relative` so a screen-reader-only label in a cell is placed inside it. -->
+<div class="relative max-h-[70vh] max-w-full overflow-auto rounded-lg border border-border">
 	<table class="w-full min-w-max border-collapse text-sm">
 		<caption class="px-3 py-2 text-left text-sm font-medium text-muted-foreground">{caption}</caption>
 		<thead class="sticky top-0 z-10 bg-card">

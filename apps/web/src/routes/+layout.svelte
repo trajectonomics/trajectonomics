@@ -86,7 +86,7 @@ $effect(() => {
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">
 	<ShellTopBar {title} />
 	<WhatIfBar />
-	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 print:px-0">
 		<PrintHeader heading={printed} />
 		{@render children()}
 	</main>
