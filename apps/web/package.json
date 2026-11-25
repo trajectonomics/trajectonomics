@@ -1,7 +1,7 @@
 {
 	"name": "@trajectonomics/web",
 	"version": "0.0.0-development",
-	"description": "The Dashboard: a static web app that renders a Snapshot of traj --json results on 127.0.0.1, and sends Edits through traj. Never published to npm, never hosted.",
+	"description": "The Dashboard: a static web app that renders a Snapshot of traj --json results on 127.0.0.1, and sends Edits through traj. Never published to npm. Only its hosted Demo build is served, as static pages on the Site.",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -19,6 +19,7 @@
 	},
 	"scripts": {
 		"build": "vite build && bun scripts/pack.ts",
+		"build:hosted": "TRAJ_WEB_TARGET=hosted vite build",
 		"typecheck": "svelte-kit sync && tsc -p tsconfig.json && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
 		"test": "bun test ./src ./scripts",
 		"test:src": "bun test ./src",

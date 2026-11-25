@@ -1,6 +1,6 @@
 // Trying the estate block as a what-if against the real traj (cli ADR 0065, web ADR 0014): one Set of the whole block,
 // nothing written, on a plan with a block and on one without (a Set may begin the block).
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { householdDocument } from "../src/lib/contract"
 import { blockFromDraft, estateDates, estateView } from "../src/lib/view/estate"
 import { failedReads } from "../src/lib/what-if/answer"
@@ -8,6 +8,7 @@ import { readsOf } from "../src/lib/what-if/lens"
 import { overridesOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedEstate } from "../src/lib/what-if/try-estate"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { slow, typedLines, withoutLines, withSavedLines } from "./estate.test-support"
 import {
 	disposeEstate,
@@ -21,6 +22,7 @@ import {
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 /** Tries a draft as the form does: the block as one Set, read through the what-if route. */

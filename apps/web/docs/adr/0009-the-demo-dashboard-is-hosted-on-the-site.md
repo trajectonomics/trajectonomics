@@ -22,3 +22,7 @@ status: accepted
 - ADR 0004's "no hosting" is superseded for the Demo only. Its other parts stand.
 - The package gains a deploy path for the Demo build, and the Demo snapshot becomes public-facing, so it must stay fictional and current.
 - `org/goals/GOALS.md` lists the web app under "Not now". A hosted Demo is not that web app: it shows no one's own plan.
+
+## Amendment (2026-11-25, #342)
+
+The build is a second target, `bun run build:hosted`, under the base path `/demo`, and the Edit controls are drawn and switched off by one fence: [ADR 0028](0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md) records how, and how the "no Edit" promise above is enforced.

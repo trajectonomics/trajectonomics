@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { failedRead, netWorth, okRead, row } from "../overview/fixtures.test-support"
-import { historyLine, monthEndRows } from "./history"
+import { historyCut, historyLine, monthEndRows } from "./history"
 
 const argv = (asOf: string) => ["report", "networth", "--as-of", asOf, "--json"]
 const total = (amount: string) => [{ currency: "THB", amount }]
@@ -56,5 +56,23 @@ describe("historyLine", () => {
 
 	test("says so plainly when there is nothing to chart", () => {
 		expect(historyLine([])).toBe("The history has no month-end read to chart.")
+	})
+})
+
+describe("historyCut", () => {
+	test("says so when the ledger's first entry is before the history's first month", () => {
+		expect(historyCut(["2016-11-30", "2016-12-31"], "2012-03-15")).toBe(
+			"The ledger's first entry is in Mar 2012, but the chart shows only the latest 2 month-ends, from Nov 2016. Earlier months are left out.",
+		)
+	})
+
+	test("is silent when the history starts in the month of the first entry", () => {
+		expect(historyCut(["2016-11-30", "2016-12-31"], "2016-11-01")).toBeNull()
+		expect(historyCut(["2016-11-30"], "2016-11-30")).toBeNull()
+	})
+
+	test("is silent for an empty history or a ledger with no first entry", () => {
+		expect(historyCut([], "2012-03-15")).toBeNull()
+		expect(historyCut(["2016-11-30"], null)).toBeNull()
 	})
 })
