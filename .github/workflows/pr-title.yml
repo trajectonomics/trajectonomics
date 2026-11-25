@@ -21,7 +21,7 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           types='feat|fix|perf|refactor|docs|test|build|ci|chore|style|revert'
-          scopes='cli|site|docs|blog|core|money|ledger|tax|sim|brand|skills|goals|agents|config|ci|release|deps|monorepo|migrate|openjot'
+          scopes='cli|site|docs|blog|data|core|money|ledger|tax|sim|brand|skills|goals|agents|config|ci|release|deps|monorepo|migrate|openjot'
           if printf '%s' "$TITLE" | grep -Eq "^(${types})(\((${scopes})\))?!?: .+"; then
             echo "ok: $TITLE"
           else

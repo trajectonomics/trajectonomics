@@ -1,0 +1,36 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
+import { decorativeMark } from "../lib/mark"
+import { DATA_PATH, DOCS_URL, METHOD_PATH, SITE_HOME_URL, SITE_NAME } from "../lib/site"
+
+interface Props {
+	/** Which header link is the current page. */
+	readonly current: "overview" | "method"
+}
+
+const { current } = Astro.props
+const artwork = decorativeMark(mark)
+---
+
+<header class="data-header">
+	<nav class="data-header-inner" aria-label="Main">
+		<div class="data-header-brand">
+			<a class="brand" href={SITE_HOME_URL} aria-label={`${SITE_NAME} home`}>
+				<span class="brand-tile"><Fragment set:html={artwork} /></span>
+			</a>
+			<a class="data-marker" href={DATA_PATH} aria-current={current === "overview" ? "page" : undefined}>
+				Data
+			</a>
+		</div>
+		<div class="data-header-nav">
+			<a
+				class="header-nav-link"
+				href={METHOD_PATH}
+				aria-current={current === "method" ? "page" : undefined}>Method</a
+			>
+			<a class="header-nav-link" href={DOCS_URL}>Docs</a>
+		</div>
+	</nav>
+</header>

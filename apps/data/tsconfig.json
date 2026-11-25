@@ -1,0 +1,22 @@
+{
+	"extends": "../../tooling/config/tsconfig/base.json",
+	"compilerOptions": {
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+		"types": ["astro/client", "bun"],
+		"isolatedDeclarations": false,
+		"resolveJsonModule": true,
+		"declaration": false
+	},
+	"include": [
+		"src/pages",
+		"src/layouts",
+		"src/components",
+		"src/lib",
+		"src/client",
+		"scripts",
+		"astro.config.ts",
+		"svelte.config.js",
+		".astro/types.d.ts"
+	],
+	"exclude": ["collector"]
+}

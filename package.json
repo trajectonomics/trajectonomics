@@ -18,6 +18,8 @@
 		"apps/docs",
 		"apps/web",
 		"apps/blog",
+		"apps/data",
+		"apps/data/collector",
 		"apps/openjot",
 		"skills/customer",
 		"skills/internal",
