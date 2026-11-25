@@ -41,7 +41,7 @@ Each line: name, version, license, and the numbers of the license texts in Part 
 ------------------------------------------------------------------------------
 OpenJot - 1
 ------------------------------------------------------------------------------
-OpenJot 1.4.0 - MIT [L1]
+OpenJot 1.5.0 - MIT [L1]
 
 ------------------------------------------------------------------------------
 Rust crates (compiled into libmoojot_lib.so) - 548
@@ -798,7 +798,7 @@ Applies to (88):
   @sveltejs/acorn-typescript 1.0.13: Copyright (c) 2022 Tyreal Hu | Copyright (c) 2025 The Svelte Team
   @tauri-apps/api 2.12.5: Copyright (c) 2017 - Present Tauri Apps Contributors
   ONNX Runtime native libraries (libonnxruntime.so, libonnxruntime4j_jni.so) 1.22.0: Copyright (c) Microsoft Corporation
-  OpenJot 1.4.0: Copyright (c) 2026 Trajectonomics
+  OpenJot 1.5.0: Copyright (c) 2026 Trajectonomics
   acorn 8.19.0: Copyright (C) 2012-2022 by various contributors (see AUTHORS)
   block2 0.6.2: Copyright (c) Mads Marquart
   bs58 0.5.1: Copyright (c) 2016 The roaring-rs developers.
