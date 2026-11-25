@@ -6,10 +6,12 @@ interface Asset {
 	readonly etag: string
 }
 
-/** The answers the assets layer gives for the two Language homes and one crawler file. */
+/** The answers the assets layer gives for each page's two Language files, and one crawler file. */
 const ASSETS: Readonly<Record<string, Asset>> = Object.freeze({
 	"/": { body: '<html lang="en">English</html>', etag: '"root-en"' },
 	"/th/": { body: '<html lang="th">ไทย</html>', etag: '"thai-home"' },
+	"/openjot/": { body: '<html lang="en">OpenJot English</html>', etag: '"openjot-en"' },
+	"/th/openjot/": { body: '<html lang="th">OpenJot ไทย</html>', etag: '"openjot-th"' },
 	"/sitemap.xml": { body: "<urlset />", etag: '"sitemap"' },
 })
 

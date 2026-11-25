@@ -7,6 +7,8 @@ const monthText = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
 /** The fields every person has. `lifeExpectancy` is always stated: `traj` has no default for it (cli ADR-0048). */
 const personBase = {
 	id: z.string().min(1),
+	// What a page reads in place of the id, such as a name in Thai (sim ADR 0032, cli ADR 0080); no key.
+	displayLabel: z.string().optional(),
 	born: monthText,
 	lifeExpectancy: integer,
 }

@@ -38,6 +38,7 @@
 @import "./command.css";
 @import "./toast.css";
 @import "./header.css";
+@import "./header-narrow.css";
 @import "./repo-link.css";
 @import "./menu.css";
 @import "./menu-panel.css";
@@ -45,6 +46,10 @@
 @import "./replay.css";
 @import "./motion-app.css";
 @import "./motion-mascot.css";
+@import "./openjot.css";
+@import "./openjot-privacy.css";
+@import "./openjot-steps.css";
+@import "./openjot-screens.css";
 
 /*
  * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own

@@ -1,10 +1,8 @@
-import type { Language } from "../language/language"
-import { dictionaryFor } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { unescapeText } from "./html-tag"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
 
 /** A `<title>` element: the scanner skips a code element's body, so the text is read here. */
@@ -15,8 +13,8 @@ function titlesOf(html: string): readonly string[] {
 	return [...html.matchAll(TITLE)].map((match) => unescapeText(match[1] ?? "").trim())
 }
 
-/** One Language home carries one title, and it is the text the Dictionary states for that Language. */
-function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[] {
+/** One page carries one title, and it is the text its own Dictionary states for that Language. */
+function failuresOf(file: BuiltFile, expected: string): readonly BuildFailure[] {
 	const path = pageUrl(file.path)
 	const titles = titlesOf(file.content)
 	const [title] = titles
@@ -26,12 +24,11 @@ function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[
 	if (titles.length > 1) {
 		return [buildFailure("TITLE_DUPLICATE", path, `carries ${titles.length} titles, not one.`)]
 	}
-	const expected = dictionaryFor(language).documentTitle
 	if (title === expected) return []
 	return [buildFailure("TITLE_TEXT_WRONG", path, `titles itself "${title}", not "${expected}".`)]
 }
 
-/** Every Language home names itself in the one document title the Dictionary states. */
+/** Every page names itself in the one document title its own Dictionary states. */
 export function checkDocumentTitle(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => failuresOf(file, entry.language))
+	return builtLanguagePages(files).flatMap(({ page, file }) => failuresOf(file, page.documentTitle))
 }

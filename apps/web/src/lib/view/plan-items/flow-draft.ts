@@ -1,7 +1,9 @@
 import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
 import { parseBps } from "../../format/bps"
+import { CATEGORY_PROBLEM, categoryOf, isCategoryText } from "./expense-category"
 import type { FlowDraft, FlowKind } from "./flows"
 import { isDateText, slugId, typedAmount, uniqueId, withoutKeys } from "./form"
+import { labelOf, labelProblem } from "./label-text"
 import type { Problems } from "./problems"
 
 /** The outcome of a form: the Flow to save, or the problems the form shows at its fields. */
@@ -23,6 +25,8 @@ function problemsOf(draft: FlowDraft, isNew: boolean): Map<string, string> {
 	if (draft.growth !== "inflation" && parseBps(draft.rate) === null) {
 		problems.set("rate", "Enter a percent with at most two places, such as 3 or 3.50.")
 	}
+	const label = labelProblem(draft.displayLabel)
+	if (label !== null) problems.set("displayLabel", label)
 	return problems
 }
 
@@ -56,8 +60,16 @@ function candidateOf(
 	const end = keptEndOf(draft)
 	const rate = draft.growth === "inflation" ? "inflation" : parseBps(draft.rate)
 	const category = categoryOf(draft, options.kind)
+	const label = labelOf(draft.displayLabel)
 	return {
-		...withoutKeys(options.existing ?? {}, ["amount", "growth", "end", "earned", "category"]),
+		...withoutKeys(options.existing ?? {}, [
+			"amount",
+			"growth",
+			"end",
+			"earned",
+			"category",
+			"displayLabel",
+		]),
 		id: options.existing?.id ?? uniqueId(slugId(draft.name), options.taken),
 		kind: options.kind,
 		frequency: draft.frequency,
@@ -67,6 +79,7 @@ function candidateOf(
 		...(end === undefined ? {} : { end }),
 		...(options.kind === "income" ? { earned: draft.earned } : {}),
 		...(category === null ? {} : { category }),
+		...(label === null ? {} : { displayLabel: label }),
 	}
 }
 
@@ -78,23 +91,4 @@ function keptEndOf(draft: FlowDraft): string | undefined {
 	const end = draft.end.trim()
 	if (draft.frequency === "once") return end === draft.start ? end : undefined
 	return end === "" ? undefined : end
-}
-
-/** The problem shown at an expense's category that is not 1 to 64 characters, none a control character (cli schema). */
-export const CATEGORY_PROBLEM = "Enter a category of 1 to 64 characters, or leave it empty."
-
-/** Whether a category is 1 to 64 characters, none of them a control character. */
-export function isCategoryText(category: string): boolean {
-	if (category.length < 1 || category.length > 64) return false
-	return [...category].every((char) => {
-		const code = char.charCodeAt(0)
-		return code >= 32 && code !== 127
-	})
-}
-
-/** The category a draft names for an expense, trimmed; null for an empty one and for any other kind of Flow. */
-function categoryOf(draft: FlowDraft, kind: FlowKind): string | null {
-	if (kind !== "expense") return null
-	const category = draft.category.trim()
-	return category === "" ? null : category
 }

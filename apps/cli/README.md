@@ -214,24 +214,31 @@ letters, digits or hyphens, is refused by name. A plan without a partner or with
 lists the `filers` when it has any, and the household's Owners are read each time the
 tax is written, so after changing them run `traj scenario tax <name> --from-stored`.
 
-A couple who file separately get one Levy each. `--filing-status married_separate`
-writes `th-2026-pit@me` and `th-2026-pit@partner`, one per person who has a labelled
-Flow or Account, with the same Owner suffixes. Each Prepayment of the tax moves to the
-Levy of its Flow's Owner (a Prepayment of a Levy of your own stays). A `shared` Flow's
-Prepayment is split half to each, and its capped Prepayment stays whole on the holder's.
-Each allowance flag takes a person (`--parents partner=2`) so each Return states its own
-claims, a bare value names the holder, and each Return's children default to 0. A value
-for someone with no income is refused, because no Return carries it. A Return claims at
-most its own two parents. Each Return has its own home-loan interest ceiling; interest on
-a loan borrowed together shares one 100,000 baht ceiling, which `traj` cannot tell from
-two separate loans, so state each person's share yourself. When both claim interest and a
-loan's Owner is `shared`, the result's `assumptions` say the loans are taken to be
-separate. `--merge` and `--from-stored` keep the stored `returns`, and `--merge` to
-`married_joint` keeps the partner's for a later switch back. The stored profile's
-`claimsHolder` says whose claims its other keys are, so if the household swaps which
-person is the holder, each person's claims stay theirs. A `projection run` then
-reports a `filer` on each `taxYears` entry, `--carry-in` takes one record per Levy, and
-`projection allowances` answers per Return.
+A couple who file separately get one Levy each. `--filing-status married_separate` writes
+`th-2026-pit@me` and `th-2026-pit@partner`, one per person who has a labelled Flow or
+Account, with the same Owner suffixes. Each Prepayment of the tax moves to the Levy of its
+Flow's Owner (a Prepayment of a Levy of your own stays). A `shared` Flow's Prepayment is
+split half to each, and its capped Prepayment stays whole on the holder's. Each allowance
+flag takes a person (`--parents partner=2`) so each Return states its own claims, a bare
+value names the holder, and each Return's children default to 0. A value for someone with
+no income is refused, because no Return carries it. A Return claims at most its own two
+parents. Interest on one loan borrowed together is stated once, as `--mortgage-interest
+shared=60000`: each Return claims half, an odd satang goes to the holder, and a sole
+person with income claims it all. The shared total is at most 100,000 baht
+(`MORTGAGE_OVER_CEILING`), and `shared=` is refused under any other filing status. A
+person's own `--mortgage-interest` is for their other loans, and each Return claims at
+most 100,000 baht of its own interest and its share together. `traj` cannot tell which
+loan interest is on, so when both claim their own, a loan's Owner is `shared` and no
+shared interest is stated, the result's `assumptions` say the loans are taken to be
+separate. `--merge` and `--from-stored` keep the stored `returns` and
+`sharedMortgageInterest`, and `--merge` to `married_joint` keeps the partner's Return and
+the shared interest for a later switch back; a joint Return claims neither, so state its
+interest bare. A write that claims neither says so in its `assumptions`, on
+`allowances.mortgageInterestCeiling`. The stored profile's `claimsHolder` says whose
+claims its other keys are, so if the household swaps which person is the holder, each
+person's claims stay theirs. A `projection run` then reports a `filer` on each `taxYears`
+entry, `--carry-in` takes one record per Levy, and `projection allowances` answers per
+Return.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
@@ -399,6 +406,31 @@ each side.
   }
 ]
 ```
+
+## Naming a Flow, a Milestone or a person
+
+> **Ships in 0.8.0.**
+
+Every Flow, every Milestone and every person of a household may carry a `displayLabel`: the words a
+page reads in place of the id, such as Thai text. It is free text of 1 to 80 code points, with no
+control, invisible or bidirectional characters and no leading or trailing whitespace. It is no key
+and changes no figure: the id still addresses the item, the label may repeat or change, and the
+engine never reads it. `traj schema scenario apply` and `traj schema scenario household` publish it
+with that rule.
+
+A label travels in the document, so `--file` and `--add` carry it, and `--set` writes it:
+
+```bash
+traj scenario apply base --set 'flows.school-fees.displayLabel="School fees"'
+traj scenario apply base --set 'milestones.condo.displayLabel="Condo down payment"'
+traj scenario household base --file household.json   # a person's label, in the household
+```
+
+A plan written before the field may lack it, and the first `--set` that names it begins it, as
+`--set accounts.<id>.volatility=…` does. Because a label is stored content, a change to one moves the
+plan's `contentHash`; a plan without labels keeps its bytes and its hash. To clear a label, write the
+document without it (`--file`), or empty the Name field in the Dashboard: `--set` writes a value and
+cannot remove a key, so `null` and `""` are refused.
 
 ## Where each year's money went
 

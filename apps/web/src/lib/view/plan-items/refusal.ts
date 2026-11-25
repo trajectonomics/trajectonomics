@@ -57,6 +57,8 @@ function anchorRefusal(segments: readonly string[]): boolean {
  * The form field a refusal names, or null when it names none. The CLI's path ends in the field
  * (`document.flows.salary.amount`), and a rate's path runs through `growth`, so `growth` names `rate`. An Account's
  * `payout` and `fee` and a salary's employer Flow have their own fields, found by the key the path ends in under them.
+ * A path's last key must also be a field of this form: a Flow's tax `label` is no field, because its Name field is
+ * `displayLabel`.
  */
 export function fieldOfRefusal(error: ErrorBody | null, fields: readonly string[]): string | null {
 	if (error?.path === undefined) return null

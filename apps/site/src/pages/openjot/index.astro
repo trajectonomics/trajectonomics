@@ -1,0 +1,8 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see <OpenJotPage /> or FALLBACK_LANGUAGE.
+import OpenJotPage from "../../components/openjot/OpenJotPage.astro"
+import { FALLBACK_LANGUAGE } from "../../lib/language/language"
+---
+
+<!-- OpenJot's one address: the fallback Language's page, written under openjot/ (ADR 0032). -->
+<OpenJotPage language={FALLBACK_LANGUAGE} />

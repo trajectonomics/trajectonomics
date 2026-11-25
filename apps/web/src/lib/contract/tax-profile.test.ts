@@ -21,6 +21,11 @@ describe("the tax profile contract", () => {
 		expect(taxProfile.parse(profile) as unknown).toEqual(profile)
 	})
 
+	it("decodes the interest of a loan borrowed together, and keeps it", () => {
+		const profile = { ...FLAT, sharedMortgageInterest: 60000.01 }
+		expect(taxProfile.parse(profile) as unknown).toEqual(profile)
+	})
+
 	it("still decodes a profile that records nobody", () => {
 		expect(taxProfile.parse(FLAT) as unknown).toEqual(FLAT)
 	})

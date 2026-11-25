@@ -1,0 +1,60 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { Language } from "../../lib/language/language"
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+import {
+	OPENJOT_PRIVACY_CONTACT_URL,
+	openJotPrivacyPolicyUrl,
+	openJotTermsUrl,
+} from "../../lib/site/openjot"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+	readonly language: Language
+}
+
+const { dictionary, language } = Astro.props
+
+/** The three links under the claims: the policy and the terms in this Language, and the contact. */
+const LINKS = [
+	{ text: dictionary.privacyPolicyLink, href: openJotPrivacyPolicyUrl(language) },
+	{ text: dictionary.termsLink, href: openJotTermsUrl(language) },
+	{ text: dictionary.privacyContactLink, href: OPENJOT_PRIVACY_CONTACT_URL },
+] as const
+---
+
+{/* The ported Privacy section: four claims in the Site's hairline-card grid, then the policy links. */}
+<section class="section-surface bg-background" aria-labelledby="openjot-privacy">
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.privacyEyebrow}</p>
+			<h2 id="openjot-privacy" class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.privacyHeading}
+			</h2>
+		</div>
+		<ul class="openjot-privacy">
+			{
+				dictionary.privacyTitles.map((title, index) => (
+					<li class="openjot-privacy-claim">
+						<span class="openjot-privacy-title">{title}</span>
+						<p class="openjot-privacy-copy text-muted-foreground">
+							{dictionary.privacyCopies[index]}
+						</p>
+					</li>
+				))
+			}
+		</ul>
+		<p class="openjot-meta openjot-privacy-links">
+			{
+				LINKS.map((link, index) => (
+					<>
+						{index > 0 ? <span aria-hidden="true"> · </span> : null}
+						<a class="openjot-link" href={link.href}>
+							{link.text}
+						</a>
+					</>
+				))
+			}
+		</p>
+	</div>
+</section>

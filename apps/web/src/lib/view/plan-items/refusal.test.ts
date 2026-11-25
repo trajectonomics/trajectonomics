@@ -72,3 +72,30 @@ describe("shownProblems", () => {
 		expect(shown.general).toBeUndefined()
 	})
 })
+
+describe("a Flow's tax label is no form field, and its display label is", () => {
+	const FIELDS = ["name", "displayLabel", "amount", "rate", "start"]
+	const TAX_LABEL = "document.flows.salary.label"
+	const DISPLAY_LABEL = "document.flows.salary.displayLabel"
+
+	test("a refusal at the tax label names no field, so it does not show under Name", () => {
+		expect(fieldOfRefusal(refusal(TAX_LABEL), FIELDS)).toBeNull()
+		const shown = shownProblems({}, refusal(TAX_LABEL), "No such tax label.", FIELDS)
+		expect(shown.at("displayLabel")).toBeUndefined()
+		expect(shown.general).toBe("No such tax label.")
+	})
+
+	test("a refusal at the display label lands on the Name field", () => {
+		expect(fieldOfRefusal(refusal(DISPLAY_LABEL), FIELDS)).toBe("displayLabel")
+		const shown = shownProblems({}, refusal(DISPLAY_LABEL), "The rule it broke.", FIELDS)
+		expect(shown.at("displayLabel")).toBe("The rule it broke.")
+		expect(shown.general).toBeUndefined()
+	})
+
+	test("a person's display label lands on the Name field too", () => {
+		const PERSON_FIELDS = ["name", "displayLabel", "role", "born"]
+		expect(fieldOfRefusal(refusal("document.people.0.displayLabel"), PERSON_FIELDS)).toBe(
+			"displayLabel",
+		)
+	})
+})

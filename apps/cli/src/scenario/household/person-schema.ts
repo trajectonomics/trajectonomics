@@ -1,3 +1,4 @@
+import { DISPLAY_LABEL_MAX, DISPLAY_LABEL_RULE, isDisplayLabel } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import type { Person } from "./model"
 
@@ -23,14 +24,25 @@ const lifeExpectancy = z
 		"The age at which the person's life ends, as a whole number. Required: there is no default.",
 	)
 
+const displayLabel = z
+	.string()
+	.min(1)
+	.max(DISPLAY_LABEL_MAX)
+	.refine((text) => isDisplayLabel(text), { message: DISPLAY_LABEL_RULE })
+	.optional()
+	.describe(
+		`What a page reads in place of the person's id, such as a name in Thai, written as ${DISPLAY_LABEL_RULE}. It is no key: the id still names the person, and the label may repeat or change (sim ADR 0032, cli ADR 0080).`,
+	)
 const holder = z.strictObject({
 	id: personId,
+	displayLabel,
 	role: z.literal("holder").describe("The account holder: exactly one per household."),
 	born,
 	lifeExpectancy,
 })
 const partner = z.strictObject({
 	id: personId,
+	displayLabel,
 	role: z.literal("partner").describe("A partner: at most one per household."),
 	born,
 	lifeExpectancy,
@@ -44,6 +56,7 @@ const partner = z.strictObject({
 })
 const dependent = z.strictObject({
 	id: personId,
+	displayLabel,
 	role: z.literal("dependent").describe("A dependent: any number per household."),
 	relation: z
 		.enum(["child", "parent", "other"])

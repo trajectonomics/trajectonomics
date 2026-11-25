@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { ABSOLUTE_CLEAN_URL } from "../language/languages"
 import { SITE_ORIGIN } from "../site"
+import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import {
 	INDEXNOW_ENDPOINT,
 	INDEXNOW_KEY,
@@ -33,10 +34,10 @@ describe("the body an IndexNow submission carries", () => {
 		expect(payload.keyLocation).toBe(INDEXNOW_KEY_URL)
 	})
 
-	it("lists the Site's one address, as the Sitemap does", () => {
+	it("lists every page address, as the Sitemap does", () => {
 		const payload = indexNowPayload()
 		expect(payload.urlList).toEqual(SITEMAP_URLS)
-		expect(payload.urlList).toEqual([ABSOLUTE_CLEAN_URL])
+		expect(payload.urlList).toEqual([ABSOLUTE_CLEAN_URL, ABSOLUTE_OPENJOT_URL])
 	})
 
 	it("hands the body out frozen, so a run cannot edit what it submits", () => {

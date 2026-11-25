@@ -1,0 +1,69 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+import { OPENJOT_DOWNLOAD_URL, OPENJOT_RELEASES_URL } from "../../lib/site/openjot"
+import Arrow from "../icons/Arrow.astro"
+import Mascot from "../Mascot.astro"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+}
+
+const { dictionary } = Astro.props
+// The hero shows the summary screen: the figure a visitor came for, before the install steps.
+const HERO_SHOT = "/openjot/summary.webp"
+---
+
+<section class="section-surface relative isolate overflow-clip bg-background">
+	<div class="section-inner openjot-hero">
+		<div class="openjot-hero-copy">
+			<p class="eyebrow">{dictionary.heroEyebrow}</p>
+			<h1 data-hero-headline class="max-w-2xl text-4xl font-normal text-balance text-foreground sm:text-6xl">
+				<span>{dictionary.heroHeadingPrefix}</span>{" "}
+				<span class="block text-accent">{dictionary.heroHeadingAccent}</span>
+			</h1>
+			<p class="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
+				{dictionary.heroLede}
+			</p>
+			<div class="openjot-actions">
+				<a
+					class="closing-primary bg-primary text-primary-foreground"
+					data-bevel
+					href={OPENJOT_DOWNLOAD_URL}
+					referrerpolicy="no-referrer-when-downgrade"
+				>
+					{dictionary.downloadCta}
+				</a>
+				<a class="window-exit" data-bevel href="#install">
+					{dictionary.installCta}<Arrow class="window-exit-arrow" />
+				</a>
+			</div>
+			<p class="openjot-meta">{dictionary.requirement}</p>
+			<p class="openjot-meta">
+				<a class="openjot-link" href={OPENJOT_RELEASES_URL}>{dictionary.releasesLink}</a>
+			</p>
+		</div>
+		<div class="openjot-hero-art">
+			<Mascot pose="hello" class="openjot-hello" />
+			<div class="openjot-phone openjot-phone-hero">
+				<img
+					src={HERO_SHOT}
+					width="412"
+					height="915"
+					alt={dictionary.screenAlts[1]}
+					fetchpriority="high"
+				/>
+			</div>
+		</div>
+	</div>
+</section>
+
+<aside class="openjot-note" aria-label={dictionary.inAppTitle}>
+	<div class="section-inner openjot-note-inner">
+		<Mascot pose="lost" class="openjot-note-mascot" />
+		<p class="openjot-note-text">
+			<strong>{dictionary.inAppTitle}</strong> {dictionary.inAppText}
+		</p>
+	</div>
+</aside>
