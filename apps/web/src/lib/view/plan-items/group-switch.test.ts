@@ -14,8 +14,9 @@ import { homeDraft, planWithHome } from "./asset-fixtures.test-support"
 import { withFlow } from "./document"
 import { baselineRead } from "./fixtures.test-support"
 import type { GroupSwitch } from "./group-switch"
-import { loanCardsOf, plainAccounts, unplacedFlows } from "./loan-card"
+import { loanCardsOf } from "./loan-card"
 import { loanPlanDocument } from "./loan-fixtures.test-support"
+import { plainAccounts, unplacedFlows } from "./unplaced"
 
 const NOTHING_HELD = baselineRead()
 const home = planWithHome(homeDraft({ saleDate: "2028-07-15" }))

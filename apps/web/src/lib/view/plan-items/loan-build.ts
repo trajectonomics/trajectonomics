@@ -10,6 +10,7 @@ import {
 } from "../../contract/scenario-show"
 import { parseBps } from "../../format/bps"
 import { withoutKeys } from "./form"
+import { LOAN_COMPOUNDINGS } from "./loan-check"
 import type { LoanParts } from "./loan-document"
 import type { LoanDraft } from "./loan-draft"
 
@@ -49,6 +50,10 @@ export function paymentOf(
 	key: string,
 	principal: string,
 ): ScenarioFlow | null {
+	// A compounding the form does not list is the stored word: the payment keeps its stored frequency, as it is.
+	const frequency = (LOAN_COMPOUNDINGS as readonly string[]).includes(draft.compounding)
+		? draft.compounding
+		: (existing?.payment.frequency ?? draft.compounding)
 	const parsed = scenarioFlow.safeParse({
 		...withoutKeys(existing?.payment ?? {}, [
 			"amount",
@@ -61,7 +66,7 @@ export function paymentOf(
 		id: existing?.payment.id ?? `${key}-payment`,
 		kind: "contribution",
 		target: id,
-		frequency: draft.compounding,
+		frequency,
 		start: draft.firstPayment.trim(),
 		level: { principal, payments: Number(draft.payments.trim()), rounding: draft.rounding },
 	})

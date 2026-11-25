@@ -12,7 +12,8 @@ import { ownedChoicesOf } from "./asset-owned"
 import { assetLayoutOf, assetShown, fieldOfAssetRefusal } from "./asset-refusal"
 import { withoutAsset } from "./asset-remove"
 import { baselineRead, planDocument } from "./fixtures.test-support"
-import { loanCardsOf, plainAccounts, unplacedFlows } from "./loan-card"
+import { loanCardsOf } from "./loan-card"
+import { plainAccounts, unplacedFlows } from "./unplaced"
 
 const doc = planWithHome()
 
