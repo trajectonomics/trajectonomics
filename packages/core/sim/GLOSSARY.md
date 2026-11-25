@@ -237,6 +237,10 @@ _Avoid_: Investment income, unearned income
 An optional name on an expense Flow that groups spending in reports, 1 to 64 code points long (a code point is one Unicode scalar value, so a decomposed accent counts as two and an emoji as one). It has no control, invisible or bidirectional code point and no leading or trailing whitespace (ADR 0018), so two expenses share a group exactly when their category strings are equal code point for code point; nothing is trimmed or normalised. It is inert: the engine never reads it, so no Projection, FI answer or chance result changes with it. It is not a **Tally label**, which a Levy sums; the two share no vocabulary and no field.
 _Avoid_: tag, label, group, Tally label
 
+**Display label**:
+An optional name a person reads in place of a Flow's or a Milestone's id, stated in `displayLabel`. Free text of 1 to 80 code points with the expense category's rules and no leading or trailing whitespace (ADR 0032). It is never a key: ids address items, and a label may repeat or change. It is inert to the engine, which reads no figure from it, but it is stored document content, so it is inside `contentHash` and a rename moves the hash. Nothing trims or normalises it: a caller that takes a person's input trims before it writes, and `check()` refuses untrimmed text rather than rewriting it.
+_Avoid_: title, name, alias, Tally label
+
 **Cash-flow breakdown**:
 One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, a Payout list by Account, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in (income and payouts) equals money out exactly, and every total equals its roll-up field, `income` with the payouts added.
 _Avoid_: Sankey, statement, budget

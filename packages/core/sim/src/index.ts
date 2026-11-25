@@ -10,6 +10,11 @@ export { allowedValues } from "./check/allowed"
 export type { ErrorCode, Path, Problem } from "./check/codes"
 export { ERROR_CODES } from "./check/codes"
 export { EXPENSE_CATEGORY_RULE } from "./check/flow-fields"
+export {
+	DISPLAY_LABEL_MAX,
+	DISPLAY_LABEL_RULE,
+	isDisplayLabel,
+} from "./check/label-rule"
 export { project } from "./engine/project"
 export { projectPath } from "./engine/project-path"
 export { routedTargetAt } from "./engine/routed"

@@ -1,6 +1,6 @@
 /**
- * The words that name a household's people. The CLI states a person's id and role and nothing else (cli ADR-0048), so
- * the words come from the role it states: "You", "Your partner", "Child". An id is never turned into a name.
+ * The words that name a household's people. A person may state a `displayLabel` (sim ADR 0032), which wins; otherwise the
+ * words come from the role the CLI states: "You", "Your partner", "Child". An id is never turned into a name.
  */
 import type { HouseholdDocument, HouseholdPerson } from "../../contract"
 
@@ -17,11 +17,19 @@ export type PersonNames = ReadonlyMap<string, PersonName>
 export const NO_PEOPLE: PersonNames = new Map()
 
 /** The words for a role: the holder is "You", the others are called by the role the CLI states. */
-function wordsOf(person: HouseholdPerson): PersonName {
+function roleWords(person: HouseholdPerson): PersonName {
 	if (person.role === "holder") return { label: "You", subject: "you" }
 	if (person.role === "partner") return { label: "Your partner", subject: "your partner" }
 	const noun = person.relation === "other" ? "dependent" : person.relation
 	return { label: `${noun.charAt(0).toUpperCase()}${noun.slice(1)}`, subject: `the ${noun}` }
+}
+
+/** The words for one person: the label the household states for them, else their role's. */
+function wordsOf(person: HouseholdPerson): PersonName {
+	const label = person.displayLabel
+	if (label === undefined) return roleWords(person)
+	// A label is what the person is called, so it is the same words in a heading and in a sentence.
+	return { label, subject: label }
 }
 
 /**

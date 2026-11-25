@@ -10,7 +10,8 @@ import { type StoredReturn, storedReturn } from "./stored-return"
  * the defaults the write applied; a deduction appears only when it is more than zero, because a
  * zero states nothing. Each key is the camelCase name of the flag that sets it. `returns` holds one
  * claim set per Return of a separate filing, and keeps other people's under another status;
- * `claimsHolder` says whose claims the other keys are (cli ADR-0075).
+ * `claimsHolder` says whose claims the other keys are, and `sharedMortgageInterest` is the interest
+ * stated as `--mortgage-interest shared=` (cli ADR-0075).
  */
 export type StoredTax = {
 	tax: TaxJurisdiction
@@ -19,6 +20,7 @@ export type StoredTax = {
 	childrenAtHigherRate: number
 	claimsHolder?: string | undefined
 	returns?: Record<string, StoredReturn> | undefined
+	sharedMortgageInterest?: number | undefined
 } & { readonly [K in keyof TaxAllowances]?: number | undefined }
 
 /** A household's name for a person. It need not fit a Filer's id: a person with no Return keeps claims. */
@@ -51,6 +53,13 @@ export const storedTax: z.ZodType<StoredTax> = z
 			.optional()
 			.describe(
 				"One claim set per Return of a separate filing, keyed by person id (cli ADR-0075). Under another filing status it holds what people other than `claimsHolder` claimed, which no Levy reads and a later separate filing takes back; that person's claims are the keys beside it.",
+			),
+		sharedMortgageInterest: z
+			.number()
+			.min(0)
+			.optional()
+			.describe(
+				"Home-loan interest on one loan borrowed together, in THB, as --mortgage-interest shared= states it: each separate Return claims half beside its own mortgageInterest, an odd satang going to the holder, and a sole Filer claims it all (cli ADR-0075). Under another filing status it is kept and no Levy reads it.",
 			),
 		...deductionFlags,
 	})

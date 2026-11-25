@@ -59,7 +59,7 @@ export const deductionInputFlags: DeductionInputFlags = {
 		.array(z.string())
 		.optional()
 		.describe(
-			'Home-loan interest paid in the tax year, in THB; needs --tax. Write "<person>=<amount>" for one Return of a separate filing.',
+			'Home-loan interest paid in the tax year, in THB; needs --tax. Write "<person>=<amount>" for one Return of a separate filing, or "shared=<amount>" for one loan borrowed together: each separate Return claims half, under one ceiling for the loan, beside the interest stated as its own.',
 		),
 	donation2x: z
 		.array(z.string())

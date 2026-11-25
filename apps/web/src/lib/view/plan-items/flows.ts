@@ -94,6 +94,13 @@ export interface FlowDraft {
 	readonly earned: boolean
 	/** An expense's group for reports, free text: empty for none. Suggested from the categories the plan holds. */
 	readonly category: string
+	/** The name a page reads in place of the id, free text: empty for none (sim ADR 0032). */
+	readonly displayLabel: string
+}
+
+/** The name a page reads in place of a Flow's id, or empty when it states none. */
+function draftLabel(flow?: ScenarioFlow): string {
+	return flow?.displayLabel ?? ""
 }
 
 /** The draft of a Flow to edit, or of a new one when there is no Flow. */
@@ -110,6 +117,7 @@ export function flowDraftOf(flow?: ScenarioFlow): FlowDraft {
 		rate: growth !== undefined && growth !== "inflation" ? formatBps(growth.bps) : "",
 		earned: flow?.earned !== false,
 		category: flow?.category ?? "",
+		displayLabel: draftLabel(flow),
 	}
 }
 

@@ -6,7 +6,12 @@ import { ageDate, joinsDate } from "./dates"
  * them. Declared by hand so the exported types never depend on unexported schema constants.
  */
 
-type PersonBase = { id: string; born: string; lifeExpectancy: number }
+type PersonBase = {
+	id: string
+	born: string
+	lifeExpectancy: number
+	displayLabel?: string | undefined
+}
 
 export type Person =
 	| (PersonBase & { role: "holder" })

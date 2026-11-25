@@ -4,7 +4,7 @@
  * holds, calling each person by the role the household states; it never works out what the anchor's date is.
  */
 import type { HouseholdAnchor, HouseholdDocument, HouseholdPerson, PersonAge } from "../../contract"
-import { anchorWords, NO_PEOPLE, type PersonNames, personNames } from "../item-names"
+import { anchorWords, type PersonNames, personNames } from "../item-names"
 import { withSearch } from "../links"
 
 /** One person as a row of the card: every field is the stored text. */
@@ -62,17 +62,14 @@ export function flowAnchorLabels(
 }
 
 /** The ages a row carries, as one line of text: "You 60, Your partner 58". A person the household does not name shows by id. Empty when the row carries none. */
-export function agesText(ages: readonly PersonAge[], people: PersonNames = NO_PEOPLE): string {
+export function agesText(ages: readonly PersonAge[], people: PersonNames): string {
 	return ages
 		.map((entry) => `${people.get(entry.person)?.label ?? entry.person} ${entry.age}`)
 		.join(", ")
 }
 
 /** The age under a chart's year: "age 50" for one person, "You 50" (the first person, by the household's words) for a household of several. Null without one. */
-export function axisAge(
-	ages: readonly PersonAge[],
-	people: PersonNames = NO_PEOPLE,
-): string | null {
+export function axisAge(ages: readonly PersonAge[], people: PersonNames): string | null {
 	const [first] = ages
 	if (first === undefined) return null
 	if (ages.length === 1) return `age ${first.age}`

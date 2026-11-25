@@ -69,6 +69,7 @@ export const ELSEWHERE: Readonly<Partial<Record<ErrorCode, Elsewhere>>> = {
 	INVALID_MULTIPLE: document,
 	INVALID_COMBINE: document,
 	INVALID_CATEGORY: document,
+	INVALID_LABEL: document,
 	// What the CLI builds from a flag: the Timeline, the path count, the seed and the Return model.
 	HORIZON_BEFORE_START: input,
 	INVALID_RESOLUTION: never,

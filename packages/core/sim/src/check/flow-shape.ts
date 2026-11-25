@@ -1,6 +1,7 @@
 import { FLOW_KINDS, FREQUENCIES, FUNDINGS } from "../vocab"
 import type { AccountIndex } from "./codes"
 import { derive } from "./derive"
+import { displayLabel } from "./display-label"
 import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED, NOT_EXPENSE } from "./flow-fields"
 import { gates } from "./flow-gates"
 import { levelField } from "./level-loan"
@@ -26,6 +27,7 @@ export interface FlowContext {
 
 const base: Shape = {
 	id: req(str),
+	displayLabel: opt(displayLabel),
 	kind: req(oneOf(FLOW_KINDS, "INVALID_KIND")),
 	amount: opt(amount),
 	frequency: req(oneOf(FREQUENCIES, "INVALID_FREQUENCY")),

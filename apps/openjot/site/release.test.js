@@ -1,7 +1,7 @@
 // Run with: node --test site/release.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ARCHIVED_REPO, handle, pickRelease, RELEASES_URL, REPO, TAG_PREFIX } from "./release.js";
+import { ARCHIVED_REPO, handle, LANDING_URL, pickRelease, RELEASES_URL, REPO } from "./release.js";
 
 const asset = (name, size = 1000, tag = "openjot-v1.0.0", repo = REPO) => ({
   name,
@@ -20,7 +20,7 @@ const release = (assets, tag = "openjot-v1.0.0", extra = {}) => ({
 });
 
 const API_LIST = `https://api.github.com/repos/${REPO}/releases?per_page=100`;
-const WEB_LIST = `https://github.com/${REPO}/releases?q=${encodeURIComponent(TAG_PREFIX)}`;
+const WEB_REFS = `https://github.com/${REPO}.git/info/refs?service=git-upload-pack`;
 const ARCHIVED_API = `https://api.github.com/repos/${ARCHIVED_REPO}/releases/latest`;
 const ARCHIVED_LATEST = `https://github.com/${ARCHIVED_REPO}/releases/latest`;
 
@@ -40,6 +40,23 @@ function github(status, body) {
     return new Response(body === undefined ? "{}" : JSON.stringify(body), { status });
   };
   return { fetch, calls };
+}
+
+/** A git-upload-pack ref advertisement; each tag is also listed peeled, as an annotated tag is. */
+function refsAdvert(...refs) {
+  const hash = (n) => n.toString(16).padStart(40, "0");
+  const pkt = (text) => `${(text.length + 4).toString(16).padStart(4, "0")}${text}`;
+  const lines = [
+    pkt("# service=git-upload-pack\n"),
+    "0000",
+    pkt(`${hash(1)} HEAD\0multi_ack thin-pack side-band-64k\n`),
+  ];
+  refs.forEach((ref, i) => {
+    lines.push(pkt(`${hash(i + 2)} ${ref}\n`));
+    lines.push(pkt(`${hash(i + 2)} ${ref}^{}\n`));
+  });
+  lines.push("0000");
+  return lines.join("");
 }
 
 const env = { ASSETS: { fetch: async () => new Response("asset") } };
@@ -136,20 +153,20 @@ test("/download falls back to the archived repository before the first openjot-v
   assert.equal((await api.json()).release.version, "v1.4.0");
 });
 
-test("/download sends people to the coming-soon note when neither repository has a release", async () => {
+test("/download sends people to the landing page when neither repository has a release", async () => {
   const gh = routes([
     [API_LIST, () => Response.json([])],
     [ARCHIVED_API, () => new Response("{}", { status: 404 })],
   ]);
   const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
   assert.equal(res.status, 302);
-  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
 test("/download falls back to the GitHub releases page when GitHub fails", async () => {
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
-    [WEB_LIST, () => new Response("", { status: 500 })],
+    [WEB_REFS, () => new Response("", { status: 500 })],
     [ARCHIVED_API, () => new Response("{}", { status: 403 })],
     [ARCHIVED_LATEST, () => new Response("", { status: 500 })],
   ]);
@@ -160,7 +177,7 @@ test("/download falls back to the GitHub releases page when GitHub fails", async
 test("/download never serves the archived APK when the openjot lookup fails", async () => {
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
-    [WEB_LIST, () => new Response("", { status: 500 })],
+    [WEB_REFS, () => new Response("", { status: 500 })],
     [
       ARCHIVED_API,
       () =>
@@ -212,13 +229,13 @@ test("/download/checksums follows the archived fallback too", async () => {
   );
 });
 
-test("/download/checksums sends people to the coming-soon note when there is no release", async () => {
+test("/download/checksums sends people to the landing page when there is no release", async () => {
   const gh = routes([
     [API_LIST, () => Response.json([])],
     [ARCHIVED_API, () => new Response("{}", { status: 404 })],
   ]);
   const res = await handle(req("/download/checksums"), env, null, { fetch: gh.fetch, cache: memoryCache() });
-  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
 test("the release lookup is cached, and errors are not", async () => {
@@ -238,7 +255,7 @@ test("the release lookup is cached, and errors are not", async () => {
 test("/api/release answers 503 when GitHub is unavailable", async () => {
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
-    [WEB_LIST, () => new Response("", { status: 500 })],
+    [WEB_REFS, () => new Response("", { status: 500 })],
     [ARCHIVED_API, () => new Response("{}", { status: 403 })],
     [ARCHIVED_LATEST, () => new Response("", { status: 500 })],
   ]);
@@ -248,7 +265,21 @@ test("/api/release answers 503 when GitHub is unavailable", async () => {
 });
 
 test("other paths are served from static assets", async () => {
-  const res = await handle(req("/"), env, null, {});
+  const res = await handle(req("/styles.css"), env, null, {});
+  assert.equal(await res.text(), "asset");
+});
+
+test("/ answers 301 to the landing page on the Site, keeping the query", async () => {
+  const res = await handle(req("/?utm_source=instagram"), env, null, {});
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), `${LANDING_URL}?utm_source=instagram`);
+  const head = await handle(new Request("https://openjot.trajectonomics.com/", { method: "HEAD" }), env, null, {});
+  assert.equal(head.status, 301);
+  assert.equal(head.headers.get("location"), LANDING_URL);
+});
+
+test("/openjot/ is still a static file if the Worker is ever asked for it", async () => {
+  const res = await handle(req("/openjot/"), env, null, {});
   assert.equal(await res.text(), "asset");
 });
 
@@ -327,48 +358,129 @@ test("the old host still proxies /ingest scripts instead of redirecting them", a
   assert.deepEqual(calls, ["https://eu-assets.i.posthog.com/static/array.js"]);
 });
 
-test("the new host serves the landing page normally", async () => {
+test("the new host sends its landing page to the Site", async () => {
   const res = await handle(
     new Request("https://openjot.trajectonomics.com/"),
     env,
     null,
     {},
   );
-  assert.equal(res.status, 200);
-  assert.equal(await res.text(), "asset");
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
-test("when the API is rate limited, /download reads the release list from github.com", async () => {
-  const tag = "openjot-v1.4.0";
+test("when the API is rate limited, the ref advertisement gives the newest openjot APK, not the archived one", async () => {
+  const newest = "openjot-v1.5.0";
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
     [
-      WEB_LIST,
-      () => new Response(
-        `<a href="/${REPO}/releases/tag/${tag}">${tag}</a>` +
-        `<a href="/${REPO}/releases/tag/cli-v0.8.0">cli-v0.8.0</a>`,
-      ),
+      WEB_REFS,
+      () =>
+        new Response(
+          refsAdvert(
+            "refs/heads/main",
+            "refs/tags/cli-v0.7.0",
+            "refs/tags/tax-v0.2.0",
+            "refs/tags/openjot-v1.4.0",
+            `refs/tags/${newest}`,
+          ),
+        ),
     ],
-    [`https://github.com/${REPO}/releases/tag/${tag}`, () => new Response("<span>Latest</span>")],
+    [`https://github.com/${REPO}/releases/tag/${newest}`, () => new Response("<span>Latest</span>")],
     [
-      `https://github.com/${REPO}/releases/expanded_assets/${tag}`,
-      () => new Response(
-        `<a href="/${REPO}/releases/download/${tag}/moojot-android-arm64.apk">apk</a>` +
-        `<a href="/${REPO}/releases/download/${tag}/SHA256SUMS">sums</a>` +
-        `<a href="/${REPO}/archive/refs/tags/${tag}.zip">zip</a>`,
-      ),
+      `https://github.com/${REPO}/releases/expanded_assets/${newest}`,
+      () =>
+        new Response(
+          `<a href="/${REPO}/releases/download/${newest}/openjot-android-arm64.apk">apk</a>` +
+            `<a href="/${REPO}/releases/download/${newest}/SHA256SUMS">sums</a>` +
+            `<a href="/${REPO}/archive/refs/tags/${newest}.zip">zip</a>`,
+        ),
+    ],
+    [
+      ARCHIVED_API,
+      () =>
+        Response.json(
+          release([asset("moojot-android-arm64.apk", 52653181, "v1.4.0", ARCHIVED_REPO)], "v1.4.0"),
+        ),
     ],
   ]);
   const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
   assert.equal(
     res.headers.get("location"),
-    `https://github.com/${REPO}/releases/download/${tag}/moojot-android-arm64.apk`,
+    `https://github.com/${REPO}/releases/download/${newest}/openjot-android-arm64.apk`,
+  );
+  assert.deepEqual(
+    gh.calls.filter((url) => url.includes("/releases/tag/")),
+    [`https://github.com/${REPO}/releases/tag/${newest}`],
+  );
+  assert.deepEqual(
+    gh.calls.filter((url) => url.includes(ARCHIVED_REPO)),
+    [],
   );
   const api = await handle(req("/api/release"), env, null, { fetch: gh.fetch, cache: memoryCache() });
   const { release: found } = await api.json();
-  assert.equal(found.version, tag);
+  assert.equal(found.version, newest);
   assert.equal(found.apk.size, null);
-  assert.match(found.checksumsUrl, /openjot-v1\.4\.0\/SHA256SUMS$/);
+  assert.match(found.checksumsUrl, /openjot-v1\.5\.0\/SHA256SUMS$/);
+});
+
+test("openjot-v1.10.0 sorts above openjot-v1.9.0 in the ref advertisement", async () => {
+  const older = "openjot-v1.9.0";
+  const newest = "openjot-v1.10.0";
+  const gh = routes([
+    [API_LIST, () => new Response("{}", { status: 403 })],
+    [WEB_REFS, () => new Response(refsAdvert(`refs/tags/${older}`, `refs/tags/${newest}`))],
+    [`https://github.com/${REPO}/releases/tag/${newest}`, () => new Response("<span>Latest</span>")],
+    [
+      `https://github.com/${REPO}/releases/expanded_assets/${newest}`,
+      () => new Response(`<a href="/${REPO}/releases/download/${newest}/openjot-android-arm64.apk">apk</a>`),
+    ],
+  ]);
+  const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
+  assert.equal(
+    res.headers.get("location"),
+    `https://github.com/${REPO}/releases/download/${newest}/openjot-android-arm64.apk`,
+  );
+});
+
+test("a tag that does not parse as a version sorts after the numeric ones", async () => {
+  const stable = "openjot-v1.5.0";
+  const strange = "openjot-v2.0.0-beta";
+  const gh = routes([
+    [API_LIST, () => new Response("{}", { status: 403 })],
+    [WEB_REFS, () => new Response(refsAdvert(`refs/tags/${strange}`, `refs/tags/${stable}`))],
+    [`https://github.com/${REPO}/releases/tag/${stable}`, () => new Response("<span>Latest</span>")],
+    [
+      `https://github.com/${REPO}/releases/expanded_assets/${stable}`,
+      () => new Response(`<a href="/${REPO}/releases/download/${stable}/openjot-android-arm64.apk">apk</a>`),
+    ],
+  ]);
+  const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
+  assert.equal(
+    res.headers.get("location"),
+    `https://github.com/${REPO}/releases/download/${stable}/openjot-android-arm64.apk`,
+  );
+  assert.equal(gh.calls.some((url) => url.includes(encodeURIComponent(strange))), false);
+});
+
+test("peeled ^{} refs are ignored", async () => {
+  const tag = "openjot-v1.5.0";
+  const gh = routes([
+    [API_LIST, () => new Response("{}", { status: 403 })],
+    [WEB_REFS, () => new Response(refsAdvert(`refs/tags/${tag}`))],
+    [`https://github.com/${REPO}/releases/tag/${tag}`, () => new Response("<span>Latest</span>")],
+    [
+      `https://github.com/${REPO}/releases/expanded_assets/${tag}`,
+      () => new Response(`<a href="/${REPO}/releases/download/${tag}/openjot-android-arm64.apk">apk</a>`),
+    ],
+  ]);
+  const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
+  assert.equal(
+    res.headers.get("location"),
+    `https://github.com/${REPO}/releases/download/${tag}/openjot-android-arm64.apk`,
+  );
+  assert.equal(gh.calls.filter((url) => url.includes("/releases/tag/")).length, 1);
+  assert.equal(gh.calls.some((url) => url.includes("%5E") || url.includes("^{}")), false);
 });
 
 test("the github.com fallback skips a prerelease and takes the next tag", async () => {
@@ -376,13 +488,7 @@ test("the github.com fallback skips a prerelease and takes the next tag", async 
   const stable = "openjot-v1.4.0";
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
-    [
-      WEB_LIST,
-      () => new Response(
-        `<a href="/${REPO}/releases/tag/${beta}">${beta}</a>` +
-        `<a href="/${REPO}/releases/tag/${stable}">${stable}</a>`,
-      ),
-    ],
+    [WEB_REFS, () => new Response(refsAdvert(`refs/tags/${beta}`, `refs/tags/${stable}`))],
     [`https://github.com/${REPO}/releases/tag/${beta}`, () => new Response("<span>Pre-release</span>")],
     [`https://github.com/${REPO}/releases/tag/${stable}`, () => new Response("<span>Latest</span>")],
     [
@@ -397,10 +503,31 @@ test("the github.com fallback skips a prerelease and takes the next tag", async 
   );
 });
 
+test("a non-2xx ref advertisement throws and never falls back to the archived APK", async () => {
+  const gh = routes([
+    [API_LIST, () => new Response("{}", { status: 403 })],
+    [WEB_REFS, () => new Response("", { status: 500 })],
+    [
+      ARCHIVED_API,
+      () =>
+        Response.json(
+          release([asset("moojot-android-arm64.apk", 52653181, "v1.4.0", ARCHIVED_REPO)], "v1.4.0"),
+        ),
+    ],
+  ]);
+  const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
+  assert.equal(res.status, 302);
+  assert.equal(res.headers.get("location"), RELEASES_URL);
+  assert.deepEqual(
+    gh.calls.filter((url) => url.includes(ARCHIVED_REPO)),
+    [],
+  );
+});
+
 test("when the API is rate limited and there is no openjot release, the archived repository answers", async () => {
   const gh = routes([
     [API_LIST, () => new Response("{}", { status: 403 })],
-    [WEB_LIST, () => new Response("No releases found")],
+    [WEB_REFS, () => new Response(refsAdvert("refs/heads/main", "refs/tags/cli-v0.7.0"))],
     [ARCHIVED_API, () => new Response("{}", { status: 403 })],
     [
       ARCHIVED_LATEST,

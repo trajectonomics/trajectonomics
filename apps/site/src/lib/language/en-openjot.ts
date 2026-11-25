@@ -1,4 +1,5 @@
-import { OPENJOT_SIGNING_FINGERPRINT } from "../site/openjot"
+import { ENGLISH_OPENJOT_FAQ } from "./en-openjot-faq"
+import { ENGLISH_OPENJOT_PRIVACY } from "./en-openjot-privacy"
 import type { OpenJotDictionary, OpenJotLanguageEntry } from "./openjot-dictionary"
 
 /** The English words of the OpenJot page, ported from the app's own landing page (ADR 0032). */
@@ -23,14 +24,14 @@ const ENGLISH_OPENJOT_DICTIONARY: OpenJotDictionary = Object.freeze({
 	screenCaptions: Object.freeze([
 		"Every day, jotted",
 		"Where it all went",
-		"Slips in English",
-		"Slips in Thai",
+		"The home screen in Thai",
+		"Adding a record by hand",
 	] as const),
 	screenAlts: Object.freeze([
 		"Home: a timeline of the day's expenses, each with a category",
-		"Summary: a donut chart of spending by category",
-		"Setup in English: OpenJot reads the slips with on-device OCR",
-		"Setup in Thai: OpenJot reads the slips with on-device OCR",
+		"Summary: a donut chart of spending by category, the month's total in the middle",
+		"Home in Thai: the same timeline, with the app's labels in Thai",
+		"Add record: a form for a new expense, with amount, category, tags and note",
 	] as const),
 	screensNote: "Screenshots use sample data.",
 	featuresEyebrow: "Features",
@@ -51,6 +52,7 @@ const ENGLISH_OPENJOT_DICTIONARY: OpenJotDictionary = Object.freeze({
 		"Import password-protected PDF e-statements from KBank, SCB, KTC, Krungsri, BBL, ttb, UOB and AEON.",
 		"Export to CSV or JSON any time. Thai or English, pink or black and orange.",
 	] as const),
+	...ENGLISH_OPENJOT_PRIVACY,
 	installEyebrow: "Install",
 	installHeading: "Install in 3 steps",
 	installLede:
@@ -72,24 +74,7 @@ const ENGLISH_OPENJOT_DICTIONARY: OpenJotDictionary = Object.freeze({
 		"Every release ships a SHA256SUMS file and is signed with the project's key, CN=MooJot (the app's earlier name), SHA-256 fingerprint",
 	checksumsLink: "Check the checksums",
 	checkFileWarning: "Don't install an OpenJot APK whose fingerprint is different.",
-	faqEyebrow: "FAQ",
-	faqHeading: "Questions",
-	faqQuestions: Object.freeze([
-		"What happened to MooJot?",
-		"Is installing outside the Play Store safe?",
-		"Does it work on iPhone?",
-		"Does it need the internet?",
-		"Does it cost anything?",
-		"How do I update?",
-	] as const),
-	faqAnswers: Object.freeze([
-		"MooJot is now OpenJot, the same app by Trajectonomics. Installing the new version over MooJot keeps every record.",
-		`The APK is built by GitHub Actions from the public source code, signed with the project's key, and published with SHA-256 checksums. You can read every line of the code. The key's certificate carries the app's earlier name, CN=MooJot; its SHA-256 fingerprint is ${OPENJOT_SIGNING_FINGERPRINT}. Every future release is signed with this same key, so if the fingerprint differs, don't install it. To check it yourself: apksigner verify --print-certs openjot-android-arm64.apk`,
-		"Not yet. OpenJot is Android-only for now: Android 7.0 or newer on a 64-bit phone. Nearly every phone sold since about 2017 is 64-bit.",
-		"No. Slip reading, OCR and categories all run on the phone. When you're online, Google's ML Kit, which reads the English text on slips, sends Google usage stats such as your phone model and the app version, never the photo or its text. If you choose to share anonymous usage stats (never your records or amounts), the app also sends them when you're online.",
-		"No. There are no ads and no subscription, and it's open source under the MIT license.",
-		"Download the new file from this page and install it over the old one. Your records stay.",
-	] as const),
+	...ENGLISH_OPENJOT_FAQ,
 	closingHeading: "Let OpenJot start jotting today",
 	closingLede: "Free, open source, and every record stays on your phone.",
 	ossLink: "Open source · View on GitHub",
