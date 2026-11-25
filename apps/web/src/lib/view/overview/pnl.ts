@@ -1,7 +1,6 @@
 import { toChartNumber } from "../../chart/number"
 import type { AmountRow, CurrencyTotal, Pnl } from "../../contract"
 import { formatDate } from "../../format"
-import { unavailableTotalNote } from "../ledger/pnl"
 
 /** The profit and loss card: the period, the CLI's totals, and its three largest rows. */
 export interface PnlView {
@@ -22,6 +21,12 @@ export function pnlView(data: Pnl): PnlView {
 		largest: largestRows(data.rows, 3),
 		hasRows: data.rows.length > 0,
 	}
+}
+
+/** The card's own note: it shows only the largest rows, below the total, so it points to the Ledger page for the rest. */
+function unavailableTotalNote(data: Pnl): string | null {
+	if (data.totals !== null) return null
+	return "The total is not stated: every account is in range, but their sum exceeds the safe integer range. The largest rows are below; the Ledger page states every row."
 }
 
 function periodOf(data: Pnl): string {

@@ -13,7 +13,7 @@ let scratch = ""
 
 function traj(argv: string[]): unknown {
 	const run = Bun.spawnSync([BINARY, ...argv, "--json"], {
-		env: { ...process.env, TRAJ_HOME: join(scratch, "home") },
+		env: { ...process.env, TRAJ_HOME: join(scratch, "home"), DO_NOT_TRACK: "1" },
 	})
 	if (run.exitCode !== 0) throw new Error(`traj ${argv.join(" ")}: ${run.stderr.toString()}`)
 	return JSON.parse(run.stdout.toString())
