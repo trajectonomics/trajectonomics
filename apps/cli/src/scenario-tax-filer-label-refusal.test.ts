@@ -84,6 +84,25 @@ describe("a write beside a Levy over Filers (cli ADR-0075)", () => {
 		expect(errorOf(res).hint).toContain("--from-stored")
 	})
 
+	it("refuses an allowance label under @shared, which no Levy reads", async () => {
+		const home = await couple(COUPLE_PLAN, coupleHousehold(COUPLE_OWNERS))
+		expect((await taxCouple(home, "married_joint")).code).toBe(0)
+		const before = await stored(home)
+		const flows = before.document["flows"] as Record<string, unknown>[]
+		const res = await applyScenario(home, "base", {
+			...before.document,
+			flows: flows.map((it) =>
+				it["id"] === "pvd" ? { ...it, label: "allowance.retirement.rmf@shared" } : it,
+			),
+		})
+		expect(res.code).toBe(2)
+		expect(errorOf(res)).toMatchObject({
+			code: "invalid_input",
+			path: "document",
+			details: { items: ["flows.pvd"] },
+		})
+	})
+
 	it("refuses a fork --set that introduces a bare label", async () => {
 		const home = await couple(COUPLE_PLAN, coupleHousehold(COUPLE_OWNERS))
 		expect((await taxCouple(home, "married_joint")).code).toBe(0)

@@ -1,7 +1,6 @@
-import { type AppError, fail, isAppError } from "../../errors"
-import { ALLOWANCE_FLAGS } from "./allowances"
-import { changesProfile, type TaxFlags, type TaxRequest, taxRequestOf, writesLevy } from "./flags"
-import { requestOfStored, type StoredTax } from "./stored"
+import { type AppError, fail } from "../../errors"
+import { fields } from "./claims-values"
+import { changesProfile, flagOf, type TaxFlags, writesLevy } from "./flags"
 
 /**
  * What one `scenario tax` call asks for (cli ADR-0066). `write` states the whole profile,
@@ -9,7 +8,7 @@ import { requestOfStored, type StoredTax } from "./stored"
  * Levy again from the stored profile, and `remove` takes the Levy and the profile out.
  */
 export type TaxMode =
-	| { kind: "write"; request: TaxRequest }
+	| { kind: "write"; flags: TaxFlags }
 	| { kind: "merge"; flags: TaxFlags }
 	| { kind: "stored" }
 	| { kind: "remove" }
@@ -40,11 +39,16 @@ function noneWith(flag: "--merge" | "--from-stored", path: string): AppError {
 	)
 }
 
-/** `--none` beside a mode flag that builds on what `--none` removes. */
+/** `--none` beside a mode flag that builds on what `--none` removes, or a flag that writes one. */
 function noneConflict(flags: TaxFlags): AppError | null {
 	if (flags.none !== true) return null
 	if (flags.fromStored === true) return noneWith("--from-stored", "none")
-	return flags.merge === true ? noneWith("--merge", "none") : null
+	if (flags.merge === true) return noneWith("--merge", "none")
+	if (!writesLevy(flags)) return null
+	return conflict(
+		"none",
+		"--none removes the tax, so it cannot be combined with the flags that write one.",
+	)
 }
 
 /** `--from-stored` and `--merge` together, or `--from-stored` beside a flag that changes the profile. */
@@ -75,18 +79,30 @@ function mergeWithoutChange(flags: TaxFlags): AppError | null {
 	)
 }
 
+/** The refusal for a profile flag with no `--tax`: it would be ignored, so it is refused instead. */
+function missingTax(flags: TaxFlags): AppError | null {
+	if (flags.tax !== undefined || !changesProfile(flags)) return null
+	const field =
+		flags.filingStatus !== undefined
+			? "filingStatus"
+			: (fields().find((it) => flags[it] !== undefined) ?? "children")
+	return conflict(
+		field,
+		`${flagOf(field)} needs --tax: without it no Levy is written and the flag would be ignored.`,
+	)
+}
+
 /** The mode a call asks for, or why its flags cannot be honoured together. */
 export function taxModeOf(flags: TaxFlags): TaxMode | AppError {
 	const refused = noneConflict(flags)
 	if (refused !== null) return refused
 	if (flags.fromStored === true) return storedConflict(flags) ?? { kind: "stored" }
-	if (flags.merge === true) {
-		return mergeWithoutChange(flags) ?? { kind: "merge", flags }
+	if (flags.merge === true) return mergeWithoutChange(flags) ?? { kind: "merge", flags }
+	if (flags.tax !== undefined || changesProfile(flags)) {
+		const wrong = missingTax(flags)
+		return wrong ?? { kind: "write", flags }
 	}
-	const request = taxRequestOf(flags)
-	if (request === null) return flags.none === true ? { kind: "remove" } : noChoice()
-	if (isAppError(request)) return request
-	return { kind: "write", request }
+	return flags.none === true ? { kind: "remove" } : noChoice()
 }
 
 /**
@@ -103,28 +119,4 @@ export function noStoredProfile(flag: "--merge" | "--from-stored", taxed: boolea
 		message: `${flag} needs a stored tax profile: ${why}.`,
 		hint: FULL_FORM,
 	})
-}
-
-/** The request a merge states: the stored profile, with each flag the caller gave laid over it. */
-export function mergedRequest(stored: StoredTax, flags: TaxFlags): TaxRequest | AppError {
-	const base = requestOfStored(stored)
-	if (flags.tax !== undefined && flags.tax !== base.jurisdiction) {
-		return conflict(
-			"tax",
-			`--merge changes the profile stored for ${base.jurisdiction}, so --tax ${flags.tax} cannot name another jurisdiction.`,
-			"To switch jurisdiction, state the profile whole with --tax and every flag it needs.",
-		)
-	}
-	const allowances = Object.fromEntries(
-		ALLOWANCE_FLAGS.map((field) => [field, flags[field] ?? base.allowances[field]]),
-	)
-	const request = taxRequestOf({
-		tax: base.jurisdiction,
-		filingStatus: flags.filingStatus ?? base.filingStatus,
-		children: flags.children ?? base.children,
-		childrenAtHigherRate: flags.childrenAtHigherRate ?? base.childrenAtHigherRate,
-		...allowances,
-	})
-	if (request === null) throw new Error("A merged profile always names its jurisdiction.")
-	return request
 }

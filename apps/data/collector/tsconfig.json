@@ -1,0 +1,10 @@
+{
+	"extends": "../../../tooling/config/tsconfig/base.json",
+	"compilerOptions": {
+		"lib": ["ES2022"],
+		"types": ["bun"],
+		"isolatedDeclarations": false,
+		"declaration": false
+	},
+	"include": ["src", "test"]
+}

@@ -13,7 +13,7 @@ import { monthsBetween, yearsBetween } from "./dates"
 import type { FiSolution } from "./fi"
 import { milestoneRowsOf } from "./milestones"
 import { runsOutView } from "./rows"
-import type { TaxYearView } from "./tax-view"
+import type { TaxYearView } from "./tax-year-view"
 
 /** One side's engine facts, kept as the engine states them so a delta is a subtraction. */
 export type SideData = {

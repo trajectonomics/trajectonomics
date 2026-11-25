@@ -1,0 +1,27 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "data",
+	"main": "src/worker.ts",
+	"compatibility_date": "2026-11-01",
+	// The only host is data.trajectonomics.com; the *.workers.dev copy stays off.
+	"workers_dev": false,
+	"routes": [{ "pattern": "data.trajectonomics.com", "custom_domain": true }],
+	"assets": {
+		// Astro's build: the static overview and method pages, the islands and the brand files.
+		"directory": "./dist",
+		// The API and ingest go to the Worker; every other path is an asset.
+		"run_worker_first": ["/api/*", "/ingest"]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "traj-data",
+			"database_id": "84d5685a-42a3-4288-b98f-2cf3ea56a23d",
+			"migrations_dir": "migrations"
+		}
+	],
+	// One hourly tick checks freshness. Sending an alert arrives with the auth slice.
+	"triggers": {
+		"crons": ["17 * * * *"]
+	}
+}

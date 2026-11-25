@@ -1,0 +1,63 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the components it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import darkTheme from "@trajectonomics/brand/current/dark.css?raw"
+import lightTheme from "@trajectonomics/brand/current/light.css?raw"
+import Footer from "../components/Footer.astro"
+import Header from "../components/Header.astro"
+import { canonicalUrl } from "../lib/page-url"
+import { SITE_NAME } from "../lib/site"
+import { themeRole } from "../lib/theme-role"
+import { FALLBACK_THEME, themeScript } from "../lib/themes"
+import "../styles/global.css"
+
+interface Props {
+	readonly title: string
+	readonly description: string
+	/** Which header link is the current page. */
+	readonly current: "overview" | "method"
+}
+
+const { title, description, current } = Astro.props
+const canonical = canonicalUrl(Astro.url.pathname)
+// The browser's bar takes each Theme's background, read from the brand's stylesheets.
+const themeColours = [
+	{ scheme: "light", colour: themeRole(lightTheme, "background") },
+	{ scheme: "dark", colour: themeRole(darkTheme, "background") },
+]
+---
+
+<html lang="en" data-theme={FALLBACK_THEME}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script is:inline set:html={themeScript()}></script>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta name="twitter:card" content="summary" />
+		{
+			themeColours.map((paint) => (
+				<meta
+					name="theme-color"
+					media={`(prefers-color-scheme: ${paint.scheme})`}
+					content={paint.colour}
+				/>
+			))
+		}
+		<link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
+		<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+	</head>
+	<body class="data-body">
+		<a class="skip-link" href="#main">Skip to content</a>
+		<Header current={current} />
+		<main id="main" class="data-main"><slot /></main>
+		<Footer />
+	</body>
+</html>

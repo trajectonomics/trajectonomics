@@ -8,9 +8,10 @@ type DeductionFlag = z.ZodOptional<z.ZodNumber>
 export type DeductionFlags = Record<keyof TaxAllowances, DeductionFlag>
 
 /**
- * The deduction flags `scenario tax` accepts. Each states an amount the taxpayer paid in the tax
- * year; `@trajectonomics/core/tax` owns every statutory ceiling, so none is restated here. The fields
- * are spread into the command's input so one file holds their wording and their order.
+ * The deduction keys a stored tax profile states, one per allowance (cli ADR-0066). The command's
+ * flags are text (`deduction-flag-inputs.ts`), because one may name a person; the stored profile
+ * holds the number it resolved to. `@trajectonomics/core/tax` owns every statutory ceiling, so none
+ * is restated here.
  */
 export const deductionFlags: DeductionFlags = {
 	parents: z
