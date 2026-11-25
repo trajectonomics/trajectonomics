@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { demoSnapshotText } from "../../../scripts/demo-snapshot"
-import { snapshot } from "../contract"
+import { type ScenarioDocument, snapshot } from "../contract"
+import { isFilerPlan } from "./allowance-params"
 import { failedRead } from "./fixtures.test-support"
 import { hasLevy } from "./levy"
 import { checkParams, type PlanInput } from "./params"
@@ -98,6 +99,32 @@ describe("which plans are asked", () => {
 	test("only a plan whose document holds a Levy; a failed document read asks none", () => {
 		expect(hasLevy(failedRead(["scenario", "show"]))).toBe(false)
 		expect(hasLevy(undefined)).toBe(false)
+	})
+})
+
+describe("a joint Return over Filers", () => {
+	const flows = (...labels: [kind: string, label?: string][]) =>
+		({
+			flows: labels.map(([kind, label], index) => ({
+				id: `f${index}`,
+				kind,
+				frequency: "annual",
+				start: "2026-01-01",
+				...(label === undefined ? {} : { label }),
+			})),
+		}) as unknown as ScenarioDocument
+
+	test("a plan whose income or contributions carry a Filer suffix is a Filer plan", () => {
+		expect(isFilerPlan(flows(["contribution", "allowance.retirement.rmf@me"]))).toBe(true)
+		expect(isFilerPlan(flows(["income", "income.section40_1@partner"]))).toBe(true)
+		expect(isFilerPlan(flows(["income", "income.section40_1@shared"]))).toBe(true)
+	})
+
+	test("a bare label, no label, an unknown label or no document is not", () => {
+		expect(isFilerPlan(flows(["contribution", "allowance.retirement.rmf"]))).toBe(false)
+		expect(isFilerPlan(flows(["income"]))).toBe(false)
+		expect(isFilerPlan(flows(["income", "salary@me"]))).toBe(false)
+		expect(isFilerPlan(null)).toBe(false)
 	})
 })
 

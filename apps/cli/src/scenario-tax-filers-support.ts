@@ -1,5 +1,6 @@
 import { projectionHome } from "./projection/testing"
 import type { Household } from "./scenario/household/model"
+import { hasFilerLevy } from "./scenario/tax/filer-label-check"
 import { setHousehold } from "./scenario-household-support"
 import { COUPLE_LABELS, SAVINGS } from "./scenario-tax-filers-plan"
 import { applyScenario, scenario } from "./scenario-test-support"
@@ -46,12 +47,14 @@ async function withInterestLabel(home: string): Promise<Record<string, unknown>>
 	const shown = await scenario(home, ["show", "base"])
 	const { document } = JSON.parse(shown.out).scenario as { document: Record<string, unknown> }
 	const accounts = document["accounts"] as Record<string, unknown>[]
+	// A Levy over Filers stores the suffix; `apply` refuses a bare label there (cli ADR-0075).
+	const label = hasFilerLevy(document)
+		? "income.section40_4.interest@shared"
+		: "income.section40_4.interest"
 	return {
 		...document,
 		accounts: accounts.map((account) =>
-			account["id"] === SAVINGS
-				? { ...account, returnLabel: "income.section40_4.interest" }
-				: account,
+			account["id"] === SAVINGS ? { ...account, returnLabel: label } : account,
 		),
 	}
 }

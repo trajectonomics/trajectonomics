@@ -40,7 +40,7 @@ export const allowances: Leaf = defineCommand({
 		labels: z
 			.string()
 			.describe(
-				`The contribution Tally labels to fill, separated by commas, in the order they should fill; each must be one the Scenario's Levy reads as a funded contribution. The Levy \`scenario tax\` writes reads: ${TH_LEVY_CONTRIBUTION_LABELS.join(", ")}.`,
+				`The contribution Tally labels to fill, separated by commas, in the order they should fill; each must be one the Scenario's Levy reads as a funded contribution. The Levy \`scenario tax\` writes reads: ${TH_LEVY_CONTRIBUTION_LABELS.join(", ")}. A joint Return over Filers reads each with its Filer's suffix, as allowance.retirement.rmf@me.`,
 			),
 		step: z
 			.string()

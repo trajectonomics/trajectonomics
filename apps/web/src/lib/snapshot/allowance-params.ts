@@ -4,7 +4,9 @@
  * in the Snapshot's parameters, not in the Scenario, so a change is a read and never a write.
  */
 import { z } from "zod"
+import type { ScenarioDocument } from "../contract"
 import { KNOWN_LABELS } from "../contract/allowance-labels"
+import { bareLabelOf } from "../edit/tax-labels"
 
 const MESSAGE = {
 	labels: "Choose at least one allowance, each once.",
@@ -51,4 +53,12 @@ export function checkAllowances(
 	const parsed = allowancePlan.safeParse(plan)
 	if (parsed.success) return null
 	return { code: "invalid_allowances", message: parsed.error.issues[0]?.message ?? MESSAGE.labels }
+}
+
+/** Whether a plan's Levy reads Filer labels: some Flow carries a tax label with its `@<filer>` suffix. */
+export function isFilerPlan(document: ScenarioDocument | null | undefined): boolean {
+	if (document == null) return false
+	return document.flows.some(
+		(flow) => flow.label !== undefined && bareLabelOf(flow.label) !== flow.label,
+	)
 }
