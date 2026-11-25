@@ -1,33 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import type { SnapshotParams } from "../../contract"
 import { failedRead, okRead } from "./fixtures.test-support"
-import { mapScenario, primaryScenario, scenarioView } from "./scenario"
-
-const params = (scenarios: string[], compare: SnapshotParams["compare"]): SnapshotParams => ({
-	asOf: "2026-10-31",
-	horizon: "2060-12-31",
-	scenarios,
-	compare,
-	birthDate: null,
-	ages: [],
-	historyDates: [],
-	allowances: null,
-	chance: null,
-})
-
-describe("primaryScenario", () => {
-	test("is the first side of a comparison, when there is one", () => {
-		expect(primaryScenario(params(["x", "y"], { a: "y", b: "x" }))).toBe("y")
-	})
-
-	test("is otherwise the first Scenario the Snapshot was planned for", () => {
-		expect(primaryScenario(params(["x", "y"], null))).toBe("x")
-	})
-
-	test("is null when the Snapshot names no Scenario", () => {
-		expect(primaryScenario(params([], null))).toBeNull()
-	})
-})
+import { mapScenario, scenarioView } from "./scenario"
 
 describe("scenarioView", () => {
 	test("is none when there is no Scenario to show", () => {
