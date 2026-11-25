@@ -55,7 +55,13 @@ function namedParents(parents: ThParentsInput | number | undefined): number {
 		validateMonetaryAmount(parents, ThAllowanceField.Parents)
 		return Math.floor(parents)
 	}
-	return Object.values(parents).filter(Boolean).length
+	const slots = [
+		parents.taxpayerFather,
+		parents.taxpayerMother,
+		parents.spouseFather,
+		parents.spouseMother,
+	]
+	return slots.filter(Boolean).length
 }
 
 /**
@@ -88,14 +94,12 @@ export function thSeparateClaimProblems(
 	const problems: ThSeparateClaimProblem[] = []
 	if (over(first)) problems.push({ code: ThSeparateClaimCode.OwnParentsOverTwo, returns: [0] })
 	if (over(second)) problems.push({ code: ThSeparateClaimCode.OwnParentsOverTwo, returns: [1] })
-	if (options.sharedMortgage) {
-		const field = ThAllowanceField.MortgageInterest
-		const total =
-			BigInt(toSatang(first.allowances?.mortgageInterest ?? 0, field)) +
-			BigInt(toSatang(second.allowances?.mortgageInterest ?? 0, field))
-		if (total > BigInt(toSatang(p.mortgageInterestCeiling))) {
-			problems.push({ code: ThSeparateClaimCode.MortgageOverCeiling, returns: [0, 1] })
-		}
+	const field = ThAllowanceField.MortgageInterest
+	const interest = [first, second].map((profile) => profile.allowances?.mortgageInterest ?? 0)
+	for (const amount of interest) validateMonetaryAmount(amount, field)
+	const total = interest.reduce((sum, amount) => sum + BigInt(toSatang(amount, field)), 0n)
+	if (options.sharedMortgage && total > BigInt(toSatang(p.mortgageInterestCeiling))) {
+		problems.push({ code: ThSeparateClaimCode.MortgageOverCeiling, returns: [0, 1] })
 	}
 	return problems
 }

@@ -3,9 +3,10 @@ import { thb } from "../../core/money"
 import { runThaiCorpusCase } from "./corpus-harness"
 
 // Transcribed corpus for separate filing (s.57 sexies para 1) when each spouse claims the same two
-// children in full. Hand-computed from the statute, not run through an external calculator here:
-// the 30,000 per child on each Return is likely (about 90%) and unconfirmed, so confirm it with RD
-// (1161) or a recognised filing calculator before relying on it (research/separate-filing.md, note 1).
+// children in full. Hand-computed from the statute. The cross-check against a recognised filing
+// calculator (married filing separately, salaries 900,000 and 600,000, children born 2014 and 2016,
+// expected 54,500 and 15,500) is pending and covered by its own issue. The 30,000 per child on each
+// Return is likely (about 90%) and unconfirmed (research/separate-filing.md, note 1).
 describe("corpus: a couple filing separately, each claiming both children in full", () => {
 	// documented: s.47(1)(ก) 60,000 personal and s.47(1)(ค)(1) 30,000 per child, claimed by each
 	// spouse with income and not halved (the halving rule, s.57 quinque para 2(2), is repealed).

@@ -37,6 +37,11 @@ describe("OWN_PARENTS_OVER_TWO: a separate Return claims only its Filer's own tw
 		])
 	})
 
+	it("counts only the four named slots, not any other truthy key", () => {
+		const parents = { taxpayerFather: true, taxpayerMother: true, bogus: true }
+		expect(codes(separate({ parents }), separate({}))).toEqual([])
+	})
+
 	it("refuses an invalid count the way the emitter does", () => {
 		expect(() => thSeparateClaimProblems(separate({ parents: -1 }), separate({}))).toThrow(
 			TaxValidationError,
@@ -63,6 +68,15 @@ describe("MORTGAGE_OVER_CEILING: one co-borrowed loan has one 100,000 ceiling", 
 	it("is silent unless the caller says the two Returns share one loan", () => {
 		expect(codes(interest(100_000), interest(100_000))).toEqual([])
 		expect(codes(interest(100_000), interest(100_000), { sharedMortgage: false })).toEqual([])
+	})
+
+	it("refuses an invalid interest whether or not the loan is shared", () => {
+		for (const bad of [Number.NaN, -1, Number.POSITIVE_INFINITY]) {
+			for (const options of [{}, { sharedMortgage: true }]) {
+				expect(() => codes(interest(bad), separate({}), options)).toThrow(TaxValidationError)
+				expect(() => codes(separate({}), interest(bad), options)).toThrow(TaxValidationError)
+			}
+		}
 	})
 
 	it("treats an unstated interest as zero", () => {
