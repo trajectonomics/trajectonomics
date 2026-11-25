@@ -20,6 +20,8 @@ import { legendItems } from "./legend-items"
 const MIN_WIDTH = 240
 /** The room on the right for the labels of a second axis, in pixels. */
 const RIGHT_AXIS_MARGIN = 48
+/** The room a second line of x labels (the ages) takes under the dates, in pixels. */
+const SUB_LINE = 14
 /** The width before the chart is measured, which is also what a prerender would show. */
 const FALLBACK_WIDTH = 640
 
@@ -57,10 +59,15 @@ const width = $derived(
 	clientWidth > 0 ? Math.max(MIN_WIDTH, Math.floor(clientWidth)) : FALLBACK_WIDTH,
 )
 const masked = $derived((hidden ?? preferences.hidden) && money)
+const subLine = $derived(series.some((line) => line.points.some((point) => point.subLabel)))
 const plot = $derived({
 	width,
 	height: HEIGHT,
-	margin: step ? { ...MARGIN, right: RIGHT_AXIS_MARGIN } : MARGIN,
+	margin: {
+		...MARGIN,
+		...(step ? { right: RIGHT_AXIS_MARGIN } : {}),
+		...(subLine ? { bottom: MARGIN.bottom + SUB_LINE } : {}),
+	},
 })
 const columns = $derived(kind === "line" ? null : columnLayout(series, plot, kind, markers))
 const layout = $derived(

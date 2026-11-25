@@ -14,6 +14,14 @@ function startsPlan(edit: Edit): edit is Extract<Edit, { template: unknown }> {
 /** The CLI's own answer to a dry run of an apply: `created` when no plan of the name was stored. */
 const applyStatus = z.looseObject({ status: z.string() })
 
+/** The anchors an apply dropped (cli ADR-0048): `scenario apply` and `scenario fork` state them (cli ADR 0076). */
+const droppedStatement = z.looseObject({ droppedAnchors: z.array(z.string()) })
+
+/** What one Edit's run came to: it ran (with the household anchors the write dropped), or the error that stopped it. */
+export type EditRun =
+	| { readonly ok: true; readonly droppedAnchors: readonly string[] }
+	| { readonly ok: false; readonly error: ErrorBody }
+
 /** The exit code `traj` gives a taken name (cli ADR-0021: a conflict with what the ledger holds). */
 const NAME_TAKEN_EXIT_CODE = 5
 
@@ -32,12 +40,13 @@ function wasCreated(data: unknown): boolean {
 	return status.success && status.data.status === "created"
 }
 
-/** Runs one Edit, dry and then real. Null when it ran, else the CLI's error (or the refusal) as data. */
-export async function runEdit(context: RunContext, edit: Edit): Promise<ErrorBody | null> {
+/** Runs one Edit, dry and then real. It ran, or it is the CLI's error (or the refusal) as data. */
+export async function runEdit(context: RunContext, edit: Edit): Promise<EditRun> {
+	const stopped = (error: ErrorBody): EditRun => ({ ok: false, error })
 	let template: string | undefined
 	if (startsPlan(edit)) {
 		const read = await runTraj(context, templateRead(edit.template.asOf), z.string())
-		if (!read.ok) return read.error
+		if (!read.ok) return stopped(read.error)
 		template = read.data
 	}
 	const run = (dryRun: boolean) => {
@@ -45,15 +54,16 @@ export async function runEdit(context: RunContext, edit: Edit): Promise<ErrorBod
 		return runTraj(context, command.argv, z.unknown(), command.stdin)
 	}
 	const dry = await run(true)
-	if (!dry.ok) return dry.error
+	if (!dry.ok) return stopped(dry.error)
 	// A new plan must be new: `scenario apply` under a taken name would replace that plan's document.
-	if (startsPlan(edit) && !wasCreated(dry.data)) return nameTaken(edit.name)
+	if (startsPlan(edit) && !wasCreated(dry.data)) return stopped(nameTaken(edit.name))
 	const real = await run(false)
-	if (!real.ok) return real.error
+	if (!real.ok) return stopped(real.error)
 	// A plan of the name made between the dry run and this write (a window of milliseconds) is replaced: say so, as the write is done.
 	if (startsPlan(edit) && !wasCreated(real.data)) {
 		const message = `A plan named ${edit.name} was made while this ran, and this write replaced it.`
-		return { ...nameTaken(edit.name), message }
+		return stopped({ ...nameTaken(edit.name), message })
 	}
-	return null
+	const dropped = droppedStatement.safeParse(real.data)
+	return { ok: true, droppedAnchors: dropped.success ? dropped.data.droppedAnchors : [] }
 }

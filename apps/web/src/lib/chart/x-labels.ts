@@ -11,6 +11,17 @@ export function labelsFor(series: readonly LineSeries[], xs: readonly number[]):
 	return xs.map((x) => labels.get(x) ?? "")
 }
 
+/** The second line of each distinct x, taken from the first point that has one; an empty string where none does. */
+export function subLabelsFor(series: readonly LineSeries[], xs: readonly number[]): string[] {
+	const subs = new Map<number, string>()
+	for (const line of series) {
+		for (const point of line.points) {
+			if (point.subLabel !== undefined && !subs.has(point.x)) subs.set(point.x, point.subLabel)
+		}
+	}
+	return xs.map((x) => subs.get(x) ?? "")
+}
+
 /** The tooltip's name of each distinct x (the period it covers), or its label where a point gives none. */
 export function titlesFor(series: readonly LineSeries[], xs: readonly number[]): string[] {
 	const titles = new Map<number, string>()

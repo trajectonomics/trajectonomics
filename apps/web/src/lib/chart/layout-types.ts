@@ -58,7 +58,12 @@ export interface LineLayout {
 	/** The longer name of each x for the tooltip, such as the period it covers; absent when the labels say it all. */
 	readonly xTitles?: readonly string[]
 	readonly xPixels: readonly number[]
-	readonly xTicks: readonly { readonly index: number; readonly label: string }[]
+	readonly xTicks: readonly {
+		readonly index: number
+		readonly label: string
+		/** The second line under the label, when the points carry one. */
+		readonly sub?: string
+	}[]
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
 	readonly markers: readonly { readonly x: number; readonly label: string }[]

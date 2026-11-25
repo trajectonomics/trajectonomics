@@ -1,9 +1,9 @@
 <script lang="ts">
 import type { ScenarioFlow } from "../../lib/contract"
-import { householdHref } from "../../lib/view/household/model"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import type { WithdrawalDraft } from "../../lib/view/withdrawals/draft"
 import { START_CHOICES } from "../../lib/view/withdrawals/options"
+import AnchoredNote from "../plan-items/AnchoredNote.svelte"
 import Field from "../plan-items/Field.svelte"
 
 interface Props {
@@ -47,6 +47,6 @@ const choices = $derived([
 		{/if}
 	{:else}
 		<Field id="spend-start" label="Date" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchor !== null} />
-		{#if anchor !== null}<p class="-mt-3 text-sm text-muted-foreground">Set by the household {anchor}: <a class="underline" href={householdHref(plan, "")}>change it there</a>.</p>{/if}
+		{#if anchor !== null}<AnchoredNote {anchor} {plan} />{/if}
 	{/if}
 </div>

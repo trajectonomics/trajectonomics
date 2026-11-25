@@ -15,7 +15,13 @@ const refusedAnswer = z.strictObject({ ok: z.literal(false), error: errorBody })
 /** The Edit answer: the Snapshot after the Edit, or the error that stopped it. */
 export const editAnswer = z.discriminatedUnion("ok", [
 	// `result` is what a write that states figures answered (`record-values`): the page shows it as traj stated it.
-	z.strictObject({ ok: z.literal(true), snapshot, result: accountValues.optional() }),
+	// `droppedAnchors` names the household anchors a plan write dropped, because the document no longer holds their item (cli ADR-0048).
+	z.strictObject({
+		ok: z.literal(true),
+		snapshot,
+		result: accountValues.optional(),
+		droppedAnchors: z.array(z.string()).optional(),
+	}),
 	refusedAnswer,
 ])
 
