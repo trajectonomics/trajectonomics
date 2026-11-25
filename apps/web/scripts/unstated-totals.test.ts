@@ -5,8 +5,10 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { balance, pnl } from "../src/lib/contract"
+import { balance, doctor, pnl } from "../src/lib/contract"
+import { doctorView } from "../src/lib/view/health/doctor"
 import { trialBalanceView } from "../src/lib/view/ledger/trial-balance"
+import { healthView } from "../src/lib/view/overview/health"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 
 let scratch = ""
@@ -59,6 +61,16 @@ describe("the Dashboard's reads of a ledger whose sums are out of range", () => 
 		expect(read.rows.map((row) => row.account.name)).toEqual(["Food", "Gains"])
 		expect(read.totals).toBeNull()
 		expect(read.totalsError?.code).toBe("AMOUNT_OVERFLOW")
+	})
+
+	test("`doctor --as-of` parses, balanced, with no totals and every other check passing", () => {
+		const read = doctor.parse(traj(["doctor", "--as-of", "2026-02-11"]))
+		expect(read.ok).toBe(true)
+		expect(read.trialBalance?.totals).toBeNull()
+		expect(read.trialBalance?.totalsError?.code).toBe("AMOUNT_OVERFLOW")
+		expect(read.trialBalance?.balanced).toBe(true)
+		expect(doctorView(read).trialBalance?.balanced).toBe(true)
+		expect(healthView(read)).toMatchObject({ ok: true, failed: 0 })
 	})
 
 	test("a date before the overdraft still states its totals", () => {

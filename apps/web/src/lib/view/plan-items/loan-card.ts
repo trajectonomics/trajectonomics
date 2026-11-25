@@ -18,6 +18,12 @@ const ROUNDING_TEXT: Readonly<Record<string, string>> = {
 	ceil: "Rounded up",
 }
 
+/** A rounding as a card words it; a word the CLI added since is shown as it is, and none stated is blank. */
+function roundingText(rounding: string | undefined): string {
+	if (rounding === undefined) return ""
+	return ROUNDING_TEXT[rounding] ?? rounding
+}
+
 /** One loan's card: its id (the liability Account), its principal, its terms and its statement. */
 export interface LoanCardView {
 	/** The liability Account's id, which the loan's name is. */
@@ -50,7 +56,7 @@ function termsOf(loan: LoanParts): LoanRow[] {
 			value: `${level?.payments ?? 0} equal ${loan.payment.frequency} payments`,
 		},
 		{ label: "First payment", value: loan.payment.start },
-		{ label: "Rounding", value: ROUNDING_TEXT[level?.rounding ?? ""] ?? "" },
+		{ label: "Rounding", value: roundingText(level?.rounding) },
 	]
 }
 

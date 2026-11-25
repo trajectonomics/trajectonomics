@@ -132,7 +132,7 @@ Each step ships and is useful on its own, in this order.
    - **4a, joint: one Levy, two Filers.** Done when:
      - `scenario tax --filing-status married_joint` on a household with a partner and Owners writes one `th-2026-pit` with Filer labels from the Owners, and each spouse gets their own expense ceiling;
      - a plan without a partner or Owners writes a byte-identical document;
-     - a hand-written `--carry-in` for a Filer Levy names Filer labels: 29 classes per Filer plus 29 under `@shared`, where today there are 29;
+     - a hand-written `--carry-in` for a Filer Levy names Filer labels: 29 classes per Filer plus the 22 income classes under `@shared`, where today there are 29 (built in #508; an allowance class is never shared);
      - `bunx turbo run check --filter=@trajectonomics/cli --filter=@trajectonomics/web --concurrency=2` passes.
    - **4b, separate: several Levies.** Done when:
      - `married_separate` writes one Levy per Filer that has at least one labelled Flow or Account;

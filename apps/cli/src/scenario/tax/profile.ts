@@ -1,6 +1,7 @@
 import { ThLevyContributionLabel } from "@trajectonomics/core/tax/th"
 import type { ScenarioDocument } from "../document"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
+import { bareLabelOf } from "./filer-labels"
 import type { TaxRequest } from "./flags"
 import { records } from "./json"
 import { flowsOf } from "./labels"
@@ -70,7 +71,7 @@ export function taxProfileOf(request: TaxRequest, document: ScenarioDocument): T
 	const carried = contributionLabelsOf(document)
 	for (const label of carried) {
 		if (!read.has(label)) continue
-		if (label === ThLevyContributionLabel.ThaiEsg) stated.add("thaiEsg")
+		if (bareLabelOf(label) === ThLevyContributionLabel.ThaiEsg) stated.add("thaiEsg")
 		else stated.add("retirementContributions")
 	}
 	return {

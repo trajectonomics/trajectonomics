@@ -1,0 +1,8232 @@
+{
+	"single": {
+		"dryRun": false,
+		"status": "unchanged",
+		"levy": "th-2026-pit",
+		"allowances": {
+			"stated": [
+				"retirementContributions"
+			],
+			"notStated": [
+				"children",
+				"parents",
+				"disabledCare",
+				"socialSecurity",
+				"lifeInsurance",
+				"healthInsurance",
+				"parentHealthInsurance",
+				"spouseLifeInsurance",
+				"mortgageInterest",
+				"donation2x",
+				"donation1x",
+				"thaiEsg"
+			]
+		},
+		"assumptions": [
+			{
+				"path": "allowances.retirementCluster.combinedCeiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Retirement allowances combined ceiling, baht."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.ceiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Provident fund ceiling, baht a year."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.maxRate",
+				"value": 0.15,
+				"status": "reported",
+				"note": "Provident fund limit, share of wages."
+			}
+		],
+		"scenario": {
+			"name": "base",
+			"contentHash": "jcs1:sha256:fb007dbfca11f5a474b37232105674bc9fa82009a2f1d0193c4d2b9916f3d47f",
+			"forkedFrom": null,
+			"document": {
+				"accounts": [
+					{
+						"id": "0194a000-0001-7000-8000-000000000001",
+						"kind": "asset",
+						"rate": 100,
+						"returnLabel": "income.section40_4.interest"
+					},
+					{
+						"id": "0194a000-0002-7000-8000-000000000002",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0004-7000-8000-000000000004",
+						"kind": "asset",
+						"rate": 500
+					},
+					{
+						"id": "0194a000-0006-7000-8000-000000000006",
+						"kind": "asset",
+						"lockedUntil": "2027-01-01",
+						"rate": 300
+					},
+					{
+						"id": "0194a000-0008-7000-8000-000000000008",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0005-7000-8000-000000000005",
+						"kind": "liability",
+						"rate": 600
+					}
+				],
+				"cashflow": {
+					"contribute": [
+						"0194a000-0004-7000-8000-000000000004"
+					],
+					"surplus": [
+						{
+							"account": "0194a000-0002-7000-8000-000000000002"
+						}
+					],
+					"withdraw": [
+						"0194a000-0002-7000-8000-000000000002"
+					]
+				},
+				"currency": "THB",
+				"economy": {
+					"inflation": 0
+				},
+				"flows": [
+					{
+						"amount": 100000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 50000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "partner-salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 3000000,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "pvd",
+						"kind": "contribution",
+						"label": "allowance.retirement.pvd",
+						"start": "2026-06-01",
+						"target": "0194a000-0004-7000-8000-000000000004"
+					}
+				],
+				"levies": [
+					{
+						"due": "tax.net_payable",
+						"id": "th-2026-pit",
+						"measures": [
+							{
+								"basis": "gross",
+								"id": "auto.0",
+								"label": "income.section40_1",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.1",
+								"label": "income.section40_2",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.2",
+								"label": "income.section40_3",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.3",
+								"label": "income.section40_4",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.4",
+								"label": "income.section40_4.interest",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.5",
+								"label": "income.section40_4.dividends",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.6",
+								"label": "income.section40_4.digitalAssets",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.7",
+								"label": "income.section40_5.building",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.8",
+								"label": "income.section40_5.agriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.9",
+								"label": "income.section40_5.nonAgriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.10",
+								"label": "income.section40_5.vehicles",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.11",
+								"label": "income.section40_5.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.12",
+								"label": "income.section40_6.medical",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.13",
+								"label": "income.section40_6.law",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.14",
+								"label": "income.section40_6.engineering",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.15",
+								"label": "income.section40_6.architecture",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.16",
+								"label": "income.section40_6.accounting",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.17",
+								"label": "income.section40_6.fineArts",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.18",
+								"label": "income.section40_6.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.19",
+								"label": "income.section40_7",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.20",
+								"label": "income.section40_8.general",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.21",
+								"label": "income.section40_8.entertainer",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.22",
+								"label": "allowance.retirement.rmf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.23",
+								"label": "allowance.retirement.ssf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.24",
+								"label": "allowance.retirement.pvd",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.25",
+								"label": "allowance.retirement.gpf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.26",
+								"label": "allowance.retirement.nsf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.27",
+								"label": "allowance.retirement.pension_life",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.28",
+								"label": "allowance.thai_esg",
+								"op": "tally"
+							},
+							{
+								"id": "credit.dividend",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.3",
+								"b": "auto.4",
+								"id": "auto.29",
+								"op": "add"
+							},
+							{
+								"a": "auto.29",
+								"b": "auto.5",
+								"id": "auto.30",
+								"op": "add"
+							},
+							{
+								"a": "auto.30",
+								"b": "auto.6",
+								"id": "auto.31",
+								"op": "add"
+							},
+							{
+								"id": "auto.32",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"id": "auto.33",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.32",
+								"b": "auto.33",
+								"id": "tax.final_withholding",
+								"op": "add"
+							},
+							{
+								"a": "auto.7",
+								"b": "auto.8",
+								"id": "auto.34",
+								"op": "add"
+							},
+							{
+								"a": "auto.34",
+								"b": "auto.9",
+								"id": "auto.35",
+								"op": "add"
+							},
+							{
+								"a": "auto.35",
+								"b": "auto.10",
+								"id": "auto.36",
+								"op": "add"
+							},
+							{
+								"a": "auto.36",
+								"b": "auto.11",
+								"id": "auto.37",
+								"op": "add"
+							},
+							{
+								"a": "auto.12",
+								"b": "auto.13",
+								"id": "auto.38",
+								"op": "add"
+							},
+							{
+								"a": "auto.38",
+								"b": "auto.14",
+								"id": "auto.39",
+								"op": "add"
+							},
+							{
+								"a": "auto.39",
+								"b": "auto.15",
+								"id": "auto.40",
+								"op": "add"
+							},
+							{
+								"a": "auto.40",
+								"b": "auto.16",
+								"id": "auto.41",
+								"op": "add"
+							},
+							{
+								"a": "auto.41",
+								"b": "auto.17",
+								"id": "auto.42",
+								"op": "add"
+							},
+							{
+								"a": "auto.42",
+								"b": "auto.18",
+								"id": "auto.43",
+								"op": "add"
+							},
+							{
+								"a": "auto.20",
+								"b": "auto.21",
+								"id": "auto.44",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.45",
+								"op": "add"
+							},
+							{
+								"a": "auto.45",
+								"b": "auto.2",
+								"id": "auto.46",
+								"op": "add"
+							},
+							{
+								"a": "auto.46",
+								"b": "auto.31",
+								"id": "auto.47",
+								"op": "add"
+							},
+							{
+								"a": "auto.47",
+								"b": "auto.37",
+								"id": "auto.48",
+								"op": "add"
+							},
+							{
+								"a": "auto.48",
+								"b": "auto.43",
+								"id": "auto.49",
+								"op": "add"
+							},
+							{
+								"a": "auto.49",
+								"b": "auto.19",
+								"id": "auto.50",
+								"op": "add"
+							},
+							{
+								"a": "auto.50",
+								"b": "auto.44",
+								"id": "auto.51",
+								"op": "add"
+							},
+							{
+								"id": "auto.52",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.51",
+								"b": "auto.52",
+								"id": "assessable.total",
+								"op": "add"
+							},
+							{
+								"a": "auto.1",
+								"b": "auto.2",
+								"id": "auto.53",
+								"op": "add"
+							},
+							{
+								"a": "auto.53",
+								"b": "auto.31",
+								"id": "auto.54",
+								"op": "add"
+							},
+							{
+								"a": "auto.54",
+								"b": "auto.37",
+								"id": "auto.55",
+								"op": "add"
+							},
+							{
+								"a": "auto.55",
+								"b": "auto.43",
+								"id": "auto.56",
+								"op": "add"
+							},
+							{
+								"a": "auto.56",
+								"b": "auto.19",
+								"id": "auto.57",
+								"op": "add"
+							},
+							{
+								"a": "auto.57",
+								"b": "auto.44",
+								"id": "auto.58",
+								"op": "add"
+							},
+							{
+								"id": "auto.59",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.58",
+								"b": "auto.59",
+								"id": "assessable.non_employment",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.60",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.61",
+								"num": 5,
+								"of": "auto.60",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.62",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.61",
+								"b": "auto.62",
+								"id": "auto.63",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.64",
+								"num": 5,
+								"of": "auto.2",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.65",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.64",
+								"b": "auto.65",
+								"id": "auto.66",
+								"op": "min"
+							},
+							{
+								"id": "auto.67",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"den": 10,
+								"id": "auto.68",
+								"num": 3,
+								"of": "auto.7",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.69",
+								"num": 2,
+								"of": "auto.8",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 100,
+								"id": "auto.70",
+								"num": 15,
+								"of": "auto.9",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.71",
+								"num": 3,
+								"of": "auto.10",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.72",
+								"num": 1,
+								"of": "auto.11",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.68",
+								"b": "auto.69",
+								"id": "auto.73",
+								"op": "add"
+							},
+							{
+								"a": "auto.73",
+								"b": "auto.70",
+								"id": "auto.74",
+								"op": "add"
+							},
+							{
+								"a": "auto.74",
+								"b": "auto.71",
+								"id": "auto.75",
+								"op": "add"
+							},
+							{
+								"a": "auto.75",
+								"b": "auto.72",
+								"id": "auto.76",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.77",
+								"num": 6,
+								"of": "auto.12",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.78",
+								"num": 3,
+								"of": "auto.13",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.79",
+								"num": 3,
+								"of": "auto.14",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.80",
+								"num": 3,
+								"of": "auto.15",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.81",
+								"num": 3,
+								"of": "auto.16",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.82",
+								"num": 3,
+								"of": "auto.17",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.83",
+								"num": 3,
+								"of": "auto.18",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.77",
+								"b": "auto.78",
+								"id": "auto.84",
+								"op": "add"
+							},
+							{
+								"a": "auto.84",
+								"b": "auto.79",
+								"id": "auto.85",
+								"op": "add"
+							},
+							{
+								"a": "auto.85",
+								"b": "auto.80",
+								"id": "auto.86",
+								"op": "add"
+							},
+							{
+								"a": "auto.86",
+								"b": "auto.81",
+								"id": "auto.87",
+								"op": "add"
+							},
+							{
+								"a": "auto.87",
+								"b": "auto.82",
+								"id": "auto.88",
+								"op": "add"
+							},
+							{
+								"a": "auto.88",
+								"b": "auto.83",
+								"id": "auto.89",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.90",
+								"num": 6,
+								"of": "auto.19",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.91",
+								"num": 6,
+								"of": "auto.20",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.92",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.92",
+								"id": "auto.93",
+								"op": "min"
+							},
+							{
+								"id": "auto.94",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.94",
+								"id": "auto.95",
+								"op": "sub"
+							},
+							{
+								"id": "auto.96",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.95",
+								"b": "auto.96",
+								"id": "auto.97",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.98",
+								"num": 6,
+								"of": "auto.93",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.99",
+								"num": 4,
+								"of": "auto.97",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.98",
+								"b": "auto.99",
+								"id": "auto.100",
+								"op": "add"
+							},
+							{
+								"id": "auto.101",
+								"op": "const",
+								"value": 60000000
+							},
+							{
+								"a": "auto.100",
+								"b": "auto.101",
+								"id": "auto.102",
+								"op": "min"
+							},
+							{
+								"a": "auto.91",
+								"b": "auto.102",
+								"id": "auto.103",
+								"op": "add"
+							},
+							{
+								"a": "auto.63",
+								"b": "auto.66",
+								"id": "auto.104",
+								"op": "add"
+							},
+							{
+								"a": "auto.104",
+								"b": "auto.67",
+								"id": "auto.105",
+								"op": "add"
+							},
+							{
+								"a": "auto.105",
+								"b": "auto.76",
+								"id": "auto.106",
+								"op": "add"
+							},
+							{
+								"a": "auto.106",
+								"b": "auto.89",
+								"id": "auto.107",
+								"op": "add"
+							},
+							{
+								"a": "auto.107",
+								"b": "auto.90",
+								"id": "auto.108",
+								"op": "add"
+							},
+							{
+								"a": "auto.108",
+								"b": "auto.103",
+								"id": "auto.109",
+								"op": "add"
+							},
+							{
+								"id": "auto.110",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.109",
+								"b": "auto.110",
+								"id": "expenses.total",
+								"op": "add"
+							},
+							{
+								"id": "allowances.fixed",
+								"op": "const",
+								"value": 6000000
+							},
+							{
+								"den": 10,
+								"id": "auto.111",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.112",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.111",
+								"b": "auto.112",
+								"id": "auto.113",
+								"op": "min"
+							},
+							{
+								"a": "auto.22",
+								"b": "auto.113",
+								"id": "auto.114",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.115",
+								"num": 0,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.116",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.115",
+								"b": "auto.116",
+								"id": "auto.117",
+								"op": "min"
+							},
+							{
+								"a": "auto.23",
+								"b": "auto.117",
+								"id": "auto.118",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.119",
+								"num": 15,
+								"of": "auto.0",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.120",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.119",
+								"b": "auto.120",
+								"id": "auto.121",
+								"op": "min"
+							},
+							{
+								"a": "auto.24",
+								"b": "auto.121",
+								"id": "auto.122",
+								"op": "min"
+							},
+							{
+								"id": "auto.123",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.25",
+								"b": "auto.123",
+								"id": "auto.124",
+								"op": "min"
+							},
+							{
+								"id": "auto.125",
+								"op": "const",
+								"value": 3000000
+							},
+							{
+								"a": "auto.26",
+								"b": "auto.125",
+								"id": "auto.126",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.127",
+								"num": 15,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.128",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.127",
+								"b": "auto.128",
+								"id": "auto.129",
+								"op": "min"
+							},
+							{
+								"a": "auto.27",
+								"b": "auto.129",
+								"id": "auto.130",
+								"op": "min"
+							},
+							{
+								"a": "auto.114",
+								"b": "auto.118",
+								"id": "auto.131",
+								"op": "add"
+							},
+							{
+								"a": "auto.131",
+								"b": "auto.122",
+								"id": "auto.132",
+								"op": "add"
+							},
+							{
+								"a": "auto.132",
+								"b": "auto.124",
+								"id": "auto.133",
+								"op": "add"
+							},
+							{
+								"a": "auto.133",
+								"b": "auto.126",
+								"id": "auto.134",
+								"op": "add"
+							},
+							{
+								"a": "auto.134",
+								"b": "auto.130",
+								"id": "auto.135",
+								"op": "add"
+							},
+							{
+								"id": "auto.136",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.135",
+								"b": "auto.136",
+								"id": "allowances.retirement_cluster",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.137",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.138",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.137",
+								"b": "auto.138",
+								"id": "auto.139",
+								"op": "min"
+							},
+							{
+								"a": "auto.28",
+								"b": "auto.139",
+								"id": "allowances.thai_esg",
+								"op": "min"
+							},
+							{
+								"a": "allowances.fixed",
+								"b": "allowances.retirement_cluster",
+								"id": "auto.140",
+								"op": "add"
+							},
+							{
+								"a": "auto.140",
+								"b": "allowances.thai_esg",
+								"id": "auto.141",
+								"op": "add"
+							},
+							{
+								"a": "assessable.total",
+								"b": "expenses.total",
+								"id": "auto.142",
+								"op": "sub"
+							},
+							{
+								"a": "auto.142",
+								"b": "auto.141",
+								"id": "auto.143",
+								"op": "sub"
+							},
+							{
+								"id": "auto.144",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.143",
+								"b": "auto.144",
+								"id": "auto.145",
+								"op": "max"
+							},
+							{
+								"id": "auto.146",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.145",
+								"b": "auto.146",
+								"id": "auto.147",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.148",
+								"num": 1,
+								"of": "auto.147",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.149",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.149",
+								"b": "auto.148",
+								"id": "auto.150",
+								"op": "min"
+							},
+							{
+								"a": "auto.147",
+								"b": "auto.150",
+								"id": "auto.151",
+								"op": "sub"
+							},
+							{
+								"id": "auto.152",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.151",
+								"b": "auto.152",
+								"id": "auto.153",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.154",
+								"num": 1,
+								"of": "auto.153",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.155",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.155",
+								"b": "auto.154",
+								"id": "auto.156",
+								"op": "min"
+							},
+							{
+								"a": "auto.150",
+								"b": "auto.156",
+								"id": "allowances.donations",
+								"op": "add"
+							},
+							{
+								"a": "auto.153",
+								"b": "auto.156",
+								"id": "auto.157",
+								"op": "sub"
+							},
+							{
+								"id": "auto.158",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.157",
+								"b": "auto.158",
+								"id": "taxable.income",
+								"op": "max"
+							},
+							{
+								"a": "auto.141",
+								"b": "allowances.donations",
+								"id": "allowances.total",
+								"op": "add"
+							},
+							{
+								"id": "auto.159",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.159",
+								"id": "auto.160",
+								"op": "sub"
+							},
+							{
+								"id": "auto.161",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.160",
+								"b": "auto.161",
+								"id": "auto.162",
+								"op": "max"
+							},
+							{
+								"id": "auto.163",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.162",
+								"b": "auto.163",
+								"id": "auto.164",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.165",
+								"num": 0,
+								"of": "auto.164",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.166",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.166",
+								"id": "auto.167",
+								"op": "sub"
+							},
+							{
+								"id": "auto.168",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.167",
+								"b": "auto.168",
+								"id": "auto.169",
+								"op": "max"
+							},
+							{
+								"id": "auto.170",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.169",
+								"b": "auto.170",
+								"id": "auto.171",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.172",
+								"num": 5,
+								"of": "auto.171",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.173",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.173",
+								"id": "auto.174",
+								"op": "sub"
+							},
+							{
+								"id": "auto.175",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.174",
+								"b": "auto.175",
+								"id": "auto.176",
+								"op": "max"
+							},
+							{
+								"id": "auto.177",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.176",
+								"b": "auto.177",
+								"id": "auto.178",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.179",
+								"num": 1,
+								"of": "auto.178",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.180",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.180",
+								"id": "auto.181",
+								"op": "sub"
+							},
+							{
+								"id": "auto.182",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.181",
+								"b": "auto.182",
+								"id": "auto.183",
+								"op": "max"
+							},
+							{
+								"id": "auto.184",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.183",
+								"b": "auto.184",
+								"id": "auto.185",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.186",
+								"num": 15,
+								"of": "auto.185",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.187",
+								"op": "const",
+								"value": 75000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.187",
+								"id": "auto.188",
+								"op": "sub"
+							},
+							{
+								"id": "auto.189",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.188",
+								"b": "auto.189",
+								"id": "auto.190",
+								"op": "max"
+							},
+							{
+								"id": "auto.191",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.190",
+								"b": "auto.191",
+								"id": "auto.192",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.193",
+								"num": 2,
+								"of": "auto.192",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.194",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.194",
+								"id": "auto.195",
+								"op": "sub"
+							},
+							{
+								"id": "auto.196",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.195",
+								"b": "auto.196",
+								"id": "auto.197",
+								"op": "max"
+							},
+							{
+								"id": "auto.198",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "auto.197",
+								"b": "auto.198",
+								"id": "auto.199",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.200",
+								"num": 25,
+								"of": "auto.199",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.201",
+								"op": "const",
+								"value": 200000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.201",
+								"id": "auto.202",
+								"op": "sub"
+							},
+							{
+								"id": "auto.203",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.202",
+								"b": "auto.203",
+								"id": "auto.204",
+								"op": "max"
+							},
+							{
+								"id": "auto.205",
+								"op": "const",
+								"value": 300000000
+							},
+							{
+								"a": "auto.204",
+								"b": "auto.205",
+								"id": "auto.206",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.207",
+								"num": 3,
+								"of": "auto.206",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.208",
+								"op": "const",
+								"value": 500000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.208",
+								"id": "auto.209",
+								"op": "sub"
+							},
+							{
+								"id": "auto.210",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.209",
+								"b": "auto.210",
+								"id": "auto.211",
+								"op": "max"
+							},
+							{
+								"den": 100,
+								"id": "auto.212",
+								"num": 35,
+								"of": "auto.211",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"a": "auto.165",
+								"b": "auto.172",
+								"id": "auto.213",
+								"op": "add"
+							},
+							{
+								"a": "auto.213",
+								"b": "auto.179",
+								"id": "auto.214",
+								"op": "add"
+							},
+							{
+								"a": "auto.214",
+								"b": "auto.186",
+								"id": "auto.215",
+								"op": "add"
+							},
+							{
+								"a": "auto.215",
+								"b": "auto.193",
+								"id": "auto.216",
+								"op": "add"
+							},
+							{
+								"a": "auto.216",
+								"b": "auto.200",
+								"id": "auto.217",
+								"op": "add"
+							},
+							{
+								"a": "auto.217",
+								"b": "auto.207",
+								"id": "auto.218",
+								"op": "add"
+							},
+							{
+								"a": "auto.218",
+								"b": "auto.212",
+								"id": "auto.219",
+								"op": "add"
+							},
+							{
+								"id": "auto.220",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.219",
+								"b": "auto.220",
+								"id": "tax.progressive",
+								"op": "add"
+							},
+							{
+								"den": 1000,
+								"id": "auto.221",
+								"num": 5,
+								"of": "assessable.non_employment",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.222",
+								"op": "const",
+								"value": 11999999
+							},
+							{
+								"id": "auto.223",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "assessable.non_employment",
+								"b": "auto.222",
+								"else": "auto.223",
+								"id": "tax.minimum",
+								"op": "pick",
+								"then": "auto.221"
+							},
+							{
+								"id": "auto.224",
+								"op": "const",
+								"value": 500000
+							},
+							{
+								"id": "auto.225",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "tax.minimum",
+								"b": "auto.224",
+								"else": "auto.225",
+								"id": "auto.226",
+								"op": "pick",
+								"then": "tax.minimum"
+							},
+							{
+								"a": "tax.progressive",
+								"b": "auto.226",
+								"id": "tax.regular",
+								"op": "max"
+							},
+							{
+								"a": "tax.regular",
+								"b": "tax.final_withholding",
+								"id": "tax.total",
+								"op": "add"
+							},
+							{
+								"a": "tax.final_withholding",
+								"b": "credit.dividend",
+								"id": "auto.227",
+								"op": "add"
+							},
+							{
+								"a": "tax.total",
+								"b": "auto.227",
+								"id": "tax.net_payable",
+								"op": "sub"
+							}
+						],
+						"period": {
+							"day": 1,
+							"month": 1
+						},
+						"settlement": {
+							"day": 31,
+							"month": 3
+						}
+					}
+				],
+				"schemaVersion": 4
+			}
+		},
+		"tax": {
+			"tax": "th-2026",
+			"filingStatus": "single",
+			"children": 0,
+			"childrenAtHigherRate": 0
+		}
+	},
+	"married_no_income_spouse": {
+		"dryRun": false,
+		"status": "unchanged",
+		"levy": "th-2026-pit",
+		"allowances": {
+			"stated": [
+				"retirementContributions"
+			],
+			"notStated": [
+				"children",
+				"parents",
+				"disabledCare",
+				"socialSecurity",
+				"lifeInsurance",
+				"healthInsurance",
+				"parentHealthInsurance",
+				"spouseLifeInsurance",
+				"mortgageInterest",
+				"donation2x",
+				"donation1x",
+				"thaiEsg"
+			]
+		},
+		"assumptions": [
+			{
+				"path": "allowances.retirementCluster.combinedCeiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Retirement allowances combined ceiling, baht."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.ceiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Provident fund ceiling, baht a year."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.maxRate",
+				"value": 0.15,
+				"status": "reported",
+				"note": "Provident fund limit, share of wages."
+			}
+		],
+		"scenario": {
+			"name": "base",
+			"contentHash": "jcs1:sha256:caa58c368e4e2ebd31e8f6793257b03995f34c97bba053aa65ed798c71719e58",
+			"forkedFrom": null,
+			"document": {
+				"accounts": [
+					{
+						"id": "0194a000-0001-7000-8000-000000000001",
+						"kind": "asset",
+						"rate": 100,
+						"returnLabel": "income.section40_4.interest"
+					},
+					{
+						"id": "0194a000-0002-7000-8000-000000000002",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0004-7000-8000-000000000004",
+						"kind": "asset",
+						"rate": 500
+					},
+					{
+						"id": "0194a000-0006-7000-8000-000000000006",
+						"kind": "asset",
+						"lockedUntil": "2027-01-01",
+						"rate": 300
+					},
+					{
+						"id": "0194a000-0008-7000-8000-000000000008",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0005-7000-8000-000000000005",
+						"kind": "liability",
+						"rate": 600
+					}
+				],
+				"cashflow": {
+					"contribute": [
+						"0194a000-0004-7000-8000-000000000004"
+					],
+					"surplus": [
+						{
+							"account": "0194a000-0002-7000-8000-000000000002"
+						}
+					],
+					"withdraw": [
+						"0194a000-0002-7000-8000-000000000002"
+					]
+				},
+				"currency": "THB",
+				"economy": {
+					"inflation": 0
+				},
+				"flows": [
+					{
+						"amount": 100000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 50000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "partner-salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 3000000,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "pvd",
+						"kind": "contribution",
+						"label": "allowance.retirement.pvd",
+						"start": "2026-06-01",
+						"target": "0194a000-0004-7000-8000-000000000004"
+					}
+				],
+				"levies": [
+					{
+						"due": "tax.net_payable",
+						"id": "th-2026-pit",
+						"measures": [
+							{
+								"basis": "gross",
+								"id": "auto.0",
+								"label": "income.section40_1",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.1",
+								"label": "income.section40_2",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.2",
+								"label": "income.section40_3",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.3",
+								"label": "income.section40_4",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.4",
+								"label": "income.section40_4.interest",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.5",
+								"label": "income.section40_4.dividends",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.6",
+								"label": "income.section40_4.digitalAssets",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.7",
+								"label": "income.section40_5.building",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.8",
+								"label": "income.section40_5.agriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.9",
+								"label": "income.section40_5.nonAgriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.10",
+								"label": "income.section40_5.vehicles",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.11",
+								"label": "income.section40_5.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.12",
+								"label": "income.section40_6.medical",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.13",
+								"label": "income.section40_6.law",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.14",
+								"label": "income.section40_6.engineering",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.15",
+								"label": "income.section40_6.architecture",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.16",
+								"label": "income.section40_6.accounting",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.17",
+								"label": "income.section40_6.fineArts",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.18",
+								"label": "income.section40_6.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.19",
+								"label": "income.section40_7",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.20",
+								"label": "income.section40_8.general",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.21",
+								"label": "income.section40_8.entertainer",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.22",
+								"label": "allowance.retirement.rmf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.23",
+								"label": "allowance.retirement.ssf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.24",
+								"label": "allowance.retirement.pvd",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.25",
+								"label": "allowance.retirement.gpf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.26",
+								"label": "allowance.retirement.nsf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.27",
+								"label": "allowance.retirement.pension_life",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.28",
+								"label": "allowance.thai_esg",
+								"op": "tally"
+							},
+							{
+								"id": "credit.dividend",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.3",
+								"b": "auto.4",
+								"id": "auto.29",
+								"op": "add"
+							},
+							{
+								"a": "auto.29",
+								"b": "auto.5",
+								"id": "auto.30",
+								"op": "add"
+							},
+							{
+								"a": "auto.30",
+								"b": "auto.6",
+								"id": "auto.31",
+								"op": "add"
+							},
+							{
+								"id": "auto.32",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"id": "auto.33",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.32",
+								"b": "auto.33",
+								"id": "tax.final_withholding",
+								"op": "add"
+							},
+							{
+								"a": "auto.7",
+								"b": "auto.8",
+								"id": "auto.34",
+								"op": "add"
+							},
+							{
+								"a": "auto.34",
+								"b": "auto.9",
+								"id": "auto.35",
+								"op": "add"
+							},
+							{
+								"a": "auto.35",
+								"b": "auto.10",
+								"id": "auto.36",
+								"op": "add"
+							},
+							{
+								"a": "auto.36",
+								"b": "auto.11",
+								"id": "auto.37",
+								"op": "add"
+							},
+							{
+								"a": "auto.12",
+								"b": "auto.13",
+								"id": "auto.38",
+								"op": "add"
+							},
+							{
+								"a": "auto.38",
+								"b": "auto.14",
+								"id": "auto.39",
+								"op": "add"
+							},
+							{
+								"a": "auto.39",
+								"b": "auto.15",
+								"id": "auto.40",
+								"op": "add"
+							},
+							{
+								"a": "auto.40",
+								"b": "auto.16",
+								"id": "auto.41",
+								"op": "add"
+							},
+							{
+								"a": "auto.41",
+								"b": "auto.17",
+								"id": "auto.42",
+								"op": "add"
+							},
+							{
+								"a": "auto.42",
+								"b": "auto.18",
+								"id": "auto.43",
+								"op": "add"
+							},
+							{
+								"a": "auto.20",
+								"b": "auto.21",
+								"id": "auto.44",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.45",
+								"op": "add"
+							},
+							{
+								"a": "auto.45",
+								"b": "auto.2",
+								"id": "auto.46",
+								"op": "add"
+							},
+							{
+								"a": "auto.46",
+								"b": "auto.31",
+								"id": "auto.47",
+								"op": "add"
+							},
+							{
+								"a": "auto.47",
+								"b": "auto.37",
+								"id": "auto.48",
+								"op": "add"
+							},
+							{
+								"a": "auto.48",
+								"b": "auto.43",
+								"id": "auto.49",
+								"op": "add"
+							},
+							{
+								"a": "auto.49",
+								"b": "auto.19",
+								"id": "auto.50",
+								"op": "add"
+							},
+							{
+								"a": "auto.50",
+								"b": "auto.44",
+								"id": "auto.51",
+								"op": "add"
+							},
+							{
+								"id": "auto.52",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.51",
+								"b": "auto.52",
+								"id": "assessable.total",
+								"op": "add"
+							},
+							{
+								"a": "auto.1",
+								"b": "auto.2",
+								"id": "auto.53",
+								"op": "add"
+							},
+							{
+								"a": "auto.53",
+								"b": "auto.31",
+								"id": "auto.54",
+								"op": "add"
+							},
+							{
+								"a": "auto.54",
+								"b": "auto.37",
+								"id": "auto.55",
+								"op": "add"
+							},
+							{
+								"a": "auto.55",
+								"b": "auto.43",
+								"id": "auto.56",
+								"op": "add"
+							},
+							{
+								"a": "auto.56",
+								"b": "auto.19",
+								"id": "auto.57",
+								"op": "add"
+							},
+							{
+								"a": "auto.57",
+								"b": "auto.44",
+								"id": "auto.58",
+								"op": "add"
+							},
+							{
+								"id": "auto.59",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.58",
+								"b": "auto.59",
+								"id": "assessable.non_employment",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.60",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.61",
+								"num": 5,
+								"of": "auto.60",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.62",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.61",
+								"b": "auto.62",
+								"id": "auto.63",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.64",
+								"num": 5,
+								"of": "auto.2",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.65",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.64",
+								"b": "auto.65",
+								"id": "auto.66",
+								"op": "min"
+							},
+							{
+								"id": "auto.67",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"den": 10,
+								"id": "auto.68",
+								"num": 3,
+								"of": "auto.7",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.69",
+								"num": 2,
+								"of": "auto.8",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 100,
+								"id": "auto.70",
+								"num": 15,
+								"of": "auto.9",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.71",
+								"num": 3,
+								"of": "auto.10",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.72",
+								"num": 1,
+								"of": "auto.11",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.68",
+								"b": "auto.69",
+								"id": "auto.73",
+								"op": "add"
+							},
+							{
+								"a": "auto.73",
+								"b": "auto.70",
+								"id": "auto.74",
+								"op": "add"
+							},
+							{
+								"a": "auto.74",
+								"b": "auto.71",
+								"id": "auto.75",
+								"op": "add"
+							},
+							{
+								"a": "auto.75",
+								"b": "auto.72",
+								"id": "auto.76",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.77",
+								"num": 6,
+								"of": "auto.12",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.78",
+								"num": 3,
+								"of": "auto.13",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.79",
+								"num": 3,
+								"of": "auto.14",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.80",
+								"num": 3,
+								"of": "auto.15",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.81",
+								"num": 3,
+								"of": "auto.16",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.82",
+								"num": 3,
+								"of": "auto.17",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.83",
+								"num": 3,
+								"of": "auto.18",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.77",
+								"b": "auto.78",
+								"id": "auto.84",
+								"op": "add"
+							},
+							{
+								"a": "auto.84",
+								"b": "auto.79",
+								"id": "auto.85",
+								"op": "add"
+							},
+							{
+								"a": "auto.85",
+								"b": "auto.80",
+								"id": "auto.86",
+								"op": "add"
+							},
+							{
+								"a": "auto.86",
+								"b": "auto.81",
+								"id": "auto.87",
+								"op": "add"
+							},
+							{
+								"a": "auto.87",
+								"b": "auto.82",
+								"id": "auto.88",
+								"op": "add"
+							},
+							{
+								"a": "auto.88",
+								"b": "auto.83",
+								"id": "auto.89",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.90",
+								"num": 6,
+								"of": "auto.19",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.91",
+								"num": 6,
+								"of": "auto.20",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.92",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.92",
+								"id": "auto.93",
+								"op": "min"
+							},
+							{
+								"id": "auto.94",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.94",
+								"id": "auto.95",
+								"op": "sub"
+							},
+							{
+								"id": "auto.96",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.95",
+								"b": "auto.96",
+								"id": "auto.97",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.98",
+								"num": 6,
+								"of": "auto.93",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.99",
+								"num": 4,
+								"of": "auto.97",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.98",
+								"b": "auto.99",
+								"id": "auto.100",
+								"op": "add"
+							},
+							{
+								"id": "auto.101",
+								"op": "const",
+								"value": 60000000
+							},
+							{
+								"a": "auto.100",
+								"b": "auto.101",
+								"id": "auto.102",
+								"op": "min"
+							},
+							{
+								"a": "auto.91",
+								"b": "auto.102",
+								"id": "auto.103",
+								"op": "add"
+							},
+							{
+								"a": "auto.63",
+								"b": "auto.66",
+								"id": "auto.104",
+								"op": "add"
+							},
+							{
+								"a": "auto.104",
+								"b": "auto.67",
+								"id": "auto.105",
+								"op": "add"
+							},
+							{
+								"a": "auto.105",
+								"b": "auto.76",
+								"id": "auto.106",
+								"op": "add"
+							},
+							{
+								"a": "auto.106",
+								"b": "auto.89",
+								"id": "auto.107",
+								"op": "add"
+							},
+							{
+								"a": "auto.107",
+								"b": "auto.90",
+								"id": "auto.108",
+								"op": "add"
+							},
+							{
+								"a": "auto.108",
+								"b": "auto.103",
+								"id": "auto.109",
+								"op": "add"
+							},
+							{
+								"id": "auto.110",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.109",
+								"b": "auto.110",
+								"id": "expenses.total",
+								"op": "add"
+							},
+							{
+								"id": "allowances.fixed",
+								"op": "const",
+								"value": 12000000
+							},
+							{
+								"den": 10,
+								"id": "auto.111",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.112",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.111",
+								"b": "auto.112",
+								"id": "auto.113",
+								"op": "min"
+							},
+							{
+								"a": "auto.22",
+								"b": "auto.113",
+								"id": "auto.114",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.115",
+								"num": 0,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.116",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.115",
+								"b": "auto.116",
+								"id": "auto.117",
+								"op": "min"
+							},
+							{
+								"a": "auto.23",
+								"b": "auto.117",
+								"id": "auto.118",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.119",
+								"num": 15,
+								"of": "auto.0",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.120",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.119",
+								"b": "auto.120",
+								"id": "auto.121",
+								"op": "min"
+							},
+							{
+								"a": "auto.24",
+								"b": "auto.121",
+								"id": "auto.122",
+								"op": "min"
+							},
+							{
+								"id": "auto.123",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.25",
+								"b": "auto.123",
+								"id": "auto.124",
+								"op": "min"
+							},
+							{
+								"id": "auto.125",
+								"op": "const",
+								"value": 3000000
+							},
+							{
+								"a": "auto.26",
+								"b": "auto.125",
+								"id": "auto.126",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.127",
+								"num": 15,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.128",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.127",
+								"b": "auto.128",
+								"id": "auto.129",
+								"op": "min"
+							},
+							{
+								"a": "auto.27",
+								"b": "auto.129",
+								"id": "auto.130",
+								"op": "min"
+							},
+							{
+								"a": "auto.114",
+								"b": "auto.118",
+								"id": "auto.131",
+								"op": "add"
+							},
+							{
+								"a": "auto.131",
+								"b": "auto.122",
+								"id": "auto.132",
+								"op": "add"
+							},
+							{
+								"a": "auto.132",
+								"b": "auto.124",
+								"id": "auto.133",
+								"op": "add"
+							},
+							{
+								"a": "auto.133",
+								"b": "auto.126",
+								"id": "auto.134",
+								"op": "add"
+							},
+							{
+								"a": "auto.134",
+								"b": "auto.130",
+								"id": "auto.135",
+								"op": "add"
+							},
+							{
+								"id": "auto.136",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.135",
+								"b": "auto.136",
+								"id": "allowances.retirement_cluster",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.137",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.138",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.137",
+								"b": "auto.138",
+								"id": "auto.139",
+								"op": "min"
+							},
+							{
+								"a": "auto.28",
+								"b": "auto.139",
+								"id": "allowances.thai_esg",
+								"op": "min"
+							},
+							{
+								"a": "allowances.fixed",
+								"b": "allowances.retirement_cluster",
+								"id": "auto.140",
+								"op": "add"
+							},
+							{
+								"a": "auto.140",
+								"b": "allowances.thai_esg",
+								"id": "auto.141",
+								"op": "add"
+							},
+							{
+								"a": "assessable.total",
+								"b": "expenses.total",
+								"id": "auto.142",
+								"op": "sub"
+							},
+							{
+								"a": "auto.142",
+								"b": "auto.141",
+								"id": "auto.143",
+								"op": "sub"
+							},
+							{
+								"id": "auto.144",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.143",
+								"b": "auto.144",
+								"id": "auto.145",
+								"op": "max"
+							},
+							{
+								"id": "auto.146",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.145",
+								"b": "auto.146",
+								"id": "auto.147",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.148",
+								"num": 1,
+								"of": "auto.147",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.149",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.149",
+								"b": "auto.148",
+								"id": "auto.150",
+								"op": "min"
+							},
+							{
+								"a": "auto.147",
+								"b": "auto.150",
+								"id": "auto.151",
+								"op": "sub"
+							},
+							{
+								"id": "auto.152",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.151",
+								"b": "auto.152",
+								"id": "auto.153",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.154",
+								"num": 1,
+								"of": "auto.153",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.155",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.155",
+								"b": "auto.154",
+								"id": "auto.156",
+								"op": "min"
+							},
+							{
+								"a": "auto.150",
+								"b": "auto.156",
+								"id": "allowances.donations",
+								"op": "add"
+							},
+							{
+								"a": "auto.153",
+								"b": "auto.156",
+								"id": "auto.157",
+								"op": "sub"
+							},
+							{
+								"id": "auto.158",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.157",
+								"b": "auto.158",
+								"id": "taxable.income",
+								"op": "max"
+							},
+							{
+								"a": "auto.141",
+								"b": "allowances.donations",
+								"id": "allowances.total",
+								"op": "add"
+							},
+							{
+								"id": "auto.159",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.159",
+								"id": "auto.160",
+								"op": "sub"
+							},
+							{
+								"id": "auto.161",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.160",
+								"b": "auto.161",
+								"id": "auto.162",
+								"op": "max"
+							},
+							{
+								"id": "auto.163",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.162",
+								"b": "auto.163",
+								"id": "auto.164",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.165",
+								"num": 0,
+								"of": "auto.164",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.166",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.166",
+								"id": "auto.167",
+								"op": "sub"
+							},
+							{
+								"id": "auto.168",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.167",
+								"b": "auto.168",
+								"id": "auto.169",
+								"op": "max"
+							},
+							{
+								"id": "auto.170",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.169",
+								"b": "auto.170",
+								"id": "auto.171",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.172",
+								"num": 5,
+								"of": "auto.171",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.173",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.173",
+								"id": "auto.174",
+								"op": "sub"
+							},
+							{
+								"id": "auto.175",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.174",
+								"b": "auto.175",
+								"id": "auto.176",
+								"op": "max"
+							},
+							{
+								"id": "auto.177",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.176",
+								"b": "auto.177",
+								"id": "auto.178",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.179",
+								"num": 1,
+								"of": "auto.178",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.180",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.180",
+								"id": "auto.181",
+								"op": "sub"
+							},
+							{
+								"id": "auto.182",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.181",
+								"b": "auto.182",
+								"id": "auto.183",
+								"op": "max"
+							},
+							{
+								"id": "auto.184",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.183",
+								"b": "auto.184",
+								"id": "auto.185",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.186",
+								"num": 15,
+								"of": "auto.185",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.187",
+								"op": "const",
+								"value": 75000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.187",
+								"id": "auto.188",
+								"op": "sub"
+							},
+							{
+								"id": "auto.189",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.188",
+								"b": "auto.189",
+								"id": "auto.190",
+								"op": "max"
+							},
+							{
+								"id": "auto.191",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.190",
+								"b": "auto.191",
+								"id": "auto.192",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.193",
+								"num": 2,
+								"of": "auto.192",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.194",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.194",
+								"id": "auto.195",
+								"op": "sub"
+							},
+							{
+								"id": "auto.196",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.195",
+								"b": "auto.196",
+								"id": "auto.197",
+								"op": "max"
+							},
+							{
+								"id": "auto.198",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "auto.197",
+								"b": "auto.198",
+								"id": "auto.199",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.200",
+								"num": 25,
+								"of": "auto.199",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.201",
+								"op": "const",
+								"value": 200000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.201",
+								"id": "auto.202",
+								"op": "sub"
+							},
+							{
+								"id": "auto.203",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.202",
+								"b": "auto.203",
+								"id": "auto.204",
+								"op": "max"
+							},
+							{
+								"id": "auto.205",
+								"op": "const",
+								"value": 300000000
+							},
+							{
+								"a": "auto.204",
+								"b": "auto.205",
+								"id": "auto.206",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.207",
+								"num": 3,
+								"of": "auto.206",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.208",
+								"op": "const",
+								"value": 500000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.208",
+								"id": "auto.209",
+								"op": "sub"
+							},
+							{
+								"id": "auto.210",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.209",
+								"b": "auto.210",
+								"id": "auto.211",
+								"op": "max"
+							},
+							{
+								"den": 100,
+								"id": "auto.212",
+								"num": 35,
+								"of": "auto.211",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"a": "auto.165",
+								"b": "auto.172",
+								"id": "auto.213",
+								"op": "add"
+							},
+							{
+								"a": "auto.213",
+								"b": "auto.179",
+								"id": "auto.214",
+								"op": "add"
+							},
+							{
+								"a": "auto.214",
+								"b": "auto.186",
+								"id": "auto.215",
+								"op": "add"
+							},
+							{
+								"a": "auto.215",
+								"b": "auto.193",
+								"id": "auto.216",
+								"op": "add"
+							},
+							{
+								"a": "auto.216",
+								"b": "auto.200",
+								"id": "auto.217",
+								"op": "add"
+							},
+							{
+								"a": "auto.217",
+								"b": "auto.207",
+								"id": "auto.218",
+								"op": "add"
+							},
+							{
+								"a": "auto.218",
+								"b": "auto.212",
+								"id": "auto.219",
+								"op": "add"
+							},
+							{
+								"id": "auto.220",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.219",
+								"b": "auto.220",
+								"id": "tax.progressive",
+								"op": "add"
+							},
+							{
+								"den": 1000,
+								"id": "auto.221",
+								"num": 5,
+								"of": "assessable.non_employment",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.222",
+								"op": "const",
+								"value": 11999999
+							},
+							{
+								"id": "auto.223",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "assessable.non_employment",
+								"b": "auto.222",
+								"else": "auto.223",
+								"id": "tax.minimum",
+								"op": "pick",
+								"then": "auto.221"
+							},
+							{
+								"id": "auto.224",
+								"op": "const",
+								"value": 500000
+							},
+							{
+								"id": "auto.225",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "tax.minimum",
+								"b": "auto.224",
+								"else": "auto.225",
+								"id": "auto.226",
+								"op": "pick",
+								"then": "tax.minimum"
+							},
+							{
+								"a": "tax.progressive",
+								"b": "auto.226",
+								"id": "tax.regular",
+								"op": "max"
+							},
+							{
+								"a": "tax.regular",
+								"b": "tax.final_withholding",
+								"id": "tax.total",
+								"op": "add"
+							},
+							{
+								"a": "tax.final_withholding",
+								"b": "credit.dividend",
+								"id": "auto.227",
+								"op": "add"
+							},
+							{
+								"a": "tax.total",
+								"b": "auto.227",
+								"id": "tax.net_payable",
+								"op": "sub"
+							}
+						],
+						"period": {
+							"day": 1,
+							"month": 1
+						},
+						"settlement": {
+							"day": 31,
+							"month": 3
+						}
+					}
+				],
+				"schemaVersion": 4
+			}
+		},
+		"tax": {
+			"tax": "th-2026",
+			"filingStatus": "married_no_income_spouse",
+			"children": 0,
+			"childrenAtHigherRate": 0
+		}
+	},
+	"married_separate": {
+		"dryRun": false,
+		"status": "unchanged",
+		"levy": "th-2026-pit",
+		"allowances": {
+			"stated": [
+				"retirementContributions"
+			],
+			"notStated": [
+				"children",
+				"parents",
+				"disabledCare",
+				"socialSecurity",
+				"lifeInsurance",
+				"healthInsurance",
+				"parentHealthInsurance",
+				"spouseLifeInsurance",
+				"mortgageInterest",
+				"donation2x",
+				"donation1x",
+				"thaiEsg"
+			]
+		},
+		"assumptions": [
+			{
+				"path": "allowances.retirementCluster.combinedCeiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Retirement allowances combined ceiling, baht."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.ceiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Provident fund ceiling, baht a year."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.maxRate",
+				"value": 0.15,
+				"status": "reported",
+				"note": "Provident fund limit, share of wages."
+			}
+		],
+		"scenario": {
+			"name": "base",
+			"contentHash": "jcs1:sha256:fb007dbfca11f5a474b37232105674bc9fa82009a2f1d0193c4d2b9916f3d47f",
+			"forkedFrom": null,
+			"document": {
+				"accounts": [
+					{
+						"id": "0194a000-0001-7000-8000-000000000001",
+						"kind": "asset",
+						"rate": 100,
+						"returnLabel": "income.section40_4.interest"
+					},
+					{
+						"id": "0194a000-0002-7000-8000-000000000002",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0004-7000-8000-000000000004",
+						"kind": "asset",
+						"rate": 500
+					},
+					{
+						"id": "0194a000-0006-7000-8000-000000000006",
+						"kind": "asset",
+						"lockedUntil": "2027-01-01",
+						"rate": 300
+					},
+					{
+						"id": "0194a000-0008-7000-8000-000000000008",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0005-7000-8000-000000000005",
+						"kind": "liability",
+						"rate": 600
+					}
+				],
+				"cashflow": {
+					"contribute": [
+						"0194a000-0004-7000-8000-000000000004"
+					],
+					"surplus": [
+						{
+							"account": "0194a000-0002-7000-8000-000000000002"
+						}
+					],
+					"withdraw": [
+						"0194a000-0002-7000-8000-000000000002"
+					]
+				},
+				"currency": "THB",
+				"economy": {
+					"inflation": 0
+				},
+				"flows": [
+					{
+						"amount": 100000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 50000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "partner-salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 3000000,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "pvd",
+						"kind": "contribution",
+						"label": "allowance.retirement.pvd",
+						"start": "2026-06-01",
+						"target": "0194a000-0004-7000-8000-000000000004"
+					}
+				],
+				"levies": [
+					{
+						"due": "tax.net_payable",
+						"id": "th-2026-pit",
+						"measures": [
+							{
+								"basis": "gross",
+								"id": "auto.0",
+								"label": "income.section40_1",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.1",
+								"label": "income.section40_2",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.2",
+								"label": "income.section40_3",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.3",
+								"label": "income.section40_4",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.4",
+								"label": "income.section40_4.interest",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.5",
+								"label": "income.section40_4.dividends",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.6",
+								"label": "income.section40_4.digitalAssets",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.7",
+								"label": "income.section40_5.building",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.8",
+								"label": "income.section40_5.agriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.9",
+								"label": "income.section40_5.nonAgriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.10",
+								"label": "income.section40_5.vehicles",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.11",
+								"label": "income.section40_5.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.12",
+								"label": "income.section40_6.medical",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.13",
+								"label": "income.section40_6.law",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.14",
+								"label": "income.section40_6.engineering",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.15",
+								"label": "income.section40_6.architecture",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.16",
+								"label": "income.section40_6.accounting",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.17",
+								"label": "income.section40_6.fineArts",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.18",
+								"label": "income.section40_6.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.19",
+								"label": "income.section40_7",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.20",
+								"label": "income.section40_8.general",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.21",
+								"label": "income.section40_8.entertainer",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.22",
+								"label": "allowance.retirement.rmf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.23",
+								"label": "allowance.retirement.ssf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.24",
+								"label": "allowance.retirement.pvd",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.25",
+								"label": "allowance.retirement.gpf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.26",
+								"label": "allowance.retirement.nsf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.27",
+								"label": "allowance.retirement.pension_life",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.28",
+								"label": "allowance.thai_esg",
+								"op": "tally"
+							},
+							{
+								"id": "credit.dividend",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.3",
+								"b": "auto.4",
+								"id": "auto.29",
+								"op": "add"
+							},
+							{
+								"a": "auto.29",
+								"b": "auto.5",
+								"id": "auto.30",
+								"op": "add"
+							},
+							{
+								"a": "auto.30",
+								"b": "auto.6",
+								"id": "auto.31",
+								"op": "add"
+							},
+							{
+								"id": "auto.32",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"id": "auto.33",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.32",
+								"b": "auto.33",
+								"id": "tax.final_withholding",
+								"op": "add"
+							},
+							{
+								"a": "auto.7",
+								"b": "auto.8",
+								"id": "auto.34",
+								"op": "add"
+							},
+							{
+								"a": "auto.34",
+								"b": "auto.9",
+								"id": "auto.35",
+								"op": "add"
+							},
+							{
+								"a": "auto.35",
+								"b": "auto.10",
+								"id": "auto.36",
+								"op": "add"
+							},
+							{
+								"a": "auto.36",
+								"b": "auto.11",
+								"id": "auto.37",
+								"op": "add"
+							},
+							{
+								"a": "auto.12",
+								"b": "auto.13",
+								"id": "auto.38",
+								"op": "add"
+							},
+							{
+								"a": "auto.38",
+								"b": "auto.14",
+								"id": "auto.39",
+								"op": "add"
+							},
+							{
+								"a": "auto.39",
+								"b": "auto.15",
+								"id": "auto.40",
+								"op": "add"
+							},
+							{
+								"a": "auto.40",
+								"b": "auto.16",
+								"id": "auto.41",
+								"op": "add"
+							},
+							{
+								"a": "auto.41",
+								"b": "auto.17",
+								"id": "auto.42",
+								"op": "add"
+							},
+							{
+								"a": "auto.42",
+								"b": "auto.18",
+								"id": "auto.43",
+								"op": "add"
+							},
+							{
+								"a": "auto.20",
+								"b": "auto.21",
+								"id": "auto.44",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.45",
+								"op": "add"
+							},
+							{
+								"a": "auto.45",
+								"b": "auto.2",
+								"id": "auto.46",
+								"op": "add"
+							},
+							{
+								"a": "auto.46",
+								"b": "auto.31",
+								"id": "auto.47",
+								"op": "add"
+							},
+							{
+								"a": "auto.47",
+								"b": "auto.37",
+								"id": "auto.48",
+								"op": "add"
+							},
+							{
+								"a": "auto.48",
+								"b": "auto.43",
+								"id": "auto.49",
+								"op": "add"
+							},
+							{
+								"a": "auto.49",
+								"b": "auto.19",
+								"id": "auto.50",
+								"op": "add"
+							},
+							{
+								"a": "auto.50",
+								"b": "auto.44",
+								"id": "auto.51",
+								"op": "add"
+							},
+							{
+								"id": "auto.52",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.51",
+								"b": "auto.52",
+								"id": "assessable.total",
+								"op": "add"
+							},
+							{
+								"a": "auto.1",
+								"b": "auto.2",
+								"id": "auto.53",
+								"op": "add"
+							},
+							{
+								"a": "auto.53",
+								"b": "auto.31",
+								"id": "auto.54",
+								"op": "add"
+							},
+							{
+								"a": "auto.54",
+								"b": "auto.37",
+								"id": "auto.55",
+								"op": "add"
+							},
+							{
+								"a": "auto.55",
+								"b": "auto.43",
+								"id": "auto.56",
+								"op": "add"
+							},
+							{
+								"a": "auto.56",
+								"b": "auto.19",
+								"id": "auto.57",
+								"op": "add"
+							},
+							{
+								"a": "auto.57",
+								"b": "auto.44",
+								"id": "auto.58",
+								"op": "add"
+							},
+							{
+								"id": "auto.59",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.58",
+								"b": "auto.59",
+								"id": "assessable.non_employment",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.60",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.61",
+								"num": 5,
+								"of": "auto.60",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.62",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.61",
+								"b": "auto.62",
+								"id": "auto.63",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.64",
+								"num": 5,
+								"of": "auto.2",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.65",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.64",
+								"b": "auto.65",
+								"id": "auto.66",
+								"op": "min"
+							},
+							{
+								"id": "auto.67",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"den": 10,
+								"id": "auto.68",
+								"num": 3,
+								"of": "auto.7",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.69",
+								"num": 2,
+								"of": "auto.8",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 100,
+								"id": "auto.70",
+								"num": 15,
+								"of": "auto.9",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.71",
+								"num": 3,
+								"of": "auto.10",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.72",
+								"num": 1,
+								"of": "auto.11",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.68",
+								"b": "auto.69",
+								"id": "auto.73",
+								"op": "add"
+							},
+							{
+								"a": "auto.73",
+								"b": "auto.70",
+								"id": "auto.74",
+								"op": "add"
+							},
+							{
+								"a": "auto.74",
+								"b": "auto.71",
+								"id": "auto.75",
+								"op": "add"
+							},
+							{
+								"a": "auto.75",
+								"b": "auto.72",
+								"id": "auto.76",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.77",
+								"num": 6,
+								"of": "auto.12",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.78",
+								"num": 3,
+								"of": "auto.13",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.79",
+								"num": 3,
+								"of": "auto.14",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.80",
+								"num": 3,
+								"of": "auto.15",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.81",
+								"num": 3,
+								"of": "auto.16",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.82",
+								"num": 3,
+								"of": "auto.17",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.83",
+								"num": 3,
+								"of": "auto.18",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.77",
+								"b": "auto.78",
+								"id": "auto.84",
+								"op": "add"
+							},
+							{
+								"a": "auto.84",
+								"b": "auto.79",
+								"id": "auto.85",
+								"op": "add"
+							},
+							{
+								"a": "auto.85",
+								"b": "auto.80",
+								"id": "auto.86",
+								"op": "add"
+							},
+							{
+								"a": "auto.86",
+								"b": "auto.81",
+								"id": "auto.87",
+								"op": "add"
+							},
+							{
+								"a": "auto.87",
+								"b": "auto.82",
+								"id": "auto.88",
+								"op": "add"
+							},
+							{
+								"a": "auto.88",
+								"b": "auto.83",
+								"id": "auto.89",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.90",
+								"num": 6,
+								"of": "auto.19",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.91",
+								"num": 6,
+								"of": "auto.20",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.92",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.92",
+								"id": "auto.93",
+								"op": "min"
+							},
+							{
+								"id": "auto.94",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.94",
+								"id": "auto.95",
+								"op": "sub"
+							},
+							{
+								"id": "auto.96",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.95",
+								"b": "auto.96",
+								"id": "auto.97",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.98",
+								"num": 6,
+								"of": "auto.93",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.99",
+								"num": 4,
+								"of": "auto.97",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.98",
+								"b": "auto.99",
+								"id": "auto.100",
+								"op": "add"
+							},
+							{
+								"id": "auto.101",
+								"op": "const",
+								"value": 60000000
+							},
+							{
+								"a": "auto.100",
+								"b": "auto.101",
+								"id": "auto.102",
+								"op": "min"
+							},
+							{
+								"a": "auto.91",
+								"b": "auto.102",
+								"id": "auto.103",
+								"op": "add"
+							},
+							{
+								"a": "auto.63",
+								"b": "auto.66",
+								"id": "auto.104",
+								"op": "add"
+							},
+							{
+								"a": "auto.104",
+								"b": "auto.67",
+								"id": "auto.105",
+								"op": "add"
+							},
+							{
+								"a": "auto.105",
+								"b": "auto.76",
+								"id": "auto.106",
+								"op": "add"
+							},
+							{
+								"a": "auto.106",
+								"b": "auto.89",
+								"id": "auto.107",
+								"op": "add"
+							},
+							{
+								"a": "auto.107",
+								"b": "auto.90",
+								"id": "auto.108",
+								"op": "add"
+							},
+							{
+								"a": "auto.108",
+								"b": "auto.103",
+								"id": "auto.109",
+								"op": "add"
+							},
+							{
+								"id": "auto.110",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.109",
+								"b": "auto.110",
+								"id": "expenses.total",
+								"op": "add"
+							},
+							{
+								"id": "allowances.fixed",
+								"op": "const",
+								"value": 6000000
+							},
+							{
+								"den": 10,
+								"id": "auto.111",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.112",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.111",
+								"b": "auto.112",
+								"id": "auto.113",
+								"op": "min"
+							},
+							{
+								"a": "auto.22",
+								"b": "auto.113",
+								"id": "auto.114",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.115",
+								"num": 0,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.116",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.115",
+								"b": "auto.116",
+								"id": "auto.117",
+								"op": "min"
+							},
+							{
+								"a": "auto.23",
+								"b": "auto.117",
+								"id": "auto.118",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.119",
+								"num": 15,
+								"of": "auto.0",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.120",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.119",
+								"b": "auto.120",
+								"id": "auto.121",
+								"op": "min"
+							},
+							{
+								"a": "auto.24",
+								"b": "auto.121",
+								"id": "auto.122",
+								"op": "min"
+							},
+							{
+								"id": "auto.123",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.25",
+								"b": "auto.123",
+								"id": "auto.124",
+								"op": "min"
+							},
+							{
+								"id": "auto.125",
+								"op": "const",
+								"value": 3000000
+							},
+							{
+								"a": "auto.26",
+								"b": "auto.125",
+								"id": "auto.126",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.127",
+								"num": 15,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.128",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.127",
+								"b": "auto.128",
+								"id": "auto.129",
+								"op": "min"
+							},
+							{
+								"a": "auto.27",
+								"b": "auto.129",
+								"id": "auto.130",
+								"op": "min"
+							},
+							{
+								"a": "auto.114",
+								"b": "auto.118",
+								"id": "auto.131",
+								"op": "add"
+							},
+							{
+								"a": "auto.131",
+								"b": "auto.122",
+								"id": "auto.132",
+								"op": "add"
+							},
+							{
+								"a": "auto.132",
+								"b": "auto.124",
+								"id": "auto.133",
+								"op": "add"
+							},
+							{
+								"a": "auto.133",
+								"b": "auto.126",
+								"id": "auto.134",
+								"op": "add"
+							},
+							{
+								"a": "auto.134",
+								"b": "auto.130",
+								"id": "auto.135",
+								"op": "add"
+							},
+							{
+								"id": "auto.136",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.135",
+								"b": "auto.136",
+								"id": "allowances.retirement_cluster",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.137",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.138",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.137",
+								"b": "auto.138",
+								"id": "auto.139",
+								"op": "min"
+							},
+							{
+								"a": "auto.28",
+								"b": "auto.139",
+								"id": "allowances.thai_esg",
+								"op": "min"
+							},
+							{
+								"a": "allowances.fixed",
+								"b": "allowances.retirement_cluster",
+								"id": "auto.140",
+								"op": "add"
+							},
+							{
+								"a": "auto.140",
+								"b": "allowances.thai_esg",
+								"id": "auto.141",
+								"op": "add"
+							},
+							{
+								"a": "assessable.total",
+								"b": "expenses.total",
+								"id": "auto.142",
+								"op": "sub"
+							},
+							{
+								"a": "auto.142",
+								"b": "auto.141",
+								"id": "auto.143",
+								"op": "sub"
+							},
+							{
+								"id": "auto.144",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.143",
+								"b": "auto.144",
+								"id": "auto.145",
+								"op": "max"
+							},
+							{
+								"id": "auto.146",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.145",
+								"b": "auto.146",
+								"id": "auto.147",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.148",
+								"num": 1,
+								"of": "auto.147",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.149",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.149",
+								"b": "auto.148",
+								"id": "auto.150",
+								"op": "min"
+							},
+							{
+								"a": "auto.147",
+								"b": "auto.150",
+								"id": "auto.151",
+								"op": "sub"
+							},
+							{
+								"id": "auto.152",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.151",
+								"b": "auto.152",
+								"id": "auto.153",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.154",
+								"num": 1,
+								"of": "auto.153",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.155",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.155",
+								"b": "auto.154",
+								"id": "auto.156",
+								"op": "min"
+							},
+							{
+								"a": "auto.150",
+								"b": "auto.156",
+								"id": "allowances.donations",
+								"op": "add"
+							},
+							{
+								"a": "auto.153",
+								"b": "auto.156",
+								"id": "auto.157",
+								"op": "sub"
+							},
+							{
+								"id": "auto.158",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.157",
+								"b": "auto.158",
+								"id": "taxable.income",
+								"op": "max"
+							},
+							{
+								"a": "auto.141",
+								"b": "allowances.donations",
+								"id": "allowances.total",
+								"op": "add"
+							},
+							{
+								"id": "auto.159",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.159",
+								"id": "auto.160",
+								"op": "sub"
+							},
+							{
+								"id": "auto.161",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.160",
+								"b": "auto.161",
+								"id": "auto.162",
+								"op": "max"
+							},
+							{
+								"id": "auto.163",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.162",
+								"b": "auto.163",
+								"id": "auto.164",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.165",
+								"num": 0,
+								"of": "auto.164",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.166",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.166",
+								"id": "auto.167",
+								"op": "sub"
+							},
+							{
+								"id": "auto.168",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.167",
+								"b": "auto.168",
+								"id": "auto.169",
+								"op": "max"
+							},
+							{
+								"id": "auto.170",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.169",
+								"b": "auto.170",
+								"id": "auto.171",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.172",
+								"num": 5,
+								"of": "auto.171",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.173",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.173",
+								"id": "auto.174",
+								"op": "sub"
+							},
+							{
+								"id": "auto.175",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.174",
+								"b": "auto.175",
+								"id": "auto.176",
+								"op": "max"
+							},
+							{
+								"id": "auto.177",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.176",
+								"b": "auto.177",
+								"id": "auto.178",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.179",
+								"num": 1,
+								"of": "auto.178",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.180",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.180",
+								"id": "auto.181",
+								"op": "sub"
+							},
+							{
+								"id": "auto.182",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.181",
+								"b": "auto.182",
+								"id": "auto.183",
+								"op": "max"
+							},
+							{
+								"id": "auto.184",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.183",
+								"b": "auto.184",
+								"id": "auto.185",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.186",
+								"num": 15,
+								"of": "auto.185",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.187",
+								"op": "const",
+								"value": 75000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.187",
+								"id": "auto.188",
+								"op": "sub"
+							},
+							{
+								"id": "auto.189",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.188",
+								"b": "auto.189",
+								"id": "auto.190",
+								"op": "max"
+							},
+							{
+								"id": "auto.191",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.190",
+								"b": "auto.191",
+								"id": "auto.192",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.193",
+								"num": 2,
+								"of": "auto.192",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.194",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.194",
+								"id": "auto.195",
+								"op": "sub"
+							},
+							{
+								"id": "auto.196",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.195",
+								"b": "auto.196",
+								"id": "auto.197",
+								"op": "max"
+							},
+							{
+								"id": "auto.198",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "auto.197",
+								"b": "auto.198",
+								"id": "auto.199",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.200",
+								"num": 25,
+								"of": "auto.199",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.201",
+								"op": "const",
+								"value": 200000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.201",
+								"id": "auto.202",
+								"op": "sub"
+							},
+							{
+								"id": "auto.203",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.202",
+								"b": "auto.203",
+								"id": "auto.204",
+								"op": "max"
+							},
+							{
+								"id": "auto.205",
+								"op": "const",
+								"value": 300000000
+							},
+							{
+								"a": "auto.204",
+								"b": "auto.205",
+								"id": "auto.206",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.207",
+								"num": 3,
+								"of": "auto.206",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.208",
+								"op": "const",
+								"value": 500000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.208",
+								"id": "auto.209",
+								"op": "sub"
+							},
+							{
+								"id": "auto.210",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.209",
+								"b": "auto.210",
+								"id": "auto.211",
+								"op": "max"
+							},
+							{
+								"den": 100,
+								"id": "auto.212",
+								"num": 35,
+								"of": "auto.211",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"a": "auto.165",
+								"b": "auto.172",
+								"id": "auto.213",
+								"op": "add"
+							},
+							{
+								"a": "auto.213",
+								"b": "auto.179",
+								"id": "auto.214",
+								"op": "add"
+							},
+							{
+								"a": "auto.214",
+								"b": "auto.186",
+								"id": "auto.215",
+								"op": "add"
+							},
+							{
+								"a": "auto.215",
+								"b": "auto.193",
+								"id": "auto.216",
+								"op": "add"
+							},
+							{
+								"a": "auto.216",
+								"b": "auto.200",
+								"id": "auto.217",
+								"op": "add"
+							},
+							{
+								"a": "auto.217",
+								"b": "auto.207",
+								"id": "auto.218",
+								"op": "add"
+							},
+							{
+								"a": "auto.218",
+								"b": "auto.212",
+								"id": "auto.219",
+								"op": "add"
+							},
+							{
+								"id": "auto.220",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.219",
+								"b": "auto.220",
+								"id": "tax.progressive",
+								"op": "add"
+							},
+							{
+								"den": 1000,
+								"id": "auto.221",
+								"num": 5,
+								"of": "assessable.non_employment",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.222",
+								"op": "const",
+								"value": 11999999
+							},
+							{
+								"id": "auto.223",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "assessable.non_employment",
+								"b": "auto.222",
+								"else": "auto.223",
+								"id": "tax.minimum",
+								"op": "pick",
+								"then": "auto.221"
+							},
+							{
+								"id": "auto.224",
+								"op": "const",
+								"value": 500000
+							},
+							{
+								"id": "auto.225",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "tax.minimum",
+								"b": "auto.224",
+								"else": "auto.225",
+								"id": "auto.226",
+								"op": "pick",
+								"then": "tax.minimum"
+							},
+							{
+								"a": "tax.progressive",
+								"b": "auto.226",
+								"id": "tax.regular",
+								"op": "max"
+							},
+							{
+								"a": "tax.regular",
+								"b": "tax.final_withholding",
+								"id": "tax.total",
+								"op": "add"
+							},
+							{
+								"a": "tax.final_withholding",
+								"b": "credit.dividend",
+								"id": "auto.227",
+								"op": "add"
+							},
+							{
+								"a": "tax.total",
+								"b": "auto.227",
+								"id": "tax.net_payable",
+								"op": "sub"
+							}
+						],
+						"period": {
+							"day": 1,
+							"month": 1
+						},
+						"settlement": {
+							"day": 31,
+							"month": 3
+						}
+					}
+				],
+				"schemaVersion": 4
+			}
+		},
+		"tax": {
+			"tax": "th-2026",
+			"filingStatus": "married_separate",
+			"children": 0,
+			"childrenAtHigherRate": 0
+		}
+	},
+	"married_separate_40_1_joint_rest": {
+		"dryRun": false,
+		"status": "unchanged",
+		"levy": "th-2026-pit",
+		"allowances": {
+			"stated": [
+				"retirementContributions"
+			],
+			"notStated": [
+				"children",
+				"parents",
+				"disabledCare",
+				"socialSecurity",
+				"lifeInsurance",
+				"healthInsurance",
+				"parentHealthInsurance",
+				"spouseLifeInsurance",
+				"mortgageInterest",
+				"donation2x",
+				"donation1x",
+				"thaiEsg"
+			]
+		},
+		"assumptions": [
+			{
+				"path": "allowances.retirementCluster.combinedCeiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Retirement allowances combined ceiling, baht."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.ceiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Provident fund ceiling, baht a year."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.maxRate",
+				"value": 0.15,
+				"status": "reported",
+				"note": "Provident fund limit, share of wages."
+			}
+		],
+		"scenario": {
+			"name": "base",
+			"contentHash": "jcs1:sha256:fb007dbfca11f5a474b37232105674bc9fa82009a2f1d0193c4d2b9916f3d47f",
+			"forkedFrom": null,
+			"document": {
+				"accounts": [
+					{
+						"id": "0194a000-0001-7000-8000-000000000001",
+						"kind": "asset",
+						"rate": 100,
+						"returnLabel": "income.section40_4.interest"
+					},
+					{
+						"id": "0194a000-0002-7000-8000-000000000002",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0004-7000-8000-000000000004",
+						"kind": "asset",
+						"rate": 500
+					},
+					{
+						"id": "0194a000-0006-7000-8000-000000000006",
+						"kind": "asset",
+						"lockedUntil": "2027-01-01",
+						"rate": 300
+					},
+					{
+						"id": "0194a000-0008-7000-8000-000000000008",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0005-7000-8000-000000000005",
+						"kind": "liability",
+						"rate": 600
+					}
+				],
+				"cashflow": {
+					"contribute": [
+						"0194a000-0004-7000-8000-000000000004"
+					],
+					"surplus": [
+						{
+							"account": "0194a000-0002-7000-8000-000000000002"
+						}
+					],
+					"withdraw": [
+						"0194a000-0002-7000-8000-000000000002"
+					]
+				},
+				"currency": "THB",
+				"economy": {
+					"inflation": 0
+				},
+				"flows": [
+					{
+						"amount": 100000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 50000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "partner-salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 3000000,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "pvd",
+						"kind": "contribution",
+						"label": "allowance.retirement.pvd",
+						"start": "2026-06-01",
+						"target": "0194a000-0004-7000-8000-000000000004"
+					}
+				],
+				"levies": [
+					{
+						"due": "tax.net_payable",
+						"id": "th-2026-pit",
+						"measures": [
+							{
+								"basis": "gross",
+								"id": "auto.0",
+								"label": "income.section40_1",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.1",
+								"label": "income.section40_2",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.2",
+								"label": "income.section40_3",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.3",
+								"label": "income.section40_4",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.4",
+								"label": "income.section40_4.interest",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.5",
+								"label": "income.section40_4.dividends",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.6",
+								"label": "income.section40_4.digitalAssets",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.7",
+								"label": "income.section40_5.building",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.8",
+								"label": "income.section40_5.agriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.9",
+								"label": "income.section40_5.nonAgriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.10",
+								"label": "income.section40_5.vehicles",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.11",
+								"label": "income.section40_5.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.12",
+								"label": "income.section40_6.medical",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.13",
+								"label": "income.section40_6.law",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.14",
+								"label": "income.section40_6.engineering",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.15",
+								"label": "income.section40_6.architecture",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.16",
+								"label": "income.section40_6.accounting",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.17",
+								"label": "income.section40_6.fineArts",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.18",
+								"label": "income.section40_6.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.19",
+								"label": "income.section40_7",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.20",
+								"label": "income.section40_8.general",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.21",
+								"label": "income.section40_8.entertainer",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.22",
+								"label": "allowance.retirement.rmf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.23",
+								"label": "allowance.retirement.ssf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.24",
+								"label": "allowance.retirement.pvd",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.25",
+								"label": "allowance.retirement.gpf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.26",
+								"label": "allowance.retirement.nsf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.27",
+								"label": "allowance.retirement.pension_life",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.28",
+								"label": "allowance.thai_esg",
+								"op": "tally"
+							},
+							{
+								"id": "credit.dividend",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.3",
+								"b": "auto.4",
+								"id": "auto.29",
+								"op": "add"
+							},
+							{
+								"a": "auto.29",
+								"b": "auto.5",
+								"id": "auto.30",
+								"op": "add"
+							},
+							{
+								"a": "auto.30",
+								"b": "auto.6",
+								"id": "auto.31",
+								"op": "add"
+							},
+							{
+								"id": "auto.32",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"id": "auto.33",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.32",
+								"b": "auto.33",
+								"id": "tax.final_withholding",
+								"op": "add"
+							},
+							{
+								"a": "auto.7",
+								"b": "auto.8",
+								"id": "auto.34",
+								"op": "add"
+							},
+							{
+								"a": "auto.34",
+								"b": "auto.9",
+								"id": "auto.35",
+								"op": "add"
+							},
+							{
+								"a": "auto.35",
+								"b": "auto.10",
+								"id": "auto.36",
+								"op": "add"
+							},
+							{
+								"a": "auto.36",
+								"b": "auto.11",
+								"id": "auto.37",
+								"op": "add"
+							},
+							{
+								"a": "auto.12",
+								"b": "auto.13",
+								"id": "auto.38",
+								"op": "add"
+							},
+							{
+								"a": "auto.38",
+								"b": "auto.14",
+								"id": "auto.39",
+								"op": "add"
+							},
+							{
+								"a": "auto.39",
+								"b": "auto.15",
+								"id": "auto.40",
+								"op": "add"
+							},
+							{
+								"a": "auto.40",
+								"b": "auto.16",
+								"id": "auto.41",
+								"op": "add"
+							},
+							{
+								"a": "auto.41",
+								"b": "auto.17",
+								"id": "auto.42",
+								"op": "add"
+							},
+							{
+								"a": "auto.42",
+								"b": "auto.18",
+								"id": "auto.43",
+								"op": "add"
+							},
+							{
+								"a": "auto.20",
+								"b": "auto.21",
+								"id": "auto.44",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.45",
+								"op": "add"
+							},
+							{
+								"a": "auto.45",
+								"b": "auto.2",
+								"id": "auto.46",
+								"op": "add"
+							},
+							{
+								"a": "auto.46",
+								"b": "auto.31",
+								"id": "auto.47",
+								"op": "add"
+							},
+							{
+								"a": "auto.47",
+								"b": "auto.37",
+								"id": "auto.48",
+								"op": "add"
+							},
+							{
+								"a": "auto.48",
+								"b": "auto.43",
+								"id": "auto.49",
+								"op": "add"
+							},
+							{
+								"a": "auto.49",
+								"b": "auto.19",
+								"id": "auto.50",
+								"op": "add"
+							},
+							{
+								"a": "auto.50",
+								"b": "auto.44",
+								"id": "auto.51",
+								"op": "add"
+							},
+							{
+								"id": "auto.52",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.51",
+								"b": "auto.52",
+								"id": "assessable.total",
+								"op": "add"
+							},
+							{
+								"a": "auto.1",
+								"b": "auto.2",
+								"id": "auto.53",
+								"op": "add"
+							},
+							{
+								"a": "auto.53",
+								"b": "auto.31",
+								"id": "auto.54",
+								"op": "add"
+							},
+							{
+								"a": "auto.54",
+								"b": "auto.37",
+								"id": "auto.55",
+								"op": "add"
+							},
+							{
+								"a": "auto.55",
+								"b": "auto.43",
+								"id": "auto.56",
+								"op": "add"
+							},
+							{
+								"a": "auto.56",
+								"b": "auto.19",
+								"id": "auto.57",
+								"op": "add"
+							},
+							{
+								"a": "auto.57",
+								"b": "auto.44",
+								"id": "auto.58",
+								"op": "add"
+							},
+							{
+								"id": "auto.59",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.58",
+								"b": "auto.59",
+								"id": "assessable.non_employment",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.60",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.61",
+								"num": 5,
+								"of": "auto.60",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.62",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.61",
+								"b": "auto.62",
+								"id": "auto.63",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.64",
+								"num": 5,
+								"of": "auto.2",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.65",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.64",
+								"b": "auto.65",
+								"id": "auto.66",
+								"op": "min"
+							},
+							{
+								"id": "auto.67",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"den": 10,
+								"id": "auto.68",
+								"num": 3,
+								"of": "auto.7",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.69",
+								"num": 2,
+								"of": "auto.8",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 100,
+								"id": "auto.70",
+								"num": 15,
+								"of": "auto.9",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.71",
+								"num": 3,
+								"of": "auto.10",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.72",
+								"num": 1,
+								"of": "auto.11",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.68",
+								"b": "auto.69",
+								"id": "auto.73",
+								"op": "add"
+							},
+							{
+								"a": "auto.73",
+								"b": "auto.70",
+								"id": "auto.74",
+								"op": "add"
+							},
+							{
+								"a": "auto.74",
+								"b": "auto.71",
+								"id": "auto.75",
+								"op": "add"
+							},
+							{
+								"a": "auto.75",
+								"b": "auto.72",
+								"id": "auto.76",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.77",
+								"num": 6,
+								"of": "auto.12",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.78",
+								"num": 3,
+								"of": "auto.13",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.79",
+								"num": 3,
+								"of": "auto.14",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.80",
+								"num": 3,
+								"of": "auto.15",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.81",
+								"num": 3,
+								"of": "auto.16",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.82",
+								"num": 3,
+								"of": "auto.17",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.83",
+								"num": 3,
+								"of": "auto.18",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.77",
+								"b": "auto.78",
+								"id": "auto.84",
+								"op": "add"
+							},
+							{
+								"a": "auto.84",
+								"b": "auto.79",
+								"id": "auto.85",
+								"op": "add"
+							},
+							{
+								"a": "auto.85",
+								"b": "auto.80",
+								"id": "auto.86",
+								"op": "add"
+							},
+							{
+								"a": "auto.86",
+								"b": "auto.81",
+								"id": "auto.87",
+								"op": "add"
+							},
+							{
+								"a": "auto.87",
+								"b": "auto.82",
+								"id": "auto.88",
+								"op": "add"
+							},
+							{
+								"a": "auto.88",
+								"b": "auto.83",
+								"id": "auto.89",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.90",
+								"num": 6,
+								"of": "auto.19",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.91",
+								"num": 6,
+								"of": "auto.20",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.92",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.92",
+								"id": "auto.93",
+								"op": "min"
+							},
+							{
+								"id": "auto.94",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.94",
+								"id": "auto.95",
+								"op": "sub"
+							},
+							{
+								"id": "auto.96",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.95",
+								"b": "auto.96",
+								"id": "auto.97",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.98",
+								"num": 6,
+								"of": "auto.93",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.99",
+								"num": 4,
+								"of": "auto.97",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.98",
+								"b": "auto.99",
+								"id": "auto.100",
+								"op": "add"
+							},
+							{
+								"id": "auto.101",
+								"op": "const",
+								"value": 60000000
+							},
+							{
+								"a": "auto.100",
+								"b": "auto.101",
+								"id": "auto.102",
+								"op": "min"
+							},
+							{
+								"a": "auto.91",
+								"b": "auto.102",
+								"id": "auto.103",
+								"op": "add"
+							},
+							{
+								"a": "auto.63",
+								"b": "auto.66",
+								"id": "auto.104",
+								"op": "add"
+							},
+							{
+								"a": "auto.104",
+								"b": "auto.67",
+								"id": "auto.105",
+								"op": "add"
+							},
+							{
+								"a": "auto.105",
+								"b": "auto.76",
+								"id": "auto.106",
+								"op": "add"
+							},
+							{
+								"a": "auto.106",
+								"b": "auto.89",
+								"id": "auto.107",
+								"op": "add"
+							},
+							{
+								"a": "auto.107",
+								"b": "auto.90",
+								"id": "auto.108",
+								"op": "add"
+							},
+							{
+								"a": "auto.108",
+								"b": "auto.103",
+								"id": "auto.109",
+								"op": "add"
+							},
+							{
+								"id": "auto.110",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.109",
+								"b": "auto.110",
+								"id": "expenses.total",
+								"op": "add"
+							},
+							{
+								"id": "allowances.fixed",
+								"op": "const",
+								"value": 6000000
+							},
+							{
+								"den": 10,
+								"id": "auto.111",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.112",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.111",
+								"b": "auto.112",
+								"id": "auto.113",
+								"op": "min"
+							},
+							{
+								"a": "auto.22",
+								"b": "auto.113",
+								"id": "auto.114",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.115",
+								"num": 0,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.116",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.115",
+								"b": "auto.116",
+								"id": "auto.117",
+								"op": "min"
+							},
+							{
+								"a": "auto.23",
+								"b": "auto.117",
+								"id": "auto.118",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.119",
+								"num": 15,
+								"of": "auto.0",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.120",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.119",
+								"b": "auto.120",
+								"id": "auto.121",
+								"op": "min"
+							},
+							{
+								"a": "auto.24",
+								"b": "auto.121",
+								"id": "auto.122",
+								"op": "min"
+							},
+							{
+								"id": "auto.123",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.25",
+								"b": "auto.123",
+								"id": "auto.124",
+								"op": "min"
+							},
+							{
+								"id": "auto.125",
+								"op": "const",
+								"value": 3000000
+							},
+							{
+								"a": "auto.26",
+								"b": "auto.125",
+								"id": "auto.126",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.127",
+								"num": 15,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.128",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.127",
+								"b": "auto.128",
+								"id": "auto.129",
+								"op": "min"
+							},
+							{
+								"a": "auto.27",
+								"b": "auto.129",
+								"id": "auto.130",
+								"op": "min"
+							},
+							{
+								"a": "auto.114",
+								"b": "auto.118",
+								"id": "auto.131",
+								"op": "add"
+							},
+							{
+								"a": "auto.131",
+								"b": "auto.122",
+								"id": "auto.132",
+								"op": "add"
+							},
+							{
+								"a": "auto.132",
+								"b": "auto.124",
+								"id": "auto.133",
+								"op": "add"
+							},
+							{
+								"a": "auto.133",
+								"b": "auto.126",
+								"id": "auto.134",
+								"op": "add"
+							},
+							{
+								"a": "auto.134",
+								"b": "auto.130",
+								"id": "auto.135",
+								"op": "add"
+							},
+							{
+								"id": "auto.136",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.135",
+								"b": "auto.136",
+								"id": "allowances.retirement_cluster",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.137",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.138",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.137",
+								"b": "auto.138",
+								"id": "auto.139",
+								"op": "min"
+							},
+							{
+								"a": "auto.28",
+								"b": "auto.139",
+								"id": "allowances.thai_esg",
+								"op": "min"
+							},
+							{
+								"a": "allowances.fixed",
+								"b": "allowances.retirement_cluster",
+								"id": "auto.140",
+								"op": "add"
+							},
+							{
+								"a": "auto.140",
+								"b": "allowances.thai_esg",
+								"id": "auto.141",
+								"op": "add"
+							},
+							{
+								"a": "assessable.total",
+								"b": "expenses.total",
+								"id": "auto.142",
+								"op": "sub"
+							},
+							{
+								"a": "auto.142",
+								"b": "auto.141",
+								"id": "auto.143",
+								"op": "sub"
+							},
+							{
+								"id": "auto.144",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.143",
+								"b": "auto.144",
+								"id": "auto.145",
+								"op": "max"
+							},
+							{
+								"id": "auto.146",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.145",
+								"b": "auto.146",
+								"id": "auto.147",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.148",
+								"num": 1,
+								"of": "auto.147",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.149",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.149",
+								"b": "auto.148",
+								"id": "auto.150",
+								"op": "min"
+							},
+							{
+								"a": "auto.147",
+								"b": "auto.150",
+								"id": "auto.151",
+								"op": "sub"
+							},
+							{
+								"id": "auto.152",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.151",
+								"b": "auto.152",
+								"id": "auto.153",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.154",
+								"num": 1,
+								"of": "auto.153",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.155",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.155",
+								"b": "auto.154",
+								"id": "auto.156",
+								"op": "min"
+							},
+							{
+								"a": "auto.150",
+								"b": "auto.156",
+								"id": "allowances.donations",
+								"op": "add"
+							},
+							{
+								"a": "auto.153",
+								"b": "auto.156",
+								"id": "auto.157",
+								"op": "sub"
+							},
+							{
+								"id": "auto.158",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.157",
+								"b": "auto.158",
+								"id": "taxable.income",
+								"op": "max"
+							},
+							{
+								"a": "auto.141",
+								"b": "allowances.donations",
+								"id": "allowances.total",
+								"op": "add"
+							},
+							{
+								"id": "auto.159",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.159",
+								"id": "auto.160",
+								"op": "sub"
+							},
+							{
+								"id": "auto.161",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.160",
+								"b": "auto.161",
+								"id": "auto.162",
+								"op": "max"
+							},
+							{
+								"id": "auto.163",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.162",
+								"b": "auto.163",
+								"id": "auto.164",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.165",
+								"num": 0,
+								"of": "auto.164",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.166",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.166",
+								"id": "auto.167",
+								"op": "sub"
+							},
+							{
+								"id": "auto.168",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.167",
+								"b": "auto.168",
+								"id": "auto.169",
+								"op": "max"
+							},
+							{
+								"id": "auto.170",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.169",
+								"b": "auto.170",
+								"id": "auto.171",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.172",
+								"num": 5,
+								"of": "auto.171",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.173",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.173",
+								"id": "auto.174",
+								"op": "sub"
+							},
+							{
+								"id": "auto.175",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.174",
+								"b": "auto.175",
+								"id": "auto.176",
+								"op": "max"
+							},
+							{
+								"id": "auto.177",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.176",
+								"b": "auto.177",
+								"id": "auto.178",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.179",
+								"num": 1,
+								"of": "auto.178",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.180",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.180",
+								"id": "auto.181",
+								"op": "sub"
+							},
+							{
+								"id": "auto.182",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.181",
+								"b": "auto.182",
+								"id": "auto.183",
+								"op": "max"
+							},
+							{
+								"id": "auto.184",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.183",
+								"b": "auto.184",
+								"id": "auto.185",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.186",
+								"num": 15,
+								"of": "auto.185",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.187",
+								"op": "const",
+								"value": 75000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.187",
+								"id": "auto.188",
+								"op": "sub"
+							},
+							{
+								"id": "auto.189",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.188",
+								"b": "auto.189",
+								"id": "auto.190",
+								"op": "max"
+							},
+							{
+								"id": "auto.191",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.190",
+								"b": "auto.191",
+								"id": "auto.192",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.193",
+								"num": 2,
+								"of": "auto.192",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.194",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.194",
+								"id": "auto.195",
+								"op": "sub"
+							},
+							{
+								"id": "auto.196",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.195",
+								"b": "auto.196",
+								"id": "auto.197",
+								"op": "max"
+							},
+							{
+								"id": "auto.198",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "auto.197",
+								"b": "auto.198",
+								"id": "auto.199",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.200",
+								"num": 25,
+								"of": "auto.199",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.201",
+								"op": "const",
+								"value": 200000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.201",
+								"id": "auto.202",
+								"op": "sub"
+							},
+							{
+								"id": "auto.203",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.202",
+								"b": "auto.203",
+								"id": "auto.204",
+								"op": "max"
+							},
+							{
+								"id": "auto.205",
+								"op": "const",
+								"value": 300000000
+							},
+							{
+								"a": "auto.204",
+								"b": "auto.205",
+								"id": "auto.206",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.207",
+								"num": 3,
+								"of": "auto.206",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.208",
+								"op": "const",
+								"value": 500000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.208",
+								"id": "auto.209",
+								"op": "sub"
+							},
+							{
+								"id": "auto.210",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.209",
+								"b": "auto.210",
+								"id": "auto.211",
+								"op": "max"
+							},
+							{
+								"den": 100,
+								"id": "auto.212",
+								"num": 35,
+								"of": "auto.211",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"a": "auto.165",
+								"b": "auto.172",
+								"id": "auto.213",
+								"op": "add"
+							},
+							{
+								"a": "auto.213",
+								"b": "auto.179",
+								"id": "auto.214",
+								"op": "add"
+							},
+							{
+								"a": "auto.214",
+								"b": "auto.186",
+								"id": "auto.215",
+								"op": "add"
+							},
+							{
+								"a": "auto.215",
+								"b": "auto.193",
+								"id": "auto.216",
+								"op": "add"
+							},
+							{
+								"a": "auto.216",
+								"b": "auto.200",
+								"id": "auto.217",
+								"op": "add"
+							},
+							{
+								"a": "auto.217",
+								"b": "auto.207",
+								"id": "auto.218",
+								"op": "add"
+							},
+							{
+								"a": "auto.218",
+								"b": "auto.212",
+								"id": "auto.219",
+								"op": "add"
+							},
+							{
+								"id": "auto.220",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.219",
+								"b": "auto.220",
+								"id": "tax.progressive",
+								"op": "add"
+							},
+							{
+								"den": 1000,
+								"id": "auto.221",
+								"num": 5,
+								"of": "assessable.non_employment",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.222",
+								"op": "const",
+								"value": 11999999
+							},
+							{
+								"id": "auto.223",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "assessable.non_employment",
+								"b": "auto.222",
+								"else": "auto.223",
+								"id": "tax.minimum",
+								"op": "pick",
+								"then": "auto.221"
+							},
+							{
+								"id": "auto.224",
+								"op": "const",
+								"value": 500000
+							},
+							{
+								"id": "auto.225",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "tax.minimum",
+								"b": "auto.224",
+								"else": "auto.225",
+								"id": "auto.226",
+								"op": "pick",
+								"then": "tax.minimum"
+							},
+							{
+								"a": "tax.progressive",
+								"b": "auto.226",
+								"id": "tax.regular",
+								"op": "max"
+							},
+							{
+								"a": "tax.regular",
+								"b": "tax.final_withholding",
+								"id": "tax.total",
+								"op": "add"
+							},
+							{
+								"a": "tax.final_withholding",
+								"b": "credit.dividend",
+								"id": "auto.227",
+								"op": "add"
+							},
+							{
+								"a": "tax.total",
+								"b": "auto.227",
+								"id": "tax.net_payable",
+								"op": "sub"
+							}
+						],
+						"period": {
+							"day": 1,
+							"month": 1
+						},
+						"settlement": {
+							"day": 31,
+							"month": 3
+						}
+					}
+				],
+				"schemaVersion": 4
+			}
+		},
+		"tax": {
+			"tax": "th-2026",
+			"filingStatus": "married_separate_40_1_joint_rest",
+			"children": 0,
+			"childrenAtHigherRate": 0
+		}
+	},
+	"married_joint": {
+		"dryRun": false,
+		"status": "unchanged",
+		"levy": "th-2026-pit",
+		"allowances": {
+			"stated": [
+				"retirementContributions"
+			],
+			"notStated": [
+				"children",
+				"parents",
+				"disabledCare",
+				"socialSecurity",
+				"lifeInsurance",
+				"healthInsurance",
+				"parentHealthInsurance",
+				"spouseLifeInsurance",
+				"mortgageInterest",
+				"donation2x",
+				"donation1x",
+				"thaiEsg"
+			]
+		},
+		"assumptions": [
+			{
+				"path": "allowances.retirementCluster.combinedCeiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Retirement allowances combined ceiling, baht."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.ceiling",
+				"value": 500000,
+				"status": "reported",
+				"note": "Provident fund ceiling, baht a year."
+			},
+			{
+				"path": "allowances.retirementCluster.pvd.maxRate",
+				"value": 0.15,
+				"status": "reported",
+				"note": "Provident fund limit, share of wages."
+			}
+		],
+		"scenario": {
+			"name": "base",
+			"contentHash": "jcs1:sha256:caa58c368e4e2ebd31e8f6793257b03995f34c97bba053aa65ed798c71719e58",
+			"forkedFrom": null,
+			"document": {
+				"accounts": [
+					{
+						"id": "0194a000-0001-7000-8000-000000000001",
+						"kind": "asset",
+						"rate": 100,
+						"returnLabel": "income.section40_4.interest"
+					},
+					{
+						"id": "0194a000-0002-7000-8000-000000000002",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0004-7000-8000-000000000004",
+						"kind": "asset",
+						"rate": 500
+					},
+					{
+						"id": "0194a000-0006-7000-8000-000000000006",
+						"kind": "asset",
+						"lockedUntil": "2027-01-01",
+						"rate": 300
+					},
+					{
+						"id": "0194a000-0008-7000-8000-000000000008",
+						"kind": "asset",
+						"rate": 0
+					},
+					{
+						"id": "0194a000-0005-7000-8000-000000000005",
+						"kind": "liability",
+						"rate": 600
+					}
+				],
+				"cashflow": {
+					"contribute": [
+						"0194a000-0004-7000-8000-000000000004"
+					],
+					"surplus": [
+						{
+							"account": "0194a000-0002-7000-8000-000000000002"
+						}
+					],
+					"withdraw": [
+						"0194a000-0002-7000-8000-000000000002"
+					]
+				},
+				"currency": "THB",
+				"economy": {
+					"inflation": 0
+				},
+				"flows": [
+					{
+						"amount": 100000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 50000000,
+						"earned": true,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "partner-salary",
+						"kind": "income",
+						"label": "income.section40_1",
+						"start": "2026-01-01"
+					},
+					{
+						"amount": 3000000,
+						"end": "2026-12-31",
+						"frequency": "annual",
+						"growth": {
+							"bps": 0
+						},
+						"id": "pvd",
+						"kind": "contribution",
+						"label": "allowance.retirement.pvd",
+						"start": "2026-06-01",
+						"target": "0194a000-0004-7000-8000-000000000004"
+					}
+				],
+				"levies": [
+					{
+						"due": "tax.net_payable",
+						"id": "th-2026-pit",
+						"measures": [
+							{
+								"basis": "gross",
+								"id": "auto.0",
+								"label": "income.section40_1",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.1",
+								"label": "income.section40_2",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.2",
+								"label": "income.section40_3",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.3",
+								"label": "income.section40_4",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.4",
+								"label": "income.section40_4.interest",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.5",
+								"label": "income.section40_4.dividends",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.6",
+								"label": "income.section40_4.digitalAssets",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.7",
+								"label": "income.section40_5.building",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.8",
+								"label": "income.section40_5.agriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.9",
+								"label": "income.section40_5.nonAgriculturalLand",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.10",
+								"label": "income.section40_5.vehicles",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.11",
+								"label": "income.section40_5.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.12",
+								"label": "income.section40_6.medical",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.13",
+								"label": "income.section40_6.law",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.14",
+								"label": "income.section40_6.engineering",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.15",
+								"label": "income.section40_6.architecture",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.16",
+								"label": "income.section40_6.accounting",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.17",
+								"label": "income.section40_6.fineArts",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.18",
+								"label": "income.section40_6.other",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.19",
+								"label": "income.section40_7",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.20",
+								"label": "income.section40_8.general",
+								"op": "tally"
+							},
+							{
+								"basis": "gross",
+								"id": "auto.21",
+								"label": "income.section40_8.entertainer",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.22",
+								"label": "allowance.retirement.rmf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.23",
+								"label": "allowance.retirement.ssf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.24",
+								"label": "allowance.retirement.pvd",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.25",
+								"label": "allowance.retirement.gpf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.26",
+								"label": "allowance.retirement.nsf",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.27",
+								"label": "allowance.retirement.pension_life",
+								"op": "tally"
+							},
+							{
+								"basis": "funded",
+								"id": "auto.28",
+								"label": "allowance.thai_esg",
+								"op": "tally"
+							},
+							{
+								"id": "credit.dividend",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.3",
+								"b": "auto.4",
+								"id": "auto.29",
+								"op": "add"
+							},
+							{
+								"a": "auto.29",
+								"b": "auto.5",
+								"id": "auto.30",
+								"op": "add"
+							},
+							{
+								"a": "auto.30",
+								"b": "auto.6",
+								"id": "auto.31",
+								"op": "add"
+							},
+							{
+								"id": "auto.32",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"id": "auto.33",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.32",
+								"b": "auto.33",
+								"id": "tax.final_withholding",
+								"op": "add"
+							},
+							{
+								"a": "auto.7",
+								"b": "auto.8",
+								"id": "auto.34",
+								"op": "add"
+							},
+							{
+								"a": "auto.34",
+								"b": "auto.9",
+								"id": "auto.35",
+								"op": "add"
+							},
+							{
+								"a": "auto.35",
+								"b": "auto.10",
+								"id": "auto.36",
+								"op": "add"
+							},
+							{
+								"a": "auto.36",
+								"b": "auto.11",
+								"id": "auto.37",
+								"op": "add"
+							},
+							{
+								"a": "auto.12",
+								"b": "auto.13",
+								"id": "auto.38",
+								"op": "add"
+							},
+							{
+								"a": "auto.38",
+								"b": "auto.14",
+								"id": "auto.39",
+								"op": "add"
+							},
+							{
+								"a": "auto.39",
+								"b": "auto.15",
+								"id": "auto.40",
+								"op": "add"
+							},
+							{
+								"a": "auto.40",
+								"b": "auto.16",
+								"id": "auto.41",
+								"op": "add"
+							},
+							{
+								"a": "auto.41",
+								"b": "auto.17",
+								"id": "auto.42",
+								"op": "add"
+							},
+							{
+								"a": "auto.42",
+								"b": "auto.18",
+								"id": "auto.43",
+								"op": "add"
+							},
+							{
+								"a": "auto.20",
+								"b": "auto.21",
+								"id": "auto.44",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.45",
+								"op": "add"
+							},
+							{
+								"a": "auto.45",
+								"b": "auto.2",
+								"id": "auto.46",
+								"op": "add"
+							},
+							{
+								"a": "auto.46",
+								"b": "auto.31",
+								"id": "auto.47",
+								"op": "add"
+							},
+							{
+								"a": "auto.47",
+								"b": "auto.37",
+								"id": "auto.48",
+								"op": "add"
+							},
+							{
+								"a": "auto.48",
+								"b": "auto.43",
+								"id": "auto.49",
+								"op": "add"
+							},
+							{
+								"a": "auto.49",
+								"b": "auto.19",
+								"id": "auto.50",
+								"op": "add"
+							},
+							{
+								"a": "auto.50",
+								"b": "auto.44",
+								"id": "auto.51",
+								"op": "add"
+							},
+							{
+								"id": "auto.52",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.51",
+								"b": "auto.52",
+								"id": "assessable.total",
+								"op": "add"
+							},
+							{
+								"a": "auto.1",
+								"b": "auto.2",
+								"id": "auto.53",
+								"op": "add"
+							},
+							{
+								"a": "auto.53",
+								"b": "auto.31",
+								"id": "auto.54",
+								"op": "add"
+							},
+							{
+								"a": "auto.54",
+								"b": "auto.37",
+								"id": "auto.55",
+								"op": "add"
+							},
+							{
+								"a": "auto.55",
+								"b": "auto.43",
+								"id": "auto.56",
+								"op": "add"
+							},
+							{
+								"a": "auto.56",
+								"b": "auto.19",
+								"id": "auto.57",
+								"op": "add"
+							},
+							{
+								"a": "auto.57",
+								"b": "auto.44",
+								"id": "auto.58",
+								"op": "add"
+							},
+							{
+								"id": "auto.59",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.58",
+								"b": "auto.59",
+								"id": "assessable.non_employment",
+								"op": "add"
+							},
+							{
+								"a": "auto.0",
+								"b": "auto.1",
+								"id": "auto.60",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.61",
+								"num": 5,
+								"of": "auto.60",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.62",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.61",
+								"b": "auto.62",
+								"id": "auto.63",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.64",
+								"num": 5,
+								"of": "auto.2",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.65",
+								"op": "const",
+								"value": 10000000
+							},
+							{
+								"a": "auto.64",
+								"b": "auto.65",
+								"id": "auto.66",
+								"op": "min"
+							},
+							{
+								"id": "auto.67",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"den": 10,
+								"id": "auto.68",
+								"num": 3,
+								"of": "auto.7",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.69",
+								"num": 2,
+								"of": "auto.8",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 100,
+								"id": "auto.70",
+								"num": 15,
+								"of": "auto.9",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.71",
+								"num": 3,
+								"of": "auto.10",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.72",
+								"num": 1,
+								"of": "auto.11",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.68",
+								"b": "auto.69",
+								"id": "auto.73",
+								"op": "add"
+							},
+							{
+								"a": "auto.73",
+								"b": "auto.70",
+								"id": "auto.74",
+								"op": "add"
+							},
+							{
+								"a": "auto.74",
+								"b": "auto.71",
+								"id": "auto.75",
+								"op": "add"
+							},
+							{
+								"a": "auto.75",
+								"b": "auto.72",
+								"id": "auto.76",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.77",
+								"num": 6,
+								"of": "auto.12",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.78",
+								"num": 3,
+								"of": "auto.13",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.79",
+								"num": 3,
+								"of": "auto.14",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.80",
+								"num": 3,
+								"of": "auto.15",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.81",
+								"num": 3,
+								"of": "auto.16",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.82",
+								"num": 3,
+								"of": "auto.17",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.83",
+								"num": 3,
+								"of": "auto.18",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.77",
+								"b": "auto.78",
+								"id": "auto.84",
+								"op": "add"
+							},
+							{
+								"a": "auto.84",
+								"b": "auto.79",
+								"id": "auto.85",
+								"op": "add"
+							},
+							{
+								"a": "auto.85",
+								"b": "auto.80",
+								"id": "auto.86",
+								"op": "add"
+							},
+							{
+								"a": "auto.86",
+								"b": "auto.81",
+								"id": "auto.87",
+								"op": "add"
+							},
+							{
+								"a": "auto.87",
+								"b": "auto.82",
+								"id": "auto.88",
+								"op": "add"
+							},
+							{
+								"a": "auto.88",
+								"b": "auto.83",
+								"id": "auto.89",
+								"op": "add"
+							},
+							{
+								"den": 10,
+								"id": "auto.90",
+								"num": 6,
+								"of": "auto.19",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.91",
+								"num": 6,
+								"of": "auto.20",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.92",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.92",
+								"id": "auto.93",
+								"op": "min"
+							},
+							{
+								"id": "auto.94",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.21",
+								"b": "auto.94",
+								"id": "auto.95",
+								"op": "sub"
+							},
+							{
+								"id": "auto.96",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.95",
+								"b": "auto.96",
+								"id": "auto.97",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.98",
+								"num": 6,
+								"of": "auto.93",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"den": 10,
+								"id": "auto.99",
+								"num": 4,
+								"of": "auto.97",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"a": "auto.98",
+								"b": "auto.99",
+								"id": "auto.100",
+								"op": "add"
+							},
+							{
+								"id": "auto.101",
+								"op": "const",
+								"value": 60000000
+							},
+							{
+								"a": "auto.100",
+								"b": "auto.101",
+								"id": "auto.102",
+								"op": "min"
+							},
+							{
+								"a": "auto.91",
+								"b": "auto.102",
+								"id": "auto.103",
+								"op": "add"
+							},
+							{
+								"a": "auto.63",
+								"b": "auto.66",
+								"id": "auto.104",
+								"op": "add"
+							},
+							{
+								"a": "auto.104",
+								"b": "auto.67",
+								"id": "auto.105",
+								"op": "add"
+							},
+							{
+								"a": "auto.105",
+								"b": "auto.76",
+								"id": "auto.106",
+								"op": "add"
+							},
+							{
+								"a": "auto.106",
+								"b": "auto.89",
+								"id": "auto.107",
+								"op": "add"
+							},
+							{
+								"a": "auto.107",
+								"b": "auto.90",
+								"id": "auto.108",
+								"op": "add"
+							},
+							{
+								"a": "auto.108",
+								"b": "auto.103",
+								"id": "auto.109",
+								"op": "add"
+							},
+							{
+								"id": "auto.110",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.109",
+								"b": "auto.110",
+								"id": "expenses.total",
+								"op": "add"
+							},
+							{
+								"id": "allowances.fixed",
+								"op": "const",
+								"value": 12000000
+							},
+							{
+								"den": 10,
+								"id": "auto.111",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.112",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.111",
+								"b": "auto.112",
+								"id": "auto.113",
+								"op": "min"
+							},
+							{
+								"a": "auto.22",
+								"b": "auto.113",
+								"id": "auto.114",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.115",
+								"num": 0,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.116",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.115",
+								"b": "auto.116",
+								"id": "auto.117",
+								"op": "min"
+							},
+							{
+								"a": "auto.23",
+								"b": "auto.117",
+								"id": "auto.118",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.119",
+								"num": 15,
+								"of": "auto.0",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.120",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.119",
+								"b": "auto.120",
+								"id": "auto.121",
+								"op": "min"
+							},
+							{
+								"a": "auto.24",
+								"b": "auto.121",
+								"id": "auto.122",
+								"op": "min"
+							},
+							{
+								"id": "auto.123",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.25",
+								"b": "auto.123",
+								"id": "auto.124",
+								"op": "min"
+							},
+							{
+								"id": "auto.125",
+								"op": "const",
+								"value": 3000000
+							},
+							{
+								"a": "auto.26",
+								"b": "auto.125",
+								"id": "auto.126",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.127",
+								"num": 15,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.128",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.127",
+								"b": "auto.128",
+								"id": "auto.129",
+								"op": "min"
+							},
+							{
+								"a": "auto.27",
+								"b": "auto.129",
+								"id": "auto.130",
+								"op": "min"
+							},
+							{
+								"a": "auto.114",
+								"b": "auto.118",
+								"id": "auto.131",
+								"op": "add"
+							},
+							{
+								"a": "auto.131",
+								"b": "auto.122",
+								"id": "auto.132",
+								"op": "add"
+							},
+							{
+								"a": "auto.132",
+								"b": "auto.124",
+								"id": "auto.133",
+								"op": "add"
+							},
+							{
+								"a": "auto.133",
+								"b": "auto.126",
+								"id": "auto.134",
+								"op": "add"
+							},
+							{
+								"a": "auto.134",
+								"b": "auto.130",
+								"id": "auto.135",
+								"op": "add"
+							},
+							{
+								"id": "auto.136",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "auto.135",
+								"b": "auto.136",
+								"id": "allowances.retirement_cluster",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.137",
+								"num": 3,
+								"of": "assessable.total",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.138",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "auto.137",
+								"b": "auto.138",
+								"id": "auto.139",
+								"op": "min"
+							},
+							{
+								"a": "auto.28",
+								"b": "auto.139",
+								"id": "allowances.thai_esg",
+								"op": "min"
+							},
+							{
+								"a": "allowances.fixed",
+								"b": "allowances.retirement_cluster",
+								"id": "auto.140",
+								"op": "add"
+							},
+							{
+								"a": "auto.140",
+								"b": "allowances.thai_esg",
+								"id": "auto.141",
+								"op": "add"
+							},
+							{
+								"a": "assessable.total",
+								"b": "expenses.total",
+								"id": "auto.142",
+								"op": "sub"
+							},
+							{
+								"a": "auto.142",
+								"b": "auto.141",
+								"id": "auto.143",
+								"op": "sub"
+							},
+							{
+								"id": "auto.144",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.143",
+								"b": "auto.144",
+								"id": "auto.145",
+								"op": "max"
+							},
+							{
+								"id": "auto.146",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.145",
+								"b": "auto.146",
+								"id": "auto.147",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.148",
+								"num": 1,
+								"of": "auto.147",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.149",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.149",
+								"b": "auto.148",
+								"id": "auto.150",
+								"op": "min"
+							},
+							{
+								"a": "auto.147",
+								"b": "auto.150",
+								"id": "auto.151",
+								"op": "sub"
+							},
+							{
+								"id": "auto.152",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.151",
+								"b": "auto.152",
+								"id": "auto.153",
+								"op": "max"
+							},
+							{
+								"den": 10,
+								"id": "auto.154",
+								"num": 1,
+								"of": "auto.153",
+								"op": "scale",
+								"rounding": "floor"
+							},
+							{
+								"id": "auto.155",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.155",
+								"b": "auto.154",
+								"id": "auto.156",
+								"op": "min"
+							},
+							{
+								"a": "auto.150",
+								"b": "auto.156",
+								"id": "allowances.donations",
+								"op": "add"
+							},
+							{
+								"a": "auto.153",
+								"b": "auto.156",
+								"id": "auto.157",
+								"op": "sub"
+							},
+							{
+								"id": "auto.158",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.157",
+								"b": "auto.158",
+								"id": "taxable.income",
+								"op": "max"
+							},
+							{
+								"a": "auto.141",
+								"b": "allowances.donations",
+								"id": "allowances.total",
+								"op": "add"
+							},
+							{
+								"id": "auto.159",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.159",
+								"id": "auto.160",
+								"op": "sub"
+							},
+							{
+								"id": "auto.161",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.160",
+								"b": "auto.161",
+								"id": "auto.162",
+								"op": "max"
+							},
+							{
+								"id": "auto.163",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.162",
+								"b": "auto.163",
+								"id": "auto.164",
+								"op": "min"
+							},
+							{
+								"den": 1,
+								"id": "auto.165",
+								"num": 0,
+								"of": "auto.164",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.166",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.166",
+								"id": "auto.167",
+								"op": "sub"
+							},
+							{
+								"id": "auto.168",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.167",
+								"b": "auto.168",
+								"id": "auto.169",
+								"op": "max"
+							},
+							{
+								"id": "auto.170",
+								"op": "const",
+								"value": 15000000
+							},
+							{
+								"a": "auto.169",
+								"b": "auto.170",
+								"id": "auto.171",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.172",
+								"num": 5,
+								"of": "auto.171",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.173",
+								"op": "const",
+								"value": 30000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.173",
+								"id": "auto.174",
+								"op": "sub"
+							},
+							{
+								"id": "auto.175",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.174",
+								"b": "auto.175",
+								"id": "auto.176",
+								"op": "max"
+							},
+							{
+								"id": "auto.177",
+								"op": "const",
+								"value": 20000000
+							},
+							{
+								"a": "auto.176",
+								"b": "auto.177",
+								"id": "auto.178",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.179",
+								"num": 1,
+								"of": "auto.178",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.180",
+								"op": "const",
+								"value": 50000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.180",
+								"id": "auto.181",
+								"op": "sub"
+							},
+							{
+								"id": "auto.182",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.181",
+								"b": "auto.182",
+								"id": "auto.183",
+								"op": "max"
+							},
+							{
+								"id": "auto.184",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.183",
+								"b": "auto.184",
+								"id": "auto.185",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.186",
+								"num": 15,
+								"of": "auto.185",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.187",
+								"op": "const",
+								"value": 75000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.187",
+								"id": "auto.188",
+								"op": "sub"
+							},
+							{
+								"id": "auto.189",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.188",
+								"b": "auto.189",
+								"id": "auto.190",
+								"op": "max"
+							},
+							{
+								"id": "auto.191",
+								"op": "const",
+								"value": 25000000
+							},
+							{
+								"a": "auto.190",
+								"b": "auto.191",
+								"id": "auto.192",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.193",
+								"num": 2,
+								"of": "auto.192",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.194",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.194",
+								"id": "auto.195",
+								"op": "sub"
+							},
+							{
+								"id": "auto.196",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.195",
+								"b": "auto.196",
+								"id": "auto.197",
+								"op": "max"
+							},
+							{
+								"id": "auto.198",
+								"op": "const",
+								"value": 100000000
+							},
+							{
+								"a": "auto.197",
+								"b": "auto.198",
+								"id": "auto.199",
+								"op": "min"
+							},
+							{
+								"den": 100,
+								"id": "auto.200",
+								"num": 25,
+								"of": "auto.199",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.201",
+								"op": "const",
+								"value": 200000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.201",
+								"id": "auto.202",
+								"op": "sub"
+							},
+							{
+								"id": "auto.203",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.202",
+								"b": "auto.203",
+								"id": "auto.204",
+								"op": "max"
+							},
+							{
+								"id": "auto.205",
+								"op": "const",
+								"value": 300000000
+							},
+							{
+								"a": "auto.204",
+								"b": "auto.205",
+								"id": "auto.206",
+								"op": "min"
+							},
+							{
+								"den": 10,
+								"id": "auto.207",
+								"num": 3,
+								"of": "auto.206",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.208",
+								"op": "const",
+								"value": 500000000
+							},
+							{
+								"a": "taxable.income",
+								"b": "auto.208",
+								"id": "auto.209",
+								"op": "sub"
+							},
+							{
+								"id": "auto.210",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.209",
+								"b": "auto.210",
+								"id": "auto.211",
+								"op": "max"
+							},
+							{
+								"den": 100,
+								"id": "auto.212",
+								"num": 35,
+								"of": "auto.211",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"a": "auto.165",
+								"b": "auto.172",
+								"id": "auto.213",
+								"op": "add"
+							},
+							{
+								"a": "auto.213",
+								"b": "auto.179",
+								"id": "auto.214",
+								"op": "add"
+							},
+							{
+								"a": "auto.214",
+								"b": "auto.186",
+								"id": "auto.215",
+								"op": "add"
+							},
+							{
+								"a": "auto.215",
+								"b": "auto.193",
+								"id": "auto.216",
+								"op": "add"
+							},
+							{
+								"a": "auto.216",
+								"b": "auto.200",
+								"id": "auto.217",
+								"op": "add"
+							},
+							{
+								"a": "auto.217",
+								"b": "auto.207",
+								"id": "auto.218",
+								"op": "add"
+							},
+							{
+								"a": "auto.218",
+								"b": "auto.212",
+								"id": "auto.219",
+								"op": "add"
+							},
+							{
+								"id": "auto.220",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "auto.219",
+								"b": "auto.220",
+								"id": "tax.progressive",
+								"op": "add"
+							},
+							{
+								"den": 1000,
+								"id": "auto.221",
+								"num": 5,
+								"of": "assessable.non_employment",
+								"op": "scale",
+								"rounding": "halfUp"
+							},
+							{
+								"id": "auto.222",
+								"op": "const",
+								"value": 11999999
+							},
+							{
+								"id": "auto.223",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "assessable.non_employment",
+								"b": "auto.222",
+								"else": "auto.223",
+								"id": "tax.minimum",
+								"op": "pick",
+								"then": "auto.221"
+							},
+							{
+								"id": "auto.224",
+								"op": "const",
+								"value": 500000
+							},
+							{
+								"id": "auto.225",
+								"op": "const",
+								"value": 0
+							},
+							{
+								"a": "tax.minimum",
+								"b": "auto.224",
+								"else": "auto.225",
+								"id": "auto.226",
+								"op": "pick",
+								"then": "tax.minimum"
+							},
+							{
+								"a": "tax.progressive",
+								"b": "auto.226",
+								"id": "tax.regular",
+								"op": "max"
+							},
+							{
+								"a": "tax.regular",
+								"b": "tax.final_withholding",
+								"id": "tax.total",
+								"op": "add"
+							},
+							{
+								"a": "tax.final_withholding",
+								"b": "credit.dividend",
+								"id": "auto.227",
+								"op": "add"
+							},
+							{
+								"a": "tax.total",
+								"b": "auto.227",
+								"id": "tax.net_payable",
+								"op": "sub"
+							}
+						],
+						"period": {
+							"day": 1,
+							"month": 1
+						},
+						"settlement": {
+							"day": 31,
+							"month": 3
+						}
+					}
+				],
+				"schemaVersion": 4
+			}
+		},
+		"tax": {
+			"tax": "th-2026",
+			"filingStatus": "married_joint",
+			"children": 0,
+			"childrenAtHigherRate": 0
+		}
+	}
+}

@@ -104,3 +104,34 @@ describe("the Scenario document contract with the routing forms", () => {
 		expect(scenarioDocument.safeParse(target).success).toBe(false)
 	})
 })
+
+describe("the words the page only shows, and the words it branches on", () => {
+	const account = { id: "fund", kind: "asset", rate: 0 }
+	const flow = { id: "f", kind: "income", frequency: "monthly", start: "2030-01-31" }
+	const parse = (document: Record<string, unknown>) =>
+		scenarioDocument.safeParse({ currency: "THB", accounts: [account], flows: [], ...document })
+
+	it("a compounding, payout or fee word the CLI added after this contract was written still decodes, kept as it is", () => {
+		const document = {
+			currency: "THB",
+			flows: [],
+			accounts: [
+				{
+					...account,
+					compounding: "fortnightly",
+					payout: { bps: "3.50", frequency: "weekly", rounding: "banker" },
+					fee: { bps: "1.00", rounding: "banker" },
+				},
+			],
+			estate: { costs: [{ id: "tax", of: "gross", bps: "1.00", rounding: "banker" }] },
+		}
+		expect(scenarioDocument.parse(document) as unknown).toEqual(document)
+	})
+
+	it("a Flow kind, a Flow frequency or an Account kind the contract does not list is refused: the pages branch on them", () => {
+		expect(parse({ flows: [flow] }).success).toBe(true)
+		expect(parse({ flows: [{ ...flow, kind: "grant" }] }).success).toBe(false)
+		expect(parse({ flows: [{ ...flow, frequency: "fortnightly" }] }).success).toBe(false)
+		expect(parse({ accounts: [{ ...account, kind: "derivative" }] }).success).toBe(false)
+	})
+})

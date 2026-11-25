@@ -1,6 +1,7 @@
 import { projectPath } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
 import type { Placed } from "./carryin-apply"
+import { modelHashOf } from "./chance-model"
 import { type ModelSource, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { optionsOf } from "./liabilities"
@@ -29,6 +30,8 @@ export function pathOf(
 	if (isAppError(built)) return built
 	const model = built === undefined && source.kind === "file" ? source.model : built?.model
 	if (model === undefined) return fail("internal", { message: "The path has no Return model." })
+	const hash = modelHashOf(model)
+	if (isAppError(hash)) return hash
 	const { breakdown, liabilities, spending, estate } = wants
 	const options = optionsOf(breakdown, liabilities, spending, estate)
 	const { result, notes: unstated } = routedRun(placed.document, placed.timeline, (routing) =>
@@ -49,11 +52,16 @@ export function pathOf(
 		notes: [
 			...view.notes,
 			...unstated,
-			`This is path ${selection.index} of ${selection.paths} seeded Market paths, over the return model "${model.id}" with seed ${selection.seed}: the one projection chance --outcomes lists as outcomes[${selection.index}]. The figures are nominal.`,
+			`This is path ${selection.index} of ${selection.paths} seeded Market paths, over the Return model "${model.id}" with seed ${selection.seed}: the one projection chance --outcomes lists as outcomes[${selection.index}]. The figures are nominal.`,
 			...(built?.notes ?? []),
 		],
 		index: selection.index,
-		definition: { modelId: model.id, seed: selection.seed, paths: selection.paths },
+		definition: {
+			modelId: model.id,
+			seed: selection.seed,
+			paths: selection.paths,
+			modelHash: hash,
+		},
 		...(built === undefined ? {} : { returnModel: built.view }),
 		returns: projection.returns.map((rollup) => ({
 			index: rollup.index,

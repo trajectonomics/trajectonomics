@@ -20,6 +20,8 @@ export type TaxWritten = {
 	levy?: string | undefined
 	/** The allowance classes the flags stated; absent when --none wrote no Levy. */
 	allowances?: TaxProfileView | undefined
+	/** The Filers of the Return the Levy is written over; absent when the plan keeps bare labels (cli ADR-0075). */
+	filers?: string[] | undefined
 	/** The unconfirmed tax figures the stored Levy would use; absent when --none wrote no Levy. */
 	assumptions?: AssumptionView[] | undefined
 	scenario: WrittenScenario
@@ -54,6 +56,16 @@ function noneWithLabel(input: TaxInput): AppError | null {
 	})
 }
 
+/** What a write that wrote a Levy reports of it; the Filers only when it has any. */
+function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scenario"> {
+	return {
+		levy: TAX_LEVY_ID,
+		...(made.filers === undefined ? {} : { filers: made.filers }),
+		allowances: taxProfileOf(made.request, made.document),
+		assumptions: taxAssumptionsOf(made.document),
+	}
+}
+
 /** The one write `scenario tax` makes, with every refusal ahead of it. */
 export function writeTax(input: TaxInput, ctx: Context): Result<TaxWritten> | AppError {
 	const mode = taxModeOf(input)
@@ -82,13 +94,7 @@ export function writeTax(input: TaxInput, ctx: Context): Result<TaxWritten> | Ap
 		return ok({
 			dryRun,
 			status: outcome.status,
-			...(made === null
-				? {}
-				: {
-						levy: TAX_LEVY_ID,
-						allowances: taxProfileOf(made.request, made.document),
-						assumptions: taxAssumptionsOf(made.document),
-					}),
+			...(made === null ? {} : writtenBy(made)),
 			scenario,
 		})
 	})

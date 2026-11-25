@@ -4,6 +4,7 @@ import { defineCommand } from "../../command"
 import { fail, isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
+import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../projection/chance-bounds"
 import { returnModelFlagDocument } from "../../projection/chance-model"
 import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
 import {
@@ -46,11 +47,13 @@ export const path: Leaf = defineCommand({
 		paths: z
 			.number()
 			.int()
+			.meta({ minimum: MIN_PATHS, maximum: MAX_PATHS })
 			.describe(
 				"The number of Market paths the run drew, from 1 to 10,000: the count you gave projection chance. There is no default.",
 			),
 		seed: z
 			.string()
+			.meta({ pattern: SEED_PATTERN.source })
 			.describe("Sixteen lower-case hex digits: the seed you gave projection chance."),
 		index: z
 			.number()

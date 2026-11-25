@@ -54,5 +54,19 @@ The Dashboard's balance read always passes `--trial-balance`, so on the repro Le
   The sentence is rewritten where the total stands: the top of the result, the `trialBalance` record, and each month of `report networth --monthly`, which printed `totals: null` and the whole `totalsError` block for a refused month before.
 - **The rows come from the engine, apart from its totals.** Unlike net worth, no existing query gives the trial balance's or the P&L's rows without summing them: `balances` has no column split, no period and no Dimension filter. The ledger
   core therefore exports `trialBalanceRows` and `profitAndLossRows` (ledger ADR 0010), the row half of each query, and the CLI states those. A row outside the range is still the call's refusal, at its row.
-- **`doctor --as-of` still refuses** an overflowing trial balance: it compares the two columns, and a total it cannot state is not one it can compare. Its refusal is `AMOUNT_OVERFLOW`, as before.
+- **`doctor --as-of`** took the same treatment afterwards (see the second addendum).
 - **Code layout.** `report/total.ts` holds the read (`totalRead`, `netWorthRead`, `countedRows`); `report/total-view.ts` holds what the refusal looks like (`totalRefusal`, `totalSentence`, `totalDisplay`).
+
+## Addendum: the doctor's check that debits equal credits (2026-11-25, #546)
+
+`doctor --as-of` compared the Trial Balance's two columns through `trialBalance`, so on the repro Ledger it refused with `AMOUNT_OVERFLOW` and the Dashboard's doctor read
+(Overview's Ledger health card, the Health page) failed while every other read worked. The check does not need the totals, only whether the columns agree, and the engine can say that
+without stating them:
+
+- **The comparison is exact, so the check still gives a real pass or fail.** The ledger core exports `trialBalanceAgrees` (ledger ADR 0010, addendum): the rows of `trialBalanceRows`, summed per `(Entity, Currency)` in `BigInt`, each pair's Debit minus Credit equal to zero.
+  No intermediate figure is a safe integer, so none can overflow, and a row outside the range is still refused at its row. No new `LedgerErrorCode`.
+- **The totals are stated as unavailable, as in `balance`.** `trialBalance` in the doctor result is `{ asOf, totals: null, totalsError, balanced }` when a column's sum leaves the range: `totalsError` is the error envelope of this ADR (`AMOUNT_OVERFLOW`, `exitCode` 3,
+  `path` `trialBalance.totals[THB].debit`), `balanced` is the exact comparison, and the `trialBalance` check passes or fails on it. A total inside the range is byte for byte what it was, the error key absent.
+- **The rest of doctor runs and the call exits as it would.** The check's detail says `compared exactly; the totals are not stated`, and human output prints this ADR's sentence without its trailing clause, since `doctor` states no rows
+  (`not stated: every account is in range, but their sum exceeds the safe integer range`). A refusal from a row outside the range, or a bad `--as-of`, is still the call's error.
+- **Contract.** `traj schema doctor` gains the nullable `totals` and the optional `totalsError`; the web contract (`doctor`) parses both, and the Health page says the totals are not stated and still shows `Balances` or `Does not balance`.

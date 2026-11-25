@@ -17,6 +17,11 @@ export type RenderHint = {
 	/** One table's columns, keyed by the entry's `name`. */
 	columns?: Readonly<Record<string, readonly ColumnHint[]>>
 	/**
+	 * A result field holding plain sentences, printed before the tables, one per line: the answer a
+	 * person came for, which the table then backs. A field that is absent or empty prints nothing.
+	 */
+	lead?: string
+	/**
 	 * A result field holding plain sentences, printed after the tables, one per line. It is for a
 	 * fact a person must read (such as a status only the JSON would otherwise show), never a
 	 * layout choice.
@@ -59,7 +64,12 @@ export function renderTableResult(data: unknown, hint: RenderHint): string | nul
 		Array.isArray(entries) && entries.length > 0 ? blocksOf(entries, rows, columns) : null
 	if (blocks === null) return null
 	const notes = noteLines(data, hint)
-	const body = [...blocks, ...extraBlocks(data, hint)].join("\n\n")
+	const lead = linesOf(data, hint.lead)
+	const body = [
+		...(lead.length === 0 ? [] : [lead.join("\n")]),
+		...blocks,
+		...extraBlocks(data, hint),
+	].join("\n\n")
 	return notes.length === 0 ? body : `${body}\n\n${notes.join("\n")}`
 }
 
@@ -91,8 +101,13 @@ function extraBlocks(data: Record<string, unknown>, hint: RenderHint): string[] 
 
 /** The hint's note field, one sentence per line; a result without one prints nothing extra. */
 function noteLines(data: Record<string, unknown>, hint: RenderHint): string[] {
-	if (hint.note === undefined) return []
-	const lines = data[hint.note]
+	return linesOf(data, hint.note)
+}
+
+/** The sentences a result field holds, one per line; a missing or non-list field holds none. */
+function linesOf(data: Record<string, unknown>, field: string | undefined): string[] {
+	if (field === undefined) return []
+	const lines = data[field]
 	if (!Array.isArray(lines)) return []
 	return lines.filter((line): line is string => typeof line === "string")
 }

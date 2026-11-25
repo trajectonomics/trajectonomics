@@ -9,7 +9,12 @@ const CLOSINGS = ["900.50", "-0.00", "0.00", "1250000.00", "-5200.25", "75.10"] 
 export function chanceWithOutcomes(overrides: Partial<ProjectionChance> = {}): ProjectionChance {
 	return chanceFixture({
 		paths: 6,
-		definition: { modelId: "illustrative-demo-model", seed: "0123456789abcdef", paths: 6 },
+		definition: {
+			modelId: "illustrative-demo-model",
+			seed: "0123456789abcdef",
+			paths: 6,
+			modelHash: "jcs1:sha256:0000000000000000000000000000000000000000000000000000000000000000",
+		},
 		outcomes: CLOSINGS.map((closingNetWorth, index) => {
 			const ranOut = index === 2 || index === 4
 			return {

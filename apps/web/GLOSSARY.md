@@ -152,6 +152,10 @@ _Avoid_: death date, payout date
 The items a plan's tax assumes about the person (filing status, children, parents, disabled care and the deductions paid in the tax year), as `scenario show` states them in `tax`. They are the person's inputs, not figures: the Dashboard shows them as stored and sends a change as one `scenario tax` write.
 _Avoid_: tax settings, tax return, tax rules
 
+**Filer**:
+A person a joint Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own (cli ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
+_Avoid_: taxpayer, spouse
+
 **Assumptions**:
 The figures a plan rests on that are the person's own, in one place: inflation per year, and each asset Account's expected yearly return and swing. They are the document's `economy.inflation` and each Account's `rate` and `volatility`, saved as one `apply-plan` Edit. None is filled in for the person: `traj` ships none, and nor does the page.
 _Avoid_: settings, parameters, defaults, market data

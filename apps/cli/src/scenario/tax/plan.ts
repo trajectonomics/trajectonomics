@@ -10,7 +10,12 @@ import { withoutTaxLevy } from "./remove"
 import { canonicalTax, parsedTax, requestOfStored, storedTaxOf } from "./stored"
 
 /** What a write that wrote a Levy leaves for the reply: the request it built and the document it wrote. */
-export type Written = { request: TaxRequest; document: ScenarioDocument }
+export type Written = {
+	request: TaxRequest
+	document: ScenarioDocument
+	/** The Filers of a joint Return; absent for a plan that keeps bare labels (cli ADR-0075). */
+	filers?: string[]
+}
 
 /** The request a mode states for this plan: its own flags, or the stored profile they build on. */
 function requestFor(
@@ -38,13 +43,13 @@ export function plannerOf(
 	labels: readonly FlowLabel[],
 	done: (written: Written) => void,
 ): TaxPlanner {
-	return (document, stored) => {
+	return (document, stored, household) => {
 		if (mode.kind === "remove") return { document: withoutTaxLevy(document) ?? document, tax: null }
 		const request = requestFor(mode, document, stored)
 		if (isAppError(request)) return request
-		const next = withTaxLevy(document, request, labels)
+		const next = withTaxLevy(document, request, labels, household)
 		if (isAppError(next)) return next
-		done({ request, document: next })
-		return { document: next, tax: canonicalTax(storedTaxOf(request)) }
+		done({ request, ...next })
+		return { document: next.document, tax: canonicalTax(storedTaxOf(request)) }
 	}
 }
