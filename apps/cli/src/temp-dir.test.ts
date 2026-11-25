@@ -30,6 +30,25 @@ describe("makeTempDir", () => {
 	})
 })
 
+describe("a run that is killed", () => {
+	it.each([
+		["SIGTERM", 143],
+		["SIGINT", 130],
+	] as const)("removes its directories on %s and exits %d", async (signal, code) => {
+		const isolated = makeTempDir("traj-temp-dir-test-")
+		const child = Bun.spawn(["bun", join(SRC, "temp-dir-victim.ts")], {
+			env: { ...process.env, TMPDIR: isolated },
+			stdout: "pipe",
+		})
+		const reader = child.stdout.getReader()
+		const made = new TextDecoder().decode((await reader.read()).value).trim()
+		expect(existsSync(made)).toBe(true)
+		child.kill(signal)
+		expect(await child.exited).toBe(code)
+		expect(existsSync(made)).toBe(false)
+	})
+})
+
 describe("temporary directories", () => {
 	it("are made only through makeTempDir, so the run removes them", () => {
 		const offenders: string[] = []

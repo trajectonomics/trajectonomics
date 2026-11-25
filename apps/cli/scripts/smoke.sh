@@ -11,6 +11,16 @@ set -eu
 version=$1
 shift
 
+# The scratch ledger and the two captured outputs go however the script ends.
+envelope=""
+log=""
+cleanup() {
+	[ -z "${TRAJ_HOME:-}" ] || rm -rf "$TRAJ_HOME"
+	[ -z "$envelope" ] || rm -f "$envelope"
+	[ -z "$log" ] || rm -f "$log"
+}
+trap cleanup EXIT
+
 fail() {
 	echo "smoke: $*" >&2
 	exit 1

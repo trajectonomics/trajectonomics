@@ -1,7 +1,6 @@
 // The scratch ledger the allowances end-to-end test runs against, through the workspace's own traj: a taxed plan
 // worked by hand for the 2027 tax year, and an editor over it, with the page's requests as functions.
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { handDocument } from "./allowances-document.test-support"
@@ -10,6 +9,7 @@ import { BINARY } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
 import type { RunContext } from "./run-traj"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 export const PLAN = "hand"
@@ -53,7 +53,7 @@ export function storedPlan(name = PLAN): { hash: string; document: ScenarioDocum
  * 600,000.00 (180,000.00), so 168,000.00 more brings the taxable income to 260,000.00 and the tax to 5,500.00.
  */
 export async function setupAllowances(): Promise<Editor> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-allowances-"))
+	scratch = await makeScratch("traj-web-allowances-")
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	const document = handDocument(storedPlan("base").document, AS_OF)
@@ -98,5 +98,5 @@ export function terminal(argv: string[], stdin?: unknown): string {
 }
 
 export async function disposeAllowances(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }

@@ -44,3 +44,25 @@ export function sweepTempDirs(): void {
 		}
 	}
 }
+
+let armed = false
+
+/**
+ * Makes the sweep also run when the process ends before `afterAll` can: on exit, and on SIGINT or
+ * SIGTERM (a timeout or a cancelled task), which exit with 128 plus the signal number. SIGKILL
+ * cannot be handled. Idempotent; `src/test-setup.ts` calls it.
+ */
+export function sweepOnKill(): void {
+	if (armed) return
+	armed = true
+	process.on("exit", sweepTempDirs)
+	for (const [signal, code] of [
+		["SIGINT", 130],
+		["SIGTERM", 143],
+	] as const) {
+		process.on(signal, () => {
+			sweepTempDirs()
+			process.exit(code)
+		})
+	}
+}
