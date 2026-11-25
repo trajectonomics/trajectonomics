@@ -62,7 +62,7 @@ let { view, argv, plan, futures }: Props = $props()
 		<h2 id="chance-runs-out" class="text-base font-semibold">When the failing paths run out</h2>
 		<RunsOutBars bars={view.runsOut} label="Failing Market paths by the year they run out" />
 	</section>
-	<ChanceFigures bandRows={view.bandRows} runsOut={view.runsOut} />
+	<ChanceFigures bandRows={view.bandRows} runsOut={view.runsOut} currency={view.currency} />
 	<FuturesSection {futures} {plan} currency={view.currency} />
 	{#if view.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm">

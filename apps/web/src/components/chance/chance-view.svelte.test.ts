@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 
+import { preferences } from "../../client/preferences.svelte.js"
 import type { ProjectionChance, Read } from "../../lib/contract"
 import { chanceFixture } from "../../lib/view/chance/fixtures.test-support"
 import ChanceView from "./ChanceView.svelte"
@@ -62,17 +63,39 @@ describe("ChanceView's text alternatives", () => {
 				},
 			],
 		})
-		const body = render(ChanceView, {
-			props: {
-				chance: { base: { argv: ARGV, ok: true, data } },
-				scenario: "",
-				onScenario: () => {},
-			},
-		}).body
+		const body = renderView({ base: { argv: ARGV, ok: true, data } })
 		expect(body).toContain('<div class="sr-only">')
+		expect(body).toContain("Net worth Bands by roll-up end (")
 		expect(body).toContain('<th scope="col">10th Percentile</th>')
-		expect(body).toContain("<td>2,000.00</td>")
+		expect(body).toContain("2,000.00")
 		expect(body).toContain('<th scope="row">31 Dec 2027</th>')
 		expect(body).toContain("<td>12</td>")
+	})
+
+	test("names the currency in the Bands caption", () => {
+		const body = renderView({ base: { argv: ARGV, ok: true, data: chanceFixture() } })
+		expect(body).toContain("Net worth Bands by roll-up end (THB)")
+	})
+
+	test("with Hide amounts on, the hidden table carries no digits and says the amount is hidden", () => {
+		const data = chanceFixture({
+			tables: [
+				{
+					name: "bands",
+					count: 1,
+					rows: [{ index: 0, to: "2026-12-31", p10: "1000.00", p50: "2000.00", p90: "3000.00" }],
+				},
+			],
+		})
+		preferences.hidden = true
+		try {
+			const body = renderView({ base: { argv: ARGV, ok: true, data } })
+			const table = body.slice(body.indexOf('<div class="sr-only">'))
+			expect(table).not.toContain("2,000.00")
+			expect(table).not.toContain("3,000.00")
+			expect(table).toContain("amount hidden")
+		} finally {
+			preferences.hidden = false
+		}
 	})
 })

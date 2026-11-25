@@ -3,8 +3,12 @@ import type { ProjectionChance } from "../../contract"
 import { formatDate, formatMoney, formatShare } from "../../format"
 import { type ChanceSource, chanceSourceWords } from "../assumptions/chance"
 
-/** A roll-up's year is labelled on every fifth bar, so a row of many bars keeps a readable axis. */
+/**
+ * A roll-up's year is labelled on every fifth bar, and on every tenth once the row passes 50 bars, so a
+ * row of many bars keeps a readable axis: at 360px, 60 bars are about 5px apart and a year is 26px wide.
+ */
 const LABEL_EVERY = 5
+const BARS_PER_LABEL_STEP = 50
 
 /** The share and its facts, as the Home card shows them. Every figure is the CLI's, shown as it stands. */
 export interface ChanceSummary {
@@ -111,13 +115,14 @@ export function bandRowsOf(tables: ProjectionChance["tables"]): BandRow[] {
 	return []
 }
 
-/** The bars of the failing paths by roll-up, in order, with a label on every fifth year. */
+/** The bars of the failing paths by roll-up, in order, with a label on every fifth year (see LABEL_EVERY). */
 export function runsOutBarsOf(rows: ProjectionChance["runsOut"]): RunsOutBar[] {
+	const every = LABEL_EVERY * Math.ceil(rows.length / BARS_PER_LABEL_STEP)
 	return rows.map((row) => {
 		const year = yearOf(row.to)
 		const noun = row.paths === 1 ? "path runs" : "paths run"
 		return {
-			label: row.index % LABEL_EVERY === 0 ? year : null,
+			label: row.index % every === 0 ? year : null,
 			ends: formatDate(row.to),
 			paths: row.paths,
 			title: `${row.paths} failing ${noun} out in ${year}`,

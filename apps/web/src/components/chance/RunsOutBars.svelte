@@ -26,14 +26,14 @@ const heights = $derived(
 <figure class="space-y-2">
 	<figcaption class="sr-only">{label}</figcaption>
 	<div class="overflow-x-auto">
-		<div class="flex min-w-full items-end gap-[3px]" style="height: {BAR_HEIGHT}px" aria-hidden="true">
+		<div class="flex min-w-full items-end gap-px" style="height: {BAR_HEIGHT}px" aria-hidden="true">
 			{#each bars as bar, index (index)}
-				<div class="min-w-[4px] flex-1 rounded-t bg-accent" style="height: {heights[index]}px" title={bar.title}></div>
+				<div class="min-w-0 flex-1 rounded-t bg-accent" style="height: {heights[index]}px" title={bar.title}></div>
 			{/each}
 		</div>
-		<div class="flex min-w-full gap-[3px] pt-2 text-xs text-muted-foreground" aria-hidden="true">
+		<div class="flex min-w-full gap-px pt-2 text-xs text-muted-foreground" aria-hidden="true">
 			{#each bars as bar, index (index)}
-				<span class="min-w-[4px] flex-1 text-center whitespace-nowrap">{bar.label ?? ""}</span>
+				<span class="min-w-0 flex-1 text-center whitespace-nowrap">{bar.label ?? ""}</span>
 			{/each}
 		</div>
 	</div>

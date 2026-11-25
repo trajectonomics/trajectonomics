@@ -11,6 +11,7 @@ import {
 	horizonFlag,
 	PROJECTION_ERROR_CODES,
 } from "../projection/flags"
+import { pathsFlag, seedFlag } from "./flags"
 import { dashboardOutput, planOf, summaryOf } from "./input"
 import { type DashboardDeps, selfCommand, startFailure } from "./run"
 
@@ -44,20 +45,8 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 				.describe(
 					"The Return model JSON file the chance of success draws from. Left out with --paths and --seed given, it is `plan`: the model built from each Scenario's own Accounts. A file wins when given.",
 				),
-			paths: z
-				.number()
-				.int()
-				.min(1)
-				.max(10000)
-				.optional()
-				.describe(
-					"The Market paths the chance runs, from 1 to 10,000. Needs --seed, and --return-model unless the Scenarios state a volatility (then `plan`).",
-				),
-			seed: z
-				.string()
-				.regex(/^[0-9a-f]{16}$/)
-				.optional()
-				.describe("Sixteen lower-case hex digits the Market paths are drawn from."),
+			paths: pathsFlag,
+			seed: seedFlag,
 			port: z
 				.number()
 				.int()

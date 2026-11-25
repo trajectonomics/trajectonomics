@@ -53,6 +53,20 @@ describe("runsOutBarsOf", () => {
 		])
 	})
 
+	test("labels every tenth roll-up once the row passes 50 bars, so a year never meets the next one", () => {
+		const labelled = (count: number) =>
+			runsOutBarsOf(
+				Array.from({ length: count }, (_, index) => ({
+					index,
+					to: `${2026 + index}-12-31`,
+					paths: 0,
+				})),
+			).flatMap((bar, index) => (bar.label === null ? [] : [index]))
+		expect(labelled(50)).toEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45])
+		expect(labelled(60)).toEqual([0, 10, 20, 30, 40, 50])
+		expect(labelled(100)).toEqual([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
+	})
+
 	test("titles each bar with its count, in the singular for one path", () => {
 		expect(runsOutBarsOf([{ index: 1, to: "2027-12-31", paths: 1 }])[0]?.title).toBe(
 			"1 failing path runs out in 2027",
