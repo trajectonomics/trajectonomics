@@ -13,6 +13,12 @@ export const MINOR_UNITS_HEAD =
 /** The unit of a Flow's money field: its amount, per occurrence. */
 export const MINOR_UNITS: string = `${MINOR_UNITS_HEAD}, and a Flow states it per occurrence, not per year.`
 
+/**
+ * The unit of a Milestone criterion's `amount` (sim's ADR 0012): a threshold the Metric must reach, stated
+ * once, so neither the per-occurrence nor the per-year tail of a Flow's unit applies.
+ */
+export const CRITERION_UNITS: string = `${MINOR_UNITS_HEAD}, and a criterion's amount is a threshold the Metric must reach on the date it is judged, not an amount per occurrence or per year.`
+
 /** The unit of a level loan's principal: stated once for the whole loan, so the per-occurrence tail does not apply. */
 export const PRINCIPAL_UNITS: string = `${MINOR_UNITS_HEAD}, and the principal is stated once for the whole loan, not per occurrence or per year.`
 

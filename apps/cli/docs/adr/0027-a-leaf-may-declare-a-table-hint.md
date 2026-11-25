@@ -13,3 +13,7 @@ Rendering the table inside the Command was rejected: a Command returns structure
 ## Consequences
 
 `Command` and `Leaf` carry `render?`, `dispatch` passes it to `renderResult`, and JSON never reads it. A hint's note lines are result values, not layout: the renderer prints one per line and adds nothing. A new table-shaped Result that wants the human view declares a hint and a column map; without one it keeps the generic renderer, which is what every older command does. The human output of a table-shaped Result is a presentation of the output schema, so a rendering change is a deliberate golden diff, never a data change; a Bun upgrade that changes Thai display width is exactly such a diff.
+
+## Addendum: the human hooks (ADR-0049)
+
+ADR-0049 amends this record. `RenderHint` gains two human-only hooks, `display` and `blocks`, so a Projection can say a milestone is `not reached by <date>` and print a table after the body. Neither hook adds, renames or drops a value: JSON ignores both, and the output schema is unchanged. Read ADR-0049 for the rule and its consequences.
