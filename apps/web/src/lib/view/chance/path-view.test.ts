@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { chanceWithOutcomes, pathFixture } from "./futures.test-support"
-import { pathHeaderOf, pathMarkers, pathRowsOf, returnAccounts } from "./path-view"
+import { pathRowsOf, returnAccounts } from "./path-rows"
+import { pathHeaderOf, pathMarkers } from "./path-view"
 import { lowestWhen, returnText } from "./path-words"
 
 describe("returnText", () => {

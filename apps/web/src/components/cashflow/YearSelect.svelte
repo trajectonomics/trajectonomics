@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { type Rollup, yearLabel } from "../../lib/view/cashflow/cashflow"
 
 interface Props {
@@ -22,7 +23,7 @@ let { rollups, selected, onYear }: Props = $props()
 		class="w-full max-w-xl rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 	>
 		{#each rollups as rollup (rollup.index)}
-			<option value={String(rollup.index)}>{yearLabel(rollup)}</option>
+			<option value={String(rollup.index)}>{yearLabel(rollup, currentItemNames().people)}</option>
 		{/each}
 	</select>
 </label>

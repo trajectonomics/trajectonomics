@@ -98,7 +98,7 @@ async function remove(): Promise<void> {
 	{/if}
 	<TryNotice fields={cleared} />
 	<ItemActions
-		id={existing?.account.id}
+		id={existing?.account.id} kind="account"
 		onDelete={remove}
 		note={held ? "Its purchase, costs, rent, sale and loan are removed. The Account stays in the plan as an ordinary asset, because the ledger holds it." : "Its purchase, costs, rent, sale and loan are removed."}
 		trying={tryValue}

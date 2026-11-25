@@ -100,5 +100,5 @@ async function remove(): Promise<void> {
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : `Add ${kind}`}>
 	<FlowFields bind:draft bind:employer {kind} {existing} {shown} {name} {anchors} categories={categoriesOf(doc.flows)} targets={employerTargets(doc)} />
 	<TryNotice fields={cleared} />
-	<ItemActions id={existing?.id} onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
+	<ItemActions id={existing?.id} kind="flow" onDelete={remove} trying={tryValue} note={existing === undefined ? undefined : salaryDeleteNote(doc.flows, existing.id)} />
 </form>

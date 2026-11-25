@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument } from "../../contract"
+import { personNames } from "../item-names"
 import {
 	agesText,
 	anchorAt,
-	anchorLabel,
 	axisAge,
 	flowAnchorLabels,
 	householdHref,
@@ -58,21 +58,11 @@ describe("personCards", () => {
 })
 
 describe("anchor labels", () => {
-	test("an age, a life end and a joining each read as the household states it", () => {
-		expect(anchorLabel({ path: "flows.salary.end", person: "me", age: 60 })).toBe("at me, age 60")
-		expect(anchorLabel({ path: "flows.pension.end", person: "me", at: "lifeEnd" })).toBe(
-			"at me, life end",
-		)
-		expect(
-			anchorLabel({ path: "flows.partner-salary.start", person: "partner", at: "joins" }),
-		).toBe("at partner, joining")
-	})
-
 	test("a flow's start and end carry the label of their own anchor, and no other", () => {
-		expect(flowAnchorLabels(household, "salary")).toEqual({ start: null, end: "at me, age 60" })
+		expect(flowAnchorLabels(household, "salary")).toEqual({ start: null, end: "at you, age 60" })
 		expect(flowAnchorLabels(household, "pension")).toEqual({
 			start: null,
-			end: "at me, life end",
+			end: "at you, life end",
 		})
 		expect(flowAnchorLabels(null, "salary")).toEqual({ start: null, end: null })
 	})
@@ -93,6 +83,19 @@ describe("agesText", () => {
 		).toBe("me 60, partner 58")
 	})
 
+	test("calls each person by the household's words, and one it does not name by id", () => {
+		expect(
+			agesText(
+				[
+					{ person: "me", age: 60 },
+					{ person: "partner", age: 58 },
+					{ person: "ghost", age: 4 },
+				],
+				personNames(household),
+			),
+		).toBe("You 60, Your partner 58, ghost 4")
+	})
+
 	test("is empty when the row carries no ages", () => {
 		expect(agesText([])).toBe("")
 	})
@@ -108,6 +111,15 @@ describe("axisAge", () => {
 			]),
 		).toBe("me 37")
 		expect(axisAge([])).toBeNull()
+	})
+
+	test("calls the first person by the household's words when the row carries several", () => {
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "partner", age: 35 },
+		]
+		expect(axisAge(ages, personNames(household))).toBe("You 37")
+		expect(axisAge([{ person: "me", age: 37 }], personNames(household))).toBe("age 37")
 	})
 })
 

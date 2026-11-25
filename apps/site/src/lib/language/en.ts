@@ -38,6 +38,7 @@ export const ENGLISH: LanguageEntry = Object.freeze({
 		blogLink: "Blog",
 		repoLinkLabel: "GitHub stars",
 		cliInstallLink: "Install the CLI directly",
+		demoLink: "Try the demo",
 		copy: "Copy prompt to your AI agents",
 		copied: "Prompt copied",
 		copiedLabel: "Copied",

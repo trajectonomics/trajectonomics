@@ -8,8 +8,28 @@
 # `npx --yes @trajectonomics/cli@<version>` for the channel smoke.
 set -eu
 
+# Every `traj` a test runs stays out of the usage telemetry.
+export DO_NOT_TRACK=1
+
 version=$1
 shift
+
+# The scratch ledger and the two captured outputs go however the script ends. Only `home` is the
+# script's own: a caller's `TRAJ_HOME` is never removed, and before `home` is set there is nothing
+# to remove.
+home=""
+envelope=""
+log=""
+cleanup() {
+	[ -z "$home" ] || rm -rf "$home"
+	[ -z "$envelope" ] || rm -f "$envelope"
+	[ -z "$log" ] || rm -f "$log"
+}
+trap cleanup EXIT
+# dash runs no EXIT trap when a signal kills it, so each handler cleans up, then exits 128 + the
+# signal number as the shell would.
+trap 'cleanup; trap - EXIT; exit 130' INT
+trap 'cleanup; trap - EXIT; exit 143' TERM
 
 fail() {
 	echo "smoke: $*" >&2
@@ -18,7 +38,8 @@ fail() {
 
 [ "$("$@" --version)" = "$version" ] || fail "--version did not report $version"
 
-export TRAJ_HOME="$(mktemp -d)"
+home="$(mktemp -d)"
+export TRAJ_HOME="$home"
 "$@" init --json | grep -q '"created":true' || fail "init did not report created"
 "$@" init --json | grep -q '"created":false' || fail "init was not idempotent"
 "$@" account add Cash --type asset --currency THB --json >/dev/null || fail "account add failed"

@@ -1,7 +1,6 @@
 // The ledger the futures end-to-end tests run against, through the workspace's own traj: the demo's `retire-early` plan
 // read through the demo's Return model, and an editor over it (web ADR 0020).
-import { mkdtemp, rm, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import type { ProjectionChance, Snapshot } from "../src/lib/contract"
 import type { PlanParams } from "../src/lib/snapshot"
@@ -12,6 +11,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 import { answerPath } from "./serve-path"
 
@@ -24,7 +24,7 @@ let params: PlanParams | null = null
 
 /** Builds the ledger and reads the Snapshot once. */
 export async function setupFutures(): Promise<void> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-futures-"))
+	scratch = await makeScratch("traj-web-futures-")
 	const home = join(scratch, "traj-home")
 	const ids = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const model = join(scratch, "return-model.json")
@@ -53,7 +53,7 @@ export async function setupFutures(): Promise<void> {
 }
 
 export async function disposeFutures(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }
 
 function held<T>(value: T | null): T {

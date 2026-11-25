@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { ProjectionRun } from "../../lib/contract"
 import { chooseRollup, rollupsOf, yearLabel } from "../../lib/view/cashflow/cashflow"
 import { cashflowTriples } from "../../lib/view/what-if/cashflow"
@@ -23,7 +24,7 @@ const triples = $derived(
 </script>
 
 {#if rollup && triples.length > 0}
-	<WhatIfPanel plan={lens.plan} intro={`The cash flow of ${yearLabel(rollup)} with the session's changes.`}>
+	<WhatIfPanel plan={lens.plan} intro={`The cash flow of ${yearLabel(rollup, currentItemNames().people)} with the session's changes.`}>
 		<FigureList {triples} />
 	</WhatIfPanel>
 {/if}

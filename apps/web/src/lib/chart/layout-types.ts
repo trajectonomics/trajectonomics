@@ -1,3 +1,5 @@
+import type { PlacedMarker } from "./markers"
+
 /** The space around the plot, in pixels, for the axis labels. */
 export interface Margin {
 	readonly top: number
@@ -66,7 +68,7 @@ export interface LineLayout {
 	}[]
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
-	readonly markers: readonly { readonly x: number; readonly label: string }[]
+	readonly markers: readonly PlacedMarker[]
 	/** "wide" draws series from a longer palette, for a chart of many series; left out, the first three. */
 	readonly palette?: "wide"
 	/** The labels of a second axis, when a series in other units is drawn against its own scale. */

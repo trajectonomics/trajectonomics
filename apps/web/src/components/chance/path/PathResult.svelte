@@ -1,6 +1,8 @@
 <script lang="ts">
+import { currentItemNames } from "../../../client/item-names.svelte.js"
 import type { ProjectionChance, ProjectionPath } from "../../../lib/contract"
-import { pathHeaderOf, pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-view"
+import { pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-rows"
+import { pathHeaderOf } from "../../../lib/view/chance/path-view"
 import { parseTerms } from "../../../lib/view/projection/terms"
 import Provenance from "../../ui/Provenance.svelte"
 import PathChart from "./PathChart.svelte"
@@ -22,7 +24,7 @@ interface Props {
 /** One future: its header, its net worth by year, and each year's returns, income, spending and net worth. */
 let { path, chance, plan, names, terms, onTerms, argv }: Props = $props()
 const header = $derived(pathHeaderOf(path, chance))
-const rows = $derived(pathRowsOf(path, header.lowest?.day ?? null))
+const rows = $derived(pathRowsOf(path, header.lowest?.day ?? null, currentItemNames()))
 const accounts = $derived(returnAccounts(path).map((id) => names.get(id) ?? id))
 </script>
 

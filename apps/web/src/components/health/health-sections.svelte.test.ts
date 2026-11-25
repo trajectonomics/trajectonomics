@@ -53,14 +53,26 @@ describe("LedgerHealthSection", () => {
 		expect(body).toContain("Does not balance")
 	})
 
-	test("says the totals are not stated, and that the columns balance, when their sums are out of range", () => {
+	test("says the totals exceed the safe range, and that the columns balance, when their sums are out of range", () => {
 		const unstated: Doctor = {
 			...doctor,
 			trialBalance: { asOf: "2026-10-31", totals: null, balanced: true },
 		}
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
 		expect(body).toContain("Balances")
-		expect(body).toContain("The totals are not stated")
+		expect(body).toContain("Debits equal credits at")
+		expect(body).toContain("the totals exceed the safe range")
+	})
+
+	test("says the columns disagree when an unstated total's columns do not balance", () => {
+		const unstated: Doctor = {
+			...doctor,
+			ok: false,
+			trialBalance: { asOf: "2026-10-31", totals: null, balanced: false },
+		}
+		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
+		expect(body).toContain("Does not balance")
+		expect(body).toContain("Debits and credits disagree at")
 	})
 
 	test("shows the CLI's error in its section when the doctor failed", () => {

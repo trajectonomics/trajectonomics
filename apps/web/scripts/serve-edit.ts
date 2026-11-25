@@ -50,7 +50,7 @@ export function createEditor(options: EditorOptions): Editor {
 			scenarios: followPlan(params.scenarios, edit),
 			compare: followCompare(params.compare, edit),
 		}
-		return answerOf(await refresh(), undefined, run.droppedAnchors)
+		return answerOf(await refresh(), undefined, run.droppedAnchors, run.droppedOwners)
 	}
 
 	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */

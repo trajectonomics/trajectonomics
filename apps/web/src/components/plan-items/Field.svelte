@@ -29,12 +29,19 @@ let {
 	hint,
 	disabled = false,
 }: Props = $props()
+
+/** The choices the select offers, plus the held value when the list does not name it, so it never opens empty. */
+const choices = $derived(
+	options === undefined || value === "" || options.some((option) => option.value === value)
+		? options
+		: [...options, { value, label: value }],
+)
 </script>
 
 <div class="space-y-1.5">
 	<label for={id} class="block text-sm font-medium text-foreground">{label}</label>
 	{#if hint}<p id="{id}-hint" class="text-xs text-muted-foreground">{hint}</p>{/if}
-	{#if options}
+	{#if choices}
 		<select
 			{id}
 			{disabled}
@@ -42,7 +49,7 @@ let {
 			aria-describedby={problem ? `${id}-problem` : undefined}
 			class="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-ring"
 		>
-			{#each options as option (option.value)}
+			{#each choices as option (option.value)}
 				<option value={option.value}>{option.label}</option>
 			{/each}
 		</select>

@@ -1,6 +1,6 @@
 import type { HouseholdDocument, ScenarioDocument } from "../../contract"
 import { formatDate } from "../../format"
-import { anchorLabel } from "../household/model"
+import { anchorWords, personNames } from "../item-names"
 import type { DateChoice } from "./dates"
 
 /** The household anchors that pin a Flow's start or end, with the date the document holds for it. */
@@ -9,6 +9,7 @@ export function anchorChoices(
 	household: HouseholdDocument | null,
 	lastDate: string,
 ): DateChoice[] {
+	const people = personNames(household)
 	return (household?.anchors ?? []).flatMap((anchor) => {
 		const [list, id, edge] = anchor.path.split(".")
 		if (list !== "flows" || (edge !== "start" && edge !== "end")) return []
@@ -19,7 +20,7 @@ export function anchorChoices(
 		return [
 			{
 				value: `anchor:${anchor.path}`,
-				label: `When ${id} ${verb}, ${anchorLabel(anchor)} (${formatDate(date)})`,
+				label: `When ${id} ${verb}, ${anchorWords(anchor, people)} (${formatDate(date)})`,
 				date,
 			},
 		]

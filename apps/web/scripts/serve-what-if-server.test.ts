@@ -1,14 +1,13 @@
 // POST /what-if through the real loopback server (startDashboard), with its own fictional ledger: the 1 MiB body
 // cap is the server's, refused before the body is read, and a good what-if answers 200 with the four reads.
 import { afterAll, describe, expect, test } from "bun:test"
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { EDIT_TOKEN_HEADER } from "../src/lib/edit/guard"
 import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { PARAMS } from "./edit-request.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { startDashboard } from "./serve"
 
 let scratch = ""
@@ -16,15 +15,15 @@ let stop: (() => Promise<void>) | null = null
 
 afterAll(async () => {
 	if (stop !== null) await stop()
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 })
 
 /** Starts the Dashboard on a free loopback port against a fresh fictional ledger, and returns its base URL and token. */
 async function start(): Promise<{ base: string; token: string }> {
 	if (stop !== null) await stop()
 	stop = null
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-what-if-"))
+	if (scratch !== "") await removeScratch(scratch)
+	scratch = await makeScratch("traj-web-what-if-")
 	const home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	const running = await startDashboard({
