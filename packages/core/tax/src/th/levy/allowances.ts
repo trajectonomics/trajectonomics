@@ -1,6 +1,7 @@
 import { addDonationAllowances } from "./allowances-donations"
+import { addFilerRetirementAllowances } from "./allowances-filers"
 import { addFixedAllowances } from "./allowances-fixed"
-import { addRetirementAllowances } from "./allowances-retirement"
+import type { ThLevyFilerReads } from "./filer-reads"
 import type { ThLevyGraph } from "./graph"
 import { sumMeasures } from "./graph-rates"
 import { ThLevyMeasureId } from "./measure-ids"
@@ -37,6 +38,8 @@ export interface ThAllowanceMeasures {
  * @param profile Emit-time filing status and allowances.
  * @param assessable Assessable income Measure used as the percentage base.
  * @param expenses Total expense deduction Measure.
+ * @param filers Each Filer's tallies and assessable income, for the retirement caps; omitted reads
+ * the Return as one Filer.
  * @statute Thailand Revenue Code Section 47.
  */
 export function addAllowanceMeasures(
@@ -45,9 +48,10 @@ export function addAllowanceMeasures(
 	profile: ThLevyProfile,
 	assessable: string,
 	expenses: string,
+	filers: readonly ThLevyFilerReads[] = [{ tallies, assessable }],
 ): ThAllowanceMeasures {
 	const fixed = addFixedAllowances(graph, profile.allowances, profile.filingStatus ?? "single")
-	const retirement = addRetirementAllowances(graph, tallies, assessable)
+	const retirement = addFilerRetirementAllowances(graph, filers)
 	const nonDonation = sumMeasures(graph, [fixed, retirement.cluster, retirement.thaiEsg])
 	const netBefore = graph.max(
 		graph.sub(graph.sub(assessable, expenses), nonDonation),

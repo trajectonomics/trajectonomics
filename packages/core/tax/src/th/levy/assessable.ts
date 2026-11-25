@@ -1,5 +1,5 @@
 import type { ThLevyGraph } from "./graph"
-import { sumMeasures } from "./graph-rates"
+import { auditedId, sumMeasures } from "./graph-rates"
 import { ThLevyIncomeLabel } from "./labels"
 import { ThLevyMeasureId } from "./measure-ids"
 import type { ThSection40_4Measures } from "./regimes"
@@ -33,12 +33,15 @@ export interface ThAssessableMeasures {
  * @param graph Measure graph being built.
  * @param tallies Income tally ids.
  * @param section40_4 Resolved Section 40(4) assessable Measure.
+ * @param named Whether the totals take their audited ids; a Filer's own share of a joint Return
+ * does not.
  * @statute Thailand Revenue Code Sections 40(1)–(8), 48(2).
  */
 export function addAssessableMeasures(
 	graph: ThLevyGraph,
 	tallies: ThLevyTallies,
 	section40_4: ThSection40_4Measures,
+	named = true,
 ): ThAssessableMeasures {
 	const income = tallies.income
 	const rental = sumMeasures(graph, [
@@ -71,7 +74,15 @@ export function addAssessableMeasures(
 		income[ThLevyIncomeLabel.Section40_7],
 		business,
 	]
-	const total = sumMeasures(graph, [employment, ...nonEmployment], ThLevyMeasureId.AssessableTotal)
-	const grossNonEmployment = sumMeasures(graph, nonEmployment, ThLevyMeasureId.GrossNonEmployment)
+	const total = sumMeasures(
+		graph,
+		[employment, ...nonEmployment],
+		auditedId(named, ThLevyMeasureId.AssessableTotal),
+	)
+	const grossNonEmployment = sumMeasures(
+		graph,
+		nonEmployment,
+		auditedId(named, ThLevyMeasureId.GrossNonEmployment),
+	)
 	return { total, grossNonEmployment }
 }
