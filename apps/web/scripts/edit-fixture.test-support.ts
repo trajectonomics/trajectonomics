@@ -55,7 +55,7 @@ export async function setupEditor(): Promise<Editor> {
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	// The demo ledger's Levy needs the Carry-in the demo states, or the projection of `base` is refused.
 	const next = createEditor({
-		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home } },
+		traj: { binary: BINARY, env: { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" } },
 		cliVersion: "test",
 		params: { ...PARAMS, scenarios: ["base"], carryIn: true },
 		records: demoCarryIn(["base"]),
@@ -118,7 +118,7 @@ export function hashOf(name: string): string {
 export function ledgerShow(name: string, decimal: boolean): ShownDocument {
 	const flags = decimal ? ["--decimal"] : []
 	const run = Bun.spawnSync([BINARY, "scenario", "show", ...flags, "--json", "--", name], {
-		env: { ...process.env, TRAJ_HOME: home },
+		env: { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" },
 	})
 	return JSON.parse(run.stdout.toString()) as ShownDocument
 }
