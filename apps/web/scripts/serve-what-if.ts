@@ -2,7 +2,7 @@
 // data. Nothing here writes: each read is a read leaf ([web ADR 0010](../docs/adr/0010-the-what-if-session-reads-through-traj-on-loopback.md)).
 import { z } from "zod"
 import type { PlanParams } from "../src/lib/snapshot"
-import { whatIfReads } from "../src/lib/what-if/argv"
+import { plannedWhatIfReads } from "../src/lib/what-if/argv"
 import { runPlanned } from "./run-planned"
 import type { RunContext } from "./run-traj"
 import { failure, readWhatIf } from "./serve-edit-answer"
@@ -17,7 +17,7 @@ export async function answerWhatIf(
 ): Promise<Response> {
 	const read = await readWhatIf(request)
 	if (!read.ok) return failure(400, read.error)
-	const plan = whatIfReads(params, read.whatIf)
+	const plan = plannedWhatIfReads(params, read.whatIf)
 	const run = (planned: typeof plan.projection) => runPlanned(traj, planned, z.unknown(), records)
 	const projection = await run(plan.projection)
 	const fi = await run(plan.fi)

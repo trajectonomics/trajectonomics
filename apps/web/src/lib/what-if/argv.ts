@@ -10,7 +10,7 @@ import type { PlannedRead } from "../snapshot/planned"
 import type { WhatIfBody } from "./overrides"
 
 /** The four reads of one what-if. `chance` is null when the Snapshot states no Return model. */
-export type WhatIfReads = {
+export type PlannedWhatIfReads = {
 	projection: PlannedRead
 	fi: PlannedRead
 	compare: PlannedRead
@@ -59,7 +59,7 @@ function carryFor(params: PlanParams, plan: string): string[] {
  * would receive in a what-if (cli ADR 0064). The plan's name follows `--scenario=`, as the Snapshot's reads do, so a name
  * that starts with a dash is still one token; `projection compare` takes its name after `--`.
  */
-export function whatIfReads(params: PlanParams, whatIf: WhatIfBody): WhatIfReads {
+export function plannedWhatIfReads(params: PlanParams, whatIf: WhatIfBody): PlannedWhatIfReads {
 	const plan = whatIf.plan
 	const overrides = [...overrideTokens(whatIf), ...decimalTokens(whatIf)]
 	const monthly = params.monthly ? ["--monthly"] : []
