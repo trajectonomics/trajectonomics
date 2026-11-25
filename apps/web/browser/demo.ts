@@ -32,6 +32,13 @@ export interface Choices {
  * ({@link PINNED_FONT}) and the call fails when it is not installed, rather than measure in another font.
  */
 export async function openDemo(page: Page, path: string, choices: Choices): Promise<void> {
+	await chooseBeforeLoad(page, choices)
+	await page.goto(`${path}?demo=1`)
+	await settle(page, choices.theme)
+}
+
+/** Sets a person's choices in `localStorage` before the page's own script reads them. */
+export async function chooseBeforeLoad(page: Page, choices: Choices): Promise<void> {
 	await page.addInitScript(
 		({ theme, hidden }) => {
 			localStorage.setItem("traj.theme", theme)
@@ -39,8 +46,11 @@ export async function openDemo(page: Page, path: string, choices: Choices): Prom
 		},
 		{ theme: choices.theme, hidden: choices.hideAmounts === true },
 	)
-	await page.goto(`${path}?demo=1`)
-	await expect(page.locator("html")).toHaveAttribute("data-theme", choices.theme)
+}
+
+/** Waits until the page has read the Demo snapshot and drawn it, in the pinned font and the theme. */
+export async function settle(page: Page, theme: Theme): Promise<void> {
+	await expect(page.locator("html")).toHaveAttribute("data-theme", theme)
 	await page.addStyleTag({ content: `html, body { font-family: "${PINNED_FONT}" !important }` })
 	await page.waitForLoadState("networkidle")
 	// The status line says "Loading the Snapshot." until the Demo snapshot has been read, and "No

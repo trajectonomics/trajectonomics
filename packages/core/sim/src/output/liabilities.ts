@@ -7,8 +7,9 @@ import type { ProjectionProblem } from "../types/projection"
 import type { LiabilityMonth, LiabilityStatement } from "../types/statement"
 import type { Moves } from "./liability-moves"
 import { monthRow, movesOf } from "./liability-moves"
-import { type StatementPeriod, statementPeriods } from "./statement-periods"
+import { type StatementMonth, statementMonths } from "./statement-months"
 
+/** The statements of one run, one per liability in Scenario order, or the problem that stopped them. */
 export interface LiabilityOutcome {
 	readonly statements?: readonly LiabilityStatement[]
 	readonly problem?: ProjectionProblem
@@ -18,27 +19,29 @@ export interface LiabilityOutcome {
 function monthsOf(
 	id: AccountId,
 	opening: bigint,
-	periods: readonly StatementPeriod[],
+	months: readonly StatementMonth[],
 	snapshots: ReadonlyMap<DateString, EngineSnapshot>,
 	moves: Moves,
 	listed: boolean,
 ): { readonly months: LiabilityMonth[]; readonly problem?: ProjectionProblem } {
-	const months: LiabilityMonth[] = []
+	const rows: LiabilityMonth[] = []
 	let before = opening
-	for (const [index, period] of periods.entries()) {
-		const closing = snapshots.get(period.to)!.balances.find((item) => item.account === id)!.amount
+	for (const [index, statementMonth] of months.entries()) {
+		const closing = snapshots
+			.get(statementMonth.to)!
+			.balances.find((item) => item.account === id)!.amount
 		const drawn = moves.drawn[index]!
 		const paid = moves.paid[index]!
 		const transferred = moves.transferred[index]!
 		const interest = closing - before - drawn + paid + transferred
 		const figures = { before, drawn, paid, transferred, interest, closing }
 		for (const value of Object.values(figures)) {
-			if (!isSafeInteger(value)) return { months, problem: overflow(period.to, id) }
+			if (!isSafeInteger(value)) return { months: rows, problem: overflow(statementMonth.to, id) }
 		}
-		months.push(monthRow(period, figures, listed))
+		rows.push(monthRow(statementMonth, figures, listed))
 		before = closing
 	}
-	return { months }
+	return { months: rows }
 }
 
 /** One statement per liability in Scenario order, cut by the Timeline and by a run-out date. */
@@ -49,18 +52,18 @@ export function buildLiabilities(
 	timeline: Timeline,
 ): LiabilityOutcome {
 	const end = run.runsOut?.date ?? timeline.horizon
-	const periods = statementPeriods(timeline.start, end, run.runsOut?.date)
+	const months = statementMonths(timeline.start, end, run.runsOut?.date)
 	const snapshots = new Map(run.snapshots.map((snapshot) => [snapshot.date, snapshot] as const))
 	const statements: LiabilityStatement[] = []
 	for (const account of scenario.accounts) {
 		if (account.kind !== "liability") continue
 		const opened = baseline.balances.find((item) => item.account === account.id)
-		const moves = movesOf(run.totals, periods, account.id)
+		const moves = movesOf(run.totals, months, account.id)
 		const listed = isTransferTarget(scenario, account.id)
 		const built = monthsOf(
 			account.id,
 			BigInt(opened?.amount ?? 0),
-			periods,
+			months,
 			snapshots,
 			moves,
 			listed,

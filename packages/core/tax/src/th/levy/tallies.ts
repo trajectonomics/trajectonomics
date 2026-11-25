@@ -23,14 +23,37 @@ export interface ThLevyTallies {
 	readonly contributions: Readonly<Record<ThLevyContributionLabel, string>>
 }
 
+/** Names the tally a label is read under; the identity for a Levy without Filers. */
+export type ThLevyLabelOf = (label: string) => string
+
 function tallyRecord<K extends string>(
 	graph: ThLevyGraph,
 	labels: readonly K[],
 	basis: ThLevyTallyBasis,
+	labelOf: ThLevyLabelOf,
 ): Readonly<Record<K, string>> {
 	const record = {} as Record<K, string>
-	for (const label of labels) record[label] = graph.tally(label, basis)
+	for (const label of labels) record[label] = graph.tally(labelOf(label), basis)
 	return record
+}
+
+/**
+ * Emits one gross tally per income label, read under the labels `labelOf` names.
+ *
+ * Purpose: Lets a Filer's income and the shared income be tallied apart.
+ * Math: No arithmetic; each Measure only reads its label from the matching sim-core tally map.
+ * Units: Tallied amounts are integer satang supplied by the caller.
+ * Throws: Nothing; the graph validates ids only.
+ *
+ * @param graph Measure graph being built.
+ * @param labelOf Maps an income label to the label its Flows carry.
+ * @statute Thailand Revenue Code Sections 40(1)–(8), 57 sexies.
+ */
+export function addIncomeTallies(
+	graph: ThLevyGraph,
+	labelOf: ThLevyLabelOf = (label) => label,
+): ThLevyTallies["income"] {
+	return tallyRecord(graph, TH_LEVY_INCOME_LABELS, ThLevyTallyBasis.Gross, labelOf)
 }
 
 /**
@@ -42,11 +65,20 @@ function tallyRecord<K extends string>(
  * Throws: Nothing; the graph validates ids only.
  *
  * @param graph Measure graph being built.
+ * @param labelOf Maps a label to the label its Flows carry; omitted reads the bare labels.
  * @statute Thailand Revenue Code Sections 40(1)–(8), 47.
  */
-export function addThLevyTallies(graph: ThLevyGraph): ThLevyTallies {
+export function addThLevyTallies(
+	graph: ThLevyGraph,
+	labelOf: ThLevyLabelOf = (label) => label,
+): ThLevyTallies {
 	return {
-		income: tallyRecord(graph, TH_LEVY_INCOME_LABELS, ThLevyTallyBasis.Gross),
-		contributions: tallyRecord(graph, TH_LEVY_CONTRIBUTION_LABELS, ThLevyTallyBasis.Funded),
+		income: addIncomeTallies(graph, labelOf),
+		contributions: tallyRecord(
+			graph,
+			TH_LEVY_CONTRIBUTION_LABELS,
+			ThLevyTallyBasis.Funded,
+			labelOf,
+		),
 	}
 }

@@ -3,6 +3,20 @@ import type { ThLevyGraph } from "./graph"
 import { ThLevyRounding } from "./graph-types"
 
 /**
+ * Names a Measure only when it is the Return's own, not a Filer's share of it.
+ *
+ * Purpose: A joint Return of two Filers computes some Measures once per Filer; only the Return's
+ * sums may take the audited ids, which are unique.
+ * Math: No arithmetic.
+ * Units: Dimensionless id.
+ * Throws: Nothing.
+ * @statute Jurisdiction-neutral graph helper; no statutory citation.
+ */
+export function auditedId(named: boolean, id: string): string | undefined {
+	return named ? id : undefined
+}
+
+/**
  * Emits a satang sum of Measure ids; an empty list becomes a zero const.
  *
  * Purpose: Keeps statutory totals readable without a fold at every call site.

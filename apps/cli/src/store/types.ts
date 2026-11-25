@@ -40,6 +40,12 @@ export type {
 /** The only source of time the store reads. Nothing in the store calls `Date.now()`. */
 export type Clock = () => Date
 
+/** The only source of ids the store reads: a client-generated UUIDv7 whose time part is `at`. */
+export type IdSource = (at: Date) => string
+
+/** What a write reads from the outside world: the time, and the ids of its new rows. */
+export type Source = { clock: Clock; newId: IdSource }
+
 /** Every list names its order; each order ends on a unique key, so it is total. */
 export type EntitySort = "id"
 export type AccountSort = "id" | "name" | "created_at"

@@ -1,6 +1,7 @@
 import type { Context } from "../command"
 import { type AppError, isAppError } from "../errors"
 import { HEAD, openStore, type RestoreCounts, type Store } from "../store"
+import { storeSourceOf } from "../with-store"
 import { sentenceOf, skipped, step } from "./checks"
 import { type DatabaseFacts, factsOf } from "./facts"
 import { integrityCheck, ledgerChecks } from "./ledger"
@@ -87,7 +88,7 @@ export function databaseChecks(
 		const detail = `No database at ${database}; run "traj init" or "traj restore".`
 		return unreadable(facts, detail, "The database does not exist.")
 	}
-	const store = openStore({ env: ctx.env, clock: () => new Date() })
+	const store = openStore({ env: ctx.env, ...storeSourceOf(ctx) })
 	if (isAppError(store)) return unreadable(facts, sentenceOf(store), "It could not be opened.")
 	try {
 		return readOpened(store, database, asOf)

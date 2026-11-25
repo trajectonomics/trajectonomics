@@ -5,6 +5,7 @@ import { dispatchFailure } from "./invalid"
 import { type Format, renderResult, resolveFormat } from "./render"
 import { route, type Stdin } from "./route"
 import { badFormat, type Ended, failureOf, namedLeaf, type Seen } from "./run-outcome"
+import type { Source } from "./store/types"
 import type { RenderHint } from "./table"
 import type { RunRecord } from "./telemetry/event"
 
@@ -30,12 +31,20 @@ async function dispatch(
 	notify: (line: string) => void,
 	seen: Seen,
 	afterSuccess: string[],
+	source: Source | undefined,
 ): Promise<Dispatched | AppError> {
 	const invocation = await route(argv, root, stdin)
 	if (isAppError(invocation)) return invocation
 	// The leaf that actually runs, a built-in such as `help` included, is the one reported.
 	seen.command = invocation.path.join(" ")
-	const ctx: Context = { env, root, stdin, notify, afterSuccess }
+	const ctx: Context = {
+		env,
+		root,
+		stdin,
+		notify,
+		afterSuccess,
+		...(source === undefined ? {} : { source }),
+	}
 	const result = await invocation.leaf.run(invocation.input, invocation.document, ctx)
 	// The dispatch step knows the leaf, so a command-raised failure follows ADR-0013's input paths.
 	if (isAppError(result)) return dispatchFailure(invocation.leaf, invocation.path, result)
@@ -54,11 +63,12 @@ async function execute(
 	format: Format,
 	invalid: string | undefined,
 	seen: Seen,
+	source: Source | undefined,
 ): Promise<Ended> {
 	try {
 		if (invalid !== undefined) return badFormat(invalid, io.err)
 		const afterSuccess: string[] = []
-		const outcome = await dispatch(argv, env, root, stdin, io.err, seen, afterSuccess)
+		const outcome = await dispatch(argv, env, root, stdin, io.err, seen, afterSuccess, source)
 		if (isAppError(outcome)) return failureOf(outcome, format, io.err)
 		io.out(renderResult(outcome.data, format, outcome.hint))
 		for (const line of afterSuccess) io.err(line)
@@ -72,19 +82,33 @@ async function execute(
 	}
 }
 
-/** Runs the CLI and returns the exit code. Never calls process.exit, so tests can drive it. */
+/**
+ * Runs the CLI and returns the exit code. Never calls process.exit, so tests can drive it. `source`
+ * replaces the clock and the id source a write reads; only the demo entry point passes it (ADR-0074).
+ */
 export async function run(
 	argv: string[],
 	io: Io,
 	env: Env,
 	root: Group = defaultRoot,
 	stdin: Stdin = defaultStdin,
+	source?: Source,
 ): Promise<number> {
 	// The format is settled first, by a pre-scan that cannot fail, so even a malformed command
 	// line is answered in the format the caller asked for.
 	const choice = resolveFormat(argv, env)
 	const seen: Seen = { command: namedLeaf(root, argv) }
-	const ended = await execute(argv, io, env, root, stdin, choice.format, choice.invalid, seen)
+	const ended = await execute(
+		argv,
+		io,
+		env,
+		root,
+		stdin,
+		choice.format,
+		choice.invalid,
+		seen,
+		source,
+	)
 	io.observe?.({
 		command: seen.command,
 		exitCode: ended.exitCode,
