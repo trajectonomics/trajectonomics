@@ -6,7 +6,7 @@ export const CHANCE_EXAMPLES: Example[] = [
 		command:
 			"traj projection chance --scenario volatile --as-of 2026-03-31 --horizon 2027-03-30 --return-model plan --paths 200 --seed 0123456789abcdef --json",
 		description:
-			"The chance from the plan's own return model: each asset Account's rate and volatility, with the inputs echoed as returnModel.",
+			"The chance from the plan's own Return model: each asset Account's rate and volatility, with the inputs echoed as returnModel.",
 	},
 	{
 		command:

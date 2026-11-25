@@ -18,7 +18,12 @@ const rollupReturns = z.strictObject({
  */
 export const projectionPath = projectionRun.extend({
 	index: integer,
-	definition: z.strictObject({ modelId: z.string(), seed: z.string(), paths: integer }),
+	definition: z.strictObject({
+		modelId: z.string(),
+		seed: z.string(),
+		paths: integer,
+		modelHash: z.string(),
+	}),
 	returnModel: planReturnModel.optional(),
 	returns: z.array(rollupReturns),
 })
