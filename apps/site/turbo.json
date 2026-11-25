@@ -11,6 +11,15 @@
 				"@trajectonomics/brand#check",
 				"@trajectonomics/web#build:hosted"
 			]
+		},
+		"lint": {
+			"dependsOn": ["@trajectonomics/brand#build"]
+		},
+		"typecheck": {
+			"dependsOn": ["@trajectonomics/brand#build"]
+		},
+		"test": {
+			"dependsOn": ["@trajectonomics/brand#build"]
 		}
 	}
 }
