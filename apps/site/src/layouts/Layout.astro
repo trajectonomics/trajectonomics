@@ -14,6 +14,7 @@ import { parseDesignTokens } from "../lib/design/tokens"
 import type { Language } from "../lib/language/language"
 import {
 	ABSOLUTE_CLEAN_URL,
+	CLEAN_URL,
 	dictionaryFor,
 	languageEntry,
 	otherLanguages,
@@ -24,20 +25,47 @@ import {
 	GOOGLE_SITE_VERIFICATION_TOKEN,
 	SITE_NAME,
 } from "../lib/site"
-import { structuredDataJson } from "../lib/site/structured-data"
+import { structuredDataJson as homeStructuredDataJson } from "../lib/site/structured-data"
 import { verificationMetas } from "../lib/site/verification"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../lib/social/layout"
 import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../lib/social/share-advert"
 
+/** The image a page advertises as `og:image`, with the words a reader who cannot see it gets. */
+interface ShareImage {
+	readonly url: string
+	readonly alt: string
+}
+
 interface Props {
 	readonly language: Language
 	readonly title: string
-	/** The Language home's one-line summary; a miss passes none, so the absence is structural. */
+	/** The page's one-line summary; a miss passes none, so the absence is structural. */
 	readonly description?: string
 	readonly indexed: boolean
+	/** The address a visitor reaches this page at: the Language choice and consent links return to it. */
+	readonly pageAddress?: string
+	/** The page's canonical and `og:url`, absolute. */
+	readonly canonicalUrl?: string
+	readonly shareImage?: ShareImage
+	readonly structuredData?: string
+	/** Whether this is the OpenJot page, so the header marks its link. */
+	readonly openjotCurrent?: boolean
 }
 
-const { language, title, description, indexed } = Astro.props
+const {
+	language,
+	title,
+	description,
+	indexed,
+	pageAddress = CLEAN_URL,
+	canonicalUrl = ABSOLUTE_CLEAN_URL,
+	shareImage = {
+		url: absoluteShareImageUrl(language),
+		alt: shareImageAlt(dictionaryFor(language)),
+	},
+	structuredData = homeStructuredDataJson(language),
+	openjotCurrent = false,
+} = Astro.props
 const dictionary = dictionaryFor(language)
 // The published Theme CSS the page loads for its own paint, read as text, so the browser's bar and
 // the header carry one colour: no colour literal is written here.
@@ -70,14 +98,14 @@ const verification = verificationMetas({
 			indexed ? (
 				<>
 					{description === undefined ? null : <meta name="description" content={description} />}
-					<link rel="canonical" href={ABSOLUTE_CLEAN_URL} />
-					{/* One address means one alternate: there is no second URL for a Language to name. */}
-					<link rel="alternate" hreflang="x-default" href={ABSOLUTE_CLEAN_URL} />
+					<link rel="canonical" href={canonicalUrl} />
+					{/* One address per page means one alternate: there is no second URL for a Language to name. */}
+					<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
 					<meta property="og:title" content={title} />
 					{description === undefined ? null : (
 						<meta property="og:description" content={description} />
 					)}
-					<meta property="og:url" content={ABSOLUTE_CLEAN_URL} />
+					<meta property="og:url" content={canonicalUrl} />
 					<meta property="og:type" content="website" />
 					<meta property="og:site_name" content={SITE_NAME} />
 					{/* The address no longer says which Language a share is in, so the card does. */}
@@ -86,18 +114,18 @@ const verification = verificationMetas({
 						<meta property="og:locale:alternate" content={entry.locale} />
 					))}
 					{/* The 1200 × 630 image the prebuild step writes, which every share sheet cuts a large card from. */}
-					<meta property="og:image" content={absoluteShareImageUrl(language)} />
+					<meta property="og:image" content={shareImage.url} />
 					<meta property="og:image:width" content={String(SHARE_IMAGE_WIDTH)} />
 					<meta property="og:image:height" content={String(SHARE_IMAGE_HEIGHT)} />
 					<meta property="og:image:type" content={SHARE_IMAGE_TYPE} />
-					<meta property="og:image:alt" content={shareImageAlt(dictionary)} />
+					<meta property="og:image:alt" content={shareImage.alt} />
 					<meta name="twitter:card" content="summary_large_image" />
-					<meta name="twitter:image" content={absoluteShareImageUrl(language)} />
+					<meta name="twitter:image" content={shareImage.url} />
 					{verification.map((meta) => (
 						<meta name={meta.name} content={meta.content} />
 					))}
 					{/* Data, not a program: ADR 0005 keeps JSON-LD outside the Program JavaScript budget. */}
-					<script type="application/ld+json" set:html={structuredDataJson(language)} />
+					<script type="application/ld+json" set:html={structuredData} />
 				</>
 			) : (
 				<meta name="robots" content="noindex" />
@@ -118,9 +146,15 @@ const verification = verificationMetas({
 		</script>
 	</head>
 	<body class="flex min-h-dvh flex-col bg-background text-foreground">
-		<Header language={language} dictionary={dictionary} markCurrent={indexed} />
+		<Header
+			language={language}
+			dictionary={dictionary}
+			markCurrent={indexed}
+			address={pageAddress}
+			openjotCurrent={openjotCurrent}
+		/>
 		<main class="flex flex-1 flex-col bg-muted text-foreground"><slot /></main>
-		<Footer dictionary={dictionary} />
+		<Footer dictionary={dictionary} address={pageAddress} />
 		{/*
 			The Reveal layer (ADR 0019) and the demo window's own controls (ADR 0022), in one script because the
 			page's whole Program JavaScript budget is 10,000 bytes. The page as served is the whole story: both

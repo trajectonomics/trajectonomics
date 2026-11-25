@@ -1,18 +1,13 @@
-import { ABSOLUTE_CLEAN_URL, LANGUAGES } from "../language/languages"
+import type { LanguagePage } from "../language/language-pages"
+import { LANGUAGES } from "../language/languages"
 import { SITE_ORIGIN } from "../site"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { hreflangTarget } from "./hreflang-target"
 import { elementsByTag, type HtmlElement, relTokens, type ScannedPage, scanHtml } from "./html"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
-
-/** One Language home: the built file's path, and the alternates it advertises. */
-interface Home {
-	readonly path: string
-	readonly alternates: readonly HtmlElement[]
-}
 
 /** The alternates of one page, in document order. */
 function alternatesOf(page: ScannedPage): readonly HtmlElement[] {
@@ -24,8 +19,12 @@ function hrefOf(link: HtmlElement | undefined): string {
 	return link?.attributes["href"] ?? "no href"
 }
 
-/** The one alternate a home carries: `x-default` at the Site's one address. */
-function checkDefault(path: string, alternates: readonly HtmlElement[]): readonly BuildFailure[] {
+/** The one alternate a page carries: `x-default` at its own address. */
+function checkDefault(
+	path: string,
+	alternates: readonly HtmlElement[],
+	page: LanguagePage,
+): readonly BuildFailure[] {
 	const matching = alternates.filter((link) => link.attributes["hreflang"] === "x-default")
 	if (matching.length === 0) {
 		return [buildFailure("HREFLANG_MISSING", path, "advertises no x-default alternate.")]
@@ -40,18 +39,21 @@ function checkDefault(path: string, alternates: readonly HtmlElement[]): readonl
 		]
 	}
 	const target = hreflangTarget(matching[0]?.attributes["href"])
-	if (target?.path === "/" && (target.origin === undefined || target.origin === SITE_ORIGIN))
+	if (
+		target?.path === page.address &&
+		(target.origin === undefined || target.origin === SITE_ORIGIN)
+	)
 		return []
 	return [
 		buildFailure(
 			"HREFLANG_TARGET",
 			path,
-			`advertises x-default at ${hrefOf(matching[0])}, not ${ABSOLUTE_CLEAN_URL}.`,
+			`advertises x-default at ${hrefOf(matching[0])}, not ${page.absoluteUrl}.`,
 		),
 	]
 }
 
-/** No home names a per-Language alternate: with one address there is no second URL to name. */
+/** No page names a per-Language alternate: with one address there is no second URL to name. */
 function checkNoLanguageAlternate(
 	path: string,
 	alternates: readonly HtmlElement[],
@@ -67,14 +69,11 @@ function checkNoLanguageAlternate(
 	)
 }
 
-/** Every Language home advertises one `x-default` at `/`, and no per-Language alternate. */
+/** Every page advertises one `x-default` at its own address, and no per-Language alternate. */
 export function checkHreflang(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	const homes = builtHomes(files).map(({ file }) => ({
-		path: pageUrl(file.path),
-		alternates: alternatesOf(scanHtml(file.content)),
-	}))
-	return homes.flatMap((home: Home) => [
-		...checkDefault(home.path, home.alternates),
-		...checkNoLanguageAlternate(home.path, home.alternates),
-	])
+	return builtLanguagePages(files).flatMap(({ page, file }) => {
+		const path = pageUrl(file.path)
+		const alternates = alternatesOf(scanHtml(file.content))
+		return [...checkDefault(path, alternates, page), ...checkNoLanguageAlternate(path, alternates)]
+	})
 }

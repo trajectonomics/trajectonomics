@@ -55,24 +55,35 @@ type Signals = Partial<Pick<Probe, "acceptLanguage" | "country" | "cookie" | "se
 
 /** A request for `/`, answered with that Language's home for the signals given. */
 export function home(language: Language, signals: Signals = {}): Probe {
+	return page("/", language, signals)
+}
+
+/** A request for one page address, answered with that Language's page for the signals given. */
+export function page(
+	address: string,
+	language: Language,
+	signals: Signals = {},
+	contains: readonly string[] = [],
+): Probe {
 	return probe({
-		path: "/",
+		path: address,
 		status: 200,
 		language,
 		mediaTypes: PAGE_MEDIA,
 		vary: HOME_VARY,
 		cacheControl: HOME_CACHE,
 		etag: true,
+		contains,
 		...signals,
 	})
 }
 
-/** The Language choice link, which stores the Language it names and returns to the address. */
-export function choice(language: Language | null): Probe {
+/** The Language choice link, which stores the Language it names and returns to the page it was chosen on. */
+export function choice(language: Language | null, address = "/"): Probe {
 	return probe({
-		path: `/?${LANGUAGE_CHOICE_PARAM}=${language ?? "zz"}`,
+		path: `${address}?${LANGUAGE_CHOICE_PARAM}=${language ?? "zz"}`,
 		status: 302,
-		location: "/",
+		location: address,
 		cacheControl: CHOICE_CACHE,
 		storesChoice: language,
 	})
@@ -91,20 +102,20 @@ export function personalised(
 	return { ...home(language, signals), etag: null, ...body }
 }
 
-/** The consent link, which stores the answer it names and returns to the address with no banner. */
-export function consent(choice: ConsentChoice | "reset"): Probe {
+/** The consent link, which stores the answer it names and returns to the page it was asked on. */
+export function consent(choice: ConsentChoice | "reset", address = "/"): Probe {
 	return probe({
-		path: `/?${CONSENT_PARAM}=${choice}`,
+		path: `${address}?${CONSENT_PARAM}=${choice}`,
 		status: 302,
-		location: "/",
+		location: address,
 		cacheControl: CHOICE_CACHE,
 		setsConsent: choice,
 	})
 }
 
 /** An old prefix, which answers 301 to the address and stores nothing. */
-export function moved(path: string): Probe {
-	return probe({ path, status: 301, location: "/" })
+export function moved(path: string, location = "/"): Probe {
+	return probe({ path, status: 301, location })
 }
 
 /** A request for a built path, which must answer with `status`, in `language`, as `mediaTypes`. */

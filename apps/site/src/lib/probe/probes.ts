@@ -2,6 +2,7 @@ import { CONSENT_COOKIE, VISITOR_COOKIE } from "../analytics/consent"
 import { ROBOTS_FILE } from "../crawl/robots"
 import { SITEMAP_FILE } from "../crawl/sitemap"
 import { LANGUAGE_CHOICE_COOKIE } from "../language/stored-choice"
+import { OPENJOT_PATH } from "../site/openjot"
 import type { Probe } from "./probe"
 import {
 	answered,
@@ -10,6 +11,7 @@ import {
 	home,
 	moved,
 	PAGE_MEDIA,
+	page,
 	personalised,
 	ROBOTS_MEDIA,
 	SITEMAP_MEDIA,
@@ -70,4 +72,10 @@ export const PROBES: readonly Probe[] = Object.freeze([
 		{ contains: [`data-consent="denied"`], lacks: ["data-visitor"] },
 	),
 	{ ...home("en"), lacks: ['data-consent="'] },
+	page(OPENJOT_PATH, "en", {}, ["OpenJot"]),
+	page(OPENJOT_PATH, "th", { acceptLanguage: "th" }, ["OpenJot"]),
+	page(OPENJOT_PATH, "th", { country: "TH" }, ["OpenJot"]),
+	choice("th", OPENJOT_PATH),
+	consent("granted", OPENJOT_PATH),
+	moved("/openjot", OPENJOT_PATH),
 ])

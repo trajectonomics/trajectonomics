@@ -1,11 +1,11 @@
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
 import { dataBlocks, parsedBlock } from "./structured-data-blocks"
 
-/** The claims about traj a block may not state: no review exists, so no rating does either. */
+/** The claims about a product a block may not state: no review exists, so no rating does either. */
 const UNSUPPORTED_CLAIMS: readonly string[] = Object.freeze([
 	"aggregateRating",
 	"review",
@@ -22,7 +22,7 @@ function claimsIn(value: unknown): readonly string[] {
 	])
 }
 
-/** The claims one home's block states that no fact on the page supports. */
+/** The claims one page's block states that no fact on the page supports. */
 function failuresOf(file: BuiltFile): readonly BuildFailure[] {
 	const path = pageUrl(file.path)
 	return dataBlocks(file.content).flatMap((block) => {
@@ -32,13 +32,13 @@ function failuresOf(file: BuiltFile): readonly BuildFailure[] {
 			buildFailure(
 				"JSON_LD_CLAIM_PRESENT",
 				path,
-				`states \`${claim}\`, and the page shows no review and no rating for traj.`,
+				`states \`${claim}\`, and the page shows no review and no rating for it.`,
 			),
 		)
 	})
 }
 
-/** Every Language home states no claim the page cannot support, such as a rating or a review. */
+/** Every page states no claim the page cannot support, such as a rating or a review. */
 export function checkStructuredDataClaims(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ file }) => failuresOf(file))
+	return builtLanguagePages(files).flatMap(({ file }) => failuresOf(file))
 }

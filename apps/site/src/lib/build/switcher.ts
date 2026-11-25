@@ -1,18 +1,18 @@
 import { currentLanguageName } from "../language/dictionary"
-import type { Language } from "../language/language"
+import type { LanguagePage } from "../language/language-pages"
 import { dictionaryFor, languageChoiceLink, otherLanguages } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, scanHtml, textOf } from "./html"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 
-/** The switcher on one home: one Language choice link per other Language, named in that Language. */
-function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFailure[] {
-	const page = scanHtml(file.content)
-	const anchors = elementsByTag(page, "a")
-	const failures = otherLanguages(language).flatMap((other) => {
-		const href = languageChoiceLink(other.language)
+/** One page's switcher: one Language choice link per other Language, named in that Language. */
+function checkSwitcherFor(file: BuiltFile, page: LanguagePage): readonly BuildFailure[] {
+	const scanned = scanHtml(file.content)
+	const anchors = elementsByTag(scanned, "a")
+	const failures = otherLanguages(page.language).flatMap((other) => {
+		const href = languageChoiceLink(other.language, page.address)
 		const code = other.language
 		const link = anchors.find(
 			(anchor) => anchor.attributes["href"] === href && anchor.attributes["lang"] === code,
@@ -36,7 +36,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 			]
 		}
 		const name = dictionaryFor(other.language).languageName
-		const text = textOf(page, link)
+		const text = textOf(scanned, link)
 		if (text === name) return []
 		return [
 			buildFailure(
@@ -46,10 +46,10 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 			),
 		]
 	})
-	const entry = dictionaryFor(language)
+	const entry = dictionaryFor(page.language)
 	const current = anchors.find(
 		(anchor) =>
-			anchor.attributes["href"] === languageChoiceLink(language) &&
+			anchor.attributes["href"] === languageChoiceLink(page.language, page.address) &&
 			anchor.attributes["aria-current"] === "page",
 	)
 	if (current === undefined) {
@@ -58,12 +58,12 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 			buildFailure(
 				"SWITCHER_CURRENT_MISSING",
 				file.path,
-				`no link marks ${languageChoiceLink(language)} as the current Language.`,
+				`no link marks ${languageChoiceLink(page.language, page.address)} as the current Language.`,
 			),
 		]
 	}
 	const named = current.attributes["aria-label"] === currentLanguageName(entry)
-	const labelled = textOf(page, current) === entry.languageName
+	const labelled = textOf(scanned, current) === entry.languageName
 	if (named && labelled) return failures
 	return [
 		...failures,
@@ -75,7 +75,7 @@ function checkSwitcherFor(file: BuiltFile, language: Language): readonly BuildFa
 	]
 }
 
-/** A home switches to every other Language with a plain Language choice link, with JavaScript off (ADR 0020). */
+/** Every page switches to every other Language with a plain Language choice link (ADR 0020). */
 export function checkSwitcher(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => checkSwitcherFor(file, entry.language))
+	return builtLanguagePages(files).flatMap(({ page, file }) => checkSwitcherFor(file, page))
 }

@@ -1,0 +1,34 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+import { OPENJOT_DOWNLOAD_URL, OPENJOT_SOURCE_URL } from "../../lib/site/openjot"
+import Mascot from "../Mascot.astro"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<section class="section-muted bg-muted" aria-labelledby="openjot-closing">
+	<div class="section-inner closing">
+		<Mascot pose="wave" class="mascot-closing" />
+		<h2 id="openjot-closing" class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+			{dictionary.closingHeading}
+		</h2>
+		<p class="section-lede closing-lede text-foreground">{dictionary.closingLede}</p>
+		<div class="install-row closing-actions">
+			<a
+				class="closing-primary bg-primary text-primary-foreground"
+				data-bevel
+				href={OPENJOT_DOWNLOAD_URL}
+				referrerpolicy="no-referrer-when-downgrade"
+			>
+				{dictionary.downloadCta}
+			</a>
+			<a class="window-exit" data-bevel href={OPENJOT_SOURCE_URL}>{dictionary.ossLink}</a>
+		</div>
+	</div>
+</section>

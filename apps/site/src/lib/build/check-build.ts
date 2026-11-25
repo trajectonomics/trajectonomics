@@ -21,6 +21,7 @@ import { checkLlmsFiles } from "./llms"
 import { type BuildMode, DEFAULT_BUILD_MODE } from "./mode"
 import { checkNoLanguageDetection } from "./no-language-detection"
 import { checkNotFoundPages } from "./not-found-pages"
+import { checkOpenJotPages } from "./openjot-pages"
 import { checkOwnerPlaceholder } from "./owner-written"
 import { checkPageLinks } from "./page-links"
 import { checkPageText } from "./page-text"
@@ -53,6 +54,7 @@ const FILE_RULES = [
 	checkFonts,
 	checkPageWeight,
 	checkLanguageHomes,
+	checkOpenJotPages,
 	checkHreflang,
 	checkSitemap,
 	checkRobots,

@@ -1,13 +1,14 @@
 import { SITEMAP_FILE } from "../crawl/sitemap"
-import { ABSOLUTE_CLEAN_URL, LANGUAGES } from "../language/languages"
+import { LANGUAGES } from "../language/languages"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import type { HtmlElement } from "./html"
 import type { SitemapEntry } from "./sitemap-entry"
 
-/** One alternate is present once, and its `href` is the Site's one address. */
+/** One alternate is present once, and its `href` is the entry's own address. */
 function defaultFailures(
 	home: string,
+	url: string,
 	alternates: readonly HtmlElement[],
 ): readonly BuildFailure[] {
 	const matching = alternates.filter((link) => link.attributes["hreflang"] === "x-default")
@@ -30,12 +31,12 @@ function defaultFailures(
 		]
 	}
 	const target = matching[0]?.attributes["href"]
-	if (target === ABSOLUTE_CLEAN_URL) return []
+	if (target === url) return []
 	return [
 		buildFailure(
 			"SITEMAP_ALTERNATE_TARGET",
 			SITEMAP_FILE,
-			`the entry at ${home} names x-default at ${target ?? "no href"}, not ${ABSOLUTE_CLEAN_URL}.`,
+			`the entry at ${home} names x-default at ${target ?? "no href"}, not ${url}.`,
 		),
 	]
 }
@@ -51,15 +52,19 @@ function languageAlternateFailures(
 		buildFailure(
 			"SITEMAP_ALTERNATE_LANGUAGE",
 			SITEMAP_FILE,
-			`the entry at ${home} names a ${entry.language} alternate, but the Site has one address.`,
+			`the entry at ${home} names a ${entry.language} alternate, but each page has one address.`,
 		),
 	)
 }
 
-/** An entry names one `x-default` at the Site's one address, and no per-Language alternate. */
-export function entryAlternateFailures(entry: SitemapEntry, home: string): readonly BuildFailure[] {
+/** An entry names one `x-default` at its own address, and no per-Language alternate. */
+export function entryAlternateFailures(
+	entry: SitemapEntry,
+	home: string,
+	url: string,
+): readonly BuildFailure[] {
 	return [
-		...defaultFailures(home, entry.alternates),
+		...defaultFailures(home, url, entry.alternates),
 		...languageAlternateFailures(home, entry.alternates),
 	]
 }
