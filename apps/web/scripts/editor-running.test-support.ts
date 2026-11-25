@@ -1,8 +1,10 @@
 import { SLOW_MS } from "./edit-slow.test-support"
 import type { Editor } from "./serve-edit"
 
-// The Edits a loan end-to-end test has sent to its editor and that are still running.
-/** The Edits the editor is running now: `send` adds each one and takes it out when it settles. */
+/**
+ * The requests a shared editor is running now, for every test that sends to one: `track` adds each request
+ * (`send` in the loan tests, `recorded` for the editors the other files share) and takes it out when it settles.
+ */
 export const running = new Set<Promise<unknown>>()
 
 /** Records a request the editor is running and takes it out when it settles; answers the request itself. */

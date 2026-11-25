@@ -12,7 +12,7 @@ import {
 	setupEditor,
 } from "./edit-fixture.test-support"
 import { editRequest, PORT } from "./edit-request.test-support"
-import { settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** A what-if that switches off `car`, the demo ledger's Flow that nothing else reads. */
 const GOOD = JSON.stringify({ plan: "base", sets: [], removals: ["flows.car"] })

@@ -1,10 +1,11 @@
 // The estate block's refusals against the real traj: each is in the CLI's own words, and its path, in the index form of the
 // core or the id form of the decimal conversion, names the form field it is shown at (cli ADR 0064, web ADR 0014).
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { type EstateBlock, scenarioDocument } from "../src/lib/contract"
 import { withEstate } from "../src/lib/view/estate"
 import { estateFieldOfRefusal, layoutOf } from "../src/lib/view/estate/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { slow, withoutLines } from "./estate.test-support"
 import {
 	accountIds,
@@ -18,6 +19,7 @@ import {
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 /** The refusal of a block the form could not make, sent as the page's Edit would send it, and the field it names. */

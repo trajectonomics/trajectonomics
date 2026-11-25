@@ -10,7 +10,7 @@ import {
 	withAmount,
 } from "./edit-fixture.test-support"
 import { forkInTerminal } from "./edit-fork.test-support"
-import { settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** An apply-plan Edit of one plan, carrying the content hash the page read for it. */
 const applyEdit = (name: string, contentHash: string, document: unknown) =>

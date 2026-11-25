@@ -1,7 +1,7 @@
 // The balance-history import against the real traj, over the fictional ledger: a pasted spreadsheet is parsed,
 // matched and previewed (nothing written), then imported, and the Net worth history chart covers the twelve
 // months (web ADR 0008, the amendment of 2026-11-25).
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { accountValues, type Snapshot, snapshot } from "../src/lib/contract"
 import { autoMatches, targetsOf } from "../src/lib/view/import-values/match"
 import { parseImport } from "../src/lib/view/import-values/parse"
@@ -18,6 +18,7 @@ import {
 	SLOW_MS,
 	setupEditor,
 } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** Twelve month-ends before the demo ledger's first transaction, one row each, with thousands separators as a spreadsheet pastes them. */
 const MONTH_ENDS = [
@@ -59,6 +60,7 @@ async function planOf(text: string, sheet: ValueSheet) {
 	return { parsed, plan: importPlan(parsed, matches), against }
 }
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)
 
 describe("importing a balance history", () => {

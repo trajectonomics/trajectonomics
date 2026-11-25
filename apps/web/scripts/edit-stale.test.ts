@@ -14,7 +14,7 @@ import {
 	withAmount,
 } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
-import { settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** `traj scenario tax base --none` in the scratch ledger, as someone at a terminal would run it. */
 function removeLevyInTerminal(): void {

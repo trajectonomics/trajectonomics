@@ -8,7 +8,7 @@ import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { SLOW_MS } from "./edit-slow.test-support"
-import { recorded } from "./loans-running.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */

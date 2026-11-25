@@ -16,7 +16,7 @@ import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
-import { track } from "./loans-running.test-support"
+import { track } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 
 export { SLOW_MS }

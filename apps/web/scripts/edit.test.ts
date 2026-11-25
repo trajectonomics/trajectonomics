@@ -14,7 +14,7 @@ import {
 	shownOf,
 } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
-import { settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 
 describe("an Edit against the real traj", () => {
 	test("the workspace traj binary is built", () => {

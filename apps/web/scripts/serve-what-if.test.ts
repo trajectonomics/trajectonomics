@@ -5,7 +5,7 @@ import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { EDIT_TOKEN_HEADER } from "../src/lib/edit/guard"
 import { disposeEditor, SLOW_MS, setupEditor } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, PORT, TOKEN } from "./edit-request.test-support"
-import { settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 import { createEditor } from "./serve-edit"
 
 /** A what-if that switches off `car`, the demo ledger's Flow that nothing else reads. */
