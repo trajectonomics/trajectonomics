@@ -256,7 +256,7 @@ Whether a result's figures include income tax: `applied`, `not_applied`, or `mix
 _Avoid_: Taxed, pre-tax, after-tax (as a status)
 
 **Filer**:
-A person a joint Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own. A joint Return with two Filers is one Levy and one bracket walk, with each Filer's own expense ceiling (tax ADR-0009, ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
+A person a Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own. A joint Return with two Filers is one Levy and one bracket walk, with each Filer's own expense ceiling; a separate Return writes one Levy per Filer (tax ADR-0009, ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
 _Avoid_: Taxpayer (a Filer is a person in the household, not the status), spouse
 
 **Filing choice**:

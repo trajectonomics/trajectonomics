@@ -120,6 +120,19 @@ describe("a joint Return over Filers", () => {
 		expect(isFilerPlan(flows(["income", "income.section40_1@shared"]))).toBe(true)
 	})
 
+	test("a Levy whose tally measures carry a Filer suffix makes it one, even with no labelled Flow", () => {
+		const plan = {
+			...flows(["income"]),
+			levies: [{ id: "th-2026-pit", measures: [{ op: "tally", label: "income.section40_1@me" }] }],
+		} as unknown as ScenarioDocument
+		expect(isFilerPlan(plan)).toBe(true)
+		const bare = {
+			...flows(["income"]),
+			levies: [{ id: "th-2026-pit", measures: [{ op: "tally", label: "income.section40_1" }] }],
+		} as unknown as ScenarioDocument
+		expect(isFilerPlan(bare)).toBe(false)
+	})
+
 	test("a bare label, no label, an unknown label or no document is not", () => {
 		expect(isFilerPlan(flows(["contribution", "allowance.retirement.rmf"]))).toBe(false)
 		expect(isFilerPlan(flows(["income"]))).toBe(false)

@@ -1,5 +1,5 @@
 import { type AppError, fail } from "../errors"
-import { TAX_LEVY_ID } from "../scenario/tax"
+import { isTaxLevyId } from "../scenario/tax"
 import { CARRY_IN_FIELD } from "./carryin"
 import type { CarryInClass } from "./carryin-classes"
 import type { Needed, Working } from "./carryin-levy"
@@ -56,7 +56,7 @@ export function completed(input: {
 	for (const start of starts) {
 		if (present.has(start)) continue
 		if (start === current) return needsRecord(input.id, start, input.classes)
-		if (input.id !== TAX_LEVY_ID) return needsOwnRecord(input.id, start)
+		if (!isTaxLevyId(input.id)) return needsOwnRecord(input.id, start)
 		next.push({
 			entry: { periodStart: start, tallies: [], prepaid: 0, source: "scope" },
 			flag: null,
