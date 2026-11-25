@@ -24,6 +24,23 @@ describe("fieldOfRefusal", () => {
 	})
 })
 
+describe("fieldOfRefusal: a household anchor", () => {
+	const ANCHOR_FIELDS = ["flow", "edge", "person", "when", "age"]
+
+	test("names the age for an anchor refused as a whole, or at its date", () => {
+		expect(fieldOfRefusal(refusal("document.anchors.0.path"), ANCHOR_FIELDS)).toBe("age")
+		expect(fieldOfRefusal(refusal("document.anchors.0"), ANCHOR_FIELDS)).toBe("age")
+		expect(fieldOfRefusal(refusal("document.anchors.12.path"), ANCHOR_FIELDS)).toBe("age")
+	})
+
+	test("still names the field an anchor's path ends in, and none for another form", () => {
+		expect(fieldOfRefusal(refusal("document.anchors.0.person"), ANCHOR_FIELDS)).toBe("person")
+		expect(fieldOfRefusal(refusal("document.anchors.0.age"), ANCHOR_FIELDS)).toBe("age")
+		expect(fieldOfRefusal(refusal("document.anchors.0.path"), FLOW_FIELDS)).toBeNull()
+		expect(fieldOfRefusal(refusal("document.people.0"), ANCHOR_FIELDS)).toBeNull()
+	})
+})
+
 describe("shownProblems", () => {
 	test("shows a refusal at the field it names, and not on the others", () => {
 		const shown = shownProblems(

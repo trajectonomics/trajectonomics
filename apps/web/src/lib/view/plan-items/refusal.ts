@@ -41,6 +41,19 @@ function employerField(segments: readonly string[], fields: readonly string[]): 
 }
 
 /**
+ * Whether a refusal is about a household anchor as a whole: `document.anchors.0.path` (END_BEFORE_START) and
+ * `document.anchors.0` (an age out of range) end in no field of the anchor form, and the date they refuse comes from its age.
+ */
+function anchorRefusal(segments: readonly string[]): boolean {
+	const at = segments.indexOf("anchors")
+	if (at < 0) return false
+	const rest = segments.slice(at + 2)
+	return (
+		/^\d+$/.test(segments[at + 1] ?? "") && (rest.length === 0 || rest[rest.length - 1] === "path")
+	)
+}
+
+/**
  * The form field a refusal names, or null when it names none. The CLI's path ends in the field
  * (`document.flows.salary.amount`), and a rate's path runs through `growth`, so `growth` names `rate`. An Account's
  * `payout` and `fee` and a salary's employer Flow have their own fields, found by the key the path ends in under them.
@@ -51,6 +64,7 @@ export function fieldOfRefusal(error: ErrorBody | null, fields: readonly string[
 	const last = segments[segments.length - 1] ?? ""
 	if (fields.includes(last)) return last
 	if (segments.includes("growth") && fields.includes("rate")) return "rate"
+	if (anchorRefusal(segments) && fields.includes("age")) return "age"
 	return sectionField(segments, fields) ?? employerField(segments, fields)
 }
 

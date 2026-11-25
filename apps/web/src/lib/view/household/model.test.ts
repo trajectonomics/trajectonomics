@@ -4,6 +4,7 @@ import {
 	agesText,
 	anchorAt,
 	anchorLabel,
+	axisAge,
 	flowAnchorLabels,
 	householdHref,
 	personCards,
@@ -94,6 +95,19 @@ describe("agesText", () => {
 
 	test("is empty when the row carries no ages", () => {
 		expect(agesText([])).toBe("")
+	})
+})
+
+describe("axisAge", () => {
+	test('reads "age N" for one person, the first person\'s age for several, and null for none', () => {
+		expect(axisAge([{ person: "me", age: 37 }])).toBe("age 37")
+		expect(
+			axisAge([
+				{ person: "me", age: 37 },
+				{ person: "partner", age: 35 },
+			]),
+		).toBe("me 37")
+		expect(axisAge([])).toBeNull()
 	})
 })
 
