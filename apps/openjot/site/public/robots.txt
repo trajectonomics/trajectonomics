@@ -5,4 +5,4 @@ Disallow: /go
 Disallow: /api/
 Disallow: /ingest/
 
-Sitemap: https://moojot.trajectonomics.com/sitemap.xml
+Sitemap: https://openjot.trajectonomics.com/sitemap.xml

@@ -130,7 +130,7 @@ object DailyReminder {
     private fun notify(context: Context) {
         if (!hasNotificationPermission(context)) return
         val p = prefs(context)
-        val title = p.getString(KEY_TITLE, null) ?: "MooJot"
+        val title = p.getString(KEY_TITLE, null) ?: "OpenJot"
         ensureChannel(context, title)
         val open = PendingIntent.getActivity(
             context,

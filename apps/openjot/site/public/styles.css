@@ -1,4 +1,4 @@
-/* MooJot landing page. Colours mirror the app's default pink & white theme
+/* OpenJot landing page. Colours mirror the app's default pink & white theme
    (src/app.css), whatever the visitor's system light/dark setting. */
 
 @font-face { font-family: "Noto Sans Thai"; font-weight: 400; font-display: swap; src: url(/fonts/noto-sans-thai-thai-400-normal.woff2) format("woff2"); unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
@@ -319,7 +319,7 @@ html[data-release="soon"] .js-download { opacity: 0.92; }
 .pick-us h3 { padding-right: 76px; }
 .pick-moo { position: absolute; right: 10px; top: -30px; width: 84px; height: auto; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.18)); }
 
-/* Side by side: MeowJot (left) and MooJot (right), one topic per row */
+/* Side by side: MeowJot (left) and OpenJot (right), one topic per row */
 .vs-rows { display: grid; gap: 44px; max-width: 760px; margin: 32px auto 0; }
 .vs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; align-items: start; }
 .vs-row > h3 { grid-column: 1 / -1; font-size: 21px; font-weight: 800; padding-bottom: 8px; border-bottom: 2px solid var(--border); }

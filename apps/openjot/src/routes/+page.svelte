@@ -608,7 +608,7 @@
     if (unlocking) return;
     unlocking = true;
     lockMessage = null;
-    const result = await requestUnlock({ reason: t(lang, "appLockReason"), title: "MooJot" });
+    const result = await requestUnlock({ reason: t(lang, "appLockReason"), title: "OpenJot" });
     unlocking = false;
     hiddenAt = null;
     if (result === "unlocked") {
@@ -637,7 +637,7 @@
   /** The My Moo switch. Turning it on needs one successful unlock first; returns why not, if not. */
   async function changeAppLock(on: boolean): Promise<string | null> {
     if (on) {
-      const result = await requestUnlock({ reason: t(lang, "appLockEnableReason"), title: "MooJot" });
+      const result = await requestUnlock({ reason: t(lang, "appLockEnableReason"), title: "OpenJot" });
       hiddenAt = null;
       if (result === "no-screen-lock") return t(lang, "appLockNoScreenLock");
       if (result === "lockout") return t(lang, "appLockLockout");
@@ -1458,7 +1458,7 @@
                 mood={isScanning || pullArmed ? "scan" : mascotMood}
                 size="hero"
                 onTap={handleMascotTap}
-                alt="MooJot mascot"
+                alt="OpenJot mascot"
               />
             </div>
           </div>
@@ -1924,12 +1924,12 @@
       }}
       onExportCsv={async () => {
         const csv = await api.exportRecordsCsv();
-        triggerAndroidDownloadOrShare("moojot-records.csv", "text/csv", csv);
+        triggerAndroidDownloadOrShare("openjot-records.csv", "text/csv", csv);
         track("data_exported", { format: "csv" });
       }}
       onExportJson={async () => {
         const json = await api.exportBackupJson();
-        triggerAndroidDownloadOrShare("moojot-backup.json", "application/json", json);
+        triggerAndroidDownloadOrShare("openjot-backup.json", "application/json", json);
         track("data_exported", { format: "json" });
       }}
     />

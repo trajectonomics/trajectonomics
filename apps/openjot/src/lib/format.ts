@@ -1,4 +1,4 @@
-// Formatting and calculator helpers for the MooJot UI.
+// Formatting and calculator helpers for the OpenJot UI.
 
 const EN_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const TH_DAYS = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."] as const;

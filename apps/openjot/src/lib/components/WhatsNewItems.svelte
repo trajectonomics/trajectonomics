@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Bell, BellRing, Lock, Mail, Smartphone } from "@lucide/svelte";
+  import { Bell, BellRing, Lock, Mail, Smartphone, Sparkles } from "@lucide/svelte";
   import { t } from "$lib/i18n";
   import type { WhatsNewAction, WhatsNewIcon, WhatsNewItem, WhatsNewRelease } from "$lib/whatsNew";
 
@@ -24,7 +24,7 @@
     reminderAvailable?: boolean;
   } = $props();
 
-  const icons = { lock: Lock, "bell-ring": BellRing, smartphone: Smartphone, mail: Mail, bell: Bell } satisfies Record<
+  const icons = { lock: Lock, "bell-ring": BellRing, smartphone: Smartphone, mail: Mail, bell: Bell, sparkles: Sparkles } satisfies Record<
     WhatsNewIcon,
     typeof Lock
   >;
