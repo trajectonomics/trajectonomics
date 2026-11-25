@@ -173,6 +173,29 @@ describe("the chart", () => {
 		const lens = demoLens()
 		expect(whatIfSeries(lens.run ?? failing(), null, "real")).toHaveLength(1)
 	})
+
+	test("with amounts hidden only the what-if series remain, none dashed and none named Baseline", () => {
+		const lens = demoLens()
+		const baseline = baselineRun(DEMO, "base")
+		const hidden = whatIfSeries(lens.run ?? failing(), baseline, "nominal", true)
+		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Nominal net worth"])
+		expect(hidden.every((entry) => entry.dashed !== true)).toBe(true)
+		expect(hidden.some((entry) => entry.name.includes("Baseline"))).toBe(false)
+	})
+
+	test("with amounts shown the series are unchanged, and hiding is off by default", () => {
+		const lens = demoLens()
+		const baseline = baselineRun(DEMO, "base")
+		const shown = whatIfSeries(lens.run ?? failing(), baseline, "nominal", false)
+		expect(shown.map((entry) => entry.name)).toEqual([
+			"What-if: Nominal net worth",
+			"Baseline: Nominal net worth",
+		])
+		expect(shown.map((entry) => entry.dashed === true)).toEqual([false, true])
+		expect(
+			whatIfSeries(lens.run ?? failing(), baseline, "nominal").map((entry) => entry.name),
+		).toEqual(["What-if: Nominal net worth", "Baseline: Nominal net worth"])
+	})
 })
 
 function failing(): never {
