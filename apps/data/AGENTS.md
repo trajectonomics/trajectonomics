@@ -1,7 +1,8 @@
 # AGENTS.md
 
 Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is specific to
-`apps/data`, the private data-collection app tree under `apps/data/collector`.
+`apps/data`, the data app at data.trajectonomics.com: the `data` Worker and the nested
+`collector/` package.
 
 ## Rules
 
@@ -17,3 +18,20 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    slice.
 5. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
    else the T3 Code `cursor` logs. Never both.
+
+## The Worker
+
+1. `traj-data` never holds an email or a name. It holds contributor ids, plan and model ids, UTC
+   buckets, numbers, and the auth user id on `contributor`.
+2. The public API serves `rollup_daily` only. No response carries a machine, a contributor or an
+   hourly bucket.
+3. `/ingest` authenticates with the temporary `INGEST_BOOTSTRAP_KEY` secret. The contributor comes
+   from the key, never from the body; a row that names another contributor is rejected.
+4. `src/core/` is pure: validation, rollups, query parsing and health take their clock as an
+   argument. D1 stays in `src/db/`, HTTP in `src/http/`.
+5. Data never triggers a rebuild (ADR 0001). Ingest recomputes rollups in D1; the pages and the API
+   are served by the deployed Worker.
+6. An ingest batch is all-or-nothing: the whole body is validated before anything is written, and
+   the writes share one `DB.batch`.
+7. The schema changes only through numbered files in `migrations/`; the deploy workflow applies
+   them before deploying the Worker.
