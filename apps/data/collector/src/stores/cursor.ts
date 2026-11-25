@@ -8,6 +8,23 @@ type RawRun = {
 	created_at: string
 }
 
+/** Returns whether one `sdk-agent-store` database has any populated usage at all, ignoring `--since`. */
+export function cursorStoreHasUsage(path: string): boolean {
+	try {
+		const db = new Database(path, { readonly: true })
+		try {
+			const row = db
+				.query("SELECT 1 FROM runs WHERE usage_json IS NOT NULL AND usage_json != '' LIMIT 1")
+				.get()
+			return row !== null
+		} finally {
+			db.close()
+		}
+	} catch {
+		return false
+	}
+}
+
 /** Reads populated Cursor usage rows from one `sdk-agent-store` database. */
 export function readCursorRuns(path: string, sinceIso: string | null): CursorRun[] {
 	try {

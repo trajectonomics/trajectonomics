@@ -17,6 +17,8 @@ function sampleFrom(line: string): UsageSample | null {
 		model,
 		timestamp,
 		tokensIn: asNumber(usage["input"]),
+		// Pi's output already includes reasoning: totalTokens is input + output + cacheRead +
+		// cacheWrite in every inspected record, and reasoning never exceeds output.
 		tokensOut: asNumber(usage["output"]),
 		cacheRead: asNumber(usage["cacheRead"]),
 		cacheWrite: asNumber(usage["cacheWrite"]),

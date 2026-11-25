@@ -45,6 +45,15 @@ describe("extractPi", () => {
 		expect(rows[0]?.tokensTotal).toBe(126)
 	})
 
+	test("does not add reasoning that output already includes", () => {
+		const rows = extractPi(
+			[[line("2026-11-24T10:30:00.000Z", "opencode-go", "deepseek-v4.1-flash", 100, 20, 9)]],
+			context,
+		)
+		expect(rows[0]?.tokensOut).toBe(20)
+		expect(rows[0]?.tokensTotal).toBe(126)
+	})
+
 	test("maps the free OpenCode route and Command Code", () => {
 		const rows = extractPi(
 			[

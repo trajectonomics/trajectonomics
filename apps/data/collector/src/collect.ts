@@ -4,14 +4,13 @@ import { basename, dirname, join } from "node:path"
 import { bucketStartUtc, sortUsageRows } from "./aggregate"
 import { type AntigravityFile, extractAntigravity } from "./extract/antigravity"
 import { extractClaude } from "./extract/claude"
-import { extractCursor } from "./extract/cursor"
+import { chooseCursorUsage } from "./extract/cursor"
 import { extractMistralCsv } from "./extract/mistral"
 import { extractOpenCode } from "./extract/opencode"
 import { extractPi } from "./extract/pi"
-import { extractT3Cursor } from "./extract/t3-cursor"
 import { extractT3Muse } from "./extract/t3-muse"
-import { readCursorRuns } from "./stores/cursor"
-import { listFiles, readLines } from "./stores/files"
+import { cursorStoreHasUsage, readCursorRuns } from "./stores/cursor"
+import { listFiles, listRecentFiles, readLines } from "./stores/files"
 import { openOpenCodeDatabase, readOpenCodeRows } from "./stores/opencode"
 import type { CollectorContext, UsageRow } from "./types"
 
@@ -26,19 +25,23 @@ function* lineFiles(paths: readonly string[]): Generator<Iterable<string>> {
 	for (const path of paths) yield readLines(path)
 }
 
-function jsonlFiles(root: string): Iterable<Iterable<string>> {
-	return lineFiles(listFiles(root, (path) => path.endsWith(".jsonl")))
+function jsonlFiles(root: string, sinceMs: number | null): Iterable<Iterable<string>> {
+	return lineFiles(listRecentFiles(root, (path) => path.endsWith(".jsonl"), sinceMs))
 }
 
 function t3LogFiles(root: string): Iterable<Iterable<string>> {
 	return lineFiles(listFiles(root, (path) => path.endsWith(".log")))
 }
 
-function* antigravityFiles(root: string): Generator<AntigravityFile> {
-	const paths = listFiles(root, (path) => {
-		const name = basename(path)
-		return name === "transcript.jsonl" || name === "transcript_full.jsonl"
-	})
+function* antigravityFiles(root: string, sinceMs: number | null): Generator<AntigravityFile> {
+	const paths = listRecentFiles(
+		root,
+		(path) => {
+			const name = basename(path)
+			return name === "transcript.jsonl" || name === "transcript_full.jsonl"
+		},
+		sinceMs,
+	)
 	for (const path of paths) {
 		const conversationId = basename(dirname(dirname(dirname(path))))
 		yield { conversationId, fileName: basename(path), lines: readLines(path) }
@@ -65,12 +68,15 @@ function collectCursor(rows: UsageRow[], context: CollectorContext, sinceIso: st
 		join(homedir(), ".cursor/projects"),
 		(path) => basename(path) === "index.db" && path.includes("/sdk-agent-store/"),
 	)
-	const runs = cursorPaths.flatMap((path) => readCursorRuns(path, sinceIso))
-	if (runs.length > 0) {
-		rows.push(...extractCursor(runs, context))
-	} else {
-		rows.push(...extractT3Cursor(t3LogFiles(t3Root), context))
-	}
+	// The choice must not depend on `--since`: a store with usage anywhere stays the source even
+	// when the window contains none of its rows, so T3's cursor lines never double-count it.
+	const storeHasUsage = cursorPaths.some((path) => cursorStoreHasUsage(path))
+	const storeRows = storeHasUsage
+		? cursorPaths.flatMap((path) => readCursorRuns(path, sinceIso))
+		: []
+	rows.push(
+		...chooseCursorUsage({ storeHasUsage, storeRows, t3Files: t3LogFiles(t3Root) }, context),
+	)
 }
 
 /** Reads every source under `$HOME`, extracts, applies `--since` and returns sorted rows. */
@@ -80,9 +86,9 @@ export function collectUsage(options: CollectOptions): UsageRow[] {
 	const sinceMs = options.since === null ? null : Date.parse(options.since)
 	const sinceIso = options.since === null ? null : bucketStartUtc(options.since)
 	const rows: UsageRow[] = []
-	rows.push(...extractClaude(jsonlFiles(join(home, ".claude/projects")), context))
-	rows.push(...extractPi(jsonlFiles(join(home, ".pi")), context))
-	rows.push(...extractAntigravity(antigravityFiles(join(home, ".gemini")), context))
+	rows.push(...extractClaude(jsonlFiles(join(home, ".claude/projects"), sinceMs), context))
+	rows.push(...extractPi(jsonlFiles(join(home, ".pi"), sinceMs), context))
+	rows.push(...extractAntigravity(antigravityFiles(join(home, ".gemini"), sinceMs), context))
 	collectOpenCode(rows, context, sinceMs)
 	collectCursor(rows, context, sinceIso)
 	rows.push(...extractT3Muse(t3LogFiles(join(home, ".t3/userdata/logs/provider")), context))

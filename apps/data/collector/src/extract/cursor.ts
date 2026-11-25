@@ -1,6 +1,7 @@
 import { aggregateSamples } from "../aggregate"
 import type { CollectorContext, UsageRow, UsageSample } from "../types"
 import { asNumber, asObject } from "./parse"
+import { extractT3Cursor } from "./t3-cursor"
 
 /** One Cursor run row from a Cursor SDK agent store database. */
 export type CursorRun = {
@@ -8,6 +9,15 @@ export type CursorRun = {
 	model: string | null
 	usageJson: string | null
 	createdAt: string
+}
+
+/** The inputs for the one-source Cursor choice, with all I/O already done. */
+export type CursorSourceInput = {
+	/** Whether any store has populated usage, checked without the `--since` filter. */
+	storeHasUsage: boolean
+	/** Rows from the store inside the `--since` window. */
+	storeRows: readonly CursorRun[]
+	t3Files: Iterable<Iterable<string>>
 }
 
 function sampleFrom(run: CursorRun): UsageSample | null {
@@ -22,6 +32,8 @@ function sampleFrom(run: CursorRun): UsageSample | null {
 		timestamp: run.createdAt,
 		// Cursor's inputTokens includes the cached prompt, while UsageRow keeps the parts apart.
 		tokensIn: input === null ? null : Math.max(input - (cacheRead ?? 0), 0),
+		// Cursor's outputTokens already includes reasoningTokens: totalTokens is
+		// inputTokens + outputTokens in every inspected run, so reasoning is not added again.
 		tokensOut: asNumber(usage["outputTokens"]),
 		cacheRead,
 		cacheWrite: asNumber(usage["cacheWriteTokens"]),
@@ -42,4 +54,14 @@ export function extractCursor(runs: readonly CursorRun[], context: CollectorCont
 		}
 	}
 	return aggregateSamples(samples, context)
+}
+
+/**
+ * Chooses exactly one Cursor source. The store wins whenever it has any populated usage, even
+ * when the `--since` window leaves it empty, so a Cursor run is never counted from both places.
+ */
+export function chooseCursorUsage(input: CursorSourceInput, context: CollectorContext): UsageRow[] {
+	return input.storeHasUsage
+		? extractCursor(input.storeRows, context)
+		: extractT3Cursor(input.t3Files, context)
 }

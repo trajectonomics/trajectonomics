@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { hostname } from "node:os"
 import { type CollectOptions, collectUsage } from "./collect"
+import { machineAlias } from "./machine"
 
 const USAGE = "Usage: bun src/cli.ts [--since <ISO>] [--machine <name>] [--mistral-csv <path>]"
 
@@ -21,9 +22,13 @@ const FLAGS: Record<string, "since" | "machine" | "mistralCsv"> = {
 	"--mistral-csv": "mistralCsv",
 }
 
-/** Parses the CLI arguments; `--machine` defaults to this host's name. */
+/** Parses the CLI arguments; `--machine` defaults to a hash alias of this host's name. */
 export function parseArgs(argv: readonly string[]): CollectOptions {
-	const options: CollectOptions = { machine: hostname(), since: null, mistralCsv: null }
+	const options: CollectOptions = {
+		machine: machineAlias(hostname()),
+		since: null,
+		mistralCsv: null,
+	}
 	for (let i = 0; i < argv.length; i += 1) {
 		const arg = argv[i] ?? ""
 		if (arg === "--help" || arg === "-h") {

@@ -58,6 +58,34 @@ describe("extractClaude", () => {
 		])
 	})
 
+	test("deduplicates one requestId across two files", () => {
+		const rows = extractClaude(
+			[
+				[line("req-synthetic-shared", "2026-11-24T10:00:00.000Z", 4)],
+				[line("req-synthetic-shared", "2026-11-24T10:00:01.000Z", 9)],
+			],
+			context,
+		)
+		expect(rows).toHaveLength(1)
+		expect(rows[0]?.tokensOut).toBe(9)
+		expect(rows[0]?.requests).toBe(1)
+	})
+
+	test("keeps one row when two occurrences tie on output tokens", () => {
+		const rows = extractClaude(
+			[
+				[
+					line("req-synthetic-tie", "2026-11-24T10:00:00.000Z", 5),
+					line("req-synthetic-tie", "2026-11-24T10:00:01.000Z", 5),
+				],
+			],
+			context,
+		)
+		expect(rows).toHaveLength(1)
+		expect(rows[0]?.tokensOut).toBe(5)
+		expect(rows[0]?.requests).toBe(1)
+	})
+
 	test("skips synthetic models and entries without a requestId", () => {
 		const rows = extractClaude(
 			[

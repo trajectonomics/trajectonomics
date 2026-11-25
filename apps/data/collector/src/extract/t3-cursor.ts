@@ -27,6 +27,8 @@ function occurrenceFrom(line: string): Occurrence | null {
 			model: "unknown-cursor",
 			timestamp: record.timestamp,
 			tokensIn: Math.max(input - cacheRead, 0),
+			// T3 forwards the Cursor SDK usage object; outputTokens already includes
+			// reasoningTokens, so reasoning is not added again.
 			tokensOut: outputTokens,
 			cacheRead,
 			cacheWrite: asNumber(usage["cacheWriteTokens"]),

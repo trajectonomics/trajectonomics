@@ -99,6 +99,11 @@ describe("extractOpenCode", () => {
 		expect(readOpenCodeRows(db, timestamp)).toHaveLength(1)
 	})
 
+	test("filters non-assistant rows in SQL", () => {
+		const db = messageDb("msg-synthetic-user", { ...messageData, role: "user" })
+		expect(readOpenCodeRows(db, null)).toHaveLength(0)
+	})
+
 	test("splits messages across an hour boundary", () => {
 		const db = messageDb("msg-synthetic-4", messageData)
 		const later = { ...messageData, time: { created: timestamp + 3_600_000 } }

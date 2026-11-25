@@ -21,19 +21,26 @@ function readTable(
 	table: "message" | "session_message",
 	sinceMs: number | null,
 ): OpenCodeRow[] {
-	const assistant = table === "session_message" ? "type = 'assistant'" : "1 = 1"
+	const assistant =
+		table === "session_message"
+			? "type = 'assistant'"
+			: "json_extract(data, '$.role') = 'assistant'"
 	const sql =
 		sinceMs === null
 			? `SELECT id, time_created, data FROM ${table} WHERE ${assistant}`
 			: `SELECT id, time_created, data FROM ${table} WHERE ${assistant} AND time_created >= ?`
 	const statement = db.query(sql)
-	const raw = (sinceMs === null ? statement.all() : statement.all(sinceMs)) as RawRow[]
-	return raw.map((row) => ({
-		id: row.id,
-		timeCreated: row.time_created,
-		data: row.data,
-		schema: table,
-	}))
+	const iterator = sinceMs === null ? statement.iterate() : statement.iterate(sinceMs)
+	const rows: OpenCodeRow[] = []
+	for (const row of iterator as Iterable<RawRow>) {
+		rows.push({
+			id: row.id,
+			timeCreated: row.time_created,
+			data: row.data,
+			schema: table,
+		})
+	}
+	return rows
 }
 
 /** Opens OpenCode's SQLite database read-only, or returns null when it is absent or unreadable. */
