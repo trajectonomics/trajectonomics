@@ -186,10 +186,9 @@ changed since you read it, as on `scenario apply`.
 }
 ```
 
-A couple who file jointly get each spouse's own expense ceiling. When the household
-(`traj scenario household`) has a partner and `owners` that say whose each Flow and
-Account is, `--filing-status married_joint` writes one Levy over both people as
-Filers: the CLI adds the Owner's suffix to each tax label (`income.section40_1@me`,
+A couple who file jointly get each spouse's own expense ceiling. When the plan's household
+has a partner and `owners` that say whose each Flow and Account is,
+`--filing-status married_joint` writes one Levy over both people as Filers: the CLI adds the Owner's suffix to each tax label (`income.section40_1@me`,
 `@partner`, or `@shared` for income of both), so state the bare label as before.
 Section 42 bis gives each spouse their own 50% expense, capped at 100,000, even on a
 joint return, which one Levy over a single label could not apply. Salaries of
