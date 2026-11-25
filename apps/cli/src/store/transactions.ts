@@ -1,11 +1,12 @@
 import { validateTransaction } from "@trajectonomics/core/ledger"
-import { type AppError, fail } from "../errors"
+import { type AppError, fail, isAppError } from "../errors"
 import { chartOf } from "./chart"
 import type { Ctx } from "./context"
 import { write } from "./guard"
 import { iso } from "./ids"
 import { storeChecks } from "./tx-checks"
 import { canonicalDimensions, postingsOf, sameContent, txByExternalRef, txById } from "./tx-content"
+import { laterRefusals } from "./tx-later"
 import type { NewTransaction, TxAdded, TxWritten, WriteOptions } from "./types"
 
 /** An id and timestamp the write already chose, so one write can append more than one row. */
@@ -86,7 +87,11 @@ export function attemptTransaction(
 	return storeChecks(ctx, input) ?? appendTransaction(ctx, input, mint())
 }
 
-/** Validates through the core, then appends. A repeated `externalRef` is idempotent. */
+/**
+ * Validates through the core, then appends. A repeated `externalRef` is idempotent. A row that
+ * leaves a later Balance of an account it posts to unreadable is refused and rolled back with the
+ * rest of the write (cli ADR-0078).
+ */
 export function addTransaction(
 	ctx: Ctx,
 	input: NewTransaction,
@@ -94,11 +99,16 @@ export function addTransaction(
 ): TxAdded | AppError {
 	return write(
 		ctx.db,
-		() =>
-			attemptTransaction(ctx, input, () => {
+		() => {
+			const outcome = attemptTransaction(ctx, input, () => {
 				const at = ctx.clock()
 				return { id: ctx.newId(at), at: iso(at) }
-			}),
+			})
+			if (isAppError(outcome)) return outcome
+			const refused = laterRefusals(ctx, [{ index: 0, added: outcome }])
+			if (isAppError(refused)) return refused
+			return refused[0]?.error ?? outcome
+		},
 		options,
 	)
 }

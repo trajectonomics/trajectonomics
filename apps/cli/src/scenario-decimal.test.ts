@@ -137,7 +137,7 @@ describe("scenario apply --decimal", () => {
 		expect(errorOf(res).code).toBe("invalid_input")
 		expect(errorOf(res).path).toBe(`document.flows.${id}.amount`)
 		expect(errorOf(res).hint).toBe(
-			'write it as a decimal string such as "350.00", or drop --decimal to give minor units',
+			'Write it as a decimal string such as "350.00", or drop --decimal to give minor units',
 		)
 	})
 
