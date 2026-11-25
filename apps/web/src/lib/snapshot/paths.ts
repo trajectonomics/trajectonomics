@@ -72,13 +72,14 @@ export type PathRequest = z.infer<typeof pathRequest>
 export type RunOf = Pick<ProjectionChance, "definition" | "scenario" | "asOf" | "horizon">
 
 /**
- * Whether a replay is of the chance read it is shown beside: the same run (`definition`), the same plan content
+ * Whether a replay is of the chance read it is shown beside: the same run (`definition`, whose model hash tells two files of one id apart), the same plan content
  * (`scenario.effectiveContentHash`, which a terminal edit changes) and the same dates. A path of another run would show a
  * future the chance never drew.
  */
 export function sameRun(chance: RunOf, path: Pick<ProjectionPath, keyof RunOf>): boolean {
 	return (
 		chance.definition.modelId === path.definition.modelId &&
+		chance.definition.modelHash === path.definition.modelHash &&
 		chance.definition.seed === path.definition.seed &&
 		chance.definition.paths === path.definition.paths &&
 		chance.scenario.effectiveContentHash === path.scenario.effectiveContentHash &&

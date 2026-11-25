@@ -42,8 +42,16 @@ export type ChanceTable =
 	| { name: "bands"; count: number; rows: ChanceTableRow[] }
 	| ChanceSpendingTable
 
+/** What the sentence stating the success share begins with: the human form reads it first (cli ADR-0027). */
+export const SUCCESS_NOTE_PREFIX = "The plan holds to "
+
 /** The inputs the chance was computed from: the Return model, the seed and the path count. */
-export type ChanceDefinitionView = { modelId: string; seed: string; paths: number }
+export type ChanceDefinitionView = {
+	modelId: string
+	seed: string
+	paths: number
+	modelHash: string
+}
 
 /** `traj projection chance`: the chance of success plus the echo block (ADR-0030). */
 export type ChanceView = Echo & {
@@ -74,6 +82,11 @@ export const chanceDefinition: z.ZodType<ChanceDefinitionView> = z.strictObject(
 	modelId: z.string().describe("The Return model's id, as the file states it."),
 	seed: z.string().describe("The seed, as 16 lower-case hex digits."),
 	paths: z.number().int().describe("The number of Market paths run."),
+	modelHash: z
+		.string()
+		.describe(
+			"The content hash of the Return model document the paths were drawn from, as jcs1:sha256:<hex>.",
+		),
 })
 
 export const chanceView: z.ZodType<ChanceView> = z.strictObject({

@@ -3,6 +3,8 @@ import { z } from "zod"
 import type { FlagDocument } from "../document"
 import { parseDocument, readDocument } from "../document"
 import { type AppError, isAppError } from "../errors"
+import { canonicalJson, contentHash } from "../store/canonical"
+import { guard } from "../store/guard"
 
 /*
  * `--return-model` is one JSON document the caller states: the Return model `chanceOfSuccess`
@@ -49,6 +51,11 @@ export const returnModelDocument: z.ZodType<ReturnModel> = z
 export const returnModelFlagDocument: FlagDocument = {
 	flag: RETURN_MODEL_FIELD,
 	schema: returnModelDocument,
+}
+
+/** The content hash of a Return model document, in the `jcs1:sha256:<hex>` form the echo states. */
+export function modelHashOf(model: ReturnModel): string | AppError {
+	return guard(() => contentHash(canonicalJson(model)))
 }
 
 /** Reads and validates the flag's document before the Store opens (ADR-0020, ADR-0030). */

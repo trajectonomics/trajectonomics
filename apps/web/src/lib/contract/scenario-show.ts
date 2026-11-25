@@ -6,6 +6,10 @@ import { scenarioCashflow } from "./scenario-cashflow"
 import { taxShown } from "./tax-profile"
 
 /**
+ * The closed vocabularies below (`kind` and `frequency` of a Flow, `kind` of an Account) are the ones the pages
+ * branch on, so they stay enums, and `scripts/contract-vocabularies.test.ts` fails when `traj schema` lists other
+ * words. Every other word list (compounding, rounding, a payout's frequency) is shown only, so it is a plain string.
+ *
  * A Flow of a Scenario document in the decimal form (`traj scenario show --decimal --json`). Only the
  * fields the planner pages show are typed; `looseObject` keeps every other field, so a save returns it
  * untouched. Every amount is the CLI's decimal string, and every rate an integer of basis points.
@@ -56,7 +60,8 @@ export const scenarioAccount = z.looseObject({
 	rate: z.number().int(),
 	// An asset's yearly swing, in basis points (cli ADR 0068): only the chance of success reads it, from the plan's own model.
 	volatility: z.number().int().optional(),
-	compounding: z.enum(["monthly", "quarterly", "semiannual", "annual"]).optional(),
+	// Read-only vocabularies (web ADR 0001, amendment 2026-11-25): the page only shows these words, so they are plain strings and a word the CLI adds is shown as it is.
+	compounding: z.string().optional(),
 	lockedUntil: dateString.optional(),
 	// false marks an asset that is in net worth but not accessible: a home or a car (sim ADR 0019).
 	liquid: z.boolean().optional(),
@@ -64,8 +69,8 @@ export const scenarioAccount = z.looseObject({
 	payout: z
 		.looseObject({
 			bps: z.string(),
-			frequency: z.enum(["monthly", "quarterly", "semiannual", "annual"]),
-			rounding: z.enum(["floor", "halfUp", "ceil"]),
+			frequency: z.string(),
+			rounding: z.string(),
 			start: dateString.optional(),
 			end: dateString.optional(),
 			startAt: z.string().optional(),
@@ -75,7 +80,7 @@ export const scenarioAccount = z.looseObject({
 		})
 		.optional(),
 	// A yearly share of the value charged every month, outside cashflow (sim ADR 0028); `bps` is a percent string in the decimal form.
-	fee: z.looseObject({ bps: z.string(), rounding: z.enum(["floor", "halfUp", "ceil"]) }).optional(),
+	fee: z.looseObject({ bps: z.string(), rounding: z.string() }).optional(),
 })
 export type ScenarioAccount = z.infer<typeof scenarioAccount>
 
@@ -88,7 +93,7 @@ export const estateLine = z.looseObject({
 	id: z.string(),
 	of: z.union([z.string(), z.looseObject({ accounts: z.array(z.string()) })]).optional(),
 	bps: z.string().optional(),
-	rounding: z.enum(["floor", "halfUp", "ceil"]).optional(),
+	rounding: z.string().optional(),
 	amount: money.optional(),
 	growth: z.union([z.literal("inflation"), z.looseObject({ bps: z.number().int() })]).optional(),
 })
