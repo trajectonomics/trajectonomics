@@ -5,6 +5,7 @@ import { withStore } from "../../with-store"
 import { scenarioNotFound } from "../errors"
 import { view, type WrittenScenario } from "../view"
 import { taxAssumptionsOf } from "./assumptions"
+import { departedHolderAssumption } from "./departed-holder"
 import type { TaxFlags } from "./flags"
 import { type FlowLabel, flowLabelOf } from "./labels"
 import { taxModeOf } from "./mode"
@@ -23,7 +24,10 @@ export type TaxWritten = {
 	allowances?: TaxProfileView | undefined
 	/** The Filers of the Return the Levy is written over; absent when the plan keeps bare labels (cli ADR-0075). */
 	filers?: string[] | undefined
-	/** The unconfirmed tax figures the stored Levy would use; absent when --none wrote no Levy. */
+	/**
+	 * The unconfirmed tax figures the stored Levy would use, and the claims a departed holder's id keeps
+	 * off every Return; absent when --none wrote no Levy.
+	 */
 	assumptions?: AssumptionView[] | undefined
 	scenario: WrittenScenario
 }
@@ -57,6 +61,14 @@ function noneWithLabel(input: TaxInput): AppError | null {
 	})
 }
 
+/** The figures the Levies assume, and after them the claims of a departed holder they leave out. */
+function assumptionsOf(made: Written): AssumptionView[] {
+	const figures = taxAssumptionsOf(made.document, made.separateLoans)
+	return made.departedHolder === undefined
+		? figures
+		: [...figures, departedHolderAssumption(made.departedHolder)]
+}
+
 /** What a write that wrote a Levy reports of it; the Filers only when it has any. */
 function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scenario"> {
 	const [only] = made.levies
@@ -64,7 +76,7 @@ function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scena
 		...(only !== undefined && made.levies.length === 1 ? { levy: only } : { levies: made.levies }),
 		...(made.filers === undefined ? {} : { filers: made.filers }),
 		allowances: taxProfileOf(made.request, made.document),
-		assumptions: taxAssumptionsOf(made.document, made.separateLoans),
+		assumptions: assumptionsOf(made),
 	}
 }
 

@@ -3,6 +3,7 @@ import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
 import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
 import { coupleOf, holderIdOf } from "./couple"
+import { departedHolderOf } from "./departed-holder"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
 import type { FlowLabel } from "./labels"
@@ -12,7 +13,10 @@ import { withoutTaxLevy } from "./remove"
 import { canonicalTax, parsedTax, storedTaxOf } from "./stored"
 
 /** What a write that wrote a Levy leaves for the reply. */
-export type Written = TaxLevyWritten
+export type Written = TaxLevyWritten & {
+	/** The recorded claims holder, no longer in the household, whose claims no Return carries. */
+	departedHolder?: string
+}
 
 /** The request a mode states for this plan: its own flags, or the stored profile they build on. */
 function requestFor(
@@ -44,6 +48,15 @@ function requestFor(
 }
 
 /**
+ * What the reply reads of a write that built on `stored`: a write of the whole profile states the
+ * claims again, so it builds on none.
+ */
+function replyOf(next: TaxLevyWritten, stored: string | null, household: string | null): Written {
+	const departed = departedHolderOf(stored, household, next.request)
+	return departed === undefined ? next : { ...next, departedHolder: departed }
+}
+
+/**
  * The change one call makes, read from the document and profile the store holds inside the write.
  * Whatever it builds is handed to `done`, so the reply can say what the Levy was written for.
  */
@@ -58,7 +71,7 @@ export function plannerOf(
 		if (isAppError(request)) return request
 		const next = withTaxLevy(document, request, labels, household)
 		if (isAppError(next)) return next
-		done(next)
+		done(replyOf(next, mode.kind === "write" ? null : stored, household))
 		return { document: next.document, tax: canonicalTax(storedTaxOf(next.request)) }
 	}
 }

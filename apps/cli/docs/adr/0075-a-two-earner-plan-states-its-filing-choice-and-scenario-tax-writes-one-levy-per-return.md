@@ -160,6 +160,14 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
     current holder's.
   - The record names a person by id. A holder given a new id reads as another person: the flat claims
     stay under the old id, and the new one's Return starts from nothing until the caller states them.
+    The result reports it (trajectonomics/trajectonomics#614). A `--merge` or `--from-stored` write
+    that finds the stored `claimsHolder` is not a person in the household, and moves claims of theirs
+    that are not all zero into their entry in `returns`, adds to `assumptions` an entry at path
+    `claimsHolder`, with value 0 and status `unsourced`, that names the old id. That is the write that
+    records the new holder, a dry run of it included; later writes find a holder in the household and
+    say nothing. A joint or single write moves nothing and counts the flat claims on its Return, so it
+    adds none, and nor does a write with no household, which cannot judge the record. A `--tax` write
+    states the claims again.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
   that claims something, whatever the filing status and also while the household names no partner or
