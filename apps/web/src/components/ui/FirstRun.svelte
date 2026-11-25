@@ -32,5 +32,5 @@ let { pathname }: Props = $props()
 	<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground select-all"><code
 			>{SNAPSHOT_COMMAND}</code
 		></pre>
-	<p class="mt-2 text-xs">Replace each YYYY-MM-DD with a date, and run it in the apps/web folder.</p>
+	<p class="mt-2 text-xs">Replace each YYYY-MM-DD with a date. It runs from any folder.</p>
 </EmptyState>
