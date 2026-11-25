@@ -1,3 +1,4 @@
+import type { Language } from "../language/language"
 import { OPENJOT_PATH } from "../site"
 
 /** The OpenJot page on the Site: one address, in every Language the Site speaks (ADR 0032). */
@@ -26,6 +27,25 @@ export const OPENJOT_SOURCE_URL =
 /** The app's MIT licence. */
 export const OPENJOT_LICENCE_URL =
 	"https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/LICENSE"
+
+/** The app's docs folder in the monorepo: the policy and the terms live beside the app. */
+const OPENJOT_DOCS_URL =
+	"https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs"
+
+/** The app's privacy policy, in the Language the page is read in: Thai ships its own file. */
+export function openJotPrivacyPolicyUrl(language: Language): string {
+	const file = language === "th" ? "privacy-policy.th.md" : "privacy-policy.md"
+	return `${OPENJOT_DOCS_URL}/${file}`
+}
+
+/** The app's terms of service, in the same Language. */
+export function openJotTermsUrl(language: Language): string {
+	const file = language === "th" ? "terms-of-service.th.md" : "terms-of-service.md"
+	return `${OPENJOT_DOCS_URL}/${file}`
+}
+
+/** Where to write about the app's privacy: the address the policy names. */
+export const OPENJOT_PRIVACY_CONTACT_URL = "mailto:privacy@trajectonomics.com"
 
 /**
  * The signing certificate's SHA-256 fingerprint, verbatim from the app's release docs: every released APK

@@ -17,7 +17,7 @@ interface Props {
 let { whatIf, baseline, terms }: Props = $props()
 const hidden = $derived(preferences.hidden)
 const series = $derived(
-	whatIfSeries(whatIf, baseline, parseTerms(terms), hidden, currentItemNames().people),
+	whatIfSeries(whatIf, baseline, parseTerms(terms), currentItemNames().people, hidden),
 )
 const label = $derived(
 	hidden

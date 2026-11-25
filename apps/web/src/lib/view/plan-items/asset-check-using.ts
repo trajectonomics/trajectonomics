@@ -3,7 +3,7 @@ import { parseBps } from "../../format/bps"
 import type { AmountDraft, AssetDraft } from "./asset-draft"
 import { ROUNDINGS } from "./asset-shape"
 import { monthAfter } from "./date-before"
-import { CATEGORY_PROBLEM, isCategoryText } from "./flow-draft"
+import { CATEGORY_PROBLEM, isCategoryText } from "./expense-category"
 import { isDateText, typedAmount } from "./form"
 
 /** A non-negative percent with at most two places: a share of the value, which is never below zero. */

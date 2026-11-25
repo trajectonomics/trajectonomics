@@ -1,10 +1,10 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { maskMoney } from "../../lib/format/mask"
-import { nameOf } from "../../lib/view/account-names"
+import { itemText } from "../../lib/view/item-names"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
 import { failedReads, pathNamed } from "../../lib/what-if/answer"
 import { labelWithNames } from "../../lib/what-if/change-names"
@@ -28,12 +28,14 @@ function refusalOf(change: Change): string | null {
 	)
 }
 
-const names = $derived(currentAccountNames())
+const names = $derived(currentItemNames())
 
 /** A change's words as the bar shows them: a Set's value is masked when the person hides amounts. */
 function wordsOf(change: Change): string {
 	const label = labelWithNames(change, names)
-	if (change.kind === "flow") return tryWords({ ...change, label }, (id) => nameOf(names, id))
+	if (change.kind === "flow") {
+		return tryWords({ ...change, label }, (id) => itemText(names, "account", id))
+	}
 	if (change.kind !== "set" || !preferences.hidden) return label
 	// A Set's label ends with its value as typed, so the value's place is masked and the rest kept.
 	return `${label.slice(0, label.length - change.value.length)}${maskMoney(change.value)}`

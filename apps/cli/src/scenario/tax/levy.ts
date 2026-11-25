@@ -1,6 +1,7 @@
 import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
 import { holderIdOf } from "./couple"
+import { departedClaimants } from "./departed-claims"
 import { leviesFor } from "./emitter"
 import { withoutFilerLabels } from "./filer-labels"
 import { type FilerScope, filerScopeOf, withFilerLabels } from "./filer-scope"
@@ -74,12 +75,13 @@ export function withTaxLevy(
 	const next = decorated(stated, scope)
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	const kept = keptRequest(request, scope, holderIdOf(household))
+	const departed = departedClaimants(kept, household)
 	return {
 		document: { ...next, levies: [...others, ...built] },
 		request: kept,
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
 		separateLoans: assumesSeparateLoans(request, scope, stated),
-		unclaimed: unclaimedClaims(request, kept, scope),
+		unclaimed: unclaimedClaims(request, kept, scope, departed),
 	}
 }

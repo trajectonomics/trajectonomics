@@ -1,7 +1,6 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
-import { nameOf } from "../../lib/view/account-names"
 import { drawerTitle, type PlanDrawer } from "../../lib/view/plan-items/drawer"
 import { PLAN_PAGES, type PlanKind } from "../../lib/view/plan-items/kinds"
 import Drawer from "../ui/Drawer.svelte"
@@ -26,15 +25,15 @@ interface Props {
 }
 
 let { drawer, kind, name, doc, household, baseline, contentHash, onClose }: Props = $props()
-// On the Assets and debts page a drawer's id is an Account's, which the heading names by its ledger name.
+// A drawer's item is named by what a Read states: an Account's ledger name, or a Flow's display label.
 const title = $derived(
 	drawer === null
 		? ""
 		: drawerTitle(
-				kind === "assets" && drawer.id !== undefined
-					? { ...drawer, id: nameOf(currentAccountNames(), drawer.id) }
-					: drawer,
+				drawer,
 				PLAN_PAGES[kind].noun,
+				currentItemNames(),
+				kind === "assets" ? "account" : "flow",
 			),
 )
 const trying = $derived(drawer?.tryValue === true)

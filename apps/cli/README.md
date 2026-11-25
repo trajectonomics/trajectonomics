@@ -233,12 +233,14 @@ shared interest is stated, the result's `assumptions` say the loans are taken to
 separate. `--merge` and `--from-stored` keep the stored `returns` and
 `sharedMortgageInterest`, and `--merge` to `married_joint` keeps the partner's Return and
 the shared interest for a later switch back; a joint Return claims neither, so state its
-interest bare. A write that claims neither says so in `unclaimed`, with how to claim them,
-and a separate filing names there each person who has stored claims and no taxed income.
-The stored profile's `claimsHolder` says whose claims its other keys are, so if the
-household swaps which person is the holder, each person's claims stay theirs. A
-`projection run` then reports a `filer` on each `taxYears` entry, `--carry-in` takes one
-record per Levy, and `projection allowances` answers per Return.
+interest bare. A write that claims neither says so in `unclaimed`, and a joint or
+no-income-spouse Return adds how to claim them. A separate filing names there each person
+who has stored claims and no taxed income. Every write also names there each id in the
+stored `returns` that no person in the household has: no Return counts that set, and a
+`--tax` write drops it. The stored profile's `claimsHolder` says whose claims its other
+keys are, so if the household swaps which person is the holder, each person's claims stay
+theirs. A `projection run` then reports a `filer` on each `taxYears` entry, `--carry-in`
+takes one record per Levy, and `projection allowances` answers per Return.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
@@ -406,6 +408,31 @@ each side.
   }
 ]
 ```
+
+## Naming a Flow, a Milestone or a person
+
+> **Ships in 0.8.0.**
+
+Every Flow, every Milestone and every person of a household may carry a `displayLabel`: the words a
+page reads in place of the id, such as Thai text. It is free text of 1 to 80 code points, with no
+control, invisible or bidirectional characters and no leading or trailing whitespace. It is no key
+and changes no figure: the id still addresses the item, the label may repeat or change, and the
+engine never reads it. `traj schema scenario apply` and `traj schema scenario household` publish it
+with that rule.
+
+A label travels in the document, so `--file` and `--add` carry it, and `--set` writes it:
+
+```bash
+traj scenario apply base --set 'flows.school-fees.displayLabel="School fees"'
+traj scenario apply base --set 'milestones.condo.displayLabel="Condo down payment"'
+traj scenario household base --file household.json   # a person's label, in the household
+```
+
+A plan written before the field may lack it, and the first `--set` that names it begins it, as
+`--set accounts.<id>.volatility=…` does. Because a label is stored content, a change to one moves the
+plan's `contentHash`; a plan without labels keeps its bytes and its hash. To clear a label, write the
+document without it (`--file`), or empty the Name field in the Dashboard: `--set` writes a value and
+cannot remove a key, so `null` and `""` are refused.
 
 ## Where each year's money went
 

@@ -67,7 +67,7 @@ export const taxOutput: z.ZodType<TaxOutputView> = z.strictObject({
 		.array(z.string())
 		.optional()
 		.describe(
-			"Claims the stored profile keeps that no Return of this write claims, one sentence each; absent when there are none, and when --none wrote no Levy. A write that is not a separate filing with Filers names the shared home-loan interest and the other people's claims it keeps. A separate filing with Filers names each person with stored claims and no taxed income.",
+			"Claims the stored profile keeps that no Return of this write claims, one sentence each; absent when there are none, and when --none wrote no Levy. A write that is not a separate filing with Filers names the shared home-loan interest, then the other people's claims, with how to claim them bare on a joint or no-income-spouse Return and what that leaves a later separate filing. A separate filing with Filers names each person still in the household who has stored claims and no taxed income. Every write also names each id in the stored `returns` that no person in the household has.",
 		),
 	scenario: writtenScenario,
 })

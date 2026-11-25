@@ -11,5 +11,5 @@ export function unclaimedBlocks(data: Record<string, unknown>): string[] {
 	const found = data["unclaimed"]
 	if (!Array.isArray(found) || found.length === 0) return []
 	const lines = found.map((sentence) => `- ${String(sentence)}`)
-	return [["Claims stored but not claimed on this Return:", ...lines].join("\n")]
+	return [["Claims stored but not claimed by this write:", ...lines].join("\n")]
 }

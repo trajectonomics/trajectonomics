@@ -55,6 +55,8 @@ export type Criterion = DateCriterion | MilestoneCriterion | MetricCriterion | M
 /** A named point in the plan that Flows may gate on. Fires on the first date its criteria hold. */
 export interface Milestone {
 	readonly id: string
+	/** What a person reads in place of the id, 1 to 80 code points (sim ADR 0032). Never a key, never read by the engine. */
+	readonly displayLabel?: string
 	readonly combine: MilestoneCombine
 	readonly criteria: readonly Criterion[]
 }

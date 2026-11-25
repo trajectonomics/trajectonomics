@@ -6,7 +6,13 @@ export { type DaySpan, dayNumber, dayPosition } from "./date-position"
 export { type Extent, extent } from "./extent"
 export { FAN_LEVELS, type Fan, fanOf, fanSeriesName } from "./fan"
 export { keyTarget } from "./hover"
-export { type LabelledMark, labelRows } from "./label-rows"
+export {
+	LABEL_OFFSET_PX,
+	type LabelArea,
+	type LabelledMark,
+	type PlacedLabel,
+	placedLabels,
+} from "./label-rows"
 export type { LineMarker, LinePoint, LineSeries } from "./line"
 export {
 	type Bar,
