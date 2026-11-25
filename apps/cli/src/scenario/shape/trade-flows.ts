@@ -5,6 +5,7 @@ export const TRADE_FLOWS: readonly Record<string, unknown>[] = [
 		kind: "contribution",
 		target: "home",
 		funding: "obligation",
+		displayLabel: "Home",
 		amount: 3_000_000,
 		frequency: "once",
 		start: "2026-06-01",

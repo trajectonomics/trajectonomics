@@ -1,0 +1,67 @@
+/*
+ * The OpenJot screenshots (ADR 0032): the app's own screens in a named phone frame. The markup does not
+ * depend on what the screenshots show, so a follow-up can replace the files without touching it.
+ */
+
+.openjot-screens {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 24px 16px;
+	margin: 40px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+@media (min-width: 48rem) {
+	.openjot-screens {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 24px;
+	}
+}
+
+.openjot-shot {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	text-align: center;
+}
+
+.openjot-shot-figure {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+}
+
+.openjot-shot-caption {
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The frame: a hairline border, a padded bezel and a rounded glass, in the Theme's own stage colour. */
+.openjot-phone {
+	width: 100%;
+	max-width: 15rem;
+	padding: 5px;
+	overflow: hidden;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 26px;
+	background: var(--ds-color-stage);
+}
+
+.openjot-phone img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 21px;
+}
+
+.openjot-phone-hero {
+	max-width: 19rem;
+	margin-inline: auto;
+}

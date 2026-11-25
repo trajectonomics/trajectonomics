@@ -1,6 +1,8 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
+import { openJotDictionaryFor } from "../language/openjot-dictionary"
 import { FI_DEMO_COMMAND, FI_DEMO_OUTPUT, INSTALL_PROMPT, SKILLS_LICENCE_URL } from "../site"
+import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
 /** The full Answer engine file's built path, relative to the Worker's assets root. */
@@ -8,6 +10,9 @@ export const LLMS_FULL_FILE = "llms-full.txt"
 
 /** The Language the full file is written in: the one a crawler falls back to, so no copy is invented. */
 const dictionary = dictionaryFor(FALLBACK_LANGUAGE)
+
+/** The OpenJot page's words, in the same fallback Language. */
+const openJot = openJotDictionaryFor(FALLBACK_LANGUAGE)
 
 /** The headline as one line, the accent run last in it as the page writes it. */
 const HEADLINE = `${dictionary.heroHeadingPrefix} ${dictionary.heroHeadingAccent}`
@@ -64,6 +69,13 @@ const FAQ = dictionary.faqQuestions.flatMap((question, index) => [
 /** The Site's one address, named in full because the file is read away from the Site. */
 const ADDRESS_LINES = [linkLine(dictionary.documentTitle, ABSOLUTE_CLEAN_URL)]
 
+/** The OpenJot page: its address, its summary and the app it describes. */
+const OPENJOT_LINES = [
+	linkLine(openJot.documentTitle, ABSOLUTE_OPENJOT_URL),
+	"",
+	openJot.description,
+]
+
 /**
  * The full Answer engine file at `/llms-full.txt`: the landing page's copy in the fallback Language,
  * rendered as Markdown, at the Site's one address. It is the page's own words, so it cannot say
@@ -83,6 +95,7 @@ export const LLMS_FULL_TXT = renderLlms(dictionary.documentTitle, dictionary.des
 	]),
 	section(dictionary.featuresHeading, FEATURES),
 	section(dictionary.faqHeading, FAQ),
+	section("OpenJot", OPENJOT_LINES),
 	section("Install", [INSTALL_PROMPT]),
 	section("License", [linkLine(dictionary.licence, SKILLS_LICENCE_URL)]),
 ])

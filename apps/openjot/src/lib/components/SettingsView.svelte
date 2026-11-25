@@ -68,7 +68,7 @@
     tags,
     isScanning,
     mascotMood = "idle",
-    theme = "pink-white",
+    theme = "trajectonomics",
     hand = "right",
     shareStats = false,
     appLockAvailable = false,
@@ -459,7 +459,7 @@
     <!-- Clean Main My Moo Hub -->
     <header
       class="text-white px-5 pb-5 rounded-b-3xl shadow-lg"
-      style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); padding-top: max(env(safe-area-inset-top), 40px);"
+      style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); outline: 1px solid var(--hero-border); outline-offset: -1px; padding-top: max(env(safe-area-inset-top), 40px);"
     >
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5 min-w-0">
@@ -498,7 +498,7 @@
           type="button"
           onclick={onScanNow}
           disabled={isScanning}
-          class="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-[var(--brand)] text-white text-xs font-bold shadow-sm disabled:opacity-50 active:bg-[var(--brand-deep)]"
+          class="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold shadow-sm disabled:opacity-50 active:bg-[var(--brand-deep)]"
         >
           <ScanLine class="size-4" />
           <span>{isScanning ? t(lang, "loading") : t(lang, "scanESlips")}</span>
@@ -559,9 +559,11 @@
                 {lang === "th" ? "ธีมสีและหน้าตา" : "Appearance & Theme"}
               </div>
               <div class="text-xs text-[var(--text-muted)] truncate">
-                {theme === "pink-white"
-                  ? lang === "th" ? "ชมพู & ขาว (ค่าเริ่มต้น)" : "Pink & White (Default)"
-                  : lang === "th" ? "ดำ & ส้ม (โหมดมืด)" : "Black & Orange (Dark)"}
+                {theme === "trajectonomics"
+                  ? `${t(lang, "themeTrajectonomics")} (${t(lang, "themeDefault")})`
+                  : theme === "pink-white"
+                    ? lang === "th" ? "ชมพู & ขาว" : "Pink & White"
+                    : lang === "th" ? "ดำ & ส้ม (โหมดมืด)" : "Black & Orange (Dark)"}
               </div>
             </div>
           </div>
@@ -828,7 +830,7 @@
     <!-- Focused Sub-Page Header seamlessly extending behind status bar -->
     <header
       class="flex shrink-0 items-center gap-2 px-3 pb-3 text-white shadow-sm"
-      style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); padding-top: max(env(safe-area-inset-top), 38px);"
+      style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); outline: 1px solid var(--hero-border); outline-offset: -1px; padding-top: max(env(safe-area-inset-top), 38px);"
     >
       <button
         type="button"
@@ -863,6 +865,27 @@
           <div class="grid grid-cols-2 gap-2.5">
             <button
               type="button"
+              onclick={() => onChangeTheme("trajectonomics")}
+              class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {theme === 'trajectonomics'
+                ? 'border-[#EA580C] bg-[#EA580C]/10 ring-1 ring-[#EA580C]'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
+            >
+              <span class="flex -space-x-1.5 shrink-0">
+                <span class="size-5 rounded-full bg-[#EA580C] ring-2 ring-[#0a0a0a]"></span>
+                <span class="size-5 rounded-full bg-[#0a0a0a] ring-2 ring-zinc-600"></span>
+              </span>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-[var(--text-primary)] truncate">
+                  {t(lang, "themeTrajectonomics")}
+                </div>
+                <div class="text-[10px] text-[var(--text-muted)]">
+                  {t(lang, "themeDefault")}
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
               onclick={() => onChangeTheme("pink-white")}
               class="flex items-center gap-2.5 rounded-2xl p-3.5 border text-left transition-all {theme === 'pink-white'
                 ? 'border-[#FF4D94] bg-[#FF4D94]/10 ring-1 ring-[#FF4D94]'
@@ -877,7 +900,7 @@
                   {lang === "th" ? "ชมพู & ขาว" : "Pink & White"}
                 </div>
                 <div class="text-[10px] text-[var(--text-muted)]">
-                  {lang === "th" ? "ค่าเริ่มต้น" : "Default"}
+                  {lang === "th" ? "โหมดสว่าง" : "Light mode"}
                 </div>
               </div>
             </button>
@@ -919,7 +942,7 @@
               type="button"
               onclick={() => onChangeHand("left")}
               class="py-2.5 rounded-xl text-xs font-bold border {hand === 'left'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
                 : 'bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]'}"
             >
               {lang === "th" ? "มือซ้าย" : "Left hand"}
@@ -928,7 +951,7 @@
               type="button"
               onclick={() => onChangeHand("right")}
               class="py-2.5 rounded-xl text-xs font-bold border {hand === 'right'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
                 : 'bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]'}"
             >
               {lang === "th" ? "มือขวา" : "Right hand"}
@@ -950,7 +973,7 @@
                 await saveAllSettings();
               }}
               class="py-2.5 rounded-xl text-xs font-bold border {draft.language === 'th'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
                 : 'bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]'}"
             >
               ภาษาไทย
@@ -962,7 +985,7 @@
                 await saveAllSettings();
               }}
               class="py-2.5 rounded-xl text-xs font-bold border {draft.language === 'en'
-                ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
                 : 'bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]'}"
             >
               English
@@ -1061,7 +1084,7 @@
               <button
                 type="button"
                 onclick={saveOwnerNames}
-                class="px-3.5 py-2 rounded-xl bg-[var(--brand)] text-white text-xs font-bold shrink-0 active:bg-[var(--brand-deep)]"
+                class="px-3.5 py-2 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold shrink-0 active:bg-[var(--brand-deep)]"
               >
                 {t(lang, "save")}
               </button>
@@ -1212,7 +1235,7 @@
               type="button"
               onclick={addCategory}
               disabled={!newCatEn.trim() && !newCatTh.trim()}
-              class="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-xs font-bold flex items-center justify-center gap-1 disabled:opacity-40 active:bg-[var(--brand-deep)]"
+              class="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold flex items-center justify-center gap-1 disabled:opacity-40 active:bg-[var(--brand-deep)]"
             >
               <Plus class="size-4" />
               <span>{t(lang, "add")}</span>
@@ -1270,7 +1293,7 @@
             <button
               type="button"
               onclick={addTag}
-              class="px-4 py-2 rounded-xl bg-[var(--brand)] text-white text-xs font-bold active:bg-[var(--brand-deep)]"
+              class="px-4 py-2 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold active:bg-[var(--brand-deep)]"
             >
               {t(lang, "add")}
             </button>
@@ -1309,7 +1332,7 @@
           <button
             type="button"
             onclick={saveAllSettings}
-            class="w-full py-2.5 rounded-xl bg-[var(--brand)] text-white font-bold text-xs flex items-center justify-center gap-1.5 active:bg-[var(--brand-deep)]"
+            class="w-full py-2.5 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] font-bold text-xs flex items-center justify-center gap-1.5 active:bg-[var(--brand-deep)]"
           >
             <Check class="size-4" />
             <span>{savedToast ? (lang === "th" ? "บันทึกแล้ว ✓" : "Saved ✓") : t(lang, "save")}</span>
@@ -1345,7 +1368,7 @@
             <button
               type="button"
               onclick={onExportCsv}
-              class="py-2.5 rounded-xl bg-[var(--brand)] text-white text-xs font-bold active:bg-[var(--brand-deep)]"
+              class="py-2.5 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold active:bg-[var(--brand-deep)]"
             >
               {t(lang, "exportCsv")}
             </button>
@@ -1472,7 +1495,7 @@
               <button
                 type="button"
                 onclick={loadNotices}
-                class="rounded-full bg-[var(--brand)] px-4 py-2 text-sm font-bold text-white active:opacity-80"
+                class="rounded-full bg-[var(--brand)] px-4 py-2 text-sm font-bold text-[var(--brand-contrast)] active:opacity-80"
               >
                 {lang === "th" ? "ลองอีกครั้ง" : "Try again"}
               </button>

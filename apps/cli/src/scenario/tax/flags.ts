@@ -40,6 +40,8 @@ export type TaxRequest = {
 	children: number
 	childrenAtHigherRate: number
 	allowances: TaxAllowances
+	/** The interest on one loan borrowed together, which separate Returns split (cli ADR-0075). */
+	sharedMortgageInterest?: number
 	/** The person whose claims the flat ones are, once a plan has had Filers (cli ADR-0075). */
 	claimsHolder?: string
 	/** One claim set per Return, for `married_separate` with Filers; absent otherwise. */

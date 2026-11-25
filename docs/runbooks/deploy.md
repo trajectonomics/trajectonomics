@@ -1,12 +1,13 @@
 # Deploy runbook
 
 The Site (`apps/site`, worker `site`), the Docs Portal (`apps/docs`, worker `docs`), the blog
-(`apps/blog`, worker `blog`), the data Worker (`apps/data`, worker `data`) and OpenJot's landing
-site (`apps/openjot/site`, worker `moojot-site`) deploy to Cloudflare Workers from this repository's
-CI: `.github/workflows/deploy.yml`. Cloudflare's own Git integration (Workers Builds) is not used,
-so the whole deploy is configured and reviewed here. `trajectonomics-web-router` routes
-trajectonomics.com to the workers by name, so a deploy changes nothing in the router. The landing
-site's Worker `moojot-site` serves `openjot.trajectonomics.com` and redirects
+(`apps/blog`, worker `blog`), the data Worker (`apps/data`, worker `data`) and OpenJot's download and
+comparison Worker (`apps/openjot/site`, worker `moojot-site`) deploy to Cloudflare Workers from this
+repository's CI: `.github/workflows/deploy.yml`. Cloudflare's own Git integration (Workers Builds) is
+not used, so the whole deploy is configured and reviewed here. `trajectonomics-web-router` routes
+trajectonomics.com to the workers by name, so a deploy changes nothing in the router. The OpenJot
+Worker `moojot-site` serves the APK short links and the MeowJot comparison page on
+`openjot.trajectonomics.com`, sends `/` to `trajectonomics.com/openjot/`, and redirects
 `moojot.trajectonomics.com` to it.
 
 ## How deploys happen

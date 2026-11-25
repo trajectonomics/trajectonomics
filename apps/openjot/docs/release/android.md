@@ -79,7 +79,7 @@ find /tmp/openjot-apk/lib -name '*.so' -print0 |
 
 ## Third-party notices
 
-The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the font) with each copyright notice and license text. MIT, Apache-2.0, BSD and OFL all require those to ship with copies of the software.
+The app shows an "Open-source licenses" page (My Moo → About). It displays `static/third-party-notices.txt`, a generated list of everything bundled in the app (Rust crates, web packages, Android libraries, ONNX Runtime, the OCR model and the fonts: Noto Sans Thai, Inter and Azeret Mono) with each copyright notice and license text. MIT, Apache-2.0, BSD and OFL all require those to ship with copies of the software.
 
 **Regenerate it before each release**, and whenever a dependency changes (`Cargo.lock`, `bun.lock`, `build.gradle.kts`):
 
@@ -89,6 +89,8 @@ node tools/third-party-notices.mjs --apk "$(find src-tauri/gen/android/app/build
 ```
 
 Use the release APK you are about to ship (the `find` picks Tauri's output; the dry-run APK from `openjot-release` works too). The generator reads the library list from the APK and the lockfiles, downloads each package's license files from crates.io, npm, Maven Central, Google Maven and Hugging Face, and writes the file in the same order every time, so a run with no dependency change leaves no diff. It needs a network, uses only Node built-ins, and keeps a download cache in the temp folder (`--cache <dir>` to move it). `--check` rewrites nothing and fails if the file on disk is out of date.
+
+Inter and Azeret Mono are the exception to the downloads: the app bundles them from the workspace's private `@trajectonomics/brand` package (Inter through `@trajectonomics/brand/current/fonts/inter.css`, Azeret Mono copied into `static/fonts/`), so the generator reads both the font files and their SIL Open Font License 1.1 texts from `packages/brand/brands/trajectonomics/assets/fonts/` without the network. It follows the app's own stylesheet: every font face the app imports or declares is included, and a bundled font whose family has no licence entry in `BRAND_FONT_LICENSES` stops the run instead of shipping without its notice.
 
 Commit the regenerated file. `bun run test` fails when `Cargo.lock` or `bun.lock` names a crate or package that the file does not list at that version, and `OPENJOT_APK=<apk> node --test tests/unit/release-apk.test.mjs` fails when the APK bundles a library the file does not list. A new native library, or a library whose POM names an unfamiliar license, stops the generator with a message instead of slipping through.
 
@@ -132,8 +134,9 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 
 ### Stable download links
 
-The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page:
+The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page at <https://trajectonomics.com/openjot/>:
 
+- Landing page: `https://trajectonomics.com/openjot/`
 - APK: `https://openjot.trajectonomics.com/download`
 - Checksums: `https://openjot.trajectonomics.com/download/checksums`
 - Release page: `https://github.com/trajectonomics/trajectonomics/releases?q=openjot-v`

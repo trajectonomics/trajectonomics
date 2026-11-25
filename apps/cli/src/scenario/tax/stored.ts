@@ -17,6 +17,8 @@ export function storedTaxOf(request: TaxRequest): StoredTax {
 	for (const field of ALLOWANCE_FLAGS) {
 		if (request.allowances[field] > 0) stored[field] = request.allowances[field]
 	}
+	const together = request.sharedMortgageInterest ?? 0
+	if (together > 0) stored.sharedMortgageInterest = together
 	if (request.returns !== undefined) {
 		stored.returns = Object.fromEntries(
 			Object.entries(request.returns).map(([person, claims]) => [person, storedReturnOf(claims)]),
@@ -34,6 +36,9 @@ export function requestOfStored(stored: StoredTax): TaxRequest {
 		childrenAtHigherRate: stored.childrenAtHigherRate,
 		allowances: allowancesOf(stored),
 		...(stored.claimsHolder === undefined ? {} : { claimsHolder: stored.claimsHolder }),
+		...(stored.sharedMortgageInterest === undefined
+			? {}
+			: { sharedMortgageInterest: stored.sharedMortgageInterest }),
 		...(stored.returns === undefined
 			? {}
 			: {

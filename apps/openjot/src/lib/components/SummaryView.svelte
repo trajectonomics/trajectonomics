@@ -10,6 +10,7 @@
   import CategoryIcon from "./CategoryIcon.svelte";
   import { formatBaht } from "$lib/format";
   import { t } from "$lib/i18n";
+  import { activeTheme } from "$lib/themeStore";
   import type {
     BudgetItem,
     Category,
@@ -48,6 +49,9 @@
     onDeleteBudget: (id: string) => Promise<void>;
   } = $props();
 
+  // The Trajectonomics theme paints the summary card with the Theme's own surfaces;
+  // pink and orange keep the crisp white card they have always drawn.
+  const robotTheme = $derived($activeTheme === "trajectonomics");
   let subView = $state<"donut" | "compare" | "budgets">("donut");
   let groupTab = $state<"category" | "tag">("category");
   let showBudgetForm = $state(false);
@@ -112,7 +116,7 @@
   <!-- Brand Period Header seamlessly extending behind status bar -->
   <header
     class="text-white px-4 pb-3 flex items-center justify-between"
-    style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); padding-top: max(env(safe-area-inset-top), 38px);"
+    style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); outline: 1px solid var(--hero-border); outline-offset: -1px; padding-top: max(env(safe-area-inset-top), 38px);"
   >
     <button
       type="button"
@@ -135,38 +139,40 @@
     </button>
   </header>
 
-  <!-- Crisp White Income / Spending / Remaining card -->
+  <!-- Income / Spending / Remaining card -->
   {#if summary}
-    <div class="bg-white text-[#18181b] px-5 pt-4 pb-0 rounded-b-3xl shadow-sm border-b border-[var(--border-subtle)]">
+    <div class="{robotTheme
+      ? 'bg-[var(--bg-card)] text-[var(--text-primary)]'
+      : 'bg-white text-[#18181b]'} px-5 pt-4 pb-0 rounded-b-3xl shadow-sm border-b border-[var(--border-subtle)]">
       <div class="grid grid-cols-2 gap-4 text-center">
         <div>
-          <div class="text-xs text-zinc-500 font-medium">↓ {t(lang, "income")}</div>
+          <div class="ds-meta text-xs {robotTheme ? 'text-[var(--text-muted)]' : 'text-zinc-500'} font-medium">↓ {t(lang, "income")}</div>
           <div class="text-lg font-extrabold text-emerald-600">
             {formatBaht(summary.incomeSatang)}
           </div>
         </div>
-        <div class="border-l border-zinc-200">
-          <div class="text-xs text-zinc-500 font-medium">↑ {t(lang, "spending")}</div>
-          <div class="text-lg font-extrabold text-[#18181b]">
+        <div class="border-l {robotTheme ? 'border-[var(--border-subtle)]' : 'border-zinc-200'}">
+          <div class="ds-meta text-xs {robotTheme ? 'text-[var(--text-muted)]' : 'text-zinc-500'} font-medium">↑ {t(lang, "spending")}</div>
+          <div class="text-lg font-extrabold {robotTheme ? 'text-[var(--text-primary)]' : 'text-[#18181b]'}">
             {formatBaht(summary.spendingSatang)}
           </div>
         </div>
       </div>
-      <div class="text-center text-xs text-zinc-600 mt-1.5 mb-3">
+      <div class="text-center text-xs {robotTheme ? 'text-[var(--text-secondary)]' : 'text-zinc-600'} mt-1.5 mb-3">
         {t(lang, "remaining")}:
-        <span class="font-bold text-[#18181b]">
+        <span class="font-bold {robotTheme ? 'text-[var(--text-primary)]' : 'text-[#18181b]'}">
           {formatBaht(summary.remainingSatang, true)}
         </span>
       </div>
 
       <!-- 3-way pill tabs -->
       <div class="flex justify-center">
-        <div class="inline-flex bg-zinc-100 rounded-t-2xl overflow-hidden text-xs font-bold">
+        <div class="inline-flex {robotTheme ? 'bg-[var(--bg-card-sub)]' : 'bg-zinc-100'} rounded-t-2xl overflow-hidden text-xs font-bold">
           {#each (["spending", "income", "transfer"] as const) as k}
             <button
               type="button"
               onclick={() => onChangeKind(k)}
-              class="px-5 py-2.5 transition-colors {activeKind === k ? 'rounded-t-2xl' : 'text-zinc-600'}"
+              class="px-5 py-2.5 transition-colors {activeKind === k ? 'rounded-t-2xl' : robotTheme ? 'text-[var(--text-secondary)]' : 'text-zinc-600'}"
               style={activeKind === k
                 ? "background-color: var(--summary-tab-active-bg); color: var(--summary-tab-active-text);"
                 : ""}
@@ -185,7 +191,7 @@
       type="button"
       onclick={() => (subView = "donut")}
       class="px-4 py-2 rounded-full text-xs font-bold border transition-colors {subView === 'donut'
-        ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+        ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
         : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)]'}"
     >
       {t(lang, "summary")}
@@ -194,7 +200,7 @@
       type="button"
       onclick={() => (subView = "compare")}
       class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-colors {subView === 'compare'
-        ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+        ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
         : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)]'}"
     >
       <BarChart3 class="size-3.5" />
@@ -204,7 +210,7 @@
       type="button"
       onclick={() => (subView = "budgets")}
       class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-colors {subView === 'budgets'
-        ? 'bg-[var(--brand)] text-white border-[var(--brand)]'
+        ? 'bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]'
         : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)]'}"
     >
       <Gauge class="size-3.5" />
@@ -371,7 +377,7 @@
         <button
           type="button"
           onclick={() => (showBudgetForm = !showBudgetForm)}
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--brand)] text-white text-xs font-bold"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] text-xs font-bold"
         >
           <Plus class="size-4" />
           <span>{t(lang, "addBudget")}</span>
@@ -385,7 +391,7 @@
               type="button"
               onclick={() => (budgetScopeType = "total")}
               class="py-2 rounded-xl text-xs font-bold {budgetScopeType === 'total'
-                ? 'bg-[var(--brand)] text-white'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)]'
                 : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'}"
             >
               {t(lang, "totalSpending")}
@@ -394,7 +400,7 @@
               type="button"
               onclick={() => (budgetScopeType = "category")}
               class="py-2 rounded-xl text-xs font-bold {budgetScopeType === 'category'
-                ? 'bg-[var(--brand)] text-white'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)]'
                 : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'}"
             >
               {t(lang, "byCategory")}

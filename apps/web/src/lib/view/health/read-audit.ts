@@ -33,6 +33,14 @@ const BASELINE_NOTE =
 	"The Baseline cannot state an overdrawn asset or an overpaid loan, so this plan cannot be projected. Correct the account's balance, then read again."
 
 /**
+ * Whether a Read is the one that reads the Baseline: `traj baseline show`. The note follows the command,
+ * so renaming the question that heads the row cannot drop it.
+ */
+function isBaselineRead(argv: readonly string[]): boolean {
+	return argv[0] === "baseline" && argv[1] === "show"
+}
+
+/**
  * Every Read the Snapshot holds, flattened, with the question it answers. Failed Reads come first,
  * and the rest keep the Snapshot's order, so the audit trail starts with what did not work.
  */
@@ -46,7 +54,7 @@ function auditRow({ question, read }: Entry, key: string): AuditRow {
 	const command = formatArgv(read.argv)
 	if (read.ok) return { key, question, command, failed: false, error: null, note: null }
 	const { code, message, hint } = read.error
-	const note = question === BASELINE && code === "NEGATIVE_AMOUNT" ? BASELINE_NOTE : null
+	const note = isBaselineRead(read.argv) && code === "NEGATIVE_AMOUNT" ? BASELINE_NOTE : null
 	return {
 		key,
 		question,

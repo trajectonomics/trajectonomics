@@ -12,6 +12,7 @@ import HouseholdCard from "./household/HouseholdCard.svelte"
 import MilestonesBody from "./milestones/MilestonesBody.svelte"
 import PlanItemsBody from "./plan-items/PlanItemsBody.svelte"
 import AnnualTable from "./projection/AnnualTable.svelte"
+import ItemName from "./ui/ItemName.svelte"
 
 const base = (() => {
 	const read = DEMO.reads.documents["base"]
@@ -109,5 +110,29 @@ describe("a Flow and a Milestone the CLI names only by id show the id in code", 
 			["car-paid-off", true],
 			["net-worth-ten-million", true],
 		])
+	})
+})
+
+describe("a label the plan states is shown in place of the id", () => {
+	const labelled = (): typeof DEMO => {
+		const next = structuredClone(DEMO)
+		const read = next.reads.documents["base"]
+		if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+		const document = read.data.scenario.document
+		const flow = document.flows[0]
+		if (flow !== undefined) flow.displayLabel = "Salary"
+		document.milestones = [{ id: "car-paid-off", displayLabel: "Car paid off" }]
+		return next
+	}
+
+	test("a Flow and a Milestone show the label, and one without a label keeps its id in code", () => {
+		replaceSnapshot(labelled())
+		const salary = render(ItemName, { props: { kind: "flow", id: "salary" } }).body
+		expect(salary).toContain('data-item="salary"')
+		expect(salary).toContain(">Salary</span>")
+		const milestone = render(ItemName, { props: { kind: "milestone", id: "car-paid-off" } })
+		expect(milestone.body).toContain(">Car paid off</span>")
+		const bare = render(ItemName, { props: { kind: "milestone", id: "sabbatical" } }).body
+		expect(bare).toMatch(code("milestone", "sabbatical"))
 	})
 })

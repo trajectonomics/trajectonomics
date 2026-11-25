@@ -1,42 +1,85 @@
-/** A generous width for one character of a marker label in the chart's small text, in pixels. */
-const CHAR_PX = 7
+import { fitted, type LabelText, stub } from "./label-width"
+
 /** The space kept between two labels on one row, in pixels. */
 const GAP_PX = 6
-/** How far a label stands off its rule, in pixels, as `LineRules.svelte` draws it. */
-const OFFSET_PX = 4
+/** How far a label stands off its rule, in pixels. */
+export const LABEL_OFFSET_PX = 4
 
 /** One marker as the rules draw it: its x in pixels and its label. */
 export interface LabelledMark {
 	readonly x: number
 	readonly label: string
+	/** True when the chart draws the label in monospace, as it does an id no Read names. */
+	readonly code?: boolean
 }
 
-/** A label's left and right edges: to the right of its rule, or to the left past the chart's middle. */
-function extentOf(mark: LabelledMark, width: number): readonly [number, number] {
-	const size = mark.label.length * CHAR_PX
-	return mark.x > width / 2
-		? [mark.x - OFFSET_PX - size, mark.x - OFFSET_PX]
-		: [mark.x + OFFSET_PX, mark.x + OFFSET_PX + size]
+/** The chart a label is placed in: its whole width, and the x its plot starts and ends at. */
+export interface LabelArea {
+	readonly width: number
+	readonly left: number
+	readonly right: number
+}
+
+/** One marker's label, placed: its row, the side of its rule it stands on, and the words drawn for it. */
+export interface PlacedLabel {
+	readonly row: number
+	/** True when the label stands to the left of its rule, so its words end there. */
+	readonly leftwards: boolean
+	/** The label, whole or shortened. Empty when there is no room for it, and then nothing is drawn. */
+	readonly text: string
 }
 
 /**
- * The row each marker's label sits on, so that no two labels overlap. Markers in x order take the first
- * row whose last label ends before theirs starts; row 0 is the top. Geometry only: it places text.
+ * The labels of the markers, each placed. A label is shortened to the nearest rule or plot edge on the
+ * side it runs towards, so none crosses a dashed rule or leaves the plot. It takes the other side of its
+ * rule when its own has no room, and is left out when neither has room for even its first letter. Markers
+ * in x order take the first row whose last label ends before theirs starts, so no two labels overlap.
+ * Row 0 is the top. Geometry only: it places text.
  */
-export function labelRows(marks: readonly LabelledMark[], width: number): number[] {
+export function placedLabels(marks: readonly LabelledMark[], area: LabelArea): PlacedLabel[] {
 	const ends: number[] = []
-	const rows = marks.map(() => 0)
-	const order = marks
-		.map((_mark, index) => index)
-		.sort((a, b) => (marks[a]?.x ?? 0) - (marks[b]?.x ?? 0) || a - b)
-	for (const index of order) {
-		const mark = marks[index]
-		if (mark === undefined) continue
-		const [left, right] = extentOf(mark, width)
+	const placed = marks.map(() => ({ row: 0, leftwards: false, text: "" }))
+	const rules = marks.map((mark) => mark.x)
+	const order = [...marks.entries()].sort(([a, first], [b, second]) => first.x - second.x || a - b)
+	for (const [index, mark] of order) {
+		const found = place(mark, rules, area)
+		// A label that is not drawn takes no row.
+		if (found === undefined) continue
+		const { leftwards, text, width } = found
+		const left = leftwards ? mark.x - LABEL_OFFSET_PX - width : mark.x + LABEL_OFFSET_PX
 		const free = ends.findIndex((end) => end + GAP_PX <= left)
 		const row = free === -1 ? ends.length : free
-		ends[row] = right
-		rows[index] = row
+		ends[row] = left + width
+		placed[index] = { row, leftwards, text }
 	}
-	return rows
+	return placed
+}
+
+/**
+ * The words of one label and the side they go on: shortened with an ellipsis on whichever side holds that,
+ * else the bare first letter. A label past the chart's middle prefers the left, so its words run towards
+ * the middle. Undefined when neither side holds anything.
+ */
+function place(
+	mark: LabelledMark,
+	rules: readonly number[],
+	area: LabelArea,
+): (LabelText & { readonly leftwards: boolean }) | undefined {
+	const preferred = mark.x > area.width / 2
+	for (const shorten of [fitted, stub]) {
+		for (const leftwards of [preferred, !preferred]) {
+			const space = room(mark.x, rules, area, leftwards)
+			const words = shorten(mark.label, space, mark.code === true)
+			if (words.text !== "") return { ...words, leftwards }
+		}
+	}
+	return undefined
+}
+
+/** The room a label at `x` has on one side: up to the nearest rule that way, and never past the plot's edge. */
+function room(x: number, rules: readonly number[], area: LabelArea, leftwards: boolean): number {
+	if (leftwards) {
+		return x - LABEL_OFFSET_PX - Math.max(area.left, ...rules.filter((rule) => rule < x))
+	}
+	return Math.min(area.right, ...rules.filter((rule) => rule > x)) - (x + LABEL_OFFSET_PX)
 }

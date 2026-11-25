@@ -26,7 +26,7 @@ const view = $derived(milestoneView(run))
 			<p>A plan says when it reaches a target by declaring milestones in the plan itself.</p>
 		</EmptyState>
 	{:else}
-		<NetWorthChart {run} {terms} {onTerms} />
+		<NetWorthChart {run} {terms} {onTerms} listedElsewhere />
 		<MilestoneTimeline reached={view.reached} />
 		<UnreachedList unreached={view.unreached} />
 	{/if}

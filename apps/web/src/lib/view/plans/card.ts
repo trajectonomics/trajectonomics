@@ -3,6 +3,7 @@ import type { Fi, ProjectionChance, ProjectionRun, Read, Snapshot } from "../../
 import { formatMonth, formatShare } from "../../format"
 import { agesText } from "../household/model"
 import { type PersonNames, snapshotItemNames } from "../item-names"
+import type { ReachedMilestone } from "../milestones/milestones"
 import { projectionView } from "../overview/projection"
 import { type PlanChart, planChart } from "./chart"
 import { type NotesPreview, notesPreview } from "./notes"
@@ -36,6 +37,8 @@ export interface PlanCard {
 	readonly netWorth: CardNetWorth | null
 	readonly series: readonly LineSeries[]
 	readonly markers: readonly LineMarker[]
+	/** The Milestones the chart draws a rule for, in date order, so the card can name each in words. */
+	readonly milestones: readonly ReachedMilestone[]
 	/** The CLI's message when the plan's projection could not be read; null otherwise. */
 	readonly problem: string | null
 }
@@ -85,6 +88,7 @@ export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCa
 		netWorth: run?.ok ? netWorthOf(run.data) : null,
 		series: chart?.series ?? [],
 		markers: chart?.markers ?? [],
+		milestones: chart?.milestones ?? [],
 		problem: run !== undefined && !run.ok ? run.error.message : null,
 	}
 }

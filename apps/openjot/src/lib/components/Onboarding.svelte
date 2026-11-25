@@ -241,7 +241,7 @@
   const optionClass = (active: boolean) =>
     `flex-1 min-h-11 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-colors ${
       active
-        ? "bg-[var(--brand)] text-white border-[var(--brand)]"
+        ? "bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]"
         : "bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]"
     }`;
 </script>
@@ -324,11 +324,11 @@
               <div class="relative">
                 <div class="absolute inset-4 rounded-full bg-[var(--brand-soft)] blur-xl"></div>
                 <div class="relative motion-safe:animate-[moo-bob_3s_ease-in-out_infinite]">
-                  <MooMascot mood="idle" size="lg" alt="Moo" />
+                  <MooMascot mood="idle" size="lg" alt={theme === "trajectonomics" ? "OpenJot mascot" : "Moo"} />
                 </div>
               </div>
               <h2 id="onb-title-{i}" bind:this={headings[i]} tabindex="-1" class="text-3xl font-extrabold tracking-tight outline-none">
-                {tr("onbWelcomeTitle")}
+                {tr(theme === "trajectonomics" ? "onbWelcomeTitleRobot" : "onbWelcomeTitle")}
               </h2>
               <p class="max-w-xs text-base leading-relaxed text-[var(--text-secondary)]">{tr("onbWelcomeBody")}</p>
               <!-- Language comes first, so the rest of the tour is in the language people read (#48). -->
@@ -379,7 +379,7 @@
               <div class="relative w-full max-w-[16rem] rounded-[2rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 shadow-sm">
                 <div
                   class="flex flex-col items-center gap-1 rounded-2xl py-3 text-white"
-                  style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to));"
+                  style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); outline: 1px solid var(--hero-border); outline-offset: -1px;"
                 >
                   <ArrowDown class="size-5 motion-safe:animate-bounce" />
                   <MooMascot mood="scan" size="md" interactive={false} alt="" />
@@ -389,7 +389,7 @@
                   <div class="h-3 w-1/2 rounded-full bg-[var(--track-muted)]"></div>
                 </div>
                 <span
-                  class="absolute -bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-lg"
+                  class="absolute -bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] shadow-lg"
                   aria-hidden="true"
                 >
                   <Plus class="size-5" />
@@ -425,13 +425,13 @@
                   <div class="mb-2.5 flex items-center gap-2 text-sm font-bold" aria-hidden="true">
                     <Palette class="size-4 text-[var(--brand)]" />{tr("onbTheme")}
                   </div>
-                  <div class="flex gap-2">
-                    {#each [{ id: "pink-white", key: "onbThemePink", a: "#FF4D94", b: "#ffffff" }, { id: "orange-black", key: "onbThemeOrange", a: "#FF6B1A", b: "#0a0a0c" }] as opt (opt.id)}
+                  <div class="grid grid-cols-3 gap-2">
+                    {#each [{ id: "trajectonomics", key: "onbThemeTrajectonomics", descKey: "themeDefault", a: "#EA580C", b: "#0A0A0A" }, { id: "pink-white", key: "onbThemePink", descKey: "themeLightMode", a: "#FF4D94", b: "#ffffff" }, { id: "orange-black", key: "onbThemeOrange", descKey: "themeDarkMode", a: "#FF6B1A", b: "#0a0a0c" }] as opt (opt.id)}
                       <button
                         type="button"
                         aria-pressed={theme === opt.id}
                         onclick={() => onChangeTheme(opt.id as AppTheme)}
-                        class="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-xs font-bold text-[var(--text-primary)] transition-colors {theme === opt.id
+                        class="flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2.5 text-[10px] font-bold text-[var(--text-primary)] transition-colors {theme === opt.id
                           ? 'border-[var(--brand)] bg-[var(--brand-soft)] ring-1 ring-[var(--brand)]'
                           : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
                       >
@@ -439,7 +439,8 @@
                           <span class="size-4 rounded-full ring-2 ring-white/80" style="background: {opt.a};"></span>
                           <span class="size-4 rounded-full ring-2 ring-zinc-400/60" style="background: {opt.b};"></span>
                         </span>
-                        {tr(opt.key as I18nKey)}
+                        <span>{tr(opt.key as I18nKey)}</span>
+                        <span class="text-[9px] font-medium text-[var(--text-muted)]">{tr(opt.descKey as I18nKey)}</span>
                       </button>
                     {/each}
                   </div>
@@ -512,7 +513,7 @@
                 <button
                   type="button"
                   onclick={requestGallery}
-                  class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3.5 text-sm font-bold text-white shadow-sm active:bg-[var(--brand-deep)]"
+                  class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3.5 text-sm font-bold text-[var(--brand-contrast)] shadow-sm active:bg-[var(--brand-deep)]"
                 >
                   {tr("onbPermAllow")}
                 </button>
@@ -523,7 +524,7 @@
                 <span class="absolute -left-6 top-2 text-2xl motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_infinite]" aria-hidden="true">✨</span>
                 <span class="absolute -right-5 top-10 text-xl motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_0.5s_infinite]" aria-hidden="true">🎉</span>
                 <span class="absolute -left-2 bottom-3 text-lg motion-safe:animate-[moo-twinkle_1.6s_ease-in-out_1s_infinite]" aria-hidden="true">💖</span>
-                <MooMascot mood="happy" size="lg" alt="Moo" />
+                <MooMascot mood="happy" size="lg" alt={theme === "trajectonomics" ? "OpenJot mascot" : "Moo"} />
               </div>
               <h2 id="onb-title-{i}" bind:this={headings[i]} tabindex="-1" class="text-3xl font-extrabold tracking-tight outline-none">
                 {tr("onbDoneTitle")}
@@ -550,7 +551,7 @@
       <button
         type="button"
         onclick={finish}
-        class="w-full rounded-full bg-[var(--brand)] py-4 text-base font-extrabold text-white shadow-lg active:bg-[var(--brand-deep)]"
+        class="w-full rounded-full bg-[var(--brand)] py-4 text-base font-extrabold text-[var(--brand-contrast)] shadow-lg active:bg-[var(--brand-deep)]"
         style="box-shadow: 0 10px 24px -8px var(--hero-shadow);"
       >
         {tr("onbStart")}
@@ -567,7 +568,7 @@
       <button
         type="button"
         onclick={() => goTo(step + 1)}
-        class="ml-auto flex min-h-12 items-center gap-1 rounded-full bg-[var(--brand)] px-7 text-sm font-bold text-white shadow-sm active:bg-[var(--brand-deep)]"
+        class="ml-auto flex min-h-12 items-center gap-1 rounded-full bg-[var(--brand)] px-7 text-sm font-bold text-[var(--brand-contrast)] shadow-sm active:bg-[var(--brand-deep)]"
       >
         {t(lang, "next")}<ChevronRight class="size-4" />
       </button>

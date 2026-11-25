@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Generates static/third-party-notices.txt: the copyright notices and license texts of everything
-// bundled in the OpenJot APK, read from the lockfiles and the built release APK (not typed by hand).
+// bundled in the OpenJot APK, read from the lockfiles, the brand package's font assets and the
+// built release APK (not typed by hand).
 //
 //   node tools/third-party-notices.mjs --apk path/to/openjot-android-arm64.apk
 //
@@ -13,7 +14,7 @@
 // It downloads crate, npm and Maven archives from the public registries, so it needs a network
 // the first time. It adds no dependency to the app: only Node built-ins are used.
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -328,6 +329,95 @@ async function npmComponents(cacheDir) {
   });
 }
 
+// --- brand typefaces --------------------------------------------------------------------------
+
+const BRAND_FONT_ASSETS = resolve(ROOT, "../../packages/brand/brands/trajectonomics/assets/fonts");
+const BRAND_CURRENT_FONTS = resolve(ROOT, "../../packages/brand/dist/current/fonts");
+
+// The OFL text that ships with each brand family the app bundles. A woff2 file carries no
+// package metadata, so the license cannot be read from the file itself; a family with no entry
+// here fails the run instead of shipping without its notice. The texts name the copyright holder.
+const BRAND_FONT_LICENSES = {
+  "Azeret Mono": "AZERET-MONO-OFL-1.1.txt",
+  "Inter Variable": "INTER-OFL-1.1.txt",
+};
+
+/** The @font-face rules in a stylesheet: the family each declares and the woff2 files it loads. */
+function fontFaces(css) {
+  return [...css.matchAll(/@font-face\s*\{([\s\S]*?)\}/g)].map(([, body]) => ({
+    family: /font-family:\s*["']([^"']+)["']/.exec(body)?.[1] ?? null,
+    files: [...body.matchAll(/url\(\s*["']?([^"')]+\.woff2)["']?\s*\)/g)].map((m) => m[1].split("/").pop()),
+  }));
+}
+
+/**
+ * The typefaces the app bundles from @trajectonomics/brand, a private devDependency that no
+ * registry serves. The app's own stylesheet says which brand sheets it imports and declares the
+ * faces for the fonts copied into static/fonts/, so this follows the app rather than a hand-kept
+ * inventory: a new subset, or a woff2 in static/fonts/ with no face, fails the run.
+ */
+export function brandFontComponents() {
+  const appCss = read("src/app.css");
+  const families = new Map(); // font-family -> Set(woff2 file name)
+  const add = (face) => {
+    if (!face.family) throw new Error("an @font-face in the app's styles has no font-family");
+    if (!face.files.length) return; // a metric-matched fallback face loads no file
+    const files = families.get(face.family) ?? new Set();
+    for (const file of face.files) files.add(file);
+    families.set(face.family, files);
+  };
+  for (const [, sheet] of appCss.matchAll(/@import\s+["']@trajectonomics\/brand\/current\/fonts\/([^"']+\.css)["']/g)) {
+    const path = join(BRAND_CURRENT_FONTS, sheet);
+    if (!existsSync(path)) {
+      throw new Error(`${path} is missing: build the brand package first (bunx turbo run build --filter=@trajectonomics/brand)`);
+    }
+    for (const face of fontFaces(readFileSync(path, "utf8"))) {
+      for (const file of face.files) {
+        if (!existsSync(join(BRAND_CURRENT_FONTS, file))) throw new Error(`${path} loads ${file}, which is not in the package`);
+      }
+      add(face);
+    }
+  }
+  for (const face of fontFaces(appCss)) {
+    for (const file of face.files) {
+      if (!existsSync(join(ROOT, "static", "fonts", file))) throw new Error(`src/app.css loads /fonts/${file}, which is not in static/fonts`);
+    }
+    add(face);
+  }
+  const declared = new Set([...families.values()].flatMap((files) => [...files]));
+  for (const file of readdirSync(join(ROOT, "static", "fonts"))) {
+    if (file.endsWith(".woff2") && !declared.has(file)) {
+      throw new Error(`static/fonts/${file} has no @font-face in src/app.css, so it would ship without a notice`);
+    }
+  }
+  const out = [];
+  for (const family of [...families.keys()].sort(cmp)) {
+    const license = BRAND_FONT_LICENSES[family];
+    if (!license) {
+      throw new Error(`the app bundles the brand typeface "${family}", which has no license in BRAND_FONT_LICENSES`);
+    }
+    const licensePath = join(BRAND_FONT_ASSETS, license);
+    if (!existsSync(licensePath)) throw new Error(`${licensePath} is missing: it is the notice for the "${family}" font`);
+    const files = [...families.get(family)].sort(cmp);
+    for (const file of files) {
+      if (!existsSync(join(BRAND_FONT_ASSETS, file))) throw new Error(`the "${family}" face loads ${file}, which is not a brand asset`);
+    }
+    out.push({
+      eco: "npm",
+      name: `${family} (${files.join(", ")})`,
+      version: "bundled",
+      license: "OFL-1.1",
+      url: null,
+      texts: [{ text: readFileSync(licensePath, "utf8") }],
+      fallback: null,
+      // Printed in full in its own Part 2 group: the OFL body repeats "Copyright ..." lines that
+      // are not copyright notices, and grouping by body would drop them from the reproduced text.
+      verbatim: true,
+    });
+  }
+  return out;
+}
+
 // --- Android libraries ------------------------------------------------------------------------
 
 /** Reads the libraries the APK itself names: META-INF/*.version and the root *.properties files. */
@@ -579,7 +669,10 @@ function appComponent() {
 const ECOSYSTEMS = [
   ["app", "OpenJot", []],
   ["rust", "Rust crates (compiled into libmoojot_lib.so)", ["Tauri's Android glue library (app.tauri.*, in classes.dex) is part of the tauri crate listed here."]],
-  ["npm", "Web app packages (bundled into the app's JavaScript, CSS and fonts)", ["@fontsource/noto-sans-thai provides the Noto Sans Thai font files under the SIL Open Font License 1.1."]],
+  ["npm", "Web app packages (bundled into the app's JavaScript, CSS and fonts)", [
+    "@fontsource/noto-sans-thai provides the Noto Sans Thai font files under the SIL Open Font License 1.1.",
+    "Inter Variable and Azeret Mono are bundled from the workspace's private @trajectonomics/brand package, which ships them under the SIL Open Font License 1.1.",
+  ]],
   ["android", "Android and Java/Kotlin libraries (classes.dex and resources)", ["The Google ML Kit and Google Play services libraries are proprietary; the open-source notices they ship are reproduced in Part 2."]],
   ["native", "Native libraries", []],
   ["model", "OCR model", []],
@@ -609,7 +702,9 @@ function buildGroups(components) {
     for (const t of c.texts) {
       const text = norm(t.text);
       if (!text) continue;
-      const key = bodyKey(text);
+      // A verbatim component's text gets its own group, printed whole: grouping it by body would
+      // replace every line the copyright heuristic matches, which for the OFL includes terms.
+      const key = c.verbatim ? Symbol("verbatim") : bodyKey(text);
       let group = groups.get(key);
       if (!group) groups.set(key, (group = { variants: new Map(), members: [] }));
       if (!group.variants.has(text)) group.variants.set(text, text);
@@ -727,7 +822,7 @@ export async function generate({ apk, cache }) {
   const apkZip = readZip(readFileSync(apk));
   const [rust, npm, android, model] = await Promise.all([rustComponents(cache, warnings), npmComponents(cache), androidComponents(cache, apkZip, warnings), modelComponents(cache, warnings)]);
   const native = await nativeComponents(cache, apkZip, android, warnings);
-  const components = [appComponent(), ...[...rust, ...npm, ...android, ...native, ...model].sort((a, b) => ECOSYSTEMS.findIndex(([e]) => e === a.eco) - ECOSYSTEMS.findIndex(([e]) => e === b.eco) || cmp(a.name, b.name) || cmp(a.version, b.version))];
+  const components = [appComponent(), ...[...rust, ...npm, ...android, ...native, ...model].sort((a, b) => ECOSYSTEMS.findIndex(([e]) => e === a.eco) - ECOSYSTEMS.findIndex(([e]) => e === b.eco) || cmp(a.name, b.name) || cmp(a.version, b.version)), ...brandFontComponents()];
   await resolveFallbacks(cache, components, warnings);
   return { text: render(components, warnings), components, warnings };
 }

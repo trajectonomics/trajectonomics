@@ -1,17 +1,18 @@
 // Request handling for the openjot.trajectonomics.com Worker (entry: worker.js), which also
-// serves moojot.trajectonomics.com and redirects it to the new host.
+// serves moojot.trajectonomics.com and redirects it to the new host. The landing page moved to the
+// Site on 2026-11-26: see apps/site (ADR 0032).
 //
 // Static files in ./public are served by Workers Static Assets. The Worker
 // only runs for the paths listed in wrangler.jsonc `run_worker_first`:
 //
+//   /            301 to the landing page on the Site, keeping the query.
 //   /download     302 to the APK in the newest `openjot-v*` GitHub release of the
 //                 monorepo, so a reel can say "openjot.trajectonomics.com/download"
 //                 and the link never goes stale. Until the first one exists it uses
 //                 the archived trajectonomics/moojot repository's latest release.
 //                 /download/<source> does the same and records where the click came from.
 //   /download/checksums  302 to that release's SHA256SUMS, through the same lookup.
-//   /api/release  JSON describing that release, used by the page for the version,
-//                 size and "coming soon" state.
+//   /api/release  JSON describing that release, used by the comparison page.
 //   /go/*, /ingest/*  Source links and the PostHog proxy: see tracking.js.
 
 import { count, downloadSource, handleGo, proxyIngest, redirect } from "./tracking.js";
@@ -21,12 +22,14 @@ export const REPO = "trajectonomics/trajectonomics";
 export const SITE_HOST = "openjot.trajectonomics.com";
 /** The host the site moved from; it redirects here, except for the analytics proxy. */
 export const OLD_SITE_HOST = "moojot.trajectonomics.com";
+/** The landing page's address on the Site: `/` on this host answers 301 here. */
+export const LANDING_URL = "https://trajectonomics.com/openjot/";
 /** The app's releases carry this prefix, so a `cli-v*` or `tax-v*` release never wins. */
 export const TAG_PREFIX = "openjot-v";
 /** The app's home before the move; its latest release is the fallback until the first openjot-v* one. */
 export const ARCHIVED_REPO = "trajectonomics/moojot";
 export const RELEASES_URL = `https://github.com/${REPO}/releases?q=${TAG_PREFIX}`;
-export const NO_RELEASE_PATH = "/#coming-soon";
+export const NO_RELEASE_PATH = LANDING_URL;
 const CACHE_SECONDS = 300;
 const CACHE_KEY = "https://moojot.trajectonomics.com/__cache/latest-release";
 const API = "https://api.github.com";
@@ -135,25 +138,42 @@ async function fromApiLatest(fetchImpl, repo) {
   throw new Error(`GitHub API answered ${res.status}`);
 }
 
-/** Same answer from github.com: the filtered releases page, then each tag's own page. */
+/**
+ * Same answer from github.com: the repository's tag refs, then each tag's own page.
+ * The releases search page stopped rendering tag links by 2026-11-26, and the Atom
+ * feed mixes every package's releases, so the git ref advertisement is the list:
+ * it has every tag and no API rate limit.
+ */
 async function fromWebList(fetchImpl) {
-  const list = await fetchImpl(`${WEB}/${REPO}/releases?q=${encodeURIComponent(TAG_PREFIX)}`, {
+  const refs = await fetchImpl(`${WEB}/${REPO}.git/info/refs?service=git-upload-pack`, {
     headers: UA,
   });
-  if (!list.ok) throw new Error(`github.com answered ${list.status}`);
-  const html = await list.text();
-  const prefix = `/${REPO}/releases/tag/`;
+  if (!refs.ok) throw new Error(`github.com answered ${refs.status}`);
+  const advertisement = await refs.text();
   const tags = [];
-  for (const m of html.matchAll(/href="([^"]+)"/g)) {
-    if (!m[1].startsWith(prefix)) continue;
-    const tag = decodeURIComponent(m[1].slice(prefix.length).split(/[?#]/)[0]);
+  for (const m of advertisement.matchAll(/refs\/tags\/([^\s^\0]+)(\^\{\})?/g)) {
+    if (m[2]) continue; // the peeled `^{}` entry of an annotated tag
+    const tag = m[1];
     if (tag.startsWith(TAG_PREFIX) && !tags.includes(tag)) tags.push(tag);
   }
+  tags.sort(byVersionDesc);
   for (const tag of tags.slice(0, WEB_CANDIDATES)) {
     const release = await fromWebTag(fetchImpl, REPO, tag);
     if (release) return release;
   }
   return null;
+}
+
+/** Newest first by the numeric major.minor.patch after the prefix; a tag that does not parse sorts last. */
+function byVersionDesc(a, b) {
+  const pa = a.slice(TAG_PREFIX.length).match(/^(\d+)\.(\d+)\.(\d+)$/);
+  const pb = b.slice(TAG_PREFIX.length).match(/^(\d+)\.(\d+)\.(\d+)$/);
+  if (!pa || !pb) return (pa ? 0 : 1) - (pb ? 0 : 1);
+  return (
+    Number(pb[1]) - Number(pa[1]) ||
+    Number(pb[2]) - Number(pa[2]) ||
+    Number(pb[3]) - Number(pa[3])
+  );
 }
 
 /** One release from github.com. Null when the tag is not a published, non-prerelease release. */
@@ -216,6 +236,12 @@ export async function handle(request, env, ctx, deps = {}) {
     if ((method === "GET" || method === "HEAD") && !isIngest) {
       return redirect(`https://${SITE_HOST}${pathname}${url.search}`, 301);
     }
+  }
+
+  // The landing page moved to the Site; its own Worker still owns downloads, go links and the API.
+  const method = request.method.toUpperCase();
+  if ((method === "GET" || method === "HEAD") && (pathname === "/" || pathname === "/index.html")) {
+    return redirect(`${LANDING_URL}${url.search}`, 301);
   }
 
   if (pathname === "/download/checksums") {

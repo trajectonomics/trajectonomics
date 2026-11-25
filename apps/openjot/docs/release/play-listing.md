@@ -82,7 +82,7 @@ OpenJot isn't affiliated with any bank or e-wallet. Bank and app names belong to
 | Developer name | Trajectonomics |
 | Category | Finance |
 | Tags | Budgeting, expense tracking (pick the closest ones Play offers) |
-| Website | https://openjot.trajectonomics.com |
+| Website | https://trajectonomics.com/openjot/ |
 | Email | privacy@trajectonomics.com |
 | Privacy policy | https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/privacy-policy.md |
 
