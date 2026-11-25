@@ -14,7 +14,7 @@ Node tests in this folder.
 | `public/meowjot-alternative.html` | The OpenJot vs MeowJot comparison page, served at `/meowjot-alternative` |
 | `public/robots.txt`, `sitemap.xml`, `llms.txt` | Search and AI-answer engine files. See "Search and AI answers" below |
 | `worker.js` | Worker entry. It only runs for `/`, `/meowjot-alternative`, `/download*`, `/go*`, `/api/*` and `/ingest/*` (see `run_worker_first`). |
-| `release.js` | Request router, and the newest `openjot-v*` release lookup. It reads the monorepo's releases (API first, github.com when Cloudflare's shared IPs are rate limited), falls back to the archived `trajectonomics/moojot` release until the first `openjot-v*` exists, then caches the answer for 5 minutes. |
+| `release.js` | Request router, and the newest `openjot-v*` release lookup. It reads the monorepo's releases (API first; when Cloudflare's shared IPs are rate limited, the repository's git ref advertisement at `trajectonomics/trajectonomics.git/info/refs`, then each tag's page), falls back to the archived `trajectonomics/moojot` release until the first `openjot-v*` exists, then caches the answer for 5 minutes. |
 | `tracking.js` | Source links (`/go/…`, `/download/…`), cookieless counting of clicks and downloads, and the `/ingest` proxy to PostHog |
 | `release.test.js`, `tracking.test.js` | Tests |
 | `wrangler.jsonc` | Worker `moojot-site` on the custom domains `openjot.trajectonomics.com` and `moojot.trajectonomics.com` |

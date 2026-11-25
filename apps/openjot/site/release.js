@@ -138,25 +138,42 @@ async function fromApiLatest(fetchImpl, repo) {
   throw new Error(`GitHub API answered ${res.status}`);
 }
 
-/** Same answer from github.com: the filtered releases page, then each tag's own page. */
+/**
+ * Same answer from github.com: the repository's tag refs, then each tag's own page.
+ * The releases search page stopped rendering tag links by 2026-11-26, and the Atom
+ * feed mixes every package's releases, so the git ref advertisement is the list:
+ * it has every tag and no API rate limit.
+ */
 async function fromWebList(fetchImpl) {
-  const list = await fetchImpl(`${WEB}/${REPO}/releases?q=${encodeURIComponent(TAG_PREFIX)}`, {
+  const refs = await fetchImpl(`${WEB}/${REPO}.git/info/refs?service=git-upload-pack`, {
     headers: UA,
   });
-  if (!list.ok) throw new Error(`github.com answered ${list.status}`);
-  const html = await list.text();
-  const prefix = `/${REPO}/releases/tag/`;
+  if (!refs.ok) throw new Error(`github.com answered ${refs.status}`);
+  const advertisement = await refs.text();
   const tags = [];
-  for (const m of html.matchAll(/href="([^"]+)"/g)) {
-    if (!m[1].startsWith(prefix)) continue;
-    const tag = decodeURIComponent(m[1].slice(prefix.length).split(/[?#]/)[0]);
+  for (const m of advertisement.matchAll(/refs\/tags\/([^\s^\0]+)(\^\{\})?/g)) {
+    if (m[2]) continue; // the peeled `^{}` entry of an annotated tag
+    const tag = m[1];
     if (tag.startsWith(TAG_PREFIX) && !tags.includes(tag)) tags.push(tag);
   }
+  tags.sort(byVersionDesc);
   for (const tag of tags.slice(0, WEB_CANDIDATES)) {
     const release = await fromWebTag(fetchImpl, REPO, tag);
     if (release) return release;
   }
   return null;
+}
+
+/** Newest first by the numeric major.minor.patch after the prefix; a tag that does not parse sorts last. */
+function byVersionDesc(a, b) {
+  const pa = a.slice(TAG_PREFIX.length).match(/^(\d+)\.(\d+)\.(\d+)$/);
+  const pb = b.slice(TAG_PREFIX.length).match(/^(\d+)\.(\d+)\.(\d+)$/);
+  if (!pa || !pb) return (pa ? 0 : 1) - (pb ? 0 : 1);
+  return (
+    Number(pb[1]) - Number(pa[1]) ||
+    Number(pb[2]) - Number(pa[2]) ||
+    Number(pb[3]) - Number(pa[3])
+  );
 }
 
 /** One release from github.com. Null when the tag is not a published, non-prerelease release. */
