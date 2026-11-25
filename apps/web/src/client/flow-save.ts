@@ -67,13 +67,19 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 		return { done, problems: {}, cleared: [], sent: document.flows.map((flow) => flow.id) }
 	}
 	if (existing === undefined) return { done: true, problems: {}, cleared: [], sent: [] }
+	// A what-if cannot clear a field, so a once value whose stored Flow has an end sends that end as its start: the CLI
+	// accepts a once Flow that ends on its start, and refuses one that keeps an end from before the try (ONCE_FLOW_END_MISMATCH).
+	const edited =
+		result.flow.frequency === "once" && existing.end !== undefined
+			? { ...result.flow, end: result.flow.start }
+			: result.flow
 	const cleared = whatIfSession.tryItem(
 		name,
 		contentHash,
 		"flows",
 		existing.id,
 		recordOf(existing),
-		recordOf(result.flow),
+		recordOf(edited),
 	)
 	tryEmployer(input, result)
 	return { done: cleared.length === 0, problems: {}, cleared, sent: [] }

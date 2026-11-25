@@ -6,6 +6,12 @@ import { fileURLToPath } from "node:url"
 import { plugin } from "bun"
 import { compile, compileModule } from "svelte/compiler"
 
+// Every `traj` a test spawns runs for a test, never for a person, so it must not count in the usage
+// telemetry that goal G1 is measured by (root AGENTS.md, "Owner"). Set once here: a helper that builds
+// its own `env` spreads `process.env`, so it inherits this. A spawn must pass `env` (`process.env`, or
+// a spread of it) to inherit `DO_NOT_TRACK`.
+process.env["DO_NOT_TRACK"] = "1"
+
 const APP_STUB = fileURLToPath(new URL("./app-stub.ts", import.meta.url))
 
 /**
