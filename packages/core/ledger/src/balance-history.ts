@@ -60,7 +60,7 @@ export const balanceHistory = (
 		byAccount.set(account.id, rows)
 	}
 	const series = new Map<string, Series>()
-	return Object.freeze({
+	return Object.freeze<BalanceHistory>({
 		at: (accountId, asOf, plus = 0n) => {
 			const id = toAccountId(accountId)
 			if (!chart.has(id)) {
