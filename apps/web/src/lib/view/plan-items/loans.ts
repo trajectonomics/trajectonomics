@@ -6,11 +6,6 @@ import { growthText } from "./flows"
 export interface LoanRow {
 	readonly label: string
 	readonly value: string
-	/**
-	 * The row's name when its label changes with the Flow: a date row reads "Starts" for a recurring Flow and "On" for
-	 * a once one, so a What-if's mark is keyed by `start` instead. Absent for a row whose label never changes.
-	 */
-	readonly key?: string
 	/** True when the value is an Account's id, which the page shows by its ledger name. */
 	readonly account?: true
 }
@@ -35,10 +30,10 @@ export function isLoan(flow: ScenarioFlow): boolean {
 
 /** The dates of a withdrawal as its rows show them: a once withdrawal has one date, "On", and no end; any other runs to the horizon when none is stated. */
 function datesOf(flow: ScenarioFlow): LoanRow[] {
-	if (isOnce(flow)) return [{ key: "start", label: "On", value: flow.start }]
+	if (isOnce(flow)) return [{ label: "On", value: flow.start }]
 	return [
-		{ key: "start", label: "Starts", value: flow.start },
-		{ key: "end", label: "Ends", value: flow.end ?? "To the horizon" },
+		{ label: "Starts", value: flow.start },
+		{ label: "Ends", value: flow.end ?? "To the horizon" },
 	]
 }
 

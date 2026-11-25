@@ -2,7 +2,7 @@ import type { Baseline, ProjectionRun, Read, ScenarioDocument } from "../../cont
 import { lensDocument } from "../../what-if/lens-document"
 import type { PlanKind } from "../plan-items/kinds"
 import { type LoanCardView, loanCardsOf } from "../plan-items/loan-card"
-import { type LoanCard, type LoanRow, loanCards } from "../plan-items/loans"
+import { type LoanCard, loanCards } from "../plan-items/loans"
 import { unplacedFlows } from "../plan-items/unplaced"
 import type { PlanChanges } from "./plan-items"
 
@@ -12,7 +12,7 @@ export interface LoanMarks {
 	readonly off: boolean
 	/** The baseline's amount borrowed, when the session changes it. */
 	readonly principal: string | undefined
-	/** The baseline's text of each term row the session changes, by the row's `key` (or its label when it has none). */
+	/** The baseline's text of each term row the session changes, by the row's label. */
 	readonly rows: Readonly<Record<string, string>>
 }
 
@@ -25,28 +25,6 @@ export interface LoanItems {
 	readonly marks: Readonly<Record<string, LoanMarks>>
 }
 
-/** The name a loan row's mark is keyed by: its own `key`, or its label when it states none. */
-export function rowKey(row: LoanRow): string {
-	return row.key ?? row.label
-}
-
-/**
- * The baseline's text of each of the what-if card's rows the session changes, by the row's key. The date rows are
- * matched by key, not label: a Flow that changes between once and recurring reads "On" instead of "Starts", and its
- * mark must still land on the row the card shows.
- */
-export function rowMarksOf(
-	baseline: readonly LoanRow[],
-	whatIf: readonly LoanRow[],
-): [string, string][] {
-	return whatIf.flatMap((row) => {
-		const before = baseline.find((item) => rowKey(item) === rowKey(row))
-		return before !== undefined && before.value !== row.value
-			? [[rowKey(row), before.value] as const]
-			: []
-	})
-}
-
 /** The marks of one loan: its terms' texts that differ between the baseline's card and the what-if's, as the cards show them. */
 function marksOf(
 	baseline: LoanCardView,
@@ -54,10 +32,14 @@ function marksOf(
 	off: boolean,
 ): LoanMarks {
 	if (whatIf === undefined) return { off, principal: undefined, rows: {} }
+	const rows = baseline.rows.flatMap((row) => {
+		const now = whatIf.rows.find((item) => item.label === row.label)
+		return now !== undefined && now.value !== row.value ? [[row.label, row.value] as const] : []
+	})
 	return {
 		off,
 		principal: whatIf.principal === baseline.principal ? undefined : baseline.principal,
-		rows: Object.fromEntries(rowMarksOf(baseline.rows, whatIf.rows)),
+		rows: Object.fromEntries(rows),
 	}
 }
 

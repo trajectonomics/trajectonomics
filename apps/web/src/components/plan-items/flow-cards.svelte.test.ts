@@ -43,12 +43,16 @@ describe("a What-if that changes a Flow's frequency", () => {
 		const body = cards([{ path: "flows.tax-refund.frequency", value: "monthly" }])
 		// Both recurring Flows and the tried once Flow have an end now.
 		expect(rows(body, "Ends")).toBe(3)
-		expect(body).not.toContain("none</s>")
+		// Server rendering leaves a comment between "none" and the closing tag, so match across it.
+		expect(body).not.toMatch(/none(<!--.*?-->)*<\/s>/)
 	})
 })
 
 describe("the Flow form's Ends field", () => {
-	const form = (id: string): string => {
+	const form = (
+		id: string,
+		anchors: { start: string | null; end: string | null } = { start: null, end: null },
+	): string => {
 		const flow = planDocument().flows.find((item) => item.id === id)
 		return render(FlowFields, {
 			props: {
@@ -57,7 +61,7 @@ describe("the Flow form's Ends field", () => {
 				existing: flow,
 				shown: NO_PROBLEMS,
 				name: "base",
-				anchors: { start: null, end: null },
+				anchors,
 			},
 		}).body
 	}
@@ -68,5 +72,11 @@ describe("the Flow form's Ends field", () => {
 
 	test("is asked for when the Flow recurs", () => {
 		expect(form("salary")).toContain('id="flow-end"')
+	})
+
+	test("is shown, with its anchor, for a once Flow whose end the household pins, so a refusal is not silent", () => {
+		const body = form("tax-refund", { start: null, end: "at me, age 70" })
+		expect(body).toContain('id="flow-end"')
+		expect(body).toContain("at me, age 70")
 	})
 })

@@ -39,7 +39,7 @@ describe("loanCards", () => {
 			source: "loan",
 		})
 		const card = loanCards([draw])[0]
-		expect(card?.rows).toContainEqual({ key: "start", label: "On", value: "2027-01-01" })
+		expect(card?.rows).toContainEqual({ label: "On", value: "2027-01-01" })
 		expect(card?.rows.map((row) => row.label)).not.toContain("Ends")
 	})
 
@@ -54,8 +54,8 @@ describe("loanCards", () => {
 			source: "loan",
 		})
 		const card = loanCards([draw])[0]
-		expect(card?.rows).toContainEqual({ key: "start", label: "Starts", value: "2027-01-01" })
-		expect(card?.rows).toContainEqual({ key: "end", label: "Ends", value: "2030-01-01" })
+		expect(card?.rows).toContainEqual({ label: "Starts", value: "2027-01-01" })
+		expect(card?.rows).toContainEqual({ label: "Ends", value: "2030-01-01" })
 	})
 
 	test("a withdrawal priced by a derived amount has no amount to show", () => {
