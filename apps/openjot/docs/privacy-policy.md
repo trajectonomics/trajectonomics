@@ -1,8 +1,8 @@
 # OpenJot Privacy Policy
 
-**Last updated: 25 November 2026**
+**Last updated: 26 November 2026**
 
-Trajectonomics publishes OpenJot (formerly MooJot), a personal income and expense tracker. This policy says what the Android app and the website at <https://openjot.trajectonomics.com> do with information. The same text is shown in My Moo → About → Privacy.
+Trajectonomics publishes OpenJot (formerly MooJot), a personal income and expense tracker. This policy says what the Android app, the OpenJot page at <https://trajectonomics.com/openjot/> and the website at <https://openjot.trajectonomics.com> do with information. The same text is shown in My Moo → About → Privacy.
 
 The short version: the ledger stays on your phone. Trajectonomics has no account server and does not receive your records. OpenJot sends us nothing about how you use it unless you choose to share anonymous usage statistics (which screens and features get used, never your records, amounts, or slips). That switch is off until you turn it on. Separately, to read English text on slips, the app uses Google ML Kit. ML Kit reads the photo on the phone, but it sends Google metrics about its own performance and use, such as your device model and a per-installation identifier. OpenJot cannot switch that off. The section "Google ML Kit metrics" below lists what is sent. The website uses cookies only if you allow them. The only upload of a slip image the code can make is optional. It happens only if an AksonOCR API key is already stored in the local database. The settings screen does not ask for that key.
 
@@ -86,11 +86,13 @@ Events go over HTTPS to `openjot.trajectonomics.com`, or to `moojot.trajectonomi
 
 ## Website
 
-The website counts clicks on its links and downloads of the app without cookies. For each one, the site's server records only where the click came from (for example, which social post or campaign link), the country our hosting provider (Cloudflare) resolved, a coarse platform (Android, iPhone, desktop, or other), and which in-app browser was used, if any. It sends that to PostHog with a new random ID every time, so clicks cannot be tied together. It does not send your IP address or browser details for these counts.
+The OpenJot landing page lives on the Trajectonomics Site at <https://trajectonomics.com/openjot/>. That Site asks before it sets an analytics cookie, and its own notice and privacy terms apply on that page. This section describes what the OpenJot website at <https://openjot.trajectonomics.com> still does.
 
-If you tap "Allow" on the cookie banner, the site also loads PostHog's web analytics from its own domain. PostHog then sets a cookie and uses local storage to count your visits and see which pages and buttons you use, and it receives your IP address to estimate your location. If you tap "No thanks", or ignore the banner, none of that loads. You can change your choice at any time with "Cookie settings" at the bottom of the page. Saying no again deletes the PostHog cookie and storage.
+The OpenJot website counts clicks on its short links and downloads of the app without cookies. For each one, the site's server records only where the click came from (for example, which social post or campaign link), the country our hosting provider (Cloudflare) resolved, a coarse platform (Android, iPhone, desktop, or other), and which in-app browser was used, if any. It sends that to PostHog with a new random ID every time, so clicks cannot be tied together. It does not send your IP address or browser details for these counts.
 
-The site remembers your language and your cookie choice in local storage.
+Its comparison page still asks with its own cookie banner. If you tap "Allow" there, the page also loads PostHog's web analytics from its own domain. PostHog then sets a cookie and uses local storage to count your visits and see which pages and buttons you use, and it receives your IP address to estimate your location. If you tap "No thanks", or ignore the banner, none of that loads. You can change your choice at any time with "Cookie settings" at the bottom of that page. Saying no again deletes the PostHog cookie and storage.
+
+That page remembers your language and your cookie choice in local storage.
 
 ## What we do not collect
 
@@ -158,13 +160,13 @@ If the PDPA applies to you, the personal data in OpenJot's ledger is processed o
 This is the data we do handle, why, and on what legal basis:
 
 - **Anonymous usage statistics from the app** (the random ID, the events listed above, and the IP address PostHog sees): to learn which screens and features get used and where people get stuck, so we can improve the app. Basis: your consent (PDPA section 19). The switch is off until you turn it on.
-- **Website analytics cookies** (PostHog's cookie, the pages and buttons you use, and your IP address): to learn how people find the website and whether it works. Basis: your consent, given with "Allow" on the cookie banner.
+- **Website analytics cookies** (PostHog's cookie, the pages and buttons you use, and your IP address): to learn how people find the website and whether it works. Basis: your consent, given with "Allow" on the comparison page's cookie banner or the Site's cookie notice.
 - **Cookieless website counts** (link source, country, coarse platform, in-app browser): to count which links bring people in. They carry no IP address, browser details, or lasting ID, so they are not linked to a person. Basis: our legitimate interest in knowing which links work (section 24(5)).
 - **ML Kit metrics** go to Google when ML Kit reads a slip, as described in "Google ML Kit metrics". They are part of the slip reading you ask the app to do (section 24(3)), and Google uses them for diagnostics and usage analytics under its own Privacy Policy. To avoid them, type your records by hand instead of scanning.
 
 For the data we handle, you have these rights under the PDPA:
 
-- withdraw your consent at any time: the switch in My Moo for the app, and "Cookie settings" on the website. Withdrawing doesn't undo processing that happened before.
+- withdraw your consent at any time: the switch in My Moo for the app, and "Cookie settings" on the comparison page. Withdrawing doesn't undo processing that happened before.
 - ask for access to and a copy of your data, and ask how we got it
 - ask for your data in a readable, commonly used format, or for us to send it to someone else
 - object to our use of it
