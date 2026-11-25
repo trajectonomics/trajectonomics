@@ -31,7 +31,7 @@ const displayLabel = z
 	.refine((text) => isDisplayLabel(text), { message: DISPLAY_LABEL_RULE })
 	.optional()
 	.describe(
-		"What a page reads in place of the person's id, such as a name in Thai. It is no key: the id still names the person, and the label may repeat or change (sim ADR 0032, cli ADR 0080).",
+		`What a page reads in place of the person's id, such as a name in Thai, written as ${DISPLAY_LABEL_RULE}. It is no key: the id still names the person, and the label may repeat or change (sim ADR 0032, cli ADR 0080).`,
 	)
 const holder = z.strictObject({
 	id: personId,

@@ -3,7 +3,7 @@
  * The document is the one the Snapshot's `scenario show` Read states (web ADR 0001), so a label the CLI never writes is
  * never shown. A label is optional: an item that states none keeps its id for the lookup to show in code.
  */
-import type { ScenarioDocument } from "../../contract"
+import { milestoneLabel, type ScenarioDocument } from "../../contract"
 
 /** The labels a plan's document states, by id, for the two kinds of item that carry one. */
 export interface DocumentNames {
@@ -25,8 +25,19 @@ function labelsOf(
 	)
 }
 
+/** The labels a document states for its Milestones: each entry is read through `milestoneLabel`, and never copied back. */
+function milestoneLabelsOf(items: readonly unknown[] | undefined): ReadonlyMap<string, string> {
+	return new Map(
+		(items ?? []).flatMap((item) => {
+			const read = milestoneLabel.safeParse(item)
+			if (!read.success || read.data.displayLabel === undefined) return []
+			return [[read.data.id, read.data.displayLabel] as const]
+		}),
+	)
+}
+
 /** The labels one plan's document states; empty for a plan with no document or none set. */
 export function documentNames(doc: ScenarioDocument | null): DocumentNames {
 	if (doc === null) return NO_DOCUMENT_NAMES
-	return { flows: labelsOf(doc.flows), milestones: labelsOf(doc.milestones) }
+	return { flows: labelsOf(doc.flows), milestones: milestoneLabelsOf(doc.milestones) }
 }

@@ -25,6 +25,7 @@ describe("the person's display label in traj schema scenario household", () => {
 				type: "string",
 				minLength: 1,
 				maxLength: 80,
+				description: expect.stringContaining(DISPLAY_LABEL_RULE),
 			})
 		}
 	})

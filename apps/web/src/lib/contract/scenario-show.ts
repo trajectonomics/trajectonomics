@@ -16,13 +16,17 @@ export { type ScenarioFlow, scenarioFlow } from "./scenario-flow"
  * below keeps its rounding a plain string for the same reason.
  */
 
-/** One Milestone of the document: the id the plan addresses it by, and the name a person reads (sim ADR 0032). */
-export const scenarioMilestone = z.looseObject({
+/**
+ * What the page reads of one Milestone: the id the plan addresses it by, and the name a person reads (sim ADR 0032). A
+ * document keeps its Milestones as they are, so a parsed document serializes them in the CLI's own key order; the
+ * lookup reads this shape off an entry without writing a copy back (web ADR 0021's Demo bytes depend on it).
+ */
+export const milestoneLabel = z.looseObject({
 	id: z.string(),
 	// What a person reads in place of the id; the id still addresses the Milestone.
 	displayLabel: z.string().optional(),
 })
-export type ScenarioMilestone = z.infer<typeof scenarioMilestone>
+export type MilestoneLabel = z.infer<typeof milestoneLabel>
 
 /**
  * One cost or gift of the estate block in the decimal form (cli ADR 0064): a share (`of`, `bps` as a percent string such
@@ -59,10 +63,11 @@ export const scenarioDocument = z.looseObject({
 	levies: z.array(z.unknown()).optional(),
 	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.
 	estate: estateBlock.optional(),
-	// The named points a Flow may gate on (sim ADR 0012): the page reads a Milestone's id and label, kept as they are.
-	// Declared last so a parsed document serializes it after `estate`, where the CLI's canonical bytes put it: the keys the
-	// contract does not name (`schemaVersion`) follow it, as they followed it before this key was declared.
-	milestones: z.array(scenarioMilestone).optional(),
+	// The named points a Flow may gate on (sim ADR 0012): the page reads a Milestone's id and label through `milestoneLabel`,
+	// and keeps each entry as it is, so it serializes in the CLI's own key order. Declared last so a parsed document
+	// serializes it after `estate`, where the CLI's canonical bytes put it: the keys the contract does not name
+	// (`schemaVersion`) follow it, as they followed it before this key was declared.
+	milestones: z.array(z.unknown()).optional(),
 })
 export type ScenarioDocument = z.infer<typeof scenarioDocument>
 

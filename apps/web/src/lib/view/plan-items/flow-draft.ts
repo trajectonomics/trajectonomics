@@ -92,4 +92,3 @@ function keptEndOf(draft: FlowDraft): string | undefined {
 	if (draft.frequency === "once") return end === draft.start ? end : undefined
 	return end === "" ? undefined : end
 }
-
