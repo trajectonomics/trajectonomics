@@ -32,7 +32,6 @@ export function isChecked(path: string): boolean {
 /** The parser's view of an extension, so TypeScript and JSX parse as the toolchain reads them. */
 function scriptKind(path: string): ts.ScriptKind {
 	if (path.endsWith(".tsx")) return ts.ScriptKind.TSX
-	if (path.endsWith(".jsx")) return ts.ScriptKind.JSX
 	if (/\.(?:[cm]?js)$/.test(path)) return ts.ScriptKind.JS
 	return ts.ScriptKind.TS
 }
@@ -71,7 +70,8 @@ function calledNames(file: SourceFile): ReadonlySet<string> {
 
 /**
  * The files that make a temporary directory with `mkdtemp` or `mkdtempSync` and never call `rm` or
- * `rmSync`, so a run leaves the directory behind (#544). A file named in `allowed` is exempt, and
+ * `rmSync`, so a run leaves the directory behind (#544). Only a file whose text mentions `mkdtemp` is
+ * parsed, which keeps the repo-wide run fast. A file named in `allowed` is exempt, and
  * only a call in code counts: one in a line comment, a block comment, a string, a template or a regex
  * does not. Svelte components are not checked, as `isChecked` reads only JS and TS files.
  */
@@ -80,6 +80,7 @@ export function unremovedTempDirs(
 	allowed: ReadonlyMap<string, string> = ALLOWED,
 ): string[] {
 	return files
+		.filter((file) => file.text.includes("mkdtemp"))
 		.filter((file) => {
 			const called = calledNames(file)
 			const makes = MAKES.some((name) => called.has(name))
