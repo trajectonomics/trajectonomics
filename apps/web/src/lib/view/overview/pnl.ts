@@ -8,16 +8,25 @@ export interface PnlView {
 	readonly totals: readonly CurrencyTotal[]
 	readonly largest: readonly AmountRow[]
 	readonly hasRows: boolean
+	/** Set when the total is not stated because the rows' sum is out of range; the rows are still stated. */
+	readonly note: string | null
 }
 
 /** The P&L card's reading of one `report pnl` Read. */
 export function pnlView(data: Pnl): PnlView {
 	return {
 		period: periodOf(data),
-		totals: data.totals,
+		totals: data.totals ?? [],
+		note: unavailableTotalNote(data),
 		largest: largestRows(data.rows, 3),
 		hasRows: data.rows.length > 0,
 	}
+}
+
+/** The card's own note: it shows only the largest rows, below the total, so it points to the Ledger page for the rest. */
+function unavailableTotalNote(data: Pnl): string | null {
+	if (data.totals !== null) return null
+	return "The total is not stated: every account is in range, but their sum exceeds the safe integer range. The largest rows are below; the Ledger page states every row."
 }
 
 function periodOf(data: Pnl): string {

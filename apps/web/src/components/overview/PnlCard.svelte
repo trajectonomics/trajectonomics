@@ -24,6 +24,9 @@ let { pnl }: Props = $props()
 				<div>
 					<p class="text-sm text-muted-foreground">Income less expenses</p>
 					<Totals totals={view.totals} className="mt-1 text-2xl font-semibold tracking-tight" />
+					{#if view.note}
+						<p class="mt-2 text-sm">{view.note}</p>
+					{/if}
 				</div>
 				{#if view.hasRows}
 					<div class="space-y-2">

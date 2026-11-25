@@ -105,6 +105,16 @@ describe("the Income page's list", () => {
 		expect(read).not.toContain('aria-label="Edit salary"')
 	})
 
+	test("a once Flow's card has one On row and no Ends row; a recurring one has Starts and Ends", () => {
+		const body = list("income")
+		const rows = (label: string) =>
+			body.match(new RegExp(`<dt[^>]*>${label}</dt>`, "g"))?.length ?? 0
+		// salary (monthly) and pension (annual) recur; tax-refund happens once.
+		expect(rows("Starts")).toBe(2)
+		expect(rows("Ends")).toBe(2)
+		expect(rows("On")).toBe(1)
+	})
+
 	test("says so when the plan has no income, and the drawer is shut", () => {
 		const body = list("income", { flows: false })
 		expect(body).toContain("No income in this plan")

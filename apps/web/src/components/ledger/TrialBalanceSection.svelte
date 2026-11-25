@@ -60,12 +60,16 @@ const totalColumns: Column<TrialBalanceTotal>[] = [
 						rowKey={(line) => line.key}
 						columns={lineColumns}
 					/>
-					<DataTable
-						caption="Totals, as the CLI states them"
-						rows={view.totals}
-						rowKey={(total) => total.currency}
-						columns={totalColumns}
-					/>
+					{#if view.note}
+						<p class="rounded-md border border-border p-3 text-sm">{view.note}</p>
+					{:else}
+						<DataTable
+							caption="Totals, as the CLI states them"
+							rows={view.totals}
+							rowKey={(total) => total.currency}
+							columns={totalColumns}
+						/>
+					{/if}
 					<Provenance argv={balance.argv} />
 				</div>
 			{/if}
