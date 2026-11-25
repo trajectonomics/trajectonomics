@@ -98,6 +98,14 @@ _Avoid_: Joint income, common income
 The 100,000 THB ceiling of the Section 42 bis (and 42 ter) standard expense, which each spouse has for their own Section 40(1)–(2) income even on a joint Return. A joint Levy of two Filers computes that expense once per Filer, each on the Filer's own income plus half of the shared income, and adds the two. Everything after it, the bracket walk included, runs once on the sums. An elected actual expense is one figure for the Return and is not repeated per Filer.
 _Avoid_: Joint ceiling, couple's cap
 
+**Own parents**:
+The Filer's father and mother, the only parents a separate Return claims (Section 47(1)(ญ), RD FAQ). A joint Return, like a no-income-spouse Return, may also claim the spouse's parents (`spouseFather`, `spouseMother` in the object form of `parents`). A separate Return that names a spouse slot is refused at `allowance.parents.spouse`, not silently left without it (ADR 0010).
+_Avoid_: Own-side parents, taxpayer's parents (the object form's `taxpayer*` slots are the Filer's own)
+
+**Separate claim problem**:
+One rule a pair of separate Returns breaks that only the two together can show, returned by `thSeparateClaimProblems` with a `ThSeparateClaimCode`: `OWN_PARENTS_OVER_TWO` (a Return claims more than its own two parents) and `MORTGAGE_OVER_CEILING` (with `sharedMortgage`, both Returns' interest on one co-borrowed loan adds up to more than 100,000). It does not check which parent or which disabled dependant each Return claims, because a count cannot show that; the caller states those claims (ADR 0010).
+_Avoid_: Cross-Return validation, split check
+
 **Minimum Gross Tax**:
 The Section 48(2) alternative calculation equal to 0.5% of gross Assessable Income under Sections 40(2)–40(8) when such income is at least 120,000 THB, payable only if it exceeds 5,000 THB and exceeds progressive bracket tax.
 _Avoid_: Alternative minimum tax

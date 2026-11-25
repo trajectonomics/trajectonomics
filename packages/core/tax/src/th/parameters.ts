@@ -50,6 +50,7 @@ export const TH_2026_PARAMETERS: ThParameters = {
 		parent: {
 			perPerson: 30_000,
 			maxCount: 4,
+			maxOwnCount: 2,
 		},
 		disabledPerPerson: 60_000,
 		socialSecurityFundCeiling: 10_500,
