@@ -89,7 +89,8 @@ the shards, which it runs beside.
   table at 360px, with amounts shown and hidden (it must not widen the page), and Reports, Projection and Cash flow in print on
   A4 landscape (tables fit 1032px, black on white, the same surfaces from either theme). The suite is
   `apps/web/browser/`, and `tooling/guards/ci-web-split.test.ts` pins the job.
-- **Steps.** The build is `bunx turbo run @trajectonomics/web#build --concurrency=2`, with no arguments after
+- **The hosted Demo.** The same job also builds `build:hosted` and checks `dist-hosted/` served under `/demo/` (`apps/web/browser/hosted.e2e.ts`, [web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)): every page at 360px and 1280px, no request but a GET of its own files, only the Demo snapshot read, and every Edit control switched off.
+- **Steps.** The build is `bunx turbo run @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=2`, with no arguments after
   `--` for the reason in the cache section below. Chromium comes from `actions/cache` on `~/.cache/ms-playwright`
   with the same key as `browser.yml` and `docs-browser.yml` (`playwright-<os>-<version>`), so one download serves
   all three; a cache hit still runs `playwright install-deps`, because the system libraries are not cached. The

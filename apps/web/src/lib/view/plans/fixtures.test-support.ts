@@ -33,6 +33,9 @@ export function ledgerWith(
 		const notes = facts[name]?.notes
 		if (read.ok && notes !== undefined) read.data.scenario.notes = notes
 	}
-	snapshot.params.scenarios = [...projected]
+	// The main plan leads, as the Snapshot states its plans (web ADR 0023).
+	const main = projected.find((name) => facts[name]?.main === true)
+	snapshot.params.scenarios =
+		main === undefined ? [...projected] : [main, ...projected.filter((name) => name !== main)]
 	return snapshot
 }

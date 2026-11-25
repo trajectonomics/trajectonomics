@@ -1,7 +1,7 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
-import { resolveScenario } from "../../lib/view/tax"
+import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -10,18 +10,20 @@ import TaxWhatIf from "../what-if/TaxWhatIf.svelte"
 import TaxBodyView from "./TaxBodyView.svelte"
 
 interface Props {
-	/** The Projections by Scenario name; their names are the choices of the picker. */
+	/** The Scenarios the Snapshot planned, main first: the choices of the picker. */
+	names: readonly string[]
+	/** The Projections by Scenario name. */
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
 	/** The Scenario the address bar asks for; empty or unknown falls back to the first one. */
 	requested: string
 	onScenario: (name: string) => unknown
 }
 
-let { projections, requested, onScenario }: Props = $props()
-const names = $derived(Object.keys(projections))
+let { names, projections, requested, onScenario }: Props = $props()
 const options = $derived(names.map((value) => ({ value, label: value })))
-const resolved = $derived(resolveScenario(names, requested))
-const name = $derived(resolved.name)
+const name = $derived(chooseScenario(names, requested))
+/** The name the address bar asks for that is not one of the plans, said above the picker; none otherwise. */
+const unknown = $derived(requested !== "" && !names.includes(requested) ? requested : null)
 const read = $derived(name === null ? undefined : projections[name])
 </script>
 
@@ -44,9 +46,9 @@ const read = $derived(name === null ? undefined : projections[name])
 {:else}
 	<div class="space-y-8">
 		<SegmentedControl name="scenario" label="Scenario" {options} value={name} onChange={onScenario} />
-		{#if resolved.unknown !== null}
+		{#if unknown !== null}
 			<p role="status" class="text-sm text-muted-foreground">
-				There is no Scenario named {resolved.unknown}. Showing {name}.
+				There is no Scenario named {unknown}. Showing {name}.
 			</p>
 		{/if}
 		{#if read === undefined}
