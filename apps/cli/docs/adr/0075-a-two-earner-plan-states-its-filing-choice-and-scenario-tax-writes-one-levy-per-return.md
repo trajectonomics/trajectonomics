@@ -152,6 +152,8 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   - A write under any other status moves nothing. Its one Return's claims are the flat keys whoever the
     holder is, and moving them would change that Return's tax. They stay recorded as before, and a
     later separate filing moves them. A value a caller changes meanwhile goes with them.
+    Once a separate write has moved them, a later joint or single Return reads the new holder's
+    claims, which can differ from the same Return written before the swap.
   - A write with no household, which names no holder, moves nothing and keeps the record, so a swap
     made while the household is gone is still seen.
   - With no `claimsHolder`, as in a profile written before it was recorded, the flat keys are the

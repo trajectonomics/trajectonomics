@@ -1,4 +1,4 @@
-import { claimsOfRequest, zeroClaims } from "./claims-seed"
+import { claimsOfRequest, ownEntry, zeroClaims } from "./claims-seed"
 import type { TaxRequest } from "./flags"
 
 /*
@@ -15,7 +15,10 @@ import type { TaxRequest } from "./flags"
 export function claimsHeldBy(profile: TaxRequest, holder: string | undefined): TaxRequest {
 	const recorded = profile.claimsHolder
 	if (holder === undefined || recorded === undefined || recorded === holder) return profile
-	const { [holder]: own = zeroClaims(), ...others } = profile.returns ?? {}
+	const own = ownEntry(profile.returns, holder) ?? zeroClaims()
+	const others = Object.fromEntries(
+		Object.entries(profile.returns ?? {}).filter(([id]) => id !== holder),
+	)
 	return {
 		...profile,
 		...claimsOfRequest(own),
