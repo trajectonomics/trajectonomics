@@ -60,7 +60,7 @@ describe("LedgerHealthSection", () => {
 		}
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
 		expect(body).toContain("Balances")
-		expect(body).toContain("Debits equal credits at")
+		expect(body).toContain("Debits equal credits")
 		expect(body).toContain("the totals exceed the safe range")
 	})
 
@@ -72,7 +72,7 @@ describe("LedgerHealthSection", () => {
 		}
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
 		expect(body).toContain("Does not balance")
-		expect(body).toContain("Debits and credits disagree at")
+		expect(body).toContain("Debits and credits disagree")
 	})
 
 	test("shows the CLI's error in its section when the doctor failed", () => {

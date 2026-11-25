@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type LineLayout, labelRows } from "../../lib/chart"
+import { hangsLeft, type LineLayout, placedLabels } from "../../lib/chart"
 import { HEIGHT, MARGIN } from "./geometry"
 
 interface Props {
@@ -8,16 +8,18 @@ interface Props {
 }
 
 let { layout, width }: Props = $props()
-/** Each label's row, so labels on the same or nearby dates never overlap. */
-const rows = $derived(labelRows(layout.markers, width))
+/** Each label's row and the words that fit before the next rule, so none overlaps another or crosses a rule. */
+const labels = $derived(placedLabels(layout.markers, width))
 /** The height of one label row, in pixels. */
 const ROW_PX = 14
 </script>
 
 <!-- A vertical rule at each marker, labelled near its top. A label past the middle hangs to the left of its
-rule, and a label that would overlap an earlier one moves down a row. -->
+rule, one that would overlap an earlier label moves down a row, and one that would cross another rule is
+shortened with an ellipsis. -->
 {#each layout.markers as marker, index (index)}
-	{@const hangLeft = marker.x > width / 2}
+	{@const left = hangsLeft(marker.x, width)}
+	{@const label = labels[index] ?? { row: 0, text: marker.label }}
 	<g>
 		<title>{marker.label}</title>
 		<line
@@ -29,10 +31,10 @@ rule, and a label that would overlap an earlier one moves down a row. -->
 			class="stroke-foreground"
 		/>
 		<text
-			x={hangLeft ? marker.x - 4 : marker.x + 4}
-			y={MARGIN.top + 10 + (rows[index] ?? 0) * ROW_PX}
-			text-anchor={hangLeft ? "end" : "start"}
-			class="fill-foreground {marker.code === true ? 'font-mono text-[11px]' : 'text-xs'}">{marker.label}</text
+			x={left ? marker.x - 4 : marker.x + 4}
+			y={MARGIN.top + 10 + label.row * ROW_PX}
+			text-anchor={left ? "end" : "start"}
+			class="fill-foreground {marker.code === true ? 'font-mono text-[11px]' : 'text-xs'}">{label.text}</text
 		>
 	</g>
 {/each}
