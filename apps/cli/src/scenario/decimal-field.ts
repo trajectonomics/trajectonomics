@@ -11,7 +11,7 @@ import { PERCENT_HINT, parsePercent } from "./percent"
 
 /** The one hint a money field in the wrong form carries: the two ways to say the same amount. */
 export const MONEY_HINT =
-	'write it as a decimal string such as "350.00", or drop --decimal to give minor units'
+	'Write it as a decimal string such as "350.00", or drop --decimal to give minor units'
 
 /** The hint a field in the wrong form carries: the two ways to say the same figure. */
 export function hintOf(kind: FieldKind): string {

@@ -77,8 +77,8 @@ describe("a command-raised failure names the input the caller typed", () => {
 		)
 		expect(error).toMatchObject({
 			path: "b",
-			message: "compare needs exactly one of a second Scenario or --set.",
-			hint: "Pass a second Scenario name, or --set to compare the first one with a what-if.",
+			message: "compare needs exactly one of a second Scenario, --set, --without or --add.",
+			hint: "Pass a second Scenario name, or --set, --without or --add to compare the first one with a what-if.",
 		})
 	})
 
