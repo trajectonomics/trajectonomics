@@ -13,12 +13,24 @@ export interface AuditRow {
 		readonly message: string
 		readonly hint: string | null
 	} | null
+	/** A plain statement of a refusal only the CLI's words would leave opaque, or null. */
+	readonly note: string | null
 }
 
 interface Entry {
 	readonly question: string
 	readonly read: Read<unknown>
 }
+
+const BASELINE = "Baseline at the As-of"
+
+/**
+ * The plain statement beside a Baseline that refuses an overdrawn asset or an overpaid loan
+ * (cli ADR-0026): every amount the engine states is non-negative, so the whole plan cannot be
+ * projected until the Balance is corrected.
+ */
+const BASELINE_NOTE =
+	"The Baseline cannot state an overdrawn asset or an overpaid loan, so this plan cannot be projected. Correct the account's balance, then read again."
 
 /**
  * Every Read the Snapshot holds, flattened, with the question it answers. Failed Reads come first,
@@ -32,9 +44,17 @@ export function readAudit(snapshot: Snapshot): AuditRow[] {
 
 function auditRow({ question, read }: Entry, key: string): AuditRow {
 	const command = formatArgv(read.argv)
-	if (read.ok) return { key, question, command, failed: false, error: null }
+	if (read.ok) return { key, question, command, failed: false, error: null, note: null }
 	const { code, message, hint } = read.error
-	return { key, question, command, failed: true, error: { code, message, hint: hint ?? null } }
+	const note = question === BASELINE && code === "NEGATIVE_AMOUNT" ? BASELINE_NOTE : null
+	return {
+		key,
+		question,
+		command,
+		failed: true,
+		error: { code, message, hint: hint ?? null },
+		note,
+	}
 }
 
 function entriesOf(snapshot: Snapshot): Entry[] {
@@ -61,7 +81,7 @@ function entriesOf(snapshot: Snapshot): Entry[] {
 		...history,
 		{ question: "Profit and loss for the period", read: reads.pnl },
 		{ question: "Transactions in the period", read: reads.transactions },
-		{ question: "Baseline at the As-of", read: reads.baseline },
+		{ question: BASELINE, read: reads.baseline },
 		{ question: "Scenarios", read: reads.scenarios },
 		...projections,
 		...fi,

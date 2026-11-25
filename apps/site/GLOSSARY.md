@@ -186,6 +186,10 @@ _Avoid_: Animation controller, trigger, observer
 The hero's drawn picture of the app a visitor's agent runs in: a title bar, a sidebar with New chat and Recents, and a main pane holding one chat at a time. It plays the chat of the agent alone, then presses New chat and plays the chat with the traj Skill ([ADR 0022](docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)). Its composer is a picture and takes no input. With no script, or with motion reduced, both chats stand whole, one above the other.
 _Avoid_: Comparison, Before/After panels, mock app, chat widget
 
+**Hosted Demo**:
+The Dashboard's read-only build, `apps/web/dist-hosted/`, copied whole to `/demo/` by the Site's build and served as static assets, with a Content-Security-Policy scoped to `/demo/*` ([ADR 0031](docs/adr/0031-the-site-serves-the-hosted-demo-with-a-scoped-csp.md)). It is not the Demo window, which is a picture, and it is not a route: Workers Static Assets serves each file. No Demo page or asset is committed.
+_Avoid_: Live demo, hosted app, dashboard route
+
 **Web font**:
 A font file the Site serves itself under the Font budget: the Brand Typeface's three latin `.woff2` files (`Aleo` 300 and 400, `Azeret Mono` 500), copied from `@trajectonomics/brand/current/fonts/` and declared in `src/styles/fonts.css`. A font URL that is absolute, a font or font stylesheet on another origin and a font in a `data:` URL each fail an Invariant, and the Site ships no Thai face, so Thai still draws from the visitor's own fonts ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).
 _Avoid_: Custom font, typeface asset

@@ -1,5 +1,6 @@
 import { dayPosition, type LineMarker } from "../../chart"
 import type { ProjectionRun, Read } from "../../contract"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
 import { annualRowsOf } from "../projection/annual"
 import type { SnapshotState } from "../state"
 
@@ -50,18 +51,27 @@ export function milestoneView(run: ProjectionRun): MilestoneView | null {
 	return { reached, unreached }
 }
 
+/** One rule on a chart at an x position, labelled with the Milestone's words. */
+export function markerOf(id: string, x: number, names: ItemNames): LineMarker {
+	const label = itemLabel(names, "milestone", id)
+	return label.named ? { x, label: label.text } : { x, label: label.text, code: true }
+}
+
 /**
  * The reached milestones as vertical rules on the net-worth chart. Each sits at the x position of its
  * date among the annual rows, through the chart's own day position. A date no row holds is not drawn,
- * though the page still lists it.
+ * though the page still lists it. A Milestone the CLI states no name for is labelled by its id, set in code.
  */
-export function milestoneMarkers(run: ProjectionRun): LineMarker[] {
+export function milestoneMarkers(
+	run: ProjectionRun,
+	names: ItemNames = NO_ITEM_NAMES,
+): LineMarker[] {
 	const view = milestoneView(run)
 	if (view === null) return []
 	const spans = annualRowsOf(run)
 	return view.reached.flatMap((milestone) => {
 		const x = dayPosition(spans, milestone.date)
-		return x === null ? [] : [{ x, label: milestone.id }]
+		return x === null ? [] : [markerOf(milestone.id, x, names)]
 	})
 }
 

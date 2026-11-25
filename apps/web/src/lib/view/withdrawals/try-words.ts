@@ -6,10 +6,9 @@ import type { Json } from "../../what-if/json"
 import { spendingRule } from "./rule"
 import { ruleWords } from "./words"
 
-/** The Flow's id in a Set's path (`flows.rent.rule` names `rent`), with its first letter in capitals. */
+/** The Flow's id in a Set's path (`flows.rent.rule` names `rent`). The CLI names no Flow, so the id is shown as it is. */
 function nameOf(path: string): string {
-	const id = path.split(".")[1] ?? path
-	return id.charAt(0).toUpperCase() + id.slice(1)
+	return path.split(".")[1] ?? path
 }
 
 /** A Json value as a record, or null. */

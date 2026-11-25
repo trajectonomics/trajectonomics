@@ -16,11 +16,13 @@ const refusedAnswer = z.strictObject({ ok: z.literal(false), error: errorBody })
 export const editAnswer = z.discriminatedUnion("ok", [
 	// `result` is what a write that states figures answered (`record-values`): the page shows it as traj stated it.
 	// `droppedAnchors` names the household anchors a plan write dropped, because the document no longer holds their item (cli ADR-0048).
+	// `droppedOwners` names the household Owners it dropped for the same reason (cli ADR-0076).
 	z.strictObject({
 		ok: z.literal(true),
 		snapshot,
 		result: accountValues.optional(),
 		droppedAnchors: z.array(z.string()).optional(),
+		droppedOwners: z.array(z.string()).optional(),
 	}),
 	refusedAnswer,
 ])

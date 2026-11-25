@@ -21,6 +21,14 @@ function traj(argv: string[]): unknown {
 	return JSON.parse(run.stdout.toString())
 }
 
+/** A call whose refusal this file asserts, with its exit code and both pipes. */
+function trajRaw(argv: string[]): { code: number; out: string; err: string } {
+	const run = Bun.spawnSync([BINARY, ...argv, "--json"], {
+		env: { ...process.env, TRAJ_HOME: join(scratch, "home"), DO_NOT_TRACK: "1" },
+	})
+	return { code: run.exitCode ?? -1, out: run.stdout.toString(), err: run.stderr.toString() }
+}
+
 beforeAll(() => {
 	return mkdtemp(join(tmpdir(), "traj-web-unstated-")).then((dir) => {
 		scratch = dir
@@ -79,5 +87,17 @@ describe("the Dashboard's reads of a ledger whose sums are out of range", () => 
 			{ currency: "THB", debit: "90071992547402.70", credit: "90071992547402.70" },
 		])
 		expect(read.trialBalance).not.toHaveProperty("totalsError")
+	})
+
+	test("`baseline show` refuses the overdrawn Fund, stating the account and its amount", () => {
+		const read = trajRaw(["baseline", "show", "--as-of", "2026-02-11"])
+		expect(read.code).toBe(3)
+		expect(read.out).toBe("")
+		const { error } = JSON.parse(read.err)
+		expect(error).toMatchObject({
+			code: "NEGATIVE_AMOUNT",
+			path: error.path,
+			details: { account: { name: "Fund" }, kind: "asset", ledgerAmount: "-9.58" },
+		})
 	})
 })

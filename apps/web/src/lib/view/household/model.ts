@@ -1,9 +1,10 @@
 /**
  * The household as the page shows it. Every figure is the stored household's text, or the CLI's age on
  * a row: the page computes no age and no date (cli ADR-0048). A label names the anchor the household
- * holds; it never works out what the anchor's date is.
+ * holds, calling each person by the role the household states; it never works out what the anchor's date is.
  */
 import type { HouseholdAnchor, HouseholdDocument, HouseholdPerson, PersonAge } from "../../contract"
+import { anchorWords, NO_PEOPLE, type PersonNames, personNames } from "../item-names"
 import { withSearch } from "../links"
 
 /** One person as a row of the card: every field is the stored text. */
@@ -34,17 +35,6 @@ export function personCards(household: HouseholdDocument | null): PersonCard[] {
 	}))
 }
 
-/** What an anchor pins the date to, as the label reads it: "age 60", "life end" or "joining". */
-export function anchorWhen(anchor: HouseholdAnchor): string {
-	if ("age" in anchor) return `age ${anchor.age}`
-	return anchor.at === "lifeEnd" ? "life end" : "joining"
-}
-
-/** An anchor as its label beside a date: "at me, age 60", "at me, life end" or "at partner, joining". */
-export function anchorLabel(anchor: HouseholdAnchor): string {
-	return `at ${anchor.person}, ${anchorWhen(anchor)}`
-}
-
 /** The anchor the household holds for a dotted path, or null when the path is not anchored. */
 export function anchorAt(
 	household: HouseholdDocument | null,
@@ -63,23 +53,30 @@ export function flowAnchorLabels(
 	household: HouseholdDocument | null,
 	flowId: string,
 ): { start: string | null; end: string | null } {
+	const people = personNames(household)
 	const label = (edge: "start" | "end") => {
 		const anchor = anchorAt(household, flowDatePath(flowId, edge))
-		return anchor === null ? null : anchorLabel(anchor)
+		return anchor === null ? null : anchorWords(anchor, people)
 	}
 	return { start: label("start"), end: label("end") }
 }
 
-/** The ages a row carries, as one line of text: "me 60, partner 58". Empty when the row carries none. */
-export function agesText(ages: readonly PersonAge[]): string {
-	return ages.map((entry) => `${entry.person} ${entry.age}`).join(", ")
+/** The ages a row carries, as one line of text: "You 60, Your partner 58". A person the household does not name shows by id. Empty when the row carries none. */
+export function agesText(ages: readonly PersonAge[], people: PersonNames = NO_PEOPLE): string {
+	return ages
+		.map((entry) => `${people.get(entry.person)?.label ?? entry.person} ${entry.age}`)
+		.join(", ")
 }
 
-/** The age under a chart's year: "age 50" for one person, "me 50" (the first person) for a household of several. Null without one. */
-export function axisAge(ages: readonly PersonAge[]): string | null {
+/** The age under a chart's year: "age 50" for one person, "You 50" (the first person, by the household's words) for a household of several. Null without one. */
+export function axisAge(
+	ages: readonly PersonAge[],
+	people: PersonNames = NO_PEOPLE,
+): string | null {
 	const [first] = ages
 	if (first === undefined) return null
-	return ages.length === 1 ? `age ${first.age}` : `${first.person} ${first.age}`
+	if (ages.length === 1) return `age ${first.age}`
+	return `${people.get(first.person)?.label ?? first.person} ${first.age}`
 }
 
 /** The link to the household card on the Overview, for the Scenario it belongs to. Keeps the other parameters. */

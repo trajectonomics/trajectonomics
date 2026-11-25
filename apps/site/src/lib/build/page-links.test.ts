@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { dictionaryFor } from "../language/languages"
-import { DOCS_CLI_INSTALL_PATH, DOCS_PATH, GITHUB_SKILLS_URL } from "../site"
+import { DEMO_PATH, DOCS_CLI_INSTALL_PATH, DOCS_PATH, GITHUB_SKILLS_URL } from "../site"
 import type { BuiltFile } from "./built-files"
 import { checkPageLinks } from "./page-links"
 import { heroCodes, heroHome, heroHomes } from "./testing/hero"
@@ -17,6 +17,14 @@ function homeWithoutWayOut(): BuiltFile {
 describe("the links every Language document must have", () => {
 	it("passes every home that links the Docs Portal and the skills repository", () => {
 		expect(heroCodes(checkPageLinks)).toEqual([])
+	})
+
+	it("fails a home with no link to the hosted Demo", () => {
+		const page = heroHome("en")
+		const content = page.content.replace(`href="${DEMO_PATH}"`, 'href="/live/"')
+		expect(heroCodes(checkPageLinks, { path: page.path, content })).toEqual([
+			"PAGE_DEMO_LINK_MISSING",
+		])
 	})
 
 	it("fails a home with no link to /docs/", () => {

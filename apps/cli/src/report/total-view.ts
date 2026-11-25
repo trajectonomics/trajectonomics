@@ -19,12 +19,18 @@ export const totalRefusal: z.ZodType<TotalRefusal> = z
 type Figure = "balance" | "amount" | "none"
 
 /**
+ * Why a total is not stated, as the clause every refused total shares: `totalSentence` prefixes it
+ * with `not stated: `, and `doctor` states it after its own words because it states no rows.
+ */
+export const outOfRangeClause =
+	"every account is in range, but their sum exceeds the safe integer range"
+
+/**
  * The human sentence for a result whose total is refused, in place of the total's line. JSON carries
  * the refusal; a person at a terminal reads that every account is stated and the sum is not.
  */
 export function totalSentence(figure: Figure = "balance"): string {
-	const range =
-		"not stated: every account is in range, but their sum exceeds the safe integer range"
+	const range = `not stated: ${outOfRangeClause}`
 	return figure === "none" ? range : `${range}; each account's ${figure} above is stated`
 }
 

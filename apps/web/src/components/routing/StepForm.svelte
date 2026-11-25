@@ -74,5 +74,5 @@ async function submit(event: SubmitEvent): Promise<void> {
 		<TargetFields bind:draft id="step" label="Up to" problem={shown.at("amount")} rateProblem={shown.at("rate")} />
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	<ItemActions trying={tryValue} />
+	<ItemActions kind="account" trying={tryValue} />
 </form>

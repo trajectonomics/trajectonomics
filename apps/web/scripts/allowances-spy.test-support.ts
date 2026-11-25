@@ -1,9 +1,9 @@
 // A runner that logs every argv the editor gives traj, then runs the real traj: the spy of the reread tests.
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { BINARY } from "./edit-fixture.test-support"
 import type { RunContext } from "./run-traj"
+import { makeScratch, removeScratch } from "./scratch"
 
 /**
  * A traj context whose every call is appended to a log, one line per call, then run for real. `dispose` removes
@@ -14,7 +14,7 @@ export async function spyContext(env: NodeJS.ProcessEnv): Promise<{
 	log: string
 	dispose: () => Promise<void>
 }> {
-	const dir = await mkdtemp(join(tmpdir(), "traj-web-spy-"))
+	const dir = await makeScratch("traj-web-spy-")
 	const log = join(dir, "argv.log")
 	const script = join(dir, "spy.sh")
 	await writeFile(log, "")
@@ -25,7 +25,7 @@ export async function spyContext(env: NodeJS.ProcessEnv): Promise<{
 		prefix: [script, "traj"],
 		env: { ...env, SPY_LOG: log, TRAJ_REAL: BINARY },
 	}
-	const dispose = () => rm(dir, { recursive: true, force: true })
+	const dispose = () => removeScratch(dir)
 	return { context, log, dispose }
 }
 

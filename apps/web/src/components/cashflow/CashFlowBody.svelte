@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { layoutFlow } from "../../lib/chart/flow"
 import { layoutStack } from "../../lib/chart/flow-stack"
 import type { ProjectionRun } from "../../lib/contract"
@@ -55,7 +56,7 @@ function pick(band: string): void {
 	<div class="space-y-6">
 		<YearSelect {rollups} selected={rollup.index} {onYear} />
 		{#key rollup.index}
-			<FlowDiagram {layout} {stack} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup)}`} />
+			<FlowDiagram {layout} {stack} {picked} onPick={pick} label={`Cash flow, ${yearLabel(rollup, currentItemNames().people)}`} />
 			<p class="text-sm text-muted-foreground">
 				A refund is shown as money in, so the tax band is the tax paid, and the tax total is the tax paid
 				less the refund.

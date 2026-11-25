@@ -4,6 +4,7 @@ import { goldenTextIn, recordGoldenTextIn } from "./golden-test-support"
 import { ILLUSTRATIVE_RETURN_MODEL, ILLUSTRATIVE_SEED } from "./projection/chance-testing"
 import { AS_OF, baseFlags, HORIZON, projection, projectionHome } from "./projection/testing"
 import { chanceBody, chanceFlags, modelFile } from "./projection-chance-support"
+import { canonicalJson, contentHash } from "./store/canonical"
 import { type Captured, capture } from "./test-support"
 
 const GOLDENS = new URL("./projection/fixtures/", import.meta.url)
@@ -62,6 +63,7 @@ describe("projection chance", () => {
 			modelId: ILLUSTRATIVE_RETURN_MODEL.id,
 			seed: ILLUSTRATIVE_SEED,
 			paths: 200,
+			modelHash: contentHash(canonicalJson(ILLUSTRATIVE_RETURN_MODEL)),
 		})
 		expect(body.paths).toBe(200)
 	})
@@ -155,7 +157,7 @@ describe("projection chance", () => {
 		expect(res.out).toContain("p90")
 		expect(res.out).toContain("a success share of")
 		expect(res.out).toContain(
-			`return model "${ILLUSTRATIVE_RETURN_MODEL.id}" with seed ${ILLUSTRATIVE_SEED}`,
+			`Return model "${ILLUSTRATIVE_RETURN_MODEL.id}" with seed ${ILLUSTRATIVE_SEED}`,
 		)
 		expect(res.out).not.toContain('"definition"')
 	})

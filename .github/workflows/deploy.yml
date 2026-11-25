@@ -1,13 +1,18 @@
 name: Deploy
 
-# Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs) and the
-# blog (worker "blog", apps/blog) to Cloudflare Workers from main. The docs Worker attaches
-# docs.trajectonomics.com and the blog Worker attaches blog.trajectonomics.com. The router still
-# forwards trajectonomics.com/docs so the docs Worker can redirect it. docs/runbooks/deploy.md has the setup.
+# Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs), the
+# blog (worker "blog", apps/blog) and MooJot's landing site (worker "moojot-site",
+# apps/openjot/site) to Cloudflare Workers from main. The docs Worker attaches
+# docs.trajectonomics.com, the blog Worker attaches blog.trajectonomics.com, and the landing site
+# attaches moojot.trajectonomics.com. The router still forwards trajectonomics.com/docs so the docs
+# Worker can redirect it. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
-#                         config, the lockfile), changed in the push.
-#   workflow_dispatch  -> deploys the app you pick, or both, from main.
+#                         config, the lockfile), changed in the push. The Site also redeploys for its
+#                         hosted Demo's inputs: the Dashboard, the command line and the core engine.
+#                         The landing site has no build and imports nothing from the workspace, so
+#                         only apps/openjot/site counts.
+#   workflow_dispatch  -> deploys the app you pick, or all of them, from main.
 #   schedule (daily)   -> redeploys the Site alone, so the GitHub star count in its header is read again
 #                         (the Site's build refreshes the Star snapshot first; see "Refresh the star count").
 #
@@ -23,7 +28,7 @@ on:
       app:
         description: Which worker to deploy.
         type: choice
-        options: [all, site, docs, blog]
+        options: [all, site, docs, blog, openjot]
         default: all
 
 permissions:
@@ -57,7 +62,7 @@ jobs:
               exit 1
             fi
             case "$APP" in
-            all) apps='["site","docs","blog"]' ;;
+            all) apps='["site","docs","blog","openjot"]' ;;
             *) apps="[\"$APP\"]" ;;
             esac
           else
@@ -66,12 +71,22 @@ jobs:
               base=$(git rev-parse --verify --quiet "$SHA^" || git hash-object -t tree /dev/null)
             fi
             shared=(packages/brand tooling/config bun.lock package.json turbo.json)
+            # The Site serves the Demo, which is built from the Dashboard, the command line and the
+            # core engine, so a change there redeploys the Site even though its own folder is unchanged.
+            site_shared=(apps/web apps/cli/src packages/core)
             apps='[]'
             for app in site docs blog; do
-              if [ -n "$(git diff --name-only "$base" "$SHA" -- "apps/$app" "${shared[@]}")" ]; then
+              paths=("apps/$app" "${shared[@]}")
+              if [ "$app" = "site" ]; then paths+=("${site_shared[@]}"); fi
+              if [ -n "$(git diff --name-only "$base" "$SHA" -- "${paths[@]}")" ]; then
                 apps=$(jq -c --arg app "$app" '. + [$app]' <<<"$apps")
               fi
             done
+            # The landing site is static files plus worker.js, with no build and no workspace
+            # imports, so only its own folder counts.
+            if [ -n "$(git diff --name-only "$base" "$SHA" -- apps/openjot/site)" ]; then
+              apps=$(jq -c '. + ["openjot"]' <<<"$apps")
+            fi
           fi
           echo "apps=$apps" >> "$GITHUB_OUTPUT"
           echo "Deploying: $apps"
@@ -124,14 +139,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: bun run stars:update || echo "::warning::Could not read the star count; deploying the committed snapshot."
 
-            # turbo builds packages/brand first: every app imports its dist/current/.
+      # turbo builds packages/brand first: every app imports its dist/current/.
+      # The landing site is plain files and worker.js: it has nothing to build.
       - name: Build
+        if: matrix.app != 'openjot'
         env:
           APP: ${{ matrix.app }}
         run: bunx turbo run build --filter="@trajectonomics/$APP" --concurrency=2
 
       - name: Deploy to Cloudflare Workers
-        working-directory: apps/${{ matrix.app }}
+        # The landing site is a subfolder of the app folder, and has no package.json of its own.
+        working-directory: ${{ matrix.app == 'openjot' && 'apps/openjot/site' || format('apps/{0}', matrix.app) }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

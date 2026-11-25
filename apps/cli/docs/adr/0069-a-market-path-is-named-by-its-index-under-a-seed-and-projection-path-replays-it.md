@@ -36,7 +36,7 @@ belongs to.
   run`'s opt-in flags (`--monthly`, `--breakdown`, `--liabilities`, `--accounts`, `--spending`, `--estate`) and
   `--index`, which is required. The engine's `projectPath` replays the one path, so only that path's draws are made.
 - **The result is `projection run`'s plus the run it is a path of.** `index`; `definition`, the run exactly as
-  `projection chance` states it (`{ modelId, seed, paths }`, one schema for both leaves); for `plan`, the `returnModel`
+  `projection chance` states it (`{ modelId, modelHash, seed, paths }`, one schema for both leaves; `modelHash` is the `jcs1:sha256:` content hash of the Return model document the paths were drawn from, so two files with one `id` echo different runs, #210); for `plan`, the `returnModel`
   echo (ADR-0068); and `returns`: for each Annual roll-up, each Account's compounded market
   return in basis points (`{ index, from, to, accounts: [{ account, returnBps }] }`). `returns` is the market's growth
   from the roll-up's first day through its last, so it need not equal the change in an Account's balance, and it covers
@@ -49,7 +49,7 @@ belongs to.
 - **A path is named by its index under the run's seed.** `--seed`, `--paths`, the model and the Scenario are the
   run; `--index` is the path in it. A per-path seed was rejected: it would leak the generator's internals, and two
   runs could name one path two ways. The cost is that the same flags must be given to both commands, which the
-  `outcomes` note says, and the result of `projection path` echoes the run (`seed`, `paths`, `modelId`,
+  `outcomes` note says, and the result of `projection path` echoes the run (`seed`, `paths`, `modelId`, `modelHash`,
   `scenario.effectiveContentHash`) so a reader can check that a replay is of the chance they read.
 
 ## Considered options

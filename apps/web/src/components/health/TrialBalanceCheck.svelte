@@ -36,7 +36,7 @@ const columns: Column<Total>[] = [
 		</div>
 		{#if trialBalance.totals === null}
 			<p class="text-sm text-muted-foreground">
-				The totals are not stated: every account is in range, but a column's sum exceeds the safe integer range. The debit and credit columns were still compared exactly.
+				{trialBalance.balanced ? "Debits equal credits" : "Debits and credits disagree"} at {formatDate(trialBalance.asOf)}, compared exactly; the totals exceed the safe range.
 			</p>
 		{:else}
 			<DataTable

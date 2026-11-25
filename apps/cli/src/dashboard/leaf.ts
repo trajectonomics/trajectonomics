@@ -66,7 +66,7 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 				command:
 					"traj dashboard --as-of 2026-11-30 --horizon 2056-11-30 --scenario volatile --paths 200 --seed 0123456789abcdef --port 0",
 				description:
-					"Add the chance of success from the plan's own return model (--return-model plan is the default with --paths and --seed).",
+					"Add the chance of success from the plan's own Return model (--return-model plan is the default with --paths and --seed).",
 			},
 			{
 				command:

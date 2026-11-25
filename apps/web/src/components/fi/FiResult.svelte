@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { Fi } from "../../lib/contract"
 import { fiModelOf } from "../../lib/view/fi/model"
 import Fact from "../projection/Fact.svelte"
@@ -15,7 +16,7 @@ interface Props {
 
 /** One Scenario's FI answer: the date or what binds it, its definition, its statement and its tax pointer. */
 let { fi, argv }: Props = $props()
-const model = $derived(fiModelOf(fi))
+const model = $derived(fiModelOf(fi, currentItemNames().people))
 </script>
 
 <div class="space-y-8">

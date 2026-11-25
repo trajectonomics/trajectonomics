@@ -1,9 +1,11 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument } from "../../lib/contract"
 import type { WithdrawalContext } from "../../lib/view/withdrawals/context"
 import { mainFlow, ruleFlows } from "../../lib/view/withdrawals/rule"
 import Drawer from "../ui/Drawer.svelte"
+import ItemName from "../ui/ItemName.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 import SpendingForm from "./SpendingForm.svelte"
 
@@ -26,13 +28,13 @@ const button =
 <!-- "Set how you spend in retirement" opens the right-side drawer: one form, one Edit, or a try in the What-if session. -->
 <div class="flex flex-wrap gap-2">
 	<button type="button" class={button} disabled={editSession.busy} onclick={() => (drawer = main === undefined ? {} : { id: main.id })}>
-		{main === undefined ? "Set how you spend in retirement" : `Change ${main.id}`}
+		{main === undefined ? "Set how you spend in retirement" : `Change ${currentItemText("flow", main.id)}`}
 	</button>
 	{#each others as flow (flow.id)}
-		<button type="button" class={button} disabled={editSession.busy} onclick={() => (drawer = { id: flow.id })}>Change {flow.id}</button>
+		<button type="button" class={button} disabled={editSession.busy} onclick={() => (drawer = { id: flow.id })}>Change <ItemName kind="flow" id={flow.id} /></button>
 	{/each}
 </div>
-<Drawer open={drawer !== null} title={drawer?.id === undefined ? "Set how you spend in retirement" : `Change ${drawer.id}`} onClose={() => (drawer = null)}>
+<Drawer open={drawer !== null} title={drawer?.id === undefined ? "Set how you spend in retirement" : `Change ${currentItemText("flow", drawer.id)}`} onClose={() => (drawer = null)}>
 	<StaleNotice />
 	{#if drawer !== null}
 		<SpendingForm {name} {contentHash} {ctx} {household} flowId={drawer.id} onDone={() => (drawer = null)} />

@@ -38,6 +38,7 @@ export const THAI: LanguageEntry = Object.freeze({
 		blogLink: "บล็อก",
 		repoLinkLabel: "ดาวบน GitHub",
 		cliInstallLink: "ติดตั้ง CLI โดยตรง",
+		demoLink: "ลองเดโม",
 		copy: "คัดลอกพรอมต์ให้เอเจนต์ของคุณ",
 		copied: "คัดลอกพรอมต์แล้ว",
 		copiedLabel: "คัดลอกแล้ว",

@@ -1,7 +1,8 @@
 import { dayPosition, type LineMarker, type LineSeries, toChartNumber } from "../../chart"
 import type { ProjectionRun } from "../../contract"
 import { formatDate, formatMoney } from "../../format"
-import { milestoneView } from "../milestones/milestones"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
+import { markerOf, milestoneView } from "../milestones/milestones"
 import { type AnnualRow, annualRowsOf } from "../projection/annual"
 import { NOMINAL_NAME } from "../projection/chart"
 import { type Range, rowsInRange } from "./range"
@@ -26,13 +27,17 @@ function point(row: AnnualRow): LineSeries["points"][number] {
  * The chart of one projection over a range. The range only chooses which of the CLI's annual rows are drawn, and a
  * Milestone whose date no drawn row holds has no rule. Null when the run has no annual rows.
  */
-export function planChart(run: ProjectionRun, range: Range): PlanChart | null {
+export function planChart(
+	run: ProjectionRun,
+	range: Range,
+	names: ItemNames = NO_ITEM_NAMES,
+): PlanChart | null {
 	const rows = rowsInRange(annualRowsOf(run), range)
 	if (rows.length === 0) return null
 	const reached = milestoneView(run)?.reached ?? []
 	const markers = reached.flatMap((milestone) => {
 		const x = dayPosition(rows, milestone.date)
-		return x === null ? [] : [{ x, label: milestone.id }]
+		return x === null ? [] : [markerOf(milestone.id, x, names)]
 	})
 	return { series: [{ name: NOMINAL_NAME, points: rows.map(point) }], markers }
 }

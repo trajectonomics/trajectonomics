@@ -26,7 +26,7 @@ function lineOf(line: LineDraft, list: ListName): EstateLine {
 			id,
 			of,
 			bps: percentText(line.share) ?? "",
-			rounding: line.rounding as "floor" | "halfUp" | "ceil",
+			rounding: line.rounding,
 		}
 	}
 	const bps = parseBps(line.rate)
@@ -38,8 +38,8 @@ function lineOf(line: LineDraft, list: ListName): EstateLine {
 }
 
 /** The block a draft names: a list with no line is left out, and a block with no list is no block at all. */
-export function blockFromDraft(draft: EstateDraft): EstateResult {
-	const problems = problemsOf(draft)
+export function blockFromDraft(draft: EstateDraft, stored?: EstateBlock): EstateResult {
+	const problems = problemsOf(draft, stored)
 	if (problems.size > 0) return { ok: false, problems: Object.fromEntries(problems) }
 	const lists = (["costs", "gifts"] as const).flatMap((list) =>
 		draft[list].length === 0

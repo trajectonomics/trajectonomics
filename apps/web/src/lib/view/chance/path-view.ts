@@ -1,13 +1,11 @@
 import { dayPosition, type LineMarker } from "../../chart"
 import type { ProjectionChance, ProjectionPath } from "../../contract"
 import { formatMonth } from "../../format"
-import { agesText } from "../household/model"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { milestoneMarkers } from "../milestones/milestones"
-import { type AnnualRow, annualRowsOf } from "../projection/annual"
-import { lowestWhen, pathTitle, returnText } from "./path-words"
-
-/** The label of the run-out rule on the chart. */
-export const RUN_OUT_LABEL = "Ran out"
+import { annualRowsOf } from "../projection/annual"
+import { RUN_OUT_LABEL } from "./path-rows"
+import { lowestWhen, pathTitle } from "./path-words"
 
 /** How a future ended, from its own read: when it ran out and what it could not pay, or that it lasted to the Horizon. */
 export interface Ending {
@@ -32,27 +30,6 @@ export interface PathHeader {
 	readonly ending: Ending
 	readonly closing: string | null
 	readonly lowest: Lowest | null
-}
-
-/** One year of the path in the table. */
-export interface PathRow {
-	readonly key: string
-	/** The month the year ends in, "Oct 2052". */
-	readonly ends: string
-	readonly ages: string
-	/** The Account returns of that year, in the order of the table's Account columns; null where `traj` states none. */
-	readonly returns: readonly (string | null)[]
-	readonly income: string
-	readonly spending: string
-	readonly netWorth: string
-	readonly realNetWorth: string
-	/** "Lowest point" and "Ran out" on the years they belong to. */
-	readonly marks: readonly string[]
-}
-
-/** The Account ids the table has a column for, in the order the CLI lists them in the first roll-up. */
-export function returnAccounts(path: ProjectionPath): string[] {
-	return (path.returns[0]?.accounts ?? []).map((entry) => entry.account)
 }
 
 /** The path's header: its title, how it ended, and the figures the chance's outcomes state of it. */
@@ -81,44 +58,9 @@ export function pathHeaderOf(path: ProjectionPath, chance: ProjectionChance): Pa
  * The marks on the chart: each reached Milestone as the Projection page draws it, and the run-out as a rule where the
  * money ran out. A date outside every year row is not drawn; the header still says it.
  */
-export function pathMarkers(path: ProjectionPath): LineMarker[] {
-	const markers = milestoneMarkers(path)
+export function pathMarkers(path: ProjectionPath, names: ItemNames = NO_ITEM_NAMES): LineMarker[] {
+	const markers = milestoneMarkers(path, names)
 	if (path.runsOut === null) return markers
 	const x = dayPosition(annualRowsOf(path), path.runsOut.date)
 	return x === null ? markers : [...markers, { x, label: RUN_OUT_LABEL }]
-}
-
-/** Whether a year's roll-up holds a date, as the CLI states both. */
-function holds(row: AnnualRow, day: string): boolean {
-	return day >= row.from && day <= row.to
-}
-
-/**
- * The table of years: each annual row with the returns `traj` states for that roll-up (matched by the roll-up's index),
- * its income, spending and net worth as strings, and the marks of the years the lowest point and the run-out fall in.
- */
-export function pathRowsOf(path: ProjectionPath, lowestDay: string | null): PathRow[] {
-	const accounts = returnAccounts(path)
-	const returns = new Map(path.returns.map((rollup) => [rollup.index, rollup.accounts]))
-	return annualRowsOf(path).map((row) => {
-		const states = returns.get(row.index) ?? []
-		const marks = [
-			...(lowestDay !== null && holds(row, lowestDay) ? ["Lowest point"] : []),
-			...(path.runsOut !== null && holds(row, path.runsOut.date) ? [RUN_OUT_LABEL] : []),
-		]
-		return {
-			key: String(row.index),
-			ends: formatMonth(row.to),
-			ages: agesText(row.ages),
-			returns: accounts.map((id) => {
-				const found = states.find((entry) => entry.account === id)
-				return found === undefined ? null : returnText(found.returnBps)
-			}),
-			income: row.income,
-			spending: row.expense,
-			netWorth: row.closingNetWorth,
-			realNetWorth: row.realNetWorth.amount,
-			marks,
-		}
-	})
 }

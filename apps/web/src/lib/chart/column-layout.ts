@@ -2,6 +2,7 @@ import { type ColumnKind, type Frame, type Lane, seriesLayout } from "./column-s
 import { extent } from "./extent"
 import type { LineMarker, LineSeries } from "./line"
 import type { LineLayout, Plot } from "./line-layout"
+import { markersIn } from "./markers"
 import { linearScale } from "./scale"
 import { type Span, stackSpans } from "./stack"
 import { niceTicks } from "./ticks"
@@ -86,20 +87,4 @@ function lanesOf(cells: readonly (readonly (unknown | null)[])[]): Lane[][] {
 		})
 	}
 	return lanes
-}
-
-/** The markers that fall inside a column, in pixels. A marker beyond every column is not drawn. */
-function markersIn(
-	markers: readonly LineMarker[],
-	xs: readonly number[],
-	xPixels: readonly number[],
-	slot: number,
-): { x: number; label: string }[] {
-	return markers.flatMap((marker) => {
-		const column = xs.findIndex((x) => marker.x > x - 1 && marker.x <= x)
-		const centre = xPixels[column]
-		const x = xs[column]
-		if (centre === undefined || x === undefined) return []
-		return [{ x: centre - slot / 2 + (marker.x - (x - 1)) * slot, label: marker.label }]
-	})
 }
