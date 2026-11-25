@@ -23,8 +23,9 @@ test's behaviour changes.
   grows by the engine's whole-year rule with `growthYears(Timeline.start, date)`, so a later M
   never makes retirement cheaper in real terms.
 - **Buffer checks.** After M's flows, at every Occurrence after M, and at the horizon, accessible
-  net worth must be at least `required(D)`. A breach is recorded but does not stop the walk, so a
-  later Shortfall can win the binding.
+  net worth must be at least `required(D)`. A breach, or a window that cannot be priced, is recorded
+  but does not stop the walk. A Shortfall outranks either, and between them the earliest date wins
+  ([ADR 0012](./0012-milestones.md)).
 - **No monotonicity assumption.** `retirementSpending` can remove a large expense only for an
   early M, so a later candidate may fail where an earlier one passed. The scan is ascending and
   returns the first pass; it never binary-searches. A Shortfall before M is identical for every
@@ -112,7 +113,8 @@ not change the survival test. It is built on the growth seam and PRNG of ADR-000
   `INVALID_SEED`; both arrive with the case, per ADR-0005's two-tier rule. An unknown `method`
   stays `INVALID_FI_METHOD`, which already exists.
 - **Overflow.** A prefix or candidate walk that overflows fails the whole call with
-  `VALUE_OVERFLOW` at its date and Account: a share over a shrunken sample would be a lie.
+  `VALUE_OVERFLOW` at its date and Account, unless a Shortfall or an earlier breach already fails
+  the path: a share over a shrunken sample would be a lie.
 - **Cost gate.** #19 landed, so the gate is met. The 200-path cap stays the method's own: the
   Outcome distribution's is 10,000, and the two never share an option type.
 

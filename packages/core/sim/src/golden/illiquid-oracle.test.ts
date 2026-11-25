@@ -141,6 +141,26 @@ describe("the FI month with a Minimum buffer matches the oracle's buffer walk", 
 	})
 })
 
+describe("an unmarked home counts as accessible but never pays the plan's bills", () => {
+	it("gives 1 Feb 2026 on a longer horizon, the date the engine finds, not 1 Jan", () => {
+		// The home is not in `withdraw`, so cash alone survives. Candidate 1 Jan: cash 200, 100, 0
+		// and then −100 on 1 Apr, so it runs short, though cash plus the home never falls below the
+		// 100 buffer. Candidate 1 Feb keeps the January salary and holds out to 1 Aug.
+		const longer = { ...unmarked, horizon: "2026-08-01" }
+		const { baseline, scenario, timeline } = fixtureOf(longer)
+		const engine = financialIndependence(baseline, scenario, timeline, {
+			method: "survival",
+			minBufferMonths: 1,
+		})
+		if (!engine.ok || !engine.financialIndependence.reachable) throw new Error("expected FI")
+		expect(engine.financialIndependence).toMatchObject({ month: "2026-02-01" })
+		expect(oracleMilestoneFi(fixtureOf(longer), 1)).toEqual({
+			month: "2026-02-01",
+			annualExpenses: 1200,
+		})
+	})
+})
+
 describe("a Milestone that reads accessible net worth fires where the oracle's walk says", () => {
 	// Each opening balance is taken before that day's flows: cash 300 on 1 Jan, 700 on 1 Feb,
 	// 1,100 on 1 Mar. So 'invested' (accessible ≥ 1,100) fires on 1 Mar with the home marked, and on
