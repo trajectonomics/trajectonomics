@@ -14,12 +14,21 @@ function startsPlan(edit: Edit): edit is Extract<Edit, { template: unknown }> {
 /** The CLI's own answer to a dry run of an apply: `created` when no plan of the name was stored. */
 const applyStatus = z.looseObject({ status: z.string() })
 
-/** The anchors an apply dropped (cli ADR-0048): `scenario apply` and `scenario fork` state them (cli ADR 0076). */
-const droppedStatement = z.looseObject({ droppedAnchors: z.array(z.string()) })
+/** The anchors and Owners an apply dropped (cli ADR-0048, ADR-0076): `scenario apply` and `scenario fork` state them. */
+const droppedStatement = z.looseObject({
+	droppedAnchors: z.array(z.string()).optional(),
+	droppedOwners: z.array(z.string()).optional(),
+})
 
-/** What one Edit's run came to: it ran (with the household anchors the write dropped), or the error that stopped it. */
+/** The household anchors and Owners a write dropped. */
+type Dropped = {
+	readonly droppedAnchors: readonly string[]
+	readonly droppedOwners: readonly string[]
+}
+
+/** What one Edit's run came to: it ran (with what the write dropped), or the error that stopped it. */
 export type EditRun =
-	| { readonly ok: true; readonly droppedAnchors: readonly string[] }
+	| ({ readonly ok: true } & Dropped)
 	| { readonly ok: false; readonly error: ErrorBody }
 
 /** The exit code `traj` gives a taken name (cli ADR-0021: a conflict with what the ledger holds). */
@@ -31,6 +40,16 @@ function nameTaken(name: string): ErrorBody {
 		code: "scenario_name_taken",
 		exitCode: NAME_TAKEN_EXIT_CODE,
 		message: `A plan named ${name} already exists.`,
+	}
+}
+
+/** The household anchors and Owners a write's answer says it dropped; none when it says nothing. */
+function droppedOf(data: unknown): Dropped {
+	const dropped = droppedStatement.safeParse(data)
+	if (!dropped.success) return { droppedAnchors: [], droppedOwners: [] }
+	return {
+		droppedAnchors: dropped.data.droppedAnchors ?? [],
+		droppedOwners: dropped.data.droppedOwners ?? [],
 	}
 }
 
@@ -64,6 +83,5 @@ export async function runEdit(context: RunContext, edit: Edit): Promise<EditRun>
 		const message = `A plan named ${edit.name} was made while this ran, and this write replaced it.`
 		return stopped({ ...nameTaken(edit.name), message })
 	}
-	const dropped = droppedStatement.safeParse(real.data)
-	return { ok: true, droppedAnchors: dropped.success ? dropped.data.droppedAnchors : [] }
+	return { ok: true, ...droppedOf(real.data) }
 }
