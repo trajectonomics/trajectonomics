@@ -70,6 +70,7 @@ describe("with no session, a page is its content and nothing more", () => {
 		const inner = createRawSnippet(() => ({ render: () => body }))
 		const reference = bodyOf(ReadView, { read, label: "Milestones of base", children: inner })
 		const page = bodyOf(MilestonesView, {
+			names: DEMO.params.scenarios,
 			projections: DEMO.reads.projections,
 			scenario: "base",
 			terms: "both",
