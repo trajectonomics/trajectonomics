@@ -2,9 +2,9 @@ import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { type AccountNames, NO_NAMES } from "../account-names"
-import { flowAnchorLabels } from "../household/model"
 import { ruleSummary } from "../withdrawals/words"
 import { employerText } from "./employer"
+import { datesOfCard } from "./flow-dates"
 
 /** The kinds of Flow a planner page lists: Income lists `income`, Expenses lists `expense`. */
 export type FlowKind = "income" | "expense"
@@ -15,11 +15,14 @@ export interface FlowCard {
 	/** The amount per occurrence, as the CLI's decimal string; null for a Flow whose amount is computed. */
 	readonly amount: string | null
 	readonly frequency: string
+	/** "On" for a once Flow, whose one occurrence is its date; "Starts" for any other. */
+	readonly startLabel: string
 	readonly start: string
-	readonly end: string
+	/** The end as the card states it, or null for a once Flow, which has no end. */
+	readonly end: string | null
 	/** The label of the start when the household pins it ("at me, age 60"), or null. */
 	readonly startAnchor: string | null
-	/** The label of the end when the household pins it, or null. */
+	/** The label of the end when the household pins it, or null (also for a once Flow). */
 	readonly endAnchor: string | null
 	readonly growth: string
 	/** "Earned" or "Passive" for an income Flow; null for an expense. */
@@ -45,17 +48,6 @@ export function growthText(flow: ScenarioFlow): string {
 	return `${formatBps(growth.bps)}% a year`
 }
 
-/** The words for a date a Milestone sets: its id, which is the only name a Milestone has. A Flow with none shows its own date. */
-function dateWords(milestone: string | undefined, date: string): string {
-	return milestone === undefined ? date : `When ${milestone} fires`
-}
-
-/** The anchor labels of one Flow's dates, as the card holds them. */
-function anchorsOf(household: HouseholdDocument | null, id: string) {
-	const labels = flowAnchorLabels(household, id)
-	return { startAnchor: labels.start, endAnchor: labels.end }
-}
-
 /** "Earned" or "Passive" for an income Flow that states it; null for any other. */
 function earnedOf(flow: ScenarioFlow, kind: FlowKind): string | null {
 	if (kind !== "income" || flow.earned === undefined) return null
@@ -79,10 +71,7 @@ export function flowCards(
 			id: flow.id,
 			amount: flow.amount ?? null,
 			frequency: flow.frequency,
-			// A Milestone date wins: `start` is then only where recurrence counts from (sim ADR 0012), not when the Flow begins.
-			start: dateWords(flow.startAt, flow.start),
-			end: dateWords(flow.endAt, flow.end ?? "To the horizon"),
-			...anchorsOf(household, flow.id),
+			...datesOfCard(flow, household),
 			growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 			earned: earnedOf(flow, kind),
 			category: kind === "expense" ? (flow.category ?? null) : null,
