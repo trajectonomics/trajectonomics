@@ -65,20 +65,9 @@ cd site && npx wrangler@4 deploy            # deploy by hand (needs a Cloudflare
 
 ## Deploys
 
-The site deploys itself. Cloudflare Workers Builds is connected to this repo, and every push to `main` that changes a file under `site/` builds and deploys the Worker. The build shows up as a check on the commit. A deploy by hand is only needed when that build is broken.
+The site deploys from this monorepo's CI, `.github/workflows/deploy.yml`, the same way the other Workers do. A push to `main` that changes a file under `apps/openjot/site` deploys the Worker; a push that changes only the rest of `apps/openjot`, or the shared workspace inputs, does not, because the site has no build and imports nothing from the workspace. To deploy by hand, open Actions → **Deploy** → **Run workflow** and pick `openjot`. The `DEPLOYS_ENABLED` switch and the Cloudflare secrets are described in `docs/runbooks/deploy.md`.
 
-The connection is set in the Cloudflare dashboard (Workers & Pages → `moojot-site` → Settings → Builds), not in this repo:
-
-| Setting | Value |
-|---|---|
-| Production branch | `main` |
-| Root directory | `site` |
-| Build command | none |
-| Deploy command | `npx wrangler@4 deploy` |
-| Build watch paths | `site/*` |
-| Non-production branch builds | off |
-
-The Worker's name in the dashboard has to match `name` in `wrangler.jsonc`, or the build fails.
+The fallback when CI is broken is a deploy with wrangler from this folder: `cd site && npx wrangler@4 deploy` (see Commands; it needs a Cloudflare login for the Trajectonomics account).
 
 App releases are separate and stay manual: an `openjot-v*` tag pushed by the owner. See `docs/release/android.md`.
 
