@@ -12,19 +12,20 @@ export const RETIRE_EARLY_SALARY_END = "2040-05-14"
 
 /**
  * The fictional household of `base`, whose ages pin two dates (cli ADR-0048). `me` is 60 on the last day
- * of June 2050, and `mali` is 6 on the last day of September 2033; the Flows hold those dates, as the
- * household writes them. The salary is not pinned, because `retire-early` moves its end.
+ * of June 2050, and `mali`, born in September 2026
+ * (before the As-of), is 7 on the last day of September 2033; the Flows hold those dates, as the
+ * household writes them. `me` is born in June 1990, which `DEMO_INPUT.birthDate` states to the day. The salary is not pinned, because `retire-early` moves its end.
  */
 export const DEMO_HOUSEHOLD = {
 	schemaVersion: 1,
 	people: [
 		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
 		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
-		{ id: "mali", role: "dependent", relation: "child", born: "2027-09", lifeExpectancy: 90 },
+		{ id: "mali", role: "dependent", relation: "child", born: "2026-09", lifeExpectancy: 90 },
 	],
 	anchors: [
 		{ path: "flows.fund.end", person: "me", age: 60 },
-		{ path: "flows.school.start", person: "mali", age: 6 },
+		{ path: "flows.school.start", person: "mali", age: 7 },
 	],
 }
 const FUND_END = "2050-06-30"

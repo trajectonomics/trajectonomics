@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
 import { type PnlResult, pnlOf } from "../../report/pnl"
+import { totalDisplay, totalRefusal } from "../../report/total-view"
 import { reportRow, totalView } from "../../report/view"
 import { withLedger } from "../../report/with-ledger"
 import { LEDGER_READ_CODES } from "../../store"
@@ -17,9 +18,13 @@ const resultSchema: z.ZodType<PnlResult> = z.strictObject({
 		),
 	totals: z
 		.array(totalView)
+		.nullable()
 		.describe(
-			"Income minus expenses, the negated sum of the rows: positive when income exceeds expenses; one entry per currency.",
+			"Income minus expenses, the negated sum of the rows: positive when income exceeds expenses; one entry per currency. Null when the rows' sum leaves the safe range, and `totalsError` says so; every row is still stated.",
 		),
+	totalsError: totalRefusal
+		.optional()
+		.describe("Why `totals` is null, present only then. The call still exits 0."),
 	hint: z
 		.string()
 		.optional()
@@ -45,6 +50,7 @@ export const pnl: Leaf = defineCommand({
 			.describe("Only postings carrying this exact project dimension value."),
 	}),
 	output: resultSchema,
+	render: { display: totalDisplay({ total: "totals", error: "totalsError", figure: "amount" }) },
 	examples: [
 		{
 			command: "traj report pnl --until 2026-03-31 --json",

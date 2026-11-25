@@ -37,16 +37,7 @@ export const trialBalance = (
 	asOf: string,
 	chart: ChartOfAccounts,
 ): TrialBalance => {
-	const rows = leafBalances(transactions, asOf, chart, (a) => `trialBalance.rows[${a.id}]`).map(
-		({ entityId, accountId, currency, amount }) =>
-			Object.freeze({
-				entityId,
-				accountId,
-				currency,
-				debit: Math.max(amount, 0),
-				credit: Math.max(-amount, 0),
-			}),
-	)
+	const rows = trialBalanceRows(transactions, asOf, chart)
 	const debits = totalsOf(
 		rows.map((r) => ({ ...r, amount: r.debit })),
 		1n,
@@ -60,7 +51,7 @@ export const trialBalance = (
 		).map((t) => [JSON.stringify([t.entityId, t.currency]), t.amount]),
 	)
 	return Object.freeze({
-		rows: Object.freeze(rows),
+		rows,
 		totals: Object.freeze(
 			debits.map(({ entityId, currency, amount }) =>
 				Object.freeze({
@@ -73,3 +64,26 @@ export const trialBalance = (
 		),
 	})
 }
+
+/**
+ * The rows of `trialBalance` alone, with no column total: what a caller states when the columns'
+ * sums leave the safe range though every row is inside it. A row outside the range is refused here
+ * as in `trialBalance`.
+ */
+export const trialBalanceRows = (
+	transactions: readonly Transaction[],
+	asOf: string,
+	chart: ChartOfAccounts,
+): readonly TrialBalanceRow[] =>
+	Object.freeze(
+		leafBalances(transactions, asOf, chart, (a) => `trialBalance.rows[${a.id}]`).map(
+			({ entityId, accountId, currency, amount }) =>
+				Object.freeze({
+					entityId,
+					accountId,
+					currency,
+					debit: Math.max(amount, 0),
+					credit: Math.max(-amount, 0),
+				}),
+		),
+	)

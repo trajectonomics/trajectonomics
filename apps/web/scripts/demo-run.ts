@@ -16,7 +16,8 @@ export const DEMO_INPUT: PlanInput = {
 	horizon: "2053-12-31",
 	scenarios: [],
 	compare: { a: "base", b: "retire-early" },
-	birthDate: "1990-05-15",
+	// Born in June 1990, as `me` is in the Demo household (`scripts/demo/scenario.ts`).
+	birthDate: "1990-06-15",
 	ages: [45, 55, 60],
 	monthly: false,
 	carryIn: true,

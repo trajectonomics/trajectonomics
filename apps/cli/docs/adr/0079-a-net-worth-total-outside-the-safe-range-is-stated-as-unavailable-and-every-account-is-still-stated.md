@@ -18,8 +18,8 @@ had written every Balance without a word (#523).
   The output schema gains one nullable type and one optional key, and `traj schema balance` and `traj schema report networth` say so.
 - **An account's own overflow is still the call's refusal.** A Leaf Balance outside the range is refused at its row (ADR-0058, the per-date rule of `account value`), and an overflow of a
   non-counted Leaf (income, expense, equity) still blocks `report networth`'s bottom line at `totals`, as before. Only the net worth sum across accounts is stated as unavailable here: a write
-  cannot be refused for it without refusing a valid Ledger. Two other cross-account sums, `trialBalance.totals` (`balance --trial-balance`) and
-  `profitAndLoss.totals` (`report pnl`), still refuse the whole call; they take the same treatment in a follow-up.
+  cannot be refused for it without refusing a valid Ledger. The two other cross-account sums, `trialBalance.totals` (`balance --trial-balance`) and
+  `profitAndLoss.totals` (`report pnl`), took the same treatment afterwards (see the addendum).
 - **Human output prints a sentence in place of the total's line:** `not stated: every account is in range, but their sum exceeds the safe integer range; each account's balance above is stated`. The refusal's fields stay in JSON.
 - **The rows come from the engine's `balances`, filtered by account type.** The engine's `netWorth` throws before it returns the rows it had assembled, so for a refused total the CLI reads `balances` at that date
   and keeps the asset and liability Leaf rows, in `account list` order. It states no figure of its own (ADR-0058): each row is the engine's Balance, and the filter is the type the column already prints.
@@ -40,3 +40,19 @@ had written every Balance without a word (#523).
 - A consumer that read `totals[0]` or `netWorth[0]` without a check must handle `null`.
 - `report networth --monthly` states the refusal per month in `totalsError`, and keeps `{ asOf, error }` for a month the Ledger refuses outright (an account's own overflow). A refusal of the scan itself (a duplicated Transaction id) is the call's own error once,
   before any month, as `--as-of` gives it (ADR-0077).
+
+## Addendum: the trial balance and the P&L totals (2026-11-25, #539)
+
+The Dashboard's balance read always passes `--trial-balance`, so on the repro Ledger (a Loan at `90071992547402.70` and a Fund overdrawn to `-9.58`) that read still failed with exit 3 on
+`trialBalance.totals[THB].debit` while the Net worth page worked, and `report pnl` failed on `profitAndLoss.totals[THB]`. Both sums are of in-range rows, as net worth is, and both take this ADR's rule:
+
+- **`balance --trial-balance`** states `trialBalance: { rows, totals: null, totalsError }` when a column's sum leaves the range. `totalsError` is the error envelope (`code` `AMOUNT_OVERFLOW`, `exitCode` 3,
+  `path` `trialBalance.totals[THB].debit`, `message`, `details`) and the call exits 0. The top-level `netWorth` is stated or `null` on its own: the two sums are independent.
+- **`report pnl`** states `totals: null, totalsError` with `path` `totals[THB]`, and every row.
+- **A total inside the range is byte for byte what it was,** the error key absent. `traj schema balance` and `traj schema report pnl` gain the nullable `totals` and the optional `totalsError`.
+- **Human output** prints the sentence of this ADR in place of the totals' line: `each account's balance above is stated` for the trial balance (as for net worth) and `each account's amount above is stated` for the P&L.
+  The sentence is rewritten where the total stands: the top of the result, the `trialBalance` record, and each month of `report networth --monthly`, which printed `totals: null` and the whole `totalsError` block for a refused month before.
+- **The rows come from the engine, apart from its totals.** Unlike net worth, no existing query gives the trial balance's or the P&L's rows without summing them: `balances` has no column split, no period and no Dimension filter. The ledger
+  core therefore exports `trialBalanceRows` and `profitAndLossRows` (ledger ADR 0010), the row half of each query, and the CLI states those. A row outside the range is still the call's refusal, at its row.
+- **`doctor --as-of` still refuses** an overflowing trial balance: it compares the two columns, and a total it cannot state is not one it can compare. Its refusal is `AMOUNT_OVERFLOW`, as before.
+- **Code layout.** `report/total.ts` holds the read (`totalRead`, `netWorthRead`, `countedRows`); `report/total-view.ts` holds what the refusal looks like (`totalRefusal`, `totalSentence`, `totalDisplay`).

@@ -45,12 +45,16 @@ const totalColumns: Column<Total>[] = [
 				</p>
 				<PnlLinesTable caption="Income" lines={view.income} empty="No income in this period." />
 				<PnlLinesTable caption="Expenses" lines={view.expense} empty="No expenses in this period." />
-				<DataTable
-					caption="Totals, as the CLI states them"
-					rows={view.totals}
-					rowKey={(total) => total.currency}
-					columns={totalColumns}
-				/>
+				{#if view.note}
+					<p class="rounded-md border border-border p-3 text-sm">{view.note}</p>
+				{:else}
+					<DataTable
+						caption="Totals, as the CLI states them"
+						rows={view.totals}
+						rowKey={(total) => total.currency}
+						columns={totalColumns}
+					/>
+				{/if}
 				<Provenance argv={pnl.argv} />
 			</div>
 		{/snippet}

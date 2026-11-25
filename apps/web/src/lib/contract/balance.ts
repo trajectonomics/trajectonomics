@@ -20,7 +20,11 @@ export const balance = z.strictObject({
 			rows: z.array(
 				z.strictObject({ account: accountRef, debit: money, credit: money, currency: z.string() }),
 			),
-			totals: z.array(z.strictObject({ currency: z.string(), debit: money, credit: money })),
+			// Null when a column's sum leaves the safe range (cli ADR 0079): every row is still stated, and `totalsError` says why.
+			totals: z
+				.array(z.strictObject({ currency: z.string(), debit: money, credit: money }))
+				.nullable(),
+			totalsError: errorBody.optional(),
 		})
 		.optional(),
 	hint: z.string().optional(),
