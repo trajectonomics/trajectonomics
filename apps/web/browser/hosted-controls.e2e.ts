@@ -24,6 +24,11 @@ for (const path of PAGES) {
 			await expect(own, "the seeded chart's Edit, Duplicate and Delete").toHaveCount(3)
 			await expect(own.first()).toBeEnabled()
 		}
+		// An `aria-pressed` toggle inside an Edit form fills a switched-off field, so it is off too.
+		if (path === "/settings/assumptions/") {
+			const swing = page.getByRole("group", { name: "Fill in a swing" }).getByRole("button")
+			await expect(swing.first()).toBeDisabled()
+		}
 
 		// The same page of the loopback build, with the Edit controls hidden (`?demo=1`): what is on there only reads.
 		const loopback = await context.newPage()
