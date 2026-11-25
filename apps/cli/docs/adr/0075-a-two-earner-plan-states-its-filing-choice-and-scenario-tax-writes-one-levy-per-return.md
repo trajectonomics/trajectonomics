@@ -57,7 +57,7 @@ The owner decided on 2026-11-23 that a plan with two earners chooses its filing:
 What each reader does with the set:
 - `projection run` adds `levy` and `filer` to each `taxYears[]` entry **only for a plan with Filers**. A plan without them, which includes every plan today, keeps its output byte for byte.
 - `projection allowances` (ADR-0061) answers per Return.
-- `--carry-in` takes one record per Levy, as it already does. A Filer Levy's classes are its Filer labels: 29 per Filer plus 29 under `@shared`, where a Levy today has 29.
+- `--carry-in` takes one record per Levy, as it already does. A Filer Levy's classes are its Filer labels: 29 per Filer plus the 22 income classes under `@shared`, where a Levy today has 29 (corrected in #508 below).
 - ADR-0066's rule that keeps the profile while the written Levy is canonically equal applies to the whole set. The profile is kept only if every CLI-written Levy is equal.
 
 **What the other choice would cost may be shown, never chosen.** A later step may add a note to a two-earner tax year saying what the other method would owe, computed by running a fork with the other status. A per-year choice (s.57 sexies para 4) is also a later step.
@@ -79,3 +79,25 @@ What each reader does with the set:
 - The store schema does not move. `returns` is an optional key inside an existing JSON column.
 - `traj schema` publishes the person-qualified allowance flags, and `scenario show` prints `returns`.
 - The Dashboard's tax pages read per-Return figures (web step, #343).
+
+## Amended (#508): step 4a, the joint Return
+
+The first build writes one Levy `th-2026-pit` over the Filers of a `married_joint` Return and nothing else of this ADR. The Levy's id, `TAX_LEVY_ID`, stays one id, so `taxLevyIds` and every reader of the set, `projection run`'s `filer` field, `returns`, per-person flags and Prepayment re-pointing wait for step 4b.
+
+- **When Filers are written.** `--filing-status married_joint`, a household with a `partner`, and at least one Owner whose Flow or Account the document still holds. Any other plan, including every plan today, writes bare labels, one Levy and the stored profile as before; `married_separate` is among them until 4b. The Filers are the holder and the partner, in that order, each only if a taxed item is theirs or `shared`; a `shared` item gives both. A plan with no taxed item at all has no Filers and fails as it does today.
+- **What is taxed.** A Flow of kind income or contribution whose label is one tax-core reads, and an asset Account's `returnLabel`, `gainLabel` and `payout.label`. The CLI adds the suffix to the bare label (`income.section40_1@me`) from the Owner of `flows.<id>` or `accounts.<id>`, and takes a suffix off again before it reads a label back, so a write is idempotent, and a write under another status, or `--none`, leaves the bare labels. An employer's share carries no label, so it needs no Owner.
+- **An Account's label is written after the Levy.** The document refuses a label with no Levy (`LEVY_REQUIRED`), so an Account's `returnLabel` is stated after `scenario tax`, as a bare label, and `scenario tax --from-stored` writes its suffix. `scenario household`, `apply` and `fork --set` do not write or check suffixes in this step, so after changing the Owners, run `scenario tax --from-stored`; filling and refusing a suffix from them (ADR-0076) is a later step. `--none` is refused, as today, while an Account's label still needs the Levy.
+- **The result.** `scenario tax` lists `filers` when it wrote any, and states nothing new otherwise, so a plan without Filers prints the bytes it printed.
+- **Carry-in classes.** The Thai Levy of two Filers tallies 29 classes per Filer (22 income, 7 allowance) and only the 22 income classes under `@shared`, 80 in all, and one Filer gives 29 + 22 = 51. #508 first said 29 under `@shared`; an allowance is a person's own, and `thLevyTalliesFor` lists no shared allowance class. The classes come from the Levy's own measures, so `--carry-in` and its refusals need no CLI change beyond the description.
+
+Both new refusals are `invalid_input`, exit code 2:
+
+| Path | When | Details |
+|---|---|---|
+| `--filing-status` | a Filer's person id is not 1 to 32 lowercase letters, digits or hyphens | `field` (`people.<n>.id`) and `person`; the hint names `scenario household` |
+| `document` | a taxed Flow or Account has no Owner, in a plan with a partner and Owners | `items` (`flows.<id>`, `accounts.<id>`); the hint names the `owners` form |
+
+An id tax-core would refuse is found by asking `thFilerLabel`, so the pattern lives in one place. A person without income is never a Filer, so an unfit id of theirs is not refused.
+
+**Hand check, pinned in `projection run`'s tests.** Salaries of 1,000,000 and 500,000 baht, two Owners, joint:
+assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowances 60,000 + 60,000 = 120,000; taxable 1,180,000; tax 0 + 7,500 + 20,000 + 37,500 + 50,000 + 45,000 = 160,000. The Levy over one label capped the couple at 100,000 of expenses: taxable 1,280,000, tax 185,000.

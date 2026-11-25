@@ -1,16 +1,12 @@
 import { emitThLevy } from "@trajectonomics/core/tax/th"
 import { type AppError, fail, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
+import { withoutFilerLabels } from "./filer-labels"
+import { filerScopeOf, withFilerLabels } from "./filer-scope"
 import type { TaxRequest } from "./flags"
 import { type JsonRecord, records } from "./json"
-import {
-	type FlowLabel,
-	mislabelledContributions,
-	TAX_CONTRIBUTION_LABELS,
-	TAX_INCOME_LABELS,
-	unlabelledIncome,
-	withFlowLabels,
-} from "./labels"
+import { labelRefusal } from "./label-refusal"
+import { type FlowLabel, withFlowLabels } from "./labels"
 
 /** The Levy id the CLI writes, and the one whose jurisdictions its notes may name. */
 export const TAX_LEVY_ID: string = "th-2026-pit"
@@ -20,8 +16,11 @@ export function leviesOf(document: ScenarioDocument): JsonRecord[] {
 	return records(document["levies"])
 }
 
-/** The Levy this build would write for a request; `AppError` when tax-core refuses the profile. */
-function levyOf(request: TaxRequest): JsonRecord | AppError {
+/**
+ * The Levy this build would write for a request, over the Filers of a joint Return when it has
+ * them; `AppError` when tax-core refuses the profile.
+ */
+function levyOf(request: TaxRequest, filers?: readonly string[]): JsonRecord | AppError {
 	if (request.jurisdiction !== "th-2026") {
 		return fail("invalid_input", {
 			message: `--tax ${request.jurisdiction} is not a jurisdiction this build applies.`,
@@ -48,6 +47,7 @@ function levyOf(request: TaxRequest): JsonRecord | AppError {
 				donation1x: request.allowances.donation1x,
 			},
 			levy: { id: TAX_LEVY_ID },
+			...(filers === undefined ? {} : { filers }),
 		})
 		return levy as unknown as JsonRecord
 	} catch (error) {
@@ -58,44 +58,35 @@ function levyOf(request: TaxRequest): JsonRecord | AppError {
 	}
 }
 
-/** The refusal for a document whose Flows tax-core would tally as nothing, or `null` when it is clear. */
-function labelRefusal(document: ScenarioDocument): AppError | null {
-	const unlabelled = unlabelledIncome(document)
-	if (unlabelled.length > 0) {
-		return fail("invalid_input", {
-			message: `With --tax, every income Flow needs a label from @trajectonomics/core/tax/th; ${
-				unlabelled.length === 1 ? "one Flow has" : `${unlabelled.length} Flows have`
-			} none this build recognises, so tax on them would be zero.`,
-			path: "document",
-			details: { flows: unlabelled, labels: TAX_INCOME_LABELS },
-		})
-	}
-	if (mislabelledContributions(document).length > 0) {
-		return fail("invalid_input", {
-			message:
-				"A contribution Flow carries a label tax-core does not read, so a retirement allowance would be silently missing.",
-			path: "document",
-			details: { flows: mislabelledContributions(document), labels: TAX_CONTRIBUTION_LABELS },
-		})
-	}
-	return null
-}
+/** What a tax write puts in the document: the Levy and labels, and the Filers when it has any. */
+export type TaxLevyWritten = { document: ScenarioDocument; filers?: string[] }
 
 /**
  * The document with this build's tax Levy written in place of any it already held. Re-applying is
  * how a caller changes the profile, so the old Levy is replaced rather than treated as a conflict.
+ * A household with a partner and Owners makes a joint Return one Levy over two Filers, and the
+ * Flows' labels take their Owner's Filer suffix (cli ADR-0075).
  */
 export function withTaxLevy(
 	document: ScenarioDocument,
 	request: TaxRequest,
 	labels: readonly FlowLabel[],
-): ScenarioDocument | AppError {
-	const levy = levyOf(request)
-	if (isAppError(levy)) return levy
-	const labelled = withFlowLabels(document, labels)
-	if (isAppError(labelled)) return labelled
-	const refused = labelRefusal(labelled)
+	household: string | null = null,
+): TaxLevyWritten | AppError {
+	const bareLevy = levyOf(request)
+	if (isAppError(bareLevy)) return bareLevy
+	const stated = withFlowLabels(withoutFilerLabels(document), labels)
+	if (isAppError(stated)) return stated
+	const refused = labelRefusal(stated)
 	if (refused !== null) return refused
+	const scope = filerScopeOf(household, stated, request.filingStatus)
+	if (isAppError(scope)) return scope
+	const levy = scope === null ? bareLevy : levyOf(request, scope.filers)
+	if (isAppError(levy)) return levy
+	const labelled = scope === null ? stated : withFilerLabels(stated, scope)
 	const kept = leviesOf(labelled).filter((it) => it["id"] !== TAX_LEVY_ID)
-	return { ...labelled, levies: [...kept, levy] }
+	return {
+		document: { ...labelled, levies: [...kept, levy] },
+		...(scope === null ? {} : { filers: scope.filers }),
+	}
 }

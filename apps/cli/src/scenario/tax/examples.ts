@@ -13,6 +13,12 @@ export const taxExamples: Example[] = [
 	},
 	{
 		command:
+			"traj scenario tax couple --tax th-2026 --filing-status married_joint --label salary=income.section40_1 --label partner-salary=income.section40_1",
+		description:
+			"File jointly with the household's Owners: one Levy over both people, each with their own expense ceiling.",
+	},
+	{
+		command:
 			"traj scenario tax base --tax th-2026 --filing-status married_no_income_spouse --life-insurance 20000 --mortgage-interest 30000 --social-security 9000 --donation1x 5000 --label salary=income.section40_1",
 		description: "The same Levy with the deductions a Thai employee usually has.",
 	},

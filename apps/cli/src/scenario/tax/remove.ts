@@ -1,4 +1,5 @@
 import type { ScenarioDocument } from "../document"
+import { withoutFilerLabels } from "./filer-labels"
 import { isRecord, type JsonRecord, records } from "./json"
 import { TAX_CONTRIBUTION_LABELS, TAX_INCOME_LABELS } from "./labels"
 import { leviesOf, TAX_LEVY_ID } from "./levy"
@@ -55,9 +56,10 @@ export function withoutTaxLevy(document: ScenarioDocument): ScenarioDocument | n
 	if (kept.length === levies.length) return null
 	const stillRead = tallyLabelsOf(kept)
 	const taxLabels = new Set([...TAX_INCOME_LABELS, ...TAX_CONTRIBUTION_LABELS])
+	const bare = withoutFilerLabels(document)
 	const next: ScenarioDocument = {
-		...document,
-		flows: records(document["flows"]).map((flow) =>
+		...bare,
+		flows: records(bare["flows"]).map((flow) =>
 			unPrepaid(unlabelled(flow, stillRead, taxLabels), TAX_LEVY_ID),
 		),
 	}
