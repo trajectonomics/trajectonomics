@@ -253,7 +253,7 @@ Whether a result's figures include income tax: `applied`, `not_applied`, or `mix
 _Avoid_: Taxed, pre-tax, after-tax (as a status)
 
 **Filing choice**:
-Whether a plan with two earners files jointly (`married_joint`, one Tax Levy) or separately (`married_separate`, one Tax Levy per earner). It is the `--filing-status` the plan states; the CLI never picks it (ADR-0075).
+Whether a plan with two earners files jointly (`married_joint`, one Tax Levy) or separately (`married_separate`, one Tax Levy per spouse who has labelled income, once the household has a partner and Owners; otherwise one Tax Levy, as before). It is the `--filing-status` the plan states; the CLI never picks it (ADR-0075).
 _Avoid_: Tax mode, filing option, cheapest filing
 
 **Carry-in**:

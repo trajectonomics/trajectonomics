@@ -83,7 +83,7 @@ One income tax computation filed by one taxpayer, or by a married couple filing 
 _Avoid_: Filing, tax form, declaration
 
 **Filer**:
-A person whose income a Return holds, named by an id the caller chooses. A joint Return has two Filers; a single or separate Return has one (ADR 0009).
+A person whose income a Return holds, named by an id the caller chooses (`[a-z0-9-]{1,32}`, never `shared`). A joint Return has one or two Filers; a single or separate Return has one (ADR 0009).
 _Avoid_: Taxpayer id, spouse slot, owner
 
 **Filer label**:
