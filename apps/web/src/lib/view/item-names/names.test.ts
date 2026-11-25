@@ -17,6 +17,23 @@ const HOUSEHOLD: HouseholdDocument = {
 const ACCOUNTS = new Map([["acct-1", "Bank"]])
 const NAMES = itemNames(ACCOUNTS, HOUSEHOLD)
 
+const DOCUMENT = {
+	currency: "THB",
+	accounts: [],
+	flows: [
+		{
+			id: "salary",
+			kind: "income" as const,
+			frequency: "monthly" as const,
+			start: "2026-01-01",
+			displayLabel: "Salary",
+		},
+		{ id: "rent", kind: "expense" as const, frequency: "monthly" as const, start: "2026-01-01" },
+	],
+	milestones: [{ id: "car-paid-off", displayLabel: "Car paid off" }],
+}
+const LABELLED = itemNames(ACCOUNTS, HOUSEHOLD, DOCUMENT)
+
 describe("a person is called by the role the household states", () => {
 	test("the holder is You, a partner is Your partner, and a dependent is its relation", () => {
 		expect(itemLabel(NAMES, "person", "me")).toEqual({ text: "You", named: true })
@@ -51,6 +68,28 @@ describe("an id no Read names shows as the id", () => {
 			text: "car-paid-off",
 			named: false,
 		})
+	})
+
+	test("a Flow and a Milestone show the label the document states, and the id when it states none", () => {
+		expect(itemLabel(LABELLED, "flow", "salary")).toEqual({ text: "Salary", named: true })
+		expect(itemLabel(LABELLED, "milestone", "car-paid-off")).toEqual({
+			text: "Car paid off",
+			named: true,
+		})
+		expect(itemLabel(LABELLED, "flow", "rent")).toEqual({ text: "rent", named: false })
+		expect(itemLabel(LABELLED, "milestone", "unknown")).toEqual({
+			text: "unknown",
+			named: false,
+		})
+	})
+
+	test("a person's displayLabel wins over the role words", () => {
+		const household: HouseholdDocument = {
+			...HOUSEHOLD,
+			people: [{ ...HOUSEHOLD.people[0]!, displayLabel: "Somchai" }],
+		}
+		const names = itemNames(ACCOUNTS, household)
+		expect(itemLabel(names, "person", "me")).toEqual({ text: "Somchai", named: true })
 	})
 
 	test("an Account is named by the ledger, and one only the plan has shows as the id", () => {

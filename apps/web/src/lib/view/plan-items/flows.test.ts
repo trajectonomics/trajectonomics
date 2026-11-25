@@ -135,6 +135,7 @@ describe("flowDraftOf", () => {
 	test("starts a new Flow monthly, following inflation and earned", () => {
 		expect(flowDraftOf()).toEqual({
 			category: "",
+			displayLabel: "",
 			name: "",
 			frequency: "monthly",
 			start: "",

@@ -1,11 +1,13 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdPerson } from "../../contract"
-import { type PersonDraft, personDraftOf, personFromDraft } from "./person-draft"
+import { type PersonDraft, personDraftOf } from "./person-draft"
+import { personFromDraft } from "./person-save"
 
 const holder: HouseholdPerson = { id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 }
 
 const draft = (change: Partial<PersonDraft> = {}): PersonDraft => ({
 	name: "Partner",
+	displayLabel: "",
 	role: "partner",
 	relation: "",
 	born: "1992-02",
@@ -15,6 +17,27 @@ const draft = (change: Partial<PersonDraft> = {}): PersonDraft => ({
 })
 
 describe("personFromDraft", () => {
+	test("saves the display label trimmed, and leaves it out when the field is empty", () => {
+		const labelled = personFromDraft(draft({ displayLabel: "  Somchai  " }), { taken: ["me"] })
+		expect(labelled.ok && labelled.person.displayLabel).toBe("Somchai")
+		const bare = personFromDraft(draft(), { taken: ["me"] })
+		expect(bare.ok && bare.person).not.toHaveProperty("displayLabel")
+	})
+
+	test("refuses a display label over 80 characters at its field", () => {
+		const result = personFromDraft(draft({ displayLabel: "a".repeat(81) }), { taken: [] })
+		expect(result.ok === false && result.problems["displayLabel"]).toContain(
+			"at most 80 characters",
+		)
+	})
+
+	test("refuses an invisible or bidirectional character at its field", () => {
+		const result = personFromDraft(draft({ displayLabel: "Somchai\u202e" }), { taken: [] })
+		expect(result.ok === false && result.problems["displayLabel"]).toContain(
+			"invisible or bidirectional",
+		)
+	})
+
 	test("a new partner takes an id from the name, and states the month they join", () => {
 		expect(personFromDraft(draft(), { taken: ["me"] })).toEqual({
 			ok: true,

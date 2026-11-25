@@ -69,4 +69,17 @@ describe("the scenario contract against the CLI's goldens", () => {
 		const wrong = { scenario: { ...body.scenario, extra: 1 } }
 		expect(scenarioShow.safeParse(wrong).success).toBe(false)
 	})
+
+	it("keeps a Milestone's keys in the CLI's order, so a parsed document serializes as the CLI wrote it", async () => {
+		const body = (await golden("show-main.output")) as {
+			scenario: { document: Record<string, unknown> }
+		}
+		const milestone = { combine: "all", criteria: [], id: "condo" }
+		const document = { ...body.scenario.document, milestones: [milestone] }
+		const parsed = scenarioShow.parse({ scenario: { ...body.scenario, document } })
+		const written = JSON.parse(JSON.stringify(parsed.scenario.document)) as {
+			milestones: Record<string, unknown>[]
+		}
+		expect(Object.keys(written.milestones[0] ?? {})).toEqual(Object.keys(milestone))
+	})
 })

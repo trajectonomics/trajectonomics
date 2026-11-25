@@ -2,6 +2,7 @@
 export const FULL_MILESTONES: unknown[] = [
 	{
 		id: "retire",
+		displayLabel: "Retirement",
 		combine: "any",
 		criteria: [
 			{ id: "when", kind: "date", on: "2045-01-01" },

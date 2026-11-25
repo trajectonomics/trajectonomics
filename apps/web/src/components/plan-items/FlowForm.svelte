@@ -56,6 +56,7 @@ let problems: Problems = $state({})
 let cleared: string[] = $state([])
 const FIELDS = [
 	"name",
+	"displayLabel",
 	"amount",
 	"frequency",
 	"start",

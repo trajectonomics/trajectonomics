@@ -15,6 +15,7 @@ export const TAIL = [
 	"TRANSFER_FROM_ILLIQUID",
 	"TRANSFER_FROM_LIABILITY",
 	"TRANSFER_SAME_ACCOUNT",
+	"INVALID_LABEL",
 	/** Found at run time, not by `check()`: a value left the safe integer range. */
 	"VALUE_OVERFLOW",
 ] as const
