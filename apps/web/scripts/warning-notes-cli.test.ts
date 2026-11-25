@@ -10,7 +10,7 @@ import { makeScratch, removeScratch } from "./scratch"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
 const BINARY = fileURLToPath(new URL("../../cli/dist/traj", import.meta.url))
-/** Building the scratch ledger with eight traj calls takes seconds, but the runner may be slow. */
+/** Building the scratch ledger takes about a dozen traj calls and seconds, but the runner may be slow. */
 const SLOW_MS = 180_000
 
 let scratch = ""
@@ -139,7 +139,7 @@ describe("the warning matcher against the real traj notes", () => {
 		)
 		// A salary that funds a small Contribution, for the compare whose side B cannot fund a large one.
 		store("funded", base({ flows: [salary, invest("1.00")], contribute: [vault] }))
-		// This build's Thai Levy, whose 2025 period settled before the As-of ends.
+		// This build's Thai Levy: the CLI completes the earlier period with its own scope record, so it says tax before 2026 is not recomputed.
 		store("taxed", base({ flows: [salary] }))
 		traj(["scenario", "tax", "taxed", "--tax", "th-2026", "--label", "salary=income.section40_1"])
 	}, SLOW_MS)
