@@ -233,12 +233,12 @@ shared interest is stated, the result's `assumptions` say the loans are taken to
 separate. `--merge` and `--from-stored` keep the stored `returns` and
 `sharedMortgageInterest`, and `--merge` to `married_joint` keeps the partner's Return and
 the shared interest for a later switch back; a joint Return claims neither, so state its
-interest bare. A write that claims neither says so in its `assumptions`, on
-`allowances.mortgageInterestCeiling`. The stored profile's `claimsHolder` says whose
-claims its other keys are, so if the household swaps which person is the holder, each
-person's claims stay theirs. A `projection run` then reports a `filer` on each `taxYears`
-entry, `--carry-in` takes one record per Levy, and `projection allowances` answers per
-Return.
+interest bare. A write that claims neither says so in `unclaimed`, with how to claim them,
+and a separate filing names there each person who has stored claims and no taxed income.
+The stored profile's `claimsHolder` says whose claims its other keys are, so if the
+household swaps which person is the holder, each person's claims stay theirs. A
+`projection run` then reports a `filer` on each `taxYears` entry, `--carry-in` takes one
+record per Levy, and `projection allowances` answers per Return.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,

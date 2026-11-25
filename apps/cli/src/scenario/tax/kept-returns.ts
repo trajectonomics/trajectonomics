@@ -3,7 +3,7 @@ import type { FilerScope } from "./filer-scope"
 import type { ReturnClaims, TaxRequest } from "./flags"
 
 /** Whether a Return claims nothing, so leaving it out loses no figure. */
-function claimsNothing(claims: ReturnClaims): boolean {
+export function claimsNothing(claims: ReturnClaims): boolean {
 	const counts = [claims.children, claims.childrenAtHigherRate]
 	return [...counts, ...ALLOWANCE_FLAGS.map((field) => claims.allowances[field])].every(
 		(value) => value === 0,

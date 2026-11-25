@@ -13,6 +13,7 @@ export type TaxOutputView = {
 	filers?: string[] | undefined
 	allowances?: TaxProfileView | undefined
 	assumptions?: AssumptionView[] | undefined
+	unclaimed?: string[] | undefined
 	scenario: WrittenScenario
 }
 
@@ -60,7 +61,13 @@ export const taxOutput: z.ZodType<TaxOutputView> = z.strictObject({
 	assumptions: assumptionsField
 		.optional()
 		.describe(
-			"The tax figures the stored Levies would use whose source is not yet confirmed, for the labels the Scenario's Flows carry; absent when --none wrote no Levy. A Projection's `taxYears` say which year used which. Where two separate Returns each state home-loan interest, both own a loan and no interest is stated as shared (--mortgage-interest shared=), the ceiling's note says each Return's interest is taken to be on separate loans. Where the write is not a separate filing with Filers and the stored profile keeps shared interest or another person's claims, the ceiling's note says this Return does not claim them, and the ceiling is listed for it even if the Levy claims no home-loan interest.",
+			"The tax figures the stored Levies would use whose source is not yet confirmed, for the labels the Scenario's Flows carry; absent when --none wrote no Levy. A Projection's `taxYears` say which year used which. Where two separate Returns each state home-loan interest, both own a loan and no interest is stated as shared (--mortgage-interest shared=), the ceiling's note says each Return's interest is taken to be on separate loans.",
+		),
+	unclaimed: z
+		.array(z.string())
+		.optional()
+		.describe(
+			"Claims the stored profile keeps that no Return of this write claims, one sentence each; absent when there are none, and when --none wrote no Levy. A write that is not a separate filing with Filers names the shared home-loan interest and the other people's claims it keeps. A separate filing with Filers names each person with stored claims and no taxed income.",
 		),
 	scenario: writtenScenario,
 })

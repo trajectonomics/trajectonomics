@@ -25,6 +25,8 @@ export type TaxWritten = {
 	filers?: string[] | undefined
 	/** The unconfirmed tax figures the stored Levy would use; absent when --none wrote no Levy. */
 	assumptions?: AssumptionView[] | undefined
+	/** What the stored profile keeps that no Return of this write claims; absent when there is nothing. */
+	unclaimed?: string[] | undefined
 	scenario: WrittenScenario
 }
 
@@ -64,7 +66,8 @@ function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scena
 		...(only !== undefined && made.levies.length === 1 ? { levy: only } : { levies: made.levies }),
 		...(made.filers === undefined ? {} : { filers: made.filers }),
 		allowances: taxProfileOf(made.request, made.document),
-		assumptions: taxAssumptionsOf(made.document, made.ceilingNotes),
+		assumptions: taxAssumptionsOf(made.document, made.separateLoans),
+		...(made.unclaimed.length === 0 ? {} : { unclaimed: made.unclaimed }),
 	}
 }
 

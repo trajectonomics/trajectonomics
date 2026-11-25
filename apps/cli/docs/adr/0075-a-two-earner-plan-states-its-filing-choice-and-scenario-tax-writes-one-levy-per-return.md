@@ -255,3 +255,26 @@ This is the follow-up the shared home-loan ceiling left above.
   Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
   2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
   the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.
+
+## Amended (2026-11-26): claims a write keeps and does not claim have their own field (#627)
+
+This replaces "What a Return does not claim is said" above, whose entry under `assumptions` read as if
+the Return used the home-loan ceiling.
+
+- **The field.** The `scenario tax` write result gains an optional `unclaimed`, a list of sentences. It
+  is absent when there is nothing to say, and with `--none`, rather than an empty list, so a plan that
+  never had Filers prints the same bytes as before. The human Format prints it under "Claims stored but
+  not claimed on this Return:", before the assumptions.
+- **`assumptions` are tax-core's figures only.** No sentence about a kept claim is on an entry, and no
+  entry is added to carry one, so a Return that claims no home-loan interest no longer lists the
+  ceiling. The separate-loans note stays on the ceiling's entry, because it says how a figure the
+  Returns use was applied.
+- **A write that is not a separate one with Filers** names the shared interest the profile keeps, then
+  the other people whose claims it keeps, in the sentences it used before. The second now ends "To
+  claim them on this Return, state them bare with --merge." A later separate write that then states
+  more than a Return may claim, such as three parents, is refused.
+- **A separate write with Filers** says, for each person who has no Return and whose stored claims are
+  not all zero: `"<person>" has no taxed income in this plan, so no Return claims their stored claims.`
+  This covers every such entry of `returns`, an earlier partner's included, and also the holder, whose
+  claims the profile keeps in its flat keys when the partner is the only Filer.
+- The stored profile, the Levies and the money are unchanged.

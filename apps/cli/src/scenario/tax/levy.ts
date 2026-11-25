@@ -1,6 +1,5 @@
 import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
-import { unclaimedNotes } from "./ceiling-notes"
 import { holderIdOf } from "./couple"
 import { leviesFor } from "./emitter"
 import { withoutFilerLabels } from "./filer-labels"
@@ -15,7 +14,8 @@ import { personRefusal } from "./person-refusals"
 import { joinedPrepayments } from "./prepayments-join"
 import { pointedPrepayments } from "./prepayments-point"
 import { separateRefusal } from "./separate-check"
-import { assumesSeparateLoans, SEPARATE_LOANS_NOTE } from "./separate-loans"
+import { assumesSeparateLoans } from "./separate-loans"
+import { unclaimedClaims } from "./unclaimed"
 
 export {
 	filerOfTaxLevy,
@@ -35,8 +35,10 @@ export type TaxLevyWritten = {
 	levies: string[]
 	/** The Filers of the Return the Levies are written for; absent for a plan that keeps bare labels. */
 	filers?: string[]
-	/** What the write says on the home-loan ceiling: what it assumed, or what its Return leaves out. */
-	ceilingNotes: string[]
+	/** Whether each Return's home-loan interest was taken to be on separate loans. */
+	separateLoans: boolean
+	/** What the kept profile holds that no Return of this write claims, one sentence each. */
+	unclaimed: string[]
 }
 
 /** The document with each taxed item labelled for its Owner and each Prepayment pointed at its Levy. */
@@ -72,12 +74,12 @@ export function withTaxLevy(
 	const next = decorated(stated, scope)
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	const kept = keptRequest(request, scope, holderIdOf(household))
-	const assumed = assumesSeparateLoans(request, scope, stated) ? [SEPARATE_LOANS_NOTE] : []
 	return {
 		document: { ...next, levies: [...others, ...built] },
 		request: kept,
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
-		ceilingNotes: [...assumed, ...unclaimedNotes(kept, scope)],
+		separateLoans: assumesSeparateLoans(request, scope, stated),
+		unclaimed: unclaimedClaims(request, kept, scope),
 	}
 }
