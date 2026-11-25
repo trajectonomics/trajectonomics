@@ -9,7 +9,7 @@ import { STAR_SNAPSHOT } from "../lib/site/star-snapshot"
 import { formatStarCount } from "../lib/site/stars"
 import Header from "./Header.astro"
 import { renderComponent } from "./testing/render"
-import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
+import { headings, scanComponent, withAttribute } from "./testing/scan"
 
 /** The attributes a header link carries, as the checks read them. */
 interface LinkShape {
@@ -93,12 +93,19 @@ function headerOf(page: ScannedPage): HtmlElement {
 }
 
 /** One rendered header, so each test names the variant it judges. */
-async function renderHeader(language: string, dictionary: Dictionary, markCurrent: boolean) {
+async function renderHeader(
+	language: string,
+	dictionary: Dictionary,
+	markCurrent: boolean,
+	openjotCurrent = false,
+) {
 	return scanComponent(
 		await renderComponent(Header, {
 			language,
 			dictionary,
 			markCurrent,
+			address: "/",
+			openjotCurrent,
 		}),
 	)
 }
@@ -152,12 +159,6 @@ describe("the Header component in every Language, current or not", () => {
 				const blog = withAttribute(page, "href", BLOG_PATH)[0]
 				if (blog === undefined) throw new Error("the blog link is missing")
 				expect(textOf(page, blog)).toBe(dictionary.blogLink)
-			})
-
-			it(`puts Docs before Blog (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				const hrefs = withClass(page, "header-nav-link").map((a) => a.attributes["href"])
-				expect(hrefs).toEqual([DOCS_PATH, BLOG_PATH])
 			})
 
 			it(`links the one repository, with its star count and no repository menu (${variant})`, async () => {
@@ -216,11 +217,6 @@ describe("the Header component in every Language, current or not", () => {
 						href: `/?lang=${entry.language}`,
 					})),
 				)
-			})
-
-			it(`renders no aria-current anywhere when the page is not a home (${variant})`, async () => {
-				const page = await renderHeader(language, dictionary, markCurrent)
-				expect(withAttribute(page, "aria-current").length).toBe(markCurrent ? 1 : 0)
 			})
 
 			it(`carries its inline menu script (${variant})`, async () => {

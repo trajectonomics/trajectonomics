@@ -1,6 +1,6 @@
 # Site
 
-The public page at the root of trajectonomics.com, in Thai and English. The router mounts it at `/`. The Docs Portal is `docs.trajectonomics.com`; `trajectonomics.com/docs` redirects there.
+The public pages at the root of trajectonomics.com, in Thai and English: the home at `/` and OpenJot's page at `/openjot/`. The router mounts the Site at `/`. The Docs Portal is `docs.trajectonomics.com`; `trajectonomics.com/docs` redirects there.
 
 ## Language
 
@@ -49,8 +49,23 @@ The page a Language's build writes. English's home is the Site's one address, `/
 _Avoid_: Language page, variant
 
 **Clean URL**:
-The one address the Site answers, `https://trajectonomics.com/`, with no Language segment. It is what a visitor copies, and what the canonical, the `x-default` alternate, the Sitemap and the Answer engine files name.
+The one address a page is served at, `https://trajectonomics.com/` for the home and
+`https://trajectonomics.com/openjot/` for OpenJot, with no Language segment. It is what a visitor
+copies, and what the canonical, the `x-default` alternate, the Sitemap and the Answer engine files
+name.
 _Avoid_: Bare URL, root URL, landing URL
+
+**Page address**:
+One of the paths the Site's Worker answers itself: `/` or `/openjot/`. Each pairs the address with
+the function that resolves its built file for a Language, and each is answered in the resolved
+Language with the same cache and consent contract.
+_Avoid_: Route, page path, mount
+
+**OpenJot page**:
+OpenJot's landing page on the Site, at `/openjot/` ([ADR 0032](docs/adr/0032-the-site-serves-openjot-at-openjot.md)).
+It is built at `openjot/` and `th/openjot/`, served at one address by the Worker, and its download
+leaves for the OpenJot Worker's `/download` short link.
+_Avoid_: App page, OpenJot site, second landing page
 
 **Language build path**:
 The path a Language's home is written to in the build: `/` for English, `th/` for Thai. It is not an address: the Worker serves Thai at `/`, and `/th` answers 301.
@@ -73,7 +88,9 @@ The strings for one Language. Every Language has the same keys.
 _Avoid_: Translation file, messages, catalog
 
 **Worker with Static Assets**:
-The Site's Worker that serves the built files. Its script answers `/` in the resolved Language, stores the Language choice when a visitor picks one, redirects the old per-Language prefixes to `/`, and hands every other path to the assets binding.
+The Site's Worker that serves the built files. Its script answers each page address in the resolved
+Language, stores the Language choice when a visitor picks one, redirects the old per-Language
+prefixes to `/`, and hands every other path to the assets binding.
 _Avoid_: Assets Worker, site server, hosting
 
 **Not-found page**:
@@ -131,7 +148,9 @@ A built file a crawler reads at the assets root rather than a page: the Sitemap 
 _Avoid_: SEO file, metadata file, static asset
 
 **Sitemap**:
-The Crawler file at `/sitemap.xml`: one `<url>` for the Clean URL, naming `x-default` at that address, which is also what the IndexNow payload submits. It lists only the Site's address. The Docs Portal publishes its own sitemap on `docs.trajectonomics.com`.
+The Crawler file at `/sitemap.xml`: one `<url>` per page address, each naming `x-default` at that
+same address, which is also what the IndexNow payload submits. It lists only the Site's addresses.
+The Docs Portal publishes its own sitemap on `docs.trajectonomics.com`.
 _Avoid_: URL list, page index
 
 **Robots file**:
@@ -159,11 +178,19 @@ The Open Graph and X meta a share sheet renders for a page: its title, descripti
 _Avoid_: Preview card, OG tags
 
 **Share image**:
-The 1200 × 630 PNG a Language home advertises as `og:image`: the Language's value statement, the brand lockup and the host, painted in the shipped Theme's colours and written to `public/og/<language>.png` by `scripts/share-image.ts` before every build. It is generated and never committed, and it is no page subresource, so no page budget counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.md)).
+The 1200 × 630 PNG a page advertises as `og:image`: the page's value statement, the brand lockup and
+the host, painted in the shipped Theme's colours and written to `public/og/<name>.png` by
+`scripts/share-image.ts` before every build (`<language>.png` for a home, `openjot-<language>.png`
+for OpenJot). It is generated and never committed, and it is no page subresource, so no page budget
+counts it ([ADR 0017](docs/adr/0018-the-share-image-is-generated-at-build-time.md)).
 _Avoid_: OG image, thumbnail, preview picture
 
 **Structured data**:
-The JSON-LD block a page carries, naming the `WebSite`, the `Organization` that publishes it with its `logo` and `sameAs`, and `traj` as a free `SoftwareApplication`. It states only what the page or the repository states, and never a rating, so it is data and outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md), [ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
+The JSON-LD block a page carries, naming the `WebSite`, the `Organization` that publishes it with its
+`logo` and `sameAs`, and traj as a free `SoftwareApplication` on the home or OpenJot as a
+`MobileApplication`. It states only what the page or the repository states, and never a rating, so it
+is data and outside the Program JavaScript budget ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md),
+[ADR 0017](docs/adr/0017-crawlers-and-answer-engines-read-the-same-facts.md)).
 _Avoid_: Schema, schema.org markup, metadata blob
 
 **Page weight budget**:

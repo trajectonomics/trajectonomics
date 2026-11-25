@@ -4,15 +4,17 @@
 	"compatibility_date": "2026-11-01",
 	// The custom domain serves the Site; the *.workers.dev copy stays off (trajectonomics/infra#82).
 	"workers_dev": false,
-	// The one script the Site has: `/` in the resolved Language, the choice link, the old prefixes (ADR 0020).
+	// The one script the Site has: each page address in the resolved Language, the choice link, the old
+	// prefixes (ADR 0020). OpenJot's address is answered by the same script (ADR 0032).
 	"main": "src/worker/index.ts",
 	// No "routes": the router attaches the public route, not this repository.
 	// No "env": there is no staging Worker yet, so deployment is a later change.
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS",
-		// The address, its choice link and the old prefixes need the script; every other path is an asset.
-		"run_worker_first": ["/", "/en", "/en/*", "/th", "/th/*"],
+		// Each address, its choice link and the old prefixes need the script; every other path is an asset.
+		// `/openjot` without the slash is listed too, so the Worker can send it to `/openjot/`.
+		"run_worker_first": ["/", "/en", "/en/*", "/th", "/th/*", "/openjot", "/openjot/"],
 		"html_handling": "auto-trailing-slash",
 		"not_found_handling": "404-page"
 	}

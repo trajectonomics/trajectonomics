@@ -78,6 +78,12 @@ export const DOCS_CLI_INSTALL_PATH = `${DOCS_ORIGIN}/cli/installation/`
 export const DEMO_PATH = "/demo/"
 
 /**
+ * The OpenJot page's one address on the Site: its own build serves it in the resolved Language, and the
+ * header links it (ADR 0032).
+ */
+export const OPENJOT_PATH = "/openjot/"
+
+/**
  * The blog's origin. `apps/blog` builds it, and its Worker serves this host (ADR 0002 in `apps/blog`).
  */
 export const BLOG_ORIGIN = "https://blog.trajectonomics.com"

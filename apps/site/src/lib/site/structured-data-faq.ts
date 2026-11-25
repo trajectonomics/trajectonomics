@@ -1,5 +1,6 @@
 import type { Language } from "../language/language"
 import { dictionaryFor } from "../language/languages"
+import { openJotDictionaryFor } from "../language/openjot-dictionary"
 
 /** One question's Answer: the text the page shows under the question. */
 export interface FaqAnswerNode {
@@ -28,34 +29,51 @@ export interface FaqPageNode {
  * text, so the Structured data carries the same strings unchanged. A string that holds markup would show
  * its tags on the page, so the Dictionary's test rejects one rather than this module stripping it.
  */
-function questionsOf(language: Language): readonly FaqQuestionNode[] {
-	const { faqQuestions, faqAnswers } = dictionaryFor(language)
-	if (faqQuestions.length !== faqAnswers.length) {
-		throw new Error(
-			`the ${language} FAQ pairs ${faqQuestions.length} questions with ${faqAnswers.length} answers`,
-		)
+export function faqQuestions(
+	questions: readonly string[],
+	answers: readonly string[],
+): readonly FaqQuestionNode[] {
+	if (questions.length !== answers.length) {
+		throw new Error(`the FAQ pairs ${questions.length} questions with ${answers.length} answers`)
 	}
 	return Object.freeze(
-		faqQuestions.map((name, index) =>
+		questions.map((name, index) =>
 			Object.freeze({
 				"@type": "Question" as const,
 				name,
 				acceptedAnswer: Object.freeze({
 					"@type": "Answer" as const,
-					text: faqAnswers[index] ?? "",
+					text: answers[index] ?? "",
 				}),
 			}),
 		),
 	)
 }
 
-/** The FAQPage one Language home states: the same questions and answers the page shows, under its URL. */
-export function faqPage(language: Language, url: string): FaqPageNode {
+/** One page's FAQPage: the questions and answers that page shows, under its own URL. */
+export function faqPageFrom(
+	language: Language,
+	url: string,
+	questions: readonly string[],
+	answers: readonly string[],
+): FaqPageNode {
 	return Object.freeze({
 		"@type": "FAQPage",
 		"@id": `${url}#faq`,
 		url,
 		inLanguage: language,
-		mainEntity: questionsOf(language),
+		mainEntity: faqQuestions(questions, answers),
 	})
+}
+
+/** The FAQPage one Language home states: the same questions and answers the page shows, under its URL. */
+export function faqPage(language: Language, url: string): FaqPageNode {
+	const dictionary = dictionaryFor(language)
+	return faqPageFrom(language, url, dictionary.faqQuestions, dictionary.faqAnswers)
+}
+
+/** The FAQPage the OpenJot page states: its own questions and answers, under its own URL. */
+export function openJotFaqPage(language: Language, url: string): FaqPageNode {
+	const dictionary = openJotDictionaryFor(language)
+	return faqPageFrom(language, url, dictionary.faqQuestions, dictionary.faqAnswers)
 }
