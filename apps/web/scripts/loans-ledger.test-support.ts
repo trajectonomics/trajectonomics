@@ -16,7 +16,7 @@ import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
-import { running } from "./loans-running.test-support"
+import { track } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 
 export { SLOW_MS }
@@ -76,13 +76,11 @@ export function editor_(): Editor {
 
 /** Sends one Edit, as the planner does, and returns the answer. */
 export function send(body: Record<string, unknown>): Promise<Answer> {
-	const sent = editor_()
-		.edit(editRequest({}, JSON.stringify(body)), 4321)
-		.then((response) => response.json() as Promise<Answer>)
-	running.add(sent)
-	const forget = () => running.delete(sent)
-	sent.then(forget, forget)
-	return sent
+	return track(
+		editor_()
+			.edit(editRequest({}, JSON.stringify(body)), 4321)
+			.then((response) => response.json() as Promise<Answer>),
+	)
 }
 
 /** An apply-plan Edit of the document over the plan as the ledger holds it now. */

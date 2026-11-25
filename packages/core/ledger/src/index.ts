@@ -10,6 +10,8 @@ export type { Account, AccountInput, AccountType, NormalBalance } from "./accoun
 export { normalBalance, statedAmount } from "./account"
 export { amend } from "./amend"
 export { balance } from "./balance"
+export type { BalanceHistory } from "./balance-history"
+export { balanceHistory } from "./balance-history"
 export type { BalanceRow } from "./balances"
 export { balances } from "./balances"
 export { createChartOfAccounts } from "./chart"
