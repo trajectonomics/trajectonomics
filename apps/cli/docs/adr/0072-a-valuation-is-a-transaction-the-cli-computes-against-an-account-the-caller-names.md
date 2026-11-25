@@ -56,3 +56,18 @@ registry and the contract test. The flag form's fields are optional in the input
 them, so `traj schema` lists none as required for the flag form and the command states a missing one itself (`invalid_input`, at the
 field). The document form's usage line still prints `[account]`, which that form refuses. The Dashboard decodes the result with
 `apps/web/src/lib/contract/account-value.ts`, against goldens the CLI writes.
+
+## Addendum: a later Balance must stay in the safe range (2026-11-25, #499)
+
+A valuation was checked only at its own date, so one could be written that a transaction dated after it pushed past the safe range
+(`90071992547409.91` on 2026-01-01, then a `1.00` Posting on 2026-01-05), and `traj balance` then refused the whole ledger with
+`AMOUNT_OVERFLOW`. A write now refuses before it writes when, once every write of the batch is in, any dated Balance after an entry of
+the valued account or of its `--against` account is outside the safe range. The refusal is `AMOUNT_OVERFLOW` at the entry's `value`
+field (the entry that began the stretch the Balance overflows in), it names the account and the first date that overflows, and a
+batch that refuses writes nothing. Dates the batch's own writes cut apart are checked each against its own total, so a later entry
+of the same batch that brings the Balance back in range is accepted, and an entry that pushes a later Balance over is the one named.
+
+The check keeps the batch's constant cost per entry: the ledger's `balanceHistory` notes the most and least each account's Balance
+reaches from each Posting on, once, the first time it is asked about the account, and answers each stretch from that note; it scans
+a stretch for its first overflowing date only when the note says one could overflow. This is a deliberate refusal the full-rescan
+oracle (`oracle.test-support.ts`) does not make: the equivalence test names it as the one exception and holds every other case equal.

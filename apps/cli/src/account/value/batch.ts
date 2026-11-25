@@ -2,6 +2,14 @@ import { type BalanceHistory, balanceHistory } from "@trajectonomics/core/ledger
 import type { AccountRow, Ledger, NewTransaction } from "../../store"
 import { datedAfter, laterValuations, type StoredValuation } from "./later"
 
+/** One write to an account: its date, what the batch has added to the account by then, and whose it is. */
+export type Step = {
+	readonly account: AccountRow
+	readonly date: string
+	readonly total: bigint
+	readonly index: number
+}
+
 /**
  * A batch being applied: the Ledger it reads, the rows it will write, and what it needs to read a
  * Balance in constant time. The Ledger is read once, and each entry's Balance is that read at the
@@ -17,6 +25,8 @@ export type Batch = {
 	history: BalanceHistory | undefined
 	/** What the entries applied so far added to each account, in Minor Units. */
 	readonly moved: Map<string, bigint>
+	/** Every write to each account, in the order they applied: what `overflows` reads at the end. */
+	readonly steps: Map<string, Step[]>
 	/** The latest date among the entries applied so far. */
 	latest: string
 	readonly later: Map<string, readonly StoredValuation[]>
@@ -35,6 +45,7 @@ export function startBatch(
 		writes: [],
 		history: undefined,
 		moved: new Map(),
+		steps: new Map(),
 		latest: "",
 		later: new Map(),
 	}
@@ -68,8 +79,18 @@ export function laterOf(
 	return datedAfter(own, date)
 }
 
-/** Records what a Posting adds to an account, for the next entry's Balance. */
-export function record(batch: Batch, id: string, date: string, amount: bigint): void {
-	batch.moved.set(id, (batch.moved.get(id) ?? 0n) + amount)
+/** Records what the entry at `index` adds to an account, for the next entry's Balance and the final check. */
+export function record(
+	batch: Batch,
+	account: AccountRow,
+	date: string,
+	amount: bigint,
+	index: number,
+): void {
+	const total = (batch.moved.get(account.id) ?? 0n) + amount
+	batch.moved.set(account.id, total)
+	const own = batch.steps.get(account.id) ?? []
+	own.push({ account, date, total, index })
+	batch.steps.set(account.id, own)
 	if (date > batch.latest) batch.latest = date
 }

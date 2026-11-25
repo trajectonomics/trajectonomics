@@ -176,4 +176,30 @@ describe("account value --file keeps each entry's Balance as it rescanned the Le
 		expect(JSON.stringify(bodyOf(fast))).toContain(`balance[${chart["Gains"]!.id}]`)
 		expect(bodyOf(fast)).toEqual(bodyOf(slow))
 	})
+
+	/**
+	 * The one named exception (ADR-0072, 2026-11-25): the full rescan reads a Balance only at an
+	 * entry's own date, so it accepts a valuation that a transaction dated after it pushes past the
+	 * safe range. The running Balance refuses it, and refuses nothing else the rescan accepts.
+	 */
+	describe("the exception: a valuation a later Balance overflows on", () => {
+		it("refuses it where the full rescan accepts it, naming the account and the first date", async () => {
+			const { home, traj } = await chartHome()
+			await own(traj, "Equity", "Fund", "1.00", "2026-01-05")
+			const { fast, slow } = bothPlans(home, [{ account: "Fund", date: "2026-01-01", value: MOST }])
+			expect(isAppError(slow)).toBe(false)
+			const body = bodyOf(fast)
+			expect(body.code).toBe("AMOUNT_OVERFLOW")
+			expect(JSON.stringify(body.details)).toContain('"Fund\\" on 2026-01-05')
+		})
+
+		it("accepts what the full rescan accepts once the later Balance is back in range", async () => {
+			const { home, traj } = await chartHome()
+			await own(traj, "Equity", "Fund", "1.00", "2026-01-05")
+			await own(traj, "Fund", "Food", "1.00", "2026-01-05")
+			const { fast, slow } = bothPlans(home, [{ account: "Fund", date: "2026-01-01", value: MOST }])
+			expect(isAppError(fast)).toBe(false)
+			expect(fast).toEqual(slow)
+		})
+	})
 })
