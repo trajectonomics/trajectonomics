@@ -30,6 +30,7 @@ const accounts = {
 
 function snapshot(paths: Record<string, unknown> = {}): Snapshot {
 	return {
+		params: { scenarios: ["base"] },
 		reads: { chance: { base: read(chance) }, paths: { base: paths }, accounts },
 	} as unknown as Snapshot
 }
@@ -51,7 +52,12 @@ afterEach(() => {
 describe("the Chance page's futures", () => {
 	const page = () =>
 		render(ChanceView, {
-			props: { chance: { base: read(chance) }, scenario: "base", onScenario: () => {} },
+			props: {
+				names: ["base"],
+				chance: { base: read(chance) },
+				scenario: "base",
+				onScenario: () => {},
+			},
 		}).body
 
 	test("lists the five cards, each linking to its future with the plan in the query", () => {
