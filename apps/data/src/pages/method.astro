@@ -1,0 +1,136 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
+import Layout from "../layouts/Layout.astro"
+import { DATA_SOURCE_URL, SOURCE_URL } from "../lib/site"
+---
+
+<Layout
+	title="Method · Trajectonomics Data"
+	description="How the data site counts tokens, which tool feeds each plan, and what the numbers leave out."
+	current="method"
+>
+	<article class="method">
+		<p class="meta-label">Method</p>
+		<h1 class="method-title">How we count</h1>
+		<p class="method-lede">
+			Tokens from the local logs of the AI coding tools we run, rolled up by UTC day.
+		</p>
+
+		<h2>The collector</h2>
+		<ul>
+			<li>The collector reads the local logs of the AI coding tools on our machines.</li>
+			<li>
+				It prints one total per plan, model and UTC hour, or one total per UTC day for the
+				Mistral console export.
+			</li>
+			<li>
+				Only those totals, a hashed machine label, plan and model ids, UTC buckets and numbers leave
+				the machine. Prompts, session titles, project names, paths and account ids never do.
+			</li>
+			<li>
+				Writes are idempotent upserts keyed by machine, plan, model and UTC bucket, so a missed
+				hour heals on the next run.
+			</li>
+		</ul>
+
+		<h2>Which tool feeds each plan</h2>
+		<table class="source-table">
+			<thead>
+				<tr>
+					<th scope="col">Source</th>
+					<th scope="col">Plan</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Claude Code session logs</td>
+					<td>Claude</td>
+				</tr>
+				<tr>
+					<td>OpenCode's local database</td>
+					<td>OpenCode Go, OpenCode (free)</td>
+				</tr>
+				<tr>
+					<td>Antigravity's <code>transcript.jsonl</code></td>
+					<td>Antigravity</td>
+				</tr>
+				<tr>
+					<td>Cursor's agent store</td>
+					<td>Cursor</td>
+				</tr>
+				<tr>
+					<td>T3 Code provider logs</td>
+					<td>Meta (Muse), and Cursor when its agent store has no usage</td>
+				</tr>
+				<tr>
+					<td>Mistral console CSV export</td>
+					<td>Mistral, one row per day</td>
+				</tr>
+				<tr>
+					<td>Pi session logs</td>
+					<td>The plan named by each record's provider id</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>What is excluded</h2>
+		<ul>
+			<li>Hourly rows are not public: the API serves daily rollups only.</li>
+			<li>
+				Prompts, session titles, project names, paths, account ids and times of day are excluded
+				from every published response; a response carries no machine or contributor.
+			</li>
+			<li>
+				A Cursor run is counted once: its agent store when <code>usage_json</code> is populated,
+				else T3 Code's Cursor logs.
+			</li>
+			<li>
+				Antigravity's duplicate full transcript is skipped. A step with no model takes its
+				conversation's model, else <code>unknown-gemini</code>; that step counts in the plan total and
+				not in a per-model row.
+			</li>
+			<li>
+				Claude streaming repeats one request's usage several times, so one row is kept per
+				<code>requestId</code>. Claude's <code>&lt;synthetic&gt;</code> models are skipped.
+			</li>
+			<li>T3 Code's <code>claudeAgent</code> lines are ignored; Claude Code's own logs are the source.</li>
+			<li>
+				The Mistral daily export has no in/out split, so those cells say <code>n/a</code>.
+			</li>
+		</ul>
+
+		<h2>UTC days</h2>
+		<p>
+			A day runs from 00:00 to 24:00 UTC. A row that starts at 23:00 UTC belongs to that UTC day,
+			whatever the local clock says.
+		</p>
+
+		<h2>What “measured by us” means</h2>
+		<p>
+			Every row here belongs to the <code>measured-by-us</code> series: our collector counted it
+			from our own usage records. It is not a vendor invoice and not a plan's own meter. Meta rows
+			are marked best-effort. Mistral rows come from its daily console export.
+		</p>
+
+		<h2>The asOf view</h2>
+		<p>
+			Add <code>?asOf=YYYY-MM-DD</code> to the overview to compute every figure from data up to and
+			including that day. It is a view computed at request time, not a frozen snapshot: a late batch
+			or a correction can change it. Each response names its method version, and the overview shows
+			the version it used.
+		</p>
+
+		<h2>Quota numbers</h2>
+		<p>
+			Quota percentages exist only for plans with a readable meter. Claude and OpenCode Go are the
+			plans whose meter we can read. A plan with no meter means no quota number on this site.
+		</p>
+
+		<div class="method-repo">
+			<p>
+				The collector, the Worker and this page are in <a href={DATA_SOURCE_URL}>apps/data</a> in
+				the <a href={SOURCE_URL}>public repository</a>.
+			</p>
+		</div>
+	</article>
+</Layout>
