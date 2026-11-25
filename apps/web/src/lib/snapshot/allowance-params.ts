@@ -56,9 +56,9 @@ export function checkAllowances(
 }
 
 /** Whether a plan's Levy reads Filer labels: some Flow carries a tax label with its `@<filer>` suffix. */
-export function isFilerPlan(document: ScenarioDocument | null | undefined): boolean {
-	if (document == null) return false
-	return document.flows.some(
+export function isFilerPlan(plan: ScenarioDocument | null | undefined): boolean {
+	if (plan == null) return false
+	return plan.flows.some(
 		(flow) => flow.label !== undefined && bareLabelOf(flow.label) !== flow.label,
 	)
 }
