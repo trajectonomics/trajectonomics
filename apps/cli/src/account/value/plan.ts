@@ -11,6 +11,7 @@ import {
 import { applyEntry } from "./apply"
 import { type Batch, startBatch } from "./batch"
 import { type StoredValuation, storedValuations } from "./later"
+import { laterOverflows } from "./overflow"
 import { againstOf, inApplyOrder, prepareAll } from "./prepare"
 import { rejection } from "./rejection"
 import type { Prepared, Refusal, Valuation, ValuedRow, ValueRequest } from "./types"
@@ -19,7 +20,11 @@ export type { Valuation, ValuedRow, ValueRequest } from "./types"
 
 type Run = { batch: Batch; valued: ValuedRow[]; failed: Refusal[] }
 
-/** Applies the entries in order; the core's refusal of one is listed at its own field. */
+/**
+ * Applies the entries in order; the core's refusal of one is listed at its own field. When every
+ * entry applies, the Balances the batch leaves after them are read once, and one that is past the
+ * safe range is listed at the entry that put it there.
+ */
 function applyAll(
 	request: ValueRequest,
 	ledger: Ledger,
@@ -36,6 +41,9 @@ function applyAll(
 			const at = request.path(entry.index, "value")
 			run.failed.push({ index: entry.index, error: ledgerFailure(error, at) })
 		}
+	}
+	if (run.failed.length === 0) {
+		run.failed.push(...laterOverflows(run.batch, (index) => request.path(index, "value")))
 	}
 	return run
 }
