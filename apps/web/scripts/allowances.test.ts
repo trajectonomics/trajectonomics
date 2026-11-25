@@ -5,7 +5,7 @@ import { type AllowanceFlow, projectionRun, readOf } from "../src/lib/contract"
 import type { EditAnswer } from "../src/lib/edit/answer"
 import { allowancesView, suggestionAdditions } from "../src/lib/view/allowances"
 import { pathNamed } from "../src/lib/what-if/answer"
-import { readsOf } from "../src/lib/what-if/lens"
+import { lensReadsOf } from "../src/lib/what-if/lens"
 import {
 	disposeAllowances,
 	editorOf,
@@ -132,7 +132,7 @@ describe("trying and keeping the RMF suggestion", () => {
 			// 168,000.00 more brings the tax from 20,300.00 to 5,500.00, as worked by hand.
 			expect(run.data.taxYears.find((year) => year.from === "2027-01-01")?.due).toBe("5500.00")
 			// The page shows a read only when the contract parses it, so each must hold the echoed Addition.
-			const lens = readsOf(tried)
+			const lens = lensReadsOf(tried)
 			expect(lens.run).not.toBeNull()
 			expect(lens.fi).not.toBeNull()
 			expect(lens.compare?.sides.b.additions?.[0]?.path).toBe(`flows.${flows[0]?.id}`)

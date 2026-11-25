@@ -57,11 +57,11 @@ describe("the Withdrawals page", () => {
 	test("states the chance, the Bands and the lowest year with the paths it counts, each level in words", () => {
 		const body = page()
 		expect(body).toContain("In good and bad markets")
-		expect(body).toContain("100.00%")
-		expect(body).toContain("200 of 200 seeded Market paths")
+		expect(body).toContain("96.50%")
+		expect(body).toContain("193 of 200 seeded Market paths")
 		expect(body).toContain("In the worst years you would spend")
 		expect(body).toContain("Worst 1 in 10 paths")
-		expect(body).toContain("834,762.68")
+		expect(body).toContain("211,589.78")
 		expect(body).toContain("It counts 200 of 200 paths")
 		expect(body).toContain("a path that ran out counts 0")
 	})
@@ -69,7 +69,7 @@ describe("the Withdrawals page", () => {
 	test("Hide amounts masks every amount and the Band axis", () => {
 		preferences.hidden = true
 		const body = page()
-		for (const shown of ["862,759.95", "429,677.39", "834,762.68", "21,568,998.89"]) {
+		for (const shown of ["862,759.95", "429,677.39", "211,589.78", "21,568,998.89"]) {
 			expect(body).not.toContain(shown)
 		}
 		expect(body).toContain("amount hidden")

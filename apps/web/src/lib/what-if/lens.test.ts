@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { DEMO } from "../view/what-if/fixtures.test-support"
 import { type WhatIfAnswer, whatIfAnswer } from "./answer"
-import { lensFor, readsOf, sameChanges } from "./lens"
+import { lensFor, lensReadsOf, sameChanges } from "./lens"
 import { startWhatIf, switchedOff, withSet } from "./session"
 
 const HASH = `jcs1:sha256:${"ab".repeat(32)}`
@@ -24,7 +24,7 @@ function answerOf(replace: Record<string, unknown> = {}): Extract<WhatIfAnswer, 
 
 describe("the reads of an answer", () => {
 	test("each read that succeeded and parses is data; one the CLI refused is null", () => {
-		const reads = readsOf(
+		const reads = lensReadsOf(
 			answerOf({ fi: { argv: [], ok: false, error: { code: "x", exitCode: 1, message: "no" } } }),
 		)
 		expect(reads.run).not.toBeNull()
@@ -34,18 +34,18 @@ describe("the reads of an answer", () => {
 	})
 
 	test("data that is not the contract's is null, not shown", () => {
-		const reads = readsOf(answerOf({ projection: { argv: [], ok: true, data: { nope: 1 } } }))
+		const reads = lensReadsOf(answerOf({ projection: { argv: [], ok: true, data: { nope: 1 } } }))
 		expect(reads.run).toBeNull()
 	})
 
 	test("a refused request has no reads", () => {
-		const reads = readsOf({ ok: false, error: { code: "x", exitCode: 1, message: "no" } })
+		const reads = lensReadsOf({ ok: false, error: { code: "x", exitCode: 1, message: "no" } })
 		expect(reads).toEqual({ run: null, fi: null, compare: null, chance: null })
 	})
 })
 
 describe("when a page may show the session", () => {
-	const reads = readsOf(answerOf())
+	const reads = lensReadsOf(answerOf())
 
 	test("on the session's plan, for the changes the reads answer", () => {
 		expect(lensFor("base", session, session, reads)?.plan).toBe("base")

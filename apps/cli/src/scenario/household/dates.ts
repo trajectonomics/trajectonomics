@@ -3,7 +3,7 @@
  * whose two-digit-year rule would misplace a year below 100.
  */
 
-const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const
+import { daysInMonth } from "../../calendar"
 
 /** The earliest and latest year an anchored date may fall in. */
 const FIRST_YEAR = 1
@@ -11,15 +11,6 @@ const LAST_YEAR = 9998
 
 export function yearOf(month: string): number {
 	return Number(month.slice(0, 4))
-}
-
-export function isLeapYear(year: number): boolean {
-	return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
-}
-
-export function daysInMonth(year: number, month: number): number {
-	if (month === 2 && isLeapYear(year)) return 29
-	return MONTH_LENGTHS[month - 1] ?? 0
 }
 
 function pad(value: number, width: number): string {

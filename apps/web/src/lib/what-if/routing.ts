@@ -7,7 +7,7 @@
 import type { ScenarioCashflow, ScenarioDocument, ScenarioFlow } from "../contract"
 import { LISTS, type ListName } from "../view/routing/entries"
 import type { Json } from "./json"
-import { overlayDocument } from "./overlay"
+import { lensDocument } from "./lens-document"
 import { type WhatIf, withSet } from "./session"
 
 /** The session with one routing list tried whole, replacing any earlier try of that list. */
@@ -31,7 +31,7 @@ function cashflowOf(doc: ScenarioDocument, whatIf: WhatIf): ScenarioCashflow | u
 /** The plan as the session shows it, or the plan itself when no session holds a change. */
 export function shownPlan(doc: ScenarioDocument, whatIf: WhatIf | null): ScenarioDocument {
 	if (whatIf === null) return doc
-	const base = overlayDocument(doc, {
+	const base = lensDocument(doc, {
 		sets: whatIf.sets,
 		removals: whatIf.removals,
 	})

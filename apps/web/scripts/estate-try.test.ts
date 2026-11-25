@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { householdDocument } from "../src/lib/contract"
 import { blockFromDraft, estateDates, estateView } from "../src/lib/view/estate"
 import { failedReads } from "../src/lib/what-if/answer"
-import { readsOf } from "../src/lib/what-if/lens"
+import { lensReadsOf } from "../src/lib/what-if/lens"
 import { overridesOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedEstate } from "../src/lib/what-if/try-estate"
 import { SLOW_MS } from "./edit-fixture.test-support"
@@ -41,7 +41,7 @@ describe("trying the estate block", () => {
 			const before = storedPlan()
 			const { session, answer } = await tryDraft("2", "5")
 			expect(session.sets.map((set) => set.path)).toEqual(["estate"])
-			const { run } = readsOf(answer)
+			const { run } = lensReadsOf(answer)
 			if (run === null) throw new Error("the what-if has a run")
 			const dates = estateDates(run, before.document, householdDocument.parse(HOUSEHOLD), "")
 			// The net is 1,391,400.00 - 184,000.00 - 27,828.00 = 1,179,572.00; 5% of it is 58,978.60.
@@ -59,7 +59,7 @@ describe("trying the estate block", () => {
 		await withSavedLines()
 		const session = withTriedEstate(startWhatIf(PLAN, storedPlan().hash), null)
 		const answer = await tryWhatIf({ plan: PLAN, ...overridesOf(session) })
-		const { run } = readsOf(answer)
+		const { run } = lensReadsOf(answer)
 		if (run === null) throw new Error("the what-if has a run")
 		const view = estateView(run, "2028-12-31", "both")
 		expect(view?.figures.row).toMatchObject({ costs: "0.00", gifts: "0.00", toHeirs: "1207400.00" })
@@ -74,7 +74,7 @@ describe("trying the estate block", () => {
 			const { session, answer } = await tryDraft("1", "5")
 			expect(failedReads(answer)).toEqual([])
 			expect(session.sets.map((set) => set.path)).toEqual(["estate"])
-			const { run } = readsOf(answer)
+			const { run } = lensReadsOf(answer)
 			if (run === null) throw new Error("the what-if has a run")
 			const dates = estateDates(run, before.document, householdDocument.parse(HOUSEHOLD), "")
 			// 1% of 1,391,400.00 is 13,914.00; the net 1,391,400.00 - 184,000.00 - 13,914.00 = 1,193,486.00;

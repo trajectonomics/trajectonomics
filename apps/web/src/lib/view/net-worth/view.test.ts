@@ -19,6 +19,19 @@ describe("netWorthView", () => {
 		expect(view.note).toBeNull()
 	})
 
+	test("states every row and says the total is not stated when the accounts' sum is out of range", () => {
+		const view = netWorthView(
+			netWorth(
+				"2026-10-31",
+				[row("Bank", "asset", "600.00"), row("Loan", "liability", "-200.00")],
+				null,
+			),
+		)
+		expect(view.totals).toEqual([])
+		expect(view.rows).toHaveLength(2)
+		expect(view.note).toContain("The total is not stated")
+	})
+
 	test("handles an empty report with no rows and no totals", () => {
 		const view = netWorthView(netWorth("2026-10-31", [], [], null))
 		expect(view.bars).toEqual([])
