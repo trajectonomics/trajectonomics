@@ -18,6 +18,8 @@ export type ForkResult = {
 	additions?: AppliedOverride[]
 	scenario: WrittenScenario
 	droppedAnchors: string[]
+	/** The Owners dropped with their item; absent when none was (cli ADR-0076). */
+	droppedOwners?: string[] | undefined
 }
 
 /** The Overrides a fork applied, which the result echoes; empty when the fork applied none. */
@@ -59,7 +61,7 @@ export function reply(
 	if (outcome.status === "name_taken") return scenarioNameTaken(outcome.scenario.id)
 	const rendered = view(outcome.scenario)
 	const scenario: WrittenScenario = { ...rendered, id: dryRun ? null : rendered.id }
-	const { droppedAnchors } = outcome
+	const { droppedAnchors, droppedOwners } = outcome
 	return ok({
 		dryRun,
 		status: "forked",
@@ -68,5 +70,6 @@ export function reply(
 		...additionsOf(applied),
 		scenario,
 		droppedAnchors,
+		...(droppedOwners.length === 0 ? {} : { droppedOwners }),
 	})
 }

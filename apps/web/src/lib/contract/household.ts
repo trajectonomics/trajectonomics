@@ -34,10 +34,21 @@ export const householdAnchor = z.union([
 ])
 export type HouseholdAnchor = z.infer<typeof householdAnchor>
 
-/** The household document of a Scenario (`traj scenario household --json`'s input; cli ADR-0048). */
+/** Who owns a Flow or an Account: a person id, or `shared` for both partners (cli ADR-0076). */
+export const householdOwner = z.strictObject({
+	path: z.string().min(1),
+	person: z.string().min(1),
+})
+export type HouseholdOwner = z.infer<typeof householdOwner>
+
+/**
+ * The household document of a Scenario (`traj scenario household --json`'s input; cli ADR-0048).
+ * Version 2 adds `owners`, which a version 1 household does not carry (cli ADR-0076).
+ */
 export const householdDocument = z.strictObject({
-	schemaVersion: z.literal(1),
+	schemaVersion: z.union([z.literal(1), z.literal(2)]),
 	people: z.array(householdPerson),
 	anchors: z.array(householdAnchor),
+	owners: z.array(householdOwner).optional(),
 })
 export type HouseholdDocument = z.infer<typeof householdDocument>

@@ -5,17 +5,18 @@ import type { ScenarioSaved } from "../store"
 import { withStore } from "../with-store"
 import { removedLevyNotes } from "./apply-notes"
 import { fromDecimalForm, printedRow } from "./decimal"
-import { droppedAnchors, view, type WrittenScenario, writtenScenario } from "./view"
+import { droppedAnchors, droppedOwners, view, type WrittenScenario, writtenScenario } from "./view"
 
 /**
  * What `scenario apply` prints: whether the write was rolled back, what it found, the row, and the
- * household anchors it dropped (cli ADR-0048).
+ * household anchors it dropped (cli ADR-0048) and, when it dropped any, the Owners (cli ADR-0076).
  */
 export type ApplyResult = {
 	dryRun: boolean
 	status: "created" | "updated" | "unchanged"
 	scenario: WrittenScenario
 	droppedAnchors: string[]
+	droppedOwners?: string[] | undefined
 	notes: string[]
 }
 
@@ -25,12 +26,14 @@ export const applyShape: {
 	status: z.ZodEnum<{ created: "created"; updated: "updated"; unchanged: "unchanged" }>
 	scenario: z.ZodType<WrittenScenario>
 	droppedAnchors: z.ZodType<string[]>
+	droppedOwners: typeof droppedOwners
 	notes: z.ZodArray<z.ZodString>
 } = {
 	dryRun: z.boolean().describe("True when the write was rolled back."),
 	status: z.enum(["created", "updated", "unchanged"]).describe("What the apply found."),
 	scenario: writtenScenario,
 	droppedAnchors,
+	droppedOwners,
 	notes: z
 		.array(z.string())
 		.describe(
@@ -66,6 +69,7 @@ export function replyOf(outcome: ScenarioSaved, reply: Reply): Result<ApplyResul
 		status: outcome.status,
 		scenario,
 		droppedAnchors: outcome.droppedAnchors,
+		...(outcome.droppedOwners.length === 0 ? {} : { droppedOwners: outcome.droppedOwners }),
 		notes: reply.notes,
 	})
 }

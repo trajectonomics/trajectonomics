@@ -61,6 +61,14 @@ export const droppedAnchors: z.ZodType<string[]> = z
 		"The household anchors this write dropped, because the document no longer holds their item; empty when none.",
 	)
 
+/** The household Owners a write dropped, because the document no longer holds their item. */
+export const droppedOwners: z.ZodOptional<z.ZodArray<z.ZodString>> = z
+	.array(z.string())
+	.optional()
+	.describe(
+		"The household Owners this write dropped, because the document no longer holds their Flow or Account (cli ADR-0076); absent when none was dropped.",
+	)
+
 /** The household a Scenario keeps, as the document it was set from; null when none is set. */
 export type HouseholdDocument = Record<string, unknown> | null
 

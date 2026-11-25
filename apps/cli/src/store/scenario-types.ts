@@ -12,15 +12,22 @@ import type { WriteOptions } from "./types"
 export type NewScenario = { name: string; document: unknown; expectedHash?: string | undefined }
 /**
  * `droppedAnchors` names the household anchors whose item the written document no longer holds;
- * the household no longer keeps them (cli ADR-0048). It is empty when none was dropped.
+ * the household no longer keeps them (cli ADR-0048); `droppedOwners` names the Owners dropped for the
+ * same reason (cli ADR-0076). Each is empty when none was dropped.
  */
 export type ScenarioSaved = {
 	status: "created" | "updated" | "unchanged"
 	scenario: ScenarioRow
 	droppedAnchors: string[]
+	droppedOwners: string[]
 }
 export type ScenarioForked =
-	| { status: "forked" | "name_taken"; scenario: ScenarioRow; droppedAnchors: string[] }
+	| {
+			status: "forked" | "name_taken"
+			scenario: ScenarioRow
+			droppedAnchors: string[]
+			droppedOwners: string[]
+	  }
 	| { status: "not_found" }
 /**
  * `deleted` carries `wasMain` when the tombstone also cleared the main plan, which only `force`
