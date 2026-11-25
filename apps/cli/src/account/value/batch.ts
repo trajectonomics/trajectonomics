@@ -15,8 +15,9 @@ export type Batch = {
 	/** The rows the entries applied so far write, in the order they applied. */
 	readonly writes: NewTransaction[]
 	history: BalanceHistory | undefined
-	/** What the entries applied so far added to each account, in Minor Units, and the latest date among them. */
+	/** What the entries applied so far added to each account, in Minor Units. */
 	readonly moved: Map<string, bigint>
+	/** The latest date among the entries applied so far. */
 	latest: string
 	readonly later: Map<string, readonly StoredValuation[]>
 }
