@@ -85,4 +85,18 @@ describe("tx import refuses a batch with a row that leaves a Balance unreadable"
 		expect((await cli(home)(["tx", "import", file, "--json"])).code).toBe(0)
 		expect((await ledgerSize(traj)).transactions).toBe(3)
 	})
+
+	it("names the row that pushed the Balance over, not a later row of its date that lowered it", async () => {
+		const { home, traj } = await chartHome()
+		const added = ["tx", "add", "--from", "Equity", "--to", "Home", "--amount", MOST]
+		expect((await traj([...added, "--date", "2026-01-05", "--json"])).code).toBe(0)
+		const file = csv(home, "same-date.csv", [
+			HEADER,
+			line("2026-01-07", "Gains", "Home", "1.00", "r1"),
+			line("2026-01-07", "Home", "Food", "0.01", "r2"),
+		])
+		const res = await cli(home)(["tx", "import", file, "--json"])
+		expect(rowsOf(res).map((rejected: { line: number }) => rejected.line)).toEqual([2])
+		expect(rowsOf(res)[0]!.reason.message).toContain('the Balance of "Home" on 2026-01-07')
+	})
 })

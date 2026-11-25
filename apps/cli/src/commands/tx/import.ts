@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand, ok } from "../../command"
 import { type AppError, fail, isAppError } from "../../errors"
+import { LEDGER_READ_CODES } from "../../store"
 import { IMPORT_HEADER, readImportCsv } from "../../tx/import-csv"
 import { importRows } from "../../tx/import-run"
 import { readSource } from "../../tx/import-source"
@@ -59,23 +60,15 @@ export const importTx: Leaf = defineCommand({
 	],
 	errorCodes: [
 		"AMOUNT_OVERFLOW",
-		"INVALID_ACCOUNT_HIERARCHY",
-		"INVALID_AMOUNT",
-		"CURRENCY_MISMATCH",
-		"INVALID_CURRENCY",
 		"INVALID_DATE",
-		"INVALID_DIMENSION",
 		"NEGATIVE_AMOUNT",
-		"NON_LEAF_ACCOUNT",
-		"UNBALANCED_TRANSACTION",
-		"UNKNOWN_ACCOUNT",
-		"ZERO_AMOUNT_POSTING",
 		"account_archived",
 		"database_busy",
 		"external_ref_conflict",
 		"invalid_input",
 		"same_account",
 		"unsupported_currency",
+		...LEDGER_READ_CODES,
 	],
 	run: async (input, ctx) => {
 		const wrong = exclusive(input)

@@ -16,7 +16,20 @@ export type Overflowed = { index: number; error: AppError }
 /** Where a refusal points: the field of the entry at `index` that wrote to the account. */
 export type StepPath = (index: number, accountId: string) => string
 
-/** The refusal of the entry whose write begins stretch `at` of an account's writes, if it earns one. */
+/**
+ * The latest write at or before `at` that moved the Balance the way the overflow lies (up for an
+ * overflow above the range, down for one below it). The stretch's total holds every earlier write,
+ * so the write that ends it may be one that moved the Balance back toward safety.
+ */
+function pusher(steps: readonly Step[], at: number, sum: bigint): number {
+	for (let i = at; i >= 0; i--) {
+		const own = steps[i]!.total - (steps[i - 1]?.total ?? 0n)
+		if (own !== 0n && own < 0n === sum < 0n) return i
+	}
+	return at
+}
+
+/** The refusal, at the entry that pushed the Balance over, of the stretch begun by write `at` of an account, if it earns one. */
 function refusalOf(
 	history: BalanceHistory | undefined,
 	steps: readonly Step[],
@@ -28,14 +41,15 @@ function refusalOf(
 	if (next?.date === step.date) return undefined
 	const found = history?.overflow(step.account.id, step.total, step.date, next?.date, true)
 	if (found === undefined) return undefined
-	const which = found.date > step.date ? "a later Balance" : "the Balance"
+	const blamed = steps[pusher(steps, at, found.sum)]!
+	const which = found.date > blamed.date ? "a later Balance" : "the Balance"
 	const error = new LedgerValidationError(
 		"AMOUNT_OVERFLOW",
 		`balance[${step.account.id}]`,
 		found.sum.toString(),
 		`${which} of "${step.account.name}" on ${found.date} exceeds the safe integer range`,
 	)
-	return { index: step.index, error: ledgerFailure(error, path(step.index, step.account.id)) }
+	return { index: blamed.index, error: ledgerFailure(error, path(blamed.index, step.account.id)) }
 }
 
 /**
@@ -45,7 +59,8 @@ function refusalOf(
  * each. They cut the account's dates into stretches the batch holds one total over, and the history
  * answers each stretch from the reach it noted once, so an entry costs no scan of the Ledger.
  * A refusal names the account and the first date on which the write leaves the Balance outside the
- * safe range and worse than the Ledger had it, at the entry that began the stretch. An overflow the
+ * safe range and worse than the Ledger had it, at the latest entry of the stretch that moved the
+ * Balance toward the overflow (not one that moved it back). An overflow the
  * Ledger already holds on a date, at least as large as the one the write leaves there, is not the
  * entry's, so each date a stretch is judged on is compared with the Ledger's own Balance that day.
  * An entry is refused once, for the first account that earns it.
@@ -58,10 +73,8 @@ export function laterOverflows(
 	const refused = new Map<number, Overflowed>()
 	for (const steps of writes) {
 		for (let at = 0; at < steps.length; at++) {
-			const index = steps[at]!.index
-			if (refused.has(index)) continue
 			const refusal = refusalOf(history, steps, at, path)
-			if (refusal !== undefined) refused.set(index, refusal)
+			if (refusal !== undefined && !refused.has(refusal.index)) refused.set(refusal.index, refusal)
 		}
 	}
 	return [...refused.values()]

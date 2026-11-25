@@ -137,4 +137,20 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 		expect(res.code).toBe(0)
 		expect((await traj(["balance", "--as-of", "2026-01-06", "--json"])).code).toBe(0)
 	})
+
+	it("names the entry that pushed the against account over, not a later one that took some back", async () => {
+		const { home, traj, chart } = await chartHome()
+		const [up, down] = [chart.Fund, chart.Home].sort((a, b) => a.id.localeCompare(b.id))
+		await own(traj, "Gains", "Food", MOST, "2026-01-10")
+		await own(traj, "Equity", down!.name, "0.01", "2026-01-06")
+		const res = await file(home, [
+			{ account: up!.name, date: "2026-01-07", value: "1.00" },
+			{ account: down!.name, date: "2026-01-07", value: "0.00" },
+		])
+		const body = error(res)
+		expect(body.code).toBe("AMOUNT_OVERFLOW")
+		expect(body.path).toBe("document.values.0.value")
+		expect(says(body)).toContain('a later Balance of "Gains" on 2026-01-10')
+		expect(body.details.values.map((row: { index: number }) => row.index)).toEqual([0])
+	})
 })

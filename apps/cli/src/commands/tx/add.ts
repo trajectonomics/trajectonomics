@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand, ok } from "../../command"
 import { isAppError } from "../../errors"
+import { LEDGER_READ_CODES } from "../../store"
 import { buildTransaction } from "../../tx/build"
 import { transactionDocument } from "../../tx/document"
 import { viewTransaction, writtenTransaction } from "../../tx/view"
@@ -59,19 +60,9 @@ export const add: Leaf = defineCommand({
 	],
 	errorCodes: [
 		"AMOUNT_OVERFLOW",
-		"INVALID_ACCOUNT_HIERARCHY",
-		"INVALID_AMOUNT",
-		"CURRENCY_MISMATCH",
-		"INVALID_CURRENCY",
 		"INVALID_DATE",
-		"INVALID_DIMENSION",
 		"NEGATIVE_AMOUNT",
 		"NON_EQUITY_CONTRA",
-		"NON_LEAF_ACCOUNT",
-		"SINGLE_POSTING",
-		"UNBALANCED_TRANSACTION",
-		"UNKNOWN_ACCOUNT",
-		"ZERO_AMOUNT_POSTING",
 		"account_archived",
 		"database_busy",
 		"external_ref_conflict",
@@ -79,6 +70,7 @@ export const add: Leaf = defineCommand({
 		"liability_opening_positive",
 		"same_account",
 		"unsupported_currency",
+		...LEDGER_READ_CODES,
 	],
 	run: (input, document, ctx) =>
 		withStore(ctx, (store) => {
