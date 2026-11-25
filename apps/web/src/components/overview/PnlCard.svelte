@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { Read } from "../../lib/contract"
-import { totalDirection } from "../../lib/format"
 import { accountTypeLabel } from "../../lib/view/net-worth/account-type"
 import type { PnlView } from "../../lib/view/overview/pnl"
 import AccountName from "../ui/AccountName.svelte"
@@ -31,7 +30,7 @@ let { pnl }: Props = $props()
 								<DirectedMoney
 									amount={total.amount}
 									currency={total.currency}
-									direction={totalDirection(total.amount)}
+									kind="net"
 								/>
 							{/each}
 						</span>
@@ -45,7 +44,7 @@ let { pnl }: Props = $props()
 						<p class="text-sm text-muted-foreground">Largest rows</p>
 						<ul class="divide-y divide-border text-sm">
 							{#each view.largest as row (`${row.account.id}:${row.currency}`)}
-								<li class="flex items-center justify-between gap-3 py-2">
+								<li class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
 									<span class="min-w-0 truncate">
 										<AccountName id={row.account.id} name={row.account.name} />
 										<span class="ml-2 text-xs text-muted-foreground">
@@ -56,7 +55,7 @@ let { pnl }: Props = $props()
 										<DirectedMoney
 											amount={row.amount}
 											currency={row.currency}
-											direction={row.type === "income" ? "income" : "expense"}
+											kind="money"
 										/>
 									</span>
 								</li>

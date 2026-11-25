@@ -35,7 +35,7 @@ describe("NetWorthContent: the headline and the composition", () => {
 		)
 	})
 
-	test("divides the assets by account and reads each liability as what you owe", () => {
+	test("divides the assets by account and reads a negative liability as what you owe", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), main)) },
 		})

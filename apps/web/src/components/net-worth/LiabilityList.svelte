@@ -10,7 +10,7 @@ interface Props {
 let { rows }: Props = $props()
 </script>
 
-<!-- The liability accounts, each read as what you owe. The ledger's signed figure stays in the title. -->
+<!-- The liability accounts, each read by its sign: a negative state is what you owe, a positive one what is owed to you. The ledger's signed figure stays in the title. -->
 <div class="space-y-2">
 	{#if rows.length === 0}
 		<p class="text-sm text-muted-foreground">No liability accounts.</p>
@@ -20,7 +20,7 @@ let { rows }: Props = $props()
 				<li class="flex items-center justify-between gap-3 py-2">
 					<span class="min-w-0 truncate"><AccountName id={row.account.id} name={row.account.name} /></span>
 					<span class="shrink-0">
-						<DirectedMoney amount={row.amount} currency={row.currency} direction="liability" />
+						<DirectedMoney amount={row.amount} currency={row.currency} kind="owed" />
 					</span>
 				</li>
 			{/each}

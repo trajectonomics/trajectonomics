@@ -4,34 +4,42 @@
  * arithmetic: every digit stays the CLI's own ([ADR 0030](../../docs/adr/0030-a-direction-word-and-a-dropped-leading-minus-are-formatting-not-arithmetic.md)).
  */
 
-/** What an amount means for a person: money coming in, money going out, or money still owed. */
-export type AmountDirection = "income" | "expense" | "liability"
+/** What a CLI amount is about, which decides the pair of words its sign chooses between. */
+export type AmountKind =
+	/** Money earned or spent over a period. The ledger books a debit positive, so a leading minus is money in. */
+	| "money"
+	/** A balance still owed: a leading minus is money you owe, and no sign is money owed to you. */
+	| "owed"
+	/** A net total, which the CLI states as income less expenses: a positive total is money in. */
+	| "net"
 
 /** One CLI amount as it is shown: the direction in words, and the CLI's digits without the sign. */
 export interface DirectedAmount {
-	readonly word: "Money in" | "Money out" | "You owe"
+	/** The word for the amount's direction; null for zero, which has no direction. */
+	readonly word: "Money in" | "Money out" | "You owe" | "Owed to you" | null
 	/** The CLI's decimal string with at most its leading minus removed: no digit changes. */
 	readonly digits: string
 }
 
-const WORD: Readonly<Record<AmountDirection, DirectedAmount["word"]>> = {
-	income: "Money in",
-	expense: "Money out",
-	liability: "You owe",
+type Word = NonNullable<DirectedAmount["word"]>
+
+/** The word a sign takes for each kind: the sign decides, and the kind decides which pair of words. */
+const WORD: Readonly<Record<AmountKind, { readonly negative: Word; readonly positive: Word }>> = {
+	money: { negative: "Money in", positive: "Money out" },
+	owed: { negative: "You owe", positive: "Owed to you" },
+	net: { negative: "Money out", positive: "Money in" },
 }
 
-/**
- * Reads one CLI amount with its direction. The ledger books income negative, expenses positive and
- * liabilities negative; a person reads "Money in", "Money out" or "You owe" instead.
- */
-export function directedAmount(amount: string, direction: AmountDirection): DirectedAmount {
-	return { word: WORD[direction], digits: amount.startsWith("-") ? amount.slice(1) : amount }
-}
+/** A zero stated either way the CLI writes it: "0.00" or "-0.00". */
+const ZERO = /^0+(?:\.0+)?$/
 
 /**
- * The direction of a profit and loss total, which is income minus expenses: a positive total is money
- * in and a negative one money out. The sign is the CLI's; the page chooses a word from it only.
+ * Reads one CLI amount as a person reads it. The sign picks the word and the kind picks the pair,
+ * so an expense refund and an income reversal read the way their sign says rather than the way
+ * their account type does. Zero has no direction at all.
  */
-export function totalDirection(amount: string): AmountDirection {
-	return amount.startsWith("-") ? "expense" : "income"
+export function directedAmount(amount: string, kind: AmountKind): DirectedAmount {
+	const digits = amount.startsWith("-") ? amount.slice(1) : amount
+	if (ZERO.test(digits)) return { word: null, digits }
+	return { word: WORD[kind][amount.startsWith("-") ? "negative" : "positive"], digits }
 }

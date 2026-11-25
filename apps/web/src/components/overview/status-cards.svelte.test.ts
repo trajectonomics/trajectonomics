@@ -50,6 +50,40 @@ describe("PnlCard", () => {
 		expect(body).toContain("50,000.00")
 	})
 
+	test("reads a refunded expense as money in and a reversed income as money out, not by account type", () => {
+		const refund = render(PnlCard, {
+			props: {
+				pnl: okRead(
+					["report", "pnl"],
+					pnlView(pnl([row("Refund", "expense", "-1500.00")], THB("0.00"))),
+				),
+			},
+		}).body
+		expect(refund).toContain("Money in")
+		expect(refund).toContain("1,500.00")
+		expect(refund).not.toContain("Money out")
+		const reversal = render(PnlCard, {
+			props: {
+				pnl: okRead(
+					["report", "pnl"],
+					pnlView(pnl([row("Reversal", "income", "700.00")], THB("0.00"))),
+				),
+			},
+		}).body
+		expect(reversal).toContain("Money out")
+		expect(reversal).toContain("700.00")
+		expect(reversal).not.toContain("Money in")
+	})
+
+	test("gives a zero total no direction word", () => {
+		const { body } = render(PnlCard, {
+			props: { pnl: okRead(["report", "pnl"], pnlView(pnl([], THB("0.00")))) },
+		})
+		expect(body).toContain("0.00")
+		expect(body).not.toContain("Money in")
+		expect(body).not.toContain("Money out")
+	})
+
 	test("Hide amounts masks the digits and keeps the direction word", () => {
 		const data = pnl([row("Salary", "income", "-900000.00")], THB("900000.00"))
 		preferences.hidden = true
