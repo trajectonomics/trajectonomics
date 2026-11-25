@@ -126,6 +126,8 @@ export interface Dictionary {
 	readonly ctaInstallLink: string
 	/** The way out under the prompt: the Docs Portal's CLI installation page, which needs no agent. */
 	readonly cliInstallLink: string
+	/** The hero's link to the hosted Demo Dashboard, under the demo window. */
+	readonly demoLink: string
 	readonly copy: string
 	/** What the toast announces once the prompt is on the clipboard. */
 	readonly copied: string

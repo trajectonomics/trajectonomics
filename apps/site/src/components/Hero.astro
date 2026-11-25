@@ -3,6 +3,7 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
+import { DEMO_PATH } from "../lib/site"
 import CopyPrompt from "./CopyPrompt.astro"
 import DemoWindow from "./DemoWindow.astro"
 import Mascot from "./Mascot.astro"
@@ -68,6 +69,10 @@ const subline = sublineParts(dictionary.heroSubline)
 			<Mascot pose="peek" />
 		</div>
 		<DemoWindow dictionary={dictionary} />
+		{/* The window is a picture of the app; this is the way into the real Demo it draws (ADR 0031). */}
+		<p class="hero-demo">
+			<a class="hero-demo-link" href={DEMO_PATH}>{dictionary.demoLink}</a>
+		</p>
 	</div>
 </section>
 

@@ -26,7 +26,7 @@ function lineOf(line: LineDraft, list: ListName): EstateLine {
 			id,
 			of,
 			bps: percentText(line.share) ?? "",
-			rounding: line.rounding as "floor" | "halfUp" | "ceil",
+			rounding: line.rounding,
 		}
 	}
 	const bps = parseBps(line.rate)

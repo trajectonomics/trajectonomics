@@ -1,11 +1,5 @@
 import { z } from "zod"
-
-/** The most Market paths one chance runs, and the fewest. */
-const MIN_PATHS = 1
-const MAX_PATHS = 10000
-
-/** The shape of `--seed`: sixteen lower-case hex digits. */
-const SEED_PATTERN = /^[0-9a-f]{16}$/
+import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../projection/chance-bounds"
 
 /**
  * `--paths`: the Market paths the chance runs. The CLI words a built-in range refusal with one generic

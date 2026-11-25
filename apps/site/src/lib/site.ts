@@ -74,6 +74,9 @@ export const DOCS_CLI_PATH = `${DOCS_ORIGIN}/cli/`
  */
 export const DOCS_CLI_INSTALL_PATH = `${DOCS_ORIGIN}/cli/installation/`
 
+/** The hosted Demo Dashboard's path on the Site: the Dashboard's build, served as static assets (ADR 0031). */
+export const DEMO_PATH = "/demo/"
+
 /**
  * The blog's origin. `apps/blog` builds it, and its Worker serves this host (ADR 0002 in `apps/blog`).
  */

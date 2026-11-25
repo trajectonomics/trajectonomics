@@ -20,3 +20,9 @@ The plan that decides which argv to run is pure. It takes the parameters (the As
 - Re-running the Dashboard means writing a new Snapshot. Nothing refreshes by itself.
 - Every figure on screen can show the argv that produced it, the As-of and the Scenario's content hash.
 - A new CLI output shape fails the contract test in `scripts/contract.test.ts` before any page breaks.
+
+## Amendment (2026-11-25): a word list the page only shows is a plain string
+
+- The contract does not copy a CLI vocabulary the page only displays. `compounding`, a payout's `frequency` and `rounding`, a fee's `rounding` and an estate line's `rounding` are `z.string()` in `src/lib/contract/scenario-show.ts`, as a loan's `level.rounding` already was (#515). A word the CLI adds later still decodes, a card or a sentence shows it as the CLI states it, and a form that opens on it holds it as it is.
+- The contract keeps a closed `z.enum` only where a page branches on the value: a Flow's `kind` and `frequency`, and an Account's `kind`. A word the CLI adds there must reach the pages, so `scripts/contract-vocabularies.test.ts` reads the allowed words from the built `traj schema "scenario apply" --json` and fails when the contract's list differs. It also fails when a list a form offers (`FREQUENCIES`, the compoundings and roundings) holds a word the CLI no longer accepts. `scripts/vocabulary.ts` holds the comparison, and `scripts/vocabulary.test.ts` shows it fails for a word added and a word removed.
+- The test keeps no copy of the CLI's lists. Without this rule a CLI that adds a word fails the whole Snapshot read as `contract_mismatch` (#318, #336, #542).

@@ -113,6 +113,10 @@ describe("sameRun", () => {
 
 	test.each([
 		["model", { definition: { ...chanceWithOutcomes().definition, modelId: "other" } }],
+		[
+			"model file",
+			{ definition: { ...chanceWithOutcomes().definition, modelHash: "jcs1:sha256:1" } },
+		],
 		["seed", { definition: { ...chanceWithOutcomes().definition, seed: "ffffffffffffffff" } }],
 		["paths", { definition: { ...chanceWithOutcomes().definition, paths: 7 } }],
 		[

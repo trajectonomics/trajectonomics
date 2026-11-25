@@ -36,7 +36,12 @@ describe("projection path", () => {
 		const path = pathBody(await pathAt(home, flags, 7))
 		expect(path).toMatchObject({
 			index: 7,
-			definition: { modelId: "illustrative-four-months", seed: ILLUSTRATIVE_SEED, paths: 20 },
+			definition: {
+				modelId: "illustrative-four-months",
+				seed: ILLUSTRATIVE_SEED,
+				paths: 20,
+				modelHash: expect.stringMatching(/^jcs1:sha256:[0-9a-f]{64}$/),
+			},
 		})
 		expect(path.returnModel).toBeUndefined()
 		expect(path.returns.map((rollup) => rollup.index)).toEqual([0, 1, 2])

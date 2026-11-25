@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+:root,
+:root[data-theme="pink-white"] {
+  font-family: "Noto Sans Thai", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+
+  --bg-canvas: #fff7fa;
+  --bg-card: #ffffff;
+  --bg-card-sub: #fff0f5;
+  --bg-input: #fff5f8;
+  --bg-elevated: #ffe6f0;
+  --border-subtle: rgba(244, 63, 133, 0.14);
+  --border-strong: rgba(244, 63, 133, 0.28);
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+
+  --brand: #ff4d94;
+  --brand-deep: #e11d74;
+  --brand-soft: rgba(255, 77, 148, 0.13);
+  --brand-border: rgba(255, 77, 148, 0.36);
+  --brand-text: #db2777;
+
+  --hero-from: #ff6aa8;
+  --hero-to: #e11d74;
+  --hero-btn-bg: #ffffff;
+  --hero-btn-text: #e11d74;
+  --hero-shadow: rgba(225, 29, 116, 0.25);
+
+  --nav-bg: rgba(255, 255, 255, 0.96);
+  --track-muted: #f5dde7;
+  --bar-inactive: #f8bed6;
+  --summary-tab-active-bg: #ff4d94;
+  --summary-tab-active-text: #ffffff;
+  --btn-contrast-bg: #18181b;
+  --btn-contrast-text: #ffffff;
+}
+
+:root[data-theme="orange-black"] {
+  color-scheme: dark;
+
+  --bg-canvas: #0a0a0c;
+  --bg-card: #141417;
+  --bg-card-sub: #1b1b20;
+  --bg-input: #0a0a0c;
+  --bg-elevated: #1f1f24;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d8;
+  --text-muted: #a1a1aa;
+
+  --brand: #ff6b1a;
+  --brand-deep: #ea580c;
+  --brand-soft: rgba(255, 107, 26, 0.16);
+  --brand-border: rgba(255, 107, 26, 0.38);
+  --brand-text: #fb923c;
+
+  --hero-from: #ff7a1a;
+  --hero-to: #ea580c;
+  --hero-btn-bg: #0a0a0c;
+  --hero-btn-text: #ffffff;
+  --hero-shadow: rgba(124, 45, 18, 0.45);
+
+  --nav-bg: rgba(14, 14, 17, 0.95);
+  --track-muted: #26262c;
+  --bar-inactive: rgba(255, 255, 255, 0.85);
+  --summary-tab-active-bg: #0a0a0c;
+  --summary-tab-active-text: #ffffff;
+  --btn-contrast-bg: #ffffff;
+  --btn-contrast-text: #0a0a0c;
+}
+
+html,
+body {
+  margin: 0;
+  max-width: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+
+@keyframes moo-pop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  28% {
+    transform: scale(1.13) rotate(-6deg);
+  }
+  58% {
+    transform: scale(0.95) rotate(5deg);
+  }
+  82% {
+    transform: scale(1.05) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-moo-pop {
+  animation: moo-pop 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Onboarding: gentle idle bob for Moo and twinkling sparkles. Used through
+   motion-safe: utilities, so they stay still with prefers-reduced-motion. */
+@keyframes moo-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes moo-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* A short highlight on a My Moo row that a "What's new" button scrolled into view (#104). */
+@keyframes moo-row-flash {
+  0%,
+  60% {
+    background-color: var(--brand-soft);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.moo-row-flash {
+  animation: moo-row-flash 1.8s ease-out;
+}
