@@ -32,6 +32,7 @@ export type Context = {
 	 * with its envelope alone, so nothing here is printed beside one.
 	 */
 	afterSuccess?: string[]
+	source?: import("./store/types").Source // the clock and ids a write reads; only the demo entry sets it (ADR-0074)
 }
 
 /** A field the document form cannot work without, and the sentence naming what is missing. It is
@@ -105,10 +106,9 @@ export type Command<
 	/** How a table-shaped result renders in the human Format; JSON ignores it. */
 	render?: RenderHint
 	/**
-	 * Codes this command raises itself. Global codes such as `unknown_flag` are not listed, and
-	 * neither are the ones opening or creating the ledger raises, except on the leaves whose
-	 * subject is the data directory itself: `init`, `inspect`, `export`, `backup`, `restore` and
-	 * `data remove`.
+	 * Codes this command raises itself. Global codes such as `unknown_flag` are not listed, nor
+	 * are the ones opening or creating the ledger raises, except on the leaves whose subject is the
+	 * data directory itself: `init`, `inspect`, `export`, `backup`, `restore` and `data remove`.
 	 */
 	errorCodes: readonly ErrorCode[]
 	run: (...args: RunArgs<I, D>) => Outcome<z.input<O>>

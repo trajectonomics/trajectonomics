@@ -8,6 +8,7 @@ import { handDocument } from "./allowances-document.test-support"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import type { RunContext } from "./run-traj"
 import { createEditor, type Editor } from "./serve-edit"
 
@@ -83,7 +84,7 @@ export async function editorOver(traj: RunContext): Promise<Editor> {
 	})
 	const first = await next.refresh()
 	if (!first.ok) throw new Error(first.error.message)
-	return next
+	return recorded(next)
 }
 
 /** The environment the scratch ledger's traj runs in. */

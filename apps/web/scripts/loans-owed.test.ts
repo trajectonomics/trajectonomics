@@ -13,6 +13,7 @@ import {
 import { loanFromDraft } from "../src/lib/view/plan-items/loan-draft"
 import { owedChoicesOf } from "../src/lib/view/plan-items/loan-owed"
 import { statementOf } from "../src/lib/view/plan-items/loan-statement"
+import { settle } from "./editor-running.test-support"
 import { BOAT } from "./loans-boat.test-support"
 import {
 	applyInTerminal,
@@ -24,7 +25,6 @@ import {
 	save,
 	setupLedger,
 } from "./loans-ledger.test-support"
-import { settle } from "./loans-running.test-support"
 
 const DEL = "loan-del"
 /** The id of the debt the Baseline holds, which the first test finds before it takes the loan's Flows out. */

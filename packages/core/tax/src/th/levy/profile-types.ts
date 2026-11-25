@@ -131,7 +131,7 @@ export interface ThLevyIdentity {
  * The taxpayer profile an emitted TH 2026 Levy is specialised to.
  *
  * Purpose: Holds everything that must be fixed at emit time: filing status, fixed allowances,
- * expense elections, Section 40(4) elections, and the Levy identity. Income and contribution
+ * expense elections, Section 40(4) elections, the Filers, and the Levy identity. Income and contribution
  * amounts are not part of the profile; they arrive as Flow tallies at evaluation time.
  * Math: No arithmetic; every monetary amount is an emit-time constant.
  * Units: Monetary profile amounts are THB major units.
@@ -149,4 +149,10 @@ export interface ThLevyProfile {
 	readonly section40_4?: ThLevySection40_4Elections | undefined
 	/** Levy id, period, and settlement; each has a statutory default. */
 	readonly levy?: ThLevyIdentity | undefined
+	/**
+	 * The Filers of this Return, one or two ids matching `[a-z0-9-]{1,32}`. Each Filer's Flows carry
+	 * Filer labels (`thFilerLabel`); omitted, the Levy reads the bare labels. Two Filers need
+	 * `married_joint`.
+	 */
+	readonly filers?: readonly string[] | undefined
 }

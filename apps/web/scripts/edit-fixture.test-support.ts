@@ -7,12 +7,13 @@ import { fileURLToPath } from "node:url"
 import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { SLOW_MS } from "./edit-slow.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
 export const BINARY = fileURLToPath(new URL("../../cli/dist/traj", import.meta.url))
-/** A fresh ledger built and written to against the real CLI takes a few seconds per Edit. */
-export const SLOW_MS = 180_000
+export { SLOW_MS }
 
 /** An Edit's answer as the page parses it: the Snapshot, or the error as data. */
 export type Answer =
@@ -57,8 +58,8 @@ export async function setupEditor(): Promise<Editor> {
 	})
 	const run = await next.refresh()
 	if (!run.ok) throw new Error(`the first read failed: ${run.error.message}`)
-	editor = next
-	return next
+	editor = recorded(next)
+	return editor
 }
 
 /** Posts one Edit body to the editor, as the page does, and parses the answer. */

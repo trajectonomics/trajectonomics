@@ -1,12 +1,13 @@
 // The Tax profile page when the plan moves under the form, or has an income Flow with no tax label, against the real traj
 // (cli ADR 0055 and 0066, web ADR 0016). Each test sets up its own state, so each passes alone.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import type { TaxProfile } from "../src/lib/contract"
 import { blankDraft, draftOf } from "../src/lib/view/tax-settings/draft"
 import { unlabelledIncome } from "../src/lib/view/tax-settings/labels"
 import { taxEdit } from "../src/lib/view/tax-settings/profile-edit"
 import { flowsSentence } from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { slow } from "./estate.test-support"
 import {
 	disposeEstate,
@@ -21,6 +22,7 @@ import { shownTax, withProfile } from "./tax-settings.test-support"
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 describe("the tax profile when the plan moves or has unlabelled income", () => {
