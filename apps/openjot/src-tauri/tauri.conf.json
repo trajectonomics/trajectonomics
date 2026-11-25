@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "MooJot",
+  "productName": "OpenJot",
   "version": "1.4.0",
   "identifier": "app.moojot.android",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "MooJot",
+        "title": "OpenJot",
         "width": 800,
         "height": 600
       }

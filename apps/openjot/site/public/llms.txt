@@ -1,22 +1,22 @@
-# MooJot
+# OpenJot
 
-> MooJot is a free, open-source Android app that reads Thai bank slips from the photos on your phone and turns them into an income and expense diary, with no account and no ads. The data stays on the phone. It is an independent, free alternative to MeowJot (เหมียวจด) and is not affiliated with MeowJot, KASIKORN X or any bank.
+> OpenJot (formerly MooJot) is a free, open-source Android app that reads Thai bank slips from the photos on your phone and turns them into an income and expense diary, with no account and no ads. The data stays on the phone. It is an independent, free alternative to MeowJot (เหมียวจด) and is not affiliated with MeowJot, KASIKORN X or any bank. It is published by Trajectonomics.
 
-MooJot reads slips from 20 Thai bank apps, sorts each into a category, spots transfers between your own accounts, shows summaries and budgets, and imports credit card statements. It needs Android 7.0 or newer on a 64-bit phone. There is no iPhone version yet. It is not on the Play Store yet: install the APK from the project's GitHub releases. It is MIT licensed.
+OpenJot reads slips from 20 Thai bank apps, sorts each into a category, spots transfers between your own accounts, shows summaries and budgets, and imports credit card statements. It needs Android 7.0 or newer on a 64-bit phone. There is no iPhone version yet. It is not on the Play Store yet: install the APK from the project's GitHub releases. It is MIT licensed.
 
 ## Site
 
-- [MooJot](https://moojot.trajectonomics.com/): the landing page, in Thai and English: what it does, the three install steps, privacy and the FAQ
-- [MooJot vs MeowJot](https://moojot.trajectonomics.com/meowjot-alternative): a side-by-side comparison with MeowJot (เหมียวจด): price, sign-up, where data is kept, slip history, budgets, tags, credit cards and export, with screenshots of both apps and sources
-- [Download the latest APK](https://moojot.trajectonomics.com/download): redirects to the signed APK in the latest GitHub release
+- [OpenJot](https://openjot.trajectonomics.com/): the landing page, in Thai and English: what it does, the three install steps, privacy and the FAQ
+- [OpenJot vs MeowJot](https://openjot.trajectonomics.com/meowjot-alternative): a side-by-side comparison with MeowJot (เหมียวจด): price, sign-up, where data is kept, slip history, budgets, tags, credit cards and export, with screenshots of both apps and sources
+- [Download the latest APK](https://openjot.trajectonomics.com/download): redirects to the signed APK in the latest GitHub release
 
 ## Source and trust
 
-- [moojot on GitHub](https://github.com/trajectonomics/moojot)
-- [Releases and SHA256SUMS](https://github.com/trajectonomics/moojot/releases)
-- [Privacy policy](https://github.com/trajectonomics/moojot/blob/main/docs/privacy-policy.md)
-- [Terms of service](https://github.com/trajectonomics/moojot/blob/main/docs/terms-of-service.md)
-- [MIT License](https://github.com/trajectonomics/moojot/blob/main/LICENSE)
+- [OpenJot on GitHub](https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot)
+- [Releases and SHA256SUMS](https://github.com/trajectonomics/trajectonomics/releases?q=openjot-v)
+- [Privacy policy](https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/privacy-policy.md)
+- [Terms of service](https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/terms-of-service.md)
+- [MIT License](https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/LICENSE)
 
 ## Publisher
 

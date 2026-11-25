@@ -1,8 +1,8 @@
 [package]
 name = "moojot"
 version = "1.4.0"
-description = "MooJot — Open-source personal income/expense tracker & Thai e-slip manager"
-authors = ["MooJot Contributors"]
+description = "OpenJot — Open-source personal income/expense tracker & Thai e-slip manager"
+authors = ["OpenJot Contributors"]
 edition = "2024"
 
 [lib]

@@ -1023,6 +1023,7 @@ pub fn export_backup_json(state: State<'_, DbState>) -> Result<String, String> {
     let tags = list_tags(&conn)?;
     let records = crate::analytics::query_records_in_range(&conn, "1970-01-01", "2999-12-31", None)?;
     let payload = serde_json::json!({
+        // The "app" marker stays "MooJot": restore (#578) reads it, so every backup keeps one marker.
         "app": "MooJot",
         "version": 1,
         "exportedAt": Local::now().to_rfc3339(),
