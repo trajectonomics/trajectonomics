@@ -38,6 +38,18 @@ export interface OpenJotDictionary {
 	readonly featureTitles: readonly string[]
 	/** Six feature sentences, one per title and in the same order. */
 	readonly featureCopies: readonly string[]
+	readonly privacyEyebrow: string
+	readonly privacyHeading: string
+	/** Four privacy claims' titles, in the order the page lists them. */
+	readonly privacyTitles: readonly string[]
+	/** One paragraph per claim, in the same order: the claim's own words, never more. */
+	readonly privacyCopies: readonly string[]
+	/** The link to the app's privacy policy. */
+	readonly privacyPolicyLink: string
+	/** The link to the app's terms of service. */
+	readonly termsLink: string
+	/** The link that writes to the privacy contact. */
+	readonly privacyContactLink: string
 	readonly installEyebrow: string
 	readonly installHeading: string
 	readonly installLede: string
@@ -63,6 +75,24 @@ export interface OpenJotDictionary {
 	/** The quiet link under the closing button. */
 	readonly ossLink: string
 }
+
+/** The FAQ's words, which each Language's own file carries. */
+export type OpenJotFaqWords = Pick<
+	OpenJotDictionary,
+	"faqEyebrow" | "faqHeading" | "faqQuestions" | "faqAnswers"
+>
+
+/** The Privacy section's words: the ported claims, and the three links under them. */
+export type OpenJotPrivacyWords = Pick<
+	OpenJotDictionary,
+	| "privacyEyebrow"
+	| "privacyHeading"
+	| "privacyTitles"
+	| "privacyCopies"
+	| "privacyPolicyLink"
+	| "termsLink"
+	| "privacyContactLink"
+>
 
 /** The OpenJot page's build path and words for one Language. */
 export interface OpenJotLanguageEntry {

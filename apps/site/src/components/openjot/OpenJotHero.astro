@@ -12,7 +12,7 @@ interface Props {
 
 const { dictionary } = Astro.props
 // The hero shows the summary screen: the figure a visitor came for, before the install steps.
-const HERO_SHOT = "/openjot/shot-summary.webp"
+const HERO_SHOT = "/openjot/summary.webp"
 ---
 
 <section class="section-surface relative isolate overflow-clip bg-background">
@@ -49,8 +49,8 @@ const HERO_SHOT = "/openjot/shot-summary.webp"
 			<div class="openjot-phone openjot-phone-hero">
 				<img
 					src={HERO_SHOT}
-					width="600"
-					height="1298"
+					width="412"
+					height="915"
 					alt={dictionary.screenAlts[1]}
 					fetchpriority="high"
 				/>
