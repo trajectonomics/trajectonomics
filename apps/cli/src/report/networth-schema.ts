@@ -1,7 +1,7 @@
 import { z } from "zod"
 import type { NetWorthResult } from "./networth"
 import { recordStartShape } from "./record"
-import { totalRefusal } from "./total"
+import { totalRefusal } from "./total-view"
 import { reportRow, totalView } from "./view"
 
 /** The single-date result: `--as-of`'s data, and each month of the monthly form. */

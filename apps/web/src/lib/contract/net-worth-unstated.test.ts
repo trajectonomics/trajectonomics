@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { balance } from "./balance"
 import { netWorth } from "./net-worth"
 import { netWorthMonthly } from "./net-worth-monthly"
+import { pnl } from "./pnl"
 
 const ERROR = {
 	code: "AMOUNT_OVERFLOW",
@@ -34,5 +35,15 @@ describe("a net worth total the CLI does not state (cli ADR 0079)", () => {
 			],
 		}
 		expect(netWorthMonthly.parse(data)).toEqual(data)
+	})
+
+	test("parses `balance` whose trial balance has rows and no totals, and `report pnl` with no total", () => {
+		const trialError = { ...ERROR, path: "trialBalance.totals[THB].debit" }
+		const trial = { rows: [], totals: null, totalsError: trialError }
+		const data = { asOf: "2026-03-31", rows: [], netWorth: null, trialBalance: trial }
+		expect(balance.parse(data)).toEqual(data)
+		const report = { since: null, until: "2026-03-31", project: null, rows: [], totals: null }
+		expect(pnl.parse({ ...report, totalsError: ERROR })).toEqual({ ...report, totalsError: ERROR })
+		expect(pnl.safeParse({ ...report, totals: undefined }).success).toBe(false)
 	})
 })

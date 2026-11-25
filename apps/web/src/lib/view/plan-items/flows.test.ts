@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { ScenarioFlow } from "../../contract/scenario-show"
+import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
 import { planDocument } from "./fixtures.test-support"
 import { flowCards, flowDraftOf } from "./flows"
 
@@ -11,6 +11,7 @@ describe("flowCards", () => {
 			id: "salary",
 			amount: "90000.00",
 			frequency: "monthly",
+			startLabel: "Starts",
 			start: "2026-11-01",
 			end: "2050-05-14",
 			startAnchor: null,
@@ -40,6 +41,51 @@ describe("flowCards", () => {
 		expect(refund?.amount).toBeNull()
 		expect(refund?.growth).toBe("Computed")
 		expect(refund?.editable).toBe(false)
+	})
+})
+
+describe("flowCards of a once Flow", () => {
+	test("a once income reads On its date, with no Ends", () => {
+		const bonus = scenarioFlow.parse({
+			id: "bonus",
+			kind: "income",
+			frequency: "once",
+			start: "2027-03-01",
+			amount: "5000.00",
+			earned: true,
+		})
+		const [card] = flowCards([bonus], "income")
+		expect(card).toMatchObject({
+			startLabel: "On",
+			start: "2027-03-01",
+			end: null,
+			endAnchor: null,
+		})
+	})
+
+	test("a once expense reads On its date, with no Ends", () => {
+		const fee = scenarioFlow.parse({
+			id: "fee",
+			kind: "expense",
+			frequency: "once",
+			start: "2027-03-01",
+			amount: "1200.00",
+		})
+		const [card] = flowCards([fee], "expense")
+		expect(card).toMatchObject({ startLabel: "On", start: "2027-03-01", end: null })
+	})
+
+	test("a recurring expense still reads Starts and Ends", () => {
+		const rent = scenarioFlow.parse({
+			id: "rent",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2026-11-01",
+			end: "2030-01-01",
+			amount: "900.00",
+		})
+		const [card] = flowCards([rent], "expense")
+		expect(card).toMatchObject({ startLabel: "Starts", start: "2026-11-01", end: "2030-01-01" })
 	})
 })
 

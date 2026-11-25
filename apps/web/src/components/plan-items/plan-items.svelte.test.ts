@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
+import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { baselineRead, planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { flowDraftOf } from "../../lib/view/plan-items/flows"
 import { shownProblems } from "../../lib/view/plan-items/problems"
 import Drawer from "../ui/Drawer.svelte"
+import AnchoredNote from "./AnchoredNote.svelte"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
@@ -67,6 +69,13 @@ describe("the household's anchored dates on the planner pages", () => {
 		expect(body).not.toMatch(/<input[^>]*id="flow-start"[^>]*disabled/)
 		expect(body).toContain('href="/projection/?scenario=base#household"')
 	})
+
+	test("the link to the household card keeps the address's other parameters", () => {
+		setTestUrl("http://127.0.0.1/income/?terms=real&demo=1&scenario=base")
+		const body = render(AnchoredNote, { props: { anchor: "at me, age 60", plan: "base" } }).body
+		expect(body).toContain('href="/projection/?terms=real&amp;demo=1&amp;scenario=base#household"')
+		setTestUrl("http://127.0.0.1/")
+	})
 })
 
 describe("the Income page's list", () => {
@@ -94,6 +103,16 @@ describe("the Income page's list", () => {
 		const read = list("income", { editable: false })
 		expect(read).not.toMatch(addButton)
 		expect(read).not.toContain('aria-label="Edit salary"')
+	})
+
+	test("a once Flow's card has one On row and no Ends row; a recurring one has Starts and Ends", () => {
+		const body = list("income")
+		const rows = (label: string) =>
+			body.match(new RegExp(`<dt[^>]*>${label}</dt>`, "g"))?.length ?? 0
+		// salary (monthly) and pension (annual) recur; tax-refund happens once.
+		expect(rows("Starts")).toBe(2)
+		expect(rows("Ends")).toBe(2)
+		expect(rows("On")).toBe(1)
 	})
 
 	test("says so when the plan has no income, and the drawer is shut", () => {

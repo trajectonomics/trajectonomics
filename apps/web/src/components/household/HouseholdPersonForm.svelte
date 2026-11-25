@@ -41,7 +41,13 @@ const taken = $derived((household?.people ?? []).map((person) => person.id))
 
 /** Saves the household as one Edit; the drawer closes only when it ran. */
 async function commit(next: HouseholdDocument): Promise<void> {
-	if (await editSession.run({ kind: "set-household", name, contentHash, household: next })) onDone()
+	if (
+		await editSession.run(
+			{ kind: "set-household", name, contentHash, household: next },
+			"household",
+		)
+	)
+		onDone()
 }
 
 async function save(event: SubmitEvent): Promise<void> {

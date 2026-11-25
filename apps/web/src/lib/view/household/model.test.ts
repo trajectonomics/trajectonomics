@@ -1,7 +1,15 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument } from "../../contract"
 import { personNames } from "../item-names"
-import { agesText, anchorAt, flowAnchorLabels, householdHref, personCards, roleText } from "./model"
+import {
+	agesText,
+	anchorAt,
+	axisAge,
+	flowAnchorLabels,
+	householdHref,
+	personCards,
+	roleText,
+} from "./model"
 
 const household: HouseholdDocument = {
 	schemaVersion: 1,
@@ -90,6 +98,19 @@ describe("agesText", () => {
 
 	test("is empty when the row carries no ages", () => {
 		expect(agesText([])).toBe("")
+	})
+})
+
+describe("axisAge", () => {
+	test('reads "age N" for one person, the first person\'s age for several, and null for none', () => {
+		expect(axisAge([{ person: "me", age: 37 }])).toBe("age 37")
+		expect(
+			axisAge([
+				{ person: "me", age: 37 },
+				{ person: "partner", age: 35 },
+			]),
+		).toBe("me 37")
+		expect(axisAge([])).toBeNull()
 	})
 })
 

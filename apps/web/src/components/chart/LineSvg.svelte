@@ -21,6 +21,9 @@ let { label, layout, width, masked, index }: Props = $props()
 /** The room a date label needs on each side of its tick, so the last one is not cut off at the edge. */
 const HALF_LABEL = 36
 
+/** Whether a second line of labels (the ages) sits under the dates, which lifts the dates by a line. */
+const stacked = $derived(layout.xTicks.some((tick) => tick.sub !== undefined))
+
 /** A label is centred on its tick, except near an edge, where it ends or starts there instead. */
 function anchorAt(x: number): "start" | "middle" | "end" {
 	if (x + HALF_LABEL > width) return "end"
@@ -41,10 +44,18 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 	{#each layout.xTicks as tick (tick.index)}
 		<text
 			x={layout.xPixels[tick.index]}
-			y={HEIGHT - 8}
+			y={stacked ? HEIGHT - 22 : HEIGHT - 8}
 			text-anchor={anchorAt(layout.xPixels[tick.index] ?? 0)}
 			class="fill-muted-foreground text-xs">{tick.label}</text
 		>
+		{#if tick.sub !== undefined}
+			<text
+				x={layout.xPixels[tick.index]}
+				y={HEIGHT - 8}
+				text-anchor={anchorAt(layout.xPixels[tick.index] ?? 0)}
+				class="fill-muted-foreground text-xs">{tick.sub}</text
+			>
+		{/if}
 	{/each}
 	{#each layout.series as line, seriesIndex (line.name)}
 		{#if line.area}

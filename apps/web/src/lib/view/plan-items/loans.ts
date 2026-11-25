@@ -1,4 +1,5 @@
 import type { ScenarioFlow } from "../../contract/scenario-show"
+import { isOnce } from "./flow-dates"
 import { growthText } from "./flows"
 
 /** One label and its value as a loan card states them. Every value is the CLI's text. */
@@ -27,8 +28,9 @@ export function isLoan(flow: ScenarioFlow): boolean {
 	return flow.kind === "withdrawal" || (flow.kind === "contribution" && flow.level !== undefined)
 }
 
-/** The start and end of a loan as its rows show them: the end runs to the horizon when none is stated. */
+/** The dates of a withdrawal as its rows show them: a once withdrawal has one date, "On", and no end; any other runs to the horizon when none is stated. */
 function datesOf(flow: ScenarioFlow): LoanRow[] {
+	if (isOnce(flow)) return [{ label: "On", value: flow.start }]
 	return [
 		{ label: "Starts", value: flow.start },
 		{ label: "Ends", value: flow.end ?? "To the horizon" },

@@ -6,6 +6,8 @@ export interface LinePoint {
 	readonly display: string
 	/** A longer name for the x, such as the period a point covers; the tooltip shows it in place of `xLabel`. */
 	readonly xTitle?: string
+	/** A second line under the x label, such as the age of a person that year; a line chart draws it when a point has one. */
+	readonly subLabel?: string
 	/** True for a point that covers part of a period. A column chart draws it faded. */
 	readonly partial?: boolean
 }

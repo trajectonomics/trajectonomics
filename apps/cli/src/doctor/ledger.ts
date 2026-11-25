@@ -1,6 +1,6 @@
 import { counted } from "../counts"
 import { type AppError, isAppError } from "../errors"
-import { trialBalanceAt } from "../report/balance"
+import { trialBalanceAt } from "../report/trial"
 import type { Ledger, Store } from "../store"
 import { NO_TRIAL, sentenceOf, skipped, step } from "./checks"
 import type { DoctorCheck, DoctorResult } from "./output"
