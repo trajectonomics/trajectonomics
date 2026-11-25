@@ -29,11 +29,15 @@ export {
 	TH_LEVY_CONTRIBUTION_LABELS,
 	TH_LEVY_INCOME_LABELS,
 	TH_LEVY_MEMBER_ONLY_LABELS,
+	TH_LEVY_SHARED_FILER,
 	ThLevyContributionLabel,
+	ThLevyFilerField,
 	ThLevyIncomeLabel,
 	ThLevyMeasureId,
 	ThLevyRounding,
 	ThLevyTallyBasis,
+	thFilerLabel,
+	thLevyTalliesFor,
 } from "./levy"
 export { TH_2026_PARAMETERS } from "./parameters"
 export type { ThTaxResult } from "./result"

@@ -214,8 +214,12 @@ The one payment a `level` Contribution makes into a nominal liability: the amoun
 _Avoid_: annuity payment, PMT, fixed payment, installment
 
 **Liability statement**:
-One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each calendar month, cut by the Timeline start, the horizon or a run-out date, gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly (a liability a Transfer pays down also lists `transferred`, taken off the same way).
+One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each **Statement month** gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly (a liability a Transfer pays down also lists `transferred`, taken off the same way).
 _Avoid_: amortization table, loan schedule, payment schedule
+
+**Statement month**:
+A calendar month, cut by the Timeline start, the horizon or a run-out date, and the unit a Liability statement reports, whatever the Compounding period. A cut edge makes it partial.
+_Avoid_: period, statement period
 
 **Paid-off date**:
 The first Landed date on which a liability's amount owed reaches zero after being above zero, reported as `paidOff` on its Liability statement. It is absent while the amount owed is never zero, such as a loan still owed at the horizon.
