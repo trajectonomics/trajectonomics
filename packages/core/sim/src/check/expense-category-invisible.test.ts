@@ -27,7 +27,10 @@ describe("a blank or invisible category is refused, so the breakdown groups exac
 		["a lone high surrogate", "a\ud800b"],
 		["a lone low surrogate", "a\udc00b"],
 		["a trailing lone high surrogate", "a\ud83d"],
-		["a family emoji, which joins with U+200D", "\u{1F468}\u200d\u{1F469}\u200d\u{1F467}"],
+		["a joiner before an emoji", "\u200d\u{1F642}"],
+		["a joiner after an emoji", "\u{1F642}\u200d"],
+		["a joiner between an emoji and a letter", "\u{1F642}\u200da"],
+		["a doubled joiner inside an emoji sequence", "\u{1F468}\u200d\u200d\u{1F469}"],
 	]
 
 	it.each(refused)("refuses %s as INVALID_CATEGORY", (_name, category) => {
@@ -84,6 +87,9 @@ describe("ordinary non-ASCII categories still pass", () => {
 		["one emoji", "🙂"],
 		["an emoji with a skin tone", "👍🏽"],
 		["a flag", "🇹🇭"],
+		["a family, joined with U+200D", "\u{1F468}\u200d\u{1F469}\u200d\u{1F467}"],
+		["a rainbow flag, joined after a variation selector", "\u{1F3F3}\ufe0f\u200d\u{1F308}"],
+		["a person with a skin tone and a job", "\u{1F468}\u{1F3FD}\u200d\u{1F4BB}"],
 		["CJK", "食費"],
 		["Arabic, which is written right to left", "طعام"],
 		["Hebrew", "מזון"],

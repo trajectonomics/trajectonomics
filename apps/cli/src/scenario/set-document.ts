@@ -1,5 +1,6 @@
 import type { AppError } from "../errors"
-import { documentPath, type ScenarioProblem } from "./document"
+import { acceptedScenarioSchemaVersion, documentPath, type ScenarioProblem } from "./document"
+import { detailOf } from "./document-detail"
 import { ownDocumentError } from "./document-error"
 import { isOwnProblem, ownProblems } from "./own-problems"
 import { formatPath, overrideSegments } from "./path"
@@ -46,6 +47,21 @@ function staleOwnError(
 }
 
 /**
+ * What states a refusal beyond its code: a code the refusal table words gives its sentence and way
+ * out, as `scenario apply --file` does; one with no sentence still names what it needs (the
+ * category rule, say), as `refusalOf` does. `detail` is the text that follows the code.
+ */
+function wordsAndDetail(problem: ScenarioProblem): {
+	said: ReturnType<typeof wordsOf>
+	detail: string
+} {
+	const said = wordsOf(problem)
+	if (said !== undefined) return { said, detail: `. ${said.message}` }
+	const needs = detailOf(problem, acceptedScenarioSchemaVersion)
+	return { said, detail: needs === undefined ? "" : ` (${needs})` }
+}
+
+/**
  * The error for a document the overrides left outside `sim-core`'s Scenario schema, at the input
  * field that caused it: a `--without`, an `--add` or a `--set`. It reports the first problem an Override covers,
  * so a later problem cannot hide the one that names the cause; when none covers a problem it reports
@@ -73,13 +89,12 @@ export function documentFailure(
 	// The index counts occurrences of that input field, as its own list does.
 	const index = items.slice(0, at).filter((item) => item.flag === flag).length
 	const path = documentPath("document", chosen.problem.segments)
-	// A code the refusal table words states its sentence and way out, as `scenario apply --file` does.
-	const said = wordsOf(chosen.problem)
+	const { said, detail } = wordsAndDetail(chosen.problem)
 	const own = `The overrides leave ${path} invalid; change that value or the path.`
 	return flagError(
 		flag,
 		index,
-		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}${said === undefined ? "" : `. ${said.message}`}`,
+		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}${detail}`,
 		{
 			hint: said?.hint === undefined ? own : `${said.hint} ${own}`,
 			details: {

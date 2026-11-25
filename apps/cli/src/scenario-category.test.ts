@@ -96,7 +96,22 @@ describe("the expense category in scenario apply and show", () => {
 				code: "INVALID_CATEGORY",
 			},
 		])
+	})
+
+	it("states the rule in the words a refusal quotes", () => {
 		expect(RULE).toContain("1 to 64 code points")
+	})
+
+	it("names the rule when a --set override breaks it, not the bare code", async () => {
+		const home = scenarioHome()
+		await applyScenario(home, "base", withExpense("essentials"))
+		const res = await capture(
+			["scenario", "fork", "base", "early", "--set", 'flows.groceries.category="a "', "--json"],
+			{ TRAJ_HOME: home },
+		)
+		expect(res.code).toBe(2)
+		expect(errorOf(res).message).toContain(`document.flows.2.category: INVALID_CATEGORY (${RULE})`)
+		expect(errorOf(res)).toMatchObject({ path: "--set" })
 	})
 
 	it("applies Thai, emoji and accented Latin categories", async () => {

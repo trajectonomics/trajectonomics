@@ -28,13 +28,24 @@ function isForbidden(code: number): boolean {
 		code < 0x20 || // C0 control characters
 		(code >= 0x7f && code <= 0x9f) || // DEL and C1 control characters
 		LINE_SEPARATORS.has(code) ||
-		(code >= 0x200b && code <= 0x200d) || // zero-width space, non-joiner and joiner
+		code === 0x200b || // zero-width space
+		code === 0x200c || // zero-width non-joiner
 		code === 0xfeff || // zero-width no-break space, the byte order mark
 		(code >= 0x202a && code <= 0x202e) || // bidirectional embeddings and overrides
 		(code >= 0x2066 && code <= 0x2069) || // bidirectional isolates
 		(code >= 0xd800 && code <= 0xdfff) // a lone surrogate: `Array.from` keeps a pair as one code point
 	)
 }
+
+const ZERO_WIDTH_JOINER = "\u200d"
+
+/** A zero-width joiner that links two pictographs, with an optional variation selector or skin tone before it. */
+const EMOJI_JOINER =
+	/(?<=\p{Extended_Pictographic}[\u{FE0F}\u{1F3FB}-\u{1F3FF}]?)\u200d(?=\p{Extended_Pictographic})/gu
+
+/** Whether a zero-width joiner stands anywhere but inside an emoji sequence, where it is invisible text. */
+const hasStrayJoiner = (value: string): boolean =>
+	value.replace(EMOJI_JOINER, "").includes(ZERO_WIDTH_JOINER)
 
 /** Leading or trailing whitespace, which also refuses a category that is whitespace alone. */
 const EDGE_WHITESPACE = /^\s|\s$/u
@@ -47,6 +58,7 @@ export const expenseCategory: Check = (value, path, emit) => {
 		codePoints.length === 0 ||
 		codePoints.length > MAX_CATEGORY_LENGTH ||
 		codePoints.some(isForbidden) ||
+		hasStrayJoiner(value) ||
 		EDGE_WHITESPACE.test(value)
 	if (bad) emit("INVALID_CATEGORY", path)
 }

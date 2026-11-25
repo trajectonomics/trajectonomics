@@ -97,7 +97,9 @@ emoji fit and a decomposed accent counts as two) with:
 
 - no control code point: C0 (U+0000 to U+001F), DEL and C1 (U+007F to U+009F), as before;
 - no line or paragraph separator (U+2028, U+2029);
-- no zero-width code point (U+200B to U+200D, U+FEFF);
+- no zero-width space, non-joiner or byte order mark (U+200B, U+200C, U+FEFF), and no zero-width joiner
+  (U+200D) except inside an emoji sequence, where it sits between two pictographs (a variation selector
+  or skin tone may come before it), as in a family or a rainbow flag;
 - no bidirectional control (U+202A to U+202E, U+2066 to U+2069), which can reorder a printed category;
 - no lone surrogate, a UTF-16 unit that is no text and that a JSON reader may replace or reject;
 - no leading or trailing whitespace (the ECMAScript `\s` set, which includes U+00A0 and U+3000), which also
@@ -108,11 +110,13 @@ groups and the breakdown reports what the document says. Refusing is the choice 
 rewrite the document the person wrote (a Scenario round-trips unchanged) and a silent merge would hide the
 typo.
 
-- **Known cost.** A multi-person emoji such as a family joins its parts with U+200D and is refused, as is
-  any text that needs a joiner or non-joiner; a single emoji, a flag, a skin tone, Thai, CJK, right-to-left
-  scripts and accented Latin pass. Other format characters (soft hyphen U+00AD, word joiner U+2060, Hangul
-  filler U+3164, Braille blank U+2800) are not refused: the list is the set that hides a category or
-  reorders it, and a wider list would refuse text people write.
+- **Known cost.** U+200C and U+200D are refused anywhere outside an emoji sequence, so text in a script
+  that needs them is refused: the zero-width non-joiner and joiner of Persian, Urdu, Devanagari and other
+  Indic scripts, for one. A category in such a script has to be written without them. Emoji, including
+  joined sequences (a family, a rainbow flag, a person with a skin tone and a job), flags, Thai, CJK,
+  other right-to-left scripts and accented Latin pass. Other format characters (soft hyphen U+00AD, word
+  joiner U+2060, Hangul filler U+3164, Braille blank U+2800) are not refused: the list is the set that hides
+  a category or reorders it, and a wider list would refuse text people write.
 - **Existing documents.** A document whose category meets the older rule but not this one is now refused
   at `category`; every document without such a category is read, and every Projection and breakdown is
   byte for byte as before (the parity hashes are unchanged).
