@@ -46,6 +46,12 @@ export class WhatIfState {
 		return this.waiting || this.inFlight
 	}
 
+	/** A rename of the plan the session is on: it follows to the new name and keeps its changes; the hash and the reads are as they were (cli ADR 0071). */
+	followRename(from: string, to: string): void {
+		if (this.whatIf?.plan === from) this.whatIf = { ...this.whatIf, plan: to }
+		if (this.asking === from) this.asking = to
+	}
+
 	/** The changes, as the bar lists them. */
 	get changes(): Change[] {
 		return this.whatIf === null ? [] : changesOf(this.whatIf)

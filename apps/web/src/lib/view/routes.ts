@@ -79,3 +79,11 @@ const CHILD_PAGES: Readonly<Record<string, string>> = { "/chance/path/": "/chanc
 export function navPath(path: string): string {
 	return CHILD_PAGES[path] ?? path
 }
+
+/** The titles of pages that are in no navigation group, by path. */
+const OTHER_TITLES: Readonly<Record<string, string>> = { "/plans/": "Plans" }
+
+/** The heading of the page at a path: its navigation label, or the title of a page the navigation does not list. */
+export function pageTitle(path: string): string {
+	return OTHER_TITLES[path] ?? routeAt(navPath(path))?.label ?? "Dashboard"
+}
