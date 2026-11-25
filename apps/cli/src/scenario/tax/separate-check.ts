@@ -33,9 +33,10 @@ function wording(code: ThSeparateClaimCode, persons: readonly string[]) {
 	const { parent, mortgageInterestCeiling: ceiling } = TH_2026_PARAMETERS.allowances
 	if (code === ThSeparateClaimCode.MortgageOverCeiling) {
 		const most = ceiling.toLocaleString("en-US")
+		const both = persons.length > 1 ? " for both Returns" : ""
 		return {
 			path: "mortgageInterest",
-			message: `--mortgage-interest: "shared=" states more than ${most} baht, the one ceiling a loan borrowed together has for both Returns`,
+			message: `--mortgage-interest: "shared=" states more than ${most} baht, the one ceiling a loan borrowed together has${both}`,
 			hint: `State at most ${most} baht, as --mortgage-interest shared=${ceiling}; add --merge to change a stored profile.`,
 		}
 	}

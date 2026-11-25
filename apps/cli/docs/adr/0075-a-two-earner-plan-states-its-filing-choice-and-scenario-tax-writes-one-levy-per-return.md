@@ -236,7 +236,22 @@ This is the follow-up the shared home-loan ceiling left above.
   or while the plan has no Filers, as the other claims are: no Levy reads it, and a later separate
   filing takes it back. A joint Return therefore claims only the flat `mortgageInterest`, so a caller
   who files jointly states the Return's interest there.
+- **What a Return does not claim is said.** A write that is not a separate one with Filers says, in
+  `assumptions` on `allowances.mortgageInterestCeiling`, that the shared interest the profile keeps is
+  not claimed, with the amount and `--mortgage-interest <amount> --merge` as the way to state this
+  Return's interest. It says the same of the claims kept for another person, naming them, whatever
+  they claim: every entry of `assumptions` is one of tax-core's figures, so this is the entry that
+  carries a sentence about a claim. The entry keeps tax-core's value and status, and is added when the
+  Levy claims no home-loan interest. A separate write whose sole Filer leaves the other person's
+  stored claims unclaimed says nothing, as before.
 - **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
   note is added as before, and now names the flag.
+- **The Dashboard** reads `sharedMortgageInterest` but neither shows nor edits it, and a save of the
+  whole profile from the Dashboard drops it, as a write with `--tax` that leaves it out does.
+  Follow-up: trajectonomics/trajectonomics#618.
+- **Known limit: the one-earner rule is applied once per write, not per projection year.** Who is a
+  Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
+  2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
+  the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.
