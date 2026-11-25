@@ -68,6 +68,20 @@ describe("validateIngest", () => {
 		expect(codes([usageRow({ hourUtc: "2026-11-25T13:00:00.000Z" })], [], now)).toEqual([])
 	})
 
+	test("rejects a bucket before 2020", () => {
+		expect(codes([usageRow({ hourUtc: "2019-12-31T23:00:00.000Z" })])).toContain("HOUR_TOO_OLD")
+	})
+
+	test("accepts the first bucket of 2020", () => {
+		expect(codes([usageRow({ hourUtc: "2020-01-01T00:00:00.000Z" })])).toEqual([])
+	})
+
+	test("rejects a quota sample before 2020", () => {
+		expect(codes([], [quotaSample({ sampledAt: "2019-12-31T23:00:00.000Z" })])).toContain(
+			"HOUR_TOO_OLD",
+		)
+	})
+
 	test("rejects invalid token counts", () => {
 		expect(codes([usageRow({ tokensIn: -1 })])).toContain("TOKEN_NEGATIVE")
 		expect(codes([usageRow({ tokensOut: 1.5 })])).toContain("TOKEN_NOT_INTEGER")
@@ -78,8 +92,15 @@ describe("validateIngest", () => {
 		expect(codes([usageRow({ tokensTotal: 99 })])).toContain("TOKENS_TOTAL_INCONSISTENT")
 	})
 
-	test("skips the total check when a part is missing", () => {
+	test("rejects a total below the present parts when one is missing", () => {
+		expect(codes([usageRow({ cacheWrite: null, tokensTotal: 59 })])).toContain(
+			"TOKENS_TOTAL_INCONSISTENT",
+		)
+	})
+
+	test("accepts a total above the present parts when one is missing", () => {
 		expect(codes([usageRow({ cacheWrite: null, tokensTotal: 60 })])).toEqual([])
+		expect(codes([usageRow({ cacheWrite: null, tokensTotal: 61 })])).toEqual([])
 	})
 
 	test("rejects an invalid request count", () => {

@@ -64,4 +64,55 @@ describe("parseUsageQuery", () => {
 	test("rejects an empty model", () => {
 		expect(parse("?model=")).toMatchObject({ ok: false, error: { code: "INVALID_MODEL" } })
 	})
+
+	test("accepts a lowercase model id up to 64 characters", () => {
+		expect(parse(`?model=${"a".repeat(64)}`).ok).toBe(true)
+		expect(parse("?model=openai/gpt-5.1_x-2").ok).toBe(true)
+	})
+
+	test("rejects a model id over 64 characters or outside the lowercase set", () => {
+		expect(parse(`?model=${"a".repeat(65)}`)).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_MODEL" },
+		})
+		expect(parse("?model=Claude-Opus")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_MODEL" },
+		})
+		expect(parse("?model=a%20b")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_MODEL" },
+		})
+	})
+
+	test("bounds dates to 2020-01-01 through tomorrow", () => {
+		expect(parse("?from=2019-12-31")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
+		})
+		expect(parse("?to=2026-11-26").ok).toBe(true)
+		expect(parse("?to=2026-11-27")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
+		})
+		expect(parse("?asOf=2019-12-31")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_DATE" },
+		})
+	})
+
+	test("caps the span at 400 days", () => {
+		expect(parse("?from=2025-01-01&to=2026-02-05").ok).toBe(true)
+		expect(parse("?from=2025-01-01&to=2026-02-06")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_RANGE" },
+		})
+	})
+
+	test("rejects from after the effective upper bound", () => {
+		expect(parse("?from=2026-11-20&asOf=2026-11-19")).toMatchObject({
+			ok: false,
+			error: { code: "INVALID_RANGE" },
+		})
+	})
 })

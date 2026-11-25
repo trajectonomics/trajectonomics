@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test"
 import type { UsageRow } from "@trajectonomics/data-collector/types"
 import type { IngestBatch, QuotaSample } from "../src/core/types"
 import { writeIngest } from "../src/db/ingest"
-import { readLastIngest, readRollups, readUsageDay } from "../src/db/read"
+import { readLastIngest, readRollups } from "../src/db/read"
 import { NOW_ISO, quotaSample, usageRow } from "./support/fixtures"
 import { harness } from "./support/http"
 
@@ -116,6 +116,22 @@ describe("the D1 layer", () => {
 		expect(rollup?.tokens_total).toBe(4)
 	})
 
+	test("two interleaved ingests of one day add up", async () => {
+		const { env } = harness()
+		await Promise.all([
+			writeIngest(env.DB, batch([usageRow({ machine: "m-aaaaaaaa" })]), NOW_ISO),
+			writeIngest(env.DB, batch([usageRow({ machine: "m-bbbbbbbb" })]), NOW_ISO),
+		])
+		const [rollup] = await readRollups(env.DB, {
+			series: "measured-by-us",
+			from: null,
+			to: null,
+			plan: null,
+			model: null,
+		})
+		expect(rollup?.tokens_total).toBe(200)
+	})
+
 	test("recomputes only the days the batch touches", async () => {
 		const { env } = harness()
 		await writeIngest(env.DB, batch([usageRow()]), NOW_ISO)
@@ -128,14 +144,5 @@ describe("the D1 layer", () => {
 			model: null,
 		})
 		expect(capped.map((row) => row.day)).toEqual(["2026-11-24"])
-	})
-
-	test("reads a day's stored rows back", async () => {
-		const { env } = harness()
-		await writeIngest(env.DB, batch([usageRow()]), NOW_ISO)
-		const rows = await readUsageDay(env.DB, "trajectonomics", "2026-11-24")
-		expect(rows).toHaveLength(1)
-		expect(rows[0]?.bestEffort).toBe(false)
-		expect(rows[0]?.tokensTotal).toBe(100)
 	})
 })

@@ -3,6 +3,9 @@ import type { Granularity } from "@trajectonomics/data-collector/types"
 
 /** One hour and one day in milliseconds. */
 export const HOUR_MS = 3_600_000
+export const DAY_MS = 86_400_000
+/** The earliest instant an ingest row may describe: 2020-01-01T00:00:00Z. */
+export const MIN_INGEST_MS = Date.parse("2020-01-01T00:00:00.000Z")
 /** The largest token or request count a row may carry. */
 export const MAX_TOKENS = 100_000_000_000
 /** The most rows one ingest body may carry. */
@@ -11,6 +14,10 @@ export const MAX_INGEST_ROWS = 5_000
 export const MAX_INGEST_BYTES = 1_048_576
 /** How many validation errors a 400 response lists. */
 export const MAX_INGEST_ERRORS = 10
+/** The earliest UTC day the public query may name. */
+export const MIN_QUERY_DAY = "2020-01-01"
+/** The longest span, in days, the public query may ask for. */
+export const MAX_QUERY_SPAN_DAYS = 400
 
 const PLAN_IDS = new Set<string>(plans.map((plan) => plan.id))
 const MACHINE_ALIAS = /^m-[0-9a-f]{8}$/
@@ -44,4 +51,14 @@ export function boundaryMs(value: string, granularity: Granularity): number | nu
 /** Whether a bucket starts more than one hour after now. */
 export function isMoreThanOneHourAhead(ms: number, nowMs: number): boolean {
 	return ms > nowMs + HOUR_MS
+}
+
+/** Whether a bucket starts before the ingest floor of 2020-01-01T00:00:00Z. */
+export function isBeforeIngestFloor(ms: number): boolean {
+	return ms < MIN_INGEST_MS
+}
+
+/** The UTC day one day after a `YYYY-MM-DD` day. */
+export function nextDay(day: string): string {
+	return new Date(Date.parse(`${day}T00:00:00.000Z`) + DAY_MS).toISOString().slice(0, 10)
 }

@@ -2,7 +2,7 @@ import type { core } from "zod"
 import { z } from "zod"
 import { isoTimestamp } from "./iso"
 import { custom } from "./issue"
-import { boundaryMs, isKnownPlan, isMoreThanOneHourAhead } from "./rules"
+import { boundaryMs, isBeforeIngestFloor, isKnownPlan, isMoreThanOneHourAhead } from "./rules"
 import type { Principal, QuotaSample, QuotaWindow } from "./types"
 
 const quota = z.strictObject({
@@ -38,6 +38,13 @@ function checkQuota(
 	const ms = boundaryMs(row.sampledAt, "hour")
 	if (ms === null) {
 		custom(ctx, ["sampledAt"], "HOUR_NOT_ON_BOUNDARY", "sampledAt must start a UTC hour.")
+	} else if (isBeforeIngestFloor(ms)) {
+		custom(
+			ctx,
+			["sampledAt"],
+			"HOUR_TOO_OLD",
+			"sampledAt must be at or after 2020-01-01T00:00:00Z.",
+		)
 	} else if (isMoreThanOneHourAhead(ms, nowMs)) {
 		custom(ctx, ["sampledAt"], "HOUR_IN_FUTURE", "sampledAt must not be more than one hour ahead.")
 	}

@@ -1,4 +1,4 @@
-import type { Granularity, UsageRow } from "@trajectonomics/data-collector/types"
+import type { UsageRow } from "@trajectonomics/data-collector/types"
 
 /** The quota windows a plan can publish. */
 export type QuotaWindow = "five_hour" | "weekly" | "monthly"
@@ -45,19 +45,3 @@ export type UsageForRollup = Pick<
 	| "requests"
 	| "bestEffort"
 >
-
-/** One day's totals for one plan and model in one series. */
-export type RollupRow = {
-	series: string
-	day: string
-	plan: string
-	model: string
-	tokensIn: number | null
-	tokensOut: number | null
-	cacheRead: number | null
-	cacheWrite: number | null
-	tokensTotal: number
-	requests: number
-	granularity: Granularity
-	bestEffort: boolean
-}

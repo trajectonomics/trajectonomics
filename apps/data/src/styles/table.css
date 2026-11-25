@@ -4,8 +4,40 @@
 	padding-top: 32px;
 }
 
+.scroll-hint {
+	display: none;
+	margin: 0 0 8px;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* The frame holds the scroll container and its edge cue without widening the page. */
+.table-frame {
+	position: relative;
+	max-width: 100%;
+}
+
 .table-scroll {
 	overflow-x: auto;
+	max-width: 100%;
+}
+
+/* On a phone, fade the right edge to show that columns continue under the frame. */
+@media (max-width: 40rem) {
+	.scroll-hint {
+		display: block;
+	}
+
+	.table-frame::after {
+		content: "";
+		position: absolute;
+		inset: 0 0 0 auto;
+		width: 2.5rem;
+		background: linear-gradient(to right, transparent, var(--ds-color-background));
+		pointer-events: none;
+	}
 }
 
 .table-scroll:focus-visible {

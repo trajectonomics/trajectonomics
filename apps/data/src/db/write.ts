@@ -1,6 +1,6 @@
 import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types"
 import type { UsageRow } from "@trajectonomics/data-collector/types"
-import type { QuotaSample, RollupRow } from "../core/types"
+import type { QuotaSample } from "../core/types"
 
 const USAGE_UPSERT = `
 INSERT INTO usage_hourly (
@@ -29,11 +29,20 @@ ON CONFLICT (contributor_id, plan, window, sampled_at) DO UPDATE SET
 	received_at = excluded.received_at
 `
 
-const ROLLUP_INSERT = `
+const ROLLUP_REBUILD = `
 INSERT INTO rollup_daily (
 	series, day, plan, model, tokens_in, tokens_out, cache_read, cache_write,
 	tokens_total, requests, granularity, best_effort
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+)
+SELECT ?, substr(hour_utc, 1, 10), plan, model,
+	SUM(tokens_in), SUM(tokens_out), SUM(cache_read), SUM(cache_write),
+	SUM(tokens_total), SUM(requests),
+	CASE WHEN MAX(granularity = 'day') = 1 THEN 'day' ELSE 'hour' END,
+	MAX(best_effort)
+FROM usage_hourly
+JOIN contributor ON contributor.id = usage_hourly.contributor_id
+WHERE substr(hour_utc, 1, 10) = ? AND contributor.kind = 'org'
+GROUP BY plan, model
 `
 
 /** One prepared upsert for a usage row. */
@@ -81,24 +90,9 @@ export function rollupDelete(db: D1Database, series: string, day: string): D1Pre
 	return db.prepare("DELETE FROM rollup_daily WHERE series = ? AND day = ?").bind(series, day)
 }
 
-/** One prepared insert for a rebuilt rollup row. */
-export function rollupInsert(db: D1Database, row: RollupRow): D1PreparedStatement {
-	return db
-		.prepare(ROLLUP_INSERT)
-		.bind(
-			row.series,
-			row.day,
-			row.plan,
-			row.model,
-			row.tokensIn,
-			row.tokensOut,
-			row.cacheRead,
-			row.cacheWrite,
-			row.tokensTotal,
-			row.requests,
-			row.granularity,
-			row.bestEffort ? 1 : 0,
-		)
+/** Rebuilds one day's rollup rows from the stored hourly rows, inside the ingest batch. */
+export function rollupRebuild(db: D1Database, series: string, day: string): D1PreparedStatement {
+	return db.prepare(ROLLUP_REBUILD).bind(series, day)
 }
 
 /** One prepared append to the ingest log. */

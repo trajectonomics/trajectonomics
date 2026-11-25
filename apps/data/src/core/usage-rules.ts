@@ -2,6 +2,7 @@ import type { core, z } from "zod"
 import { custom } from "./issue"
 import {
 	boundaryMs,
+	isBeforeIngestFloor,
 	isKnownPlan,
 	isMachineAlias,
 	isMoreThanOneHourAhead,
@@ -37,14 +38,14 @@ function checkTokenFields(row: UsageShape, ctx: core.$RefinementCtx): void {
 	const totalOk = checkToken(ctx, ["tokensTotal"], row.tokensTotal)
 	if (!inOk || !outOk || !readOk || !writeOk || !totalOk) return
 	const parts = [row.tokensIn, row.tokensOut, row.cacheRead, row.cacheWrite]
-	if (parts.some((part) => part === null)) return
-	const sum = parts.reduce<number>((total, part) => total + (part ?? 0), 0)
-	if (sum !== row.tokensTotal) {
+	const present = parts.filter((part): part is number => part !== null)
+	const sum = present.reduce((total, part) => total + part, 0)
+	if (row.tokensTotal < sum || (present.length === parts.length && row.tokensTotal !== sum)) {
 		custom(
 			ctx,
 			["tokensTotal"],
 			"TOKENS_TOTAL_INCONSISTENT",
-			"tokensTotal must equal the sum of the four token parts.",
+			"tokensTotal must be at least the sum of its parts, and equal to it when all are present.",
 		)
 	}
 }
@@ -63,6 +64,10 @@ function checkBoundary(
 			"HOUR_NOT_ON_BOUNDARY",
 			granularity === "day" ? "hourUtc must start a UTC day." : "hourUtc must start a UTC hour.",
 		)
+		return
+	}
+	if (isBeforeIngestFloor(ms)) {
+		custom(ctx, ["hourUtc"], "HOUR_TOO_OLD", "hourUtc must be at or after 2020-01-01T00:00:00Z.")
 		return
 	}
 	if (isMoreThanOneHourAhead(ms, nowMs)) {

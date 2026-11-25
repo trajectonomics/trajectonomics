@@ -17,12 +17,12 @@ CREATE TABLE usage_hourly (
 	model TEXT NOT NULL,
 	hour_utc TEXT NOT NULL,
 	granularity TEXT NOT NULL CHECK (granularity IN ('hour', 'day')),
-	tokens_in INTEGER,
-	tokens_out INTEGER,
-	cache_read INTEGER,
-	cache_write INTEGER,
-	tokens_total INTEGER NOT NULL,
-	requests INTEGER NOT NULL,
+	tokens_in INTEGER CHECK (tokens_in IS NULL OR tokens_in >= 0),
+	tokens_out INTEGER CHECK (tokens_out IS NULL OR tokens_out >= 0),
+	cache_read INTEGER CHECK (cache_read IS NULL OR cache_read >= 0),
+	cache_write INTEGER CHECK (cache_write IS NULL OR cache_write >= 0),
+	tokens_total INTEGER NOT NULL CHECK (tokens_total >= 0),
+	requests INTEGER NOT NULL CHECK (requests >= 0),
 	source TEXT NOT NULL,
 	best_effort INTEGER NOT NULL DEFAULT 0,
 	received_at TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE quota_sample (
 	plan TEXT NOT NULL,
 	window TEXT NOT NULL CHECK (window IN ('five_hour', 'weekly', 'monthly')),
 	sampled_at TEXT NOT NULL,
-	used_pct REAL NOT NULL,
+	used_pct REAL NOT NULL CHECK (used_pct BETWEEN 0 AND 100),
 	resets_at TEXT,
 	received_at TEXT NOT NULL,
 	PRIMARY KEY (contributor_id, plan, window, sampled_at)
@@ -45,12 +45,12 @@ CREATE TABLE rollup_daily (
 	day TEXT NOT NULL,
 	plan TEXT NOT NULL,
 	model TEXT NOT NULL,
-	tokens_in INTEGER,
-	tokens_out INTEGER,
-	cache_read INTEGER,
-	cache_write INTEGER,
-	tokens_total INTEGER NOT NULL,
-	requests INTEGER NOT NULL,
+	tokens_in INTEGER CHECK (tokens_in IS NULL OR tokens_in >= 0),
+	tokens_out INTEGER CHECK (tokens_out IS NULL OR tokens_out >= 0),
+	cache_read INTEGER CHECK (cache_read IS NULL OR cache_read >= 0),
+	cache_write INTEGER CHECK (cache_write IS NULL OR cache_write >= 0),
+	tokens_total INTEGER NOT NULL CHECK (tokens_total >= 0),
+	requests INTEGER NOT NULL CHECK (requests >= 0),
 	granularity TEXT NOT NULL CHECK (granularity IN ('hour', 'day')),
 	best_effort INTEGER NOT NULL,
 	PRIMARY KEY (series, day, plan, model)
@@ -68,7 +68,7 @@ CREATE TABLE ingest_log (
 CREATE INDEX rollup_daily_series_day ON rollup_daily (series, day);
 CREATE INDEX rollup_daily_series_plan_model_day ON rollup_daily (series, plan, model, day);
 
--- A replay reads the affected day before it rewrites the rollup.
+-- An ingest rebuilds each affected day's rollup from the hourly rows.
 CREATE INDEX usage_hourly_contributor_hour ON usage_hourly (contributor_id, hour_utc);
 
 CREATE INDEX quota_sample_plan ON quota_sample (contributor_id, plan, sampled_at);

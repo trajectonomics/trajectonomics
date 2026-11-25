@@ -25,6 +25,41 @@ describe("POST /ingest", () => {
 		expect(count(context, "usage_hourly")).toBe(0)
 	})
 
+	test("rejects every request when the bootstrap key is unset", async () => {
+		const context = harness()
+		const env = {
+			...context.env,
+			INGEST_BOOTSTRAP_KEY: undefined,
+		} as unknown as typeof context.env
+		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }), env, {
+			nowMs: NOW_MS,
+		})
+		expect(response.status).toBe(401)
+		expect(count(context, "usage_hourly")).toBe(0)
+	})
+
+	test("rejects every request when the bootstrap key is empty", async () => {
+		const context = harness()
+		const env = { ...context.env, INGEST_BOOTSTRAP_KEY: "" }
+		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }, ""), env, {
+			nowMs: NOW_MS,
+		})
+		expect(response.status).toBe(401)
+		expect(count(context, "usage_hourly")).toBe(0)
+	})
+
+	test("rejects an empty bearer token", async () => {
+		const context = harness()
+		const request = new Request("https://data.test/ingest", {
+			method: "POST",
+			headers: { authorization: "Bearer ", "content-type": "application/json" },
+			body: JSON.stringify({ usage: [usageRow()] }),
+		})
+		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		expect(response.status).toBe(401)
+		expect(count(context, "usage_hourly")).toBe(0)
+	})
+
 	test("rejects an unknown plan with 400 and the first errors", async () => {
 		const context = harness()
 		const response = await post(context, { usage: [usageRow({ plan: "nope" })] })
@@ -65,6 +100,24 @@ describe("POST /ingest", () => {
 		const row = usageRow({ model: "x".repeat(1_100_000) })
 		const response = await post(context, { usage: [row] })
 		expect(response.status).toBe(413)
+	})
+
+	test("rejects an oversize body with no Content-Length", async () => {
+		const context = harness()
+		const request = ingestRequest({ usage: [usageRow({ model: "x".repeat(1_100_000) })] })
+		request.headers.delete("content-length")
+		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		expect(response.status).toBe(413)
+		expect(count(context, "usage_hourly")).toBe(0)
+	})
+
+	test("rejects an oversize body that lies about Content-Length", async () => {
+		const context = harness()
+		const request = ingestRequest({ usage: [usageRow({ model: "x".repeat(1_100_000) })] })
+		request.headers.set("content-length", "10")
+		const response = await handleRequest(request, context.env, { nowMs: NOW_MS })
+		expect(response.status).toBe(413)
+		expect(count(context, "usage_hourly")).toBe(0)
 	})
 
 	test("rejects more than 5000 rows with 413", async () => {

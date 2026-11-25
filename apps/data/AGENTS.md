@@ -40,6 +40,6 @@ serves it, and the nested `collector/` package.
 5. Data never triggers a rebuild (ADR 0001). Ingest recomputes rollups in D1; the pages and the API
    are served by the deployed Worker.
 6. An ingest batch is all-or-nothing: the whole body is validated before anything is written, and
-   the writes share one `DB.batch`.
+   the upserts plus each affected day's SQL rollup rebuild share one `DB.batch` (one D1 query).
 7. The schema changes only through numbered files in `migrations/`; the deploy workflow applies
    them before deploying the Worker.
