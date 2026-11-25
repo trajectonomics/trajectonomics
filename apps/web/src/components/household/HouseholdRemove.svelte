@@ -15,7 +15,8 @@ const button =
 
 /** Removes the household; the dates it pinned stay as they are. */
 async function removeHousehold(): Promise<void> {
-	if (await editSession.run({ kind: "remove-household", name, contentHash })) removing = false
+	if (await editSession.run({ kind: "remove-household", name, contentHash }, "household"))
+		removing = false
 }
 </script>
 

@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
+import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { baselineRead, planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { flowDraftOf } from "../../lib/view/plan-items/flows"
 import { shownProblems } from "../../lib/view/plan-items/problems"
 import Drawer from "../ui/Drawer.svelte"
+import AnchoredNote from "./AnchoredNote.svelte"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"
@@ -66,6 +68,13 @@ describe("the household's anchored dates on the planner pages", () => {
 		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)
 		expect(body).not.toMatch(/<input[^>]*id="flow-start"[^>]*disabled/)
 		expect(body).toContain('href="/projection/?scenario=base#household"')
+	})
+
+	test("the link to the household card keeps the address's other parameters", () => {
+		setTestUrl("http://127.0.0.1/income/?terms=real&demo=1&scenario=base")
+		const body = render(AnchoredNote, { props: { anchor: "at me, age 60", plan: "base" } }).body
+		expect(body).toContain('href="/projection/?terms=real&amp;demo=1&amp;scenario=base#household"')
+		setTestUrl("http://127.0.0.1/")
 	})
 })
 
