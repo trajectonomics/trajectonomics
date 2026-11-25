@@ -2,17 +2,9 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { accountList } from "../src/lib/contract"
 import { DEMO_ACCOUNTS, DEMO_OPENING_DATE, DEMO_OPENINGS } from "./demo/accounts"
-import { DEMO_ESTATE } from "./demo/estate"
+import { applyScenarios } from "./demo/apply"
 import { nextFixedSource } from "./demo/fixed-source"
-import { HOME_ACCOUNTS, HOME_FLOWS } from "./demo/home"
-import {
-	baseScenarioDocument,
-	DEMO_HOUSEHOLD,
-	DEMO_TAX,
-	type DemoAccountIds,
-	RETIRE_EARLY_SALARY_END,
-} from "./demo/scenario"
-import { demoSpendingFlows } from "./demo/spending"
+import type { DemoAccountIds } from "./demo/scenario"
 import { demoCsv } from "./demo/transactions"
 import { spawnCapture } from "./spawn"
 
@@ -46,8 +38,8 @@ async function idsOf(place: DemoLedgerPlace): Promise<DemoAccountIds> {
 
 /**
  * Builds the fictional ledger in `place.home`: a chart of accounts, opening balances, about two years
- * of monthly transactions imported from CSV, and two Scenarios, `base` and `retire-early`, with the Thai
- * Levy on both. Every name and figure is invented.
+ * of monthly transactions imported from CSV, and the Scenarios `base`, `retire-early` and `separate`,
+ * with the Thai Levy on each. Every name and figure is invented.
  */
 export async function buildDemoLedger(place: DemoLedgerPlace): Promise<DemoAccountIds> {
 	await mkdir(place.home, { recursive: true })
@@ -76,44 +68,6 @@ export async function buildDemoLedger(place: DemoLedgerPlace): Promise<DemoAccou
 	await writeFile(csv, demoCsv())
 	await traj(place, ["tx", "import", csv])
 	const ids = await idsOf(place)
-	await applyScenarios(place, ids)
+	await applyScenarios(place, (argv) => traj(place, argv), ids)
 	return ids
-}
-
-/** Applies `base`, adds the Thai Levy to it, then forks `retire-early` from it with one changed flow. */
-async function applyScenarios(place: DemoLedgerPlace, ids: DemoAccountIds): Promise<void> {
-	const file = join(place.scratch, "base.json")
-	const document = baseScenarioDocument(ids)
-	await writeFile(file, JSON.stringify(document, null, "\t"))
-	await traj(place, ["scenario", "apply", "base", "--file", file])
-	const household = join(place.scratch, "household.json")
-	await writeFile(household, JSON.stringify(DEMO_HOUSEHOLD, null, "\t"))
-	await traj(place, ["scenario", "household", "base", "--file", household])
-	await traj(place, ["scenario", "tax", "base", "--tax", DEMO_TAX.tax, "--label", DEMO_TAX.label])
-	await traj(place, [
-		"scenario",
-		"fork",
-		"base",
-		"retire-early",
-		"--set",
-		`flows.salary.end="${RETIRE_EARLY_SALARY_END}"`,
-	])
-	await addHome(place, "base", demoSpendingFlows(ids))
-}
-
-/** Puts the condo, the spending rule (cli ADR 0063) and the estate block (cli ADR 0064) into `base`, read back and applied; `retire-early` has none. */
-async function addHome(place: DemoLedgerPlace, name: string, extra: unknown[]): Promise<void> {
-	const shown = JSON.parse(await traj(place, ["scenario", "show", name])) as {
-		scenario: { document: { accounts: unknown[]; flows: unknown[] } }
-	}
-	const file = join(place.scratch, "base-with-home.json")
-	const { document } = shown.scenario
-	const withHome = {
-		...document,
-		accounts: [...document.accounts, ...HOME_ACCOUNTS],
-		flows: [...document.flows, ...HOME_FLOWS, ...extra],
-		estate: DEMO_ESTATE,
-	}
-	await writeFile(file, JSON.stringify(withHome, null, "\t"))
-	await traj(place, ["scenario", "apply", name, "--file", file])
 }
