@@ -150,13 +150,11 @@ describe("report networth", () => {
 		expect(JSON.parse(res.err).error).toMatchObject({ code: "INVALID_DATE", path: "asOf" })
 	})
 
-	it("rejects every date-range and Dimension flag by name", async () => {
+	it("rejects every account-pair and Dimension flag by name", async () => {
 		const home = ledgerHome()
 		const cases = [
 			["--from", "Cash"],
 			["--to", "Cash"],
-			["--since", "2026-01-01"],
-			["--until", FIXTURE_AS_OF],
 			["--project", "venture"],
 		]
 		for (const args of cases) {
@@ -188,9 +186,14 @@ describe("report networth", () => {
 			(await cli(ledgerHome())(["schema", "report", "networth", "--json"])).out,
 		)
 		expect(data.name).toBe("report networth")
-		expect(data.input.required).toEqual(["asOf"])
+		// `--as-of` states one date and `--monthly` states a range, so no flag is required by the schema (cli ADR-0077).
+		expect(data.input.required).toBeUndefined()
+		expect(Object.keys(data.input.properties)).toEqual(["asOf", "monthly", "since", "until"])
 		expect(data.input.properties.project).toBeUndefined()
-		expect(data.output.properties.firstTransactionDate.type).toEqual(["string", "null"])
-		expect(data.output.properties.noTransactionsBefore.type).toBe("boolean")
+		// The output is one of two forms: the single-date result, then the monthly one.
+		const [single, range] = data.output.anyOf
+		expect(single.properties.firstTransactionDate.type).toEqual(["string", "null"])
+		expect(single.properties.noTransactionsBefore.type).toBe("boolean")
+		expect(Object.keys(range.properties)).toEqual(["since", "until", "months", "hint"])
 	})
 })

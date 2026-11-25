@@ -12,7 +12,7 @@ import { withStore } from "../../with-store"
 
 export const show: Leaf = defineCommand({
 	name: "show",
-	summary: "Show one Scenario with its document",
+	summary: "Show one Scenario with its document, household and owners",
 	note: "The --decimal form ships in 0.8.0, and so do the stored tax profile, the notes, the main mark and the tax allowances.",
 	positionals: ["scenario"],
 	input: z.strictObject({
@@ -26,7 +26,8 @@ export const show: Leaf = defineCommand({
 		{ command: "traj scenario show base", description: "Show a Scenario by name." },
 		{
 			command: "traj scenario show base --json",
-			description: "Print the Scenario as JSON; pipe it to jq to pick out the document.",
+			description:
+				"Print the Scenario as JSON; pipe it to jq to pick out the document, or its household, whose owners say who owns each Flow or Account.",
 		},
 		{
 			command: "traj scenario show base --decimal",
