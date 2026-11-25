@@ -5,7 +5,7 @@ import { employerDraftOf } from "../lib/view/plan-items/employer-draft"
 import { planDocument } from "../lib/view/plan-items/fixtures.test-support"
 import { flowDraftOf } from "../lib/view/plan-items/flows"
 import { fieldOfRefusal, namedRefusal } from "../lib/view/plan-items/refusal"
-import { NO_CHANGES, overlayDocument } from "../lib/what-if/overlay"
+import { lensDocument, NO_CHANGES } from "../lib/what-if/lens-document"
 import { editSession } from "./edit.svelte.js"
 import { saveFlow } from "./flow-save.js"
 import { whatIfSession } from "./what-if.svelte.js"
@@ -45,7 +45,7 @@ async function trySalary(edit: {
 	share?: string
 	rounding?: string
 }): Promise<void> {
-	const shown = overlayDocument(doc, whatIfSession.changesFor("base") ?? NO_CHANGES)
+	const shown = lensDocument(doc, whatIfSession.changesFor("base") ?? NO_CHANGES)
 	const draft = {
 		...flowDraftOf(salary),
 		...(edit.amount === undefined ? {} : { amount: edit.amount }),

@@ -7,6 +7,7 @@ import NetWorthContent from "../net-worth/NetWorthContent.svelte"
 import RecordValues from "../record-values/RecordValues.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import ProjectionWhatIf from "../what-if/ProjectionWhatIf.svelte"
+import WhatIfAbove from "../what-if/WhatIfAbove.svelte"
 
 interface Props {
 	/** The Scenario the plan switcher selects: a what-if shows here only when it is on this plan. */
@@ -24,12 +25,16 @@ let { scenario }: Props = $props()
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
-		<div class="space-y-8">
-			{#if lens && plan !== null}
-				<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} terms="nominal" keys={["closingNetWorth"]} />
-			{/if}
-			<RecordValues {snapshot} />
-			<NetWorthContent view={netWorthPageView(snapshot)} />
-		</div>
+		<WhatIfAbove open={lens !== null}>
+			{#snippet whatIf()}
+				{#if lens && plan !== null}
+					<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} terms="nominal" keys={["closingNetWorth"]} />
+				{/if}
+			{/snippet}
+			<div class="space-y-8">
+				<RecordValues {snapshot} />
+				<NetWorthContent view={netWorthPageView(snapshot)} />
+			</div>
+		</WhatIfAbove>
 	{/snippet}
 </PageShell>

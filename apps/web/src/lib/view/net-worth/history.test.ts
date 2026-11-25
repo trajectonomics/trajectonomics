@@ -14,12 +14,32 @@ describe("monthEndRows", () => {
 			),
 			failedRead(argv("2026-10-31")),
 		])
-		expect(rows[0]).toEqual({ index: 0, asOf: "30 Sep 2026", totals: total("1.00"), code: null })
+		expect(rows[0]).toEqual({
+			index: 0,
+			asOf: "30 Sep 2026",
+			totals: total("1.00"),
+			code: null,
+			unstated: false,
+		})
 		expect(rows[1]).toEqual({
 			index: 1,
 			asOf: "31 Oct 2026",
 			totals: null,
 			code: "LEDGER_EMPTY",
+			unstated: false,
+		})
+	})
+
+	test("keeps a month whose total is not stated as a row with no total, and says it was read", () => {
+		const rows = monthEndRows([
+			okRead(argv("2026-09-30"), netWorth("2026-09-30", [row("Bank", "asset", "1.00")], null)),
+		])
+		expect(rows[0]).toEqual({
+			index: 0,
+			asOf: "30 Sep 2026",
+			totals: null,
+			code: "AMOUNT_OVERFLOW",
+			unstated: true,
 		})
 	})
 

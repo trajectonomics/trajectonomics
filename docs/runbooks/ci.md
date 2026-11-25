@@ -47,6 +47,16 @@ before, through `cli#build`).
   fails when that script gains a step, when `test` stops being `test:src` plus `test:scripts`, or when
   the workflow stops running them. Update the workflow in the same pull request.
 
+## Reproducible Dashboard build
+
+SvelteKit stamps a build with the time it ran, so two builds of one commit packed different
+`dashboard.bin` bytes. `apps/web/vite.config.ts` now stamps it with `TURBO_HASH`, the hash turbo gives
+the task from its inputs, so the same inputs pack the same bytes and a changed file is a new version
+([web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
+`TRAJ_WEB_VERSION` pins the stamp for a build outside turbo (used to compare two commits by raw `sha256`, see the ADR) and is never set in a workflow, so the web build stays a cache hit when no web input changed.
+The `Check web` job runs `turbo run @trajectonomics/web#build --cache=local: --only` twice (no cache, so the build runs and no cache entry is written) and fails when the
+`sha256` of `pack/dashboard.bin` differs.
+
 ## Files outside every package
 
 `tooling/config/**` (the shared Biome and TypeScript config) and `tooling/scripts/**` are

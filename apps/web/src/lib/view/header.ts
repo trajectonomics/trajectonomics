@@ -22,7 +22,7 @@ export function headerLine(snapshot: Snapshot): HeaderLine {
 
 function currencyOf(snapshot: Snapshot): string | null {
 	const netWorth = snapshot.reads.netWorth
-	const fromNetWorth = netWorth.ok ? netWorth.data.totals[0]?.currency : undefined
+	const fromNetWorth = netWorth.ok ? netWorth.data.totals?.[0]?.currency : undefined
 	if (fromNetWorth) return fromNetWorth
 	const compare = snapshot.reads.compare
 	return compare?.ok ? compare.data.currency : null

@@ -3,6 +3,7 @@ import { accountRef } from "./account-ref"
 import { amountRow, currencyTotal } from "./amount-row"
 import { dateString } from "./date"
 import { money } from "./money"
+import { errorBody } from "./read"
 
 /** `traj balance --as-of --trial-balance --json`: every balance, net worth and the trial balance. */
 export const balance = z.strictObject({
@@ -11,13 +12,19 @@ export const balance = z.strictObject({
 	firstTransactionDate: dateString.nullable().optional(),
 	noTransactionsBefore: z.boolean().optional(),
 	rows: z.array(amountRow),
-	netWorth: z.array(currencyTotal),
+	// Null when the accounts' sum leaves the safe range (cli ADR 0079): every row is still stated, and `netWorthError` says why.
+	netWorth: z.array(currencyTotal).nullable(),
+	netWorthError: errorBody.optional(),
 	trialBalance: z
 		.strictObject({
 			rows: z.array(
 				z.strictObject({ account: accountRef, debit: money, credit: money, currency: z.string() }),
 			),
-			totals: z.array(z.strictObject({ currency: z.string(), debit: money, credit: money })),
+			// Null when a column's sum leaves the safe range (cli ADR 0079): every row is still stated, and `totalsError` says why.
+			totals: z
+				.array(z.strictObject({ currency: z.string(), debit: money, credit: money }))
+				.nullable(),
+			totalsError: errorBody.optional(),
 		})
 		.optional(),
 	hint: z.string().optional(),

@@ -1,5 +1,5 @@
 import type { WhatIfAnswer } from "../lib/what-if/answer"
-import { lensFor, readsOf, type WhatIfLens, type WhatIfReads } from "../lib/what-if/lens"
+import { type LensReads, lensFor, lensReadsOf, type WhatIfLens } from "../lib/what-if/lens"
 import { SerialReader } from "../lib/what-if/reads"
 import {
 	type Change,
@@ -17,7 +17,7 @@ export class WhatIfState {
 	answer = $state<WhatIfAnswer | null>(null)
 	/** The state of the session the answer was read for, and the answer's four reads parsed against the contract. */
 	private answered = $state<WhatIf | null>(null)
-	private reads = $state<WhatIfReads | null>(null)
+	private reads = $state<LensReads | null>(null)
 	error = $state<string | null>(null)
 	/** The plan a person asked to switch to while changes were pending; null when none is asked. */
 	asking = $state<string | null>(null)
@@ -86,7 +86,7 @@ export class WhatIfState {
 	private receive(reply: WhatIfAnswer | string, state: WhatIf): void {
 		this.answer = typeof reply === "string" ? null : reply
 		this.answered = typeof reply === "string" ? null : state
-		this.reads = typeof reply === "string" ? null : readsOf(reply)
+		this.reads = typeof reply === "string" ? null : lensReadsOf(reply)
 		this.error = typeof reply === "string" ? reply : reply.ok ? null : reply.error.message
 	}
 

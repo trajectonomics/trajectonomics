@@ -6,6 +6,7 @@ import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
 import PageShell from "../ui/PageShell.svelte"
 import OverviewWhatIf from "../what-if/OverviewWhatIf.svelte"
+import WhatIfAbove from "../what-if/WhatIfAbove.svelte"
 
 interface Props {
 	/** The Scenario the address bar names; left empty, Home follows the main plan. */
@@ -23,15 +24,17 @@ let { scenario = "" }: Props = $props()
 	{#snippet children(snapshot)}
 		{@const plan = homePlan(snapshot, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
-		<div class="space-y-4">
-			{#if lens && plan !== null}
-				<OverviewWhatIf
-					{lens}
-					baseline={baselineRun(snapshot, plan)}
-					baselineChance={baselineChance(snapshot, plan)}
-				/>
-			{/if}
+		<WhatIfAbove open={lens !== null} gap="space-y-4">
+			{#snippet whatIf()}
+				{#if lens && plan !== null}
+					<OverviewWhatIf
+						{lens}
+						baseline={baselineRun(snapshot, plan)}
+						baselineChance={baselineChance(snapshot, plan)}
+					/>
+				{/if}
+			{/snippet}
 			<OverviewGrid view={overviewView(snapshot, scenario)} />
-		</div>
+		</WhatIfAbove>
 	{/snippet}
 </PageShell>

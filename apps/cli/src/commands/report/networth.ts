@@ -4,6 +4,7 @@ import { defineCommand } from "../../command"
 import { networthForm } from "../../report/networth-form"
 import { monthlySchema, resultSchema } from "../../report/networth-schema"
 import { recordNoteBlocks } from "../../report/record"
+import { totalDisplay } from "../../report/total-view"
 import { LEDGER_READ_CODES } from "../../store"
 
 export const networth: Leaf = defineCommand({
@@ -33,7 +34,13 @@ export const networth: Leaf = defineCommand({
 			.describe("With --monthly, the range's inclusive end date, as YYYY-MM-DD; required."),
 	}),
 	output: z.union([resultSchema, monthlySchema]),
-	render: { blocks: recordNoteBlocks },
+	render: {
+		blocks: recordNoteBlocks,
+		display: totalDisplay(
+			{ total: "totals", error: "totalsError" },
+			{ total: "totals", error: "totalsError", within: "months" },
+		),
+	},
 	examples: [
 		{
 			command: "traj report networth --as-of 2026-03-31 --json",
