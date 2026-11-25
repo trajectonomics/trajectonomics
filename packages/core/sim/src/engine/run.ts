@@ -5,7 +5,7 @@ import { collectDates } from "./dates"
 import { buildEvents, flowsAt } from "./events"
 import { finishLevies, planLevies } from "./levy-finish"
 import { allSettlementDates, type LevySet } from "./levy-set"
-import { type LiabilityLedger, openLedger } from "./liability-ledger"
+import { type OwedTracker, openOwedTracker } from "./owed-tracker"
 import type { EngineResult } from "./result"
 import { resolveReturns } from "./return-rows"
 import type { Returns } from "./returns"
@@ -39,10 +39,10 @@ function finish(
 	return { ok: true, run: { ...withLevies.run, milestones: gate.results(runEnd) } }
 }
 
-/** Attaches the liability ledger's paid-off dates, when the run tracks liabilities. */
-function attachLedger(result: EngineResult, ledger: LiabilityLedger | undefined): EngineResult {
-	if (!result.ok || ledger === undefined) return result
-	return { ok: true, run: { ...result.run, paidOff: ledger.paidOff } }
+/** Attaches the owed tracker's paid-off dates, when the run tracks liabilities. */
+function attachTracker(result: EngineResult, tracker: OwedTracker | undefined): EngineResult {
+	if (!result.ok || tracker === undefined) return result
+	return { ok: true, run: { ...result.run, paidOff: tracker.paidOff } }
 }
 
 /** Attaches the rule Flows' Rule years, when the Scenario declares one. */
@@ -70,7 +70,7 @@ export function runEngine(
 	const events = buildEvents(scenario, timeline, calendar)
 	const levies = planLevies(scenario, timeline, calendar)
 	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
-	const ledger = tracked ? openLedger(states, timeline.start) : undefined
+	const tracker = tracked ? openOwedTracker(states, timeline.start) : undefined
 	const rules = openRules(scenario, recordRules)
 	const acc: RunAccumulator = {
 		snapshots: [],
@@ -78,7 +78,7 @@ export function runEngine(
 		wanted: new Set<DateString>(observations),
 		levies,
 		gate,
-		ledger,
+		tracker,
 		...(rules === undefined ? {} : { rules }),
 		breakdown,
 	}
@@ -91,10 +91,10 @@ export function runEngine(
 		const result = stepDate(acc, states, scenario, date, dayEvents)
 		if (result !== undefined) {
 			const end = endDate(result, timeline)
-			return attachRules(attachLedger(finish(result, states, levies, gate, end), ledger), rules)
+			return attachRules(attachTracker(finish(result, states, levies, gate, end), tracker), rules)
 		}
 	}
 	const run = { snapshots: acc.snapshots, totals: acc.totals }
 	const finished = finish({ ok: true, run }, states, levies, gate, timeline.horizon)
-	return attachRules(attachLedger(finished, ledger), rules)
+	return attachRules(attachTracker(finished, tracker), rules)
 }

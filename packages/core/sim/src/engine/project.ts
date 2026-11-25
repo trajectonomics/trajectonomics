@@ -4,7 +4,7 @@ import { buildProjection } from "../output/build"
 import { buildLiabilities } from "../output/liabilities"
 import { periodEndDates } from "../output/periods"
 import { rowDates } from "../output/row-dates"
-import { statementPeriods } from "../output/statement-periods"
+import { statementMonths } from "../output/statement-months"
 import { withPayouts } from "../payout/flows"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionResult } from "../types/projection"
@@ -19,7 +19,7 @@ function observationDates(timeline: Timeline, statements: boolean): readonly Dat
 	if (!statements) return dates
 	return [
 		...dates,
-		...statementPeriods(timeline.start, timeline.horizon, undefined).map((p) => p.to),
+		...statementMonths(timeline.start, timeline.horizon, undefined).map((p) => p.to),
 	]
 }
 

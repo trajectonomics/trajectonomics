@@ -3,12 +3,12 @@ import type { Env } from "../command"
 import { defaultHomeRefusal } from "../data-directory"
 import { type AppError, type ErrorCode, fail, isAppError } from "../errors"
 import { connect } from "./connection"
-import { PERSONAL_ENTITY_ID } from "./ids"
+import { newId, PERSONAL_ENTITY_ID } from "./ids"
 import { notADirectory } from "./io-errors"
 import { directoryStep } from "./io-steps"
 import { ledgerPaths, privateLedger } from "./ledger-file"
 import { storeOver } from "./store"
-import type { Clock, Store } from "./types"
+import type { Clock, IdSource, Store } from "./types"
 
 export { ACCOUNT_TYPES, isAccountType } from "./accounts"
 export { contentHash } from "./canonical"
@@ -44,6 +44,8 @@ export const LEDGER_OPEN_CODES: readonly ErrorCode[] = [
 export type StoreOptions = {
 	env: Env
 	clock: Clock
+	/** Mints the ids of new rows. Defaults to `newId`; a fixed source replaces it (cli ADR-0074). */
+	newId?: IdSource
 	/** How long a write waits for another writer before `database_busy`. Defaults to 5000. */
 	busyTimeoutMs?: number
 }
@@ -80,5 +82,9 @@ export function openStore(options: StoreOptions): Store | AppError {
 		db.close()
 		return restricted
 	}
-	return storeOver(paths.database, { db, clock: options.clock, entityId: PERSONAL_ENTITY_ID }, copy)
+	return storeOver(
+		paths.database,
+		{ db, clock: options.clock, newId: options.newId ?? newId, entityId: PERSONAL_ENTITY_ID },
+		copy,
+	)
 }
