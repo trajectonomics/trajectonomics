@@ -20,6 +20,18 @@ describe("FiResult: reachable", () => {
 		expect(body).toContain("The earliest month earned income could stop: 1 Mar 2041")
 	})
 
+	test("states each person's age on the FI date, and no line without a household", () => {
+		const ages = [
+			{ person: "me", age: 51 },
+			{ person: "partner", age: 49 },
+		]
+		const reachable = fiFixture(REACHABLE)
+		if (!reachable.fi.reachable) throw new Error("expected a reachable answer")
+		const body = renderFi({ ...reachable, fi: { ...reachable.fi, ages } })
+		expect(body).toContain("Ages on that date: me 51, partner 49.")
+		expect(renderFi(reachable)).not.toContain("Ages on that date")
+	})
+
 	test("labels the rule-of-thumb as a reference, not the answer, with its figures", () => {
 		const body = renderFi(fiFixture(REACHABLE))
 		expect(body).toContain("Rule-of-thumb reference, not the answer")

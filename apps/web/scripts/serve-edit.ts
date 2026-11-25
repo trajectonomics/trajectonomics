@@ -43,14 +43,14 @@ export function createEditor(options: EditorOptions): Editor {
 		if (edit.kind === "record-values") {
 			return recordValues({ traj: options.traj, held, refresh }, edit)
 		}
-		const error = await runEdit(options.traj, edit)
-		if (error !== null) return failure(200, error)
+		const run = await runEdit(options.traj, edit)
+		if (!run.ok) return failure(200, run.error)
 		params = {
 			...params,
 			scenarios: followPlan(params.scenarios, edit),
 			compare: followCompare(params.compare, edit),
 		}
-		return answerOf(await refresh())
+		return answerOf(await refresh(), undefined, run.droppedAnchors)
 	}
 
 	/** Reads the Snapshot again, with the allowance or chance inputs the body states, and answers it, or the CLI's error as data; or reads one path. */

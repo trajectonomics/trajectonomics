@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { editSession } from "../../client/edit.svelte.js"
 import type { HouseholdDocument } from "../../lib/contract"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import HouseholdCard from "./HouseholdCard.svelte"
@@ -29,7 +30,26 @@ function card(options: { household?: HouseholdDocument | null; editable?: boolea
 	}).body
 }
 
+afterEach(() => {
+	editSession.error = null
+	editSession.stale = false
+})
+
 describe("the household card", () => {
+	test("shows a refused Remove household in the card, beside the control", () => {
+		editSession.error = "The plan has no household to remove."
+		const body = card()
+		expect(body).toMatch(/role="alert"[^>]*>The plan has no household to remove\./)
+		expect(body.indexOf("Remove household")).toBeLessThan(body.indexOf("The plan has no household"))
+	})
+
+	test("shows the stale-plan notice in the card, and no alert when nothing was refused", () => {
+		editSession.stale = true
+		expect(card()).toContain("This plan changed since the page read it.")
+		editSession.stale = false
+		expect(card()).not.toContain('role="alert"')
+	})
+
 	test("lists each person's role, birth month and life expectancy as the stored text", () => {
 		const body = card()
 		expect(body).toContain("Account holder")

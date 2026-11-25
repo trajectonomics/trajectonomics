@@ -7,6 +7,8 @@ import Drawer from "../ui/Drawer.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
 import HouseholdAnchorForm from "./HouseholdAnchorForm.svelte"
 import HouseholdAnchors from "./HouseholdAnchors.svelte"
+import HouseholdFailure from "./HouseholdFailure.svelte"
+import HouseholdHeader from "./HouseholdHeader.svelte"
 import HouseholdPeople from "./HouseholdPeople.svelte"
 import HouseholdPersonForm from "./HouseholdPersonForm.svelte"
 import HouseholdRemove from "./HouseholdRemove.svelte"
@@ -27,8 +29,6 @@ let { name, doc, household, editable, contentHash }: Props = $props()
 /** The drawer: the person form (for a new person, or the one of that id) or the anchor form; null when shut. */
 type Form = { form: "person"; id?: string } | { form: "anchor" }
 let shown = $state<Form | null>(null)
-const button =
-	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 const busy = $derived(editSession.busy)
 const people = $derived(personCards(household))
 const existing = $derived(
@@ -59,26 +59,15 @@ async function unpin(path: string): Promise<void> {
 </script>
 
 <section id="household" class="space-y-4 rounded-lg border border-border bg-card p-5">
-	<div class="flex flex-wrap items-center justify-between gap-3">
-		<div>
-			<h2 class="font-semibold">Household</h2>
-			<p class="text-sm text-muted-foreground">
-				The people whose ages pin the dates of plan {name}. Ages appear on the rows once they are set.
-			</p>
-		</div>
-		{#if editable}
-			<div class="flex flex-wrap gap-2">
-				<button type="button" disabled={busy} onclick={() => open({ form: "person" })} class={button}>
-					{household === null ? "Set up the household" : "Add a person"}
-				</button>
-				{#if household !== null && people.length > 0}
-					<button type="button" disabled={busy} onclick={() => open({ form: "anchor" })} class={button}>
-						Pin a date
-					</button>
-				{/if}
-			</div>
-		{/if}
-	</div>
+	<HouseholdHeader
+		{name}
+		set={household !== null}
+		hasPeople={people.length > 0}
+		{editable}
+		{busy}
+		onPerson={() => open({ form: "person" })}
+		onAnchor={() => open({ form: "anchor" })}
+	/>
 	{#if household === null}
 		<p class="text-sm text-foreground">No household is set for plan {name}.</p>
 	{:else}
@@ -88,6 +77,8 @@ async function unpin(path: string): Promise<void> {
 			<HouseholdRemove {name} {contentHash} />
 		{/if}
 	{/if}
+	<!-- A refusal shows beside the control that sent it; while the drawer is open its form shows the refusal instead. -->
+	{#if shown === null}<HouseholdFailure />{/if}
 	<Drawer open={shown !== null} {title} onClose={() => open(null)}>
 		<StaleNotice />
 		{#if shown?.form === "anchor" && household !== null}

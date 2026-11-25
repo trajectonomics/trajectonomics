@@ -4,6 +4,7 @@ import type { EditInput } from "../lib/edit/edit"
 import { EDIT_SESSION_PATH } from "../lib/edit/guard"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
+import { dropped } from "./dropped-anchors.svelte.js"
 import { postEdit, postPreview } from "./edit-post.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
@@ -48,10 +49,8 @@ class EditSession {
 		if (this.token === null || this.busy) return false
 		this.busy = true
 		this.source = source
-		this.error = null
-		this.failure = null
-		this.stale = false
-		this.result = null
+		this.clear()
+		dropped.anchors = []
 		try {
 			const answer = editAnswer.safeParse(await postEdit(this.token, edit))
 			return this.settle(answer.success ? answer.data : null)
@@ -119,6 +118,7 @@ class EditSession {
 			return false
 		}
 		this.result = answer.result ?? null
+		dropped.anchors = answer.droppedAnchors ?? []
 		replaceSnapshot(answer.snapshot)
 		return true
 	}
