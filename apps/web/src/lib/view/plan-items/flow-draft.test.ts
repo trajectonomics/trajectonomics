@@ -128,6 +128,20 @@ describe("a new Flow", () => {
 		expect(result.problems["rate"]).toContain("two places")
 	})
 
+	test("a once Flow keeps no end the CLI would refuse, and keeps one that repeats its start", () => {
+		// `traj` refuses a once Flow whose end differs from its start (ONCE_FLOW_END_MISMATCH).
+		const stale = flowFromDraft(
+			{ ...blank, name: "Trip", frequency: "once", start: "2027-01-01", end: "2030-01-01" },
+			{ kind: "expense", taken: [] },
+		)
+		expect(stale.ok && "end" in stale.flow).toBe(false)
+		const same = flowFromDraft(
+			{ ...blank, name: "Trip", frequency: "once", start: "2027-01-01", end: "2027-01-01" },
+			{ kind: "expense", taken: [] },
+		)
+		expect(same.ok && same.flow.end).toBe("2027-01-01")
+	})
+
 	test("an existing Flow's id is never renamed by the form, even when its name field is blank", () => {
 		const salary = planDocument().flows[0]
 		const result = flowFromDraft(

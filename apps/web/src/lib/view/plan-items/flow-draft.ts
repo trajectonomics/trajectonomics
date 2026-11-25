@@ -18,7 +18,8 @@ function problemsOf(draft: FlowDraft, isNew: boolean): Map<string, string> {
 	}
 	if (!isDateText(draft.start)) problems.set("start", "Enter the start as YYYY-MM-DD.")
 	const end = draft.end.trim()
-	if (end !== "" && !isDateText(end)) {
+	// A once Flow shows no Ends field, so it has no end text to check.
+	if (draft.frequency !== "once" && end !== "" && !isDateText(end)) {
 		problems.set("end", "Enter the end as YYYY-MM-DD, or leave it empty to run to the horizon.")
 	}
 	if (draft.growth !== "inflation" && parseBps(draft.rate) === null) {
@@ -56,7 +57,7 @@ function candidateOf(
 	draft: FlowDraft,
 	options: { kind: FlowKind; existing?: ScenarioFlow | undefined; taken: readonly string[] },
 ): Record<string, unknown> {
-	const end = draft.end.trim()
+	const end = keptEndOf(draft)
 	const rate = draft.growth === "inflation" ? "inflation" : parseBps(draft.rate)
 	const category = categoryOf(draft, options.kind)
 	const label = labelOf(draft.displayLabel)
@@ -75,9 +76,20 @@ function candidateOf(
 		start: draft.start,
 		amount: typedAmount(draft.amount),
 		growth: rate === "inflation" ? "inflation" : { bps: rate },
-		...(end === "" ? {} : { end }),
+		...(end === undefined ? {} : { end }),
 		...(options.kind === "income" ? { earned: draft.earned } : {}),
 		...(category === null ? {} : { category }),
 		...(label === null ? {} : { displayLabel: label }),
 	}
 }
+
+/**
+ * The end a draft saves. A once Flow lands on its start alone, so it keeps an end only when it repeats the start (cli
+ * `ONCE_FLOW_END_MISMATCH`); any other Flow keeps its text, and an empty one runs to the horizon.
+ */
+function keptEndOf(draft: FlowDraft): string | undefined {
+	const end = draft.end.trim()
+	if (draft.frequency === "once") return end === draft.start ? end : undefined
+	return end === "" ? undefined : end
+}
+
