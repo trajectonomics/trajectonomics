@@ -88,6 +88,20 @@ describe("NetWorthContent: the history", () => {
 		expect(body).toContain("The history uses 1 month-end read, from Sep 2026 to Sep 2026.")
 	})
 
+	test("says in plain words when the history starts later than the ledger's first entry, and not otherwise", () => {
+		const reads: Read<NetWorth>[] = [
+			okRead(argv("2026-09-30"), netWorth("2026-09-30", [], THB("700.00"))),
+		]
+		const cut =
+			"The ledger's first entry is in Jan 2010, but the chart shows only the latest 120 month-ends."
+		const cutBody = render(NetWorthContent, {
+			props: { view: pageView(headline, reads, cut) },
+		}).body
+		expect(cutBody).toContain(cut)
+		const whole = render(NetWorthContent, { props: { view: pageView(headline, reads) } }).body
+		expect(whole).not.toContain("first entry is in")
+	})
+
 	test("handles an empty history and an empty ledger", () => {
 		const empty = netWorth("2026-10-31", [], [])
 		const { body } = render(NetWorthContent, {
