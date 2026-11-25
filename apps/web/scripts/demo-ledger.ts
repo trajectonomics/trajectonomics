@@ -3,6 +3,7 @@ import { join } from "node:path"
 import { accountList } from "../src/lib/contract"
 import { DEMO_ACCOUNTS, DEMO_OPENING_DATE, DEMO_OPENINGS } from "./demo/accounts"
 import { DEMO_ESTATE } from "./demo/estate"
+import { nextFixedSource } from "./demo/fixed-source"
 import { HOME_ACCOUNTS, HOME_FLOWS } from "./demo/home"
 import {
 	baseScenarioDocument,
@@ -18,10 +19,13 @@ import { spawnCapture } from "./spawn"
 /** Where the fictional ledger is built: the `traj` binary, the data directory, and a scratch directory. */
 export type DemoLedgerPlace = { binary: string; home: string; scratch: string }
 
-/** Runs one `traj` write and throws its message when it fails, so a broken demo stops at its cause. */
+/**
+ * Runs one `traj` write and throws its message when it fails, so a broken demo stops at its cause. It
+ * sets the fixed source, so the clock and the ids repeat from one generation to the next.
+ */
 async function traj(place: DemoLedgerPlace, argv: string[]): Promise<string> {
 	const captured = await spawnCapture([place.binary, ...argv, "--json"], {
-		env: { ...process.env, TRAJ_HOME: place.home },
+		env: { ...process.env, TRAJ_HOME: place.home, ...nextFixedSource(place) },
 	})
 	if (captured.code !== 0) {
 		throw new Error(`traj ${argv.join(" ")} failed: ${captured.stderr.trim()}`)

@@ -392,6 +392,10 @@ _Avoid_: distribution method, delivery
 A line in a document or a help page naming the release that ships what the text describes, so a reader of an older release is not sent to a command it cannot run (ADR-0034).
 _Avoid_: version note, TODO, roadmap marker
 
+**Fixed source**:
+The clock and the id source a write reads, replaced by `TRAJ_FIXED_SOURCE=<instant>#<seed>`: one instant for every reading, and ids that are valid UUIDv7s counted up from the seed. Only the demo entry point honours it, so a shipped `traj` has none (ADR-0074).
+_Avoid_: mock clock, test mode, seed data
+
 ### Usage
 
 **Usage count**:

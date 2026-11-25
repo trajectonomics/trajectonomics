@@ -30,7 +30,11 @@ export function withStore<T>(
 	ctx: Context,
 	work: (store: Store) => Result<T> | AppError,
 ): Result<T> | AppError {
-	const store = openStore({ env: ctx.env, clock: () => new Date() })
+	const store = openStore({
+		env: ctx.env,
+		clock: ctx.source?.clock ?? (() => new Date()),
+		...(ctx.source === undefined ? {} : { newId: ctx.source.newId }),
+	})
 	if (isAppError(store)) return store
 	try {
 		if (store.upgradedFrom !== undefined) ctx.afterSuccess?.push(upgradeNotice(store.upgradedFrom))
