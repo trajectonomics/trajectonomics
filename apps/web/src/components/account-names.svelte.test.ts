@@ -10,8 +10,16 @@ import AssumptionsBody from "./assumptions/AssumptionsBody.svelte"
 import NetWorthContent from "./net-worth/NetWorthContent.svelte"
 import PlanItemsBody from "./plan-items/PlanItemsBody.svelte"
 
-const BANK = "01a210f7-e58a-76d3-b3c7-192a7854bfca"
-const FUND = "01a210f7-e610-7618-8b16-75b511d5ef3b"
+/** The id the Demo gives the Account of that name: ids are the CLI's, so a test reads them and never spells them. */
+function idOf(name: string): string {
+	const read = DEMO.reads.accounts
+	const found = read.ok ? read.data.accounts.find((account) => account.name === name) : undefined
+	if (found === undefined) throw new Error(`the Demo has an Account ${name}`)
+	return found.id
+}
+
+const BANK = idOf("Bank")
+const FUND = idOf("Fund")
 
 /** The Demo with the accounts Read changed by `change`, as a rename in the ledger would give after a reread. */
 function withAccounts(
@@ -40,9 +48,9 @@ const assumptions = (snapshot: Snapshot) =>
 describe("accounts are named by their ledger name", () => {
 	test("an Account card heads with its ledger name and the Edit button says it, never the id", () => {
 		const body = assets(DEMO)
-		expect(body).toContain('<span data-account="' + BANK + '">Bank</span>')
+		expect(body).toContain(`<span data-account="${BANK}">Bank</span>`)
 		expect(body).toContain('aria-label="Edit Bank"')
-		expect(body).not.toContain('aria-label="Edit ' + BANK)
+		expect(body).not.toContain(`aria-label="Edit ${BANK}`)
 	})
 
 	test("an Account only the plan has shows its id as code", () => {
@@ -52,8 +60,8 @@ describe("accounts are named by their ledger name", () => {
 
 	test("the Assumptions rows head with the ledger name", () => {
 		const body = assumptions(DEMO)
-		expect(body).toContain('<span data-account="' + FUND + '">Fund</span>')
-		expect(body).not.toContain(">" + FUND + "<")
+		expect(body).toContain(`<span data-account="${FUND}">Fund</span>`)
+		expect(body).not.toContain(`>${FUND}<`)
 	})
 
 	test("the Net worth page keeps the ledger name of each row", () => {
