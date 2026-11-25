@@ -16,4 +16,4 @@ Rendering the table inside the Command was rejected: a Command returns structure
 
 ## Addendum: the human hooks (ADR-0049)
 
-ADR-0049 amends this record. `RenderHint` gains two human-only hooks, `display` and `blocks`, so a Projection can say a milestone is `not reached by <date>` and print a table after the body. Neither hook adds, renames or drops a value: JSON ignores both, and the output schema is unchanged. Read ADR-0049 for the rule and its consequences.
+ADR-0049 amends this: `RenderHint` gains the human-only hooks `display` and `blocks`, which may show a value as a sentence (`null` as "not reached by <date>") and print a table after the body; JSON ignores both and the output schema is unchanged.
