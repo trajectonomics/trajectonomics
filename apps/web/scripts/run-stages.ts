@@ -24,6 +24,7 @@ import {
 	type StageTwoPlan,
 } from "../src/lib/snapshot"
 import { runAllowances } from "./run-allowances"
+import { runHistory } from "./run-history"
 import { runPaths } from "./run-paths"
 import { runPlanned } from "./run-planned"
 import type { RunContext } from "./run-traj"
@@ -82,9 +83,7 @@ export async function runStageTwo(
 		pnl: await runPlanned(context, plan.pnl, pnl, records),
 		transactions: await runPlanned(context, plan.transactions, txList, records),
 		baseline: await runPlanned(context, plan.baseline, baseline, records),
-		netWorthHistory: await sequential(plan.netWorthHistory, (planned) =>
-			runPlanned(context, planned, netWorth, records),
-		),
+		netWorthHistory: await runHistory(context, plan, records),
 		documents,
 		projections: await recordOf(plan.projections, (planned) =>
 			runPlanned(context, planned, projectionRun, records),

@@ -36,3 +36,13 @@ Measured on this machine (the workspace `traj` binary, the fictional ledger of t
 
 - An import of up to ten years of month-end values is charted from its first month on the first day.
 - A ledger older than ten years is charted from its latest ten, with the sentence above. Raising the cap is one constant (`HISTORY_MONTHS`), and this table is the price list.
+
+## Amended 2026-11-25: one batched read ([#514](https://github.com/trajectonomics/trajectonomics/issues/514))
+
+The second Decision bullet and the cost table above describe the history as it was read when this ADR was written: one `report networth --as-of <month-end>` call per month. They no longer hold.
+
+- **The history is one read.** `traj report networth --monthly --since <first month-end> --until <last month-end> --json` states net worth at every month-end of the range, each exactly what `--as-of` states for that date ([cli ADR 0077](../../../cli/docs/adr/0077-net-worth-states-every-month-end-in-one-read.md)). The Plan holds it as `netWorthHistory` (`planHistory`), one read of the already allowlisted leaf `report networth`, instead of up to 120. The dates are still the Plan's (`monthEndsBetween`, the cap, the first transaction date from stage one), and they bound the range, so the page still computes no figure and no date `traj` states.
+- **The Snapshot is unchanged, byte for byte.** `historyReads` splits the monthly result into one Read per planned date, each with the argv of its single-date call (`report networth --as-of <date> --json`) and the data or error that call gave. The Net worth page, Overview, the read audit and the history range tests see the Snapshot of before. A month `traj` refuses (an overflow) is a failed Read with the same error body `--as-of` gives, and a call that fails as a whole fails every date, as 120 calls did. `scripts/history-range.test.ts` compares the history of an 84-month and of a 120-month ledger with one real `--as-of` call per month-end.
+- **The cap stays 120.** It no longer bounds a cost that grows by 1.7 s a year, but it still bounds the size of the Snapshot (611 bytes a month) and the chart, and a mistyped year of 1900 would still be 1,500 months in every Snapshot.
+- **What it costs now** (the Demo's ledger shape, 120 month-ends, one machine, see the pull request for the table): the history takes the time of one `traj` call plus one scan, so an Edit on a ledger that fills the cap takes close to the time of one on a 24-month ledger.
+- The reread rules, the cut sentence and the Considered Options are unchanged. "No batched or series read" in the second bullet is the part this note replaces.

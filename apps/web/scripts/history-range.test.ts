@@ -2,7 +2,8 @@
 // fictional ledger: five years of month-end values are imported and the history starts at the first of them, and a
 // value older than the cap keeps the latest ten years and says so.
 import { afterAll, afterEach, describe, expect, test } from "bun:test"
-import { type Snapshot, snapshot } from "../src/lib/contract"
+import { type NetWorth, netWorth, type Read, type Snapshot, snapshot } from "../src/lib/contract"
+import { historyArgv } from "../src/lib/snapshot"
 import { HISTORY_MONTHS, monthEnd } from "../src/lib/snapshot/dates"
 import { autoMatches, targetsOf } from "../src/lib/view/import-values/match"
 import { parseImport } from "../src/lib/view/import-values/parse"
@@ -10,8 +11,16 @@ import { importEdit, importPlan } from "../src/lib/view/import-values/plan"
 import { netWorthPageView } from "../src/lib/view/net-worth/page"
 import { valueSheet } from "../src/lib/view/record-values/sheet"
 import type { ValueSheet } from "../src/lib/view/record-values/types"
-import { disposeEditor, postEdit, SLOW_MS, setupEditor } from "./edit-fixture.test-support"
+import {
+	BINARY,
+	disposeEditor,
+	ledgerHome,
+	postEdit,
+	SLOW_MS,
+	setupEditor,
+} from "./edit-fixture.test-support"
 import { settle } from "./editor-running.test-support"
+import { runTraj } from "./run-traj"
 
 /** The month-ends from a month through another, as `YYYY-MM-DD`. */
 function monthEnds(from: [number, number], count: number): string[] {
@@ -25,6 +34,17 @@ function monthEnds(from: [number, number], count: number): string[] {
 function sheetOf(dates: string[]): string {
 	const rows = dates.map((date, at) => `${date}\t${100 + at},000.00\t${200 + 2 * at},000.00`)
 	return ["Month\tBank\tFund", ...rows].join("\n")
+}
+
+/**
+ * The history one `report networth --as-of` call per month-end would hold, read from the scratch ledger: the Reads the
+ * Snapshot held before the history was one batched call (cli ADR 0077).
+ */
+async function singleDateHistory(dates: readonly string[]): Promise<Read<NetWorth>[]> {
+	const context = { binary: BINARY, env: { ...process.env, TRAJ_HOME: ledgerHome() } }
+	const reads: Read<NetWorth>[] = []
+	for (const date of dates) reads.push(await runTraj(context, historyArgv(date), netWorth))
+	return reads
 }
 
 /** Imports a pasted sheet as the page does and answers the Snapshot of the Edit's answer. */
@@ -55,6 +75,9 @@ describe("the history after an import of values older than the ledger", () => {
 			expect(after.params.historyDates.at(-1)).toBe("2026-10-31")
 			expect(after.params.historyDates).toHaveLength(84)
 			expect(after.reads.netWorthHistory).toHaveLength(84)
+			expect(after.reads.netWorthHistory).toEqual(
+				await singleDateHistory(after.params.historyDates),
+			)
 			const history = netWorthPageView(after).history
 			expect(history.series.points[0]?.xLabel).toBe("Nov 2019")
 			expect(history.line).toContain("from Nov 2019 to Oct 2026")
@@ -72,6 +95,11 @@ describe("the history after an import of values older than the ledger", () => {
 			const after = await importSheet("Month\tBank\n2010-01-31\t1,000.00")
 			expect(after.params.historyDates).toHaveLength(HISTORY_MONTHS)
 			expect(after.params.historyDates[0]).toBe("2016-11-30")
+			// One batched call stands for 120, and states exactly what each of them stated.
+			expect(after.reads.netWorthHistory).toHaveLength(HISTORY_MONTHS)
+			expect(after.reads.netWorthHistory).toEqual(
+				await singleDateHistory(after.params.historyDates),
+			)
 			const history = netWorthPageView(after).history
 			expect(history.line).toContain("from Nov 2016 to Oct 2026")
 			expect(history.cut).toBe(
