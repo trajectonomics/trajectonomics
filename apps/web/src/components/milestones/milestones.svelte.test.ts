@@ -37,8 +37,9 @@ describe("MilestonesBody", () => {
 	test("draws a mark on the chart for each reached Milestone, and repeats it in a list below", () => {
 		const body = renderBody(withMilestones(MILESTONE_ROWS))
 		expect(body).toContain("<title>first-year</title>")
-		// Hidden on a wide screen, where the chart's own label has room, and visible on a phone, which has no hover.
-		expect(body).toContain('<ul class="space-y-1 text-xs not-sr-only sm:sr-only">')
+		// The page's own timeline shows the Milestones, so the chart's list is for a screen reader only.
+		expect(body).toContain('<ul class="space-y-1 text-xs sr-only">')
+		expect(body).not.toContain("not-sr-only")
 		expect(body).toMatch(
 			/data-item="first-year"[^>]*>first-year<\/code>(<!--.*?-->)*: reached on 31 Dec 2026/,
 		)

@@ -33,8 +33,8 @@ const name = $derived(card.row.name)
 		{#if card.series.length > 0}
 			<LineChart label={`Net worth by year, ${name}`} series={card.series} markers={card.markers} />
 			{#if card.milestones.length > 0}
-				<!-- The chart shortens a rule's label to the room between rules, and a phone has no hover, so the
-				card names each Milestone it draws in full. -->
+				<!-- The chart shortens a rule's label to the room it has, or leaves it out, and a phone has no hover,
+				so the card names each Milestone it draws in full. -->
 				<ul aria-label="Milestones reached" class="space-y-1 text-xs text-muted-foreground">
 					{#each card.milestones as milestone (milestone.id)}
 						<li>

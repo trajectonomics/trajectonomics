@@ -7,7 +7,8 @@ export { type Extent, extent } from "./extent"
 export { FAN_LEVELS, type Fan, fanOf, fanSeriesName } from "./fan"
 export { keyTarget } from "./hover"
 export {
-	hangsLeft,
+	LABEL_OFFSET_PX,
+	type LabelArea,
 	type LabelledMark,
 	type PlacedLabel,
 	placedLabels,
