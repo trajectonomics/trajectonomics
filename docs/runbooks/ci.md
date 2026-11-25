@@ -53,8 +53,8 @@ SvelteKit stamps a build with the time it ran, so two builds of one commit packe
 `dashboard.bin` bytes. `apps/web/vite.config.ts` now stamps it with `TURBO_HASH`, the hash turbo gives
 the task from its inputs, so the same inputs pack the same bytes and a changed file is a new version
 ([web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
-Nothing sets a variable in a workflow, so the web build stays a cache hit when no web input changed.
-The `Check web` job runs `turbo run @trajectonomics/web#build --force --only` twice and fails when the
+`TRAJ_WEB_VERSION` pins the stamp for a build outside turbo (used to compare two commits by raw `sha256`, see the ADR) and is never set in a workflow, so the web build stays a cache hit when no web input changed.
+The `Check web` job runs `turbo run @trajectonomics/web#build --cache=local: --only` twice (no cache, so the build runs and no cache entry is written) and fails when the
 `sha256` of `pack/dashboard.bin` differs.
 
 ## Files outside every package

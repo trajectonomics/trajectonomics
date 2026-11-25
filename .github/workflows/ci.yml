@@ -159,15 +159,15 @@ jobs:
         run: bunx turbo run lint typecheck test:src build --filter=@trajectonomics/web --concurrency=2
 
       # SvelteKit's build stamp is the task's turbo hash (web ADR 0028), so two builds of the same inputs
-      # must pack the same bytes. `--force` skips the cache and `--only` runs just the web build (the Demo
-      # snapshot and the packages it needs were built above), so this is vite and the pack, twice. No `--`
-      # arguments: turbo hashes them into the task.
+      # must pack the same bytes. `--cache=local:` turns the cache off (the build runs and writes no entry)
+      # and `--only` runs just the web build (the Demo snapshot and the packages it needs were built above),
+      # so this is vite and the pack, twice. No `--` arguments: turbo hashes them into the task.
       - name: Check the Dashboard Pack is reproducible
         run: |
           set -euo pipefail
-          bunx turbo run @trajectonomics/web#build --force --only --concurrency=2
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
           first=$(sha256sum apps/web/pack/dashboard.bin)
-          bunx turbo run @trajectonomics/web#build --force --only --concurrency=2
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
           second=$(sha256sum apps/web/pack/dashboard.bin)
           echo "first:  $first"
           echo "second: $second"
