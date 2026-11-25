@@ -20,9 +20,11 @@ import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
+	/** The page the cookie reset returns to: the address the visitor is reading. */
+	readonly address: string
 }
 
-const { dictionary } = Astro.props
+const { dictionary, address } = Astro.props
 
 /** One link column: a mono label and its links. The page's one `nav` is the header's, so these are lists. */
 interface FooterLink {
@@ -39,7 +41,7 @@ const columns: readonly { readonly label: string; readonly links: readonly Foote
 			{ text: dictionary.footerDocsLink, href: DOCS_PATH },
 			{ text: dictionary.footerCliDocsLink, href: DOCS_CLI_PATH },
 			{ text: dictionary.footerInstallLink, href: DOCS_CLI_INSTALL_PATH },
-			{ text: dictionary.footerCookieLink, href: "/?consent=reset", rel: "nofollow" },
+			{ text: dictionary.footerCookieLink, href: `${address}?consent=reset`, rel: "nofollow" },
 		],
 	},
 	{

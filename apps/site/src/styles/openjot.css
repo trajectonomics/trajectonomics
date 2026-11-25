@@ -1,0 +1,98 @@
+/*
+ * The OpenJot page (ADR 0032): the Site's own sections, with a phone frame for the app's screenshots and
+ * the three install steps as cards. Every colour is a Semantic Token Role.
+ */
+
+/* The hero: the copy and the phone side by side from 64 rem, stacked below it. */
+.openjot-hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 48px;
+	align-items: center;
+}
+
+@media (min-width: 64rem) {
+	.openjot-hero {
+		grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+		gap: 64px;
+	}
+}
+
+.openjot-hero-copy {
+	display: flex;
+	max-width: 40rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 20px;
+}
+
+.openjot-hero-art {
+	position: relative;
+	justify-self: center;
+	width: 100%;
+	max-width: 19rem;
+}
+
+/* The mascot peeks over the phone's top edge, as the home's does over the demo window (ADR 0027). */
+.openjot-hello {
+	position: absolute;
+	top: -52px;
+	right: -20px;
+	width: 96px;
+	z-index: 1;
+}
+
+.openjot-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+}
+
+.openjot-meta {
+	margin: 0;
+	font-family: var(--font-meta);
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	color: var(--ds-color-muted-foreground);
+}
+
+.openjot-link {
+	color: var(--ds-color-foreground);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.openjot-link:hover {
+	text-decoration: none;
+}
+
+.openjot-link:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}
+
+/* The in-app browser note: one quiet band under the hero, with the lost robot beside it. */
+.openjot-note {
+	border-block: 1px solid var(--ds-color-border);
+	background: var(--ds-color-muted);
+	color: var(--ds-color-foreground);
+}
+
+.openjot-note-inner {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding-block: 24px;
+}
+
+.openjot-note-mascot {
+	flex: none;
+	width: 64px;
+}
+
+.openjot-note-text {
+	margin: 0;
+	max-width: 48rem;
+	text-wrap: pretty;
+}

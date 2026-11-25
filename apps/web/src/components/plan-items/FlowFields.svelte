@@ -50,8 +50,10 @@ let {
 	<Field id="flow-frequency" label="How often" options={FREQUENCY_CHOICES} bind:value={draft.frequency} problem={shown.at("frequency")} />
 	<Field id="flow-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchors.start !== null} />
 	{#if anchors.start !== null}<AnchoredNote anchor={anchors.start} plan={name} />{/if}
-	<Field id="flow-end" label="Ends" hint="YYYY-MM-DD, or empty to run to the horizon" bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
-	{#if anchors.end !== null}<AnchoredNote anchor={anchors.end} plan={name} />{/if}
+	{#if draft.frequency !== "once" || anchors.end !== null}
+		<Field id="flow-end" label="Ends" hint="YYYY-MM-DD, or empty to run to the horizon" bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
+		{#if anchors.end !== null}<AnchoredNote anchor={anchors.end} plan={name} />{/if}
+	{/if}
 	<Field id="flow-growth" label="Growth" options={GROWTH_CHOICES} bind:value={draft.growth} problem={shown.at("growth")} />
 	{#if draft.growth === "fixed"}
 		<Field id="flow-rate" label="Percent a year" inputmode="decimal" hint="Up to two places, such as 3 or 3.50" bind:value={draft.rate} problem={shown.at("rate")} />

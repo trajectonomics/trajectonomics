@@ -1,11 +1,11 @@
 import type { Dictionary } from "../language/dictionary"
-import { CLEAN_URL } from "../language/languages"
+import { CLEAN_URL, languageEntry } from "../language/languages"
 import { GITHUB_ORG_URL, GITHUB_SKILLS_URL, SITE_NAME, SKILLS_LICENCE_URL } from "../site"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, type HtmlElement, type ScannedPage, scanHtml, textOf } from "./html"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 
 interface ExpectedLink {
 	readonly text: string
@@ -53,7 +53,7 @@ function namedLinkFailures(
 	})
 }
 
-/** The brand lockup is the accessible name trajectonomics, and it links the Site's one address. */
+/** The brand lockup is the accessible name trajectonomics, and it links the Site's home. */
 function brandFailures(path: string, links: readonly HtmlElement[]): readonly BuildFailure[] {
 	const brand = links.find((link) => link.attributes["aria-label"] === SITE_NAME)
 	if (brand === undefined) {
@@ -75,13 +75,13 @@ function brandFailures(path: string, links: readonly HtmlElement[]): readonly Bu
 	]
 }
 
-/** Every named link and the brand lockup of every Language home goes where it says. */
+/** Every named link and the brand lockup of every page goes where it says. */
 export function checkSiteLinks(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => {
+	return builtLanguagePages(files).flatMap(({ page, file }) => {
 		const scanned = scanHtml(file.content)
 		const links = elementsByTag(scanned, "a")
 		return [
-			...namedLinkFailures(file.path, scanned, links, entry.dictionary),
+			...namedLinkFailures(file.path, scanned, links, languageEntry(page.language).dictionary),
 			...brandFailures(file.path, links),
 		]
 	})

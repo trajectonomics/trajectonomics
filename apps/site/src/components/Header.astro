@@ -5,7 +5,7 @@ import mark from "@trajectonomics/brand/current/logo/mark.svg?raw"
 import type { Dictionary } from "../lib/language/dictionary"
 import type { Language } from "../lib/language/language"
 import { CLEAN_URL } from "../lib/language/languages"
-import { BLOG_PATH, DOCS_PATH, SITE_NAME } from "../lib/site"
+import { BLOG_PATH, DOCS_PATH, OPENJOT_PATH, SITE_NAME } from "../lib/site"
 import LanguageMenu from "./LanguageMenu.astro"
 import RepoLink from "./RepoLink.astro"
 
@@ -14,9 +14,13 @@ interface Props {
 	readonly dictionary: Dictionary
 	/** A Language home is the page the reading Language points at; a miss is not. */
 	readonly markCurrent: boolean
+	/** The address a Language choice returns to: the page the visitor is reading. */
+	readonly address: string
+	/** Whether this is the OpenJot page, whose header link is then the current page. */
+	readonly openjotCurrent: boolean
 }
 
-const { language, dictionary, markCurrent } = Astro.props
+const { language, dictionary, markCurrent, address, openjotCurrent } = Astro.props
 // The link names itself, so the artwork is decoration: the mark's own role and title go with it, and
 // its viewBox and xmlns stay, because that is what draws it.
 const artwork = mark
@@ -38,11 +42,23 @@ const artwork = mark
 		<div class="header-nav">
 			<a class="header-nav-link" href={DOCS_PATH}>{dictionary.docsLink}</a>
 			<a class="header-nav-link" href={BLOG_PATH}>{dictionary.blogLink}</a>
+			<a
+				class="header-nav-link"
+				href={OPENJOT_PATH}
+				aria-current={openjotCurrent ? "page" : undefined}
+			>
+				{dictionary.openjotLink}
+			</a>
 		</div>
 		<div class="header-end">
 			<RepoLink dictionary={dictionary} />
 			<span class="header-sep" aria-hidden="true"></span>
-			<LanguageMenu language={language} dictionary={dictionary} markCurrent={markCurrent} />
+			<LanguageMenu
+				language={language}
+				dictionary={dictionary}
+				markCurrent={markCurrent}
+				address={address}
+			/>
 		</div>
 	</nav>
 </header>

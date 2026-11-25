@@ -57,7 +57,7 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 		// The model sits in the data directory, so the Snapshot names it as `~/.traj/return-model.json`.
 		const model = join(home, "return-model.json")
 		await writeFile(model, `${JSON.stringify(demoReturnModel(ids), null, "\t")}\n`)
-		const check = await checkBinary(binary, process.env)
+		const check = await checkBinary(binary, { ...process.env, DO_NOT_TRACK: "1" })
 		if (!check.ok) return { ok: false, message: check.message }
 		const params = checkParams({
 			...DEMO_INPUT,
@@ -66,7 +66,7 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 			seed: DEMO_SEED,
 		})
 		if (!params.ok) return { ok: false, message: params.error.message }
-		const env = { ...process.env, TRAJ_HOME: home }
+		const env = { ...process.env, TRAJ_HOME: home, DO_NOT_TRACK: "1" }
 		const run = await runSnapshot({ binary, env }, check.version, params.params, [
 			...demoCarryIn(DEMO_SCENARIOS),
 			...demoSeparateCarryIn(),

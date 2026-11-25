@@ -2,7 +2,7 @@ import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { isDataBlockType, scriptElements } from "./html"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 
 /** What a script would read to choose a Language: the browser's own, a cookie, or storage. */
 const DETECTION = /\b(?:navigator\.languages?|localStorage|sessionStorage|document\.cookie)\b/
@@ -18,7 +18,7 @@ function inlineScripts(html: string): readonly string[] {
 
 /** The server resolves the Language, so no page script reads a Visitor signal or the choice (ADR 0020). */
 export function checkNoLanguageDetection(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files)
+	return builtLanguagePages(files)
 		.filter(({ file }) => inlineScripts(file.content).some((body) => DETECTION.test(body)))
 		.map(({ file }) =>
 			buildFailure(

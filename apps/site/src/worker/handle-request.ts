@@ -1,13 +1,8 @@
 import { CONSENT_PARAM, consentFromRequest } from "../lib/analytics/consent"
 import { chooseLanguage } from "../lib/language/choose"
-import {
-	CLEAN_URL,
-	LANGUAGE_CHOICE_PARAM,
-	LANGUAGES,
-	languageHomePath,
-	spokenLanguage,
-} from "../lib/language/languages"
-import { languageChoiceCookie, languageFromCookie } from "../lib/language/stored-choice"
+import { LANGUAGE_CHOICE_PARAM } from "../lib/language/languages"
+import { languageFromCookie } from "../lib/language/stored-choice"
+import { OPENJOT_PATH } from "../lib/site/openjot"
 import {
 	consentResponse,
 	type IdSource,
@@ -15,55 +10,25 @@ import {
 	personalisedHome,
 	signalsOf,
 } from "./consent-answer"
+import {
+	choiceResponse,
+	isOldAddress,
+	movedToAddress,
+	type PageAddress,
+	pageAt,
+	trailingSlashResponse,
+} from "./page-address"
 import { bodyOf } from "./response-body"
 
-/** The one path the Worker answers itself; every other path is a static asset (ADR 0020). */
-const ROOT_PATH = CLEAN_URL
-
-/** The prefixes the Site answered at before it had one address: one per Language the Site speaks. */
-const OLD_PREFIXES: readonly string[] = Object.freeze(
-	LANGUAGES.map((entry) => `/${entry.language}`),
-)
-
-/** What the answer at `/` depends on, in the order the response names them. */
+/** What the answer at a page address depends on, in the order the response names them. */
 const VARY = "Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT"
 
-/** `/` is private, so no shared cache hands one visitor's Language to another, and revalidated. */
-const HOME_CACHE_CONTROL = "private, no-cache"
+/** A page is private, so no shared cache hands one visitor's Language to another, and revalidated. */
+const PAGE_CACHE_CONTROL = "private, no-cache"
 
-/** The choice answer is a redirect that stores state, so no cache may keep it. */
-const CHOICE_CACHE_CONTROL = "no-store"
-
-/** The status an old prefix answers with: permanent, because the address will not move back. */
-const MOVED_STATUS = 301
-
-/** The status the Language choice answers with: back to the address, with the choice stored. */
-const CHOICE_STATUS = 302
-
-/** The assets binding the Worker hands every path but `/` and the old prefixes back to. */
+/** The assets binding the Worker hands every path but its pages and the old prefixes back to. */
 export interface Assets {
 	fetch(request: Request): Promise<Response>
-}
-
-/** Whether a path is one the Site answered at before it had one address. */
-function isOldAddress(pathname: string): boolean {
-	return OLD_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
-}
-
-/** The 301 every old prefix answers, so an indexed URL never 404s. */
-function movedToAddress(): Response {
-	return new Response(null, {
-		status: MOVED_STATUS,
-		headers: { Location: CLEAN_URL },
-	})
-}
-
-/** The Language choice answer: store a Language the Site speaks, then return to `/`. */
-function choiceResponse(choice: string | null): Response {
-	const language = spokenLanguage(choice)
-	const headers = new Headers({ Location: CLEAN_URL, "Cache-Control": CHOICE_CACHE_CONTROL })
-	if (language !== undefined) headers.set("Set-Cookie", languageChoiceCookie(language))
-	return new Response(null, { status: CHOICE_STATUS, headers })
 }
 
 /** The conditional headers a revalidation carries, so a 304 describes the bytes it stands for. */
@@ -76,8 +41,13 @@ function conditionalHeaders(request: Request): Headers {
 	return headers
 }
 
-/** The answer at `/`: the resolved Language's home, with what the answer depends on. */
-async function homeResponse(request: Request, assets: Assets, newId: IdSource): Promise<Response> {
+/** The answer at one page address: the resolved Language's page, with what the answer depends on. */
+async function pageResponse(
+	request: Request,
+	assets: Assets,
+	newId: IdSource,
+	page: PageAddress,
+): Promise<Response> {
 	const url = new URL(request.url)
 	const state = consentFromRequest(signalsOf(request))
 	const language = chooseLanguage(
@@ -86,14 +56,14 @@ async function homeResponse(request: Request, assets: Assets, newId: IdSource): 
 		request.headers.get("cf-ipcountry"),
 	)
 	const decided = state.kind !== "undecided"
-	const assetRequest = new Request(new URL(languageHomePath(language), url.origin), {
+	const assetRequest = new Request(new URL(page.assetPath(language), url.origin), {
 		method: "GET",
 		headers: decided ? new Headers() : conditionalHeaders(request),
 	})
 	const assetResponse = await assets.fetch(assetRequest)
 	const headers = new Headers(assetResponse.headers)
 	headers.set("Vary", VARY)
-	headers.set("Cache-Control", HOME_CACHE_CONTROL)
+	headers.set("Cache-Control", PAGE_CACHE_CONTROL)
 	if (!decided) {
 		return new Response(bodyOf(request, assetResponse), { status: assetResponse.status, headers })
 	}
@@ -102,8 +72,8 @@ async function homeResponse(request: Request, assets: Assets, newId: IdSource): 
 }
 
 /**
- * Answer the address, the Language choice link, the consent link and the old prefixes, and hand every
- * other path to assets. `newId` mints a visitor id; a test passes a fixed one.
+ * Answer each page address, the Language choice link, the consent link and the old prefixes, and hand
+ * every other path to assets. `newId` mints a visitor id; a test passes a fixed one.
  */
 export function handleRequest(
 	request: Request,
@@ -112,12 +82,22 @@ export function handleRequest(
 ): Promise<Response> {
 	const url = new URL(request.url)
 	if (isOldAddress(url.pathname)) return Promise.resolve(movedToAddress())
-	if (url.pathname !== ROOT_PATH) return assets.fetch(request)
+	const page = pageAt(url.pathname)
+	if (page === undefined) {
+		if (url.pathname === OPENJOT_PATH.slice(0, -1)) {
+			return Promise.resolve(trailingSlashResponse(url))
+		}
+		return assets.fetch(request)
+	}
 	if (url.searchParams.has(LANGUAGE_CHOICE_PARAM)) {
-		return Promise.resolve(choiceResponse(url.searchParams.get(LANGUAGE_CHOICE_PARAM)))
+		return Promise.resolve(
+			choiceResponse(page.address, url.searchParams.get(LANGUAGE_CHOICE_PARAM)),
+		)
 	}
 	if (url.searchParams.has(CONSENT_PARAM)) {
-		return Promise.resolve(consentResponse(request, url.searchParams.get(CONSENT_PARAM), newId))
+		return Promise.resolve(
+			consentResponse(request, url.searchParams.get(CONSENT_PARAM), newId, page.address),
+		)
 	}
-	return homeResponse(request, assets, newId)
+	return pageResponse(request, assets, newId, page)
 }
