@@ -60,6 +60,9 @@ Projection, under [ADR 0016](./0016-loans-borrowing-and-level-payments.md)'s loa
 - The independent oracle (`src/golden/oracle-statement*.ts`) walks every calendar day in exact integers
   and reports each month and the payoff date. It shares only the loan oracle's rounding with the rest of
   the golden suite.
-- The month-end observations add reads to a statement run only. Non-statement runs are unchanged.
+- A statement run adds a read on every month end, and each month end's overflow check. Non-statement
+  runs make neither read and are unchanged.
+- `financialIndependence` and `chanceOfSuccess` build no statements: they take no `ProjectionOptions`, and their paths
+  (`src/fi/prefix*.ts`, `src/chance/path.ts`) never build statements. Only `project` with `liabilityStatements: true` reports them.
 - A liability named in `surplus`, `withdraw` or `contribute` is already refused (`LIABILITY_MISUSE`), so
   the two moves a statement reports are the whole of a liability's movements. Asset statements are a later slice.

@@ -91,8 +91,12 @@ A Tally label scoped to one Filer, written `<label>@<filer>`, such as `income.se
 _Avoid_: Person label, namespaced label, suffix
 
 **Shared income**:
-Income a couple cannot attribute to either spouse, which Section 57 sexies para 2 counts as half each. It is tallied under the reserved Filer `shared`: a separate Return reads half of it and a joint Return reads all of it.
+Income a couple cannot attribute to either spouse, which Section 57 sexies para 2 counts as half each. It is tallied under the reserved Filer `shared`. A separate Return reads half of it, rounded down. A joint Return of one Filer reads all of it. A joint Return of two Filers gives half to each Filer, the odd satang to the second, so the halves add up to the whole.
 _Avoid_: Joint income, common income
+
+**Filer expense ceiling**:
+The 100,000 THB ceiling of the Section 42 bis (and 42 ter) standard expense, which each spouse has for their own Section 40(1)–(2) income even on a joint Return. A joint Levy of two Filers computes that expense once per Filer, each on the Filer's own income plus half of the shared income, and adds the two. Everything after it, the bracket walk included, runs once on the sums. An elected actual expense is one figure for the Return and is not repeated per Filer.
+_Avoid_: Joint ceiling, couple's cap
 
 **Minimum Gross Tax**:
 The Section 48(2) alternative calculation equal to 0.5% of gross Assessable Income under Sections 40(2)–40(8) when such income is at least 120,000 THB, payable only if it exceeds 5,000 THB and exceeds progressive bracket tax.

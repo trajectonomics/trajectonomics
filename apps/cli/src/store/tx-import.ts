@@ -2,7 +2,7 @@ import { LedgerValidationError } from "@trajectonomics/core/ledger"
 import { type AppError, fail, isAppError } from "../errors"
 import type { Ctx } from "./context"
 import { write } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { fromLedgerError } from "./ledger-errors"
 import { attemptTransaction, type Minted } from "./transactions"
 import type { ImportRejection, NewTransaction, TxAdded, WriteOptions } from "./types"
@@ -49,7 +49,7 @@ export function importTransactions(
 			const written: TxAdded[] = []
 			const rejected: ImportRejection[] = []
 			for (const [index, input] of inputs.entries()) {
-				const outcome = rowOutcome(ctx, input, { id: newId(at), at: stamp })
+				const outcome = rowOutcome(ctx, input, { id: ctx.newId(at), at: stamp })
 				if (isAppError(outcome)) rejected.push({ index, reason: outcome.body })
 				else written.push(outcome)
 			}

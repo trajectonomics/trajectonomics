@@ -3,10 +3,10 @@ import type { DateString, Scenario } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { DatedEvent } from "./events"
 import { closeReturnsOn, hasSettlement, type LevySet } from "./levy-set"
-import { type LiabilityLedger, recordMoves } from "./liability-ledger"
 import type { DayTotals, EngineRunsOut } from "./occurrence"
 import { processDate } from "./occurrence"
 import { isSafeInteger, overflow } from "./overflow"
+import { type OwedTracker, recordMoves } from "./owed-tracker"
 import type { EngineResult } from "./result"
 import type { RuleBook } from "./rule-book"
 import { type EngineSnapshot, snapshot } from "./snapshot"
@@ -18,7 +18,7 @@ export interface RunAccumulator {
 	readonly wanted: ReadonlySet<DateString>
 	readonly levies: LevySet | undefined
 	readonly gate: MilestoneGate | undefined
-	readonly ledger: LiabilityLedger | undefined
+	readonly tracker: OwedTracker | undefined
 	/** The rule Flows' Rule years, present only when the Scenario declares one (ADR 0023). */
 	readonly rules?: RuleBook
 	/** Whether each date records its cash-flow lines; only the breakdown option turns it on. */
@@ -55,7 +55,7 @@ function handleDay(
 	const outcome = processDate(states, scenario, date, events, acc.levies, acc.breakdown, acc.rules)
 	acc.totals.push(outcome.totals)
 	acc.gate?.record(outcome.totals)
-	if (acc.ledger !== undefined) recordMoves(acc.ledger, states, outcome.totals)
+	if (acc.tracker !== undefined) recordMoves(acc.tracker, states, outcome.totals)
 	if (outcome.problem !== undefined) return { ok: false, problem: outcome.problem }
 	if (outcome.runsOut !== undefined) return finishRunout(acc, states, outcome.runsOut)
 	return undefined
