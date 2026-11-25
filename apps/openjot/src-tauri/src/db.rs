@@ -1462,7 +1462,7 @@ mod payee_rule_tests {
     #[test]
     fn income_record_does_not_overwrite_a_spending_rule() {
         let (conn, path) = temp_db();
-        // The user taught moojot that "Test Mart" is food.
+        // The user taught OpenJot that "Test Mart" is food.
         upsert_user_rule(&conn, "test mart", "cat_food").unwrap();
 
         // Later they get cashback from the same payee.

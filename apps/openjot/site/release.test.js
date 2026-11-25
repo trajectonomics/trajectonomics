@@ -43,7 +43,7 @@ function github(status, body) {
 }
 
 const env = { ASSETS: { fetch: async () => new Response("asset") } };
-const req = (path) => new Request(`https://moojot.trajectonomics.com${path}`);
+const req = (path) => new Request(`https://openjot.trajectonomics.com${path}`);
 
 function routes(table) {
   const calls = [];
@@ -143,7 +143,7 @@ test("/download sends people to the coming-soon note when neither repository has
   ]);
   const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
   assert.equal(res.status, 302);
-  assert.equal(res.headers.get("location"), "https://moojot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
 });
 
 test("/download falls back to the GitHub releases page when GitHub fails", async () => {
@@ -218,7 +218,7 @@ test("/download/checksums sends people to the coming-soon note when there is no 
     [ARCHIVED_API, () => new Response("{}", { status: 404 })],
   ]);
   const res = await handle(req("/download/checksums"), env, null, { fetch: gh.fetch, cache: memoryCache() });
-  assert.equal(res.headers.get("location"), "https://moojot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
 });
 
 test("the release lookup is cached, and errors are not", async () => {
@@ -249,6 +249,92 @@ test("/api/release answers 503 when GitHub is unavailable", async () => {
 
 test("other paths are served from static assets", async () => {
   const res = await handle(req("/"), env, null, {});
+  assert.equal(await res.text(), "asset");
+});
+
+test("the old host answers 301 to the new host, keeping the path and query", async () => {
+  const res = await handle(
+    new Request("https://moojot.trajectonomics.com/download/ig?x=1"),
+    env,
+    null,
+    {},
+  );
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/download/ig?x=1");
+});
+
+test("the old host redirects the comparison page, and the new host serves it from assets", async () => {
+  const old = await handle(
+    new Request("https://moojot.trajectonomics.com/meowjot-alternative"),
+    env,
+    null,
+    {},
+  );
+  assert.equal(old.status, 301);
+  assert.equal(old.headers.get("location"), "https://openjot.trajectonomics.com/meowjot-alternative");
+
+  const calls = [];
+  const assets = {
+    fetch: async (request) => {
+      calls.push(request.url);
+      return new Response("asset");
+    },
+  };
+  const res = await handle(
+    new Request("https://openjot.trajectonomics.com/meowjot-alternative"),
+    { ASSETS: assets },
+    null,
+    {},
+  );
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), "asset");
+  assert.deepEqual(calls, ["https://openjot.trajectonomics.com/meowjot-alternative"]);
+});
+
+test("the old host still proxies /ingest events instead of redirecting them", async () => {
+  const calls = [];
+  const fetch = async (url) => {
+    calls.push(url);
+    return new Response("{}", { status: 200 });
+  };
+  const res = await handle(
+    new Request("https://moojot.trajectonomics.com/ingest/e/", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+    }),
+    env,
+    null,
+    { fetch },
+  );
+  assert.equal(res.status, 200);
+  assert.deepEqual(calls, ["https://eu.i.posthog.com/e/"]);
+});
+
+test("the old host still proxies /ingest scripts instead of redirecting them", async () => {
+  const calls = [];
+  const fetch = async (url) => {
+    calls.push(url);
+    return new Response("// posthog", { status: 200 });
+  };
+  const res = await handle(
+    new Request("https://moojot.trajectonomics.com/ingest/static/array.js"),
+    env,
+    null,
+    { fetch },
+  );
+  assert.notEqual(res.status, 301);
+  assert.deepEqual(calls, ["https://eu-assets.i.posthog.com/static/array.js"]);
+});
+
+test("the new host serves the landing page normally", async () => {
+  const res = await handle(
+    new Request("https://openjot.trajectonomics.com/"),
+    env,
+    null,
+    {},
+  );
+  assert.equal(res.status, 200);
   assert.equal(await res.text(), "asset");
 });
 

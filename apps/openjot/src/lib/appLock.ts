@@ -1,4 +1,4 @@
-// Opt-in app lock (#79): Android checks the fingerprint, face or phone PIN, and MooJot only
+// Opt-in app lock (#79): Android checks the fingerprint, face or phone PIN, and OpenJot only
 // hears "unlocked" or "not unlocked". Nothing about the fingerprint reaches the app.
 //
 // The rules, kept free of Svelte and Tauri so the unit tests can run them:

@@ -37,6 +37,17 @@ describe("temporary directories made by a source file", () => {
 		expect(unremovedTempDirs(files)).toEqual(["a.ts"])
 	})
 
+	it("does not count an rm that appears only in a block or JSDoc comment", () => {
+		const files = [
+			{ path: "a.ts", text: "const d = await mkdtemp(p)\n/* then rm(d) in the caller */\n" },
+			{
+				path: "b.ts",
+				text: "const d = mkdtempSync(p)\n/** The caller does rm(d) when it is done. */\n",
+			},
+		]
+		expect(unremovedTempDirs(files)).toEqual(["a.ts", "b.ts"])
+	})
+
 	it("exempts a file whose helper removes the directory, and only with a reason", () => {
 		const files = [{ path: "a.ts", text: "const d = mkdtempSync(p)" }]
 		const allowed = new Map([["a.ts", "the sweep in temp-dir.ts removes it"]])

@@ -106,3 +106,26 @@ describe("the household Owners a write dropped", () => {
 		)
 	})
 })
+
+describe("a write that drops both household anchors and Owners", () => {
+	test("names every item in one notice, and Dismiss clears both lists", async () => {
+		answer({
+			droppedAnchors: ["flows.fund.end", "flows.school.start"],
+			droppedOwners: ["flows.rent", "flows.food", "flows.fund"],
+		})
+		expect(await editSession.run(EDIT)).toBe(true)
+		expect(dropped.anchors).toEqual(["flows.fund.end", "flows.school.start"])
+		expect(dropped.owners).toEqual(["flows.rent", "flows.food", "flows.fund"])
+		const body = render(DroppedAnchorsNotice).body
+		expect(body).toContain(
+			"This change to plan early removed the household anchors that pinned flows.fund.end, flows.school.start, because the plan no longer holds those dates.",
+		)
+		expect(body).toContain(
+			"This change to plan early removed the Owner of flows.rent, the Owner of flows.food and the Owner of flows.fund, because the plan no longer holds those items.",
+		)
+		dismissDropped()
+		expect(dropped.anchors).toEqual([])
+		expect(dropped.owners).toEqual([])
+		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+	})
+})

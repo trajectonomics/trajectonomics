@@ -3,8 +3,8 @@
 // slip imported as 0 baht. Debug builds skip R8, so only a real release APK shows it.
 //
 // Run it against a built APK:
-//   MOOJOT_APK=path/to/moojot-android-arm64.apk node --test tests/unit/release-apk.test.mjs
-// Without MOOJOT_APK the test is skipped, because CI's unit job builds no APK.
+//   OPENJOT_APK=path/to/openjot-android-arm64.apk node --test tests/unit/release-apk.test.mjs
+// Without OPENJOT_APK the test is skipped, because CI's unit job builds no APK.
 //
 // It also checks #57: every library the APK bundles has an entry in static/third-party-notices.txt.
 
@@ -14,7 +14,7 @@ import { readFileSync } from "node:fs";
 import { inflateRawSync } from "node:zlib";
 import { apkArtifacts, NATIVE_LIBS } from "../../tools/third-party-notices.mjs";
 
-const apkPath = process.env.MOOJOT_APK;
+const apkPath = process.env.OPENJOT_APK;
 const ONNX_JNI_LIB = "lib/arm64-v8a/libonnxruntime4j_jni.so";
 const REGISTRAR_PREFIX = "com.google.firebase.components:";
 
@@ -171,7 +171,7 @@ function printableStrings(buf, min = 4) {
 
 // --- tests ----------------------------------------------------------------
 
-const skip = apkPath ? false : "set MOOJOT_APK to a release APK to run this check";
+const skip = apkPath ? false : "set OPENJOT_APK to a release APK to run this check";
 
 test("release APK keeps what ML Kit and ONNX Runtime look up at runtime", { skip }, async (t) => {
   const zip = readZip(readFileSync(apkPath));
