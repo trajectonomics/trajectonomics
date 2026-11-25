@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
 import { hasLevy } from "../../lib/snapshot"
-import { chooseScenario } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import { addLevyCommand } from "../../lib/view/tax"
 import EmptyState from "../ui/EmptyState.svelte"
 import AllowancesPlan from "./AllowancesPlan.svelte"

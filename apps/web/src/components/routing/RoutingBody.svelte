@@ -2,7 +2,7 @@
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { Snapshot } from "../../lib/contract"
 import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
-import { chooseScenario } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import { shownPlan } from "../../lib/what-if/routing"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
