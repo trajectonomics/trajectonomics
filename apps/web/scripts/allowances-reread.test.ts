@@ -1,6 +1,6 @@
 // A change of the allowance settings against the real traj: only the allowance reads run, every other Read is kept
 // as it was, and a plan that changed since the Snapshot was read still makes a full read (web ADR 0012).
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
 import {
 	disposeAllowances,
@@ -13,6 +13,7 @@ import {
 import { calls, clearCalls, spyContext } from "./allowances-spy.test-support"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
+import { settle } from "./editor-running.test-support"
 import type { Editor } from "./serve-edit"
 
 const RMF = "allowance.retirement.rmf"
@@ -54,6 +55,7 @@ beforeAll(async () => {
 	disposeSpy = made.dispose
 	spy = await editorOver(made.context)
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(async () => {
 	await disposeSpy()
 	await disposeAllowances()

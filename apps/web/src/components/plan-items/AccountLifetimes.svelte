@@ -18,11 +18,11 @@ let { fees, payouts, wasFees, wasPayouts, currency }: Props = $props()
 </script>
 
 <!-- Only dt/dd pairs: the card's own <dl> holds them, so they line up with its other rows. -->
-{#if payouts !== null}
+{#if payouts !== null || wasPayouts !== undefined}
 	<dt class="text-muted-foreground">Paid out over the plan</dt>
-	<dd><Money amount={payouts} {currency} /><WasText was={wasPayouts} money={wasPayouts !== ""} {currency} /></dd>
+	<dd>{#if payouts === null}None{:else}<Money amount={payouts} {currency} />{/if}<WasText was={wasPayouts} money={wasPayouts !== ""} {currency} /></dd>
 {/if}
-{#if fees !== null}
+{#if fees !== null || wasFees !== undefined}
 	<dt class="text-muted-foreground">Fees over the plan</dt>
-	<dd><Money amount={fees} {currency} /><WasText was={wasFees} money={wasFees !== ""} {currency} /></dd>
+	<dd>{#if fees === null}None{:else}<Money amount={fees} {currency} />{/if}<WasText was={wasFees} money={wasFees !== ""} {currency} /></dd>
 {/if}
