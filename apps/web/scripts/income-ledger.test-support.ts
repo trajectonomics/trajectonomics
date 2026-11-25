@@ -9,6 +9,7 @@ import { type WhatIfAnswer, whatIfAnswer } from "../src/lib/what-if/answer"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import { handDocument } from "./income-document.test-support"
 import { AS_OF, PLAN, PROVIDENT } from "./income-names.test-support"
 import { createEditor, type Editor } from "./serve-edit"
@@ -47,13 +48,15 @@ export async function setupIncome(): Promise<{ fund: string; bank: string }> {
 	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const base = storedPlan0(demo)
 	traj(["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"], base.document)
-	editor = createEditor({
-		traj: { binary: BINARY, env: env() },
-		cliVersion: "test",
-		params: { ...PARAMS, asOf: AS_OF, horizon: "2029-12-31", scenarios: [PLAN], chance: null },
-		records: [],
-		token: TOKEN,
-	})
+	editor = recorded(
+		createEditor({
+			traj: { binary: BINARY, env: env() },
+			cliVersion: "test",
+			params: { ...PARAMS, asOf: AS_OF, horizon: "2029-12-31", scenarios: [PLAN], chance: null },
+			records: [],
+			token: TOKEN,
+		}),
+	)
 	const first = await editor.refresh()
 	if (!first.ok) throw new Error(first.error.message)
 	return base.ids

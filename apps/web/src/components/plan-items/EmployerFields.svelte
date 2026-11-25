@@ -1,4 +1,6 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { nameOf } from "../../lib/view/account-names"
 import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import { ROUNDING_CHOICES } from "../../lib/view/withdrawals/options"
@@ -14,7 +16,7 @@ interface Props {
 let { draft = $bindable(), shown, targets }: Props = $props()
 const choices = $derived([
 	{ value: "", label: "Choose an account" },
-	...targets.map((id) => ({ value: id, label: id })),
+	...targets.map((id) => ({ value: id, label: nameOf(currentAccountNames(), id) })),
 ])
 </script>
 

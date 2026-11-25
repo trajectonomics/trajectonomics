@@ -1,12 +1,13 @@
 // The fees and payouts over the plan against the real traj (sim ADR 0027, 0028; cli ADR 0067; web ADR 0017): a 1% fee on the
 // fund shows on its card and on Home, each the figure `projection run` states, and each equal to the years the card lists.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { render } from "svelte/server"
 import NetWorthCard from "../src/components/overview/NetWorthCard.svelte"
 import AccountLifetimes from "../src/components/plan-items/AccountLifetimes.svelte"
 import { overviewView } from "../src/lib/view/overview/view"
 import { accountItems } from "../src/lib/view/what-if/plan-items"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { minor, runOf, savePayoutAndFee, slow, snapshotOf } from "./income.test-support"
 import { disposeIncome, PLAN, setupIncome } from "./income-ledger.test-support"
 
@@ -15,6 +16,7 @@ beforeAll(async () => {
 	fund = (await setupIncome()).fund
 }, SLOW_MS)
 afterAll(disposeIncome)
+afterEach(settle, SLOW_MS)
 
 /** The sum of decimal money strings, in minor units: test arithmetic only, the page adds nothing. */
 const sum = (amounts: readonly (string | null)[]): bigint =>

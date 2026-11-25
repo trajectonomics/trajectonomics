@@ -38,7 +38,8 @@ export function anchorsFor(
 	document: unknown,
 	owner: string,
 ): ResolvedAnchors | AppError {
-	if (stored?.household == null) return { document, household: null, dropped: [] }
+	if (stored?.household == null)
+		return { document, household: null, dropped: [], droppedOwners: [] }
 	return resolveHousehold(stored.household, document, owner)
 }
 

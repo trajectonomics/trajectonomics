@@ -1,6 +1,8 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import type { Baseline, HouseholdDocument, Read, ScenarioDocument } from "../../lib/contract"
+import { nameOf } from "../../lib/view/account-names"
 import { balanceOf } from "../../lib/view/plan-items/accounts"
 import { realAssetById } from "../../lib/view/plan-items/asset-document"
 import { newAssetDraft, percentFields } from "../../lib/view/plan-items/asset-draft"
@@ -44,8 +46,8 @@ let {
 	tryValue = false,
 }: Props = $props()
 const existing = $derived(assetId === undefined ? undefined : realAssetById(doc, assetId)?.parts)
-const choices = $derived(ownedChoicesOf(doc, baseline, existing?.account.id))
-const routed = $derived(routedChoicesOf(doc, baseline, existing?.account.id))
+const choices = $derived(ownedChoicesOf(doc, baseline, existing?.account.id, currentAccountNames()))
+const routed = $derived(routedChoicesOf(doc, baseline, existing?.account.id, currentAccountNames()))
 /** True when the Baseline holds a balance in the Account: it stays declared, or no read can run. */
 const held = $derived(existing !== undefined && balanceOf(existing.account, baseline) !== null)
 const anchors = $derived(assetAnchors(household, existing?.account.id ?? ""))
@@ -89,7 +91,7 @@ async function remove(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="min-w-0 space-y-6" aria-label={existing ? `Edit asset ${existing.account.id}` : "Add a home or car"}>
+<form onsubmit={save} class="min-w-0 space-y-6" aria-label={existing ? `Edit asset ${nameOf(currentAccountNames(), existing.account.id)}` : "Add a home or car"}>
 	<AssetFields bind:draft editing={existing !== undefined} {choices} {routed} {shown} {anchors} plan={name} />
 	{#if tryValue}
 		<p class="text-sm text-muted-foreground">A Try changes the asset's terms in the What-if. It cannot add or take out one of its items.</p>

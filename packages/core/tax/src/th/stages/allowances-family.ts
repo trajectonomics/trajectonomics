@@ -49,6 +49,9 @@ function computeChildAllowance(children: ThAllowancesInput["children"]): Clamped
 	return unclamped(count * p.basePerChild + bonus * p.bonusSecondPlusBorn2018OrLater)
 }
 
+const countNamed = (...slots: (boolean | undefined)[]) => slots.filter(Boolean).length
+const refusesSpouseSlots = (status: ThFilingStatus) => status.startsWith("married_separate")
+
 /**
  * Counts the parents a Return claims from the object form of `parents`.
  *
@@ -56,7 +59,7 @@ function computeChildAllowance(children: ThAllowancesInput["children"]): Clamped
  * the Filer's own, so a spouse slot on it is refused instead of dropped (tax ADR 0010).
  * Math: One for each named slot the status admits; the count form is the number as given.
  * Units: Counts of persons.
- * Throws: TaxValidationError at `allowance.parents.spouse` for a spouse slot on `married_separate`.
+ * Throws: TaxValidationError at `allowance.parents.spouse` for a spouse slot on a separate status.
  */
 function computeParentCount(
 	parents: ThParentsInput | number | undefined,
@@ -67,9 +70,9 @@ function computeParentCount(
 		validateMonetaryAmount(parents, ThAllowanceField.Parents)
 		return Math.floor(parents)
 	}
-	const own = (parents.taxpayerFather ? 1 : 0) + (parents.taxpayerMother ? 1 : 0)
-	const spouse = (parents.spouseFather ? 1 : 0) + (parents.spouseMother ? 1 : 0)
-	if (status === "married_separate" && spouse > 0) {
+	const own = countNamed(parents.taxpayerFather, parents.taxpayerMother)
+	const spouse = countNamed(parents.spouseFather, parents.spouseMother)
+	if (refusesSpouseSlots(status) && spouse > 0) {
 		throw new TaxValidationError(
 			ThAllowanceField.ParentsSpouseSlot,
 			spouse,

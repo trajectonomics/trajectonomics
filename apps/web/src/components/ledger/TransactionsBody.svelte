@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import type { Read, TxList } from "../../lib/contract"
 import {
 	accountOptions,
@@ -32,7 +33,7 @@ function clearFilters(): void {
 <!-- The transactions Read as a filterable table, with its period and its command. -->
 <ReadView {read} label="The transactions">
 	{#snippet children(list)}
-		{@const rows = transactionRows(list)}
+		{@const rows = transactionRows(list, currentAccountNames())}
 		{@const shown = filterTransactions(rows, filter)}
 		<div class="space-y-4">
 			<TransactionFilters

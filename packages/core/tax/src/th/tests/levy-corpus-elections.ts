@@ -28,7 +28,10 @@ function familyCases(): readonly ThLevyCase[] {
 					filingStatus,
 					allowances: {
 						children,
-						parents: { taxpayerFather: true, spouseFather: filingStatus !== "married_separate" },
+						parents: {
+							taxpayerFather: true,
+							spouseFather: !filingStatus.startsWith("married_separate"),
+						},
 						spouse: 60_000,
 					},
 				},

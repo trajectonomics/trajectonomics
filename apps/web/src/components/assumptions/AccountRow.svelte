@@ -2,11 +2,12 @@
 import { fieldKey } from "../../lib/view/assumptions/draft"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
+import AccountName from "../ui/AccountName.svelte"
 import AccountFee from "./AccountFee.svelte"
 import SwingChoices from "./SwingChoices.svelte"
 
 interface Props {
-	/** The Account's id, which names the row and each field. */
+	/** The Account's id, which keys the row and each field; the heading names it by its ledger name. */
 	id: string
 	/** Whether the Account has a volatility field: an illiquid asset has none. */
 	swings: boolean
@@ -34,7 +35,7 @@ let {
 
 <!-- One asset Account. An illiquid asset shows its return only: the chance of success moves only what can be sold. -->
 <div class="space-y-4 rounded-md border border-border p-4">
-	<h3 class="font-medium text-foreground">{id}</h3>
+	<h3 class="font-medium text-foreground"><AccountName {id} /></h3>
 	<div class="grid gap-4 sm:grid-cols-2">
 		<Field
 			id="rate-{id}"

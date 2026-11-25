@@ -1,4 +1,5 @@
 import type { Balance } from "../../contract"
+import { type AccountNames, NO_NAMES, refLabel } from "../account-names"
 
 /** One line of the trial balance: a leaf account's debit or credit, exactly as the CLI states it. */
 export interface TrialBalanceLine {
@@ -23,12 +24,15 @@ export interface TrialBalanceView {
 }
 
 /** The trial balance rows and totals in the CLI's order. The page does not add to them. */
-export function trialBalanceView(trial: Balance["trialBalance"]): TrialBalanceView | null {
+export function trialBalanceView(
+	trial: Balance["trialBalance"],
+	names: AccountNames = NO_NAMES,
+): TrialBalanceView | null {
 	if (trial === undefined) return null
 	return {
 		lines: trial.rows.map((row, index) => ({
 			key: `${index}`,
-			account: row.account.name,
+			account: refLabel(names, row.account),
 			currency: row.currency,
 			debit: row.debit,
 			credit: row.credit,

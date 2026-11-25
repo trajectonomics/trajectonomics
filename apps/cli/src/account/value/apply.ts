@@ -33,7 +33,8 @@ export function applyEntry(batch: Batch, entry: Prepared): ValuedRow {
 	const memo = `${MEMO_PREFIX}${formatMinorUnits(value, account.currency)}`
 	batch.writes.push(written(transaction, { date, memo }))
 	for (const posting of transaction.postings) {
-		record(batch, posting.accountId, date, BigInt(posting.amount))
+		const own = (posting.accountId as string) === account.id ? account : batch.against
+		record(batch, own, date, BigInt(posting.amount), entry.index)
 	}
 	const notes = laterNotes({
 		account,

@@ -100,7 +100,9 @@ describe("the Assumptions page", () => {
 		expect(body).toContain('value="500"')
 		expect(body).toContain('value="0123456789abcdef"')
 		expect(body).toContain("Built from your plan")
-		expect(body).toContain("fund: returns 5.00% a year, swings 15.00%")
+		expect(body).toMatch(
+			/data-account="fund"[^>]*>fund<\/code>(<!--\]-->)?<!---->: returns 5.00% a year, swings 15.00%/,
+		)
 	})
 
 	test("fits a phone: each field is full width in one column, the choices wrap, and nothing has a fixed width", () => {

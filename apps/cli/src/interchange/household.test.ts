@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { backupPath } from "../backup/testing"
+import { isAppError } from "../errors"
 import { applyScenario, resultOf, rowOf, scenario } from "../scenario-test-support"
 import { ledgerHome, must, mustOpen, SCENARIO_DOCUMENT, tempHome } from "../store/testing"
 import { capture } from "../test-support"
@@ -12,11 +13,21 @@ const HOUSEHOLD = {
 	anchors: [{ path: "flows.salary.end", person: "me", age: 60 }],
 }
 
+/** The same household in version 2, with Owners (cli ADR-0076). */
+const OWNED_HOUSEHOLD = {
+	...HOUSEHOLD,
+	schemaVersion: 2,
+	owners: [
+		{ path: "flows.salary", person: "me" },
+		{ path: "flows.bonus", person: "shared" },
+	],
+}
+
 /** A Ledger-free data directory whose one Scenario carries a household, through the commands. */
-async function homeWithHousehold(): Promise<string> {
+async function homeWithHousehold(household: unknown = HOUSEHOLD): Promise<string> {
 	const home = ledgerHome()
 	await applyScenario(home, "base", SCENARIO_DOCUMENT)
-	const set = await scenario(home, ["household", "base", "--file", "-"], JSON.stringify(HOUSEHOLD))
+	const set = await scenario(home, ["household", "base", "--file", "-"], JSON.stringify(household))
 	expect(set.code).toBe(0)
 	return home
 }
@@ -37,6 +48,51 @@ describe("a household through backup and restore", () => {
 		expect(resultOf(await scenario(restored, ["show", "base"])).scenario.household).toEqual(
 			HOUSEHOLD,
 		)
+	})
+
+	it("carries the owners of a version 2 household into a restored database", async () => {
+		const home = await homeWithHousehold(OWNED_HOUSEHOLD)
+		const backup = backupPath()
+		expect((await capture(["backup", "--out", backup, "--json"], { TRAJ_HOME: home })).code).toBe(0)
+		const restored = tempHome()
+		expect((await capture(["restore", backup, "--json"], { TRAJ_HOME: restored })).code).toBe(0)
+		expect(resultOf(await scenario(restored, ["show", "base"])).scenario.household).toEqual(
+			OWNED_HOUSEHOLD,
+		)
+	})
+
+	it("writes the owners into the export, and an import of it restores them", async () => {
+		const home = await homeWithHousehold(OWNED_HOUSEHOLD)
+		const out = backupPath()
+		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
+		const text = await Bun.file(`${out}/traj.jsonl`).text()
+		const line = text.split("\n").find((entry) => entry.includes('"record":"scenario"')) ?? ""
+		expect(line).toContain(
+			'"owners":[{"path":"flows.salary","person":"me"},{"path":"flows.bonus","person":"shared"}]',
+		)
+		const store = mustOpen(ledgerHome())
+		must(importJsonl(text, store))
+		expect(must(exportJsonl(store))).toBe(text)
+		store.close()
+	})
+
+	it("refuses an import whose household names an unknown person as an Owner", async () => {
+		const home = await homeWithHousehold(OWNED_HOUSEHOLD)
+		const out = backupPath()
+		await capture(["export", "--format", "jsonl", "--out", out, "--json"], { TRAJ_HOME: home })
+		const text = (await Bun.file(`${out}/traj.jsonl`).text()).replace(
+			'"person":"me"},{"path":"flows.bonus"',
+			'"person":"nobody"},{"path":"flows.bonus"',
+		)
+		const store = mustOpen(ledgerHome())
+		const refused = importJsonl(text, store)
+		expect(isAppError(refused)).toBe(true)
+		if (isAppError(refused)) {
+			expect(refused.body.code).toBe("invalid_input")
+			expect(refused.body.message).toContain("is not a household document")
+			expect(refused.body.message).toContain("nobody")
+		}
+		store.close()
 	})
 
 	it("writes the household into the export as canonical JSON, with its keys sorted", async () => {

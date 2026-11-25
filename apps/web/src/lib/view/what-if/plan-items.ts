@@ -7,6 +7,7 @@ import type {
 } from "../../contract"
 import { overlayDocument } from "../../what-if/overlay"
 import type { SetChange } from "../../what-if/overrides"
+import type { AccountNames } from "../account-names"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
 import { groupedIds } from "../plan-items/asset-document"
 import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
@@ -69,6 +70,7 @@ export function flowItems(
 	pageKind: PlanKind,
 	household: HouseholdDocument | null,
 	changes: PlanChanges | null,
+	names?: AccountNames,
 ): ItemsView<FlowCard> {
 	const kind: FlowKind = pageKind === "expense" ? "expense" : "income"
 	const grouped = groupedIds(doc)
@@ -78,6 +80,7 @@ export function flowItems(
 			kind,
 			household,
 			flows,
+			names,
 		)
 	const baseline = listed(doc.flows)
 	if (changes === null) return { cards: baseline, marks: {} }

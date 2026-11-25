@@ -14,7 +14,7 @@ import {
 	setFlag,
 	withoutFlag,
 } from "../../scenario/override-flags"
-import { droppedAnchors, writtenScenario } from "../../scenario/view"
+import { droppedAnchors, droppedOwners, writtenScenario } from "../../scenario/view"
 import type { ForkOptions } from "../../store"
 import { withStore } from "../../with-store"
 
@@ -49,6 +49,7 @@ export const fork: Leaf = defineCommand({
 		additions: additionsField,
 		scenario: writtenScenario,
 		droppedAnchors,
+		droppedOwners,
 	}),
 	examples: [
 		{ command: "traj scenario fork base early", description: "Copy a Scenario under a new name." },
