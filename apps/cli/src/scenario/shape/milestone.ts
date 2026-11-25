@@ -1,3 +1,4 @@
+import { DISPLAY_LABEL_RULE } from "@trajectonomics/core/sim"
 import { criterionShape } from "./criterion-shape"
 import { MILESTONE_COMBINES } from "./terms"
 
@@ -11,6 +12,12 @@ export const milestoneShape: Record<string, unknown> = {
 			type: "string",
 			description:
 				"The name a Flow's `startAt` or `endAt`, or a milestone criterion's `milestone`, uses. Unique within the Scenario.",
+		},
+		displayLabel: {
+			type: "string",
+			minLength: 1,
+			maxLength: 80,
+			description: `What a person reads in place of the id, written as ${DISPLAY_LABEL_RULE}. It is no key: a Flow's gate still names the id, and the label may repeat or change. It changes no figure (sim ADR 0032).`,
 		},
 		combine: {
 			enum: [...MILESTONE_COMBINES],

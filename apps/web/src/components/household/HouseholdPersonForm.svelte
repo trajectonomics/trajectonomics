@@ -3,11 +3,8 @@ import { editSession } from "../../client/edit.svelte.js"
 import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, HouseholdPerson } from "../../lib/contract"
 import { householdWithoutPerson, householdWithPerson } from "../../lib/view/household/document"
-import {
-	type PersonDraft,
-	personDraftOf,
-	personFromDraft,
-} from "../../lib/view/household/person-draft"
+import { type PersonDraft, personDraftOf } from "../../lib/view/household/person-draft"
+import { personFromDraft } from "../../lib/view/household/person-save"
 import { RELATION_CHOICES, ROLE_CHOICES } from "../../lib/view/plan-items/options"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
@@ -35,7 +32,7 @@ const ROLE_CHOICES_WITH_BLANK = [{ value: "", label: "Choose a role" }, ...ROLE_
 const initial = () => personDraftOf(existing, household === null ? "holder" : "")
 let draft: PersonDraft = $state(initial())
 let problems: Problems = $state({})
-const FIELDS = ["name", "role", "relation", "born", "lifeExpectancy", "joins"]
+const FIELDS = ["name", "displayLabel", "role", "relation", "born", "lifeExpectancy", "joins"]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
 const taken = $derived((household?.people ?? []).map((person) => person.id))
 
@@ -75,6 +72,7 @@ async function removePerson(): Promise<void> {
 	{:else}
 		<Field id="person-name" label="Id" hint="A short id for the person, such as me or partner. The card shows it in its Id row." bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
+	<Field id="person-label" label="Name" hint="Shown in place of the id, on cards, anchors and pickers. Optional." bind:value={draft.displayLabel} problem={shown.at("displayLabel")} />
 	<Field id="person-role" label="Role" options={existing || household === null ? ROLE_CHOICES : ROLE_CHOICES_WITH_BLANK} bind:value={draft.role} problem={shown.at("role")} />
 	{#if draft.role === "dependent"}
 		<Field id="person-relation" label="Relation to the account holder" options={RELATION_CHOICES_WITH_BLANK} bind:value={draft.relation} problem={shown.at("relation")} />

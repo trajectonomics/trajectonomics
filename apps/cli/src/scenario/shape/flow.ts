@@ -1,4 +1,4 @@
-import { EXPENSE_CATEGORY_RULE } from "@trajectonomics/core/sim"
+import { DISPLAY_LABEL_RULE, EXPENSE_CATEGORY_RULE } from "@trajectonomics/core/sim"
 import { labelSetsSentence } from "../tax/labels"
 import { fundingShape } from "./flow-funding"
 import { cappedPrepaymentShape, deriveShape, levelShape, prepaymentsShape } from "./flow-parts"
@@ -15,6 +15,12 @@ export const flowShape: Record<string, unknown> = {
 		id: {
 			type: "string",
 			description: "The name this document gives the Flow, unique within it and never changed.",
+		},
+		displayLabel: {
+			type: "string",
+			minLength: 1,
+			maxLength: 80,
+			description: `What a person reads in place of the id, written as ${DISPLAY_LABEL_RULE}. It is no key: the id still addresses the Flow, and the label may repeat or change. It changes no figure (sim ADR 0032).`,
 		},
 		kind: {
 			enum: [...FLOW_KINDS],

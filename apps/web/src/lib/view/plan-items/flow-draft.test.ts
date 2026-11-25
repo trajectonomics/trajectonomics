@@ -5,6 +5,7 @@ import { type FlowDraft, flowDraftOf } from "./flows"
 
 const blank: FlowDraft = {
 	category: "",
+	displayLabel: "",
 	name: "",
 	frequency: "monthly",
 	start: "2027-01-01",
@@ -30,6 +31,56 @@ describe("saving a Flow that changed nothing", () => {
 })
 
 describe("a new Flow", () => {
+	test("saves the display label trimmed, and leaves it out when the field is empty", () => {
+		const labelled = flowFromDraft(
+			{ ...blank, name: "School fees", displayLabel: "  School fees  " },
+			{ kind: "expense", taken: [] },
+		)
+		expect(labelled.ok && labelled.flow.displayLabel).toBe("School fees")
+		const bare = flowFromDraft({ ...blank, name: "Rent" }, { kind: "expense", taken: [] })
+		expect(bare.ok && bare.flow).not.toHaveProperty("displayLabel")
+	})
+
+	test("refuses a display label over 80 characters at its field", () => {
+		const result = flowFromDraft(
+			{ ...blank, name: "Rent", displayLabel: "a".repeat(81) },
+			{ kind: "expense", taken: [] },
+		)
+		expect(result.ok === false && result.problems["displayLabel"]).toContain(
+			"at most 80 characters",
+		)
+	})
+
+	test("refuses an invisible or bidirectional character at the display label field", () => {
+		for (const label of ["Rent\u200b", "Rent\u202e"]) {
+			const result = flowFromDraft(
+				{ ...blank, name: "Rent", displayLabel: label },
+				{
+					kind: "expense",
+					taken: [],
+				},
+			)
+			expect(result.ok === false && result.problems["displayLabel"]).toContain(
+				"invisible or bidirectional",
+			)
+		}
+	})
+
+	test("clears a stored Flow's label when the field is emptied", () => {
+		const rent = planDocument().flows.find((flow) => flow.id === "rent")
+		if (rent === undefined) throw new Error("the fixture has a rent Flow")
+		const stored = { ...rent, displayLabel: "Rent" }
+		const result = flowFromDraft(
+			{ ...flowDraftOf(stored), displayLabel: "" },
+			{
+				kind: "expense",
+				existing: stored,
+				taken: [],
+			},
+		)
+		expect(result.ok && result.flow).not.toHaveProperty("displayLabel")
+	})
+
 	test("takes its id from its name, its amount without commas, and a fixed percent in basis points", () => {
 		const result = flowFromDraft(
 			{ ...blank, name: "Bonus 2027", amount: "1,000", growth: "fixed", rate: "3.5" },

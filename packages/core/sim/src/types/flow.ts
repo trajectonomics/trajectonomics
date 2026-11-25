@@ -25,6 +25,8 @@ export interface CappedPrepayment {
 
 interface FlowBase {
 	readonly id: string
+	/** What a person reads in place of the id, 1 to 80 code points (sim ADR 0032). Never a key, never read by the engine. */
+	readonly displayLabel?: string
 	readonly frequency: Frequency
 	readonly start: DateString
 	/** Omitted means the flow runs to `Timeline.horizon`. A `once` flow omits it or equals `start`. */

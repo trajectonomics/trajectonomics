@@ -30,8 +30,10 @@ this page: the Site's own Worker answers it, as it answers `/`.
   consent card, tokens, type and section and card styles. Its strings are two more Dictionaries,
   `en-openjot.ts` and `th-openjot.ts`, with the same keys and the same parity and Thai-text rules as
   the home. The copy is ported from the old page: the hero, the four screenshots, the six feature
-  cards, the three install steps and the in-app-browser note, the FAQ and the closing download call
-  to action. The MeowJot comparison is not ported: that page stays on the old host for now. The
+  cards, the four privacy claims with their policy and contact links, the three install steps and the
+  in-app-browser note, the FAQ and the closing download call to action. Each screenshot is a capture
+  of the app's default Trajectonomics theme and each caption states what its screen shows. The
+  MeowJot comparison is not ported: that page stays on the old host for now. The
   robot from `public/mascot/` is the only mascot — `hello` over the hero's phone, `lost` in the
   in-app note, `chart` beside the Features heading, `open` beside the checksum note, `think` beside
   the FAQ heading, `wave` above the closing section and `sit` in the footer. Every one is

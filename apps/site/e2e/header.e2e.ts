@@ -29,21 +29,21 @@ test.describe("the header's ground", () => {
 test.describe("the header on a 360 px phone", () => {
 	test.use({ viewport: { width: 360, height: 740 } })
 
-	test("fits the three links, the repository count and the Language menu without a sideways scroll", async ({
-		page,
-	}) => {
-		const openJot = OPENJOT_PAGES[0]
-		if (openJot === undefined) throw new Error("the browser checks name no OpenJot page")
-		await openPage(page, openJot)
-		const widths = await page.evaluate(() => ({
-			client: document.documentElement.clientWidth,
-			document: document.documentElement.scrollWidth,
-			body: document.body.scrollWidth,
-		}))
-		expect(Math.max(widths.document, widths.body)).toBeLessThanOrEqual(widths.client)
-		await expect(page.locator("header.site-header a[href='/openjot/']")).toHaveAttribute(
-			"aria-current",
-			"page",
-		)
-	})
+	for (const openJot of OPENJOT_PAGES) {
+		test(`fits the three links, the repository count and the Language menu on the ${openJot.name} without a sideways scroll`, async ({
+			page,
+		}) => {
+			await openPage(page, openJot)
+			const widths = await page.evaluate(() => ({
+				client: document.documentElement.clientWidth,
+				document: document.documentElement.scrollWidth,
+				body: document.body.scrollWidth,
+			}))
+			expect(Math.max(widths.document, widths.body)).toBeLessThanOrEqual(widths.client)
+			await expect(page.locator("header.site-header a[href='/openjot/']")).toHaveAttribute(
+				"aria-current",
+				"page",
+			)
+		})
+	}
 })

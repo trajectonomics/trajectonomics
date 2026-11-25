@@ -73,6 +73,7 @@ export { scenarioRef } from "./scenario-ref"
 export type {
 	EstateBlock,
 	EstateLine,
+	MilestoneLabel,
 	ScenarioAccount,
 	ScenarioDocument,
 	ScenarioFlow,
@@ -81,6 +82,7 @@ export type {
 export {
 	estateBlock,
 	estateLine,
+	milestoneLabel,
 	scenarioAccount,
 	scenarioDocument,
 	scenarioFlow,

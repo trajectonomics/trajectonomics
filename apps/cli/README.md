@@ -409,6 +409,31 @@ each side.
 ]
 ```
 
+## Naming a Flow, a Milestone or a person
+
+> **Ships in 0.8.0.**
+
+Every Flow, every Milestone and every person of a household may carry a `displayLabel`: the words a
+page reads in place of the id, such as Thai text. It is free text of 1 to 80 code points, with no
+control, invisible or bidirectional characters and no leading or trailing whitespace. It is no key
+and changes no figure: the id still addresses the item, the label may repeat or change, and the
+engine never reads it. `traj schema scenario apply` and `traj schema scenario household` publish it
+with that rule.
+
+A label travels in the document, so `--file` and `--add` carry it, and `--set` writes it:
+
+```bash
+traj scenario apply base --set 'flows.school-fees.displayLabel="School fees"'
+traj scenario apply base --set 'milestones.condo.displayLabel="Condo down payment"'
+traj scenario household base --file household.json   # a person's label, in the household
+```
+
+A plan written before the field may lack it, and the first `--set` that names it begins it, as
+`--set accounts.<id>.volatility=…` does. Because a label is stored content, a change to one moves the
+plan's `contentHash`; a plan without labels keeps its bytes and its hash. To clear a label, write the
+document without it (`--file`), or empty the Name field in the Dashboard: `--set` writes a value and
+cannot remove a key, so `null` and `""` are refused.
+
 ## Where each year's money went
 
 > **Ships in 0.8.0.**

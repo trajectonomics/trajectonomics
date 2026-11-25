@@ -7,6 +7,7 @@ export {
 	anchorWords,
 	pinnedTo,
 } from "./anchor"
+export { type DocumentNames, documentNames, NO_DOCUMENT_NAMES } from "./labels"
 export {
 	type ItemKind,
 	type ItemLabel,
@@ -17,4 +18,4 @@ export {
 	NO_ITEM_NAMES,
 } from "./names"
 export { NO_PEOPLE, type PersonName, type PersonNames, personNames } from "./people"
-export { householdOf, snapshotItemNames } from "./snapshot"
+export { documentOf, householdOf, snapshotItemNames } from "./snapshot"
