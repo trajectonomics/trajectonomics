@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { healthReport } from "../src/core/health"
-import { affectedDays } from "../src/core/rollup"
+import { affectedDays, dayBounds } from "../src/core/rollup"
 import { usageRow } from "./support/fixtures"
 
 describe("affectedDays", () => {
@@ -12,6 +12,22 @@ describe("affectedDays", () => {
 				usageRow({ hourUtc: "2026-11-24T00:00:00.000Z" }),
 			]),
 		).toEqual(["2026-11-24", "2026-11-25"])
+	})
+})
+
+describe("dayBounds", () => {
+	test("returns canonical hourUtc bounds for one UTC day", () => {
+		expect(dayBounds("2026-11-24")).toEqual({
+			start: "2026-11-24T00:00:00.000Z",
+			end: "2026-11-25T00:00:00.000Z",
+		})
+		expect(dayBounds("2026-11-24").start).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/)
+	})
+
+	test("rolls over a month, a year and a leap day", () => {
+		expect(dayBounds("2026-11-30").end).toBe("2026-12-01T00:00:00.000Z")
+		expect(dayBounds("2026-12-31").end).toBe("2027-01-01T00:00:00.000Z")
+		expect(dayBounds("2028-02-28").end).toBe("2028-02-29T00:00:00.000Z")
 	})
 })
 

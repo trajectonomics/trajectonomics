@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import { usageStaleCacheKey } from "../src/http/cache"
 import { usageRow } from "./support/fixtures"
-import { harness } from "./support/http"
+import { get, harness } from "./support/http"
 import { silenceConsoleError } from "./support/log"
 import { failingEnv, read, readWith, seed } from "./support/usage"
 
@@ -20,7 +21,7 @@ describe("GET /api/usage caching", () => {
 		expect(await second.text()).toBe(firstBody)
 	})
 
-	test("serves the stale copy after the fresh copy expires", async () => {
+	test("serves the stale copy after the fresh copy expires, uncacheable downstream", async () => {
 		const context = harness()
 		const restore = silenceConsoleError()
 		await seed(context, [usageRow()])
@@ -31,8 +32,20 @@ describe("GET /api/usage caching", () => {
 		const second = await readWith(context, failingEnv(context), "/api/usage?from=2026-11-24")
 		expect(second.status).toBe(200)
 		expect(second.headers.get("x-data-stale")).toBe("1")
+		expect(second.headers.get("cache-control")).toBe("no-store")
 		expect(await second.text()).toBe(firstBody)
 		restore()
+	})
+
+	test("keeps the long lifetime on the stored stale copy only", async () => {
+		const context = harness()
+		await seed(context, [usageRow()])
+		const first = await read(context, "/api/usage?from=2026-11-24")
+		expect(first.headers.get("cache-control")).toBe("public, max-age=3600, stale-if-error=86400")
+		const stored = context.cache.entries.get(
+			usageStaleCacheKey(get("/api/usage?from=2026-11-24")).url,
+		)
+		expect(stored?.response.headers.get("cache-control")).toBe("public, max-age=86400")
 	})
 
 	test("returns 503 when D1 fails and the stale copy expired too", async () => {

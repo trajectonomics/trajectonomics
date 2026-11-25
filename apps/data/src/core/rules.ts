@@ -18,6 +18,8 @@ export const MAX_INGEST_ERRORS = 10
 export const MIN_QUERY_DAY = "2020-01-01"
 /** The longest span, in days, the public query may ask for. */
 export const MAX_QUERY_SPAN_DAYS = 400
+/** The span, in days, a query reads when it names no `from`. */
+export const DEFAULT_QUERY_SPAN_DAYS = 30
 
 const PLAN_IDS = new Set<string>(plans.map((plan) => plan.id))
 const MACHINE_ALIAS = /^m-[0-9a-f]{8}$/
@@ -58,7 +60,12 @@ export function isBeforeIngestFloor(ms: number): boolean {
 	return ms < MIN_INGEST_MS
 }
 
+/** A `YYYY-MM-DD` UTC day moved by a whole number of days. */
+export function addDays(day: string, days: number): string {
+	return new Date(Date.parse(`${day}T00:00:00.000Z`) + days * DAY_MS).toISOString().slice(0, 10)
+}
+
 /** The UTC day one day after a `YYYY-MM-DD` day. */
 export function nextDay(day: string): string {
-	return new Date(Date.parse(`${day}T00:00:00.000Z`) + DAY_MS).toISOString().slice(0, 10)
+	return addDays(day, 1)
 }

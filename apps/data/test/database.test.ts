@@ -4,6 +4,7 @@ import type { UsageRow } from "@trajectonomics/data-collector/types"
 import type { IngestBatch, QuotaSample } from "../src/core/types"
 import { writeIngest } from "../src/db/ingest"
 import { readLastIngest, readRollups } from "../src/db/read"
+import { rollupRebuild } from "../src/db/write"
 import { NOW_ISO, quotaSample, usageRow } from "./support/fixtures"
 import { harness } from "./support/http"
 
@@ -144,5 +145,48 @@ describe("the D1 layer", () => {
 			model: null,
 		})
 		expect(capped.map((row) => row.day)).toEqual(["2026-11-24"])
+	})
+
+	test("a rebuild sums only its own UTC day", async () => {
+		const { env } = harness()
+		await writeIngest(
+			env.DB,
+			batch([
+				usageRow({ hourUtc: "2026-11-24T00:00:00.000Z", tokensTotal: 100 }),
+				usageRow({ hourUtc: "2026-11-24T23:00:00.000Z", tokensTotal: 100 }),
+				usageRow({ hourUtc: "2026-11-25T00:00:00.000Z", tokensTotal: 500 }),
+			]),
+			NOW_ISO,
+		)
+		const rows = await readRollups(env.DB, {
+			series: "measured-by-us",
+			from: "2026-11-24",
+			to: "2026-11-25",
+			plan: null,
+			model: null,
+		})
+		expect(rows.map((row) => [row.day, row.tokens_total])).toEqual([
+			["2026-11-24", 200],
+			["2026-11-25", 500],
+		])
+	})
+
+	test("the rollup rebuild searches the hour index instead of scanning", () => {
+		const { database, env } = harness()
+		const statement = rollupRebuild(env.DB, "measured-by-us", "2026-11-24") as unknown as {
+			sql: string
+			values: string[]
+		}
+		expect(statement.values).toEqual([
+			"measured-by-us",
+			"2026-11-24T00:00:00.000Z",
+			"2026-11-25T00:00:00.000Z",
+		])
+		const plan = database
+			.prepare(`EXPLAIN QUERY PLAN ${statement.sql}`)
+			.all(...(statement.values as never[]))
+			.map((row) => (row as { detail: string }).detail)
+		expect(plan.some((line) => line.startsWith("SCAN usage_hourly"))).toBe(false)
+		expect(plan.some((line) => line.includes("USING INDEX usage_hourly_hour"))).toBe(true)
 	})
 })

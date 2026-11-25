@@ -9,15 +9,52 @@ function parse(search: string) {
 }
 
 describe("parseUsageQuery", () => {
-	test("defaults the report date to today and applies no bounds", () => {
+	test("defaults a missing window to the last 30 days ending today", () => {
 		const result = parse("")
 		expect(result).toEqual({
 			ok: true,
 			query: {
-				filter: { series: SERIES, from: null, to: null, plan: null, model: null },
+				filter: { series: SERIES, from: "2026-10-26", to: "2026-11-25", plan: null, model: null },
 				asOf: "2026-11-25",
 			},
 		})
+	})
+
+	test("reads a 30-day window ending today when only from is given", () => {
+		const result = parse("?from=2026-11-01")
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.query.filter).toEqual({
+			series: SERIES,
+			from: "2026-11-01",
+			to: "2026-11-25",
+			plan: null,
+			model: null,
+		})
+		expect(result.query.asOf).toBe("2026-11-25")
+	})
+
+	test("reads a 30-day window ending at to when only to is given", () => {
+		const result = parse("?to=2026-11-20")
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.query.filter).toEqual({
+			series: SERIES,
+			from: "2026-10-21",
+			to: "2026-11-20",
+			plan: null,
+			model: null,
+		})
+		expect(result.query.asOf).toBe("2026-11-25")
+	})
+
+	test("reads a 30-day window ending at asOf when only asOf is given", () => {
+		const result = parse("?asOf=2026-11-24")
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.query.filter.from).toBe("2026-10-25")
+		expect(result.query.filter.to).toBe("2026-11-24")
+		expect(result.query.asOf).toBe("2026-11-24")
 	})
 
 	test("keeps from, to, plan and model filters", () => {
@@ -31,7 +68,7 @@ describe("parseUsageQuery", () => {
 			plan: "claude",
 			model: "claude-opus-5-5",
 		})
-		expect(result.query.asOf).toBe("2026-11-20")
+		expect(result.query.asOf).toBe("2026-11-25")
 	})
 
 	test("asOf caps a later to and never widens it", () => {

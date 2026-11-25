@@ -17,7 +17,11 @@ function constantTimeEqual(left: string, right: string): boolean {
 /** Resolves the ingest key to the contributor it owns; the body never names one. */
 export function authorizeIngest(request: Request, env: Env): Principal | null {
 	const expected = env.INGEST_BOOTSTRAP_KEY
-	if (typeof expected !== "string" || expected.length === 0) return null
+	if (typeof expected !== "string" || expected.length === 0) {
+		// Visible on the first request, without ever printing the key or the bearer token.
+		console.error("INGEST_BOOTSTRAP_KEY is not set")
+		return null
+	}
 	const match = BEARER.exec(request.headers.get("authorization") ?? "")
 	if (match === null) return null
 	if (!constantTimeEqual(match[1] ?? "", expected)) return null

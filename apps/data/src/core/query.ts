@@ -1,6 +1,8 @@
 import type { QueryError, QueryErrorCode } from "./errors"
 import {
+	addDays,
 	DAY_MS,
+	DEFAULT_QUERY_SPAN_DAYS,
 	isDateString,
 	isKnownPlan,
 	MAX_QUERY_SPAN_DAYS,
@@ -64,8 +66,7 @@ function checkModel(params: URLSearchParams): Check {
 	return { ok: true, value }
 }
 
-function rangeCheck(from: string | null, upper: string | null): QueryResult | null {
-	if (from === null || upper === null) return null
+function rangeCheck(from: string, upper: string): QueryResult | null {
 	if (from > upper) return invalid("INVALID_RANGE", "from must not be after to.")
 	const span = (Date.parse(`${upper}T00:00:00.000Z`) - Date.parse(`${from}T00:00:00.000Z`)) / DAY_MS
 	if (span > MAX_QUERY_SPAN_DAYS) {
@@ -74,6 +75,7 @@ function rangeCheck(from: string | null, upper: string | null): QueryResult | nu
 	return null
 }
 
+/** Resolves the effective day window and the asOf the answer reports. */
 function buildQuery(
 	from: string | null,
 	to: string | null,
@@ -83,16 +85,16 @@ function buildQuery(
 	nowMs: number,
 	series: string,
 ): QueryResult {
-	let upper = to
-	if (asOf !== null) upper = upper === null || asOf < upper ? asOf : upper
-	const range = rangeCheck(from, upper)
-	if (range !== null) return range
 	const today = new Date(nowMs).toISOString().slice(0, 10)
+	const upper = asOf !== null && asOf < (to ?? today) ? asOf : (to ?? today)
+	const lower = from ?? addDays(upper, -DEFAULT_QUERY_SPAN_DAYS)
+	const range = rangeCheck(lower, upper)
+	if (range !== null) return range
 	return {
 		ok: true,
 		query: {
-			filter: { series, from, to: upper, plan, model },
-			asOf: asOf ?? to ?? today,
+			filter: { series, from: lower, to: upper, plan, model },
+			asOf: asOf ?? today,
 		},
 	}
 }

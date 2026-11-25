@@ -4,6 +4,8 @@ import { json } from "./responses"
 
 const FRESH_CACHE_CONTROL = `public, max-age=${FRESH_MAX_AGE}, stale-if-error=${STALE_MAX_AGE}`
 const ERROR_CACHE_CONTROL = `public, max-age=${FRESH_MAX_AGE}`
+/** The stored stale copy's lifetime; only this Worker's cache holds it, never a reader's. */
+const STALE_CACHE_CONTROL = `public, max-age=${STALE_MAX_AGE}`
 
 /** Puts one copy without letting a cache failure break a good response. */
 async function put(cache: CacheLike, key: Request, response: Response): Promise<void> {
@@ -14,14 +16,14 @@ async function put(cache: CacheLike, key: Request, response: Response): Promise<
 	}
 }
 
-/** A copy of a response with its own lifetime and optional extra headers. */
+/** A copy of a response with its own cache lifetime and optional extra headers. */
 function copyWith(
 	response: Response,
-	maxAge: number,
+	cacheControl: string,
 	extra: Record<string, string> = {},
 ): Response {
 	const headers = new Headers(response.headers)
-	headers.set("cache-control", `public, max-age=${maxAge}`)
+	headers.set("cache-control", cacheControl)
 	for (const [name, value] of Object.entries(extra)) headers.set(name, value)
 	return new Response(response.clone().body, {
 		status: response.status,
@@ -54,12 +56,15 @@ export async function cachedFresh(
 	const response = json(body, { headers: { "cache-control": FRESH_CACHE_CONTROL } })
 	if (cache !== undefined) {
 		await put(cache, key, response.clone())
-		await put(cache, usageStaleCacheKey(request), copyWith(response, STALE_MAX_AGE))
+		await put(cache, usageStaleCacheKey(request), copyWith(response, STALE_CACHE_CONTROL))
 	}
 	return response
 }
 
-/** The stale copy served after D1 fails, marked so callers can see it is old. */
+/**
+ * The stale copy served after D1 fails, marked so callers can see it is old. It is never cached
+ * again: a downstream copy would outlive the failure and could not be corrected.
+ */
 export async function cachedStale(
 	cache: CacheLike | undefined,
 	request: Request,
@@ -67,5 +72,5 @@ export async function cachedStale(
 	if (cache === undefined) return undefined
 	const stale = await cache.match(usageStaleCacheKey(request))
 	if (stale === undefined) return undefined
-	return copyWith(stale, STALE_MAX_AGE, { "x-data-stale": "1" })
+	return copyWith(stale, "no-store", { "x-data-stale": "1" })
 }

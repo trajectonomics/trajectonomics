@@ -60,4 +60,59 @@ describe("the migration constraints", () => {
 			),
 		).toThrow()
 	})
+
+	test("accepts only 0 or 1 as the best_effort flag", () => {
+		const { database } = harness()
+		const insertUsage = database.prepare(
+			`INSERT INTO usage_hourly (
+				contributor_id, machine, plan, model, hour_utc, granularity,
+				tokens_in, tokens_total, requests, source, best_effort, received_at
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		)
+		const row = [
+			"trajectonomics",
+			"m-0123abcd",
+			"claude",
+			"claude-opus-5-5",
+			"2026-11-24T00:00:00.000Z",
+			"hour",
+			0,
+			0,
+			0,
+			"claude-code",
+		]
+		expect(() => insertUsage.run(...row, 2, NOW_ISO)).toThrow()
+		expect(() => insertUsage.run(...row, -1, NOW_ISO)).toThrow()
+		expect(() => insertUsage.run(...row, 1, NOW_ISO)).not.toThrow()
+
+		const insertRollup = database.prepare(
+			`INSERT INTO rollup_daily (
+				series, day, plan, model, tokens_total, requests, granularity, best_effort
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		)
+		expect(() =>
+			insertRollup.run(
+				"measured-by-us",
+				"2026-11-24",
+				"claude",
+				"claude-opus-5-5",
+				0,
+				0,
+				"hour",
+				2,
+			),
+		).toThrow()
+		expect(() =>
+			insertRollup.run(
+				"measured-by-us",
+				"2026-11-24",
+				"claude",
+				"claude-opus-5-5",
+				0,
+				0,
+				"hour",
+				0,
+			),
+		).not.toThrow()
+	})
 })

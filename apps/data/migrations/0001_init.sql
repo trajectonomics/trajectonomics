@@ -24,7 +24,7 @@ CREATE TABLE usage_hourly (
 	tokens_total INTEGER NOT NULL CHECK (tokens_total >= 0),
 	requests INTEGER NOT NULL CHECK (requests >= 0),
 	source TEXT NOT NULL,
-	best_effort INTEGER NOT NULL DEFAULT 0,
+	best_effort INTEGER NOT NULL DEFAULT 0 CHECK (best_effort IN (0, 1)),
 	received_at TEXT NOT NULL,
 	PRIMARY KEY (contributor_id, machine, plan, model, hour_utc, source)
 );
@@ -52,7 +52,7 @@ CREATE TABLE rollup_daily (
 	tokens_total INTEGER NOT NULL CHECK (tokens_total >= 0),
 	requests INTEGER NOT NULL CHECK (requests >= 0),
 	granularity TEXT NOT NULL CHECK (granularity IN ('hour', 'day')),
-	best_effort INTEGER NOT NULL,
+	best_effort INTEGER NOT NULL CHECK (best_effort IN (0, 1)),
 	PRIMARY KEY (series, day, plan, model)
 );
 
@@ -70,6 +70,8 @@ CREATE INDEX rollup_daily_series_plan_model_day ON rollup_daily (series, plan, m
 
 -- An ingest rebuilds each affected day's rollup from the hourly rows.
 CREATE INDEX usage_hourly_contributor_hour ON usage_hourly (contributor_id, hour_utc);
+-- The rollup rebuild reads one day's range of hours, whatever the contributor.
+CREATE INDEX usage_hourly_hour ON usage_hourly (hour_utc);
 
 CREATE INDEX quota_sample_plan ON quota_sample (contributor_id, plan, sampled_at);
 

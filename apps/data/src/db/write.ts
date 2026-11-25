@@ -1,5 +1,6 @@
 import type { D1Database, D1PreparedStatement } from "@cloudflare/workers-types"
 import type { UsageRow } from "@trajectonomics/data-collector/types"
+import { dayBounds } from "../core/rollup"
 import type { QuotaSample } from "../core/types"
 
 const USAGE_UPSERT = `
@@ -41,7 +42,7 @@ SELECT ?, substr(hour_utc, 1, 10), plan, model,
 	MAX(best_effort)
 FROM usage_hourly
 JOIN contributor ON contributor.id = usage_hourly.contributor_id
-WHERE substr(hour_utc, 1, 10) = ? AND contributor.kind = 'org'
+WHERE hour_utc >= ? AND hour_utc < ? AND contributor.kind = 'org'
 GROUP BY plan, model
 `
 
@@ -92,7 +93,8 @@ export function rollupDelete(db: D1Database, series: string, day: string): D1Pre
 
 /** Rebuilds one day's rollup rows from the stored hourly rows, inside the ingest batch. */
 export function rollupRebuild(db: D1Database, series: string, day: string): D1PreparedStatement {
-	return db.prepare(ROLLUP_REBUILD).bind(series, day)
+	const { start, end } = dayBounds(day)
+	return db.prepare(ROLLUP_REBUILD).bind(series, start, end)
 }
 
 /** One prepared append to the ingest log. */

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test"
+import { describe, expect, spyOn, test } from "bun:test"
 import type { D1Database } from "@cloudflare/workers-types"
 import { handleRequest } from "../src/http/router"
 import { NOW_MS, quotaSample, usageRow } from "./support/fixtures"
@@ -18,15 +18,19 @@ function count(context: ReturnType<typeof harness>, table: string): number {
 }
 
 describe("POST /ingest", () => {
-	test("rejects a wrong key with 401", async () => {
+	test("rejects a wrong key with 401 and logs nothing", async () => {
 		const context = harness()
+		const logged = spyOn(console, "error").mockImplementation(() => {})
 		const response = await post(context, { usage: [usageRow()] }, "wrong")
 		expect(response.status).toBe(401)
 		expect(count(context, "usage_hourly")).toBe(0)
+		expect(logged).not.toHaveBeenCalled()
+		logged.mockRestore()
 	})
 
-	test("rejects every request when the bootstrap key is unset", async () => {
+	test("rejects every request when the bootstrap key is unset, and says so once", async () => {
 		const context = harness()
+		const logged = spyOn(console, "error").mockImplementation(() => {})
 		const env = {
 			...context.env,
 			INGEST_BOOTSTRAP_KEY: undefined,
@@ -36,16 +40,24 @@ describe("POST /ingest", () => {
 		})
 		expect(response.status).toBe(401)
 		expect(count(context, "usage_hourly")).toBe(0)
+		expect(logged).toHaveBeenCalledTimes(1)
+		expect(logged).toHaveBeenCalledWith("INGEST_BOOTSTRAP_KEY is not set")
+		expect(JSON.stringify(logged.mock.calls)).not.toContain("test-key")
+		logged.mockRestore()
 	})
 
-	test("rejects every request when the bootstrap key is empty", async () => {
+	test("rejects every request when the bootstrap key is empty, and says so once", async () => {
 		const context = harness()
+		const logged = spyOn(console, "error").mockImplementation(() => {})
 		const env = { ...context.env, INGEST_BOOTSTRAP_KEY: "" }
 		const response = await handleRequest(ingestRequest({ usage: [usageRow()] }, ""), env, {
 			nowMs: NOW_MS,
 		})
 		expect(response.status).toBe(401)
 		expect(count(context, "usage_hourly")).toBe(0)
+		expect(logged).toHaveBeenCalledTimes(1)
+		expect(logged).toHaveBeenCalledWith("INGEST_BOOTSTRAP_KEY is not set")
+		logged.mockRestore()
 	})
 
 	test("rejects an empty bearer token", async () => {
