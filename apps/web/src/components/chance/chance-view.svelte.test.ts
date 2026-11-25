@@ -48,3 +48,29 @@ describe("ChanceView", () => {
 		expect(body).toContain("--seed HEX")
 	})
 })
+
+describe("ChanceView's text alternatives", () => {
+	test("carries the Bands table and the runs-out counts in visually hidden tables", () => {
+		const data = chanceFixture({
+			tables: [
+				{
+					name: "bands",
+					count: 1,
+					rows: [{ index: 0, to: "2026-12-31", p10: "1000.00", p50: "2000.00", p90: "3000.00" }],
+				},
+			],
+		})
+		const body = render(ChanceView, {
+			props: {
+				chance: { base: { argv: ARGV, ok: true, data } },
+				scenario: "",
+				onScenario: () => {},
+			},
+		}).body
+		expect(body).toContain('<div class="sr-only">')
+		expect(body).toContain('<th scope="col">10th Percentile</th>')
+		expect(body).toContain("<td>2,000.00</td>")
+		expect(body).toContain('<th scope="row">31 Dec 2027</th>')
+		expect(body).toContain("<td>12</td>")
+	})
+})

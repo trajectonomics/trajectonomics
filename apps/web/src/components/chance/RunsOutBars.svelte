@@ -21,17 +21,20 @@ const heights = $derived(
 )
 </script>
 
-<!-- One bar per roll-up: the failing Market paths whose Runs-out falls in it. Zero draws no bar. -->
+<!-- One bar per roll-up: the failing Market paths whose Runs-out falls in it. Zero draws no bar. The row scrolls
+	inside its own box, so a long horizon never widens the page (web ADR 0026). -->
 <figure class="space-y-2">
 	<figcaption class="sr-only">{label}</figcaption>
-	<div class="flex items-end gap-[3px]" style="height: {BAR_HEIGHT}px">
-		{#each bars as bar, index (index)}
-			<div class="min-w-[4px] flex-1 rounded-t bg-accent" style="height: {heights[index]}px" title={bar.title}></div>
-		{/each}
-	</div>
-	<div class="flex gap-[3px] text-xs text-muted-foreground">
-		{#each bars as bar, index (index)}
-			<span class="min-w-[4px] flex-1 text-center whitespace-nowrap">{bar.label ?? ""}</span>
-		{/each}
+	<div class="overflow-x-auto">
+		<div class="flex min-w-full items-end gap-[3px]" style="height: {BAR_HEIGHT}px" aria-hidden="true">
+			{#each bars as bar, index (index)}
+				<div class="min-w-[4px] flex-1 rounded-t bg-accent" style="height: {heights[index]}px" title={bar.title}></div>
+			{/each}
+		</div>
+		<div class="flex min-w-full gap-[3px] pt-2 text-xs text-muted-foreground" aria-hidden="true">
+			{#each bars as bar, index (index)}
+				<span class="min-w-[4px] flex-1 text-center whitespace-nowrap">{bar.label ?? ""}</span>
+			{/each}
+		</div>
 	</div>
 </figure>

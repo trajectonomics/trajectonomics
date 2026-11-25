@@ -76,3 +76,26 @@ describe("chanceViewOf", () => {
 		expect(view.runsOut.map((bar) => bar.paths)).toEqual([0, 12, 14])
 	})
 })
+
+describe("bandRowsOf", () => {
+	test("takes the CLI's Bands table rows as dates and money, and reads nothing else", () => {
+		const view = chanceViewOf(
+			chanceFixture({
+				tables: [
+					{
+						name: "bands",
+						count: 1,
+						rows: [{ index: 2, to: "2028-12-31", p10: "1000.00", p50: "2000.50", p90: "3000.00" }],
+					},
+				],
+			}),
+		)
+		expect(view.bandRows).toEqual([
+			{ ends: "31 Dec 2028", p10: "1,000.00", p50: "2,000.50", p90: "3,000.00" },
+		])
+	})
+
+	test("has no rows when the CLI printed no Bands table", () => {
+		expect(chanceViewOf(chanceFixture()).bandRows).toEqual([])
+	})
+})

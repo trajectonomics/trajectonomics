@@ -47,12 +47,15 @@ export function dashboardLeaf(deps: DashboardDeps): Leaf {
 			paths: z
 				.number()
 				.int()
+				.min(1)
+				.max(10000)
 				.optional()
 				.describe(
 					"The Market paths the chance runs, from 1 to 10,000. Needs --seed, and --return-model unless the Scenarios state a volatility (then `plan`).",
 				),
 			seed: z
 				.string()
+				.regex(/^[0-9a-f]{16}$/)
 				.optional()
 				.describe("Sixteen lower-case hex digits the Market paths are drawn from."),
 			port: z
