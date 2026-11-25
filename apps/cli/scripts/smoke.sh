@@ -20,16 +20,19 @@ shift
 home=""
 envelope=""
 log=""
+dashboard=""
 cleanup() {
+	[ -z "$dashboard" ] || kill "$dashboard" 2>/dev/null || true
 	[ -z "$home" ] || rm -rf "$home"
 	[ -z "$envelope" ] || rm -f "$envelope"
 	[ -z "$log" ] || rm -f "$log"
 }
 trap cleanup EXIT
-# dash runs no EXIT trap when a signal kills it, so each handler cleans up, then exits 128 + the
-# signal number as the shell would.
-trap 'cleanup; trap - EXIT; exit 130' INT
-trap 'cleanup; trap - EXIT; exit 143' TERM
+# dash runs no EXIT trap when a signal kills it, so each handler cleans up, then dies by the same
+# signal: reset the traps and re-raise it, so the exit status is 128 + the signal number, as for a
+# shell that never trapped it.
+trap 'cleanup; trap - EXIT INT; kill -INT $$' INT
+trap 'cleanup; trap - EXIT TERM; kill -TERM $$' TERM
 
 fail() {
 	echo "smoke: $*" >&2
@@ -61,6 +64,7 @@ if [ -x "$1" ] && [ "$#" -eq 1 ]; then
 		log="$(mktemp)"
 		"$1" dashboard --as-of 2026-03-31 --horizon 2027-03-31 --port 0 >/dev/null 2>"$log" &
 		pid=$!
+		dashboard=$pid
 		url=""
 		tries=0
 		while [ -z "$url" ] && [ "$tries" -lt 150 ]; do
@@ -73,6 +77,7 @@ if [ -x "$1" ] && [ "$#" -eq 1 ]; then
 		curl -fsS "${url}snapshot.json" | grep -q '"snapshotVersion":1' || { kill "$pid"; fail "dashboard served no Snapshot"; }
 		kill -INT "$pid"
 		wait "$pid" || fail "dashboard did not exit 0 on SIGINT"
+		dashboard=""
 		;;
 	esac
 fi
