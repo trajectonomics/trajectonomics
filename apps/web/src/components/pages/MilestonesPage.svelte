@@ -19,6 +19,12 @@ let { scenario, terms, onTerms }: Props = $props()
 	intro="When the selected plan reaches each of its targets, and the ones it does not reach."
 >
 	{#snippet children(snapshot)}
-		<MilestonesView projections={snapshot.reads.projections} {scenario} {terms} {onTerms} />
+		<MilestonesView
+			names={snapshot.params.scenarios}
+			projections={snapshot.reads.projections}
+			{scenario}
+			{terms}
+			{onTerms}
+		/>
 	{/snippet}
 </PageShell>

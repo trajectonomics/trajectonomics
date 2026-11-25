@@ -1,9 +1,8 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
-import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioDocument } from "../../lib/contract"
-import { accountNames } from "../../lib/view/account-names"
 import { blockFromDraft, draftOf, estateShown, layoutOf, withEstate } from "../../lib/view/estate"
 import { accountChoices } from "../../lib/view/estate/options"
 import type { Problems } from "../../lib/view/plan-items/problems"
@@ -24,13 +23,7 @@ const initial = () => draftOf(plan.estate)
 let draft = $state(initial())
 let problems: Problems = $state({})
 let layout = $state(layoutOf(null))
-const snapshot = $derived(currentSnapshot())
-const accounts = $derived(
-	accountChoices(
-		plan,
-		accountNames(snapshot.status === "ready" ? snapshot.snapshot.reads.accounts : undefined),
-	),
-)
+const accounts = $derived(accountChoices(plan, currentAccountNames()))
 const shown = $derived(estateShown(problems, editSession.failure, editSession.error, layout))
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"

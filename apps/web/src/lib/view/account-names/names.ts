@@ -2,6 +2,9 @@
  * The one lookup that turns an Account's id into the name the ledger gives it. It is built from the accounts Read
  * (`traj account list --json`) and from nothing else: a name the Snapshot does not hold is never made up, and the
  * caller shows the id as it is (`isNamed` says which). Pure: no figure is made here (web ADR 0002).
+ *
+ * The ledger keeps names unique (`account_name_taken`), so the parent path and the id tail below only guard a Snapshot
+ * that breaks that: two Accounts of one name must still be told apart on a page.
  */
 import type { AccountList, Read } from "../../contract"
 

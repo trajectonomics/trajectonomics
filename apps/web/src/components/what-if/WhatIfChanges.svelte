@@ -1,10 +1,10 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
-import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { maskMoney } from "../../lib/format/mask"
-import { accountNames, nameOf } from "../../lib/view/account-names"
+import { nameOf } from "../../lib/view/account-names"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
 import { failedReads, pathNamed } from "../../lib/what-if/answer"
 import { labelWithNames } from "../../lib/what-if/change-names"
@@ -28,10 +28,7 @@ function refusalOf(change: Change): string | null {
 	)
 }
 
-const names = $derived.by(() => {
-	const state = currentSnapshot()
-	return accountNames(state.status === "ready" ? state.snapshot.reads.accounts : undefined)
-})
+const names = $derived(currentAccountNames())
 
 /** A change's words as the bar shows them: a Set's value is masked when the person hides amounts. */
 function wordsOf(change: Change): string {

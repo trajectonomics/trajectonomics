@@ -1,5 +1,6 @@
 import type { CurrencyTotal, NetWorth, Read } from "../../contract"
-import { formatDate } from "../../format"
+import { formatDate, formatMonth } from "../../format"
+import { parseDate } from "../../snapshot/dates"
 import { netWorthHistorySeries } from "../overview/net-worth-history"
 
 /** One month-end of the history as a table row: its totals, or null where its Read failed. */
@@ -44,4 +45,24 @@ export function historyLine(reads: readonly Read<NetWorth>[]): string {
 	const tail =
 		left > 0 ? `; ${left} could not be read and ${left === 1 ? "is" : "are"} left out` : ""
 	return `The history uses ${used.length} ${noun}, ${range}${tail}.`
+}
+
+/**
+ * A sentence that says so when the history starts later than the ledger's first entry, because the Snapshot
+ * holds at most the latest `HISTORY_MONTHS` month-ends (web ADR 0027); null when the history reaches the first
+ * entry, or when the ledger has no first entry or the Snapshot no history. The months are compared, not the days:
+ * the month of the first entry is the history's first month-end.
+ */
+export function historyCut(
+	historyDates: readonly string[],
+	firstTransactionDate: string | null,
+): string | null {
+	const start = historyDates[0]
+	if (start === undefined || firstTransactionDate === null) return null
+	const first = parseDate(firstTransactionDate)
+	const from = parseDate(start)
+	if (first === null || from === null) return null
+	if (first.year * 12 + first.month >= from.year * 12 + from.month) return null
+	const months = historyDates.length
+	return `The ledger's first entry is in ${formatMonth(firstTransactionDate)}, but the chart shows only the latest ${months} month-ends, from ${formatMonth(start)}. Earlier months are left out.`
 }

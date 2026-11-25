@@ -232,10 +232,11 @@ jobs:
       - name: Setup the workspace
         uses: ./.github/actions/setup
 
-      # The suite serves `apps/web/dist` and reads the Demo snapshot in it. No arguments after `--`: turbo
-      # hashes them into every task of the graph and the build would miss the cache (docs/runbooks/ci.md).
-      - name: Build the web package and the Demo snapshot
-        run: bunx turbo run @trajectonomics/web#build --concurrency=2
+      # The suite serves `apps/web/dist` (the loopback build) and `apps/web/dist-hosted` (the hosted Demo, web ADR 0028)
+      # and reads the Demo snapshot in them. No arguments after `--`: turbo hashes them into every task of the graph
+      # and the build would miss the cache (docs/runbooks/ci.md).
+      - name: Build the web package, the hosted Demo and the Demo snapshot
+        run: bunx turbo run @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=2
 
       - name: Read the Playwright version
         id: playwright

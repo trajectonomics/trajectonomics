@@ -5,7 +5,7 @@
  * (cli ADR 0059).
  */
 import type { Baseline, Read, ScenarioDocument } from "../../contract"
-import { type AccountNames, NO_NAMES } from "../account-names"
+import { type AccountNames, NO_NAMES, refLabel } from "../account-names"
 import { loanPartsOf } from "./loan-document"
 import type { Choice } from "./options"
 
@@ -42,7 +42,7 @@ export function owedChoicesOf(
 		return [
 			{
 				id,
-				name: names.get(row.account.id) ?? row.account.name,
+				name: refLabel(names, row.account),
 				balance: row.amount,
 				declared: declared !== undefined,
 			},

@@ -1,13 +1,13 @@
 <script lang="ts">
+import { currentAccountNames } from "../../../client/account-names.svelte.js"
 import { editSession } from "../../../client/edit.svelte.js"
 import { currentSearch } from "../../../client/location.svelte.js"
 import { pathReads } from "../../../client/path-reads.svelte.js"
 import type { Snapshot } from "../../../lib/contract"
 import { editsShown } from "../../../lib/edit/shown"
-import { accountNames } from "../../../lib/view/account-names"
 import { chanceHref } from "../../../lib/view/chance/links"
 import { resolvePath } from "../../../lib/view/chance/path-state"
-import { chooseScenario, projectionNames } from "../../../lib/view/projection/scenario"
+import { chooseScenario } from "../../../lib/view/plan"
 import EmptyState from "../../ui/EmptyState.svelte"
 import PathResult from "./PathResult.svelte"
 
@@ -22,7 +22,7 @@ interface Props {
 
 /** One future of a plan's chance: read in advance, or live through the server, and held against the chance on screen. */
 let { snapshot, scenario, index, terms, onTerms }: Props = $props()
-const plan = $derived(chooseScenario(projectionNames(snapshot.reads.chance), scenario))
+const plan = $derived(chooseScenario(snapshot.params.scenarios, scenario))
 const chance = $derived(plan === null ? undefined : snapshot.reads.chance[plan])
 const token = $derived(editSession.token)
 const resolution = $derived(
@@ -49,7 +49,7 @@ $effect(() => {
 		path={state.path}
 		chance={state.chance}
 		plan={plan ?? ""}
-		names={accountNames(snapshot.reads.accounts)}
+		names={currentAccountNames()}
 		{terms}
 		{onTerms}
 		argv={state.argv}

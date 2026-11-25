@@ -55,7 +55,7 @@ describe("stage two", () => {
 		])
 	})
 
-	test("the net worth history is one read per month-end since the first transaction, at most 36", () => {
+	test("the net worth history is one read per month-end since the first transaction, at most HISTORY_MONTHS (120)", () => {
 		const plan = planStageTwo(paramsOf({}), stageOne("2026-10-31", ["base"], "2024-11-01"))
 		expect(plan.historyDates).toHaveLength(24)
 		expect(plan.historyDates[0]).toBe("2024-11-30")

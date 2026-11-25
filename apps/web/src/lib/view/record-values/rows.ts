@@ -1,5 +1,5 @@
 import type { Snapshot } from "../../contract"
-import { type AccountNames, accountNames } from "../account-names"
+import { type AccountNames, accountNames, refLabel } from "../account-names"
 import { accountGroups, type ListedAccount } from "../ledger/account-tree"
 import type { SheetGroup, SheetRow } from "./types"
 
@@ -70,7 +70,7 @@ export function rowsByGroup(
 		const { key, title } = groupOf(account, byId)
 		const row: SheetRow = {
 			id: account.id,
-			name: names.get(account.id) ?? account.name,
+			name: refLabel(names, account),
 			currency: account.currency,
 			balance: balances.get(account.id) ?? null,
 			lastDate: dates.get(account.id) ?? null,

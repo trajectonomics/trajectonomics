@@ -1,9 +1,9 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
-import { accountNames } from "../../lib/view/account-names"
+import type { ProjectionRun, Read } from "../../lib/contract"
 import { hasCashflow } from "../../lib/view/cashflow/cashflow"
-import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
@@ -11,10 +11,10 @@ import CashFlowWhatIf from "../what-if/CashFlowWhatIf.svelte"
 import CashFlowBody from "./CashFlowBody.svelte"
 
 interface Props {
+	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
+	names: readonly string[]
 	/** The projection Reads of the Snapshot, by Scenario name. */
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
-	/** The accounts Read, which names each Account a line draws on. */
-	accounts: Read<AccountList>
 	/** The Scenario the plan switcher shows. An unknown one shows the first. */
 	scenario: string
 	/** The year the address bar asks for, and the setter that writes it. */
@@ -23,10 +23,10 @@ interface Props {
 }
 
 /** The cash flow of the selected Scenario. The Scenario comes from the plan switcher, the year from the address bar. */
-let { projections, accounts, scenario, year, onYear }: Props = $props()
-const name = $derived(chooseScenario(projectionNames(projections), scenario))
+let { names: planNames, projections, scenario, year, onYear }: Props = $props()
+const name = $derived(chooseScenario(planNames, scenario))
 const read = $derived(name === null ? undefined : projections[name])
-const names = $derived(accountNames(accounts))
+const names = $derived(currentAccountNames())
 </script>
 
 {#if name === null || read === undefined}

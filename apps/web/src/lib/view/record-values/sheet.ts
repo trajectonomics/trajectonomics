@@ -1,5 +1,5 @@
 import type { Snapshot } from "../../contract"
-import { type AccountNames, accountNames } from "../account-names"
+import { type AccountNames, accountNames, refLabel } from "../account-names"
 import type { ListedAccount } from "../ledger/account-tree"
 import { periodOfRead } from "../ledger/transactions"
 import { rowsByGroup } from "./rows"
@@ -18,7 +18,7 @@ function againstChoices(listed: readonly ListedAccount[], names: AccountNames): 
 	return listed
 		.filter((a) => (a.type === "income" || a.type === "equity") && a.archivedAt === null)
 		.filter((a) => !parents.has(a.id))
-		.map((a) => ({ id: a.id, name: names.get(a.id) ?? a.name, currency: a.currency }))
+		.map((a) => ({ id: a.id, name: refLabel(names, a), currency: a.currency }))
 }
 
 /**
