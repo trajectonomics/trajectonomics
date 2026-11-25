@@ -1,6 +1,8 @@
 <script lang="ts">
+import { formatDate } from "../../lib/format"
 import type { PlanCard } from "../../lib/view/plans/card"
 import LineChart from "../chart/LineChart.svelte"
+import ItemName from "../ui/ItemName.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import PlanFacts from "./PlanFacts.svelte"
 import PlanMenu from "./PlanMenu.svelte"
@@ -30,6 +32,19 @@ const name = $derived(card.row.name)
 		<PlanFacts {card} />
 		{#if card.series.length > 0}
 			<LineChart label={`Net worth by year, ${name}`} series={card.series} markers={card.markers} />
+			{#if card.milestones.length > 0}
+				<!-- The chart shortens a rule's label to the room it has, or leaves it out, and a phone has no hover,
+				so the card names each Milestone it draws in full. -->
+				<ul aria-label="Milestones reached" class="space-y-1 text-xs text-muted-foreground">
+					{#each card.milestones as milestone (milestone.id)}
+						<li>
+							<ItemName kind="milestone" id={milestone.id} />: reached on <time
+								datetime={milestone.date}>{formatDate(milestone.date)}</time
+							>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		{/if}
 	{/if}
 	<footer class="mt-auto flex flex-wrap items-center gap-3">

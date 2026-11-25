@@ -35,8 +35,9 @@ const reached = $derived(milestoneView(path)?.reached ?? [])
 		markers={pathMarkers(path, currentItemNames())}
 		kind="bars"
 	/>
-	<!-- The marks above, in words, for a reader who cannot see them. -->
-	<ul class="sr-only">
+	<!-- The marks above in words: a phone has no hover to name a shortened or unlabelled rule, so the list
+	shows below the chart there. A screen reader gets it at any width. -->
+	<ul class="space-y-1 text-xs not-sr-only sm:sr-only">
 		{#each reached as milestone (milestone.id)}
 			<li><ItemName kind="milestone" id={milestone.id} />: reached on {formatDate(milestone.date)}</li>
 		{/each}

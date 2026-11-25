@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Doctor } from "../../lib/contract"
 import { formatDate } from "../../lib/format"
+import { trialBalanceNote } from "../../lib/view/health/trial-balance"
 import Badge from "../ui/Badge.svelte"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
@@ -35,9 +36,7 @@ const columns: Column<Total>[] = [
 			<span class="text-sm text-muted-foreground">{`Trial balance at ${formatDate(trialBalance.asOf)}`}</span>
 		</div>
 		{#if trialBalance.totals === null}
-			<p class="text-sm text-muted-foreground">
-				{trialBalance.balanced ? "Debits equal credits" : "Debits and credits disagree"} at {formatDate(trialBalance.asOf)}, compared exactly; the totals exceed the safe range.
-			</p>
+			<p class="text-sm text-muted-foreground">{trialBalanceNote(trialBalance.balanced)}</p>
 		{:else}
 			<DataTable
 				caption="Trial balance totals"
