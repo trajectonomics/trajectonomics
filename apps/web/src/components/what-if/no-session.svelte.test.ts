@@ -8,6 +8,7 @@ import { useSessionHooks } from "../../client/what-if.test-support"
 import type { ProjectionRun } from "../../lib/contract"
 import { parseTerms } from "../../lib/view/compare"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
+import { heroOf } from "../../lib/view/overview/hero"
 import { overviewView } from "../../lib/view/overview/view"
 import { LOADING } from "../../lib/view/state"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
@@ -16,6 +17,7 @@ import MilestonesBody from "../milestones/MilestonesBody.svelte"
 import MilestonesView from "../milestones/MilestonesView.svelte"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
+import OverviewHero from "../overview/OverviewHero.svelte"
 import ComparePage from "../pages/ComparePage.svelte"
 import NetWorthPage from "../pages/NetWorthPage.svelte"
 import OverviewPage from "../pages/OverviewPage.svelte"
@@ -109,7 +111,9 @@ describe("with no session, a page is its content and nothing more", () => {
 	})
 
 	test("Home", () => {
-		const content = bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })
+		const hero = heroOf(DEMO, "")
+		if (hero === null) throw new Error("the Demo has no hero")
+		const content = `<div class="space-y-4">${bodyOf(OverviewHero, { hero })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
 		expect(shown(page)).toBe(
 			framed(
