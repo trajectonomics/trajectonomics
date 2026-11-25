@@ -67,14 +67,18 @@ describe("TH 2026 Levy golden corpus", () => {
 		expect(buildCorpus().map((item) => item.name)).toEqual(first.map((item) => item.name))
 	})
 
-	it("matches calculate to the satang for every generated case", () => {
-		const failures = buildCorpus()
-			.map((testCase) => ({
-				name: testCase.name,
-				expected: expectedOf(testCase),
-				actual: actualOf(testCase),
-			}))
-			.filter((row) => JSON.stringify(row.expected) !== JSON.stringify(row.actual))
-		expect(failures.slice(0, 5)).toEqual([])
-	})
+	const SLICES = 6
+	for (let slice = 0; slice < SLICES; slice++) {
+		it(`matches calculate to the satang for every generated case, slice ${slice + 1} of ${SLICES}`, () => {
+			const failures = buildCorpus()
+				.filter((_, index) => index % SLICES === slice)
+				.map((testCase) => ({
+					name: testCase.name,
+					expected: expectedOf(testCase),
+					actual: actualOf(testCase),
+				}))
+				.filter((row) => JSON.stringify(row.expected) !== JSON.stringify(row.actual))
+			expect(failures.slice(0, 5)).toEqual([])
+		})
+	}
 })

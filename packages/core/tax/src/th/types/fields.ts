@@ -56,6 +56,7 @@ export enum ThAllowanceField {
 	Spouse = "allowance.spouse",
 	Children = "allowance.children",
 	Parents = "allowance.parents",
+	ParentsSpouseSlot = "allowance.parents.spouse",
 	Disabled = "allowance.disabled",
 	SocialSecurity = "allowance.social_security",
 	LifeHealthCombined = "allowance.life_health_combined",

@@ -4,7 +4,6 @@ import { projectionRun } from "../compare/projection.test-support"
 import { assumptionLines } from "./assumptions"
 import { addLevyCommand, taxBody } from "./body"
 import { carryInRows } from "./carry-in"
-import { resolveScenario } from "./scenario"
 import { taxStatusWords } from "./status"
 import { taxChart } from "./tax-chart"
 import { isRefund, taxHeadline, taxRows } from "./tax-rows"
@@ -24,30 +23,6 @@ function year(over: Partial<TaxYear> = {}): TaxYear {
 		...over,
 	}
 }
-
-describe("scenario resolution", () => {
-	test("an empty request is the first Scenario, with nothing unknown", () => {
-		expect(resolveScenario(["base", "retire-early"], "")).toEqual({ name: "base", unknown: null })
-	})
-
-	test("a name that is one of the Scenarios is the one shown", () => {
-		expect(resolveScenario(["base", "retire-early"], "retire-early")).toEqual({
-			name: "retire-early",
-			unknown: null,
-		})
-	})
-
-	test("an unknown name falls back to the first Scenario and keeps the name it asked for", () => {
-		expect(resolveScenario(["base", "retire-early"], "ghost")).toEqual({
-			name: "base",
-			unknown: "ghost",
-		})
-	})
-
-	test("no Scenarios at all resolves to no name", () => {
-		expect(resolveScenario([], "")).toEqual({ name: null, unknown: null })
-	})
-})
 
 describe("tax body", () => {
 	test("a Scenario with no tax years has no Levy, even when its tax says applied", () => {

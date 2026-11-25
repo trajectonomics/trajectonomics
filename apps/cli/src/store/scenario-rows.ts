@@ -5,7 +5,7 @@ import { taxLevyIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
 import type { Ctx } from "./context"
 import { abort, guard } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { liveScenario } from "./scenario-read"
 import type { ScenarioRow } from "./types"
 
@@ -38,7 +38,8 @@ export function anchorsFor(
 	document: unknown,
 	owner: string,
 ): ResolvedAnchors | AppError {
-	if (stored?.household == null) return { document, household: null, dropped: [] }
+	if (stored?.household == null)
+		return { document, household: null, dropped: [], droppedOwners: [] }
 	return resolveHousehold(stored.household, document, owner)
 }
 
@@ -70,7 +71,7 @@ export type ScenarioDraft = {
 
 export function insertScenario(ctx: Ctx, draft: ScenarioDraft): ScenarioRow {
 	const at = ctx.clock()
-	const id = newId(at)
+	const id = ctx.newId(at)
 	ctx.db.run(
 		`INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from, household,
 		tax, notes, version, created_at, updated_at)

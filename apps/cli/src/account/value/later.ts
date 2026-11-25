@@ -1,17 +1,6 @@
-import {
-	accountId,
-	balance as balanceAt,
-	statedAmount,
-	type Transaction,
-} from "@trajectonomics/core/ledger"
+import { accountId, type Transaction } from "@trajectonomics/core/ledger"
 import { isAppError } from "../../errors"
-import {
-	type AccountRow,
-	formatMinorUnits,
-	type Ledger,
-	parseMinorUnits,
-	type TxRow,
-} from "../../store"
+import { type AccountRow, type Ledger, parseMinorUnits, type TxRow } from "../../store"
 
 /** What a valuation's memo starts with: the CLI writes it, and a later write finds its own by it. */
 export const MEMO_PREFIX = "Valued at "
@@ -74,53 +63,17 @@ export function laterValuations(
 	return stored.filter((entry) => entry.row.date > date && isValuationOf(entry, account, ledger))
 }
 
-/** The sentence a write carries when it moves valuations stated after it. */
-export function laterNote(input: {
-	account: AccountRow
-	date: string
-	difference: string
-	later: readonly StoredValuation[]
-	becomes: string
-}): string {
-	const [first, ...others] = input.later
-	if (first === undefined) return ""
-	const moves = input.account.type === "liability" ? "what it owes" : "its value"
-	const more =
-		others.length === 0
-			? ""
-			: ` ${others.length} more later ${others.length === 1 ? "valuation moves" : "valuations move"} by the same amount.`
-	return (
-		`"${input.account.name}" has a later valuation: ${first.row.date}, valued at ${first.stated} (transaction ${first.row.id}). ` +
-		`This write moves ${moves} by ${input.difference} from ${input.date} on, so on ${first.row.date} it becomes ${input.becomes} ` +
-		`and that valuation no longer holds; value it again on ${first.row.date} to restate it.${more}`
-	)
-}
-
-/**
- * The note a write carries when stored valuations of the account are dated after it: it names the
- * earliest and says what the value on its date becomes, read from the Ledger with this write in.
- */
-export function laterNotes(input: {
-	ledger: Ledger
-	stored: readonly StoredValuation[]
-	transactions: readonly Transaction[]
-	account: AccountRow
-	date: string
-	difference: number
-}): string[] {
-	const { account, ledger } = input
-	const later = laterValuations(ledger, input.stored, account, input.date)
-	const first = later[0]
-	if (first === undefined) return []
-	const after = balanceAt(input.transactions, account.id, first.row.date, ledger.chart).amount
-	const money = (amount: number) => formatMinorUnits(amount, account.currency)
-	return [
-		laterNote({
-			account,
-			date: input.date,
-			difference: money(input.difference),
-			later,
-			becomes: money(statedAmount(account.type, after)),
-		}),
-	]
+/** The entries of a list sorted by date that are dated after `date`: a binary search, then a slice. */
+export function datedAfter(
+	sorted: readonly StoredValuation[],
+	date: string,
+): readonly StoredValuation[] {
+	let low = 0
+	let high = sorted.length
+	while (low < high) {
+		const mid = (low + high) >> 1
+		if (sorted[mid]!.row.date > date) high = mid
+		else low = mid + 1
+	}
+	return low === 0 ? sorted : sorted.slice(low)
 }

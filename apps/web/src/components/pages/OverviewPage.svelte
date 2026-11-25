@@ -1,6 +1,6 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { homePlan, requestedPlan } from "../../lib/view/overview/scenario"
+import { homePlan } from "../../lib/view/overview/scenario"
 import { overviewView } from "../../lib/view/overview/view"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import OverviewGrid from "../overview/OverviewGrid.svelte"
@@ -9,7 +9,7 @@ import OverviewWhatIf from "../what-if/OverviewWhatIf.svelte"
 import WhatIfAbove from "../what-if/WhatIfAbove.svelte"
 
 interface Props {
-	/** The Scenario the address bar names; left empty, Home follows the What-if session's plan, else the main plan. */
+	/** The Scenario the address bar names; left empty, Home follows the main plan. */
 	scenario?: string
 }
 
@@ -22,8 +22,7 @@ let { scenario = "" }: Props = $props()
 	intro="The headline figures of your ledger. Each card names the command that produced it."
 >
 	{#snippet children(snapshot)}
-		{@const requested = requestedPlan(scenario, whatIfSession.activePlan)}
-		{@const plan = homePlan(snapshot, requested)}
+		{@const plan = homePlan(snapshot, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
 		<WhatIfAbove open={lens !== null} gap="space-y-4">
 			{#snippet whatIf()}
@@ -35,7 +34,7 @@ let { scenario = "" }: Props = $props()
 					/>
 				{/if}
 			{/snippet}
-			<OverviewGrid view={overviewView(snapshot, requested)} />
+			<OverviewGrid view={overviewView(snapshot, scenario)} />
 		</WhatIfAbove>
 	{/snippet}
 </PageShell>

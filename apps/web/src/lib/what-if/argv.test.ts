@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { leafOf } from "../snapshot/leaves"
 import type { PlanParams } from "../snapshot/params"
-import { whatIfReads } from "./argv"
+import { plannedWhatIfReads } from "./argv"
 import type { WhatIfBody } from "./overrides"
 
 const PARAMS: PlanParams = {
@@ -28,7 +28,7 @@ const WHAT_IF: WhatIfBody = {
 
 describe("the reads of a what-if", () => {
 	test("projection run, fi and compare take the removal and the Set, with --decimal, and write nothing", () => {
-		const reads = whatIfReads(PARAMS, WHAT_IF)
+		const reads = plannedWhatIfReads(PARAMS, WHAT_IF)
 		expect(reads.projection.argv).toEqual([
 			"projection",
 			"run",
@@ -75,7 +75,7 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("only the projection takes --breakdown, so the Cash flow page can show the session's lines and totals", () => {
-		const reads = whatIfReads({ ...PARAMS, monthly: true }, WHAT_IF)
+		const reads = plannedWhatIfReads({ ...PARAMS, monthly: true }, WHAT_IF)
 		expect(reads.projection.argv).toContain("--breakdown")
 		expect(reads.projection.argv.indexOf("--breakdown")).toBeLessThan(
 			reads.projection.argv.indexOf("--decimal"),
@@ -84,7 +84,7 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("every read is a read leaf of the Snapshot allowlist", () => {
-		const reads = whatIfReads(
+		const reads = plannedWhatIfReads(
 			{ ...PARAMS, chance: { returnModel: "m.json", paths: 10, seed: "0123456789abcdef" } },
 			WHAT_IF,
 		)
@@ -95,7 +95,7 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("a value with = in it is one --set token, and a plan with a leading space is one --scenario token", () => {
-		const reads = whatIfReads(PARAMS, {
+		const reads = plannedWhatIfReads(PARAMS, {
 			plan: " early",
 			sets: [{ path: "flows.a.name", value: "x=y" }],
 			removals: [],
@@ -107,14 +107,14 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("the Carry-in is passed to each read for the plan, when the Plan states one", () => {
-		const reads = whatIfReads({ ...PARAMS, carryIn: true }, WHAT_IF)
+		const reads = plannedWhatIfReads({ ...PARAMS, carryIn: true }, WHAT_IF)
 		expect(reads.projection.argv).toContain("--carry-in")
 		expect(reads.projection.carryInFor).toEqual(["base"])
 		expect(reads.compare.carryInFor).toEqual(["base"])
 	})
 
 	test("chance is one more read when the Snapshot states a Return model", () => {
-		const reads = whatIfReads(
+		const reads = plannedWhatIfReads(
 			{ ...PARAMS, chance: { returnModel: "m.json", paths: 10, seed: "0123456789abcdef" } },
 			WHAT_IF,
 		)
@@ -137,7 +137,12 @@ describe("the reads of a what-if", () => {
 	})
 
 	test("a what-if with no change reads the plan as it is, with no override flag but --decimal", () => {
-		const reads = whatIfReads(PARAMS, { plan: "base", sets: [], removals: [], additions: [] })
+		const reads = plannedWhatIfReads(PARAMS, {
+			plan: "base",
+			sets: [],
+			removals: [],
+			additions: [],
+		})
 		expect(reads.projection.argv).not.toContain("--without=flows.gym")
 		expect(reads.projection.argv.filter((token) => token.startsWith("--set"))).toEqual([])
 		expect(reads.projection.argv.at(-2)).toBe("--decimal")

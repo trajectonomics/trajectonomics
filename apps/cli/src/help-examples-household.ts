@@ -8,7 +8,7 @@
  * the investment's, so each anchor names a Flow the fixture holds (cli ADR-0048).
  */
 export const BASE_HOUSEHOLD: Record<string, unknown> = {
-	schemaVersion: 1,
+	schemaVersion: 2,
 	people: [
 		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
 		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 90, joins: "2028-01" },
@@ -16,5 +16,9 @@ export const BASE_HOUSEHOLD: Record<string, unknown> = {
 	anchors: [
 		{ path: "flows.salary.end", person: "me", age: 60 },
 		{ path: "flows.invest.end", person: "me", at: "lifeEnd" },
+	],
+	owners: [
+		{ path: "flows.salary", person: "me" },
+		{ path: "flows.invest", person: "shared" },
 	],
 }

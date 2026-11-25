@@ -3,7 +3,7 @@ import { TH_2026_PARAMETERS } from "../parameters"
 import { ThFinalWithholdingElection } from "../types"
 import { validateCorpTaxRate } from "../validate"
 import type { ThLevyGraph } from "./graph"
-import { sumMeasures } from "./graph-rates"
+import { auditedId, sumMeasures } from "./graph-rates"
 import { ThLevyRounding } from "./graph-types"
 import { ThLevyIncomeLabel } from "./labels"
 import { ThLevyMeasureId } from "./measure-ids"
@@ -47,12 +47,15 @@ function withheld(graph: ThLevyGraph, tally: string, rate: number): string {
  * @param graph Measure graph being built.
  * @param tallies Income tally ids.
  * @param elections Final-withholding and Section 47 bis elections fixed at emit time.
+ * @param named Whether the final tax and dividend credit take their audited ids; a Filer's own
+ * share of a joint Return does not, since the Return's sums do.
  * @statute Thailand Revenue Code Sections 40(4), 47 bis, 50(2)(g), 57 ter.
  */
 export function addSection40_4(
 	graph: ThLevyGraph,
 	tallies: ThLevyTallies,
 	elections: ThLevySection40_4Elections = {},
+	named = true,
 ): ThSection40_4Measures {
 	const rates = TH_2026_PARAMETERS.finalWithholding
 	const income = tallies.income
@@ -81,13 +84,17 @@ export function addSection40_4(
 			num,
 			den - num,
 			ThLevyRounding.HalfUp,
-			ThLevyMeasureId.DividendCredit,
+			auditedId(named, ThLevyMeasureId.DividendCredit),
 		)
 		included.push(credit)
 	} else {
-		credit = graph.constant(0, ThLevyMeasureId.DividendCredit)
+		credit = graph.constant(0, auditedId(named, ThLevyMeasureId.DividendCredit))
 	}
 	const assessable = sumMeasures(graph, included)
-	const finalWithholdingTax = sumMeasures(graph, finalTaxes, ThLevyMeasureId.FinalWithholdingTax)
+	const finalWithholdingTax = sumMeasures(
+		graph,
+		finalTaxes,
+		auditedId(named, ThLevyMeasureId.FinalWithholdingTax),
+	)
 	return { assessable, finalWithholdingTax, dividendCredit: credit }
 }

@@ -49,7 +49,7 @@ function carryFor(params: PlanParams, plan: string): string[] {
  * would receive in a what-if (cli ADR 0064). The plan's name follows `--scenario=`, as the Snapshot's reads do, so a name
  * that starts with a dash is still one token; `projection compare` takes its name after `--`.
  */
-export function whatIfReads(params: PlanParams, whatIf: WhatIfBody): PlannedWhatIfReads {
+export function plannedWhatIfReads(params: PlanParams, whatIf: WhatIfBody): PlannedWhatIfReads {
 	const plan = whatIf.plan
 	const overrides = [...overrideTokens(whatIf), "--decimal"]
 	const monthly = params.monthly ? ["--monthly"] : []

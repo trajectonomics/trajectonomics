@@ -28,7 +28,8 @@ import OverviewWhatIf from "./OverviewWhatIf.svelte"
 useSessionHooks()
 
 const projections = DEMO.reads.projections
-const run = { projections, scenario: "base", terms: "both", onTerms: () => {} }
+const names = DEMO.params.scenarios
+const run = { names, projections, scenario: "base", terms: "both", onTerms: () => {} }
 
 describe("the Milestones page", () => {
 	test("with no session it renders as it does today", () => {
@@ -88,13 +89,13 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 		expect(fi.match(/What-if on/g)).toHaveLength(1)
 
 		const chance = render(ChanceView, {
-			props: { chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
+			props: { names, chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
 		}).body
 		expect(chance).toContain("What-if on base")
 		expect(chance).toMatch(/Chance of success from \d+\.\d\d% to \d+\.\d\d%/)
 
 		const tax = render(TaxPanel, {
-			props: { projections, requested: "base", onScenario: () => {} },
+			props: { names, projections, requested: "base", onScenario: () => {} },
 		}).body
 		expect(tax).toContain("What-if on base")
 		expect(tax).toContain("Baseline:")
@@ -102,6 +103,7 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 
 		const cash = render(CashFlowView, {
 			props: {
+				names,
 				projections,
 				accounts: DEMO.reads.accounts,
 				scenario: "base",
@@ -117,9 +119,10 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 		for (const body of [
 			render(FiSections, { props: { fi: DEMO.reads.fi } }).body,
 			render(ChanceView, {
-				props: { chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
+				props: { names, chance: DEMO.reads.chance, scenario: "base", onScenario: () => {} },
 			}).body,
-			render(TaxPanel, { props: { projections, requested: "base", onScenario: () => {} } }).body,
+			render(TaxPanel, { props: { names, projections, requested: "base", onScenario: () => {} } })
+				.body,
 		]) {
 			expect(body).not.toContain("What-if on")
 		}

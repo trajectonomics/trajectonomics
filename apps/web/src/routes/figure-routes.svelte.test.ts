@@ -3,7 +3,6 @@ import { render } from "svelte/server"
 import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
-import { whatIfSession } from "../client/what-if.svelte.js"
 import { openDemoSession, useSessionHooks } from "../client/what-if.test-support"
 import { LOADING } from "../lib/view/state"
 import { DEMO } from "../lib/view/what-if/fixtures.test-support"
@@ -58,21 +57,4 @@ describe("a figure page's route, with a session open", () => {
 			expect(render(route.page).body).not.toContain("What-if on")
 		})
 	}
-})
-
-describe("Home", () => {
-	test("shows the session's plan when the address bar names none", async () => {
-		setTestUrl("http://127.0.0.1/?demo=1")
-		await openDemoSession("retire-early")
-		expect(whatIfSession.activePlan).toBe("retire-early")
-		expect(render(Home).body).toContain("What-if on retire-early")
-	})
-
-	test("follows the plan the address bar names, and shows the lens only when it is the session's", async () => {
-		await openDemoSession("retire-early")
-		setTestUrl("http://127.0.0.1/?demo=1&scenario=base")
-		expect(render(Home).body).not.toContain("What-if on")
-		setTestUrl("http://127.0.0.1/?demo=1&scenario=retire-early")
-		expect(render(Home).body).toContain("What-if on retire-early")
-	})
 })

@@ -1,11 +1,10 @@
-import { balance as balanceAt, type Transaction, valuationEntry } from "@trajectonomics/core/ledger"
-import { type AccountRow, formatMinorUnits, type Ledger, type NewTransaction } from "../../store"
+import { valuationEntry } from "@trajectonomics/core/ledger"
+import { formatMinorUnits } from "../../store"
 import { written } from "../../tx/legs"
-import { laterNotes, MEMO_PREFIX, type StoredValuation } from "./later"
+import { type Batch, balanceOn, laterOf, record } from "./batch"
+import { MEMO_PREFIX } from "./later"
+import { laterNotes } from "./later-note"
 import type { Prepared, ValuedRow } from "./types"
-
-/** What the entries applied so far added: the core's entries, for the next Balance, and the rows to write. */
-export type Applied = { pending: Transaction[]; writes: NewTransaction[] }
 
 /** A draft id the core can tell apart; the store mints the real one when the row is written. */
 function draftId(position: number): string {
@@ -16,39 +15,33 @@ function draftId(position: number): string {
  * Applies one entry to the Balance the earlier ones leave. It throws the core's refusal, which the
  * caller reports at the entry's own field.
  */
-export function applyEntry(
-	ledger: Ledger,
-	against: AccountRow,
-	stored: readonly StoredValuation[],
-	applied: Applied,
-	entry: Prepared,
-): ValuedRow {
+export function applyEntry(batch: Batch, entry: Prepared): ValuedRow {
 	const { account, date, value } = entry
-	const transactions = [...ledger.transactions, ...applied.pending]
-	const current = balanceAt(transactions, account.id, date, ledger.chart).amount
 	const { transaction, before, difference } = valuationEntry(
 		{
-			id: draftId(applied.pending.length),
+			id: draftId(batch.writes.length),
 			date,
 			account: account.id,
-			against: against.id,
-			balance: current,
+			against: batch.against.id,
+			balance: balanceOn(batch, account, date),
 			value,
 		},
-		ledger.chart,
+		batch.ledger.chart,
 	)
 	const row = { index: entry.index, account, date, before, value }
 	if (transaction === undefined) return { ...row, difference, write: null, notes: [] }
 	const memo = `${MEMO_PREFIX}${formatMinorUnits(value, account.currency)}`
-	applied.writes.push(written(transaction, { date, memo }))
-	applied.pending.push(transaction)
+	batch.writes.push(written(transaction, { date, memo }))
+	for (const posting of transaction.postings) {
+		const own = (posting.accountId as string) === account.id ? account : batch.against
+		record(batch, own, date, BigInt(posting.amount), entry.index)
+	}
 	const notes = laterNotes({
-		ledger,
-		stored,
-		transactions: [...transactions, transaction],
 		account,
 		date,
 		difference,
+		later: laterOf(batch, account, date),
+		balanceAt: (asOf) => balanceOn(batch, account, asOf),
 	})
-	return { ...row, difference, write: applied.writes.length - 1, notes }
+	return { ...row, difference, write: batch.writes.length - 1, notes }
 }

@@ -4,6 +4,7 @@ import { formatPath } from "../path"
 import { parsePath } from "../set-parse"
 import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, type Household } from "./model"
+import { unheldOwner } from "./owner-held"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
 
 /** A date one anchor wrote into a Scenario, as `traj scenario household` reports it. */
@@ -58,8 +59,18 @@ function refusedAfterPlacing(document: unknown, placed: readonly Placed[], house
 	})
 }
 
-/** `household`: writes every anchor's date into the Scenario document, then checks the result. */
+/**
+ * `household`: checks that every Owner names an item the Scenario holds (cli ADR-0076), writes every
+ * anchor's date into the document, then checks the result.
+ */
 export function placeHousehold(
+	household: Household,
+	document: ScenarioDocument,
+): { document: ScenarioDocument; anchored: AnchoredDate[]; followed: FollowedDate[] } | AppError {
+	return unheldOwner(household, document) ?? placeAnchors(household, document)
+}
+
+function placeAnchors(
 	household: Household,
 	document: ScenarioDocument,
 ): { document: ScenarioDocument; anchored: AnchoredDate[]; followed: FollowedDate[] } | AppError {

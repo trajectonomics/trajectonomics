@@ -3,9 +3,9 @@ import { documentPath, type ScenarioProblem } from "./document"
 import { ownDocumentError } from "./document-error"
 import { isOwnProblem, ownProblems } from "./own-problems"
 import { formatPath, overrideSegments } from "./path"
-import { wordsOf } from "./problem-words"
 import type { AppliedOverrides } from "./set-apply"
-import { flagError, type OverrideFlag } from "./set-parse"
+import type { OverrideFlag } from "./set-parse"
+import { overrideRefusal } from "./set-refusal"
 
 /**
  * One applied Override, in the order a command applies them: every `--without` removal, then every
@@ -73,23 +73,13 @@ export function documentFailure(
 	// The index counts occurrences of that input field, as its own list does.
 	const index = items.slice(0, at).filter((item) => item.flag === flag).length
 	const path = documentPath("document", chosen.problem.segments)
-	// A code the refusal table words states its sentence and way out, as `scenario apply --file` does.
-	const said = wordsOf(chosen.problem)
-	const own = `The overrides leave ${path} invalid; change that value or the path.`
-	return flagError(
-		flag,
+	const details = {
 		index,
-		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}${said === undefined ? "" : `. ${said.message}`}`,
-		{
-			hint: said?.hint === undefined ? own : `${said.hint} ${own}`,
-			details: {
-				index,
-				path: selected?.path ?? formatPath(overrideSegments(document, chosen.problem.segments)),
-				documentPath: path,
-				code: chosen.problem.code,
-			},
-		},
-	)
+		path: selected?.path ?? formatPath(overrideSegments(document, chosen.problem.segments)),
+		documentPath: path,
+		code: chosen.problem.code,
+	}
+	return overrideRefusal(flag, index, chosen.problem, path, details)
 }
 
 /** The applied Overrides in the order a command applied them: removals, additions, then Sets. */

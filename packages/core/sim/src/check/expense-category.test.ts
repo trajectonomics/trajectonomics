@@ -1,43 +1,7 @@
 import { describe, expect, it } from "bun:test"
-import { check } from "./index"
+import { problemsOf, withCategory } from "./expense-category-support"
 
-const baseline = { schemaVersion: 1, balances: [{ account: "cash", amount: 0 }] }
-const timeline = { start: "2026-01-01", horizon: "2027-01-01", resolution: "month" }
-const accounts = [
-	{ id: "cash", kind: "asset", rate: 0 },
-	{ id: "loan", kind: "liability", rate: 600, compounding: "monthly" },
-]
-const EXPENSE = {
-	id: "groceries",
-	kind: "expense",
-	amount: 500,
-	frequency: "monthly",
-	start: "2026-02-01",
-	growth: { bps: 0 },
-}
-
-/** The problems of one Flow, as `path code` strings, so a duplicate shows as two equal lines. */
-function problemsOf(flow: Record<string, unknown>): string[] {
-	const scenario = {
-		schemaVersion: 4,
-		currency: "THB",
-		economy: { inflation: 0 },
-		accounts,
-		flows: [flow],
-		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: ["cash"] },
-	}
-	return check(baseline, scenario, timeline).map(
-		(problem) => `${problem.path.join("/")} ${problem.code}`,
-	)
-}
-
-/** An expense with the given `category`, so the category is the only difference between cases. */
-const withCategory = (category: unknown): Record<string, unknown> => ({
-	...EXPENSE,
-	category,
-})
-
-describe("an expense category is optional free text of 1 to 64 characters", () => {
+describe("an expense category is optional free text of 1 to 64 code points", () => {
 	it("accepts a plain category", () => {
 		expect(problemsOf(withCategory("Essentials"))).toEqual([])
 	})
@@ -50,11 +14,11 @@ describe("an expense category is optional free text of 1 to 64 characters", () =
 		expect(problemsOf(withCategory("a".repeat(64)))).toEqual([])
 	})
 
-	it("counts characters, not UTF-16 units: 64 emoji fit", () => {
+	it("counts code points, not UTF-16 units: 64 emoji fit", () => {
 		expect(problemsOf(withCategory("🙂".repeat(64)))).toEqual([])
 	})
 
-	it("refuses 65 characters as INVALID_CATEGORY at the category path", () => {
+	it("refuses 65 code points as INVALID_CATEGORY at the category path", () => {
 		expect(problemsOf(withCategory("a".repeat(65)))).toEqual([
 			"scenario/flows/0/category INVALID_CATEGORY",
 		])

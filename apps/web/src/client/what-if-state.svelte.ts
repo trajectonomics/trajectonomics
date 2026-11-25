@@ -41,11 +41,6 @@ export class WhatIfState {
 		return this.whatIf !== null && hasChanges(this.whatIf)
 	}
 
-	/** The plan the session holds changes on, or null when it holds none. */
-	get activePlan(): string | null {
-		return this.whatIf !== null && hasChanges(this.whatIf) ? this.whatIf.plan : null
-	}
-
 	/** Whether a read is pending or in flight. Keeping the session waits for it, so the server is not busy. */
 	get reading(): boolean {
 		return this.waiting || this.inFlight

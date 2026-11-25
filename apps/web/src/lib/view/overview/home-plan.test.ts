@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { ledgerWith } from "../plans/fixtures.test-support"
-import { homePlan, primaryScenario, requestedPlan } from "./scenario"
+import { homePlan } from "./scenario"
 import { overviewView } from "./view"
 
 const params = (scenarios: string[], compare: { a: string; b: string } | null = null) => ({
@@ -31,24 +31,12 @@ describe("the plan Home follows", () => {
 		expect(homePlan(snapshot, "")).toBe("base")
 	})
 
-	test("the main plan comes before the plan a comparison names first", () => {
-		expect(primaryScenario(params(["a", "b"], { a: "b", b: "a" }), "", "a")).toBe("a")
-		expect(primaryScenario(params(["a", "b"], { a: "b", b: "a" }))).toBe("b")
-	})
-
-	test("is the plan a What-if session holds changes on when the address bar names none", () => {
-		const snapshot = ledgerWith({ base: {}, "retire-early": { main: true } })
-		expect(homePlan(snapshot, requestedPlan("", "base"))).toBe("base")
-		expect(homePlan(snapshot, requestedPlan("", null))).toBe("retire-early")
-	})
-
-	test("the address bar wins over the session", () => {
-		expect(requestedPlan("retire-early", "base")).toBe("retire-early")
-	})
-
-	test("a session on a plan the dashboard does not project is passed over for the main plan", () => {
-		const snapshot = ledgerWith({ base: {}, "retire-early": { main: true } })
-		expect(homePlan(snapshot, requestedPlan("", "gone"))).toBe("retire-early")
+	test("a comparison does not choose the plan: the Snapshot's order does, main first", () => {
+		const snapshot = {
+			...ledgerWith({ base: {}, "retire-early": {} }),
+			params: params(["base", "retire-early"], { a: "retire-early", b: "base" }),
+		}
+		expect(homePlan(snapshot, "")).toBe("base")
 	})
 
 	test("the cards read that plan's figures", () => {

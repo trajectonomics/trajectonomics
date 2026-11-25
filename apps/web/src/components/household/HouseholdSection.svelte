@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
-import { chooseScenario } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import ReadView from "../ui/ReadView.svelte"
 import HouseholdCard from "./HouseholdCard.svelte"
 

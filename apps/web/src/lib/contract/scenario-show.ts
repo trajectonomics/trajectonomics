@@ -37,11 +37,13 @@ export const scenarioFlow = z.looseObject({
 	endAt: z.string().optional(),
 	// A spending rule in place of `amount` (cli ADR 0063); `view/withdrawals/rule.ts` reads it, so a shape it does not know stays untouched.
 	rule: z.looseObject({}).optional(),
+	// Read-only: the CLI states the bounds of `payments` and the `rounding` words (sim ADR-0016), so the contract
+	// takes any integer and any string. A bound that moves in the CLI then cannot fail as `contract_mismatch` (#336).
 	level: z
 		.looseObject({
 			principal: money,
-			payments: z.number().int().min(1).max(119976),
-			rounding: z.enum(["floor", "halfUp", "ceil"]),
+			payments: z.number().int(),
+			rounding: z.string(),
 		})
 		.optional(),
 })
