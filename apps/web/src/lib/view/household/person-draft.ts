@@ -5,6 +5,7 @@
  */
 import type { HouseholdPerson } from "../../contract"
 import { slugId, uniqueId } from "../plan-items/form"
+import { labelOf, labelProblem } from "../plan-items/label-text"
 import type { Problems } from "../plan-items/problems"
 
 const MONTH_TEXT = /^\d{4}-(0[1-9]|1[0-2])$/
@@ -18,6 +19,8 @@ export type Relation = (typeof RELATIONS)[number]
 /** The text of the person form. `relation` applies to a dependent, and `joins` to a partner. */
 export interface PersonDraft {
 	readonly name: string
+	/** The name a page reads in place of the id, free text: empty for none (sim ADR 0032). */
+	readonly label: string
 	/** "holder", "partner" or "dependent": text, so a select can bind it. */
 	readonly role: string
 	/** One of `RELATIONS`, or empty until the person chooses one. */
@@ -31,6 +34,7 @@ export interface PersonDraft {
 export function personDraftOf(person: HouseholdPerson | undefined, role: string): PersonDraft {
 	return {
 		name: person?.id ?? "",
+		label: person?.displayLabel ?? "",
 		role: person?.role ?? role,
 		relation: person?.role === "dependent" ? person.relation : "",
 		born: person?.born ?? "",
@@ -60,19 +64,23 @@ function personProblems(draft: PersonDraft, isNew: boolean): Map<string, string>
 	if (draft.role === "partner" && joins !== "" && !MONTH_TEXT.test(joins)) {
 		problems.set("joins", "Enter the month the partner joins as YYYY-MM, or leave it empty.")
 	}
+	const label = labelProblem(draft.label)
+	if (label !== null) problems.set("label", label)
 	return problems
 }
 
 /** The person a draft names, with the fields its role takes; null when a dependent has no relation. */
 function personOf(draft: PersonDraft, id: string): HouseholdPerson | null {
 	const base = { id, born: draft.born.trim(), lifeExpectancy: Number(draft.lifeExpectancy.trim()) }
+	const label = labelOf(draft.label)
+	const named = label === null ? base : { ...base, displayLabel: label }
 	const joins = draft.joins.trim()
-	if (draft.role === "holder") return { ...base, role: "holder" }
+	if (draft.role === "holder") return { ...named, role: "holder" }
 	if (draft.role === "partner") {
-		return { ...base, role: "partner", ...(joins === "" ? {} : { joins }) }
+		return { ...named, role: "partner", ...(joins === "" ? {} : { joins }) }
 	}
 	const relation = relationOf(draft.relation)
-	return relation === null ? null : { ...base, role: "dependent", relation }
+	return relation === null ? null : { ...named, role: "dependent", relation }
 }
 
 /**

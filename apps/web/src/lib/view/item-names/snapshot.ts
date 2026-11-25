@@ -1,4 +1,4 @@
-import type { HouseholdDocument, Snapshot } from "../../contract"
+import type { HouseholdDocument, ScenarioDocument, Snapshot } from "../../contract"
 import { accountNames } from "../account-names"
 import { type ItemNames, itemNames } from "./names"
 
@@ -9,7 +9,17 @@ export function householdOf(snapshot: Snapshot, plan: string | null): HouseholdD
 	return read?.ok === true ? read.data.scenario.household : null
 }
 
-/** The lookup of one plan, built from the Snapshot's accounts Read and that plan's household, and from nothing else. */
+/** The document the Snapshot holds for a plan, whose item labels the lookup reads, or null when it has none or failed. */
+export function documentOf(snapshot: Snapshot, plan: string | null): ScenarioDocument | null {
+	const read = plan === null ? undefined : snapshot.reads.documents?.[plan]
+	return read?.ok === true ? read.data.scenario.document : null
+}
+
+/** The lookup of one plan, built from the Snapshot's accounts Read, that plan's household and its document. */
 export function snapshotItemNames(snapshot: Snapshot, plan: string | null): ItemNames {
-	return itemNames(accountNames(snapshot.reads.accounts), householdOf(snapshot, plan))
+	return itemNames(
+		accountNames(snapshot.reads.accounts),
+		householdOf(snapshot, plan),
+		documentOf(snapshot, plan),
+	)
 }

@@ -66,13 +66,26 @@ export function beginsSurplusKey(segment: string, prefix: readonly string[]): bo
 	)
 }
 
-/** The keys a `--set` may add to an item that leaves them out: an Account's volatility, a surplus step's share or cap. */
+/** The keys a `--set` may add to a Flow or a Milestone: its display label, which a plan may leave out (sim ADR 0032). */
+export function beginsDisplayLabel(segment: string, prefix: readonly string[]): boolean {
+	return (
+		segment === "displayLabel" &&
+		prefix.length === 2 &&
+		(prefix[0] === "flows" || prefix[0] === "milestones")
+	)
+}
+
+/** The keys a `--set` may add to an item that leaves them out: an Account's volatility, a display label, a surplus step's share or cap. */
 export function beginsKey(
 	node: Record<string, unknown>,
 	segment: string,
 	prefix: readonly string[],
 ): boolean {
-	return beginsAccountVolatility(node, segment, prefix) || beginsSurplusKey(segment, prefix)
+	return (
+		beginsAccountVolatility(node, segment, prefix) ||
+		beginsDisplayLabel(segment, prefix) ||
+		beginsSurplusKey(segment, prefix)
+	)
 }
 
 /**
@@ -103,7 +116,7 @@ export function beginnableKeysAt(
 	prefix: readonly string[],
 ): readonly string[] {
 	const keys = [...(prefix.length === 0 ? BEGINNABLE_BLOCKS : [])]
-	for (const key of ["volatility", ...STEP_KEYS]) {
+	for (const key of ["volatility", "displayLabel", ...STEP_KEYS]) {
 		if (beginsKey(node, key, prefix)) keys.push(key)
 	}
 	return keys.filter((key) => !Object.hasOwn(node, key))

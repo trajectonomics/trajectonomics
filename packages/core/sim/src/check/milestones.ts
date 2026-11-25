@@ -1,9 +1,10 @@
 import { MILESTONE_COMBINES } from "../vocab"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
+import { displayLabel } from "./display-label"
 import { criterionCheck } from "./milestone-criterion"
 import { checkMilestoneGraph } from "./milestone-graph"
 import { oneOf, str } from "./scalars"
-import { checkShape, checkUnique, list, req } from "./shape"
+import { checkShape, checkUnique, list, opt, req } from "./shape"
 
 /** A Milestone's criteria: a non-empty list with unique ids, like a Scenario's Levies. */
 function criteriaCheck(accounts: AccountIndex | undefined): Check {
@@ -22,6 +23,7 @@ function milestoneCheck(accounts: AccountIndex | undefined): Check {
 			path,
 			{
 				id: req(str),
+				displayLabel: opt(displayLabel),
 				combine: req(oneOf(MILESTONE_COMBINES, "INVALID_COMBINE")),
 				criteria: req(criteriaCheck(accounts)),
 			},

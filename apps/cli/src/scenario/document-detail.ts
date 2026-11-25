@@ -1,4 +1,4 @@
-import { allowedValues, EXPENSE_CATEGORY_RULE } from "@trajectonomics/core/sim"
+import { allowedValues, DISPLAY_LABEL_RULE, EXPENSE_CATEGORY_RULE } from "@trajectonomics/core/sim"
 import type { ScenarioProblem } from "./document"
 import { isOwnCode } from "./own-problems"
 
@@ -22,6 +22,7 @@ export function detailOf(
 		return accepted === undefined ? undefined : `the accepted version is ${accepted}`
 	}
 	if (problem.code === "INVALID_CATEGORY") return EXPENSE_CATEGORY_RULE
+	if (problem.code === "INVALID_LABEL") return DISPLAY_LABEL_RULE
 	if (problem.code === "INVALID_GROWTH") return `one of: ${GROWTH_FORMS}`
 	if (problem.code === "NOT_SAFE_INTEGER" && problem.segments.some((s) => RATE_SEGMENTS.has(s))) {
 		return "basis points, a whole number: 2% is 200"

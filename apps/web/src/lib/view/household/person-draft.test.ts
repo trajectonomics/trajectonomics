@@ -6,6 +6,7 @@ const holder: HouseholdPerson = { id: "me", role: "holder", born: "1990-06", lif
 
 const draft = (change: Partial<PersonDraft> = {}): PersonDraft => ({
 	name: "Partner",
+	label: "",
 	role: "partner",
 	relation: "",
 	born: "1992-02",
@@ -15,6 +16,18 @@ const draft = (change: Partial<PersonDraft> = {}): PersonDraft => ({
 })
 
 describe("personFromDraft", () => {
+	test("saves the display label trimmed, and leaves it out when the field is empty", () => {
+		const labelled = personFromDraft(draft({ label: "  Somchai  " }), { taken: ["me"] })
+		expect(labelled.ok && labelled.person.displayLabel).toBe("Somchai")
+		const bare = personFromDraft(draft(), { taken: ["me"] })
+		expect(bare.ok && bare.person).not.toHaveProperty("displayLabel")
+	})
+
+	test("refuses a display label over 80 characters at its field", () => {
+		const result = personFromDraft(draft({ label: "a".repeat(81) }), { taken: [] })
+		expect(result.ok === false && result.problems["label"]).toContain("at most 80 characters")
+	})
+
 	test("a new partner takes an id from the name, and states the month they join", () => {
 		expect(personFromDraft(draft(), { taken: ["me"] })).toEqual({
 			ok: true,

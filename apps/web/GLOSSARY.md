@@ -69,8 +69,8 @@ The name the ledger gives an Account (`traj account list`), which every page sho
 _Avoid_: label, alias, display name
 
 **Item name**:
-The words a page shows for the id of a plan item, from one lookup (`src/lib/view/item-names/`, [ADR 0029](docs/adr/0029-plan-items-are-named-by-what-a-read-states-and-never-made-up.md)). A Read states a name for an Account (the Account name) and, by role, for a person of the household ("You", "Your partner", "Child"). It states none for a Flow or a Milestone, so the page shows the id in code and never turns it into words. Pickers keep the id as the value and an Edit still sends ids.
-_Avoid_: label, display name, title, alias (a `label` field on a Scenario item is a later change, #322)
+The words a page shows for the id of a plan item, from one lookup (`src/lib/view/item-names/`, [ADR 0029](docs/adr/0029-plan-items-are-named-by-what-a-read-states-and-never-made-up.md)). A Read states a name for an Account (the Account name), for a person of the household (the `displayLabel` it states, else the role: "You", "Your partner", "Child"), and for a Flow and a Milestone (the `displayLabel` the plan's document states). An item that states no label shows its id in code, and the page never turns an id into words. Pickers keep the id as the value and an Edit still sends ids.
+_Avoid_: label, display name, title, alias
 
 **Household**:
 The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.

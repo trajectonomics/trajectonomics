@@ -2,6 +2,7 @@ import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
 import { parseBps } from "../../format/bps"
 import type { FlowDraft, FlowKind } from "./flows"
 import { isDateText, slugId, typedAmount, uniqueId, withoutKeys } from "./form"
+import { labelOf, labelProblem } from "./label-text"
 import type { Problems } from "./problems"
 
 /** The outcome of a form: the Flow to save, or the problems the form shows at its fields. */
@@ -22,6 +23,8 @@ function problemsOf(draft: FlowDraft, isNew: boolean): Map<string, string> {
 	if (draft.growth !== "inflation" && parseBps(draft.rate) === null) {
 		problems.set("rate", "Enter a percent with at most two places, such as 3 or 3.50.")
 	}
+	const label = labelProblem(draft.label)
+	if (label !== null) problems.set("label", label)
 	return problems
 }
 
@@ -55,8 +58,16 @@ function candidateOf(
 	const end = draft.end.trim()
 	const rate = draft.growth === "inflation" ? "inflation" : parseBps(draft.rate)
 	const category = categoryOf(draft, options.kind)
+	const label = labelOf(draft.label)
 	return {
-		...withoutKeys(options.existing ?? {}, ["amount", "growth", "end", "earned", "category"]),
+		...withoutKeys(options.existing ?? {}, [
+			"amount",
+			"growth",
+			"end",
+			"earned",
+			"category",
+			"displayLabel",
+		]),
 		id: options.existing?.id ?? uniqueId(slugId(draft.name), options.taken),
 		kind: options.kind,
 		frequency: draft.frequency,
@@ -66,6 +77,7 @@ function candidateOf(
 		...(end === "" ? {} : { end }),
 		...(options.kind === "income" ? { earned: draft.earned } : {}),
 		...(category === null ? {} : { category }),
+		...(label === null ? {} : { displayLabel: label }),
 	}
 }
 

@@ -16,6 +16,14 @@ export { type ScenarioFlow, scenarioFlow } from "./scenario-flow"
  * below keeps its rounding a plain string for the same reason.
  */
 
+/** One Milestone of the document: the id the plan addresses it by, and the name a person reads (sim ADR 0032). */
+export const scenarioMilestone = z.looseObject({
+	id: z.string(),
+	// What a person reads in place of the id; the id still addresses the Milestone.
+	displayLabel: z.string().optional(),
+})
+export type ScenarioMilestone = z.infer<typeof scenarioMilestone>
+
 /**
  * One cost or gift of the estate block in the decimal form (cli ADR 0064): a share (`of`, `bps` as a percent string such
  * as "1.00", `rounding`) or a fixed `amount` in major units that grows by `growth`. `view/estate/` reads it; any key it
@@ -43,6 +51,8 @@ export const scenarioDocument = z.looseObject({
 	currency: z.string(),
 	flows: z.array(scenarioFlow),
 	accounts: z.array(scenarioAccount),
+	// The named points a Flow may gate on (sim ADR 0012): the page reads a Milestone's id and label, kept as they are.
+	milestones: z.array(scenarioMilestone).optional(),
 	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
 	cashflow: scenarioCashflow.optional(),
 	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.

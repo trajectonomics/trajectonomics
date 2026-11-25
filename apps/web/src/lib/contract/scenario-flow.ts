@@ -21,6 +21,8 @@ export const scenarioFlow = z.looseObject({
 	amount: money.optional(),
 	growth: z.union([z.literal("inflation"), z.looseObject({ bps: z.number().int() })]).optional(),
 	earned: z.boolean().optional(),
+	// What a person reads in place of the id (sim ADR 0032, cli ADR 0080): no key, and the id still addresses the Flow.
+	displayLabel: z.string().optional(),
 	// The Tally label a Levy reads the Flow under, such as an income class for tax (cli ADR-0010).
 	label: z.string().optional(),
 	target: z.string().optional(),

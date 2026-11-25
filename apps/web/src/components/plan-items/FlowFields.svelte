@@ -44,8 +44,9 @@ let {
 	{#if existing}
 		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}
-		<Field id="flow-name" label="Name" bind:value={draft.name} problem={shown.at("name")} />
+		<Field id="flow-name" label="Id" hint="The name this plan addresses the item by; it never changes" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
+	<Field id="flow-label" label="Name" hint="Shown in place of the id, on cards, charts and pickers. Optional." bind:value={draft.label} problem={shown.at("label")} />
 	<Field id="flow-amount" label="Amount per occurrence" inputmode="decimal" hint="A decimal number, such as 9000.50" bind:value={draft.amount} problem={shown.at("amount")} />
 	<Field id="flow-frequency" label="How often" options={FREQUENCY_CHOICES} bind:value={draft.frequency} problem={shown.at("frequency")} />
 	<Field id="flow-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchors.start !== null} />
