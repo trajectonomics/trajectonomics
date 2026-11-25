@@ -12,23 +12,24 @@ describe("a scratch directory", () => {
 		await removeScratch(dir)
 	})
 
-	test.each([
-		["SIGTERM", 143],
-		["SIGINT", 130],
-	] as const)("is removed when the run gets %s, which exits %d", async (signal, code) => {
-		const isolated = await makeScratch("traj-web-scratch-test-")
-		try {
-			const child = Bun.spawn(["bun", join(import.meta.dir, "scratch-victim.ts")], {
-				env: { ...process.env, TMPDIR: isolated },
-				stdout: "pipe",
-			})
-			const made = new TextDecoder().decode((await child.stdout.getReader().read()).value).trim()
-			expect(existsSync(made)).toBe(true)
-			child.kill(signal)
-			expect(await child.exited).toBe(code)
-			expect(existsSync(made)).toBe(false)
-		} finally {
-			await removeScratch(isolated)
-		}
-	})
+	test.each([["SIGTERM"], ["SIGINT"]] as const)(
+		"is removed when the run dies by %s",
+		async (signal) => {
+			const isolated = await makeScratch("traj-web-scratch-test-")
+			try {
+				const child = Bun.spawn(["bun", join(import.meta.dir, "scratch-victim.ts")], {
+					env: { ...process.env, TMPDIR: isolated },
+					stdout: "pipe",
+				})
+				const made = new TextDecoder().decode((await child.stdout.getReader().read()).value).trim()
+				expect(existsSync(made)).toBe(true)
+				child.kill(signal)
+				await child.exited
+				expect(child.signalCode).toBe(signal)
+				expect(existsSync(made)).toBe(false)
+			} finally {
+				await removeScratch(isolated)
+			}
+		},
+	)
 })

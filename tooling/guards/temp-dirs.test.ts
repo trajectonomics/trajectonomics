@@ -30,6 +30,20 @@ describe("temporary directories made by a source file", () => {
 		expect(unremovedTempDirs(files)).toEqual([])
 	})
 
+	it("does not count an rm that appears only in a line comment", () => {
+		const files = [
+			{ path: "a.ts", text: "const d = await mkdtemp(p) // then rm(d) in the caller\n" },
+		]
+		expect(unremovedTempDirs(files)).toEqual(["a.ts"])
+	})
+
+	it("exempts a file whose helper removes the directory, and only with a reason", () => {
+		const files = [{ path: "a.ts", text: "const d = mkdtempSync(p)" }]
+		const allowed = new Map([["a.ts", "the sweep in temp-dir.ts removes it"]])
+		expect(unremovedTempDirs(files, allowed)).toEqual([])
+		expect(unremovedTempDirs(files, new Map([["b.ts", "another file"]]))).toEqual(["a.ts"])
+	})
+
 	it("reads source code outside build output and vendored skills", () => {
 		expect(isChecked("apps/web/scripts/loans.test.ts")).toBe(true)
 		expect(isChecked("tooling/release/version.test.ts")).toBe(true)

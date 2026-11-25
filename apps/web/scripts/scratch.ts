@@ -18,18 +18,20 @@ function sweep(): void {
 	made.clear()
 }
 
-/** Has the sweep also run on exit, and on SIGINT or SIGTERM (a timeout or a cancelled task). */
+/**
+ * Has the sweep also run on exit, and on SIGINT or SIGTERM (a timeout or a cancelled task). After
+ * the sweep each handler removes itself and re-raises the signal, so the parent sees a child killed
+ * by that signal rather than one that exited 128 plus its number.
+ */
 function arm(): void {
 	if (armed) return
 	armed = true
 	process.on("exit", sweep)
-	for (const [signal, code] of [
-		["SIGINT", 130],
-		["SIGTERM", 143],
-	] as const) {
+	for (const signal of ["SIGINT", "SIGTERM"] as const) {
 		process.on(signal, () => {
 			sweep()
-			process.exit(code)
+			process.removeAllListeners(signal)
+			process.kill(process.pid, signal)
 		})
 	}
 }
