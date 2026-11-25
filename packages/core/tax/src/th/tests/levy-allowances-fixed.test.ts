@@ -1,7 +1,9 @@
 import { describe, expect, it } from "bun:test"
+import { TaxValidationError } from "../../core/money"
 import { addFixedAllowances } from "../levy/allowances-fixed"
+import { emitThLevy } from "../levy/emit"
 import type { ThLevyAllowances, ThLevyProfile } from "../levy/profile-types"
-import type { ThFilingStatus } from "../types"
+import { ThAllowanceField, type ThFilingStatus } from "../types"
 import { breakdownOf, runLevy } from "./levy-build"
 import { satangOf } from "./levy-satang"
 
@@ -44,7 +46,11 @@ describe("TH 2026 Levy fixed allowances", () => {
 				filingStatus: status,
 				allowances: {
 					children: [{ birthYear: 2020 }, { birthYear: 2015 }],
-					parents: { taxpayerFather: true, taxpayerMother: true, spouseFather: true },
+					parents: {
+						taxpayerFather: true,
+						taxpayerMother: true,
+						spouseFather: status !== "married_separate",
+					},
 					disabledCareCount: 1,
 				},
 			}
@@ -68,5 +74,22 @@ describe("TH 2026 Levy fixed allowances", () => {
 			100 * (60_000 + 60_000 + 10_500 + 100_000 + 15_000 + 10_000 + 100_000),
 		)
 		expect(fixed(profile.allowances, "married_no_income_spouse")).toBe(expectedFixed(profile))
+	})
+
+	it("claims the spouse's parents on a joint Return, in the object form of parents", () => {
+		const both = { taxpayerFather: true, spouseFather: true, spouseMother: true }
+		expect(fixed({ parents: both }, "married_joint")).toBe(100 * (60_000 + 60_000 + 3 * 30_000))
+	})
+
+	it("refuses spouse parent slots on a separate Return at their own field", () => {
+		for (const slot of ["spouseFather", "spouseMother"] as const) {
+			try {
+				emitThLevy({ filingStatus: "married_separate", allowances: { parents: { [slot]: true } } })
+				expect.unreachable()
+			} catch (error) {
+				expect(error).toBeInstanceOf(TaxValidationError)
+				expect((error as TaxValidationError).field).toBe(ThAllowanceField.ParentsSpouseSlot)
+			}
+		}
 	})
 })
