@@ -1,3 +1,4 @@
+import { dismissDropped } from "./dropped-anchors.svelte.js"
 import { setQueryParam } from "./query-param.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 
@@ -10,6 +11,7 @@ import { whatIfSession } from "./what-if.svelte.js"
  */
 export function selectPlan(name: string): boolean {
 	if (!whatIfSession.requestSwitch(name)) return false
+	dismissDropped()
 	void setQueryParam("scenario", name)
 	return true
 }

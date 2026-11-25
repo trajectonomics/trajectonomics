@@ -4,7 +4,8 @@ import { dismissDropped, dropped } from "../../client/dropped-anchors.svelte.js"
 const message = $derived.by(() => {
 	const some = dropped.anchors
 	const one = some.length === 1
-	return `This change removed the household ${one ? "anchor" : "anchors"} that pinned ${some.join(", ")}, because the plan no longer holds ${one ? "that date" : "those dates"}.`
+	const change = dropped.plan === null ? "This change" : `This change to plan ${dropped.plan}`
+	return `${change} removed the household ${one ? "anchor" : "anchors"} that pinned ${some.join(", ")}, because the plan no longer holds ${one ? "that date" : "those dates"}.`
 })
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"

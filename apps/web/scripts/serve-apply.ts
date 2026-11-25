@@ -14,7 +14,7 @@ function startsPlan(edit: Edit): edit is Extract<Edit, { template: unknown }> {
 /** The CLI's own answer to a dry run of an apply: `created` when no plan of the name was stored. */
 const applyStatus = z.looseObject({ status: z.string() })
 
-/** The anchors an apply dropped (cli ADR-0048): `scenario apply` states them, and no other write does. */
+/** The anchors an apply dropped (cli ADR-0048): `scenario apply` and `scenario fork` state them (cli ADR 0076). */
 const droppedStatement = z.looseObject({ droppedAnchors: z.array(z.string()) })
 
 /** What one Edit's run came to: it ran (with the household anchors the write dropped), or the error that stopped it. */

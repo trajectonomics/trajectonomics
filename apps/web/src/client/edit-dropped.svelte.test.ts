@@ -3,6 +3,7 @@ import { render } from "svelte/server"
 import DroppedAnchorsNotice from "../components/ui/DroppedAnchorsNotice.svelte"
 import { dismissDropped, dropped } from "./dropped-anchors.svelte.js"
 import { editSession } from "./edit.svelte.js"
+import { selectPlan } from "./select-plan.svelte.js"
 import { RAN, realFetch } from "./what-if.test-support"
 
 const EDIT = { kind: "delete-plan", name: "early" } as const
@@ -27,7 +28,9 @@ describe("the household anchors a write dropped", () => {
 		expect(await editSession.run(EDIT)).toBe(true)
 		expect(dropped.anchors).toEqual(["flows.fund.end", "flows.school.start"])
 		const body = render(DroppedAnchorsNotice).body
-		expect(body).toContain("household anchors that pinned flows.fund.end, flows.school.start")
+		expect(body).toContain(
+			"This change to plan early removed the household anchors that pinned flows.fund.end, flows.school.start",
+		)
 		expect(body).toContain("Dismiss")
 	})
 
@@ -42,5 +45,21 @@ describe("the household anchors a write dropped", () => {
 		await editSession.run(EDIT)
 		dismissDropped()
 		expect(dropped.anchors).toEqual([])
+	})
+
+	test("belong to the plan the write changed, so switching plans hides the notice", async () => {
+		answer({ droppedAnchors: ["flows.fund.end"] })
+		await editSession.run(EDIT)
+		expect(dropped.plan).toBe("early")
+		expect(selectPlan("late")).toBe(true)
+		expect(dropped.anchors).toEqual([])
+		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+	})
+
+	test("fall back to the plain wording when the Edit names no plan", () => {
+		dropped.anchors = ["flows.fund.end"]
+		expect(render(DroppedAnchorsNotice).body).toContain(
+			"This change removed the household anchor that pinned",
+		)
 	})
 })

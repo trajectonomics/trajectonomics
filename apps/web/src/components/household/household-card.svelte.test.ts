@@ -33,10 +33,12 @@ function card(options: { household?: HouseholdDocument | null; editable?: boolea
 afterEach(() => {
 	editSession.error = null
 	editSession.stale = false
+	editSession.source = "form"
 })
 
 describe("the household card", () => {
 	test("shows a refused Remove household in the card, beside the control", () => {
+		editSession.source = "household"
 		editSession.error = "The plan has no household to remove."
 		const body = card()
 		expect(body).toMatch(/role="alert"[^>]*>The plan has no household to remove\./)
@@ -44,10 +46,21 @@ describe("the household card", () => {
 	})
 
 	test("shows the stale-plan notice in the card, and no alert when nothing was refused", () => {
+		editSession.source = "household"
 		editSession.stale = true
 		expect(card()).toContain("This plan changed since the page read it.")
 		editSession.stale = false
 		expect(card()).not.toContain('role="alert"')
+	})
+
+	test("shows neither another control's refusal nor its stale-plan notice", () => {
+		editSession.source = "form"
+		editSession.error = "The tax profile was refused."
+		editSession.stale = true
+		const body = card()
+		expect(body).not.toContain('role="alert"')
+		expect(body).not.toContain("The tax profile was refused.")
+		expect(body).not.toContain("This plan changed since the page read it.")
 	})
 
 	test("lists each person's role, birth month and life expectancy as the stored text", () => {

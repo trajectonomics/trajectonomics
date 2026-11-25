@@ -4,7 +4,7 @@ import type { EditInput } from "../lib/edit/edit"
 import { EDIT_SESSION_PATH } from "../lib/edit/guard"
 import type { AllowancePlan } from "../lib/snapshot/allowance-params"
 import type { ChanceInputs } from "../lib/snapshot/chance-params"
-import { dropped } from "./dropped-anchors.svelte.js"
+import { dismissDropped, showDropped } from "./dropped-anchors.svelte.js"
 import { postEdit, postPreview } from "./edit-post.js"
 import { postReread, type RereadBody } from "./reread.js"
 import { replaceSnapshot } from "./snapshot.svelte.js"
@@ -50,10 +50,10 @@ class EditSession {
 		this.busy = true
 		this.source = source
 		this.clear()
-		dropped.anchors = []
+		dismissDropped()
 		try {
 			const answer = editAnswer.safeParse(await postEdit(this.token, edit))
-			return this.settle(answer.success ? answer.data : null)
+			return this.settle(answer.success ? answer.data : null, "name" in edit ? edit.name : null)
 		} catch {
 			this.error = "The Dashboard could not reach traj. Try again."
 			return false
@@ -105,7 +105,7 @@ class EditSession {
 		return answer.ok
 	}
 
-	private settle(answer: EditAnswer | null): boolean {
+	private settle(answer: EditAnswer | null, plan: string | null): boolean {
 		if (answer === null) {
 			this.error = "The Dashboard could not read the answer to the Edit."
 			return false
@@ -118,7 +118,7 @@ class EditSession {
 			return false
 		}
 		this.result = answer.result ?? null
-		dropped.anchors = answer.droppedAnchors ?? []
+		showDropped(plan, answer.droppedAnchors ?? [])
 		replaceSnapshot(answer.snapshot)
 		return true
 	}

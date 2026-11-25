@@ -49,12 +49,15 @@ function open(next: Form | null): void {
 /** Removes the anchor of a path, as one write of the household without it. */
 async function unpin(path: string): Promise<void> {
 	if (household === null) return
-	await editSession.run({
-		kind: "set-household",
-		name,
-		contentHash,
-		household: householdWithoutAnchor(household, path),
-	})
+	await editSession.run(
+		{
+			kind: "set-household",
+			name,
+			contentHash,
+			household: householdWithoutAnchor(household, path),
+		},
+		"household",
+	)
 }
 </script>
 
@@ -80,7 +83,7 @@ async function unpin(path: string): Promise<void> {
 	<!-- A refusal shows beside the control that sent it; while the drawer is open its form shows the refusal instead. -->
 	{#if shown === null}<HouseholdFailure />{/if}
 	<Drawer open={shown !== null} {title} onClose={() => open(null)}>
-		<StaleNotice />
+		{#if editSession.source === "household"}<StaleNotice />{/if}
 		{#if shown?.form === "anchor" && household !== null}
 			<HouseholdAnchorForm {name} {household} {contentHash} flows={doc.flows} onDone={() => open(null)} />
 		{:else if shown?.form === "person"}
