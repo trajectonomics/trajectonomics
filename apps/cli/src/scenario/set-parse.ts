@@ -32,12 +32,11 @@ export function badSet(
 	return flagError("set", index, message, options)
 }
 
-/** What an empty path says, by the flag it came from: only `--set` and `--add` have an `=` to point at. */
-const EMPTY_PATH: Record<OverrideFlag, string> = {
+/** What an empty path says, by the flag it came from: only `--set` has an `=` to point at. */
+const EMPTY_PATH = {
 	set: "the path before = is empty",
 	without: "the path is empty",
-	add: "the list before = is empty",
-}
+} as const
 
 const SEGMENT = /(?:\\.|[^.])+/g
 
@@ -69,7 +68,7 @@ function unescapeSegment(part: string, index: number, flag: OverrideFlag): strin
 export function parsePath(
 	text: string,
 	index: number,
-	flag: OverrideFlag = "set",
+	flag: keyof typeof EMPTY_PATH = "set",
 ): string[] | AppError {
 	if (text === "") {
 		return flagError(flag, index, EMPTY_PATH[flag], { details: { path: text } })

@@ -137,6 +137,12 @@ describe("--decimal with nothing to read", () => {
 		refusedAt(await scenario(home, ["fork", "base", "copy", "--decimal"]))
 	})
 
+	it("is refused on a scenario apply in its override form", async () => {
+		const home = scenarioHome()
+		await applyScenario(home, "base", SCENARIO_DOCUMENT)
+		refusedAt(await scenario(home, ["apply", "base", "--without", "flows.rent", "--decimal"]))
+	})
+
 	it("still reads a --set or an --add item", async () => {
 		const home = await projectionHome()
 		const set = await projection(home, [
