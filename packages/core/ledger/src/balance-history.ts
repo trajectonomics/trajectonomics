@@ -20,7 +20,9 @@ export interface BalanceHistory {
 	/**
 	 * The first date from `from` (inclusive) to `before` (exclusive; none means no end) on which the
 	 * Leaf Account's Balance, with `shift` Minor Units added to it, is not a safe integer, and the
-	 * sum it reaches. With `worse`, a date on which the Balance is already outside the range without `shift`, and `shift` leaves it no further out, is not counted. The Ledger read alone is not asked about: the Leaf's own Postings are. It
+	 * sum it reaches. With `worse`, a date on which the Balance is already outside the range without
+	 * `shift`, and `shift` leaves it no further out, is not counted. The Ledger read alone is not asked
+	 * about: the Leaf's own Postings are. It
 	 * answers in constant time once the Leaf's reach is noted, which is on its first question.
 	 */
 	readonly overflow: (

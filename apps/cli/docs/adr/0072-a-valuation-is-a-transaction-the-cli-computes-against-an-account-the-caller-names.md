@@ -64,7 +64,7 @@ A valuation was checked only at its own date, so one could be written that a tra
 `AMOUNT_OVERFLOW`. A write now refuses before it writes when, once every write of the batch is in, a dated Balance of the valued
 account or of its `--against` account, on an entry's date or later, is outside the safe range and the batch made it worse than the
 Ledger had it. The refusal is `AMOUNT_OVERFLOW` at the entry's `value` field (the entry that began the stretch the Balance overflows
-in), it names the account and the first date that overflows, and a batch that refuses writes nothing. The wording says "a later Balance"
+in), it names the account and the first date on which the write leaves the Balance outside the safe range and worse than the Ledger had it, and a batch that refuses writes nothing. The wording says "a later Balance"
 only when that date is after the entry's own. Dates the batch's own writes cut apart are checked each against its own total, so a later
 entry of the same batch that brings the Balance back in range is accepted, and an entry that pushes a Balance over is the one named.
 An overflow the Ledger already holds on a date, at least as large as the one the write leaves there, is not the entry's: each date of

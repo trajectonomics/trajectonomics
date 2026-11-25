@@ -30,8 +30,9 @@ function refusalOf(
  * against, on the entry's date or later, outside the safe range once every write of the batch is
  * in, and worse than the Ledger left it. Each account's writes cut its dates into stretches the
  * batch holds one total over, and the history answers each stretch from the reach it noted once,
- * so an entry costs no scan of the Ledger. A refusal names the account and the first date that
- * overflows, at the entry that began the stretch. An overflow the Ledger already holds on a date, at
+ * so an entry costs no scan of the Ledger. A refusal names the account and the first date on which
+ * the write leaves the Balance outside the safe range and worse than the Ledger had it, at the entry
+ * that began the stretch. An overflow the Ledger already holds on a date, at
  * least as large as the one the write leaves there, is not the entry's, so the dates it is judged on
  * are each compared with the Ledger's own Balance that day, not only the first.
  */
