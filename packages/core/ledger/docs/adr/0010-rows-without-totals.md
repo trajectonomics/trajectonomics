@@ -21,3 +21,12 @@ has neither Dimensions nor the trial balance's columns.
 - **Return the rows on the thrown error.** Rejected: an error carrying a result is a second return channel, and the error's `field` is its whole contract.
 - **Make `totals` nullable on the result.** Rejected: it changes a published type for every caller, and the CLI is the only one that wants it.
 - **Rebuild the rows in the CLI.** Rejected: the Dimension filter and the period rules are this package's (CLI AGENTS rule 3).
+
+## Addendum: whether the columns agree, without a total (2026-11-25, issue #546)
+
+`doctor` asks only whether a Trial Balance's Debit and Credit columns are equal, and the rows from `trialBalanceRows` were enough to ask it, but the sum a caller would write in `number` can leave the safe range
+(CLI ADR-0079). The decision:
+
+- **One more additive export, `trialBalanceAgrees`,** with the arguments of `trialBalance`: per `(Entity, Currency)` it sums Debit minus Credit over `trialBalanceRows` in `BigInt` and returns whether every pair is zero. No sum is
+  converted to a safe integer, so it never throws for a total; a row out of range is refused at its row as in `trialBalanceRows`. No new `LedgerErrorCode`, so the pull request is `fix:`.
+- **Considered: have the CLI sum the rows itself.** Rejected: the comparison is a rule of the Trial Balance, and the CLI does not reimplement a core's rules (CLI AGENTS rule 3).
