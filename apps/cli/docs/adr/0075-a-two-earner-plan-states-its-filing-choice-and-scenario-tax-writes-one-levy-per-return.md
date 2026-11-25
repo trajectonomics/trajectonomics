@@ -207,3 +207,36 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   projection now agree instead of the second refusing what the first stored. The Dashboard's
   `isFilerPlan` reads the same rule from `document.levies`, so a plan whose labels are all bare but
   whose Levy tallies suffixes is still a Filer plan.
+
+## Amended (2026-11-26): the interest on a loan borrowed together is stated once (#606)
+
+This is the follow-up the shared home-loan ceiling left above.
+
+- **The flag.** `--mortgage-interest shared=<amount>` states the interest on one loan borrowed
+  together, beside each person's own `--mortgage-interest [<person>=]<amount>`. A household with
+  Owners cannot name a person `shared` (cli ADR-0076), so the word is never a Filer's id. No other flag
+  takes it.
+- **The split.** Each separate Return claims half, and an odd satang goes to the holder, as the other
+  shared splits do. With one Filer, that person claims it all: if only one spouse has income, that
+  spouse claims all the interest, and a borrower with no income claims nothing (s.47(1)(ซ),
+  [tax research](../../../../packages/core/tax/docs/research/separate-filing.md)). The split is made
+  at each write from the stored total, so a later write follows a new holder or a second income.
+- **The ceilings.** `thSeparateClaimProblems` receives the two shares, with `sharedMortgage`, and its
+  `MORTGAGE_OVER_CEILING` is refused at `--mortgage-interest`, with `details` naming the `problem` and
+  the `persons`. Each person's own interest is not part of that check. A Return's Levy claims its own
+  interest plus its share, and tax-core caps that sum at the 100,000 baht every Return has for all its
+  home-loan interest: a person's other loans and their part of the shared one count toward it. A sum
+  above the cap is clamped, as any claim above a ceiling is, and not refused.
+- **The stored profile** gains an optional `sharedMortgageInterest`, the total as stated, left out at
+  zero. The flat `mortgageInterest` and each entry of `returns` stay a person's own and never include a
+  share, so no write counts it twice. `--merge` replaces it (`shared=0` removes it), `--merge` and
+  `--from-stored` otherwise keep it, and a write of the whole profile (`--tax`) states it anew.
+- **Other statuses.** `shared=` is refused, as `invalid_input` at `--mortgage-interest`, unless the
+  write is a `married_separate` one with Filers. A value already stored is kept under another status,
+  or while the plan has no Filers, as the other claims are: no Levy reads it, and a later separate
+  filing takes it back. A joint Return therefore claims only the flat `mortgageInterest`, so a caller
+  who files jointly states the Return's interest there.
+- **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
+  once the profile states shared interest, because the person has said which interest is shared. The
+  CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
+  note is added as before, and now names the flag.

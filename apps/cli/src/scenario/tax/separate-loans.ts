@@ -9,23 +9,28 @@ import { records } from "./json"
 /*
  * A loan borrowed together shares one home-loan ceiling between two separate Returns, while each
  * person's own other loans count toward their own (tax ADR-0010). A liability has no kind and a
- * claim names no loan, so the CLI cannot tell which the interest is on: it allows each Return its
- * own ceiling and says so in the result (cli ADR-0075).
+ * claim names no loan, so the CLI cannot tell which a Return's own interest is on: unless the caller
+ * states the shared loan's interest as such, it takes the loans to be separate and says so in the
+ * result (cli ADR-0075).
  */
 
 const PATH = "allowances.mortgageInterestCeiling"
 
 const CEILING = TH_2026_PARAMETERS.allowances.mortgageInterestCeiling.toLocaleString("en-US")
 
-const NOTE = `Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns. If it is one loan borrowed together, state each Return's share so the two total at most ${CEILING} baht.`
+const NOTE = `Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns. If it is one loan borrowed together, state its interest as --mortgage-interest shared=<amount> instead, which splits it half to each Return under one ceiling of ${CEILING} baht.`
 
-/** Whether two Filers each state home-loan interest while the household says both own a loan. */
+/**
+ * Whether two Filers each state home-loan interest while the household says both own a loan, and no
+ * interest is stated as that of a shared loan.
+ */
 export function assumesSeparateLoans(
 	request: TaxRequest,
 	scope: FilerScope | null,
 	document: ScenarioDocument,
 ): boolean {
 	if (scope?.kind !== "separate" || scope.filers.length < 2) return false
+	if ((request.sharedMortgageInterest ?? 0) > 0) return false
 	const claimed = scope.filers.every(
 		(filer) => (request.returns?.[filer]?.allowances.mortgageInterest ?? 0) > 0,
 	)

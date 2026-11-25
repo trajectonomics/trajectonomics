@@ -60,7 +60,7 @@ export const taxOutput: z.ZodType<TaxOutputView> = z.strictObject({
 	assumptions: assumptionsField
 		.optional()
 		.describe(
-			"The tax figures the stored Levies would use whose source is not yet confirmed, for the labels the Scenario's Flows carry; absent when --none wrote no Levy. A Projection's `taxYears` say which year used which. Where two separate Returns each state home-loan interest and both own a loan, the ceiling's note says each Return's interest is taken to be on separate loans.",
+			"The tax figures the stored Levies would use whose source is not yet confirmed, for the labels the Scenario's Flows carry; absent when --none wrote no Levy. A Projection's `taxYears` say which year used which. Where two separate Returns each state home-loan interest, both own a loan and no interest is stated as shared (--mortgage-interest shared=), the ceiling's note says each Return's interest is taken to be on separate loans.",
 		),
 	scenario: writtenScenario,
 })
