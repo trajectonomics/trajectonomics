@@ -9,6 +9,7 @@ import { selectPlan } from "../client/select-plan.svelte.js"
 import { shellPanels } from "../client/shell.svelte.js"
 import { currentSnapshot, loadSnapshot } from "../client/snapshot.svelte.js"
 import { whatIfSession } from "../client/what-if.svelte.js"
+import PlanDrawer from "../components/plans/PlanDrawer.svelte"
 import { brandArtwork } from "../components/shell/brand-artwork"
 import DisplayOptions from "../components/shell/DisplayOptions.svelte"
 import PrintHeader from "../components/shell/PrintHeader.svelte"
@@ -19,18 +20,20 @@ import { editsShown } from "../lib/edit/shown"
 import { hasLevy } from "../lib/snapshot"
 import { hasCashflow } from "../lib/view/cashflow/cashflow"
 import { hasMilestones, projectionRead } from "../lib/view/milestones/milestones"
-import { scenarioNames } from "../lib/view/plan"
+import { projectedRows, scenarioNames } from "../lib/view/plan"
 import { documentRead } from "../lib/view/plan-items/document"
 import { printHeading } from "../lib/view/print-header"
 import { chooseScenario } from "../lib/view/projection/scenario"
-import { navPath, routeAt } from "../lib/view/routes"
+import { navPath, pageTitle } from "../lib/view/routes"
 import { isDemo } from "../lib/view/snapshot-url"
 
 let { children }: { children: Snippet } = $props()
 const artwork = brandArtwork(mark)
 const names = $derived(scenarioNames(currentSnapshot()))
+// What the Snapshot says of each plan the pages can show: the Main tag, the notes icon and the menus.
+const rows = $derived(projectedRows(currentSnapshot()))
 const selected = $derived(chooseScenario(names, queryParam("scenario", "")) ?? "")
-const title = $derived(routeAt(navPath(page.url.pathname))?.label ?? "Dashboard")
+const title = $derived(pageTitle(page.url.pathname))
 // Edit controls show only when the server answered the token, and never in the Demo snapshot.
 const editable = $derived(editsShown(editSession.token, page.url.search))
 // The planner pages are listed only when the Snapshot holds the selected plan's read of its items.
@@ -72,16 +75,18 @@ $effect(() => {
 	{selected}
 	onPlan={selectPlan}
 	{editable}
+	{rows}
 	{planDocument}
 	{milestones}
 	{cashflow}
 	{levy}
 />
+<PlanDrawer />
 <!-- While the menu drawer is open on a narrow screen, the page behind it is inert: Tab stays in the drawer. -->
 <div inert={shellPanels.menu} class="flex min-h-screen min-w-0 flex-1 flex-col print:pl-0 lg:pl-60">
 	<ShellTopBar {title} />
 	<WhatIfBar />
-	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+	<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 print:px-0">
 		<PrintHeader heading={printed} />
 		{@render children()}
 	</main>

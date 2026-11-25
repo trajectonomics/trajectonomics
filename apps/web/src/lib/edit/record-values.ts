@@ -8,8 +8,13 @@ import { z } from "zod"
 import type { AccountList } from "../contract"
 import { isValidDate } from "../snapshot/dates"
 
-/** The most rows one Edit may carry: a long chart of accounts, and well under the body cap. */
-export const RECORD_VALUES_MAX_ROWS = 200
+/**
+ * The most rows one Edit may carry. A balance history imported from a spreadsheet is accounts times months:
+ * 4,000 is 33 accounts for ten years of month-ends, and a row is at most about 200 bytes of JSON, so a full
+ * batch is under the server's 1 MiB body cap (`record-values.test.ts` pins it). It is under the CLI's own
+ * limit of 5,000 values a document, which is why a history is one Edit, written in one transaction or none.
+ */
+export const RECORD_VALUES_MAX_ROWS = 4000
 
 /** The longest value text one row may carry: `traj` reads a plain decimal, which is far shorter. */
 export const RECORD_VALUE_MAX_LENGTH = 40
@@ -35,6 +40,8 @@ export const recordValuesSchema = z.strictObject({
 	kind: z.literal("record-values"),
 	against: accountId,
 	values: z.array(recordedValue).min(1).max(RECORD_VALUES_MAX_ROWS),
+	// A preview runs the dry run only and answers its result: nothing is written, and no Snapshot is read again.
+	preview: z.literal(true).optional(),
 })
 export type RecordValuesEdit = z.infer<typeof recordValuesSchema>
 

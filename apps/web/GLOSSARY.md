@@ -29,16 +29,24 @@ The list of argv a Snapshot needs, computed from the parameters alone. Stage one
 _Avoid_: pipeline, workflow, job, script
 
 **Edit**:
-A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` writes, copy a plan, apply a Scenario document, delete a plan, or record values in the ledger. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot (and, for recorded values, what `traj` stated) or the CLI's error envelope.
+A write the page asks the server to run: one of a closed list (`src/lib/edit/edit.ts`) of `traj` writes, copy a plan, apply a Scenario document, delete a plan, rename it, keep notes on it, mark the main plan, or record values in the ledger. The server runs it dry, then for real, then re-reads the Snapshot, and answers with the new Snapshot (and, for recorded values, what `traj` stated) or the CLI's error envelope.
 _Avoid_: save, mutation, update, PATCH, request, write
 
 **Value sheet**:
 The drawer on the Net worth page, "Record today's values": one row per open asset and liability Leaf Account, grouped by the top-level account each asset sits under (or "Assets" when it has no parent) and "Debts", each with its last Balance, the date of its last Transaction and a field for today's value. A row with a typed value is changed, and Save sends every changed row as one `record-values` Edit. The page sends the text as typed and shows `before → value` and the difference as `traj` stated them.
-_Avoid_: form, import, reconciliation, balance update
+_Avoid_: form, reconciliation, balance update
 
 **Count against**:
 The income or equity Leaf Account that a recorded value's difference is counted against, chosen once from the ledger's own accounts and kept for the session. The page never makes one: with none, it shows the `traj account add` command to run.
 _Avoid_: offset, contra account, source account
+
+**Balance history import**:
+The three-step drawer on the Net worth page, "Import a balance history", that turns a spreadsheet into one `record-values` Edit: **Load** (pasted text or a CSV or TSV file, in one of three layouts, with a required header row), **Match** (each account of the table matched to a Leaf Account of the ledger, or skipped) and **Review** (the count, the dates, the Count against account and a Preview). The page reads the text and converts no amount; a date it cannot read unambiguously is a row to fix, and a Buddhist-era year is read as input and never written. Nothing is written until Import, and Cancel forgets the draft.
+_Avoid_: upload, sync, migration, bulk edit, reconciliation
+
+**Preview**:
+The `record-values` Edit with `preview: true`: the server runs `traj`'s dry run only and answers its result, with no write and no new Snapshot. The Review step shows it as what would be recorded, or every refused value at its row and column in the table.
+_Avoid_: simulation, validation, test run, draft
 
 **Household**:
 The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.
@@ -216,3 +224,19 @@ _Avoid_: real target, indexed amount
 **Planned move**:
 A `transfer` Flow: money moved between the plan's own Accounts, or onto a loan, outside income, spending and saving. It changes no net worth, and counts a gain for tax only when `realise` is on.
 _Avoid_: rebalance, switch, transfer (as a page word)
+
+**Main plan**:
+The one plan the ledger marks as the person's real plan (`scenario main`). It is a label and not a default for a `traj` read: the Dashboard lists it first, opens its pages on it, and Home follows it unless the address bar names another plan.
+_Avoid_: default plan, primary plan, active plan
+
+**Plan notes**:
+The plain text a plan keeps about what it assumes (`scenario notes`), outside the Scenario document and its hash. A card shows the first line and opens the rest; the switcher shows a notes icon beside a plan that has some.
+_Avoid_: comment, description, memo
+
+**Plans page**:
+`/plans/`: one card for each plan the dashboard projects, side by side, the main plan first and then by name. A plan the ledger holds that the dashboard was not started with is listed by name as not projected, with an action to add it.
+_Avoid_: compare page, plan list, portfolio
+
+**Range**:
+The control of the Plans page that narrows every chart to the first 10, 20 or 30 yearly rows of its plan, or shows the whole plan. It chooses which of `traj`'s rows are drawn and computes no date or figure.
+_Avoid_: zoom, period, window

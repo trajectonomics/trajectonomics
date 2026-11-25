@@ -68,19 +68,28 @@ describe("SiteNavLinks", () => {
 })
 
 describe("PlanSwitcher", () => {
-	test("offers each Scenario name and selects the one the pages show", () => {
+	beforeEach(() => setTestUrl("http://127.0.0.1/net-worth/"))
+
+	test("lists each Scenario name and marks the one the pages show", () => {
 		const { body } = render(PlanSwitcher, {
 			props: { names: ["base", "retire-early"], selected: "retire-early", onChange: noop },
 		})
-		expect(body).toContain("<select")
-		expect(body).toContain("Scenario")
-		expect(body).toMatch(/<option value="base"/)
-		expect(body).toMatch(/<option value="retire-early" selected/)
+		expect(body).toContain("Plans")
+		expect(body.match(/<button[^>]*aria-current="true"[^>]*>\s*retire-early/)).not.toBeNull()
+		expect(body.match(/aria-current="true"/g)).toHaveLength(1)
+		expect(body).toMatch(/>\s*base\s*</)
 	})
 
 	test("is hidden when the Snapshot names no Scenario", () => {
 		const { body } = render(PlanSwitcher, { props: { names: [], selected: "", onChange: noop } })
-		expect(body).not.toContain("<select")
+		expect(body).not.toContain("Plans")
+	})
+
+	test("links to every plan side by side, whether or not the server answers Edits", () => {
+		const { body } = render(PlanSwitcher, {
+			props: { names: ["base"], selected: "base", onChange: noop },
+		})
+		expect(body).toMatch(/href="\/plans\/"[\s\S]*?See every plan/)
 	})
 })
 
@@ -136,10 +145,20 @@ describe("the plan actions", () => {
 		const readOnly = render(PlanSwitcher, { props: { names, selected: "base", onChange: noop } })
 		expect(readOnly.body).not.toContain("Copy plan")
 		expect(readOnly.body).not.toContain("Delete plan")
+		expect(readOnly.body).not.toContain("New plan")
+		const rows = [{ name: "base", contentHash: "h", main: false, hasNotes: false, projected: true }]
 		const editing = render(PlanSwitcher, {
-			props: { names, selected: "base", onChange: noop, editable: true },
+			props: { names, selected: "base", onChange: noop, editable: true, rows },
 		})
-		expect(editing.body).toContain("Copy plan")
-		expect(editing.body).toContain("Delete plan")
+		for (const words of [
+			"Rename",
+			"Notes",
+			"Make this my main plan",
+			"Copy plan",
+			"Delete plan",
+			"New plan",
+		]) {
+			expect(editing.body).toContain(words)
+		}
 	})
 })
