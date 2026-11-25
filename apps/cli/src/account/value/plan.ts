@@ -8,7 +8,8 @@ import {
 	type Planned,
 	type TxPlanner,
 } from "../../store"
-import { type Applied, applyEntry } from "./apply"
+import { applyEntry } from "./apply"
+import { type Batch, startBatch } from "./batch"
 import { type StoredValuation, storedValuations } from "./later"
 import { againstOf, inApplyOrder, prepareAll } from "./prepare"
 import { rejection } from "./rejection"
@@ -16,7 +17,7 @@ import type { Prepared, Refusal, Valuation, ValuedRow, ValueRequest } from "./ty
 
 export type { Valuation, ValuedRow, ValueRequest } from "./types"
 
-type Run = { applied: Applied; valued: ValuedRow[]; failed: Refusal[] }
+type Run = { batch: Batch; valued: ValuedRow[]; failed: Refusal[] }
 
 /** Applies the entries in order; the core's refusal of one is listed at its own field. */
 function applyAll(
@@ -26,10 +27,10 @@ function applyAll(
 	stored: readonly StoredValuation[],
 	ready: readonly Prepared[],
 ): Run {
-	const run: Run = { applied: { pending: [], writes: [] }, valued: [], failed: [] }
+	const run: Run = { batch: startBatch(ledger, against, stored), valued: [], failed: [] }
 	for (const entry of inApplyOrder(ready)) {
 		try {
-			run.valued.push(applyEntry(ledger, against, stored, run.applied, entry))
+			run.valued.push(applyEntry(run.batch, entry))
 		} catch (error) {
 			if (!(error instanceof LedgerValidationError)) throw error
 			const at = request.path(entry.index, "value")
@@ -52,7 +53,7 @@ export function planValues(request: ValueRequest): TxPlanner<Valuation> {
 		if (refused.length > 0) return rejection(request, refused)
 		const run = applyAll(request, ledger, against, storedValuations(ledger, rows), ready)
 		if (run.failed.length > 0) return rejection(request, run.failed)
-		const writes: readonly NewTransaction[] = run.applied.writes
+		const writes: readonly NewTransaction[] = run.batch.writes
 		return { writes, value: { against, rows: run.valued } }
 	}
 }
