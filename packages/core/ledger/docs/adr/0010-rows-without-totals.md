@@ -29,4 +29,5 @@ has neither Dimensions nor the trial balance's columns.
 
 - **One more additive export, `trialBalanceAgrees`,** with the arguments of `trialBalance`: per `(Entity, Currency)` it sums Debit minus Credit over `trialBalanceRows` in `BigInt` and returns whether every pair is zero. No sum is
   converted to a safe integer, so it never throws for a total; a row out of range is refused at its row as in `trialBalanceRows`. No new `LedgerErrorCode`, so the pull request is `fix:`.
+- **`columnsAgree` is exported too,** the row half whose argument is the rows a caller already holds: the CLI's `doctor` reads them once through the Trial Balance report and asks this instead of scanning the Ledger again (#560).
 - **Considered: have the CLI sum the rows itself.** Rejected: the comparison is a rule of the Trial Balance, and the CLI does not reimplement a core's rules (CLI AGENTS rule 3).
