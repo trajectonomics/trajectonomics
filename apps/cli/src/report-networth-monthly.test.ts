@@ -1,8 +1,12 @@
 import { describe, expect, it } from "bun:test"
+import { isAppError } from "./errors"
 import { ACCOUNT_HINT } from "./hint"
 import { FIXTURE_AS_OF, fixtureHome, overflowRows, seededHome } from "./ledger-fixture"
+import { netWorthOf, netWorthReader } from "./report/networth"
+import { type MonthlyInput, netWorthMonthlyOf } from "./report/networth-monthly"
 import { longRows, monthEnds, singleReads } from "./report-networth-monthly.test-support"
-import { ledgerHome } from "./store/testing"
+import type { Ledger } from "./store"
+import { ledgerHome, must, mustOpen } from "./store/testing"
 import { capture, errorOf } from "./test-support"
 
 function monthly(home: string, ...args: string[]) {
@@ -89,6 +93,49 @@ describe("report networth --monthly", () => {
 		const home = fixtureHome()
 		const args = ["--since", "2026-01-01", "--until", FIXTURE_AS_OF]
 		expect(await monthly(home, ...args)).toEqual(await monthly(home, ...args))
+	})
+})
+
+/** The fixture Ledger with its first Transaction listed twice: a damaged database the scan refuses. */
+function duplicated(): Ledger {
+	const store = mustOpen(fixtureHome())
+	const ledger = must(store.ledger())
+	store.close()
+	const [first] = ledger.transactions
+	if (first === undefined) throw new Error("the fixture holds no Transaction")
+	return { ...ledger, transactions: [first, ...ledger.transactions] }
+}
+
+describe("report networth --monthly on a Ledger the scan refuses", () => {
+	it("hands back the scan's refusal once, in place of a reader", () => {
+		const read = netWorthReader(duplicated())
+		expect(isAppError(read)).toBe(true)
+		expect(isAppError(read) && read.body).toMatchObject({
+			code: "DUPLICATE_TRANSACTION_ID",
+			exitCode: 3,
+		})
+	})
+
+	it("is the call's own refusal, whatever range it names", () => {
+		const ledger = duplicated()
+		const single = netWorthOf(ledger, FIXTURE_AS_OF)
+		if (!isAppError(single)) throw new Error("the duplicated Ledger was read")
+		const ranges: MonthlyInput[] = [
+			{ since: "2026-01-01", until: FIXTURE_AS_OF },
+			{ until: FIXTURE_AS_OF },
+			// No month-end falls inside this range, and the refusal still states itself.
+			{ since: "2026-03-05", until: "2026-03-10" },
+		]
+		for (const range of ranges) {
+			const res = netWorthMonthlyOf(ledger, range)
+			expect(isAppError(res)).toBe(true)
+			expect(isAppError(res) && res.body).toEqual(single.body)
+		}
+	})
+
+	it("still checks the range before it reads the Ledger", () => {
+		const res = netWorthMonthlyOf(duplicated(), { since: "2026-02-01", until: "2026-01-01" })
+		expect(isAppError(res) && res.body).toMatchObject({ code: "INVALID_PERIOD", path: "since" })
 	})
 })
 

@@ -1,6 +1,7 @@
 import { z } from "zod"
 import type { NetWorthResult } from "./networth"
 import { recordStartShape } from "./record"
+import { totalRefusal } from "./total"
 import { reportRow, totalView } from "./view"
 
 /** The single-date result: `--as-of`'s data, and each month of the monthly form. */
@@ -10,7 +11,15 @@ export const resultSchema: z.ZodType<NetWorthResult> = z.strictObject({
 	rows: z
 		.array(reportRow)
 		.describe("The asset and liability Leaf Accounts behind the total, in `account list` order."),
-	totals: z.array(totalView).describe("Assets minus liabilities, one entry per currency."),
+	totals: z
+		.array(totalView)
+		.nullable()
+		.describe(
+			"Assets minus liabilities, one entry per currency; null when the accounts' sum leaves the safe range, and `totalsError` says so. Every row is still stated.",
+		),
+	totalsError: totalRefusal
+		.optional()
+		.describe("Why `totals` is null, present only then. The call still exits 0."),
 	hint: z
 		.string()
 		.optional()

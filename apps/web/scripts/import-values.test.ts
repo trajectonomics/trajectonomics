@@ -120,7 +120,7 @@ describe("importing a balance history", () => {
 			// The CLI's own totals at the first and the last imported month-end: the two values stated, added by traj.
 			const totals = snapshot
 				.parse(imported.answer.snapshot)
-				.reads.netWorthHistory.map((read) => (read.ok ? read.data.totals[0]?.amount : null))
+				.reads.netWorthHistory.map((read) => (read.ok ? read.data.totals?.[0]?.amount : null))
 			expect(totals[0]).toBe("300000.00")
 			expect(totals[11]).toBe("333000.00")
 		},
