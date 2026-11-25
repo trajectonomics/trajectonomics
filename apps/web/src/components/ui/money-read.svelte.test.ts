@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { createRawSnippet } from "svelte"
 import { render } from "svelte/server"
 import type { Read } from "../../lib/contract"
+import DirectedMoney from "./DirectedMoney.svelte"
 import Money from "./Money.svelte"
 import ReadView from "./ReadView.svelte"
 
@@ -40,6 +41,38 @@ describe("Money", () => {
 		const signed = render(Money, { props: { amount: "-5.00", hidden: false, signed: true } }).body
 		expect(plain).not.toContain("text-destructive")
 		expect(signed).toContain("text-destructive")
+	})
+})
+
+describe("DirectedMoney", () => {
+	test("reads a row's sign as money in or money out, whatever the account type", () => {
+		const refund = render(DirectedMoney, {
+			props: { amount: "-1500.00", kind: "money", currency: "THB" },
+		}).body
+		expect(refund).toContain("Money in")
+		expect(refund).toContain("1,500.00")
+		expect(refund).toContain('title="The ledger states −1,500.00 THB"')
+		const reversal = render(DirectedMoney, { props: { amount: "700.00", kind: "money" } }).body
+		expect(reversal).toContain("Money out")
+		expect(reversal).toContain("700.00")
+	})
+
+	test("reads a liability's sign as what you owe, or as what is owed to you", () => {
+		expect(render(DirectedMoney, { props: { amount: "-200.00", kind: "owed" } }).body).toContain(
+			"You owe",
+		)
+		const overpaid = render(DirectedMoney, { props: { amount: "50.00", kind: "owed" } }).body
+		expect(overpaid).toContain("Owed to you")
+		expect(overpaid).toContain("50.00")
+	})
+
+	test("gives zero no direction word, whether the CLI writes a sign or not", () => {
+		for (const amount of ["0.00", "-0.00"]) {
+			const { body } = render(DirectedMoney, { props: { amount, kind: "money" } })
+			expect(body).toContain("0.00")
+			expect(body).not.toContain("Money in")
+			expect(body).not.toContain("Money out")
+		}
 	})
 })
 

@@ -38,7 +38,7 @@ export function assetBars(
 	return [...groups].map(([currency, segments]) => ({ currency, segments }))
 }
 
-/** The liability rows, in the order the CLI lists them. Their amounts stay negative, as stated. */
+/** The liability rows, in the order the CLI lists them, with the CLI's signed amounts. */
 export function liabilityRows(rows: readonly AmountRow[]): AmountRow[] {
 	return rows.filter((row) => row.type === "liability")
 }
