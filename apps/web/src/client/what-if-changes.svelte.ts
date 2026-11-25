@@ -34,11 +34,9 @@ export class WhatIfChanges extends WhatIfState {
 	 * while Apply or Save runs. True when it was made.
 	 */
 	setOff(plan: string, contentHash: string, path: string, off: boolean): boolean {
-		if (this.saving) return false
-		const base = this.sessionFor(plan, contentHash)
-		if (base === null) return false
-		this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
-		return true
+		const base = this.saving ? null : this.sessionFor(plan, contentHash)
+		if (base !== null) this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
+		return base !== null
 	}
 
 	/** Makes the Sets of the edited item's changed fields, replacing an earlier try: the drawer's "Try a value". Returns the fields it cleared. */
@@ -52,9 +50,11 @@ export class WhatIfChanges extends WhatIfState {
 	): string[] {
 		const base = this.saving ? null : this.sessionFor(plan, contentHash)
 		if (base === null) return []
+		if (itemSets(list, id, stored, edited).length === 0 && isOff(base, `${list}.${id}`))
+			return clearedFields(stored, edited)
 		let next = withoutItemChanges(base, list, id)
 		for (const set of itemSets(list, id, stored, edited)) next = withSet(next, set.path, set.value)
-		if (next !== base) this.keep(next)
+		this.keep(next)
 		return clearedFields(stored, edited)
 	}
 

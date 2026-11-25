@@ -1,7 +1,5 @@
 <script lang="ts">
-import { currentSearch } from "../../client/location.svelte.js"
 import type { ScenarioFlow } from "../../lib/contract"
-import { householdHref } from "../../lib/view/household/model"
 import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
@@ -58,8 +56,8 @@ let {
 	{#if draft.frequency !== "once" || anchors.end !== null}
 		<Field id="flow-end" label="Ends" hint={draft.frequency === "once" ? "A once Flow ends when it starts." : "YYYY-MM-DD, or empty to run to the horizon"} bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
 		{#if anchors.end !== null}<AnchoredNote anchor={anchors.end} plan={name} />{/if}
-		{#if trying && draft.frequency === "once" && anchors.end !== null}
-			<p class="-mt-3 text-sm text-destructive">A once Flow ends when it starts, so applying this one to the plan will be refused while the household sets its end {anchors.end}: <a class="underline" href={householdHref(name, currentSearch())}>change it there</a>.</p>
+		{#if trying && draft.frequency === "once" && anchors.end !== null && draft.start !== draft.end}
+			<p class="-mt-3 text-sm text-muted-foreground">A once Flow ends when it starts, so applying this one to the plan will be refused while the household sets its end {anchors.end}.</p>
 		{/if}
 	{/if}
 	<Field id="flow-growth" label="Growth" options={GROWTH_CHOICES} bind:value={draft.growth} problem={shown.at("growth")} />

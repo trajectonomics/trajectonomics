@@ -3,8 +3,8 @@ import { scenarioDocument } from "../lib/contract"
 import { employerOf } from "../lib/view/plan-items/employer"
 import { employerDraftOf } from "../lib/view/plan-items/employer-draft"
 import { planDocument } from "../lib/view/plan-items/fixtures.test-support"
-import { type FlowDraft, flowDraftOf } from "../lib/view/plan-items/flows"
-import { lensDocument, NO_CHANGES } from "../lib/what-if/lens-document"
+import { type FlowDraft, flowDraftForTry } from "../lib/view/plan-items/flows"
+import { shownPlan } from "../lib/what-if/routing"
 import { saveFlow } from "./flow-save.js"
 import { whatIfSession } from "./what-if.svelte.js"
 import { HASH, useSessionHooks } from "./what-if.test-support"
@@ -24,6 +24,16 @@ const doc = scenarioDocument.parse({
 			start: "2026-11-01",
 			end: "2050-05-14",
 			amount: "30000.00",
+			growth: "inflation",
+		},
+		{
+			id: "side",
+			kind: "income",
+			frequency: "monthly",
+			start: "2026-11-01",
+			end: "2050-05-14",
+			amount: "2000.00",
+			earned: true,
 		},
 		{
 			id: "salary-employer",
@@ -44,11 +54,11 @@ const doc = scenarioDocument.parse({
 	],
 })
 const stored = (id: string) => doc.flows.find((flow) => flow.id === id)
-const shownFlows = () => lensDocument(doc, whatIfSession.changesFor("base") ?? NO_CHANGES).flows
-/** The Flow as the drawer starts it: the session's view while a value is tried, as FlowForm does. */
-const shownFlow = (id: string) => shownFlows().find((flow) => flow.id === id) ?? stored(id)
+const shownFlows = () =>
+	whatIfSession.whatIf?.plan === "base" ? shownPlan(doc, whatIfSession.whatIf).flows : doc.flows
+/** The draft as the drawer starts it: the session's view while a value is tried, as FlowForm does. */
 const draftOf = (id: string, edit: Partial<FlowDraft>): FlowDraft => ({
-	...flowDraftOf(shownFlow(id)),
+	...flowDraftForTry(shownFlows(), id, stored(id)),
 	...edit,
 })
 
@@ -85,6 +95,25 @@ async function trySalary(edit: Partial<FlowDraft>, share?: string): Promise<void
 	expect(saved.done).toBe(true)
 }
 
+/** Tries the side income, with the employer share the form shows unless one is given. */
+async function trySide(
+	edit: Partial<FlowDraft>,
+	employer = employerDraftOf(employerOf(shownFlows(), "side")),
+): Promise<void> {
+	const saved = await saveFlow({
+		name: "base",
+		contentHash: HASH,
+		doc,
+		kind: "income",
+		existing: stored("side"),
+		draft: draftOf("side", edit),
+		employer,
+		tryValue: true,
+	})
+	expect(saved.problems).toEqual({})
+	expect(saved.done).toBe(true)
+}
+
 describe("a second try on a Flow starts from the session", () => {
 	test("a monthly Flow tried once, then a new start alone, puts its once end on the new start", async () => {
 		await tryLiving({ frequency: "once" })
@@ -101,8 +130,8 @@ describe("a second try on a Flow starts from the session", () => {
 		await tryLiving({ frequency: "monthly" })
 		const living = shownFlows().find((flow) => flow.id === "living")
 		expect(living?.frequency).toBe("monthly")
-		// The Ends field the draft now shows holds the session's end, which the first try put on the start.
-		expect(living?.end).toBe("2026-11-01")
+		// The draft reads the stored end back, not the `end = start` the once try added only for `traj`.
+		expect(living?.end).toBe("2050-05-14")
 	})
 
 	test("a salary tried once keeps its employer's share on a second try of the amount alone", async () => {
@@ -116,5 +145,28 @@ describe("a second try on a Flow starts from the session", () => {
 		// The employer's Flow lands when the salary does, so it stays once on the same date.
 		expect(employer?.flow.frequency).toBe("once")
 		expect(employer?.flow.start).toBe(salary?.start)
+	})
+
+	test("an employer share the session added survives a try of its salary as once", async () => {
+		await trySide({}, { account: "fund", share: "3", rounding: "floor" })
+		await trySide({ frequency: "once" })
+		const flows = shownFlows()
+		const side = flows.find((flow) => flow.id === "side")
+		const employer = employerOf(flows, "side")
+		expect(employer?.percent).toBe("3.00")
+		expect(employer?.flow.frequency).toBe("once")
+		expect(employer?.flow.start).toBe(side?.start)
+	})
+
+	test("clearing the employer section removes the share the session added", async () => {
+		await trySide({}, { account: "fund", share: "3", rounding: "floor" })
+		await trySide({}, employerDraftOf(null))
+		expect(whatIfSession.whatIf?.additions ?? []).toEqual([])
+	})
+
+	test("a try submitted with no edits leaves a switched-off Flow off", async () => {
+		whatIfSession.setOff("base", HASH, "flows.living", true)
+		await tryLiving({})
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(true)
 	})
 })

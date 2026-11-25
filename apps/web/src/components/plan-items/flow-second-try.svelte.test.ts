@@ -74,12 +74,29 @@ describe("a once try whose end the household pins", () => {
 		const body = fields(true)
 		expect(body).toContain("applying this one to the plan will be refused")
 		expect(body).toContain("at you, age 70")
-		expect(body).toContain('href="/projection/?scenario=base#household"')
+		expect(body).toContain("text-muted-foreground")
 	})
 
-	test("does not warn for a recurring Flow, or before the value is tried", () => {
+	test("does not warn for a recurring Flow, before the value is tried, or on the anchored date", () => {
 		expect(fields(true, { start: null, end: null })).not.toContain("will be refused")
 		expect(fields(false)).not.toContain("will be refused")
+		const onAnchor = render(FlowFields, {
+			props: {
+				draft: {
+					...flowDraftOf(salary),
+					frequency: "once",
+					start: "2026-11-01",
+					end: "2026-11-01",
+				},
+				kind: "income",
+				existing: salary,
+				shown: NO_PROBLEMS,
+				name: "base",
+				anchors: ANCHORED_END,
+				trying: true,
+			},
+		}).body
+		expect(onAnchor).not.toContain("will be refused")
 	})
 
 	test("gives the once Ends field a hint that fits it", () => {
