@@ -188,11 +188,11 @@ describe("the form in the drawer", () => {
 
 	test("an existing item's Delete asks first, and a new one has no Delete", () => {
 		const withDelete = render(ItemActions, {
-			props: { id: "salary", onDelete: () => {} },
+			props: { id: "salary", kind: "flow", onDelete: () => {} },
 		}).body
 		expect(withDelete).toContain(">Save<")
 		expect(withDelete).not.toContain("Delete salary from this plan?")
-		const noDelete = render(ItemActions, { props: { onDelete: () => {} } }).body
+		const noDelete = render(ItemActions, { props: { kind: "flow", onDelete: () => {} } }).body
 		expect(noDelete).not.toContain("Delete")
 	})
 })

@@ -14,7 +14,7 @@ The Dashboard printed ids where a person expects names ([#322](https://github.co
   - a person, by the role the household states: the holder is "You", a partner "Your partner", a dependent "Child", "Parent" or "Dependent", with the id in brackets when two people share a role;
   - a Flow and a Milestone have an `id` and no name, anywhere in the output (`scenario show`, `projection run`, `schema`).
 - **An id is not a name.** The page does not turn `car-paid-off` into "Car paid off" or capitalise a Flow's id: that is a name the CLI never stated, it is lossy (`me` cannot become "You" by a rule on the text), and a person who writes `car-paid-off` and sees "Car paid off" cannot tell which id an Edit will name. An id with no name shows in code (`<code>`, or the monospace face in a chart's label, `LineMarker.code`). The What-if bar leads with the id as it stands, as it already did for an Account the ledger does not name.
-- **An anchor is words built from its structure.** A path `flows.fund.end` is an item (`fund`, named by the lookup) and a date ("ends"), and the person reads as the household's words: "fund ends, at you, age 60". A path with no words (a field this page does not know) is shown whole, in code.
+- **An anchor is words built from its structure.** A path `flows.fund.end` is an item (`fund`, named by the lookup) and a date ("ends"), and the person reads as the household's words: "fund ends at you, age 60". A path with no words (a field this page does not know) is shown whole, in code.
 - **Pickers keep the id as the value, and an Edit still sends ids.** The label is the lookup's words; nothing in the document, the argv or a `data-*` key changes. The id stays on the household card (an "Id" row) and in every Edit.
 
 ## Considered Options

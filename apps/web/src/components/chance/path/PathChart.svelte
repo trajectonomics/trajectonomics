@@ -2,7 +2,8 @@
 import { currentItemNames } from "../../../client/item-names.svelte.js"
 import type { ProjectionPath } from "../../../lib/contract"
 import { formatDate } from "../../../lib/format"
-import { pathMarkers, RUN_OUT_LABEL } from "../../../lib/view/chance/path-view"
+import { RUN_OUT_LABEL } from "../../../lib/view/chance/path-rows"
+import { pathMarkers } from "../../../lib/view/chance/path-view"
 import { milestoneView } from "../../../lib/view/milestones/milestones"
 import { netWorthSeries } from "../../../lib/view/projection/chart"
 import { parseTerms } from "../../../lib/view/projection/terms"
@@ -30,7 +31,7 @@ const reached = $derived(milestoneView(path)?.reached ?? [])
 	</div>
 	<LineChart
 		label="Net worth at the close of each year of this future"
-		series={netWorthSeries(path, chosen)}
+		series={netWorthSeries(path, chosen, currentItemNames().people)}
 		markers={pathMarkers(path, currentItemNames())}
 		kind="bars"
 	/>

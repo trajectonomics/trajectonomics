@@ -73,5 +73,5 @@ function tryIt(): void {
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	<!-- A what-if can begin the block on a plan that has none (cli ADR 0065), so every plan can try. -->
 	<button type="button" class={button} disabled={editSession.busy || whatIfSession.saving} onclick={tryIt}>Try as a what-if</button>
-	<ItemActions />
+	<ItemActions kind="account" />
 </form>

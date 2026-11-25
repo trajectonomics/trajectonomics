@@ -112,6 +112,15 @@ describe("axisAge", () => {
 		).toBe("me 37")
 		expect(axisAge([])).toBeNull()
 	})
+
+	test("calls the first person by the household's words when the row carries several", () => {
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "partner", age: 35 },
+		]
+		expect(axisAge(ages, personNames(household))).toBe("You 37")
+		expect(axisAge([{ person: "me", age: 37 }], personNames(household))).toBe("age 37")
+	})
 })
 
 describe("householdHref", () => {

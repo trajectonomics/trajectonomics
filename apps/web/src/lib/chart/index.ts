@@ -18,6 +18,7 @@ export {
 	type RightAxis,
 	type SeriesLayout,
 } from "./line-layout"
+export { markersIn, type PlacedMarker } from "./markers"
 export { nearestIndex } from "./nearest"
 export { toChartNumber } from "./number"
 export { areaPath, bandPath, linePath, type PathPoint } from "./path"

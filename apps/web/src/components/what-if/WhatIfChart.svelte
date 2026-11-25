@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { ProjectionRun } from "../../lib/contract"
 import { parseTerms } from "../../lib/view/projection/terms"
 import { whatIfSeries } from "../../lib/view/what-if/chart"
@@ -13,7 +14,9 @@ interface Props {
 
 /** The net worth of the what-if drawn over the baseline's: the what-if solid, the baseline dashed, both named. */
 let { whatIf, baseline, terms }: Props = $props()
-const series = $derived(whatIfSeries(whatIf, baseline, parseTerms(terms)))
+const series = $derived(
+	whatIfSeries(whatIf, baseline, parseTerms(terms), currentItemNames().people),
+)
 </script>
 
 <LineChart label="Net worth at the close of each year: the what-if, solid, over the baseline, dashed" {series} />

@@ -1,7 +1,8 @@
 <script lang="ts">
 import { currentItemNames } from "../../../client/item-names.svelte.js"
 import type { ProjectionChance, ProjectionPath } from "../../../lib/contract"
-import { pathHeaderOf, pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-view"
+import { pathRowsOf, returnAccounts } from "../../../lib/view/chance/path-rows"
+import { pathHeaderOf } from "../../../lib/view/chance/path-view"
 import { parseTerms } from "../../../lib/view/projection/terms"
 import Provenance from "../../ui/Provenance.svelte"
 import PathChart from "./PathChart.svelte"

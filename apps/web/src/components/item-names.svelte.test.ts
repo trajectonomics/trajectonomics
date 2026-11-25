@@ -57,7 +57,7 @@ describe("the household's people are called by role, never by id", () => {
 		const body = household()
 		expect(body).toMatch(code("flow", "fund"))
 		expect(body).toContain("at you, age 60")
-		expect(body).toContain("at the child, age 6")
+		expect(body).toContain("at the child, age 7")
 		expect(body).not.toContain("flows.fund.end")
 		expect(body).toContain('aria-label="Remove the anchor of fund ends"')
 	})

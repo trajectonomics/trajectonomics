@@ -22,7 +22,7 @@ interface Props {
 /** The net worth chart by year, with the choice of terms in the address bar, and a mark for each reached Milestone. */
 let { run, terms, onTerms, title }: Props = $props()
 const chosen = $derived(parseTerms(terms))
-const series = $derived(netWorthSeries(run, chosen))
+const series = $derived(netWorthSeries(run, chosen, currentItemNames().people))
 const markers = $derived(milestoneMarkers(run, currentItemNames()))
 const reached = $derived(milestoneView(run)?.reached ?? [])
 </script>

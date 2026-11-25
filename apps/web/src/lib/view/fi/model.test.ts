@@ -1,7 +1,18 @@
 import { describe, expect, test } from "bun:test"
+import type { HouseholdDocument } from "../../contract"
+import { personNames } from "../item-names"
 import { bindingSentence, type UnreachableBinding } from "./binding"
 import { fiFixture, REACHABLE, REFERENCE, UNREACHABLE } from "./fixtures.test-support"
 import { fiModelOf } from "./model"
+
+const HOUSEHOLD: HouseholdDocument = {
+	schemaVersion: 1,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+	],
+	anchors: [],
+}
 
 describe("fiModelOf: the reachable branch", () => {
 	test("shows the FI month and the day it names, as the main figure", () => {
@@ -25,6 +36,18 @@ describe("fiModelOf: the reachable branch", () => {
 		const none = fiModelOf(fiFixture(REACHABLE))
 		if (none.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(none.ages).toBeNull()
+	})
+
+	test("calls each person by the household's words, so the FI page reads You", () => {
+		const ages = [
+			{ person: "me", age: 51 },
+			{ person: "partner", age: 49 },
+		]
+		const base = fiFixture(REACHABLE)
+		if (!base.fi.reachable) throw new Error("expected a reachable answer")
+		const model = fiModelOf({ ...base, fi: { ...base.fi, ages } }, personNames(HOUSEHOLD))
+		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
+		expect(model.ages).toBe("You 51, Your partner 49")
 	})
 
 	test("states the rule-of-thumb reference with its multiplier, date, basis, window and terms", () => {

@@ -68,11 +68,15 @@ export function agesText(ages: readonly PersonAge[], people: PersonNames = NO_PE
 		.join(", ")
 }
 
-/** The age under a chart's year: "age 50" for one person, "me 50" (the first person) for a household of several. Null without one. */
-export function axisAge(ages: readonly PersonAge[]): string | null {
+/** The age under a chart's year: "age 50" for one person, "You 50" (the first person, by the household's words) for a household of several. Null without one. */
+export function axisAge(
+	ages: readonly PersonAge[],
+	people: PersonNames = NO_PEOPLE,
+): string | null {
 	const [first] = ages
 	if (first === undefined) return null
-	return ages.length === 1 ? `age ${first.age}` : `${first.person} ${first.age}`
+	if (ages.length === 1) return `age ${first.age}`
+	return `${people.get(first.person)?.label ?? first.person} ${first.age}`
 }
 
 /** The link to the household card on the Overview, for the Scenario it belongs to. Keeps the other parameters. */

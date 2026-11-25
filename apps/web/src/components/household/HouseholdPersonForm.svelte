@@ -73,7 +73,7 @@ async function removePerson(): Promise<void> {
 	{#if existing}
 		<p class="text-sm text-foreground">Person <span class="font-medium"><ItemName kind="person" id={existing.id} /></span></p>
 	{:else}
-		<Field id="person-name" label="Name" hint="A short name for the person, such as me or partner" bind:value={draft.name} problem={shown.at("name")} />
+		<Field id="person-name" label="Id" hint="A short id for the person, such as me or partner. The card shows it in its Id row." bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
 	<Field id="person-role" label="Role" options={existing || household === null ? ROLE_CHOICES : ROLE_CHOICES_WITH_BLANK} bind:value={draft.role} problem={shown.at("role")} />
 	{#if draft.role === "dependent"}

@@ -59,5 +59,5 @@ async function save(event: SubmitEvent): Promise<void> {
 		{/if}
 		{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	</div>
-	<ItemActions />
+	<ItemActions kind="flow" />
 </form>
