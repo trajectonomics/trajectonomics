@@ -1,6 +1,7 @@
 /**
  * The notes the CLI states that ask the reader to check something. The words are the CLI's own (see `funding.ts`,
- * `withdraw-notes.ts` and `levies.ts`); the page only recognises them.
+ * `withdraw-notes.ts` and `levies.ts`); the page only recognises them. `scripts/warning-notes-cli.test.ts` runs the
+ * real `traj` over a scratch ledger that states each warning, so rewording one of those sentences fails a test here.
  */
 const WARNING_PATTERNS: readonly RegExp[] = [
 	/could not be funded/,
