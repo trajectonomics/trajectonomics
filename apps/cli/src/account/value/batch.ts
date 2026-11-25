@@ -1,14 +1,6 @@
 import { type BalanceHistory, balanceHistory } from "@trajectonomics/core/ledger"
-import type { AccountRow, Ledger, NewTransaction } from "../../store"
+import type { AccountRow, Ledger, NewTransaction, Step } from "../../store"
 import { datedAfter, laterValuations, type StoredValuation } from "./later"
-
-/** One write to an account: its date, what the batch has added to the account by then, and whose it is. */
-export type Step = {
-	readonly account: AccountRow
-	readonly date: string
-	readonly total: bigint
-	readonly index: number
-}
 
 /**
  * A batch being applied: the Ledger it reads, the rows it will write, and what it needs to read a

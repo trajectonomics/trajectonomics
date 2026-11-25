@@ -58,6 +58,7 @@ export const add: Leaf = defineCommand({
 		},
 	],
 	errorCodes: [
+		"AMOUNT_OVERFLOW",
 		"INVALID_ACCOUNT_HIERARCHY",
 		"INVALID_AMOUNT",
 		"CURRENCY_MISMATCH",

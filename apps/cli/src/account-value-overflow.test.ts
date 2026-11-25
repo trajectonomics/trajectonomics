@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { chartHome, value } from "./account-value-support"
+import { plant } from "./plant-test-support"
 import { cli, ledgerSize, type Traj } from "./tx-test-support"
 
 /** The most a Balance can hold, in baht: 2^53 - 1 satang. */
@@ -98,30 +99,30 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 	})
 
 	it("accepts a write that shrinks an overflow the ledger already holds", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", "90071992547399.91", "2026-01-05")
-		await own(traj, "Equity", "Fund", "11.00", "2026-01-06")
-		await own(traj, "Fund", "Food", "11.00", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", "90071992547399.91", "2026-01-05")
+		plant(home, "Equity", "Fund", "11.00", "2026-01-06")
+		plant(home, "Fund", "Food", "11.00", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).toBe(0)
 	})
 
 	it("accepts a write that cures the first overflow and shrinks a later one", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
-		await own(traj, "Equity", "Fund", "0.30", "2026-01-06")
-		await own(traj, "Equity", "Fund", "0.70", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", MOST, "2026-01-05")
+		plant(home, "Equity", "Fund", "0.30", "2026-01-06")
+		plant(home, "Equity", "Fund", "0.70", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).toBe(0)
 	})
 
 	it("refuses a write that shrinks the first overflow and worsens a later one the other way", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
-		await own(traj, "Equity", "Fund", "1.00", "2026-01-06")
-		await own(traj, "Fund", "Food", MOST, "2026-01-07")
-		await own(traj, "Fund", "Food", MOST, "2026-01-07")
-		await own(traj, "Fund", "Food", "2.00", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", MOST, "2026-01-05")
+		plant(home, "Equity", "Fund", "1.00", "2026-01-06")
+		plant(home, "Fund", "Food", MOST, "2026-01-07")
+		plant(home, "Fund", "Food", MOST, "2026-01-07")
+		plant(home, "Fund", "Food", "2.00", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).not.toBe(0)
 		expect(says(error(res))).toContain('"Fund" on 2026-01-07')

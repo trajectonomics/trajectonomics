@@ -29,6 +29,7 @@ describe("tx import schema, help and listing", () => {
 		expect(data.examples.length).toBeGreaterThan(0)
 		expect(data.errorCodes).toEqual(
 			[
+				"AMOUNT_OVERFLOW",
 				"INVALID_ACCOUNT_HIERARCHY",
 				"INVALID_AMOUNT",
 				"CURRENCY_MISMATCH",
