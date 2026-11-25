@@ -15,13 +15,13 @@ import {
 	disposeFutures,
 	editorOf,
 	PLAN,
-	page,
 	paramsOf,
 	readPath,
 	setupFutures,
 	snapshotOf,
 	trajOf,
 } from "./futures.test-support"
+import { page } from "./futures-page.test-support"
 import { answerPath } from "./serve-path"
 
 beforeAll(setupFutures, SLOW_MS)
