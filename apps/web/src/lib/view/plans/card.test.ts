@@ -71,6 +71,10 @@ describe("a card", () => {
 			"car-paid-off",
 			"net-worth-ten-million",
 		])
+		expect(base.milestones.map((milestone) => milestone.id)).toEqual([
+			"car-paid-off",
+			"net-worth-ten-million",
+		])
 	})
 
 	test("a range draws the first rows only, and drops a Milestone no drawn row holds", () => {
@@ -80,6 +84,7 @@ describe("a card", () => {
 			base.series[0]?.points.slice(0, 10).map((point) => point.x),
 		)
 		expect(ten.markers.map((marker) => marker.label)).toEqual(["car-paid-off"])
+		expect(ten.milestones.map((milestone) => milestone.id)).toEqual(["car-paid-off"])
 		// The figures on the card are the plan's, whatever the range.
 		expect(ten.netWorth).toEqual(base.netWorth)
 		expect(ten.fi).toEqual(base.fi)

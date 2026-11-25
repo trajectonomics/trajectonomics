@@ -34,10 +34,11 @@ describe("MilestonesBody", () => {
 		expect(body).toContain('Not reached by <time datetime="2028-04-01">1 Apr 2028</time>')
 	})
 
-	test("draws a mark on the chart for each reached Milestone, and repeats it in a visually hidden list", () => {
+	test("draws a mark on the chart for each reached Milestone, and repeats it in a list below", () => {
 		const body = renderBody(withMilestones(MILESTONE_ROWS))
 		expect(body).toContain("<title>first-year</title>")
-		expect(body).toContain('<ul class="sr-only">')
+		// Hidden on a wide screen, where the chart's own label has room, and visible on a phone, which has no hover.
+		expect(body).toContain('<ul class="sr-only space-y-1 text-xs sm:not-sr-only">')
 		expect(body).toMatch(
 			/data-item="first-year"[^>]*>first-year<\/code>(<!--.*?-->)*: reached on 31 Dec 2026/,
 		)

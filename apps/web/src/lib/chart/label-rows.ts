@@ -1,5 +1,5 @@
-/** A generous width for one character of a marker label in the chart's small text, in pixels. */
-const CHAR_PX = 7
+import { fitted, type LabelText, stub } from "./label-width"
+
 /** The space kept between two labels on one row, in pixels. */
 const GAP_PX = 6
 /** How far a label stands off its rule, in pixels, as `LineRules.svelte` draws it. */
@@ -9,12 +9,14 @@ const OFFSET_PX = 4
 export interface LabelledMark {
 	readonly x: number
 	readonly label: string
+	/** True when the chart draws the label in monospace, as it does an id no Read names. */
+	readonly code?: boolean
 }
 
 /** One marker's label, placed: the row it sits on and the words the chart draws for it. */
 export interface PlacedLabel {
 	readonly row: number
-	/** The label, shortened with an ellipsis when a rule leaves no room; empty when it leaves none at all. */
+	/** The label, shortened with an ellipsis to fit between the rules, or its first grapheme as a last stub. */
 	readonly text: string
 }
 
@@ -29,7 +31,9 @@ export function hangsLeft(x: number, width: number): boolean {
 /**
  * The labels of the markers, each placed. Markers in x order take the first row whose last label ends
  * before theirs starts, so no two labels overlap, and a label is shortened to the nearest rule on the
- * side it runs towards, so no label crosses a dashed rule. Row 0 is the top. Geometry only: it places text.
+ * side it runs towards, so no label crosses a dashed rule. A label with no room on that side moves to the
+ * other side of its rule, and one with no room on either keeps a visible stub instead of disappearing.
+ * Row 0 is the top. Geometry only: it places text.
  */
 export function placedLabels(marks: readonly LabelledMark[], width: number): PlacedLabel[] {
 	const ends: number[] = []
@@ -42,6 +46,8 @@ export function placedLabels(marks: readonly LabelledMark[], width: number): Pla
 		const mark = marks[index]
 		if (mark === undefined) continue
 		const [left, right, text] = place(mark, rules, width)
+		// A label with no words at all draws nothing and leaves its row free for one that has some.
+		if (text === "") continue
 		const free = ends.findIndex((end) => end + GAP_PX <= left)
 		const row = free === -1 ? ends.length : free
 		ends[row] = right
@@ -50,21 +56,34 @@ export function placedLabels(marks: readonly LabelledMark[], width: number): Pla
 	return placed
 }
 
-/** One label's box in pixels, and the words that fit in it before the rule it runs towards. */
+/** One label's box in pixels, and the words that fit in it, on whichever side of its rule has room. */
 function place(
 	mark: LabelledMark,
 	rules: readonly number[],
 	width: number,
 ): readonly [number, number, string] {
-	const leftwards = hangsLeft(mark.x, width)
-	const room = leftwards
-		? mark.x - OFFSET_PX - ruleBefore(rules, mark.x)
-		: ruleAfter(rules, mark.x) - (mark.x + OFFSET_PX)
-	const text = fitted(mark.label, room)
-	const size = text.length * CHAR_PX
+	const code = mark.code === true
+	const preferred = hangsLeft(mark.x, width)
+	const first = fitted(mark.label, room(mark.x, rules, preferred), code)
+	if (first.text !== "") return box(mark.x, preferred, first)
+	const second = fitted(mark.label, room(mark.x, rules, !preferred), code)
+	if (second.text !== "") return box(mark.x, !preferred, second)
+	const own = room(mark.x, rules, preferred)
+	const other = room(mark.x, rules, !preferred)
+	const leftwards = own >= other ? preferred : !preferred
+	return box(mark.x, leftwards, stub(mark.label, leftwards ? own : other, code))
+}
+
+/** A fitted label's box: its left edge, its right edge, and the words. */
+function box(x: number, leftwards: boolean, fitted: LabelText): readonly [number, number, string] {
 	return leftwards
-		? [mark.x - OFFSET_PX - size, mark.x - OFFSET_PX, text]
-		: [mark.x + OFFSET_PX, mark.x + OFFSET_PX + size, text]
+		? [x - OFFSET_PX - fitted.width, x - OFFSET_PX, fitted.text]
+		: [x + OFFSET_PX, x + OFFSET_PX + fitted.width, fitted.text]
+}
+
+/** The room a label at `x` has on one side, up to the nearest rule in that direction. */
+function room(x: number, rules: readonly number[], leftwards: boolean): number {
+	return leftwards ? x - OFFSET_PX - ruleBefore(rules, x) : ruleAfter(rules, x) - (x + OFFSET_PX)
 }
 
 /** The nearest rule to the left of `x`, or -Infinity when no marker stands there. */
@@ -79,12 +98,4 @@ function ruleAfter(rules: readonly number[], x: number): number {
 	let nearest = Infinity
 	for (const rule of rules) if (rule > x && rule < nearest) nearest = rule
 	return nearest
-}
-
-/** The label shortened with an ellipsis to fit `room` pixels; the whole label when it fits. */
-function fitted(label: string, room: number): string {
-	const fits = Math.floor(room / CHAR_PX)
-	if (label.length <= fits) return label
-	// A rule's `<title>` still names its marker, so a label with no room for a word and an ellipsis is left out.
-	return fits <= 1 ? "" : `${label.slice(0, fits - 1).trimEnd()}…`
 }
