@@ -43,7 +43,7 @@ Product, growth and roadmap research lives in `research/` in the private `trajec
 Saving the owner's attention is part of the job, so finish a task instead of asking about it.
 
 - Finish end-to-end: commit, push, open the PR, get an independent review, `gh pr merge` when the work is green or the owner said to proceed, then do the follow-up steps the change implies. Do not stop for small permission questions, and do not end with a `## Not done yet` list.
-- When unsure, consult subagents on other models (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`, and `deepseek-v4.1-flash` once it is available again) instead of asking the owner. The model rules above still decide which one a session may itself run.
+- When unsure, consult subagents on other models (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`, and `deepseek-v4.1-flash` once the owner says it is available again) instead of asking the owner. The model rules above still decide which one a session may itself run.
 - Merge only on CI that ran against the current `main`. A pull request whose CI ran before another merge touched the same package is merged with `main` first and checked again: on 2026-11-23 #249 and #257 each passed alone and together broke `packages/core/sim`'s check on `main`.
 - Any `traj` an agent runs for a test, validation or eval sets `DO_NOT_TRACK=1`, so it never counts as a person using `traj` in the usage telemetry that goal G1 is measured by.
 - Any `traj` an agent runs by hand sets `TRAJ_HOME` to a scratch directory it made first and checked is non-empty. An unset or empty `TRAJ_HOME` falls back to the owner's real ledger in `~/.traj`. On 2026-11-23 a development build run that way migrated that ledger to a schema no released `traj` reads, and it had to be restored from its pre-migration copy.
@@ -66,12 +66,12 @@ A brief to a free model carries this repository's code and docs only: never a se
 
 ### Claude is the work model for now (from 2026-11-25, until the owner says otherwise)
 
-On 2026-11-25 every DeepSeek route ran dry: Command Code was out of credits, the OpenCode free tier hit its limit, and OpenCode Go needs a subscription. Muse (`muse-ember-1.0`), which the owner first chose to replace DeepSeek, used up its allowance the same evening. Until the owner says otherwise, Claude does the work DeepSeek did:
-- Ladder step 2 is skipped. A brief that `claude-haiku-5-5` cannot finish goes to `claude-sonnet-5-5`.
-- `apps/site`'s work model is Claude in the same order.
-- Do not route work through Muse.
+On 2026-11-25 every DeepSeek route ran dry: Command Code was out of credits, the OpenCode free tier hit its limit, and OpenCode Go needs a subscription. Muse (`muse-ember-1.0`), which the owner first chose to replace DeepSeek, used up its allowance on 2026-11-25 too. Until the owner says otherwise, Claude agents implement directly:
 
-Rule 7 is unchanged: a Pi session still runs DeepSeek only.
+- Ladder step 2 is skipped. A brief that `claude-haiku-5-5` cannot finish goes to `claude-sonnet-5-5`.
+- `apps/site`'s work model is the same: `claude-haiku-5-5`, then `claude-sonnet-5-5`.
+
+Rule 7 is unchanged: a Pi session still runs DeepSeek only, so Pi work waits until DeepSeek is available again.
 
 ## Agent skills
 
