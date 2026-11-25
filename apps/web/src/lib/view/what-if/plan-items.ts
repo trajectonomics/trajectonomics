@@ -27,6 +27,7 @@ const ACCOUNT_FIELDS = [
 	"lockedUntil",
 	"kind",
 	"payout",
+	"payoutHow",
 	"fee",
 	"lifetimeFees",
 	"lifetimePayouts",

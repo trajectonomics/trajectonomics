@@ -1,6 +1,6 @@
 // The record-values Edit against the real traj, over the fictional ledger: three values change net worth by
 // the CLI's own differences, an equal value writes no Transaction, and a refusal writes nothing (web ADR 0008).
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import { accountValues } from "../src/lib/contract"
 import { recordValuesSchema } from "../src/lib/edit/record-values"
 import {
@@ -11,6 +11,7 @@ import {
 	SLOW_MS,
 	setupEditor,
 } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { recordValues } from "./serve-record-values"
 
 type Reads = {
@@ -54,6 +55,7 @@ async function record(rows: [string, string][], against = "Fund Return") {
 	return postEdit(JSON.stringify({ kind: "record-values", against: await idOf(against), values }))
 }
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)
 
 describe("the record-values Edit", () => {

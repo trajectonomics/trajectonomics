@@ -1,6 +1,6 @@
 // The plan-managing Edits against the real traj (web ADR 0023): a plan from the ledger, renamed, noted, made main, seen first
 // on the plans page and on Home, and the old main plan deleted after another is chosen.
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
 import { homePlan } from "../src/lib/view/overview/scenario"
 import { notProjected, planCards } from "../src/lib/view/plans/card"
@@ -16,6 +16,7 @@ import {
 	setupEditor,
 } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, PORT } from "./edit-request.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** What the page does: sends the Edit, and reads the Snapshot it answers with. */
 async function run(
@@ -47,6 +48,7 @@ function terminal(...argv: string[]): void {
 	if (done.exitCode !== 0) throw new Error(done.stderr.toString() || done.stdout.toString())
 }
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)
 
 describe("managing plans against the real traj", () => {

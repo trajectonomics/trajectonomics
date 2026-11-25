@@ -1,9 +1,10 @@
 // The Tax profile page's Edits against the real traj (cli ADR 0066, web ADR 0016): a merge changes one item and keeps the rest,
 // a whole set states the profile, a remove takes it out, a refusal names its field, and a stale save is refused. Each test
 // sets up its own state, so each passes alone.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { needsWholeProfile, taxFieldOfRefusal } from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { slow } from "./estate.test-support"
 import { disposeEstate, PLAN, post, setupEstate, storedPlan } from "./estate-ledger.test-support"
 import { send, shownTax, withProfile } from "./tax-settings.test-support"
@@ -11,6 +12,7 @@ import { send, shownTax, withProfile } from "./tax-settings.test-support"
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 describe("the tax profile through traj", () => {

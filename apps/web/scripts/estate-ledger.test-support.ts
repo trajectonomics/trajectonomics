@@ -10,6 +10,7 @@ import { type WhatIfAnswer, whatIfAnswer } from "../src/lib/what-if/answer"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
@@ -74,15 +75,16 @@ export async function setupEstate(): Promise<Editor> {
 	const document = hand
 	traj(["scenario", "apply", PLAN, "--file", "-", "--decimal", "--json"], document)
 	traj(["scenario", "household", PLAN, "--file", "-", "--json"], HOUSEHOLD)
-	editor = createEditor({
+	const next = createEditor({
 		traj: { binary: BINARY, env: env() },
 		cliVersion: "test",
 		params: { ...PARAMS, asOf: AS_OF, horizon: "2030-12-31", scenarios: [PLAN] },
 		records: [],
 		token: TOKEN,
 	})
-	const first = await editor.refresh()
+	const first = await next.refresh()
 	if (!first.ok) throw new Error(first.error.message)
+	editor = recorded(next)
 	return editor
 }
 
