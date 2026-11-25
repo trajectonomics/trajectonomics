@@ -1,6 +1,7 @@
 import { ThLevyContributionLabel } from "@trajectonomics/core/tax/th"
 import type { ScenarioDocument } from "../document"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
+import { carriedClaims } from "./carried-claims"
 import { bareLabelOf } from "./filer-labels"
 import type { ReturnClaims, TaxRequest } from "./flags"
 import { records } from "./json"
@@ -90,7 +91,7 @@ function contributionClasses(document: ScenarioDocument): Set<TaxAllowanceClass>
  * ineligible filer, zeroes it: this reports what the write was told, never what it applied.
  */
 export function taxProfileOf(request: TaxRequest, document: ScenarioDocument): TaxProfileView {
-	const claims = [request, ...Object.values(request.returns ?? {})]
+	const claims = carriedClaims(request, document)
 	const stated = new Set([...statedClasses(claims), ...contributionClasses(document)])
 	return {
 		stated: TAX_ALLOWANCE_CLASSES.filter((it) => stated.has(it)),

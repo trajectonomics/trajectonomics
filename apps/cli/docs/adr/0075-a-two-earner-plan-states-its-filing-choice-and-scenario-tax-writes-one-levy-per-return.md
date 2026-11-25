@@ -118,19 +118,46 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   joint Return. A plan with no taxed item, no partner or no Owners keeps the bare labels and the one
   Levy, so its output is byte-identical.
 - **Labels and Prepayments.** Each taxed item's label takes its Owner's suffix, `shared` included. A
-  write first takes every Prepayment this build wrote back to the bare id (summing the halves a
-  previous separate write split), then, for a separate Return, points each at its Flow's Owner's Levy.
-  A `shared` Flow's share is split half to each Levy and the odd basis point goes to the holder's, so
-  the total is unchanged. Switching back to joint or to `--none` joins the halves again.
-- **The stored `returns`.** `scenario.tax` gains an optional `returns`, an object keyed by person id,
-  written only for `married_separate` with Filers. Each entry holds `children`, `childrenAtHigherRate`
-  and the deductions it states, under the flat profile's keys; every key defaults to 0, children
-  included, and a zero deduction is left out, as the flat profile does. The flat keys stay the holder's
-  claims, so `scenario show` and every earlier reader read the same fields.
+  write first takes every Prepayment of a tax Levy back to the bare id, then, for a separate Return,
+  points each at the Levy of its Owner. Only an entry naming `th-2026-pit` or `th-2026-pit@…` moves: a
+  Prepayment of another Levy, plain or capped, is never touched. An asset Account's `payout` moves its
+  Prepayments as a Flow does, by the Account's Owner.
+  - A `shared` item's plain share is split half to each Levy and the odd basis point goes to the
+    holder's, so the total is unchanged. Joining sums the halves into one entry where the first stood,
+    so a switch to joint or to `--none` restores the basis points, and a plan without Filers keeps the
+    order of its entries and its bytes.
+  - A `shared` Flow's **capped** Prepayment stays whole on the holder's Levy. A Flow states one
+    `cappedPrepayment`, so it cannot be split, and halving it would lose basis points for good.
+    Refusing it was the other choice: rejected, because the household's total credit is the same and
+    the caller would have no way to file separately without dropping the withholding.
+- **The stored `returns`.** `scenario.tax` gains an optional `returns`, an object keyed by person id.
+  A separate Return with Filers writes one entry per Filer: `children`, `childrenAtHigherRate` and the
+  deductions it states, under the flat profile's keys; every key defaults to 0, children included, and
+  a zero deduction is left out, as the flat profile does. The flat keys are the holder's claims, so
+  `scenario show` and every earlier reader read the same fields. A profile with no entry for the holder,
+  such as one written before the plan had Owners, gives the holder's Return the flat claims, on
+  `--merge` and on `--from-stored`.
+- **`returns` across a status change.** `--merge` keeps every item it is not told to change (ADR-0066),
+  so under another status the profile keeps the partner's entry, if it claims anything. No Levy reads
+  it there. The holder's entry is dropped, because the flat keys are then what changes, and a later
+  separate filing takes the holder's claims from them and the partner's from the kept entry. A write
+  of the whole profile (`--tax`) states it whole, so it keeps neither.
 - **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
-  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. A
-  person-qualified value used without `married_separate` and Filers is refused at the flag. `--merge`
-  merges it into the stored `returns`, and `--from-stored` keeps them.
+  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder; while the
+  holder has no income it is stored and no Return carries it. `--merge` merges into the stored
+  `returns`, and `--from-stored` keeps them. Each of these is refused at the flag, as `invalid_input`:
+  - a person-qualified value without `married_separate` and Filers;
+  - a person-qualified value for a person who is not a Filer, because no Levy is written to carry it;
+  - a bare value beside the holder's own id on one flag, which states the holder twice;
+  - a count that is not a safe integer, or an amount that is not a safe number of satang, with the
+    message "The value is outside its allowed range.".
+- **The cross-Return check.** Every separate Return with Filers, of one Filer or two, goes through
+  `thSeparateClaimProblems` (tax ADR-0010) before its Levies are written, `--merge` and `--from-stored`
+  included. `OWN_PARENTS_OVER_TWO` is refused at `--parents` and `MORTGAGE_OVER_CEILING` at
+  `--mortgage-interest`, with `details` naming the `problem` and the `persons`. The function checks a
+  mortgage only when told the two Returns state one loan. The CLI says so when there are two Filers and
+  the household names `shared` as the Owner of a liability Account. A liability has no kind, so any
+  shared loan counts; a loan borrowed together that has no `shared` Owner is not checked.
 - **The readers of the set.** `--carry-in` takes one record per Levy and treats any `th-2026-pit@…`
   id as the CLI's own, so a past period needs no record of the caller's. `projection allowances` scans
   every Levy and names the Levy and the Filer label each row read. ADR-0066's rule keeps the stored

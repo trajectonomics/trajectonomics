@@ -1,4 +1,6 @@
+import { toMinorUnits } from "@trajectonomics/core/money"
 import { type AppError, fail } from "../../errors"
+import { SENTENCES } from "../../sentences"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
 import { flagOf, type TaxFlags } from "./flags"
 
@@ -22,16 +24,48 @@ export function fields(): readonly Field[] {
 	return ["children", "childrenAtHigherRate", ...ALLOWANCE_FLAGS]
 }
 
-/** One stated value as the number its field takes, or the refusal that names the flag. */
+/** Whether an amount in THB is still an exact count of satang. */
+function inSatangRange(amount: number): boolean {
+	try {
+		toMinorUnits(amount, 2)
+		return true
+	} catch {
+		return false
+	}
+}
+
+/** The refusal for a number too large to keep exactly, in the words a flag's own range check uses. */
+function outOfRange(field: Field): AppError {
+	const message = SENTENCES.range
+	return fail("invalid_input", { path: field, message, details: [{ path: field, message }] })
+}
+
+/**
+ * One stated value as the number its field takes, or the refusal that names the flag. A count must be
+ * a safe integer and an amount a safe number of satang: a larger one could not be stored and read back.
+ */
 function numberOf(field: Field, text: string): number | AppError {
 	const count = COUNT_FIELDS.has(field)
-	if ((count ? COUNT : AMOUNT).test(text)) return Number(text)
+	if ((count ? COUNT : AMOUNT).test(text)) {
+		const value = Number(text)
+		const exact = count ? Number.isSafeInteger(value) : inSatangRange(value)
+		return exact ? value : outOfRange(field)
+	}
 	return fail("invalid_input", {
 		path: field,
 		message: `${flagOf(field)}: "${text}" is not ${count ? "a whole count of zero or more" : "an amount of zero or more"}.`,
 		hint: count
 			? "Give a whole number, such as 1."
 			: "Give a plain decimal, such as 9000 or 9000.50.",
+	})
+}
+
+/** The refusal for one person's value stated twice on one flag. */
+export function statedTwice(field: string, whose: string): AppError {
+	return fail("invalid_input", {
+		path: field,
+		message: `${flagOf(field)} states ${whose} twice.`,
+		hint: "State each person's value once, as --parents 1 for the holder or --parents partner=1.",
 	})
 }
 
@@ -43,11 +77,7 @@ function statedOne(field: Field, text: string, into: Stated): AppError | null {
 	if (typeof parsed !== "number") return parsed
 	const values = into.get(field) ?? new Map<string, number>()
 	if (values.has(person)) {
-		return fail("invalid_input", {
-			path: field,
-			message: `${flagOf(field)} states ${person === "" ? "a bare value" : `"${person}"`} twice.`,
-			hint: "State each person's value once, as --parents 1 for the holder or --parents partner=1.",
-		})
+		return statedTwice(field, person === "" ? "a bare value" : `"${person}"`)
 	}
 	values.set(person, parsed)
 	into.set(field, values)

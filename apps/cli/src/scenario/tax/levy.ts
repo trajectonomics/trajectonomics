@@ -1,15 +1,19 @@
-import { type AppError, fail, isAppError } from "../../errors"
+import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
+import { holderIdOf } from "./couple"
 import { leviesFor } from "./emitter"
 import { withoutFilerLabels } from "./filer-labels"
 import { type FilerScope, filerScopeOf, withFilerLabels } from "./filer-scope"
 import type { TaxRequest } from "./flags"
-import { flagOf } from "./flags"
 import { records } from "./json"
+import { keptRequest } from "./kept-returns"
 import { labelRefusal } from "./label-refusal"
 import { type FlowLabel, withFlowLabels } from "./labels"
 import { isTaxLevyId } from "./levy-ids"
-import { joinedPrepayments, pointedPrepayments } from "./prepayments"
+import { personRefusal } from "./person-refusals"
+import { joinedPrepayments } from "./prepayments-join"
+import { pointedPrepayments } from "./prepayments-point"
+import { separateRefusal } from "./separate-check"
 
 export {
 	filerOfTaxLevy,
@@ -29,36 +33,11 @@ export type TaxLevyWritten = {
 	filers?: string[]
 }
 
-/** The refusal for per-Return claims with no separate Return to hold them, at the flag that stated one. */
-function noFilers(field: string): AppError {
-	return fail("invalid_input", {
-		path: field,
-		message: `${flagOf(field)} names a person, but this plan has no separate Return to put the value on: it needs --filing-status married_separate and a household with a partner and Owners.`,
-		hint: 'Add a partner and Owners with "traj scenario household", or state the value bare for the holder.',
-	})
-}
-
 /** The document with each taxed item labelled for its Owner and each Prepayment pointed at its Levy. */
 function decorated(document: ScenarioDocument, scope: FilerScope | null): ScenarioDocument {
 	const joined = joinedPrepayments(document)
 	const labelled = scope === null ? joined : withFilerLabels(joined, scope)
 	return pointedPrepayments(labelled, scope)
-}
-
-/** The request without the per-Return claims a plan with no separate Return cannot use. */
-function withoutReturns(request: TaxRequest): TaxRequest {
-	if (request.returns === undefined && request.persons === undefined) return request
-	const { returns: _returns, persons: _persons, ...flat } = request
-	return flat
-}
-
-/** The request with its per-Return claims kept only for the Filers that got a Levy. */
-function returnsOf(request: TaxRequest, scope: FilerScope): TaxRequest {
-	if (request.returns === undefined) return request
-	const returns = Object.fromEntries(
-		Object.entries(request.returns).filter(([person]) => scope.filers.includes(person)),
-	)
-	return { ...request, returns }
 }
 
 /**
@@ -80,16 +59,15 @@ export function withTaxLevy(
 	if (refused !== null) return refused
 	const scope = filerScopeOf(household, stated, request.filingStatus)
 	if (isAppError(scope)) return scope
-	if (request.persons !== undefined && request.persons.length > 0 && scope?.kind !== "separate") {
-		return noFilers(request.persons[0] as string)
-	}
+	const claim = personRefusal(request.named, scope) ?? separateRefusal(request, scope, stated)
+	if (claim !== null) return claim
 	const built = leviesFor(request, scope)
 	if (isAppError(built)) return built
 	const next = decorated(stated, scope)
 	const kept = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	return {
 		document: { ...next, levies: [...kept, ...built] },
-		request: scope?.kind === "separate" ? returnsOf(request, scope) : withoutReturns(request),
+		request: keptRequest(request, scope, holderIdOf(household)),
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
 	}

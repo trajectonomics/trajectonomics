@@ -1,7 +1,7 @@
 import { type AppError, fail, isAppError } from "../../errors"
 import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
-import { mergedRequest, taxRequestOf } from "./claims"
+import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
 import { coupleOf } from "./couple"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
@@ -9,7 +9,7 @@ import type { FlowLabel } from "./labels"
 import { withTaxLevy } from "./levy"
 import { noStoredProfile, type TaxMode } from "./mode"
 import { withoutTaxLevy } from "./remove"
-import { canonicalTax, parsedTax, requestOfStored, storedTaxOf } from "./stored"
+import { canonicalTax, parsedTax, storedTaxOf } from "./stored"
 
 /** What a write that wrote a Levy leaves for the reply: the request it built and the document it wrote. */
 export type Written = {
@@ -46,7 +46,7 @@ function requestFor(
 	}
 	return mode.kind === "merge"
 		? mergedRequest(profile, mode.flags, couple)
-		: requestOfStored(profile)
+		: fromStoredRequest(profile, couple)
 }
 
 /**

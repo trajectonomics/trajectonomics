@@ -4,7 +4,8 @@ import { requestOfClaims } from "./claims-request"
 import { claimsOf } from "./claims-values"
 import type { Couple } from "./couple"
 import type { TaxFlags, TaxRequest } from "./flags"
-import { requestOfStored, type StoredTax } from "./stored"
+import { requestOfStored } from "./stored"
+import type { StoredTax } from "./stored-schema"
 
 /**
  * The caller's flags as one request, `null` when they state no `--tax`, or why a value cannot be
@@ -26,6 +27,16 @@ export function taxRequestOf(flags: TaxFlags, couple: Couple | null): TaxRequest
 			allowances: allowancesOf({}),
 		},
 	})
+}
+
+/**
+ * The request `--from-stored` writes: the stored profile. A separate filing whose profile holds no
+ * Return for the holder, such as one written before the plan had Owners, takes the holder's from the
+ * flat claims.
+ */
+export function fromStoredRequest(stored: StoredTax, couple: Couple | null): TaxRequest | AppError {
+	const base = requestOfStored(stored)
+	return requestOfClaims({ status: base.filingStatus, couple, stated: new Map(), base })
 }
 
 /** The request a merge states: the stored profile, with each flag the caller gave laid over it. */

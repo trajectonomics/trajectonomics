@@ -1,5 +1,5 @@
 export { ALLOWANCE_FLAGS, allowancesOf, type TaxAllowances } from "./allowances"
-export { mergedRequest, taxRequestOf } from "./claims"
+export { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
 export { taxExamples } from "./examples"
 export {
 	FILING_STATUSES,
