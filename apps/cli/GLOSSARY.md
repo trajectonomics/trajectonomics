@@ -190,6 +190,10 @@ _Avoid_: Default plan, active plan, current Scenario, baseline (the Baseline is 
 A household's pin of one Scenario date field to a person's age, to their life's end or to a partner's join month. The date is written into the Scenario when the household is set; a later apply or fork keeps it, fills it, or refuses a value that disagrees (ADR-0048).
 _Avoid_: Link, binding, age field
 
+**Owner**:
+The household person whose money a Flow, Account or liability is, or `shared` for both. It is stated in the household's `owners` list, never in the document, and the CLI writes the Filer label it implies onto the item's Tally labels (ADR-0076).
+_Avoid_: Holder (a role), payee, account owner, filer
+
 **Template**:
 The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
 _Avoid_: Sample, skeleton, example
@@ -247,6 +251,10 @@ _Avoid_: Tax rate, tax setting, tax flag
 **Tax status**:
 Whether a result's figures include income tax: `applied`, `not_applied`, or `mixed` for a compare whose two sides disagree.
 _Avoid_: Taxed, pre-tax, after-tax (as a status)
+
+**Filing choice**:
+Whether a plan with two earners files jointly (`married_joint`, one Tax Levy) or separately (`married_separate`, one Tax Levy per earner). It is the `--filing-status` the plan states; the CLI never picks it (ADR-0075).
+_Avoid_: Tax mode, filing option, cheapest filing
 
 **Carry-in**:
 What a Levy's period had already tallied before the as-of, and what had already been prepaid. It is a property of the projection, not of the scenario, because the same scenario projected from two dates needs two answers. The caller states it with `--carry-in`, one record per Levy and period, and the result echoes it with the source it came from: `flag`, `document` or `scope`.

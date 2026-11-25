@@ -78,6 +78,22 @@ _Avoid_: Capital gains tax
 The Section 47 bis gross-up and tax credit granted when a taxpayer elects to include dividends from Thai corporate entities in regular progressive calculation to recover underlying corporate income tax. The grossed-up amount (dividend + credit) stays in Section 40(4) assessable income and the credit offsets tax payable.
 _Avoid_: Dividend deduction
 
+**Return**:
+One income tax computation filed by one taxpayer, or by a married couple filing jointly under Section 57 sexies (ภ.ง.ด. 90/91). One Thai Levy models one Return. A couple who file separately have two Returns, and so two Levies.
+_Avoid_: Filing, tax form, declaration
+
+**Filer**:
+A person whose income a Return holds, named by an id the caller chooses. A joint Return has two Filers; a single or separate Return has one (ADR 0009).
+_Avoid_: Taxpayer id, spouse slot, owner
+
+**Filer label**:
+A Tally label scoped to one Filer, written `<label>@<filer>`, such as `income.section40_1@partner`, and built only with `thFilerLabel`. A Levy with no Filers reads bare labels, as before ADR 0009.
+_Avoid_: Person label, namespaced label, suffix
+
+**Shared income**:
+Income a couple cannot attribute to either spouse, which Section 57 sexies para 2 counts as half each. It is tallied under the reserved Filer `shared`: a separate Return reads half of it and a joint Return reads all of it.
+_Avoid_: Joint income, common income
+
 **Minimum Gross Tax**:
 The Section 48(2) alternative calculation equal to 0.5% of gross Assessable Income under Sections 40(2)–40(8) when such income is at least 120,000 THB, payable only if it exceeds 5,000 THB and exceeds progressive bracket tax.
 _Avoid_: Alternative minimum tax
