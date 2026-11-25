@@ -2,9 +2,9 @@ import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
 import { networthForm } from "../../report/networth-form"
+import { monthlySchema, resultSchema } from "../../report/networth-schema"
 import { recordNoteBlocks } from "../../report/record"
 import { LEDGER_READ_CODES } from "../../store"
-import { monthlySchema, resultSchema } from "./networth-schema"
 
 export const networth: Leaf = defineCommand({
 	name: "networth",

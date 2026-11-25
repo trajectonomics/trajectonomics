@@ -65,10 +65,10 @@ describe("the record has started", () => {
 
 		it(`${name}: publishes both fields in the schema`, async () => {
 			const res = await capture(["schema", ...command, "--json"], { TRAJ_HOME: ledgerHome() })
-			const output = JSON.parse(res.out).output as {
-				required: string[]
-				properties: Record<string, { type: unknown }>
-			}
+			type Shape = { required: string[]; properties: Record<string, { type: unknown }> }
+			// `report networth` also states a monthly form (cli ADR 0077); its single-date form is the first branch.
+			const published = JSON.parse(res.out).output as Shape & { anyOf?: Shape[] }
+			const output = published.anyOf?.[0] ?? published
 			expect(output.properties["firstTransactionDate"]?.type).toEqual(["string", "null"])
 			expect(output.properties["noTransactionsBefore"]?.type).toBe("boolean")
 			expect(output.required).toEqual(

@@ -1,7 +1,7 @@
 import { z } from "zod"
-import type { NetWorthResult } from "../../report/networth"
-import { recordStartShape } from "../../report/record"
-import { reportRow, totalView } from "../../report/view"
+import type { NetWorthResult } from "./networth"
+import { recordStartShape } from "./record"
+import { reportRow, totalView } from "./view"
 
 /** The single-date result: `--as-of`'s data, and each month of the monthly form. */
 export const resultSchema: z.ZodType<NetWorthResult> = z.strictObject({
