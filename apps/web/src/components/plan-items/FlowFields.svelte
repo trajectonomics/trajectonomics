@@ -1,5 +1,7 @@
 <script lang="ts">
+import { currentSearch } from "../../client/location.svelte.js"
 import type { ScenarioFlow } from "../../lib/contract"
+import { householdHref } from "../../lib/view/household/model"
 import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
@@ -19,6 +21,8 @@ interface Props {
 	name: string
 	/** The label of each date the household pins, or null for a date it does not pin. */
 	anchors: { start: string | null; end: string | null }
+	/** True when the drawer tries the value in the What-if session, where Apply runs later. */
+	trying?: boolean
 	/** The categories the plan's expenses already use: suggestions only, never a preset list. */
 	categories?: readonly string[]
 	/** What the employer adds to a salary, and the Accounts it may pay into. */
@@ -33,6 +37,7 @@ let {
 	shown,
 	name,
 	anchors,
+	trying = false,
 	categories = [],
 	employer = $bindable({ account: "", share: "", rounding: "" }),
 	targets = [],
@@ -51,8 +56,11 @@ let {
 	<Field id="flow-start" label="Starts" hint="YYYY-MM-DD" bind:value={draft.start} problem={shown.at("start")} disabled={anchors.start !== null} />
 	{#if anchors.start !== null}<AnchoredNote anchor={anchors.start} plan={name} />{/if}
 	{#if draft.frequency !== "once" || anchors.end !== null}
-		<Field id="flow-end" label="Ends" hint="YYYY-MM-DD, or empty to run to the horizon" bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
+		<Field id="flow-end" label="Ends" hint={draft.frequency === "once" ? "A once Flow ends when it starts." : "YYYY-MM-DD, or empty to run to the horizon"} bind:value={draft.end} problem={shown.at("end")} disabled={anchors.end !== null} />
 		{#if anchors.end !== null}<AnchoredNote anchor={anchors.end} plan={name} />{/if}
+		{#if trying && draft.frequency === "once" && anchors.end !== null}
+			<p class="-mt-3 text-sm text-destructive">A once Flow ends when it starts, so applying this one to the plan will be refused while the household sets its end {anchors.end}: <a class="underline" href={householdHref(name, currentSearch())}>change it there</a>.</p>
+		{/if}
 	{/if}
 	<Field id="flow-growth" label="Growth" options={GROWTH_CHOICES} bind:value={draft.growth} problem={shown.at("growth")} />
 	{#if draft.growth === "fixed"}
