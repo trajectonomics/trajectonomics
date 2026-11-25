@@ -4,6 +4,7 @@ import {
 	TH_LEVY_SHARED_FILER,
 	type ThLevyFilerIds,
 	thFilerLabel,
+	validateThFilers,
 } from "./filers"
 import type { ThLevyGraph } from "./graph"
 import { ThLevyRounding } from "./graph-types"
@@ -64,7 +65,7 @@ function sumViews(graph: ThLevyGraph, a: ThLevyTallies, b: ThLevyTallies): ThLev
 
 function halfOf(graph: ThLevyGraph, shared: Income): Income {
 	return mapRecord(TH_LEVY_INCOME_LABELS, (label) =>
-		graph.scale(shared[label], 1, 2, ThLevyRounding.Floor),
+		graph.scale(shared[label], 1, 2, ThLevyRounding.Floor, `${TH_LEVY_READ_PREFIX}half.${label}`),
 	)
 }
 
@@ -81,7 +82,9 @@ function oneFiler(graph: ThLevyGraph, filer: string, status: ThFilingStatus): Th
 function twoFilers(graph: ThLevyGraph, first: string, second: string): ThLevyScope {
 	const shared = addIncomeTallies(graph, (label) => thFilerLabel(label, TH_LEVY_SHARED_FILER))
 	const half = halfOf(graph, shared)
-	const rest = mapRecord(TH_LEVY_INCOME_LABELS, (label) => graph.sub(shared[label], half[label]))
+	const rest = mapRecord(TH_LEVY_INCOME_LABELS, (label) =>
+		graph.sub(shared[label], half[label], `${TH_LEVY_READ_PREFIX}rest.${label}`),
+	)
 	const a = viewOf(graph, first, half)
 	const b = viewOf(graph, second, rest)
 	return { views: [a, b], total: sumViews(graph, a, b) }
@@ -121,7 +124,7 @@ export function addThLevyScope(
  * Purpose: Lets a caller check that every labelled Flow is read by some Levy.
  * Math: No arithmetic.
  * Units: Dimensionless label strings.
- * Throws: TaxValidationError if a Filer id does not match `[a-z0-9-]{1,32}`.
+ * Throws: TaxValidationError for a list `emitThLevy` refuses (see {@link validateThFilers}).
  *
  * @param filers Filer ids; an empty list reads the bare labels.
  * @param status Filing status; only `married_separate` and `married_joint` read shared income.
@@ -134,6 +137,7 @@ export function thLevyTalliesFor(
 	if (filers.length === 0) {
 		return { income: TH_LEVY_INCOME_LABELS, contributions: TH_LEVY_CONTRIBUTION_LABELS }
 	}
+	validateThFilers(filers, status)
 	const readsShared = status === "married_separate" || status === "married_joint"
 	const ids = readsShared ? [...filers, TH_LEVY_SHARED_FILER] : filers
 	const labelsOf = (labels: readonly string[], ids: readonly string[]): string[] =>

@@ -10,7 +10,9 @@ interface ReadMeasure {
 
 /**
  * The ids a `scale` reads, directly or through the sums that read a Filer's tally with the shared
- * share (`read.<filer>.<label>`, and `read.total.<label>` for two Filers).
+ * share (`read.<filer>.<label>`, and `read.total.<label>` for two Filers). The halving of the shared
+ * income is a `read.` Measure too, not a standard rate: it passes the standard rate to the shared
+ * tally only when something scales it.
  *
  * Purpose: Tells a tally that is scaled by a standard rate from one that is only capped or elected.
  * Math: No arithmetic; ids only.
@@ -20,10 +22,12 @@ interface ReadMeasure {
  */
 export function scaledIds(measures: readonly ReadMeasure[]): ReadonlySet<string | undefined> {
 	const scaled = new Set<string | undefined>()
-	for (const measure of measures) if (measure.op === "scale") scaled.add(measure.of)
+	const isRead = (measure: ReadMeasure): boolean => measure.id.startsWith(TH_LEVY_READ_PREFIX)
+	for (const measure of measures)
+		if (measure.op === "scale" && !isRead(measure)) scaled.add(measure.of)
 	for (const measure of [...measures].reverse()) {
-		if (measure.id.startsWith(TH_LEVY_READ_PREFIX) && scaled.has(measure.id)) {
-			scaled.add(measure.a).add(measure.b)
+		if (isRead(measure) && scaled.has(measure.id)) {
+			scaled.add(measure.a).add(measure.b).add(measure.of)
 		}
 	}
 	return scaled

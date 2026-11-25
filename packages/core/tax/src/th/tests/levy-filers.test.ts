@@ -99,6 +99,14 @@ describe("a filers list is refused, each rule with its own field", () => {
 })
 
 describe("thLevyTalliesFor", () => {
+	it("refuses the lists emitThLevy refuses", () => {
+		const call = (filers: readonly string[], status: ThFilingStatus): string | undefined =>
+			fieldOf(() => thLevyTalliesFor(filers, status))
+		expect(call(["a", "b"], "single")).toBe(ThLevyFilerField.Count)
+		expect(call([TH_LEVY_SHARED_FILER], "married_joint")).toBe(ThLevyFilerField.Shared)
+		expect(call(["a", "a"], "married_joint")).toBe(ThLevyFilerField.Duplicate)
+	})
+
 	it("reads the bare labels with no Filer", () => {
 		const read = thLevyTalliesFor([])
 		expect(read.income).toEqual(TH_LEVY_INCOME_LABELS)

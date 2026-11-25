@@ -34,7 +34,8 @@ A joint Return is not simply one Filer either. s.42 bis para 2 gives each spouse
   - Refusal fields: `levy.filers.empty`, `.max` (more than two), `.id` (off the pattern), `.shared`, `.duplicate`, `.count` (two Filers on a status other than `married_joint`), `.status` (`married_separate_40_1_joint_rest`).
   - An elected actual expense on s.40(3) is one figure for the Return, so it is computed on the sums; only the standard 50% is per Filer.
   - The odd satang of the shared income goes to the second Filer, so the two halves add up to the whole.
-  - The Measures that add a Filer's tally to its share of the shared income have ids starting `read.`, so `thLevyAssumptions` can tell a tally scaled by a standard rate from one that is only capped. It reads a Filer label as its bare label.
+  - The Measures that read a Filer's tally with its share of the shared income (the sums, the halving of `@shared` and the second Filer's remainder) have ids starting `read.`. `thLevyAssumptions` follows them to the tally, and does not count the halving as a standard rate, so it can tell a tally scaled by a standard rate from one that is only capped. It reads a Filer label as its bare label.
+  - On `married_separate` each Return reads `floor(shared / 2)`, so an odd satang of `@shared` appears in neither Return.
 
 ## Considered options
 
