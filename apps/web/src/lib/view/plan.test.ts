@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import type { Snapshot } from "../contract"
 import { parseSnapshotText } from "./parse-snapshot"
-import { scenarioNames } from "./plan"
+import { chooseScenario, scenarioNames } from "./plan"
 import { LOADING } from "./state"
 
 const DEMO_TEXT = await demoSnapshotText()
@@ -41,5 +41,29 @@ describe("scenarioNames", () => {
 				details: [],
 			}),
 		).toEqual([])
+	})
+})
+
+describe("chooseScenario", () => {
+	const names = ["base", "retire-early"]
+
+	test("shows the Scenario the address bar names when it is one of the names", () => {
+		expect(chooseScenario(names, "retire-early")).toBe("retire-early")
+	})
+
+	test("falls back to the first Scenario when the address bar names an unknown one or none", () => {
+		expect(chooseScenario(names, "no-such-scenario")).toBe("base")
+		expect(chooseScenario(names, "")).toBe("base")
+	})
+
+	test("has no Scenario to show when there are no names", () => {
+		expect(chooseScenario([], "base")).toBeNull()
+	})
+
+	test("keeps the Snapshot's order, so an integer-like name does not jump to the front", () => {
+		// Object.keys puts "2030" first; the rule reads the Snapshot's list, not an object's keys.
+		const planned = ["retire", "2030"]
+		expect(chooseScenario(planned, "")).toBe("retire")
+		expect(chooseScenario(planned, "2030")).toBe("2030")
 	})
 })

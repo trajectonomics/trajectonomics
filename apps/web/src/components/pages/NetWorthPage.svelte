@@ -1,7 +1,7 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { netWorthPageView } from "../../lib/view/net-worth/page"
-import { chooseScenario } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import NetWorthContent from "../net-worth/NetWorthContent.svelte"
 import RecordValues from "../record-values/RecordValues.svelte"

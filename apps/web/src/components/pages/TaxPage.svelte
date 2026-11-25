@@ -18,6 +18,11 @@ let { scenario, onScenario }: Props = $props()
 	intro="Each Levy's settlement period: what is due, prepaid and owed, and whether it is settled."
 >
 	{#snippet children(snapshot)}
-		<TaxPanel projections={snapshot.reads.projections} requested={scenario} {onScenario} />
+		<TaxPanel
+			names={snapshot.params.scenarios}
+			projections={snapshot.reads.projections}
+			requested={scenario}
+			{onScenario}
+		/>
 	{/snippet}
 </PageShell>
