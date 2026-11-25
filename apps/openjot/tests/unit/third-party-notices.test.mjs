@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { npmPackageList } from "../../tools/third-party-notices.mjs";
+import { directDependencyVersions, npmPackageList } from "../../tools/third-party-notices.mjs";
 
 const read = (rel) => readFileSync(new URL(`../../${rel}`, import.meta.url), "utf8");
 const notices = read("static/third-party-notices.txt");
@@ -45,31 +45,10 @@ test("every Rust crate in Cargo.lock is listed with its locked version", () => {
   assert.deepEqual(missing, [], "regenerate the notices: node tools/third-party-notices.mjs --apk <release apk>");
 });
 
-/** The root importer's resolved versions, read from pnpm-lock.yaml by plain line matching. */
-function resolvedDirectVersions() {
-  const lines = read("pnpm-lock.yaml").split("\n");
-  const start = lines.indexOf("  .:");
-  assert.ok(start > 0, "pnpm-lock.yaml has no root importer");
-  const resolved = {};
-  let inDependencies = false;
-  let name = null;
-  for (const line of lines.slice(start + 1)) {
-    if (/^ {2}\S/.test(line) || /^\S/.test(line)) break; // next importer or next top-level section
-    if (/^ {4}dependencies:$/.test(line)) inDependencies = true;
-    else if (/^ {4}\S/.test(line)) inDependencies = false;
-    else if (inDependencies && /^ {6}\S.*:$/.test(line)) name = line.trim().replace(/:$/, "").replace(/^'(.*)'$/, "$1");
-    else if (inDependencies && name && /^ {8}version: /.test(line)) {
-      resolved[name] = line.trim().slice("version: ".length).replace(/^'(.*)'$/, "$1").replace(/\(.*$/, "");
-      name = null;
-    }
-  }
-  return resolved;
-}
-
 test("every production dependency in package.json is listed with its locked version", () => {
   const declared = Object.keys(JSON.parse(read("package.json")).dependencies);
-  const resolved = resolvedDirectVersions();
-  assert.deepEqual(Object.keys(resolved).sort(), [...declared].sort(), "package.json and pnpm-lock.yaml disagree");
+  const resolved = directDependencyVersions();
+  assert.deepEqual(Object.keys(resolved).sort(), [...declared].sort(), "package.json and bun.lock disagree");
   const missing = declared.filter((name) => !listed(name, resolved[name]));
   assert.deepEqual(missing.map((n) => `${n} ${resolved[n]}`), [], "regenerate the notices: node tools/third-party-notices.mjs --apk <release apk>");
 });

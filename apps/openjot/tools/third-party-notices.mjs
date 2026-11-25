@@ -176,96 +176,122 @@ async function rustComponents(cacheDir, warnings) {
 
 // --- npm packages ---------------------------------------------------------------------------
 
-/** Reads pnpm-lock.yaml with line matching only. */
-function parsePnpmLock(text) {
-  const lines = text.split("\n");
-  const section = (title) => lines.findIndex((l) => l === `${title}:`);
-  const importers = {};
-  const snapshots = {};
-  const strip = (s) => s.trim().replace(/^'(.*)'$/, "$1").replace(/^"(.*)"$/, "$1");
-
-  // importers: "  <path>:" then "    dependencies:" / "    devDependencies:" then pairs.
-  let i = section("importers") + 1;
-  let importer = null;
-  let group = null;
-  let dep = null;
-  for (; i < lines.length && !/^\S/.test(lines[i]); i++) {
-    const line = lines[i];
-    let m;
-    if ((m = /^ {2}(\S.*):$/.exec(line))) {
-      importer = importers[strip(m[1])] = { dependencies: {}, devDependencies: {} };
-      group = null;
-    } else if ((m = /^ {4}(dependencies|devDependencies|optionalDependencies):$/.exec(line))) {
-      group = m[1] === "devDependencies" ? "devDependencies" : "dependencies";
-      dep = null;
-    } else if (group && (m = /^ {6}(\S.*):$/.exec(line))) {
-      dep = strip(m[1]);
-    } else if (group && dep && (m = /^ {8}version: (.*)$/.exec(line))) {
-      importer[group][dep] = strip(m[1]);
-    } else if (/^ {4}\S/.test(line)) {
-      group = null;
-    }
-  }
-
-  // snapshots: "  '<name>@<version>(peers)':" then "    dependencies:" / "    optionalDependencies:".
-  i = section("snapshots") + 1;
-  let key = null;
-  let inDeps = false;
-  for (; i < lines.length; i++) {
-    const line = lines[i];
-    let m;
-    if ((m = /^ {2}(\S.*):$/.exec(line))) {
-      key = strip(m[1]);
-      snapshots[key] = {};
-      inDeps = false;
-    } else if (/^ {4}(dependencies|optionalDependencies):$/.test(line)) {
-      inDeps = true;
-    } else if (/^ {4}\S/.test(line)) {
-      inDeps = false;
-    } else if (inDeps && key && (m = /^ {6}(\S.*?): (.*)$/.exec(line))) {
-      snapshots[key][strip(m[1])] = strip(m[2]);
-    }
-  }
-  return { importers, snapshots };
+/** bun.lock is JSON with trailing commas and `//` comments. */
+function parseBunLock(text) {
+  const json = text
+    .replace(/^\s*\/\/.*$/gm, "")
+    .replace(/,(\s*[}\]])/g, "$1");
+  return JSON.parse(json);
 }
 
-const splitNameVersion = (key) => {
-  const at = key.indexOf("@", 1);
-  return { name: key.slice(0, at), version: key.slice(at + 1).replace(/\(.*$/, "") };
-};
+/** A package key's parent scope: "@scope/name" has none, "parent/@scope/name" is "parent". */
+function parentKey(key, name) {
+  if (key === name) return "";
+  const suffix = `/${name}`;
+  return key.endsWith(suffix) ? key.slice(0, -suffix.length) : "";
+}
+
+/** The packages in bun.lock, keyed by their install path, with the names and versions they resolve to. */
+function bunPackages(lock) {
+  const packages = new Map();
+  for (const [key, value] of Object.entries(lock.packages ?? {})) {
+    const id = value[0];
+    const at = id.lastIndexOf("@");
+    const meta = value[2] && typeof value[2] === "object" ? value[2] : {};
+    packages.set(key, {
+      name: id.slice(0, at),
+      version: id.slice(at + 1),
+      dependencies: meta.dependencies ?? {},
+      optionalDependencies: meta.optionalDependencies ?? {},
+      peerDependencies: meta.peerDependencies ?? {},
+      optionalPeers: meta.optionalPeers ?? [],
+    });
+  }
+  return packages;
+}
+
+/** A direct dependency of a workspace: nested under it when bun had to, otherwise hoisted. */
+function resolveDirect(packages, workspace, name) {
+  const nested = `${workspace}/${name}`;
+  if (packages.has(nested)) return nested;
+  return packages.has(name) ? name : null;
+}
+
+/** A package's dependency: the nearest nested copy, walking up to the hoisted one. */
+function resolveDependency(packages, key, name) {
+  const pkg = packages.get(key);
+  const candidates = [`${key}/${name}`];
+  let scope = parentKey(key, pkg.name);
+  while (scope) {
+    candidates.push(`${scope}/${name}`);
+    const parent = packages.get(scope);
+    if (!parent) break;
+    scope = parentKey(scope, parent.name);
+  }
+  candidates.push(name);
+  return candidates.find((candidate) => packages.has(candidate)) ?? null;
+}
 
 /** Direct production packages, their transitive production closure, and the bundled dev packages. */
-export function npmPackageList(lockText = read("pnpm-lock.yaml")) {
-  const { importers, snapshots } = parsePnpmLock(lockText);
-  const root = importers["."];
+export function npmPackageList(lockText = read("../../bun.lock"), workspace = "apps/openjot") {
+  const lock = parseBunLock(lockText);
+  const packages = bunPackages(lock);
+  const root = lock.workspaces?.[workspace];
+  if (!root) throw new Error(`bun.lock has no ${workspace} workspace`);
   const found = new Map();
   const queue = [];
-  const add = (aliasOrName, versionWithPeers) => {
-    // An aliased dependency reads "alias: real-name@version".
-    const aliased = /^(@?[a-zA-Z][^@(]*)@(.+)$/.exec(versionWithPeers);
-    const name = aliased ? aliased[1] : aliasOrName;
-    if (aliased) versionWithPeers = aliased[2];
-    const key = `${name}@${versionWithPeers}`;
-    const { version } = splitNameVersion(key);
-    if (!found.has(`${name}@${version}`)) {
-      found.set(`${name}@${version}`, { name, version });
-      queue.push(key);
-    }
+  const add = (key) => {
+    const pkg = packages.get(key);
+    if (!pkg) throw new Error(`bun.lock has no package ${key}`);
+    if (found.has(`${pkg.name}@${pkg.version}`)) return;
+    found.set(`${pkg.name}@${pkg.version}`, { name: pkg.name, version: pkg.version });
+    queue.push(key);
   };
-  for (const [name, version] of Object.entries(root.dependencies)) add(name, version);
-  const direct = Object.keys(root.dependencies);
+  const direct = Object.keys(root.dependencies ?? {});
+  for (const name of direct) {
+    const key = resolveDirect(packages, root.name, name);
+    if (!key) throw new Error(`bun.lock does not resolve ${name} from ${workspace}`);
+    add(key);
+  }
   while (queue.length) {
-    for (const [name, version] of Object.entries(snapshots[queue.shift()] ?? {})) add(name, version);
+    const key = queue.shift();
+    const pkg = packages.get(key);
+    const deps = [
+      ...Object.keys(pkg.dependencies),
+      ...Object.keys(pkg.optionalDependencies),
+      ...Object.keys(pkg.peerDependencies).filter((name) => !pkg.optionalPeers.includes(name)),
+    ];
+    for (const name of deps) {
+      const depKey = resolveDependency(packages, key, name);
+      if (depKey) add(depKey);
+    }
   }
   for (const name of BUNDLED_DEV_PACKAGES) {
-    const version = root.devDependencies[name];
-    if (!version) throw new Error(`${name} is listed as bundled but is not a devDependency in pnpm-lock.yaml`);
-    const { version: v } = splitNameVersion(`${name}@${version}`);
-    found.set(`${name}@${v}`, { name, version: v });
+    if (!(name in (root.devDependencies ?? {}))) {
+      throw new Error(`${name} is listed as bundled but is not a devDependency in bun.lock`);
+    }
+    const key = resolveDirect(packages, root.name, name);
+    if (!key) throw new Error(`bun.lock does not resolve ${name} from ${workspace}`);
+    add(key);
   }
   return { direct, packages: [...found.values()].sort((a, b) => cmp(a.name, b.name) || cmp(a.version, b.version)) };
 }
 
+/** The resolved version of each direct production dependency of a workspace. */
+export function directDependencyVersions(lockText = read("../../bun.lock"), workspace = "apps/openjot") {
+  const lock = parseBunLock(lockText);
+  const packages = bunPackages(lock);
+  const root = lock.workspaces?.[workspace];
+  if (!root) throw new Error(`bun.lock has no ${workspace} workspace`);
+  const resolved = {};
+  for (const name of Object.keys(root.dependencies ?? {})) {
+    const key = resolveDirect(packages, root.name, name);
+    const pkg = key ? packages.get(key) : null;
+    if (!pkg) throw new Error(`bun.lock does not resolve ${name} from ${workspace}`);
+    resolved[name] = pkg.version;
+  }
+  return resolved;
+}
 
 async function npmComponents(cacheDir) {
   const { packages } = npmPackageList();
