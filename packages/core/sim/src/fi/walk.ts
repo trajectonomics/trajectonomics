@@ -2,7 +2,7 @@ import { recordedValues } from "../engine/account-values"
 import { flowsAt } from "../engine/events"
 import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
-import type { BufferBreach } from "./buffer"
+import type { BufferBreach, WindowEvent } from "./buffer"
 import { cloneLevySet, cloneRules, cloneStates } from "./clone"
 import type { PrefixPoint } from "./prefix"
 import { recordReads } from "./read-dates"
@@ -54,15 +54,15 @@ export function walkCandidate(input: WalkInput, grid: ScanGrid): WalkOutcome {
 	const dates = gridDates(grid, input.month)
 	let index = 0
 	let read = lowerBound(readDates.sorted, input.month)
-	let firstBreach: BufferBreach | undefined
+	let firstEvent: WindowEvent | undefined
 	for (const date of dates) {
 		read = recordReads(working.values, readDates.sorted, read, point.states, date)
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
 		const day = processDay(working, date, dayEvents)
 		if (day.kind !== "ok") return day
-		if (day.breach !== undefined && firstBreach === undefined) firstBreach = day.breach
+		if (day.event !== undefined && firstEvent === undefined) firstEvent = day.event
 	}
 	walkTail(input, working)
-	return finish(input, working, firstBreach)
+	return finish(input, working, firstEvent)
 }

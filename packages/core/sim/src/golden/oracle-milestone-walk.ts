@@ -3,6 +3,7 @@ import type { DateString, Flow, Milestone } from "../types"
 import { oracleMarkedIds } from "./oracle-access"
 import { oracleAddDays, oracleAddMonthsClamped } from "./oracle-date"
 import { holds, type Opening } from "./oracle-milestone-criteria"
+import { assertLandsOnce, assertScope } from "./oracle-milestone-scope"
 
 /** Milestone id to fire date. */
 export type OracleFires = Map<string, DateString>
@@ -18,7 +19,9 @@ export interface OracleWalk {
  * The oracle for Milestone plans covers one liquid asset Account plus Accounts marked `liquid: false`
  * at rate 0 that no Flow touches, zero inflation, monthly and `once` Flows with a fixed amount on a
  * day-of-month every month has, and Milestones made of `date`, `netWorth` and `accessibleNetWorth`
- * criteria. Accessible net worth is then the cash, and net worth adds the marked balances.
+ * criteria. Accessible net worth is then the cash, and net worth adds the marked balances. Anything
+ * else throws rather than being modelled: another frequency, a rate, inflation, or a `once` Flow whose
+ * `startAt` has not fired by its start (the engine defers that Flow to its fire date).
  */
 export function oracleAmount(flow: Flow): number {
 	if (!("amount" in flow)) throw new Error("the oracle takes fixed amounts only")
@@ -27,6 +30,9 @@ export function oracleAmount(flow: Flow): number {
 
 /** A Flow's Due dates from its start through `last`, one a month, or just the start for `once`. */
 export function oracleDues(flow: Flow, last: DateString): DateString[] {
+	if (flow.frequency !== "monthly" && flow.frequency !== "once") {
+		throw new Error("the oracle takes monthly and once Flows only")
+	}
 	const end = flow.end !== undefined && flow.end < last ? flow.end : last
 	const dates: DateString[] = []
 	for (let step = 0; ; step++) {
@@ -87,6 +93,7 @@ function oracleDay(
 	for (const milestone of due.length === 0 ? [] : milestones) {
 		if (!known.has(milestone.id) && fires(milestone, day, balances)) known.set(milestone.id, day)
 	}
+	assertLandsOnce(known, due)
 	let cash = opening
 	for (const flow of due.filter((item) => oracleLands(known, item, day))) {
 		cash += flow.kind === "income" ? oracleAmount(flow) : -oracleAmount(flow)
@@ -102,6 +109,7 @@ export function oracleWalk(fixture: Fixture, flows: readonly Flow[]): OracleWalk
 	const dues = duesByDate(flows, timeline.horizon)
 	const after = new Map<DateString, number>()
 	const markedIds = oracleMarkedIds(scenario.accounts)
+	assertScope(fixture)
 	let cash = 0
 	let illiquid = 0
 	for (const balance of fixture.baseline.balances) {

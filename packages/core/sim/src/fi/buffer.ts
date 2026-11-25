@@ -40,15 +40,34 @@ export function breachAt(
 	return { kind: "ok" }
 }
 
+/**
+ * A window event a walk keeps rather than acts on: a Minimum buffer breach, or a window that cannot
+ * be priced. A Shortfall outranks it; among events, the earliest date wins.
+ */
+export type WindowEvent =
+	| { readonly kind: "breach"; readonly breach: BufferBreach }
+	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
+
+/** One day's buffer check: a window event, a valuation problem that stops the walk, or nothing. */
+export type BufferCheck =
+	| { readonly kind: "ok" }
+	| { readonly kind: "event"; readonly event: WindowEvent }
+	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
+
 /** Checks accessible net worth after `date`'s flows against a full twelve-month expense window. */
 export function checkBuffer(
 	states: StateMap,
 	date: DateString,
 	table: RequirementTable,
-): BufferOutcome {
+): BufferCheck {
 	const needed = requirement(table, date)
-	if (needed.kind === "problem") return needed
+	if (needed.kind === "problem") {
+		return { kind: "event", event: { kind: "problem", problem: needed.problem } }
+	}
 	const valued = accessibleAfter(states, date)
-	if (valued.kind === "problem") return valued
-	return breachAt(table, date, valued.accessible)
+	if (valued.kind === "problem") return { kind: "problem", problem: valued.problem }
+	const checked = breachAt(table, date, valued.accessible)
+	return checked.kind === "breach"
+		? { kind: "event", event: { kind: "breach", breach: checked.breach } }
+		: { kind: "ok" }
 }

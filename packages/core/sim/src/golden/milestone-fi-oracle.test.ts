@@ -83,6 +83,23 @@ describe("the FI scan gates each candidate's windows by that candidate's own Mil
 		expect(found).toEqual({ month: "2026-01-01", annualExpenses: 1200, threshold: 30_000 })
 	})
 
+	it("Case C: travel from 'rich' stays out of the window while 'rich' is unfired by the horizon", () => {
+		// Cash 1,500; salary 1,000 (earned), pension 200 (not earned), food 100, travel 300 from 'rich'
+		// (net worth 4,100). Candidate 1 Jan 2026 stops the salary, so net worth gains 100 a month and
+		// 'rich' would fire on 1 Mar 2028, a year past the horizon. The candidate's walk ends at the
+		// horizon with 'rich' unfired, so travel never lands and the twelve months from 1 Jan 2026 hold
+		// food only: 1,200, a threshold of 25 × 1,200 = 30,000. Travel drops out because
+		// the `startAt` gate is unfired (ADR 0012).
+		const pension = income("pension", 200, { ...monthly, earned: false })
+		const travel = expense("travel", 300, { ...monthly, startAt: "rich" })
+		const fixture = plan(1_500, [food, salary, pension, travel], [netWorthAtLeast("rich", 4_100)])
+		expect(bothAgree(fixture, 12)).toEqual({
+			month: "2026-01-01",
+			annualExpenses: 1200,
+			threshold: 30_000,
+		})
+	})
+
 	it("fires on the same date with or without the stop, and agrees", () => {
 		// Cash 10,000; 'rich' is 10,500. Opening net worth: 10,000 on 1 Jan, 10,600 on 1 Feb
 		// (10,000 + 1,000 − 100 − 300), so the unchanged plan fires on 1 Feb. Candidate 1 Feb
