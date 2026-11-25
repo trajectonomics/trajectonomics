@@ -16,6 +16,7 @@ const LINKED_ATTRIBUTES = [
 	{ tag: "script", attribute: "src" },
 	{ tag: "img", attribute: "src" },
 	{ tag: "img", attribute: "srcset" },
+	{ tag: "link", attribute: "imagesrcset" },
 	{ tag: "source", attribute: "src" },
 	{ tag: "source", attribute: "srcset" },
 	{ tag: "video", attribute: "src" },
@@ -43,23 +44,38 @@ function srcsetUrls(srcset: string): readonly string[] {
 }
 
 /** The URL a `<meta http-equiv="refresh">` names, when it carries one. */
-function refreshUrl(element: HtmlElement): string | undefined {
-	if (element.tag !== "meta") return undefined
-	if ((element.attributes["http-equiv"] ?? "").toLowerCase() !== "refresh") return undefined
-	const content = element.attributes["content"] ?? ""
-	return /(?:^|;)\s*url\s*=\s*(['"]?)([^'"]+)\1/i.exec(content)?.[2]
+function refreshUrl(tag: string, attributes: Readonly<Record<string, string>>): string | undefined {
+	if (tag !== "meta") return undefined
+	if ((attributes["http-equiv"] ?? "").toLowerCase() !== "refresh") return undefined
+	const content = attributes["content"] ?? ""
+	const separator = content.search(/[,;]/)
+	if (separator === -1) return undefined
+	const rest = content.slice(separator + 1).trim()
+	const named = rest.replace(/^url\s*=\s*/i, "")
+	const unquoted = named.replace(/^['"]/, "").replace(/['"]$/, "")
+	return unquoted === "" ? undefined : unquoted
+}
+
+/** The attributes keyed by their lowercase name, because an HTML attribute name ignores case. */
+function attributesByName(element: HtmlElement): Readonly<Record<string, string>> {
+	const attributes: Record<string, string> = {}
+	for (const [name, value] of Object.entries(element.attributes)) {
+		attributes[name.toLowerCase()] = value
+	}
+	return attributes
 }
 
 /** Every URL an element carries, in the order a browser would read them. */
 function linkedUrls(element: HtmlElement): readonly LinkedUrl[] {
-	const refresh = refreshUrl(element)
+	const attributes = attributesByName(element)
+	const refresh = refreshUrl(element.tag, attributes)
 	if (refresh !== undefined) return [{ attribute: "content", value: refresh }]
 	return LINKED_ATTRIBUTES.flatMap((link): readonly LinkedUrl[] => {
 		if (link.tag !== element.tag) return []
-		const value = element.attributes[link.attribute]
+		const value = attributes[link.attribute]
 		if (value === undefined) return []
-		if (link.attribute === "srcset") {
-			return srcsetUrls(value).map((url) => ({ attribute: "srcset", value: url }))
+		if (link.attribute.endsWith("srcset")) {
+			return srcsetUrls(value).map((url) => ({ attribute: link.attribute, value: url }))
 		}
 		return [{ attribute: link.attribute, value }]
 	})
