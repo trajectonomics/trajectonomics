@@ -18,6 +18,12 @@ const fiHref = $derived(withSearch("/fi/", currentSearch()))
 	<p class="max-w-prose text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
 		{hero.sentence}
 	</p>
+	{#if hero.planNote}
+		<p class="mt-3 max-w-prose text-sm text-muted-foreground">
+			<span class="font-medium text-foreground">{hero.planNote.label}</span>
+			{hero.planNote.text}
+		</p>
+	{/if}
 	{#if hero.warningsLabel}
 		<p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
 			<span class="font-medium text-foreground">{hero.warningsLabel}</span>

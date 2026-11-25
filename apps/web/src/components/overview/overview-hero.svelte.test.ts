@@ -7,9 +7,12 @@ import OverviewHero from "./OverviewHero.svelte"
 
 const ANCHOR = noteAnchor("base", 0)
 
+const SUCCESS_NOTE =
+	"The plan holds to 2043-12-31 on 174 of 200 seeded Market paths: a success share of 87.00%."
+
 const HERO: HeroView = {
-	sentence:
-		"You could stop working in Mar 2041, at You 54. Your plan as written holds to 2043-12-31 in 174 of 200 simulated markets, which is not a guarantee.",
+	sentence: "You could stop working in Mar 2041, when you are 54.",
+	planNote: { label: "Your plan as written:", text: SUCCESS_NOTE },
 	warnings: [
 		{
 			text: "29603.80 of Contributions could not be funded, so they were not made.",
@@ -21,9 +24,11 @@ const HERO: HeroView = {
 }
 
 describe("OverviewHero", () => {
-	test("shows the sentence, the count and a link to the note", () => {
+	test("shows the sentence, the plan note, the count and a link to the note", () => {
 		const { body } = render(OverviewHero, { props: { hero: HERO } })
 		expect(body).toContain(HERO.sentence)
+		expect(body).toContain("Your plan as written:")
+		expect(body).toContain(SUCCESS_NOTE)
 		expect(body).toContain("1 thing to check")
 		expect(body).toContain(`href="/fi/#${ANCHOR}"`)
 	})
@@ -31,7 +36,12 @@ describe("OverviewHero", () => {
 	test("keeps the note's money out of Home, so hiding amounts reveals nothing new", () => {
 		const { body } = render(OverviewHero, { props: { hero: HERO } })
 		expect(body).not.toContain("29603.80")
-		expect(body).not.toMatch(/\d+\.\d{2}/)
+		expect(body).not.toContain("Contributions could not be funded")
+	})
+
+	test("shows no plan note when the chance states none", () => {
+		const { body } = render(OverviewHero, { props: { hero: { ...HERO, planNote: null } } })
+		expect(body).not.toContain("Your plan as written:")
 	})
 
 	test("shows no count when the CLI states no note to check", () => {

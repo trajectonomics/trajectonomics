@@ -9,7 +9,7 @@ import type {
 import { chanceFixture } from "../chance/fixtures.test-support"
 import { fiFixture, REACHABLE, UNREACHABLE } from "../fi/fixtures.test-support"
 import { noteAnchor } from "../projection/notes"
-import { heroOf, isWarningNote, warningsLabel } from "./hero"
+import { heroOf, warningsLabel } from "./hero"
 
 const PLAN = "base"
 
@@ -25,6 +25,17 @@ const PAIR: HouseholdDocument = {
 	people: [
 		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
 		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+	],
+	anchors: [],
+	owners: [],
+}
+
+const FAMILY: HouseholdDocument = {
+	schemaVersion: 2,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		{ id: "child", role: "dependent", relation: "child", born: "2026-10", lifeExpectancy: 90 },
 	],
 	anchors: [],
 	owners: [],
@@ -79,17 +90,29 @@ const SUCCESS_NOTE =
 const HERO_CHANCE = chanceFixture({ succeeded: 174, paths: 200, notes: [SUCCESS_NOTE] })
 
 describe("heroOf", () => {
-	test("answers a reachable plan with its month, each person's age and what the chance measured", () => {
+	test("answers a reachable plan with its month and the holder's age, and quotes the chance note below", () => {
 		const hero = heroOf(
 			snapshotOf(reachable([{ person: "me", age: 54 }]), {
 				chance: HERO_CHANCE,
 				household: HOUSEHOLD,
 			}),
 		)
-		expect(hero?.sentence).toBe(`You could stop working in Mar 2041, at You 54. ${SUCCESS_NOTE}`)
+		expect(hero?.sentence).toBe("You could stop working in Mar 2041, when you are 54.")
+		expect(hero?.planNote).toEqual({ label: "Your plan as written:", text: SUCCESS_NOTE })
 	})
 
-	test("names the partner in a household of more than one person", () => {
+	test("never puts the markets note in the answer's sentence", () => {
+		const hero = heroOf(
+			snapshotOf(reachable([{ person: "me", age: 54 }]), {
+				chance: HERO_CHANCE,
+				household: HOUSEHOLD,
+			}),
+		)
+		expect(hero?.sentence).not.toContain(SUCCESS_NOTE)
+		expect(hero?.sentence).not.toContain("simulated markets")
+	})
+
+	test("names the holder and the partner in a household of two, and no one else", () => {
 		const hero = heroOf(
 			snapshotOf(
 				reachable([
@@ -99,7 +122,26 @@ describe("heroOf", () => {
 				{ household: PAIR },
 			),
 		)
-		expect(hero?.sentence).toBe("You could stop working in Mar 2041, at You 50, Your partner 48.")
+		expect(hero?.sentence).toBe(
+			"You could stop working in Mar 2041, when you are 50 and your partner is 48.",
+		)
+	})
+
+	test("leaves a child out of the age clause", () => {
+		const hero = heroOf(
+			snapshotOf(
+				reachable([
+					{ person: "me", age: 50 },
+					{ person: "partner", age: 48 },
+					{ person: "child", age: 14 },
+				]),
+				{ household: FAMILY },
+			),
+		)
+		expect(hero?.sentence).toBe(
+			"You could stop working in Mar 2041, when you are 50 and your partner is 48.",
+		)
+		expect(hero?.sentence).not.toContain("14")
 	})
 
 	test("answers an unreachable plan with its horizon, the binding sentence and the best case", () => {
@@ -107,27 +149,33 @@ describe("heroOf", () => {
 		expect(hero?.sentence).toBe(
 			"You could not stop working before 31 Dec 2060. The money runs out, and even the locked or unrouted assets are not enough to cover the gap. If earned income stopped in Mar 2030, the money runs out on 1 Aug 2031.",
 		)
+		expect(hero?.planNote).toBeNull()
 	})
 
 	test("leaves the age clause out when the plan states no age", () => {
 		const hero = heroOf(snapshotOf(reachable(), { chance: HERO_CHANCE }))
-		expect(hero?.sentence).toBe(`You could stop working in Mar 2041. ${SUCCESS_NOTE}`)
+		expect(hero?.sentence).toBe("You could stop working in Mar 2041.")
 		expect(hero?.sentence).not.toContain(", at ")
 	})
 
-	test("answers a reachable plan with no chance read in its FI date alone", () => {
+	test("leaves the age clause out without a household", () => {
+		const hero = heroOf(snapshotOf(reachable([{ person: "me", age: 54 }])))
+		expect(hero?.sentence).toBe("You could stop working in Mar 2041.")
+	})
+
+	test("states no plan note when there is no chance read", () => {
 		const hero = heroOf(
 			snapshotOf(reachable([{ person: "me", age: 54 }]), { household: HOUSEHOLD }),
 		)
-		expect(hero?.sentence).toBe("You could stop working in Mar 2041, at You 54.")
-		expect(hero?.sentence).not.toContain("simulated markets")
+		expect(hero?.planNote).toBeNull()
 	})
 
 	test("names the chance's own horizon and counts when it states no success note", () => {
 		const hero = heroOf(snapshotOf(reachable(), { chance: chanceFixture({ succeeded: 174 }) }))
-		expect(hero?.sentence).toBe(
-			"You could stop working in Mar 2041. Your plan as written holds to 2028-12-31 in 174 of 200 simulated markets, which is not a guarantee.",
-		)
+		expect(hero?.planNote).toEqual({
+			label: "Your plan as written:",
+			text: "The plan holds to 2028-12-31 in 174 of 200 simulated markets, which is not a guarantee.",
+		})
 	})
 
 	test("holds no arithmetic: every number is exactly one of the values it was given", () => {
@@ -141,14 +189,13 @@ describe("heroOf", () => {
 				household: HOUSEHOLD,
 			}),
 		)
-		expect(hero?.sentence).toBe(
-			"You could stop working in Jul 2057, at You 47. Your plan as written holds to 2058-12-31 in 137 of 219 simulated markets, which is not a guarantee.",
-		)
-		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47", "2058", "12", "31", "137", "219"])
+		expect(hero?.sentence).toBe("You could stop working in Jul 2057, when you are 47.")
+		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47"])
+		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["2058", "12", "31", "137", "219"])
 	})
 })
 
-describe("the warnings count", () => {
+describe("the warnings", () => {
 	const notes = [
 		"29603.80 of Contributions could not be funded, so they were not made. Contribution cap: use a monthly Flow.",
 		"The Scenario had 125000.00 unmet on 2027-03-31. Anything the day's income cannot cover is paid only from the Accounts in cashflow.withdraw.",
@@ -157,42 +204,13 @@ describe("the warnings count", () => {
 		"FI is not reachable, so taxYears describes the plan as written, with earned income running to the horizon.",
 	]
 
-	test("counts the unfunded, unmet and tax notes, and no others", () => {
+	test("counts the unfunded, unmet and tax notes, and links each to its own anchor", () => {
 		const hero = heroOf(snapshotOf({ ...reachable(), notes }))
-		expect(hero?.warnings).toHaveLength(3)
-		expect(hero?.warningsLabel).toBe("3 things to check")
-		expect(notes.filter(isWarningNote)).toEqual(notes.slice(0, 3))
-	})
-
-	test("recognises the exact sentences the CLI's note builders state", () => {
-		const stated = [
-			"29603.80 of Contributions could not be funded, so they were not made. Contribution cap: use a monthly Flow.",
-			"Side B could not fund 125000.00 of Contributions, so they were not made. Contribution cap: use a monthly Flow.",
-			"The Scenario had 125000.00 unmet on 2027-03-31. Anything the day's income cannot cover is paid only from the Accounts in cashflow.withdraw, and this asset Account was not in it, holding on that day: bank (125000.00). If the Scenario may draw on it, add it to cashflow.withdraw, for example --set 'cashflow.withdraw=[\"bank\"]'.",
-			"No tax is applied; figures are before tax.",
-			"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
-			"Tax before 2026 is not recomputed; any tax still owed belongs in the Ledger as a liability.",
-		]
-		expect(stated.filter(isWarningNote)).toEqual(stated)
-	})
-
-	test("leaves the success note and an applied-tax note out of the count", () => {
-		expect(isWarningNote(SUCCESS_NOTE)).toBe(false)
-		expect(
-			isWarningNote(
-				'Tax is applied: Thailand 2026 personal income tax, from the Scenario\'s Levy "th-2026".',
-			),
-		).toBe(false)
-	})
-
-	test("links each warning to the note it counts, by the note's own anchor", () => {
-		const hero = heroOf(snapshotOf({ ...reachable(), notes }))
-		expect(hero?.warnings.map((warning) => warning.anchor)).toEqual([
-			noteAnchor(PLAN, 0),
-			noteAnchor(PLAN, 1),
-			noteAnchor(PLAN, 2),
-		])
 		expect(hero?.warnings.map((warning) => warning.text)).toEqual(notes.slice(0, 3))
+		expect(hero?.warnings.map((warning) => warning.anchor)).toEqual(
+			notes.slice(0, 3).map((_, index) => noteAnchor(PLAN, index)),
+		)
+		expect(hero?.warningsLabel).toBe("3 things to check")
 	})
 
 	test("says one thing, or nothing, in words", () => {
