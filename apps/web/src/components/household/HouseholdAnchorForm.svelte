@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioFlow } from "../../lib/contract"
 import {
 	type AnchorDraft,
@@ -32,8 +33,14 @@ let draft: AnchorDraft = $state(anchorDraftOf())
 let problems: Problems = $state({})
 const FIELDS = ["flow", "edge", "person", "when", "age"]
 const shown = $derived(shownProblems(problems, editSession.failure, editSession.error, FIELDS))
-const flowChoices = $derived([BLANK, ...flows.map((flow) => ({ value: flow.id, label: flow.id }))])
-const personChoices = $derived([BLANK, ...people.map((id) => ({ value: id, label: id }))])
+const flowChoices = $derived([
+	BLANK,
+	...flows.map((flow) => ({ value: flow.id, label: currentItemText("flow", flow.id) })),
+])
+const personChoices = $derived([
+	BLANK,
+	...people.map((id) => ({ value: id, label: currentItemText("person", id) })),
+])
 
 /** Saves the household with this anchor as one Edit; the drawer closes only when it ran. */
 async function save(event: SubmitEvent): Promise<void> {

@@ -32,7 +32,7 @@ rule, and a label that would overlap an earlier one moves down a row. -->
 			x={hangLeft ? marker.x - 4 : marker.x + 4}
 			y={MARGIN.top + 10 + (rows[index] ?? 0) * ROW_PX}
 			text-anchor={hangLeft ? "end" : "start"}
-			class="fill-foreground text-xs">{marker.label}</text
+			class="fill-foreground {marker.code === true ? 'font-mono text-[11px]' : 'text-xs'}">{marker.label}</text
 		>
 	</g>
 {/each}

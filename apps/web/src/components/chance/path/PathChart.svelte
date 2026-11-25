@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../../client/item-names.svelte.js"
 import type { ProjectionPath } from "../../../lib/contract"
 import { formatDate } from "../../../lib/format"
 import { pathMarkers, RUN_OUT_LABEL } from "../../../lib/view/chance/path-view"
@@ -7,6 +8,7 @@ import { netWorthSeries } from "../../../lib/view/projection/chart"
 import { parseTerms } from "../../../lib/view/projection/terms"
 import LineChart from "../../chart/LineChart.svelte"
 import TermsControl from "../../projection/TermsControl.svelte"
+import ItemName from "../../ui/ItemName.svelte"
 
 interface Props {
 	path: ProjectionPath
@@ -29,13 +31,13 @@ const reached = $derived(milestoneView(path)?.reached ?? [])
 	<LineChart
 		label="Net worth at the close of each year of this future"
 		series={netWorthSeries(path, chosen)}
-		markers={pathMarkers(path)}
+		markers={pathMarkers(path, currentItemNames())}
 		kind="bars"
 	/>
 	<!-- The marks above, in words, for a reader who cannot see them. -->
 	<ul class="sr-only">
 		{#each reached as milestone (milestone.id)}
-			<li>{milestone.id}: reached on {formatDate(milestone.date)}</li>
+			<li><ItemName kind="milestone" id={milestone.id} />: reached on {formatDate(milestone.date)}</li>
 		{/each}
 		{#if path.runsOut !== null}
 			<li>{RUN_OUT_LABEL}: {formatDate(path.runsOut.date)}</li>

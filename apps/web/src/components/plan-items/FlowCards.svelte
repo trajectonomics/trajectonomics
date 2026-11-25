@@ -1,6 +1,8 @@
 <script lang="ts">
+import { currentItemText } from "../../client/item-names.svelte.js"
 import type { FlowCard } from "../../lib/view/plan-items/flows"
 import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
+import ItemName from "../ui/ItemName.svelte"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
 import WasText from "../what-if/WasText.svelte"
@@ -26,11 +28,11 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 		{@const mark = marks[card.id] ?? NO_MARKS}
 		<li class="rounded-lg border border-border bg-card p-4 {mark.off ? 'opacity-60' : ''}">
 			<div class="flex items-start justify-between gap-3">
-				<h2 class="font-semibold break-all">{card.id}</h2>
+				<h2 class="font-semibold break-all"><ItemName kind="flow" id={card.id} /></h2>
 				{#if editable && card.editable}
 					<button
 						type="button"
-						aria-label="Edit {card.id}"
+						aria-label="Edit {currentItemText("flow", card.id)}"
 						onclick={() => onEdit(card.id)}
 						class="shrink-0 rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 					>
@@ -69,7 +71,7 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				{/if}
 			</dl>
 			{#if editable && card.editable}
-				<ItemSwitch {plan} {contentHash} path="flows.{card.id}" label={card.id} onTry={() => onTry(card.id)} />
+				<ItemSwitch {plan} {contentHash} path="flows.{card.id}" label={currentItemText("flow", card.id)} onTry={() => onTry(card.id)} />
 			{/if}
 		</li>
 	{/each}

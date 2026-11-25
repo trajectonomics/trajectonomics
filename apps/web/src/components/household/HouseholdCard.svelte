@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, ScenarioDocument } from "../../lib/contract"
 import { householdWithoutAnchor } from "../../lib/view/household/document"
 import { personCards } from "../../lib/view/household/model"
@@ -36,7 +37,8 @@ const existing = $derived(
 )
 const title = $derived.by(() => {
 	if (shown?.form === "anchor") return "Pin a date to a person"
-	if (shown?.form === "person" && shown.id !== undefined) return `Edit ${shown.id}`
+	if (shown?.form === "person" && shown.id !== undefined)
+		return `Edit ${currentItemText("person", shown.id)}`
 	return household === null ? "Set up the household" : "Add a person"
 })
 

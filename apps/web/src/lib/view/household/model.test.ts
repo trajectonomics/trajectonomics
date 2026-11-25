@@ -1,14 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument } from "../../contract"
-import {
-	agesText,
-	anchorAt,
-	anchorLabel,
-	flowAnchorLabels,
-	householdHref,
-	personCards,
-	roleText,
-} from "./model"
+import { personNames } from "../item-names"
+import { agesText, anchorAt, flowAnchorLabels, householdHref, personCards, roleText } from "./model"
 
 const household: HouseholdDocument = {
 	schemaVersion: 1,
@@ -57,21 +50,11 @@ describe("personCards", () => {
 })
 
 describe("anchor labels", () => {
-	test("an age, a life end and a joining each read as the household states it", () => {
-		expect(anchorLabel({ path: "flows.salary.end", person: "me", age: 60 })).toBe("at me, age 60")
-		expect(anchorLabel({ path: "flows.pension.end", person: "me", at: "lifeEnd" })).toBe(
-			"at me, life end",
-		)
-		expect(
-			anchorLabel({ path: "flows.partner-salary.start", person: "partner", at: "joins" }),
-		).toBe("at partner, joining")
-	})
-
 	test("a flow's start and end carry the label of their own anchor, and no other", () => {
-		expect(flowAnchorLabels(household, "salary")).toEqual({ start: null, end: "at me, age 60" })
+		expect(flowAnchorLabels(household, "salary")).toEqual({ start: null, end: "at you, age 60" })
 		expect(flowAnchorLabels(household, "pension")).toEqual({
 			start: null,
-			end: "at me, life end",
+			end: "at you, life end",
 		})
 		expect(flowAnchorLabels(null, "salary")).toEqual({ start: null, end: null })
 	})
@@ -90,6 +73,19 @@ describe("agesText", () => {
 				{ person: "partner", age: 58 },
 			]),
 		).toBe("me 60, partner 58")
+	})
+
+	test("calls each person by the household's words, and one it does not name by id", () => {
+		expect(
+			agesText(
+				[
+					{ person: "me", age: 60 },
+					{ person: "partner", age: 58 },
+					{ person: "ghost", age: 4 },
+				],
+				personNames(household),
+			),
+		).toBe("You 60, Your partner 58, ghost 4")
 	})
 
 	test("is empty when the row carries no ages", () => {

@@ -28,7 +28,7 @@ describe("the session bar's words for a tried Flow", () => {
 		]) {
 			const words = tryWords(change, account)
 			expect(words).toBe(
-				"Retirement-spending: spends 3.50% of savings at the start, then cuts and raises by guardrails, from Savings account and Index fund",
+				"retirement-spending: spends 3.50% of savings at the start, then cuts and raises by guardrails, from Savings account and Index fund",
 			)
 			expect(words).not.toContain("{")
 			expect(words).not.toContain("300000")
@@ -43,7 +43,7 @@ describe("the session bar's words for a tried Flow", () => {
 			growth: "inflation",
 		}
 		expect(tryWords(changeAt("flows.retirement-spending", level), account)).toBe(
-			"Retirement-spending: a level amount that keeps pace with inflation",
+			"retirement-spending: a level amount that keeps pace with inflation",
 		)
 	})
 

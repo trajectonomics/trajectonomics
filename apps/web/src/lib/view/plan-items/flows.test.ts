@@ -80,7 +80,7 @@ describe("flowCards with a household", () => {
 			anchors: [{ path: "flows.salary.end", person: "me", age: 60 }],
 		}
 		const cards = flowCards(planDocument().flows, "income", household)
-		expect(cards[0]).toMatchObject({ startAnchor: null, endAnchor: "at me, age 60" })
+		expect(cards[0]).toMatchObject({ startAnchor: null, endAnchor: "at you, age 60" })
 		expect(cards[1]).toMatchObject({ startAnchor: null, endAnchor: null })
 	})
 })

@@ -5,6 +5,7 @@ import type { EmployerDraft } from "../../lib/view/plan-items/employer-draft"
 import type { FlowDraft, FlowKind } from "../../lib/view/plan-items/flows"
 import { FREQUENCY_CHOICES, GROWTH_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import ItemName from "../ui/ItemName.svelte"
 import EmployerFields from "./EmployerFields.svelte"
 import Field from "./Field.svelte"
 
@@ -41,7 +42,7 @@ let {
 <!-- The fields of a Flow. Its amount is text, sent as the person typed it, after its commas are removed. -->
 <div class="space-y-4">
 	{#if existing}
-		<p class="text-sm text-foreground">Item <span class="font-medium">{existing.id}</span></p>
+		<p class="text-sm text-foreground">Item <span class="font-medium"><ItemName kind="flow" id={existing.id} /></span></p>
 	{:else}
 		<Field id="flow-name" label="Name" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}

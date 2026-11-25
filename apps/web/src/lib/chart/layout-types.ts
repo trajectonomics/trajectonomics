@@ -61,7 +61,11 @@ export interface LineLayout {
 	readonly xTicks: readonly { readonly index: number; readonly label: string }[]
 	readonly yTicks: readonly { readonly value: number; readonly y: number }[]
 	readonly series: readonly SeriesLayout[]
-	readonly markers: readonly { readonly x: number; readonly label: string }[]
+	readonly markers: readonly {
+		readonly x: number
+		readonly label: string
+		readonly code?: boolean
+	}[]
 	/** "wide" draws series from a longer palette, for a chart of many series; left out, the first three. */
 	readonly palette?: "wide"
 	/** The labels of a second axis, when a series in other units is drawn against its own scale. */

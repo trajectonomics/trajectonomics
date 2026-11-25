@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import type { HouseholdDocument, HouseholdPerson } from "../../lib/contract"
 import { householdWithoutPerson, householdWithPerson } from "../../lib/view/household/document"
 import {
@@ -11,6 +12,7 @@ import { RELATION_CHOICES, ROLE_CHOICES } from "../../lib/view/plan-items/option
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import Field from "../plan-items/Field.svelte"
 import ItemActions from "../plan-items/ItemActions.svelte"
+import ItemName from "../ui/ItemName.svelte"
 
 interface Props {
 	/** The Scenario the household belongs to: the Edit saves its household under this name. */
@@ -61,9 +63,9 @@ async function removePerson(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Add a person"}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("person", existing.id)}` : "Add a person"}>
 	{#if existing}
-		<p class="text-sm text-foreground">Person <span class="font-medium">{existing.id}</span></p>
+		<p class="text-sm text-foreground">Person <span class="font-medium"><ItemName kind="person" id={existing.id} /></span></p>
 	{:else}
 		<Field id="person-name" label="Name" hint="A short name for the person, such as me or partner" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}
@@ -77,5 +79,5 @@ async function removePerson(): Promise<void> {
 		<Field id="person-joins" label="Joins the plan" hint="The month, YYYY-MM, or empty when the partner is in the plan from the start" bind:value={draft.joins} problem={shown.at("joins")} />
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	<ItemActions id={existing?.id} onDelete={removePerson} />
+	<ItemActions id={existing?.id} kind="person" onDelete={removePerson} />
 </form>

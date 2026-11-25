@@ -38,7 +38,9 @@ describe("MilestonesBody", () => {
 		const body = renderBody(withMilestones(MILESTONE_ROWS))
 		expect(body).toContain("<title>first-year</title>")
 		expect(body).toContain('<ul class="sr-only">')
-		expect(body).toContain("first-year: reached on 31 Dec 2026")
+		expect(body).toMatch(
+			/data-item="first-year"[^>]*>first-year<\/code>(<!--.*?-->)*: reached on 31 Dec 2026/,
+		)
 		expect(body).not.toContain("never: reached")
 	})
 

@@ -1,11 +1,13 @@
 <script lang="ts">
 import type { Snippet } from "svelte"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import type { ProjectionRun } from "../../lib/contract"
 import { formatDate } from "../../lib/format"
 import { milestoneMarkers, milestoneView } from "../../lib/view/milestones/milestones"
 import { netWorthSeries } from "../../lib/view/projection/chart"
 import { parseTerms } from "../../lib/view/projection/terms"
 import LineChart from "../chart/LineChart.svelte"
+import ItemName from "../ui/ItemName.svelte"
 import TermsControl from "./TermsControl.svelte"
 
 interface Props {
@@ -21,7 +23,7 @@ interface Props {
 let { run, terms, onTerms, title }: Props = $props()
 const chosen = $derived(parseTerms(terms))
 const series = $derived(netWorthSeries(run, chosen))
-const markers = $derived(milestoneMarkers(run))
+const markers = $derived(milestoneMarkers(run, currentItemNames()))
 const reached = $derived(milestoneView(run)?.reached ?? [])
 </script>
 
@@ -39,7 +41,7 @@ const reached = $derived(milestoneView(run)?.reached ?? [])
 		<!-- The marks above, in words, for a reader who cannot see them. -->
 		<ul class="sr-only">
 			{#each reached as milestone (milestone.id)}
-				<li>{milestone.id}: reached on {formatDate(milestone.date)}</li>
+				<li><ItemName kind="milestone" id={milestone.id} />: reached on {formatDate(milestone.date)}</li>
 			{/each}
 		</ul>
 	{/if}

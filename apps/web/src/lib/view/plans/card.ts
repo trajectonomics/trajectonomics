@@ -1,6 +1,8 @@
 import type { LineMarker, LineSeries } from "../../chart"
 import type { Fi, ProjectionChance, ProjectionRun, Read, Snapshot } from "../../contract"
 import { formatMonth, formatShare } from "../../format"
+import { agesText } from "../household/model"
+import { type PersonNames, snapshotItemNames } from "../item-names"
 import { projectionView } from "../overview/projection"
 import { type PlanChart, planChart } from "./chart"
 import { type NotesPreview, notesPreview } from "./notes"
@@ -39,18 +41,21 @@ export interface PlanCard {
 }
 
 /** The ages a reachable FI answer states: "age 54", or each person's when the household has several. */
-function agesText(ages: Extract<Fi["fi"], { reachable: true }>["ages"]): string | null {
+function agesOf(
+	ages: Extract<Fi["fi"], { reachable: true }>["ages"],
+	people: PersonNames,
+): string | null {
 	if (ages.length === 0) return null
 	const [only] = ages
 	if (ages.length === 1 && only !== undefined) return `age ${only.age}`
-	return ages.map((one) => `${one.person} ${one.age}`).join(", ")
+	return agesText(ages, people)
 }
 
-function fiOf(read: Read<Fi> | undefined): CardFi | null {
+function fiOf(read: Read<Fi> | undefined, people: PersonNames): CardFi | null {
 	if (read === undefined || !read.ok) return null
 	const result = read.data.fi
 	if (!result.reachable) return { reachable: false }
-	return { reachable: true, month: formatMonth(result.fiDate), ages: agesText(result.ages) }
+	return { reachable: true, month: formatMonth(result.fiDate), ages: agesOf(result.ages, people) }
 }
 
 function chanceOf(read: Read<ProjectionChance> | undefined): CardChance | null {
@@ -70,11 +75,12 @@ export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCa
 	const { reads } = snapshot
 	const shown = reads.documents[row.name]
 	const run = reads.projections[row.name]
-	const chart: PlanChart | null = run?.ok ? planChart(run.data, range) : null
+	const names = snapshotItemNames(snapshot, row.name)
+	const chart: PlanChart | null = run?.ok ? planChart(run.data, range, names) : null
 	return {
 		row,
 		notes: notesPreview(shown?.ok ? shown.data.scenario.notes : null),
-		fi: fiOf(reads.fi[row.name]),
+		fi: fiOf(reads.fi[row.name], names.people),
 		chance: chanceOf(reads.chance[row.name]),
 		netWorth: run?.ok ? netWorthOf(run.data) : null,
 		series: chart?.series ?? [],

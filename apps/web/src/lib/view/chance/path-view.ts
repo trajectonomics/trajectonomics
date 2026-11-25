@@ -2,6 +2,7 @@ import { dayPosition, type LineMarker } from "../../chart"
 import type { ProjectionChance, ProjectionPath } from "../../contract"
 import { formatMonth } from "../../format"
 import { agesText } from "../household/model"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { milestoneMarkers } from "../milestones/milestones"
 import { type AnnualRow, annualRowsOf } from "../projection/annual"
 import { lowestWhen, pathTitle, returnText } from "./path-words"
@@ -81,8 +82,8 @@ export function pathHeaderOf(path: ProjectionPath, chance: ProjectionChance): Pa
  * The marks on the chart: each reached Milestone as the Projection page draws it, and the run-out as a rule where the
  * money ran out. A date outside every year row is not drawn; the header still says it.
  */
-export function pathMarkers(path: ProjectionPath): LineMarker[] {
-	const markers = milestoneMarkers(path)
+export function pathMarkers(path: ProjectionPath, names: ItemNames = NO_ITEM_NAMES): LineMarker[] {
+	const markers = milestoneMarkers(path, names)
 	if (path.runsOut === null) return markers
 	const x = dayPosition(annualRowsOf(path), path.runsOut.date)
 	return x === null ? markers : [...markers, { x, label: RUN_OUT_LABEL }]
@@ -97,7 +98,11 @@ function holds(row: AnnualRow, day: string): boolean {
  * The table of years: each annual row with the returns `traj` states for that roll-up (matched by the roll-up's index),
  * its income, spending and net worth as strings, and the marks of the years the lowest point and the run-out fall in.
  */
-export function pathRowsOf(path: ProjectionPath, lowestDay: string | null): PathRow[] {
+export function pathRowsOf(
+	path: ProjectionPath,
+	lowestDay: string | null,
+	names: ItemNames = NO_ITEM_NAMES,
+): PathRow[] {
 	const accounts = returnAccounts(path)
 	const returns = new Map(path.returns.map((rollup) => [rollup.index, rollup.accounts]))
 	return annualRowsOf(path).map((row) => {
@@ -109,7 +114,7 @@ export function pathRowsOf(path: ProjectionPath, lowestDay: string | null): Path
 		return {
 			key: String(row.index),
 			ends: formatMonth(row.to),
-			ages: agesText(row.ages),
+			ages: agesText(row.ages, names.people),
 			returns: accounts.map((id) => {
 				const found = states.find((entry) => entry.account === id)
 				return found === undefined ? null : returnText(found.returnBps)

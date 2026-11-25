@@ -100,6 +100,12 @@ function markersIn(
 		const centre = xPixels[column]
 		const x = xs[column]
 		if (centre === undefined || x === undefined) return []
-		return [{ x: centre - slot / 2 + (marker.x - (x - 1)) * slot, label: marker.label }]
+		return [
+			{
+				x: centre - slot / 2 + (marker.x - (x - 1)) * slot,
+				label: marker.label,
+				...(marker.code === true ? { code: true } : {}),
+			},
+		]
 	})
 }

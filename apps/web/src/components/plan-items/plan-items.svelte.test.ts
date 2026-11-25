@@ -48,7 +48,7 @@ describe("the household's anchored dates on the planner pages", () => {
 				contentHash: HASH,
 			},
 		}).body
-		expect(body).toContain("at me, age 60")
+		expect(body).toContain("at you, age 60")
 	})
 
 	test("the Flow form disables a pinned date and links to the household card", () => {
@@ -60,7 +60,7 @@ describe("the household's anchored dates on the planner pages", () => {
 				existing: salary,
 				shown: NO_PROBLEMS,
 				name: "base",
-				anchors: { start: null, end: "at me, age 60" },
+				anchors: { start: null, end: "at you, age 60" },
 			},
 		}).body
 		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { formatDate } from "../../lib/format"
 import { agesText } from "../../lib/view/household/model"
 import type { AnnualRow } from "../../lib/view/projection/annual"
@@ -45,7 +46,7 @@ const columns: Column<AnnualRow>[] = [
 {#snippet unfunded(row: AnnualRow)}<Money amount={row.unfundedContributions} />{/snippet}
 {#snippet interest(row: AnnualRow)}<Money amount={row.interest} />{/snippet}
 {#snippet unmet(row: AnnualRow)}<Money amount={row.unmet} />{/snippet}
-{#snippet ages(row: AnnualRow)}{agesText(row.ages) || "—"}{/snippet}
+{#snippet ages(row: AnnualRow)}{agesText(row.ages, currentItemNames().people) || "—"}{/snippet}
 
 {#snippet real(row: AnnualRow)}
 	<Money amount={row.realNetWorth.amount} />

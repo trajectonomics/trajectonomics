@@ -162,7 +162,9 @@ describe("the form", () => {
 		expect(body).toContain("Your own estimate")
 		expect(body).toContain("Cut after the share grows too large")
 		expect(body).toContain("Raise after the share grows too small")
-		expect(body).toContain("Stop rent when this starts")
+		expect(body).toMatch(
+			/Stop (<!--.*?-->)*<code[^>]*data-item="rent"[^>]*>rent<\/code>(<!--.*?-->)* when this starts/,
+		)
 		expect(body).not.toMatch(/value="rent"[^>]*checked/)
 	})
 })

@@ -45,6 +45,7 @@ export function lineLayout(
 		markers: markers.map((marker) => ({
 			x: clampToPlot(scaleX(marker.x), plot),
 			label: marker.label,
+			...(marker.code === true ? { code: true } : {}),
 		})),
 		...(palette ? { palette } : {}),
 	}
