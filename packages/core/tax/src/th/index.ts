@@ -23,6 +23,7 @@ export type {
 	ThLevyMonthDay,
 	ThLevyProfile,
 	ThLevySection40_4Elections,
+	ThLevySharedMortgage,
 	ThSeparateClaimOptions,
 	ThSeparateClaimProblem,
 } from "./levy"

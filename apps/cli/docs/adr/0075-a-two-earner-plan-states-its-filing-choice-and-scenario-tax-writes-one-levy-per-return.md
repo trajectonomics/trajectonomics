@@ -251,7 +251,34 @@ This is the follow-up the shared home-loan ceiling left above.
 - **The Dashboard** reads `sharedMortgageInterest` but neither shows nor edits it, and a save of the
   whole profile from the Dashboard drops it, as a write with `--tax` that leaves it out does.
   Follow-up: trajectonomics/trajectonomics#618.
-- **Known limit: the one-earner rule is applied once per write, not per projection year.** Who is a
-  Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
-  2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
-  the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.
+
+## Amended (2026-11-26): the one-earner rule applies in every projection year (#619)
+
+The one-earner rule this ADR stated at the write is now applied period by period, so the shared
+interest is right in every year of the Projection, not only in the first.
+
+- **The rule.** Each Settlement period is one tax year. A separate Return whose profile states
+  `sharedMortgageInterest` emits one mortgage-interest Measure instead of a fixed claim. In a period
+  where this Return has no income it claims nothing of the loan; where the other Filer also has
+  income it claims its stored share; where the other Filer has none it claims the whole loan; and
+  each claim is capped with this Return's own interest at the 100,000 baht every Return has. A
+  Filer's income is the same view tax-core gives that Filer under `married_separate`: their own
+  gross income labels plus half of `@shared`, so shared income alone keeps both Returns in the
+  split.
+- **What the write still computes.** The two shares and the odd satang (to the holder) are still
+  made once, at the write, and stored as each Levy's both-earners claim; tax-core divides nothing.
+  The Levy carries the other Filer's id and this Return's own interest in `sharedMortgage`, and its
+  `pick` Measures decide the period's claim. A plan that has no other Filer (a sole Filer, or a plan
+  without Filers) keeps the fixed claim it wrote before.
+- **The consequence for a mid-period start.** A shared-loan Levy tallies the other Filer's income
+  labels so it can see that income. `--carry-in` for a period a shared-loan separate plan starts
+  inside therefore states 73 classes per Levy: 29 for the Filer, the 22 `@shared` income classes and
+  the other Filer's 22 income classes.
+- **Hand check, in the projection tests.** Salaries of 1,000,000 and 500,000, separate filing, a
+  60,000 loan, and the partner's salary ends in 2027. In 2026 and 2027 the holder claims 30,000 with
+  its own interest, so allowances are 60,000 + 30,000 = 90,000, taxable 810,000 and tax 77,000. From
+  2028 only the holder earns, so it claims all 60,000: allowances 120,000, taxable 780,000 and tax
+  71,000, not 77,000. The partner owes 8,500 in 2026 and 2027 and nothing later.
+- **Unchanged.** Two earners in every year keep the half split and the same tax. A plan without
+  Filers keeps the fixed claim it wrote before, and its `scenario tax` and projection output are
+  byte-identical to the build before this amendment.

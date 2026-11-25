@@ -5,17 +5,18 @@ import type { FilerScope } from "./filer-scope"
 import type { TaxRequest } from "./flags"
 import type { JsonRecord } from "./json"
 import { TAX_LEVY_ID, taxLevyIdFor } from "./levy-ids"
-import { sharedShares, withShare } from "./shared-mortgage"
+import { type SharedClaim, sharedClaim, sharedMortgageField } from "./shared-claim"
+import { withShare } from "./shared-mortgage"
 
 /**
  * The Levy this build would write for a request and a Levy id; `AppError` when tax-core refuses it.
- * `share` is the Return's part, in satang, of the interest on a loan borrowed together.
+ * `shared` is the Return's part, in satang, of the loan borrowed together and the other Filer.
  */
 export function emitLevy(
 	request: TaxRequest,
 	id: string,
 	filers?: readonly string[],
-	share = 0,
+	shared?: SharedClaim,
 ): JsonRecord | AppError {
 	if (request.jurisdiction !== "th-2026") {
 		return fail("invalid_input", {
@@ -38,12 +39,15 @@ export function emitLevy(
 				healthInsurance: request.allowances.healthInsurance,
 				parentHealthInsurance: request.allowances.parentHealthInsurance,
 				spouseLifeInsurance: request.allowances.spouseLifeInsurance,
-				mortgageInterest: withShare(request.allowances.mortgageInterest, share),
+				mortgageInterest: withShare(request.allowances.mortgageInterest, shared?.share ?? 0),
 				donation2x: request.allowances.donation2x,
 				donation1x: request.allowances.donation1x,
 			},
 			levy: { id },
 			...(filers === undefined ? {} : { filers }),
+			...(shared === undefined
+				? {}
+				: sharedMortgageField(request.allowances.mortgageInterest, shared)),
 		})
 		return levy as unknown as JsonRecord
 	} catch (error) {
@@ -74,10 +78,10 @@ function one(levy: JsonRecord | AppError): JsonRecord[] | AppError {
 /** One Levy per Filer of a separate Return, keyed by that Filer's Levy id. */
 function separateLevies(request: TaxRequest, scope: FilerScope): JsonRecord[] | AppError {
 	const levies: JsonRecord[] = []
-	const shares = sharedShares(request, scope.filers.length)
 	for (const [at, filer] of scope.filers.entries()) {
 		const own = requestForFiler(request, filer)
-		const levy = emitLevy(own, taxLevyIdFor(filer), [filer], shares[at])
+		const claim = sharedClaim(request, scope.filers, at)
+		const levy = emitLevy(own, taxLevyIdFor(filer), [filer], claim)
 		if (isAppError(levy)) return levy
 		levies.push(levy)
 	}
