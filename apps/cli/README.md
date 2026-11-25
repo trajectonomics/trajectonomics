@@ -220,12 +220,16 @@ Flow or Account, with the same Owner suffixes. Each Prepayment of the tax moves 
 Levy of its Flow's Owner (a Prepayment of a Levy of your own stays). A `shared` Flow's
 Prepayment is split half to each, and its capped Prepayment stays whole on the holder's.
 Each allowance flag takes a person (`--parents partner=2`) so each Return states its own
-claims, a bare value names the holder, and each Return's children default to 0. A Return
-claims at most its own two parents, and on a loan whose Owner is `shared` the two Returns
-state at most 100,000 baht of interest together. `--merge` and `--from-stored` keep the
-stored `returns`, and `--merge` to `married_joint` keeps the partner's for a later switch
-back. A `projection run` then reports a `filer` on each `taxYears` entry, `--carry-in`
-takes one record per Levy, and `projection allowances` answers per Return.
+claims, a bare value names the holder, and each Return's children default to 0. A value
+for someone with no income is refused, because no Return carries it. A Return claims at
+most its own two parents. Each Return has its own home-loan interest ceiling; interest on
+a loan borrowed together shares one 100,000 baht ceiling, which `traj` cannot tell from
+two separate loans, so state each person's share yourself. When both claim interest and a
+loan's Owner is `shared`, the result's `assumptions` say the loans are taken to be
+separate. `--merge` and `--from-stored` keep the stored `returns`, and `--merge` to
+`married_joint` keeps the partner's for a later switch back. A `projection run` then
+reports a `filer` on each `taxYears` entry, `--carry-in` takes one record per Levy, and
+`projection allowances` answers per Return.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,

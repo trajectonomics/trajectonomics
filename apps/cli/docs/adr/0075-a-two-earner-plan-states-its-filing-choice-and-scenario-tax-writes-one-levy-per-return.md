@@ -138,26 +138,41 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   such as one written before the plan had Owners, gives the holder's Return the flat claims, on
   `--merge` and on `--from-stored`.
 - **`returns` across a status change.** `--merge` keeps every item it is not told to change (ADR-0066),
-  so under another status the profile keeps the partner's entry, if it claims anything. No Levy reads
-  it there. The holder's entry is dropped, because the flat keys are then what changes, and a later
-  separate filing takes the holder's claims from them and the partner's from the kept entry. A write
-  of the whole profile (`--tax`) states it whole, so it keeps neither.
+  so a write that files no separate Return keeps the entry of the household's partner, if it claims
+  anything. No Levy reads it there. No other entry is kept, and none when the plan has no household or
+  no partner then, so the partner's claims are lost by a write made while the plan names no partner.
+  The holder's entry is dropped because the flat keys are what changes: a later separate filing takes
+  the holder's claims from them and the partner's from the kept entry. An entry kept for a holder the
+  write could not identify would outlast those changes and understate the tax. A write of the whole
+  profile (`--tax`) states it whole, so it keeps neither.
 - **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
-  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder; while the
-  holder has no income it is stored and no Return carries it. `--merge` merges into the stored
-  `returns`, and `--from-stored` keeps them. Each of these is refused at the flag, as `invalid_input`:
+  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. `--merge`
+  merges into the stored `returns`, and `--from-stored` keeps them. Each of these is refused at the
+  flag, as `invalid_input`:
   - a person-qualified value without `married_separate` and Filers;
-  - a person-qualified value for a person who is not a Filer, because no Levy is written to carry it;
+  - on `married_separate` with a partner, a person who is neither the holder nor the partner;
+  - a value for a person who is not a Filer, because no Levy is written to carry it. That includes a
+    bare value on a separate filing whose holder has no income. Claims the profile already holds for
+    such a person stay stored and no Return carries them;
   - a bare value beside the holder's own id on one flag, which states the holder twice;
-  - a count that is not a safe integer, or an amount that is not a safe number of satang, with the
-    message "The value is outside its allowed range.".
+  - a count that is not a safe integer or is too large for tax-core to compute a Return with, or an
+    amount that is not a safe number of satang, with the message "The value is outside its allowed
+    range.".
 - **The cross-Return check.** Every separate Return with Filers, of one Filer or two, goes through
   `thSeparateClaimProblems` (tax ADR-0010) before its Levies are written, `--merge` and `--from-stored`
-  included. `OWN_PARENTS_OVER_TWO` is refused at `--parents` and `MORTGAGE_OVER_CEILING` at
-  `--mortgage-interest`, with `details` naming the `problem` and the `persons`. The function checks a
-  mortgage only when told the two Returns state one loan. The CLI says so when there are two Filers and
-  the household names `shared` as the Owner of a liability Account. A liability has no kind, so any
-  shared loan counts; a loan borrowed together that has no `shared` Owner is not checked.
+  included. `OWN_PARENTS_OVER_TWO` is refused at `--parents`, with `details` naming the `problem` and
+  the `persons`.
+- **The shared home-loan ceiling is an assumption, not a refusal.** This replaces the
+  `MORTGAGE_OVER_CEILING` refusal above. The 100,000 baht that two Returns share is for one loan
+  borrowed together, and each person's own other home loans still count toward their own 100,000. A
+  liability has no kind and a claim names no loan, so the plan cannot say which loan the interest is
+  on. Refusing would force a caller to mis-state an Owner or to claim less than the law allows. So the
+  CLI does not tell the function that a mortgage is shared, and each Return has its own ceiling. When
+  there are two Filers, both state mortgage interest and the household names `shared` as the Owner of a
+  liability Account, the write's `assumptions` say on `allowances.mortgageInterestCeiling` that each
+  Return's interest is taken to be on separate loans.
+  - Follow-up: an explicit `--mortgage-interest shared=<amount>`, split half to each Return, would let
+    the caller state a loan borrowed together, and the shared ceiling could then be checked.
 - **The readers of the set.** `--carry-in` takes one record per Levy and treats any `th-2026-pit@…`
   id as the CLI's own, so a past period needs no record of the caller's. `projection allowances` scans
   every Levy and names the Levy and the Filer label each row read. ADR-0066's rule keeps the stored

@@ -54,7 +54,7 @@ export function requestOfClaims(input: {
 	applyStated(input.stated, flat, returns, pair)
 	const request = assembled(input.status, input.base, flat, returns, pair)
 	if ("jurisdiction" in request) {
-		const named = namedValues(input.stated)
+		const named = namedValues(input.stated, pair)
 		if (named.length > 0) request.named = named
 	}
 	return request

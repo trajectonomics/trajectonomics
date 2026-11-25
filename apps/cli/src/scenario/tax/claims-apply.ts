@@ -37,9 +37,14 @@ export function applyStated(
 	}
 }
 
-/** The values the caller stated with a person, in the flags' own order. */
-export function namedValues(stated: Stated): NamedValue[] {
+/**
+ * The values that need a person's Return, in the flags' own order: each stated with a person, and
+ * with a `pair` each bare one too, which names the holder.
+ */
+export function namedValues(stated: Stated, pair: Couple | null): NamedValue[] {
+	const bare = (field: string): NamedValue[] =>
+		pair === null ? [] : [{ field, person: pair.holder.id, bare: true }]
 	return [...stated].flatMap(([field, values]) =>
-		[...values.keys()].filter((person) => person !== "").map((person) => ({ field, person })),
+		[...values.keys()].flatMap((person) => (person === "" ? bare(field) : [{ field, person }])),
 	)
 }

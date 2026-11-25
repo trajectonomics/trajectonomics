@@ -42,12 +42,12 @@ export type TaxRequest = {
 	allowances: TaxAllowances
 	/** One claim set per Return, for `married_separate` with Filers; absent otherwise. */
 	returns?: Record<string, ReturnClaims>
-	/** The values a person-qualified flag stated; absent when the caller stated none. */
+	/** The values the flags put on a person's Return; absent when there is none. */
 	named?: NamedValue[]
 }
 
-/** One person-qualified value: the profile field, and the person it names. */
-export type NamedValue = { field: string; person: string }
+/** One stated value: the profile field and the person it names; `bare` when it named the holder bare. */
+export type NamedValue = { field: string; person: string; bare?: true }
 
 /** A filing status a caller may name; the values are tax-core's own enum. */
 export const FILING_STATUSES: readonly [ThFilingStatus, ...ThFilingStatus[]] = [

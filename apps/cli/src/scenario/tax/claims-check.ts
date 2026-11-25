@@ -13,6 +13,21 @@ function noReturn(field: string, person: string): AppError {
 	})
 }
 
+/** The refusal for a person who is neither of the two a separate filing is for. */
+function notOfCouple(field: string, person: string, pair: Couple): AppError {
+	const { holder, partner } = pair
+	return fail("invalid_input", {
+		path: field,
+		message: `${flagOf(field)}: "${person}" is neither the holder nor the partner.`,
+		hint: `Name "${holder.id}" or "${partner.id}", or state the value bare for the holder.`,
+	})
+}
+
+/** The refusal for a person who has no Return here, in the words that fit why. */
+function unknownPerson(field: string, person: string, pair: Couple | null): AppError {
+	return pair === null ? noReturn(field, person) : notOfCouple(field, person, pair)
+}
+
 /** The refusal for the holder's value stated both bare and by the holder's id. */
 function holderTwice(stated: Stated, holder: string): AppError | null {
 	for (const [field, values] of stated) {
@@ -28,9 +43,8 @@ function holderTwice(stated: Stated, holder: string): AppError | null {
 export function checkedPersons(stated: Stated, pair: Couple | null): AppError | null {
 	const known = new Set(pair === null ? [] : [pair.holder.id, pair.partner.id])
 	for (const [field, values] of stated) {
-		for (const person of values.keys()) {
-			if (person !== "" && !known.has(person)) return noReturn(field, person)
-		}
+		const stranger = [...values.keys()].find((person) => person !== "" && !known.has(person))
+		if (stranger !== undefined) return unknownPerson(field, stranger, pair)
 	}
 	return pair === null ? null : holderTwice(stated, pair.holder.id)
 }

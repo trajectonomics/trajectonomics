@@ -1,7 +1,7 @@
-import { toMinorUnits } from "@trajectonomics/core/money"
 import { type AppError, fail } from "../../errors"
 import { SENTENCES } from "../../sentences"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
+import { withinCore } from "./claims-bound"
 import { flagOf, type TaxFlags } from "./flags"
 
 /** A profile field a caller states: the two children counts, or one deduction. */
@@ -24,32 +24,21 @@ export function fields(): readonly Field[] {
 	return ["children", "childrenAtHigherRate", ...ALLOWANCE_FLAGS]
 }
 
-/** Whether an amount in THB is still an exact count of satang. */
-function inSatangRange(amount: number): boolean {
-	try {
-		toMinorUnits(amount, 2)
-		return true
-	} catch {
-		return false
-	}
-}
-
-/** The refusal for a number too large to keep exactly, in the words a flag's own range check uses. */
+/** The refusal for a number too large to keep and tax exactly, in the words a flag's own range check uses. */
 function outOfRange(field: Field): AppError {
 	const message = SENTENCES.range
 	return fail("invalid_input", { path: field, message, details: [{ path: field, message }] })
 }
 
 /**
- * One stated value as the number its field takes, or the refusal that names the flag. A count must be
- * a safe integer and an amount a safe number of satang: a larger one could not be stored and read back.
+ * One stated value as the number its field takes, or the refusal that names the flag. One too large
+ * could not be stored and read back, or taxed.
  */
 function numberOf(field: Field, text: string): number | AppError {
 	const count = COUNT_FIELDS.has(field)
 	if ((count ? COUNT : AMOUNT).test(text)) {
 		const value = Number(text)
-		const exact = count ? Number.isSafeInteger(value) : inSatangRange(value)
-		return exact ? value : outOfRange(field)
+		return withinCore(field, value) ? value : outOfRange(field)
 	}
 	return fail("invalid_input", {
 		path: field,

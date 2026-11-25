@@ -6,20 +6,13 @@ import { coupleOf } from "./couple"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
 import type { FlowLabel } from "./labels"
-import { withTaxLevy } from "./levy"
+import { type TaxLevyWritten, withTaxLevy } from "./levy"
 import { noStoredProfile, type TaxMode } from "./mode"
 import { withoutTaxLevy } from "./remove"
 import { canonicalTax, parsedTax, storedTaxOf } from "./stored"
 
-/** What a write that wrote a Levy leaves for the reply: the request it built and the document it wrote. */
-export type Written = {
-	request: TaxRequest
-	document: ScenarioDocument
-	/** The Levies this build wrote, in document order (cli ADR-0075). */
-	levies: string[]
-	/** The Filers of the Return the Levies are written for; absent for a plan that keeps bare labels. */
-	filers?: string[]
-}
+/** What a write that wrote a Levy leaves for the reply. */
+export type Written = TaxLevyWritten
 
 /** The request a mode states for this plan: its own flags, or the stored profile they build on. */
 function requestFor(

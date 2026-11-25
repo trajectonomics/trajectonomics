@@ -28,6 +28,9 @@ describe("a value too large to keep", () => {
 	it.each([
 		["--parents", "9007199254740993"],
 		["--children", TOO_BIG],
+		["--children", "9007199254740991"],
+		["--children-at-higher-rate", "partner=9007199254740991"],
+		["--disabled-care", "9007199254740991"],
 		["--disabled-care", `partner=${TOO_BIG}`],
 		["--life-insurance", TOO_BIG],
 		["--donation1x", "9".repeat(400)],
@@ -66,7 +69,10 @@ describe("the check across two separate Returns", () => {
 		])
 		expect(errorOf(res)).toMatchObject({ path: "--parents" })
 	})
+})
 
+describe("interest on two separate Returns beside a loan both own", () => {
+	const PATH = "allowances.mortgageInterestCeiling"
 	const interest = (me: string, partner: string) => [
 		"--mortgage-interest",
 		me,
@@ -74,22 +80,27 @@ describe("the check across two separate Returns", () => {
 		`partner=${partner}`,
 	]
 
-	it("refuses interest over the ceiling on a loan both own", async () => {
-		const home = await couple(LOAN_PLAN, owners("shared"))
-		const res = await taxCouple(home, "married_separate", LABELS, interest("50000", "50000.01"))
-		expect(res.code, res.out).toBe(2)
-		expect(errorOf(res)).toMatchObject({
-			path: "--mortgage-interest",
-			details: { problem: "MORTGAGE_OVER_CEILING", persons: ["me", "partner"] },
-		})
-		const at = await taxCouple(home, "married_separate", LABELS, interest("50000", "50000"))
-		expect(at.code, at.err).toBe(0)
+	/** The write's assumptions about the home-loan ceiling. */
+	async function assumed(loan: string, claims: readonly string[]) {
+		const home = await couple(LOAN_PLAN, owners(loan))
+		const res = await taxCouple(home, "married_separate", LABELS, claims)
+		expect(res.code, res.err).toBe(0)
+		const found = resultOf(res).assumptions as { path: string; note: string }[]
+		return found.filter((it) => it.path === PATH)
+	}
+
+	it("is accepted, and the result says it takes the loans to be separate", async () => {
+		const [entry, ...more] = await assumed("shared", interest("80000", "80000"))
+		expect(more).toEqual([])
+		expect(entry).toMatchObject({ value: 100000, status: "reported" })
+		expect(entry?.note).toContain("separate loans")
 	})
 
-	it("accepts each Return's own interest when no loan is shared", async () => {
-		const home = await couple(LOAN_PLAN, owners("me"))
-		const res = await taxCouple(home, "married_separate", LABELS, interest("80000", "80000"))
-		expect(res.code, res.err).toBe(0)
-		expect(resultOf(res).levies).toHaveLength(2)
+	it.each([
+		["no loan is shared", "me", interest("80000", "80000")],
+		["one Return states interest", "shared", ["--mortgage-interest", "80000"]],
+	])("says nothing of it when %s", async (_when, loan, claims) => {
+		const found = await assumed(loan, claims)
+		expect(found.map((it) => it.note).join()).not.toContain("separate loans")
 	})
 })

@@ -64,17 +64,56 @@ describe("a switch to joint and back", () => {
 	})
 })
 
+describe("a household removed and set again", () => {
+	/*
+	 * me: 1,000,000 - 100,000 expenses - 60,000 personal - 30,000 parent = 810,000, so 65,000 up to
+	 * 750,000 and 20% of 60,000 = 77,000. The old Return's two parents and 80,000 of life insurance
+	 * would owe 57,500.
+	 */
+	it("files what the caller changed in between, not the holder's old Return", async () => {
+		const home = await couple(TWO_SALARIES, coupleHousehold())
+		const old = ["--parents", "me=2", "--life-insurance", "me=80000"]
+		expect((await taxCouple(home, "married_separate", LABELS)).code).toBe(0)
+		expect((await tax(home, "--merge", ...old)).code).toBe(0)
+		expect((await scenario(home, ["household", "base", "--none"])).code).toBe(0)
+		const changed = await tax(home, "--merge", "--parents", "1", "--life-insurance", "0")
+		expect(changed.code, changed.err).toBe(0)
+		expect(await profileOf(home)).not.toHaveProperty("returns")
+		expect((await setHousehold(home, coupleHousehold())).code).toBe(0)
+		expect((await tax(home, "--from-stored")).code).toBe(0)
+		const profile = await profileOf(home)
+		expect(profile).toMatchObject({ parents: 1, returns: { me: { parents: 1 } } })
+		expect(profile).not.toHaveProperty("lifeInsurance")
+		expect((await year2026(home)).map((it) => [it.filer, it.due])).toEqual([
+			["me", "77000.00"],
+			["partner", "11500.00"],
+		])
+	})
+})
+
 describe("a holder with no Return", () => {
+	const ONE_SALARY = { ...TWO_SALARIES, flows: [pay("salary", 100_000_000)] }
+	const LABEL = ["--label", "salary=income.section40_1"]
+	const PARTNERS = coupleHousehold([{ path: "flows.salary", person: "partner" }])
+
+	it("refuses a bare value, which no Return would carry, at its flag", async () => {
+		const home = await couple(ONE_SALARY, PARTNERS)
+		const res = await taxCouple(home, "married_separate", LABEL, ["--parents", "1"])
+		expect(res.code, res.out).toBe(2)
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "--parents" })
+		expect(errorOf(res).message).toContain('"me"')
+		expect((await taxCouple(home, "married_separate", LABEL)).code).toBe(0)
+		const merged = await tax(home, "--merge", "--life-insurance", "1000")
+		expect(errorOf(merged)).toMatchObject({ path: "--life-insurance" })
+		expect((await taxCouple(home, "married_joint", LABEL, ["--parents", "1"])).code).toBe(0)
+	})
+
 	it("keeps the claims in the flat keys, so an id unfit as a Filer's is never a Return's", async () => {
-		const household = coupleHousehold([{ path: "flows.salary", person: "partner" }])
-		const [me, partner] = household.people
+		const [me, partner] = PARTNERS.people
 		const people = [{ ...me!, id: "My Self" }, partner!]
-		const home = await couple(
-			{ ...TWO_SALARIES, flows: [pay("salary", 100_000_000)] },
-			{ ...household, people },
-		)
-		const label = ["--label", "salary=income.section40_1"]
-		const res = await taxCouple(home, "married_separate", label, ["--parents", "1"])
+		const home = await couple(ONE_SALARY, { ...PARTNERS, people })
+		expect((await taxCouple(home, "married_joint", LABEL, ["--parents", "1"])).code).toBe(0)
+		const res = await tax(home, "--merge", "--filing-status", "married_separate")
 		expect(res.code, res.err).toBe(0)
 		expect(await profileOf(home)).toMatchObject({ parents: 1 })
 		expect(Object.keys((await profileOf(home)).returns)).toEqual(["partner"])
@@ -96,6 +135,14 @@ describe("a person-qualified value", () => {
 		expect((await taxCouple(home, "married_separate", LABEL)).code).toBe(0)
 		const merged = await tax(home, "--merge", "--life-insurance", "partner=1000")
 		expect(errorOf(merged)).toMatchObject({ path: "--life-insurance" })
+	})
+
+	it("is refused as naming neither person on a plan that already files separately", async () => {
+		const home = await couple(TWO_SALARIES, coupleHousehold())
+		expect((await taxCouple(home, "married_separate", LABELS)).code).toBe(0)
+		const res = await tax(home, "--merge", "--parents", "ghost=1")
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input", path: "--parents" })
+		expect(errorOf(res).message).toContain('"ghost" is neither the holder nor the partner')
 	})
 
 	it("is refused as stated twice beside the holder's bare value", async () => {

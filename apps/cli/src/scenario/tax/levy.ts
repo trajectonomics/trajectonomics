@@ -1,6 +1,6 @@
 import { type AppError, isAppError } from "../../errors"
 import type { ScenarioDocument } from "../document"
-import { holderIdOf } from "./couple"
+import { coupleOf } from "./couple"
 import { leviesFor } from "./emitter"
 import { withoutFilerLabels } from "./filer-labels"
 import { type FilerScope, filerScopeOf, withFilerLabels } from "./filer-scope"
@@ -14,6 +14,7 @@ import { personRefusal } from "./person-refusals"
 import { joinedPrepayments } from "./prepayments-join"
 import { pointedPrepayments } from "./prepayments-point"
 import { separateRefusal } from "./separate-check"
+import { assumesSeparateLoans } from "./separate-loans"
 
 export {
 	filerOfTaxLevy,
@@ -29,8 +30,12 @@ export {
 export type TaxLevyWritten = {
 	document: ScenarioDocument
 	request: TaxRequest
+	/** The Levies this build wrote, in document order (cli ADR-0075). */
 	levies: string[]
+	/** The Filers of the Return the Levies are written for; absent for a plan that keeps bare labels. */
 	filers?: string[]
+	/** Set when each separate Return's home-loan interest is assumed to be on its own loan. */
+	separateLoans?: true
 }
 
 /** The document with each taxed item labelled for its Owner and each Prepayment pointed at its Levy. */
@@ -59,7 +64,7 @@ export function withTaxLevy(
 	if (refused !== null) return refused
 	const scope = filerScopeOf(household, stated, request.filingStatus)
 	if (isAppError(scope)) return scope
-	const claim = personRefusal(request.named, scope) ?? separateRefusal(request, scope, stated)
+	const claim = personRefusal(request.named, scope) ?? separateRefusal(request, scope)
 	if (claim !== null) return claim
 	const built = leviesFor(request, scope)
 	if (isAppError(built)) return built
@@ -67,8 +72,9 @@ export function withTaxLevy(
 	const kept = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
 	return {
 		document: { ...next, levies: [...kept, ...built] },
-		request: keptRequest(request, scope, holderIdOf(household)),
+		request: keptRequest(request, scope, coupleOf(household)?.partner.id),
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
+		...(assumesSeparateLoans(request, scope, stated) ? { separateLoans: true } : {}),
 	}
 }
