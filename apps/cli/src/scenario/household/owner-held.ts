@@ -1,5 +1,5 @@
 import { type AppError, fail } from "../../errors"
-import type { Household } from "./model"
+import type { Household, Owner } from "./model"
 import { ownedSegments } from "./owner-rules"
 import { locate } from "./paths"
 
@@ -20,4 +20,21 @@ export function unheldOwner(household: Household, document: unknown): AppError |
 		})
 	}
 	return null
+}
+
+/** The Owners whose item the document still holds, and the paths of those it no longer holds. */
+export function resolveOwners(
+	household: Household,
+	document: unknown,
+): { owners: Owner[] | undefined; dropped: string[] } {
+	if (household.owners === undefined) return { owners: undefined, dropped: [] }
+	const owners: Owner[] = []
+	const dropped: string[] = []
+	for (const entry of household.owners) {
+		const segments = ownedSegments(entry.path)
+		const held = segments !== null && locate(document, segments).kind !== "missing"
+		if (held) owners.push(entry)
+		else dropped.push(entry.path)
+	}
+	return { owners, dropped }
 }

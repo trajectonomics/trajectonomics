@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { HOUSEHOLD, seedBase, setHousehold, shown } from "./scenario-household-support"
 import { applyScenario, resultOf, scenario, scenarioHome } from "./scenario-test-support"
+import { SCENARIO_DOCUMENT } from "./store/testing"
 import { capture } from "./test-support"
 
 /** The Owners of a household (cli ADR-0076): who owns each Flow, the holder, the partner, or both. */
@@ -74,6 +75,55 @@ describe("scenario household, version 2", () => {
 		expect((await shown(home)).household).toEqual(OWNED)
 		expect((await scenario(home, ["fork", "base", "copy"])).code).toBe(0)
 		expect((await shown(home, "copy")).household).toEqual(OWNED)
+	})
+})
+
+describe("an Owner whose item the document no longer holds", () => {
+	const WITHOUT_BONUS = { ...SCENARIO_DOCUMENT, flows: [SCENARIO_DOCUMENT.flows[0]] }
+
+	it("is dropped by apply and named in droppedOwners, and the household writes back", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, OWNED)
+		const applied = resultOf(await applyScenario(home, "base", WITHOUT_BONUS))
+		expect(applied).toMatchObject({
+			status: "updated",
+			droppedAnchors: ["flows.bonus.end"],
+			droppedOwners: ["flows.bonus"],
+		})
+		const kept = (await shown(home)).household
+		expect(kept).toMatchObject({ owners: [{ path: "flows.salary", person: "me" }] })
+		const back = await setHousehold(home, kept)
+		expect(back.code).toBe(0)
+		expect(resultOf(back).status).toBe("unchanged")
+	})
+
+	it("is dropped by fork --without and named in droppedOwners", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, OWNED)
+		const forked = resultOf(
+			await scenario(home, ["fork", "base", "copy", "--without", "flows.bonus"]),
+		)
+		expect(forked).toMatchObject({
+			droppedAnchors: ["flows.bonus.end"],
+			droppedOwners: ["flows.bonus"],
+		})
+		expect((await shown(home, "copy")).household).toMatchObject({
+			owners: [{ path: "flows.salary", person: "me" }],
+		})
+		expect((await shown(home)).household).toEqual(OWNED)
+	})
+
+	it("leaves droppedOwners out when none is dropped, and a version 1 household without owners", async () => {
+		const home = scenarioHome()
+		await seedBase(home)
+		await setHousehold(home, HOUSEHOLD)
+		const applied = resultOf(await applyScenario(home, "base", WITHOUT_BONUS))
+		expect(applied).not.toHaveProperty("droppedOwners")
+		expect((await shown(home)).household).not.toHaveProperty("owners")
+		const plain = resultOf(await scenario(home, ["fork", "base", "copy"]))
+		expect(plain).not.toHaveProperty("droppedOwners")
 	})
 })
 
