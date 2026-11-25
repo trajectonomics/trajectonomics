@@ -1,8 +1,7 @@
-import { type ChanceOfSuccess, chanceOfSuccess, type ReturnModel } from "@trajectonomics/core/sim"
+import { type ChanceOfSuccess, chanceOfSuccess } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
-import { canonicalJson, contentHash } from "../store/canonical"
-import { guard } from "../store/guard"
 import type { Placed } from "./carryin-apply"
+import { modelHashOf } from "./chance-model"
 import { outcomesOf } from "./chance-outcomes"
 import { type ModelSource, type PlanModel, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
@@ -16,11 +15,6 @@ import { moneyOf } from "./money"
  * the result also lists each path's outcome (cli ADR-0069).
  */
 export type ChanceOptions = { seed: string; paths: number; outcomes?: boolean }
-
-/** The content hash of the Return model document the chance was computed from. */
-function hashOf(model: ReturnModel): string | AppError {
-	return guard(() => contentHash(canonicalJson(model)))
-}
 
 /**
  * `traj projection chance`: the engine's chance of success in the CLI's money. The engine reports
@@ -36,7 +30,7 @@ export function chanceOf(
 	if (isAppError(built)) return built
 	const model = built === undefined && source.kind === "file" ? source.model : built?.model
 	if (model === undefined) return fail("internal", { message: "The chance has no Return model." })
-	const hash = hashOf(model)
+	const hash = modelHashOf(model)
 	if (isAppError(hash)) return hash
 	const result = chanceOfSuccess(placed.baseline, placed.document, placed.timeline, {
 		model,

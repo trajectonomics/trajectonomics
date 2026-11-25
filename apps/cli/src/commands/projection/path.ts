@@ -1,10 +1,10 @@
 import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
-import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../dashboard/flags"
 import { fail, isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
+import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../projection/chance-bounds"
 import { returnModelFlagDocument } from "../../projection/chance-model"
 import { bucketsFlag, modelSourceOf, returnModelFlag } from "../../projection/chance-plan"
 import {

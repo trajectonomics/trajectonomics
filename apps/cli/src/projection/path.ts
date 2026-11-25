@@ -1,8 +1,7 @@
-import { projectPath, type ReturnModel } from "@trajectonomics/core/sim"
+import { projectPath } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
-import { canonicalJson, contentHash } from "../store/canonical"
-import { guard } from "../store/guard"
 import type { Placed } from "./carryin-apply"
+import { modelHashOf } from "./chance-model"
 import { type ModelSource, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
 import { optionsOf } from "./liabilities"
@@ -13,11 +12,6 @@ import type { Wants } from "./run-tables"
 
 /** The run a path belongs to: the seed and the path count the chance states, and the path's index. */
 export type PathSelection = { seed: string; paths: number; index: number }
-
-/** The content hash of the Return model document the path was drawn from. */
-function hashOf(model: ReturnModel): string | AppError {
-	return guard(() => contentHash(canonicalJson(model)))
-}
 
 /**
  * `traj projection path`: the Projection of Market path `index` of the run `--seed`, `--paths` and the
@@ -36,7 +30,7 @@ export function pathOf(
 	if (isAppError(built)) return built
 	const model = built === undefined && source.kind === "file" ? source.model : built?.model
 	if (model === undefined) return fail("internal", { message: "The path has no Return model." })
-	const hash = hashOf(model)
+	const hash = modelHashOf(model)
 	if (isAppError(hash)) return hash
 	const { breakdown, liabilities, spending, estate } = wants
 	const options = optionsOf(breakdown, liabilities, spending, estate)

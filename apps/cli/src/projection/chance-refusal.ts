@@ -9,7 +9,6 @@ const INPUT_ROOTS: ReadonlySet<string> = new Set(["options", "selection", "model
 const OPTION_FLAGS: Readonly<Record<string, string>> = {
 	paths: "--paths",
 	seed: "--seed",
-	buckets: "--buckets",
 	index: "--index",
 }
 
@@ -53,7 +52,6 @@ function messageOf(problem: ProjectionProblem): string {
 const FLAG_HINTS: Readonly<Record<string, string>> = {
 	"--paths": "Give --paths a whole number from 1 to 10,000.",
 	"--seed": "Give --seed sixteen lower-case hex digits, such as 0123456789abcdef.",
-	"--buckets": "Give --buckets one of 16, 32, 64, 128, 256, 512 or 1024.",
 }
 
 /** The hint after a Return-model problem: the Return model's shape is published, so it is not guessed. */
@@ -61,7 +59,7 @@ const MODEL_HINT =
 	"details lists every problem; the Return model's shape is in traj schema projection chance."
 
 /**
- * The hint by which input failed: a bad `--paths`, `--seed` or `--buckets` says what that flag takes,
+ * The hint by which input failed: a bad `--paths` or `--seed` says what that flag takes,
  * `--index` its range, and only a problem in the Return model points at the model's shape.
  */
 function hintOf(problem: ProjectionProblem, inputPath: string, paths?: number): string {
