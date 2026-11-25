@@ -1,3 +1,4 @@
+import { addDays } from "../calendar/arith"
 import { project } from "../engine/project"
 import type { Fixture } from "../fixtures/fixture"
 import type { LiabilityStatement } from "../types"
@@ -56,7 +57,12 @@ export function statementOf(fixture: Fixture): LiabilityStatement {
 export function oracleOf(fixture: Fixture, lands: Lands, end: string): OracleStatement {
 	const loan = fixture.scenario.accounts.find((item) => item.id === "loan")!
 	const opening = fixture.baseline.balances.find((item) => item.account === "loan")!.amount
-	const days = calendarDays("2026-01-01", end, lands, loan.compounding ?? "monthly")
+	const days = calendarDays(
+		addDays(fixture.timeline.start, 1),
+		end,
+		lands,
+		loan.compounding ?? "monthly",
+	)
 	return walkStatement(BigInt(opening), BigInt(loan.rate), days)
 }
 

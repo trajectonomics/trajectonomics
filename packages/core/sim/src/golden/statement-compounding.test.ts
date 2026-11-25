@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { compoundedLoan, effectiveLoan } from "./statement-compounding-cases"
+import { compoundedLoan, effectiveLoan, leapYearLoan } from "./statement-compounding-cases"
 import { engineTable, identityHolds, oracleOf, oracleTable, statementOf } from "./statement-helpers"
 
 const NO_LANDS = {}
@@ -51,3 +51,17 @@ for (const [period, january] of CASES) {
 		})
 	})
 }
+
+describe("a nominal liability compounded monthly through 2028, a leap year", () => {
+	const statement = statementOf(leapYearLoan)
+
+	// February 2028 has 29 days, so its statement month ends on the 29th. The oracle walks the same
+	// calendar day by day, and the engine must agree with it in every month.
+	it("ends February 2028 on the 29th and matches the oracle in every month", () => {
+		expect(statement.months[2]).toMatchObject({ from: "2028-02-01", to: "2028-02-29" })
+		expect(engineTable(statement)).toEqual(
+			oracleTable(oracleOf(leapYearLoan, NO_LANDS, "2028-12-31")),
+		)
+		expect(identityHolds(statement)).toBe(true)
+	})
+})

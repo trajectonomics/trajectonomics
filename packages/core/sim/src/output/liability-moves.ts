@@ -9,7 +9,7 @@ export interface Moves {
 	readonly transferred: readonly bigint[]
 }
 
-/** Sums one liability's borrowing and payments into each statementMonth. Totals are in date order. */
+/** Sums one liability's borrowing and payments into each statement month. Totals are in date order. */
 export function movesOf(
 	totals: readonly DayTotals[],
 	statementMonths: readonly StatementMonth[],

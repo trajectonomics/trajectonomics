@@ -19,14 +19,14 @@ export interface LiabilityOutcome {
 function monthsOf(
 	id: AccountId,
 	opening: bigint,
-	statementMonths: readonly StatementMonth[],
+	months: readonly StatementMonth[],
 	snapshots: ReadonlyMap<DateString, EngineSnapshot>,
 	moves: Moves,
 	listed: boolean,
 ): { readonly months: LiabilityMonth[]; readonly problem?: ProjectionProblem } {
-	const months: LiabilityMonth[] = []
+	const rows: LiabilityMonth[] = []
 	let before = opening
-	for (const [index, statementMonth] of statementMonths.entries()) {
+	for (const [index, statementMonth] of months.entries()) {
 		const closing = snapshots
 			.get(statementMonth.to)!
 			.balances.find((item) => item.account === id)!.amount
@@ -36,12 +36,12 @@ function monthsOf(
 		const interest = closing - before - drawn + paid + transferred
 		const figures = { before, drawn, paid, transferred, interest, closing }
 		for (const value of Object.values(figures)) {
-			if (!isSafeInteger(value)) return { months, problem: overflow(statementMonth.to, id) }
+			if (!isSafeInteger(value)) return { months: rows, problem: overflow(statementMonth.to, id) }
 		}
-		months.push(monthRow(statementMonth, figures, listed))
+		rows.push(monthRow(statementMonth, figures, listed))
 		before = closing
 	}
-	return { months }
+	return { months: rows }
 }
 
 /** One statement per liability in Scenario order, cut by the Timeline and by a run-out date. */
