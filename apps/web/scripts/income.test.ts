@@ -1,12 +1,13 @@
 // An employer's share, a payout and a fee against the real traj: a salary of 100,000.00 a month to 1 July 2027, the
 // provident fund the employer pays 5% into, and a fund of 736,600.00 that pays out 3.5% a quarter from retirement and is
 // charged 1% (sim ADR 0026, 0027, 0028; cli ADR 0067; web ADR 0017). The what-if is in `income-try.test.ts`.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { chooseRollup, rollupsOf, sectionsOf } from "../src/lib/view/cashflow/cashflow"
 import { lineLabel } from "../src/lib/view/cashflow/cashflow-labels"
 import { fieldOfRefusal, namedRefusal } from "../src/lib/view/plan-items/refusal"
 import { accountItems, flowItems } from "../src/lib/view/what-if/plan-items"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	minor,
 	oracle,
@@ -30,6 +31,7 @@ beforeAll(async () => {
 	ids = await setupIncome()
 }, SLOW_MS)
 afterAll(disposeIncome)
+afterEach(settle, SLOW_MS)
 
 describe("the employer's 5% of a salary", () => {
 	slow(

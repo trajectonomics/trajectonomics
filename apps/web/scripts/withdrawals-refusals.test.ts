@@ -1,9 +1,10 @@
 // The rule's refusals against the real traj: each is in the CLI's own words, and its path names the form field it is
 // shown at (cli ADR 0063, web ADR 0013).
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { scenarioDocument } from "../src/lib/contract"
 import { layoutOf, withdrawalFieldOfRefusal } from "../src/lib/view/withdrawals/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	AS_OF,
 	accountIds,
@@ -22,6 +23,7 @@ beforeAll(async () => {
 	await setupWithdrawals()
 }, SLOW_MS)
 afterAll(disposeWithdrawals)
+afterEach(settle, SLOW_MS)
 
 describe("the rule's refusals are in the CLI's words, at the field the path names", () => {
 	/** The refusal of a document the form could not make, sent as the page's Edit would send it. */

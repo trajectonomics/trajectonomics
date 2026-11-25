@@ -13,6 +13,7 @@ import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
 export { AS_OF }
 
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 
 export const PLAN = "spend"
@@ -68,19 +69,21 @@ export async function setupWithdrawals(): Promise<Editor> {
 		model,
 		JSON.stringify(demoReturnModel({ bank: bank.id, fund: fund.id, loan: demo.loan })),
 	)
-	editor = createEditor({
-		traj: { binary: BINARY, env: env() },
-		cliVersion: "test",
-		params: {
-			...PARAMS,
-			asOf: AS_OF,
-			horizon: "2030-12-31",
-			scenarios: [PLAN],
-			chance: { returnModel: model, paths: DEMO_PATHS, seed: DEMO_SEED },
-		},
-		records: [],
-		token: TOKEN,
-	})
+	editor = recorded(
+		createEditor({
+			traj: { binary: BINARY, env: env() },
+			cliVersion: "test",
+			params: {
+				...PARAMS,
+				asOf: AS_OF,
+				horizon: "2030-12-31",
+				scenarios: [PLAN],
+				chance: { returnModel: model, paths: DEMO_PATHS, seed: DEMO_SEED },
+			},
+			records: [],
+			token: TOKEN,
+		}),
+	)
 	const first = await editor.refresh()
 	if (!first.ok) throw new Error(first.error.message)
 	return editor
