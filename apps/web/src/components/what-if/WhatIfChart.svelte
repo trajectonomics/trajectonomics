@@ -24,6 +24,7 @@ const label = $derived(
 </script>
 
 <LineChart {label} {series} />
-{#if hidden}
+<!-- The note names a baseline only when there is one to hide. -->
+{#if hidden && baseline !== null}
 	<p class="mt-2 text-sm text-muted-foreground">The baseline is hidden with the amounts, because drawing it would show which way the change moved.</p>
 {/if}

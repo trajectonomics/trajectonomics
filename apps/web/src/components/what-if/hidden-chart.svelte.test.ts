@@ -57,6 +57,13 @@ describe("the what-if chart with amounts hidden", () => {
 		expect(renderChart(higher)).toBe(renderChart(lower))
 	})
 
+	test("says nothing about a baseline when the Snapshot holds none", () => {
+		preferences.hidden = true
+		const body = renderChart(null)
+		expect(body).not.toContain(NOTE)
+		expect(body.match(/<path/g) ?? []).toHaveLength(1)
+	})
+
 	test("with amounts shown it draws both lines, names both and shows no note", () => {
 		const body = renderChart(baselineRun(DEMO, "base"))
 		expect(body).toContain("What-if: Nominal net worth")
