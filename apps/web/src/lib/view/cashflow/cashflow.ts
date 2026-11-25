@@ -1,6 +1,7 @@
 import type { ProjectionRun, Read } from "../../contract"
 import { formatDate } from "../../format/date"
 import { agesText } from "../household/model"
+import { NO_PEOPLE, type PersonNames } from "../item-names"
 import { EMPLOYER_NOTE, EMPLOYER_SECTION, SECTIONS } from "./cashflow-sections"
 
 /**
@@ -85,8 +86,8 @@ export function pickedKey(pick: Pick | null, index: number | undefined): string 
 }
 
 /** A year's label for the selector: its span, its household's ages, and a mark for a partial year. */
-export function yearLabel(rollup: Rollup): string {
-	const ages = agesText(rollup.ages)
+export function yearLabel(rollup: Rollup, people: PersonNames = NO_PEOPLE): string {
+	const ages = agesText(rollup.ages, people)
 	return [
 		`${formatDate(rollup.from)} to ${formatDate(rollup.to)}`,
 		ages === "" ? null : `ages ${ages}`,

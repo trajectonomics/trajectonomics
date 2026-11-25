@@ -32,8 +32,8 @@ const names = $derived(currentAccountNames())
 
 /** A change's words as the bar shows them: a Set's value is masked when the person hides amounts. */
 function wordsOf(change: Change): string {
-	if (change.kind === "flow") return tryWords(change, (id) => nameOf(names, id))
 	const label = labelWithNames(change, names)
+	if (change.kind === "flow") return tryWords({ ...change, label }, (id) => nameOf(names, id))
 	if (change.kind !== "set" || !preferences.hidden) return label
 	// A Set's label ends with its value as typed, so the value's place is masked and the rest kept.
 	return `${label.slice(0, label.length - change.value.length)}${maskMoney(change.value)}`

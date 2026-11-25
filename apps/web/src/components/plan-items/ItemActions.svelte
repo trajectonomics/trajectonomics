@@ -1,11 +1,13 @@
 <script lang="ts">
-import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
-import { nameOf } from "../../lib/view/account-names"
+import { currentItemText } from "../../client/item-names.svelte.js"
+import type { ItemKind } from "../../lib/view/item-names"
 
 interface Props {
 	/** The item's id when the form edits an item; absent for a new one, which has nothing to delete. */
 	id?: string | undefined
+	/** What the id names, so the question calls it by its name: an Account by the ledger's, a person by role. A Flow's id is shown as it is. A form that deletes nothing passes one it never reads. */
+	kind: ItemKind
 	/** Removes the item from the plan. Runs after the person confirms the delete; absent for a form that deletes nothing. */
 	onDelete?: () => void
 	/** True when the drawer tries a value in the What-if session: the save is a Set, and nothing is deleted. */
@@ -14,9 +16,9 @@ interface Props {
 	note?: string | undefined
 }
 
-let { id, onDelete, trying = false, note }: Props = $props()
-// An Account's id is called by its ledger name; a Flow's id, which the ledger does not hold, is shown as it is.
-const called = $derived(id === undefined ? undefined : nameOf(currentAccountNames(), id))
+let { id, kind, onDelete, trying = false, note }: Props = $props()
+// An item is called by the words a Read states for it; an id no Read names (a Flow's) is shown as it is.
+const called = $derived(id === undefined ? undefined : currentItemText(kind, id))
 let confirming = $state(false)
 
 const button =

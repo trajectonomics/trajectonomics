@@ -25,4 +25,6 @@ export interface LineSeries {
 export interface LineMarker {
 	readonly x: number
 	readonly label: string
+	/** True when the label is an id no `traj` Read names, which the chart sets in code. */
+	readonly code?: boolean
 }

@@ -62,5 +62,5 @@ async function submit(event: SubmitEvent): Promise<void> {
 		<p class="text-xs text-muted-foreground">A floor adds a later entry that takes the rest of this account, so the money under the floor is still there to use once the other entries are used up. Remove that entry to keep the floor for good.</p>
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	<ItemActions trying={tryValue} />
+	<ItemActions kind="account" trying={tryValue} />
 </form>

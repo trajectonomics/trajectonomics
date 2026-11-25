@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { PathRow } from "../../../lib/view/chance/path-view"
+import type { PathRow } from "../../../lib/view/chance/path-rows"
 import type { Terms } from "../../../lib/view/projection/terms"
 import Badge from "../../ui/Badge.svelte"
 import Money from "../../ui/Money.svelte"

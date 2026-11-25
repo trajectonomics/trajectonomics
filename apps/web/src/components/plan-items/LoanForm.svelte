@@ -95,6 +95,7 @@ async function remove(): Promise<void> {
 	<TryNotice fields={cleared} />
 	<ItemActions
 		id={existing?.account.id}
+		kind="account"
 		onDelete={remove}
 		note={held
 			? `Its payments, extra payments and withdrawal are removed. The Account stays in the plan as a debt with no payments, because the ledger owes it, so its interest keeps adding up.`

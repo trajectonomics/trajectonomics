@@ -5,6 +5,7 @@ import type { WithdrawalDraft } from "../../lib/view/withdrawals/draft"
 import { START_CHOICES } from "../../lib/view/withdrawals/options"
 import AnchoredNote from "../plan-items/AnchoredNote.svelte"
 import Field from "../plan-items/Field.svelte"
+import ItemName from "../ui/ItemName.svelte"
 
 interface Props {
 	draft: WithdrawalDraft
@@ -39,7 +40,7 @@ const choices = $derived([
 				{#each stoppable as flow (flow.id)}
 					<label class="flex items-center gap-2 text-sm text-foreground">
 						<input type="checkbox" value={flow.id} bind:group={draft.stops} class="size-4" />
-						Stop {flow.id} when this starts
+						Stop <ItemName kind="flow" id={flow.id} /> when this starts
 					</label>
 				{/each}
 				{#if shown.at("stops")}<p role="alert" class="text-sm text-destructive">{shown.at("stops")}</p>{/if}
