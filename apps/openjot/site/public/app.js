@@ -54,8 +54,10 @@
       meta.appendChild(document.createTextNode(" · " + rest.join(" · ")));
     }
     if (release.checksumsUrl) {
+      // The worker's /download/checksums route resolves the same release, so the
+      // link stays on this domain and keeps working when a release has no SHA256SUMS.
       var sums = document.querySelectorAll(".js-checksums");
-      for (var j = 0; j < sums.length; j++) sums[j].setAttribute("href", release.checksumsUrl);
+      for (var j = 0; j < sums.length; j++) sums[j].setAttribute("href", "/download/checksums");
     }
   }
 

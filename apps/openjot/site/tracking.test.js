@@ -40,11 +40,14 @@ function network() {
       return new Response("proxied", { status: 200 });
     }
     if (url.startsWith("https://api.github.com/")) {
-      return Response.json({
-        tag_name: "v1.0.0",
-        draft: false,
-        assets: [{ name: "moojot-android-arm64.apk", size: 1, browser_download_url: "https://github.com/x/moojot-android-arm64.apk" }],
-      });
+      return Response.json([
+        {
+          tag_name: "openjot-v1.0.0",
+          draft: false,
+          prerelease: false,
+          assets: [{ name: "moojot-android-arm64.apk", size: 1, browser_download_url: "https://github.com/x/moojot-android-arm64.apk" }],
+        },
+      ]);
     }
     return new Response("not found", { status: 404 });
   };
@@ -127,7 +130,7 @@ test("/download/<source> goes straight to the APK and counts the download with i
   assert.equal(event.properties.campaign, "launch");
   assert.equal(event.properties.via, "link");
   assert.equal(event.properties.outcome, "apk");
-  assert.equal(event.properties.apk_version, "v1.0.0");
+  assert.equal(event.properties.apk_version, "openjot-v1.0.0");
 });
 
 test("/download from the landing page takes the source from the page's utm tags", async () => {

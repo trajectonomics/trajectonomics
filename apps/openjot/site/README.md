@@ -10,14 +10,15 @@ The page is plain HTML, CSS and JS with no build step and no dependencies. It's 
 | `public/meowjot-alternative.html` | The MooJot vs MeowJot comparison page, served at `/meowjot-alternative` |
 | `public/robots.txt`, `sitemap.xml`, `llms.txt` | Search and AI-answer engine files. See "Search and AI answers" below |
 | `worker.js` | Worker entry. It only runs for `/download*`, `/go*`, `/api/*` and `/ingest/*` (see `run_worker_first`). |
-| `release.js` | Request router, and the latest GitHub release lookup. It uses the API first and falls back to github.com when Cloudflare's shared IPs are rate limited, then caches the answer for 5 minutes. |
+| `release.js` | Request router, and the newest `openjot-v*` release lookup. It reads the monorepo's releases (API first, github.com when Cloudflare's shared IPs are rate limited), falls back to the archived `trajectonomics/moojot` release until the first `openjot-v*` exists, then caches the answer for 5 minutes. |
 | `tracking.js` | Source links (`/go/…`, `/download/…`), cookieless counting of clicks and downloads, and the `/ingest` proxy to PostHog |
 | `release.test.js`, `tracking.test.js` | Tests |
 | `wrangler.jsonc` | Worker `moojot-site` on the custom domain `moojot.trajectonomics.com` |
 
 ## Links that matter
 
-- `https://moojot.trajectonomics.com/download` redirects (302) to the `.apk` in the latest GitHub release. Use this short link in reels and bios. Before the first release it lands on `/#coming-soon`.
+- `https://moojot.trajectonomics.com/download` redirects (302) to the `.apk` in the newest `openjot-v*` GitHub release. Use this short link in reels and bios. Before the first one it uses the archived `trajectonomics/moojot` release; only when neither exists does it land on `/#coming-soon`.
+- `https://moojot.trajectonomics.com/download/checksums` redirects to that release's `SHA256SUMS` through the same lookup.
 - `https://moojot.trajectonomics.com/api/release` returns `{ "release": null | { version, apk: { name, size, url }, checksumsUrl, … } }`.
 - `?lang=th` / `?lang=en` forces a language. Otherwise the page uses the visitor's saved choice, then the browser language. Thai is the no-JS default.
 
@@ -79,7 +80,7 @@ The connection is set in the Cloudflare dashboard (Workers & Pages → `moojot-s
 
 The Worker's name in the dashboard has to match `name` in `wrangler.jsonc`, or the build fails.
 
-App releases are separate and stay manual: a `v*` tag pushed by the owner. See `docs/release/android.md`.
+App releases are separate and stay manual: an `openjot-v*` tag pushed by the owner. See `docs/release/android.md`.
 
 The PostHog project key and region are `vars` in `wrangler.jsonc`. The same key is in `public/analytics.js` and `src/lib/analytics.ts`, and `tracking.test.js` checks that they match. It is a public project key that can only send events, so it is not a secret.
 
