@@ -86,3 +86,35 @@ declared income Flows, so money in also sums `payouts`, and the roll-up's `incom
 
 An Account's fee leaves net worth outside cashflow, so the breakdown has no fee line and money in plus unmet
 still equals money out. The roll-up's `fees` is reported beside it, and `interest` is the growth before the fee.
+
+## Amended 2026-11-25: a category has no blank or invisible code point
+
+`categories` groups by the exact category string, so two strings that read the same but differ in bytes
+would split one group in two (`"a"` and `"a "`), and a string that reads as nothing would make a group
+no one can name. `check()` decides this at the source: a category that is not text is `WRONG_TYPE`, and
+text is `INVALID_CATEGORY` unless it is 1 to 64 code points (the length is counted in code points, so 64
+emoji fit and a decomposed accent counts as two) with:
+
+- no control code point: C0 (U+0000 to U+001F), DEL and C1 (U+007F to U+009F), as before;
+- no line or paragraph separator (U+2028, U+2029);
+- no zero-width code point (U+200B to U+200D, U+FEFF);
+- no bidirectional control (U+202A to U+202E, U+2066 to U+2069), which can reorder a printed category;
+- no lone surrogate, a UTF-16 unit that is no text and that a JSON reader may replace or reject;
+- no leading or trailing whitespace (the ECMAScript `\s` set, which includes U+00A0 and U+3000), which also
+  refuses a category that is whitespace alone. A space inside a category is kept.
+
+Grouping stays exact: a category is never trimmed or normalised, so `"Cafe\u0301"` and `"Caf\u00e9"` are two
+groups and the breakdown reports what the document says. Refusing is the choice because trimming would
+rewrite the document the person wrote (a Scenario round-trips unchanged) and a silent merge would hide the
+typo.
+
+- **Known cost.** A multi-person emoji such as a family joins its parts with U+200D and is refused, as is
+  any text that needs a joiner or non-joiner; a single emoji, a flag, a skin tone, Thai, CJK, right-to-left
+  scripts and accented Latin pass. Other format characters (soft hyphen U+00AD, word joiner U+2060, Hangul
+  filler U+3164, Braille blank U+2800) are not refused: the list is the set that hides a category or
+  reorders it, and a wider list would refuse text people write.
+- **Existing documents.** A document whose category meets the older rule but not this one is now refused
+  at `category`; every document without such a category is read, and every Projection and breakdown is
+  byte for byte as before (the parity hashes are unchanged).
+- **The refusal names the rule.** `INVALID_CATEGORY` is one code for every way to break the rule, so the
+  CLI quotes `EXPENSE_CATEGORY_RULE`, which `sim` exports, beside the code.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import { EXPENSE_CATEGORY_RULE as RULE } from "@trajectonomics/core/sim"
 import {
 	applyScenario,
 	errorOf,
@@ -28,7 +29,7 @@ function withExpense(category: unknown): Doc {
 }
 
 describe("the expense category in traj schema scenario apply", () => {
-	it("publishes category on a Flow as a 1 to 64 character string", async () => {
+	it("publishes category on a Flow as a 1 to 64 code point string, in the rule's own words", async () => {
 		const res = await capture(["schema", "scenario", "apply", "--json"], {
 			TRAJ_HOME: ledgerHome(),
 		})
@@ -40,6 +41,7 @@ describe("the expense category in traj schema scenario apply", () => {
 			type: "string",
 			minLength: 1,
 			maxLength: 64,
+			description: expect.stringContaining(RULE),
 		})
 	})
 })
@@ -69,9 +71,38 @@ describe("the expense category in scenario apply and show", () => {
 		expect(errorOf(res).details).toEqual([
 			{
 				path: "document.flows.2.category",
-				message: "document.flows.2.category: INVALID_CATEGORY",
+				message: `document.flows.2.category: INVALID_CATEGORY (${RULE})`,
 				code: "INVALID_CATEGORY",
 			},
 		])
+	})
+
+	it.each([
+		["an empty category", ""],
+		["a tab inside a category", "a\tb"],
+		["a whitespace-only category", " "],
+		["a trailing space", "a "],
+		["a zero-width space", "a\u200bb"],
+		["a right-to-left override", "a\u202eb"],
+		["a line separator", "a\u2028b"],
+		["a lone surrogate", "a\ud800b"],
+	])("names the rule it broke for %s, not the bare code", async (_name, category) => {
+		const res = await applyScenario(scenarioHome(), "base", withExpense(category))
+		expect(res.code).toBe(2)
+		expect(errorOf(res).details).toEqual([
+			{
+				path: "document.flows.2.category",
+				message: `document.flows.2.category: INVALID_CATEGORY (${RULE})`,
+				code: "INVALID_CATEGORY",
+			},
+		])
+		expect(RULE).toContain("1 to 64 code points")
+	})
+
+	it("applies Thai, emoji and accented Latin categories", async () => {
+		for (const category of ["ค่าอาหาร", "🙂", "Café crème"]) {
+			const res = await applyScenario(scenarioHome(), "base", withExpense(category))
+			expect(res.code).toBe(0)
+		}
 	})
 })
