@@ -1,0 +1,43 @@
+/* The loading, empty and error panels, and the retry control they share. */
+
+.state-panel {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 24px 0;
+	border-top: 1px solid var(--ds-color-border);
+	border-bottom: 1px solid var(--ds-color-border);
+	color: var(--ds-color-muted-foreground);
+}
+
+.state-panel p {
+	margin: 0;
+}
+
+.retry-button {
+	display: inline-flex;
+	min-height: 2.5rem;
+	align-items: center;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 4px;
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+	font: inherit;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+@supports (corner-shape: bevel) {
+	.retry-button {
+		border-radius: 4px 4px 16px 4px;
+		corner-shape: round round bevel round;
+	}
+}
+
+.retry-button:focus-visible {
+	outline: 2px solid var(--ds-color-ring);
+	outline-offset: 4px;
+}

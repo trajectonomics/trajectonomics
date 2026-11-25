@@ -5,8 +5,8 @@
  */
 export {}
 
-const url = process.env.INGEST_URL ?? "http://127.0.0.1:8787/ingest"
-const key = process.env.INGEST_BOOTSTRAP_KEY ?? "local-test"
+const url = process.env["INGEST_URL"] ?? "http://127.0.0.1:8787/ingest"
+const key = process.env["INGEST_BOOTSTRAP_KEY"] ?? "local-test"
 const text = await Bun.stdin.text()
 const usage = text
 	.split("\n")

@@ -11,12 +11,16 @@
 		"includes": [
 			"**",
 			"!**/collector",
-			"!**/collector",
 			"!**/dist",
 			"!**/coverage",
 			"!**/*.md",
 			"!**/.agents",
 			"!**/.claude"
 		]
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
 	}
 }

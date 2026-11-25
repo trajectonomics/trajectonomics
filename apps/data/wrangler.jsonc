@@ -7,8 +7,8 @@
 	"workers_dev": false,
 	"routes": [{ "pattern": "data.trajectonomics.com", "custom_domain": true }],
 	"assets": {
-		// Slice 2b adds the overview page. The placeholder proves the binding works.
-		"directory": "./public",
+		// Astro's build: the static overview and method pages, the islands and the brand files.
+		"directory": "./dist",
 		// The API and ingest go to the Worker; every other path is an asset.
 		"run_worker_first": ["/api/*", "/ingest"]
 	},

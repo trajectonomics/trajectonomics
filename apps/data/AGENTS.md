@@ -1,8 +1,8 @@
 # AGENTS.md
 
 Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is specific to
-`apps/data`, the data app at data.trajectonomics.com: the `data` Worker and the nested
-`collector/` package.
+`apps/data`, the data app at data.trajectonomics.com: the static site, the `data` Worker that
+serves it, and the nested `collector/` package.
 
 ## Rules
 
@@ -18,6 +18,14 @@ Read the root [AGENTS.md](../../AGENTS.md) first. This file holds only what is s
    slice.
 5. Cursor is counted from exactly one source per run: its SDK store when `usage_json` is populated,
    else the T3 Code `cursor` logs. Never both.
+
+## The site
+
+1. The static pages are Astro (`src/pages`, `src/layouts`) with Svelte 5 islands (`src/components`, `src/client`). `astro build` writes `dist/`, which wrangler serves; the brand fonts and Favicon Set are copied into `public/` before a build and are never committed.
+2. `src/lib/` is pure and tested with `bun test`: data in, data out, no clock, no `fetch`, no DOM. `src/client/api.ts` is the only module that calls `fetch`; a component renders what the pure functions give it.
+3. No colour literal: paint from the brand's Theme roles (`--ds-color-*`). `colour-literals.test.ts` fails any literal in a stylesheet, an Astro file or a Svelte component.
+4. Data never bakes into the build (ADR 0001). The pages fetch the read API in the browser, so a new ingest needs no rebuild.
+5. Done means `bun run check` passes here: Biome with zero warnings, `tsc` for the Worker and the site, `astro check`, the tests, the Astro build and the Worker dry run.
 
 ## The Worker
 
