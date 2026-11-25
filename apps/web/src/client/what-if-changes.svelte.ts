@@ -11,6 +11,7 @@ import {
 	switchedOn,
 	type WhatIf,
 	withAddition,
+	withoutItemChanges,
 	withSet,
 } from "../lib/what-if/session"
 import { withoutChange } from "../lib/what-if/session-without"
@@ -33,17 +34,12 @@ export class WhatIfChanges extends WhatIfState {
 	 * while Apply or Save runs. True when it was made.
 	 */
 	setOff(plan: string, contentHash: string, path: string, off: boolean): boolean {
-		if (this.saving) return false
-		const base = this.sessionFor(plan, contentHash)
-		if (base === null) return false
-		this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
-		return true
+		const base = this.saving ? null : this.sessionFor(plan, contentHash)
+		if (base !== null) this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
+		return base !== null
 	}
 
-	/**
-	 * Makes the Sets of an edited item, one per changed field: the drawer's "Try a value". Returns the fields the
-	 * form cleared, which a what-if cannot try, because `traj` replaces a path and cannot delete one.
-	 */
+	/** Makes the Sets of the edited item's changed fields, replacing an earlier try: the drawer's "Try a value". Returns the fields it cleared. */
 	tryItem(
 		plan: string,
 		contentHash: string,
@@ -52,12 +48,13 @@ export class WhatIfChanges extends WhatIfState {
 		stored: Record<string, Json>,
 		edited: Record<string, Json>,
 	): string[] {
-		if (this.saving) return []
-		const base = this.sessionFor(plan, contentHash)
+		const base = this.saving ? null : this.sessionFor(plan, contentHash)
 		if (base === null) return []
-		let next = base
+		if (itemSets(list, id, stored, edited).length === 0 && isOff(base, `${list}.${id}`))
+			return clearedFields(stored, edited)
+		let next = withoutItemChanges(base, list, id)
 		for (const set of itemSets(list, id, stored, edited)) next = withSet(next, set.path, set.value)
-		if (next !== base) this.keep(next)
+		this.keep(next)
 		return clearedFields(stored, edited)
 	}
 
