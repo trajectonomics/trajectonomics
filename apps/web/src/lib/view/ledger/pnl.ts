@@ -18,6 +18,8 @@ export interface PnlView {
 	readonly income: readonly PnlLine[]
 	readonly expense: readonly PnlLine[]
 	readonly totals: readonly { readonly currency: string; readonly amount: string }[]
+	/** Set when the total is not stated because the rows' sum is out of range; the rows are still stated. */
+	readonly note: string | null
 }
 
 /** The P&L report as the page shows it: income rows first, then expense rows, then the totals. */
@@ -27,8 +29,15 @@ export function pnlView(report: Pnl, names: AccountNames = NO_NAMES): PnlView {
 		project: report.project,
 		income: linesOf(report.rows, "income", names),
 		expense: linesOf(report.rows, "expense", names),
-		totals: report.totals.map((total) => ({ ...total })),
+		totals: (report.totals ?? []).map((total) => ({ ...total })),
+		note: unavailableTotalNote(report),
 	}
+}
+
+/** The plain statement that no total is stated because the rows' sum is out of range, or null when one is. */
+export function unavailableTotalNote(report: Pnl): string | null {
+	if (report.totals !== null) return null
+	return "The total is not stated: every account is in range, but their sum exceeds the safe integer range. Each account's amount is shown above."
 }
 
 /** The period of a report. A report with no start date runs from the start of the ledger. */

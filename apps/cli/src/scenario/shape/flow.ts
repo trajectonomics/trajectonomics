@@ -45,7 +45,7 @@ export const flowShape: Record<string, unknown> = {
 		},
 		label: {
 			type: "string",
-			description: `Income and contribution only: the Tally label a Levy sums this Flow under, written by \`traj scenario tax --label\`. A Flow without one is not tax-free, it is income no Levy is told about. ${labelSetsSentence()} Needs a Levy.`,
+			description: `Income and contribution only: the Tally label a Levy sums this Flow under, written by \`traj scenario tax --label\`. A Flow without one is not tax-free, it is income no Levy is told about. ${labelSetsSentence()} A joint Return over Filers (cli ADR-0075) stores the label with its Owner's suffix, such as income.section40_1@me or income.section40_1@shared. Needs a Levy.`,
 		},
 		prepayments: prepaymentsShape,
 		cappedPrepayment: cappedPrepaymentShape,

@@ -30,6 +30,19 @@ describe("income Flows without a tax label", () => {
 		expect(incomeFlows(document)).toEqual(["salary", "condo-rent", "side", "bonus"])
 	})
 
+	test("a joint Return's suffixed known label is labelled", () => {
+		const joint = {
+			...document,
+			flows: [
+				flow("salary", "income", "income.section40_1@me"),
+				flow("partner", "income", "income.section40_1@partner"),
+				flow("both", "income", "income.section40_1@shared"),
+				flow("side", "income", "income.section40_9@nobody"),
+			],
+		} as unknown as ScenarioDocument
+		expect(unlabelledIncome(joint)).toEqual(["side"])
+	})
+
 	test("a document refusal that names Flows is a sentence naming them and where the labels are set", () => {
 		const refusal = {
 			code: "invalid_input",

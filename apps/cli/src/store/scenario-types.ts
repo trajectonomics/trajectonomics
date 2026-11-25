@@ -82,8 +82,15 @@ export type HouseholdOptions = WriteOptions & { expectedHash?: string | undefine
  * text, or null when the profile is removed (cli ADR-0066).
  */
 export type TaxPlan = { document: unknown; tax: string | null }
-/** Reads the Scenario's document and its stored profile inside a tax write and says what to store. */
-export type TaxPlanner = (document: ScenarioDocument, stored: string | null) => TaxPlan | AppError
+/**
+ * Reads the Scenario's document, its stored profile and its household inside a tax write and says
+ * what to store; the household says whose each taxed item is (cli ADR-0075).
+ */
+export type TaxPlanner = (
+	document: ScenarioDocument,
+	stored: string | null,
+	household: string | null,
+) => TaxPlan | AppError
 export type TaxSet =
 	| { status: "updated" | "unchanged"; scenario: ScenarioRow }
 	| { status: "not_found" }

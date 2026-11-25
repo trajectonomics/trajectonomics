@@ -20,6 +20,7 @@ export type Answer =
 	| {
 			ok: true
 			snapshot: { params: { scenarios: string[] }; reads: { projections: Record<string, unknown> } }
+			droppedAnchors?: string[]
 	  }
 	| { ok: false; error: { code: string; message: string; path?: string } }
 

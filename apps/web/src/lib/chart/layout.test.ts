@@ -13,6 +13,26 @@ const net = {
 	],
 }
 
+describe("lineLayout: a second line under the x labels", () => {
+	const aged = {
+		name: "Net worth",
+		points: [
+			{ x: 0, xLabel: "2027", subLabel: "age 37", y: 100, display: "100.00" },
+			{ x: 1, xLabel: "2028", y: 300, display: "300.00" },
+		],
+	}
+
+	test("carries a point's sub label onto its tick, and only that tick", () => {
+		const layout = lineLayout([aged], PLOT)
+		expect(layout?.xTicks.map((tick) => tick.sub)).toEqual(["age 37", undefined])
+	})
+
+	test("leaves every tick without one when no point has one", () => {
+		const layout = lineLayout([net], PLOT)
+		expect(layout?.xTicks.every((tick) => !("sub" in tick))).toBe(true)
+	})
+})
+
 describe("lineLayout", () => {
 	test("is null for a chart with no points", () => {
 		expect(lineLayout([{ name: "none", points: [] }], PLOT)).toBeNull()

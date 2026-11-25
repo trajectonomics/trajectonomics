@@ -56,8 +56,8 @@ function taxed(): Scenario {
 		{ flow: "salary", label: "income.section40_1" },
 		{ flow: "rmf", label: "allowance.retirement.rmf" },
 	])
-	if (!("levies" in (written as object))) throw new Error("the tax Levy was refused")
-	return written as unknown as Scenario
+	if (isAppError(written)) throw new Error("the tax Levy was refused")
+	return written.document as unknown as Scenario
 }
 
 /** The period the Levy's year starts on, which is the first of January for the Thai Levy. */

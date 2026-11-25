@@ -51,4 +51,14 @@ describe("pnlView", () => {
 		expect(view.totals).toEqual([{ currency: "THB", amount: "900000.00" }])
 		expect(view.largest).toHaveLength(1)
 	})
+
+	test("says the total is not stated and points to the rows below and the Ledger page", () => {
+		const view = pnlView({ ...pnl([row("Loan", "income", "-9.58")], []), totals: null })
+		expect(view.totals).toEqual([])
+		expect(view.note).toContain("The largest rows are below; the Ledger page states every row.")
+	})
+
+	test("has no note when the CLI states the total", () => {
+		expect(pnlView(pnl([], [{ currency: "THB", amount: "0.00" }])).note).toBeNull()
+	})
 })

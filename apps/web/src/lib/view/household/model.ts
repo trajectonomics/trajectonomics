@@ -75,6 +75,13 @@ export function agesText(ages: readonly PersonAge[]): string {
 	return ages.map((entry) => `${entry.person} ${entry.age}`).join(", ")
 }
 
+/** The age under a chart's year: "age 50" for one person, "me 50" (the first person) for a household of several. Null without one. */
+export function axisAge(ages: readonly PersonAge[]): string | null {
+	const [first] = ages
+	if (first === undefined) return null
+	return ages.length === 1 ? `age ${first.age}` : `${first.person} ${first.age}`
+}
+
 /** The link to the household card on the Overview, for the Scenario it belongs to. Keeps the other parameters. */
 export function householdHref(scenario: string, search: string): string {
 	const params = new URLSearchParams(search)
