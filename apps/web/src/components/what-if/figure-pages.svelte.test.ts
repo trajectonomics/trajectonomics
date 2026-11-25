@@ -2,7 +2,15 @@ import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { preferences } from "../../client/preferences.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { fakeServer, HASH, held, settle, useSessionHooks } from "../../client/what-if.test-support"
+import {
+	demoAnswer,
+	fakeServer,
+	HASH,
+	held,
+	openDemoSession,
+	settle,
+	useSessionHooks,
+} from "../../client/what-if.test-support"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import {
 	DEMO,
@@ -19,28 +27,6 @@ import OverviewWhatIf from "./OverviewWhatIf.svelte"
 
 useSessionHooks()
 
-/** The server's answer to a what-if: the demo's `retire-early` reads stand in for the what-if, with this compare. */
-function answer(compare: unknown): unknown {
-	return {
-		ok: true,
-		reads: {
-			projection: DEMO.reads.projections["retire-early"],
-			fi: DEMO.reads.fi["retire-early"],
-			compare: { argv: [], ok: true, data: compare },
-			chance: DEMO.reads.chance["retire-early"] ?? null,
-		},
-	}
-}
-
-/** Opens a session on `base` with one switch and answers its read, as the server would. */
-async function openSession(compare: unknown = statedCompare()): Promise<void> {
-	fakeServer()
-	whatIfSession.setOff("base", HASH, "flows.rent", true)
-	await settle()
-	held[0]?.settle(200, answer(compare))
-	await settle(50)
-}
-
 const projections = DEMO.reads.projections
 const names = DEMO.params.scenarios
 const run = { names, projections, scenario: "base", terms: "both", onTerms: () => {} }
@@ -53,7 +39,7 @@ describe("the Milestones page", () => {
 	})
 
 	test("with a session, a milestone reached only in the what-if reads not reached beside it", async () => {
-		await openSession()
+		await openDemoSession()
 		const body = render(MilestonesView, { props: run }).body
 		expect(body).toContain("What-if on base")
 		expect(body).toContain("sabbatical")
@@ -64,13 +50,13 @@ describe("the Milestones page", () => {
 	})
 
 	test("a page on another plan shows no what-if: the session belongs to its own plan", async () => {
-		await openSession()
+		await openDemoSession()
 		const body = render(MilestonesView, { props: { ...run, scenario: "retire-early" } }).body
 		expect(body).not.toContain("What-if on")
 	})
 
 	test("a compare with null months says there is no change figure, with its reason in view", async () => {
-		await openSession(DEMO_COMPARE)
+		await openDemoSession("base", DEMO_COMPARE)
 		const body = render(MilestonesView, { props: run }).body
 		expect(body).toContain("No change figure")
 		expect(body).toContain('<span class="block max-w-64 text-xs">Neither side reaches it</span>')
@@ -81,9 +67,9 @@ describe("the Milestones page", () => {
 		whatIfSession.setOff("base", HASH, "flows.rent", true)
 		await settle()
 		held[0]?.settle(200, {
-			...(answer(statedCompare()) as object),
+			...(demoAnswer(statedCompare()) as object),
 			reads: {
-				...(answer(statedCompare()) as { reads: object }).reads,
+				...(demoAnswer(statedCompare()) as { reads: object }).reads,
 				compare: { argv: [], ok: false, error: { code: "x", exitCode: 1, message: "no" } },
 			},
 		})
@@ -96,7 +82,7 @@ describe("the Milestones page", () => {
 
 describe("the FI date, the chance, the tax and the cash flow", () => {
 	test("each page shows the what-if beside the baseline on the session's plan only", async () => {
-		await openSession()
+		await openDemoSession()
 		const fi = render(FiSections, { props: { fi: DEMO.reads.fi } }).body
 		expect(fi).toContain("What-if on base")
 		expect(fi).toContain("−3 months, earlier")
@@ -119,7 +105,6 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 			props: {
 				names,
 				projections,
-				accounts: DEMO.reads.accounts,
 				scenario: "base",
 				year: "",
 				onYear: () => {},
@@ -188,19 +173,19 @@ describe("the Overview's what-if", () => {
 
 describe("the session's reads on the pages", () => {
 	test("a page shows the what-if only for the changes it was read for: a newer change hides the older answer", async () => {
-		await openSession()
+		await openDemoSession()
 		expect(whatIfSession.lensFor("base")).not.toBeNull()
 		whatIfSession.setOff("base", HASH, "flows.living", true)
 		expect(whatIfSession.lensFor("base")).toBeNull()
 		await settle()
-		held[1]?.settle(200, answer(statedCompare()))
+		held[1]?.settle(200, demoAnswer(statedCompare()))
 		await settle(50)
 		expect(whatIfSession.lensFor("base")?.plan).toBe("base")
 		expect(whatIfSession.lensFor("retire-early")).toBeNull()
 	})
 
 	test("reverting the session removes the what-if from every page", async () => {
-		await openSession()
+		await openDemoSession()
 		whatIfSession.revert()
 		expect(whatIfSession.lensFor("base")).toBeNull()
 		expect(render(MilestonesView, { props: run }).body).not.toContain("What-if on")

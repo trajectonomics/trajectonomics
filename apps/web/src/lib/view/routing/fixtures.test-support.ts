@@ -1,4 +1,5 @@
 import type { ScenarioDocument } from "../../contract"
+import type { AccountNames } from "../account-names"
 
 /** A plan with routing: a bank, an emergency fund, a fund, a home that cannot be drawn on, and a loan. */
 export function planWith(cashflow: ScenarioDocument["cashflow"]): ScenarioDocument {
@@ -16,7 +17,7 @@ export function planWith(cashflow: ScenarioDocument["cashflow"]): ScenarioDocume
 	}
 }
 
-export const NAMES: ReadonlyMap<string, string> = new Map([
+export const NAMES: AccountNames = new Map([
 	["bank", "Savings"],
 	["emergency", "Emergency fund"],
 	["fund", "Funds"],

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { type AppError, fail } from "../errors"
 
 /*
  * The Override flags the projection leaves and `scenario fork` share (ADR-0024, cli ADR-0056): one
@@ -53,3 +54,23 @@ export const additionsField: z.ZodOptional<z.ZodArray<typeof appliedOverride>> =
 	.describe(
 		"The items put on a list with --add, in command-line order, each as its path (list.id) and the item as given; present only when an --add was given.",
 	)
+
+/**
+ * `--decimal` reads the money of a `--set` or an `--add` item, so beside neither it has nothing to
+ * read and is refused, as a `--set` beside two Scenarios is (cli ADR-0056, ADR-0062). A `--without`
+ * carries no amount.
+ */
+export function decimalProblem(input: {
+	decimal?: boolean | undefined
+	set?: readonly string[] | undefined
+	add?: readonly string[] | undefined
+}): AppError | null {
+	if (input.decimal !== true || (input.set ?? []).length > 0 || (input.add ?? []).length > 0) {
+		return null
+	}
+	return fail("invalid_input", {
+		path: "decimal",
+		message: "--decimal reads the amounts of a --set or an --add item, and none is given.",
+		hint: "Pass a --set or an --add beside --decimal, or drop --decimal.",
+	})
+}

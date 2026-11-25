@@ -53,6 +53,20 @@ describe("runsOutBarsOf", () => {
 		])
 	})
 
+	test("labels every tenth roll-up once the row passes 50 bars, so a year never meets the next one", () => {
+		const labelled = (count: number) =>
+			runsOutBarsOf(
+				Array.from({ length: count }, (_, index) => ({
+					index,
+					to: `${2026 + index}-12-31`,
+					paths: 0,
+				})),
+			).flatMap((bar, index) => (bar.label === null ? [] : [index]))
+		expect(labelled(50)).toEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45])
+		expect(labelled(60)).toEqual([0, 10, 20, 30, 40, 50])
+		expect(labelled(100)).toEqual([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
+	})
+
 	test("titles each bar with its count, in the singular for one path", () => {
 		expect(runsOutBarsOf([{ index: 1, to: "2027-12-31", paths: 1 }])[0]?.title).toBe(
 			"1 failing path runs out in 2027",
@@ -74,5 +88,28 @@ describe("chanceViewOf", () => {
 		})
 		expect(view.notes).toEqual(["Every figure is nominal."])
 		expect(view.runsOut.map((bar) => bar.paths)).toEqual([0, 12, 14])
+	})
+})
+
+describe("bandRowsOf", () => {
+	test("takes the CLI's Bands table rows as dates and money, and reads nothing else", () => {
+		const view = chanceViewOf(
+			chanceFixture({
+				tables: [
+					{
+						name: "bands",
+						count: 1,
+						rows: [{ index: 2, to: "2028-12-31", p10: "1000.00", p50: "2000.50", p90: "3000.00" }],
+					},
+				],
+			}),
+		)
+		expect(view.bandRows).toEqual([
+			{ ends: "31 Dec 2028", p10: "1,000.00", p50: "2,000.50", p90: "3,000.00" },
+		])
+	})
+
+	test("has no rows when the CLI printed no Bands table", () => {
+		expect(chanceViewOf(chanceFixture()).bandRows).toEqual([])
 	})
 })

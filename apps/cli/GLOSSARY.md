@@ -148,7 +148,10 @@ _Avoid_: Income source
 
 **Event**:
 A dated one-off change in a scenario, such as a purchase or a windfall.
-_Avoid_: Milestone
+
+**Milestone**:
+A named point in a Scenario that a Flow gates on with `startAt` or `endAt`, fired by its Criteria the first time they hold. The CLI carries a Scenario's Milestones unchanged and reports each one's fire date in a Projection (`milestones` table, cli ADR-0049); the rules are the simulation core's, in `packages/core/sim/GLOSSARY.md`.
+_Avoid_: Event, trigger, goal, checkpoint
 
 **Fork**:
 A copy of a Scenario under a new name that remembers the id of the Scenario it came from.

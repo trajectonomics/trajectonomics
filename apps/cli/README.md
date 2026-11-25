@@ -84,6 +84,15 @@ traj report networth --as-of 2026-03-31
 comes from, and a transaction moves an amount from one to another. Every read states its own
 date and never reads the clock, so the same command always answers the same question.
 
+To chart net worth over time, state every month-end of a period in one read instead of one
+call per month:
+
+```bash
+traj report networth --monthly --since 2026-01-01 --until 2026-03-31
+```
+
+Each month is exactly what `--as-of` gives for that date.
+
 `traj help` lists every command, `traj help <command>` lists one command's flags, and
 `traj schema --json` prints the whole contract: every command's input, output and error codes.
 

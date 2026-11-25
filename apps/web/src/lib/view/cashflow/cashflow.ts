@@ -1,4 +1,4 @@
-import type { AccountList, ProjectionRun, Read } from "../../contract"
+import type { ProjectionRun, Read } from "../../contract"
 import { formatDate } from "../../format/date"
 import { agesText } from "../household/model"
 import { EMPLOYER_NOTE, EMPLOYER_SECTION, SECTIONS } from "./cashflow-sections"
@@ -94,12 +94,6 @@ export function yearLabel(rollup: Rollup): string {
 	]
 		.filter((part): part is string => part !== null)
 		.join(", ")
-}
-
-/** The name of each Account, by its id, from the accounts Read. An id the Read does not name stays as it is. */
-export function accountNamesOf(read: Read<AccountList> | undefined): ReadonlyMap<string, string> {
-	if (read?.ok !== true) return new Map()
-	return new Map(read.data.accounts.map((account) => [account.id, account.name]))
 }
 
 /** The sections of a roll-up: each with the CLI's total for it, and its parts, whose lines keep the CLI's order. The employer's section shows only when it has lines. */

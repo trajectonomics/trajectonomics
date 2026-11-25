@@ -57,12 +57,16 @@ The three-step drawer on the Net worth page, "Import a balance history", that tu
 _Avoid_: upload, sync, migration, bulk edit, reconciliation
 
 **History cap**:
-The most month-ends the Net worth history holds, 120 (ten years), one `report networth` read each. A ledger that reaches back further keeps the latest 120, and the page says where the ledger really starts. It is a limit on reads, not a date the page computes (web ADR 0027).
+The most month-ends the Net worth history holds, 120 (ten years), stated by one `report networth --monthly` read. A ledger that reaches back further keeps the latest 120, and the page says where the ledger really starts. It is a limit on the months one read states, not a date the page computes (web ADR 0027).
 _Avoid_: window, zoom, range (the Plans page's Range is a different control)
 
 **Preview**:
 The `record-values` Edit with `preview: true`: the server runs `traj`'s dry run only and answers its result, with no write and no new Snapshot. The Review step shows it as what would be recorded, or every refused value at its row and column in the table.
 _Avoid_: simulation, validation, test run, draft
+
+**Account name**:
+The name the ledger gives an Account (`traj account list`), which every page shows in place of the id the plan holds it by. One lookup (`src/lib/view/account-names/`) is built from the Snapshot's accounts Read and nothing else, so a rename in the ledger shows once the Snapshot is read again. The ledger keeps names unique (`account_name_taken`); this only guards a Snapshot that breaks that: two Accounts that share a name are shown with their parents, the fewest that tell them apart ("Bank A › Savings"), and with the tail of their id when even the parents agree. An id the ledger does not name (an Account only the plan has, such as a home it buys) shows as the id, in code. Pickers keep the id as the value and show the name as the label, and an Edit still sends ids.
+_Avoid_: label, alias, display name (a name a person gives a plan item is a later change, #322)
 
 **Household**:
 The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.
@@ -93,8 +97,8 @@ A loan or a real asset changed as a whole: its parts (Account, Flows, debt) are 
 _Avoid_: bundle, batch
 
 **What-if lens**:
-The four reads of a What-if session's answer, parsed against the contract and bound to the session's plan: what a figure page may show of the session. A page with no lens shows the baseline alone.
-_Avoid_: preview, overlay, diff
+What a page may show of a What-if session, on the session's plan only. For a figure page it is the four reads of the session's answer, parsed against the contract and bound to the plan (`WhatIfLens`, whose reads are `LensReads`); for a planner page it is the plan's document with the session's changes put in (`lensDocument`). A page with no lens shows the baseline alone, and its markup is the markup it has with no What-if at all.
+_Avoid_: preview, overlay, diff, what-if reads (for the lens's reads)
 
 **Loan**:
 A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.

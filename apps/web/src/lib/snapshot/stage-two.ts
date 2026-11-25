@@ -1,5 +1,6 @@
 import type { Read } from "../contract"
 import { firstDayOfYear, firstDayTwoMonthsBack, monthEndsBetween } from "./dates"
+import { planHistory } from "./history"
 import type { PlanParams } from "./params"
 import { pathRead } from "./paths"
 import { type PlannedRead, plainRead } from "./planned"
@@ -17,14 +18,15 @@ import {
 export type StageTwoPlan = {
 	/** The Scenario names projected, in the order the ledger lists them. */
 	scenarios: string[]
-	/** The month-ends of the net worth history, oldest first; one net worth read per date. */
+	/** The month-ends of the net worth history, oldest first; the Snapshot holds one net worth Read per date. */
 	historyDates: string[]
 	doctor: PlannedRead
 	balance: PlannedRead
 	pnl: PlannedRead
 	transactions: PlannedRead
 	baseline: PlannedRead
-	netWorthHistory: PlannedRead[]
+	/** The one `report networth --monthly` read of every month-end in `historyDates`; null when there is none. */
+	netWorthHistory: PlannedRead | null
 	/** One `scenario show --decimal` per Scenario, the documents the planner pages show and edit. */
 	documents: Record<string, PlannedRead>
 	projections: Record<string, PlannedRead>
@@ -91,9 +93,7 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 			"--json",
 		]),
 		baseline: plainRead(["baseline", "show", "--as-of", params.asOf, "--json"]),
-		netWorthHistory: historyDates.map((date) =>
-			plainRead(["report", "networth", "--as-of", date, "--json"]),
-		),
+		netWorthHistory: planHistory(historyDates),
 		documents: planDocuments(scenarios),
 		projections: planProjections(params, scenarios),
 		fi: planFi(params, scenarios),

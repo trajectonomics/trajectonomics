@@ -46,7 +46,6 @@ let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = 
 			{onTerms}
 			{chart}
 			{onChart}
-			accounts={snapshot.reads.accounts}
 		/>
 	{/snippet}
 </PageShell>

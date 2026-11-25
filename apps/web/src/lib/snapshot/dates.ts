@@ -4,7 +4,7 @@ export type YearMonthDay = { year: number; month: number; day: number }
 const DATE_SHAPE = /^(\d{4})-(\d{2})-(\d{2})$/
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const
 /**
- * The number of month-ends a Snapshot's history holds at most: ten years, one `report networth` read each (web ADR 0027).
+ * The number of month-ends a Snapshot's history holds at most: ten years, stated by one `report networth --monthly` read (web ADR 0027).
  * A ledger that reaches back further keeps the latest ten years and the page says so.
  */
 export const HISTORY_MONTHS = 120

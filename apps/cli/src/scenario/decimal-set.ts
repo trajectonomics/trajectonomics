@@ -48,10 +48,12 @@ function atSetFlag(error: AppError, index: number, path: string, flag: OverrideF
 	const details = isNode(body.details) ? body.details : {}
 	const hint = body.hint ?? (body.code === "invalid_input" ? MONEY_HINT : undefined)
 	// The conversion's message opens with the path it names; the flag sentence says where instead.
+	// A flag refusal reads "At <path>, ..." once the dispatch drops the `<flag>: ` it carries, and this one
+	// keeps its own `--<flag>` path, so it states the sentence the same way.
 	const lead = `${path}: `
 	const reason = body.message.startsWith(lead) ? body.message.slice(lead.length) : body.message
 	return fail(body.code, {
-		message: `${flag}: at ${path}, ${reason}`,
+		message: `At ${path}, ${reason}`,
 		path: `--${flag}`,
 		...(hint === undefined ? {} : { hint }),
 		details: { ...details, index, path },

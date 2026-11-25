@@ -77,9 +77,14 @@ export const RUN_EXAMPLES: Leaf["examples"] = [
 			"The loan's months in a Scenario whose transfers pay it down: each month's `transferred`, apart from the debt payments it states as `paid`.",
 	},
 	{
+		command: `traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --add 'milestones={"id":"retire","combine":"all","criteria":[{"id":"date","kind":"date","on":"2026-06-30"}]}' --json`,
+		description:
+			"The annual roll-up with one Milestone added, and nothing saved: the milestones table gives the date it fires, and a Flow gates on it with startAt or endAt.",
+	},
+	{
 		command:
 			"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --without flows.invest --json",
-		description: "The annual roll-up with one Stream taken out, and nothing saved.",
+		description: "The annual roll-up with one Contribution taken out, and nothing saved.",
 	},
 	{
 		command: `traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal --json`,

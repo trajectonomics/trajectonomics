@@ -5,7 +5,7 @@ import type { Currency } from "./currency"
 import type { ISODate } from "./date"
 import { parseISODate } from "./date"
 import type { AccountId } from "./ids"
-import { scanLedger } from "./ledger-scan"
+import { type ScannedPosting, scanLedger } from "./ledger-scan"
 import { toSafeAmount } from "./safe-amount"
 import type { Transaction } from "./transaction"
 
@@ -28,18 +28,17 @@ export const compareRows = (
 	byCodeUnit(a.currency, b.currency)
 
 /**
- * Every Leaf Account's amount over the Postings `inDate` accepts, zeros included, sorted. `fieldOf`
- * gives the output path an `AMOUNT_OVERFLOW` reports for a Leaf, so it names the query the caller
- * called.
+ * Every Leaf Account's amount over the already scanned Postings `inDate` accepts, zeros included,
+ * sorted. A caller that asks for many dates scans the Ledger once and calls this for each.
  */
-export const leafSums = (
-	transactions: readonly Transaction[],
+export const leafSumsOf = (
+	scanned: readonly ScannedPosting[],
 	chart: ChartOfAccounts,
 	inDate: (date: ISODate) => boolean,
 	fieldOf: (account: Account) => string,
 ): readonly BalanceRow[] => {
 	const sums = new Map<AccountId, bigint>()
-	for (const { account, posting, date } of scanLedger(transactions, chart)) {
+	for (const { account, posting, date } of scanned) {
 		if (inDate(date)) sums.set(account.id, (sums.get(account.id) ?? 0n) + BigInt(posting.amount))
 	}
 	return Object.freeze(
@@ -56,6 +55,18 @@ export const leafSums = (
 			.sort(compareRows),
 	)
 }
+
+/**
+ * Every Leaf Account's amount over the Postings `inDate` accepts, zeros included, sorted. `fieldOf`
+ * gives the output path an `AMOUNT_OVERFLOW` reports for a Leaf, so it names the query the caller
+ * called.
+ */
+export const leafSums = (
+	transactions: readonly Transaction[],
+	chart: ChartOfAccounts,
+	inDate: (date: ISODate) => boolean,
+	fieldOf: (account: Account) => string,
+): readonly BalanceRow[] => leafSumsOf(scanLedger(transactions, chart), chart, inDate, fieldOf)
 
 /**
  * Every Leaf Account's Balance up to and including `asOf`, zeros included, sorted. `fieldOf` gives

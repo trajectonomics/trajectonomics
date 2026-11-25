@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import { currentSearch } from "../../client/location.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
@@ -53,7 +54,7 @@ const note = $derived(plan === null ? null : noCostNote(plan))
 					<EstateControls {dates} {terms} {onTerms} {onAt} />
 					{#if tried}<EstateResult view={tried} terms={chosen} title="With your try" />{/if}
 					<EstateResult view={saved} terms={chosen} title={tried ? "Saved plan" : undefined} />
-					{#if plan}<EstateAssumptions {plan} {note} baseline={snapshot.reads.baseline} />{/if}
+					{#if plan}<EstateAssumptions {plan} {note} names={currentAccountNames()} />{/if}
 				{/if}
 			{/snippet}
 		</ReadView>

@@ -1,12 +1,13 @@
 import type { AmountRow, CurrencyTotal, NetWorth } from "../../contract"
 import { formatDate } from "../../format"
+import { type AccountNames, NO_NAMES } from "../account-names"
 import { assetBars, type CurrencyBar, liabilityRows } from "./composition"
 
 /** What the net worth pages show, derived from one `report networth` Read. */
 export interface NetWorthView {
 	readonly asOf: string
 	readonly totals: readonly CurrencyTotal[]
-	/** Set when the As-of is before the first transaction, so the total is not a real reading. */
+	/** Set when the As-of is before the first transaction, so the total is not a real reading, or when the total is not stated. */
 	readonly note: string | null
 	readonly bars: readonly CurrencyBar[]
 	readonly liabilities: readonly AmountRow[]
@@ -14,15 +15,21 @@ export interface NetWorthView {
 }
 
 /** The view of one `report networth` result: its totals, its composition and every row. */
-export function netWorthView(data: NetWorth): NetWorthView {
+export function netWorthView(data: NetWorth, names: AccountNames = NO_NAMES): NetWorthView {
 	return {
 		asOf: formatDate(data.asOf),
-		totals: data.totals,
-		note: noTransactionsNote(data),
-		bars: assetBars(data.rows),
+		totals: data.totals ?? [],
+		note: noTransactionsNote(data) ?? unavailableTotalNote(data),
+		bars: assetBars(data.rows, names),
 		liabilities: liabilityRows(data.rows),
 		rows: data.rows,
 	}
+}
+
+/** The plain statement that no total is stated because the accounts' sum is out of range, or null when one is. */
+export function unavailableTotalNote(data: NetWorth): string | null {
+	if (data.totals !== null) return null
+	return "The total is not stated: every account is in range, but their sum exceeds the safe integer range. Each account's balance is shown below."
 }
 
 /** The plain statement that the zero is not a real reading, or null when the As-of has transactions. */

@@ -3,8 +3,6 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { render } from "svelte/server"
-import PathView from "../src/components/chance/path/PathView.svelte"
 import type { ProjectionChance, Snapshot } from "../src/lib/contract"
 import type { PlanParams } from "../src/lib/snapshot"
 import { pathAnswer } from "../src/lib/snapshot/paths"
@@ -13,6 +11,7 @@ import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 import { answerPath } from "./serve-path"
 
@@ -39,13 +38,15 @@ export async function setupFutures(): Promise<void> {
 		carryIn: true,
 		chance: { returnModel: model, paths: DEMO_PATHS, seed: DEMO_SEED },
 	}
-	editor = createEditor({
-		traj,
-		cliVersion: "test",
-		params,
-		records: demoCarryIn([PLAN]),
-		token: TOKEN,
-	})
+	editor = recorded(
+		createEditor({
+			traj,
+			cliVersion: "test",
+			params,
+			records: demoCarryIn([PLAN]),
+			token: TOKEN,
+		}),
+	)
 	const run = await editor.refresh()
 	if (!run.ok) throw new Error(run.error.message)
 	snapshot = run.snapshot
@@ -77,19 +78,6 @@ export async function readPath(body: unknown, change: Record<string, string | nu
 	const request = editRequest(change, JSON.stringify(body))
 	const response = await editorOf().reread(request, 4321)
 	return { status: response.status, answer: pathAnswer.parse(await response.json()) }
-}
-
-/** The path page for one index, over the Snapshot. */
-export function page(index: number): string {
-	return render(PathView, {
-		props: {
-			snapshot: snapshotOf(),
-			scenario: PLAN,
-			index: String(index),
-			terms: "both",
-			onTerms: () => {},
-		},
-	}).body
 }
 
 /** `answerPath` over a held Snapshot with the chance parameters changed: the refusals come before any traj run, so none runs. */

@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite"
 import { describe, expect, it } from "bun:test"
 import { join } from "node:path"
 import { run } from "./cli"
+import { LEDGER_READ_CODES } from "./store"
 import { capture } from "./test-support"
 import {
 	cli,
@@ -29,6 +30,7 @@ describe("tx import schema, help and listing", () => {
 		expect(data.examples.length).toBeGreaterThan(0)
 		expect(data.errorCodes).toEqual(
 			[
+				"AMOUNT_OVERFLOW",
 				"INVALID_ACCOUNT_HIERARCHY",
 				"INVALID_AMOUNT",
 				"CURRENCY_MISMATCH",
@@ -46,7 +48,10 @@ describe("tx import schema, help and listing", () => {
 				"invalid_input",
 				"same_account",
 				"unsupported_currency",
-			].sort(),
+				...LEDGER_READ_CODES,
+			]
+				.filter((code, at, all) => all.indexOf(code) === at)
+				.sort(),
 		)
 	})
 
