@@ -1,7 +1,16 @@
 <script lang="ts">
+  import { activeTheme } from "$lib/themeStore";
+
   let { alt = "Empty month" }: { alt?: string } = $props();
+
+  // The sitting robot waits with you rather than looking lost at an empty month. Copied
+  // from apps/site/public/mascot/sit.webp into static/mascot/robot/ (offline bundle).
+  const robot = $derived($activeTheme === "trajectonomics");
 </script>
 
+{#if robot}
+  <img src="/mascot/robot/sit.webp" {alt} class="h-24 w-28 object-contain select-none" />
+{:else}
 <!--
   Distinct from the hero mascot photo: a flat receipt with a sleeping pig mark.
   Colors follow the active theme.
@@ -52,3 +61,4 @@
     stroke-linecap="round"
   />
 </svg>
+{/if}

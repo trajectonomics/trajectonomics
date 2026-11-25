@@ -1,0 +1,53 @@
+---
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+}
+
+const { dictionary } = Astro.props
+
+/** The app's screens, in the order the page shows them; each file keeps the name the app's site gave it. */
+const SHOTS = [
+	{ src: "/openjot/shot-home.webp", width: 600, height: 1298 },
+	{ src: "/openjot/shot-summary.webp", width: 600, height: 1298 },
+	{ src: "/openjot/shot-scan-en.webp", width: 412, height: 891 },
+	{ src: "/openjot/shot-scan-th.webp", width: 540, height: 1142 },
+] as const
+---
+
+<section class="section-muted bg-muted" aria-labelledby="openjot-screens">
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.screensEyebrow}</p>
+			<h2 id="openjot-screens" class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.screensHeading}
+			</h2>
+		</div>
+		<ul class="openjot-screens">
+			{
+				SHOTS.map((shot, index) => (
+					<li class="openjot-shot">
+						<figure class="openjot-shot-figure">
+							<div class="openjot-phone">
+								<img
+									src={shot.src}
+									width={shot.width}
+									height={shot.height}
+									loading="lazy"
+									decoding="async"
+									alt={dictionary.screenAlts[index] ?? ""}
+								/>
+							</div>
+							<figcaption class="openjot-shot-caption">
+								{dictionary.screenCaptions[index]}
+							</figcaption>
+						</figure>
+					</li>
+				))
+			}
+		</ul>
+		<p class="openjot-meta">{dictionary.screensNote}</p>
+	</div>
+</section>

@@ -31,6 +31,8 @@ export interface Dictionary {
 	readonly docsLink: string
 	/** The header's link to the blog. */
 	readonly blogLink: string
+	/** The header's link to the OpenJot page on the Site. */
+	readonly openjotLink: string
 	/** The header's one repository link, heard with its star count: the GitHub mark, the count and an arrow. */
 	readonly repoLinkLabel: string
 	/** The See it in action section's small label, which the page no longer draws. */

@@ -160,14 +160,16 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
     current holder's.
   - The record names a person by id. A holder given a new id reads as another person: the flat claims
     stay under the old id, and the new one's Return starts from nothing until the caller states them.
-    The result reports it (trajectonomics/trajectonomics#614). A `--merge` or `--from-stored` write
-    that finds the stored `claimsHolder` is not a person in the household, and moves claims of theirs
-    that are not all zero into their entry in `returns`, adds to `assumptions` an entry at path
-    `claimsHolder`, with value 0 and status `unsourced`, that names the old id. That is the write that
-    records the new holder, a dry run of it included; later writes find a holder in the household and
-    say nothing. A joint or single write moves nothing and counts the flat claims on its Return, so it
-    adds none, and nor does a write with no household, which cannot judge the record. A `--tax` write
-    states the claims again.
+    The result reports it (trajectonomics/trajectonomics#614). Every `married_separate` write, by
+    `--merge` or `--from-stored` and a dry run of either, adds to `assumptions` one entry for each id
+    in the written `returns` that no person in the household has. Such a set claims something, because
+    `returns` keeps no empty set for a person with no Return. The entry is at path `returns.<id>`,
+    with value 0 and status `unsourced`, and names the id. So a partner given a new id is reported as
+    a holder is, and the entry stays for as long as the claims sit on no Return. Stating them again
+    for a person in the household leaves the old set stored: a `--tax` write drops it, and a household
+    that has the old id again ends the entry. A joint or single write adds none, because it counts the
+    flat claims on its Return, and the kept-claims note (#606, below) names the sets in `returns`. A
+    write with no household cannot judge an id and adds none.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
   that claims something, whatever the filing status and also while the household names no partner or
@@ -215,3 +217,53 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   projection now agree instead of the second refusing what the first stored. The Dashboard's
   `isFilerPlan` reads the same rule from `document.levies`, so a plan whose labels are all bare but
   whose Levy tallies suffixes is still a Filer plan.
+
+## Amended (2026-11-26): the interest on a loan borrowed together is stated once (#606)
+
+This is the follow-up the shared home-loan ceiling left above.
+
+- **The flag.** `--mortgage-interest shared=<amount>` states the interest on one loan borrowed
+  together, beside each person's own `--mortgage-interest [<person>=]<amount>`. A household with
+  Owners cannot name a person `shared` (cli ADR-0076), so the word is never a Filer's id. No other flag
+  takes it.
+- **The split.** Each separate Return claims half, and an odd satang goes to the holder, as the other
+  shared splits do. With one Filer, that person claims it all: if only one spouse has income, that
+  spouse claims all the interest, and a borrower with no income claims nothing (s.47(1)(ซ),
+  [tax research](../../../../packages/core/tax/docs/research/separate-filing.md)). The split is made
+  at each write from the stored total, so a later write follows a new holder or a second income.
+- **The ceilings.** `thSeparateClaimProblems` receives the two shares, with `sharedMortgage`, and its
+  `MORTGAGE_OVER_CEILING` is refused at `--mortgage-interest`, with `details` naming the `problem` and
+  the `persons`. Each person's own interest is not part of that check. A Return's Levy claims its own
+  interest plus its share, and tax-core caps that sum at the 100,000 baht every Return has for all its
+  home-loan interest: a person's other loans and their part of the shared one count toward it. A sum
+  above the cap is clamped, as any claim above a ceiling is, and not refused.
+- **The stored profile** gains an optional `sharedMortgageInterest`, the total as stated, left out at
+  zero. The flat `mortgageInterest` and each entry of `returns` stay a person's own and never include a
+  share, so no write counts it twice. `--merge` replaces it (`shared=0` removes it), `--merge` and
+  `--from-stored` otherwise keep it, and a write of the whole profile (`--tax`) states it anew.
+- **Other statuses.** `shared=` is refused, as `invalid_input` at `--mortgage-interest`, unless the
+  write is a `married_separate` one with Filers. A value already stored is kept under another status,
+  or while the plan has no Filers, as the other claims are: no Levy reads it, and a later separate
+  filing takes it back. A joint Return therefore claims only the flat `mortgageInterest`, so a caller
+  who files jointly states the Return's interest there.
+- **What a Return does not claim is said.** A write that is not a separate one with Filers says, in
+  `assumptions` on `allowances.mortgageInterestCeiling`, that the shared interest the profile keeps is
+  not claimed, with the amount and `--mortgage-interest <amount> --merge` as the way to state this
+  Return's interest. It says the same of the claims kept for another person, naming them, whatever
+  they claim: apart from the entries of #614, every entry of `assumptions` is one of tax-core's
+  figures, so this is the entry that carries a sentence about a claim. The entry keeps tax-core's
+  value and status, and is added when the Levy claims no home-loan interest. On a `married_separate`
+  write with no Filers, an id no longer in the household is left out of this sentence, because it has
+  its own entry (#614, above). A separate write whose sole Filer leaves the other person's stored
+  claims unclaimed says nothing of a person still in the household, as before.
+- **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
+  once the profile states shared interest, because the person has said which interest is shared. The
+  CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
+  note is added as before, and now names the flag.
+- **The Dashboard** reads `sharedMortgageInterest` but neither shows nor edits it, and a save of the
+  whole profile from the Dashboard drops it, as a write with `--tax` that leaves it out does.
+  Follow-up: trajectonomics/trajectonomics#618.
+- **Known limit: the one-earner rule is applied once per write, not per projection year.** Who is a
+  Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
+  2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
+  the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.

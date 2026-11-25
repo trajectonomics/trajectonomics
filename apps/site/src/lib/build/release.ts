@@ -1,10 +1,10 @@
 import { LLMS_FULL_FILE } from "../crawl/llms-full"
 import type { Dictionary } from "../language/dictionary"
-import { languageEntry } from "../language/languages"
+import { dictionaryFor, languageEntry } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import { fileAt } from "./built-files"
 import type { BuildFailure } from "./failures"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { NOT_FOUND_PAGES } from "./not-found-pages"
 import { footerFailures } from "./release-footer"
 import { versionFailures } from "./release-version"
@@ -15,16 +15,19 @@ interface CoveredPage {
 	readonly dictionary: Dictionary | undefined
 }
 
-/** Both Language homes, the three Not-found pages and the full Answer engine file, as the build wrote them. */
+/** Every page the build writes, the Not-found page and the full Answer engine file, as it wrote them. */
 function coveredPages(files: readonly BuiltFile[]): readonly CoveredPage[] {
-	const homes = builtHomes(files).map(({ entry, file }) => ({ file, dictionary: entry.dictionary }))
+	const pages = builtLanguagePages(files).map(({ page, file }) => ({
+		file,
+		dictionary: dictionaryFor(page.language),
+	}))
 	const notFound = NOT_FOUND_PAGES.flatMap((page) => {
 		const file = fileAt(files, page.path)
 		return file === undefined ? [] : [{ file, dictionary: languageEntry(page.language).dictionary }]
 	})
 	const full = fileAt(files, LLMS_FULL_FILE)
 	return [
-		...homes,
+		...pages,
 		...notFound,
 		...(full === undefined ? [] : [{ file: full, dictionary: undefined }]),
 	]

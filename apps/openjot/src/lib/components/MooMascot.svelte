@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { activeTheme } from "$lib/themeStore";
+
   export type MascotMood = "idle" | "scan" | "happy";
 
   let {
@@ -18,8 +20,20 @@
   let popping = $state(false);
   let fallback = $state(false);
 
+  // The Trajectonomics theme shows the brand's cream robot instead of Moo. The poses are
+  // copied from apps/site/public/mascot/ (the Site's mascot renders) into
+  // static/mascot/robot/ so the offline app bundles them. Only full-body poses: the Site's
+  // `hello` and `peek` lean over an edge and look cut off on their own. Idle `wave` greets,
+  // scan `open` examines the slip through its magnifier, happy `same` throws both arms up.
+  const robot = $derived($activeTheme === "trajectonomics");
+
   const src = $derived.by(() => {
     if (fallback) return "/app-icon.png";
+    if (robot) {
+      if (mood === "scan") return "/mascot/robot/open.webp";
+      if (mood === "happy") return "/mascot/robot/same.webp";
+      return "/mascot/robot/wave.webp";
+    }
     if (mood === "scan") return "/mascot/mascot-scan.webp";
     if (mood === "happy") return "/mascot/mascot-happy.webp";
     return "/mascot/mascot-idle.webp";

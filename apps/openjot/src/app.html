@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>OpenJot</title>
+    <!-- Paint the saved theme before the app runs, so a saved pink or orange never flashes the
+         default. Keep this in step with themeAttribute() in src/lib/theme.ts: trajectonomics
+         (and no saved theme) is the brand's dark Theme. -->
+    <script>
+      try {
+        var t = localStorage.getItem("moojot_theme");
+        if (t === "pink-white" || t === "orange-black") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

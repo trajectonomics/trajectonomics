@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test"
-import { DEVICE_SCHEMES, expectShippedTheme, homeOf, openPage, PAGES } from "./pages"
+import { DEVICE_SCHEMES, expectShippedTheme, homeOf, openPage, PAGES_UNDER_TEST } from "./pages"
 
 /** Thai text whose nearest declared Language, `html` included, is not Thai. */
 function unmarkedThai(page: Page): Promise<readonly string[]> {
@@ -33,7 +33,7 @@ for (const scheme of DEVICE_SCHEMES) {
 	test.describe(`the Language of the page on a ${scheme} device`, () => {
 		test.use({ colorScheme: scheme })
 
-		for (const underTest of PAGES) {
+		for (const underTest of PAGES_UNDER_TEST) {
 			test(`${underTest.name} speaks the Language it declares`, async ({ page }) => {
 				await openPage(page, underTest)
 				await expectShippedTheme(page)

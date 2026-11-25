@@ -5,6 +5,8 @@ import type { Dictionary } from "../lib/language/dictionary"
 
 interface Props {
 	readonly dictionary: Dictionary
+	/** The page the consent links return to: the address the visitor is reading. */
+	readonly address: string
 }
 
 // A labelled `section`, not an `aside`: the banner sits inside the page's `main`, where a
@@ -12,13 +14,13 @@ interface Props {
 // It is plain links and no script (ADR 0024): each link's redirect stores the choice and
 // returns the visitor to the page without the banner. A script would only spare that one reload, and
 // the home's program JavaScript budget is 10,000 bytes (ADR 0005), which it does not fit.
-const { dictionary } = Astro.props
+const { dictionary, address } = Astro.props
 ---
 
 <section class="consent" aria-label={dictionary.consentLabel}>
 	<p class="consent-text">{dictionary.consentText}</p>
 	<div class="consent-actions">
-		<a class="consent-link consent-link-allow" href="/?consent=granted" rel="nofollow">{dictionary.consentAllow}</a>
-		<a class="consent-link" href="/?consent=denied" rel="nofollow">{dictionary.consentDecline}</a>
+		<a class="consent-link consent-link-allow" href={`${address}?consent=granted`} rel="nofollow">{dictionary.consentAllow}</a>
+		<a class="consent-link" href={`${address}?consent=denied`} rel="nofollow">{dictionary.consentDecline}</a>
 	</div>
 </section>

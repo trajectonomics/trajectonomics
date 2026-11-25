@@ -1,11 +1,9 @@
-import type { Language } from "../language/language"
-import { dictionaryFor } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, type ScannedPage, scanHtml } from "./html"
 import { unescapeText } from "./html-tag"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
 
 /** The `name` a description meta carries, whatever case the build writes it in. */
@@ -18,8 +16,8 @@ function descriptionsOf(page: ScannedPage): readonly string[] {
 		.map((meta) => unescapeText(meta.attributes["content"] ?? ""))
 }
 
-/** One Language home summarises itself once, in the words the Dictionary states for that Language. */
-function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[] {
+/** One page summarises itself once, in the words its own Dictionary states for that Language. */
+function failuresOf(file: BuiltFile, expected: string): readonly BuildFailure[] {
 	const path = pageUrl(file.path)
 	const descriptions = descriptionsOf(scanHtml(file.content))
 	const [description] = descriptions
@@ -41,7 +39,6 @@ function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[
 			),
 		]
 	}
-	const expected = dictionaryFor(language).description
 	if (description === expected) return []
 	return [
 		buildFailure(
@@ -52,7 +49,7 @@ function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[
 	]
 }
 
-/** Every Language home describes itself in the one description the Dictionary states. */
+/** Every page describes itself in the one description its own Dictionary states. */
 export function checkDescription(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => failuresOf(file, entry.language))
+	return builtLanguagePages(files).flatMap(({ page, file }) => failuresOf(file, page.description))
 }
