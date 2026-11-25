@@ -40,7 +40,7 @@ const reached = $derived(milestoneView(run)?.reached ?? [])
 	{#if reached.length > 0}
 		<!-- The marks above in words: a phone has no hover to name a shortened rule, so the list is visible
 		below the chart there, and it stays for a reader who cannot see the marks at any width. -->
-		<ul class="sr-only space-y-1 text-xs sm:not-sr-only">
+		<ul class="space-y-1 text-xs not-sr-only sm:sr-only">
 			{#each reached as milestone (milestone.id)}
 				<li><ItemName kind="milestone" id={milestone.id} />: reached on {formatDate(milestone.date)}</li>
 			{/each}

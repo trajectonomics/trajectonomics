@@ -38,7 +38,7 @@ describe("MilestonesBody", () => {
 		const body = renderBody(withMilestones(MILESTONE_ROWS))
 		expect(body).toContain("<title>first-year</title>")
 		// Hidden on a wide screen, where the chart's own label has room, and visible on a phone, which has no hover.
-		expect(body).toContain('<ul class="sr-only space-y-1 text-xs sm:not-sr-only">')
+		expect(body).toContain('<ul class="space-y-1 text-xs not-sr-only sm:sr-only">')
 		expect(body).toMatch(
 			/data-item="first-year"[^>]*>first-year<\/code>(<!--.*?-->)*: reached on 31 Dec 2026/,
 		)
