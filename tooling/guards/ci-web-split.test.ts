@@ -9,7 +9,7 @@ const ROOT = join(import.meta.dir, "..", "..")
 
 type Step = { name?: string; if?: string; uses?: string; run?: string; with?: { path?: string } }
 type Job = { name?: string; if?: string; needs?: string | string[]; steps?: Step[] }
-type Tasks = Record<string, { dependsOn?: string[] }>
+type Tasks = Record<string, { dependsOn?: string[]; env?: string[] }>
 
 const web = (await Bun.file(join(ROOT, "apps/web/package.json")).json()) as {
 	scripts: Record<string, string>
@@ -18,6 +18,12 @@ const web = (await Bun.file(join(ROOT, "apps/web/package.json")).json()) as {
 const workflow = Bun.YAML.parse(await Bun.file(join(ROOT, ".github/workflows/ci.yml")).text()) as {
 	jobs: Record<string, Job>
 }
+
+const workflowOf = async (name: string) =>
+	Bun.YAML.parse(await Bun.file(join(ROOT, ".github/workflows", name)).text()) as {
+		env?: Record<string, string>
+		jobs: Record<string, Job & { env?: Record<string, string> }>
+	}
 
 const webTurbo = (await Bun.file(join(ROOT, "apps/web/turbo.json")).json()) as { tasks: Tasks }
 
@@ -133,5 +139,25 @@ describe("the CI split of the web check", () => {
 		// It judges the whole `needs` object, so a job added to the list needs no edit to the script.
 		expect(JSON.stringify(check.steps)).toContain("toJSON(needs)")
 		expect(JSON.stringify(check.steps)).not.toMatch(/needs\.[\w-]+\.result/)
+	})
+
+	it("stamps every web build with the commit and checks the Pack is reproducible (web ADR 0028)", async () => {
+		// SvelteKit stamps a build with the time it ran unless TRAJ_WEB_VERSION says otherwise. The variable is the
+		// commit, never a constant, so a new deploy of the hosted Demo is still a new version. Turbo hides the
+		// variables a task does not list, so `build` and `build:hosted` must list it (which also puts it in the cache key).
+		const ci = (await workflowOf("ci.yml")) as { env?: Record<string, string> }
+		expect(ci.env?.["TRAJ_WEB_VERSION"]).toBe("${{ github.sha }}")
+		for (const task of ["build", "build:hosted"]) {
+			expect(webTurbo.tasks[task]?.env).toContain("TRAJ_WEB_VERSION")
+		}
+		const release = await workflowOf("release.yml")
+		expect(release.jobs["publish"]?.env?.["TRAJ_WEB_VERSION"]).toBe("${{ github.sha }}")
+		// A repair dispatch of the binaries rebuilds an older tag, so its stamp is the checked-out commit.
+		const binaries = await workflowOf("binaries.yml")
+		expect(commandsOf(binaries.jobs["build"] as Job)).toContain("TRAJ_WEB_VERSION=$(git rev-parse HEAD)")
+		// The web job builds again, outside turbo, and compares the raw sha256 of dashboard.bin.
+		const reproducible = (workflow.jobs["web"] as Job).steps?.find((step) => step.run?.includes("sha256sum"))
+		expect(reproducible?.run).toContain("bun run build")
+		expect(reproducible?.run).toContain("pack/dashboard.bin")
 	})
 })

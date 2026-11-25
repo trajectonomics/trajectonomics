@@ -122,6 +122,9 @@ jobs:
       FIRST_VERSION: ${{ matrix.firstVersion }}
       EXTRA_PATHS: ${{ join(matrix.extraPaths, ' ') }}
       GITHUB_LATEST: ${{ matrix.githubLatest }}
+      # The Dashboard the CLI embeds is a SvelteKit build, which stamps the time it ran unless told otherwise.
+      # The commit is the stamp, so a rebuild of it packs the same bytes (web ADR 0028).
+      TRAJ_WEB_VERSION: ${{ github.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

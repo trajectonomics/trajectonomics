@@ -47,6 +47,17 @@ before, through `cli#build`).
   fails when that script gains a step, when `test` stops being `test:src` plus `test:scripts`, or when
   the workflow stops running them. Update the workflow in the same pull request.
 
+## Reproducible Dashboard build
+
+SvelteKit stamps a build with the time it ran, so two builds of one commit packed different
+`dashboard.bin` bytes. `ci.yml` sets `TRAJ_WEB_VERSION` to `github.sha` for every job (`binaries.yml`
+sets it to the checked-out commit and `release.yml` to `github.sha`), and `apps/web/turbo.json` lists
+it in the `env` of `build` and `build:hosted`, so it is in their cache key. The `Check web` job builds
+once more outside turbo and fails when the `sha256` of `pack/dashboard.bin` changed
+([web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
+The price: the web `build` and the tasks that build on it (the command line's build) miss the turbo
+cache on every new commit, even when no web source changed, because the stamp is part of their key.
+
 ## Files outside every package
 
 `tooling/config/**` (the shared Biome and TypeScript config) and `tooling/scripts/**` are

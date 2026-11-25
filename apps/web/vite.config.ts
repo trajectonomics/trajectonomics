@@ -13,9 +13,16 @@ import hostedConfig from "./src/hosted/overrides.json" with { type: "json" }
 // `TRAJ_WEB_TARGET=hosted` builds the hosted Demo instead ([ADR 0028](./docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)):
 // its own output folder (`dist-hosted/`, or `TRAJ_WEB_OUT`) and its own working folder (`.svelte-kit-<folder name>`), the base path from src/hosted/overrides.json, and the
 // closed list of twins in that file swapped in. Without the variable nothing below changes the loopback build, and
-// `dist/` (which `scripts/pack.ts` packs into dashboard.bin) is the same files, except SvelteKit's build stamp
-// (`_app/version.json` and the pages that name it), which `scripts/pack-fingerprint.ts` masks.
+// `dist/` (which `scripts/pack.ts` packs into dashboard.bin) is the same files.
+//
+// SvelteKit stamps every build with a version name (`_app/version.json` and the pages that name it), by default the time
+// it ran, so two builds of one commit would pack different bytes. `TRAJ_WEB_VERSION` fixes the stamp: CI, the binaries
+// build and the release set it to the commit SHA, so a build is byte for byte reproducible and a new commit is still a
+// new version for the hosted Demo to detect ([ADR 0028](./docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
+// Unset (or empty), a local build gets the time, as SvelteKit does.
 const hosted = process.env["TRAJ_WEB_TARGET"] === "hosted"
+const stamp = process.env["TRAJ_WEB_VERSION"]
+const version = stamp === undefined || stamp === "" ? Date.now().toString() : stamp
 const out = hosted ? (process.env["TRAJ_WEB_OUT"] ?? "dist-hosted") : "dist"
 const SRC = join(dirname(fileURLToPath(import.meta.url)), "src")
 const HOSTED = join(SRC, "hosted")
@@ -47,6 +54,7 @@ export default defineConfig({
 			compilerOptions: { runes: true },
 			adapter: adapter({ pages: out, assets: out, strict: true }),
 			files: { assets: "public" },
+			version: { name: version },
 			...(hosted
 				? {
 						paths: { base: hostedConfig.base as `/${string}` },
