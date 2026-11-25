@@ -22,7 +22,7 @@ describe("the Footer component in every Language", () => {
 		const dictionary = languageEntry(language).dictionary
 
 		it(`renders one footer with the disclaimer first (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const footer = elementsByTag(page, "footer")[0]
 			if (footer === undefined) throw new Error("no footer rendered")
 			const disclaimer = page.elements.find(
@@ -35,7 +35,7 @@ describe("the Footer component in every Language", () => {
 		})
 
 		it(`states the three facts above the disclaimer (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const footer = elementsByTag(page, "footer")[0]
 			if (footer === undefined) throw new Error("no footer")
 			const facts = page.elements.find((element) => "data-facts" in element.attributes)
@@ -53,7 +53,7 @@ describe("the Footer component in every Language", () => {
 		})
 
 		it(`links the licence and the organisation (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const links = elementsByTag(page, "a")
 			const licence = links.find((element) => element.attributes["href"] === SKILLS_LICENCE_URL)
 			const org = links.find((element) => element.attributes["href"] === GITHUB_ORG_URL)
@@ -63,14 +63,14 @@ describe("the Footer component in every Language", () => {
 		})
 
 		it(`makes the disclaimer the footer's first paragraph, ahead of the brand and the columns (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const first = elementsByTag(page, "p")[0]
 			if (first === undefined) throw new Error("no paragraph rendered")
 			expect(textOf(page, first)).toBe(dictionary.footerDisclaimer)
 		})
 
 		it(`lists three labelled columns of links, and every link goes where it says (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const labels = withClass(page, "footer-label").map((element) => textOf(page, element))
 			expect(labels).toEqual([
 				dictionary.footerProductLabel,
@@ -96,7 +96,7 @@ describe("the Footer component in every Language", () => {
 		})
 
 		it(`draws the wordmark as decoration, not a second brand link or a second nav (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			const wordmark = withClass(page, "footer-wordmark")[0]
 			expect(wordmark?.attributes["aria-hidden"]).toBe("true")
 			expect(wordmark?.attributes["data-text"]).toBe(SITE_NAME)
@@ -105,7 +105,7 @@ describe("the Footer component in every Language", () => {
 		})
 
 		it(`renders no heading (${language})`, async () => {
-			const page = scanComponent(await renderComponent(Footer, { dictionary }))
+			const page = scanComponent(await renderComponent(Footer, { dictionary, address: "/" }))
 			expect(headings(page)).toEqual([])
 		})
 	}

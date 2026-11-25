@@ -1,0 +1,41 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the Mascot it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+import Mascot from "../Mascot.astro"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+{/* One `h2`, and every question is a native disclosure whose answer stays in the page (ADR 0012, ADR 0030). */}
+<section class="section-surface bg-background" aria-labelledby="openjot-faq">
+	<div class="section-inner faq-layout">
+		<div class="faq-head">
+			<div class="section-head">
+				<p class="eyebrow">{dictionary.faqEyebrow}</p>
+				<h2 id="openjot-faq" class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+					{dictionary.faqHeading}
+				</h2>
+			</div>
+			<Mascot pose="think" class="mascot-think" />
+		</div>
+
+		<div class="faq-list">
+			{
+				dictionary.faqQuestions.map((question, index) => (
+					<details class="faq-item" data-faq-item>
+						<summary class="faq-question text-foreground">
+							<span>{question}</span>
+							<span class="faq-mark" aria-hidden="true" />
+						</summary>
+						<p class="faq-answer text-foreground">{dictionary.faqAnswers[index]}</p>
+					</details>
+				))
+			}
+		</div>
+	</div>
+</section>

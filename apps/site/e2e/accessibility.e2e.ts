@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect, type Page, test } from "@playwright/test"
 import { FI_DEMO_OUTPUT } from "../src/lib/site"
-import { DEVICE_SCHEMES, expectShippedTheme, homeOf, openPage, PAGES } from "./pages"
+import { DEVICE_SCHEMES, expectShippedTheme, homeOf, openPage, PAGES_UNDER_TEST } from "./pages"
 import { VIEWPORTS } from "./viewports"
 
 /** Every WCAG 2.2 AA tag the Site promises. */
@@ -51,7 +51,7 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
 				viewport,
 			})
 
-			for (const underTest of PAGES) {
+			for (const underTest of PAGES_UNDER_TEST) {
 				test(`${underTest.name} has no axe violation and nothing axe cannot judge`, async ({
 					page,
 				}) => {

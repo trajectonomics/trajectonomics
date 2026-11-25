@@ -56,10 +56,18 @@ describe("the Worker config", () => {
 		expect(config.compatibility_date).toBe("2026-11-01")
 	})
 
-	it("runs the Worker first for the address and the old prefixes, and nowhere else", () => {
+	it("runs the Worker first for each page address and the old prefixes, and nowhere else", () => {
 		expect(config.main).toBe("src/worker/index.ts")
 		expect(config.assets?.binding).toBe("ASSETS")
-		expect(config.assets?.run_worker_first).toEqual(["/", "/en", "/en/*", "/th", "/th/*"])
+		expect(config.assets?.run_worker_first).toEqual([
+			"/",
+			"/en",
+			"/en/*",
+			"/th",
+			"/th/*",
+			"/openjot",
+			"/openjot/",
+		])
 	})
 
 	it("attaches no route or custom domain", () => {

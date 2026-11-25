@@ -1,0 +1,20 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see <OpenJotPage />.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import OpenJotPage from "../../../components/openjot/OpenJotPage.astro"
+import type { Language } from "../../../lib/language/language"
+import { languagePaths } from "../../../lib/language/paths"
+
+interface Props {
+	readonly language: Language
+}
+
+export function getStaticPaths() {
+	return languagePaths()
+}
+
+const { language } = Astro.props
+---
+
+<!-- A Language's OpenJot page built beside the address: a build path the Worker serves at /openjot/ (ADR 0032). -->
+<OpenJotPage language={language} />

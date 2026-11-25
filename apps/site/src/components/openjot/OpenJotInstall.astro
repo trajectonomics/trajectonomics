@@ -1,0 +1,52 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the Mascot it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import type { OpenJotDictionary } from "../../lib/language/openjot-dictionary"
+import { OPENJOT_CHECKSUMS_URL, OPENJOT_SIGNING_FINGERPRINT } from "../../lib/site/openjot"
+import Mascot from "../Mascot.astro"
+
+interface Props {
+	readonly dictionary: OpenJotDictionary
+}
+
+const { dictionary } = Astro.props
+---
+
+<section id="install" class="section-muted bg-muted" aria-labelledby="openjot-install">
+	<div class="section-inner">
+		<div class="section-head">
+			<p class="eyebrow">{dictionary.installEyebrow}</p>
+			<h2 id="openjot-install" class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+				{dictionary.installHeading}
+			</h2>
+			<p class="section-lede text-muted-foreground">{dictionary.installLede}</p>
+		</div>
+
+		<ol class="openjot-steps">
+			{
+				dictionary.stepTitles.map((title, index) => (
+					<li class="openjot-step">
+						<span class="openjot-step-num" aria-hidden="true">
+							{String(index + 1).padStart(2, "0")}
+						</span>
+						<p class="openjot-step-title">{title}</p>
+						<p class="openjot-step-copy">{dictionary.stepCopies[index]}</p>
+						{index === 1 ? <p class="openjot-step-tip">{dictionary.installTip}</p> : null}
+					</li>
+				))
+			}
+		</ol>
+
+		<p class="section-lede mt-8 text-foreground">{dictionary.updateNote}</p>
+
+		<div class="openjot-check">
+			<Mascot pose="open" class="openjot-check-mascot" />
+			<p class="openjot-check-text">
+				{dictionary.checkFileText}{" "}
+				<code class="openjot-fingerprint">{OPENJOT_SIGNING_FINGERPRINT}</code>.{" "}
+				<a class="openjot-link" href={OPENJOT_CHECKSUMS_URL}>{dictionary.checksumsLink}</a>.{" "}
+				{dictionary.checkFileWarning}
+			</p>
+		</div>
+	</div>
+</section>
