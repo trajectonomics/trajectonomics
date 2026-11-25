@@ -1,6 +1,7 @@
 import { z } from "zod"
 import type { Leaf } from "../../command"
 import { defineCommand } from "../../command"
+import { MAX_PATHS, MIN_PATHS, SEED_PATTERN } from "../../dashboard/flags"
 import { fail, isAppError } from "../../errors"
 import { readCarryIn } from "../../projection/carryin"
 import { withCarryInSide } from "../../projection/carryin-apply"
@@ -46,9 +47,11 @@ export const chance: Leaf = defineCommand({
 		paths: z
 			.number()
 			.int()
+			.meta({ minimum: MIN_PATHS, maximum: MAX_PATHS })
 			.describe("The number of Market paths to run, from 1 to 10,000. There is no default."),
 		seed: z
 			.string()
+			.meta({ pattern: SEED_PATTERN.source })
 			.describe("Sixteen lower-case hex digits. The same seed and model give the same paths."),
 		outcomes: outcomesFlag,
 	}),

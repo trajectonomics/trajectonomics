@@ -1,11 +1,11 @@
 import { z } from "zod"
 
 /** The most Market paths one chance runs, and the fewest. */
-const MIN_PATHS = 1
-const MAX_PATHS = 10000
+export const MIN_PATHS: number = 1
+export const MAX_PATHS: number = 10000
 
 /** The shape of `--seed`: sixteen lower-case hex digits. */
-const SEED_PATTERN = /^[0-9a-f]{16}$/
+export const SEED_PATTERN: RegExp = /^[0-9a-f]{16}$/
 
 /**
  * `--paths`: the Market paths the chance runs. The CLI words a built-in range refusal with one generic

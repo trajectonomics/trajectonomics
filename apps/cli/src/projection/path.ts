@@ -1,5 +1,7 @@
-import { projectPath } from "@trajectonomics/core/sim"
+import { projectPath, type ReturnModel } from "@trajectonomics/core/sim"
 import { type AppError, fail, isAppError } from "../errors"
+import { canonicalJson, contentHash } from "../store/canonical"
+import { guard } from "../store/guard"
 import type { Placed } from "./carryin-apply"
 import { type ModelSource, planModelOf } from "./chance-plan"
 import { chanceRefusal } from "./chance-refusal"
@@ -11,6 +13,11 @@ import type { Wants } from "./run-tables"
 
 /** The run a path belongs to: the seed and the path count the chance states, and the path's index. */
 export type PathSelection = { seed: string; paths: number; index: number }
+
+/** The content hash of the Return model document the path was drawn from. */
+function hashOf(model: ReturnModel): string | AppError {
+	return guard(() => contentHash(canonicalJson(model)))
+}
 
 /**
  * `traj projection path`: the Projection of Market path `index` of the run `--seed`, `--paths` and the
@@ -29,6 +36,8 @@ export function pathOf(
 	if (isAppError(built)) return built
 	const model = built === undefined && source.kind === "file" ? source.model : built?.model
 	if (model === undefined) return fail("internal", { message: "The path has no Return model." })
+	const hash = hashOf(model)
+	if (isAppError(hash)) return hash
 	const { breakdown, liabilities, spending, estate } = wants
 	const options = optionsOf(breakdown, liabilities, spending, estate)
 	const { result, notes: unstated } = routedRun(placed.document, placed.timeline, (routing) =>
@@ -49,11 +58,16 @@ export function pathOf(
 		notes: [
 			...view.notes,
 			...unstated,
-			`This is path ${selection.index} of ${selection.paths} seeded Market paths, over the return model "${model.id}" with seed ${selection.seed}: the one projection chance --outcomes lists as outcomes[${selection.index}]. The figures are nominal.`,
+			`This is path ${selection.index} of ${selection.paths} seeded Market paths, over the Return model "${model.id}" with seed ${selection.seed}: the one projection chance --outcomes lists as outcomes[${selection.index}]. The figures are nominal.`,
 			...(built?.notes ?? []),
 		],
 		index: selection.index,
-		definition: { modelId: model.id, seed: selection.seed, paths: selection.paths },
+		definition: {
+			modelId: model.id,
+			seed: selection.seed,
+			paths: selection.paths,
+			modelHash: hash,
+		},
 		...(built === undefined ? {} : { returnModel: built.view }),
 		returns: projection.returns.map((rollup) => ({
 			index: rollup.index,
