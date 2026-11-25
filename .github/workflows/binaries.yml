@@ -98,11 +98,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ needs.resolve.outputs.ref }}
-      # The Dashboard inside the binary is packed from a SvelteKit build, which stamps the time it ran unless
-      # told otherwise. The commit being built is the stamp, so a rebuild of a tag packs the same bytes
-      # (web ADR 0028). It is `HEAD`, not `github.sha`: a repair dispatch checks out an older tag.
-      - name: Stamp the Dashboard build with the commit
-        run: echo "TRAJ_WEB_VERSION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: "1.4.4"

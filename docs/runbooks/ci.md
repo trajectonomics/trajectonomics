@@ -50,13 +50,12 @@ before, through `cli#build`).
 ## Reproducible Dashboard build
 
 SvelteKit stamps a build with the time it ran, so two builds of one commit packed different
-`dashboard.bin` bytes. `ci.yml` sets `TRAJ_WEB_VERSION` to `github.sha` for every job (`binaries.yml`
-sets it to the checked-out commit and `release.yml` to `github.sha`), and `apps/web/turbo.json` lists
-it in the `env` of `build` and `build:hosted`, so it is in their cache key. The `Check web` job builds
-once more outside turbo and fails when the `sha256` of `pack/dashboard.bin` changed
+`dashboard.bin` bytes. `apps/web/vite.config.ts` now stamps it with `TURBO_HASH`, the hash turbo gives
+the task from its inputs, so the same inputs pack the same bytes and a changed file is a new version
 ([web ADR 0028](../../apps/web/docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
-The price: the web `build` and the tasks that build on it (the command line's build) miss the turbo
-cache on every new commit, even when no web source changed, because the stamp is part of their key.
+Nothing sets a variable in a workflow, so the web build stays a cache hit when no web input changed.
+The `Check web` job runs `turbo run @trajectonomics/web#build --force --only` twice and fails when the
+`sha256` of `pack/dashboard.bin` differs.
 
 ## Files outside every package
 

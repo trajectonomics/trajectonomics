@@ -16,12 +16,12 @@ import hostedConfig from "./src/hosted/overrides.json" with { type: "json" }
 // `dist/` (which `scripts/pack.ts` packs into dashboard.bin) is the same files.
 //
 // SvelteKit stamps every build with a version name (`_app/version.json` and the pages that name it), by default the time
-// it ran, so two builds of one commit would pack different bytes. `TRAJ_WEB_VERSION` fixes the stamp: CI, the binaries
-// build and the release set it to the commit SHA, so a build is byte for byte reproducible and a new commit is still a
-// new version for the hosted Demo to detect ([ADR 0028](./docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
-// Unset (or empty), a local build gets the time, as SvelteKit does.
+// it ran, so two builds of one commit would pack different bytes. Under Turborepo the stamp is `TURBO_HASH`, the hash of the
+// task's inputs: the same inputs give the same bytes, and any changed file gives a new version, so the hosted Demo still
+// sees a new deploy. Outside turbo (`bun run build` by hand) it is the time, as SvelteKit does
+// ([ADR 0028](./docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)).
 const hosted = process.env["TRAJ_WEB_TARGET"] === "hosted"
-const stamp = process.env["TRAJ_WEB_VERSION"]
+const stamp = process.env["TURBO_HASH"]
 const version = stamp === undefined || stamp === "" ? Date.now().toString() : stamp
 const out = hosted ? (process.env["TRAJ_WEB_OUT"] ?? "dist-hosted") : "dist"
 const SRC = join(dirname(fileURLToPath(import.meta.url)), "src")

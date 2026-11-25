@@ -24,12 +24,10 @@
 		},
 		"build": {
 			"dependsOn": ["^build", "@trajectonomics/brand#check", "demo"],
-			"env": ["$TURBO_EXTENDS$", "TRAJ_WEB_VERSION"],
 			"outputs": ["dist/**", "pack/**"]
 		},
 		"build:hosted": {
 			"dependsOn": ["^build", "@trajectonomics/brand#check", "demo"],
-			"env": ["TRAJ_WEB_VERSION"],
 			"outputs": ["dist-hosted/**"]
 		},
 		"test": {
