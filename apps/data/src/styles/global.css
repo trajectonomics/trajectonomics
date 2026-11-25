@@ -1,0 +1,96 @@
+/*
+ * The Web Consumer Contract, in the brand's documented order: Tailwind, the light and dark Theme
+ * CSS, then the Tailwind Theme Stylesheet that turns the Semantic Token Roles into utility colours.
+ * There is no `dark:` variant: `data-theme` on <html> picks the Theme, and the device picks that.
+ */
+@import "tailwindcss";
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
+@import "@trajectonomics/brand/tailwind.css";
+/* The Theme's own type: the sans stack with its Thai fallback, and Thai's taller line. */
+@import "@trajectonomics/brand/typography.css";
+/* The Brand Typeface's @font-face rules; scripts/copy-brand-assets.ts puts the files in public/fonts/. */
+@import "./fonts.css";
+@import "./header.css";
+@import "./footer.css";
+@import "./overview.css";
+@import "./state.css";
+@import "./chart.css";
+@import "./table.css";
+@import "./method.css";
+
+/* A test fixture spells markup the data site never ships, so it must not become a stylesheet source. */
+@source not "../**/*.test.ts";
+
+/* Each Theme states its own scheme, so scrollbars and form controls follow the page. */
+[data-theme="light"] {
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+/* The display face of headlines and the mono face of every meta label, as the Site draws them. */
+:root {
+	--font-display: "Aleo", "Aleo Fallback", Georgia, serif;
+	--font-meta:
+		"Azeret Mono", "Azeret Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+	--font-mono: var(--font-meta);
+}
+
+.data-body {
+	display: flex;
+	min-height: 100dvh;
+	flex-direction: column;
+	overflow-x: clip;
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+}
+
+.data-main {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+/* The mono label: 11 px, uppercase, tracked, the Site's meta layer. */
+.meta-label {
+	margin: 0;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: var(--ds-color-muted-foreground);
+}
+
+/* Kept for assistive technology, out of the visual layout. */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	text-wrap: nowrap;
+	border: 0;
+}
+
+/* The skip link stays off screen until the keyboard reaches it. */
+.skip-link {
+	position: absolute;
+	top: -100px;
+	left: 1rem;
+	z-index: 60;
+	padding: 8px 12px;
+	border-radius: var(--ds-radius-sm);
+	background: var(--ds-color-primary);
+	color: var(--ds-color-primary-foreground);
+}
+
+.skip-link:focus {
+	top: 1rem;
+}

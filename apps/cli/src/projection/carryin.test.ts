@@ -50,7 +50,7 @@ const DOCUMENT = {
 
 /** The document with this build's tax Levy, the only one whose scope record the CLI can write. */
 function taxed(): Scenario {
-	const request = taxRequestOf({ tax: "th-2026", filingStatus: "single" })
+	const request = taxRequestOf({ tax: "th-2026", filingStatus: "single" }, null)
 	if (request === null || isAppError(request)) throw new Error("the tax request was refused")
 	const written = withTaxLevy(DOCUMENT, request, [
 		{ flow: "salary", label: "income.section40_1" },

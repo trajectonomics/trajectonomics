@@ -105,3 +105,105 @@ An id tax-core would refuse is found by asking `thFilerLabel`, so the pattern li
 
 **Hand check, pinned in `projection run`'s tests.** Salaries of 1,000,000 and 500,000 baht, two Owners, joint:
 assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowances 60,000 + 60,000 = 120,000; taxable 1,180,000; tax 0 + 7,500 + 20,000 + 37,500 + 50,000 + 45,000 = 160,000. The Levy over one label capped the couple at 100,000 of expenses: taxable 1,280,000, tax 185,000.
+
+## Amended (2026-11-25): step 4b, the separate Return
+
+`married_separate` now writes one Levy per Filer that has income, and the stored profile gains
+`returns`. The rest of the ADR is unchanged.
+
+- **Levy ids.** A separate Return writes `th-2026-pit@<person>`, one per Filer. `isTaxLevyId` owns the
+  pattern (the bare id, or the id and an `@` suffix), and `taxLevyIds` lists a document's set. A
+  joint or bare Return still writes the bare `th-2026-pit`.
+- **Which Filers.** A Filer has income when a taxed Flow or Account is theirs or `shared`, as for the
+  joint Return. A plan with no taxed item, no partner or no Owners keeps the bare labels and the one
+  Levy, so its output is byte-identical.
+- **Labels and Prepayments.** Each taxed item's label takes its Owner's suffix, `shared` included. A
+  write first takes every Prepayment of a tax Levy back to the bare id, then, for a separate Return,
+  points each at the Levy of its Owner. Only an entry naming `th-2026-pit` or `th-2026-pit@…` moves: a
+  Prepayment of another Levy, plain or capped, is never touched. An asset Account's `payout` moves its
+  Prepayments as a Flow does, by the Account's Owner.
+  - A `shared` item's plain share is split half to each Levy and the odd basis point goes to the
+    holder's, so the total is unchanged. Joining sums the halves into one entry where the first stood,
+    so a switch to joint or to `--none` restores the basis points, and a plan without Filers keeps the
+    order of its entries and its bytes.
+  - A `shared` Flow's **capped** Prepayment stays whole on the holder's Levy. A Flow states one
+    `cappedPrepayment`, so it cannot be split, and halving it would lose basis points for good.
+    Refusing it was the other choice: rejected, because the household's total credit is the same and
+    the caller would have no way to file separately without dropping the withholding.
+- **The stored `returns`.** `scenario.tax` gains an optional `returns`, an object keyed by person id.
+  A separate Return with Filers writes one entry per Filer: `children`, `childrenAtHigherRate` and the
+  deductions it states, under the flat profile's keys; every key defaults to 0, children included, and
+  a zero deduction is left out, as the flat profile does. The flat keys are the holder's claims, so
+  `scenario show` and every earlier reader read the same fields. The holder's Return is always taken
+  from them, on `--merge` and on `--from-stored`, so a profile written before the plan had Owners
+  gives it the holder's claims. The holder's entry in `returns` records what their Return claimed and
+  is never read back: it can be older than the flat keys, and reading it would understate the tax.
+- **Whose claims the flat keys are.** "The holder" is a role the household can give the other person,
+  so the profile gains an optional `claimsHolder`, the id of the person whose claims the flat keys are.
+  Without it, a swap would give the new holder the old one's claims while the old one's entry kept
+  them: one claim on two Returns.
+  - It is recorded by the first write of a plan with Filers, as the household's holder, and every later
+    write keeps it. A plan that never had Filers records nobody and keeps its bytes. A write of the
+    whole profile (`--tax`) states it anew.
+  - When a `married_separate` write finds that the household's holder is not the recorded person, the
+    flat keys go to the recorded person's entry in `returns`, the new holder takes their own entry, or
+    nothing, and `claimsHolder` becomes the new holder. Flags then apply to the result, so a bare value
+    names the new holder.
+  - A write under any other status moves nothing. Its one Return's claims are the flat keys whoever the
+    holder is, and moving them would change that Return's tax. They stay recorded as before, and a
+    later separate filing moves them. A value a caller changes meanwhile goes with them.
+    Once a separate write has moved them, a later joint or single Return reads the new holder's
+    claims, which can differ from the same Return written before the swap.
+  - A write with no household, which names no holder, moves nothing and keeps the record, so a swap
+    made while the household is gone is still seen.
+  - With no `claimsHolder`, as in a profile written before it was recorded, the flat keys are the
+    current holder's.
+  - The record names a person by id. A holder given a new id reads as another person: the flat claims
+    stay under the old id, and the new one's Return starts from nothing until the caller states them.
+- **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
+  they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
+  that claims something, whatever the filing status and also while the household names no partner or
+  the plan has no household. The one exception is the person the flat keys are the claims of
+  (`claimsHolder`, else the holder): with no Return of their own, they need no entry. No Levy reads a
+  kept entry; a later separate filing takes it back. A write of the whole profile (`--tax`) states it
+  whole, so it keeps no earlier entry.
+- **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
+  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. `--merge`
+  merges into the stored `returns`, and `--from-stored` keeps them. Each of these is refused at the
+  flag, as `invalid_input`:
+  - a person-qualified value without `married_separate` and Filers;
+  - on `married_separate` with a partner, a person who is neither the holder nor the partner;
+  - a value for a person who is not a Filer, because no Levy is written to carry it. That includes a
+    bare value on a separate filing whose holder has no income. Claims the profile already holds for
+    such a person stay stored and no Return carries them;
+  - a bare value beside the holder's own id on one flag, which states the holder twice;
+  - a count that is not a safe integer or is too large for tax-core to compute a Return with, or an
+    amount that is not a safe number of satang, with the message "The value is outside its allowed
+    range.". Counts that are too large only together are refused so at the last count flag stated.
+- **The cross-Return check.** Every separate Return with Filers, of one Filer or two, goes through
+  `thSeparateClaimProblems` (tax ADR-0010) before its Levies are written, `--merge` and `--from-stored`
+  included. `OWN_PARENTS_OVER_TWO` is refused at `--parents`, with `details` naming the `problem` and
+  the `persons`.
+- **The shared home-loan ceiling is an assumption, not a refusal.** This replaces the
+  `MORTGAGE_OVER_CEILING` refusal above. The 100,000 baht that two Returns share is for one loan
+  borrowed together, and each person's own other home loans still count toward their own 100,000. A
+  liability has no kind and a claim names no loan, so the plan cannot say which loan the interest is
+  on. Refusing would force a caller to mis-state an Owner or to claim less than the law allows. So the
+  CLI does not tell the function that a mortgage is shared, and each Return has its own ceiling. When
+  there are two Filers, both state mortgage interest and the household names `shared` as the Owner of a
+  liability Account, the write's `assumptions` say on `allowances.mortgageInterestCeiling` that each
+  Return's interest is taken to be on separate loans.
+  - Follow-up: an explicit `--mortgage-interest shared=<amount>`, split half to each Return, would let
+    the caller state a loan borrowed together, and the shared ceiling could then be checked.
+- **The readers of the set.** `--carry-in` takes one record per Levy and treats any `th-2026-pit@…`
+  id as the CLI's own, so a past period needs no record of the caller's. `projection allowances` scans
+  every Levy and names the Levy and the Filer label each row read. ADR-0066's rule keeps the stored
+  profile only while the written set of Levies is canonically equal to the stored set. `projection run`
+  adds `filer` to each `taxYears[]` entry, from the Levy id, only when the plan has Filers; the `levy`
+  field was already there, and a plan without Filers keeps its bytes.
+- **The write check reads the Levy's own labels.** `filerLabelRefusal` accepts a label only when one of
+  the document's tax Levies tallies it exactly (trajectonomics/trajectonomics#561). A bare label still
+  fails, and so does `allowance.retirement.rmf@shared`, which no Levy reads: the check and the
+  projection now agree instead of the second refusing what the first stored. The Dashboard's
+  `isFilerPlan` reads the same rule from `document.levies`, so a plan whose labels are all bare but
+  whose Levy tallies suffixes is still a Filer plan.

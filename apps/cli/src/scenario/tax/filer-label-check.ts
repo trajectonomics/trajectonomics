@@ -1,8 +1,8 @@
 import { type AppError, fail } from "../../errors"
 import type { ScenarioDocument } from "../document"
-import { bareLabelOf, taxSlots } from "./filer-labels"
+import { taxSlots } from "./filer-labels"
 import { type JsonRecord, records } from "./json"
-import { leviesOf, TAX_LEVY_ID } from "./levy"
+import { leviesOf, taxLeviesOf } from "./levy-ids"
 
 /*
  * The labels a document states that its Levies do not read (cli ADR-0075). A Levy over Filers
@@ -31,15 +31,9 @@ function filerIds(levy: JsonRecord): Set<string> | null {
 	return ids.size === 0 ? null : ids
 }
 
-/** The Levy `th-2026-pit`'s Filer ids, or null when the document holds no Levy over Filers. */
-function filerIdsOf(document: ScenarioDocument): Set<string> | null {
-	const levy = leviesOf(document).find((it) => it["id"] === TAX_LEVY_ID)
-	return levy === undefined ? null : filerIds(levy)
-}
-
-/** Whether a document's `th-2026-pit` Levy reads Filer labels, by its own `tally` measures. */
+/** Whether a document's tax Levies read Filer labels, by their own `tally` measures. */
 export function hasFilerLevy(document: ScenarioDocument): boolean {
-	return filerIdsOf(document) !== null
+	return taxLeviesOf(document).some((levy) => filerIds(levy) !== null)
 }
 
 /** The items, in document order, each once. */
@@ -48,27 +42,28 @@ function itemsOf(bad: readonly string[]): string[] {
 }
 
 /**
- * The refusal for a document whose `th-2026-pit` Levy reads Filer labels while a Flow or an Account
- * states a bare label or one with a suffix this Return does not read, or null when it is clear.
+ * The refusal for a document whose tax Levies read Filer labels while a Flow or an Account states a
+ * label none of them tallies, or null when every stated label is read. A label is accepted only when
+ * it is one of the Levies' own tallied labels, so an allowance under `@shared`, which no Levy reads,
+ * is refused here rather than at projection.
  */
 export function filerLabelRefusal(document: unknown): AppError | null {
 	if (typeof document !== "object" || document === null) return null
 	const doc = document as ScenarioDocument
-	const ids = filerIdsOf(doc)
-	if (ids === null) return null
-	const allowed = new Set([...ids, "shared"])
-	const bad = taxSlots(doc).filter((slot) => {
-		if (slot.label === bareLabelOf(slot.label)) return true
-		const suffix = slot.label.slice(slot.label.lastIndexOf("@") + 1)
-		return !allowed.has(suffix)
-	})
+	const levies = taxLeviesOf(doc)
+	if (!levies.some((levy) => filerIds(levy) !== null)) return null
+	const read = new Set(levies.flatMap(tallyLabels))
+	const bad = taxSlots(doc).filter((slot) => !read.has(slot.label))
 	if (bad.length === 0) return null
 	const items = itemsOf(bad.map((slot) => slot.item))
+	const [only] = levies
 	return fail("invalid_input", {
 		path: "document",
-		message: `The Levy "${TAX_LEVY_ID}" reads Filer labels, so ${
+		message: `The tax ${
+			levies.length === 1 ? `Levy "${String(only?.["id"])}" reads` : "Levies read"
+		} Filer labels, so ${
 			items.length === 1 ? "one item has" : `${items.length} items have`
-		} a bare label or one this Return does not read: ${items.join(", ")}.`,
+		} a label no Levy reads: ${items.join(", ")}.`,
 		hint: 'Run "traj scenario tax <name> --from-stored" to write each label with its Filer suffix.',
 		details: { items },
 	})
@@ -76,7 +71,7 @@ export function filerLabelRefusal(document: unknown): AppError | null {
 
 /**
  * The refusal for a document with a Levy that states a tax label no Levy reads, or null when every
- * stated label is read. A plan with no Levy is leave alone, so its output is unchanged.
+ * stated label is read. A plan with no Levy is left alone, so its output is unchanged.
  */
 export function unreadLabelRefusal(document: ScenarioDocument): AppError | null {
 	const levies = leviesOf(document)

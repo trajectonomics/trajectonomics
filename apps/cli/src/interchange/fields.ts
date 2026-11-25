@@ -3,7 +3,8 @@ import { isPlainObject } from "../json"
 import { householdDocument } from "../scenario/household/document"
 import { canonicalHousehold } from "../scenario/household/model"
 import { notesProblem } from "../scenario/notes"
-import { canonicalTax, requestOfStored, storedTax, storedTaxOf } from "../scenario/tax/stored"
+import { canonicalTax, requestOfStored, storedTaxOf } from "../scenario/tax/stored"
+import { storedTax } from "../scenario/tax/stored-schema"
 import {
 	canonicalScenarioDocument,
 	formatMinorUnits,

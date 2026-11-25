@@ -1,0 +1,72 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import {
+	DATA_PATH,
+	DATA_SOURCE_URL,
+	ISSUES_URL,
+	LICENCE_URL,
+	METHOD_PATH,
+	SITE_HOME_URL,
+	SITE_NAME,
+	SOURCE_URL,
+} from "../lib/site"
+
+/** The link columns: a mono label and its links. The page's one `nav` is the header's. */
+const columns = [
+	{
+		label: "Read",
+		links: [
+			{ text: "Data", href: DATA_PATH },
+			{ text: "Method", href: METHOD_PATH },
+			{ text: "Site Home", href: SITE_HOME_URL },
+		],
+	},
+	{
+		label: "Source",
+		links: [
+			{ text: "Source code", href: SOURCE_URL },
+			{ text: "The data app", href: DATA_SOURCE_URL },
+		],
+	},
+	{
+		label: "Help",
+		links: [
+			{ text: "Report a wrong fact", href: ISSUES_URL },
+			{ text: "Licence", href: LICENCE_URL },
+		],
+	},
+] as const
+---
+
+<footer class="data-footer">
+	<div class="data-footer-inner">
+		<div class="data-footer-top">
+			<div class="data-footer-brand">
+				<span class="data-footer-name">{SITE_NAME}</span>
+				<span class="data-footer-tagline">
+					Tokens we used on each AI subscription plan, measured by us.
+				</span>
+			</div>
+			<div class="data-footer-columns">
+				{
+					columns.map((column) => (
+						<div>
+							<span class="meta-label data-footer-label">{column.label}</span>
+							<ul class="data-footer-links">
+								{column.links.map((link) => (
+									<li>
+										<a class="data-footer-link" href={link.href}>
+											{link.text}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</div>
+		</div>
+		<p class="data-footer-licence">{SITE_NAME}. The data site's source is MIT licensed.</p>
+	</div>
+</footer>

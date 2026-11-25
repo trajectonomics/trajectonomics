@@ -2,7 +2,8 @@ import { z } from "zod"
 import type { ScenarioRow } from "../store"
 import type { TaxProfileView } from "./tax/profile"
 import { taxAllowancesShape } from "./tax/shown-allowances"
-import { parsedTax, type StoredTax, storedTax } from "./tax/stored"
+import { parsedTax } from "./tax/stored"
+import { type StoredTax, storedTax } from "./tax/stored-schema"
 import {
 	documentShape,
 	type HouseholdDocument,
