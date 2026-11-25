@@ -3,21 +3,35 @@ import { formatDate, formatMonth } from "../../format"
 import { parseDate } from "../../snapshot/dates"
 import { netWorthHistorySeries } from "../overview/net-worth-history"
 
-/** One month-end of the history as a table row: its totals, or null where its Read failed. */
+/** One month-end of the history as a table row: its totals, or null where its Read failed or its total is not stated. */
 export interface MonthEndRow {
 	readonly index: number
 	readonly asOf: string
 	readonly totals: readonly CurrencyTotal[] | null
-	/** The CLI's error code for a month that could not be read. */
+	/** The CLI's error code for a month that could not be read, or whose total is not stated. */
 	readonly code: string | null
+	/** True when the month was read and its total is not stated, as its accounts' sum is out of range (cli ADR 0079). */
+	readonly unstated: boolean
 }
 
 /** The history's rows, one per month-end in the order the Snapshot holds them. */
 export function monthEndRows(reads: readonly Read<NetWorth>[]): MonthEndRow[] {
 	return reads.map((read, index) =>
 		read.ok
-			? { index, asOf: formatDate(read.data.asOf), totals: read.data.totals, code: null }
-			: { index, asOf: monthOfArgv(read.argv), totals: null, code: read.error.code },
+			? {
+					index,
+					asOf: formatDate(read.data.asOf),
+					totals: read.data.totals,
+					code: read.data.totalsError?.code ?? null,
+					unstated: read.data.totals === null,
+				}
+			: {
+					index,
+					asOf: monthOfArgv(read.argv),
+					totals: null,
+					code: read.error.code,
+					unstated: false,
+				},
 	)
 }
 

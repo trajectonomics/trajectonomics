@@ -9,7 +9,7 @@ import { formatMoney, formatMonth } from "../../format"
  */
 export function netWorthHistorySeries(reads: readonly Read<NetWorth>[]): LineSeries {
 	const points = reads.flatMap((read, index) => {
-		const total = read.ok ? read.data.totals[0] : undefined
+		const total = read.ok ? read.data.totals?.[0] : undefined
 		if (!read.ok || !total) return []
 		return [
 			{

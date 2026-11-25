@@ -62,7 +62,9 @@ describe("traj dashboard, served", () => {
 			expect(snapshot.params.asOf).toBe("2026-03-31")
 			expect(snapshot.reads.accounts.ok).toBe(true)
 			const netWorth = snapshot.reads.netWorth
-			expect(netWorth.ok ? netWorth.data.totals[0]?.amount : netWorth.error.message).toBe("-120.50")
+			expect(netWorth.ok ? netWorth.data.totals?.[0]?.amount : netWorth.error.message).toBe(
+				"-120.50",
+			)
 			expect((await fetch(`${url}missing`)).status).toBe(404)
 			child.kill("SIGINT")
 			expect(await child.exited).toBe(0)

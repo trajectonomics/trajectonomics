@@ -1,5 +1,5 @@
 /**
- * A plan's document with the session's changes put in, for the planner pages to show what the what-if holds
+ * The What-if lens of a planner page (glossary): a plan's document with the session's changes put in, for the planner pages to show what the what-if holds
  * beside what the plan stores. It is object editing and nothing else: a Set replaces the value at its path,
  * and a Removal takes the item out by its id, the same two things `traj` does when it applies the Overrides
  * (cli ADR 0056). No amount is read or changed, so the page still computes no figure.
@@ -41,7 +41,7 @@ function listWith(
 export const NO_CHANGES = { sets: [], removals: [] } as const
 
 /** The document the what-if reads: its Flows and Accounts without the removed items and with the Sets put in. */
-export function overlayDocument(
+export function lensDocument(
 	doc: ScenarioDocument,
 	changes: { sets: readonly SetChange[]; removals: readonly string[] },
 ): ScenarioDocument {
@@ -62,5 +62,5 @@ export function shownAccount(
 	changes: { sets: readonly SetChange[]; removals: readonly string[] } | null,
 	id: string | undefined,
 ): ScenarioDocument["accounts"][number] | undefined {
-	return overlayDocument(doc, changes ?? NO_CHANGES).accounts.find((one) => one.id === id)
+	return lensDocument(doc, changes ?? NO_CHANGES).accounts.find((one) => one.id === id)
 }

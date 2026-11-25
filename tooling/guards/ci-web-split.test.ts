@@ -134,4 +134,28 @@ describe("the CI split of the web check", () => {
 		expect(JSON.stringify(check.steps)).toContain("toJSON(needs)")
 		expect(JSON.stringify(check.steps)).not.toMatch(/needs\.[\w-]+\.result/)
 	})
+
+	it("stamps the web build with its turbo hash and checks the Pack is reproducible (web ADR 0028)", async () => {
+		// SvelteKit stamps a build with the time it ran, so two builds of one commit packed different bytes. The
+		// stamp is TURBO_HASH (the hash of the task's inputs): reproducible, and new whenever a file changes. A
+		// variable in the `env` of `build` would put the commit in the cache key and miss the cache every commit. TRAJ_WEB_VERSION
+		// only pins the stamp of a build outside turbo, to compare two commits by raw sha256.
+		const config = await Bun.file(join(ROOT, "apps/web/vite.config.ts")).text()
+		expect(config).toContain('process.env["TURBO_HASH"]')
+		expect(config).toContain('process.env["TRAJ_WEB_VERSION"]')
+		expect(config).toMatch(/version:\s*\{\s*name:\s*version\s*\}/)
+		const turbo = await Bun.file(join(ROOT, "apps/web/turbo.json")).text()
+		expect(turbo).not.toContain("TRAJ_WEB_VERSION")
+		// The web job builds twice with turbo, uncached, and compares the raw sha256 of dashboard.bin.
+		const step = (workflow.jobs["web"] as Job).steps?.find((s) => s.run?.includes("sha256sum"))
+		const runs = (step?.run ?? "").split("\n").filter((line) => line.includes("turbo run"))
+		expect(runs).toHaveLength(2)
+		for (const run of runs) {
+			expect(run.split(/\s+/)).toContain("@trajectonomics/web#build")
+			expect(run).toContain("--cache=local:")
+			expect(run).toContain("--only")
+			expect(run).not.toMatch(/\s--(\s|$)/)
+		}
+		expect(step?.run).toContain("pack/dashboard.bin")
+	})
 })

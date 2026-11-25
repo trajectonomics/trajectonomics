@@ -128,7 +128,7 @@ describe("header and overview view models, on the Demo snapshot", () => {
 		const series = netWorthHistorySeries(reads)
 		const last = reads.at(-1)
 		if (!last?.ok) throw new Error("the Demo snapshot's last month-end Read must be ok")
-		const amount = last.data.totals[0]?.amount ?? ""
+		const amount = last.data.totals?.[0]?.amount ?? ""
 		expect(series.points).toHaveLength(reads.length)
 		expect(series.points.at(-1)).toEqual({
 			x: reads.length - 1,

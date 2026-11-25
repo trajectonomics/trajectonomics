@@ -8,6 +8,13 @@ import { type FieldMap, type FieldRules, query, respell } from "./errors"
 import { reportHint } from "./hint"
 import { type RecordStart, recordStartOf } from "./record"
 import { accountIndex, reportRowsOf, totalsOf } from "./rows"
+import {
+	countedRows,
+	isTotalRefused,
+	netWorthRead,
+	type TotalRefusal,
+	type TotalRefused,
+} from "./total"
 import type { ReportRow, TotalView } from "./view"
 
 // The core names its own query; respell those paths into this result's keys.
@@ -24,7 +31,10 @@ const fieldOf: FieldMap = (field) =>
 export type NetWorthResult = RecordStart & {
 	asOf: string
 	rows: ReportRow[]
-	totals: TotalView[]
+	/** The total per currency, or null when the accounts' sum leaves the safe range (ADR-0079). */
+	totals: TotalView[] | null
+	/** Why `totals` is null; absent when it is stated. */
+	totalsError?: TotalRefusal | undefined
 	hint?: string | undefined
 }
 
@@ -33,19 +43,24 @@ function assemble(
 	ledger: Ledger,
 	asOf: string,
 	index: ReturnType<typeof accountIndex>,
-	read: () => NetWorth | AppError,
+	read: () => NetWorth | TotalRefused | AppError,
 ): NetWorthResult | AppError {
 	const date = checkedDate(asOf, "asOf")
 	if (isAppError(date)) return date
 	const result = read()
 	if (isAppError(result)) return result
-	const rows = reportRowsOf(result.rows, index)
+	// A refused total leaves the rows stated: every account is in range, only their sum is not.
+	const counted = isTotalRefused(result) ? countedRows(ledger, asOf, index, fieldOf) : result.rows
+	if (isAppError(counted)) return counted
+	const rows = reportRowsOf(counted, index)
 	const hint = reportHint(ledger, rows)
 	return {
 		asOf,
 		...recordStartOf(ledger.transactions, asOf),
 		rows,
-		totals: totalsOf(result.totals),
+		...(isTotalRefused(result)
+			? { totals: null, totalsError: result.totalRefused.body }
+			: { totals: totalsOf(result.totals) }),
 		...hintField(hint),
 	}
 }
@@ -53,19 +68,22 @@ function assemble(
 /** Assembles net worth from one assembled read; the Command only renders it. */
 export function netWorthOf(ledger: Ledger, asOf: string): NetWorthResult | AppError {
 	return assemble(ledger, asOf, accountIndex(ledger.accounts), () =>
-		query(() => netWorth(ledger.transactions, asOf, ledger.chart), fieldOf),
+		netWorthRead(() => netWorth(ledger.transactions, asOf, ledger.chart), fieldOf),
 	)
 }
 
+/** One date's answer from a Ledger that was scanned once. */
+export type NetWorthReader = (asOf: string) => NetWorthResult | AppError
+
 /**
  * The same read for many dates: the Ledger is scanned once, and each date's answer is `netWorthOf`'s
- * for it, the refusal of an overflow or of a Ledger the scan refuses included.
+ * for it, the refusal of an overflow included. A Ledger the scan itself refuses is refused for
+ * every date alike, so that refusal is returned once, in place of a reader, and not repeated per date.
  */
-export function netWorthReader(ledger: Ledger): (asOf: string) => NetWorthResult | AppError {
+export function netWorthReader(ledger: Ledger): NetWorthReader | AppError {
 	const index = accountIndex(ledger.accounts)
 	const history = query(() => netWorthHistory(ledger.transactions, ledger.chart), fieldOf)
+	if (isAppError(history)) return history
 	return (asOf) =>
-		assemble(ledger, asOf, index, () =>
-			isAppError(history) ? history : query(() => history.at(asOf), fieldOf),
-		)
+		assemble(ledger, asOf, index, () => netWorthRead(() => history.at(asOf), fieldOf))
 }

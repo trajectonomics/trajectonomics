@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioDocument } from "../contract"
-import { overlayDocument } from "./overlay"
+import { lensDocument } from "./lens-document"
 
 const DOC = {
 	currency: "THB",
@@ -13,7 +13,7 @@ const DOC = {
 
 describe("a plan's document with the session's changes put in", () => {
 	test("a Set replaces the value at its path and nothing else", () => {
-		const out = overlayDocument(DOC, {
+		const out = lensDocument(DOC, {
 			sets: [{ path: "flows.salary.amount", value: "6000.00" }],
 			removals: [],
 		})
@@ -23,13 +23,13 @@ describe("a plan's document with the session's changes put in", () => {
 	})
 
 	test("a Removal takes the item out by its id, in its own list", () => {
-		const out = overlayDocument(DOC, { sets: [], removals: ["flows.gym", "accounts.cash"] })
+		const out = lensDocument(DOC, { sets: [], removals: ["flows.gym", "accounts.cash"] })
 		expect(out.flows.map((flow) => flow.id)).toEqual(["salary"])
 		expect(out.accounts).toEqual([])
 	})
 
 	test("a Set on a path the item does not hold is left out, as is a Set on a removed item", () => {
-		const out = overlayDocument(DOC, {
+		const out = lensDocument(DOC, {
 			sets: [
 				{ path: "flows.salary.nope", value: "1" },
 				{ path: "flows.gym.amount", value: "1.00" },
@@ -43,7 +43,7 @@ describe("a plan's document with the session's changes put in", () => {
 describe("a whole item Set", () => {
 	test("takes the item's place, so an Account's first fee shows in the what-if", () => {
 		const fee = { id: "cash", kind: "asset", rate: 100, fee: { bps: "1.50", rounding: "floor" } }
-		const out = overlayDocument(DOC, {
+		const out = lensDocument(DOC, {
 			sets: [{ path: "accounts.cash", value: fee }],
 			removals: [],
 		})

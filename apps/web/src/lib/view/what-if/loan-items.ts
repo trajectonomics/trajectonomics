@@ -1,5 +1,5 @@
 import type { Baseline, ProjectionRun, Read, ScenarioDocument } from "../../contract"
-import { overlayDocument } from "../../what-if/overlay"
+import { lensDocument } from "../../what-if/lens-document"
 import type { PlanKind } from "../plan-items/kinds"
 import { type LoanCardView, loanCardsOf, unplacedFlows } from "../plan-items/loan-card"
 import { type LoanCard, loanCards } from "../plan-items/loans"
@@ -54,7 +54,7 @@ export function loanItems(
 ): LoanItems {
 	const baseline = loanCardsOf(doc, context.run, context.baseline)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = loanCardsOf(overlayDocument(doc, changes), context.run, context.baseline)
+	const whatIf = loanCardsOf(lensDocument(doc, changes), context.run, context.baseline)
 	return {
 		cards: baseline.map((card) => {
 			const tried = whatIf.find((entry) => entry.id === card.id)
