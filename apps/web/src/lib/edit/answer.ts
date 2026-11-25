@@ -9,12 +9,22 @@ import { accountValues, errorBody, snapshot } from "../contract"
 /** The session answer: the token the page sends in `EDIT_TOKEN_HEADER`. */
 export const sessionAnswer = z.strictObject({ token: z.string().min(1) })
 
+/** The answer of an Edit that did not run: the error that stopped it, as the CLI stated it. */
+const refusedAnswer = z.strictObject({ ok: z.literal(false), error: errorBody })
+
 /** The Edit answer: the Snapshot after the Edit, or the error that stopped it. */
 export const editAnswer = z.discriminatedUnion("ok", [
 	// `result` is what a write that states figures answered (`record-values`): the page shows it as traj stated it.
 	z.strictObject({ ok: z.literal(true), snapshot, result: accountValues.optional() }),
-	z.strictObject({ ok: z.literal(false), error: errorBody }),
+	refusedAnswer,
 ])
+
+/** The answer of a preview (`record-values` with `preview`): the dry run's result and no Snapshot, or the error. */
+export const previewAnswer = z.union([
+	z.strictObject({ ok: z.literal(true), preview: z.literal(true), result: accountValues }),
+	refusedAnswer,
+])
+export type PreviewAnswer = z.infer<typeof previewAnswer>
 
 /** One Edit answer, parsed. */
 export type EditAnswer = z.infer<typeof editAnswer>

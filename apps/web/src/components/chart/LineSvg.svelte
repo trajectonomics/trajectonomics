@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { LineLayout } from "../../lib/chart"
-import { abbreviate, maskMoney } from "../../lib/format"
-import { HEIGHT, MARGIN } from "./geometry"
+import { HEIGHT } from "./geometry"
+import LineAxis from "./LineAxis.svelte"
 import LineMarks from "./LineMarks.svelte"
 import LineRules from "./LineRules.svelte"
 import { dashPattern, fillClass, fillOpacity, strokeClass } from "./series-style"
@@ -37,23 +37,7 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 	viewBox="0 0 {width} {HEIGHT}"
 	class="block h-auto w-full"
 >
-	{#each layout.yTicks as tick (tick.value)}
-		<line
-			x1={MARGIN.left}
-			x2={width - MARGIN.right}
-			y1={tick.y}
-			y2={tick.y}
-			class="stroke-border"
-		/>
-		<text
-			x={MARGIN.left - 8}
-			y={tick.y}
-			text-anchor="end"
-			dominant-baseline="middle"
-			class="fill-muted-foreground text-xs tabular-nums"
-			>{masked ? maskMoney(abbreviate(tick.value)) : abbreviate(tick.value)}</text
-		>
-	{/each}
+	<LineAxis {layout} {width} {masked} />
 	{#each layout.xTicks as tick (tick.index)}
 		<text
 			x={layout.xPixels[tick.index]}

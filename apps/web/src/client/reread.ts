@@ -5,7 +5,12 @@ import type { ChanceInputs } from "../lib/snapshot/chance-params"
 import { replaceSnapshot } from "./snapshot.svelte.js"
 
 /** The body of `POST /reread`: nothing, or the inputs of the allowance reads, or the paths and seed of the chance reads. */
-export type RereadBody = { allowances?: AllowancePlan | null; chance?: ChanceInputs }
+export type RereadBody = {
+	allowances?: AllowancePlan | null
+	chance?: ChanceInputs
+	/** A plan the ledger holds, added to the plans the Snapshot projects (web ADR 0023). */
+	addPlan?: string
+}
 
 /**
  * Posts a reread and shows the Snapshot it answers with. The answer is ok, or the sentence a person reads: the CLI's

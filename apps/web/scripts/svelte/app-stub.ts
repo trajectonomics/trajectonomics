@@ -8,5 +8,10 @@ export function setTestUrl(href: string): void {
 	page.url = new URL(href)
 }
 
-/** A no-op: the tests render server output, which never navigates. */
-export async function goto(): Promise<void> {}
+/** The addresses the page asked to go to, in order. A test reads them to see where the address bar would be. */
+export const navigations: string[] = []
+
+/** Records the address and goes nowhere: the tests render server output, which never navigates. */
+export async function goto(url?: string): Promise<void> {
+	if (url !== undefined) navigations.push(url)
+}

@@ -16,7 +16,7 @@ interface Props {
 let { figures, terms, picked, onPick }: Props = $props()
 </script>
 
-<div class="max-w-full overflow-x-auto rounded-lg border border-border">
+<div class="relative max-w-full overflow-x-auto rounded-lg border border-border">
 	<table class="w-full min-w-max border-collapse text-sm">
 		<caption class="px-3 py-2 text-left text-sm font-medium text-muted-foreground">The estate on {figures.date}, line by line</caption>
 		<thead class="bg-card">

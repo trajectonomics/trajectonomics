@@ -1,4 +1,5 @@
 <script lang="ts">
+import { queryParam } from "../client/query-param.svelte.js"
 import OverviewPage from "../components/pages/OverviewPage.svelte"
 </script>
 
@@ -6,4 +7,4 @@ import OverviewPage from "../components/pages/OverviewPage.svelte"
 	<title>Home · Dashboard</title>
 </svelte:head>
 
-<OverviewPage />
+<OverviewPage scenario={queryParam("scenario", "")} />

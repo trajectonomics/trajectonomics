@@ -9,6 +9,13 @@ import { labelsFor, titlesFor, xTicksFor } from "./x-labels"
 
 export type { ColumnKind }
 
+/** The distinct x of a column chart's series, in order: each is one column. */
+export function columnXs(series: readonly LineSeries[]): number[] {
+	return [...new Set(series.flatMap((line) => line.points.map((point) => point.x)))].sort(
+		(a, b) => a - b,
+	)
+}
+
 const X_LABEL_SPACE = 84
 
 /**
@@ -24,9 +31,7 @@ export function columnLayout(
 	kind: ColumnKind,
 	markers: readonly LineMarker[] = [],
 ): LineLayout | null {
-	const xs = [...new Set(series.flatMap((line) => line.points.map((point) => point.x)))].sort(
-		(a, b) => a - b,
-	)
+	const xs = columnXs(series)
 	const cells = series.map((line) => xs.map((x) => line.points.find((p) => p.x === x) ?? null))
 	const values = cells.map((row) => row.map((point) => (point ? point.y : null)))
 	const spans = kind === "bars" ? ownSpans(values) : stackSpans(values)

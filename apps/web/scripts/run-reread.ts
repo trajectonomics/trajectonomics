@@ -25,15 +25,31 @@ export function changedBy(reread: Reread): Changed {
 	return { allowances: reread.allowances !== undefined, chance: reread.chance !== undefined }
 }
 
+/** The plans projected with one more the ledger stores. An empty list means every plan, so it stays empty. */
+function withPlan(
+	scenarios: readonly string[],
+	added: string | undefined,
+	stored: readonly string[],
+): string[] {
+	if (added === undefined || scenarios.length === 0 || scenarios.includes(added))
+		return [...scenarios]
+	return stored.includes(added) ? [...scenarios, added] : [...scenarios]
+}
+
 /**
  * The parameters a reread asks for. The inputs live with the Snapshot's parameters, so a change of them is a read and no write.
  * The paths and the seed change and the Return model stays: the file the server was given, or the plan's own.
  */
-export function paramsAfter(params: PlanParams, reread: Reread): PlanParams {
+export function paramsAfter(
+	params: PlanParams,
+	reread: Reread,
+	stored: readonly string[] = [],
+): PlanParams {
 	const { allowances, chance } = reread
 	const model = params.chance?.returnModel ?? PLAN_RETURN_MODEL
 	return {
 		...params,
+		scenarios: withPlan(params.scenarios, reread.addPlan, stored),
 		...(allowances === undefined ? {} : { allowances }),
 		...(chance === undefined ? {} : { chance: { returnModel: model, ...chance } }),
 	}

@@ -12,7 +12,7 @@ import { mapRead } from "./map-read"
 import { monthEndValues } from "./net-worth-history"
 import { type PnlView, pnlView } from "./pnl"
 import { type ProjectionView, projectionView } from "./projection"
-import { mapScenario, primaryScenario, type ScenarioView, scenarioView } from "./scenario"
+import { homePlan, mapScenario, type ScenarioView, scenarioView } from "./scenario"
 import { type TaxView, taxView } from "./tax"
 
 /** The net worth card: the net worth view, the month-end values its sparkline draws, and the plan's fees. */
@@ -40,9 +40,12 @@ export interface OverviewView {
 	readonly health: Read<HealthView>
 }
 
-/** The Overview's view of a Snapshot: every card's figures, derived from its Reads. */
-export function overviewView(snapshot: Snapshot): OverviewView {
-	const scenario = primaryScenario(snapshot.params)
+/**
+ * The Overview's view of a Snapshot: every card's figures, derived from its Reads. The cards follow the plan the
+ * address bar names (`requested`), and the main plan when it names none.
+ */
+export function overviewView(snapshot: Snapshot, requested = ""): OverviewView {
+	const scenario = homePlan(snapshot, requested)
 	const history = snapshot.reads.netWorthHistory
 	const netWorth = mapRead(snapshot.reads.netWorth, netWorthView)
 	const projections = scenarioView(scenario, snapshot.reads.projections)

@@ -1,8 +1,6 @@
 import { check, type Problem } from "@trajectonomics/core/sim"
-import { type AppError, fail } from "../errors"
 import { detailOf } from "./document-detail"
 import { type OwnProblem, ownProblems } from "./own-problems"
-import { wordsOf } from "./problem-words"
 
 // `sim-core` owns the Scenario model (AGENTS.md rule 5, ADR-0024). Its `check()` reads a Baseline,
 // a Scenario and a Timeline in one pass and returns `{ code, path }` problems, so the CLI validates
@@ -96,32 +94,4 @@ export function refusalOf(problem: ScenarioProblem, base: string): Refusal {
 		code: problem.code,
 		hint: SCHEMA_HINT,
 	}
-}
-
-function detailsOf(problems: readonly ScenarioProblem[], base: string) {
-	return problems.map((problem) => {
-		const { path, message, code } = refusalOf(problem, base)
-		return { path, message, code }
-	})
-}
-
-/**
- * The `invalid_input` for a document `sim-core` refuses, or null when it accepts the document. A code
- * the refusal table words (a loan's rules, ADR-0016) states its own sentence and hint, the same ones
- * `projection run` prints for a stored row, followed by the schema hint every document refusal carries
- * (ADR-0052); any other code keeps the code and its allowed values.
- */
-export function scenarioDocumentError(value: unknown, base = "document"): AppError | null {
-	const problems = scenarioProblems(value)
-	const first = problems[0]
-	if (first === undefined) return null
-	const refusal = refusalOf(first, base)
-	const said = wordsOf(first)
-	return fail("invalid_input", {
-		path: refusal.path,
-		message: said?.message ?? refusal.message,
-		// A worded refusal keeps the schema hint every document refusal carries (ADR-0052).
-		hint: [said?.hint, refusal.hint].filter((part) => part !== undefined).join(" "),
-		details: detailsOf(problems, base),
-	})
 }
