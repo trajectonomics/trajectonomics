@@ -5,13 +5,13 @@ import { processDate } from "../engine/occurrence"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { DateString } from "../types"
 import type { ProjectionProblem } from "../types/projection"
-import { accessibleAfter, type BufferBreach, checkBuffer } from "./buffer"
+import { accessibleAfter, type BufferFinding, checkBuffer } from "./buffer"
 import { lockedOrAbsentAssets } from "./undrawable"
 import type { Shortfall } from "./walk"
 import type { DayInput } from "./walk-input"
 
 type DayOutcome =
-	| { readonly kind: "ok"; readonly breach?: BufferBreach }
+	| { readonly kind: "ok"; readonly finding?: BufferFinding }
 	| { readonly kind: "shortfall"; readonly shortfall: Shortfall }
 	| { readonly kind: "problem"; readonly problem: ProjectionProblem }
 
@@ -73,6 +73,6 @@ export function processDay(
 	if (input.table === undefined) return trace(input, date)
 	const checked = checkBuffer(input.point.states, date, input.table)
 	if (checked.kind === "problem") return { kind: "problem", problem: checked.problem }
-	if (checked.kind === "breach") return { kind: "ok", breach: checked.breach }
+	if (checked.kind === "finding") return { kind: "ok", finding: checked.finding }
 	return { kind: "ok" }
 }

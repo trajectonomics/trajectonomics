@@ -1,6 +1,7 @@
 import type { Fixture } from "../fixtures/fixture"
 import type { DateString, Flow } from "../types"
 import { oracleAddDays, oracleAddMonthsClamped } from "./oracle-date"
+import { assertLandsOnce } from "./oracle-milestone-scope"
 import {
 	type OracleWalk,
 	oracleAmount,
@@ -41,7 +42,10 @@ function expenseLandings(flows: readonly Flow[], walk: OracleWalk, through: Date
 		flow.kind !== "expense"
 			? []
 			: oracleDues(flow, through)
-					.filter((date) => oracleLands(walk.fires, flow, date))
+					.filter((date) => {
+						assertLandsOnce(walk.fires, [flow], date)
+						return oracleLands(walk.fires, flow, date)
+					})
 					.map((date) => ({ date, amount: oracleAmount(flow) })),
 	)
 }
