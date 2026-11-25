@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { existsSync, readFileSync } from "node:fs"
 import { join, relative } from "node:path"
 import { STALE_PLAN } from "../client/edit.svelte"
+import * as guard from "../lib/edit/guard"
 import { STALE_PLAN as hostedStale } from "./edit-session.svelte"
 import { OVERRIDES } from "./overrides"
 
@@ -19,8 +20,14 @@ const read = (file: string): string =>
 
 /** Network and storage-of-requests calls: any file that holds one is a way for a figure to leave the page. */
 const NETWORK = /\b(fetch\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource)/
-/** The names of the loopback server's write path. */
-const WRITE_PATH = /\b(EDIT_PATH|EDIT_SESSION_PATH|REREAD_PATH|WHAT_IF_PATH|EDIT_TOKEN_HEADER)\b/
+/** The names of the loopback server's write path: every `*_PATH` string `lib/edit/guard.ts` exports, and its token header. A path added there is on the list without an edit here. */
+const WRITE_PATH_NAMES: readonly string[] = [
+	...Object.entries(guard)
+		.filter(([name, value]) => name.endsWith("_PATH") && typeof value === "string")
+		.map(([name]) => name),
+	"EDIT_TOKEN_HEADER",
+]
+const WRITE_PATH = new RegExp(`\\b(${WRITE_PATH_NAMES.join("|")})\\b`)
 
 describe("the closed list of hosted twins", () => {
 	test("names a file under src/ and a twin in src/hosted/ for every entry", () => {
@@ -34,6 +41,23 @@ describe("the closed list of hosted twins", () => {
 	test("has a twin for every file that calls the network, except the one that reads the Demo snapshot", () => {
 		const callers = files("**/*.{ts,svelte}").filter((file) => NETWORK.test(read(file)))
 		expect(callers.filter((file) => OVERRIDES[file] === undefined)).toEqual(["client/browser.ts"])
+	})
+
+	test("lists every write path name of the guard, `EDIT_PATH` among them", () => {
+		expect(WRITE_PATH_NAMES).toEqual(
+			expect.arrayContaining([
+				"EDIT_PATH",
+				"EDIT_SESSION_PATH",
+				"REREAD_PATH",
+				"WHAT_IF_PATH",
+				"EDIT_TOKEN_HEADER",
+			]),
+		)
+	})
+
+	test("keeps the one file that calls the network to a single fetch of the Demo snapshot", () => {
+		const calls = read("client/browser.ts").match(new RegExp(NETWORK.source, "g"))
+		expect(calls).toEqual(["fetch("])
 	})
 
 	test("has a twin for every file that names the loopback server's write path", () => {

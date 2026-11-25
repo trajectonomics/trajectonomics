@@ -9,13 +9,25 @@ export const DEMO_SNAPSHOT = `${HOSTED_PREFIX}/demo/snapshot.json`
 export interface Requests {
 	/** `METHOD url` for each request, in order. */
 	readonly seen: string[]
+	/** `STATUS url` for each response, in order. */
+	readonly answered: string[]
 }
 
 /** Starts the log. Call it before `openHosted`, so the first request is in it. */
 export function logRequests(page: Page): Requests {
 	const seen: string[] = []
+	const answered: string[] = []
 	page.on("request", (request) => seen.push(`${request.method()} ${request.url()}`))
-	return { seen }
+	page.on("response", (response) => answered.push(`${response.status()} ${response.url()}`))
+	return { seen, answered }
+}
+
+/** The responses under the base path that are an error (status 400 or more): a page that links to a file the build does not hold. */
+export function failures(requests: Requests): string[] {
+	return requests.answered.filter((line) => {
+		const [status = "0", url = ""] = line.split(" ")
+		return Number(status) >= 400 && new URL(url).pathname.startsWith(`${HOSTED_PREFIX}/`)
+	})
 }
 
 /** The requests that are not a GET of something under the hosted build's own origin and base path. */
@@ -46,8 +58,9 @@ export async function openHosted(
 	page: Page,
 	path: string,
 	theme: "light" | "dark" = "light",
+	query = "",
 ): Promise<void> {
 	await chooseBeforeLoad(page, { theme })
-	await page.goto(`${HOSTED_PREFIX}${path}`)
+	await page.goto(`${HOSTED_PREFIX}${path}${query}`)
 	await settle(page, theme)
 }

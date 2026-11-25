@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { HOSTED_PREFIX } from "./base-url"
 import { SCREENSHOTS } from "./demo"
 import { labelsEscaping, measureOverflow } from "./fit"
-import { DEMO_SNAPSHOT, logRequests, openHosted, snapshotsRead, strays } from "./hosted"
+import { DEMO_SNAPSHOT, failures, logRequests, openHosted, snapshotsRead, strays } from "./hosted"
 import { PAGES, pageName } from "./pages"
 
 // The hosted Demo (web ADR 0028), served under /demo/ as the Site will serve it: every page at a phone (360px) and a
@@ -45,6 +45,7 @@ for (const width of WIDTHS_PX) {
 			expect(strays(requests), "requests that are not a GET under /demo/ of this origin").toEqual(
 				[],
 			)
+			expect(failures(requests), "responses with an error status under /demo/").toEqual([])
 			expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
 			await expect(page.getByRole("complementary", { name: "About this demo" })).toBeVisible()
 		})
@@ -83,6 +84,7 @@ for (const path of PAGES) {
 		}
 		await page.waitForLoadState("networkidle")
 		expect(strays(requests), "requests that are not a GET under /demo/ of this origin").toEqual([])
+		expect(failures(requests), "responses with an error status under /demo/").toEqual([])
 		expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
 	})
 }
@@ -99,6 +101,7 @@ test("hosted: the navigation stays under /demo/ and reads the Demo snapshot once
 	await expect(page).toHaveURL(/\/demo\/net-worth\/$/)
 	await expect(page.getByRole("heading", { level: 1, name: "Net worth" })).toBeVisible()
 	expect(strays(requests)).toEqual([])
+	expect(failures(requests)).toEqual([])
 	expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
 	expect(requests.seen.filter((line) => line.endsWith(DEMO_SNAPSHOT))).toHaveLength(1)
 })

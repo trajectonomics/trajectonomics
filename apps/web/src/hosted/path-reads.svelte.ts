@@ -8,7 +8,7 @@ export const BUSY_WAITS_MS: readonly number[] = []
  * The futures a tab reads live through the server's `traj`. The hosted build has no server, so it holds none: the
  * Chance page shows the futures the Demo snapshot already carries, and a future it does not carry stays unread.
  */
-export class PathReads implements Pick<LoopbackPathReads, "entry" | "load"> {
+export class PathReads implements Pick<LoopbackPathReads, keyof LoopbackPathReads> {
 	entries = $state<Record<string, LiveEntry>>({})
 
 	entry(_plan: string, _index: number): LiveEntry | undefined {

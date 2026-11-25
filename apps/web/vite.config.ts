@@ -1,4 +1,4 @@
-import { dirname, join, relative, sep } from "node:path"
+import { basename, dirname, join, relative, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 import adapter from "@sveltejs/adapter-static"
 import { sveltekit } from "@sveltejs/kit/vite"
@@ -11,9 +11,10 @@ import hostedConfig from "./src/hosted/overrides.json" with { type: "json" }
 // Runes are forced for every file, so `export let`, `$:` and `$$props` do not compile.
 //
 // `TRAJ_WEB_TARGET=hosted` builds the hosted Demo instead ([ADR 0028](./docs/adr/0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md)):
-// its own output folder (`dist-hosted/`, or `TRAJ_WEB_OUT`), the base path from src/hosted/overrides.json, and the
+// its own output folder (`dist-hosted/`, or `TRAJ_WEB_OUT`) and its own working folder (`.svelte-kit-<folder name>`), the base path from src/hosted/overrides.json, and the
 // closed list of twins in that file swapped in. Without the variable nothing below changes the loopback build, and
-// `dist/` (which `scripts/pack.ts` packs into dashboard.bin) is the same bytes.
+// `dist/` (which `scripts/pack.ts` packs into dashboard.bin) is the same files, except SvelteKit's build stamp
+// (`_app/version.json` and the pages that name it), which `scripts/pack-fingerprint.ts` masks.
 const hosted = process.env["TRAJ_WEB_TARGET"] === "hosted"
 const out = hosted ? (process.env["TRAJ_WEB_OUT"] ?? "dist-hosted") : "dist"
 const SRC = join(dirname(fileURLToPath(import.meta.url)), "src")
@@ -47,7 +48,10 @@ export default defineConfig({
 			adapter: adapter({ pages: out, assets: out, strict: true }),
 			files: { assets: "public" },
 			...(hosted
-				? { paths: { base: hostedConfig.base as `/${string}` }, outDir: ".svelte-kit-hosted" }
+				? {
+						paths: { base: hostedConfig.base as `/${string}` },
+						outDir: `.svelte-kit-${basename(out)}`,
+					}
 				: {}),
 		}),
 	],
