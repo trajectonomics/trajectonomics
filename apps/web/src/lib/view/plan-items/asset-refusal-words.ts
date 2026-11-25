@@ -1,7 +1,7 @@
 /**
  * The refusals a real-asset form can cause, said in plain words at the field that fixes them. `traj` refuses a
- * Scenario document with `invalid_input` whose message is `<path>: <CODE>`, so the sentence is chosen by the CODE
- * (kept in `details` and in the message) and the field by where the path leads (`asset-refusal.ts`).
+ * Scenario document with `invalid_input` whose `details[].code` is the CODE (a worded code's message is its own sentence),
+ * so the sentence is chosen by the CODE and the field by where the path leads (`asset-refusal.ts`).
  */
 import type { ErrorBody } from "../../contract"
 import type { AssetLayout } from "./asset-refusal"

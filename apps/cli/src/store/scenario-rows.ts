@@ -1,5 +1,5 @@
 import type { AppError } from "../errors"
-import { scenarioDocumentError } from "../scenario/document"
+import { scenarioDocumentError } from "../scenario/document-error"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
 import { taxLevyIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"

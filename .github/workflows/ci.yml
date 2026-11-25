@@ -15,6 +15,8 @@ name: CI
 #   Check packages        every other package, `turbo run check` without @trajectonomics/web
 #   Check web             the web package's lint, typecheck, `./src` tests and build
 #   Check web scripts N   one shard of the web package's `./scripts` tests
+#   Check web browser     a headless Chromium over the built Demo: every page at phone and desktop
+#                         width, and three pages in print (apps/web/browser, web ADR 0026)
 #   Check                 the required check: fails when any job above failed. Branch protection
 #                         requires this name, so keep it.
 #
@@ -204,9 +206,82 @@ jobs:
       - name: Test the web scripts, shard ${{ matrix.shard }} of ${{ strategy.job-total }}
         run: bun run --cwd apps/web test:scripts --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
-  # The browser checks (#377) go here as their own job, `needs: plan` and
-  # `if: needs.plan.outputs.web == 'true'`, so they run only when apps/web or the command line
-  # changed and never lengthen the packages job. Add the job's id to `needs` of `check` below.
+  # The browser checks (#377, web ADR 0026): Chromium over the built Demo, at phone and desktop width and in
+  # print. A job of its own, so it runs beside the shards and never lengthens `Check packages`. Budget: 10
+  # minutes from the start of the job (the timeout), about 5 when the build and the browser are cached.
+  web-browser:
+    name: Check web browser
+    needs: plan
+    if: needs.plan.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Read only, like the shards: the build below is a hit when `Check web` or `Check packages` saved it.
+      - name: Restore the Turborepo cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
+
+      # The suite serves `apps/web/dist` and reads the Demo snapshot in it. No arguments after `--`: turbo
+      # hashes them into every task of the graph and the build would miss the cache (docs/runbooks/ci.md).
+      - name: Build the web package and the Demo snapshot
+        run: bunx turbo run @trajectonomics/web#build --concurrency=2
+
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p 'require("./apps/web/package.json").devDependencies["@playwright/test"]')" >> "$GITHUB_OUTPUT"
+
+      # The same key and path as browser.yml and docs-browser.yml, so the browser is downloaded once per
+      # Playwright version and shared with them.
+      - name: Cache the Playwright browser
+        id: browser
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # A cached browser still needs its system libraries, which are not in the cache.
+      - name: Install Chromium
+        working-directory: apps/web
+        run: |
+          if [ "${{ steps.browser.outputs.cache-hit }}" = true ]; then
+            bunx playwright install-deps chromium
+          else
+            bunx playwright install --with-deps chromium
+          fi
+
+      - name: Check every page at phone and desktop width, and in print
+        working-directory: apps/web
+        run: bun run test:browser
+
+      # The screenshots are for people to look at: they are uploaded whether the checks passed or not.
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-screenshots
+          path: apps/web/screenshots/
+          retention-days: 7
+
+      - name: Upload the browser report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 7
 
   check:
     name: Check
@@ -216,7 +291,7 @@ jobs:
     # judged without editing the script: it must succeed, and may be skipped only when `Plan` said
     # to skip the web jobs.
     if: always()
-    needs: [plan, packages, web, web-scripts]
+    needs: [plan, packages, web, web-scripts, web-browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

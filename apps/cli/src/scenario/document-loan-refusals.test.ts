@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { scenarioDocumentError } from "./document"
+import { scenarioDocumentError } from "./document-error"
 import { scenarioExample } from "./shape/index"
 import { VERSION } from "./shape/testing"
 

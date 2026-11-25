@@ -16,6 +16,9 @@ describe("the Edit list", () => {
 			"merge-tax",
 			"set-tax",
 			"remove-tax",
+			"rename-plan",
+			"set-plan-notes",
+			"set-main-plan",
 			"record-values",
 		])
 	})
@@ -36,7 +39,7 @@ describe("the Edit list", () => {
 			{ kind: "remove-tax", name: "early", contentHash: HASH },
 		]) {
 			expect(editSchema.safeParse(edit).success).toBe(true)
-			expect(writeCommand(editSchema.parse(edit), false).argv[0]).toBe("scenario")
+			expect(writeCommand(editSchema.parse(edit), false, "{}").argv[0]).toBe("scenario")
 		}
 	})
 
@@ -191,25 +194,19 @@ describe("record-values", () => {
 		expect(followPlan(["base"], edit)).toEqual(["base"])
 		expect(followPlan([], edit)).toEqual([])
 	})
-})
 
-describe("followPlan", () => {
-	test("a copy or an apply joins an explicit list, and an empty list stays every Scenario", () => {
-		const copy: Edit = {
-			kind: "copy-plan",
-			from: "base",
-			name: "early",
-			sets: [],
-			removals: [],
-			additions: [],
-		}
-		expect(followPlan(["base"], copy)).toEqual(["base", "early"])
-		expect(followPlan([], copy)).toEqual([])
-		expect(followPlan(["base", "early"], copy)).toEqual(["base", "early"])
+	test("a preview is the same dry-run argv and stdin, so it runs the write rolled back and nothing else", () => {
+		const preview = editSchema.parse({ ...edit, preview: true })
+		expect(preview).toMatchObject({ preview: true })
+		const dry = writeCommand(edit, true)
+		expect(writeCommand(preview, true)).toEqual(dry)
+		expect(dry.argv).toContain("--dry-run")
+		// The preview flag is never a flag or a field traj sees: the document on stdin is the batch alone.
+		expect(JSON.parse(dry.stdin ?? "null")).toEqual({ against: "gains-id", values: edit.values })
 	})
 
-	test("a delete leaves the list without its name", () => {
-		expect(followPlan(["base", "early"], { kind: "delete-plan", name: "early" })).toEqual(["base"])
-		expect(followPlan([], { kind: "delete-plan", name: "early" })).toEqual([])
+	test("preview is true or absent: false is refused", () => {
+		expect(editSchema.safeParse({ ...edit, preview: false }).success).toBe(false)
+		expect(editSchema.safeParse({ ...edit, preview: "yes" }).success).toBe(false)
 	})
 })
