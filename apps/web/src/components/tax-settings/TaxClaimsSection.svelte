@@ -6,11 +6,9 @@ interface Props {
 	table: ClaimsTable
 	/** The household's people, so a column is named by role ("You", "Your partner"), never by id. */
 	people: PersonNames
-	/** The CLI's notes on what it assumes when two separate Returns share a home loan, each in its own words. */
-	notes: readonly string[]
 }
 
-let { table, people, notes }: Props = $props()
+let { table, people }: Props = $props()
 const columns = $derived(table.people.map((person) => personText(people, person)))
 </script>
 
@@ -48,7 +46,4 @@ const columns = $derived(table.people.map((person) => personText(people, person)
 			Shared home-loan interest, split half to each Return: <span class="tabular-nums">{table.sharedInterest}</span>
 		</p>
 	{/if}
-	{#each notes as note, index (index)}
-		<p class="text-sm text-muted-foreground">{note}</p>
-	{/each}
 </section>

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument, TaxProfile } from "../../contract"
-import { claimsTable, sharedLiabilityNotes } from "./claims"
+import { claimsTable } from "./claims"
 
 const PROFILE: TaxProfile = {
 	tax: "th-2026",
@@ -78,44 +78,5 @@ describe("who claims each allowance", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, FILERS)?.sharedInterest).toBeNull()
 		const shared = { ...PROFILE, sharedMortgageInterest: 60000 }
 		expect(claimsTable(shared, HOUSEHOLD, FILERS)?.sharedInterest).toBe("60,000 THB")
-	})
-})
-
-describe("the shared home-loan assumption", () => {
-	const separate = {
-		path: "allowances.mortgageInterestCeiling",
-		value: 100000,
-		status: "reported" as const,
-		note: "Home-loan interest ceiling, baht. Each separate Return's interest is taken to be on separate loans.",
-	}
-	const generic = { ...separate, note: "Home-loan interest ceiling, baht." }
-	const unclaimed = {
-		...separate,
-		note: "60,000 baht of shared home-loan interest is stored for separate Returns, and this Return does not claim it.",
-	}
-	const other = {
-		path: "allowances.personal",
-		value: 60000,
-		status: "reported" as const,
-		note: "Other.",
-	}
-	const year = (assumptions: (typeof separate | typeof other)[]) => ({ assumptions })
-
-	test("states each CLI sentence the CLI writes about a shared loan once, in its order", () => {
-		expect(sharedLiabilityNotes([year([other, separate]), year([separate])])).toEqual([
-			separate.note,
-		])
-		expect(sharedLiabilityNotes([year([unclaimed]), year([separate, unclaimed])])).toEqual([
-			unclaimed.note,
-			separate.note,
-		])
-	})
-
-	test("leaves out tax-core's generic ceiling note, which explains no shared loan", () => {
-		expect(sharedLiabilityNotes([year([generic])])).toEqual([])
-	})
-
-	test("is empty when the CLI states nothing about a shared loan", () => {
-		expect(sharedLiabilityNotes([year([other]), year([])])).toEqual([])
 	})
 })

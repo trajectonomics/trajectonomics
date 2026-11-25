@@ -4,7 +4,7 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioShow, TaxYear } from "../../lib/contract"
 import { personNames } from "../../lib/view/item-names"
 import { returnsOf } from "../../lib/view/tax"
-import { claimsTable, sharedLiabilityNotes } from "../../lib/view/tax-settings/claims"
+import { claimsTable } from "../../lib/view/tax-settings/claims"
 import { type GroupKey, groupCards } from "../../lib/view/tax-settings/groups"
 import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import { notStated } from "../../lib/view/tax-settings/not-stated"
@@ -34,7 +34,6 @@ const people = $derived(personNames(show.household))
 /** The Filers the projection states, one column each: a profile with no Filer's Levy shows no claims table. */
 const filers = $derived(returnsOf(years).map((one) => one.filer))
 const claims = $derived(profile === null ? null : claimsTable(profile, show.household, filers))
-const notes = $derived(sharedLiabilityNotes(years))
 // While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
 // with none labels them in the write that gives it tax, which the profile form carries.
 const unlabelled = $derived(unlabelledIncome(show.document))
@@ -64,7 +63,7 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 	<TaxLabelForm {name} {show} disabled={wait} />
 {/if}
 {#if claims}
-	<TaxClaimsSection table={claims} {people} {notes} />
+	<TaxClaimsSection table={claims} {people} />
 {/if}
 {#if profile !== null}
 	<TaxGroupCards cards={groupCards(profile)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />

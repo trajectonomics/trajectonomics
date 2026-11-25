@@ -35,18 +35,18 @@ const SHARED = claimsTable({ ...PROFILE, sharedMortgageInterest: 60000 }, HOUSEH
 	"partner",
 ])
 
-function rendered(table: typeof TABLE, notes: readonly string[]): string {
+function rendered(table: typeof TABLE): string {
 	if (table === null) throw new Error("the profile files separately")
-	return render(TaxClaimsSection, { props: { table, people: PEOPLE, notes } }).body
+	return render(TaxClaimsSection, { props: { table, people: PEOPLE } }).body
 }
 
-function section(notes: readonly string[]): string {
-	return rendered(TABLE, notes)
+function section(): string {
+	return rendered(TABLE)
 }
 
 describe("the per-Return allowance view", () => {
 	test("names each column by person and each cell by that Return's stored claim", () => {
-		const body = section([])
+		const body = section()
 		expect(body).toContain("Who claims each allowance")
 		expect(body).toContain(">You<")
 		expect(body).toContain(">Your partner<")
@@ -56,15 +56,9 @@ describe("the per-Return allowance view", () => {
 		expect(body).toContain(">None<")
 	})
 
-	test("states the CLI's shared home-loan assumption under the table when it states one", () => {
-		const note = "Each separate Return's interest is taken to be on separate loans."
-		expect(section([note])).toContain(note)
-		expect(section([])).not.toContain("separate loans")
-	})
-
 	test("states the stored shared home-loan interest the Returns split between them", () => {
-		expect(rendered(SHARED, [])).toContain("Shared home-loan interest, split half to each Return")
-		expect(rendered(SHARED, [])).toContain("60,000 THB")
-		expect(section([])).not.toContain("Shared home-loan interest")
+		expect(rendered(SHARED)).toContain("Shared home-loan interest, split half to each Return")
+		expect(rendered(SHARED)).toContain("60,000 THB")
+		expect(section()).not.toContain("Shared home-loan interest")
 	})
 })

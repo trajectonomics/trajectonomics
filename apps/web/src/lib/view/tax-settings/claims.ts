@@ -3,7 +3,7 @@
  * Return claims (cli ADR-0075). The holder's claims are the profile's flat keys, never its `returns` entry; every
  * other Return's claims are its `returns` entry. The page shows the stored claims and applies nothing. Pure.
  */
-import type { Assumption, HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
+import type { HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
 import { groupDigits } from "./rows"
 
@@ -21,12 +21,6 @@ export interface ClaimsTable {
 	/** The interest on one loan the Returns borrowed together, in baht, or null when the profile stores none. */
 	readonly sharedInterest: string | null
 }
-
-/** The tax-core assumption path whose note says what the CLI assumes or leaves unclaimed about home-loan interest. */
-const SHARED_CEILING = "allowances.mortgageInterestCeiling"
-
-/** The words each of the CLI's own sentences on that path carries, so tax-core's bare ceiling note is not shown. */
-const CLI_NOTE_MARKERS = ["separate loans", "does not claim"]
 
 /** What one Return states for one allowance: a count as it is, an amount in baht, and "None" for zero or absent. */
 function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: TaxField): string {
@@ -70,21 +64,4 @@ export function claimsTable(
 				? null
 				: `${groupDigits(profile.sharedMortgageInterest)} THB`,
 	}
-}
-
-/**
- * The CLI's own notes on home-loan interest, each once, in its order (cli ADR-0075, #606): the separate-loans
- * assumption, and the sentence that says a Return does not claim stored shared interest or another's claims.
- * Tax-core's generic ceiling note alone is neither, and is left out.
- */
-export function sharedLiabilityNotes(
-	years: readonly { readonly assumptions: readonly Assumption[] }[],
-): readonly string[] {
-	const notes = years.flatMap((year) =>
-		year.assumptions
-			.filter((one) => one.path === SHARED_CEILING)
-			.map((one) => one.note)
-			.filter((note) => CLI_NOTE_MARKERS.some((marker) => note.includes(marker))),
-	)
-	return [...new Set(notes)]
 }
