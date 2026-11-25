@@ -1,4 +1,4 @@
-// Shared domain types for the MooJot frontend.
+// Shared domain types for the OpenJot frontend.
 // These mirror the Rust Tauri IPC JSON models, which are serialized in
 // camelCase via `#[serde(rename_all = "camelCase")]`.
 

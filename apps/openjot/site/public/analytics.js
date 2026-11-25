@@ -31,7 +31,7 @@
       person_profiles: "identified_only",
       persistence: "localStorage+cookie",
       secure_cookie: true,
-      cross_subdomain_cookie: false, // keep the cookie on moojot.trajectonomics.com only
+      cross_subdomain_cookie: false, // keep the cookie on this domain only
       capture_pageview: true,
       capture_pageleave: true,
       autocapture: true,

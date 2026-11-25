@@ -19,6 +19,8 @@ keytool -genkeypair -v \
 
 keytool asks for the password twice. The keystore is PKCS12, so the key uses the same password: `ANDROID_KEYSTORE_PASSWORD` and `ANDROID_KEY_PASSWORD` are equal. The certificate name (`-dname`) is public, because anyone can read it from the APK.
 
+The key's file name, alias and `CN=MooJot` predate the rename to OpenJot and never change: the certificate can never change.
+
 **Back up `moojot-release.jks` and its password** (a password manager is fine). Every future update must be signed with this key. If you lose it, people can only install a new version after uninstalling the old one, which deletes their records.
 
 `src-tauri/gen/android/app/build.gradle.kts` signs release builds when these are set. Environment variables win over `keystore.properties`.
@@ -65,8 +67,8 @@ Check alignment after the build (every `LOAD` segment should be 0x4000 or larger
 
 ```bash
 READELF="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
-unzip -q -d /tmp/moojot-apk path/to/app.apk
-find /tmp/moojot-apk/lib -name '*.so' -print0 |
+unzip -q -d /tmp/openjot-apk path/to/app.apk
+find /tmp/openjot-apk/lib -name '*.so' -print0 |
   xargs -0 -n1 "$READELF" -l |
   awk '/LOAD/ { if (strtonum($NF) < 16384) bad = 1 } END { exit bad }'
 ```
@@ -88,7 +90,7 @@ node tools/third-party-notices.mjs --apk "$(find src-tauri/gen/android/app/build
 
 Use the release APK you are about to ship (the `find` picks Tauri's output; the dry-run APK from `openjot-release` works too). The generator reads the library list from the APK and the lockfiles, downloads each package's license files from crates.io, npm, Maven Central, Google Maven and Hugging Face, and writes the file in the same order every time, so a run with no dependency change leaves no diff. It needs a network, uses only Node built-ins, and keeps a download cache in the temp folder (`--cache <dir>` to move it). `--check` rewrites nothing and fails if the file on disk is out of date.
 
-Commit the regenerated file. `bun run test` fails when `Cargo.lock` or `bun.lock` names a crate or package that the file does not list at that version, and `MOOJOT_APK=<apk> node --test tests/unit/release-apk.test.mjs` fails when the APK bundles a library the file does not list. A new native library, or a library whose POM names an unfamiliar license, stops the generator with a message instead of slipping through.
+Commit the regenerated file. `bun run test` fails when `Cargo.lock` or `bun.lock` names a crate or package that the file does not list at that version, and `OPENJOT_APK=<apk> node --test tests/unit/release-apk.test.mjs` fails when the APK bundles a library the file does not list. A new native library, or a library whose POM names an unfamiliar license, stops the generator with a message instead of slipping through.
 
 Google ML Kit and the Google Play services libraries are proprietary (ML Kit Terms of Service). They are listed as such, together with the open-source notices Google ships inside them.
 
@@ -99,7 +101,7 @@ Google ML Kit and the Google Play services libraries are proprietary (ML Kit Ter
 To run that APK check on a build you have locally:
 
 ```bash
-MOOJOT_APK=path/to/moojot-android-arm64.apk node --test tests/unit/release-apk.test.mjs
+OPENJOT_APK=path/to/openjot-android-arm64.apk node --test tests/unit/release-apk.test.mjs
 ```
 
 **Dry run** (publishes nothing): Actions → `openjot-release` → Run workflow, or
@@ -124,16 +126,16 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 
 | Asset | What it is |
 |---|---|
-| `moojot-android-arm64.apk` | The app, for direct install |
-| `moojot-android-arm64.aab` | The Google Play upload |
+| `openjot-android-arm64.apk` | The app, for direct install |
+| `openjot-android-arm64.aab` | The Google Play upload |
 | `SHA256SUMS` | Checksums of both |
 
 ### Stable download links
 
 The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page:
 
-- APK: `https://moojot.trajectonomics.com/download`
-- Checksums: `https://moojot.trajectonomics.com/download/checksums`
+- APK: `https://openjot.trajectonomics.com/download`
+- Checksums: `https://openjot.trajectonomics.com/download/checksums`
 - Release page: `https://github.com/trajectonomics/trajectonomics/releases?q=openjot-v`
 
 The build is arm64 only (`aarch64`), which covers current Android phones.

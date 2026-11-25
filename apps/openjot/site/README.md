@@ -1,25 +1,25 @@
-# moojot.trajectonomics.com
+# openjot.trajectonomics.com
 
-This is the landing page for MooJot. It's built for people arriving from short-form video (Instagram reels) on an Android phone, so its main job is to get the app installed: a download button, three install steps, and a tip for getting out of in-app browsers.
+This is the landing page for OpenJot. It's built for people arriving from short-form video (Instagram reels) on an Android phone, so its main job is to get the app installed: a download button, three install steps, and a tip for getting out of in-app browsers.
 
 The page is plain HTML, CSS and JS with no build step and no dependencies. It's served by a Cloudflare Worker with Static Assets.
 
 | Path | What it is |
 |---|---|
 | `public/` | The static site: `index.html`, `styles.css`, `boot.js` (sets the language before paint), `app.js` (language switch, release info, animated Moo), `analytics.js` (cookie banner, then PostHog), `_headers`, `404.html`, `img/`, `fonts/` |
-| `public/meowjot-alternative.html` | The MooJot vs MeowJot comparison page, served at `/meowjot-alternative` |
+| `public/meowjot-alternative.html` | The OpenJot vs MeowJot comparison page, served at `/meowjot-alternative` |
 | `public/robots.txt`, `sitemap.xml`, `llms.txt` | Search and AI-answer engine files. See "Search and AI answers" below |
-| `worker.js` | Worker entry. It only runs for `/download*`, `/go*`, `/api/*` and `/ingest/*` (see `run_worker_first`). |
+| `worker.js` | Worker entry. It only runs for `/`, `/meowjot-alternative`, `/download*`, `/go*`, `/api/*` and `/ingest/*` (see `run_worker_first`). |
 | `release.js` | Request router, and the newest `openjot-v*` release lookup. It reads the monorepo's releases (API first, github.com when Cloudflare's shared IPs are rate limited), falls back to the archived `trajectonomics/moojot` release until the first `openjot-v*` exists, then caches the answer for 5 minutes. |
 | `tracking.js` | Source links (`/go/…`, `/download/…`), cookieless counting of clicks and downloads, and the `/ingest` proxy to PostHog |
 | `release.test.js`, `tracking.test.js` | Tests |
-| `wrangler.jsonc` | Worker `moojot-site` on the custom domain `moojot.trajectonomics.com` |
+| `wrangler.jsonc` | Worker `moojot-site` on the custom domains `openjot.trajectonomics.com` and `moojot.trajectonomics.com` |
 
 ## Links that matter
 
-- `https://moojot.trajectonomics.com/download` redirects (302) to the `.apk` in the newest `openjot-v*` GitHub release. Use this short link in reels and bios. Before the first one it uses the archived `trajectonomics/moojot` release; only when neither exists does it land on `/#coming-soon`.
-- `https://moojot.trajectonomics.com/download/checksums` redirects to that release's `SHA256SUMS` through the same lookup.
-- `https://moojot.trajectonomics.com/api/release` returns `{ "release": null | { version, apk: { name, size, url }, checksumsUrl, … } }`.
+- `https://openjot.trajectonomics.com/download` redirects (302) to the `.apk` in the newest `openjot-v*` GitHub release. Use this short link in reels and bios. Before the first one it uses the archived `trajectonomics/moojot` release; only when neither exists does it land on `/#coming-soon`.
+- `https://openjot.trajectonomics.com/download/checksums` redirects to that release's `SHA256SUMS` through the same lookup.
+- `https://openjot.trajectonomics.com/api/release` returns `{ "release": null | { version, apk: { name, size, url }, checksumsUrl, … } }`.
 - `?lang=th` / `?lang=en` forces a language. Otherwise the page uses the visitor's saved choice, then the browser language. Thai is the no-JS default.
 
 ## Source links
@@ -33,15 +33,15 @@ Use a different link for every place you post, so PostHog can tell which one bri
 
 | Where | Landing page | Direct download |
 |---|---|---|
-| Instagram | `moojot.trajectonomics.com/go/ig` | `moojot.trajectonomics.com/download/ig` |
-| Facebook | `moojot.trajectonomics.com/go/fb` | `moojot.trajectonomics.com/download/fb` |
-| X | `moojot.trajectonomics.com/go/x` | `moojot.trajectonomics.com/download/x` |
-| Threads | `moojot.trajectonomics.com/go/threads` | `moojot.trajectonomics.com/download/threads` |
-| TikTok | `moojot.trajectonomics.com/go/tiktok` | `moojot.trajectonomics.com/download/tiktok` |
-| YouTube | `moojot.trajectonomics.com/go/yt` | `moojot.trajectonomics.com/download/yt` |
-| LINE | `moojot.trajectonomics.com/go/line` | `moojot.trajectonomics.com/download/line` |
-| GitHub | `moojot.trajectonomics.com/go/gh` | `moojot.trajectonomics.com/download/gh` |
-| QR code / print | `moojot.trajectonomics.com/go/qr` | `moojot.trajectonomics.com/download/qr` |
+| Instagram | `openjot.trajectonomics.com/go/ig` | `openjot.trajectonomics.com/download/ig` |
+| Facebook | `openjot.trajectonomics.com/go/fb` | `openjot.trajectonomics.com/download/fb` |
+| X | `openjot.trajectonomics.com/go/x` | `openjot.trajectonomics.com/download/x` |
+| Threads | `openjot.trajectonomics.com/go/threads` | `openjot.trajectonomics.com/download/threads` |
+| TikTok | `openjot.trajectonomics.com/go/tiktok` | `openjot.trajectonomics.com/download/tiktok` |
+| YouTube | `openjot.trajectonomics.com/go/yt` | `openjot.trajectonomics.com/download/yt` |
+| LINE | `openjot.trajectonomics.com/go/line` | `openjot.trajectonomics.com/download/line` |
+| GitHub | `openjot.trajectonomics.com/go/gh` | `openjot.trajectonomics.com/download/gh` |
+| QR code / print | `openjot.trajectonomics.com/go/qr` | `openjot.trajectonomics.com/download/qr` |
 
 Any other slug works too and becomes its own source (`/go/pantip` → `utm_source=pantip`). The known slugs and their mediums are `SOURCES` in `tracking.js`.
 
@@ -52,6 +52,16 @@ In PostHog, the events are:
 - Visitors who allow cookies also get PostHog's normal web analytics (`$pageview`, autocapture), with the `utm_*` tags as the referrer source. Download buttons carry `data-ph-capture-attribute-cta` (`hero`, `install`, `final`).
 
 Bots and link-preview fetchers (Facebook, WhatsApp, Telegram, Slack, Discord, …) are not counted.
+
+## The domain move
+
+The site moved from `moojot.trajectonomics.com` to `openjot.trajectonomics.com`. Both hosts attach to the same Worker (`moojot-site`, see `wrangler.jsonc`):
+
+- The old host answers `301` to the new host, keeping the path and the query, for `GET` and `HEAD`. The app's short links, QR codes and reels keep working.
+- Both pages, `/` and `/meowjot-alternative`, are in `run_worker_first`, so a page view on the old host reaches the Worker and is redirected. That costs one Worker request per page view; on the new host the Worker falls through to the static asset. Images, CSS, JS, fonts, `robots.txt`, `sitemap.xml` and `llms.txt` stay asset-first and never wake the Worker.
+- The one exception is `/ingest` and `/ingest/*`: it is proxied to PostHog exactly as before. App versions up to 1.4.0 send their analytics to `moojot.trajectonomics.com/ingest`, and a redirect would drop those requests.
+- The Worker keeps its name `moojot-site`: renaming it would create a second Worker, which cannot take over the custom domain. The name is infrastructure, not the product's.
+- `tracking.js` compares the referrer with the request's own host, so a download button is counted the same way on both hosts.
 
 ## Commands
 
@@ -93,7 +103,7 @@ The PostHog project key and region are `vars` in `wrangler.jsonc`. The same key 
 
 ## Comparison page
 
-`meowjot-alternative.html` compares MooJot with MeowJot (เหมียวจด). Comparing with a named product needs extra care:
+`meowjot-alternative.html` compares OpenJot with MeowJot (เหมียวจด). Comparing with a named product needs extra care:
 
 - Every claim about MeowJot comes from MeowJot's own public pages or from its app, listed under "Sources" on the page with the date they were checked. Never guess, and leave out what you can't check.
 - The FAQPage JSON-LD on the comparison page must list exactly the questions and answers visible in its FAQ.
@@ -106,8 +116,15 @@ The PostHog project key and region are `vars` in `wrangler.jsonc`. The same key 
 
 - `img/moo-wave.webp` is `static/mascot/mascot-idle.webp`. `img/moo-still.webp` is its first frame, used until the page has loaded.
 - `img/icon-*.png` and `img/apple-touch-icon.png` are resized from `static/app-icon.png`.
-- `img/og.jpg` (1200×630) is the link preview card.
+- `img/og.jpg` (1200×630) is the link preview card. Its source is `og/og.html`, which is not deployed (the Worker serves only `public/`). Run these in this folder (`apps/openjot/site`):
+
+  ```bash
+  d="$(mktemp -d -p ~/.cache)"
+  google-chrome --headless --hide-scrollbars --window-size=1200,630 --screenshot="$d/og.png" "file://$PWD/og/og.html"
+  ffmpeg -y -i "$d/og.png" -q:v 3 public/img/og.jpg
+  rm -rf "$d"
+  ```
 - `img/vs-*.webp` (540×1142) are the side-by-side captures on the comparison page, taken from a Nothing Phone (Android 16) on 24 Nov 2026 with the status bar cropped off and personal data blurred.
 - `img/shot-private-{en,th}.webp` and `img/shot-scan-{en,th}.webp` are intro screens 2 and 3 in the pink & white theme. The Thai ones (540×1142) were captured from the app; the English ones (412×891) are cropped from `docs/onboarding/pink-en-*`. The comparison page shows the one that matches the page language.
-- Every MooJot screenshot on the site uses the pink & white theme, so the site looks like one app.
+- Every OpenJot screenshot on the site uses the pink & white theme, so the site looks like one app.
 - `fonts/` holds Noto Sans Thai from `@fontsource/noto-sans-thai` (SIL OFL 1.1, see `fonts/OFL.txt`).

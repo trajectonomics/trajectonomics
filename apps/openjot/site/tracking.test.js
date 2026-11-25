@@ -1,7 +1,7 @@
 // Run with: node --test site/tracking.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { handle } from "./release.js";
 import { landingUrl, parseSourcePath, requestContext, resolveSource, sourceFromReferer } from "./tracking.js";
 
@@ -16,7 +16,7 @@ const PHONE =
 const INSTAGRAM = `${PHONE} Instagram 360.0.0.0.0 Android`;
 
 const req = (path, headers = {}, init = {}) =>
-  new Request(`https://moojot.trajectonomics.com${path}`, { headers: { "user-agent": PHONE, ...headers }, ...init });
+  new Request(`https://openjot.trajectonomics.com${path}`, { headers: { "user-agent": PHONE, ...headers }, ...init });
 
 function memoryCache() {
   const store = new Map();
@@ -45,7 +45,7 @@ function network() {
           tag_name: "openjot-v1.0.0",
           draft: false,
           prerelease: false,
-          assets: [{ name: "moojot-android-arm64.apk", size: 1, browser_download_url: "https://github.com/x/moojot-android-arm64.apk" }],
+          assets: [{ name: "openjot-android-arm64.apk", size: 1, browser_download_url: "https://github.com/x/openjot-android-arm64.apk" }],
         },
       ]);
     }
@@ -69,8 +69,8 @@ test("slugs resolve to a source, aliases included, and anything else valid becom
 test("landing URLs carry utm tags and keep ?lang=", () => {
   const link = parseSourcePath("/ig/reel-12");
   assert.equal(
-    landingUrl("https://moojot.trajectonomics.com/go/ig/reel-12?lang=en&x=1", link),
-    "https://moojot.trajectonomics.com/?lang=en&utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
+    landingUrl("https://openjot.trajectonomics.com/go/ig/reel-12?lang=en&x=1", link),
+    "https://openjot.trajectonomics.com/?lang=en&utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
   );
 });
 
@@ -80,7 +80,7 @@ test("/go/<source> redirects to the tagged landing page and counts one anonymous
   assert.equal(res.status, 302);
   assert.equal(
     res.headers.get("location"),
-    "https://moojot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
+    "https://openjot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
   );
   assert.equal(net.events.length, 1);
   const [event] = net.events;
@@ -112,7 +112,7 @@ test("the Worker never forwards the IP address or user agent in a count", async 
 test("bad /go links go home without counting, and so do bots and link previews", async () => {
   const net = network();
   const bad = await handle(req("/go/not%20a%20slug"), env, null, net.deps);
-  assert.equal(bad.headers.get("location"), "https://moojot.trajectonomics.com/");
+  assert.equal(bad.headers.get("location"), "https://openjot.trajectonomics.com/");
   await handle(req("/go/ig", { "user-agent": "facebookexternalhit/1.1" }), env, null, net.deps);
   await handle(req("/go/ig", { "user-agent": "WhatsApp/2.23.20.0" }), env, null, net.deps);
   await handle(req("/go/ig", { "user-agent": "" }), env, null, net.deps);
@@ -123,7 +123,7 @@ test("bad /go links go home without counting, and so do bots and link previews",
 test("/download/<source> goes straight to the APK and counts the download with its source", async () => {
   const net = network();
   const res = await handle(req("/download/tiktok/launch"), env, null, net.deps);
-  assert.equal(res.headers.get("location"), "https://github.com/x/moojot-android-arm64.apk");
+  assert.equal(res.headers.get("location"), "https://github.com/x/openjot-android-arm64.apk");
   const [event] = net.events;
   assert.equal(event.event, "apk_download");
   assert.equal(event.properties.source, "tiktok");
@@ -135,7 +135,7 @@ test("/download/<source> goes straight to the APK and counts the download with i
 
 test("/download from the landing page takes the source from the page's utm tags", async () => {
   const net = network();
-  const referer = "https://moojot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12";
+  const referer = "https://openjot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12";
   await handle(req("/download", { referer }), env, null, net.deps);
   const { properties } = net.events[0];
   assert.equal(properties.source, "instagram");
@@ -146,12 +146,12 @@ test("/download from the landing page takes the source from the page's utm tags"
 
 test("sourceFromReferer: untagged page, another site, and no referer", () => {
   const from = (referer) => sourceFromReferer(req("/download", referer ? { referer } : {}));
-  assert.equal(from("https://moojot.trajectonomics.com/#install").source, "website");
+  assert.equal(from("https://openjot.trajectonomics.com/#install").source, "website");
   assert.equal(from("https://l.instagram.com/").source, "l.instagram.com");
   assert.equal(from("https://l.instagram.com/").medium, "referral");
   assert.equal(from(null).source, "direct");
   assert.equal(from("not a url").source, "direct");
-  assert.equal(from("https://moojot.trajectonomics.com/?utm_source=%3Cb%3E").source, "website");
+  assert.equal(from("https://openjot.trajectonomics.com/?utm_source=%3Cb%3E").source, "website");
 });
 
 test("requestContext keeps only coarse labels", () => {
@@ -224,6 +224,29 @@ test("/ingest/static and /ingest/array come from the assets host", async () => {
     net.proxied.map((c) => c.url),
     ["https://eu-assets.i.posthog.com/static/array.js", "https://eu-assets.i.posthog.com/array/phc_test/config.js"],
   );
+});
+
+/** A JSON string, a `//` line comment, or a block comment; strings survive, comments do not. */
+const JSONC_COMMENT = /("(?:\\.|[^"\\])*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g;
+
+/** `wrangler.jsonc` as an object, stripped the same way apps/site and apps/blog strip theirs. */
+function wranglerConfig() {
+  const text = readFileSync(new URL("./wrangler.jsonc", import.meta.url), "utf8");
+  return JSON.parse(text.replace(JSONC_COMMENT, (_match, string) => string ?? ""));
+}
+
+test("every page runs the Worker first, so the old host can redirect it", () => {
+  const first = wranglerConfig().assets.run_worker_first;
+  for (const path of ["/", "/meowjot-alternative"]) {
+    assert.ok(first.includes(path), `run_worker_first lists ${path}`);
+  }
+  // html_handling "auto-trailing-slash" turns index.html into / and <name>.html into /<name>.
+  const pages = readdirSync(new URL("./public", import.meta.url))
+    .filter((name) => name.endsWith(".html") && name !== "404.html")
+    .map((name) => (name === "index.html" ? "/" : `/${name.slice(0, -".html".length)}`));
+  for (const path of pages) {
+    assert.ok(first.includes(path), `${path} is in run_worker_first, or the old host serves it instead of redirecting`);
+  }
 });
 
 test("the PostHog key is the same in wrangler.jsonc, the page and the app", () => {
