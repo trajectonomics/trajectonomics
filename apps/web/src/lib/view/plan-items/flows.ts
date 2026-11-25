@@ -95,7 +95,7 @@ export interface FlowDraft {
 	/** An expense's group for reports, free text: empty for none. Suggested from the categories the plan holds. */
 	readonly category: string
 	/** The name a page reads in place of the id, free text: empty for none (sim ADR 0032). */
-	readonly label: string
+	readonly displayLabel: string
 }
 
 /** The name a page reads in place of a Flow's id, or empty when it states none. */
@@ -106,19 +106,18 @@ function draftLabel(flow?: ScenarioFlow): string {
 /** The draft of a Flow to edit, or of a new one when there is no Flow. */
 export function flowDraftOf(flow?: ScenarioFlow): FlowDraft {
 	const growth = flow?.growth
-	/** The fixed percent a Flow states, in basis points; null when it follows inflation or states nothing. */
-	const percent = growth === undefined || growth === "inflation" ? null : growth.bps
+	const fixed = growth !== undefined && growth !== "inflation"
 	return {
 		name: flow?.id ?? "",
 		frequency: flow?.frequency ?? "monthly",
 		start: flow?.start ?? "",
 		end: flow?.end ?? "",
 		amount: flow?.amount ?? "",
-		growth: percent === null ? "inflation" : "fixed",
-		rate: percent === null ? "" : formatBps(percent),
+		growth: fixed ? "fixed" : "inflation",
+		rate: growth !== undefined && growth !== "inflation" ? formatBps(growth.bps) : "",
 		earned: flow?.earned !== false,
 		category: flow?.category ?? "",
-		label: draftLabel(flow),
+		displayLabel: draftLabel(flow),
 	}
 }
 

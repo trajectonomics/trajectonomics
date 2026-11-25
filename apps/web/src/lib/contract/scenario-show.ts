@@ -51,8 +51,6 @@ export const scenarioDocument = z.looseObject({
 	currency: z.string(),
 	flows: z.array(scenarioFlow),
 	accounts: z.array(scenarioAccount),
-	// The named points a Flow may gate on (sim ADR 0012): the page reads a Milestone's id and label, kept as they are.
-	milestones: z.array(scenarioMilestone).optional(),
 	// Where the money goes: the routing forms (cli ADR-0070). Optional so a document without it still decodes, and kept as it is.
 	cashflow: scenarioCashflow.optional(),
 	// The assumptions of the whole plan: inflation per year in basis points, which is an integer in the decimal form too.
@@ -61,6 +59,10 @@ export const scenarioDocument = z.looseObject({
 	levies: z.array(z.unknown()).optional(),
 	// The costs and gifts of the estate, when the plan states them (cli ADR 0064); none is shipped, each is the person's own.
 	estate: estateBlock.optional(),
+	// The named points a Flow may gate on (sim ADR 0012): the page reads a Milestone's id and label, kept as they are.
+	// Declared last so a parsed document serializes it after `estate`, where the CLI's canonical bytes put it: the keys the
+	// contract does not name (`schemaVersion`) follow it, as they followed it before this key was declared.
+	milestones: z.array(scenarioMilestone).optional(),
 })
 export type ScenarioDocument = z.infer<typeof scenarioDocument>
 

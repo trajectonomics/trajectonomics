@@ -1,4 +1,4 @@
-import { isDisplayLabel } from "@trajectonomics/core/sim"
+import { DISPLAY_LABEL_MAX, DISPLAY_LABEL_RULE, isDisplayLabel } from "@trajectonomics/core/sim"
 import { z } from "zod"
 import type { Person } from "./model"
 
@@ -26,9 +26,9 @@ const lifeExpectancy = z
 
 const displayLabel = z
 	.string()
-	.refine((text) => isDisplayLabel(text), {
-		message: "1 to 80 code points, with no control or invisible characters and no edge whitespace",
-	})
+	.min(1)
+	.max(DISPLAY_LABEL_MAX)
+	.refine((text) => isDisplayLabel(text), { message: DISPLAY_LABEL_RULE })
 	.optional()
 	.describe(
 		"What a page reads in place of the person's id, such as a name in Thai. It is no key: the id still names the person, and the label may repeat or change (sim ADR 0032, cli ADR 0080).",

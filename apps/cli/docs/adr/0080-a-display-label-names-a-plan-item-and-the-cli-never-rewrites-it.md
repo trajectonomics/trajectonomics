@@ -41,7 +41,13 @@ label is the CLI's field, not sim's.
   format prints the same document, so the label is read next to the id. `traj schema` publishes the
   field on a Flow, on a Milestone and on a household person.
 - **A refusal names the rule.** `INVALID_LABEL` carries `DISPLAY_LABEL_RULE` as its detail, the way
-  `INVALID_CATEGORY` carries the category's, and `scenario apply` lists it in its `errorCodes`.
+  `INVALID_CATEGORY` carries the category's, and the refusal quotes it. `scenario apply` states it as
+  `invalid_input`, naming the document path in the message, so `INVALID_LABEL` is not in its
+  `errorCodes`: that is sim's check code, not one of the CLI's own.
+- **A label is cleared by writing the document, not by a Set.** `--set` writes a value and cannot
+  remove a key: `null` is the wrong type and `""` breaks the label's rule, so both are refused. A
+  label is removed with `--file` (the document without its `displayLabel`) or by emptying the Name
+  field in the Dashboard, which sends the whole document as an Edit.
 - **The content hash moves when a label changes, as it does for any document field.** The hash is
   the canonical document's (ADR-0024), and a label is document content (sim ADR 0032), so
   `--if-hash` refuses a write that read another name. A plan without labels keeps its hash, and a
