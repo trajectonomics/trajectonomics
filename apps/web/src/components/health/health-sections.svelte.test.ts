@@ -53,6 +53,16 @@ describe("LedgerHealthSection", () => {
 		expect(body).toContain("Does not balance")
 	})
 
+	test("says the totals are not stated, and that the columns balance, when their sums are out of range", () => {
+		const unstated: Doctor = {
+			...doctor,
+			trialBalance: { asOf: "2026-10-31", totals: null, balanced: true },
+		}
+		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
+		expect(body).toContain("Balances")
+		expect(body).toContain("The totals are not stated")
+	})
+
 	test("shows the CLI's error in its section when the doctor failed", () => {
 		const failed: Read<Doctor> = {
 			argv: ["doctor", "--json"],
