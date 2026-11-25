@@ -17,8 +17,9 @@ had written every Balance without a word (#523).
 - **A total inside the range is byte for byte what it was.** `totals` and `netWorth` are the same arrays, and the error key is absent, not `null`: the goldens do not change.
   The output schema gains one nullable type and one optional key, and `traj schema balance` and `traj schema report networth` say so.
 - **An account's own overflow is still the call's refusal.** A Leaf Balance outside the range is refused at its row (ADR-0058, the per-date rule of `account value`), and an overflow of a
-  non-counted Leaf (income, expense, equity) still blocks `report networth`'s bottom line at `totals`, as before. Only the sum across accounts is stated as unavailable, because it is the one
-  figure no write can be refused for without refusing a valid Ledger.
+  non-counted Leaf (income, expense, equity) still blocks `report networth`'s bottom line at `totals`, as before. Only the net worth sum across accounts is stated as unavailable here: a write
+  cannot be refused for it without refusing a valid Ledger. Two other cross-account sums, `trialBalance.totals` (`balance --trial-balance`) and
+  `profitAndLoss.totals` (`report pnl`), still refuse the whole call; they take the same treatment in a follow-up.
 - **Human output prints a sentence in place of the total's line:** `not stated: every account is in range, but their sum exceeds the safe integer range; each account's balance above is stated`. The refusal's fields stay in JSON.
 - **The rows come from the engine's `balances`, filtered by account type.** The engine's `netWorth` throws before it returns the rows it had assembled, so for a refused total the CLI reads `balances` at that date
   and keeps the asset and liability Leaf rows, in `account list` order. It states no figure of its own (ADR-0058): each row is the engine's Balance, and the filter is the type the column already prints.
