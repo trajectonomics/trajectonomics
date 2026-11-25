@@ -11,9 +11,11 @@ interface Props {
 	readonly dictionary: Dictionary
 	/** A Language home is the page the reading Language points at; a miss is not. */
 	readonly markCurrent: boolean
+	/** The page the choice returns to: the address the visitor is reading. */
+	readonly address: string
 }
 
-const { language, dictionary, markCurrent } = Astro.props
+const { language, dictionary, markCurrent, address } = Astro.props
 const languages = [languageEntry(language), ...otherLanguages(language)]
 ---
 
@@ -27,7 +29,7 @@ const languages = [languageEntry(language), ...otherLanguages(language)]
 			languages.map((entry) => (
 				<a
 					class="header-menu-link"
-					href={languageChoiceLink(entry.language)}
+					href={languageChoiceLink(entry.language, address)}
 					lang={entry.language}
 					aria-label={
 						entry.language === language ? currentLanguageName(entry.dictionary) : undefined

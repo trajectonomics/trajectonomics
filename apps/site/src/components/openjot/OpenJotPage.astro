@@ -1,0 +1,52 @@
+---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see these.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
+import Layout from "../../layouts/Layout.astro"
+import type { Language } from "../../lib/language/language"
+import { dictionaryFor } from "../../lib/language/languages"
+import { openJotDictionaryFor } from "../../lib/language/openjot-dictionary"
+import { ABSOLUTE_OPENJOT_URL, OPENJOT_PATH } from "../../lib/site/openjot"
+import { openJotStructuredDataJson } from "../../lib/site/openjot-structured-data"
+import { absoluteOpenJotShareImageUrl, openJotShareImageAlt } from "../../lib/social/share-advert"
+import Consent from "../Consent.astro"
+import OpenJotClosing from "./OpenJotClosing.astro"
+import OpenJotFaq from "./OpenJotFaq.astro"
+import OpenJotFeatures from "./OpenJotFeatures.astro"
+import OpenJotHero from "./OpenJotHero.astro"
+import OpenJotInstall from "./OpenJotInstall.astro"
+import OpenJotPrivacy from "./OpenJotPrivacy.astro"
+import OpenJotScreens from "./OpenJotScreens.astro"
+
+interface Props {
+	readonly language: Language
+}
+
+// The OpenJot page: the app's own words under the Site's chrome, at its one address (ADR 0032).
+const { language } = Astro.props
+const dictionary = openJotDictionaryFor(language)
+const home = dictionaryFor(language)
+---
+
+<Layout
+	language={language}
+	title={dictionary.documentTitle}
+	description={dictionary.description}
+	indexed={true}
+	pageAddress={OPENJOT_PATH}
+	canonicalUrl={ABSOLUTE_OPENJOT_URL}
+	shareImage={{
+		url: absoluteOpenJotShareImageUrl(language),
+		alt: openJotShareImageAlt(language),
+	}}
+	structuredData={openJotStructuredDataJson(language)}
+	openjotCurrent={true}
+>
+	<OpenJotHero dictionary={dictionary} />
+	<OpenJotScreens dictionary={dictionary} />
+	<OpenJotFeatures dictionary={dictionary} />
+	<OpenJotPrivacy dictionary={dictionary} language={language} />
+	<OpenJotInstall dictionary={dictionary} />
+	<OpenJotFaq dictionary={dictionary} />
+	<OpenJotClosing dictionary={dictionary} />
+	<Consent dictionary={home} address={OPENJOT_PATH} />
+</Layout>

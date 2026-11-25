@@ -109,12 +109,17 @@ describe("interest on two separate Returns beside a loan both own", () => {
 		expect(more).toEqual([])
 		expect(entry).toMatchObject({ value: 100000, status: "reported" })
 		expect(entry?.note).toContain("separate loans")
-		expect(entry?.note).toContain("so the two total at most 100,000 baht")
+		expect(entry?.note).toContain("--mortgage-interest shared=<amount>")
 	})
 
 	it.each([
 		["no loan is shared", "me", interest("80000", "80000")],
 		["one Return states interest", "shared", ["--mortgage-interest", "80000"]],
+		[
+			"the shared loan's interest is stated as such",
+			"shared",
+			[...interest("80000", "80000"), "--mortgage-interest", "shared=20000"],
+		],
 	])("says nothing of it when %s", async (_when, loan, claims) => {
 		const found = await assumed(loan, claims)
 		expect(found.map((it) => it.note).join()).not.toContain("separate loans")

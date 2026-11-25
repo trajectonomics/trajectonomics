@@ -39,6 +39,6 @@ const headingId = $props.id()
 		{@render children?.()}
 	</dl>
 	<OverrideList overrides={statement.overrides} />
-	<NoteList notes={statement.notes} />
+	<NoteList notes={statement.notes} scenario={statement.scenario} />
 	<Provenance {argv} />
 </section>

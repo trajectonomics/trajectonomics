@@ -1,10 +1,11 @@
 import assert from "node:assert/strict"
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { test } from "node:test"
 
 const read = (name) => readFileSync(new URL(`../../site/public/${name}`, import.meta.url), "utf8")
 const ORIGIN = "https://openjot.trajectonomics.com/"
-const html = read("index.html")
+const LANDING = "https://trajectonomics.com/openjot/"
+const html = read("meowjot-alternative.html")
 const visible = html
 	.replace(/<script[\s\S]*?<\/script>/g, "")
 	.replace(/<wbr>/g, "")
@@ -14,31 +15,34 @@ const squash = (text) => text.replace(/\s+/g, "")
 
 const graph = () => {
 	const match = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)
-	assert.ok(match, "the landing page carries a JSON-LD block")
+	assert.ok(match, "the comparison page carries a JSON-LD block")
 	return JSON.parse(match[1])["@graph"]
 }
 
-test("the JSON-LD names the app, its publisher and the site at the canonical address", () => {
-	const types = graph().map((node) => [node["@type"]].flat())
-	for (const type of ["WebSite", "Organization", "MobileApplication", "FAQPage"]) {
-		assert.ok(types.some((t) => t.includes(type)), `${type} is stated`)
-	}
-	assert.match(html, new RegExp(`<link rel="canonical" href="${ORIGIN}">`))
+test("the landing page is no longer served on this host", () => {
+	assert.equal(existsSync(new URL("../../site/public/index.html", import.meta.url)), false)
 })
 
-test("the app is free and says only what the page says", () => {
-	const app = graph().find((node) => [node["@type"]].flat().includes("MobileApplication"))
-	assert.equal(app.offers.price, "0")
-	assert.equal(app.isAccessibleForFree, true)
+test("the JSON-LD names the comparison page, its breadcrumb and its FAQ", () => {
+	const types = graph().map((node) => [node["@type"]].flat())
+	for (const type of ["WebPage", "BreadcrumbList", "FAQPage"]) {
+		assert.ok(types.some((t) => t.includes(type)), `${type} is stated`)
+	}
+	assert.match(html, new RegExp(`<link rel="canonical" href="${ORIGIN}meowjot-alternative">`))
+	const breadcrumb = graph().find((node) => node["@type"] === "BreadcrumbList")
+	assert.equal(breadcrumb.itemListElement[0].item, LANDING)
+})
+
+test("the page is free, and states no claim it cannot support", () => {
 	const written = JSON.stringify(graph())
-	for (const claim of ["aggregateRating", "review", "softwareVersion"]) {
+	for (const claim of ["aggregateRating", "review", "reviewRating", "softwareVersion"]) {
 		assert.ok(!written.includes(claim), `${claim} is not stated`)
 	}
 })
 
 test("every FAQ question and answer in the JSON-LD is on the page in the same words", () => {
 	const faq = graph().find((node) => node["@type"] === "FAQPage")
-	assert.equal(faq.mainEntity.length, 14)
+	assert.equal(faq.mainEntity.length, 6)
 	for (const question of faq.mainEntity) {
 		assert.ok(visible.includes(squash(question.name)), `question on the page: ${question.name}`)
 		for (const sentence of question.acceptedAnswer.text.split(". ")) {
@@ -56,11 +60,18 @@ test("robots.txt names the sitemap and keeps the worker's redirects out of the i
 	assert.doesNotMatch(robots, /^Disallow: \/\s*$/m)
 })
 
-test("the sitemap lists both pages, and llms.txt links them", () => {
-	for (const page of [ORIGIN, `${ORIGIN}meowjot-alternative`]) {
-		assert.match(read("sitemap.xml"), new RegExp(`<loc>${page}</loc>`))
-		assert.ok(read("llms.txt").includes(`(${page})`))
-	}
+test("the sitemap lists the comparison page, and llms.txt names the Site's landing page", () => {
+	assert.match(read("sitemap.xml"), new RegExp(`<loc>${ORIGIN}meowjot-alternative</loc>`))
+	const llms = read("llms.txt")
+	assert.ok(llms.includes(`(${LANDING})`), "llms.txt links the landing page on the Site")
+	assert.ok(llms.includes(`(${ORIGIN}meowjot-alternative)`), "llms.txt links the comparison page")
+	assert.ok(llms.includes(`(${ORIGIN}download)`), "llms.txt links the download short link")
+})
+
+test("the comparison page's home and install links point at the Site's OpenJot page", () => {
+	assert.match(html, new RegExp(`class="brand" href="${LANDING}"`))
+	assert.match(html, new RegExp(`href="${LANDING}#install"`))
+	assert.match(html, /href="\/download"/)
 })
 
 test("the IndexNow key file holds its own name and nothing else", () => {

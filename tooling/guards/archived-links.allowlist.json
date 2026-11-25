@@ -50,11 +50,6 @@
 		"reason": "The landing page's README documents the fallback to the archived repository's release until the first openjot-v* exists."
 	},
 	{
-		"path": "apps/openjot/site/public/index.html",
-		"match": "trajectonomics/moojot",
-		"reason": "The Released roadmap items are closed issues of the archived repository, where they stay."
-	},
-	{
 		"path": "apps/openjot/site/release.js",
 		"match": "trajectonomics/moojot",
 		"reason": "The fallback reads the archived repository's latest release until the first openjot-v* release exists."

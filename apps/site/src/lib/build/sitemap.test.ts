@@ -10,7 +10,7 @@ const LOC = new RegExp(`<loc>${ABSOLUTE_CLEAN_URL}</loc>`)
 /** The one alternate a healthy Sitemap carries, so a test can point it somewhere else. */
 const DEFAULT = /<xhtml:link rel="alternate" hreflang="x-default" href="[^"]*" \/>/
 
-describe("the Sitemap of the Site's one address", () => {
+describe("the Sitemap of the Site's page addresses", () => {
 	it("passes the Sitemap the build generates", () => {
 		expect(codes(checkSitemap, [{ path: "sitemap.xml", content: SITEMAP }])).toEqual([])
 	})
@@ -36,6 +36,16 @@ describe("the Sitemap of the Site's one address", () => {
 		expect(
 			codes(checkSitemap, edited("sitemap.xml", LOC, "<loc>https://trajectonomics.com/th/</loc>")),
 		).toEqual(["SITEMAP_URL_UNKNOWN", "SITEMAP_URL_MISSING"])
+	})
+
+	it("fails a Sitemap that omits the OpenJot page", () => {
+		const without = SITEMAP.replace(
+			/ {2}<url>\n {4}<loc>https:\/\/trajectonomics\.com\/openjot\/[\s\S]*?<\/url>\n/,
+			"",
+		)
+		expect(codes(checkSitemap, [{ path: "sitemap.xml", content: without }])).toEqual([
+			"SITEMAP_URL_MISSING",
+		])
 	})
 
 	it("fails an entry whose loc is that path on another origin", () => {

@@ -1,7 +1,7 @@
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 
 /**
  * The npm package that is not Trajectonomics', and must appear nowhere: not on a page, not in a
@@ -48,6 +48,6 @@ export function checkSiteContent(files: readonly BuiltFile[]): readonly BuildFai
 					]
 				: [],
 		),
-		...builtHomes(files).flatMap(({ file }) => retiredCommandFailures(file)),
+		...builtLanguagePages(files).flatMap(({ file }) => retiredCommandFailures(file)),
 	]
 }

@@ -1,5 +1,6 @@
 import { FALLBACK_LANGUAGE } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
+import { openJotDictionaryFor } from "../language/openjot-dictionary"
 import {
 	DOCS_CLI_INSTALL_PATH,
 	DOCS_CLI_PATH,
@@ -11,6 +12,7 @@ import {
 	SITE_NAME,
 	SKILLS_LICENCE_URL,
 } from "../site"
+import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import { linkLine, renderLlms, section } from "./llms-markdown"
 
 /** The short Answer engine file's built path, relative to the Worker's assets root. */
@@ -19,8 +21,14 @@ export const LLMS_FILE = "llms.txt"
 /** The words the file uses, taken from the Language a crawler falls back to, so none is invented. */
 const dictionary = dictionaryFor(FALLBACK_LANGUAGE)
 
+/** The OpenJot page's words, in the same fallback Language. */
+const openJot = openJotDictionaryFor(FALLBACK_LANGUAGE)
+
 /** The Site has one address, so it is listed once rather than once per Language. */
-const SITE_LINES = [linkLine(SITE_NAME, ABSOLUTE_CLEAN_URL)]
+const SITE_LINES = [
+	linkLine(SITE_NAME, ABSOLUTE_CLEAN_URL),
+	linkLine(openJot.documentTitle, ABSOLUTE_OPENJOT_URL),
+]
 
 /** The Docs Portal's pages, under the footer's own words for them. The constants are full URLs already. */
 const DOCS_LINES = [

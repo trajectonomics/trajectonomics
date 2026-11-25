@@ -38,7 +38,7 @@
     type="button"
     onclick={onUnlock}
     disabled={busy}
-    class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3 text-sm font-bold text-white shadow-sm active:bg-[var(--brand-deep)] disabled:opacity-60"
+    class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3 text-sm font-bold text-[var(--brand-contrast)] shadow-sm active:bg-[var(--brand-deep)] disabled:opacity-60"
   >
     {t(lang, "appLockUnlock")}
   </button>

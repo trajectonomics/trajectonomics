@@ -1,6 +1,8 @@
 import { type AppError, fail } from "../../errors"
+import { SHARED } from "../household/model"
 import type { FilerScope } from "./filer-scope"
 import { flagOf, type NamedValue } from "./flags"
+import { sharedNeedsSeparate } from "./shared-mortgage"
 
 /** The refusal for per-Return claims with no separate Return to hold them, at the flag that stated one. */
 function noFilers(field: string): AppError {
@@ -22,8 +24,9 @@ function noIncome({ field, person, bare }: NamedValue): AppError {
 }
 
 /**
- * Refuses a value that no written Return would carry (cli ADR-0075): one naming a person where no
- * separate Return is written, and one for a person, bare for the holder included, with no Return.
+ * Refuses a value that no written Return would carry (cli ADR-0075): one naming a person, or the
+ * shared loan, where no separate Return is written, and one for a person, bare for the holder
+ * included, with no Return. Any separate Return claims a share of the shared loan.
  */
 export function personRefusal(
 	named: readonly NamedValue[] | undefined,
@@ -31,8 +34,11 @@ export function personRefusal(
 ): AppError | null {
 	if (scope?.kind !== "separate") {
 		const first = named?.find((value) => !value.bare)
-		return first === undefined ? null : noFilers(first.field)
+		if (first === undefined) return null
+		return first.person === SHARED ? sharedNeedsSeparate() : noFilers(first.field)
 	}
-	const stray = named?.find((value) => !scope.filers.includes(value.person))
+	const stray = named?.find(
+		(value) => value.person !== SHARED && !scope.filers.includes(value.person),
+	)
 	return stray === undefined ? null : noIncome(stray)
 }

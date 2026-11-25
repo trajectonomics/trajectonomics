@@ -32,6 +32,24 @@ export const PAGES: readonly PageUnderTest[] = Object.freeze([
 	},
 ])
 
+/** OpenJot's one address in each Language: a page like the home, judged by the same generic checks. */
+export const OPENJOT_PAGES: readonly PageUnderTest[] = Object.freeze([
+	{
+		path: "/openjot/",
+		language: "en",
+		name: "English OpenJot page",
+		status: 200,
+		storedChoice: null,
+	},
+	{ path: "/openjot/", language: "th", name: "Thai OpenJot page", status: 200, storedChoice: "th" },
+])
+
+/** Every page the generic checks judge: the home in each Language, the miss, and OpenJot. */
+export const PAGES_UNDER_TEST: readonly PageUnderTest[] = Object.freeze([
+	...PAGES,
+	...OPENJOT_PAGES,
+])
+
 /**
  * The device schemes the harness sets before navigation. Both are kept although the Site ships one
  * Theme: a leftover device query in a component's own styles is what this catches ([ADR 0016]).
