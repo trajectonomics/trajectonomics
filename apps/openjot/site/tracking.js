@@ -1,5 +1,5 @@
-// Source links, cookieless counting and the PostHog proxy for moojot.trajectonomics.com.
-// Routed from handle() in release.js.
+// Source links, cookieless counting and the PostHog proxy for openjot.trajectonomics.com
+// (and the moojot.trajectonomics.com host, which forwards to it). Routed from handle() in release.js.
 //
 //   /go/<source>[/<campaign>]        302 to the landing page with utm_* tags, and counts
 //                                    a `link_clicked` event.
@@ -16,7 +16,7 @@
 // carry only: source, medium, campaign, the link slug, the country Cloudflare resolved, a
 // coarse platform (android, ios, desktop, other) and which in-app browser it was, if any.
 
-/** Short slugs for the places MooJot is posted. Any other valid slug works too, as its own source. */
+/** Short slugs for the places OpenJot is posted. Any other valid slug works too, as its own source. */
 export const SOURCES = {
   ig: { source: "instagram", medium: "social" },
   fb: { source: "facebook", medium: "social" },
@@ -238,9 +238,9 @@ export async function proxyIngest(request, env, deps = {}) {
   return fetchImpl(`https://${host}${path}${url.search}`, init);
 }
 
-export function redirect(location) {
+export function redirect(location, status = 302) {
   return new Response(null, {
-    status: 302,
+    status,
     headers: { location, "cache-control": "no-store" },
   });
 }

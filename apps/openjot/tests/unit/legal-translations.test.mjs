@@ -7,7 +7,7 @@ import test from "node:test";
 
 const NOTE =
   "ฉบับแปลภาษาไทยนี้จัดทำเพื่อความสะดวกในการอ่าน หากข้อความไม่ตรงกับฉบับภาษาอังกฤษ ให้ถือฉบับภาษาอังกฤษเป็นหลัก";
-const REPO = "https://github.com/trajectonomics/moojot/blob/main/docs/";
+const REPO = "https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/";
 
 const MONTHS_EN = [
   "January", "February", "March", "April", "May", "June",

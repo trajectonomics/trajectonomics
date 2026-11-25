@@ -58,7 +58,8 @@
     | "privacy"
     | "licenses";
 
-  const GITHUB_URL = "https://github.com/trajectonomics/moojot";
+  const GITHUB_URL =
+    "https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot";
 
   let {
     settings,
@@ -122,7 +123,7 @@
     reminderEnabled?: boolean;
     /** "HH:MM" */
     reminderTime?: string;
-    /** The reminder is on but Android notifications are off for MooJot. */
+    /** The reminder is on but Android notifications are off for OpenJot. */
     notificationsBlocked?: boolean;
     /** Returns why the reminder couldn't change, or null when it did. */
     onChangeReminder?: (enabled: boolean, time: string) => Promise<string | null>;
@@ -355,7 +356,7 @@
   // They are a few MB, so they load only when the page opens, and render in chunks the browser can skip
   // while they are off screen.
   const NOTICES_URL = "/third-party-notices.txt";
-  const NOTICES_FIRST_LINE = "MOOJOT THIRD-PARTY NOTICES";
+  const NOTICES_FIRST_LINE = "OPENJOT THIRD-PARTY NOTICES";
   const NOTICE_CHUNK_LINES = 300;
   let noticesState = $state<"idle" | "loading" | "ready" | "error">("idle");
   let noticeChunks = $state<string[]>([]);
@@ -462,7 +463,7 @@
     >
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5 min-w-0">
-          <MooMascot mood={isScanning ? "scan" : mascotMood} size="md" alt="MooJot" />
+          <MooMascot mood={isScanning ? "scan" : mascotMood} size="md" alt="OpenJot" />
           <div class="min-w-0">
             <h1 class="text-2xl font-extrabold tracking-tight">
               {lang === "th" ? "สวัสดี มนุษย์หมู!" : "Hello, Moo Human!"}
@@ -1431,7 +1432,7 @@
               </span>
               <div class="min-w-0">
                 <div class="text-sm font-bold text-[var(--text-primary)]">GitHub</div>
-                <div class="text-xs text-[var(--text-muted)] truncate">trajectonomics/moojot</div>
+                <div class="text-xs text-[var(--text-muted)] truncate">trajectonomics/trajectonomics</div>
               </div>
             </div>
             <ChevronRight class="size-4 text-[var(--text-muted)] shrink-0" />
@@ -1439,8 +1440,8 @@
         </section>
         <p class="px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
           {lang === "th"
-            ? `MooJot${appVersion ? ` ${appVersion}` : ""} เผยแพร่โดย Trajectonomics ภายใต้สัญญาอนุญาต MIT ข้อความกฎหมายฉบับภาษาอังกฤษเป็นฉบับที่มีผล`
-            : `MooJot${appVersion ? ` ${appVersion}` : ""} is published by Trajectonomics under the MIT License. The English legal text is the official version.`}
+            ? `OpenJot${appVersion ? ` ${appVersion}` : ""} เผยแพร่โดย Trajectonomics ภายใต้สัญญาอนุญาต MIT ข้อความกฎหมายฉบับภาษาอังกฤษเป็นฉบับที่มีผล`
+            : `OpenJot${appVersion ? ` ${appVersion}` : ""} is published by Trajectonomics under the MIT License. The English legal text is the official version.`}
         </p>
 
       {:else if subPage === "terms"}

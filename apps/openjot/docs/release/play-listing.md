@@ -8,14 +8,14 @@ Default language: Thai (th-TH). Add English (en-US) as a translation.
 
 ### Thai (th-TH)
 
-**App name:** MooJot: จดรายจ่ายจากสลิป
+**App name:** OpenJot จดรายจ่ายจากสลิป
 
 **Short description:** อ่านสลิปธนาคารไทยแล้วจดรายจ่ายให้เอง ในมือถือคุณ ฟรี ไม่ต้องสมัคร ไม่มีโฆษณา
 
 **Full description:**
 
 ```text
-MooJot อ่านสลิปที่แอปธนาคารบันทึกไว้ในมือถือ แล้วจดรายจ่ายพร้อมแยกหมวดให้เอง ไม่ต้องสมัคร ไม่มีโฆษณา ฟรีทุกฟีเจอร์
+OpenJot อ่านสลิปที่แอปธนาคารบันทึกไว้ในมือถือ แล้วจดรายจ่ายพร้อมแยกหมวดให้เอง ไม่ต้องสมัคร ไม่มีโฆษณา ฟรีทุกฟีเจอร์
 
 มูทำอะไรได้บ้าง
 • อ่านสลิปได้ 20 แอปธนาคารและวอลเล็ต เช่น K PLUS, SCB EASY, Krungthai NEXT, MAKE และ TrueMoney อ่าน QR บนสลิป และข้อความภาษาไทยและอังกฤษในเครื่อง
@@ -26,27 +26,27 @@ MooJot อ่านสลิปที่แอปธนาคารบันท�
 • ส่งออก CSV หรือ JSON ได้ตลอด ใช้ได้ทั้งไทยและอังกฤษ เลือกธีมชมพูขาวหรือดำส้ม
 
 ความเป็นส่วนตัว
-• บัญชีรายรับรายจ่ายเก็บในมือถือคุณ ไม่มีบัญชีผู้ใช้ และไม่มีเซิร์ฟเวอร์ของ MooJot ที่เก็บรายการของคุณ
+• บัญชีรายรับรายจ่ายเก็บในมือถือคุณ ไม่มีบัญชีผู้ใช้ และไม่มีเซิร์ฟเวอร์ของ OpenJot ที่เก็บรายการของคุณ
 • ค่าเริ่มต้นอ่านเฉพาะอัลบั้มสลิปของแอปธนาคาร ไม่เปิดรูปจากกล้อง ภาพหน้าจอ หรือโฟลเดอร์ดาวน์โหลด
 • สถิติการใช้งานแบบไม่ระบุตัวตนปิดไว้ จนกว่าคุณจะเปิดเอง และไม่มีรายการหรือยอดเงินของคุณ
 • การอ่านข้อความภาษาอังกฤษบนสลิปใช้ ML Kit ของ Google ซึ่งส่งสถิติการใช้งานของตัวเองให้ Google (ไม่ส่งรูปหรือข้อความในสลิป)
 
 โอเพนซอร์ส
-โค้ดของ MooJot เปิดให้ดูได้ทุกบรรทัด ภายใต้สัญญาอนุญาต MIT: https://github.com/trajectonomics/moojot
+โค้ดของ OpenJot เปิดให้ดูได้ทุกบรรทัด ภายใต้สัญญาอนุญาต MIT: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
 
-MooJot ไม่มีส่วนเกี่ยวข้องกับธนาคารหรือวอลเล็ตใด ชื่อธนาคารและชื่อแอปเป็นของเจ้าของแต่ละราย
+OpenJot ไม่มีส่วนเกี่ยวข้องกับธนาคารหรือวอลเล็ตใด ชื่อธนาคารและชื่อแอปเป็นของเจ้าของแต่ละราย
 ```
 
 ### English (en-US)
 
-**App name:** MooJot: Slip expense diary
+**App name:** OpenJot: Slip Expense Tracker
 
 **Short description:** Reads Thai bank slips and logs every expense on your phone. Free, no sign-up.
 
 **Full description:**
 
 ```text
-MooJot reads the payment slips your banking apps save to your phone, then logs and sorts every expense for you. No sign-up, no ads, every feature free.
+OpenJot reads the payment slips your banking apps save to your phone, then logs and sorts every expense for you. No sign-up, no ads, every feature free.
 
 What Moo can do
 • Reads slips from 20 banking and wallet apps, including K PLUS, SCB EASY, Krungthai NEXT, MAKE and TrueMoney: the slip QR, plus the Thai and English text, read on your phone
@@ -57,15 +57,15 @@ What Moo can do
 • Export to CSV or JSON any time. Thai or English, pink and white or black and orange
 
 Private by design
-• Your ledger is stored on your phone. There's no MooJot account, and no MooJot server holds your records
+• Your ledger is stored on your phone. There's no OpenJot account, and no OpenJot server holds your records
 • By default it reads only your banking apps' slip albums, never your camera photos, screenshots or downloads
 • Anonymous usage stats are off until you turn them on, and never include your records or amounts
-• To read English text on slips, MooJot uses Google ML Kit, which sends Google its own usage metrics (not your photos or their text)
+• To read English text on slips, OpenJot uses Google ML Kit, which sends Google its own usage metrics (not your photos or their text)
 
 Open source
-MooJot's code is open source under the MIT license: https://github.com/trajectonomics/moojot
+OpenJot's code is open source under the MIT license: https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot
 
-MooJot isn't affiliated with any bank or e-wallet. Bank and app names belong to their owners.
+OpenJot isn't affiliated with any bank or e-wallet. Bank and app names belong to their owners.
 ```
 
 ### Graphics
@@ -79,11 +79,14 @@ MooJot isn't affiliated with any bank or e-wallet. Bank and app names belong to 
 | Field | Value |
 |---|---|
 | App or game | App |
+| Developer name | Trajectonomics |
 | Category | Finance |
 | Tags | Budgeting, expense tracking (pick the closest ones Play offers) |
-| Website | https://moojot.trajectonomics.com |
+| Website | https://openjot.trajectonomics.com |
 | Email | privacy@trajectonomics.com |
-| Privacy policy | https://github.com/trajectonomics/moojot/blob/main/docs/privacy-policy.md |
+| Privacy policy | https://github.com/trajectonomics/trajectonomics/blob/main/apps/openjot/docs/privacy-policy.md |
+
+The developer account is a personal account named Trajectonomics. New personal accounts must run a closed test with 12 testers for 14 days before production (trajectonomics/trajectonomics#568).
 
 ## App content declarations
 
@@ -93,17 +96,17 @@ MooJot isn't affiliated with any bank or e-wallet. Bank and app names belong to 
 | Ads | No, the app has no ads |
 | App access | All functionality is available without special access. There is no login |
 | Content rating | Fill the IARC questionnaire as a utility app with no violence, sexual content, gambling, user-to-user communication, location sharing or purchases. Expect the lowest rating |
-| Target audience | 18 and over. The terms say MooJot is for adults. Don't choose any age under 13, so the Families policy doesn't apply |
+| Target audience | 18 and over. The terms say OpenJot is for adults. Don't choose any age under 13, so the Families policy doesn't apply |
 | News app | No |
 | Government app | No |
 | Health apps | No health features |
-| Financial features | MooJot tracks spending the user records. It does not offer banking, payments, loans, investing, insurance or crypto. Pick the personal-finance / budgeting option, or "no financial features" if Play has no such option |
+| Financial features | OpenJot tracks spending the user records. It does not offer banking, payments, loans, investing, insurance or crypto. Pick the personal-finance / budgeting option, or "no financial features" if Play has no such option |
 | Advertising ID | No. The app doesn't use it, and the release APK doesn't request `com.google.android.gms.permission.AD_ID` |
 | Data safety | [play-data-safety.md](play-data-safety.md) |
 | Photo and video permissions | [play-data-safety.md](play-data-safety.md#photo-and-video-permissions) |
 
 ## Release
 
-Upload `moojot-android-arm64.aab` from the GitHub release.
+Upload `openjot-android-arm64.aab` from the GitHub release.
 
-When Play Console sets up Play App Signing, choose to **use your own app signing key** and upload the existing `moojot-release.jks` key (Play Console shows the export steps, using its PEPK tool). Play then signs with the same certificate as the GitHub APK (`CN=MooJot`, SHA-256 `be15a0f5…5041a3a1`). The landing page promises that every release is signed with that key, and it lets people move between the GitHub APK and Play without uninstalling. If Play generates its own key instead, a GitHub install has to be uninstalled before the Play version can be installed, and uninstalling deletes the records. This choice can't be undone later.
+When Play Console sets up Play App Signing, choose to **use your own app signing key** and upload the existing `moojot-release.jks` key (Play Console shows the export steps, using its PEPK tool). Play then signs with the same certificate as the GitHub APK (`CN=MooJot`, the app's earlier name, which predates the rename and never changes; SHA-256 `be15a0f5…5041a3a1`). The landing page promises that every release is signed with that key, and it lets people move between the GitHub APK and Play without uninstalling. If Play generates its own key instead, a GitHub install has to be uninstalled before the Play version can be installed, and uninstalling deletes the records. This choice can't be undone later.

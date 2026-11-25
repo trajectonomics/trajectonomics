@@ -3,7 +3,7 @@
 // plain Node. The changelog texts live here (not in i18n.ts) for the same reason.
 
 export type WhatsNewLang = "en" | "th";
-export type WhatsNewIcon = "lock" | "bell-ring" | "smartphone" | "mail" | "bell";
+export type WhatsNewIcon = "lock" | "bell-ring" | "smartphone" | "mail" | "bell" | "sparkles";
 export type WhatsNewAction = "app-lock" | "reminder" | "widget-help" | "feedback";
 
 export interface WhatsNewItem {
@@ -24,6 +24,24 @@ export interface WhatsNewRelease {
 
 /** Newest first. Add an entry for every release: a unit test fails when the newest one is older than package.json. */
 export const CHANGELOG: WhatsNewRelease[] = [
+  {
+    version: "1.5.0",
+    date: "2026-11-25",
+    items: [
+      {
+        id: "rename",
+        icon: "sparkles",
+        title: {
+          en: "MooJot is now OpenJot",
+          th: "MooJot เปลี่ยนชื่อเป็น OpenJot แล้ว",
+        },
+        body: {
+          en: "Same app and same Moo, now by Trajectonomics. Your records, settings and app lock stay exactly as they were.",
+          th: "แอปเดิม มูตัวเดิม ตอนนี้โดย Trajectonomics รายการ การตั้งค่า และล็อกแอปของคุณยังอยู่ครบเหมือนเดิม",
+        },
+      },
+    ],
+  },
   {
     version: "1.4.0",
     date: "2026-11-24",

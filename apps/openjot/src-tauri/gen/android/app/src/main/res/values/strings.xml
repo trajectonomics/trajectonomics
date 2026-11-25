@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">"moojot"</string>
-    <string name="main_activity_title">"moojot"</string>
+    <string name="app_name">"OpenJot"</string>
+    <string name="main_activity_title">"OpenJot"</string>
     <!-- Home-screen widget (#81). The app sends its own labels once it has run. -->
     <string name="widget_description">Moo, your jot streak and today\'s spending</string>
-    <string name="widget_empty">Open MooJot to start jotting</string>
+    <string name="widget_empty">Tap OpenJot to start jotting</string>
     <string name="widget_today">Today</string>
     <string name="widget_period">This period</string>
     <string name="widget_add">+ Jot</string>
