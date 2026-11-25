@@ -1,6 +1,7 @@
 import { toChartNumber } from "../../chart/number"
 import type { AmountRow, CurrencyTotal, Pnl } from "../../contract"
 import { formatDate } from "../../format"
+import { unavailableTotalNote } from "../ledger/pnl"
 
 /** The profit and loss card: the period, the CLI's totals, and its three largest rows. */
 export interface PnlView {
@@ -8,13 +9,16 @@ export interface PnlView {
 	readonly totals: readonly CurrencyTotal[]
 	readonly largest: readonly AmountRow[]
 	readonly hasRows: boolean
+	/** Set when the total is not stated because the rows' sum is out of range; the rows are still stated. */
+	readonly note: string | null
 }
 
 /** The P&L card's reading of one `report pnl` Read. */
 export function pnlView(data: Pnl): PnlView {
 	return {
 		period: periodOf(data),
-		totals: data.totals,
+		totals: data.totals ?? [],
+		note: unavailableTotalNote(data),
 		largest: largestRows(data.rows, 3),
 		hasRows: data.rows.length > 0,
 	}
