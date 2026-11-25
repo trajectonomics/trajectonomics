@@ -105,3 +105,41 @@ An id tax-core would refuse is found by asking `thFilerLabel`, so the pattern li
 
 **Hand check, pinned in `projection run`'s tests.** Salaries of 1,000,000 and 500,000 baht, two Owners, joint:
 assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowances 60,000 + 60,000 = 120,000; taxable 1,180,000; tax 0 + 7,500 + 20,000 + 37,500 + 50,000 + 45,000 = 160,000. The Levy over one label capped the couple at 100,000 of expenses: taxable 1,280,000, tax 185,000.
+
+## Amended (2026-11-25): step 4b, the separate Return
+
+`married_separate` now writes one Levy per Filer that has income, and the stored profile gains
+`returns`. The rest of the ADR is unchanged.
+
+- **Levy ids.** A separate Return writes `th-2026-pit@<person>`, one per Filer. `isTaxLevyId` owns the
+  pattern (the bare id, or the id and an `@` suffix), and `taxLevyIds` lists a document's set. A
+  joint or bare Return still writes the bare `th-2026-pit`.
+- **Which Filers.** A Filer has income when a taxed Flow or Account is theirs or `shared`, as for the
+  joint Return. A plan with no taxed item, no partner or no Owners keeps the bare labels and the one
+  Levy, so its output is byte-identical.
+- **Labels and Prepayments.** Each taxed item's label takes its Owner's suffix, `shared` included. A
+  write first takes every Prepayment this build wrote back to the bare id (summing the halves a
+  previous separate write split), then, for a separate Return, points each at its Flow's Owner's Levy.
+  A `shared` Flow's share is split half to each Levy and the odd basis point goes to the holder's, so
+  the total is unchanged. Switching back to joint or to `--none` joins the halves again.
+- **The stored `returns`.** `scenario.tax` gains an optional `returns`, an object keyed by person id,
+  written only for `married_separate` with Filers. Each entry holds `children`, `childrenAtHigherRate`
+  and the deductions it states, under the flat profile's keys; every key defaults to 0, children
+  included, and a zero deduction is left out, as the flat profile does. The flat keys stay the holder's
+  claims, so `scenario show` and every earlier reader read the same fields.
+- **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
+  `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. A
+  person-qualified value used without `married_separate` and Filers is refused at the flag. `--merge`
+  merges it into the stored `returns`, and `--from-stored` keeps them.
+- **The readers of the set.** `--carry-in` takes one record per Levy and treats any `th-2026-pit@…`
+  id as the CLI's own, so a past period needs no record of the caller's. `projection allowances` scans
+  every Levy and names the Levy and the Filer label each row read. ADR-0066's rule keeps the stored
+  profile only while the written set of Levies is canonically equal to the stored set. `projection run`
+  adds `filer` to each `taxYears[]` entry, from the Levy id, only when the plan has Filers; the `levy`
+  field was already there, and a plan without Filers keeps its bytes.
+- **The write check reads the Levy's own labels.** `filerLabelRefusal` accepts a label only when one of
+  the document's tax Levies tallies it exactly (trajectonomics/trajectonomics#561). A bare label still
+  fails, and so does `allowance.retirement.rmf@shared`, which no Levy reads: the check and the
+  projection now agree instead of the second refusing what the first stored. The Dashboard's
+  `isFilerPlan` reads the same rule from `document.levies`, so a plan whose labels are all bare but
+  whose Levy tallies suffixes is still a Filer plan.

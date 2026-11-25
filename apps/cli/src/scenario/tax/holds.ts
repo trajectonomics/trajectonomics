@@ -1,17 +1,19 @@
 import { isRecord } from "./json"
-import { TAX_LEVY_ID } from "./levy"
+import { isTaxLevyId } from "./levy-ids"
 
-/**
- * Whether a document holds the tax Levy this build writes. A stored tax profile describes that
- * Levy, so a write that leaves the document without it leaves the profile with nothing to describe
- * (cli ADR-0066).
- */
-export function holdsTaxLevy(document: unknown): boolean {
-	return taxLevyIn(document) !== undefined
+/** The tax Levies a document holds, in document order (cli ADR-0075). */
+export function taxLeviesIn(document: unknown): Record<string, unknown>[] {
+	if (!isRecord(document) || !Array.isArray(document["levies"])) return []
+	return document["levies"].filter(
+		(levy): levy is Record<string, unknown> => isRecord(levy) && isTaxLevyId(levy["id"]),
+	)
 }
 
-/** The tax Levy a document holds, or `undefined` when it holds none. */
-export function taxLevyIn(document: unknown): Record<string, unknown> | undefined {
-	if (!isRecord(document) || !Array.isArray(document["levies"])) return undefined
-	return document["levies"].find((levy) => isRecord(levy) && levy["id"] === TAX_LEVY_ID)
+/**
+ * Whether a document holds a tax Levy this build writes. A stored tax profile describes those
+ * Levies, so a write that leaves the document without them leaves the profile with nothing to
+ * describe (cli ADR-0066).
+ */
+export function holdsTaxLevy(document: unknown): boolean {
+	return taxLeviesIn(document).length > 0
 }

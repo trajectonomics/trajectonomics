@@ -1,6 +1,7 @@
 import type { LevyReport, Scenario } from "@trajectonomics/core/sim"
 import { thLevyAssumptions } from "@trajectonomics/core/tax/th"
 import { z } from "zod"
+import { filerOfTaxLevy } from "../scenario/tax"
 import { type AssumptionView, assumptionsField, assumptionViews } from "../tax-assumptions"
 import { dateField, moneyField, moneyOf } from "./money"
 import { breakdownOf } from "./tax-breakdown"
@@ -13,6 +14,8 @@ import { taxWalkShape } from "./tax-walk-schema"
  */
 export type TaxYearView = TaxWalkFields & {
 	levy: string
+	/** The Filer whose Return this Levy files, for a separate filing (cli ADR-0075). */
+	filer?: string | undefined
 	from: string
 	to: string
 	settlementDate: string
@@ -29,6 +32,12 @@ export type TaxYearView = TaxWalkFields & {
 
 export const taxYearView: z.ZodType<TaxYearView> = z.strictObject({
 	levy: z.string().describe("The Levy's id, as the Scenario spells it."),
+	filer: z
+		.string()
+		.optional()
+		.describe(
+			"The Filer whose Return this Levy files, for a separate filing (cli ADR-0075); absent when the plan keeps one Return.",
+		),
 	from: dateField("The period's first day"),
 	to: dateField("The period's last day"),
 	settlementDate: dateField("The day the amount owed is due to be paid"),
@@ -77,8 +86,10 @@ export function taxYearsOf(
 	if (levies === undefined) return []
 	return levies.flatMap((levy) => {
 		const rules = document.levies?.find((it) => it.id === levy.id)
+		const filer = filerOfTaxLevy(levy.id)
 		return levy.periods.map((period) => ({
 			levy: levy.id,
+			...(filer === undefined ? {} : { filer }),
 			from: period.from,
 			to: period.to,
 			settlementDate: period.settlementDate,

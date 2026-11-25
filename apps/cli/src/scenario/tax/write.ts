@@ -7,7 +7,6 @@ import { view, type WrittenScenario } from "../view"
 import { taxAssumptionsOf } from "./assumptions"
 import type { TaxFlags } from "./flags"
 import { type FlowLabel, flowLabelOf } from "./labels"
-import { TAX_LEVY_ID } from "./levy"
 import { taxModeOf } from "./mode"
 import { plannerOf, type Written } from "./plan"
 import { type TaxProfileView, taxProfileOf } from "./profile"
@@ -16,8 +15,10 @@ import { type TaxProfileView, taxProfileOf } from "./profile"
 export type TaxWritten = {
 	dryRun: boolean
 	status: "created" | "updated" | "unchanged"
-	/** The Levy id the write states; absent when --none wrote no Levy. */
+	/** The Levy id the write states; absent when --none wrote no Levy, or when it wrote several. */
 	levy?: string | undefined
+	/** The Levy ids a separate Return wrote, one per Filer; absent when it wrote one or none. */
+	levies?: string[] | undefined
 	/** The allowance classes the flags stated; absent when --none wrote no Levy. */
 	allowances?: TaxProfileView | undefined
 	/** The Filers of the Return the Levy is written over; absent when the plan keeps bare labels (cli ADR-0075). */
@@ -58,8 +59,9 @@ function noneWithLabel(input: TaxInput): AppError | null {
 
 /** What a write that wrote a Levy reports of it; the Filers only when it has any. */
 function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scenario"> {
+	const [only] = made.levies
 	return {
-		levy: TAX_LEVY_ID,
+		...(only !== undefined && made.levies.length === 1 ? { levy: only } : { levies: made.levies }),
 		...(made.filers === undefined ? {} : { filers: made.filers }),
 		allowances: taxProfileOf(made.request, made.document),
 		assumptions: taxAssumptionsOf(made.document),

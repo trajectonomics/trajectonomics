@@ -9,19 +9,25 @@ import {
 	type TaxRequest,
 	type ThFilingStatus,
 } from "./flags"
+import { returnOfStored, type StoredReturn, storedReturn, storedReturnOf } from "./stored-return"
 
 /**
  * The tax profile a Scenario keeps beside its document (cli ADR-0066): the flags `scenario tax`
  * was given, normalised. The jurisdiction, filing status and children counts always appear, with
  * the defaults the write applied; a deduction appears only when it is more than zero, because a
- * zero states nothing. Each key is the camelCase name of the flag that sets it.
+ * zero states nothing. Each key is the camelCase name of the flag that sets it. `returns` holds one
+ * claim set per Return of a separate filing (cli ADR-0075).
  */
 export type StoredTax = {
 	tax: TaxJurisdiction
 	filingStatus: ThFilingStatus
 	children: number
 	childrenAtHigherRate: number
+	returns?: Record<string, StoredReturn> | undefined
 } & { readonly [K in keyof TaxAllowances]?: number | undefined }
+
+/** A person id a Return may be keyed by: the Filer id pattern (tax ADR-0009). */
+const PERSON = /^[a-z0-9-]{1,32}$/
 
 /** The stored profile's shape, which `scenario show` prints and `traj schema` publishes. */
 export const storedTax: z.ZodType<StoredTax> = z
@@ -40,6 +46,12 @@ export const storedTax: z.ZodType<StoredTax> = z
 			.int()
 			.min(0)
 			.describe("Children born 2018 or later, a subset of children (--children-at-higher-rate)."),
+		returns: z
+			.record(z.string().regex(PERSON), storedReturn)
+			.optional()
+			.describe(
+				"One claim set per Return of a separate filing, keyed by person id (cli ADR-0075). Absent for a joint or single Return.",
+			),
 		...deductionFlags,
 	})
 	.describe(
@@ -57,6 +69,11 @@ export function storedTaxOf(request: TaxRequest): StoredTax {
 	for (const field of ALLOWANCE_FLAGS) {
 		if (request.allowances[field] > 0) stored[field] = request.allowances[field]
 	}
+	if (request.returns !== undefined) {
+		stored.returns = Object.fromEntries(
+			Object.entries(request.returns).map(([person, claims]) => [person, storedReturnOf(claims)]),
+		)
+	}
 	return stored
 }
 
@@ -68,6 +85,16 @@ export function requestOfStored(stored: StoredTax): TaxRequest {
 		children: stored.children,
 		childrenAtHigherRate: stored.childrenAtHigherRate,
 		allowances: allowancesOf(stored),
+		...(stored.returns === undefined
+			? {}
+			: {
+					returns: Object.fromEntries(
+						Object.entries(stored.returns).map(([person, claims]) => [
+							person,
+							returnOfStored(claims),
+						]),
+					),
+				}),
 	}
 }
 

@@ -214,6 +214,16 @@ letters, digits or hyphens, is refused by name. A plan without a partner or with
 lists the `filers` when it has any, and the household's Owners are read each time the
 tax is written, so after changing them run `traj scenario tax <name> --from-stored`.
 
+A couple who file separately get one Levy each. `--filing-status married_separate`
+writes `th-2026-pit@me` and `th-2026-pit@partner`, one per person who has a labelled
+Flow or Account, with the same Owner suffixes. Each Prepayment moves to the Levy of its
+Flow's Owner, and a `shared` Flow's Prepayment is split half to each. Each allowance flag
+takes a person (`--parents partner=2`) so each Return states its own claims, a bare value
+names the holder, and each Return's children default to 0; `--merge` and `--from-stored`
+keep the stored `returns`. A `projection run` then reports a `filer` on each `taxYears`
+entry, `--carry-in` takes one record per Levy, and `projection allowances` answers per
+Return.
+
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
 Levy and period, with a `"0.00"` for every class the period had no income in or

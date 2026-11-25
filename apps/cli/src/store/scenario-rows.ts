@@ -2,7 +2,7 @@ import type { AppError } from "../errors"
 import { scenarioDocumentError } from "../scenario/document-error"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
 import { filerLabelRefusal } from "../scenario/tax/filer-label-check"
-import { taxLevyIn } from "../scenario/tax/holds"
+import { taxLeviesIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
 import type { Ctx } from "./context"
 import { abort, guard } from "./guard"
@@ -56,10 +56,10 @@ export function anchorsFor(
  */
 export function taxKept(stored: ScenarioRow | null, document: unknown): string | null {
 	if (stored?.tax == null) return null
-	const written = taxLevyIn(document)
-	if (written === undefined) return null
-	const before = taxLevyIn(JSON.parse(stored.document))
-	if (before === undefined) return null
+	const written = taxLeviesIn(document)
+	if (written.length === 0) return null
+	const before = taxLeviesIn(JSON.parse(stored.document))
+	if (before.length === 0) return null
 	return canonicalJson(written, "levies") === canonicalJson(before, "levies") ? stored.tax : null
 }
 

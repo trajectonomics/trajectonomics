@@ -2,10 +2,10 @@ import { ThLevyContributionLabel } from "@trajectonomics/core/tax/th"
 import type { ScenarioDocument } from "../document"
 import { ALLOWANCE_FLAGS, type TaxAllowances } from "./allowances"
 import { bareLabelOf } from "./filer-labels"
-import type { TaxRequest } from "./flags"
+import type { ReturnClaims, TaxRequest } from "./flags"
 import { records } from "./json"
 import { flowsOf } from "./labels"
-import { leviesOf, TAX_LEVY_ID } from "./levy"
+import { taxLeviesOf } from "./levy-ids"
 
 /**
  * The deduction classes a `scenario tax` write can state, in the order the result lists them.
@@ -33,13 +33,14 @@ export type TaxProfileView = {
 	notStated: TaxAllowanceClass[]
 }
 
-/** The contribution labels the CLI's Levy reads, from the Levy's own tally measures. */
+/** The contribution labels the CLI's Levies read, from their own tally measures. */
 function fundedLabelsOf(document: ScenarioDocument): Set<string> {
-	const levy = leviesOf(document).find((it) => it["id"] === TAX_LEVY_ID)
 	const labels = new Set<string>()
-	for (const measure of records(levy?.["measures"])) {
-		if (measure["op"] === "tally" && measure["basis"] === "funded") {
-			labels.add(String(measure["label"] ?? ""))
+	for (const levy of taxLeviesOf(document)) {
+		for (const measure of records(levy["measures"])) {
+			if (measure["op"] === "tally" && measure["basis"] === "funded") {
+				labels.add(String(measure["label"] ?? ""))
+			}
 		}
 	}
 	return labels
@@ -55,6 +56,33 @@ function contributionLabelsOf(document: ScenarioDocument): Set<string> {
 	return labels
 }
 
+/** The classes the flag-stated claims name, for every Return of the write. */
+function statedClasses(claims: readonly ReturnClaims[]): Set<TaxAllowanceClass> {
+	const stated = new Set<TaxAllowanceClass>()
+	for (const claim of claims) {
+		if (claim.children > 0) stated.add("children")
+		for (const field of ALLOWANCE_FLAGS) {
+			if (claim.allowances[field] > 0) stated.add(field)
+		}
+	}
+	return stated
+}
+
+/** The classes the document's contribution Flows state, when a Levy reads their label. */
+function contributionClasses(document: ScenarioDocument): Set<TaxAllowanceClass> {
+	const read = fundedLabelsOf(document)
+	const stated = new Set<TaxAllowanceClass>()
+	for (const label of contributionLabelsOf(document)) {
+		if (!read.has(label)) continue
+		stated.add(
+			bareLabelOf(label) === ThLevyContributionLabel.ThaiEsg
+				? "thaiEsg"
+				: "retirementContributions",
+		)
+	}
+	return stated
+}
+
 /**
  * The allowance classes one written Levy states. A contribution class is stated only when the
  * Levy reads its label and a Flow carries it, which is read from the emitted graph rather than
@@ -62,18 +90,8 @@ function contributionLabelsOf(document: ScenarioDocument): Set<string> {
  * ineligible filer, zeroes it: this reports what the write was told, never what it applied.
  */
 export function taxProfileOf(request: TaxRequest, document: ScenarioDocument): TaxProfileView {
-	const stated = new Set<TaxAllowanceClass>()
-	if (request.children > 0) stated.add("children")
-	for (const field of ALLOWANCE_FLAGS) {
-		if (request.allowances[field] > 0) stated.add(field)
-	}
-	const read = fundedLabelsOf(document)
-	const carried = contributionLabelsOf(document)
-	for (const label of carried) {
-		if (!read.has(label)) continue
-		if (bareLabelOf(label) === ThLevyContributionLabel.ThaiEsg) stated.add("thaiEsg")
-		else stated.add("retirementContributions")
-	}
+	const claims = [request, ...Object.values(request.returns ?? {})]
+	const stated = new Set([...statedClasses(claims), ...contributionClasses(document)])
 	return {
 		stated: TAX_ALLOWANCE_CLASSES.filter((it) => stated.has(it)),
 		notStated: TAX_ALLOWANCE_CLASSES.filter((it) => !stated.has(it)),
