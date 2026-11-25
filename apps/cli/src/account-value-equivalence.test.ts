@@ -3,10 +3,13 @@ import { oraclePlan } from "./account/value/oracle.test-support"
 import { planValues } from "./account/value/plan"
 import type { ValueRequest } from "./account/value/types"
 import { chartHome, value } from "./account-value-support"
-import { isAppError } from "./errors"
+import { type AppError, isAppError } from "./errors"
 import { mustOpen } from "./store/testing"
 import type { PlannedRead } from "./store/tx-planning"
 import type { Traj } from "./tx-test-support"
+
+/** The most a Balance can hold, in baht: 2^53 - 1 satang. */
+const MOST = "90071992547409.91"
 
 type Entry = { account: string; date: string; value: string }
 
@@ -31,6 +34,12 @@ function readOf(home: string): PlannedRead {
 	)
 	store.close()
 	return read!
+}
+
+/** The body of a refusal; `toEqual` cannot compare two AppErrors, which keep it private. */
+function bodyOf(plan: unknown) {
+	expect(isAppError(plan)).toBe(true)
+	return (plan as AppError).body
 }
 
 /** A transaction a person recorded with `tx add`, dated between the dates a batch will state. */
@@ -102,7 +111,32 @@ describe("account value --file keeps each entry's Balance as it rescanned the Le
 			{ account: "Fund", date: "2026-01-10", value: "5.00" },
 			{ account: "Loan", date: "2026-03-01", value: "-2.00" },
 		])
-		expect(isAppError(fast)).toBe(true)
-		expect(fast).toEqual(slow)
+		expect(bodyOf(fast).details).toBeDefined()
+		expect(bodyOf(fast)).toEqual(bodyOf(slow))
+	})
+
+	it("refuses an entry the core refuses while it is applied, as the full rescan does", async () => {
+		const { home, traj } = await chartHome()
+		await own(traj, "Fund", "Food", MOST, "2026-01-15")
+		const { fast, slow } = bothPlans(home, [
+			{ account: "Fund", date: "2026-02-01", value: MOST },
+			{ account: "Home", date: "2026-02-02", value: "1.00" },
+		])
+		expect(bodyOf(fast).code).toBe("AMOUNT_OVERFLOW")
+		expect(bodyOf(fast).details).toBeDefined()
+		expect(bodyOf(fast)).toEqual(bodyOf(slow))
+	})
+
+	it("refuses an entry that overflows the account it posts against, at that account's field", async () => {
+		const { home, chart } = await chartHome()
+		const { fast, slow } = bothPlans(home, [
+			{ account: "Fund", date: "2026-01-01", value: MOST },
+			{ account: "Home", date: "2026-01-02", value: MOST },
+			{ account: "Fund", date: "2026-01-03", value: MOST },
+		])
+		const body = bodyOf(fast)
+		expect(body.code).toBe("AMOUNT_OVERFLOW")
+		expect(JSON.stringify(body)).toContain(`balance[${chart.Gains.id}]`)
+		expect(body).toEqual(bodyOf(slow))
 	})
 })

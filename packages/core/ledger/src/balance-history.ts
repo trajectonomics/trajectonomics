@@ -60,7 +60,7 @@ export const balanceHistory = (
 		byAccount.set(account.id, rows)
 	}
 	const series = new Map<string, Series>()
-	return {
+	return Object.freeze({
 		at: (accountId, asOf, plus = 0n) => {
 			const id = toAccountId(accountId)
 			if (!chart.has(id)) {
@@ -87,5 +87,5 @@ export const balanceHistory = (
 			}
 			return toSafeAmount(sumUpTo(own, cutoff) + plus, "balance.amount")
 		},
-	}
+	})
 }

@@ -8,7 +8,8 @@ import {
 	type Planned,
 	type TxPlanner,
 } from "../../store"
-import { applyEntry, type Batch, startBatch } from "./apply"
+import { applyEntry } from "./apply"
+import { type Batch, startBatch } from "./batch"
 import { type StoredValuation, storedValuations } from "./later"
 import { againstOf, inApplyOrder, prepareAll } from "./prepare"
 import { rejection } from "./rejection"
