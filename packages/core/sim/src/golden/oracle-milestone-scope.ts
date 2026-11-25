@@ -32,15 +32,30 @@ function routedAccount(cashflow: Scenario["cashflow"]): string {
 	return cash
 }
 
+/** The oracle lands income and expense Flows only: a transfer moves cash it does not model. */
+function assertFlows(scenario: Scenario): void {
+	for (const flow of scenario.flows) {
+		if (flow.kind !== "income" && flow.kind !== "expense") {
+			throw new Error("the oracle takes income and expense Flows only")
+		}
+		if (flow.kind === "income" && (flow.prepayments?.length || flow.cappedPrepayment)) {
+			throw new Error("the oracle takes income Flows with no prepayment only")
+		}
+	}
+	if (scenario.levies?.length) throw new Error("the oracle takes plans with no Levy only")
+}
+
 /**
  * Throws on any plan outside the oracle's scope: inflation, rates, a liability, a lock, a fee, a
- * payout, a Reserve floor, or routing that names more than one Account. Returns the one Account the
+ * payout, a Reserve floor, a Flow that is neither income nor expense, a prepayment, a Levy, or
+ * routing that names more than one Account. Returns the one Account the
  * plan draws on and fills, the cash survival reads. Every other Account is idle at rate 0.
  */
 export function assertScope(fixture: Fixture): string {
 	const { economy, accounts, cashflow } = fixture.scenario
 	if (economy.inflation !== 0) throw new Error("the oracle takes zero inflation only")
 	assertAccounts(accounts)
+	assertFlows(fixture.scenario)
 	return routedAccount(cashflow)
 }
 

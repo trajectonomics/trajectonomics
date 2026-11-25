@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import { expense, income } from "../engine/test-flows"
 import { makeFixture, type Setup } from "../engine/test-helpers"
-import type { Flow, Milestone } from "../types"
+import { transfer } from "../engine/test-transfer"
+import type { Flow, Levy, Milestone } from "../types"
 import { oracleWalk } from "./oracle-milestone-walk"
 
 const monthly = { frequency: "monthly", start: "2026-01-01" } as const
@@ -123,6 +124,48 @@ describe("the milestone oracle refuses plans outside its scope", () => {
 		const floor = setup({ withdraw: [{ account: "cash", downTo: 100 }] })
 		expect(walk(floor, [expense("food", 100, monthly)])).toThrow(
 			"the oracle takes withdrawals with no downTo floor only",
+		)
+	})
+
+	it("throws on a transfer Flow, which moves cash the oracle does not model", () => {
+		const two = setup({
+			accounts: [
+				{ id: "cash", kind: "asset", rate: 0 },
+				{ id: "bank", kind: "asset", rate: 0 },
+			],
+			balances: { cash: 300, bank: 0 },
+			horizon: "2026-01-20",
+			flows: [expense("food", 100, monthly), transfer("move", "cash", "bank", 200, monthly)],
+		})
+		expect(walk(two, [expense("food", 100, monthly)])).toThrow(
+			"the oracle takes income and expense Flows only",
+		)
+	})
+
+	it("throws on an income Flow with a prepayment or a capped prepayment", () => {
+		const prepaid = income("salary", 500, { ...monthly, prepayments: [{ levy: "tax", bps: 1000 }] })
+		expect(walk(setup({ flows: [prepaid] }), [prepaid])).toThrow(
+			"the oracle takes income Flows with no prepayment only",
+		)
+		const capped = income("salary", 500, {
+			...monthly,
+			cappedPrepayment: { levy: "tax", bps: 1000, upTo: "cap" },
+		})
+		expect(walk(setup({ flows: [capped] }), [capped])).toThrow(
+			"the oracle takes income Flows with no prepayment only",
+		)
+	})
+
+	it("throws on a Levy", () => {
+		const levy: Levy = {
+			id: "tax",
+			period: { month: 1, day: 1 },
+			settlement: { month: 1, day: 1 },
+			measures: [],
+			due: "due",
+		}
+		expect(walk(setup({ levies: [levy] }), [expense("food", 100, monthly)])).toThrow(
+			"the oracle takes plans with no Levy only",
 		)
 	})
 })

@@ -6,8 +6,8 @@ import type { DayInput, WalkInput } from "./walk-input"
 /**
  * Ends a walk that no Shortfall stopped, and resolves its buffer findings by date (ADR 0012). A
  * candidate that builds its own windows takes them from the fire dates its walk reached, then checks
- * the buffer on the accessible net worth the walk recorded. A shared table has no trace: its events
- * arrived during the walk in `early`, so both paths report the earliest breach or problem.
+ * the buffer on the accessible net worth the walk recorded. A shared table has no trace: its
+ * findings arrived during the walk in `early`, so both paths report the earliest breach or problem.
  */
 export function finish(
 	input: WalkInput,

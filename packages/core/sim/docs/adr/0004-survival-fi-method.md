@@ -112,9 +112,9 @@ not change the survival test. It is built on the growth seam and PRNG of ADR-000
   `RATE_OUT_OF_RANGE`. `paths` outside `1..200` is `INVALID_PATH_COUNT` and a malformed `seed` is
   `INVALID_SEED`; both arrive with the case, per ADR-0005's two-tier rule. An unknown `method`
   stays `INVALID_FI_METHOD`, which already exists.
-- **Overflow.** A prefix or candidate walk that overflows fails the whole call with
-  `VALUE_OVERFLOW` at its date and Account, unless a Shortfall or an earlier breach already fails
-  the path: a share over a shrunken sample would be a lie.
+- **Overflow.** `VALUE_OVERFLOW` at its date and Account, unless a Shortfall already ended the
+  path. Among buffer findings, an earlier breach outranks a later window that cannot be priced
+  (ADR 0012). A prefix overflow, or a flow or valuation overflow in a walk, always fails the call.
 - **Cost gate.** #19 landed, so the gate is met. The 200-path cap stays the method's own: the
   Outcome distribution's is 10,000, and the two never share an option type.
 
