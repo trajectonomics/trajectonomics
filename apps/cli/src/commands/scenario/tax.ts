@@ -10,6 +10,7 @@ import {
 	writeTax,
 } from "../../scenario/tax"
 import { deductionInputFlags } from "../../scenario/tax/deduction-flag-inputs"
+import { taxShownBody, unclaimedBlocks } from "../../scenario/tax/human"
 import { taxOutput } from "../../scenario/tax/output"
 
 export const tax: Leaf = defineCommand({
@@ -48,6 +49,7 @@ export const tax: Leaf = defineCommand({
 		ifHash: IF_HASH,
 	}),
 	output: taxOutput,
+	render: { display: taxShownBody, blocks: unclaimedBlocks },
 	examples: taxExamples,
 	errorCodes: ["database_busy", "invalid_input", "not_found", "scenario_changed"],
 	run: (input, ctx) => writeTax(input, ctx),

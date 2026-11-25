@@ -4,7 +4,7 @@ import type { AssumptionView } from "../../tax-assumptions"
 import { withStore } from "../../with-store"
 import { scenarioNotFound } from "../errors"
 import { view, type WrittenScenario } from "../view"
-import { writtenAssumptions } from "./departed-claims"
+import { taxAssumptionsOf } from "./assumptions"
 import type { TaxFlags } from "./flags"
 import { type FlowLabel, flowLabelOf } from "./labels"
 import { taxModeOf } from "./mode"
@@ -23,11 +23,10 @@ export type TaxWritten = {
 	allowances?: TaxProfileView | undefined
 	/** The Filers of the Return the Levy is written over; absent when the plan keeps bare labels (cli ADR-0075). */
 	filers?: string[] | undefined
-	/**
-	 * The unconfirmed tax figures the stored Levy would use, and the claims a separate filing keeps under
-	 * an id no longer in the household; absent when --none wrote no Levy.
-	 */
+	/** The unconfirmed tax figures the stored Levy would use; absent when --none wrote no Levy. */
 	assumptions?: AssumptionView[] | undefined
+	/** What the stored profile keeps that no Return of this write claims; absent when there is nothing. */
+	unclaimed?: string[] | undefined
 	scenario: WrittenScenario
 }
 
@@ -67,7 +66,8 @@ function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scena
 		...(only !== undefined && made.levies.length === 1 ? { levy: only } : { levies: made.levies }),
 		...(made.filers === undefined ? {} : { filers: made.filers }),
 		allowances: taxProfileOf(made.request, made.document),
-		assumptions: writtenAssumptions(made),
+		assumptions: taxAssumptionsOf(made.document, made.separateLoans),
+		...(made.unclaimed.length === 0 ? {} : { unclaimed: made.unclaimed }),
 	}
 }
 

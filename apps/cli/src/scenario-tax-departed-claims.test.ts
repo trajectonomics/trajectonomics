@@ -3,7 +3,6 @@ import { setHousehold } from "./scenario-household-support"
 import { couple, coupleHousehold, TWO_SALARIES, taxCouple } from "./scenario-tax-filers-support"
 import { LABELS, year2026 } from "./scenario-tax-separate-support"
 import { resultOf, scenario } from "./scenario-test-support"
-import type { AssumptionView } from "./tax-assumptions"
 
 /* Claims stored under an id no longer in the household sit on no Return (cli ADR-0075). */
 
@@ -26,6 +25,7 @@ const CLAIM: readonly string[] = ["--life-insurance", "80000"]
 const WHOLE = ["--tax", "th-2026", "--filing-status", "married_separate"]
 const SEPARATE = ["--merge", "--filing-status", "married_separate"]
 const JOINT = ["--merge", "--filing-status", "married_joint"]
+const SINGLE = ["--merge", "--filing-status", "single"]
 
 const tax = (home: string, ...flags: string[]) => scenario(home, ["tax", "base", ...flags])
 const owed = async (home: string) =>
@@ -43,94 +43,84 @@ async function rehoused(claims: readonly string[], household: typeof MARRIED | n
 	return home
 }
 
-/** What a successful write assumes. */
-async function assumed(home: string, ...flags: string[]): Promise<AssumptionView[]> {
+/** What a successful write leaves unclaimed; absent reads as nothing. */
+async function unclaimed(home: string, ...flags: string[]): Promise<string[]> {
 	const res = await tax(home, ...flags)
 	expect(res.code, res.err).toBe(0)
-	return resultOf(res).assumptions as AssumptionView[]
+	return resultOf(res).unclaimed ?? []
 }
 
-/** The entries for stored claims, one per id. */
-const stored = (found: readonly AssumptionView[]) =>
-	found.filter((it) => it.path.startsWith("returns."))
-const reported = async (home: string, ...flags: string[]) =>
-	stored(await assumed(home, ...flags)).map((it) => it.path)
+/** The sentence for an id no person in the household has. */
+function departed(id: string): string {
+	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person in the household; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+}
 
 describe("a holder given a new id after claims were stated", () => {
 	it.each([
 		["--from-stored", ["--from-stored"]],
 		["--merge", ["--merge", "--parents", "alice=1"]],
 		["a dry run", ["--from-stored", "--dry-run"]],
-	])("is reported by %s, naming the old id", async (_how, flags) => {
+	])("is named by %s, under the old id", async (_how, flags) => {
 		const home = await rehoused(CLAIM, ALICE)
-		const [entry, ...more] = stored(await assumed(home, ...flags))
-		expect(more).toEqual([])
-		expect(entry).toMatchObject({ path: "returns.me", value: 0, status: "unsourced" })
-		expect(entry?.note).toContain(
-			'The claims stored for "me", who is not in the household, are not counted on any Return.',
-		)
-		expect(entry?.note).toContain("--tax or <person>=<value> flags")
+		expect(await unclaimed(home, ...flags)).toEqual([departed("me")])
 	})
 
-	it("is reported by every later separate write, while the claims sit on no Return", async () => {
+	it("stays named by every later separate write while the claims sit on no Return", async () => {
 		const home = await rehoused(CLAIM, ALICE)
-		expect(await reported(home, "--from-stored")).toEqual(["returns.me"])
+		expect(await unclaimed(home, "--from-stored")).toEqual([departed("me")])
 		// Without the 80,000 alice owes 83,000.00, where the Return of "me" owed 67,000.00.
 		expect((await owed(home))["alice"]).toBe("83000.00")
-		expect(await reported(home, "--from-stored")).toEqual(["returns.me"])
-		expect(await reported(home, "--merge", "--parents", "partner=1")).toEqual(["returns.me"])
+		expect(await unclaimed(home, "--merge", "--parents", "partner=1")).toEqual([departed("me")])
 		// Stated again for alice, they are counted; the old set is still stored on no Return.
 		const again = ["--merge", "--life-insurance", "alice=80000"]
-		expect(await reported(home, ...again)).toEqual(["returns.me"])
+		expect(await unclaimed(home, ...again)).toEqual([departed("me")])
 		expect((await owed(home))["alice"]).toBe("67000.00")
-		expect(await reported(home, ...WHOLE)).toEqual([])
-		expect(await reported(home, "--from-stored")).toEqual([])
+		// The sentence names where the set is: scenario show keeps it under `returns` until --tax.
+		const shown = resultOf(await scenario(home, ["show", "base"])).scenario
+		expect(shown.tax.returns.me).toMatchObject({ lifeInsurance: 80000 })
+		expect(await unclaimed(home, ...WHOLE)).toEqual([])
+		expect(await unclaimed(home, "--from-stored")).toEqual([])
 	})
 
-	it("is reported from the first write that stops counting the claims", async () => {
+	it("is not named by the joint write that counts the flat claims, but by the next separate one", async () => {
 		const home = await rehoused(CLAIM, ALICE)
 		// A joint Return is one Return and carries the flat claims whoever the holder is.
-		expect(await reported(home, ...JOINT)).toEqual([])
-		expect(await reported(home, ...SEPARATE)).toEqual(["returns.me"])
-		// Once moved off the flat keys, a joint Return names them in the kept-claims note alone.
-		const joined = await assumed(home, ...JOINT)
-		expect(stored(joined)).toEqual([])
-		expect(joined.map((it) => it.note).join()).toContain('The claims stored for "me" are kept')
+		expect(await unclaimed(home, ...JOINT)).toEqual([])
+		expect(await unclaimed(home, ...SEPARATE)).toEqual([departed("me")])
+		// The departed sentence never says the set waits for a separate filing.
+		expect((await unclaimed(home, ...SEPARATE)).join()).not.toContain("kept for a separate filing")
 	})
 })
 
 describe("a partner given a new id after claims were stated", () => {
-	it("is reported, naming the old id", async () => {
-		const home = await rehoused(["--life-insurance", "partner=50000"], MARRIED)
-		const before = await owed(home)
-		expect(before["partner"]).toBe("7000.00")
-		expect((await setHousehold(home, BOB)).code).toBe(0)
-		expect(await reported(home, "--from-stored")).toEqual(["returns.partner"])
+	it("is named by a joint write, which counts no stored set", async () => {
+		const home = await rehoused(["--life-insurance", "partner=50000"], BOB)
+		expect((await owed(home))["partner"]).toBe("7000.00")
+		// A joint Return counts only the flat claims, so the old partner's set is on no Return.
+		expect(await unclaimed(home, ...JOINT)).toEqual([departed("partner")])
+		expect(await unclaimed(home, ...SINGLE)).toEqual([departed("partner")])
+		expect(await unclaimed(home, ...SEPARATE)).toEqual([departed("partner")])
 		expect((await owed(home))["bob"]).toBe("11500.00")
-		expect(await reported(home, "--from-stored")).toEqual(["returns.partner"])
 	})
 
-	it("has an entry of its own beside the holder's", async () => {
+	it("has a sentence of its own beside the holder's", async () => {
 		const claims = [...CLAIM, "--life-insurance", "partner=50000"]
 		const home = await rehoused(claims, renamed("partner", "bob", ALICE))
-		expect(await reported(home, "--from-stored")).toEqual(["returns.me", "returns.partner"])
+		expect(await unclaimed(home, "--from-stored")).toEqual([departed("me"), departed("partner")])
 	})
 })
 
 describe("a separate write with no Filers", () => {
-	it("names each stored claim set once, a departed id in its own entry", async () => {
+	it("names each stored claim set once, and no departed one as having no income", async () => {
 		const claims = [...CLAIM, "--life-insurance", "partner=50000"]
 		const home = await rehoused(claims, renamed("me", "alice", coupleHousehold([])))
-		const found = await assumed(home, "--from-stored")
-		const [entry, ...more] = stored(found)
-		expect(more).toEqual([])
-		expect(entry?.path).toBe("returns.me")
-		// A person-qualified value is refused without Filers, so the note offers none.
-		expect(entry?.note).toContain("for example with --tax.")
-		expect(entry?.note).not.toContain("<person>")
-		const kept = found.find((it) => it.path === "allowances.mortgageInterestCeiling")
-		expect(kept?.note).toContain('The claims stored for "partner" are kept')
-		expect(kept?.note).not.toContain('"me"')
+		const found = await unclaimed(home, "--from-stored")
+		expect(found).toHaveLength(2)
+		expect(found[0]).toContain('The claims stored for "partner" are kept')
+		expect(found[0]).not.toContain('"me"')
+		expect(found[0]).not.toContain("with --merge")
+		expect(found[1]).toBe(departed("me"))
+		expect(found.join()).not.toContain("has no taxed income")
 	})
 })
 
@@ -142,6 +132,6 @@ describe("a write with nothing left behind", () => {
 		["everyone keeps their id", [...CLAIM, "--life-insurance", "partner=50000"], MARRIED],
 	])("says nothing when %s", async (_when, claims, household) => {
 		const home = await rehoused(claims, household)
-		expect(await reported(home, "--from-stored")).toEqual([])
+		expect(await unclaimed(home, "--from-stored")).toEqual([])
 	})
 })

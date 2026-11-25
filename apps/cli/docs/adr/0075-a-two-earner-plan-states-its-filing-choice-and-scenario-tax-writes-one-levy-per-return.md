@@ -160,16 +160,16 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
     current holder's.
   - The record names a person by id. A holder given a new id reads as another person: the flat claims
     stay under the old id, and the new one's Return starts from nothing until the caller states them.
-    The result reports it (trajectonomics/trajectonomics#614). Every `married_separate` write, by
-    `--merge` or `--from-stored` and a dry run of either, adds to `assumptions` one entry for each id
-    in the written `returns` that no person in the household has. Such a set claims something, because
-    `returns` keeps no empty set for a person with no Return. The entry is at path `returns.<id>`,
-    with value 0 and status `unsourced`, and names the id. So a partner given a new id is reported as
-    a holder is, and the entry stays for as long as the claims sit on no Return. Stating them again
-    for a person in the household leaves the old set stored: a `--tax` write drops it, and a household
-    that has the old id again ends the entry. A joint or single write adds none, because it counts the
-    flat claims on its Return, and the kept-claims note (#606, below) names the sets in `returns`. A
-    write with no household cannot judge an id and adds none.
+    The result reports it (trajectonomics/trajectonomics#614). Every write on a plan with a household,
+    by `--merge` or `--from-stored` and a dry run of either, adds to `unclaimed` one sentence for each
+    id in the written `returns` that no person in the household has. Such a set claims something,
+    because `returns` keeps no empty set for a person with no Return. The sentence says the set is on
+    no Return, and that a `--tax` write drops it. So a partner given a new id is reported as a holder
+    is, and the sentence stays for as long as the claims sit on no Return. Stating them again for a
+    person in the household leaves the old set stored: a `--tax` write drops it, and a household that
+    has the old id again ends the sentence. A joint or single write says it too, because its one Return
+    counts only the flat claims: no sentence says the set waits for a separate filing. A write with no
+    household cannot judge an id and says nothing.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
   that claims something, whatever the filing status and also while the household names no partner or
@@ -250,12 +250,12 @@ This is the follow-up the shared home-loan ceiling left above.
   `assumptions` on `allowances.mortgageInterestCeiling`, that the shared interest the profile keeps is
   not claimed, with the amount and `--mortgage-interest <amount> --merge` as the way to state this
   Return's interest. It says the same of the claims kept for another person, naming them, whatever
-  they claim: apart from the entries of #614, every entry of `assumptions` is one of tax-core's
-  figures, so this is the entry that carries a sentence about a claim. The entry keeps tax-core's
-  value and status, and is added when the Levy claims no home-loan interest. On a `married_separate`
-  write with no Filers, an id no longer in the household is left out of this sentence, because it has
-  its own entry (#614, above). A separate write whose sole Filer leaves the other person's stored
-  claims unclaimed says nothing of a person still in the household, as before.
+  they claim, in the kept-claims sentence that the #627 amendment below moves to `unclaimed`. The
+  entry keeps tax-core's value and status, and is added when the Levy claims no home-loan interest. An
+  id no longer in the household has its own sentence in `unclaimed` (#614, above, and the #627
+  amendment below), so neither branch of the kept-claims sentence names it. A separate write whose
+  sole Filer leaves the other person's stored claims unclaimed says nothing of a person still in the
+  household, as before.
 - **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
@@ -267,3 +267,39 @@ This is the follow-up the shared home-loan ceiling left above.
   Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
   2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
   the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.
+
+## Amended (2026-11-26): claims a write keeps and does not claim have their own field (#627)
+
+This replaces "What a Return does not claim is said" above, whose entry under `assumptions` read as if
+the Return used the home-loan ceiling.
+
+- **The field.** The `scenario tax` write result gains an optional `unclaimed`, a list of sentences. It
+  is absent when there is nothing to say, and with `--none`, rather than an empty list, so a plan that
+  never had Filers prints the same bytes as before. The human Format prints it under "Claims stored but
+  not claimed by this write:", before the assumptions. The heading says "write" because a separate
+  filing writes two Returns.
+- **`assumptions` are tax-core's figures only.** No sentence about a kept claim is on an entry, and no
+  entry is added to carry one, so a Return that claims no home-loan interest no longer lists the
+  ceiling. The separate-loans note stays on the ceiling's entry, because it says how a figure the
+  Returns use was applied. An id no longer in the household has its sentence in `unclaimed` too
+  (#614), not an entry of its own.
+- **A write that is not a separate one with Filers** names the shared interest the profile keeps, then
+  the other people whose claims it keeps. The second says how to state them bare with `--merge` only
+  under `married_joint` and `married_no_income_spouse`. A single or separate Return claims only the
+  Filer's own parents, and the bare count form bypasses tax-core's refusal of a spouse slot on it, so
+  there the hint would invite a claim the caller's filing cannot make. Where it prints, the hint is
+  conditional ("If this Return does not claim them yet"), so it stays true after it has been followed,
+  and it says that stating them bare replaces the stored flat claims, which a later separate filing
+  reads as the holder's own, so the holder's own claims must be stated again when switching back. A
+  later separate write that states more than a Return may claim, such as three parents, is refused;
+  within the cap nothing refuses it, so the holder's claims must be restated as above.
+- **A separate write with Filers** says, for each person still in the household who has no Return and
+  whose stored claims are not all zero: `"<person>" has no taxed income in this plan, so no Return
+  claims their stored claims.` This covers an earlier partner still in the household, and also the
+  holder, whose claims the profile keeps in its flat keys when the partner is the only Filer. A
+  departed id is left out of this sentence and named once by its own (#614).
+- **A departed id** is named in `unclaimed` by every write, whatever the filing status: the stored set
+  is on no Return. No sentence says it is kept for a separate filing, because a separate Return counts
+  it no more than a joint one does. The sentence says a `--tax` write drops the set, so it stays right
+  after the claims are stated again under a person in the household.
+- The stored profile, the Levies and the money are unchanged.
