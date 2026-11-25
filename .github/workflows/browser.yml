@@ -3,14 +3,27 @@ name: Browser checks (site)
 # axe, the keyboard, the Language checks and the Lighthouse budget need a browser, so they run here
 # and not in the shared check. This is the port of apps/site/.github/workflows/browser.yml.
 #
-# Pull requests run it when they touch the site, the brand package or the lockfile. Pushes to main
+# Pull requests run it when they touch the site, the Demo's inputs (the Dashboard, the command line
+# the Demo's snapshot reads, and the core engine), the brand package or the lockfile. Pushes to main
 # run it too, so a merge that breaks the site is seen on main.
 on:
   pull_request:
-    paths: ["apps/site/**", "packages/brand/**", "bun.lock"]
+    paths:
+      - "apps/site/**"
+      - "apps/web/**"
+      - "apps/cli/src/**"
+      - "packages/core/**"
+      - "packages/brand/**"
+      - "bun.lock"
   push:
     branches: [main]
-    paths: ["apps/site/**", "packages/brand/**", "bun.lock"]
+    paths:
+      - "apps/site/**"
+      - "apps/web/**"
+      - "apps/cli/src/**"
+      - "packages/core/**"
+      - "packages/brand/**"
+      - "bun.lock"
   workflow_dispatch:
 
 permissions:

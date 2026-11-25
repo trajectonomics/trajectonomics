@@ -46,7 +46,12 @@ const amount: z.ZodString = z
 	.describe('A decimal string at the currency\'s own scale, as "1234.56".')
 
 const tallyForm: z.ZodType<CarryInTallyForm> = z.strictObject({
-	label: z.string().min(1).describe("A Tally label one of the Levy's own measures reads."),
+	label: z
+		.string()
+		.min(1)
+		.describe(
+			"A Tally label one of the Levy's own measures reads. A Levy over Filers, the joint Return of a household with a partner and Owners, reads Filer labels instead of bare ones: each of its 29 classes once for each Filer, as income.section40_1@<person id>, and its 22 income classes once more for income of both, as income.section40_1@shared.",
+		),
 	basis: z.enum(CARRY_IN_BASES).describe("The basis that measure tallies it under."),
 	amount,
 })

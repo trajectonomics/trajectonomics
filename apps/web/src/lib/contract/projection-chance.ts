@@ -100,7 +100,12 @@ const representative = z.strictObject({
  */
 export const projectionChance = z.strictObject({
 	...projectionShape,
-	definition: z.strictObject({ modelId: z.string(), seed: z.string(), paths: integer }),
+	definition: z.strictObject({
+		modelId: z.string(),
+		seed: z.string(),
+		paths: integer,
+		modelHash: z.string(),
+	}),
 	paths: integer,
 	succeeded: integer,
 	successBps: integer,

@@ -1,6 +1,7 @@
 import type { AppError } from "../errors"
 import { scenarioDocumentError } from "../scenario/document-error"
 import { type ResolvedAnchors, resolveHousehold } from "../scenario/household/resolve"
+import { filerLabelRefusal } from "../scenario/tax/filer-label-check"
 import { taxLevyIn } from "../scenario/tax/holds"
 import { canonicalJson, contentHash } from "./canonical"
 import type { Ctx } from "./context"
@@ -18,6 +19,8 @@ export { liveScenario }
 export function canonicalDocument(document: unknown, path = "document"): string {
 	const failure = scenarioDocumentError(document, path)
 	if (failure !== null) return abort(failure)
+	const filer = filerLabelRefusal(document)
+	if (filer !== null) return abort(filer)
 	return canonicalJson(document, path)
 }
 

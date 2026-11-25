@@ -2,6 +2,9 @@ import { shippedThemes } from "../design/shipped-themes"
 import type { DesignTokens } from "../design/tokens"
 import type { BuiltFile } from "./built-files"
 import { checkTextContrast } from "./contrast"
+import { checkDemoHome, isDemoFile } from "./demo"
+import { checkDemoHeaders } from "./demo-headers"
+import { checkDemoLinks } from "./demo-links"
 import { checkDescription } from "./description"
 import { checkDocumentTitle } from "./document-title"
 import { checkExternalAssets } from "./external-assets"
@@ -83,12 +86,18 @@ export function checkBuild(
 	mode: BuildMode = DEFAULT_BUILD_MODE,
 ): readonly BuildFailure[] {
 	const themes = shippedThemes(mode)
+	// The Site's own rules judge the Site's pages and assets. The hosted Demo is a different build
+	// with its own vocabulary, so it is judged by the Demo's rules instead ([ADR 0031]).
+	const siteFiles = files.filter((file) => !isDemoFile(file.path))
 	return [
-		...FILE_RULES.flatMap((rule) => rule(files)),
-		...TOKEN_RULES.flatMap((rule) => rule(files, tokens)),
-		...checkTheme(files, tokens, themes),
-		...checkThemeColour(files, tokens, themes),
-		...checkOwnerPlaceholder(files, mode),
+		...FILE_RULES.flatMap((rule) => rule(siteFiles)),
+		...TOKEN_RULES.flatMap((rule) => rule(siteFiles, tokens)),
+		...checkTheme(siteFiles, tokens, themes),
+		...checkThemeColour(siteFiles, tokens, themes),
+		...checkOwnerPlaceholder(siteFiles, mode),
+		...checkDemoHome(files),
+		...checkDemoLinks(files),
+		...checkDemoHeaders(files),
 	]
 }
 

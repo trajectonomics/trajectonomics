@@ -40,7 +40,7 @@ export interface BandRow {
 
 /** The whole Chance of success page for one Scenario: the summary, the inputs, the Bands and the bars. */
 export interface ChanceView extends ChanceSummary {
-	readonly definition: { readonly modelId: string; readonly seed: string; readonly paths: number }
+	readonly definition: ProjectionChance["definition"]
 	/** One series per fan Percentile, one point per roll-up, in the Percentile order of FAN_LEVELS. */
 	readonly series: readonly LineSeries[]
 	readonly runsOut: readonly RunsOutBar[]

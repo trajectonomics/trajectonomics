@@ -26,9 +26,6 @@ export type TrialRowView = {
 /** One per-currency Trial Balance total. */
 export type TrialTotalView = { currency: string; debit: string; credit: string }
 
-/** A Trial Balance whose totals are stated: what `doctor` reads, where a refused total fails the check. */
-export type TrialBalanceView = { rows: TrialRowView[]; totals: TrialTotalView[] }
-
 /** The Trial Balance of `balance`: its totals are null, with the reason, when their sum leaves the safe range. */
 export type TrialBalanceReport = {
 	rows: TrialRowView[]

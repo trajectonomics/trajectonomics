@@ -76,12 +76,6 @@ describe("a trial balance whose column total is outside the safe range", () => {
 		expect(data.trialBalance.totals).toBeNull()
 		expect(names(data.rows)).toHaveLength(6)
 	})
-
-	it("leaves `doctor` refusing the date it cannot compare", async () => {
-		const { traj } = await overdrawnHome()
-		const res = await traj(["doctor", "--as-of", "2026-02-11", "--json"])
-		expect(res.out + res.err).toContain("AMOUNT_OVERFLOW")
-	})
 })
 
 describe("a P&L whose total is outside the safe range", () => {

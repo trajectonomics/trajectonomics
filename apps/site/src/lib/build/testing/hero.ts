@@ -1,6 +1,7 @@
 import type { Language } from "../../language/language"
 import { CLEAN_URL, LANGUAGES, languageEntry, languageHomeFile } from "../../language/languages"
 import {
+	DEMO_PATH,
 	DOCS_PATH,
 	GITHUB_ORG_URL,
 	GITHUB_REPO_URL,
@@ -52,6 +53,7 @@ export function heroHome(language: Language, parts: HeroParts = {}): BuiltFile {
 		`<h1>${headline}</h1>`,
 		`<p>${parts.subline ?? dictionary.heroSubline}</p>`,
 		installWindow(dictionary, parts),
+		`<p><a href="${DEMO_PATH}">${dictionary.demoLink}</a></p>`,
 		'<p role="status"></p>',
 		"<section>",
 		`<h2>${dictionary.actionHeading}</h2>`,

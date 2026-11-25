@@ -7,6 +7,7 @@ import { householdDocument } from "../scenario/household/document"
 import type { Household } from "../scenario/household/model"
 import { applyScenarioSets } from "../scenario/set-apply"
 import type { AppliedOverride } from "../scenario/set-error"
+import { unreadLabelRefusal } from "../scenario/tax/filer-label-check"
 import type { Store } from "../store"
 import { contentHash, supportedCurrency } from "../store"
 import { canonicalJson } from "../store/canonical"
@@ -74,6 +75,14 @@ function thbOnly(document: ScenarioDocument): AppError | null {
 }
 
 /**
+ * What keeps a document from being projected: a currency the Baseline cannot take, then a tax
+ * label no Levy reads, which the Levy would tally as nothing (cli ADR-0075).
+ */
+function unprojectable(document: ScenarioDocument): AppError | null {
+	return thbOnly(document) ?? unreadLabelRefusal(document)
+}
+
+/**
  * Resolves one Scenario by name or id, applies the `--set` Overrides transiently (ADR-0024),
  * maps the Ledger's Balances at `asOf` (ADR-0026) and builds the Timeline. It never writes, and
  * it reads nothing the caller did not state (ADR-0030): the store, the Ledger and the flags are
@@ -89,7 +98,7 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		decimal: input.decimal,
 	})
 	if (isAppError(applied)) return applied
-	const unsupported = thbOnly(applied.document)
+	const unsupported = unprojectable(applied.document)
 	if (unsupported !== null) return unsupported
 	const household = householdOfRow(row.household)
 	if (isAppError(household)) return household

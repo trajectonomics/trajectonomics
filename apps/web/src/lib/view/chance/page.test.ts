@@ -85,6 +85,7 @@ describe("chanceViewOf", () => {
 			modelId: "illustrative-demo-model",
 			seed: "0123456789abcdef",
 			paths: 200,
+			modelHash: "jcs1:sha256:0000000000000000000000000000000000000000000000000000000000000000",
 		})
 		expect(view.notes).toEqual(["Every figure is nominal."])
 		expect(view.runsOut.map((bar) => bar.paths)).toEqual([0, 12, 14])

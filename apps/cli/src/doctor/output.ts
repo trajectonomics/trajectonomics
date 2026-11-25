@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { countsSchema } from "../counts"
-import { type TrialTotalView, trialTotal } from "../report/view"
 import type { RestoreCounts } from "../store"
+import { type DoctorTrialBalance, doctorTrialBalance } from "./trial-output"
 
 /** One thing `traj doctor` looked at: `pass`, `fail`, or `skipped` with the reason it could not. */
 export const DOCTOR_CHECKS = [
@@ -15,13 +15,6 @@ export const DOCTOR_CHECKS = [
 export type DoctorCheckName = (typeof DOCTOR_CHECKS)[number]
 export type DoctorStatus = "pass" | "fail" | "skipped"
 export type DoctorCheck = { name: DoctorCheckName; status: DoctorStatus; detail: string }
-
-/** The Trial Balance as a check reads it: the figures, and whether the two columns agree. */
-export type DoctorTrialBalance = {
-	asOf: string
-	totals: TrialTotalView[]
-	balanced: boolean
-}
 
 /**
  * `traj doctor`'s result. `ok` is true only when no check failed; a skipped check is one the
@@ -87,13 +80,6 @@ export const doctorOutput: z.ZodType<DoctorResult> = z.strictObject({
 			),
 	}),
 	rows: countsSchema.describe("Every stored row, tombstones included; all zero when absent."),
-	trialBalance: z
-		.strictObject({
-			asOf: z.string().describe("The date the Trial Balance is stated at."),
-			totals: z.array(trialTotal).describe("One entry per currency."),
-			balanced: z.boolean().describe("Whether every currency's debits equal its credits."),
-		})
-		.optional()
-		.describe("Present only when --as-of was given."),
+	trialBalance: doctorTrialBalance.optional().describe("Present only when --as-of was given."),
 	checks: z.array(check).describe("One entry per check, in the order they ran."),
 })

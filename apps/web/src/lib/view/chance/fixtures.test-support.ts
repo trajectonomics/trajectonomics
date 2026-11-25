@@ -25,7 +25,12 @@ export function chanceFixture(overrides: Partial<ProjectionChance> = {}): Projec
 		notes: ["Every figure is nominal."],
 		horizon: "2028-12-31",
 		currency: "THB",
-		definition: { modelId: "illustrative-demo-model", seed: "0123456789abcdef", paths: 200 },
+		definition: {
+			modelId: "illustrative-demo-model",
+			seed: "0123456789abcdef",
+			paths: 200,
+			modelHash: "jcs1:sha256:0000000000000000000000000000000000000000000000000000000000000000",
+		},
 		paths: 200,
 		succeeded: 174,
 		successBps: 8700,

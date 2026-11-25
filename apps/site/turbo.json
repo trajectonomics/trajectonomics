@@ -2,8 +2,15 @@
 	"$schema": "https://turbo.build/schema.json",
 	"extends": ["//"],
 	"tasks": {
+		"build": {
+			"dependsOn": ["@trajectonomics/brand#build", "@trajectonomics/web#build:hosted"]
+		},
 		"check": {
-			"dependsOn": ["^build", "^check"]
+			"dependsOn": [
+				"@trajectonomics/brand#build",
+				"@trajectonomics/brand#check",
+				"@trajectonomics/web#build:hosted"
+			]
 		}
 	}
 }
