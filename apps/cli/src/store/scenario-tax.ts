@@ -28,7 +28,11 @@ export function replaceTax(
 			if (expected !== undefined && current.contentHash !== expected) {
 				return scenarioChanged(current.name, expected, current.contentHash)
 			}
-			const planned = plan(JSON.parse(current.document) as ScenarioDocument, current.tax)
+			const planned = plan(
+				JSON.parse(current.document) as ScenarioDocument,
+				current.tax,
+				current.household,
+			)
 			if (isAppError(planned)) return planned
 			const document = canonicalDocument(planned.document)
 			if (current.contentHash === contentHash(document) && current.tax === planned.tax) {
