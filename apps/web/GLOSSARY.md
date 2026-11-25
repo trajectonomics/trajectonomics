@@ -44,6 +44,10 @@ _Avoid_: offset, contra account, source account
 The three-step drawer on the Net worth page, "Import a balance history", that turns a spreadsheet into one `record-values` Edit: **Load** (pasted text or a CSV or TSV file, in one of three layouts, with a required header row), **Match** (each account of the table matched to a Leaf Account of the ledger, or skipped) and **Review** (the count, the dates, the Count against account and a Preview). The page reads the text and converts no amount; a date it cannot read unambiguously is a row to fix, and a Buddhist-era year is read as input and never written. Nothing is written until Import, and Cancel forgets the draft.
 _Avoid_: upload, sync, migration, bulk edit, reconciliation
 
+**History cap**:
+The most month-ends the Net worth history holds, 120 (ten years), one `report networth` read each. A ledger that reaches back further keeps the latest 120, and the page says where the ledger really starts. It is a limit on reads, not a date the page computes (web ADR 0027).
+_Avoid_: window, zoom, range (the Plans page's Range is a different control)
+
 **Preview**:
 The `record-values` Edit with `preview: true`: the server runs `traj`'s dry run only and answers its result, with no write and no new Snapshot. The Review step shows it as what would be recorded, or every refused value at its row and column in the table.
 _Avoid_: simulation, validation, test run, draft
