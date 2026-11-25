@@ -64,6 +64,10 @@ Pick the cheapest model that can finish the brief:
 
 A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
+### Muse replaces DeepSeek (from 2026-11-25, until the owner says otherwise)
+
+The owner decided on 2026-11-25 that Muse at `muse exec --model muse-ember --reasoning-effort max` replaces DeepSeek V4.1 Flash wherever DeepSeek is the work model: ladder step 2 above, and `apps/site`'s work model. The DeepSeek routes ran dry the same day: Command Code was out of credits, the OpenCode free tier hit its limit, and OpenCode Go needs a subscription. A Claude agent plans the task, briefs Muse and checks what Muse wrote. Rule 7 is unchanged: a Pi session still runs DeepSeek only.
+
 ## Agent skills
 
 ### Where the skills come from
