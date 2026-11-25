@@ -31,7 +31,7 @@ const fieldOf: FieldMap = (field) =>
 export type NetWorthResult = RecordStart & {
 	asOf: string
 	rows: ReportRow[]
-	/** The total per currency, or null when the accounts' sum leaves the safe range (ADR-0078). */
+	/** The total per currency, or null when the accounts' sum leaves the safe range (ADR-0079). */
 	totals: TotalView[] | null
 	/** Why `totals` is null; absent when it is stated. */
 	totalsError?: TotalRefusal | undefined

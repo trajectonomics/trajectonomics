@@ -9,7 +9,7 @@ export const netWorth = z.strictObject({
 	firstTransactionDate: dateString.nullable(),
 	noTransactionsBefore: z.boolean(),
 	rows: z.array(amountRow),
-	// Null when the accounts' sum leaves the safe range (cli ADR 0078): every row is still stated, and `totalsError` says why.
+	// Null when the accounts' sum leaves the safe range (cli ADR 0079): every row is still stated, and `totalsError` says why.
 	totals: z.array(currencyTotal).nullable(),
 	totalsError: errorBody.optional(),
 	hint: z.string().optional(),

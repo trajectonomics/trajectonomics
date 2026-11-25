@@ -10,7 +10,7 @@ export interface MonthEndRow {
 	readonly totals: readonly CurrencyTotal[] | null
 	/** The CLI's error code for a month that could not be read, or whose total is not stated. */
 	readonly code: string | null
-	/** True when the month was read and its total is not stated, as its accounts' sum is out of range (cli ADR 0078). */
+	/** True when the month was read and its total is not stated, as its accounts' sum is out of range (cli ADR 0079). */
 	readonly unstated: boolean
 }
 

@@ -10,7 +10,7 @@ import { firstTransactionDateOf } from "./record"
 /**
  * One month-end of `report networth --monthly`: the reading the single-date read gives, or the
  * refusal it gives, in place. A month the Ledger refuses (an account's overflow) does not hide the others; a month whose total alone
- * is refused states its rows and `totals: null` (ADR-0078).
+ * is refused states its rows and `totals: null` (ADR-0079).
  */
 export type NetWorthMonth = NetWorthResult | { asOf: string; error: ErrorBody }
 

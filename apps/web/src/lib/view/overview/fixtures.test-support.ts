@@ -36,7 +36,7 @@ export function netWorth(
 	noTransactionsBefore = false,
 ): NetWorth {
 	const base = { asOf, firstTransactionDate, noTransactionsBefore, rows, totals }
-	// A null total is one the CLI refused, and it says why (cli ADR 0078).
+	// A null total is one the CLI refused, and it says why (cli ADR 0079).
 	return totals === null
 		? {
 				...base,

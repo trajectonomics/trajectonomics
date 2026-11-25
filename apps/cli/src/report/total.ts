@@ -14,7 +14,7 @@ import type { AccountIndex } from "./rows"
 /** Where the core names the sum across accounts; a refusal here leaves every Leaf Balance stated. */
 const TOTAL_FIELD = "netWorth.totals["
 
-/** A refusal of the net-worth total alone: every account is in range, their sum is not (ADR-0078). */
+/** A refusal of the net-worth total alone: every account is in range, their sum is not (ADR-0079). */
 export type TotalRefused = { totalRefused: AppError }
 
 /** The refusal the total gives, in the fields of the error envelope, as the result carries it. */

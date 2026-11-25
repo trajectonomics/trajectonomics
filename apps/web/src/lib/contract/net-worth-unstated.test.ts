@@ -11,7 +11,7 @@ const ERROR = {
 }
 const START = { firstTransactionDate: "2026-01-01", noTransactionsBefore: false }
 
-describe("a net worth total the CLI does not state (cli ADR 0078)", () => {
+describe("a net worth total the CLI does not state (cli ADR 0079)", () => {
 	test("parses `report networth` with a null total and the refusal, and still needs the key", () => {
 		const data = { asOf: "2026-03-31", ...START, rows: [], totals: null, totalsError: ERROR }
 		expect(netWorth.parse(data)).toEqual(data)
