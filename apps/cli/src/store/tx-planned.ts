@@ -1,7 +1,7 @@
 import { type AppError, isAppError } from "../errors"
 import type { Ctx } from "./context"
 import { write } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { readLedger } from "./ledger"
 import { attemptTransaction } from "./transactions"
 import { listTransactions } from "./tx-reads"
@@ -28,7 +28,7 @@ function appendAll(ctx: Ctx, inputs: readonly NewTransaction[]): TxAdded[] | App
 	const stamp = iso(at)
 	const written: TxAdded[] = []
 	for (const input of inputs) {
-		const outcome = attemptTransaction(ctx, input, () => ({ id: newId(at), at: stamp }))
+		const outcome = attemptTransaction(ctx, input, () => ({ id: ctx.newId(at), at: stamp }))
 		if (isAppError(outcome)) return outcome
 		written.push(outcome)
 	}
