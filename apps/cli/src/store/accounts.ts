@@ -4,7 +4,7 @@ import { chartOf } from "./chart"
 import { ACCOUNT_COLUMNS, ACCOUNT_ORDER, liveOnly } from "./columns"
 import type { Ctx } from "./context"
 import { read, write } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { supportedCurrency } from "./money"
 import type {
 	AccountCreated,
@@ -44,7 +44,7 @@ export function getAccount(ctx: Ctx, idOrName: string): AccountRow | null | AppE
 
 function insert(ctx: Ctx, input: NewAccount): AccountRow {
 	const at = ctx.clock()
-	const id = newId(at)
+	const id = ctx.newId(at)
 	const parent = input.parentId === undefined ? {} : { parentId: input.parentId }
 	const { type, currency } = input
 	chartOf(ctx, { id, type, currency, entityId: ctx.entityId, ...parent })

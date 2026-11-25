@@ -1,6 +1,6 @@
 # A Levy tallies the Filers of one Return through Filer labels
 
-Status: Proposed (trajectonomics/trajectonomics#343).
+Status: Accepted. Step 1 is built in trajectonomics/trajectonomics#505 (#343).
 
 ## Context
 
@@ -29,7 +29,13 @@ A joint Return is not simply one Filer either. s.42 bis para 2 gives each spouse
     - two Filers on a status other than `married_joint`;
     - more than two Filers.
 - **`married_separate_40_1_joint_rest` is not given Filers yet.** One spouse's s.40(1) Return holds one class of their income, and the rest joins the other Return. RD ruling 0702/1985 (2025) shows that this needs **per-class Filer selection plus income apportionment of the 100,000 cap** between the two Returns, and of the RMF and LTF limits too. A profile that combines this status with `filers` is refused until a later step builds both. Without `filers` the status works as it does today.
-- **Exports.** `TH_LEVY_SHARED_FILER`, `thFilerLabel`, and `thLevyTalliesFor(filers)` (the labels a Levy with these Filers reads). The CLI uses the last to check that every labelled Flow is read by some Levy.
+- **Exports.** `TH_LEVY_SHARED_FILER`, `thFilerLabel`, `ThLevyFilerField` (one field per refusal), and `thLevyTalliesFor(filers, filingStatus)` (the labels a Levy with these Filers reads, `@shared` included only on a married Return). The CLI uses the last to check that every labelled Flow is read by some Levy.
+- **As built.**
+  - Refusal fields: `levy.filers.empty`, `.max` (more than two), `.id` (off the pattern), `.shared`, `.duplicate`, `.count` (two Filers on a status other than `married_joint`), `.status` (`married_separate_40_1_joint_rest`).
+  - An elected actual expense on s.40(3) is one figure for the Return, so it is computed on the sums; only the standard 50% is per Filer.
+  - The odd satang of the shared income goes to the second Filer, so the two halves add up to the whole.
+  - The Measures that read a Filer's tally with its share of the shared income (the sums, the halving of `@shared` and the second Filer's remainder) have ids starting `read.`. `thLevyAssumptions` follows them to the tally, and does not count the halving as a standard rate, so it can tell a tally scaled by a standard rate from one that is only capped. It reads a Filer label as its bare label.
+  - On `married_separate` each Return reads `floor(shared / 2)`, so an odd satang of `@shared` appears in neither Return.
 
 ## Considered options
 

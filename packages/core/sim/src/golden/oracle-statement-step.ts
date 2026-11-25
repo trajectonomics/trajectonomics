@@ -1,13 +1,16 @@
 import { roundRational } from "./oracle-loan"
 
-/** One calendar day: the amounts that land on it, and where its calendar month and period end. */
+/** One calendar day: the amounts that land on it, and where its compounding and statement month end. */
 export interface OracleDay {
 	readonly date: string
-	readonly monthDays: number
-	/** The last day of its calendar month: a Compounding date. */
-	readonly monthEnd: boolean
-	/** The last day of its statement period. */
-	readonly periodEnd: boolean
+	/** 10,000 × periods a year × the counted days of the compounding period this day falls in. */
+	readonly denominator: bigint
+	/** False on a Feb 29, which Actual/365 No Leap leaves out of every accrual. */
+	readonly counted: boolean
+	/** The last day of its compounding period: the date its interest is Capitalised. */
+	readonly compoundEnd: boolean
+	/** The last day of its statement month, or the horizon. */
+	readonly statementEnd: boolean
 	/** The planned withdrawal that lands on the day. */
 	readonly drawn: bigint
 	/** The debt payment planned for the day; the payment is the lesser of this and the amount owed. */
@@ -17,9 +20,9 @@ export interface OracleDay {
 export interface Walk {
 	capitalised: bigint
 	numerator: bigint
-	/** Interest capitalised in the current period. */
+	/** Interest capitalised in the current statement month. */
 	posted: bigint
-	/** The accrual left unposted at the previous period end. */
+	/** The accrual left unposted at the previous statement month end. */
 	carried: bigint
 	drawn: bigint
 	paid: bigint
@@ -39,9 +42,9 @@ export function newWalk(opening: bigint): Walk {
 	}
 }
 
-/** Interest on the day's numerator, rounded half up once for the calendar month. */
-export function accrual(walk: Walk, annualBps: bigint, monthDays: number): bigint {
-	return roundRational(walk.numerator * annualBps, 120_000n * BigInt(monthDays), "halfUp")
+/** Interest on the running numerator, rounded half up once against the day's denominator. */
+export function accrual(walk: Walk, annualBps: bigint, denominator: bigint): bigint {
+	return roundRational(walk.numerator * annualBps, denominator, "halfUp")
 }
 
 function capitalise(walk: Walk, amount: bigint): void {
@@ -55,7 +58,7 @@ function land(walk: Walk, annualBps: bigint, day: OracleDay): void {
 	walk.capitalised += day.drawn
 	walk.drawn += day.drawn
 	if (day.planned === 0n) return
-	const accrued = accrual(walk, annualBps, day.monthDays)
+	const accrued = accrual(walk, annualBps, day.denominator)
 	const owed = walk.capitalised + accrued
 	let pay = day.planned
 	if (owed < pay) pay = owed
@@ -64,17 +67,17 @@ function land(walk: Walk, annualBps: bigint, day: OracleDay): void {
 	walk.paid += pay
 }
 
-/** Advances one day: the balance accrues, a month end capitalises, then the day's amounts land. */
+/** Advances one day: the balance accrues, a compounding date capitalises, then the day's amounts land. */
 export function step(walk: Walk, annualBps: bigint, day: OracleDay): void {
-	walk.numerator += walk.capitalised
-	if (day.monthEnd) capitalise(walk, accrual(walk, annualBps, day.monthDays))
+	if (day.counted) walk.numerator += walk.capitalised
+	if (day.compoundEnd) capitalise(walk, accrual(walk, annualBps, day.denominator))
 	land(walk, annualBps, day)
 }
 
 /** Records a landing's owed amount; returns the date when it is zero after a positive amount. */
 export function noteLanding(walk: Walk, annualBps: bigint, day: OracleDay): string | undefined {
 	if (day.drawn === 0n && day.planned === 0n) return undefined
-	const owed = walk.capitalised + accrual(walk, annualBps, day.monthDays)
+	const owed = walk.capitalised + accrual(walk, annualBps, day.denominator)
 	const payoff = walk.owed > 0n && owed === 0n ? day.date : undefined
 	walk.owed = owed
 	return payoff

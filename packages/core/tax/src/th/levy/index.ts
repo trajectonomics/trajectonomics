@@ -1,4 +1,8 @@
 export { emitThLevy } from "./emit"
+export type { ThLevyScope } from "./filer-tallies"
+export { thLevyTalliesFor } from "./filer-tallies"
+export type { ThLevyFilerIds } from "./filers"
+export { TH_LEVY_SHARED_FILER, ThLevyFilerField, thFilerLabel } from "./filers"
 export type { ThLevy, ThLevyMeasure, ThLevyMonthDay } from "./graph-types"
 export { ThLevyRounding, ThLevyTallyBasis } from "./graph-types"
 export {

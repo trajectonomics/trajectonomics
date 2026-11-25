@@ -3,7 +3,7 @@ import { type AppError, fail } from "../errors"
 import { chartOf } from "./chart"
 import type { Ctx } from "./context"
 import { write } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { storeChecks } from "./tx-checks"
 import { canonicalDimensions, postingsOf, sameContent, txByExternalRef, txById } from "./tx-content"
 import type { NewTransaction, TxAdded, TxWritten, WriteOptions } from "./types"
@@ -56,7 +56,7 @@ export function appendTransaction(
 /** Validates through the core and appends the row; the store mints its one id, inside the write. */
 export function insertTransaction(ctx: Ctx, input: NewTransaction): TxAdded {
 	const at = ctx.clock()
-	return appendTransaction(ctx, input, { id: newId(at), at: iso(at) })
+	return appendTransaction(ctx, input, { id: ctx.newId(at), at: iso(at) })
 }
 
 function replay(ctx: Ctx, input: NewTransaction, externalRef: string): TxAdded | AppError | null {
@@ -97,7 +97,7 @@ export function addTransaction(
 		() =>
 			attemptTransaction(ctx, input, () => {
 				const at = ctx.clock()
-				return { id: newId(at), at: iso(at) }
+				return { id: ctx.newId(at), at: iso(at) }
 			}),
 		options,
 	)
