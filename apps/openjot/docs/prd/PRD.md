@@ -1,4 +1,4 @@
-# MooJot — Product Requirements Document (PRD) & Roadmap
+# OpenJot — Product Requirements Document (PRD) & Roadmap
 
 **Status:** v0.1 Android MVP Implemented & Verified On-Device
 **Stack:** Tauri v2 + Svelte 5 + TypeScript + Tailwind CSS v4 + Rust (`rusqlite` bundled SQLite) + Android Kotlin Native Bridge (`ZXing`, `ML Kit Latin`, `ONNX Runtime Android` + `AksonOCR-Lite`)
@@ -8,9 +8,9 @@
 
 ## 1. Product Vision
 
-MooJot is an open-source, privacy-first personal income & expense tracker built specifically for **Thailand's banking ecosystem** (all 20 Thai banks & e-wallets).
+OpenJot is an open-source, privacy-first personal income & expense tracker built specifically for **Thailand's banking ecosystem** (all 20 Thai banks & e-wallets).
 
-Instead of requiring cloud subscriptions, paid OCR APIs, or external slip-verification servers, MooJot runs **100% locally on the user's Android device**:
+Instead of requiring cloud subscriptions, paid OCR APIs, or external slip-verification servers, OpenJot runs **100% locally on the user's Android device**:
 - Reads Thai bank e-slips straight from dedicated bank gallery albums (with a strict 4-layer gatekeeper for opt-in shared albums).
 - Decodes Bank of Thailand (BOT) Slip Verify Mini-QR & TrueMoney QR codes locally, runs bundled ML Kit Latin + **4.3 MB Apache-2.0 `AksonOCR-Lite` ONNX** locally for Thai text, attaches the original slip image privately inside the app, detects cross-bank self-transfers automatically, and auto-categorizes expenses offline.
 

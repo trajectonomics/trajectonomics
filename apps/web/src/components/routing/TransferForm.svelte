@@ -78,5 +78,5 @@ async function submit(event: SubmitEvent): Promise<void> {
 		<span>Count any gain for tax<span class="mt-1 block text-xs text-muted-foreground">{REALISE_WORDS}</span></span>
 	</label>
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
-	<ItemActions trying={tryValue} />
+	<ItemActions kind="flow" trying={tryValue} />
 </form>

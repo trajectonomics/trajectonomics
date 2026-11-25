@@ -2,8 +2,7 @@
 // paid-off date is read back from the Snapshot's statement; a payment extra moves that date; every other item
 // of the plan is kept; and a refusal the CLI words at the payments names that field (cli ADR 0059).
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import {
 	type ErrorBody,
@@ -22,6 +21,7 @@ import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 const PLAN = "loan-pay"
@@ -117,7 +117,7 @@ const LOAN_DRAFT: LoanDraft = {
 }
 
 beforeAll(async () => {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-loans-pay-"))
+	scratch = await makeScratch("traj-web-loans-pay-")
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	// The plan starts as the demo's base, with no loan of the planner's own.
@@ -134,7 +134,7 @@ beforeAll(async () => {
 }, SLOW_MS)
 
 afterAll(async () => {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 })
 
 describe("a loan saved from the planner, against the real traj", () => {

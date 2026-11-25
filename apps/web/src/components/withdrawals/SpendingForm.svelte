@@ -97,5 +97,5 @@ async function remove(): Promise<void> {
 	{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	<button type="button" class={button} disabled={editSession.busy || whatIfSession.saving} onclick={tryIt}>Try as a what-if</button>
-	<ItemActions id={existing?.id} onDelete={remove} />
+	<ItemActions id={existing?.id} kind="flow" onDelete={remove} />
 </form>

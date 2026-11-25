@@ -1,7 +1,8 @@
+import { columnsAgree } from "@trajectonomics/core/ledger"
 import { counted } from "../counts"
 import { type AppError, isAppError } from "../errors"
-import { totalSentence } from "../report/total-view"
-import { trialAgrees, trialReport } from "../report/trial"
+import { outOfRangeClause } from "../report/total-view"
+import { trialReport } from "../report/trial"
 import type { Ledger, Store } from "../store"
 import { NO_TRIAL, sentenceOf, skipped, step } from "./checks"
 import type { DoctorCheck, DoctorResult } from "./output"
@@ -33,17 +34,17 @@ function ledgerCheck(store: Store): { check: DoctorCheck; ledger?: Ledger } {
  * comparison is exact, so a total that cannot be stated (ADR-0079) still gives a real pass or fail.
  */
 function trialCheck(ledger: Ledger, asOf: string) {
-	const report = trialReport(ledger, asOf)
-	if (isAppError(report)) return report
-	const balanced = trialAgrees(ledger, asOf)
-	if (isAppError(balanced)) return balanced
+	const trial = trialReport(ledger, asOf)
+	if (isAppError(trial)) return trial
+	const { report } = trial
+	const balanced = columnsAgree(trial.rows)
 	const stated = report.totals !== null
 	const verdict = balanced
 		? `Debits equal credits at ${asOf}`
 		: `Debits and credits disagree at ${asOf}`
 	const detail = stated
 		? `${verdict}${balanced ? "." : ": a currency's totals differ."}`
-		: `${verdict}, compared exactly; the totals are not stated: ${totalSentence("none").replace("not stated: ", "")}.`
+		: `${verdict}, compared exactly; the totals are not stated: ${outOfRangeClause}.`
 	const { rows: _rows, ...totals } = report
 	return {
 		check: step("trialBalance", balanced ? "pass" : "fail", detail),

@@ -20,15 +20,15 @@ const listed = (name, version) => new RegExp(`^${escape(name)} ${escape(version)
 test("the notices file starts with its header and says what it is", () => {
   // assert.ok, not assert.match: a failed match would print the whole multi-megabyte file.
   const has = (re) => assert.ok(re.test(notices), `the notices file does not match ${re}`);
-  assert.ok(notices.startsWith("MOOJOT THIRD-PARTY NOTICES\n"));
+  assert.ok(notices.startsWith("OPENJOT THIRD-PARTY NOTICES\n"));
   has(/MIT License/);
   has(/Google ML Kit[\s\S]*?NOT\s+open\s+source/);
   has(/node tools\/third-party-notices\.mjs --apk/);
 });
 
-test("the MooJot entry has the app's own version", () => {
+test("the OpenJot entry has the app's own version", () => {
   const { version } = JSON.parse(read("package.json"));
-  assert.ok(listed("MooJot", version), `the notices list a different MooJot version than ${version}: regenerate them`);
+  assert.ok(listed("OpenJot", version), `the notices list a different OpenJot version than ${version}: regenerate them`);
 });
 
 test("every Rust crate in Cargo.lock is listed with its locked version", () => {

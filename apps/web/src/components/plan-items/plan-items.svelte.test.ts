@@ -50,7 +50,7 @@ describe("the household's anchored dates on the planner pages", () => {
 				contentHash: HASH,
 			},
 		}).body
-		expect(body).toContain("at me, age 60")
+		expect(body).toContain("at you, age 60")
 	})
 
 	test("the Flow form disables a pinned date and links to the household card", () => {
@@ -62,7 +62,7 @@ describe("the household's anchored dates on the planner pages", () => {
 				existing: salary,
 				shown: NO_PROBLEMS,
 				name: "base",
-				anchors: { start: null, end: "at me, age 60" },
+				anchors: { start: null, end: "at you, age 60" },
 			},
 		}).body
 		expect(body).toMatch(/<input[^>]*id="flow-end"[^>]*disabled/)
@@ -188,11 +188,11 @@ describe("the form in the drawer", () => {
 
 	test("an existing item's Delete asks first, and a new one has no Delete", () => {
 		const withDelete = render(ItemActions, {
-			props: { id: "salary", onDelete: () => {} },
+			props: { id: "salary", kind: "flow", onDelete: () => {} },
 		}).body
 		expect(withDelete).toContain(">Save<")
 		expect(withDelete).not.toContain("Delete salary from this plan?")
-		const noDelete = render(ItemActions, { props: { onDelete: () => {} } }).body
+		const noDelete = render(ItemActions, { props: { kind: "flow", onDelete: () => {} } }).body
 		expect(noDelete).not.toContain("Delete")
 	})
 })

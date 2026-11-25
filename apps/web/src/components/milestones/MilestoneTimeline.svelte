@@ -2,6 +2,7 @@
 import { formatDate } from "../../lib/format"
 import type { ReachedMilestone } from "../../lib/view/milestones/milestones"
 import EmptyState from "../ui/EmptyState.svelte"
+import ItemName from "../ui/ItemName.svelte"
 
 interface Props {
 	/** The Milestones the plan reached, in date order. */
@@ -26,7 +27,7 @@ let { reached }: Props = $props()
 					<p class="text-sm text-muted-foreground">
 						<time datetime={milestone.date}>{formatDate(milestone.date)}</time>
 					</p>
-					<p class="font-medium">{milestone.id}</p>
+					<p class="font-medium"><ItemName kind="milestone" id={milestone.id} /></p>
 				</li>
 			{/each}
 		</ol>

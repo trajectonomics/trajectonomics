@@ -66,14 +66,18 @@ _Avoid_: simulation, validation, test run, draft
 
 **Account name**:
 The name the ledger gives an Account (`traj account list`), which every page shows in place of the id the plan holds it by. One lookup (`src/lib/view/account-names/`) is built from the Snapshot's accounts Read and nothing else, so a rename in the ledger shows once the Snapshot is read again. The ledger keeps names unique (`account_name_taken`); this only guards a Snapshot that breaks that: two Accounts that share a name are shown with their parents, the fewest that tell them apart ("Bank A › Savings"), and with the tail of their id when even the parents agree. An id the ledger does not name (an Account only the plan has, such as a home it buys) shows as the id, in code. Pickers keep the id as the value and show the name as the label, and an Edit still sends ids.
-_Avoid_: label, alias, display name (a name a person gives a plan item is a later change, #322)
+_Avoid_: label, alias, display name
+
+**Item name**:
+The words a page shows for the id of a plan item, from one lookup (`src/lib/view/item-names/`, [ADR 0029](docs/adr/0029-plan-items-are-named-by-what-a-read-states-and-never-made-up.md)). A Read states a name for an Account (the Account name) and, by role, for a person of the household ("You", "Your partner", "Child"). It states none for a Flow or a Milestone, so the page shows the id in code and never turns it into words. Pickers keep the id as the value and an Edit still sends ids.
+_Avoid_: label, display name, title, alias (a `label` field on a Scenario item is a later change, #322)
 
 **Household**:
 The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.
 _Avoid_: family, members, users, profile
 
 **Anchor**:
-One date of a Scenario item pinned to a person's age, life end or joining. The label reads "at me, age 60", and the date is the one the household wrote.
+One date of a Scenario item pinned to a person's age, life end or joining. The label reads "at you, age 60" (the person called by the household's words, an Item name), and the date is the one the household wrote.
 _Avoid_: link, rule, trigger
 
 **Milestone**:

@@ -1,10 +1,11 @@
-// Request handling for the moojot.trajectonomics.com Worker (entry: worker.js).
+// Request handling for the openjot.trajectonomics.com Worker (entry: worker.js), which also
+// serves moojot.trajectonomics.com and redirects it to the new host.
 //
 // Static files in ./public are served by Workers Static Assets. The Worker
 // only runs for the paths listed in wrangler.jsonc `run_worker_first`:
 //
 //   /download     302 to the APK in the newest `openjot-v*` GitHub release of the
-//                 monorepo, so a reel can say "moojot.trajectonomics.com/download"
+//                 monorepo, so a reel can say "openjot.trajectonomics.com/download"
 //                 and the link never goes stale. Until the first one exists it uses
 //                 the archived trajectonomics/moojot repository's latest release.
 //                 /download/<source> does the same and records where the click came from.
@@ -16,9 +17,13 @@
 import { count, downloadSource, handleGo, proxyIngest, redirect } from "./tracking.js";
 
 export const REPO = "trajectonomics/trajectonomics";
+/** The site's own host. */
+export const SITE_HOST = "openjot.trajectonomics.com";
+/** The host the site moved from; it redirects here, except for the analytics proxy. */
+export const OLD_SITE_HOST = "moojot.trajectonomics.com";
 /** The app's releases carry this prefix, so a `cli-v*` or `tax-v*` release never wins. */
 export const TAG_PREFIX = "openjot-v";
-/** MooJot's home before the move; its latest release is the fallback until the first openjot-v* one. */
+/** The app's home before the move; its latest release is the fallback until the first openjot-v* one. */
 export const ARCHIVED_REPO = "trajectonomics/moojot";
 export const RELEASES_URL = `https://github.com/${REPO}/releases?q=${TAG_PREFIX}`;
 export const NO_RELEASE_PATH = "/#coming-soon";
@@ -99,7 +104,7 @@ async function archivedRelease(fetchImpl) {
   }
 }
 
-const UA = { "user-agent": "moojot-site (+https://moojot.trajectonomics.com)" };
+const UA = { "user-agent": "openjot-site (+https://openjot.trajectonomics.com)" };
 
 async function fromApiList(fetchImpl) {
   const res = await fetchImpl(`${API}/repos/${REPO}/releases?per_page=100`, {
@@ -200,7 +205,18 @@ export async function fromWebLatest(fetchImpl, repo = REPO) {
 }
 
 export async function handle(request, env, ctx, deps = {}) {
-  const { pathname } = new URL(request.url);
+  const url = new URL(request.url);
+  const { pathname } = url;
+
+  // The site moved to SITE_HOST. App versions up to 1.4.0 post their analytics to the old
+  // host's /ingest, where a 301 would drop them, so that path is exempt and proxied as before.
+  if (url.hostname === OLD_SITE_HOST) {
+    const method = request.method.toUpperCase();
+    const isIngest = pathname === "/ingest" || pathname.startsWith("/ingest/");
+    if ((method === "GET" || method === "HEAD") && !isIngest) {
+      return redirect(`https://${SITE_HOST}${pathname}${url.search}`, 301);
+    }
+  }
 
   if (pathname === "/download/checksums") {
     let to = RELEASES_URL;

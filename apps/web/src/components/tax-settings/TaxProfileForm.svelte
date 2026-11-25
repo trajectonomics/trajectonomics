@@ -82,5 +82,5 @@ async function save(event: SubmitEvent): Promise<void> {
 			{merging ? "State the whole profile instead" : "Change one item instead"}
 		</button>
 	{/if}
-	<ItemActions />
+	<ItemActions kind="account" />
 </form>

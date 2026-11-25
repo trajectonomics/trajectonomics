@@ -59,7 +59,7 @@ describe("the What-if bar names an Account by its ledger name", () => {
 		}
 		const flow: Change = { kind: "off", path: "flows.rent", label: "Rent switched off" }
 		expect(labelWithNames(group, NAMES)).toBe("Loan Bank switched off")
-		expect(labelWithNames(flow, NAMES)).toBe("Rent switched off")
+		expect(labelWithNames(flow, NAMES)).toBe("rent switched off")
 	})
 
 	test("an Account the ledger does not name keeps its id", () => {

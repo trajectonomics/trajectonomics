@@ -2,12 +2,13 @@
  * The shape checks of the estate form: each text that is not a shape `traj` may take is a problem at its field. The CLI
  * checks the rest (a share above 100%, an unknown Account, a liability as a base) in its own words (cli ADR 0064).
  */
+import type { EstateBlock } from "../../contract"
 import { parseBps } from "../../format/bps"
+import { ROUNDINGS } from "../plan-items/asset-shape"
 import { slugId, typedAmount } from "../plan-items/form"
 import { percentText } from "../withdrawals/check"
 import { type EstateDraft, fieldKey, type LineDraft, type ListName } from "./draft"
 
-const ROUNDINGS = ["floor", "halfUp", "ceil"]
 const ID_SHAPE = /^[a-z0-9][a-z0-9_-]*$/i
 const RATE_WORDS = "Enter a percent with at most two places, such as 1 or 2.5."
 const AMOUNT_WORDS = "Enter an amount as a decimal number, such as 50000.00."
@@ -38,11 +39,23 @@ function nameProblem(
 
 type Found = [string, string][]
 
+/** The rounding the stored block states for a line, so a word the form's list lacks is kept as it is. */
+function storedRoundingOf(
+	stored: EstateBlock | undefined,
+	list: ListName,
+	line: LineDraft,
+): string | undefined {
+	return (stored?.[list] ?? []).find((one) => one.id === idOf(line))?.rounding
+}
+
 /** The problems of a share: its percent, its rounding and, for a cost, its base. */
-function shareProblems(line: LineDraft, list: ListName): Found {
+function shareProblems(line: LineDraft, list: ListName, stored: EstateBlock | undefined): Found {
 	const found: Found = []
 	if (percentText(line.share) === null) found.push(["share", RATE_WORDS])
-	if (!ROUNDINGS.includes(line.rounding))
+	if (
+		!(ROUNDINGS as readonly string[]).includes(line.rounding) &&
+		line.rounding !== storedRoundingOf(stored, list, line)
+	)
 		found.push(["rounding", "Choose how the share rounds to a minor unit."])
 	if (list === "gifts") return found
 	if (line.of === "") found.push(["of", "Choose what the share is of."])
@@ -62,21 +75,21 @@ function fixedProblems(line: LineDraft): Found {
 }
 
 /** The problems of a line's way of being set. */
-function amountProblems(line: LineDraft, list: ListName): Found {
-	if (line.how === "share") return shareProblems(line, list)
+function amountProblems(line: LineDraft, list: ListName, stored: EstateBlock | undefined): Found {
+	if (line.how === "share") return shareProblems(line, list, stored)
 	if (line.how === "fixed") return fixedProblems(line)
 	return [["how", "Choose a share or a fixed amount."]]
 }
 
 /** The problems a draft has at its fields, keyed as `fieldKey` names them. */
-export function problemsOf(draft: EstateDraft): Map<string, string> {
+export function problemsOf(draft: EstateDraft, stored?: EstateBlock): Map<string, string> {
 	const found = new Map<string, string>()
 	const taken = [...draft.costs, ...draft.gifts].map(idOf)
 	for (const list of ["costs", "gifts"] as const) {
 		draft[list].forEach((line, index) => {
 			const name = nameProblem(line, taken, list)
 			if (name !== undefined) found.set(fieldKey(list, index, "name"), name)
-			for (const [field, text] of amountProblems(line, list))
+			for (const [field, text] of amountProblems(line, list, stored))
 				found.set(fieldKey(list, index, field), text)
 		})
 	}

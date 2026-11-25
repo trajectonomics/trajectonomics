@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { NO_ITEM_NAMES } from "../item-names"
 import { projectionRunFixture } from "../projection/fixtures.test-support"
 import { MILESTONE_ROWS, withMilestones } from "./fixtures.test-support"
 import { hasMilestones, milestoneMarkers, milestoneRowsOf, milestoneView } from "./milestones"
@@ -71,5 +72,15 @@ describe("hasMilestones", () => {
 		expect(
 			hasMilestones({ argv: [], ok: false, error: { code: "x", exitCode: 1, message: "m" } }),
 		).toBe(false)
+	})
+})
+
+describe("a Milestone marker says whether its label is a name", () => {
+	test("an id no Read names is set in code, since the CLI states no Milestone name", () => {
+		const markers = milestoneMarkers(withMilestones(MILESTONE_ROWS), NO_ITEM_NAMES)
+		expect(markers.map((marker) => [marker.label, marker.code])).toEqual([
+			["first-year", true],
+			["second-year", true],
+		])
 	})
 })

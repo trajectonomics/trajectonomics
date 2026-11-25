@@ -43,10 +43,22 @@ function identityProblems(
 	}
 }
 
+/** A word a form may keep as it stands: one the CLI states, which the form's list does not offer. */
+export interface StoredWords {
+	readonly compounding?: string | undefined
+	readonly rounding?: string | undefined
+}
+
 /** The problems a loan draft has at its fields: each text that is not a shape `traj` may take. */
 export function problemsOf(
 	draft: LoanDraft,
-	options: { isNew: boolean; choices: readonly OwedChoice[]; keep?: string | undefined },
+	options: {
+		isNew: boolean
+		choices: readonly OwedChoice[]
+		keep?: string | undefined
+		/** The words the stored loan states: an unknown one is kept as it is, an unknown typed one is refused. */
+		stored?: StoredWords | undefined
+	},
 ): Map<string, string> {
 	const problems = new Map<string, string>()
 	identityProblems(draft, options, problems)
@@ -56,7 +68,10 @@ export function problemsOf(
 	if (parseBps(draft.rate) === null) {
 		problems.set("rate", "Enter a percent with at most two places, such as 6 or 6.25.")
 	}
-	if (!(LOAN_COMPOUNDINGS as readonly string[]).includes(draft.compounding)) {
+	if (
+		!(LOAN_COMPOUNDINGS as readonly string[]).includes(draft.compounding) &&
+		draft.compounding !== options.stored?.compounding
+	) {
 		problems.set("compounding", "Choose how often the interest is added.")
 	}
 	if (!isWholeCount(draft.payments)) {
@@ -68,7 +83,10 @@ export function problemsOf(
 	if (!isDateText(draft.firstPayment)) {
 		problems.set("firstPayment", "Enter the first payment's date as YYYY-MM-DD.")
 	}
-	if (!(LOAN_ROUNDINGS as readonly string[]).includes(draft.rounding)) {
+	if (
+		!(LOAN_ROUNDINGS as readonly string[]).includes(draft.rounding) &&
+		draft.rounding !== options.stored?.rounding
+	) {
 		problems.set("rounding", "Choose how each payment rounds to a minor unit.")
 	}
 	if (draft.arrival === "date" && !isDateText(draft.arrivalDate)) {

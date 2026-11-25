@@ -101,5 +101,5 @@ async function save(event: SubmitEvent): Promise<void> {
 
 <form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${nameOf(names, existing.id)}` : "Add account"}>
 	<AccountFields bind:draft existingId={existing?.id} {shown} illiquid={existing?.liquid === false} {...income} />
-	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
+	<ItemActions id={existing?.id} kind="account" onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>
