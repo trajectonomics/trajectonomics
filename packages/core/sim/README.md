@@ -88,6 +88,8 @@ figure without a Projection. See [ADR 0016](docs/adr/0016-loans-borrowing-and-le
 With `liabilityStatements: true`, a Projection also reports one monthly statement per liability: the
 drawn and paid amounts, the interest and the amount owed, and the `paidOff` date once it is zero. See
 [ADR 0017](docs/adr/0017-liability-statements.md).
+A Timeline that starts on a month end gives a one-day first row, zero with `partial: true`, before the first
+calendar month. `financialIndependence` and `chanceOfSuccess` never report statements.
 
 With `cashflowBreakdown: true`, a Projection also reports one cash-flow breakdown per Annual roll-up:
 the income by Flow, the Prepayment and Settlement by Levy, the expenses by Flow and category, the

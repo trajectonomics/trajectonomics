@@ -52,14 +52,15 @@ export function statementOf(fixture: Fixture): LiabilityStatement {
 	return result.projection.liabilities![0]!
 }
 
-/** The oracle walks from the day after the Timeline start, since the start day is its own period. */
+/** The oracle walks from the day after the Timeline start, since the start day is its own month. A nominal loan only. */
 export function oracleOf(fixture: Fixture, lands: Lands, end: string): OracleStatement {
 	const loan = fixture.scenario.accounts.find((item) => item.id === "loan")!
 	const opening = fixture.baseline.balances.find((item) => item.account === "loan")!.amount
-	return walkStatement(BigInt(opening), BigInt(loan.rate), calendarDays("2026-01-01", end, lands))
+	const days = calendarDays("2026-01-01", end, lands, loan.compounding ?? "monthly")
+	return walkStatement(BigInt(opening), BigInt(loan.rate), days)
 }
 
-/** The engine's months after the start period: their end dates, figures and payoff date. */
+/** The engine's months after the start month: their end dates, figures and payoff date. */
 export function engineTable(statement: LiabilityStatement): Table {
 	const months = statement.months.slice(1)
 	return {
