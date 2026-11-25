@@ -56,6 +56,14 @@ describe("the household anchors a write dropped", () => {
 		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
 	})
 
+	test("stay when the page then shows the plan the write changed, as after Save as new plan", async () => {
+		answer({ droppedAnchors: ["flows.fund.end"] })
+		await editSession.run({ kind: "copy-plan", from: "base", name: "early" })
+		expect(selectPlan("early")).toBe(true)
+		expect(dropped.anchors).toEqual(["flows.fund.end"])
+		expect(render(DroppedAnchorsNotice).body).toContain("This change to plan early removed")
+	})
+
 	test("fall back to the plain wording when the Edit names no plan", () => {
 		dropped.anchors = ["flows.fund.end"]
 		expect(render(DroppedAnchorsNotice).body).toContain(
