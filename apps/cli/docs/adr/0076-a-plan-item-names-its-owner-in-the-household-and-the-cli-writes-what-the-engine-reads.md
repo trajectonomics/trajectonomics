@@ -53,3 +53,13 @@ An employer's share follows its salary's Owner, as it follows its dates (ADR-004
 - Backup, export and restore carry `owners` as part of the household's canonical JSON.
 - `scenario show` prints the Owners, and the Dashboard's household editor gains an Owner picker per Flow and Account (web step, #343).
 - Adding the first Owner to a two-earner taxed plan makes ADR-0075 require an Owner on every taxed Flow. The refusal lists the Flows that lack one, with a hint naming the `owners` form.
+
+## Amended (#507): the household reads and stores Owners
+
+Step 3 of separate filing builds the household's side only, and changes no tax behaviour. Its choices:
+
+- **`owners` is stated in version 2 and refused in version 1.** A version 2 household states `owners`, an empty list when no item has an Owner, as it states `anchors`. A version 1 household with an `owners` key is refused at `owners` with a hint to set `schemaVersion` to 2. A version 1 household without one is stored as the same bytes it was, so a household that reads today never changes.
+- **Refusals name their field.** A person whose id is `shared`, in a version 2 household, is refused at `people.<n>.id`; a version 1 household with such a person keeps reading. An Owner whose `person` is not in `people`, or is a dependent, is refused at `owners.<n>.person`. An Owner whose `path` is not `flows.<id>` or `accounts.<id>`, or repeats an earlier path, is refused at `owners.<n>.path`. `scenario household` also refuses a path whose Flow or Account the Scenario does not hold, at `document.owners.<n>.path`, the way it refuses an anchor.
+- **A person id is not checked against the Filer pattern here.** That refusal belongs to the tax write (ADR-0075).
+- **`apply` and `fork` carry `owners` as stored.** Dropping an Owner whose item left the document, and listing it in `droppedOwners`, comes with the label writes of the filing step, which are what make a stale Owner matter.
+

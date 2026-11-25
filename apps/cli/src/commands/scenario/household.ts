@@ -17,8 +17,9 @@ import { withStore } from "../../with-store"
 
 export const household: Leaf = defineCommand({
 	name: "household",
-	summary: "Set the people whose ages pin a Scenario's dates, or remove them",
-	note: "The household ships in 0.8.0, and so does --if-hash.",
+	summary:
+		"Set the people whose ages pin a Scenario's dates and who owns its items, or remove them",
+	note: "The household ships in 0.8.0, and so do --if-hash and the owners of a version 2 household.",
 	positionals: ["scenario"],
 	input: z.strictObject({
 		scenario: z.string().min(1).optional().describe("The Scenario's exact name or its id."),
@@ -39,7 +40,8 @@ export const household: Leaf = defineCommand({
 	examples: [
 		{
 			command: "traj scenario household base --file household.json",
-			description: "Set the people of base; the dates their ages pin are written into it.",
+			description:
+				"Set the people and owners of base, a version 2 household; the dates their ages pin are written into it. Each owner names a person id or shared.",
 		},
 		{
 			command: "traj scenario household base --file household.json --dry-run",
