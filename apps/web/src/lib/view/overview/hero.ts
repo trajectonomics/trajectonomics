@@ -1,5 +1,6 @@
 import type { Fi, ProjectionChance, Read, Snapshot } from "../../contract"
-import { formatDate, formatMonth } from "../../format"
+import { type BestCaseView, fiModelOf, type UnreachableFi } from "../fi/model"
+import { householdOf, type PersonNames, personNames } from "../item-names"
 import { noteAnchor } from "../projection/notes"
 import { homePlan } from "./scenario"
 
@@ -15,7 +16,7 @@ export interface HeroWarning {
 
 /** Home's answer to "when could I stop working?", built only from Snapshot fields. */
 export interface HeroView {
-	/** The one-sentence answer, or the CLI's best case when FI is not reachable. */
+	/** The answer: the FI date and ages, then what the chance measured, or the CLI's best case. */
 	readonly sentence: string
 	/** The notes worth checking, in the CLI's order. */
 	readonly warnings: readonly HeroWarning[]
@@ -36,6 +37,9 @@ const WARNING_PATTERNS: readonly RegExp[] = [
 	/^Tax before .* is not recomputed\b/,
 ]
 
+/** What the CLI's success note begins with: the one sentence that says what the chance read measured. */
+const CHANCE_SUCCESS_PREFIX = "The plan holds to "
+
 /** Whether a note is one the hero counts as something to check. */
 export function isWarningNote(note: string): boolean {
 	return WARNING_PATTERNS.some((pattern) => pattern.test(note))
@@ -48,50 +52,55 @@ export function heroOf(snapshot: Snapshot, requested = ""): HeroView | null {
 	const read = snapshot.reads.fi[plan]
 	if (read === undefined || !read.ok) return null
 	const warnings = warningsOf(read.data, plan)
+	const people = personNames(householdOf(snapshot, plan))
 	return {
-		sentence: sentenceOf(read.data, snapshot.reads.chance[plan], holderId(snapshot, plan)),
+		sentence: sentenceOf(read.data, people, snapshot.reads.chance[plan]),
 		warnings,
 		warningsLabel: warningsLabel(warnings.length),
 	}
 }
 
-/** The household's account holder id, or null when the Snapshot holds no household for the plan. */
-function holderId(snapshot: Snapshot, plan: string): string | null {
-	const read = snapshot.reads.documents[plan]
-	if (read === undefined || !read.ok) return null
-	const people = read.data.scenario.household?.people ?? []
-	return people.find((person) => person.role === "holder")?.id ?? null
-}
-
-/** The answer's sentence: the month and the holder's age, then the share that held, or the best case. */
+/** The answer's sentence: the FI date and each person's age, then what the chance read measured. */
 function sentenceOf(
 	fi: Fi,
+	people: PersonNames,
 	chance: Read<ProjectionChance> | undefined,
-	holder: string | null,
 ): string {
-	const result = fi.fi
-	if (!result.reachable) return unreachableSentence(fi)
-	const month = formatMonth(result.fiDate)
-	const age = result.ages.find((entry) => entry.person === holder)?.age ?? null
+	const model = fiModelOf(fi, people)
+	if (model.kind === "unreachable") return unreachableSentence(model)
 	const opening =
-		age === null
-			? `You could stop working in ${month}.`
-			: `You could stop working in ${month}, at ${age}.`
-	if (chance === undefined || !chance.ok) return opening
-	return `${opening} It held in ${chance.data.succeeded} of ${chance.data.paths} simulated markets, which is not a guarantee.`
+		model.ages === null
+			? `You could stop working in ${model.month}.`
+			: `You could stop working in ${model.month}, at ${model.ages}.`
+	const measured = chanceSentenceOf(chance)
+	return measured === null ? opening : `${opening} ${measured}`
 }
 
-/** The unreachable answer, with the CLI's best case when it states one (its amounts are left to its notes). */
-function unreachableSentence(fi: Fi): string {
-	const result = fi.fi
-	if (result.reachable) return ""
-	const opening = `You could not stop working before ${formatDate(fi.horizon)}.`
-	if (!("bestCase" in result)) return opening
-	const best = result.bestCase
-	if ("runsOut" in best) {
-		return `${opening} If earned income stopped in ${formatMonth(best.month)}, the money runs out on ${formatDate(best.runsOut.date)}.`
+/**
+ * What the chance result measured: the CLI's own success note when it states one, so the sentence never
+ * says the FI date itself held. Otherwise the horizon and the counts, as the chance result gives them.
+ */
+function chanceSentenceOf(chance: Read<ProjectionChance> | undefined): string | null {
+	if (chance === undefined || !chance.ok) return null
+	const stated = chance.data.notes.find((note) => note.startsWith(CHANCE_SUCCESS_PREFIX))
+	if (stated !== undefined) return stated
+	return `Your plan as written holds to ${chance.data.horizon} in ${chance.data.succeeded} of ${chance.data.paths} simulated markets, which is not a guarantee.`
+}
+
+/** The unreachable answer: the horizon, the FI model's binding sentence and the CLI's best case, if any. */
+function unreachableSentence(model: UnreachableFi): string {
+	const opening = `You could not stop working before ${model.horizon}.`
+	const parts = [opening, model.sentence]
+	if (model.best !== null) parts.push(bestCaseSentence(model.best))
+	return parts.join(" ")
+}
+
+/** What the CLI's best case says: when the money runs out, or when the buffer is breached. */
+function bestCaseSentence(best: BestCaseView): string {
+	if (best.kind === "runsOut") {
+		return `If earned income stopped in ${best.month}, the money runs out on ${best.date}.`
 	}
-	return `${opening} If earned income stopped in ${formatMonth(best.month)}, accessible net worth falls short of the buffer on ${formatDate(best.bufferBreach.date)}.`
+	return `If earned income stopped in ${best.month}, accessible net worth falls short of the buffer on ${best.date}.`
 }
 
 /** The warning notes, each with the anchor its entry has on the FI page. */

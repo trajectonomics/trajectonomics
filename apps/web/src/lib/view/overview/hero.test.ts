@@ -20,11 +20,21 @@ const HOUSEHOLD: HouseholdDocument = {
 	owners: [],
 }
 
-/** A reachable FI answer with the ages the CLI states on its FI date. */
-function reachable(ages: { person: string; age: number }[] = []): Fi {
+const PAIR: HouseholdDocument = {
+	schemaVersion: 2,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+	],
+	anchors: [],
+	owners: [],
+}
+
+/** A reachable FI answer with the ages and date the CLI states. */
+function reachable(ages: { person: string; age: number }[] = [], fiDate = "2041-03-01"): Fi {
 	const base = fiFixture(REACHABLE)
 	if (!base.fi.reachable) throw new Error("the fixture is reachable")
-	return { ...base, fi: { ...base.fi, ages } }
+	return { ...base, fi: { ...base.fi, fiDate, ages } }
 }
 
 /** A Snapshot with only the Reads Home's hero reads, cast because the other Reads do not matter here. */
@@ -64,51 +74,77 @@ function snapshotOf(
 	} as unknown as Snapshot
 }
 
-const HERO_CHANCE = chanceFixture({ succeeded: 200, paths: 200 })
+const SUCCESS_NOTE =
+	"The plan holds to 2043-12-31 on 174 of 200 seeded Market paths: a success share of 87.00%."
+const HERO_CHANCE = chanceFixture({ succeeded: 174, paths: 200, notes: [SUCCESS_NOTE] })
 
 describe("heroOf", () => {
-	test("answers a reachable plan with its month, the holder's age and the simulated markets", () => {
+	test("answers a reachable plan with its month, each person's age and what the chance measured", () => {
 		const hero = heroOf(
 			snapshotOf(reachable([{ person: "me", age: 54 }]), {
 				chance: HERO_CHANCE,
 				household: HOUSEHOLD,
 			}),
 		)
-		expect(hero?.sentence).toBe(
-			"You could stop working in Mar 2041, at 54. It held in 200 of 200 simulated markets, which is not a guarantee.",
-		)
+		expect(hero?.sentence).toBe(`You could stop working in Mar 2041, at You 54. ${SUCCESS_NOTE}`)
 	})
 
-	test("answers an unreachable plan with the horizon and the CLI's best case", () => {
+	test("names the partner in a household of more than one person", () => {
+		const hero = heroOf(
+			snapshotOf(
+				reachable([
+					{ person: "me", age: 50 },
+					{ person: "partner", age: 48 },
+				]),
+				{ household: PAIR },
+			),
+		)
+		expect(hero?.sentence).toBe("You could stop working in Mar 2041, at You 50, Your partner 48.")
+	})
+
+	test("answers an unreachable plan with its horizon, the binding sentence and the best case", () => {
 		const hero = heroOf(snapshotOf(fiFixture(UNREACHABLE.insufficientMoney)))
 		expect(hero?.sentence).toBe(
-			"You could not stop working before 31 Dec 2060. If earned income stopped in Mar 2030, the money runs out on 1 Aug 2031.",
+			"You could not stop working before 31 Dec 2060. The money runs out, and even the locked or unrouted assets are not enough to cover the gap. If earned income stopped in Mar 2030, the money runs out on 1 Aug 2031.",
 		)
 	})
 
-	test("leaves the age clause out when the plan has no household", () => {
+	test("leaves the age clause out when the plan states no age", () => {
 		const hero = heroOf(snapshotOf(reachable(), { chance: HERO_CHANCE }))
-		expect(hero?.sentence).toBe(
-			"You could stop working in Mar 2041. It held in 200 of 200 simulated markets, which is not a guarantee.",
-		)
+		expect(hero?.sentence).toBe(`You could stop working in Mar 2041. ${SUCCESS_NOTE}`)
 		expect(hero?.sentence).not.toContain(", at ")
 	})
 
-	test("holds no arithmetic: every number in the sentence is already in the Snapshot", () => {
-		for (const snapshot of [
-			snapshotOf(reachable([{ person: "me", age: 54 }]), {
-				chance: HERO_CHANCE,
+	test("answers a reachable plan with no chance read in its FI date alone", () => {
+		const hero = heroOf(
+			snapshotOf(reachable([{ person: "me", age: 54 }]), { household: HOUSEHOLD }),
+		)
+		expect(hero?.sentence).toBe("You could stop working in Mar 2041, at You 54.")
+		expect(hero?.sentence).not.toContain("simulated markets")
+	})
+
+	test("names the chance's own horizon and counts when it states no success note", () => {
+		const hero = heroOf(snapshotOf(reachable(), { chance: chanceFixture({ succeeded: 174 }) }))
+		expect(hero?.sentence).toBe(
+			"You could stop working in Mar 2041. Your plan as written holds to 2028-12-31 in 174 of 200 simulated markets, which is not a guarantee.",
+		)
+	})
+
+	test("holds no arithmetic: every number is exactly one of the values it was given", () => {
+		const age = 47
+		const succeeded = 137
+		const paths = 219
+		const horizon = "2058-12-31"
+		const hero = heroOf(
+			snapshotOf(reachable([{ person: "me", age }], "2057-07-01"), {
+				chance: chanceFixture({ succeeded, paths, horizon, notes: ["Every figure is nominal."] }),
 				household: HOUSEHOLD,
 			}),
-			snapshotOf(fiFixture(UNREACHABLE.insufficientMoney)),
-		]) {
-			const hero = heroOf(snapshot)
-			if (hero === null) throw new Error("expected a hero")
-			const text = JSON.stringify(snapshot)
-			const numbers = hero.sentence.match(/\d+/g) ?? []
-			expect(numbers.length).toBeGreaterThan(0)
-			for (const number of numbers) expect(text).toContain(number)
-		}
+		)
+		expect(hero?.sentence).toBe(
+			"You could stop working in Jul 2057, at You 47. Your plan as written holds to 2058-12-31 in 137 of 219 simulated markets, which is not a guarantee.",
+		)
+		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47", "2058", "12", "31", "137", "219"])
 	})
 })
 
@@ -126,6 +162,27 @@ describe("the warnings count", () => {
 		expect(hero?.warnings).toHaveLength(3)
 		expect(hero?.warningsLabel).toBe("3 things to check")
 		expect(notes.filter(isWarningNote)).toEqual(notes.slice(0, 3))
+	})
+
+	test("recognises the exact sentences the CLI's note builders state", () => {
+		const stated = [
+			"29603.80 of Contributions could not be funded, so they were not made. Contribution cap: use a monthly Flow.",
+			"Side B could not fund 125000.00 of Contributions, so they were not made. Contribution cap: use a monthly Flow.",
+			"The Scenario had 125000.00 unmet on 2027-03-31. Anything the day's income cannot cover is paid only from the Accounts in cashflow.withdraw, and this asset Account was not in it, holding on that day: bank (125000.00). If the Scenario may draw on it, add it to cashflow.withdraw, for example --set 'cashflow.withdraw=[\"bank\"]'.",
+			"No tax is applied; figures are before tax.",
+			"The 2026 tax year is charged on the Flows from 2026-10-31 plus the stated Carry-in, not the whole year.",
+			"Tax before 2026 is not recomputed; any tax still owed belongs in the Ledger as a liability.",
+		]
+		expect(stated.filter(isWarningNote)).toEqual(stated)
+	})
+
+	test("leaves the success note and an applied-tax note out of the count", () => {
+		expect(isWarningNote(SUCCESS_NOTE)).toBe(false)
+		expect(
+			isWarningNote(
+				'Tax is applied: Thailand 2026 personal income tax, from the Scenario\'s Levy "th-2026".',
+			),
+		).toBe(false)
 	})
 
 	test("links each warning to the note it counts, by the note's own anchor", () => {
