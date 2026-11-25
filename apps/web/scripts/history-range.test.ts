@@ -11,7 +11,7 @@ import { netWorthPageView } from "../src/lib/view/net-worth/page"
 import { valueSheet } from "../src/lib/view/record-values/sheet"
 import type { ValueSheet } from "../src/lib/view/record-values/types"
 import { disposeEditor, postEdit, SLOW_MS, setupEditor } from "./edit-fixture.test-support"
-import { running, settle } from "./loans-running.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** The month-ends from a month through another, as `YYYY-MM-DD`. */
 function monthEnds(from: [number, number], count: number): string[] {
@@ -27,7 +27,7 @@ function sheetOf(dates: string[]): string {
 	return ["Month\tBank\tFund", ...rows].join("\n")
 }
 
-/** The Edit's answer as the page gets it: sent as the editor takes one Edit at a time, and tracked for `settle`. */
+/** Imports a pasted sheet as the page does and answers the Snapshot of the Edit's answer. */
 async function importSheet(text: string): Promise<Snapshot> {
 	const held = snapshot.parse(JSON.parse((await setupEditor()).body ?? "null"))
 	const sheet = valueSheet(held) as ValueSheet
@@ -35,9 +35,7 @@ async function importSheet(text: string): Promise<Snapshot> {
 	expect(parsed.problems).toEqual([])
 	const plan = importPlan(parsed, autoMatches(parsed.sources, targetsOf(sheet)))
 	const against = sheet.choices.find((choice) => choice.name === "Fund Return")?.id ?? ""
-	const sent = postEdit(JSON.stringify(importEdit(plan, against, false)))
-	running.add(sent)
-	const { answer } = await sent.finally(() => running.delete(sent))
+	const { answer } = await postEdit(JSON.stringify(importEdit(plan, against, false)))
 	if (!answer.ok) throw new Error(answer.error.message)
 	return snapshot.parse(answer.snapshot)
 }
