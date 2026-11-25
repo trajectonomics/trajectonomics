@@ -29,6 +29,35 @@ describe("loanCards", () => {
 		expect(loan?.rows).toContainEqual({ label: "Payments", value: "60 equal payments" })
 	})
 
+	test("a once withdrawal reads On its date, with no Ends row", () => {
+		const draw = scenarioFlow.parse({
+			id: "draw",
+			kind: "withdrawal",
+			frequency: "once",
+			start: "2027-01-01",
+			amount: "500000.00",
+			source: "loan",
+		})
+		const card = loanCards([draw])[0]
+		expect(card?.rows).toContainEqual({ label: "On", value: "2027-01-01" })
+		expect(card?.rows.map((row) => row.label)).not.toContain("Ends")
+	})
+
+	test("a recurring withdrawal still reads Starts and Ends", () => {
+		const draw = scenarioFlow.parse({
+			id: "draw",
+			kind: "withdrawal",
+			frequency: "monthly",
+			start: "2027-01-01",
+			end: "2030-01-01",
+			amount: "500.00",
+			source: "loan",
+		})
+		const card = loanCards([draw])[0]
+		expect(card?.rows).toContainEqual({ label: "Starts", value: "2027-01-01" })
+		expect(card?.rows).toContainEqual({ label: "Ends", value: "2030-01-01" })
+	})
+
 	test("a withdrawal priced by a derived amount has no amount to show", () => {
 		const derived = scenarioFlow.parse({
 			id: "draw",

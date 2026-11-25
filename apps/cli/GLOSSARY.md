@@ -255,6 +255,10 @@ _Avoid_: Tax rate, tax setting, tax flag
 Whether a result's figures include income tax: `applied`, `not_applied`, or `mixed` for a compare whose two sides disagree.
 _Avoid_: Taxed, pre-tax, after-tax (as a status)
 
+**Filer**:
+A person a joint Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own. A joint Return with two Filers is one Levy and one bracket walk, with each Filer's own expense ceiling (tax ADR-0009, ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
+_Avoid_: Taxpayer (a Filer is a person in the household, not the status), spouse
+
 **Filing choice**:
 Whether a plan with two earners files jointly (`married_joint`, one Tax Levy) or separately (`married_separate`, one Tax Levy per spouse who has labelled income, once the household has a partner and Owners; otherwise one Tax Levy, as before). It is the `--filing-status` the plan states; the CLI never picks it (ADR-0075).
 _Avoid_: Tax mode, filing option, cheapest filing

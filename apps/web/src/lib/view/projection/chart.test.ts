@@ -39,6 +39,27 @@ describe("netWorthSeries", () => {
 		expect(nominal?.points).toHaveLength(ANNUAL_ROWS.length)
 	})
 
+	test("puts the first person's age under each year, and every person's age in the tooltip's title", () => {
+		const run = projectionRunFixture()
+		const [first, ...rest] = ANNUAL_ROWS
+		if (first === undefined) throw new Error("the fixture has rows")
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "partner", age: 35 },
+		]
+		const withAges = {
+			...run,
+			tables: [{ name: "annual" as const, count: 3, rows: [{ ...first, ages }, ...rest] }],
+		}
+		const [nominal] = netWorthSeries(withAges, "nominal")
+		expect(nominal?.points[0]).toMatchObject({
+			xLabel: "2027",
+			xTitle: "2027, me 37, partner 35",
+			subLabel: "me 37",
+		})
+		expect(nominal?.points[1]?.subLabel).toBeUndefined()
+	})
+
 	test("has no points when the projection has no annual table", () => {
 		const series = netWorthSeries(projectionRunFixture({ tables: [] }), "both")
 		expect(series.every((line) => line.points.length === 0)).toBe(true)

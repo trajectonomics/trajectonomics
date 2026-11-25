@@ -2,6 +2,7 @@ import { z } from "zod"
 import { dateString } from "./date"
 import { integer } from "./integer"
 import { money } from "./money"
+import { errorBody } from "./read"
 
 /** `traj doctor --json`: the data directory, the database, the row counts and each check. */
 export const doctor = z.strictObject({
@@ -30,7 +31,11 @@ export const doctor = z.strictObject({
 	trialBalance: z
 		.strictObject({
 			asOf: dateString,
-			totals: z.array(z.strictObject({ currency: z.string(), debit: money, credit: money })),
+			// Null when a column's sum leaves the safe range (cli ADR 0079): `balanced` is still compared exactly, and `totalsError` says why.
+			totals: z
+				.array(z.strictObject({ currency: z.string(), debit: money, credit: money }))
+				.nullable(),
+			totalsError: errorBody.optional(),
 			balanced: z.boolean(),
 		})
 		.optional(),

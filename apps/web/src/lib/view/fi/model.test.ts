@@ -12,6 +12,21 @@ describe("fiModelOf: the reachable branch", () => {
 		expect(model.date).toBe("1 Mar 2041")
 	})
 
+	test("reads each person's age on the FI date as the CLI states it, and none without a household", () => {
+		const ages = [
+			{ person: "me", age: 51 },
+			{ person: "partner", age: 49 },
+		]
+		const base = fiFixture(REACHABLE)
+		if (!base.fi.reachable) throw new Error("expected a reachable answer")
+		const stated = fiModelOf({ ...base, fi: { ...base.fi, ages } })
+		if (stated.kind !== "reachable") throw new Error("expected a reachable answer")
+		expect(stated.ages).toBe("me 51, partner 49")
+		const none = fiModelOf(fiFixture(REACHABLE))
+		if (none.kind !== "reachable") throw new Error("expected a reachable answer")
+		expect(none.ages).toBeNull()
+	})
+
 	test("states the rule-of-thumb reference with its multiplier, date, basis, window and terms", () => {
 		const model = fiModelOf(fiFixture(REACHABLE))
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")

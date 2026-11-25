@@ -201,6 +201,19 @@ changed since you read it, as on `scenario apply`.
 }
 ```
 
+A couple who file jointly get each spouse's own expense ceiling. When the plan's household
+has a partner and `owners` that say whose each Flow and Account is,
+`--filing-status married_joint` writes one Levy over both people as Filers: the CLI adds the Owner's suffix to each tax label (`income.section40_1@me`,
+`@partner`, or `@shared` for income of both), so state the bare label as before.
+Section 42 bis gives each spouse their own 50% expense, capped at 100,000, even on a
+joint return, which one Levy over a single label could not apply. Salaries of
+1,000,000 and 500,000 owe 160,000 this way, where a Levy over one label owes
+185,000. A taxed Flow with no Owner, or a person id that is not 1 to 32 lowercase
+letters, digits or hyphens, is refused by name. A plan without a partner or without
+`owners` writes the bare labels it always wrote, for every filing status. The result
+lists the `filers` when it has any, and the household's Owners are read each time the
+tax is written, so after changing them run `traj scenario tax <name> --from-stored`.
+
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
 Levy and period, with a `"0.00"` for every class the period had no income in or
@@ -219,6 +232,11 @@ and where it came from, and one that starts on a period boundary needs nothing:
   }
 ]
 ```
+
+A Levy over Filers reads Filer labels, so its record names them: each of its 29 classes
+once per Filer (`income.section40_1@me`) and its 22 income classes once more for income
+of both (`income.section40_1@shared`), 80 for two Filers where a Levy over one label has
+29. A missing class is listed by name, and a bare label is refused.
 
 ## Chance of success
 

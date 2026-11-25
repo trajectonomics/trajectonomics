@@ -16,10 +16,19 @@ export function failure(status: number, error: ErrorBody): Response {
 	return json(status, JSON.stringify({ ok: false, error }))
 }
 
-/** Answers a Snapshot run: the Snapshot, with the write's own result when it states one, or the CLI's error as data. */
-export function answerOf(run: SnapshotRun, result?: unknown): Response {
+/**
+ * Answers a Snapshot run: the Snapshot, with the write's own result when it states one and the household
+ * anchors it dropped when it dropped any, or the CLI's error as data.
+ */
+export function answerOf(
+	run: SnapshotRun,
+	result?: unknown,
+	droppedAnchors: readonly string[] = [],
+): Response {
 	if (!run.ok) return failure(200, run.error)
-	const stated = result === undefined ? "" : `,"result":${JSON.stringify(result)}`
+	const dropped =
+		droppedAnchors.length === 0 ? "" : `,"droppedAnchors":${JSON.stringify(droppedAnchors)}`
+	const stated = (result === undefined ? "" : `,"result":${JSON.stringify(result)}`) + dropped
 	return json(200, `{"ok":true,"snapshot":${JSON.stringify(run.snapshot)}${stated}}`)
 }
 

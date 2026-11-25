@@ -5,6 +5,7 @@
  * labels are offered: the form labels income Flows. `scripts/tax-cards.test.ts` pins the list against `traj`'s own. Pure.
  */
 import { z } from "zod"
+import { KNOWN_LABELS } from "../contract/allowance-labels"
 
 /** The income labels `scenario tax --label` takes for an income Flow, in the CLI's order. */
 export const INCOME_LABEL_IDS = [
@@ -55,4 +56,17 @@ export type TaxLabels = z.infer<typeof taxLabels>
 /** The argv tokens of the labels: one `--label=<flow>=<label>` each, a single token. */
 export function labelTokens(labels: TaxLabels): string[] {
 	return labels.map((one) => `--label=${one.flow}=${one.label}`)
+}
+
+/**
+ * A tax label without its `@<filer>` suffix, or the label itself when its base is no income or contribution label `traj` reads.
+ * A joint Return over Filers stores each Flow's label with its Owner's suffix (`income.section40_1@me`, or `@shared`), the same
+ * rule as `bareLabelOf` in `traj` (cli ADR-0075). Pure.
+ */
+export function bareLabelOf(label: string): string {
+	const at = label.lastIndexOf("@")
+	if (at <= 0) return label
+	const base = label.slice(0, at)
+	const known = [...INCOME_LABEL_IDS, ...KNOWN_LABELS] as readonly string[]
+	return known.includes(base) ? base : label
 }

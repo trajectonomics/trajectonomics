@@ -1,6 +1,7 @@
 import { counted } from "../counts"
 import { type AppError, isAppError } from "../errors"
-import { trialBalanceAt } from "../report/trial"
+import { totalSentence } from "../report/total-view"
+import { trialAgrees, trialReport } from "../report/trial"
 import type { Ledger, Store } from "../store"
 import { NO_TRIAL, sentenceOf, skipped, step } from "./checks"
 import type { DoctorCheck, DoctorResult } from "./output"
@@ -27,17 +28,26 @@ function ledgerCheck(store: Store): { check: DoctorCheck; ledger?: Ledger } {
 	return { check: step("ledger", "pass", detail), ledger }
 }
 
-/** The Trial Balance at the caller's date, and whether each currency's two columns agree. */
+/**
+ * The Trial Balance at the caller's date, and whether each currency's two columns agree. The
+ * comparison is exact, so a total that cannot be stated (ADR-0079) still gives a real pass or fail.
+ */
 function trialCheck(ledger: Ledger, asOf: string) {
-	const trial = trialBalanceAt(ledger, asOf)
-	if (isAppError(trial)) return trial
-	const balanced = trial.totals.every((total) => total.debit === total.credit)
-	const detail = balanced
-		? `Debits equal credits at ${asOf}.`
-		: `Debits and credits disagree at ${asOf}: a currency's totals differ.`
+	const report = trialReport(ledger, asOf)
+	if (isAppError(report)) return report
+	const balanced = trialAgrees(ledger, asOf)
+	if (isAppError(balanced)) return balanced
+	const stated = report.totals !== null
+	const verdict = balanced
+		? `Debits equal credits at ${asOf}`
+		: `Debits and credits disagree at ${asOf}`
+	const detail = stated
+		? `${verdict}${balanced ? "." : ": a currency's totals differ."}`
+		: `${verdict}, compared exactly; the totals are not stated: ${totalSentence("none").replace("not stated: ", "")}.`
+	const { rows: _rows, ...totals } = report
 	return {
 		check: step("trialBalance", balanced ? "pass" : "fail", detail),
-		trialBalance: { asOf, totals: trial.totals, balanced },
+		trialBalance: { asOf, ...totals, balanced },
 	}
 }
 

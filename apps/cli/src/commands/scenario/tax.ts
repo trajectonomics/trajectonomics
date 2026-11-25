@@ -17,6 +17,8 @@ import { assumptionsField } from "../../tax-assumptions"
 export const tax: Leaf = defineCommand({
 	name: "tax",
 	summary: "Write or remove the tax Levy a Scenario's labelled Flows are taxed under",
+	description:
+		"With --filing-status married_joint and a household that has a partner and Owners (traj scenario household), the Levy is one over both people as Filers: state each label bare, and the CLI adds the Owner's suffix (income.section40_1@me, or @shared for income of both), so each spouse has their own expense ceiling. Without a partner or Owners every status writes the bare labels it always wrote. The household is read each time the tax is written: after changing its owners, run --from-stored.",
 	note: "The stored tax profile ships in 0.8.0, and so do --merge, --from-stored and --if-hash.",
 	positionals: ["scenario"],
 	input: z.strictObject({
@@ -60,6 +62,12 @@ export const tax: Leaf = defineCommand({
 			.string()
 			.optional()
 			.describe("The Levy id the write states; absent when --none wrote no Levy."),
+		filers: z
+			.array(z.string())
+			.optional()
+			.describe(
+				"The Filers of the joint Return the Levy is written over, holder first, each a household person who has income; absent when the plan keeps bare labels, because its household has no partner or no Owners, or its filing status is not married_joint.",
+			),
 		allowances: z
 			.strictObject({
 				stated: z

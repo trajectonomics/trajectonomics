@@ -15,15 +15,17 @@ export const totalRefusal: z.ZodType<TotalRefusal> = z
 	})
 	.describe("Why the total is not stated, in the fields of an error envelope.")
 
-/** What the amounts above a refused total are called: a Balance at a date, or an amount over a period. */
-type Figure = "balance" | "amount"
+/** What the amounts above a refused total are called: a Balance at a date, an amount over a period, or none (`doctor` states no rows). */
+type Figure = "balance" | "amount" | "none"
 
 /**
  * The human sentence for a result whose total is refused, in place of the total's line. JSON carries
  * the refusal; a person at a terminal reads that every account is stated and the sum is not.
  */
 export function totalSentence(figure: Figure = "balance"): string {
-	return `not stated: every account is in range, but their sum exceeds the safe integer range; each account's ${figure} above is stated`
+	const range =
+		"not stated: every account is in range, but their sum exceeds the safe integer range"
+	return figure === "none" ? range : `${range}; each account's ${figure} above is stated`
 }
 
 /**
