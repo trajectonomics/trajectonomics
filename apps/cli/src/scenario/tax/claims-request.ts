@@ -6,6 +6,7 @@ import { claimsOfRequest, seedReturns, zeroClaims } from "./claims-seed"
 import type { Stated } from "./claims-values"
 import type { Couple } from "./couple"
 import type { ReturnClaims, TaxRequest, ThFilingStatus } from "./flags"
+import { sharedNeedsSeparate, takeShared, withShared } from "./shared-mortgage"
 
 /** The request the resolved claims state: one Return, or one claim set per Return of a separate filing. */
 function assembled(
@@ -43,7 +44,8 @@ function assembled(
  * The request the flags state over an optional base (cli ADR-0075). A bare value names the holder; a
  * person-qualified one needs `married_separate` with a partner, and is refused otherwise. Each Return's
  * children default to 0. Without such a pair the base's Returns are carried as they are. A separate
- * filing first hands the flat claims to the household's holder.
+ * filing first hands the flat claims to the household's holder. `shared=` states the interest on a loan
+ * borrowed together, which needs the pair too.
  */
 export function requestOfClaims(input: {
 	status: ThFilingStatus
@@ -55,20 +57,19 @@ export function requestOfClaims(input: {
 }): TaxRequest | AppError {
 	const separate = input.status === "married_separate"
 	const pair = separate ? input.couple : null
-	const refused = checkedPersons(input.stated, pair)
+	const { own: stated, shared } = takeShared(input.stated)
+	if (shared !== undefined && pair === null) return sharedNeedsSeparate()
+	const refused = checkedPersons(stated, pair)
 	if (refused !== null) return refused
 	// One joint or single Return's claims are the Return's, whoever the holder is: nothing moves.
 	const base =
 		separate && input.base !== undefined ? claimsHeldBy(input.base, input.holder) : input.base
 	const flat = base === undefined ? zeroClaims() : claimsOfRequest(base)
 	const returns = seedReturns(pair, base, flat)
-	applyStated(input.stated, flat, returns, pair)
-	const tooMany = checkedCounts(input.stated, pair === null ? [flat] : [...returns.values()])
+	applyStated(stated, flat, returns, pair)
+	const tooMany = checkedCounts(stated, pair === null ? [flat] : [...returns.values()])
 	if (tooMany !== null) return tooMany
 	const request = assembled(input.status, base, flat, returns, pair)
-	if ("jurisdiction" in request) {
-		const named = namedValues(input.stated, pair)
-		if (named.length > 0) request.named = named
-	}
-	return request
+	if (!("jurisdiction" in request)) return request
+	return withShared(request, shared, base, namedValues(stated, pair))
 }

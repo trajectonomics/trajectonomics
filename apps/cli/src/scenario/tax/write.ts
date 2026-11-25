@@ -64,7 +64,7 @@ function writtenBy(made: Written): Omit<TaxWritten, "dryRun" | "status" | "scena
 		...(only !== undefined && made.levies.length === 1 ? { levy: only } : { levies: made.levies }),
 		...(made.filers === undefined ? {} : { filers: made.filers }),
 		allowances: taxProfileOf(made.request, made.document),
-		assumptions: taxAssumptionsOf(made.document, made.separateLoans),
+		assumptions: taxAssumptionsOf(made.document, made.ceilingNotes),
 	}
 }
 
