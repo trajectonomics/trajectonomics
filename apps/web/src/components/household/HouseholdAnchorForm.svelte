@@ -46,7 +46,13 @@ async function save(event: SubmitEvent): Promise<void> {
 	}
 	problems = {}
 	const next = householdWithAnchor(household, result.anchor)
-	if (await editSession.run({ kind: "set-household", name, contentHash, household: next })) onDone()
+	if (
+		await editSession.run(
+			{ kind: "set-household", name, contentHash, household: next },
+			"household",
+		)
+	)
+		onDone()
 }
 </script>
 

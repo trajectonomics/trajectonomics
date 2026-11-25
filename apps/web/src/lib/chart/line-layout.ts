@@ -4,7 +4,7 @@ import type { LineMarker, LineSeries } from "./line"
 import { linePath } from "./path"
 import { linearScale } from "./scale"
 import { niceTicks } from "./ticks"
-import { labelsFor, titlesFor, xTicksFor } from "./x-labels"
+import { labelsFor, subLabelsFor, titlesFor, xTicksFor } from "./x-labels"
 
 export type * from "./layout-types"
 
@@ -35,11 +35,17 @@ export function lineLayout(
 	const xLabels = labelsFor(series, xs)
 	const xPixels = xs.map(scaleX)
 	const plotWidth = plot.width - margin.left - margin.right
+	const subs = subLabelsFor(series, xs)
+	const xTicks = xTicksFor(
+		xLabels,
+		xPixels,
+		Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE)),
+	).map((tick) => (subs[tick.index] ? { ...tick, sub: subs[tick.index] as string } : tick))
 	return {
 		xLabels,
 		xTitles: titlesFor(series, xs),
 		xPixels,
-		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
+		xTicks,
 		yTicks: yTicks.map((value) => ({ value, y: scaleY(value) })),
 		series: series.map((line) => seriesLayout(line, xs, scaleX, scaleY)),
 		markers: markers.map((marker) => ({

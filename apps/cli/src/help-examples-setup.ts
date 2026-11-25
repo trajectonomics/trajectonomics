@@ -1,5 +1,6 @@
 import { isAppError } from "./errors"
 import { CHANCE_SETUP } from "./help-examples-chance"
+import { COUPLE_SETUP } from "./help-examples-couple"
 import { BASE_HOUSEHOLD } from "./help-examples-household"
 import { RUN_SETUP } from "./help-examples-run"
 import { ACCOUNT_SETUPS } from "./help-examples-value"
@@ -77,6 +78,8 @@ export const SETUP: Record<string, Setup> = {
 		steps: [["scenario", "fork", "base", "early"]],
 		files: { "notes.txt": "Retire at 55.\nSell the condo in 2031.\n" },
 	},
+	// A plan of two earners and the household that owns each salary, which the joint-Return example taxes (cli ADR-0075).
+	"scenario tax": COUPLE_SETUP,
 	"scenario household": { files: { "household.json": JSON.stringify(BASE_HOUSEHOLD) } },
 	"scenario apply": {
 		files: {

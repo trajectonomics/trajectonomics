@@ -63,3 +63,7 @@ Step 3 of separate filing builds the household's side only, and changes no tax b
 - **A person id is not checked against the Filer pattern here.** That refusal belongs to the tax write (ADR-0075).
 - **`apply` and `fork` drop an Owner whose item left the document, as they drop an anchor.** The household keeps the Owners whose Flow or Account the written document still holds, so the stored household can always be written back with `scenario household`. The paths dropped are in `droppedOwners`, a key of the `apply` and `fork` results that is absent when none was dropped, so their output keeps its bytes for a household with no Owners. A version 1 household has no `owners` and keeps its bytes. Filling or refusing a Filer suffix from an Owner is still the filing step's.
 - **Older builds.** A `traj` built before this change refuses a version 2 household at the household schema check, so `projection run` against one fails with `internal` there.
+
+## Amended (#508): `scenario tax` reads the Owners
+
+The first reader of Owners is `scenario tax` for a joint Return (ADR-0075). It reads the household inside its own write, and writes the Filer suffix onto the tax labels of the Flows and Accounts the Owners name. `scenario household`, `apply` and `fork --set` still write no label, so the labels and the Owners can drift apart until `scenario tax --from-stored` runs again; filling a missing suffix and refusing a different one from those commands remains to be built.

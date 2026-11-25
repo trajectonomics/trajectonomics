@@ -54,6 +54,33 @@ export function profitAndLoss(
 	options: ProfitAndLossOptions,
 	chart: ChartOfAccounts,
 ): ProfitAndLoss<BalanceRow | GroupedRow> {
+	const { rows, leaves } = readRows(transactions, options, chart)
+	// Seed every Income and Expense Leaf's pair so the totals' shape depends only on the chart.
+	const pairs = leaves.map(({ entityId, currency }) => ({ entityId, currency, amount: 0 }))
+	return Object.freeze({
+		rows,
+		totals: totalsOf([...pairs, ...rows], -1n, (pair) => `profitAndLoss.totals[${pair}]`),
+	})
+}
+
+/**
+ * The rows of `profitAndLoss` alone, with no total: what a caller states when the sum across
+ * accounts leaves the safe range though every row is inside it. The rows are `profitAndLoss`'s, and
+ * a row outside the range is refused here as there.
+ */
+export function profitAndLossRows(
+	transactions: readonly Transaction[],
+	options: ProfitAndLossOptions,
+	chart: ChartOfAccounts,
+): readonly (BalanceRow | GroupedRow)[] {
+	return readRows(transactions, options, chart).rows
+}
+
+function readRows(
+	transactions: readonly Transaction[],
+	options: ProfitAndLossOptions,
+	chart: ChartOfAccounts,
+) {
 	const period = parsePeriod(options)
 	const entries = scanLedger(transactions, chart).filter(
 		({ account, posting, date }) =>
@@ -66,10 +93,5 @@ export function profitAndLoss(
 		(a) => chart.isLeaf(a.id) && (a.type === "income" || a.type === "expense"),
 	)
 	const rows = groupBy === undefined ? plainRows(leaves, entries) : groupedRows(entries, groupBy)
-	// Seed every Income and Expense Leaf's pair so the totals' shape depends only on the chart.
-	const pairs = leaves.map(({ entityId, currency }) => ({ entityId, currency, amount: 0 }))
-	return Object.freeze({
-		rows: Object.freeze(rows),
-		totals: totalsOf([...pairs, ...rows], -1n, (pair) => `profitAndLoss.totals[${pair}]`),
-	})
+	return { rows: Object.freeze(rows), leaves }
 }

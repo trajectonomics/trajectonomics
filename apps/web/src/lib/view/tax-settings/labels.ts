@@ -5,7 +5,7 @@
  * the Levy would tally such a Flow as nothing. Pure.
  */
 import type { ScenarioDocument } from "../../contract"
-import { INCOME_LABEL_IDS } from "../../edit/tax-labels"
+import { bareLabelOf, INCOME_LABEL_IDS } from "../../edit/tax-labels"
 
 /** The ids of the plan's income Flows. */
 export function incomeFlows(plan: ScenarioDocument): string[] {
@@ -18,7 +18,7 @@ export function unlabelledIncome(plan: ScenarioDocument): string[] {
 		.filter(
 			(flow) =>
 				flow.kind === "income" &&
-				!(INCOME_LABEL_IDS as readonly string[]).includes(flow.label ?? ""),
+				!(INCOME_LABEL_IDS as readonly string[]).includes(bareLabelOf(flow.label ?? "")),
 		)
 		.map((flow) => flow.id)
 }
