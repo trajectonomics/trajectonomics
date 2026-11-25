@@ -1,7 +1,6 @@
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import {
 	BINARY,
-	copy,
 	disposeEditor,
 	ledgerHome,
 	ledgerShow,
@@ -10,6 +9,8 @@ import {
 	shownOf,
 	withAmount,
 } from "./edit-fixture.test-support"
+import { forkInTerminal } from "./edit-fork.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** An apply-plan Edit of one plan, carrying the content hash the page read for it. */
 const applyEdit = (name: string, contentHash: string, document: unknown) =>
@@ -19,9 +20,8 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 	test(
 		"a changed amount runs apply --decimal: the Snapshot shows 9000.50, and the ledger holds 900050",
 		async () => {
-			const copied = await postEdit(copy("e2e-edit"))
-			if (!copied.answer.ok) throw new Error(copied.answer.error.message)
-			const before = shownOf(copied.answer, "e2e-edit")
+			await forkInTerminal("e2e-edit")
+			const before = ledgerShow("e2e-edit", true)
 			const document = withAmount(before.scenario.document, "salary", "9000.50")
 			const { status, answer } = await postEdit(
 				applyEdit("e2e-edit", before.scenario.contentHash, document),
@@ -45,9 +45,8 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 	test(
 		"saving a document that changed nothing leaves the plan unchanged: same hash, same version",
 		async () => {
-			const copied = await postEdit(copy("e2e-same"))
-			if (!copied.answer.ok) throw new Error(copied.answer.error.message)
-			const before = shownOf(copied.answer, "e2e-same")
+			await forkInTerminal("e2e-same")
+			const before = ledgerShow("e2e-same", true)
 			const { status, answer } = await postEdit(
 				applyEdit("e2e-same", before.scenario.contentHash, before.scenario.document),
 			)
@@ -71,9 +70,8 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 	test(
 		"a refused amount answers the CLI's error with the path of its field, and changes nothing",
 		async () => {
-			const copied = await postEdit(copy("e2e-refused"))
-			if (!copied.answer.ok) throw new Error(copied.answer.error.message)
-			const before = shownOf(copied.answer, "e2e-refused")
+			await forkInTerminal("e2e-refused")
+			const before = ledgerShow("e2e-refused", true)
 			const document = withAmount(before.scenario.document, "salary", "9000.501")
 			const { status, answer } = await postEdit(
 				applyEdit("e2e-refused", before.scenario.contentHash, document),
@@ -89,4 +87,5 @@ describe("saving a Flow of a plan's document, against the real traj", () => {
 	)
 })
 
+afterEach(settle, SLOW_MS)
 afterAll(disposeEditor)

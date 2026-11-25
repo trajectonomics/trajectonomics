@@ -8,6 +8,7 @@ import { homeDraft } from "../src/lib/view/plan-items/asset-fixtures.test-suppor
 import { assetFromDraft } from "../src/lib/view/plan-items/asset-from-draft"
 import { assetDraftOf } from "../src/lib/view/plan-items/asset-read"
 import { withoutAsset } from "../src/lib/view/plan-items/asset-remove"
+import { settle } from "./editor-running.test-support"
 import {
 	disposeLedger,
 	documentOf,
@@ -16,7 +17,6 @@ import {
 	save,
 	setupLedger,
 } from "./loans-ledger.test-support"
-import { settle } from "./loans-running.test-support"
 
 const PLAN = "home-plan"
 const EDIT = { isNew: false, ownedIds: [] }
