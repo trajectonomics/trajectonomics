@@ -2,7 +2,7 @@
 import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { nameOf } from "../../lib/view/account-names"
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
-import { type LoanMarks, NO_LOAN_MARKS } from "../../lib/view/what-if/loan-items"
+import { type LoanMarks, NO_LOAN_MARKS, rowKey } from "../../lib/view/what-if/loan-items"
 import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
 import GroupSwitch from "../what-if/GroupSwitch.svelte"
@@ -56,7 +56,7 @@ const button =
 	<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 		{#each card.rows as row (row.label)}
 			<dt class="text-muted-foreground">{row.label}</dt>
-			<dd>{row.value}<WasText was={marks.rows[row.label]} /></dd>
+			<dd>{row.value}<WasText was={marks.rows[rowKey(row)]} /></dd>
 		{/each}
 		<dt class="text-muted-foreground">Paid in the first payment month</dt>
 		<dd>
