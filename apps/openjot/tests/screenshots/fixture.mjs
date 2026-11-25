@@ -13,7 +13,7 @@ export const TIMEZONE = "Asia/Bangkok";
 /**
  * @param {object} options
  * @param {"en" | "th"} [options.lang]
- * @param {"pink-white" | "orange-black"} [options.theme]
+ * @param {"trajectonomics" | "pink-white" | "orange-black"} [options.theme]
  * @param {"left" | "right"} [options.hand]
  * @param {"full" | "empty"} [options.data] "empty" is a month with no records.
  * @param {"done" | "pending"} [options.onboarding] "pending" opens the first-run tour.
