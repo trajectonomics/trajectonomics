@@ -250,7 +250,7 @@ function writeReport(failed) {
     .join("\n");
   const html = `<!doctype html>
 <meta charset="utf-8">
-<title>moojot screenshot diffs</title>
+<title>openjot screenshot diffs</title>
 <style>
   body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; background: #f4f4f5; color: #18181b; }
   section { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }

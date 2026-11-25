@@ -60,11 +60,28 @@ describe("AssetsCard", () => {
 		expect(body).toContain("No liability accounts.")
 	})
 
-	test("divides the assets as a bar and lists the liabilities with their negative amounts", () => {
+	test("divides the assets as a bar and reads a negative liability as what you owe", () => {
 		const { body } = render(AssetsCard, { props: { assets: netWorthCardRead() } })
 		expect(body).toContain('aria-label="Assets by account, THB"')
 		expect(body).toContain("Loan")
-		expect(body).toContain("−200.00")
+		expect(body).toContain("You owe")
+		expect(body).toContain("200.00")
+		expect(body).toContain('title="The ledger states −200.00 THB"')
+		expect(body).not.toContain("as the ledger states them")
+	})
+
+	test("reads an overpaid liability as money owed to you, not as money you owe", () => {
+		const data = netWorth(
+			"2026-10-31",
+			[row("Bank", "asset", "600.00"), row("Loan", "liability", "50.00")],
+			THB("650.00"),
+		)
+		const { body } = render(AssetsCard, {
+			props: { assets: okRead(NW_ARGV, netWorthView(data)) },
+		})
+		expect(body).toContain("Owed to you")
+		expect(body).toContain("50.00")
+		expect(body).not.toContain("You owe")
 	})
 
 	test("is a failed card on its own when its Read failed", () => {

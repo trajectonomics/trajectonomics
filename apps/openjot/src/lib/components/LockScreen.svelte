@@ -26,7 +26,7 @@
   aria-modal="true"
   aria-labelledby="lock-title"
 >
-  <MooMascot mood="idle" size="lg" interactive={false} alt="MooJot" />
+  <MooMascot mood="idle" size="lg" interactive={false} alt="OpenJot" />
   <div class="space-y-1.5">
     <h1 id="lock-title" class="flex items-center justify-center gap-2 text-xl font-extrabold text-[var(--text-primary)]">
       <Lock class="size-5 text-[var(--brand)]" />

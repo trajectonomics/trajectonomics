@@ -1,16 +1,31 @@
 {
   "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
-  // moojot.trajectonomics.com: the landing page. See site/README.md.
+  // openjot.trajectonomics.com: the landing page; moojot.trajectonomics.com redirects to it
+  // (except /ingest, see release.js). See site/README.md.
   "name": "moojot-site",
   "main": "worker.js",
   "compatibility_date": "2026-11-01",
   "workers_dev": false,
-  "routes": [{ "pattern": "moojot.trajectonomics.com", "custom_domain": true }],
+  "routes": [
+    { "pattern": "openjot.trajectonomics.com", "custom_domain": true },
+    { "pattern": "moojot.trajectonomics.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    // Every other path is a static file and never wakes the script.
-    "run_worker_first": ["/download", "/download/*", "/go", "/go/*", "/api/*", "/ingest/*"],
+    // The two pages run the Worker so the old host can redirect them (see release.js),
+    // which costs one Worker request per page view. Every other path is a static file
+    // and never wakes the script.
+    "run_worker_first": [
+      "/",
+      "/meowjot-alternative",
+      "/download",
+      "/download/*",
+      "/go",
+      "/go/*",
+      "/api/*",
+      "/ingest/*"
+    ],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },

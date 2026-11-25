@@ -8,8 +8,31 @@
 # `npx --yes @trajectonomics/cli@<version>` for the channel smoke.
 set -eu
 
+# Every `traj` a test runs stays out of the usage telemetry.
+export DO_NOT_TRACK=1
+
 version=$1
 shift
+
+# The scratch ledger and the two captured outputs go however the script ends. Only `home` is the
+# script's own: a caller's `TRAJ_HOME` is never removed, and before `home` is set there is nothing
+# to remove.
+home=""
+envelope=""
+log=""
+dashboard=""
+cleanup() {
+	[ -z "$dashboard" ] || kill "$dashboard" 2>/dev/null || true
+	[ -z "$home" ] || rm -rf "$home"
+	[ -z "$envelope" ] || rm -f "$envelope"
+	[ -z "$log" ] || rm -f "$log"
+}
+trap cleanup EXIT
+# dash runs no EXIT trap when a signal kills it, so each handler cleans up, then dies by the same
+# signal: reset the traps and re-raise it, so the exit status is 128 + the signal number, as for a
+# shell that never trapped it.
+trap 'cleanup; trap - EXIT INT; kill -INT $$' INT
+trap 'cleanup; trap - EXIT TERM; kill -TERM $$' TERM
 
 fail() {
 	echo "smoke: $*" >&2
@@ -18,7 +41,8 @@ fail() {
 
 [ "$("$@" --version)" = "$version" ] || fail "--version did not report $version"
 
-export TRAJ_HOME="$(mktemp -d)"
+home="$(mktemp -d)"
+export TRAJ_HOME="$home"
 "$@" init --json | grep -q '"created":true' || fail "init did not report created"
 "$@" init --json | grep -q '"created":false' || fail "init was not idempotent"
 "$@" account add Cash --type asset --currency THB --json >/dev/null || fail "account add failed"
@@ -40,6 +64,7 @@ if [ -x "$1" ] && [ "$#" -eq 1 ]; then
 		log="$(mktemp)"
 		"$1" dashboard --as-of 2026-03-31 --horizon 2027-03-31 --port 0 >/dev/null 2>"$log" &
 		pid=$!
+		dashboard=$pid
 		url=""
 		tries=0
 		while [ -z "$url" ] && [ "$tries" -lt 150 ]; do
@@ -52,6 +77,7 @@ if [ -x "$1" ] && [ "$#" -eq 1 ]; then
 		curl -fsS "${url}snapshot.json" | grep -q '"snapshotVersion":1' || { kill "$pid"; fail "dashboard served no Snapshot"; }
 		kill -INT "$pid"
 		wait "$pid" || fail "dashboard did not exit 0 on SIGINT"
+		dashboard=""
 		;;
 	esac
 fi

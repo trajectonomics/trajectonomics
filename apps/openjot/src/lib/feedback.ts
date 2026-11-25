@@ -28,13 +28,13 @@ export function feedbackMailto(info: {
   androidVersion: string | null;
   lang: FeedbackLang;
 }): string {
-  const subject = `[MooJot feedback] ${info.version}`;
+  const subject = `[OpenJot feedback] ${info.version}`;
   const body = [
     "",
     "",
     "---",
     MAIL_NOTE[info.lang],
-    `App: MooJot ${info.version}`,
+    `App: OpenJot ${info.version}`,
     `Android: ${info.androidVersion ?? "unknown"}`,
     `Language: ${info.lang}`,
   ].join("\n");

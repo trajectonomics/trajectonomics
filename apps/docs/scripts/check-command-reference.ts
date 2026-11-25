@@ -34,5 +34,10 @@ export async function main(argv: readonly string[], deps: CommandReferenceDeps):
 }
 
 if (import.meta.main) {
-	process.exitCode = await main(process.argv.slice(2), createCommandReferenceDeps())
+	const deps = createCommandReferenceDeps()
+	try {
+		process.exitCode = await main(process.argv.slice(2), deps)
+	} finally {
+		await deps.dispose()
+	}
 }

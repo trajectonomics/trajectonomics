@@ -1,7 +1,6 @@
 // The scratch ledger the account-income end-to-end test runs against, through the workspace's own traj: a plan worked by
 // hand with a salary that stops at a Milestone, a fund and a provident fund, and an editor over it (web ADR 0017).
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { type EditAnswer, editAnswer } from "../src/lib/edit/answer"
@@ -12,6 +11,7 @@ import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
 import { handDocument } from "./income-document.test-support"
 import { AS_OF, PLAN, PROVIDENT } from "./income-names.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 export { AS_OF, PLAN, PROVIDENT }
@@ -43,7 +43,7 @@ export function storedPlan(): { hash: string; document: ScenarioDocument } {
 
 /** The ledger, the plan and the editor over them. Returns the fund's id, which the Baseline holds. */
 export async function setupIncome(): Promise<{ fund: string; bank: string }> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-income-"))
+	scratch = await makeScratch("traj-web-income-")
 	home = join(scratch, "traj-home")
 	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const base = storedPlan0(demo)
@@ -88,5 +88,5 @@ export async function tryWhatIf(body: unknown): Promise<WhatIfAnswer> {
 }
 
 export async function disposeIncome(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }

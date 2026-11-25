@@ -1,6 +1,7 @@
 import { afterAll } from "bun:test"
-import { sweepTempDirs } from "./temp-dir"
+import { sweepOnKill, sweepTempDirs } from "./temp-dir"
 
 // Loaded by `bunfig.toml` before the tests. Bun runs this hook once, after the last file, whether
-// the tests passed or failed.
+// the tests passed or failed; `sweepOnKill` covers a run that is interrupted or terminated.
 afterAll(sweepTempDirs)
+sweepOnKill()

@@ -1,8 +1,7 @@
 // The scratch ledger the Assumptions end-to-end tests run against, through the workspace's own traj: the withdrawals test's
 // hand-worked plan (a bank, a fund and a car loan, inflation stated as 0) with no volatility and no chance inputs, and an
 // editor over it whose every traj call is logged (cli ADR 0068, web ADR 0018).
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { type EditAnswer, editAnswer } from "../src/lib/edit/answer"
@@ -12,6 +11,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
@@ -48,7 +48,7 @@ export function storedPlan(): { hash: string; document: ScenarioDocument } {
 
 /** Builds the ledger, applies the plan, and starts the editor, with the chance reads off until a test states them. */
 export async function setupAssumptions(): Promise<Editor> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-assumptions-"))
+	scratch = await makeScratch("traj-web-assumptions-")
 	home = join(scratch, "traj-home")
 	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const base = scenarioDocument.parse(
@@ -113,7 +113,7 @@ export async function tryWhatIf(body: unknown): Promise<WhatIfAnswer> {
 
 export async function disposeAssumptions(): Promise<void> {
 	if (spy !== null) await spy.dispose()
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }
 
 /** `traj <argv>` on the scratch ledger, as someone at a terminal would run it. */

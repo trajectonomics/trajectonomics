@@ -1,7 +1,6 @@
 // The scratch ledger the loan end-to-end tests write to, through the workspace's own traj binary: helpers to
 // read a plan, send an Edit as the planner does, and read the plan's projection back from the answer.
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import {
 	type Baseline,
@@ -17,6 +16,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { track } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 export { SLOW_MS }
@@ -100,7 +100,7 @@ export function runOf(answer: Answer, name: string): ProjectionRun {
 
 /** Builds the demo ledger in a scratch directory, with each plan a copy of `base`, and an editor over it. */
 export async function setupLedger(plans: string[]): Promise<void> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-loans-fixes-"))
+	scratch = await makeScratch("traj-web-loans-fixes-")
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	for (const name of plans) applyInTerminal(name, documentOf("base"))
@@ -116,5 +116,5 @@ export async function setupLedger(plans: string[]): Promise<void> {
 
 /** Removes the scratch ledger. */
 export async function disposeLedger(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }

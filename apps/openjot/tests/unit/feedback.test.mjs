@@ -22,7 +22,7 @@ test("the mailto goes to support@ with the version in the subject", () => {
   assert.equal(FEEDBACK_EMAIL, "support@trajectonomics.com");
   const mail = decode(feedbackMailto({ version: "1.3.0", androidVersion: "14", lang: "en" }));
   assert.equal(mail.head, "mailto:support@trajectonomics.com");
-  assert.equal(mail.subject, "[MooJot feedback] 1.3.0");
+  assert.equal(mail.subject, "[OpenJot feedback] 1.3.0");
 });
 
 test("the body is two empty lines, a separator, the note and the three footer lines", () => {
@@ -34,7 +34,7 @@ test("the body is two empty lines, a separator, the note and the three footer li
       "",
       "---",
       "Please don't include account numbers or slip photos.",
-      "App: MooJot 1.3.0",
+      "App: OpenJot 1.3.0",
       "Android: 14",
       "Language: en",
     ].join("\n"),
@@ -45,7 +45,7 @@ test("the note is in the app language and the footer says th", () => {
   const mail = decode(feedbackMailto({ version: "1.3.0", androidVersion: null, lang: "th" }));
   const lines = mail.body.split("\n");
   assert.equal(lines[3], "กรุณาอย่าใส่เลขบัญชีหรือรูปสลิป");
-  assert.deepEqual(lines.slice(4), ["App: MooJot 1.3.0", "Android: unknown", "Language: th"]);
+  assert.deepEqual(lines.slice(4), ["App: OpenJot 1.3.0", "Android: unknown", "Language: th"]);
 });
 
 test("spaces are %20, never +", () => {

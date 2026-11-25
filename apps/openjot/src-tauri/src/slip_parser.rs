@@ -1,4 +1,4 @@
-//! Bank-slip understanding for MooJot.
+//! Bank-slip understanding for OpenJot.
 //!
 //! Three independent pieces:
 //! 1. [`parse_slip_qr`] decodes the BOT Slip-Verify Mini-QR and TrueMoney QR
