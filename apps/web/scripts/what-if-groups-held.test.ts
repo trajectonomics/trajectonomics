@@ -10,6 +10,7 @@ import { assetDocument } from "../src/lib/view/plan-items/asset-document"
 import { homeDraft, partsOf } from "../src/lib/view/plan-items/asset-fixtures.test-support"
 import { loanCardsOf } from "../src/lib/view/plan-items/loan-card"
 import type { GroupSpec } from "../src/lib/what-if/session"
+import { settle } from "./editor-running.test-support"
 import { forkHash } from "./loans-fork.test-support"
 import {
 	applyInTerminal,
@@ -21,7 +22,6 @@ import {
 	send,
 	setupLedger,
 } from "./loans-ledger.test-support"
-import { settle } from "./loans-running.test-support"
 
 /** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
 const realFetch = globalThis.fetch

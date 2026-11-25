@@ -11,6 +11,7 @@ import { homeDraft, partsOf } from "../src/lib/view/plan-items/asset-fixtures.te
 import { loanCardsOf } from "../src/lib/view/plan-items/loan-card"
 import { loanDocument, loanOf } from "../src/lib/view/plan-items/loan-document"
 import { loanFromDraft } from "../src/lib/view/plan-items/loan-draft"
+import { settle } from "./editor-running.test-support"
 import { BOAT } from "./loans-boat.test-support"
 import { forkHash } from "./loans-fork.test-support"
 import {
@@ -25,7 +26,6 @@ import {
 	send,
 	setupLedger,
 } from "./loans-ledger.test-support"
-import { settle } from "./loans-running.test-support"
 
 /** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
 const realFetch = globalThis.fetch

@@ -2,10 +2,11 @@
 // clears the lines it needs first, so any of them passes when run alone. The plan is worked by hand: no interest, no
 // inflation, the bank and the fund hold 1,398,900.00 at the start, the gym takes 100.00 a month, and the car loan owes
 // 184,000.00 throughout; the household's one person reaches the life expectancy of 38 in 2028.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { householdDocument } from "../src/lib/contract"
 import { estateDates, estateView } from "../src/lib/view/estate"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	runOf,
 	saveDraft,
@@ -25,6 +26,7 @@ import {
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 /** The page's own reading of the stored plan and its run on a choice of date. */

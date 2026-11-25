@@ -1,7 +1,7 @@
 // The grouped tax cards against the real traj (web ADR 0016): a child added with a merge changes the tax per year the page
 // shows, the classes `scenario tax` reports are all placed and the not-stated list is the one `traj` reports, and the tax label
 // form's Edit gives an income Flow its label. Each test sets up its own state, so each passes alone.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { TAX_FLAG_KEYS } from "../src/lib/edit/tax-flags"
 import { taxRows } from "../src/lib/view/tax"
 import { blankDraft } from "../src/lib/view/tax-settings/draft"
@@ -12,6 +12,7 @@ import { unlabelledIncome } from "../src/lib/view/tax-settings/labels"
 import { notStated } from "../src/lib/view/tax-settings/not-stated"
 import { taxEdit } from "../src/lib/view/tax-settings/profile-edit"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { runOf, slow } from "./estate.test-support"
 import {
 	disposeEstate,
@@ -27,6 +28,7 @@ import { send, shownTax, withProfile } from "./tax-settings.test-support"
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 const owedByYear = (answer: Awaited<ReturnType<typeof post>>) =>

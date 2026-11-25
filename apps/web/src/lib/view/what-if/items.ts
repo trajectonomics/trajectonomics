@@ -11,6 +11,7 @@ export type WasField =
 	| "lockedUntil"
 	| "kind"
 	| "payout"
+	| "payoutHow"
 	| "fee"
 	| "lifetimeFees"
 	| "lifetimePayouts"

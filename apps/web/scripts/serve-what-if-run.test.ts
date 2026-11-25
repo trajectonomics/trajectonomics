@@ -1,9 +1,10 @@
 // POST /what-if against the real traj: one at a time, each read carries its Overrides and nothing is written, and
 // the Edits that keep a what-if are checked against the ledger.
-import { afterAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
 import {
 	BINARY,
 	disposeEditor,
+	hashOf,
 	ledgerHome,
 	ledgerShow,
 	postEdit,
@@ -11,6 +12,7 @@ import {
 	setupEditor,
 } from "./edit-fixture.test-support"
 import { editRequest, PORT } from "./edit-request.test-support"
+import { settle } from "./editor-running.test-support"
 
 /** A what-if that switches off `car`, the demo ledger's Flow that nothing else reads. */
 const GOOD = JSON.stringify({ plan: "base", sets: [], removals: ["flows.car"] })
@@ -118,9 +120,9 @@ describe("keeping a what-if: copy and apply, each through the Edit guards and th
 	test(
 		"apply-overrides over a plan that changed since the page read it is refused, and nothing is written",
 		async () => {
-			const editor = await setupEditor()
+			await setupEditor()
 			// A change made in a terminal moves the stored plan on; the page's hash is the one it read before.
-			const stale = (await readBaseHash(editor)) ?? ""
+			const stale = hashOf("base")
 			const terminal = Bun.spawnSync([BINARY, "scenario", "tax", "base", "--none", "--json"], {
 				env: { ...process.env, TRAJ_HOME: ledgerHome() },
 			})
@@ -147,8 +149,8 @@ describe("keeping a what-if: copy and apply, each through the Edit guards and th
 	test(
 		"apply-overrides with the hash the page read now saves the what-if to the plan",
 		async () => {
-			const editor = await setupEditor()
-			const hash = (await readBaseHash(editor)) ?? ""
+			await setupEditor()
+			const hash = hashOf("base")
 			const { status, answer } = await postEdit(
 				JSON.stringify({
 					kind: "apply-overrides",
@@ -169,16 +171,7 @@ describe("keeping a what-if: copy and apply, each through the Edit guards and th
 	)
 })
 
-/** The content hash of the base plan as the served Snapshot holds it, after a fresh read of the ledger. */
-async function readBaseHash(
-	editor: Awaited<ReturnType<typeof setupEditor>>,
-): Promise<string | null> {
-	const run = await editor.refresh()
-	if (!run.ok) throw new Error(run.error.message)
-	const read = run.snapshot.reads.documents["base"]
-	return read?.ok ? read.data.scenario.contentHash : null
-}
-
+afterEach(settle, SLOW_MS)
 afterAll(async () => {
 	await disposeEditor()
 })
