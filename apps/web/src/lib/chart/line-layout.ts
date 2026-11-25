@@ -13,8 +13,9 @@ const X_LABEL_SPACE = 84
 
 /**
  * Lays a line chart out in pixels. The y axis always starts at zero and ends on a nice tick. Each
- * distinct x is one column; a series with no point at an x has a gap there. A marker may sit between
- * columns, so the x axis widens to take it in. Null for no points.
+ * distinct x is one column; a series with no point at an x has a gap there. The x axis spans the
+ * series only: a marker outside it is not drawn beyond the plot, which would move every point to make
+ * room, but stands on the nearer edge with its label (#268). Null for no points.
  */
 export function lineLayout(
 	series: readonly LineSeries[],
@@ -23,7 +24,7 @@ export function lineLayout(
 	palette?: "wide",
 ): LineLayout | null {
 	const xs = distinctSorted(series.flatMap((line) => line.points.map((point) => point.x)))
-	const xDomain = xs.length === 0 ? null : extent([...xs, ...markers.map((marker) => marker.x)])
+	const xDomain = xs.length === 0 ? null : extent(xs)
 	const yExtent = extent([0, ...series.flatMap((line) => line.points.map((point) => point.y))])
 	if (!xDomain || !yExtent) return null
 	const yTicks = niceTicks(yExtent)
@@ -41,9 +42,17 @@ export function lineLayout(
 		xTicks: xTicksFor(xLabels, xPixels, Math.max(2, Math.floor(plotWidth / X_LABEL_SPACE))),
 		yTicks: yTicks.map((value) => ({ value, y: scaleY(value) })),
 		series: series.map((line) => seriesLayout(line, xs, scaleX, scaleY)),
-		markers: markers.map((marker) => ({ x: scaleX(marker.x), label: marker.label })),
+		markers: markers.map((marker) => ({
+			x: clampToPlot(scaleX(marker.x), plot),
+			label: marker.label,
+		})),
 		...(palette ? { palette } : {}),
 	}
+}
+
+/** A pixel x held within the plot's own width, so a marker outside the series' span stands on the edge. */
+function clampToPlot(x: number, plot: Plot): number {
+	return Math.min(Math.max(x, plot.margin.left), plot.width - plot.margin.right)
 }
 
 function distinctSorted(values: readonly number[]): number[] {

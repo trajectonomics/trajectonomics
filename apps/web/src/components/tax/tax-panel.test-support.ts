@@ -24,7 +24,7 @@ export function panel(
 	requested = "",
 ): string {
 	return render(TaxPanel, {
-		props: { projections, requested, onScenario: () => {} },
+		props: { names: Object.keys(projections), projections, requested, onScenario: () => {} },
 	}).body
 }
 

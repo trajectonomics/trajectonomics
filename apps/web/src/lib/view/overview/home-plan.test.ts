@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { ledgerWith } from "../plans/fixtures.test-support"
-import { homePlan, primaryScenario } from "./scenario"
+import { homePlan } from "./scenario"
 import { overviewView } from "./view"
 
 const params = (scenarios: string[], compare: { a: string; b: string } | null = null) => ({
@@ -31,9 +31,12 @@ describe("the plan Home follows", () => {
 		expect(homePlan(snapshot, "")).toBe("base")
 	})
 
-	test("the main plan comes before the plan a comparison names first", () => {
-		expect(primaryScenario(params(["a", "b"], { a: "b", b: "a" }), "", "a")).toBe("a")
-		expect(primaryScenario(params(["a", "b"], { a: "b", b: "a" }))).toBe("b")
+	test("a comparison does not choose the plan: the Snapshot's order does, main first", () => {
+		const snapshot = {
+			...ledgerWith({ base: {}, "retire-early": {} }),
+			params: params(["base", "retire-early"], { a: "retire-early", b: "base" }),
+		}
+		expect(homePlan(snapshot, "")).toBe("base")
 	})
 
 	test("the cards read that plan's figures", () => {
