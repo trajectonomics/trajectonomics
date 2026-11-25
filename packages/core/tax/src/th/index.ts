@@ -23,6 +23,8 @@ export type {
 	ThLevyMonthDay,
 	ThLevyProfile,
 	ThLevySection40_4Elections,
+	ThSeparateClaimOptions,
+	ThSeparateClaimProblem,
 } from "./levy"
 export {
 	emitThLevy,
@@ -36,8 +38,10 @@ export {
 	ThLevyMeasureId,
 	ThLevyRounding,
 	ThLevyTallyBasis,
+	ThSeparateClaimCode,
 	thFilerLabel,
 	thLevyTalliesFor,
+	thSeparateClaimProblems,
 } from "./levy"
 export { TH_2026_PARAMETERS } from "./parameters"
 export type { ThTaxResult } from "./result"

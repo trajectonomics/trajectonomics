@@ -12,13 +12,18 @@ export const argv = (asOf: string) => ["report", "networth", "--as-of", asOf, "-
 export const THB = (amount: string) => [{ currency: "THB", amount }]
 
 /** The Net worth page's view of one headline Read and the month-end reads behind its history. */
-export function pageView(read: Read<NetWorth>, reads: Read<NetWorth>[] = []): NetWorthPageView {
+export function pageView(
+	read: Read<NetWorth>,
+	reads: Read<NetWorth>[] = [],
+	cut: string | null = null,
+): NetWorthPageView {
 	return {
 		netWorth: mapRead(read, netWorthView),
 		history: {
 			series: netWorthHistorySeries(reads),
 			rows: monthEndRows(reads),
 			line: historyLine(reads),
+			cut,
 		},
 	}
 }

@@ -2,6 +2,7 @@ import { type AppError, fail, isAppError } from "../../errors"
 import { parsePath } from "../set-parse"
 import { anchoredSegments, employerFollowers } from "./employer"
 import { type Anchor, anchorDate, canonicalHousehold, type Household } from "./model"
+import { resolveOwners } from "./owner-held"
 import { documentPathOf, locate, type Step, setAt } from "./paths"
 
 /**
@@ -17,6 +18,8 @@ export type ResolvedAnchors = {
 	household: string | null
 	/** The anchor paths whose item the incoming document no longer holds. */
 	dropped: string[]
+	/** The Owner paths whose Flow or Account the incoming document no longer holds (cli ADR-0076). */
+	droppedOwners: string[]
 }
 
 /**
@@ -108,9 +111,16 @@ export function resolveHousehold(
 		current = outcome.document
 		kept.push(anchor)
 	}
+	// A version 1 household has no owners, so its bytes stay as they were (cli ADR-0076).
+	const { owners, dropped: droppedOwners } = resolveOwners(household, current)
 	return {
 		document: current,
-		household: canonicalHousehold({ ...household, anchors: kept }),
+		household: canonicalHousehold({
+			...household,
+			anchors: kept,
+			...(owners === undefined ? {} : { owners }),
+		}),
 		dropped,
+		droppedOwners,
 	}
 }

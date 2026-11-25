@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test"
+import { TaxValidationError } from "../../core/money"
 import { calculateFamilyAllowances } from "../stages/allowances-family"
+import { ThAllowanceField } from "../types"
 
 describe("Thailand Family Allowances", () => {
 	it("grants personal allowance of 60,000 THB", () => {
@@ -91,6 +93,52 @@ describe("Thailand Family Allowances", () => {
 			"married_no_income_spouse",
 		)
 		expect(allFourParents.parents.allowed).toBe(120_000)
+	})
+
+	it("claims the spouse's parents on a joint Return, as on a no-income-spouse Return", () => {
+		const parents = { taxpayerFather: true, spouseFather: true, spouseMother: true }
+		expect(calculateFamilyAllowances({ parents }, "married_joint").parents.allowed).toBe(90_000)
+		expect(calculateFamilyAllowances({ parents }, "married_no_income_spouse").parents.allowed).toBe(
+			90_000,
+		)
+	})
+
+	it("refuses a spouse parent slot on a separate Return instead of dropping it", () => {
+		const refused = (
+			parents: { spouseFather?: boolean; spouseMother?: boolean },
+			status: "married_separate" | "married_separate_40_1_joint_rest",
+		) => {
+			try {
+				calculateFamilyAllowances({ parents }, status)
+			} catch (error) {
+				return error instanceof TaxValidationError ? error.field : String(error)
+			}
+			return undefined
+		}
+		expect(refused({ spouseFather: true }, "married_separate")).toBe(
+			ThAllowanceField.ParentsSpouseSlot,
+		)
+		expect(refused({ spouseMother: true }, "married_separate")).toBe(
+			ThAllowanceField.ParentsSpouseSlot,
+		)
+		const own = { taxpayerFather: true, taxpayerMother: true, spouseFather: false }
+		expect(calculateFamilyAllowances({ parents: own }, "married_separate").parents.allowed).toBe(
+			60_000,
+		)
+	})
+
+	it("refuses a spouse parent slot on married_separate_40_1_joint_rest, and still counts its own parents", () => {
+		expect(() =>
+			calculateFamilyAllowances(
+				{ parents: { spouseFather: true } },
+				"married_separate_40_1_joint_rest",
+			),
+		).toThrow(TaxValidationError)
+		const own = { taxpayerFather: true, taxpayerMother: true }
+		expect(
+			calculateFamilyAllowances({ parents: own }, "married_separate_40_1_joint_rest").parents
+				.allowed,
+		).toBe(60_000)
 	})
 
 	it("calculates disabled care allowance (60,000 THB each)", () => {

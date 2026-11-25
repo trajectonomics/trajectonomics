@@ -38,6 +38,7 @@ export interface ThParameters {
 		readonly parent: {
 			readonly perPerson: number
 			readonly maxCount: number
+			readonly maxOwnCount: number
 		}
 		readonly disabledPerPerson: number
 		readonly socialSecurityFundCeiling: number

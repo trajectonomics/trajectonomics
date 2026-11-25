@@ -1,6 +1,6 @@
 # An allowance is stated as what one Return claims, and the emitter divides nothing
 
-Status: Proposed (trajectonomics/trajectonomics#343).
+Status: Accepted. Step 2 is built in trajectonomics/trajectonomics#506 (#343).
 
 ## Context
 
@@ -47,4 +47,15 @@ One Levy sees one Return. It cannot know what the other spouse's Levy claims, so
 ## Consequences
 
 - The CLI keeps one stored profile per Return (cli ADR 0075). Nothing in the tax core knows about a household.
-- Both eligibility changes are in the change log. Neither changes a Levy the CLI writes today.
+- Both eligibility changes are listed under As built. Neither changes a Levy the CLI writes today.
+
+## As built
+
+Both behaviour changes are listed here, because the package has no change log. Neither changes a Levy the CLI writes today.
+
+- **`married_joint` claims the spouse's parents (a fix).** In the object form of `parents`, `spouseFather` and `spouseMother` now count on `married_joint` as they do on `married_no_income_spouse`. An object-form profile on a joint Return that names a spouse slot now claims 30,000 more per slot than it did, in the calculator and in the Levy. The count form (`parents: 2`) and every Levy in the golden set (count form) are unchanged. `single` still ignores spouse slots, as before.
+- **`married_separate` refuses spouse parent slots (new).** A spouse slot set on a separate Return throws a `TaxValidationError` with field `allowance.parents.spouse` (`ThAllowanceField.ParentsSpouseSlot`), from both `calculateThTax` and `emitThLevy`. The Decision above gave the field as `allowances.parents`; the as-built field is the one new enum member, so it stays distinct from `allowance.parents`, which the count validation reports. Before, the slot was dropped without a word.
+- **`married_separate_40_1_joint_rest` refuses spouse parent slots (new, #521).** It is refused the same way as `married_separate`: the same `allowance.parents.spouse` field and error, from both `calculateThTax` and `emitThLevy`. The Filer's own parents still count. RD ruling 0702/1985 item 3 and N-136 clause 1(6)(ค) give each spouse their own parents on a separate Return.
+- **`thSeparateClaimProblems(first, second, { sharedMortgage })`** returns `readonly ThSeparateClaimProblem[]`, each `{ code, returns }`, where `returns` lists the positions (0 for `first`, 1 for `second`) the problem names. One `OWN_PARENTS_OVER_TWO` is returned per Return that is over: its count form, or the number of slots it names, spouse slots included, above `parent.maxOwnCount` (2, a new parameter). `MORTGAGE_OVER_CEILING` names both Returns and needs `sharedMortgage`; the interest is added in satang as BigInt, so exactly 100,000 passes and one satang more does not. It does not check that the profiles are `married_separate`.
+- **Corpus.** `corpus-separate-filing.test.ts` holds a separate-filing case where each spouse claims the same two children in full (30,000 each per child, s.47(1)(ค)(1)), worked by hand in the test. The cross-check against a recognised filing calculator is pending and covered by its own issue, so the open point in [note 1](../research/separate-filing.md#q1-who-claims-which-allowance-when-spouses-file-separately) stands.
+- **A guard for ADR 0009's as-built `read.` rule.** `levy-filers-assumptions.test.ts` asserts that every standard-rate `scale` that is not itself a `read.` Measure and reads one rate label alone points at a `tally` or a `read.` Measure, for each golden profile and a two-Filer joint profile, so `scaledIds` cannot lose a rate silently.

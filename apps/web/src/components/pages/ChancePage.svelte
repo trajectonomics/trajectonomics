@@ -17,6 +17,11 @@ let { scenario, onScenario }: Props = $props()
 	intro="The share of seeded Market paths on which a Scenario holds to its Horizon, with the net-worth Bands it draws from."
 >
 	{#snippet children(snapshot)}
-		<ChanceView chance={snapshot.reads.chance} {scenario} {onScenario} />
+		<ChanceView
+			names={snapshot.params.scenarios}
+			chance={snapshot.reads.chance}
+			{scenario}
+			{onScenario}
+		/>
 	{/snippet}
 </PageShell>

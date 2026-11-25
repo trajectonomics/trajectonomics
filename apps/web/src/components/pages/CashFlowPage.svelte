@@ -20,6 +20,7 @@ let { scenario, year, onYear }: Props = $props()
 >
 	{#snippet children(snapshot)}
 		<CashFlowView
+			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
 			accounts={snapshot.reads.accounts}
 			{scenario}
