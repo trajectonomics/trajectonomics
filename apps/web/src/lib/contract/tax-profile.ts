@@ -24,8 +24,8 @@ export type ReturnClaims = z.infer<typeof returnClaims>
 /**
  * The tax profile `traj scenario tax` keeps beside a Scenario (cli ADR-0066): the flags it was given,
  * each key a flag's camelCase name. A deduction left out, or stated as zero, is absent. `returns` holds
- * one claim set per Return of a separate filing (cli ADR-0075). `traj` parses every amount, so a page
- * only reads this back; it never writes it as JSON.
+ * one claim set per Return of a separate filing, and `claimsHolder` says whose claims the other keys are (cli ADR-0075).
+ * `traj` parses every amount, so a page only reads this back; it never writes it as JSON.
  */
 export const taxProfile = z.strictObject({
 	tax: z.literal("th-2026"),
@@ -38,6 +38,7 @@ export const taxProfile = z.strictObject({
 	]),
 	children: integer,
 	childrenAtHigherRate: integer,
+	claimsHolder: z.string().optional(),
 	returns: z.record(z.string(), returnClaims).optional(),
 	parents: integer.optional(),
 	disabledCare: integer.optional(),

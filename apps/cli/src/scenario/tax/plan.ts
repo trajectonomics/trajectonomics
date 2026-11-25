@@ -2,7 +2,7 @@ import { type AppError, fail, isAppError } from "../../errors"
 import type { TaxPlanner } from "../../store"
 import type { ScenarioDocument } from "../document"
 import { fromStoredRequest, mergedRequest, taxRequestOf } from "./claims"
-import { coupleOf } from "./couple"
+import { coupleOf, holderIdOf } from "./couple"
 import type { TaxRequest } from "./flags"
 import { holdsTaxLevy } from "./holds"
 import type { FlowLabel } from "./labels"
@@ -37,9 +37,10 @@ function requestFor(
 			holdsTaxLevy(document),
 		)
 	}
+	const filing = { couple, holder: holderIdOf(household) }
 	return mode.kind === "merge"
-		? mergedRequest(profile, mode.flags, couple)
-		: fromStoredRequest(profile, couple)
+		? mergedRequest(profile, mode.flags, filing)
+		: fromStoredRequest(profile, filing)
 }
 
 /**

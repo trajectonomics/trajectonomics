@@ -138,16 +138,33 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   from them, on `--merge` and on `--from-stored`, so a profile written before the plan had Owners
   gives it the holder's claims. The holder's entry in `returns` records what their Return claimed and
   is never read back: it can be older than the flat keys, and reading it would understate the tax.
-  - Known limit: the flat keys say "the holder", not which person. After a household swaps which
-    person is the holder, the new holder's Return takes the flat keys, and the new partner's takes
-    the entry held under their id. Stating the profile whole again (`--tax`) puts both right.
+- **Whose claims the flat keys are.** "The holder" is a role the household can give the other person,
+  so the profile gains an optional `claimsHolder`, the id of the person whose claims the flat keys are.
+  Without it, a swap would give the new holder the old one's claims while the old one's entry kept
+  them: one claim on two Returns.
+  - It is recorded by the first write of a plan with Filers, as the household's holder, and every later
+    write keeps it. A plan that never had Filers records nobody and keeps its bytes. A write of the
+    whole profile (`--tax`) states it anew.
+  - When a `married_separate` write finds that the household's holder is not the recorded person, the
+    flat keys go to the recorded person's entry in `returns`, the new holder takes their own entry, or
+    nothing, and `claimsHolder` becomes the new holder. Flags then apply to the result, so a bare value
+    names the new holder.
+  - A write under any other status moves nothing. Its one Return's claims are the flat keys whoever the
+    holder is, and moving them would change that Return's tax. They stay recorded as before, and a
+    later separate filing moves them. A value a caller changes meanwhile goes with them.
+  - A write with no household, which names no holder, moves nothing and keeps the record, so a swap
+    made while the household is gone is still seen.
+  - With no `claimsHolder`, as in a profile written before it was recorded, the flat keys are the
+    current holder's.
+  - The record names a person by id. A holder given a new id reads as another person: the flat claims
+    stay under the old id, and the new one's Return starts from nothing until the caller states them.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
-  that claims something except the holder's, whatever the filing status and also while the household
-  names no partner. No Levy reads a kept entry; a later separate filing takes the partner's from it.
-  A plan with no household names no holder, so every entry that claims something stays, the holder's
-  among them, which nothing reads. A write of the whole profile (`--tax`) states it whole, so it keeps
-  no earlier entry.
+  that claims something, whatever the filing status and also while the household names no partner or
+  the plan has no household. The one exception is the person the flat keys are the claims of
+  (`claimsHolder`, else the holder): with no Return of their own, they need no entry. No Levy reads a
+  kept entry; a later separate filing takes it back. A write of the whole profile (`--tax`) states it
+  whole, so it keeps no earlier entry.
 - **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
   `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. `--merge`
   merges into the stored `returns`, and `--from-stored` keeps them. Each of these is refused at the

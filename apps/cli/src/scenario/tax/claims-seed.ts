@@ -17,9 +17,9 @@ export function claimsOfRequest(request: ReturnClaims): ReturnClaims {
 }
 
 /**
- * The two claim sets of a separate filing. The holder's is always the flat claims, which are theirs
- * under every status, so an entry the base holds for them is never read: it can be older than the flat
- * claims. The partner's is the base's, or nothing.
+ * The two claim sets of a separate filing. The holder's is always the flat claims, which the caller
+ * has made theirs (`claimsHeldBy`), so an entry the base holds for them is never read: it can be older
+ * than the flat claims. The partner's is the base's, or nothing.
  */
 export function seedReturns(
 	pair: Couple | null,

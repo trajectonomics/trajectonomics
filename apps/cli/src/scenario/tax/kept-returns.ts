@@ -11,11 +11,11 @@ function claimsNothing(claims: ReturnClaims): boolean {
 }
 
 /**
- * The request as the profile keeps it (cli ADR-0075): one claim set per Filer of a separate Return,
- * and every other person's but the holder's that claims something, so a later separate filing has it
- * back. The holder needs no entry, because the flat claims are theirs; a plan with no household names
- * no holder, so every entry that claims something stays. A claim set of nothing for a person with no
- * Return is left out, so a plan that never filed separately stores what it always did.
+ * The request as the profile keeps it (cli ADR-0075). `claimsHolder` names whose the flat claims are:
+ * as the request carries it, else the holder of a Return with Filers, so a plan that never had Filers
+ * records nobody. `returns` holds one claim set per Filer of a separate Return, and every other
+ * person's that claims something, so a later separate filing has it back; the person the flat claims
+ * are needs no entry. A claim set of nothing for a person with no Return is left out.
  */
 export function keptRequest(
 	request: TaxRequest,
@@ -23,9 +23,15 @@ export function keptRequest(
 	holder: string | undefined,
 ): TaxRequest {
 	const { returns, named: _named, ...flat } = request
+	const claimsHolder = request.claimsHolder ?? (scope === null ? undefined : holder)
+	const inFlat = claimsHolder ?? holder
 	const filers = scope?.kind === "separate" ? scope.filers : []
 	const kept = Object.entries(returns ?? {}).filter(
-		([person, claims]) => filers.includes(person) || (person !== holder && !claimsNothing(claims)),
+		([person, claims]) => filers.includes(person) || (person !== inFlat && !claimsNothing(claims)),
 	)
-	return kept.length === 0 ? flat : { ...flat, returns: Object.fromEntries(kept) }
+	return {
+		...flat,
+		...(claimsHolder === undefined ? {} : { claimsHolder }),
+		...(kept.length === 0 ? {} : { returns: Object.fromEntries(kept) }),
+	}
 }

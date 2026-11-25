@@ -9,19 +9,20 @@ import { type StoredReturn, storedReturn } from "./stored-return"
  * was given, normalised. The jurisdiction, filing status and children counts always appear, with
  * the defaults the write applied; a deduction appears only when it is more than zero, because a
  * zero states nothing. Each key is the camelCase name of the flag that sets it. `returns` holds one
- * claim set per Return of a separate filing, and keeps the partner's under another status (cli
- * ADR-0075).
+ * claim set per Return of a separate filing, and keeps other people's under another status;
+ * `claimsHolder` says whose claims the other keys are (cli ADR-0075).
  */
 export type StoredTax = {
 	tax: TaxJurisdiction
 	filingStatus: ThFilingStatus
 	children: number
 	childrenAtHigherRate: number
+	claimsHolder?: string | undefined
 	returns?: Record<string, StoredReturn> | undefined
 } & { readonly [K in keyof TaxAllowances]?: number | undefined }
 
-/** A person id a Return may be keyed by: the Filer id pattern (tax ADR-0009). */
-const PERSON = /^[a-z0-9-]{1,32}$/
+/** A household's name for a person. It need not fit a Filer's id: a person with no Return keeps claims. */
+const person = z.string().min(1)
 
 /** The stored profile's shape, which `scenario show` prints and `traj schema` publishes. */
 export const storedTax: z.ZodType<StoredTax> = z
@@ -40,11 +41,16 @@ export const storedTax: z.ZodType<StoredTax> = z
 			.int()
 			.min(0)
 			.describe("Children born 2018 or later, a subset of children (--children-at-higher-rate)."),
-		returns: z
-			.record(z.string().regex(PERSON), storedReturn)
+		claimsHolder: person
 			.optional()
 			.describe(
-				"One claim set per Return of a separate filing, keyed by person id (cli ADR-0075). Under another filing status it holds only what the partner claimed, which no Levy reads and a later separate filing takes back; the holder's claims are then the keys beside it.",
+				"The household person whose claims the keys beside it are (cli ADR-0075), so they stay theirs if the household swaps which person is the holder. Absent for a plan that never had Filers: the claims are then the holder's.",
+			),
+		returns: z
+			.record(person, storedReturn)
+			.optional()
+			.describe(
+				"One claim set per Return of a separate filing, keyed by person id (cli ADR-0075). Under another filing status it holds what people other than `claimsHolder` claimed, which no Levy reads and a later separate filing takes back; that person's claims are the keys beside it.",
 			),
 		...deductionFlags,
 	})

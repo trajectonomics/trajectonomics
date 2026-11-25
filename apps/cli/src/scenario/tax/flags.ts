@@ -40,6 +40,8 @@ export type TaxRequest = {
 	children: number
 	childrenAtHigherRate: number
 	allowances: TaxAllowances
+	/** The person whose claims the flat ones are, once a plan has had Filers (cli ADR-0075). */
+	claimsHolder?: string
 	/** One claim set per Return, for `married_separate` with Filers; absent otherwise. */
 	returns?: Record<string, ReturnClaims>
 	/** The values the flags put on a person's Return; absent when there is none. */

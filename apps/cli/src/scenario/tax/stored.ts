@@ -13,6 +13,7 @@ export function storedTaxOf(request: TaxRequest): StoredTax {
 		children: request.children,
 		childrenAtHigherRate: request.childrenAtHigherRate,
 	}
+	if (request.claimsHolder !== undefined) stored.claimsHolder = request.claimsHolder
 	for (const field of ALLOWANCE_FLAGS) {
 		if (request.allowances[field] > 0) stored[field] = request.allowances[field]
 	}
@@ -32,6 +33,7 @@ export function requestOfStored(stored: StoredTax): TaxRequest {
 		children: stored.children,
 		childrenAtHigherRate: stored.childrenAtHigherRate,
 		allowances: allowancesOf(stored),
+		...(stored.claimsHolder === undefined ? {} : { claimsHolder: stored.claimsHolder }),
 		...(stored.returns === undefined
 			? {}
 			: {

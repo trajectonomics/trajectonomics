@@ -227,7 +227,9 @@ a loan borrowed together shares one 100,000 baht ceiling, which `traj` cannot te
 two separate loans, so state each person's share yourself. When both claim interest and a
 loan's Owner is `shared`, the result's `assumptions` say the loans are taken to be
 separate. `--merge` and `--from-stored` keep the stored `returns`, and `--merge` to
-`married_joint` keeps the partner's for a later switch back. A `projection run` then
+`married_joint` keeps the partner's for a later switch back. The stored profile's
+`claimsHolder` says whose claims its other keys are, so if the household swaps which
+person is the holder, each person's claims stay theirs. A `projection run` then
 reports a `filer` on each `taxYears` entry, `--carry-in` takes one record per Levy, and
 `projection allowances` answers per Return.
 

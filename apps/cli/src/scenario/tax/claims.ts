@@ -29,21 +29,24 @@ export function taxRequestOf(flags: TaxFlags, couple: Couple | null): TaxRequest
 	})
 }
 
+/** The two people a stored profile can file for, and the holder even of a household with no partner. */
+export type Filing = { couple: Couple | null; holder: string | undefined }
+
 /**
  * The request `--from-stored` writes: the stored profile. A separate filing whose profile holds no
  * Return for the holder, such as one written before the plan had Owners, takes the holder's from the
  * flat claims.
  */
-export function fromStoredRequest(stored: StoredTax, couple: Couple | null): TaxRequest | AppError {
+export function fromStoredRequest(stored: StoredTax, filing: Filing): TaxRequest | AppError {
 	const base = requestOfStored(stored)
-	return requestOfClaims({ status: base.filingStatus, couple, stated: new Map(), base })
+	return requestOfClaims({ status: base.filingStatus, ...filing, stated: new Map(), base })
 }
 
 /** The request a merge states: the stored profile, with each flag the caller gave laid over it. */
 export function mergedRequest(
 	stored: StoredTax,
 	flags: TaxFlags,
-	couple: Couple | null,
+	filing: Filing,
 ): TaxRequest | AppError {
 	const base = requestOfStored(stored)
 	if (flags.tax !== undefined && flags.tax !== base.jurisdiction) {
@@ -57,7 +60,7 @@ export function mergedRequest(
 	if (!(stated instanceof Map)) return stated
 	return requestOfClaims({
 		status: flags.filingStatus ?? base.filingStatus,
-		couple,
+		...filing,
 		stated,
 		base,
 	})
