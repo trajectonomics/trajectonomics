@@ -1,6 +1,6 @@
 // The allowances page against the real traj: a plan worked by hand for one tax year, read through the loopback
 // editor, tried as a what-if, kept with Add to plan, and saved from a what-if (cli ADR 0061, ADR 0062).
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { type AllowanceFlow, projectionRun, readOf } from "../src/lib/contract"
 import type { EditAnswer } from "../src/lib/edit/answer"
 import { allowancesView, suggestionAdditions } from "../src/lib/view/allowances"
@@ -16,6 +16,7 @@ import {
 import { allowancesOf, post, snapshotOf, tryWhatIf } from "./allowances-requests.test-support"
 import { SLOW_MS } from "./edit-fixture.test-support"
 import { editRequest } from "./edit-request.test-support"
+import { settle } from "./editor-running.test-support"
 
 const RMF = "allowance.retirement.rmf"
 const ESG = "allowance.thai_esg"
@@ -24,6 +25,7 @@ const INPUTS = { labels: [RMF, ESG], step: "1000", budget: null, minSaving: null
 beforeAll(async () => {
 	await setupAllowances()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeAllowances)
 
 describe("a reread body is a closed shape", () => {

@@ -1,7 +1,7 @@
 // The tax labels against the real traj (web ADR 0008 and 0016): a Flow id the page makes (Thai script) labelled in the whole
 // write, a taxed plan whose income Flow carries a label `traj` does not know, and the not-stated list of a plan with
 // retirement contributions. Each test sets up its own state, so each passes alone.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import type { TaxAllowances } from "../src/lib/contract"
 import { blankDraft } from "../src/lib/view/tax-settings/draft"
 import { labelEdit } from "../src/lib/view/tax-settings/label-edit"
@@ -10,6 +10,7 @@ import { notStated } from "../src/lib/view/tax-settings/not-stated"
 import { taxEdit } from "../src/lib/view/tax-settings/profile-edit"
 import { flowsSentence } from "../src/lib/view/tax-settings/refusal"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import { slow } from "./estate.test-support"
 import { disposeEstate, post, setupEstate, storedPlan, traj } from "./estate-ledger.test-support"
 import { bare, income, reported, taxedSalary } from "./tax-cards.test-support"
@@ -17,6 +18,7 @@ import { bare, income, reported, taxedSalary } from "./tax-cards.test-support"
 beforeAll(async () => {
 	await setupEstate()
 }, SLOW_MS)
+afterEach(settle, SLOW_MS)
 afterAll(disposeEstate)
 
 /** Stores a document under a name, as `scenario apply` takes it. */

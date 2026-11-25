@@ -6,6 +6,7 @@ import { tryLoanInWhatIf } from "../src/components/plan-items/loan-what-if"
 import { loanDocument, loanOf } from "../src/lib/view/plan-items/loan-document"
 import { loanFromDraft } from "../src/lib/view/plan-items/loan-draft"
 import { statementOf } from "../src/lib/view/plan-items/loan-statement"
+import { settle } from "./editor-running.test-support"
 import { BOAT } from "./loans-boat.test-support"
 import {
 	applyInTerminal,
@@ -19,7 +20,6 @@ import {
 	setupLedger,
 	showOf,
 } from "./loans-ledger.test-support"
-import { settle } from "./loans-running.test-support"
 
 /** The real fetch: `bun test` runs every file in one process, so a later file must get it back. */
 const realFetch = globalThis.fetch
