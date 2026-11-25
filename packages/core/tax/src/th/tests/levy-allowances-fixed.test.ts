@@ -49,7 +49,7 @@ describe("TH 2026 Levy fixed allowances", () => {
 					parents: {
 						taxpayerFather: true,
 						taxpayerMother: true,
-						spouseFather: status !== "married_separate",
+						spouseFather: !status.startsWith("married_separate"),
 					},
 					disabledCareCount: 1,
 				},
@@ -82,13 +82,15 @@ describe("TH 2026 Levy fixed allowances", () => {
 	})
 
 	it("refuses spouse parent slots on a separate Return at their own field", () => {
-		for (const slot of ["spouseFather", "spouseMother"] as const) {
-			try {
-				emitThLevy({ filingStatus: "married_separate", allowances: { parents: { [slot]: true } } })
-				expect.unreachable()
-			} catch (error) {
-				expect(error).toBeInstanceOf(TaxValidationError)
-				expect((error as TaxValidationError).field).toBe(ThAllowanceField.ParentsSpouseSlot)
+		for (const filingStatus of ["married_separate", "married_separate_40_1_joint_rest"] as const) {
+			for (const slot of ["spouseFather", "spouseMother"] as const) {
+				try {
+					emitThLevy({ filingStatus, allowances: { parents: { [slot]: true } } })
+					expect.unreachable()
+				} catch (error) {
+					expect(error).toBeInstanceOf(TaxValidationError)
+					expect((error as TaxValidationError).field).toBe(ThAllowanceField.ParentsSpouseSlot)
+				}
 			}
 		}
 	})
