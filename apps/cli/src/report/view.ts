@@ -1,6 +1,8 @@
 import type { AccountType } from "@trajectonomics/core/ledger"
 import { z } from "zod"
 import { ACCOUNT_TYPE_VALUES, type AccountRef, accountRef } from "../account/view"
+import type { TotalRefusal } from "./total"
+import { totalRefusal } from "./total-view"
 
 /** One Account's amount in a report: named, typed, and rendered at its currency's scale. */
 export type ReportRow = {
@@ -24,7 +26,15 @@ export type TrialRowView = {
 /** One per-currency Trial Balance total. */
 export type TrialTotalView = { currency: string; debit: string; credit: string }
 
+/** A Trial Balance whose totals are stated: what `doctor` reads, where a refused total fails the check. */
 export type TrialBalanceView = { rows: TrialRowView[]; totals: TrialTotalView[] }
+
+/** The Trial Balance of `balance`: its totals are null, with the reason, when their sum leaves the safe range. */
+export type TrialBalanceReport = {
+	rows: TrialRowView[]
+	totals: TrialTotalView[] | null
+	totalsError?: TotalRefusal | undefined
+}
 
 export const reportRow: z.ZodType<ReportRow> = z.strictObject({
 	account: accountRef.describe("The Account this Balance belongs to."),
@@ -53,7 +63,15 @@ export const trialTotal: z.ZodType<TrialTotalView> = z.strictObject({
 	credit: z.string().describe("The sum of every row's credit, a non-negative decimal string."),
 })
 
-export const trialBalanceView: z.ZodType<TrialBalanceView> = z.strictObject({
+export const trialBalanceView: z.ZodType<TrialBalanceReport> = z.strictObject({
 	rows: z.array(trialRow).describe("One row per Leaf Account, in `account list` order."),
-	totals: z.array(trialTotal).describe("One entry per currency, by currency."),
+	totals: z
+		.array(trialTotal)
+		.nullable()
+		.describe(
+			"One entry per currency, by currency; null when a column's sum leaves the safe range, and `totalsError` says so. Every row is still stated.",
+		),
+	totalsError: totalRefusal
+		.optional()
+		.describe("Why `totals` is null, present only then. The call still exits 0."),
 })

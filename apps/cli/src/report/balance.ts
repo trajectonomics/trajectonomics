@@ -1,22 +1,16 @@
-import { balances, netWorth, trialBalance } from "@trajectonomics/core/ledger"
+import { balances, netWorth } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
-import { fail, isAppError } from "../errors"
+import { isAppError } from "../errors"
 import { hintField } from "../hint"
 import type { Ledger } from "../store"
 import { type FieldMap, type FieldRules, query, respell } from "./errors"
 import { reportHint } from "./hint"
 import { type RecordStart, recordStartOf } from "./record"
-import {
-	accountIndex,
-	inAccountOrder,
-	reportRowsOf,
-	totalsOf,
-	trialRowOf,
-	trialTotalOf,
-} from "./rows"
+import { accountIndex, reportRowsOf, totalsOf } from "./rows"
 import { isTotalRefused, netWorthRead, type TotalRefusal } from "./total"
-import type { ReportRow, TotalView, TrialBalanceView } from "./view"
+import { trialOf } from "./trial"
+import type { ReportRow, TotalView, TrialBalanceReport } from "./view"
 
 // The core names its own queries; every one of these paths is respelled into this result's keys.
 const FIELDS: FieldRules = [
@@ -35,7 +29,8 @@ export type BalanceResult = RecordStart & {
 	netWorth: TotalView[] | null
 	/** Why `netWorth` is null; absent when it is stated. */
 	netWorthError?: TotalRefusal | undefined
-	trialBalance?: TrialBalanceView | undefined
+	/** The Trial Balance; its totals are null, with `totalsError`, when a column's sum leaves the safe range. */
+	trialBalance?: TrialBalanceReport | undefined
 	hint?: string | undefined
 }
 
@@ -46,36 +41,6 @@ function readings(ledger: Ledger, asOf: string) {
 	const worth = netWorthRead(() => netWorth(ledger.transactions, asOf, ledger.chart), fields)
 	if (isAppError(worth)) return worth
 	return { rows, worth }
-}
-
-/**
- * The Trial Balance at a date, asserting nothing: each caller decides what a disagreement means.
- * `balance` treats one as a core bug; `doctor` reports it as the finding it went looking for.
- */
-export function trialBalanceAt(ledger: Ledger, asOf: string): TrialBalanceView | AppError {
-	const index = accountIndex(ledger.accounts)
-	const result = query(
-		() => trialBalance(ledger.transactions, asOf, ledger.chart),
-		(field) => respell(field, []),
-	)
-	if (isAppError(result)) return result
-	return {
-		rows: inAccountOrder(result.rows, index).map((row) => trialRowOf(row, index)),
-		totals: result.totals.map(trialTotalOf),
-	}
-}
-
-/**
- * The Trial Balance, asserting the one thing it exists to say: each currency's debits equal its
- * credits. The core re-validates every stored Transaction, so a tampered Posting fails earlier
- * with UNBALANCED_TRANSACTION; this guards a core arithmetic bug and is not a declared code.
- */
-function trialOf(ledger: Ledger, asOf: string): TrialBalanceView | AppError {
-	const trial = trialBalanceAt(ledger, asOf)
-	if (isAppError(trial)) return trial
-	// ADR-0013 keeps the catch-all's bytes fixed, so the guard states nothing of its own.
-	if (trial.totals.some((row) => row.debit !== row.credit)) return fail("internal")
-	return trial
 }
 
 /** Assembles the balance result from one assembled read; the Command only renders it. */

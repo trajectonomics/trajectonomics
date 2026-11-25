@@ -1,5 +1,5 @@
 import type { ProfitAndLossOptions } from "@trajectonomics/core/ledger"
-import { profitAndLoss } from "@trajectonomics/core/ledger"
+import { profitAndLoss, profitAndLossRows } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
@@ -8,6 +8,7 @@ import type { Ledger } from "../store"
 import { type FieldMap, type FieldRules, query, respell } from "./errors"
 import { reportHint } from "./hint"
 import { accountIndex, reportRowsOf, totalsOf } from "./rows"
+import { isTotalRefused, PNL_TOTAL, type TotalRefusal, totalRead } from "./total"
 import type { ReportRow, TotalView } from "./view"
 
 // The core names its own queries and period options; respell them into this result's keys.
@@ -26,7 +27,10 @@ export type PnlResult = {
 	until: string
 	project: string | null
 	rows: ReportRow[]
-	totals: TotalView[]
+	/** Income minus expenses per currency, or null when the rows' sum leaves the safe range (ADR-0079). */
+	totals: TotalView[] | null
+	/** Why `totals` is null; absent when it is stated. */
+	totalsError?: TotalRefusal | undefined
 	hint?: string | undefined
 }
 
@@ -52,19 +56,28 @@ export function pnlOf(
 	const until = checkedDate(input.until, "until")
 	if (isAppError(until)) return until
 	const index = accountIndex(ledger.accounts)
-	const result = query(
-		() => profitAndLoss(ledger.transactions, optionsOf(input), ledger.chart),
+	const options = optionsOf(input)
+	const result = totalRead(
+		() => profitAndLoss(ledger.transactions, options, ledger.chart),
 		fields,
+		PNL_TOTAL,
 	)
 	if (isAppError(result)) return result
-	const rows = reportRowsOf(result.rows, index)
+	// A refused total leaves the rows stated: every row is in range, only their sum is not.
+	const stated = isTotalRefused(result)
+		? query(() => profitAndLossRows(ledger.transactions, options, ledger.chart), fields)
+		: result.rows
+	if (isAppError(stated)) return stated
+	const rows = reportRowsOf(stated, index)
 	const hint = reportHint(ledger, rows)
 	return {
 		since: input.since ?? null,
 		until: input.until,
 		project: input.project ?? null,
 		rows,
-		totals: totalsOf(result.totals),
+		...(isTotalRefused(result)
+			? { totals: null, totalsError: result.totalRefused.body }
+			: { totals: totalsOf(result.totals) }),
 		...hintField(hint),
 	}
 }
