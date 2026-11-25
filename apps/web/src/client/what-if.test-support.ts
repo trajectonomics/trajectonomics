@@ -1,4 +1,5 @@
 import { afterEach, beforeEach } from "bun:test"
+import { DEMO, statedCompare } from "../lib/view/what-if/fixtures.test-support"
 import { editSession } from "./edit.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 
@@ -83,4 +84,29 @@ export function useSessionHooks(): void {
 		editSession.token = null
 		globalThis.fetch = realFetch
 	})
+}
+
+/** The server's answer to a what-if: the Demo's `retire-early` reads stand in for the what-if, with this compare. */
+export function demoAnswer(compare: unknown = statedCompare()): unknown {
+	return {
+		ok: true,
+		reads: {
+			projection: DEMO.reads.projections["retire-early"],
+			fi: DEMO.reads.fi["retire-early"],
+			compare: { argv: [], ok: true, data: compare },
+			chance: DEMO.reads.chance["retire-early"] ?? null,
+		},
+	}
+}
+
+/** Opens a session on `plan` with one switch and answers its read, as the server would. */
+export async function openDemoSession(
+	plan = "base",
+	compare: unknown = statedCompare(),
+): Promise<void> {
+	fakeServer()
+	whatIfSession.setOff(plan, HASH, "flows.rent", true)
+	await settle()
+	held[0]?.settle(200, demoAnswer(compare))
+	await settle(50)
 }

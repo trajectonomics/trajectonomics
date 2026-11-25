@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { editSchema, writeCommand } from "../edit/edit"
 import type { Addition } from "./additions"
-import { whatIfReads } from "./argv"
+import { plannedWhatIfReads } from "./argv"
 import { whatIfSchema } from "./overrides"
 import { changesOf, hasChanges, overridesOf, startWhatIf } from "./session"
 import { withAddition, withoutAddition } from "./session-items"
@@ -61,7 +61,7 @@ describe("the what-if body with Additions", () => {
 
 describe("the reads of a what-if with Additions", () => {
 	test("each Addition is one --add=<list>=<json> token, after the removals and before the sets", () => {
-		const reads = whatIfReads(PARAMS, {
+		const reads = plannedWhatIfReads(PARAMS, {
 			plan: "base",
 			sets: [{ path: "flows.salary.amount", value: "90000.00" }],
 			removals: ["flows.gym"],

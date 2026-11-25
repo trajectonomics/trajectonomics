@@ -21,7 +21,7 @@ import type { WhatIfAnswer } from "./answer"
 import { hasChanges, overridesOf, type WhatIf } from "./session"
 
 /** The four reads of one answer, each parsed; `null` for a read that failed, did not parse or was not asked. */
-export type WhatIfReads = {
+export type LensReads = {
 	readonly run: ProjectionRun | null
 	readonly fi: Fi | null
 	readonly compare: ProjectionCompare | null
@@ -29,7 +29,7 @@ export type WhatIfReads = {
 }
 
 /** The reads a page may show: they belong to one plan, and answer the changes the session holds now. */
-export type WhatIfLens = WhatIfReads & { readonly plan: string }
+export type WhatIfLens = LensReads & { readonly plan: string }
 
 /** The data of one read of the answer, or null when the CLI refused it or the data is not the contract's. */
 function dataOf<T extends z.ZodType>(schema: T, read: unknown): z.output<T> | null {
@@ -41,7 +41,7 @@ function dataOf<T extends z.ZodType>(schema: T, read: unknown): z.output<T> | nu
 }
 
 /** The four reads of an answer, parsed. A refused request has none. */
-export function readsOf(answer: WhatIfAnswer): WhatIfReads {
+export function lensReadsOf(answer: WhatIfAnswer): LensReads {
 	if (!answer.ok) return { run: null, fi: null, compare: null, chance: null }
 	return {
 		run: dataOf(projectionRun, answer.reads.projection),
@@ -65,7 +65,7 @@ export function lensFor(
 	plan: string,
 	session: WhatIf | null,
 	answered: WhatIf | null,
-	reads: WhatIfReads | null,
+	reads: LensReads | null,
 ): WhatIfLens | null {
 	if (session === null || answered === null || reads === null) return null
 	if (session.plan !== plan || !sameChanges(session, answered)) return null

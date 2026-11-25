@@ -1,7 +1,7 @@
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioDocument } from "../../lib/contract"
 import type { Json } from "../../lib/what-if/json"
-import { shownAccount } from "../../lib/what-if/overlay"
+import { shownAccount } from "../../lib/what-if/lens-document"
 import { recordOf, withSet } from "../../lib/what-if/session"
 
 /** Whether two values of a document are the same JSON. */

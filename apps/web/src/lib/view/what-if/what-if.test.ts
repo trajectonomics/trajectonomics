@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { baselineChance, baselineRun } from "./baseline"
 import { cashflowTriples } from "./cashflow"
 import { chanceTriple } from "./chance"
-import { changeSentence, countChange, moneyChange } from "./change"
+import { countChange, moneyChange } from "./change"
 import { whatIfSeries } from "./chart"
 import { figureOf, figureTriples } from "./figures"
 import { DEMO, DEMO_COMPARE, demoLens, statedCompare } from "./fixtures.test-support"
@@ -39,7 +39,6 @@ describe("a change is a figure the CLI stated, with a sign and words", () => {
 	test("a count of months reads as words: negative is earlier, positive later", () => {
 		const earlier = countChange(-3, "month", ["earlier", "later"], "")
 		expect(earlier).toEqual({ kind: "count", text: "−3 months", words: "earlier" })
-		expect(changeSentence(earlier)).toBe("−3 months, earlier")
 		expect(countChange(1, "month", ["earlier", "later"], "")).toEqual({
 			kind: "count",
 			text: "+1 month",
