@@ -4,7 +4,7 @@ import { currentSearch } from "../../../client/location.svelte.js"
 import { pathReads } from "../../../client/path-reads.svelte.js"
 import type { Snapshot } from "../../../lib/contract"
 import { editsShown } from "../../../lib/edit/shown"
-import { accountNamesOf } from "../../../lib/view/cashflow/cashflow"
+import { accountNames } from "../../../lib/view/account-names"
 import { chanceHref } from "../../../lib/view/chance/links"
 import { resolvePath } from "../../../lib/view/chance/path-state"
 import { chooseScenario, projectionNames } from "../../../lib/view/projection/scenario"
@@ -49,7 +49,7 @@ $effect(() => {
 		path={state.path}
 		chance={state.chance}
 		plan={plan ?? ""}
-		names={accountNamesOf(snapshot.reads.accounts)}
+		names={accountNames(snapshot.reads.accounts)}
 		{terms}
 		{onTerms}
 		argv={state.argv}

@@ -5,6 +5,8 @@ import { growthText } from "./flows"
 export interface LoanRow {
 	readonly label: string
 	readonly value: string
+	/** True when the value is an Account's id, which the page shows by its ledger name. */
+	readonly account?: true
 }
 
 /**
@@ -36,7 +38,7 @@ function datesOf(flow: ScenarioFlow): LoanRow[] {
 /** The rows of a withdrawal: what it borrows from, how often, its dates and its growth. */
 function withdrawalRows(flow: ScenarioFlow): LoanRow[] {
 	return [
-		{ label: "Borrows from", value: flow.source ?? "" },
+		{ label: "Borrows from", value: flow.source ?? "", account: true },
 		{ label: "How often", value: flow.frequency },
 		...datesOf(flow),
 		{ label: "Growth", value: flow.derive === undefined ? growthText(flow) : "Computed" },
@@ -47,7 +49,7 @@ function withdrawalRows(flow: ScenarioFlow): LoanRow[] {
 function levelRows(flow: ScenarioFlow): LoanRow[] {
 	const level = flow.level
 	return [
-		{ label: "Repays", value: flow.target ?? "" },
+		{ label: "Repays", value: flow.target ?? "", account: true },
 		{ label: "Payments", value: level === undefined ? "" : `${level.payments} equal payments` },
 		{ label: "Rounding", value: level?.rounding ?? "" },
 		{ label: "How often", value: flow.frequency },

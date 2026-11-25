@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type {
@@ -47,11 +48,10 @@ function setDrawer(next: PlanDrawer | null): void {
 }
 const noun = $derived(PLAN_PAGES[kind].noun)
 const changes = $derived(whatIfSession.changesFor(name))
-const flows = $derived(flowItems(doc, kind, household, changes))
+const flows = $derived(flowItems(doc, kind, household, changes, currentAccountNames()))
 const tried = $derived(whatIfSession.lensFor(name)?.run ?? undefined)
 const accounts = $derived(accountItems(doc, baseline, changes, { run, tried }))
 const assets = $derived(kind === "assets" ? assetCardsOf(doc, baseline, run) : [])
-const grouped = $derived(kind === "assets" ? [] : assetsWithFlows(doc, kind))
 const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
 </script>
 
@@ -90,7 +90,7 @@ const loans = $derived(loanPage(kind, doc, { run, baseline }, changes))
 			onTry={(id) => setDrawer({ id, tryValue: true })}
 		/>
 	{/if}
-	<AssetsNote assets={grouped} plan={name} />
+	<AssetsNote assets={kind === "assets" ? [] : assetsWithFlows(doc, kind)} plan={name} />
 	<PlanItemDrawer
 		{drawer}
 		{kind}

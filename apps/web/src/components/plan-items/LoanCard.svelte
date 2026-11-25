@@ -1,6 +1,9 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { nameOf } from "../../lib/view/account-names"
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
 import { type LoanMarks, NO_LOAN_MARKS } from "../../lib/view/what-if/loan-items"
+import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
 import GroupSwitch from "../what-if/GroupSwitch.svelte"
 import WasText from "../what-if/WasText.svelte"
@@ -31,6 +34,7 @@ let {
 	onPay,
 	onTry,
 }: Props = $props()
+const title = $derived(nameOf(currentAccountNames(), card.id))
 const statement = $derived(card.statement)
 const button =
 	"rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
@@ -38,11 +42,11 @@ const button =
 
 <li class="min-w-0 rounded-lg border border-border bg-card p-4 {marks.off ? 'opacity-60' : ''}">
 	<div class="flex flex-wrap items-start justify-between gap-3">
-		<h3 class="font-semibold break-all">{card.id}</h3>
+		<h3 class="font-semibold break-all"><AccountName id={card.id} /></h3>
 		{#if editable}
 			<div class="flex shrink-0 flex-wrap gap-2">
-				<button type="button" aria-label="Edit loan {card.id}" onclick={onEdit} class={button}>Edit</button>
-				<button type="button" aria-label="Pay {card.id} extra" onclick={onPay} class={button}>Pay extra</button>
+				<button type="button" aria-label="Edit loan {title}" onclick={onEdit} class={button}>Edit</button>
+				<button type="button" aria-label="Pay {title} extra" onclick={onPay} class={button}>Pay extra</button>
 			</div>
 		{/if}
 	</div>
@@ -82,6 +86,6 @@ const button =
 		{#if marks.off || Object.keys(marks.rows).length > 0 || marks.principal !== undefined}
 			<p class="mt-1 text-xs text-muted-foreground">The schedule and what the loan owes are the plan's own, not the what-if's.</p>
 		{/if}
-		<GroupSwitch {plan} {contentHash} group={card.switch} label={card.id} {onTry} />
+		<GroupSwitch {plan} {contentHash} group={card.switch} label={title} {onTry} />
 	{/if}
 </li>

@@ -1,5 +1,6 @@
 import type { LineSeries } from "../../chart/line"
 import type { Read, Snapshot } from "../../contract"
+import { accountNames } from "../account-names"
 import { mapRead } from "../overview/map-read"
 import { netWorthHistorySeries } from "../overview/net-worth-history"
 import { historyLine, type MonthEndRow, monthEndRows } from "./history"
@@ -21,8 +22,9 @@ export interface NetWorthPageView {
 /** The Net worth page's view of one Snapshot. */
 export function netWorthPageView(snapshot: Snapshot): NetWorthPageView {
 	const reads = snapshot.reads.netWorthHistory
+	const names = accountNames(snapshot.reads.accounts)
 	return {
-		netWorth: mapRead(snapshot.reads.netWorth, netWorthView),
+		netWorth: mapRead(snapshot.reads.netWorth, (data) => netWorthView(data, names)),
 		history: {
 			series: netWorthHistorySeries(reads),
 			rows: monthEndRows(reads),

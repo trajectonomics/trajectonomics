@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { ChanceSource } from "../../lib/view/assumptions/chance"
+import AccountName from "../ui/AccountName.svelte"
 
 interface Props {
 	source: ChanceSource
@@ -15,7 +16,7 @@ let { source }: Props = $props()
 	{#if source.accounts.length > 0}
 		<ul class="space-y-1 text-sm tabular-nums">
 			{#each source.accounts as account (account.id)}
-				<li>{account.id}: returns {account.rate} a year, swings {account.volatility}</li>
+				<li><AccountName id={account.id} />: returns {account.rate} a year, swings {account.volatility}</li>
 			{/each}
 		</ul>
 	{/if}

@@ -3,6 +3,7 @@ import { editSession } from "../../client/edit.svelte.js"
 import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioDocument } from "../../lib/contract"
+import { accountNames } from "../../lib/view/account-names"
 import { blockFromDraft, draftOf, estateShown, layoutOf, withEstate } from "../../lib/view/estate"
 import { accountChoices } from "../../lib/view/estate/options"
 import type { Problems } from "../../lib/view/plan-items/problems"
@@ -25,7 +26,10 @@ let problems: Problems = $state({})
 let layout = $state(layoutOf(null))
 const snapshot = $derived(currentSnapshot())
 const accounts = $derived(
-	accountChoices(plan, snapshot.status === "ready" ? snapshot.snapshot.reads.baseline : undefined),
+	accountChoices(
+		plan,
+		accountNames(snapshot.status === "ready" ? snapshot.snapshot.reads.accounts : undefined),
+	),
 )
 const shown = $derived(estateShown(problems, editSession.failure, editSession.error, layout))
 const button =

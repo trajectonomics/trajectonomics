@@ -1,7 +1,8 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
-import { accountNamesOf, hasCashflow } from "../../lib/view/cashflow/cashflow"
+import { accountNames } from "../../lib/view/account-names"
+import { hasCashflow } from "../../lib/view/cashflow/cashflow"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -25,7 +26,7 @@ interface Props {
 let { projections, accounts, scenario, year, onYear }: Props = $props()
 const name = $derived(chooseScenario(projectionNames(projections), scenario))
 const read = $derived(name === null ? undefined : projections[name])
-const names = $derived(accountNamesOf(accounts))
+const names = $derived(accountNames(accounts))
 </script>
 
 {#if name === null || read === undefined}

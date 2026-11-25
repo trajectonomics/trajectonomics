@@ -1,6 +1,6 @@
 <script lang="ts">
 import { routing } from "../../client/routing.svelte.js"
-import { nameOf } from "../../lib/view/routing/accounts"
+import { nameOf } from "../../lib/view/account-names"
 import type { RoutingContext } from "../../lib/view/routing/context"
 import { savedFigure } from "../../lib/view/routing/figures"
 import { sameOrder } from "../../lib/view/routing/order"

@@ -5,6 +5,7 @@
  * (cli ADR 0059).
  */
 import type { Baseline, Read, ScenarioDocument } from "../../contract"
+import { type AccountNames, NO_NAMES } from "../account-names"
 import { loanPartsOf } from "./loan-document"
 import type { Choice } from "./options"
 
@@ -26,6 +27,7 @@ export function owedChoicesOf(
 	doc: ScenarioDocument,
 	baseline: Read<Baseline> | undefined,
 	keep?: string,
+	names: AccountNames = NO_NAMES,
 ): OwedChoice[] {
 	if (baseline === undefined || !baseline.ok) return []
 	const repaid = new Set(loanPartsOf(doc).map((loan) => loan.account.id))
@@ -37,7 +39,14 @@ export function owedChoicesOf(
 		if (declared !== undefined && declared.kind !== "liability") return []
 		const id = declared?.id ?? row.account.id
 		if (repaid.has(id) && id !== keep) return []
-		return [{ id, name: row.account.name, balance: row.amount, declared: declared !== undefined }]
+		return [
+			{
+				id,
+				name: names.get(row.account.id) ?? row.account.name,
+				balance: row.amount,
+				declared: declared !== undefined,
+			},
+		]
 	})
 }
 

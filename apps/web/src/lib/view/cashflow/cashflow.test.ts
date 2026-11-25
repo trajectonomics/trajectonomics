@@ -2,15 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { LABEL_HALF, layoutFlow } from "../../chart/flow"
 import type { ProjectionRun, Read } from "../../contract"
 import { projectionRunFixture } from "../projection/fixtures.test-support"
-import {
-	accountNamesOf,
-	chooseRollup,
-	hasCashflow,
-	pickedKey,
-	rollupsOf,
-	sectionsOf,
-	yearLabel,
-} from "./cashflow"
+import { chooseRollup, hasCashflow, pickedKey, rollupsOf, sectionsOf, yearLabel } from "./cashflow"
 import { flowOf } from "./cashflow-flow"
 import { lineLabel } from "./cashflow-labels"
 import { cashflowRunFixture } from "./fixtures.test-support"
@@ -200,10 +192,6 @@ describe("labels", () => {
 		expect(yearLabel({ ...rollup, ages: [], partial: true })).toBe(
 			"31 Oct 2028 to 31 Dec 2028, partial year",
 		)
-	})
-
-	test("the account names come from the accounts Read, and none without one", () => {
-		expect(accountNamesOf(undefined).size).toBe(0)
 	})
 })
 

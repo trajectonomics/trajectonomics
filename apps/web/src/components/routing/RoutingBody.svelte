@@ -1,7 +1,7 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { Snapshot } from "../../lib/contract"
-import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
+import { accountNames } from "../../lib/view/account-names"
 import { chooseScenario } from "../../lib/view/projection/scenario"
 import { shownPlan } from "../../lib/what-if/routing"
 import EmptyState from "../ui/EmptyState.svelte"
@@ -24,7 +24,7 @@ const name = $derived(chooseScenario(snapshot.params.scenarios, scenario))
 const read = $derived(name === null ? undefined : snapshot.reads.documents[name])
 const saved = $derived(name === null ? undefined : snapshot.reads.projections[name])
 const lens = $derived(name === null ? null : whatIfSession.lensFor(name))
-const names = $derived(accountNamesOf(snapshot.reads.accounts))
+const names = $derived(accountNames(snapshot.reads.accounts))
 const session = $derived(
 	name !== null && whatIfSession.changesFor(name) !== null ? whatIfSession.whatIf : null,
 )

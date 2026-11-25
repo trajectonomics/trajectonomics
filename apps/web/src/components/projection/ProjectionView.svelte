@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
-import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
+import { accountNames } from "../../lib/view/account-names"
 import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -34,7 +34,7 @@ const charts = $derived(
 				chart: chart ?? "",
 				onChart,
 				runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
-				accountNames: accountNamesOf(accounts),
+				accountNames: accountNames(accounts),
 			},
 )
 const options = $derived(names.map((value) => ({ value, label: value })))
