@@ -1,5 +1,6 @@
 import { type AppError, fail } from "../../errors"
-import { type Stated, statedTwice } from "./claims-values"
+import { COUNTED_FIELDS, countsWithinCore } from "./claims-bound"
+import { outOfRange, type Stated, statedTwice } from "./claims-values"
 import type { Couple } from "./couple"
 import type { ReturnClaims } from "./flags"
 import { flagOf } from "./flags"
@@ -57,4 +58,14 @@ export function checkedClaims(claims: ReturnClaims, person: string): AppError | 
 		message: `--children-at-higher-rate${whose} counts children that --children also counts, so it cannot exceed it.`,
 		path: "childrenAtHigherRate",
 	})
+}
+
+/**
+ * Refuses counts that each pass alone but that tax-core cannot compute a Return with together, at the
+ * last count flag the call stated.
+ */
+export function checkedCounts(stated: Stated, returns: readonly ReturnClaims[]): AppError | null {
+	const last = COUNTED_FIELDS.filter((field) => stated.has(field)).at(-1)
+	if (last === undefined || returns.every(countsWithinCore)) return null
+	return outOfRange(last)
 }

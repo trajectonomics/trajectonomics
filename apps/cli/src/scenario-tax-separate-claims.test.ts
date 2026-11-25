@@ -78,7 +78,6 @@ describe("a household removed and set again", () => {
 		expect((await scenario(home, ["household", "base", "--none"])).code).toBe(0)
 		const changed = await tax(home, "--merge", "--parents", "1", "--life-insurance", "0")
 		expect(changed.code, changed.err).toBe(0)
-		expect(await profileOf(home)).not.toHaveProperty("returns")
 		expect((await setHousehold(home, coupleHousehold())).code).toBe(0)
 		expect((await tax(home, "--from-stored")).code).toBe(0)
 		const profile = await profileOf(home)
@@ -88,6 +87,32 @@ describe("a household removed and set again", () => {
 			["me", "77000.00"],
 			["partner", "11500.00"],
 		])
+	})
+})
+
+describe("a plan that names no partner for a while", () => {
+	const { people, ...rest } = coupleHousehold([{ path: "flows.salary", person: "me" }])
+	const holderOnly = (home: string) => setHousehold(home, { ...rest, people: [people[0]!] })
+	const removed = (home: string) => scenario(home, ["household", "base", "--none"])
+
+	/* partner: 500,000 - 100,000 - 60,000 - 60,000 parents - 50,000 = 230,000, so 5% of 80,000. */
+	it.each([
+		["has no household", removed],
+		["has a household of the holder alone", holderOnly],
+	])("keeps the partner's claims while it %s", async (_when, without) => {
+		const home = await couple(TWO_SALARIES, coupleHousehold())
+		const claims = ["--parents", "partner=2", "--life-insurance", "partner=50000"]
+		expect((await taxCouple(home, "married_separate", LABELS, claims)).code).toBe(0)
+		const owes = async () => (await year2026(home)).map((it) => [it.filer, it.due])
+		const before = await owes()
+		expect(before).toContainEqual(["partner", "4000.00"])
+		expect((await without(home)).code).toBe(0)
+		const meanwhile = await tax(home, "--from-stored")
+		expect(meanwhile.code, meanwhile.err).toBe(0)
+		expect((await profileOf(home)).returns?.partner).toMatchObject({ parents: 2 })
+		expect((await setHousehold(home, coupleHousehold())).code).toBe(0)
+		expect((await tax(home, "--from-stored")).code).toBe(0)
+		expect(await owes()).toEqual(before)
 	})
 })
 

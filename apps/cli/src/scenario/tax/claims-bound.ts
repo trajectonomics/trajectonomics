@@ -1,6 +1,7 @@
 import { toMinorUnits } from "@trajectonomics/core/money"
 import { emitThLevy, type ThLevyProfile } from "@trajectonomics/core/tax/th"
 import type { Field } from "./claims-values"
+import type { ReturnClaims } from "./flags"
 
 /** A profile that claims nothing but this many of one counted field; `null` for an amount field. */
 function countedAlone(
@@ -32,4 +33,26 @@ export function withinCore(field: Field, value: number): boolean {
 	const allowances = countedAlone(field, value)
 	if (allowances === null) return accepts(() => toMinorUnits(value, 2))
 	return Number.isSafeInteger(value) && accepts(() => emitThLevy({ allowances }))
+}
+
+/** The counted fields, in the order the flags list them. */
+export const COUNTED_FIELDS: readonly Field[] = [
+	"children",
+	"childrenAtHigherRate",
+	"parents",
+	"disabledCare",
+]
+
+/** Whether tax-core can compute a Return with all of these counts at once. */
+export function countsWithinCore(claims: ReturnClaims): boolean {
+	const { children, childrenAtHigherRate, allowances } = claims
+	return accepts(() =>
+		emitThLevy({
+			allowances: {
+				children: { totalCount: children, secondPlusBorn2018OrLaterCount: childrenAtHigherRate },
+				parents: allowances.parents,
+				disabledCareCount: allowances.disabledCare,
+			},
+		}),
+	)
 }

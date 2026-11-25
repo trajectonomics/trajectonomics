@@ -1,6 +1,6 @@
 import type { AppError } from "../../errors"
 import { applyStated, namedValues } from "./claims-apply"
-import { checkedClaims, checkedPersons } from "./claims-check"
+import { checkedClaims, checkedCounts, checkedPersons } from "./claims-check"
 import { claimsOfRequest, seedReturns, zeroClaims } from "./claims-seed"
 import type { Stated } from "./claims-values"
 import type { Couple } from "./couple"
@@ -52,6 +52,8 @@ export function requestOfClaims(input: {
 	const flat = input.base === undefined ? zeroClaims() : claimsOfRequest(input.base)
 	const returns = seedReturns(pair, input.base, flat)
 	applyStated(input.stated, flat, returns, pair)
+	const tooMany = checkedCounts(input.stated, pair === null ? [flat] : [...returns.values()])
+	if (tooMany !== null) return tooMany
 	const request = assembled(input.status, input.base, flat, returns, pair)
 	if ("jurisdiction" in request) {
 		const named = namedValues(input.stated, pair)

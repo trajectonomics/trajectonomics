@@ -25,7 +25,7 @@ export function fields(): readonly Field[] {
 }
 
 /** The refusal for a number too large to keep and tax exactly, in the words a flag's own range check uses. */
-function outOfRange(field: Field): AppError {
+export function outOfRange(field: Field): AppError {
 	const message = SENTENCES.range
 	return fail("invalid_input", { path: field, message, details: [{ path: field, message }] })
 }

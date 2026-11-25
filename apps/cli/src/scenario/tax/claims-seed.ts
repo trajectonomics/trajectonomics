@@ -17,9 +17,9 @@ export function claimsOfRequest(request: ReturnClaims): ReturnClaims {
 }
 
 /**
- * The two claim sets of a separate filing, seeded from the base and defaulting to zero. The holder's
- * is the flat claims unless the base is itself a separate filing that holds it: under any other status
- * the flat claims are what the caller last changed.
+ * The two claim sets of a separate filing. The holder's is always the flat claims, which are theirs
+ * under every status, so an entry the base holds for them is never read: it can be older than the flat
+ * claims. The partner's is the base's, or nothing.
  */
 export function seedReturns(
 	pair: Couple | null,
@@ -28,14 +28,10 @@ export function seedReturns(
 ): Map<string, ReturnClaims> {
 	const returns = new Map<string, ReturnClaims>()
 	if (pair === null) return returns
-	const held = base?.returns ?? {}
-	const own = base?.filingStatus === "married_separate" ? held[pair.holder.id] : undefined
 	const seeds: [string, ReturnClaims][] = [
-		[pair.holder.id, own ?? claimsOfRequest(flat)],
-		[pair.partner.id, held[pair.partner.id] ?? zeroClaims()],
+		[pair.holder.id, flat],
+		[pair.partner.id, base?.returns?.[pair.partner.id] ?? zeroClaims()],
 	]
-	for (const [person, claims] of seeds) {
-		returns.set(person, { ...claims, allowances: { ...claims.allowances } })
-	}
+	for (const [person, claims] of seeds) returns.set(person, claimsOfRequest(claims))
 	return returns
 }

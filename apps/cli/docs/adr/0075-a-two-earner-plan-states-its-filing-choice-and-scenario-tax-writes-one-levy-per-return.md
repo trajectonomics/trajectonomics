@@ -134,17 +134,20 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   A separate Return with Filers writes one entry per Filer: `children`, `childrenAtHigherRate` and the
   deductions it states, under the flat profile's keys; every key defaults to 0, children included, and
   a zero deduction is left out, as the flat profile does. The flat keys are the holder's claims, so
-  `scenario show` and every earlier reader read the same fields. A profile with no entry for the holder,
-  such as one written before the plan had Owners, gives the holder's Return the flat claims, on
-  `--merge` and on `--from-stored`.
-- **`returns` across a status change.** `--merge` keeps every item it is not told to change (ADR-0066),
-  so a write that files no separate Return keeps the entry of the household's partner, if it claims
-  anything. No Levy reads it there. No other entry is kept, and none when the plan has no household or
-  no partner then, so the partner's claims are lost by a write made while the plan names no partner.
-  The holder's entry is dropped because the flat keys are what changes: a later separate filing takes
-  the holder's claims from them and the partner's from the kept entry. An entry kept for a holder the
-  write could not identify would outlast those changes and understate the tax. A write of the whole
-  profile (`--tax`) states it whole, so it keeps neither.
+  `scenario show` and every earlier reader read the same fields. The holder's Return is always taken
+  from them, on `--merge` and on `--from-stored`, so a profile written before the plan had Owners
+  gives it the holder's claims. The holder's entry in `returns` records what their Return claimed and
+  is never read back: it can be older than the flat keys, and reading it would understate the tax.
+  - Known limit: the flat keys say "the holder", not which person. After a household swaps which
+    person is the holder, the new holder's Return takes the flat keys, and the new partner's takes
+    the entry held under their id. Stating the profile whole again (`--tax`) puts both right.
+- **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
+  they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
+  that claims something except the holder's, whatever the filing status and also while the household
+  names no partner. No Levy reads a kept entry; a later separate filing takes the partner's from it.
+  A plan with no household names no holder, so every entry that claims something stays, the holder's
+  among them, which nothing reads. A write of the whole profile (`--tax`) states it whole, so it keeps
+  no earlier entry.
 - **Per-person flags.** Each profile flag takes `[<person>=]<value>` and may be repeated, so
   `--parents partner=2 --parents me=1` states both Returns. A bare value names the holder. `--merge`
   merges into the stored `returns`, and `--from-stored` keeps them. Each of these is refused at the
@@ -157,7 +160,7 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
   - a bare value beside the holder's own id on one flag, which states the holder twice;
   - a count that is not a safe integer or is too large for tax-core to compute a Return with, or an
     amount that is not a safe number of satang, with the message "The value is outside its allowed
-    range.".
+    range.". Counts that are too large only together are refused so at the last count flag stated.
 - **The cross-Return check.** Every separate Return with Filers, of one Filer or two, goes through
   `thSeparateClaimProblems` (tax ADR-0010) before its Levies are written, `--merge` and `--from-stored`
   included. `OWN_PARENTS_OVER_TWO` is refused at `--parents`, with `details` naming the `problem` and

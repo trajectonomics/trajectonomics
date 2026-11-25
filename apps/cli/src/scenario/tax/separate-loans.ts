@@ -15,8 +15,9 @@ import { records } from "./json"
 
 const PATH = "allowances.mortgageInterestCeiling"
 
-const NOTE =
-	"Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns."
+const CEILING = TH_2026_PARAMETERS.allowances.mortgageInterestCeiling.toLocaleString("en-US")
+
+const NOTE = `Each separate Return's interest is taken to be on separate loans, each under its own ceiling; interest on one loan borrowed together shares a single ceiling between both Returns. If it is one loan borrowed together, state each Return's share so the two total at most ${CEILING} baht.`
 
 /** Whether two Filers each state home-loan interest while the household says both own a loan. */
 export function assumesSeparateLoans(
@@ -39,15 +40,12 @@ export function assumesSeparateLoans(
 }
 
 /**
- * The assumptions with that one said on the ceiling's entry, so each figure is still named once. The
- * entry is added if tax-core names the ceiling no longer, because the assumption outlives its source.
+ * The assumptions with that one said on tax-core's own entry for the ceiling, so each figure is still
+ * named once and its status stays tax-core's. A write with interest on a Return has the entry while
+ * tax-core calls the ceiling unconfirmed; the test of this note fails when it no longer does.
  */
 export function withSeparateLoans(found: readonly AssumptionView[]): AssumptionView[] {
-	if (found.some((entry) => entry.path === PATH)) {
-		return found.map((entry) =>
-			entry.path === PATH ? { ...entry, note: `${entry.note} ${NOTE}` } : entry,
-		)
-	}
-	const value = TH_2026_PARAMETERS.allowances.mortgageInterestCeiling
-	return [...found, { path: PATH, value, status: "unsourced", note: NOTE }]
+	return found.map((entry) =>
+		entry.path === PATH ? { ...entry, note: `${entry.note} ${NOTE}` } : entry,
+	)
 }

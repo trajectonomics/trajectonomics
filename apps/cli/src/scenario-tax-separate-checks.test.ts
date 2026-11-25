@@ -43,6 +43,21 @@ describe("a value too large to keep", () => {
 	})
 })
 
+describe("counts that are too large only together", () => {
+	it("are refused at the last of their flags", async () => {
+		const home = await couple(TWO_SALARIES, coupleHousehold())
+		const children = ["--children", "1501199875", "--children-at-higher-rate", "1501199875"]
+		const disabled = ["--disabled-care", "1001199874"]
+		const refused = { path: "--disabled-care", message: SENTENCES.range }
+		const res = await taxCouple(home, "married_separate", LABELS, [...children, ...disabled])
+		expect(res.code, res.out).toBe(2)
+		expect(errorOf(res)).toMatchObject(refused)
+		expect((await taxCouple(home, "married_separate", LABELS, children)).code).toBe(0)
+		const merged = await scenario(home, ["tax", "base", "--merge", ...disabled])
+		expect(errorOf(merged)).toMatchObject(refused)
+	})
+})
+
 describe("the check across two separate Returns", () => {
 	it.each([
 		[["--parents", "4"], "me"],
@@ -94,6 +109,7 @@ describe("interest on two separate Returns beside a loan both own", () => {
 		expect(more).toEqual([])
 		expect(entry).toMatchObject({ value: 100000, status: "reported" })
 		expect(entry?.note).toContain("separate loans")
+		expect(entry?.note).toContain("so the two total at most 100,000 baht")
 	})
 
 	it.each([
