@@ -36,12 +36,12 @@ output, and where the CLI does arithmetic at all.
 - **Why no total of the CLI's own.** The CLI prints no figure that is neither an engine field nor an exact
   sum of engine lines. The one arithmetic it does is that sum, and the identity in sim ADR-0018 is what makes
   it correct; `projection-breakdown.test.ts` hand-checks each printed total against the plan's numbers.
-- **JSON carries the lines only.** **Superseded by the addendum (#337):** The totals are not added to JSON: the long table is the contract, and a
-  total in JSON would be a second figure a caller could disagree with.
+- **JSON carries the lines only.** **Superseded by the addendum (#337): the totals are now in JSON.** The original decision was: the totals are not
+  added to JSON, the long table is the contract, and a total in JSON would be a second figure a caller could disagree with.
 
 ## Considered options
 
-- **Totals in JSON.** Rejected: the table would then state figures beside its lines, and the annual row would
+- **Totals in JSON.** **Superseded by the addendum (#337).** Rejected: the table would then state figures beside its lines, and the annual row would
   need `levy` and `withdrawals` to carry the same totals, which changes its bytes with the flag.
 - **The long table in the human form.** Rejected: a person reads a year, not a list of routed lines. The
   block is that year; the table is the same lines for a program.

@@ -357,8 +357,8 @@ Flow's income, the tax taken at source and each Levy's settlement (a refund is n
 and its category, each Contribution applied and the part the cash could not fund, each planned
 withdrawal, what `cashflow.withdraw` drew and what `cashflow.surplus` filled. In JSON it is the
 `cashflow` table, one row per line. Its section totals are the `cashflowTotals` table beside it: nine rows per year,
-in the order money in, tax, withdrawals, drawn, spending, saving, not funded, left over and unmet. Both tables and the
-human block come from one function, so they cannot disagree. JSON states a zero total as `0.00`; the human block
+in the order money in, tax, withdrawals, drawn, spending, saving, not funded, left over and unmet. The `cashflowTotals` table
+and the human block come from one function (`cashflowTotalsOf`), so they cannot disagree. JSON states a zero total as `0.00`; the human block
 leaves out a zero not funded or unmet, and withdrawals, drawn or tax when its roll-up has no line of that group. In the
 human format it is one block per year, after the body:
 

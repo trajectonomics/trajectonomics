@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { isAppError } from "../errors"
 import { cashflowTotalRowsOf, cashflowTotalsOf, type RollupFigures } from "./cashflow-totals"
+import { OVERFLOW_HINT } from "./overflow"
 
 /*
  * The section totals sum in BigInt (cli ADR-0058, addendum): each engine figure is a safe integer, but
@@ -69,6 +70,7 @@ describe("an exact total", () => {
 			code: "projection_refused",
 			exitCode: 3,
 			details: [{ code: "VALUE_OVERFLOW", date: "2030-12-31" }],
+			hint: OVERFLOW_HINT,
 		})
 	})
 })

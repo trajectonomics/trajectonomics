@@ -62,7 +62,7 @@ export const outputFlags: Record<
 > = {
 	monthly: more("Also report the monthly rows."),
 	breakdown: more(
-		"Also report each Annual roll-up's cash flow by source, tax, category and Account, and its nine section totals (the cashflowTotals table in JSON, computed by the same function as the human block). JSON states a zero total as 0.00; the human block leaves out a zero not funded or unmet, and withdrawals, drawn or tax when its roll-up has no line of that group.",
+		"Also report each Annual roll-up's cash flow by source, tax, category and Account, and its nine section totals (the cashflowTotals table in JSON). JSON states a zero total as 0.00; the human block leaves out a zero not funded or unmet, and withdrawals, drawn or tax when its roll-up has no line of that group.",
 	),
 	liabilities: more(
 		"Also report each loan's statement: its months, the interest in each, and the date it is paid off.",
