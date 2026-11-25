@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument } from "../../contract"
-import { personNames } from "../item-names"
+import { NO_PEOPLE, personNames } from "../item-names"
 import {
 	agesText,
 	anchorAt,
@@ -76,10 +76,13 @@ describe("anchor labels", () => {
 describe("agesText", () => {
 	test("lists each person's age on the row, in the household's order", () => {
 		expect(
-			agesText([
-				{ person: "me", age: 60 },
-				{ person: "partner", age: 58 },
-			]),
+			agesText(
+				[
+					{ person: "me", age: 60 },
+					{ person: "partner", age: 58 },
+				],
+				NO_PEOPLE,
+			),
 		).toBe("me 60, partner 58")
 	})
 
@@ -97,20 +100,23 @@ describe("agesText", () => {
 	})
 
 	test("is empty when the row carries no ages", () => {
-		expect(agesText([])).toBe("")
+		expect(agesText([], NO_PEOPLE)).toBe("")
 	})
 })
 
 describe("axisAge", () => {
 	test('reads "age N" for one person, the first person\'s age for several, and null for none', () => {
-		expect(axisAge([{ person: "me", age: 37 }])).toBe("age 37")
+		expect(axisAge([{ person: "me", age: 37 }], NO_PEOPLE)).toBe("age 37")
 		expect(
-			axisAge([
-				{ person: "me", age: 37 },
-				{ person: "partner", age: 35 },
-			]),
+			axisAge(
+				[
+					{ person: "me", age: 37 },
+					{ person: "partner", age: 35 },
+				],
+				NO_PEOPLE,
+			),
 		).toBe("me 37")
-		expect(axisAge([])).toBeNull()
+		expect(axisAge([], NO_PEOPLE)).toBeNull()
 	})
 
 	test("calls the first person by the household's words when the row carries several", () => {

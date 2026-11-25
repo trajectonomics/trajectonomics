@@ -1,9 +1,9 @@
 /**
- * Who claims each allowance when a plan files separately: one column per Return, each cell the amount that Return's
- * profile states (cli ADR-0075). The page shows the stored claims and applies nothing; a claim `traj` does not hold
- * reads "Not stated". Pure.
+ * Who claims each allowance when a plan files separately: one column per Filer, each cell the amount that Filer's
+ * Return claims (cli ADR-0075). The holder's claims are the profile's flat keys, never its `returns` entry; every
+ * other Return's claims are its `returns` entry. The page shows the stored claims and applies nothing. Pure.
  */
-import type { Assumption, ReturnClaims, TaxProfile } from "../../contract"
+import type { Assumption, HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
 import { groupDigits } from "./rows"
 
@@ -14,58 +14,77 @@ export interface ClaimRow {
 	readonly cells: readonly string[]
 }
 
-/** The per-Return view of a separate filing: the people whose Return is a column, and one row per allowance. */
+/** The per-Return view of a separate filing: the Filers whose Return is a column, and one row per allowance. */
 export interface ClaimsTable {
 	readonly people: readonly string[]
 	readonly rows: readonly ClaimRow[]
+	/** The interest on one loan the Returns borrowed together, in baht, or null when the profile stores none. */
+	readonly sharedInterest: string | null
 }
 
-/** The tax-core assumption path whose note says a shared home loan shares one ceiling between both Returns. */
+/** The tax-core assumption path whose note says what the CLI assumes or leaves unclaimed about home-loan interest. */
 const SHARED_CEILING = "allowances.mortgageInterestCeiling"
 
+/** The words each of the CLI's own sentences on that path carries, so tax-core's bare ceiling note is not shown. */
+const CLI_NOTE_MARKERS = ["separate loans", "does not claim"]
+
 /** What one Return states for one allowance: a count as it is, an amount in baht, and "None" for zero or absent. */
-function cellOf(claims: ReturnClaims | undefined, field: TaxField): string {
-	const value = (claims as Record<string, number | undefined> | undefined)?.[field.key]
+function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: TaxField): string {
+	const value = claims?.[field.key]
 	if (value === undefined || value === 0) return "None"
 	return field.kind === "count" ? String(value) : `${groupDigits(value)} THB`
 }
 
-/** The columns: the household's people first, in its order, then anyone else whose Return the profile still keeps. */
-function peopleOf(
-	returns: Readonly<Record<string, ReturnClaims>>,
-	people: readonly string[],
-): string[] {
-	const named = people.filter((person) => Object.hasOwn(returns, person))
-	return [...named, ...Object.keys(returns).filter((person) => !named.includes(person))]
+/** The person whose claims the flat keys are: the recorded `claimsHolder`, else the household's holder, else a Filer. */
+function holderOf(
+	profile: TaxProfile,
+	household: HouseholdDocument | null,
+	filers: readonly string[],
+): string | undefined {
+	const holder = household?.people.find((person) => person.role === "holder")
+	return profile.claimsHolder ?? holder?.id ?? filers[0]
 }
 
 /**
- * The per-Return claims of a separate filing, or null for a joint or single one: only `married_separate` writes
- * `returns` for a Levy to read, and another status may hold a person's claims no Levy reads.
+ * The per-Return claims of a separate filing, or null for a plan whose projection names no Filer (a joint or single
+ * filing, or a separate profile with no Filers): only a Filer's Levy reads a Return's claims.
  */
-export function claimsTable(profile: TaxProfile, people: readonly string[]): ClaimsTable | null {
-	const returns = profile.returns
-	if (profile.filingStatus !== "married_separate" || returns === undefined) return null
-	const columns = peopleOf(returns, people)
+export function claimsTable(
+	profile: TaxProfile,
+	household: HouseholdDocument | null,
+	filers: readonly string[],
+): ClaimsTable | null {
+	if (profile.filingStatus !== "married_separate" || filers.length === 0) return null
+	const holder = holderOf(profile, household, filers)
+	const claimsOf = (person: string): ReturnClaims | TaxProfile | undefined =>
+		person === holder ? profile : profile.returns?.[person]
 	return {
-		people: columns,
+		people: [...filers],
 		rows: [...COUNT_FIELDS, ...AMOUNT_FIELDS].map((field) => ({
 			key: field.key,
 			label: field.label,
-			cells: columns.map((person) => cellOf(returns[person], field)),
+			cells: filers.map((person) => cellOf(claimsOf(person), field)),
 		})),
+		sharedInterest:
+			profile.sharedMortgageInterest === undefined
+				? null
+				: `${groupDigits(profile.sharedMortgageInterest)} THB`,
 	}
 }
 
 /**
- * The CLI's notes on a home loan two separate Returns share a ceiling for, each once, in its order (cli ADR-0075).
- * They come from the projection's tax years, so a plan whose Returns state no home-loan interest has none.
+ * The CLI's own notes on home-loan interest, each once, in its order (cli ADR-0075, #606): the separate-loans
+ * assumption, and the sentence that says a Return does not claim stored shared interest or another's claims.
+ * Tax-core's generic ceiling note alone is neither, and is left out.
  */
 export function sharedLiabilityNotes(
 	years: readonly { readonly assumptions: readonly Assumption[] }[],
 ): readonly string[] {
 	const notes = years.flatMap((year) =>
-		year.assumptions.filter((one) => one.path === SHARED_CEILING).map((one) => one.note),
+		year.assumptions
+			.filter((one) => one.path === SHARED_CEILING)
+			.map((one) => one.note)
+			.filter((note) => CLI_NOTE_MARKERS.some((marker) => note.includes(marker))),
 	)
 	return [...new Set(notes)]
 }

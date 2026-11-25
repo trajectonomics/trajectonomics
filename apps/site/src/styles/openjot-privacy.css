@@ -1,0 +1,51 @@
+/*
+ * The OpenJot page's Privacy section (ADR 0032): four claims on the home's hairline-card grid, two
+ * columns from 40 rem. The grid's own background is the hairline, and a 1 px gap between the cells
+ * shows it. Every colour is a Semantic Token Role.
+ */
+
+.openjot-privacy {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1px;
+	margin: 40px 0 0;
+	padding: 0;
+	overflow: hidden;
+	border: 1px solid var(--ds-color-border);
+	border-radius: 12px;
+	background: var(--ds-color-border);
+	list-style: none;
+}
+
+@media (min-width: 40rem) {
+	.openjot-privacy {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		margin-top: 56px;
+	}
+}
+
+.openjot-privacy-claim {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 24px;
+	background: var(--ds-color-background);
+	color: var(--ds-color-foreground);
+}
+
+.openjot-privacy-title {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+.openjot-privacy-copy {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	text-wrap: pretty;
+}
+
+/* The three links under the claims, in the page's quiet mono line. */
+.openjot-privacy-links {
+	margin-top: 32px;
+}

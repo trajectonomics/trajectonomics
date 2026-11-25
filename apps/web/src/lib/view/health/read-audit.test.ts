@@ -101,4 +101,26 @@ describe("readAudit", () => {
 		const [row] = readAudit(withFailedBaseline(demo, "INVALID_DATE"))
 		expect(row?.note).toBeNull()
 	})
+
+	test("keys the note off the Read's own command, not the question that heads its row", () => {
+		// The Baseline slot holding another command's Read stands in for a renamed question: the note
+		// follows `baseline show`, so a row that only looks like the Baseline gets none.
+		const mislabelled: Snapshot = {
+			...demo,
+			reads: {
+				...demo.reads,
+				baseline: {
+					argv: ["report", "pnl", "--since", "2026-01-01", "--until", "2026-10-31", "--json"],
+					ok: false,
+					error: {
+						code: "NEGATIVE_AMOUNT",
+						exitCode: 3,
+						message: "A column holds a negative amount.",
+					},
+				},
+			},
+		}
+		const row = readAudit(mislabelled).find((entry) => entry.question === "Baseline at the As-of")
+		expect(row?.note).toBeNull()
+	})
 })

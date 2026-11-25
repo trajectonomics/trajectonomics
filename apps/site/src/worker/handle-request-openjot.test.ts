@@ -32,6 +32,31 @@ describe("the Worker's answer at OpenJot's address", () => {
 		expect(response.headers.get("etag")).toBe('"openjot-en"')
 	})
 
+	it("passes a 304 through with the cache contract the answer would have carried", async () => {
+		const asked: Asked[] = []
+		const response = await handleRequest(
+			get("/openjot/", { "if-none-match": '"openjot-en"' }),
+			fakeAssets(asked),
+		)
+		expect(asked[0]?.ifNoneMatch).toBe('"openjot-en"')
+		expect(response.status).toBe(304)
+		expect(await contentOf(response)).toBe("")
+		expect(response.headers.get("etag")).toBe('"openjot-en"')
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
+		expect(response.headers.get("cache-control")).toBe("private, no-cache")
+	})
+
+	it("answers HEAD with the headers and no body", async () => {
+		const response = await handleRequest(
+			new Request("https://trajectonomics.com/openjot/", { method: "HEAD" }),
+			fakeAssets(),
+		)
+		expect(response.status).toBe(200)
+		expect(response.headers.get("etag")).toBe('"openjot-en"')
+		expect(response.headers.get("vary")).toBe("Cookie, Accept-Language, CF-IPCountry, Sec-GPC, DNT")
+		expect(await contentOf(response)).toBe("")
+	})
+
 	it("stores a Language chosen on /openjot/ and returns to /openjot/", async () => {
 		const response = await handleRequest(get("/openjot/?lang=th"), fakeAssets())
 		expect(response.status).toBe(302)
@@ -54,5 +79,13 @@ describe("the Worker's answer at OpenJot's address", () => {
 		const response = await handleRequest(get("/openjot?lang=th"), fakeAssets())
 		expect(response.status).toBe(301)
 		expect(response.headers.get("location")).toBe("/openjot/?lang=th")
+	})
+
+	it("sends /th/openjot/ to /, so the Thai build path never becomes an address", async () => {
+		const asked: Asked[] = []
+		const response = await handleRequest(get("/th/openjot/"), fakeAssets(asked))
+		expect(response.status).toBe(301)
+		expect(response.headers.get("location")).toBe("/")
+		expect(asked).toEqual([])
 	})
 })

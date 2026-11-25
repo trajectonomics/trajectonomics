@@ -8,12 +8,12 @@ interface Props {
 
 const { dictionary } = Astro.props
 
-/** The app's screens, in the order the page shows them; each file keeps the name the app's site gave it. */
+/** The app's screens, in the order the page shows them: the default theme's own captures. */
 const SHOTS = [
-	{ src: "/openjot/shot-home.webp", width: 600, height: 1298 },
-	{ src: "/openjot/shot-summary.webp", width: 600, height: 1298 },
-	{ src: "/openjot/shot-scan-en.webp", width: 412, height: 891 },
-	{ src: "/openjot/shot-scan-th.webp", width: 540, height: 1142 },
+	{ src: "/openjot/home.webp", width: 412, height: 915 },
+	{ src: "/openjot/summary.webp", width: 412, height: 915 },
+	{ src: "/openjot/home-thai.webp", width: 412, height: 915 },
+	{ src: "/openjot/add-record.webp", width: 412, height: 915 },
 ] as const
 ---
 

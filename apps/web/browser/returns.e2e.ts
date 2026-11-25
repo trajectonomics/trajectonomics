@@ -37,5 +37,12 @@ test("the profile page names who claims each allowance, and fits at 360px", asyn
 	await openDemo(page, "/settings/tax/?scenario=separate", { theme: "light" })
 	await expect(page.getByText("Who claims each allowance")).toBeVisible()
 	await expect(page.locator("main")).toContainText("Your partner")
+	// The holder's column is the profile's flat claims; the partner's is their `returns` entry.
+	const claims = page.locator("section[aria-labelledby='tax-claims-title']")
+	const life = claims
+		.getByRole("row")
+		.filter({ has: page.getByRole("rowheader", { name: "Life insurance premiums", exact: true }) })
+	await expect(life).toContainText("15,000 THB")
+	await expect(life).toContainText("12,000 THB")
 	await fits(page)
 })

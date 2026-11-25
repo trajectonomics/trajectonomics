@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { NO_PEOPLE } from "../item-names"
 import { baselineChance, baselineRun } from "./baseline"
 import { cashflowTriples } from "./cashflow"
 import { chanceTriple } from "./chance"
@@ -161,7 +162,7 @@ describe("the chance, tax and cash flow", () => {
 describe("the chart", () => {
 	test("draws the what-if solid over the baseline dashed, and names both", () => {
 		const lens = demoLens()
-		const series = whatIfSeries(lens.run ?? failing(), baselineRun(DEMO, "base"), "both")
+		const series = whatIfSeries(lens.run ?? failing(), baselineRun(DEMO, "base"), "both", NO_PEOPLE)
 		expect(series.map((entry) => entry.name)).toEqual([
 			"What-if: Nominal net worth",
 			"Baseline: Nominal net worth",
@@ -171,13 +172,13 @@ describe("the chart", () => {
 
 	test("with no baseline run it draws the what-if alone", () => {
 		const lens = demoLens()
-		expect(whatIfSeries(lens.run ?? failing(), null, "real")).toHaveLength(1)
+		expect(whatIfSeries(lens.run ?? failing(), null, "real", NO_PEOPLE)).toHaveLength(1)
 	})
 
 	test("with amounts hidden only the what-if series remain, none dashed and none named Baseline", () => {
 		const lens = demoLens()
 		const baseline = baselineRun(DEMO, "base")
-		const hidden = whatIfSeries(lens.run ?? failing(), baseline, "nominal", true)
+		const hidden = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, true)
 		expect(hidden.map((entry) => entry.name)).toEqual(["What-if: Nominal net worth"])
 		expect(hidden.every((entry) => entry.dashed !== true)).toBe(true)
 		expect(hidden.some((entry) => entry.name.includes("Baseline"))).toBe(false)
@@ -186,14 +187,16 @@ describe("the chart", () => {
 	test("with amounts shown the series are unchanged, and hiding is off by default", () => {
 		const lens = demoLens()
 		const baseline = baselineRun(DEMO, "base")
-		const shown = whatIfSeries(lens.run ?? failing(), baseline, "nominal", false)
+		const shown = whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE, false)
 		expect(shown.map((entry) => entry.name)).toEqual([
 			"What-if: Nominal net worth",
 			"Baseline: Nominal net worth",
 		])
 		expect(shown.map((entry) => entry.dashed === true)).toEqual([false, true])
 		expect(
-			whatIfSeries(lens.run ?? failing(), baseline, "nominal").map((entry) => entry.name),
+			whatIfSeries(lens.run ?? failing(), baseline, "nominal", NO_PEOPLE).map(
+				(entry) => entry.name,
+			),
 		).toEqual(["What-if: Nominal net worth", "Baseline: Nominal net worth"])
 	})
 })

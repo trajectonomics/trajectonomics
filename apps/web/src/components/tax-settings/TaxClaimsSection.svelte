@@ -43,6 +43,11 @@ const columns = $derived(table.people.map((person) => personText(people, person)
 			</tbody>
 		</table>
 	</div>
+	{#if table.sharedInterest !== null}
+		<p class="text-sm text-foreground">
+			Shared home-loan interest, split half to each Return: <span class="tabular-nums">{table.sharedInterest}</span>
+		</p>
+	{/if}
 	{#each notes as note, index (index)}
 		<p class="text-sm text-muted-foreground">{note}</p>
 	{/each}

@@ -29,11 +29,19 @@ const HOUSEHOLD: HouseholdDocument = {
 }
 
 const PEOPLE = personNames(HOUSEHOLD)
-const TABLE = claimsTable(PROFILE, ["me", "partner"])
+const TABLE = claimsTable(PROFILE, HOUSEHOLD, ["me", "partner"])
+const SHARED = claimsTable({ ...PROFILE, sharedMortgageInterest: 60000 }, HOUSEHOLD, [
+	"me",
+	"partner",
+])
+
+function rendered(table: typeof TABLE, notes: readonly string[]): string {
+	if (table === null) throw new Error("the profile files separately")
+	return render(TaxClaimsSection, { props: { table, people: PEOPLE, notes } }).body
+}
 
 function section(notes: readonly string[]): string {
-	if (TABLE === null) throw new Error("the profile files separately")
-	return render(TaxClaimsSection, { props: { table: TABLE, people: PEOPLE, notes } }).body
+	return rendered(TABLE, notes)
 }
 
 describe("the per-Return allowance view", () => {
@@ -52,5 +60,11 @@ describe("the per-Return allowance view", () => {
 		const note = "Each separate Return's interest is taken to be on separate loans."
 		expect(section([note])).toContain(note)
 		expect(section([])).not.toContain("separate loans")
+	})
+
+	test("states the stored shared home-loan interest the Returns split between them", () => {
+		expect(rendered(SHARED, [])).toContain("Shared home-loan interest, split half to each Return")
+		expect(rendered(SHARED, [])).toContain("60,000 THB")
+		expect(section([])).not.toContain("Shared home-loan interest")
 	})
 })

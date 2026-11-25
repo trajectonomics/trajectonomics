@@ -2,7 +2,7 @@ import { dayPosition, type LineMarker, type LineSeries, toChartNumber } from "..
 import type { ProjectionRun } from "../../contract"
 import { formatDate, formatMoney } from "../../format"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
-import { markerOf, milestoneView } from "../milestones/milestones"
+import { markerOf, milestoneView, type ReachedMilestone } from "../milestones/milestones"
 import { type AnnualRow, annualRowsOf } from "../projection/annual"
 import { NOMINAL_NAME } from "../projection/chart"
 import { type Range, rowsInRange } from "./range"
@@ -11,6 +11,8 @@ import { type Range, rowsInRange } from "./range"
 export interface PlanChart {
 	readonly series: readonly LineSeries[]
 	readonly markers: readonly LineMarker[]
+	/** The Milestones those rules stand for, in date order, for the list under the chart. */
+	readonly milestones: readonly ReachedMilestone[]
 }
 
 function point(row: AnnualRow): LineSeries["points"][number] {
@@ -35,9 +37,13 @@ export function planChart(
 	const rows = rowsInRange(annualRowsOf(run), range)
 	if (rows.length === 0) return null
 	const reached = milestoneView(run)?.reached ?? []
-	const markers = reached.flatMap((milestone) => {
+	const drawn = reached.flatMap((milestone) => {
 		const x = dayPosition(rows, milestone.date)
-		return x === null ? [] : [markerOf(milestone.id, x, names)]
+		return x === null ? [] : [{ milestone, marker: markerOf(milestone.id, x, names) }]
 	})
-	return { series: [{ name: NOMINAL_NAME, points: rows.map(point) }], markers }
+	return {
+		series: [{ name: NOMINAL_NAME, points: rows.map(point) }],
+		markers: drawn.map((entry) => entry.marker),
+		milestones: drawn.map((entry) => entry.milestone),
+	}
 }

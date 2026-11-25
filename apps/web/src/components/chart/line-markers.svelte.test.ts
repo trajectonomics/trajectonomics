@@ -33,6 +33,27 @@ describe("LineChart markers", () => {
 		expect(renderWith([{ x: 0, label: "early" }])).toContain('text-anchor="start"')
 	})
 
+	// Rules at x 204 and about 210: the first label has no room on its own side, the right.
+	test("draws a label moved to the other side of its rule on that side", () => {
+		const body = renderWith([
+			{ x: 0.5, label: "moved" },
+			{ x: 0.52, label: "stays" },
+		])
+		expect(body).toMatch(/<text data-marker-label[^>]*x="200"[^>]*text-anchor="end"[^>]*>moved</)
+		expect(body).toMatch(/<text data-marker-label[^>]*text-anchor="start"[^>]*>stays</)
+	})
+
+	test("draws the rule but no words for a marker with no room on either side", () => {
+		const body = renderWith([
+			{ x: 0.5, label: "one" },
+			{ x: 0.52, label: "two" },
+			{ x: 0.54, label: "three" },
+		])
+		expect(body.match(/<title>/g)).toHaveLength(3)
+		expect(body.match(/data-marker-label/g)).toHaveLength(2)
+		expect(body).not.toMatch(/>two<\/text>/)
+	})
+
 	test("draws no rule when no markers are passed", () => {
 		expect(renderWith([])).not.toContain("<title>")
 	})

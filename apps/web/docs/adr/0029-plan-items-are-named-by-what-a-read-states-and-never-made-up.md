@@ -26,3 +26,12 @@ The Dashboard printed ids where a person expects names ([#322](https://github.co
 
 - A Flow, a Milestone and an anchored item show as their ids, in code, on every page. The issue's names for them ("Car paid off", "Fund ends when you turn 60") wait for the CLI to state a name.
 - People are named everywhere: cards, anchors, pickers, the ages of a year, the FI ages on a Plans card, the cash flow year picker.
+
+## Amended 2026-11-26: a plan states a display label, and the lookup reads it
+
+The CLI now states a display name for a Flow, a Milestone and a person: `displayLabel` in the Scenario document and the household document (sim ADR 0032, cli ADR 0080). The second step this ADR named has landed, so the decision changes in one place and in no other.
+
+- **The lookup has a third source, the plan's document.** `itemNames(accountNames, household, document)` also reads `document.flows` and `document.milestones`, and `snapshotItemNames` and `currentItemNames()` pass the document from the Snapshot's `scenario show` Read. `labels.ts` builds the two maps; an item with no `displayLabel` is left out, and `itemLabel` falls back to the id in code exactly as before. A person's `displayLabel` wins over the role words ("You", "Your partner"); the role words remain the fallback when the household states no label, so a plan without labels reads as it did.
+- **The label is what the CLI states, and the page still invents nothing.** The label comes from the document, never from the id's text. An item with no label keeps showing its id in code (`<code>`, or `LineMarker.code`), so the page's guess is still never printed.
+- **The forms write the label, and the id stays the id.** The Flow form and the person form gain a "Name" field that writes `displayLabel`; the id keeps its own field (marked "Id" for a new item) and every Edit still sends ids. The form trims the name before it sends it, because `traj` refuses untrimmed text rather than rewriting it. There is no Milestone form in the Dashboard, so a Milestone's label is read from the document and a person sets it with `traj scenario apply --set`; the lookup, the chart marks and the Milestones page show it as soon as the Snapshot is read again.
+- **A chart's mark still says whether it is code.** `LineMarker.code` is true only for an id with no label, so a labelled Milestone reads in the interface face and an unlabelled one stays monospaced.
