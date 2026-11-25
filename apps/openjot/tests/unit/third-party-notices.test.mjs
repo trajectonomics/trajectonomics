@@ -7,8 +7,8 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { directDependencyVersions, npmPackageList } from "../../tools/third-party-notices.mjs";
+import { readFileSync, readdirSync } from "node:fs";
+import { brandFontComponents, directDependencyVersions, npmPackageList } from "../../tools/third-party-notices.mjs";
 
 const read = (rel) => readFileSync(new URL(`../../${rel}`, import.meta.url), "utf8");
 const notices = read("static/third-party-notices.txt");
@@ -74,4 +74,27 @@ test("the model, the font and the native runtime have notices", () => {
   has(/^@fontsource\/noto-sans-thai \S+ - OFL-1\.1/m);
   has(/ONNX Runtime native libraries/);
   has(/SIL OPEN FONT LICENSE/);
+});
+
+test("every brand font the app bundles is listed with the OFL-1.1 licence", () => {
+  // Inter comes from @trajectonomics/brand/current/fonts/inter.css and Azeret Mono is copied
+  // into static/fonts/; both are under the SIL Open Font License 1.1. The generator reads them
+  // from the workspace, not from a registry, so this guards the committed file against drift.
+  const fonts = brandFontComponents();
+  const staticFonts = readdirSync(new URL("../../static/fonts/", import.meta.url)).filter((name) => name.endsWith(".woff2"));
+  assert.ok(staticFonts.length > 0, "static/fonts/ has no woff2 file");
+  const covered = new Set(fonts.flatMap((font) => font.name.match(/[\w.-]+\.woff2/g) ?? []));
+  const expected = ["inter-latin-wght.woff2", "inter-latin-ext-wght.woff2", ...staticFonts];
+  assert.deepEqual(expected.filter((file) => !covered.has(file)), [], "a brand font the app bundles has no notice");
+  for (const font of fonts) {
+    assert.equal(font.license, "OFL-1.1", `${font.name} is not listed as OFL-1.1`);
+    assert.ok(
+      new RegExp(`^${escape(font.name)} ${escape(font.version)}(?: \\*)? - OFL-1\\.1 \\[L\\d+\\]$`, "m").test(notices),
+      `${font.name} is not listed in the notices: regenerate them with node tools/third-party-notices.mjs --apk <apk>`,
+    );
+    // The full licence text ships with each family, copyright line included. It is printed
+    // verbatim because the OFL body itself contains lines that start with "Copyright".
+    const text = font.texts[0].text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").replace(/[ \t]+$/gm, "").trim();
+    assert.ok(notices.includes(text), `the notices do not reproduce the ${font.name} licence text in full`);
+  }
 });

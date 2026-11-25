@@ -1,11 +1,12 @@
 import type { Dictionary } from "../language/dictionary"
+import { languageEntry } from "../language/languages"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { type HtmlElement, type ScannedPage, scanHtml, textOf } from "./html"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 
-/** The attribute that marks a Language home's strip of facts, which belongs to its footer. */
+/** The attribute that marks a page's strip of facts, which belongs to its footer. */
 const FACTS = "data-facts"
 
 /** The landmark the facts belong to: the footer, with the rest of the fine print. */
@@ -73,14 +74,15 @@ function placementFailures(
 	]
 }
 
-/** Every Language home states its three plain facts in its footer (site#69). */
+/** Every page states the Site's three plain facts in its footer (site#69). */
 export function checkFacts(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => {
+	return builtLanguagePages(files).flatMap(({ page: words, file }) => {
+		const dictionary = languageEntry(words.language).dictionary
 		const page = scanHtml(file.content)
 		const strip = stripIn(page)
-		if (strip === undefined) return [missingStrip(file, entry.dictionary)]
+		if (strip === undefined) return [missingStrip(file, dictionary)]
 		return [
-			...unstatedFacts(file, page, strip, entry.dictionary),
+			...unstatedFacts(file, page, strip, dictionary),
 			...placementFailures(file, page, strip),
 		]
 	})

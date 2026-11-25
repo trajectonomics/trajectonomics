@@ -1,19 +1,14 @@
-import type { Language } from "../language/language"
-import {
-	ABSOLUTE_CLEAN_URL,
-	dictionaryFor,
-	languageEntry,
-	otherLanguages,
-} from "../language/languages"
+import type { LanguagePage } from "../language/language-pages"
+import { otherLanguages } from "../language/languages"
 import { SITE_NAME } from "../site"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../social/layout"
-import { absoluteShareImageUrl, SHARE_IMAGE_TYPE, shareImageAlt } from "../social/share-advert"
+import { SHARE_IMAGE_TYPE } from "../social/share-advert"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { elementsByTag, type ScannedPage, scanHtml } from "./html"
 import { unescapeText } from "./html-tag"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
 
 /** The card kind: `summary_large_image`, because a 1200 × 630 share image ships with the page. */
@@ -26,30 +21,27 @@ interface CardProperty {
 	readonly expected: string
 }
 
-/** The card one Language home must carry, property by property. */
-function cardOf(language: Language): readonly CardProperty[] {
-	const dictionary = dictionaryFor(language)
-	const image = absoluteShareImageUrl(language)
-	const entry = languageEntry(language)
+/** The card one page must carry, property by property. */
+function cardOf(page: LanguagePage): readonly CardProperty[] {
 	return [
-		{ attribute: "property", key: "og:title", expected: dictionary.documentTitle },
-		{ attribute: "property", key: "og:description", expected: dictionary.description },
-		{ attribute: "property", key: "og:url", expected: ABSOLUTE_CLEAN_URL },
-		{ attribute: "property", key: "og:locale", expected: entry.locale },
-		...otherLanguages(language).map((other) => ({
+		{ attribute: "property", key: "og:title", expected: page.documentTitle },
+		{ attribute: "property", key: "og:description", expected: page.description },
+		{ attribute: "property", key: "og:url", expected: page.absoluteUrl },
+		{ attribute: "property", key: "og:locale", expected: page.locale },
+		...otherLanguages(page.language).map((other) => ({
 			attribute: "property" as const,
 			key: "og:locale:alternate",
 			expected: other.locale,
 		})),
 		{ attribute: "property", key: "og:type", expected: "website" },
 		{ attribute: "property", key: "og:site_name", expected: SITE_NAME },
-		{ attribute: "property", key: "og:image", expected: image },
+		{ attribute: "property", key: "og:image", expected: page.shareImageUrl },
 		{ attribute: "property", key: "og:image:width", expected: String(SHARE_IMAGE_WIDTH) },
 		{ attribute: "property", key: "og:image:height", expected: String(SHARE_IMAGE_HEIGHT) },
 		{ attribute: "property", key: "og:image:type", expected: SHARE_IMAGE_TYPE },
-		{ attribute: "property", key: "og:image:alt", expected: shareImageAlt(dictionary) },
+		{ attribute: "property", key: "og:image:alt", expected: page.shareImageAlt },
 		{ attribute: "name", key: "twitter:card", expected: CARD_KIND },
-		{ attribute: "name", key: "twitter:image", expected: image },
+		{ attribute: "name", key: "twitter:image", expected: page.shareImageUrl },
 	]
 }
 
@@ -99,12 +91,10 @@ function checkProperty(
 	]
 }
 
-/** Every Language home carries one Social card, and every property of it agrees with the page. */
+/** Every page carries one Social card, and every property of it agrees with the page. */
 export function checkSocialCard(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => {
-		const page = scanHtml(file.content)
-		return cardOf(entry.language).flatMap((property) =>
-			checkProperty(pageUrl(file.path), page, property),
-		)
+	return builtLanguagePages(files).flatMap(({ page, file }) => {
+		const scanned = scanHtml(file.content)
+		return cardOf(page).flatMap((property) => checkProperty(pageUrl(file.path), scanned, property))
 	})
 }

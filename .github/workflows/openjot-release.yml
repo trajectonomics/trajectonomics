@@ -86,6 +86,9 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
+      - name: Build the brand package
+        run: bunx turbo run build --filter=@trajectonomics/brand
+
       - name: Typecheck
         working-directory: apps/openjot
         run: bun run check

@@ -53,12 +53,18 @@ export function signalsOf(request: Request): ConsentSignals {
 }
 
 /**
- * The consent answer: store the visitor's choice, then return to `/` without the banner. A grant keeps
- * the visitor's own valid id, and mints one only when there is none. An unknown value stores nothing.
+ * The consent answer: store the visitor's choice, then return to the page it was asked on without the
+ * banner. A grant keeps the visitor's own valid id, and mints one only when there is none. An unknown
+ * value stores nothing.
  */
-export function consentResponse(request: Request, value: string | null, newId: IdSource): Response {
+export function consentResponse(
+	request: Request,
+	value: string | null,
+	newId: IdSource,
+	address: string = CLEAN_URL,
+): Response {
 	const choice = consentChoiceFrom(value)
-	const headers = new Headers({ Location: CLEAN_URL, "Cache-Control": CHOICE_CACHE_CONTROL })
+	const headers = new Headers({ Location: address, "Cache-Control": CHOICE_CACHE_CONTROL })
 	if (choice !== undefined && isNavigation(request)) {
 		// The id is read from the cookie itself, not from the resolved state: a visitor whose browser
 		// sends `Sec-GPC` resolves to `denied` but keeps the id they already hold.

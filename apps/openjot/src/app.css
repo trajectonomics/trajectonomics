@@ -1,4 +1,22 @@
 @import "tailwindcss";
+/*
+ * The default theme's type. The Inter sheet and the dark Theme's `--ds-*` roles come
+ * from @trajectonomics/brand; the brand's Azeret Mono is copied into static/fonts/
+ * below (the app is offline, so it bundles its fonts with it).
+ */
+@import "@trajectonomics/brand/current/fonts/inter.css";
+@import "@trajectonomics/brand/current/dark.css";
+
+@font-face {
+  font-family: "Azeret Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("/fonts/azeret-mono-latin-500.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
 
 :root,
 :root[data-theme="pink-white"] {
@@ -77,6 +95,70 @@
   --btn-contrast-text: #0a0a0c;
 }
 
+/*
+ * Names the Trajectonomics theme needs that the two older themes answer with their own
+ * look: white text on the pink/orange brand, a hairline that the old headers do not draw,
+ * and the icon disc on the hero. Existing themes keep exactly their previous pixels.
+ */
+:root {
+  --brand-contrast: #ffffff;
+  --hero-border: transparent;
+  --hero-icon-bg: #ffffff;
+  --hero-icon-fg: var(--brand);
+  --nav-active: var(--brand);
+  --inverse-accent: var(--brand);
+}
+
+/*
+ * Trajectonomics: the brand's dark Theme (apps/site/docs/adr/0016), mapped onto the
+ * app's colour names. The brand roles are `--ds-color-*`; `--brand` is the near-white
+ * primary action with dark text (`--brand-contrast`), and orange (`--ds-color-accent`,
+ * read through `--brand-text` and the summary tab) is the one accent.
+ */
+:root[data-theme="dark"] {
+  font-family: "Inter Variable", "Noto Sans Thai", system-ui, sans-serif;
+  color-scheme: dark;
+
+  --brand-contrast: var(--ds-color-primary-foreground);
+  --hero-border: var(--ds-color-border);
+  --hero-icon-bg: var(--ds-color-primary);
+  --hero-icon-fg: var(--ds-color-primary-foreground);
+  --nav-active: var(--ds-color-accent);
+  --inverse-accent: var(--ds-color-accent);
+
+  --bg-canvas: var(--ds-color-background);
+  --bg-card: var(--ds-color-card);
+  --bg-card-sub: var(--ds-color-secondary);
+  --bg-input: var(--ds-color-muted);
+  --bg-elevated: var(--ds-color-secondary);
+  --border-subtle: var(--ds-color-border);
+  --border-strong: color-mix(in oklab, var(--ds-color-foreground) 22%, transparent);
+
+  --text-primary: var(--ds-color-foreground);
+  --text-secondary: var(--ds-color-muted-foreground);
+  --text-muted: color-mix(in oklab, var(--ds-color-muted-foreground) 88%, var(--ds-color-background));
+
+  --brand: var(--ds-color-primary);
+  --brand-deep: color-mix(in oklab, var(--ds-color-primary) 78%, var(--ds-color-background));
+  --brand-soft: color-mix(in oklab, var(--ds-color-accent) 16%, transparent);
+  --brand-border: color-mix(in oklab, var(--ds-color-accent) 40%, transparent);
+  --brand-text: color-mix(in oklab, var(--ds-color-accent) 62%, var(--ds-color-foreground));
+
+  --hero-from: var(--ds-color-stage);
+  --hero-to: var(--ds-color-stage);
+  --hero-btn-bg: var(--ds-color-stage-foreground);
+  --hero-btn-text: var(--ds-color-stage);
+  --hero-shadow: rgb(0 0 0 / 0.45);
+
+  --nav-bg: color-mix(in oklab, var(--ds-color-background) 94%, transparent);
+  --track-muted: var(--ds-color-secondary);
+  --bar-inactive: color-mix(in oklab, var(--ds-color-muted-foreground) 30%, transparent);
+  --summary-tab-active-bg: var(--ds-color-accent);
+  --summary-tab-active-text: var(--ds-color-accent-foreground);
+  --btn-contrast-bg: var(--ds-color-primary);
+  --btn-contrast-text: var(--ds-color-primary-foreground);
+}
+
 html,
 body {
   margin: 0;
@@ -147,4 +229,22 @@ body {
 
 .moo-row-flash {
   animation: moo-row-flash 1.8s ease-out;
+}
+
+/*
+ * Trajectonomics' two extra signature elements, scoped so pink and orange render
+ * exactly as they did: the Site's flat stage (the decorative waves are hidden) and
+ * its mono, uppercase 12 px meta labels (apps/site/src/styles/header.css).
+ */
+:root[data-theme="dark"] .ds-hero-waves {
+  display: none;
+}
+
+:root[data-theme="dark"] .ds-meta {
+  font-family: "Azeret Mono", "Noto Sans Thai", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: uppercase;
 }

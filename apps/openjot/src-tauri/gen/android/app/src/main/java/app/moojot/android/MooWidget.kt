@@ -88,12 +88,12 @@ object MooWidget {
             views.setTextViewText(R.id.widget_scan, labels.optString("scan", "Scan"))
         }
 
-        val dark = snap?.optString("theme") == "orange-black"
-        views.setInt(
-            R.id.widget_root,
-            "setBackgroundResource",
-            if (dark) R.drawable.widget_bg_dark else R.drawable.widget_bg_pink
-        )
+        val background = when (snap?.optString("theme")) {
+            "trajectonomics" -> R.drawable.widget_bg_traj
+            "orange-black" -> R.drawable.widget_bg_dark
+            else -> R.drawable.widget_bg_pink
+        }
+        views.setInt(R.id.widget_root, "setBackgroundResource", background)
         views.setOnClickPendingIntent(R.id.widget_root, openApp(context, null, 0))
         views.setOnClickPendingIntent(R.id.widget_add, openApp(context, ACTION_ADD, 1))
         views.setOnClickPendingIntent(R.id.widget_scan, openApp(context, ACTION_SCAN, 2))
