@@ -11,6 +11,7 @@ import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 import { answerPath } from "./serve-path"
 
@@ -37,13 +38,15 @@ export async function setupFutures(): Promise<void> {
 		carryIn: true,
 		chance: { returnModel: model, paths: DEMO_PATHS, seed: DEMO_SEED },
 	}
-	editor = createEditor({
-		traj,
-		cliVersion: "test",
-		params,
-		records: demoCarryIn([PLAN]),
-		token: TOKEN,
-	})
+	editor = recorded(
+		createEditor({
+			traj,
+			cliVersion: "test",
+			params,
+			records: demoCarryIn([PLAN]),
+			token: TOKEN,
+		}),
+	)
 	const run = await editor.refresh()
 	if (!run.ok) throw new Error(run.error.message)
 	snapshot = run.snapshot
