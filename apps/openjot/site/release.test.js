@@ -1,7 +1,7 @@
 // Run with: node --test site/release.test.js
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ARCHIVED_REPO, handle, pickRelease, RELEASES_URL, REPO, TAG_PREFIX } from "./release.js";
+import { ARCHIVED_REPO, handle, LANDING_URL, pickRelease, RELEASES_URL, REPO, TAG_PREFIX } from "./release.js";
 
 const asset = (name, size = 1000, tag = "openjot-v1.0.0", repo = REPO) => ({
   name,
@@ -136,14 +136,14 @@ test("/download falls back to the archived repository before the first openjot-v
   assert.equal((await api.json()).release.version, "v1.4.0");
 });
 
-test("/download sends people to the coming-soon note when neither repository has a release", async () => {
+test("/download sends people to the landing page when neither repository has a release", async () => {
   const gh = routes([
     [API_LIST, () => Response.json([])],
     [ARCHIVED_API, () => new Response("{}", { status: 404 })],
   ]);
   const res = await handle(req("/download"), env, null, { fetch: gh.fetch, cache: memoryCache() });
   assert.equal(res.status, 302);
-  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
 test("/download falls back to the GitHub releases page when GitHub fails", async () => {
@@ -212,13 +212,13 @@ test("/download/checksums follows the archived fallback too", async () => {
   );
 });
 
-test("/download/checksums sends people to the coming-soon note when there is no release", async () => {
+test("/download/checksums sends people to the landing page when there is no release", async () => {
   const gh = routes([
     [API_LIST, () => Response.json([])],
     [ARCHIVED_API, () => new Response("{}", { status: 404 })],
   ]);
   const res = await handle(req("/download/checksums"), env, null, { fetch: gh.fetch, cache: memoryCache() });
-  assert.equal(res.headers.get("location"), "https://openjot.trajectonomics.com/#coming-soon");
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
 test("the release lookup is cached, and errors are not", async () => {
@@ -248,7 +248,21 @@ test("/api/release answers 503 when GitHub is unavailable", async () => {
 });
 
 test("other paths are served from static assets", async () => {
-  const res = await handle(req("/"), env, null, {});
+  const res = await handle(req("/styles.css"), env, null, {});
+  assert.equal(await res.text(), "asset");
+});
+
+test("/ answers 301 to the landing page on the Site, keeping the query", async () => {
+  const res = await handle(req("/?utm_source=instagram"), env, null, {});
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), `${LANDING_URL}?utm_source=instagram`);
+  const head = await handle(new Request("https://openjot.trajectonomics.com/", { method: "HEAD" }), env, null, {});
+  assert.equal(head.status, 301);
+  assert.equal(head.headers.get("location"), LANDING_URL);
+});
+
+test("/openjot/ is still a static file if the Worker is ever asked for it", async () => {
+  const res = await handle(req("/openjot/"), env, null, {});
   assert.equal(await res.text(), "asset");
 });
 
@@ -327,15 +341,15 @@ test("the old host still proxies /ingest scripts instead of redirecting them", a
   assert.deepEqual(calls, ["https://eu-assets.i.posthog.com/static/array.js"]);
 });
 
-test("the new host serves the landing page normally", async () => {
+test("the new host sends its landing page to the Site", async () => {
   const res = await handle(
     new Request("https://openjot.trajectonomics.com/"),
     env,
     null,
     {},
   );
-  assert.equal(res.status, 200);
-  assert.equal(await res.text(), "asset");
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), LANDING_URL);
 });
 
 test("when the API is rate limited, /download reads the release list from github.com", async () => {

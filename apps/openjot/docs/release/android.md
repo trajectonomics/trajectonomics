@@ -134,8 +134,9 @@ The APK, AAB and `SHA256SUMS` are attached to the run as an artifact for 7 days.
 
 ### Stable download links
 
-The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page:
+The asset names don't change between releases, and the Worker picks the newest `openjot-v*` release, so these links always point at it. Use them on the landing page at <https://trajectonomics.com/openjot/>:
 
+- Landing page: `https://trajectonomics.com/openjot/`
 - APK: `https://openjot.trajectonomics.com/download`
 - Checksums: `https://openjot.trajectonomics.com/download/checksums`
 - Release page: `https://github.com/trajectonomics/trajectonomics/releases?q=openjot-v`
