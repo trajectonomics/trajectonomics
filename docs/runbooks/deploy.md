@@ -1,11 +1,12 @@
 # Deploy runbook
 
 The Site (`apps/site`, worker `site`), the Docs Portal (`apps/docs`, worker `docs`), the blog
-(`apps/blog`, worker `blog`) and the MooJot landing site (`apps/openjot/site`, worker `moojot-site`)
+(`apps/blog`, worker `blog`) and OpenJot's landing site (`apps/openjot/site`, worker `moojot-site`)
 deploy to Cloudflare Workers from this repository's CI: `.github/workflows/deploy.yml`. Cloudflare's
 own Git integration (Workers Builds) is not used, so the whole deploy is configured and reviewed
 here. `trajectonomics-web-router` routes trajectonomics.com to the workers by name, so a deploy
-changes nothing in the router.
+changes nothing in the router. The landing site's Worker `moojot-site` serves
+`openjot.trajectonomics.com` and redirects `moojot.trajectonomics.com` to it.
 
 ## How deploys happen
 
@@ -39,7 +40,7 @@ changes nothing in the router.
    The account ID is on the dashboard's **Workers & Pages** overview, or comes from
    `curl -s -H "Authorization: Bearer $TOKEN" https://api.cloudflare.com/client/v4/accounts`.
 3. **First deploy.** `gh workflow run deploy.yml --ref main -f app=all`, then open
-   trajectonomics.com, docs.trajectonomics.com and moojot.trajectonomics.com. `/contribute/tax/` exists
+   trajectonomics.com, docs.trajectonomics.com and openjot.trajectonomics.com. `/contribute/tax/` exists
    only in builds from this repository, so it answering 200 proves the new deploy is live.
    `trajectonomics.com/docs/contribute/tax/` should answer 301 to that page. The docs Worker attaches
    `docs.trajectonomics.com` as a custom domain on deploy. That creates the DNS record, so the hostname

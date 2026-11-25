@@ -22,8 +22,8 @@ concurrency:
 
 env:
   # Fixed asset names, so the landing site's Worker can find them in any release.
-  APK_NAME: moojot-android-arm64.apk
-  AAB_NAME: moojot-android-arm64.aab
+  APK_NAME: openjot-android-arm64.apk
+  AAB_NAME: openjot-android-arm64.aab
   NDK_VERSION: 28.2.13676358
   BUILD_TOOLS: 36.0.0
 
@@ -152,7 +152,7 @@ jobs:
       # R8 once stripped what ML Kit and ONNX Runtime look up at runtime, so every
       # slip imported as 0 baht (#45). Debug builds skip R8, so check the real APK.
       - name: Check the APK keeps what OCR needs
-        run: MOOJOT_APK="dist-release/$APK_NAME" node --test apps/openjot/tests/unit/release-apk.test.mjs
+        run: OPENJOT_APK="dist-release/$APK_NAME" node --test apps/openjot/tests/unit/release-apk.test.mjs
 
       - name: Check signature
         if: steps.mode.outputs.publish == 'true'
@@ -181,7 +181,7 @@ jobs:
         if: steps.mode.outputs.publish != 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: moojot-${{ steps.mode.outputs.version }}-dry-run
+          name: openjot-${{ steps.mode.outputs.version }}-dry-run
           path: dist-release/
           retention-days: 7
 
@@ -193,7 +193,7 @@ jobs:
         run: |
           repo_url="https://github.com/${GITHUB_REPOSITORY}"
           cat > "$RUNNER_TEMP/notes.md" <<EOF
-          MooJot ${VERSION} for Android (arm64). 🐷
+          OpenJot ${VERSION} for Android (arm64). 🐷
 
           **Install:** download \`${APK_NAME}\` on your phone, open it, and allow installing from this source when Android asks. The app works offline, and your records stay on your phone.
 
@@ -212,7 +212,7 @@ jobs:
             notes_args=()
           fi
           gh release create "$GITHUB_REF_NAME" dist-release/* \
-            --title "MooJot ${VERSION}" \
+            --title "OpenJot ${VERSION}" \
             --notes-file "$RUNNER_TEMP/notes.md" \
             "${notes_args[@]}" \
             --latest=false

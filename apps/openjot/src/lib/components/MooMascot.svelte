@@ -5,7 +5,7 @@
     mood = "idle",
     size = "md",
     interactive = true,
-    alt = "MooJot mascot",
+    alt = "OpenJot mascot",
     onTap,
   }: {
     mood?: MascotMood;

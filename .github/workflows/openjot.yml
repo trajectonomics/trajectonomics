@@ -1,5 +1,5 @@
 name: openjot
-# MooJot's checks: the SvelteKit frontend, the screenshot baselines and the Rust
+# OpenJot's checks: the SvelteKit frontend, the screenshot baselines and the Rust
 # library tests. It runs only when the app, the root lockfile or this workflow
 # changes, so the rest of the monorepo does not pay for it.
 

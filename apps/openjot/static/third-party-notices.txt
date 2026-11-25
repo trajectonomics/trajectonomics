@@ -1,15 +1,15 @@
-MOOJOT THIRD-PARTY NOTICES
+OPENJOT THIRD-PARTY NOTICES
 ==============================================================================
 
-MooJot is free software under the MIT License (the first entry below). It also contains software
+OpenJot is free software under the MIT License (the first entry below). It also contains software
 from other projects. This file lists each component with its version and license, and reproduces the
 copyright notices and license texts that those licenses ask us to pass on.
 
 Google ML Kit (on-device text recognition) and the Google Play services libraries it uses are NOT
 open source. Google provides them under the ML Kit Terms of Service
 (https://developers.google.com/ml-kit/terms) and the Android Software Development Kit License
-(https://developer.android.com/studio/terms). MooJot's MIT License covers MooJot's own source code,
-not those libraries.
+(https://developer.android.com/studio/terms). OpenJot's MIT License covers OpenJot's own source
+code, not those libraries.
 
 Where several components share one license text, the text is printed once and each component is
 listed with its own copyright notice(s). Licenses written as "A OR B" let the recipient choose;
@@ -27,10 +27,10 @@ An asterisk (*) after a component marks one whose package ships no license file:
 of its license is printed instead, with the copyright holder taken from the package metadata.
 
 This file is generated, not edited by hand. To regenerate it after a dependency change, build the
-release APK and run: node tools/third-party-notices.mjs --apk path/to/moojot-android-arm64.apk (see
+release APK and run: node tools/third-party-notices.mjs --apk path/to/openjot-android-arm64.apk (see
 docs/release/android.md).
 
-Components: 548 Rust crates, 38 web packages, 100 Android/Java libraries, 2 native-library entries, 1 model, plus MooJot itself.
+Components: 548 Rust crates, 37 web packages, 100 Android/Java libraries, 2 native-library entries, 1 model, plus OpenJot itself.
 
 ==============================================================================
 PART 1. COMPONENTS
@@ -39,9 +39,9 @@ Each line: name, version, license, and the numbers of the license texts in Part 
 ...).
 
 ------------------------------------------------------------------------------
-MooJot - 1
+OpenJot - 1
 ------------------------------------------------------------------------------
-MooJot 1.4.0 - MIT [L1]
+OpenJot 1.5.0 - MIT [L1]
 
 ------------------------------------------------------------------------------
 Rust crates (compiled into libmoojot_lib.so) - 548
@@ -599,7 +599,7 @@ zvariant_derive 5.15.1 - MIT [L4]
 zvariant_utils 4.2.0 - MIT [L4]
 
 ------------------------------------------------------------------------------
-Web app packages (bundled into the app's JavaScript, CSS and fonts) - 38
+Web app packages (bundled into the app's JavaScript, CSS and fonts) - 37
 ------------------------------------------------------------------------------
 @fontsource/noto-sans-thai provides the Noto Sans Thai font files under the SIL Open Font License
 1.1.
@@ -640,7 +640,6 @@ query-selector-shadow-dom 1.0.1 - MIT [L1]
 svelte 5.59.1 - MIT [L4]
 tailwindcss 4.3.5 - MIT [L1]
 web-vitals 6.2.1 - Apache-2.0 [L107]
-web-vitals 6.2.3 - Apache-2.0 [L107]
 zimmerframe 1.1.5 - MIT [L1]
 
 ------------------------------------------------------------------------------
@@ -798,8 +797,8 @@ L1
 Applies to (88):
   @sveltejs/acorn-typescript 1.0.13: Copyright (c) 2022 Tyreal Hu | Copyright (c) 2025 The Svelte Team
   @tauri-apps/api 2.12.5: Copyright (c) 2017 - Present Tauri Apps Contributors
-  MooJot 1.4.0: Copyright (c) 2026 Trajectonomics
   ONNX Runtime native libraries (libonnxruntime.so, libonnxruntime4j_jni.so) 1.22.0: Copyright (c) Microsoft Corporation
+  OpenJot 1.5.0: Copyright (c) 2026 Trajectonomics
   acorn 8.19.0: Copyright (C) 2012-2022 by various contributors (see AUTHORS)
   block2 0.6.2: Copyright (c) Mads Marquart
   bs58 0.5.1: Copyright (c) 2016 The roaring-rs developers.
@@ -10346,9 +10345,8 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 ------------------------------------------------------------------------------
 L107
 ------------------------------------------------------------------------------
-Applies to (2):
+Applies to (1):
   web-vitals 6.2.1
-  web-vitals 6.2.3
 
 Apache License
                            Version 2.0, January 2004

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Generates static/third-party-notices.txt: the copyright notices and license texts of everything
-// bundled in the MooJot APK, read from the lockfiles and the built release APK (not typed by hand).
+// bundled in the OpenJot APK, read from the lockfiles and the built release APK (not typed by hand).
 //
-//   node tools/third-party-notices.mjs --apk path/to/moojot-android-arm64.apk
+//   node tools/third-party-notices.mjs --apk path/to/openjot-android-arm64.apk
 //
 // Options:
 //   --apk <file>     the release APK to inventory (required)
 //   --out <file>     where to write (default static/third-party-notices.txt)
-//   --cache <dir>    download cache (default <tmp>/moojot-notices-cache); safe to delete
+//   --cache <dir>    download cache (default <tmp>/openjot-notices-cache); safe to delete
 //   --check          write nothing; exit 1 if the file on disk differs from what would be generated
 //
 // It downloads crate, npm and Maven archives from the public registries, so it needs a network
@@ -37,7 +37,7 @@ const BUNDLED_DEV_PACKAGES = ["@sveltejs/kit", "tailwindcss"];
 // Native libraries that may sit in the APK, and what covers each. An unknown library fails the
 // run, so a new native dependency cannot slip into a release without a notice.
 export const NATIVE_LIBS = {
-  "libmoojot_lib.so": "MooJot's Rust library: the crates listed below, with SQLite statically linked",
+  "libmoojot_lib.so": "OpenJot's Rust library: the crates listed below, with SQLite statically linked",
   "libonnxruntime.so": "ONNX Runtime",
   "libonnxruntime4j_jni.so": "ONNX Runtime",
   "libmlkit_google_ocr_pipeline.so": "Google ML Kit (proprietary)",
@@ -69,7 +69,7 @@ const bodyKey = (text) =>
     .trim();
 
 function parseArgs(argv) {
-  const args = { out: DEFAULT_OUT, cache: join(tmpdir(), "moojot-notices-cache"), check: false, apk: null };
+  const args = { out: DEFAULT_OUT, cache: join(tmpdir(), "openjot-notices-cache"), check: false, apk: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--check") args.check = true;
@@ -132,7 +132,7 @@ async function rustComponents(cacheDir, warnings) {
   for (const block of lock.split("[[package]]").slice(1)) {
     const name = /^name = "(.*)"$/m.exec(block)?.[1];
     const version = /^version = "(.*)"$/m.exec(block)?.[1];
-    // The workspace's own crate has no `source`; it is MooJot itself.
+    // The workspace's own crate has no `source`; it is OpenJot itself.
     if (name && version && /^source = /m.test(block)) crates.push({ name, version });
   }
   const loaded = await mapLimit(crates, 12, ({ name, version }) =>
@@ -571,13 +571,13 @@ async function modelComponents(cacheDir, warnings) {
 
 function appComponent() {
   const pkg = JSON.parse(read("package.json"));
-  return { eco: "app", name: "MooJot", version: pkg.version, license: "MIT", url: "https://github.com/trajectonomics/moojot", texts: [{ text: read("LICENSE") }], fallback: null };
+  return { eco: "app", name: "OpenJot", version: pkg.version, license: "MIT", url: "https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot", texts: [{ text: read("LICENSE") }], fallback: null };
 }
 
 // --- rendering ----------------------------------------------------------------------------------
 
 const ECOSYSTEMS = [
-  ["app", "MooJot", []],
+  ["app", "OpenJot", []],
   ["rust", "Rust crates (compiled into libmoojot_lib.so)", ["Tauri's Android glue library (app.tauri.*, in classes.dex) is part of the tauri crate listed here."]],
   ["npm", "Web app packages (bundled into the app's JavaScript, CSS and fonts)", ["@fontsource/noto-sans-thai provides the Noto Sans Thai font files under the SIL Open Font License 1.1."]],
   ["android", "Android and Java/Kotlin libraries (classes.dex and resources)", ["The Google ML Kit and Google Play services libraries are proprietary; the open-source notices they ship are reproduced in Part 2."]],
@@ -645,12 +645,12 @@ export function render(components, warnings = []) {
   for (const c of components) if (c.eco === "rust" && /MPL-2\.0/.test(c.license) && !/OR/.test(c.license) && !/cssparser|dtoa-short|option-ext|selectors/.test(c.name)) warnings.push(`MPL-2.0 crate ${c.name} is not named in the header note; update it`);
   const out = [];
   out.push(
-    "MOOJOT THIRD-PARTY NOTICES",
+    "OPENJOT THIRD-PARTY NOTICES",
     RULE,
     "",
-    wrap("MooJot is free software under the MIT License (the first entry below). It also contains software from other projects. This file lists each component with its version and license, and reproduces the copyright notices and license texts that those licenses ask us to pass on."),
+    wrap("OpenJot is free software under the MIT License (the first entry below). It also contains software from other projects. This file lists each component with its version and license, and reproduces the copyright notices and license texts that those licenses ask us to pass on."),
     "",
-    wrap("Google ML Kit (on-device text recognition) and the Google Play services libraries it uses are NOT open source. Google provides them under the ML Kit Terms of Service (https://developers.google.com/ml-kit/terms) and the Android Software Development Kit License (https://developer.android.com/studio/terms). MooJot's MIT License covers MooJot's own source code, not those libraries."),
+    wrap("Google ML Kit (on-device text recognition) and the Google Play services libraries it uses are NOT open source. Google provides them under the ML Kit Terms of Service (https://developers.google.com/ml-kit/terms) and the Android Software Development Kit License (https://developer.android.com/studio/terms). OpenJot's MIT License covers OpenJot's own source code, not those libraries."),
     "",
     wrap("Where several components share one license text, the text is printed once and each component is listed with its own copyright notice(s). Licenses written as \"A OR B\" let the recipient choose; every text shipped with the component is included. The standard (SPDX) license text is used only where a component's package ships none, and the copyright holder then comes from the package metadata."),
     "",
@@ -658,9 +658,9 @@ export function render(components, warnings = []) {
     "",
     wrap("An asterisk (*) after a component marks one whose package ships no license file: the standard text of its license is printed instead, with the copyright holder taken from the package metadata."),
     "",
-    wrap("This file is generated, not edited by hand. To regenerate it after a dependency change, build the release APK and run: node tools/third-party-notices.mjs --apk path/to/moojot-android-arm64.apk (see docs/release/android.md)."),
+    wrap("This file is generated, not edited by hand. To regenerate it after a dependency change, build the release APK and run: node tools/third-party-notices.mjs --apk path/to/openjot-android-arm64.apk (see docs/release/android.md)."),
     "",
-    `Components: ${counts.rust} Rust crates, ${counts.npm} web packages, ${counts.android} Android/Java libraries, ${counts.native} native-library entries, ${counts.model} model, plus MooJot itself.`,
+    `Components: ${counts.rust} Rust crates, ${counts.npm} web packages, ${counts.android} Android/Java libraries, ${counts.native} native-library entries, ${counts.model} model, plus OpenJot itself.`,
     "",
     RULE,
     "PART 1. COMPONENTS",

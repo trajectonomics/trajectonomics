@@ -1,22 +1,22 @@
-# MooJot Privacy Policy
+# OpenJot Privacy Policy
 
-**Last updated: 23 November 2026**
+**Last updated: 25 November 2026**
 
-Trajectonomics publishes MooJot, a personal income and expense tracker. This policy says what the Android app and the website at <https://moojot.trajectonomics.com> do with information. The same text is shown in My Moo → About → Privacy.
+Trajectonomics publishes OpenJot (formerly MooJot), a personal income and expense tracker. This policy says what the Android app and the website at <https://openjot.trajectonomics.com> do with information. The same text is shown in My Moo → About → Privacy.
 
-The short version: the ledger stays on your phone. Trajectonomics has no account server and does not receive your records. MooJot sends us nothing about how you use it unless you choose to share anonymous usage statistics (which screens and features get used, never your records, amounts, or slips). That switch is off until you turn it on. Separately, to read English text on slips, the app uses Google ML Kit. ML Kit reads the photo on the phone, but it sends Google metrics about its own performance and use, such as your device model and a per-installation identifier. MooJot cannot switch that off. The section "Google ML Kit metrics" below lists what is sent. The website uses cookies only if you allow them. The only upload of a slip image the code can make is optional. It happens only if an AksonOCR API key is already stored in the local database. The settings screen does not ask for that key.
+The short version: the ledger stays on your phone. Trajectonomics has no account server and does not receive your records. OpenJot sends us nothing about how you use it unless you choose to share anonymous usage statistics (which screens and features get used, never your records, amounts, or slips). That switch is off until you turn it on. Separately, to read English text on slips, the app uses Google ML Kit. ML Kit reads the photo on the phone, but it sends Google metrics about its own performance and use, such as your device model and a per-installation identifier. OpenJot cannot switch that off. The section "Google ML Kit metrics" below lists what is sent. The website uses cookies only if you allow them. The only upload of a slip image the code can make is optional. It happens only if an AksonOCR API key is already stored in the local database. The settings screen does not ask for that key.
 
 This policy is written so a person can read it. It is the project's description of its own behavior. It is not a certificate of compliance, and it is not legal advice.
 
 ## Who we are
 
-MooJot is published by Supakone Kongprapan under the name Trajectonomics, at <https://github.com/trajectonomics/moojot>. In this policy, "we" and "Trajectonomics" mean Supakone Kongprapan, who is the data controller for the personal data this policy describes. You can reach us about privacy at [privacy@trajectonomics.com](mailto:privacy@trajectonomics.com).
+OpenJot is published by Supakone Kongprapan under the name Trajectonomics, at <https://github.com/trajectonomics/trajectonomics/tree/main/apps/openjot>. In this policy, "we" and "Trajectonomics" mean Supakone Kongprapan, who is the data controller for the personal data this policy describes. You can reach us about privacy at [privacy@trajectonomics.com](mailto:privacy@trajectonomics.com).
 
 Because the ledger never reaches us, we cannot see it, correct it, or delete it from our side. You hold it on your phone.
 
 ## Information that stays on the phone
 
-MooJot stores the following in the app's private files. None of it is sent to a MooJot server, except the random usage-statistics ID and events described in "Anonymous usage statistics", if you turn that switch on.
+OpenJot stores the following in the app's private files. None of it is sent to an OpenJot server, except the random usage-statistics ID and events described in "Anonymous usage statistics", if you turn that switch on.
 
 | Data | Where | Why |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ MooJot stores the following in the app's private files. None of it is sent to a 
 | Text taken from a credit-card statement PDF | SQLite, as records | Import a statement you chose |
 | PDF password | Phone memory for that import only | Open the file. It is not written to the database. |
 | Owner names you type, language, month-start day, week start, shared-album switch | SQLite on the phone | Tell your own transfers apart, and set the calendar |
-| AksonOCR API key and model name, if a key is present | SQLite on the phone, as plain text | Optional cloud OCR. The key is not encrypted by a separate MooJot secret. |
+| AksonOCR API key and model name, if a key is present | SQLite on the phone, as plain text | Optional cloud OCR. The key is not encrypted by a separate OpenJot secret. |
 | Ids of photos already scanned, and months already scanned | SQLite on the phone | Do not repeat work |
 | Daily counts of slips synced and records categorized | SQLite on the phone | A local activity count, not a remote log |
 | Theme (pink or dark) and hand (left or right) | localStorage on the phone | Remember appearance. These two keys are not tracking cookies. |
@@ -40,13 +40,13 @@ You type a record, you scan a bank album, you pick one photo, or you pick a stat
 
 You can import one slip or one PDF with the system picker instead of granting album access. Shared albums stay off until you turn them on. The scanner looks for a slip QR before it treats a photo as a slip. Camera and Screenshots folders are not the scan target.
 
-On-device tools read the slip locally: a QR decoder, ML Kit Latin for English text, and AksonOCR-Lite (an ONNX model) for Thai text. Those steps do not send the photo to Trajectonomics or to Google as part of MooJot's design. ML Kit does send Google metrics about how it runs, described in the next section.
+On-device tools read the slip locally: a QR decoder, ML Kit Latin for English text, and AksonOCR-Lite (an ONNX model) for Thai text. Those steps do not send the photo to Trajectonomics or to Google as part of OpenJot's design. ML Kit does send Google metrics about how it runs, described in the next section.
 
 The manifest declares `INTERNET` so ML Kit can send those metrics, and so the optional OCR request below and the optional anonymous usage statistics can use HTTPS. The manifest also declares `POST_NOTIFICATIONS`. The current app does not send notification content anywhere and does not use notifications to collect data.
 
 ## Google ML Kit metrics
 
-MooJot uses Google ML Kit text recognition to read English text on a slip. ML Kit is a library made by Google. It is not open source, and Google's ML Kit Terms of Service apply to it: <https://developers.google.com/ml-kit/terms>
+OpenJot uses Google ML Kit text recognition to read English text on a slip. ML Kit is a library made by Google. It is not open source, and Google's ML Kit Terms of Service apply to it: <https://developers.google.com/ml-kit/terms>
 
 ML Kit reads the photo on the phone. Google states that ML Kit does not send the image, or the text it reads, to Google servers. It does send Google metrics about the performance and use of ML Kit in the app. Google's ML Kit data disclosure (<https://developers.google.com/ml-kit/android-data-disclosure>) lists these kinds of data:
 
@@ -59,7 +59,7 @@ ML Kit reads the photo on the phone. Google states that ML Kit does not send the
 
 Google says ML Kit sends this over HTTPS, uses it for diagnostics and usage analytics, and does not transfer it to third parties. Google's Privacy Policy (<https://policies.google.com/privacy>) applies to it. Trajectonomics does not receive these metrics and cannot delete them.
 
-MooJot has no setting that switches these metrics off, and Google's documentation does not describe one. The "Share anonymous usage stats" switch controls only MooJot's own statistics, not ML Kit. ML Kit's text reader runs when you scan bank albums, pick a slip photo, share a slip to MooJot, or re-parse slips. Typing a record by hand does not use it.
+OpenJot has no setting that switches these metrics off, and Google's documentation does not describe one. The "Share anonymous usage stats" switch controls only OpenJot's own statistics, not ML Kit. ML Kit's text reader runs when you scan bank albums, pick a slip photo, share a slip to OpenJot, or re-parse slips. Typing a record by hand does not use it.
 
 ## Optional AksonOCR upload
 
@@ -82,7 +82,7 @@ What an event can contain:
 
 The list of allowed events and labels is in the app's source code (`src/lib/analyticsEvents.ts`), and the app drops anything not on it before sending. Events never contain amounts, payees, notes, category, tag or account names, slip images, OCR text, file names, or anything you type. We do not link the random ID to your name, email, phone number, or advertising ID. There is no session recording and no automatic capture of what is on the screen.
 
-Events go over HTTPS to `moojot.trajectonomics.com`, which passes them to PostHog, our analytics provider, on its EU Cloud. PostHog receives the IP address of the connection and uses it to estimate your country and city. Turning the switch off stops sending at once and resets the random ID, so if you turn it on again, the app starts with a new ID. Because the ID is not linked to you, we usually cannot find past events for one person. Ask through the contact links below if you want us to try.
+Events go over HTTPS to `openjot.trajectonomics.com`, or to `moojot.trajectonomics.com` from app versions before 1.5.0. Both hosts pass them to PostHog, our analytics provider, on its EU Cloud. PostHog receives the IP address of the connection and uses it to estimate your country and city. Turning the switch off stops sending at once and resets the random ID, so if you turn it on again, the app starts with a new ID. Because the ID is not linked to you, we usually cannot find past events for one person. Ask through the contact links below if you want us to try.
 
 ## Website
 
@@ -96,7 +96,7 @@ The site remembers your language and your cookie choice in local storage.
 
 We do not collect:
 
-- a MooJot account, email, or password
+- an OpenJot account, email, or password
 - a payment card for Trajectonomics (the app is free and we take no payment)
 - advertising identifiers or crash reports
 - any analytics event that contains your records, amounts, payees, notes, or slips
@@ -122,7 +122,7 @@ Banks, Google (including Google Play and ML Kit), Android, AksonOCR, PostHog, an
 
 ## How long it stays
 
-Records stay on the phone until you delete them, clear the app's storage, or uninstall MooJot. Android normally deletes the app's private storage on uninstall. A backup you made, or a file you exported, is outside the app and stays until you delete that copy.
+Records stay on the phone until you delete them, clear the app's storage, or uninstall OpenJot. Android normally deletes the app's private storage on uninstall. A backup you made, or a file you exported, is outside the app and stays until you delete that copy.
 
 We have no server copy of the ledger, so the ledger has no server retention period. We also have no server backup we could restore for you.
 
@@ -132,7 +132,7 @@ Usage statistics and website counts are kept in PostHog for as long as our PostH
 
 The database sits in the app's private storage, which other apps are not supposed to read. That is not the same as a promise of encryption at rest.
 
-MooJot has an optional app lock (My Moo → App lock), off until you turn it on. When it is on, the app asks for your fingerprint, face, or phone PIN when it opens and after more than a minute away. Android shows that prompt and checks it. MooJot only learns whether the unlock worked. Your fingerprint, face, and PIN never reach MooJot. The lock covers the screen. It does not encrypt the database.
+OpenJot has an optional app lock (My Moo → App lock), off until you turn it on. When it is on, the app asks for your fingerprint, face, or phone PIN when it opens and after more than a minute away. Android shows that prompt and checks it. OpenJot only learns whether the unlock worked. Your fingerprint, face, and PIN never reach OpenJot. The lock covers the screen. It does not encrypt the database.
 
 No method of storage is perfectly safe. Someone who unlocks your phone, or who has a backup of it, may be able to read the database. If you save an AksonOCR key, it is stored in that database as plain text.
 
@@ -153,7 +153,7 @@ Those are the practical ways to access, correct, and delete the ledger. We canno
 
 ### Thailand (PDPA)
 
-If the PDPA applies to you, the personal data in MooJot's ledger is processed on your device for your own household ledger. Trajectonomics does not collect that ledger onto its own system. For the optional AksonOCR send, you cause the transfer by having a key stored, and AksonOCR is the recipient.
+If the PDPA applies to you, the personal data in OpenJot's ledger is processed on your device for your own household ledger. Trajectonomics does not collect that ledger onto its own system. For the optional AksonOCR send, you cause the transfer by having a key stored, and AksonOCR is the recipient.
 
 This is the data we do handle, why, and on what legal basis:
 
@@ -185,11 +185,11 @@ We do not transfer your ledger outside your phone. ML Kit metrics go to Google, 
 
 ### California
 
-We do not sell personal information and we do not share it for cross-context behavioral advertising. We do not offer a financial incentive for personal information. Categories that can exist on the device are identifiers inside a slip (such as a name or account reference), financial information you enter, photos you import, and the local settings listed above. We do not collect those categories onto a MooJot server. The anonymous usage statistics and website counts described above are internet activity information, sent to PostHog as our service provider. Google receives ML Kit metrics, including a per-installation identifier, as described above.
+We do not sell personal information and we do not share it for cross-context behavioral advertising. We do not offer a financial incentive for personal information. Categories that can exist on the device are identifiers inside a slip (such as a name or account reference), financial information you enter, photos you import, and the local settings listed above. We do not collect those categories onto an OpenJot server. The anonymous usage statistics and website counts described above are internet activity information, sent to PostHog as our service provider. Google receives ML Kit metrics, including a per-installation identifier, as described above.
 
 ## Children
 
-MooJot is not directed at children under 13, and we do not knowingly collect personal information from children on a server. Anonymous usage statistics are not linked to a person. If you are under 20, ask a parent or guardian before you turn on usage statistics or allow cookies on the website. The app has no account that a child could register with us. If a child uses a phone where the app is installed, the records remain on that phone.
+OpenJot is not directed at children under 13, and we do not knowingly collect personal information from children on a server. Anonymous usage statistics are not linked to a person. If you are under 20, ask a parent or guardian before you turn on usage statistics or allow cookies on the website. The app has no account that a child could register with us. If a child uses a phone where the app is installed, the records remain on that phone.
 
 ## Changes to this policy
 
@@ -200,7 +200,7 @@ We will change the "last updated" date when this policy changes, and we will put
 Questions about this policy, and privacy requests we are actually able to answer, including the PDPA requests above, go to:
 
 - Email: [privacy@trajectonomics.com](mailto:privacy@trajectonomics.com). Use this for anything about you, because it is private.
-- Public questions about the app: <https://github.com/trajectonomics/moojot/issues>
-- Security: <https://github.com/trajectonomics/moojot/security/advisories/new>
+- Public questions about the app: <https://github.com/trajectonomics/trajectonomics/issues>
+- Security: <https://github.com/trajectonomics/trajectonomics/security/advisories/new>
 
 There is no postal address published for this project. Please do not include real bank details, slip images, or an API key in a public issue.

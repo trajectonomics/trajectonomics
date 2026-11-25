@@ -68,5 +68,5 @@ pub fn run() {
             commands::import_statement_pdf,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running MooJot Tauri application");
+        .expect("error while running OpenJot Tauri application");
 }
