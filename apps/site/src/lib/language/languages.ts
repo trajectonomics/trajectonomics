@@ -64,6 +64,6 @@ export function languageBuildUrl(language: Language): string {
 }
 
 /** The Language choice link: it stores one Language as the visitor's choice, then returns to the address. */
-export function languageChoiceLink(language: Language): string {
-	return `${CLEAN_URL}?${LANGUAGE_CHOICE_PARAM}=${encodeURIComponent(language)}`
+export function languageChoiceLink(language: Language, address: string = CLEAN_URL): string {
+	return `${address}?${LANGUAGE_CHOICE_PARAM}=${encodeURIComponent(language)}`
 }

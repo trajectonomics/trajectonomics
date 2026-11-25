@@ -15,6 +15,7 @@
 // and look at the new PNG before committing it.
 
 const DARK = { theme: "orange-black" };
+const TRAJ = { theme: "trajectonomics" };
 // A first run on Android with photo access already allowed.
 const FIRST_RUN_ANDROID = { data: "empty", onboarding: "pending", android: "granted" };
 // The first scan covers this month and the two before it (FIRST_SCAN_MONTHS): from
@@ -225,6 +226,54 @@ export const scenes = [
   { name: "app-lock", fixture: { android: "granted", appLock: true }, ready: "#lock-title" },
   { name: "app-lock-dark", fixture: { ...DARK, android: "granted", appLock: true }, ready: "#lock-title" },
   { name: "app-lock-thai", fixture: { ...THAI, android: "granted", appLock: true }, ready: "#lock-title" },
+
+  // ------------------------------------------------------- trajectonomics ---
+  // The default theme: the brand's dark Theme with the cream robot instead of Moo.
+  { name: "home-trajectonomics", fixture: TRAJ },
+  { name: "home-trajectonomics-thai", fixture: { ...TRAJ, ...THAI } },
+  { name: "summary-trajectonomics", fixture: TRAJ, run: openSummary },
+  { name: "settings-trajectonomics", fixture: TRAJ, run: openSettings },
+  {
+    name: "settings-appearance-trajectonomics",
+    fixture: TRAJ,
+    run: async (page) => {
+      await openSettings(page);
+      await page.clickText("Appearance & Theme", "button *");
+      await page.waitFor('button[aria-label="Back"]');
+    },
+  },
+  {
+    name: "record-add-trajectonomics",
+    fixture: TRAJ,
+    run: async (page) => {
+      await page.clickText("Add Record");
+      await page.waitForText("Paste");
+    },
+  },
+  {
+    name: "app-lock-trajectonomics",
+    fixture: { ...TRAJ, android: "granted", appLock: true },
+    ready: "#lock-title",
+  },
+  {
+    name: "home-empty-month-trajectonomics",
+    fixture: { ...TRAJ, data: "empty" },
+    ready: 'img[alt="No records yet"]',
+  },
+  {
+    name: "onboarding-welcome-trajectonomics",
+    fixture: { ...TRAJ, data: "empty", onboarding: "pending" },
+    ready: "#onb-title-0",
+  },
+  {
+    name: "onboarding-setup-trajectonomics",
+    fixture: { ...TRAJ, data: "empty", onboarding: "pending" },
+    ready: "#onb-title-0",
+    run: async (page) => {
+      await page.click('button[aria-label="Go to step 4"]');
+      await page.waitFor("#onb-title-3");
+    },
+  },
 
   // ------------------------------------------------------------ onboarding ---
   {

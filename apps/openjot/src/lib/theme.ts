@@ -1,17 +1,27 @@
-export type AppTheme = "pink-white" | "orange-black";
+export type AppTheme = "trajectonomics" | "pink-white" | "orange-black";
 export type HandMode = "left" | "right";
 
 const STORAGE_KEY = "moojot_theme";
 
+/**
+ * The `<html data-theme>` value a theme paints with. The Trajectonomics theme is the
+ * brand's dark Theme, whose `--ds-*` roles live under `[data-theme="dark"]`; the
+ * other two keep their own names. Keep the inline script in `src/app.html` in step
+ * with this mapping: it paints the saved theme before the app runs.
+ */
+export function themeAttribute(theme: AppTheme): "dark" | "pink-white" | "orange-black" {
+  return theme === "trajectonomics" ? "dark" : theme;
+}
+
 export function loadSavedTheme(): AppTheme {
-  if (typeof window === "undefined") return "pink-white";
+  if (typeof window === "undefined") return "trajectonomics";
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw === "orange-black" || raw === "pink-white") return raw;
+    if (raw === "trajectonomics" || raw === "orange-black" || raw === "pink-white") return raw;
   } catch {
     // ignore storage restrictions
   }
-  return "pink-white";
+  return "trajectonomics";
 }
 
 export function saveTheme(theme: AppTheme) {
@@ -21,7 +31,7 @@ export function saveTheme(theme: AppTheme) {
   } catch {
     // ignore
   }
-  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.theme = themeAttribute(theme);
 }
 
 const HAND_KEY = "moojot_hand";

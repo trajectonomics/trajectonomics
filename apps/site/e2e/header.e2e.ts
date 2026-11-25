@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { homeOf, openPage } from "./pages"
+import { homeOf, OPENJOT_PAGES, openPage } from "./pages"
 
 /** The English home, whose header carries the repository link and the scroll ground. */
 const HOME = homeOf("en")
@@ -23,5 +23,27 @@ test.describe("the header's ground", () => {
 		const scrolled = await groundOf(page)
 		expect(scrolled).not.toBe(atTop)
 		expect(scrolled).toMatch(/^rgb\(/)
+	})
+})
+
+test.describe("the header on a 360 px phone", () => {
+	test.use({ viewport: { width: 360, height: 740 } })
+
+	test("fits the three links, the repository count and the Language menu without a sideways scroll", async ({
+		page,
+	}) => {
+		const openJot = OPENJOT_PAGES[0]
+		if (openJot === undefined) throw new Error("the browser checks name no OpenJot page")
+		await openPage(page, openJot)
+		const widths = await page.evaluate(() => ({
+			client: document.documentElement.clientWidth,
+			document: document.documentElement.scrollWidth,
+			body: document.body.scrollWidth,
+		}))
+		expect(Math.max(widths.document, widths.body)).toBeLessThanOrEqual(widths.client)
+		await expect(page.locator("header.site-header a[href='/openjot/']")).toHaveAttribute(
+			"aria-current",
+			"page",
+		)
 	})
 })

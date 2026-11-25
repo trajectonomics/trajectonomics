@@ -3,6 +3,7 @@ import { LLMS_FILE, LLMS_TXT } from "../crawl/llms"
 import { LLMS_FULL_FILE, LLMS_FULL_TXT } from "../crawl/llms-full"
 import { OWNER_WRITTEN_PLACEHOLDER } from "../language/dictionary"
 import { ABSOLUTE_CLEAN_URL, languageBuildUrl } from "../language/languages"
+import { ABSOLUTE_OPENJOT_URL } from "../site/openjot"
 import type { BuiltFile } from "./built-files"
 import { checkLlmsFiles } from "./llms"
 
@@ -45,6 +46,11 @@ describe("the Answer engine files of the host", () => {
 	it("fails the short file that links no address", () => {
 		const withoutHome = LLMS_TXT.replaceAll(`](${ABSOLUTE_CLEAN_URL})`, "")
 		expect(codes(built(LLMS_FILE, withoutHome))).toEqual(["LLMS_HOME_MISSING"])
+	})
+
+	it("fails a file that links no OpenJot page", () => {
+		const withoutOpenJot = LLMS_FULL_TXT.replaceAll(`](${ABSOLUTE_OPENJOT_URL})`, "")
+		expect(codes(built(LLMS_FULL_FILE, withoutOpenJot))).toEqual(["LLMS_OPENJOT_MISSING"])
 	})
 
 	it("fails the full file that links no address", () => {

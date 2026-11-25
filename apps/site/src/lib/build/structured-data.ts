@@ -1,10 +1,11 @@
-import type { Language } from "../language/language"
+import type { LanguagePage } from "../language/language-pages"
+import { openJotStructuredData } from "../site/openjot-structured-data"
 import { structuredData } from "../site/structured-data"
 import type { BuiltFile } from "./built-files"
 import type { BuildFailure } from "./failures"
 import { buildFailure } from "./failures"
 import { jsonDifferences } from "./json-difference"
-import { builtHomes } from "./language-home"
+import { builtLanguagePages } from "./language-pages"
 import { pageUrl } from "./page-url"
 import { dataBlocks, parsedBlock } from "./structured-data-blocks"
 
@@ -13,11 +14,16 @@ function shown(value: unknown): string {
 	return value === undefined ? "nothing" : JSON.stringify(value)
 }
 
+/** The one block a page must state, from the page its own kind draws. */
+function expectedBlock(page: LanguagePage): unknown {
+	return page.kind === "home" ? structuredData(page.language) : openJotStructuredData(page.language)
+}
+
 /**
- * One Language home carries one block, it parses, and it states every node of the one the Site
- * publishes: the WebSite, the Organization and traj, property by property.
+ * One page carries one block, it parses, and it states every node of the one the Site publishes for that
+ * page: the WebSite, the Organization and the app or CLI, property by property.
  */
-function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[] {
+function failuresOf(file: BuiltFile, page: LanguagePage): readonly BuildFailure[] {
 	const path = pageUrl(file.path)
 	const blocks = dataBlocks(file.content)
 	const [block] = blocks
@@ -37,7 +43,7 @@ function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[
 	if (parsed === undefined) {
 		return [buildFailure("JSON_LD_INVALID", path, "carries a block no JSON parser can read.")]
 	}
-	return jsonDifferences(structuredData(language), parsed).map((difference) =>
+	return jsonDifferences(expectedBlock(page), parsed).map((difference) =>
 		buildFailure(
 			"JSON_LD_WRONG",
 			path,
@@ -46,7 +52,7 @@ function failuresOf(file: BuiltFile, language: Language): readonly BuildFailure[
 	)
 }
 
-/** Every Language home states one Structured data block, and it is that page's own. */
+/** Every page states one Structured data block, and it is that page's own. */
 export function checkStructuredData(files: readonly BuiltFile[]): readonly BuildFailure[] {
-	return builtHomes(files).flatMap(({ entry, file }) => failuresOf(file, entry.language))
+	return builtLanguagePages(files).flatMap(({ page, file }) => failuresOf(file, page))
 }

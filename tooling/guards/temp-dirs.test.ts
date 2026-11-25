@@ -37,6 +37,66 @@ describe("temporary directories made by a source file", () => {
 		expect(unremovedTempDirs(files)).toEqual(["a.ts"])
 	})
 
+	it("does not read a /* inside a string as the start of a block comment", () => {
+		const files = [
+			{
+				path: "a.ts",
+				text: 'const d = mkdtempSync(p)\nconst g = "**/*.ts"\nrmSync(d)\n/** doc */\n',
+			},
+		]
+		expect(unremovedTempDirs(files)).toEqual([])
+	})
+
+	it("does not read a /* inside a line comment as the start of a block comment", () => {
+		const files = [
+			{
+				path: "a.ts",
+				text: "const d = mkdtempSync(p)\n// every file under src/*\nrmSync(d)\n/** doc */\n",
+			},
+		]
+		expect(unremovedTempDirs(files)).toEqual([])
+	})
+
+	it("keeps an escaped quote or a template literal whole, so its /* is not a comment", () => {
+		const files = [
+			{ path: "a.ts", text: "const d = mkdtempSync(p)\nconst g = `**/*.ts`\nrmSync(d)\n" },
+			{
+				path: "b.ts",
+				text: 'const d = mkdtempSync(p)\nconst g = "a \\" **/*.ts"\nrmSync(d)\n',
+			},
+		]
+		expect(unremovedTempDirs(files)).toEqual([])
+	})
+
+	it("does not count a commented-out rm after a quote in a regex literal", () => {
+		const files = [
+			{ path: "a.ts", text: 'const d = mkdtempSync(p)\nconst r = /[",]/\n// then rm(d)\n' },
+			{ path: "b.ts", text: "const d = mkdtempSync(p)\nconst q = /'/g\n// then rm(d)\n" },
+		]
+		expect(unremovedTempDirs(files)).toEqual(["a.ts", "b.ts"])
+	})
+
+	it("counts a real rmSync after a regex literal that looks like a comment", () => {
+		const files = [
+			{ path: "a.ts", text: "const d = mkdtempSync(p)\nconst r = /\\/*$/\nrmSync(d)\n" },
+		]
+		expect(unremovedTempDirs(files)).toEqual([])
+	})
+
+	it("counts a real rmSync after a string that contains a line comment", () => {
+		const files = [
+			{ path: "a.ts", text: 'const d = mkdtempSync(p)\nconst u = "http://x"\nrmSync(d)\n' },
+		]
+		expect(unremovedTempDirs(files)).toEqual([])
+	})
+
+	it("does not count an rm in a comment inside a template substitution", () => {
+		const files = [
+			{ path: "a.ts", text: "const d = mkdtempSync(p)\nconst t = `\u0024{a /* rm(d) */}`\n" },
+		]
+		expect(unremovedTempDirs(files)).toEqual(["a.ts"])
+	})
+
 	it("does not count an rm that appears only in a block or JSDoc comment", () => {
 		const files = [
 			{ path: "a.ts", text: "const d = await mkdtemp(p)\n/* then rm(d) in the caller */\n" },

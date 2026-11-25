@@ -101,13 +101,15 @@ describe("the PNG a share image rasterizes to", () => {
 })
 
 describe("the share images the prebuild step writes", () => {
-	it("writes one PNG per Language, at the card's size, into the static directory", async () => {
+	it("writes one PNG per page and Language, at the card's size, into the static directory", async () => {
 		const destination = await mkdtemp(join(tmpdir(), "share-image-"))
 		try {
-			const languages = await writeShareImages(destination)
-			expect(languages).toEqual(LANGUAGES.map((entry) => entry.language))
-			for (const language of languages) {
-				const png = await Bun.file(join(destination, `${language}.png`)).bytes()
+			const files = await writeShareImages(destination)
+			expect(files).toEqual([
+				...LANGUAGES.flatMap((entry) => [`${entry.language}.png`, `openjot-${entry.language}.png`]),
+			])
+			for (const name of files) {
+				const png = await Bun.file(join(destination, name)).bytes()
 				expect(pngPixels(png)).toEqual(CARD)
 			}
 		} finally {

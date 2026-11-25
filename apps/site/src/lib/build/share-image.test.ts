@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test"
 import { LANGUAGES } from "../language/languages"
+import { OPENJOT_LANGUAGES } from "../language/openjot-dictionary"
 import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "../social/layout"
-import { shareImagePath } from "../social/share-advert"
+import { openJotShareImagePath, shareImagePath } from "../social/share-advert"
 import { SHARE_IMAGE_MAX_BYTES } from "../social/share-image"
 import type { BuiltFile } from "./built-files"
 import { checkShareImage } from "./share-image"
@@ -9,10 +10,17 @@ import { checkShareImage } from "./share-image"
 /** The size a large card is cut at, which every built share image must state. */
 const CARD = Object.freeze({ width: SHARE_IMAGE_WIDTH, height: SHARE_IMAGE_HEIGHT })
 
+/** Every card path a healthy build writes: each page's, in each Language. */
+function cardPaths(): readonly string[] {
+	return [
+		...LANGUAGES.map((entry) => shareImagePath(entry.language)),
+		...OPENJOT_LANGUAGES.map((entry) => openJotShareImagePath(entry.language)),
+	]
+}
+
 /** The share images a healthy build writes, with any given file standing in for one of them. */
 function files(...replace: readonly BuiltFile[]): readonly BuiltFile[] {
-	return LANGUAGES.map((entry) => {
-		const path = shareImagePath(entry.language)
+	return cardPaths().map((path) => {
 		const healthy: BuiltFile = { path, content: "", bytes: 40_000, pixels: CARD }
 		return replace.find((given) => given.path === path) ?? healthy
 	})

@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url"
 import { expect, type Page, test } from "@playwright/test"
-import { expectShippedTheme, openPage, PAGES } from "./pages"
+import { expectShippedTheme, openPage, PAGES_UNDER_TEST } from "./pages"
 import { VIEWPORTS } from "./viewports"
 
 /** The two baselines this file names, and the viewport each one judges. The filenames are its own. */
@@ -41,7 +41,7 @@ async function pinFonts(page: Page): Promise<void> {
 test.describe("the built pages as screenshots", () => {
 	test.use({ reducedMotion: "reduce", colorScheme: "light" })
 
-	for (const underTest of PAGES) {
+	for (const underTest of PAGES_UNDER_TEST) {
 		for (const [snapshot, viewport] of Object.entries(SNAPSHOTS)) {
 			test(`${underTest.name} on ${snapshot}`, async ({ page }) => {
 				await pinFonts(page)
