@@ -1,17 +1,26 @@
-export type AppTheme = "pink-white" | "orange-black";
+export type AppTheme = "light" | "dark";
 export type HandMode = "left" | "right";
 
 const STORAGE_KEY = "moojot_theme";
 
+/**
+ * Maps a stored theme value onto the current name. The retired `pink-white` and
+ * `orange-black` values migrate to `light` and `dark` so a saved choice survives.
+ */
+export function migrateTheme(raw: string | null | undefined): AppTheme {
+  if (raw === "pink-white" || raw === "light") return "light";
+  if (raw === "orange-black" || raw === "dark") return "dark";
+  return "light";
+}
+
 export function loadSavedTheme(): AppTheme {
-  if (typeof window === "undefined") return "pink-white";
+  if (typeof window === "undefined") return "light";
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw === "orange-black" || raw === "pink-white") return raw;
+    return migrateTheme(window.localStorage.getItem(STORAGE_KEY));
   } catch {
     // ignore storage restrictions
+    return "light";
   }
-  return "pink-white";
 }
 
 export function saveTheme(theme: AppTheme) {

@@ -1,80 +1,92 @@
 @import "tailwindcss";
+@import "@trajectonomics/brand/current/fonts/inter.css";
+@import "@trajectonomics/brand/current/light.css";
+@import "@trajectonomics/brand/current/dark.css";
 
+/*
+ * The app's own colour names, mapped onto the Trajectonomics brand roles.
+ * `--brand` is the primary action (near-black in light, near-white in dark);
+ * the orange is the one accent, used for text and active indicators.
+ */
 :root,
-:root[data-theme="pink-white"] {
-  font-family: "Noto Sans Thai", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+:root[data-theme="light"] {
+  font-family: "Inter Variable", "Noto Sans Thai", system-ui, sans-serif;
   line-height: 1.6;
   color-scheme: light;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 
-  --bg-canvas: #fff7fa;
-  --bg-card: #ffffff;
-  --bg-card-sub: #fff0f5;
-  --bg-input: #fff5f8;
-  --bg-elevated: #ffe6f0;
-  --border-subtle: rgba(244, 63, 133, 0.14);
-  --border-strong: rgba(244, 63, 133, 0.28);
+  --bg-canvas: var(--ds-color-background);
+  --bg-card: var(--ds-color-card);
+  --bg-card-sub: var(--ds-color-secondary);
+  --bg-input: var(--ds-color-secondary);
+  --bg-elevated: var(--ds-color-secondary);
+  --border-subtle: var(--ds-color-border);
+  --border-strong: color-mix(in oklab, var(--ds-color-foreground) 22%, transparent);
 
-  --text-primary: #18181b;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
+  --text-primary: var(--ds-color-foreground);
+  --text-secondary: var(--ds-color-muted-foreground);
+  --text-muted: color-mix(in oklab, var(--ds-color-muted-foreground) 88%, var(--ds-color-background));
 
-  --brand: #ff4d94;
-  --brand-deep: #e11d74;
-  --brand-soft: rgba(255, 77, 148, 0.13);
-  --brand-border: rgba(255, 77, 148, 0.36);
-  --brand-text: #db2777;
+  --brand: var(--ds-color-primary);
+  --brand-contrast: var(--ds-color-primary-foreground);
+  --brand-deep: color-mix(in oklab, var(--ds-color-primary) 78%, var(--ds-color-background));
+  --brand-soft: color-mix(in oklab, var(--ds-color-accent) 12%, transparent);
+  --brand-border: color-mix(in oklab, var(--ds-color-accent) 35%, transparent);
+  --brand-text: var(--ds-color-accent);
 
-  --hero-from: #ff6aa8;
-  --hero-to: #e11d74;
-  --hero-btn-bg: #ffffff;
-  --hero-btn-text: #e11d74;
-  --hero-shadow: rgba(225, 29, 116, 0.25);
+  --hero-from: var(--ds-color-stage);
+  --hero-to: var(--ds-color-stage);
+  --hero-btn-bg: var(--ds-color-stage-foreground);
+  --hero-btn-text: var(--ds-color-stage);
+  --hero-shadow: rgb(0 0 0 / 0.35);
+  --hero-border: transparent;
 
-  --nav-bg: rgba(255, 255, 255, 0.96);
-  --track-muted: #f5dde7;
-  --bar-inactive: #f8bed6;
-  --summary-tab-active-bg: #ff4d94;
-  --summary-tab-active-text: #ffffff;
-  --btn-contrast-bg: #18181b;
-  --btn-contrast-text: #ffffff;
+  --nav-bg: color-mix(in oklab, var(--ds-color-background) 96%, transparent);
+  --track-muted: var(--ds-color-secondary);
+  --bar-inactive: color-mix(in oklab, var(--ds-color-muted-foreground) 32%, transparent);
+  --summary-tab-active-bg: var(--ds-color-accent);
+  --summary-tab-active-text: var(--ds-color-accent-foreground);
+  --btn-contrast-bg: var(--ds-color-primary);
+  --btn-contrast-text: var(--ds-color-primary-foreground);
 }
 
-:root[data-theme="orange-black"] {
+:root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg-canvas: #0a0a0c;
-  --bg-card: #141417;
-  --bg-card-sub: #1b1b20;
-  --bg-input: #0a0a0c;
-  --bg-elevated: #1f1f24;
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --bg-canvas: var(--ds-color-background);
+  --bg-card: var(--ds-color-card);
+  --bg-card-sub: var(--ds-color-secondary);
+  --bg-input: var(--ds-color-muted);
+  --bg-elevated: var(--ds-color-secondary);
+  --border-subtle: var(--ds-color-border);
+  --border-strong: color-mix(in oklab, var(--ds-color-foreground) 22%, transparent);
 
-  --text-primary: #ffffff;
-  --text-secondary: #d4d4d8;
-  --text-muted: #a1a1aa;
+  --text-primary: var(--ds-color-foreground);
+  --text-secondary: var(--ds-color-muted-foreground);
+  --text-muted: color-mix(in oklab, var(--ds-color-muted-foreground) 88%, var(--ds-color-background));
 
-  --brand: #ff6b1a;
-  --brand-deep: #ea580c;
-  --brand-soft: rgba(255, 107, 26, 0.16);
-  --brand-border: rgba(255, 107, 26, 0.38);
-  --brand-text: #fb923c;
+  --brand: var(--ds-color-primary);
+  --brand-contrast: var(--ds-color-primary-foreground);
+  --brand-deep: color-mix(in oklab, var(--ds-color-primary) 78%, var(--ds-color-background));
+  --brand-soft: color-mix(in oklab, var(--ds-color-accent) 16%, transparent);
+  --brand-border: color-mix(in oklab, var(--ds-color-accent) 40%, transparent);
+  --brand-text: color-mix(in oklab, var(--ds-color-accent) 62%, var(--ds-color-foreground));
 
-  --hero-from: #ff7a1a;
-  --hero-to: #ea580c;
-  --hero-btn-bg: #0a0a0c;
-  --hero-btn-text: #ffffff;
-  --hero-shadow: rgba(124, 45, 18, 0.45);
+  --hero-from: var(--ds-color-stage);
+  --hero-to: var(--ds-color-stage);
+  --hero-btn-bg: var(--ds-color-stage-foreground);
+  --hero-btn-text: var(--ds-color-stage);
+  --hero-shadow: rgb(0 0 0 / 0.45);
+  --hero-border: var(--ds-color-border);
 
-  --nav-bg: rgba(14, 14, 17, 0.95);
-  --track-muted: #26262c;
-  --bar-inactive: rgba(255, 255, 255, 0.85);
-  --summary-tab-active-bg: #0a0a0c;
-  --summary-tab-active-text: #ffffff;
-  --btn-contrast-bg: #ffffff;
-  --btn-contrast-text: #0a0a0c;
+  --nav-bg: color-mix(in oklab, var(--ds-color-background) 94%, transparent);
+  --track-muted: var(--ds-color-secondary);
+  --bar-inactive: color-mix(in oklab, var(--ds-color-muted-foreground) 30%, transparent);
+  --summary-tab-active-bg: var(--ds-color-accent);
+  --summary-tab-active-text: var(--ds-color-accent-foreground);
+  --btn-contrast-bg: var(--ds-color-primary);
+  --btn-contrast-text: var(--ds-color-primary-foreground);
 }
 
 html,

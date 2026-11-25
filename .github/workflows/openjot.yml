@@ -7,12 +7,14 @@ on:
   pull_request:
     paths:
       - "apps/openjot/**"
+      - "packages/brand/**"
       - "bun.lock"
       - ".github/workflows/openjot.yml"
   push:
     branches: [main]
     paths:
       - "apps/openjot/**"
+      - "packages/brand/**"
       - "bun.lock"
       - ".github/workflows/openjot.yml"
 
@@ -40,6 +42,9 @@ jobs:
 
       - name: Install
         run: bun install --frozen-lockfile
+
+      - name: Build the brand package
+        run: bunx turbo run build --filter=@trajectonomics/brand
 
       - name: Typecheck
         working-directory: apps/openjot
@@ -76,6 +81,9 @@ jobs:
 
       - name: Install
         run: bun install --frozen-lockfile
+
+      - name: Build the brand package
+        run: bunx turbo run build --filter=@trajectonomics/brand
 
       # Compares every scene in tests/screenshots/scenes.mjs with the committed
       # baseline. The baselines are made on this runner (see the steps below),

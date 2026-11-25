@@ -151,7 +151,7 @@
   <!-- Brand top header extending seamlessly behind status bar -->
   <header
     class="text-white px-3 pb-0 flex items-center justify-between gap-2 shrink-0"
-    style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to)); padding-top: max(env(safe-area-inset-top), 36px);"
+    style="background: var(--hero-from); outline: 1px solid var(--hero-border); outline-offset: -1px; padding-top: max(env(safe-area-inset-top), 36px);"
   >
     <button
       type="button"
@@ -171,7 +171,7 @@
             if (tab === "transfer") categoryId = null;
           }}
           class="px-4 py-2.5 transition-colors {kind === tab
-            ? 'bg-[var(--bg-canvas)] text-[var(--text-primary)] rounded-t-2xl'
+            ? 'bg-[var(--bg-card)] text-[var(--text-primary)] rounded-t-2xl'
             : 'text-white/90'}"
         >
           {t(lang, tab === "transfer" ? "transfers" : tab)}
@@ -305,7 +305,7 @@
               type="button"
               onclick={() => toggleTag(tg.id)}
               class="px-3 py-1 rounded-full text-xs font-semibold transition-colors {active
-                ? 'bg-[var(--brand)] text-white'
+                ? 'bg-[var(--brand)] text-[var(--brand-contrast)]'
                 : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'}"
             >
               #{tg.name}
@@ -420,14 +420,14 @@
   <!-- Built-in Calculator Numpad OR Save button -->
   {#if showNumpad}
     <div
-      class="bg-white text-[#18181b] px-3 pt-2 shadow-2xl border-t border-zinc-200 shrink-0"
+      class="bg-[var(--bg-card)] text-[var(--text-primary)] px-3 pt-2 shadow-2xl border-t border-[var(--border-subtle)] shrink-0"
       style="padding-bottom: max(env(safe-area-inset-bottom), 24px);"
     >
       <div class="flex items-center justify-between pb-2 px-1">
         <button
           type="button"
           onclick={pasteClipboard}
-          class="flex items-center gap-1.5 text-sm font-bold text-[var(--brand)] active:opacity-70"
+          class="flex items-center gap-1.5 text-sm font-bold text-[var(--brand-text)] active:opacity-70"
         >
           <ClipboardPaste class="size-4" />
           <span>{lang === "th" ? "วาง" : "Paste"}</span>
@@ -435,41 +435,41 @@
         <button
           type="button"
           onclick={() => (showNumpad = false)}
-          class="text-sm font-bold text-[#18181b] px-2 py-0.5"
+          class="text-sm font-bold text-[var(--text-primary)] px-2 py-0.5"
         >
           {t(lang, "done")}
         </button>
       </div>
       <div class="grid grid-cols-4 gap-2 text-lg font-bold">
-        <button type="button" onclick={() => tapKey("AC")} class="col-span-2 h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">AC</button>
-        <button type="button" onclick={() => tapKey("%")} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">%</button>
+        <button type="button" onclick={() => tapKey("AC")} class="col-span-2 h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">AC</button>
+        <button type="button" onclick={() => tapKey("%")} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">%</button>
         <button type="button" onclick={() => tapKey("÷")} class="h-12 rounded-xl bg-[var(--brand-soft)] text-[var(--brand-text)]">÷</button>
 
         {#each ["7", "8", "9"] as d}
-          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">{d}</button>
+          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">{d}</button>
         {/each}
         <button type="button" onclick={() => tapKey("×")} class="h-12 rounded-xl bg-[var(--brand-soft)] text-[var(--brand-text)]">×</button>
 
         {#each ["4", "5", "6"] as d}
-          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">{d}</button>
+          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">{d}</button>
         {/each}
         <button type="button" onclick={() => tapKey("-")} class="h-12 rounded-xl bg-[var(--brand-soft)] text-[var(--brand-text)]">−</button>
 
         {#each ["1", "2", "3"] as d}
-          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">{d}</button>
+          <button type="button" onclick={() => tapKey(d)} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">{d}</button>
         {/each}
         <button type="button" onclick={() => tapKey("+")} class="h-12 rounded-xl bg-[var(--brand-soft)] text-[var(--brand-text)]">+</button>
 
-        <button type="button" onclick={() => tapKey(".")} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">.</button>
-        <button type="button" onclick={() => tapKey("0")} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] active:bg-zinc-200">0</button>
-        <button type="button" onclick={() => tapKey("BS")} class="h-12 rounded-xl bg-zinc-100 text-[#18181b] flex items-center justify-center active:bg-zinc-200">
+        <button type="button" onclick={() => tapKey(".")} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">.</button>
+        <button type="button" onclick={() => tapKey("0")} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] active:bg-[var(--bg-elevated)]">0</button>
+        <button type="button" onclick={() => tapKey("BS")} class="h-12 rounded-xl bg-[var(--bg-card-sub)] text-[var(--text-primary)] flex items-center justify-center active:bg-[var(--bg-elevated)]">
           <Delete class="size-5" />
         </button>
         <button
           type="button"
           onclick={submit}
           disabled={satangValue <= 0 || saving}
-          class="h-12 rounded-xl bg-[var(--brand)] text-white shadow-xs flex items-center justify-center disabled:opacity-40 active:bg-[var(--brand-deep)]"
+          class="h-12 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] shadow-xs flex items-center justify-center disabled:opacity-40 active:bg-[var(--brand-deep)]"
         >
           <Check class="size-6" />
         </button>
@@ -484,7 +484,7 @@
         type="button"
         onclick={submit}
         disabled={satangValue <= 0 || saving}
-        class="w-full py-3.5 rounded-full bg-[var(--brand)] text-white font-bold text-base shadow-lg disabled:opacity-40 active:bg-[var(--brand-deep)]"
+        class="w-full py-3.5 rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] font-bold text-base shadow-lg disabled:opacity-40 active:bg-[var(--brand-deep)]"
       >
         {saving ? t(lang, "loading") : t(lang, "save")}
       </button>

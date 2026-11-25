@@ -13,7 +13,7 @@ export const TIMEZONE = "Asia/Bangkok";
 /**
  * @param {object} options
  * @param {"en" | "th"} [options.lang]
- * @param {"pink-white" | "orange-black"} [options.theme]
+ * @param {"light" | "dark"} [options.theme]
  * @param {"left" | "right"} [options.hand]
  * @param {"full" | "empty"} [options.data] "empty" is a month with no records.
  * @param {"done" | "pending"} [options.onboarding] "pending" opens the first-run tour.
@@ -32,7 +32,7 @@ export const TIMEZONE = "Asia/Bangkok";
 export function fixtureScript(options = {}) {
   const config = {
     lang: "en",
-    theme: "pink-white",
+    theme: "light",
     hand: "right",
     data: "full",
     onboarding: "done",
@@ -285,7 +285,7 @@ function pageFixture(config) {
     });
     const food = list.filter((r) => r.kind === "spending" && r.categoryId === "cat_food").reduce((t, r) => t + r.amountSatang, 0);
     return [
-      budget("budget_total", "total", null, "Total Spending", null, "#FF4D94", 3000000, sum(list, "spending")),
+      budget("budget_total", "total", null, "Total Spending", null, "#ea580c", 3000000, sum(list, "spending")),
       budget("budget_food", "category", "cat_food", "Food", "utensils", "#f97316", 60000, food),
     ];
   }

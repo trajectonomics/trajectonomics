@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget background, pink theme: the same colours as the app header (hero-from to hero-to in app.css). -->
+<!-- Widget background, light theme: the brand's stage surface (--ds-color-stage in light.css). -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <corners android:radius="24dp" />
-    <gradient android:angle="315" android:startColor="#FF6AA8" android:endColor="#E11D74" />
+    <solid android:color="#171717" />
 </shape>

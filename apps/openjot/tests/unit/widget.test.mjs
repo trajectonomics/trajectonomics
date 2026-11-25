@@ -17,7 +17,7 @@ const home = {
 };
 
 test("the widget shows today's and this period's spending in baht", () => {
-  const s = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "pink-white", hideAmounts: false, baht });
+  const s = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "light", hideAmounts: false, baht });
   assert.equal(s.todayText, "฿189");
   assert.equal(s.periodText, "฿12,345.50");
   assert.equal(s.zeroText, "฿0");
@@ -27,23 +27,23 @@ test("the widget shows today's and this period's spending in baht", () => {
 });
 
 test("a day with nothing jotted yet shows ฿0 today", () => {
-  const s = widgetSnapshot(home, "2026-11-24", { lang: "en", theme: "pink-white", hideAmounts: false, baht });
+  const s = widgetSnapshot(home, "2026-11-24", { lang: "en", theme: "light", hideAmounts: false, baht });
   assert.equal(s.todayText, "฿0");
 });
 
 test("with the app lock on, the snapshot asks Android to hide amounts", () => {
-  const s = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "pink-white", hideAmounts: true, baht });
+  const s = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "light", hideAmounts: true, baht });
   assert.equal(s.hideAmounts, true);
 });
 
 test("labels follow the app's language and the streak has a {n} slot", () => {
-  const en = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "pink-white", hideAmounts: false, baht });
-  const th = widgetSnapshot(home, "2026-11-23", { lang: "th", theme: "orange-black", hideAmounts: false, baht });
+  const en = widgetSnapshot(home, "2026-11-23", { lang: "en", theme: "light", hideAmounts: false, baht });
+  const th = widgetSnapshot(home, "2026-11-23", { lang: "th", theme: "dark", hideAmounts: false, baht });
   assert.equal(en.labels.today, "Today");
   assert.equal(th.labels.today, "วันนี้");
   assert.match(en.labels.streak, /\{n\}/);
   assert.match(th.labels.streak, /\{n\}/);
-  assert.equal(th.theme, "orange-black");
+  assert.equal(th.theme, "dark");
 });
 
 test("the streak is the longer of the slip-sync and categorize streaks, never negative", () => {

@@ -241,7 +241,7 @@
   const optionClass = (active: boolean) =>
     `flex-1 min-h-11 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-colors ${
       active
-        ? "bg-[var(--brand)] text-white border-[var(--brand)]"
+        ? "bg-[var(--brand)] text-[var(--brand-contrast)] border-[var(--brand)]"
         : "bg-[var(--bg-input)] text-[var(--text-primary)] border-[var(--border-subtle)]"
     }`;
 </script>
@@ -271,7 +271,7 @@
         >
           <span
             class="block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none {i === step
-              ? 'w-6 bg-[var(--brand)]'
+              ? 'w-6 bg-[var(--brand-text)]'
               : i < step
                 ? 'w-2 bg-[var(--brand-border)]'
                 : 'w-2 bg-[var(--track-muted)]'}"
@@ -379,7 +379,7 @@
               <div class="relative w-full max-w-[16rem] rounded-[2rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 shadow-sm">
                 <div
                   class="flex flex-col items-center gap-1 rounded-2xl py-3 text-white"
-                  style="background: linear-gradient(135deg, var(--hero-from), var(--hero-to));"
+                  style="background: var(--hero-from); outline: 1px solid var(--hero-border); outline-offset: -1px;"
                 >
                   <ArrowDown class="size-5 motion-safe:animate-bounce" />
                   <MooMascot mood="scan" size="md" interactive={false} alt="" />
@@ -389,7 +389,7 @@
                   <div class="h-3 w-1/2 rounded-full bg-[var(--track-muted)]"></div>
                 </div>
                 <span
-                  class="absolute -bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-lg"
+                  class="absolute -bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] shadow-lg"
                   aria-hidden="true"
                 >
                   <Plus class="size-5" />
@@ -426,7 +426,7 @@
                     <Palette class="size-4 text-[var(--brand)]" />{tr("onbTheme")}
                   </div>
                   <div class="flex gap-2">
-                    {#each [{ id: "pink-white", key: "onbThemePink", a: "#FF4D94", b: "#ffffff" }, { id: "orange-black", key: "onbThemeOrange", a: "#FF6B1A", b: "#0a0a0c" }] as opt (opt.id)}
+                    {#each [{ id: "light", key: "onbThemeLight", a: "#c2410c", b: "#ffffff" }, { id: "dark", key: "onbThemeDark", a: "#ea580c", b: "#0a0a0a" }] as opt (opt.id)}
                       <button
                         type="button"
                         aria-pressed={theme === opt.id}
@@ -436,8 +436,8 @@
                           : 'border-[var(--border-subtle)] bg-[var(--bg-input)]'}"
                       >
                         <span class="flex -space-x-1.5" aria-hidden="true">
-                          <span class="size-4 rounded-full ring-2 ring-white/80" style="background: {opt.a};"></span>
-                          <span class="size-4 rounded-full ring-2 ring-zinc-400/60" style="background: {opt.b};"></span>
+                          <span class="size-4 rounded-full ring-2 ring-[var(--border-strong)]" style="background: {opt.a};"></span>
+                          <span class="size-4 rounded-full ring-2 ring-[var(--border-strong)]" style="background: {opt.b};"></span>
                         </span>
                         {tr(opt.key as I18nKey)}
                       </button>
@@ -512,7 +512,7 @@
                 <button
                   type="button"
                   onclick={requestGallery}
-                  class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3.5 text-sm font-bold text-white shadow-sm active:bg-[var(--brand-deep)]"
+                  class="w-full max-w-xs rounded-full bg-[var(--brand)] py-3.5 text-sm font-bold text-[var(--brand-contrast)] shadow-sm active:bg-[var(--brand-deep)]"
                 >
                   {tr("onbPermAllow")}
                 </button>
@@ -550,7 +550,7 @@
       <button
         type="button"
         onclick={finish}
-        class="w-full rounded-full bg-[var(--brand)] py-4 text-base font-extrabold text-white shadow-lg active:bg-[var(--brand-deep)]"
+        class="w-full rounded-full bg-[var(--brand)] py-4 text-base font-extrabold text-[var(--brand-contrast)] shadow-lg active:bg-[var(--brand-deep)]"
         style="box-shadow: 0 10px 24px -8px var(--hero-shadow);"
       >
         {tr("onbStart")}
@@ -567,7 +567,7 @@
       <button
         type="button"
         onclick={() => goTo(step + 1)}
-        class="ml-auto flex min-h-12 items-center gap-1 rounded-full bg-[var(--brand)] px-7 text-sm font-bold text-white shadow-sm active:bg-[var(--brand-deep)]"
+        class="ml-auto flex min-h-12 items-center gap-1 rounded-full bg-[var(--brand)] px-7 text-sm font-bold text-[var(--brand-contrast)] shadow-sm active:bg-[var(--brand-deep)]"
       >
         {t(lang, "next")}<ChevronRight class="size-4" />
       </button>

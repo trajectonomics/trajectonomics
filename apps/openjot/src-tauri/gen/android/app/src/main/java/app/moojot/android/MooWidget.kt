@@ -88,7 +88,10 @@ object MooWidget {
             views.setTextViewText(R.id.widget_scan, labels.optString("scan", "Scan"))
         }
 
-        val dark = snap?.optString("theme") == "orange-black"
+        // "orange-black" is the retired name of the dark theme; a snapshot written before the
+        // update keeps it until the app runs again.
+        val theme = snap?.optString("theme")
+        val dark = theme == "dark" || theme == "orange-black"
         views.setInt(
             R.id.widget_root,
             "setBackgroundResource",

@@ -14,7 +14,7 @@
 // To add a scene: add an entry, then run `pnpm test:screenshots:update <name>`
 // and look at the new PNG before committing it.
 
-const DARK = { theme: "orange-black" };
+const DARK = { theme: "dark" };
 // A first run on Android with photo access already allowed.
 const FIRST_RUN_ANDROID = { data: "empty", onboarding: "pending", android: "granted" };
 // The first scan covers this month and the two before it (FIRST_SCAN_MONTHS): from

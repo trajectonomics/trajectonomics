@@ -365,7 +365,7 @@
       showSearch ||
       recordLightboxOpen;
     const isLightStatusBar =
-      theme === "pink-white" &&
+      theme === "light" &&
       (lockState !== "open" || showOnboarding || (!hasColoredTopBar && activeTab !== "home"));
     window.MooJotAndroid?.setStatusBarLight?.(isLightStatusBar);
   });
@@ -1311,7 +1311,7 @@
       class="fixed inset-x-0 top-0 z-40 text-white transition-transform duration-200 ease-out {stickyVisible
         ? 'translate-y-0'
         : '-translate-y-full pointer-events-none'}"
-      style="padding-top: env(safe-area-inset-top); background: linear-gradient(180deg, var(--hero-from), var(--hero-to));"
+      style="padding-top: env(safe-area-inset-top); background: var(--hero-from); outline: 1px solid var(--hero-border); outline-offset: -1px;"
       aria-hidden={!stickyVisible}
     >
       <div class="flex items-center justify-between gap-3 px-4 py-3 {hand === 'left' ? 'flex-row-reverse' : ''}">
@@ -1350,7 +1350,7 @@
         bind:this={heroEl}
         role="group"
         class="relative overflow-hidden shadow-xl"
-        style="background: linear-gradient(180deg, var(--hero-from), var(--hero-to)); border-radius: 0 0 28px 28px;"
+        style="background: var(--hero-from); border-radius: 0 0 28px 28px; outline: 1px solid var(--hero-border); outline-offset: -1px;"
       >
         <svg class="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 360 228" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           <path d="M0 150 C90 118 150 176 230 146 C290 126 330 160 360 140 L360 228 L0 228 Z" fill="#ffffff" opacity="0.2" />
@@ -1438,7 +1438,7 @@
               <button
                 type="button"
                 class="truncate rounded-full px-3 py-1 text-xs font-bold {periodOffset === 0
-                  ? 'bg-[var(--brand)] text-white'
+                  ? 'bg-[var(--brand)] text-[var(--brand-contrast)]'
                   : 'bg-white text-[#18181b]'}"
                 onclick={openMonthPicker}
               >
@@ -1515,7 +1515,7 @@
             <button
               type="button"
               onclick={sendFeedbackFromCard}
-              class="mt-1.5 rounded-full bg-[var(--brand)] px-3.5 py-1.5 text-xs font-extrabold text-white active:bg-[var(--brand-deep)]"
+              class="mt-1.5 rounded-full bg-[var(--brand)] px-3.5 py-1.5 text-xs font-extrabold text-[var(--brand-contrast)] active:bg-[var(--brand-deep)]"
             >
               {t(lang, "sendFeedback")}
             </button>
@@ -1570,7 +1570,7 @@
                   <div class="flex items-center gap-3">
                     <CategoryIcon
                       icon={cat?.icon ?? "leaf"}
-                      color={cat?.color ?? "#71717a"}
+                      color={cat?.color ?? "var(--text-muted)"}
                       size="sm"
                     />
                     <div>
@@ -1682,7 +1682,7 @@
                       <div class="flex items-center gap-3 min-w-0">
                         <CategoryIcon
                           icon={rec.kind === "transfer" ? "transfer" : cat?.icon ?? "leaf"}
-                          color={rec.kind === "transfer" ? (theme === "pink-white" ? "#FF4D94" : "#FF6B1A") : cat?.color ?? "#71717a"}
+                          color={rec.kind === "transfer" ? "var(--brand-text)" : cat?.color ?? "var(--text-muted)"}
                           size="sm"
                         />
                         <div class="min-w-0">
@@ -1768,7 +1768,7 @@
 
     <!-- Split Floating Action Button (+ Add record | ^) -->
     <div
-      class="fixed right-4 z-40 inline-flex items-center rounded-full bg-[var(--brand)] text-white shadow-xl overflow-hidden"
+      class="fixed right-4 z-40 inline-flex items-center rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] shadow-xl overflow-hidden"
       style="bottom: calc(max(env(safe-area-inset-bottom), 20px) + 64px); box-shadow: 0 10px 24px -6px var(--hero-shadow);"
     >
       <button
@@ -1978,7 +1978,7 @@
         <button
           type="button"
           onclick={() => whatsNewSheet.current?.()}
-          class="w-full rounded-xl bg-[var(--brand)] py-2.5 text-sm font-extrabold text-white active:bg-[var(--brand-deep)]"
+          class="w-full rounded-xl bg-[var(--brand)] py-2.5 text-sm font-extrabold text-[var(--brand-contrast)] active:bg-[var(--brand-deep)]"
         >
           {t(lang, "whatsNewGotIt")}
         </button>
@@ -2000,7 +2000,7 @@
             type="button"
             aria-current={offset === periodOffset ? "date" : undefined}
             class="rounded-xl py-2.5 text-sm font-bold {offset === 0
-              ? 'border border-[var(--brand)] bg-[var(--brand)] text-white'
+              ? 'border border-[var(--brand)] bg-[var(--brand)] text-[var(--brand-contrast)]'
               : offset === periodOffset
                 ? 'border border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand-text)]'
                 : 'border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-primary)]'}"
@@ -2032,7 +2032,7 @@
       <div class="mt-4 flex flex-col gap-2">
         <button
           type="button"
-          class="rounded-xl bg-[var(--brand)] py-2.5 text-sm font-bold text-white"
+          class="rounded-xl bg-[var(--brand)] py-2.5 text-sm font-bold text-[var(--brand-contrast)]"
           onclick={() => startSlipScan(monthStartSec(periodOffset))}
         >
           {home?.period.label ?? monthLabel(periodOffset)}
@@ -2111,7 +2111,7 @@
           </button>
           <button
             type="submit"
-            class="flex-1 rounded-xl bg-[var(--brand)] py-2.5 text-sm font-bold text-white disabled:opacity-60"
+            class="flex-1 rounded-xl bg-[var(--brand)] py-2.5 text-sm font-bold text-[var(--brand-contrast)] disabled:opacity-60"
             disabled={pdfBusy || pdfPassword.trim() === ""}
           >
             {t(lang, "confirm")}
@@ -2129,7 +2129,7 @@
       type="button"
       onclick={() => (activeTab = "home")}
       class="flex flex-col items-center gap-0.5 text-[11px] font-bold {activeTab === 'home'
-        ? 'text-[var(--brand)]'
+        ? 'text-[var(--brand-text)]'
         : 'text-[var(--text-muted)]'}"
     >
       <Home class="size-5" />
@@ -2139,7 +2139,7 @@
       type="button"
       onclick={() => (activeTab = "summary")}
       class="flex flex-col items-center gap-0.5 text-[11px] font-bold {activeTab === 'summary'
-        ? 'text-[var(--brand)]'
+        ? 'text-[var(--brand-text)]'
         : 'text-[var(--text-muted)]'}"
     >
       <PieChart class="size-5" />
@@ -2152,7 +2152,7 @@
         activeTab = "settings";
       }}
       class="flex flex-col items-center gap-0.5 text-[11px] font-bold {activeTab === 'settings'
-        ? 'text-[var(--brand)]'
+        ? 'text-[var(--brand-text)]'
         : 'text-[var(--text-muted)]'}"
     >
       <User class="size-5" />
@@ -2207,7 +2207,7 @@
   {#if showSearch}
     <div class="fixed inset-0 z-50 bg-[var(--bg-canvas)] flex flex-col overscroll-contain">
       <div
-        class="bg-[var(--brand)] px-3 pb-3 flex items-center gap-2 shrink-0"
+        class="bg-[var(--hero-from)] px-3 pb-3 flex items-center gap-2 shrink-0"
         style="padding-top: max(env(safe-area-inset-top), 36px);"
       >
         <button
@@ -2243,7 +2243,7 @@
               class="w-full flex items-center justify-between rounded-2xl bg-[var(--bg-card)] border border-[var(--border-subtle)] px-4 py-3 text-left"
             >
               <div class="flex items-center gap-3 min-w-0">
-                <CategoryIcon icon={cat?.icon ?? "leaf"} color={cat?.color ?? "#71717a"} size="sm" />
+                <CategoryIcon icon={cat?.icon ?? "leaf"} color={cat?.color ?? "var(--text-muted)"} size="sm" />
                 <div class="min-w-0">
                   <div class="text-sm font-semibold text-[var(--text-primary)] truncate">
                     {rec.payeeRaw || rec.note || (cat ? (lang === "th" ? cat.nameTh : cat.nameEn) : rec.kind)}
@@ -2312,7 +2312,7 @@
             await refreshPeriodData();
             filterSheet.current?.();
           }}
-          class="w-full rounded-full bg-[var(--brand)] py-3 text-sm font-bold text-white active:bg-[var(--brand-deep)]"
+          class="w-full rounded-full bg-[var(--brand)] py-3 text-sm font-bold text-[var(--brand-contrast)] active:bg-[var(--brand-deep)]"
         >
           {t(lang, "apply")}
         </button>

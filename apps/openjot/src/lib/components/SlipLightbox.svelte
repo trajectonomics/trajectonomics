@@ -36,7 +36,7 @@
       type="button"
       onclick={() => (zoom = zoom === 1 ? 2 : 1)}
       class="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-colors {zoom === 2
-        ? 'bg-[#FF6B1A] text-white'
+        ? 'bg-[var(--brand-text)] text-[var(--ds-color-accent-foreground)]'
         : 'bg-white/10 text-white active:bg-white/20'}"
       aria-label={zoom === 1 ? "Zoom in" : "Zoom out"}
     >

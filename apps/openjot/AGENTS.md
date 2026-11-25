@@ -39,3 +39,4 @@ The landing page's tests are Node tests in `site/`: `cd site && node --test`.
    - The PostHog identity (`$lib: "moojot-site-worker"` and the event names) and the Worker name `moojot-site`: renaming the Worker would create a second Worker that cannot take over the custom domain.
    - The signing key's file (`moojot-release.jks`), alias and `CN=MooJot`: the certificate can never change.
    - `ARCHIVED_REPO = "trajectonomics/moojot"` in `site/release.js`: it is the v1.4.0 download fallback.
+7. **Theme.** The app's colours and its Latin font come from `@trajectonomics/brand` ([`packages/brand`](../../packages/brand/AGENTS.md)): `src/app.css` imports the brand's light and dark Theme CSS and maps the app's own `--bg-*` and `--brand-*` names onto the `--ds-*` roles. The choice is still stored under the localStorage key `moojot_theme`; `migrateTheme` in `src/lib/theme.ts` maps the retired `pink-white`/`orange-black` values to `light`/`dark`, so never change the key.
