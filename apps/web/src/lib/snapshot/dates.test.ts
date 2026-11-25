@@ -4,6 +4,7 @@ import {
 	daysInMonth,
 	firstDayOfYear,
 	firstDayTwoMonthsBack,
+	HISTORY_MONTHS,
 	isValidDate,
 	monthEnd,
 	monthEndsBetween,
@@ -40,11 +41,18 @@ describe("month-end dates", () => {
 		expect(monthEnd(2100, 2)).toBe("2100-02-28")
 	})
 
-	test("the history holds at most the last 36 month-ends", () => {
-		const ends = monthEndsBetween("2020-01-01", "2026-10-31")
-		expect(ends).toHaveLength(36)
+	test("the history holds at most the last 120 month-ends, ten years", () => {
+		const ends = monthEndsBetween("2010-01-01", "2026-10-31")
+		expect(ends).toHaveLength(HISTORY_MONTHS)
+		expect(HISTORY_MONTHS).toBe(120)
 		expect(ends.at(-1)).toBe("2026-10-31")
-		expect(ends[0]).toBe("2023-11-30")
+		expect(ends[0]).toBe("2016-11-30")
+	})
+
+	test("a ledger that starts five years back is held whole", () => {
+		const ends = monthEndsBetween("2021-11-01", "2026-10-31")
+		expect(ends).toHaveLength(60)
+		expect(ends[0]).toBe("2021-11-30")
 	})
 
 	test("a history that ends before it starts is empty", () => {
