@@ -57,17 +57,22 @@ them, so `traj schema` lists none as required for the flag form and the command 
 field). The document form's usage line still prints `[account]`, which that form refuses. The Dashboard decodes the result with
 `apps/web/src/lib/contract/account-value.ts`, against goldens the CLI writes.
 
-## Addendum: a later Balance must stay in the safe range (2026-11-25, #499)
+## Addendum: no write leaves a Balance outside the safe range (2026-11-25, #499)
 
 A valuation was checked only at its own date, so one could be written that a transaction dated after it pushed past the safe range
 (`90071992547409.91` on 2026-01-01, then a `1.00` Posting on 2026-01-05), and `traj balance` then refused the whole ledger with
-`AMOUNT_OVERFLOW`. A write now refuses before it writes when, once every write of the batch is in, any dated Balance after an entry of
-the valued account or of its `--against` account is outside the safe range. The refusal is `AMOUNT_OVERFLOW` at the entry's `value`
-field (the entry that began the stretch the Balance overflows in), it names the account and the first date that overflows, and a
-batch that refuses writes nothing. Dates the batch's own writes cut apart are checked each against its own total, so a later entry
-of the same batch that brings the Balance back in range is accepted, and an entry that pushes a later Balance over is the one named.
+`AMOUNT_OVERFLOW`. A write now refuses before it writes when, once every write of the batch is in, a dated Balance of the valued
+account or of its `--against` account, on an entry's date or later, is outside the safe range and the batch made it worse than the
+Ledger had it. The refusal is `AMOUNT_OVERFLOW` at the entry's `value` field (the entry that began the stretch the Balance overflows
+in), it names the account and the first date that overflows, and a batch that refuses writes nothing. The wording says "a later Balance"
+only when that date is after the entry's own. Dates the batch's own writes cut apart are checked each against its own total, so a later
+entry of the same batch that brings the Balance back in range is accepted, and an entry that pushes a Balance over is the one named.
+An overflow the Ledger already holds on that date, at least as large as the one the write leaves, is not the entry's, so a write that
+shrinks it is accepted (the ledger stays as unreadable as it was; that is not this command's to cure).
 
 The check keeps the batch's constant cost per entry: the ledger's `balanceHistory` notes the most and least each account's Balance
 reaches from each Posting on, once, the first time it is asked about the account, and answers each stretch from that note; it scans
-a stretch for its first overflowing date only when the note says one could overflow. This is a deliberate refusal the full-rescan
-oracle (`oracle.test-support.ts`) does not make: the equivalence test names it as the one exception and holds every other case equal.
+a stretch for its first overflowing date only when the note says one could overflow. These are deliberate refusals the full-rescan
+oracle (`oracle.test-support.ts`) does not make. It reads a Balance only at an entry's own date, so it accepts two kinds of write the
+check refuses: one a later transaction overflows, and one that takes the account it posts against over on the last entry's own date.
+The equivalence test pins both as named exceptions and holds every other case equal.

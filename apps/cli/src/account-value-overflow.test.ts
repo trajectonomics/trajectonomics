@@ -92,8 +92,18 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 		expect(res.code).not.toBe(0)
 		const body = error(res)
 		expect(body.path).toBe("document.values.1.value")
-		expect(says(body)).toContain('"Gains" on 2026-01-05')
+		expect(says(body)).toContain('the Balance of "Gains" on 2026-01-05')
+		expect(says(body)).not.toContain("later")
 		expect(await ledgerSize(traj)).toEqual({ transactions: 0, postings: 0 })
+	})
+
+	it("accepts a write that shrinks an overflow the ledger already holds", async () => {
+		const { home, traj } = await chartHome()
+		await own(traj, "Equity", "Fund", "90071992547399.91", "2026-01-05")
+		await own(traj, "Equity", "Fund", "11.00", "2026-01-06")
+		await own(traj, "Fund", "Food", "11.00", "2026-01-07")
+		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
+		expect(res.code).toBe(0)
 	})
 
 	it("accepts a batch that stays in range at every later date", async () => {
