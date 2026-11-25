@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import type { Pnl, Read } from "../../lib/contract"
 import { type PnlView, pnlView } from "../../lib/view/ledger/pnl"
 import DataTable from "../ui/DataTable.svelte"
@@ -34,7 +35,7 @@ const totalColumns: Column<Total>[] = [
 >
 	<ReadView read={pnl} label="Profit and loss">
 		{#snippet children(report)}
-			{@const view = pnlView(report)}
+			{@const view = pnlView(report, currentAccountNames())}
 			<div class="space-y-6">
 				<p class="text-sm">
 					<span class="text-muted-foreground">Period{" "}</span>{view.period}

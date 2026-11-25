@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { AmountRow } from "../../lib/contract"
+import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
 
 interface Props {
@@ -20,7 +21,7 @@ let { rows }: Props = $props()
 		<ul class="divide-y divide-border text-sm">
 			{#each rows as row (`${row.account.id}:${row.currency}`)}
 				<li class="flex items-center justify-between gap-3 py-2">
-					<span class="min-w-0 truncate">{row.account.name}</span>
+					<span class="min-w-0 truncate"><AccountName id={row.account.id} name={row.account.name} /></span>
 					<span class="shrink-0">
 						<Money amount={row.amount} currency={row.currency} />
 					</span>

@@ -119,7 +119,6 @@ describe("the FI date, the chance, the tax and the cash flow", () => {
 			props: {
 				names,
 				projections,
-				accounts: DEMO.reads.accounts,
 				scenario: "base",
 				year: "",
 				onYear: () => {},

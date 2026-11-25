@@ -1,7 +1,7 @@
 // A reread that changes only the chance inputs, against the real traj (web ADR 0018): the three stage-one checks and the
 // chance reads run, every other Read is kept as it was, a plan changed since the Snapshot was read makes a full read, and
 // the partial answer equals the full one. The timings are printed for the ADR.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
 import { sameRun } from "../src/lib/snapshot/paths"
 import { calls, clearCalls } from "./allowances-spy.test-support"
@@ -17,6 +17,7 @@ import {
 	terminal,
 } from "./assumptions-ledger.test-support"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 
 const FIRST = { paths: 200, seed: "0123456789abcdef" }
 const SECOND = { paths: 1000, seed: "fedcba9876543210" }
@@ -61,6 +62,7 @@ beforeAll(async () => {
 	if (!saved.ok) throw new Error(saved.error.message)
 }, SLOW_MS)
 afterAll(disposeAssumptions)
+afterEach(settle, SLOW_MS)
 
 describe("a reread that changes only the chance inputs", () => {
 	test(

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import type { Balance, Read } from "../../lib/contract"
 import { formatDate } from "../../lib/format"
 import {
@@ -48,7 +49,7 @@ const totalColumns: Column<TrialBalanceTotal>[] = [
 >
 	<ReadView read={balance} label="The trial balance">
 		{#snippet children(data)}
-			{@const view = trialBalanceView(data.trialBalance)}
+			{@const view = trialBalanceView(data.trialBalance, currentAccountNames())}
 			{#if view === null}
 				<EmptyState title="No trial balance in this Snapshot" />
 			{:else}

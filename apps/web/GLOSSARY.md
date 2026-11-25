@@ -64,6 +64,10 @@ _Avoid_: window, zoom, range (the Plans page's Range is a different control)
 The `record-values` Edit with `preview: true`: the server runs `traj`'s dry run only and answers its result, with no write and no new Snapshot. The Review step shows it as what would be recorded, or every refused value at its row and column in the table.
 _Avoid_: simulation, validation, test run, draft
 
+**Account name**:
+The name the ledger gives an Account (`traj account list`), which every page shows in place of the id the plan holds it by. One lookup (`src/lib/view/account-names/`) is built from the Snapshot's accounts Read and nothing else, so a rename in the ledger shows once the Snapshot is read again. The ledger keeps names unique (`account_name_taken`); this only guards a Snapshot that breaks that: two Accounts that share a name are shown with their parents, the fewest that tell them apart ("Bank A › Savings"), and with the tail of their id when even the parents agree. An id the ledger does not name (an Account only the plan has, such as a home it buys) shows as the id, in code. Pickers keep the id as the value and show the name as the label, and an Edit still sends ids.
+_Avoid_: label, alias, display name (a name a person gives a plan item is a later change, #322)
+
 **Household**:
 The people a Scenario's dates are pinned to: one account holder, at most one partner, and any dependents, each with a birth month and a life expectancy. Its anchors write a date into a Scenario item, so the Dashboard shows the age it is pinned to. The page computes no age.
 _Avoid_: family, members, users, profile

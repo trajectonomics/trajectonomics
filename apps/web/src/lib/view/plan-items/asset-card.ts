@@ -16,8 +16,6 @@ import { assetSwitch, type GroupSwitch } from "./group-switch"
 export interface AssetCardView {
 	/** The Account's id, which the asset's name is. */
 	readonly id: string
-	/** Its ledger name when the Baseline holds it, else its id. */
-	readonly title: string
 	readonly owned: boolean
 	/** The Baseline's amount for an owned asset, or null. */
 	readonly baselineValue: string | null
@@ -69,12 +67,8 @@ function cardOf(
 	}
 	const owned = parts.purchase === null
 	const baselineValue = owned ? balanceOf(parts.account, baseline) : null
-	const named = baseline?.ok
-		? baseline.data.rows.find((row) => row.account.id === parts.account.id)
-		: undefined
 	return {
 		id: parts.account.id,
-		title: named?.account.name ?? parts.account.id,
 		owned,
 		baselineValue,
 		rows: assetRows(parts),
