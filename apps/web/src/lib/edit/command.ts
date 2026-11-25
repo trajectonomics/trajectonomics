@@ -2,7 +2,7 @@
  * The `traj` write each Edit runs: the argv, and the standard input the write reads. Pure; the Edit list is
  * `edit.ts`, and each Edit maps to one `traj` write here (a `scenario` write, or `account value` for the ledger) ([web ADR 0008](../../../docs/adr/0008-the-dashboard-edits-scenarios-through-traj-on-loopback.md)).
  */
-import { overrideTokens } from "../what-if/argv"
+import { decimalTokens, overrideTokens } from "../what-if/argv"
 import type { Edit } from "./edit"
 import { planCommand, startCommand } from "./plan-command"
 import { valuesDocument } from "./record-values"
@@ -25,7 +25,7 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 			const overrides =
 				edit.sets.length + edit.removals.length + edit.additions.length === 0
 					? []
-					: [...overrideTokens(edit), "--decimal"]
+					: [...overrideTokens(edit), ...decimalTokens(edit)]
 			return { argv: ["scenario", "fork", edit.from, edit.name, ...overrides, ...flags] }
 		}
 		case "apply-overrides":
@@ -36,7 +36,7 @@ export function writeCommand(edit: Edit, dryRun: boolean, template?: string): Wr
 					"apply",
 					edit.name,
 					...overrideTokens(edit),
-					"--decimal",
+					...decimalTokens(edit),
 					"--if-hash",
 					edit.contentHash,
 					...flags,

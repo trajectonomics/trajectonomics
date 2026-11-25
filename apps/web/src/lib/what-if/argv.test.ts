@@ -136,10 +136,20 @@ describe("the reads of a what-if", () => {
 		])
 	})
 
-	test("a what-if with no change reads the plan as it is, with no override flag but --decimal", () => {
+	test("a what-if with no change reads the plan as it is, with no override flag and no --decimal", () => {
 		const reads = whatIfReads(PARAMS, { plan: "base", sets: [], removals: [], additions: [] })
 		expect(reads.projection.argv).not.toContain("--without=flows.gym")
 		expect(reads.projection.argv.filter((token) => token.startsWith("--set"))).toEqual([])
-		expect(reads.projection.argv.at(-2)).toBe("--decimal")
+		for (const read of [reads.projection, reads.fi, reads.compare]) {
+			expect(read.argv).not.toContain("--decimal")
+		}
+	})
+
+	test("a what-if that only removes something carries no --decimal, which has no amount to read", () => {
+		const reads = whatIfReads(PARAMS, { ...WHAT_IF, sets: [] })
+		for (const read of [reads.projection, reads.fi, reads.compare]) {
+			expect(read.argv).toContain("--without=flows.gym")
+			expect(read.argv).not.toContain("--decimal")
+		}
 	})
 })

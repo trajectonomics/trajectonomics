@@ -43,6 +43,24 @@ describe("the what-if Edits", () => {
 		})
 	})
 
+	test("a copy or an apply that only removes something carries no --decimal", () => {
+		const copy = editSchema.parse({ kind: "copy-plan", from: "base", name: "early", removals })
+		expect(writeCommand(copy, false)).toEqual({
+			argv: ["scenario", "fork", "base", "early", "--without=flows.gym", "--json"],
+		})
+		const apply: Edit = {
+			kind: "apply-overrides",
+			name: "early",
+			contentHash: HASH,
+			sets: [],
+			removals,
+			additions: [],
+		}
+		expect(writeCommand(apply, false)).toEqual({
+			argv: ["scenario", "apply", "early", "--without=flows.gym", "--if-hash", HASH, "--json"],
+		})
+	})
+
 	test("apply-overrides is scenario apply with the what-if flags and --if-hash, and no document", () => {
 		const edit: Edit = {
 			kind: "apply-overrides",
