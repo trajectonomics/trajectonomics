@@ -1,6 +1,7 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ProjectionRun, Read } from "../../lib/contract"
+import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
 import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import Provenance from "../ui/Provenance.svelte"
@@ -14,12 +15,14 @@ interface Props {
 	names: readonly string[]
 	/** The Projections by Scenario name. */
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
+	/** The people of each Scenario's household, so a Return is named by role ("You", "Your partner"). */
+	people: Readonly<Record<string, PersonNames>>
 	/** The Scenario the address bar asks for; empty or unknown falls back to the first one. */
 	requested: string
 	onScenario: (name: string) => unknown
 }
 
-let { names, projections, requested, onScenario }: Props = $props()
+let { names, projections, people, requested, onScenario }: Props = $props()
 const options = $derived(names.map((value) => ({ value, label: value })))
 const name = $derived(chooseScenario(names, requested))
 /** The name the address bar asks for that is not one of the plans, said above the picker; none otherwise. */
@@ -34,7 +37,7 @@ const read = $derived(name === null ? undefined : projections[name])
 		{#if lens}<TaxWhatIf {lens} />{/if}
 		<ReadView read={scenarioRead} label={`The tax of ${scenario}`}>
 			{#snippet children(run)}
-				<TaxBodyView name={scenario} {run} />
+				<TaxBodyView name={scenario} {run} people={people[scenario] ?? NO_PEOPLE} />
 			{/snippet}
 		</ReadView>
 		<Provenance argv={scenarioRead.argv} />

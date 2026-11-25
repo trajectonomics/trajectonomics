@@ -34,6 +34,11 @@ export type TaxBracket = z.infer<typeof taxBracket>
 /** One Levy settlement period: what it owes, what was prepaid, and whether its settlement is in view. */
 export const taxYear = z.strictObject({
 	levy: z.string(),
+	/**
+	 * The Filer whose Return this Levy files, for a separate filing (cli ADR-0075); absent when the plan keeps one
+	 * Return, so a Snapshot saved by an earlier build still decodes.
+	 */
+	filer: z.string().optional(),
 	from: dateString,
 	to: dateString,
 	settlementDate: dateString,

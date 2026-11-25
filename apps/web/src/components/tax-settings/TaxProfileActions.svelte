@@ -1,11 +1,15 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import type { ScenarioShow } from "../../lib/contract"
+import type { ScenarioShow, TaxYear } from "../../lib/contract"
+import { personNames } from "../../lib/view/item-names"
+import { returnsOf } from "../../lib/view/tax"
+import { claimsTable } from "../../lib/view/tax-settings/claims"
 import { type GroupKey, groupCards } from "../../lib/view/tax-settings/groups"
 import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import { notStated } from "../../lib/view/tax-settings/not-stated"
 import { isTaxed } from "../../lib/view/tax-settings/rows"
+import TaxClaimsSection from "./TaxClaimsSection.svelte"
 import TaxDrawer from "./TaxDrawer.svelte"
 import TaxGroupCards from "./TaxGroupCards.svelte"
 import TaxLabelForm from "./TaxLabelForm.svelte"
@@ -18,11 +22,18 @@ interface Props {
 	show: ScenarioShow["scenario"]
 	/** Whether the page changes anything: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
+	/** The plan's tax years, whose assumptions the page echoes when two separate Returns share a home loan. */
+	years?: readonly TaxYear[]
 }
 
-let { name, show, editable }: Props = $props()
+let { name, show, editable, years = [] }: Props = $props()
 const profile = $derived(show.tax ?? null)
 const taxed = $derived(isTaxed(show))
+/** The people of the plan's household, and the per-Return claims of a separate filing; both absent for one Return. */
+const people = $derived(personNames(show.household))
+/** The Filers the projection states, one column each: a profile with no Filer's Levy shows no claims table. */
+const filers = $derived(returnsOf(years).map((one) => one.filer))
+const claims = $derived(profile === null ? null : claimsTable(profile, show.household, filers))
 // While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
 // with none labels them in the write that gives it tax, which the profile form carries.
 const unlabelled = $derived(unlabelledIncome(show.document))
@@ -50,6 +61,9 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 {/if}
 {#if editable && taxed && unlabelled.length > 0}
 	<TaxLabelForm {name} {show} disabled={wait} />
+{/if}
+{#if claims}
+	<TaxClaimsSection table={claims} {people} />
 {/if}
 {#if profile !== null}
 	<TaxGroupCards cards={groupCards(profile)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />

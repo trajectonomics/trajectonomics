@@ -1,52 +1,77 @@
 <script lang="ts">
 import type { ProjectionRun } from "../../lib/contract"
+import { type PersonNames, personText } from "../../lib/view/item-names"
 import {
 	addLevyCommand,
 	assumptionLines,
 	carryInRows,
+	returnOf,
+	returnsOf,
 	taxBody,
+	taxBodyOf,
 	taxStatusWords,
 } from "../../lib/view/tax"
 import Badge from "../ui/Badge.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
+import SegmentedControl from "../ui/SegmentedControl.svelte"
 import CarryInTable from "./CarryInTable.svelte"
-import TaxBracketChart from "./TaxBracketChart.svelte"
-import TaxChart from "./TaxChart.svelte"
-import TaxCurrent from "./TaxCurrent.svelte"
-import TaxHeadline from "./TaxHeadline.svelte"
-import TaxRateTable from "./TaxRateTable.svelte"
-import TaxTable from "./TaxTable.svelte"
+import TaxReturnBody from "./TaxReturnBody.svelte"
 
 interface Props {
 	name: string
 	run: ProjectionRun
+	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"), never by id. */
+	people: PersonNames
 }
 
-let { name, run }: Props = $props()
+let { name, run, people }: Props = $props()
+/** The Filer the person chose; empty opens on the first Return, the holder's (cli ADR-0075). */
+let chosen = $state("")
 const body = $derived(taxBody(run))
-const carry = $derived(carryInRows(run.carryIn ?? []))
-const assumptions = $derived(assumptionLines(run.taxYears))
+const returns = $derived(returnsOf(run.taxYears))
+/** Two or more Filers mean the plan files separately: one Return each, and a switch between them. */
+const separate = $derived(returns.length > 1)
+const picked = $derived(separate ? returnOf(returns, chosen) : null)
+const shown = $derived(picked === null ? body : taxBodyOf(picked.years, run.tax, run.asOf))
+const options = $derived(
+	returns.map((one) => ({ value: one.filer, label: personText(people, one.filer) })),
+)
+const years = $derived(picked?.years ?? run.taxYears)
+/** The Carry-in records of the Return on screen, and every record of a plan with one Return. */
+const carry = $derived(
+	carryInRows(run.carryIn ?? []).filter(
+		(row) => !separate || years.some((year) => year.levy === row.levy),
+	),
+)
+const assumptions = $derived(assumptionLines(years))
 </script>
 
-<!-- One Scenario's projection as the Tax page shows it: its Levy's years, or the empty state. -->
+<!-- One Scenario's projection as the Tax page shows it: one Return at a time when it files separately, else the plan's own. -->
 <div class="space-y-8">
 	<div class="flex flex-wrap items-center gap-2">
 		<Badge>{taxStatusWords(run.tax)}</Badge>
 	</div>
-	{#if body.kind === "no-levy"}
+	{#if separate}
+		<div class="space-y-2">
+			<p class="text-sm text-muted-foreground">
+				This plan files separately, so each person has their own Return. Choose one to read.
+			</p>
+			<SegmentedControl
+				name="return"
+				label="Return"
+				{options}
+				value={picked?.filer ?? ""}
+				onChange={(value) => (chosen = value)}
+			/>
+		</div>
+	{/if}
+	{#if shown.kind === "no-levy"}
 		<EmptyState title="No Levy in this Scenario">
 			<p>Its figures are before tax, because the Scenario has no Levy. Add Thailand's with:</p>
 			<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code>{addLevyCommand(name)}</code></pre>
 		</EmptyState>
 	{:else}
-		<TaxHeadline headline={body.headline} currency={run.currency} />
-		{#if body.current}<TaxCurrent year={body.current} currency={run.currency} />{/if}
-		<TaxTable rows={body.rows} currency={run.currency} />
-		{#if body.chart}
-			<TaxChart series={body.chart} />
-		{/if}
-		{#if body.brackets}<TaxBracketChart chart={body.brackets} />{/if}
-		{#if body.rates.length > 0}<TaxRateTable rows={body.rates} currency={run.currency} />{/if}
+		<TaxReturnBody body={shown} currency={run.currency} />
 	{/if}
 	{#if carry.length > 0}
 		<CarryInTable rows={carry} currency={run.currency} />

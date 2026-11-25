@@ -156,6 +156,14 @@ _Avoid_: tax settings, tax return, tax rules
 A person a joint Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own (cli ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
 _Avoid_: taxpayer, spouse
 
+**Return**:
+One Filer's Thai tax Levy of a separate filing, `th-2026-pit@<person>`, with its own taxable income, allowances, tax and prepayments as `traj` states them. The Tax page shows one Return at a time, chosen by a switch named by the household's role ("You", "Your partner"). A joint or single plan has one Return and no switch; a profile that files separately states each Return's claims in `returns` (cli ADR-0075).
+_Avoid_: tax return, filing, declaration
+
+**Who claims each allowance**:
+The table on the Tax profile page of a separate filing: one column per Return and one row per allowance, each cell the amount that Return's profile claims, from `returns`. It is what the profile stores, never what the tax rules applied, and the CLI's note on a shared home loan's ceiling shows under it when it states one.
+_Avoid_: allowance split, allocation
+
 **Assumptions**:
 The figures a plan rests on that are the person's own, in one place: inflation per year, and each asset Account's expected yearly return and swing. They are the document's `economy.inflation` and each Account's `rate` and `volatility`, saved as one `apply-plan` Edit. None is filled in for the person: `traj` ships none, and nor does the page.
 _Avoid_: settings, parameters, defaults, market data

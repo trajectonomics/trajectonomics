@@ -118,6 +118,13 @@ describe("the page over the Demo snapshot", () => {
 		expect(page).toContain("traj scenario tax base --tax th-2026")
 	})
 
+	test("a separate filing says each Return has its own ceilings, and points to the follow-up", () => {
+		const page = body(DEMO, "separate")
+		expect(page).toContain("Not read for a separate filing yet")
+		expect(page).toContain("Each Return has its own allowance ceilings")
+		expect(page).toContain("#635")
+	})
+
 	test("before the person chooses, no allowance is on and the page says nothing is read yet", () => {
 		const fresh = structuredClone(DEMO)
 		fresh.params.allowances = null
