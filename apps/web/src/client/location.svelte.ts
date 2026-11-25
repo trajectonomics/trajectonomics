@@ -19,3 +19,12 @@ export function currentSearch(): string {
 export function currentPathname(): string {
 	return visibleAddress().pathname
 }
+
+/**
+ * The fragment of the address bar without its "#", or "" when it has none. Reactive, so a note linked
+ * from Home highlights once the page it names has drawn it: the browser's `:target` is set before the
+ * note exists, so it alone would not mark it.
+ */
+export function currentHash(): string {
+	return (page.shallow?.url ?? page.url).hash.replace(/^#/, "")
+}
