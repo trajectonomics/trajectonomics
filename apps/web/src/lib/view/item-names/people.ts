@@ -51,3 +51,8 @@ export function personNames(household: HouseholdDocument | null): PersonNames {
 		}),
 	)
 }
+
+/** The words of a person by id, or the id itself for one the household does not name. */
+export function personText(people: PersonNames, id: string): string {
+	return people.get(id)?.label ?? id
+}

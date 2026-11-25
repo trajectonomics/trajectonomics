@@ -33,7 +33,8 @@ export interface Choices {
  */
 export async function openDemo(page: Page, path: string, choices: Choices): Promise<void> {
 	await chooseBeforeLoad(page, choices)
-	await page.goto(`${path}?demo=1`)
+	// A path that already names a query keeps it: `?demo=1` joins it, and never replaces what the caller asked for.
+	await page.goto(`${path}${path.includes("?") ? "&" : "?"}demo=1`)
 	await settle(page, choices.theme)
 }
 

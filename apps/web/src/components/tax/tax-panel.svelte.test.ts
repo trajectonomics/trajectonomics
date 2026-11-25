@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
+import type { HouseholdDocument } from "../../lib/contract"
 import { failed, ok, projectionRun } from "../../lib/view/compare/projection.test-support"
+import { personNames } from "../../lib/view/item-names"
 import { panel, withLevy, year } from "./tax-panel.test-support"
 
 describe("TaxPanel: the Scenario", () => {
@@ -20,6 +22,40 @@ describe("TaxPanel: the Scenario", () => {
 		expect(body).toContain('role="alert"')
 		expect(body).toContain("The Scenario is empty.")
 		expect(body).toContain('name="scenario"')
+	})
+})
+
+describe("TaxPanel: the Returns of a separate filing", () => {
+	const household: HouseholdDocument = {
+		schemaVersion: 2,
+		people: [
+			{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+			{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		],
+		anchors: [],
+		owners: [],
+	}
+	const separate = projectionRun({
+		taxYears: [
+			year({ levy: "th-2026-pit@me", filer: "me", due: "80000.00", owed: "80000.00" }),
+			year({ levy: "th-2026-pit@partner", filer: "partner", due: "4600.00", owed: "4600.00" }),
+		],
+	})
+	const people = { separate: personNames(household) }
+
+	test("shows one Return at a time, with a switch named by person through the item-name lookup", () => {
+		const body = panel({ separate: ok(separate) }, "separate", people)
+		expect(body).toContain('name="return"')
+		expect(body).toContain(">You<")
+		expect(body).toContain(">Your partner<")
+		expect(body).toContain("th-2026-pit@me")
+		expect(body).toContain("80,000.00")
+		expect(body).not.toContain("4,600.00")
+	})
+
+	test("a plan with one Return shows no switch", () => {
+		const body = panel({ base: ok(withLevy) })
+		expect(body).not.toContain('name="return"')
 	})
 })
 

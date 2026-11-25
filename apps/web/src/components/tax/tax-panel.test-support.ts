@@ -1,6 +1,7 @@
 import { render } from "svelte/server"
 import type { ProjectionRun, Read, TaxYear } from "../../lib/contract"
 import { projectionRun } from "../../lib/view/compare/projection.test-support"
+import type { PersonNames } from "../../lib/view/item-names"
 import TaxPanel from "./TaxPanel.svelte"
 
 export function year(over: Partial<TaxYear> = {}): TaxYear {
@@ -22,9 +23,16 @@ export function year(over: Partial<TaxYear> = {}): TaxYear {
 export function panel(
 	projections: Readonly<Record<string, Read<ProjectionRun>>>,
 	requested = "",
+	people: Readonly<Record<string, PersonNames>> = {},
 ): string {
 	return render(TaxPanel, {
-		props: { names: Object.keys(projections), projections, requested, onScenario: () => {} },
+		props: {
+			names: Object.keys(projections),
+			projections,
+			people,
+			requested,
+			onScenario: () => {},
+		},
 	}).body
 }
 

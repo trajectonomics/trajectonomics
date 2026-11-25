@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { ProjectionRun, Read } from "../../lib/contract"
+import { type PersonNames, personText } from "../../lib/view/item-names"
 import { type TaxRow, taxRows } from "../../lib/view/tax"
 import Badge from "../ui/Badge.svelte"
 import DataTable from "../ui/DataTable.svelte"
@@ -12,18 +13,25 @@ interface Props {
 	name: string
 	/** The plan's `projection run`, which the Snapshot already holds: every figure is its own. */
 	read: Read<ProjectionRun>
+	/** The household's people, so a separate filing's Return is named by role rather than by id. */
+	people: PersonNames
 }
 
-let { name, read }: Props = $props()
+let { name, read, people }: Props = $props()
+/** Whether the plan files separately: its years then name a Filer each, and the table says whose Return a row is. */
+const withReturn = $derived(read.ok && read.data.taxYears.some((year) => year.filer !== undefined))
 
-const columns: readonly Column<TaxRow>[] = [
+const RETURN_COLUMN: Column<TaxRow> = { key: "return", header: "Return", cell: returnCell }
+const COLUMNS: readonly Column<TaxRow>[] = [
 	{ key: "period", header: "Tax year", cell: periodCell },
 	{ key: "settles", header: "Settles", cell: settlesCell },
 	{ key: "due", header: "Due before prepayment", numeric: true, cell: dueCell },
 	{ key: "owed", header: "Owed", numeric: true, cell: owedCell },
 ]
+const columns = $derived(withReturn ? [RETURN_COLUMN, ...COLUMNS] : COLUMNS)
 </script>
 
+{#snippet returnCell(row: TaxRow)}{row.filer === null ? "—" : personText(people, row.filer)}{/snippet}
 {#snippet periodCell(row: TaxRow)}{row.period}{/snippet}
 {#snippet settlesCell(row: TaxRow)}{row.settles}{/snippet}
 {#snippet dueCell(row: TaxRow)}<Money amount={row.due} />{/snippet}

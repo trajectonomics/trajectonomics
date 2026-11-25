@@ -19,6 +19,7 @@ describe("scenarioNames", () => {
 		expect(scenarioNames({ status: "ready", url: "/demo/snapshot.json", snapshot })).toEqual([
 			"base",
 			"retire-early",
+			"separate",
 		])
 	})
 

@@ -90,7 +90,7 @@ export {
 } from "./scenario-show"
 export type { Snapshot, SnapshotParams, SnapshotReads } from "./snapshot"
 export { SNAPSHOT_VERSION, snapshot, snapshotParams, snapshotReads } from "./snapshot"
-export type { TaxAllowances, TaxProfile } from "./tax-profile"
+export type { ReturnClaims, TaxAllowances, TaxProfile } from "./tax-profile"
 export { taxAllowances, taxProfile } from "./tax-profile"
 export type { Assumption, TaxBracket, TaxWalk, TaxYear } from "./tax-year"
 export { taxYear } from "./tax-year"

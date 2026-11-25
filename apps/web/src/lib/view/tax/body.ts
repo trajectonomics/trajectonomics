@@ -1,5 +1,5 @@
 import type { LineSeries } from "../../chart/line"
-import type { ProjectionRun } from "../../contract"
+import type { ProjectionRun, TaxYear } from "../../contract"
 import { type BracketChart, bracketChart } from "./bracket-chart"
 import { type CurrentYear, currentYear } from "./current-year"
 import { type RateRow, rateRows } from "./rate-rows"
@@ -24,16 +24,25 @@ export type TaxBody =
 
 /** The Tax page's body for a projection: no Levy when the result has no tax years, else its years. */
 export function taxBody(run: ProjectionRun): TaxBody {
-	const headline = taxHeadline(run.taxYears)
-	if (run.tax === "not_applied" || headline === null) return { kind: "no-levy" }
+	return taxBodyOf(run.taxYears, run.tax, run.asOf)
+}
+
+/** One Return's body: its own years, with the projection's tax status and As-of, so a switch shows one Return at a time. */
+export function taxBodyOf(
+	years: readonly TaxYear[],
+	tax: ProjectionRun["tax"],
+	asOf: string,
+): TaxBody {
+	const headline = taxHeadline(years)
+	if (tax === "not_applied" || headline === null) return { kind: "no-levy" }
 	return {
 		kind: "levies",
 		headline,
-		rows: taxRows(run.taxYears),
-		chart: taxChart(run.taxYears),
-		current: currentYear(run.taxYears, run.asOf),
-		brackets: bracketChart(run.taxYears),
-		rates: rateRows(run.taxYears),
+		rows: taxRows(years),
+		chart: taxChart(years),
+		current: currentYear(years, asOf),
+		brackets: bracketChart(years),
+		rates: rateRows(years),
 	}
 }
 
