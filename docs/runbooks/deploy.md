@@ -1,23 +1,27 @@
 # Deploy runbook
 
-The Site (`apps/site`, worker `site`), the Docs Portal (`apps/docs`, worker `docs`) and the blog
-(`apps/blog`, worker `blog`) deploy to Cloudflare Workers from this repository's CI:
-`.github/workflows/deploy.yml`. Cloudflare's own Git integration (Workers Builds) is not used, so the
-whole deploy is configured and reviewed here. `trajectonomics-web-router` routes trajectonomics.com to
-the workers by name, so a deploy changes nothing in the router.
+The Site (`apps/site`, worker `site`), the Docs Portal (`apps/docs`, worker `docs`), the blog
+(`apps/blog`, worker `blog`) and the MooJot landing site (`apps/openjot/site`, worker `moojot-site`)
+deploy to Cloudflare Workers from this repository's CI: `.github/workflows/deploy.yml`. Cloudflare's
+own Git integration (Workers Builds) is not used, so the whole deploy is configured and reviewed
+here. `trajectonomics-web-router` routes trajectonomics.com to the workers by name, so a deploy
+changes nothing in the router.
 
 ## How deploys happen
 
 - **Off until switched on.** Nothing runs while the repository variable `DEPLOYS_ENABLED` is not
   `true`.
 - **Push to main.** Each app deploys when its folder changed, or a shared input did:
-  `packages/brand`, `tooling/config`, `bun.lock`, the root `package.json` or `turbo.json`.
+  `packages/brand`, `tooling/config`, `bun.lock`, the root `package.json` or `turbo.json`. The
+  landing site is the exception: it has no build and no workspace imports, so only
+  `apps/openjot/site` counts.
 - **By hand.** From main, deploy one app or all of them:
   ```sh
-  gh workflow run deploy.yml --ref main -f app=all    # or site, docs, blog
+  gh workflow run deploy.yml --ref main -f app=all    # or site, docs, blog, openjot
   ```
 - **Build.** `bunx turbo run build --filter=@trajectonomics/<app>`, which builds `packages/brand`
-  first (every app imports its `dist/current/`), then `bunx wrangler deploy` in the app folder.
+  first (every app imports its `dist/current/`), then `bunx wrangler deploy` in the app folder. The
+  landing site has nothing to build: it deploys with `bunx wrangler deploy` in `apps/openjot/site`.
 - **Roll back.** Revert the commit on main (a new deploy follows), or in the Cloudflare dashboard
   open the worker → **Deployments** and roll back to an earlier version.
 
@@ -35,15 +39,15 @@ the workers by name, so a deploy changes nothing in the router.
    The account ID is on the dashboard's **Workers & Pages** overview, or comes from
    `curl -s -H "Authorization: Bearer $TOKEN" https://api.cloudflare.com/client/v4/accounts`.
 3. **First deploy.** `gh workflow run deploy.yml --ref main -f app=all`, then open
-   trajectonomics.com and docs.trajectonomics.com. `/contribute/tax/` exists only in builds from
-   this repository, so it answering 200 proves the new deploy is live. `trajectonomics.com/docs/contribute/tax/`
-   should answer 301 to that page. The docs Worker attaches `docs.trajectonomics.com` as a custom domain
-   on deploy. That creates the DNS record, so the hostname must not already be a CNAME, and the API
-   token needs permission to attach a custom domain on the `trajectonomics.com` zone. The router keeps
-   forwarding `/docs`; do not remove that mount.
-4. **Disconnect the old Git integration (optional).** In each worker's **Settings → Build**,
-   disconnect the old `trajectonomics/site` and `trajectonomics/docs` repositories, so no build from
-   them can overwrite a CI deploy.
+   trajectonomics.com, docs.trajectonomics.com and moojot.trajectonomics.com. `/contribute/tax/` exists
+   only in builds from this repository, so it answering 200 proves the new deploy is live.
+   `trajectonomics.com/docs/contribute/tax/` should answer 301 to that page. The docs Worker attaches
+   `docs.trajectonomics.com` as a custom domain on deploy. That creates the DNS record, so the hostname
+   must not already be a CNAME, and the API token needs permission to attach a custom domain on the
+   `trajectonomics.com` zone. The router keeps forwarding `/docs`; do not remove that mount.
+4. **Disconnect the old Git integrations (optional).** In each worker's **Settings → Build**,
+   disconnect the old `trajectonomics/site`, `trajectonomics/docs` and `trajectonomics/moojot`
+   repositories, so no build from them can overwrite a CI deploy.
 
 ## The blog's first deploy
 

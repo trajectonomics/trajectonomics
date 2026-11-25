@@ -1,0 +1,136 @@
+name: openjot
+# MooJot's checks: the SvelteKit frontend, the screenshot baselines and the Rust
+# library tests. It runs only when the app, the root lockfile or this workflow
+# changes, so the rest of the monorepo does not pay for it.
+
+on:
+  pull_request:
+    paths:
+      - "apps/openjot/**"
+      - "bun.lock"
+      - ".github/workflows/openjot.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/openjot/**"
+      - "bun.lock"
+      - ".github/workflows/openjot.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openjot-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Frontend (check, unit, build, e2e)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        working-directory: apps/openjot
+        run: bun run check
+
+      - name: Unit tests
+        working-directory: apps/openjot
+        run: bun run test
+
+      - name: Build
+        working-directory: apps/openjot
+        run: bun run build
+
+      # Headless Chrome is preinstalled on GitHub's Ubuntu runners.
+      - name: Swipe width regression test
+        working-directory: apps/openjot
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: bun run test:e2e
+
+  screenshots:
+    name: Screenshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      # Compares every scene in tests/screenshots/scenes.mjs with the committed
+      # baseline. The baselines are made on this runner (see the steps below),
+      # because text rendering differs between machines.
+      - name: Screenshot test
+        id: compare
+        working-directory: apps/openjot
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: bun run test:screenshots
+
+      - name: Upload the diff report
+        if: failure() && steps.compare.outcome == 'failure'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshot-diff
+          path: apps/openjot/tests/screenshots/output
+          if-no-files-found: ignore
+
+      # The baselines as this runner draws them. When the change is intended,
+      # download this artifact over tests/screenshots/baseline and commit it.
+      - name: Make baselines on this runner
+        if: failure() && steps.compare.outcome == 'failure'
+        working-directory: apps/openjot
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: bun run test:screenshots:update --no-build
+
+      - name: Upload the new baselines
+        if: failure() && steps.compare.outcome == 'failure'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshot-baselines
+          path: apps/openjot/tests/screenshots/baseline
+
+  rust:
+    name: Rust tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Linux libraries for host tests
+        run: sudo apt-get update && sudo apt-get install -y pkg-config libdbus-1-dev libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - uses: dtolnay/rust-toolchain@stable # TODO pin SHA
+
+      - uses: Swatinem/rust-cache@v2 # TODO pin SHA
+        with:
+          workspaces: apps/openjot/src-tauri
+
+      # tauri::generate_context! needs frontendDist (../build) to exist; the
+      # tests don't need the real frontend, so an empty folder is enough.
+      - name: Placeholder frontend
+        run: mkdir -p apps/openjot/build
+
+      - name: cargo test
+        working-directory: apps/openjot/src-tauri
+        run: cargo test --lib

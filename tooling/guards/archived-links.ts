@@ -12,6 +12,7 @@ export const ARCHIVED_REPOS = [
 	"design-system",
 	"goals",
 	"blog",
+	"moojot",
 ] as const
 
 /**

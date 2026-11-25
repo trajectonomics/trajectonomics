@@ -8,6 +8,7 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 - [`apps/docs`](apps/docs/AGENTS.md): the docs portal (Worker `docs`, `@trajectonomics/docs`).
 - [`apps/blog`](apps/blog/AGENTS.md): the blog at blog.trajectonomics.com (Worker `blog`, static Astro).
 - [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never published; its hosted Demo build is served as static pages by the Site).
+- [`apps/openjot`](apps/openjot/AGENTS.md): MooJot, the Android app: Tauri 2, a SvelteKit 2 frontend, Rust for the engine and Kotlin for the Android-native parts (still named MooJot until trajectonomics/moojot#97).
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
 - `packages/core`: `@trajectonomics/core`, the engine bundle the CLI builds on (private, not published). It bundles the four packages below as subpath exports (`/money`, `/ledger`, `/tax`, `/sim`).
   - [`packages/core/money`](packages/core/money/AGENTS.md), [`packages/core/ledger`](packages/core/ledger/AGENTS.md), [`packages/core/tax`](packages/core/tax/AGENTS.md), [`packages/core/sim`](packages/core/sim/AGENTS.md): private workspace packages.
