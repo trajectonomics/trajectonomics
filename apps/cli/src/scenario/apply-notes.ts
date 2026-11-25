@@ -1,5 +1,5 @@
 import { isPlainObject } from "../json"
-import { TAX_LEVY_ID } from "./tax/levy"
+import { isTaxLevyId } from "./tax/levy-ids"
 
 /** The ids of the Levies a document holds; anything that is not a Levy list holds none. */
 function levyIds(document: unknown): string[] {
@@ -30,7 +30,7 @@ export function removedLevyNotes(
 	if (storedDocument === undefined) return []
 	const kept = new Set(levyIds(applied))
 	const removed = levyIds(parsed(storedDocument)).filter((id) => !kept.has(id))
-	const again = removed.includes(TAX_LEVY_ID) ? "; run traj scenario tax again" : ""
+	const again = removed.some(isTaxLevyId) ? "; run traj scenario tax again" : ""
 	const be = dryRun ? "would be" : "was"
 	return removed.map((id) =>
 		kept.size === 0

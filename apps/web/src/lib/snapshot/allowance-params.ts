@@ -55,10 +55,32 @@ export function checkAllowances(
 	return { code: "invalid_allowances", message: parsed.error.issues[0]?.message ?? MESSAGE.labels }
 }
 
-/** Whether a plan's Levy reads Filer labels: some Flow carries a tax label with its `@<filer>` suffix. */
+/** A Levy of a document, as much as the page reads: its `tally` measures' labels. */
+function tallyLabels(levy: unknown): string[] {
+	if (levy === null || typeof levy !== "object") return []
+	const measures = (levy as { measures?: unknown }).measures
+	if (!Array.isArray(measures)) return []
+	return measures.flatMap((measure) => {
+		if (measure === null || typeof measure !== "object") return []
+		const { op, label } = measure as { op?: unknown; label?: unknown }
+		return op === "tally" && typeof label === "string" ? [label] : []
+	})
+}
+
+/** Whether a document's Levies tally a label under a Filer suffix, as the CLI's `hasFilerLevy` reads them. */
+function hasFilerLevy(levies: readonly unknown[]): boolean {
+	return levies.some((levy) => tallyLabels(levy).some((label) => bareLabelOf(label) !== label))
+}
+
+/**
+ * Whether a plan's Return reads Filer labels: some Flow carries a tax label with its `@<filer>` suffix,
+ * or a Levy's own `tally` measures do. The Levy is the rule of record once its labels are written (the
+ * same rule as `hasFilerLevy` in `traj`, cli ADR-0075); a Flow-only plan is a Filer plan too.
+ */
 export function isFilerPlan(plan: ScenarioDocument | null | undefined): boolean {
 	if (plan == null) return false
-	return plan.flows.some(
+	const flow = plan.flows.some(
 		(flow) => flow.label !== undefined && bareLabelOf(flow.label) !== flow.label,
 	)
+	return flow || hasFilerLevy(plan.levies ?? [])
 }

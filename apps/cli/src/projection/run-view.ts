@@ -4,7 +4,7 @@ import { type AccountLifetimeView, accountLifetimesField, lifetimeFeesField } fr
 import { dateField } from "./money"
 import { type RoutingView, routingField } from "./routing-view"
 import { type ProjectionTable, projectionTable } from "./run-table-view"
-import { type TaxYearView, taxYearsField } from "./tax-view"
+import { type TaxYearView, taxYearsField } from "./tax-year-view"
 import {
 	asOfField,
 	type Echo,
@@ -19,7 +19,7 @@ import {
 
 export type { AnnualRow, MonthlyRow } from "./rows-view"
 export { type ProjectionTable, projectionTable } from "./run-table-view"
-export type { TaxYearView } from "./tax-view"
+export type { TaxYearView } from "./tax-year-view"
 
 /** `traj projection run`: the Projection plus the echo block (ADR-0030). */
 export type ProjectionRunView = Echo & {
