@@ -1,5 +1,6 @@
 import type { AmountRow, Pnl } from "../../contract"
 import { formatDate } from "../../format"
+import { type AccountNames, NO_NAMES, refLabel } from "../account-names"
 
 /** One P&L row: an income or expense account with the CLI's amount, sign unchanged. */
 export interface PnlLine {
@@ -20,12 +21,12 @@ export interface PnlView {
 }
 
 /** The P&L report as the page shows it: income rows first, then expense rows, then the totals. */
-export function pnlView(report: Pnl): PnlView {
+export function pnlView(report: Pnl, names: AccountNames = NO_NAMES): PnlView {
 	return {
 		period: periodOf(report.since, report.until),
 		project: report.project,
-		income: linesOf(report.rows, "income"),
-		expense: linesOf(report.rows, "expense"),
+		income: linesOf(report.rows, "income", names),
+		expense: linesOf(report.rows, "expense", names),
 		totals: report.totals.map((total) => ({ ...total })),
 	}
 }
@@ -36,12 +37,16 @@ export function periodOf(since: string | null, until: string): string {
 	return `${start} to ${formatDate(until)}`
 }
 
-function linesOf(rows: readonly AmountRow[], type: AmountRow["type"]): PnlLine[] {
+function linesOf(
+	rows: readonly AmountRow[],
+	type: AmountRow["type"],
+	names: AccountNames,
+): PnlLine[] {
 	return rows
 		.filter((row) => row.type === type)
 		.map((row, index) => ({
 			key: `${type}:${index}`,
-			account: row.account.name,
+			account: refLabel(names, row.account),
 			currency: row.currency,
 			amount: row.amount,
 		}))

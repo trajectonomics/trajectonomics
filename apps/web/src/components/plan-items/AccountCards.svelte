@@ -1,6 +1,9 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { nameOf } from "../../lib/view/account-names"
 import type { AccountCard } from "../../lib/view/plan-items/accounts"
 import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
+import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
 import WasText from "../what-if/WasText.svelte"
@@ -21,6 +24,7 @@ interface Props {
 }
 
 let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }: Props = $props()
+const names = $derived(currentAccountNames())
 </script>
 
 <ul class="grid gap-3 sm:grid-cols-2">
@@ -28,11 +32,11 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 		{@const mark = marks[card.id] ?? NO_MARKS}
 		<li class="rounded-lg border border-border bg-card p-4 {mark.off ? 'opacity-60' : ''}">
 			<div class="flex items-start justify-between gap-3">
-				<h2 class="font-semibold break-all">{card.id}</h2>
+				<h2 class="font-semibold break-all"><AccountName id={card.id} /></h2>
 				{#if editable}
 					<button
 						type="button"
-						aria-label="Edit {card.id}"
+						aria-label="Edit {nameOf(names, card.id)}"
 						onclick={() => onEdit(card.id)}
 						class="shrink-0 rounded-md border border-border px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
 					>
@@ -68,7 +72,7 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 			</dl>
 			<AccountYears years={card.years} {currency} />
 			{#if editable}
-				<ItemSwitch {plan} {contentHash} path="accounts.{card.id}" label={card.id} onTry={() => onTry(card.id)} />
+				<ItemSwitch {plan} {contentHash} path="accounts.{card.id}" label={nameOf(names, card.id)} onTry={() => onTry(card.id)} />
 			{/if}
 		</li>
 	{/each}

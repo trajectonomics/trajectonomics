@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
-import { chooseScenario } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import WithdrawalsPlan from "./WithdrawalsPlan.svelte"
 

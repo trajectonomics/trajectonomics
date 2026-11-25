@@ -1,6 +1,6 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import ReportView from "../reports/ReportView.svelte"
 import PageShell from "../ui/PageShell.svelte"
 
@@ -20,7 +20,7 @@ let { scenario, terms }: Props = $props()
 	intro="Download a table of the selected plan as CSV or JSON, or print this page. Every figure is one traj stated: nothing is added, rounded or reformatted."
 >
 	{#snippet children(snapshot)}
-		{@const plan = chooseScenario(projectionNames(snapshot.reads.projections), scenario)}
+		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{#if plan === null}
 			<p role="status" class="text-muted-foreground">The Snapshot holds no plan to report on.</p>
 		{:else}

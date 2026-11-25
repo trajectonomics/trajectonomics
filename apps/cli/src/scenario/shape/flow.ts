@@ -1,3 +1,4 @@
+import { EXPENSE_CATEGORY_RULE } from "@trajectonomics/core/sim"
 import { labelSetsSentence } from "../tax/labels"
 import { fundingShape } from "./flow-funding"
 import { cappedPrepaymentShape, deriveShape, levelShape, prepaymentsShape } from "./flow-parts"
@@ -52,8 +53,7 @@ export const flowShape: Record<string, unknown> = {
 			type: "string",
 			minLength: 1,
 			maxLength: 64,
-			description:
-				"Expense only: a free-text group for reports, 1 to 64 characters with no control characters. It changes no figure; the engine never reads it.",
+			description: `Expense only: a group name for reports, written as ${EXPENSE_CATEGORY_RULE}. It changes no figure; the engine never reads it.`,
 		},
 		target: {
 			type: "string",

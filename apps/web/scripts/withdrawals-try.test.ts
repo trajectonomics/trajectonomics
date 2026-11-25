@@ -1,9 +1,10 @@
 // Trying another way on the Withdrawals page, and keeping it, against the real traj (cli ADR 0062, 0063; web ADR 0010, 0013).
 // Each test saves the rule it needs first, so any of them passes when run alone.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { withdrawalsView } from "../src/lib/view/withdrawals"
 import { draftOf } from "../src/lib/view/withdrawals/draft"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	contextOf,
 	guardrails,
@@ -21,6 +22,7 @@ beforeAll(async () => {
 	await setupWithdrawals()
 }, SLOW_MS)
 afterAll(disposeWithdrawals)
+afterEach(settle, SLOW_MS)
 
 describe("trying another way, and keeping it", () => {
 	slow(

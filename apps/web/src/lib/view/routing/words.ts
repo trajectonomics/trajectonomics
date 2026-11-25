@@ -3,7 +3,7 @@
  * hide-amounts switch masks them. An amount is the document's decimal string as typed or stored, never computed (ADR 0002).
  */
 import { formatBps, percentWords } from "../../format"
-import { nameOf } from "./accounts"
+import { type AccountNames, nameOf } from "../account-names"
 import { amountOf, type Entry, entryAccount, isReal, type Step, type Target } from "./entries"
 
 /** A piece of a sentence: words, or a money amount the page formats and masks. */
@@ -22,12 +22,7 @@ function realWords(target: Target | undefined): string {
 }
 
 /** The surplus step at `index` of `count` in a sentence: "Fill Emergency fund up to 300,000 in today's money". */
-export function stepWords(
-	step: Step,
-	index: number,
-	count: number,
-	names: ReadonlyMap<string, string>,
-): Part[] {
+export function stepWords(step: Step, index: number, count: number, names: AccountNames): Part[] {
 	const name = nameOf(names, step.account)
 	const cap: Part[] =
 		step.upTo === undefined
@@ -43,11 +38,7 @@ export function stepWords(
 }
 
 /** The `withdraw` entry at `index` in a sentence: "Take from Funds", "Take from Savings, down to ...", "Then the rest of Savings". */
-export function entryWords(
-	list: readonly Entry[],
-	index: number,
-	names: ReadonlyMap<string, string>,
-): Part[] {
+export function entryWords(list: readonly Entry[], index: number, names: AccountNames): Part[] {
 	const entry = list[index]
 	if (entry === undefined) return []
 	const name = nameOf(names, entryAccount(entry))

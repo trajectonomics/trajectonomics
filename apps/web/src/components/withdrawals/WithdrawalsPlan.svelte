@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import { currentSearch } from "../../client/location.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
@@ -46,7 +47,7 @@ const ctx = $derived(
 				doc: doc.data.scenario.document,
 				asOf: snapshot.params.asOf,
 				milestoneDates: milestoneDatesOf(run?.ok ? run.data : null),
-				baseline: snapshot.reads.baseline,
+				names: currentAccountNames(),
 			}
 		: null,
 )

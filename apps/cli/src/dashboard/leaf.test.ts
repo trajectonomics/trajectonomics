@@ -25,6 +25,8 @@ const SNAPSHOT = {
 				["projection", "run", "--scenario", "base", "--breakdown", "--liabilities", "--json"],
 				false,
 			),
+			// A Scenario with a Milestone, so the Snapshot's reads carry the milestones table (cli ADR-0049).
+			milestoned: read(["projection", "run", "--scenario", "milestoned", "--json"], true),
 		},
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
@@ -68,7 +70,7 @@ describe("traj dashboard", () => {
 			url: "http://127.0.0.1:4321/",
 			asOf: "2026-11-30",
 			horizon: "2056-11-30",
-			reads: 11,
+			reads: 12,
 			failedReads: ["traj projection run --scenario base --breakdown --liabilities --json"],
 		})
 		expect(calls[0]?.port).toBe(DEFAULT_PORT)

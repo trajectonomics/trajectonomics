@@ -4,6 +4,7 @@ import { scenarioDocument } from "./document-form"
 import { ACCOUNT_PERCENT_UNITS, ACCOUNT_RATE_UNITS } from "./shape/account-terms"
 import { ESTATE_PERCENT_UNITS, ESTATE_RATE_UNITS, ESTATE_UNITS } from "./shape/estate-terms"
 import {
+	CRITERION_UNITS,
 	MINOR_UNITS,
 	PERCENT_UNITS,
 	PRINCIPAL_UNITS,
@@ -18,7 +19,7 @@ import {
  * Which fields of a Scenario document are money (ADR-0047), and which are a Spending rule's, an
  * estate line's or an Account's payout or fee rates, or a surplus step's share (cli ADR-0063, ADR-0064, ADR-0067, ADR-0070). Nothing lists them by hand: a money field is a node of the published document
  * schema whose description starts with one of the money units (MINOR_UNITS, PRINCIPAL_UNITS for a
- * loan's principal, YEARLY_UNITS for a rule's bound), and a rule rate one whose description starts
+ * loan's principal, YEARLY_UNITS for a rule's bound, CRITERION_UNITS for a Milestone's threshold), and a rule rate one whose description starts
  * with RULE_RATE_UNITS, so the decimal conversion and `traj schema` read the same schema and cannot
  * drift, and a new field is converted as soon as it is published. No other rate is converted.
  */
@@ -26,6 +27,7 @@ import {
 /** The units a money field's description may start with. A new unit is added here and nowhere else. */
 const MONEY_UNITS: readonly string[] = [
 	MINOR_UNITS,
+	CRITERION_UNITS,
 	PRINCIPAL_UNITS,
 	YEARLY_UNITS,
 	ROUTED_UNITS,

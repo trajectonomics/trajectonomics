@@ -20,11 +20,15 @@ describe("lineLayout markers", () => {
 		expect(layout?.xPixels).toEqual([0, 150, 300])
 	})
 
-	test("widens the x axis to take in a marker before the first point, and moves the points with it", () => {
+	test("does not widen the x axis for a marker before the first point, so the points do not move", () => {
 		const layout = lineLayout([series], FLAT, [{ x: -0.5, label: "early" }])
-		// The domain is now -0.5..2, a span of 2.5, so the first point is 0.5 of 2.5 across.
-		expect(layout?.markers[0]?.x).toBe(0)
-		expect(layout?.xPixels[0]).toBeCloseTo(60, 10)
+		expect(layout?.xPixels).toEqual([0, 150, 300])
+		expect(layout?.series[0]?.marks[0]?.x).toBe(0)
+	})
+
+	test("stands a marker after the last point on the right edge, with its label", () => {
+		const layout = lineLayout([series], FLAT, [{ x: 2.4, label: "late" }])
+		expect(layout?.markers).toEqual([{ x: 300, label: "late" }])
 		expect(layout?.xPixels.at(-1)).toBe(300)
 	})
 

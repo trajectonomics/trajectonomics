@@ -1,4 +1,5 @@
 import type { Snapshot } from "../../contract"
+import { type AccountNames, accountNames, refLabel } from "../account-names"
 import { accountGroups, type ListedAccount } from "../ledger/account-tree"
 import type { SheetGroup, SheetRow } from "./types"
 
@@ -51,7 +52,11 @@ function hasValue(
  * The open asset and liability Leaf Accounts as rows, grouped by the top-level account each sits under, in
  * the order the account tree lists them. The ledger's own names title the groups; the page reads no word in them.
  */
-export function rowsByGroup(snapshot: Snapshot, listed: readonly ListedAccount[]): SheetGroup[] {
+export function rowsByGroup(
+	snapshot: Snapshot,
+	listed: readonly ListedAccount[],
+	names: AccountNames = accountNames(snapshot.reads.accounts),
+): SheetGroup[] {
 	const { balance } = snapshot.reads
 	const byId = new Map(listed.map((account) => [account.id, account]))
 	const balances = new Map(
@@ -65,7 +70,7 @@ export function rowsByGroup(snapshot: Snapshot, listed: readonly ListedAccount[]
 		const { key, title } = groupOf(account, byId)
 		const row: SheetRow = {
 			id: account.id,
-			name: account.name,
+			name: refLabel(names, account),
 			currency: account.currency,
 			balance: balances.get(account.id) ?? null,
 			lastDate: dates.get(account.id) ?? null,

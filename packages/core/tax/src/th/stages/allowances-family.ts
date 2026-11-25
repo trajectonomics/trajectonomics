@@ -1,5 +1,5 @@
 import { type ClampedAmount, clampCap } from "../../core/caps"
-import { validateMonetaryAmount } from "../../core/money"
+import { TaxValidationError, validateMonetaryAmount } from "../../core/money"
 import { TH_2026_PARAMETERS } from "../parameters"
 import {
 	ThAllowanceField,
@@ -49,6 +49,18 @@ function computeChildAllowance(children: ThAllowancesInput["children"]): Clamped
 	return unclamped(count * p.basePerChild + bonus * p.bonusSecondPlusBorn2018OrLater)
 }
 
+const countNamed = (...slots: (boolean | undefined)[]) => slots.filter(Boolean).length
+const refusesSpouseSlots = (status: ThFilingStatus) => status.startsWith("married_separate")
+
+/**
+ * Counts the parents a Return claims from the object form of `parents`.
+ *
+ * Purpose: A joint Return names both spouses' parents (s.47(1)(ญ)); a separate Return names only
+ * the Filer's own, so a spouse slot on it is refused instead of dropped (tax ADR 0010).
+ * Math: One for each named slot the status admits; the count form is the number as given.
+ * Units: Counts of persons.
+ * Throws: TaxValidationError at `allowance.parents.spouse` for a spouse slot on a separate status.
+ */
 function computeParentCount(
 	parents: ThParentsInput | number | undefined,
 	status: ThFilingStatus,
@@ -58,11 +70,17 @@ function computeParentCount(
 		validateMonetaryAmount(parents, ThAllowanceField.Parents)
 		return Math.floor(parents)
 	}
-	let count = (parents.taxpayerFather ? 1 : 0) + (parents.taxpayerMother ? 1 : 0)
-	if (status === "married_no_income_spouse") {
-		count += (parents.spouseFather ? 1 : 0) + (parents.spouseMother ? 1 : 0)
+	const own = countNamed(parents.taxpayerFather, parents.taxpayerMother)
+	const spouse = countNamed(parents.spouseFather, parents.spouseMother)
+	if (refusesSpouseSlots(status) && spouse > 0) {
+		throw new TaxValidationError(
+			ThAllowanceField.ParentsSpouseSlot,
+			spouse,
+			"A separate Return claims only the Filer's own parents",
+		)
 	}
-	return count
+	const claimsSpouse = status === "married_no_income_spouse" || status === "married_joint"
+	return own + (claimsSpouse ? spouse : 0)
 }
 
 /**

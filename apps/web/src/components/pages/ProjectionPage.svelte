@@ -1,6 +1,6 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
-import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { chooseScenario } from "../../lib/view/plan"
 import { baselineRun } from "../../lib/view/what-if/baseline"
 import { ALL_YEAR_FIGURES } from "../../lib/view/what-if/years"
 import HouseholdSection from "../household/HouseholdSection.svelte"
@@ -31,13 +31,14 @@ let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = 
 	intro="One Scenario projected year by year, in nominal and real terms, with its notes and tax status."
 >
 	{#snippet children(snapshot)}
-		{@const plan = chooseScenario(projectionNames(snapshot.reads.projections), scenario)}
+		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}
 		{@const lens = plan === null ? null : whatIfSession.lensFor(plan)}
 		{#if lens && plan !== null}
 			<ProjectionWhatIf {lens} baseline={baselineRun(snapshot, plan)} {terms} keys={ALL_YEAR_FIGURES} />
 		{/if}
 		<HouseholdSection {snapshot} {scenario} {editable} />
 		<ProjectionView
+			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
 			{scenario}
 			{onScenario}
@@ -45,7 +46,6 @@ let { scenario, editable, onScenario, terms, onTerms, chart, onChart }: Props = 
 			{onTerms}
 			{chart}
 			{onChart}
-			accounts={snapshot.reads.accounts}
 		/>
 	{/snippet}
 </PageShell>

@@ -35,15 +35,13 @@ function allArgvs(overrides: Partial<PlanInput>): string[][] {
 	const one = stageOne("2026-10-31", ["base", "retire-early"])
 	const two = planStageTwo(result.params, one)
 	const first = Object.values(planStageOne(result.params)).map((read) => read.argv)
-	const reads = [
-		two.doctor,
-		two.balance,
-		two.pnl,
-		two.transactions,
-		two.baseline,
-		...two.netWorthHistory,
+	const reads = [two.doctor, two.balance, two.pnl, two.transactions, two.baseline]
+	const rest = [
+		two.netWorthHistory,
+		...Object.values(two.projections),
+		...Object.values(two.fi),
+		two.compare,
 	]
-	const rest = [...Object.values(two.projections), ...Object.values(two.fi), two.compare]
 	return [
 		...first,
 		...reads.map((read) => read.argv),

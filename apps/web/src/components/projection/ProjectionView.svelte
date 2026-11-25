@@ -1,13 +1,15 @@
 <script lang="ts">
-import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
-import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
-import { chooseScenario, projectionNames } from "../../lib/view/projection/scenario"
+import { currentAccountNames } from "../../client/account-names.svelte.js"
+import type { ProjectionRun, Read } from "../../lib/contract"
+import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
 import ProjectionResult from "./ProjectionResult.svelte"
 
 interface Props {
+	/** The Scenarios the Snapshot planned, main first; the plan switcher's choices. */
+	names: readonly string[]
 	/** The projection Reads of the Snapshot, by Scenario name. */
 	projections: Readonly<Record<string, Read<ProjectionRun>>>
 	/** The Scenario the address bar asks for. An unknown one shows the first. */
@@ -15,16 +17,13 @@ interface Props {
 	onScenario: (value: string) => unknown
 	terms: string
 	onTerms: (value: string) => void
-	/** The custom chart the address bar names ("" for none), its setter, and the accounts Read that names Accounts. */
+	/** The custom chart the address bar names ("" for none) and its setter. */
 	chart?: string
 	onChart?: (id: string) => void
-	accounts?: Read<AccountList>
 }
 
 /** The Scenario picker and the projection of the chosen Scenario. The choice lives in the address bar. */
-let { projections, scenario, onScenario, terms, onTerms, chart, onChart, accounts }: Props =
-	$props()
-const names = $derived(projectionNames(projections))
+let { names, projections, scenario, onScenario, terms, onTerms, chart, onChart }: Props = $props()
 const name = $derived(chooseScenario(names, scenario))
 const read = $derived(name === null ? undefined : projections[name])
 const charts = $derived(
@@ -34,7 +33,7 @@ const charts = $derived(
 				chart: chart ?? "",
 				onChart,
 				runs: Object.values(projections).flatMap((read) => (read.ok ? [read.data] : [])),
-				accountNames: accountNamesOf(accounts),
+				accountNames: currentAccountNames(),
 			},
 )
 const options = $derived(names.map((value) => ({ value, label: value })))

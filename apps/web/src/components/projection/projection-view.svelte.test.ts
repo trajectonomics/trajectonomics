@@ -16,7 +16,14 @@ function renderView(
 	scenario = "",
 ): string {
 	return render(ProjectionView, {
-		props: { projections, scenario, onScenario: () => {}, terms: "both", onTerms: () => {} },
+		props: {
+			names: Object.keys(projections),
+			projections,
+			scenario,
+			onScenario: () => {},
+			terms: "both",
+			onTerms: () => {},
+		},
 	}).body
 }
 

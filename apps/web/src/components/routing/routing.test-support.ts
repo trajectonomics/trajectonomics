@@ -1,5 +1,5 @@
 import type { Snapshot } from "../../lib/contract"
-import { accountNamesOf } from "../../lib/view/cashflow/cashflow"
+import { accountNames } from "../../lib/view/account-names"
 import type { RoutingContext } from "../../lib/view/routing/context"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 
@@ -39,7 +39,7 @@ export function routedSnapshot(): {
 		contentHash: read.data.scenario.contentHash,
 		doc,
 		shown: doc,
-		names: accountNamesOf(snapshot.reads.accounts),
+		names: accountNames(snapshot.reads.accounts),
 		household: read.data.scenario.household,
 		asOf: snapshot.params.asOf,
 		editable: true,
