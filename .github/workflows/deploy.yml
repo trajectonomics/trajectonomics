@@ -1,12 +1,12 @@
 name: Deploy
 
 # Deploys the Site (worker "site", apps/site), the Docs Portal (worker "docs", apps/docs), the
-# blog (worker "blog", apps/blog), the data Worker (worker "data", apps/data) and OpenJot's landing
-# site (worker "moojot-site", apps/openjot/site) to Cloudflare Workers from main. The docs Worker
-# attaches docs.trajectonomics.com, the blog Worker attaches blog.trajectonomics.com, the data
-# Worker attaches data.trajectonomics.com, and the landing site attaches openjot.trajectonomics.com
-# (and redirects moojot.trajectonomics.com to it). The router still forwards
-# trajectonomics.com/docs so the docs Worker can redirect it.
+# blog (worker "blog", apps/blog), the data Worker (worker "data", apps/data) and OpenJot's download
+# and comparison Worker (worker "moojot-site", apps/openjot/site) to Cloudflare Workers from main.
+# The docs Worker attaches docs.trajectonomics.com, the blog Worker attaches
+# blog.trajectonomics.com, the data Worker attaches data.trajectonomics.com, and the OpenJot Worker
+# attaches openjot.trajectonomics.com (and redirects moojot.trajectonomics.com to it). The router
+# still forwards trajectonomics.com/docs so the docs Worker can redirect it.
 # docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared

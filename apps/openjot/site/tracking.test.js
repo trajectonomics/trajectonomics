@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { handle } from "./release.js";
-import { landingUrl, parseSourcePath, requestContext, resolveSource, sourceFromReferer } from "./tracking.js";
+import { LANDING_URL, landingUrl, parseSourcePath, requestContext, resolveSource, sourceFromReferer } from "./tracking.js";
 
 const KEY = "phc_test";
 const env = {
@@ -66,11 +66,11 @@ test("slugs resolve to a source, aliases included, and anything else valid becom
   assert.equal(parseSourcePath("/ig/no spaces"), null);
 });
 
-test("landing URLs carry utm tags and keep ?lang=", () => {
+test("landing URLs carry utm tags and drop ?lang=, which would cost the Site the tags", () => {
   const link = parseSourcePath("/ig/reel-12");
   assert.equal(
     landingUrl("https://openjot.trajectonomics.com/go/ig/reel-12?lang=en&x=1", link),
-    "https://openjot.trajectonomics.com/?lang=en&utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
+    "https://trajectonomics.com/openjot/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
   );
 });
 
@@ -80,7 +80,7 @@ test("/go/<source> redirects to the tagged landing page and counts one anonymous
   assert.equal(res.status, 302);
   assert.equal(
     res.headers.get("location"),
-    "https://openjot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
+    "https://trajectonomics.com/openjot/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12",
   );
   assert.equal(net.events.length, 1);
   const [event] = net.events;
@@ -112,7 +112,7 @@ test("the Worker never forwards the IP address or user agent in a count", async 
 test("bad /go links go home without counting, and so do bots and link previews", async () => {
   const net = network();
   const bad = await handle(req("/go/not%20a%20slug"), env, null, net.deps);
-  assert.equal(bad.headers.get("location"), "https://openjot.trajectonomics.com/");
+  assert.equal(bad.headers.get("location"), LANDING_URL);
   await handle(req("/go/ig", { "user-agent": "facebookexternalhit/1.1" }), env, null, net.deps);
   await handle(req("/go/ig", { "user-agent": "WhatsApp/2.23.20.0" }), env, null, net.deps);
   await handle(req("/go/ig", { "user-agent": "" }), env, null, net.deps);
@@ -135,13 +135,25 @@ test("/download/<source> goes straight to the APK and counts the download with i
 
 test("/download from the landing page takes the source from the page's utm tags", async () => {
   const net = network();
-  const referer = "https://openjot.trajectonomics.com/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12";
+  const referer = "https://trajectonomics.com/openjot/?utm_source=instagram&utm_medium=social&utm_campaign=reel-12";
   await handle(req("/download", { referer }), env, null, net.deps);
   const { properties } = net.events[0];
   assert.equal(properties.source, "instagram");
   assert.equal(properties.medium, "social");
   assert.equal(properties.campaign, "reel-12");
   assert.equal(properties.via, "page");
+});
+
+test("/download from the Site's OpenJot page counts as a page download even when untagged", async () => {
+  const net = network();
+  for (const referer of ["https://trajectonomics.com/openjot/", "https://trajectonomics.com/openjot/#install"]) {
+    await handle(req("/download", { referer }), env, null, net.deps);
+    const { properties } = net.events[net.events.length - 1];
+    assert.equal(properties.source, "website");
+    assert.equal(properties.via, "page");
+  }
+  await handle(req("/download", { referer: "https://trajectonomics.com/" }), env, null, net.deps);
+  assert.equal(net.events[net.events.length - 1].properties.via, "direct");
 });
 
 test("sourceFromReferer: untagged page, another site, and no referer", () => {

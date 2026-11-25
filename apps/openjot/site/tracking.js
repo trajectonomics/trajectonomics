@@ -1,8 +1,8 @@
 // Source links, cookieless counting and the PostHog proxy for openjot.trajectonomics.com
 // (and the moojot.trajectonomics.com host, which forwards to it). Routed from handle() in release.js.
 //
-//   /go/<source>[/<campaign>]        302 to the landing page with utm_* tags, and counts
-//                                    a `link_clicked` event.
+//   /go/<source>[/<campaign>]        302 to the landing page on the Site with utm_* tags,
+//                                    and counts a `link_clicked` event.
 //   /download/<source>[/<campaign>]  302 straight to the APK, and counts `apk_download`.
 //   /download                        Counts `apk_download` too. The source comes from the
 //                                    landing page URL in the Referer (its utm_* tags), or
@@ -28,6 +28,13 @@ export const SOURCES = {
   gh: { source: "github", medium: "referral" },
   qr: { source: "qr", medium: "offline" },
 };
+
+/** The landing page on the Site, where every source link now sends people. */
+export const LANDING_URL = "https://trajectonomics.com/openjot/";
+
+/** The host and path a download's referrer names when the button is the Site's OpenJot page. */
+const SITE_HOST = "trajectonomics.com";
+const SITE_LANDING_PATH = "/openjot";
 
 /** Longer spellings people may type, mapped to the slugs above. */
 const ALIASES = {
@@ -66,12 +73,13 @@ export function parseSourcePath(rest) {
   return { ...src, campaign };
 }
 
-/** The landing page URL a /go link redirects to. Keeps ?lang= so a link can force a language. */
+/**
+ * The landing page URL a /go link redirects to. A ?lang= on the link is dropped: on the Site,
+ * ?lang= stores a Language choice and redirects to the bare page, which would lose the utm_* tags
+ * that attribute a later download to this link. The Site picks the Language itself.
+ */
 export function landingUrl(requestUrl, link) {
-  const from = new URL(requestUrl);
-  const url = new URL("/", from);
-  const lang = from.searchParams.get("lang");
-  if (lang === "th" || lang === "en") url.searchParams.set("lang", lang);
+  const url = new URL(LANDING_URL);
   url.searchParams.set("utm_source", link.source);
   url.searchParams.set("utm_medium", link.medium);
   if (link.campaign) url.searchParams.set("utm_campaign", link.campaign);
@@ -93,9 +101,12 @@ export function sourceFromReferer(request) {
   }
   if (!ref) return { source: "direct", medium: "none", campaign: null, link: null, via: "direct" };
 
-  if (ref.host === new URL(request.url).host) {
-    // A download button on the landing page. With Referrer-Policy
-    // strict-origin-when-cross-origin, same-origin requests carry the full URL.
+  const onSiteLanding =
+    ref.hostname === SITE_HOST &&
+    (ref.pathname === SITE_LANDING_PATH || ref.pathname.startsWith(`${SITE_LANDING_PATH}/`));
+  if (ref.host === new URL(request.url).host || onSiteLanding) {
+    // A download button on the landing page: this host's old page, or the Site's /openjot/.
+    // With Referrer-Policy strict-origin-when-cross-origin, same-origin requests carry the full URL.
     const tag = (name) => {
       const value = (ref.searchParams.get(name) ?? "").toLowerCase();
       return SLUG.test(value) ? value : null;
@@ -196,7 +207,7 @@ export async function count(request, env, ctx, deps, event, properties) {
 export async function handleGo(request, env, ctx, deps = {}) {
   const { pathname } = new URL(request.url);
   const link = parseSourcePath(pathname.slice("/go".length));
-  if (!link) return redirect(new URL("/", request.url).toString());
+  if (!link) return redirect(LANDING_URL);
   await count(request, env, ctx, deps, "link_clicked", linkProps(link, "link"));
   return redirect(landingUrl(request.url, link));
 }
