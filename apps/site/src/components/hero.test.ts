@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { elementsByTag, isInlineScript, textOf } from "../lib/build/html"
 import { LANGUAGES, languageEntry } from "../lib/language/languages"
-import { INSTALL_PROMPT } from "../lib/site"
+import { DEMO_PATH, INSTALL_PROMPT } from "../lib/site"
 import Hero from "./Hero.astro"
 import { renderComponent } from "./testing/render"
 import { headings, scanComponent, withAttribute, withClass } from "./testing/scan"
@@ -77,6 +77,15 @@ describe("the Hero component in every Language", () => {
 			const page = scanComponent(await renderComponent(Hero, { dictionary }))
 			const codes = elementsByTag(page, "code").map((element) => textOf(page, element))
 			expect(codes).toContain("traj")
+		})
+
+		it(`links the hosted Demo under the window (${language})`, async () => {
+			const page = scanComponent(await renderComponent(Hero, { dictionary }))
+			const link = elementsByTag(page, "a").find(
+				(anchor) => anchor.attributes["href"] === DEMO_PATH,
+			)
+			if (link === undefined) throw new Error("the hero rendered no demo link")
+			expect(textOf(page, link)).toBe(dictionary.demoLink)
 		})
 
 		it(`carries no facts strip, which belongs to the footer (${language})`, async () => {

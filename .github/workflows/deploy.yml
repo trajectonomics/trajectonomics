@@ -6,7 +6,8 @@ name: Deploy
 # forwards trajectonomics.com/docs so the docs Worker can redirect it. docs/runbooks/deploy.md has the setup.
 #
 #   push to main       -> deploys each app whose folder, or a shared input (the brand, the shared
-#                         config, the lockfile), changed in the push.
+#                         config, the lockfile), changed in the push. The Site also redeploys for its
+#                         hosted Demo's inputs: the Dashboard, the command line and the core engine.
 #   workflow_dispatch  -> deploys the app you pick, or both, from main.
 #   schedule (daily)   -> redeploys the Site alone, so the GitHub star count in its header is read again
 #                         (the Site's build refreshes the Star snapshot first; see "Refresh the star count").
@@ -66,9 +67,14 @@ jobs:
               base=$(git rev-parse --verify --quiet "$SHA^" || git hash-object -t tree /dev/null)
             fi
             shared=(packages/brand tooling/config bun.lock package.json turbo.json)
+            # The Site serves the Demo, which is built from the Dashboard, the command line and the
+            # core engine, so a change there redeploys the Site even though its own folder is unchanged.
+            site_shared=(apps/web apps/cli/src packages/core)
             apps='[]'
             for app in site docs blog; do
-              if [ -n "$(git diff --name-only "$base" "$SHA" -- "apps/$app" "${shared[@]}")" ]; then
+              paths=("apps/$app" "${shared[@]}")
+              if [ "$app" = "site" ]; then paths+=("${site_shared[@]}"); fi
+              if [ -n "$(git diff --name-only "$base" "$SHA" -- "${paths[@]}")" ]; then
                 apps=$(jq -c --arg app "$app" '. + [$app]' <<<"$apps")
               fi
             done
