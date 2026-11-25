@@ -1,5 +1,5 @@
 import type { AppError } from "../errors"
-import { documentPath, type ScenarioProblem } from "./document"
+import { documentPath, refusalOf, type ScenarioProblem } from "./document"
 import { ownDocumentError } from "./document-error"
 import { isOwnProblem, ownProblems } from "./own-problems"
 import { formatPath, overrideSegments } from "./path"
@@ -12,6 +12,18 @@ import { flagError, type OverrideFlag } from "./set-parse"
  * `--add`, then every `--set` (ADR-0024, cli ADR-0056, ADR-0062). `flag` names the input field the Override came from.
  */
 export type AppliedItem = { flag: OverrideFlag; path: string }
+
+/**
+ * The loan codes (sim ADR-0016) a `--set` states sentence first, as the document form does (#336). The other
+ * worded codes keep their code-first wording, which their own tests pin.
+ */
+const LOAN_CODES: ReadonlySet<string> = new Set([
+	"LEVEL_TARGET_NOT_LIABILITY",
+	"LEVEL_TARGET_NOT_NOMINAL",
+	"LEVEL_FREQUENCY_MISMATCH",
+	"LEVEL_PAYMENTS_OUT_OF_RANGE",
+	"LEVEL_PAYMENT_OVERFLOW",
+])
 
 /**
  * The applied Override whose path covers a problem: the last in application order when several do,
@@ -73,22 +85,41 @@ export function documentFailure(
 	// The index counts occurrences of that input field, as its own list does.
 	const index = items.slice(0, at).filter((item) => item.flag === flag).length
 	const path = documentPath("document", chosen.problem.segments)
-	// A code the refusal table words states its sentence and way out, as `scenario apply --file` does.
-	const said = wordsOf(chosen.problem)
+	const details = {
+		index,
+		path: selected?.path ?? formatPath(overrideSegments(document, chosen.problem.segments)),
+		documentPath: path,
+		code: chosen.problem.code,
+	}
+	return overrideRefusal(flag, index, chosen.problem, path, details)
+}
+
+/**
+ * The refusal for the problem an Override causes. A loan code states its sentence first, then the schema hint
+ * every document refusal carries (ADR-0052), as `scenario apply --file` does (#336); any other code keeps its
+ * code-first wording.
+ */
+function overrideRefusal(
+	flag: OverrideFlag,
+	index: number,
+	problem: ScenarioProblem,
+	path: string,
+	details: Record<string, unknown>,
+): AppError {
+	const said = wordsOf(problem)
+	if (said !== undefined && LOAN_CODES.has(problem.code)) {
+		const schema = refusalOf(problem, "document").hint
+		return flagError(flag, index, said.message, {
+			hint: [said.hint, schema].filter((part) => part !== undefined).join(" "),
+			details,
+		})
+	}
 	const own = `The overrides leave ${path} invalid; change that value or the path.`
 	return flagError(
 		flag,
 		index,
-		`the document is invalid after the overrides: ${path}: ${chosen.problem.code}${said === undefined ? "" : `. ${said.message}`}`,
-		{
-			hint: said?.hint === undefined ? own : `${said.hint} ${own}`,
-			details: {
-				index,
-				path: selected?.path ?? formatPath(overrideSegments(document, chosen.problem.segments)),
-				documentPath: path,
-				code: chosen.problem.code,
-			},
-		},
+		`the document is invalid after the overrides: ${path}: ${problem.code}${said === undefined ? "" : `. ${said.message}`}`,
+		{ hint: said?.hint === undefined ? own : `${said.hint} ${own}`, details },
 	)
 }
 
