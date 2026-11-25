@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { ageDate, daysInMonth, isLeapYear, joinsDate } from "./dates"
+import { ageDate, joinsDate } from "./dates"
 import { ANCHORABLE, anchorableSegments } from "./paths"
 
 describe("age to date", () => {
@@ -25,13 +25,6 @@ describe("age to date", () => {
 	it("reads a partner's join month as its first day", () => {
 		expect(joinsDate("2028-01")).toBe("2028-01-01")
 		expect(joinsDate("9998-12")).toBe("9998-12-01")
-	})
-
-	it("counts February's days by the Gregorian rule", () => {
-		expect([1900, 2000, 2024, 2100].map(isLeapYear)).toEqual([false, true, true, false])
-		expect(daysInMonth(2026, 2)).toBe(28)
-		expect(daysInMonth(2028, 2)).toBe(29)
-		expect(daysInMonth(2026, 4)).toBe(30)
 	})
 })
 

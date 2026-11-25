@@ -9,7 +9,8 @@ import { firstTransactionDateOf } from "./record"
 
 /**
  * One month-end of `report networth --monthly`: the reading the single-date read gives, or the
- * refusal it gives, in place. A month the Ledger refuses (an overflow) does not hide the others.
+ * refusal it gives, in place. A month the Ledger refuses (an account's overflow) does not hide the others; a month whose total alone
+ * is refused states its rows and `totals: null` (ADR-0078).
  */
 export type NetWorthMonth = NetWorthResult | { asOf: string; error: ErrorBody }
 
@@ -27,7 +28,8 @@ export type MonthlyInput = { since?: string | undefined; until: string }
 /**
  * Net worth at each month-end of an inclusive period, from one assembled read. Each month is
  * the single-date read's answer for that date, read from one scan of the Ledger, so its figures and
- * its refusal are `--as-of`'s. With no `since` the range starts at the month of the Ledger's first
+ * its refusal are `--as-of`'s, and a refusal of the scan itself is returned once, before any month.
+ * With no `since` the range starts at the month of the Ledger's first
  * Transaction, and a Ledger with none has no month to state.
  */
 export function netWorthMonthlyOf(
@@ -45,9 +47,11 @@ export function netWorthMonthlyOf(
 			details: { since, until },
 		})
 	}
+	// A Ledger the scan refuses has no month to state: the refusal is the call's own, as `--as-of`'s.
+	const read = netWorthReader(ledger)
+	if (isAppError(read)) return read
 	const start = since ?? firstTransactionDateOf(ledger.transactions)
 	const dates = start === null ? [] : monthEndsBetween(start, until)
-	const read = netWorthReader(ledger)
 	const months = dates.map((date): NetWorthMonth => {
 		const month = read(date)
 		return isAppError(month) ? { asOf: date, error: month.body } : month

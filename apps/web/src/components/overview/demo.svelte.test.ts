@@ -13,7 +13,7 @@ const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 describe("the pages, rendered from the Demo snapshot", () => {
 	test("the Overview shows the CLI's net worth total and the primary Scenario's name", () => {
 		const { body } = render(OverviewGrid, { props: { view: overviewView(DEMO) } })
-		const total = DEMO.reads.netWorth.ok ? DEMO.reads.netWorth.data.totals[0] : undefined
+		const total = DEMO.reads.netWorth.ok ? DEMO.reads.netWorth.data.totals?.[0] : undefined
 		expect(total).toBeDefined()
 		expect(body).toContain(formatMoney(total?.amount ?? ""))
 		expect(body).toContain(`Scenario ${DEMO.params.compare?.a ?? DEMO.params.scenarios[0]}`)

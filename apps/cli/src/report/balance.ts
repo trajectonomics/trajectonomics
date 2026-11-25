@@ -15,6 +15,7 @@ import {
 	trialRowOf,
 	trialTotalOf,
 } from "./rows"
+import { isTotalRefused, netWorthRead, type TotalRefusal } from "./total"
 import type { ReportRow, TotalView, TrialBalanceView } from "./view"
 
 // The core names its own queries; every one of these paths is respelled into this result's keys.
@@ -30,7 +31,10 @@ const fields: FieldMap = (field) => respell(field, FIELDS)
 export type BalanceResult = RecordStart & {
 	asOf: string
 	rows: ReportRow[]
-	netWorth: TotalView[]
+	/** The net-worth total per currency, or null when the accounts' sum leaves the safe range (ADR-0078). */
+	netWorth: TotalView[] | null
+	/** Why `netWorth` is null; absent when it is stated. */
+	netWorthError?: TotalRefusal | undefined
 	trialBalance?: TrialBalanceView | undefined
 	hint?: string | undefined
 }
@@ -38,9 +42,10 @@ export type BalanceResult = RecordStart & {
 function readings(ledger: Ledger, asOf: string) {
 	const rows = query(() => balances(ledger.transactions, asOf, ledger.chart), fields)
 	if (isAppError(rows)) return rows
-	const worth = query(() => netWorth(ledger.transactions, asOf, ledger.chart), fields)
+	// A refused total leaves every row stated: each account is in range, only their sum is not.
+	const worth = netWorthRead(() => netWorth(ledger.transactions, asOf, ledger.chart), fields)
 	if (isAppError(worth)) return worth
-	return { rows, totals: worth.totals }
+	return { rows, worth }
 }
 
 /**
@@ -91,7 +96,9 @@ export function balanceOf(
 		asOf: input.asOf,
 		...recordStartOf(ledger.transactions, input.asOf),
 		rows,
-		netWorth: totalsOf(read.totals),
+		...(isTotalRefused(read.worth)
+			? { netWorth: null, netWorthError: read.worth.totalRefused.body }
+			: { netWorth: totalsOf(read.worth.totals) }),
 		...(trial === undefined ? {} : { trialBalance: trial }),
 		...hintField(hint),
 	}

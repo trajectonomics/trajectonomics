@@ -31,11 +31,22 @@ export function failedRead<T>(argv: string[], code = "LEDGER_EMPTY"): Read<T> {
 export function netWorth(
 	asOf: string,
 	rows: AmountRow[],
-	totals: CurrencyTotal[],
+	totals: CurrencyTotal[] | null,
 	firstTransactionDate: string | null = "2024-11-01",
 	noTransactionsBefore = false,
 ): NetWorth {
-	return { asOf, firstTransactionDate, noTransactionsBefore, rows, totals }
+	const base = { asOf, firstTransactionDate, noTransactionsBefore, rows, totals }
+	// A null total is one the CLI refused, and it says why (cli ADR 0078).
+	return totals === null
+		? {
+				...base,
+				totalsError: {
+					code: "AMOUNT_OVERFLOW",
+					exitCode: 3,
+					message: "totals[THB]: exceeds the safe integer range",
+				},
+			}
+		: base
 }
 
 /** A `report pnl` result over the given period. */

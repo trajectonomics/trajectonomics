@@ -18,7 +18,7 @@ const columns: Column<MonthEndRow>[] = [
 {#snippet monthCell(row: MonthEndRow)}{row.asOf}{/snippet}
 {#snippet netWorthCell(row: MonthEndRow)}
 	{#if row.totals === null}
-		<span class="text-destructive">Could not be read ({row.code})</span>
+		<span class="text-destructive">{row.unstated ? "Not stated" : "Could not be read"} ({row.code})</span>
 	{:else}
 		{#each row.totals as total (total.currency)}
 			<Money amount={total.amount} currency={total.currency} />

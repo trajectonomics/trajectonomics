@@ -84,7 +84,7 @@ describe("the history after an import of values older than the ledger", () => {
 			expect(history.cut).toBeNull()
 			// The CLI's own total at the first imported month-end: the two values stated, added by traj.
 			const first = after.reads.netWorthHistory[0]
-			expect(first?.ok ? first.data.totals[0]?.amount : null).toBe("300000.00")
+			expect(first?.ok ? first.data.totals?.[0]?.amount : null).toBe("300000.00")
 		},
 		SLOW_MS,
 	)
