@@ -1,11 +1,13 @@
 # Deploy runbook
 
 The Site (`apps/site`, worker `site`), the Docs Portal (`apps/docs`, worker `docs`), the blog
-(`apps/blog`, worker `blog`) and the MooJot landing site (`apps/openjot/site`, worker `moojot-site`)
-deploy to Cloudflare Workers from this repository's CI: `.github/workflows/deploy.yml`. Cloudflare's
-own Git integration (Workers Builds) is not used, so the whole deploy is configured and reviewed
-here. `trajectonomics-web-router` routes trajectonomics.com to the workers by name, so a deploy
-changes nothing in the router.
+(`apps/blog`, worker `blog`), the data Worker (`apps/data`, worker `data`) and OpenJot's landing
+site (`apps/openjot/site`, worker `moojot-site`) deploy to Cloudflare Workers from this repository's
+CI: `.github/workflows/deploy.yml`. Cloudflare's own Git integration (Workers Builds) is not used,
+so the whole deploy is configured and reviewed here. `trajectonomics-web-router` routes
+trajectonomics.com to the workers by name, so a deploy changes nothing in the router. The landing
+site's Worker `moojot-site` serves `openjot.trajectonomics.com` and redirects
+`moojot.trajectonomics.com` to it.
 
 ## How deploys happen
 
@@ -17,7 +19,7 @@ changes nothing in the router.
   `apps/openjot/site` counts.
 - **By hand.** From main, deploy one app or all of them:
   ```sh
-  gh workflow run deploy.yml --ref main -f app=all    # or site, docs, blog, openjot
+  gh workflow run deploy.yml --ref main -f app=all    # or site, docs, blog, data, openjot
   ```
 - **Build.** `bunx turbo run build --filter=@trajectonomics/<app>`, which builds `packages/brand`
   first (every app imports its `dist/current/`), then `bunx wrangler deploy` in the app folder. The
@@ -39,7 +41,7 @@ changes nothing in the router.
    The account ID is on the dashboard's **Workers & Pages** overview, or comes from
    `curl -s -H "Authorization: Bearer $TOKEN" https://api.cloudflare.com/client/v4/accounts`.
 3. **First deploy.** `gh workflow run deploy.yml --ref main -f app=all`, then open
-   trajectonomics.com, docs.trajectonomics.com and moojot.trajectonomics.com. `/contribute/tax/` exists
+   trajectonomics.com, docs.trajectonomics.com and openjot.trajectonomics.com. `/contribute/tax/` exists
    only in builds from this repository, so it answering 200 proves the new deploy is live.
    `trajectonomics.com/docs/contribute/tax/` should answer 301 to that page. The docs Worker attaches
    `docs.trajectonomics.com` as a custom domain on deploy. That creates the DNS record, so the hostname
@@ -56,6 +58,26 @@ a custom domain, as the docs Worker attaches its host. Nothing in Cloudflare nee
 but the hostname must not already be a CNAME, and the API token needs permission to attach a custom
 domain on the `trajectonomics.com` zone. Then open `https://blog.trajectonomics.com/`. The router is
 not involved.
+
+## The data Worker's first deploy
+
+The `data` Worker owns `data.trajectonomics.com` and reads D1 `traj-data` (the database id is in
+`apps/data/wrangler.jsonc`). Create that database in Cloudflare first, and add **D1: Edit** on the
+account to the deploy token; the **Edit Cloudflare Workers** template alone cannot apply
+migrations. The workflow applies `apps/data/migrations` with
+`bunx wrangler d1 migrations apply traj-data --remote` before it deploys the Worker, which attaches
+the hostname as a custom domain. The first deploy needs no secret: `/ingest` answers 401 until one
+exists. After it, set the temporary bootstrap key and send one batch:
+
+```sh
+cd apps/data
+bunx wrangler secret put INGEST_BOOTSTRAP_KEY
+bunx wrangler d1 migrations apply traj-data --local   # local development only
+```
+
+`GET https://data.trajectonomics.com/api/health` shows the last ingest. The key is temporary and the
+auth service replaces it (ADR 0004); never commit it and never put it in `wrangler.jsonc`. The read
+API caches for an hour, so a fresh batch appears within that window without a deploy.
 
 ## White-label deploys
 

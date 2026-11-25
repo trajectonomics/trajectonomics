@@ -1,0 +1,9 @@
+node_modules/
+coverage/
+.turbo/
+*.tgz
+.scratch/
+.DS_Store
+*.log
+.env
+.env.*

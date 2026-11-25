@@ -1,0 +1,64 @@
+/* The chart: a hand-drawn SVG on the page, with a legend that repeats every line's cues. */
+
+.chart-figure {
+	margin: 0;
+	padding: 24px 0 32px;
+	border-bottom: 1px solid var(--ds-color-border);
+}
+
+.chart-svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.chart-grid {
+	stroke: var(--ds-color-border);
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
+}
+
+.chart-axis {
+	fill: var(--ds-color-muted-foreground);
+	font-family: var(--font-meta);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+}
+
+/* The SVG scales to the column; on a phone the labels need a larger user-unit size to stay legible. */
+@media (max-width: 40rem) {
+	.chart-axis {
+		font-size: 20px;
+	}
+}
+
+.chart-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 24px;
+	margin: 16px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.chart-legend li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+}
+
+.legend-mark {
+	width: 40px;
+	height: 12px;
+	flex: none;
+	overflow: visible;
+}
+
+.chart-caption {
+	margin: 14px 0 0;
+	font-family: var(--font-meta);
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	color: var(--ds-color-muted-foreground);
+}

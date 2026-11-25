@@ -1,5 +1,5 @@
 import type { ScenarioDocument } from "../scenario/document"
-import { leviesOf, TAX_LEVY_ID } from "../scenario/tax"
+import { isTaxLevyId, leviesOf } from "../scenario/tax"
 import type { CarryInEcho } from "./carryin-view"
 import { periodStartAtOrBefore, storedMonthDay } from "./periods"
 
@@ -7,11 +7,11 @@ import { periodStartAtOrBefore, storedMonthDay } from "./periods"
 export const NO_TAX: string = "No tax is applied; figures are before tax."
 
 /**
- * The one sentence for a Levy, which names the jurisdiction only for the Levy this build emits:
+ * The one sentence for a Levy, which names the jurisdiction only for the Levies this build emits:
  * a Levy the caller wrote is the Scenario's own, and the CLI claims no rule it cannot see.
  */
 function levySentence(id: string): string {
-	if (id === TAX_LEVY_ID) {
+	if (isTaxLevyId(id)) {
 		return `Tax is applied: Thailand 2026 personal income tax, from the Scenario's Levy "${id}".`
 	}
 	return `Tax is applied: the Scenario's own Levy "${id}".`

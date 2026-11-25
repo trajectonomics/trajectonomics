@@ -3,7 +3,7 @@
 
 const en = {
   // App / navigation
-  appName: "MooJot",
+  appName: "OpenJot",
   home: "Home",
   summary: "Summary",
   compare: "Compare",
@@ -179,13 +179,13 @@ const en = {
   noSlipsFound: "No new slips found",
 
   // First-run onboarding
-  onbDialogLabel: "Welcome to MooJot",
+  onbDialogLabel: "Welcome to OpenJot",
   onbSkip: "Skip",
   onbStart: "Let's go",
   onbStepOf: "Step {n} of {total}",
   onbGoToStep: "Go to step {n}",
   onbWelcomeTitle: "Hi, I'm Moo!",
-  onbWelcomeBody: "MooJot is a simple, cute money diary. Jot down what comes in and what goes out, and I'll keep it all tidy for you.",
+  onbWelcomeBody: "OpenJot is a simple, cute money diary. Jot down what comes in and what goes out, and I'll keep it all tidy for you.",
   onbPrivateTitle: "Your money stays with you",
   onbPrivateBody: "Your records are saved on this phone only. They are never uploaded.",
   onbPrivatePoint1: "No account, no sign-in",
@@ -208,7 +208,7 @@ const en = {
   onbDecrease: "Decrease",
   onbIncrease: "Increase",
   onbPermTitle: "Can I peek at your slips?",
-  onbPermBody: "To scan slips, MooJot needs to read photos on this phone. Photos never leave the device.",
+  onbPermBody: "To scan slips, OpenJot needs to read photos on this phone. Photos never leave the device.",
   onbPermAllow: "Allow photo access",
   onbPermGranted: "Photo access is on",
   onbPermLater: "You can skip this and allow it later from Home.",
@@ -226,11 +226,11 @@ const en = {
 
   // App lock (opt-in, #79)
   appLock: "App lock",
-  appLockHint: "Off unless you turn it on. Asks for your fingerprint or phone PIN when MooJot opens, and after a minute away.",
-  appLockLocked: "MooJot is locked",
+  appLockHint: "Off unless you turn it on. Asks for your fingerprint or phone PIN when OpenJot opens, and after a minute away.",
+  appLockLocked: "OpenJot is locked",
   appLockLockedHint: "Use your fingerprint, face or phone PIN to open it.",
   appLockUnlock: "Unlock",
-  appLockReason: "Unlock MooJot",
+  appLockReason: "Unlock OpenJot",
   appLockEnableReason: "Confirm it's you to turn on the app lock",
   appLockNoScreenLock: "Set a screen lock (PIN, pattern or password) in your phone's settings first.",
   appLockLockout: "Too many tries. Use your phone PIN, or wait a moment and try again.",
@@ -240,7 +240,7 @@ const en = {
   dailyReminder: "Daily reminder",
   dailyReminderHint: "Off unless you turn it on. A nudge to jot, skipped on days you already did.",
   reminderTime: "Remind me at",
-  reminderNoPermission: "Notifications are off for MooJot. Allow them in your phone's settings to get the reminder.",
+  reminderNoPermission: "Notifications are off for OpenJot. Allow them in your phone's settings to get the reminder.",
   // Send feedback (#90)
   sendFeedback: "Send feedback",
   copyFeedbackEmail: "Copy email address",
@@ -250,12 +250,12 @@ const en = {
   feedbackNotNow: "Not now",
   // What's new (#104)
   whatsNew: "What's new",
-  whatsNewTitle: "What's new in MooJot {version}",
+  whatsNewTitle: "What's new in OpenJot {version}",
   whatsNewTurnOn: "Turn on",
   whatsNewHowToAdd: "How to add",
   whatsNewSend: "Send",
   whatsNewGotIt: "Got it",
-  whatsNewWidgetSteps: "Long-press your home screen → Widgets → MooJot",
+  whatsNewWidgetSteps: "Long-press your home screen → Widgets → OpenJot",
   whatsNewNewDot: "New",
   whatsNewSeeAll: "See all",
   whatsNewHideBanner: "Hide this news",
@@ -272,7 +272,7 @@ export type I18nKey = keyof typeof en;
 
 const th: Record<I18nKey, string> = {
   // App / navigation
-  appName: "MooJot",
+  appName: "OpenJot",
   home: "หน้าแรก",
   summary: "สรุป",
   compare: "เปรียบเทียบ",
@@ -448,13 +448,13 @@ const th: Record<I18nKey, string> = {
   noSlipsFound: "ไม่พบสลิปใหม่",
 
   // First-run onboarding
-  onbDialogLabel: "ยินดีต้อนรับสู่ MooJot",
+  onbDialogLabel: "ยินดีต้อนรับสู่ OpenJot",
   onbSkip: "ข้าม",
   onbStart: "เริ่มจดเลย",
   onbStepOf: "ขั้นที่ {n} จาก {total}",
   onbGoToStep: "ไปขั้นที่ {n}",
   onbWelcomeTitle: "สวัสดี เราชื่อมู!",
-  onbWelcomeBody: "MooJot คือสมุดจดเงินแบบง่าย ๆ น่ารัก ๆ จดเงินเข้า เงินออก แล้วมูจะช่วยเก็บให้เป็นระเบียบเอง",
+  onbWelcomeBody: "OpenJot คือสมุดจดเงินแบบง่าย ๆ น่ารัก ๆ จดเงินเข้า เงินออก แล้วมูจะช่วยเก็บให้เป็นระเบียบเอง",
   onbPrivateTitle: "เงินของคุณ อยู่กับคุณ",
   onbPrivateBody: "รายการทั้งหมดเก็บไว้ในมือถือเครื่องนี้เท่านั้น ไม่มีการอัปโหลดไปที่ไหน",
   onbPrivatePoint1: "ไม่ต้องสมัคร ไม่ต้องล็อกอิน",
@@ -495,11 +495,11 @@ const th: Record<I18nKey, string> = {
 
   // App lock (opt-in, #79)
   appLock: "ล็อกแอป",
-  appLockHint: "ปิดไว้จนกว่าคุณจะเปิดเอง ใช้ลายนิ้วมือหรือรหัสเครื่องตอนเปิด MooJot และเมื่อออกไปเกิน 1 นาที",
-  appLockLocked: "MooJot ล็อกอยู่",
+  appLockHint: "ปิดไว้จนกว่าคุณจะเปิดเอง ใช้ลายนิ้วมือหรือรหัสเครื่องตอนเปิด OpenJot และเมื่อออกไปเกิน 1 นาที",
+  appLockLocked: "OpenJot ล็อกอยู่",
   appLockLockedHint: "ใช้ลายนิ้วมือ ใบหน้า หรือรหัสเครื่องเพื่อเปิด",
   appLockUnlock: "ปลดล็อก",
-  appLockReason: "ปลดล็อก MooJot",
+  appLockReason: "ปลดล็อก OpenJot",
   appLockEnableReason: "ยืนยันตัวตนเพื่อเปิดล็อกแอป",
   appLockNoScreenLock: "ตั้งการล็อกหน้าจอ (PIN รูปแบบ หรือรหัสผ่าน) ในการตั้งค่าเครื่องก่อน",
   appLockLockout: "ลองผิดหลายครั้งเกินไป ใช้รหัสเครื่อง หรือรอสักครู่แล้วลองใหม่",
@@ -509,7 +509,7 @@ const th: Record<I18nKey, string> = {
   dailyReminder: "เตือนให้จดทุกวัน",
   dailyReminderHint: "ปิดไว้จนกว่าคุณจะเปิดเอง เตือนให้จดรายจ่าย และไม่เตือนในวันที่คุณจดแล้ว",
   reminderTime: "เตือนเวลา",
-  reminderNoPermission: "การแจ้งเตือนของ MooJot ถูกปิดอยู่ เปิดได้ในการตั้งค่าเครื่องเพื่อรับการเตือน",
+  reminderNoPermission: "การแจ้งเตือนของ OpenJot ถูกปิดอยู่ เปิดได้ในการตั้งค่าเครื่องเพื่อรับการเตือน",
   // Send feedback (#90)
   sendFeedback: "ส่งความคิดเห็น",
   copyFeedbackEmail: "คัดลอกอีเมล",
@@ -519,12 +519,12 @@ const th: Record<I18nKey, string> = {
   feedbackNotNow: "ไว้ทีหลัง",
   // What's new (#104)
   whatsNew: "มีอะไรใหม่",
-  whatsNewTitle: "มีอะไรใหม่ใน MooJot {version}",
+  whatsNewTitle: "มีอะไรใหม่ใน OpenJot {version}",
   whatsNewTurnOn: "เปิดใช้",
   whatsNewHowToAdd: "วิธีเพิ่ม",
   whatsNewSend: "ส่ง",
   whatsNewGotIt: "เข้าใจแล้ว",
-  whatsNewWidgetSteps: "กดค้างที่หน้าจอหลัก → วิดเจ็ต → MooJot",
+  whatsNewWidgetSteps: "กดค้างที่หน้าจอหลัก → วิดเจ็ต → OpenJot",
   whatsNewNewDot: "ใหม่",
   whatsNewSeeAll: "ดูทั้งหมด",
   whatsNewHideBanner: "ซ่อนข่าวนี้",

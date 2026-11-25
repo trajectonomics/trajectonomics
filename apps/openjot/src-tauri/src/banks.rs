@@ -1,4 +1,4 @@
-//! Registry of Thai bank and e-wallet apps that MooJot can recognise from
+//! Registry of Thai bank and e-wallet apps that OpenJot can recognise from
 //! payment slips and screenshots.
 
 use serde::{Deserialize, Serialize};

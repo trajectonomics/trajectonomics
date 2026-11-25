@@ -114,6 +114,7 @@ On 2026-11-22 the owner decided that the Dashboard edits plans. A person copies 
 - A rename puts the new name into the `--scenario` list (`followPlan`) and into the comparison (`followCompare`). `POST /reread` takes `{ "addPlan": "<name>" }` to add a stored plan to the list; nothing is written. See [ADR 0023](0023-the-plans-page-shows-every-plan-side-by-side-and-the-switcher-manages-plans.md).
 - The plan switcher is a list with a menu for each plan, not a select, and "Copy plan" and "Delete plan" are in that menu.
 
-## Amendment (2026-11-25): an Edit answers the household anchors it dropped
+## Amendment (2026-11-25): an Edit answers the household anchors and Owners it dropped
 
 - A write of `apply-plan` that removes an item drops the household anchors that pinned its dates ([cli ADR 0048](../../../cli/docs/adr/0048-a-household-is-a-sibling-of-the-scenario-with-anchors-written-on-save.md)), and `traj` states them as `droppedAnchors`. The server keeps that list from the real write and the Edit answer carries it as `droppedAnchors` (absent when none was dropped). The page shows it as a notice above the page until it is dismissed or the next Edit runs.
+- The same write also drops the household Owners whose item it removed ([cli ADR 0076](../../../cli/docs/adr/0076-a-plan-item-names-its-owner-in-the-household-and-the-cli-writes-what-the-engine-reads.md)), stating each as an item path of the document in `droppedOwners`. The server keeps that list too, the Edit answer carries it as `droppedOwners` (absent when none was dropped), and the page shows it in the same notice.

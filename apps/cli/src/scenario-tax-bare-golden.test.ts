@@ -83,8 +83,11 @@ describe("a plan that keeps bare labels writes what it wrote before Filers", () 
 	})
 
 	for (const [name, household] of Object.entries(HOUSEHOLDS)) {
-		// A joint Return of the last household has Filers; its other statuses keep bare labels until the separate step.
-		const statuses = name === FILERS ? STATUSES.filter((it) => it !== "married_joint") : STATUSES
+		// The last household gets Filers on both married statuses; its other statuses keep bare labels.
+		const statuses =
+			name === FILERS
+				? STATUSES.filter((it) => it !== "married_joint" && it !== "married_separate")
+				: STATUSES
 		it(`writes those same bytes for ${name}`, async () => {
 			const golden = JSON.parse(await goldenTextIn(GOLDENS, GOLDEN)) as Record<string, unknown>
 			const outcome = await outcomes(household, statuses)

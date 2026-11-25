@@ -1,4 +1,4 @@
-// What MooJot's product analytics is allowed to send. Kept pure and dependency-free
+// What OpenJot's product analytics is allowed to send. Kept pure and dependency-free
 // so it is unit tested (tests/unit/analyticsEvents.test.mjs).
 //
 // The rule: an event, and each property on it, must be listed here. Values are short

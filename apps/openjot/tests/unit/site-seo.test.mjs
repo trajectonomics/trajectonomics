@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs"
 import { test } from "node:test"
 
 const read = (name) => readFileSync(new URL(`../../site/public/${name}`, import.meta.url), "utf8")
-const ORIGIN = "https://moojot.trajectonomics.com/"
+const ORIGIN = "https://openjot.trajectonomics.com/"
 const html = read("index.html")
 const visible = html
 	.replace(/<script[\s\S]*?<\/script>/g, "")
@@ -38,7 +38,7 @@ test("the app is free and says only what the page says", () => {
 
 test("every FAQ question and answer in the JSON-LD is on the page in the same words", () => {
 	const faq = graph().find((node) => node["@type"] === "FAQPage")
-	assert.equal(faq.mainEntity.length, 12)
+	assert.equal(faq.mainEntity.length, 14)
 	for (const question of faq.mainEntity) {
 		assert.ok(visible.includes(squash(question.name)), `question on the page: ${question.name}`)
 		for (const sentence of question.acceptedAnswer.text.split(". ")) {
@@ -49,7 +49,7 @@ test("every FAQ question and answer in the JSON-LD is on the page in the same wo
 
 test("robots.txt names the sitemap and keeps the worker's redirects out of the index", () => {
 	const robots = read("robots.txt")
-	assert.match(robots, /^Sitemap: https:\/\/moojot\.trajectonomics\.com\/sitemap\.xml$/m)
+	assert.match(robots, /^Sitemap: https:\/\/openjot\.trajectonomics\.com\/sitemap\.xml$/m)
 	for (const path of ["/download", "/go", "/api/", "/ingest/"]) {
 		assert.match(robots, new RegExp(`^Disallow: ${path}$`, "m"))
 	}

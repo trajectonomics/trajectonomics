@@ -2,7 +2,8 @@ import { z } from "zod"
 import type { ScenarioDocument } from "../document"
 import { holdsTaxLevy } from "./holds"
 import { TAX_ALLOWANCE_CLASSES, type TaxProfileView, taxProfileOf } from "./profile"
-import { requestOfStored, type StoredTax } from "./stored"
+import { requestOfStored } from "./stored"
+import type { StoredTax } from "./stored-schema"
 
 export const taxAllowancesShape: z.ZodType<TaxProfileView> = z
 	.strictObject({
