@@ -45,7 +45,7 @@ The three-step drawer on the Net worth page, "Import a balance history", that tu
 _Avoid_: upload, sync, migration, bulk edit, reconciliation
 
 **History cap**:
-The most month-ends the Net worth history holds, 120 (ten years), one `report networth` read each. A ledger that reaches back further keeps the latest 120, and the page says where the ledger really starts. It is a limit on reads, not a date the page computes (web ADR 0027).
+The most month-ends the Net worth history holds, 120 (ten years), stated by one `report networth --monthly` read. A ledger that reaches back further keeps the latest 120, and the page says where the ledger really starts. It is a limit on the months one read states, not a date the page computes (web ADR 0027).
 _Avoid_: window, zoom, range (the Plans page's Range is a different control)
 
 **Preview**:
