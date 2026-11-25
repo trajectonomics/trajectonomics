@@ -21,6 +21,7 @@ export type Answer =
 			ok: true
 			snapshot: { params: { scenarios: string[] }; reads: { projections: Record<string, unknown> } }
 			droppedAnchors?: string[]
+			droppedOwners?: string[]
 	  }
 	| { ok: false; error: { code: string; message: string; path?: string } }
 
@@ -30,7 +31,10 @@ export type ShownDocument = {
 		contentHash: string
 		version: number
 		document: { flows: { id: string; amount?: string; end?: string }[] }
-		household: { anchors: { path: string; person: string; age?: number }[] } | null
+		household: {
+			anchors: { path: string; person: string; age?: number }[]
+			owners?: { path: string; person: string }[]
+		} | null
 	}
 }
 

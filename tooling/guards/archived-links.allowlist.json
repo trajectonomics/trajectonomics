@@ -5,6 +5,21 @@
 		"reason": "The source table names the internal skills' former repository; its Lives-in column is the monorepo folder."
 	},
 	{
+		"path": "AGENTS.md",
+		"match": "trajectonomics/moojot#97",
+		"reason": "The repository map says the app is still named MooJot until the rename issue in its former repository."
+	},
+	{
+		"path": "apps/blog/src/content/posts/install-moojot-on-android/en.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The install guide is about MooJot v1.4.0 and links to the repository it was published from; the archived repository stays readable until the rename moves the guide."
+	},
+	{
+		"path": "apps/blog/src/content/posts/install-moojot-on-android/th.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The install guide is about MooJot v1.4.0 and links to the repository it was published from; the archived repository stays readable until the rename moves the guide."
+	},
+	{
 		"path": "apps/cli/install.ps1",
 		"match": "trajectonomics/cli",
 		"reason": "0.1.0 to 0.3.0 download their assets from the archived cli repository, where they stay."
@@ -30,14 +45,89 @@
 		"reason": "Design record citing issues of the archived docs repository by number; the issues stay readable."
 	},
 	{
+		"path": "apps/openjot/AGENTS.md",
+		"match": "trajectonomics/moojot#97",
+		"reason": "Names the rename issue in the app's former repository; the app is still MooJot in this phase."
+	},
+	{
+		"path": "apps/openjot/docs/privacy-policy.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The published policy names the repository it was published under; the archived repository stays readable, and the translation test pins the URL."
+	},
+	{
+		"path": "apps/openjot/docs/privacy-policy.th.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The published policy names the repository it was published under; the archived repository stays readable, and the translation test pins the URL."
+	},
+	{
+		"path": "apps/openjot/docs/release/play-listing.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The Play listing text names the project's former repository; the store copy moves with the rename."
+	},
+	{
+		"path": "apps/openjot/docs/terms-of-service.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The published terms name the repository they were published under; the archived repository stays readable, and the translation test pins the URL."
+	},
+	{
+		"path": "apps/openjot/docs/terms-of-service.th.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The published terms name the repository they were published under; the archived repository stays readable, and the translation test pins the URL."
+	},
+	{
+		"path": "apps/openjot/site/README.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The landing page's README documents the fallback to the archived repository's release until the first openjot-v* exists."
+	},
+	{
+		"path": "apps/openjot/site/public/index.html",
+		"match": "trajectonomics/moojot",
+		"reason": "The MooJot landing page still points at its former repository for source, issues and legal pages; those links move with the rename."
+	},
+	{
+		"path": "apps/openjot/site/public/llms.txt",
+		"match": "trajectonomics/moojot",
+		"reason": "The summary for AI assistants still points at MooJot's former repository; those links move with the rename."
+	},
+	{
+		"path": "apps/openjot/site/public/meowjot-alternative.html",
+		"match": "trajectonomics/moojot",
+		"reason": "The comparison page still points at MooJot's former repository for source and legal pages; those links move with the rename."
+	},
+	{
+		"path": "apps/openjot/site/release.js",
+		"match": "trajectonomics/moojot",
+		"reason": "The fallback reads the archived repository's latest release until the first openjot-v* release exists."
+	},
+	{
+		"path": "apps/openjot/site/release.test.js",
+		"match": "trajectonomics/moojot",
+		"reason": "Pins the archived-repository fallback's download URLs."
+	},
+	{
+		"path": "apps/openjot/src/lib/components/SettingsView.svelte",
+		"match": "trajectonomics/moojot",
+		"reason": "The in-app About link names the app's former repository; phase 1 keeps the app's source unchanged."
+	},
+	{
+		"path": "apps/openjot/tests/unit/legal-translations.test.mjs",
+		"match": "trajectonomics/moojot",
+		"reason": "Pins the published legal documents' repository URL; the documents change in the rename phase."
+	},
+	{
+		"path": "apps/openjot/tools/third-party-notices.mjs",
+		"match": "trajectonomics/moojot",
+		"reason": "The generated notices name the project's former repository; regenerating them is part of the rename phase."
+	},
+	{
 		"path": "apps/site/README.md",
 		"match": "trajectonomics/site/issues/",
 		"reason": "Cites issues of the archived site repository by number; the issues stay readable."
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
-		"match": "trajectonomics/site/issues/33",
-		"reason": "Design record citing an archived site issue by number; the issue stays readable."
+		"match": "trajectonomics/design-system/issues/59",
+		"reason": "Design record citing an archived design-system issue by number; the issue stays readable."
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
@@ -46,8 +136,8 @@
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
-		"match": "trajectonomics/design-system/issues/59",
-		"reason": "Design record citing an archived design-system issue by number; the issue stays readable."
+		"match": "trajectonomics/site/issues/33",
+		"reason": "Design record citing an archived site issue by number; the issue stays readable."
 	},
 	{
 		"path": "apps/site/src/lib/build/site-content.test.ts",
@@ -56,13 +146,13 @@
 	},
 	{
 		"path": "docs/monorepo-migration.md",
-		"match": "trajectonomics/cli",
-		"reason": "Migration record: names the archived repositories the cutover moved out of."
+		"match": "docs/runbooks/release.md",
+		"reason": "Migration record: names the archived cli repository the cutover forwarded from."
 	},
 	{
 		"path": "docs/monorepo-migration.md",
-		"match": "docs/runbooks/release.md",
-		"reason": "Migration record: names the archived cli repository the cutover forwarded from."
+		"match": "trajectonomics/cli",
+		"reason": "Migration record: names the archived repositories the cutover moved out of."
 	},
 	{
 		"path": "docs/runbooks/deploy.md",
@@ -85,6 +175,11 @@
 		"reason": "Glossary note naming the package's former repository."
 	},
 	{
+		"path": "skills/customer/scripts/traj-handoff.test.ts",
+		"match": "source` is `trajectonomics/skills`",
+		"reason": "Asserts the handoff names the former source's lock entry as no pin."
+	},
+	{
 		"path": "skills/customer/scripts/traj-onboarding-setup.test.ts",
 		"match": "trajectonomics/cli#",
 		"reason": "Asserts the onboarding Skill names no archived cli issue."
@@ -98,11 +193,6 @@
 		"path": "skills/customer/skills/traj/SKILL.md",
 		"match": "source` is `trajectonomics/skills`",
 		"reason": "Describes the lock entry an install from the former source leaves, so the handoff reads it as no pin."
-	},
-	{
-		"path": "skills/customer/scripts/traj-handoff.test.ts",
-		"match": "source` is `trajectonomics/skills`",
-		"reason": "Asserts the handoff names the former source's lock entry as no pin."
 	},
 	{
 		"path": "skills/internal/AGENTS.md",
