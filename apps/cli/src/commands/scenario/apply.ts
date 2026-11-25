@@ -9,7 +9,7 @@ import { applyResult, writeApplied } from "../../scenario/apply-write"
 import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
 import { IF_HASH } from "../../scenario/if-hash"
-import { addFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
+import { addFlag, decimalProblem, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { printTemplate } from "../../scenario/template"
 import { LEDGER_READ_CODES } from "../../store"
 
@@ -76,7 +76,7 @@ export const apply: Leaf = defineCommand({
 		const wrong = exclusive(input)
 		if (wrong !== undefined) return wrong
 		if (input.template === true) return printTemplate(ctx, input.asOf)
-		if (input.file === undefined) return applyWhatIfFlags(ctx, input)
+		if (input.file === undefined) return decimalProblem(input) ?? applyWhatIfFlags(ctx, input)
 		// The document form checks this before it reads the document; the guard keeps `name` a string.
 		const name = input.name
 		if (name === undefined) return missingFieldError(REQUIRED_NAME)

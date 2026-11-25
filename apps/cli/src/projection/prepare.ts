@@ -13,6 +13,7 @@ import { canonicalJson } from "../store/canonical"
 import { guard } from "../store/guard"
 import { hasAnyLevy } from "./levies"
 import type { ScenarioEcho, TaxStatus } from "./view"
+import { withoutHeldAccount } from "./without-held"
 
 /** What every projection leaf resolves before it runs the engine. */
 export type Prepared = {
@@ -94,6 +95,8 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	if (isAppError(household)) return household
 	const mapped = input.baseline()
 	if (isAppError(mapped)) return mapped
+	const held = withoutHeldAccount(input.without ?? [], mapped)
+	if (held !== null) return held
 	// The effective hash is the stored hash function applied to the document after the Overrides.
 	// Canonicalising cannot fail on a stored document plus JSON values, but `guard` makes a bug in
 	// that assumption an envelope rather than a throw.

@@ -10,6 +10,7 @@ import {
 	additionsField,
 	appliedOverride,
 	decimalFlag,
+	decimalProblem,
 	setFlag,
 	withoutFlag,
 } from "../../scenario/override-flags"
@@ -64,6 +65,8 @@ export const fork: Leaf = defineCommand({
 	errorCodes: ["database_busy", "invalid_input", "not_found", "scenario_name_taken"],
 	run: (input, ctx) => {
 		if (UUID_SHAPED.test(input.name)) return invalidScenarioName()
+		const unread = decimalProblem(input)
+		if (unread !== null) return unread
 		const sets = input.set ?? []
 		const without = input.without ?? []
 		const add = input.add ?? []

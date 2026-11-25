@@ -8,7 +8,13 @@ import { DEFAULT_BUCKETS, planModelOf } from "../../projection/chance-plan"
 import { scenarioFlag } from "../../projection/flags"
 import type { ScenarioDocument } from "../../scenario/document"
 import { scenarioNotFound } from "../../scenario/errors"
-import { addFlag, decimalFlag, setFlag, withoutFlag } from "../../scenario/override-flags"
+import {
+	addFlag,
+	decimalFlag,
+	decimalProblem,
+	setFlag,
+	withoutFlag,
+} from "../../scenario/override-flags"
 import { applyScenarioSets } from "../../scenario/set-apply"
 import { withStore } from "../../with-store"
 
@@ -47,6 +53,7 @@ export const model: Leaf = defineCommand({
 	],
 	errorCodes: ["invalid_input", "not_found"],
 	run: (input, ctx) =>
+		decimalProblem(input) ??
 		withStore(ctx, (store) => {
 			const row = store.getScenario(input.scenario)
 			if (isAppError(row)) return row
