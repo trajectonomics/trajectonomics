@@ -2,7 +2,7 @@ import { TH_2026_PARAMETERS } from "../parameters"
 import { ThAllowanceField } from "../types"
 import { toSatang } from "../units"
 import type { ThLevyGraph } from "./graph"
-import { rateCapAt, sumMeasures } from "./graph-rates"
+import { auditedId, rateCapAt, sumMeasures } from "./graph-rates"
 import { ThLevyContributionLabel, ThLevyIncomeLabel } from "./labels"
 import { ThLevyMeasureId } from "./measure-ids"
 import type { ThLevyTallies } from "./tallies"
@@ -37,12 +37,15 @@ export interface ThRetirementAllowanceMeasures {
  * @param graph Measure graph being built.
  * @param tallies Income and contribution tally ids.
  * @param assessable Assessable income Measure used as the percentage base.
+ * @param named Whether the cluster and ThaiESG take their audited ids; a Filer's own share of a
+ * joint Return does not.
  * @statute Thailand Revenue Code Section 47; Ministerial Regulations No. 126, 390.
  */
 export function addRetirementAllowances(
 	graph: ThLevyGraph,
 	tallies: ThLevyTallies,
 	assessable: string,
+	named = true,
 ): ThRetirementAllowanceMeasures {
 	const p = TH_2026_PARAMETERS.allowances.retirementCluster
 	const income = tallies.income
@@ -82,13 +85,13 @@ export function addRetirementAllowances(
 	const cluster = graph.min(
 		individual,
 		graph.constant(toSatang(p.combinedCeiling, ThAllowanceField.RetirementCluster)),
-		ThLevyMeasureId.RetirementCluster,
+		auditedId(named, ThLevyMeasureId.RetirementCluster),
 	)
 	const esg = TH_2026_PARAMETERS.allowances.thaiEsg
 	const thaiEsg = graph.min(
 		funded[ThLevyContributionLabel.ThaiEsg],
 		rateCapAt(graph, assessable, esg.maxRate, toSatang(esg.ceiling, ThAllowanceField.ThaiEsg)),
-		ThLevyMeasureId.ThaiEsg,
+		auditedId(named, ThLevyMeasureId.ThaiEsg),
 	)
 	return { cluster, thaiEsg }
 }

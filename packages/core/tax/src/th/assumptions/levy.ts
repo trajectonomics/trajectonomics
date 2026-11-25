@@ -1,6 +1,7 @@
 import { ThLevyContributionLabel, ThLevyIncomeLabel } from "../levy/labels"
 import { ThLevyMeasureId } from "../levy/measure-ids"
 import { ThAssumptionFact as F, type ThAssumptionFact } from "./facts"
+import { bareLabel, scaledIds } from "./levy-reads"
 import { type ThAssumption, thAssumptions } from "./resolve"
 
 /** The Measures of a Levy and, optionally, what each one came to in a period. */
@@ -10,6 +11,8 @@ export interface ThAssumptionLevy {
 		readonly op: string
 		readonly label?: string
 		readonly of?: string
+		readonly a?: string
+		readonly b?: string
 	}[]
 }
 
@@ -57,9 +60,7 @@ function factsOf(
 	levy: ThAssumptionLevy,
 	isActive: (measure: { readonly id: string; readonly label?: string }) => boolean,
 ): ReadonlySet<ThAssumptionFact> {
-	const scaled = new Set(
-		levy.measures.flatMap((measure) => (measure.op === "scale" ? [measure.of] : [])),
-	)
+	const scaled = scaledIds(levy.measures)
 	const facts = new Set<ThAssumptionFact>()
 	for (const measure of levy.measures) {
 		const fact = factOfMeasure(measure, scaled)
@@ -74,7 +75,7 @@ function factOfMeasure(
 ): ThAssumptionFact | undefined {
 	if (measure.op === "const") return CLAIM_MEASURES[measure.id]
 	if (measure.op !== "tally") return undefined
-	const label = measure.label ?? ""
+	const label = bareLabel(measure.label ?? "")
 	const rate = RATE_LABELS[label]
 	if (rate === undefined) return CLAIM_LABELS[label]
 	return scaled.has(measure.id) ? rate : undefined
