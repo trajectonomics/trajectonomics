@@ -87,10 +87,12 @@ describe("PnlCard", () => {
 	test("Hide amounts masks the digits and keeps the direction word", () => {
 		const data = pnl([row("Salary", "income", "-900000.00")], THB("900000.00"))
 		preferences.hidden = true
-		const { body } = render(PnlCard, {
-			props: { pnl: okRead(["report", "pnl"], pnlView(data)) },
-		})
-		preferences.hidden = false
+		let body = ""
+		try {
+			body = render(PnlCard, { props: { pnl: okRead(["report", "pnl"], pnlView(data)) } }).body
+		} finally {
+			preferences.hidden = false
+		}
 		expect(body).toContain("Money in")
 		expect(body).toContain("•••••")
 		expect(body).not.toContain("900,000.00")
