@@ -32,7 +32,7 @@ describe("the OpenJot page's Dictionary", () => {
 		}
 	})
 
-	it("keeps the six features, the three steps and the four screenshots paired", () => {
+	it("keeps the six features, the three steps, the four screenshots and the four privacy claims paired", () => {
 		for (const { language, dictionary } of OPENJOT_LANGUAGES) {
 			expect({ language, titles: dictionary.featureTitles.length }).toEqual({ language, titles: 6 })
 			expect({ language, copies: dictionary.featureCopies.length }).toEqual({ language, copies: 6 })
@@ -46,6 +46,14 @@ describe("the OpenJot page's Dictionary", () => {
 				captions: 4,
 			})
 			expect({ language, alts: dictionary.screenAlts.length }).toEqual({ language, alts: 4 })
+			expect({ language, claims: dictionary.privacyTitles.length }).toEqual({
+				language,
+				claims: 4,
+			})
+			expect({ language, claimCopies: dictionary.privacyCopies.length }).toEqual({
+				language,
+				claimCopies: 4,
+			})
 			expect({ language, questions: dictionary.faqQuestions.length }).toEqual({
 				language,
 				questions: 6,
