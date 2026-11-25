@@ -2,7 +2,7 @@
  * One loan as a card on the Assets and debts page: its terms as the document states them, and its statement
  * as `traj` prints it. Every amount is the CLI's decimal string; the card computes nothing.
  */
-import type { Baseline, ProjectionRun, Read, ScenarioDocument, ScenarioFlow } from "../../contract"
+import type { Baseline, ProjectionRun, Read, ScenarioDocument } from "../../contract"
 import { formatBps } from "../../format/bps"
 import { balanceOf } from "./accounts"
 import { groupedIds } from "./asset-document"
@@ -10,19 +10,7 @@ import { type GroupSwitch, loanSwitch } from "./group-switch"
 import { type LoanParts, loanPartsOf } from "./loan-document"
 import { type LoanStatement, type LoanTerms, statementOf } from "./loan-statement"
 import type { LoanRow } from "./loans"
-
-/** The words a payment's rounding reads as on a card. */
-const ROUNDING_TEXT: Readonly<Record<string, string>> = {
-	floor: "Rounded down",
-	halfUp: "Rounded to the nearest",
-	ceil: "Rounded up",
-}
-
-/** A rounding as a card words it; a word the CLI added since is shown as it is, and none stated is blank. */
-function roundingText(rounding: string | undefined): string {
-	if (rounding === undefined) return ""
-	return ROUNDING_TEXT[rounding] ?? rounding
-}
+import { roundingText } from "./rounding-text"
 
 /** One loan's card: its id (the liability Account), its principal, its terms and its statement. */
 export interface LoanCardView {
@@ -96,26 +84,4 @@ export function loanCardsOf(
 			statement: statementOf(run, loan.account.id, termsOfStatement(doc, loan)),
 			switch: loanSwitch(doc, loan, held),
 		}))
-}
-
-/**
- * The loan Flows a loan card does not place: a withdrawal or a payment that is not one of a loan's parts. A
- * real asset's items are placed on its card, so they are not listed here.
- */
-export function unplacedFlows(doc: ScenarioDocument): ScenarioFlow[] {
-	const placed = new Set(
-		loanPartsOf(doc).flatMap((loan) => [
-			loan.payment.id,
-			...(loan.draw === null ? [] : [loan.draw.id]),
-		]),
-	)
-	const grouped = groupedIds(doc)
-	return doc.flows.filter((flow) => !placed.has(flow.id) && !grouped.has(flow.id))
-}
-
-/** The Accounts a plain card shows: every Account except the debts a loan repays and the real assets, which have cards. */
-export function plainAccounts(doc: ScenarioDocument): ScenarioDocument["accounts"] {
-	const repaid = new Set(loanPartsOf(doc).map((loan) => loan.account.id))
-	const grouped = groupedIds(doc)
-	return doc.accounts.filter((account) => !repaid.has(account.id) && !grouped.has(account.id))
 }

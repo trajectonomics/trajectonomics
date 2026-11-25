@@ -37,7 +37,7 @@ function forget(): void {
 
 /** The block the draft names, or the problems at its fields (shown, nothing sent). */
 function prepare() {
-	const result = blockFromDraft(draft)
+	const result = blockFromDraft(draft, plan.estate)
 	editSession.clear()
 	problems = result.ok ? {} : result.problems
 	return result.ok ? result : null

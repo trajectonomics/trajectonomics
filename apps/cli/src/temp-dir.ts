@@ -44,3 +44,24 @@ export function sweepTempDirs(): void {
 		}
 	}
 }
+
+let armed = false
+
+/**
+ * Makes the sweep also run when the process ends before `afterAll` can: on exit, and on SIGINT or
+ * SIGTERM (a timeout or a cancelled task). After the sweep the handler removes itself and re-raises
+ * the signal, so the parent sees a child killed by that signal rather than one that exited 128 plus
+ * its number. SIGKILL cannot be handled. Idempotent; `src/test-setup.ts` calls it.
+ */
+export function sweepOnKill(): void {
+	if (armed) return
+	armed = true
+	process.on("exit", sweepTempDirs)
+	for (const signal of ["SIGINT", "SIGTERM"] as const) {
+		process.on(signal, () => {
+			sweepTempDirs()
+			process.removeAllListeners(signal)
+			process.kill(process.pid, signal)
+		})
+	}
+}

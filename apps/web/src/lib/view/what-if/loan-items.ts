@@ -1,8 +1,9 @@
 import type { Baseline, ProjectionRun, Read, ScenarioDocument } from "../../contract"
 import { lensDocument } from "../../what-if/lens-document"
 import type { PlanKind } from "../plan-items/kinds"
-import { type LoanCardView, loanCardsOf, unplacedFlows } from "../plan-items/loan-card"
+import { type LoanCardView, loanCardsOf } from "../plan-items/loan-card"
 import { type LoanCard, type LoanRow, loanCards } from "../plan-items/loans"
+import { unplacedFlows } from "../plan-items/unplaced"
 import type { PlanChanges } from "./plan-items"
 
 /** What a What-if session changes in one loan card: the baseline's text of each term and of the amount borrowed. */

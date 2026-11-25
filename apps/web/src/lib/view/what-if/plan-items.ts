@@ -12,7 +12,7 @@ import { type AccountCard, accountCards } from "../plan-items/accounts"
 import { groupedIds } from "../plan-items/asset-document"
 import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
 import type { PlanKind } from "../plan-items/kinds"
-import { plainAccounts } from "../plan-items/loan-card"
+import { plainAccounts } from "../plan-items/unplaced"
 import { type ItemMarks, type MarkMap, marksOf, shownCards, type WasField } from "./items"
 
 /** The session's changes to one plan, or null when no session is open on it. */

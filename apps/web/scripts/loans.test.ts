@@ -1,14 +1,14 @@
 // A plan that holds a loan, against the real traj: the Snapshot reads its document (cli ADR-0016), an Edit to
 // another item keeps the loan's fields as they were, and a loan refusal is worded at its field.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { snapshot } from "../src/lib/contract"
 import { demoCarryIn } from "./demo/carry-in"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY, SLOW_MS, withAmount } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 const PLAN = "loan-plan"
@@ -85,7 +85,7 @@ function serve(): Editor {
 }
 
 beforeAll(async () => {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-loans-"))
+	scratch = await makeScratch("traj-web-loans-")
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	applyInTerminal(PLAN, loanDocument())
@@ -101,7 +101,7 @@ beforeAll(async () => {
 }, SLOW_MS)
 
 afterAll(async () => {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 })
 
 describe("a plan that holds a loan, against the real traj", () => {

@@ -87,6 +87,10 @@ export function loanFromDraft(
 		isNew: existing === undefined,
 		choices,
 		keep: existing?.account.id,
+		stored: {
+			compounding: existing?.account.compounding,
+			rounding: existing?.payment.level?.rounding,
+		},
 	})
 	if (problems.size > 0) return { ok: false, problems: Object.fromEntries(problems) }
 	const owed = draft.arrival === "owed" ? owedChoiceOf(choices, draft.owedAccount) : undefined

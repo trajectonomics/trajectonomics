@@ -1,7 +1,6 @@
 // The fictional ledger the Edit tests write to, through the workspace's own traj binary, and the
 // editor that serves the write path over it.
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { demoCarryIn } from "./demo/carry-in"
@@ -9,6 +8,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { SLOW_MS } from "./edit-slow.test-support"
 import { recorded } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
@@ -50,7 +50,7 @@ export function ledgerHome(): string {
 /** The fictional ledger, built once; each Edit writes to it through the real traj. */
 export async function setupEditor(): Promise<Editor> {
 	if (editor !== null) return editor
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-edit-"))
+	scratch = await makeScratch("traj-web-edit-")
 	home = join(scratch, "traj-home")
 	await buildDemoLedger({ binary: BINARY, home, scratch })
 	// The demo ledger's Levy needs the Carry-in the demo states, or the projection of `base` is refused.
@@ -75,7 +75,7 @@ export async function postEdit(body: string): Promise<{ status: number; answer: 
 
 /** Removes the scratch ledger, so the next test file builds its own. */
 export async function disposeEditor(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 	scratch = ""
 	home = ""
 	editor = null

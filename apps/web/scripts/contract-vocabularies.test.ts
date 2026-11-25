@@ -90,6 +90,12 @@ const LISTS: readonly { label: string; web: readonly string[]; path: string; fol
 		follow: "within",
 	},
 	{
+		label: "the form's estate roundings",
+		web: ASSET_ROUNDINGS,
+		path: `${DOCUMENT}.estate.properties.costs.items.properties.rounding.enum`,
+		follow: "within",
+	},
+	{
 		label: "the form's loan roundings",
 		web: LOAN_ROUNDINGS,
 		path: `${FLOW}.level.properties.rounding.enum`,

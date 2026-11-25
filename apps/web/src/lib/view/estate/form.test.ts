@@ -107,6 +107,23 @@ describe("what the form checks, and what it leaves to traj", () => {
 		expect(found.get("costs.0.name")).toContain("at least one letter")
 		expect(problemsOf({ costs: [{ ...share, name: "fee-1" }], gifts: [] }).size).toBe(0)
 	})
+
+	test("a stored rounding the form does not offer is kept as it is, and a different unknown word is refused", () => {
+		const block = {
+			costs: [{ id: "settlement", of: "gross", bps: "1.00", rounding: "banker" }],
+			gifts: [],
+		}
+		const draft = draftOf(block)
+		expect(draft.costs[0]?.rounding).toBe("banker")
+		expect(blockFromDraft(draft, block).ok).toBe(true)
+		const typed = { ...draft, costs: [{ ...draft.costs[0]!, rounding: "weird" }] }
+		const result = blockFromDraft(typed, block)
+		expect(result.ok).toBe(false)
+		if (!result.ok)
+			expect(result.problems).toEqual({
+				"costs.0.rounding": "Choose how the share rounds to a minor unit.",
+			})
+	})
 })
 
 describe("the block a draft saves as", () => {
