@@ -1749,7 +1749,7 @@
           class="flex items-center gap-3 text-sm font-bold text-white"
         >
           <span>{t(lang, "scanESlips")}</span>
-          <span class="size-11 rounded-full bg-white text-[var(--brand)] flex items-center justify-center shadow-lg">
+          <span class="size-11 rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] flex items-center justify-center shadow-lg">
             <ScanLine class="size-5" />
           </span>
         </button>
@@ -1759,7 +1759,7 @@
           class="flex items-center gap-3 text-sm font-bold text-white"
         >
           <span>{lang === "th" ? "นำเข้าจากรูปสลิป" : "Import Slip Photo"}</span>
-          <span class="size-11 rounded-full bg-white text-[var(--brand)] flex items-center justify-center shadow-lg">
+          <span class="size-11 rounded-full bg-[var(--brand)] text-[var(--brand-contrast)] flex items-center justify-center shadow-lg">
             <ImagePlus class="size-5" />
           </span>
         </button>
@@ -1784,7 +1784,7 @@
         <Plus class="size-4" />
         <span>{t(lang, "addRecord")}</span>
       </button>
-      <span class="w-px h-5 bg-white/30"></span>
+      <span class="w-px h-5 bg-[var(--brand-contrast)]/30"></span>
       <button
         type="button"
         onclick={() => (showFabMenu = !showFabMenu)}

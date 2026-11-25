@@ -5,6 +5,13 @@
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>OpenJot</title>
+    <!-- Paint the saved theme before the app runs, so a dark choice never flashes light. Mirrors migrateTheme in src/lib/theme.ts. -->
+    <script>
+      try {
+        var t = localStorage.getItem("moojot_theme");
+        if (t === "dark" || t === "orange-black") document.documentElement.dataset.theme = "dark";
+      } catch (e) {}
+    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">
