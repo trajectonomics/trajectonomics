@@ -57,12 +57,16 @@ describe("a closed flag names the values it accepts", () => {
 		)
 	})
 
-	it("prints --set's own description and repeatable once, on each of its four pages", async () => {
-		const plain = /Replace one existing dotted document path with a JSON value; repeatable$/
+	it("prints --set's own description and repeatable once, on each of its five pages", async () => {
 		const satang =
-			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\); repeatable$/
-		expect(flagLine((await help(["scenario", "fork"])).out, "set")).toMatch(plain)
-		for (const path of [["fi"], ["projection", "run"], ["projection", "compare"]]) {
+			/Replace one existing dotted document path with a JSON value; amounts are in satang \(100 per THB\), or decimal strings with --decimal\. The paths a plan may lack are the estate block \(--set estate=<json> begins it whole\), an asset Account's volatility, a surplus step's share and upTo, and a withdraw entry's downTo\. Items of cashflow\.surplus and cashflow\.withdraw are addressed by position from 0, such as cashflow\.withdraw\.0\.downTo; repeatable$/
+		expect(flagLine((await help(["scenario", "fork"])).out, "set")).toMatch(satang)
+		for (const path of [
+			["fi"],
+			["projection", "run"],
+			["projection", "compare"],
+			["projection", "chance"],
+		]) {
 			expect(flagLine((await help(path)).out, "set")).toMatch(satang)
 		}
 	})
@@ -70,7 +74,7 @@ describe("a closed flag names the values it accepts", () => {
 	it("prints --label's description saying needs --tax, and repeatable once at the end", async () => {
 		const line = flagLine((await help(["scenario", "tax"])).out, "label") ?? ""
 		expect(line).toContain(
-			"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax. An income Flow takes one of ",
+			"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax. A label replaces that Flow's label and adds to the labels the other Flows already carry; --none clears them all. An income Flow takes one of ",
 		)
 		expect(line.match(/repeatable/g)).toHaveLength(1)
 		expect(line).toMatch(/; repeatable$/)

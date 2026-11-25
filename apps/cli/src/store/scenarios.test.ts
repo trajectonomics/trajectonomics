@@ -39,7 +39,12 @@ describe("scenarios", () => {
 			],
 		}
 		const same = must(store.saveScenario({ name: "base", document: reordered }))
-		expect(same).toEqual({ status: "unchanged", scenario: first.scenario })
+		expect(same).toEqual({
+			status: "unchanged",
+			scenario: first.scenario,
+			droppedAnchors: [],
+			droppedOwners: [],
+		})
 		const changed = must(
 			store.saveScenario({ name: "base", document: { ...DOC, economy: { inflation: 100 } } }),
 		)
@@ -87,6 +92,8 @@ describe("scenarios", () => {
 		expect(must(store.forkScenario(base.id, "early"))).toEqual({
 			status: "name_taken",
 			scenario: fork.scenario,
+			droppedAnchors: [],
+			droppedOwners: [],
 		})
 		expect(must(store.forkScenario("nope", "late"))).toEqual({ status: "not_found" })
 	})
@@ -103,6 +110,7 @@ describe("scenarios", () => {
 				updatedAt: "2026-01-01T00:00:01.000Z",
 				deletedAt: "2026-01-01T00:00:01.000Z",
 			},
+			wasMain: false,
 		})
 		expect(must(store.deleteScenario(base.id))).toEqual({ status: "not_found" })
 		expect(must(store.saveScenario({ name: "base", document: DOC })).status).toBe("created")

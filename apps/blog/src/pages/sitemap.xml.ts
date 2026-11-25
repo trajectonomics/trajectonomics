@@ -1,13 +1,37 @@
 import type { APIRoute } from "astro"
-import { readPosts } from "../content/read-posts"
+import { postPagePath, readPosts } from "../content/read-posts"
+import { chooseTranslation, DEFAULT_LANGUAGE, LANGUAGES, treePath } from "../lib/languages"
 import { BLOG_PATH, SITE_ORIGIN } from "../lib/site"
-import { sitemapXml } from "../lib/sitemap"
+import { type SitemapEntry, sitemapXml } from "../lib/sitemap"
 
-/** The front page and every published Post. */
+/**
+ * Every tree's front page, and every Post in each Language it is written in. A page that falls
+ * back to another Translation is not listed: its canonical is the native page.
+ */
 export const GET: APIRoute = async () => {
 	const posts = await readPosts()
-	const paths = [BLOG_PATH, ...posts.map((post) => post.path)]
-	return new Response(sitemapXml(SITE_ORIGIN, paths), {
+	const frontAlternates = [
+		...LANGUAGES.map((language) => ({ hreflang: language, path: treePath(language, BLOG_PATH) })),
+		{ hreflang: "x-default", path: BLOG_PATH },
+	]
+	const fronts: SitemapEntry[] = LANGUAGES.map((language) => ({
+		path: treePath(language, BLOG_PATH),
+		alternates: frontAlternates,
+	}))
+	const postEntries: SitemapEntry[] = posts.flatMap((post) => {
+		const alternates = [
+			...post.languages.map((language) => ({
+				hreflang: language,
+				path: postPagePath(post, language),
+			})),
+			{
+				hreflang: "x-default",
+				path: postPagePath(post, chooseTranslation(post.languages, DEFAULT_LANGUAGE)),
+			},
+		]
+		return post.languages.map((language) => ({ path: postPagePath(post, language), alternates }))
+	})
+	return new Response(sitemapXml(SITE_ORIGIN, [...fronts, ...postEntries]), {
 		headers: { "content-type": "application/xml; charset=utf-8" },
 	})
 }

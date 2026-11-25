@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import {
 	type Doctor,
 	type Read,
@@ -13,7 +14,7 @@ import SnapshotSection from "./SnapshotSection.svelte"
 
 // The Demo supplies only the shape of a Snapshot and its dates: each assertion reads them from it, so the
 // test survives a rebuilt Demo. Every figure asserted in the sections below is a hand-made fixture.
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 const demo: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 const doctor: Doctor = {
@@ -50,6 +51,28 @@ describe("LedgerHealthSection", () => {
 		const { body } = render(LedgerHealthSection, { props: { doctor: ok(failing) } })
 		expect(body).toContain("Needs attention")
 		expect(body).toContain("Does not balance")
+	})
+
+	test("says the totals exceed the safe range, and that the columns balance, when their sums are out of range", () => {
+		const unstated: Doctor = {
+			...doctor,
+			trialBalance: { asOf: "2026-10-31", totals: null, balanced: true },
+		}
+		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
+		expect(body).toContain("Balances")
+		expect(body).toContain("Debits equal credits at")
+		expect(body).toContain("the totals exceed the safe range")
+	})
+
+	test("says the columns disagree when an unstated total's columns do not balance", () => {
+		const unstated: Doctor = {
+			...doctor,
+			ok: false,
+			trialBalance: { asOf: "2026-10-31", totals: null, balanced: false },
+		}
+		const { body } = render(LedgerHealthSection, { props: { doctor: ok(unstated) } })
+		expect(body).toContain("Does not balance")
+		expect(body).toContain("Debits and credits disagree at")
 	})
 
 	test("shows the CLI's error in its section when the doctor failed", () => {

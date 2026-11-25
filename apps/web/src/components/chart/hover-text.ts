@@ -13,16 +13,16 @@ export function displayOf(display: string | undefined, masked: boolean): string 
 export function describeIndex(layout: LineLayout, index: number, masked: boolean): string {
 	const parts = layout.series.map((line) => {
 		const mark = line.marks[index]
-		return `${line.name} ${displayOf(mark?.display, masked)}`
+		return `${line.name} ${displayOf(mark?.display, masked && !line.plain)}`
 	})
-	return [layout.xLabels[index] ?? "", ...parts].join(", ")
+	return [layout.xTitles?.[index] ?? layout.xLabels[index] ?? "", ...parts].join(", ")
 }
 
 /** The rows of the tooltip at an index: each series' name, its string and its stroke. */
 export function tooltipRows(layout: LineLayout, index: number, masked: boolean): TooltipRow[] {
 	return layout.series.map((line, seriesIndex) => ({
 		name: line.name,
-		display: displayOf(line.marks[index]?.display, masked),
-		stroke: strokeClass(seriesIndex),
+		display: displayOf(line.marks[index]?.display, masked && !line.plain),
+		stroke: strokeClass(seriesIndex, layout.palette === "wide"),
 	}))
 }

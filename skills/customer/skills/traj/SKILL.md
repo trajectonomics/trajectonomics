@@ -1,8 +1,8 @@
 ---
 name: traj
-description: "Operate `traj`, the Trajectonomics ledger and projection CLI, on someone's own money: record what they earned and spent, read balances and reports, and answer what-if and financial-independence questions. Use when the user talks about their accounts, spending, budget, net worth, savings plan, Thai tax, or planning a purchase."
+description: "Operate `traj`, the Trajectonomics command-line ledger, on someone's own money: record what they earned and spent, keep their accounts, check that the ledger balances, and read balances and reports. Use when someone wants to track their spending from a terminal, set up their accounts (for example to work out their Thai income tax estimate), record an expense or income, check their ledger, or asks about net worth or financial-independence questions; also whenever they name `traj`. It computes from a ledger and nothing else: it is no spreadsheet, gives no investment advice, and does not prepare, file or check a tax return."
 metadata:
-  cli: ">=0.2.0 <0.7.0"
+  cli: ">=0.2.0 <0.8.0"
 ---
 
 # traj
@@ -49,7 +49,7 @@ Take every flag, required field, document shape and enum value from that output,
 - Commands never prompt. Nothing will come back asking a question.
 - A JSON error is an envelope on stderr: `{"error":{"code","exitCode","message","path?","hint?","details?"}}`. Read `exitCode` for the class, `code` for which failure, `hint` for what to try next.
 - Exit classes: `0` ok, `1` unexpected, `2` invalid input you must fix, `3` the domain refused it, `4` not found, `5` conflict such as a name already taken. A launcher failure, before the binary starts, is plain text rather than an envelope: read it, tell the user what it said, and stop retrying.
-- Money is a decimal string at the currency's scale, with its currency (`"120.50"`), everywhere except inside a Scenario document: an amount you pass in a flag, a CSV `amount` cell, a transaction document, and every amount a ledger, report or projection result prints. Inside a Scenario document — one you apply or read back, and the `--set` overrides that change it — money is an integer of minor units, so `100000` is 1,000.00 THB, which is that document's form of the same amount and not a restatement. `traj schema` is the authority wherever it states a unit. Keep the unit the user's: restating one amount in a different unit is a second number you invented.
+- Money is a decimal string at the currency's scale, with its currency (`"120.50"`), everywhere except inside a Scenario document: an amount you pass in a flag, a CSV `amount` cell, a transaction document, and every amount a ledger, report or projection result prints. Inside a Scenario document — one you apply or read back, and the `--set` overrides that change it — money is an integer of minor units, so `100000` is 1,000.00 THB, which is that document's form of the same amount and not a restatement. Add `--decimal` beside a `--set` or `--add` to give its amounts as decimal strings (`--set 'flows.salary.amount="90000.50"' --decimal`); it is refused when there is no `--set` or `--add` for it to read. `traj schema` is the authority wherever it states a unit. Keep the unit the user's: restating one amount in a different unit is a second number you invented.
 - Dates are `YYYY-MM-DD` Gregorian, in English. A Buddhist Era year is the same day under a different year number: convert it, and ask the user when the source does not say which calendar it is.
 - Use `traj`; never import a core package and compute the figure yourself. The point of the tool is that its arithmetic is the one answer.
 
@@ -70,13 +70,31 @@ Two write behaviours to use on purpose, wherever the schema lists them:
 
 A flag that carries a document takes a path or `-`. `-` is the only way to send a document on stdin; it is never inferred from a pipe.
 
+## Read a sign
+
+Every Skill reads a sign from this section and states none of its own. `traj balance`, `traj report networth`, `traj report pnl` and the trial balance print raw signed units, and each row's `type` says how to read its sign:
+
+| type | its normal sign | a figure on it reads as |
+| --- | --- | --- |
+| `asset` | positive | what they hold |
+| `expense` | positive | what they spent |
+| `liability` | negative | what they owe: `-2400.00` is a debt of 2,400.00 |
+| `income` | negative | what they earned |
+| `equity` | negative | the opening balances and offsets behind the other rows, never a figure about their wealth |
+
+- **Net worth already counts every debt.** It is assets minus liabilities, and `traj balance` prints it as `netWorth` and `traj report networth` as `totals`. Quote that figure; adding a liability row's size to it, or subtracting the row from it, counts the debt twice.
+- A liability whose balance moves towards `0` is being repaid, and one that moves further below `0` is borrowing.
+- `traj report pnl` prints raw rows, income negative and expense positive, and its total is income minus expenses: positive when they earned more than they spent. Report the printed figure, say in words which way it points, and never flip a sign to make a sentence read better.
+- **A write takes a magnitude, and the direction is `--from` and `--to`.** A negative `--amount` is refused with `NEGATIVE_AMOUNT`, exit `3`. Borrowing runs `--from` the liability `--to` the account that received the money; repaying runs `--from` the account that paid `--to` the liability.
+- **`--opening` is the one signed write.** It reads `--from` as equity and `--amount` as signed, so an opening debt is a negative amount, as in `traj tx add --opening --from Opening --to Mortgage --amount -2400.00 --date 2026-01-01`. From 0.3.0 the command line refuses a positive opening on a liability with `liability_opening_positive`, exit `3`, and its `hint` names the signed amount. On 0.2.0 a positive opening is accepted and the debt reads as a gain, in net worth too, so a negative amount is the only correct entry at every release in the CLI Range.
+
 ## Hand a job to the Skill that owns it
 
 This is the contract, not a recipe, and it is not a router either: a Skill the agent has to hop through is one an unattended run skips.
 
 When the user's request is a job with a Recipe — a bank import, a periodic review, a plan — the [Skill Manifest](https://github.com/trajectonomics/trajectonomics/blob/<commit>/skills/customer/skills.manifest.json), at the commit this Skill's scope pinned, names the Skill that carries it. Install that row in this Skill's own scope by its explicit name, then follow it. Three reads come before any install.
 
-1. **The scope.** Run `npx skills list --json` and `npx skills list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
+1. **The scope.** Run `npx -y skills@1.9.0 list --json` and `npx -y skills@1.9.0 list -g --json`. A project list that names `traj` is this session's copy; when it does not, a global list that does is. A `traj` in the other scope belongs to another setup.
 2. **The pin.** Read the `commit` the resolved scope's lock records for `traj`. A project lock is `./skills-lock.json`; a global lock is `${XDG_STATE_HOME}/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, and `~/.agents/.skill-lock.json` when it is not. The list reports no commit, so the lock is the only place it is read. Never install from `main`: a branch moves, and a person's setup must not.
 3. **The row.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at that commit, and take the job's row and its `cliRange`. When the resolved scope's list already names that row's Skill, install nothing and follow it.
 
@@ -85,7 +103,7 @@ When the user's request is a job with a Recipe — a bank import, a periodic rev
 **Install** the row when the command line is at or above its CLI Range floor, the range's lower bound, using the pin and an explicit name:
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
+npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name> -y
 ```
 
 Add `-g` to it in the global scope. Then confirm from the same scope's list that it landed. A row whose upper bound the command line has passed — a pre-release of that bound's minor counts as past it — is installed all the same, and you say so in one sentence: name the range the Skill was checked through, and that `traj schema` is authoritative where the two differ.

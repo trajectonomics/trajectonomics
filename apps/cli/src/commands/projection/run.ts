@@ -10,6 +10,7 @@ import {
 	carryInFlag,
 	carryInFlagDocument,
 	horizonFlag,
+	outputFlags,
 	PROJECTION_ERROR_CODES,
 	scenarioFlag,
 	setFlag,
@@ -17,11 +18,14 @@ import {
 import { withProjection } from "../../projection/leaf"
 import { projectionHint } from "../../projection/render"
 import { projectionOf } from "../../projection/run"
+import { RUN_EXAMPLES } from "../../projection/run-examples"
 import { projectionRunView } from "../../projection/run-view"
+import { addFlag, decimalFlag, withoutFlag } from "../../scenario/override-flags"
 
 export const run: Leaf = defineCommand({
 	name: "run",
 	summary: "Project the Baseline through a Scenario, year by year",
+	note: "Each person's age on the rows, the --breakdown cash flow, --liabilities statements, --accounts values, --spending rule years and --estate statement, and the payouts, fees and employer share a plan declares, ships in 0.8.0.",
 	description: FI_METHOD,
 	positionals: [],
 	input: z.strictObject({
@@ -29,23 +33,16 @@ export const run: Leaf = defineCommand({
 		horizon: horizonFlag,
 		scenario: scenarioFlag,
 		set: setFlag,
+		without: withoutFlag,
+		add: addFlag,
+		decimal: decimalFlag,
 		carryIn: carryInFlag,
-		monthly: z.boolean().default(false).describe("Also report the monthly rows."),
+		...outputFlags,
 	}),
 	flagDocuments: [carryInFlagDocument],
 	output: projectionRunView,
 	render: projectionHint,
-	examples: [
-		{
-			command: "traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --json",
-			description: "The annual roll-up of one Scenario.",
-		},
-		{
-			command:
-				"traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 --set flows.salary.amount=9000000 --monthly",
-			description: "Try a raise without forking, and read the monthly rows.",
-		},
-	],
+	examples: RUN_EXAMPLES,
 	errorCodes: PROJECTION_ERROR_CODES,
 	run: async (input, ctx) => {
 		const records = input.carryIn === undefined ? [] : await readCarryIn(input.carryIn, ctx.stdin)
@@ -55,11 +52,14 @@ export const run: Leaf = defineCommand({
 				scenario: input.scenario,
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
+				without: input.without ?? [],
+				add: input.add ?? [],
+				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })
 			if (isAppError(placed)) return placed
-			return projectionOf(placed, input.monthly)
+			return projectionOf(placed, input)
 		})
 	},
 })

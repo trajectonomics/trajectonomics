@@ -1,11 +1,9 @@
 import { describe, expect, it } from "bun:test"
-import { mkdtempSync } from "node:fs"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
 import type { Leaf } from "./command"
 import { root } from "./commands"
 import type { RegistryEntry } from "./error-listing"
 import { SENTENCES } from "./sentences"
+import { makeTempDir } from "./temp-dir"
 import { capture, type ErrorBody, errorOf } from "./test-support"
 import { leavesOf } from "./tree"
 import { ledgerHome } from "./tx-test-support"
@@ -49,7 +47,10 @@ const STATE_FIRST: Record<string, { code: string; exit: number }> = {
 
 /** A command may raise its own CLI sentence for a missing input, outside the table. */
 const OWN_SENTENCES: Record<string, string> = {
+	"account value": "Name the account to value",
 	"scenario apply": "Name a JSON document, - for stdin, or --template",
+	"scenario household": "Name a household document, - for stdin, or --none",
+	"scenario main": "Name the Scenario to mark, or use --clear",
 	"tx import": "Name a CSV file, - for stdin, or --template",
 }
 
@@ -88,7 +89,7 @@ describe("every leaf with no arguments", () => {
 			// The config home is a temporary one, so `telemetry on` and `off` never write a real one.
 			const res = await capture([...path, "--json"], {
 				TRAJ_HOME: ledgerHome(),
-				XDG_CONFIG_HOME: mkdtempSync(join(tmpdir(), "traj-invalid-input-")),
+				XDG_CONFIG_HOME: makeTempDir("traj-invalid-input-"),
 			})
 			if (SUCCEEDING.has(name)) {
 				expect({ name, code: res.code }).toEqual({ name, code: 0 })

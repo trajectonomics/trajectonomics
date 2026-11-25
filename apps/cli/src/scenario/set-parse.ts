@@ -1,9 +1,27 @@
 import { type AppError, fail, isAppError } from "../errors"
 
-/** One parsed `--set`: the dotted segments and the JSON value they take. */
-export type ParsedSet = { segments: string[]; value: unknown }
+/** The input field an Override error points at: a `--set`, a `--without` removal or an `--add` (cli ADR-0054, ADR-0062). */
+export type OverrideFlag = "set" | "without" | "add"
 
 const SET_HINT = "A --set is path=json, such as --set flows.salary.amount=50000."
+const WITHOUT_HINT = "A --without names one list item by its id, such as --without flows.gym."
+const ADD_HINT = `An --add is list=json, such as --add 'flows={"id":"gym","kind":"expense",...}'.`
+const HINTS: Record<OverrideFlag, string> = { set: SET_HINT, without: WITHOUT_HINT, add: ADD_HINT }
+
+/** An invalid Override points at its input field, never at a document path. */
+export function flagError(
+	flag: OverrideFlag,
+	index: number,
+	message: string,
+	options: { hint?: string; details?: Record<string, unknown> } = {},
+): AppError {
+	return fail("invalid_input", {
+		path: flag,
+		message: `${flag}: ${message}`,
+		hint: options.hint ?? HINTS[flag],
+		details: { index, ...options.details },
+	})
+}
 
 /** An invalid `--set` always points at the input field `set`, never at a document path. */
 export function badSet(
@@ -11,38 +29,18 @@ export function badSet(
 	message: string,
 	options: { hint?: string; details?: Record<string, unknown> } = {},
 ): AppError {
-	return fail("invalid_input", {
-		path: "set",
-		message: `set: ${message}`,
-		hint: options.hint ?? SET_HINT,
-		details: { index, ...options.details },
-	})
+	return flagError("set", index, message, options)
 }
 
-/** Splits at the first unescaped `=`; a backslash only shields the next character here. */
-export function splitAssignment(
-	raw: string,
-	index: number,
-): { path: string; value: string } | AppError {
-	for (let at = 0; at < raw.length; at += 1) {
-		const char = raw[at]
-		if (char === "\\") {
-			if (at + 1 >= raw.length) {
-				return badSet(index, `"${raw}" ends with a dangling \\`, { details: { path: raw } })
-			}
-			at += 1
-			continue
-		}
-		if (char === "=") return { path: raw.slice(0, at), value: raw.slice(at + 1) }
-	}
-	return badSet(index, `"${raw}" has no unescaped = between the path and the value`, {
-		details: { path: raw },
-	})
-}
+/** What an empty path says, by the flag it came from: only `--set` has an `=` to point at. */
+const EMPTY_PATH = {
+	set: "the path before = is empty",
+	without: "the path is empty",
+} as const
 
 const SEGMENT = /(?:\\.|[^.])+/g
 
-function unescapeSegment(part: string, index: number): string | AppError {
+function unescapeSegment(part: string, index: number, flag: OverrideFlag): string | AppError {
 	let text = ""
 	for (let at = 0; at < part.length; at += 1) {
 		const char = part[at] ?? ""
@@ -52,7 +50,7 @@ function unescapeSegment(part: string, index: number): string | AppError {
 		}
 		const next = part[at + 1]
 		if (next === undefined || !".\\=".includes(next)) {
-			return badSet(index, `"${part}" uses an escape other than \\. \\\\ or \\=`, {
+			return flagError(flag, index, `"${part}" uses an escape other than \\. \\\\ or \\=`, {
 				hint: "Only \\. \\\\ and \\= are escapes; any other backslash is invalid.",
 				details: { path: part },
 			})
@@ -63,39 +61,27 @@ function unescapeSegment(part: string, index: number): string | AppError {
 	return text
 }
 
-/** Unescapes one dotted path: `\.`, `\\` and `\=` are literals, any other escape is invalid. */
-export function parsePath(text: string, index: number): string[] | AppError {
-	if (text === "") return badSet(index, "the path before = is empty", { details: { path: text } })
+/**
+ * Unescapes one dotted path: `\.`, `\\` and `\=` are literals, any other escape is invalid. The
+ * `flag` says which input field a refusal names, so a `--without` path reports itself, not `set`.
+ */
+export function parsePath(
+	text: string,
+	index: number,
+	flag: keyof typeof EMPTY_PATH = "set",
+): string[] | AppError {
+	if (text === "") {
+		return flagError(flag, index, EMPTY_PATH[flag], { details: { path: text } })
+	}
 	const parts = text.match(SEGMENT) ?? []
 	if (parts.join(".") !== text) {
-		return badSet(index, `"${text}" has an empty segment`, { details: { path: text } })
+		return flagError(flag, index, `"${text}" has an empty segment`, { details: { path: text } })
 	}
 	const segments: string[] = []
 	for (const part of parts) {
-		const segment = unescapeSegment(part, index)
+		const segment = unescapeSegment(part, index, flag)
 		if (isAppError(segment)) return segment
 		segments.push(segment)
 	}
 	return segments
-}
-
-function parseValue(text: string, index: number): unknown | AppError {
-	try {
-		return JSON.parse(text)
-	} catch {
-		return badSet(index, `"${text}" is not JSON`, {
-			hint: 'A --set value is a JSON literal: 50000 is a number, "50000" a string. Quote a string.',
-			details: { path: text },
-		})
-	}
-}
-
-/** Parses one `path=json` string; nothing about the document is read here. */
-export function parseSet(raw: string, index: number): ParsedSet | AppError {
-	const parts = splitAssignment(raw, index)
-	if (isAppError(parts)) return parts
-	const segments = parsePath(parts.path, index)
-	if (isAppError(segments)) return segments
-	const value = parseValue(parts.value, index)
-	return isAppError(value) ? value : { segments, value }
 }

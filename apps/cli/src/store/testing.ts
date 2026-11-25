@@ -1,7 +1,7 @@
-import { mkdtempSync, statSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { statSync } from "node:fs"
 import { join } from "node:path"
 import { type AppError, isAppError } from "../errors"
+import { makeTempDir } from "../temp-dir"
 import { openStore } from "./index"
 import { createLedger } from "./ledger-file"
 import type { Clock, Store } from "./types"
@@ -13,7 +13,7 @@ export function fileMode(path: string): number {
 
 /** A data directory that does not exist yet, inside a fresh temporary folder. */
 export function tempHome(): string {
-	return join(mkdtempSync(join(tmpdir(), "traj-store-")), "home")
+	return join(makeTempDir("traj-store-"), "home")
 }
 
 /** A data directory holding an empty ledger, the way `traj init` leaves one. */

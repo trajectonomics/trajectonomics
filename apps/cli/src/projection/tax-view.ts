@@ -3,12 +3,15 @@ import { thLevyAssumptions } from "@trajectonomics/core/tax/th"
 import { z } from "zod"
 import { type AssumptionView, assumptionsField, assumptionViews } from "../tax-assumptions"
 import { dateField, moneyField, moneyOf } from "./money"
+import { breakdownOf } from "./tax-breakdown"
+import type { TaxWalkFields } from "./tax-walk-schema"
+import { taxWalkShape } from "./tax-walk-schema"
 
 /**
  * One Levy period as a Projection reports it: what the period owed, what was prepaid, and what
  * settles. Every figure is the engine's own `SettlementPeriod`; the CLI only formats it (ADR-0036).
  */
-export type TaxYearView = {
+export type TaxYearView = TaxWalkFields & {
 	levy: string
 	from: string
 	to: string
@@ -18,6 +21,9 @@ export type TaxYearView = {
 	owed: string
 	settled: boolean
 	partial: boolean
+	taxableIncome?: string | undefined
+	progressiveTax?: string | undefined
+	notes: string[]
 	assumptions: AssumptionView[]
 }
 
@@ -39,6 +45,16 @@ export const taxYearView: z.ZodType<TaxYearView> = z.strictObject({
 	partial: z
 		.boolean()
 		.describe("Whether the Projection ended before the period did, so the period is incomplete."),
+	taxableIncome: moneyField(
+		"The income the progressive brackets were applied to, after expenses and allowances; absent when the Levy does not report it",
+	).optional(),
+	progressiveTax: moneyField(
+		"The tax the progressive brackets gave on that income; absent when the Levy does not report it",
+	).optional(),
+	...taxWalkShape,
+	notes: z
+		.array(z.string())
+		.describe("What a reader needs to check the figure, such as the minimum tax applying."),
 	assumptions: assumptionsField,
 })
 
@@ -71,6 +87,7 @@ export function taxYearsOf(
 			owed: moneyOf(currency)(period.settlement),
 			settled: period.settled,
 			partial: period.partial,
+			...breakdownOf(period.measures, moneyOf(currency), period.due),
 			assumptions:
 				rules === undefined ? [] : assumptionViews(thLevyAssumptions(rules, period.measures)),
 		}))

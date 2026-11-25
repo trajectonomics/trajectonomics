@@ -3,9 +3,11 @@ import { isAppError } from "../errors"
 import { applyScenario, errorOf, scenarioHome } from "../scenario-test-support"
 import { canonicalScenarioDocument } from "../store"
 import { SCENARIO_DOCUMENT } from "../store/testing"
-import { acceptedScenarioSchemaVersion, scenarioDocumentError, scenarioProblems } from "./document"
+import { acceptedScenarioSchemaVersion, scenarioProblems } from "./document"
+import { scenarioDocumentError } from "./document-error"
 import { scenarioTemplate } from "./template"
 
+const HINT = 'Run "traj schema scenario apply" to see the document schema.'
 const SALARY = SCENARIO_DOCUMENT.flows[0]
 const VALID = SCENARIO_DOCUMENT
 
@@ -44,6 +46,7 @@ describe("scenarioDocumentError", () => {
 		expect(error.body).toEqual({
 			code: "invalid_input",
 			exitCode: 2,
+			hint: HINT,
 			path: "line.24.document.flows.0.nope",
 			message: "line.24.document.flows.0.nope: UNKNOWN_KEY",
 			details: [
@@ -64,11 +67,41 @@ describe("scenarioDocumentError", () => {
 	it("returns null for a document sim-core accepts", () => {
 		expect(scenarioDocumentError(VALID)).toBeNull()
 	})
+
+	it("states a sale refusal in words, as projection run does, and keeps its path and code", () => {
+		const draw = {
+			id: "draw",
+			kind: "withdrawal",
+			frequency: "once",
+			start: "2026-01-01",
+			amount: 100,
+			growth: { bps: 0 },
+			source: "vault",
+		}
+		const vault = { id: "vault", kind: "asset", rate: 0, lockedUntil: "2027-01-01" }
+		const error = scenarioDocumentError({
+			...VALID,
+			accounts: [...VALID.accounts, vault],
+			flows: [...VALID.flows, draw],
+		})
+		if (error === null) throw new Error("the document was accepted")
+		expect(error.body.path).toBe(`document.flows.${VALID.flows.length}.start`)
+		expect(error.body.message).toBe(
+			"A withdrawal sells an asset that is locked on the withdrawal's first date, and no Milestone gate says to wait, so it could never move anything on that date.",
+		)
+		expect(error.body.hint).toContain("Start the withdrawal on or after the asset's lockedUntil")
+		expect(error.body.details).toEqual([
+			{
+				path: `document.flows.${VALID.flows.length}.start`,
+				// The same sentence `scenario apply` puts in each detail (cli ADR-0067).
+				message: error.body.message,
+				code: "WITHDRAWAL_LOCKED",
+			},
+		])
+	})
 })
 
 describe("scenario document validation", () => {
-	const HINT = 'Run "traj schema scenario apply" to see the document schema.'
-
 	it("reports a non-object the same way from the document form and the store", async () => {
 		const cli = errorOf(await applyScenario(scenarioHome(), "base", "[]"))
 		expect(cli).toEqual({
@@ -76,6 +109,7 @@ describe("scenario document validation", () => {
 			exitCode: 2,
 			path: "document",
 			message: "document: NOT_AN_OBJECT",
+			hint: HINT,
 			details: [{ path: "document", message: "document: NOT_AN_OBJECT", code: "NOT_AN_OBJECT" }],
 		})
 		const stored = canonicalScenarioDocument([])

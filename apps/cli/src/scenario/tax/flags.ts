@@ -17,8 +17,12 @@ export type TaxFlags = {
 	filingStatus?: ThFilingStatus | undefined
 	children?: number | undefined
 	childrenAtHigherRate?: number | undefined
-	/** `scenario tax --none` removes the Levy instead of writing one. */
+	/** `scenario tax --none` removes the Levy and its stored profile instead of writing one. */
 	none?: boolean | undefined
+	/** `scenario tax --merge` changes the flags given and keeps the rest of the stored profile. */
+	merge?: boolean | undefined
+	/** `scenario tax --from-stored` writes the Levy again from the stored profile. */
+	fromStored?: boolean | undefined
 } & { readonly [K in keyof TaxAllowances]?: number | undefined }
 
 /** What the caller asked the CLI to write, with every default resolved. */
@@ -47,20 +51,30 @@ export const FILING_STATUSES: readonly [ThFilingStatus, ...ThFilingStatus[]] = [
 export function labelFlagDescription(): string {
 	return [
 		"Classify one Flow for tax as <flow>=<label>, such as salary=income.section40_1; needs --tax.",
+		"A label replaces that Flow's label and adds to the labels the other Flows already carry; --none clears them all.",
 		labelSetsSentence(),
 	].join(" ")
+}
+
+/** Whether a profile flag that changes the Levy was given, `--tax` itself aside. */
+export function changesProfile(flags: TaxFlags): boolean {
+	return (
+		flags.filingStatus !== undefined ||
+		flags.children !== undefined ||
+		flags.childrenAtHigherRate !== undefined ||
+		ALLOWANCE_FLAGS.some((field) => flags[field] !== undefined)
+	)
+}
+
+/** Whether any flag that writes a Levy was given. */
+export function writesLevy(flags: TaxFlags): boolean {
+	return flags.tax !== undefined || changesProfile(flags)
 }
 
 /** `--none` beside any flag that writes a Levy: one or the other, never both. */
 function noneConflict(flags: TaxFlags): AppError | null {
 	if (flags.none !== true) return null
-	const writer =
-		flags.tax !== undefined ||
-		flags.filingStatus !== undefined ||
-		flags.children !== undefined ||
-		flags.childrenAtHigherRate !== undefined ||
-		ALLOWANCE_FLAGS.some((field) => flags[field] !== undefined)
-	if (!writer) return null
+	if (!writesLevy(flags)) return null
 	return fail("invalid_input", {
 		message: "--none removes the tax, so it cannot be combined with the flags that write one.",
 		path: "none",
@@ -88,7 +102,7 @@ function missingTax(flags: TaxFlags): AppError | null {
 }
 
 /** A count of children the statute allows at the higher rate cannot exceed the children counted. */
-function higherRateConflict(flags: TaxFlags): AppError | null {
+export function higherRateConflict(flags: TaxFlags): AppError | null {
 	if ((flags.childrenAtHigherRate ?? 0) <= (flags.children ?? 0)) return null
 	return fail("invalid_input", {
 		message:
@@ -98,7 +112,7 @@ function higherRateConflict(flags: TaxFlags): AppError | null {
 }
 
 /** The caller's spelling of one field, so a refusal names the flag rather than the schema key. */
-function flagOf(field: string): string {
+export function flagOf(field: string): string {
 	return `--${field.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
 }
 

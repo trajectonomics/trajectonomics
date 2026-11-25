@@ -3,18 +3,16 @@ import type { ProjectionProblem } from "../types/projection"
 import type { RuleOfThumbReference } from "../types/reference"
 import { type Accumulator, consume } from "./accumulate"
 import type { BufferFailure, ShortfallFailure } from "./best"
-import type { Prefix } from "./prefix"
+import type { Prefix, PrefixPoint } from "./prefix"
 import { ruleOfThumb } from "./reference"
-import type { ReferencePlan } from "./reference-plan"
-import type { RequirementTable } from "./required"
 import type { ScanGrid } from "./scan-grid"
 import { walkCandidate } from "./walk"
+import type { WindowPlan } from "./windows"
 
 export interface SearchInput {
 	readonly scenario: Scenario
 	readonly prefix: Prefix
-	readonly requirement: RequirementTable
-	readonly reference: ReferencePlan
+	readonly windows: WindowPlan
 	readonly grid: ScanGrid
 }
 
@@ -23,6 +21,8 @@ export type SearchOutcome =
 			readonly kind: "reachable"
 			readonly month: DateString
 			readonly reference: RuleOfThumbReference
+			/** The candidate's walked state: its Levy tallies cover the whole stopped path. */
+			readonly point: PrefixPoint
 	  }
 	| {
 			readonly kind: "unreachable"
@@ -36,6 +36,7 @@ export type CandidateOutcome =
 			readonly kind: "reachable"
 			readonly month: DateString
 			readonly reference: RuleOfThumbReference
+			readonly point: PrefixPoint
 	  }
 	| { readonly kind: "buffer"; readonly failure: BufferFailure }
 	| { readonly kind: "shortfall"; readonly failure: ShortfallFailure; readonly beforeStop: boolean }
@@ -50,7 +51,7 @@ function inspectCandidate(input: SearchInput, month: DateString): CandidateOutco
 	const point = input.prefix.points.get(month)
 	if (point === undefined) return { kind: "skip" }
 	const walked = walkCandidate(
-		{ scenario: input.scenario, month, point, requirement: input.requirement },
+		{ scenario: input.scenario, month, point, windows: input.windows },
 		input.grid,
 	)
 	if (walked.kind === "problem") return walked
@@ -58,9 +59,9 @@ function inspectCandidate(input: SearchInput, month: DateString): CandidateOutco
 	if (walked.kind === "shortfall") {
 		return { kind: "shortfall", failure: { month, shortfall: walked.shortfall }, beforeStop: false }
 	}
-	const reference = ruleOfThumb(point.states, month, input.reference)
+	const reference = ruleOfThumb(point.states, month, walked.windows.reference)
 	if (!reference.ok) return { kind: "problem", problem: reference.problem, terminal: true }
-	return { kind: "reachable", month, reference: reference.reference }
+	return { kind: "reachable", month, reference: reference.reference, point: walked.point }
 }
 
 /** Ascending linear scan over `months`; returns the first pass, never assuming monotonicity. */

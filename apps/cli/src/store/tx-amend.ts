@@ -4,7 +4,7 @@ import { yearFailure } from "../year"
 import { chartOf } from "./chart"
 import type { Ctx } from "./context"
 import { write } from "./guard"
-import { iso, newId } from "./ids"
+import { iso } from "./ids"
 import { fromLedgerError } from "./ledger-errors"
 import { appendTransaction } from "./transactions"
 import { externalRefTaken, storeChecks } from "./tx-checks"
@@ -93,7 +93,7 @@ export function amendTransaction(
 			// One clock reading and one write: a failure in the second insert writes neither row.
 			const at = ctx.clock()
 			const minted = { at: iso(at) }
-			const ids = { reversal: newId(at), replacement: newId(at) }
+			const ids = { reversal: ctx.newId(at), replacement: ctx.newId(at) }
 			const rows = correctionRows(ctx, original, input, ids)
 			if (isAppError(rows)) return rows
 			const [reversal, replacement] = rows

@@ -1,0 +1,9 @@
+<resources>
+    <!-- Home-screen widget (#81) -->
+    <string name="widget_description">มู สถิติจดต่อเนื่อง และรายจ่ายวันนี้</string>
+    <string name="widget_empty">เปิด OpenJot เพื่อเริ่มจด</string>
+    <string name="widget_today">วันนี้</string>
+    <string name="widget_period">งวดนี้</string>
+    <string name="widget_add">+ จด</string>
+    <string name="widget_scan">สแกน</string>
+</resources>

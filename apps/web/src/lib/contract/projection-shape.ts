@@ -16,6 +16,10 @@ export const projectionShape = {
 	engine,
 	scenario: scenarioRef,
 	overrides: z.array(override),
+	/** The `--without` paths taken out before the overrides, in command-line order (cli ADR-0056). */
+	removals: z.array(z.string()),
+	/** The `--add` items put on a list after the removals and before the overrides; absent when none was given (cli ADR-0062). */
+	additions: z.array(override).optional(),
 	tax: taxStatus,
 	carryIn: z.array(carryInRecord).optional(),
 	notes: z.array(z.string()),

@@ -6,6 +6,8 @@ export interface SnapshotLoader {
 	current(): SnapshotState
 	subscribe(listener: () => void): () => void
 	load(url: string): Promise<SnapshotState>
+	/** Shows a state the page already has, such as the Snapshot an Edit answered with. */
+	replace(next: SnapshotState): void
 }
 
 /**
@@ -31,6 +33,9 @@ export function createSnapshotLoader(fetchText: TextFetcher): SnapshotLoader {
 			return () => {
 				listeners.delete(listener)
 			}
+		},
+		replace(next) {
+			publish(next)
 		},
 		load(url) {
 			const existing = requests.get(url)

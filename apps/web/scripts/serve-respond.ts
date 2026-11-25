@@ -18,6 +18,14 @@ export function text(status: number, body: string): Response {
 	})
 }
 
+/** A JSON answer with the same headers as every other: never cached, never read across origins. */
+export function json(status: number, body: string): Response {
+	return new Response(body, {
+		status,
+		headers: { ...HEADERS, "content-type": "application/json; charset=utf-8" },
+	})
+}
+
 /** Answers one request: the Snapshot, a packed file, or a refusal. Only this machine is served. */
 export function respond(request: Request, pack: Pack, snapshot: string, port: number): Response {
 	if (request.method !== "GET" && request.method !== "HEAD") return text(405, "Method not allowed")

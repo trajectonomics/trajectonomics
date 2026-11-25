@@ -14,7 +14,7 @@ export const POSTING_COLUMNS = `tx_id AS txId, ordinal, account_id AS accountId,
 	dimensions`
 export const SCENARIO_COLUMNS = `id, entity_id AS entityId, name, document,
 	content_hash AS contentHash, forked_from AS forkedFrom, version, created_at AS createdAt,
-	updated_at AS updatedAt, deleted_at AS deletedAt`
+	updated_at AS updatedAt, deleted_at AS deletedAt, household, tax, notes, main`
 
 // Each order ends on the primary key, so ties never fall back to rowid order.
 export const ENTITY_ORDER: Record<EntitySort, string> = { id: "id" }

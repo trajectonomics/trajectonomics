@@ -1,16 +1,20 @@
 import type { Baseline, Scenario, Timeline } from "@trajectonomics/core/sim"
 import { BASELINE_CURRENCY } from "../baseline/kind"
-import { type AppError, isAppError } from "../errors"
+import { type AppError, fail, isAppError } from "../errors"
 import type { ScenarioDocument } from "../scenario/document"
 import { scenarioNotFound } from "../scenario/errors"
+import { householdDocument } from "../scenario/household/document"
+import type { Household } from "../scenario/household/model"
 import { applyScenarioSets } from "../scenario/set-apply"
 import type { AppliedOverride } from "../scenario/set-error"
+import { unreadLabelRefusal } from "../scenario/tax/filer-label-check"
 import type { Store } from "../store"
 import { contentHash, supportedCurrency } from "../store"
 import { canonicalJson } from "../store/canonical"
 import { guard } from "../store/guard"
 import { hasAnyLevy } from "./levies"
 import type { ScenarioEcho, TaxStatus } from "./view"
+import { withoutHeldAccount } from "./without-held"
 
 /** What every projection leaf resolves before it runs the engine. */
 export type Prepared = {
@@ -20,6 +24,10 @@ export type Prepared = {
 	 */
 	document: Scenario
 	overrides: AppliedOverride[]
+	/** The `--without` paths taken out before the Overrides, in command-line order (cli ADR-0056). */
+	removals: string[]
+	/** The `--add` items put on a list after the removals and before the Overrides (cli ADR-0062). */
+	additions: AppliedOverride[]
 	scenario: ScenarioEcho
 	currency: string
 	baseline: Baseline
@@ -28,6 +36,8 @@ export type Prepared = {
 	tax: TaxStatus
 	/** The input field the Scenario's name came from, so a stored record names the flag. */
 	scenarioPath: string
+	/** The Scenario's household, parsed from its stored text; null when none is set (cli ADR-0048). */
+	household: Household | null
 }
 
 /** The caller's side of one prepared Projection: which Scenario, from where, under which Sets. */
@@ -45,6 +55,12 @@ export type PrepareInput = {
 	asOf: string
 	horizon: string
 	sets: readonly string[]
+	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
+	without?: readonly string[] | undefined
+	/** The `--add` items, put on a list after the removals and before the Sets (cli ADR-0062). */
+	add?: readonly string[] | undefined
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
+	decimal?: boolean | undefined
 }
 
 /**
@@ -59,6 +75,14 @@ function thbOnly(document: ScenarioDocument): AppError | null {
 }
 
 /**
+ * What keeps a document from being projected: a currency the Baseline cannot take, then a tax
+ * label no Levy reads, which the Levy would tally as nothing (cli ADR-0075).
+ */
+function unprojectable(document: ScenarioDocument): AppError | null {
+	return thbOnly(document) ?? unreadLabelRefusal(document)
+}
+
+/**
  * Resolves one Scenario by name or id, applies the `--set` Overrides transiently (ADR-0024),
  * maps the Ledger's Balances at `asOf` (ADR-0026) and builds the Timeline. It never writes, and
  * it reads nothing the caller did not state (ADR-0030): the store, the Ledger and the flags are
@@ -68,12 +92,20 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 	const row = input.store.getScenario(input.scenario)
 	if (isAppError(row)) return row
 	if (row === null) return scenarioNotFound(input.scenario, input.scenarioPath)
-	const applied = applyScenarioSets(JSON.parse(row.document) as ScenarioDocument, input.sets)
+	const applied = applyScenarioSets(JSON.parse(row.document) as ScenarioDocument, input.sets, {
+		without: input.without,
+		add: input.add,
+		decimal: input.decimal,
+	})
 	if (isAppError(applied)) return applied
-	const unsupported = thbOnly(applied.document)
+	const unsupported = unprojectable(applied.document)
 	if (unsupported !== null) return unsupported
+	const household = householdOfRow(row.household)
+	if (isAppError(household)) return household
 	const mapped = input.baseline()
 	if (isAppError(mapped)) return mapped
+	const held = withoutHeldAccount(input.without ?? [], mapped)
+	if (held !== null) return held
 	// The effective hash is the stored hash function applied to the document after the Overrides.
 	// Canonicalising cannot fail on a stored document plus JSON values, but `guard` makes a bug in
 	// that assumption an envelope rather than a throw.
@@ -85,6 +117,8 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		// The one place the stored JSON becomes the engine's type; `check()` reads it again.
 		document: stored,
 		overrides: applied.overrides,
+		removals: applied.removals,
+		additions: applied.additions,
 		scenario: {
 			id: row.id,
 			name: row.name,
@@ -96,5 +130,16 @@ export function prepareProjection(input: PrepareInput): Prepared | AppError {
 		timeline: { start: input.asOf, horizon: input.horizon, resolution: "month" },
 		tax: hasAnyLevy(applied.document) ? "applied" : "not_applied",
 		scenarioPath: input.scenarioPath,
+		household,
 	}
+}
+
+/** A stored household, parsed again: a row written by `scenario household` always parses. */
+function householdOfRow(stored: string | null): Household | null | AppError {
+	if (stored === null) return null
+	const parsed = householdDocument.safeParse(JSON.parse(stored))
+	if (!parsed.success) {
+		return fail("internal", { message: "The stored household does not parse as a household." })
+	}
+	return parsed.data
 }

@@ -12,7 +12,7 @@ import { commitReturns, rebaseReturns } from "./levy-returns"
 import type { LevySet } from "./levy-set"
 import { isSafeInteger, overflow } from "./overflow"
 import type { AccountState } from "./state"
-import { activeNominalRule, valuation } from "./value"
+import { activeNominalRule, earningAt, valuation } from "./value"
 
 function negative(id: string, date: DateString): RangeError {
 	return new RangeError(`Negative balance on ${id} at ${date}`)
@@ -31,6 +31,30 @@ function commit(
 	if (levies !== undefined) rebaseReturns(state, date)
 }
 
+/**
+ * What changes an Account without a sale or a purchase: a payout (ADR 0027), a fee (ADR 0028) or an untaxed
+ * transfer (ADR 0031), which moves the Cost basis itself.
+ */
+export type Distribution = "payout" | "fee" | "transfer"
+
+/**
+ * Books the growth since the last commit, and the gain a withdrawal realises unless it is a distribution.
+ * A fee is taken off the growth it was charged on.
+ */
+function bookTallies(
+	state: AccountState,
+	levies: LevySet | undefined,
+	date: DateString,
+	delta: bigint,
+	valueBefore: bigint,
+	distribution: Distribution | undefined,
+): void {
+	if (levies === undefined) return
+	const fee = distribution === "fee" ? -delta : 0n
+	for (const tracker of levies.trackers) commitReturns(state, tracker, date, fee)
+	if (distribution === undefined) commitGains(state, levies, date, delta, valueBefore)
+}
+
 /** Nominal commit: completed periods capitalise first, then the delta applies to capitalised. */
 function nominalCommit(
 	state: AccountState,
@@ -38,12 +62,9 @@ function nominalCommit(
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
+	distribution: Distribution | undefined,
 ): ProjectionProblem | undefined {
-	const valueBefore = valuation(state, date)
-	if (levies !== undefined) {
-		for (const tracker of levies.trackers) commitReturns(state, tracker, date)
-		commitGains(state, levies, date, delta, valueBefore)
-	}
+	bookTallies(state, levies, date, delta, valuation(state, date), distribution)
 	const settled = capitaliseThrough(
 		{ capitalised: state.balance, capitalisedDays: state.capitalisedDays, asOf: state.asOf },
 		rule,
@@ -67,26 +88,39 @@ function nominalCommit(
 }
 
 /**
+ * A change inside a Return row (ADR 0005): an amount added or taken takes `r * h2 / D` from its date
+ * to the row's end, so it moves the part still to earn by its own size; what the row already earned
+ * stays out. The whole part moves at a row's start. Where nothing is left (the Account was worth
+ * nothing, or the change empties it) the part restarts from the new balance, and a withdrawal larger
+ * than the part took the rest from what the row had earned, so the part stops at zero.
+ */
+function moveEarning(state: AccountState, date: DateString, committed: bigint, next: bigint): void {
+	const moved = earningAt(state, date) + next - committed
+	state.earning = committed === 0n || next === 0n ? next : moved < 0n ? 0n : moved
+	state.grown = undefined
+}
+
+/**
  * Commits accrued growth, then applies `delta`; returns a problem on overflow. The commit books
- * the tallies the change produces (returns attribution, later realised gains) before moving.
+ * the tallies the change produces (returns attribution, later realised gains) before moving. A
+ * `distribution` (a payout, ADR 0027, or a fee, ADR 0028) is no sale: it takes no Cost basis and realises no gain.
  */
 export function mutate(
 	state: AccountState,
 	date: DateString,
 	delta: bigint,
 	levies: LevySet | undefined,
+	distribution?: Distribution,
 ): ProjectionProblem | undefined {
 	const rule = activeNominalRule(state)
-	if (rule !== undefined) return nominalCommit(state, rule, date, delta, levies)
+	if (rule !== undefined) return nominalCommit(state, rule, date, delta, levies, distribution)
 	const committed = valuation(state, date)
 	if (!isSafeInteger(committed)) return overflow(date, state.rule.id)
 	const next = committed + delta
 	if (next < 0n) throw negative(state.rule.id, date)
 	if (!isSafeInteger(next)) return overflow(date, state.rule.id)
-	if (levies !== undefined) {
-		for (const tracker of levies.trackers) commitReturns(state, tracker, date)
-		commitGains(state, levies, date, delta, committed)
-	}
+	bookTallies(state, levies, date, delta, committed, distribution)
+	if (state.series !== undefined) moveEarning(state, date, committed, next)
 	state.balance = next
 	state.asOf = date
 	if (levies !== undefined) rebaseReturns(state, date)

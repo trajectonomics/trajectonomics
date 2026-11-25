@@ -1,3 +1,4 @@
+import type { MilestoneGate } from "../milestone/gate"
 import type { DateString, Scenario } from "../types"
 import type { ProjectionProblem } from "../types/projection"
 import type { DatedEvent } from "./events"
@@ -5,7 +6,9 @@ import { closeReturnsOn, hasSettlement, type LevySet } from "./levy-set"
 import type { DayTotals, EngineRunsOut } from "./occurrence"
 import { processDate } from "./occurrence"
 import { isSafeInteger, overflow } from "./overflow"
+import { type OwedTracker, recordMoves } from "./owed-tracker"
 import type { EngineResult } from "./result"
+import type { RuleBook } from "./rule-book"
 import { type EngineSnapshot, snapshot } from "./snapshot"
 import type { StateMap } from "./state"
 
@@ -14,6 +17,12 @@ export interface RunAccumulator {
 	readonly totals: DayTotals[]
 	readonly wanted: ReadonlySet<DateString>
 	readonly levies: LevySet | undefined
+	readonly gate: MilestoneGate | undefined
+	readonly tracker: OwedTracker | undefined
+	/** The rule Flows' Rule years, present only when the Scenario declares one (ADR 0023). */
+	readonly rules?: RuleBook
+	/** Whether each date records its cash-flow lines; only the breakdown option turns it on. */
+	readonly breakdown: boolean
 }
 
 function addSnapshot(
@@ -43,8 +52,10 @@ function handleDay(
 ): EngineResult | undefined {
 	const settlement = acc.levies !== undefined && hasSettlement(acc.levies, date)
 	if (events.length === 0 && !settlement) return undefined
-	const outcome = processDate(states, scenario, date, events, acc.levies)
+	const outcome = processDate(states, scenario, date, events, acc.levies, acc.breakdown, acc.rules)
 	acc.totals.push(outcome.totals)
+	acc.gate?.record(outcome.totals)
+	if (acc.tracker !== undefined) recordMoves(acc.tracker, states, outcome.totals)
 	if (outcome.problem !== undefined) return { ok: false, problem: outcome.problem }
 	if (outcome.runsOut !== undefined) return finishRunout(acc, states, outcome.runsOut)
 	return undefined
@@ -69,7 +80,9 @@ export function stepDate(
 	events: readonly DatedEvent[],
 ): EngineResult | undefined {
 	if (acc.levies !== undefined) closeReturnsOn(acc.levies, states, date)
-	const dayResult = handleDay(acc, states, scenario, date, events)
+	const settled = acc.levies !== undefined && hasSettlement(acc.levies, date)
+	const landing = acc.gate === undefined ? events : acc.gate.apply(states, date, events, settled)
+	const dayResult = handleDay(acc, states, scenario, date, landing)
 	if (dayResult !== undefined) return dayResult
 	return handleSnapshot(acc, states, date)
 }

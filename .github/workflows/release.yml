@@ -48,7 +48,7 @@ jobs:
       channel: ${{ steps.plan.outputs.channel }}
       stable_cli: ${{ steps.plan.outputs.stable_cli }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # the diff of a push, and the tags
       - id: plan
@@ -123,7 +123,7 @@ jobs:
       EXTRA_PATHS: ${{ join(matrix.extraPaths, ' ') }}
       GITHUB_LATEST: ${{ matrix.githubLatest }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # tags and commit messages drive the version
           # Nothing here pushes with git: the tag and release go through gh and GH_TOKEN. Keeping the
@@ -132,7 +132,7 @@ jobs:
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: "1.4.4"
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org

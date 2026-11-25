@@ -1,7 +1,8 @@
 import { type AppError, isAppError } from "../errors"
+import { holdsTaxLevy } from "../scenario/tax/holds"
 import { ACCOUNT_TYPES, contentHash, isAccountType, type RestoreRows } from "../store"
 import { DECODERS } from "./fields"
-import { FIELDS, RECORD_ORDER, type RecordRows, type RecordType } from "./format"
+import { FIELDS, type Layout, RECORD_ORDER, type RecordRows, type RecordType } from "./format"
 import { exactKeys, invalid } from "./invalid"
 
 export type Decoded = { [T in RecordType]: { type: T; row: RecordRows[T] } }[RecordType]
@@ -12,11 +13,18 @@ function recordType(record: Record<string, unknown>, path: string): RecordType |
 	return invalid(`${path}.record`, `must be one of ${RECORD_ORDER.join(", ")}`)
 }
 
-/** Checks each field against its declared kind and builds the store row from it. */
-export function decodeRecord(record: Record<string, unknown>, path: string): Decoded | AppError {
+/**
+ * Checks each field against the layout's declared kind and builds the store row from it. A
+ * Scenario record of a layout without the household or tax column restores with it null.
+ */
+export function decodeRecord(
+	record: Record<string, unknown>,
+	path: string,
+	layout: Layout = FIELDS,
+): Decoded | AppError {
 	const type = recordType(record, path)
 	if (isAppError(type)) return type
-	const fields = Object.entries(FIELDS[type])
+	const fields = Object.entries(layout[type])
 	const wrongKeys = exactKeys(record, ["record", ...fields.map(([key]) => key)], path)
 	if (wrongKeys) return wrongKeys
 	const row: Record<string, unknown> = {}
@@ -25,7 +33,35 @@ export function decodeRecord(record: Record<string, unknown>, path: string): Dec
 		if (isAppError(value)) return value
 		row[key] = value
 	}
+	if (type === "scenario") {
+		const refused = scenarioSiblings(row, path)
+		if (refused !== null) return refused
+	}
 	return { type, row } as Decoded
+}
+
+/**
+ * Fills the household, tax and notes a layout without the column leaves out with null, and the main plan with false, and refuses a tax
+ * profile beside a document that holds no Levy: a profile describes a Levy, so it cannot be kept
+ * without one (cli ADR-0066).
+ */
+function scenarioSiblings(row: Record<string, unknown>, path: string): AppError | null {
+	if (!("household" in row)) row["household"] = null
+	if (!("tax" in row)) row["tax"] = null
+	if (!("notes" in row)) row["notes"] = null
+	if (!("main" in row)) row["main"] = false
+	if (row["main"] === true && row["deletedAt"] !== null) {
+		return invalid(`${path}.main`, "must be false: a deleted scenario is not the main plan")
+	}
+	if (row["tax"] === null) return null
+	let document: unknown
+	try {
+		document = JSON.parse(String(row["document"]))
+	} catch {
+		return null
+	}
+	if (holdsTaxLevy(document)) return null
+	return invalid(`${path}.tax`, "must be null: the scenario's document holds no tax Levy")
 }
 
 /** The personal entity owns every record, and no name is empty. */

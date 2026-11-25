@@ -19,5 +19,8 @@ let { model, currency }: Props = $props()
 	>
 		{#snippet value()}{model.month}{/snippet}
 	</Stat>
+	{#if model.ages !== null}
+		<p class="text-sm text-muted-foreground">Ages on that date: {model.ages}.</p>
+	{/if}
 	<FiReference reference={model.reference} {currency} />
 </div>

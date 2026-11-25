@@ -12,6 +12,7 @@
 /* The Brand Typeface's @font-face rules; scripts/copy-brand-assets.ts puts the files in public/fonts/. */
 @import "./fonts.css";
 @import "./header.css";
+@import "./language-menu.css";
 @import "./footer.css";
 @import "./page.css";
 @import "./list.css";

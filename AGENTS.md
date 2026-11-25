@@ -7,7 +7,8 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 - [`apps/site`](apps/site/AGENTS.md): the Site at trajectonomics.com (Worker `site`, static HTML).
 - [`apps/docs`](apps/docs/AGENTS.md): the docs portal (Worker `docs`, `@trajectonomics/docs`).
 - [`apps/blog`](apps/blog/AGENTS.md): the blog at blog.trajectonomics.com (Worker `blog`, static Astro).
-- [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never hosted).
+- [`apps/web`](apps/web/AGENTS.md): the Dashboard, a read-only static web app in Svelte 5 that renders a Snapshot of `traj --json` results on `127.0.0.1` (`@trajectonomics/web`, never published; its hosted Demo build is served as static pages by the Site).
+- [`apps/openjot`](apps/openjot/AGENTS.md): OpenJot (formerly MooJot), the Android app: Tauri 2, a SvelteKit 2 frontend, Rust for the engine and Kotlin for the Android-native parts.
 - [`apps/cli`](apps/cli/AGENTS.md): `@trajectonomics/cli`, the `traj` command line.
 - `packages/core`: `@trajectonomics/core`, the engine bundle the CLI builds on (private, not published). It bundles the four packages below as subpath exports (`/money`, `/ledger`, `/tax`, `/sim`).
   - [`packages/core/money`](packages/core/money/AGENTS.md), [`packages/core/ledger`](packages/core/ledger/AGENTS.md), [`packages/core/tax`](packages/core/tax/AGENTS.md), [`packages/core/sim`](packages/core/sim/AGENTS.md): private workspace packages.
@@ -19,16 +20,16 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 ## Rules
 
-1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...). A scope is optional, and when present it is one from the closed list in [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml): a package without its own scope uses the nearest one (`skills` for `skills/internal`, `ci` for `tooling/guards`).
+1. Never commit to `main`. Branch (`feat/*`, `fix/*`, `docs/*`) and open a PR. PR titles are conventional commits (`feat:`, `fix:`, `feat!:` ...). A scope is optional, and when present it is one from the closed list in [`.github/workflows/pr-title.yml`](.github/workflows/pr-title.yml): a package without its own scope uses the nearest one (`skills` for `skills/internal`, `ci` for `tooling/guards`). Branch with `git switch --no-track -c <branch> origin/main` and push with `git push -u origin HEAD:<branch>`: a branch that tracks `origin/main` pushes to `main` on a bare `git push` when `push.default=upstream`.
 2. Never commit secrets or `.env` files. Publishing tokens (`NPM_TOKEN`) live in repo secrets only; Cloudflare credentials live in Cloudflare (Workers Builds), never in this repository.
 3. Bun only: `bun install`, `bun test`, `bun run <script>`. Do not add npm/pnpm/yarn lockfiles.
 4. Package design: keep core packages pure and deterministic wherever applicable (data in, data out, no I/O, no clock, no unseeded randomness). Keep boundaries closed-world with explicit contracts.
-5. Done means `bun run check` passes at the root (Turborepo). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
+5. Done means `bun run check` passes at the root (Turborepo). `check` depends on the package's own `build` in turbo, so each package's `dist/` has one writer per run. A package's `check` script still builds, through `tooling/scripts/build-unless-turbo.ts`: a no-op under turbo (which sets `TURBO_HASH`), a `bun run build` when `bun run check` runs inside the package, so a direct run never reads a stale `dist/`. `apps/docs`, `apps/blog` and `apps/site` opt out of the turbo dependency: their `check` builds and scans the built site, and nothing depends on them (`turbo run build check` would still run their build twice). For one package, `bunx turbo run check --filter=<package>`. `bun run format` fixes formatting and import order. Do not loosen the shared config in `tooling/config`, a package's `biome.json`, or its `tsconfig` to make an error go away.
 6. Never edit `version` in a `package.json` by hand and never run `npm publish` locally. Release versions are set by the release process.
 7. Model & Pi (`pi.dev`) rules:
    - Never use `gemini-3.8-flash` anywhere; use `gemini-4-hydrogen` instead for Antigravity tasks and reviews (and `gemini-4-argon` where configured).
    - When running the Pi coding agent (`pi.dev`), strictly use **DeepSeek 4.1 Flash** only (e.g., `deepseek/deepseek-v4.1-flash`, `deepseek/deepseek-v4.1-flash-fast`), whether routed via Command Code GOAT (`command-code`) or OpenCode Go (`opencode`). Do not switch to or run any other models (Claude, GPT, Gemini, etc.) in Pi sessions for this repository. This rule is mechanically enforced via `.pi/settings.json`.
-8. Temporary files and scratch clones: `/tmp` is a shared, nearly full tmpfs. Never use fixed `/tmp` filenames (use `mktemp`, or `--body-file -` for `gh` bodies), and never install `node_modules` or clone scratch repositories under `/tmp`. Verification clones go under `~/.cache/<slug>`.
+8. Temporary files and scratch clones: `/tmp` is a shared, nearly full tmpfs. Never use fixed `/tmp` filenames (use `mktemp`, or `--body-file -` for `gh` bodies), and never install `node_modules` or clone scratch repositories under `/tmp`. Verification clones go under `~/.cache/<slug>`. Remove only the directory your own `mktemp -d` returned (`d=$(mktemp -d -p ~/.cache)`, then `rm -rf "$d"`), never an inherited `$TMPDIR` you did not create and never a glob such as `~/.cache/tmp.*`: other sessions' directories match it and vanish mid-run. A test makes its temporary directory through the package's helper (`makeTempDir` in `apps/cli`, `makeScratch` in `apps/web`) or removes it itself, and `tooling/guards` fails on a `mkdtemp` call with no removal in the same file, ignoring one that appears only in a line comment and exempting the files named in its short allow-list, each with the helper that removes their directory.
 9. Resource limits: run turbo with `--concurrency=2`, and wrap heavy builds in a memory cap, for example `systemd-run --user --scope -q -p MemoryMax=6G <command>`.
 10. UI frameworks: an app with a client-side interface is written in Svelte 5 (`apps/web`). React is allowed only in `apps/docs`, and there only because Fumadocs needs it; do not add React to another package. `apps/site` ships static HTML with no UI framework.
 
@@ -36,12 +37,17 @@ Instructions for AI coding agents in `trajectonomics/trajectonomics`, the monore
 
 The organisation's goals are in [`org/goals/GOALS.md`](org/goals/GOALS.md). Read them before proposing a new direction. Only the owner edits that file; never edit it.
 
+Product, growth and roadmap research lives in `research/` in the private `trajectonomics/marketing` repository, which replaced the retired `trajectonomics/growth`. Research that names a competitor stays there, never in this public repository.
+
 ## Owner
 
 Saving the owner's attention is part of the job, so finish a task instead of asking about it.
 
 - Finish end-to-end: commit, push, open the PR, get an independent review, `gh pr merge` when the work is green or the owner said to proceed, then do the follow-up steps the change implies. Do not stop for small permission questions, and do not end with a `## Not done yet` list.
-- When unsure, consult subagents on other models (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`, `deepseek-v4.1-flash`) instead of asking the owner. The model rules above still decide which one a session may itself run.
+- When unsure, consult subagents on other models (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`, and `deepseek-v4.1-flash`) instead of asking the owner. The model rules above still decide which one a session may itself run.
+- Merge only on CI that ran against the current `main`. A pull request whose CI ran before another merge touched the same package is merged with `main` first and checked again: on 2026-11-23 #249 and #257 each passed alone and together broke `packages/core/sim`'s check on `main`.
+- Any `traj` an agent runs for a test, validation or eval sets `DO_NOT_TRACK=1`, so it never counts as a person using `traj` in the usage telemetry that goal G1 is measured by.
+- Any `traj` an agent runs by hand sets `TRAJ_HOME` to a scratch directory it made first and checked is non-empty. An unset or empty `TRAJ_HOME` falls back to the owner's real ledger in `~/.traj`. On 2026-11-23 a development build run that way migrated that ledger to a schema no released `traj` reads, and it had to be restored from its pre-migration copy.
 - Verify before calling something blocked: read live GitHub state (`gh issue view`, `gh pr view`) and the real CLI/API schema first.
 - Keep replies short and lead with what only the owner must do; add detail when asked.
 - Record every durable lesson here, in the package's `AGENTS.md` or in `docs/`, never only in agent memory.
@@ -54,18 +60,17 @@ Delegate by default: this section is the owner's standing request to use subagen
 Pick the cheapest model that can finish the brief:
 
 1. `claude-haiku-5-5` for a Claude subagent (the `Agent` tool, `model: haiku`).
-2. `opencode/deepseek-v4.1-flash-free` for a task on OpenCode (`delegate_task`). When it fails with the free usage limit, rerun the brief on `opencode-go/deepseek-v4.1-flash`.
+2. `opencode-go/deepseek-v4.1-flash` for a task on OpenCode (`delegate_task`, or `t3_thread_launch` with the `opencode` provider on a linked machine). See "DeepSeek on OpenCode Go implements" below.
 3. A model from the Owner section's list (`claude-sonnet-5-5`, `gemini-4-hydrogen`, `gemini-4-argon`) only when a cheap one failed the brief, or for design and the independent review. The reviewer is a different model from the author.
 
-A brief to a free model carries this repository's code and docs only: never a secret, a token or a person's financial data.
+A brief to DeepSeek, on OpenCode Go or on the free tier (`opencode/deepseek-v4.1-flash-free`, used when the paid route is out), carries this repository's code and docs only: never a secret, a token or a person's financial data.
 
-### Quota week: 2026-11-22 to 2026-11-29
+### DeepSeek on OpenCode Go implements (from 2026-11-25, until the owner says otherwise)
 
-Antigravity quota is short this week, so this block overrides step 3 of the ladder until it expires on 2026-11-29. Delete the block then, and step 3 applies again.
+On 2026-11-25 the owner subscribed to OpenCode Go and made `opencode-go/deepseek-v4.1-flash` the main implementor. Earlier that day every DeepSeek route had run dry, and Muse (`muse-ember-1.0`) used up its allowance, so Claude implemented for a few hours. Muse is not used.
 
-- Antigravity (`gemini-4-hydrogen`, `gemini-4-argon`) takes content tasks only: blog posts, site copy, docs prose, release notes. It does no code, design or review work.
-- Claude is the main sub. Step 3 becomes `claude-sonnet-5-5` for a failed cheap brief and for the independent review (the reviewer is still a different model from the author, so a Sonnet-authored diff goes to `claude-opus-5-5`). Design uses `claude-opus-5-5`.
-- T3 Code defaults to `claude-sonnet-5-5` on prameubuntu, homeserver1 and homeserver2, and the Antigravity favourites sit last in the picker.
+- An implementation brief goes to `opencode-go/deepseek-v4.1-flash` before `claude-haiku-5-5`, which keeps reading, searching and cheap checks. A brief DeepSeek cannot finish goes to `claude-sonnet-5-5`.
+- The independent review stays on Claude, on `claude-opus-5-5` when `claude-sonnet-5-5` wrote the diff.
 
 ## Agent skills
 
@@ -81,7 +86,7 @@ Antigravity quota is short this week, so this block overrides step 3 of the ladd
 - The canonical copy of every installed skill is `.agents/skills/` at the root. `.claude/skills/<name>` (Claude Code) and `.vibe/skills/<name>` (Mistral Vibe) are relative symlinks to `../../.agents/skills/<name>`, and `.grok/skills/goal-setting-okrs` is one more. Never edit the external copies or the symlinks by hand.
 - Edit an internal skill in `skills/internal/skills/<name>/`, the source of truth. Its `.agents/skills/` entry is a symlink, so the change is picked up everywhere.
 - A first-party customer skill is hand-edited in `skills/customer/skills/`. It is never in `skills-lock.json` and never copied into `.agents/skills/`: a lock entry would stop `npx skills add trajectonomics/trajectonomics/skills/customer --skill <name>` from installing it.
-- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
+- Add a new skill: external skills through the Vercel `skills` CLI (below), which updates the lock, then list the copy in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) (a new upstream also needs its own section with its licence), or `bun run check` fails; internal skills by adding the folder under `skills/internal/skills/` and the three symlinks.
 
 ### Commands
 

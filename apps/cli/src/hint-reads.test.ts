@@ -79,6 +79,8 @@ describe("a dead-end read names the next command", () => {
 		])
 		expect((await traj(["balance", "--as-of", FIXTURE_AS_OF])).out.split("\n")).toEqual([
 			`asOf: ${FIXTURE_AS_OF}`,
+			"firstTransactionDate: null",
+			"noTransactionsBefore: true",
 			"rows:",
 			"netWorth:",
 			`hint: ${ACCOUNT_HINT}`,
@@ -88,10 +90,14 @@ describe("a dead-end read names the next command", () => {
 	it("publishes the field in the schema of every command that can be a dead end", async () => {
 		const traj = cli(ledgerHome())
 		for (const path of SCHEMA_PATHS) {
-			const output = data(await traj(["schema", ...path, "--json"]))["output"] as {
-				properties: Record<string, { description: string }>
+			type Shape = { properties: Record<string, { description: string }> }
+			const published = data(await traj(["schema", ...path, "--json"]))["output"] as Shape & {
+				anyOf?: Shape[]
 			}
-			expect(output.properties["hint"]?.description).toContain("The command")
+			// `report networth` publishes two forms (cli ADR 0077), and each can be a dead end.
+			for (const output of published.anyOf ?? [published]) {
+				expect(output.properties["hint"]?.description).toContain("The command")
+			}
 		}
 	})
 })

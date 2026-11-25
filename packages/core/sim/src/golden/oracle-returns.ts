@@ -28,13 +28,22 @@ function spanFactor(row: OracleRow, held: number): Fraction {
 
 /** Resolves raw rows with its own day count, as a run start must. */
 export function oracleResolveRows(
-	rows: readonly { readonly from: DateString; readonly returnBps: number }[],
+	rows: readonly {
+		readonly from: DateString
+		readonly returnBps: number
+		readonly span?: number
+	}[],
 	horizon: DateString,
 ): OracleSeries {
 	return rows.map((row, index) => {
 		const next = rows[index + 1]
 		const to = next === undefined ? horizon : next.from
-		return { from: row.from, to, returnBps: row.returnBps, days: oracleCountedDays(row.from, to) }
+		return {
+			from: row.from,
+			to,
+			returnBps: row.returnBps,
+			days: row.span ?? oracleCountedDays(row.from, to),
+		}
 	})
 }
 

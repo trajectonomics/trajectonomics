@@ -10,6 +10,9 @@ const base: PlanInput = {
 	ages: [],
 	monthly: false,
 	carryIn: false,
+	returnModel: null,
+	paths: null,
+	seed: null,
 }
 
 function codeOf(input: PlanInput): string | null {

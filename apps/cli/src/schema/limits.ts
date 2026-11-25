@@ -27,6 +27,6 @@ export const NOT_SUPPORTED: readonly NotSupported[] = [
 	{
 		feature: 'A retirement date, as in "retire at 60"',
 		detail:
-			"No flag states one, and the Scenario document has no `retireAt`: state it by ending the earned Flows at that date (`flows.<id>.end`), which takes an edited document, because `scenario fork --set` replaces a path that already exists and cannot add one.",
+			"No flag states one, and the Scenario document has no `retireAt`: state it with a Milestone. Add one whose `date` criterion is the retirement date (`scenario apply --add milestones=<json>`), then set each earned Flow's `endAt` to that Milestone's id, so the Flow lands only strictly before it. No flag sets `endAt` on a Flow that lacks it, so the key goes in an edited document, because `scenario fork --set` replaces a path that already exists and cannot add one.",
 	},
 ]

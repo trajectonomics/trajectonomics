@@ -48,3 +48,39 @@ export function images(html: string): readonly { src: string; alt: string | unde
 		alt: attributes.get("alt"),
 	}))
 }
+
+/** Whether the page is a Post, which the build marks with an Open Graph type of `article`. */
+export function isArticle(html: string): boolean {
+	return tags(html, "meta").some(
+		(attributes) =>
+			attributes.get("property") === "og:type" && attributes.get("content") === "article",
+	)
+}
+
+/** The `@type` of every JSON-LD node the page states, from each block's top level and its `@graph`. */
+export function jsonLdTypes(html: string): readonly string[] {
+	const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+	return blocks.flatMap((match) => {
+		let parsed: unknown
+		try {
+			parsed = JSON.parse(match[1] ?? "")
+		} catch {
+			return []
+		}
+		const nodes = Array.isArray(parsed) ? parsed : [parsed]
+		return nodes.flatMap((node) => {
+			const type = (node as { "@type"?: unknown } | null)?.["@type"]
+			return typeof type === "string" ? [type] : []
+		})
+	})
+}
+
+/** The page's `hreflang` alternates, as each Language and its href. */
+export function alternatesOf(html: string): readonly { hreflang: string; href: string }[] {
+	return tags(html, "link")
+		.filter((attributes) => attributes.get("rel") === "alternate" && attributes.has("hreflang"))
+		.map((attributes) => ({
+			hreflang: attributes.get("hreflang") ?? "",
+			href: attributes.get("href") ?? "",
+		}))
+}

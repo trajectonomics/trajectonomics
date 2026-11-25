@@ -1,21 +1,24 @@
 import { existsSync, statSync } from "node:fs"
 import type { Env } from "../command"
+import { defaultHomeRefusal } from "../data-directory"
 import { type AppError, type ErrorCode, fail, isAppError } from "../errors"
 import { connect } from "./connection"
-import { PERSONAL_ENTITY_ID } from "./ids"
+import { newId, PERSONAL_ENTITY_ID } from "./ids"
 import { notADirectory } from "./io-errors"
 import { directoryStep } from "./io-steps"
 import { ledgerPaths, privateLedger } from "./ledger-file"
 import { storeOver } from "./store"
-import type { Clock, Store } from "./types"
+import type { Clock, IdSource, Store } from "./types"
 
 export { ACCOUNT_TYPES, isAccountType } from "./accounts"
 export { contentHash } from "./canonical"
 export { PERSONAL_ENTITY_ID } from "./ids"
+export { laterOverflows, type Step } from "./later-overflow"
 export { LEDGER_READ_CODES } from "./ledger"
 export { fromLedgerError, ledgerFailure } from "./ledger-errors"
 export { HEAD } from "./migrations"
 export { formatMinorUnits, parseMinorUnits, supportedCurrency } from "./money"
+export { type PreMigrationCopy, preMigrationCopies, unfinishedCopies } from "./pre-migration-files"
 export { isTxCorrection, TX_CORRECTIONS } from "./rows"
 export { canonicalScenarioDocument } from "./scenario-rows"
 export { importRejections } from "./tx-import"
@@ -28,6 +31,7 @@ export type * from "./types"
  * unwritable or corrupt.
  */
 export const LEDGER_OPEN_CODES: readonly ErrorCode[] = [
+	"default_home_refused",
 	"ledger_missing",
 	"not_a_directory",
 	"permission_denied",
@@ -41,6 +45,8 @@ export const LEDGER_OPEN_CODES: readonly ErrorCode[] = [
 export type StoreOptions = {
 	env: Env
 	clock: Clock
+	/** Mints the ids of new rows. Defaults to `newId`; a fixed source replaces it (cli ADR-0074). */
+	newId?: IdSource
 	/** How long a write waits for another writer before `database_busy`. Defaults to 5000. */
 	busyTimeoutMs?: number
 }
@@ -60,6 +66,8 @@ function ledgerMissing(database: string): AppError {
  * until `close()`.
  */
 export function openStore(options: StoreOptions): Store | AppError {
+	const refused = defaultHomeRefusal(options.env)
+	if (refused !== undefined) return refused
 	const paths = ledgerPaths(options.env)
 	const kind = directoryStep(paths.directory, () =>
 		statSync(paths.directory, { throwIfNoEntry: false }),
@@ -67,16 +75,17 @@ export function openStore(options: StoreOptions): Store | AppError {
 	if (isAppError(kind)) return kind
 	if (kind !== undefined && !kind.isDirectory()) return notADirectory(paths.directory)
 	if (!existsSync(paths.database)) return ledgerMissing(paths.database)
-	const db = connect(paths.database, options.busyTimeoutMs ?? 5000)
-	if (isAppError(db)) return db
+	const connected = connect(paths.database, options.busyTimeoutMs ?? 5000)
+	if (isAppError(connected)) return connected
+	const { db, copy } = connected
 	const restricted = privateLedger(paths)
 	if (isAppError(restricted)) {
 		db.close()
 		return restricted
 	}
-	return storeOver(paths.database, {
-		db,
-		clock: options.clock,
-		entityId: PERSONAL_ENTITY_ID,
-	})
+	return storeOver(
+		paths.database,
+		{ db, clock: options.clock, newId: options.newId ?? newId, entityId: PERSONAL_ENTITY_ID },
+		copy,
+	)
 }

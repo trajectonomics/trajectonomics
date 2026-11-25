@@ -1,8 +1,9 @@
 import type { Fixture } from "../fixtures/fixture"
 import { freelancer } from "../fixtures/freelancer"
 import { thaiEmployee } from "../fixtures/thai-employee"
-import type { SurvivalOptions } from "../types"
+import type { ChanceOfSuccessOptions, ProjectionOptions, SurvivalOptions } from "../types"
 import { calendarFiMonth, calendarShiftDay } from "./calendar-cases"
+import { freelancerChance } from "./chance-cases"
 import { capped } from "./contribution-cases"
 import { deriveRent } from "./derive-case"
 import { levyJointFilers, wageBaseCase } from "./levy-cap-cases"
@@ -18,32 +19,22 @@ import { levySeveral, levyStepped } from "./levy-extensions-cases"
 import { levyGainsDay } from "./levy-gains-case"
 import { levyReturnsDay } from "./levy-returns-case"
 import { levyCareCredit } from "./levy-us-cases"
+import { borrowDay, levelLoanMonth } from "./loan-cases"
+import { milestoneFreelancer } from "./milestone-cases"
 import { nominalLeapFebruary, nominalPartial, nominalReal, nominalZero } from "./nominal-cases"
 import { nominalMonthlyLoan } from "./nominal-flow-cases"
+import { configured, leapTie } from "./parity-fixtures"
+import type { ParitySavings } from "./parity-savings"
 
 export interface ParityCase {
 	readonly name: string
 	readonly fixture: Fixture
 	readonly options?: SurvivalOptions
-}
-
-/** One year of 50% growth across Feb 29 2028: a rounding tie plus the No Leap day count. */
-const leapTie: Fixture = {
-	baseline: { schemaVersion: 1, balances: [{ account: "cash", amount: 1 }] },
-	scenario: {
-		schemaVersion: 4,
-		currency: "THB",
-		economy: { inflation: 300 },
-		accounts: [{ id: "cash", kind: "asset", rate: 5000 }],
-		flows: [],
-		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
-	},
-	timeline: { start: "2027-02-28", horizon: "2029-03-01", resolution: "day" },
-}
-
-const configured: SurvivalOptions = {
-	method: "survival",
-	reference: { multiplier: 30, basis: "netWorth", window: "trailing12Months", terms: "real" },
+	readonly chance?: ChanceOfSuccessOptions
+	/** A chance run over the Return model `planReturnModel` builds from the Scenario (ADR 0029). */
+	readonly plan?: { readonly buckets: number; readonly seed: string; readonly paths: number }
+	readonly projectOptions?: ProjectionOptions
+	readonly savings?: ParitySavings
 }
 
 /** Inputs whose Projection and Financial Independence must hash identically under every engine. */
@@ -73,11 +64,14 @@ export const PARITY_CASES: readonly ParityCase[] = [
 		options: { method: "survival", minBufferMonths: 3 },
 	},
 	{ name: "levy-several-fi", fixture: levySeveral, options: { method: "survival" } },
+	{ name: "loan-level-month", fixture: levelLoanMonth },
+	{ name: "loan-borrow-day", fixture: borrowDay },
 	{ name: "levy-wage-base", fixture: wageBaseCase(60_000_000) },
 	{ name: "levy-joint-filers", fixture: levyJointFilers },
 	{ name: "calendar-shift-day", fixture: calendarShiftDay },
 	{ name: "calendar-fi", fixture: calendarFiMonth, options: { method: "survival" } },
 	{ name: "freelancer-fi", fixture: freelancer, options: { method: "survival" } },
+	{ name: "freelancer-chance", fixture: freelancer, chance: freelancerChance },
 	{ name: "freelancer-fi-reference", fixture: freelancer, options: configured },
 	{
 		name: "thai-employee-fi-buffer",
@@ -98,4 +92,11 @@ export const PARITY_CASES: readonly ParityCase[] = [
 			minBufferMonths: 3,
 		},
 	},
+	{ name: "milestone-freelancer-month", fixture: milestoneFreelancer },
+	{
+		name: "milestone-freelancer-fi",
+		fixture: milestoneFreelancer,
+		options: { method: "survival" },
+	},
+	{ name: "milestone-freelancer-chance", fixture: milestoneFreelancer, chance: freelancerChance },
 ]

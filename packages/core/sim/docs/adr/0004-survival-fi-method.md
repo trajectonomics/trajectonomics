@@ -23,8 +23,9 @@ test's behaviour changes.
   grows by the engine's whole-year rule with `growthYears(Timeline.start, date)`, so a later M
   never makes retirement cheaper in real terms.
 - **Buffer checks.** After M's flows, at every Occurrence after M, and at the horizon, accessible
-  net worth must be at least `required(D)`. A breach is recorded but does not stop the walk, so a
-  later Shortfall can win the binding.
+  net worth must be at least `required(D)`. A breach, or a window that cannot be priced, is recorded
+  but does not stop the walk. A Shortfall outranks either, and between them the earliest date wins
+  ([ADR 0012](./0012-milestones.md)).
 - **No monotonicity assumption.** `retirementSpending` can remove a large expense only for an
   early M, so a later candidate may fail where an earlier one passed. The scan is ascending and
   returns the first pass; it never binary-searches. A Shortfall before M is identical for every
@@ -45,9 +46,10 @@ test's behaviour changes.
   runs-out date is before M; then `undrawableMoney` when locked or unrouted assets cover the
   unmet amount; otherwise `insufficientMoney`.
 - **25× reference.** On a reachable answer, the result reports unlocked assets at M before M's
-  flows, `E(M)`, `25 × E(M)`, and the floored multiple in basis points. It is informational and
+  flows, `E(M)`, `25 × E(M)`, and the floored multiple in basis points. An Illiquid asset
+  ([ADR 0019](./0019-illiquid-assets.md)) is left out of the unlocked sum. It is informational and
   never decides the FI month.
-  [ADR 0007](./0007-fi-reference-is-configured-not-decided.md) makes the multiplier, balances,
+  [ADR 0013](./0013-fi-reference-is-configured-not-decided.md) makes the multiplier, balances,
   window and terms configurable; the reference stays informational.
 - **Execution.** The scan reuses the unchanged prefix: one walk saves cloned account states and
   Levy tallies before each candidate month, then each candidate continues from its own clone.
@@ -82,7 +84,7 @@ not change the survival test. It is built on the growth seam and PRNG of ADR-000
   `id` and `accounts` are validated, every bucket carries one `returnsBps` per Account in
   `-9999..10000`, and the weights are non-negative safe integers summing to exactly 2^32.
   `INVALID_WEIGHT`, `RETURN_WEIGHT_TOTAL` and `TOO_MANY_ENTRIES` are the ADR-0005 codes this input
-  uses; 64 Accounts, 512 buckets and 1,200 month rows are its caps. A missing model is
+  uses; 64 Accounts, 512 buckets (1,024 since ADR 0029) and 1,200 month rows are its caps. A missing model is
   `MISSING_KEY` at `["model"]`. An Account the model does not name keeps its `Account.rate`.
 - **Paths.** One draw per month row picks one Market bucket for every Account in the model. Path
   `i` starts from `pathSeed(seed, i)` and its rows run from `Timeline.start` to the horizon, one
@@ -110,8 +112,9 @@ not change the survival test. It is built on the growth seam and PRNG of ADR-000
   `RATE_OUT_OF_RANGE`. `paths` outside `1..200` is `INVALID_PATH_COUNT` and a malformed `seed` is
   `INVALID_SEED`; both arrive with the case, per ADR-0005's two-tier rule. An unknown `method`
   stays `INVALID_FI_METHOD`, which already exists.
-- **Overflow.** A prefix or candidate walk that overflows fails the whole call with
-  `VALUE_OVERFLOW` at its date and Account: a share over a shrunken sample would be a lie.
+- **Overflow.** `VALUE_OVERFLOW` at its date and Account, unless a Shortfall already ended the
+  path. Among buffer findings, an earlier breach outranks a later window that cannot be priced
+  (ADR 0012). A prefix overflow, or a flow or valuation overflow in a walk, always fails the call.
 - **Cost gate.** #19 landed, so the gate is met. The 200-path cap stays the method's own: the
   Outcome distribution's is 10,000, and the two never share an option type.
 

@@ -6,7 +6,7 @@ import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import type { Column } from "../ui/table-types"
 
-type Total = NonNullable<Doctor["trialBalance"]>["totals"][number]
+type Total = NonNullable<NonNullable<Doctor["trialBalance"]>["totals"]>[number]
 
 interface Props {
 	trialBalance: Doctor["trialBalance"] | null
@@ -34,11 +34,17 @@ const columns: Column<Total>[] = [
 			<Badge tone={trialBalance.balanced ? "neutral" : "accent"}>{trialBalance.balanced ? "Balances" : "Does not balance"}</Badge>
 			<span class="text-sm text-muted-foreground">{`Trial balance at ${formatDate(trialBalance.asOf)}`}</span>
 		</div>
-		<DataTable
-			caption="Trial balance totals"
-			rows={trialBalance.totals}
-			rowKey={(total) => total.currency}
-			{columns}
-		/>
+		{#if trialBalance.totals === null}
+			<p class="text-sm text-muted-foreground">
+				{trialBalance.balanced ? "Debits equal credits" : "Debits and credits disagree"} at {formatDate(trialBalance.asOf)}, compared exactly; the totals exceed the safe range.
+			</p>
+		{:else}
+			<DataTable
+				caption="Trial balance totals"
+				rows={trialBalance.totals}
+				rowKey={(total) => total.currency}
+				{columns}
+			/>
+		{/if}
 	</div>
 {/if}

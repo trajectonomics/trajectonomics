@@ -14,8 +14,14 @@ const table = {
 	unknown_format: { exit: 2, message: "Unknown output format." },
 	not_found: { exit: 4, message: "The requested resource was not found." },
 	ledger_missing: { exit: 4, message: "The data directory holds no ledger." },
+	default_home_refused: {
+		exit: 3,
+		message: "A development build does not open the default data directory.",
+	},
 	account_name_taken: { exit: 5, message: "An account with this name already exists." },
 	scenario_name_taken: { exit: 5, message: "A scenario with this name already exists." },
+	scenario_is_main: { exit: 5, message: "The scenario is the main plan." },
+	scenario_changed: { exit: 5, message: "The scenario changed since it was read." },
 	unsupported_currency: { exit: 3, message: "The currency is not supported in v1." },
 	account_archived: { exit: 3, message: "The account is archived and accepts no postings." },
 	same_account: {
@@ -25,6 +31,20 @@ const table = {
 	liability_opening_positive: {
 		exit: 3,
 		message: "A liability's opening balance is negative: enter the debt as a negative amount.",
+	},
+	valuation_account_invalid: {
+		exit: 3,
+		message:
+			"Only an asset or a liability can be valued: it has a value that moves without a transaction.",
+	},
+	valuation_value_negative: {
+		exit: 3,
+		message: "A liability's value is what it still owes, stated as a positive amount.",
+	},
+	valuation_against_invalid: {
+		exit: 3,
+		message:
+			"A valuation is posted against an income or equity account in the valued account's currency.",
 	},
 	external_ref_conflict: {
 		exit: 5,
@@ -42,7 +62,11 @@ const table = {
 	backup_unreadable: { exit: 1, message: "The backup could not be read." },
 	backup_stale: { exit: 3, message: "The backup does not match the data in the ledger." },
 	restore_target_not_empty: { exit: 5, message: "The database already holds data." },
-	projection_refused: { exit: 3, message: "The projection engine refused its input." },
+	projection_refused: {
+		exit: 3,
+		message:
+			"The projection engine refused its input; details names each problem by code, and VALUE_OVERFLOW means a figure grew past the largest amount the engine can hold.",
+	},
 	SINGLE_POSTING: { exit: 3, message: "A transaction needs at least two postings." },
 	INVALID_AMOUNT: { exit: 3, message: "The amount is not a safe integer of minor units." },
 	ZERO_AMOUNT_POSTING: { exit: 3, message: "A posting amount cannot be zero." },

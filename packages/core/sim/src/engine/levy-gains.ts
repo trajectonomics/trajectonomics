@@ -6,7 +6,7 @@ import type { LevySet } from "./levy-set"
 import type { AccountState } from "./state"
 
 /** The share of pooled basis a withdrawal uses, rounded half up and never above the basis. */
-function basisTaken(basis: bigint, withdrawn: bigint, valueBefore: bigint): bigint {
+export function basisTaken(basis: bigint, withdrawn: bigint, valueBefore: bigint): bigint {
 	if (basis === 0n || valueBefore === 0n) return 0n
 	const share = roundHalfUp(basis * withdrawn, valueBefore)
 	return share > basis ? basis : share

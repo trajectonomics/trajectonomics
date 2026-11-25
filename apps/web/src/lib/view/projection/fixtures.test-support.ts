@@ -1,4 +1,7 @@
 import type { ProjectionRun } from "../../contract"
+import { MONTHLY_ROWS } from "./monthly-rows.test-support"
+
+export { MONTHLY_ROWS }
 
 /** A hand-made projection, so the tests pin their own figures rather than the Demo snapshot's. */
 export type AnnualRow = Extract<ProjectionRun["tables"][number], { name: "annual" }>["rows"][number]
@@ -27,6 +30,7 @@ function annualRow(
 		index,
 		from: span.from,
 		to: span.to,
+		ages: [],
 		openingNetWorth: "1000000.00",
 		closingNetWorth: closing,
 		income: "120000.00",
@@ -65,23 +69,6 @@ export const ANNUAL_ROWS: readonly AnnualRow[] = [
 	),
 ]
 
-export const MONTHLY_ROWS: readonly MonthlyRow[] = [
-	{
-		date: "2026-10-31",
-		netWorth: "1250000.00",
-		realNetWorth: "1250000.00",
-		accessibleNetWorth: "900000.00",
-		realAccessibleNetWorth: "900000.00",
-	},
-	{
-		date: "2026-11-30",
-		netWorth: "1262000.00",
-		realNetWorth: "1255000.00",
-		accessibleNetWorth: "910000.00",
-		realAccessibleNetWorth: "905000.00",
-	},
-]
-
 /** A projection run with the given patch over the fixture: no runs-out, no Overrides, no monthly table. */
 export function projectionRunFixture(patch: Partial<ProjectionRun> = {}): ProjectionRun {
 	return {
@@ -90,6 +77,7 @@ export function projectionRunFixture(patch: Partial<ProjectionRun> = {}): Projec
 		engine: ENGINE,
 		scenario: SCENARIO,
 		overrides: [],
+		removals: [],
 		tax: "applied",
 		notes: ["Tax is applied: the fixture levy.", "A note the CLI states, in its own order."],
 		currency: "THB",

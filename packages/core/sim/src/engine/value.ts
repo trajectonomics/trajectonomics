@@ -2,6 +2,7 @@ import { countedDays } from "../calendar/counted"
 import { grow } from "../money/growth"
 import { accrualParts, capitaliseThrough, type NominalRule } from "../money/nominal"
 import type { Account, DateString } from "../types"
+import { leftOutOfAccessible } from "./accessible"
 import { walkRows } from "./span"
 import type { AccountState, StateMap } from "./state"
 
@@ -25,15 +26,40 @@ export function activeNominalRule(state: AccountState): NominalRule | undefined 
 }
 
 /** A Return series replaces the rate, so an Account holding one takes this path. */
-function effectiveParts(state: AccountState, date: DateString): ValueParts {
+function growTo(state: AccountState, date: DateString): GrownRead {
 	const series = state.series
-	const amount =
-		series === undefined
-			? state.asOf === date
-				? state.balance
-				: grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
-			: walkRows(state.balance, state.asOf, date, series)
-	return { capitalised: amount, accruedInterest: 0n, amount }
+	if (series !== undefined) {
+		const read = walkRows(state, date, series, state.walked)
+		state.walked = read.walked
+		return read
+	}
+	const amount = grow(state.balance, state.rule.rate, countedDays(state.asOf, date))
+	return { amount, earning: amount }
+}
+
+interface GrownRead {
+	readonly amount: bigint
+	readonly earning: bigint
+}
+
+/** The grown value is read again and again on one date, so the last reading is kept (pure). */
+function effectiveParts(state: AccountState, date: DateString): ValueParts {
+	const { balance, asOf, grown } = state
+	if (asOf === date) return { capitalised: balance, accruedInterest: 0n, amount: balance }
+	const hit = grown?.date === date && grown.balance === balance && grown.asOf === asOf
+	const read = hit ? grown : growTo(state, date)
+	if (!hit) state.grown = { balance, asOf, date, ...read }
+	return { capitalised: read.amount, accruedInterest: 0n, amount: read.amount }
+}
+
+/**
+ * The part of a Return series Account's value on `date` still to earn in the row `date` falls in:
+ * what a change on `date` leaves earning the rest of that row (ADR 0005).
+ */
+export function earningAt(state: AccountState, date: DateString): bigint {
+	if (state.asOf === date) return state.earning ?? state.balance
+	effectiveParts(state, date)
+	return state.grown!.earning
 }
 
 /**
@@ -73,9 +99,7 @@ export function accessibleNetWorth(states: StateMap, date: DateString): bigint {
 	let total = 0n
 	for (const state of states.values()) {
 		if (state.rule.kind === "liability") total -= valuation(state, date)
-		else if (state.rule.lockedUntil === undefined || date >= state.rule.lockedUntil) {
-			total += valuation(state, date)
-		}
+		else if (!leftOutOfAccessible(state.rule, date)) total += valuation(state, date)
 	}
 	return total
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { skillFrontmatter } from "./skill-frontmatter"
 import { metadataCli } from "./skill-metadata"
-import { manifest, OPERATING_SKILL_PATH, read, SKILLS_SOURCE } from "./skills-test-support"
+import { manifest, OPERATING_SKILL_PATH, read, SKILLS_SOURCE, section } from "./skills-test-support"
 
 /**
  * Static checks on the first-party operating Skill, `traj`, which publishes from this repository and
@@ -139,7 +139,7 @@ describe("the traj operating Skill", () => {
 	})
 
 	it("hands a job to the Skill that owns it, installed by its explicit name from the pin", () => {
-		expect(body).toContain(`npx skills add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
+		expect(body).toContain(`npx -y skills@1.9.0 add ${SKILLS_SOURCE}#<commit> --skill <name> -y`)
 		expect(body).not.toContain(`npx skills add ${SKILLS_SOURCE} --skill <name> -y`)
 		expect(body).toContain("is not a router either")
 	})
@@ -160,5 +160,72 @@ describe("the traj operating Skill", () => {
 			"traj fi",
 		])
 			expect(body).not.toContain(removed)
+	})
+})
+
+/**
+ * The sign conventions, stated once. Each span below was read from the real CLI at 0.2.0, 0.3.0 and
+ * 0.7.0 on a scratch ledger: raw signed rows, a liability balance of `-2400.00` for a debt of 2,400.00,
+ * net worth as the printed sum, `NEGATIVE_AMOUNT` on a negative plain write, and `--opening` as the
+ * one signed write.
+ */
+describe("the traj operating Skill's sign conventions", () => {
+	const signs = section(read(OPERATING_SKILL_PATH), "Read a sign")
+
+	it("reads every row's sign from its type, raw and signed", () => {
+		expect(signs).toContain(
+			"print raw signed units, and each row's `type` says how to read its sign",
+		)
+		for (const row of [
+			"| `asset` | positive | what they hold |",
+			"| `expense` | positive | what they spent |",
+			"| `liability` | negative | what they owe: `-2400.00` is a debt of 2,400.00 |",
+			"| `income` | negative | what they earned |",
+			"| `equity` | negative |",
+		])
+			expect(signs).toContain(row)
+	})
+
+	it("quotes net worth as printed, because it already counts every debt", () => {
+		expect(signs).toContain("**Net worth already counts every debt.**")
+		expect(signs).toContain("It is assets minus liabilities")
+		expect(signs).toContain("`netWorth`")
+		expect(signs).toContain("counts the debt twice")
+	})
+
+	it("reads the profit-and-loss rows raw and never flips a sign", () => {
+		expect(signs).toContain("income negative and expense positive")
+		expect(signs).toContain("its total is income minus expenses")
+		expect(signs).toContain("never flip a sign to make a sentence read better")
+	})
+
+	it("writes a magnitude and gives the direction to --from and --to", () => {
+		expect(signs).toContain(
+			"**A write takes a magnitude, and the direction is `--from` and `--to`.**",
+		)
+		expect(signs).toContain("`NEGATIVE_AMOUNT`")
+		expect(signs).toContain(
+			"Borrowing runs `--from` the liability `--to` the account that received",
+		)
+	})
+
+	it("opens a debt with a negative amount at every release in the range", () => {
+		expect(signs).toContain("**`--opening` is the one signed write.**")
+		expect(signs).toContain(
+			"`traj tx add --opening --from Opening --to Mortgage --amount -2400.00 --date 2026-01-01`",
+		)
+		expect(signs).toContain("From 0.3.0 the command line refuses a positive opening on a liability")
+		expect(signs).toContain("`liability_opening_positive`")
+		expect(signs).toContain("On 0.2.0 a positive opening is accepted and the debt reads as a gain")
+		expect(signs).toContain("at every release in the CLI Range")
+	})
+
+	it("is the only place a Skill states a sign convention", () => {
+		for (const skill of ["traj-onboarding", "traj-import", "traj-review", "traj-plan"]) {
+			const source = read(`skills/${skill}/SKILL.md`)
+			expect(source).not.toContain("negative opening balance")
+			expect(source).not.toContain("as a negative amount")
+			expect(source).not.toContain("reads as a gain")
+		}
 	})
 })

@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { demoSnapshotText } from "../../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot as snapshotSchema } from "../../contract"
 import { overviewView } from "./view"
 
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 describe("overviewView", () => {

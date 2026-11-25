@@ -63,7 +63,8 @@ export const INSERTS: Inserts = {
 	},
 	scenario: {
 		sql: `INSERT INTO scenario (id, entity_id, name, document, content_hash, forked_from,
-		${SYNC_COLUMNS}, deleted_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`,
+		${SYNC_COLUMNS}, deleted_at, household, tax, notes, main)
+		VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)`,
 		values: (r) => [
 			r.id,
 			r.entityId,
@@ -75,6 +76,10 @@ export const INSERTS: Inserts = {
 			r.createdAt,
 			r.updatedAt,
 			r.deletedAt,
+			r.household,
+			r.tax,
+			r.notes,
+			r.main ? 1 : 0,
 		],
 	},
 }

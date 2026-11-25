@@ -1,46 +1,23 @@
 import type { DateString, Scenario } from "../types"
-import type { ProjectionProblem } from "../types/projection"
-import { aggregate } from "./aggregate"
-import { applyAssets, applyDebt } from "./contributions"
-import { plannedAmounts } from "./derive"
+import type { DateOutcome } from "./day-totals"
+
+export type { DateOutcome, DayTotals, EngineRunsOut } from "./day-totals"
+
+import { aggregate, type DayFlows } from "./aggregate"
+import { applyEmployer } from "./employer"
 import type { DatedEvent } from "./events"
+import { applyFees, feesOwed } from "./fee"
 import { type LevySet, settlementOn, settlementPeriodViews } from "./levy-set"
-import { mergeFunded, tally, totalsOf } from "./levy-step"
-import { route } from "./route"
+import { totalsOf } from "./levy-step"
+import { payOut } from "./pay-out"
+import { applyPayouts } from "./payout"
+import { plannedFail } from "./planned-fail"
+import { plannedOn } from "./planned-on"
+import { applyPlannedWithdrawals } from "./planned-withdrawals"
+import type { RuleBook } from "./rule-book"
 import type { StateMap } from "./state"
 
-export interface DayTotals {
-	readonly date: DateString
-	/** Planned gross income before Prepayment. */
-	readonly income: bigint
-	readonly expense: bigint
-	readonly contributions: bigint
-	readonly unfunded: ReadonlyMap<string, bigint>
-	/** Prepayment plus Settlements net of refunds on this date. */
-	readonly levy: bigint
-}
-
-export interface EngineRunsOut {
-	readonly date: DateString
-	readonly unmet: bigint
-}
-
-export interface DateOutcome {
-	readonly totals: DayTotals
-	readonly problem: ProjectionProblem | undefined
-	readonly runsOut: EngineRunsOut | undefined
-}
-
-const nothing = { income: 0n, expense: 0n, prepaid: 0n }
-
-/** A Derived-amount problem is reported before any Settlement, debt or tally work on the date. */
-function plannedFail(date: DateString, problem: ProjectionProblem): DateOutcome {
-	return {
-		totals: totalsOf(date, nothing, 0n, new Map(), { amount: 0n, problem: undefined }),
-		problem,
-		runsOut: undefined,
-	}
-}
+const NO_SETTLEMENT = { amount: 0n, byLevy: new Map<string, bigint>(), problem: undefined }
 
 /** Applies one occurrence date in the canonical order of operations. */
 export function processDate(
@@ -49,40 +26,61 @@ export function processDate(
 	date: DateString,
 	events: readonly DatedEvent[],
 	levies: LevySet | undefined,
+	breakdown = false,
+	rules?: RuleBook,
 ): DateOutcome {
-	const planned = plannedAmounts(events, scenario.flows, date, scenario.economy.inflation)
+	const planned = plannedOn(events, scenario, date, states, rules)
 	if (!planned.ok) return plannedFail(date, planned.problem)
 	const views = levies === undefined ? [] : settlementPeriodViews(levies, date)
 	const day = aggregate(events, planned.planned, views, date)
-	const settlement =
-		levies === undefined ? { amount: 0n, problem: undefined } : settlementOn(levies, states, date)
-	if (day.problem !== undefined) {
-		return {
-			totals: totalsOf(date, day, 0n, new Map(), settlement),
-			problem: day.problem,
-			runsOut: undefined,
-		}
+	const settlement = levies === undefined ? NO_SETTLEMENT : settlementOn(levies, states, date)
+	const early = (flows: DayFlows, problem: NonNullable<DateOutcome["problem"]>): DateOutcome => ({
+		totals: totalsOf(date, flows, 0n, new Map(), new Map(), settlement),
+		problem,
+		runsOut: undefined,
+	})
+	if (day.problem !== undefined) return early(day, day.problem)
+	// A fee reads its Account before anything lands and is charged last (ADR 0028).
+	const owed = feesOwed(states, events, date)
+	// An employer share lands in its Account first: it is outside cashflow, so a sale on the same date can
+	// sell it, and nothing below reads it (ADR 0026).
+	const employer = applyEmployer(states, day.contributionEntries, date, levies)
+	if (employer.problem !== undefined) return early({ ...day, employer: 0n }, employer.problem)
+	// A payout leaves its Account on its date, before a sale or a payment reads the Account (ADR 0027).
+	const payout = applyPayouts(states, events, planned.planned, date, levies)
+	if (payout.problem !== undefined) return early(day, payout.problem)
+	const moves = applyPlannedWithdrawals(states, day.plannedBySource, date, levies)
+	const landed = {
+		...day,
+		payouts: payout.paid,
+		payoutsBy: payout.by,
+		withdrawals: moves.cash,
+		plannedBySource: moves.borrowedBy,
 	}
-	const debt = applyDebt(states, day.contributionEntries, date, levies)
-	if (debt.problem !== undefined) {
-		tally(levies, date, day.gross, debt.funded, day.prepaidByLevy)
-		const totals = totalsOf(date, day, debt.paid, new Map(), settlement)
-		return { totals, problem: debt.problem, runsOut: undefined }
-	}
-	const cashflow = day.income - day.prepaid - day.expense - debt.paid - settlement.amount
-	const available = cashflow > 0n ? cashflow : 0n
-	const assets = applyAssets(
+	if (moves.problem !== undefined) return early(landed, moves.problem)
+	const dated = {
+		scenario,
 		states,
-		scenario.cashflow.contribute,
-		day.contributionEntries,
-		available,
 		date,
+		events,
 		levies,
-	)
-	tally(levies, date, day.gross, mergeFunded(debt.funded, assets.funded), day.prepaidByLevy)
-	const totals = totalsOf(date, day, debt.paid + assets.applied, assets.unfunded, settlement)
-	if (settlement.problem !== undefined)
-		return { totals, problem: settlement.problem, runsOut: undefined }
-	if (assets.problem !== undefined) return { totals, problem: assets.problem, runsOut: undefined }
-	return route(states, scenario, date, totals, cashflow - assets.applied, levies)
+		breakdown,
+		employerFunded: employer.funded,
+	}
+	const outcome = payOut(dated, planned.planned, landed, moves.soldBy, settlement)
+	return outcome.problem === undefined ? charge(outcome, states, owed, date, levies) : outcome
+}
+
+/** Takes the date's fees last, so nothing above reads an Account a fee has touched (ADR 0028). */
+function charge(
+	outcome: DateOutcome,
+	states: StateMap,
+	owed: ReadonlyMap<string, bigint>,
+	date: DateString,
+	levies: LevySet | undefined,
+): DateOutcome {
+	if (owed.size === 0) return outcome
+	const fees = applyFees(states, owed, date, levies)
+	const totals = { ...outcome.totals, fees: fees.total, feesBy: fees.by }
+	return { ...outcome, totals, problem: fees.problem }
 }

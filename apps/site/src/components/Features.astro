@@ -3,21 +3,38 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { FEATURE_SAMPLES } from "../lib/site/feature-samples"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
 }
 
 const { dictionary } = Astro.props
+/**
+ * The Mascot each small card carries, by the card's index: the pose that acts out its feature, and the corner it takes
+ * (ADR 0028, ADR 0029). Each card puts its robot somewhere else, so the row reads as four scenes, not one repeated
+ * corner. The two wide cards carry a CLI sample instead, and the robot beside the heading already stands over them.
+ */
+const CARD_MASCOTS = [
+	undefined,
+	undefined,
+	{ pose: "same", place: "top-right" },
+	{ pose: "local", place: "bottom-right" },
+	{ pose: "open", place: "bottom-left" },
+	{ pose: "tax", place: "top-left" },
+] as const
 ---
 
 <section class="section-surface bg-background">
 	<div class="section-inner">
-		<div class="section-head">
-			<p class="eyebrow">{dictionary.featuresEyebrow}</p>
-			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
-				{dictionary.featuresHeading}
-			</h2>
+		<div class="section-head-row">
+			<div class="section-head">
+				<p class="eyebrow">{dictionary.featuresEyebrow}</p>
+				<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+					{dictionary.featuresHeading}
+				</h2>
+			</div>
+			<Mascot pose="chart" class="mascot-features" />
 		</div>
 
 		{/* Two wide cards with a sample of the CLI's own output, then four small ones (Resend and Cursor on Mobbin). */}
@@ -25,9 +42,16 @@ const { dictionary } = Astro.props
 			{
 				dictionary.featureTitles.map((title, index) => {
 					const sample = FEATURE_SAMPLES[index]
+					const mascot = CARD_MASCOTS[index]
+					const robot = mascot && <Mascot pose={mascot.pose} class="mascot-card" />
+					const isTop = mascot?.place.startsWith("top") === true
 					return (
 						<li
-							class:list={["feature bg-background text-foreground", { "feature-wide": sample !== undefined }]}
+							class:list={[
+								"feature bg-background text-foreground",
+								{ "feature-wide": sample !== undefined },
+							]}
+							data-mascot-place={mascot?.place}
 						>
 							{sample !== undefined && (
 								<figure class="feature-sample bg-muted text-foreground" data-feature-sample>
@@ -38,11 +62,13 @@ const { dictionary } = Astro.props
 									<figcaption class="feature-sample-note">{dictionary.actionExampleNote}</figcaption>
 								</figure>
 							)}
+							{isTop && robot}
 							<span class="feature-index text-muted-foreground tabular-nums">
 								{String(index + 1).padStart(2, "0")}
 							</span>
 							<span class="feature-title">{title}</span>
 							<span class="feature-copy text-muted-foreground">{dictionary.featureCopies[index]}</span>
+							{!isTop && robot}
 						</li>
 					)
 				})

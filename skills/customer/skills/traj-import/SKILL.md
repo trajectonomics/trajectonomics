@@ -2,7 +2,7 @@
 name: traj-import
 description: "Bring a bank or card statement into `traj`, the personal money command line: read the export's header, choose its signed-amount mapping, chart every counterparty, date the opening balance, import once with an idempotency key, and prove the result against the statement's closing balance. Use when someone has a bank export or CSV to import, asks to load a statement, or wants last month's transactions in their ledger."
 metadata:
-  cli: ">=0.2.0 <0.7.0"
+  cli: ">=0.2.0 <0.8.0"
 ---
 
 # traj-import

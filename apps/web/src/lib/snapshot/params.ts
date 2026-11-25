@@ -1,4 +1,6 @@
-import { isValidDate } from "./dates"
+import { type AllowancePlan, checkAllowances } from "./allowance-params"
+import { type ChanceErrorCode, type ChancePlan, chancePlanOf, checkChance } from "./chance-params"
+import { checkAges, checkCompare, checkDates } from "./params-rules"
 
 /** The caller's parameters, as the command line states them. An unset date is null. */
 export type PlanInput = {
@@ -12,6 +14,24 @@ export type PlanInput = {
 	monthly: boolean
 	/** Whether the caller supplies Carry-in records; the records themselves are read by the runner. */
 	carryIn: boolean
+	/** The Return model file the chance reads draw from. The three chance flags go together. */
+	returnModel: string | null
+	paths: number | null
+	seed: string | null
+	/** The `projection allowances` reads' inputs; left out or null, the Snapshot reads none. */
+	allowances?: AllowancePlan | null | undefined
+	/**
+	 * Whether the chance reads list every Market path (`--outcomes`) and the Snapshot reads the five representative paths
+	 * ([web ADR 0020](../../../docs/adr/0020-the-chance-page-lists-every-future-and-opens-one-year-by-year.md)). Left out, it is true;
+	 * only the Demo snapshot says false, to stay under Biome's size limit.
+	 */
+	futures?: boolean | undefined
+	/**
+	 * Whether the Snapshot also reads the five representative paths in advance, so the offline Snapshot opens them with
+	 * no server. Left out, it is false: a live dashboard reads a future when it is opened (web ADR 0020). Only the
+	 * snapshot command says true.
+	 */
+	readPaths?: boolean | undefined
 }
 
 /** The parameters once every rule has held. */
@@ -24,6 +44,14 @@ export type PlanParams = {
 	ages: readonly number[]
 	monthly: boolean
 	carryIn: boolean
+	/** The chance reads' inputs, or null when the caller stated no Return model. */
+	chance: ChancePlan | null
+	/** The allowance reads' inputs, or null when none are stated: no `projection allowances` read is made. */
+	allowances: AllowancePlan | null
+	/** Whether the chance reads take `--outcomes` and the Snapshot holds the representative paths. */
+	futures: boolean
+	/** Whether the five representative paths are read in advance, for the offline Snapshot (web ADR 0020). */
+	readPaths: boolean
 }
 
 /** One code per rule the parameters can break. */
@@ -37,62 +65,43 @@ export type ParamsErrorCode =
 	| "invalid_birth_date"
 	| "age_needs_birth_date"
 	| "invalid_age"
+	| "invalid_allowances"
+	| ChanceErrorCode
 
 /** A rule the parameters broke, with the sentence a person reads. */
 export type ParamsError = { code: ParamsErrorCode; message: string }
-
-const MESSAGES: Record<ParamsErrorCode, string> = {
-	as_of_required: "Pass --as-of YYYY-MM-DD.",
-	invalid_as_of: "--as-of must be a YYYY-MM-DD date that exists.",
-	horizon_required: "Pass --horizon YYYY-MM-DD.",
-	invalid_horizon: "--horizon must be a YYYY-MM-DD date that exists.",
-	horizon_before_as_of: "--horizon must not be before --as-of.",
-	compare_needs_two_names: "--compare takes two Scenario names: --compare A B.",
-	invalid_birth_date: "--birth-date must be a YYYY-MM-DD date that exists.",
-	age_needs_birth_date: "--age needs --birth-date, so the ages count from a birth date.",
-	invalid_age: "--age must be a whole number from 0 up.",
-}
-
-type Check = ParamsError | null
-
-/** The first rule the dates break, or null when they hold. */
-function checkDates(input: PlanInput): Check {
-	if (input.asOf === null) return { code: "as_of_required", message: MESSAGES.as_of_required }
-	if (!isValidDate(input.asOf)) return { code: "invalid_as_of", message: MESSAGES.invalid_as_of }
-	if (input.horizon === null)
-		return { code: "horizon_required", message: MESSAGES.horizon_required }
-	if (!isValidDate(input.horizon)) {
-		return { code: "invalid_horizon", message: MESSAGES.invalid_horizon }
-	}
-	if (input.horizon < input.asOf) {
-		return { code: "horizon_before_as_of", message: MESSAGES.horizon_before_as_of }
-	}
-	return null
-}
-
-/** The first rule the birth date and the ages break, or null when they hold. */
-function checkAges(input: PlanInput): Check {
-	if (input.birthDate !== null && !isValidDate(input.birthDate)) {
-		return { code: "invalid_birth_date", message: MESSAGES.invalid_birth_date }
-	}
-	if (input.ages.length > 0 && input.birthDate === null) {
-		return { code: "age_needs_birth_date", message: MESSAGES.age_needs_birth_date }
-	}
-	const badAge = input.ages.some((age) => !Number.isSafeInteger(age) || age < 0)
-	return badAge ? { code: "invalid_age", message: MESSAGES.invalid_age } : null
-}
 
 /** Checks the parameters, returning the first rule they break. */
 export function checkParams(
 	input: PlanInput,
 ): { ok: true; params: PlanParams } | { ok: false; error: ParamsError } {
-	const error = checkDates(input) ?? checkAges(input) ?? checkCompare(input)
+	const error =
+		checkDates(input) ??
+		checkAges(input) ??
+		checkCompare(input) ??
+		checkChance(input) ??
+		checkAllowances(input.allowances)
 	if (error) return { ok: false, error }
 	// checkDates has held, so both dates are set; the fallbacks below are never taken.
-	return { ok: true, params: { ...input, asOf: input.asOf ?? "", horizon: input.horizon ?? "" } }
-}
-
-function checkCompare(input: PlanInput): Check {
-	const bad = input.compare !== null && (input.compare.a === "" || input.compare.b === "")
-	return bad ? { code: "compare_needs_two_names", message: MESSAGES.compare_needs_two_names } : null
+	const {
+		returnModel: _r,
+		paths: _p,
+		seed: _s,
+		allowances: _a,
+		futures: _f,
+		readPaths: _w,
+		...rest
+	} = input
+	return {
+		ok: true,
+		params: {
+			...rest,
+			asOf: input.asOf ?? "",
+			horizon: input.horizon ?? "",
+			chance: chancePlanOf(input),
+			allowances: input.allowances ?? null,
+			futures: input.futures ?? true,
+			readPaths: input.readPaths ?? false,
+		},
+	}
 }

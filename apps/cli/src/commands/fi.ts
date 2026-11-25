@@ -5,29 +5,34 @@ import { isAppError } from "../errors"
 import { readCarryIn } from "../projection/carryin"
 import { withCarryInSide } from "../projection/carryin-apply"
 import { independenceOf } from "../projection/fi"
-import { FI_METHOD } from "../projection/fi-method"
+import { FI_HORIZON, FI_METHOD } from "../projection/fi-method"
 import { fiView } from "../projection/fi-view"
 import {
 	asOfFlag,
 	carryInFlag,
 	carryInFlagDocument,
-	horizonFlag,
+	fiHorizonFlag,
 	PROJECTION_ERROR_CODES,
 	scenarioFlag,
 	setFlag,
 } from "../projection/flags"
 import { withProjection } from "../projection/leaf"
+import { addFlag, decimalFlag, withoutFlag } from "../scenario/override-flags"
 
 export const fi: Leaf = defineCommand({
 	name: "fi",
 	summary: "Report the financial independence date under a Scenario",
-	description: FI_METHOD,
+	note: "Each person's age at the FI date ships in 0.8.0.",
+	description: `${FI_METHOD} ${FI_HORIZON}`,
 	positionals: [],
 	input: z.strictObject({
 		asOf: asOfFlag,
-		horizon: horizonFlag,
+		horizon: fiHorizonFlag,
 		scenario: scenarioFlag,
 		set: setFlag,
+		without: withoutFlag,
+		add: addFlag,
+		decimal: decimalFlag,
 		carryIn: carryInFlag,
 	}),
 	flagDocuments: [carryInFlagDocument],
@@ -52,6 +57,9 @@ export const fi: Leaf = defineCommand({
 				scenario: input.scenario,
 				scenarioPath: "scenario",
 				sets: input.set ?? [],
+				without: input.without ?? [],
+				add: input.add ?? [],
+				decimal: input.decimal,
 			})
 			if (isAppError(prepared)) return prepared
 			const placed = withCarryInSide({ prepared, records, asOf: input.asOf })

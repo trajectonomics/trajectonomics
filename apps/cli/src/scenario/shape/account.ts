@@ -1,10 +1,11 @@
-import { BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
+import { feeShape, payoutShape } from "./account-income"
+import { ACCOUNT_KINDS, BASIS_POINTS, COMPOUNDING, DATE } from "./terms"
 
 /** One Account the Scenario assumes, with the unit of every number it states. */
 export const accountShape: Record<string, unknown> = {
 	type: "object",
 	description:
-		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional.",
+		"One Account the Scenario assumes. Every field but `id`, `kind` and `rate` is optional. `payout`, `fee` and `volatility` are an asset's alone, and every rate in them is the caller's.",
 	properties: {
 		id: {
 			type: "string",
@@ -12,7 +13,7 @@ export const accountShape: Record<string, unknown> = {
 				"The name this document gives the Account, unique within it. A projection against the derived Baseline needs the Ledger Account's id here.",
 		},
 		kind: {
-			enum: ["asset", "liability"],
+			enum: [...ACCOUNT_KINDS],
 			description:
 				"`asset` holds value and earns `rate`; `liability` is money owed, and its Balance is stated as the positive amount owed.",
 		},
@@ -29,6 +30,11 @@ export const accountShape: Record<string, unknown> = {
 			type: "string",
 			description: `Assets only, ${DATE} Value held in the Account does not count toward accessible net worth until then.`,
 		},
+		liquid: {
+			type: "boolean",
+			description:
+				"Assets only: `false` marks an illiquid asset, such as a home or a car. It stays in net worth, but it does not count toward accessible net worth, the reference, the minimum buffer or the unlocked-asset and accessible-net-worth Metrics, and no withdrawal or surplus step may draw on it. Omit it, or give `true`, for a liquid asset.",
+		},
 		returnLabel: {
 			type: "string",
 			description:
@@ -39,6 +45,12 @@ export const accountShape: Record<string, unknown> = {
 			description:
 				"Assets only: the Tally label the Account's realised gains are reported under; omit to report none. Needs a Levy.",
 		},
+		volatility: {
+			type: "integer",
+			description: `${BASIS_POINTS} Assets only, 0 to 10000: how much the Account's yearly return swings, as the standard deviation of that return, so 15% is 1500. Only the chance of success reads it: \`traj projection chance --return-model plan\` builds its Market paths from each Account's \`rate\` and \`volatility\`, and every Account with a \`volatility\` above 0 moves with one shared market factor. An Account without one keeps its \`rate\` on every path, and every other projection ignores it. The figure is the caller's own: \`traj\` ships none.`,
+		},
+		payout: payoutShape,
+		fee: feeShape,
 	},
 	required: ["id", "kind", "rate"],
 	additionalProperties: false,

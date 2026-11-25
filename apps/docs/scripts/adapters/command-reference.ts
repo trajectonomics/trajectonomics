@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs"
-import { mkdtemp } from "node:fs/promises"
+import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import {
@@ -36,14 +36,16 @@ async function latestVersion(): Promise<string | undefined> {
 }
 
 /** The published CLI over `bunx`, spawned in a temporary directory away from the repository's lockfile. */
-function cliRunner(): Pick<CommandReferenceDeps, "cliJson" | "cliText"> {
+function cliRunner(bunx: string): Pick<CommandReferenceDeps, "cliJson" | "cliText"> & {
+	dispose(): Promise<void>
+} {
 	let directory: Promise<string> | undefined
 	const workingDirectory = (): Promise<string> => {
 		directory ??= mkdtemp(join(tmpdir(), "command-reference-"))
 		return directory
 	}
 	const run = async (version: string, args: readonly string[]): Promise<string | undefined> => {
-		const child = Bun.spawn(["bunx", `@trajectonomics/cli@${version}`, ...args], {
+		const child = Bun.spawn([bunx, `@trajectonomics/cli@${version}`, ...args], {
 			cwd: await workingDirectory(),
 			stdout: "pipe",
 			stderr: "pipe",
@@ -55,6 +57,10 @@ function cliRunner(): Pick<CommandReferenceDeps, "cliJson" | "cliText"> {
 		return (await child.exited) === 0 ? stdout : undefined
 	}
 	return {
+		/** Removes the temporary directory the calls ran in, if one was made. */
+		async dispose(): Promise<void> {
+			if (directory !== undefined) await rm(await directory, { recursive: true, force: true })
+		},
 		cliText: run,
 		async cliJson(version: string, args: readonly string[]): Promise<unknown> {
 			const text = await run(version, args)
@@ -97,14 +103,16 @@ async function pagesAt(ref: string): Promise<readonly ContentFile[] | undefined>
 	return files.sort((left, right) => left.path.localeCompare(right.path))
 }
 
-/** Assemble the check over the npm registry, `bunx`, git and the checkout's files. */
-export function createCommandReferenceDeps(): CommandReferenceDeps {
+/** Assemble the check over the npm registry, `bunx` (a test names another command), git and the checkout's files. */
+export function createCommandReferenceDeps(bunx = "bunx"): CommandReferenceDeps & {
+	dispose(): Promise<void>
+} {
 	return {
 		now: () => Date.now(),
 		sleep: (ms: number) => Bun.sleep(ms),
 		print: (line: string) => console.log(line),
 		latestVersion,
-		...cliRunner(),
+		...cliRunner(bunx),
 		pages: () => readPages(process.cwd()),
 		pagesAt,
 	}

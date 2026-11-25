@@ -1,0 +1,62 @@
+annual (2 rows)
+index  from        to          Ages  openingNetWorth  closingNetWorth      income  withdrawals  transfers    expense  contributions  unfundedContributions  interest  unmet  partial  realNetWorth
+    0  2026-01-01  2026-12-31                   0.00        440000.00  1200000.00      3000.00   33000.00  760000.00       55000.00                5000.00      0.00   0.00  false    {"date":"2027-01-01","amount":"495145.62"}
+    1  2027-01-01  2027-01-01              440000.00        510000.00   100000.00         0.00       0.00   30000.00        5000.00                   0.00      0.00   0.00  true     {"date":"2027-01-01","amount":"495145.62"}
+
+No tax is applied; figures are before tax.
+5000.00 of Contributions could not be funded, so they were not made. An asset Contribution is capped by that day's income minus the tax prepaid, expenses, debt payments and tax settled that day, so a lump sum from savings is not funded: use a monthly Flow.
+
+routing (6 rows)
+list      entry  account     share  target
+surplus       0  emergency          up to 100000.00 at the start, grown by inflation: 103000.00 at the horizon
+surplus       1  funds      50.00%
+surplus       2  cash
+withdraw      0  emergency          down to 20000.00 at the start, grown by inflation: 20600.00 at the horizon
+withdraw      1  funds
+withdraw      2  emergency
+
+cash flow 2026-01-01 to 2026-12-31 (13 rows)
+line                                   amount
+money in                           1533000.00
+  income                           1200000.00
+  withdrawals                         3000.00
+  drawn                             330000.00
+spending                            760000.00
+  (uncategorised)                   760000.00
+saving                               55000.00
+not funded                            5000.00
+left over                           718000.00
+moved between accounts (not cash)    33000.00
+  roll-pvd: pvd to rmf               30000.00
+  pay-debt: funds to debt             3000.00
+  pay-debt: not moved                 6000.00
+
+cash flow 2027-01-01 to 2027-01-01 (9 rows)
+line                                  amount
+money in                           100000.00
+  income                           100000.00
+spending                            30000.00
+  (uncategorised)                   30000.00
+saving                               5000.00
+left over                           65000.00
+moved between accounts (not cash)       0.00
+  pay-debt: funds to debt               0.00
+  pay-debt: not moved                1000.00
+
+debt: paid off on 2026-06-01
+
+liabilities (13 rows)
+account  from        to          opening    drawn  paid  transferred  interest  closing  partial
+debt     2026-01-01  2026-01-31     0.00  3000.00  0.00         0.00      0.00  3000.00  false
+debt     2026-02-01  2026-02-28  3000.00     0.00  0.00         0.00      0.00  3000.00  false
+debt     2026-03-01  2026-03-31  3000.00     0.00  0.00         0.00      0.00  3000.00  false
+debt     2026-04-01  2026-04-30  3000.00     0.00  0.00      1000.00      0.00  2000.00  false
+debt     2026-05-01  2026-05-31  2000.00     0.00  0.00      1000.00      0.00  1000.00  false
+debt     2026-06-01  2026-06-30  1000.00     0.00  0.00      1000.00      0.00     0.00  false
+debt     2026-07-01  2026-07-31     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2026-08-01  2026-08-31     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2026-09-01  2026-09-30     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2026-10-01  2026-10-31     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2026-11-01  2026-11-30     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2026-12-01  2026-12-31     0.00     0.00  0.00         0.00      0.00     0.00  false
+debt     2027-01-01  2027-01-01     0.00     0.00  0.00         0.00      0.00     0.00  true

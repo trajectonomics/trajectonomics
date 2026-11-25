@@ -1,17 +1,27 @@
-import { FLOW_KINDS, FREQUENCIES } from "../vocab"
+import { FLOW_KINDS, FREQUENCIES, FUNDINGS } from "../vocab"
 import type { AccountIndex } from "./codes"
 import { derive } from "./derive"
-import { cappedPrepayment, label, NOT_ALLOWED } from "./flow-fields"
+import { cappedPrepayment, expenseCategory, label, NOT_ALLOWED, NOT_EXPENSE } from "./flow-fields"
+import { gates } from "./flow-gates"
+import { levelField } from "./level-loan"
+import type { LoanIndex } from "./loan-index"
 import { prepayments } from "./prepayments"
 import { accountRef } from "./refs"
+import { spendingRule } from "./rule"
 import { amount, bool, date, growth, oneOf, str } from "./scalars"
 import { opt, req, type Shape } from "./shape"
+import { transferShape } from "./transfer"
 
-/** What a Flow's fields may reference: the Accounts, and the Levies a label or share needs. */
+/** What a Flow's fields may reference: the Accounts, the Levies a label or share needs, and Milestones. */
 export interface FlowContext {
 	readonly accounts: AccountIndex | undefined
 	readonly hasLevy: boolean
 	readonly levyIds: ReadonlySet<string>
+	readonly milestoneIds: ReadonlySet<string>
+	/** The raw loan fields of each declared Account, for a withdrawal source and a level payment. */
+	readonly loans: LoanIndex
+	/** The asset Accounts marked `liquid: false`, which a Spending rule's portfolio refuses. */
+	readonly illiquid: ReadonlySet<string>
 }
 
 const base: Shape = {
@@ -31,28 +41,65 @@ const base: Shape = {
  */
 export function flowShape(kind: unknown, context: FlowContext): Shape {
 	const target = accountRef(context.accounts)
+	const shared = { ...base, ...gates(context), rule: NOT_EXPENSE }
 	const levied = {
 		label: label(context.hasLevy),
 		prepayments: prepayments(context.hasLevy, context.levyIds),
 	}
 	const capped = cappedPrepayment(context.hasLevy)
-	if (kind === "income") return { ...base, earned: req(bool), ...levied, cappedPrepayment: capped }
+	if (kind === "income")
+		return {
+			...shared,
+			earned: req(bool),
+			...levied,
+			cappedPrepayment: capped,
+			funding: NOT_ALLOWED,
+			level: NOT_ALLOWED,
+		}
 	if (kind === "contribution") {
 		return {
-			...base,
+			...shared,
 			target: req(target),
+			funding: opt(oneOf(FUNDINGS, "INVALID_FUNDING")),
 			label: label(context.hasLevy),
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
+			level: levelField,
 		}
 	}
 	if (kind === "expense") {
 		return {
-			...base,
+			...shared,
+			rule: opt(spendingRule(context)),
+			category: opt(expenseCategory),
+			funding: NOT_ALLOWED,
 			label: NOT_ALLOWED,
 			prepayments: NOT_ALLOWED,
 			cappedPrepayment: NOT_ALLOWED,
+			level: NOT_ALLOWED,
 		}
 	}
-	return { ...base, earned: opt(bool), target: opt(target), ...levied, cappedPrepayment: capped }
+	if (kind === "transfer") return transferShape(shared, context)
+	if (kind === "withdrawal") {
+		return {
+			...shared,
+			source: req(accountRef(context.accounts)),
+			funding: NOT_ALLOWED,
+			label: NOT_ALLOWED,
+			prepayments: NOT_ALLOWED,
+			cappedPrepayment: NOT_ALLOWED,
+			level: NOT_ALLOWED,
+		}
+	}
+	return {
+		...shared,
+		rule: opt(spendingRule(context)),
+		category: opt(expenseCategory),
+		earned: opt(bool),
+		target: opt(target),
+		funding: opt(oneOf(FUNDINGS, "INVALID_FUNDING")),
+		...levied,
+		cappedPrepayment: capped,
+		level: levelField,
+	}
 }

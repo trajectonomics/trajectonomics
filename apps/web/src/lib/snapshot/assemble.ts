@@ -1,4 +1,5 @@
 import { SNAPSHOT_VERSION, type Snapshot, type SnapshotReads } from "../contract"
+import { chanceSourceOf } from "./chance-params"
 import type { PlanParams } from "./params"
 
 /** What the document is assembled from: the planned parameters, the resolved names, and every Read. */
@@ -23,6 +24,15 @@ export function assembleSnapshot(input: AssembleInput): Snapshot {
 			birthDate: params.birthDate,
 			ages: [...params.ages],
 			historyDates: [...input.historyDates],
+			allowances: params.allowances,
+			chance:
+				params.chance === null
+					? null
+					: {
+							source: chanceSourceOf(params.chance),
+							paths: params.chance.paths,
+							seed: params.chance.seed,
+						},
 		},
 		cliVersion: input.cliVersion,
 		reads: input.reads,

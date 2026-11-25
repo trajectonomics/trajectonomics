@@ -1,6 +1,8 @@
 ---
+// biome-ignore-all lint/correctness/noUnusedImports: Biome cannot read an Astro template, so it cannot see the Mascot it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome cannot read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -17,11 +19,14 @@ const { dictionary } = Astro.props
  */}
 <section class="section-muted bg-muted" data-faq>
 	<div class="section-inner faq-layout">
-		<div class="section-head faq-head">
-			<p class="eyebrow">{dictionary.faqEyebrow}</p>
-			<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
-				{dictionary.faqHeading}
-			</h2>
+		<div class="faq-head">
+			<div class="section-head">
+				<p class="eyebrow">{dictionary.faqEyebrow}</p>
+				<h2 class="section-heading text-3xl text-balance text-foreground sm:text-4xl">
+					{dictionary.faqHeading}
+				</h2>
+			</div>
+			<Mascot pose="think" class="mascot-think" />
 		</div>
 
 		<div class="faq-list">

@@ -26,6 +26,34 @@ _Avoid_: Forecast, model
 The month-by-month result of running a baseline through a scenario. The same baseline and scenario always give the same projection.
 _Avoid_: Run, output
 
+**Cash-flow breakdown**:
+The lines one Annual roll-up of a Projection is made of, by source, tax, category and Account, as the engine routed them (`projection run --breakdown`, ADR-0058). Each total is the engine's figure or an exact sum of its lines, and money in plus unmet equals money out.
+_Avoid_: Cash-flow statement, budget, flow report
+
+**Routing**:
+Where a Scenario's money goes: `cashflow.surplus` fills Accounts in order, a step taking a `share` of what is still unrouted and filling up to an `upTo`; `cashflow.withdraw` draws them in order, an entry optionally keeping a Reserve floor with `downTo`. An `upTo` or `downTo` is a whole number (nominal) or `{ amount, growth }`, grown by whole years from the start of the Timeline so it keeps its value in today's money (sim ADR-0030). A `--set` names a step or an entry by its position, such as `cashflow.withdraw.0.downTo` (ADR-0070). `projection run` states it as the `routing` echo.
+_Avoid_: Allocation, waterfall, budget
+
+**Reserve floor**:
+The balance a `withdraw` entry leaves in an Account, `downTo`: the draw takes the Account only down to it and moves on, and a Shortfall the floors stop is unmet, never taken from below the floor. The same Account may be listed again with a lower floor, and a `drawn` cash-flow line carries the position of its entry (sim ADR-0030, ADR-0070).
+_Avoid_: Minimum balance, emergency fund (the floor is the mechanism; what it protects is the caller's)
+
+**Transfer**:
+A Flow of `kind: "transfer"` that moves money between two of the plan's own Accounts, outside cashflow: it is no income, spending or saving, net worth is unchanged by it, and it never makes a Shortfall. What it could not move is `unmoved` in the `transfers` table of `projection run --breakdown`, and a loan it pays down states `transferred` (sim ADR-0031, ADR-0070).
+_Avoid_: Withdrawal plus contribution, rollover (a rollover is a transfer a plan states)
+
+**Real asset**:
+A home, a car or another thing owned that stays in net worth but is not spent: not a model of its own, but an asset Account marked `liquid: false` that no routing list names, an obligation Contribution that buys it, an optional loan, Flows whose amounts read its value, and a planned withdrawal that sells it, with a payoff that repays its loan from the sale (ADR-0060). Its ids follow `<asset>-purchase`, `-running`, `-rent`, `-sale`, `-loan` and `-loan-payoff`, a convention the Dashboard writes and reads that the core never sees.
+_Avoid_: Property (as a type), fixed asset, holding
+
+**Spending rule**:
+A fourth way to state an expense Flow's amount, `rule` beside `amount`, `derive` and `level`: its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year (sim ADR-0023). `initialRate` fixes the first year's amount as a share and grows it by inflation, `currentRate` takes a share of what the portfolio is worth each year (with optional dated rate steps, a floor and a ceiling), and `guardrails` cuts the amount after the share has grown too large and raises it after it has grown too small. The rule is the engine's, and `traj` ships no rate, band, bound or rounding for it: every figure is the caller's. `projection run --spending` states each Rule year (ADR-0063), and `projection chance` states what a rule pays across Market paths as spending Bands and a lowest year. A fixed amount that keeps pace with inflation is an ordinary expense with `growth: "inflation"`, not a rule.
+_Avoid_: Retirement plan, withdrawal strategy, safe withdrawal rate (a rate is the caller's, not a default)
+
+**Estate**:
+What a plan would leave on a date: everything owned (locked and illiquid Accounts and a home included), less what is owed, less the settlement costs, less the gifts, which is what heirs receive (sim ADR-0025). The optional `estate` block of a Scenario states its costs and gifts, every one the caller's own: `traj` ships none and models no inheritance tax, so a tax or a transfer fee is a cost line the caller types. `projection run --estate` states each roll-up's end (ADR-0064). A what-if may begin the block on a plan that lacks it with `--set estate=<json>` (ADR-0065). It changes no other figure of a Projection.
+_Avoid_: Inheritance (as the figure), legacy, will
+
 **As-of**:
 The date a result is evaluated at. Every result states it.
 _Avoid_: Today, now, snapshot date
@@ -120,7 +148,10 @@ _Avoid_: Income source
 
 **Event**:
 A dated one-off change in a scenario, such as a purchase or a windfall.
-_Avoid_: Milestone
+
+**Milestone**:
+A named point in a Scenario that a Flow gates on with `startAt` or `endAt`, fired by its Criteria the first time they hold. The CLI carries a Scenario's Milestones unchanged and reports each one's fire date in a Projection (`milestones` table, cli ADR-0049); the rules are the simulation core's, in `packages/core/sim/GLOSSARY.md`.
+_Avoid_: Event, trigger, goal, checkpoint
 
 **Fork**:
 A copy of a Scenario under a new name that remembers the id of the Scenario it came from.
@@ -130,13 +161,75 @@ _Avoid_: Branch, clone
 A value that replaces one dotted path of a Scenario's document; persisted when a fork is made, or applied transiently to a Projection.
 _Avoid_: Patch, edit
 
+**Removal**:
+A list item taken out of a Scenario's document by its `id`, with `--without`, before any Override is applied. It names an item, never a value, so `--set` cannot stand in for it; a Projection applies it transiently and `scenario fork` persists it.
+_Avoid_: Delete, drop, exclude
+
+**Addition**:
+A new list item put on a Scenario's `accounts`, `flows` or `milestones` with `--add <list>=<json>`, after the Removals and before the Sets. It carries its own `id`, which must not already exist and must not be one the same call's `--without` took out, so it never replaces anything (`--set` changes an item); a Projection applies it transiently and `scenario fork` and `scenario apply` persist it (ADR-0062).
+_Avoid_: Insert, create
+
+**What-if**:
+A set of Overrides, Removals and Additions applied to one stored Scenario. A Projection applies it transiently, `scenario fork` saves it as a new plan, and `scenario apply <name> --set/--without/--add` saves it to the plan it came from (ADR-0057, ADR-0062).
+_Avoid_: Draft, patch, edit
+
 **Contribution**:
 Money moved from cash flow into an investment or retirement account. It is not an expense, so net worth does not change at that instant.
 _Avoid_: Investment expense, savings
 
+**Household**:
+The people a Scenario's plan belongs to, stored beside its document: one holder, at most one partner and any dependents, each with a birth month and a life expectancy. It never changes the document's own fields; its Anchors do (ADR-0048).
+_Avoid_: Profile, family
+
+**Notes**:
+Plain text a person keeps on a Scenario in `scenario.notes`: what the plan assumes and why it exists. They are outside the document and its `contentHash`, so writing them never changes what a projection reads or what `--if-hash` compares; `fork` copies them unless `--no-notes` (ADR-0071).
+_Avoid_: Description, comment, memo (a `tx` has a memo)
+
+**Main plan**:
+The one live Scenario a person marks as their real plan with `scenario main`, stored as `scenario.main` on its row. It is a label for people, agents and the Dashboard, not a default: every read still names its plan with `--scenario` (ADR-0071).
+_Avoid_: Default plan, active plan, current Scenario, baseline (the Baseline is the ledger's own starting figures)
+
+**Anchor**:
+A household's pin of one Scenario date field to a person's age, to their life's end or to a partner's join month. The date is written into the Scenario when the household is set; a later apply or fork keeps it, fills it, or refuses a value that disagrees (ADR-0048).
+_Avoid_: Link, binding, age field
+
+**Owner**:
+The household person whose money a Flow, Account or liability is, or `shared` for both. It is stated in the household's `owners` list, never in the document, and the CLI writes the Filer label it implies onto the item's Tally labels (ADR-0076).
+_Avoid_: Holder (a role), payee, account owner, filer
+
 **Template**:
 The Scenario document `scenario apply --template` prints to edit and then apply with `--file`. Alone it is a minimal document; with an As-of it declares every asset and liability Account of the Ledger at that date, pre-filled from the Baseline, and it writes nothing (ADR-0044).
 _Avoid_: Sample, skeleton, example
+
+### Chance
+
+**Chance of success**:
+The share of seeded Market paths on which a Scenario never runs out before its Horizon. It is a share of the paths a Return model produced, so it is only as meaningful as that model.
+_Avoid_: Probability, success rate, confidence
+
+**Return model**:
+The weighted table of monthly returns, one per Account, that Market paths draw from. The CLI ships none: a caller states one in a JSON file with `--return-model`, or says `--return-model plan` to build it from the Scenario's own Accounts, each asset's `rate` and `volatility` (ADR-0068; `traj projection model` prints it).
+_Avoid_: Market history, returns table, assumptions
+
+**Market path**:
+One seeded run of a Return model's monthly draws over a Timeline. Paths differ only by their index, so the same seed and model always give the same set.
+_Avoid_: Simulation, run, scenario path
+
+**Path outcome**:
+What one Market path came to: its closing net worth, its lowest net worth and the year it was lowest in, and when it ran out, if it did. `projection chance --outcomes` lists one per path, and `projection path --index` replays the path year by year. A path is named by its index under the seed (ADR-0069).
+_Avoid_: Trial, scenario, run
+
+**Representative path**:
+A Market path worth opening first, named by index in `representative`: the paths at the 10th, 50th and 90th Percentile of closing net worth by nearest rank, the earliest to run out, and the one with the lowest net worth (ADR-0069).
+_Avoid_: Typical path, sample
+
+**Band**:
+The net-worth Percentiles across Market paths at one annual roll-up end, at the 10th, 25th, 50th, 75th and 90th levels. Every Band value is one a path produced.
+_Avoid_: Range, interval, confidence band
+
+**Decimal form**:
+The Scenario document with each money field written as a decimal string of the Currency's major unit, such as `"350.00"`, as `scenario show --decimal` prints it and `scenario apply --decimal` reads it. The stored document is always minor units, so the two forms have one hash (ADR-0047).
+_Avoid_: Float form, human form, display form
 
 ### Financial independence
 
@@ -162,6 +255,14 @@ _Avoid_: Tax rate, tax setting, tax flag
 Whether a result's figures include income tax: `applied`, `not_applied`, or `mixed` for a compare whose two sides disagree.
 _Avoid_: Taxed, pre-tax, after-tax (as a status)
 
+**Filer**:
+A person a joint Tax Levy files for: the household's holder or partner who has income, named by the Filer label suffix `@<person id>` on the tax labels of the Flows and Accounts they own, with `@shared` for what both own. A joint Return with two Filers is one Levy and one bracket walk, with each Filer's own expense ceiling (tax ADR-0009, ADR-0075). A plan without a partner or Owners has no Filers and bare labels.
+_Avoid_: Taxpayer (a Filer is a person in the household, not the status), spouse
+
+**Filing choice**:
+Whether a plan with two earners files jointly (`married_joint`, one Tax Levy) or separately (`married_separate`, one Tax Levy per spouse who has labelled income, once the household has a partner and Owners; otherwise one Tax Levy, as before). It is the `--filing-status` the plan states; the CLI never picks it (ADR-0075).
+_Avoid_: Tax mode, filing option, cheapest filing
+
 **Carry-in**:
 What a Levy's period had already tallied before the as-of, and what had already been prepaid. It is a property of the projection, not of the scenario, because the same scenario projected from two dates needs two answers. The caller states it with `--carry-in`, one record per Levy and period, and the result echoes it with the source it came from: `flag`, `document` or `scope`.
 _Avoid_: Opening balance, prior year
@@ -174,6 +275,10 @@ _Avoid_: Category, tag, tax code
 One period of a Tax Levy and its Settlement: what it owed, what was prepaid, and what settles. A result reports one row per Tax year, a year that began before the As-of included.
 _Avoid_: Tax period, fiscal year, assessment year
 
+**Bracket walk**:
+What a Tax year of an emitted Thai Levy states beside its figures (ADR-0036): the `walk` from assessable to taxable income, the `brackets` with the income and tax inside each, `marginalRateBps`, `toNextBracket` and `effectiveRateBps`, all from `thBracketWalk` and `thEffectiveRateBps` in the tax core. Its marginal rate is the rate of the bracket the last satang of taxable income falls in, so an income exactly on a bracket's upper edge is in the bracket the edge closes, with `toNextBracket` of `0.00`. This differs from the tax core's Tax Result, whose marginal rate is the rate of the next unit and so is the next bracket's rate on an edge. The effective rate is on assessable income.
+_Avoid_: Tax bracket table, marginal tax, tax slab
+
 **Prepayment**:
 Money already taken at source against a Tax year, such as payroll withholding. It reduces what the year owes at its Settlement but is not an expense.
 _Avoid_: Withholding tax, advance payment
@@ -185,6 +290,10 @@ _Avoid_: Tax bill, balance due, refund amount
 **Stated allowance**:
 A deduction class the flags of a tax write named, such as life insurance or home-loan interest. `scenario tax` reports the classes it stated and the ones it left out, so a deduction nobody named is visible instead of read as zero; what the Levy then allows is tax-core's rule, not the CLI's.
 _Avoid_: Modelled allowance, applied allowance, tax relief
+
+**Tax profile**:
+The flags `scenario tax` was given (filing status, children, each deduction), normalised and stored in `scenario.tax` beside the document, so a caller can read what the plan assumes and change one item with `--merge`. It is the request the Levy was emitted from, not the Levy; a plan taxed before it was kept has a Levy and no profile (ADR-0066).
+_Avoid_: Tax settings, tax request, taxpayer record
 
 **Tax assumption**:
 A tax figure a result used whose source is not yet confirmed, named in the result's `assumptions` until it is sourced: `reported` when only a secondary source states it, `unsourced` when none was read. The tax core owns the list and the Levy's tallies decide which tax years used which figure; the CLI states them and holds no figure of its own (ADR-0042).
@@ -272,6 +381,10 @@ _Avoid_: Snapshot, Copy (a Backup is the directory that holds a Dump; the Dump i
 Writing a Backup's rows into an empty database, verbatim. It never merges and never overwrites.
 _Avoid_: Import (an Import writes new Ledger facts through the write path), load, sync
 
+**Pre-migration copy**:
+The file `traj.db.pre-v<N>.bak` beside the database, a plain SQLite copy written before an upgrade migrated a database that held schema version `N`. There is one per version, and the newest replaces the older. An older `traj` can open it; nothing in the current `traj` reads it, and it is not a Backup (cli ADR-0050).
+_Avoid_: Backup (a Backup is the JSONL Dump a restore reads), snapshot, rollback file
+
 **Stored data**:
 The database file in the Data directory, and nothing else there. `traj data remove` deletes it; the launcher's `bin/` cache and anything else in the directory stay.
 _Avoid_: Home, state, everything under `~/.traj`
@@ -293,6 +406,10 @@ _Avoid_: distribution method, delivery
 **Release marker**:
 A line in a document or a help page naming the release that ships what the text describes, so a reader of an older release is not sent to a command it cannot run (ADR-0034).
 _Avoid_: version note, TODO, roadmap marker
+
+**Fixed source**:
+The clock and the id source a write reads, replaced by `TRAJ_FIXED_SOURCE=<instant>#<seed>`: one instant for every reading, and ids that are valid UUIDv7s counted up from the seed. Only the demo entry point honours it, so a shipped `traj` has none (ADR-0074).
+_Avoid_: mock clock, test mode, seed data
 
 ### Usage
 

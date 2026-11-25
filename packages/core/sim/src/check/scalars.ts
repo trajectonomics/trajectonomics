@@ -32,6 +32,13 @@ export const rate: Check = boundedInt(-9999, Infinity, "RATE_OUT_OF_RANGE")
 /** Non-negative safe integer minor units. */
 export const amount: Check = boundedInt(0, Infinity, "NEGATIVE_AMOUNT")
 
+const SEED = /^[0-9a-f]{16}$/
+
+/** Exactly 16 lower-case hex digits, as ADR-0005 fixes the Seed. */
+export const seed: Check = (value, path, emit) => {
+	if (typeof value !== "string" || !SEED.test(value)) emit("INVALID_SEED", path)
+}
+
 export const date: Check = (value, path, emit) => {
 	if (!isValidDate(value)) emit("INVALID_DATE", path)
 }
@@ -46,4 +53,10 @@ export const growth: Check = (value, path, emit) => {
 	if (value === "inflation") return
 	if (!isRecord(value)) return emit("INVALID_GROWTH", path)
 	checkShape(value, path, { bps: req(rate) }, emit)
+}
+
+/** A routing target: a non-negative number, or `{ amount, growth }` that keeps its value over the years (ADR 0030). */
+export const routed: Check = (value, path, emit) => {
+	if (!isRecord(value)) return amount(value, path, emit)
+	checkShape(value, path, { amount: req(amount), growth: req(growth) }, emit)
 }

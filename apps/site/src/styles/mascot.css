@@ -1,0 +1,85 @@
+/*
+ * The Mascot (Mascot.astro): placement. Each pose is a transparent render, so it sits on any surface in either Theme;
+ * its width is set here and its height follows the file's own ratio.
+ */
+
+.mascot {
+	display: block;
+	height: auto;
+	pointer-events: none;
+	user-select: none;
+}
+
+/*
+ * The hero: the robot peeks over the demo window's top edge, its hands resting on the title bar. The frame clips it,
+ * so it climbs up from behind the edge (motion-mascot.css) and never covers a word of the chat. The negative bottom is
+ * about the hands' half-height, so the fingers curl over the edge.
+ */
+.mascot-peek {
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+	right: calc(1.25rem + 4px);
+	bottom: calc(100% - 6px);
+	width: 64px;
+	overflow: clip;
+}
+
+/* Until 68 rem the call-to-action row reaches over the robot, 56 px above the window, so it stays small enough to fit. */
+@media (min-width: 40rem) {
+	.mascot-peek {
+		right: calc(1.5rem + 10%);
+		bottom: calc(100% - 7px);
+		width: 72px;
+	}
+}
+
+@media (min-width: 68rem) {
+	.mascot-peek {
+		bottom: calc(100% - 11px);
+		width: 124px;
+	}
+}
+
+.mascot-peek > .mascot {
+	width: 100%;
+}
+
+/* Features: the robot stands on the cards' top edge, at the head's far end; the margin is the grid's own (features.css). */
+.mascot-features {
+	position: relative;
+	z-index: 1;
+	width: 64px;
+	flex: none;
+	align-self: flex-end;
+	margin-bottom: -40px;
+}
+
+@media (min-width: 40rem) {
+	.mascot-features {
+		width: 88px;
+		margin-right: 2rem;
+		margin-bottom: -56px;
+	}
+}
+
+/* The closing section and the Not-found page: the robot stands above the eyebrow or the heading. */
+.mascot-closing {
+	width: 100px;
+	margin-bottom: 4px;
+}
+
+.mascot-lost {
+	width: 96px;
+	margin-bottom: 16px;
+}
+
+@media (min-width: 40rem) {
+	.mascot-closing {
+		width: 128px;
+	}
+
+	.mascot-lost {
+		width: 120px;
+	}
+}

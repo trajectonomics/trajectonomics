@@ -1,7 +1,7 @@
 {
 	"name": "@trajectonomics/web",
 	"version": "0.0.0-development",
-	"description": "The Dashboard: a read-only static web app that renders a Snapshot of traj --json results on 127.0.0.1. Never published to npm, never hosted.",
+	"description": "The Dashboard: a static web app that renders a Snapshot of traj --json results on 127.0.0.1, and sends Edits through traj. Never published to npm. Only its hosted Demo build is served, as static pages on the Site.",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -19,17 +19,22 @@
 	},
 	"scripts": {
 		"build": "vite build && bun scripts/pack.ts",
+		"build:hosted": "TRAJ_WEB_TARGET=hosted vite build",
 		"typecheck": "svelte-kit sync && tsc -p tsconfig.json && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
 		"test": "bun test ./src ./scripts",
+		"test:src": "bun test ./src",
+		"test:scripts": "bun test ./scripts",
+		"test:browser": "playwright test",
 		"lint": "biome ci --error-on-warnings .",
 		"format": "biome check --write .",
-		"check": "bun run lint && bun run typecheck && bun run test && bun run build",
+		"check": "bun run lint && bun run typecheck && bun scripts/demo-unless-turbo.ts && bun run test && bun ../../tooling/scripts/build-unless-turbo.ts",
 		"snapshot": "bun scripts/snapshot.ts",
 		"demo": "bun scripts/demo.ts",
 		"dashboard": "bun scripts/dashboard.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.3",
+		"@playwright/test": "1.65.0",
 		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.4.0",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",

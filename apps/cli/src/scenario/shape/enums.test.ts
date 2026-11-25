@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { TAX_CONTRIBUTION_LABELS, TAX_INCOME_LABELS } from "../tax/labels"
 import { scenarioExample } from "./index"
+import { graphOf } from "./probe-graphs"
 import { canonical, documented, nodeAt, type Path, probed, refusalsOf, VERSION } from "./testing"
 
 /*
@@ -28,6 +29,7 @@ function probe(input: {
 }): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION ?? 0),
+		estate: {},
 		accounts: input.accounts ?? [CASH],
 		flows: input.flows.map((flow) => ({ id: "flow", start: "2026-01-01", ...flow })),
 		cashflow: {
@@ -36,6 +38,15 @@ function probe(input: {
 			withdraw: [],
 		},
 	}
+}
+
+/** A Contribution into the asset Account `cash`, which a `funding` value may be stated on. */
+const BUY = {
+	kind: "contribution",
+	target: "cash",
+	amount: 1,
+	frequency: "monthly",
+	growth: { bps: 0 },
 }
 
 /** One valid Flow per kind, because each kind requires and forbids its own keys. */
@@ -49,35 +60,8 @@ const KIND_FLOWS: Record<string, Record<string, unknown>> = {
 		frequency: "monthly",
 		growth: { bps: 0 },
 	},
-}
-
-/** `then`, spelled out so the object holding it is not read as a thenable (biome noThenProperty). */
-const PICK_THEN = ["th", "en"].join("")
-
-/** A `pick` Measure: `then` is the Measure id chosen when `a` is above `b`. */
-function pickMeasure(op: string): Record<string, unknown> {
-	const measure: Record<string, unknown> = { id: "x", op, a: "c", b: "c", else: "c" }
-	measure[PICK_THEN] = "c"
-	return measure
-}
-
-/** One valid Measure graph per operation a Flow's `derive` may hold, its `op` Measure first. */
-function graphOf(op: string): Record<string, unknown> {
-	const constant = { id: "c", op: "const", value: 100 }
-	const graphs: Record<string, Record<string, unknown>> = {
-		add: { id: "x", op, a: "c", b: "c" },
-		sub: { id: "x", op, a: "c", b: "c" },
-		min: { id: "x", op, a: "c", b: "c" },
-		max: { id: "x", op, a: "c", b: "c" },
-		scale: { id: "x", op, of: "c", num: 1, den: 2, rounding: "floor" },
-		mul: { id: "x", op, a: "c", b: "c", den: 1, rounding: "floor" },
-		pick: pickMeasure(op),
-		flow: { id: "x", op, flow: "salary" },
-	}
-	if (op === "const") return { measures: [{ id: "x", op, value: 100 }], result: "x" }
-	// A value outside the set still needs a Measure the core can read, so its `op` is the only fault.
-	const measure = graphs[op] ?? { id: "x", op, value: 1 }
-	return { measures: [measure, constant], result: "x" }
+	withdrawal: { ...EXPENSE, kind: "withdrawal", source: "debt" },
+	transfer: { ...EXPENSE, kind: "transfer", source: "cash", target: "debt" },
 }
 
 /** The Flows a derived amount is probed with: an income Flow to reference, and the graph. */
@@ -86,6 +70,11 @@ function deriveFlows(op: string): Record<string, unknown>[] {
 		{ id: "salary", ...INCOME },
 		{ id: "derived", kind: "expense", frequency: "monthly", derive: graphOf(op) },
 	]
+}
+
+/** The `scale` graph's one `"floor"`, swapped for the rounding probed. */
+function roundedFlows(rounding: string): Record<string, unknown>[] {
+	return JSON.parse(JSON.stringify(deriveFlows("scale")).replace('"floor"', `"${rounding}"`))
 }
 
 type EnumProbe = {
@@ -130,6 +119,7 @@ const PROBES: EnumProbe[] = [
 			(nodeAt(["flows", 0, "kind"])["enum"] as string[]).map((kind) =>
 				probe({
 					flows: [KIND_FLOWS[kind] as Record<string, unknown>],
+					accounts: [CASH, { id: "debt", kind: "liability", rate: 0 }],
 					contribute: kind === "contribution" ? ["cash"] : [],
 				}),
 			),
@@ -146,6 +136,15 @@ const PROBES: EnumProbe[] = [
 		code: "INVALID_FREQUENCY",
 	},
 	{
+		path: ["flows", 0, "funding"],
+		accepted: () =>
+			(nodeAt(["flows", 0, "funding"])["enum"] as string[]).map((funding) =>
+				probe({ flows: [{ ...BUY, funding }], contribute: ["cash"] }),
+			),
+		refused: () => probe({ flows: [{ ...BUY, funding: "sometimes" }] }),
+		code: "INVALID_FUNDING",
+	},
+	{
 		path: ["flows", 1, "derive", "measures", 0, "op"],
 		accepted: () =>
 			(nodeAt(["flows", 1, "derive", "measures", 0, "op"])["enum"] as string[]).map((op) =>
@@ -155,23 +154,39 @@ const PROBES: EnumProbe[] = [
 		code: "INVALID_OP",
 	},
 	{
+		path: ["flows", 1, "derive", "measures", 0, "rounding"],
+		accepted: () =>
+			(nodeAt(["flows", 1, "derive", "measures", 0, "rounding"])["enum"] as string[]).map(
+				(rounding) => probe({ flows: roundedFlows(rounding) }),
+			),
+		refused: () => probe({ flows: roundedFlows("halfEven") }),
+		code: "INVALID_ROUNDING",
+	},
+	{
 		path: ["calendar", "dayRule"],
 		accepted: () =>
 			(nodeAt(["calendar", "dayRule"])["enum"] as string[]).map((dayRule) => ({
 				...scenarioExample(VERSION ?? 0),
+				estate: {},
 				calendar: { dayRule, holidays: [] },
 			})),
 		refused: () => ({
 			...scenarioExample(VERSION ?? 0),
+			estate: {},
 			calendar: { dayRule: "nearest", holidays: [] },
 		}),
 		code: "INVALID_DAY_RULE",
 	},
 ]
 
+/** Paths probed in their own file: milestone criteria, the level rounding and a spending rule's kind and rounding (rule-enums.test.ts), an estate line's rounding and base (estate-enums.test.ts) and an Account's payout and fee (account-enums.test.ts). */
+const PROBED_ELSEWHERE = /^(milestones|estate|flows\.\*\.(level|rule)|accounts\.\*\.(payout|fee))\./
+
 describe("the closed value sets the shape states", () => {
 	it("covers every one of them with a probe", () => {
-		const enums = documented().filter((entry) => Array.isArray(entry.node["enum"]))
+		const enums = documented().filter(
+			(entry) => Array.isArray(entry.node["enum"]) && !PROBED_ELSEWHERE.test(canonical(entry.path)),
+		)
 		expect(enums.map((entry) => canonical(entry.path)).sort()).toEqual(
 			PROBES.map((entry) => canonical(entry.path)).sort(),
 		)

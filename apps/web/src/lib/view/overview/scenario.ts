@@ -1,12 +1,10 @@
-import type { Read, SnapshotParams } from "../../contract"
+import type { Read, Snapshot } from "../../contract"
+import { chooseScenario } from "../plan"
 import { mapRead } from "./map-read"
 
-/**
- * The Scenario an Overview card reads: the one a comparison names first, else the first Scenario
- * the Snapshot was planned for. Null when the Snapshot names none.
- */
-export function primaryScenario(params: SnapshotParams): string | null {
-	return params.compare?.a ?? params.scenarios[0] ?? null
+/** The plan Home shows: the one rule of `chooseScenario`, over the Snapshot's planned plans, main first. */
+export function homePlan(snapshot: Snapshot, requested: string): string | null {
+	return chooseScenario(snapshot.params.scenarios, requested)
 }
 
 /** A card's Scenario: none to show, a Scenario with no Read in the Snapshot, or its Read. */

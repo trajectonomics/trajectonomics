@@ -14,10 +14,22 @@ bun run eval -- --agent antigravity --release 0.4.0    # a pinned release
 bun run eval -- --agent claude --dry-run               # print what would run, run nothing
 ```
 
+To split a run across processes, give each its own `--out` file, so none overwrites another's results:
+
+```sh
+for p in nok-salaried-employee ploy-freelancer-40-8 pim-krit-couple-mortgage; do
+  bun run eval -- --agent claude --persona $p --out results/rows/0.7.0-claude-$p.md &
+done
+wait
+```
+
+Each process writes a one-persona table. Merge the rows into `results/<release>-<agent>.md` by hand (the header is the same for each).
+
 - `--agent` is required: `claude` (Claude Code, `claude -p`), `antigravity` (the `agy` CLI, `-p`) or `opencode` (`opencode run`).
 - `--persona <id>` runs one persona; repeat it for several. Ids are the file names in `personas/`.
 - `--release` is `latest` by default and is resolved to a version before the run. The traj under test is `npx -y @trajectonomics/cli@<version>`.
 - `--traj-command "<command>" --release <label>` tests a local build instead, for example `--traj-command "bun /path/to/apps/cli/src/index.ts" --release dev`.
+- `--out <file>` writes the results table there instead of `results/<release>-<agent>.md`. A relative path is taken from the directory the command ran in. The dry run prints the file it would write.
 - `--timeout-minutes` caps each agent session (default 40).
 
 If the agent CLI is not on PATH the runner prints a `skipped:` line and exits 0. It writes nothing for that agent.
@@ -43,7 +55,9 @@ For each persona the runner:
 
 Before the first persona the runner reads the release's own `traj schema --json` and `traj help <command>` for every command. Invented flags are the flags a call used that its command's help does not list.
 
-The prompt forbids reading files, searching, or looking for the repository, and forbids writing any file outside the agent's working directory. The OpenCode smoke run (`results/0.4.0-opencode.md`) predates the write rule: it wrote its scenario documents to `/tmp/opencode/`, on the shared tmpfs. Its figures were produced with the earlier prompt and persona wording, so it is kept as a record, not as a result for the current prompt. The prompt is a request, not a sandbox. The sandbox is the working directory, the PATH and the `TRAJ_HOME`. Each agent is also configured to refuse file and web tools (Claude: `Read`, `Glob`, `Grep`, `Edit`, `Write`, `WebFetch`, `WebSearch` disallowed; OpenCode: bash denied except `traj`, and `read`, `glob`, `grep`, `list`, `edit` and `webfetch` denied). Antigravity has no per-tool allow-list in print mode, so it runs with `--dangerously-skip-permissions`. Its shell is not restricted beyond the PATH and the prompt. Read its `calls.jsonl` to see what it actually ran.
+The prompt forbids reading files, searching, or looking for the repository, and forbids writing any file outside the agent's working directory. The OpenCode smoke run (`results/0.4.0-opencode.md`) predates the write rule: it wrote its scenario documents to `/tmp/opencode/`, on the shared tmpfs. Its figures were produced with the earlier prompt and persona wording, so it is kept as a record, not as a result for the current prompt. The prompt is a request, not a sandbox. The sandbox is the working directory, the PATH and the `TRAJ_HOME`. Each agent is also configured to refuse file and web tools (Claude: only the `Bash` tool is offered, and Bash may run only `traj`, see below; OpenCode: bash denied except `traj`, and `read`, `glob`, `grep`, `list`, `edit` and `webfetch` denied). Claude Code's shell is restricted by four flags together: `--tools Bash` (no file, web, ToolSearch or MCP tools), `--setting-sources project` (the user's own settings, which allow Bash, are not loaded; the workspace has no project settings), `--permission-mode dontAsk` (any call not pre-approved is denied, with no prompt) and `--allowedTools Bash(traj:*)` (the one pre-approval). Probed on Claude Code 2.1.330 with a stand-in `traj`: `echo hi > f.txt` and `cat /etc/hostname` were refused, `traj` ran. What the agent can still run is Claude Code's own built-in read-only commands (`ls`, `pwd` and `grep` inside the workspace), which cannot write and cannot read outside it. A deny rule alone cannot do this, because it cannot say "everything except `traj`", and `--allowedTools` only pre-approves. Antigravity has no per-tool allow-list in print mode, so it runs with `--dangerously-skip-permissions`. Its shell is not restricted beyond the PATH and the prompt. Read its `calls.jsonl` to see what it actually ran.
+
+Every `traj` the runner starts (the shim, the agent's environment and the reference reads of `schema` and `help`) gets `DO_NOT_TRACK=1` and `TRAJ_TELEMETRY=off`, so an eval run is never counted as real use by the usage telemetry. `sandbox.test.ts` pins it.
 
 Each agent still loads its own user-level configuration from `HOME` (for example a global `CLAUDE.md`). That is intentional, because the logins live there, and it is outside this eval's control.
 
@@ -104,7 +118,7 @@ These are constants in `oracle.ts` (`TOLERANCE`). Changing them changes what cou
 
 ## Reading a result
 
-`results/<release>-<agent>.md` is one table per run. It is overwritten by each run of that release and agent, so a run of one persona replaces a run of three. Its columns:
+`results/<release>-<agent>.md` is one table per run. It is overwritten by each run of that release and agent, so a run of one persona replaces a run of three, unless `--out` names another file. Its columns:
 
 - **Correct (of 3):** the number of the three questions answered within tolerance. This is the headline.
 - **FI month, given / oracle:** what the agent said, then the oracle. Each question's `yes`/`no` is in brackets.
@@ -112,7 +126,7 @@ These are constants in `oracle.ts` (`TOLERANCE`). Changing them changes what cou
 - **traj calls:** every `traj` invocation the shim logged. More is not always worse: a careful agent reads `help` more. Read it with the errors.
 - **Errors:** calls that exited non-zero, from the shim's log.
 - **Invented flags:** flags a call used that the command's `traj help` does not list. A non-zero count means the agent guessed at the interface, which is what ADR 0002's schema-only test is meant to catch.
-- **Model:** the OpenCode model that answered, or `n/a`.
+- **Model:** the model that answered: the OpenCode model the runner chose, or the one Claude Code reports in its first `system` `init` event. `n/a` for Antigravity, whose text output names none.
 - **Status:** `ok`, or why no answer was read (`no answer block`, `agent exited N`, `timed out`).
 
 The raw files are in the run's directory under `~/.cache/eval-harness/runs/`: `transcript.txt` (the agent's stdout), `stderr.txt`, `calls.jsonl` (every `traj` call with its exit code), and `home/` (the ledger it built, which is useful when an answer is wrong).
@@ -120,7 +134,7 @@ The raw files are in the run's directory under `~/.cache/eval-harness/runs/`: `t
 ## Status of the agent adapters
 
 - **OpenCode** was run live once: the free model on `nok-salaried-employee`, release 0.4.0. The result is `results/0.4.0-opencode.md`, produced with the persona wording from before the review fixes: 1 of 3 correct. The 2026 tax matched the oracle exactly (32,450 baht). FI came out at 2043-03 against the oracle's 2043-08, and the what-if at 2040-02 against 2040-05. The agent applied the tax Levy (four `scenario tax` calls). The gap came from the persona, not the engine: the earlier wording did not say the 15,000 baht contribution stays fixed, and the agent grew it with inflation. Growing that one contribution gives 2043-03 and 2040-02, the smoke run's figures. The current persona states that the contribution is fixed, so the oracle's 2043-08 and 2040-05 are the expected answers. No run of the current persona is committed yet.
-- **Claude Code** flags were taken from `claude --help` on Claude Code 2.1.330. They have not been run live by the author.
+- **Claude Code** was run live on release 0.7.0 with Claude Code 2.1.330, which ran `claude-opus-5-5`: 3 of 3 correct on all three personas (`results/0.7.0-claude.md`). That run used only `--allowedTools Bash(traj:*)`, which pre-approves `traj` but did not stop the agents from running other shell commands, because their own user settings allow Bash: they ran `ls`, `cd` and `cat > base.json <<EOF` inside their workspaces, and one tried `ToolSearch` for `Read` and `Write`. Nothing was written outside the workspace. The runner now restricts the shell as described above ([#281](https://github.com/trajectonomics/trajectonomics/issues/281)), and reads the model from the stream's `init` event. The committed 0.7.0 results file predates both: its Model column was filled in by hand. The first run with the restricted shell is `results/main-0f63b73-claude.md` (the CLI built from main after the help and schema fixes): 3 of 3 correct on all three personas again, with 83 `traj` calls and 5 errors, against 101 and 15 for 0.7.0. The restricted shell refuses `cat > file <<EOF` and a heredoc after `traj`, so the agents applied their Scenario documents with `echo '<json>' | traj scenario apply <name> --file -` or `printf`, which the allow-list admits.
 - **Antigravity** flags were taken from `agy --help` on agy 1.5.13. They have not been run live by the author, and its JSON output is not parsed: the runner reads its text output as the answer. The runner passes `--model gemini-4-hydrogen-medium`. `agy models` lists the Hydrogen family only with an effort suffix (`-low`, `-medium`, `-high`, `-xhigh`), and has no bare `gemini-4-hydrogen`, so the medium-effort model is the one named (root AGENTS.md rule 7). Change `ANTIGRAVITY_MODEL` in `agents.ts` to run another effort level.
 
 Run `--dry-run` to see the exact argv for each.

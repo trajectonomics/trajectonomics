@@ -4,7 +4,12 @@ export const SCENARIO_SCHEMA_VERSION: 4 = 4
 export const ACCOUNT_KINDS = ["asset", "liability"] as const
 export const COMPOUNDING_PERIODS = ["monthly", "quarterly", "semiannual", "annual"] as const
 export const FI_METHODS = ["survival", "probabilityThreshold"] as const
-export const FLOW_KINDS = ["income", "expense", "contribution"] as const
+export const FLOW_KINDS = ["income", "expense", "contribution", "withdrawal", "transfer"] as const
+/**
+ * How a Contribution into an asset is paid: a `target` spends Available cashflow, an `obligation` is paid in
+ * full out of cashflow, and an `employer` share lands in the Account from outside the household's cash.
+ */
+export const FUNDINGS = ["target", "obligation", "employer"] as const
 export const FREQUENCIES = [
 	"once",
 	"daily",
@@ -27,8 +32,11 @@ export const MEASURE_OPS = [
 	"mul",
 	"pick",
 	"flow",
+	"account",
 ] as const
 export const TALLY_BASES = ["gross", "funded", "returns", "gains"] as const
+/** The Spending rule kinds a Flow's `rule` takes (ADR 0023). */
+export const RULE_KINDS = ["initialRate", "currentRate", "guardrails"] as const
 export const ROUNDINGS = ["floor", "halfUp", "ceil"] as const
 export const REFERENCE_BASES = [
 	"unlockedAssets",
@@ -38,3 +46,14 @@ export const REFERENCE_BASES = [
 ] as const
 export const REFERENCE_WINDOWS = ["next12Months", "trailing12Months"] as const
 export const REFERENCE_TERMS = ["nominal", "real"] as const
+export const CRITERION_KINDS = ["date", "milestone", "metric", "multiple"] as const
+export const MILESTONE_COMBINES = ["all", "any"] as const
+export const COMPARISONS = ["atLeast", "atMost"] as const
+export const MILESTONE_TERMS = ["nominal", "real"] as const
+export const METRIC_NAMES = [
+	"netWorth",
+	"accessibleNetWorth",
+	"allAssets",
+	"unlockedAssets",
+	"liabilities",
+] as const

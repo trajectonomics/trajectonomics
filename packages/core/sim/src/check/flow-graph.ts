@@ -1,4 +1,5 @@
 import type { Emit, Path } from "./codes"
+import { accountEdges } from "./flow-accounts"
 import { isRecord } from "./shape"
 
 interface Edge {
@@ -68,13 +69,16 @@ function reportCycles(edges: readonly (readonly Edge[])[], emit: Emit): void {
 	for (let index = 0; index < edges.length; index++) if (state[index] === 0) visit(index)
 }
 
-/** Reports unknown Flow references in a `derive` graph and cycles among the Flows. */
+/** Reports unknown Flow references in a `derive` graph and cycles among the Flows, reads of Accounts included. */
 export function checkFlowGraph(flows: unknown, path: Path, emit: Emit): void {
 	if (!Array.isArray(flows)) return
 	const ids = indexIds(flows)
 	const edges: Edge[][] = []
 	for (let index = 0; index < flows.length; index++) {
-		edges.push([...edgesOf(flows[index], index, ids, path, emit)])
+		edges.push([
+			...edgesOf(flows[index], index, ids, path, emit),
+			...accountEdges(flows, index, path),
+		])
 	}
 	reportCycles(edges, emit)
 }

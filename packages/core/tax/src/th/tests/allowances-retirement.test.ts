@@ -9,7 +9,7 @@ describe("Thailand Retirement Cluster and ThaiESG Allowances", () => {
 		const res = calculateRetirementAllowances(
 			{
 				rmf: 350_000, // 30% of 1M is 300k, capped at 500k -> allowed 300k
-				ssf: 250_000, // 30% of 1M is 300k, capped at 200k -> allowed 200k
+				ssf: 250_000, // SSF is not deductible for 2026 (ADR 0007) -> allowed 0
 				pvd: 200_000, // 15% of 1M is 150k, capped at 500k -> allowed 150k
 				gpf: 350_000, // no share-of-wages limit, under the 500k ceiling -> allowed 350k
 				nsf: 40_000, // capped at 30k -> allowed 30k
@@ -22,7 +22,7 @@ describe("Thailand Retirement Cluster and ThaiESG Allowances", () => {
 		expect(res.retirementCluster.rmf.allowed).toBe(300_000)
 		expect(res.retirementCluster.rmf.wasClamped).toBe(true)
 
-		expect(res.retirementCluster.ssf.allowed).toBe(200_000)
+		expect(res.retirementCluster.ssf.allowed).toBe(0)
 		expect(res.retirementCluster.ssf.wasClamped).toBe(true)
 
 		expect(res.retirementCluster.pvd.allowed).toBe(150_000)
@@ -42,14 +42,13 @@ describe("Thailand Retirement Cluster and ThaiESG Allowances", () => {
 		const res = calculateRetirementAllowances(
 			{
 				rmf: 300_000,
-				ssf: 200_000,
-				pvd: 100_000,
+				pvd: 250_000,
 			},
 			2_000_000,
 			2_000_000,
 		)
-		// Sum is 600,000 -> clamped to 500,000
-		expect(res.retirementCluster.combined.requested).toBe(600_000)
+		// Sum is 550,000 -> clamped to 500,000
+		expect(res.retirementCluster.combined.requested).toBe(550_000)
 		expect(res.retirementCluster.combined.allowed).toBe(500_000)
 		expect(res.retirementCluster.combined.wasClamped).toBe(true)
 		expect(res.allowedClusterTotal).toBe(500_000)

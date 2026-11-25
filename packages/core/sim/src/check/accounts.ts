@@ -1,25 +1,35 @@
 import { ACCOUNT_KINDS, COMPOUNDING_PERIODS } from "../vocab"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
+import { feeField } from "./fee"
 import { tallyLabel } from "./levy-fields"
-import { date, oneOf, safeInt, str } from "./scalars"
+import { checkPayoutRules, type PayoutContext, payoutField } from "./payout"
+import { bool, boundedInt, date, oneOf, safeInt, str } from "./scalars"
 import { checkShape, checkUnique, isRecord, list, opt, req, type Shape } from "./shape"
 
 const LABEL_KEYS = ["returnLabel", "gainLabel"] as const
+
+/** Keys an asset may carry and a liability may not. */
+const ASSET_ONLY_KEYS = ["lockedUntil", "liquid", "fee", "volatility"] as const
 
 /** A valid compounding period, so the nominal-rate rule knows whether to apply. */
 function isCompoundingPeriod(value: unknown): boolean {
 	return typeof value === "string" && COMPOUNDING_PERIODS.some((period) => period === value)
 }
 
-function shapeOf(hasLevy: boolean): Shape {
+function shapeOf(context: PayoutContext): Shape {
+	const { hasLevy } = context
 	return {
 		id: req(str),
 		kind: req(oneOf(ACCOUNT_KINDS, "INVALID_KIND")),
 		rate: req(safeInt),
 		compounding: opt(oneOf(COMPOUNDING_PERIODS, "INVALID_COMPOUNDING")),
 		lockedUntil: opt(date),
+		liquid: opt(bool),
 		returnLabel: tallyLabel(hasLevy),
 		gainLabel: tallyLabel(hasLevy),
+		payout: payoutField(context),
+		fee: feeField,
+		volatility: opt(boundedInt(0, 10_000, "RATE_OUT_OF_RANGE")),
 	}
 }
 
@@ -50,20 +60,32 @@ function checkLabelRules(rule: Readonly<Record<string, unknown>>, path: Path, em
 	}
 }
 
+/** An asset-only key is a misuse on a liability, whatever its value. */
+function checkAssetOnlyKeys(checked: Readonly<Record<string, unknown>>, path: Path, emit: Emit) {
+	if (checked["kind"] !== "liability") return
+	for (const key of ASSET_ONLY_KEYS) {
+		if (Object.hasOwn(checked, key)) emit("LIABILITY_MISUSE", [...path, key])
+	}
+}
+
 const account =
-	(hasLevy: boolean): Check =>
+	(context: PayoutContext): Check =>
 	(value, path, emit) => {
-		const checked = checkShape(value, path, shapeOf(hasLevy), emit)
+		const checked = checkShape(value, path, shapeOf(context), emit)
 		if (checked === undefined) return
-		if (checked["kind"] === "liability" && Object.hasOwn(checked, "lockedUntil")) {
-			emit("LIABILITY_MISUSE", [...path, "lockedUntil"])
-		}
-		if (hasLevy) checkLabelRules(checked, path, emit)
+		checkAssetOnlyKeys(checked, path, emit)
+		checkPayoutRules(checked, path, emit)
+		if (context.hasLevy) checkLabelRules(checked, path, emit)
 		checkRate(value, path, emit)
 	}
 
-export function checkAccounts(value: unknown, path: Path, emit: Emit, hasLevy: boolean): void {
-	list(account(hasLevy))(value, path, emit)
+export function checkAccounts(
+	value: unknown,
+	path: Path,
+	emit: Emit,
+	context: PayoutContext,
+): void {
+	list(account(context))(value, path, emit)
 	checkUnique(value, path, "id", emit)
 }
 
@@ -81,4 +103,16 @@ export function indexAccounts(accounts: unknown): AccountIndex | undefined {
 		}
 	}
 	return index
+}
+
+/** Ids of the asset Accounts marked `liquid: false`; a malformed entry is skipped, not reported here. */
+export function illiquidAccountIds(accounts: unknown): ReadonlySet<string> {
+	const ids = new Set<string>()
+	if (!Array.isArray(accounts)) return ids
+	for (const item of accounts) {
+		if (isRecord(item) && item["kind"] === "asset" && item["liquid"] === false) {
+			if (typeof item["id"] === "string") ids.add(item["id"])
+		}
+	}
+	return ids
 }

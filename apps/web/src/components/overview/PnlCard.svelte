@@ -2,10 +2,10 @@
 import type { Read } from "../../lib/contract"
 import { accountTypeLabel } from "../../lib/view/net-worth/account-type"
 import type { PnlView } from "../../lib/view/overview/pnl"
+import AccountName from "../ui/AccountName.svelte"
 import Card from "../ui/Card.svelte"
-import Money from "../ui/Money.svelte"
+import DirectedMoney from "../ui/DirectedMoney.svelte"
 import ReadView from "../ui/ReadView.svelte"
-import Totals from "../ui/Totals.svelte"
 
 interface Props {
 	pnl: Read<PnlView>
@@ -22,29 +22,45 @@ let { pnl }: Props = $props()
 				<p class="text-sm text-muted-foreground">{view.period}</p>
 				<div>
 					<p class="text-sm text-muted-foreground">Income less expenses</p>
-					<Totals totals={view.totals} className="mt-1 text-2xl font-semibold tracking-tight" />
+					{#if view.totals.length === 0}
+						<p class="mt-1 text-muted-foreground">No total</p>
+					{:else}
+						<span class="mt-1 flex flex-col gap-1 text-2xl font-semibold tracking-tight">
+							{#each view.totals as total (total.currency)}
+								<DirectedMoney
+									amount={total.amount}
+									currency={total.currency}
+									kind="net"
+								/>
+							{/each}
+						</span>
+					{/if}
+					{#if view.note}
+						<p class="mt-2 text-sm">{view.note}</p>
+					{/if}
 				</div>
 				{#if view.hasRows}
 					<div class="space-y-2">
 						<p class="text-sm text-muted-foreground">Largest rows</p>
 						<ul class="divide-y divide-border text-sm">
 							{#each view.largest as row (`${row.account.id}:${row.currency}`)}
-								<li class="flex items-center justify-between gap-3 py-2">
+								<li class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
 									<span class="min-w-0 truncate">
-										{row.account.name}
+										<AccountName id={row.account.id} name={row.account.name} />
 										<span class="ml-2 text-xs text-muted-foreground">
 											{accountTypeLabel(row.type)}
 										</span>
 									</span>
 									<span class="shrink-0">
-										<Money amount={row.amount} currency={row.currency} />
+										<DirectedMoney
+											amount={row.amount}
+											currency={row.currency}
+											kind="money"
+										/>
 									</span>
 								</li>
 							{/each}
 						</ul>
-						<p class="text-xs text-muted-foreground">
-							Income is shown negative and expenses positive, as the ledger books them.
-						</p>
 					</div>
 				{:else}
 					<p class="text-sm">No income or expense in this period.</p>

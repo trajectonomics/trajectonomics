@@ -1,0 +1,19 @@
+The plan holds to 2029-03-30 on 20 of 20 seeded Market paths: a success share of 100.00%.
+
+bands (2 rows)
+index  to                 p10         p50         p90
+    0  2027-03-30  1557606.51  1567481.34  1571482.62
+    2  2029-03-30  2767879.33  2795687.77  2816417.74
+
+spendingBands (2 rows)
+index  to               p10       p50       p90
+    0  2027-03-30  25137.36  25143.04  25144.07
+    2  2029-03-30  32454.77  33316.89  34048.38
+
+lowestYearSpending (1 row)
+paths       p10       p25       p50       p75       p90
+   20  25137.36  25140.59  25143.04  25143.04  25144.07
+
+No tax is applied; figures are before tax.
+The chance is over the Return model "illustrative-four-months" with seed 0123456789abcdef, and every figure is nominal.
+The spending Bands are what the plan's spending rules paid in each roll-up, nominal, with a path that ran out paying 0 after it did. The lowest year is each path's least whole year of spending, over the 20 of 20 paths that have one; a path that ran out counts 0.

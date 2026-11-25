@@ -32,11 +32,26 @@ export type CarryInRecordForm = {
 	rest?: string | undefined
 }
 
-/** A money figure, as every other input states one: a decimal string at the currency's scale. */
-const amount = z.string().describe('A decimal string at the currency\'s own scale, as "1234.56".')
+/** What a refused amount says: the form, the unit and an example, because the document form states satang. */
+const AMOUNT_FORM =
+	'The amount must be a decimal string in the Currency\'s major unit, for example "1200000.00" in THB, not a number of satang.'
+
+/**
+ * A money figure, as every other input states one: a decimal string at the currency's scale. It
+ * refuses anything else with the form named, because a Scenario document and `--set` take satang
+ * integers and a caller carries that habit here. Published as a string.
+ */
+const amount: z.ZodString = z
+	.string({ error: AMOUNT_FORM })
+	.describe('A decimal string at the currency\'s own scale, as "1234.56".')
 
 const tallyForm: z.ZodType<CarryInTallyForm> = z.strictObject({
-	label: z.string().min(1).describe("A Tally label one of the Levy's own measures reads."),
+	label: z
+		.string()
+		.min(1)
+		.describe(
+			"A Tally label one of the Levy's own measures reads. A Levy over Filers, the joint Return of a household with a partner and Owners, reads Filer labels instead of bare ones: each of its 29 classes once for each Filer, as income.section40_1@<person id>, and its 22 income classes once more for income of both, as income.section40_1@shared.",
+		),
 	basis: z.enum(CARRY_IN_BASES).describe("The basis that measure tallies it under."),
 	amount,
 })

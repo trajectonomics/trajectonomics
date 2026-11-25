@@ -63,10 +63,14 @@ function renderHumanLines(value: unknown, indent: string): string[] {
 export function renderResult(data: unknown, format: Format, hint?: RenderHint): string {
 	if (format === "json") return JSON.stringify(data)
 	if (typeof data === "string") return data
-	const tables = hint === undefined ? null : renderTableResult(data, hint)
-	const body = tables ?? renderHumanLines(data, "").join("\n")
+	// The presentation the body is printed from; the blocks read the result as the command returned it.
+	const shown = hint?.display !== undefined && isRecord(data) ? hint.display(data) : data
+	const tables = hint === undefined ? null : renderTableResult(shown, hint)
+	const body = tables ?? renderHumanLines(shown, "").join("\n")
+	const blocks = hint?.blocks !== undefined && isRecord(data) ? hint.blocks(data) : []
+	const main = blocks.length === 0 ? body : [body, ...blocks].join("\n\n")
 	const assumptions = assumptionLines(data)
-	return assumptions.length === 0 ? body : `${body}\n\n${assumptions.join("\n")}`
+	return assumptions.length === 0 ? main : `${main}\n\n${assumptions.join("\n")}`
 }
 
 /** One engine problem a refused projection lists: its code, and where it is. */

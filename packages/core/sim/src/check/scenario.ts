@@ -1,11 +1,16 @@
-import { checkAccounts } from "./accounts"
+import { checkAccounts, illiquidAccountIds } from "./accounts"
 import { checkCalendar } from "./calendar"
 import { checkCashflow } from "./cashflow"
 import type { AccountIndex, Check, Emit, Path } from "./codes"
+import { checkEstate } from "./estate"
 import { checkFlowCaps } from "./flow-caps"
 import { checkFlows, type FlowContext } from "./flows"
 import { checkLevies } from "./levy"
-import { checkContributionRouting } from "./routing"
+import { loanIndex } from "./loan-index"
+import { checkMilestones } from "./milestones"
+import { checkObligationWithdrawn } from "./obligation-withdrawn"
+import { checkReservedFlowIds } from "./reserved-ids"
+import { checkContributionRouting, checkIlliquidRouting } from "./routing"
 import { rate, str } from "./scalars"
 import { anyVersion, checkShape, isRecord, opt, req } from "./shape"
 
@@ -13,8 +18,8 @@ const economy: Check = (value, path, emit) => {
 	checkShape(value, path, { inflation: req(rate) }, emit)
 }
 
-/** Ids of the Levies the Scenario declares, for every reference a Flow may make. */
-function levyIds(value: unknown): ReadonlySet<string> {
+/** Ids of the entries of a Scenario list (Levies, Milestones), for every reference a Flow may make. */
+function idsOf(value: unknown): ReadonlySet<string> {
 	const ids = new Set<string>()
 	if (!Array.isArray(value)) return ids
 	for (const item of value) {
@@ -31,18 +36,31 @@ export function checkScenario(
 ): void {
 	const levies = isRecord(value) ? value["levies"] : undefined
 	const hasLevy = Array.isArray(levies) && levies.length > 0
-	const context: FlowContext = { accounts, hasLevy, levyIds: levyIds(levies) }
+	const milestones = isRecord(value) ? value["milestones"] : undefined
+	const context: FlowContext = {
+		accounts,
+		hasLevy,
+		levyIds: idsOf(levies),
+		milestoneIds: idsOf(milestones),
+		loans: loanIndex(isRecord(value) ? value["accounts"] : undefined),
+		illiquid: illiquidAccountIds(isRecord(value) ? value["accounts"] : undefined),
+	}
 	const shape = {
 		schemaVersion: req(anyVersion),
 		currency: req(str),
 		economy: req(economy),
-		accounts: req((v, p, e) => checkAccounts(v, p, e, hasLevy)),
+		accounts: req((v, p, e) => checkAccounts(v, p, e, context)),
 		flows: req((v, p, e) => checkFlows(v, p, context, e)),
 		cashflow: req((v, p, e) => checkCashflow(v, p, accounts, e)),
 		levies: opt(checkLevies),
+		milestones: opt((v, p, e) => checkMilestones(v, p, accounts, e)),
 		calendar: opt(checkCalendar),
+		estate: opt((v, p, e) => checkEstate(v, p, accounts, e)),
 	}
 	const checked = checkShape(value, path, shape, emit)
+	checkReservedFlowIds(checked?.["accounts"], checked?.["flows"], path, emit)
 	checkFlowCaps(checked?.["flows"], checked?.["levies"], path, emit)
 	checkContributionRouting(checked?.["flows"], checked?.["cashflow"], accounts, path, emit)
+	checkObligationWithdrawn(checked?.["flows"], checked?.["cashflow"], context.illiquid, path, emit)
+	checkIlliquidRouting(checked?.["cashflow"], context.illiquid, path, emit)
 }

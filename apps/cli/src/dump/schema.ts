@@ -74,6 +74,16 @@ export const dumpScenario: z.ZodType<DumpScenarioRow> = z.strictObject({
 		.describe("The id of the scenario this was forked from, or null."),
 	...sync,
 	deletedAt,
+	household: z
+		.string()
+		.nullable()
+		.describe("The household's canonical JSON text, or null when none is set."),
+	tax: z
+		.string()
+		.nullable()
+		.describe("The tax profile's canonical JSON text, or null when none is stored."),
+	notes: z.string().nullable().describe("The plan's notes, or null when it has none."),
+	main: z.boolean().describe("True when this is the ledger's main plan."),
 })
 
 /** One schema per table, each with its row's exact keys and types. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import type { Pnl, Read } from "../../lib/contract"
 import { type PnlView, pnlView } from "../../lib/view/ledger/pnl"
 import DataTable from "../ui/DataTable.svelte"
@@ -34,7 +35,7 @@ const totalColumns: Column<Total>[] = [
 >
 	<ReadView read={pnl} label="Profit and loss">
 		{#snippet children(report)}
-			{@const view = pnlView(report)}
+			{@const view = pnlView(report, currentAccountNames())}
 			<div class="space-y-6">
 				<p class="text-sm">
 					<span class="text-muted-foreground">Period{" "}</span>{view.period}
@@ -44,12 +45,16 @@ const totalColumns: Column<Total>[] = [
 				</p>
 				<PnlLinesTable caption="Income" lines={view.income} empty="No income in this period." />
 				<PnlLinesTable caption="Expenses" lines={view.expense} empty="No expenses in this period." />
-				<DataTable
-					caption="Totals, as the CLI states them"
-					rows={view.totals}
-					rowKey={(total) => total.currency}
-					columns={totalColumns}
-				/>
+				{#if view.note}
+					<p class="rounded-md border border-border p-3 text-sm">{view.note}</p>
+				{:else}
+					<DataTable
+						caption="Totals, as the CLI states them"
+						rows={view.totals}
+						rowKey={(total) => total.currency}
+						columns={totalColumns}
+					/>
+				{/if}
 				<Provenance argv={pnl.argv} />
 			</div>
 		{/snippet}

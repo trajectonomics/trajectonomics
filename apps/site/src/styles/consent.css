@@ -1,43 +1,39 @@
 /*
- * The cookie banner (ADR 0024): a slim bar, the hero stage's first row, in the page's own flow, with
- * the question and two links on one row where they fit. It is never fixed over the page: axe cannot
- * judge text that overlays different content on each of its lines, and ADR 0021 fails a page axe
- * cannot judge. It keeps the phone's 16 px gutter and never scrolls sideways. The Worker leaves it out
- * of the page once the visitor has answered. Colours are Theme roles, so both themes keep their contrast.
+ * The cookie banner (ADR 0024, placed by ADR 0028): a small card fixed to the bottom-left corner of the screen, so it
+ * never pushes the hero down; from 40 rem up it stays clear of the copy toast at the bottom right. Its background is opaque, so the
+ * question is judged against the card alone and never against what scrolls under it. On a phone it spans the width
+ * inside the 16 px gutter and never scrolls sideways. The Worker writes `data-consent` once the visitor has answered,
+ * so the card is never painted. Colours are Theme roles, so both themes keep their contrast.
  */
 
 .consent {
-	/* The header is fixed and 64 px tall (global.css), so the bar starts below it, not under it. */
-	margin-top: 4rem;
-	/* Above the stage's field, which sits at `z-index: -1` inside the same stage (blast.css). */
-	position: relative;
-	z-index: 1;
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	left: 16px;
+	/* Under the fixed header (z-index 50) and the copy toast (40), over every section. */
+	z-index: 30;
 	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
-	gap: 8px 16px;
-	padding: 8px 16px;
-	border-block: 1px solid var(--ds-color-border);
+	flex-direction: column;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid var(--ds-color-border);
+	border-radius: var(--ds-radius-md);
 	background: var(--ds-color-card);
 	color: var(--ds-color-card-foreground);
+	box-shadow: 0 12px 32px -16px var(--ds-color-border);
 }
 
-/*
- * The hero's copy is padded to clear the fixed header, and the bar has already cleared it, so while
- * the bar is shown the copy keeps 8 px. That holds the demo window within a few pixels of where it
- * stands on a visit without the bar, so it still starts playing on a 1280 x 720 screen, as the demo's
- * in-view trigger (120 px above the fold) expects, even when a wider font wraps the question onto a
- * third line.
- */
-html:not([data-consent]) .consent + .hero-rise {
-	padding-top: 0.5rem;
+@media (min-width: 40rem) {
+	.consent {
+		right: auto;
+		width: 22rem;
+	}
 }
 
 .consent-text {
-	max-width: 60rem;
 	margin: 0;
-	font-size: 0.875rem;
+	font-size: 0.8125rem;
 	line-height: 1.5;
 }
 
@@ -52,11 +48,11 @@ html:not([data-consent]) .consent + .hero-rise {
 	min-height: 32px;
 	align-items: center;
 	justify-content: center;
-	padding: 0 14px;
+	padding: 0 12px;
 	border: 1px solid var(--ds-color-border);
 	border-radius: var(--ds-radius-sm);
 	color: var(--ds-color-foreground);
-	font-size: 0.875rem;
+	font-size: 0.8125rem;
 	text-decoration: none;
 }
 
@@ -73,6 +69,18 @@ html:not([data-consent]) .consent + .hero-rise {
 .consent-link:focus-visible {
 	outline: 2px solid var(--ds-color-ring);
 	outline-offset: 2px;
+}
+
+/*
+ * While the card is up, the footer's words end with room for it, so the card covers only the cropped wordmark below
+ * them, and a focused link is scrolled clear of the card rather than under it (WCAG 2.4.11).
+ */
+html:not([data-consent]):has(.consent) {
+	scroll-padding-bottom: 11rem;
+}
+
+html:not([data-consent]):has(.consent) .footer-inner {
+	padding-bottom: 10rem;
 }
 
 /* The Worker writes `data-consent` for a visitor who has answered, so the banner is never painted. */

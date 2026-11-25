@@ -49,7 +49,7 @@ export const ruleOfThumb: z.ZodType<RuleOfThumbView> = z.strictObject({
 		.enum(["next12Months", "trailing12Months"])
 		.describe("Which twelve months of expenses the reference divides."),
 	terms: z.enum(["nominal", "real"]).describe("Whether the reference is nominal or real money."),
-	unlockedAssets: moneyField("Assets that are not locked"),
+	unlockedAssets: moneyField("Assets that are not locked and not marked illiquid"),
 	numerator: moneyField("The balance the reference compares"),
 	annualExpenses: moneyField("Annual expenses the reference measures against"),
 	threshold: moneyField("The balance the reference asks for"),

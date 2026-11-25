@@ -3,11 +3,15 @@ export type FailureCode =
 	| "not-found-page-missing"
 	| "page-title-missing"
 	| "page-canonical-missing"
+	| "page-canonical-unbuilt"
+	| "page-alternate-unbuilt"
 	| "page-image-missing"
 	| "page-image-alt-missing"
 	| "shell-home-link-missing"
 	| "shell-blog-link-missing"
 	| "shell-footer-missing"
+	| "llms-txt-missing"
+	| "post-structured-data-missing"
 
 /** A broken rule, the built file that breaks it, and a sentence a reader can act on. */
 export interface Failure {

@@ -27,8 +27,6 @@ export const ThAssumptionFact = {
 	DigitalAssetFinal: "rate.digitalAsset.final",
 	/** A Retirement Mutual Fund contribution was claimed. */
 	ClaimRmf: "claim.rmf",
-	/** A Super Savings Fund contribution was claimed. */
-	ClaimSsf: "claim.ssf",
 	/** A provident fund contribution was claimed. */
 	ClaimPvd: "claim.pvd",
 	/** A government pension fund contribution was claimed. */

@@ -1,6 +1,7 @@
 import type { AnnualRollup, ProjectionRow, RunsOut } from "@trajectonomics/core/sim"
 import type { AppError } from "../errors"
 import { fail, isAppError } from "../errors"
+import type { PersonAge } from "../scenario/household/ages"
 import { addDays } from "./dates"
 import { moneyOf } from "./money"
 import type { AnnualRow, MonthlyRow } from "./run-view"
@@ -13,17 +14,29 @@ export function runsOutView(runsOut: RunsOut | undefined, currency: string): Run
 }
 
 /**
- * The real figure at an annual roll-up's end. The engine's roll-up is nominal only and its last
- * day is the day before the anniversary, which has no monthly row, so this takes the row dated
- * that day, or the next day's row, and never presents it as `closingNetWorth` (ADR-0030).
+ * The monthly row a roll-up's end is read at. The roll-up's last day is the day before the
+ * anniversary, which has no monthly row, so this takes the row dated that day, or the next day's.
+ */
+export function rowAtEnd(
+	rollup: AnnualRollup,
+	rows: readonly ProjectionRow[],
+): ProjectionRow | undefined {
+	return (
+		rows.find((row) => row.date === rollup.to) ??
+		rows.find((row) => row.date === addDays(rollup.to, 1))
+	)
+}
+
+/**
+ * The real figure at an annual roll-up's end. The engine's roll-up is nominal only, so this takes
+ * the row at its end (`rowAtEnd`) and never presents it as `closingNetWorth` (ADR-0030).
  */
 export function realNetWorthOf(
 	rollup: AnnualRollup,
 	rows: readonly ProjectionRow[],
 	currency: string,
 ): AnnualRow["realNetWorth"] | AppError {
-	const onDay = rows.find((row) => row.date === rollup.to)
-	const found = onDay ?? rows.find((row) => row.date === addDays(rollup.to, 1))
+	const found = rowAtEnd(rollup, rows)
 	if (found === undefined) {
 		// The decided guard for an engine change (OD6): stop rather than print a figure that is not
 		// net worth at the roll-up's end.
@@ -34,11 +47,15 @@ export function realNetWorthOf(
 	return { date: found.date, amount: moneyOf(currency)(found.realNetWorth) }
 }
 
-/** One roll-up row, money at the currency's own scale, real figure from the engine's own row. */
+/**
+ * One roll-up row, money at the currency's own scale, real figure from the engine's own row. Its
+ * ages are the people's ages on the roll-up's last day (cli ADR-0048).
+ */
 export function annualRow(
 	rollup: AnnualRollup,
 	rows: readonly ProjectionRow[],
 	currency: string,
+	ages: PersonAge[],
 ): AnnualRow | AppError {
 	const money = moneyOf(currency)
 	const realNetWorth = realNetWorthOf(rollup, rows, currency)
@@ -47,9 +64,20 @@ export function annualRow(
 		index: rollup.index,
 		from: rollup.from,
 		to: rollup.to,
+		ages,
 		openingNetWorth: money(rollup.openingNetWorth),
 		closingNetWorth: money(rollup.closingNetWorth),
 		income: money(rollup.income),
+		// Present only when the Scenario declares a withdrawal Flow, as the engine states it (sim ADR-0016).
+		...(rollup.withdrawals === undefined ? {} : { withdrawals: money(rollup.withdrawals) }),
+		// Each is present only when the Scenario declares its field, as the engine states it (sim ADR-0026, 0027, 0028).
+		...(rollup.payouts === undefined ? {} : { payouts: money(rollup.payouts) }),
+		...(rollup.employerContributions === undefined
+			? {}
+			: { employerContributions: money(rollup.employerContributions) }),
+		// Present only when the Scenario declares a transfer Flow (sim ADR-0031), as the engine states it.
+		...(rollup.transfers === undefined ? {} : { transfers: money(rollup.transfers) }),
+		...(rollup.fees === undefined ? {} : { fees: money(rollup.fees) }),
 		expense: money(rollup.expense),
 		contributions: money(rollup.contributions),
 		unfundedContributions: money(rollup.unfundedContributions),
@@ -60,11 +88,12 @@ export function annualRow(
 	}
 }
 
-/** One monthly row: net worth and accessible net worth, nominal and real. */
-export function monthlyRow(row: ProjectionRow, currency: string): MonthlyRow {
+/** One monthly row: net worth and accessible net worth, nominal and real, and the ages on its date. */
+export function monthlyRow(row: ProjectionRow, currency: string, ages: PersonAge[]): MonthlyRow {
 	const money = moneyOf(currency)
 	return {
 		date: row.date,
+		ages,
 		netWorth: money(row.netWorth),
 		realNetWorth: money(row.realNetWorth),
 		accessibleNetWorth: money(row.accessibleNetWorth),

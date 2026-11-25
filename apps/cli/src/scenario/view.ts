@@ -22,7 +22,15 @@ export type WrittenScenario = Omit<ScenarioView, "id"> & { id: string | null }
 /** A Scenario named by `scenario diff`, without its document. */
 export type ScenarioRef = { id: string; name: string; contentHash: string }
 
-const summaryShape = {
+export const summaryShape: {
+	id: z.ZodString
+	name: z.ZodString
+	contentHash: z.ZodString
+	forkedFrom: z.ZodNullable<z.ZodString>
+	version: z.ZodNumber
+	createdAt: z.ZodString
+	updatedAt: z.ZodString
+} = {
 	id: z.string().describe("The Scenario's UUIDv7 id."),
 	name: z.string().describe("The Scenario's exact, case-sensitive name."),
 	contentHash: z.string().describe("jcs1:sha256 of the canonical document."),
@@ -32,7 +40,7 @@ const summaryShape = {
 	updatedAt: z.string().describe("When the row was last changed."),
 }
 
-const documentShape = z
+export const documentShape: z.ZodRecord<z.ZodString, z.ZodUnknown> = z
 	.record(z.string(), z.unknown())
 	.describe("The document parsed from the stored canonical JSON.")
 
@@ -46,6 +54,38 @@ export const writtenScenario: z.ZodType<WrittenScenario> = z.strictObject({
 	id: z.string().nullable().describe("The Scenario's id; null under --dry-run."),
 	document: documentShape,
 })
+/** The household anchors a write dropped, because the document no longer holds their item. */
+export const droppedAnchors: z.ZodType<string[]> = z
+	.array(z.string())
+	.describe(
+		"The household anchors this write dropped, because the document no longer holds their item; empty when none.",
+	)
+
+/** The household Owners a write dropped, because the document no longer holds their item. */
+export const droppedOwners: z.ZodOptional<z.ZodArray<z.ZodString>> = z
+	.array(z.string())
+	.optional()
+	.describe(
+		"The household Owners this write dropped, because the document no longer holds their Flow or Account (cli ADR-0076); absent when none was dropped.",
+	)
+
+/** The household a Scenario keeps, as the document it was set from; null when none is set. */
+export type HouseholdDocument = Record<string, unknown> | null
+
+export const householdShape: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>> = z
+	.record(z.string(), z.unknown())
+	.nullable()
+	.describe("The household's document, or null when no household is set (cli ADR-0048).")
+
+/** A Scenario a household write reports: the written Scenario with its household and anchored dates. */
+export const writtenWithHousehold: z.ZodType<WrittenScenario & { household: HouseholdDocument }> =
+	z.strictObject({
+		...summaryShape,
+		id: z.string().nullable().describe("The Scenario's id; null under --dry-run."),
+		document: documentShape,
+		household: householdShape,
+	})
+
 export const scenarioRef: z.ZodType<ScenarioRef> = z.strictObject({
 	id: summaryShape.id,
 	name: summaryShape.name,
@@ -68,6 +108,14 @@ export function view(row: ScenarioRow): ScenarioView {
 	const document: unknown = JSON.parse(row.document)
 	if (!isPlainObject(document)) throw new Error(`Scenario ${row.id} does not hold a JSON object`)
 	return { ...summary(row), document }
+}
+
+/** The household a row keeps, parsed from its stored canonical text. */
+export function householdOf(row: ScenarioRow): HouseholdDocument {
+	if (row.household === null) return null
+	const household: unknown = JSON.parse(row.household)
+	if (!isPlainObject(household)) throw new Error(`Scenario ${row.id} holds no household object`)
+	return household
 }
 
 export function ref(row: ScenarioRow): ScenarioRef {

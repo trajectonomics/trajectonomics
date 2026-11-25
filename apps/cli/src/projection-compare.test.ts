@@ -202,23 +202,4 @@ describe("projection compare", () => {
 		expect(once.out).toContain("deltas:")
 		expect(once.out).toContain("No tax is applied")
 	})
-
-	it("describes its input and result in `traj schema`", async () => {
-		const res = await capture(["schema", "projection", "compare", "--json"])
-		expect(res.code).toBe(0)
-		const data = JSON.parse(res.out)
-		expect(data.name).toBe("projection compare")
-		expect(data.positionals).toEqual(["a", "b"])
-		expect(Object.keys(data.input.properties).sort()).toEqual([
-			"a",
-			"age",
-			"asOf",
-			"b",
-			"birthDate",
-			"carryIn",
-			"horizon",
-			"set",
-		])
-		expect([...data.input.required].sort()).toEqual(["a", "asOf", "horizon"])
-	})
 })

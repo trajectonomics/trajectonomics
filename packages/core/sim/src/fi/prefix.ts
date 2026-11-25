@@ -1,19 +1,28 @@
 import type { ResolvedCalendar } from "../calendar/business"
+import { type AccountValues, recordedValues } from "../engine/account-values"
 import { collectDates } from "../engine/dates"
 import { type DatedEvent, flowsAt } from "../engine/events"
 import { planLevies } from "../engine/levy-finish"
-import { allSettlementDates, closeReturnsOn, hasSettlement, type LevySet } from "../engine/levy-set"
-import { type EngineRunsOut, processDate } from "../engine/occurrence"
-import { isSafeInteger, overflow } from "../engine/overflow"
+import { allSettlementDates, type LevySet } from "../engine/levy-set"
+import type { EngineRunsOut } from "../engine/occurrence"
 import type { ResolvedReturns } from "../engine/returns"
+import { openRules, type RuleBook } from "../engine/rule-book"
 import { createStates, type StateMap } from "../engine/state"
+import { MilestoneGate } from "../milestone/gate"
 import type { Baseline, DateString, Scenario, Timeline } from "../types"
 import type { ProjectionProblem } from "../types/projection"
-import { cloneLevySet, cloneStates } from "./clone"
+import { cloneLevySet, cloneRules, cloneStates } from "./clone"
+import { advance } from "./prefix-advance"
 
 export interface PrefixPoint {
 	readonly states: StateMap
 	readonly levies: LevySet | undefined
+	/** The rule Flows' Rule years before this date, present only when the Scenario declares one. */
+	readonly rules?: RuleBook | undefined
+	/** The Milestone state before this date, present only when the Scenario declares Milestones. */
+	readonly gate?: MilestoneGate
+	/** The unchanged walk's Account values, present only when a Derived amount reads an Account. */
+	readonly values?: AccountValues
 }
 
 export interface Prefix {
@@ -39,27 +48,22 @@ export function levyPlan(
 	return { levies, settlementDates: allSettlementDates(levies, timeline.horizon) }
 }
 
-interface PrefixAdvance {
-	readonly problem?: ProjectionProblem
-	readonly runsOut?: EngineRunsOut
-}
-
-function advance(
+/** The saved point before one candidate month: copies of the states, the Levy tallies and the gate. */
+function pointOf(
 	states: StateMap,
-	scenario: Scenario,
-	date: DateString,
-	dayEvents: readonly DatedEvent[],
 	levies: LevySet | undefined,
-): PrefixAdvance {
-	if (dayEvents.length === 0 && !(levies !== undefined && hasSettlement(levies, date))) {
-		return {}
+	gate: MilestoneGate | undefined,
+	events: readonly DatedEvent[],
+	values: AccountValues | undefined,
+	rules: RuleBook | undefined,
+): PrefixPoint {
+	return {
+		states: cloneStates(states),
+		levies: cloneLevySet(levies),
+		...(rules && { rules: cloneRules(rules) }),
+		...(gate && { gate: gate.clone(events) }),
+		...(values && { values }),
 	}
-	if (levies !== undefined) closeReturnsOn(levies, states, date)
-	const outcome = processDate(states, scenario, date, dayEvents, levies)
-	if (outcome.problem !== undefined) return { problem: outcome.problem }
-	if (outcome.runsOut === undefined) return {}
-	if (!isSafeInteger(outcome.runsOut.unmet)) return { problem: overflow(date) }
-	return { runsOut: outcome.runsOut }
 }
 
 /** Walks the unmodified Scenario once, saving states and Levy tallies before each candidate month. */
@@ -71,20 +75,24 @@ export function baselinePrefix(
 	candidates: readonly DateString[],
 	calendar: ResolvedCalendar | undefined,
 	series?: ResolvedReturns,
+	reads: readonly string[] = [],
+	readDates: ReadonlySet<DateString> = new Set(),
 ): Prefix {
 	const states = createStates(baseline, scenario, timeline.start, series)
 	const { levies, settlementDates } = levyPlan(scenario, timeline, calendar)
+	const gate = MilestoneGate.create(scenario, timeline, calendar, events)
+	const rules = openRules(scenario)
+	const recorded =
+		reads.length === 0 ? undefined : recordedValues(reads, states, undefined, readDates)
 	const wanted = new Set(candidates)
 	const points = new Map<DateString, PrefixPoint>()
 	const dates = collectDates(events, candidates, settlementDates)
 	let index = 0
 	for (const date of dates) {
-		if (wanted.has(date)) {
-			points.set(date, { states: cloneStates(states), levies: cloneLevySet(levies) })
-		}
+		if (wanted.has(date)) points.set(date, pointOf(states, levies, gate, events, recorded, rules))
 		const [next, dayEvents] = flowsAt(events, index, date)
 		index = next
-		const stepped = advance(states, scenario, date, dayEvents, levies)
+		const stepped = advance(states, scenario, date, dayEvents, levies, gate, recorded, rules)
 		if (stepped.problem !== undefined) {
 			return { points, runsOut: undefined, problem: stepped.problem, stoppedAt: date }
 		}

@@ -4,6 +4,7 @@ import { dateString } from "./date"
 import { fiResult } from "./fi-result"
 import { integer } from "./integer"
 import { money } from "./money"
+import { milestoneRow } from "./projection-rows"
 import { override } from "./projection-shape"
 import { scenarioRef } from "./scenario-ref"
 import { taxYear } from "./tax-year"
@@ -22,10 +23,14 @@ export const atAge = z.strictObject({
 export const compareSide = z.strictObject({
 	scenario: scenarioRef,
 	overrides: z.array(override),
+	removals: z.array(z.string()),
+	additions: z.array(override).optional(),
 	carryIn: z.array(carryInRecord).optional(),
 	fi: fiResult,
 	taxYears: z.array(taxYear),
 	runOut: z.strictObject({ date: dateString, unmet: money }).nullable(),
+	/** This side's milestones in Scenario order, present only when its Scenario declares them. */
+	milestones: z.array(milestoneRow).optional(),
 	netWorth: z.strictObject({ final: pointOfNetWorth, atAges: z.array(atAge) }),
 })
 export type CompareSide = z.infer<typeof compareSide>

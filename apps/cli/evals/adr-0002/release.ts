@@ -1,4 +1,5 @@
 import { type FlagTable, flagsIn } from "./calls"
+import { TELEMETRY_OFF } from "./sandbox"
 
 /** The release under test: its label for the results file, and the argv that runs its `traj`. */
 export interface Released {
@@ -39,7 +40,7 @@ export async function trajStdout(
 	home: string,
 ): Promise<string> {
 	const proc = Bun.spawn([...argv, ...args], {
-		env: { ...process.env, TRAJ_HOME: home },
+		env: { ...process.env, ...TELEMETRY_OFF, TRAJ_HOME: home },
 		stdout: "pipe",
 		stderr: "pipe",
 		stdin: "ignore",

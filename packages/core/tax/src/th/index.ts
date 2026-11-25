@@ -23,16 +23,25 @@ export type {
 	ThLevyMonthDay,
 	ThLevyProfile,
 	ThLevySection40_4Elections,
+	ThSeparateClaimOptions,
+	ThSeparateClaimProblem,
 } from "./levy"
 export {
 	emitThLevy,
 	TH_LEVY_CONTRIBUTION_LABELS,
 	TH_LEVY_INCOME_LABELS,
+	TH_LEVY_MEMBER_ONLY_LABELS,
+	TH_LEVY_SHARED_FILER,
 	ThLevyContributionLabel,
+	ThLevyFilerField,
 	ThLevyIncomeLabel,
 	ThLevyMeasureId,
 	ThLevyRounding,
 	ThLevyTallyBasis,
+	ThSeparateClaimCode,
+	thFilerLabel,
+	thLevyTalliesFor,
+	thSeparateClaimProblems,
 } from "./levy"
 export { TH_2026_PARAMETERS } from "./parameters"
 export type { ThTaxResult } from "./result"
@@ -75,3 +84,5 @@ export {
 	ThRealEstateExpenseBasis,
 	ThSeparateSheetPaymentType,
 } from "./types"
+export type { ThBracketWalk, ThBracketWalkSlice } from "./walk"
+export { thBracketWalk, thEffectiveRateBps } from "./walk"

@@ -5,27 +5,8 @@ import { join } from "node:path"
 import { isAppError } from "../errors"
 import { capture } from "../test-support"
 import { HEAD, openStore } from "./index"
-import { schemaV1 } from "./schema-v1"
+import { fixtures } from "./open-fixtures"
 import { ledgerHome, mustOpen, steppingClock, tempHome } from "./testing"
-
-/**
- * One builder per schema version below head, each producing what that version left on disk.
- * Adding a migration step fails the coverage test below until its predecessor gets a fixture.
- */
-const fixtures: Record<number, (home: string) => Promise<void>> = {
-	// Version 0 is exactly what `traj init` leaves behind: an empty WAL database.
-	0: async (home) => {
-		expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
-	},
-	// Version 1 is the five tables, the seeded entity and no correction kind yet.
-	1: async (home) => {
-		expect((await capture(["init"], { TRAJ_HOME: home })).code).toBe(0)
-		const db = new Database(join(home, "traj.db"))
-		schemaV1(db)
-		db.run("PRAGMA user_version = 1")
-		db.close()
-	},
-}
 
 function setUserVersion(home: string, version: number) {
 	const db = new Database(join(home, "traj.db"))
@@ -63,6 +44,7 @@ describe("openStore", () => {
 			"account_parent",
 			"posting_account",
 			"scenario_live_name",
+			"scenario_one_main",
 			"tx_entity_date",
 			"tx_external_ref",
 			"tx_linked_to",

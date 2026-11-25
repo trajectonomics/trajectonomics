@@ -1,5 +1,9 @@
 import { type AppError, isAppError } from "../errors"
 import { isPlainObject } from "../json"
+import { householdDocument } from "../scenario/household/document"
+import { canonicalHousehold } from "../scenario/household/model"
+import { notesProblem } from "../scenario/notes"
+import { canonicalTax, requestOfStored, storedTax, storedTaxOf } from "../scenario/tax/stored"
 import {
 	canonicalScenarioDocument,
 	formatMinorUnits,
@@ -60,6 +64,37 @@ function document(value: unknown, path: string): unknown | AppError {
 	return canonicalScenarioDocument(value, path)
 }
 
+/** A household document, checked by the rules `traj scenario household` applies, as canonical text. */
+function household(value: unknown, path: string): unknown | AppError {
+	const parsed = householdDocument.safeParse(value)
+	if (!parsed.success) {
+		const reason = parsed.error.issues[0]?.message ?? "does not match the household schema"
+		return invalid(path, `is not a household document: ${reason}`)
+	}
+	return canonicalHousehold(parsed.data)
+}
+
+/** A tax profile, checked by the rules `traj scenario tax` stores, as canonical text. */
+function tax(value: unknown, path: string): unknown | AppError {
+	const parsed = storedTax.safeParse(value)
+	if (!parsed.success) {
+		const reason = parsed.error.issues[0]?.message ?? "does not match the tax profile schema"
+		return invalid(path, `is not a tax profile: ${reason}`)
+	}
+	return canonicalTax(storedTaxOf(requestOfStored(parsed.data)))
+}
+
+/** A plan's notes, checked by the rules `traj scenario notes` stores them under. */
+function notes(value: unknown, path: string): unknown | AppError {
+	if (typeof value !== "string") return invalid(path, "must be a string or null")
+	const problem = notesProblem(value)
+	return problem === null ? value : invalid(path, problem)
+}
+
+function flag(value: unknown, path: string): unknown | AppError {
+	return typeof value === "boolean" ? value : invalid(path, "must be true or false")
+}
+
 function correction(value: unknown, path: string): unknown | AppError {
 	if (value === null || isTxCorrection(value)) return value
 	return invalid(path, `must be null or one of ${TX_CORRECTIONS.join(", ")}`)
@@ -75,5 +110,9 @@ export const DECODERS: Record<FieldKind, Decode> = {
 	amount,
 	dimensions: nullable(dimensions),
 	document,
+	"household?": nullable(household),
+	"tax?": nullable(tax),
+	"notes?": nullable(notes),
+	flag,
 	correction,
 }

@@ -1,5 +1,5 @@
 import type { z } from "zod"
-import { checkDocument } from "./document"
+import { checkDocument, type FlagDocument } from "./document"
 import type { AppError, ErrorCode } from "./errors"
 import { checkPositionals, deriveFlags, type FlagSpec } from "./flags"
 import type { RenderHint } from "./table"
@@ -26,6 +26,13 @@ export type Context = {
 	 * keeps running, such as `dashboard`, calls it; the result is still the one envelope on stdout.
 	 */
 	notify?: (line: string) => void
+	/**
+	 * Lines to print on stderr only if the run succeeds, after its result: a note about something
+	 * the run did on the way, such as migrating the database (cli ADR-0050). A failed run answers
+	 * with its envelope alone, so nothing here is printed beside one.
+	 */
+	afterSuccess?: string[]
+	source?: import("./store/types").Source // the clock and ids a write reads; only the demo entry sets it (ADR-0074)
 }
 
 /** A field the document form cannot work without, and the sentence naming what is missing. It is
@@ -45,16 +52,17 @@ export type DocumentSpec<D extends z.ZodType = z.ZodType> = {
 	required?: readonly RequiredDocumentField[]
 	/** The hint a refusal of the document flag beside a flag it cannot take carries. */
 	hint?: string
-}
-
-/**
- * A document a flag names beside the other flags, such as `--carry-in <path>` (ADR-0030). It is
- * not the document form: the flag may be combined with the rest, so it is published under its own
- * key instead of replacing the input schema the way `DocumentSpec` does.
- */
-export type FlagDocument = {
-	flag: string
-	schema: z.ZodType
+	/**
+	 * The hint for one flag the document form cannot take, when that flag names a form of its own;
+	 * `hint` serves every other flag (cli ADR-0057).
+	 */
+	exclusiveHints?: Readonly<Record<string, string>>
+	/**
+	 * A second form of the same document, taken instead of `schema` when the boolean input field
+	 * `flag` is true, such as `--decimal` (ADR-0047). It is published by `traj schema` beside the
+	 * first, and the two never mix: the flag selects one schema before the document is read.
+	 */
+	alternate?: { flag: string; schema: z.ZodType }
 }
 
 type Outcome<T> = Result<T> | AppError | Promise<Result<T> | AppError>
@@ -98,10 +106,9 @@ export type Command<
 	/** How a table-shaped result renders in the human Format; JSON ignores it. */
 	render?: RenderHint
 	/**
-	 * Codes this command raises itself. Global codes such as `unknown_flag` are not listed, and
-	 * neither are the ones opening or creating the ledger raises, except on the leaves whose
-	 * subject is the data directory itself: `init`, `inspect`, `export`, `backup`, `restore` and
-	 * `data remove`.
+	 * Codes this command raises itself. Global codes such as `unknown_flag` are not listed, nor
+	 * are the ones opening or creating the ledger raises, except on the leaves whose subject is the
+	 * data directory itself: `init`, `inspect`, `export`, `backup`, `restore` and `data remove`.
 	 */
 	errorCodes: readonly ErrorCode[]
 	run: (...args: RunArgs<I, D>) => Outcome<z.input<O>>

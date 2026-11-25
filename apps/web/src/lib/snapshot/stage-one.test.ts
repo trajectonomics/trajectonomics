@@ -11,6 +11,9 @@ const params = checkParams({
 	ages: [],
 	monthly: false,
 	carryIn: false,
+	returnModel: null,
+	paths: null,
+	seed: null,
 })
 
 describe("stage one", () => {

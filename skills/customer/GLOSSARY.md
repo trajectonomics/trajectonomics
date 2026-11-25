@@ -22,12 +22,20 @@ _Avoid_: workflow, procedure
 A rule or condition that must hold true across all state transitions in this system.
 
 ### CLI Range
-The npm semver range a published Skill declares it expects of `@trajectonomics/cli`, from the Skill Manifest: copied into the Skill's frontmatter, and stated in the Skill's body only as its CLI Version Floor, because it is authored once and every other place derives from it. Its lower bound is the CLI Version Floor; its upper bound says when a new CLI minor needs the Skill rechecked, and is not a compatibility claim. The lower bound gates an install: a Skill is installed when the command line is at or above its floor, and skipped and named below it. Above its upper bound it is still installed, disclosed instead ([ADR 0004](./docs/adr/0004-the-cli-range-ceiling-is-a-recheck-marker.md)). Every published Skill declares `>=0.2.0 <0.7.0` today, except the planning Recipe `traj-plan`, which declares `>=0.3.0 <0.7.0` because its Thai tax allowance flags are published from 0.3.0.
+The npm semver range a published Skill declares it expects of `@trajectonomics/cli`, from the Skill Manifest: copied into the Skill's frontmatter, and stated in the Skill's body only as its CLI Version Floor, because it is authored once and every other place derives from it. Its lower bound is the CLI Version Floor; its upper bound says when a new CLI minor needs the Skill rechecked, and is not a compatibility claim. The lower bound gates an install: a Skill is installed when the command line is at or above its floor, and skipped and named below it. Above its upper bound it is still installed, disclosed instead ([ADR 0004](./docs/adr/0004-the-cli-range-ceiling-is-a-recheck-marker.md)). Every published Skill declares `>=0.2.0 <0.8.0` today, except the planning Recipe `traj-plan`, which declares `>=0.3.0 <0.8.0` because its Thai tax allowance flags are published from 0.3.0.
 _Avoid_: supported versions, min version
 
 ### CLI Version Floor
 The oldest `@trajectonomics/cli` release whose command surface a published Skill assumes: the lower bound of that Skill's CLI Range in the [Skill Manifest](#skill-manifest), which is where the number is authored. The onboarding Skill states the floor of the Skill it hands over to and discloses a command line older than it, instead of handing the conversation over silently.
 
+### Sign Convention
+How a printed figure's sign reads, by account type: raw signed units where a liability, income and equity row is negative when normal, so a debt of 2,400.00 prints `-2400.00` and net worth is the printed sum that already counts it. The operating Skill's "Read a sign" section states it once and every other Skill reads from there. `tx add --opening` is the one signed write, and a negative amount opens a debt at every release in the CLI Range.
+_Avoid_: sign rules, debt rule
+
 ### Ledger File
 The SQLite file at `${TRAJ_HOME:-~/.traj}/traj.db`, whose presence means the ledger has been opened on this machine at least once, and never that it holds data: `traj init` and every store-opening command create it empty on the way. The onboarding Skill tests for it and hands the read to the operating Skill.
 _Avoid_: database, data directory
+
+### Tax Baseline
+The Scenario a `traj-plan` tax comparison starts from: a fork whose tax Levy the Skill wrote in this conversation, with the person's stated facts. Both sides of a comparison are Levies written by the installed `traj`, so one rule set taxes both; a Levy stored by an earlier session is never a side, because `traj schema` cannot say which release wrote it ([ADR 0006](./docs/adr/0006-a-tax-comparison-uses-levies-written-in-the-conversation.md)).
+_Avoid_: base plan, stored baseline

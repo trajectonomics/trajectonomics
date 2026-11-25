@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import type { HouseholdDocument } from "../../contract"
+import { personNames } from "../item-names"
 import { NOMINAL_NAME, netWorthSeries, REAL_NAME } from "./chart"
 import { ANNUAL_ROWS, projectionRunFixture } from "./fixtures.test-support"
 
@@ -37,6 +39,54 @@ describe("netWorthSeries", () => {
 	test("has one point per annual row, the same count as the fixture's rows", () => {
 		const [nominal] = netWorthSeries(projectionRunFixture(), "nominal")
 		expect(nominal?.points).toHaveLength(ANNUAL_ROWS.length)
+	})
+
+	test("puts the first person's age under each year, and every person's age in the tooltip's title", () => {
+		const run = projectionRunFixture()
+		const [first, ...rest] = ANNUAL_ROWS
+		if (first === undefined) throw new Error("the fixture has rows")
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "partner", age: 35 },
+		]
+		const withAges = {
+			...run,
+			tables: [{ name: "annual" as const, count: 3, rows: [{ ...first, ages }, ...rest] }],
+		}
+		const [nominal] = netWorthSeries(withAges, "nominal")
+		expect(nominal?.points[0]).toMatchObject({
+			xLabel: "2027",
+			xTitle: "2027, me 37, partner 35",
+			subLabel: "me 37",
+		})
+		expect(nominal?.points[1]?.subLabel).toBeUndefined()
+	})
+
+	test("names the ages by the household's words, so the axis under a year reads You 37", () => {
+		const run = projectionRunFixture()
+		const [first, ...rest] = ANNUAL_ROWS
+		if (first === undefined) throw new Error("the fixture has rows")
+		const ages = [
+			{ person: "me", age: 37 },
+			{ person: "partner", age: 35 },
+		]
+		const withAges = {
+			...run,
+			tables: [{ name: "annual" as const, count: 3, rows: [{ ...first, ages }, ...rest] }],
+		}
+		const household: HouseholdDocument = {
+			schemaVersion: 1,
+			people: [
+				{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+			],
+			anchors: [],
+		}
+		const [nominal] = netWorthSeries(withAges, "nominal", personNames(household))
+		expect(nominal?.points[0]).toMatchObject({
+			xTitle: "2027, You 37, Your partner 35",
+			subLabel: "You 37",
+		})
 	})
 
 	test("has no points when the projection has no annual table", () => {

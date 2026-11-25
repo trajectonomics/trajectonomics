@@ -4,6 +4,16 @@ import type { DocumentSpec, RequiredDocumentField } from "./command"
 import { documentFailure } from "./document-issues"
 import { type AppError, fail } from "./errors"
 
+/**
+ * A document a flag names beside the other flags, such as `--carry-in <path>` (ADR-0030). It is
+ * not the document form: the flag may be combined with the rest, so it is published under its own
+ * key instead of replacing the input schema the way `DocumentSpec` does.
+ */
+export type FlagDocument = {
+	flag: string
+	schema: z.ZodType
+}
+
 /** Fields that only the flag form uses: everything not the document flag or an allowed field. */
 export function exclusiveFields(input: z.ZodObject, spec: DocumentSpec): string[] {
 	const keep = new Set([spec.flag, ...(spec.allowed ?? [])])
@@ -46,6 +56,19 @@ export function checkDocument(input: z.ZodObject, document: DocumentSpec | undef
 			throw new Error(`Required document field "${field}" is not a field of the input schema.`)
 		}
 	}
+	checkAlternate(input, document)
+}
+
+/** The alternate form's flag is an input field the document form allows (ADR-0047). */
+function checkAlternate(input: z.ZodObject, document: DocumentSpec): void {
+	const flag = document.alternate?.flag
+	if (flag === undefined) return
+	if (!(flag in input.shape)) {
+		throw new Error(`Alternate document flag "${flag}" is not a field of the input schema.`)
+	}
+	if (!(document.allowed ?? []).includes(flag)) {
+		throw new Error(`Alternate document flag "${flag}" must be allowed beside the document.`)
+	}
 }
 
 /** A document field is `-` for stdin, otherwise a path resolved against the working directory. */
@@ -74,11 +97,15 @@ export async function readDocument(
 	}
 }
 
-/** Empty text is invalid input; JSON syntax and shape errors both name the document's field. */
+/**
+ * Empty text is invalid input; JSON syntax and shape errors both name the document's field. The
+ * schema is the spec's own unless the caller has selected its alternate form (ADR-0047).
+ */
 export function parseDocument<D extends z.ZodType>(
 	spec: DocumentSpec<D>,
 	text: string,
 	path: string,
+	schema: z.ZodType = spec.schema,
 ): z.output<D> | AppError {
 	if (text.trim() === "") {
 		return fail("invalid_input", { path, message: `${path}: the document is empty` })
@@ -89,6 +116,7 @@ export function parseDocument<D extends z.ZodType>(
 	} catch {
 		return fail("invalid_input", { path, message: `${path}: the document is not valid JSON` })
 	}
-	const result = spec.schema.safeParse(value, { reportInput: true })
-	return result.success ? result.data : documentFailure(result.error)
+	const result = schema.safeParse(value, { reportInput: true })
+	// The alternate form's schema accepts any JSON value, so its output is the parsed value as is.
+	return result.success ? (result.data as z.output<D>) : documentFailure(result.error)
 }

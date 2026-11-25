@@ -2,6 +2,7 @@ import type { Language } from "../language/language"
 import { ABSOLUTE_CLEAN_URL, dictionaryFor } from "../language/languages"
 import { SITE_NAME } from "../site"
 import { type SoftwareApplicationNode, softwareApplication } from "./structured-data-application"
+import { type FaqPageNode, faqPage } from "./structured-data-faq"
 import {
 	ORGANIZATION_ID,
 	type OrganizationNode,
@@ -25,7 +26,7 @@ export interface WebSiteNode {
 /** One page's Structured data: the WebSite it is, the Organization that publishes it and traj. */
 export interface StructuredData {
 	readonly "@context": string
-	readonly "@graph": readonly [WebSiteNode, OrganizationNode, SoftwareApplicationNode]
+	readonly "@graph": readonly [WebSiteNode, OrganizationNode, SoftwareApplicationNode, FaqPageNode]
 }
 
 /** One Language home's WebSite: the URL it is, the Language it speaks and who publishes it. */
@@ -41,7 +42,7 @@ function website(language: Language, url: string): WebSiteNode {
 	})
 }
 
-/** The one WebSite a Language home is, the Organization that publishes it, and traj itself. */
+/** The one WebSite a Language home is, the Organization that publishes it, traj, and the FAQ the page shows. */
 export function structuredData(language: Language): StructuredData {
 	const url = ABSOLUTE_CLEAN_URL
 	return Object.freeze({
@@ -50,6 +51,7 @@ export function structuredData(language: Language): StructuredData {
 			website(language, url),
 			organization(),
 			softwareApplication(language, url),
+			faqPage(language, url),
 		] as const),
 	})
 }

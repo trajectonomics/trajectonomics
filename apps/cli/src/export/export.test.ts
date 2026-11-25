@@ -1,13 +1,13 @@
 import { describe, expect, it, setSystemTime } from "bun:test"
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import { goldenHome, goldenJsonl } from "../interchange/testing"
 import { ledgerHome } from "../store/testing"
+import { makeTempDir } from "../temp-dir"
 import { capture } from "../test-support"
 
 /** A directory path that does not exist yet, so the command is the one that creates it. */
-const outPath = () => join(mkdtempSync(join(tmpdir(), "traj-export-")), "out")
+const outPath = () => join(makeTempDir("traj-export-"), "out")
 
 const SEEDED =
 	'{"record":"entity","id":"00000000-0000-7000-8000-000000000001","name":"Personal","version":1,' +
@@ -22,7 +22,7 @@ describe("export --format jsonl", () => {
 		const data = JSON.parse(res.out)
 		expect(data.format).toBe("jsonl")
 		expect(data.files).toEqual(["traj.jsonl"])
-		expect(data.schemaVersion).toBe(2)
+		expect(data.schemaVersion).toBe(5)
 		expect(data.directory).toBe(resolve(out))
 		expect(data.rows).toEqual({ entity: 1, account: 7, tx: 4, posting: 8, scenario: 3 })
 		expect(await Bun.file(join(out, "traj.jsonl")).text()).toBe(await goldenJsonl())
@@ -42,7 +42,7 @@ describe("export --format jsonl", () => {
 		const res = await capture(["export", "--out", out, "--json"], { TRAJ_HOME: ledgerHome() })
 		expect(res.code).toBe(0)
 		expect(await Bun.file(join(out, "traj.jsonl")).text()).toBe(
-			`{"record":"header","formatVersion":1,"schemaVersion":2}\n${SEEDED}\n`,
+			`{"record":"header","formatVersion":1,"schemaVersion":5}\n${SEEDED}\n`,
 		)
 		expect(JSON.parse(res.out).rows).toEqual({
 			entity: 1,
@@ -102,7 +102,7 @@ describe("export's refusals", () => {
 	})
 
 	it("names the path and a stable code when the write cannot happen", async () => {
-		const file = join(mkdtempSync(join(tmpdir(), "traj-export-")), "afile")
+		const file = join(makeTempDir("traj-export-"), "afile")
 		writeFileSync(file, "")
 		const out = join(file, "out")
 		const res = await capture(["export", "--out", out, "--json"], { TRAJ_HOME: await goldenHome() })

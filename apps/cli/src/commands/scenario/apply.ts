@@ -1,25 +1,23 @@
 import { z } from "zod"
 import { UUID_SHAPED } from "../../account/name"
-import type { Leaf } from "../../command"
-import { defineCommand, ok } from "../../command"
+import { defineCommand, type Leaf } from "../../command"
 import { missingFieldError } from "../../document"
-import { isAppError } from "../../errors"
+import { APPLY_EXAMPLES } from "../../scenario/apply-examples"
 import { DOCUMENT, exclusive, REQUIRED_NAME } from "../../scenario/apply-forms"
+import { applyWhatIfFlags, whatIfResult } from "../../scenario/apply-what-if"
+import { applyResult, writeApplied } from "../../scenario/apply-write"
+import { decimalFlag } from "../../scenario/decimal-schema"
 import { invalidScenarioName } from "../../scenario/errors"
+import { IF_HASH } from "../../scenario/if-hash"
+import { addFlag, decimalProblem, setFlag, withoutFlag } from "../../scenario/override-flags"
 import { printTemplate } from "../../scenario/template"
-import { view, type WrittenScenario, writtenScenario } from "../../scenario/view"
 import { LEDGER_READ_CODES } from "../../store"
-import { withStore } from "../../with-store"
-
-const result = z.strictObject({
-	dryRun: z.boolean().describe("True when the write was rolled back."),
-	status: z.enum(["created", "updated", "unchanged"]).describe("What the apply found."),
-	scenario: writtenScenario,
-})
 
 export const apply: Leaf = defineCommand({
 	name: "apply",
-	summary: "Create or update a Scenario from a JSON document",
+	summary: "Create or update a Scenario from a JSON document, or apply a what-if to its plan",
+	description:
+		"Three forms. --file stores a JSON document as the Scenario. --template prints a document to start from. --set, --without and --add, with no --file, apply the same Overrides projection run applies to the stored Scenario and store the result, so a what-if that projects is the one that is saved (--add puts a new item on a list); an apply that leaves the plan unchanged writes nothing.",
 	positionals: ["name"],
 	input: z.strictObject({
 		name: z
@@ -31,7 +29,9 @@ export const apply: Leaf = defineCommand({
 			.string()
 			.min(1)
 			.optional()
-			.describe("The JSON document's path, or - for stdin; --template prints one to start from."),
+			.describe(
+				"The JSON document's path, or - for stdin; its schema is `traj schema scenario apply`, and --template prints one to start from.",
+			),
 		template: z
 			.boolean()
 			.optional()
@@ -46,58 +46,47 @@ export const apply: Leaf = defineCommand({
 				"With --template, pre-fill the document from the Baseline at this date, as YYYY-MM-DD.",
 			),
 		dryRun: z.boolean().optional().describe("Report the row and roll the write back."),
+		decimal: decimalFlag,
+		ifHash: IF_HASH,
+		set: setFlag,
+		without: withoutFlag.describe(
+			"Take one list item out by its id, such as flows.gym, before any --set. Applied to the stored plan, the removal is saved.",
+		),
+		add: addFlag.describe(
+			'Add one new list item, as list=json, such as flows=\'{"id":"extra","kind":"expense",...}\', after any --without and before any --set. Applied to the stored plan, the item is saved.',
+		),
 	}),
 	document: DOCUMENT,
-	output: z.union([z.string(), result]),
-	examples: [
-		{
-			command: "traj scenario apply --template",
-			description: "Print a minimal document to start from.",
-		},
-		{
-			command: "traj scenario apply --template --as-of 2026-03-31",
-			description: "Print a Scenario pre-filled from the Baseline at one date, to edit and apply.",
-		},
-		{
-			command: "traj scenario apply base --file base.json",
-			description: "Create a Scenario, or update it when the document changed.",
-		},
-		{
-			command: "traj scenario apply base --file -",
-			description: "Read the document from stdin, for example redirected from base.json.",
-		},
-		{
-			command: "traj scenario apply base --file base.json --dry-run",
-			description: "Show the row and roll the write back.",
-		},
-	],
+	note: "The --decimal form ships in 0.8.0, and so do --if-hash and the what-if form with --set and --without. --add ships in 0.8.0 as well.",
+	output: z.union([z.string(), applyResult, whatIfResult]),
+	examples: APPLY_EXAMPLES,
 	errorCodes: [
 		"database_busy",
 		"invalid_input",
 		"INVALID_DATE",
+		"INVALID_AMOUNT",
 		"NEGATIVE_AMOUNT",
 		"AMOUNT_OVERFLOW",
 		"unsupported_currency",
+		"scenario_changed",
+		"not_found",
 		...LEDGER_READ_CODES,
 	],
 	run: (input, document, ctx) => {
 		const wrong = exclusive(input)
 		if (wrong !== undefined) return wrong
 		if (input.template === true) return printTemplate(ctx, input.asOf)
+		if (input.file === undefined) return decimalProblem(input) ?? applyWhatIfFlags(ctx, input)
 		// The document form checks this before it reads the document; the guard keeps `name` a string.
 		const name = input.name
 		if (name === undefined) return missingFieldError(REQUIRED_NAME)
 		if (UUID_SHAPED.test(name)) return invalidScenarioName()
-		const dryRun = input.dryRun === true
-		return withStore(ctx, (store) => {
-			const outcome = store.saveScenario({ name, document }, { dryRun })
-			if (isAppError(outcome)) return outcome
-			const rendered = view(outcome.scenario)
-			const scenario: WrittenScenario = {
-				...rendered,
-				id: dryRun && outcome.status === "created" ? null : rendered.id,
-			}
-			return ok({ dryRun, status: outcome.status, scenario })
+		return writeApplied(ctx, {
+			name,
+			document,
+			decimal: input.decimal === true,
+			dryRun: input.dryRun === true,
+			ifHash: input.ifHash,
 		})
 	},
 })

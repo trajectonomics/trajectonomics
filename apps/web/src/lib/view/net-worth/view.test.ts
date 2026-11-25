@@ -19,6 +19,19 @@ describe("netWorthView", () => {
 		expect(view.note).toBeNull()
 	})
 
+	test("states every row and says the total is not stated when the accounts' sum is out of range", () => {
+		const view = netWorthView(
+			netWorth(
+				"2026-10-31",
+				[row("Bank", "asset", "600.00"), row("Loan", "liability", "-200.00")],
+				null,
+			),
+		)
+		expect(view.totals).toEqual([])
+		expect(view.rows).toHaveLength(2)
+		expect(view.note).toContain("The total is not stated")
+	})
+
 	test("handles an empty report with no rows and no totals", () => {
 		const view = netWorthView(netWorth("2026-10-31", [], [], null))
 		expect(view.bars).toEqual([])
@@ -37,9 +50,11 @@ describe("noTransactionsNote", () => {
 		)
 	})
 
-	test("still says so when no first transaction date is known", () => {
+	test("says the ledger records no transaction when there is no first date", () => {
 		const note = noTransactionsNote(netWorth("2024-10-31", [], [], null, true))
-		expect(note).toContain("is before the first transaction, so the zero is not a real reading.")
+		expect(note).toBe(
+			"The ledger records no transaction, so the zero at 31 Oct 2024 is not a real reading.",
+		)
 	})
 
 	test("says nothing when the As-of has transactions behind it", () => {

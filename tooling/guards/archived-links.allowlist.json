@@ -5,6 +5,16 @@
 		"reason": "The source table names the internal skills' former repository; its Lives-in column is the monorepo folder."
 	},
 	{
+		"path": "apps/blog/src/content/posts/install-moojot-on-android/en.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The install guide is about MooJot v1.4.0 and links to the repository it was published from; the archived repository stays readable."
+	},
+	{
+		"path": "apps/blog/src/content/posts/install-moojot-on-android/th.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The install guide is about MooJot v1.4.0 and links to the repository it was published from; the archived repository stays readable."
+	},
+	{
 		"path": "apps/cli/install.ps1",
 		"match": "trajectonomics/cli",
 		"reason": "0.1.0 to 0.3.0 download their assets from the archived cli repository, where they stay."
@@ -30,14 +40,39 @@
 		"reason": "Design record citing issues of the archived docs repository by number; the issues stay readable."
 	},
 	{
+		"path": "apps/openjot/AGENTS.md",
+		"match": "ARCHIVED_REPO = \"trajectonomics/moojot\"",
+		"reason": "Rule 6 lists the names that stay `moojot` after the rename, including the archived release the download link falls back to."
+	},
+	{
+		"path": "apps/openjot/site/README.md",
+		"match": "trajectonomics/moojot",
+		"reason": "The landing page's README documents the fallback to the archived repository's release until the first openjot-v* exists."
+	},
+	{
+		"path": "apps/openjot/site/public/index.html",
+		"match": "trajectonomics/moojot",
+		"reason": "The Released roadmap items are closed issues of the archived repository, where they stay."
+	},
+	{
+		"path": "apps/openjot/site/release.js",
+		"match": "trajectonomics/moojot",
+		"reason": "The fallback reads the archived repository's latest release until the first openjot-v* release exists."
+	},
+	{
+		"path": "apps/openjot/site/release.test.js",
+		"match": "trajectonomics/moojot",
+		"reason": "Pins the archived-repository fallback's download URLs."
+	},
+	{
 		"path": "apps/site/README.md",
 		"match": "trajectonomics/site/issues/",
 		"reason": "Cites issues of the archived site repository by number; the issues stay readable."
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
-		"match": "trajectonomics/site/issues/33",
-		"reason": "Design record citing an archived site issue by number; the issue stays readable."
+		"match": "trajectonomics/design-system/issues/59",
+		"reason": "Design record citing an archived design-system issue by number; the issue stays readable."
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
@@ -46,8 +81,8 @@
 	},
 	{
 		"path": "apps/site/docs/design/landing-page-redesign.md",
-		"match": "trajectonomics/design-system/issues/59",
-		"reason": "Design record citing an archived design-system issue by number; the issue stays readable."
+		"match": "trajectonomics/site/issues/33",
+		"reason": "Design record citing an archived site issue by number; the issue stays readable."
 	},
 	{
 		"path": "apps/site/src/lib/build/site-content.test.ts",
@@ -56,13 +91,13 @@
 	},
 	{
 		"path": "docs/monorepo-migration.md",
-		"match": "trajectonomics/cli",
-		"reason": "Migration record: names the archived repositories the cutover moved out of."
+		"match": "docs/runbooks/release.md",
+		"reason": "Migration record: names the archived cli repository the cutover forwarded from."
 	},
 	{
 		"path": "docs/monorepo-migration.md",
-		"match": "docs/runbooks/release.md",
-		"reason": "Migration record: names the archived cli repository the cutover forwarded from."
+		"match": "trajectonomics/cli",
+		"reason": "Migration record: names the archived repositories the cutover moved out of."
 	},
 	{
 		"path": "docs/runbooks/deploy.md",
@@ -85,6 +120,11 @@
 		"reason": "Glossary note naming the package's former repository."
 	},
 	{
+		"path": "skills/customer/scripts/traj-handoff.test.ts",
+		"match": "source` is `trajectonomics/skills`",
+		"reason": "Asserts the handoff names the former source's lock entry as no pin."
+	},
+	{
 		"path": "skills/customer/scripts/traj-onboarding-setup.test.ts",
 		"match": "trajectonomics/cli#",
 		"reason": "Asserts the onboarding Skill names no archived cli issue."
@@ -98,11 +138,6 @@
 		"path": "skills/customer/skills/traj/SKILL.md",
 		"match": "source` is `trajectonomics/skills`",
 		"reason": "Describes the lock entry an install from the former source leaves, so the handoff reads it as no pin."
-	},
-	{
-		"path": "skills/customer/scripts/traj-handoff.test.ts",
-		"match": "source` is `trajectonomics/skills`",
-		"reason": "Asserts the handoff names the former source's lock entry as no pin."
 	},
 	{
 		"path": "skills/internal/AGENTS.md",

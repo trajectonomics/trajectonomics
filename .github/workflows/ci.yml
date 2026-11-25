@@ -4,6 +4,23 @@ name: CI
 # touches only apps/site checks only what depends on it. Pull requests run on every base branch,
 # so a PR stacked on another phase branch is checked too. A push to main and a manual run check
 # every package.
+#
+# The Dashboard (apps/web) is the slow package: its `scripts/` tests spawn the real `traj` binary
+# hundreds of times and took about 20 of the 22 minutes of a web pull request. So the web package
+# does not run inside the packages job. It runs as its own jobs, and its `scripts/` tests are split
+# across a matrix by bun's own `--shard`:
+#
+#   Plan                  decides whether the web jobs run (a pull request that does not affect
+#                         apps/web or apps/cli skips them)
+#   Check packages        every other package, `turbo run check` without @trajectonomics/web
+#   Check web             the web package's lint, typecheck, `./src` tests and build
+#   Check web scripts N   one shard of the web package's `./scripts` tests
+#   Check web browser     a headless Chromium over the built Demo: every page at phone and desktop
+#                         width, and three pages in print (apps/web/browser, web ADR 0026)
+#   Check                 the required check: fails when any job above failed. Branch protection
+#                         requires this name, so keep it.
+#
+# `bun run check` in apps/web (and at the root) still runs every web test. See docs/runbooks/ci.md.
 on:
   pull_request:
   push:
@@ -18,46 +35,81 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Check
+  plan:
+    name: Plan
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      web: ${{ steps.web.outputs.run }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Turbo compares the PR's base with its head, so the base commit must be in the clone.
           fetch-depth: 0
 
-      # The root package.json engines is >=22.23.4 (the site needs it); "22" resolves to the newest 22.x.
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: "22"
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.4.4
+      # The web `scripts/` tests run the workspace's own `traj`, so they must run when the web
+      # package or the command line is affected (the command line depends on the web package, so
+      # a web change affects both). A change to this workflow or its setup action runs them too,
+      # so a change to the sharding is exercised by its own pull request.
+      - name: Decide whether the web jobs run
+        id: web
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          run=true
+          if [ "$EVENT_NAME" = pull_request ]; then
+            run=false
+            affected=$(bunx turbo ls --affected --output=json 2>/dev/null | jq -r '.packages.items[].name')
+            changed=$(git diff --name-only "$TURBO_SCM_BASE" HEAD)
+            echo "Affected packages:"
+            echo "$affected"
+            # A here-string, not a pipe: with pipefail, grep -q closing the pipe early fails the line.
+            if grep -qxE '@trajectonomics/(web|cli)' <<< "$affected"; then
+              run=true
+            elif grep -qE '^\.github/(workflows/ci\.yml|actions/)' <<< "$changed"; then
+              run=true
+            fi
+          fi
+          echo "Run the web jobs: $run"
+          echo "run=$run" >> "$GITHUB_OUTPUT"
 
-      # Turbo keeps task outputs in .turbo/cache. Restore the newest cache for this lockfile, then
-      # save this run's cache (actions/cache saves on success).
+  packages:
+    name: Check packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # Turbo keeps task outputs in .turbo/cache. Restore the newest cache for this lockfile, and save
+      # this run's cache even when the run fails, so a retry skips the tasks that passed.
       - name: Restore the Turborepo cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo/cache
-          key: turbo-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
           restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
 
+      # The web package is left out here: it has its own jobs below. `apps/cli/turbo.json` keeps the
+      # command line's check from pulling the web check back in through `^check`.
       - name: Check the packages a pull request affects
         if: github.event_name == 'pull_request'
         env:
           TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
-        run: bunx turbo run check --affected --concurrency=2
+        run: bunx turbo run check --affected --filter='!@trajectonomics/web' --concurrency=2
 
       # The guards read every tracked file, but `--affected` selects them only when a file inside
       # tooling/guards changes. Run them on every pull request so an archived link in any folder
@@ -68,4 +120,204 @@ jobs:
 
       - name: Check every package
         if: github.event_name != 'pull_request'
-        run: bunx turbo run check --concurrency=2
+        run: bunx turbo run check --filter='!@trajectonomics/web' --concurrency=2
+
+      - name: Save the Turborepo cache
+        if: ${{ !cancelled() && steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+
+  web:
+    name: Check web
+    needs: plan
+    if: needs.plan.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Restore the Turborepo cache
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
+
+      # The same four steps as `bun run check` in apps/web (lint, typecheck, test, build), with the
+      # `./scripts` half of `test` left to the shards below. tooling/guards pins that the split
+      # still covers `test`.
+      - name: Lint, typecheck, test ./src and build the web package
+        run: bunx turbo run lint typecheck test:src build --filter=@trajectonomics/web --concurrency=2
+
+      # SvelteKit's build stamp is the task's turbo hash (web ADR 0028), so two builds of the same inputs
+      # must pack the same bytes. `--cache=local:` turns the cache off (the build runs and writes no entry)
+      # and `--only` runs just the web build (the Demo snapshot and the packages it needs were built above),
+      # so this is vite and the pack, twice. No `--` arguments: turbo hashes them into the task.
+      - name: Check the Dashboard Pack is reproducible
+        run: |
+          set -euo pipefail
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
+          first=$(sha256sum apps/web/pack/dashboard.bin)
+          bunx turbo run @trajectonomics/web#build --cache=local: --only --concurrency=2
+          second=$(sha256sum apps/web/pack/dashboard.bin)
+          echo "first:  $first"
+          echo "second: $second"
+          [ "$first" = "$second" ] || { echo "::error::Two builds of the same inputs packed different dashboard.bin bytes."; exit 1; }
+
+      - name: Save the Turborepo cache
+        if: ${{ !cancelled() && steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+
+  web-scripts:
+    name: Check web scripts (${{ matrix.shard }})
+    needs: plan
+    if: needs.plan.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # The length of this list is the number of shards. Add a number to add a shard.
+        shard: [1, 2, 3, 4]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Read only: these jobs restore the packages job's cache and do not save.
+      - name: Restore the Turborepo cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
+
+      # Builds what the tests read: the command line they spawn and the Demo snapshot (and what both
+      # build on). This is a separate step, without `--shard`, on purpose: turbo adds the arguments after
+      # `--` to the hash of every task in the graph, so with `-- --shard=N/4` on one command the shard's
+      # `demo`, `core#build` and `cli#build` could never match what the packages job saved, and every
+      # shard rebuilt them (#464). Here the hashes are the packages job's, so they are cache hits.
+      - name: Build the command line and the Demo snapshot the tests read
+        run: bunx turbo run @trajectonomics/cli#build @trajectonomics/web#demo --concurrency=2
+
+      # bun splits the files the same way in every job, so the shards together run each file exactly
+      # once. Run through bun, not turbo, so the shard argument reaches no task hash. The task graph of
+      # `test:scripts` (apps/web/turbo.json) is exactly what the step above ran; tooling/guards pins that.
+      - name: Test the web scripts, shard ${{ matrix.shard }} of ${{ strategy.job-total }}
+        run: bun run --cwd apps/web test:scripts --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+
+  # The browser checks (#377, web ADR 0026): Chromium over the built Demo, at phone and desktop width and in
+  # print. A job of its own, so it runs beside the shards and never lengthens `Check packages`. Budget: 10
+  # minutes from the start of the job (the timeout), about 5 when the build and the browser are cached.
+  web-browser:
+    name: Check web browser
+    needs: plan
+    if: needs.plan.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Read only, like the shards: the build below is a hit when `Check web` or `Check packages` saved it.
+      - name: Restore the Turborepo cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-web-${{ hashFiles('bun.lock') }}-
+            turbo-${{ runner.os }}-packages-${{ hashFiles('bun.lock') }}-
+
+      - name: Setup the workspace
+        uses: ./.github/actions/setup
+
+      # The suite serves `apps/web/dist` (the loopback build) and `apps/web/dist-hosted` (the hosted Demo, web ADR 0028)
+      # and reads the Demo snapshot in them. No arguments after `--`: turbo hashes them into every task of the graph
+      # and the build would miss the cache (docs/runbooks/ci.md).
+      - name: Build the web package, the hosted Demo and the Demo snapshot
+        run: bunx turbo run @trajectonomics/web#build @trajectonomics/web#build:hosted --concurrency=2
+
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p 'require("./apps/web/package.json").devDependencies["@playwright/test"]')" >> "$GITHUB_OUTPUT"
+
+      # The same key and path as browser.yml and docs-browser.yml, so the browser is downloaded once per
+      # Playwright version and shared with them.
+      - name: Cache the Playwright browser
+        id: browser
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # A cached browser still needs its system libraries, which are not in the cache.
+      - name: Install Chromium
+        working-directory: apps/web
+        run: |
+          if [ "${{ steps.browser.outputs.cache-hit }}" = true ]; then
+            bunx playwright install-deps chromium
+          else
+            bunx playwright install --with-deps chromium
+          fi
+
+      - name: Check every page at phone and desktop width, and in print
+        working-directory: apps/web
+        run: bun run test:browser
+
+      # The screenshots are for people to look at: they are uploaded whether the checks passed or not.
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-screenshots
+          path: apps/web/screenshots/
+          retention-days: 7
+
+      - name: Upload the browser report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: web-playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 7
+
+  check:
+    name: Check
+    # Branch protection requires this name. It runs after every job in `needs`, whatever they did
+    # (`always()`, not `!cancelled()`: a cancelled run must fail this check, since GitHub counts a
+    # skipped required check as passing). It reads `needs`, so a job added to the list below is
+    # judged without editing the script: it must succeed, and may be skipped only when `Plan` said
+    # to skip the web jobs.
+    if: always()
+    needs: [plan, packages, web, web-scripts, web-browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          WEB_REQUIRED: ${{ needs.plan.outputs.web }}
+        run: |
+          set -euo pipefail
+          jq -r 'to_entries[] | "\(.key)=\(.value.result)"' <<< "$NEEDS"
+          jq -e --arg web "$WEB_REQUIRED" 'to_entries | all(.value.result == "success"
+            or (.value.result == "skipped" and $web != "true" and (.key | IN("plan", "packages") | not)))' \
+            <<< "$NEEDS" > /dev/null || { echo "::error::A CI job did not pass."; exit 1; }

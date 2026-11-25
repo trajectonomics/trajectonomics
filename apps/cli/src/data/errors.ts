@@ -8,6 +8,7 @@ function detailsOf(inventory: Inventory) {
 		database: inventory.database,
 		bytes: inventory.bytes,
 		rows: inventory.rows,
+		copies: inventory.copies,
 	}
 }
 
@@ -19,10 +20,14 @@ function loss(inventory: Inventory): string {
 
 /** No `--confirm`: the command states what it would destroy and how to say yes. */
 export function confirmRequired(inventory: Inventory): AppError {
+	const copies =
+		inventory.copies.length === 0
+			? ""
+			: ` The copies traj wrote before an upgrade stay, and hold your data in plain text: ${inventory.copies.join(", ")}.`
 	return fail("invalid_input", {
 		path: "confirm",
 		message: `confirm: ${loss(inventory)}; type that path with --confirm to delete the data`,
-		hint: `Nothing was removed. Take a backup first: "traj backup --out <new dir>", then "traj data remove --confirm ${inventory.directory} --backup <backup dir>".`,
+		hint: `Nothing was removed. Take a backup first: "traj backup --out <new dir>", then "traj data remove --confirm ${inventory.directory} --backup <backup dir>".${copies}`,
 		details: detailsOf(inventory),
 	})
 }

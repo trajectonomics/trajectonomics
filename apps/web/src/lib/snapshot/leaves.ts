@@ -8,9 +8,13 @@ export const READ_LEAVES = [
 	"tx list",
 	"baseline show",
 	"scenario list",
+	"scenario show",
 	"projection run",
 	"fi",
 	"projection compare",
+	"projection chance",
+	"projection path",
+	"projection allowances",
 ] as const
 
 /** One of the read leaves the Plan may emit. */

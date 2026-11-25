@@ -93,13 +93,42 @@ describe("valuation over a Return series", () => {
 		expect(valuation(stateAt(fixture()), "2024-01-01")).toBe(118800n)
 	})
 
-	it("rounds once per held row, so a mid-row commit adds the r² term", () => {
+	it("makes a change mid-row neutral: a zero change still settles to 110,000", () => {
 		const state = stateAt(fixture())
 		expect(mutate(state, "2023-04-01", 0n, undefined)).toBeUndefined()
-		// The commit at 2023-04-01 carries 105,000; the second half is 105,000 × 1.05 = 110,250.
-		expect(valuation(state, "2023-06-30")).toBe(110250n)
-		// r²·h₁h₂/D² = 0.01 × 0.25 = 0.0025, so 100,000 × 0.0025 = 250 above 110,000.
-		const split = valuation(state, "2023-06-30") - valuation(stateAt(fixture()), "2023-06-30")
-		expect(split).toBe(250n)
+		// The row's start balance takes the full 10%: 100,000 × 1.1, with no r² term.
+		expect(valuation(state, "2023-06-30")).toBe(110000n)
+	})
+
+	it("gives a deposit mid-row its own part of the row's return", () => {
+		const state = stateAt(fixture())
+		mutate(state, "2023-04-01", 10000n, undefined)
+		// 115,000 held, of which 110,000 still earns 10% × 90/180 = 5,500: 100,000 × 1.1 + 10,000 × 1.05.
+		expect(valuation(state, "2023-06-30")).toBe(120500n)
+	})
+
+	it("takes a withdrawal mid-row off the part still to earn", () => {
+		const state = stateAt(fixture())
+		mutate(state, "2023-04-01", -10000n, undefined)
+		// 100,000 × 1.1 − 10,000 × 1.05 = 99,500.
+		expect(valuation(state, "2023-06-30")).toBe(99500n)
+	})
+
+	it("leaves nothing after a withdrawal of the whole balance mid-row", () => {
+		const state = stateAt(fixture())
+		mutate(state, "2023-04-01", -105000n, undefined)
+		expect(valuation(state, "2023-06-30")).toBe(0n)
+		expect(valuation(state, "2024-01-01")).toBe(0n)
+	})
+
+	it("restarts the part still to earn at the next row's start", () => {
+		const state = stateAt(fixture())
+		mutate(state, "2023-04-01", 10000n, undefined)
+		// 120,500 at 2023-06-30, the second row's start; 8% over 185 days.
+		mutate(state, "2023-09-01", -20000n, undefined)
+		// 120,500 × 800 × 63 / 1,850,000 = 3,282.7 → 123,783 at 2023-09-01, then 103,783 after the withdrawal.
+		expect(valuation(state, "2023-09-01")).toBe(103783n)
+		// 103,783 + 100,500 × 800 × 122 / 1,850,000 = 103,783 + 5,302.1 → 109,085
+		expect(valuation(state, "2024-01-01")).toBe(109085n)
 	})
 })

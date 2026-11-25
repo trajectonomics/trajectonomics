@@ -84,8 +84,47 @@ traj report networth --as-of 2026-03-31
 comes from, and a transaction moves an amount from one to another. Every read states its own
 date and never reads the clock, so the same command always answers the same question.
 
+To chart net worth over time, state every month-end of a period in one read instead of one
+call per month:
+
+```bash
+traj report networth --monthly --since 2026-01-01 --until 2026-03-31
+```
+
+Each month is exactly what `--as-of` gives for that date.
+
+A figure that sums accounts (net worth, the trial balance's debit and credit columns, the P&L's income
+less expenses) can leave the safe integer range though every account is inside it. The read still
+exits 0 and states every account, and states that figure as `null` with an error object beside it
+(`netWorthError`, `totalsError`); the text form prints a sentence in its place. A figure inside the
+range carries no error key. Run `traj schema balance` or `traj schema report pnl` for the exact shape.
+
 `traj help` lists every command, `traj help <command>` lists one command's flags, and
 `traj schema --json` prints the whole contract: every command's input, output and error codes.
+
+## Importing a statement
+
+To load a bank statement, fill the one CSV template instead of adding each transaction by
+hand. `traj tx import` has been in every release since 0.1.0.
+
+```bash
+traj tx import --template     # print the template header and nothing else
+traj tx import statement.csv --dry-run
+traj tx import statement.csv
+```
+
+`--template` prints the header the importer reads, and it opens no data directory:
+
+```csv
+date,from,to,amount,memo,external_ref,project
+```
+
+Start your file with that header and write one row per transaction. `--dry-run` reports every
+row and rolls every write back, so run it first. A file name of `-` reads the CSV from stdin, as in
+`traj tx import - --dry-run`. The import is all or nothing, and `external_ref` is the duplicate
+key, so importing the same statement twice adds nothing the second time. Each command's flags and
+the rest of the columns are in
+[the `tx` page of the docs](https://docs.trajectonomics.com/cli/commands/tx/).
 
 ## Development
 
@@ -144,6 +183,14 @@ deduction nobody stated is visible rather than assumed to be zero. It states
 what the flags said, never what tax-core applied: a premium the statute does
 not allow for the filing status is still stated, and the Levy zeroes it.
 
+The write keeps that profile beside the Scenario, and `traj scenario show` prints
+it back as `tax`. `--merge` then changes only the flags it carries
+(`traj scenario tax base --merge --children 2`) and keeps the rest, and
+`--from-stored` writes the Levy again from the profile, for example after a
+tax-year update. Both need a stored profile: a plan taxed before it was kept
+states its profile whole once. `--if-hash` refuses a write over a plan that
+changed since you read it, as on `scenario apply`.
+
 ```json
 {
   "status": "updated",
@@ -153,6 +200,19 @@ not allow for the filing status is still stated, and the Levy zeroes it.
   }
 }
 ```
+
+A couple who file jointly get each spouse's own expense ceiling. When the plan's household
+has a partner and `owners` that say whose each Flow and Account is,
+`--filing-status married_joint` writes one Levy over both people as Filers: the CLI adds the Owner's suffix to each tax label (`income.section40_1@me`,
+`@partner`, or `@shared` for income of both), so state the bare label as before.
+Section 42 bis gives each spouse their own 50% expense, capped at 100,000, even on a
+joint return, which one Levy over a single label could not apply. Salaries of
+1,000,000 and 500,000 owe 160,000 this way, where a Levy over one label owes
+185,000. A taxed Flow with no Owner, or a person id that is not 1 to 32 lowercase
+letters, digits or hyphens, is refused by name. A plan without a partner or without
+`owners` writes the bare labels it always wrote, for every filing status. The result
+lists the `filers` when it has any, and the household's Owners are read each time the
+tax is written, so after changing them run `traj scenario tax <name> --from-stored`.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,
@@ -172,6 +232,261 @@ and where it came from, and one that starts on a period boundary needs nothing:
   }
 ]
 ```
+
+A Levy over Filers reads Filer labels, so its record names them: each of its 29 classes
+once per Filer (`income.section40_1@me`) and its 22 income classes once more for income
+of both (`income.section40_1@shared`), 80 for two Filers where a Levy over one label has
+29. A missing class is listed by name, and a bare label is refused.
+
+## Chance of success
+
+> **Ships in 0.8.0.**
+
+`traj projection chance` runs one Scenario over seeded Market paths and reports
+the share that never run out before the Horizon, with the net-worth Bands at each
+year. The paths draw from a Return model you state in a JSON file, with
+`--return-model`, and `--paths` and `--seed` are required, so the same model,
+seed and count always give the same answer. The CLI ships no Return model: which
+market history a plan is tested against is your decision, and every figure is
+only as good as that choice. `traj schema projection chance` describes the file.
+Or pass `--return-model plan` to build the model from the plan itself: each asset
+Account's `rate` and its `volatility` (the standard deviation of its yearly
+return, in basis points, which you write into the Scenario). `--buckets` sets its
+size (a power of two from 16 to 1024, 256 by default), the result echoes what it
+was built from as `returnModel`, and `traj projection model --scenario NAME`
+prints the model as JSON, a file `--return-model` reads back. A plan with no
+`volatility` is refused, because every path would be the same path.
+Add `--outcomes` to see what each path came to: its closing and lowest net
+worth, the year it was lowest and when it ran out, with the paths at the 10th,
+50th and 90th percentile, the earliest to run out and the lowest named as
+`representative` (the human form prints every path, worst first). Then
+`traj projection path --index N`, with the same flags, replays path N year by
+year: `projection run`'s result, with the same flags for the cash flow and each
+Account's value, plus the market return each Account drew in each year as
+`returns`. An index is a path's name under the seed, so it is from 0 to
+`--paths` minus 1.
+Pass `--paths` and `--seed` to `traj dashboard` to add the chance of success to the
+Dashboard, as a page of its own: it uses `plan` unless you name a
+`--return-model` file.
+
+## Tax allowances
+
+> **Ships in 0.8.0.**
+
+`traj projection allowances` reads a Scenario that has a tax Levy and says, for each
+whole tax year the Projection holds, how much more of each contribution label (RMF, ThaiESG
+and the others the Levy reads) would still lower the tax, and by how much. You name the
+labels in the order they should fill with `--labels`, and the size of one step with
+`--step`, in major units: the CLI ships no default. `--budget` caps what the extra
+contributions may add up to in a year, and `--min-saving` is the least percent of a step
+a step must save. Each suggestion comes with the contribution Flow that would apply it,
+which you add to the Scenario yourself: the command writes nothing. The figures are one
+plan's own tax rules, an estimate and not tax advice, and each fund's holding rules are
+not checked. A year that ended before the As-of, and a year the horizon cuts short, are left out; the
+current year is included, and when the As-of falls mid-year it needs `--carry-in`, the
+record of what was already contributed in that year earlier. `traj schema projection allowances`
+describes the result.
+
+## Money as decimals in a Scenario
+
+> **Ships in 0.8.0.**
+
+`traj scenario show base --decimal` prints a Scenario with each amount as a decimal string of the
+Currency's major unit, such as `"1000.00"` for 100000 satang, and
+`traj scenario apply base --file base.json --decimal` reads that form back. The stored plan is the
+same either way: saving what `show --decimal` printed leaves it unchanged. A value with more places
+than the Currency has is refused, never rounded.
+
+## A what-if, applied to the plan it came from
+
+> **Ships in 0.8.0.**
+
+`traj projection run --set` projects a change without saving it. `traj scenario apply` saves the same
+change to the stored plan, so the plan you keep is the one you projected. It takes the `--set`,
+`--without` and `--decimal` that `projection run` takes, and refuses what they would be refused for:
+
+```bash
+traj scenario apply base --set flows.salary.amount=9000000 --dry-run
+traj scenario apply base --set flows.salary.amount=9000000 --without flows.gym
+```
+
+The result names the Overrides it wrote. A change that leaves the plan as it is writes nothing and
+exits 0. `--if-hash <contentHash>` writes only when the stored plan still has that hash, as
+`traj scenario show` printed it, and refuses the write otherwise. Without `--file`, `--set` and
+`--without` never take a document, so the what-if cannot replace a plan you did not read.
+
+### Adding an item to a what-if
+
+> **Ships in 0.8.0.**
+
+`--add <list>=<json>` puts one new item on the end of `accounts`, `flows` or `milestones`, so a new
+loan, an extra payment or a new Flow can be tried before it is saved. The item carries its own `id`,
+and an `id` the list already holds is refused (`--set` is the flag that changes an item that exists).
+Every read that takes `--set` takes `--add` (`projection run`, `projection compare`, `fi`,
+`projection chance` and `projection allowances`), and `scenario fork` and `scenario apply` save it:
+
+```bash
+traj projection run --scenario base --as-of 2026-03-31 --horizon 2027-03-30 \
+  --add 'flows={"id":"extra","kind":"expense","amount":"1000.00","frequency":"monthly","start":"2026-04-01","growth":{"bps":0}}' --decimal
+traj scenario apply base --add 'flows={...}' --decimal --if-hash <contentHash>
+```
+
+The flags apply in a fixed order whatever order they are typed in: every `--without`, then every
+`--add`, then every `--set`. So a `--set` can reach an item the same command adds
+(`--add` then `--set flows.extra.amount=...`). An `--add` never replaces: one whose `list.id` the same
+call's `--without` took out is refused, and `--set <path>.<key>=<value>` changes an item field by field,
+so no field is dropped by accident and the plan saved is the plan projected. The result lists the items it added under `additions` (absent when none were), and
+`effectiveContentHash` covers them. The engine checks the document with the item in it, so a refusal names
+`--add` and the item's path (`flows.extra`) with the document path inside it. Under `--decimal` the
+item's money is a decimal string of the Currency's major unit. Nothing is written until
+`scenario apply` or `scenario fork` is run with the same flags.
+
+## Naming plans, keeping notes on them, and marking the main one
+
+> **Ships in 0.8.0.**
+
+A person who compares "retire at 55" with "retire at 60 and buy a condo" ends up with several plans.
+`traj scenario rename early retire-at-55` gives a plan a better name and keeps its id, document and
+`contentHash`. `traj scenario notes retire-at-55 --text "Sell the condo in 2031."` keeps plain text
+on it (`--file <path>` or `--file -` reads it, `--clear` removes it), and `scenario show` prints it
+back as `notes`. Notes are not part of the plan, so they never change its `contentHash`, and a
+`scenario fork` copies them unless it is given `--no-notes`.
+
+`traj scenario main retire-at-55` marks one plan as your main plan, and `scenario list` and
+`scenario show` print `main`. It is a label and not a default: `projection run` and every other read
+still need `--scenario`. `scenario rm` of the main plan is refused until another is chosen
+(`scenario main --clear` takes the mark off), or removed anyway with `--force`.
+
+## Milestones: points in the plan that a Flow waits for
+
+> **Ships in 0.8.0.**
+
+A Scenario may name points in the plan a Flow can wait for: a date, a number of months after another
+point, a net-worth or spending figure, or a multiple of spending. They are the `milestones` of the
+Scenario document, and `traj schema scenario apply` lists every key. A Flow's `startAt` lands it on
+or after a point's date, and its `endAt` before it. `traj projection run` reports each point's date,
+or that it was not reached, in a `milestones` table, and `traj projection compare` reports them under
+each side.
+
+```json
+"milestones": [
+  {
+    "id": "retire",
+    "combine": "all",
+    "criteria": [
+      { "id": "wealth", "kind": "metric", "metric": "accessibleNetWorth", "op": "atLeast", "amount": 50000000, "terms": "real" },
+      { "id": "age", "kind": "date", "on": "2045-01-01" }
+    ]
+  }
+]
+```
+
+## Where each year's money went
+
+> **Ships in 0.8.0.**
+
+`traj projection run --breakdown` adds each Annual roll-up's cash flow as the engine routed it: each
+Flow's income, the tax taken at source and each Levy's settlement (a refund is negative), each expense
+and its category, each Contribution applied and the part the cash could not fund, each planned
+withdrawal, what `cashflow.withdraw` drew and what `cashflow.surplus` filled. In JSON it is the
+`cashflow` table, one row per line. Its section totals are the `cashflowTotals` table beside it: nine rows per year,
+in the order money in, tax, withdrawals, drawn, spending, saving, not funded, left over and unmet. The `cashflowTotals` table
+and the human block come from one function (`cashflowTotalsOf`), so they cannot disagree. JSON states a zero total as `0.00`; the human block
+leaves out a zero not funded or unmet, and withdrawals, drawn or tax when its roll-up has no line of that group. In the
+human format it is one block per year, after the body:
+
+```
+cash flow 2026-03-31 to 2027-03-30 (13 rows)
+line                  amount
+money in           124500.00
+  income           120000.00
+  withdrawals        3000.00
+  drawn              1500.00
+tax                  4200.00
+spending            50700.00
+  housing           30000.00
+  food              18000.00
+  transport          1500.00
+  (uncategorised)    1200.00
+saving              64800.00
+not funded          19200.00
+left over            4800.00
+```
+
+Each total is the engine's figure, or an exact sum of the engine's own lines, so the CLI adds no figure of
+its own. In every year, money in plus `unmet` (the cash a Shortfall left unpaid) equals tax, spending,
+saving and left over: the engine routes every unit of cash. `not funded` is the part of the
+Contributions the cash could not fund; it is not in saving.
+
+## Where the money goes, and moving it between Accounts
+
+> **Ships in 0.8.0.**
+
+`cashflow` takes three more forms, every figure in them the caller's own (`traj` ships none): a surplus step's `share`, which takes that
+many basis points of what is still unrouted instead of everything (a percent string such as `"30.00"` under `--decimal`); a `withdraw` entry that is `{ account, downTo }`, which keeps a Reserve floor
+in the Account while the others are drawn; and an `upTo` or `downTo` that is `{ amount, growth }`, which keeps its value in today's money. A
+Flow of `kind: "transfer"` moves money between two of the plan's own Accounts, outside cashflow: a provident fund rolled into a locked RMF, or
+a monthly amount from savings paying a loan down. `traj schema scenario apply` describes each, and `--set` reaches a step or an entry by
+its position, so "what if I kept 100,000.00 in savings before touching the funds" is
+`traj projection run --scenario plan --set cashflow.withdraw.0.downTo=10000000`.
+
+`traj projection run` states what each did: the annual row's `transfers`, a `routing` echo of every step and entry by position,
+and with `--breakdown` the `entry` each drawn line came from and a `transfers` table (what moved and what could not); with
+`--liabilities`, `transferred` on a loan's months. The amount a target that keeps its value is worth on a later date is the engine's
+and is not stated yet. A plan without these forms prints exactly as before.
+
+## Loans
+
+> **Ships in 0.8.0.**
+
+A loan is three parts of a Scenario document: a liability Account with a nominal `rate` and a `compounding`
+period, a `withdrawal` Flow from that liability when the money arrives, and a Contribution into the
+liability whose amount is a `level` payment. `traj schema scenario apply` publishes one as its worked example.
+
+`traj projection run --liabilities` adds the engine's statement of each loan: one month row per liability
+(`opening`, `drawn`, `paid`, `interest`, `closing`) and each loan's paid-off date. The rows shown are
+one loan's months, cut from the table; it lists every liability the Scenario holds. In JSON they are the
+`liabilities` and `paidOff` tables. The human format prints one line per loan, then its months:
+
+```
+car: paid off on 2026-12-01
+liabilities (26 rows)
+account                               from        to            opening     drawn     paid  interest    closing  partial
+car                                   2026-06-01  2026-06-30       0.00  12000.00     0.00     58.00   12058.00  false
+car                                   2026-07-01  2026-07-31   12058.00      0.00  2035.15     50.44   10073.29  false
+car                                   2026-12-01  2026-12-31       9.66      0.00     9.66      0.00       0.00  false
+```
+
+The figures are the engine's: `interest` is the residual of the month, so `opening + drawn − paid + interest`
+equals `closing` exactly. Without `--liabilities` the output is unchanged.
+
+### What a fee and a payout came to over the plan
+
+> **Ships in 0.8.0.**
+
+An asset Account can pay out a share of its value as income (`payout`) and be charged a yearly `fee`.
+`traj projection run` states each one's total over the whole horizon, so nothing needs adding up: the
+engine sums them in the same run as the roll-ups (it is the sum of the `payouts` and `fees` of every
+roll-up). Two fields appear, and only when the Scenario declares the item above 0 bps (0 bps is none):
+
+- `accountLifetimes`: one `{ account, lifetimeFees?, lifetimePayouts? }` per Account that declares a fee or a payout,
+  in Scenario order. `lifetimeFees` is there when the Account carries a fee, `lifetimePayouts` when it carries a
+  payout; each is `0.00` if the Account never charged or paid.
+- `lifetimeFees`: the fees of all Accounts together, present only when an Account carries a fee.
+
+Both are money as every figure is, a decimal string at the currency's scale (`--decimal` changes what you
+write, not what is read). The human format prints the plan-wide fees on a line of their own, then each
+Account's totals as a table, and `projection path` states the same fields for a Market path:
+
+```
+Fees over the plan, all accounts: 1514.01
+
+accountLifetimes (1 row)
+account  lifetimeFees  lifetimePayouts
+fund          1514.01          4051.89
+```
+
+Without a fee or a payout the output is unchanged.
 
 ## Seeing it in a browser
 
@@ -201,6 +516,28 @@ traj doctor --as-of 2026-11-30
 traj backup --out ~/traj-backup-2026-11-30
 traj data remove --confirm ~/.traj --backup ~/traj-backup-2026-11-30
 ```
+
+### Going back after an upgrade
+
+> **Ships in 0.8.0.**
+
+When a newer `traj` has to migrate your database to a newer schema, it first copies it beside the
+original as `traj.db.pre-v<N>.bak`, where `N` is the schema version the copy holds, and says so once
+on stderr. Each copy is about the size of the database, so the upgrade needs that much free space;
+if the copy cannot be written (a full disk, a directory that is not writable) the database is not
+migrated and nothing changes. A new, empty ledger is not copied.
+
+An older `traj` refuses a database a newer one has migrated, so to go back: stop every `traj`,
+install the release you used before (the
+[releases page](https://github.com/trajectonomics/trajectonomics/releases) lists them; `traj doctor`
+on it reports the schema version it writes as `head`, which must equal `N`), delete `traj.db`,
+`traj.db-wal` and `traj.db-shm` in the data directory, and copy the `.bak` file to `traj.db`.
+Changes made after the upgrade are lost: the copy is the database as it was.
+
+`traj doctor` lists the copies as `database.preMigrationCopies`, and any half-written one a crash
+left as `database.unfinishedCopies`. `traj data remove` leaves the copies, because they are separate
+files you can delete when you no longer need them, and its refusal names them: they hold your
+data in plain text.
 
 ## Telemetry
 

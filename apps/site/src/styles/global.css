@@ -29,6 +29,8 @@
 @import "./feature-sample.css";
 @import "./faq.css";
 @import "./closing.css";
+@import "./mascot.css";
+@import "./mascot-places.css";
 @import "./footer.css";
 @import "./footer-legal.css";
 @import "./footer-facts.css";
@@ -42,6 +44,7 @@
 @import "./motion.css";
 @import "./replay.css";
 @import "./motion-app.css";
+@import "./motion-mascot.css";
 
 /*
  * Tailwind's automatic source detection reads every file it is not told to skip, and the checks' own

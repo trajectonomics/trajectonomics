@@ -1,4 +1,4 @@
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import { parseArgs } from "node:util"
 import { AGENTS, type AgentName } from "./agents"
 import { previewArgs } from "./invoke"
@@ -16,6 +16,8 @@ export interface Options {
 	readonly trajCommand: string | undefined
 	readonly timeoutMs: number
 	readonly dryRun: boolean
+	/** The results file to write, as given; undefined means `results/<release>-<agent>.md`. */
+	readonly out: string | undefined
 }
 
 /** Reads the command line; throws with a plain message when a value is missing, unknown or out of range. */
@@ -29,6 +31,7 @@ export function parseOptions(argv: readonly string[]): Options {
 			"traj-command": { type: "string" },
 			"timeout-minutes": { type: "string" },
 			"dry-run": { type: "boolean", default: false },
+			out: { type: "string" },
 		},
 		strict: true,
 		allowPositionals: false,
@@ -48,7 +51,25 @@ export function parseOptions(argv: readonly string[]): Options {
 		trajCommand: values["traj-command"],
 		timeoutMs: minutes * 60_000,
 		dryRun: values["dry-run"],
+		out: values.out,
 	}
+}
+
+/**
+ * The results file a run writes: `--out` when given (relative to the directory the command ran in),
+ * otherwise `<resultsDir>/<release>-<agent>.md`. Parallel processes pass different `--out` files so
+ * none overwrites another's.
+ */
+export function resultsPath(
+	options: Pick<Options, "out" | "agent">,
+	label: string,
+	resultsDir: string,
+): string {
+	if (options.out !== undefined) {
+		if (options.out === "") throw new Error("--out needs a file path")
+		return resolve(options.out)
+	}
+	return join(resultsDir, `${label}-${options.agent}.md`)
 }
 
 /** The personas whose ids were asked for, or all of them when no id was given; throws when none match. */
@@ -67,8 +88,10 @@ export function printPlan(
 	agent: AgentName,
 	personas: readonly Persona[],
 	runRoot: string,
+	resultsFile: string,
 ): void {
 	process.stdout.write(`release under test: ${released.argv.join(" ")} (label ${released.label})\n`)
+	process.stdout.write(`results file: ${resultsFile}\n`)
 	for (const persona of personas) {
 		process.stdout.write(`${persona.id}: ${previewArgs(agent, promptFor(persona))}\n`)
 		process.stdout.write(`  cwd ${join(runRoot, persona.id, "workspace")}\n`)

@@ -98,10 +98,11 @@ describe("the returns tally over a Return series", () => {
 
 	it("splits a withdrawal's growth at the period end it has already closed", () => {
 		// 110,000 × (3,650,000 + 1,000 × 152) / 3,650,000 = 114,580.82 → 114,581 at 2027-06-01
-		// 104,581 × (3,650,000 + 1,000 × 213) / 3,650,000 = 110,683.94 → 110,684 at 2027-12-31
+		// The 10,000 taken then leaves 100,000 of the row's start still to earn:
+		// 104,581 + 100,000 × 1,000 × 213 / 3,650,000 = 110,416.62 → 110,417 at 2027-12-31
 		const projection = withSeries(true)
 		expect(returned(projection, "2026-01-01")).toBe(10_000)
-		expect(returned(projection, "2027-01-01")).toBe(10_684)
-		expect(finalValue(projection)).toBe(110_684)
+		expect(returned(projection, "2027-01-01")).toBe(10_417)
+		expect(finalValue(projection)).toBe(110_417)
 	})
 })

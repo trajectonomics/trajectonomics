@@ -8,5 +8,12 @@
 		"allowImportingTsExtensions": false,
 		"declaration": false
 	},
-	"include": ["src", "scripts", "vite.config.ts", ".svelte-kit/ambient.d.ts"]
+	"include": [
+		"src",
+		"scripts",
+		"browser",
+		"vite.config.ts",
+		"playwright.config.ts",
+		".svelte-kit/ambient.d.ts"
+	]
 }

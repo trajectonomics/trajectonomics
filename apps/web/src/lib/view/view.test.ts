@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { toChartNumber } from "../chart"
 import { type Snapshot, snapshot as snapshotSchema } from "../contract"
 import { formatDate, formatMoney, formatMonth } from "../format"
@@ -11,7 +12,7 @@ import { parseSnapshotText } from "./parse-snapshot"
 import { parseHideAmounts, resolveTheme, serializeHideAmounts } from "./preferences"
 import { DEMO_SNAPSHOT_PATH, isDemo, SNAPSHOT_PATH, snapshotUrl } from "./snapshot-url"
 
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 const DEMO: Snapshot = snapshotSchema.parse(JSON.parse(DEMO_TEXT))
 
 function response(status: number, body: string): FetchedText {
@@ -37,7 +38,7 @@ describe("withSearch", () => {
 })
 
 describe("parseSnapshotText", () => {
-	test("accepts the committed Demo snapshot", () => {
+	test("accepts the Demo snapshot", () => {
 		expect(parseSnapshotText(DEMO_TEXT).ok).toBe(true)
 	})
 
@@ -127,7 +128,7 @@ describe("header and overview view models, on the Demo snapshot", () => {
 		const series = netWorthHistorySeries(reads)
 		const last = reads.at(-1)
 		if (!last?.ok) throw new Error("the Demo snapshot's last month-end Read must be ok")
-		const amount = last.data.totals[0]?.amount ?? ""
+		const amount = last.data.totals?.[0]?.amount ?? ""
 		expect(series.points).toHaveLength(reads.length)
 		expect(series.points.at(-1)).toEqual({
 			x: reads.length - 1,

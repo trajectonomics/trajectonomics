@@ -156,3 +156,17 @@ export const TH_LEVY_CONTRIBUTION_LABELS: readonly ThLevyContributionLabel[] = [
 	ThLevyContributionLabel.PensionLifeInsurance,
 	ThLevyContributionLabel.ThaiEsg,
 ]
+
+/**
+ * Every contribution label that is a member's own payment, read from {@link ThLevyContributionLabel}.
+ *
+ * Purpose: The labels a caller must not put on an employer's share: only the member's own money is
+ * deductible, so a Flow that is not the member's payment carries none of them. Read from the label
+ * object, so a label added there is member-only until this package says otherwise.
+ * Math: No arithmetic.
+ * Units: Dimensionless label strings.
+ * Throws: Nothing.
+ * @statute Thailand Revenue Code Section 47; Ministerial Regulations No. 126, 390.
+ */
+export const TH_LEVY_MEMBER_ONLY_LABELS: readonly ThLevyContributionLabel[] =
+	Object.values(ThLevyContributionLabel)

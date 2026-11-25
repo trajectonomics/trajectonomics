@@ -1,6 +1,12 @@
 import { describe, expect, it } from "bun:test"
+import { FULL_FUND } from "./account-fixture"
+import { FULL_ESTATE } from "./estate-fixture"
 import { scenarioExample } from "./index"
+import { FULL_MILESTONES } from "./milestone-fixture"
+import { OBJECT_PATHS } from "./object-paths"
+import { RULE_FLOWS } from "./rule-fixture"
 import { documented, PROPERTIES, refusalsOf, replaceAt, resolves, VERSION } from "./testing"
+import { TRADE_FLOWS } from "./trade-flows"
 
 /*
  * The structure the published document shape states, proved against the pinned core: every path it
@@ -16,6 +22,9 @@ const FULL: Record<string, unknown> = {
 		{ id: "pension", kind: "asset", rate: 400, lockedUntil: "2051-01-01" },
 		{ id: "gold", kind: "asset", rate: 200, returnLabel: "returns.gold" },
 		{ id: "loan", kind: "liability", rate: 500 },
+		{ id: "car-loan", kind: "liability", rate: 600, compounding: "monthly" },
+		{ id: "home", kind: "asset", rate: 0, liquid: false },
+		{ ...FULL_FUND, payout: { ...(FULL_FUND["payout"] as object), endAt: "downsize" } },
 	],
 	flows: [
 		{
@@ -39,6 +48,7 @@ const FULL: Record<string, unknown> = {
 			start: "2026-01-01",
 			end: "2046-01-01",
 			growth: { bps: 200 },
+			startAt: "retire",
 		},
 		{
 			id: "rent",
@@ -47,6 +57,7 @@ const FULL: Record<string, unknown> = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: { bps: 0 },
+			category: "housing",
 		},
 		{
 			id: "once",
@@ -64,6 +75,7 @@ const FULL: Record<string, unknown> = {
 			frequency: "monthly",
 			start: "2026-01-01",
 			growth: "inflation",
+			endAt: "downsize",
 		},
 		{
 			id: "pay",
@@ -79,11 +91,48 @@ const FULL: Record<string, unknown> = {
 			kind: "expense",
 			frequency: "monthly",
 			start: "2026-01-01",
-			derive: { measures: [{ id: "base", op: "const", value: 100 }], result: "base" },
+			derive: {
+				measures: [
+					{ id: "base", op: "const", value: 100 },
+					{ id: "worth", op: "account", account: "cash" },
+					{ id: "tenth", op: "scale", of: "base", num: 1, den: 10, rounding: "floor" },
+				],
+				result: "tenth",
+			},
+		},
+		{
+			id: "borrow",
+			kind: "withdrawal",
+			source: "loan",
+			frequency: "once",
+			start: "2026-02-01",
+			amount: 1,
+			growth: { bps: 0 },
+		},
+		{
+			id: "car",
+			kind: "contribution",
+			target: "car-loan",
+			frequency: "monthly",
+			start: "2026-01-01",
+			level: { principal: 100_000, payments: 12, rounding: "halfUp" },
+		},
+		...TRADE_FLOWS,
+		...RULE_FLOWS,
+		{
+			id: "roll",
+			kind: "transfer",
+			source: "index",
+			target: "pension",
+			realise: true,
+			amount: 1_000,
+			frequency: "once",
+			start: "2026-03-01",
+			growth: { bps: 0 },
 		},
 	],
 	cashflow: {
-		surplus: [{ account: "cash", upTo: 500_000 }, { account: "index" }],
+		surplus: [{ account: "cash", upTo: 500_000, share: 3_000 }, { account: "index" }],
 		contribute: ["index", "gold"],
 		withdraw: ["cash"],
 	},
@@ -103,25 +152,10 @@ const FULL: Record<string, unknown> = {
 			carryIn: [{ periodStart: "2025-01-01", tallies: [], prepaid: 0 }],
 		},
 	],
+	milestones: FULL_MILESTONES,
 	calendar: { dayRule: "next", holidays: ["2026-04-13"] },
+	estate: FULL_ESTATE,
 }
-
-/** Every object the schema states as closed, as a path into `FULL`, so each is probed closed. */
-const OBJECT_PATHS: (string | number)[][] = [
-	[],
-	["economy"],
-	["accounts", 0],
-	["flows", 0],
-	["flows", 0, "prepayments", 0],
-	["flows", 0, "cappedPrepayment"],
-	["flows", 6, "derive"],
-	["cashflow"],
-	["cashflow", "surplus", 0],
-	["levies", 0],
-	["levies", 0, "period"],
-	["levies", 0, "settlement"],
-	["calendar"],
-]
 
 /** The objects whose keys a Measure's own `op` decides, which the schema states as open. */
 const OPEN_OBJECTS = ["flows.*.derive.measures.*"]

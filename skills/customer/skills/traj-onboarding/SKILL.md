@@ -1,8 +1,8 @@
 ---
 name: traj-onboarding
-description: "Set up `traj`, the personal money command line, for someone starting out, or set it up again on a machine that already has a ledger: install the command line, install the skill that operates it, and start from their financial situation and their goal. Use when someone wants to get started with their money, asks to install `traj`, or tells you their financial situation and their goal while setup is not done."
+description: "Set up `traj`, the personal money command line, for someone starting out, or set it up again on a machine that already has a ledger: install the command line, install the skill that operates it, and start from their financial situation and their goal. Use when someone wants to get started tracking their money in a terminal, asks to install `traj` or the trajectonomics cli, or tells you their financial situation and their goal while setup is not done."
 metadata:
-  cli: ">=0.2.0 <0.7.0"
+  cli: ">=0.2.0 <0.8.0"
   version: "0.1.0"
 ---
 
@@ -38,11 +38,12 @@ person who has done this before is noticed before anything is installed.
   that prints is the command line. When the machine has neither, that first run of the scoped package
   fetches the binary once and caches it, so this check is also the install; it narrates the download
   on stderr, and a download line is not an error.
-- **Scope and operating skill**: `npx skills list --json` and `npx skills list -g --json`. A project
-  list that names `traj-onboarding` is this session's copy; when it does not, a global list that does
-  is, and step 2 installs into that same scope. Read the operating skill out of that one scope's list:
-  a skill named `traj`, whose `source` is the same as this one's, is the operating
-  skill, and its `path` is where you read it. A `traj` in the other scope belongs to another setup.
+- **Scope and operating skill**: `npx -y skills@1.9.0 list --json` and
+  `npx -y skills@1.9.0 list -g --json`. A project list that names `traj-onboarding` is this
+  session's copy; when it does not, a global list that does is, and step 2 installs into that same
+  scope. Read the operating skill out of that one scope's list: a skill named `traj`, whose `source`
+  is the same as this one's, is the operating skill, and its `path` is where you read it. A `traj` in
+  the other scope belongs to another setup.
 
 When the two install checks pass and step 3 has ended — its question answered by the person directly
 or grounded in the Ledger File they already have, or, where the read failed, that failure reported and
@@ -96,21 +97,32 @@ npx skills add trajectonomics/trajectonomics/skills/customer --skill traj-onboar
 That is the command the Site prints. What this step installs is the published set, at the commit this
 copy came from.
 
-**Find the pin.** `skills@1.9.0` records, in `skills-lock.json`, the `commit` it installed this
-skill from. Read this skill's own entry and that `commit`: everything below installs from it. When
-that entry's `source` is `trajectonomics/skills`, this copy predates the move to this source and its
-`commit` does not exist here: run the command above again, with this skill's own scope, and read the
-new entry. Never install from `main`:
+**Find the pin.** Read this skill's own entry, `traj-onboarding`, in the lock of the scope the list
+named: `./skills-lock.json` for the project; for global, `${XDG_STATE_HOME}/skills/.skill-lock.json`
+when `XDG_STATE_HOME` is set and `~/.agents/.skill-lock.json` when it is not. The entry's `commit` is
+the pin, and everything below installs from it. `skills@1.9.0` writes a `commit`; `skills@1.7.6` and
+older write none, and the list reports none, so the lock is the only place it is read. When the entry
+has no `commit`, or its `source` is `trajectonomics/skills` (this copy predates the move to this
+source, and its `commit` does not exist here), run the command above once more as
+`npx -y skills@1.9.0 add …`, with this skill's own scope and `-y`, and read the entry again: it now
+carries the `commit` that run installed. That run may also have installed a newer `traj-onboarding`
+than the copy you are following: read this skill again at the `path` the list reports, and follow
+that copy. A `commit` comes from the lock and from nowhere else. When the entry still has none,
+report that setup stopped here, with the entry's `source` and its hash (`computedHash` in a project
+lock, `skillFolderHash` in a global one), and install nothing else. Say what the person can do:
+`skills@1.9.0` needs Node 22.20 or later, and they can run `npx -y skills@1.9.0 add … -y`
+themselves, then run setup again. Treat it as a failed step (see below). Never install from `main`:
 a branch moves, and a person's setup must not.
 
 **Read the set at that commit.** Fetch `skills.manifest.json` from `skills/customer` in `trajectonomics/trajectonomics` at the
 pinned commit. It lists every published skill, its directory and the CLI Range it expects, in install
 order. Install each row in this skill's scope — add `-g` when the project list did not name
 `traj-onboarding` and the global list did, and no flag otherwise — with an explicit `--skill` per
-row, from the pin:
+row, from the pin. Every `skills` call this skill makes is `npx -y skills@1.9.0 …`: a `skills` that
+resolves to 1.7.6 refuses the version 2 lock that 1.9.0 writes, and no row would install.
 
 ```bash
-npx skills add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name>
+npx -y skills@1.9.0 add trajectonomics/trajectonomics/skills/customer#<commit> --skill <name>
 ```
 
 Install a row when the command line is at or above its CLI Range floor, the range's lower bound,
@@ -122,8 +134,8 @@ commands from `traj schema`. When the manifest cannot be read, install `traj` al
 say in one plain sentence that the rest of the set could not be read, so nobody is left without the
 contract.
 
-Done when that same scope's list names every row you installed, `traj` among them, and you hold the
-`path` each one reported.
+Done when that same scope's list names every row you installed, `traj` among them, you hold the
+`path` each one reported, and you hold the `commit` they installed from.
 
 ## Step 3: Ask once, then hand over
 
@@ -171,10 +183,8 @@ document. Then report what it found before you ask anything, in one of three way
   already be recorded there.
 
 **No ledger file yet.** Ask the person two things in one question: their financial situation, and
-their goal. **Enter a debt as a negative opening balance**, so that borrowing lowers net worth
-instead of raising it; from 0.3.0 the command line refuses a positive opening on a liability, and below 0.3.0 a debt
-recorded the obvious way reads as a gain. Then read the `traj` skill at the `path` the list command reported, and
-follow it for the rest of this conversation.
+their goal. Then read the `traj` skill at the `path` the list command reported, and follow it for the
+rest of this conversation.
 
 Tell them, in every open, that a new session loads that skill by itself whenever they talk about their
 money, and that another machine needs setup once.
@@ -182,14 +192,14 @@ money, and that another machine needs setup once.
 Done when their answer is in hand — given directly, or confirmed against the Ledger File — or, where
 the read failed, the failure has been reported and the conversation handed over; a below-floor command
 line has been disclosed where one exists, as has a skill whose range the command line has passed; and
-the operating skill is running the conversation.
+the operating skill is running the conversation, with what was installed named.
 
 ## If a step fails
 
-When a step cannot finish — the download of the command line, an install of a row, or the read in
-step 3 — report what failed in the command line's own words. Then offer once: "If you want the project
-to hear what got in the way, I can draft a GitHub issue for you to read and send yourself. Nothing is
-sent unless you send it." Setup does not wait for the answer.
+When a step cannot finish — the download of the command line, the pin in step 2, an install of a
+row, or the read in step 3 — report what failed in the command line's own words. Then offer once:
+"If you want the project to hear what got in the way, I can draft a GitHub issue for you to read and
+send yourself. Nothing is sent unless you send it." Setup does not wait for the answer.
 
 When they accept, draft the issue on the project's "I tried traj and stopped" form, the issue template
 `tried-and-stopped.yml` at `https://github.com/trajectonomics/trajectonomics/issues/new?template=tried-and-stopped.yml`:
@@ -202,6 +212,12 @@ in this conversation.
 
 Tell them, once, before the handover:
 
+- **What was installed.** Name it in one short paragraph from what you hold, so they can say which
+  set they run when they come back: the `commit` from step 2 as the skills' version, the rows you
+  installed (and any you skipped, with the range each wanted), the `traj --version` that printed, and
+  the CLI Range this skill's own frontmatter `cli` states, which is the range of command lines it
+  expects. The `commit` is the set's version: the version in this skill's frontmatter is this
+  skill's own, and is not the set's. Name nothing you did not read, and no number from memory.
 - **Where the data lives.** Everything is in `~/.traj`, and `TRAJ_HOME` moves it. The ledger never
   leaves this machine: its figures, accounts and documents are computed and kept here, and no command
   sends them anywhere. Setup itself reaches the network twice, and only twice — the binary download,

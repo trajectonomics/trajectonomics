@@ -13,6 +13,26 @@ const net = {
 	],
 }
 
+describe("lineLayout: a second line under the x labels", () => {
+	const aged = {
+		name: "Net worth",
+		points: [
+			{ x: 0, xLabel: "2027", subLabel: "age 37", y: 100, display: "100.00" },
+			{ x: 1, xLabel: "2028", y: 300, display: "300.00" },
+		],
+	}
+
+	test("carries a point's sub label onto its tick, and only that tick", () => {
+		const layout = lineLayout([aged], PLOT)
+		expect(layout?.xTicks.map((tick) => tick.sub)).toEqual(["age 37", undefined])
+	})
+
+	test("leaves every tick without one when no point has one", () => {
+		const layout = lineLayout([net], PLOT)
+		expect(layout?.xTicks.every((tick) => !("sub" in tick))).toBe(true)
+	})
+})
+
 describe("lineLayout", () => {
 	test("is null for a chart with no points", () => {
 		expect(lineLayout([{ name: "none", points: [] }], PLOT)).toBeNull()
@@ -56,6 +76,33 @@ describe("lineLayout", () => {
 		const layout = lineLayout([{ name: "long", points: many }], PLOT)
 		expect(layout?.xTicks[0]).toEqual({ index: 0, label: "m0" })
 		expect(layout?.xTicks.length).toBeLessThanOrEqual(7)
+	})
+})
+
+describe("x labels", () => {
+	test("a label too close to the one before it is left out, so a part year beside its neighbour stays readable", () => {
+		const point = (x: number, label: string) => ({ x, xLabel: label, y: 1, display: "1.00" })
+		const layout = lineLayout(
+			[{ name: "A", points: [point(0, "30 Oct"), point(10, "31 Dec"), point(400, "30 Oct next")] }],
+			PLOT,
+		)
+		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["30 Oct", "30 Oct next"])
+	})
+
+	test("the last label, which ends at the edge, needs more room than the others", () => {
+		const point = (x: number, label: string) => ({ x, xLabel: label, y: 1, display: "1.00" })
+		const layout = lineLayout(
+			[{ name: "A", points: [point(0, "a"), point(700, "b"), point(780, "last")] }],
+			{ ...PLOT, width: 900 },
+		)
+		// "last" is 86px from "b": room enough for a label in the middle, not for one against the edge.
+		expect(layout?.xTicks.map((tick) => tick.label)).toEqual(["a", "b"])
+	})
+
+	test("a chart of many series asks for the wide palette", () => {
+		const series = [{ name: "A", points: [{ x: 0, xLabel: "0", y: 1, display: "1.00" }] }]
+		expect(lineLayout(series, PLOT, [], "wide")?.palette).toBe("wide")
+		expect(lineLayout(series, PLOT)?.palette).toBeUndefined()
 	})
 })
 

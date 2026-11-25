@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
-
+import { demoSnapshotJson } from "../../../../scripts/demo-snapshot"
 import { type Snapshot, snapshot } from "../../contract"
 import { snapshotFacts } from "./snapshot-facts"
 
-const DEMO = await Bun.file(`${import.meta.dir}/../../../../public/demo/snapshot.json`).json()
+const DEMO = await demoSnapshotJson()
 const demo: Snapshot = snapshot.parse(DEMO)
 
 function valueAt(facts: ReturnType<typeof snapshotFacts>, label: string): string | undefined {
@@ -14,7 +14,7 @@ describe("snapshotFacts", () => {
 	test("states the As-of and horizon the Snapshot was planned from", () => {
 		const facts = snapshotFacts(demo)
 		expect(valueAt(facts, "As-of")).toBe("31 Oct 2026")
-		expect(valueAt(facts, "Horizon")).toBe("31 Dec 2060")
+		expect(valueAt(facts, "Horizon")).toBe("31 Dec 2053")
 	})
 
 	test("names the Scenarios and the compared pair", () => {

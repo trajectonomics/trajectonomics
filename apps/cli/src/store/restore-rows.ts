@@ -15,9 +15,23 @@ function unsupportedCurrency(rows: RestoreRows): AppError | null {
 	return null
 }
 
+/** The second Scenario marked as the main plan: a ledger has one (cli ADR-0071). */
+function secondMain(rows: RestoreRows): AppError | null {
+	const marked = rows.scenario.flatMap((row, index) => (row.main ? [index] : []))
+	const [, second] = marked
+	if (second === undefined) return null
+	const path = `scenario.${second}.main`
+	return fail("invalid_input", {
+		path,
+		message: `${path}: a ledger has one main plan`,
+		details: { indexes: marked },
+	})
+}
+
 /**
  * The restore's own shape rules, checked before any write: exactly one entity, the personal one,
- * every account, transaction and scenario owned by it, and THB as the only currency.
+ * every account, transaction and scenario owned by it, THB as the only currency, and at most one
+ * main plan.
  */
 export function checkRows(entityId: string, rows: RestoreRows): AppError | null {
 	const [entity, ...more] = rows.entity
@@ -38,5 +52,5 @@ export function checkRows(entityId: string, rows: RestoreRows): AppError | null 
 			message: `${path}: must be the personal entity ${entityId}`,
 		})
 	}
-	return unsupportedCurrency(rows)
+	return unsupportedCurrency(rows) ?? secondMain(rows)
 }

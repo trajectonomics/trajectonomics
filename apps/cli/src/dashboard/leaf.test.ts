@@ -20,9 +20,20 @@ const SNAPSHOT = {
 		baseline: single("baseline"),
 		scenarios: single("scenario"),
 		netWorthHistory: [read(["report", "networth", "--json"], true)],
-		projections: { base: read(["projection", "run", "--scenario", "base", "--json"], false) },
+		projections: {
+			base: read(
+				["projection", "run", "--scenario", "base", "--breakdown", "--liabilities", "--json"],
+				false,
+			),
+			// A Scenario with a Milestone, so the Snapshot's reads carry the milestones table (cli ADR-0049).
+			milestoned: read(["projection", "run", "--scenario", "milestoned", "--json"], true),
+		},
 		fi: { ok: read(["fi", "--scenario", "ok", "--json"], true) },
 		compare: null,
+		chance: {},
+		allowances: {},
+		paths: {},
+		documents: {},
 	},
 } as unknown as Snapshot
 
@@ -59,8 +70,8 @@ describe("traj dashboard", () => {
 			url: "http://127.0.0.1:4321/",
 			asOf: "2026-11-30",
 			horizon: "2056-11-30",
-			reads: 11,
-			failedReads: ["traj projection run --scenario base --json"],
+			reads: 12,
+			failedReads: ["traj projection run --scenario base --breakdown --liabilities --json"],
 		})
 		expect(calls[0]?.port).toBe(DEFAULT_PORT)
 		expect(calls[0]?.params.compare).toBeNull()
@@ -133,5 +144,34 @@ describe("traj dashboard", () => {
 			path: "--port",
 			message: "In use.",
 		})
+	})
+})
+
+describe("traj dashboard chance flags (cli ADR-0068)", () => {
+	const chance = (extra: string[]) => ["dashboard", ...DATES, ...extra, "--json"]
+	const SEED = ["--paths", "200", "--seed", "0123456789abcdef"]
+
+	it("uses the plan's own Return model when --paths and --seed come without --return-model", async () => {
+		const { root, calls } = harness(SERVED)
+		await capture(chance(SEED), {}, root)
+		expect(calls[0]?.params.chance).toEqual({
+			returnModel: "plan",
+			paths: 200,
+			seed: "0123456789abcdef",
+		})
+	})
+
+	it("lets a Return model file win when it is given", async () => {
+		const { root, calls } = harness(SERVED)
+		await capture(chance([...SEED, "--return-model", "model.json"]), {}, root)
+		expect(calls[0]?.params.chance?.returnModel).toBe("model.json")
+	})
+
+	it("keeps the chance off with no flag, and still refuses a lone --paths", async () => {
+		const { root, calls } = harness(SERVED)
+		await capture(chance([]), {}, root)
+		expect(calls[0]?.params.chance).toBeNull()
+		const res = await capture(chance(["--paths", "200"]), {}, root)
+		expect(errorOf(res)).toMatchObject({ code: "invalid_input" })
 	})
 })

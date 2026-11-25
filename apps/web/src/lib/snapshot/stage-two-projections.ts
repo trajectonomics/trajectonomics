@@ -2,7 +2,7 @@ import type { PlanParams } from "./params"
 import type { PlannedRead } from "./planned"
 
 /** The flags every projection-shaped read takes: the dates, the horizon and the Carry-in. */
-function projectionFlags(params: PlanParams): string[] {
+export function projectionFlags(params: PlanParams): string[] {
 	const carry = params.carryIn ? ["--carry-in", "-"] : []
 	return ["--as-of", params.asOf, "--horizon", params.horizon, ...carry]
 }
@@ -11,12 +11,12 @@ function projectionFlags(params: PlanParams): string[] {
  * A Scenario name as one `--scenario=NAME` token. A name is the caller's or the ledger's, so it never
  * stands alone as a token: one that starts with a dash would otherwise be read as a flag.
  */
-function scenarioFlag(name: string): string {
+export function scenarioFlag(name: string): string {
 	return `--scenario=${name}`
 }
 
 /** One planned read per Scenario name, each taking that Scenario's Carry-in when the caller gave one. */
-function perScenario(
+export function perScenario(
 	params: PlanParams,
 	names: string[],
 	argvFor: (name: string) => string[],
@@ -29,7 +29,16 @@ function perScenario(
 	)
 }
 
-/** One `projection run` per Scenario, with the monthly rows when asked. */
+/**
+ * One `projection run` per Scenario, with the monthly rows when asked. Every run takes `--breakdown`, so
+ * the Cash flow page has each year's lines and section totals (cli ADR-0058, addendum), and
+ * `--liabilities` for the loans' statements (cli ADR 0059): the planner's loan cards show the schedule and
+ * the paid-off date from those rows, so the page computes none of them. `--accounts` adds each Account's value
+ * (cli ADR 0060), which the real-asset cards chart, and `--spending` states each Rule year of a spending rule
+ * (cli ADR 0063), which the Withdrawals page reads: a plan with no rule gets an empty table. `--estate` states what
+ * heirs would receive on each roll-up end and each settlement cost and gift (cli ADR 0064), which the Estate page reads:
+ * a plan with no estate block still gets the tables, with its gross estate less its debts.
+ */
 export function planProjections(params: PlanParams, names: string[]): Record<string, PlannedRead> {
 	const monthly = params.monthly ? ["--monthly"] : []
 	return perScenario(params, names, (name) => [
@@ -38,8 +47,27 @@ export function planProjections(params: PlanParams, names: string[]): Record<str
 		scenarioFlag(name),
 		...projectionFlags(params),
 		...monthly,
+		"--breakdown",
+		"--liabilities",
+		"--accounts",
+		"--spending",
+		"--estate",
 		"--json",
 	])
+}
+
+/**
+ * One `scenario show --decimal` per Scenario: the document the planner pages edit, in the form where
+ * money is a decimal string. The name follows the flags, after `--`, so a name that starts with a dash
+ * is still read as a name.
+ */
+export function planDocuments(names: string[]): Record<string, PlannedRead> {
+	return Object.fromEntries(
+		names.map((name): [string, PlannedRead] => [
+			name,
+			{ argv: ["scenario", "show", "--decimal", "--json", "--", name], carryInFor: [] },
+		]),
+	)
 }
 
 /** One `fi` per Scenario. */
@@ -48,6 +76,28 @@ export function planFi(params: PlanParams, names: string[]): Record<string, Plan
 		"fi",
 		scenarioFlag(name),
 		...projectionFlags(params),
+		"--json",
+	])
+}
+
+/**
+ * One `projection chance` per Scenario, when the caller stated a Return model. The model is read from its
+ * file by the CLI, so only its path is in the argv; the Carry-in goes on standard input, as for a run. It asks for
+ * `--outcomes` unless the parameters leave the futures out, so the Chance page can list every Market path (web ADR 0020).
+ */
+export function planChance(params: PlanParams, names: string[]): Record<string, PlannedRead> {
+	const chance = params.chance
+	if (chance === null) return {}
+	const outcomes = params.futures ? ["--outcomes"] : []
+	return perScenario(params, names, (name) => [
+		"projection",
+		"chance",
+		scenarioFlag(name),
+		...projectionFlags(params),
+		`--return-model=${chance.returnModel}`,
+		`--paths=${chance.paths}`,
+		`--seed=${chance.seed}`,
+		...outcomes,
 		"--json",
 	])
 }

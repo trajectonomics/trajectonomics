@@ -15,6 +15,7 @@ import ChatMessage from "./ChatMessage.astro"
 import Arrow from "./icons/Arrow.astro"
 import Check from "./icons/Check.astro"
 import Cross from "./icons/Cross.astro"
+import Mascot from "./Mascot.astro"
 
 interface Props {
 	readonly dictionary: Dictionary
@@ -171,6 +172,8 @@ const keys = (prompt: typeof typed.with, chars: number) =>
 					</ol>
 				</div>
 				<p class="app-verdict text-foreground" data-tone="good" style={`--step-delay:${guided.totalMs}ms`}>
+					{/* The Mascot waves over the verdict's hairline once traj's answer lands, so it arrives with it (ADR 0028). */}
+					<Mascot pose="hello" class="mascot-hello" />
 					{dictionary.actionWithNote}
 				</p>
 				<div class="app-composer" aria-hidden="true" style={keys(typed.with, [...skilled].length)}>

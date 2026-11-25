@@ -1,4 +1,5 @@
 import { countedDays } from "../calendar/counted"
+import { leftOutOfAccessible } from "../engine/accessible"
 import { isSafeInteger, overflow } from "../engine/overflow"
 import type { EngineSnapshot } from "../engine/snapshot"
 import { deflate } from "../money/growth"
@@ -55,9 +56,7 @@ export function realValues(
 		const rule = rules.get(balance.account)
 		const signed = rule?.kind === "liability" ? -amount : amount
 		net += signed
-		const unlocked =
-			rule?.kind !== "asset" || rule.lockedUntil === undefined || snapshot.date >= rule.lockedUntil
-		if (unlocked) accessible += signed
+		if (!leftOutOfAccessible(rule, snapshot.date)) accessible += signed
 	}
 	if (!isSafeInteger(net) || !isSafeInteger(accessible)) {
 		return { values: undefined, problem: overflow(snapshot.date) }

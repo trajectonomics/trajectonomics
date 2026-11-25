@@ -150,7 +150,7 @@ describe("scenario apply --template", () => {
 		})
 	})
 
-	it("leaves another refusal's message and gives it no hint", async () => {
+	it("leaves another refusal's message and gives it the schema hint too", async () => {
 		const home = scenarioHome()
 		const cases: [unknown, string, string][] = [
 			[
@@ -169,7 +169,7 @@ describe("scenario apply --template", () => {
 			expect(res.code).toBe(2)
 			const error = errorOf(res)
 			expect(error.message).toBe(`${path}: ${code}`)
-			expect(error.hint).toBeUndefined()
+			expect(error.hint).toBe(SCHEMA_HINT)
 		}
 	})
 
@@ -178,7 +178,7 @@ describe("scenario apply --template", () => {
 		expect(help.code).toBe(0)
 		expect(help.out.split("\n").filter((line) => line.startsWith("Usage:"))).toEqual([
 			"Usage: traj scenario apply [options] [name]",
-			"Usage: traj scenario apply <name> --file <file|-> [--dry-run]",
+			"Usage: traj scenario apply <name> --file <file|-> [--dry-run] [--decimal] [--if-hash <string>]",
 		])
 		expect(help.out).toContain("--template")
 		expect(help.out).toContain("traj scenario apply --template")

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { join } from "node:path"
 import { goldenStore } from "../interchange/testing"
+import { LOADED_MACHINE_MS } from "../test-timeouts"
 import { ledgerHome, must, mustOpen } from "./testing"
 
 const WRITER = join(import.meta.dir, "concurrent-writer.fixture.ts")
@@ -67,34 +68,41 @@ describe("dump", () => {
 		})
 	})
 
-	it("cannot see a posting whose transaction is missing while another process writes", async () => {
-		const home = ledgerHome()
-		const setup = mustOpen(home)
-		must(setup.createAccount({ name: "Cash", type: "asset", currency: "THB" }))
-		must(setup.createAccount({ name: "Food", type: "expense", currency: "THB" }))
-		setup.close()
+	it(
+		"cannot see a posting whose transaction is missing while another process writes",
+		async () => {
+			const home = ledgerHome()
+			const setup = mustOpen(home)
+			must(setup.createAccount({ name: "Cash", type: "asset", currency: "THB" }))
+			must(setup.createAccount({ name: "Food", type: "expense", currency: "THB" }))
+			setup.close()
 
-		const store = mustOpen(home)
-		const writer = Bun.spawn([process.execPath, WRITER, home, "0", "2000"], {
-			stdout: "pipe",
-			stderr: "pipe",
-		})
-		let dumps = 0
-		let orphan: string | null = null
-		while (writer.exitCode === null) {
-			const dump = must(store.dump())
-			dumps += 1
-			const known = new Set(dump.tx.map((row) => row.id))
-			const missing = dump.posting.find((row) => !known.has(row.txId))
-			if (missing) orphan = `${missing.txId}#${missing.ordinal}`
-			await Bun.sleep(0)
-		}
-		const [code, err] = await Promise.all([writer.exited, new Response(writer.stderr).text()])
-		expect({ code, err }).toEqual({ code: 0, err: "" })
-		expect(orphan).toBeNull()
-		expect(dumps).toBeGreaterThan(10)
-		store.close()
-	}, 30_000)
+			const store = mustOpen(home)
+			const writer = Bun.spawn(
+				[process.execPath, WRITER, home, "0", "2000", String(LOADED_MACHINE_MS)],
+				{
+					stdout: "pipe",
+					stderr: "pipe",
+				},
+			)
+			let dumps = 0
+			let orphan: string | null = null
+			while (writer.exitCode === null) {
+				const dump = must(store.dump())
+				dumps += 1
+				const known = new Set(dump.tx.map((row) => row.id))
+				const missing = dump.posting.find((row) => !known.has(row.txId))
+				if (missing) orphan = `${missing.txId}#${missing.ordinal}`
+				await Bun.sleep(0)
+			}
+			const [code, err] = await Promise.all([writer.exited, new Response(writer.stderr).text()])
+			expect({ code, err }).toEqual({ code: 0, err: "" })
+			expect(orphan).toBeNull()
+			expect(dumps).toBeGreaterThan(10)
+			store.close()
+		},
+		LOADED_MACHINE_MS,
+	)
 
 	it("counts every table's rows, tombstones included, in one statement", async () => {
 		const store = await goldenStore()

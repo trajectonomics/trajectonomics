@@ -1,8 +1,8 @@
 ---
 name: traj-plan
-description: "Answer planning questions with `traj`, the personal money command line: when someone can stop working, what a purchase or a raise would change, what their plan looks like at a horizon they name, and what their Thai income tax comes to for a tax year and what a deduction would change. Use when someone asks about financial independence, retiring early, a projection, a what-if, a savings plan, whether their money lasts, or Thai income tax."
+description: "Work out when someone can stop working, or reach financial independence, from their own money with `traj`, the personal money command line: project their net worth to a date they name, show what a purchase or a raise would change, and estimate what their Thai income tax comes to for a tax year and what one deduction (RMF, ThaiESG, an allowance) would change. Use when someone asks when they can stop working or retire, how much Thai income tax they will owe, what an RMF contribution would save them in tax, what their net worth will be next year, for a projection or a what-if on their money, or whether their money lasts. It estimates; it never prepares, files or checks a tax return."
 metadata:
-  cli: ">=0.3.0 <0.7.0"
+  cli: ">=0.3.0 <0.8.0"
 ---
 
 # traj-plan
@@ -38,6 +38,16 @@ its own so the baseline stays untouched.
 The plan's baseline is the person's ledger, so a balance the tool refuses as undeclared means the
 Scenario does not carry that account yet: declare the account the ledger already has, rather than
 renaming or dropping it.
+
+## Name every fork, and offer to remove it
+
+Every fork this conversation makes (the Tax Baseline, a what-if) is named `<scenario>-<question>`: the
+Scenario it came from, then a short slug of the question it answers, such as `base-tax-baseline` or
+`base-rmf-50000`. Run `traj scenario list --json` first and pick a name no live Scenario holds, so a
+second question never collides with the first. Keep a list of the names you made.
+
+When the answers are given, offer to remove those forks with `traj scenario rm <name>`, naming each.
+Remove one only on the person's yes, and only a name on your list: the person's own Scenarios stay.
 
 ## Step 1: the financial-independence date
 
@@ -116,6 +126,12 @@ baseline stays untouched. Then write the Levy to that fork: run `traj scenario t
 with the flags for the facts the person gave, and one
 `--label <flow>=<label>` for each classified Flow. Dry-run it with `--dry-run` first, then write it.
 
+This fork is the **Tax Baseline**: the one Scenario every tax comparison in this conversation starts
+from, because its Levy was written by the `traj` in front of you. A Levy stored in an earlier session
+may have been written by an older release under older rules, and nothing in `traj schema` or the
+Scenario's document says which. Run Steps T1 and T2 even when the Scenario already carries a Levy, and
+never run Step T3 or T4 against a Levy this conversation did not write.
+
 The result's `allowances` lists what the flags stated, and what the figure leaves out. Report the
 classes it leaves out, by the names the tool printed, as the figure's "not modelled" list.
 
@@ -136,19 +152,25 @@ Done when the year's `owed` is reported with its dates and the disclosures.
 
 ### Step T4: what one deduction changes
 
+Both sides of the comparison carry a Levy this conversation wrote, so one set of rules taxes both.
+`<name>` is the Tax Baseline from Step T2.
+
 There are two ways to show a deduction, one for each kind:
 
-- **A deduction the `scenario tax` flags state.** Fork the baseline into a what-if of its own, write
-  its Levy again with that one flag changed, and compare:
-  `traj scenario fork <baseline> <what-if>`, then `traj scenario tax <what-if> --tax th-2026` with the
-  same flags and that one change, then
-  `traj projection compare <baseline> <what-if> --as-of <as-of> --horizon <horizon> --json`.
+- **A deduction the `scenario tax` flags state.** Fork the Tax Baseline into a what-if of its own,
+  write its Levy again with that one flag changed, and compare:
+  `traj scenario fork <name> <what-if>`, then `traj scenario tax <what-if> --tax th-2026` with the
+  same flags and labels as Step T2 and that one change, then
+  `traj projection compare <name> <what-if> --as-of <as-of> --horizon <horizon> --json`.
 - **A retirement or ThaiESG contribution.** These are contribution Flows, classified in Step T1, and no
-  flag states them. Keep one contribution Flow of that class in the baseline at amount zero, then
+  flag states them. Keep one contribution Flow of that class in the Tax Baseline at amount zero, then
   compare with `--set`, which replaces that Flow's amount:
   `traj projection compare <name> --as-of <as-of> --horizon <horizon> --set flows.<id>.amount=<satang> --json`.
   `--set` replaces a path that exists and cannot add one, so when the Scenario has no such Flow, add
-  it to the document first and then compare. Amounts are integer satang: 100 THB is 10000 satang.
+  it to the document first. Step T2's `--label` never covered that Flow, so write the Tax Baseline's
+  Levy again before comparing: `traj scenario tax <name> --tax th-2026` with the same flags and labels
+  as Step T2 plus `--label <flow>=<label>`, the class the person chose in Step T1. Compare only after
+  that. Amounts are integer satang: 100 THB is 10000 satang.
 
 Read the result. Its `deltas` carry net worth and financial-independence timing; they do not carry tax
 owed. Report each side's `owed` figure for tax year 2026, from that side's `taxYears`, side by side, as

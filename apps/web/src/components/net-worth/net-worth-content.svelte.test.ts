@@ -35,13 +35,15 @@ describe("NetWorthContent: the headline and the composition", () => {
 		)
 	})
 
-	test("divides the assets by account and lists the liabilities as the CLI states them", () => {
+	test("divides the assets by account and reads a negative liability as what you owe", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), main)) },
 		})
 		expect(body).toContain('aria-label="Assets by account, THB"')
-		expect(body).toContain("−200.00")
-		expect(body).toContain("Liabilities, shown negative as the ledger states them")
+		expect(body).toContain("You owe")
+		expect(body).toContain("200.00")
+		expect(body).toContain('title="The ledger states −200.00 THB"')
+		expect(body).not.toContain("as the ledger states them")
 	})
 
 	test("gives every row of the report in a table with its account, type and amount", () => {
@@ -86,6 +88,20 @@ describe("NetWorthContent: the history", () => {
 		]
 		const { body } = render(NetWorthContent, { props: { view: pageView(headline, reads) } })
 		expect(body).toContain("The history uses 1 month-end read, from Sep 2026 to Sep 2026.")
+	})
+
+	test("says in plain words when the history starts later than the ledger's first entry, and not otherwise", () => {
+		const reads: Read<NetWorth>[] = [
+			okRead(argv("2026-09-30"), netWorth("2026-09-30", [], THB("700.00"))),
+		]
+		const cut =
+			"The ledger's first entry is in Jan 2010, but the chart shows only the latest 120 month-ends."
+		const cutBody = render(NetWorthContent, {
+			props: { view: pageView(headline, reads, cut) },
+		}).body
+		expect(cutBody).toContain(cut)
+		const whole = render(NetWorthContent, { props: { view: pageView(headline, reads) } }).body
+		expect(whole).not.toContain("first entry is in")
 	})
 
 	test("handles an empty history and an empty ledger", () => {

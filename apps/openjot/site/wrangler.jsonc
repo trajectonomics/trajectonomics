@@ -1,0 +1,40 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  // openjot.trajectonomics.com: the landing page; moojot.trajectonomics.com redirects to it
+  // (except /ingest, see release.js). See site/README.md.
+  "name": "moojot-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "openjot.trajectonomics.com", "custom_domain": true },
+    { "pattern": "moojot.trajectonomics.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // The two pages run the Worker so the old host can redirect them (see release.js),
+    // which costs one Worker request per page view. Every other path is a static file
+    // and never wakes the script.
+    "run_worker_first": [
+      "/",
+      "/meowjot-alternative",
+      "/download",
+      "/download/*",
+      "/go",
+      "/go/*",
+      "/api/*",
+      "/ingest/*"
+    ],
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  // PostHog project for analytics (EU Cloud). See tracking.js. The key is public by
+  // design: it can only send events. Keep it in sync with public/analytics.js and
+  // src/lib/analytics.ts (site/tracking.test.js checks the first).
+  "vars": {
+    "POSTHOG_KEY": "phc_uNb2thEMk4Rh7HrKRaThNsxSwFGxta4gnV5dxBcH5T9n",
+    "POSTHOG_REGION": "eu"
+  },
+  "observability": { "enabled": true }
+}

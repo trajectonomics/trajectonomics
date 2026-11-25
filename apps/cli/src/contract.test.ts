@@ -1,14 +1,15 @@
 import { describe, expect, it } from "bun:test"
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { z } from "zod"
 import { defineCommand, defineGroup } from "./command"
+import { commandTriggers } from "./command-triggers.test-support"
 import { type ErrorCode, isAppError, registry } from "./errors"
 import { FIXTURE_AS_OF, fixtureHome } from "./ledger-fixture"
 import { type StoreRaised, storeTriggers } from "./store/store-triggers"
 import { ledgerHome, SCENARIO_DOCUMENT, tempHome } from "./store/testing"
 import type { Trigger } from "./store/trigger-setup"
+import { makeTempDir } from "./temp-dir"
 import { type Captured, capture } from "./test-support"
 import { throwingRoot } from "./test-tree"
 
@@ -59,56 +60,9 @@ describe("contract", () => {
 		not_found: () => capture(["account", "show", "Nope", "--json"], { TRAJ_HOME: fixtureHome() }),
 		// The one code raised before a connection exists: a read against a home with no ledger.
 		ledger_missing: () => capture(["account", "list", "--json"], { TRAJ_HOME: tempHome() }),
-		liability_opening_positive: async () => {
-			const home = ledgerHome()
-			for (const [name, type] of [
-				["Opening", "equity"],
-				["Loan", "liability"],
-			] as const) {
-				await capture(["account", "add", name, "--type", type, "--currency", "THB", "--json"], {
-					TRAJ_HOME: home,
-				})
-			}
-			return capture(
-				[
-					"tx",
-					"add",
-					"--opening",
-					"--from",
-					"Opening",
-					"--to",
-					"Loan",
-					"--amount",
-					"300000.00",
-					"--date",
-					"2026-11-01",
-					"--json",
-				],
-				{ TRAJ_HOME: home },
-			)
-		},
-		same_account: async () => {
-			const home = ledgerHome()
-			await capture(["account", "add", "Cash", "--type", "asset", "--currency", "THB", "--json"], {
-				TRAJ_HOME: home,
-			})
-			return capture(
-				[
-					"tx",
-					"add",
-					"--from",
-					"Cash",
-					"--to",
-					"Cash",
-					"--amount",
-					"5.00",
-					"--date",
-					"2026-11-22",
-					"--json",
-				],
-				{ TRAJ_HOME: home },
-			)
-		},
+		// A development build, which every test run is, with no TRAJ_HOME: the guard refuses (ADR-0053).
+		default_home_refused: () => capture(["account", "list", "--json"], {}),
+		...commandTriggers,
 		projection_refused: async () => {
 			const home = fixtureHome()
 			await capture(
@@ -133,26 +87,26 @@ describe("contract", () => {
 			)
 		},
 		output_exists: async () => {
-			const out = join(mkdtempSync(join(tmpdir(), "traj-test-")), "out")
+			const out = join(makeTempDir("traj-test-"), "out")
 			mkdirSync(out)
 			const home = fixtureHome()
 			return capture(["export", "--out", out, "--json"], { TRAJ_HOME: home })
 		},
 		export_failed: async () => {
-			const file = join(mkdtempSync(join(tmpdir(), "traj-test-")), "afile")
+			const file = join(makeTempDir("traj-test-"), "afile")
 			writeFileSync(file, "")
 			const home = fixtureHome()
 			return capture(["export", "--out", join(file, "out"), "--json"], { TRAJ_HOME: home })
 		},
 		backup_unreadable: async () => {
 			// A directory where the backup file should be: the read fails however the mode is set.
-			const dir = mkdtempSync(join(tmpdir(), "traj-test-"))
+			const dir = makeTempDir("traj-test-")
 			mkdirSync(join(dir, "traj.jsonl"))
 			return capture(["restore", dir, "--json"], { TRAJ_HOME: tempHome() })
 		},
 		backup_stale: async () => {
 			const home = ledgerHome()
-			const out = join(mkdtempSync(join(tmpdir(), "traj-test-")), "out")
+			const out = join(makeTempDir("traj-test-"), "out")
 			const add = (name: string) =>
 				capture(["account", "add", name, "--type", "asset", "--currency", "THB", "--json"], {
 					TRAJ_HOME: home,
@@ -169,6 +123,13 @@ describe("contract", () => {
 			const apply = ["scenario", "apply", "base", "--file", "-", "--json"]
 			await capture(apply, { TRAJ_HOME: home }, undefined, JSON.stringify(SCENARIO_DOCUMENT))
 			return capture(["scenario", "fork", "base", "base", "--json"], { TRAJ_HOME: home })
+		},
+		scenario_is_main: async () => {
+			const home = ledgerHome()
+			const apply = ["scenario", "apply", "base", "--file", "-", "--json"]
+			await capture(apply, { TRAJ_HOME: home }, undefined, JSON.stringify(SCENARIO_DOCUMENT))
+			await capture(["scenario", "main", "base", "--json"], { TRAJ_HOME: home })
+			return capture(["scenario", "rm", "base", "--json"], { TRAJ_HOME: home })
 		},
 		...probed(storeTriggers),
 	}

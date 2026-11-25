@@ -18,3 +18,109 @@
 [data-theme="dark"] {
 	color-scheme: dark;
 }
+
+/*
+ * Print: every page prints in black on white, with its navigation and controls left out by the
+ * `print:hidden` classes. These rules are unlayered, so they win over Tailwind's layered utilities without
+ * `!important`. A scrolling table loses its scroll box and its minimum width and fits the page, its header
+ * repeats on each page, and a row is not split. `print-css.test.ts` pins each of these rules.
+ */
+@media print {
+	@page {
+		size: landscape;
+		margin: 12mm;
+	}
+
+	/* The Theme's tokens become black on white, whichever Theme the screen shows, so no component keeps a dark or grey fill. */
+	:root,
+	[data-theme="light"],
+	[data-theme="dark"] {
+		color-scheme: light;
+		--ds-color-background: #fff;
+		--ds-color-foreground: #000;
+		--ds-color-card: #fff;
+		--ds-color-card-foreground: #000;
+		--ds-color-popover: #fff;
+		--ds-color-popover-foreground: #000;
+		--ds-color-secondary: #fff;
+		--ds-color-secondary-foreground: #000;
+		--ds-color-muted: #fff;
+		--ds-color-muted-foreground: #000;
+		--ds-color-primary: #000;
+		--ds-color-primary-foreground: #fff;
+		--ds-color-border: #8a8a8a;
+	}
+
+	html,
+	body {
+		background: #fff;
+		color: #000;
+		overflow-wrap: anywhere;
+	}
+
+	[class*="max-h-"],
+	[class*="overflow-auto"],
+	[class*="overflow-x-auto"],
+	[class*="overflow-y-auto"] {
+		max-height: none;
+		overflow: visible;
+	}
+
+	svg[class*="min-w-"] {
+		min-width: 0;
+	}
+
+	pre {
+		white-space: pre-wrap;
+	}
+
+	table {
+		width: 100%;
+		min-width: 0;
+		table-layout: auto;
+		font-size: 8pt;
+	}
+
+	/*
+	 * A header may break anywhere, but a cell does not: a figure or a date split over two lines reads as two
+	 * numbers. Figures and every cell of a Report keep to one line, and a page that is too wide is narrowed
+	 * by hiding fields, not by splitting values.
+	 */
+	th {
+		overflow-wrap: anywhere;
+		padding-inline: 4px;
+	}
+
+	td {
+		overflow-wrap: normal;
+		padding-inline: 4px;
+	}
+
+	td.tabular-nums,
+	td .tabular-nums,
+	[data-report] td {
+		white-space: nowrap;
+	}
+
+	/* A picker of a few options is a control: with its inputs hidden, only its empty border would print. */
+	fieldset:has(input) {
+		display: none;
+	}
+
+	thead {
+		display: table-header-group;
+		position: static;
+	}
+
+	tr {
+		break-inside: avoid;
+	}
+
+	/* The controls are for the screen. A button inside a table cell is the cell's text, so it stays. */
+	select,
+	input,
+	button:not(td button, th button),
+	label:has(select, input) {
+		display: none;
+	}
+}

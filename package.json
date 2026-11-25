@@ -20,6 +20,7 @@
 		"apps/blog",
 		"apps/data",
 		"apps/data/collector",
+		"apps/openjot",
 		"skills/customer",
 		"skills/internal",
 		"tooling/release",
@@ -38,6 +39,8 @@
 		"turbo": "2.11.10"
 	},
 	"overrides": {
-		"@fumadocs/satteri": "0.7.1"
+		"@fumadocs/satteri": "0.7.1",
+		"@posthog/types": "1.427.0",
+		"dompurify": "3.4.18"
 	}
 }

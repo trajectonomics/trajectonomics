@@ -41,7 +41,7 @@ describe("the Skill Manifest", () => {
 	it("authors the CLI Range once; every Skill expects the operating floor, except the planning Recipe", () => {
 		// traj-plan's Thai tax recipe needs the allowance flags, which only the 0.3.0 release publishes.
 		for (const row of manifest.skills) {
-			expect(row.cliRange).toBe(row.name === "traj-plan" ? ">=0.3.0 <0.7.0" : ">=0.2.0 <0.7.0")
+			expect(row.cliRange).toBe(row.name === "traj-plan" ? ">=0.3.0 <0.8.0" : ">=0.2.0 <0.8.0")
 		}
 		expect(cliVersionFloor(manifest.skills)).toBe(CLI_VERSION_FLOOR)
 	})

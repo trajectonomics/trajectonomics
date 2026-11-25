@@ -36,6 +36,10 @@ _Avoid_: Hard validation limit, maximum input
 The standardized output envelope produced by any Tax System, containing top-level summary figures (gross income, total deductions, taxable income, total tax, net tax payable or refund, effective rate, marginal rate, currency) and a jurisdiction-specific Breakdown.
 _Avoid_: Tax response, calculation summary
 
+**Bracket Walk**:
+Where a Thai net taxable income sits in the Section 48(1) schedule (`thBracketWalk`): one slice per bracket with the income inside it and its tax, the marginal rate and the income left before the next bracket. Its marginal rate is the rate of the bracket the last satang of the income falls in, so an income exactly on a bracket's upper edge is in the bracket the edge closes, with nothing left. This differs from the marginal rate of a Tax Result, which is the rate of the next unit (income plus one) and so is the next bracket's rate on an edge.
+_Avoid_: Marginal rate, bracket evaluation
+
 **Breakdown**:
 The itemized audit trail inside a Tax Result showing requested versus allowed deductions, bracket-by-bracket slices, special regime computations, and credits.
 _Avoid_: Debug log, trace
@@ -55,7 +59,7 @@ A statutory personal, family, insurance, social security, housing, retirement fu
 _Avoid_: Expense deduction, credit
 
 **Retirement Cluster**:
-The group of Thai long-term retirement allowances (RMF, SSF, PVD, GPF, National Savings Fund, and pension life insurance) that are subject to both individual statutory limits and a combined 500,000 THB ceiling.
+The group of Thai long-term retirement allowances (RMF, SSF, PVD, GPF, National Savings Fund, and pension life insurance) that are subject to both individual statutory limits and a combined 500,000 THB ceiling. SSF allows nothing from the 2025 tax year (ADR 0007), so it takes no room in the ceiling.
 _Avoid_: Investment deduction
 
 **Separate Sheet**:
@@ -73,6 +77,34 @@ _Avoid_: Capital gains tax
 **Dividend Tax Credit**:
 The Section 47 bis gross-up and tax credit granted when a taxpayer elects to include dividends from Thai corporate entities in regular progressive calculation to recover underlying corporate income tax. The grossed-up amount (dividend + credit) stays in Section 40(4) assessable income and the credit offsets tax payable.
 _Avoid_: Dividend deduction
+
+**Return**:
+One income tax computation filed by one taxpayer, or by a married couple filing jointly under Section 57 sexies (ภ.ง.ด. 90/91). One Thai Levy models one Return. A couple who file separately have two Returns, and so two Levies.
+_Avoid_: Filing, tax form, declaration
+
+**Filer**:
+A person whose income a Return holds, named by an id the caller chooses (`[a-z0-9-]{1,32}`, never `shared`). A joint Return has one or two Filers; a single or separate Return has one (ADR 0009).
+_Avoid_: Taxpayer id, spouse slot, owner
+
+**Filer label**:
+A Tally label scoped to one Filer, written `<label>@<filer>`, such as `income.section40_1@partner`, and built only with `thFilerLabel`. A Levy with no Filers reads bare labels, as before ADR 0009.
+_Avoid_: Person label, namespaced label, suffix
+
+**Shared income**:
+Income a couple cannot attribute to either spouse, which Section 57 sexies para 2 counts as half each. It is tallied under the reserved Filer `shared`. A separate Return reads half of it, rounded down. A joint Return of one Filer reads all of it. A joint Return of two Filers gives half to each Filer, the odd satang to the second, so the halves add up to the whole.
+_Avoid_: Joint income, common income
+
+**Filer expense ceiling**:
+The 100,000 THB ceiling of the Section 42 bis (and 42 ter) standard expense, which each spouse has for their own Section 40(1)–(2) income even on a joint Return. A joint Levy of two Filers computes that expense once per Filer, each on the Filer's own income plus half of the shared income, and adds the two. Everything after it, the bracket walk included, runs once on the sums. An elected actual expense is one figure for the Return and is not repeated per Filer.
+_Avoid_: Joint ceiling, couple's cap
+
+**Own parents**:
+The Filer's father and mother, the only parents a separate Return claims (Section 47(1)(ญ), RD FAQ). A joint Return, like a no-income-spouse Return, may also claim the spouse's parents (`spouseFather`, `spouseMother` in the object form of `parents`). A separate Return that names a spouse slot is refused at `allowance.parents.spouse`, not silently left without it (ADR 0010).
+_Avoid_: Own-side parents, taxpayer's parents (the object form's `taxpayer*` slots are the Filer's own)
+
+**Separate claim problem**:
+One rule a pair of separate Returns breaks that only the two together can show, returned by `thSeparateClaimProblems` with a `ThSeparateClaimCode`: `OWN_PARENTS_OVER_TWO` (a Return claims more than its own two parents) and `MORTGAGE_OVER_CEILING` (with `sharedMortgage`, both Returns' interest on one co-borrowed loan adds up to more than 100,000). It does not check which parent or which disabled dependant each Return claims, because a count cannot show that; the caller states those claims (ADR 0010).
+_Avoid_: Cross-Return validation, split check
 
 **Minimum Gross Tax**:
 The Section 48(2) alternative calculation equal to 0.5% of gross Assessable Income under Sections 40(2)–40(8) when such income is at least 120,000 THB, payable only if it exceeds 5,000 THB and exceeds progressive bracket tax.

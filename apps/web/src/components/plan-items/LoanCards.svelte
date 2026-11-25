@@ -1,0 +1,50 @@
+<script lang="ts">
+import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
+import { type LoanMarks, NO_LOAN_MARKS } from "../../lib/view/what-if/loan-items"
+import LoanCard from "./LoanCard.svelte"
+
+interface Props {
+	cards: readonly LoanCardView[]
+	/** What the What-if session changes in each loan card, by loan id. */
+	marks?: Readonly<Record<string, LoanMarks>>
+	currency: string
+	editable: boolean
+	/** The plan and the content hash the page read for it: the what-if switch names both. */
+	plan: string
+	contentHash: string
+	onEdit: (id: string) => void
+	onPay: (id: string) => void
+	onTry: (id: string) => void
+}
+
+let {
+	cards,
+	marks = {},
+	currency,
+	editable,
+	plan,
+	contentHash,
+	onEdit,
+	onPay,
+	onTry,
+}: Props = $props()
+</script>
+
+<section class="min-w-0 space-y-3" aria-label="Loans">
+	<h2 class="font-semibold">Loans</h2>
+	<ul class="grid min-w-0 gap-3 sm:grid-cols-2">
+		{#each cards as card (card.id)}
+			<LoanCard
+				{card}
+				marks={marks[card.id] ?? NO_LOAN_MARKS}
+				{currency}
+				{editable}
+				{plan}
+				{contentHash}
+				onEdit={() => onEdit(card.id)}
+				onPay={() => onPay(card.id)}
+				onTry={() => onTry(card.id)}
+			/>
+		{/each}
+	</ul>
+</section>

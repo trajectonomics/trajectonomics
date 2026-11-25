@@ -1,4 +1,40 @@
 import type { AccountId, BasisPoints, CompoundingPeriod, DateString } from "./common"
+import type { Prepayment } from "./flow"
+import type { Rounding } from "./measure"
+
+/**
+ * A yearly share of an asset's value paid out of it as passive income (ADR 0027). `rate` stays the total
+ * return; what is paid out leaves, the rest compounds. The window fields mean what they mean on a Flow.
+ */
+export interface Payout {
+	/** The yearly share of value paid out, 0 to 10000 bps. */
+	readonly bps: BasisPoints
+	/** The calendar period at whose last day a payout lands. */
+	readonly frequency: CompoundingPeriod
+	/** How each payout is rounded to a minor unit. Required; no default. */
+	readonly rounding: Rounding
+	readonly start?: DateString
+	readonly end?: DateString
+	/** A Milestone id: the Account pays out only on or after that Milestone's fire date. */
+	readonly startAt?: string
+	/** A Milestone id: the Account pays out only strictly before that Milestone's fire date. */
+	readonly endAt?: string
+	/** Gross Tally label of each payout, as on an income Flow. Needs a Levy; refused beside `returnLabel`. */
+	readonly label?: string
+	/** Shares of each payout taken at source, as on an income Flow. Needs a Levy. */
+	readonly prepayments?: readonly Prepayment[]
+}
+
+/**
+ * A yearly share of an asset's value charged to it every calendar month, and paid to nobody (ADR 0028).
+ * It is no expense of the household: it never enters cashflow, and it is charged on every path.
+ */
+export interface Fee {
+	/** The yearly share of value, 0 to 10000 bps; 0 is no fee. */
+	readonly bps: BasisPoints
+	/** How each monthly charge is rounded to a minor unit. Required; no default. */
+	readonly rounding: Rounding
+}
 
 /** Asset: `rate` is the expected return. Locked money does not count until `lockedUntil`. */
 export interface AssetRule {
@@ -8,10 +44,25 @@ export interface AssetRule {
 	readonly rate: BasisPoints
 	readonly compounding?: CompoundingPeriod
 	readonly lockedUntil?: DateString
+	/**
+	 * `false` marks an illiquid asset, such as a home or a car: it stays in Net worth but is left out of
+	 * Accessible net worth, the reference, the Minimum buffer and the accessible Metrics, and no
+	 * withdrawal or surplus step may draw on it. Absent or `true` means liquid.
+	 */
+	readonly liquid?: boolean
 	/** Tally label for this Account's accrued growth; absent means it is never tallied. */
 	readonly returnLabel?: string
 	/** Tally label for this Account's realised gains; absent means it is never tallied. */
 	readonly gainLabel?: string
+	/** Pays part of the total return out as passive income; absent means everything is reinvested. */
+	readonly payout?: Payout
+	/** Charges a yearly share of value every month, outside cashflow; absent means no fee. */
+	readonly fee?: Fee
+	/**
+	 * The yearly standard deviation of the return, 0 to 10000 bps (ADR 0029). Inert to `project()` and every
+	 * deterministic figure; only `planReturnModel` reads it. Absent or 0 means the Account does not swing.
+	 */
+	readonly volatility?: BasisPoints
 }
 
 /** Liability: `rate` is the interest on the outstanding balance. Cannot be locked. */

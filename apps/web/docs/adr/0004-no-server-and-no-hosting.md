@@ -1,5 +1,5 @@
 ---
-status: superseded in part by 0007 (the loopback server)
+status: superseded in part by 0007 (the loopback server) and 0009 (the hosted Demo)
 ---
 
 # No server and no hosting
@@ -19,3 +19,11 @@ The committed Demo snapshot is built from a fictional ledger, so the built pages
 
 - A person who wants the Dashboard clones the repository, installs with Bun and runs the command.
 - Nothing in this package is published or deployed, and `org/goals/GOALS.md` still lists the desktop and web apps under "Not now".
+
+## Amendment (2026-11-24, #378)
+
+The Demo snapshot is generated at build and is not committed ([ADR 0021](0021-the-demo-snapshot-is-generated-at-build-and-not-committed.md)). The sentence above that calls it committed describes the state before that change.
+
+## Amendment (2026-11-25, #342)
+
+The hosted Demo that [ADR 0009](0009-the-demo-dashboard-is-hosted-on-the-site.md) allows is built as a second target of this package, with no edit client: [ADR 0028](0028-the-hosted-demo-is-a-second-build-target-with-no-edit-client.md).

@@ -1,5 +1,7 @@
 # `traj dashboard` serves the Dashboard on loopback until it is stopped
 
+*Partly superseded by [ADR-0046](0046-traj-dashboard-edits-scenarios-on-loopback.md): the server now also answers `POST /edit`, which runs a `traj` write. Its reads-only rule and its GET-and-HEAD rule no longer hold.*
+
 The Dashboard (`apps/web`) renders a Snapshot: one JSON document made only of `traj … --json` reads. Until now a person got it by cloning the repository and running `bun run dashboard`, which nobody outside a checkout can do. The owner asked for the CLI to start it.
 
 `traj dashboard --as-of DATE --horizon DATE` binds its port first (so a taken port fails before any read runs), reads the Snapshot by running this same build's read leaves as child processes (the compiled binary runs itself; a checkout runs `bun src/index.ts`), then serves the Dashboard's pages and that Snapshot on `127.0.0.1` (port 4321, or `--port`; `--port 0` lets the system pick) until SIGINT or SIGTERM. It then prints one result: the URL, the As-of, the horizon, how many reads ran, and the command of each read that failed. Its flags are the snapshot runner's: `--scenario` (repeatable), `--compare` (twice), `--birth-date`, `--age` (repeatable), `--monthly`, `--carry-in`.

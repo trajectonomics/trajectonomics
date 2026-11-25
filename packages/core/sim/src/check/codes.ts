@@ -1,3 +1,5 @@
+import { TAIL } from "./codes-tail"
+
 const CODES = [
 	"UNSUPPORTED_SCHEMA_VERSION",
 	"NOT_AN_OBJECT",
@@ -13,6 +15,7 @@ const CODES = [
 	"INVALID_COMPOUNDING",
 	"INVALID_FREQUENCY",
 	"INVALID_GROWTH",
+	"INVALID_CATEGORY",
 	"INVALID_RESOLUTION",
 	"HORIZON_BEFORE_START",
 	"END_BEFORE_START",
@@ -23,6 +26,7 @@ const CODES = [
 	"LIABILITY_MISUSE",
 	"SURPLUS_UNROUTED",
 	"CONTRIBUTION_UNROUTED",
+	"ILLIQUID_ROUTED",
 	"RATE_OUT_OF_RANGE",
 	"INVALID_OP",
 	"INVALID_BASIS",
@@ -49,6 +53,7 @@ const CODES = [
 	"UNSUPPLIED_TALLY_LABEL",
 	"INVALID_FI_METHOD",
 	"INVALID_PATH_COUNT",
+	"INVALID_PATH_INDEX",
 	"INVALID_SEED",
 	"REFERENCE_MULTIPLIER_OUT_OF_RANGE",
 	"INVALID_REFERENCE_BASIS",
@@ -60,24 +65,37 @@ const CODES = [
 	"INVALID_DAY_RULE",
 	"DUPLICATE_HOLIDAY",
 	"HOLIDAYS_UNUSABLE",
+	"UNKNOWN_MILESTONE",
+	"MILESTONE_CYCLE",
+	"MILESTONE_LOOKAHEAD",
+	"INVALID_METRIC",
+	"MIXED_METRIC_ACCOUNTS",
+	"INVALID_COMPARISON",
+	"INVALID_TERMS",
+	"INVALID_MULTIPLE",
+	"INVALID_COMBINE",
+	"INVALID_FUNDING",
+	"FUNDING_ON_LIABILITY",
+	"OBLIGATION_TARGET_WITHDRAWN",
+	"WITHDRAWAL_LOCKED",
+	"LEVEL_TARGET_NOT_LIABILITY",
+	"LEVEL_TARGET_NOT_NOMINAL",
+	"LEVEL_FREQUENCY_MISMATCH",
+	"LEVEL_PAYMENTS_OUT_OF_RANGE",
+	"LEVEL_PAYMENT_OVERFLOW",
+	"ACCOUNT_MEASURE_IN_LEVY",
+	"NEXT_12_MONTHS_READS_ACCOUNT",
+	"UNKNOWN_FUNDED_LABEL",
+	"TOO_MANY_STEPS",
+	"INVALID_OPTION",
+	"PERIOD_DUE_MISMATCH",
 ] as const
 
-/** The closed set of problem codes. Frozen so consumers cannot mutate it at runtime. */
-export const ERROR_CODES: typeof CODES = Object.freeze(CODES)
+/** The closed set of problem codes a `ProjectionProblem` or a `Problem` can carry, frozen. */
+export const ERROR_CODES: readonly [...typeof CODES, ...typeof TAIL] = Object.freeze([
+	...CODES,
+	...TAIL,
+] as const)
 
-export type ErrorCode = (typeof CODES)[number]
-
-/** Location of a problem: a segment is an object key or an array index. */
-export type Path = readonly (string | number)[]
-
-export interface Problem {
-	readonly code: ErrorCode
-	readonly path: Path
-}
-
-export type Emit = (code: ErrorCode, path: Path) => void
-
-export type Check = (value: unknown, path: Path, emit: Emit) => void
-
-/** Declared account id -> raw `kind` value from the scenario. */
-export type AccountIndex = ReadonlyMap<string, unknown>
+export type ErrorCode = (typeof ERROR_CODES)[number]
+export type { AccountIndex, Check, Emit, Path, Problem } from "./codes-types"

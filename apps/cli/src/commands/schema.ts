@@ -1,11 +1,51 @@
 import { z } from "zod"
-import type { Leaf } from "../command"
+import type { DocumentSpec, Leaf } from "../command"
 import { defineCommand, ok } from "../command"
 import { registryListing } from "../error-listing"
 import { fail } from "../errors"
 import { NOT_SUPPORTED } from "../schema/limits"
 import { detailSchema, listingSchema } from "../schema/output"
 import { findNode, leavesOf, pathWords } from "../tree"
+
+/** The document form as `traj schema` prints it: its flag, its schema and its alternate form (ADR-0047). */
+function documentDetail(document: DocumentSpec) {
+	const alternate = document.alternate
+	return {
+		flag: document.flag,
+		schema: z.toJSONSchema(document.schema, { io: "input" }),
+		...(document.required === undefined
+			? {}
+			: { required: document.required.map((entry) => entry.field) }),
+		...(alternate === undefined
+			? {}
+			: {
+					alternate: {
+						flag: alternate.flag,
+						schema: z.toJSONSchema(alternate.schema, { io: "input" }),
+					},
+				}),
+	}
+}
+
+/**
+ * The input's JSON Schema with the exact flag spelling beside each flag property (ADR-0054). The
+ * names come from the leaf's derived flags, the table the parser reads, so they cannot drift; a
+ * positional has no flag and is left as it is.
+ */
+function inputDetail(leaf: Leaf): Record<string, unknown> {
+	const input = z.toJSONSchema(leaf.input, { io: "input" }) as Record<string, unknown>
+	const properties = input["properties"] as Record<string, Record<string, unknown>> | undefined
+	if (properties === undefined) return input
+	const flagged = { ...properties }
+	for (const spec of leaf.flags) {
+		const property = flagged[spec.field]
+		if (property !== undefined) flagged[spec.field] = { ...property, flag: `--${spec.flag}` }
+	}
+	return { ...input, properties: flagged }
+}
+
+/** The first line of the root listing: what to run next to see a command's flags and document. */
+const USAGE = "traj schema <command> prints a command's flags and the document it reads."
 
 export const schema: Leaf = defineCommand({
 	name: "schema",
@@ -40,22 +80,11 @@ export const schema: Leaf = defineCommand({
 			}))
 			return ok(
 				path.length === 0
-					? { commands, errors: registryListing(), notSupported: [...NOT_SUPPORTED] }
+					? { usage: USAGE, commands, errors: registryListing(), notSupported: [...NOT_SUPPORTED] }
 					: { commands },
 			)
 		}
-		const document =
-			node.document === undefined
-				? {}
-				: {
-						document: {
-							flag: node.document.flag,
-							schema: z.toJSONSchema(node.document.schema, { io: "input" }),
-							...(node.document.required === undefined
-								? {}
-								: { required: node.document.required.map((entry) => entry.field) }),
-						},
-					}
+		const document = node.document === undefined ? {} : { document: documentDetail(node.document) }
 		const documents =
 			node.flagDocuments === undefined
 				? {}
@@ -70,7 +99,7 @@ export const schema: Leaf = defineCommand({
 			summary: node.summary,
 			...(node.description === undefined ? {} : { description: node.description }),
 			positionals: [...node.positionals],
-			input: z.toJSONSchema(node.input, { io: "input" }),
+			input: inputDetail(node),
 			...document,
 			...documents,
 			output: z.toJSONSchema(node.output, { io: "output" }),

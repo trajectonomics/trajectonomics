@@ -1,3 +1,4 @@
+import { FUNDINGS } from "../vocab"
 import type { AccountIndex, Emit, Path } from "./codes"
 import { isRecord } from "./shape"
 
@@ -18,6 +19,11 @@ function isUnroutedAsset(
 	accounts: AccountIndex | undefined,
 ): flow is Readonly<Record<string, unknown>> {
 	if (!isRecord(flow) || flow["kind"] !== "contribution") return false
+	const funding = flow["funding"]
+	if (funding === "obligation" || funding === "employer") return false
+	// An unknown funding is `INVALID_FUNDING` alone, as on a liability.
+	if (funding !== undefined && !(FUNDINGS as readonly string[]).includes(String(funding)))
+		return false
 	const target = flow["target"]
 	return typeof target === "string" && accounts?.get(target) === "asset" && !routed.has(target)
 }
@@ -38,4 +44,32 @@ export function checkContributionRouting(
 			emit("CONTRIBUTION_UNROUTED", [...path, "flows", index, "target"])
 		}
 	}
+}
+
+function isIlliquid(value: unknown, illiquid: ReadonlySet<string>): boolean {
+	return typeof value === "string" && illiquid.has(value)
+}
+
+/** Emits `ILLIQUID_ROUTED` for an illiquid Account that a withdrawal or a surplus step names. */
+export function checkIlliquidRouting(
+	cashflow: unknown,
+	illiquid: ReadonlySet<string>,
+	path: Path,
+	emit: Emit,
+): void {
+	if (!isRecord(cashflow) || illiquid.size === 0) return
+	const withdraw: unknown[] = Array.isArray(cashflow["withdraw"]) ? cashflow["withdraw"] : []
+	withdraw.forEach((entry, index) => {
+		const floored = isRecord(entry)
+		if (isIlliquid(floored ? entry["account"] : entry, illiquid)) {
+			const at = [...path, "cashflow", "withdraw", index]
+			emit("ILLIQUID_ROUTED", floored ? [...at, "account"] : at)
+		}
+	})
+	const surplus = Array.isArray(cashflow["surplus"]) ? cashflow["surplus"] : []
+	surplus.forEach((step: unknown, index) => {
+		if (isRecord(step) && isIlliquid(step["account"], illiquid)) {
+			emit("ILLIQUID_ROUTED", [...path, "cashflow", "surplus", index, "account"])
+		}
+	})
 }

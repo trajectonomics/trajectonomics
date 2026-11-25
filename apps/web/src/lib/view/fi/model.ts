@@ -1,5 +1,7 @@
 import type { Fi, FiResult } from "../../contract"
 import { formatDate, formatMonth } from "../../format"
+import { agesText } from "../household/model"
+import { NO_PEOPLE, type PersonNames } from "../item-names"
 import { bindingSentence, type UnreachableBinding } from "./binding"
 import { type ReferenceView, referenceOf } from "./reference"
 
@@ -24,6 +26,8 @@ export interface ReachableFi {
 	readonly kind: "reachable"
 	readonly month: string
 	readonly date: string
+	/** Each household person's age on the FI date, as the CLI states it ("You 54, Your partner 52"); null without a household. */
+	readonly ages: string | null
 	readonly reference: ReferenceView
 }
 
@@ -39,14 +43,15 @@ export interface UnreachableFi {
 /** The FI answer of one Scenario, ready to render. */
 export type FiModel = ReachableFi | UnreachableFi
 
-/** The FI answer of a Scenario as the page shows it. */
-export function fiModelOf(fi: Fi): FiModel {
-	const result: FiResult = fi.fi
+/** The FI answer of a Scenario as the page shows it, naming each person by the household's words. */
+export function fiModelOf(fi: Fi, people: PersonNames = NO_PEOPLE): FiModel {
+	const result = fi.fi
 	if (result.reachable) {
 		return {
 			kind: "reachable",
 			month: formatMonth(result.fiDate),
 			date: formatDate(result.fiDate),
+			ages: result.ages.length === 0 ? null : agesText(result.ages, people),
 			reference: referenceOf(result.reference),
 		}
 	}

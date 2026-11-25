@@ -1,11 +1,7 @@
-import type { DateString, Scenario, SurplusStep } from "../types"
+import type { DateString, Scenario } from "../types"
 import { type OracleEvent, oracleAmount } from "./oracle-flow"
-import { type OracleStates, oracleMutate, oracleValuation } from "./oracle-state"
-
-function min(left: bigint, right: bigint): bigint {
-	if (left < right) return left
-	return right
-}
+import { oracleDraw, oracleFill } from "./oracle-routing"
+import type { OracleStates } from "./oracle-state"
 
 export function oracleIncomeExpense(
 	events: readonly OracleEvent[],
@@ -23,45 +19,20 @@ export function oracleIncomeExpense(
 
 export function oracleSurplus(
 	states: OracleStates,
-	surplus: readonly SurplusStep[],
+	scenario: Scenario,
+	start: DateString,
 	date: DateString,
 	amount: bigint,
 ): void {
-	let remaining = amount
-	for (const step of surplus) {
-		if (remaining === 0n) return
-		const state = states.get(step.account)!
-		const headroom =
-			step.upTo === undefined ? remaining : BigInt(step.upTo) - oracleValuation(state, date)
-		let fill = 0n
-		if (headroom > 0n) fill = min(remaining, headroom)
-		if (fill > 0n) {
-			oracleMutate(state, date, fill)
-			remaining -= fill
-		}
-	}
+	oracleFill(states, scenario, start, date, amount)
 }
 
 export function oracleWithdraw(
 	states: OracleStates,
 	scenario: Scenario,
+	start: DateString,
 	date: DateString,
 	amount: bigint,
 ): bigint {
-	let remaining = amount
-	for (const account of scenario.cashflow.withdraw) {
-		if (remaining === 0n) return 0n
-		const state = states.get(account)!
-		const locked =
-			state.rule.kind === "asset" &&
-			state.rule.lockedUntil !== undefined &&
-			date < state.rule.lockedUntil
-		if (locked) continue
-		const take = min(remaining, oracleValuation(state, date))
-		if (take > 0n) {
-			oracleMutate(state, date, -take)
-			remaining -= take
-		}
-	}
-	return remaining
+	return oracleDraw(states, scenario, start, date, amount).unmet
 }

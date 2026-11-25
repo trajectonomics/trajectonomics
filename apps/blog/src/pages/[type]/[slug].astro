@@ -1,17 +1,15 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
-import { render } from "astro:content"
-import PostMeta from "../../components/PostMeta.astro"
-import { type Post, readPosts } from "../../content/read-posts"
-import Layout from "../../layouts/Layout.astro"
-import { ISSUES_URL } from "../../lib/site"
+import PostPage from "../../components/PostPage.astro"
+import { type Post, postPagePath, readPosts } from "../../content/read-posts"
+import { DEFAULT_LANGUAGE } from "../../lib/languages"
 
-/** One page per published Post, at its type's folder and its slug. */
+/** Every published Post in the default Language Tree, at its type's folder and its slug. */
 export async function getStaticPaths() {
 	const posts = await readPosts()
 	return posts.map((post) => {
-		const [, type, slug] = post.path.split("/")
+		const [, type, slug] = postPagePath(post, DEFAULT_LANGUAGE).split("/")
 		return { params: { type, slug }, props: { post } }
 	})
 }
@@ -21,25 +19,6 @@ interface Props {
 }
 
 const { post } = Astro.props
-const { title, description, cover } = post.entry.data
-const { Content } = await render(post.entry)
 ---
 
-<Layout title={`${title} · Trajectonomics Blog`} description={description} indexed={true} image={cover} article={post.publishedOn}>
-	<article class="post">
-		<header class="post-header">
-			<PostMeta post={post} />
-			<h1 class="post-title">{title}</h1>
-			<p class="post-lede">{description}</p>
-			<p class="post-byline">By the Trajectonomics team</p>
-		</header>
-		<figure class="post-cover">
-			<img src={cover.src} alt={cover.alt} width={cover.width} height={cover.height} />
-		</figure>
-		<div class="post-body"><Content /></div>
-		<p class="post-fair-play">
-			Found a wrong fact or a number you cannot reproduce? <a href={ISSUES_URL}>Tell us</a>, and we will
-			correct the post.
-		</p>
-	</article>
-</Layout>
+<PostPage post={post} language={DEFAULT_LANGUAGE} />

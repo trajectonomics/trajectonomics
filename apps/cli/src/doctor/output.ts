@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { countsSchema } from "../counts"
-import { type TrialTotalView, trialTotal } from "../report/view"
 import type { RestoreCounts } from "../store"
+import { type DoctorTrialBalance, doctorTrialBalance } from "./trial-output"
 
 /** One thing `traj doctor` looked at: `pass`, `fail`, or `skipped` with the reason it could not. */
 export const DOCTOR_CHECKS = [
@@ -15,13 +15,6 @@ export const DOCTOR_CHECKS = [
 export type DoctorCheckName = (typeof DOCTOR_CHECKS)[number]
 export type DoctorStatus = "pass" | "fail" | "skipped"
 export type DoctorCheck = { name: DoctorCheckName; status: DoctorStatus; detail: string }
-
-/** The Trial Balance as a check reads it: the figures, and whether the two columns agree. */
-export type DoctorTrialBalance = {
-	asOf: string
-	totals: TrialTotalView[]
-	balanced: boolean
-}
 
 /**
  * `traj doctor`'s result. `ok` is true only when no check failed; a skipped check is one the
@@ -37,6 +30,8 @@ export type DoctorResult = {
 		bytes: number
 		schemaVersion: number | null
 		head: number
+		preMigrationCopies: { path: string; schemaVersion: number; bytes: number }[]
+		unfinishedCopies: string[]
 	}
 	rows: RestoreCounts
 	trialBalance?: DoctorTrialBalance | undefined
@@ -67,15 +62,24 @@ export const doctorOutput: z.ZodType<DoctorResult> = z.strictObject({
 			.nullable()
 			.describe("The schema version the database holds, or null when it could not be read."),
 		head: z.number().int().describe("The schema version this build writes."),
+		preMigrationCopies: z
+			.array(
+				z.strictObject({
+					path: z.string().describe("The copy's path, beside the database."),
+					schemaVersion: z.number().int().describe("The schema version the copy holds."),
+					bytes: z.number().int().describe("The copy's size in bytes."),
+				}),
+			)
+			.describe(
+				"The copies traj wrote before an upgrade migrated the database, oldest schema version first; each is a database an older traj can open.",
+			),
+		unfinishedCopies: z
+			.array(z.string())
+			.describe(
+				"Half-written copies a crash left beside the database, as paths; safe to delete when no traj is running.",
+			),
 	}),
 	rows: countsSchema.describe("Every stored row, tombstones included; all zero when absent."),
-	trialBalance: z
-		.strictObject({
-			asOf: z.string().describe("The date the Trial Balance is stated at."),
-			totals: z.array(trialTotal).describe("One entry per currency."),
-			balanced: z.boolean().describe("Whether every currency's debits equal its credits."),
-		})
-		.optional()
-		.describe("Present only when --as-of was given."),
+	trialBalance: doctorTrialBalance.optional().describe("Present only when --as-of was given."),
 	checks: z.array(check).describe("One entry per check, in the order they ran."),
 })

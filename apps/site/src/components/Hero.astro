@@ -3,9 +3,10 @@
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import type { Dictionary } from "../lib/language/dictionary"
 import { sublineParts } from "../lib/language/subline"
-import Consent from "./Consent.astro"
+import { DEMO_PATH } from "../lib/site"
 import CopyPrompt from "./CopyPrompt.astro"
 import DemoWindow from "./DemoWindow.astro"
+import Mascot from "./Mascot.astro"
 import Badge from "./ui/Badge.astro"
 import Separator from "./ui/Separator.astro"
 
@@ -28,11 +29,6 @@ const subline = sublineParts(dictionary.heroSubline)
 			</div>
 		</div>
 	</div>
-	{/*
-		The cookie banner (ADR 0024) is the stage's first row, so the hero still starts at the top of the
-		page and its field never reaches the header. The Worker leaves it out once the visitor has answered.
-	*/}
-	<Consent dictionary={dictionary} />
 	<div
 		class="hero-rise relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-5 pt-20 pb-10 text-center sm:px-6 sm:pt-28 sm:pb-14"
 	>
@@ -68,7 +64,15 @@ const subline = sublineParts(dictionary.heroSubline)
 	</div>
 	{/* The demonstration is the product itself in a window, in the landing view, as twenty.com's hero is. */}
 	<div class="hero-app relative mx-auto w-full max-w-[67rem] px-5 pb-16 sm:px-6 sm:pb-24">
+		{/* The mascot peeks over the window's top edge, clipped so it climbs up from behind it (mascot.css). */}
+		<div class="mascot-peek" aria-hidden="true">
+			<Mascot pose="peek" />
+		</div>
 		<DemoWindow dictionary={dictionary} />
+		{/* The window is a picture of the app; this is the way into the real Demo it draws (ADR 0031). */}
+		<p class="hero-demo">
+			<a class="hero-demo-link" href={DEMO_PATH}>{dictionary.demoLink}</a>
+		</p>
 	</div>
 </section>
 

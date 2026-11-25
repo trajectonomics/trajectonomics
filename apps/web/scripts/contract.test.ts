@@ -1,16 +1,19 @@
 import { describe, expect, test } from "bun:test"
 import { existsSync } from "node:fs"
-import { readFile } from "node:fs/promises"
 import { fileURLToPath } from "node:url"
 import { snapshot } from "../src/lib/contract"
 import { readsOf } from "../src/lib/snapshot"
 import { type DemoRun, runDemo } from "./demo-run"
+import { demoSnapshotJson } from "./demo-snapshot"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
 const BINARY = fileURLToPath(new URL("../../cli/dist/traj", import.meta.url))
-const COMMITTED = fileURLToPath(new URL("../public/demo/snapshot.json", import.meta.url))
-/** A fresh ledger, built and read against the real CLI, takes a little over ten seconds. */
-const SLOW_MS = 120_000
+/**
+ * A fresh ledger, built and read against the real CLI, takes about 75 s on an idle 4-core machine with
+ * the Demo's chance read and Milestones (#264 tracks the slowdown), so the limit leaves room for a
+ * slower runner.
+ */
+const SLOW_MS = 180_000
 
 /** One demo run shared by the tests that need it, so the ledger is built once. */
 let demo: Promise<DemoRun> | null = null
@@ -50,8 +53,8 @@ describe("the Snapshot against the real traj", () => {
 		SLOW_MS,
 	)
 
-	test("the committed Demo snapshot parses with the Snapshot schema", async () => {
-		const committed: unknown = JSON.parse(await readFile(COMMITTED, "utf8"))
-		expect(snapshot.safeParse(committed).success).toBe(true)
+	test("the generated Demo snapshot parses with the Snapshot schema", async () => {
+		const demo = await demoSnapshotJson()
+		expect(snapshot.safeParse(demo).success).toBe(true)
 	})
 })

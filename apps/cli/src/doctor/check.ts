@@ -1,7 +1,7 @@
 import { join, resolve } from "node:path"
 import pkg from "../../package.json"
 import type { Context } from "../command"
-import { DATABASE_FILE, dataDirectory } from "../data-directory"
+import { DATABASE_FILE, dataDirectory, defaultHomeRefusal } from "../data-directory"
 import { type AppError, isAppError } from "../errors"
 import { databaseChecks } from "./database"
 import { directoryChecks } from "./directory"
@@ -9,6 +9,8 @@ import type { DoctorResult } from "./output"
 
 /** Assembles the whole check: the data directory, then the database it should hold. */
 export function doctorOf(ctx: Context, asOf: string | undefined): DoctorResult | AppError {
+	const refused = defaultHomeRefusal(ctx.env)
+	if (refused !== undefined) return refused
 	const directory = directoryChecks(resolve(dataDirectory(ctx.env)))
 	const database = databaseChecks(ctx, join(directory.facts.path, DATABASE_FILE), asOf)
 	if (isAppError(database)) return database

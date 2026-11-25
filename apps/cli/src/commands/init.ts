@@ -25,7 +25,13 @@ export const init: Leaf = defineCommand({
 		{ command: "traj init", description: "Create ~/.traj/traj.db if it does not exist." },
 		{ command: "TRAJ_HOME=~/traj-demo traj init --json", description: "Use another directory." },
 	],
-	errorCodes: ["database_corrupt", "disk_full", "not_a_directory", "permission_denied"],
+	errorCodes: [
+		"database_corrupt",
+		"default_home_refused",
+		"disk_full",
+		"not_a_directory",
+		"permission_denied",
+	],
 	run: (_input, ctx) => {
 		const ledger = createLedger(ctx.env)
 		if (isAppError(ledger)) return ledger

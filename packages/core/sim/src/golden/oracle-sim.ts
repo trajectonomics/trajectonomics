@@ -74,9 +74,9 @@ function processDay(
 		unfunded: assets.unfunded,
 	}
 	const net = cashflow - assets.applied
-	if (net > 0n) oracleSurplus(states, scenario.cashflow.surplus, date, net)
+	if (net > 0n) oracleSurplus(states, scenario, fixture.timeline.start, date, net)
 	if (net < 0n) {
-		const remaining = oracleWithdraw(states, scenario, date, -net)
+		const remaining = oracleWithdraw(states, scenario, fixture.timeline.start, date, -net)
 		if (remaining > 0n) return { flow, runsOut: { date, unmet: remaining } }
 	}
 	return { flow }

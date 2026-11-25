@@ -14,6 +14,9 @@ const USAGE = `Usage: bun scripts/snapshot.ts --as-of DATE --horizon DATE [optio
   --age N               an age to report in a compare; repeat for several
   --monthly             also read the monthly rows of each projection
   --carry-in PATH       a JSON array of Carry-in records for every Scenario named
+  --return-model PATH   the Return model JSON file the chance of success draws from
+  --paths N             the Market paths to run for the chance; needs --return-model and --seed
+  --seed HEX            sixteen lower-case hex digits the Market paths are drawn from
   --traj PATH           the traj binary (else TRAJ_BINARY_PATH, else traj on PATH)
   --out FILE            write the Snapshot to FILE (else print it)
 `
@@ -37,7 +40,8 @@ async function prepare(
 ): Promise<Prepared> {
 	const args = parseSnapshotArgs(argv)
 	if (!args.ok) return { ok: false, message: args.message }
-	const params = checkParams(args.options.input)
+	// The offline Snapshot opens its five representative futures with no server, so it reads them in advance (web ADR 0020).
+	const params = checkParams({ ...args.options.input, readPaths: true })
 	if (!params.ok) return { ok: false, message: params.error.message }
 	const binary = await checkBinary(args.options.traj, env)
 	if (!binary.ok) return { ok: false, message: binary.message }

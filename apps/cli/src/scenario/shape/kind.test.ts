@@ -20,6 +20,7 @@ function documentOf(input: {
 }): Record<string, unknown> {
 	return {
 		...scenarioExample(VERSION_NUMBER),
+		estate: {},
 		accounts: input.accounts ?? [CASH],
 		flows: (input.flows ?? [EXPENSE]).map((flow) => ({ start: "2026-01-01", ...flow })),
 		cashflow: { surplus: [{ account: "cash" }], contribute: [], withdraw: [] },
@@ -50,7 +51,25 @@ const FLOW_KIND_ONLY: {
 	code: string
 }[] = [
 	{ key: "earned", value: true, statement: "Income only", code: "UNKNOWN_KEY" },
-	{ key: "target", value: "cash", statement: "Contribution only", code: "UNKNOWN_KEY" },
+	{
+		key: "target",
+		value: "cash",
+		statement: "Contribution and transfer only",
+		code: "UNKNOWN_KEY",
+	},
+	{
+		key: "source",
+		value: "debt",
+		statement: "Withdrawal and transfer only",
+		code: "UNKNOWN_KEY",
+	},
+	{ key: "realise", value: true, statement: "Transfer only", code: "UNKNOWN_KEY" },
+	{
+		key: "level",
+		value: { principal: 100_000, payments: 12, rounding: "halfUp" },
+		statement: "Contribution only",
+		code: "FIELD_NOT_ALLOWED",
+	},
 	{
 		key: "label",
 		value: "income.section40_1",
@@ -97,6 +116,75 @@ describe("the keys the shape states for one kind only", () => {
 			expect(refusals).toContainEqual({
 				code: entry.code,
 				path: ["flows", 0, entry.key].join("."),
+			})
+		}
+	})
+})
+
+/*
+ * The criterion keys one kind uses. A criterion's `kind` decides its keys (milestone.ts), so a key
+ * placed on another kind is UNKNOWN_KEY at that key, and its description says which kind it is for.
+ */
+const DATE_CRITERION = { id: "c", kind: "date", on: "2045-01-01" }
+const METRIC_CRITERION = {
+	id: "c",
+	kind: "metric",
+	metric: "netWorth",
+	op: "atLeast",
+	amount: 1,
+	terms: "nominal",
+}
+
+const CRITERION_KIND_ONLY: { key: string; value: unknown; statement: string; placed: object }[] = [
+	{ key: "on", value: "2045-01-01", statement: "Date criterion only", placed: METRIC_CRITERION },
+	{ key: "milestone", value: "m", statement: "Milestone criterion only", placed: DATE_CRITERION },
+	{ key: "months", value: 0, statement: "Milestone criterion only", placed: DATE_CRITERION },
+	{
+		key: "metric",
+		value: "netWorth",
+		statement: "Metric and multiple criteria only",
+		placed: DATE_CRITERION,
+	},
+	{
+		key: "op",
+		value: "atLeast",
+		statement: "Metric and multiple criteria only",
+		placed: DATE_CRITERION,
+	},
+	{
+		key: "terms",
+		value: "nominal",
+		statement: "Metric and multiple criteria only",
+		placed: DATE_CRITERION,
+	},
+	{ key: "amount", value: 1, statement: "Metric criteria only", placed: DATE_CRITERION },
+	{ key: "base", value: "netWorth", statement: "Multiple criteria only", placed: METRIC_CRITERION },
+	{ key: "num", value: 1, statement: "Multiple criteria only", placed: METRIC_CRITERION },
+	{ key: "den", value: 1, statement: "Multiple criteria only", placed: METRIC_CRITERION },
+]
+
+/** A Scenario whose one Milestone holds `criterion` as its first criterion. */
+function withCriterion(criterion: object): Record<string, unknown> {
+	return {
+		...documentOf({}),
+		milestones: [{ id: "m", combine: "all", criteria: [criterion] }],
+	}
+}
+
+describe("the criterion keys one kind uses", () => {
+	it("says which kind each of them belongs to, in its own description", () => {
+		for (const entry of CRITERION_KIND_ONLY) {
+			const criterionKey = ["milestones", 0, "criteria", 0, entry.key] as Path
+			expect(String(nodeAt(criterionKey)["description"])).toContain(entry.statement)
+		}
+	})
+
+	it("refuses a criterion key on a kind that does not take it, at that key", () => {
+		for (const entry of CRITERION_KIND_ONLY) {
+			const criterion = { ...entry.placed, [entry.key]: entry.value }
+			expect(refusalsOf(withCriterion(criterion))).toContainEqual({
+				code: "UNKNOWN_KEY",
+				path: ["milestones", 0, "criteria", 0, entry.key].join("."),
 			})
 		}
 	})

@@ -4,15 +4,15 @@ Phases are ordered, not dated. Decisions behind them are in [`docs/adr/`](docs/a
 
 ## Phase 1: record, project, answer
 
-`init`, accounts, `tx add/void/amend`, balances, reports, `inspect`/`export`, `schema`, scenarios, deterministic projection, `fi`, and Thai tax via tax-core — done, except an allowance optimizer and a stored taxpayer profile, which are Phase 3.
+`init`, accounts, `tx add/void/amend`, bulk `tx import` (single CSV template), balances, reports, `inspect`/`export`, `schema`, scenarios, deterministic projection, `fi`, and Thai tax via tax-core — done, except an allowance optimizer and a stored taxpayer profile, which are Phase 3.
 
 ## Phase 2: richer input
 
-Bulk `tx import` (single CSV template), history-derived baseline, liabilities and amortization, multiple goals.
+History-derived baseline, liabilities and amortization, multiple goals.
 
 ## Phase 3: richer analysis
 
-Seeded Monte Carlo, Thai allowance optimizer (RMF, SSF, ThaiESG), additional FI methods.
+Seeded Monte Carlo, Thai allowance optimizer (RMF, ThaiESG, provident fund), additional FI methods.
 
 ## Phase 4: budgeting
 

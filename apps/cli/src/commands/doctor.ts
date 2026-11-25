@@ -4,6 +4,7 @@ import { defineCommand, ok } from "../command"
 import { doctorOf } from "../doctor/check"
 import { doctorOutput } from "../doctor/output"
 import { isAppError } from "../errors"
+import { totalDisplay } from "../report/total-view"
 
 export const doctor: Leaf = defineCommand({
 	name: "doctor",
@@ -24,7 +25,15 @@ export const doctor: Leaf = defineCommand({
 		},
 	],
 	// A check's finding is a result, not a failure (ADR-0038); only a bad --as-of is an input error.
-	errorCodes: ["AMOUNT_OVERFLOW", "INVALID_DATE"],
+	errorCodes: ["AMOUNT_OVERFLOW", "default_home_refused", "INVALID_DATE"],
+	render: {
+		display: totalDisplay({
+			total: "totals",
+			error: "totalsError",
+			figure: "none",
+			within: "trialBalance",
+		}),
+	},
 	run: (input, ctx) => {
 		const result = doctorOf(ctx, input.asOf)
 		return isAppError(result) ? result : ok(result)

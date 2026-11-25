@@ -1,6 +1,8 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the imports it renders.
 // biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
+import { dictionaryFor } from "../lib/dictionary"
+import { type Language, treePath } from "../lib/languages"
 import {
 	BLOG_PATH,
 	DOCS_URL,
@@ -12,28 +14,36 @@ import {
 	SOURCE_URL,
 } from "../lib/site"
 
+interface Props {
+	/** The Interface Language the footer's words are in. */
+	readonly language: Language
+}
+
+const { language } = Astro.props
+const words = dictionaryFor(language)
+
 /** The link columns: a mono label and its links. The page's one `nav` is the header's. */
 const columns = [
 	{
-		label: "Read",
+		label: words.footerRead,
 		links: [
-			{ text: "Blog", href: BLOG_PATH },
-			{ text: "Docs", href: DOCS_URL },
-			{ text: "Site Home", href: SITE_HOME_URL },
+			{ text: words.footerBlog, href: treePath(language, BLOG_PATH) },
+			{ text: words.footerDocs, href: DOCS_URL },
+			{ text: words.footerSiteHome, href: SITE_HOME_URL },
 		],
 	},
 	{
-		label: "Source",
+		label: words.footerSource,
 		links: [
-			{ text: "Source code", href: SOURCE_URL },
-			{ text: "Organisation", href: GITHUB_ORG_URL },
+			{ text: words.footerSourceCode, href: SOURCE_URL },
+			{ text: words.footerOrganisation, href: GITHUB_ORG_URL },
 		],
 	},
 	{
-		label: "Help",
+		label: words.footerHelp,
 		links: [
-			{ text: "Report a wrong fact", href: ISSUES_URL },
-			{ text: "Licence", href: LICENCE_URL },
+			{ text: words.footerReport, href: ISSUES_URL },
+			{ text: words.footerLicence, href: LICENCE_URL },
 		],
 	},
 ] as const
@@ -44,7 +54,7 @@ const columns = [
 		<div class="blog-footer-top">
 			<div class="blog-footer-brand">
 				<span class="blog-footer-name">{SITE_NAME}</span>
-				<span class="blog-footer-tagline">Free, open-source financial simulation for AI agents.</span>
+				<span class="blog-footer-tagline">{words.footerTagline}</span>
 			</div>
 			<div class="blog-footer-columns">
 				{
@@ -65,6 +75,6 @@ const columns = [
 				}
 			</div>
 		</div>
-		<p class="blog-footer-licence">{SITE_NAME}. The blog's source is MIT licensed.</p>
+		<p class="blog-footer-licence">{words.footerLicenceLine(SITE_NAME)}</p>
 	</div>
 </footer>

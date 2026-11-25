@@ -105,6 +105,10 @@ A published Semantic Token Role a landmark paints behind its content, and the te
 `background`/`foreground`, `muted`/`foreground`, `stage`/`stage-foreground` ([ADR 0008](docs/adr/0008-landmark-surface-roles.md)).
 _Avoid_: Background colour, band
 
+**Mascot**:
+The cream robot with a dark visor, orange eyes and an orange-tipped antenna, the character the blog's covers draw. On the Site it is eleven poses, each a Gemini render cut out of a green screen into a transparent WebP. It peeks over the demo window and waves over its traj chat verdict. It holds a chart beside the Features heading, and each of the four small Features cards has its own pose that acts out the feature, each in a different place ([ADR 0028](docs/adr/0028-the-cookie-card-sits-in-the-corner-and-each-small-feature-has-its-robot.md), [ADR 0029](docs/adr/0029-each-small-feature-card-puts-its-robot-somewhere-else.md)). It thinks beside the FAQ heading, waves above the closing call to action, sits in the footer, and is lost on the Not-found page. The home places it so a phone always has one on screen ([ADR 0027](docs/adr/0027-a-phone-always-has-the-mascot-on-screen.md)). It is decoration, with an empty `alt`, and still under reduced motion ([ADR 0025](docs/adr/0025-the-page-carries-the-mascot.md), [ADR 0026](docs/adr/0026-the-mascot-is-a-rendered-cut-out.md)).
+_Avoid_: Bot icon, logo, avatar
+
 **Star snapshot**:
 The committed star count of the Site's one repository, plus the date it was read,
 written by `bun run stars:update` and never fetched at request time. The deploy workflow runs that script
@@ -181,6 +185,10 @@ _Avoid_: Animation controller, trigger, observer
 **Demo window**:
 The hero's drawn picture of the app a visitor's agent runs in: a title bar, a sidebar with New chat and Recents, and a main pane holding one chat at a time. It plays the chat of the agent alone, then presses New chat and plays the chat with the traj Skill ([ADR 0022](docs/adr/0022-the-hero-carries-one-app-window-and-the-page-loses-how-it-works.md)). Its composer is a picture and takes no input. With no script, or with motion reduced, both chats stand whole, one above the other.
 _Avoid_: Comparison, Before/After panels, mock app, chat widget
+
+**Hosted Demo**:
+The Dashboard's read-only build, `apps/web/dist-hosted/`, copied whole to `/demo/` by the Site's build and served as static assets, with a Content-Security-Policy scoped to `/demo/*` ([ADR 0031](docs/adr/0031-the-site-serves-the-hosted-demo-with-a-scoped-csp.md)). It is not the Demo window, which is a picture, and it is not a route: Workers Static Assets serves each file. No Demo page or asset is committed.
+_Avoid_: Live demo, hosted app, dashboard route
 
 **Web font**:
 A font file the Site serves itself under the Font budget: the Brand Typeface's three latin `.woff2` files (`Aleo` 300 and 400, `Azeret Mono` 500), copied from `@trajectonomics/brand/current/fonts/` and declared in `src/styles/fonts.css`. A font URL that is absolute, a font or font stylesheet on another origin and a font in a `data:` URL each fail an Invariant, and the Site ships no Thai face, so Thai still draws from the visitor's own fonts ([ADR 0005](docs/adr/0005-page-weight-and-web-font-budget.md)).

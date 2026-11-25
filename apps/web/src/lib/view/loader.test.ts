@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
+import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import type { FetchedText } from "./fetch-snapshot"
 import { createSnapshotLoader } from "./loader"
 
-const DEMO_TEXT = await Bun.file(`${import.meta.dir}/../../../public/demo/snapshot.json`).text()
+const DEMO_TEXT = await demoSnapshotText()
 
 function response(status: number, body: string): FetchedText {
 	return { ok: status >= 200 && status < 300, status, text: async () => body }

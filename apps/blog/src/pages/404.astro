@@ -1,10 +1,16 @@
 ---
 // biome-ignore-all lint/correctness/noUnusedImports: Biome does not read an Astro template, so it cannot see the layout it renders.
+// biome-ignore-all lint/correctness/noUnusedVariables: Biome does not read an Astro template, so it cannot see these.
 import Layout from "../layouts/Layout.astro"
+import { DEFAULT_LANGUAGE, perLanguage, treePath } from "../lib/languages"
 import { BLOG_PATH, SITE_HOME_URL } from "../lib/site"
+
+// One Not-found Page answers every miss in every tree, so it is in the default Language, and its
+// Language menu leads to each tree's front page.
+const languagePaths = perLanguage((language) => treePath(language, BLOG_PATH))
 ---
 
-<Layout title="Page not found · Trajectonomics Blog" indexed={false}>
+<Layout title="Page not found · Trajectonomics Blog" indexed={false} language={DEFAULT_LANGUAGE} languagePaths={languagePaths}>
 	<section class="masthead" aria-labelledby="not-found-title">
 		<p class="meta-label">404</p>
 		<h1 id="not-found-title" class="masthead-title">This page is not here</h1>

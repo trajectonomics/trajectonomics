@@ -12,7 +12,7 @@ describe("exportJsonl", () => {
 	it("writes the header and the seeded personal entity for a fresh database", () => {
 		const store = mustOpen(ledgerHome())
 		expect(must(exportJsonl(store))).toBe(
-			`{"record":"header","formatVersion":1,"schemaVersion":2}\n${SEEDED}\n`,
+			`{"record":"header","formatVersion":1,"schemaVersion":5}\n${SEEDED}\n`,
 		)
 	})
 

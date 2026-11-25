@@ -23,14 +23,14 @@ describe("importJsonl refusals", () => {
 
 	it("refuses an unknown or malformed header before writing any row", async () => {
 		const golden = await goldenJsonl()
-		const header = '{"record":"header","formatVersion":1,"schemaVersion":2}'
+		const header = '{"record":"header","formatVersion":1,"schemaVersion":5}'
 		const cases: [string, string][] = [
-			['{"record":"header","formatVersion":2,"schemaVersion":2}', "line.1.formatVersion"],
-			['{"record":"header","formatVersion":1,"schemaVersion":3}', "line.1.schemaVersion"],
+			['{"record":"header","formatVersion":2,"schemaVersion":5}', "line.1.formatVersion"],
+			['{"record":"header","formatVersion":1,"schemaVersion":6}', "line.1.schemaVersion"],
 			['{"record":"header","formatVersion":1,"schemaVersion":1}', "line.1.schemaVersion"],
 			['{"record":"header","formatVersion":1,"schemaVersion":0}', "line.1.schemaVersion"],
-			['{"record":"header","schemaVersion":2,"formatVersion":1}', "line.1"],
-			['{"record":"header","formatVersion":1,"schemaVersion":2,"at":"now"}', "line.1"],
+			['{"record":"header","schemaVersion":5,"formatVersion":1}', "line.1"],
+			['{"record":"header","formatVersion":1,"schemaVersion":5,"at":"now"}', "line.1"],
 			['{"record":"entity"}', "line.1.record"],
 			["not json", "line.1"],
 		]
@@ -53,7 +53,11 @@ describe("importJsonl refusals", () => {
 
 	it("refuses a v1 Scenario document at its line, which the pinned engine no longer accepts", async () => {
 		const golden = await goldenJsonl()
-		const text = edit(golden, '"schemaVersion":4}', '"schemaVersion":1}')
+		const text = edit(
+			golden,
+			'"schemaVersion":4},"contentHash"',
+			'"schemaVersion":1},"contentHash"',
+		)
 		const accepted = acceptedScenarioSchemaVersion()
 		const path = "line.22.document.schemaVersion"
 		expect(refused(text)).toMatchObject({

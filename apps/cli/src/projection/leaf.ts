@@ -4,6 +4,7 @@ import type { Context, Result } from "../command"
 import { ok } from "../command"
 import { checkedAsOf, unsupportedYear, unsupportedYearMessage } from "../date"
 import { type AppError, fail, isAppError } from "../errors"
+import { decimalProblem } from "../scenario/override-flags"
 import { withStore } from "../with-store"
 import type { Prepared } from "./prepare"
 import { prepareProjection } from "./prepare"
@@ -14,10 +15,25 @@ export type ScenarioRequest = {
 	/** The input field the name came from: `scenario`, `a` or `b`. */
 	scenarioPath: string
 	sets: readonly string[]
+	/** The `--without` paths, taken out before the Sets (cli ADR-0056). */
+	without?: readonly string[] | undefined
+	/** The `--add` items, put on a list after the removals and before the Sets (cli ADR-0062). */
+	add?: readonly string[] | undefined
+	/** Whether each money amount of a Set is a decimal string (cli ADR-0047, ADR-0056). */
+	decimal?: boolean | undefined
 }
 
-/** The date flags every projection leaf takes: both are required and both come from the caller. */
-export type DateFlags = { asOf: string; horizon: string }
+/**
+ * The flags every projection leaf takes: both dates are required and come from the caller. A leaf
+ * that reads Overrides hands over its whole input, so `--decimal` with nothing to read is refused here.
+ */
+export type DateFlags = {
+	asOf: string
+	horizon: string
+	decimal?: boolean | undefined
+	set?: readonly string[] | undefined
+	add?: readonly string[] | undefined
+}
 
 /** Prepares one side, or fails with the reason the caller can act on. */
 export type Prepare = (request: ScenarioRequest) => Prepared | AppError
@@ -33,6 +49,8 @@ export function withProjection<T>(
 	ctx: Context,
 	work: (prepare: Prepare) => T | AppError,
 ): Result<T> | AppError {
+	const unread = decimalProblem(input)
+	if (unread !== null) return unread
 	// The Horizon is the engine's Timeline, so a year outside the range is invalid input at its
 	// flag rather than the Ledger's INVALID_DATE (ADR-0030, ADR-0036).
 	const horizonYear = unsupportedYear(input.horizon)
@@ -65,6 +83,9 @@ export function withProjection<T>(
 				asOf: input.asOf,
 				horizon: input.horizon,
 				sets: request.sets,
+				without: request.without,
+				add: request.add,
+				decimal: request.decimal,
 			})
 		const outcome = work(prepare)
 		return isAppError(outcome) ? outcome : ok(outcome)

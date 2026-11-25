@@ -1,0 +1,91 @@
+import { afterAll, afterEach, describe, expect, test } from "bun:test"
+import {
+	BINARY,
+	disposeEditor,
+	ledgerHome,
+	ledgerShow,
+	postEdit,
+	SLOW_MS,
+	shownOf,
+	withAmount,
+} from "./edit-fixture.test-support"
+import { forkInTerminal } from "./edit-fork.test-support"
+import { settle } from "./editor-running.test-support"
+
+/** An apply-plan Edit of one plan, carrying the content hash the page read for it. */
+const applyEdit = (name: string, contentHash: string, document: unknown) =>
+	JSON.stringify({ kind: "apply-plan", name, contentHash, document })
+
+describe("saving a Flow of a plan's document, against the real traj", () => {
+	test(
+		"a changed amount runs apply --decimal: the Snapshot shows 9000.50, and the ledger holds 900050",
+		async () => {
+			await forkInTerminal("e2e-edit")
+			const before = ledgerShow("e2e-edit", true)
+			const document = withAmount(before.scenario.document, "salary", "9000.50")
+			const { status, answer } = await postEdit(
+				applyEdit("e2e-edit", before.scenario.contentHash, document),
+			)
+			expect(status).toBe(200)
+			if (!answer.ok) throw new Error(answer.error.message)
+			const after = shownOf(answer, "e2e-edit")
+			expect(after.scenario.document.flows.find((flow) => flow.id === "salary")?.amount).toBe(
+				"9000.50",
+			)
+			const stored = ledgerShow("e2e-edit", false) as unknown as {
+				scenario: { document: { flows: { id: string; amount: number }[] } }
+			}
+			expect(stored.scenario.document.flows.find((flow) => flow.id === "salary")?.amount).toBe(
+				900050,
+			)
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"saving a document that changed nothing leaves the plan unchanged: same hash, same version",
+		async () => {
+			await forkInTerminal("e2e-same")
+			const before = ledgerShow("e2e-same", true)
+			const { status, answer } = await postEdit(
+				applyEdit("e2e-same", before.scenario.contentHash, before.scenario.document),
+			)
+			expect(status).toBe(200)
+			if (!answer.ok) throw new Error(answer.error.message)
+			const after = shownOf(answer, "e2e-same")
+			expect(after.scenario.contentHash).toBe(before.scenario.contentHash)
+			expect(after.scenario.version).toBe(before.scenario.version)
+			const direct = Bun.spawnSync(
+				[BINARY, "scenario", "apply", "e2e-same", "--file", "-", "--decimal", "--json"],
+				{
+					env: { ...process.env, TRAJ_HOME: ledgerHome() },
+					stdin: new TextEncoder().encode(JSON.stringify(before.scenario.document)),
+				},
+			)
+			expect((JSON.parse(direct.stdout.toString()) as { status: string }).status).toBe("unchanged")
+		},
+		SLOW_MS,
+	)
+
+	test(
+		"a refused amount answers the CLI's error with the path of its field, and changes nothing",
+		async () => {
+			await forkInTerminal("e2e-refused")
+			const before = ledgerShow("e2e-refused", true)
+			const document = withAmount(before.scenario.document, "salary", "9000.501")
+			const { status, answer } = await postEdit(
+				applyEdit("e2e-refused", before.scenario.contentHash, document),
+			)
+			expect(status).toBe(200)
+			expect(answer.ok).toBe(false)
+			if (answer.ok) return
+			expect(answer.error.code).toBe("INVALID_AMOUNT")
+			expect(answer.error.path).toBe("document.flows.salary.amount")
+			expect(ledgerShow("e2e-refused", true).scenario.contentHash).toBe(before.scenario.contentHash)
+		},
+		SLOW_MS,
+	)
+})
+
+afterEach(settle, SLOW_MS)
+afterAll(disposeEditor)

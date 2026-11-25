@@ -47,6 +47,7 @@ export const restore: Leaf = defineCommand({
 		"backup_unreadable",
 		"database_busy",
 		"database_corrupt",
+		"default_home_refused",
 		"disk_full",
 		"not_a_directory",
 		"permission_denied",

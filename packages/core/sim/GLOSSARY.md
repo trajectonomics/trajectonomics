@@ -50,6 +50,10 @@ _Avoid_: Tick, step, period
 Totals over one twelve-month period of a Projection, running from an anniversary of `start` to the day before the next one. The last period is cut short by the horizon or a Shortfall and marked partial.
 _Avoid_: Year, fiscal year
 
+**Lifetime totals**:
+What a Projection states over the whole horizon for the Accounts that declare a fee or a payout above 0 bps: `accountLifetimes`, one `{ account, lifetimeFees?, lifetimePayouts? }` per such Account in Scenario order (each figure only when the Account declares that item), and a plan-wide `lifetimeFees`, present only when a fee is declared. Each is the sum of the Annual roll-up figures of that Account and comes from the same run. Without a fee or a payout above 0 bps no field appears.
+_Avoid_: Cumulative, running total
+
 **Levy**:
 A closed rule set in the Scenario that charges an amount for each Settlement period from that period's Flows: a period rule, a settlement rule and a graph of Measures. A Scenario may hold several Levies, each with its own periods, Settlements and Carry-in; they share Tally labels but never read each other. The core does not know what a Levy represents; callers, or a rule-set emitter such as tax-core, author it as data.
 _Avoid_: Tax, tax rules, formula callback, plugin
@@ -59,7 +63,7 @@ A twelve-month period set by the Levy's period rule, over which the Levy tallies
 _Avoid_: Tax year, fiscal year, year, Annual roll-up
 
 **Measure**:
-A named value inside a Levy, or inside a Derived amount, computed in integer minor units from tallies (Levy only), Flow amounts (Derived amount only), constants and other Measures. The Measures form an acyclic graph, and the Levy names the Measure that is due.
+A named value inside a Levy, or inside a Derived amount, computed in integer minor units from tallies (Levy only), Flow amounts and Account values (Derived amount only), constants and other Measures. The Measures form an acyclic graph, and the Levy names the Measure that is due.
 _Avoid_: Variable, formula, derived flow
 
 **Dated constant**:
@@ -67,23 +71,55 @@ A `const` Measure whose value steps on given dates: a starting value and a list 
 _Avoid_: Time-varying parameter, schedule
 
 **Derived amount**:
-A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), before Prepayment and any cap. The Flows form an acyclic graph. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
+A Flow amount computed on each Occurrence from other Flows instead of fixed: a Measure graph over the planned gross amounts that other Flows land on the same Landed date (0 for a Flow that does not land then), and over an Account's value on that date, read before its Flows land (ADR 0020), before Prepayment and any cap. The Flows, with the Flows that change the Accounts they read, form an acyclic graph; a Planned withdrawal that reads its own `source` is no cycle, since the read precedes every landing. A negative result or an overflow is reported, never clamped. A Derived amount that reads earned income falls to 0 once earned income stops in the FI test.
 _Avoid_: Percentage flow, formula flow, linked flow
+
+**Spending rule**:
+A fourth amount form of an expense Flow (`rule`, beside `amount`, `derive` and `level`): its yearly amount follows what a portfolio of asset Accounts is worth, fixed once per Rule year. Three kinds: `initialRate` (a share of the first year's portfolio, kept level in real terms), `currentRate` (a share of each year's portfolio, with optional dated rate steps, a floor and a ceiling) and `guardrails` (last year's amount grown by inflation, cut when the withdrawal rate has risen past an upper band and raised when it has fallen past a lower one). It only sets the expense: the withdraw order, a Shortfall and Settlement are unchanged. A fixed real amount is an ordinary expense with `growth: "inflation"`, not a kind.
+_Avoid_: Withdrawal strategy, safe withdrawal rate, glide path
+
+**Rule year**:
+The twelve monthly Occurrences, or the one annual Occurrence, of a rule Flow, counted from its first Landed date: the thirteenth, twenty-fifth, ... Occurrence (the second, third, ... for an annual Flow) begins the next. On that date, before any Flow lands, the rule reads the portfolio and fixes the year's amount. This is a decision, not the anniversary rule: under a shifting Calendar the first Landed date on or after an anniversary can give a year of eleven or thirteen Occurrences, which would not sum to the year's amount. A year the horizon or a Shortfall cuts short pays only its Occurrences.
+_Avoid_: Spending year, withdrawal year, rule period
+
+**Spending rule statement**:
+What a Projection reports per rule Flow with `spendingRules: true`: for each Rule year its first date, the `portfolio` read, the `amount` fixed, what was `paid`, both also in today's money (`real.amount`, `real.paid`, each deflated once at the year's first date), the `withdrawalRateBps` (absent when the portfolio is 0) and the `action` that led to the amount (`none`, `floor`, `ceiling`, `cut` or `raise`).
+_Avoid_: Spending report, withdrawal schedule
+
+**Estate statement**:
+What a Projection reports per row with `estate: true`, read from that row's own balances and changing no other figure: the Gross estate, the `debts` (every liability's amount owed), each Settlement cost and their exact total `costsTotal`, `net = gross − debts − costsTotal` (signed), each Gift and their exact total `giftsTotal`, and What heirs receive, with `net` and `toHeirs` also in today's money (`real.net` is the row's `realNetWorth` less each cost deflated once, so an empty block states exactly `realNetWorth`). A plan with no `estate` block still has one, with no cost and no gift.
+_Avoid_: Legacy, estate report, estate tax
+
+**Gross estate**:
+Every asset Account's value on the row's date: locked and Illiquid Accounts included, as they are in Net worth. Liabilities are not netted from it.
+_Avoid_: Legacy, total assets, net worth
+
+**Settlement cost**:
+One line of the estate block's `costs`: a share (`bps` with a stated `rounding`) of the Gross estate or of named asset Accounts' value, or a fixed amount grown by whole years from `Timeline.start`. It is taken before any Gift. The core states no tax: an inheritance tax, a transfer fee or a sale tax is a cost line the caller types.
+_Avoid_: Estate tax, inheritance tax, fee, legacy cost
+
+**Gift**:
+One line of the estate block's `gifts`: a share of the net estate or a fixed amount, taken in order from `max(0, net)`. A later Gift takes only what earlier ones left, so Gifts never exceed it.
+_Avoid_: Bequest, donation, legacy
+
+**What heirs receive** (`toHeirs`):
+`max(0, net)` less the Gifts: 0 when net is not above 0, and then `−net` is the shortfall.
+_Avoid_: Inheritance, legacy, estate
 
 **Tally label**:
 A label on an income Flow, on a contribution Flow, or on an asset Account (`returnLabel`, `gainLabel`), that a Levy sums over a Settlement period. A Flow or Account with no label is never tallied, which is how a tax-sheltered Account is left out. Gross tallies use the planned income amount; funded tallies use the amount a contribution actually applied after any cap. A label is the unit of per-person scope: separate caps per earner are separate labels, and `add` sums their Measures. A Levy whose `due` graph reads tally labels and has none of them supplied anywhere in the Scenario is refused by `check()` (`UNSUPPLIED_TALLY_LABEL`), because every total it reads would be zero in every Settlement period.
 _Avoid_: Category, tag, tax category
 
 **Returns tally**:
-The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. It is signed, and attributed from read-only valuations so it never changes a balance.
+The growth an Account with a `returnLabel` accrued inside a Settlement period, counted whether or not it was withdrawn. Net of its fee (ADR 0028). It is signed, and attributed from read-only valuations so it never changes a balance.
 _Avoid_: Interest income, investment income
 
 **Realised gain**:
-The gain of a withdrawal from an Account with a `gainLabel`: the amount withdrawn minus the Cost basis it used up. It is signed and tallied in the Settlement period of the withdrawal's Landed date.
+The gain of a withdrawal from an Account with a `gainLabel`: the amount withdrawn minus the Cost basis it used up. It is signed and tallied in the Settlement period of the withdrawal's Landed date. A Transfer realises it only with `realise: true`.
 _Avoid_: Capital gain, profit
 
 **Cost basis**:
-The pooled amount put into an Account (average cost): applied Contributions and surplus fills add to it, growth does not, and a withdrawal uses up a proportional share. The opening value is given in the Baseline.
+The pooled amount put into an Account (average cost): applied Contributions and surplus fills add to it, growth does not, and a withdrawal uses up a proportional share. A Transfer carries that share from its source to a gain-tracked target. The opening value is given in the Baseline.
 _Avoid_: Purchase price, lot
 
 **Prepayment**:
@@ -94,13 +130,21 @@ _Avoid_: Withholding, prepaid tax
 The one date after a Settlement period ends on which the Levy's due amount is reconciled against Prepayment. A balance due is paid like an expense and a refund lands like income. The date is the settlement rule's date moved forward to the next Business day, so a Settlement always falls after the period it closes. Settlements of several Levies on one Landed date are summed into one movement. A period the Projection ends before is still reported, with `settled: false`, and nothing is deducted.
 _Avoid_: Tax settlement, filing, payment
 
+**Contribution saving**:
+The fall in a Settlement period's `due` from extra funded contributions under one Tally label, found by raising that label's funded Tally in whole steps and re-evaluating the Levy while each step pays, and dropping a last step whose last grain saved nothing because it went past a cap or past where `due` stops falling (`contributionSavings`). It is a statement about one period's Levy, in the caller's label order, and never changes a Scenario.
+_Avoid_: tax saving, optimisation
+
 **Carry-in**:
 The tallies and Prepayment already recorded for a Settlement period that began before `start`, supplied by the caller because the Baseline holds balances only. It covers the period containing `start` and any earlier period whose Settlement falls after `start`, and it covers money that landed before `start`, not money that was due before it.
 _Avoid_: Year-to-date, opening income
 
 **Account**:
-A named balance with an explicit rule in the Scenario: `kind` (`asset` or `liability`), rate in basis points, optional `lockedUntil`. Every account with a balance must have a rule. A liability's balance is the positive amount owed. Without `compounding`, `rate` is an **effective annual rate**: one year grows the balance by exactly the rate, whatever the compounding period, unless a Return series covers those dates. With `compounding`, `rate` is a **nominal annual rate** and the Account also carries the split of **Capitalised balance** and **Accrued interest**. A Return series replaces the rate for the dates it covers; the rate stays required and validated.
+A named balance with an explicit rule in the Scenario: `kind` (`asset` or `liability`), rate in basis points, optional `lockedUntil`, and optional `liquid`, where `liquid: false` marks an **Illiquid asset**. Every account with a balance must have a rule. A liability's balance is the positive amount owed. Without `compounding`, `rate` is an **effective annual rate**: one year grows the balance by exactly the rate, whatever the compounding period, unless a Return series covers those dates. With `compounding`, `rate` is a **nominal annual rate** and the Account also carries the split of **Capitalised balance** and **Accrued interest**. A Return series replaces the rate for the dates it covers; the rate stays required and validated.
 _Avoid_: Wallet, holding
+
+**Illiquid asset**:
+An asset Account marked `liquid: false`, such as a home or a car. It is in Net worth and `allAssets`, and left out of Accessible net worth, `unlockedAssets`, the Minimum buffer, the rule-of-thumb numerator on the unlocked and accessible bases, and the accessible Metrics. No `withdraw` or `surplus` step may name it, though a contribution may fund it. It is sold only by a Planned withdrawal that names it, never by a Shortfall. Absent or `liquid: true` means liquid, and `liquid` on a liability is refused.
+_Avoid_: Real asset (the word `real` already means inflation-adjusted money), locked asset (a locked asset only waits for `lockedUntil`)
 
 **Nominal annual rate**:
 A rate stated by a contract or a law together with a **Compounding period**, such as "7% nominal, compounded monthly". It is not an effective annual rate: a full period earns exactly `rate / periodsPerYear`, and a year earns more when the interest is capitalised more often. An Account's `rate` is nominal exactly when it carries `compounding`; absent, the rate is effective annual.
@@ -131,34 +175,86 @@ One Account's value in a Projection row, split into `amount`, `capitalised` and 
 _Avoid_: Balance entry, row amount
 
 **Flow**:
-A dated cash movement of kind `income`, `expense` or `contribution`, with a frequency (including `once`), a start, an optional end, and growth. Replaces the former Stream and Event.
+A dated cash movement of kind `income`, `expense`, `contribution`, `withdrawal` or `transfer`, with a frequency (including `once`), a start, an optional end, and growth. It may gate on a Milestone with `startAt` and `endAt`. Replaces the former Stream and Event.
 _Avoid_: Stream, Event, Transaction, Recurring transaction, Schedule
 
 **Contribution**:
-A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation. Into an asset account it is a target: it is limited to the Available cashflow on that Occurrence and is never funded from existing assets. Same-date amounts are summed per Account, and `cashflow.contribute` sets the funding priority.
+A Flow that moves money from cashflow into an Account. Not an expense: net worth is unchanged at that instant. Into a liability account it is a debt payment and an obligation, and a `level` amount into a nominal liability pays its Level payment. Into an asset account it is a **target** (`funding` absent or `target`): it is limited to the Available cashflow on that Occurrence and is never funded from existing assets, and `cashflow.contribute` sets the funding priority. With `funding: "obligation"` it is a **purchase**: paid in full, subtracted before Available cashflow, drawn from the `withdraw` list when the day's cash is short or a Shortfall when that is short too, and not routed. An obligation's target may not be on the `withdraw` list (`OBLIGATION_TARGET_WITHDRAWN`). A Contribution that is a target and one that is an obligation into one Account are separate. Same-date amounts of one kind are summed per Account. `funding` on a liability is refused: a debt payment is already an obligation. With `funding: "employer"` it is an **Employer contribution**.
+
+**Employer contribution**:
+A Contribution with `funding: "employer"` into a liquid asset Account: money the employer pays into a provident fund. It lands in full on its Landed date from outside the household's cash, so it is not income, not an expense, never part of Available cashflow, never capped or unfunded, never drawn from the `withdraw` list and never a Shortfall, and its target need not be in `cashflow.contribute`. It adds to the Cost basis, may be locked, and is tallied only under the `label` its author gives. In the FI test it stops with Earned income, fixed or derived. The Annual roll-up reports `employerContributions` and the Cash-flow breakdown an `employer` list, both outside `income` and `contributions`. Refused into a liability (`EMPLOYER_INTO_LIABILITY`) and into an Illiquid asset (`EMPLOYER_INTO_ILLIQUID`).
+_Avoid_: match, employer match, free money
+
+**Account fee**:
+A yearly share of an asset Account's value charged to it every month, stated as `fee` on the Account (`bps` a year, a required `rounding`). On the last day of each calendar month (a Due date, shifted to a Landed date by the Calendar) `value x bps / 120000` leaves the Account, where `value` is the valuation read before the date's Flows land, Accrued interest included. It is read first and taken last on the date, never more than the Account holds, and it goes nowhere: it is no expense and no income, is in no cashflow, causes no Shortfall, takes no Cost basis, is no Milestone evaluation date, is counted net under `returnLabel`, and is on every Market path, because a Return series replaces the rate and not the fee. A locked and an Illiquid Account are charged; a liability may not carry one (`LIABILITY_MISUSE`). The Annual roll-up reports `fees` and `accountFees`, and `interest` is the growth before the fee. A fee of 0 bps is no fee. A declared Flow may not take the id `fee:<account>` beside a fee above 0 bps.
+_Avoid_: expense ratio, TER, management fee
+
+**Payout**:
+A share of an asset Account's value paid out of it as passive income, stated as `payout` on the Account (`bps` a year, a `frequency` of monthly, quarterly, semiannual or annual, a required `rounding`, and the window, `label` and `prepayments` of a Flow). The Account's `rate` stays its total return: the payout leaves and the rest compounds. On the last day of each calendar period (a Due date, shifted to a Landed date by the Calendar) `value x bps / (10000 x periods a year)` leaves the Account, where `value` is the valuation read before the date's Flows land. It lands as income with `earned: false`: in `income` and Available cashflow, and it goes on in the FI test. It takes no Cost basis and realises no gain, a locked Account pays out too, and it is refused on an Illiquid asset (`PAYOUT_ILLIQUID`), a liability (`LIABILITY_MISUSE`) and beside `returnLabel` (`CONFLICTING_LABELS`). The Annual roll-up reports `payouts` (inside `income`) and the Cash-flow breakdown a `payouts` list by Account. A payout of 0 bps is no payout.
+_Avoid_: dividend, distribution, yield
 
 **Available cashflow**:
-The income on one Occurrence minus its expenses and debt payments actually made, floored at zero. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
+The income on one Occurrence minus its expenses, debt payments and obligations actually made, floored at zero. Cash from a Planned withdrawal, a sale's proceeds included, is left out: it pays what it was raised for and the rest lands in surplus, so borrowing or selling never looks like saving. Other dates are ignored; this is the ceiling for asset contributions. Because the cap is per Occurrence, money saved on one date can still be spent by an expense on another and leave a Shortfall then.
 _Avoid_: Free cashflow, disposable income
 
 **Unfunded contribution**:
 The part of an asset contribution's planned amount, after same-date summing per Account, that Available cashflow could not cover. It is dropped, not carried over, and a zero grant never touches the account. Debt planned above the amount owed is not unfunded.
 _Avoid_: Missed contribution
 
+**Planned withdrawal**:
+A Flow of kind `withdrawal`. From a liability `source` it borrows: on each Landed date the amount owed grows by the amount and the same cash lands in cashflow, so net worth is unchanged that day. From an asset `source` it is a **sale**: `min(planned, value)` leaves the Account and lands in cashflow (nothing while the Account is locked), its Realised gain is tallied when the Account has a `gainLabel`, and a Derived amount that reads the Account sells all of it. It is not income, is never tallied as income and does not stop in the FI test. A sale of an Illiquid asset raises Accessible net worth by the cash that lands.
+_Avoid_: draw
+
+**Transfer**:
+A Flow of kind `transfer`: money moved from an asset `source` that is not Illiquid to an asset or liability `target`, both the plan's own Accounts, outside cashflow. It is not income, an expense, a Contribution or a Planned withdrawal, never enters Available cashflow, the `withdraw` list or a Shortfall, and leaves net worth unchanged on its date. `min(planned, what the source holds)` moves (nothing while the source is locked, and no more than a liability target owes), so it never overdraws; what could not move is `unmoved` in the Cash-flow breakdown. The Cost basis moves with the money, and `realise: true` tallies the source's Realised gain on it as a sale does (off by default). It lands after the date's income, expenses and Contributions: before the surplus when the date's net is zero or above, after the `withdraw` list has drawn when it is below zero (so it never turns a bill the plan can pay into a Shortfall); several of one date apply in Scenario order. Into a liability it is a payment line marked `transferred` on the Liability statement. A gift to someone outside the plan is an expense, not a Transfer.
+_Avoid_: draw, rebalance, internal payment
+
+**Level payment**:
+The one payment a `level` Contribution makes into a nominal liability: the amount that repays a principal over a number of equal payments at the Account's nominal rate, computed once from principal, rate and term and rounded once as the caller states. It does not grow.
+_Avoid_: annuity payment, PMT, fixed payment, installment
+
+**Liability statement**:
+One liability's monthly record, reported as `Projection.liabilities` only when `project` is given `liabilityStatements: true`. Each **Statement month** gives the amount owed at its start (Accrued interest included), the Planned withdrawals that borrowed from it, the debt payments applied after the cap, its interest and the amount owed at its end. The interest is the residual, so `opening + drawn + interest − paid = closing` holds exactly (a liability a Transfer pays down also lists `transferred`, taken off the same way).
+_Avoid_: amortization table, loan schedule, payment schedule
+
+**Statement month**:
+A calendar month, cut by the Timeline start, the horizon or a run-out date, and the unit a Liability statement reports, whatever the Compounding period. A cut edge makes it partial.
+_Avoid_: period, statement period
+
+**Paid-off date**:
+The first Landed date on which a liability's amount owed reaches zero after being above zero, reported as `paidOff` on its Liability statement. It is absent while the amount owed is never zero, such as a loan still owed at the horizon.
+_Avoid_: payoff date, maturity date, final payment date
+
 **Earned income**:
-Income from work, marked `earned: true`. It is the only income that stops in the FI test.
+Income from work, marked `earned: true`. With an Employer contribution, it is all that stops in the FI test.
 _Avoid_: Active income, salary income
 
 **Passive income**:
-Income marked `earned: false`. It continues when earned income stops.
+Income marked `earned: false`, such as rent or an Account's Payout. It continues when earned income stops.
 _Avoid_: Investment income, unearned income
 
+**Expense category**:
+An optional name on an expense Flow that groups spending in reports, 1 to 64 code points long (a code point is one Unicode scalar value, so a decomposed accent counts as two and an emoji as one). It has no control, invisible or bidirectional code point and no leading or trailing whitespace (ADR 0018), so two expenses share a group exactly when their category strings are equal code point for code point; nothing is trimmed or normalised. It is inert: the engine never reads it, so no Projection, FI answer or chance result changes with it. It is not a **Tally label**, which a Levy sums; the two share no vocabulary and no field.
+_Avoid_: tag, label, group, Tally label
+
+**Cash-flow breakdown**:
+One Annual roll-up's report of where its money came from and went, reported as `Projection.cashflow` only when `project` is given `cashflowBreakdown: true`. It lists planned income by Flow, a Payout list by Account, Prepayment and Settlement by Levy, expenses by Flow and by category, contributions by Flow and Account with the unfunded part, planned withdrawals, what `withdraw` drew and what `surplus` filled, and the unmet amount. Money in (income and payouts) equals money out exactly, and every total equals its roll-up field, `income` with the payouts added.
+_Avoid_: Sankey, statement, budget
+
 **Cashflow**:
-The routing rules for net money each time flows land: ordered `surplus` steps (account, optional fixed `upTo`), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list.
+The routing rules for net money each time flows land: ordered `surplus` steps (account, optional `upTo`, optional `share` of what is left), an ordered `contribute` list of asset accounts (funding priority), and an ordered `withdraw` list whose entries are an Account or an Account with a Reserve floor. An `upTo` and a floor are a number, or `{ amount, growth }` grown by whole years from the Timeline start so it keeps its value in today's money (ADR 0030).
 _Avoid_: Income/expense delta
 
+**Routing statement**:
+`Projection.routing`, opt-in (the `routing` option of `project()`) and present only when some `upTo` or `downTo` is `{ amount, growth }`: for every surplus step and `withdraw` entry in list order, its `entry` position and the target in force as `{ first, horizon }` (on the Timeline start and on the horizon date) or `null` when it has none. The same figure `routedTargetAt` returns, never re-derived by a caller (ADR 0030).
+_Avoid_: Resolved target, routing echo
+
+**Reserve floor**:
+The `downTo` of a `withdraw` entry: the entry draws its Account only down to that value, then the draw moves on, so an emergency fund is kept while other Accounts are drawn first. The same Account may appear again later with a lower floor or none. A Shortfall the floors stop is unmet, never taken from below the floor.
+_Avoid_: Emergency fund, buffer, minimum balance
+
 **Shortfall**:
-Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
+Money owed on an Occurrence that no unlocked Account in the `withdraw` list can supply above its floor. Expenses and debt payments are never refused; asset contributions are capped before this point. A debt payment can cause one; an asset contribution cannot. The Projection ends on that date.
 _Avoid_: Overdraft, deficit
 
 **Runs-out date**:
@@ -166,7 +262,7 @@ The date of the first Shortfall, recorded with the unmet amount. Absent when mon
 _Avoid_: Depletion date, bankruptcy
 
 **Net worth / Accessible net worth**:
-Net worth is every Account's value with liabilities subtracted, including locked assets. Accessible net worth does the same but leaves out assets before their `lockedUntil`; it is not the same as the subset the `withdraw` list can draw on.
+Net worth is every Account's value with liabilities subtracted, including locked and Illiquid assets. Accessible net worth does the same but leaves out assets before their `lockedUntil` and every Illiquid asset; it is not the same as the subset the `withdraw` list can draw on.
 _Avoid_: Liquid assets, spendable
 
 **Financial Independence (FI)**:
@@ -182,12 +278,42 @@ The monthly spending that replaces planned expenses from the FI month onward whe
 _Avoid_: Post-retirement expenses, withdrawal rate
 
 **Minimum buffer**:
-The number of months of expenses the FI method requires as accessible net worth.
+The number of months of expenses the FI method requires as accessible net worth. An Illiquid asset does not count toward it.
 _Avoid_: Emergency fund, cash reserve
 
 **Rule-of-thumb reference**:
 An informational multiple of annual expenses (25 by default) reported beside a reachable FI month. The caller may set the multiplier, which balances count, which twelve months of expenses it divides by, and nominal or real money. It never decides the FI answer.
 _Avoid_: FI threshold, target net worth, 25× reference
+
+## Milestones
+
+**Milestone**:
+A named point in the plan. Its Criteria are combined with `all` or `any`, and it fires on the first evaluation date (or, for a Static milestone, the date) its Criteria hold; it stays fired. A Flow gates on it with `startAt` (lands on or after the fire date) or `endAt` (lands strictly before it).
+_Avoid_: Event, trigger, goal, checkpoint
+
+**Criterion**:
+One condition of a Milestone: a `date`, an offset in months from another Milestone's fire date, a Metric compared with an amount, or a Metric compared with a multiple of another Metric.
+_Avoid_: Condition, rule, predicate
+
+**Metric**:
+A money figure read from the plan on a date: a named balance (net worth, accessible net worth, all assets, unlocked assets, liabilities), the sum of named Accounts, or an expense window (next or trailing twelve months). Read before that date's Flows land.
+_Avoid_: KPI, indicator, Measure
+
+**Fire date**:
+The date a Milestone fires. It is a Landed date: for a Static milestone it is known before the run; for a Dynamic milestone it is the evaluation date on which it first fires.
+_Avoid_: Trigger date, hit date, achieved date
+
+**Static milestone**:
+A Milestone whose Criteria name only dates and other Static milestones, so its Fire date is known before the run. It may fall before `Timeline.start`.
+_Avoid_: Fixed milestone, scheduled milestone
+
+**Dynamic milestone**:
+A Milestone with a Metric Criterion, or one that names a Dynamic milestone. It fires only on an Evaluation date.
+_Avoid_: Conditional milestone, live milestone
+
+**Evaluation date**:
+A date on which a Flow's recurrence lands or a Settlement falls, and so the only dates a Dynamic milestone can fire on. Observation rows are never evaluation dates, so `resolution` changes no fire date.
+_Avoid_: Tick, check date, observation date
 
 ## Market Paths and Stochastic Runs
 
@@ -206,6 +332,14 @@ _Avoid_: Rate override, return stream
 **Return model**:
 A joint bucket table of month span returns, one entry per Account in the model. It carries no fitted distribution: lognormal, historical bootstrap and a hand-written table all arrive as bucket tables.
 _Avoid_: Distribution, market model
+
+**Volatility**:
+The standard deviation of an asset Account's yearly return, in basis points, stated as `volatility` on the Account (0 to 10000; a liability may not carry one, `LIABILITY_MISUSE`). Inert to `project()`, FI and every deterministic figure: only `planReturnModel` reads it (ADR 0029).
+_Avoid_: Risk, standard deviation, sigma
+
+**Plan return model**:
+The Return model `planReturnModel` builds from a Scenario: each Account with a Volatility above 0 has its `rate` as the mean of its month return and one shared standard normal factor per Market bucket, from a committed integer quantile table; an Account with none is left out and keeps its rate. The same Scenario and bucket count give the same model (ADR 0029).
+_Avoid_: Monte Carlo settings
 
 **Market bucket**:
 One month's span returns for every Account in a Return model, with an integer weight; the weights sum to exactly 2^32, which is what makes the draw unbiased without rejection.
@@ -238,6 +372,22 @@ _Avoid_: Success probability, confidence
 **Probability threshold**:
 The FI survival share a probability-threshold FI method requires, in basis points from 1 to 10000.
 _Avoid_: Confidence level, target
+
+**Chance of success**:
+The result of `chanceOfSuccess`: the Success probability of one plan over seeded Market paths, with its Bands, its Runs-out counts by Annual roll-up period and, for a plan with a rule Flow, its Spending Bands. It is an Outcome distribution for one plan, not a Projection.
+_Avoid_: Confidence, forecast, simulation result
+
+**Band**:
+The net-worth Percentiles across Market paths at one Annual roll-up end, at levels 10, 25, 50, 75 and 90. A failed path contributes the net worth it died with.
+_Avoid_: Range, confidence interval, corridor
+
+**Path outcome**:
+What one Market path of a Chance of success came to, reported per path with the `outcomes` option, in path order, from the same engine run that feeds the Bands (ADR 0011): its `index` under the run's seed (0-based, so "path 37 of this run"), its `closingNetWorth` at the last Annual roll-up, its `lowestNetWorth` (the least closing net worth of any of its roll-ups) and `lowestAt` (the first roll-up index that holds it), and `runsOut` (its date and unmet amount) when it ran out. A path that ran out is pinned at the net worth it died with, as in a Band. `projectPath` replays the path `index` as a Projection, with `returns`: each Account's compounded return over each Annual roll-up, in basis points, rounded half away from zero. It counts the market's growth from the roll-up's first day through its last day, including the last day's growth, with months compounding and days within a month accruing linearly; the roll-up's `closingNetWorth` is read on its last day before that day's growth, so the two differ by one day of growth as well as by Flows, and a roll-up that is only the horizon day reports 0.
+_Avoid_: Trial, scenario, run
+
+**Spending Band**:
+The Percentiles, at levels 10, 25, 50, 75 and 90 and by nearest rank, of what a plan's rule Flows paid across Market paths in one Annual roll-up (`spending.bands`), present in a Chance of success only when the Scenario has a rule Flow (ADR 0024). It counts what was paid, not the planned amount, in nominal terms: a path that ran out pays 0 in every later roll-up, and the roll-up it ran out in counts what was paid before it and the met share of the failing day. Its `lowestYear` is the same five Percentiles of each path's lowest year, the least of its roll-ups that hold a whole year of the rule's payments (a partial first, last or clipped roll-up never counts); a path that ran out has a lowest year of 0, wherever it ran out, and is always in the sample.
+_Avoid_: Expense Band, income Band, withdrawal Band
 
 ## Input Conventions
 

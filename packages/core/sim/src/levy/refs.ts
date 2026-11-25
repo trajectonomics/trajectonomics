@@ -16,6 +16,7 @@ export const REF_KEYS: { readonly [Op in keyof ByOp]: readonly OperandKey<ByOp[O
 		mul: ["a", "b"],
 		pick: ["a", "b", "then", "else"],
 		flow: [],
+		account: [],
 	})
 
 const BY_NAME: Readonly<Record<string, readonly string[]>> = REF_KEYS
@@ -32,6 +33,16 @@ export function operandsOf(measure: Measure): readonly string[] {
 		const operand: unknown = Reflect.get(measure, key)
 		return typeof operand === "string" ? [operand] : []
 	})
+}
+
+/** The Account ids a Derived amount reads, in Measure order. */
+export function accountRefsOf(derive: Derive): readonly string[] {
+	const ids: string[] = []
+	for (let index = 0; index < derive.measures.length; index++) {
+		const measure = derive.measures[index]
+		if (measure !== undefined && measure.op === "account") ids.push(measure.account)
+	}
+	return ids
 }
 
 /** The Flow ids a Derived amount reads, in Measure order. */

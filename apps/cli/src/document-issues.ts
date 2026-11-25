@@ -8,6 +8,16 @@ function paramsOf(issue: z.core.$ZodIssue): Record<string, unknown> {
 	return typeof params === "object" && params !== null ? (params as Record<string, unknown>) : {}
 }
 
+/**
+ * The message a schema authored for a wrong type (`z.string({ error })`), so a document can say the
+ * form it wants. The validator's own default starts with "Invalid input" and never reaches the
+ * envelope (ADR-0013).
+ */
+function authoredMessage(issue: z.core.$ZodIssue): string | undefined {
+	if (issue.code !== "invalid_type" || issue.message.startsWith("Invalid input")) return undefined
+	return issue.message
+}
+
 /** One row per validator issue; an unexpected key gets its own row, under its container. */
 function documentRows(issue: z.core.$ZodIssue): Row[] {
 	if (issue.code === "custom") {
@@ -26,7 +36,8 @@ function documentRows(issue: z.core.$ZodIssue): Row[] {
 			message: SENTENCES.unexpectedField,
 		}))
 	}
-	return [{ path: documentPathOf(issue.path), message: sentenceOf(issue, "document") }]
+	const message = authoredMessage(issue) ?? sentenceOf(issue, "document")
+	return [{ path: documentPathOf(issue.path), message }]
 }
 
 /** The hint a core put on its first issue; it owns that sentence too (ADR-0024). */

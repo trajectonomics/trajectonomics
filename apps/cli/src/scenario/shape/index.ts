@@ -1,8 +1,10 @@
 import { accountShape } from "./account"
 import { calendarShape } from "./calendar"
 import { cashflowShape } from "./cashflow"
+import { estateShape } from "./estate"
 import { flowShape } from "./flow"
 import { levyShape } from "./levy"
+import { milestoneShape } from "./milestone"
 import { BASIS_POINTS } from "./terms"
 
 export { scenarioShapeDescription } from "./description"
@@ -56,6 +58,12 @@ export function scenarioShapeProperties(version: number | undefined): Record<str
 			description: "The Streams, Events and Contributions the Scenario assumes.",
 			items: flowShape,
 		},
+		milestones: {
+			type: "array",
+			description:
+				"The named points in the plan that Flows may gate on, each fired by its criteria. Omit it when the Scenario declares none; a list that is present is non-empty.",
+			items: milestoneShape,
+		},
 		cashflow: cashflowShape,
 		levies: {
 			type: "array",
@@ -64,6 +72,7 @@ export function scenarioShapeProperties(version: number | undefined): Record<str
 			items: levyShape,
 		},
 		calendar: calendarShape,
+		estate: estateShape,
 	}
 }
 

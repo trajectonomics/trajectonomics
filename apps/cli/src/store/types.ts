@@ -1,12 +1,18 @@
-import type { AccountType, ChartOfAccounts } from "@trajectonomics/core/ledger"
+import type { ChartOfAccounts } from "@trajectonomics/core/ledger"
 import type { AppError } from "../errors"
-import type { ScenarioDocument } from "../scenario/document"
+import type { AccountClosed, AccountCreated, AccountDeleted, NewAccount } from "./account-types"
 import type { Ledger } from "./ledger"
-import type { AccountRow, EntityRow, PostingRow, ScenarioRow, TxRow } from "./rows"
+import type { PreMigrationCopy } from "./pre-migration-files"
+import type { RestoreCounts, RestoreRows } from "./restore-types"
+import type { AccountRow, EntityRow, PostingRow, TxRow } from "./rows"
+import type { ScenarioStore } from "./scenario-store"
 import type { TxFilter } from "./tx-filter"
+import type { Planning } from "./tx-planning"
 import type { NewAmendment, NewTransaction, TxAdded, TxAmended, TxVoided } from "./tx-types"
 
+export type * from "./account-types"
 export type { Ledger } from "./ledger"
+export type * from "./restore-types"
 export type {
 	AccountRow,
 	EntityRow,
@@ -15,7 +21,10 @@ export type {
 	TxCorrection,
 	TxRow,
 } from "./rows"
+export type * from "./scenario-store"
+export type * from "./scenario-types"
 export type { TxFilter } from "./tx-filter"
+export type * from "./tx-planning"
 export type {
 	ImportRejection,
 	NewAmendment,
@@ -30,6 +39,12 @@ export type {
 
 /** The only source of time the store reads. Nothing in the store calls `Date.now()`. */
 export type Clock = () => Date
+
+/** The only source of ids the store reads: a client-generated UUIDv7 whose time part is `at`. */
+export type IdSource = (at: Date) => string
+
+/** What a write reads from the outside world: the time, and the ids of its new rows. */
+export type Source = { clock: Clock; newId: IdSource }
 
 /** Every list names its order; each order ends on a unique key, so it is total. */
 export type EntitySort = "id"
@@ -47,49 +62,18 @@ export type ListOptions<S> = {
 /** Runs the write for real, then rolls it back before commit (ADR-0019). */
 export type WriteOptions = { dryRun?: boolean }
 
-export type NewAccount = { name: string; type: AccountType; currency: string; parentId?: string }
-export type AccountCreated =
-	| { status: "created"; account: AccountRow }
-	| { status: "name_taken"; account: AccountRow }
-export type AccountClosed =
-	| { status: "archived" | "already_archived"; account: AccountRow }
-	| { status: "not_found" }
-export type AccountDeleted =
-	| { status: "deleted" | "has_postings" | "has_children"; account: AccountRow }
-	| { status: "not_found" }
-
-export type NewScenario = { name: string; document: unknown }
-export type ScenarioSaved = { status: "created" | "updated" | "unchanged"; scenario: ScenarioRow }
-export type ScenarioForked =
-	| { status: "forked" | "name_taken"; scenario: ScenarioRow }
-	| { status: "not_found" }
-export type ScenarioDeleted = { status: "deleted"; scenario: ScenarioRow } | { status: "not_found" }
-
-/**
- * A pure change to a fork's copy, applied inside the fork's one write. Return an `AppError`
- * (usually `invalid_input`) and the whole write rolls back.
- */
-export type ScenarioTransform = (document: ScenarioDocument) => ScenarioDocument | AppError
-
-export type ForkOptions = WriteOptions & { transform?: ScenarioTransform }
-
-/** Every row of a lossless dump, by table, exactly as the list methods return them. */
-export type RestoreRows = {
-	entity: readonly EntityRow[]
-	account: readonly AccountRow[]
-	tx: readonly TxRow[]
-	posting: readonly PostingRow[]
-	scenario: readonly ScenarioRow[]
-}
-export type RestoreCounts = { [Table in keyof RestoreRows]: number }
-
 /**
  * The only code that reads or writes `traj.db`. Every method returns its value or an `AppError`
  * built by `fail()`; none throws for an expected failure.
  */
-export interface Store {
+export interface Store extends ScenarioStore, Planning {
 	/** The database file this store owns. */
 	readonly path: string
+	/**
+	 * The copy written because opening this store migrated the database, so a caller can say where
+	 * to go back to. Absent for a database already at head and for a new one (cli ADR-0050).
+	 */
+	readonly upgradedFrom: PreMigrationCopy | undefined
 	/** The personal entity every account, transaction and scenario belongs to. */
 	readonly entityId: string
 	/** `PRAGMA user_version`: the schema version the export header carries. */
@@ -126,13 +110,6 @@ export interface Store {
 	/** The transaction with this id in the personal entity, or null. */
 	getTransaction(id: string): TxRow | null | AppError
 	listPostings(options: { sort: PostingSort; filter?: TxFilter }): PostingRow[] | AppError
-	saveScenario(input: NewScenario, options?: WriteOptions): ScenarioSaved | AppError
-	/** Copies a live Scenario by id; `transform` runs inside the same write (ADR-0019, ADR-0024). */
-	forkScenario(id: string, name: string, options?: ForkOptions): ScenarioForked | AppError
-	deleteScenario(id: string, options?: WriteOptions): ScenarioDeleted | AppError
-	/** The live Scenario this id or exact name names; an id is read first (ADR-0018). */
-	getScenario(idOrName: string): ScenarioRow | null | AppError
-	listScenarios(options: ListOptions<ScenarioSort>): ScenarioRow[] | AppError
 	/**
 	 * Every row of every table, tombstones included, in the export's canonical order, read inside
 	 * one deferred read transaction so one dump never mixes two snapshots.

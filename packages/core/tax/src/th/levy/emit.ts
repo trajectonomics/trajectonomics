@@ -3,12 +3,14 @@ import { addAssessableMeasures } from "./assessable"
 import { addMinimumGrossTax, addProgressiveTax, addRegularTax } from "./brackets"
 import { addClaimMeasures } from "./claims"
 import { addExpenseMeasures } from "./expenses"
+import { addFilerReads } from "./filer-reads"
+import { addThLevyScope } from "./filer-tallies"
+import { validateThFilers } from "./filers"
 import { ThLevyGraph } from "./graph"
 import type { ThLevy, ThLevyMonthDay } from "./graph-types"
 import { ThLevyMeasureId } from "./measure-ids"
 import type { ThLevyProfile } from "./profile-types"
 import { addSection40_4 } from "./regimes"
-import { addThLevyTallies } from "./tallies"
 
 /** Default Levy id: Thailand Personal Income Tax for the 2026 tax year. */
 const DEFAULT_ID = "th-2026-pit"
@@ -29,18 +31,32 @@ const DEFAULT_SETTLEMENT: ThLevyMonthDay = { month: 3, day: 31 }
  * - final withholding tax - Section 47 bis credit`, which is the calculator's `netTaxPayable`
  * when no separate sheet, real estate, or other withholding is supplied.
  * Units: Every monetary Measure is integer satang.
- * Throws: TaxValidationError for an invalid profile allowance, donation, actual expense, or rate.
+ * With `profile.filers`, each Filer's income is tallied under its Filer labels, and a joint Return
+ * of two Filers is one bracket walk over the sum, with each Filer's own Section 42 bis ceiling.
+ * Throws: TaxValidationError for an invalid profile allowance, donation, actual expense, or rate,
+ * or for a `filers` list the filing status does not allow.
  *
  * @param profile Taxpayer profile and elections fixed at emit time.
  * @statute Thailand Revenue Code Sections 40, 42 bis, 47, 47 bis, 48(1)–(2), 50(2)(g), 56.
  */
 export function emitThLevy(profile: ThLevyProfile = {}): ThLevy {
 	const graph = new ThLevyGraph()
-	const tallies = addThLevyTallies(graph)
+	const status = profile.filingStatus ?? "single"
+	const filers = profile.filers && validateThFilers(profile.filers, status)
+	const scope = addThLevyScope(graph, filers, status)
+	const tallies = scope.total
 	const section40_4 = addSection40_4(graph, tallies, profile.section40_4)
 	const assessable = addAssessableMeasures(graph, tallies, section40_4)
-	const expenses = addExpenseMeasures(graph, tallies, profile.expenses)
-	const allowances = addAllowanceMeasures(graph, tallies, profile, assessable.total, expenses)
+	const reads = addFilerReads(graph, scope, profile, assessable.total)
+	const expenses = addExpenseMeasures(graph, tallies, profile.expenses, scope.views)
+	const allowances = addAllowanceMeasures(
+		graph,
+		tallies,
+		profile,
+		assessable.total,
+		expenses,
+		reads,
+	)
 	const progressive = addProgressiveTax(graph, allowances.netTaxable)
 	const minimum = addMinimumGrossTax(graph, assessable.grossNonEmployment)
 	const regular = addRegularTax(graph, progressive, minimum.applicable)

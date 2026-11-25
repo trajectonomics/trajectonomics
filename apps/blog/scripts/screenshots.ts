@@ -12,6 +12,9 @@ const OUTPUT_ROOT = resolve(import.meta.dir, "..", "docs", "screenshots")
 const PAGES = Object.freeze([
 	{ name: "front", path: "/" },
 	{ name: "post", path: "/guides/one-answer-every-time/" },
+	{ name: "front-th", path: "/th/" },
+	{ name: "post-th", path: "/th/guides/one-answer-every-time/" },
+	{ name: "post-fallback", path: "/guides/software-factory/" },
 	{ name: "not-found", path: "/missing/" },
 ])
 

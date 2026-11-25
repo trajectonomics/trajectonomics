@@ -1,0 +1,105 @@
+import { describe, expect, test } from "bun:test"
+import type { HouseholdDocument } from "../../contract"
+import { anchorRow, anchorTarget, anchorWords } from "./anchor"
+import { itemLabel, itemNames, itemText, NO_ITEM_NAMES } from "./names"
+import { personNames } from "./people"
+
+const HOUSEHOLD: HouseholdDocument = {
+	schemaVersion: 1,
+	people: [
+		{ id: "me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+		{ id: "mali", role: "dependent", relation: "child", born: "2027-09", lifeExpectancy: 90 },
+		{ id: "gran", role: "dependent", relation: "parent", born: "1950-01", lifeExpectancy: 90 },
+	],
+	anchors: [],
+}
+const ACCOUNTS = new Map([["acct-1", "Bank"]])
+const NAMES = itemNames(ACCOUNTS, HOUSEHOLD)
+
+describe("a person is called by the role the household states", () => {
+	test("the holder is You, a partner is Your partner, and a dependent is its relation", () => {
+		expect(itemLabel(NAMES, "person", "me")).toEqual({ text: "You", named: true })
+		expect(itemText(NAMES, "person", "partner")).toBe("Your partner")
+		expect(itemText(NAMES, "person", "mali")).toBe("Child")
+		expect(itemText(NAMES, "person", "gran")).toBe("Parent")
+	})
+
+	test("two people of one role take their id, so a page can tell them apart", () => {
+		const twins: HouseholdDocument = {
+			...HOUSEHOLD,
+			people: [
+				{ id: "mali", role: "dependent", relation: "child", born: "2027-09", lifeExpectancy: 90 },
+				{ id: "pim", role: "dependent", relation: "child", born: "2029-01", lifeExpectancy: 90 },
+			],
+		}
+		const names = personNames(twins)
+		expect(names.get("mali")?.label).toBe("Child (mali)")
+		expect(names.get("pim")?.label).toBe("Child (pim)")
+	})
+
+	test("a person the household does not hold shows by id, not named", () => {
+		expect(itemLabel(NAMES, "person", "ghost")).toEqual({ text: "ghost", named: false })
+		expect(itemLabel(NO_ITEM_NAMES, "person", "me")).toEqual({ text: "me", named: false })
+	})
+})
+
+describe("an id no Read names shows as the id", () => {
+	test("a Flow and a Milestone have no name in the CLI's output, so each is the id and unnamed", () => {
+		expect(itemLabel(NAMES, "flow", "salary")).toEqual({ text: "salary", named: false })
+		expect(itemLabel(NAMES, "milestone", "car-paid-off")).toEqual({
+			text: "car-paid-off",
+			named: false,
+		})
+	})
+
+	test("an Account is named by the ledger, and one only the plan has shows as the id", () => {
+		expect(itemLabel(NAMES, "account", "acct-1")).toEqual({ text: "Bank", named: true })
+		expect(itemLabel(NAMES, "account", "condo")).toEqual({ text: "condo", named: false })
+	})
+
+	test("an id is never turned into words: a kebab-case id is kept as it is", () => {
+		expect(itemText(NAMES, "milestone", "net-worth-ten-million")).toBe("net-worth-ten-million")
+	})
+})
+
+describe("anchors in words", () => {
+	test("a path names its item and its date, or none when it has no words", () => {
+		expect(anchorTarget("flows.fund.end")).toEqual({ kind: "flow", id: "fund", edge: "end" })
+		expect(anchorTarget("accounts.joint.start")?.kind).toBe("account")
+		expect(anchorTarget("flows.fund")).toBeNull()
+		expect(anchorTarget("flows.fund.rate")).toBeNull()
+		expect(anchorTarget("tax.year.end")).toBeNull()
+	})
+
+	test("the person reads as the household's words: an age, a life end and a joining", () => {
+		const people = NAMES.people
+		expect(anchorWords({ path: "flows.fund.end", person: "me", age: 60 }, people)).toBe(
+			"at you, age 60",
+		)
+		expect(anchorWords({ path: "flows.fund.end", person: "me", at: "lifeEnd" }, people)).toBe(
+			"at you, life end",
+		)
+		expect(anchorWords({ path: "flows.a.start", person: "partner", at: "joins" }, people)).toBe(
+			"at your partner, joining",
+		)
+		expect(anchorWords({ path: "flows.school.start", person: "mali", age: 6 }, people)).toBe(
+			"at the child, age 6",
+		)
+	})
+
+	test("without the household's words the person is the id", () => {
+		expect(anchorWords({ path: "flows.fund.end", person: "me", age: 60 })).toBe("at me, age 60")
+	})
+
+	test("a row holds the item, the date and a plain label, and a path with no words stays whole", () => {
+		const row = anchorRow({ path: "flows.fund.end", person: "me", age: 60 }, NAMES)
+		expect(row.target).toEqual({ kind: "flow", id: "fund", edge: "end" })
+		expect(row.edge).toBe("ends")
+		expect(row.when).toBe("at you, age 60")
+		expect(row.plain).toBe("fund ends")
+		const odd = anchorRow({ path: "tax.year.end", person: "me", age: 60 }, NAMES)
+		expect(odd.target).toBeNull()
+		expect(odd.plain).toBe("tax.year.end")
+	})
+})
