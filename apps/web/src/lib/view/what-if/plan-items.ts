@@ -5,7 +5,7 @@ import type {
 	Read,
 	ScenarioDocument,
 } from "../../contract"
-import { overlayDocument } from "../../what-if/overlay"
+import { lensDocument } from "../../what-if/lens-document"
 import type { SetChange } from "../../what-if/overrides"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
 import { groupedIds } from "../plan-items/asset-document"
@@ -81,7 +81,7 @@ export function flowItems(
 		)
 	const baseline = listed(doc.flows)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = listed(overlayDocument(doc, changes).flows)
+	const whatIf = listed(lensDocument(doc, changes).flows)
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "flows", changes, FLOW_FIELDS),
@@ -101,7 +101,7 @@ export function accountItems(
 	const { run, tried = run } = runs
 	const baseline = accountCards(plainAccounts(doc), baselineRead, run)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = accountCards(overlayDocument(doc, changes).accounts, baselineRead, tried)
+	const whatIf = accountCards(lensDocument(doc, changes).accounts, baselineRead, tried)
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "accounts", changes, ACCOUNT_FIELDS),

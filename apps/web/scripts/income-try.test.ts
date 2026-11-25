@@ -2,8 +2,8 @@
 // share says (cli ADR 0062, 0067; web ADR 0010, 0017).
 import { afterAll, beforeAll, describe, expect } from "bun:test"
 import { accountItems } from "../src/lib/view/what-if/plan-items"
-import { readsOf } from "../src/lib/what-if/lens"
-import { shownAccount } from "../src/lib/what-if/overlay"
+import { lensReadsOf } from "../src/lib/what-if/lens"
+import { shownAccount } from "../src/lib/what-if/lens-document"
 import { overridesOf, recordOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedItem } from "../src/lib/what-if/try-flow"
 import { SLOW_MS } from "./edit-fixture.test-support"
@@ -45,7 +45,7 @@ describe("the fee changed in a What-if session", () => {
 				edited: { ...edited, id: ids.fund },
 			})
 			expect(session.sets.map((set) => set.path)).toEqual([`accounts.${ids.fund}.fee`])
-			const lens = readsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
+			const lens = lensReadsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
 			if (lens.run === null) throw new Error("no what-if run")
 			const baseline = snapshot.reads.baseline
 			const row = baseline.ok
@@ -82,7 +82,7 @@ describe("the fee changed in a What-if session", () => {
 				edited: { ...recordOf(bare), id: ids.fund, fee: { bps: "2.00", rounding: "floor" } },
 			})
 			expect(session.sets.map((set) => set.path)).toEqual([`accounts.${ids.fund}`])
-			const lens = readsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
+			const lens = lensReadsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
 			expect(lens.run?.tables.some((table) => table.name === "fees")).toBe(true)
 		},
 	)
@@ -113,7 +113,7 @@ describe("the fee changed in a What-if session", () => {
 				rate: 700,
 				fee: { bps: "0.50" },
 			})
-			const lens = readsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
+			const lens = lensReadsOf(await tryWhatIf({ plan: PLAN, ...overridesOf(session) }))
 			expect(lens.run?.tables.some((table) => table.name === "fees")).toBe(true)
 		},
 	)

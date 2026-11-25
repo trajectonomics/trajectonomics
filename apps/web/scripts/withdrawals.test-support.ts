@@ -5,7 +5,7 @@ import type { EditAnswer } from "../src/lib/edit/answer"
 import { milestoneDatesOf, type WithdrawalContext } from "../src/lib/view/withdrawals/context"
 import { draftOf, type WithdrawalDraft } from "../src/lib/view/withdrawals/draft"
 import { changedFlows, prepareWithdrawal } from "../src/lib/view/withdrawals/plan"
-import { readsOf } from "../src/lib/what-if/lens"
+import { lensReadsOf } from "../src/lib/what-if/lens"
 import { overridesOf, startWhatIf } from "../src/lib/what-if/session"
 import { withTriedFlow } from "../src/lib/what-if/try-flow"
 import { SLOW_MS } from "./edit-fixture.test-support"
@@ -90,5 +90,5 @@ export async function tryDraft(draft: WithdrawalDraft) {
 		startWhatIf(PLAN, storedPlan().hash),
 	)
 	const answer = await tryWhatIf({ plan: PLAN, ...overridesOf(session) })
-	return { session, lens: readsOf(answer) }
+	return { session, lens: lensReadsOf(answer) }
 }

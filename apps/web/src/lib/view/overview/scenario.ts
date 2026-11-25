@@ -19,6 +19,15 @@ export function primaryScenario(
 	return params.compare?.a ?? params.scenarios[0] ?? null
 }
 
+/**
+ * The plan Home is asked for: the one the address bar names, else the plan a What-if session holds changes on, so
+ * a person who tries a change on a plan and opens Home sees that plan's cards and the session beside them.
+ * An empty string asks for neither, and `homePlan` then follows the main plan.
+ */
+export function requestedPlan(address: string, session: string | null): string {
+	return address !== "" ? address : (session ?? "")
+}
+
 /** The plan Home shows for a Snapshot: see `primaryScenario`. The main plan is the one `scenario list` marks. */
 export function homePlan(snapshot: Snapshot, requested: string): string | null {
 	return primaryScenario(snapshot.params, requested, mainPlan(snapshot))

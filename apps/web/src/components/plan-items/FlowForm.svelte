@@ -9,7 +9,7 @@ import { employerDraftOf } from "../../lib/view/plan-items/employer-draft"
 import { categoriesOf, type FlowKind, flowDraftOf } from "../../lib/view/plan-items/flows"
 import { type Problems, shownProblems } from "../../lib/view/plan-items/problems"
 import { namedRefusal } from "../../lib/view/plan-items/refusal"
-import { NO_CHANGES, overlayDocument } from "../../lib/what-if/overlay"
+import { lensDocument, NO_CHANGES } from "../../lib/what-if/lens-document"
 import FlowFields from "./FlowFields.svelte"
 import ItemActions from "./ItemActions.svelte"
 import TryNotice from "./TryNotice.svelte"
@@ -46,7 +46,7 @@ const initial = () => flowDraftOf(existing)
 let draft = $state(initial())
 /** The plan's Flows as the form starts from them: as the session shows them while a value is tried, so a new try carries the earlier ones. */
 const startFlows = () =>
-	tryValue ? overlayDocument(doc, whatIfSession.changesFor(name) ?? NO_CHANGES).flows : doc.flows
+	tryValue ? lensDocument(doc, whatIfSession.changesFor(name) ?? NO_CHANGES).flows : doc.flows
 /** What the employer adds on top of a salary: nothing until the person fills it in. */
 const initialEmployer = () =>
 	employerDraftOf(existing === undefined ? null : employerOf(startFlows(), existing.id))

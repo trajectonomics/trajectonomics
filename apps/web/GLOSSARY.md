@@ -77,8 +77,8 @@ A loan or a real asset changed as a whole: its parts (Account, Flows, debt) are 
 _Avoid_: bundle, batch
 
 **What-if lens**:
-The four reads of a What-if session's answer, parsed against the contract and bound to the session's plan: what a figure page may show of the session. A page with no lens shows the baseline alone.
-_Avoid_: preview, overlay, diff
+What a page may show of a What-if session, on the session's plan only. For a figure page it is the four reads of the session's answer, parsed against the contract and bound to the plan (`WhatIfLens`, whose reads are `LensReads`); for a planner page it is the plan's document with the session's changes put in (`lensDocument`). A page with no lens shows the baseline alone, and its markup is the markup it has with no What-if at all.
+_Avoid_: preview, overlay, diff, what-if reads (for the lens's reads)
 
 **Loan**:
 A liability Account in a plan, with the level Contribution that repays it and, when the money arrives on a date, the withdrawal that borrows it. The page edits the three parts together; `traj` computes the payments and the statement.

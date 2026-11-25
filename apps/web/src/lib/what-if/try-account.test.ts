@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioDocument } from "../contract"
 import type { Json } from "./json"
-import { overlayDocument } from "./overlay"
+import { lensDocument } from "./lens-document"
 import { changesOf, overridesOf, startWhatIf } from "./session"
 import { withTriedItem } from "./try-flow"
 
@@ -47,7 +47,7 @@ describe("a second try of the same Account carries the first", () => {
 	const doc = (accounts: unknown[]) => ({ accounts, flows: [] }) as unknown as ScenarioDocument
 	/** The Account as the session shows it, which a drawer that tries a value starts its form from. */
 	const shown = (session: ReturnType<typeof startWhatIf>, accounts: Record<string, Json>[]) =>
-		overlayDocument(doc(accounts), overridesOf(session)).accounts[0]
+		lensDocument(doc(accounts), overridesOf(session)).accounts[0]
 
 	test("a rate and then a fee, with the fee the Account already has, are two Sets that both stay", () => {
 		const stored = { ...STORED, fee: FEE }

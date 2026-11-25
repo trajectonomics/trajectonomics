@@ -6,7 +6,7 @@ import {
 	scenarioDocument,
 	scenarioFlow,
 } from "../../contract"
-import { overlayDocument } from "../../what-if/overlay"
+import { lensDocument } from "../../what-if/lens-document"
 import { startWhatIf, withGroupOff } from "../../what-if/session"
 import { flowItems } from "../what-if/plan-items"
 import { assetCardsOf } from "./asset-card"
@@ -31,7 +31,7 @@ function holding(id: string): Read<Baseline> {
 /** The document a session shows when the switch of a card is off. */
 function switchedOff(doc: ScenarioDocument, card: { switch: GroupSwitch }) {
 	const { spec, removals } = card.switch
-	return overlayDocument(doc, withGroupOff(startWhatIf("base", "hash"), spec, removals))
+	return lensDocument(doc, withGroupOff(startWhatIf("base", "hash"), spec, removals))
 }
 
 /** What no plan may hold: a Flow of an Account the plan does not declare, or a debt nothing borrows or repays. */
