@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { bodyOf, bothPlans, MOST, own } from "./account-value-equivalence-support"
 import { chartHome } from "./account-value-support"
 import { isAppError } from "./errors"
+import { plant } from "./plant-test-support"
 
 /**
  * The named exceptions (ADR-0072, 2026-11-25): the full rescan reads a Balance only at an
@@ -43,10 +44,10 @@ describe("the exceptions: a write after which a Balance is outside the safe rang
 	})
 
 	it("accepts a write that shrinks an overflow the Ledger already holds, as the full rescan does", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", "90071992547399.91", "2026-01-05")
-		await own(traj, "Equity", "Fund", "11.00", "2026-01-06")
-		await own(traj, "Fund", "Food", "11.00", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", "90071992547399.91", "2026-01-05")
+		plant(home, "Equity", "Fund", "11.00", "2026-01-06")
+		plant(home, "Fund", "Food", "11.00", "2026-01-07")
 		const { fast, slow } = bothPlans(home, [
 			{ account: "Fund", date: "2026-01-01", value: "-0.50" },
 		])

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { chartHome, value } from "./account-value-support"
+import { plant } from "./plant-test-support"
 import { cli, ledgerSize, type Traj } from "./tx-test-support"
 
 /** The most a Balance can hold, in baht: 2^53 - 1 satang. */
@@ -98,30 +99,30 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 	})
 
 	it("accepts a write that shrinks an overflow the ledger already holds", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", "90071992547399.91", "2026-01-05")
-		await own(traj, "Equity", "Fund", "11.00", "2026-01-06")
-		await own(traj, "Fund", "Food", "11.00", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", "90071992547399.91", "2026-01-05")
+		plant(home, "Equity", "Fund", "11.00", "2026-01-06")
+		plant(home, "Fund", "Food", "11.00", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).toBe(0)
 	})
 
 	it("accepts a write that cures the first overflow and shrinks a later one", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
-		await own(traj, "Equity", "Fund", "0.30", "2026-01-06")
-		await own(traj, "Equity", "Fund", "0.70", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", MOST, "2026-01-05")
+		plant(home, "Equity", "Fund", "0.30", "2026-01-06")
+		plant(home, "Equity", "Fund", "0.70", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).toBe(0)
 	})
 
 	it("refuses a write that shrinks the first overflow and worsens a later one the other way", async () => {
-		const { home, traj } = await chartHome()
-		await own(traj, "Equity", "Fund", MOST, "2026-01-05")
-		await own(traj, "Equity", "Fund", "1.00", "2026-01-06")
-		await own(traj, "Fund", "Food", MOST, "2026-01-07")
-		await own(traj, "Fund", "Food", MOST, "2026-01-07")
-		await own(traj, "Fund", "Food", "2.00", "2026-01-07")
+		const { home } = await chartHome()
+		plant(home, "Equity", "Fund", MOST, "2026-01-05")
+		plant(home, "Equity", "Fund", "1.00", "2026-01-06")
+		plant(home, "Fund", "Food", MOST, "2026-01-07")
+		plant(home, "Fund", "Food", MOST, "2026-01-07")
+		plant(home, "Fund", "Food", "2.00", "2026-01-07")
 		const res = await file(home, [{ account: "Fund", date: "2026-01-01", value: "-0.50" }])
 		expect(res.code).not.toBe(0)
 		expect(says(error(res))).toContain('"Fund" on 2026-01-07')
@@ -135,5 +136,21 @@ describe("account value refuses a valuation a later Balance overflows on", () =>
 		])
 		expect(res.code).toBe(0)
 		expect((await traj(["balance", "--as-of", "2026-01-06", "--json"])).code).toBe(0)
+	})
+
+	it("names the entry that pushed the against account over, not a later one that took some back", async () => {
+		const { home, traj, chart } = await chartHome()
+		const [up, down] = [chart.Fund, chart.Home].sort((a, b) => a.id.localeCompare(b.id))
+		await own(traj, "Gains", "Food", MOST, "2026-01-10")
+		await own(traj, "Equity", down!.name, "0.01", "2026-01-06")
+		const res = await file(home, [
+			{ account: up!.name, date: "2026-01-07", value: "1.00" },
+			{ account: down!.name, date: "2026-01-07", value: "0.00" },
+		])
+		const body = error(res)
+		expect(body.code).toBe("AMOUNT_OVERFLOW")
+		expect(body.path).toBe("document.values.0.value")
+		expect(says(body)).toContain('a later Balance of "Gains" on 2026-01-10')
+		expect(body.details.values.map((row: { index: number }) => row.index)).toEqual([0])
 	})
 })

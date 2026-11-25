@@ -72,7 +72,9 @@ describe("the Projection states each Account's fees and payouts over the plan", 
 
 	it("formats the figures as every money figure is, whatever --decimal does to the input", async () => {
 		const plain = runBody(await run(await planHome()))
-		const decimal = runBody(await run(await planHome(), ["--decimal"]))
+		const decimal = runBody(
+			await run(await planHome(), ["--set", "economy.inflation=250", "--decimal"]),
+		)
 		expect(decimal.accountLifetimes).toEqual(plain.accountLifetimes)
 		expect(decimal.lifetimeFees).toBe(plain.lifetimeFees)
 	})
