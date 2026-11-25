@@ -1,3 +1,4 @@
+import { leafOrder, type Series, seriesOf, sumUpTo, unsafe } from "./balance-series"
 import type { ChartOfAccounts } from "./chart-map"
 import { parseISODate } from "./date"
 import { LedgerValidationError } from "./errors"
@@ -9,83 +10,89 @@ import type { Transaction } from "./transaction"
 /** One Leaf Account's Balance on any date, from one read of the Ledger. */
 export interface BalanceHistory {
 	/**
-	 * The Leaf Account's Balance up to and including `asOf`, as `balance` gives it, plus `plus`: the
-	 * Minor Units of Postings the Ledger read does not hold. `plus` is a bigint so that the sum is
-	 * checked once, and `AMOUNT_OVERFLOW` is thrown for the whole of it as `balance` would.
+	 * The Leaf Account's Balance up to and including `asOf`, as `balance` gives it, with `extra`
+	 * added: the Minor Units, by Account id, of Postings the Ledger read does not hold. Like
+	 * `balance`, it throws `AMOUNT_OVERFLOW` for the first Leaf Account, in chart order, whose Balance
+	 * is not a safe integer, whichever Leaf it is: the target's at `balance.amount`, any other's at
+	 * `balance[<id>]`.
 	 */
-	readonly at: (accountId: string, asOf: string, plus?: bigint) => number
+	readonly at: (accountId: string, asOf: string, extra?: ReadonlyMap<string, bigint>) => number
 }
 
-/** The Postings of one Account by date, with the running sum up to each. */
-type Series = { readonly dates: readonly string[]; readonly sums: readonly bigint[] }
-
-const seriesOf = (rows: readonly { date: string; amount: number }[]): Series => {
-	const sorted = [...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
-	let sum = 0n
-	return {
-		dates: sorted.map((row) => row.date),
-		sums: sorted.map((row) => {
-			sum += BigInt(row.amount)
-			return sum
-		}),
+/** Throws what `balance` throws for an account that is not a Leaf Account of the chart. */
+const assertLeaf = (accountId: string, chart: ChartOfAccounts): void => {
+	const id = toAccountId(accountId)
+	if (!chart.has(id)) {
+		throw new LedgerValidationError(
+			"UNKNOWN_ACCOUNT",
+			"accountId",
+			accountId,
+			"is not in the chart of accounts",
+		)
+	}
+	if (!chart.isLeaf(id)) {
+		throw new LedgerValidationError(
+			"NON_LEAF_ACCOUNT",
+			"accountId",
+			accountId,
+			"is a header account",
+		)
 	}
 }
 
-/** The running sum up to and including `cutoff`: the last row whose date is not after it. */
-const sumUpTo = (series: Series, cutoff: string): bigint => {
-	let low = 0
-	let high = series.dates.length
-	while (low < high) {
-		const mid = (low + high) >> 1
-		if (series.dates[mid]! <= cutoff) low = mid + 1
-		else high = mid
+/** The first of `leaves`, in chart order, whose Balance is not a safe integer. */
+const firstUnsafe = (
+	leaves: Iterable<string>,
+	order: ReadonlyMap<string, number>,
+	balanceOf: (leaf: string) => bigint,
+): string | undefined => {
+	let first: string | undefined
+	for (const leaf of leaves) {
+		const place = order.get(leaf)
+		if (place === undefined || !unsafe(balanceOf(leaf))) continue
+		if (first === undefined || place < order.get(first)!) first = leaf
 	}
-	return low === 0 ? 0n : series.sums[low - 1]!
+	return first
 }
 
 /**
  * Reads the Ledger once and answers `balance` for any Leaf Account and date from that read, so a
  * caller that asks many times pays for the scan once rather than once per question. Every answer
  * equals `balance(transactions, accountId, asOf, chart)`, errors included, and a Ledger the scan
- * refuses is refused here, at the first read.
+ * refuses is refused here, at construction.
  */
 export const balanceHistory = (
 	transactions: readonly Transaction[],
 	chart: ChartOfAccounts,
 ): BalanceHistory => {
-	const byAccount = new Map<string, { date: string; amount: number }[]>()
+	const rows = new Map<string, { date: string; amount: number }[]>()
 	for (const { account, posting, date } of scanLedger(transactions, chart)) {
-		const rows = byAccount.get(account.id) ?? []
-		rows.push({ date, amount: posting.amount })
-		byAccount.set(account.id, rows)
+		const own = rows.get(account.id) ?? []
+		own.push({ date, amount: posting.amount })
+		rows.set(account.id, own)
 	}
 	const series = new Map<string, Series>()
+	// The Leaves whose Balance leaves the safe range on some date: usually none, and the only ones
+	// besides the caller's `extra` that can refuse a question.
+	const strained = new Set<string>()
+	for (const [id, own] of rows) {
+		const built = seriesOf(own)
+		series.set(id, built)
+		if (built.sums.some(unsafe)) strained.add(id)
+	}
+	const order = leafOrder(chart)
 	return Object.freeze<BalanceHistory>({
-		at: (accountId, asOf, plus = 0n) => {
-			const id = toAccountId(accountId)
-			if (!chart.has(id)) {
-				throw new LedgerValidationError(
-					"UNKNOWN_ACCOUNT",
-					"accountId",
-					accountId,
-					"is not in the chart of accounts",
-				)
-			}
-			if (!chart.isLeaf(id)) {
-				throw new LedgerValidationError(
-					"NON_LEAF_ACCOUNT",
-					"accountId",
-					accountId,
-					"is a header account",
-				)
-			}
+		at: (accountId, asOf, extra) => {
+			assertLeaf(accountId, chart)
 			const cutoff = parseISODate(asOf, "asOf")
-			let own = series.get(id)
-			if (own === undefined) {
-				own = seriesOf(byAccount.get(id) ?? [])
-				series.set(id, own)
+			const balanceOf = (leaf: string): bigint =>
+				sumUpTo(series.get(leaf), cutoff) + (extra?.get(leaf) ?? 0n)
+			const leaves = [...strained, ...(extra?.keys() ?? [])]
+			const first = firstUnsafe(leaves, order, balanceOf)
+			if (first !== undefined) {
+				toSafeAmount(balanceOf(first), first === accountId ? "balance.amount" : `balance[${first}]`)
 			}
-			return toSafeAmount(sumUpTo(own, cutoff) + plus, "balance.amount")
+			return Number(balanceOf(accountId))
 		},
 	})
 }

@@ -6,7 +6,7 @@ import { chartHome, value } from "./account-value-support"
 import { type AppError, isAppError } from "./errors"
 import { mustOpen } from "./store/testing"
 import type { PlannedRead } from "./store/tx-planning"
-import type { Traj } from "./tx-test-support"
+import { accounts, cli, ledgerHome, type Traj } from "./tx-test-support"
 
 /** The most a Balance can hold, in baht: 2^53 - 1 satang. */
 const MOST = "90071992547409.91"
@@ -138,5 +138,42 @@ describe("account value --file keeps each entry's Balance as it rescanned the Le
 		expect(body.code).toBe("AMOUNT_OVERFLOW")
 		expect(JSON.stringify(body)).toContain(`balance[${chart.Gains.id}]`)
 		expect(body).toEqual(bodyOf(slow))
+	})
+
+	it("refuses an entry when another account the batch values overflows, at that account's field", async () => {
+		const { home, traj, chart } = await chartHome()
+		await own(traj, "Equity", "Fund", "1.00", "2026-01-05")
+		const { fast, slow } = bothPlans(home, [
+			{ account: "Fund", date: "2026-01-01", value: MOST },
+			{ account: "Home", date: "2026-01-06", value: "0.00" },
+		])
+		const body = bodyOf(fast)
+		expect(body.code).toBe("AMOUNT_OVERFLOW")
+		expect(JSON.stringify(body)).toContain(`balance[${chart.Fund.id}]`)
+		expect(body).toEqual(bodyOf(slow))
+	})
+
+	it("refuses a batch when an account it does not touch already overflows in the ledger", async () => {
+		const { home, traj, chart } = await chartHome()
+		await own(traj, "Equity", "Fund", MOST, "2026-01-01")
+		await own(traj, "Equity", "Fund", "1.00", "2026-01-02")
+		const { fast, slow } = bothPlans(home, [{ account: "Home", date: "2026-01-06", value: "5.00" }])
+		expect(JSON.stringify(bodyOf(fast))).toContain(`balance[${chart.Fund.id}]`)
+		expect(bodyOf(fast)).toEqual(bodyOf(slow))
+	})
+
+	it("reports the first overflowing account in chart order, not the one being valued", async () => {
+		const home = ledgerHome()
+		const traj = cli(home)
+		const chart = await accounts(traj, [
+			["Gains", "income"],
+			["Fund", "asset"],
+		])
+		await own(traj, "Gains", "Fund", MOST, "2026-01-01")
+		await own(traj, "Gains", "Fund", "1.00", "2026-01-02")
+		const { fast, slow } = bothPlans(home, [{ account: "Fund", date: "2026-01-03", value: "1.00" }])
+		expect(bodyOf(fast).code).toBe("AMOUNT_OVERFLOW")
+		expect(JSON.stringify(bodyOf(fast))).toContain(`balance[${chart["Gains"]!.id}]`)
+		expect(bodyOf(fast)).toEqual(bodyOf(slow))
 	})
 })

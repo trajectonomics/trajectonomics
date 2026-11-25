@@ -1,13 +1,6 @@
-import {
-	type BalanceHistory,
-	balanceHistory,
-	LedgerValidationError,
-} from "@trajectonomics/core/ledger"
+import { type BalanceHistory, balanceHistory } from "@trajectonomics/core/ledger"
 import type { AccountRow, Ledger, NewTransaction } from "../../store"
 import { datedAfter, laterValuations, type StoredValuation } from "./later"
-
-/** What the batch has added to one account so far: the sum of its Postings and the latest date among them. */
-type Moved = { total: bigint; latest: string }
 
 /**
  * A batch being applied: the Ledger it reads, the rows it will write, and what it needs to read a
@@ -22,7 +15,9 @@ export type Batch = {
 	/** The rows the entries applied so far write, in the order they applied. */
 	readonly writes: NewTransaction[]
 	history: BalanceHistory | undefined
-	readonly moved: Map<string, Moved>
+	/** What the entries applied so far added to each account, in Minor Units, and the latest date among them. */
+	readonly moved: Map<string, bigint>
+	latest: string
 	readonly later: Map<string, readonly StoredValuation[]>
 }
 
@@ -39,43 +34,23 @@ export function startBatch(
 		writes: [],
 		history: undefined,
 		moved: new Map(),
+		latest: "",
 		later: new Map(),
 	}
 }
 
 /**
- * An account's signed Balance on `asOf`: the Ledger as it was read, plus what the batch has added.
- * Entries apply in date order, so everything added so far is dated on or before `asOf`, and the
- * running total is the answer; a date before one already added means the order broke.
- */
-function readBalance(batch: Batch, history: BalanceHistory, id: string, asOf: string): number {
-	const moved = batch.moved.get(id)
-	if (moved !== undefined && asOf < moved.latest) {
-		throw new Error(`a Balance was read on ${asOf}, before ${moved.latest}, which the batch holds`)
-	}
-	return history.at(id, asOf, moved?.total ?? 0n)
-}
-
-/**
- * The account's signed Balance on `asOf`. `balance` refuses an overflow of any Leaf Account's
- * Balance, and a write moves the account it values and the one it posts against, so both are read:
- * the against account's overflow is reported at its own field, as `balance` reports it.
+ * The account's signed Balance on `asOf`: the Ledger as it was read, plus what the batch has added,
+ * with `balance`'s refusal of any Leaf Account whose Balance overflows. Entries apply in date order,
+ * so everything added so far is dated on or before `asOf` and the running totals are the answer; a
+ * date before one already added means the order broke.
  */
 export function balanceOn(batch: Batch, account: AccountRow, asOf: string): number {
-	batch.history ??= balanceHistory(batch.ledger.transactions, batch.ledger.chart)
-	const amount = readBalance(batch, batch.history, account.id, asOf)
-	try {
-		readBalance(batch, batch.history, batch.against.id, asOf)
-	} catch (error) {
-		if (!(error instanceof LedgerValidationError)) throw error
-		throw new LedgerValidationError(
-			error.code,
-			`balance[${batch.against.id}]`,
-			error.value,
-			error.reason,
-		)
+	if (asOf < batch.latest) {
+		throw new Error(`a Balance was read on ${asOf}, before ${batch.latest}, which the batch holds`)
 	}
-	return amount
+	batch.history ??= balanceHistory(batch.ledger.transactions, batch.ledger.chart)
+	return batch.history.at(account.id, asOf, batch.moved)
 }
 
 /** The stored valuations of the account dated after `date`: the account's own are found once. */
@@ -94,8 +69,6 @@ export function laterOf(
 
 /** Records what a Posting adds to an account, for the next entry's Balance. */
 export function record(batch: Batch, id: string, date: string, amount: bigint): void {
-	const moved = batch.moved.get(id) ?? { total: 0n, latest: date }
-	moved.total += amount
-	if (date > moved.latest) moved.latest = date
-	batch.moved.set(id, moved)
+	batch.moved.set(id, (batch.moved.get(id) ?? 0n) + amount)
+	if (date > batch.latest) batch.latest = date
 }
