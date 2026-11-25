@@ -1,8 +1,7 @@
 // The scratch ledger the withdrawals end-to-end test runs against, through the workspace's own traj: a plan with two
 // expenses and a retirement Milestone, worked by hand, and an editor over it with a Return model, so the chance read
 // states the spending Bands (cli ADR 0063).
-import { mkdtemp, rm, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
@@ -14,6 +13,7 @@ import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 export { AS_OF }
 
 import { recorded } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 
 export const PLAN = "spend"
@@ -56,7 +56,7 @@ export function accountIds(): { bank: string; fund: string } {
  * 500.00 (the gym's five payments, which a stop at `retire` would end).
  */
 export async function setupWithdrawals(): Promise<Editor> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-withdrawals-"))
+	scratch = await makeScratch("traj-web-withdrawals-")
 	home = join(scratch, "traj-home")
 	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const base = storedPlan("base").document
@@ -96,5 +96,5 @@ export function editorOf(): Editor {
 }
 
 export async function disposeWithdrawals(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }

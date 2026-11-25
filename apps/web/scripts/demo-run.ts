@@ -1,5 +1,4 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import type { Snapshot } from "../src/lib/contract"
 import { checkParams, type PlanInput } from "../src/lib/snapshot"
@@ -7,6 +6,7 @@ import { redactDirectory } from "../src/lib/snapshot/redact"
 import { demoCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
+import { makeScratch, removeScratch } from "./scratch"
 import { runSnapshot } from "./snapshot-run"
 import { checkBinary } from "./traj-binary"
 
@@ -50,7 +50,7 @@ export type DemoRun =
  * with the scratch path replaced by `~/.traj`. The scratch directory is removed afterwards.
  */
 export async function runDemo(binary: string): Promise<DemoRun> {
-	const scratch = await mkdtemp(join(tmpdir(), "traj-web-demo-"))
+	const scratch = await makeScratch("traj-web-demo-")
 	try {
 		const home = join(scratch, "traj-home")
 		const ids = await buildDemoLedger({ binary, home, scratch })
@@ -81,6 +81,6 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 			text: `${redactDirectory(json, home, HOME_STAND_IN)}\n`,
 		}
 	} finally {
-		await rm(scratch, { recursive: true, force: true })
+		await removeScratch(scratch)
 	}
 }

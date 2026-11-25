@@ -1,8 +1,7 @@
 // The scratch ledger the Estate end-to-end tests run against, through the workspace's own traj: the withdrawals test's
 // hand-worked plan (no interest, no inflation, two expenses, a `retire` Milestone on 1 June 2027) with a household of one
 // person whose life expectancy falls inside the horizon, and an editor over it (cli ADR 0064, web ADR 0014).
-import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
 import { type EditAnswer, editAnswer } from "../src/lib/edit/answer"
@@ -11,6 +10,7 @@ import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
 import { recorded } from "./editor-running.test-support"
+import { makeScratch, removeScratch } from "./scratch"
 import { createEditor, type Editor } from "./serve-edit"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
@@ -58,7 +58,7 @@ export function accountIds(): { bank: string; fund: string; loan: string } {
 
 /** Builds the ledger, applies the hand plan and its household, and starts the editor over it. */
 export async function setupEstate(): Promise<Editor> {
-	scratch = await mkdtemp(join(tmpdir(), "traj-web-estate-"))
+	scratch = await makeScratch("traj-web-estate-")
 	home = join(scratch, "traj-home")
 	const demo = await buildDemoLedger({ binary: BINARY, home, scratch })
 	const base = scenarioDocument.parse(
@@ -106,5 +106,5 @@ export async function tryWhatIf(body: unknown): Promise<WhatIfAnswer> {
 }
 
 export async function disposeEstate(): Promise<void> {
-	if (scratch !== "") await rm(scratch, { recursive: true, force: true })
+	if (scratch !== "") await removeScratch(scratch)
 }
