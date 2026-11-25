@@ -168,7 +168,7 @@
         type="button"
         onclick={applyAll}
         disabled={applying}
-        class="w-full py-3 rounded-xl bg-[var(--brand)] text-white font-bold flex items-center justify-center gap-2 shadow-md transition-colors active:bg-[var(--brand-deep)] disabled:opacity-50"
+        class="w-full py-3 rounded-xl bg-[var(--brand)] text-[var(--brand-contrast)] font-bold flex items-center justify-center gap-2 shadow-md transition-colors active:bg-[var(--brand-deep)] disabled:opacity-50"
       >
         {#if applying}
           <Loader2 class="size-5 animate-spin" />
