@@ -19,11 +19,30 @@ describe("PageFrame", () => {
 		expect(html).not.toContain("body")
 	})
 
-	test("shows the exact command and a demo link when no Snapshot is there", () => {
+	test("leads with the demo, then explains both dates before the command", () => {
 		const html = frame({ status: "missing", url: "/snapshot.json" }).body
-		expect(html).toContain("traj dashboard --as-of YYYY-MM-DD --horizon YYYY-MM-DD")
+		expect(html).toContain("Nothing to show yet")
 		expect(html).toContain('href="/net-worth/?demo=1"')
-		expect(html).toContain("View the demo")
+		const demo = html.indexOf("Try the demo")
+		const line = html.indexOf("To see your own plan, run this in a terminal:")
+		const asOf = html.indexOf("the date your figures are as of, usually today.")
+		const horizon = html.indexOf("the last day to plan to, for example the year you turn 90.")
+		const command = html.indexOf("traj dashboard --as-of YYYY-MM-DD --horizon YYYY-MM-DD")
+		expect(demo).toBeGreaterThan(-1)
+		expect(demo).toBeLessThan(line)
+		expect(line).toBeLessThan(asOf)
+		expect(asOf).toBeLessThan(horizon)
+		expect(horizon).toBeLessThan(command)
+	})
+
+	test("never names Snapshot, As-of or horizon without a plain explanation", () => {
+		const html = frame({ status: "missing", url: "/snapshot.json" }).body
+		expect(html).not.toContain("Snapshot")
+		expect(html).not.toContain("As-of")
+		expect(html).toContain("--as-of")
+		expect(html).toContain("the date your figures are as of")
+		expect(html).toContain("--horizon")
+		expect(html).toContain("the last day to plan to")
 	})
 
 	test("says why a file is not a Snapshot, and lists the first problems", () => {

@@ -1,9 +1,8 @@
 <script lang="ts">
 import type { Snippet } from "svelte"
 import type { Snapshot } from "../../lib/contract"
-import { withSearch } from "../../lib/view/links"
 import type { SnapshotState } from "../../lib/view/state"
-import EmptyState from "./EmptyState.svelte"
+import FirstRun from "./FirstRun.svelte"
 import { SNAPSHOT_COMMAND } from "./snapshot-command"
 
 interface Props {
@@ -32,20 +31,7 @@ let { title, intro, state, pathname, children }: Props = $props()
 	{#if state.status === "loading"}
 		<p role="status" class="text-muted-foreground">Loading the Snapshot.</p>
 	{:else if state.status === "missing"}
-		<EmptyState title="No Snapshot yet">
-			<p>
-				Write one from your own ledger, in apps/web, with this command. The dates are the As-of and the
-				horizon you want to see.
-			</p>
-			<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code
-					>{SNAPSHOT_COMMAND}</code
-				></pre>
-			<p class="mt-3">
-				<a href={withSearch(pathname, "?demo=1")} class="text-accent underline-offset-4 hover:underline"
-					>View the demo</a
-				>
-			</p>
-		</EmptyState>
+		<FirstRun {pathname} />
 	{:else if state.status === "invalid"}
 		<div role="alert" class="rounded-lg border border-destructive p-4 text-sm">
 			<p class="font-medium">The Snapshot at {state.url} {state.reason}.</p>
