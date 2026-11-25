@@ -35,13 +35,15 @@ describe("NetWorthContent: the headline and the composition", () => {
 		)
 	})
 
-	test("divides the assets by account and lists the liabilities as the CLI states them", () => {
+	test("divides the assets by account and reads each liability as what you owe", () => {
 		const { body } = render(NetWorthContent, {
 			props: { view: pageView(okRead(argv("2026-10-31"), main)) },
 		})
 		expect(body).toContain('aria-label="Assets by account, THB"')
-		expect(body).toContain("−200.00")
-		expect(body).toContain("Liabilities, shown negative as the ledger states them")
+		expect(body).toContain("You owe")
+		expect(body).toContain("200.00")
+		expect(body).toContain('title="The ledger states −200.00 THB"')
+		expect(body).not.toContain("as the ledger states them")
 	})
 
 	test("gives every row of the report in a table with its account, type and amount", () => {

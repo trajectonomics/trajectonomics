@@ -1,12 +1,12 @@
 <script lang="ts">
 import type { Read } from "../../lib/contract"
+import { totalDirection } from "../../lib/format"
 import { accountTypeLabel } from "../../lib/view/net-worth/account-type"
 import type { PnlView } from "../../lib/view/overview/pnl"
 import AccountName from "../ui/AccountName.svelte"
 import Card from "../ui/Card.svelte"
-import Money from "../ui/Money.svelte"
+import DirectedMoney from "../ui/DirectedMoney.svelte"
 import ReadView from "../ui/ReadView.svelte"
-import Totals from "../ui/Totals.svelte"
 
 interface Props {
 	pnl: Read<PnlView>
@@ -23,7 +23,19 @@ let { pnl }: Props = $props()
 				<p class="text-sm text-muted-foreground">{view.period}</p>
 				<div>
 					<p class="text-sm text-muted-foreground">Income less expenses</p>
-					<Totals totals={view.totals} className="mt-1 text-2xl font-semibold tracking-tight" />
+					{#if view.totals.length === 0}
+						<p class="mt-1 text-muted-foreground">No total</p>
+					{:else}
+						<span class="mt-1 flex flex-col gap-1 text-2xl font-semibold tracking-tight">
+							{#each view.totals as total (total.currency)}
+								<DirectedMoney
+									amount={total.amount}
+									currency={total.currency}
+									direction={totalDirection(total.amount)}
+								/>
+							{/each}
+						</span>
+					{/if}
 					{#if view.note}
 						<p class="mt-2 text-sm">{view.note}</p>
 					{/if}
@@ -41,14 +53,15 @@ let { pnl }: Props = $props()
 										</span>
 									</span>
 									<span class="shrink-0">
-										<Money amount={row.amount} currency={row.currency} />
+										<DirectedMoney
+											amount={row.amount}
+											currency={row.currency}
+											direction={row.type === "income" ? "income" : "expense"}
+										/>
 									</span>
 								</li>
 							{/each}
 						</ul>
-						<p class="text-xs text-muted-foreground">
-							Income is shown negative and expenses positive, as the ledger books them.
-						</p>
 					</div>
 				{:else}
 					<p class="text-sm">No income or expense in this period.</p>

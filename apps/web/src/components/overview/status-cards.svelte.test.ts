@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 
+import { preferences } from "../../client/preferences.svelte.js"
 import type { Read } from "../../lib/contract"
 import {
 	doctor,
@@ -19,7 +20,7 @@ import PnlCard from "./PnlCard.svelte"
 const THB = (amount: string) => [{ currency: "THB", amount }]
 
 describe("PnlCard", () => {
-	test("shows the CLI's total, its largest rows and the sign convention", () => {
+	test("words the total and its largest rows by direction, and keeps the ledger's figure in a title", () => {
 		const data = pnl(
 			[row("Salary", "income", "-900000.00"), row("Rent", "expense", "140000.00")],
 			THB("760000.00"),
@@ -28,9 +29,38 @@ describe("PnlCard", () => {
 			props: { pnl: okRead(["report", "pnl"], pnlView(data)) },
 		})
 		expect(body).toContain("Profit and loss, year to date")
+		expect(body).toContain("Money in")
 		expect(body).toContain("760,000.00")
+		expect(body).toContain("Money out")
+		expect(body).toContain("140,000.00")
 		expect(body).toContain("Salary")
-		expect(body).toContain("Income is shown negative and expenses positive")
+		expect(body).toContain('title="The ledger states −900,000.00 THB"')
+		expect(body).not.toContain("as the ledger books them")
+	})
+
+	test("reads a negative total as money out", () => {
+		const data = pnl(
+			[row("Salary", "income", "-900000.00"), row("Rent", "expense", "950000.00")],
+			THB("-50000.00"),
+		)
+		const { body } = render(PnlCard, {
+			props: { pnl: okRead(["report", "pnl"], pnlView(data)) },
+		})
+		expect(body).toContain("Money out")
+		expect(body).toContain("50,000.00")
+	})
+
+	test("Hide amounts masks the digits and keeps the direction word", () => {
+		const data = pnl([row("Salary", "income", "-900000.00")], THB("900000.00"))
+		preferences.hidden = true
+		const { body } = render(PnlCard, {
+			props: { pnl: okRead(["report", "pnl"], pnlView(data)) },
+		})
+		preferences.hidden = false
+		expect(body).toContain("Money in")
+		expect(body).toContain("•••••")
+		expect(body).not.toContain("900,000.00")
+		expect(body).not.toContain("The ledger states")
 	})
 
 	test("says so when the period has no income or expense", () => {
