@@ -1,5 +1,7 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
+import { nameOf } from "../../lib/view/account-names"
 
 interface Props {
 	/** The item's id when the form edits an item; absent for a new one, which has nothing to delete. */
@@ -13,6 +15,8 @@ interface Props {
 }
 
 let { id, onDelete, trying = false, note }: Props = $props()
+// An Account's id is called by its ledger name; a Flow's id, which the ledger does not hold, is shown as it is.
+const called = $derived(id === undefined ? undefined : nameOf(currentAccountNames(), id))
 let confirming = $state(false)
 
 const button =
@@ -30,13 +34,13 @@ const button =
 		{/if}
 	</div>
 	{#if id !== undefined && confirming}
-		<p class="text-sm text-foreground">Delete {id} from this plan?</p>
+		<p class="text-sm text-foreground">Delete {called} from this plan?</p>
 		{#if note}<p class="text-sm text-muted-foreground">{note}</p>{/if}
 		<div class="flex flex-wrap gap-2">
 			<button type="button" onclick={onDelete} disabled={editSession.busy} class={button}>
-				Delete {id}
+				Delete {called}
 			</button>
-			<button type="button" onclick={() => (confirming = false)} class={button}>Keep {id}</button>
+			<button type="button" onclick={() => (confirming = false)} class={button}>Keep {called}</button>
 		</div>
 	{/if}
 </div>

@@ -4,6 +4,7 @@
  * asset attaches to is the one the Baseline names, so its value opens at that balance (cli ADR 0060).
  */
 import type { Baseline, Read, ScenarioDocument } from "../../contract"
+import { type AccountNames, NO_NAMES, refLabel } from "../account-names"
 import { withdrawAccounts } from "../routing/entries"
 import { isRealAsset } from "./asset-parts"
 import type { Choice } from "./options"
@@ -45,6 +46,7 @@ function candidatesOf(
 	doc: ScenarioDocument,
 	baseline: Read<Baseline> | undefined,
 	keep?: string,
+	names: AccountNames = NO_NAMES,
 ): OwnedChoice[] {
 	if (baseline === undefined || !baseline.ok) return []
 	return baseline.data.rows.flatMap((row): OwnedChoice[] => {
@@ -54,11 +56,17 @@ function candidatesOf(
 		)
 		if (declared !== undefined && (declared.kind !== "asset" || isRealAsset(declared))) {
 			return declared.id === keep
-				? [{ id: declared.id, name: row.account.name, balance: row.amount }]
+				? [
+						{
+							id: declared.id,
+							name: refLabel(names, row.account),
+							balance: row.amount,
+						},
+					]
 				: []
 		}
 		const id = declared?.id ?? row.account.id
-		return [{ id, name: row.account.name, balance: row.amount }]
+		return [{ id, name: refLabel(names, row.account), balance: row.amount }]
 	})
 }
 
@@ -71,9 +79,10 @@ export function ownedChoicesOf(
 	doc: ScenarioDocument,
 	baseline: Read<Baseline> | undefined,
 	keep?: string,
+	names: AccountNames = NO_NAMES,
 ): OwnedChoice[] {
 	const routed = routedIds(doc)
-	return candidatesOf(doc, baseline, keep).filter(
+	return candidatesOf(doc, baseline, keep, names).filter(
 		(choice) => choice.id === keep || !routed.has(choice.id),
 	)
 }
@@ -83,9 +92,10 @@ export function routedChoicesOf(
 	doc: ScenarioDocument,
 	baseline: Read<Baseline> | undefined,
 	keep?: string,
+	names: AccountNames = NO_NAMES,
 ): string[] {
 	const routed = routedIds(doc)
-	return candidatesOf(doc, baseline, keep)
+	return candidatesOf(doc, baseline, keep, names)
 		.filter((choice) => choice.id !== keep && routed.has(choice.id))
 		.map((choice) => choice.name)
 }

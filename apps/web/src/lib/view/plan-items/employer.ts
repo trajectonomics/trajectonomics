@@ -9,6 +9,7 @@ import { z } from "zod"
 import type { ScenarioDocument, ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { percentWords } from "../../format/percent"
+import { type AccountNames, NO_NAMES, nameOf } from "../account-names"
 import { ROUNDINGS } from "./asset-shape"
 
 /** The basis points in a unit: the denominator a share typed as a percent is written over. */
@@ -54,8 +55,8 @@ export function employerOf(flows: readonly ScenarioFlow[], salaryId: string): Em
 }
 
 /** The sentence of a salary's card: "Employer adds 5% to Provident fund". */
-export function employerWords(share: EmployerShare): string {
-	return `Employer adds ${percentWords(share.percent)}% to ${share.account}`
+export function employerWords(share: EmployerShare, names: AccountNames = NO_NAMES): string {
+	return `Employer adds ${percentWords(share.percent)}% to ${nameOf(names, share.account)}`
 }
 
 /** The Accounts an employer's share may go to: assets that are not illiquid (a liability or a `liquid: false` asset is refused). */
@@ -70,10 +71,11 @@ export function employerText(
 	all: readonly ScenarioFlow[],
 	flow: ScenarioFlow,
 	kind: "income" | "expense",
+	names: AccountNames = NO_NAMES,
 ): string | null {
 	if (kind !== "income" || flow.earned !== true) return null
 	const share = employerOf(all, flow.id)
-	return share === null ? null : employerWords(share)
+	return share === null ? null : employerWords(share, names)
 }
 
 /** What deleting a salary takes with it besides the salary: the employer's Flow it carries, or none when it has none of the form's shape. */

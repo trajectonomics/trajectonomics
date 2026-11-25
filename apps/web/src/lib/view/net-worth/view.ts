@@ -1,5 +1,6 @@
 import type { AmountRow, CurrencyTotal, NetWorth } from "../../contract"
 import { formatDate } from "../../format"
+import { type AccountNames, NO_NAMES } from "../account-names"
 import { assetBars, type CurrencyBar, liabilityRows } from "./composition"
 
 /** What the net worth pages show, derived from one `report networth` Read. */
@@ -14,12 +15,12 @@ export interface NetWorthView {
 }
 
 /** The view of one `report networth` result: its totals, its composition and every row. */
-export function netWorthView(data: NetWorth): NetWorthView {
+export function netWorthView(data: NetWorth, names: AccountNames = NO_NAMES): NetWorthView {
 	return {
 		asOf: formatDate(data.asOf),
 		totals: data.totals ?? [],
 		note: noTransactionsNote(data) ?? unavailableTotalNote(data),
-		bars: assetBars(data.rows),
+		bars: assetBars(data.rows, names),
 		liabilities: liabilityRows(data.rows),
 		rows: data.rows,
 	}

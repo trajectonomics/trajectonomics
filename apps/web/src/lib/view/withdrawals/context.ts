@@ -3,17 +3,19 @@
  * rule may read, and the other expenses that could stop when the rule starts. Reads the document and the CLI's
  * own dates; it works no figure out (web ADR 0002).
  */
-import type { Baseline, ProjectionRun, Read, ScenarioDocument, ScenarioFlow } from "../../contract"
+import type { ProjectionRun, ScenarioDocument, ScenarioFlow } from "../../contract"
+import { type AccountNames, nameOf } from "../account-names"
 import { withdrawAccounts } from "../routing/entries"
 import { ruleOf } from "./rule"
 
-/** What a form is made against: the saved document, the As-of, the date each reached Milestone fired, and the Baseline's names. */
+/** What a form is made against: the saved document, the As-of, the date each reached Milestone fired, and the ledger's names. */
 export interface WithdrawalContext {
 	readonly doc: ScenarioDocument
 	readonly asOf: string
 	/** The fire date `projection run` states for each reached Milestone, by id. */
 	readonly milestoneDates: Readonly<Record<string, string>>
-	readonly baseline?: Read<Baseline> | undefined
+	/** The ledger name of each Account, by id; an id it does not name shows as it is. */
+	readonly names?: AccountNames | undefined
 }
 
 /** The ids of the Milestones a document declares, in its order. */
@@ -58,18 +60,11 @@ export interface PortfolioChoice {
 	readonly label: string
 }
 
-/** The Account's name the Baseline states for it, or its id when the Baseline does not know it. */
-export function accountNameOf(id: string, baseline: Read<Baseline> | undefined): string {
-	if (baseline === undefined || !baseline.ok) return id
-	const row = baseline.data.rows.find((one) => one.account.id === id || one.account.name === id)
-	return row?.account.name ?? id
-}
-
 /** The asset Accounts a rule may read: a liability and an Account marked `liquid: false` are never offered. */
 export function portfolioChoices(ctx: WithdrawalContext): PortfolioChoice[] {
 	return ctx.doc.accounts
 		.filter((account) => account.kind === "asset" && account.liquid !== false)
-		.map((account) => ({ id: account.id, label: accountNameOf(account.id, ctx.baseline) }))
+		.map((account) => ({ id: account.id, label: nameOf(ctx.names ?? new Map(), account.id) }))
 }
 
 /** The Accounts a new rule reads at first: the liquid assets of the plan's withdraw list, each removable. */

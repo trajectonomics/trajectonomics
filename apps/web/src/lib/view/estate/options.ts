@@ -1,7 +1,7 @@
 /** The choices of the estate form's selects, with the words the person reads. No choice is made for them. */
-import type { Baseline, Read, ScenarioDocument } from "../../contract"
+import type { ScenarioDocument } from "../../contract"
+import { type AccountNames, nameOf } from "../account-names"
 import type { Choice } from "../plan-items/options"
-import { accountNameOf } from "../withdrawals/context"
 
 /** How a line is set: a share of a base, or a fixed amount. */
 export const HOW_CHOICES: readonly Choice[] = [
@@ -24,11 +24,8 @@ export interface AccountChoice {
 }
 
 /** The asset Accounts of the plan, a home included; a liability is never offered, because `traj` refuses it as a base. */
-export function accountChoices(
-	doc: ScenarioDocument,
-	baseline: Read<Baseline> | undefined,
-): AccountChoice[] {
+export function accountChoices(doc: ScenarioDocument, names: AccountNames): AccountChoice[] {
 	return doc.accounts
 		.filter((account) => account.kind === "asset")
-		.map((account) => ({ id: account.id, label: accountNameOf(account.id, baseline) }))
+		.map((account) => ({ id: account.id, label: nameOf(names, account.id) }))
 }
