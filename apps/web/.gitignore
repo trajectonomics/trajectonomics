@@ -1,5 +1,7 @@
 node_modules/
 /dist/
+/dist-hosted/
+/.svelte-kit-hosted/
 /pack/
 .svelte-kit/
 coverage/
