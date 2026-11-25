@@ -54,14 +54,12 @@ describe("a What-if that removes an Account's fee", () => {
 	const body = fundCard({ fee: FEE }, {}, { run: runOf("203804.22"), tried: runOf() })
 
 	test("keeps the Fee row, saying none and striking the baseline's fee", () => {
-		expect(body).toContain("Fee</dt>")
-		expect(body).toContain("none")
+		expect(body).toMatch(/Fee<\/dt>\s*<dd>none/)
 		expect(body).toMatch(struck("Fee 1% a year"))
 	})
 
 	test("keeps 'Fees over the plan', saying None and striking the baseline's figure", () => {
-		expect(body).toContain("Fees over the plan")
-		expect(body).toContain("None")
+		expect(body).toMatch(/Fees over the plan<\/dt>\s*<dd>(?:<!--[^>]*-->)*None/)
 		expect(body).toMatch(struck("203,804.22"))
 	})
 })
@@ -74,13 +72,16 @@ describe("a What-if that removes an Account's payout", () => {
 	)
 
 	test("keeps the Payout row, saying none and striking the baseline's payout", () => {
-		expect(body).toContain("Payout</dt>")
+		expect(body).toMatch(/Payout<\/dt>\s*<dd>none/)
 		expect(body).toMatch(struck("Pays out 3.5% a year"))
 	})
 
+	test("strikes the baseline's how-line, so 'Paid quarterly' is not lost", () => {
+		expect(body).toMatch(struck("Paid quarterly"))
+	})
+
 	test("keeps 'Paid out over the plan', saying None and striking the baseline's figure", () => {
-		expect(body).toContain("Paid out over the plan")
-		expect(body).toContain("None")
+		expect(body).toMatch(/Paid out over the plan<\/dt>\s*<dd>(?:<!--[^>]*-->)*None/)
 		expect(body).toMatch(struck("4,051.89"))
 	})
 })
@@ -98,6 +99,15 @@ describe("a What-if that adds a fee or a payout", () => {
 		expect(body).toContain("Pays out 3.5% a year")
 		expect(body).toMatch(struck("none"))
 		expect(body).toContain("Paid out over the plan")
+	})
+})
+
+describe("a What-if that changes only how a payout is paid", () => {
+	test("strikes the baseline's how-line and leaves the payout's own words alone", () => {
+		const body = fundCard({ payout: PAYOUT }, { payout: { ...PAYOUT, frequency: "monthly" } })
+		expect(body).toContain("Paid monthly")
+		expect(body).toMatch(struck("Paid quarterly"))
+		expect(body).not.toMatch(struck("Pays out"))
 	})
 })
 
