@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { LoanCard } from "../../lib/view/plan-items/loans"
+import AccountName from "../ui/AccountName.svelte"
 import Money from "../ui/Money.svelte"
 
 interface Props {
@@ -29,7 +30,7 @@ let { cards, currency }: Props = $props()
 				<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 					{#each card.rows as row (row.label)}
 						<dt class="text-muted-foreground">{row.label}</dt>
-						<dd>{row.value}</dd>
+						<dd>{#if row.account === true && row.value !== ""}<AccountName id={row.value} />{:else}{row.value}{/if}</dd>
 					{/each}
 				</dl>
 			</li>

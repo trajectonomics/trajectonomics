@@ -22,7 +22,6 @@ let { scenario, year, onYear }: Props = $props()
 		<CashFlowView
 			names={snapshot.params.scenarios}
 			projections={snapshot.reads.projections}
-			accounts={snapshot.reads.accounts}
 			{scenario}
 			{year}
 			{onYear}

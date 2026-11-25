@@ -107,7 +107,9 @@ describe("the Assumptions page through traj", () => {
 			}).body
 			expect(html).toContain(formatShare(chance.successBps))
 			expect(html).toContain("Built from your plan")
-			expect(html).toContain(`${fund}: returns 6.00% a year, swings 15.00%`)
+			// With no Snapshot loaded the ledger names nothing, so the Account shows as its id.
+			expect(html).toContain(`data-account="${fund}"`)
+			expect(html).toContain(`</code><!--]--><!---->: returns 6.00% a year, swings 15.00%`)
 		},
 	)
 

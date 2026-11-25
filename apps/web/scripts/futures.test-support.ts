@@ -3,8 +3,6 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { render } from "svelte/server"
-import PathView from "../src/components/chance/path/PathView.svelte"
 import type { ProjectionChance, Snapshot } from "../src/lib/contract"
 import type { PlanParams } from "../src/lib/snapshot"
 import { pathAnswer } from "../src/lib/snapshot/paths"
@@ -77,19 +75,6 @@ export async function readPath(body: unknown, change: Record<string, string | nu
 	const request = editRequest(change, JSON.stringify(body))
 	const response = await editorOf().reread(request, 4321)
 	return { status: response.status, answer: pathAnswer.parse(await response.json()) }
-}
-
-/** The path page for one index, over the Snapshot. */
-export function page(index: number): string {
-	return render(PathView, {
-		props: {
-			snapshot: snapshotOf(),
-			scenario: PLAN,
-			index: String(index),
-			terms: "both",
-			onTerms: () => {},
-		},
-	}).body
 }
 
 /** `answerPath` over a held Snapshot with the chance parameters changed: the refusals come before any traj run, so none runs. */
