@@ -1,8 +1,8 @@
+import { assertLeaf, firstUnsafe } from "./balance-leaf"
+import { firstOverflow, type Overflow, type Reach, reachOf } from "./balance-reach"
 import { leafOrder, type Series, seriesOf, sumUpTo, unsafe } from "./balance-series"
 import type { ChartOfAccounts } from "./chart-map"
 import { parseISODate } from "./date"
-import { LedgerValidationError } from "./errors"
-import { accountId as toAccountId } from "./ids"
 import { scanLedger } from "./ledger-scan"
 import { toSafeAmount } from "./safe-amount"
 import type { Transaction } from "./transaction"
@@ -17,42 +17,21 @@ export interface BalanceHistory {
 	 * `balance[<id>]`.
 	 */
 	readonly at: (accountId: string, asOf: string, extra?: ReadonlyMap<string, bigint>) => number
-}
-
-/** Throws what `balance` throws for an account that is not a Leaf Account of the chart. */
-const assertLeaf = (accountId: string, chart: ChartOfAccounts): void => {
-	const id = toAccountId(accountId)
-	if (!chart.has(id)) {
-		throw new LedgerValidationError(
-			"UNKNOWN_ACCOUNT",
-			"accountId",
-			accountId,
-			"is not in the chart of accounts",
-		)
-	}
-	if (!chart.isLeaf(id)) {
-		throw new LedgerValidationError(
-			"NON_LEAF_ACCOUNT",
-			"accountId",
-			accountId,
-			"is a header account",
-		)
-	}
-}
-
-/** The first of `leaves`, in chart order, whose Balance is not a safe integer. */
-const firstUnsafe = (
-	leaves: Iterable<string>,
-	order: ReadonlyMap<string, number>,
-	balanceOf: (leaf: string) => bigint,
-): string | undefined => {
-	let first: string | undefined
-	for (const leaf of leaves) {
-		const place = order.get(leaf)
-		if (place === undefined || !unsafe(balanceOf(leaf))) continue
-		if (first === undefined || place < order.get(first)!) first = leaf
-	}
-	return first
+	/**
+	 * The first date from `from` (inclusive) to `before` (exclusive; none means no end) on which the
+	 * Leaf Account's Balance, with `shift` Minor Units added to it, is not a safe integer, and the
+	 * sum it reaches. With `worse`, a date on which the Balance is already outside the range without
+	 * `shift`, and `shift` leaves it no further out, is not counted. The Ledger read alone is not asked
+	 * about: the Leaf's own Postings are. It
+	 * answers in constant time once the Leaf's reach is noted, which is on its first question.
+	 */
+	readonly overflow: (
+		accountId: string,
+		shift: bigint,
+		from: string,
+		before?: string,
+		worse?: boolean,
+	) => Overflow | undefined
 }
 
 /**
@@ -81,6 +60,7 @@ export const balanceHistory = (
 		if (built.sums.some(unsafe)) strained.add(id)
 	}
 	const order = leafOrder(chart)
+	const reaches = new Map<string, Reach>()
 	return Object.freeze<BalanceHistory>({
 		at: (accountId, asOf, extra) => {
 			assertLeaf(accountId, chart)
@@ -93,6 +73,17 @@ export const balanceHistory = (
 				toSafeAmount(balanceOf(first), first === accountId ? "balance.amount" : `balance[${first}]`)
 			}
 			return Number(balanceOf(accountId))
+		},
+		overflow: (accountId, shift, from, before, worse) => {
+			assertLeaf(accountId, chart)
+			const own = series.get(accountId)
+			const reach = (): Reach => {
+				const noted = reaches.get(accountId) ?? reachOf(own!)
+				reaches.set(accountId, noted)
+				return noted
+			}
+			const end = before === undefined ? undefined : parseISODate(before, "before")
+			return firstOverflow(own, reach, shift, parseISODate(from, "from"), end, worse)
 		},
 	})
 }

@@ -18,17 +18,31 @@ export const seriesOf = (rows: readonly { date: string; amount: number }[]): Ser
 	}
 }
 
-/** The running sum up to and including `cutoff`: the last row whose date is not after it. */
-export const sumUpTo = (series: Series | undefined, cutoff: string): bigint => {
-	if (series === undefined) return 0n
+/** How many rows satisfy `leading`, which holds for a prefix of the dates and no later one. */
+const countWhile = (series: Series, leading: (date: string) => boolean): number => {
 	let low = 0
 	let high = series.dates.length
 	while (low < high) {
 		const mid = (low + high) >> 1
-		if (series.dates[mid]! <= cutoff) low = mid + 1
+		if (leading(series.dates[mid]!)) low = mid + 1
 		else high = mid
 	}
-	return low === 0 ? 0n : series.sums[low - 1]!
+	return low
+}
+
+/** The number of rows dated on or before `cutoff`. */
+export const rowsUpTo = (series: Series, cutoff: string): number =>
+	countWhile(series, (date) => date <= cutoff)
+
+/** The number of rows dated before `date`. */
+export const rowsBefore = (series: Series, date: string): number =>
+	countWhile(series, (row) => row < date)
+
+/** The running sum up to and including `cutoff`: the last row whose date is not after it. */
+export const sumUpTo = (series: Series | undefined, cutoff: string): bigint => {
+	if (series === undefined) return 0n
+	const count = rowsUpTo(series, cutoff)
+	return count === 0 ? 0n : series.sums[count - 1]!
 }
 
 /** The Leaf Accounts by their place in the chart, the order `balance` checks them in. */

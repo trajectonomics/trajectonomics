@@ -104,20 +104,41 @@ describe("Thailand Family Allowances", () => {
 	})
 
 	it("refuses a spouse parent slot on a separate Return instead of dropping it", () => {
-		const refused = (parents: { spouseFather?: boolean; spouseMother?: boolean }) => {
+		const refused = (
+			parents: { spouseFather?: boolean; spouseMother?: boolean },
+			status: "married_separate" | "married_separate_40_1_joint_rest",
+		) => {
 			try {
-				calculateFamilyAllowances({ parents }, "married_separate")
+				calculateFamilyAllowances({ parents }, status)
 			} catch (error) {
 				return error instanceof TaxValidationError ? error.field : String(error)
 			}
 			return undefined
 		}
-		expect(refused({ spouseFather: true })).toBe(ThAllowanceField.ParentsSpouseSlot)
-		expect(refused({ spouseMother: true })).toBe(ThAllowanceField.ParentsSpouseSlot)
+		expect(refused({ spouseFather: true }, "married_separate")).toBe(
+			ThAllowanceField.ParentsSpouseSlot,
+		)
+		expect(refused({ spouseMother: true }, "married_separate")).toBe(
+			ThAllowanceField.ParentsSpouseSlot,
+		)
 		const own = { taxpayerFather: true, taxpayerMother: true, spouseFather: false }
 		expect(calculateFamilyAllowances({ parents: own }, "married_separate").parents.allowed).toBe(
 			60_000,
 		)
+	})
+
+	it("refuses a spouse parent slot on married_separate_40_1_joint_rest, and still counts its own parents", () => {
+		expect(() =>
+			calculateFamilyAllowances(
+				{ parents: { spouseFather: true } },
+				"married_separate_40_1_joint_rest",
+			),
+		).toThrow(TaxValidationError)
+		const own = { taxpayerFather: true, taxpayerMother: true }
+		expect(
+			calculateFamilyAllowances({ parents: own }, "married_separate_40_1_joint_rest").parents
+				.allowed,
+		).toBe(60_000)
 	})
 
 	it("calculates disabled care allowance (60,000 THB each)", () => {
