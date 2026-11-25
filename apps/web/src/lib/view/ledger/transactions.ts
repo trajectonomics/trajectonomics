@@ -1,5 +1,6 @@
 import type { TxList } from "../../contract"
 import { formatDate } from "../../format"
+import { type AccountNames, NO_NAMES, refLabel } from "../account-names"
 
 /** One posting of a loaded transaction, with its account and the CLI's signed amount. */
 export interface PostingLine {
@@ -31,7 +32,7 @@ export interface AccountOption {
 }
 
 /** The loaded transactions, newest first. Transactions on one date sort by id, descending. */
-export function transactionRows(list: TxList): TransactionRow[] {
+export function transactionRows(list: TxList, names: AccountNames = NO_NAMES): TransactionRow[] {
 	return list.transactions
 		.map((tx) => ({
 			id: tx.id,
@@ -40,7 +41,7 @@ export function transactionRows(list: TxList): TransactionRow[] {
 			postings: tx.postings.map((posting) => ({
 				key: `${tx.id}:${posting.ordinal}`,
 				accountId: posting.account.id,
-				account: posting.account.name,
+				account: refLabel(names, posting.account),
 				currency: posting.currency,
 				amount: posting.amount,
 			})),

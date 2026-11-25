@@ -77,4 +77,4 @@ reaches from each Posting on, once, the first time it is asked about the account
 a stretch for its first overflowing date only when the note says one could overflow. These are deliberate refusals the full-rescan
 oracle (`oracle.test-support.ts`) does not make. It reads a Balance only at an entry's own date, so it accepts two kinds of write the
 check refuses: one a later transaction overflows, and one that takes the account it posts against over on the last entry's own date.
-The equivalence test pins both as named exceptions and holds every other case equal.
+The equivalence test pins both as named exceptions and holds every other case equal. `tx add` and `tx import` apply the same rule, in the same code (ADR-0078); the refusal names the latest entry of the stretch that moved the Balance toward the overflow, not one that moved it back.

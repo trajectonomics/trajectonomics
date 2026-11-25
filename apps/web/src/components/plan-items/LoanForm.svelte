@@ -1,6 +1,8 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import type { Baseline, Read, ScenarioDocument } from "../../lib/contract"
+import { nameOf } from "../../lib/view/account-names"
 import { balanceOf } from "../../lib/view/plan-items/accounts"
 import { loanDocument, loanOf, withoutLoan } from "../../lib/view/plan-items/loan-document"
 import { type LoanDraft, loanDraftOf, loanFromDraft } from "../../lib/view/plan-items/loan-draft"
@@ -29,8 +31,9 @@ interface Props {
 }
 
 let { name, contentHash, doc, baseline, loanId, onDone, tryValue = false }: Props = $props()
+const names = $derived(currentAccountNames())
 const existing = $derived(loanId === undefined ? undefined : loanOf(doc, loanId))
-const choices = $derived(owedChoicesOf(doc, baseline, existing?.account.id))
+const choices = $derived(owedChoicesOf(doc, baseline, existing?.account.id, names))
 /** True when the Baseline holds a balance in the loan's Account: it stays declared, or no read can run. */
 const held = $derived(existing !== undefined && balanceOf(existing.account, baseline) !== null)
 const initial = () => loanDraftOf(existing)
@@ -81,7 +84,7 @@ async function remove(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit loan ${existing.account.id}` : "Add loan"}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit loan ${nameOf(names, existing.account.id)}` : "Add loan"}>
 	<LoanFields bind:draft editing={existing !== undefined} {choices} {shown} />
 	{#if tryValue}
 		<p class="text-sm text-muted-foreground">

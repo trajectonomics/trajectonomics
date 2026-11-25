@@ -1,20 +1,20 @@
 <script lang="ts">
-import type { Baseline, EstateLine, Read, ScenarioDocument } from "../../lib/contract"
+import type { EstateLine, ScenarioDocument } from "../../lib/contract"
+import { type AccountNames, nameOf } from "../../lib/view/account-names"
 import { NOT_MODELLED_NOTE } from "../../lib/view/estate/notes"
 import { lineWords } from "../../lib/view/estate/words"
-import { accountNameOf } from "../../lib/view/withdrawals/context"
 import Money from "../ui/Money.svelte"
 
 interface Props {
 	plan: ScenarioDocument
 	/** Said when the plan states no settlement cost: the net estate is everything owned less debts. */
 	note: string | null
-	baseline: Read<Baseline> | undefined
+	names: AccountNames
 }
 
 /** The lines the person set, in their own order, and what the page does not work out. */
-let { plan, note, baseline }: Props = $props()
-const account = (id: string): string => accountNameOf(id, baseline)
+let { plan, note, names }: Props = $props()
+const account = (id: string): string => nameOf(names, id)
 const groups: { title: string; lines: readonly EstateLine[] }[] = $derived([
 	{ title: "Settlement costs", lines: plan.estate?.costs ?? [] },
 	{ title: "Gifts", lines: plan.estate?.gifts ?? [] },

@@ -1,4 +1,5 @@
 import type { Snapshot } from "../../contract"
+import { type AccountNames, accountNames, refLabel } from "../account-names"
 import type { ListedAccount } from "../ledger/account-tree"
 import { periodOfRead } from "../ledger/transactions"
 import { rowsByGroup } from "./rows"
@@ -12,12 +13,12 @@ export function addAgainstCommand(currency: string): string {
 }
 
 /** The income and equity Leaf Accounts that are open: the ones a value's difference can count against. */
-function againstChoices(listed: readonly ListedAccount[]): AgainstChoice[] {
+function againstChoices(listed: readonly ListedAccount[], names: AccountNames): AgainstChoice[] {
 	const parents = new Set(listed.flatMap((account) => account.parentId ?? []))
 	return listed
 		.filter((a) => (a.type === "income" || a.type === "equity") && a.archivedAt === null)
 		.filter((a) => !parents.has(a.id))
-		.map((a) => ({ id: a.id, name: a.name, currency: a.currency }))
+		.map((a) => ({ id: a.id, name: refLabel(names, a), currency: a.currency }))
 }
 
 /**
@@ -27,8 +28,9 @@ function againstChoices(listed: readonly ListedAccount[]): AgainstChoice[] {
 export function valueSheet(snapshot: Snapshot): ValueSheet | null {
 	const { accounts, transactions } = snapshot.reads
 	if (!accounts.ok) return null
-	const groups = rowsByGroup(snapshot, accounts.data.accounts)
-	const choices = againstChoices(accounts.data.accounts)
+	const names = accountNames(accounts)
+	const groups = rowsByGroup(snapshot, accounts.data.accounts, names)
+	const choices = againstChoices(accounts.data.accounts, names)
 	const currencies = [...new Set(groups.flatMap((group) => group.rows.map((row) => row.currency)))]
 	return {
 		asOf: snapshot.params.asOf,

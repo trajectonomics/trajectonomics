@@ -1,4 +1,4 @@
-import { netWorth } from "@trajectonomics/core/ledger"
+import { type NetWorth, netWorth, netWorthHistory } from "@trajectonomics/core/ledger"
 import { checkedDate } from "../date"
 import type { AppError } from "../errors"
 import { isAppError } from "../errors"
@@ -28,12 +28,16 @@ export type NetWorthResult = RecordStart & {
 	hint?: string | undefined
 }
 
-/** Assembles net worth from one assembled read; the Command only renders it. */
-export function netWorthOf(ledger: Ledger, asOf: string): NetWorthResult | AppError {
+/** Assembles one date's result from `read`, the core's answer for it; the Command only renders it. */
+function assemble(
+	ledger: Ledger,
+	asOf: string,
+	index: ReturnType<typeof accountIndex>,
+	read: () => NetWorth | AppError,
+): NetWorthResult | AppError {
 	const date = checkedDate(asOf, "asOf")
 	if (isAppError(date)) return date
-	const index = accountIndex(ledger.accounts)
-	const result = query(() => netWorth(ledger.transactions, asOf, ledger.chart), fieldOf)
+	const result = read()
 	if (isAppError(result)) return result
 	const rows = reportRowsOf(result.rows, index)
 	const hint = reportHint(ledger, rows)
@@ -44,4 +48,24 @@ export function netWorthOf(ledger: Ledger, asOf: string): NetWorthResult | AppEr
 		totals: totalsOf(result.totals),
 		...hintField(hint),
 	}
+}
+
+/** Assembles net worth from one assembled read; the Command only renders it. */
+export function netWorthOf(ledger: Ledger, asOf: string): NetWorthResult | AppError {
+	return assemble(ledger, asOf, accountIndex(ledger.accounts), () =>
+		query(() => netWorth(ledger.transactions, asOf, ledger.chart), fieldOf),
+	)
+}
+
+/**
+ * The same read for many dates: the Ledger is scanned once, and each date's answer is `netWorthOf`'s
+ * for it, the refusal of an overflow or of a Ledger the scan refuses included.
+ */
+export function netWorthReader(ledger: Ledger): (asOf: string) => NetWorthResult | AppError {
+	const index = accountIndex(ledger.accounts)
+	const history = query(() => netWorthHistory(ledger.transactions, ledger.chart), fieldOf)
+	return (asOf) =>
+		assemble(ledger, asOf, index, () =>
+			isAppError(history) ? history : query(() => history.at(asOf), fieldOf),
+		)
 }

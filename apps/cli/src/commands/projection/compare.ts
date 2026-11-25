@@ -55,6 +55,11 @@ export const compare: Leaf = defineCommand({
 			description: "A what-if against the base, with net worth at two ages.",
 		},
 		{
+			command: `traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --add 'milestones={"id":"retire","combine":"all","criteria":[{"id":"date","kind":"date","on":"2026-06-30"}]}' --json`,
+			description:
+				"The base against a what-if that adds a Milestone: each side reports the milestones its Scenario declares, and no milestone delta where only one side declares it.",
+		},
+		{
 			command: `traj projection compare base --as-of 2026-03-31 --horizon 2027-03-30 --set 'flows.salary.amount="90000.50"' --decimal --json`,
 			description: "A what-if whose salary is a decimal amount in THB, not satang.",
 		},

@@ -2,6 +2,7 @@
 import type { Read } from "../../lib/contract"
 import { accountTypeLabel } from "../../lib/view/net-worth/account-type"
 import type { PnlView } from "../../lib/view/overview/pnl"
+import AccountName from "../ui/AccountName.svelte"
 import Card from "../ui/Card.svelte"
 import Money from "../ui/Money.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -31,7 +32,7 @@ let { pnl }: Props = $props()
 							{#each view.largest as row (`${row.account.id}:${row.currency}`)}
 								<li class="flex items-center justify-between gap-3 py-2">
 									<span class="min-w-0 truncate">
-										{row.account.name}
+										<AccountName id={row.account.id} name={row.account.name} />
 										<span class="ml-2 text-xs text-muted-foreground">
 											{accountTypeLabel(row.type)}
 										</span>

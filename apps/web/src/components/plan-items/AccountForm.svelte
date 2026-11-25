@@ -1,7 +1,9 @@
 <script lang="ts">
+import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument, ScenarioAccount, ScenarioDocument } from "../../lib/contract"
+import { nameOf } from "../../lib/view/account-names"
 import { anchorChoices } from "../../lib/view/estate/anchors"
 import { accountFromDraft } from "../../lib/view/plan-items/account-draft"
 import { accountDraftOf } from "../../lib/view/plan-items/accounts"
@@ -38,6 +40,7 @@ let {
 	contentHash,
 	tryValue = false,
 }: Props = $props()
+const names = $derived(currentAccountNames())
 /** What a payout reads of the plan: whether a Levy taxes it, its Milestones and the dates the household names. */
 const income = $derived({
 	taxed: (doc.levies?.length ?? 0) > 0,
@@ -96,7 +99,7 @@ async function save(event: SubmitEvent): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Add account"}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${nameOf(names, existing.id)}` : "Add account"}>
 	<AccountFields bind:draft existingId={existing?.id} {shown} illiquid={existing?.liquid === false} {...income} />
 	<ItemActions id={existing?.id} onDelete={() => commit(withoutAccount(doc, existing?.id ?? ""))} trying={tryValue} />
 </form>

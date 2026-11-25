@@ -1,8 +1,12 @@
-import { describe, expect, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { snapshotLoader } from "../../client/browser"
+import { replaceSnapshot } from "../../client/snapshot.svelte"
 import type { AccountList, ProjectionRun, Read } from "../../lib/contract"
 import { cashflowRunFixture } from "../../lib/view/cashflow/fixtures.test-support"
 import { projectionRunFixture } from "../../lib/view/projection/fixtures.test-support"
+import { LOADING } from "../../lib/view/state"
+import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import CashFlowView from "./CashFlowView.svelte"
 
 const ARGV = ["projection", "run", "--scenario", "base", "--breakdown", "--json"]
@@ -26,12 +30,15 @@ const ACCOUNTS: Read<AccountList> = {
 	},
 }
 
+// The page reads the ledger names from the Snapshot it shows.
+beforeEach(() => replaceSnapshot({ ...DEMO, reads: { ...DEMO.reads, accounts: ACCOUNTS } }))
+afterAll(() => snapshotLoader.replace(LOADING))
+
 function renderView(projections: Readonly<Record<string, Read<ProjectionRun>>>, year = ""): string {
 	return render(CashFlowView, {
 		props: {
 			names: Object.keys(projections),
 			projections,
-			accounts: ACCOUNTS,
 			scenario: "base",
 			year,
 			onYear: () => {},

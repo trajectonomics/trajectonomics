@@ -16,7 +16,7 @@ describe("loanCards", () => {
 		const draw = loanCards(loanPlanDocument().flows).find((card) => card.id === "car-draw")
 		expect(draw?.title).toBe("Withdrawal")
 		expect(draw?.amount).toBe("500000.00")
-		expect(draw?.rows).toContainEqual({ label: "Borrows from", value: "loan" })
+		expect(draw?.rows).toContainEqual({ label: "Borrows from", value: "loan", account: true })
 		expect(draw?.rows).toContainEqual({ label: "Growth", value: "0.00% a year" })
 	})
 
@@ -25,7 +25,7 @@ describe("loanCards", () => {
 		expect(loan?.title).toBe("Level loan")
 		expect(loan?.amountLabel).toBe("Principal")
 		expect(loan?.amount).toBe("500000.00")
-		expect(loan?.rows).toContainEqual({ label: "Repays", value: "loan" })
+		expect(loan?.rows).toContainEqual({ label: "Repays", value: "loan", account: true })
 		expect(loan?.rows).toContainEqual({ label: "Payments", value: "60 equal payments" })
 	})
 

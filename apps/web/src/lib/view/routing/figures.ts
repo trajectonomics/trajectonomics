@@ -6,8 +6,8 @@
 import { type LinePoint, type LineSeries, toChartNumber } from "../../chart"
 import type { ProjectionRun } from "../../contract"
 import { formatMoney, isAboveZero } from "../../format"
+import { type AccountNames, nameOf } from "../account-names"
 import { annualRowsOf } from "../projection/annual"
-import { nameOf } from "./accounts"
 import { type Entry, entryAccount } from "./entries"
 import { entryWords, plainText } from "./words"
 
@@ -52,7 +52,7 @@ function linesOf(run: ProjectionRun, group: Line["group"]): Line[] {
 }
 
 /** What each surplus step filled: a series for each Account the steps name. */
-export function filledFigure(run: ProjectionRun, names: ReadonlyMap<string, string>): Figure {
+export function filledFigure(run: ProjectionRun, names: AccountNames): Figure {
 	const lines = linesOf(run, "surplus")
 	return {
 		series: seriesOf(
@@ -69,7 +69,7 @@ export function filledFigure(run: ProjectionRun, names: ReadonlyMap<string, stri
 export function drawnFigure(
 	run: ProjectionRun,
 	list: readonly Entry[],
-	names: ReadonlyMap<string, string>,
+	names: AccountNames,
 ): Figure {
 	const nameBy = (line: Line): string => {
 		const at = line.entry ?? list.findIndex((one) => entryAccount(one) === line.account)
@@ -84,7 +84,7 @@ export function drawnFigure(
 export function savedFigure(
 	run: ProjectionRun,
 	listed: readonly string[],
-	names: ReadonlyMap<string, string>,
+	names: AccountNames,
 ): Figure {
 	const lines = linesOf(run, "contribution").filter((l) => listed.includes(l.account ?? ""))
 	const nameBy = (l: Line) => `${l.id ?? ""} into ${nameOf(names, l.account ?? "")}`

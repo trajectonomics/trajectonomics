@@ -31,6 +31,16 @@ export function overrideTokens(
 	]
 }
 
+/**
+ * `--decimal` reads the amounts of a `--set` or an `--add` item, and `traj` refuses it beside neither (cli ADR 0056,
+ * ADR 0062), so a what-if that only removes something, or changes nothing, passes none.
+ */
+export function decimalTokens(
+	whatIf: Pick<WhatIfBody, "sets"> & { additions?: WhatIfBody["additions"] },
+): string[] {
+	return whatIf.sets.length + (whatIf.additions ?? []).length > 0 ? ["--decimal"] : []
+}
+
 /** The date flags every projection-shaped read takes, and the Carry-in on standard input when one is stated. */
 function projectionFlags(params: PlanParams): string[] {
 	const carry = params.carryIn ? ["--carry-in", "-"] : []
@@ -51,7 +61,7 @@ function carryFor(params: PlanParams, plan: string): string[] {
  */
 export function plannedWhatIfReads(params: PlanParams, whatIf: WhatIfBody): PlannedWhatIfReads {
 	const plan = whatIf.plan
-	const overrides = [...overrideTokens(whatIf), "--decimal"]
+	const overrides = [...overrideTokens(whatIf), ...decimalTokens(whatIf)]
 	const monthly = params.monthly ? ["--monthly"] : []
 	const scenario = `--scenario=${plan}`
 	const chance = params.chance

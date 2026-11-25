@@ -1,7 +1,7 @@
 /** A transfer in a sentence: "Move all of Provident fund to RMF on 30 Jun 2031", "Move 10% of Savings to Fixed deposit every year". */
 import type { ScenarioFlow } from "../../contract"
 import { formatBps, formatDate, percentWords } from "../../format"
-import { nameOf } from "./accounts"
+import { type AccountNames, nameOf } from "../account-names"
 import { movesOf } from "./transfer-read"
 import type { Part } from "./words"
 
@@ -31,7 +31,7 @@ function growthWords(growth: ScenarioFlow["growth"]): string {
 }
 
 /** The transfer's sentence as parts, with its amount drawn by the page. */
-export function transferWords(flow: ScenarioFlow, names: ReadonlyMap<string, string>): Part[] {
+export function transferWords(flow: ScenarioFlow, names: AccountNames): Part[] {
 	const from = nameOf(names, flow.source ?? "")
 	const to = nameOf(names, flow.target ?? "")
 	const moves = movesOf(flow)

@@ -3,6 +3,7 @@ import type { DateChoice } from "../../lib/view/estate/dates"
 import type { AccountDraft } from "../../lib/view/plan-items/accounts"
 import { COMPOUNDING_CHOICES, KIND_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
+import AccountName from "../ui/AccountName.svelte"
 import FeeFields from "./FeeFields.svelte"
 import Field from "./Field.svelte"
 import PayoutFields from "./PayoutFields.svelte"
@@ -34,7 +35,7 @@ let {
 <!-- The fields of an Account. A rate is a percent with at most two places; a lock applies to an asset only. -->
 <div class="space-y-4">
 	{#if existingId !== undefined}
-		<p class="text-sm text-foreground">Account <span class="font-medium">{existingId}</span></p>
+		<p class="text-sm text-foreground">Account <span class="font-medium"><AccountName id={existingId} /></span></p>
 	{:else}
 		<Field id="account-name" label="Name" bind:value={draft.name} problem={shown.at("name")} />
 	{/if}

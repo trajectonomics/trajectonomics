@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { AmountRow } from "../../lib/contract"
 import { accountTypeLabel } from "../../lib/view/net-worth/account-type"
+import AccountName from "../ui/AccountName.svelte"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import type { Column } from "../ui/table-types"
@@ -17,7 +18,7 @@ const columns: Column<AmountRow>[] = [
 ]
 </script>
 
-{#snippet accountCell(row: AmountRow)}{row.account.name}{/snippet}
+{#snippet accountCell(row: AmountRow)}<AccountName id={row.account.id} name={row.account.name} />{/snippet}
 {#snippet typeCell(row: AmountRow)}{accountTypeLabel(row.type)}{/snippet}
 {#snippet amountCell(row: AmountRow)}<Money amount={row.amount} currency={row.currency} />{/snippet}
 

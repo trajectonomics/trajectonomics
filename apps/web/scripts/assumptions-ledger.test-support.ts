@@ -11,6 +11,7 @@ import { spyContext } from "./allowances-spy.test-support"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
 import { editRequest, PARAMS, TOKEN } from "./edit-request.test-support"
+import { recorded } from "./editor-running.test-support"
 import { createEditor, type Editor } from "./serve-edit"
 import { AS_OF, handDocument } from "./withdrawals-document.test-support"
 
@@ -66,13 +67,15 @@ export async function setupAssumptions(): Promise<Editor> {
 /** A new editor over the same ledger, with the five paths read in advance or not (the offline Snapshot reads them, a live dashboard does not). */
 export async function startEditor(readPaths: boolean): Promise<Editor> {
 	if (spy === null) throw new Error("the ledger is not set up")
-	editor = createEditor({
-		traj: spy.context,
-		cliVersion: "test",
-		params: { ...PARAMS, asOf: AS_OF, horizon: "2030-12-31", scenarios: [PLAN], readPaths },
-		records: [],
-		token: TOKEN,
-	})
+	editor = recorded(
+		createEditor({
+			traj: spy.context,
+			cliVersion: "test",
+			params: { ...PARAMS, asOf: AS_OF, horizon: "2030-12-31", scenarios: [PLAN], readPaths },
+			records: [],
+			token: TOKEN,
+		}),
+	)
 	const first = await editor.refresh()
 	if (!first.ok) throw new Error(first.error.message)
 	return editor
