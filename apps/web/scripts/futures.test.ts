@@ -1,7 +1,7 @@
 // Every future on the Chance page and one future year by year, against the real traj (web ADR 0020): the Snapshot reads the
 // five representative paths, the earliest run-out opens with its fall year and run-out marker, and a path the Snapshot did
 // not read is read live through POST /reread, leaving the Snapshot alone.
-import { afterAll, beforeAll, describe, expect, test } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import { pathReads } from "../src/client/path-reads.svelte"
 import type { Snapshot } from "../src/lib/contract"
 import { pathAnswer, pathKey, sameRun } from "../src/lib/snapshot/paths"
@@ -9,23 +9,25 @@ import { runKey } from "../src/lib/view/chance/path-state"
 import { demoCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS } from "./demo/return-model"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	answerChanged,
 	chanceOf,
 	disposeFutures,
 	editorOf,
 	PLAN,
-	page,
 	paramsOf,
 	readPath,
 	setupFutures,
 	snapshotOf,
 	trajOf,
 } from "./futures.test-support"
+import { page } from "./futures-page.test-support"
 import { answerPath } from "./serve-path"
 
 beforeAll(setupFutures, SLOW_MS)
 afterAll(disposeFutures)
+afterEach(settle, SLOW_MS)
 
 describe("the Snapshot's futures", () => {
 	test("the chance read lists every path, and names the five picks", () => {

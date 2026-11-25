@@ -1,5 +1,5 @@
 import { metricShape } from "./metric-shape"
-import { COMPARISONS, CRITERION_KINDS, DATE, MILESTONE_TERMS, MINOR_UNITS } from "./terms"
+import { COMPARISONS, CRITERION_KINDS, CRITERION_UNITS, DATE, MILESTONE_TERMS } from "./terms"
 
 /*
  * A Milestone's criterion (sim's ADR 0012). A criterion is one object whose `kind` decides the
@@ -49,7 +49,7 @@ export const criterionShape: Record<string, unknown> = {
 		},
 		amount: {
 			type: "integer",
-			description: `${MINOR_UNITS} Metric criteria only: the figure the Metric is compared with.`,
+			description: `${CRITERION_UNITS} Metric criteria only: the figure the Metric is compared with.`,
 		},
 		base: {
 			...metricShape,

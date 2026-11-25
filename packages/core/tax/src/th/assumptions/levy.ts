@@ -22,7 +22,8 @@ export interface ThAssumptionMeasureValue {
 	readonly value: number
 }
 
-const RATE_LABELS: Readonly<Record<string, ThAssumptionFact>> = {
+/** The income labels whose standard rate is unconfirmed, each with the fact it names. */
+export const RATE_LABELS: Readonly<Record<string, ThAssumptionFact>> = {
 	[ThLevyIncomeLabel.Section40_5Building]: F.Rate40_5Building,
 	[ThLevyIncomeLabel.Section40_5AgriculturalLand]: F.Rate40_5AgriculturalLand,
 	[ThLevyIncomeLabel.Section40_5NonAgriculturalLand]: F.Rate40_5NonAgriculturalLand,

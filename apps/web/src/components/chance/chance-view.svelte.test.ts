@@ -11,7 +11,9 @@ function renderView(
 	chance: Readonly<Record<string, Read<ProjectionChance>>>,
 	scenario = "",
 ): string {
-	return render(ChanceView, { props: { chance, scenario, onScenario: () => {} } }).body
+	return render(ChanceView, {
+		props: { names: Object.keys(chance), chance, scenario, onScenario: () => {} },
+	}).body
 }
 
 describe("ChanceView", () => {

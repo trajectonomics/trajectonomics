@@ -42,7 +42,8 @@ export function forkScenario(
 			if (isAppError(resolved)) return resolved
 			const document = canonicalDocument(resolved.document)
 			const taken = liveScenario(ctx, "name", name)
-			if (taken) return { status: "name_taken", scenario: taken, droppedAnchors: [] }
+			if (taken)
+				return { status: "name_taken", scenario: taken, droppedAnchors: [], droppedOwners: [] }
 			return {
 				status: "forked",
 				scenario: insertScenario(ctx, {
@@ -54,6 +55,7 @@ export function forkScenario(
 					notes: notesFor(source, options),
 				}),
 				droppedAnchors: resolved.dropped,
+				droppedOwners: resolved.droppedOwners,
 			}
 		},
 		options,

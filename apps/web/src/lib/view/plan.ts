@@ -13,3 +13,14 @@ export function scenarioNames(state: SnapshotState): readonly string[] {
 export function projectedRows(state: SnapshotState): PlanRow[] {
 	return state.status === "ready" ? planRows(state.snapshot).filter((row) => row.projected) : []
 }
+
+/**
+ * The one rule for which plan a page shows, for every page and for Home. `names` is the Snapshot's
+ * `params.scenarios`, which the main plan leads (web ADR 0023), so a page opens on the main plan. The
+ * plan the address bar names wins when it is one of the names; otherwise the first name. Null when
+ * there are no names. Pure: it never reads an object's keys, whose order JavaScript changes for
+ * integer-like names.
+ */
+export function chooseScenario(names: readonly string[], requested: string): string | null {
+	return names.includes(requested) ? requested : (names[0] ?? null)
+}

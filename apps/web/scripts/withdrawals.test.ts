@@ -1,8 +1,9 @@
 // The Withdrawals page against the real traj: a plan worked by hand, a rule set from the retirement Milestone, and its
 // years and Bands read back (cli ADR 0063, web ADR 0013). The tries are in `withdrawals-try.test.ts`.
-import { afterAll, beforeAll, describe, expect } from "bun:test"
+import { afterAll, afterEach, beforeAll, describe, expect } from "bun:test"
 import { withdrawalsView } from "../src/lib/view/withdrawals"
 import { SLOW_MS } from "./edit-fixture.test-support"
+import { settle } from "./editor-running.test-support"
 import {
 	contextOf,
 	guardrails,
@@ -24,6 +25,7 @@ beforeAll(async () => {
 	await setupWithdrawals()
 }, SLOW_MS)
 afterAll(disposeWithdrawals)
+afterEach(settle, SLOW_MS)
 
 describe("a plan with no rule", () => {
 	slow("states an empty table of Rule years and no spending Bands", async () => {

@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
+import { chooseScenario } from "../../lib/view/plan"
 import type { PlanKind } from "../../lib/view/plan-items/kinds"
-import { chooseScenario } from "../../lib/view/projection/scenario"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import PlanItemsList from "./PlanItemsList.svelte"

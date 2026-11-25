@@ -56,6 +56,41 @@ describe("the Scenario document contract with the routing forms", () => {
 		expect(scenarioDocument.safeParse(without).success).toBe(true)
 	})
 
+	it("decodes a level loan whose payments are outside the bounds the CLI stated when this contract was written (#336)", () => {
+		const loan = {
+			...DOCUMENT,
+			flows: [
+				{
+					id: "pay",
+					kind: "contribution",
+					target: "loan",
+					frequency: "monthly",
+					start: "2030-01-31",
+					level: { principal: "1000000.00", payments: 200000, rounding: "someNewRounding" },
+				},
+			],
+		}
+		expect(scenarioDocument.safeParse(loan).success).toBe(true)
+		expect(scenarioDocument.parse(loan) as unknown).toEqual(loan)
+	})
+
+	it("refuses a level loan whose payments are not a whole number", () => {
+		const loan = {
+			...DOCUMENT,
+			flows: [
+				{
+					id: "pay",
+					kind: "contribution",
+					target: "loan",
+					frequency: "monthly",
+					start: "2030-01-31",
+					level: { principal: "1000000.00", payments: 12.5, rounding: "ceil" },
+				},
+			],
+		}
+		expect(scenarioDocument.safeParse(loan).success).toBe(false)
+	})
+
 	it("refuses a share that is a number, not a percent string, and a target that is not money", () => {
 		const share = {
 			...DOCUMENT,

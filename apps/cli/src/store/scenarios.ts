@@ -53,7 +53,7 @@ export function saveScenario(
 					tax: null,
 					notes: null,
 				})
-				return { status: "created", scenario, droppedAnchors: [] }
+				return { status: "created", scenario, droppedAnchors: [], droppedOwners: [] }
 			}
 			const tax = taxKept(current, resolved.document)
 			if (
@@ -61,13 +61,18 @@ export function saveScenario(
 				current.household === resolved.household &&
 				current.tax === tax
 			) {
-				return { status: "unchanged", scenario: current, droppedAnchors: [] }
+				return { status: "unchanged", scenario: current, droppedAnchors: [], droppedOwners: [] }
 			}
 			const scenario = replaceScenario(ctx, current, document, {
 				household: resolved.household,
 				tax,
 			})
-			return { status: "updated", scenario, droppedAnchors: resolved.dropped }
+			return {
+				status: "updated",
+				scenario,
+				droppedAnchors: resolved.dropped,
+				droppedOwners: resolved.droppedOwners,
+			}
 		},
 		options,
 	)

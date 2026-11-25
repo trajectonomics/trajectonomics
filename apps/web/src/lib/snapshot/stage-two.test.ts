@@ -55,18 +55,27 @@ describe("stage two", () => {
 		])
 	})
 
-	test("the net worth history is one read per month-end since the first transaction, at most HISTORY_MONTHS (120)", () => {
+	test("the net worth history is one monthly read of every month-end since the first transaction, at most HISTORY_MONTHS (120)", () => {
 		const plan = planStageTwo(paramsOf({}), stageOne("2026-10-31", ["base"], "2024-11-01"))
 		expect(plan.historyDates).toHaveLength(24)
 		expect(plan.historyDates[0]).toBe("2024-11-30")
 		expect(plan.historyDates.at(-1)).toBe("2026-10-31")
-		expect(plan.netWorthHistory.map((read) => read.argv.at(3))).toEqual(plan.historyDates)
+		expect(plan.netWorthHistory?.argv).toEqual([
+			"report",
+			"networth",
+			"--monthly",
+			"--since",
+			"2024-11-30",
+			"--until",
+			"2026-10-31",
+			"--json",
+		])
 	})
 
 	test("a ledger with no transaction has no history", () => {
 		const plan = planStageTwo(paramsOf({}), stageOne("2026-10-31", ["base"], null))
 		expect(plan.historyDates).toEqual([])
-		expect(plan.netWorthHistory).toEqual([])
+		expect(plan.netWorthHistory).toBeNull()
 	})
 
 	test("with no Scenario named, it projects and runs fi for every Scenario in the ledger", () => {

@@ -1,12 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
+import { snapshotLoader } from "../../client/browser"
 import { editSession } from "../../client/edit.svelte.js"
 import { pathReads } from "../../client/path-reads.svelte.js"
+import { replaceSnapshot } from "../../client/snapshot.svelte"
 import type { ProjectionChance, Read, Snapshot } from "../../lib/contract"
 import { futuresViewOf } from "../../lib/view/chance/futures"
 import { chanceWithOutcomes, pathFixture } from "../../lib/view/chance/futures.test-support"
 import { runKey } from "../../lib/view/chance/path-state"
+import { LOADING } from "../../lib/view/state"
 import ChanceView from "./ChanceView.svelte"
 import FuturesSection from "./FuturesSection.svelte"
 import PathView from "./path/PathView.svelte"
@@ -30,6 +33,7 @@ const accounts = {
 
 function snapshot(paths: Record<string, unknown> = {}): Snapshot {
 	return {
+		params: { scenarios: ["base"] },
 		reads: { chance: { base: read(chance) }, paths: { base: paths }, accounts },
 	} as unknown as Snapshot
 }
@@ -38,12 +42,15 @@ const stored = {
 }
 
 function pathPage(index: string, paths = stored, terms = "both"): string {
+	// The page reads the ledger names from the Snapshot it shows.
+	replaceSnapshot(snapshot(paths))
 	return render(PathView, {
 		props: { snapshot: snapshot(paths), scenario: "base", index, terms, onTerms: () => {} },
 	}).body
 }
 
 afterEach(() => {
+	snapshotLoader.replace(LOADING)
 	editSession.token = null
 	setTestUrl("http://127.0.0.1/")
 })
@@ -51,7 +58,12 @@ afterEach(() => {
 describe("the Chance page's futures", () => {
 	const page = () =>
 		render(ChanceView, {
-			props: { chance: { base: read(chance) }, scenario: "base", onScenario: () => {} },
+			props: {
+				names: ["base"],
+				chance: { base: read(chance) },
+				scenario: "base",
+				onScenario: () => {},
+			},
 		}).body
 
 	test("lists the five cards, each linking to its future with the plan in the query", () => {
