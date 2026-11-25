@@ -25,6 +25,24 @@ function withFailedPnl(source: Snapshot): Snapshot {
 	}
 }
 
+function withFailedBaseline(source: Snapshot, code = "NEGATIVE_AMOUNT"): Snapshot {
+	return {
+		...source,
+		reads: {
+			...source.reads,
+			baseline: {
+				argv: ["baseline", "show", "--as-of", "2026-10-31", "--json"],
+				ok: false,
+				error: {
+					code,
+					exitCode: 3,
+					message: "rows.fund: Fund holds -9.58 THB, which is negative once stated as an asset",
+				},
+			},
+		},
+	}
+}
+
 describe("readAudit", () => {
 	test("lists every Read the Snapshot holds, once each", () => {
 		const { reads } = demo
@@ -67,5 +85,20 @@ describe("readAudit", () => {
 	test("gives every row a key unique in the table", () => {
 		const keys = readAudit(withFailedPnl(demo)).map((row) => row.key)
 		expect(new Set(keys).size).toBe(keys.length)
+	})
+
+	test("states an overdrawn Baseline plainly beside the CLI's refusal", () => {
+		const [row] = readAudit(withFailedBaseline(demo))
+		expect(row).toMatchObject({
+			question: "Baseline at the As-of",
+			failed: true,
+			error: { code: "NEGATIVE_AMOUNT" },
+		})
+		expect(row?.note).toContain("overdrawn asset")
+	})
+
+	test("leaves the note off a Baseline that failed another way", () => {
+		const [row] = readAudit(withFailedBaseline(demo, "INVALID_DATE"))
+		expect(row?.note).toBeNull()
 	})
 })
