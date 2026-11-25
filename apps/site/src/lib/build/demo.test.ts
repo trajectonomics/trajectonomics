@@ -73,6 +73,45 @@ describe("the links of the Demo's pages", () => {
 			codes(checkDemoLinks([page("demo/index.html", '<form action="/upload"></form>')])),
 		).toEqual(["DEMO_LINK_OUTSIDE"])
 	})
+
+	it("fails a srcset candidate that points outside the Demo", () => {
+		expect(
+			codes(
+				checkDemoLinks([
+					page("demo/index.html", '<img srcset="/demo/a.png 1x, /b.png 2x" src="/demo/a.png">'),
+				]),
+			),
+		).toEqual(["DEMO_LINK_OUTSIDE"])
+	})
+
+	it("fails a meta refresh that sends the page outside the Demo", () => {
+		expect(
+			codes(
+				checkDemoLinks([
+					page("demo/index.html", '<meta http-equiv="refresh" content="0; url=/outside">'),
+				]),
+			),
+		).toEqual(["DEMO_LINK_OUTSIDE"])
+	})
+
+	it("fails an SVG use whose href leaves the Demo", () => {
+		expect(
+			codes(
+				checkDemoLinks([
+					page(
+						"demo/index.html",
+						'<svg><use href="https://example.com/icons.svg#icon"></use></svg>',
+					),
+				]),
+			),
+		).toEqual(["DEMO_LINK_OUTSIDE"])
+	})
+
+	it("fails a formaction that submits outside the Demo", () => {
+		expect(
+			codes(checkDemoLinks([page("demo/index.html", '<button formaction="/upload">Go</button>')])),
+		).toEqual(["DEMO_LINK_OUTSIDE"])
+	})
 })
 
 describe("the policy the headers file sets for the Demo", () => {
