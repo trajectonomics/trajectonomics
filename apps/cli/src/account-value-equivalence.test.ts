@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { bodyOf, bothPlans, MOST, own } from "./account-value-equivalence-support"
 import { chartHome, value } from "./account-value-support"
 import { isAppError } from "./errors"
+import { plant } from "./plant-test-support"
 import { accounts, cli, ledgerHome } from "./tx-test-support"
 
 describe("account value --file keeps each entry's Balance as it rescanned the Ledger", () => {
@@ -103,9 +104,9 @@ describe("account value --file keeps each entry's Balance as it rescanned the Le
 	})
 
 	it("refuses a batch when an account it does not touch already overflows in the ledger", async () => {
-		const { home, traj, chart } = await chartHome()
-		await own(traj, "Equity", "Fund", MOST, "2026-01-01")
-		await own(traj, "Equity", "Fund", "1.00", "2026-01-02")
+		const { home, chart } = await chartHome()
+		plant(home, "Equity", "Fund", MOST, "2026-01-01")
+		plant(home, "Equity", "Fund", "1.00", "2026-01-02")
 		const { fast, slow } = bothPlans(home, [{ account: "Home", date: "2026-01-06", value: "5.00" }])
 		expect(JSON.stringify(bodyOf(fast))).toContain(`balance[${chart.Fund.id}]`)
 		expect(bodyOf(fast)).toEqual(bodyOf(slow))
@@ -118,8 +119,8 @@ describe("account value --file keeps each entry's Balance as it rescanned the Le
 			["Gains", "income"],
 			["Fund", "asset"],
 		])
-		await own(traj, "Gains", "Fund", MOST, "2026-01-01")
-		await own(traj, "Gains", "Fund", "1.00", "2026-01-02")
+		plant(home, "Gains", "Fund", MOST, "2026-01-01")
+		plant(home, "Gains", "Fund", "1.00", "2026-01-02")
 		const { fast, slow } = bothPlans(home, [{ account: "Fund", date: "2026-01-03", value: "1.00" }])
 		expect(bodyOf(fast).code).toBe("AMOUNT_OVERFLOW")
 		expect(JSON.stringify(bodyOf(fast))).toContain(`balance[${chart["Gains"]!.id}]`)
