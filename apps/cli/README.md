@@ -93,6 +93,12 @@ traj report networth --monthly --since 2026-01-01 --until 2026-03-31
 
 Each month is exactly what `--as-of` gives for that date.
 
+A figure that sums accounts (net worth, the trial balance's debit and credit columns, the P&L's income
+less expenses) can leave the safe integer range though every account is inside it. The read still
+exits 0 and states every account, and states that figure as `null` with an error object beside it
+(`netWorthError`, `totalsError`); the text form prints a sentence in its place. A figure inside the
+range carries no error key. Run `traj schema balance` or `traj schema report pnl` for the exact shape.
+
 `traj help` lists every command, `traj help <command>` lists one command's flags, and
 `traj schema --json` prints the whole contract: every command's input, output and error codes.
 

@@ -9,7 +9,7 @@ Requires a checkout of this repository and [Bun](https://bun.sh). The `traj` bin
 ```sh
 bun install
 bunx turbo run build --filter=@trajectonomics/cli   # builds apps/cli/dist/traj
-bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-05-15 --age 45 --age 60
+bun run dashboard -- --as-of 2026-10-31 --horizon 2060-12-31 --birth-date 1990-06-15 --age 45 --age 60
 ```
 
 The Demo snapshot is not in git. A fresh clone runs `bunx turbo run demo --filter=@trajectonomics/web` (or `bunx turbo run check --filter=@trajectonomics/web`, which runs it first) before `bun test`, and `bun run demo` in this directory regenerates it after a change to the CLI or the Demo ledger. A test that finds it missing says so.

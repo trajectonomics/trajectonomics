@@ -49,10 +49,12 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 			<dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
 				<dt class="text-muted-foreground">How often</dt>
 				<dd>{card.frequency}<WasText was={mark.was.frequency} /></dd>
-				<dt class="text-muted-foreground">Starts</dt>
+				<dt class="text-muted-foreground">{card.startLabel}</dt>
 				<dd>{card.start}<WasText was={mark.was.start} />{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
-				<dt class="text-muted-foreground">Ends</dt>
-				<dd>{card.end}<WasText was={mark.was.end} />{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
+				{#if card.end !== null}
+					<dt class="text-muted-foreground">Ends</dt>
+					<dd>{card.end}<WasText was={mark.was.end} />{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
+				{/if}
 				<dt class="text-muted-foreground">Growth</dt>
 				<dd>{card.growth}<WasText was={mark.was.growth} /></dd>
 				{#if card.category !== null}
