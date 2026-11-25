@@ -26,6 +26,10 @@
 			"dependsOn": ["^build", "@trajectonomics/brand#check", "demo"],
 			"outputs": ["dist/**", "pack/**"]
 		},
+		"build:hosted": {
+			"dependsOn": ["^build", "@trajectonomics/brand#check", "demo"],
+			"outputs": ["dist-hosted/**"]
+		},
 		"test": {
 			"dependsOn": ["^build", "@trajectonomics/cli#build", "demo"]
 		},

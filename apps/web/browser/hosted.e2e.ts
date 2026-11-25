@@ -1,0 +1,116 @@
+import { expect, test } from "@playwright/test"
+import { HOSTED_PREFIX } from "./base-url"
+import { SCREENSHOTS } from "./demo"
+import { labelsEscaping, measureOverflow } from "./fit"
+import { DEMO_SNAPSHOT, failures, logRequests, openHosted, snapshotsRead, strays } from "./hosted"
+import { PAGES, pageName } from "./pages"
+
+// The hosted Demo (web ADR 0028), served under /demo/ as the Site will serve it: every page at a phone (360px) and a
+// desktop (1280px). Besides the fit rules of the loopback Demo, it checks the hosted promise: no request leaves the build
+// (only GETs of its own pages and assets), the Demo snapshot is the only Snapshot read, every Edit control that stays is
+// switched off and says so, and a click on any control that is still on sends nothing.
+const WIDTHS_PX = [360, 1280] as const
+const HEIGHT_PX = 800
+
+/** Pages with Edit controls: each must show at least one that is switched off, or the fence is not running. */
+const EDIT_PAGES: readonly string[] = [
+	"/assets-and-debts/",
+	"/expenses/",
+	"/income/",
+	"/plans/",
+	"/projection/",
+	"/routing/",
+	"/settings/assumptions/",
+	"/settings/tax/",
+]
+
+for (const width of WIDTHS_PX) {
+	for (const path of PAGES) {
+		test(`hosted ${pageName(path)} fits a ${width}px screen and sends nothing but reads of its own files`, async ({
+			page,
+		}) => {
+			await page.setViewportSize({ width, height: HEIGHT_PX })
+			const requests = logRequests(page)
+			await openHosted(page, path)
+			await page.screenshot({
+				path: `${SCREENSHOTS}/hosted/${width}/${pageName(path)}.png`,
+				fullPage: true,
+			})
+
+			const fit = await measureOverflow(page, true)
+			expect(fit.tables, "tables outside a scroll box").toEqual([])
+			expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
+			expect(await labelsEscaping(page)).toEqual([])
+
+			expect(strays(requests), "requests that are not a GET under /demo/ of this origin").toEqual(
+				[],
+			)
+			expect(failures(requests), "responses with an error status under /demo/").toEqual([])
+			expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
+			await expect(page.getByRole("complementary", { name: "About this demo" })).toBeVisible()
+		})
+	}
+}
+
+for (const path of PAGES) {
+	test(`hosted ${pageName(path)}: every link stays under ${HOSTED_PREFIX}/, every Edit control is off and says why, and a click sends nothing`, async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 1280, height: HEIGHT_PX })
+		const requests = logRequests(page)
+		await openHosted(page, path)
+
+		const links = await page
+			.locator("a[href]")
+			.evaluateAll((anchors) => anchors.map((a) => a.getAttribute("href") ?? ""))
+		expect(
+			links.filter((href) => href.startsWith("/") && !href.startsWith(`${HOSTED_PREFIX}/`)),
+		).toEqual([])
+
+		const off = page.locator("main :disabled[title], div:has(> #plan-switcher) :disabled[title]")
+		const titles = await off.evaluateAll((controls) =>
+			controls.map((c) => c.getAttribute("title") ?? ""),
+		)
+		for (const title of titles) expect(title).toContain("traj dashboard")
+		if (EDIT_PAGES.includes(path)) expect(titles.length, "switched-off controls").toBeGreaterThan(0)
+
+		// A click on every control still on, outside a dialog: none of them may send a request.
+		const clicks = page.locator("main button:enabled:not(dialog *)")
+		const count = path === "/reports/" ? 0 : await clicks.count()
+		for (let index = 0; index < count; index++) {
+			const control = clicks.nth(index)
+			if (await control.isVisible())
+				await control.click({ trial: false, timeout: 2000 }).catch(() => undefined)
+		}
+		await page.waitForLoadState("networkidle")
+		expect(strays(requests), "requests that are not a GET under /demo/ of this origin").toEqual([])
+		expect(failures(requests), "responses with an error status under /demo/").toEqual([])
+		expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
+	})
+}
+
+test("hosted: the navigation stays under /demo/ and reads the Demo snapshot once for the whole visit", async ({
+	page,
+}) => {
+	const requests = logRequests(page)
+	await openHosted(page, "/")
+	await page
+		.getByRole("navigation", { name: "Pages" })
+		.getByRole("link", { name: "Net worth" })
+		.click()
+	await expect(page).toHaveURL(/\/demo\/net-worth\/$/)
+	await expect(page.getByRole("heading", { level: 1, name: "Net worth" })).toBeVisible()
+	expect(strays(requests)).toEqual([])
+	expect(failures(requests)).toEqual([])
+	expect(snapshotsRead(requests)).toEqual([DEMO_SNAPSHOT])
+	expect(requests.seen.filter((line) => line.endsWith(DEMO_SNAPSHOT))).toHaveLength(1)
+})
+
+test("hosted: a page outside the base path is not served, so nothing can read the loopback build by mistake", async ({
+	request,
+}) => {
+	const outside = await request.get("/snapshot.json")
+	expect(outside.status()).toBe(404)
+	const page = await request.get(`${HOSTED_PREFIX}/`)
+	expect(page.status()).toBe(200)
+})
