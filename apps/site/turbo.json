@@ -2,8 +2,24 @@
 	"$schema": "https://turbo.build/schema.json",
 	"extends": ["//"],
 	"tasks": {
+		"build": {
+			"dependsOn": ["@trajectonomics/brand#build", "@trajectonomics/web#build:hosted"]
+		},
 		"check": {
-			"dependsOn": ["^build", "^check"]
+			"dependsOn": [
+				"@trajectonomics/brand#build",
+				"@trajectonomics/brand#check",
+				"@trajectonomics/web#build:hosted"
+			]
+		},
+		"lint": {
+			"dependsOn": ["@trajectonomics/brand#build"]
+		},
+		"typecheck": {
+			"dependsOn": ["@trajectonomics/brand#build"]
+		},
+		"test": {
+			"dependsOn": ["@trajectonomics/brand#build"]
 		}
 	}
 }

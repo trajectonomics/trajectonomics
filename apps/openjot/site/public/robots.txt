@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /download
+Disallow: /go
+Disallow: /api/
+Disallow: /ingest/
+
+Sitemap: https://moojot.trajectonomics.com/sitemap.xml

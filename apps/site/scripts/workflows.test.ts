@@ -91,8 +91,15 @@ describe("browser.yml, the workflow that needs a browser", () => {
 	const workflow = load("browser.yml")
 	const steps = () => soleJob(workflow).steps ?? []
 
-	it("runs on pull requests and on pushes to main that touch the site, the brand or the lockfile", () => {
-		const paths = ["apps/site/**", "packages/brand/**", "bun.lock"]
+	it("runs on pull requests and on pushes to main that touch the site, its Demo's inputs, the brand or the lockfile", () => {
+		const paths = [
+			"apps/site/**",
+			"apps/web/**",
+			"apps/cli/src/**",
+			"packages/core/**",
+			"packages/brand/**",
+			"bun.lock",
+		]
 		expect(workflow.on?.["pull_request"]).toEqual({ paths })
 		expect(workflow.on?.["push"]).toEqual({ branches: ["main"], paths })
 	})

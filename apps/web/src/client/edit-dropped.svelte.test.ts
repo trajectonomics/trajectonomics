@@ -71,3 +71,38 @@ describe("the household anchors a write dropped", () => {
 		)
 	})
 })
+
+describe("the household Owners a write dropped", () => {
+	test("are kept from the Edit's answer and shown as a notice naming the plan and the item", async () => {
+		answer({ droppedOwners: ["flows.rent"] })
+		expect(await editSession.run(EDIT)).toBe(true)
+		expect(dropped.owners).toEqual(["flows.rent"])
+		expect(render(DroppedAnchorsNotice).body).toContain(
+			"This change to plan early removed the Owner of flows.rent, because the plan no longer holds that item.",
+		)
+	})
+
+	test("are cleared by Dismiss, and when another plan is shown", async () => {
+		answer({ droppedOwners: ["flows.rent"] })
+		await editSession.run(EDIT)
+		dismissDropped()
+		expect(dropped.owners).toEqual([])
+		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+
+		answer({ droppedOwners: ["flows.rent"] })
+		await editSession.run(EDIT)
+		expect(selectPlan("late")).toBe(true)
+		expect(dropped.owners).toEqual([])
+		expect(render(DroppedAnchorsNotice).body).not.toContain("Dismiss")
+	})
+
+	test("stay when the page then shows the plan the write changed", async () => {
+		answer({ droppedOwners: ["flows.rent"] })
+		await editSession.run({ kind: "copy-plan", from: "base", name: "early" })
+		expect(selectPlan("early")).toBe(true)
+		expect(dropped.owners).toEqual(["flows.rent"])
+		expect(render(DroppedAnchorsNotice).body).toContain(
+			"This change to plan early removed the Owner",
+		)
+	})
+})
