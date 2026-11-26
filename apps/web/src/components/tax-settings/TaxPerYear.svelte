@@ -24,6 +24,16 @@ interface Props {
 let { name, read, people, claimsHolder = null }: Props = $props()
 /** Whether the plan files separately: its years then name a Filer each, and the table says whose Return a row is. */
 const withReturn = $derived(read.ok && read.data.taxYears.some((year) => year.filer !== undefined))
+/** Every Filer the years name, so two departed ones read apart. */
+const filers = $derived(
+	read.ok
+		? [
+				...new Set(
+					read.data.taxYears.flatMap((year) => (year.filer === undefined ? [] : [year.filer])),
+				),
+			]
+		: [],
+)
 
 const RETURN_COLUMN: Column<TaxRow> = { key: "return", header: "Return", cell: returnCell }
 const COLUMNS: readonly Column<TaxRow>[] = [
@@ -36,7 +46,7 @@ const columns = $derived(withReturn ? [RETURN_COLUMN, ...COLUMNS] : COLUMNS)
 </script>
 
 {#snippet returnCell(row: TaxRow)}
-	{#if row.filer === null}—{:else}<ItemWords label={returnLabel(row.filer, people, claimsHolder)} />{/if}
+	{#if row.filer === null}—{:else}<ItemWords label={returnLabel(row.filer, people, claimsHolder, filers)} />{/if}
 {/snippet}
 {#snippet periodCell(row: TaxRow)}{row.period}{/snippet}
 {#snippet settlesCell(row: TaxRow)}{row.settles}{/snippet}

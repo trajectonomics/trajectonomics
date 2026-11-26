@@ -46,7 +46,12 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	await expect(shared).toBeEnabled()
 	await expect(shared).toHaveValue("")
 	await shared.fill("30000")
+	const sent = page.waitForRequest(
+		(request) => request.method() === "POST" && request.url().includes("/edit"),
+	)
 	await dialog.getByRole("button", { name: "Save", exact: true }).click()
+	// The save sends the shared interest alone: a locked field sends nothing, not even a removal.
+	expect((await sent).postDataJSON().flags).toEqual({ sharedMortgageInterest: "30000" })
 	await expect(dialog).toBeHidden({ timeout: SLOW })
 	// The page read the plan again after the save: the shared interest is stored, still hidden.
 	await expect(
@@ -65,5 +70,7 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 	const home = claims
 		.getByRole("row")
 		.filter({ has: page.getByRole("rowheader", { name: "Home-loan interest", exact: true }) })
-	await expect(home).toContainText(`${LOCKED.homeLoan} THB`)
+	const headers = await claims.locator("thead th").allInnerTexts()
+	const column = headers.findIndex((text) => text.trim() === "Your partner")
+	await expect(home.locator("td").nth(column - 1)).toContainText(`${LOCKED.homeLoan} THB`)
 })

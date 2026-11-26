@@ -29,7 +29,7 @@ let { table, people, claimsHolder = null }: Props = $props()
 				<tr class="border-b border-border">
 					<th scope="col" class="px-3 py-2 text-left font-medium text-muted-foreground">Allowance</th>
 					{#each table.people as person (person)}
-						<th scope="col" class="px-3 py-2 text-right font-medium text-muted-foreground"><ItemWords label={returnLabel(person, people, claimsHolder)} /></th>
+						<th scope="col" class="px-3 py-2 text-right font-medium text-muted-foreground"><ItemWords label={returnLabel(person, people, claimsHolder, table.people)} /></th>
 					{/each}
 				</tr>
 			</thead>
