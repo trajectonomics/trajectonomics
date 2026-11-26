@@ -8,9 +8,9 @@ import SegmentedControl from "./SegmentedControl.svelte"
 import type { Column } from "./table-types"
 
 describe("Provenance, EmptyState and SegmentedControl", () => {
-	test("shows the command under 'Show the command'", () => {
+	test("shows the command under 'Details'", () => {
 		const { body } = render(Provenance, { props: { argv: ["doctor", "--json"] } })
-		expect(body).toContain("Show the command")
+		expect(body).toContain(">Details</summary>")
 		expect(body).toContain("traj doctor --json")
 	})
 

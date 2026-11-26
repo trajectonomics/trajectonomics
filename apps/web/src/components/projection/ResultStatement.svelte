@@ -13,11 +13,11 @@ interface Props {
 	shape: ProjectionShape
 	/** The argv of the Read the result came from. */
 	argv: readonly string[]
-	/** Extra facts a page states beside the echo, such as an FI definition. */
+	/** Extra raw provenance a page states, such as an FI definition or the figures behind a ratio. */
 	children?: Snippet
 }
 
-/** What a result says about itself: its tax status, its echo, its Overrides and notes, and its command. */
+/** What a result says about itself: its tax status, its echo, its Overrides and notes, and its Details. */
 let { shape, argv, children }: Props = $props()
 const statement = $derived(statementOf(shape))
 const headingId = $props.id()
@@ -33,12 +33,17 @@ const headingId = $props.id()
 		<Fact label="Horizon">{statement.horizon}</Fact>
 		<Fact label="Engine">{statement.engine}</Fact>
 		<Fact label="Scenario">{statement.scenario}</Fact>
-		{#each statement.hashes as hash (hash.label)}
-			<Fact label={hash.label}><HashText {hash} /></Fact>
-		{/each}
-		{@render children?.()}
 	</dl>
 	<OverrideList overrides={statement.overrides} />
 	<NoteList notes={statement.notes} scenario={statement.scenario} />
-	<Provenance {argv} />
+	<Provenance {argv}>
+		{#snippet details()}
+			<dl class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+				{#each statement.hashes as hash (hash.label)}
+					<Fact label={hash.label}><HashText {hash} /></Fact>
+				{/each}
+				{@render children?.()}
+			</dl>
+		{/snippet}
+	</Provenance>
 </section>

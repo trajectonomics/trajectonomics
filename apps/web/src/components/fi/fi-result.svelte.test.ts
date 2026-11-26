@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 
 import type { Fi } from "../../lib/contract"
+import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import { bindingSentence } from "../../lib/view/fi/binding"
 import { fiFixture, REACHABLE, UNREACHABLE } from "../../lib/view/fi/fixtures.test-support"
 import FiResult from "./FiResult.svelte"
@@ -41,12 +42,30 @@ describe("FiResult: reachable", () => {
 		expect(body).toContain("1,250,000.00")
 	})
 
-	test("states the definition, the tax status and the command", () => {
+	test("states the definition and tax status at full weight, and the command, hashes and raw measures in Details", () => {
 		const body = renderFi(fiFixture(REACHABLE))
-		expect(body).toContain("Definition version")
-		expect(body).toContain("survival")
-		expect(body).toContain("Tax not applied")
-		expect(body).toContain("traj fi --scenario base --as-of 2026-10-31 --json")
+		const outside = outsideDetails(body)
+		const details = insideDetails(body)
+		expect(outside).toContain("Tax not applied")
+		expect(outside).not.toContain("Method")
+		expect(outside).not.toContain(">survival<")
+		expect(outside).not.toContain("Content hash")
+		expect(outside).not.toContain("Definition version")
+		expect(outside).not.toContain("basis points")
+		expect(details).toContain("traj fi --scenario base --as-of 2026-10-31 --json")
+		expect(details).toContain("Content hash")
+		expect(details).toContain("0123456789ab")
+		expect(details).toContain("Effective hash, after Overrides")
+		expect(details).toContain("Definition version")
+		expect(details).toContain("survival")
+		expect(details).toContain("Numerator")
+		expect(details).toContain("200000 basis points, where 10,000 is one times")
+	})
+
+	test("shows the multiple in words at full weight, with the CLI's reference value", () => {
+		const body = renderFi(fiFixture(REACHABLE))
+		expect(outsideDetails(body)).toContain("20.0× a year of spending (reference: 25×)")
+		expect(outsideDetails(body)).not.toContain("200000 basis points")
 	})
 
 	test("has no best case when the FI date is reachable", () => {

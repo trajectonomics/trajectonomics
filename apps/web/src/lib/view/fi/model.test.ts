@@ -50,10 +50,9 @@ describe("fiModelOf: the reachable branch", () => {
 		expect(model.ages).toBe("You 51, Your partner 49")
 	})
 
-	test("states the rule-of-thumb reference with its multiplier, date, basis, window and terms", () => {
+	test("states the rule-of-thumb reference with its date, basis, window and terms", () => {
 		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
-		expect(model.reference.multiplier).toBe("25×")
 		expect(model.reference.date).toBe("1 Mar 2041")
 		expect(model.reference.basis).toBe("Unlocked assets")
 		expect(model.reference.window).toBe("The next twelve months of expenses")
@@ -84,16 +83,17 @@ describe("fiModelOf: the reachable branch", () => {
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
 		expect(model.reference.amounts).toEqual([
 			{ label: "Unlocked assets", amount: "1000000.00" },
-			{ label: "Numerator", amount: "1000000.00" },
 			{ label: "Annual expenses", amount: "50000.00" },
 			{ label: "Threshold", amount: "1250000.00" },
 		])
 	})
 
-	test("shows the multiple in basis points, and says so, when the CLI states one", () => {
+	test("reads the multiple in words with its reference value, and its raw basis points", () => {
 		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
-		expect(model.reference.multiple).toBe("200000 basis points, where 10,000 is one times")
+		expect(model.reference.multipleInWords).toBe("20.0× a year of spending (reference: 25×)")
+		expect(model.reference.multipleRaw).toBe("200000 basis points, where 10,000 is one times")
+		expect(model.reference.numerator).toBe("1000000.00")
 	})
 
 	test("has no multiple when the CLI states none", () => {
@@ -103,7 +103,8 @@ describe("fiModelOf: the reachable branch", () => {
 			NO_PEOPLE,
 		)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
-		expect(model.reference.multiple).toBeNull()
+		expect(model.reference.multipleInWords).toBeNull()
+		expect(model.reference.multipleRaw).toBeNull()
 	})
 })
 

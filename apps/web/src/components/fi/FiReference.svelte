@@ -22,17 +22,16 @@ const headingId = $props.id()
 		The survival date above decides financial independence. The rule of thumb is shown for
 		comparison only, and it never moves that date.
 	</p>
+	{#if reference.multipleInWords}
+		<p class="text-lg font-medium">{reference.multipleInWords}</p>
+	{/if}
 	<dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-		<Fact label="Multiplier">{reference.multiplier}</Fact>
 		<Fact label="Measured at">{reference.date}</Fact>
 		<Fact label="Basis">{reference.basis}</Fact>
 		<Fact label="Window">{reference.window}</Fact>
 		<Fact label="Terms">{reference.terms}</Fact>
 		<Fact label="Met">{reference.met}</Fact>
 		<Fact label="Window length">{reference.partial}</Fact>
-		{#if reference.multiple}
-			<Fact label="Multiple">{reference.multiple}</Fact>
-		{/if}
 		{#each reference.amounts as amount (amount.label)}
 			<Fact label={amount.label}><Money amount={amount.amount} {currency} /></Fact>
 		{/each}
