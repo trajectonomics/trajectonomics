@@ -70,7 +70,7 @@ const totalColumns: Column<TrialBalanceTotal>[] = [
 							columns={totalColumns}
 						/>
 					{/if}
-					<Provenance argv={balance.argv} />
+					<Provenance name="Trial balance" commands={[balance.argv]} />
 				</div>
 			{/if}
 		{/snippet}

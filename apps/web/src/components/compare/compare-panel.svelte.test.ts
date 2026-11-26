@@ -10,6 +10,7 @@ import {
 	ok,
 	projectionRun,
 } from "../../lib/view/compare/projection.test-support"
+import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import ComparePanel from "./ComparePanel.svelte"
 
 const compare: Read<ProjectionCompare> = ok(compareOf(SIDE_A, SIDE_B, DEFAULT_DELTAS))
@@ -53,8 +54,19 @@ describe("ComparePanel", () => {
 		expect(body).toContain("A, solid")
 		expect(body).toContain("B, dashed")
 		expect(body).toContain("Difference, B minus A")
-		expect(body).toContain("Content hash eba036341234")
 		expect(body).toContain('role="img"')
+	})
+
+	test("keeps the command and both content hashes in Details", () => {
+		const body = panel({ base: ok(runA), "retire-early": ok(runB) })
+		expect(outsideDetails(body)).not.toContain("Content hash")
+		expect(outsideDetails(body)).not.toContain("jcs1:sha256:")
+		const details = insideDetails(body)
+		expect(details).toContain("traj projection compare --json")
+		expect(details).toContain("Content hash, A")
+		expect(details).toContain("jcs1:sha256:eba036341234ffff0000")
+		expect(details).toContain("Effective hash, B")
+		expect(details).toContain("jcs1:sha256:96b45010aaaabbbbcccc")
 	})
 
 	test("the figures are the CLI's: a zero delta reads No change and an unstated one is a dash", () => {

@@ -14,7 +14,7 @@ let { model, currency }: Props = $props()
 
 <div class="space-y-8">
 	<Stat
-		label="Survival method"
+		label="FI date"
 		secondary={`The earliest month earned income could stop: ${model.date}`}
 	>
 		{#snippet value()}{model.month}{/snippet}

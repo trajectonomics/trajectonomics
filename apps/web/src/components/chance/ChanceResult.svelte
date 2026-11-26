@@ -2,6 +2,7 @@
 import type { FuturesView } from "../../lib/view/chance/futures"
 import type { ChanceView } from "../../lib/view/chance/page"
 import ChanceSource from "../assumptions/ChanceSource.svelte"
+import Fact from "../projection/Fact.svelte"
 import Provenance from "../ui/Provenance.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import ChanceFan from "./ChanceFan.svelte"
@@ -34,14 +35,6 @@ let { view, argv, plan, futures }: Props = $props()
 				<dt class="text-muted-foreground">Paths</dt>
 				<dd class="tabular-nums">{view.paths}</dd>
 			</div>
-			<div>
-				<dt class="text-muted-foreground">Seed</dt>
-				<dd class="font-mono">{view.definition.seed}</dd>
-			</div>
-			<div>
-				<dt class="text-muted-foreground">Return model</dt>
-				<dd class="font-mono break-all">{view.definition.modelId}</dd>
-			</div>
 		</dl>
 	</section>
 	<section aria-labelledby="chance-source" class="space-y-2">
@@ -71,5 +64,14 @@ let { view, argv, plan, futures }: Props = $props()
 			{/each}
 		</ul>
 	{/if}
-	<Provenance {argv} />
+	<Provenance name={`Chance of success for ${plan}`} commands={[argv]}>
+		{#snippet details()}
+			<dl class="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+				<Fact label="Seed"><code class="font-mono">{view.definition.seed}</code></Fact>
+				<Fact label="Return model">
+					<code class="font-mono break-all">{view.definition.modelId}</code>
+				</Fact>
+			</dl>
+		{/snippet}
+	</Provenance>
 </div>

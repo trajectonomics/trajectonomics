@@ -66,6 +66,6 @@ const plan = $derived(
 				<AllowancesResult {data} {plan} {people} />
 			{/snippet}
 		</ReadView>
-		<Provenance argv={read.argv} />
+		<Provenance name={`Allowances for ${name}`} commands={[read.argv]} />
 	{/if}
 </div>

@@ -35,7 +35,7 @@ const view = $derived(allowancesView(data))
 	{/if}
 	{#if view.assumptions.length > 0}
 		<details class="rounded-lg border border-border p-4 text-sm">
-			<summary class="cursor-pointer font-medium">Details: the tax figures used</summary>
+			<summary class="cursor-pointer font-medium">Tax figures used</summary>
 			<ul class="mt-2 list-disc space-y-1 pl-5">
 				{#each view.assumptions as line (line.key)}
 					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.text}</span></li>

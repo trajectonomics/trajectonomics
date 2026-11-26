@@ -9,16 +9,18 @@ import NoteList from "./NoteList.svelte"
 import OverrideList from "./OverrideList.svelte"
 
 interface Props {
+	/** The result this statement belongs to, which names its disclosure for a screen reader. */
+	name: string
 	/** The echo fields a result states at its root: the As-of, engine, Scenario, Overrides and notes. */
 	shape: ProjectionShape
 	/** The argv of the Read the result came from. */
 	argv: readonly string[]
-	/** Extra facts a page states beside the echo, such as an FI definition. */
+	/** Extra raw provenance a page states, such as an FI definition or the figures behind a ratio. */
 	children?: Snippet
 }
 
-/** What a result says about itself: its tax status, its echo, its Overrides and notes, and its command. */
-let { shape, argv, children }: Props = $props()
+/** What a result says about itself: its tax status, its echo, its Overrides and notes, and its Details. */
+let { name, shape, argv, children }: Props = $props()
 const statement = $derived(statementOf(shape))
 const headingId = $props.id()
 </script>
@@ -33,12 +35,17 @@ const headingId = $props.id()
 		<Fact label="Horizon">{statement.horizon}</Fact>
 		<Fact label="Engine">{statement.engine}</Fact>
 		<Fact label="Plan">{statement.scenario}</Fact>
-		{#each statement.hashes as hash (hash.label)}
-			<Fact label={hash.label}><HashText {hash} /></Fact>
-		{/each}
-		{@render children?.()}
 	</dl>
 	<OverrideList overrides={statement.overrides} />
 	<NoteList notes={statement.notes} scenario={statement.scenario} />
-	<Provenance {argv} />
+	<Provenance {name} commands={[argv]}>
+		{#snippet details()}
+			<dl class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+				{#each statement.hashes as hash (hash.label)}
+					<Fact label={hash.label}><HashText {hash} /></Fact>
+				{/each}
+				{@render children?.()}
+			</dl>
+		{/snippet}
+	</Provenance>
 </section>
