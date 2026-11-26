@@ -41,4 +41,14 @@ describe("traj schema projection allowances", () => {
 			]),
 		)
 	})
+
+	it("names the Filer on each table's rows, for a separate filing", async () => {
+		const { output } = await published()
+		const tables = output.properties as Record<
+			string,
+			{ items?: { properties?: Record<string, unknown> } }
+		>
+		expect(tables["taxYears"]?.items?.properties).toHaveProperty("filer")
+		expect(tables["allowances"]?.items?.properties).toHaveProperty("filer")
+	})
 })

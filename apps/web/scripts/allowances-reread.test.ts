@@ -2,6 +2,7 @@
 // as it was, and a plan that changed since the Snapshot was read still makes a full read (web ADR 0012).
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import type { Snapshot } from "../src/lib/contract"
+import { allowancesView } from "../src/lib/view/allowances"
 import {
 	disposeAllowances,
 	editorOver,
@@ -27,8 +28,8 @@ let log = ""
 let disposeSpy: () => Promise<void> = async () => {}
 
 /** One reread, posted to the spy editor as the page posts it, and its answer's Snapshot. */
-async function reread(body: unknown): Promise<Snapshot> {
-	const response = await spy.reread(editRequest({}, JSON.stringify(body)), 4321)
+async function reread(body: unknown, editor: Editor = spy): Promise<Snapshot> {
+	const response = await editor.reread(editRequest({}, JSON.stringify(body)), 4321)
 	const answer = (await response.json()) as { ok: boolean; snapshot: Snapshot }
 	if (!answer.ok) throw new Error("the reread failed")
 	return answer.snapshot
@@ -138,6 +139,28 @@ describe("a reread after the ledger moved", () => {
 			await clearCalls(log)
 			await reread({})
 			expect((await calls(log)).some((line) => line.startsWith("projection run"))).toBe(true)
+		},
+		SLOW_MS,
+	)
+})
+
+describe("a reread on a plan with Filers", () => {
+	test(
+		"reads each Filer's own labels, so the page groups one section per Return",
+		async () => {
+			const filer = await editorOver(
+				{ binary: BINARY, env: ledgerEnv() },
+				{ asOf: "2026-01-01", horizon: "2026-12-31", scenarios: ["separate"] },
+			)
+			const after = await reread({ allowances: FIRST }, filer)
+			const read = after.reads.allowances["separate"]
+			if (read?.ok !== true) throw new Error("the Filer plan has no allowance read")
+			expect(read.argv).toContain("allowance.retirement.rmf@me,allowance.retirement.rmf@partner")
+			const view = allowancesView(read.data)
+			expect(view.returns.map((one) => one.current?.levy)).toEqual([
+				"th-2026-pit@me",
+				"th-2026-pit@partner",
+			])
 		},
 		SLOW_MS,
 	)

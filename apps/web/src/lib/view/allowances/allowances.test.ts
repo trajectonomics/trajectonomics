@@ -162,9 +162,15 @@ describe("keeping a year's suggestions", () => {
 })
 
 describe("the Home card", () => {
-	test("states the current year's saving when it is above zero", () => {
+	test("states the current year's saving when it is above zero, unnamed for one Return", () => {
 		expect(allowancesSummaryOf(inYear("2026-03-01"))).toEqual({
-			saving: "28100.00",
+			savings: [
+				{
+					key: "th-2026-pit:2026-01-01",
+					name: null,
+					saving: "28100.00",
+				},
+			],
 			currency: "THB",
 			period: "1 Jan 2026 to 31 Dec 2026",
 		})
