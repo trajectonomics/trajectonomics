@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument, TaxProfile } from "../../contract"
-import { claimsTable } from "./claims"
+import { NO_PEOPLE, personNames } from "../item-names"
+import { claimsTable, flatClaimant } from "./claims"
 
 const PROFILE: TaxProfile = {
 	tax: "th-2026",
@@ -27,6 +28,15 @@ const HOUSEHOLD: HouseholdDocument = {
 }
 
 const FILERS = ["me", "partner"]
+
+/** The same two people after the household swapped holder and partner, before `--from-stored` ran. */
+const SWAPPED: HouseholdDocument = {
+	...HOUSEHOLD,
+	people: [
+		{ id: "partner", role: "holder", born: "1992-02", lifeExpectancy: 88 },
+		{ id: "me", role: "partner", born: "1990-06", lifeExpectancy: 90 },
+	],
+}
 
 describe("who claims each allowance", () => {
 	test("holds one column per Filer, and takes the holder's cells from the flat keys", () => {
@@ -74,9 +84,37 @@ describe("who claims each allowance", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, [])).toBeNull()
 	})
 
-	test("states the stored shared home-loan interest, split half to each Return, or none", () => {
+	test("states the stored shared home-loan interest the Returns share, or none", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, FILERS)?.sharedInterest).toBeNull()
 		const shared = { ...PROFILE, sharedMortgageInterest: 60000 }
 		expect(claimsTable(shared, HOUSEHOLD, FILERS)?.sharedInterest).toBe("60,000 THB")
+	})
+})
+
+describe("who the cards say the flat claims are", () => {
+	const people = personNames(SWAPPED)
+
+	test("names the recorded holder after a swap, and no one while the flat keys are the holder's own", () => {
+		expect(flatClaimant(PROFILE, SWAPPED, people)?.subject).toBe("your partner")
+		expect(flatClaimant(PROFILE, HOUSEHOLD, personNames(HOUSEHOLD))).toBeNull()
+	})
+
+	test("names no one for a joint or single filing, whose flat keys are that Return's own", () => {
+		expect(flatClaimant({ ...PROFILE, filingStatus: "married_joint" }, SWAPPED, people)).toBeNull()
+		expect(flatClaimant({ ...PROFILE, filingStatus: "single" }, SWAPPED, people)).toBeNull()
+	})
+
+	test("names no one after --from-stored moved the record to the new holder", () => {
+		const stored = { ...PROFILE, claimsHolder: "partner" }
+		expect(flatClaimant(stored, SWAPPED, people)).toBeNull()
+	})
+
+	test("names no one with no household holder, and the earlier holder for an id it no longer names", () => {
+		expect(flatClaimant(PROFILE, null, NO_PEOPLE)).toBeNull()
+		const gone = { ...PROFILE, claimsHolder: "gone" }
+		expect(flatClaimant(gone, HOUSEHOLD, personNames(HOUSEHOLD))).toEqual({
+			label: "The earlier holder",
+			subject: "the earlier holder",
+		})
 	})
 })

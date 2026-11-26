@@ -3,7 +3,7 @@ import { join } from "node:path"
 import type { Snapshot } from "../src/lib/contract"
 import { checkParams, type PlanInput } from "../src/lib/snapshot"
 import { redactDirectory } from "../src/lib/snapshot/redact"
-import { demoCarryIn, demoSeparateCarryIn } from "./demo/carry-in"
+import { demoCarryIn, demoJointCarryIn, demoSeparateCarryIn } from "./demo/carry-in"
 import { DEMO_PATHS, DEMO_SEED, demoReturnModel } from "./demo/return-model"
 import { buildDemoLedger } from "./demo-ledger"
 import { makeScratch, removeScratch } from "./scratch"
@@ -35,7 +35,7 @@ export const DEMO_INPUT: PlanInput = {
 	},
 }
 
-/** The demo's Scenarios, in the order their Carry-in records name them. */
+/** The demo's bare-label Scenarios, in the order their Carry-in records name them. */
 const DEMO_SCENARIOS = ["base", "retire-early"]
 
 /** The stand-in for the scratch data directory in the Demo snapshot. */
@@ -70,6 +70,7 @@ export async function runDemo(binary: string): Promise<DemoRun> {
 		const run = await runSnapshot({ binary, env }, check.version, params.params, [
 			...demoCarryIn(DEMO_SCENARIOS),
 			...demoSeparateCarryIn(),
+			...demoJointCarryIn(),
 		])
 		if (!run.ok) return { ok: false, message: run.error.message }
 		const json = JSON.stringify(run.snapshot)

@@ -37,10 +37,18 @@ function milestoneValue(label: string, change: Change, names: ItemNames): string
 
 /**
  * The change's label, with the name of the Account (or of the loan or asset group's Account) the ledger gives it, and
- * the `displayLabel` the plan's document states for a Flow or a Milestone. An item with no name keeps its id.
- * A `startAt` or `endAt` Set shows the Milestone's name in place of the id it stores.
+ * the `displayLabel` the plan's document states for a Flow or a Milestone. A `salary:` group names its salary's Flow in
+ * place of the id. An item with no name keeps its id. A `startAt` or `endAt` Set shows the Milestone's name in place of
+ * the id it stores.
  */
 export function labelWithNames(change: Change, names: ItemNames): string {
+	if (change.kind === "group" && change.path.startsWith("salary:")) {
+		const id = change.path.slice("salary:".length)
+		const leading = id.charAt(0).toUpperCase() + id.slice(1)
+		return change.label.startsWith(leading)
+			? `${itemText(names, "flow", id)}${change.label.slice(leading.length)}`
+			: change.label
+	}
 	if (change.kind === "group") {
 		const name = change.path.slice(change.path.indexOf(":") + 1)
 		return change.label.replace(` ${name} `, ` ${itemText(names, "account", name)} `)

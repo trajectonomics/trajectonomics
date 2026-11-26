@@ -45,12 +45,15 @@ export function isGroupOff(whatIf: WhatIf, id: string): boolean {
 /**
  * The session without the group: its record and every Removal, Addition and Set of its parts. A salary's try, added
  * share and Removal made before its switch come back with it: the switch held them rather than taking them out of the
- * session, so a share a try cleared stays cleared when the salary switches back on.
+ * session, so a share a try cleared stays cleared when the salary switches back on. A switch off cleared every Set of
+ * its parts, so a Set that remains under a switched-off group was made while it was off, on a part the plan keeps
+ * declared (the Account a Baseline row holds), and is sent: it stays when the group comes back.
  */
 export function withoutGroup(whatIf: WhatIf, id: string): WhatIf {
 	const group = groupOf(whatIf, id)
 	if (group === undefined) return whatIf
 	const salary = group.kind === "salary"
+	const keepSets = salary || group.how === "off"
 	return {
 		...whatIf,
 		groups: whatIf.groups.filter((one) => one !== group),
@@ -60,7 +63,7 @@ export function withoutGroup(whatIf: WhatIf, id: string): WhatIf {
 		additions: salary
 			? whatIf.additions
 			: whatIf.additions.filter((one) => !inGroup(group, additionPath(one))),
-		sets: salary ? whatIf.sets : whatIf.sets.filter((set) => !inGroup(group, set.path)),
+		sets: keepSets ? whatIf.sets : whatIf.sets.filter((set) => !inGroup(group, set.path)),
 	}
 }
 

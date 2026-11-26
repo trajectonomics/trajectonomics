@@ -1,5 +1,6 @@
 /** The rows the page shows for a stored tax profile: what was stated, and "None" for the rest. Pure; no arithmetic. */
 import type { ScenarioShow, TaxProfile } from "../../contract"
+import type { PersonName } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, filingLabel } from "./fields"
 
 /** One row: the item and what the profile states for it. */
@@ -17,24 +18,71 @@ export function groupDigits(value: number): string {
 	return part === undefined ? grouped : `${grouped}.${part}`
 }
 
-/** The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None". */
-export function profileRows(profile: TaxProfile): ProfileRow[] {
-	const stated = (key: string): number | undefined =>
-		(profile as Record<string, unknown>)[key] as number | undefined
+/** The rows whose words say "you": a separate filing's flat keys may be the other person's claims after a holder swap. */
+const YOURS: Readonly<Record<string, (who: PersonName) => string>> = {
+	parents: (who) => `Parents ${who.subject} supports`,
+	disabledCare: (who) => `Relatives with a disability ${who.subject} cares for`,
+	healthInsurance: (who) => `${who.label}'s health insurance premiums`,
+	parentHealthInsurance: (who) => `Health insurance premiums for ${who.subject}'s parents`,
+}
+
+/** What an item is called: its own words, or the claimant's when the flat keys are the other person's claims. */
+function labelOf(key: string, label: string, claimant: PersonName | null): string {
+	return claimant === null ? label : (YOURS[key]?.(claimant) ?? label)
+}
+
+/** What the profile states at a key, or undefined when it states nothing. */
+function statedIn(profile: TaxProfile, key: string): number | undefined {
+	return (profile as Record<string, unknown>)[key] as number | undefined
+}
+
+/** An amount in baht, said to be kept and unclaimed when no Return of the plan claims the shared interest. */
+function amountValue(key: string, amount: number | undefined, sharedClaimed: boolean): string {
+	if (amount === undefined) return "None"
+	const value = `${groupDigits(amount)} THB`
+	return key === "sharedMortgageInterest" && !sharedClaimed
+		? `${value} (kept, not claimed by this Return)`
+		: value
+}
+
+/** The amount rows: the shared row only where the separate filing shows one or the profile stores it. */
+function amountRows(
+	profile: TaxProfile,
+	claimant: PersonName | null,
+	sharedClaimed: boolean,
+): ProfileRow[] {
+	return AMOUNT_FIELDS.flatMap(({ key, label }) => {
+		const amount = statedIn(profile, key)
+		if (key === "sharedMortgageInterest" && profile.filingStatus !== "married_separate") {
+			if (amount === undefined) return []
+		}
+		return [
+			{ key, label: labelOf(key, label, claimant), value: amountValue(key, amount, sharedClaimed) },
+		]
+	})
+}
+
+/**
+ * The filing status, then each count and amount; an item the profile does not state, or states as zero, reads "None".
+ * `claimant` names the person whose claims the flat keys are, when that is not the household's holder, and
+ * `sharedClaimed` says whether a Return of the plan claims the stored shared home-loan interest.
+ */
+export function profileRows(
+	profile: TaxProfile,
+	claimant: PersonName | null = null,
+	sharedClaimed = profile.filingStatus === "married_separate",
+): ProfileRow[] {
 	return [
 		{ key: "filingStatus", label: "Filing status", value: filingLabel(profile.filingStatus) },
 		...COUNT_FIELDS.map(({ key, label }) => {
-			const counted = stated(key)
+			const counted = statedIn(profile, key)
 			return {
 				key,
-				label,
+				label: labelOf(key, label, claimant),
 				value: counted === undefined || counted === 0 ? "None" : String(counted),
 			}
 		}),
-		...AMOUNT_FIELDS.map(({ key, label }) => {
-			const amount = stated(key)
-			return { key, label, value: amount === undefined ? "None" : `${groupDigits(amount)} THB` }
-		}),
+		...amountRows(profile, claimant, sharedClaimed),
 	]
 }
 

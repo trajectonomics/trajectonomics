@@ -1,12 +1,11 @@
 import type { ScenarioDocument, ScenarioFlow } from "../lib/contract"
 import { type EmployerShare, employerIdOf, employerOf } from "../lib/view/plan-items/employer"
-import type { EmployerDraft } from "../lib/view/plan-items/employer-draft"
+import { type EmployerDraft, employerDraftOf } from "../lib/view/plan-items/employer-draft"
 import { employerStart } from "../lib/view/plan-items/flow-try-draft"
 import type { FlowDraft, FlowKind } from "../lib/view/plan-items/flows"
 import type { Problems } from "../lib/view/plan-items/problems"
 import { salaryFromDraft, withoutSalary, withSalary } from "../lib/view/plan-items/salary-draft"
 import { withTriedSalary } from "../lib/what-if/salary-try"
-import { sameJson } from "../lib/what-if/same-json"
 import { clearedFields, recordOf, triedItemSets } from "../lib/what-if/session"
 import type { TriedFlow } from "../lib/what-if/try-flow"
 import { editSession } from "./edit.svelte.js"
@@ -36,10 +35,11 @@ export interface FlowSaved {
 }
 
 /** Whether the employer section differs from the share the form started from. */
-function shareChanged(starting: EmployerShare | null, result: ScenarioFlow | null): boolean {
-	if (starting === null) return result !== null
-	if (result === null) return true
-	return !sameJson(recordOf(starting.flow), recordOf(result))
+function shareChanged(starting: EmployerShare | null, draft: EmployerDraft): boolean {
+	const from = employerDraftOf(starting)
+	return (
+		from.account !== draft.account || from.share !== draft.share || from.rounding !== draft.rounding
+	)
 }
 
 /** The employer's Flow a salary try carries, or null: as the plan stores it (undefined for a share the session adds) and as the form made it. */
@@ -86,11 +86,13 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 		? []
 		: clearedFields(stored, made)
 	const starting = employerStart(doc, name, existing, whatIfSession.whatIf)
-	// A try with no edit in either section leaves a switched-off salary off: switching it on would be a change the person did not make.
-	const untouched =
-		sets.length === 0 && cleared.length === 0 && !shareChanged(starting, result.employer)
-	if (whatIfSession.isOffIn(name, `flows.${existing.id}`) && untouched)
-		return { done: true, problems: {}, cleared, sent: [] }
+	// A try with no edit in either section leaves a switched-off Flow off: switching it on would be a change the person
+	// did not make. A field the form cleared is no edit a what-if can make either, so it leaves the Flow off too, and the
+	// notice says why. The employer section compares the form's draft with the share the form started from, because the
+	// form's salary reads the stored dates while the salary is off, so a rebuilt share would differ on the dates alone.
+	const off = whatIfSession.isOffIn(name, `flows.${existing.id}`)
+	if (off && sets.length === 0 && !shareChanged(starting, input.employer))
+		return { done: cleared.length === 0, problems: {}, cleared, sent: [] }
 	const storedShare = employerOf(doc.flows, existing.id)
 	const shareId = employerIdOf(existing.id)
 	const ran = whatIfSession.tryChange(name, contentHash, (base) =>

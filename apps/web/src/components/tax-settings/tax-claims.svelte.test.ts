@@ -56,8 +56,10 @@ describe("the per-Return allowance view", () => {
 		expect(body).toContain(">None<")
 	})
 
-	test("states the stored shared home-loan interest the Returns split between them", () => {
-		expect(rendered(SHARED)).toContain("Shared home-loan interest, split half to each Return")
+	test("states the stored shared home-loan interest the Returns share, or none", () => {
+		expect(rendered(SHARED)).toContain(
+			"Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all",
+		)
 		expect(rendered(SHARED)).toContain("60,000 THB")
 		expect(section()).not.toContain("Shared home-loan interest")
 	})

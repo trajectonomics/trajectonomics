@@ -2,7 +2,13 @@ import type { Addition } from "../lib/what-if/additions"
 import type { WhatIfAnswer } from "../lib/what-if/answer"
 import { type LensReads, lensFor, lensReadsOf, type WhatIfLens } from "../lib/what-if/lens"
 import { SerialReader } from "../lib/what-if/reads"
-import { type Change, changesOf, hasChanges, type WhatIf } from "../lib/what-if/session"
+import {
+	type Change,
+	changesOf,
+	hasChanges,
+	overridesOf,
+	type WhatIf,
+} from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { readWhatIf } from "./what-if-remote.js"
 
@@ -81,6 +87,16 @@ export class WhatIfState {
 			removals: this.whatIf.removals,
 			additions: this.whatIf.additions,
 		}
+	}
+
+	/**
+	 * The Sets and Removals the session sends when it is open on `plan` and holds a change, else null. A report names
+	 * these, because a held change did not produce the figures; the planner cards read `changesFor`, which holds them.
+	 */
+	sentChangesFor(plan: string): { sets: WhatIf["sets"]; removals: WhatIf["removals"] } | null {
+		if (this.whatIf === null || this.whatIf.plan !== plan || !this.active) return null
+		const { sets, removals } = overridesOf(this.whatIf)
+		return { sets, removals }
 	}
 
 	private receive(reply: WhatIfAnswer | string, state: WhatIf): void {

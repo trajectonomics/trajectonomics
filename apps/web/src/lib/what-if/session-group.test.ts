@@ -94,10 +94,26 @@ describe("a loan switched off is one group", () => {
 		const kept = withGroupOff(start, SPEC, SPEC.paths.slice(1))
 		expect(kept.removals).not.toContain("accounts.boat-loan")
 		expect(isOff(kept, "accounts.boat-loan")).toBe(false)
-		expect(changesOf(withSet(kept, "accounts.boat-loan.rate", 1))).toHaveLength(1)
-		expect(withoutGroup(withSet(kept, "accounts.boat-loan.rate", 1), groupId(SPEC)).sets).toEqual(
-			[],
-		)
+		// The Set is sent while the group is off, so the bar lists it beside the switch, and it stays through the switch.
+		expect(changesOf(withSet(kept, "accounts.boat-loan.rate", 1))).toHaveLength(2)
+		expect(withoutGroup(withSet(kept, "accounts.boat-loan.rate", 1), groupId(SPEC)).sets).toEqual([
+			{ path: "accounts.boat-loan.rate", value: 1 },
+		])
+	})
+
+	test("off, then a try on a part the plan keeps declared, then on: the try survives", () => {
+		const kept = withGroupOff(start, SPEC, SPEC.paths.slice(1))
+		const tried = withSet(kept, "accounts.boat-loan.rate", 700)
+		expect(changesOf(tried).map((change) => change.label)).toEqual([
+			"Boat-loan rate set to 700",
+			"Loan boat-loan switched off",
+		])
+		const group = changesOf(tried).find((change) => change.kind === "group")
+		if (group === undefined) throw new Error("no group change")
+		const back = withoutChange(tried, group)
+		expect(back.removals).toEqual([])
+		expect(back.sets).toEqual([{ path: "accounts.boat-loan.rate", value: 700 }])
+		expect(hasChanges(back)).toBe(true)
 	})
 
 	test("a try on a part the group keeps declared is sent, not held back by the switch", () => {

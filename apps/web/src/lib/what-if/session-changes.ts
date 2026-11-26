@@ -59,6 +59,10 @@ function tryWhat(path: string): string {
 export function changesOf(whatIf: WhatIf): Change[] {
 	const own = (path: string) => !whatIf.groups.some((group) => inGroup(group, path))
 	const hiding = (path: string) => isHeld(whatIf, path)
+	// A Set under a tried group is that group's one change; one under a switched-off group is sent when the plan keeps
+	// its part declared (the Account a Baseline row holds), so it is listed, though a held one still is not.
+	const listedSet = (path: string) =>
+		!hiding(path) && whatIf.groups.every((group) => group.how === "off" || !inGroup(group, path))
 	const removals = whatIf.removals.filter(own).map(
 		(path): Change => ({
 			kind: "off",
@@ -77,7 +81,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 			}),
 		)
 	const sets = whatIf.sets
-		.filter((set) => own(set.path) && !hiding(set.path))
+		.filter((set) => listedSet(set.path))
 		.map((set): Change => {
 			if (set.path === "estate")
 				return { kind: "estate", path: set.path, label: "Estate lines tried as edited" }
