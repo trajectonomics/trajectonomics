@@ -88,6 +88,7 @@ describe("managing plans against the real traj", () => {
 			expect(planRows(snapshot).map((row) => [row.name, row.main])).toEqual([
 				["later", true],
 				["base", false],
+				["joint", false],
 				["retire-early", false],
 				["separate", false],
 			])
@@ -102,6 +103,7 @@ describe("managing plans against the real traj", () => {
 			expect(snapshot.params.scenarios).toEqual(["later"])
 			expect(planRows(snapshot).map((row) => row.name)).toEqual([
 				"later",
+				"joint",
 				"retire-early",
 				"separate",
 			])
@@ -150,6 +152,7 @@ describe("managing plans against the real traj", () => {
 			// The demo ledger holds `retire-early` too, which the editor was not started with.
 			expect(notProjected(before).map((row) => row.name)).toEqual([
 				"extra",
+				"joint",
 				"retire-early",
 				"separate",
 			])
@@ -161,6 +164,7 @@ describe("managing plans against the real traj", () => {
 			expect(answer.ok).toBe(true)
 			expect(answer.snapshot.params.scenarios).toEqual(["later", "extra"])
 			expect(notProjected(answer.snapshot).map((row) => row.name)).toEqual([
+				"joint",
 				"retire-early",
 				"separate",
 			])

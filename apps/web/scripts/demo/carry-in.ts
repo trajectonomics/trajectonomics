@@ -15,6 +15,26 @@ export function demoCarryIn(names: readonly string[]): unknown[] {
 }
 
 /**
+ * The Carry-in of `joint`: one record for its one Return, tallying each Filer's salary label for the ten months
+ * before the As-of. Every other class is zero, which `rest` states.
+ */
+export function demoJointCarryIn(): unknown[] {
+	return [
+		{
+			scenario: "joint",
+			levy: "th-2026-pit",
+			periodStart: "2026-01-01",
+			tallies: [
+				{ label: "income.section40_1@me", basis: "gross", amount: "850000.00" },
+				{ label: "income.section40_1@partner", basis: "gross", amount: "420000.00" },
+			],
+			prepaid: "0.00",
+			rest: "0.00",
+		},
+	]
+}
+
+/**
  * The Carry-in of `separate`: one record per Return, each tallying that person's own salary label for the ten months
  * before the As-of. Every other class is zero, which `rest` states.
  */
