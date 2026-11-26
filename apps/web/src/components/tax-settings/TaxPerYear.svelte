@@ -1,9 +1,11 @@
 <script lang="ts">
 import type { ProjectionRun, Read } from "../../lib/contract"
-import { type PersonNames, personText } from "../../lib/view/item-names"
+import type { PersonNames } from "../../lib/view/item-names"
 import { type TaxRow, taxRows } from "../../lib/view/tax"
+import { returnLabel } from "../../lib/view/tax-settings/return-name"
 import Badge from "../ui/Badge.svelte"
 import DataTable from "../ui/DataTable.svelte"
+import ItemWords from "../ui/ItemWords.svelte"
 import Money from "../ui/Money.svelte"
 import ReadView from "../ui/ReadView.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
@@ -15,11 +17,23 @@ interface Props {
 	read: Read<ProjectionRun>
 	/** The household's people, so a separate filing's Return is named by role rather than by id. */
 	people: PersonNames
+	/** The recorded `claimsHolder`, so an id the household no longer names reads as the earlier holder. */
+	claimsHolder?: string | null
 }
 
-let { name, read, people }: Props = $props()
+let { name, read, people, claimsHolder = null }: Props = $props()
 /** Whether the plan files separately: its years then name a Filer each, and the table says whose Return a row is. */
 const withReturn = $derived(read.ok && read.data.taxYears.some((year) => year.filer !== undefined))
+/** Every Filer the years name, so two departed ones read apart. */
+const filers = $derived(
+	read.ok
+		? [
+				...new Set(
+					read.data.taxYears.flatMap((year) => (year.filer === undefined ? [] : [year.filer])),
+				),
+			]
+		: [],
+)
 
 const RETURN_COLUMN: Column<TaxRow> = { key: "return", header: "Return", cell: returnCell }
 const COLUMNS: readonly Column<TaxRow>[] = [
@@ -31,7 +45,9 @@ const COLUMNS: readonly Column<TaxRow>[] = [
 const columns = $derived(withReturn ? [RETURN_COLUMN, ...COLUMNS] : COLUMNS)
 </script>
 
-{#snippet returnCell(row: TaxRow)}{row.filer === null ? "—" : personText(people, row.filer)}{/snippet}
+{#snippet returnCell(row: TaxRow)}
+	{#if row.filer === null}—{:else}<ItemWords label={returnLabel(row.filer, people, claimsHolder, filers)} />{/if}
+{/snippet}
 {#snippet periodCell(row: TaxRow)}{row.period}{/snippet}
 {#snippet settlesCell(row: TaxRow)}{row.settles}{/snippet}
 {#snippet dueCell(row: TaxRow)}<Money amount={row.due} />{/snippet}
