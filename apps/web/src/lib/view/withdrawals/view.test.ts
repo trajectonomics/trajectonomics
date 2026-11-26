@@ -25,11 +25,11 @@ describe("what the rule pays, year by year", () => {
 		expect(rule?.rows).toHaveLength(4)
 		expect(rule?.rows[0]).toMatchObject({
 			from: "1 Jun 2050",
-			portfolio: "21568998.89",
-			amount: "862759.95",
-			realAmount: "429677.39",
-			paid: "862759.95",
-			realPaid: "429677.39",
+			portfolio: "21556406.02",
+			amount: "862256.24",
+			realAmount: "429426.52",
+			paid: "862256.24",
+			realPaid: "429426.52",
 			share: "3.99%",
 			action: "Followed the rule",
 			marked: false,
@@ -57,7 +57,7 @@ describe("what the rule pays, year by year", () => {
 
 	test("the Home card states the first Rule year's amount and its share", () => {
 		expect(withdrawalsSummaryOf(run)).toEqual({
-			amount: "862759.95",
+			amount: "862256.24",
 			share: "3.99%",
 			from: "1 Jun 2050",
 			currency: "THB",
@@ -88,11 +88,11 @@ describe("in good and bad markets", () => {
 	test("the lowest year is labelled by level in plain words and says how many paths it counts", () => {
 		expect(bands?.counted).toBe(200)
 		expect(bands?.lowest.map((one) => [one.level, one.words, one.amount])).toEqual([
-			[10, "Worst 1 in 10 paths", "211589.78"],
-			[25, "Worst 1 in 4 paths", "232796.21"],
-			[50, "Middle path", "259769.15"],
-			[75, "Best 1 in 4 paths", "300348.06"],
-			[90, "Best 1 in 10 paths", "346431.86"],
+			[10, "Worst 1 in 10 paths", "211506.76"],
+			[25, "Worst 1 in 4 paths", "232725.11"],
+			[50, "Middle path", "259654.04"],
+			[75, "Best 1 in 4 paths", "300208.29"],
+			[90, "Best 1 in 10 paths", "346285.00"],
 		])
 	})
 
