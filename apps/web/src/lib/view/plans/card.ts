@@ -2,8 +2,7 @@ import type { LineMarker, LineSeries } from "../../chart"
 import type { Fi, ProjectionChance, ProjectionRun, Read, Snapshot } from "../../contract"
 import { formatMonth, formatShare } from "../../format"
 import { agesText } from "../household/model"
-import { type PersonNames, snapshotItemNames } from "../item-names"
-import type { ReachedMilestone } from "../milestones/milestones"
+import { type ItemLabel, itemLabel, type PersonNames, snapshotItemNames } from "../item-names"
 import { projectionView } from "../overview/projection"
 import { type PlanChart, planChart } from "./chart"
 import { type NotesPreview, notesPreview } from "./notes"
@@ -28,6 +27,12 @@ export interface CardNetWorth {
 	readonly endDate: string
 }
 
+/** A Milestone the card's chart draws a rule for: its words in this card's plan, and the CLI's date. */
+export interface CardMilestone {
+	readonly label: ItemLabel
+	readonly date: string
+}
+
 /** One plan side by side with the others: its facts, each only when the Snapshot holds the read. */
 export interface PlanCard {
 	readonly row: PlanRow
@@ -37,8 +42,8 @@ export interface PlanCard {
 	readonly netWorth: CardNetWorth | null
 	readonly series: readonly LineSeries[]
 	readonly markers: readonly LineMarker[]
-	/** The Milestones the chart draws a rule for, in date order, so the card can name each in words. */
-	readonly milestones: readonly ReachedMilestone[]
+	/** The Milestones the chart draws a rule for, named by this plan's document, in date order. */
+	readonly milestones: readonly CardMilestone[]
 	/** The CLI's message when the plan's projection could not be read; null otherwise. */
 	readonly problem: string | null
 }
@@ -88,7 +93,10 @@ export function planCard(snapshot: Snapshot, row: PlanRow, range: Range): PlanCa
 		netWorth: run?.ok ? netWorthOf(run.data) : null,
 		series: chart?.series ?? [],
 		markers: chart?.markers ?? [],
-		milestones: chart?.milestones ?? [],
+		milestones: (chart?.milestones ?? []).map((milestone) => ({
+			label: itemLabel(names, "milestone", milestone.id),
+			date: milestone.date,
+		})),
 		problem: run !== undefined && !run.ok ? run.error.message : null,
 	}
 }
