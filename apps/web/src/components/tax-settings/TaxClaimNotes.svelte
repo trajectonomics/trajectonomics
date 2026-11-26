@@ -11,7 +11,8 @@ let { lines }: Props = $props()
 {#if lines.length > 0}
 	<section aria-labelledby="tax-claim-notes" class="space-y-2">
 		<h3 id="tax-claim-notes" class="text-sm font-semibold">Notes on the stored claims</h3>
-		{#each lines as line (line)}
+		<!-- Keyed by position: two notes may read the same. -->
+		{#each lines as line, index (index)}
 			<p class="text-sm text-foreground wrap-anywhere">{line}</p>
 		{/each}
 	</section>

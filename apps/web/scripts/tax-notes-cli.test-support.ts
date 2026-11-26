@@ -3,6 +3,7 @@
 import { fileURLToPath } from "node:url"
 import { type Read, scenarioTax, type TaxNotes } from "../src/lib/contract"
 import { decodeRead } from "../src/lib/snapshot/decode-read"
+import { planTaxNotes } from "../src/lib/snapshot/stage-two-tax-notes"
 import { claimNoteLines, taxNotesFrom } from "../src/lib/view/tax-settings/notes"
 
 /** The workspace's own traj binary, built by `turbo run build --filter=@trajectonomics/cli`. */
@@ -87,9 +88,11 @@ export function taxSeparately(home: string, name: string, extra: readonly string
 	traj(home, ["scenario", "tax", name, ...SEPARATE, ...extra, ...LABELS])
 }
 
-/** The plan's notes, read from a real dry run exactly as the Snapshot reads them. */
+/** The plan's notes, read from a real dry run with the argv the Snapshot plans, so a change to that argv is guarded too. */
 export function readNotes(home: string, name: string): Read<TaxNotes> {
-	const argv = ["scenario", "tax", "--from-stored", "--dry-run", "--json", "--", name]
+	const planned = planTaxNotes([name])[name]
+	if (planned === undefined) throw new Error(`no notes read planned for ${name}`)
+	const argv = planned.argv
 	const run = spawn(home, argv)
 	const captured = {
 		code: run.exitCode,
