@@ -44,6 +44,6 @@ const notes = $derived(
 				/>
 			{/snippet}
 		</ReadView>
-		{#if run !== undefined}<TaxPerYear {name} read={run} {people} />{/if}
+		{#if run !== undefined}<TaxPerYear {name} read={run} {people} claimsHolder={holder} />{/if}
 	</div>
 {/if}
