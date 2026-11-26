@@ -6,6 +6,7 @@ import { planDocument } from "../lib/view/plan-items/fixtures.test-support"
 import { flowDraftForTry } from "../lib/view/plan-items/flow-try-draft"
 import type { FlowDraft } from "../lib/view/plan-items/flows"
 import { shownPlan } from "../lib/what-if/routing"
+import { overridesOf } from "../lib/what-if/session"
 import { saveFlow } from "./flow-save.js"
 import { whatIfSession } from "./what-if.svelte.js"
 import { HASH, useSessionHooks } from "./what-if.test-support"
@@ -169,5 +170,28 @@ describe("a second try on a Flow starts from the session", () => {
 		whatIfSession.setOff("base", HASH, "flows.living", true)
 		await tryLiving({})
 		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(true)
+	})
+
+	test("a tried Flow switched off holds its try, reopens on the stored values, and an edited try switches it back on", async () => {
+		await tryLiving({ amount: "31000.00" })
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		whatIfSession.setOff("base", HASH, "flows.living", true)
+		// The switch holds the try out of what `traj` reads: it refuses a Set of a Flow a Removal took out.
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.living"])
+		expect(overridesOf(whatIfSession.whatIf!).sets).toEqual([])
+		// Reopened on the stored Flow, which the session no longer shows: a try with no edits leaves it off.
+		expect(draftOf("living", {}).amount).toBe("30000.00")
+		await tryLiving({})
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(true)
+		// A switch back on brings the held try back, rather than losing it.
+		whatIfSession.setOff("base", HASH, "flows.living", false)
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(false)
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		// An edited try replaces the try and leaves the Flow on.
+		await tryLiving({ amount: "32000.00" })
+		expect(whatIfSession.isOffIn("base", "flows.living")).toBe(false)
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.living.amount", value: "32000.00" }])
 	})
 })

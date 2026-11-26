@@ -101,49 +101,49 @@ describe("the default date", () => {
 })
 
 describe("what the date states", () => {
-	test("the last year of the Demo, worked by hand: 1% of 16,786,385.30 and a fixed fee, then 5% of the net", () => {
+	test("the last year of the Demo, worked by hand: 1% of 16,775,132.11 and a fixed fee, then 5% of the net", () => {
 		const figures = figuresAt(base.run, "2053-12-31")
 		expect(figures?.row).toMatchObject({
-			gross: "16786385.30",
+			gross: "16775132.11",
 			debts: "0.00",
-			costs: "278928.30",
-			net: "16507457.00",
-			gifts: "825372.85",
-			toHeirs: "15682084.15",
-			realNet: "7394855.78",
-			realToHeirs: "7025112.99",
+			costs: "278815.77",
+			net: "16496316.34",
+			gifts: "824815.82",
+			toHeirs: "15671500.52",
+			realNet: "7389865.10",
+			realToHeirs: "7020371.84",
 		})
 		expect(figures?.costs.map((one) => [one.label, one.amount])).toEqual([
-			["settlement", "167863.85"],
+			["settlement", "167751.32"],
 			["court-and-legal-fees", "111064.45"],
 		])
-		expect(figures?.gifts.map((one) => [one.label, one.amount])).toEqual([["temple", "825372.85"]])
+		expect(figures?.gifts.map((one) => [one.label, one.amount])).toEqual([["temple", "824815.82"]])
 		expect(figures?.shortfall).toBeNull()
 	})
 
 	test("only the net and what heirs receive have a figure in today's money; the rest stay nominal, and say so", () => {
 		const items = figuresAt(base.run, "2053-12-31")?.items ?? []
 		const real = (key: string) => items.find((one) => one.key === key)
-		expect(real("net")?.real).toBe("7394855.78")
-		expect(real("heirs")?.real).toBe("7025112.99")
+		expect(real("net")?.real).toBe("7389865.10")
+		expect(real("heirs")?.real).toBe("7020371.84")
 		expect(real("gross")?.real).toBeNull()
 		const gross = real("gross")
 		const heirs = real("heirs")
 		if (gross === undefined || heirs === undefined) throw new Error("the lines exist")
 		expect(shownUnder(gross, "real")).toEqual({
-			amount: "16786385.30",
+			amount: "16775132.11",
 			tag: "Nominal",
 			aside: null,
 		})
 		expect(shownUnder(heirs, "real")).toEqual({
-			amount: "7025112.99",
+			amount: "7020371.84",
 			tag: "Today's money",
 			aside: null,
 		})
 		expect(shownUnder(heirs, "both")).toEqual({
-			amount: "15682084.15",
+			amount: "15671500.52",
 			tag: null,
-			aside: "7025112.99",
+			aside: "7020371.84",
 		})
 		expect(shownUnder(heirs, "nominal").aside).toBeNull()
 	})
@@ -175,7 +175,7 @@ describe("what the date states", () => {
 			"What heirs receive, in today's money",
 		])
 		expect(both[0]?.points).toHaveLength(28)
-		expect(both[0]?.points.at(-1)?.display).toBe("15,682,084.15")
+		expect(both[0]?.points.at(-1)?.display).toBe("15,671,500.52")
 		expect(heirsSeries(base.run, "real")).toHaveLength(1)
 		expect(estateView(base.run, "2031-10-31", "both")?.markers).toEqual([{ x: 4, label: "2031" }])
 	})
@@ -192,7 +192,7 @@ describe("the notes and the Home card", () => {
 
 	test("the card states what heirs receive on the default date, and what it is", () => {
 		expect(estateSummaryOf(base.run, base.doc, base.household)).toEqual({
-			toHeirs: "15682084.15",
+			toHeirs: "15671500.52",
 			date: "2053-12-31",
 			currency: "THB",
 			noCost: false,

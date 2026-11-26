@@ -2,7 +2,8 @@ import { describe, expect, test } from "bun:test"
 import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
 import { itemNames } from "../item-names"
 import { planDocument } from "./fixtures.test-support"
-import { flowCards, flowDraftOf } from "./flows"
+import { switchPathsOf } from "./flow-switch"
+import { flowCards } from "./flows"
 
 describe("flowCards", () => {
 	test("lists the income Flows as cards, each with its amount, growth and whether it is earned", () => {
@@ -21,6 +22,7 @@ describe("flowCards", () => {
 			earned: "Earned",
 			category: null,
 			employer: null,
+			employerId: null,
 			editable: true,
 		})
 		expect(cards[1]?.earned).toBe("Passive")
@@ -94,6 +96,40 @@ describe("flowCards of a once Flow", () => {
 	})
 })
 
+describe("flowCards with an employer share", () => {
+	test("a salary's card names the employer Flow whose switch follows it", () => {
+		const flows = planDocument().flows
+		const salary = flows.find((flow) => flow.id === "salary")
+		if (salary === undefined) throw new Error("the fixture has a salary")
+		const employer = scenarioFlow.parse({
+			id: "salary-employer",
+			kind: "contribution",
+			target: "fund",
+			funding: "employer",
+			frequency: "monthly",
+			start: "2026-11-01",
+			derive: {
+				measures: [
+					{ id: "pay", op: "flow", flow: "salary" },
+					{ id: "share", op: "scale", of: "pay", num: 500, den: 10000, rounding: "floor" },
+				],
+				result: "share",
+			},
+		})
+		const [card] = flowCards([salary], "income", null, [salary, employer])
+		expect(card?.employer).not.toBeNull()
+		expect(card?.employerId).toBe("salary-employer")
+		expect(switchPathsOf(card ?? { id: "salary", employerId: null })).toEqual([
+			"flows.salary",
+			"flows.salary-employer",
+		])
+	})
+
+	test("a Flow with no share has only its own path", () => {
+		expect(switchPathsOf({ id: "pension", employerId: null })).toEqual(["flows.pension"])
+	})
+})
+
 describe("flowCards with a Milestone date", () => {
 	test("a Flow that starts at a Milestone reads when it fires, not the As-of the form wrote as its start", () => {
 		const rule = {
@@ -153,27 +189,5 @@ describe("flowCards with a household", () => {
 		const cards = flowCards(planDocument().flows, "income", household)
 		expect(cards[0]).toMatchObject({ startAnchor: null, endAnchor: "at you, age 60" })
 		expect(cards[1]).toMatchObject({ startAnchor: null, endAnchor: null })
-	})
-})
-
-describe("flowDraftOf", () => {
-	test("starts a new Flow monthly, following inflation and earned", () => {
-		expect(flowDraftOf()).toEqual({
-			category: "",
-			displayLabel: "",
-			name: "",
-			frequency: "monthly",
-			start: "",
-			end: "",
-			amount: "",
-			growth: "inflation",
-			rate: "",
-			earned: true,
-		})
-	})
-
-	test("shows an existing Flow's rate as a percent, moved from its basis points", () => {
-		const rent = planDocument().flows.find((flow) => flow.id === "rent")
-		expect(flowDraftOf(rent)).toMatchObject({ growth: "fixed", rate: "3.00", amount: "14000.00" })
 	})
 })

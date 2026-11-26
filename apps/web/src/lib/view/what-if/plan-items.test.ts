@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioDocument } from "../../contract"
+import { scenarioFlow } from "../../contract/scenario-show"
+import type { Json } from "../../what-if/json"
 import { itemNames } from "../item-names"
 import { baselineRead, planDocument } from "../plan-items/fixtures.test-support"
 import { DEMO } from "./fixtures.test-support"
@@ -30,6 +32,49 @@ describe("the planner cards while a session is open", () => {
 		expect(view.marks[expense.id]?.off).toBe(false)
 		const other = view.cards.find((card) => card.id !== expense.id)
 		if (other !== undefined) expect(view.marks[other.id]?.was).toEqual({})
+	})
+
+	const share = scenarioFlow.parse({
+		id: "salary-employer",
+		kind: "contribution",
+		target: "bank",
+		funding: "employer",
+		frequency: "monthly",
+		start: "2026-11-01",
+		end: "2050-05-14",
+		derive: {
+			measures: [
+				{ id: "pay", op: "flow", flow: "salary" },
+				{ id: "share", op: "scale", of: "pay", num: 500, den: 10000, rounding: "floor" },
+			],
+			result: "share",
+		},
+	})
+
+	test("a share the session adds rides on its salary's switch, though the card keeps the plan's text", () => {
+		const changes = {
+			sets: [],
+			removals: [],
+			additions: [{ list: "flows" as const, item: share as unknown as Record<string, Json> }],
+		}
+		const view = flowItems(planDocument(), "income", null, changes)
+		const card = view.cards.find((entry) => entry.id === "salary")
+		// The card shows the share the session adds, marked against a plan that states none, and its switch follows it.
+		expect(card?.employer).toBe("Employer adds 5% to bank")
+		expect(card?.employerId).toBe("salary-employer")
+		expect(view.marks["salary"]?.was.employer).toBe("")
+	})
+
+	test("a share a try cleared keeps its id on the salary's card, so the switch takes both parts together", () => {
+		const base = planDocument()
+		const doc: ScenarioDocument = { ...base, flows: [...base.flows, share] }
+		const cleared = { sets: [], removals: ["flows.salary-employer"] }
+		const card = flowItems(doc, "income", null, cleared).cards.find(
+			(entry) => entry.id === "salary",
+		)
+		// The what-if shows no share, but the switch still names it: a Removal of the salary alone would be refused.
+		expect(card?.employer).toBeNull()
+		expect(card?.employerId).toBe("salary-employer")
 	})
 
 	test("a switched-off item is kept as the plan stores it, and marked off", () => {

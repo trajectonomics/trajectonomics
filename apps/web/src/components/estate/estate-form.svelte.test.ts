@@ -53,7 +53,7 @@ describe("the Home card: your heirs would receive", () => {
 	test("states what heirs receive on the default date, says why that date, and links to the page", () => {
 		const body = render(EstateCard, { props: { scenario: overviewView(DEMO).estate } }).body
 		expect(body).toContain("Your heirs would receive")
-		expect(body).toContain("15,682,084.15")
+		expect(body).toContain("15,671,500.52")
 		expect(body).toContain("the plan's last year")
 		expect(body).toContain('href="/estate/')
 		expect(render(OverviewGrid, { props: { view: overviewView(DEMO) } }).body).toContain("/estate/")
@@ -70,6 +70,6 @@ describe("the Home card: your heirs would receive", () => {
 		preferences.hidden = true
 		expect(
 			render(EstateCard, { props: { scenario: overviewView(DEMO).estate } }).body,
-		).not.toContain("15,682,084.15")
+		).not.toContain("15,671,500.52")
 	})
 })

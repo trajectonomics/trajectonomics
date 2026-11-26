@@ -2,7 +2,9 @@
 import { additionId, additionPath, additionWords } from "./additions"
 import type { Json } from "./overrides"
 import type { WhatIf } from "./session"
-import { groupId, inGroup } from "./session-group"
+import { inGroup } from "./session-group"
+import { groupChanges } from "./session-group-changes"
+import { isHeld } from "./session-overrides"
 import { routingChange } from "./session-routing"
 
 /** One change of the session, as the bar lists it: a switch off, or a Set with its value as typed. */
@@ -53,29 +55,14 @@ function tryWhat(path: string): string {
 	return "tried as edited"
 }
 
-/** Whether a refusal that names this path (`details.path`) is about the change: its own path, or a part of its group. */
-export function namesChange(change: Change, path: string): boolean {
-	if (change.kind === "group") return inGroup({ paths: change.parts }, path) || change.path === path
-	return change.path === path
-}
-
-/** One change per group, worded by how the group was changed. */
-function groupChanges(whatIf: WhatIf): Change[] {
-	return whatIf.groups.map((group): Change => {
-		const noun = group.kind === "loan" ? "Loan" : "Asset"
-		const how = group.how === "off" ? "switched off" : "tried as edited"
-		return {
-			kind: "group",
-			path: groupId(group),
-			label: `${noun} ${group.name} ${how}`,
-			parts: group.paths,
-		}
-	})
-}
-
 /** The changes, in the order `traj` applies them: removals first, then Additions, then Sets, and each group as one. */
 export function changesOf(whatIf: WhatIf): Change[] {
 	const own = (path: string) => !whatIf.groups.some((group) => inGroup(group, path))
+	const hiding = (path: string) => isHeld(whatIf, path)
+	// A Set under a tried group is that group's one change; one under a switched-off group is sent when the plan keeps
+	// its part declared (the Account a Baseline row holds), so it is listed, though a held one still is not.
+	const listedSet = (path: string) =>
+		!hiding(path) && whatIf.groups.every((group) => group.how === "off" || !inGroup(group, path))
 	const removals = whatIf.removals.filter(own).map(
 		(path): Change => ({
 			kind: "off",
@@ -84,7 +71,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 		}),
 	)
 	const additions = whatIf.additions
-		.filter((one) => own(additionPath(one)))
+		.filter((one) => own(additionPath(one)) && !hiding(additionPath(one)))
 		.map(
 			(one): Change => ({
 				kind: "add",
@@ -94,7 +81,7 @@ export function changesOf(whatIf: WhatIf): Change[] {
 			}),
 		)
 	const sets = whatIf.sets
-		.filter((set) => own(set.path))
+		.filter((set) => listedSet(set.path))
 		.map((set): Change => {
 			if (set.path === "estate")
 				return { kind: "estate", path: set.path, label: "Estate lines tried as edited" }
@@ -119,3 +106,5 @@ export function changesOf(whatIf: WhatIf): Change[] {
 		})
 	return [...removals, ...additions, ...sets, ...groupChanges(whatIf)]
 }
+
+export { namesChange } from "./session-group-changes"

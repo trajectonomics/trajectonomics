@@ -108,6 +108,7 @@ describe("trying a once value on a Flow whose stored end would be left behind", 
 			end: "2027-01-01",
 			amount: "1000.00",
 			earned: false,
+			growth: "inflation",
 		})
 		const sets = await tryFlow(once, { ...flowDraftOf(once), start: "2027-02-01" })
 		expect(sets.get("flows.bonus.start")).toBe("2027-02-01")

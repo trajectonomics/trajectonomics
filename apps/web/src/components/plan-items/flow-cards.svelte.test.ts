@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { scenarioDocument } from "../../lib/contract"
 import { planDocument } from "../../lib/view/plan-items/fixtures.test-support"
 import { flowDraftOf } from "../../lib/view/plan-items/flows"
 import { flowItems } from "../../lib/view/what-if/plan-items"
@@ -9,6 +10,34 @@ import FlowFields from "./FlowFields.svelte"
 
 const NO_PROBLEMS = { at: () => undefined, general: undefined }
 const HASH = "jcs1:sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+/** The plan with the share its employer adds, so the salary's switch has two paths. */
+function withEmployer() {
+	const base = planDocument()
+	return scenarioDocument.parse({
+		...base,
+		accounts: [...base.accounts, { id: "fund", kind: "asset", rate: 300 }],
+		flows: [
+			...base.flows,
+			{
+				id: "salary-employer",
+				kind: "contribution",
+				target: "fund",
+				funding: "employer",
+				frequency: "monthly",
+				start: "2026-11-01",
+				end: "2050-05-14",
+				derive: {
+					measures: [
+						{ id: "pay", op: "flow", flow: "salary" },
+						{ id: "share", op: "scale", of: "pay", num: 500, den: 10000, rounding: "floor" },
+					],
+					result: "share",
+				},
+			},
+		],
+	})
+}
 
 /** The income cards as a What-if that sets those Flow paths holds them. */
 function cards(sets: readonly SetChange[]): string {
@@ -32,6 +61,24 @@ const rows = (body: string, label: string) =>
 	body.match(new RegExp(`<dt[^>]*>${label}</dt>`, "g"))?.length ?? 0
 
 describe("a What-if that changes a Flow's frequency", () => {
+	test("a salary's switch carries its employer share's path, so one switch turns both off", () => {
+		const doc = withEmployer()
+		const view = flowItems(doc, "income", null, null)
+		const body = render(FlowCards, {
+			props: {
+				cards: view.cards,
+				marks: view.marks,
+				currency: doc.currency,
+				editable: true,
+				plan: "base",
+				contentHash: HASH,
+				onEdit: () => {},
+				onTry: () => {},
+			},
+		}).body
+		expect(body).toContain('data-also="flows.salary-employer"')
+	})
+
 	test("a monthly Flow tried once keeps its Ends row, with the baseline's end struck through", () => {
 		const body = cards([{ path: "flows.salary.frequency", value: "once" }])
 		// The pension runs to the horizon, as before; the salary's struck end must still have a row to sit on.
