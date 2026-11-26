@@ -1,6 +1,7 @@
 <script lang="ts">
 import { currentAccountNames } from "../../client/account-names.svelte.js"
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemNames } from "../../client/item-names.svelte.js"
 import { currentSearch } from "../../client/location.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { Snapshot } from "../../lib/contract"
@@ -32,7 +33,9 @@ const run = $derived(snapshot.reads.projections[name])
 const lens = $derived(whatIfSession.lensFor(name))
 const plan = $derived(doc?.ok ? doc.data.scenario.document : null)
 const household = $derived(doc?.ok ? doc.data.scenario.household : null)
-const dates = $derived(run?.ok && plan ? estateDates(run.data, plan, household, at) : null)
+const dates = $derived(
+	run?.ok && plan ? estateDates(run.data, plan, household, at, currentItemNames()) : null,
+)
 const saved = $derived(run?.ok && dates ? estateView(run.data, dates.chosen.date, chosen) : null)
 const tried = $derived(lens?.run && dates ? estateView(lens.run, dates.chosen.date, chosen) : null)
 const note = $derived(plan === null ? null : noCostNote(plan))
