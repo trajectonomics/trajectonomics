@@ -22,13 +22,24 @@ export const SEPARATE_LOANS_SENTENCE =
 export const DEPARTED_CLAIMS_OPENING = 'The claims stored for "'
 export const DEPARTED_CLAIMS_MARKER = '", who is not in the household, are on no Return.'
 
-/** A departed id's note in the household's words: "the earlier holder", never the id the CLI quotes. */
-export function departedNoteInHouseholdWords(note: string, people: PersonNames): string {
+/** The words for a departed id that is not the recorded holder of the flat claims: never the id, never a guess at who. */
+export const ANOTHER_PERSON = "another person"
+
+/**
+ * A departed id's note in the household's words, never the id the CLI quotes. The CLI writes it for every id the
+ * household no longer names, so only the recorded `claimsHolder` is "the earlier holder"; any other id, such as a
+ * renamed partner's, is "another person".
+ */
+export function departedNoteInHouseholdWords(
+	note: string,
+	people: PersonNames,
+	holder: string | null = null,
+): string {
 	if (!note.startsWith(DEPARTED_CLAIMS_OPENING)) return note
 	const close = note.indexOf(DEPARTED_CLAIMS_MARKER)
 	if (close < 0) return note
 	const id = note.slice(DEPARTED_CLAIMS_OPENING.length, close)
-	const words = people.get(id)?.subject ?? EARLIER_HOLDER.subject
+	const words = people.get(id)?.subject ?? (id === holder ? EARLIER_HOLDER.subject : ANOTHER_PERSON)
 	return `The claims stored for ${words}${note.slice(close + 1)}`
 }
 
@@ -54,13 +65,17 @@ export function taxNotesFrom(read: Read<ScenarioTax>): Read<TaxNotes> {
 	return { argv: read.argv, ok: true, data: taxNotesOf(read.data) }
 }
 
-/** The notes a read states, one paragraph each; none when the CLI refused the dry run, so the page shows nothing false. */
+/**
+ * The notes a read states, one paragraph each; none when the CLI refused the dry run, so the page shows nothing false.
+ * `holder` is the profile's recorded `claimsHolder`, which tells the earlier holder from another departed id.
+ */
 export function claimNoteLines(
 	read: Read<TaxNotes> | undefined,
 	people: PersonNames = NO_PEOPLE,
+	holder: string | null = null,
 ): readonly string[] {
 	if (read?.ok !== true) return []
 	const { separateLoans, unclaimed } = read.data
-	const lines = unclaimed.map((note) => departedNoteInHouseholdWords(note, people))
+	const lines = unclaimed.map((note) => departedNoteInHouseholdWords(note, people, holder))
 	return separateLoans === null ? lines : [separateLoans, ...lines]
 }

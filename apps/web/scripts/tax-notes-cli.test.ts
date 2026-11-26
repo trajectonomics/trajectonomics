@@ -141,7 +141,8 @@ describe("the tax notes the real traj states", () => {
 	})
 
 	test("the claims stored under an id no longer in the household", () => {
-		// The CLI quotes the raw id; the page says it in the household's words instead.
+		// The CLI quotes the raw id; the page says it in neutral words instead. The holder `me` is still in the
+		// household, so the departed `partner` is never called the earlier holder.
 		const raw = readNotes(home, "gone")
 		if (!raw.ok) throw new Error(raw.error.message)
 		expect(raw.data.unclaimed).toContainEqual(
@@ -149,7 +150,7 @@ describe("the tax notes the real traj states", () => {
 		)
 		expect(linesOf(home, "gone")).toContainEqual(
 			expect.stringMatching(
-				/The claims stored for the earlier holder, who is not in the household, are on no Return\./,
+				/The claims stored for another person, who is not in the household, are on no Return\./,
 			),
 		)
 		expect(linesOf(home, "gone").join("\n")).not.toContain('"partner"')
