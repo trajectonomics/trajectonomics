@@ -92,13 +92,18 @@ describe("report files", () => {
 		const file = everythingFile(
 			{ projections: { base: readOf(run) }, fi: {}, documents: {}, chance: {} },
 			source(true),
-			{ sets: [{ path: "income.salary", value: "1000" }], removals: ["expense.rent"] },
+			{
+				sets: [{ path: "income.salary", value: "1000" }],
+				removals: ["expense.rent"],
+				additions: [],
+			},
 		)
 		expect(file.name).toBe("base-all-2026-10-31-what-if.json")
 		expect(JSON.parse(file.text).whatIf).toEqual({
 			plan: "base",
 			sets: [{ path: "income.salary", value: "1000" }],
 			removals: ["expense.rent"],
+			additions: [],
 			projection: run,
 		})
 	})

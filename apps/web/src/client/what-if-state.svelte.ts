@@ -90,13 +90,17 @@ export class WhatIfState {
 	}
 
 	/**
-	 * The Sets and Removals the session sends when it is open on `plan` and holds a change, else null. A report names
-	 * these, because a held change did not produce the figures; the planner cards read `changesFor`, which holds them.
+	 * The Sets, Removals and Additions the session sends when it is open on `plan` and holds a change, else null. A
+	 * report names these, because a held change did not produce the figures; the planner cards read `changesFor`,
+	 * which holds them.
 	 */
-	sentChangesFor(plan: string): { sets: WhatIf["sets"]; removals: WhatIf["removals"] } | null {
+	sentChangesFor(plan: string): {
+		sets: WhatIf["sets"]
+		removals: WhatIf["removals"]
+		additions: Addition[]
+	} | null {
 		if (this.whatIf === null || this.whatIf.plan !== plan || !this.active) return null
-		const { sets, removals } = overridesOf(this.whatIf)
-		return { sets, removals }
+		return overridesOf(this.whatIf)
 	}
 
 	private receive(reply: WhatIfAnswer | string, state: WhatIf): void {

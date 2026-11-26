@@ -93,11 +93,11 @@ The picture of one year's cash flow on the Cash flow page: sources on the left, 
 _Avoid_: Sankey (as a name for the page), chart, graph
 
 **What-if session**:
-The changes one tab holds against one plan, switched items off (Removals) and values set (Sets), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. It is held in the tab only.
+The changes one tab holds against one plan: switched items off (Removals), values set (Sets) and items added (Additions), which `traj` applies transiently to read a figure and never writes until the person keeps or applies it. A change a switch holds back stays in the session but is not sent, so it does not reach the figures. It is held in the tab only.
 _Avoid_: scratch plan, draft, scenario copy, simulation
 
 **Group** (in a What-if session):
-A loan, a real asset or a salary with its employer share changed as a whole: its parts (Account, Flows, debt, the share) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself. A path is in at most one group, and a debt the Baseline holds has no switch.
+A loan, a real asset or a salary with its employer share changed as a whole: its parts (Account, Flows, debt, the share) are switched off, tried and taken back together, and the session bar lists them as one change. A part never changes alone, because the plan would not agree with itself. A path is in at most one group, and a debt the Baseline holds has no switch. Only the switch groups a salary with its share: a tried salary is listed as its separate changes, and a share a try cleared is its own chip.
 _Avoid_: bundle, batch
 
 **What-if lens**:
