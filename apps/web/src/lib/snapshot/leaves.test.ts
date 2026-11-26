@@ -19,10 +19,15 @@ describe("the read-leaf allowlist", () => {
 			"projection chance",
 			"projection path",
 			"projection allowances",
+			"scenario tax",
 		])
 		for (const write of ["tx add", "account add", "scenario apply", "scenario fork", "init"]) {
 			expect(READ_LEAVES as readonly string[]).not.toContain(write)
 		}
+	})
+
+	test("matches scenario tax, which the Plan emits only as a dry run", () => {
+		expect(leafOf(["scenario", "tax", "--from-stored", "--dry-run", "--json"])).toBe("scenario tax")
 	})
 
 	test("an argv is matched to the longest leaf it starts with, and a write argv to none", () => {

@@ -10,6 +10,7 @@ import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/label
 import { notStated } from "../../lib/view/tax-settings/not-stated"
 import { isTaxed } from "../../lib/view/tax-settings/rows"
 import { canClaimShared, sharedInterestClaimed } from "../../lib/view/tax-settings/shared-plan"
+import TaxClaimNotes from "./TaxClaimNotes.svelte"
 import TaxClaimsSection from "./TaxClaimsSection.svelte"
 import TaxDrawer from "./TaxDrawer.svelte"
 import TaxGroupCards from "./TaxGroupCards.svelte"
@@ -23,11 +24,13 @@ interface Props {
 	show: ScenarioShow["scenario"]
 	/** Whether the page changes anything: the server answers, and the page is not the Demo snapshot. */
 	editable: boolean
+	/** The CLI's own notes about the stored claims, one paragraph each. */
+	notes?: readonly string[]
 	/** The plan's tax years, whose assumptions the page echoes when two separate Returns share a home loan. */
 	years?: readonly TaxYear[]
 }
 
-let { name, show, editable, years = [] }: Props = $props()
+let { name, show, editable, notes = [], years = [] }: Props = $props()
 const profile = $derived(show.tax ?? null)
 const taxed = $derived(isTaxed(show))
 /** The people of the plan's household, and the per-Return claims of a separate filing; both absent for one Return. */
@@ -71,6 +74,9 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 {/if}
 {#if claims}
 	<TaxClaimsSection table={claims} {people} />
+{/if}
+{#if profile !== null}
+	<TaxClaimNotes lines={notes} />
 {/if}
 {#if profile !== null}
 	<TaxGroupCards cards={groupCards(profile, claimant, sharedClaimed)} disabled={wait} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />

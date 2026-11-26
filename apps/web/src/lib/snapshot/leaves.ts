@@ -1,4 +1,7 @@
-/** The read leaves the Plan may emit. A write leaf is never on this list: `leaves.test.ts` pins it. */
+/**
+ * The read leaves the Plan may emit. A leaf that writes is never on this list, except `scenario tax`,
+ * which the Plan emits only with `--dry-run`, so it stores nothing; `leaves.test.ts` pins the list.
+ */
 export const READ_LEAVES = [
 	"doctor",
 	"account list",
@@ -15,6 +18,7 @@ export const READ_LEAVES = [
 	"projection chance",
 	"projection path",
 	"projection allowances",
+	"scenario tax",
 ] as const
 
 /** One of the read leaves the Plan may emit. */

@@ -13,6 +13,7 @@ import {
 	planFi,
 	planProjections,
 } from "./stage-two-projections"
+import { planTaxNotes } from "./stage-two-tax-notes"
 
 /** The argv of stage two, the reads that depend on the Scenarios and the first transaction date. */
 export type StageTwoPlan = {
@@ -40,6 +41,8 @@ export type StageTwoPlan = {
 	pathOf: (scenario: string, index: number) => PlannedRead | null
 	/** One `projection allowances` per Scenario; empty when the Snapshot states no allowance inputs. The runner reads only plans with a Levy. */
 	allowances: Record<string, PlannedRead>
+	/** One `scenario tax --from-stored --dry-run` per Scenario; the runner reads only plans with a tax profile. */
+	taxNotes: Record<string, PlannedRead>
 }
 
 /** The names of the Scenarios the list read holds, or none when that read failed. */
@@ -102,5 +105,6 @@ export function planStageTwo(params: PlanParams, one: StageOneReads): StageTwoPl
 		readPaths: params.readPaths,
 		pathOf: (scenario, index) => pathRead(params, scenario, index),
 		allowances: planAllowances(params, scenarios),
+		taxNotes: planTaxNotes(scenarios),
 	}
 }
