@@ -14,7 +14,7 @@ interface Props {
 let { name, commands, details }: Props = $props()
 </script>
 
-<details class="text-sm">
+<details class="text-sm" data-provenance>
 	<summary class="cursor-pointer text-muted-foreground hover:text-foreground" aria-label={`Details of ${name}`}>Details</summary>
 	{#each commands as command, index (index)}
 		<pre class="mt-2 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code>{formatArgv(command)}</code></pre>

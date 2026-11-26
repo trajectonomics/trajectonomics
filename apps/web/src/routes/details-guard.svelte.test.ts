@@ -63,6 +63,15 @@ describe("every page of the Demo keeps its provenance behind Details", () => {
 			expect(outside, `${page.path} states a basis-point figure`).not.toContain("basis points")
 		})
 
+		test(`${page.path} names each Details apart from the others`, async () => {
+			setTestUrl(`http://127.0.0.1${page.path}?demo=1`)
+			const module = (await import(pathToFileURL(page.file).href)) as { default: Component }
+			const names = [
+				...render(module.default).body.matchAll(/aria-label="(Details of [^"]*)"/g),
+			].map((match) => match[1])
+			expect(names.length, `${page.path} repeats a Details name`).toBe(new Set(names).size)
+		})
+
 		test(`${page.path} shows at most one Details in each of its sections`, async () => {
 			setTestUrl(`http://127.0.0.1${page.path}?demo=1`)
 			const module = (await import(pathToFileURL(page.file).href)) as { default: Component }

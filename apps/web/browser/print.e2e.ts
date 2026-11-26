@@ -81,7 +81,7 @@ test("a closed Details prints its contents, so the paper keeps the commands and 
 }) => {
 	await openDemo(page, "/projection/", { theme: "light" })
 	await page.emulateMedia({ media: "print" })
-	const details = page.locator("details").first()
+	const details = page.locator("details[data-provenance]").first()
 	await expect(details.locator("summary")).toHaveText("Details")
 	const content = await details.evaluate(
 		(element) => getComputedStyle(element, "::details-content").contentVisibility,
@@ -91,4 +91,19 @@ test("a closed Details prints its contents, so the paper keeps the commands and 
 	expect(
 		await command.evaluate((element) => element.getBoundingClientRect().height),
 	).toBeGreaterThan(0)
+})
+
+test("any other closed disclosure stays closed on paper, so a long table does not print", async ({
+	page,
+}) => {
+	await openDemo(page, "/net-worth/", { theme: "light" })
+	await page.emulateMedia({ media: "print" })
+	const table = page.locator("details:not([data-provenance])", {
+		hasText: "Month-end figures as a table",
+	})
+	await expect(table).toHaveCount(1)
+	const content = await table.evaluate(
+		(element) => getComputedStyle(element, "::details-content").contentVisibility,
+	)
+	expect(content, "a closed table disclosure on paper").not.toBe("visible")
 })

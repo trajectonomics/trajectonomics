@@ -78,6 +78,9 @@ function innermostAt(sections: readonly SectionSpan[], at: number): SectionSpan 
 }
 
 /**
+ * The guard counts per section, not per result: two Details of one result in different sections would pass.
+ * Results are not marked in the markup, and Home cards legitimately repeat commands, so a section is the unit.
+ *
  * The "Details" summaries of each `<section>`, counted in the innermost section that holds them, so a card
  * inside a page counts on its own. A result is one section, and it shows one Details, never two.
  */

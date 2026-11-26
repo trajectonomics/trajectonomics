@@ -75,15 +75,11 @@
 	}
 
 	/*
-	 * A closed Details still prints what it holds, so a printed page keeps its commands and hashes. The
-	 * `::details-content` rule is what current Chromium needs; the `display` rule is the older fallback.
+	 * A closed provenance Details still prints what it holds, so a printed page keeps its commands and hashes.
+	 * Only provenance: every other disclosure (a monthly table, a loan schedule, a menu) stays closed on paper.
 	 */
-	details::details-content {
+	details[data-provenance]::details-content {
 		content-visibility: visible;
-	}
-
-	details > :not(summary) {
-		display: block;
 	}
 
 	table {
