@@ -36,7 +36,7 @@ let pickedIn: Pick | null = $state(null)
 
 const rollups = $derived(rollupsOf(run))
 const rollup = $derived(chooseRollup(rollups, year))
-const flow = $derived(rollup === null ? null : flowOf(rollup, names.accounts, names))
+const flow = $derived(rollup === null ? null : flowOf(rollup, names))
 const layout = $derived(flow === null ? null : layoutFlow(flow))
 const stack = $derived(flow === null ? null : layoutStack(flow))
 const sections = $derived(rollup === null ? [] : sectionsOf(rollup))

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
+import { currentItemText } from "../../client/item-names.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { HouseholdDocument } from "../../lib/contract"
 import { flowAnchorLabels } from "../../lib/view/household/model"
@@ -88,7 +89,7 @@ async function remove(): Promise<void> {
 }
 </script>
 
-<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${existing.id}` : "Set how you spend in retirement"}>
+<form onsubmit={save} class="space-y-6" aria-label={existing ? `Edit ${currentItemText("flow", existing.id)}` : "Set how you spend in retirement"}>
 	<HowFields bind:draft {shown} />
 	{#if draft.how !== ""}
 		<RuleFields bind:draft {shown} />

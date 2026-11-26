@@ -1,10 +1,10 @@
 <script lang="ts">
 import { editSession } from "../../client/edit.svelte.js"
-import { currentItemNames } from "../../client/item-names.svelte.js"
 import { preferences } from "../../client/preferences.svelte.js"
+import { currentSnapshot } from "../../client/snapshot.svelte.js"
 import { whatIfSession } from "../../client/what-if.svelte.js"
 import { maskMoney } from "../../lib/format/mask"
-import { itemText } from "../../lib/view/item-names"
+import { itemText, NO_ITEM_NAMES, snapshotItemNames } from "../../lib/view/item-names"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
 import { failedReads, pathNamed } from "../../lib/what-if/answer"
 import { labelWithNames } from "../../lib/what-if/change-names"
@@ -28,7 +28,17 @@ function refusalOf(change: Change): string | null {
 	)
 }
 
-const names = $derived(currentItemNames())
+/**
+ * The names of the session's own plan. The bar words a change by the plan it is made against, which the session holds;
+ * the address may name another plan, so the page's `currentItemNames()` would name it by the wrong one's labels.
+ */
+const names = $derived.by(() => {
+	const state = currentSnapshot()
+	const plan = whatIfSession.whatIf?.plan
+	return state.status !== "ready" || plan === undefined
+		? NO_ITEM_NAMES
+		: snapshotItemNames(state.snapshot, plan)
+})
 
 /** Whether a Set changes a figure, which hiding amounts masks. A Milestone's id or name is not a figure. */
 function isFigure(change: Change): change is Extract<Change, { kind: "set" }> {

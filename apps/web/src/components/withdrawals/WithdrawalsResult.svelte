@@ -25,8 +25,8 @@ let { view, terms, names, title, spends = true }: Props = $props()
 	{#if title}<h2 class="text-lg font-semibold">{title}</h2>{/if}
 	{#each view.rules as rule (rule.flow)}
 		{@const label = itemLabel(names, "flow", rule.flow)}
-		<section aria-label={`${label.text} year by year`} class="min-w-0 space-y-2">
-			<h3 class="min-w-0 text-base font-semibold wrap-anywhere">Year by year: <ItemWords {label} /></h3>
+		<section aria-label={`${label.text} year by year`} class="space-y-2">
+			<h3 class="text-base font-semibold">Year by year: <ItemWords {label} /></h3>
 			<RuleYearsTable {rule} currency={view.currency} {terms} {names} />
 		</section>
 	{/each}

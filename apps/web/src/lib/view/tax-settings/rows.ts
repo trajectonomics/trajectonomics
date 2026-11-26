@@ -35,7 +35,7 @@ const YOURS: Readonly<Record<string, (who: PersonName) => string>> = {
 }
 
 /** What an item is called: its own words, or the claimant's when the flat keys are the other person's claims. */
-function labelOf(key: string, label: string, claimant: PersonName | null): string {
+export function claimLabel(key: string, label: string, claimant: PersonName | null): string {
 	return claimant === null ? label : (YOURS[key]?.(claimant) ?? label)
 }
 
@@ -76,7 +76,7 @@ function amountRows(
 		return [
 			{
 				key,
-				label: labelOf(key, label, claimant),
+				label: claimLabel(key, label, claimant),
 				...amountValue(key, amount, sharedClaimed),
 			},
 		]
@@ -99,7 +99,7 @@ export function profileRows(
 			const counted = statedIn(profile, key)
 			return {
 				key,
-				label: labelOf(key, label, claimant),
+				label: claimLabel(key, label, claimant),
 				value: counted === undefined || counted === 0 ? "None" : String(counted),
 			}
 		}),

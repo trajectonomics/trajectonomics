@@ -65,9 +65,9 @@ describe("the employer's 5% of a salary", () => {
 			if (rollup === null) throw new Error("no roll-up")
 			const sections = sectionsOf(rollup)
 			const employer = sections.find((section) => section.total === "from your employer")
-			expect(
-				employer?.parts[0]?.lines.map((line) => [lineLabel(line, new Map()), line.amount]),
-			).toEqual([[`From your employer into ${PROVIDENT} (salary-employer)`, "30000.00"]])
+			expect(employer?.parts[0]?.lines.map((line) => [lineLabel(line), line.amount])).toEqual([
+				[`From your employer into ${PROVIDENT} (salary-employer)`, "30000.00"],
+			])
 			expect(sections.find((section) => section.total === "money in")?.amount).toBe("600000.00")
 		},
 	)

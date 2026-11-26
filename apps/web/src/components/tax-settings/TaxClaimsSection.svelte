@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type PersonNames, personText } from "../../lib/view/item-names"
+import { type PersonName, type PersonNames, personText } from "../../lib/view/item-names"
 import type { ClaimsTable } from "../../lib/view/tax-settings/claims"
 import MaskedAmount from "../ui/MaskedAmount.svelte"
 
@@ -7,10 +7,18 @@ interface Props {
 	table: ClaimsTable
 	/** The household's people, so a column is named by role ("You", "Your partner"), never by id. */
 	people: PersonNames
+	/** The person whose claims the flat keys are after a holder swap: their column takes those words, never the id. */
+	claimant?: PersonName | null
+	/** The recorded `claimsHolder` id, the column the claimant names. */
+	claimantId?: string | null
 }
 
-let { table, people }: Props = $props()
-const columns = $derived(table.people.map((person) => personText(people, person)))
+let { table, people, claimant = null, claimantId = null }: Props = $props()
+const columns = $derived(
+	table.people.map((person) =>
+		person === claimantId && claimant !== null ? claimant.label : personText(people, person),
+	),
+)
 </script>
 
 <!-- One column per Return of a separate filing: the amount that Return's profile claims, so a person sees at a glance. -->

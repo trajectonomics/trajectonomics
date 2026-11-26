@@ -20,7 +20,7 @@ interface Props {
 let { sections, names, picked, onPick }: Props = $props()
 
 function words(line: CashflowLine) {
-	return lineWords(line, names.accounts, names)
+	return lineWords(line, names)
 }
 
 const isEmpty = (section: Section): boolean =>

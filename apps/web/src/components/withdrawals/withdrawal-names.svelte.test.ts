@@ -78,8 +78,12 @@ describe("the Withdrawals block names each rule Flow", () => {
 		const body = render(WithdrawalsResult, {
 			props: { view: twinView(), terms: "both", names },
 		}).body
+		expect(body).toContain('aria-label="Retirement spending (retirement-spending) year by year"')
+		expect(body).toContain('aria-label="Retirement spending (retirement-spending-2) year by year"')
 		expect(body).toContain(">Retirement spending (retirement-spending)</span>")
 		expect(body).toContain(">Retirement spending (retirement-spending-2)</span>")
+		expect(body).toContain("Retirement spending (retirement-spending), each year in THB")
+		expect(body).toContain("Retirement spending (retirement-spending-2), each year in THB")
 	})
 })
 

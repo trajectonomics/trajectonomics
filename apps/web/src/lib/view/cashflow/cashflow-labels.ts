@@ -71,30 +71,25 @@ const NAMERS: Readonly<Record<CashflowLine["group"], Namer>> = {
 }
 
 /** The words of a Flow a line names, or null for a line that names none. */
-function flowOf(line: CashflowLine, names: ItemNames): ItemLabel | null {
+function flowNamed(line: CashflowLine, names: ItemNames): ItemLabel | null {
 	if (line.id === null || !FLOW_GROUPS.has(line.group)) return null
 	return itemLabel(names, "flow", line.id)
 }
 
 /**
  * A line's label as parts, with the Account's name where the line has one and the plan's words for the Flow it names.
- * A Flow the plan labels reads its label, and one it does not label shows its id in code. A null category is named as
- * uncategorised.
+ * The names hold both: the ledger's Account names and the plan's Flow labels. A Flow the plan labels reads its label,
+ * and one it does not label shows its id in code. A null category is named as uncategorised.
  */
 export function lineWords(
 	line: CashflowLine,
-	accountName: ReadonlyMap<string, string>,
 	names: ItemNames = NO_ITEM_NAMES,
 ): readonly LinePart[] {
-	const account = line.account === null ? "" : (accountName.get(line.account) ?? line.account)
-	return NAMERS[line.group](line, account, flowOf(line, names))
+	const account = line.account === null ? "" : (names.accounts.get(line.account) ?? line.account)
+	return NAMERS[line.group](line, account, flowNamed(line, names))
 }
 
 /** A line's label as plain text, for a chart's label, which holds no markup (web ADR 0029). */
-export function lineLabel(
-	line: CashflowLine,
-	accountName: ReadonlyMap<string, string>,
-	names: ItemNames = NO_ITEM_NAMES,
-): string {
-	return wordsOf(lineWords(line, accountName, names)).text
+export function lineLabel(line: CashflowLine, names: ItemNames = NO_ITEM_NAMES): string {
+	return wordsOf(lineWords(line, names)).text
 }

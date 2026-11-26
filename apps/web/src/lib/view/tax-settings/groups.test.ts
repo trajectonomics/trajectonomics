@@ -152,4 +152,17 @@ describe("what the plan does not state yet", () => {
 		expect(all.map((one) => one.place).includes(null)).toBe(false)
 		expect(all.map((one) => one.label === one.class)).not.toContain(true)
 	})
+
+	test("names a flat class by the claimant after a holder swap, never as yours", () => {
+		const claimant = { label: "Your partner", subject: "your partner" }
+		const missing = notStated(
+			{ stated: [], notStated: ["parents", "healthInsurance", "thaiEsg"] },
+			claimant,
+		)
+		expect(missing.map((one) => one.label)).toEqual([
+			"Parents your partner supports",
+			"Your partner's health insurance premiums",
+			"ThaiESG contributions",
+		])
+	})
 })

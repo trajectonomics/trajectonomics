@@ -8,9 +8,11 @@ interface Props {
 	/** Opens the drawer on the group that holds the item; absent when the page changes nothing. */
 	onEdit?: ((group: GroupKey) => void) | undefined
 	disabled: boolean
+	/** True after a holder swap: a flat class waits for `--from-stored`, and only a contribution Flow links out. */
+	locked?: boolean
 }
 
-let { items, onEdit, disabled }: Props = $props()
+let { items, onEdit, disabled, locked = false }: Props = $props()
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-left text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 </script>
@@ -27,7 +29,7 @@ const button =
 						<SiteLink href="/optimize/allowances/" class="inline-block rounded-md border border-border px-3 py-1.5 text-sm underline">{item.label} (a contribution Flow)</SiteLink>
 					{:else if onEdit && item.place !== null}
 						{@const group = item.place}
-						<button type="button" {disabled} onclick={() => onEdit(group)} class={button}>{item.label}</button>
+						<button type="button" disabled={disabled || locked} onclick={() => onEdit(group)} class={button}>{item.label}</button>
 					{:else}
 						<span class="inline-block rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground">{item.label}</span>
 					{/if}
