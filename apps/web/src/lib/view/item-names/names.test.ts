@@ -92,6 +92,55 @@ describe("an id no Read names shows as the id", () => {
 		expect(itemLabel(names, "person", "me")).toMatchObject({ text: "Somchai", named: true })
 	})
 
+	test("two items of one kind that share a label take their id, so a page can tell them apart", () => {
+		const doc = {
+			...DOCUMENT,
+			flows: [
+				{ ...DOCUMENT.flows[0]!, displayLabel: "Retirement" },
+				{
+					id: "pension",
+					kind: "income" as const,
+					frequency: "monthly" as const,
+					start: "2026-01-01",
+					displayLabel: "Retirement",
+				},
+				{ ...DOCUMENT.flows[1]!, displayLabel: "Rent" },
+			],
+			milestones: [
+				{ id: "retire", displayLabel: "Retirement" },
+				{ id: "retire-2", displayLabel: "Retirement" },
+				{ id: "car-paid-off", displayLabel: "Car paid off" },
+			],
+		}
+		const names = itemNames(ACCOUNTS, HOUSEHOLD, doc)
+		expect(itemText(names, "milestone", "retire")).toBe("Retirement (retire)")
+		expect(itemText(names, "milestone", "retire-2")).toBe("Retirement (retire-2)")
+		expect(itemText(names, "milestone", "car-paid-off")).toBe("Car paid off")
+		expect(itemText(names, "flow", "salary")).toBe("Retirement (salary)")
+		expect(itemText(names, "flow", "pension")).toBe("Retirement (pension)")
+		expect(itemText(names, "flow", "rent")).toBe("Rent")
+	})
+
+	test("a Flow and a Milestone may share a label: the twin count is per kind", () => {
+		const doc = {
+			...DOCUMENT,
+			flows: [
+				...DOCUMENT.flows,
+				{
+					id: "bonus",
+					kind: "income" as const,
+					frequency: "monthly" as const,
+					start: "2026-01-01",
+					displayLabel: "Freedom",
+				},
+			],
+			milestones: [...DOCUMENT.milestones, { id: "freedom", displayLabel: "Freedom" }],
+		}
+		const names = itemNames(ACCOUNTS, HOUSEHOLD, doc)
+		expect(itemText(names, "flow", "bonus")).toBe("Freedom")
+		expect(itemText(names, "milestone", "freedom")).toBe("Freedom")
+	})
+
 	test("an Account is named by the ledger, and one only the plan has shows as the id", () => {
 		expect(itemLabel(NAMES, "account", "acct-1")).toMatchObject({ text: "Bank", named: true })
 		expect(itemLabel(NAMES, "account", "condo")).toMatchObject({ text: "condo", named: false })

@@ -2,7 +2,7 @@
 import { formatDate } from "../../lib/format"
 import type { PlanCard } from "../../lib/view/plans/card"
 import LineChart from "../chart/LineChart.svelte"
-import ItemName from "../ui/ItemName.svelte"
+import ItemWords from "../ui/ItemWords.svelte"
 import SiteLink from "../ui/SiteLink.svelte"
 import PlanFacts from "./PlanFacts.svelte"
 import PlanMenu from "./PlanMenu.svelte"
@@ -36,9 +36,9 @@ const name = $derived(card.row.name)
 				<!-- The chart shortens a rule's label to the room it has, or leaves it out, and a phone has no hover,
 				so the card names each Milestone it draws in full. -->
 				<ul aria-label="Milestones reached" class="space-y-1 text-xs text-muted-foreground">
-					{#each card.milestones as milestone (milestone.id)}
+					{#each card.milestones as milestone (milestone.label.id)}
 						<li>
-							<ItemName kind="milestone" id={milestone.id} />: reached on <time
+							<ItemWords label={milestone.label} />: reached on <time
 								datetime={milestone.date}>{formatDate(milestone.date)}</time
 							>
 						</li>

@@ -22,7 +22,7 @@ let drawer: { id?: string } | null = $state(null)
 const main = $derived(mainFlow(ctx.doc.flows))
 const others = $derived(ruleFlows(ctx.doc.flows).filter((flow) => flow.id !== main?.id))
 const button =
-	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+	"max-w-full rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground wrap-anywhere outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 </script>
 
 <!-- "Set how you spend in retirement" opens the right-side drawer: one form, one Edit, or a try in the What-if session. -->
