@@ -28,11 +28,15 @@ describe("the CLI's notes under the claims", () => {
 		expect(page).toContain(KEPT)
 	})
 
-	test("keeps every sentence whole while amounts are hidden: they are notes, not figures", () => {
+	test("hides every sentence while amounts are hidden, and says so: a note can state an amount", () => {
 		preferences.hidden = true
-		const page = body([SHARED])
-		expect(page).toContain(SHARED)
-		expect(page).not.toContain("••")
+		const page = body([SHARED, KEPT])
+		expect(page).toContain("Notes on the stored claims")
+		expect(page).toContain("The notes on the stored claims are hidden with the amounts.")
+		expect(page).not.toContain(SHARED)
+		expect(page).not.toContain(KEPT)
+		expect(page).not.toContain("60,000")
+		expect(page.match(/<p[ >]/g)?.length).toBe(1)
 	})
 
 	test("shows no section when the CLI stated no note", () => {

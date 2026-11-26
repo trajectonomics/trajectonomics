@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument, TaxProfile } from "../../contract"
 import { NO_PEOPLE, personNames } from "../item-names"
-import { claimsTable, flatClaimant } from "./claims"
+import { type ClaimCell, claimsTable, flatClaimant } from "./claims"
 
 const PROFILE: TaxProfile = {
 	tax: "th-2026",
@@ -29,6 +29,10 @@ const HOUSEHOLD: HouseholdDocument = {
 
 const FILERS = ["me", "partner"]
 
+/** Each cell's text as the page shows it: the count, "None", or the amount with its currency. */
+const values = (cells: readonly ClaimCell[] | undefined): string[] | undefined =>
+	cells?.map((cell) => cell.value)
+
 /** The same two people after the household swapped holder and partner, before `--from-stored` ran. */
 const SWAPPED: HouseholdDocument = {
 	...HOUSEHOLD,
@@ -43,24 +47,24 @@ describe("who claims each allowance", () => {
 		const table = claimsTable(PROFILE, HOUSEHOLD, FILERS)
 		expect(table?.people).toEqual(["me", "partner"])
 		const row = (key: string) => table?.rows.find((one) => one.key === key)
-		expect(row("children")?.cells).toEqual(["1", "1"])
-		expect(row("parents")?.cells).toEqual(["None", "2"])
-		expect(row("lifeInsurance")?.cells).toEqual(["15,000 THB", "12,000 THB"])
-		expect(row("mortgageInterest")?.cells).toEqual(["None", "None"])
+		expect(values(row("children")?.cells)).toEqual(["1", "1"])
+		expect(values(row("parents")?.cells)).toEqual(["None", "2"])
+		expect(values(row("lifeInsurance")?.cells)).toEqual(["15,000 THB", "12,000 THB"])
+		expect(values(row("mortgageInterest")?.cells)).toEqual(["None", "None"])
 	})
 
 	test("never reads the holder's older `returns` entry, even with no claimsHolder recorded", () => {
 		const profile: TaxProfile = { ...PROFILE, claimsHolder: undefined }
 		const table = claimsTable(profile, HOUSEHOLD, FILERS)
 		const row = (key: string) => table?.rows.find((one) => one.key === key)
-		expect(row("children")?.cells).toEqual(["1", "1"])
-		expect(row("lifeInsurance")?.cells).toEqual(["15,000 THB", "12,000 THB"])
+		expect(values(row("children")?.cells)).toEqual(["1", "1"])
+		expect(values(row("lifeInsurance")?.cells)).toEqual(["15,000 THB", "12,000 THB"])
 	})
 
 	test("puts the flat keys in the recorded holder's column, not the household's holder", () => {
 		const table = claimsTable({ ...PROFILE, claimsHolder: "partner" }, HOUSEHOLD, FILERS)
 		const row = (key: string) => table?.rows.find((one) => one.key === key)
-		expect(row("lifeInsurance")?.cells).toEqual(["1,000 THB", "15,000 THB"])
+		expect(values(row("lifeInsurance")?.cells)).toEqual(["1,000 THB", "15,000 THB"])
 	})
 
 	test("names no column for a person the projection does not file as a Filer", () => {
@@ -73,7 +77,7 @@ describe("who claims each allowance", () => {
 		}
 		const table = claimsTable(profile, HOUSEHOLD, ["me", "partner"])
 		expect(table?.people).toEqual(["me", "partner"])
-		expect(table?.rows[0]?.cells).toEqual(["1", "None"])
+		expect(values(table?.rows[0]?.cells)).toEqual(["1", "None"])
 	})
 
 	test("is absent for a joint or single filing, whose flat keys are the one Return's claims", () => {
@@ -87,7 +91,7 @@ describe("who claims each allowance", () => {
 	test("states the stored shared home-loan interest the Returns share, or none", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, FILERS)?.sharedInterest).toBeNull()
 		const shared = { ...PROFILE, sharedMortgageInterest: 60000 }
-		expect(claimsTable(shared, HOUSEHOLD, FILERS)?.sharedInterest).toBe("60,000 THB")
+		expect(claimsTable(shared, HOUSEHOLD, FILERS)?.sharedInterest?.value).toBe("60,000 THB")
 	})
 })
 

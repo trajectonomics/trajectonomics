@@ -1,6 +1,7 @@
 <script lang="ts">
 import { type PersonNames, personText } from "../../lib/view/item-names"
 import type { ClaimsTable } from "../../lib/view/tax-settings/claims"
+import MaskedAmount from "../ui/MaskedAmount.svelte"
 
 interface Props {
 	table: ClaimsTable
@@ -34,7 +35,7 @@ const columns = $derived(table.people.map((person) => personText(people, person)
 					<tr class="border-b border-border last:border-0">
 						<th scope="row" class="px-3 py-2 text-left font-normal text-muted-foreground">{row.label}</th>
 						{#each row.cells as cell, index (table.people[index])}
-							<td class="px-3 py-2 text-right tabular-nums">{cell}</td>
+							<td class="px-3 py-2 text-right tabular-nums">{#if cell.amount}<MaskedAmount digits={cell.amount.digits} after={cell.amount.after} />{:else}{cell.value}{/if}</td>
 						{/each}
 					</tr>
 				{/each}
@@ -43,7 +44,7 @@ const columns = $derived(table.people.map((person) => personText(people, person)
 	</div>
 	{#if table.sharedInterest !== null}
 		<p class="text-sm text-foreground">
-			Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all: <span class="tabular-nums">{table.sharedInterest}</span>
+			Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all: <span class="tabular-nums">{#if table.sharedInterest.amount}<MaskedAmount digits={table.sharedInterest.amount.digits} after={table.sharedInterest.amount.after} />{:else}{table.sharedInterest.value}{/if}</span>
 		</p>
 	{/if}
 </section>
