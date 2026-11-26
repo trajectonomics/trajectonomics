@@ -52,7 +52,7 @@ async function unclaimed(home: string, ...flags: string[]): Promise<string[]> {
 
 /** The sentence for an id no person in the household has, with the placeholder example a separate write gives. */
 function departed(id: string, example: string): string {
-	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person who has a Return, for example with "<person>=<value>" flags such as ${example} --merge; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person who has a Return, for example with "<person>=<value>" flags such as --filing-status married_separate ${example} --merge; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }
 
 /** The same sentence on a write with no Filers, which refuses a person-qualified value. */
@@ -130,6 +130,25 @@ describe("a partner given a new id after claims were stated", () => {
 		const res = await tax(home, ...restated.split(" "), "--merge")
 		expect(res.code, res.err).toBe(0)
 		expect((await owed(home))["bob"]).toBe("7000.00")
+	})
+
+	it("prints a command a stored joint plan accepts", async () => {
+		const home = await rehoused(["--life-insurance", "partner=50000"], BOB)
+		expect(await unclaimed(home, ...JOINT)).toEqual([departedNoFilers("partner")])
+		// The stored plan is joint, so the example names the filing status that accepts a person.
+		const [sentence] = await unclaimed(
+			home,
+			"--merge",
+			"--filing-status",
+			"married_separate",
+			"--dry-run",
+		)
+		expect(sentence).toBe(departed("partner", "--life-insurance <person>=<amount>"))
+		const command = /such as (--filing-status married_separate .+) --merge/.exec(sentence!)![1]!
+		const filled = command.replace("<person>", "bob").replace("<amount>", "50000")
+		const res = await tax(home, ...filled.split(" "), "--merge")
+		expect(res.code, res.err).toBe(0)
+		expect(await owed(home)).toEqual({ me: "83000.00", bob: "7000.00" })
 	})
 
 	it("has a sentence of its own beside the holder's", async () => {

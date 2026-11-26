@@ -27,7 +27,8 @@ export function departedClaimants(kept: TaxRequest, household: string | null): s
  * say the set waits for a separate filing. A set whose claims were stated again under a person who
  * has a Return stays behind, so the sentence names the one write that drops it. A separate write with
  * Filers shows a person-keyed flag for every claim it holds, under a `<person>` placeholder: the old
- * id may have become any person in the household, and any other status refuses the flag.
+ * id may have become any person in the household, and any other status refuses the flag. The example
+ * names the filing status too, so it also runs while the stored plan is still joint.
  */
 export function departedClaims(
 	id: string,
@@ -39,6 +40,6 @@ export function departedClaims(
 	const how =
 		example === undefined
 			? ""
-			: `, for example with "<person>=<value>" flags such as ${example} --merge`
+			: `, for example with "<person>=<value>" flags such as --filing-status married_separate ${example} --merge`
 	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person who has a Return${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }

@@ -293,12 +293,17 @@ the Return used the home-loan ceiling.
   reads as "me"'s own, so state "me"'s own claims again when switching back (`"me"` is the named
   person). The caveat names the person whose flat claims they are (`claimsHolder`, else the household
   holder) and gives the switch-back command in full, with a person-keyed flag for every field the kept
-  sets hold (`for example --filing-status married_separate --parents me=<n> --life-insurance
-  me=<amount> --merge`). It does that only when this write has a Return for that person, because a
-  person-qualified value needs a separate filing and a Return to carry it; otherwise it keeps the
-  older words without a name or example. A later separate write that states
-  more than a Return may claim, such as three parents, is refused; within the cap nothing refuses
-  it, so the claims holder's claims must be restated as above. (#644)
+  sets hold and, when the profile also keeps shared home-loan interest, that person's own
+  `--mortgage-interest`, because the bare amount the shared-interest sentence suggests would otherwise
+  drop it (`for example --filing-status married_separate --parents me=<n> --life-insurance
+  me=<amount> --merge`). It also says to note that person's own claims from `scenario show` before
+  stating them bare, since a bare write replaces the stored flat claims. A person id that starts with
+  `-` takes the `=` form (`--parents=-me=<n>`), because the space form's value reads as a flag. It
+  does that only when this write has a Return for that person, because a person-qualified value needs
+  a separate filing and a Return to carry it; otherwise it keeps the older words without a name or
+  example. A later separate write that states more than a Return may claim, such as three parents, is
+  refused; within the cap nothing refuses it, so the claims holder's claims must be restated as
+  above. (#644)
 - **A separate write with Filers** says, for each person still in the household who has no Return and
   whose stored claims are not all zero: `"<person>" has no taxed income in this plan, so no Return
   claims their stored claims.` This covers an earlier partner still in the household, and also the
@@ -308,9 +313,9 @@ the Return used the home-loan ceiling.
   is on no Return. No sentence says it is kept for a separate filing, because a separate Return counts
   it no more than a joint one does. The sentence says a `--tax` write drops the set, so it stays right
   after the claims are stated again under a person who has a Return. A separate write with Filers also
-  shows how to restate them, with `"<person>=<value>"` flags such as `--life-insurance
-  <person>=<amount> --merge`. The example uses a literal `<person>` placeholder,
-  because the old id may have become any person in the household, and `--merge` keeps the separate
-  filing. Any other filing status shows no example, because it refuses a person-qualified value.
-  (#644)
+  shows how to restate them, with `"<person>=<value>"` flags such as `--filing-status married_separate
+  --life-insurance <person>=<amount> --merge`. The example uses a literal `<person>` placeholder,
+  because the old id may have become any person in the household, and it names the separate filing
+  status so it also runs while the stored plan is still joint. Any other filing status shows no
+  example, because it refuses a person-qualified value. (#644)
 - The stored profile, the Levies and the money are unchanged.

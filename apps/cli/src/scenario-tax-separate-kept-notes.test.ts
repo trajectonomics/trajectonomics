@@ -34,7 +34,7 @@ const KEPT =
 
 /** The hint, with the flat claims' person named and the full switch-back command as its example. */
 function hint(example: string): string {
-	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as "me"'s own, so state "me"'s own claims again when switching back, for example --filing-status married_separate ${example} --merge.`
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as "me"'s own, so note "me"'s own claims from scenario show before you state them bare, and state them again when switching back, for example --filing-status married_separate ${example} --merge.`
 }
 
 const OLDER =
@@ -138,12 +138,6 @@ describe("a partner's claims a Return does not claim", () => {
 		expect((await applyScenario(home, "base", { ...document, flows })).code).toBe(0)
 		expect((await refile(home, "married_separate")).code).toBe(0)
 		expect(unclaimed(await refile(home, "married_joint"))).toEqual([KEPT + OLDER])
-	})
-
-	it("follow the shared interest when both are kept", async () => {
-		const home = await separate("--mortgage-interest", "shared=60000", "--parents", "partner=2")
-		const found = unclaimed(await refile(home, "married_joint"))
-		expect(found).toEqual([expect.stringContaining("baht of shared home-loan interest"), CLAIMS])
 	})
 
 	it("are not named when the partner claims nothing", async () => {

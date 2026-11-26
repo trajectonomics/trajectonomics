@@ -32,12 +32,18 @@ export function caveatPerson(
  * How a Return that may claim both spouses' claims states another person's kept claims bare, and what
  * that leaves a later separate filing. The first clause is conditional, so the sentence stays true
  * once followed. The caveat gives the switch-back command in full, because a person-qualified value
- * needs a separate filing, with a flag for every claim the kept sets hold as its example.
+ * needs a separate filing, with a flag for every claim the kept sets hold and, when the profile keeps
+ * shared interest, the person's own mortgage interest. It says to read the person's own claims before
+ * stating them bare, because that bare write replaces the stored flat claims.
  */
-export function bareHint(claims: readonly ReturnClaims[], person: string | undefined): string {
+export function bareHint(
+	claims: readonly ReturnClaims[],
+	person: string | undefined,
+	shared: number,
+): string {
 	if (person === undefined) return GENERIC
-	const example = exampleFlagsOf(claims, person)
+	const example = exampleFlagsOf(claims, person, shared > 0 ? ["mortgageInterest"] : [])
 	if (example === undefined) return GENERIC
 	const name = JSON.stringify(person)
-	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as ${name}'s own, so state ${name}'s own claims again when switching back, for example --filing-status married_separate ${example} --merge.`
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as ${name}'s own, so note ${name}'s own claims from scenario show before you state them bare, and state them again when switching back, for example --filing-status married_separate ${example} --merge.`
 }

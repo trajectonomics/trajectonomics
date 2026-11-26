@@ -52,6 +52,42 @@ describe("shared interest a Return does not claim", () => {
 		expect((await year2026(home)).map((it) => it.due)).toEqual(["135000.00"])
 	})
 
+	/*
+	 * me's own 10,000 and the shared 60,000 make 70,000. The shared sentence's bare 70,000 drops
+	 * me's own interest, so the caveat's command states me's 10,000 again: 75,000 and 5,000.
+	 */
+	it("follow the shared interest when both are kept", async () => {
+		const home = await separate(
+			...SHARED,
+			"--parents",
+			"partner=2",
+			"--mortgage-interest",
+			"me=10000",
+		)
+		expect((await year2026(home)).map((it) => it.due)).toEqual(["75000.00", "5000.00"])
+		const [shared, sentence] = unclaimed(await refile(home, "married_joint")) as [string, string]
+		expect(shared).toBe(INTEREST)
+		expect(sentence).toContain(
+			"for example --filing-status married_separate --parents me=<n> --mortgage-interest me=<amount> --merge.",
+		)
+		// Follow both sentences: the shared interest bare, then the caveat's whole command.
+		expect(
+			(await tax(home, "--merge", "--parents", "2", "--mortgage-interest", "70000")).code,
+		).toBe(0)
+		expect((await year2026(home)).map((it) => it.due)).toEqual(["127500.00"])
+		const command = /for example (--filing-status married_separate .+) --merge\.$/.exec(
+			sentence,
+		)![1]!
+		const filled = command.replace(
+			/--([a-z-]+) me=<(?:n|amount)>/g,
+			(_all, flag: string) => `--${flag} me=${flag === "parents" ? "0" : "10000"}`,
+		)
+		expect(filled).not.toContain("<")
+		const back = await tax(home, ...filled.split(" "), "--merge")
+		expect(back.code, back.err).toBe(0)
+		expect((await year2026(home)).map((it) => it.due)).toEqual(["75000.00", "5000.00"])
+	})
+
 	it.each(["married_joint", "single"])(
 		"lists no ceiling under %s when the Return claims no interest",
 		async (status) => {

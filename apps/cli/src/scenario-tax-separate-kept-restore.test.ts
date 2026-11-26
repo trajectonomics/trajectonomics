@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test"
+import type { Household } from "./scenario/household/model"
 import { couple, coupleHousehold, TWO_SALARIES, taxCouple } from "./scenario-tax-filers-support"
 import { LABELS, year2026 } from "./scenario-tax-separate-support"
 import { resultOf, scenario } from "./scenario-test-support"
@@ -116,5 +117,63 @@ describe("the caveat's switch-back command with a claim in every field", () => {
 		const back = printed(sentence!, { children: "0", parents: "1" })
 		expect((await tax(home, ...back)).code).toBe(0)
 		expect(await owed(home)).toEqual(original)
+	})
+})
+
+describe("the caveat's words and forms", () => {
+	it("says where to read the holder's own claims before they are lost", async () => {
+		const home = await couple(TWO_SALARIES, coupleHousehold())
+		const first = await taxCouple(home, "married_separate", LABELS, [
+			"--life-insurance",
+			"me=30000",
+			"--life-insurance",
+			"partner=80000",
+		])
+		expect(first.code, first.err).toBe(0)
+		const joint = await tax(home, "--merge", "--filing-status", "married_joint")
+		const [sentence] = resultOf(joint).unclaimed as string[]
+		expect(sentence).toContain(
+			'note "me"\'s own claims from scenario show before you state them bare',
+		)
+		expect(sentence!.indexOf("before you state them bare")).toBeLessThan(
+			sentence!.indexOf("for example"),
+		)
+		// A bare write keeps only the stated amount: me's own 30,000 is gone from `scenario show`.
+		const bare = await tax(home, "--merge", "--life-insurance", "110000")
+		expect(bare.code, bare.err).toBe(0)
+		const shown = resultOf(await scenario(home, ["show", "base"])).scenario.tax
+		expect(shown.lifeInsurance).toBe(110000)
+		expect(JSON.stringify(shown)).not.toContain("30000")
+	})
+
+	it("prints the = form for a person id that starts with a hyphen", async () => {
+		const hyphen: Household = {
+			schemaVersion: 2,
+			people: [
+				{ id: "-me", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 90 },
+			],
+			anchors: [],
+			owners: [
+				{ path: "flows.salary", person: "-me" },
+				{ path: "flows.partner-salary", person: "partner" },
+			],
+		}
+		const home = await couple(TWO_SALARIES, hyphen)
+		expect(
+			(await taxCouple(home, "married_separate", LABELS, ["--parents", "partner=2"])).code,
+		).toBe(0)
+		const joint = await tax(home, "--merge", "--filing-status", "married_joint")
+		const [sentence] = resultOf(joint).unclaimed as string[]
+		expect(sentence).toContain(
+			"for example --filing-status married_separate --parents=-me=<n> --merge.",
+		)
+		// `--parents -me=0` reads the value as a flag; the = form is the command the CLI accepts.
+		const command = /for example (--filing-status married_separate .+) --merge\.$/.exec(
+			sentence!,
+		)![1]!
+		const res = await tax(home, ...command.replace("<n>", "0").split(" "), "--merge")
+		expect(res.code, res.err).toBe(0)
+		expect(await owed(home)).toEqual({ "-me": "83000.00", partner: "6500.00" })
 	})
 })

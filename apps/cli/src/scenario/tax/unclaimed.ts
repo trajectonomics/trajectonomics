@@ -20,10 +20,11 @@ function claimsUnclaimed(
 	claims: readonly ReturnClaims[],
 	hint: boolean,
 	person: string | undefined,
+	shared: number,
 ): string {
 	const names = persons.map((name) => `"${name}"`).join(" and ")
 	const kept = `The claims stored for ${names} are kept for a separate filing, and this Return does not claim them.`
-	return hint ? kept + bareHint(claims, person) : kept
+	return hint ? kept + bareHint(claims, person, shared) : kept
 }
 
 /** The sentence for a person whose claims a separate filing keeps and writes no Return for. */
@@ -79,6 +80,7 @@ export function unclaimedClaims(
 						keptSets.map(([, claims]) => claims),
 						hint,
 						person,
+						shared,
 					),
 				]
 			: []),
