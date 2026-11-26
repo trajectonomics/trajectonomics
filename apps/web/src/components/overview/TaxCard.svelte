@@ -18,7 +18,7 @@ let { scenario }: Props = $props()
 		<div class="space-y-4">
 			<Badge>{view.status}</Badge>
 			{#if view.first === null}
-				<p class="text-sm">This Scenario has no Levy, so every figure is before tax.</p>
+				<p class="text-sm">This plan has no Levy, so every figure is before tax.</p>
 			{:else}
 				<div class="space-y-2">
 					<p class="text-sm text-muted-foreground">

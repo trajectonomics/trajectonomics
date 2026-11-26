@@ -1,5 +1,6 @@
 /** The terms of a real asset as the text rows of its card (cli ADR 0060). Every figure is the document's own text. */
 import type { ScenarioFlow } from "../../contract/scenario-show"
+import { formatDate } from "../../format"
 import { formatBps } from "../../format/bps"
 import type { AssetParts } from "./asset-parts"
 import { shareOf } from "./asset-shape"
@@ -55,7 +56,9 @@ export function assetRows(parts: AssetParts): AssetRow[] {
 	const account = parts.account.id
 	const rows = [valueRow(parts)]
 	if (parts.purchase !== null) {
-		rows.push(row("Bought", `On ${parts.purchase.start} for`, parts.purchase.amount ?? null))
+		rows.push(
+			row("Bought", `On ${formatDate(parts.purchase.start)} for`, parts.purchase.amount ?? null),
+		)
 		if (parts.buyCost !== null) rows.push(row("Buying costs", "", parts.buyCost.amount ?? null))
 		rows.push(payingRow(parts))
 	} else {
@@ -63,7 +66,7 @@ export function assetRows(parts: AssetParts): AssetRow[] {
 	}
 	if (parts.running !== null) rows.push(keepingRow("Running costs", parts.running, account))
 	if (parts.rent !== null) rows.push(keepingRow("Rent", parts.rent, account))
-	if (parts.sale !== null) rows.push(row("Sold", `On ${parts.sale.start}`))
+	if (parts.sale !== null) rows.push(row("Sold", `On ${formatDate(parts.sale.start)}`))
 	if (parts.saleCost !== null) rows.push(saleCostRow(parts.saleCost, account))
 	return rows
 }

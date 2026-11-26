@@ -8,7 +8,7 @@ const MESSAGES: Record<Exclude<ParamsErrorCode, ChanceErrorCode | "invalid_allow
 	horizon_required: "Pass --horizon YYYY-MM-DD.",
 	invalid_horizon: "--horizon must be a YYYY-MM-DD date that exists.",
 	horizon_before_as_of: "--horizon must not be before --as-of.",
-	compare_needs_two_names: "--compare takes two Scenario names: --compare A B.",
+	compare_needs_two_names: "--compare takes two plan names: --compare A B.",
 	invalid_birth_date: "--birth-date must be a YYYY-MM-DD date that exists.",
 	age_needs_birth_date: "--age needs --birth-date, so the ages count from a birth date.",
 	invalid_age: "--age must be a whole number from 0 up.",

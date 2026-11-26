@@ -26,7 +26,7 @@ const read = $derived(name === null ? undefined : projections[name])
 </script>
 
 {#if name === null || read === undefined}
-	<EmptyState title="No Scenario to show milestones for" />
+	<EmptyState title="No plan to show milestones for" />
 {:else}
 	{@const lens = whatIfSession.lensFor(name)}
 	<WhatIfAbove open={lens !== null}>

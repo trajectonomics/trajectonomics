@@ -19,6 +19,6 @@ let { label, figure, empty }: Props = $props()
 {:else}
 	<div class="space-y-2">
 		<LineChart {label} series={figure.series} kind="stacked-bars" />
-		{#each figure.notes as note (note)}<p class="text-xs text-muted-foreground">{note}</p>{/each}
+		{#each figure.notes as note (note)}<p class="text-xs text-muted-foreground" data-cli>{note}</p>{/each}
 	</div>
 {/if}

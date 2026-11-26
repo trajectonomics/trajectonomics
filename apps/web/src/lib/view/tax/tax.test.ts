@@ -126,7 +126,7 @@ describe("carry-in and status", () => {
 	test("the tax status is said in words", () => {
 		expect(taxStatusWords("applied")).toBe("Tax applied")
 		expect(taxStatusWords("not_applied")).toBe("Tax not applied")
-		expect(taxStatusWords("mixed")).toBe("Tax mixed across the two Scenarios")
+		expect(taxStatusWords("mixed")).toBe("Tax mixed across the two plans")
 	})
 })
 

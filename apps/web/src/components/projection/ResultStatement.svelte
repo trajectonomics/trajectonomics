@@ -32,7 +32,7 @@ const headingId = $props.id()
 		<Fact label="As of">{statement.asOf}</Fact>
 		<Fact label="Horizon">{statement.horizon}</Fact>
 		<Fact label="Engine">{statement.engine}</Fact>
-		<Fact label="Scenario">{statement.scenario}</Fact>
+		<Fact label="Plan">{statement.scenario}</Fact>
 		{#each statement.hashes as hash (hash.label)}
 			<Fact label={hash.label}><HashText {hash} /></Fact>
 		{/each}

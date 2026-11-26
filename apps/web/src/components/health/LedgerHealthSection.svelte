@@ -29,7 +29,7 @@ const checkColumns: Column<CheckLine>[] = [
 	<span class={check.status === "fail" ? "font-medium text-destructive" : undefined}>{check.status}</span>
 {/snippet}
 
-{#snippet detailCell(check: CheckLine)}{check.detail}{/snippet}
+{#snippet detailCell(check: CheckLine)}<span data-cli>{check.detail}</span>{/snippet}
 
 <!-- The doctor's verdict, its checks, the data directory and database, the row counts and the trial balance. -->
 <ReportSection

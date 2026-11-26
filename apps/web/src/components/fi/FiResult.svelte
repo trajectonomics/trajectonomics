@@ -14,7 +14,7 @@ interface Props {
 	argv: readonly string[]
 }
 
-/** One Scenario's FI answer: the date or what binds it, its definition, its statement and its tax pointer. */
+/** One plan's FI answer: the date or what binds it, its definition, its statement and its tax pointer. */
 let { fi, argv }: Props = $props()
 const model = $derived(fiModelOf(fi, currentItemNames().people))
 </script>
@@ -33,7 +33,7 @@ const model = $derived(fiModelOf(fi, currentItemNames().people))
 	</ResultStatement>
 	{#if fi.taxYears.length > 0}
 		<p class="text-sm text-muted-foreground">
-			This Scenario has tax years. <SiteLink
+			This plan has tax years. <SiteLink
 				href="/tax/"
 				class="text-accent underline-offset-4 hover:underline">See them on the Tax page</SiteLink
 			>.

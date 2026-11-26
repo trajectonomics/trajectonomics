@@ -6,6 +6,7 @@ import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { type Snapshot, snapshot as snapshotSchema } from "../lib/contract"
+import { formatDate } from "../lib/format"
 import { LOADING } from "../lib/view/state"
 import Layout from "./+layout.svelte"
 
@@ -34,7 +35,7 @@ describe("the layout, printed", () => {
 		const { body } = render(Layout, { props: { children: page } })
 		const header = body.match(/<p data-print-header[^>]*>([^<]*)<\/p>/)
 		expect(header).not.toBeNull()
-		expect(header?.[1]).toContain(`As of ${DEMO.params.asOf}`)
+		expect(header?.[1]).toContain(`As of ${formatDate(DEMO.params.asOf)}`)
 		expect(header?.[1]).toContain("Real, in As-of terms")
 		expect(header?.[1]).toContain(DEMO.params.scenarios[0] ?? "no plan in the Demo snapshot")
 		expect(body).toContain('<header class="print:hidden')

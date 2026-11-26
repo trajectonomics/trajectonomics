@@ -1,3 +1,4 @@
+import { formatDate } from "../format"
 import { termsWords } from "./reports/source"
 import type { SnapshotState } from "./state"
 
@@ -26,7 +27,7 @@ export function printHeading(
 		? state.snapshot.reads.projections[plan]
 		: undefined
 	const asOf = read?.ok === true ? read.data.asOf : state.snapshot.params.asOf
-	return { plan, asOf, terms: termsWords(terms), whatIf }
+	return { plan, asOf: formatDate(asOf), terms: termsWords(terms), whatIf }
 }
 
 /** The header as one line of text: plan, As-of date, terms, and the What-if session when there is one. */

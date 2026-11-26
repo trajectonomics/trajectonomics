@@ -6,11 +6,11 @@ interface Props {
 	sides: readonly CompareSideHeading[]
 }
 
-/** Each side's letter, Scenario and shortened content hash, with a sample of its line style. */
+/** Each side's letter, plan and shortened content hash, with a sample of its line style. */
 let { sides }: Props = $props()
 </script>
 
-<section aria-label="The two Scenarios" class="grid gap-3 sm:grid-cols-2">
+<section aria-label="The two plans" class="grid gap-3 sm:grid-cols-2">
 	{#each sides as side (side.letter)}
 		<div class="rounded-lg border border-border bg-card p-4">
 			<p class="flex items-center gap-2 text-sm text-muted-foreground">

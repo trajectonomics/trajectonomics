@@ -3,6 +3,7 @@ import { render } from "svelte/server"
 import { demoSnapshotText } from "../../../scripts/demo-snapshot"
 import { setTestUrl } from "../../../scripts/svelte/app-stub"
 import { type Snapshot, snapshot as snapshotSchema } from "../../lib/contract"
+import { formatDate } from "../../lib/format"
 import { reportSource } from "../../lib/view/reports/source"
 import { reportTables } from "../../lib/view/reports/tables"
 import ReportView from "./ReportView.svelte"
@@ -34,7 +35,9 @@ describe("the Reports view, rendered from the Demo snapshot", () => {
 		for (const label of ["Download CSV", "Download JSON", "Download everything", "Print"]) {
 			expect(body).toContain(label)
 		}
-		expect(body).toContain(`${PLAN} · As of ${RUN.asOf} · Nominal and real, in As-of terms`)
+		expect(body).toContain(
+			`${PLAN} · As of ${formatDate(RUN.asOf)} · Nominal and real, in As-of terms`,
+		)
 		expect(body).not.toContain("What-if session")
 	})
 
@@ -58,7 +61,7 @@ describe("the Reports view, rendered from the Demo snapshot", () => {
 		const lens = { plan: PLAN, run: RUN, fi: null, compare: null, chance: null }
 		const body = view({ lens, changes: { sets: [], removals: [] } })
 		expect(body).toContain(
-			`${PLAN} · As of ${RUN.asOf} · Nominal and real, in As-of terms · What-if session`,
+			`${PLAN} · As of ${formatDate(RUN.asOf)} · Nominal and real, in As-of terms · What-if session`,
 		)
 		expect(reportSource(DEMO.reads, PLAN, lens)?.whatIf).toBe(true)
 	})

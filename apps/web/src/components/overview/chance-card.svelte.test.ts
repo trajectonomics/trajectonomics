@@ -16,10 +16,10 @@ describe("ChanceCard", () => {
 		expect(body).toContain('href="/chance/"')
 	})
 
-	test("says the Snapshot holds no chance read when it has none for the Scenario", () => {
+	test("says the Snapshot holds no chance read when it has none for the plan", () => {
 		const { body } = render(ChanceCard, {
 			props: { scenario: { status: "unread", name: "base" } },
 		})
-		expect(body).toContain("The Snapshot holds no chance read for Scenario base.")
+		expect(body).toContain("The Snapshot holds no chance read for plan base.")
 	})
 })

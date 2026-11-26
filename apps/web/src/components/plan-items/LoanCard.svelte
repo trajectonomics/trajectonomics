@@ -1,5 +1,6 @@
 <script lang="ts">
 import { currentAccountNames } from "../../client/account-names.svelte.js"
+import { formatDate } from "../../lib/format"
 import { nameOf } from "../../lib/view/account-names"
 import type { LoanCardView } from "../../lib/view/plan-items/loan-card"
 import { type LoanMarks, NO_LOAN_MARKS } from "../../lib/view/what-if/loan-items"
@@ -68,9 +69,9 @@ const button =
 	</dl>
 	<p class="mt-3 text-sm">
 		{#if statement.paidOff !== null}
-			Paid off on {statement.paidOff}.
+			Paid off on {formatDate(statement.paidOff)}.
 		{:else if statement.owing !== null}
-			Owes <Money amount={statement.owing.amount} {currency} /> at {statement.owing.date}.
+			Owes <Money amount={statement.owing.amount} {currency} /> at {formatDate(statement.owing.date)}.
 		{:else}
 			No schedule in this Projection.
 		{/if}

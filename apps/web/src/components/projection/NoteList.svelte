@@ -24,6 +24,7 @@ const hash = $derived(currentHash())
 				{@const anchor = noteAnchor(scenario, index)}
 				<li
 					id={anchor}
+					data-cli
 					class={cx(
 						"scroll-mt-24 target:rounded-sm target:bg-muted",
 						hash === anchor && "rounded-sm bg-muted",

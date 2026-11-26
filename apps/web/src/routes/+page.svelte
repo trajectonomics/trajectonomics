@@ -4,7 +4,7 @@ import OverviewPage from "../components/pages/OverviewPage.svelte"
 </script>
 
 <svelte:head>
-	<title>Home · Dashboard</title>
+	<title>Overview · Dashboard</title>
 </svelte:head>
 
 <OverviewPage scenario={queryParam("scenario", "")} />

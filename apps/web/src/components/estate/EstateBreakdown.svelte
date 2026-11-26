@@ -1,4 +1,5 @@
 <script lang="ts">
+import { formatDate } from "../../lib/format"
 import { type EstateFigures, shownUnder } from "../../lib/view/estate/figures"
 import type { Terms } from "../../lib/view/projection/terms"
 import { cx } from "../ui/cx"
@@ -18,7 +19,7 @@ let { figures, terms, picked, onPick }: Props = $props()
 
 <div class="relative max-w-full overflow-x-auto rounded-lg border border-border">
 	<table class="w-full min-w-max border-collapse text-sm">
-		<caption class="px-3 py-2 text-left text-sm font-medium text-muted-foreground">The estate on {figures.date}, line by line</caption>
+		<caption class="px-3 py-2 text-left text-sm font-medium text-muted-foreground">The estate on {formatDate(figures.date)}, line by line</caption>
 		<thead class="bg-card">
 			<tr>
 				<th scope="col" class="border-b border-border px-3 py-2 text-left font-medium text-muted-foreground">Line</th>

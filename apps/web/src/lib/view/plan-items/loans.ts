@@ -1,4 +1,5 @@
 import type { ScenarioFlow } from "../../contract/scenario-show"
+import { formatDate } from "../../format"
 import { isOnce } from "./flow-dates"
 import { growthText } from "./flows"
 
@@ -30,10 +31,10 @@ export function isLoan(flow: ScenarioFlow): boolean {
 
 /** The dates of a withdrawal as its rows show them: a once withdrawal has one date, "On", and no end; any other runs to the horizon when none is stated. */
 function datesOf(flow: ScenarioFlow): LoanRow[] {
-	if (isOnce(flow)) return [{ label: "On", value: flow.start }]
+	if (isOnce(flow)) return [{ label: "On", value: formatDate(flow.start) }]
 	return [
-		{ label: "Starts", value: flow.start },
-		{ label: "Ends", value: flow.end ?? "To the horizon" },
+		{ label: "Starts", value: formatDate(flow.start) },
+		{ label: "Ends", value: flow.end === undefined ? "To the horizon" : formatDate(flow.end) },
 	]
 }
 
@@ -55,7 +56,7 @@ function levelRows(flow: ScenarioFlow): LoanRow[] {
 		{ label: "Payments", value: level === undefined ? "" : `${level.payments} equal payments` },
 		{ label: "Rounding", value: level?.rounding ?? "" },
 		{ label: "How often", value: flow.frequency },
-		{ label: "Starts", value: flow.start },
+		{ label: "Starts", value: formatDate(flow.start) },
 	]
 }
 

@@ -18,20 +18,20 @@ interface Props {
 let { title, href, label, scenario, body }: Props = $props()
 </script>
 
-<!-- A card for one Scenario's Read: it names the Scenario, and says what is missing when there is none. -->
+<!-- A card for one plan's Read: it names the plan, and says what is missing when there is none. -->
 {#if scenario.status === "none"}
 	<Card {title} {href}>
-		<p class="text-sm text-muted-foreground">The Snapshot names no Scenario.</p>
+		<p class="text-sm text-muted-foreground">The Snapshot names no plan.</p>
 	</Card>
 {:else if scenario.status === "unread"}
 	<Card {title} {href}>
 		<p class="text-sm text-muted-foreground">
-			The Snapshot holds no {label} read for Scenario {scenario.name}.
+			The Snapshot holds no {label} read for plan {scenario.name}.
 		</p>
 	</Card>
 {:else}
 	<Card {title} {href} argv={scenario.read.argv}>
-		<p class="mb-3 text-sm text-muted-foreground">Scenario {scenario.name}</p>
+		<p class="mb-3 text-sm text-muted-foreground">Plan {scenario.name}</p>
 		<ReadView read={scenario.read} {label}>
 			{#snippet children(data)}
 				{@render body(data)}

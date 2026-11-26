@@ -36,6 +36,10 @@ _Avoid_: lock, guard, overlay
 The built pages of `dist/` in one file, `pack/dashboard.bin`: every file's bytes in base64 by its path, in one JSON document. The compiled `traj` embeds it so `traj dashboard` can serve the Dashboard without a checkout.
 _Avoid_: bundle, archive, assets
 
+**Scenario**:
+The CLI's name for one named plan document, and this glossary's. The Dashboard calls it a **Plan** in every word it shows; a `traj` command quoted in code keeps `scenario`, and so do the code's identifiers.
+_Avoid_: (in the Dashboard's interface) scenario
+
 **Plan**:
 The list of argv a Snapshot needs, computed from the parameters alone. Stage one reads the Scenarios, the accounts and the first transaction date; stage two reads everything else.
 _Avoid_: pipeline, workflow, job, script

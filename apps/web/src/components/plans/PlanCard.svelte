@@ -27,7 +27,7 @@ const name = $derived(card.row.name)
 	</header>
 	{#if card.notes}<PlanNotes notes={card.notes} />{/if}
 	{#if card.problem}
-		<p role="alert" class="text-sm text-destructive">{card.problem}</p>
+		<p role="alert" class="text-sm text-destructive" data-cli>{card.problem}</p>
 	{:else}
 		<PlanFacts {card} />
 		{#if card.series.length > 0}

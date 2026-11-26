@@ -51,13 +51,13 @@ describe("the navigation's routes", () => {
 		expect(new Set(ROUTES.map((route) => route.path)).size).toBe(ROUTES.length)
 	})
 
-	test("the groups are Home and Net worth, then Plan, then Optimize, then Estate, then Cash flow, then Chance of success, then Tax, then Records, then Settings", () => {
+	test("the groups are Overview and Net worth, then Plan, then Optimize, then Estate, then Cash flow, then Chance of success, then Tax, then Records, then Settings", () => {
 		expect(NAV_GROUPS.map((group) => [group.heading, group.routes.map((r) => r.label)])).toEqual([
-			[null, ["Home", "Net worth"]],
+			[null, ["Overview", "Net worth"]],
 			[
 				"Plan",
 				[
-					"Overview",
+					"Projection",
 					"Milestones",
 					"Income",
 					"Expenses",
@@ -86,7 +86,7 @@ describe("the navigation's routes", () => {
 		const plan = NAV_GROUPS.find((group) => group.heading === "Plan")
 		if (plan === undefined) throw new Error("the Plan group exists")
 		expect(routesShown(plan, true, true).map((route) => route.label)).toEqual([
-			"Overview",
+			"Projection",
 			"Milestones",
 			"Income",
 			"Expenses",
@@ -96,7 +96,7 @@ describe("the navigation's routes", () => {
 			"Reports",
 		])
 		expect(routesShown(plan, false, true).map((route) => route.label)).toEqual([
-			"Overview",
+			"Projection",
 			"Milestones",
 			"FI date",
 			"Compare",
@@ -109,7 +109,7 @@ describe("the navigation's routes", () => {
 		if (plan === undefined) throw new Error("the Plan group exists")
 		expect(routeAt("/milestones/")?.icon).toBe("milestone")
 		expect(routesShown(plan, true, false).map((route) => route.label)).toEqual([
-			"Overview",
+			"Projection",
 			"Income",
 			"Expenses",
 			"Assets and debts",

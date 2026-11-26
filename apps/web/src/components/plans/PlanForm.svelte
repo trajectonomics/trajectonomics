@@ -27,7 +27,7 @@ const shown = $derived(problem ?? editSession.error)
 >
 	{@render children()}
 	{#if shown}
-		<p role="alert" class="text-sm text-destructive">{shown}</p>
+		<p role="alert" class="text-sm text-destructive" data-cli>{shown}</p>
 	{/if}
 	<div class="flex flex-wrap gap-2">
 		<button type="submit" disabled={editSession.busy} class={BUTTON}>{submit}</button>

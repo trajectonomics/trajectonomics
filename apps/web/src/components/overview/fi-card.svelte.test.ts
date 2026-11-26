@@ -7,13 +7,13 @@ import { fi, reachableFi } from "../../lib/view/overview/projection-fixtures.tes
 import FiCard from "./FiCard.svelte"
 
 describe("FiCard", () => {
-	test("shows the month of a reachable FI date, the Scenario and a link", () => {
+	test("shows the month of a reachable FI date, the plan and a link", () => {
 		const read = okRead(["fi"], fiView(reachableFi()))
 		const { body } = render(FiCard, {
 			props: { scenario: { status: "ready", name: "base", read } },
 		})
 		expect(body).toContain("Oct 2042")
-		expect(body).toContain("Scenario base")
+		expect(body).toContain("Plan base")
 		expect(body).toContain('href="/fi/"')
 	})
 
@@ -32,16 +32,16 @@ describe("FiCard", () => {
 		})
 		expect(body).toContain("Not reachable before 31 Dec 2060")
 		expect(body).toContain("minimum buffer")
-		expect(body).toContain("Scenario retire-early")
+		expect(body).toContain("Plan retire-early")
 	})
 
-	test("says there is no Scenario, or no FI read for it", () => {
+	test("says there is no plan, or no FI read for it", () => {
 		expect(render(FiCard, { props: { scenario: { status: "none" } } }).body).toContain(
-			"names no Scenario",
+			"names no plan",
 		)
 		const unread = { status: "unread" as const, name: "base" }
 		expect(render(FiCard, { props: { scenario: unread } }).body).toContain(
-			"no FI read for Scenario base",
+			"no FI read for plan base",
 		)
 	})
 

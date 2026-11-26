@@ -42,9 +42,9 @@ function panel(
 }
 
 describe("ComparePanel", () => {
-	test("with no comparison, it says a comparison needs two Scenarios and shows the flag", () => {
+	test("with no comparison, it says a comparison needs two plans and shows the flag", () => {
 		const body = panel({}, null)
-		expect(body).toContain("A comparison needs two Scenarios")
+		expect(body).toContain("A comparison needs two plans")
 		expect(body).toContain("--compare A --compare B")
 	})
 
