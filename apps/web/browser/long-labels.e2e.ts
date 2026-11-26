@@ -6,6 +6,9 @@ for (const [name, path] of [
 	["the Expenses cards", "/expenses/"],
 	["the Routing moves", "/routing/"],
 	["the Assets payout", "/assets-and-debts/"],
+	["the Milestones page", "/milestones/"],
+	["the Projection page", "/projection/"],
+	["the Plans page", "/plans/"],
 ] as const) {
 	test(`${name} wrap an 80-character Milestone name at 360px`, async ({ page }) => {
 		await page.setViewportSize(VIEWPORT)

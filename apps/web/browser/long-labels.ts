@@ -83,7 +83,7 @@ export async function serve(page: Page, snapshot: DemoSnapshot): Promise<void> {
 
 /** The page never scrolls sideways with the long name on it. */
 export async function expectNoSidewaysScroll(page: Page): Promise<void> {
-	await expect(page.getByText(LONG).first()).toBeVisible()
+	await expect(page.getByText(LONG).filter({ visible: true }).first()).toBeVisible()
 	const fit = await measureOverflow(page, true)
 	expect(fit.tables, "tables outside a scroll box").toEqual([])
 	expect(fit.scrollWidth, "the page's scroll width").toBeLessThanOrEqual(fit.innerWidth)
