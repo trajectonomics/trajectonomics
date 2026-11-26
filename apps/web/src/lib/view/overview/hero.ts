@@ -36,7 +36,7 @@ export interface HeroView {
 }
 
 /** What the CLI's success note begins with: the one sentence that says what the chance read measured. */
-const SUCCESS_NOTE_PREFIX = "The plan holds to "
+export const SUCCESS_NOTE_PREFIX = "The plan holds to "
 
 /** The hero of a Snapshot's plan, or null when it has no plan or no FI read to answer from. */
 export function heroOf(snapshot: Snapshot, requested = ""): HeroView | null {
