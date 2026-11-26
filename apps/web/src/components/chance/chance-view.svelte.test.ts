@@ -4,6 +4,7 @@ import { render } from "svelte/server"
 import { preferences } from "../../client/preferences.svelte.js"
 import type { ProjectionChance, Read } from "../../lib/contract"
 import { chanceFixture } from "../../lib/view/chance/fixtures.test-support"
+import { insideDetails, outsideDetails } from "../../lib/view/details.test-support"
 import ChanceView from "./ChanceView.svelte"
 
 const ARGV = ["projection", "chance", "--scenario=base", "--json"]
@@ -18,12 +19,18 @@ function renderView(
 }
 
 describe("ChanceView", () => {
-	test("shows the success share as the headline, with the paths, seed and model id beside it", () => {
+	test("shows the success share as the headline, with the paths beside it and the seed and model id in Details", () => {
 		const body = renderView({ base: { argv: ARGV, ok: true, data: chanceFixture() } })
 		expect(body).toContain("87.00%")
 		expect(body).toContain("174 of 200 seeded Market paths never run out before 31 Dec 2028.")
-		expect(body).toContain("0123456789abcdef")
-		expect(body).toContain("illustrative-demo-model")
+		const outside = outsideDetails(body)
+		expect(outside).not.toContain("0123456789abcdef")
+		expect(outside).not.toContain(">Seed<")
+		expect(outside).not.toContain(">Return model<")
+		const details = insideDetails(body)
+		expect(details).toContain("0123456789abcdef")
+		expect(details).toContain(">Seed<")
+		expect(details).toContain(">Return model<")
 		expect(body).toContain("Net worth Bands by year")
 		expect(body).toContain("When the failing paths run out")
 		expect(body).toContain("Every figure is nominal.")

@@ -115,12 +115,6 @@ describe("with no session, a page is its content and nothing more", () => {
 		if (hero === null) throw new Error("the Demo has no hero")
 		const content = `<div class="space-y-4">${bodyOf(OverviewHero, { hero })}${bodyOf(OverviewGrid, { view: overviewView(DEMO, "") })}</div>`
 		const page = bodyOf(OverviewPage, { scenario: "" })
-		expect(shown(page)).toBe(
-			framed(
-				"Overview",
-				"The headline figures of your ledger. Each card names the command that produced it.",
-				content,
-			),
-		)
+		expect(shown(page)).toBe(framed("Overview", "The headline figures of your ledger.", content))
 	})
 })

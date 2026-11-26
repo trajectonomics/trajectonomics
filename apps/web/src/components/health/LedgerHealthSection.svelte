@@ -71,7 +71,7 @@ const checkColumns: Column<CheckLine>[] = [
 					</section>
 				</div>
 				<TrialBalanceCheck trialBalance={view.trialBalance} />
-				<Provenance argv={doctor.argv} />
+				<Provenance name="Ledger health" commands={[doctor.argv]} />
 			</div>
 		{/snippet}
 	</ReadView>
