@@ -1,5 +1,6 @@
 import type { Household } from "../household/model"
-import type { TaxRequest } from "./flags"
+import { exampleFlagsOf } from "./example-flag"
+import type { ReturnClaims, TaxRequest } from "./flags"
 
 /*
  * A person given a new id reads as another person (cli ADR-0075). The profile keeps what was claimed
@@ -23,9 +24,25 @@ export function departedClaimants(kept: TaxRequest, household: string | null): s
 
 /**
  * The sentence for one such id. No Return of any filing status counts the stored set, so it does not
- * say the set waits for a separate filing. A set whose claims were stated again under a person in
- * the household stays behind, so the sentence names the one write that drops it.
+ * say the set waits for a separate filing. A set whose claims were stated again under a person who
+ * has a Return stays behind, so the sentence names the one write that drops it. A separate write with
+ * Filers shows a person-keyed flag for every claim it holds, under a `<person>` placeholder: the old
+ * id may have become any person in the household, and any other status refuses the flag. The example
+ * names the filing status too, so it also runs while the stored plan is still joint, and uses the
+ * `--flag=<person>=<value>` form, which takes any id. Without an example the words are the ones a
+ * write without Filers always gave.
  */
-export function departedClaims(id: string): string {
-	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person in the household; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+export function departedClaims(
+	id: string,
+	claims: ReturnClaims | undefined,
+	separate: boolean,
+): string {
+	const example =
+		separate && claims !== undefined ? exampleFlagsOf([claims], "<person>", [], true) : undefined
+	const how =
+		example === undefined
+			? ""
+			: `, for example with "<person>=<value>" flags such as --filing-status married_separate ${example} --merge`
+	const who = example === undefined ? "a person in the household" : "a person who has a Return"
+	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for ${who}${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }

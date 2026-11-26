@@ -1,6 +1,7 @@
+import { bareHint, caveatPerson } from "./bare-hint"
 import { departedClaims } from "./departed-claims"
 import type { FilerScope } from "./filer-scope"
-import type { TaxRequest } from "./flags"
+import type { ReturnClaims, TaxRequest } from "./flags"
 import { claimsNothing } from "./kept-returns"
 
 /*
@@ -13,19 +14,17 @@ function sharedUnclaimed(amount: number): string {
 	return `${amount.toLocaleString("en-US")} baht of shared home-loan interest is stored for separate Returns, and this Return does not claim it. To state this Return's interest, use --mortgage-interest <amount> --merge; it replaces the stored mortgageInterest, which a later separate filing reads as one person's own, so state that again then.`
 }
 
-/**
- * How a Return that may claim both spouses' claims states another person's kept claims bare, and what
- * that leaves a later separate filing. The write cannot tell whether it has been followed, so the
- * first clause is conditional: the sentence stays true once the claims have been stated.
- */
-const BARE_HINT =
-	" If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, so state the holder's own claims again when switching back."
-
 /** The sentence for the claims of other people the profile keeps while no separate Return is written. */
-function claimsUnclaimed(persons: readonly string[], hint: boolean): string {
-	const names = persons.map((person) => `"${person}"`).join(" and ")
+function claimsUnclaimed(
+	persons: readonly string[],
+	claims: readonly ReturnClaims[],
+	hint: boolean,
+	person: string | undefined,
+	shared: number,
+): string {
+	const names = persons.map((name) => `"${name}"`).join(" and ")
 	const kept = `The claims stored for ${names} are kept for a separate filing, and this Return does not claim them.`
-	return hint ? kept + BARE_HINT : kept
+	return hint ? kept + bareHint(claims, person, shared) : kept
 }
 
 /** The sentence for a person whose claims a separate filing keeps and writes no Return for. */
@@ -47,15 +46,18 @@ function mayHint(status: TaxRequest["filingStatus"]): boolean {
  * claims something, read from the request: its `returns` still holds the holder's entry, which the kept
  * profile states as the flat claims. Any other write names what the kept profile holds for a separate
  * filing, where every entry of `returns` claims something and is not the flat claims' person's
- * (`keptRequest`). A departed id is left out of both branches and named once, from `departed`.
+ * (`keptRequest`). A departed id is named once, from `departed`, with the flag a separate write takes.
  */
 export function unclaimedClaims(
 	request: TaxRequest,
 	kept: TaxRequest,
 	scope: FilerScope | null,
 	departed: readonly string[],
+	holder: string | undefined,
 ): string[] {
-	const gone = departed.map(departedClaims)
+	const gone = departed.map((id) =>
+		departedClaims(id, kept.returns?.[id], scope?.kind === "separate"),
+	)
 	if (scope?.kind === "separate") {
 		const noIncome = Object.entries(request.returns ?? {})
 			.filter(
@@ -66,11 +68,22 @@ export function unclaimedClaims(
 		return [...noIncome, ...gone]
 	}
 	const shared = kept.sharedMortgageInterest ?? 0
-	const persons = Object.keys(kept.returns ?? {}).filter((id) => !departed.includes(id))
+	const keptSets = Object.entries(kept.returns ?? {}).filter(([id]) => !departed.includes(id))
 	const hint = mayHint(request.filingStatus)
+	const person = caveatPerson(kept, scope, holder)
 	return [
 		...(shared > 0 ? [sharedUnclaimed(shared)] : []),
-		...(persons.length > 0 ? [claimsUnclaimed(persons, hint)] : []),
+		...(keptSets.length > 0
+			? [
+					claimsUnclaimed(
+						keptSets.map(([id]) => id),
+						keptSets.map(([, claims]) => claims),
+						hint,
+						person,
+						shared,
+					),
+				]
+			: []),
 		...gone,
 	]
 }
