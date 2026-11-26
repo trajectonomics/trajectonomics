@@ -84,6 +84,8 @@ describe("the allowance reads of the Plan", () => {
 	test.each([
 		["no allowance chosen", { ...INPUTS, labels: [] }],
 		["a label the Levy does not read", { ...INPUTS, labels: ["allowance.other"] }],
+		// `readForFilers` adds the Filer's suffix after this schema takes the bare labels, so a suffixed one is refused.
+		["a label with a Filer suffix", { ...INPUTS, labels: ["allowance.retirement.rmf@me"] }],
 		["an allowance twice", { ...INPUTS, labels: [INPUTS.labels[0] ?? "", INPUTS.labels[0] ?? ""] }],
 		["a step that is not a decimal", { ...INPUTS, step: "1,000" }],
 		["a least saving over 100", { ...INPUTS, minSaving: "100.5" }],

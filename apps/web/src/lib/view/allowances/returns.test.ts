@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
-import type { AllowanceRow, ProjectionAllowances } from "../../contract"
+import type { AllowanceRow, ProjectionAllowances, ScenarioDocument } from "../../contract"
 import { GOLDEN_ALLOWANCES } from "./fixtures.test-support"
-import { filerOfRow, isFilerRead, returnsView } from "./returns"
+import { filerOfRow, isFilerRead, returnsView, skippedReadReason } from "./returns"
 import { allowancesView } from "./years"
 
 /** One Filer's Returns from the golden, its Levy and each label suffixed as a separate filing writes them. */
@@ -96,5 +96,38 @@ describe("the Returns a read states", () => {
 
 	test("the returns of no year build no section", () => {
 		expect(returnsView([], "2026-01-01")).toEqual([])
+	})
+})
+
+describe("a Filer plan with no Return to read", () => {
+	/** A plan whose Flow labels and Levy tallies are the given ones. */
+	function documentOf(flow: string, tally: string): ScenarioDocument {
+		return {
+			currency: "THB",
+			accounts: [],
+			flows: [
+				{ id: "salary", kind: "income", frequency: "annual", start: "2026-01-01", label: flow },
+			],
+			levies: [{ id: "th-2026-pit", measures: [{ op: "tally", label: tally }] }],
+		} as unknown as ScenarioDocument
+	}
+
+	test("a Flow's suffix alone names no Return, and the page says why there is none", () => {
+		const why = skippedReadReason(
+			documentOf("income.section40_1@me", "income.section40_1"),
+			undefined,
+		)
+		expect(why).toContain("no Levy of it tallies a Filer's label")
+		expect(why).toContain("traj scenario tax <name> --from-stored")
+	})
+
+	test("a Levy that tallies a Filer's label is read, and a plan without Filers says nothing", () => {
+		expect(
+			skippedReadReason(documentOf("income.section40_1@me", "income.section40_1@me"), undefined),
+		).toBeNull()
+		expect(
+			skippedReadReason(documentOf("income.section40_1", "income.section40_1"), undefined),
+		).toBeNull()
+		expect(skippedReadReason(null, undefined)).toBeNull()
 	})
 })

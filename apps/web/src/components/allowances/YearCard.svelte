@@ -14,15 +14,22 @@ interface Props {
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
 	/** The household's people, so a joint Return names each spouse's allowances. */
 	people?: PersonNames
+	/** The Return this card sits in, when the page shows one section per Return: it names the region and steps the heading down. */
+	region?: string
 }
 
-let { year, currency, plan, people = NO_PEOPLE }: Props = $props()
+let { year, currency, plan, people = NO_PEOPLE, region }: Props = $props()
+const label = $derived(region === undefined ? "This tax year" : `${region}: this tax year`)
 </script>
 
 <!-- The tax year the As-of falls in: the tax due now, the tax due with every suggestion, and the saving. -->
-<section aria-label="This tax year" class="space-y-4 rounded-lg border border-border bg-card p-4 sm:p-5">
+<section aria-label={label} class="space-y-4 rounded-lg border border-border bg-card p-4 sm:p-5">
 	<header>
-		<h2 class="text-base font-semibold">This tax year</h2>
+		{#if region === undefined}
+			<h2 class="text-base font-semibold">This tax year</h2>
+		{:else}
+			<h3 class="text-base font-semibold">This tax year</h3>
+		{/if}
 		<p class="text-sm text-muted-foreground">{year.levy}, {year.period}, settles {year.settles}</p>
 	</header>
 	<div class="grid gap-4 sm:grid-cols-3">

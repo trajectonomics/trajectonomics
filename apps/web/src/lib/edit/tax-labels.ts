@@ -70,3 +70,11 @@ export function bareLabelOf(label: string): string {
 	const known = [...INCOME_LABEL_IDS, ...KNOWN_LABELS] as readonly string[]
 	return known.includes(base) ? base : label
 }
+
+/** The Filer a tax label names: its `@<filer>` suffix, or null for a bare label and the household's `@shared`. */
+export function filerOfLabel(label: string): string | null {
+	const bare = bareLabelOf(label)
+	if (bare === label) return null
+	const filer = label.slice(bare.length + 1)
+	return filer === "" || filer === "shared" ? null : filer
+}

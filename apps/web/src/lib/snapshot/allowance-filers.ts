@@ -4,29 +4,9 @@
  * keeps one Levy, so its Filers come from that Levy's own tallies. Pure.
  */
 import type { ProjectionRun, ScenarioDocument } from "../contract"
-import { bareLabelOf } from "../edit/tax-labels"
+import { filerOfLabel } from "../edit/tax-labels"
+import { tallyLabels } from "./allowance-params"
 import type { PlannedRead } from "./planned"
-
-/** The Filer a suffixed tax label names; null for a bare label and for the household's `@shared`. */
-function filerOfLabel(label: string): string | null {
-	const bare = bareLabelOf(label)
-	if (bare === label) return null
-	const filer = label.slice(bare.length + 1)
-	return filer === "" || filer === "shared" ? null : filer
-}
-
-/** The labels a plan's Levies tally: the Returns' own classes, which name each Filer (cli ADR-0075). */
-function levyLabels(plan: ScenarioDocument): string[] {
-	return (plan.levies ?? []).flatMap((levy) => {
-		const measures = (levy as { measures?: unknown }).measures
-		if (!Array.isArray(measures)) return []
-		return measures.flatMap((measure) => {
-			if (measure === null || typeof measure !== "object") return []
-			const { op, label } = measure as { op?: unknown; label?: unknown }
-			return op === "tally" && typeof label === "string" ? [label] : []
-		})
-	})
-}
 
 /**
  * The Filers whose Returns the read names, in the CLI's order: the projection's own, then those the plan's
@@ -38,7 +18,7 @@ export function filersOf(plan: ScenarioDocument, projection: ProjectionRun | und
 		if (filer !== null && !found.includes(filer)) found.push(filer)
 	}
 	for (const year of projection?.taxYears ?? []) add(year.filer ?? null)
-	for (const label of levyLabels(plan)) add(filerOfLabel(label))
+	for (const label of (plan.levies ?? []).flatMap(tallyLabels)) add(filerOfLabel(label))
 	return found
 }
 

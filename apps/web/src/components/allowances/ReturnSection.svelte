@@ -21,6 +21,6 @@ const title = $derived(one.filer === null ? "Your joint Return" : personText(peo
 <!-- One Return: its current tax year, then its later years, each with that Return's own ceilings and headroom. -->
 <section aria-label={title} class="space-y-4">
 	<h2 class="text-lg font-semibold">{title}</h2>
-	{#if one.current}<YearCard year={one.current} {currency} {plan} {people} />{/if}
-	{#if one.later.length > 0}<LaterYears years={one.later} {currency} {plan} {people} />{/if}
+	{#if one.current}<YearCard year={one.current} {currency} {plan} {people} region={title} />{/if}
+	{#if one.later.length > 0}<LaterYears years={one.later} {currency} {plan} {people} region={title} />{/if}
 </section>

@@ -3,8 +3,16 @@
  * Filers whose rows still name each spouse. A plan without Filers names none, and the page reads it as it always has.
  * Pure: the years are grouped in the CLI's order and no figure changes.
  */
-import type { AllowanceRow, ProjectionAllowances } from "../../contract"
-import { bareLabelOf } from "../../edit/tax-labels"
+import type {
+	AllowanceRow,
+	ProjectionAllowances,
+	ProjectionRun,
+	Read,
+	ScenarioDocument,
+} from "../../contract"
+import { filerOfLabel } from "../../edit/tax-labels"
+import { filersOf } from "../../snapshot/allowance-filers"
+import { isFilerPlan } from "../../snapshot/allowance-params"
 import type { YearView } from "./years"
 
 /** One Return: the Filer whose Return it is, or null for one Return over no Filer, and its tax years. */
@@ -19,10 +27,24 @@ export interface ReturnView {
 /** The Filer a row names: the CLI's own field, else the suffix its label carries; null for neither. */
 export function filerOfRow(row: AllowanceRow): string | null {
 	if (row.filer !== undefined) return row.filer
-	const bare = bareLabelOf(row.label)
-	if (bare === row.label) return null
-	const filer = row.label.slice(bare.length + 1)
-	return filer === "" || filer === "shared" ? null : filer
+	return filerOfLabel(row.label)
+}
+
+/** What a Filer plan with no Return to read says: its labels name a Filer, but no Levy of it tallies one. */
+const NO_FILER_LEVY =
+	"This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run `traj scenario tax <name> --from-stored` to write each label with its Filer suffix."
+
+/**
+ * Why a Filer plan has no allowance read, or null when it has one: the read names no Filer, so `traj` would
+ * refuse the suffixed labels the page would have to send. A plan without Filers says nothing.
+ */
+export function skippedReadReason(
+	document: ScenarioDocument | null,
+	projection: Read<ProjectionRun> | undefined,
+): string | null {
+	if (document === null || !isFilerPlan(document)) return null
+	const data = projection?.ok === true ? projection.data : undefined
+	return filersOf(document, data).length > 0 ? null : NO_FILER_LEVY
 }
 
 /** Whether the read names any Filer, so the page groups its Returns; a plan without Filers groups nothing. */
