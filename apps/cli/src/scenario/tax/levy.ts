@@ -74,7 +74,8 @@ export function withTaxLevy(
 	if (isAppError(built)) return built
 	const next = decorated(stated, scope)
 	const others = records(next["levies"]).filter((levy) => !isTaxLevyId(levy["id"]))
-	const kept = keptRequest(request, scope, holderIdOf(household))
+	const holder = holderIdOf(household)
+	const kept = keptRequest(request, scope, holder)
 	const departed = departedClaimants(kept, household)
 	return {
 		document: { ...next, levies: [...others, ...built] },
@@ -82,6 +83,6 @@ export function withTaxLevy(
 		levies: built.map((levy) => levy["id"] as string),
 		...(scope === null ? {} : { filers: scope.filers }),
 		separateLoans: assumesSeparateLoans(request, scope, stated),
-		unclaimed: unclaimedClaims(request, kept, scope, departed),
+		unclaimed: unclaimedClaims(request, kept, scope, departed, holder),
 	}
 }
