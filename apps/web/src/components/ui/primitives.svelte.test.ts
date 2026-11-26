@@ -8,10 +8,20 @@ import SegmentedControl from "./SegmentedControl.svelte"
 import type { Column } from "./table-types"
 
 describe("Provenance, EmptyState and SegmentedControl", () => {
-	test("shows the command under 'Details'", () => {
-		const { body } = render(Provenance, { props: { argv: ["doctor", "--json"] } })
+	test("shows each command under 'Details', named for its result", () => {
+		const { body } = render(Provenance, {
+			props: {
+				name: "Doctor",
+				commands: [
+					["doctor", "--json"],
+					["accounts", "--json"],
+				],
+			},
+		})
 		expect(body).toContain(">Details</summary>")
+		expect(body).toContain('aria-label="Details of Doctor"')
 		expect(body).toContain("traj doctor --json")
+		expect(body).toContain("traj accounts --json")
 	})
 
 	test("renders an empty state with its title", () => {

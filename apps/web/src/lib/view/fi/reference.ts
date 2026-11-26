@@ -18,8 +18,8 @@ export interface ReferenceView {
 	readonly terms: string
 	readonly met: string
 	readonly partial: string
-	/** The CLI's multiple in words, with its own reference value: "14.5× a year of spending (reference: 25×)". */
-	readonly multipleInWords: string | null
+	/** The CLI's multiple in words, with its own reference value, always stated: "14.5× a year of spending (reference: 25×)", or "No multiple (reference: 25×)". */
+	readonly multipleInWords: string
 	/** The same multiple as the CLI states it: "145376 basis points, where 10,000 is one times". */
 	readonly multipleRaw: string | null
 	/** The figure the multiple divides, kept for the result's Details. */
@@ -66,9 +66,12 @@ export function referenceOf(reference: Reference): ReferenceView {
 	}
 }
 
-function multipleInWords(reference: Reference): string | null {
-	if (reference.multipleBps === null) return null
-	return `${formatMultiple(reference.multipleBps)} a year of spending (reference: ${reference.multiplier}×)`
+function multipleInWords(reference: Reference): string {
+	const stated = `reference: ${reference.multiplier}×`
+	if (reference.multipleBps === null) return `No multiple (${stated})`
+	// The engine does not annualise a partial window, so its expenses are the window's, not a year's.
+	const spending = reference.partial ? "the spending in the window" : "a year of spending"
+	return `${formatMultiple(reference.multipleBps)} ${spending} (${stated})`
 }
 
 function multipleRaw(bps: number | null): string | null {

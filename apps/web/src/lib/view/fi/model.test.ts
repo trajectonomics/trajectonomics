@@ -78,6 +78,19 @@ describe("fiModelOf: the reachable branch", () => {
 		expect(model.reference.terms).toBe("Real money")
 	})
 
+	test("drops 'a year of' from the multiple when the window is partial", () => {
+		const reference = { ...REFERENCE, partial: true }
+		const model = fiModelOf(
+			fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }),
+			NO_PEOPLE,
+		)
+		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
+		expect(model.reference.multipleInWords).toBe(
+			"20.0× the spending in the window (reference: 25×)",
+		)
+		expect(model.reference.multipleInWords).not.toContain("a year of")
+	})
+
 	test("lists the reference's money figures as the CLI states them, with their labels", () => {
 		const model = fiModelOf(fiFixture(REACHABLE), NO_PEOPLE)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
@@ -96,14 +109,14 @@ describe("fiModelOf: the reachable branch", () => {
 		expect(model.reference.numerator).toBe("1000000.00")
 	})
 
-	test("has no multiple when the CLI states none", () => {
+	test("has no multiple when the CLI states none, and still states the reference", () => {
 		const reference = { ...REFERENCE, multipleBps: null }
 		const model = fiModelOf(
 			fiFixture({ reachable: true, fiDate: REFERENCE.date, reference }),
 			NO_PEOPLE,
 		)
 		if (model.kind !== "reachable") throw new Error("expected a reachable answer")
-		expect(model.reference.multipleInWords).toBeNull()
+		expect(model.reference.multipleInWords).toBe("No multiple (reference: 25×)")
 		expect(model.reference.multipleRaw).toBeNull()
 	})
 })

@@ -40,7 +40,7 @@ const sidesWithHashes = $derived([
 	<CompareChart state={chart} {terms} {onTerms} />
 	<CompareFigures {rows} currency={data.currency} {headers} />
 	<CompareNotes {data} />
-	<Provenance {argv}>
+	<Provenance name="Comparison" commands={[argv]}>
 		{#snippet details()}
 			<dl class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
 				{#each sidesWithHashes as side (side.letter)}

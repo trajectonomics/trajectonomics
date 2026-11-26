@@ -75,3 +75,20 @@ for (const theme of THEMES) {
 		})
 	}
 }
+
+test("a closed Details prints its contents, so the paper keeps the commands and the hashes", async ({
+	page,
+}) => {
+	await openDemo(page, "/projection/", { theme: "light" })
+	await page.emulateMedia({ media: "print" })
+	const details = page.locator("details").first()
+	await expect(details.locator("summary")).toHaveText("Details")
+	const content = await details.evaluate(
+		(element) => getComputedStyle(element, "::details-content").contentVisibility,
+	)
+	expect(content, "a closed Details' content on paper").toBe("visible")
+	const command = details.locator("pre").first()
+	expect(
+		await command.evaluate((element) => element.getBoundingClientRect().height),
+	).toBeGreaterThan(0)
+})

@@ -14,9 +14,10 @@ function renderFi(fi: Fi): string {
 }
 
 describe("FiResult: reachable", () => {
-	test("shows the FI month as the main figure, under the label Survival method", () => {
+	test("shows the FI month as the main figure, under the label FI date", () => {
 		const body = renderFi(fiFixture(REACHABLE))
-		expect(body).toContain("Survival method")
+		expect(body).toContain(">FI date<")
+		expect(body).not.toContain("Survival method")
 		expect(body).toContain("Mar 2041")
 		expect(body).toContain("The earliest month earned income could stop: 1 Mar 2041")
 	})

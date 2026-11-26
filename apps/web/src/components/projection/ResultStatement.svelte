@@ -9,6 +9,8 @@ import NoteList from "./NoteList.svelte"
 import OverrideList from "./OverrideList.svelte"
 
 interface Props {
+	/** The result this statement belongs to, which names its disclosure for a screen reader. */
+	name: string
 	/** The echo fields a result states at its root: the As-of, engine, Scenario, Overrides and notes. */
 	shape: ProjectionShape
 	/** The argv of the Read the result came from. */
@@ -18,7 +20,7 @@ interface Props {
 }
 
 /** What a result says about itself: its tax status, its echo, its Overrides and notes, and its Details. */
-let { shape, argv, children }: Props = $props()
+let { name, shape, argv, children }: Props = $props()
 const statement = $derived(statementOf(shape))
 const headingId = $props.id()
 </script>
@@ -36,7 +38,7 @@ const headingId = $props.id()
 	</dl>
 	<OverrideList overrides={statement.overrides} />
 	<NoteList notes={statement.notes} scenario={statement.scenario} />
-	<Provenance {argv}>
+	<Provenance {name} commands={[argv]}>
 		{#snippet details()}
 			<dl class="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
 				{#each statement.hashes as hash (hash.label)}

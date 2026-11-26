@@ -27,7 +27,7 @@ const reference = $derived(model.kind === "reachable" ? model.reference : null)
 	{:else}
 		<FiUnreachable {model} currency={fi.currency} />
 	{/if}
-	<ResultStatement shape={fi} {argv}>
+	<ResultStatement name="FI" shape={fi} {argv}>
 		{#snippet children()}
 			<Fact label="Method">{fi.definition.method}</Fact>
 			<Fact label="Definition version">{fi.definition.definitionVersion}</Fact>

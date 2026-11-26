@@ -74,6 +74,18 @@
 		white-space: pre-wrap;
 	}
 
+	/*
+	 * A closed Details still prints what it holds, so a printed page keeps its commands and hashes. The
+	 * `::details-content` rule is what current Chromium needs; the `display` rule is the older fallback.
+	 */
+	details::details-content {
+		content-visibility: visible;
+	}
+
+	details > :not(summary) {
+		display: block;
+	}
+
 	table {
 		width: 100%;
 		min-width: 0;

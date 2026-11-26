@@ -8,7 +8,7 @@ import { setTestUrl } from "../../scripts/svelte/app-stub"
 import { snapshotLoader } from "../client/browser"
 import { replaceSnapshot } from "../client/snapshot.svelte"
 import { useSessionHooks } from "../client/what-if.test-support"
-import { outsideDetails } from "../lib/view/details.test-support"
+import { detailsPerSection, outsideDetails } from "../lib/view/details.test-support"
 import { LOADING } from "../lib/view/state"
 import { DEMO } from "../lib/view/what-if/fixtures.test-support"
 
@@ -54,12 +54,22 @@ describe("every page of the Demo keeps its provenance behind Details", () => {
 		test(`${page.path} shows no hash, definition version or basis-point figure outside Details`, async () => {
 			setTestUrl(`http://127.0.0.1${page.path}?demo=1`)
 			const module = (await import(pathToFileURL(page.file).href)) as { default: Component }
-			const outside = outsideDetails(render(module.default).body)
+			const body = render(module.default).body
+			const outside = outsideDetails(body)
 			for (const hash of HASHES) {
 				expect(outside, `${page.path} shows the hash ${hash}`).not.toContain(hash)
 			}
 			expect(outside, `${page.path} names a definition version`).not.toContain("Definition version")
 			expect(outside, `${page.path} states a basis-point figure`).not.toContain("basis points")
+		})
+
+		test(`${page.path} shows at most one Details in each of its sections`, async () => {
+			setTestUrl(`http://127.0.0.1${page.path}?demo=1`)
+			const module = (await import(pathToFileURL(page.file).href)) as { default: Component }
+			const crowded = detailsPerSection(render(module.default).body).filter(
+				(section) => section.count > 1,
+			)
+			expect(crowded, `${page.path} shows more than one Details in a section`).toEqual([])
 		})
 	}
 
@@ -68,5 +78,29 @@ describe("every page of the Demo keeps its provenance behind Details", () => {
 		expect(paths).toContain("/")
 		expect(paths).toContain("/fi/")
 		expect(paths).toContain("/compare/")
+	})
+})
+
+describe("detailsPerSection", () => {
+	test("counts the old Ledger markup as two Details in one section", () => {
+		const old = [
+			'<section aria-labelledby="accounts"><h2 id="accounts">Accounts and balances</h2>',
+			"<details><summary>Details</summary><pre>traj accounts --json</pre></details>",
+			"<details><summary>Details</summary><pre>traj balance --json</pre></details></section>",
+		].join("")
+		expect(detailsPerSection(old)).toEqual([{ label: "Accounts and balances", count: 2 }])
+	})
+
+	test("counts a card's Details on the card, not on the page that holds it", () => {
+		const nested = [
+			'<section aria-labelledby="page-title"><h1 id="page-title">Overview</h1>',
+			'<section class="card"><h2>FI date</h2>',
+			"<details><summary>Details</summary><pre>traj fi --json</pre></details></section>",
+			"</section>",
+		].join("")
+		expect(detailsPerSection(nested)).toEqual([
+			{ label: "Overview", count: 0 },
+			{ label: "FI date", count: 1 },
+		])
 	})
 })

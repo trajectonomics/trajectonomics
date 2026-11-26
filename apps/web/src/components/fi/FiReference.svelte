@@ -22,9 +22,7 @@ const headingId = $props.id()
 		The survival date above decides financial independence. The rule of thumb is shown for
 		comparison only, and it never moves that date.
 	</p>
-	{#if reference.multipleInWords}
-		<p class="text-lg font-medium">{reference.multipleInWords}</p>
-	{/if}
+	<p class="text-lg font-medium">{reference.multipleInWords}</p>
 	<dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
 		<Fact label="Measured at">{reference.date}</Fact>
 		<Fact label="Basis">{reference.basis}</Fact>

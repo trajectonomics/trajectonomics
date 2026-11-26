@@ -27,6 +27,24 @@ for (const theme of THEMES) {
 	}
 }
 
+// Opening every Details on Home must not widen a phone: a closed disclosure holds a long command, and a
+// card without `min-w-0` stretched its grid column and the page (#672).
+test("Home stays 360px wide with every Details open", async ({ page }) => {
+	await page.setViewportSize({ width: WIDTHS_PX[0], height: HEIGHT_PX })
+	await openDemo(page, "/", { theme: "light" })
+	const summaries = page.locator("details > summary")
+	const count = await summaries.count()
+	expect(count, "Details disclosures on Home").toBeGreaterThan(0)
+	for (let index = 0; index < count; index++) {
+		await summaries.nth(index).click()
+		const fit = await measureOverflow(page, true)
+		expect(
+			fit.scrollWidth,
+			`the page's scroll width with Details ${index + 1} of ${count} open`,
+		).toBeLessThanOrEqual(fit.innerWidth)
+	}
+})
+
 // A scroll box around a table holds the screen-reader-only labels in its cells (#352). Only a phone shows it.
 // Hiding amounts masks each figure with a label that is for a screen reader, so the second pass runs the
 // pages' own labels as well as the synthetic one.
