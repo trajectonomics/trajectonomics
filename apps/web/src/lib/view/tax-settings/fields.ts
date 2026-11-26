@@ -59,7 +59,7 @@ export const AMOUNT_FIELDS: readonly TaxField[] = [
 		key: "sharedMortgageInterest",
 		kind: "amount",
 		label: "Shared home-loan interest",
-		hint: "Interest on one loan borrowed together; each separate Return claims half",
+		hint: "Interest on one loan borrowed together; half in a year both have income, otherwise the Return with income claims it all",
 	},
 	{
 		key: "donation2x",

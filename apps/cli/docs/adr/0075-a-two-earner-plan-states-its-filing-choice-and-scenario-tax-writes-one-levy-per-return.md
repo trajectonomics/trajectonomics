@@ -261,16 +261,13 @@ This is the follow-up the shared home-loan ceiling left above.
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the
   note is added as before, and now names the flag.
 - **The Dashboard** shows the stored `sharedMortgageInterest` in the separate filing's claims, beside
-  the Home card's own home-loan interest, and its tax profile form sets and clears it on a separate
-  filing as `--mortgage-interest shared=<amount>` (an emptied or all-zero field is `shared=0`). A
-  whole save fills the stored value in, so leaving it alone keeps it, and says when it would drop it.
-  Where no Return claims the value (another filing status, or a separate profile whose projection
-  names no Filer) the Home card says it is kept and not claimed by this Return, and no `shared=`
-  field is offered. (#618)
-- **Known limit: the one-earner rule is applied once per write, not per projection year.** Who is a
-  Filer comes from the whole plan, and each Levy freezes its share. If the partner's salary ends in
-  2027 and they stay a Filer, the holder keeps claiming only their half in later years, although only
-  the holder has income then, so the tax is overstated. Follow-up: trajectonomics/trajectonomics#619.
+  the Home card's own home-loan interest. Its tax profile form offers
+  `--mortgage-interest shared=<amount>` (an emptied or all-zero field is `shared=0`) whenever the draft
+  files separately and the household names a partner and Owners, which is what `traj` reads the flag
+  for. A whole save fills a stored value in whatever the profile's status, so a change from joint to
+  separate keeps it, and the form says when the save would drop it. The Home card marks the value kept
+  and not claimed by this Return when the stored status is not separate, or when no Levy id names a
+  Filer (`th-2026-pit@<filer>`), because no Return claims it then. (#618)
 
 ## Amended (2026-11-26): claims a write keeps and does not claim have their own field (#627)
 
@@ -307,3 +304,56 @@ the Return used the home-loan ceiling.
   it no more than a joint one does. The sentence says a `--tax` write drops the set, so it stays right
   after the claims are stated again under a person in the household.
 - The stored profile, the Levies and the money are unchanged.
+
+## Amended (2026-11-26): the one-earner rule applies in every projection year (#619)
+
+The one-earner rule this ADR stated at the write is now applied period by period, so the shared
+interest is right in every year of the Projection, not only in the first.
+
+- **The rule.** Each Settlement period is one tax year. A separate Return whose profile states
+  `sharedMortgageInterest` emits one mortgage-interest Measure instead of a fixed claim. In a period
+  where this Return has no income it claims nothing of the loan; where the other Filer also has
+  income it claims its stored share; where the other Filer has none it claims the whole loan; and
+  each claim is capped with this Return's own interest at the 100,000 baht every Return has. A
+  Filer's income is the same view tax-core gives that Filer under `married_separate`: their own
+  gross income labels plus half of `@shared`, so shared income alone keeps both Returns in the
+  split.
+- **What the write still computes.** The two shares and the odd satang (to the holder) are still
+  made once, at the write, and stored as each Levy's both-earners claim; tax-core divides nothing.
+  The profile's `sharedMortgage` is an emit-time input: the Levy keeps no profile, and the emitted
+  Measures read the other Filer's income labels while its `pick` Measures decide the period's
+  claim. A plan that has no other Filer (a sole Filer, or a plan without Filers) keeps the fixed
+  claim it wrote before.
+- **The consequence for a mid-period start.** A shared-loan Levy tallies the other Filer's income
+  labels so it can see that income. `--carry-in` for a period a shared-loan separate plan starts
+  inside states 51 classes per Levy: 29 for the Filer and the 22 `@shared` income classes. The CLI
+  reads the other Filer's 22 income classes from that Filer's own record and fills them in, so an
+  ordinary file with one record per Levy, each stating only its own Filer's income, needs no change.
+  It also reconciles the 22 `@shared` classes between the pair, because tax-core decides the other
+  Filer's income from this Levy's shared tally: a stated class fills a record that leaves it out,
+  and two different claims are refused. A `"rest": "0.00"` is a claim of zero, so a rest that
+  disagrees with the other record is refused too; a record that leaves the other Return's classes or
+  a shared class out needs no `rest`. Each `@shared` class must still be stated by at least one
+  record of the pair, or covered by a `rest`: a class neither names is refused, so forgotten shared
+  income never reads as none. The CLI's own scope record, which stands for a period it does not
+  recompute (ADR-0032), says nothing about either income: a record whose pair has only a scope
+  record must state the other Filer's and the shared income itself. The CLI refuses a record that
+  states those classes differently from the other Return's record, and one that leaves them out or
+  to `"rest": "0.00"` while the other Return has no record of its own for the period. The CLI finds
+  the other Filer from the labels the emitted Measures read, because the stored Levy keeps no
+  `sharedMortgage` field.
+- **Assumption: what counts as income.** A Filer has income when any gross income label tallies a
+  positive amount, including Section 40(4) income elected final and left off the Return. This is the
+  conservative reading of s.57 sexies paragraph 2 and never understates the tax; confirmation from
+  the Revenue Department is still open.
+- **Hand check, in the projection tests.** Salaries of 1,000,000 and 500,000, separate filing, a
+  60,000 loan, and the partner's salary ends in 2027. In 2026 and 2027 the holder claims 30,000 with
+  its own interest, so allowances are 60,000 + 30,000 = 90,000, taxable 810,000 and tax 77,000. From
+  2028 only the holder earns, so it claims all 60,000: allowances 120,000, taxable 780,000 and tax
+  71,000, not 77,000. The partner owes 8,500 in 2026 and 2027 and nothing later. A Projection that
+  starts inside 2026 with a Carry-in stating the same 1,000,000 and 500,000 owes the same 77,000 and
+  8,500; with the partner's salary ended before the year, the holder claims the whole loan and owes
+  71,000 while the partner owes 0.
+- **Unchanged.** Two earners in every year keep the half split and the same tax. A plan without
+  Filers keeps the fixed claim it wrote before, and its `scenario tax` and projection output are
+  byte-identical to the build before this amendment.

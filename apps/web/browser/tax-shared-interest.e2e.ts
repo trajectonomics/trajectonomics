@@ -45,7 +45,9 @@ for (const width of [360, 1280] as const) {
 		await dialog.getByRole("button", { name: "Save", exact: true }).click()
 		await expect(dialog).toBeHidden({ timeout: SLOW })
 		await expect(
-			page.getByText("Shared home-loan interest, split half to each Return:"),
+			page.getByText(
+				"Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all:",
+			),
 		).toBeVisible({ timeout: SLOW })
 		await expect(page.locator("main")).toContainText("60,000 THB")
 		await fits(page)
@@ -58,7 +60,9 @@ for (const width of [360, 1280] as const) {
 		await dialog.getByRole("button", { name: "Save", exact: true }).click()
 		await expect(dialog).toBeHidden({ timeout: SLOW })
 		await expect(
-			page.getByText("Shared home-loan interest, split half to each Return:"),
+			page.getByText(
+				"Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all:",
+			),
 		).toBeVisible({ timeout: SLOW })
 		await expect(page.locator("main")).toContainText("60,000 THB")
 		await fits(page)
@@ -81,7 +85,9 @@ for (const width of [360, 1280] as const) {
 		await dialog.getByRole("button", { name: "Save", exact: true }).click()
 		await expect(dialog).toBeHidden({ timeout: SLOW })
 		await expect(
-			page.getByText("Shared home-loan interest, split half to each Return:"),
+			page.getByText(
+				"Shared home-loan interest, half in a year both have income; otherwise the Return with income claims it all:",
+			),
 		).toHaveCount(0, { timeout: SLOW })
 		await fits(page)
 	})

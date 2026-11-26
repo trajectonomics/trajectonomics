@@ -33,7 +33,7 @@ const HOUSEHOLD: HouseholdDocument = {
 		{ id: "partner", role: "partner", born: "1992-02", lifeExpectancy: 88 },
 	],
 	anchors: [],
-	owners: [],
+	owners: [{ path: "flows.salary", person: "me" }],
 }
 
 /** The same two people after the household swapped holder and partner, before `--from-stored` ran. */
@@ -45,7 +45,11 @@ const SWAPPED: HouseholdDocument = {
 	],
 }
 
-function show(profile: TaxProfile, household: HouseholdDocument | null): ScenarioShow["scenario"] {
+function show(
+	profile: TaxProfile,
+	household: HouseholdDocument | null,
+	levies: readonly unknown[] = [{ id: "th-2026-pit" }],
+): ScenarioShow["scenario"] {
 	return {
 		id: "id",
 		name: "base",
@@ -54,7 +58,7 @@ function show(profile: TaxProfile, household: HouseholdDocument | null): Scenari
 		version: 1,
 		createdAt: "2026-11-01T00:00:00Z",
 		updatedAt: "2026-11-01T00:00:00Z",
-		document: planDocument(),
+		document: { ...planDocument(), levies: [...levies] },
 		household,
 		tax: profile,
 		taxed: true,
@@ -71,9 +75,10 @@ const card = (
 	profile: TaxProfile,
 	household: HouseholdDocument | null,
 	years: readonly TaxYear[] = [],
+	levies: readonly unknown[] = [{ id: "th-2026-pit" }],
 ): string =>
 	render(TaxProfileCard, {
-		props: { name: "base", show: show(profile, household), editable: true, years },
+		props: { name: "base", show: show(profile, household, levies), editable: true, years },
 	}).body
 
 const drawer = (profile: TaxProfile, sharedClaimable = true): string =>
@@ -105,18 +110,28 @@ describe("the shared home-loan interest", () => {
 		expect(drawer(JOINT)).not.toContain('id="tax-sharedMortgageInterest"')
 	})
 
-	test("the form offers no field when no Return of the plan claims the shared interest", () => {
+	test("the form offers no field when the household has no partner or Owners", () => {
 		expect(drawer(SEPARATE, false)).not.toContain('id="tax-sharedMortgageInterest"')
 	})
 
 	test("the Home card says a stored value a Return does not claim is kept and not claimed", () => {
 		const joint = { ...JOINT, sharedMortgageInterest: 60000 }
-		expect(card(joint, HOUSEHOLD, FILERS)).toContain(
+		// A joint filing writes one Levy without a Filer, so no Return claims it, whatever the projection says.
+		expect(card(joint, HOUSEHOLD, FILERS, [{ id: "th-2026-pit" }])).toContain(
 			"60,000 THB (kept, not claimed by this Return)",
 		)
-		expect(card(SEPARATE, HOUSEHOLD)).toContain("60,000 THB (kept, not claimed by this Return)")
-		expect(card(SEPARATE, HOUSEHOLD, FILERS)).toContain("60,000 THB")
-		expect(card(SEPARATE, HOUSEHOLD, FILERS)).not.toContain("kept, not claimed")
+		// A separate profile whose document has no Levy id naming a Filer claims none either.
+		expect(card(SEPARATE, HOUSEHOLD, FILERS, [{ id: "th-2026-pit" }])).toContain(
+			"60,000 THB (kept, not claimed by this Return)",
+		)
+		// A separate Return's Levy names its Filer (`th-2026-pit@me`), and the projection is not what decides it.
+		expect(card(SEPARATE, HOUSEHOLD, [], [{ id: "th-2026-pit@me" }])).toContain("60,000 THB")
+		expect(card(SEPARATE, HOUSEHOLD, [], [{ id: "th-2026-pit@me" }])).not.toContain(
+			"kept, not claimed",
+		)
+		expect(card(SEPARATE, HOUSEHOLD, FILERS, [{ id: "th-2026-pit@me" }])).not.toContain(
+			"kept, not claimed",
+		)
 	})
 
 	test("the Home card has no shared row on a joint plan that stores none", () => {

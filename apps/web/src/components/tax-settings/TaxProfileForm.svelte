@@ -2,7 +2,7 @@
 import { editSession } from "../../client/edit.svelte.js"
 import type { TaxProfile } from "../../lib/contract"
 import { TAX_FLAG_KEYS, type TaxFlags } from "../../lib/edit/tax-flags"
-import { draftOf, wholeDraftOf } from "../../lib/view/tax-settings/draft"
+import { draftOf, keepsStoredShared, wholeDraftOf } from "../../lib/view/tax-settings/draft"
 import { sharedDropWarning } from "../../lib/view/tax-settings/flags"
 import { GROUPS, type GroupKey } from "../../lib/view/tax-settings/groups"
 import { taxEdit } from "../../lib/view/tax-settings/profile-edit"
@@ -21,6 +21,7 @@ interface Props {
 	group?: GroupKey | null
 	/** The income Flows with no tax label: a whole write labels each, because `traj` refuses a plan with an unlabelled one. */
 	unlabelled?: readonly string[]
+	/** The plan's household names a partner and Owners, so a separate draft may state the shared home-loan interest. */
 	sharedClaimable?: boolean
 	onDone: () => void
 }
@@ -46,12 +47,8 @@ const visible = $derived(
 	(merging && group !== null && GROUPS.find((one) => one.key === group)?.items) || TAX_FLAG_KEYS,
 )
 const shown = $derived(taxShown(problems, editSession.failure, editSession.error, visible, sent))
-const keepsShared = $derived(
-	sharedClaimable &&
-		profile !== null &&
-		profile.filingStatus === "married_separate" &&
-		profile.sharedMortgageInterest !== undefined,
-)
+// The sentence is about the field the form offers: only a separate draft can keep the stored shared interest.
+const keepsShared = $derived(keepsStoredShared(profile, draft, sharedClaimable))
 const dropWarning = $derived(sharedDropWarning(profile, whole, draft))
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"

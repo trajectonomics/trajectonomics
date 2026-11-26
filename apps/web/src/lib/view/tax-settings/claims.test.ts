@@ -84,7 +84,7 @@ describe("who claims each allowance", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, [])).toBeNull()
 	})
 
-	test("states the stored shared home-loan interest, split half to each Return, or none", () => {
+	test("states the stored shared home-loan interest the Returns share, or none", () => {
 		expect(claimsTable(PROFILE, HOUSEHOLD, FILERS)?.sharedInterest).toBeNull()
 		const shared = { ...PROFILE, sharedMortgageInterest: 60000 }
 		expect(claimsTable(shared, HOUSEHOLD, FILERS)?.sharedInterest).toBe("60,000 THB")

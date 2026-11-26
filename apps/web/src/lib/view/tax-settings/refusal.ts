@@ -16,7 +16,8 @@ function keyOf(path: string): string {
 
 /**
  * The form field a refusal names, or null when it names none. A shared-interest refusal names `--mortgage-interest`
- * too, so the flags the form sent tell the two apart when its message does not say `shared=`.
+ * too, so the flags the form sent tell the two apart when its message does not say `shared=`. When it sent both
+ * kinds and the message does not say which, no field can be told and the form shows the refusal whole.
  */
 export function taxFieldOfRefusal(error: ErrorBody | null, flags?: TaxFlags | null): string | null {
 	const key = error?.path === undefined ? "" : keyOf(error.path)
@@ -26,6 +27,7 @@ export function taxFieldOfRefusal(error: ErrorBody | null, flags?: TaxFlags | nu
 		const ownSent = flags?.mortgageInterest !== undefined
 		if (error?.message.includes("shared=") || (sharedSent && !ownSent))
 			return "sharedMortgageInterest"
+		if (sharedSent && ownSent) return null
 	}
 	return key
 }

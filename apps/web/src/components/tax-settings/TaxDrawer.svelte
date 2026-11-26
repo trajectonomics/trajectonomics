@@ -18,7 +18,7 @@ interface Props {
 	group: GroupKey | null
 	/** The income Flows with no tax label, which a whole write labels. */
 	unlabelled: readonly string[]
-	/** Whether a Return of the plan claims the shared interest: with none, the form offers no `shared=` field. */
+	/** Whether the household names a partner and Owners, which `traj` needs for a `shared=` field; with none, it offers no field. */
 	sharedClaimable?: boolean
 	onClose: () => void
 }
