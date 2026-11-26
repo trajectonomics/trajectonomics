@@ -38,7 +38,7 @@ const view = $derived(allowancesView(data))
 			<summary class="cursor-pointer font-medium">Tax figures used</summary>
 			<ul class="mt-2 list-disc space-y-1 pl-5">
 				{#each view.assumptions as line (line.key)}
-					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.text}</span></li>
+					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.note}</span> {line.used}</li>
 				{/each}
 			</ul>
 		</details>

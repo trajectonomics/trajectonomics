@@ -103,6 +103,23 @@ describe("a page of the Demo Snapshot", () => {
 		}
 	})
 
+	test("prints a locked Account's date as a date, outside code and the CLI's own text", () => {
+		const next = structuredClone(DEMO)
+		const read = next.reads.documents["base"]
+		if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+		const account = read.data.scenario.document.accounts.find((one) => one.kind === "asset")
+		if (account === undefined) throw new Error("the Demo's base plan has an asset")
+		account.lockedUntil = "2031-06-30"
+		replaceSnapshot(next)
+		const page = PAGES.find((one) => one.path === "/assets-and-debts/")
+		if (page === undefined) throw new Error("no page renders /assets-and-debts/")
+		setTestUrl("http://127.0.0.1/assets-and-debts/?demo=1&scenario=base")
+		const body = render(page.page).body
+		expect(body).toContain("30 Jun 2031")
+		expect(body).not.toContain("2031-06-30")
+		expect(problemsOf(body)).toEqual([])
+	})
+
 	test("links a page of the navigation with words that name it", () => {
 		const plans = PAGES.find((one) => one.path === "/plans/")
 		if (plans === undefined) throw new Error("no page renders /plans/")

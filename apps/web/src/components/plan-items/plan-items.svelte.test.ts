@@ -134,7 +134,7 @@ describe("the Expenses and Assets and debts lists", () => {
 		const body = list("assets")
 		expect(body).toContain("1.00%")
 		expect(body).toContain("Locked until")
-		expect(body).toContain("2030-01-01")
+		expect(body).toContain("1 Jan 2030")
 		expect(body).toContain("5.00%, monthly")
 		expect(body).toContain("662,300.00")
 		expect(body).toContain("no balance")

@@ -121,3 +121,21 @@ describe("Hide amounts and a tried Flow date", () => {
 		}
 	})
 })
+
+describe("Hide amounts and a tried Account lock", () => {
+	test("a lockedUntil Set is printed as a date and not masked, with amounts shown or hidden", () => {
+		whatIfSession.whatIf = withSet(
+			startWhatIf("base", HASH),
+			"accounts.fund.lockedUntil",
+			"2031-06-30",
+		)
+		for (const hidden of [false, true]) {
+			preferences.hidden = hidden
+			const body = render(WhatIfChanges, { props: {} }).body
+			expect(body).toContain("30 Jun 2031")
+			expect(body).not.toContain("2031-06-30")
+			expect(body).not.toContain("amount hidden")
+			expect(body).not.toContain("•••••")
+		}
+	})
+})

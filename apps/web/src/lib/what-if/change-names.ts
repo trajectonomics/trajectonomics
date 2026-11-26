@@ -27,15 +27,15 @@ function namesMilestone(path: string): boolean {
 	return field === "startAt" || field === "endAt"
 }
 
-/** Whether a path's last field is a Flow's own date: `flows.salary.start` or `flows.salary.end`. */
-function namesDate(path: string): boolean {
+/** Whether a path's last field is a date the plan stores: a Flow's `start` or `end`, or an Account's `lockedUntil`. */
+export function isDatePath(path: string): boolean {
 	const field = path.slice(path.lastIndexOf(".") + 1)
-	return field === "start" || field === "end"
+	return field === "start" || field === "end" || field === "lockedUntil"
 }
 
-/** A Set of a Flow's start or end date shows it as every date on the Dashboard is printed. */
+/** A Set of a date shows it as every date on the Dashboard is printed. */
 function dateValue(label: string, change: Change): string {
-	if (change.kind !== "set" || !namesDate(change.path)) return label
+	if (change.kind !== "set" || !isDatePath(change.path)) return label
 	const tail = ` set to ${change.value}`
 	if (!label.endsWith(tail)) return label
 	return `${label.slice(0, label.length - tail.length)} set to ${formatDate(change.value)}`
@@ -54,7 +54,7 @@ function milestoneValue(label: string, change: Change, names: ItemNames): string
  * The change's label, with the name of the Account (or of the loan or asset group's Account) the ledger gives it, and
  * the `displayLabel` the plan's document states for a Flow or a Milestone. A `salary:` group names its salary's Flow in
  * place of the id. An item with no name keeps its id. A `startAt` or `endAt` Set shows the Milestone's name in place of
- * the id it stores, and a Flow's `start` or `end` Set shows its date as the Dashboard prints dates.
+ * the id it stores, and a Flow's `start` or `end` Set (or an Account's `lockedUntil`) shows its date as the Dashboard prints dates.
  */
 export function labelWithNames(change: Change, names: ItemNames): string {
 	if (change.kind === "group" && change.path.startsWith("salary:")) {

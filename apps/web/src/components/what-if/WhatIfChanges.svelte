@@ -7,7 +7,7 @@ import { maskMoney } from "../../lib/format/mask"
 import { itemText, NO_ITEM_NAMES, snapshotItemNames } from "../../lib/view/item-names"
 import { tryWords } from "../../lib/view/withdrawals/try-words"
 import { failedReads, pathNamed } from "../../lib/what-if/answer"
-import { labelWithNames } from "../../lib/what-if/change-names"
+import { isDatePath, labelWithNames } from "../../lib/what-if/change-names"
 import { type Change, namesChange } from "../../lib/what-if/session"
 import NavIcon from "../shell/NavIcon.svelte"
 
@@ -40,11 +40,11 @@ const names = $derived.by(() => {
 		: snapshotItemNames(state.snapshot, plan)
 })
 
-/** Whether a Set changes a figure, which hiding amounts masks. A Milestone's id or a Flow's date is not a figure. */
+/** Whether a Set changes a figure, which hiding amounts masks. A Milestone's id or a date is not a figure. */
 function isFigure(change: Change): change is Extract<Change, { kind: "set" }> {
 	if (change.kind !== "set") return false
 	const field = change.path.slice(change.path.lastIndexOf(".") + 1)
-	return field !== "startAt" && field !== "endAt" && field !== "start" && field !== "end"
+	return field !== "startAt" && field !== "endAt" && !isDatePath(change.path)
 }
 
 /** A change's words as the bar shows them: a Set of a figure is masked when the person hides amounts. */

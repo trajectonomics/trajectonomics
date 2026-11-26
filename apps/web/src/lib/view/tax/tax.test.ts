@@ -144,10 +144,9 @@ describe("assumption lines", () => {
 			year({ from: "2027-01-01", assumptions: [gpf, { ...gpf, path: "a.b", value: [1, 2] }] }),
 		])
 		expect(lines.map((line) => line.path)).toEqual([gpf.path, "a.b"])
-		expect(lines[0]?.text).toBe(
-			"Government pension fund limit, share of wages. Used 0.3; reported.",
-		)
-		expect(lines[1]?.text).toContain("Used 1, 2;")
+		expect(lines[0]?.note).toBe("Government pension fund limit, share of wages.")
+		expect(lines[0]?.used).toBe("Used 0.3; reported.")
+		expect(lines[1]?.used).toContain("Used 1, 2;")
 	})
 
 	test("is empty when no year used an unconfirmed figure", () => {

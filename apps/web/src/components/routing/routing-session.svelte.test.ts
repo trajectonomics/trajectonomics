@@ -98,6 +98,26 @@ describe("each drawer names itself by its own heading", () => {
 	})
 })
 
+describe("a refusal's source", () => {
+	test("says whether its message is the CLI's own or the server's, so only the CLI's is marked", () => {
+		editSession.source = "routing"
+		editSession.failure = {
+			code: "edit_running",
+			exitCode: 1,
+			message: "Another Edit is running. Wait for it.",
+		}
+		editSession.error = "Another Edit is running. Wait for it."
+		expect(routing.message).toBe("Another Edit is running. Wait for it.")
+		expect(routing.messageFromCli).toBe(false)
+		editSession.failure = {
+			code: "invalid_input",
+			exitCode: 2,
+			message: "WITHDRAW_FLOOR_ORDER: a floor after a plain entry",
+		}
+		expect(routing.messageFromCli).toBe(true)
+	})
+})
+
 describe("a what-if's refusal lands on its row", () => {
 	const error = {
 		code: "invalid_input",

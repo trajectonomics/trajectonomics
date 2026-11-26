@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Snippet } from "svelte"
 import { editSession } from "../../client/edit.svelte.js"
+import { isCliError } from "../../lib/edit/failure"
 import { BUTTON } from "./styles"
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 }
 
 let { submit, problem, onSubmit, onCancel, children }: Props = $props()
-const fromCli = $derived(problem === null && editSession.failure !== null)
+const fromCli = $derived(problem === null && isCliError(editSession.failure))
 const shown = $derived(problem ?? editSession.error)
 </script>
 
