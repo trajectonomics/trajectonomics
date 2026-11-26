@@ -3,7 +3,6 @@ import { render } from "svelte/server"
 import type { HouseholdDocument, Snapshot, TaxProfile } from "../../lib/contract"
 import { personNames } from "../../lib/view/item-names"
 import { claimsTable } from "../../lib/view/tax-settings/claims"
-import { flatClaimant } from "../../lib/view/tax-settings/flat-claims"
 import { DEMO } from "../../lib/view/what-if/fixtures.test-support"
 import TaxClaimsSection from "./TaxClaimsSection.svelte"
 import TaxSettingsBody from "./TaxSettingsBody.svelte"
@@ -39,12 +38,7 @@ describe("the claims table after a holder swap", () => {
 		const table = claimsTable(PROFILE, GONE, ["me", "partner"])
 		if (table === null) throw new Error("the profile files separately")
 		const body = render(TaxClaimsSection, {
-			props: {
-				table,
-				people,
-				claimant: flatClaimant(PROFILE, GONE, people),
-				claimantId: "me",
-			},
+			props: { table, people, claimsHolder: "me" },
 		}).body
 		expect(body).toContain(">The earlier holder<")
 		expect(body).not.toContain(">me<")
@@ -63,7 +57,7 @@ describe("the claims table after a holder swap", () => {
 		const table = claimsTable(PROFILE, renamed, ["me", "partner"])
 		if (table === null) throw new Error("the profile files separately")
 		const body = render(TaxClaimsSection, {
-			props: { table, people, claimant: flatClaimant(PROFILE, renamed, people), claimantId: "me" },
+			props: { table, people, claimsHolder: "me" },
 		}).body
 		expect(body).toContain(">Another person<")
 		expect(body).not.toContain(">partner<")
@@ -71,15 +65,16 @@ describe("the claims table after a holder swap", () => {
 })
 
 describe("the claims table with no household", () => {
-	test("keeps the columns apart by id, never two columns of the same words", () => {
+	test("keeps the columns apart by id, in code, never two columns of the same words", () => {
 		const table = claimsTable(PROFILE, null, ["me", "partner"])
 		if (table === null) throw new Error("the profile files separately")
 		const body = render(TaxClaimsSection, {
-			props: { table, people: personNames(null), claimant: null, claimantId: "me" },
+			props: { table, people: personNames(null), claimsHolder: "me" },
 		}).body
-		expect(body).toContain(">me<")
-		expect(body).toContain(">partner<")
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>me<\/code>/)
+		expect(body).toMatch(/<code[^>]*data-unnamed[^>]*>partner<\/code>/)
 		expect(body).not.toContain(">Another person<")
+		expect(body).not.toContain(">The earlier holder<")
 	})
 })
 
