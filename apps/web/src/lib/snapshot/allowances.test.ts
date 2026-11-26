@@ -84,6 +84,8 @@ describe("the allowance reads of the Plan", () => {
 	test.each([
 		["no allowance chosen", { ...INPUTS, labels: [] }],
 		["a label the Levy does not read", { ...INPUTS, labels: ["allowance.other"] }],
+		// `readForFilers` adds the Filer's suffix after this schema takes the bare labels, so a suffixed one is refused.
+		["a label with a Filer suffix", { ...INPUTS, labels: ["allowance.retirement.rmf@me"] }],
 		["an allowance twice", { ...INPUTS, labels: [INPUTS.labels[0] ?? "", INPUTS.labels[0] ?? ""] }],
 		["a step that is not a decimal", { ...INPUTS, step: "1,000" }],
 		["a least saving over 100", { ...INPUTS, minSaving: "100.5" }],
@@ -146,10 +148,26 @@ describe("the Demo snapshot", () => {
 		const text = await demoSnapshotText()
 		const demo = snapshot.parse(JSON.parse(text))
 		expect(demo.params.allowances?.labels).toEqual(INPUTS.labels)
-		expect(Object.keys(demo.reads.allowances).sort()).toEqual(["base", "retire-early"])
+		expect(Object.keys(demo.reads.allowances).sort()).toEqual([
+			"base",
+			"joint",
+			"retire-early",
+			"separate",
+		])
 		for (const read of Object.values(demo.reads.allowances)) {
 			expect(read.ok).toBe(true)
 			expect(read.argv.slice(0, 2)).toEqual(["projection", "allowances"])
 		}
+		// A plan without Filers keeps its bare labels; a plan with Filers, separate or joint, reads each Filer's own.
+		const base = demo.reads.allowances["base"]
+		const separate = demo.reads.allowances["separate"]
+		const joint = demo.reads.allowances["joint"]
+		expect(base?.ok === true ? base.argv : []).toContain(
+			"allowance.retirement.rmf,allowance.thai_esg",
+		)
+		const byFiler =
+			"allowance.retirement.rmf@me,allowance.thai_esg@me,allowance.retirement.rmf@partner,allowance.thai_esg@partner"
+		expect(separate?.ok === true ? separate.argv : []).toContain(byFiler)
+		expect(joint?.ok === true ? joint.argv : []).toContain(byFiler)
 	})
 })

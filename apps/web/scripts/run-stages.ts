@@ -77,6 +77,9 @@ export async function runStageTwo(
 	const documents = await recordOf(plan.documents, (planned) =>
 		runPlanned(context, planned, scenarioShow, records),
 	)
+	const projections = await recordOf(plan.projections, (planned) =>
+		runPlanned(context, planned, projectionRun, records),
+	)
 	const chance = await runChance(context, plan, records)
 	return {
 		doctor: await runPlanned(context, plan.doctor, doctor, records),
@@ -86,9 +89,7 @@ export async function runStageTwo(
 		baseline: await runPlanned(context, plan.baseline, baseline, records),
 		netWorthHistory: await runHistory(context, plan, records),
 		documents,
-		projections: await recordOf(plan.projections, (planned) =>
-			runPlanned(context, planned, projectionRun, records),
-		),
+		projections,
 		fi: await recordOf(plan.fi, (planned) => runPlanned(context, planned, fi, records)),
 		compare:
 			plan.compare === null
@@ -96,7 +97,7 @@ export async function runStageTwo(
 				: await runPlanned(context, plan.compare, projectionCompare, records),
 		chance,
 		paths: await runPaths(context, plan, chance, records),
-		allowances: await runAllowances(context, plan, documents, records),
+		allowances: await runAllowances(context, plan, documents, projections, records),
 		taxNotes: await runTaxNotes(context, plan, documents, records),
 	}
 }

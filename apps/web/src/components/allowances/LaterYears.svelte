@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { ScenarioDocument } from "../../lib/contract"
 import type { YearView } from "../../lib/view/allowances"
+import { NO_PEOPLE, type PersonNames } from "../../lib/view/item-names"
 import DataTable from "../ui/DataTable.svelte"
 import Money from "../ui/Money.svelte"
 import type { Column } from "../ui/table-types"
@@ -11,10 +12,17 @@ interface Props {
 	years: readonly YearView[]
 	currency: string
 	plan: { name: string; contentHash: string; doc: ScenarioDocument } | null
+	/** The household's people, so a joint Return names each spouse's allowances. */
+	people?: PersonNames
+	/** The Return this table sits in, when the page shows one section per Return: it names the region and steps the heading down. */
+	region?: string
 }
 
-let { years, currency, plan }: Props = $props()
+let { years, currency, plan, people = NO_PEOPLE, region }: Props = $props()
 let open: string | null = $state(null)
+const label = $derived(
+	region === undefined ? "Every later tax year" : `${region}: every later tax year`,
+)
 const shown = $derived(years.find((year) => year.key === open))
 const columns: readonly Column<YearView>[] = [
 	{ key: "period", header: "Tax year", cell: period },
@@ -36,13 +44,17 @@ const columns: readonly Column<YearView>[] = [
 {/snippet}
 
 <!-- The later tax years with the same columns. A year opens to its allowances and its actions. -->
-<section aria-label="Every later tax year" class="space-y-3">
-	<h2 class="text-base font-semibold">Every later tax year</h2>
+<section aria-label={label} class="space-y-3">
+	{#if region === undefined}
+		<h2 class="text-base font-semibold">Every later tax year</h2>
+	{:else}
+		<h3 class="text-base font-semibold">Every later tax year</h3>
+	{/if}
 	<DataTable caption={`Later tax years, figures in ${currency}`} {columns} rows={years} rowKey={(year) => year.key} />
 	{#if shown}
 		<div class="space-y-3 rounded-lg border border-border p-4">
 			<h3 class="text-sm font-medium">{shown.period}</h3>
-			<LineList lines={shown.lines} {currency} />
+			<LineList lines={shown.lines} {currency} {people} />
 			{#if plan !== null}<YearActions year={shown} {plan} />{/if}
 		</div>
 	{/if}

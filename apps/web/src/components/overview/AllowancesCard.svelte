@@ -13,6 +13,12 @@ let { scenario }: Props = $props()
 const shown = $derived(
 	scenario.status === "ready" && (!scenario.read.ok || scenario.read.data !== null),
 )
+// One Return keeps the card's single figure, as it always showed it; several Returns name each one.
+const single = $derived(
+	scenario.status === "ready" && scenario.read.ok && scenario.read.data?.savings.length === 1
+		? scenario.read.data.savings[0]
+		: undefined,
+)
 </script>
 
 {#if shown}
@@ -20,7 +26,18 @@ const shown = $derived(
 		{#snippet body(view: AllowancesSummary | null)}
 			{#if view !== null}
 				<div class="space-y-2">
-					<p class="text-2xl font-semibold tracking-tight"><Money amount={view.saving} currency={view.currency} /></p>
+					{#if single !== undefined && single.name === null}
+						<p class="text-2xl font-semibold tracking-tight"><Money amount={single.saving} currency={view.currency} /></p>
+					{:else}
+						<dl class="space-y-1">
+							{#each view.savings as one (one.key)}
+								<div class="flex items-baseline justify-between gap-3">
+									<dt class="text-sm text-muted-foreground">{one.name ?? ""}</dt>
+									<dd class="text-xl font-semibold tracking-tight"><Money amount={one.saving} currency={view.currency} /></dd>
+								</div>
+							{/each}
+						</dl>
+					{/if}
 					<p class="text-sm text-muted-foreground">By taking more of your allowances in {view.period}.</p>
 				</div>
 			{/if}

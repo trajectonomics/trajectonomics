@@ -24,6 +24,25 @@ const PLAN = {
 const result = (data: ProjectionAllowances, plan: typeof PLAN | null = null) =>
 	render(AllowancesResult, { props: { data, plan } }).body
 
+/**
+ * The Demo's `separate` plan with its Levy tallies made bare and both its per-Filer reads removed: the Filer plan
+ * whose only Filer suffix is on a Flow's label, which the runner skips.
+ */
+function flowOnlyFilerPlan(): Snapshot {
+	const stripped = structuredClone(DEMO)
+	const stored = stripped.reads.documents["separate"]
+	if (stored?.ok !== true) throw new Error("the Demo has no separate document")
+	for (const levy of stored.data.scenario.document.levies ?? []) {
+		const measures = (levy as { measures?: { label?: string }[] }).measures ?? []
+		for (const measure of measures) {
+			if (measure.label !== undefined) measure.label = measure.label.replace(/@(me|partner)$/, "")
+		}
+	}
+	delete stripped.reads.allowances["separate"]
+	delete stripped.reads.projections["separate"]
+	return stripped
+}
+
 afterEach(() => {
 	editSession.token = null
 	editSession.error = null
@@ -118,11 +137,25 @@ describe("the page over the Demo snapshot", () => {
 		expect(page).toContain("traj scenario tax base --tax th-2026")
 	})
 
-	test("a separate filing says each Return has its own ceilings, and points to the follow-up", () => {
+	test("a separate filing shows a section per Return, named by the household's role", () => {
 		const page = body(DEMO, "separate")
-		expect(page).toContain("Not read for a separate filing yet")
-		expect(page).toContain("Each Return has its own allowance ceilings")
-		expect(page).toContain("#635")
+		expect(page).toContain('aria-label="You"')
+		expect(page).toContain('aria-label="Your partner"')
+		expect(page.match(/aria-label="You: this tax year"/g)).toHaveLength(1)
+		expect(page.match(/aria-label="Your partner: this tax year"/g)).toHaveLength(1)
+		expect(page.match(/aria-label="You: every later tax year"/g)).toHaveLength(1)
+		expect(page.match(/aria-label="Your partner: every later tax year"/g)).toHaveLength(1)
+		expect(page).toContain("th-2026-pit@me")
+		expect(page).toContain("th-2026-pit@partner")
+		expect(page).not.toContain("Not read for a separate filing yet")
+		expect(page).not.toContain("#635")
+	})
+
+	test("a Filer plan whose Levies tally no Filer label says why it has no read", () => {
+		const page = body(flowOnlyFilerPlan(), "separate")
+		expect(page).toContain("No Return to read")
+		expect(page).toContain("no Levy of it tallies a Filer's label")
+		expect(page).not.toContain("Choose the allowances you could buy")
 	})
 
 	test("before the person chooses, no allowance is on and the page says nothing is read yet", () => {

@@ -6,8 +6,10 @@ import {
 } from "@trajectonomics/core/sim"
 import { thLevyAssumptions } from "@trajectonomics/core/tax/th"
 import type { AppError } from "../errors"
+import { filerOfTaxLevy } from "../scenario/tax"
 import { assumptionViews } from "../tax-assumptions"
 import { flowOf, targetOf } from "./allowances-flow"
+import { noTargetHint } from "./allowances-hint"
 import { type AllowanceRequest, MAX_STEPS } from "./allowances-input"
 import { allowancesRefusal } from "./allowances-refusal"
 import type { AllowanceRowView, AllowanceYearView } from "./allowances-rows-view"
@@ -30,14 +32,6 @@ export type YearInput = {
 	taken: Set<string>
 }
 
-/** Why a suggestion has no target Account, and what the caller does about it (cli ADR-0061). */
-function noTargetHint(label: string, withdrawn: readonly string[]): string {
-	if (withdrawn.length > 0) {
-		return `The contribution of this plan that carries ${label} pays into ${withdrawn.join(", ")}, which the plan draws from (cashflow.withdraw), and the engine refuses a lump sum into it. Take the Account out of cashflow.withdraw, or add another asset Account for the purchase, then add this Flow with that Account as its target.`
-	}
-	return `No contribution of this plan carries ${label}. Pick the asset Account that will hold it, adding one to the Scenario if none fits, then add this Flow with that Account as its target.`
-}
-
 /** The engine's options for one year: the caller's, plus the Scenario's inflation and the step bound. */
 function optionsOf(input: YearInput) {
 	const { request, placed } = input
@@ -56,6 +50,7 @@ function optionsOf(input: YearInput) {
 export function yearOf(input: YearInput): YearRows | AppError {
 	const { placed, report, period } = input
 	const money = moneyOf(placed.currency)
+	const filer = filerOfTaxLevy(report.id)
 	const said = contributionSavings(input.levy, period, optionsOf(input))
 	if (!said.ok)
 		return allowancesRefusal(said.problem, { levy: report.id, period, request: input.request })
@@ -68,6 +63,7 @@ export function yearOf(input: YearInput): YearRows | AppError {
 		const target = found.target
 		const row = {
 			levy: report.id,
+			...(filer === undefined ? {} : { filer }),
 			from: period.from,
 			to: period.to,
 			label: item.label,
@@ -98,6 +94,7 @@ export function yearOf(input: YearInput): YearRows | AppError {
 	return {
 		year: {
 			levy: report.id,
+			...(filer === undefined ? {} : { filer }),
 			from: period.from,
 			to: period.to,
 			settlementDate: period.settlementDate,

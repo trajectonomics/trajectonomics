@@ -85,7 +85,13 @@ export async function rereadInputs(
 	const plan = planStageTwo(params, one)
 	let snapshot = held
 	if (changed.allowances) {
-		const reads = await runAllowances(context, plan, held.reads.documents, records)
+		const reads = await runAllowances(
+			context,
+			plan,
+			held.reads.documents,
+			held.reads.projections,
+			records,
+		)
 		snapshot = withAllowances(snapshot, params.allowances, reads)
 	}
 	if (changed.chance && params.chance !== null) {

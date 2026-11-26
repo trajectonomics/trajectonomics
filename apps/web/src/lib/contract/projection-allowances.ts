@@ -28,6 +28,8 @@ export type AllowanceFlow = z.infer<typeof allowanceFlow>
 /** One whole tax year: the tax it owes now and with every suggestion, and the saving. */
 export const allowanceYear = z.strictObject({
 	levy: z.string(),
+	/** The Filer whose Return this Levy files, for a separate filing; absent when the plan keeps one. */
+	filer: z.string().optional(),
 	from: dateString,
 	to: dateString,
 	settlementDate: dateString,
@@ -41,6 +43,8 @@ export type AllowanceYear = z.infer<typeof allowanceYear>
 /** One tax year and label: what is planned, what more fits, why it stopped, and the Flow that applies it. */
 export const allowanceRow = z.strictObject({
 	levy: z.string(),
+	/** The Filer whose Return this Levy files, for a separate filing; absent when the plan keeps one. */
+	filer: z.string().optional(),
 	from: dateString,
 	to: dateString,
 	label: z.string(),

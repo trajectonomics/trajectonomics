@@ -66,8 +66,8 @@ describe("projection allowances of a separate Return", () => {
 		])
 		expect(res.code, res.err).toBe(0)
 		const body = runBody(res) as unknown as {
-			taxYears: { levy: string }[]
-			allowances: { levy: string; label: string }[]
+			taxYears: { levy: string; filer?: string }[]
+			allowances: { levy: string; label: string; filer?: string }[]
 		}
 		expect([...new Set(body.taxYears.map((it) => it.levy))]).toEqual([
 			"th-2026-pit@me",
@@ -76,6 +76,15 @@ describe("projection allowances of a separate Return", () => {
 		expect([...new Set(body.allowances.map((it) => `${it.levy} ${it.label}`))]).toEqual([
 			"th-2026-pit@me allowance.retirement.rmf@me",
 			"th-2026-pit@partner allowance.retirement.rmf@partner",
+		])
+		// Each year and row names the Filer whose Return it belongs to, so the page groups them without the Levy id.
+		expect([...new Set(body.taxYears.map((it) => `${it.levy} ${it.filer}`))]).toEqual([
+			"th-2026-pit@me me",
+			"th-2026-pit@partner partner",
+		])
+		expect([...new Set(body.allowances.map((it) => `${it.levy} ${it.filer}`))]).toEqual([
+			"th-2026-pit@me me",
+			"th-2026-pit@partner partner",
 		])
 	})
 })
