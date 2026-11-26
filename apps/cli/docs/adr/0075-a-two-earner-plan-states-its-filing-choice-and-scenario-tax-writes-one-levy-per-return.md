@@ -330,7 +330,9 @@ interest is right in every year of the Projection, not only in the first.
   that disagrees with the other record is refused too; a record that leaves the other Return's
   classes or a shared class out needs no `rest`. Each `@shared` class must still be stated by at
   least one record of the pair, or covered by a `rest`: a class neither names is refused, so
-  forgotten shared income never reads as none. It refuses when a record states those classes
+  forgotten shared income never reads as none. The CLI's own scope record, which stands for a
+  period it does not recompute (ADR-0032), says nothing about either income: a record whose pair
+  has only a scope record must state the other Filer's and the shared income itself. It refuses when a record states those classes
   differently from the other Return's record, and when a record leaves them to `"rest": "0.00"`
   while the other Return has no record for the period. The CLI finds the other Filer from the
   labels the emitted Measures read, because the stored Levy keeps no `sharedMortgage` field.

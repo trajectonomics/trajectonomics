@@ -65,6 +65,7 @@ function filledOf(input: {
 	return filledTally({
 		tally: input.tally,
 		stated: input.entry.stated.has(input.key),
+		rested: input.entry.rested.has(input.key),
 		from,
 		where: input.where,
 	})

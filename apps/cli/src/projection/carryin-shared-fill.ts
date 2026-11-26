@@ -18,8 +18,8 @@ export function sourceEntryOf(
 }
 
 /**
- * The other record's amount for a class: its tally, zero when it left the class to an empty scope
- * record or owes none, and undefined when it has no record for a period only it can state.
+ * The other record's amount for a class: its tally, zero when it owes no record for the period, and
+ * undefined when it has none to read, as with the CLI's scope record (not recomputed, cli ADR-0032).
  */
 export function sourceAmount(
 	source: ResolvedLevy | undefined,
@@ -29,8 +29,7 @@ export function sourceAmount(
 	const item = source?.items.find((it) => it.entry.periodStart === periodStart)
 	if (item !== undefined) {
 		const found = item.entry.tallies.find((it) => keyOf(it) === key)
-		if (found !== undefined) return found.amount
-		return item.entry.source === "scope" ? 0 : undefined
+		return item.entry.source === "scope" ? undefined : found?.amount
 	}
 	const needed = source?.needed
 	if (needed === null || needed === undefined) return undefined
@@ -42,11 +41,12 @@ export function sourceAmount(
 export function filledTally(input: {
 	tally: StatedTally
 	stated: boolean
+	rested: boolean
 	from: number | undefined
 	where: FillWhere
 }): StatedTally | AppError {
 	if (input.from === undefined) {
-		return input.stated ? input.tally : refusedNoRecord(input.where, input.tally)
+		return input.stated ? input.tally : refusedNoRecord(input.where, input.tally, input.rested)
 	}
 	if (input.stated && input.tally.amount !== input.from) {
 		return refusedDifferent(input.where, input.tally, input.from)
@@ -54,16 +54,21 @@ export function filledTally(input: {
 	return { ...input.tally, amount: input.from }
 }
 
-/** What a record asserts for a shared class: a stated tally, `rest`'s zero, or nothing at all. */
+/** What a record asserts for a shared class: a stated tally, `rest`'s zero, or nothing (a scope record). */
 function asserted(
 	entry: CarryInEntry | undefined,
 	key: string,
 	amount: number | undefined,
 ): number | undefined {
-	if (entry === undefined) return undefined
+	if (entry === undefined || entry.source === "scope") return undefined
 	if (entry.stated.has(key)) return amount
-	if (entry.rested.has(key) || entry.source === "scope") return 0
+	if (entry.rested.has(key)) return 0
 	return undefined
+}
+
+/** Whether the other Return has a record of its own for the period, which a hint may point to. */
+function theirsReadable(source: CarryInEntry | undefined): boolean {
+	return source !== undefined && source.source !== "scope"
 }
 
 /**
@@ -85,7 +90,7 @@ export function filledShared(input: {
 	const theirs = asserted(input.source, key, input.from)
 	if (mine === undefined) {
 		return theirs === undefined
-			? refusedUnstated(input.where, input.tally)
+			? refusedUnstated(input.where, input.tally, theirsReadable(input.source))
 			: { ...input.tally, amount: theirs }
 	}
 	if (theirs === undefined) return input.tally
