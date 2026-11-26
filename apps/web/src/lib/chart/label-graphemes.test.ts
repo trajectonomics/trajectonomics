@@ -19,6 +19,12 @@ describe("the grapheme estimate", () => {
 		}
 	})
 
+	test("counts the middle dot narrow, so FI · coast measures as on main", () => {
+		expect(width("·")).toBe(7)
+		const total = graphemes("FI · coast", false).reduce((sum, part) => sum + part.width, 0)
+		expect(total).toBe(76)
+	})
+
 	test("counts a capital at 10px and the wide ones at 12px", () => {
 		expect(width("S")).toBe(10)
 		expect(width("M")).toBe(12)

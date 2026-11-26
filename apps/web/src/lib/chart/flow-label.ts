@@ -1,11 +1,12 @@
 import { FLOW_WIDTH } from "./flow"
 import { FLOW_MARGIN } from "./flow-geometry"
 import type { FlowNode } from "./flow-types"
-import { fittedKeepingSuffix } from "./label-keep"
-import { type TextMeasure, textWidth } from "./label-width"
+import { fitted, type TextMeasure, textWidth } from "./label-width"
 
 /** The least space between a name and its amount, so a measurement that runs a little short cannot join them. */
 const NAME_GAP = 4
+/** How far a name's clip reaches past the fitted text on each side, for a glyph that paints past the canvas measure. */
+const CLIP_SLACK = 2
 
 /** The room a node's label has, from its anchor to the edge of the box on its side. */
 export function labelRoom(node: Pick<FlowNode, "labelX" | "anchor">): number {
@@ -17,7 +18,7 @@ export function labelRoom(node: Pick<FlowNode, "labelX" | "anchor">): number {
  * never cut, and where each sits. The name's clip ends before the amount, so it can never paint over it.
  */
 export interface FlowLabel {
-	/** The name, shortened to its room, with a twin's id kept when the label names one. */
+	/** The name, kept from its start and ended with an ellipsis when it does not fit. */
 	readonly label: string
 	readonly amount: string
 	/** Where the name's text is anchored, on the side away from the amount. */
@@ -32,37 +33,37 @@ export interface FlowLabel {
 /**
  * A node's label as the diagram draws it. The name is shortened with an ellipsis so that it and the amount
  * fit its room, measured in the page's font when `measure` is given and in a conservative estimate when
- * not. The amount is whole. The full name stays in the band's label and the table, so nothing is lost to a
- * screen reader.
+ * not. The amount is whole. The name keeps its start and loses its end, as on `main`, so a twin whose
+ * `(id)` differs at its start stays distinct on the diagram. The full label stays in the band's
+ * `aria-label` and the table, so the id is never lost (#667 allows the cut).
  */
 export function fittedLabel(
-	node: Pick<FlowNode, "label" | "labelX" | "anchor" | "keep">,
+	node: Pick<FlowNode, "label" | "labelX" | "anchor">,
 	amount: string,
 	measure?: TextMeasure,
 ): FlowLabel {
 	const room = labelRoom(node)
 	const amountWidth = widthOf(amount, measure)
 	const nameRoom = Math.max(0, room - amountWidth - NAME_GAP)
-	const fitted = fittedKeepingSuffix(node.label, nameRoom, false, node.keep ?? null, measure)
-	const label = fitted.text
+	const name = fitted(node.label, nameRoom, false, measure)
 	const leftwards = node.anchor === "end"
 	const labelX = leftwards ? node.labelX - amountWidth - NAME_GAP : node.labelX
 	// A start-anchored name is clipped to the width it was fitted to, so the clip never runs on into the
 	// amount even when the page draws the words a little wider than the measure expected.
-	const clip = leftwards ? nameRoom : Math.min(nameRoom, fitted.width)
+	const clip = leftwards ? nameRoom : Math.min(nameRoom, name.width)
 	return {
-		label,
+		label: name.text,
 		amount,
 		labelX,
-		clipX: leftwards ? labelX - clip : labelX,
-		clipWidth: clip,
+		clipX: leftwards ? labelX - clip - CLIP_SLACK : labelX - CLIP_SLACK,
+		clipWidth: clip + 2 * CLIP_SLACK,
 		amountX: leftwards
 			? node.labelX
-			: node.labelX + fitted.width + (label === "" ? 0 : NAME_GAP) + amountWidth,
+			: node.labelX + name.width + (name.text === "" ? 0 : NAME_GAP) + amountWidth,
 	}
 }
 
-/** One string's width in the chart's 12px text: measured in the page, or estimated when it cannot measure. */
+/** One string's width in the diagram's text: measured in the page, or estimated when it cannot measure. */
 function widthOf(text: string, measure?: TextMeasure): number {
 	return measure === undefined ? textWidth(text, false) : measure(text)
 }

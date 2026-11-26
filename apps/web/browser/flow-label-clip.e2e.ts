@@ -5,7 +5,8 @@ import { measureMarkedClip } from "./flow-label-clip"
 import { longFlowLabels, serveFlowLabels } from "./flow-labels"
 
 // A label's marks above the line (Thai tone marks, Vietnamese stacked marks) must fit their clip; a clip as
-// short as a text line cuts them. The same check measures a copy with the clip removed.
+// short as a text line cuts them. The same check holds each name's painted box inside its clip and keeps
+// the clip clear of the amount.
 for (const width of [360, 1280] as const) {
 	test(`Cash flow keeps Thai and Vietnamese marks inside their clip at ${width}px`, async ({
 		page,

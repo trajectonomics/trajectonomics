@@ -1,7 +1,6 @@
 import { columnTotal, round, sized } from "./flow-geometry"
 import type { FlowInput, FlowKind } from "./flow-types"
-import { fittedKeepingSuffix } from "./label-keep"
-import { type TextMeasure, textWidth } from "./label-width"
+import { fitted, type TextMeasure, textWidth } from "./label-width"
 
 /**
  * The flow diagram of one year, for a phone: the sources above and the uses below, two lists of bars on
@@ -38,6 +37,8 @@ export const STACK_HEADING_HEIGHT = 2 * STACK_LABEL_HALF + 6
 export const STACK_SECTION_GAP = 14
 /** The gap between a row's name and its amount. */
 const NAME_GAP = 8
+/** How far a row's name clip reaches past its room on each side, for a glyph that paints past the canvas measure. */
+export const STACK_CLIP_SLACK = 2
 
 /** A heading above one list: the words and where its text starts. */
 export interface StackHeading {
@@ -52,8 +53,6 @@ export interface StackRow {
 	readonly key: string
 	readonly kind: FlowKind
 	readonly label: string
-	/** A twin Flow's `(id)`, which a fitted label keeps in view; null or absent for any other band. */
-	readonly keep?: string | null | undefined
 	readonly amount: string
 	readonly side: "source" | "use"
 	/** Where the name starts (left-anchored) and where the amount ends (right-anchored), both on `labelY`. */
@@ -102,7 +101,6 @@ export function layoutStack(input: FlowInput): StackLayout {
 				key: band.key,
 				kind: band.kind,
 				label: band.label,
-				keep: band.keep,
 				amount: band.amount,
 				side,
 				labelX: STACK_MARGIN,
@@ -129,17 +127,12 @@ export interface StackName {
 /**
  * A row's name as it is drawn. The name is shortened with an ellipsis so that it and the amount fit the
  * line, measured in the page's font when `measure` is given and in a conservative estimate when not. The
- * amount is as the page shows it and is never shortened: the name gives way first, cut between graphemes,
- * so it never covers the amount or leaves the line. A twin's `(id)` stays in view. The full name stays in
- * the band's label and the table, so nothing is lost to a screen reader.
+ * amount is as the page shows it and is never shortened: the name gives way first, losing its end
+ * between graphemes, so it never covers the amount or leaves the line. The full name stays in the band's
+ * `aria-label` and the table.
  */
-export function stackName(
-	label: string,
-	shownAmount: string,
-	keep: string | null = null,
-	measure?: TextMeasure,
-): StackName {
+export function stackName(label: string, shownAmount: string, measure?: TextMeasure): StackName {
 	const amount = measure === undefined ? textWidth(shownAmount, false) : measure(shownAmount)
 	const room = Math.max(0, STACK_WIDTH - 2 * STACK_MARGIN - NAME_GAP - amount)
-	return { text: fittedKeepingSuffix(label, room, false, keep, measure).text, room }
+	return { text: fitted(label, room, false, measure).text, room }
 }

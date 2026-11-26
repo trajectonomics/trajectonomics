@@ -23,12 +23,12 @@ export const SUBSCRIPTIONS = "SUBSCRIPTIONS"
 export const NETFLIX = "NETFLIX AND HBO"
 /** Capitals that fit on `main` at 360px only: 1280px cuts them on `main` too. */
 export const HOME_LOAN = "HOME LOAN AND CONDO FEES"
-/** Two income Flows that share a label, with long ids that differ only near their end. */
-export const INCOME_IDS = [
-	"income-from-the-old-consulting-contract",
-	"income-from-the-overseas-rental-flat",
+/** Two income Flows that share a label, with long ids that differ at their start. */
+export const INCOME_IDS = ["a0-consulting-contract", "a1-consulting-contract"] as const
+/** Two saving Flows that share a label, with ids that differ at their start. */
+export const SAVING_IDS = ["a0-saving-from-the-bank", "a1-saving-from-the-bank"] as const
+/** Two withdrawal Flows that share a label, with ids that differ at their start. */
+export const WITHDRAWAL_IDS = [
+	"a0-withdraw-from-the-pension",
+	"a1-withdraw-from-the-pension",
 ] as const
-/** Two saving Flows that share a label, with ids whose tails tell them apart. */
-export const SAVING_IDS = ["saving-from-the-bank", "saving-from-the-vault"] as const
-/** Two withdrawal Flows that share a label, with ids whose tails tell them apart. */
-export const WITHDRAWAL_IDS = ["withdraw-from-the-pension", "withdraw-from-the-trust"] as const

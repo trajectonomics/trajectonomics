@@ -46,11 +46,13 @@ describe("stackName", () => {
 		expect(fits(name, "171,012.54")).toBe(true)
 	})
 
-	test("keeps a twin's (id) suffix in view when the name is cut", () => {
-		expect(
-			stackName("Salary and rent from the Bangkok apartment (salary)", "336,000.00", "(salary)")
-				.text,
-		).toBe("Salary and rent from…(salary)")
+	test("cuts a twin's id with the name, so ids that differ at the start stay distinct", () => {
+		const label = (start: string) => `Saving (${start}-from-the-bank) into Bank`
+		const one = stackName(label("a0"), "336,000.00").text
+		const two = stackName(label("a1"), "336,000.00").text
+		expect(one).toContain("(a0-")
+		expect(two).toContain("(a1-")
+		expect(one).not.toBe(two)
 	})
 
 	test("gives all the line to the amount when the amount is that long", () => {

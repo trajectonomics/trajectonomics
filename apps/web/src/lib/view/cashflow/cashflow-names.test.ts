@@ -3,7 +3,7 @@ import { type ItemNames, itemNames } from "../item-names"
 import type { CashflowLine } from "./cashflow"
 import { rollupsOf } from "./cashflow"
 import { flowOf } from "./cashflow-flow"
-import { lineLabel, lineTwinId, lineWords } from "./cashflow-labels"
+import { lineLabel, lineWords } from "./cashflow-labels"
 import { YEAR_ZERO_LINES } from "./fixture-lines.test-support"
 import { cashflowRunFixture } from "./fixtures.test-support"
 
@@ -105,15 +105,12 @@ describe("the cash flow diagram's labels", () => {
 		)
 	})
 
-	test("a twin's id travels with the band, whichever words follow it on the line", () => {
+	test("a twin's id stays in the label, whichever words follow it on the line", () => {
 		const names = plan({ invest: "Saving", extra: "Saving", borrow: "Drawn" })
-		expect(lineTwinId(lineOf("contribution", "invest"), names)).toBe("(invest)")
-		expect(lineTwinId(lineOf("withdrawal", "borrow"), names)).toBeNull()
 		const rollup = rollupsOf(cashflowRunFixture())[0]
 		if (rollup === undefined) throw new Error("the fixture has a first year")
 		const flow = flowOf(rollup, names)
 		const saving = flow.uses.filter((band) => band.kind === "saving")
-		expect(saving.map((band) => band.keep)).toEqual(["(invest)", "(extra)"])
 		expect(saving.map((band) => band.label)).toEqual([
 			"Saving (invest) into Investments",
 			"Saving (extra) into Investments",

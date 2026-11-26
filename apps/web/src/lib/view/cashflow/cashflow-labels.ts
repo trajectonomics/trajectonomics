@@ -93,14 +93,3 @@ export function lineWords(
 export function lineLabel(line: CashflowLine, names: ItemNames = NO_ITEM_NAMES): string {
 	return wordsOf(lineWords(line, names)).text
 }
-
-/**
- * A twin Flow's `(id)`, which a diagram keeps in view when it cuts the line's name, or null for a line
- * that names no twin. Two Flows that share a label take their id in brackets (web ADR 0029), so the id is
- * what tells them apart, whether it ends the label or sits before words such as "into Bank".
- */
-export function lineTwinId(line: CashflowLine, names: ItemNames = NO_ITEM_NAMES): string | null {
-	const flow = flowNamed(line, names)
-	if (flow === null) return null
-	return flow.text.endsWith(` (${flow.id})`) ? `(${flow.id})` : null
-}

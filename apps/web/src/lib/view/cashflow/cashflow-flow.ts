@@ -1,7 +1,7 @@
 import type { FlowBand, FlowInput, FlowKind } from "../../chart/flow"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import type { CashflowLine, Rollup } from "./cashflow"
-import { intoKey, isRefund, lineKey, lineLabel, lineTwinId } from "./cashflow-labels"
+import { intoKey, isRefund, lineKey, lineLabel } from "./cashflow-labels"
 
 /**
  * The bands of a roll-up's flow diagram. Sources are income, withdrawals, money drawn, tax refunds and
@@ -14,7 +14,6 @@ export function flowOf(rollup: Rollup, names: ItemNames = NO_ITEM_NAMES): FlowIn
 		key: lineKey(line),
 		kind,
 		label: lineLabel(line, names),
-		keep: lineTwinId(line, names),
 		amount,
 	})
 	// Each side's bands follow the order the diagram reads: a source by its kind, a use by its kind.

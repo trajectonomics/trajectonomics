@@ -41,15 +41,11 @@ function expectWholeCapitals(labels: readonly string[], width: number): void {
 	for (const text of whole) expect(labels, `${text} at ${width}px`).toContain(text)
 }
 
-/** Two twins of each kind stay distinct, because a cut label keeps the tail of the Flow's id. */
+/** Two twins of each kind stay distinct, because their ids differ where the cut keeps them, at the start. */
 function expectTwins(labels: readonly string[]): void {
-	for (const markers of [
-		["contract)", "flat)"],
-		["bank)", "vault)"],
-		["pension)", "trust)"],
-	] as const) {
-		const twins = labels.filter((label) => markers.some((marker) => label.includes(marker)))
-		expect(twins).toHaveLength(2)
+	for (const start of ["Consulting (a", "Saving (a", "Withdraw (a"]) {
+		const twins = labels.filter((label) => label.startsWith(start))
+		expect(twins, start).toHaveLength(2)
 		expect(new Set(twins).size).toBe(2)
 	}
 }

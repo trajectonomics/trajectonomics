@@ -29,6 +29,8 @@ const PICTURE = /[\p{Extended_Pictographic}\p{Regional_Indicator}]/u
 const EAST_ASIAN =
 	/^[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Hangul}\u3000-\u303F\u3200-\u33FF\uFF01-\uFF60\uFFE0-\uFFE6]$/u
 const THAI_BROAD = /^[ญฌฒณ]$/
+/** U+00B7 is Script_Extensions=Han but draws as a narrow dot, as on `main`; it must not take a full em. */
+const MIDDLE_DOT = /^\u00B7$/u
 /** Sans-serif characters wider than {@link CHAR_PX}. A monospace font draws them as wide as the others. */
 const WIDEST = /^[mMW@%—]$/
 const BROAD = /^[A-Z&w]$/
@@ -69,6 +71,7 @@ function graphemeWidth(grapheme: string, code: boolean): number {
 /** The width of one character, rounded up for the wide ones so a box is not narrower than its words. */
 function characterWidth(character: string, code: boolean): number {
 	if (ZERO_WIDTH.test(character)) return 0
+	if (MIDDLE_DOT.test(character)) return CHAR_PX
 	if (EAST_ASIAN.test(character)) return WIDEST_PX
 	if (THAI_BROAD.test(character)) return THAI_BROAD_PX
 	if (code) return CODE_CHAR_PX

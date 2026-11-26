@@ -23,13 +23,12 @@ interface Props {
 /** The wide flow diagram of one year, from a medium screen up. Each band is a control: a click, or Enter or Space, picks its table row. */
 let { layout, picked, onPick, label, stacked = false }: Props = $props()
 
-/** The diagram's one id prefix, so each name's clip is its own. */
 const uid = $props.id()
 
-/** The page's own font, read once for the whole drawing, so each name is fitted to the words a person sees. */
-const measure = flowMeasure()
+/** The page's own font, read from the drawing, so each name is fitted at the size it is drawn. */
+let diagram = $state<SVGSVGElement | null>(null)
+const measure = $derived(flowMeasure(diagram))
 
-/** A money string as the page shows it: its digits grouped, or masked when amounts are hidden. */
 const shown = (amount: string): string =>
 	preferences.hidden ? maskMoney(amount) : formatMoney(amount)
 </script>
@@ -37,11 +36,12 @@ const shown = (amount: string): string =>
 <!-- The figures are the CLI's strings. A band is drawn by its share of the taller column; the table below repeats each one. -->
 <div class={cx("max-w-full overflow-x-auto rounded-lg border border-border", stacked && "hidden md:block")}>
 	<svg
+		bind:this={diagram}
 		viewBox={`0 0 ${layout.width} ${layout.height}`}
 		role="group"
 		aria-label={label}
 		text-rendering="geometricPrecision"
-		class="h-auto min-w-[640px] w-full text-[12px]"
+		class="h-auto min-w-[640px] w-full text-xs"
 	>
 		{#each layout.links as link (link.key)}
 			<path
