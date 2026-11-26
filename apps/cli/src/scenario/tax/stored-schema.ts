@@ -59,7 +59,7 @@ export const storedTax: z.ZodType<StoredTax> = z
 			.min(0)
 			.optional()
 			.describe(
-				"Home-loan interest on one loan borrowed together, in THB, as --mortgage-interest shared= states it: each separate Return claims half beside its own mortgageInterest, an odd satang going to the holder, and a sole Filer claims it all (cli ADR-0075). Under another filing status it is kept and no Levy reads it.",
+				"Home-loan interest on one loan borrowed together, in THB, as --mortgage-interest shared= states it: each separate Return claims half in a year both have income beside its own mortgageInterest, an odd satang going to the holder, and a sole Filer claims it all, as does the only Return with income in a year (cli ADR-0075). Under another filing status it is kept and no Levy reads it.",
 			),
 		...deductionFlags,
 	})

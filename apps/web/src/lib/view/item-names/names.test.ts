@@ -121,6 +121,26 @@ describe("an id no Read names shows as the id", () => {
 		expect(itemText(names, "flow", "rent")).toBe("Rent")
 	})
 
+	test("a Flow and a Milestone may share a label: the twin count is per kind", () => {
+		const doc = {
+			...DOCUMENT,
+			flows: [
+				...DOCUMENT.flows,
+				{
+					id: "bonus",
+					kind: "income" as const,
+					frequency: "monthly" as const,
+					start: "2026-01-01",
+					displayLabel: "Freedom",
+				},
+			],
+			milestones: [...DOCUMENT.milestones, { id: "freedom", displayLabel: "Freedom" }],
+		}
+		const names = itemNames(ACCOUNTS, HOUSEHOLD, doc)
+		expect(itemText(names, "flow", "bonus")).toBe("Freedom")
+		expect(itemText(names, "milestone", "freedom")).toBe("Freedom")
+	})
+
 	test("an Account is named by the ledger, and one only the plan has shows as the id", () => {
 		expect(itemLabel(NAMES, "account", "acct-1")).toMatchObject({ text: "Bank", named: true })
 		expect(itemLabel(NAMES, "account", "condo")).toMatchObject({ text: "condo", named: false })

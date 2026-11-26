@@ -6,6 +6,7 @@ import type { ThLevyGraph } from "./graph"
 import { sumMeasures } from "./graph-rates"
 import { ThLevyMeasureId } from "./measure-ids"
 import type { ThLevyProfile } from "./profile-types"
+import { addSharedMortgageAllowance } from "./shared-mortgage"
 import type { ThLevyTallies } from "./tallies"
 
 /**
@@ -18,7 +19,7 @@ import type { ThLevyTallies } from "./tallies"
  * @statute Thailand Revenue Code Section 47.
  */
 export interface ThAllowanceMeasures {
-	/** Fixed + Retirement Cluster + ThaiESG + donations, after every cap. */
+	/** Fixed (or its per-period mortgage Measure) + Retirement Cluster + ThaiESG + donations. */
 	readonly total: string
 	/** Net taxable income in satang, never below zero. */
 	readonly netTaxable: string
@@ -27,11 +28,12 @@ export interface ThAllowanceMeasures {
 /**
  * Emits every Section 47 allowance and derives net taxable income.
  *
- * Purpose: Orders the fixed, retirement, ThaiESG, and donation rules into one pipeline.
+ * Purpose: Orders the fixed, retirement, ThaiESG, and donation rules into one pipeline. A shared
+ * home loan's interest is one per-period Measure instead of part of the fixed const.
  * Math: `netBefore = max(0, assessable - expenses - fixed - cluster - ThaiESG)`, then donations
  * are capped against that net; `netTaxable = max(0, netBefore - allowed donations)`.
  * Units: Integer satang Measures.
- * Throws: TaxValidationError for an invalid profile allowance or donation amount.
+ * Throws: TaxValidationError for an invalid profile allowance, shared loan or donation amount.
  *
  * @param graph Measure graph being built.
  * @param tallies Income and contribution tally ids.
@@ -50,9 +52,19 @@ export function addAllowanceMeasures(
 	expenses: string,
 	filers: readonly ThLevyFilerReads[] = [{ tallies, assessable }],
 ): ThAllowanceMeasures {
-	const fixed = addFixedAllowances(graph, profile.allowances, profile.filingStatus ?? "single")
+	const shared = profile.sharedMortgage
+	const fixed = addFixedAllowances(graph, profile.allowances, profile.filingStatus ?? "single", {
+		mortgageInterest: shared === undefined,
+	})
+	const mortgage =
+		shared === undefined ? [] : [addSharedMortgageAllowance(graph, profile, tallies, shared)]
 	const retirement = addFilerRetirementAllowances(graph, filers)
-	const nonDonation = sumMeasures(graph, [fixed, retirement.cluster, retirement.thaiEsg])
+	const nonDonation = sumMeasures(graph, [
+		fixed,
+		...mortgage,
+		retirement.cluster,
+		retirement.thaiEsg,
+	])
 	const netBefore = graph.max(
 		graph.sub(graph.sub(assessable, expenses), nonDonation),
 		graph.constant(0),

@@ -1,9 +1,12 @@
 import type { MonthDay } from "@trajectonomics/core/sim"
 import { checkedDate } from "../date"
 import { type AppError, fail, isAppError } from "../errors"
+import { type JsonRecord, records as objects } from "../scenario/tax/json"
 import { parseMinorUnits } from "../store"
 import type { CarryInRecordForm } from "./carryin"
 import type { StatedTally } from "./carryin-classes"
+import { unreadable } from "./carryin-refuse"
+import { isBasis } from "./carryin-view"
 
 /** A `periodStart` the Levy's own period can start on, or the refusal that says why not. */
 export function alignedStart(input: {
@@ -50,4 +53,22 @@ export function amountsOf(
 		})
 	}
 	return { prepaid, rest: true, stated }
+}
+
+/** The tallies a stored record states, or the refusal for one this build cannot read. */
+export function storedTallies(
+	record: JsonRecord,
+	path: string,
+	levy: string,
+	at: string,
+): StatedTally[] | AppError {
+	const stated: StatedTally[] = []
+	for (const tally of objects(record["tallies"])) {
+		const { label, basis, amount } = tally
+		if (typeof label !== "string" || !isBasis(basis) || typeof amount !== "number") {
+			return unreadable(path, levy, at, "a class this build cannot read")
+		}
+		stated.push({ label, basis, amount })
+	}
+	return stated
 }

@@ -44,7 +44,7 @@ $effect(() => {
 >
 	<div class="flex h-full flex-col gap-5 overflow-y-auto p-5">
 		<div class="flex items-center justify-between gap-2">
-			<h2 id="{titleId}-title" class="text-base font-semibold">{title}</h2>
+			<h2 id="{titleId}-title" class="min-w-0 text-base font-semibold wrap-anywhere">{title}</h2>
 			<button
 				type="button"
 				onclick={() => {

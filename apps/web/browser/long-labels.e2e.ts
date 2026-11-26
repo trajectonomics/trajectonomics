@@ -46,7 +46,7 @@ test("the Milestones What-if panel wraps an 80-character name at 360px", async (
 	await page.getByRole("link", { name: "Milestones" }).click()
 	const panel = page.getByRole("region", { name: "What-if on base" })
 	await expect(panel.getByText(LONG)).toBeVisible()
-	// The Milestones page's own timeline is #641's overflow; the panel here must wrap its name on its own.
+	// The Milestones timeline wraps the name itself; this panel must wrap its own copy too.
 	const fit = await panel.evaluate((element) => ({
 		scrollWidth: element.scrollWidth,
 		clientWidth: element.clientWidth,
