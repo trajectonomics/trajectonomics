@@ -160,6 +160,16 @@ assessable 1,500,000; expenses 100,000 + 100,000 = 200,000 (s.42 bis); allowance
     current holder's.
   - The record names a person by id. A holder given a new id reads as another person: the flat claims
     stay under the old id, and the new one's Return starts from nothing until the caller states them.
+    The result reports it (trajectonomics/trajectonomics#614). Every `married_separate` write, by
+    `--merge` or `--from-stored` and a dry run of either, adds to `assumptions` one entry for each id
+    in the written `returns` that no person in the household has. Such a set claims something, because
+    `returns` keeps no empty set for a person with no Return. The entry is at path `returns.<id>`,
+    with value 0 and status `unsourced`, and names the id. So a partner given a new id is reported as
+    a holder is, and the entry stays for as long as the claims sit on no Return. Stating them again
+    for a person in the household leaves the old set stored: a `--tax` write drops it, and a household
+    that has the old id again ends the entry. A joint or single write adds none, because it counts the
+    flat claims on its Return, and the kept-claims note (#606, below) names the sets in `returns`. A
+    write with no household cannot judge an id and adds none.
 - **`returns` across a status or household change.** `--merge` and `--from-stored` keep every item
   they are not told to change (ADR-0066). So a write keeps each Filer's entry, and every other entry
   that claims something, whatever the filing status and also while the household names no partner or
@@ -240,10 +250,12 @@ This is the follow-up the shared home-loan ceiling left above.
   `assumptions` on `allowances.mortgageInterestCeiling`, that the shared interest the profile keeps is
   not claimed, with the amount and `--mortgage-interest <amount> --merge` as the way to state this
   Return's interest. It says the same of the claims kept for another person, naming them, whatever
-  they claim: every entry of `assumptions` is one of tax-core's figures, so this is the entry that
-  carries a sentence about a claim. The entry keeps tax-core's value and status, and is added when the
-  Levy claims no home-loan interest. A separate write whose sole Filer leaves the other person's
-  stored claims unclaimed says nothing, as before.
+  they claim: apart from the entries of #614, every entry of `assumptions` is one of tax-core's
+  figures, so this is the entry that carries a sentence about a claim. The entry keeps tax-core's
+  value and status, and is added when the Levy claims no home-loan interest. On a `married_separate`
+  write with no Filers, an id no longer in the household is left out of this sentence, because it has
+  its own entry (#614, above). A separate write whose sole Filer leaves the other person's stored
+  claims unclaimed says nothing of a person still in the household, as before.
 - **The assumption.** The separate-loans note on `allowances.mortgageInterestCeiling` is not added
   once the profile states shared interest, because the person has said which interest is shared. The
   CLI does not check that the rest of each Return's interest is on separate loans. Without it, the

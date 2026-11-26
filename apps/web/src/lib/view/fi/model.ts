@@ -1,7 +1,7 @@
 import type { Fi, FiResult } from "../../contract"
 import { formatDate, formatMonth } from "../../format"
 import { agesText } from "../household/model"
-import { NO_PEOPLE, type PersonNames } from "../item-names"
+import type { PersonNames } from "../item-names"
 import { bindingSentence, type UnreachableBinding } from "./binding"
 import { type ReferenceView, referenceOf } from "./reference"
 
@@ -44,7 +44,7 @@ export interface UnreachableFi {
 export type FiModel = ReachableFi | UnreachableFi
 
 /** The FI answer of a Scenario as the page shows it, naming each person by the household's words. */
-export function fiModelOf(fi: Fi, people: PersonNames = NO_PEOPLE): FiModel {
+export function fiModelOf(fi: Fi, people: PersonNames): FiModel {
 	const result = fi.fi
 	if (result.reachable) {
 		return {

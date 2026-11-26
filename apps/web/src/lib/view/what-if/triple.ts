@@ -1,4 +1,5 @@
 import type { Cell } from "../compare/cell"
+import type { ItemLabel } from "../item-names"
 import type { ChangeView } from "./change"
 
 /**
@@ -8,6 +9,8 @@ import type { ChangeView } from "./change"
 export interface Triple {
 	readonly key: string
 	readonly label: string
+	/** The item the label names, when a Milestone's id shows in code if the plan states no name. */
+	readonly labelItem?: ItemLabel | undefined
 	readonly whatIf: Cell
 	readonly baseline: Cell
 	readonly change: ChangeView

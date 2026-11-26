@@ -3,7 +3,7 @@ import { toChartNumber } from "../../chart"
 import type { ProjectionRun } from "../../contract"
 import { formatMoney } from "../../format"
 import { agesText, axisAge } from "../household/model"
-import { NO_PEOPLE, type PersonNames } from "../item-names"
+import type { PersonNames } from "../item-names"
 import { type AnnualRow, annualRowsOf } from "./annual"
 import type { Terms } from "./terms"
 
@@ -21,7 +21,7 @@ export const REAL_NAME = "Real net worth, in As-of terms"
 export function netWorthSeries(
 	run: ProjectionRun,
 	terms: Terms,
-	people: PersonNames = NO_PEOPLE,
+	people: PersonNames,
 ): LineSeries[] {
 	const rows = annualRowsOf(run)
 	const nominal: LineSeries = {

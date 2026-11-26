@@ -28,6 +28,15 @@ function cashflowOf(doc: ScenarioDocument, whatIf: WhatIf): ScenarioCashflow | u
 		: ({ ...doc.cashflow, ...tried } as ScenarioCashflow)
 }
 
+/** The Flows the session shows on `plan`, or the plan's own when the session is on another plan. */
+export function shownFlows(
+	doc: ScenarioDocument,
+	whatIf: WhatIf | null,
+	plan: string,
+): ScenarioFlow[] {
+	return whatIf !== null && whatIf.plan === plan ? shownPlan(doc, whatIf).flows : doc.flows
+}
+
 /** The plan as the session shows it, or the plan itself when no session holds a change. */
 export function shownPlan(doc: ScenarioDocument, whatIf: WhatIf | null): ScenarioDocument {
 	if (whatIf === null) return doc

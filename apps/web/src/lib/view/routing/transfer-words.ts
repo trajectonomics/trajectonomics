@@ -2,9 +2,9 @@
 import type { ScenarioFlow } from "../../contract"
 import { formatBps, formatDate, percentWords } from "../../format"
 import { type AccountNames, nameOf } from "../account-names"
-import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
+import type { Part } from "../words"
 import { movesOf } from "./transfer-read"
-import type { Part } from "./words"
 
 const EVERY: Readonly<Record<string, string>> = {
 	daily: "every day",
@@ -15,15 +15,15 @@ const EVERY: Readonly<Record<string, string>> = {
 	annual: "every year",
 }
 
-/** When the transfer lands: its date, or the Milestone that fires it, with its frequency. */
-function whenWords(flow: ScenarioFlow, names: ItemNames): string {
-	const at =
+/** When a transfer lands: its date, or the Milestone that fires it, with its frequency. */
+function whenParts(flow: ScenarioFlow, names: ItemNames): readonly Part[] {
+	const at: readonly Part[] =
 		flow.startAt === undefined
-			? formatDate(flow.start)
-			: `when ${itemText(names, "milestone", flow.startAt)} fires`
+			? [formatDate(flow.start)]
+			: ["when ", { item: itemLabel(names, "milestone", flow.startAt) }, " fires"]
 	const every = EVERY[flow.frequency]
-	if (every === undefined) return flow.startAt === undefined ? `on ${at}` : at
-	return flow.startAt === undefined && flow.start === "" ? every : `${every}, from ${at}`
+	if (every === undefined) return flow.startAt === undefined ? ["on ", ...at] : at
+	return flow.startAt === undefined && flow.start === "" ? [every] : [every, ", from ", ...at]
 }
 
 /** How an amount grows, in words: nothing for a rate of 0. */
@@ -43,11 +43,11 @@ export function transferWords(
 	const from = nameOf(names, flow.source ?? "")
 	const to = nameOf(names, flow.target ?? "")
 	const moves = movesOf(flow)
-	const when = ` ${whenWords(flow, items)}`
-	if (moves === null) return [`Move money from ${from} to ${to} by a computed amount${when}`]
-	if (moves.how === "all") return [`Move all of ${from} to ${to}${when}`]
+	const said = [" ", ...whenParts(flow, items)]
+	if (moves === null) return [`Move money from ${from} to ${to} by a computed amount`, ...said]
+	if (moves.how === "all") return [`Move all of ${from} to ${to}`, ...said]
 	if (moves.how === "share")
-		return [`Move ${percentWords(moves.share)}% of ${from} to ${to}${when}`]
+		return [`Move ${percentWords(moves.share)}% of ${from} to ${to}`, ...said]
 	const real = growthWords(flow.growth)
-	return ["Move ", { amount: flow.amount ?? "" }, `${real} from ${from} to ${to}${when}`]
+	return ["Move ", { amount: flow.amount ?? "" }, `${real} from ${from} to ${to}`, ...said]
 }

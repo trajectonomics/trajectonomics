@@ -1,7 +1,7 @@
 import type { ProjectionCompare } from "../../contract"
 import { formatDate } from "../../format"
 import { type Cell, textCell } from "../compare/cell"
-import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
 import { countChange } from "./change"
 import type { Triple } from "./triple"
 
@@ -51,9 +51,11 @@ export function milestoneTriples(
 	const { a, b } = data.sides
 	return idsOf(data).map((id) => {
 		const delta = data.deltas.milestones?.find((row) => row.id === id)
+		const label = itemLabel(names, "milestone", id)
 		return {
 			key: id,
-			label: itemText(names, "milestone", id),
+			label: label.text,
+			labelItem: label,
 			whatIf: dateCell(b.milestones, id),
 			baseline: dateCell(a.milestones, id),
 			change: countChange(

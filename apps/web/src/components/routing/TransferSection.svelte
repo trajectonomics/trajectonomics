@@ -42,7 +42,7 @@ const remove = (id: string) => ({ kind: "remove", id }) as const
 			{@const isTried = tried.includes(flow)}
 			<li class="space-y-2 rounded-md border border-border bg-card p-3 text-sm">
 				<div class="flex flex-wrap items-center justify-between gap-2">
-					<span class="min-w-0 flex-1"><Sentence parts={transferWords(flow, ctx.names, items)} currency={ctx.doc.currency} />{isTried ? " (tried)" : ""}</span>
+					<span class="wrap-anywhere min-w-0 flex-1"><Sentence parts={transferWords(flow, ctx.names, items)} currency={ctx.doc.currency} />{isTried ? " (tried)" : ""}</span>
 					{#if ctx.editable}
 						<span class="flex flex-wrap gap-1.5">
 							<RowButtons label={plainText(transferWords(flow, ctx.names, items), formatMoney)} busy={false}

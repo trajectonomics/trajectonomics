@@ -128,7 +128,7 @@ describe("a quarterly payout from retirement and a 1% fee", () => {
 		}).cards
 		const card = cards.find((one) => one.id === ids.fund)
 		expect(card).toMatchObject({
-			payout: "Pays out 3.5% a year from retire",
+			payout: { text: "Pays out 3.5% a year from retire" },
 			payoutHow: "Paid quarterly",
 			fee: "Fee 1% a year",
 		})

@@ -238,7 +238,9 @@ interest bare. A write that claims neither says so in its `assumptions`, on
 claims its other keys are, so if the household swaps which person is the holder, each
 person's claims stay theirs. A `projection run` then reports a `filer` on each `taxYears`
 entry, `--carry-in` takes one record per Levy, and `projection allowances` answers per
-Return.
+Return. A person given a new id reads as another person: no separate Return counts the
+claims stored under the old id, and each separate write says so in `assumptions`, at
+`returns.<old id>`, until a `--tax` write states the profile again.
 
 A Projection that starts inside a tax period also needs what that period had
 already taken: `--carry-in carry-in.json` states it, one record per Scenario,

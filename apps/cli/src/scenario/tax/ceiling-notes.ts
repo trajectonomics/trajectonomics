@@ -8,9 +8,9 @@ import type { FilerScope } from "./filer-scope"
 import type { TaxRequest } from "./flags"
 
 /*
- * What a write says on tax-core's assumption about the home-loan ceiling (cli ADR-0075). A result's
- * assumptions are tax-core's figures, so a sentence about what a write assumed or left unclaimed goes
- * on that entry, and its value and status stay tax-core's.
+ * What a write says on tax-core's assumption about the home-loan ceiling (cli ADR-0075): a sentence
+ * about what the write assumed or left unclaimed goes on that entry, and its value and status stay
+ * tax-core's. Claims under an id no longer in the household have their own entry (`departed-claims.ts`).
  */
 
 const PATH = "allowances.mortgageInterestCeiling"
@@ -29,12 +29,17 @@ function claimsUnclaimed(persons: readonly string[]): string {
 /**
  * What the profile a write keeps holds for a separate filing and its Return leaves out; nothing for a
  * separate Return with Filers. Under any other write every entry of `returns` is one that claims
- * something and is not the flat claims' person's (`keptRequest`).
+ * something and is not the flat claims' person's (`keptRequest`). The `departed` ids are left to their
+ * own entries, so no claim set is named twice.
  */
-export function unclaimedNotes(kept: TaxRequest, scope: FilerScope | null): string[] {
+export function unclaimedNotes(
+	kept: TaxRequest,
+	scope: FilerScope | null,
+	departed: readonly string[],
+): string[] {
 	if (scope?.kind === "separate") return []
 	const shared = kept.sharedMortgageInterest ?? 0
-	const persons = Object.keys(kept.returns ?? {})
+	const persons = Object.keys(kept.returns ?? {}).filter((id) => !departed.includes(id))
 	return [
 		...(shared > 0 ? [sharedUnclaimed(shared)] : []),
 		...(persons.length > 0 ? [claimsUnclaimed(persons)] : []),

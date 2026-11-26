@@ -3,6 +3,7 @@ import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { ruleSummary } from "../withdrawals/words"
+import type { Words } from "../words"
 import { employerText } from "./employer"
 import { datesOfCard } from "./flow-dates"
 
@@ -17,9 +18,10 @@ export interface FlowCard {
 	readonly frequency: string
 	/** "On" for a once Flow, whose one occurrence is its date; "Starts" for any other. */
 	readonly startLabel: string
-	readonly start: string
+	/** The start's words, with a Milestone's id in code when the plan names it none. */
+	readonly start: Words
 	/** The end as the card states it, or null for a once Flow, which has no end. */
-	readonly end: string | null
+	readonly end: Words | null
 	/** The label of the start when the household pins it ("at me, age 60"), or null. */
 	readonly startAnchor: string | null
 	/** The label of the end when the household pins it, or null (also for a once Flow). */

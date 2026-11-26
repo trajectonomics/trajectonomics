@@ -2,6 +2,7 @@ import type { Baseline, ProjectionRun, Read, ScenarioAccount } from "../../contr
 import { formatBps } from "../../format/bps"
 import { percentWords } from "../../format/percent"
 import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
+import type { Words } from "../words"
 import {
 	type FeeDraft,
 	feeDraftOf,
@@ -26,7 +27,7 @@ export interface AccountCard {
 	readonly lockedUntil: string | null
 	readonly balance: string | null
 	/** "Pays out 3.5% a year from retire", from the stored payout; null when the Account pays none out. */
-	readonly payout: string | null
+	readonly payout: Words | null
 	/** How it is paid: "Paid quarterly", with the kind of income when a tax label says it; null with no payout. */
 	readonly payoutHow: string | null
 	/** "Fee 1.5% a year"; null when the Account charges none. */

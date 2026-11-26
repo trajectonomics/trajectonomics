@@ -1,16 +1,18 @@
 import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { flowAnchorLabels } from "../household/model"
-import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
+import { type Words, wordsOf } from "../words"
 
 /** Whether a Flow is once: one occurrence on its start date, so it has no end. */
 export function isOnce(flow: ScenarioFlow): boolean {
 	return flow.frequency === "once"
 }
 
-/** The words for a date a Milestone sets: the plan's name for it, or the id when it states none. A Flow with none shows its own date. */
-function dateWords(milestone: string | undefined, date: string, names: ItemNames): string {
-	return milestone === undefined ? date : `When ${itemText(names, "milestone", milestone)} fires`
+/** The words for a date a Milestone sets: the plan's name for it, or its id in code when it states none. A Flow with none shows its own date. */
+function dateWords(milestone: string | undefined, date: string, names: ItemNames): Words {
+	if (milestone === undefined) return wordsOf([date])
+	return wordsOf(["When ", { item: itemLabel(names, "milestone", milestone) }, " fires"])
 }
 
 /** The anchor labels of one Flow's dates, as the card holds them. A once Flow has no end to label. */

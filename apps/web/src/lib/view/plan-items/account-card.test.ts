@@ -28,7 +28,7 @@ describe("the Account card", () => {
 
 	test("reads 'Pays out 3.5% a year from retire' and 'Fee 1.5% a year', with how it is paid", () => {
 		const card = read(fund(PAYS))
-		expect(card?.payout).toBe("Pays out 3.5% a year from retire")
+		expect(card?.payout?.text).toBe("Pays out 3.5% a year from retire")
 		expect(card?.payoutHow).toBe("Paid quarterly, counted as dividends")
 		expect(card?.fee).toBe("Fee 1.5% a year")
 	})
@@ -40,17 +40,17 @@ describe("the Account card", () => {
 			flows: [],
 			milestones: [{ id: "retire", displayLabel: "Retirement" }],
 		})
-		expect(accountCards([fund(PAYS)], baselineRead(), undefined, names)[0]?.payout).toBe(
+		expect(accountCards([fund(PAYS)], baselineRead(), undefined, names)[0]?.payout?.text).toBe(
 			"Pays out 3.5% a year from Retirement",
 		)
-		expect(read(fund(PAYS))?.payout).toBe("Pays out 3.5% a year from retire")
+		expect(read(fund(PAYS))?.payout?.text).toBe("Pays out 3.5% a year from retire")
 	})
 
 	test("a payout from a date says the date, and an Account with neither says nothing", () => {
 		const dated = fund({
 			payout: { bps: "4.00", frequency: "semiannual", rounding: "floor", start: "2030-01-01" },
 		})
-		expect(read(dated)?.payout).toBe("Pays out 4% a year from 1 Jan 2030")
+		expect(read(dated)?.payout?.text).toBe("Pays out 4% a year from 1 Jan 2030")
 		expect(read(dated)?.payoutHow).toBe("Paid twice a year")
 		expect(read(doc.accounts[0] as ScenarioAccount)).toMatchObject({
 			payout: null,

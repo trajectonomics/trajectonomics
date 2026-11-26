@@ -2,7 +2,8 @@
 import type { ScenarioAccount } from "../../contract/scenario-show"
 import { formatDate } from "../../format/date"
 import { percentWords } from "../../format/percent"
-import { type ItemNames, itemText, NO_ITEM_NAMES } from "../item-names"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
+import { type Part, type Words, wordsOf } from "../words"
 import { PAYOUT_LABELS } from "./account-income"
 
 const FREQUENCY_WORDS: Readonly<Record<string, string>> = {
@@ -16,16 +17,16 @@ const FREQUENCY_WORDS: Readonly<Record<string, string>> = {
 export function payoutWords(
 	account: ScenarioAccount,
 	names: ItemNames = NO_ITEM_NAMES,
-): string | null {
+): Words | null {
 	const payout = account.payout
 	if (payout === undefined) return null
-	const from =
-		payout.startAt !== undefined
-			? ` from ${itemText(names, "milestone", payout.startAt)}`
-			: payout.start === undefined
-				? ""
-				: ` from ${formatDate(payout.start)}`
-	return `Pays out ${percentWords(payout.bps)}% a year${from}`
+	let from: readonly Part[] = []
+	if (payout.startAt !== undefined) {
+		from = [" from ", { item: itemLabel(names, "milestone", payout.startAt) }]
+	} else if (payout.start !== undefined) {
+		from = [` from ${formatDate(payout.start)}`]
+	}
+	return wordsOf([`Pays out ${percentWords(payout.bps)}% a year`, ...from])
 }
 
 /** How a payout is paid, and the kind of income the tax label says it is when it says one the form writes. */

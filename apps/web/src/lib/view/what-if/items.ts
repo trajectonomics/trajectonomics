@@ -34,6 +34,15 @@ export type MarkMap = Readonly<Record<string, ItemMarks>>
 /** The marks a card with no session has. */
 export const NO_MARKS: ItemMarks = { off: false, was: {} }
 
+/** A card field's plain text: the words a field carries, or the value as it stands. */
+function textOf(value: unknown): string {
+	if (typeof value === "object" && value !== null && "text" in value) {
+		const text = (value as { text: unknown }).text
+		if (typeof text === "string") return text
+	}
+	return String(value ?? "")
+}
+
 /**
  * The marks of one item: whether it is off, and the baseline's text of each field whose text differs from the
  * what-if's. The texts are compared as the cards show them; none is parsed or computed.
@@ -47,8 +56,8 @@ export function marksOf<T extends object>(
 	if (whatIf === undefined) return { off, was: {} }
 	const was: { [K in WasField]?: string } = {}
 	for (const field of fields) {
-		const before = String(baseline[field] ?? "")
-		if (before !== String(whatIf[field] ?? "")) was[field] = before
+		const before = textOf(baseline[field])
+		if (before !== textOf(whatIf[field])) was[field] = before
 	}
 	return { off, was }
 }
