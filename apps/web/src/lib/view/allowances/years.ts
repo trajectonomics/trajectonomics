@@ -49,6 +49,12 @@ export interface YearView {
 	readonly hints: readonly string[]
 }
 
+/** One note under the page: the CLI's own sentence, or the page's estimate notice. */
+export interface NoteView {
+	readonly text: string
+	readonly fromCli: boolean
+}
+
 /** The whole page's reading of one `projection allowances` result. */
 export interface AllowancesView {
 	readonly currency: string
@@ -58,7 +64,7 @@ export interface AllowancesView {
 	/** One section per Return, when the read names Filers; empty for a plan without them. */
 	readonly returns: readonly ReturnView[]
 	readonly assumptions: readonly AssumptionLine[]
-	readonly notes: readonly string[]
+	readonly notes: readonly NoteView[]
 }
 
 /** The page's view of a read, with each tax year as a card and each Return as a section when it names Filers. */
@@ -74,7 +80,10 @@ export function allowancesView(data: ProjectionAllowances): AllowancesView {
 		returns: isFilerRead(data) ? returnsView(years, data.asOf) : [],
 		assumptions: assumptionLines(data.taxYears),
 		notes: data.notes.some((note) => /tax advice/i.test(note))
-			? data.notes
-			: [...data.notes, ESTIMATE_NOTE],
+			? data.notes.map((text) => ({ text, fromCli: true }))
+			: [
+					...data.notes.map((text) => ({ text, fromCli: true })),
+					{ text: ESTIMATE_NOTE, fromCli: false },
+				],
 	}
 }

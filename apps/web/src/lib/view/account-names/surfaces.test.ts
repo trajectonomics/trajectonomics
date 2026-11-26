@@ -133,4 +133,21 @@ describe("the What-if bar names an Account by its ledger name", () => {
 		}
 		expect(labelWithNames(end, named)).toBe("School fees endAt set to Retirement")
 	})
+
+	test("a Flow's start or end date is shown as the Dashboard prints dates", () => {
+		const start: Change = {
+			kind: "set",
+			path: "flows.rent.start",
+			label: "Rent start set to 2027-03-01",
+			value: "2027-03-01",
+		}
+		const end: Change = {
+			kind: "set",
+			path: "flows.rent.end",
+			label: "Rent end set to 2028-12-31",
+			value: "2028-12-31",
+		}
+		expect(labelWithNames(start, ITEMS)).toBe("School fees start set to 1 Mar 2027")
+		expect(labelWithNames(end, ITEMS)).toBe("School fees end set to 31 Dec 2028")
+	})
 })

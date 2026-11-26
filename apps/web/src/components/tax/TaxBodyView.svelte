@@ -46,7 +46,7 @@ const carry = $derived(
 const assumptions = $derived(assumptionLines(years))
 </script>
 
-<!-- One Scenario's projection as the Tax page shows it: one Return at a time when it files separately, else the plan's own. -->
+<!-- One plan's projection as the Tax page shows it: one Return at a time when it files separately, else the plan's own. -->
 <div class="space-y-8">
 	<div class="flex flex-wrap items-center gap-2">
 		<Badge>{taxStatusWords(run.tax)}</Badge>
@@ -66,8 +66,8 @@ const assumptions = $derived(assumptionLines(years))
 		</div>
 	{/if}
 	{#if shown.kind === "no-levy"}
-		<EmptyState title="No Levy in this Scenario">
-			<p>Its figures are before tax, because the Scenario has no Levy. Add Thailand's with:</p>
+		<EmptyState title="No Levy in this plan">
+			<p>Its figures are before tax, because the plan has no Levy. Add Thailand's with:</p>
 			<pre class="mt-3 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs text-foreground"><code>{addLevyCommand(name)}</code></pre>
 		</EmptyState>
 	{:else}
@@ -82,7 +82,7 @@ const assumptions = $derived(assumptionLines(years))
 			<p class="text-sm text-muted-foreground">Tax figures used whose source is not yet confirmed.</p>
 			<ul class="list-disc space-y-1 pl-5 text-sm">
 				{#each assumptions as line (line.key)}
-					<li><code class="font-mono text-xs">{line.path}</code>: {line.text}</li>
+					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.note}</span> {line.used}</li>
 				{/each}
 			</ul>
 		</section>
@@ -90,7 +90,7 @@ const assumptions = $derived(assumptionLines(years))
 	{#if run.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
 			{#each run.notes as note, index (index)}
-				<li>{note}</li>
+				<li data-cli>{note}</li>
 			{/each}
 		</ul>
 	{/if}

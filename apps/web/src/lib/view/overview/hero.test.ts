@@ -98,7 +98,7 @@ describe("heroOf", () => {
 			}),
 		)
 		expect(hero?.sentence).toBe("You could stop working in Mar 2041, when you are 54.")
-		expect(hero?.planNote).toEqual({ label: "Your plan as written:", text: SUCCESS_NOTE })
+		expect(hero?.planNote).toMatchObject({ text: SUCCESS_NOTE, fromCli: true })
 	})
 
 	test("never puts the markets note in the answer's sentence", () => {
@@ -172,10 +172,9 @@ describe("heroOf", () => {
 
 	test("names the chance's own horizon and counts when it states no success note", () => {
 		const hero = heroOf(snapshotOf(reachable(), { chance: chanceFixture({ succeeded: 174 }) }))
-		expect(hero?.planNote).toEqual({
-			label: "Your plan as written:",
-			text: "The plan holds to 2028-12-31 in 174 of 200 simulated markets, which is not a guarantee.",
-		})
+		const text =
+			"The plan holds to 31 Dec 2028 in 174 of 200 simulated markets, which is not a guarantee."
+		expect(hero?.planNote).toMatchObject({ text, fromCli: false })
 	})
 
 	test("holds no arithmetic: every number is exactly one of the values it was given", () => {
@@ -191,7 +190,7 @@ describe("heroOf", () => {
 		)
 		expect(hero?.sentence).toBe("You could stop working in Jul 2057, when you are 47.")
 		expect(hero?.sentence.match(/\d+/g)).toEqual(["2057", "47"])
-		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["2058", "12", "31", "137", "219"])
+		expect(hero?.planNote?.text.match(/\d+/g)).toEqual(["31", "2058", "137", "219"])
 	})
 })
 

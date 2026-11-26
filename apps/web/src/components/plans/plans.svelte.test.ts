@@ -53,7 +53,7 @@ describe("the plans page", () => {
 		expect(body.match(/>Main</g)).toHaveLength(1)
 	})
 
-	test("shows each card's FI date, chance of success, net worth, notes and chart, and opens its Overview", () => {
+	test("shows each card's FI date, chance of success, net worth, notes and chart, and opens its Projection", () => {
 		const body = page()
 		expect(body).toContain("FI date")
 		expect(body).toContain("Oct 2040")
@@ -62,6 +62,9 @@ describe("the plans page", () => {
 		expect(body.match(/<svg[^>]*role="img"/g)?.length ?? 0).toBeGreaterThanOrEqual(2)
 		expect(body).toContain('href="/projection/?scenario=base"')
 		expect(body).toContain('href="/projection/?scenario=retire-early"')
+		expect(body).toContain("Open the Projection of base")
+		expect(body).toContain("Open the Projection of retire-early")
+		expect(body).not.toContain("Open the Overview")
 	})
 
 	test("shows the first line of the notes and keeps the rest to expand", () => {

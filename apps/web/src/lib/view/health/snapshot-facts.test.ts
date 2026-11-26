@@ -17,21 +17,21 @@ describe("snapshotFacts", () => {
 		expect(valueAt(facts, "Horizon")).toBe("31 Dec 2053")
 	})
 
-	test("names the Scenarios and the compared pair", () => {
+	test("names the plans and the compared pair", () => {
 		const facts = snapshotFacts(demo)
-		expect(valueAt(facts, "Scenarios")).toBe(demo.params.scenarios.join(", "))
+		expect(valueAt(facts, "Plans")).toBe(demo.params.scenarios.join(", "))
 		expect(valueAt(facts, "Compared")).toBe(
 			`${demo.params.compare?.a} and ${demo.params.compare?.b}`,
 		)
 	})
 
-	test("says none when no Scenario or comparison is in the Snapshot", () => {
+	test("says none when no plan or comparison is in the Snapshot", () => {
 		const bare: Snapshot = {
 			...demo,
 			params: { ...demo.params, scenarios: [], compare: null, birthDate: null, ages: [] },
 		}
 		const facts = snapshotFacts(bare)
-		expect(valueAt(facts, "Scenarios")).toBe("None")
+		expect(valueAt(facts, "Plans")).toBe("None")
 		expect(valueAt(facts, "Compared")).toBe("None")
 		expect(valueAt(facts, "Birth date")).toBe("Not given")
 		expect(valueAt(facts, "Ages")).toBe("None")

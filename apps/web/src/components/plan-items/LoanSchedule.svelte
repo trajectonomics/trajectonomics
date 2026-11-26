@@ -1,4 +1,5 @@
 <script lang="ts">
+import { formatMonth } from "../../lib/format"
 import type { ScheduleYear } from "../../lib/view/plan-items/loan-statement"
 import Money from "../ui/Money.svelte"
 
@@ -33,7 +34,7 @@ let { years, currency }: Props = $props()
 					<tbody>
 						{#each year.rows as row (row.month)}
 							<tr class="border-t border-border">
-								<td class="py-1 pr-2">{row.month}</td>
+								<td class="py-1 pr-2">{formatMonth(row.month)}</td>
 								<td class="py-1 pr-2"><Money amount={row.opening} {currency} /></td>
 								<td class="py-1 pr-2"><Money amount={row.drawn} {currency} /></td>
 								<td class="py-1 pr-2"><Money amount={row.interest} {currency} /></td>

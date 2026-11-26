@@ -6,7 +6,7 @@ import type { SegmentedOption } from "./segmented-option"
 interface Props {
 	/** The radio group's name. Unique on the page. */
 	name: string
-	/** The group's accessible name, such as "Scenario". */
+	/** The group's accessible name, such as "Plan". */
 	label: string
 	options: readonly SegmentedOption<T>[]
 	value: T

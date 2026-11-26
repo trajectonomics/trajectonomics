@@ -155,6 +155,8 @@ describe("the page over the Demo snapshot", () => {
 		const page = body(flowOnlyFilerPlan(), "separate")
 		expect(page).toContain("No Return to read")
 		expect(page).toContain("no Levy of it tallies a Filer's label")
+		expect(page).toContain("<code>traj scenario tax separate --from-stored</code>")
+		expect(page).not.toContain("`traj")
 		expect(page).not.toContain("Choose the allowances you could buy")
 	})
 

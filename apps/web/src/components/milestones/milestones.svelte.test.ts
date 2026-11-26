@@ -60,11 +60,11 @@ describe("MilestonesBody", () => {
 })
 
 describe("MilestonesView", () => {
-	test("says there is no Scenario to show when the Snapshot holds no projection", () => {
+	test("says there is no plan to show when the Snapshot holds no projection", () => {
 		const body = render(MilestonesView, {
 			props: { names: [], projections: {}, scenario: "", terms: "both", onTerms: () => {} },
 		}).body
-		expect(body).toContain("No Scenario to show milestones for")
+		expect(body).toContain("No plan to show milestones for")
 	})
 
 	test("shows the chosen Scenario's milestones, and the first one when the request names none", () => {

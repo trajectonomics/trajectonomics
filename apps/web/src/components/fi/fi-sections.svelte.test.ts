@@ -48,7 +48,7 @@ describe("FiSections", () => {
 		expect(body).toContain("Mar 2041")
 	})
 
-	test("says there is no Scenario to read when none has an FI Read", () => {
-		expect(render(FiSections, { props: { fi: {} } }).body).toContain("No Scenario to read")
+	test("says there is no plan to read when none has an FI Read", () => {
+		expect(render(FiSections, { props: { fi: {} } }).body).toContain("No plan to read")
 	})
 })

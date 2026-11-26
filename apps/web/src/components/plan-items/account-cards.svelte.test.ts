@@ -5,12 +5,13 @@ import { type ItemNames, itemNames } from "../../lib/view/item-names"
 import { type AccountCard, accountCards } from "../../lib/view/plan-items/accounts"
 import AccountCards from "./AccountCards.svelte"
 
-/** An asset whose payout starts when the Milestone `retire` fires. */
+/** An asset whose payout starts when the Milestone `retire` fires, and whose lock ends in June 2031. */
 function fund(): ScenarioAccount {
 	return scenarioAccount.parse({
 		id: "fund",
 		kind: "asset",
 		rate: 600,
+		lockedUntil: "2031-06-30",
 		payout: { bps: "3.50", frequency: "quarterly", rounding: "floor", startAt: "retire" },
 	})
 }
@@ -61,5 +62,11 @@ describe("an Account card names the Milestone its payout starts at", () => {
 			'from <span class="wrap-anywhere" data-item="retire" data-kind="milestone">Retirement</span>',
 		)
 		expect(html).not.toContain(">retire</code>")
+	})
+
+	test("a locked Account prints its lock as a date, not the stored ISO date", () => {
+		const html = plain(body([card()]))
+		expect(html).toContain("30 Jun 2031")
+		expect(html).not.toContain("2031-06-30")
 	})
 })

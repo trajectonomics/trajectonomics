@@ -19,11 +19,11 @@ describe("SiteNavLinks", () => {
 		const { body } = render(SiteNavLinks, { props: { current: "/net-worth/", onNavigate: noop } })
 		expect(body).toContain('<nav aria-label="Pages"')
 		const at = (text: string) => body.indexOf(text)
-		expect(at("Home")).toBeGreaterThan(-1)
-		expect(at("Net worth")).toBeGreaterThan(at("Home"))
+		expect(at("Overview")).toBeGreaterThan(-1)
+		expect(at("Net worth")).toBeGreaterThan(at("Overview"))
 		expect(at(">Plan<")).toBeGreaterThan(at("Net worth"))
-		expect(at("Overview")).toBeGreaterThan(at(">Plan<"))
-		expect(at("FI date")).toBeGreaterThan(at("Overview"))
+		expect(at("Projection")).toBeGreaterThan(at(">Plan<"))
+		expect(at("FI date")).toBeGreaterThan(at("Projection"))
 		expect(at("Compare")).toBeGreaterThan(at("FI date"))
 		expect(at("Tax")).toBeGreaterThan(at("Compare"))
 		expect(at(">Records<")).toBeGreaterThan(at("Tax"))
@@ -115,7 +115,7 @@ describe("PreferenceControls", () => {
 describe("SiteBrand", () => {
 	beforeEach(() => setTestUrl("http://127.0.0.1/"))
 
-	test("is the link back to Home, with the artwork hidden from the reader", () => {
+	test("is the link back to the Overview, with the artwork hidden from the reader", () => {
 		const { body } = render(SiteBrand, { props: { artwork: '<svg focusable="false"></svg>' } })
 		expect(body).toContain('href="/"')
 		expect(body).toContain('aria-hidden="true"')

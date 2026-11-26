@@ -118,8 +118,9 @@ describe("a Filer plan with no Return to read", () => {
 			undefined,
 			"flows-only",
 		)
-		expect(why).toContain("no Levy of it tallies a Filer's label")
-		expect(why).toContain("traj scenario tax flows-only --from-stored")
+		expect(why?.before).toContain("no Levy of it tallies a Filer's label")
+		expect(why?.command).toBe("traj scenario tax flows-only --from-stored")
+		expect(why?.after).toContain("Filer suffix")
 	})
 
 	test("a Levy that tallies a Filer's label is read, and a plan without Filers says nothing", () => {

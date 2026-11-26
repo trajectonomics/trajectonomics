@@ -18,7 +18,7 @@ let { lines }: Props = $props()
 		{:else}
 			<!-- Keyed by position: two notes may read the same. -->
 			{#each lines as line, index (index)}
-				<p class="text-sm text-foreground wrap-anywhere">{line}</p>
+				<p class="text-sm text-foreground wrap-anywhere" data-cli>{line}</p>
 			{/each}
 		{/if}
 	</section>

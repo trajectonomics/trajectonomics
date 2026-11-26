@@ -13,7 +13,7 @@ export function snapshotFacts(snapshot: Snapshot): readonly FactLine[] {
 	return [
 		{ label: "As-of", value: formatDate(params.asOf) },
 		{ label: "Horizon", value: formatDate(params.horizon) },
-		{ label: "Scenarios", value: listOf(params.scenarios, "None") },
+		{ label: "Plans", value: listOf(params.scenarios, "None") },
 		{
 			label: "Compared",
 			value: params.compare === null ? "None" : `${params.compare.a} and ${params.compare.b}`,

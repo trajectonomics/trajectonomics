@@ -4,4 +4,10 @@ export { DEFAULT_STEP, draftOf, type InputDraft, type InputProblems, planFromDra
 export { chosenLabels, moved, type OrderChoice, orderOf, toggled } from "./order"
 export { filerOfRow, isFilerRead, type ReturnView, returnsView, skippedReadReason } from "./returns"
 export { ESTIMATE_NOTE, ORDER_NOTE, SSF_WORDS, STOP_WORDS } from "./words"
-export { type AllowancesView, allowancesView, type LineView, type YearView } from "./years"
+export {
+	type AllowancesView,
+	allowancesView,
+	type LineView,
+	type NoteView,
+	type YearView,
+} from "./years"

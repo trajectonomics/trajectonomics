@@ -34,7 +34,7 @@ const grouped = $derived(
 					<div><dt class="text-muted-foreground">Saves</dt><dd><Money amount={line.saving} {currency} /></dd></div>
 				</dl>
 				<p class="mt-2 text-muted-foreground">{line.why}</p>
-				{#if line.hint}<p class="mt-1">{line.hint}</p>{/if}
+				{#if line.hint}<p class="mt-1" data-cli>{line.hint}</p>{/if}
 			{/if}
 		</li>
 	{/each}

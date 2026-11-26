@@ -86,7 +86,7 @@ describe("resolvePath", () => {
 	test("shows the CLI's own error of a failed path read, and a failed live read", () => {
 		const error = { code: "invalid_input", exitCode: 2, message: "No such path." }
 		const failed = resolvePath(input({ stored: { "2": { argv: [], ok: false, error } } }))
-		expect(failed.state).toEqual({ kind: "failed", message: "No such path." })
+		expect(failed.state).toEqual({ kind: "failed", message: "No such path.", fromCli: true })
 		const live: LiveEntry = {
 			run: runKey(chance),
 			status: "failed",
@@ -95,6 +95,7 @@ describe("resolvePath", () => {
 		expect(resolvePath(input({ canRead: true, live: () => live })).state).toEqual({
 			kind: "failed",
 			message: "Could not reach traj.",
+			fromCli: false,
 		})
 	})
 
@@ -106,7 +107,7 @@ describe("resolvePath", () => {
 		const error = { code: "projection_refused", exitCode: 3, message: "The engine refused." }
 		const failed = resolvePath(input({ chance: { argv: [], ok: false, error }, canRead: true }))
 		expect(failed).toEqual({
-			state: { kind: "no-chance", message: "The engine refused." },
+			state: { kind: "no-chance", message: "The engine refused.", fromCli: true },
 			wanted: null,
 		})
 		expect(resolvePath(input({ chance: undefined, canRead: true })).state.kind).toBe("no-chance")
