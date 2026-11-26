@@ -22,7 +22,7 @@ export function itemSets(
 /**
  * The Sets a try makes of an edited item: one per changed field, or one Set of the whole item when the try adds a
  * field the stored item lacks. `traj` sets a path the stored item has and refuses an absent one (`No key or id`), so
- * an open-ended Flow's first end or a first category is one Set of the whole Flow (cli ADR 0062, 0068).
+ * an open-ended Flow's first end or a first category is one Set of the whole Flow (cli ADR 0024, 0062, 0065).
  */
 export function triedItemSets(
 	list: string,

@@ -175,12 +175,16 @@ describe("the cards", () => {
 	test("a salary says what its employer adds, and the employer's Flow is no card of its own", () => {
 		const body = list("income")
 		expect(body).toContain("Employer adds 5% to provident-fund")
-		expect(body).not.toContain("salary-employer")
+		// Its path rides on the salary's switch, but it names no card of its own.
+		expect(body).not.toContain('data-item="salary-employer"')
 	})
 
 	test("an account says what it pays out and what it is charged", () => {
 		const body = list("assets")
-		expect(body).toContain("Pays out 3.5% a year from retire")
+		// The Milestone's id is code, so the sentence's words sit on both sides of the element.
+		const plain = body.replace(/<!--[\s\S]*?-->/g, "")
+		expect(plain).toContain("Pays out 3.5% a year from <code")
+		expect(plain).toContain(">retire</code>")
 		expect(body).toContain("Fee 1.5% a year")
 		expect(body).toContain("Paid quarterly")
 	})

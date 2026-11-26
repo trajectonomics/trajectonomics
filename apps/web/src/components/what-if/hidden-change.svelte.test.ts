@@ -3,14 +3,17 @@ import { render } from "svelte/server"
 import { snapshotLoader } from "../../client/browser"
 import { preferences } from "../../client/preferences.svelte.js"
 import { replaceSnapshot } from "../../client/snapshot.svelte"
-import { openDemoSession, useSessionHooks } from "../../client/what-if.test-support"
+import { whatIfSession } from "../../client/what-if.svelte.js"
+import { HASH, openDemoSession, useSessionHooks } from "../../client/what-if.test-support"
 import { LOADING } from "../../lib/view/state"
 import { baselineChance, baselineRun } from "../../lib/view/what-if/baseline"
 import { countChange, moneyChange } from "../../lib/view/what-if/change"
 import { DEMO, demoLens, statedCompare } from "../../lib/view/what-if/fixtures.test-support"
+import { startWhatIf, withSet } from "../../lib/what-if/session"
 import NetWorthPage from "../pages/NetWorthPage.svelte"
 import ChangeText from "./ChangeText.svelte"
 import OverviewWhatIf from "./OverviewWhatIf.svelte"
+import WhatIfChanges from "./WhatIfChanges.svelte"
 
 useSessionHooks()
 
@@ -86,5 +89,21 @@ describe("Hide amounts and a money change", () => {
 		expect(body).not.toMatch(/\+<span/)
 		// A change in months is not money, and still names its direction.
 		expect(body).toContain("−3 months, earlier")
+	})
+})
+
+describe("Hide amounts and a tried Milestone date", () => {
+	test("a startAt Set keeps the Milestone's name and is not masked", () => {
+		const next = structuredClone(DEMO)
+		const read = next.reads.documents["base"]
+		if (read?.ok !== true) throw new Error("the Demo reads its base plan")
+		read.data.scenario.document.milestones = [{ id: "retire", displayLabel: "Retirement" }]
+		replaceSnapshot(next)
+		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.rent.startAt", "retire")
+		preferences.hidden = true
+		const body = render(WhatIfChanges, { props: {} }).body
+		expect(body).toContain("set to Retirement")
+		expect(body).not.toContain("amount hidden")
+		expect(body).not.toContain("•••••")
 	})
 })

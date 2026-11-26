@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { overridesOf } from "../lib/what-if/session"
 import { whatIfSession } from "./what-if.svelte.js"
 import { HASH, useSessionHooks } from "./what-if.test-support"
 
@@ -53,23 +54,47 @@ describe("trying a field the stored Flow lacks", () => {
 })
 
 describe("switching a Flow off", () => {
-	test("drops its try, so no Set of a removed Flow is left for traj to refuse", () => {
+	test("holds its try out of what traj reads, and a switch back on restores it", () => {
 		whatIfSession.tryFlow("base", HASH, { stored: STORED, edited: LEVEL })
 		expect(whatIfSession.whatIf?.sets).toEqual([
 			{ path: "flows.retirement-spending", value: LEVEL },
 		])
 		whatIfSession.setOff("base", HASH, "flows.retirement-spending", true)
-		expect(whatIfSession.whatIf?.sets).toEqual([])
+		// The Set stays in the session, held back: `traj` refuses a Set of a Flow a Removal took out.
+		expect(whatIfSession.whatIf?.sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
 		expect(whatIfSession.whatIf?.removals).toEqual(["flows.retirement-spending"])
+		expect(overridesOf(whatIfSession.whatIf!).sets).toEqual([])
+		whatIfSession.setOff("base", HASH, "flows.retirement-spending", false)
+		expect(overridesOf(whatIfSession.whatIf!).sets).toEqual([
+			{ path: "flows.retirement-spending", value: LEVEL },
+		])
 	})
 
-	test("takes a salary's employer share with it, and a switch back on leaves the share switched off", () => {
-		expect(
-			whatIfSession.setOff("base", HASH, "flows.salary", true, ["flows.salary-employer"]),
-		).toBe(true)
-		expect(whatIfSession.whatIf?.removals).toEqual(["flows.salary", "flows.salary-employer"])
-		whatIfSession.setOff("base", HASH, "flows.salary", false)
-		expect(whatIfSession.whatIf?.removals).toEqual(["flows.salary-employer"])
+	test("takes a salary's employer share with it as one group, and the bar's chip switches both back on", () => {
+		const spec = {
+			kind: "salary" as const,
+			name: "salary",
+			paths: ["flows.salary", "flows.salary-employer"],
+		}
+		whatIfSession.setOff("base", HASH, "flows.gym", true)
+		expect(whatIfSession.setGroupOff("base", HASH, spec, spec.paths, true)).toBe(true)
+		expect(whatIfSession.whatIf?.removals).toEqual([
+			"flows.gym",
+			"flows.salary",
+			"flows.salary-employer",
+		])
+		expect(whatIfSession.isGroupOffIn("base", spec)).toBe(true)
+		expect(whatIfSession.changes.map((change) => change.label)).toEqual([
+			"Gym switched off",
+			"Salary and its employer share switched off",
+		])
+		const change = whatIfSession.changes.find((one) => one.kind === "group")
+		if (change === undefined) throw new Error("no group change")
+		whatIfSession.removeChange(change)
+		expect(whatIfSession.whatIf?.removals).toEqual(["flows.gym"])
+		expect(whatIfSession.whatIf?.groups).toEqual([])
 	})
 })
 

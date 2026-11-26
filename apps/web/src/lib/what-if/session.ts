@@ -3,10 +3,9 @@
  * the Sets and Removals the person has made. Pure: a reducer per change, and the words that name each
  * change. Nothing here is stored; the client module holds the value for the length of the tab.
  */
-import { type Addition, additionPath } from "./additions"
+import type { Addition } from "./additions"
 import type { Json, SetChange } from "./overrides"
 import type { Group } from "./session-group"
-import { triedItemSets, withoutItemChanges } from "./session-items"
 
 export type WhatIf = {
 	/** The plan the changes are made against. */
@@ -17,7 +16,7 @@ export type WhatIf = {
 	removals: string[]
 	/** The items the session puts on a list, which the plan does not hold (cli ADR 0062). */
 	additions: Addition[]
-	/** The loans and assets the session changes as a whole: their parts switch and try together (`session-group.ts`). */
+	/** The loans and assets the session changes as a whole, and a salary with its employer share (`session-group.ts`). */
 	groups: Group[]
 }
 
@@ -56,60 +55,6 @@ export function withoutSet(whatIf: WhatIf, path: string): WhatIf {
 	return { ...whatIf, sets: whatIf.sets.filter((set) => set.path !== path) }
 }
 
-/**
- * Switches an item off, with `also` the paths that go with it (a salary's employer share is a Flow of its own, which
- * `traj` refuses to leave reading a salary a Removal took out): a Removal of each. `traj` also refuses a Set of an
- * item a Removal took out (`No key or id`), and a Removal beside an Addition of the same id, so each item's Sets and
- * Addition are dropped. A form opened on it then starts from the plan's own values. Switching off an item already
- * off, and the paths with it, changes nothing.
- */
-export function switchedOff(whatIf: WhatIf, path: string, also: readonly string[] = []): WhatIf {
-	const gone = [path, ...also]
-	if (gone.every((one) => isOff(whatIf, one))) return whatIf
-	return {
-		...whatIf,
-		removals: [...whatIf.removals, ...gone.filter((one) => !whatIf.removals.includes(one))],
-		sets: whatIf.sets.filter(
-			(set) => !gone.some((one) => set.path === one || set.path.startsWith(`${one}.`)),
-		),
-		additions: whatIf.additions.filter((one) => !gone.includes(additionPath(one))),
-	}
-}
-
-/** Switches an item back on: its Removal is dropped. */
-export function switchedOn(whatIf: WhatIf, path: string): WhatIf {
-	return { ...whatIf, removals: whatIf.removals.filter((removal) => removal !== path) }
-}
-
-/**
- * The session with an item's changed fields tried, replacing any earlier try of it: one Set per changed field, or one
- * Set of the whole item when the try adds a field the stored item lacks (`triedItemSets`). A field the form cleared
- * is not tried here, and the form reports it (`TryNotice`); one Set of the whole item clears it, and the Edit that saves
- * the plan clears it too.
- */
-export function withTriedFields(
-	whatIf: WhatIf,
-	list: string,
-	id: string,
-	stored: Record<string, Json>,
-	edited: Record<string, Json>,
-): WhatIf {
-	const base = withoutItemChanges(whatIf, list, id)
-	return triedItemSets(list, id, stored, edited).reduce(
-		(one, set) => withSet(one, set.path, set.value),
-		base,
-	)
-}
-
-/** The Overrides of a session in the order `traj` takes them: removals, Additions, then Sets (cli ADR 0056, 0062). */
-export function overridesOf(whatIf: WhatIf): {
-	sets: SetChange[]
-	removals: string[]
-	additions: Addition[]
-} {
-	return { sets: whatIf.sets, removals: whatIf.removals, additions: whatIf.additions }
-}
-
 export { type Change, changesOf, namesChange } from "./session-changes"
 export {
 	type Group,
@@ -130,3 +75,10 @@ export {
 	withoutAddition,
 	withoutItemChanges,
 } from "./session-items"
+export { isHeld, overridesOf } from "./session-overrides"
+export {
+	switchedOff,
+	switchedOn,
+	switchedOnUnit,
+	withTriedFields,
+} from "./session-switch"

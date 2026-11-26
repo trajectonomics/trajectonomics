@@ -1,15 +1,14 @@
 import type { ScenarioDocument, ScenarioFlow } from "../lib/contract"
-import { employerIdOf, employerOf } from "../lib/view/plan-items/employer"
+import { type EmployerShare, employerIdOf, employerOf } from "../lib/view/plan-items/employer"
 import type { EmployerDraft } from "../lib/view/plan-items/employer-draft"
+import { employerStart } from "../lib/view/plan-items/flow-try-draft"
 import type { FlowDraft, FlowKind } from "../lib/view/plan-items/flows"
 import type { Problems } from "../lib/view/plan-items/problems"
-import {
-	type SalaryResult,
-	salaryFromDraft,
-	withoutSalary,
-	withSalary,
-} from "../lib/view/plan-items/salary-draft"
-import { recordOf, withoutAddition } from "../lib/what-if/session"
+import { salaryFromDraft, withoutSalary, withSalary } from "../lib/view/plan-items/salary-draft"
+import { withTriedSalary } from "../lib/what-if/salary-try"
+import { sameJson } from "../lib/what-if/same-json"
+import { clearedFields, recordOf, triedItemSets } from "../lib/what-if/session"
+import type { TriedFlow } from "../lib/what-if/try-flow"
 import { editSession } from "./edit.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 
@@ -36,21 +35,25 @@ export interface FlowSaved {
 	sent: string[]
 }
 
-/** Tries the employer's Flow beside the salary: a new one is an Addition, an edited one a Set, a cleared one is switched off. */
-function tryEmployer(input: FlowSave, result: Extract<SalaryResult, { ok: true }>): void {
-	const { name, contentHash, doc, existing } = input
-	const stored = existing === undefined ? null : employerOf(doc.flows, existing.id)
-	if (result.employer !== null) {
-		whatIfSession.tryFlow(name, contentHash, {
-			stored: stored === null ? undefined : recordOf(stored.flow),
-			edited: { ...recordOf(result.employer), id: result.employer.id },
-		})
+/** Whether the employer section differs from the share the form started from. */
+function shareChanged(starting: EmployerShare | null, result: ScenarioFlow | null): boolean {
+	if (starting === null) return result !== null
+	if (result === null) return true
+	return !sameJson(recordOf(starting.flow), recordOf(result))
+}
+
+/** The employer's Flow a salary try carries, or null: as the plan stores it (undefined for a share the session adds) and as the form made it. */
+function employerTry(
+	doc: ScenarioDocument,
+	id: string,
+	employer: ScenarioFlow | null,
+): TriedFlow | null {
+	if (employer === null) return null
+	const stored = employerOf(doc.flows, id)
+	return {
+		stored: stored === null ? undefined : recordOf(stored.flow),
+		edited: { ...recordOf(employer), id: employer.id },
 	}
-	if (result.dropped !== null)
-		whatIfSession.setOff(name, contentHash, `flows.${result.dropped}`, true)
-	const added = existing === undefined ? null : `flows.${employerIdOf(existing.id)}`
-	if (result.employer === null && stored === null && added !== null)
-		whatIfSession.tryChange(name, contentHash, (base) => withoutAddition(base, added))
 }
 
 /**
@@ -76,16 +79,31 @@ export async function saveFlow(input: FlowSave): Promise<FlowSaved> {
 		result.flow.frequency === "once" && existing.end !== undefined
 			? { ...result.flow, end: result.flow.start }
 			: result.flow
-	const cleared = whatIfSession.tryItem(
-		name,
-		contentHash,
-		"flows",
-		existing.id,
-		recordOf(existing),
-		recordOf(edited),
+	const stored = recordOf(existing)
+	const made = recordOf(edited)
+	const sets = triedItemSets("flows", existing.id, stored, made)
+	const cleared = sets.some((set) => set.path === `flows.${existing.id}`)
+		? []
+		: clearedFields(stored, made)
+	const starting = employerStart(doc, name, existing, whatIfSession.whatIf)
+	// A try with no edit in either section leaves a switched-off salary off: switching it on would be a change the person did not make.
+	const untouched =
+		sets.length === 0 && cleared.length === 0 && !shareChanged(starting, result.employer)
+	if (whatIfSession.isOffIn(name, `flows.${existing.id}`) && untouched)
+		return { done: true, problems: {}, cleared, sent: [] }
+	const storedShare = employerOf(doc.flows, existing.id)
+	const shareId = employerIdOf(existing.id)
+	const ran = whatIfSession.tryChange(name, contentHash, (base) =>
+		withTriedSalary(base, {
+			id: existing.id,
+			shareId,
+			salary: { stored, edited: made },
+			employer: employerTry(doc, existing.id, result.employer),
+			dropped: result.dropped,
+			added: storedShare === null ? `flows.${shareId}` : null,
+		}),
 	)
-	tryEmployer(input, result)
-	return { done: cleared.length === 0, problems: {}, cleared, sent: [] }
+	return { done: cleared.length === 0 && ran, problems: {}, cleared, sent: [] }
 }
 
 /** Deletes a Flow, and the employer's Flow it carries, as one Edit. True when it ran. */

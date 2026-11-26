@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test"
 import { type ScenarioFlow, scenarioFlow } from "../../contract/scenario-show"
+import { itemNames } from "../item-names"
 import { planDocument } from "./fixtures.test-support"
 import { switchPathsOf } from "./flow-switch"
-import { flowCards, flowDraftOf } from "./flows"
+import { flowCards } from "./flows"
 
 describe("flowCards", () => {
 	test("lists the income Flows as cards, each with its amount, growth and whether it is earned", () => {
@@ -13,8 +14,8 @@ describe("flowCards", () => {
 			amount: "90000.00",
 			frequency: "monthly",
 			startLabel: "Starts",
-			start: "2026-11-01",
-			end: "2050-05-14",
+			start: { text: "2026-11-01", parts: ["2026-11-01"] },
+			end: { text: "2050-05-14", parts: ["2050-05-14"] },
 			startAnchor: null,
 			endAnchor: null,
 			growth: "Follows inflation",
@@ -26,7 +27,7 @@ describe("flowCards", () => {
 		})
 		expect(cards[1]?.earned).toBe("Passive")
 		expect(cards[1]?.growth).toBe("0.00% a year")
-		expect(cards[1]?.end).toBe("To the horizon")
+		expect(cards[1]?.end?.text).toBe("To the horizon")
 	})
 
 	test("lists the expenses without an income marker, with a fixed percent a year", () => {
@@ -59,7 +60,7 @@ describe("flowCards of a once Flow", () => {
 		const [card] = flowCards([bonus], "income")
 		expect(card).toMatchObject({
 			startLabel: "On",
-			start: "2027-03-01",
+			start: { text: "2027-03-01" },
 			end: null,
 			endAnchor: null,
 		})
@@ -74,7 +75,7 @@ describe("flowCards of a once Flow", () => {
 			amount: "1200.00",
 		})
 		const [card] = flowCards([fee], "expense")
-		expect(card).toMatchObject({ startLabel: "On", start: "2027-03-01", end: null })
+		expect(card).toMatchObject({ startLabel: "On", start: { text: "2027-03-01" }, end: null })
 	})
 
 	test("a recurring expense still reads Starts and Ends", () => {
@@ -87,7 +88,11 @@ describe("flowCards of a once Flow", () => {
 			amount: "900.00",
 		})
 		const [card] = flowCards([rent], "expense")
-		expect(card).toMatchObject({ startLabel: "Starts", start: "2026-11-01", end: "2030-01-01" })
+		expect(card).toMatchObject({
+			startLabel: "Starts",
+			start: { text: "2026-11-01" },
+			end: { text: "2030-01-01" },
+		})
 	})
 })
 
@@ -135,8 +140,28 @@ describe("flowCards with a Milestone date", () => {
 			startAt: "retire",
 		}
 		const [card] = flowCards([rule as ScenarioFlow], "expense")
-		expect(card?.start).toBe("When retire fires")
-		expect(card?.end).toBe("To the horizon")
+		expect(card?.start.text).toBe("When retire fires")
+		expect(card?.end?.text).toBe("To the horizon")
+	})
+
+	test("a Milestone date reads the name the plan states for it, or its id when it states none", () => {
+		const rule = {
+			id: "retirement-spending",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2026-10-31",
+			startAt: "retire",
+		} as ScenarioFlow
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "retire", displayLabel: "Retirement" }],
+		})
+		expect(flowCards([rule], "expense", null, [rule], names)[0]?.start.text).toBe(
+			"When Retirement fires",
+		)
+		expect(flowCards([rule], "expense")[0]?.start.text).toBe("When retire fires")
 	})
 
 	test("an expense stopped at a Milestone reads when it fires, not 'To the horizon'", () => {
@@ -149,8 +174,8 @@ describe("flowCards with a Milestone date", () => {
 			endAt: "retire",
 		}
 		const [card] = flowCards([rent as ScenarioFlow], "expense")
-		expect(card?.start).toBe("2026-10-31")
-		expect(card?.end).toBe("When retire fires")
+		expect(card?.start.text).toBe("2026-10-31")
+		expect(card?.end?.text).toBe("When retire fires")
 	})
 })
 
@@ -164,27 +189,5 @@ describe("flowCards with a household", () => {
 		const cards = flowCards(planDocument().flows, "income", household)
 		expect(cards[0]).toMatchObject({ startAnchor: null, endAnchor: "at you, age 60" })
 		expect(cards[1]).toMatchObject({ startAnchor: null, endAnchor: null })
-	})
-})
-
-describe("flowDraftOf", () => {
-	test("starts a new Flow monthly, following inflation and earned", () => {
-		expect(flowDraftOf()).toEqual({
-			category: "",
-			displayLabel: "",
-			name: "",
-			frequency: "monthly",
-			start: "",
-			end: "",
-			amount: "",
-			growth: "inflation",
-			rate: "",
-			earned: true,
-		})
-	})
-
-	test("shows an existing Flow's rate as a percent, moved from its basis points", () => {
-		const rent = planDocument().flows.find((flow) => flow.id === "rent")
-		expect(flowDraftOf(rent)).toMatchObject({ growth: "fixed", rate: "3.00", amount: "14000.00" })
 	})
 })

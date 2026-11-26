@@ -1,5 +1,5 @@
 // A try that adds a field the stored Flow lacks is one Set of the whole Flow, as an Account's try is (issue #638;
-// cli ADR 0062, 0068). The session is read through POST /what-if as the page reads it, and the figures are the plan's
+// cli ADR 0024, 0062, 0065). The session is read through POST /what-if as the page reads it, and the figures are the plan's
 // own with the field stored: traj takes the whole-item Set, and the lens shows the added field.
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test"
 import type { ProjectionRun } from "../src/lib/contract"

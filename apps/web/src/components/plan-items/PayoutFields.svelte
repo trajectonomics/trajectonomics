@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemText } from "../../client/item-names.svelte"
 import type { DateChoice } from "../../lib/view/estate/dates"
 import type { PayoutDraft } from "../../lib/view/plan-items/account-income"
 import {
@@ -28,6 +29,11 @@ const fromChoices = $derived(
 			(one.value !== "anchor" || anchors.length > 0),
 	),
 )
+/** The Milestones by id, with the name the plan states for each; the value stays the id an Edit names. */
+const milestoneChoices = $derived([
+	{ value: "", label: "Choose a Milestone" },
+	...milestones.map((id) => ({ value: id, label: currentItemText("milestone", id) })),
+])
 </script>
 
 <!-- What the Account pays out as passive income. Nothing is chosen for the person: the share and the rounding are theirs. -->
@@ -38,7 +44,7 @@ const fromChoices = $derived(
 	<Field id="payout-frequency" label="How often" options={PAYOUT_FREQUENCY_CHOICES} bind:value={draft.frequency} problem={shown.at("payoutFrequency")} />
 	<Field id="payout-from" label="Paid from" options={fromChoices} bind:value={draft.from} problem={draft.from === "now" ? shown.at("payoutStart") : undefined} />
 	{#if draft.from === "milestone"}
-		<Field id="payout-milestone" label="Milestone" options={[{ value: "", label: "Choose a Milestone" }, ...milestones.map((id) => ({ value: id, label: id }))]} bind:value={draft.milestone} problem={shown.at("payoutStart")} />
+		<Field id="payout-milestone" label="Milestone" options={milestoneChoices} bind:value={draft.milestone} problem={shown.at("payoutStart")} />
 	{:else if draft.from === "anchor"}
 		<Field id="payout-anchor" label="Date the household names" options={[{ value: "", label: "Choose a date" }, ...anchors.map((one) => ({ value: one.value, label: one.label }))]} bind:value={draft.anchor} problem={shown.at("payoutStart")} />
 	{:else if draft.from === "date"}

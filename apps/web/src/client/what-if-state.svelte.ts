@@ -1,13 +1,8 @@
+import type { Addition } from "../lib/what-if/additions"
 import type { WhatIfAnswer } from "../lib/what-if/answer"
 import { type LensReads, lensFor, lensReadsOf, type WhatIfLens } from "../lib/what-if/lens"
 import { SerialReader } from "../lib/what-if/reads"
-import {
-	type Change,
-	changesOf,
-	hasChanges,
-	overridesOf,
-	type WhatIf,
-} from "../lib/what-if/session"
+import { type Change, changesOf, hasChanges, type WhatIf } from "../lib/what-if/session"
 import { editSession } from "./edit.svelte.js"
 import { readWhatIf } from "./what-if-remote.js"
 
@@ -76,11 +71,16 @@ export class WhatIfState {
 		return lensFor(plan, this.whatIf, this.answered, this.reads)
 	}
 
-	/** The reply of the latest state: its reads, or the sentence of why they could not be had. */
-	/** The Sets and Removals of the session when it is open on `plan` and holds a change, else null. */
-	changesFor(plan: string): { sets: WhatIf["sets"]; removals: WhatIf["removals"] } | null {
+	/** The Sets, Removals and Additions of the session when it is open on `plan` and holds a change, else null. */
+	changesFor(
+		plan: string,
+	): { sets: WhatIf["sets"]; removals: WhatIf["removals"]; additions: Addition[] } | null {
 		if (this.whatIf === null || this.whatIf.plan !== plan || !this.active) return null
-		return overridesOf(this.whatIf)
+		return {
+			sets: this.whatIf.sets,
+			removals: this.whatIf.removals,
+			additions: this.whatIf.additions,
+		}
 	}
 
 	private receive(reply: WhatIfAnswer | string, state: WhatIf): void {

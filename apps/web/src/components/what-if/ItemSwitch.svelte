@@ -1,5 +1,6 @@
 <script lang="ts">
 import { whatIfSession } from "../../client/what-if.svelte.js"
+import type { GroupSpec } from "../../lib/what-if/session"
 import { restoreSwitch } from "../ui/restore"
 
 interface Props {
@@ -17,19 +18,30 @@ interface Props {
 }
 
 let { plan, contentHash, path, also = [], label, onTry }: Props = $props()
-const off = $derived(whatIfSession.isOffIn(plan, path))
+/** A salary and its employer share are one unit: the switch and the bar chip take both parts together. */
+const unit: GroupSpec | null = $derived(
+	also.length === 0
+		? null
+		: { kind: "salary", name: path.split(".")[1] ?? path, paths: [path, ...also] },
+)
+const off = $derived(
+	whatIfSession.isOffIn(plan, path) || (unit !== null && whatIfSession.isGroupOffIn(plan, unit)),
+)
 const button =
 	"rounded-md border border-border bg-card px-2.5 py-1 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
 /** Makes the change the switch asks for; a refused one (another plan holds changes) puts the switch back. */
 function change(control: HTMLInputElement): void {
-	if (!whatIfSession.setOff(plan, contentHash, path, !control.checked, also))
-		restoreSwitch(control, !off)
+	const made =
+		unit === null
+			? whatIfSession.setOff(plan, contentHash, path, !control.checked, also)
+			: whatIfSession.setGroupOff(plan, contentHash, unit, unit.paths, !control.checked)
+	if (!made) restoreSwitch(control, !off)
 }
 </script>
 
 <!-- A what-if control per item: the switch takes it out of the what-if, and "Try a value" sets one field of it. -->
-<div class="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-sm">
+<div class="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-sm" data-also={also.join(" ") || undefined}>
 	<label class="inline-flex items-center gap-2">
 		<input
 			type="checkbox"

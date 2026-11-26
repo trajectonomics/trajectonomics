@@ -3,6 +3,7 @@ import { currentItemText } from "../../client/item-names.svelte.js"
 import { switchPathsOf } from "../../lib/view/plan-items/flow-switch"
 import type { FlowCard } from "../../lib/view/plan-items/flows"
 import { type MarkMap, NO_MARKS } from "../../lib/view/what-if/items"
+import Sentence from "../routing/Sentence.svelte"
 import ItemName from "../ui/ItemName.svelte"
 import Money from "../ui/Money.svelte"
 import ItemSwitch from "../what-if/ItemSwitch.svelte"
@@ -54,10 +55,10 @@ let { cards, marks = {}, currency, editable, onEdit, plan, contentHash, onTry }:
 				<dt class="text-muted-foreground">How often</dt>
 				<dd>{card.frequency}<WasText was={mark.was.frequency} /></dd>
 				<dt class="text-muted-foreground">{card.startLabel}</dt>
-				<dd>{card.start}<WasText was={mark.was.start} />{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
+				<dd class="wrap-anywhere"><Sentence parts={card.start.parts} {currency} /><WasText was={mark.was.start} />{#if card.startAnchor !== null} <span class="block text-xs text-muted-foreground">{card.startAnchor}</span>{/if}</dd>
 				{#if card.end !== null || mark.was.end !== undefined}
 					<dt class="text-muted-foreground">Ends</dt>
-					<dd>{card.end ?? "none"}{#if mark.was.end}<WasText was={mark.was.end} />{/if}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
+					<dd class="wrap-anywhere">{#if card.end !== null}<Sentence parts={card.end.parts} {currency} />{:else}none{/if}{#if mark.was.end}<WasText was={mark.was.end} />{/if}{#if card.endAnchor !== null} <span class="block text-xs text-muted-foreground">{card.endAnchor}</span>{/if}</dd>
 				{/if}
 				<dt class="text-muted-foreground">Growth</dt>
 				<dd>{card.growth}<WasText was={mark.was.growth} /></dd>

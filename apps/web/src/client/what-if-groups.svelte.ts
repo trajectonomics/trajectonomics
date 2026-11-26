@@ -5,6 +5,7 @@ import {
 	groupId,
 	isGroupOff,
 	itemSets,
+	switchedOn,
 	withGroupOff,
 	withGroupTried,
 	withoutGroup,
@@ -42,7 +43,10 @@ export class WhatIfGroups extends WhatIfChanges {
 		if (this.saving) return false
 		const base = this.sessionFor(plan, contentHash)
 		if (base === null) return false
-		this.keep(off ? withGroupOff(base, spec, removals) : withoutGroup(base, groupId(spec)))
+		// On takes back the group and each part's own Removal: a salary switched off after its share was cleared has no
+		// group record, and both paths must still come back when its switch says on.
+		const on = spec.paths.reduce(switchedOn, withoutGroup(base, groupId(spec)))
+		this.keep(off ? withGroupOff(base, spec, removals) : on)
 		return true
 	}
 

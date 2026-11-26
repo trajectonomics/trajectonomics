@@ -151,3 +151,25 @@ describe("a new Flow", () => {
 		expect(result.ok && result.flow.id).toBe("salary")
 	})
 })
+
+describe("flowDraftOf", () => {
+	test("starts a new Flow monthly, following inflation and earned", () => {
+		expect(flowDraftOf()).toEqual({
+			category: "",
+			displayLabel: "",
+			name: "",
+			frequency: "monthly",
+			start: "",
+			end: "",
+			amount: "",
+			growth: "inflation",
+			rate: "",
+			earned: true,
+		})
+	})
+
+	test("shows an existing Flow's rate as a percent, moved from its basis points", () => {
+		const rent = planDocument().flows.find((flow) => flow.id === "rent")
+		expect(flowDraftOf(rent)).toMatchObject({ growth: "fixed", rate: "3.00", amount: "14000.00" })
+	})
+})

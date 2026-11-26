@@ -52,4 +52,19 @@ describe("the session bar's words for a tried Flow", () => {
 		expect(change.label).toBe("Rent tried as edited")
 		expect(tryWords(change, account)).toBe("Rent tried as edited")
 	})
+
+	test("a whole-Flow try that only adds a field keeps the session's own words", () => {
+		const gym = {
+			id: "gym",
+			kind: "expense",
+			frequency: "monthly",
+			start: "2026-11-01",
+			amount: "100.00",
+			growth: "inflation",
+			end: "2027-04-30",
+		}
+		const change = changeAt("flows.gym", gym)
+		expect(change.label).toBe("Gym tried as edited")
+		expect(tryWords(change, account)).toBe("Gym tried as edited")
+	})
 })

@@ -1,8 +1,9 @@
 import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { formatBps } from "../../format/bps"
-import { type AccountNames, NO_NAMES } from "../account-names"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { ruleSummary } from "../withdrawals/words"
+import type { Words } from "../words"
 import { employerIdOf, employerText } from "./employer"
 import { datesOfCard } from "./flow-dates"
 
@@ -17,9 +18,10 @@ export interface FlowCard {
 	readonly frequency: string
 	/** "On" for a once Flow, whose one occurrence is its date; "Starts" for any other. */
 	readonly startLabel: string
-	readonly start: string
+	/** The start's words, with a Milestone's id in code when the plan names it none. */
+	readonly start: Words
 	/** The end as the card states it, or null for a once Flow, which has no end. */
-	readonly end: string | null
+	readonly end: Words | null
 	/** The label of the start when the household pins it ("at me, age 60"), or null. */
 	readonly startAnchor: string | null
 	/** The label of the end when the household pins it, or null (also for a once Flow). */
@@ -65,17 +67,17 @@ export function flowCards(
 	kind: FlowKind,
 	household: HouseholdDocument | null = null,
 	all: readonly ScenarioFlow[] = flows,
-	names: AccountNames = NO_NAMES,
+	names: ItemNames = NO_ITEM_NAMES,
 ): FlowCard[] {
 	return flows
 		.filter((flow) => flow.kind === kind)
 		.map((flow) => {
-			const employer = employerText(all, flow, kind, names)
+			const employer = employerText(all, flow, kind, names.accounts)
 			return {
 				id: flow.id,
 				amount: flow.amount ?? null,
 				frequency: flow.frequency,
-				...datesOfCard(flow, household),
+				...datesOfCard(flow, household, names),
 				growth: isComputed(flow) ? (ruleSummary(flow) ?? "Computed") : growthText(flow),
 				earned: earnedOf(flow, kind),
 				category: kind === "expense" ? (flow.category ?? null) : null,

@@ -1,4 +1,5 @@
 <script lang="ts">
+import type { Words } from "../../lib/view/words"
 import Money from "../ui/Money.svelte"
 import WasText from "../what-if/WasText.svelte"
 
@@ -8,8 +9,8 @@ interface Props {
 	/** What the Account paid out over the whole plan, as `traj` states it; null when it states none. */
 	payouts: string | null
 	/** The baseline's figure beside a tried one: undefined when the session left it alone, "" when the baseline stated none. */
-	wasFees?: string | undefined
-	wasPayouts?: string | undefined
+	wasFees?: string | Words | undefined
+	wasPayouts?: string | Words | undefined
 	currency: string
 }
 

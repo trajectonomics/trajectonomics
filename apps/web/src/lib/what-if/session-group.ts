@@ -1,8 +1,9 @@
 /**
- * A loan's or a real asset's changes as one group in the What-if session. A loan is an Account and the Flows that
- * borrow and repay it, an asset is its Account, its loan and its Flows (cli ADR 0059, 0060): a change to one part
- * alone leaves the plan inconsistent (a loan that is never repaid, a draw with no purchase), so the session makes
- * and takes back the parts together. Pure: a reducer per change.
+ * A loan's, a real asset's or a salary's changes as one group in the What-if session. A loan is an Account and the
+ * Flows that borrow and repay it, an asset is its Account, its loan and its Flows (cli ADR 0059, 0060), and a salary
+ * is its Flow and the employer share beside it: a change to one part alone leaves the plan inconsistent (a loan that
+ * is never repaid, a share whose salary is gone), so the session makes and takes back the parts together. Pure: a
+ * reducer per change.
  */
 import { additionPath } from "./additions"
 import type { Json } from "./overrides"
@@ -11,9 +12,9 @@ import type { WhatIf } from "./session"
 /** How a group is changed in the session: its parts switched off together, or tried as edited together. */
 export type GroupHow = "off" | "tried"
 
-/** What a group is: a loan or an asset, its name, and the `<list>.<id>` path of each of its parts. */
+/** What a group is: a loan, an asset or a salary, its name, and the `<list>.<id>` path of each of its parts. */
 export type GroupSpec = {
-	readonly kind: "loan" | "asset"
+	readonly kind: "loan" | "asset" | "salary"
 	readonly name: string
 	readonly paths: readonly string[]
 }
@@ -45,12 +46,16 @@ export function isGroupOff(whatIf: WhatIf, id: string): boolean {
 export function withoutGroup(whatIf: WhatIf, id: string): WhatIf {
 	const group = groupOf(whatIf, id)
 	if (group === undefined) return whatIf
+	// A salary's try and added share come back with it: the switch held them, rather than taking them out of the session.
+	const held = group.kind === "salary"
 	return {
 		...whatIf,
 		groups: whatIf.groups.filter((one) => one !== group),
 		removals: whatIf.removals.filter((path) => !inGroup(group, path)),
-		additions: whatIf.additions.filter((one) => !inGroup(group, additionPath(one))),
-		sets: whatIf.sets.filter((set) => !inGroup(group, set.path)),
+		additions: held
+			? whatIf.additions
+			: whatIf.additions.filter((one) => !inGroup(group, additionPath(one))),
+		sets: held ? whatIf.sets : whatIf.sets.filter((set) => !inGroup(group, set.path)),
 	}
 }
 
@@ -63,12 +68,13 @@ function overlap(a: Pick<GroupSpec, "paths">, b: Pick<GroupSpec, "paths">): bool
  * The session with the paths of `spec` handed to a new group: every group that claims one of them goes, whole, and
  * so does every Removal, Addition and Set under the paths of those groups and of `spec`, an independent Set made
  * before the group included. A path belongs to at most one group, so taking one group back never undoes part of
- * another, and a Set of a part that a switch takes out is never left to be refused.
+ * another, and a Set of a part that a switch takes out is never left to be refused. A salary's own changes are `keep`t:
+ * the switch holds them for a later switch on (`overridesOf`).
  */
-function takenOver(whatIf: WhatIf, spec: GroupSpec): WhatIf {
+function takenOver(whatIf: WhatIf, spec: GroupSpec, keep: boolean): WhatIf {
 	const gone = whatIf.groups.filter((one) => groupId(one) === groupId(spec) || overlap(one, spec))
-	const owners = [...gone, spec]
-	const owned = (path: string) => owners.some((one) => inGroup(one, path))
+	const owned = (path: string) =>
+		gone.some((one) => inGroup(one, path)) || (!keep && inGroup(spec, path))
 	return {
 		...whatIf,
 		groups: whatIf.groups.filter((one) => !gone.includes(one)),
@@ -82,10 +88,10 @@ function takenOver(whatIf: WhatIf, spec: GroupSpec): WhatIf {
  * The session with the group switched off: `removals` take its parts out together, and any earlier try or switch of
  * the group, of a group that shares a part with it and of a part alone is dropped, because a Set of a part that is
  * gone would be refused. A plan can keep a part declared (the Account a Baseline row holds), so the removals are
- * the caller's, and `spec.paths` are all the group's parts.
+ * the caller's, and `spec.paths` are all the group's parts. A salary's try is held, so a switch back on restores it.
  */
 export function withGroupOff(whatIf: WhatIf, spec: GroupSpec, removals: readonly string[]): WhatIf {
-	const base = takenOver(whatIf, spec)
+	const base = takenOver(whatIf, spec, spec.kind === "salary")
 	return {
 		...base,
 		removals: [...base.removals, ...removals.filter((path) => !base.removals.includes(path))],
@@ -102,7 +108,7 @@ export function withGroupTried(
 	spec: GroupSpec,
 	sets: readonly { path: string; value: Json }[],
 ): WhatIf {
-	const base = takenOver(whatIf, spec)
+	const base = takenOver(whatIf, spec, false)
 	if (sets.length === 0) return base
 	return {
 		...base,

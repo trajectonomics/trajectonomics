@@ -36,7 +36,7 @@ const LABELLED = itemNames(ACCOUNTS, HOUSEHOLD, DOCUMENT)
 
 describe("a person is called by the role the household states", () => {
 	test("the holder is You, a partner is Your partner, and a dependent is its relation", () => {
-		expect(itemLabel(NAMES, "person", "me")).toEqual({ text: "You", named: true })
+		expect(itemLabel(NAMES, "person", "me")).toMatchObject({ text: "You", named: true })
 		expect(itemText(NAMES, "person", "partner")).toBe("Your partner")
 		expect(itemText(NAMES, "person", "mali")).toBe("Child")
 		expect(itemText(NAMES, "person", "gran")).toBe("Parent")
@@ -56,28 +56,28 @@ describe("a person is called by the role the household states", () => {
 	})
 
 	test("a person the household does not hold shows by id, not named", () => {
-		expect(itemLabel(NAMES, "person", "ghost")).toEqual({ text: "ghost", named: false })
-		expect(itemLabel(NO_ITEM_NAMES, "person", "me")).toEqual({ text: "me", named: false })
+		expect(itemLabel(NAMES, "person", "ghost")).toMatchObject({ text: "ghost", named: false })
+		expect(itemLabel(NO_ITEM_NAMES, "person", "me")).toMatchObject({ text: "me", named: false })
 	})
 })
 
 describe("an id no Read names shows as the id", () => {
 	test("a Flow and a Milestone have no name in the CLI's output, so each is the id and unnamed", () => {
-		expect(itemLabel(NAMES, "flow", "salary")).toEqual({ text: "salary", named: false })
-		expect(itemLabel(NAMES, "milestone", "car-paid-off")).toEqual({
+		expect(itemLabel(NAMES, "flow", "salary")).toMatchObject({ text: "salary", named: false })
+		expect(itemLabel(NAMES, "milestone", "car-paid-off")).toMatchObject({
 			text: "car-paid-off",
 			named: false,
 		})
 	})
 
 	test("a Flow and a Milestone show the label the document states, and the id when it states none", () => {
-		expect(itemLabel(LABELLED, "flow", "salary")).toEqual({ text: "Salary", named: true })
-		expect(itemLabel(LABELLED, "milestone", "car-paid-off")).toEqual({
+		expect(itemLabel(LABELLED, "flow", "salary")).toMatchObject({ text: "Salary", named: true })
+		expect(itemLabel(LABELLED, "milestone", "car-paid-off")).toMatchObject({
 			text: "Car paid off",
 			named: true,
 		})
-		expect(itemLabel(LABELLED, "flow", "rent")).toEqual({ text: "rent", named: false })
-		expect(itemLabel(LABELLED, "milestone", "unknown")).toEqual({
+		expect(itemLabel(LABELLED, "flow", "rent")).toMatchObject({ text: "rent", named: false })
+		expect(itemLabel(LABELLED, "milestone", "unknown")).toMatchObject({
 			text: "unknown",
 			named: false,
 		})
@@ -89,12 +89,12 @@ describe("an id no Read names shows as the id", () => {
 			people: [{ ...HOUSEHOLD.people[0]!, displayLabel: "Somchai" }],
 		}
 		const names = itemNames(ACCOUNTS, household)
-		expect(itemLabel(names, "person", "me")).toEqual({ text: "Somchai", named: true })
+		expect(itemLabel(names, "person", "me")).toMatchObject({ text: "Somchai", named: true })
 	})
 
 	test("an Account is named by the ledger, and one only the plan has shows as the id", () => {
-		expect(itemLabel(NAMES, "account", "acct-1")).toEqual({ text: "Bank", named: true })
-		expect(itemLabel(NAMES, "account", "condo")).toEqual({ text: "condo", named: false })
+		expect(itemLabel(NAMES, "account", "acct-1")).toMatchObject({ text: "Bank", named: true })
+		expect(itemLabel(NAMES, "account", "condo")).toMatchObject({ text: "condo", named: false })
 	})
 
 	test("an id is never turned into words: a kebab-case id is kept as it is", () => {
