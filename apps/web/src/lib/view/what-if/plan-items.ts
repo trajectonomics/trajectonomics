@@ -7,7 +7,7 @@ import type {
 } from "../../contract"
 import { lensDocument } from "../../what-if/lens-document"
 import type { SetChange } from "../../what-if/overrides"
-import type { AccountNames } from "../account-names"
+import { type ItemNames, NO_ITEM_NAMES } from "../item-names"
 import { type AccountCard, accountCards } from "../plan-items/accounts"
 import { groupedIds } from "../plan-items/asset-document"
 import { type FlowCard, type FlowKind, flowCards } from "../plan-items/flows"
@@ -70,7 +70,7 @@ export function flowItems(
 	pageKind: PlanKind,
 	household: HouseholdDocument | null,
 	changes: PlanChanges | null,
-	names?: AccountNames,
+	names: ItemNames = NO_ITEM_NAMES,
 ): ItemsView<FlowCard> {
 	const kind: FlowKind = pageKind === "expense" ? "expense" : "income"
 	const grouped = groupedIds(doc)
@@ -100,11 +100,12 @@ export function accountItems(
 	baselineRead: Read<Baseline> | undefined,
 	changes: PlanChanges | null,
 	runs: { run?: ProjectionRun | undefined; tried?: ProjectionRun | undefined } = {},
+	names: ItemNames = NO_ITEM_NAMES,
 ): ItemsView<AccountCard> {
 	const { run, tried = run } = runs
-	const baseline = accountCards(plainAccounts(doc), baselineRead, run)
+	const baseline = accountCards(plainAccounts(doc), baselineRead, run, names)
 	if (changes === null) return { cards: baseline, marks: {} }
-	const whatIf = accountCards(lensDocument(doc, changes).accounts, baselineRead, tried)
+	const whatIf = accountCards(lensDocument(doc, changes).accounts, baselineRead, tried, names)
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "accounts", changes, ACCOUNT_FIELDS),

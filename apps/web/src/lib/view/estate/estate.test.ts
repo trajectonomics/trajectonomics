@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { itemNames } from "../item-names"
 import { estateDates } from "./dates"
 import { diagramBands } from "./diagram.test-support"
 import { figuresAt, shownUnder } from "./figures"
@@ -79,6 +80,23 @@ describe("the default date", () => {
 			estateDates(base.run, base.doc, base.household, "anchor:flows.fund.end")?.chosen.date,
 		).toBe("2050-06-30")
 		expect(estateDates(base.run, base.doc, base.household, "nowhere")?.chosen.value).toBe("life")
+	})
+
+	test("a Milestone choice reads the name the plan states for it, or its id when it states none", () => {
+		const names = itemNames(new Map(), null, {
+			currency: "THB",
+			accounts: [],
+			flows: [],
+			milestones: [{ id: "car-paid-off", displayLabel: "Car paid off" }],
+		})
+		const labelled = estateDates(base.run, base.doc, base.household, "", names)
+		expect(labelled?.choices.find((one) => one.value === "milestone:car-paid-off")?.label).toBe(
+			"When Car paid off fires (1 Jan 2031)",
+		)
+		const bare = estateDates(base.run, base.doc, base.household, "")
+		expect(bare?.choices.find((one) => one.value === "milestone:car-paid-off")?.label).toBe(
+			"When car-paid-off fires (1 Jan 2031)",
+		)
 	})
 })
 

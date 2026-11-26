@@ -94,4 +94,26 @@ describe("the What-if bar names an Account by its ledger name", () => {
 		const off: Change = { kind: "off", path: "accounts.condo", label: "Condo switched off" }
 		expect(labelWithNames(off, ITEMS)).toBe("condo switched off")
 	})
+
+	test("a Milestone a Flow starts or ends at shows its name in place of the id", () => {
+		const start: Change = {
+			kind: "set",
+			path: "flows.rent.startAt",
+			label: "Rent startAt set to retire",
+			value: "retire",
+		}
+		const named: ItemNames = {
+			...ITEMS,
+			milestones: new Map([["retire", "Retirement"]]),
+		}
+		expect(labelWithNames(start, named)).toBe("School fees startAt set to Retirement")
+		expect(labelWithNames(start, ITEMS)).toBe("School fees startAt set to retire")
+		const end: Change = {
+			kind: "set",
+			path: "flows.rent.endAt",
+			label: "Rent endAt set to retire",
+			value: "retire",
+		}
+		expect(labelWithNames(end, named)).toBe("School fees endAt set to Retirement")
+	})
 })
