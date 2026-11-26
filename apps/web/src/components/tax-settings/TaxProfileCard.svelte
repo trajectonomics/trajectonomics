@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { ScenarioShow } from "../../lib/contract"
+import type { ScenarioShow, TaxYear } from "../../lib/contract"
 import { isTaxed } from "../../lib/view/tax-settings/rows"
 import TaxProfileActions from "./TaxProfileActions.svelte"
 import TaxScope from "./TaxScope.svelte"
@@ -10,9 +10,11 @@ interface Props {
 	/** The plan as `scenario show` reads it: its tax profile, whether it is taxed, and the hash every Edit names. */
 	show: ScenarioShow["scenario"]
 	editable: boolean
+	/** The plan's tax years, whose assumptions the page echoes for two separate Returns that share a home loan. */
+	years?: readonly TaxYear[]
 }
 
-let { name, show, editable }: Props = $props()
+let { name, show, editable, years = [] }: Props = $props()
 const profile = $derived(show.tax ?? null)
 // A Snapshot saved before profiles were kept states no `taxed`; the plan's own tax rules say it.
 const taxed = $derived(isTaxed(show))
@@ -30,5 +32,5 @@ const taxed = $derived(isTaxed(show))
 	{:else if profile === null}
 		<p class="text-sm text-foreground">Plan {name} is not taxed, so its figures are before tax.</p>
 	{/if}
-	<TaxProfileActions {name} {show} {editable} />
+	<TaxProfileActions {name} {show} {editable} {years} />
 </section>
