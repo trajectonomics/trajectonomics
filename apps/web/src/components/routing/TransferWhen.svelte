@@ -1,4 +1,5 @@
 <script lang="ts">
+import { currentItemText } from "../../client/item-names.svelte"
 import { FREQUENCY_CHOICES } from "../../lib/view/plan-items/options"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import { WHEN_CHOICES } from "../../lib/view/routing/options"
@@ -21,7 +22,7 @@ const choices = $derived(
 )
 const milestones = $derived([
 	{ value: "", label: "Choose a Milestone" },
-	...ctx.milestones.map((id) => ({ value: id, label: id })),
+	...ctx.milestones.map((id) => ({ value: id, label: currentItemText("milestone", id) })),
 ])
 const anchors = $derived([
 	{ value: "", label: "Choose a date" },

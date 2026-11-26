@@ -44,6 +44,9 @@ export function itemNames(
 export interface ItemLabel {
 	readonly text: string
 	readonly named: boolean
+	/** The id and kind the words stand for, which the markup carries as `data-item` and `data-kind`. */
+	readonly id: string
+	readonly kind: ItemKind
 }
 
 /** The label of a document item, or undefined when the document states none. */
@@ -56,13 +59,13 @@ function documentLabel(names: ItemNames, kind: ItemKind, id: string): string | u
 /** The label of an id: its name when a Read states one, else the id itself, marked as not named. */
 export function itemLabel(names: ItemNames, kind: ItemKind, id: string): ItemLabel {
 	if (kind === "account" && isNamed(names.accounts, id)) {
-		return { text: nameOf(names.accounts, id), named: true }
+		return { text: nameOf(names.accounts, id), named: true, kind, id }
 	}
 	const person = kind === "person" ? names.people.get(id) : undefined
-	if (person !== undefined) return { text: person.label, named: true }
+	if (person !== undefined) return { text: person.label, named: true, kind, id }
 	const label = documentLabel(names, kind, id)
-	if (label !== undefined) return { text: label, named: true }
-	return { text: id, named: false }
+	if (label !== undefined) return { text: label, named: true, kind, id }
+	return { text: id, named: false, kind, id }
 }
 
 /** The words of an id as plain text, for a label that cannot hold markup (an option, an aria-label, a notice). */

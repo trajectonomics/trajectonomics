@@ -1,6 +1,7 @@
 import type { ProjectionCompare } from "../../contract"
 import { formatDate } from "../../format"
 import { type Cell, textCell } from "../compare/cell"
+import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
 import { countChange } from "./change"
 import type { Triple } from "./triple"
 
@@ -40,15 +41,21 @@ function idsOf(data: ProjectionCompare): readonly string[] {
 /**
  * Each Milestone's what-if date, its baseline date and the CLI's `months` between them
  * (`deltas.milestones`). A Milestone reached on one side only reads "Not reached" on the other and has no
- * change, because `months` is null there. Empty when neither side declares a Milestone.
+ * change, because `months` is null there. Empty when neither side declares a Milestone. Each label is the plan's name for it,
+ * or its id when the document states none (web ADR 0029).
  */
-export function milestoneTriples(data: ProjectionCompare): readonly Triple[] {
+export function milestoneTriples(
+	data: ProjectionCompare,
+	names: ItemNames = NO_ITEM_NAMES,
+): readonly Triple[] {
 	const { a, b } = data.sides
 	return idsOf(data).map((id) => {
 		const delta = data.deltas.milestones?.find((row) => row.id === id)
+		const label = itemLabel(names, "milestone", id)
 		return {
 			key: id,
-			label: id,
+			label: label.text,
+			labelItem: label,
 			whatIf: dateCell(b.milestones, id),
 			baseline: dateCell(a.milestones, id),
 			change: countChange(

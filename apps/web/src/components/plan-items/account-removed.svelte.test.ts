@@ -72,8 +72,14 @@ describe("a What-if that removes an Account's payout", () => {
 	)
 
 	test("keeps the Payout row, saying none and striking the baseline's payout", () => {
-		expect(body).toMatch(/Payout<\/dt>\s*<dd>none/)
+		expect(body).toMatch(/Payout<\/dt>\s*<dd class="wrap-anywhere">(?:<!--[^>]*-->)*none/)
 		expect(body).toMatch(struck("Pays out 3.5% a year"))
+	})
+
+	test("strikes the Milestone's id in code, as the card shows it", () => {
+		const segment = body.match(struck("Pays out 3.5% a year"))?.[0] ?? ""
+		expect(segment).toContain('data-item="retire"')
+		expect(segment).toContain(">retire</code>")
 	})
 
 	test("strikes the baseline's how-line, so 'Paid quarterly' is not lost", () => {
