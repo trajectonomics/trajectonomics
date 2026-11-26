@@ -95,15 +95,31 @@ describe("placedLabels: rules and the plot's edges", () => {
 	})
 
 	test("shortens on the roomier side when neither side holds the whole label", () => {
-		// The rule at 170 leaves 16px to the right; the plot's edge at 90 leaves 56px to the left, less than
-		// the whole 70px label but enough for "abcdef…", so the label shortens on its roomier left side.
+		// The rule at 180 leaves 26px to the right, enough for "ab…" on the preferred side; the plot's edge at
+		// 90 leaves 56px to the left, less than the whole 70px label but enough for "abcdef…", so the label
+		// shortens on its roomier left side rather than on its preferred one.
 		const marks = [
 			{ x: 150, label: "abcdefghij" },
-			{ x: 170, label: "k" },
+			{ x: 180, label: "k" },
 		]
 		const area = { width: 600, left: 90, right: 600 }
 		const placed = placedLabels(marks, area)
 		expect(placed[0]).toEqual({ row: 0, leftwards: true, text: "abcdef…" })
+		expect(faults(marks, placed, area)).toEqual([])
+	})
+
+	test("keeps the preferred side when both sides have the same room", () => {
+		// Rules 40px either side of a marker left of the middle: neither side holds the whole label, both hold
+		// the same shortened words, and the tie goes to the preferred right side.
+		const marks = [
+			{ x: 160, label: "k" },
+			{ x: 200, label: "abcdefghij" },
+			{ x: 240, label: "k" },
+		]
+		const area = bareArea(600)
+		const placed = placedLabels(marks, area)
+		expect(placed[1]).toMatchObject({ leftwards: false })
+		expect(placed[1]?.text.endsWith("…")).toBe(true)
 		expect(faults(marks, placed, area)).toEqual([])
 	})
 
