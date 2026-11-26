@@ -32,14 +32,22 @@ const plan = $derived(
 		: null,
 )
 const filer = $derived(stored?.ok ? isFilerPlan(stored.data.scenario.document) : false)
+/** The filing choice the plan states, so the empty state below says what its Returns actually do. */
+const status = $derived(stored?.ok ? stored.data.scenario.tax?.filingStatus : undefined)
 </script>
 
 <!-- One plan with a Levy: the person's order and limits, then what the CLI says those allowances could take. -->
 {#if filer}
-	<!-- A joint Return over Filers reads suffixed labels, which this read cannot name yet (cli ADR-0075). -->
-	<EmptyState title="Not read for a joint Return yet">
-		<p>This plan files jointly over Filers, so each spouse has their own allowance ceilings. Reading what more each allowance could take comes with step 5 of #343.</p>
-	</EmptyState>
+	<!-- A Return over Filers reads suffixed labels, which this read cannot name yet (cli ADR-0075). -->
+	{#if status === "married_separate"}
+		<EmptyState title="Not read for a separate filing yet">
+			<p>Each Return has its own allowance ceilings. Reading each Return's own comes in #635.</p>
+		</EmptyState>
+	{:else}
+		<EmptyState title="Not read for a joint Return yet">
+			<p>This plan files jointly over Filers, so each spouse has their own allowance ceilings. Reading each spouse's own comes in #635.</p>
+		</EmptyState>
+	{/if}
 {:else}
 	<div class="space-y-8">
 		{#if editable}<InputForm {inputs} />{:else}<InputSummary {inputs} />{/if}

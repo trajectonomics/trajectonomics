@@ -1,6 +1,7 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"globalDependencies": ["tooling/config/**", "tooling/scripts/**"],
+	"globalPassThroughEnv": ["TMPDIR"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],

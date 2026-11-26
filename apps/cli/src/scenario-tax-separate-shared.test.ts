@@ -63,6 +63,15 @@ describe("the shared interest", () => {
 		})
 	})
 
+	/* me: 67,000 as above; partner: 500,000 - 100,000 - 60,000 - 30,000 = 310,000, so 7,500 + 1,000. */
+	it("leaves the other Return the shared half alone: 67,000 and 8,500", async () => {
+		const home = await separate(...interest("shared=60000", "50000"))
+		expect(await owes(home)).toEqual([
+			["me", "67000.00"],
+			["partner", "8500.00"],
+		])
+	})
+
 	/*
 	 * me claims 50,000 + 80,000, which tax-core caps at 100,000 for one Return: 740,000, so 27,500
 	 * up to 500,000 and 15% of 240,000 = 63,500. partner claims 50,000: 290,000, so 5% of 140,000.

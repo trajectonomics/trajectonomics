@@ -1,10 +1,11 @@
 export { type AssumptionLine, assumptionLines } from "./assumptions"
 /** The Tax page's view model: pure functions from a projection to the rows, headline and chart it shows. */
-export { addLevyCommand, type TaxBody, taxBody } from "./body"
+export { addLevyCommand, type TaxBody, taxBody, taxBodyOf } from "./body"
 export type { BracketBar } from "./bracket-bars"
 export type { BracketChart } from "./bracket-chart"
 export { type CarryInRow, type CarryInTally, carryInRows } from "./carry-in"
 export type { CurrentYear, WalkLine } from "./current-year"
 export type { RateRow } from "./rate-rows"
+export { returnOf, returnsOf, type TaxReturn } from "./returns"
 export { taxStatusWords } from "./status"
 export { type TaxHeadline, type TaxRow, taxHeadline, taxRows } from "./tax-rows"

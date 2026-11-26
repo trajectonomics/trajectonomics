@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Snapshot } from "../../lib/contract"
+import { personNames } from "../../lib/view/item-names"
 import { chooseScenario } from "../../lib/view/plan"
 import EmptyState from "../ui/EmptyState.svelte"
 import ReadView from "../ui/ReadView.svelte"
@@ -18,6 +19,8 @@ let { snapshot, scenario, editable }: Props = $props()
 const name = $derived(chooseScenario(snapshot.params.scenarios, scenario))
 const read = $derived(name === null ? undefined : snapshot.reads.documents[name])
 const run = $derived(name === null ? undefined : snapshot.reads.projections[name])
+/** The words for the plan's people, so the per-year table names each Return of a separate filing by role. */
+const people = $derived(personNames(read?.ok === true ? read.data.scenario.household : null))
 </script>
 
 {#if name === null || read === undefined}
@@ -26,9 +29,14 @@ const run = $derived(name === null ? undefined : snapshot.reads.projections[name
 	<div class="space-y-10">
 		<ReadView {read} label={`The tax profile of ${name}`}>
 			{#snippet children(data)}
-				<TaxProfileCard {name} show={data.scenario} {editable} />
+				<TaxProfileCard
+					{name}
+					show={data.scenario}
+					{editable}
+					years={run?.ok === true ? run.data.taxYears : []}
+				/>
 			{/snippet}
 		</ReadView>
-		{#if run !== undefined}<TaxPerYear {name} read={run} />{/if}
+		{#if run !== undefined}<TaxPerYear {name} read={run} {people} />{/if}
 	</div>
 {/if}

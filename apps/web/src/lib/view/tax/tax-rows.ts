@@ -5,6 +5,8 @@ import { formatDate } from "../../format"
 export interface TaxRow {
 	readonly key: string
 	readonly levy: string
+	/** The Filer whose Return this period is, for a separate filing; null when the plan keeps one Return. */
+	readonly filer: string | null
 	readonly period: string
 	readonly settles: string
 	readonly due: string
@@ -42,6 +44,7 @@ export function taxRows(years: readonly TaxYear[]): readonly TaxRow[] {
 	return years.map((year) => ({
 		key: `${year.levy}-${year.from}`,
 		levy: year.levy,
+		filer: year.filer ?? null,
 		period: periodOf(year),
 		settles: formatDate(year.settlementDate),
 		due: year.due,

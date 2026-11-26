@@ -89,6 +89,7 @@ describe("managing plans against the real traj", () => {
 				["later", true],
 				["base", false],
 				["retire-early", false],
+				["separate", false],
 			])
 			// It is first on the plans page, on Home, and in the order every page opens on.
 			expect(planCards(snapshot, parseRange("all"))[0]?.row.name).toBe("later")
@@ -99,7 +100,11 @@ describe("managing plans against the real traj", () => {
 			// Now the old main plan can go.
 			snapshot = await snapshotAfter({ kind: "delete-plan", name: "base" })
 			expect(snapshot.params.scenarios).toEqual(["later"])
-			expect(planRows(snapshot).map((row) => row.name)).toEqual(["later", "retire-early"])
+			expect(planRows(snapshot).map((row) => row.name)).toEqual([
+				"later",
+				"retire-early",
+				"separate",
+			])
 		},
 		SLOW_MS,
 	)
@@ -143,7 +148,11 @@ describe("managing plans against the real traj", () => {
 			await editor.reread(editRequest({}, "{}"), PORT)
 			const before = JSON.parse(editor.body ?? "null") as Snapshot
 			// The demo ledger holds `retire-early` too, which the editor was not started with.
-			expect(notProjected(before).map((row) => row.name)).toEqual(["extra", "retire-early"])
+			expect(notProjected(before).map((row) => row.name)).toEqual([
+				"extra",
+				"retire-early",
+				"separate",
+			])
 			const response = await editor.reread(
 				editRequest({}, JSON.stringify({ addPlan: "extra" })),
 				PORT,
@@ -151,7 +160,10 @@ describe("managing plans against the real traj", () => {
 			const answer = (await response.json()) as { ok: boolean; snapshot: Snapshot }
 			expect(answer.ok).toBe(true)
 			expect(answer.snapshot.params.scenarios).toEqual(["later", "extra"])
-			expect(notProjected(answer.snapshot).map((row) => row.name)).toEqual(["retire-early"])
+			expect(notProjected(answer.snapshot).map((row) => row.name)).toEqual([
+				"retire-early",
+				"separate",
+			])
 			// A name the ledger does not hold is not added.
 			const ghost = await editor.reread(editRequest({}, JSON.stringify({ addPlan: "ghost" })), PORT)
 			const kept = (await ghost.json()) as { snapshot: Snapshot }

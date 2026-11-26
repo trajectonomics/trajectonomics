@@ -25,9 +25,15 @@ describe("the taxYear contract", () => {
 		expect(taxYear.parse(row)).toEqual(row)
 	})
 
-	it("still parses a row without them, and refuses a field it does not know", () => {
+	it("parses a row without them, and refuses a field it does not know", () => {
 		expect(taxYear.parse(ROW)).toEqual(ROW)
 		expect(taxYear.safeParse({ ...ROW, extra: 1 }).success).toBe(false)
+	})
+
+	it("parses a separate filing's Filer on the row, and a row of one Return without it (cli ADR 0075)", () => {
+		const separate = { ...ROW, levy: "th-2026-pit@me", filer: "me" }
+		expect(taxYear.parse(separate)).toEqual(separate)
+		expect(taxYear.parse(ROW)).not.toHaveProperty("filer")
 	})
 
 	it("parses the walk, the brackets and the rates a Thai Levy adds (cli ADR 0036), each optional", () => {
