@@ -57,7 +57,7 @@ function departed(id: string, example: string): string {
 
 /** The same sentence on a write with no Filers, which refuses a person-qualified value. */
 function departedNoFilers(id: string): string {
-	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person who has a Return; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person in the household; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }
 
 describe("a holder given a new id after claims were stated", () => {
@@ -68,24 +68,24 @@ describe("a holder given a new id after claims were stated", () => {
 	])("is named by %s, under the old id", async (_how, flags) => {
 		const home = await rehoused(CLAIM, ALICE)
 		expect(await unclaimed(home, ...flags)).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
 		])
 	})
 
 	it("stays named by every later separate write while the claims sit on no Return", async () => {
 		const home = await rehoused(CLAIM, ALICE)
 		expect(await unclaimed(home, "--from-stored")).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
 		])
 		// Without the 80,000 alice owes 83,000.00, where the Return of "me" owed 67,000.00.
 		expect((await owed(home))["alice"]).toBe("83000.00")
 		expect(await unclaimed(home, "--merge", "--parents", "partner=1")).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
 		])
 		// Stated again for alice, they are counted; the old set is still stored on no Return.
 		const again = ["--merge", "--life-insurance", "alice=80000"]
 		expect(await unclaimed(home, ...again)).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
 		])
 		expect((await owed(home))["alice"]).toBe("67000.00")
 		// The sentence names where the set is: scenario show keeps it under `returns` until --tax.
@@ -100,7 +100,7 @@ describe("a holder given a new id after claims were stated", () => {
 		// A joint Return is one Return and carries the flat claims whoever the holder is.
 		expect(await unclaimed(home, ...JOINT)).toEqual([])
 		expect(await unclaimed(home, ...SEPARATE)).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
 		])
 		// The departed sentence never says the set waits for a separate filing.
 		expect((await unclaimed(home, ...SEPARATE)).join()).not.toContain("kept for a separate filing")
@@ -115,14 +115,14 @@ describe("a partner given a new id after claims were stated", () => {
 		expect(await unclaimed(home, ...JOINT)).toEqual([departedNoFilers("partner")])
 		expect(await unclaimed(home, ...SINGLE)).toEqual([departedNoFilers("partner")])
 		expect(await unclaimed(home, ...SEPARATE)).toEqual([
-			departed("partner", "--life-insurance <person>=<amount>"),
+			departed("partner", "--life-insurance=<person>=<amount>"),
 		])
 		expect((await owed(home))["bob"]).toBe("11500.00")
 	})
 
 	it("gives a separate write a placeholder a person in the household can run", async () => {
 		const home = await rehoused(["--life-insurance", "partner=50000"], BOB)
-		const example = "--life-insurance <person>=<amount>"
+		const example = "--life-insurance=<person>=<amount>"
 		expect(await unclaimed(home, ...SEPARATE)).toEqual([departed("partner", example)])
 		expect((await owed(home))["bob"]).toBe("11500.00")
 		// The printed flag, with bob in the placeholder, states the departed claims again for him.
@@ -143,7 +143,7 @@ describe("a partner given a new id after claims were stated", () => {
 			"married_separate",
 			"--dry-run",
 		)
-		expect(sentence).toBe(departed("partner", "--life-insurance <person>=<amount>"))
+		expect(sentence).toBe(departed("partner", "--life-insurance=<person>=<amount>"))
 		const command = /such as (--filing-status married_separate .+) --merge/.exec(sentence!)![1]!
 		const filled = command.replace("<person>", "bob").replace("<amount>", "50000")
 		const res = await tax(home, ...filled.split(" "), "--merge")
@@ -155,8 +155,8 @@ describe("a partner given a new id after claims were stated", () => {
 		const claims = [...CLAIM, "--life-insurance", "partner=50000"]
 		const home = await rehoused(claims, renamed("partner", "bob", ALICE))
 		expect(await unclaimed(home, "--from-stored")).toEqual([
-			departed("me", "--life-insurance <person>=<amount>"),
-			departed("partner", "--life-insurance <person>=<amount>"),
+			departed("me", "--life-insurance=<person>=<amount>"),
+			departed("partner", "--life-insurance=<person>=<amount>"),
 		])
 	})
 })

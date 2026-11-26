@@ -24,19 +24,23 @@ function held(sets: readonly ReturnClaims[], field: Field): boolean {
  * A flag for every field some of these sets holds, and every field in `also`, naming `person`: `<n>`
  * for a count and `<amount>` for an amount, joined by spaces; `undefined` when there is none. A count
  * flag on its own can be refused beside a kept set's other counts, so the whole command states them
- * all. A person id that starts with `-` takes the `=` form, or its value would read as a flag.
+ * all. A person id that starts with `-` takes the `=` form, or its value would read as a flag;
+ * `equals` asks for that form for any id, as a placeholder that may become such an id does.
  */
 export function exampleFlagsOf(
 	sets: readonly ReturnClaims[],
 	person: string,
 	also: readonly Field[] = [],
+	equals = false,
 ): string | undefined {
 	const fields = FIELDS.filter((field) => also.includes(field) || held(sets, field))
 	if (fields.length === 0) return undefined
 	return fields
 		.map((field) => {
 			const value = `${person}=${COUNTS.has(field) ? "<n>" : "<amount>"}`
-			return person.startsWith("-") ? `${flagOf(field)}=${value}` : `${flagOf(field)} ${value}`
+			return equals || person.startsWith("-")
+				? `${flagOf(field)}=${value}`
+				: `${flagOf(field)} ${value}`
 		})
 		.join(" ")
 }

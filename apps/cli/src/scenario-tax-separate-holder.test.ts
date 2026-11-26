@@ -146,7 +146,7 @@ describe("the switch-back caveat when the roles swap before a joint Return", () 
 		expect(joint.code, joint.err).toBe(0)
 		const [sentence] = resultOf(joint).unclaimed as string[]
 		// The bare claims are "me"'s, who is the partner now, not the household's holder.
-		expect(sentence).toContain('reads as "me"\'s own, so state "me"\'s own claims again')
+		expect(sentence).toContain('reads as "me"\'s own, so before you do, note "me"\'s own claims')
 		expect(sentence).not.toContain("the holder's own")
 		expect(sentence).not.toContain('"partner"\'s own claims')
 		const example = "--parents me=<n>"

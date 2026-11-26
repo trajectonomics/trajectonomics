@@ -34,7 +34,7 @@ const KEPT =
 
 /** The hint, with the flat claims' person named and the full switch-back command as its example. */
 function hint(example: string): string {
-	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as "me"'s own, so note "me"'s own claims from scenario show before you state them bare, and state them again when switching back, for example --filing-status married_separate ${example} --merge.`
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as "me"'s own, so before you do, note "me"'s own claims from scenario show, and state those again when switching back, for example --filing-status married_separate ${example} --merge.`
 }
 
 const OLDER =

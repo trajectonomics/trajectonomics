@@ -132,12 +132,8 @@ describe("the caveat's words and forms", () => {
 		expect(first.code, first.err).toBe(0)
 		const joint = await tax(home, "--merge", "--filing-status", "married_joint")
 		const [sentence] = resultOf(joint).unclaimed as string[]
-		expect(sentence).toContain(
-			'note "me"\'s own claims from scenario show before you state them bare',
-		)
-		expect(sentence!.indexOf("before you state them bare")).toBeLessThan(
-			sentence!.indexOf("for example"),
-		)
+		expect(sentence).toContain('so before you do, note "me"\'s own claims from scenario show')
+		expect(sentence!.indexOf("before you do")).toBeLessThan(sentence!.indexOf("for example"))
 		// A bare write keeps only the stated amount: me's own 30,000 is gone from `scenario show`.
 		const bare = await tax(home, "--merge", "--life-insurance", "110000")
 		expect(bare.code, bare.err).toBe(0)

@@ -45,5 +45,5 @@ export function bareHint(
 	const example = exampleFlagsOf(claims, person, shared > 0 ? ["mortgageInterest"] : [])
 	if (example === undefined) return GENERIC
 	const name = JSON.stringify(person)
-	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as ${name}'s own, so note ${name}'s own claims from scenario show before you state them bare, and state them again when switching back, for example --filing-status married_separate ${example} --merge.`
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as ${name}'s own, so before you do, note ${name}'s own claims from scenario show, and state those again when switching back, for example --filing-status married_separate ${example} --merge.`
 }

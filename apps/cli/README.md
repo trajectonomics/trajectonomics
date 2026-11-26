@@ -235,7 +235,7 @@ separate. `--merge` and `--from-stored` keep the stored `returns` and
 `sharedMortgageInterest`, and `--merge` to `married_joint` keeps the partner's Return and
 the shared interest for a later switch back; a joint Return claims neither, so state its
 interest bare. A write that claims neither says so in `unclaimed`, and a joint or
-no-income-spouse Return adds how to claim the stored claims bare; when the write has a
+no-income-spouse Return adds how to claim the stored claims bare; when a joint write has a
 Return for the person whose flat claims those are, it names them and gives the switch-back
 command in full, with a flag for every claim the kept sets hold and, when the profile keeps
 shared home-loan interest, that person's own mortgage interest, for example

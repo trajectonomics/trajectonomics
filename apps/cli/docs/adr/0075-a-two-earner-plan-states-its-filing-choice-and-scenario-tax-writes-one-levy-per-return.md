@@ -286,9 +286,9 @@ the Return used the home-loan ceiling.
   there the hint would invite a claim the caller's filing cannot make. Where it prints, the hint is
   conditional ("If this Return does not claim them yet"), so it stays true after it has been followed,
   and it says that stating them bare replaces the stored flat claims, which a later separate filing
-  reads as "me"'s own, so state "me"'s own claims again when switching back (`"me"` is the named
-  person). The caveat names the person whose flat claims they are (`claimsHolder`, else the household
-  holder) and gives the switch-back command in full, with a person-keyed flag for every field the kept
+  reads as "me"'s own, so before stating them bare the person notes "me"'s own claims from `scenario
+  show` and states those again when switching back (`"me"` is the named person). A joint write with a Return for the person whose flat claims they are (`claimsHolder`, else
+  the household holder) names that person and gives the switch-back command in full, with a person-keyed flag for every field the kept
   sets hold and, when the profile also keeps shared home-loan interest, that person's own
   `--mortgage-interest`, because the bare amount the shared-interest sentence suggests would otherwise
   drop it (`for example --filing-status married_separate --parents me=<n> --life-insurance
