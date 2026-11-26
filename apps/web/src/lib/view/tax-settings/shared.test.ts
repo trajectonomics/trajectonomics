@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import type { TaxProfile } from "../../contract"
 import { taxTokens } from "../../edit/tax-flags"
-import { draftOf, keepsStoredShared, wholeDraftOf } from "./draft"
+import { draftOf, keepsStoredShared, type TaxDraft, wholeDraftOf } from "./draft"
 import { mergeFlags, sharedDropWarning, wholeFlags } from "./flags"
 import { taxEdit } from "./profile-edit"
 import { taxFieldOfRefusal, taxShown } from "./refusal"
@@ -14,6 +14,14 @@ const stored: TaxProfile = {
 	childrenAtHigherRate: 0,
 	claimsHolder: "me",
 	sharedMortgageInterest: 60000,
+}
+
+/** The warning's whole sentence as the page shows it with Hide amounts off. */
+function sentence(profile: TaxProfile | null, whole: boolean, draft: TaxDraft): string | null {
+	const warning = sharedDropWarning(profile, whole, draft)
+	return warning === null
+		? null
+		: `${warning.before}${warning.amount.digits}${warning.amount.after}${warning.after}`
 }
 
 describe("the shared home-loan interest", () => {
@@ -64,10 +72,10 @@ describe("the shared home-loan interest", () => {
 			ok: true,
 			flags: { filingStatus: "married_joint" },
 		})
-		expect(sharedDropWarning(stored, true, cleared)).toBe(
+		expect(sentence(stored, true, cleared)).toBe(
 			"This save drops the stored shared home-loan interest of 60,000 THB.",
 		)
-		expect(sharedDropWarning(stored, true, { ...cleared, filingStatus: "married_joint" })).toBe(
+		expect(sentence(stored, true, { ...cleared, filingStatus: "married_joint" })).toBe(
 			"This save drops the stored shared home-loan interest of 60,000 THB.",
 		)
 		expect(sharedDropWarning(stored, true, separate)).toBeNull()
@@ -91,7 +99,7 @@ describe("the shared home-loan interest", () => {
 	test("an all-zero amount drops the stored value as an empty one does", () => {
 		const separate = { ...wholeDraftOf(stored, true), filingStatus: "married_separate" }
 		for (const text of ["0", "0.00", "000"]) {
-			expect(sharedDropWarning(stored, true, { ...separate, sharedMortgageInterest: text })).toBe(
+			expect(sentence(stored, true, { ...separate, sharedMortgageInterest: text })).toBe(
 				"This save drops the stored shared home-loan interest of 60,000 THB.",
 			)
 			expect(wholeFlags({ ...separate, sharedMortgageInterest: text })).toEqual({
@@ -106,9 +114,18 @@ describe("the shared home-loan interest", () => {
 		expect(draft.sharedMortgageInterest).toBe("")
 		const separate = { ...draft, filingStatus: "married_separate" }
 		expect(wholeFlags(separate)).toEqual({ ok: true, flags: { filingStatus: "married_separate" } })
-		expect(sharedDropWarning(stored, true, separate)).toBe(
+		expect(sentence(stored, true, separate)).toBe(
 			"This save drops the stored shared home-loan interest of 60,000 THB.",
 		)
+	})
+
+	test("keeps the words apart from the amount, so Hide amounts masks only the digits", () => {
+		const separate = { ...wholeDraftOf(stored, true), filingStatus: "married_separate" }
+		expect(sharedDropWarning(stored, true, { ...separate, sharedMortgageInterest: "" })).toEqual({
+			before: "This save drops the stored shared home-loan interest of ",
+			amount: { digits: "60,000", after: " THB" },
+			after: ".",
+		})
 	})
 
 	test("a refusal of `shared=` lands at the shared field, not at the person's own interest", () => {

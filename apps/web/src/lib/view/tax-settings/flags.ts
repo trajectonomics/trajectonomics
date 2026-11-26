@@ -7,7 +7,7 @@ import { AMOUNT_SHAPE, COUNT_SHAPE, type TaxFlags } from "../../edit/tax-flags"
 import type { Problems } from "../plan-items/problems"
 import type { TaxDraft } from "./draft"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
-import { groupDigits } from "./rows"
+import { groupDigits, type ShownAmount } from "./rows"
 
 /** The flags a draft makes, or the problems at its fields. */
 export type TaxResult = { ok: true; flags: TaxFlags } | { ok: false; problems: Problems }
@@ -98,16 +98,28 @@ export function wholeFlags(draft: TaxDraft): TaxResult {
 /**
  * The sentence a whole save shows when it would drop a stored shared home-loan interest, or null when it keeps it. An
  * all-zero amount is stated as `shared=0`, which the CLI reads as a removal, so it drops the value as an empty one does.
+ * The words stay apart from the amount, so Hide amounts masks only the digits and keeps the currency and the words.
  */
 export function sharedDropWarning(
 	profile: TaxProfile | null,
 	whole: boolean,
 	draft: TaxDraft,
-): string | null {
+): SharedDropWarning | null {
 	const stored = profile?.sharedMortgageInterest
 	const text = draft.sharedMortgageInterest.trim()
 	if (!whole || stored === undefined || draft.filingStatus === "") return null
 	const kept = draft.filingStatus === "married_separate" && text !== "" && !/^0+(\.0*)?$/.test(text)
 	if (kept) return null
-	return `This save drops the stored shared home-loan interest of ${groupDigits(stored)} THB.`
+	return {
+		before: "This save drops the stored shared home-loan interest of ",
+		amount: { digits: groupDigits(stored), after: " THB" },
+		after: ".",
+	}
+}
+
+/** The warning's words before the amount, the amount itself, and the words after it. */
+export interface SharedDropWarning {
+	readonly before: string
+	readonly amount: ShownAmount
+	readonly after: string
 }

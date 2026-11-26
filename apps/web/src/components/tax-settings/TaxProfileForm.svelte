@@ -8,6 +8,7 @@ import { GROUPS, type GroupKey } from "../../lib/view/tax-settings/groups"
 import { taxEdit } from "../../lib/view/tax-settings/profile-edit"
 import { needsWholeProfile, taxShown } from "../../lib/view/tax-settings/refusal"
 import ItemActions from "../plan-items/ItemActions.svelte"
+import TaxDropWarning from "./TaxDropWarning.svelte"
 import TaxFlowLabels from "./TaxFlowLabels.svelte"
 import TaxProfileFields from "./TaxProfileFields.svelte"
 
@@ -89,7 +90,7 @@ async function save(event: SubmitEvent): Promise<void> {
 	{/if}
 	<TaxProfileFields bind:draft {shown} {visible} {sharedClaimable} lockedFlat={flatClaimsLocked} />
 	{#if !merging}<TaxFlowLabels flows={unlabelled} bind:labels {shown} />{/if}
-	{#if dropWarning}<p role="status" class="text-sm text-destructive">{dropWarning}</p>{/if}
+	{#if dropWarning}<TaxDropWarning warning={dropWarning} />{/if}
 	{#if shown.general}<p role="alert" class="text-sm text-destructive">{shown.general}</p>{/if}
 	{#if needsWholeProfile(editSession.failure)}
 		<button type="button" class={button} disabled={flatClaimsLocked} onclick={() => switchTo(true)}>Set the whole profile</button>
