@@ -70,7 +70,7 @@ The Demo's other reads are byte-identical; its only new leaf is the notes read. 
 - **The claims table.** Every money cell of "Who claims each allowance" and the stored shared home-loan interest under it read through the same mask; a count and "None" stay as they are. `claims.ts` keeps each amount's digits beside its text (`ShownAmount`), so the page masks the digits and never the words around them.
 - **The notes.** A CLI note can state an amount (the sentence about shared home-loan interest names it), so with Hide amounts on the section shows one line, "The notes on the stored claims are hidden with the amounts.", instead of the sentences.
 - **The drawer's warning.** When a whole save would drop a stored shared home-loan interest, its sentence reads through the same mask (`TaxDropWarning`, which uses `MaskedAmount`): the words before and after the amount stay, the digits become `•••••`, " THB" stays, and a screen reader hears "amount hidden".
-- **What does not change.** The per-year table already reads `Money`, so it needs no change. The profile form's fields show the person's own input, so they stay unmasked. With Hide amounts off the page shows the same text and markup apart from the comment markers Svelte writes for a block.
+- **What does not change.** The per-year table already reads `Money`, so it needs no change. The profile form's fields show the person's own input, so they stay unmasked. A locked field takes no input, so its value is masked. With Hide amounts off the page shows the same text and markup apart from the comment markers Svelte writes for a block.
 
 ## Amendment (2026-11-26): the flat claims wait after a holder swap
 
