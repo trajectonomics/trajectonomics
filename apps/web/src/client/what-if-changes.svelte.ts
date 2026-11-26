@@ -1,17 +1,13 @@
 import type { Addition } from "../lib/what-if/additions"
-import type { Json } from "../lib/what-if/overrides"
 import {
 	type Change,
-	clearedFields,
 	hasChanges,
 	isOff,
 	startWhatIf,
 	switchedOff,
 	switchedOn,
-	triedItemSets,
 	type WhatIf,
 	withAddition,
-	withTriedFields,
 } from "../lib/what-if/session"
 import { withoutChange } from "../lib/what-if/session-without"
 import { type TriedFlow, withTriedFlow, withTriedItem } from "../lib/what-if/try-flow"
@@ -28,40 +24,15 @@ export class WhatIfChanges extends WhatIfState {
 	}
 
 	/**
-	 * Switches an item off or back on, by its path (`flows.gym`, `accounts.cash`). `also` are the paths that switch off
-	 * with it: a salary's employer share is a Flow of its own, and `traj` refuses its `derive` reading a salary a Removal
-	 * took out (`UNKNOWN_FLOW`). A switch back on drops only this item's Removal, so a share cleared in a try stays clear.
-	 * A session belongs to one plan: a change to another plan while this one holds changes is refused and asks first, and so
-	 * is any change while Apply or Save runs. True when it was made.
+	 * Switches an item off or back on, by its path (`flows.gym`, `accounts.cash`). A salary and its employer share
+	 * switch as one group, through `setGroupOff`. A switch back on drops only this item's Removal, so a share cleared in
+	 * a try stays clear. A session belongs to one plan: a change to another plan while this one holds changes is refused
+	 * and asks first, and so is any change while Apply or Save runs. True when it was made.
 	 */
-	setOff(plan: string, contentHash: string, path: string, off: boolean, also?: string[]): boolean {
+	setOff(plan: string, contentHash: string, path: string, off: boolean): boolean {
 		const base = this.saving ? null : this.sessionFor(plan, contentHash)
-		if (base !== null) this.keep(off ? switchedOff(base, path, also) : switchedOn(base, path))
+		if (base !== null) this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
 		return base !== null
-	}
-
-	/**
-	 * Makes the Sets of the edited item's changed fields, replacing an earlier try: the drawer's "Try a value". One
-	 * Set of the whole item when the try adds a field the stored item lacks, as `withTriedItem` does for an Account.
-	 * Returns the cleared fields a field Set cannot try; a whole-item Set clears them, so it reports none.
-	 */
-	tryItem(
-		plan: string,
-		contentHash: string,
-		list: "flows" | "accounts",
-		id: string,
-		stored: Record<string, Json>,
-		edited: Record<string, Json>,
-	): string[] {
-		const base = this.saving ? null : this.sessionFor(plan, contentHash)
-		if (base === null) return []
-		const path = `${list}.${id}`
-		const sets = triedItemSets(list, id, stored, edited)
-		// A try with no edit leaves a switched-off item off: switching it on would be a change the person did not make.
-		if (sets.length === 0 && isOff(base, path)) return clearedFields(stored, edited)
-		this.keep(withTriedFields(base, list, id, stored, edited))
-		// A Set of the whole item leaves out every field it does not name, so it clears a field a field Set cannot.
-		return sets.some((set) => set.path === path) ? [] : clearedFields(stored, edited)
 	}
 
 	/** Puts a change in the session unless Apply or Save runs or another plan's changes must be settled first. True when it was made. */

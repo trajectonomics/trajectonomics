@@ -10,6 +10,7 @@ import { lensReadsOf } from "../src/lib/what-if/lens"
 import {
 	overridesOf,
 	startWhatIf,
+	switchedOff,
 	withAddition,
 	withGroupOff,
 	withoutGroup,
@@ -139,6 +140,26 @@ describe("a salary switched off with its employer share", () => {
 		if (back.run === null) throw new Error("traj refused the salary switched back on")
 		expect(moneyOf(back.run)).toEqual(moneyOf(plan.run))
 	})
+
+	slow(
+		"a share a try cleared before the switch stays cleared, and traj takes both the switch and the switch back",
+		async () => {
+			const { hash } = await planWithSalary()
+			// A try cleared the share first: its Removal is in place before the salary's switch.
+			const cleared = switchedOff(startWhatIf(PLAN, hash), `flows.${SHARE}`)
+			const off = withGroupOff(cleared, SPEC, SPEC.paths)
+			const leaving = overridesOf(off)
+			// The switch sends the salary and the share together, though the share's Removal came first.
+			expect(leaving.removals).toEqual([`flows.${SHARE}`, `flows.${SALARY}`])
+			const lens = lensReadsOf(await tryWhatIf({ plan: PLAN, ...leaving }))
+			if (lens.run === null) throw new Error("traj refused the salary with its cleared share")
+			// Switching the salary back on keeps the share out, and traj takes that too.
+			const back = overridesOf(withoutGroup(off, `salary:${SALARY}`))
+			expect(back.removals).toEqual([`flows.${SHARE}`])
+			const on = lensReadsOf(await tryWhatIf({ plan: PLAN, ...back }))
+			if (on.run === null) throw new Error("traj refused the salary switched back on")
+		},
+	)
 
 	slow(
 		"a share the session adds is held while the salary is off, and comes back with it",

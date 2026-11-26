@@ -19,8 +19,8 @@ export type GroupSpec = {
 	readonly paths: readonly string[]
 }
 
-/** A group the session holds. */
-export type Group = GroupSpec & { readonly how: GroupHow }
+/** A group the session holds. `held` are the Removals its switch found in place, which a switch back on keeps. */
+export type Group = GroupSpec & { readonly how: GroupHow; readonly held: readonly string[] }
 
 /** The id of a group, which is also the `path` of the change that lists it. */
 export function groupId(spec: Pick<GroupSpec, "kind" | "name">): string {
@@ -42,20 +42,25 @@ export function isGroupOff(whatIf: WhatIf, id: string): boolean {
 	return groupOf(whatIf, id)?.how === "off"
 }
 
-/** The session without the group: its record and every Removal, Addition and Set of its parts. */
+/**
+ * The session without the group: its record and every Removal, Addition and Set of its parts. A salary's try, added
+ * share and Removal made before its switch come back with it: the switch held them rather than taking them out of the
+ * session, so a share a try cleared stays cleared when the salary switches back on.
+ */
 export function withoutGroup(whatIf: WhatIf, id: string): WhatIf {
 	const group = groupOf(whatIf, id)
 	if (group === undefined) return whatIf
-	// A salary's try and added share come back with it: the switch held them, rather than taking them out of the session.
-	const held = group.kind === "salary"
+	const salary = group.kind === "salary"
 	return {
 		...whatIf,
 		groups: whatIf.groups.filter((one) => one !== group),
-		removals: whatIf.removals.filter((path) => !inGroup(group, path)),
-		additions: held
+		removals: whatIf.removals.filter(
+			(path) => !inGroup(group, path) || (salary && group.held.includes(path)),
+		),
+		additions: salary
 			? whatIf.additions
 			: whatIf.additions.filter((one) => !inGroup(group, additionPath(one))),
-		sets: held ? whatIf.sets : whatIf.sets.filter((set) => !inGroup(group, set.path)),
+		sets: salary ? whatIf.sets : whatIf.sets.filter((set) => !inGroup(group, set.path)),
 	}
 }
 
@@ -84,18 +89,28 @@ function takenOver(whatIf: WhatIf, spec: GroupSpec, keep: boolean): WhatIf {
 	}
 }
 
+/** The Removals already in place under the group's paths, which only a salary's switch holds rather than makes. */
+function heldRemovals(whatIf: WhatIf, spec: GroupSpec): readonly string[] {
+	if (spec.kind !== "salary") return []
+	const existing = groupOf(whatIf, groupId(spec))
+	if (existing !== undefined) return existing.held
+	return whatIf.removals.filter((path) => inGroup(spec, path))
+}
+
 /**
  * The session with the group switched off: `removals` take its parts out together, and any earlier try or switch of
  * the group, of a group that shares a part with it and of a part alone is dropped, because a Set of a part that is
  * gone would be refused. A plan can keep a part declared (the Account a Baseline row holds), so the removals are
- * the caller's, and `spec.paths` are all the group's parts. A salary's try is held, so a switch back on restores it.
+ * the caller's, and `spec.paths` are all the group's parts. A salary's try is held, so a switch back on restores it,
+ * and so is a Removal it found in place (a share a try cleared), so that switch back on keeps the share out.
  */
 export function withGroupOff(whatIf: WhatIf, spec: GroupSpec, removals: readonly string[]): WhatIf {
+	const held = heldRemovals(whatIf, spec)
 	const base = takenOver(whatIf, spec, spec.kind === "salary")
 	return {
 		...base,
 		removals: [...base.removals, ...removals.filter((path) => !base.removals.includes(path))],
-		groups: [...base.groups, { ...spec, how: "off" }],
+		groups: [...base.groups, { ...spec, how: "off", held }],
 	}
 }
 
@@ -113,6 +128,6 @@ export function withGroupTried(
 	return {
 		...base,
 		sets: [...base.sets, ...sets.filter((set) => !base.sets.some((one) => one.path === set.path))],
-		groups: [...base.groups, { ...spec, how: "tried" }],
+		groups: [...base.groups, { ...spec, how: "tried", held: [] }],
 	}
 }

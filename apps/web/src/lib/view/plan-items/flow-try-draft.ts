@@ -1,8 +1,8 @@
 import type { ScenarioDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
 import { shownFlows } from "../../what-if/routing"
-import { isOff, type WhatIf } from "../../what-if/session"
-import { type EmployerShare, employerOf } from "./employer"
+import { groupId, groupOf, isOff, type WhatIf } from "../../what-if/session"
+import { type EmployerShare, employerIdOf, employerOf } from "./employer"
 import { type EmployerDraft, employerDraftOf } from "./employer-draft"
 import { type FlowDraft, flowDraftOf } from "./flows"
 
@@ -26,7 +26,8 @@ export function flowDraftForTry(
 
 /**
  * The employer share a try's form starts from: as the session shows it, or the stored share while the salary is off,
- * because the session then holds the share out of what it shows. A cleared share is still null while the salary is on.
+ * because the session then holds the share out of what it shows. A share a try cleared before the switch stays cleared:
+ * its Removal is the switch's to keep, so the form must not fall back to the stored share.
  */
 export function employerStart(
 	doc: ScenarioDocument,
@@ -35,11 +36,15 @@ export function employerStart(
 	whatIf: WhatIf | null,
 ): EmployerShare | null {
 	if (existing === undefined) return null
-	const shown = whatIf !== null && whatIf.plan === name ? shownFlows(doc, whatIf, name) : doc.flows
-	const share = employerOf(shown, existing.id)
-	return whatIf !== null && whatIf.plan === name && isOff(whatIf, `flows.${existing.id}`)
-		? (employerOf(doc.flows, existing.id) ?? share)
-		: share
+	const session = whatIf !== null && whatIf.plan === name ? whatIf : null
+	const share =
+		session === null
+			? employerOf(doc.flows, existing.id)
+			: employerOf(shownFlows(doc, session, name), existing.id)
+	if (session === null || !isOff(session, `flows.${existing.id}`)) return share
+	const group = groupOf(session, groupId({ kind: "salary", name: existing.id }))
+	if (group?.held.includes(`flows.${employerIdOf(existing.id)}`) === true) return null
+	return employerOf(doc.flows, existing.id) ?? share
 }
 
 /** What a Flow form starts from: the draft and the employer section, as the session shows the plan when it tries a value. */

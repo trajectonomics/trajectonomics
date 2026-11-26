@@ -7,14 +7,13 @@
 import { type Addition, additionPath } from "./additions"
 import type { SetChange } from "./overrides"
 import type { WhatIf } from "./session"
-import { inGroup } from "./session-group"
 
-/** Whether a change of this path is held back: the item is off, or a loan, an asset or a salary is switched off as one. */
+/**
+ * Whether a change of this path is held back: a Removal takes the item out, so `traj` would refuse a Set of it. A part
+ * a switched-off group keeps declared (the Account a Baseline row holds) has no Removal, so its Set is still sent.
+ */
 export function isHeld(whatIf: WhatIf, path: string): boolean {
-	return (
-		whatIf.removals.some((one) => path === one || path.startsWith(`${one}.`)) ||
-		whatIf.groups.some((group) => group.how === "off" && inGroup(group, path))
-	)
+	return whatIf.removals.some((one) => path === one || path.startsWith(`${one}.`))
 }
 
 /** The Overrides of a session in the order `traj` takes them: removals, Additions, then Sets (cli ADR 0056, 0062). */

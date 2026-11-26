@@ -6,6 +6,7 @@ import {
 	isGroupOff,
 	isOff,
 	namesChange,
+	overridesOf,
 	startWhatIf,
 	switchedOff,
 	withGroupOff,
@@ -97,6 +98,16 @@ describe("a loan switched off is one group", () => {
 		expect(withoutGroup(withSet(kept, "accounts.boat-loan.rate", 1), groupId(SPEC)).sets).toEqual(
 			[],
 		)
+	})
+
+	test("a try on a part the group keeps declared is sent, not held back by the switch", () => {
+		const kept = withGroupOff(start, SPEC, SPEC.paths.slice(1))
+		const tried = withSet(kept, "accounts.boat-loan.rate", 700)
+		expect(overridesOf(tried)).toEqual({
+			sets: [{ path: "accounts.boat-loan.rate", value: 700 }],
+			removals: [...SPEC.paths.slice(1)],
+			additions: [],
+		})
 	})
 
 	test("another item switched off stays its own change", () => {

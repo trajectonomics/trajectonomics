@@ -128,4 +128,44 @@ describe("a salary switched off with its employer share", () => {
 		expect(whatIfSession.isOffIn("base", "flows.salary")).toBe(false)
 		expect(whatIfSession.isOffIn("base", "flows.salary-employer")).toBe(true)
 	})
+
+	test("a share a try cleared before the switch stays cleared when the salary switches off and on", async () => {
+		await tryForm({}, employerDraftOf(null))
+		switchOff()
+		expect(whatIfSession.whatIf?.groups[0]?.held).toEqual(["flows.salary-employer"])
+		whatIfSession.setGroupOff("base", HASH, SPEC, SPEC.paths, false)
+		expect(whatIfSession.isOffIn("base", "flows.salary")).toBe(false)
+		expect(whatIfSession.isOffIn("base", "flows.salary-employer")).toBe(true)
+	})
+
+	test("while off, its form starts from the share the try cleared, not the stored one", async () => {
+		await tryForm({}, employerDraftOf(null))
+		switchOff()
+		expect(start().employer).toEqual(employerDraftOf(null))
+	})
+
+	test("an amount-only try while off keeps the share cleared", async () => {
+		await tryForm({}, employerDraftOf(null))
+		switchOff()
+		await tryForm({ amount: "95000.00" })
+		expect(whatIfSession.isOffIn("base", "flows.salary")).toBe(false)
+		expect(whatIfSession.isOffIn("base", "flows.salary-employer")).toBe(true)
+	})
+
+	test("removing each change in turn never sends the salary without its share", async () => {
+		await tryForm({}, employerDraftOf(null))
+		switchOff()
+		expect(overridesOf(whatIfSession.whatIf!).removals).toEqual([
+			"flows.salary-employer",
+			"flows.salary",
+		])
+		const group = whatIfSession.changes.find((change) => change.kind === "group")
+		if (group === undefined) throw new Error("no group change")
+		whatIfSession.removeChange(group)
+		expect(overridesOf(whatIfSession.whatIf!).removals).toEqual(["flows.salary-employer"])
+		const [shareChange] = whatIfSession.changes
+		if (shareChange === undefined) throw new Error("no share change")
+		whatIfSession.removeChange(shareChange)
+		expect(whatIfSession.whatIf).toBeNull()
+	})
 })

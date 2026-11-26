@@ -34,7 +34,7 @@ const button =
 function change(control: HTMLInputElement): void {
 	const made =
 		unit === null
-			? whatIfSession.setOff(plan, contentHash, path, !control.checked, also)
+			? whatIfSession.setOff(plan, contentHash, path, !control.checked)
 			: whatIfSession.setGroupOff(plan, contentHash, unit, unit.paths, !control.checked)
 	if (!made) restoreSwitch(control, !off)
 }

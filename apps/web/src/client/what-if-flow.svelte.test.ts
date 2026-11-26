@@ -38,7 +38,7 @@ describe("trying a field the stored Flow lacks", () => {
 		["displayLabel", "Rent"],
 	] as const) {
 		test(`a first ${field} is one Set of the whole Flow`, () => {
-			whatIfSession.tryItem("base", HASH, "flows", "rent", RENT, { ...RENT, [field]: value })
+			whatIfSession.tryFlow("base", HASH, { stored: RENT, edited: { ...RENT, [field]: value } })
 			expect(whatIfSession.whatIf?.sets).toEqual([
 				{ path: "flows.rent", value: { ...RENT, [field]: value } },
 			])
@@ -48,7 +48,7 @@ describe("trying a field the stored Flow lacks", () => {
 	test("a whole-item Set clears a field the form cleared, so nothing is reported as untried", () => {
 		const stored = { ...RENT, category: "housing" }
 		const edited = { ...RENT, end: "2030-01-01" }
-		expect(whatIfSession.tryItem("base", HASH, "flows", "rent", stored, edited)).toEqual([])
+		expect(whatIfSession.tryFlow("base", HASH, { stored, edited })).toBe(true)
 		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.rent", value: edited }])
 	})
 })

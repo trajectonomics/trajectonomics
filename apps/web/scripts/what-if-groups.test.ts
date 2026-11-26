@@ -89,7 +89,10 @@ describe("a loan Try, then removed", () => {
 			// A Set of the salary to what it already is keeps the session open without changing the plan, so the
 			// effective plan is read from a fork that carries what the session holds.
 			const salary = doc.flows.find((flow) => flow.id === "salary")?.amount ?? ""
-			whatIfSession.tryItem(LOAN, hash, "flows", "salary", { amount: "0.00" }, { amount: salary })
+			whatIfSession.tryFlow(LOAN, hash, {
+				stored: { id: "salary", amount: "0.00" },
+				edited: { id: "salary", amount: salary },
+			})
 			expect(whatIfSession.whatIf?.sets).toHaveLength(1)
 			const none = effectiveHash(LOAN, "group-loan-none")
 			expect(none).toBe(hash)

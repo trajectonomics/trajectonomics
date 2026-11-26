@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
 import WhatIfBar from "../components/what-if/WhatIfBar.svelte"
+import { employerDraftOf } from "../lib/view/plan-items/employer-draft"
+import { planDocument } from "../lib/view/plan-items/fixtures.test-support"
+import { flowDraftOf } from "../lib/view/plan-items/flows"
+import { saveFlow } from "./flow-save.js"
 import { selectPlan } from "./select-plan.svelte.js"
 import { whatIfSession } from "./what-if.svelte.js"
 import { fakeServer, HASH, held, settle, useSessionHooks } from "./what-if.test-support"
@@ -25,7 +29,10 @@ describe("a session is bound to its plan", () => {
 
 	test("a tried value on another plan is refused the same way", () => {
 		whatIfSession.setOff("base", HASH, "flows.salary", true)
-		whatIfSession.tryItem("retire-early", HASH, "flows", "gym", { amount: "1" }, { amount: "2" })
+		whatIfSession.tryFlow("retire-early", HASH, {
+			stored: { id: "gym", amount: "1" },
+			edited: { id: "gym", amount: "2" },
+		})
 		expect(whatIfSession.asking).toBe("retire-early")
 		expect(whatIfSession.whatIf?.sets).toEqual([])
 	})
@@ -64,7 +71,10 @@ describe("a session with no change is no session", () => {
 	})
 
 	test("a tried value that changes nothing starts no session", () => {
-		whatIfSession.tryItem("base", HASH, "flows", "gym", { amount: "1" }, { amount: "1" })
+		whatIfSession.tryFlow("base", HASH, {
+			stored: { id: "gym", amount: "1" },
+			edited: { id: "gym", amount: "1" },
+		})
 		expect(whatIfSession.whatIf).toBeNull()
 	})
 
@@ -87,17 +97,22 @@ describe("a session with no change is no session", () => {
 		expect(bar()).not.toContain("What-if session")
 	})
 
-	test("clearing a field is reported, and is not a Set", () => {
-		const cleared = whatIfSession.tryItem(
-			"base",
-			HASH,
-			"flows",
-			"gym",
-			{ amount: "1", end: "2030-01" },
-			{ amount: "2" },
-		)
-		expect(cleared).toEqual(["end"])
-		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.gym.amount", value: "2" }])
+	test("clearing a field is reported, and is not a Set", async () => {
+		const doc = planDocument()
+		const salary = doc.flows.find((flow) => flow.id === "salary")
+		if (salary === undefined) throw new Error("the fixture has a salary")
+		const saved = await saveFlow({
+			name: "base",
+			contentHash: HASH,
+			doc,
+			kind: "income",
+			existing: salary,
+			draft: { ...flowDraftOf(salary), amount: "95000.00", end: "" },
+			employer: employerDraftOf(null),
+			tryValue: true,
+		})
+		expect(saved.cleared).toEqual(["end"])
+		expect(whatIfSession.whatIf?.sets).toEqual([{ path: "flows.salary.amount", value: "95000.00" }])
 	})
 })
 

@@ -5,26 +5,23 @@ import { withoutGroup } from "./session-group"
 import { triedItemSets, withoutItemChanges } from "./session-items"
 
 /**
- * Switches an item off, with `also` the paths that go with it, such as a salary's employer share. A stored item gets a
- * Removal; an item the session adds is not in the plan, so a Removal of it would be refused (`No key or id`), and it
- * leaves the session with its Sets instead. Every other Set stays in the session, held back by `overridesOf` while the
- * item is off, so a switch back on brings the try back. Switching off an item already off changes nothing.
+ * Switches an item off: a stored item gets a Removal, while an item the session adds is not in the plan, so a Removal
+ * of it would be refused (`No key or id`), and it leaves the session with its Sets instead. Every other Set stays in
+ * the session, held back by `overridesOf` while the item is off, so a switch back on brings the try back. Switching
+ * off an item already off changes nothing. A salary and its employer share switch as a group (`withGroupOff`).
  */
-export function switchedOff(whatIf: WhatIf, path: string, also: readonly string[] = []): WhatIf {
-	const gone = [path, ...also]
-	const added = new Set(whatIf.additions.map(additionPath))
-	const leaving = gone.filter((one) => added.has(one))
-	const removals = gone.filter((one) => !added.has(one) && !isOff(whatIf, one))
-	if (removals.length === 0 && leaving.length === 0) return whatIf
-	return {
-		...whatIf,
-		removals: [...whatIf.removals, ...removals],
-		// A Flow that leaves the session cannot keep a Set: its id names nothing left in the plan.
-		sets: whatIf.sets.filter(
-			(set) => !leaving.some((one) => set.path === one || set.path.startsWith(`${one}.`)),
-		),
-		additions: whatIf.additions.filter((one) => !gone.includes(additionPath(one))),
+export function switchedOff(whatIf: WhatIf, path: string): WhatIf {
+	const added = whatIf.additions.some((one) => additionPath(one) === path)
+	if (added) {
+		return {
+			...whatIf,
+			// A Flow that leaves the session cannot keep a Set: its id names nothing left in the plan.
+			sets: whatIf.sets.filter((set) => !(set.path === path || set.path.startsWith(`${path}.`))),
+			additions: whatIf.additions.filter((one) => additionPath(one) !== path),
+		}
 	}
+	if (isOff(whatIf, path)) return whatIf
+	return { ...whatIf, removals: [...whatIf.removals, path] }
 }
 
 /** Switches an item back on: its Removal is dropped. */

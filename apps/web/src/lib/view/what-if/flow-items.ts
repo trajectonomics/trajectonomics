@@ -24,6 +24,14 @@ function withAddedShare(card: FlowCard, shares: ReadonlySet<string>): FlowCard {
 	return card.employerId === null && shares.has(id) ? { ...card, employerId: id } : card
 }
 
+/** A card keeps the plan's share id when a try cleared the share, so its switch still takes the salary and share together. */
+function withStoredShare(card: FlowCard, baseline: readonly FlowCard[]): FlowCard {
+	const stored = baseline.find((one) => one.id === card.id)
+	return card.employerId === null && stored?.employerId != null
+		? { ...card, employerId: stored.employerId }
+		: card
+}
+
 /**
  * The Flow cards of a page as the what-if holds them, with the baseline's text of each changed field. The
  * Assets page lists no Flow, so its kind reads as income and its cards are not shown. A real asset's Flows are
@@ -51,7 +59,7 @@ export function flowItems(
 	const baseline = listed(doc.flows, doc.flows).map((card) => withAddedShare(card, shares))
 	if (changes === null) return { cards: baseline, marks: {} }
 	const whatIfFlows = [...lensDocument(doc, changes).flows, ...added]
-	const whatIf = listed(whatIfFlows, whatIfFlows)
+	const whatIf = listed(whatIfFlows, whatIfFlows).map((card) => withStoredShare(card, baseline))
 	return {
 		cards: shownCards(baseline, whatIf),
 		marks: marksFor(baseline, whatIf, "flows", changes, FLOW_FIELDS),
