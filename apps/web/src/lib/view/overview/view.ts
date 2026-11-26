@@ -2,6 +2,7 @@ import type { Read, Snapshot } from "../../contract"
 import { type AllowancesSummary, allowancesSummaryOf } from "../allowances/home"
 import { type ChanceSummary, chanceSummaryOf } from "../chance/page"
 import { type EstateSummary, estateSummaryOf } from "../estate/home"
+import { NO_PEOPLE, snapshotPeople } from "../item-names"
 import { type FeesOverPlan, feesOverPlan } from "../lifetime"
 import { type NetWorthView, netWorthView } from "../net-worth/view"
 import { baselineRun } from "../what-if/baseline"
@@ -46,6 +47,8 @@ export interface OverviewView {
  */
 export function overviewView(snapshot: Snapshot, requested = ""): OverviewView {
 	const scenario = homePlan(snapshot, requested)
+	const people =
+		scenario === null ? NO_PEOPLE : (snapshotPeople(snapshot, [scenario])[scenario] ?? NO_PEOPLE)
 	const history = snapshot.reads.netWorthHistory
 	const netWorth = mapRead(snapshot.reads.netWorth, netWorthView)
 	const projections = scenarioView(scenario, snapshot.reads.projections)
@@ -61,7 +64,9 @@ export function overviewView(snapshot: Snapshot, requested = ""): OverviewView {
 		fi: mapScenario(scenarioView(scenario, snapshot.reads.fi), fiView),
 		projection: mapScenario(projections, projectionView),
 		chance: mapScenario(scenarioView(scenario, snapshot.reads.chance), chanceSummaryOf),
-		allowances: mapScenario(scenarioView(scenario, snapshot.reads.allowances), allowancesSummaryOf),
+		allowances: mapScenario(scenarioView(scenario, snapshot.reads.allowances), (data) =>
+			allowancesSummaryOf(data, people),
+		),
 		withdrawals: mapScenario(projections, withdrawalsSummaryOf),
 		estate: mapScenario(projections, (run) =>
 			estateSummaryOf(run, shown?.document ?? null, shown?.household ?? null),

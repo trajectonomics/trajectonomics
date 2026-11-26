@@ -32,6 +32,7 @@ export function largerThanOne(text: string): boolean {
 
 /** The allowance reads' inputs as the Snapshot states them: a limit the person left out is null. */
 export const allowancePlan = z.strictObject({
+	// A chosen label is bare: `readForFilers` adds each Filer's suffix after this schema has taken it.
 	labels: z
 		.array(z.string().refine((label) => KNOWN_LABELS.includes(label)))
 		.min(1, MESSAGE.labels)
@@ -56,7 +57,7 @@ export function checkAllowances(
 }
 
 /** A Levy of a document, as much as the page reads: its `tally` measures' labels. */
-function tallyLabels(levy: unknown): string[] {
+export function tallyLabels(levy: unknown): string[] {
 	if (levy === null || typeof levy !== "object") return []
 	const measures = (levy as { measures?: unknown }).measures
 	if (!Array.isArray(measures)) return []

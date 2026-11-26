@@ -3,6 +3,7 @@
 
 import { join } from "node:path"
 import { type ScenarioDocument, scenarioDocument } from "../src/lib/contract"
+import type { PlanParams } from "../src/lib/snapshot"
 import { handDocument } from "./allowances-document.test-support"
 import { buildDemoLedger } from "./demo-ledger"
 import { BINARY } from "./edit-fixture.test-support"
@@ -74,11 +75,14 @@ export async function setupAllowances(): Promise<Editor> {
 }
 
 /** An editor over the scratch ledger that runs traj as the context says, with its first read done. */
-export async function editorOver(traj: RunContext): Promise<Editor> {
+export async function editorOver(
+	traj: RunContext,
+	overrides: Partial<PlanParams> = {},
+): Promise<Editor> {
 	const next = createEditor({
 		traj,
 		cliVersion: "test",
-		params: { ...PARAMS, asOf: AS_OF, horizon: "2027-12-31", scenarios: [PLAN] },
+		params: { ...PARAMS, asOf: AS_OF, horizon: "2027-12-31", scenarios: [PLAN], ...overrides },
 		records: [],
 		token: TOKEN,
 	})

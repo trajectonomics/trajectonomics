@@ -10,6 +10,8 @@ export type StoppedBy = (typeof STOPPED_BY)[number]
 /** One row per tax year the Projection holds whole: what it owes now and with every suggestion. */
 export type AllowanceYearView = {
 	levy: string
+	/** The Filer whose Return this Levy files, for a separate filing (cli ADR-0075). */
+	filer?: string | undefined
 	from: string
 	to: string
 	settlementDate: string
@@ -22,6 +24,8 @@ export type AllowanceYearView = {
 /** One row per tax year and label: what is planned, what more fits, and why it stopped. */
 export type AllowanceRowView = {
 	levy: string
+	/** The Filer whose Return this Levy files, for a separate filing (cli ADR-0075). */
+	filer?: string | undefined
 	from: string
 	to: string
 	label: string
@@ -35,6 +39,12 @@ export type AllowanceRowView = {
 
 export const allowanceYear: z.ZodType<AllowanceYearView> = z.strictObject({
 	levy: z.string().describe("The Levy's id, as the Scenario spells it."),
+	filer: z
+		.string()
+		.optional()
+		.describe(
+			"The Filer whose Return this Levy files, for a separate filing (cli ADR-0075); absent when the plan keeps one Return.",
+		),
 	from: dateField("The tax year's first day"),
 	to: dateField("The tax year's last day"),
 	settlementDate: dateField("The day the amount owed is due to be paid"),
@@ -48,6 +58,12 @@ export const allowanceYear: z.ZodType<AllowanceYearView> = z.strictObject({
 
 export const allowanceRow: z.ZodType<AllowanceRowView> = z.strictObject({
 	levy: z.string().describe("The Levy's id."),
+	filer: z
+		.string()
+		.optional()
+		.describe(
+			"The Filer whose Return this Levy files, for a separate filing (cli ADR-0075); absent when the plan keeps one Return.",
+		),
 	from: dateField("The tax year's first day"),
 	to: dateField("The tax year's last day"),
 	label: z.string().describe("The contribution Tally label, as `--labels` names it."),
