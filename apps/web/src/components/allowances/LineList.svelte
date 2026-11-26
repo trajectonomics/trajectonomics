@@ -23,7 +23,7 @@ const grouped = $derived(
 		{#if grouped && line.filer !== null && line.filer !== lines[index - 1]?.filer}
 			<li class="pt-1 text-sm font-medium">{personText(people, line.filer)}</li>
 		{/if}
-		<li class="rounded-md border border-border p-3 text-sm" data-cli>
+		<li class="rounded-md border border-border p-3 text-sm">
 			<p class="font-medium">{line.name}</p>
 			{#if line.ssf}
 				<p class="mt-1 text-muted-foreground">{line.why}</p>
@@ -34,7 +34,7 @@ const grouped = $derived(
 					<div><dt class="text-muted-foreground">Saves</dt><dd><Money amount={line.saving} {currency} /></dd></div>
 				</dl>
 				<p class="mt-2 text-muted-foreground">{line.why}</p>
-				{#if line.hint}<p class="mt-1">{line.hint}</p>{/if}
+				{#if line.hint}<p class="mt-1" data-cli>{line.hint}</p>{/if}
 			{/if}
 		</li>
 	{/each}

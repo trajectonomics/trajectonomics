@@ -66,7 +66,7 @@ $effect(() => {
 {:else}
 	<div role="alert" class="space-y-2 rounded-lg border border-destructive p-4 text-sm">
 		<p class="font-medium">This future could not be opened.</p>
-		<p data-cli>{state.message}</p>
+		{#if state.fromCli}<p data-cli>{state.message}</p>{:else}<p>{state.message}</p>{/if}
 		<a href={chanceHref(currentSearch(), plan ?? "")} class="text-accent underline-offset-4 hover:underline">Back to Chance of success</a>
 	</div>
 {/if}

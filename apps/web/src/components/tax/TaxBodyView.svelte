@@ -82,7 +82,7 @@ const assumptions = $derived(assumptionLines(years))
 			<p class="text-sm text-muted-foreground">Tax figures used whose source is not yet confirmed.</p>
 			<ul class="list-disc space-y-1 pl-5 text-sm">
 				{#each assumptions as line (line.key)}
-					<li data-cli><code class="font-mono text-xs">{line.path}</code>: {line.text}</li>
+					<li><code class="font-mono text-xs">{line.path}</code>: <span data-cli>{line.text}</span></li>
 				{/each}
 			</ul>
 		</section>

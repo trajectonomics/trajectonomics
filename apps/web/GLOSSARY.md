@@ -40,7 +40,7 @@ _Avoid_: bundle, archive, assets
 The CLI's name for one named plan document, and this glossary's. The Dashboard calls it a **Plan** in every word it shows; a `traj` command quoted in code keeps `scenario`, and so do the code's identifiers.
 _Avoid_: (in the Dashboard's interface) scenario
 
-**Plan**:
+**Snapshot plan**:
 The list of argv a Snapshot needs, computed from the parameters alone. Stage one reads the Scenarios, the accounts and the first transaction date; stage two reads everything else.
 _Avoid_: pipeline, workflow, job, script
 
@@ -266,7 +266,7 @@ A `transfer` Flow: money moved between the plan's own Accounts, or onto a loan, 
 _Avoid_: rebalance, switch, transfer (as a page word)
 
 **Main plan**:
-The one plan the ledger marks as the person's real plan (`scenario main`). It is a label and not a default for a `traj` read: the Dashboard lists it first, opens its pages on it, and Home follows it unless the address bar names another plan.
+The one plan the ledger marks as the person's real plan (`scenario main`). It is a label and not a default for a `traj` read: the Dashboard lists it first, opens its pages on it, and Overview follows it unless the address bar names another plan.
 _Avoid_: default plan, primary plan, active plan
 
 **Plan notes**:

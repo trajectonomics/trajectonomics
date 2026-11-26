@@ -107,3 +107,17 @@ describe("Hide amounts and a tried Milestone date", () => {
 		expect(body).not.toContain("•••••")
 	})
 })
+
+describe("Hide amounts and a tried Flow date", () => {
+	test("a start date is printed as a date and not masked, with amounts shown or hidden", () => {
+		whatIfSession.whatIf = withSet(startWhatIf("base", HASH), "flows.rent.start", "2027-03-01")
+		for (const hidden of [false, true]) {
+			preferences.hidden = hidden
+			const body = render(WhatIfChanges, { props: {} }).body
+			expect(body).toContain("1 Mar 2027")
+			expect(body).not.toContain("2027-03-01")
+			expect(body).not.toContain("amount hidden")
+			expect(body).not.toContain("•••••")
+		}
+	})
+})

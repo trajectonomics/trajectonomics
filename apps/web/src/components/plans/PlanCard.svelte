@@ -52,7 +52,7 @@ const name = $derived(card.row.name)
 			href={`/projection/?scenario=${encodeURIComponent(name)}`}
 			class="text-sm text-accent underline-offset-4 hover:underline"
 		>
-			Open the Overview of {name}
+			Open the Projection of {name}
 		</SiteLink>
 		{#if editable}<PlanMenu row={card.row} />{/if}
 	</footer>

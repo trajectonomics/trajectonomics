@@ -1,4 +1,5 @@
 /** A change's label with the words a Read states in place of an item's id. Pure; a label that names no item is as it was. */
+import { formatDate } from "../format"
 import { type ItemKind, type ItemNames, itemText } from "../view/item-names"
 import type { Change } from "./session-changes"
 
@@ -26,6 +27,20 @@ function namesMilestone(path: string): boolean {
 	return field === "startAt" || field === "endAt"
 }
 
+/** Whether a path's last field is a Flow's own date: `flows.salary.start` or `flows.salary.end`. */
+function namesDate(path: string): boolean {
+	const field = path.slice(path.lastIndexOf(".") + 1)
+	return field === "start" || field === "end"
+}
+
+/** A Set of a Flow's start or end date shows it as every date on the Dashboard is printed. */
+function dateValue(label: string, change: Change): string {
+	if (change.kind !== "set" || !namesDate(change.path)) return label
+	const tail = ` set to ${change.value}`
+	if (!label.endsWith(tail)) return label
+	return `${label.slice(0, label.length - tail.length)} set to ${formatDate(change.value)}`
+}
+
 /** A Set of a Milestone field shows the Milestone's words in place of the id it stores. */
 function milestoneValue(label: string, change: Change, names: ItemNames): string {
 	if (change.kind !== "set" || !namesMilestone(change.path)) return label
@@ -39,7 +54,7 @@ function milestoneValue(label: string, change: Change, names: ItemNames): string
  * The change's label, with the name of the Account (or of the loan or asset group's Account) the ledger gives it, and
  * the `displayLabel` the plan's document states for a Flow or a Milestone. A `salary:` group names its salary's Flow in
  * place of the id. An item with no name keeps its id. A `startAt` or `endAt` Set shows the Milestone's name in place of
- * the id it stores.
+ * the id it stores, and a Flow's `start` or `end` Set shows its date as the Dashboard prints dates.
  */
 export function labelWithNames(change: Change, names: ItemNames): string {
 	if (change.kind === "group" && change.path.startsWith("salary:")) {
@@ -58,5 +73,5 @@ export function labelWithNames(change: Change, names: ItemNames): string {
 		item === null || !change.label.startsWith(leading(item.id))
 			? change.label
 			: `${itemText(names, kindOf(item.list), item.id)}${change.label.slice(leading(item.id).length)}`
-	return milestoneValue(named, change, names)
+	return dateValue(milestoneValue(named, change, names), change)
 }

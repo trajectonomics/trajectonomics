@@ -31,6 +31,16 @@ class Routing {
 			? this.refused.message
 			: null
 	})
+	/** Whether `message` is the CLI's own words, or the page's sentence about not reaching it. */
+	readonly messageFromCli = $derived.by(() => {
+		if (
+			editSession.source === SOURCE &&
+			(editSession.failure !== null || editSession.error !== null)
+		) {
+			return editSession.failure !== null
+		}
+		return this.refused !== null && placeOf(this.refused, this.sent) !== null
+	})
 	/**
 	 * The refusal the What-if session's own read states for a routing list it holds a Set of (`cashflow.*`): the CLI's error, whose
 	 * `details.documentPath` names the row. Null while the session tries no routing list or its reads are well.

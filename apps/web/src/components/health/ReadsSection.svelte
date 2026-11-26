@@ -33,7 +33,7 @@ const columns: Column<AuditRow>[] = [
 			<p class="font-medium text-destructive">{`Failed: ${row.error.code}`}</p>
 			<p data-cli>{row.error.message}</p>
 			{#if row.note !== null}
-				<p class="text-muted-foreground" data-cli>{row.note}</p>
+				<p class="text-muted-foreground">{row.note}</p>
 			{/if}
 			{#if row.error.hint !== null}
 				<p class="text-muted-foreground" data-cli>{row.error.hint}</p>

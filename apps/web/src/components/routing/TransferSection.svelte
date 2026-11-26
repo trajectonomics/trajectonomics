@@ -53,7 +53,7 @@ const remove = (id: string) => ({ kind: "remove", id }) as const
 					{/if}
 				</div>
 				{#if routing.place?.kind === "flow" && routing.place.id === flow.id && drawer === null && routing.message}
-					<p role="alert" class="text-sm text-destructive" data-cli>{routing.message}</p>
+					<p role="alert" class="text-sm text-destructive" data-cli={routing.messageFromCli ? "" : undefined}>{routing.message}</p>
 				{/if}
 			</li>
 		{:else}
