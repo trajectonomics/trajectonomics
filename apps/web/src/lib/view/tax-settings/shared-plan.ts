@@ -19,8 +19,11 @@ export function canClaimShared(household: HouseholdDocument | null): boolean {
 	return roles.has("holder") && roles.has("partner") && (household.owners?.length ?? 0) > 0
 }
 
-/** Whether the stored profile files separately and one of the plan's Levies names a Filer, so a Return claims it. */
+/** The id of the tax Levy of one Filer's Return: `th-2026-pit@<filer>` (cli ADR-0075). Another Levy may carry an `@`. */
+const FILER_TAX_LEVY = "th-2026-pit@"
+
+/** Whether the stored profile files separately and one of the plan's tax Levies names a Filer, so a Return claims it. */
 export function sharedInterestClaimed(profile: TaxProfile | null, plan: ScenarioDocument): boolean {
 	if (profile?.filingStatus !== "married_separate") return false
-	return (plan.levies ?? []).some((levy) => levyId(levy)?.includes("@") === true)
+	return (plan.levies ?? []).some((levy) => levyId(levy)?.startsWith(FILER_TAX_LEVY) === true)
 }

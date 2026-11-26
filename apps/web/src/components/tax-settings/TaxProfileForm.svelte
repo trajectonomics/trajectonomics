@@ -81,8 +81,7 @@ async function save(event: SubmitEvent): Promise<void> {
 		<p class="text-sm text-muted-foreground">Change an item and save: every other item of the stored profile stays. Empty an amount to take it out.</p>
 	{:else}
 		<p class="text-sm text-muted-foreground">
-			State the whole profile. An item left empty is none, and anything an earlier write stated and you leave out is dropped.{#if keepsShared}
-				The stored shared home-loan interest is filled in so a save keeps it.{/if}
+			State the whole profile. An item left empty is none, and anything an earlier write stated and you leave out is dropped. {#if keepsShared && dropWarning === null}The stored shared home-loan interest is filled in so a save keeps it.{/if}
 		</p>
 	{/if}
 	<TaxProfileFields bind:draft {shown} {visible} {sharedClaimable} />

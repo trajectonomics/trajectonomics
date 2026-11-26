@@ -53,6 +53,12 @@ describe("whether a Return claims the stored shared interest", () => {
 		).toBe(true)
 	})
 
+	test("a Levy of the plan's own that carries an `@` is not a Filer's Return", () => {
+		expect(
+			sharedInterestClaimed(PROFILE, withLevies([{ id: "th-2026-pit" }, { id: "own@home" }])),
+		).toBe(false)
+	})
+
 	test("another status, or no Levy id naming a Filer, claims none", () => {
 		expect(
 			sharedInterestClaimed(

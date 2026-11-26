@@ -57,6 +57,9 @@ for (const width of [360, 1280] as const) {
 		await dialog.getByRole("button", { name: "State the whole profile instead" }).click()
 		await dialog.getByLabel("Filing status").selectOption("married_separate")
 		await expect(dialog.getByLabel("Shared home-loan interest")).toHaveValue("60000")
+		await expect(dialog).toContainText(
+			"is dropped. The stored shared home-loan interest is filled in",
+		)
 		await dialog.getByRole("button", { name: "Save", exact: true }).click()
 		await expect(dialog).toBeHidden({ timeout: SLOW })
 		await expect(
@@ -76,6 +79,7 @@ for (const width of [360, 1280] as const) {
 		await expect(dialog).toContainText(
 			"This save drops the stored shared home-loan interest of 60,000 THB.",
 		)
+		await expect(dialog).not.toContainText("is filled in so a save keeps it")
 		await dialog.getByRole("button", { name: "Close the drawer" }).click()
 
 		// Clear it: an emptied amount is stated as zero, which removes the stored interest.
