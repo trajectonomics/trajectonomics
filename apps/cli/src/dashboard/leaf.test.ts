@@ -34,6 +34,7 @@ const SNAPSHOT = {
 		allowances: {},
 		paths: {},
 		documents: {},
+		taxNotes: {},
 	},
 } as unknown as Snapshot
 
