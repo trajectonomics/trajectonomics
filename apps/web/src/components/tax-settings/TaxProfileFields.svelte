@@ -1,9 +1,11 @@
 <script lang="ts">
+import { preferences } from "../../client/preferences.svelte.js"
 import { TAX_FLAG_KEYS } from "../../lib/edit/tax-flags"
 import type { Shown } from "../../lib/view/plan-items/problems"
 import type { TaxDraft } from "../../lib/view/tax-settings/draft"
 import { AMOUNT_FIELDS, COUNT_FIELDS, FILING_CHOICES } from "../../lib/view/tax-settings/fields"
 import Field from "../plan-items/Field.svelte"
+import TaxLockedAmount from "./TaxLockedAmount.svelte"
 
 interface Props {
 	draft: TaxDraft
@@ -44,5 +46,9 @@ const amounts = $derived(
 	<p class="text-sm text-muted-foreground">Amounts are what you paid in the tax year, in baht.</p>
 {/if}
 {#each amounts as field (field.key)}
-	<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat && field.key !== "sharedMortgageInterest"} />
+	{#if lockedFlat && field.key !== "sharedMortgageInterest" && preferences.hidden && draft[field.key].trim() !== ""}
+		<TaxLockedAmount id={`tax-${field.key}`} label={field.label} hint={field.hint} problem={shown.at(field.key)} digits={draft[field.key]} />
+	{:else}
+		<Field id={`tax-${field.key}`} label={field.label} hint={field.hint} inputmode="decimal" bind:value={draft[field.key]} problem={shown.at(field.key)} disabled={lockedFlat && field.key !== "sharedMortgageInterest"} />
+	{/if}
 {/each}
