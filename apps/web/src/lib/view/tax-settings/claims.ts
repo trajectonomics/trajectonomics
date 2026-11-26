@@ -6,13 +6,19 @@
 import type { HouseholdDocument, ReturnClaims, TaxProfile } from "../../contract"
 import type { PersonName, PersonNames } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, type TaxField } from "./fields"
-import { groupDigits } from "./rows"
+import { groupDigits, type ShownAmount } from "./rows"
+
+/** One cell: what a Return claims, and the amount's digits for the hide-amounts mask when it is money. */
+export interface ClaimCell {
+	readonly value: string
+	readonly amount?: ShownAmount | undefined
+}
 
 /** One allowance, with what each Return claims for it: the cells are in the same order as `people`. */
 export interface ClaimRow {
 	readonly key: string
 	readonly label: string
-	readonly cells: readonly string[]
+	readonly cells: readonly ClaimCell[]
 }
 
 /** The per-Return view of a separate filing: the Filers whose Return is a column, and one row per allowance. */
@@ -20,7 +26,7 @@ export interface ClaimsTable {
 	readonly people: readonly string[]
 	readonly rows: readonly ClaimRow[]
 	/** The interest on one loan the Returns borrowed together, in baht, or null when the profile stores none. */
-	readonly sharedInterest: string | null
+	readonly sharedInterest: ClaimCell | null
 }
 
 /** One item a Return claims: the shared loan's interest is not a Return's own claim. */
@@ -33,11 +39,17 @@ const CLAIM_FIELDS: readonly ClaimField[] = [...COUNT_FIELDS, ...AMOUNT_FIELDS].
 	(field): field is ClaimField => field.key !== "sharedMortgageInterest",
 )
 
+/** An amount in baht, with the digits Hide amounts masks and the currency after them. */
+function moneyCell(amount: number): ClaimCell {
+	const digits = groupDigits(amount)
+	return { value: `${digits} THB`, amount: { digits, after: " THB" } }
+}
+
 /** What one Return states for one allowance: a count as it is, an amount in baht, and "None" for zero or absent. */
-function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: ClaimField): string {
+function cellOf(claims: ReturnClaims | TaxProfile | undefined, field: ClaimField): ClaimCell {
 	const value = claims?.[field.key]
-	if (value === undefined || value === 0) return "None"
-	return field.kind === "count" ? String(value) : `${groupDigits(value)} THB`
+	if (value === undefined || value === 0) return { value: "None" }
+	return field.kind === "count" ? { value: String(value) } : moneyCell(value)
 }
 
 /** The person whose claims the flat keys are: the recorded `claimsHolder`, else the household's holder, else a Filer. */
@@ -73,7 +85,7 @@ export function claimsTable(
 		sharedInterest:
 			profile.sharedMortgageInterest === undefined
 				? null
-				: `${groupDigits(profile.sharedMortgageInterest)} THB`,
+				: moneyCell(profile.sharedMortgageInterest),
 	}
 }
 

@@ -1,6 +1,8 @@
-import { describe, expect, test } from "bun:test"
+import { afterEach, describe, expect, test } from "bun:test"
 import { render } from "svelte/server"
+import { preferences } from "../../client/preferences.svelte.js"
 import type { HouseholdDocument, TaxProfile } from "../../lib/contract"
+import { AMOUNT_MASK } from "../../lib/format"
 import { personNames } from "../../lib/view/item-names"
 import { claimsTable } from "../../lib/view/tax-settings/claims"
 import TaxClaimsSection from "./TaxClaimsSection.svelte"
@@ -44,6 +46,13 @@ function section(): string {
 	return rendered(TABLE)
 }
 
+afterEach(() => {
+	preferences.hidden = false
+})
+
+/** A body without Svelte's comment markers: the text and markup a browser shows. */
+const shown = (body: string): string => body.replace(/<!--.*?-->/gs, "")
+
 describe("the per-Return allowance view", () => {
 	test("names each column by person and each cell by that Return's stored claim", () => {
 		const body = section()
@@ -62,5 +71,25 @@ describe("the per-Return allowance view", () => {
 		)
 		expect(rendered(SHARED)).toContain("60,000 THB")
 		expect(section()).not.toContain("Shared home-loan interest")
+	})
+
+	test("masks every amount and the shared interest while amounts are hidden, and keeps the counts", () => {
+		preferences.hidden = true
+		const body = rendered(SHARED)
+		expect(body).toContain(AMOUNT_MASK)
+		expect(body).toContain("amount hidden")
+		for (const amount of ["15,000", "12,000", "60,000"]) {
+			expect(body).not.toContain(amount)
+		}
+		// The counts are not money: one child each and the partner's two parents still read as digits.
+		expect(shown(body)).toContain(">1</td>")
+		expect(shown(body)).toContain(">2</td>")
+	})
+
+	test("shows every figure as before while the switch is off", () => {
+		const body = section()
+		expect(body).toContain("15,000 THB")
+		expect(body).not.toContain(AMOUNT_MASK)
+		expect(body).not.toContain("amount hidden")
 	})
 })

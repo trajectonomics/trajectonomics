@@ -3,12 +3,20 @@ import type { ScenarioShow, TaxProfile } from "../../contract"
 import type { PersonName } from "../item-names"
 import { AMOUNT_FIELDS, COUNT_FIELDS, filingLabel } from "./fields"
 
+/** A money amount as a page shows it: the digits Hide amounts masks, and the words after them. */
+export interface ShownAmount {
+	readonly digits: string
+	readonly after: string
+}
+
 /** One row: the item and what the profile states for it. */
 export interface ProfileRow {
 	/** The profile key of the item, so a group takes its own rows. */
 	readonly key: string
 	readonly label: string
 	readonly value: string
+	/** The amount's digits and the words after them, for the hide-amounts mask; absent for a count or a word. */
+	readonly amount?: ShownAmount | undefined
 }
 
 /** Digits grouped in threes, so 1250000.5 reads 1,250,000.5. Only the text changes. */
@@ -36,13 +44,22 @@ function statedIn(profile: TaxProfile, key: string): number | undefined {
 	return (profile as Record<string, unknown>)[key] as number | undefined
 }
 
-/** An amount in baht, said to be kept and unclaimed when no Return of the plan claims the shared interest. */
-function amountValue(key: string, amount: number | undefined, sharedClaimed: boolean): string {
-	if (amount === undefined) return "None"
-	const value = `${groupDigits(amount)} THB`
-	return key === "sharedMortgageInterest" && !sharedClaimed
-		? `${value} (kept, not claimed by this Return)`
-		: value
+/**
+ * An amount in baht, said to be kept and unclaimed when no Return of the plan claims the shared interest: the row's
+ * text, and the digits and words after them so the hide-amounts mask keeps the currency and the words.
+ */
+function amountValue(
+	key: string,
+	amount: number | undefined,
+	sharedClaimed: boolean,
+): { value: string; amount?: ShownAmount } {
+	if (amount === undefined) return { value: "None" }
+	const digits = groupDigits(amount)
+	const after =
+		key === "sharedMortgageInterest" && !sharedClaimed
+			? " THB (kept, not claimed by this Return)"
+			: " THB"
+	return { value: `${digits}${after}`, amount: { digits, after } }
 }
 
 /** The amount rows: the shared row only where the separate filing shows one or the profile stores it. */
@@ -57,7 +74,11 @@ function amountRows(
 			if (amount === undefined) return []
 		}
 		return [
-			{ key, label: labelOf(key, label, claimant), value: amountValue(key, amount, sharedClaimed) },
+			{
+				key,
+				label: labelOf(key, label, claimant),
+				...amountValue(key, amount, sharedClaimed),
+			},
 		]
 	})
 }
