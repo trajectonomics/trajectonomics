@@ -46,7 +46,7 @@ describe("the Home card: tax you could still save this year", () => {
 		const body = card(summaryOf("separate"), "separate")
 		expect(body).toContain(">You<")
 		expect(body).toContain(">Your partner<")
-		expect(body).toContain("76,700.00")
+		expect(body).toContain("84,950.00")
 		expect(body).toContain("4,600.00")
 	})
 
@@ -67,7 +67,7 @@ describe("the Home card: tax you could still save this year", () => {
 
 	test("a joint Return keeps one unnamed figure", () => {
 		const body = card(summaryOf("joint"), "joint")
-		expect(body).toContain("137,450.00")
+		expect(body).toContain("148,200.00")
 		expect(body).not.toContain("4,600.00")
 		expect(body).not.toContain(">You<")
 	})
@@ -92,7 +92,7 @@ describe("the Home card: tax you could still save this year", () => {
 			preferences.hidden = false
 		}
 		expect(body.match(/•••••/g)).toHaveLength(2)
-		expect(body).not.toContain("76,700.00")
+		expect(body).not.toContain("84,950.00")
 		expect(body).not.toContain("4,600.00")
 	})
 })

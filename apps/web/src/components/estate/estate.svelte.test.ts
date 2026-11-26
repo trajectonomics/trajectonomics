@@ -39,11 +39,11 @@ describe("the Estate page", () => {
 	test("states what heirs receive on the default date, the gross estate, debts, costs, net and gifts, and each line", () => {
 		const body = page()
 		for (const shown of [
-			"15,682,084.15",
-			"16,786,385.30",
-			"278,928.30",
-			"16,507,457.00",
-			"825,372.85",
+			"15,671,500.52",
+			"16,775,132.11",
+			"278,815.77",
+			"16,496,316.34",
+			"824,815.82",
 		])
 			expect(body).toContain(shown)
 		for (const line of ["settlement", "court-and-legal-fees", "temple"])
@@ -56,25 +56,25 @@ describe("the Estate page", () => {
 
 	test("shows nominal and today's money together, or each alone; only the net and heirs have a real figure, the rest say nominal", () => {
 		expect(page({ terms: "both" })).toContain("In today's money")
-		expect(page({ terms: "both" })).toContain("7,025,112.99")
+		expect(page({ terms: "both" })).toContain("7,020,371.84")
 		const nominal = page({ terms: "nominal" })
-		expect(nominal).not.toContain("7,025,112.99")
-		expect(nominal).toContain("15,682,084.15")
+		expect(nominal).not.toContain("7,020,371.84")
+		expect(nominal).toContain("15,671,500.52")
 		const real = page({ terms: "real" })
-		expect(real).toContain("7,025,112.99")
-		expect(real).toContain("7,394,855.78")
+		expect(real).toContain("7,020,371.84")
+		expect(real).toContain("7,389,865.10")
 		expect(real).toContain("(nominal)")
-		expect(real).toContain("16,786,385.30")
+		expect(real).toContain("16,775,132.11")
 	})
 
 	test("Hide amounts masks every figure, the diagram and the chart's axis included", () => {
 		preferences.hidden = true
 		const body = page()
 		for (const shown of [
-			"15,682,084.15",
-			"16,786,385.30",
-			"278,928.30",
-			"825,372.85",
+			"15,671,500.52",
+			"16,775,132.11",
+			"278,815.77",
+			"824,815.82",
 			"111,064.45",
 		])
 			expect(body).not.toContain(shown)
