@@ -4,6 +4,15 @@ import type { ClassProblem } from "./carryin-classes"
 /** The record a flag problem came from: its document path, its Levy and its period. */
 export type FlagWhere = { base: string; levy: string; periodStart: string }
 
+/** The refusal for a stored record whose shape this build cannot read at all. */
+export function unreadable(path: string, levy: string, at: string, what: string): AppError {
+	return fail("invalid_input", {
+		path,
+		message: `The stored Carry-in for "${levy}" from ${at} states ${what}.`,
+		hint: "Re-apply the Scenario with a periodStart, tallies and a prepaid amount for every record.",
+	})
+}
+
 /** The refusal for a class problem the flag document caused, at the record it came from. */
 export function flagProblem(problem: ClassProblem, where: FlagWhere): AppError {
 	if (problem.kind === "missing") {

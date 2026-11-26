@@ -3,12 +3,10 @@ import type { ScenarioDocument } from "../scenario/document"
 import { leviesOf } from "../scenario/tax"
 import type { JsonRecord } from "../scenario/tax/json"
 import { CARRY_IN_FIELD, type CarryInRecordForm } from "./carryin"
-import { echoOf, replaced } from "./carryin-echo"
-import { entriesOf } from "./carryin-levy"
-import { completed } from "./carryin-needed"
+import { completedOf, placedOf, type ResolvedLevy, resolvedOf } from "./carryin-resolve"
+import { fillSharedLevies } from "./carryin-shared-levies"
 import type { CarryInEcho } from "./carryin-view"
 import { taxNotes } from "./levies"
-import { carryInStarts, periodStartAtOrBefore, storedMonthDay } from "./periods"
 
 /** A Projection's input: the effective Scenario, the dates, and the records the flag stated. */
 export type PlaceInput = {
@@ -24,17 +22,6 @@ export type PlacedCarryIn = {
 	document: ScenarioDocument
 	carryIn: CarryInEcho[]
 	notes: string[]
-}
-
-/** The period starts a Levy needs a record for, or null when nothing here can be derived. */
-function neededOf(levy: JsonRecord, asOf: string): { starts: string[]; current: string } | null {
-	const period = storedMonthDay(levy["period"])
-	const settlement = storedMonthDay(levy["settlement"])
-	if (period === undefined || settlement === undefined) return null
-	return {
-		starts: carryInStarts(asOf, { period, settlement }),
-		current: periodStartAtOrBefore(asOf, period),
-	}
 }
 
 /** The refusal for a `--carry-in` whose Scenario holds no Levy to state anything about. */
@@ -55,37 +42,15 @@ function unknownLevy(levy: string, index: number): AppError {
 	})
 }
 
-/** One Levy with its records placed in period order, or the refusal that stopped the placement. */
-function placementOf(
-	levy: JsonRecord,
-	input: PlaceInput,
-	selected: readonly { record: CarryInRecordForm; index: number }[],
-): { levy: JsonRecord; carryIn: CarryInEcho[] } | AppError {
-	const id = typeof levy["id"] === "string" ? levy["id"] : ""
-	const mine = selected.filter((it) => it.record.levy === id)
-	const loaded = entriesOf(levy, id, mine, input)
-	if (isAppError(loaded)) return loaded
-	const items = completed({
-		items: loaded.items,
-		classes: loaded.classes,
-		id,
-		needed: Object.hasOwn(input.document, "calendar") ? null : neededOf(levy, input.asOf),
-	})
-	if (isAppError(items)) return items
-	const ordered = [...items].sort((a, b) => a.entry.periodStart.localeCompare(b.entry.periodStart))
-	return {
-		levy: replaced(levy, ordered),
-		carryIn: ordered.map((it) => echoOf(it.entry, id, input.currency)),
-	}
-}
-
 /**
- * Places the caller's Carry-in in every Levy of the effective Scenario (ADR-0032). The flag's
- * records are matched by Scenario and Levy, checked class by class, and completed with the scope
- * record only where this build wrote the Levy; the rest is the caller's or a refusal.
+ * The records this command places, or the refusal for a Scenario or Levy it does not hold. The
+ * Scenario check runs before any side says it is missing a record, because only the pair knows
+ * which Scenario names are valid.
  */
-export function placeCarryIn(input: PlaceInput): PlacedCarryIn | AppError {
-	const levies = leviesOf(input.document)
+function selectedOf(
+	input: PlaceInput,
+	levies: readonly JsonRecord[],
+): { record: CarryInRecordForm; index: number }[] | AppError {
 	const selected = input.records
 		.map((record, index) => ({ record, index }))
 		.filter(
@@ -94,14 +59,39 @@ export function placeCarryIn(input: PlaceInput): PlacedCarryIn | AppError {
 		)
 	if (selected.length > 0 && levies.length === 0) return noLevy(input.scenario.name)
 	const unknown = selected.find((it) => !levies.some((levy) => levy["id"] === it.record.levy))
-	if (unknown !== undefined) return unknownLevy(unknown.record.levy, unknown.index)
+	return unknown === undefined ? selected : unknownLevy(unknown.record.levy, unknown.index)
+}
+
+/**
+ * Places the caller's Carry-in in every Levy of the effective Scenario (ADR-0032). The flag's
+ * records are matched by Scenario and Levy, checked class by class, and completed with the scope
+ * record only where this build wrote the Levy; a shared loan's other-Filer classes are read from
+ * that Filer's own record, and the rest is the caller's or a refusal.
+ */
+export function placeCarryIn(input: PlaceInput): PlacedCarryIn | AppError {
+	const levies = leviesOf(input.document)
+	const selected = selectedOf(input, levies)
+	if (isAppError(selected)) return selected
+	const completed: ResolvedLevy[] = []
+	for (const levy of levies) {
+		const one = resolvedOf(levy, input, selected)
+		if (isAppError(one)) return one
+		const done = completedOf(one)
+		if (isAppError(done)) return done
+		completed.push(done)
+	}
+	const filled = fillSharedLevies({
+		levies: completed,
+		path: input.scenario.path,
+		currency: input.currency,
+	})
+	if (isAppError(filled)) return filled
 	const placements: JsonRecord[] = []
 	const carryIn: CarryInEcho[] = []
-	for (const levy of levies) {
-		const placement = placementOf(levy, input, selected)
-		if (isAppError(placement)) return placement
-		placements.push(placement.levy)
-		carryIn.push(...placement.carryIn)
+	for (const filledOne of filled) {
+		const placed = placedOf(filledOne, input.currency)
+		placements.push(placed.levy)
+		carryIn.push(...placed.carryIn)
 	}
 	// An empty `levies` array is not the same document as no key: the engine refuses the first.
 	const document: ScenarioDocument =
