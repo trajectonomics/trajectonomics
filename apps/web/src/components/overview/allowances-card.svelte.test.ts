@@ -50,6 +50,21 @@ describe("the Home card: tax you could still save this year", () => {
 		expect(body).toContain("4,600.00")
 	})
 
+	test("still shows a partner's saving when the holder's Return saves nothing", () => {
+		const data = readOf("separate")
+		const holderSavesNothing: ProjectionAllowances = {
+			...data,
+			taxYears: data.taxYears.map((year) =>
+				year.filer === "me" ? { ...year, saving: "0.00" } : year,
+			),
+		}
+		const people = snapshotPeople(DEMO, ["separate"])["separate"] ?? NO_PEOPLE
+		const body = card(allowancesSummaryOf(holderSavesNothing, people), "separate")
+		expect(body).toContain("Tax you could still save this year")
+		expect(body).toContain(">Your partner<")
+		expect(body).toContain("4,600.00")
+	})
+
 	test("a joint Return keeps one unnamed figure", () => {
 		const body = card(summaryOf("joint"), "joint")
 		expect(body).toContain("137,450.00")

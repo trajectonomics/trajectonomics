@@ -28,7 +28,11 @@ const projection = $derived(snapshot.reads.projections[name])
 const why = $derived(
 	inputs === null
 		? null
-		: skippedReadReason(stored?.ok === true ? stored.data.scenario.document : null, projection),
+		: skippedReadReason(
+				stored?.ok === true ? stored.data.scenario.document : null,
+				projection,
+				name,
+			),
 )
 /** The household's people, so each Return is named by the role the CLI states. */
 const people = $derived(snapshotPeople(snapshot, [name])[name] ?? NO_PEOPLE)

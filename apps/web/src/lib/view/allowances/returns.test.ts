@@ -116,18 +116,23 @@ describe("a Filer plan with no Return to read", () => {
 		const why = skippedReadReason(
 			documentOf("income.section40_1@me", "income.section40_1"),
 			undefined,
+			"flows-only",
 		)
 		expect(why).toContain("no Levy of it tallies a Filer's label")
-		expect(why).toContain("traj scenario tax <name> --from-stored")
+		expect(why).toContain("traj scenario tax flows-only --from-stored")
 	})
 
 	test("a Levy that tallies a Filer's label is read, and a plan without Filers says nothing", () => {
 		expect(
-			skippedReadReason(documentOf("income.section40_1@me", "income.section40_1@me"), undefined),
+			skippedReadReason(
+				documentOf("income.section40_1@me", "income.section40_1@me"),
+				undefined,
+				"a",
+			),
 		).toBeNull()
 		expect(
-			skippedReadReason(documentOf("income.section40_1", "income.section40_1"), undefined),
+			skippedReadReason(documentOf("income.section40_1", "income.section40_1"), undefined, "b"),
 		).toBeNull()
-		expect(skippedReadReason(null, undefined)).toBeNull()
+		expect(skippedReadReason(null, undefined, "c")).toBeNull()
 	})
 })

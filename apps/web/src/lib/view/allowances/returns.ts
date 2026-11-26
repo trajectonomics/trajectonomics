@@ -30,9 +30,10 @@ export function filerOfRow(row: AllowanceRow): string | null {
 	return filerOfLabel(row.label)
 }
 
-/** What a Filer plan with no Return to read says: its labels name a Filer, but no Levy of it tallies one. */
-const NO_FILER_LEVY =
-	"This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run `traj scenario tax <name> --from-stored` to write each label with its Filer suffix."
+/** What a Filer plan with no Return to read says, with the command for that plan: no Levy of it tallies a Filer. */
+function noFilerLevy(name: string): string {
+	return `This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run \`traj scenario tax ${name} --from-stored\` to write each label with its Filer suffix.`
+}
 
 /**
  * Why a Filer plan has no allowance read, or null when it has one: the read names no Filer, so `traj` would
@@ -41,10 +42,11 @@ const NO_FILER_LEVY =
 export function skippedReadReason(
 	document: ScenarioDocument | null,
 	projection: Read<ProjectionRun> | undefined,
+	name: string,
 ): string | null {
 	if (document === null || !isFilerPlan(document)) return null
 	const data = projection?.ok === true ? projection.data : undefined
-	return filersOf(document, data).length > 0 ? null : NO_FILER_LEVY
+	return filersOf(document, data).length > 0 ? null : noFilerLevy(name)
 }
 
 /** Whether the read names any Filer, so the page groups its Returns; a plan without Filers groups nothing. */
