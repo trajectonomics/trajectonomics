@@ -1,6 +1,15 @@
 import { describe, expect, test } from "bun:test"
 import type { ScenarioTax } from "../../contract"
-import { claimNoteLines, SEPARATE_LOANS_SENTENCE, taxNotesOf } from "./notes"
+import { NO_PEOPLE } from "../item-names"
+import {
+	ANOTHER_PERSON,
+	claimNoteLines,
+	DEPARTED_CLAIMS_MARKER,
+	DEPARTED_CLAIMS_OPENING,
+	departedNoteInHouseholdWords,
+	SEPARATE_LOANS_SENTENCE,
+	taxNotesOf,
+} from "./notes"
 
 const SCENARIO: ScenarioTax["scenario"] = {
 	id: "id",
@@ -71,6 +80,46 @@ describe("the CLI's notes about the stored claims", () => {
 			data: { separateLoans: CLI_SENTENCE, unclaimed: [SHARED, KEPT] },
 		}
 		expect(claimNoteLines(read)).toEqual([CLI_SENTENCE, SHARED, KEPT])
+	})
+
+	test("says a departed id's note in the household's words, never the id the CLI quotes", () => {
+		// The recorded holder of the flat claims is the earlier holder.
+		expect(departedNoteInHouseholdWords(DEPARTED, NO_PEOPLE, "gone")).toBe(
+			"The claims stored for the earlier holder, who is not in the household, are on no Return.",
+		)
+		// Any other departed id, such as a renamed partner's, is never called the holder.
+		expect(departedNoteInHouseholdWords(DEPARTED, NO_PEOPLE, "me")).toBe(
+			`The claims stored for ${ANOTHER_PERSON}, who is not in the household, are on no Return.`,
+		)
+		expect(departedNoteInHouseholdWords(DEPARTED, NO_PEOPLE)).toBe(
+			`The claims stored for ${ANOTHER_PERSON}, who is not in the household, are on no Return.`,
+		)
+		// The note keeps the CLI's opening words, and everything after the quoted id as it wrote them.
+		expect(DEPARTED.startsWith(DEPARTED_CLAIMS_OPENING)).toBe(true)
+		expect(DEPARTED).toContain(DEPARTED_CLAIMS_MARKER)
+		expect(
+			departedNoteInHouseholdWords(`${DEPARTED} State any that still apply.`, NO_PEOPLE, "gone"),
+		).toBe(
+			"The claims stored for the earlier holder, who is not in the household, are on no Return. State any that still apply.",
+		)
+	})
+
+	test("leaves a note about a person still in the household as the CLI wrote it", () => {
+		expect(departedNoteInHouseholdWords(KEPT, NO_PEOPLE)).toBe(KEPT)
+		expect(
+			claimNoteLines(
+				{
+					argv: ["scenario", "tax"],
+					ok: true,
+					data: { separateLoans: null, unclaimed: [KEPT, DEPARTED] },
+				},
+				NO_PEOPLE,
+				"gone",
+			),
+		).toEqual([
+			KEPT,
+			"The claims stored for the earlier holder, who is not in the household, are on no Return.",
+		])
 	})
 
 	test("shows nothing false when the CLI refused the dry run, or the Snapshot kept no read", () => {

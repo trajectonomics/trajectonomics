@@ -59,10 +59,18 @@ describe("the per-Return allowance view", () => {
 		expect(body).toContain("Who claims each allowance")
 		expect(body).toContain(">You<")
 		expect(body).toContain(">Your partner<")
-		expect(body).toContain("Parents you support")
 		expect(body).toContain(">2<")
 		expect(body).toContain("12,000 THB")
 		expect(body).toContain(">None<")
+	})
+
+	test("uses neutral row labels, because each column is one person's Return", () => {
+		const body = shown(section())
+		expect(body).toContain("Parents supported")
+		expect(body).toContain("Health insurance premiums")
+		expect(body).not.toContain("Parents you support")
+		expect(body).not.toContain("Your health insurance")
+		expect(body).not.toContain("parents you support")
 	})
 
 	test("states the stored shared home-loan interest the Returns share, or none", () => {

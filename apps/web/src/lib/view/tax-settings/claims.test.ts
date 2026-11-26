@@ -1,14 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import type { HouseholdDocument, TaxProfile } from "../../contract"
 import { NO_PEOPLE, personNames } from "../item-names"
-import {
-	type ClaimCell,
-	claimsTable,
-	FLAT_CLAIM_KEYS,
-	flatClaimant,
-	flatClaimNote,
-	isFlatClaim,
-} from "./claims"
+import { type ClaimCell, claimsTable, FLAT_CLAIM_KEYS, isFlatClaim } from "./claims"
+import { flatClaimant, flatClaimNote } from "./flat-claims"
 
 const PROFILE: TaxProfile = {
 	tax: "th-2026",
@@ -60,6 +54,16 @@ describe("who claims each allowance", () => {
 		expect(values(row("mortgageInterest")?.cells)).toEqual(["None", "None"])
 	})
 
+	test("labels every row neutrally, since each column is one person's Return", () => {
+		const table = claimsTable(PROFILE, HOUSEHOLD, FILERS)
+		const label = (key: string) => table?.rows.find((one) => one.key === key)?.label
+		expect(label("parents")).toBe("Parents supported")
+		expect(label("disabledCare")).toBe("Relatives with a disability cared for")
+		expect(label("healthInsurance")).toBe("Health insurance premiums")
+		expect(label("parentHealthInsurance")).toBe("Health insurance premiums for parents")
+		expect(table?.rows.some((row) => /\byou\b/i.test(row.label))).toBe(false)
+	})
+
 	test("never reads the holder's older `returns` entry, even with no claimsHolder recorded", () => {
 		const profile: TaxProfile = { ...PROFILE, claimsHolder: undefined }
 		const table = claimsTable(profile, HOUSEHOLD, FILERS)
@@ -107,6 +111,7 @@ describe("who the cards say the flat claims are", () => {
 
 	test("names the recorded holder after a swap, and no one while the flat keys are the holder's own", () => {
 		expect(flatClaimant(PROFILE, SWAPPED, people)?.subject).toBe("your partner")
+		expect(flatClaimant(PROFILE, SWAPPED, people)?.departed).toBe(false)
 		expect(flatClaimant(PROFILE, HOUSEHOLD, personNames(HOUSEHOLD))).toBeNull()
 	})
 
@@ -126,6 +131,7 @@ describe("who the cards say the flat claims are", () => {
 		expect(flatClaimant(gone, HOUSEHOLD, personNames(HOUSEHOLD))).toEqual({
 			label: "The earlier holder",
 			subject: "the earlier holder",
+			departed: true,
 		})
 	})
 })
@@ -148,6 +154,10 @@ describe("the flat claims a swapped holder must not write", () => {
 		)
 		const gone = flatClaimant({ ...PROFILE, claimsHolder: "gone" }, HOUSEHOLD, people)
 		if (gone === null) throw new Error("the departed holder is named")
-		expect(flatClaimNote(gone, "base")).toContain("recorded under the earlier holder.")
+		expect(flatClaimNote(gone, "base")).toBe(
+			"These claims are still recorded under the earlier holder, who is no longer in the household. They stay unclaimed until they are stated for a person who has a Return. Run `traj scenario tax base --from-stored` before editing them here.",
+		)
+		// The earlier holder's claims do not go "under each person" after `--from-stored`: they stay on no Return.
+		expect(flatClaimNote(gone, "base")).not.toContain("record them under each person")
 	})
 })
