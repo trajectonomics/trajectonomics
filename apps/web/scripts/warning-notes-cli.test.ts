@@ -1,6 +1,7 @@
 // The Overview's warning matcher against the sentences the real traj states (web ADR 0001): one
-// scratch ledger, one Scenario per warning, and the CLI's own notes, so rewording `funding.ts`,
-// `withdraw-notes.ts` or `levies.ts` fails here instead of quietly dropping a warning from the hero.
+// scratch ledger, one Scenario per warning the Demo snapshot does not state, and the CLI's own notes,
+// so rewording `withdraw-notes.ts` or `levies.ts` fails here instead of quietly dropping a warning
+// from the hero. `demo-warning-notes.test.ts` guards the funding note through the Demo.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { mkdir } from "node:fs/promises"
 import { join } from "node:path"
@@ -81,9 +82,7 @@ describe("the warning matcher against the real traj notes", () => {
 		}
 		const bank = idOf("Bank")
 		const vault = idOf("Vault")
-		const base = (
-			extra: { flows?: unknown[]; contribute?: string[]; withdraw?: string[] } = {},
-		): Record<string, unknown> => ({
+		const base = (flows: unknown[] = []): Record<string, unknown> => ({
 			schemaVersion: 4,
 			currency: "THB",
 			economy: { inflation: 0 },
@@ -91,12 +90,8 @@ describe("the warning matcher against the real traj notes", () => {
 				{ id: bank, kind: "asset", rate: 0 },
 				{ id: vault, kind: "asset", rate: 0 },
 			],
-			flows: extra.flows ?? [],
-			cashflow: {
-				surplus: [{ account: bank }],
-				contribute: extra.contribute ?? [],
-				withdraw: extra.withdraw ?? [bank],
-			},
+			flows,
+			cashflow: { surplus: [{ account: bank }], contribute: [], withdraw: [bank] },
 		})
 		const salary = {
 			id: "salary",
@@ -107,40 +102,25 @@ describe("the warning matcher against the real traj notes", () => {
 			start: "2026-01-01",
 			growth: { bps: 0 },
 		}
-		const invest = (amount: string) => ({
-			id: "invest",
-			kind: "contribution",
-			target: vault,
-			amount,
-			frequency: "monthly",
-			start: "2026-02-01",
-			growth: { bps: 0 },
-		})
 
 		// No Levy at all: the CLI states that no tax is applied.
 		store("untaxed", base())
-		// A Contribution far beyond the day's income, so the engine could not fund it.
-		store("unfunded", base({ flows: [invest("200000.00")], contribute: [vault] }))
 		// One expense larger than the cash, with the Vault outside `cashflow.withdraw` and holding money.
 		store(
 			"unmet",
-			base({
-				flows: [
-					{
-						id: "big",
-						kind: "expense",
-						amount: "9000000.00",
-						frequency: "once",
-						start: "2026-02-01",
-						growth: { bps: 0 },
-					},
-				],
-			}),
+			base([
+				{
+					id: "big",
+					kind: "expense",
+					amount: "9000000.00",
+					frequency: "once",
+					start: "2026-02-01",
+					growth: { bps: 0 },
+				},
+			]),
 		)
-		// A salary that funds a small Contribution, for the compare whose side B cannot fund a large one.
-		store("funded", base({ flows: [salary, invest("1.00")], contribute: [vault] }))
 		// This build's Thai Levy: the CLI completes the earlier period with its own scope record, so it says tax before 2026 is not recomputed.
-		store("taxed", base({ flows: [salary] }))
+		store("taxed", base([salary]))
 		traj(["scenario", "tax", "taxed", "--tax", "th-2026", "--label", "salary=income.section40_1"])
 	}, SLOW_MS)
 
@@ -148,46 +128,24 @@ describe("the warning matcher against the real traj notes", () => {
 		if (scratch !== "") await removeScratch(scratch)
 	})
 
-	test("counts the unfunded Contribution note", () => {
-		const warnings = projectionNotes(["projection", "run", "--scenario", "unfunded"]).filter(
-			isWarningNote,
-		)
-		expect(warnings.some((note) => note.includes("of Contributions could not be funded"))).toBe(
-			true,
-		)
-	})
-
-	test("counts the note of a side that could not fund a Contribution", () => {
-		const warnings = projectionNotes([
-			"projection",
-			"compare",
-			"funded",
-			"--set",
-			"flows.invest.amount=20000000",
-		]).filter(isWarningNote)
-		expect(warnings.some((note) => note.startsWith("Side B could not fund "))).toBe(true)
-	})
-
 	test("counts the unmet-amount note", () => {
-		const warnings = projectionNotes(["projection", "run", "--scenario", "unmet"]).filter(
-			isWarningNote,
-		)
-		expect(warnings.some((note) => note.includes(" unmet on 2026-02-01"))).toBe(true)
+		const stated = / unmet on 2026-02-01/
+		const notes = projectionNotes(["projection", "run", "--scenario", "unmet"])
+		expect(notes).toContainEqual(expect.stringMatching(stated))
+		expect(notes.filter(isWarningNote)).toContainEqual(expect.stringMatching(stated))
 	})
 
 	test("counts the no-tax note", () => {
-		const warnings = projectionNotes(["projection", "run", "--scenario", "untaxed"]).filter(
-			isWarningNote,
-		)
-		expect(warnings).toContain("No tax is applied; figures are before tax.")
+		const stated = "No tax is applied; figures are before tax."
+		const notes = projectionNotes(["projection", "run", "--scenario", "untaxed"])
+		expect(notes).toContain(stated)
+		expect(notes.filter(isWarningNote)).toContain(stated)
 	})
 
 	test("counts the note that tax before a year is not recomputed", () => {
-		const warnings = projectionNotes(["projection", "run", "--scenario", "taxed"]).filter(
-			isWarningNote,
-		)
-		expect(warnings.some((note) => note.startsWith("Tax before 2026 is not recomputed;"))).toBe(
-			true,
-		)
+		const stated = /^Tax before 2026 is not recomputed;/
+		const notes = projectionNotes(["projection", "run", "--scenario", "taxed"])
+		expect(notes).toContainEqual(expect.stringMatching(stated))
+		expect(notes.filter(isWarningNote)).toContainEqual(expect.stringMatching(stated))
 	})
 })
