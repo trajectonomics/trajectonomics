@@ -83,7 +83,7 @@ describe("a What-if that changes a Flow's frequency", () => {
 		const body = cards([{ path: "flows.salary.frequency", value: "once" }])
 		// The pension runs to the horizon, as before; the salary's struck end must still have a row to sit on.
 		expect(rows(body, "Ends")).toBe(2)
-		expect(body).toContain("2050-05-14")
+		expect(body).toContain("14 May 2050")
 	})
 
 	test("a once Flow tried monthly shows its end with nothing struck, as its baseline had no end", () => {

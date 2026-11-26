@@ -12,7 +12,7 @@ const SUCCESS_NOTE =
 
 const HERO: HeroView = {
 	sentence: "You could stop working in Mar 2041, when you are 54.",
-	planNote: { label: "Your plan as written:", text: SUCCESS_NOTE },
+	planNote: { label: "Your plan as written:", text: SUCCESS_NOTE, fromCli: true },
 	warnings: [
 		{
 			text: "29603.80 of Contributions could not be funded, so they were not made.",

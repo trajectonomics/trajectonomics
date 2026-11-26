@@ -50,8 +50,8 @@ describe("ProjectionView", () => {
 		expect(body).toMatch(/value="retire-early" checked=""/)
 	})
 
-	test("says there is no Scenario to project when none has a Read", () => {
-		expect(renderView({})).toContain("No Scenario to project")
+	test("says there is no plan to project when none has a Read", () => {
+		expect(renderView({})).toContain("No plan to project")
 	})
 
 	test("shows the CLI's error for a failed Read, with its command, and does not blank the picker", () => {

@@ -60,7 +60,7 @@ let { view, argv, plan, futures }: Props = $props()
 	{#if view.notes.length > 0}
 		<ul class="list-disc space-y-1 pl-5 text-sm">
 			{#each view.notes as note (note)}
-				<li>{note}</li>
+				<li data-cli>{note}</li>
 			{/each}
 		</ul>
 	{/if}

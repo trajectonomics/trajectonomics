@@ -14,7 +14,7 @@ const year = $derived(card.year)
 
 <div class="mt-3 space-y-1 text-sm">
 	{#if card.loan !== null && card.loan.known}
-		<p>{card.loan.paidOff !== null ? `Its loan is paid off on ${card.loan.paidOff}.` : "Its loan is not paid off by the end of this Projection."}</p>
+		<p>{card.loan.paidOff !== null ? `Its loan is paid off on ${formatDate(card.loan.paidOff)}.` : "Its loan is not paid off by the end of this Projection."}</p>
 	{/if}
 	{#if year !== null}
 		<p class="text-muted-foreground">This year, {formatDate(year.from)} to {formatDate(year.to)}:</p>

@@ -1,5 +1,6 @@
 import type { HouseholdDocument } from "../../contract"
 import type { ScenarioFlow } from "../../contract/scenario-show"
+import { formatDate } from "../../format"
 import { flowAnchorLabels } from "../household/model"
 import { type ItemNames, itemLabel, NO_ITEM_NAMES } from "../item-names"
 import { type Words, wordsOf } from "../words"
@@ -11,7 +12,7 @@ export function isOnce(flow: ScenarioFlow): boolean {
 
 /** The words for a date a Milestone sets: the plan's name for it, or its id in code when it states none. A Flow with none shows its own date. */
 function dateWords(milestone: string | undefined, date: string, names: ItemNames): Words {
-	if (milestone === undefined) return wordsOf([date])
+	if (milestone === undefined) return wordsOf([formatDate(date)])
 	return wordsOf(["When ", { item: itemLabel(names, "milestone", milestone) }, " fires"])
 }
 

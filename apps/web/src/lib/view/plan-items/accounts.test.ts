@@ -11,7 +11,7 @@ describe("accountCards", () => {
 			kind: "asset",
 			rate: "1.00%",
 			compounding: null,
-			lockedUntil: "2030-01-01",
+			lockedUntil: "1 Jan 2030",
 			balance: "662300.00",
 			payout: null,
 			payoutHow: null,

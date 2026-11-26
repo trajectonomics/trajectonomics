@@ -17,7 +17,7 @@ let { scenario, terms }: Props = $props()
 
 <PageShell
 	title="Reports"
-	intro="Download a table of the selected plan as CSV or JSON, or print this page. Every figure is one traj stated: nothing is added, rounded or reformatted."
+	intro="Download a table of the selected plan as CSV or JSON, or print this page. Every figure is one traj stated: nothing is added or rounded. Dates are shown as the Dashboard shows them; the downloaded file keeps traj's own text."
 >
 	{#snippet children(snapshot)}
 		{@const plan = chooseScenario(snapshot.params.scenarios, scenario)}

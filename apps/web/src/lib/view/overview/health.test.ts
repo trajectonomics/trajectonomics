@@ -25,7 +25,7 @@ describe("healthView", () => {
 			{ label: "Accounts", value: 3 },
 			{ label: "Transactions", value: 4 },
 			{ label: "Postings", value: 8 },
-			{ label: "Scenarios", value: 1 },
+			{ label: "Plans", value: 1 },
 		])
 	})
 })

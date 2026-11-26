@@ -1,5 +1,5 @@
 import type { Read, Snapshot } from "../../contract"
-import { formatArgv } from "../../format"
+import { formatArgv, formatDate } from "../../format"
 
 /** One Read of the Snapshot, as the audit table shows it. */
 export interface AuditRow {
@@ -67,10 +67,13 @@ function auditRow({ question, read }: Entry, key: string): AuditRow {
 
 function entriesOf(snapshot: Snapshot): Entry[] {
 	const { reads, params } = snapshot
-	const history = reads.netWorthHistory.map((read, index) => ({
-		question: `Net worth at ${params.historyDates[index] ?? "a month-end"}`,
-		read,
-	}))
+	const history = reads.netWorthHistory.map((read, index) => {
+		const date = params.historyDates[index]
+		return {
+			question: `Net worth at ${date === undefined ? "a month-end" : formatDate(date)}`,
+			read,
+		}
+	})
 	const projections = Object.entries(reads.projections).map(([name, read]) => ({
 		question: `Projection of ${name}`,
 		read,
@@ -80,7 +83,7 @@ function entriesOf(snapshot: Snapshot): Entry[] {
 		read,
 	}))
 	const compare =
-		reads.compare === null ? [] : [{ question: "Comparison of two Scenarios", read: reads.compare }]
+		reads.compare === null ? [] : [{ question: "Comparison of two plans", read: reads.compare }]
 	return [
 		{ question: "Ledger health (doctor)", read: reads.doctor },
 		{ question: "Chart of accounts", read: reads.accounts },
@@ -90,7 +93,7 @@ function entriesOf(snapshot: Snapshot): Entry[] {
 		{ question: "Profit and loss for the period", read: reads.pnl },
 		{ question: "Transactions in the period", read: reads.transactions },
 		{ question: BASELINE, read: reads.baseline },
-		{ question: "Scenarios", read: reads.scenarios },
+		{ question: "Plans", read: reads.scenarios },
 		...projections,
 		...fi,
 		...compare,

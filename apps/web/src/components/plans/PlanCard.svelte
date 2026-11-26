@@ -27,7 +27,7 @@ const name = $derived(card.row.name)
 	</header>
 	{#if card.notes}<PlanNotes notes={card.notes} />{/if}
 	{#if card.problem}
-		<p role="alert" class="text-sm text-destructive">{card.problem}</p>
+		<p role="alert" class="text-sm text-destructive" data-cli>{card.problem}</p>
 	{:else}
 		<PlanFacts {card} />
 		{#if card.series.length > 0}
@@ -52,7 +52,7 @@ const name = $derived(card.row.name)
 			href={`/projection/?scenario=${encodeURIComponent(name)}`}
 			class="text-sm text-accent underline-offset-4 hover:underline"
 		>
-			Open the Overview of {name}
+			Open the Projection of {name}
 		</SiteLink>
 		{#if editable}<PlanMenu row={card.row} />{/if}
 	</footer>

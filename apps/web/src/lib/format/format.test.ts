@@ -42,6 +42,12 @@ describe("formatDate and formatMonth", () => {
 	test("prints the month of a date", () => {
 		expect(formatMonth("2026-10-31")).toBe("Oct 2026")
 	})
+
+	test("prints a month on its own, and refuses a month that is not one", () => {
+		expect(formatMonth("1990-06")).toBe("Jun 1990")
+		expect(formatMonth("1990-13")).toBe("1990-13")
+		expect(formatMonth("June")).toBe("June")
+	})
 })
 
 describe("formatArgv", () => {

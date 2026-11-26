@@ -1,5 +1,6 @@
 <script lang="ts">
 import { layoutFlow } from "../../lib/chart/flow"
+import { formatDate } from "../../lib/format"
 import type { EstateView } from "../../lib/view/estate"
 import type { Terms } from "../../lib/view/projection/terms"
 import FlowDiagram from "../cashflow/FlowDiagram.svelte"
@@ -29,14 +30,14 @@ const pick = (key: string): void => {
 	<EstateHeadline figures={view.figures} {terms} />
 	{#if view.figures.shortfall !== null}
 		<p role="status" class="rounded-lg border border-destructive p-3 text-sm">
-			On {view.figures.date}, debts and costs come to more than everything owned, so heirs would receive nothing and gifts are not made. The shortfall is <Money amount={view.figures.shortfall} currency={view.figures.currency} />.
+			On {formatDate(view.figures.date)}, debts and costs come to more than everything owned, so heirs would receive nothing and gifts are not made. The shortfall is <Money amount={view.figures.shortfall} currency={view.figures.currency} />.
 		</p>
 	{/if}
 	{#if layout !== null}
 		<section aria-label="Where the estate goes" class="space-y-3">
 			<h3 class="text-base font-semibold">Where it goes</h3>
 			{#if terms === "real"}<p class="text-xs text-muted-foreground">Nominal: the bands are in the money of each date, because only the net estate and what heirs receive are stated in today's money.</p>{/if}
-			<FlowDiagram {layout} {picked} onPick={pick} label={`The estate on ${view.figures.date}, from the gross estate to debts, costs, gifts and heirs`} />
+			<FlowDiagram {layout} {picked} onPick={pick} label={`The estate on ${formatDate(view.figures.date)}, from the gross estate to debts, costs, gifts and heirs`} />
 		</section>
 	{/if}
 	<EstateBreakdown figures={view.figures} {terms} {picked} onPick={pick} />

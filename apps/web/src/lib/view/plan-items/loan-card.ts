@@ -3,6 +3,7 @@
  * as `traj` prints it. Every amount is the CLI's decimal string; the card computes nothing.
  */
 import type { Baseline, ProjectionRun, Read, ScenarioDocument } from "../../contract"
+import { formatDate } from "../../format"
 import { formatBps } from "../../format/bps"
 import { balanceOf } from "./accounts"
 import { groupedIds } from "./asset-document"
@@ -37,13 +38,16 @@ function termsOf(loan: LoanParts): LoanRow[] {
 		},
 		{
 			label: "Borrowed",
-			value: loan.draw === null ? "Already owed (the Baseline holds it)" : `On ${loan.draw.start}`,
+			value:
+				loan.draw === null
+					? "Already owed (the Baseline holds it)"
+					: `On ${formatDate(loan.draw.start)}`,
 		},
 		{
 			label: "Payments",
 			value: `${level?.payments ?? 0} equal ${loan.payment.frequency} payments`,
 		},
-		{ label: "First payment", value: loan.payment.start },
+		{ label: "First payment", value: formatDate(loan.payment.start) },
 		{ label: "Rounding", value: roundingText(level?.rounding) },
 	]
 }

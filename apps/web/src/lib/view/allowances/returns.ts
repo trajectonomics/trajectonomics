@@ -30,9 +30,21 @@ export function filerOfRow(row: AllowanceRow): string | null {
 	return filerOfLabel(row.label)
 }
 
+/** The words around the command that writes each label with its Filer suffix, so a component sets the command in code. */
+export interface SkippedReadParts {
+	readonly before: string
+	readonly command: string
+	readonly after: string
+}
+
 /** What a Filer plan with no Return to read says, with the command for that plan: no Levy of it tallies a Filer. */
-function noFilerLevy(name: string): string {
-	return `This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run \`traj scenario tax ${name} --from-stored\` to write each label with its Filer suffix.`
+function noFilerLevy(name: string): SkippedReadParts {
+	return {
+		before:
+			"This plan's labels name a Filer, but no Levy of it tallies a Filer's label, so there is no Return to read. Run ",
+		command: `traj scenario tax ${name} --from-stored`,
+		after: " to write each label with its Filer suffix.",
+	}
 }
 
 /**
@@ -43,7 +55,7 @@ export function skippedReadReason(
 	document: ScenarioDocument | null,
 	projection: Read<ProjectionRun> | undefined,
 	name: string,
-): string | null {
+): SkippedReadParts | null {
 	if (document === null || !isFilerPlan(document)) return null
 	const data = projection?.ok === true ? projection.data : undefined
 	return filersOf(document, data).length > 0 ? null : noFilerLevy(name)

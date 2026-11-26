@@ -15,7 +15,7 @@ describe("the loans on the Assets and debts page", () => {
 		expect(body).toContain("Add loan")
 		expect(body).toContain("Rounded to the nearest")
 		expect(body).toContain("60 equal monthly payments")
-		expect(body).toContain("On 2027-01-01")
+		expect(body).toContain("On 1 Jan 2027")
 		expect(body).toContain('aria-label="Include loan in the what-if"')
 	})
 
@@ -34,9 +34,9 @@ describe("the loans on the Assets and debts page", () => {
 
 	test("the statement's payment, paid-off date and schedule come from the Projection run", () => {
 		const body = assets({ run: runWithLoan() })
-		expect(body).toContain("Paid off on 2032-01-31.")
+		expect(body).toContain("Paid off on 31 Jan 2032.")
 		expect(body).toContain('aria-label="Schedule 2027"')
-		expect(body).toContain("2027-02")
+		expect(body).toContain("Feb 2027")
 		expect(body).toContain("492,083.33")
 	})
 

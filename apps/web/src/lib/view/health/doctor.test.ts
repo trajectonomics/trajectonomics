@@ -43,7 +43,7 @@ describe("doctorView", () => {
 	test("counts each kind of row the CLI counted", () => {
 		const counts = doctorView(doctor).rows.map((row) => [row.label, row.count])
 		expect(counts).toContainEqual(["Transactions", "152"])
-		expect(counts).toContainEqual(["Scenarios", "0"])
+		expect(counts).toContainEqual(["Plans", "0"])
 	})
 
 	test("has no trial balance when the doctor did not check one", () => {

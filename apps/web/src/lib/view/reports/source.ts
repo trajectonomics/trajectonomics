@@ -37,12 +37,21 @@ export function termsWords(raw: string): string {
 	return "Nominal and real, in As-of terms"
 }
 
+/** Why a plan has no projection to report on, and whether the CLI stated it or the page did. */
+export interface NoProjectionReason {
+	readonly text: string
+	readonly fromCli: boolean
+}
+
 /** Why a plan has no projection to report on: the CLI's own message when its read failed, else that none was taken. */
 export function noProjectionReason(
 	reads: Pick<Snapshot["reads"], "projections">,
 	plan: string,
-): string {
+): NoProjectionReason {
 	const read = Object.hasOwn(reads.projections, plan) ? reads.projections[plan] : undefined
-	if (read === undefined) return "The Snapshot holds no projection for this plan."
-	return read.ok ? "The projection of this plan holds no table." : read.error.message
+	if (read === undefined)
+		return { text: "The Snapshot holds no projection for this plan.", fromCli: false }
+	return read.ok
+		? { text: "The projection of this plan holds no table.", fromCli: false }
+		: { text: read.error.message, fromCli: true }
 }

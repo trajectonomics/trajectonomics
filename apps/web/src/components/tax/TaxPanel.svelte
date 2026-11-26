@@ -45,13 +45,13 @@ const read = $derived(name === null ? undefined : projections[name])
 {/snippet}
 
 {#if name === null}
-	<EmptyState title="No Scenario to read" />
+	<EmptyState title="No plan to read" />
 {:else}
 	<div class="space-y-8">
-		<SegmentedControl name="scenario" label="Scenario" {options} value={name} onChange={onScenario} />
+		<SegmentedControl name="scenario" label="Plan" {options} value={name} onChange={onScenario} />
 		{#if unknown !== null}
 			<p role="status" class="text-sm text-muted-foreground">
-				There is no Scenario named {unknown}. Showing {name}.
+				There is no plan named {unknown}. Showing {name}.
 			</p>
 		{/if}
 		{#if read === undefined}

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { Snapshot } from "../contract"
+import { formatDate } from "../format"
 import { failedRead } from "../snapshot/fixtures.test-support"
 import { printHeading, printHeadingText } from "./print-header"
 import { projectionRunFixture } from "./projection/fixtures.test-support"
@@ -19,7 +20,7 @@ describe("printHeading", () => {
 		const state = ready({ argv: [], ok: true, data: run })
 		expect(printHeading(state, "base", "real", false)).toEqual({
 			plan: "base",
-			asOf: run.asOf,
+			asOf: formatDate(run.asOf),
 			terms: "Real, in As-of terms",
 			whatIf: false,
 		})
@@ -27,9 +28,9 @@ describe("printHeading", () => {
 
 	test("falls back to the Snapshot's As-of date when the plan's projection failed", () => {
 		const heading = printHeading(ready(failedRead(["projection"])), "base", "nominal", true)
-		expect(heading?.asOf).toBe("2026-09-30")
+		expect(heading?.asOf).toBe("30 Sep 2026")
 		expect(heading && printHeadingText(heading)).toBe(
-			"base · As of 2026-09-30 · Nominal · What-if session",
+			"base · As of 30 Sep 2026 · Nominal · What-if session",
 		)
 	})
 

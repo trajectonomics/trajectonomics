@@ -19,7 +19,7 @@ let { year, currency }: Props = $props()
 		<p class="text-sm text-muted-foreground">{year.levy}, {year.period}</p>
 	</div>
 	{#each year.notes as note, index (index)}
-		<p role="note" class="rounded-md bg-muted p-3 text-sm">{note}</p>
+		<p role="note" class="rounded-md bg-muted p-3 text-sm" data-cli>{note}</p>
 	{/each}
 	{#if year.walk}<TaxWalk lines={year.walk} {currency} />{/if}
 	<TaxRates topRate={year.topRate} shareOfIncome={year.shareOfIncome} />

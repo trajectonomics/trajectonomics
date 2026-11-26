@@ -11,14 +11,14 @@ interface Props {
 	fi: Readonly<Record<string, Read<Fi>>>
 }
 
-/** One section per Scenario, each with its own FI answer. */
+/** One section per plan, each with its own FI answer. */
 let { fi }: Props = $props()
 const uid = $props.id()
 const entries = $derived(Object.entries(fi))
 </script>
 
 {#if entries.length === 0}
-	<EmptyState title="No Scenario to read" />
+	<EmptyState title="No plan to read" />
 {:else}
 	<div class="space-y-12">
 		{#each entries as [name, read], index (name)}
