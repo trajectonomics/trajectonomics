@@ -1,26 +1,20 @@
 import type { MonthDay } from "@trajectonomics/core/sim"
-import { type AppError, fail, isAppError } from "../errors"
+import { type AppError, isAppError } from "../errors"
 import type { JsonRecord } from "../scenario/tax/json"
-import { records as objects } from "../scenario/tax/json"
 import type { CarryInRecordForm } from "./carryin"
 import { type CarryInClass, type StatedTally, withAllClasses } from "./carryin-classes"
-import { alignedStart, amountsOf } from "./carryin-record"
-import { flagProblem, storedProblem } from "./carryin-refuse"
-import { type CarryInSource, isBasis } from "./carryin-view"
-
-/** The refusal for a stored record whose shape this build cannot read at all. */
-function unreadable(path: string, levy: string, at: string, what: string): AppError {
-	return fail("invalid_input", {
-		path,
-		message: `The stored Carry-in for "${levy}" from ${at} states ${what}.`,
-		hint: "Re-apply the Scenario with a periodStart, tallies and a prepaid amount for every record.",
-	})
-}
+import { alignedStart, amountsOf, storedTallies } from "./carryin-record"
+import { flagProblem, storedProblem, unreadable } from "./carryin-refuse"
+import type { CarryInSource } from "./carryin-view"
 
 /** One Carry-in record resolved into minor units, ready to place in a Levy and echo. */
 export type CarryInEntry = {
 	periodStart: string
 	tallies: StatedTally[]
+	/** The classes the record itself stated; a shared-loan fill reads the rest from the other Return. */
+	stated: ReadonlySet<string>
+	/** The classes the record left to `rest`'s zero: it asserts they tallied nothing. */
+	rested: ReadonlySet<string>
 	prepaid: number
 	source: CarryInSource
 }
@@ -31,6 +25,7 @@ export function flagEntry(input: {
 	index: number
 	levy: string
 	classes: readonly CarryInClass[]
+	fillable: ReadonlySet<string>
 	currency: string
 	period: MonthDay | undefined
 }): CarryInEntry | AppError {
@@ -44,11 +39,22 @@ export function flagEntry(input: {
 	if (isAppError(periodStart)) return periodStart
 	const amounts = amountsOf(input.record, base, input.currency)
 	if (isAppError(amounts)) return amounts
-	const tallies = withAllClasses(amounts.stated, input.classes, amounts.rest, (problem) =>
-		flagProblem(problem, { base, levy: input.levy, periodStart }),
+	const tallies = withAllClasses(
+		amounts.stated,
+		input.classes,
+		amounts.rest,
+		(problem) => flagProblem(problem, { base, levy: input.levy, periodStart }),
+		input.fillable,
 	)
 	if (isAppError(tallies)) return tallies
-	return { periodStart, tallies, prepaid: amounts.prepaid, source: "flag" }
+	return {
+		periodStart,
+		tallies: tallies.tallies,
+		stated: tallies.stated,
+		rested: tallies.rested,
+		prepaid: amounts.prepaid,
+		source: "flag",
+	}
 }
 
 /** One stored `levy.carryIn` record, resolved by the same class rule as the flag's. */
@@ -56,6 +62,7 @@ export function storedEntry(input: {
 	record: JsonRecord
 	levy: string
 	classes: readonly CarryInClass[]
+	fillable: ReadonlySet<string>
 	path: string
 	period: MonthDay | undefined
 }): CarryInEntry | AppError {
@@ -68,21 +75,26 @@ export function storedEntry(input: {
 		levy: input.levy,
 	})
 	if (isAppError(periodStart)) return periodStart
-	const stated: StatedTally[] = []
-	for (const tally of objects(input.record["tallies"])) {
-		const { label, basis, amount } = tally
-		if (typeof label !== "string" || !isBasis(basis) || typeof amount !== "number") {
-			return unreadable(input.path, input.levy, at, "a class this build cannot read")
-		}
-		stated.push({ label, basis, amount })
-	}
+	const stated = storedTallies(input.record, input.path, input.levy, at)
+	if (isAppError(stated)) return stated
 	const prepaid = input.record["prepaid"]
 	if (typeof prepaid !== "number") {
 		return unreadable(input.path, input.levy, at, "no prepaid amount")
 	}
-	const tallies = withAllClasses(stated, input.classes, false, (problem) =>
-		storedProblem(problem, { path: input.path, levy: input.levy, periodStart }),
+	const tallies = withAllClasses(
+		stated,
+		input.classes,
+		false,
+		(problem) => storedProblem(problem, { path: input.path, levy: input.levy, periodStart }),
+		input.fillable,
 	)
 	if (isAppError(tallies)) return tallies
-	return { periodStart, tallies, prepaid, source: "document" }
+	return {
+		periodStart,
+		tallies: tallies.tallies,
+		stated: tallies.stated,
+		rested: tallies.rested,
+		prepaid,
+		source: "document",
+	}
 }
