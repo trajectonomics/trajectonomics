@@ -11,6 +11,9 @@ export const EARLIER_HOLDER: PersonName = {
 	subject: "the earlier holder",
 }
 
+/** The column words for an id the household no longer names that is not the recorded holder: never the id. */
+export const ANOTHER_PERSON_LABEL = "Another person"
+
 /** The person the flat keys are recorded under: the household's words, and whether that id has left the household. */
 export interface FlatClaimant extends PersonName {
 	readonly departed: boolean

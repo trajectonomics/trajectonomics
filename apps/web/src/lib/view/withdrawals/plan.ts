@@ -60,7 +60,10 @@ export function anchorRefusal(
 	for (const edge of ["start", "end"] as const) {
 		const label = labels[edge]
 		if (label !== null && tried.edited[edge] === undefined) {
-			return `Your household sets when ${itemText(names, "flow", tried.edited.id)} ${edge === "start" ? "starts" : "ends"} (${label}), and this change leaves that date out. Save it to have the household fill the date in, or keep a ${edge} date in the form.`
+			const name = itemText(names, "flow", tried.edited.id)
+			const edgeWord = edge === "start" ? "starts" : "ends"
+			const note = `Your household sets when ${name} ${edgeWord} (${label}), and this change leaves that date out. Save it to have the household fill the date in`
+			return edge === "start" ? `${note}, or keep a start date in the form.` : `${note}.`
 		}
 	}
 	return null

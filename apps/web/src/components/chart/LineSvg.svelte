@@ -57,7 +57,7 @@ function anchorAt(x: number): "start" | "middle" | "end" {
 			>
 		{/if}
 	{/each}
-	{#each layout.series as line, seriesIndex (line.name)}
+	{#each layout.series as line, seriesIndex (seriesIndex)}
 		{#if line.area}
 			<path d={line.area} class={fillClass(seriesIndex)} fill-opacity={fillOpacity(seriesIndex)} />
 		{/if}

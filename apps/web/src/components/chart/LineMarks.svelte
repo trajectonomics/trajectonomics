@@ -24,7 +24,7 @@ const x = $derived(layout.xPixels[index])
 			stroke-dasharray="2 3"
 			class="stroke-muted-foreground"
 		/>
-		{#each layout.series as line, seriesIndex (line.name)}
+		{#each layout.series as line, seriesIndex (seriesIndex)}
 			{#if line.marks[index]}
 				<circle
 					cx={line.marks[index].x}

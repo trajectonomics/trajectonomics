@@ -9,6 +9,12 @@ const HOUSEHOLD: HouseholdDocument = {
 	anchors: [{ path: "flows.retirement-spending.start", person: "me", age: 60 }],
 }
 
+/** A household that pins the Flow's end instead, which the withdrawal form cannot write. */
+const END_HOUSEHOLD: HouseholdDocument = {
+	...HOUSEHOLD,
+	anchors: [{ path: "flows.retirement-spending.end", person: "me", age: 70 }],
+}
+
 /** The plan's names for the Flows `labels` lists: each id, and the label it states when it has one. */
 function namesOf(labels: readonly { id: string; displayLabel?: string }[]): ItemNames {
 	const document: ScenarioDocument = scenarioDocument.parse({
@@ -53,6 +59,19 @@ describe("the note that refuses a try over an anchored date", () => {
 		expect(note(twins)).toContain(
 			"Your household sets when Retirement spending (retirement-spending) starts",
 		)
+	})
+
+	test("for an end date, asks only for the save, because the form has no end-date field", () => {
+		const names = namesOf([{ id: "retirement-spending", displayLabel: "Retirement spending" }])
+		const note = anchorRefusal(
+			END_HOUSEHOLD,
+			{ stored: undefined, edited: { id: "retirement-spending" } },
+			names,
+		)
+		expect(note).toBe(
+			"Your household sets when Retirement spending ends (at you, age 70), and this change leaves that date out. Save it to have the household fill the date in.",
+		)
+		expect(note).not.toContain("end date in the form")
 	})
 
 	test("has no note when the Flow keeps the date, or the household pins none", () => {

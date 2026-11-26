@@ -27,6 +27,19 @@ export function defaultName(seriesNames: readonly string[]): string {
 	return (more > 0 ? `${first} and ${more} more` : first).slice(0, MAX_NAME)
 }
 
+/**
+ * The name a chart is saved under: the one typed, or the default from its series ids, read through a name index
+ * without the plan's labels. The name is the same on every plan, so a saved chart fits all of them.
+ */
+export function savedName(
+	typed: string,
+	series: readonly string[],
+	names: ReadonlyMap<string, string>,
+): string {
+	const chosen = typed.trim()
+	return chosen === "" ? defaultName(series.map((id) => names.get(id) ?? id)) : chosen
+}
+
 /** Adds a chart, or replaces the one with the same id. Refused (null) when the list is full. */
 export function saveChart(
 	charts: readonly ChartDef[],

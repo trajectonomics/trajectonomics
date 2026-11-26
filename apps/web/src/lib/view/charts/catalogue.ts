@@ -1,5 +1,5 @@
 import type { ProjectionRun } from "../../contract"
-import type { ItemNames } from "../item-names"
+import { type ItemNames, itemNames } from "../item-names"
 import { reasonFor } from "./reasons"
 import { resolveSeries } from "./resolve"
 import { GROUPS, type GroupId, type Resolved } from "./types"
@@ -106,4 +106,15 @@ export function nameIndex(
 /** Every series of one run by id. */
 export function seriesById(run: ProjectionRun, names: ItemNames): ReadonlyMap<string, Resolved> {
 	return new Map(resolveSeries(run, names).map((item) => [item.id, item]))
+}
+
+/**
+ * The series names a new chart's default name reads: the same names with no plan label, so the name comes from the
+ * series ids and fits every plan. The names a chart shows still read the plan's labels.
+ */
+export function defaultNameIndex(
+	runs: readonly ProjectionRun[],
+	names: ItemNames,
+): ReadonlyMap<string, string> {
+	return nameIndex(runs, itemNames(names.accounts, null))
 }

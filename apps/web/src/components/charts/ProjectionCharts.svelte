@@ -3,7 +3,12 @@ import { tick } from "svelte"
 import { focusById } from "../../client/browser.js"
 import { chartStore } from "../../client/charts.svelte.js"
 import type { ProjectionRun } from "../../lib/contract"
-import { buildCatalogue, nameIndex, seriesById } from "../../lib/view/charts/catalogue"
+import {
+	buildCatalogue,
+	defaultNameIndex,
+	nameIndex,
+	seriesById,
+} from "../../lib/view/charts/catalogue"
 import type { ChartDef, ChartKind } from "../../lib/view/charts/types"
 import { chartView } from "../../lib/view/charts/view"
 import { parseTerms } from "../../lib/view/projection/terms"
@@ -31,6 +36,8 @@ let drawer = $state<"new" | ChartDef | null>(null)
 const chosen = $derived(chartStore.charts.find((chart) => chart.id === charts.chart))
 const groups = $derived(buildCatalogue(charts.runs, run, charts.names))
 const names = $derived(nameIndex(charts.runs, charts.names))
+/** The same names with no plan label, so a default chart name reads the ids and fits every plan. */
+const defaultNames = $derived(defaultNameIndex(charts.runs, charts.names))
 const view = $derived(
 	chosen && chartView(chosen, seriesById(run, charts.names), names, parseTerms(terms)),
 )
@@ -85,5 +92,5 @@ function save(draft: { name: string; kind: ChartKind; series: readonly string[] 
 	{/if}
 	<ChartNotices problem={chartStore.problem} unsaved={chartStore.unsaved} notice={chartStore.notice} />
 	<ChartFiles hasCharts={chartStore.charts.length > 0} onExport={() => chartStore.exportFile()} onImport={(file) => chartStore.importFile(file)} />
-	<ChartDrawer open={drawer} {groups} {names} onSave={save} onClose={close} />
+	<ChartDrawer open={drawer} {groups} {names} {defaultNames} onSave={save} onClose={close} />
 </div>

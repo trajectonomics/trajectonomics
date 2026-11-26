@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
-import { scenarioDocument } from "../../contract"
 import { type ItemNames, itemNames } from "../item-names"
-import { buildCatalogue } from "./catalogue"
-import { defaultName, duplicateOf, mergeCharts, saveChart, uniqueId } from "./edit"
+import { buildCatalogue, defaultNameIndex } from "./catalogue"
+import { defaultName, duplicateOf, mergeCharts, saveChart, savedName, uniqueId } from "./edit"
 import { plain, withTax } from "./fixtures.test-support"
+import { planNames, withExpenseFlows } from "./flow-fixtures.test-support"
 import { resolveSeries } from "./resolve"
 import { parseCharts, readCharts, serializeCharts } from "./stored"
 import type { ChartDef } from "./types"
@@ -12,21 +12,6 @@ import { periodText } from "./year"
 const NAMES = new Map([["savings", "Savings"]])
 const NO_NAMES = itemNames(NAMES, null)
 
-/** The names of a plan whose document states the labels `flows` carries, and no others. */
-function planNames(flows: readonly { id: string; displayLabel?: string }[]): ItemNames {
-	const document = scenarioDocument.parse({
-		currency: "THB",
-		accounts: [],
-		flows: flows.map(({ id, displayLabel }) => ({
-			id,
-			kind: "income",
-			frequency: "monthly",
-			start: "2026-01-01",
-			...(displayLabel === undefined ? {} : { displayLabel }),
-		})),
-	})
-	return itemNames(NAMES, null, document)
-}
 const CHART: ChartDef = {
 	id: "spend",
 	name: "Spend",
@@ -70,6 +55,32 @@ describe("the series catalogue", () => {
 				]),
 			),
 		).toBe("Income: Salary (salary)")
+	})
+
+	test("adds the id when a label reads the same as an id, so the series can be told apart", () => {
+		const run = withExpenseFlows(["a", "rent"])
+		const names = planNames([{ id: "a", displayLabel: "rent" }, { id: "rent" }])
+		const namesOfRun = resolveSeries(run, names)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.name)
+		expect(namesOfRun).toEqual(["Expense: rent (a)", "Expense: rent (rent)"])
+	})
+
+	test("adds the id when a label equals another Flow's twin form", () => {
+		const run = withExpenseFlows(["a", "b", "rent"])
+		const names = planNames([
+			{ id: "a", displayLabel: "rent" },
+			{ id: "rent", displayLabel: "rent" },
+			{ id: "b", displayLabel: "rent (a)" },
+		])
+		const namesOfRun = resolveSeries(run, names)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.name)
+		expect(namesOfRun).toEqual([
+			"Expense: rent (a) (a)",
+			"Expense: rent (a) (b)",
+			"Expense: rent (rent)",
+		])
 	})
 
 	test("keeps the CLI's strings and places a point at the day its period ends", () => {
@@ -174,5 +185,18 @@ describe("storage", () => {
 		expect(uniqueId("My chart!", new Set(["my-chart"]))).toBe("my-chart-2")
 		expect(duplicateOf([CHART], CHART)).toMatchObject({ id: "spend-2", name: "Spend (copy)" })
 		expect(defaultName(["Income", "Expenses"])).toBe("Income and 1 more")
+	})
+
+	test("a new chart's default name reads the series ids, so it fits every plan", () => {
+		const run = withExpenseFlows(["salary"])
+		const alpha = planNames([{ id: "salary", displayLabel: "Alpha job" }])
+		const bravo = planNames([{ id: "salary", displayLabel: "Bravo job" }])
+		const series = resolveSeries(run, alpha)
+			.filter((item) => item.id.startsWith("cash:"))
+			.map((item) => item.id)
+		expect(series).toHaveLength(1)
+		expect(savedName("", series, defaultNameIndex([run], alpha))).toBe("Expense: salary")
+		expect(savedName("", series, defaultNameIndex([run], bravo))).toBe("Expense: salary")
+		expect(savedName("  Mine  ", series, defaultNameIndex([run], alpha))).toBe("Mine")
 	})
 })
