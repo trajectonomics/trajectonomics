@@ -184,6 +184,16 @@ describe("a refusal lands at its field, in the CLI's words", () => {
 		expect(taxShown({ children: "own" }, null, null).at("children")).toBe("own")
 	})
 
+	test("the edit server's flat-claim refusal is shown for the whole form, with the plan's command", () => {
+		const message =
+			"These claims are still recorded under your partner. Run traj scenario tax base --from-stored to record them under each person, then edit them here."
+		const error = { code: "tax_claims_recorded_elsewhere", exitCode: 1, message }
+		const shown = taxShown({}, error, message)
+		expect(shown.general).toBe(message)
+		expect(shown.general).toContain("traj scenario tax base --from-stored")
+		expect(shown.at("children")).toBeUndefined()
+	})
+
 	test("a refusal at an item the form does not show is shown for the whole form", () => {
 		const shown = taxShown({}, refusal("--children-at-higher-rate"), "the CLI's sentence", [
 			"children",

@@ -4,7 +4,8 @@ import { whatIfSession } from "../../client/what-if.svelte.js"
 import type { ScenarioShow, TaxYear } from "../../lib/contract"
 import { personNames } from "../../lib/view/item-names"
 import { returnsOf } from "../../lib/view/tax"
-import { claimsTable, flatClaimant, flatClaimNote } from "../../lib/view/tax-settings/claims"
+import { claimsTable } from "../../lib/view/tax-settings/claims"
+import { flatClaimant, flatClaimParts } from "../../lib/view/tax-settings/flat-claims"
 import { type GroupKey, groupCards } from "../../lib/view/tax-settings/groups"
 import { incomeFlows, unlabelledIncome } from "../../lib/view/tax-settings/labels"
 import { notStated } from "../../lib/view/tax-settings/not-stated"
@@ -13,6 +14,7 @@ import { canClaimShared, sharedInterestClaimed } from "../../lib/view/tax-settin
 import TaxClaimNotes from "./TaxClaimNotes.svelte"
 import TaxClaimsSection from "./TaxClaimsSection.svelte"
 import TaxDrawer from "./TaxDrawer.svelte"
+import TaxFlatClaimNote from "./TaxFlatClaimNote.svelte"
 import TaxGroupCards from "./TaxGroupCards.svelte"
 import TaxLabelForm from "./TaxLabelForm.svelte"
 import TaxNotStated from "./TaxNotStated.svelte"
@@ -46,7 +48,7 @@ const sharedClaimed = $derived(sharedInterestClaimed(profile, show.document))
 const claimant = $derived(profile === null ? null : flatClaimant(profile, show.household, people))
 // A swapped holder's bare value writes the new holder, so the flat claims wait until `--from-stored` records them per person.
 const flatLocked = $derived(claimant !== null)
-const flatNote = $derived(claimant === null ? "" : flatClaimNote(claimant, name))
+const flatNote = $derived(claimant === null ? null : flatClaimParts(claimant, name))
 // While an income Flow has no tax label `scenario tax` refuses. A plan with tax labels its Flows in the label form first; a plan
 // with none labels them in the write that gives it tax, which the profile form carries.
 const unlabelled = $derived(unlabelledIncome(show.document))
@@ -80,10 +82,10 @@ function showDrawer(next: boolean, on: GroupKey | null = null): void {
 {/if}
 {#if profile !== null}
 	<TaxClaimNotes lines={notes} />
-	{#if offered && flatLocked}
-		<p class="text-sm text-foreground">{flatNote}</p>
+	{#if offered && flatNote}
+		<TaxFlatClaimNote note={flatNote} />
 	{/if}
-	<TaxGroupCards cards={groupCards(profile, claimant, sharedClaimed)} disabled={wait} locked={flatLocked} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
+	<TaxGroupCards cards={groupCards(profile, claimant, sharedClaimed)} disabled={wait} locked={flatLocked} {sharedClaimable} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 	<TaxNotStated items={notStated(show.taxAllowances, claimant)} disabled={wait} locked={flatLocked} onEdit={offered ? (on) => showDrawer(true, on) : undefined} />
 {/if}
 <div class="flex flex-wrap gap-3">

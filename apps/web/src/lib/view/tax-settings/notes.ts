@@ -1,9 +1,12 @@
 /**
  * The CLI's own notes about a plan's stored claims, kept from its dry-run write (cli ADR-0075): the
  * separate-loans note on `allowances.mortgageInterestCeiling` and the `unclaimed` sentences. The page
- * shows each sentence as the CLI wrote it, so it adds no wording of its own. Pure.
+ * shows each sentence as the CLI wrote it, apart from a departed id's quoted id, which it says in the
+ * household's words. Pure.
  */
 import type { Read, ScenarioTax, TaxNotes } from "../../contract"
+import { NO_PEOPLE, type PersonNames } from "../item-names"
+import { EARLIER_HOLDER } from "./flat-claims"
 
 /**
  * Where the CLI's separate-loans sentence begins. The CLI appends it, after a space, to tax-core's own
@@ -11,6 +14,23 @@ import type { Read, ScenarioTax, TaxNotes } from "../../contract"
  */
 export const SEPARATE_LOANS_SENTENCE =
 	"Each separate Return's interest is taken to be on separate loans"
+
+/**
+ * How the CLI's sentence about a departed id opens, and the clause that tells it from the kept-claims sentence: only
+ * the departed one is rewritten, because only that id is one the household no longer names.
+ */
+export const DEPARTED_CLAIMS_OPENING = 'The claims stored for "'
+export const DEPARTED_CLAIMS_MARKER = '", who is not in the household, are on no Return.'
+
+/** A departed id's note in the household's words: "the earlier holder", never the id the CLI quotes. */
+export function departedNoteInHouseholdWords(note: string, people: PersonNames): string {
+	if (!note.startsWith(DEPARTED_CLAIMS_OPENING)) return note
+	const close = note.indexOf(DEPARTED_CLAIMS_MARKER)
+	if (close < 0) return note
+	const id = note.slice(DEPARTED_CLAIMS_OPENING.length, close)
+	const words = people.get(id)?.subject ?? EARLIER_HOLDER.subject
+	return `The claims stored for ${words}${note.slice(close + 1)}`
+}
 
 /** The separate-loans note the assumptions state, or null when this write does not state one. */
 function separateLoansOf(assumptions: ScenarioTax["assumptions"]): string | null {
@@ -35,8 +55,12 @@ export function taxNotesFrom(read: Read<ScenarioTax>): Read<TaxNotes> {
 }
 
 /** The notes a read states, one paragraph each; none when the CLI refused the dry run, so the page shows nothing false. */
-export function claimNoteLines(read: Read<TaxNotes> | undefined): readonly string[] {
+export function claimNoteLines(
+	read: Read<TaxNotes> | undefined,
+	people: PersonNames = NO_PEOPLE,
+): readonly string[] {
 	if (read?.ok !== true) return []
 	const { separateLoans, unclaimed } = read.data
-	return separateLoans === null ? [...unclaimed] : [separateLoans, ...unclaimed]
+	const lines = unclaimed.map((note) => departedNoteInHouseholdWords(note, people))
+	return separateLoans === null ? lines : [separateLoans, ...lines]
 }

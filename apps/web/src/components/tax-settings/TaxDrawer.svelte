@@ -1,8 +1,10 @@
 <script lang="ts">
 import type { TaxProfile } from "../../lib/contract"
+import type { FlatClaimNoteParts } from "../../lib/view/tax-settings/flat-claims"
 import { GROUPS, type GroupKey } from "../../lib/view/tax-settings/groups"
 import Drawer from "../ui/Drawer.svelte"
 import StaleNotice from "../ui/StaleNotice.svelte"
+import TaxFlatClaimNote from "./TaxFlatClaimNote.svelte"
 import TaxProfileForm from "./TaxProfileForm.svelte"
 
 interface Props {
@@ -22,7 +24,7 @@ interface Props {
 	sharedClaimable?: boolean
 	/** True after a holder swap, when a flat claim's field waits for `--from-stored`, and `flatClaimNote` says why. */
 	flatClaimsLocked?: boolean
-	flatClaimNote?: string
+	flatClaimNote?: FlatClaimNoteParts | null
 	onClose: () => void
 }
 
@@ -36,7 +38,7 @@ let {
 	unlabelled,
 	sharedClaimable = true,
 	flatClaimsLocked = false,
-	flatClaimNote = "",
+	flatClaimNote = null,
 	onClose,
 }: Props = $props()
 const title = $derived.by(() => {
@@ -52,8 +54,8 @@ const title = $derived.by(() => {
 		<p role="status" class="text-sm text-foreground">The plan changed since you opened this form, so it shows the stored profile again. Enter your change again.</p>
 	{/if}
 	{#if open}
-		{#if flatClaimsLocked && flatClaimNote !== ""}
-			<p class="text-sm text-foreground">{flatClaimNote}</p>
+		{#if flatClaimsLocked && flatClaimNote}
+			<TaxFlatClaimNote note={flatClaimNote} />
 		{/if}
 		{#key contentHash}
 			<TaxProfileForm {name} {contentHash} {profile} {group} {unlabelled} {sharedClaimable} {flatClaimsLocked} onDone={onClose} />

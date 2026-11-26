@@ -11,15 +11,19 @@ interface Props {
 	disabled: boolean
 	/** True after a holder swap, when a card of only flat claims waits for `--from-stored`. */
 	locked?: boolean
+	/** Whether the shared home-loan interest field is offered: without it, a swapped Home card has nothing to edit. */
+	sharedClaimable?: boolean
 }
 
-let { cards, onEdit, disabled, locked = false }: Props = $props()
+let { cards, onEdit, disabled, locked = false, sharedClaimable = true }: Props = $props()
 const button =
 	"rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
 
-/** A card whose every item is a flat claim: its Edit would send a bare value, which after a swap names the new holder. */
+/** A card whose Edit would send a bare value after a swap, or whose only writable field (the shared interest) is not offered. */
 function waits(card: GroupCard): boolean {
-	return locked && card.rows.every((row) => isFlatClaim(row.key))
+	if (!locked) return false
+	if (card.rows.every((row) => isFlatClaim(row.key))) return true
+	return card.key === "home" && !sharedClaimable
 }
 </script>
 
