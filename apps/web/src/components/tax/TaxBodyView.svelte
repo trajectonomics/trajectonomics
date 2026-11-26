@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { ProjectionRun } from "../../lib/contract"
-import { type PersonNames, personText } from "../../lib/view/item-names"
+import type { PersonNames } from "../../lib/view/item-names"
 import {
 	addLevyCommand,
 	assumptionLines,
@@ -11,6 +11,7 @@ import {
 	taxBodyOf,
 	taxStatusWords,
 } from "../../lib/view/tax"
+import { returnLabel } from "../../lib/view/tax-settings/return-name"
 import Badge from "../ui/Badge.svelte"
 import EmptyState from "../ui/EmptyState.svelte"
 import SegmentedControl from "../ui/SegmentedControl.svelte"
@@ -22,9 +23,10 @@ interface Props {
 	run: ProjectionRun
 	/** The household's people, so a Return is named by the role the CLI states ("You", "Your partner"), never by id. */
 	people: PersonNames
+	claimsHolder?: string | null
 }
 
-let { name, run, people }: Props = $props()
+let { name, run, people, claimsHolder = null }: Props = $props()
 /** The Filer the person chose; empty opens on the first Return, the holder's (cli ADR-0075). */
 let chosen = $state("")
 const body = $derived(taxBody(run))
@@ -33,8 +35,12 @@ const returns = $derived(returnsOf(run.taxYears))
 const separate = $derived(returns.length > 1)
 const picked = $derived(separate ? returnOf(returns, chosen) : null)
 const shown = $derived(picked === null ? body : taxBodyOf(picked.years, run.tax, run.asOf))
+const filers = $derived(returns.map((one) => one.filer))
 const options = $derived(
-	returns.map((one) => ({ value: one.filer, label: personText(people, one.filer) })),
+	returns.map((one) => ({
+		value: one.filer,
+		label: returnLabel(one.filer, people, claimsHolder, filers).text,
+	})),
 )
 const years = $derived(picked?.years ?? run.taxYears)
 /** The Carry-in records of the Return on screen, and every record of a plan with one Return. */
