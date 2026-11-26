@@ -59,7 +59,7 @@ describe("a shortened marker label", () => {
 	})
 
 	test("never leaves a lone surrogate of an emoji", () => {
-		// 73px fits the eight ASCII characters and the ellipsis, but not the emoji's 14px: the whole emoji goes.
+		// 73px fits the eight ASCII characters and the ellipsis, but not the emoji's 16px: the whole emoji goes.
 		const text = first("pay-off-🏠-loan", 177)
 		expect(text).toBe("pay-off-…")
 		expect(text).not.toMatch(

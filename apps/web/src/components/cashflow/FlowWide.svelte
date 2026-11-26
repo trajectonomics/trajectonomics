@@ -59,6 +59,7 @@ const shown = (amount: string): string =>
 			class="fill-foreground"
 		/>
 		{#each layout.nodes as node (node.key)}
+			{@const words = fittedLabel(node, shown(node.amount))}
 			<rect
 				x={node.x}
 				y={node.y}
@@ -73,9 +74,7 @@ const shown = (amount: string): string =>
 				dominant-baseline="middle"
 				aria-hidden="true"
 				class="fill-foreground"
-			>
-				{fittedLabel(node, shown(node.amount))}
-			</text>
+			><tspan data-flow-label>{words.label}</tspan><tspan data-flow-amount>{words.label === "" ? words.amount : ` ${words.amount}`}</tspan></text>
 		{/each}
 	</svg>
 </div>

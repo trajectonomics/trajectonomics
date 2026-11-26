@@ -29,6 +29,45 @@ export function stub(label: string, room: number, code: boolean): LabelText {
 	return first !== undefined && first.width <= room ? first : { text: "", width: 0 }
 }
 
+/** The estimated width of `text` in the chart's text, in pixels: the sum of its graphemes' widths. */
+export function textWidth(text: string, code: boolean): number {
+	return graphemes(text, code).reduce((sum, part) => sum + part.width, 0)
+}
+
+/** The words before a twin label's `(id)` suffix, and the suffix itself. */
+interface Twin {
+	readonly stem: string
+	readonly suffix: string
+}
+
+/** A label that ends with a twin's `(id)`, split before the suffix; null for a label without one. */
+function twinOf(label: string): Twin | null {
+	const match = /^(.*?)\s*\(([^()]*)\)$/u.exec(label)
+	if (match === null) return null
+	const stem = (match[1] ?? "").trimEnd()
+	const id = (match[2] ?? "").trim()
+	return stem === "" || id === "" ? null : { stem, suffix: `(${id})` }
+}
+
+/**
+ * The label shortened to `room` with a twin's `(id)` suffix kept in view: "Salary and rent from…(salary)".
+ * The suffix gives way only when it and the ellipsis alone cannot fit, and then the label is cut normally.
+ */
+export function fittedKeepingSuffix(label: string, room: number, code: boolean): LabelText {
+	const twin = twinOf(label)
+	if (twin === null) return fitted(label, room, code)
+	const suffixWidth = textWidth(twin.suffix, code)
+	const stem = fitted(twin.stem, room - suffixWidth, code)
+	if (stem.text === "") return fitted(label, room, code)
+	if (stem.text === twin.stem) {
+		const whole = fitted(label, room, code)
+		if (whole.text === label) return whole
+		// A whole stem can still lose the space before its suffix, so glue the suffix on rather than cut it.
+		return { text: `${twin.stem}${twin.suffix}`, width: stem.width + suffixWidth }
+	}
+	return { text: `${stem.text}${twin.suffix}`, width: stem.width + suffixWidth }
+}
+
 /** The longest prefix of whole graphemes that fits `room` beside the ellipsis. */
 function prefix(parts: readonly Grapheme[], room: number, ellipsis: number): LabelText {
 	let width = 0

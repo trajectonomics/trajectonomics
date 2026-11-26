@@ -42,10 +42,10 @@ const shown = (amount: string): string =>
 				onkeydown={(event) => keyed(event, () => onPick(row.key))}
 				class="group cursor-pointer outline-none hover:opacity-85"
 			>
-				<text x={row.labelX} y={row.labelY} dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
+				<text data-flow-label x={row.labelX} y={row.labelY} dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
 					{stackName(row.label, shown(row.amount))}
 				</text>
-				<text x={row.amountX} y={row.labelY} text-anchor="end" dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
+				<text data-flow-amount x={row.amountX} y={row.labelY} text-anchor="end" dominant-baseline="middle" aria-hidden="true" class="fill-foreground">
 					{shown(row.amount)}
 				</text>
 				<rect

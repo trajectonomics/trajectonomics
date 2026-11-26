@@ -5,9 +5,9 @@ const BROAD_PX = 10
 /** The width of a wide Thai consonant, in either font, in pixels. */
 const THAI_BROAD_PX = 11
 /** The width of the widest characters: East Asian, or a sans-serif `m`, `M`, `W`, `@`, `%` or dash. */
-const WIDEST_PX = 12
-/** The width of one emoji in the chart's small text, in pixels. */
-const EMOJI_PX = 14
+const WIDEST_PX = 13
+/** The width of one emoji in the chart's small text, in pixels: a glyph that is wider than a letter. */
+const EMOJI_PX = 16
 
 /** The graphemes of a label in Thai segmentation: a combining mark stays with its base, a pair never splits. */
 const GRAPHEMES = new Intl.Segmenter("th", { granularity: "grapheme" })
@@ -17,9 +17,11 @@ const LEADING_VOWELS = /^[เ-ไ]+$/
 
 /** A character that draws with no width of its own: a Thai tone mark, a variation selector, a joiner. */
 const ZERO_WIDTH = /^[\p{Mn}\p{Me}\p{Cf}]$/u
-/** A grapheme that holds a pictograph, such as an emoji: one glyph, wider than a letter. */
-const PICTURE = /\p{Extended_Pictographic}/u
-const EAST_ASIAN = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]$/u
+/** A grapheme that holds a pictograph, such as an emoji or a flag: one glyph, wider than a letter. */
+const PICTURE = /[\p{Extended_Pictographic}\p{Regional_Indicator}]/u
+/** East Asian scripts, and the CJK punctuation and full-width forms drawn at a full em beside them. */
+const EAST_ASIAN =
+	/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303F\uFF01-\uFF60\uFFE0-\uFFE6]$/u
 const THAI_BROAD = /^[ญฌฒณ]$/
 /** Sans-serif characters wider than {@link CHAR_PX}. A monospace font draws them as wide as the others. */
 const WIDEST = /^[mMW@%—]$/
@@ -47,11 +49,19 @@ function clusters(label: string): string[] {
 	return found
 }
 
-/** The width of one grapheme: a combined emoji one glyph, a Thai base with its marks one character. */
+/**
+ * The width of one grapheme: a Thai base with its marks one character, and a joined emoji every pictograph
+ * it is built from. A font without the joined glyph draws each emoji on its own, so none may go uncounted.
+ */
 function graphemeWidth(grapheme: string, code: boolean): number {
-	if (PICTURE.test(grapheme)) return code ? CHAR_PX * 2 : EMOJI_PX
 	let width = 0
-	for (const character of grapheme) width += characterWidth(character, code)
+	for (const character of grapheme) {
+		width += PICTURE.test(character)
+			? code
+				? CHAR_PX * 2
+				: EMOJI_PX
+			: characterWidth(character, code)
+	}
 	return width
 }
 

@@ -1,5 +1,6 @@
 import { columnTotal, round, sized } from "./flow-geometry"
 import type { FlowInput, FlowKind } from "./flow-types"
+import { fittedKeepingSuffix, textWidth } from "./label-width"
 
 /**
  * The flow diagram of one year, for a phone: the sources above and the uses below, two lists of bars on
@@ -34,8 +35,6 @@ export const STACK_ROW_GAP = 10
 export const STACK_HEADING_HEIGHT = 2 * STACK_LABEL_HALF + 6
 /** The gap between the sources' list and the uses' list. */
 export const STACK_SECTION_GAP = 14
-/** A generous width for one character of 12-unit text: wide enough for digits and capitals. */
-export const STACK_CHAR_WIDTH = 7.5
 /** The gap between a row's name and its amount. */
 const NAME_GAP = 8
 
@@ -119,12 +118,12 @@ export function layoutStack(input: FlowInput): StackLayout {
 
 /**
  * A row's name as it is drawn: the name shortened with an ellipsis so that it and the amount fit the line.
- * The amount is as the page shows it and is never shortened: the name gives way first. The full name stays in
- * the band's label and the table, so nothing is lost to a screen reader.
+ * The amount is as the page shows it and is never shortened: the name gives way first, cut between
+ * graphemes and measured at a conservative width, so it never covers the amount or leaves the line. A
+ * twin's `(id)` suffix stays in view. The full name stays in the band's label and the table, so nothing is
+ * lost to a screen reader.
  */
 export function stackName(label: string, shownAmount: string): string {
-	const room = STACK_WIDTH - 2 * STACK_MARGIN - NAME_GAP - shownAmount.length * STACK_CHAR_WIDTH
-	const fits = Math.floor(room / STACK_CHAR_WIDTH)
-	if (label.length <= fits) return label
-	return fits <= 1 ? "…" : `${label.slice(0, fits - 1).trimEnd()}…`
+	const room = STACK_WIDTH - 2 * STACK_MARGIN - NAME_GAP - textWidth(shownAmount, false)
+	return fittedKeepingSuffix(label, room, false).text
 }
