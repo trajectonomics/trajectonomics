@@ -1,7 +1,7 @@
 import { TaxValidationError, validateIntegerMinorUnits } from "../../core/money"
 import { ThAllowanceField } from "../types"
 import { toSatang } from "../units"
-import { validateThFilers } from "./filers"
+import { ThLevyFilerField, validateThFilers } from "./filers"
 import type { ThLevyProfile, ThLevySharedMortgage } from "./profile-types"
 
 /**
@@ -33,9 +33,10 @@ export interface ThSharedMortgageSatang {
  * Math: Converts `own`, `total` and the claim to satang, requires `own + total` to be a safe
  * integer, and requires `claim <= own + total`.
  * Units: THB major units in, integer satang out.
- * Throws: TaxValidationError at {@link ThAllowanceField.MortgageInterest} for a status or Filer
- * count other than one `married_separate` Filer, an `other` equal to that Filer, an invalid
- * `other` id, a negative or unsafe amount, or a claim above `own + total`.
+ * Throws: TaxValidationError at {@link ThAllowanceField.MortgageInterest} for a status other than
+ * `married_separate`, at {@link ThLevyFilerField} for a Filer list that is not one Filer, and at
+ * the mortgage field for an `other` equal to that Filer, an invalid `other` id, a negative or
+ * unsafe amount, or a claim above `own + total`.
  *
  * @param profile The Return's profile.
  * @param shared The shared loan's other Filer, this Return's own interest and the whole interest.
@@ -46,16 +47,16 @@ export function validateSharedMortgage(
 	shared: ThLevySharedMortgage,
 ): ThSharedMortgageSatang {
 	const field = ThAllowanceField.MortgageInterest
-	const filers = profile.filers
-	if (profile.filingStatus !== "married_separate" || filers?.length !== 1) {
+	if (profile.filingStatus !== "married_separate") {
 		throw new TaxValidationError(
 			field,
 			profile.filingStatus,
-			"A shared home loan needs one Return filed married_separate",
+			"A shared home loan needs a Return filed married_separate",
 		)
 	}
+	const [filer] = validateThFilers(profile.filers ?? [], "married_separate")
 	validateThFilers([shared.other], "married_separate")
-	if (shared.other === filers[0]) {
+	if (shared.other === filer) {
 		throw new TaxValidationError(
 			field,
 			shared.other,

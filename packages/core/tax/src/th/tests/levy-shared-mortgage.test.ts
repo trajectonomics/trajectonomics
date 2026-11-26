@@ -31,6 +31,15 @@ function fieldOf(run: () => unknown): string | undefined {
 	return undefined
 }
 
+function errorOf(run: () => unknown): { field?: string; value?: unknown } {
+	try {
+		run()
+	} catch (error) {
+		return error instanceof TaxValidationError ? { field: error.field, value: error.value } : {}
+	}
+	return {}
+}
+
 /** A separate Return of the holder, claiming 30,000 of a 60,000 loan when both earn. */
 function holder(own: number): ThLevyProfile {
 	return {
@@ -123,19 +132,26 @@ describe("a shared loan must fit its Return", () => {
 	const loan = { other: "partner", own: 0, total: 60_000 }
 	const refused = (profile: ThLevyProfile) => fieldOf(() => emitThLevy(profile))
 
-	it("refuses a status or Filer count that is not one separate Return", () => {
+	it("refuses a status that is not a separate Return at the mortgage field", () => {
 		expect(refused({ filingStatus: "single", sharedMortgage: loan })).toBe(field)
 		expect(
 			refused({ filingStatus: "married_joint", filers: ["me", "partner"], sharedMortgage: loan }),
 		).toBe(field)
-		expect(refused({ filingStatus: "married_separate", sharedMortgage: loan })).toBe(field)
-		expect(
-			refused({
+	})
+
+	it("refuses a Filer list that is not one Filer, naming the list", () => {
+		const empty = errorOf(() =>
+			emitThLevy({ filingStatus: "married_separate", sharedMortgage: loan }),
+		)
+		expect(empty).toEqual({ field: ThLevyFilerField.Empty, value: [] })
+		const two = errorOf(() =>
+			emitThLevy({
 				filingStatus: "married_separate",
 				filers: ["me", "partner"],
 				sharedMortgage: loan,
 			}),
-		).toBe(field)
+		)
+		expect(two).toEqual({ field: ThLevyFilerField.Count, value: 2 })
 	})
 
 	it("refuses the other Filer naming this Return's own Filer", () => {

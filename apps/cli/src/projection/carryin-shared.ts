@@ -5,7 +5,8 @@ import type { JsonRecord } from "../scenario/tax/json"
 import { type CarryInClass, classesOf, keyOf, type StatedTally } from "./carryin-classes"
 import type { CarryInEntry } from "./carryin-entry"
 import type { ResolvedLevy } from "./carryin-resolve"
-import { type FillWhere, refusedDifferent, refusedNoRecord } from "./carryin-shared-refuse"
+import { filledShared, filledTally, sourceAmount, sourceEntryOf } from "./carryin-shared-fill"
+import type { FillWhere } from "./carryin-shared-refuse"
 
 /**
  * The other Filer whose income a separate Levy reads, or undefined when it shares no loan. The
@@ -33,37 +34,43 @@ function otherClasses(classes: readonly CarryInClass[], other: string): CarryInC
 	return classes.filter((it) => it.basis === "gross" && it.label.endsWith(suffix))
 }
 
-/** The other record's amount for a class, zero when it has no record and owes none, else undefined. */
-function sourceAmount(
-	source: ResolvedLevy | undefined,
-	periodStart: string,
-	key: string,
-): number | undefined {
-	const item = source?.items.find((it) => it.entry.periodStart === periodStart)
-	if (item !== undefined) return item.entry.tallies.find((it) => keyOf(it) === key)?.amount
-	const needed = source?.needed
-	if (needed === null || needed === undefined) return undefined
-	if (periodStart === needed.current && needed.starts.includes(needed.current)) return undefined
-	return 0
+/** The shared income classes both records of a shared-loan pair state, which the fill reconciles. */
+export function sharedClasses(classes: readonly CarryInClass[]): CarryInClass[] {
+	const suffix = `@${TH_LEVY_SHARED_FILER}`
+	return classes.filter((it) => it.basis === "gross" && it.label.endsWith(suffix))
 }
 
-/** One other-Filer class: the other record's amount, or the refusal that says why there is none. */
-function filledTally(input: {
+/** One tally of a shared-loan record: the other Filer's income, the shared income, or untouched. */
+function filledOf(input: {
+	entry: CarryInEntry
 	tally: StatedTally
-	stated: boolean
-	from: number | undefined
+	key: string
+	others: ReadonlySet<string>
+	shared: ReadonlySet<string>
+	source: CarryInEntry | undefined
+	sourceLevy: ResolvedLevy | undefined
 	where: FillWhere
 }): StatedTally | AppError {
-	if (input.from === undefined) {
-		return input.stated ? input.tally : refusedNoRecord(input.where, input.tally)
+	const from = sourceAmount(input.sourceLevy, input.entry.periodStart, input.key)
+	if (input.shared.has(input.key)) {
+		return filledShared({
+			entry: input.entry,
+			source: input.source,
+			tally: input.tally,
+			from,
+			where: input.where,
+		})
 	}
-	if (input.stated && input.tally.amount !== input.from) {
-		return refusedDifferent(input.where, input.tally, input.from)
-	}
-	return { ...input.tally, amount: input.from }
+	if (!input.others.has(input.key)) return input.tally
+	return filledTally({
+		tally: input.tally,
+		stated: input.entry.stated.has(input.key),
+		from,
+		where: input.where,
+	})
 }
 
-/** One record with the other Filer's income read from that Return's record, or the refusal. */
+/** One record with the other Filer's income and the shared income read from the other record. */
 export function fillOne(input: {
 	entry: CarryInEntry
 	other: string
@@ -71,19 +78,20 @@ export function fillOne(input: {
 	source: ResolvedLevy | undefined
 	where: FillWhere
 }): CarryInEntry | AppError {
-	const keys = new Set(otherClasses(input.classes, input.other).map(keyOf))
-	if (keys.size === 0) return input.entry
+	const others = new Set(otherClasses(input.classes, input.other).map(keyOf))
+	const shared = new Set(sharedClasses(input.classes).map(keyOf))
+	if (others.size === 0 && shared.size === 0) return input.entry
+	const source = sourceEntryOf(input.source, input.entry.periodStart)
 	const tallies: StatedTally[] = []
 	for (const tally of input.entry.tallies) {
-		const key = keyOf(tally)
-		if (!keys.has(key)) {
-			tallies.push(tally)
-			continue
-		}
-		const filled = filledTally({
+		const filled = filledOf({
+			entry: input.entry,
 			tally,
-			stated: input.entry.stated.has(key),
-			from: sourceAmount(input.source, input.entry.periodStart, key),
+			key: keyOf(tally),
+			others,
+			shared,
+			source,
+			sourceLevy: input.source,
 			where: input.where,
 		})
 		if (isAppError(filled)) return filled

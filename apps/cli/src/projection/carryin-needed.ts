@@ -62,6 +62,7 @@ export function completed(input: {
 				periodStart: start,
 				tallies: [],
 				stated: new Set(),
+				rested: new Set(),
 				prepaid: 0,
 				source: "scope",
 			},

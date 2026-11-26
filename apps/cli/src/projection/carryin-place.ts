@@ -72,14 +72,16 @@ export function placeCarryIn(input: PlaceInput): PlacedCarryIn | AppError {
 	const levies = leviesOf(input.document)
 	const selected = selectedOf(input, levies)
 	if (isAppError(selected)) return selected
-	const resolved: ResolvedLevy[] = []
+	const completed: ResolvedLevy[] = []
 	for (const levy of levies) {
 		const one = resolvedOf(levy, input, selected)
 		if (isAppError(one)) return one
-		resolved.push(one)
+		const done = completedOf(one)
+		if (isAppError(done)) return done
+		completed.push(done)
 	}
 	const filled = fillSharedLevies({
-		levies: resolved,
+		levies: completed,
 		path: input.scenario.path,
 		currency: input.currency,
 	})
@@ -87,9 +89,7 @@ export function placeCarryIn(input: PlaceInput): PlacedCarryIn | AppError {
 	const placements: JsonRecord[] = []
 	const carryIn: CarryInEcho[] = []
 	for (const filledOne of filled) {
-		const done = completedOf(filledOne)
-		if (isAppError(done)) return done
-		const placed = placedOf(done, input.currency)
+		const placed = placedOf(filledOne, input.currency)
 		placements.push(placed.levy)
 		carryIn.push(...placed.carryIn)
 	}
