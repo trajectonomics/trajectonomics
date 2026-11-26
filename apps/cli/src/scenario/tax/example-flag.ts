@@ -23,10 +23,10 @@ function held(set: ReturnClaims, field: Field): boolean {
 
 /**
  * One example flag that states a claim some of these sets holds, naming `person`: the first field
- * held, with `<n>` for a count and `<amount>` for an amount. `--children` stands for a set that
- * holds nothing, so the form is still one the CLI accepts.
+ * held, with `<n>` for a count and `<amount>` for an amount; `undefined` when they hold nothing.
  */
-export function exampleFlagOf(sets: readonly ReturnClaims[], person: string): string {
-	const field = FIELDS.find((name) => sets.some((set) => held(set, name))) ?? "children"
+export function exampleFlagOf(sets: readonly ReturnClaims[], person: string): string | undefined {
+	const field = FIELDS.find((name) => sets.some((set) => held(set, name)))
+	if (field === undefined) return undefined
 	return `${flagOf(field)} ${person}=${COUNTS.has(field) ? "<n>" : "<amount>"}`
 }

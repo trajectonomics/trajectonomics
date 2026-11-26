@@ -290,12 +290,15 @@ the Return used the home-loan ceiling.
   there the hint would invite a claim the caller's filing cannot make. Where it prints, the hint is
   conditional ("If this Return does not claim them yet"), so it stays true after it has been followed,
   and it says that stating them bare replaces the stored flat claims, which a later separate filing
-  reads as the holder's own, so the holder's own claims must be stated again when switching back. The
-  caveat names the household holder's id and a person-keyed example flag for a claim the kept set
-  holds (`so state "me"'s own claims again when switching back, for example --parents me=<n> --merge`);
-  a plan with no holder keeps the older words without either. A later separate write that states more
-  than a Return may claim, such as three parents, is refused; within the cap nothing refuses it, so the
-  holder's claims must be restated as above. (#644)
+  reads as the claims holder's own, so that person's claims must be stated again when switching back.
+  The caveat names the person whose flat claims they are (`claimsHolder`, else the household holder)
+  and gives the switch-back command in full, with a person-keyed example flag for a claim the kept
+  set holds (`so state "me"'s own claims again when switching back, for example --filing-status
+  married_separate --parents me=<n> --merge`). It does that only when this write has a Return for
+  that person, because a person-qualified value needs a separate filing and a Return to carry it;
+  otherwise it keeps the older words without a name or example. A later separate write that states
+  more than a Return may claim, such as three parents, is refused; within the cap nothing refuses
+  it, so the claims holder's claims must be restated as above. (#644)
 - **A separate write with Filers** says, for each person still in the household who has no Return and
   whose stored claims are not all zero: `"<person>" has no taxed income in this plan, so no Return
   claims their stored claims.` This covers an earlier partner still in the household, and also the
@@ -304,8 +307,10 @@ the Return used the home-loan ceiling.
 - **A departed id** is named in `unclaimed` by every write, whatever the filing status: the stored set
   is on no Return. No sentence says it is kept for a separate filing, because a separate Return counts
   it no more than a joint one does. The sentence says a `--tax` write drops the set, so it stays right
-  after the claims are stated again under a person in the household. A write with Filers also shows how
-  to restate them, with `"<person>=<value>"` flags such as `--life-insurance alice=<amount>`, or with
-  `--tax`; a write without Filers names only `--tax`, because it refuses a person-qualified value.
+  after the claims are stated again under a person in the household. A separate write with Filers also
+  shows how to restate them, with `"<person>=<value>"` flags such as `--life-insurance
+  <person>=<amount> --merge`, or with `--tax`. The example uses a literal `<person>` placeholder,
+  because the old id may have become any person in the household, and `--merge` keeps the separate
+  filing. Any other filing status shows no example, because it refuses a person-qualified value.
   (#644)
 - The stored profile, the Levies and the money are unchanged.

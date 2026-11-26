@@ -25,18 +25,19 @@ export function departedClaimants(kept: TaxRequest, household: string | null): s
 /**
  * The sentence for one such id. No Return of any filing status counts the stored set, so it does not
  * say the set waits for a separate filing. A set whose claims were stated again under a person in
- * the household stays behind, so the sentence names the one write that drops it. A write with Filers
- * shows the person-keyed flag that restates the claims, which a write without one refuses.
+ * the household stays behind, so the sentence names the one write that drops it. A separate write
+ * with Filers shows the person-keyed flag that restates the claims, under a `<person>` placeholder:
+ * the old id may have become any person in the household, and any other status refuses the flag.
  */
 export function departedClaims(
 	id: string,
 	claims: ReturnClaims | undefined,
-	holder: string | undefined,
-	hasFilers: boolean,
+	separate: boolean,
 ): string {
+	const example = separate && claims !== undefined ? exampleFlagOf([claims], "<person>") : undefined
 	const how =
-		hasFilers && holder !== undefined && claims !== undefined
-			? `, for example with "<person>=<value>" flags such as ${exampleFlagOf([claims], holder)}, or with --tax`
-			: ""
+		example === undefined
+			? ""
+			: `, for example with "<person>=<value>" flags such as ${example} --merge, or with --tax`
 	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person in the household${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }

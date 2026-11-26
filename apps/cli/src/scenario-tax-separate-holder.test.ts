@@ -134,3 +134,29 @@ describe("whose claims a stored profile records", () => {
 		expect((await profileOf(home)).claimsHolder).toBe("partner")
 	})
 })
+
+describe("the switch-back caveat when the roles swap before a joint Return", () => {
+	it("names the recorded claims holder and prints a command that restores the tax", async () => {
+		const home = await couple(TWO_SALARIES, MARRIED)
+		const first = await taxCouple(home, "married_separate", LABELS, ["--parents", "partner=2"])
+		expect(first.code, first.err).toBe(0)
+		expect(await owed(home)).toEqual({ me: "83000.00", partner: "6500.00" })
+		expect((await setHousehold(home, SWAPPED)).code).toBe(0)
+		const joint = await tax(home, "--merge", "--filing-status", "married_joint")
+		expect(joint.code, joint.err).toBe(0)
+		const [sentence] = resultOf(joint).unclaimed as string[]
+		// The bare claims are "me"'s, who is the partner now, not the household's holder.
+		expect(sentence).toContain('so state "me"\'s own claims again when switching back')
+		expect(sentence).not.toContain('"partner"\'s own claims')
+		const example = "--parents me=<n>"
+		expect(sentence).toContain(`for example --filing-status married_separate ${example} --merge.`)
+		const back = [
+			"--filing-status",
+			"married_separate",
+			...example.replace("<n>", "0").split(" "),
+			"--merge",
+		]
+		expect((await tax(home, ...back)).code).toBe(0)
+		expect(await owed(home)).toEqual({ me: "83000.00", partner: "6500.00" })
+	})
+})
