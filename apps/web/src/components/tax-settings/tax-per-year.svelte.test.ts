@@ -133,6 +133,20 @@ describe("the per-year Return column names a person as the claims table does", (
 		expect(rows).not.toContain("data-unnamed")
 	})
 
+	test("as another person and its id when two departed Returns would read alike", () => {
+		const both: HouseholdDocument = {
+			...RENAMED,
+			people: [
+				{ id: "ann", role: "holder", born: "1990-06", lifeExpectancy: 90 },
+				{ id: "bob", role: "partner", born: "1992-02", lifeExpectancy: 88 },
+			],
+		}
+		const people = personNames(both)
+		const apart = ["Another person (me)", "Another person (partner)"]
+		expect(perYearReturns(perYear(people, null))).toEqual(apart)
+		expect(claimColumns(claims(both, people, null))).toEqual(apart)
+	})
+
 	test("by its id, in code, with no household at all", () => {
 		const people = personNames(null)
 		const rows = perYear(people, "me")

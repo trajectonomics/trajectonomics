@@ -1,7 +1,8 @@
 /**
  * The words a tax table gives one Return's Filer. Both the per-year table and the claims table read it, so the same
  * person reads the same way in each: the household's words for a person it names, "The earlier holder" for the
- * recorded `claimsHolder` it no longer names, "Another person" for any other id it no longer names, and the id, in
+ * recorded `claimsHolder` it no longer names, "Another person" for any other id it no longer names ("Another person
+ * (<id>)" when two would read alike, as twins do), and the id, in
  * code, when there is no household at all (web ADR 0029). Pure.
  */
 import type { ItemLabel, PersonNames } from "../item-names"

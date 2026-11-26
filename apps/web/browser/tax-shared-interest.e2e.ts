@@ -72,5 +72,6 @@ test("a save from a locked drawer keeps the stored home-loan interest", async ({
 		.filter({ has: page.getByRole("rowheader", { name: "Home-loan interest", exact: true }) })
 	const headers = await claims.locator("thead th").allInnerTexts()
 	const column = headers.findIndex((text) => text.trim() === "Your partner")
+	expect(column, "the claims table names the earlier holder's column").toBeGreaterThan(0)
 	await expect(home.locator("td").nth(column - 1)).toContainText(`${LOCKED.homeLoan} THB`)
 })
