@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test"
 import { buildCatalogue } from "./catalogue"
 import { planNames, withExpenseFlows } from "./flow-fixtures.test-support"
-import { cashflowFigures, seriesLabelId } from "./resolve-flows"
+import { cashflowFigures } from "./resolve-flows"
+import { seriesLabelId } from "./series-names"
 
 /** The visible names of the picker's entries, in order. */
 function pickerNames(groups: ReturnType<typeof buildCatalogue>): string[] {

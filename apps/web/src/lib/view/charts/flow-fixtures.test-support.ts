@@ -2,23 +2,54 @@ import { type ProjectionRun, scenarioDocument } from "../../contract"
 import { type ItemNames, itemNames } from "../item-names"
 import { ANNUAL_ROWS, projectionRunFixture } from "../projection/fixtures.test-support"
 
-/** A run whose cash flow has one expense line per Flow id, each in the first year, so a chart can name them. */
-export function withExpenseFlows(flowIds: readonly string[]): ProjectionRun {
+/** One cash-flow line of a fixture, in the first year, so a chart can name it. */
+interface FixtureLine {
+	readonly group: "expense" | "category"
+	readonly id: string | null
+	readonly category?: string | null
+}
+
+/** A run whose cash flow has the lines given, each in the first year, so a chart can name them. */
+export function withCashLines(lines: readonly FixtureLine[]): ProjectionRun {
 	return projectionRunFixture({
 		tables: [
 			{ name: "annual", count: ANNUAL_ROWS.length, rows: [...ANNUAL_ROWS] },
 			{
 				name: "cashflow",
-				count: flowIds.length,
-				rows: flowIds.map((id) => ({
+				count: lines.length,
+				rows: lines.map((line) => ({
 					index: 0,
 					from: "2026-10-31",
 					to: "2027-10-30",
-					group: "expense" as const,
-					id,
+					group: line.group,
+					id: line.id,
 					account: null,
-					category: null,
+					category: line.category ?? null,
 					amount: "100.00",
+				})),
+			},
+		],
+	})
+}
+
+/** A run whose cash flow has one expense line per Flow id, each in the first year, so a chart can name them. */
+export function withExpenseFlows(flowIds: readonly string[]): ProjectionRun {
+	return withCashLines(flowIds.map((id) => ({ group: "expense" as const, id })))
+}
+
+/** A run with each of the given Account ids valued once, so a chart can name them. */
+export function withAccountValues(accounts: readonly string[]): ProjectionRun {
+	return projectionRunFixture({
+		tables: [
+			{ name: "annual", count: ANNUAL_ROWS.length, rows: [...ANNUAL_ROWS] },
+			{
+				name: "balances",
+				count: accounts.length,
+				rows: accounts.map((account) => ({
+					date: "2027-10-30",
+					account,
+					amount: "500000.00",
+					real: "480000.00",
 				})),
 			},
 		],

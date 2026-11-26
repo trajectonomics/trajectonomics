@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { type ProjectionRun, type Snapshot, snapshot } from "../src/lib/contract"
-import { seriesById } from "../src/lib/view/charts/catalogue"
+import { seriesById } from "../src/lib/view/charts/resolve"
 import { parseCharts, serializeCharts } from "../src/lib/view/charts/stored"
 import { type ChartDef, MAX_SERIES } from "../src/lib/view/charts/types"
 import { chartView } from "../src/lib/view/charts/view"
