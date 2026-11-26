@@ -41,28 +41,20 @@ describe("the planner pages while a What-if session is open", () => {
 	})
 
 	test("an overridden amount shows the session's value, with the baseline's struck through and named", () => {
-		whatIfSession.tryItem(
-			"base",
-			HASH,
-			"flows",
-			"rent",
-			{ amount: "14000.00" },
-			{ amount: "9000.00" },
-		)
+		whatIfSession.tryFlow("base", HASH, {
+			stored: { id: "rent", amount: "14000.00" },
+			edited: { id: "rent", amount: "9000.00" },
+		})
 		const body = list("expense")
 		expect(body).toContain("9,000.00")
 		expect(body).toMatch(/<s [^>]*>.*Baseline:.*14,000\.00/s)
 	})
 
 	test("a changed growth shows the baseline's text struck through beside the session's", () => {
-		whatIfSession.tryItem(
-			"base",
-			HASH,
-			"flows",
-			"rent",
-			{ growth: { bps: 300 } },
-			{ growth: { bps: 500 } },
-		)
+		whatIfSession.tryFlow("base", HASH, {
+			stored: { id: "rent", growth: { bps: 300 } },
+			edited: { id: "rent", growth: { bps: 500 } },
+		})
 		const body = list("expense")
 		expect(body).toContain("5.00% a year")
 		expect(body).toMatch(/<s [^>]*>.*3\.00% a year/s)
@@ -76,7 +68,10 @@ describe("the planner pages while a What-if session is open", () => {
 	})
 
 	test("an Account's changed rate is struck through, and a switched-off Account is dimmed", () => {
-		whatIfSession.tryItem("base", HASH, "accounts", "bank", { rate: 100 }, { rate: 250 })
+		whatIfSession.tryAccount("base", HASH, {
+			stored: { id: "bank", rate: 100 },
+			edited: { id: "bank", rate: 250 },
+		})
 		whatIfSession.setOff("base", HASH, "accounts.loan", true)
 		const body = list("assets")
 		expect(body).toContain("2.50%")
@@ -103,16 +98,10 @@ describe("an Account card while a What-if changes its payout", () => {
 		const snapshot: Snapshot = structuredClone(DEMO)
 		snapshot.reads.documents["base"] = documentRead(doc)
 		replaceSnapshot(snapshot)
-		whatIfSession.tryItem(
-			"base",
-			HASH,
-			"accounts",
-			"bank",
-			{ payout },
-			{
-				payout: { ...payout, bps: "5.00" },
-			},
-		)
+		whatIfSession.tryAccount("base", HASH, {
+			stored: { id: "bank", payout },
+			edited: { id: "bank", payout: { ...payout, bps: "5.00" } },
+		})
 		const body = render(PlanItemsList, {
 			props: {
 				kind: "assets",

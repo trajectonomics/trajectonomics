@@ -29,7 +29,7 @@ let { scenario, terms }: Props = $props()
 				{plan}
 				{terms}
 				lens={whatIfSession.lensFor(plan)}
-				changes={whatIfSession.changesFor(plan)}
+				changes={whatIfSession.sentChangesFor(plan)}
 			/>
 		{/if}
 	{/snippet}

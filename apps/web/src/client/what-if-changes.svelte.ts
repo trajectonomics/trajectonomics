@@ -1,18 +1,13 @@
 import type { Addition } from "../lib/what-if/additions"
-import type { Json } from "../lib/what-if/overrides"
 import {
 	type Change,
-	clearedFields,
 	hasChanges,
 	isOff,
-	itemSets,
 	startWhatIf,
 	switchedOff,
 	switchedOn,
 	type WhatIf,
 	withAddition,
-	withoutItemChanges,
-	withSet,
 } from "../lib/what-if/session"
 import { withoutChange } from "../lib/what-if/session-without"
 import { type TriedFlow, withTriedFlow, withTriedItem } from "../lib/what-if/try-flow"
@@ -29,33 +24,15 @@ export class WhatIfChanges extends WhatIfState {
 	}
 
 	/**
-	 * Switches an item off or back on, by its path (`flows.gym`, `accounts.cash`). A session belongs to one plan:
-	 * a change to another plan while this one holds changes is refused and asks first, and so is any change
-	 * while Apply or Save runs. True when it was made.
+	 * Switches an item off or back on, by its path (`flows.gym`, `accounts.cash`). A salary and its employer share
+	 * switch as one group, through `setGroupOff`. A switch back on drops only this item's Removal, so a share cleared in
+	 * a try stays clear. A session belongs to one plan: a change to another plan while this one holds changes is refused
+	 * and asks first, and so is any change while Apply or Save runs. True when it was made.
 	 */
 	setOff(plan: string, contentHash: string, path: string, off: boolean): boolean {
 		const base = this.saving ? null : this.sessionFor(plan, contentHash)
 		if (base !== null) this.keep(off ? switchedOff(base, path) : switchedOn(base, path))
 		return base !== null
-	}
-
-	/** Makes the Sets of the edited item's changed fields, replacing an earlier try: the drawer's "Try a value". Returns the fields it cleared. */
-	tryItem(
-		plan: string,
-		contentHash: string,
-		list: string,
-		id: string,
-		stored: Record<string, Json>,
-		edited: Record<string, Json>,
-	): string[] {
-		const base = this.saving ? null : this.sessionFor(plan, contentHash)
-		if (base === null) return []
-		if (itemSets(list, id, stored, edited).length === 0 && isOff(base, `${list}.${id}`))
-			return clearedFields(stored, edited)
-		let next = withoutItemChanges(base, list, id)
-		for (const set of itemSets(list, id, stored, edited)) next = withSet(next, set.path, set.value)
-		this.keep(next)
-		return clearedFields(stored, edited)
 	}
 
 	/** Puts a change in the session unless Apply or Save runs or another plan's changes must be settled first. True when it was made. */

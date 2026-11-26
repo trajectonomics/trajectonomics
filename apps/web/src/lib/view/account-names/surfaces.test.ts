@@ -76,6 +76,23 @@ describe("the What-if bar names an Account by its ledger name", () => {
 		expect(labelWithNames(flow, ITEMS)).toBe("School fees switched off")
 	})
 
+	test("a salary group names its Flow in place of the id", () => {
+		const group: Change = {
+			kind: "group",
+			path: "salary:rent",
+			label: "Rent and its employer share switched off",
+			parts: [],
+		}
+		const unnamed: Change = {
+			kind: "group",
+			path: "salary:gym",
+			label: "Gym and its employer share switched off",
+			parts: [],
+		}
+		expect(labelWithNames(group, ITEMS)).toBe("School fees and its employer share switched off")
+		expect(labelWithNames(unnamed, ITEMS)).toBe("gym and its employer share switched off")
+	})
+
 	test("a Milestone the document labels shows its label in the bar", () => {
 		const milestone: Change = {
 			kind: "set",

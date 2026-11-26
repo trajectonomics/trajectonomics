@@ -41,8 +41,11 @@ describe("a change made while Apply or Save runs", () => {
 			expect(whatIfSession.saving).toBe(true)
 			expect(whatIfSession.setOff("base", HASH, "flows.living", true)).toBe(false)
 			expect(
-				whatIfSession.tryItem("base", HASH, "flows", "gym", { amount: "1" }, { amount: "2" }),
-			).toEqual([])
+				whatIfSession.tryFlow("base", HASH, {
+					stored: { id: "gym", amount: "1" },
+					edited: { id: "gym", amount: "2" },
+				}),
+			).toBe(false)
 			// The refused Try a value adds no Set: the session still holds only the change sent.
 			expect(whatIfSession.whatIf?.sets ?? []).toEqual([])
 			expect(whatIfSession.changes).toHaveLength(1)

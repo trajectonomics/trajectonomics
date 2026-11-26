@@ -6,9 +6,11 @@
  */
 import type { ScenarioCashflow, ScenarioDocument, ScenarioFlow } from "../contract"
 import { LISTS, type ListName } from "../view/routing/entries"
+import { additionPath } from "./additions"
 import type { Json } from "./json"
 import { lensDocument } from "./lens-document"
 import { type WhatIf, withSet } from "./session"
+import { isHeld } from "./session-overrides"
 
 /** The session with one routing list tried whole, replacing any earlier try of that list. */
 export function withTriedList(whatIf: WhatIf, list: ListName, items: readonly unknown[]): WhatIf {
@@ -44,7 +46,9 @@ export function shownPlan(doc: ScenarioDocument, whatIf: WhatIf | null): Scenari
 		sets: whatIf.sets,
 		removals: whatIf.removals,
 	})
-	const added = whatIf.additions.filter((one) => one.list === "flows").map((one) => one.item)
+	const added = whatIf.additions
+		.filter((one) => one.list === "flows" && !isHeld(whatIf, additionPath(one)))
+		.map((one) => one.item)
 	const cashflow = cashflowOf(doc, whatIf)
 	const flows = [...base.flows, ...(added as unknown as ScenarioFlow[])]
 	return { ...base, flows, ...(cashflow === undefined ? {} : { cashflow }) }

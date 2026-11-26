@@ -175,7 +175,8 @@ describe("the cards", () => {
 	test("a salary says what its employer adds, and the employer's Flow is no card of its own", () => {
 		const body = list("income")
 		expect(body).toContain("Employer adds 5% to provident-fund")
-		expect(body).not.toContain("salary-employer")
+		// Its path rides on the salary's switch, but it names no card of its own.
+		expect(body).not.toContain('data-item="salary-employer"')
 	})
 
 	test("an account says what it pays out and what it is charged", () => {

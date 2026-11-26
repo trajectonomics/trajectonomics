@@ -9,6 +9,7 @@ import {
 	startWhatIf,
 	switchedOff,
 	switchedOn,
+	withAddition,
 	withoutSet,
 	withSet,
 } from "./session"
@@ -39,6 +40,35 @@ describe("the What-if session", () => {
 			{ path: "flows.salary.amount", value: "95000.00" },
 			{ path: "flows.gym.amount", value: "120.00" },
 		])
+	})
+
+	test("switching off an item the session adds takes it out of the session, Sets and all, with no Removal", () => {
+		let session = withSet(startWhatIf("base", HASH), "flows.gym.amount", "1")
+		session = withSet(session, "flows.gym", { id: "gym", amount: "2" })
+		session = withAddition(session, { list: "flows", item: { id: "gym", amount: "3" } })
+		session = switchedOff(session, "flows.gym")
+		expect(session.sets).toEqual([])
+		expect(session.additions).toEqual([])
+		// The plan does not hold gym, so a Removal of it would be refused (`No key or id`).
+		expect(session.removals).toEqual([])
+	})
+
+	test("switching off a plan's item holds its try out of what traj reads, and switching it on brings it back", () => {
+		let session = withSet(startWhatIf("base", HASH), "flows.living.amount", "31000.00")
+		session = switchedOff(session, "flows.living")
+		expect(session.removals).toEqual(["flows.living"])
+		// The Set stays in the session, held back: `traj` refuses a Set of a Flow a Removal took out.
+		expect(session.sets).toEqual([{ path: "flows.living.amount", value: "31000.00" }])
+		expect(overridesOf(session)).toEqual({
+			sets: [],
+			removals: ["flows.living"],
+			additions: [],
+		})
+		expect(overridesOf(switchedOn(session, "flows.living"))).toEqual({
+			sets: [{ path: "flows.living.amount", value: "31000.00" }],
+			removals: [],
+			additions: [],
+		})
 	})
 
 	test("dropping a Set leaves the others, and a Removal is not a Set", () => {
