@@ -30,11 +30,11 @@ export interface PlacedLabel {
 }
 
 /**
- * The labels of the markers, each placed. A label is shortened to the nearest rule or plot edge on the
- * side it runs towards, so none crosses a dashed rule or leaves the plot. It takes the other side of its
- * rule when its own has no room, and is left out when neither has room for even its first letter. Markers
- * in x order take the first row whose last label ends before theirs starts, so no two labels overlap.
- * Row 0 is the top. Geometry only: it places text.
+ * The labels of the markers, each placed. A label is tried whole on its preferred side of its rule, then
+ * whole on the other side, then shortened towards the nearest rule or plot edge on whichever side has
+ * more room, so none crosses a dashed rule or leaves the plot. It is left out when neither side holds
+ * even its first letter. Markers in x order take the first row whose last label ends before theirs
+ * starts, so no two labels overlap. Row 0 is the top. Geometry only: it places text.
  */
 export function placedLabels(marks: readonly LabelledMark[], area: LabelArea): PlacedLabel[] {
 	const ends: number[] = []
@@ -56,9 +56,10 @@ export function placedLabels(marks: readonly LabelledMark[], area: LabelArea): P
 }
 
 /**
- * The words of one label and the side they go on: shortened with an ellipsis on whichever side holds that,
- * else the bare first letter. A label past the chart's middle prefers the left, so its words run towards
- * the middle. Undefined when neither side holds anything.
+ * The words of one label and the side they go on: the whole label on its preferred side, else whole on the
+ * other side, else shortened with an ellipsis on whichever side has more room, else the bare first letter.
+ * A label past the chart's middle prefers the left, so its words run towards the middle. Undefined when
+ * neither side holds anything.
  */
 function place(
 	mark: LabelledMark,
@@ -66,12 +67,23 @@ function place(
 	area: LabelArea,
 ): (LabelText & { readonly leftwards: boolean }) | undefined {
 	const preferred = mark.x > area.width / 2
-	for (const shorten of [fitted, stub]) {
-		for (const leftwards of [preferred, !preferred]) {
-			const space = room(mark.x, rules, area, leftwards)
-			const words = shorten(mark.label, space, mark.code === true)
-			if (words.text !== "") return { ...words, leftwards }
+	const code = mark.code === true
+	const sides = [
+		{ leftwards: preferred, space: room(mark.x, rules, area, preferred) },
+		{ leftwards: !preferred, space: room(mark.x, rules, area, !preferred) },
+	] as const
+	for (const side of sides) {
+		const words = fitted(mark.label, side.space, code)
+		if (words.text !== "" && words.text === mark.label) {
+			return { ...words, leftwards: side.leftwards }
 		}
+	}
+	const roomier = sides[1].space > sides[0].space ? sides[1] : sides[0]
+	const shorter = fitted(mark.label, roomier.space, code)
+	if (shorter.text !== "") return { ...shorter, leftwards: roomier.leftwards }
+	for (const side of sides) {
+		const words = stub(mark.label, side.space, code)
+		if (words.text !== "") return { ...words, leftwards: side.leftwards }
 	}
 	return undefined
 }
