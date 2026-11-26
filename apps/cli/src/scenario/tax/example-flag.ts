@@ -14,19 +14,22 @@ const COUNTS: ReadonlySet<Field> = new Set([
 	"disabledCare",
 ])
 
-/** Whether one claim set states this field at more than zero. */
-function held(set: ReturnClaims, field: Field): boolean {
-	if (field === "children") return set.children > 0
-	if (field === "childrenAtHigherRate") return set.childrenAtHigherRate > 0
-	return set.allowances[field as keyof TaxAllowances] > 0
+/** Whether any of these claim sets states this field at more than zero. */
+function held(sets: readonly ReturnClaims[], field: Field): boolean {
+	if (field === "children") return sets.some((set) => set.children > 0)
+	if (field === "childrenAtHigherRate") return sets.some((set) => set.childrenAtHigherRate > 0)
+	return sets.some((set) => set.allowances[field as keyof TaxAllowances] > 0)
 }
 
 /**
- * One example flag that states a claim some of these sets holds, naming `person`: the first field
- * held, with `<n>` for a count and `<amount>` for an amount; `undefined` when they hold nothing.
+ * A flag for every field some of these sets holds, naming `person`: `<n>` for a count and
+ * `<amount>` for an amount, joined by spaces; `undefined` when they hold nothing. A count flag on
+ * its own can be refused beside a kept set's other counts, so the whole command states them all.
  */
-export function exampleFlagOf(sets: readonly ReturnClaims[], person: string): string | undefined {
-	const field = FIELDS.find((name) => sets.some((set) => held(set, name)))
-	if (field === undefined) return undefined
-	return `${flagOf(field)} ${person}=${COUNTS.has(field) ? "<n>" : "<amount>"}`
+export function exampleFlagsOf(sets: readonly ReturnClaims[], person: string): string | undefined {
+	const fields = FIELDS.filter((field) => held(sets, field))
+	if (fields.length === 0) return undefined
+	return fields
+		.map((field) => `${flagOf(field)} ${person}=${COUNTS.has(field) ? "<n>" : "<amount>"}`)
+		.join(" ")
 }

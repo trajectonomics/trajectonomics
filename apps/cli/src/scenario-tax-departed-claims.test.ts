@@ -52,12 +52,12 @@ async function unclaimed(home: string, ...flags: string[]): Promise<string[]> {
 
 /** The sentence for an id no person in the household has, with the placeholder example a separate write gives. */
 function departed(id: string, example: string): string {
-	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person in the household, for example with "<person>=<value>" flags such as ${example} --merge, or with --tax; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person who has a Return, for example with "<person>=<value>" flags such as ${example} --merge; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }
 
 /** The same sentence on a write with no Filers, which refuses a person-qualified value. */
 function departedNoFilers(id: string): string {
-	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person in the household; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+	return `The claims stored for "${id}", who is not in the household, are on no Return. State any that still apply for a person who has a Return; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }
 
 describe("a holder given a new id after claims were stated", () => {

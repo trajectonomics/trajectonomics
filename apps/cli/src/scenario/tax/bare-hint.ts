@@ -1,4 +1,4 @@
-import { exampleFlagOf } from "./example-flag"
+import { exampleFlagsOf } from "./example-flag"
 import type { FilerScope } from "./filer-scope"
 import type { ReturnClaims, TaxRequest } from "./flags"
 
@@ -10,6 +10,9 @@ import type { ReturnClaims, TaxRequest } from "./flags"
 
 /** The words when no Return of this write is the flat claims' person's, so no example flag applies. */
 const OLDER = "so state the holder's own claims again when switching back."
+
+/** The old sentence, byte for byte, for when the caveat can name nobody or no claim to state. */
+const GENERIC = ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, ${OLDER}`
 
 /**
  * The person the caveat may name: whose claims the flat keys are (`claimsHolder`, else the
@@ -29,13 +32,12 @@ export function caveatPerson(
  * How a Return that may claim both spouses' claims states another person's kept claims bare, and what
  * that leaves a later separate filing. The first clause is conditional, so the sentence stays true
  * once followed. The caveat gives the switch-back command in full, because a person-qualified value
- * needs a separate filing, with the first claim the kept set holds as its example.
+ * needs a separate filing, with a flag for every claim the kept sets hold as its example.
  */
 export function bareHint(claims: readonly ReturnClaims[], person: string | undefined): string {
-	const example = person === undefined ? undefined : exampleFlagOf(claims, person)
-	const back =
-		person === undefined || example === undefined
-			? OLDER
-			: `so state ${JSON.stringify(person)}'s own claims again when switching back, for example --filing-status married_separate ${example} --merge.`
-	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as the holder's own, ${back}`
+	if (person === undefined) return GENERIC
+	const example = exampleFlagsOf(claims, person)
+	if (example === undefined) return GENERIC
+	const name = JSON.stringify(person)
+	return ` If this Return does not claim them yet, state them bare with --merge: that replaces the stored flat claims, which a later separate filing reads as ${name}'s own, so state ${name}'s own claims again when switching back, for example --filing-status married_separate ${example} --merge.`
 }

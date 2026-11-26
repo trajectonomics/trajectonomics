@@ -1,5 +1,5 @@
 import type { Household } from "../household/model"
-import { exampleFlagOf } from "./example-flag"
+import { exampleFlagsOf } from "./example-flag"
 import type { ReturnClaims, TaxRequest } from "./flags"
 
 /*
@@ -24,20 +24,21 @@ export function departedClaimants(kept: TaxRequest, household: string | null): s
 
 /**
  * The sentence for one such id. No Return of any filing status counts the stored set, so it does not
- * say the set waits for a separate filing. A set whose claims were stated again under a person in
- * the household stays behind, so the sentence names the one write that drops it. A separate write
- * with Filers shows the person-keyed flag that restates the claims, under a `<person>` placeholder:
- * the old id may have become any person in the household, and any other status refuses the flag.
+ * say the set waits for a separate filing. A set whose claims were stated again under a person who
+ * has a Return stays behind, so the sentence names the one write that drops it. A separate write with
+ * Filers shows a person-keyed flag for every claim it holds, under a `<person>` placeholder: the old
+ * id may have become any person in the household, and any other status refuses the flag.
  */
 export function departedClaims(
 	id: string,
 	claims: ReturnClaims | undefined,
 	separate: boolean,
 ): string {
-	const example = separate && claims !== undefined ? exampleFlagOf([claims], "<person>") : undefined
+	const example =
+		separate && claims !== undefined ? exampleFlagsOf([claims], "<person>") : undefined
 	const how =
 		example === undefined
 			? ""
-			: `, for example with "<person>=<value>" flags such as ${example} --merge, or with --tax`
-	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person in the household${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
+			: `, for example with "<person>=<value>" flags such as ${example} --merge`
+	return `The claims stored for ${JSON.stringify(id)}, who is not in the household, are on no Return. State any that still apply for a person who has a Return${how}; if those claims are already stated for another person, a --tax write drops this set. scenario show lists them under returns until then.`
 }

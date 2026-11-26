@@ -236,12 +236,13 @@ the shared interest for a later switch back; a joint Return claims neither, so s
 interest bare. A write that claims neither says so in `unclaimed`, and a joint or
 no-income-spouse Return adds how to claim the stored claims bare; when the write has a
 Return for the person whose flat claims those are, it names them and gives the switch-back
-command in full, with an example flag (`--filing-status married_separate --parents me=<n>
---merge`). A separate filing names there each person who has stored claims and no taxed
+command in full, with a flag for every claim the kept sets hold, for example
+(`--filing-status married_separate --parents me=<n> --life-insurance me=<amount> --merge`).
+A separate filing names there each person who has stored claims and no taxed
 income. Every write also names there each id in the stored `returns` that no person in the
 household has: no Return counts that set, and a `--tax` write drops it; a separate write
-also shows the person-keyed form that restates them (`--life-insurance <person>=<amount>
---merge`, or `--tax`). The stored profile's `claimsHolder` says whose claims its other
+with Filers also shows the person-keyed form that restates them (`--life-insurance
+<person>=<amount> --merge`). The stored profile's `claimsHolder` says whose claims its other
 keys are, so if the household swaps which person is the holder, each person's claims stay
 theirs. A `projection run` then reports a `filer` on each
 `taxYears` entry, `--carry-in` takes one record per Levy, and `projection allowances`
